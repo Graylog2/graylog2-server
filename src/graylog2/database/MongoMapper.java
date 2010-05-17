@@ -1,0 +1,59 @@
+/**
+ * MongoMapper.java: lennart | Apr 13, 2010 9:13:03 PM
+ */
+
+package graylog2.database;
+
+import com.mongodb.Mongo;
+import com.mongodb.DB;
+import com.mongodb.DBCollection;
+import com.mongodb.BasicDBObject;
+
+import org.productivity.java.syslog4j.server.SyslogServerEventIF;
+
+public class MongoMapper {
+    // TODO: make configurable
+    public static final String MONGO_HOSTNAME = "localhost";
+    public static final int MONGO_PORT = 27017;
+    public static final String MONGO_DB_NAME = "graylog2";
+    public static final int MAX_LOG_ENTRIES = 5000000;
+
+    private Mongo m = null;
+    private DB db = null;
+
+    private boolean connect() {
+        try {
+            this.m = new Mongo(MongoMapper.MONGO_HOSTNAME, MongoMapper.MONGO_PORT);
+            this.db = m.getDB(MongoMapper.MONGO_DB_NAME);
+        } catch (java.net.UnknownHostException e) {
+            return false;
+        }
+
+        return true;
+    }
+
+    public boolean insert(SyslogServerEventIF event) {
+        try {
+            if (!this.connect()) {
+                return false;
+            }
+
+            DBCollection coll = this.db.getCollection("messages");
+            BasicDBObject dbObj = new BasicDBObject();
+            dbObj.put("message", event.getMessage());
+            dbObj.put("date", event.getDate());
+            dbObj.put("host", event.getHost());
+            dbObj.put("facility", event.getFacility());
+            dbObj.put("level", event.getLevel());
+
+            // Inserto BasicDBObject into DBCollection.
+            coll.insert(dbObj);
+        } catch(Exception e) {
+            // XXX: System.out.println("ERROR: " + e.toString());
+            return false;
+        }
+
+        return true;
+    }
+
+}
