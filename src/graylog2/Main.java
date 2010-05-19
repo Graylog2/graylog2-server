@@ -20,6 +20,8 @@
 
 package graylog2;
 
+// TODO: (optional) mongo authentication
+
 /**
  *
  * @author Lennart Koopmann <lennart@scopeport.org>
