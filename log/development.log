@@ -1,0 +1,508 @@
+
+
+Processing WelcomeController#index (for 127.0.0.1 at 2010-05-19 17:16:48) [GET]
+
+ActionController::UnknownAction (No action responded to index. Actions: ):
+  /usr/lib/ruby/1.8/webrick/httpserver.rb:104:in `service'
+  /usr/lib/ruby/1.8/webrick/httpserver.rb:65:in `run'
+  /usr/lib/ruby/1.8/webrick/server.rb:173:in `start_thread'
+  /usr/lib/ruby/1.8/webrick/server.rb:162:in `start'
+  /usr/lib/ruby/1.8/webrick/server.rb:162:in `start_thread'
+  /usr/lib/ruby/1.8/webrick/server.rb:95:in `start'
+  /usr/lib/ruby/1.8/webrick/server.rb:92:in `each'
+  /usr/lib/ruby/1.8/webrick/server.rb:92:in `start'
+  /usr/lib/ruby/1.8/webrick/server.rb:23:in `start'
+  /usr/lib/ruby/1.8/webrick/server.rb:82:in `start'
+
+Rendering rescues/layout (not_found)
+
+
+Processing WelcomeController#index (for 127.0.0.1 at 2010-05-19 17:17:05) [GET]
+Completed in 3ms (View: 1, DB: 0) | 200 OK [http://localhost/]
+
+
+Processing WelcomeController#index (for 127.0.0.1 at 2010-05-19 17:17:05) [GET]
+Completed in 2ms (View: 0, DB: 0) | 200 OK [http://localhost/]
+
+
+Processing WelcomeController#index (for 127.0.0.1 at 2010-05-19 17:17:15) [GET]
+Completed in 3ms (View: 1, DB: 0) | 200 OK [http://localhost/]
+
+
+Processing WelcomeController#index (for 127.0.0.1 at 2010-05-19 17:17:34) [GET]
+
+NameError (uninitialized constant Message::MongoMapper):
+  app/models/message.rb:2
+  app/controllers/welcome_controller.rb:5:in `index'
+  /usr/lib/ruby/1.8/webrick/httpserver.rb:104:in `service'
+  /usr/lib/ruby/1.8/webrick/httpserver.rb:65:in `run'
+  /usr/lib/ruby/1.8/webrick/server.rb:173:in `start_thread'
+  /usr/lib/ruby/1.8/webrick/server.rb:162:in `start'
+  /usr/lib/ruby/1.8/webrick/server.rb:162:in `start_thread'
+  /usr/lib/ruby/1.8/webrick/server.rb:95:in `start'
+  /usr/lib/ruby/1.8/webrick/server.rb:92:in `each'
+  /usr/lib/ruby/1.8/webrick/server.rb:92:in `start'
+  /usr/lib/ruby/1.8/webrick/server.rb:23:in `start'
+  /usr/lib/ruby/1.8/webrick/server.rb:82:in `start'
+
+Rendered rescues/_trace (37.6ms)
+Rendered rescues/_request_and_response (1.2ms)
+Rendering rescues/layout (internal_server_error)
+
+
+Processing WelcomeController#index (for 127.0.0.1 at 2010-05-19 17:17:54) [GET]
+
+NameError (uninitialized constant Message::MongoMapper):
+  app/models/message.rb:2
+  app/controllers/welcome_controller.rb:5:in `index'
+  /usr/lib/ruby/1.8/webrick/httpserver.rb:104:in `service'
+  /usr/lib/ruby/1.8/webrick/httpserver.rb:65:in `run'
+  /usr/lib/ruby/1.8/webrick/server.rb:173:in `start_thread'
+  /usr/lib/ruby/1.8/webrick/server.rb:162:in `start'
+  /usr/lib/ruby/1.8/webrick/server.rb:162:in `start_thread'
+  /usr/lib/ruby/1.8/webrick/server.rb:95:in `start'
+  /usr/lib/ruby/1.8/webrick/server.rb:92:in `each'
+  /usr/lib/ruby/1.8/webrick/server.rb:92:in `start'
+  /usr/lib/ruby/1.8/webrick/server.rb:23:in `start'
+  /usr/lib/ruby/1.8/webrick/server.rb:82:in `start'
+
+Rendered rescues/_trace (37.1ms)
+Rendered rescues/_request_and_response (1.1ms)
+Rendering rescues/layout (internal_server_error)
+
+
+Processing WelcomeController#index (for 127.0.0.1 at 2010-05-19 17:18:50) [GET]
+Completed in 86ms (View: 1, DB: 0) | 200 OK [http://localhost/]
+
+
+Processing WelcomeController#index (for 127.0.0.1 at 2010-05-19 17:19:04) [GET]
+Completed in 9ms (View: 1, DB: 0) | 200 OK [http://localhost/]
+
+
+Processing WelcomeController#index (for 127.0.0.1 at 2010-05-19 17:19:22) [GET]
+Completed in 10ms (View: 1, DB: 0) | 200 OK [http://localhost/]
+
+
+Processing WelcomeController#index (for 127.0.0.1 at 2010-05-19 17:19:23) [GET]
+Completed in 9ms (View: 1, DB: 0) | 200 OK [http://localhost/]
+
+
+Processing WelcomeController#index (for 127.0.0.1 at 2010-05-19 17:19:24) [GET]
+Completed in 9ms (View: 0, DB: 0) | 200 OK [http://localhost/]
+
+
+Processing WelcomeController#index (for 127.0.0.1 at 2010-05-19 17:19:24) [GET]
+Completed in 11ms (View: 1, DB: 0) | 200 OK [http://localhost/]
+
+
+Processing WelcomeController#index (for 127.0.0.1 at 2010-05-19 17:19:32) [GET]
+Completed in 8ms (View: 0, DB: 0) | 200 OK [http://localhost/]
+
+
+Processing WelcomeController#index (for 127.0.0.1 at 2010-05-19 17:19:55) [GET]
+Completed in 9ms (View: 1, DB: 0) | 200 OK [http://localhost/]
+
+
+Processing WelcomeController#index (for 127.0.0.1 at 2010-05-19 17:20:53) [GET]
+Completed in 88ms (View: 1, DB: 0) | 200 OK [http://localhost/]
+
+
+Processing WelcomeController#index (for 127.0.0.1 at 2010-05-19 17:22:22) [GET]
+Completed in 2ms (View: 0, DB: 0) | 200 OK [http://localhost/]
+
+
+Processing WelcomeController#index (for 127.0.0.1 at 2010-05-19 17:22:39) [GET]
+Completed in 7ms (View: 1, DB: 0) | 200 OK [http://localhost/]
+
+
+Processing WelcomeController#index (for 127.0.0.1 at 2010-05-19 17:22:40) [GET]
+Completed in 7ms (View: 0, DB: 0) | 200 OK [http://localhost/]
+
+
+Processing WelcomeController#index (for 127.0.0.1 at 2010-05-19 17:22:40) [GET]
+Completed in 8ms (View: 1, DB: 0) | 200 OK [http://localhost/]
+
+
+Processing WelcomeController#index (for 127.0.0.1 at 2010-05-19 17:22:40) [GET]
+Completed in 8ms (View: 0, DB: 0) | 200 OK [http://localhost/]
+
+
+Processing WelcomeController#index (for 127.0.0.1 at 2010-05-19 17:22:45) [GET]
+Completed in 7ms (View: 0, DB: 0) | 200 OK [http://localhost/]
+
+
+Processing WelcomeController#index (for 127.0.0.1 at 2010-05-19 17:22:50) [GET]
+
+NameError (uninitialized constant WelcomeController::Messages):
+  app/controllers/welcome_controller.rb:5:in `index'
+  /usr/lib/ruby/1.8/webrick/httpserver.rb:104:in `service'
+  /usr/lib/ruby/1.8/webrick/httpserver.rb:65:in `run'
+  /usr/lib/ruby/1.8/webrick/server.rb:173:in `start_thread'
+  /usr/lib/ruby/1.8/webrick/server.rb:162:in `start'
+  /usr/lib/ruby/1.8/webrick/server.rb:162:in `start_thread'
+  /usr/lib/ruby/1.8/webrick/server.rb:95:in `start'
+  /usr/lib/ruby/1.8/webrick/server.rb:92:in `each'
+  /usr/lib/ruby/1.8/webrick/server.rb:92:in `start'
+  /usr/lib/ruby/1.8/webrick/server.rb:23:in `start'
+  /usr/lib/ruby/1.8/webrick/server.rb:82:in `start'
+
+Rendered rescues/_trace (97.6ms)
+Rendered rescues/_request_and_response (1.3ms)
+Rendering rescues/layout (internal_server_error)
+
+
+Processing WelcomeController#index (for 127.0.0.1 at 2010-05-19 17:22:57) [GET]
+Completed in 8ms (View: 1, DB: 0) | 200 OK [http://localhost/]
+
+
+Processing WelcomeController#index (for 127.0.0.1 at 2010-05-19 17:24:10) [GET]
+
+Mongo::ConnectionFailure (Operation failed with the following exception: connection closed):
+  mongo (1.0) lib/./lib/mongo/connection.rb:699:in `receive_message_on_socket'
+  mongo (1.0) lib/./lib/mongo/connection.rb:604:in `receive_header'
+  mongo (1.0) lib/./lib/mongo/connection.rb:597:in `receive'
+  mongo (1.0) lib/./lib/mongo/connection.rb:394:in `receive_message'
+  mongo (1.0) lib/./lib/mongo/connection.rb:392:in `synchronize'
+  mongo (1.0) lib/./lib/mongo/connection.rb:392:in `receive_message'
+  mongo (1.0) lib/./lib/mongo/cursor.rb:328:in `refill_via_get_more'
+  mongo (1.0) lib/./lib/mongo/cursor.rb:311:in `num_remaining'
+  mongo (1.0) lib/./lib/mongo/cursor.rb:87:in `has_next?'
+  mongo (1.0) lib/./lib/mongo/cursor.rb:181:in `each'
+  plucky (0.1.1) lib/plucky/query.rb:31:in `all'
+  plucky (0.1.1) lib/plucky/query.rb:30:in `tap'
+  plucky (0.1.1) lib/plucky/query.rb:30:in `all'
+  /usr/lib/ruby/gems/1.8/gems/mongo_mapper-0.7.6/lib/mongo_mapper/query.rb:12:in `send'
+  /usr/lib/ruby/gems/1.8/gems/mongo_mapper-0.7.6/lib/mongo_mapper/query.rb:12:in `method_missing'
+  /usr/lib/ruby/gems/1.8/gems/mongo_mapper-0.7.6/lib/mongo_mapper/document.rb:193:in `find_many'
+  /usr/lib/ruby/gems/1.8/gems/mongo_mapper-0.7.6/lib/mongo_mapper/document.rb:97:in `all'
+  app/controllers/welcome_controller.rb:5:in `index'
+  /usr/lib/ruby/1.8/webrick/httpserver.rb:104:in `service'
+  /usr/lib/ruby/1.8/webrick/httpserver.rb:65:in `run'
+  /usr/lib/ruby/1.8/webrick/server.rb:173:in `start_thread'
+  /usr/lib/ruby/1.8/webrick/server.rb:162:in `start'
+  /usr/lib/ruby/1.8/webrick/server.rb:162:in `start_thread'
+  /usr/lib/ruby/1.8/webrick/server.rb:95:in `start'
+  /usr/lib/ruby/1.8/webrick/server.rb:92:in `each'
+  /usr/lib/ruby/1.8/webrick/server.rb:92:in `start'
+  /usr/lib/ruby/1.8/webrick/server.rb:23:in `start'
+  /usr/lib/ruby/1.8/webrick/server.rb:82:in `start'
+
+Rendered rescues/_trace (39.5ms)
+Rendered rescues/_request_and_response (0.3ms)
+Rendering rescues/layout (internal_server_error)
+
+
+Processing WelcomeController#index (for 127.0.0.1 at 2010-05-19 17:25:36) [GET]
+Completed in 347ms (View: 1, DB: 0) | 200 OK [http://localhost/]
+
+
+Processing WelcomeController#index (for 127.0.0.1 at 2010-05-19 17:25:53) [GET]
+
+MongoMapper::KeyNotFound (Could not find key: 0):
+  /usr/lib/ruby/gems/1.8/gems/mongo_mapper-0.7.6/lib/mongo_mapper/plugins/keys.rb:302:in `read_key'
+  /usr/lib/ruby/gems/1.8/gems/mongo_mapper-0.7.6/lib/mongo_mapper/plugins/keys.rb:237:in `[]'
+  app/controllers/welcome_controller.rb:5:in `index'
+  /usr/lib/ruby/1.8/webrick/httpserver.rb:104:in `service'
+  /usr/lib/ruby/1.8/webrick/httpserver.rb:65:in `run'
+  /usr/lib/ruby/1.8/webrick/server.rb:173:in `start_thread'
+  /usr/lib/ruby/1.8/webrick/server.rb:162:in `start'
+  /usr/lib/ruby/1.8/webrick/server.rb:162:in `start_thread'
+  /usr/lib/ruby/1.8/webrick/server.rb:95:in `start'
+  /usr/lib/ruby/1.8/webrick/server.rb:92:in `each'
+  /usr/lib/ruby/1.8/webrick/server.rb:92:in `start'
+  /usr/lib/ruby/1.8/webrick/server.rb:23:in `start'
+  /usr/lib/ruby/1.8/webrick/server.rb:82:in `start'
+
+Rendered rescues/_trace (31.1ms)
+Rendered rescues/_request_and_response (1.3ms)
+Rendering rescues/layout (internal_server_error)
+
+
+Processing WelcomeController#index (for 127.0.0.1 at 2010-05-19 17:26:03) [GET]
+Completed in 9ms (View: 1, DB: 0) | 200 OK [http://localhost/]
+
+
+Processing WelcomeController#index (for 127.0.0.1 at 2010-05-19 17:26:14) [GET]
+Completed in 9ms (View: 1, DB: 0) | 200 OK [http://localhost/]
+
+
+Processing ApplicationController#index (for 127.0.0.1 at 2010-05-19 17:27:30) [GET]
+
+SyntaxError (/home/lennart/workspace/gs-web/app/controllers/welcome_controller.rb:3: syntax error, unexpected tCONSTANT, expecting kEND
+    @hits Message.all(:facility => 18).count
+                 ^):
+  /usr/lib/ruby/1.8/webrick/httpserver.rb:104:in `service'
+  /usr/lib/ruby/1.8/webrick/httpserver.rb:65:in `run'
+  /usr/lib/ruby/1.8/webrick/server.rb:173:in `start_thread'
+  /usr/lib/ruby/1.8/webrick/server.rb:162:in `start'
+  /usr/lib/ruby/1.8/webrick/server.rb:162:in `start_thread'
+  /usr/lib/ruby/1.8/webrick/server.rb:95:in `start'
+  /usr/lib/ruby/1.8/webrick/server.rb:92:in `each'
+  /usr/lib/ruby/1.8/webrick/server.rb:92:in `start'
+  /usr/lib/ruby/1.8/webrick/server.rb:23:in `start'
+  /usr/lib/ruby/1.8/webrick/server.rb:82:in `start'
+
+Rendered rescues/_trace (98.2ms)
+Rendered rescues/_request_and_response (0.4ms)
+Rendering rescues/layout (internal_server_error)
+
+
+Processing WelcomeController#index (for 127.0.0.1 at 2010-05-19 17:27:40) [GET]
+
+
+Processing WelcomeController#index (for 127.0.0.1 at 2010-05-19 17:32:30) [GET]
+Rendering welcome/index
+Completed in 129ms (View: 8, DB: 0) | 200 OK [http://localhost/]
+
+
+Processing WelcomeController#index (for 127.0.0.1 at 2010-05-19 17:32:35) [GET]
+Rendering welcome/index
+Completed in 296ms (View: 1, DB: 0) | 200 OK [http://localhost/]
+
+
+Processing WelcomeController#index (for 127.0.0.1 at 2010-05-19 17:32:38) [GET]
+
+Mongo::ConnectionFailure (Operation failed with the following exception: connection closed):
+  mongo (1.0) lib/./lib/mongo/connection.rb:699:in `receive_message_on_socket'
+  mongo (1.0) lib/./lib/mongo/connection.rb:604:in `receive_header'
+  mongo (1.0) lib/./lib/mongo/connection.rb:597:in `receive'
+  mongo (1.0) lib/./lib/mongo/connection.rb:394:in `receive_message'
+  mongo (1.0) lib/./lib/mongo/connection.rb:392:in `synchronize'
+  mongo (1.0) lib/./lib/mongo/connection.rb:392:in `receive_message'
+  mongo (1.0) lib/./lib/mongo/cursor.rb:328:in `refill_via_get_more'
+  mongo (1.0) lib/./lib/mongo/cursor.rb:311:in `num_remaining'
+  mongo (1.0) lib/./lib/mongo/cursor.rb:87:in `has_next?'
+  mongo (1.0) lib/./lib/mongo/cursor.rb:181:in `each'
+  plucky (0.1.1) lib/plucky/query.rb:31:in `all'
+  plucky (0.1.1) lib/plucky/query.rb:30:in `tap'
+  plucky (0.1.1) lib/plucky/query.rb:30:in `all'
+  /usr/lib/ruby/gems/1.8/gems/mongo_mapper-0.7.6/lib/mongo_mapper/query.rb:12:in `send'
+  /usr/lib/ruby/gems/1.8/gems/mongo_mapper-0.7.6/lib/mongo_mapper/query.rb:12:in `method_missing'
+  /usr/lib/ruby/gems/1.8/gems/mongo_mapper-0.7.6/lib/mongo_mapper/document.rb:193:in `find_many'
+  /usr/lib/ruby/gems/1.8/gems/mongo_mapper-0.7.6/lib/mongo_mapper/document.rb:97:in `all'
+  app/controllers/welcome_controller.rb:3:in `index'
+  /usr/lib/ruby/1.8/webrick/httpserver.rb:104:in `service'
+  /usr/lib/ruby/1.8/webrick/httpserver.rb:65:in `run'
+  /usr/lib/ruby/1.8/webrick/server.rb:173:in `start_thread'
+  /usr/lib/ruby/1.8/webrick/server.rb:162:in `start'
+  /usr/lib/ruby/1.8/webrick/server.rb:162:in `start_thread'
+  /usr/lib/ruby/1.8/webrick/server.rb:95:in `start'
+  /usr/lib/ruby/1.8/webrick/server.rb:92:in `each'
+  /usr/lib/ruby/1.8/webrick/server.rb:92:in `start'
+  /usr/lib/ruby/1.8/webrick/server.rb:23:in `start'
+  /usr/lib/ruby/1.8/webrick/server.rb:82:in `start'
+
+Rendered rescues/_trace (39.1ms)
+Rendered rescues/_request_and_response (1.3ms)
+Rendering rescues/layout (internal_server_error)
+
+
+Processing WelcomeController#index (for 127.0.0.1 at 2010-05-19 17:33:11) [GET]
+Rendering welcome/index
+Completed in 359ms (View: 2, DB: 0) | 200 OK [http://localhost/]
+
+
+Processing WelcomeController#index (for 127.0.0.1 at 2010-05-19 17:37:39) [GET]
+
+NameError (uninitialized constant WelcomeController::FinderOptions):
+  app/controllers/welcome_controller.rb:3:in `index'
+  /usr/lib/ruby/1.8/webrick/httpserver.rb:104:in `service'
+  /usr/lib/ruby/1.8/webrick/httpserver.rb:65:in `run'
+  /usr/lib/ruby/1.8/webrick/server.rb:173:in `start_thread'
+  /usr/lib/ruby/1.8/webrick/server.rb:162:in `start'
+  /usr/lib/ruby/1.8/webrick/server.rb:162:in `start_thread'
+  /usr/lib/ruby/1.8/webrick/server.rb:95:in `start'
+  /usr/lib/ruby/1.8/webrick/server.rb:92:in `each'
+  /usr/lib/ruby/1.8/webrick/server.rb:92:in `start'
+  /usr/lib/ruby/1.8/webrick/server.rb:23:in `start'
+  /usr/lib/ruby/1.8/webrick/server.rb:82:in `start'
+
+Rendered rescues/_trace (29.7ms)
+Rendered rescues/_request_and_response (0.3ms)
+Rendering rescues/layout (internal_server_error)
+
+
+Processing WelcomeController#index (for 127.0.0.1 at 2010-05-19 17:38:03) [GET]
+
+NameError (uninitialized constant WelcomeController::FinderOptions):
+  app/controllers/welcome_controller.rb:4:in `index'
+  /usr/lib/ruby/1.8/webrick/httpserver.rb:104:in `service'
+  /usr/lib/ruby/1.8/webrick/httpserver.rb:65:in `run'
+  /usr/lib/ruby/1.8/webrick/server.rb:173:in `start_thread'
+  /usr/lib/ruby/1.8/webrick/server.rb:162:in `start'
+  /usr/lib/ruby/1.8/webrick/server.rb:162:in `start_thread'
+  /usr/lib/ruby/1.8/webrick/server.rb:95:in `start'
+  /usr/lib/ruby/1.8/webrick/server.rb:92:in `each'
+  /usr/lib/ruby/1.8/webrick/server.rb:92:in `start'
+  /usr/lib/ruby/1.8/webrick/server.rb:23:in `start'
+  /usr/lib/ruby/1.8/webrick/server.rb:82:in `start'
+
+Rendered rescues/_trace (248.5ms)
+Rendered rescues/_request_and_response (0.4ms)
+Rendering rescues/layout (internal_server_error)
+
+
+Processing WelcomeController#index (for 127.0.0.1 at 2010-05-19 17:40:52) [GET]
+Rendering welcome/index
+Completed in 61ms (View: 1, DB: 0) | 200 OK [http://localhost/]
+
+
+Processing ApplicationController#index (for 127.0.0.1 at 2010-05-19 17:41:17) [GET]
+
+SyntaxError (/home/lennart/workspace/gs-web/app/controllers/welcome_controller.rb:3: syntax error, unexpected $undefined
+    @hits = Message.count(:message => \www\, :limit => 20000)
+                                       ^):
+  /usr/lib/ruby/1.8/webrick/httpserver.rb:104:in `service'
+  /usr/lib/ruby/1.8/webrick/httpserver.rb:65:in `run'
+  /usr/lib/ruby/1.8/webrick/server.rb:173:in `start_thread'
+  /usr/lib/ruby/1.8/webrick/server.rb:162:in `start'
+  /usr/lib/ruby/1.8/webrick/server.rb:162:in `start_thread'
+  /usr/lib/ruby/1.8/webrick/server.rb:95:in `start'
+  /usr/lib/ruby/1.8/webrick/server.rb:92:in `each'
+  /usr/lib/ruby/1.8/webrick/server.rb:92:in `start'
+  /usr/lib/ruby/1.8/webrick/server.rb:23:in `start'
+  /usr/lib/ruby/1.8/webrick/server.rb:82:in `start'
+
+Rendered rescues/_trace (26.6ms)
+Rendered rescues/_request_and_response (0.3ms)
+Rendering rescues/layout (internal_server_error)
+
+
+Processing ApplicationController#index (for 127.0.0.1 at 2010-05-19 17:41:45) [GET]
+
+SyntaxError (/home/lennart/workspace/gs-web/app/controllers/welcome_controller.rb:3: unterminated string meets end of file
+/home/lennart/workspace/gs-web/app/controllers/welcome_controller.rb:3: syntax error, unexpected $end, expecting ')'):
+  /usr/lib/ruby/1.8/webrick/httpserver.rb:104:in `service'
+  /usr/lib/ruby/1.8/webrick/httpserver.rb:65:in `run'
+  /usr/lib/ruby/1.8/webrick/server.rb:173:in `start_thread'
+  /usr/lib/ruby/1.8/webrick/server.rb:162:in `start'
+  /usr/lib/ruby/1.8/webrick/server.rb:162:in `start_thread'
+  /usr/lib/ruby/1.8/webrick/server.rb:95:in `start'
+  /usr/lib/ruby/1.8/webrick/server.rb:92:in `each'
+  /usr/lib/ruby/1.8/webrick/server.rb:92:in `start'
+  /usr/lib/ruby/1.8/webrick/server.rb:23:in `start'
+  /usr/lib/ruby/1.8/webrick/server.rb:82:in `start'
+
+Rendered rescues/_trace (26.3ms)
+Rendered rescues/_request_and_response (0.3ms)
+Rendering rescues/layout (internal_server_error)
+
+
+Processing ApplicationController#index (for 127.0.0.1 at 2010-05-19 17:41:53) [GET]
+
+SyntaxError (/home/lennart/workspace/gs-web/app/controllers/welcome_controller.rb:3: syntax error, unexpected $undefined
+    @hits = Message.count(:message => \www\, :limit => 20000)
+                                       ^):
+  /usr/lib/ruby/1.8/webrick/httpserver.rb:104:in `service'
+  /usr/lib/ruby/1.8/webrick/httpserver.rb:65:in `run'
+  /usr/lib/ruby/1.8/webrick/server.rb:173:in `start_thread'
+  /usr/lib/ruby/1.8/webrick/server.rb:162:in `start'
+  /usr/lib/ruby/1.8/webrick/server.rb:162:in `start_thread'
+  /usr/lib/ruby/1.8/webrick/server.rb:95:in `start'
+  /usr/lib/ruby/1.8/webrick/server.rb:92:in `each'
+  /usr/lib/ruby/1.8/webrick/server.rb:92:in `start'
+  /usr/lib/ruby/1.8/webrick/server.rb:23:in `start'
+  /usr/lib/ruby/1.8/webrick/server.rb:82:in `start'
+
+Rendered rescues/_trace (29.5ms)
+Rendered rescues/_request_and_response (0.3ms)
+Rendering rescues/layout (internal_server_error)
+
+
+Processing ApplicationController#index (for 127.0.0.1 at 2010-05-19 17:42:01) [GET]
+
+SyntaxError (/home/lennart/workspace/gs-web/app/controllers/welcome_controller.rb:3: syntax error, unexpected $undefined
+    @hits = Message.count(:message => \www\i, :limit => 20000)
+                                       ^
+/home/lennart/workspace/gs-web/app/controllers/welcome_controller.rb:3: syntax error, unexpected tASSOC, expecting tCOLON2 or '[' or '.'
+    @hits = Message.count(:message => \www\i, :limit => 20000)
+                                                       ^):
+  /usr/lib/ruby/1.8/webrick/httpserver.rb:104:in `service'
+  /usr/lib/ruby/1.8/webrick/httpserver.rb:65:in `run'
+  /usr/lib/ruby/1.8/webrick/server.rb:173:in `start_thread'
+  /usr/lib/ruby/1.8/webrick/server.rb:162:in `start'
+  /usr/lib/ruby/1.8/webrick/server.rb:162:in `start_thread'
+  /usr/lib/ruby/1.8/webrick/server.rb:95:in `start'
+  /usr/lib/ruby/1.8/webrick/server.rb:92:in `each'
+  /usr/lib/ruby/1.8/webrick/server.rb:92:in `start'
+  /usr/lib/ruby/1.8/webrick/server.rb:23:in `start'
+  /usr/lib/ruby/1.8/webrick/server.rb:82:in `start'
+
+Rendered rescues/_trace (26.9ms)
+Rendered rescues/_request_and_response (0.3ms)
+Rendering rescues/layout (internal_server_error)
+
+
+Processing WelcomeController#index (for 127.0.0.1 at 2010-05-19 17:43:38) [GET]
+Rendering welcome/index
+Completed in 840ms (View: 1, DB: 0) | 200 OK [http://localhost/]
+
+
+Processing WelcomeController#index (for 127.0.0.1 at 2010-05-19 17:43:40) [GET]
+Rendering welcome/index
+Completed in 856ms (View: 1, DB: 0) | 200 OK [http://localhost/]
+
+
+Processing WelcomeController#index (for 127.0.0.1 at 2010-05-19 17:43:49) [GET]
+Rendering welcome/index
+Completed in 839ms (View: 1, DB: 0) | 200 OK [http://localhost/]
+
+
+Processing WelcomeController#index (for 127.0.0.1 at 2010-05-19 17:43:56) [GET]
+Rendering welcome/index
+Completed in 79ms (View: 1, DB: 0) | 200 OK [http://localhost/]
+
+
+Processing WelcomeController#index (for 127.0.0.1 at 2010-05-19 17:44:12) [GET]
+
+NameError (undefined local variable or method `message' for #<WelcomeController:0x7f3b06610628>):
+  app/controllers/welcome_controller.rb:3:in `index'
+  /usr/lib/ruby/1.8/webrick/httpserver.rb:104:in `service'
+  /usr/lib/ruby/1.8/webrick/httpserver.rb:65:in `run'
+  /usr/lib/ruby/1.8/webrick/server.rb:173:in `start_thread'
+  /usr/lib/ruby/1.8/webrick/server.rb:162:in `start'
+  /usr/lib/ruby/1.8/webrick/server.rb:162:in `start_thread'
+  /usr/lib/ruby/1.8/webrick/server.rb:95:in `start'
+  /usr/lib/ruby/1.8/webrick/server.rb:92:in `each'
+  /usr/lib/ruby/1.8/webrick/server.rb:92:in `start'
+  /usr/lib/ruby/1.8/webrick/server.rb:23:in `start'
+  /usr/lib/ruby/1.8/webrick/server.rb:82:in `start'
+
+Rendered rescues/_trace (30.6ms)
+Rendered rescues/_request_and_response (0.3ms)
+Rendering rescues/layout (internal_server_error)
+
+
+Processing WelcomeController#index (for 127.0.0.1 at 2010-05-19 17:44:19) [GET]
+Rendering welcome/index
+Completed in 81ms (View: 1, DB: 0) | 200 OK [http://localhost/]
+
+
+Processing WelcomeController#index (for 127.0.0.1 at 2010-05-19 17:44:20) [GET]
+Rendering welcome/index
+Completed in 81ms (View: 1, DB: 0) | 200 OK [http://localhost/]
+
+
+Processing WelcomeController#index (for 127.0.0.1 at 2010-05-19 17:44:41) [GET]
+Rendering welcome/index
+Completed in 79ms (View: 1, DB: 0) | 200 OK [http://localhost/]
+
+
+Processing WelcomeController#index (for 127.0.0.1 at 2010-05-19 17:44:56) [GET]
+Rendering welcome/index
+Completed in 79ms (View: 1, DB: 0) | 200 OK [http://localhost/]
+
+
+Processing WelcomeController#index (for 127.0.0.1 at 2010-05-19 17:45:09) [GET]
+Rendering welcome/index
+Completed in 82ms (View: 1, DB: 0) | 200 OK [http://localhost/]
+
+
+Processing WelcomeController#index (for 127.0.0.1 at 2010-05-19 17:45:14) [GET]
+Rendering welcome/index
+Completed in 8ms (View: 1, DB: 0) | 200 OK [http://localhost/]
+
+
+Processing WelcomeController#index (for 127.0.0.1 at 2010-05-19 17:45:19) [GET]
+Rendering welcome/index
+Completed in 885ms (View: 1, DB: 0) | 200 OK [http://localhost/]
