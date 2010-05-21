@@ -19,30 +19,16 @@
  */
 
 /**
- * SyslogServerThread.java: Lennart Koopmann <lennart@scopeport.org> | May 17, 2010 9:23:33 PM
+ * SystemStatisticThread.java: Lennart Koopmann <lennart@scopeport.org> | May 21, 2010 6:42:25 PM
  */
 
 package graylog2;
 
-import org.productivity.java.syslog4j.server.SyslogServer;
-import org.productivity.java.syslog4j.server.SyslogServerIF;
 
-public class SyslogServerThread extends Thread {
-
-    private int port = 0;
-
-    public SyslogServerThread(int port) {
-        this.port = port;
-    }
+public class SystemStatisticThread extends Thread {
 
     @Override public void run() {
-        SyslogServerIF syslogServer = SyslogServer.getInstance("udp");
         
-        syslogServer.getConfig().setPort(port);
-        syslogServer.getConfig().addEventHandler(new SyslogEventHandler());
-
-        syslogServer = SyslogServer.getThreadedInstance("udp");
-        Main.syslogCoreThread = syslogServer.getThread();
     }
 
 }

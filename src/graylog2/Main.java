@@ -20,9 +20,10 @@
 
 package graylog2;
 
-import java.io.FileInputStream;
-import java.util.Properties;
 
+import java.io.FileInputStream;
+import java.util.ArrayList;
+import java.util.Properties;
 
 /**
  *
@@ -34,6 +35,8 @@ public class Main {
 
     // This holds the configuration from /etc/graylog2.conf
     public static Properties masterConfig = null;
+
+    public static Thread syslogCoreThread = null;
 
     /**
      * @param args the command line arguments
@@ -50,8 +53,28 @@ public class Main {
             configStream.close();
         } catch(java.io.IOException e) {
             System.out.println("Could not read config file: " + e.toString());
-        } finally {
+        }
 
+        // Define required configuration fields.
+        ArrayList requiredConfigFields = new ArrayList();
+        requiredConfigFields.add("syslog_listen_port");
+        requiredConfigFields.add("mongodb_user");
+        requiredConfigFields.add("mongodb_password");
+        requiredConfigFields.add("mongodb_host");
+        requiredConfigFields.add("mongodb_database");
+        requiredConfigFields.add("mongodb_port");
+
+        // Check if all required configuration fields are set.
+        for (Object requiredConfigFieldO : requiredConfigFields) {
+            String requiredConfigField = (String) requiredConfigFieldO;
+            try {
+                if (Main.masterConfig.getProperty(requiredConfigField).length() <= 0) {
+                    throw new Exception("Not set");
+                }
+            } catch (Exception e) {
+                System.out.println("Missing configuration variable '" + requiredConfigField + "' - Terminating. (" + e.toString() + ")");
+                System.exit(1); // Exit with error.
+            }
         }
 
         // Are we in debug mode?
@@ -63,8 +86,20 @@ public class Main {
         }
 
         // Start the Syslog thread that accepts syslog packages.
-        SyslogServerThread syslogServerThread = new SyslogServerThread();
+        SyslogServerThread syslogServerThread = new SyslogServerThread(Integer.parseInt(Main.masterConfig.getProperty("syslog_listen_port")));
         syslogServerThread.start();
+
+        // Check if the thread started up completely.
+        try { Thread.sleep(1000); } catch(InterruptedException e) {}
+        if(!syslogCoreThread.isAlive()) {
+            System.out.println("Could not start syslog server core thread. Do you have permissions to listen on UDP port " + Main.masterConfig.getProperty("syslog_listen_port") + "?");
+            System.exit(1); // Exit with error.
+        }
+
+        // Start the thread that continously collects system information.
+        SystemStatisticThread systemStatisticThread = new SystemStatisticThread();
+        systemStatisticThread.start();
+        System.out.println("[x] System statistic thread is up.");
 
         System.out.println("[x] Syslog server up and running.");
     }

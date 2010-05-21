@@ -31,7 +31,7 @@ import org.productivity.java.syslog4j.server.SyslogServerIF;
 
 public class SyslogEventHandler implements SyslogServerEventHandlerIF {
     
-    public void event(SyslogServerIF syslogServer, SyslogServerEventIF event) {
+    @Override public void event(SyslogServerIF syslogServer, SyslogServerEventIF event) {
         if (Main.debugMode) {
             Log.info("Received message: " + event.getMessage());
             Log.info("Date: " + event.getDate());
