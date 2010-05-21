@@ -49,7 +49,12 @@ public class SyslogEventHandler implements SyslogServerEventHandlerIF {
                 Integer.valueOf(Main.masterConfig.getProperty("mongodb_port"))
         );
 
-        m.insert(event);
+        // Insert into database.
+        try {
+            m.insert(event);
+        } catch (Exception e) {
+            Log.crit("Could not insert syslog event into database: " + e.toString());
+        }
     }
 
 }

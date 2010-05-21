@@ -50,35 +50,27 @@ public class MongoMapper {
         }
     }
 
-    public boolean insert(SyslogServerEventIF event) {
-        try {
-            this.connect();
-            
-            DBCollection coll = null;
+    public void insert(SyslogServerEventIF event) throws Exception {
+        this.connect();
 
-            // Create a capped collection if the collection does not yet exist.
-            if(db.getCollectionNames().contains("messages")) {
-                coll = db.getCollection("messages");
-            } else {
-                coll = db.createCollection("messages", BasicDBObjectBuilder.start().add("capped", true).add("size", MongoMapper.MAX_MESSAGE_SIZE).get());
-            }
+        DBCollection coll = null;
 
-            BasicDBObject dbObj = new BasicDBObject();
-            dbObj.put("message", event.getMessage());
-            dbObj.put("date", event.getDate());
-            dbObj.put("host", event.getHost());
-            dbObj.put("facility", event.getFacility());
-            dbObj.put("level", event.getLevel());
-
-            // Inserto BasicDBObject into DBCollection.
-            coll.insert(dbObj);
-        } catch(Exception e) {
-            // Something failed. Log and return.
-            Log.crit(e.toString());
-            return false;
+        // Create a capped collection if the collection does not yet exist.
+        if(db.getCollectionNames().contains("messages")) {
+            coll = db.getCollection("messages");
+        } else {
+            coll = db.createCollection("messages", BasicDBObjectBuilder.start().add("capped", true).add("size", MongoMapper.MAX_MESSAGE_SIZE).get());
         }
 
-        return true;
+        BasicDBObject dbObj = new BasicDBObject();
+        dbObj.put("message", event.getMessage());
+        dbObj.put("date", event.getDate());
+        dbObj.put("host", event.getHost());
+        dbObj.put("facility", event.getFacility());
+        dbObj.put("level", event.getLevel());
+
+        // Inserto BasicDBObject into DBCollection.
+        coll.insert(dbObj);
     }
 
 }

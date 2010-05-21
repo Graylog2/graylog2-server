@@ -28,7 +28,15 @@ package graylog2;
 public class SystemStatisticThread extends Thread {
 
     @Override public void run() {
-        
+        // Run forever.
+        while (true) {
+            try {
+
+            } catch (Exception e) {
+                Log.warn("Error in SystemStatisticThread: " + e.toString());
+                continue;
+            }
+        }
     }
 
 }
