@@ -4,6 +4,8 @@
 
 package graylog2.database;
 
+import graylog2.Log;
+
 import com.mongodb.Mongo;
 import com.mongodb.DB;
 import com.mongodb.DBCollection;
@@ -14,34 +16,47 @@ import org.productivity.java.syslog4j.server.SyslogServerEventIF;
 
 public class MongoMapper {
     // TODO: make configurable
-    public static final String MONGO_HOSTNAME = "localhost";
-    public static final int MONGO_PORT = 27017;
-    public static final String MONGO_DB_NAME = "graylog2";
     public static final int MAX_MESSAGE_SIZE = 500000000;
+    public static final int STANDARD_PORT = 27017;
 
     private Mongo m = null;
     private DB db = null;
+    
+    private String username = null;
+    private String password = null;
+    private String hostname = null;
+    private String database = null;
+    private int    port = 27017;
 
-    private boolean connect() {
-        try {
-            this.m = new Mongo(MongoMapper.MONGO_HOSTNAME, MongoMapper.MONGO_PORT);
-            this.db = m.getDB(MongoMapper.MONGO_DB_NAME);
-        } catch (java.net.UnknownHostException e) {
-            return false;
+    public MongoMapper(String username, String password, String hostname, String database, int port) {
+        this.username = username;
+        this.password = password;
+        this.hostname = hostname;
+        this.database = database;
+        if (port == 0) {
+            this.port = MongoMapper.STANDARD_PORT;
+        } else {
+            this.port = port;
         }
+    }
 
-        return true;
+    private void connect() throws Exception {
+        this.m = new Mongo(this.hostname, this.port);
+        this.db = m.getDB(this.database);
+
+        // Try to authenticate.
+        if(!db.authenticate(this.username, this.password.toCharArray())) {
+            throw new Exception("Could not authenticate to database '" + this.database + "' with user '" + this.username + "'.");
+        }
     }
 
     public boolean insert(SyslogServerEventIF event) {
         try {
-            if (!this.connect()) {
-                return false;
-            }
-
+            this.connect();
+            
             DBCollection coll = null;
 
-            // Create a capped collection
+            // Create a capped collection if the collection does not yet exist.
             if(db.getCollectionNames().contains("messages")) {
                 coll = db.getCollection("messages");
             } else {
@@ -58,6 +73,8 @@ public class MongoMapper {
             // Inserto BasicDBObject into DBCollection.
             coll.insert(dbObj);
         } catch(Exception e) {
+            // Something failed. Log and return.
+            Log.crit(e.toString());
             return false;
         }
 

@@ -20,7 +20,9 @@
 
 package graylog2;
 
-// TODO: (optional) mongo authentication
+import java.io.FileInputStream;
+import java.util.Properties;
+
 
 /**
  *
@@ -30,11 +32,27 @@ public class Main {
 
     public static boolean debugMode = false;
 
+    // This holds the configuration from /etc/graylog2.conf
+    public static Properties masterConfig = null;
+
     /**
      * @param args the command line arguments
      */
     public static void main(String[] args) {
         System.out.println("[x] Graylog2 starting up. (JRE: " + Tools.getSystemInformation() + ")");
+
+        // Read config.
+        System.out.println("[x] Reading config.");
+        Main.masterConfig = new Properties();
+        try {
+            FileInputStream configStream = new FileInputStream("/etc/graylog2.conf");
+            Main.masterConfig.load(configStream);
+            configStream.close();
+        } catch(java.io.IOException e) {
+            System.out.println("Could not read config file: " + e.toString());
+        } finally {
+
+        }
 
         // Are we in debug mode?
         if (args.length > 0 && args[0].equalsIgnoreCase("debug")) {

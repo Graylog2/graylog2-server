@@ -32,7 +32,7 @@ public class SyslogServerThread extends Thread {
     @Override public void run() {
         SyslogServerIF syslogServer = SyslogServer.getInstance("udp");
         // TODO: Make configurable
-        syslogServer.getConfig().setPort(514);
+        syslogServer.getConfig().setPort(12000);
         syslogServer.getConfig().addEventHandler(new SyslogEventHandler());
         
         syslogServer = SyslogServer.getThreadedInstance("udp");
