@@ -4,8 +4,6 @@
 
 package graylog2.database;
 
-import graylog2.Log;
-
 import com.mongodb.Mongo;
 import com.mongodb.DB;
 import com.mongodb.DBCollection;
@@ -50,6 +48,11 @@ public class MongoMapper {
         }
     }
 
+    public void dropCollection(String databaseName) throws Exception {
+        this.connect();
+        m.dropDatabase(databaseName);
+    }
+
     public void insert(SyslogServerEventIF event) throws Exception {
         this.connect();
 
@@ -69,7 +72,24 @@ public class MongoMapper {
         dbObj.put("facility", event.getFacility());
         dbObj.put("level", event.getLevel());
 
-        // Inserto BasicDBObject into DBCollection.
+        coll.insert(dbObj);
+    }
+    
+    public void insertSystemStatisticValue(String key, long value) throws Exception {
+        this.connect();
+        
+        DBCollection coll = null;
+
+        // Create a capped collection if the collection does not yet exist.
+        if(db.getCollectionNames().contains("systemstatistics")) {
+            coll = db.getCollection("systemstatistics");
+        } else {
+            coll = db.createCollection("systemstatistics", BasicDBObjectBuilder.start().add("capped", true).add("size", 5242880).get());
+        }
+        
+        BasicDBObject dbObj = new BasicDBObject();
+        dbObj.put(key, value);
+
         coll.insert(dbObj);
     }
 

@@ -85,6 +85,15 @@ public class Main {
             System.out.println("[x] Not in Debug mode.");
         }
 
+        // Clear systemstatistics collection.
+        try {
+            SystemStatistics.getInstance().clearCollection();
+        } catch (Exception e) {
+            System.out.println("Could not clear system statistic collection: " + e.toString());
+            e.printStackTrace();
+            System.exit(1); // Exit with error.
+        }
+
         // Start the Syslog thread that accepts syslog packages.
         SyslogServerThread syslogServerThread = new SyslogServerThread(Integer.parseInt(Main.masterConfig.getProperty("syslog_listen_port")));
         syslogServerThread.start();

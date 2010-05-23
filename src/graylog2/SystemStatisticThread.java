@@ -24,14 +24,27 @@
 
 package graylog2;
 
+import graylog2.database.MongoMapper;
 
 public class SystemStatisticThread extends Thread {
 
     @Override public void run() {
         // Run forever.
         while (true) {
-            try {
+            // Run every minute.
+            try { Thread.sleep(60000); } catch(InterruptedException e) {}
 
+            try {
+                MongoMapper m = new MongoMapper(
+                    Main.masterConfig.getProperty("mongodb_user"),
+                    Main.masterConfig.getProperty("mongodb_password"),
+                    Main.masterConfig.getProperty("mongodb_host"),
+                    Main.masterConfig.getProperty("mongodb_database"),
+                    Integer.valueOf(Main.masterConfig.getProperty("mongodb_port"))
+                );
+
+                // Handled syslog events.
+                m.insertSystemStatisticValue("handled_syslog_events", SystemStatistics.getInstance().getHandledSyslogEvents());
             } catch (Exception e) {
                 Log.warn("Error in SystemStatisticThread: " + e.toString());
                 continue;

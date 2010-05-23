@@ -41,20 +41,23 @@ public class SyslogEventHandler implements SyslogServerEventHandlerIF {
             Log.info("=======");
         }
 
-        MongoMapper m = new MongoMapper(
-                Main.masterConfig.getProperty("mongodb_user"),
-                Main.masterConfig.getProperty("mongodb_password"),
-                Main.masterConfig.getProperty("mongodb_host"),
-                Main.masterConfig.getProperty("mongodb_database"),
-                Integer.valueOf(Main.masterConfig.getProperty("mongodb_port"))
-        );
-
-        // Insert into database.
+         // Insert into database.
         try {
+            MongoMapper m = new MongoMapper(
+                    Main.masterConfig.getProperty("mongodb_user"),
+                    Main.masterConfig.getProperty("mongodb_password"),
+                    Main.masterConfig.getProperty("mongodb_host"),
+                    Main.masterConfig.getProperty("mongodb_database"),
+                    Integer.valueOf(Main.masterConfig.getProperty("mongodb_port"))
+            );
+
             m.insert(event);
         } catch (Exception e) {
             Log.crit("Could not insert syslog event into database: " + e.toString());
         }
+
+        // Count up for statistics.
+        SystemStatistics.getInstance().countUpHandledSyslogEvents();
     }
 
 }

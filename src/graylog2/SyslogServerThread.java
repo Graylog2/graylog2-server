@@ -35,7 +35,7 @@ public class SyslogServerThread extends Thread {
         this.port = port;
     }
 
-    @Override public void run() {
+    public void run() {
         SyslogServerIF syslogServer = SyslogServer.getInstance("udp");
         
         syslogServer.getConfig().setPort(port);
