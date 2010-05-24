@@ -25,6 +25,8 @@ import java.io.FileInputStream;
 import java.util.ArrayList;
 import java.util.Properties;
 
+// TODO: indizes richtig setzen
+
 /**
  *
  * @author Lennart Koopmann <lennart@scopeport.org>

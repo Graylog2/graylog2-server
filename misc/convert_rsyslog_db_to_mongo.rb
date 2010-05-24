@@ -5,7 +5,7 @@ require 'mysql'
 require 'mongo'
 
 begin
-  dbh = Mysql.real_connect("localhost", "root", "123", "Syslog")
+  dbh = Mysql.real_connect("localhost", "root", "123123123", "Syslog")
   res = dbh.query("SELECT Message, ReceivedAt, FromHost, Facility, Priority FROM SystemEvents ORDER BY ReceivedAt ASC");
 
   while row = res.fetch_row do
