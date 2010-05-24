@@ -1,0 +1,33 @@
+<h1>Blacklist &raquo;<%= @blacklist.title %>&laquo;</h1>
+
+<% form_for @new_term, :url => { :controller => "blacklistedterms", :action => "create" } do |f| %>
+  <%= f.hidden_field :blacklist_id, :value => @blacklist.id %>
+  <%= f.label :term, "New term:" %>
+  <%= f.text_field :term %>
+  <%= submit_tag "Add" %>
+<% end %>
+
+<div id="blocks-terms">
+  <h2>Filtering:</h2>
+  <ul>
+    <% if @blacklist.blacklisted_terms.blank? %>
+      <li>nothing</li>
+    <% else %>
+      <% @blacklist.blacklisted_terms.each do |term| %>
+        <li>
+          <%=h term.term %>
+          <%= link_to "[x]", { :controller => "blacklistedterms", :action => "destroy", :id => term.id, :blacklist_id => @blacklist.id }, :class => "blocks-terms-delete" %>
+        </li>
+      <% end %>
+    <% end %>
+  </ul>
+  <br style="clear: both;" />
+</div>
+
+<% unless @blacklist.blacklisted_terms.blank? %>
+  <%= render :partial => "messages/table", :locals => { :messages => @messages } %>
+<% end %>
+
+<p>
+  <%= link_to "Delete this blacklist", { :action => "destroy", :id => @blacklist.id } %>
+</p>

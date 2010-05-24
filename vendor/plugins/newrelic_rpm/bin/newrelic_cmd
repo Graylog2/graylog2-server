@@ -1,0 +1,4 @@
+#!/usr/bin/env ruby
+# executes one of the commands in the new_relic/commands directory
+# pass the name of the command as an argument
+require File.dirname(__FILE__) + '/../lib/new_relic/commands/new_relic_commands'

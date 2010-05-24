@@ -1,0 +1,23 @@
+<h1>Blacklists</h1>
+
+<% form_for @new_blacklist, :url => { :action => "create" } do |f| %>
+  <%= f.label :title, "Title:" %>
+  <%= f.text_field :title %>
+  <%= submit_tag "Create blacklist" %>
+<% end %>
+
+
+<% @blacklists.each do |blacklist| %>
+  <div class="blocks">
+    <span class="blocks-title"><%= link_to h(blacklist.title), { :action => "show", :id => blacklist.id } %></span>
+    <ul class="blocks-termslist">
+      <% if blacklist.blacklisted_terms.blank? %>
+        <li>Filtering nothing</li>
+      <% else %>
+        <%= blacklist.blacklisted_terms.map{|t| "<li>#{t.term}</li>" } %>
+      <% end %>
+    </ul>
+  </div>
+<% end %>
+
+<br style="clear: both;" />

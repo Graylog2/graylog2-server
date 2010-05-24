@@ -1,0 +1,24 @@
+<table class="messages">
+  <thead>
+    <tr>
+      <th>Date</th>
+      <th>Host</th>
+      <th>Severity</th>
+      <th>Facility</th>
+      <th>Message</th>
+    </tr>
+  </thead>
+  <tbody>
+    <% i = 0 %>
+    <% @messages.each do |message|  %>
+      <tr class="<%= i.modulo(2) == 1 ? "tr-light" : "tr-dark" %>">
+        <td class="messages-c-date"><%= gl_date(message.date) %></td>
+        <td><%=h message.host %></td>
+        <td><%= syslog_level_to_human(message.level) %></td>
+        <td><%= syslog_facility_to_human(message.facility) %></td>
+        <td><%=h message.message[0..200] %></td>
+      </tr>
+      <% i+=1 %>
+    <% end %>
+  </tbody>
+</table>

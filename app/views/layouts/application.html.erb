@@ -1,0 +1,33 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+  <head>
+  <title>Graylog2</title>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+  <link rel="shortcut icon" href="/favicon.ico" />
+  <%= stylesheet_link_tag "reset" %>
+  <%= stylesheet_link_tag "core" %>
+  <%= stylesheet_link_tag "sections" %>
+  <%= javascript_include_tag "application" %>
+</head>
+<body>
+
+  <div id="top">
+    <%= image_tag "graylog.png", :id => "toplogo" %>
+    <ul id="topmenu">
+      <%= menu_item({ :title => "Messages", :controller => "/" }) %>
+      <%= menu_item({ :title => "Streams", :controller => "streams" }) %>
+      <%= menu_item({ :title => "Hosts", :controller => "hosts" }) %>
+      <%= menu_item({ :title => "Blacklists", :controller => "blacklists" }) %>
+      <%= menu_item({ :title => "Statistics", :controller => "statistics" }) %>
+      <%= menu_item({ :title => "Settings", :controller => "settings" }) %>
+      <%= menu_item({ :title => "Logout", :controller => "logout" }) %>
+    </ul>
+  </div>
+
+  <div id="content">
+    <%= yield %>
+  </div>
+
+</body>
+</html>

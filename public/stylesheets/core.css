@@ -1,0 +1,127 @@
+body {
+  background-color: #d4d4d4;
+  color: #000;
+  font-size: 12px;
+  font-family: Helvetica,Arial,'Liberation Sans',FreeSans,sans-serif;
+  line-height: 16px;
+}
+
+h1 {
+    font-family: Georgia;
+    font-size: 45px;
+    margin-top: 15px;
+    margin-bottom: 25px;
+    display: block;
+    font-weight: normal;
+}
+
+a {
+    color: #fd0c99;
+    text-decoration: none;
+}
+
+table {
+    font-size: 11px;
+    width: 100%;
+    margin-top: 10px;
+}
+
+th {
+    text-align: left;
+    padding-right: 15px;
+    padding-bottom: 2px;
+    border-bottom: 2px dashed #222222;
+    font-size: 12px;
+}
+
+tr:hover {
+    background-color: #ffdddd;
+}
+
+input {
+    font-size: 16px;
+    padding: 2px;
+    font-family: Georgia;
+}
+
+label {
+    font-size: 16px;
+    font-family: Georgia;
+}
+
+.highlighted {
+    color: #fd0c99;
+}
+
+#top {
+    height: 100px;
+    width: 100%;
+    background-color: #333;
+}
+
+#toplogo {
+    float: left;
+}
+
+#topmenu {
+    margin-left: 325px;
+    color: #fff;
+    padding-top: 40px;
+    font-size: 16px;
+    height: 60px;
+}
+
+#topmenu a {
+    color: #fff;
+}
+
+#topmenu li {
+    float: left;
+    margin-left: 20px;
+    padding: 7px;
+    color: #000;
+    text-transform: lowercase;
+    text-shadow: #000 3px 3px 2px;
+}
+
+#topmenu a:hover {
+    color: #fd0c99;
+}
+
+.topmenu-active {
+   background-color: #fd0c99;
+}
+
+.topmenu-active a {
+    text-shadow: #333 2px 1px 1px;
+}
+
+.topmenu-active a:hover {
+    color: #fff !important;
+}
+
+#content {
+    margin: 15px;
+    padding: 15px;
+    background-color: #fff;
+}
+
+.messages {
+    font-family: Helvetica,Arial,'Liberation Sans',FreeSans,sans-serif;
+}
+
+.messages tr {
+    border-bottom: 1px solid #ccc;
+}
+
+.messages td {
+    padding: 4px;
+}
+
+.tr-light {
+    background-color: #f6f6f6;
+}
+
+.tr-dark {
+    background-color: #eee;
+}

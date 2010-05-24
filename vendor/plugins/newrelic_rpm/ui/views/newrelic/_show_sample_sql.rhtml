@@ -1,0 +1,20 @@
+  <% if rows_logger_present? %>
+    <h3>Plugin Incompatibility</h3>
+    The Rows Logger plugin rewrites part of Active Record, which in effect turns off the 
+    SQL statement tracing functionality of NewRelic RPM Developer Mode. To gain SQL statement
+    visibility, you must remove <samp>rows_logger_plugin</samp>, or change your plugin load order 
+    so that the rows logger is loaded first.  
+  <% else %>
+  <%= render :partial => agent_views_path('segment_limit_message') if trace_row_display_limit_reached %>
+	<table width="100%">
+		<thead>
+		<tr>
+			<td>Timestamp</td>
+			<td colspan="2">Duration</td>
+			<td>SQL</td>
+		</tr>
+		</thead>
+		
+		<%= render :partial => agent_views_path('sql_row'), :collection => @sample.sql_segments[0...trace_row_display_limit] %>
+	</table>
+  <% end %>

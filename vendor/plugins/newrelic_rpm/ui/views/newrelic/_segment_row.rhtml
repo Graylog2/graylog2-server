@@ -1,0 +1,14 @@
+<tr class='<%= cycle('even_row', 'odd_row') %>'>
+	<td>
+			<%= write_summary_segment_label segment_row %>
+			<small>
+			<%= link_to "?", url_for_metric_doc(segment_row.metric_name) %>
+      </small>
+	</td>
+	<td align=left> <%= segment_row.call_count %></td>
+	<td align=right><%= with_delimiter(to_ms(segment_row.exclusive_time)) %> ms</td>
+	<td align=right><%= to_percentage(segment_row.exclusive_time_percentage) %>% </td>
+	<td>  </td>
+	<td align=right><%= with_delimiter(to_ms(segment_row.total_time)) %> ms</td>
+	<td align=right><%= to_percentage(segment_row.total_time_percentage) %>%</td>
+</tr>

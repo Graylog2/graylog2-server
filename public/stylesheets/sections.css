@@ -1,0 +1,56 @@
+.blocks {
+    margin-top: 15px;
+    font-family: Georgia;
+    float: left;
+    margin: 25px;
+}
+
+.blocks-title {
+    font-size: 25px;
+    color: #fd0c99;
+}
+
+.blocks-termslist {
+    margin-top: 10px;
+}
+
+#blocks-terms {
+    margin-top: 15px;
+    font-family: Georgia;
+}
+
+#blocks-terms h2 {
+    font-size: 15px;
+    float: left;
+    margin-right: 10px;
+}
+
+#blocks-terms li {
+    float: left;
+    margin-right: 15px;
+    font-size: 15px;
+    color: #fd0c99;
+}
+
+.blocks-terms-delete {
+    color: #000;
+}
+
+/* Streams */
+#streams-notice {
+    margin-top: 10px;
+}
+
+.stream {
+    width: 98%;
+    margin: 0px auto;
+    margin-top: 15px;
+    padding: 15px;
+    border: 1px dashed #333;
+    font-family: Georgia;
+}
+
+.stream-title {
+    font-size: 25px;
+    color: #fd0c99;
+}

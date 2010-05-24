@@ -1,0 +1,11 @@
+<% segment = sql_row %>
+<tr class='<%= cycle('even_row', 'odd_row') %>'>
+  <td align=right><%= timestamp(segment) %></td>
+	<td align=right><%= segment_duration_value(segment) %> </td>
+    <td> <%= link_to_source(segment[:backtrace]) %> </td>
+	<td align=left>
+		<div class="sql_statement">
+			<small><%= line_wrap_sql(segment[:sql] || segment[:sql_obfuscated]) %></small>
+		</div>
+	</td>
+</tr>
