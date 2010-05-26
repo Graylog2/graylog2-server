@@ -20,7 +20,6 @@
 
 package graylog2;
 
-
 import java.io.FileInputStream;
 import java.util.ArrayList;
 import java.util.Properties;
@@ -58,7 +57,7 @@ public class Main {
         }
 
         // Define required configuration fields.
-        ArrayList requiredConfigFields = new ArrayList();
+        ArrayList<String> requiredConfigFields = new ArrayList<String>();
         requiredConfigFields.add("syslog_listen_port");
         requiredConfigFields.add("mongodb_user");
         requiredConfigFields.add("mongodb_password");

@@ -9,6 +9,7 @@ import com.mongodb.DB;
 import com.mongodb.DBCollection;
 import com.mongodb.BasicDBObject;
 import com.mongodb.BasicDBObjectBuilder;
+import com.mongodb.MongoException;
 
 import org.productivity.java.syslog4j.server.SyslogServerEventIF;
 
@@ -39,12 +40,16 @@ public class MongoMapper {
     }
 
     private void connect() throws Exception {
-        this.m = new Mongo(this.hostname, this.port);
-        this.db = m.getDB(this.database);
+        try {
+            this.m = new Mongo(this.hostname, this.port);
+            this.db = m.getDB(this.database);
 
-        // Try to authenticate.
-        if(!db.authenticate(this.username, this.password.toCharArray())) {
-            throw new Exception("Could not authenticate to database '" + this.database + "' with user '" + this.username + "'.");
+            // Try to authenticate.
+            if(!db.authenticate(this.username, this.password.toCharArray())) {
+                throw new Exception("Could not authenticate to database '" + this.database + "' with user '" + this.username + "'.");
+            }
+        } catch (MongoException.Network e) {
+            throw new Exception("Could not connect to Mongo DB.");
         }
     }
 
