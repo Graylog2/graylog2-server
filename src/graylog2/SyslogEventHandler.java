@@ -34,7 +34,6 @@ public class SyslogEventHandler implements SyslogServerEventHandlerIF {
     @Override public void event(SyslogServerIF syslogServer, SyslogServerEventIF event) {
         if (Main.debugMode) {
             Log.info("Received message: " + event.getMessage());
-            Log.info("Date: " + event.getDate());
             Log.info("Host: " + event.getHost());
             Log.info("Facility: " + event.getFacility() + " (" + Tools.syslogFacilityToReadable(event.getFacility()) + ")");
             Log.info("Level: " + event.getLevel() + " (" + Tools.syslogLevelToReadable(event.getLevel()) + ")");
@@ -43,6 +42,7 @@ public class SyslogEventHandler implements SyslogServerEventHandlerIF {
 
          // Insert into database.
         try {
+            // Connect to database.
             MongoMapper m = new MongoMapper(
                     Main.masterConfig.getProperty("mongodb_user"),
                     Main.masterConfig.getProperty("mongodb_password"),
@@ -50,6 +50,7 @@ public class SyslogEventHandler implements SyslogServerEventHandlerIF {
                     Main.masterConfig.getProperty("mongodb_database"),
                     Integer.valueOf(Main.masterConfig.getProperty("mongodb_port"))
             );
+
 
             m.insert(event);
         } catch (Exception e) {

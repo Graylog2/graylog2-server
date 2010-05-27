@@ -1,4 +1,24 @@
 /**
+ * Copyright 2010 Lennart Koopmann <lennart@scopeport.org>
+ *
+ * This file is part of Graylog2.
+ *
+ * Graylog2 is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * Graylog2 is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with Graylog2.  If not, see <http://www.gnu.org/licenses/>.
+ *
+ */
+
+/**
  * MongoMapper.java: lennart | Apr 13, 2010 9:13:03 PM
  */
 
@@ -68,14 +88,18 @@ public class MongoMapper {
             coll = db.getCollection("messages");
         } else {
             coll = db.createCollection("messages", BasicDBObjectBuilder.start().add("capped", true).add("size", MongoMapper.MAX_MESSAGE_SIZE).get());
+            coll.createIndex(new BasicDBObject("created_at", 1));
+            coll.createIndex(new BasicDBObject("host", 1));
+            coll.createIndex(new BasicDBObject("facility", 1));
+            coll.createIndex(new BasicDBObject("level", 1));
         }
 
         BasicDBObject dbObj = new BasicDBObject();
         dbObj.put("message", event.getMessage());
-        dbObj.put("date", event.getDate());
         dbObj.put("host", event.getHost());
         dbObj.put("facility", event.getFacility());
         dbObj.put("level", event.getLevel());
+        dbObj.put("created_at", (int) (System.currentTimeMillis()/1000));
 
         coll.insert(dbObj);
     }
