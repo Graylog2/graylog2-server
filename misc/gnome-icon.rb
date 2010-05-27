@@ -2,19 +2,50 @@
 
 require 'gtk2'
 
-icon = Gtk::StatusIcon.new
-icon.pixbuf = Gdk::Pixbuf.new("/home/lennart/testicon.png", 20, 20);
-icon.tooltip = "Graylog2: 426 log messages in the last 10 minutes"
+TRAYICON = "/home/lennart/testicon.png"
 
-Gtk::Menu.new
-Gtk::ImageMenuItem.new(Gtk::Stock::QUIT);
+NOTIFYICON = "/usr/share/icons/gnome/32x32/status/gtk-dialog-warning.png"
+NOTIFYTITLE = "Graylog2: Warning"
 
-Thread.new { Gtk.main }
+class Graylog2Notification
+  def self.notify message
+    puts "notify-send -i #{NOTIFYICON} '#{NOTIFYTITLE}' '#{message}'"
+  end
+end
 
-sleep 4
-icon.blinking = true
+class Graylog2Icon
+  def initialize
+    @icon = Gtk::StatusIcon.new
+    @icon.pixbuf = Gdk::Pixbuf.new(TRAYICON, 20, 20);
+    @icon.tooltip = "Graylog"
+  end
 
-system "notify-send -u critical -i /usr/share/icons/gnome/32x32/status/gtk-dialog-warning.png 'Graylog2: Warning' '426 new log messages in the last 10 minutes'"
+  def run
+    Thread.new { Gtk.main }
+  end
+
+  def start_blinking secs = nil
+    @icon.blinking = true
+
+    # Reset blinking if requested.
+    unless secs == nil
+      Thread.new {
+        # Reset blinking if requested.
+        sleep secs
+        @icon.blinking = false
+      }
+    end
+  end
+
+  def stop_blinking
+    @icon.blinking = false
+  end
+end
+
+icon = Graylog2Icon.new
+icon.run
+
+Graylog2Notification.notify "bla"
 
 while true do
   puts "bla"
