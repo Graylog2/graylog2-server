@@ -34,3 +34,11 @@ The error occurred while evaluating nil.[]
 [05/24/10 04:47:19 +0200 sundaysister (6501)] WARN : The error reporting queue has reached 20. The error detail for this and subsequent errors will not be transmitted to RPM until the queued errors have been sent: No action responded to update_stream. Actions: create and index
 [05/24/10 04:47:29 +0200 sundaysister (6501)] WARN : The error reporting queue has reached 20. The error detail for this and subsequent errors will not be transmitted to RPM until the queued errors have been sent: No action responded to update_stream. Actions: create and index
 [05/24/10 04:47:39 +0200 sundaysister (6501)] WARN : The error reporting queue has reached 20. The error detail for this and subsequent errors will not be transmitted to RPM until the queued errors have been sent: No action responded to update_stream. Actions: create and index
+[05/30/10 01:23:55 +0200 sundaysister (15967)] INFO : Dispatcher: webrick
+[05/30/10 01:23:55 +0200 sundaysister (15967)] INFO : Application: My Application
+[05/30/10 01:23:55 +0200 sundaysister (15967)] INFO : New Relic RPM Agent 2.12.1 Initialized: pid = 15967
+[05/30/10 01:23:55 +0200 sundaysister (15967)] INFO : Agent Log found in /home/lennart/workspace/graylog2-web/log/newrelic_agent.log
+[05/31/10 19:58:40 +0200 sundaysister (3389)] INFO : Dispatcher: webrick
+[05/31/10 19:58:40 +0200 sundaysister (3389)] INFO : Application: My Application
+[05/31/10 19:58:40 +0200 sundaysister (3389)] INFO : New Relic RPM Agent 2.12.1 Initialized: pid = 3389
+[05/31/10 19:58:40 +0200 sundaysister (3389)] INFO : Agent Log found in /home/lennart/workspace/graylog2-web/log/newrelic_agent.log

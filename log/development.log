@@ -26496,3 +26496,793 @@ Rendering template within layouts/application
 Rendering messages/index
 Rendered messages/_table (131.4ms)
 Completed in 332ms (View: 139, DB: 1) | 200 OK [http://localhost/]
+Starting the New Relic Agent.
+NewRelic Agent Developer Mode enabled.
+To view performance information, go to http://localhost:3000/newrelic
+New Relic RPM Agent 2.12.1 Initialized: pid = 15967
+Agent Log found in /home/lennart/workspace/graylog2-web/log/newrelic_agent.log
+  [4;36;1mSQL (0.1ms)[0m   [0;1mSET NAMES 'utf8'[0m
+  [4;35;1mSQL (0.1ms)[0m   [0mSET SQL_AUTO_IS_NULL=0[0m
+  [4;36;1mSQL (25.2ms)[0m   [0;1mSHOW TABLES[0m
+  [4;35;1mSQL (123.6ms)[0m   [0mSELECT version FROM schema_migrations[0m
+  [4;36;1mSQL (0.1ms)[0m   [0;1mSET NAMES 'utf8'[0m
+  [4;35;1mSQL (0.1ms)[0m   [0mSET SQL_AUTO_IS_NULL=0[0m
+
+
+Processing MessagesController#index (for 127.0.0.1 at 2010-05-30 01:24:05) [GET]
+  [4;36;1mBlacklistedTerm Load (19.2ms)[0m   [0;1mSELECT * FROM `blacklisted_terms` [0m
+  [4;35;1mBlacklistedTerm Columns (1.4ms)[0m   [0mSHOW FIELDS FROM `blacklisted_terms`[0m
+
+Mongo::ConnectionFailure (failed to connect to any given host:port):
+  mongo (1.0) lib/./lib/mongo/connection.rb:435:in `connect_to_master'
+  mongo (1.0) lib/./lib/mongo/connection.rb:112:in `initialize'
+  /usr/lib/ruby/gems/1.8/gems/mongo_mapper-0.7.6/lib/mongo_mapper.rb:31:in `new'
+  /usr/lib/ruby/gems/1.8/gems/mongo_mapper-0.7.6/lib/mongo_mapper.rb:31:in `connection'
+  /usr/lib/ruby/gems/1.8/gems/mongo_mapper-0.7.6/lib/mongo_mapper/plugins/persistence.rb:10:in `connection'
+  /usr/lib/ruby/gems/1.8/gems/mongo_mapper-0.7.6/lib/mongo_mapper/plugins/persistence.rb:32:in `database'
+  /usr/lib/ruby/gems/1.8/gems/mongo_mapper-0.7.6/lib/mongo_mapper/plugins/persistence.rb:48:in `collection'
+  /usr/lib/ruby/gems/1.8/gems/mongo_mapper-0.7.6/lib/mongo_mapper/query.rb:16:in `query'
+  /usr/lib/ruby/gems/1.8/gems/mongo_mapper-0.7.6/lib/mongo_mapper/query.rb:6:in `initialize'
+  /usr/lib/ruby/gems/1.8/gems/mongo_mapper-0.7.6/lib/mongo_mapper/document.rb:155:in `new'
+  /usr/lib/ruby/gems/1.8/gems/mongo_mapper-0.7.6/lib/mongo_mapper/document.rb:155:in `query'
+  /usr/lib/ruby/gems/1.8/gems/mongo_mapper-0.7.6/lib/mongo_mapper/document.rb:193:in `find_many'
+  /usr/lib/ruby/gems/1.8/gems/mongo_mapper-0.7.6/lib/mongo_mapper/document.rb:97:in `all'
+  app/models/message.rb:25:in `all_with_blacklist'
+  app/controllers/messages_controller.rb:3:in `index'
+  /usr/lib/ruby/1.8/webrick/httpserver.rb:104:in `service'
+  /usr/lib/ruby/1.8/webrick/httpserver.rb:65:in `run'
+  /usr/lib/ruby/1.8/webrick/server.rb:173:in `start_thread'
+  /usr/lib/ruby/1.8/webrick/server.rb:162:in `start'
+  /usr/lib/ruby/1.8/webrick/server.rb:162:in `start_thread'
+  /usr/lib/ruby/1.8/webrick/server.rb:95:in `start'
+  /usr/lib/ruby/1.8/webrick/server.rb:92:in `each'
+  /usr/lib/ruby/1.8/webrick/server.rb:92:in `start'
+  /usr/lib/ruby/1.8/webrick/server.rb:23:in `start'
+  /usr/lib/ruby/1.8/webrick/server.rb:82:in `start'
+
+Rendered rescues/_trace (123.3ms)
+Rendered rescues/_request_and_response (1.7ms)
+Rendering rescues/layout (internal_server_error)
+  [4;36;1mSQL (0.2ms)[0m   [0;1mSET NAMES 'utf8'[0m
+  [4;35;1mSQL (0.1ms)[0m   [0mSET SQL_AUTO_IS_NULL=0[0m
+
+
+Processing MessagesController#index (for 127.0.0.1 at 2010-05-30 01:24:33) [GET]
+  [4;36;1mBlacklistedTerm Load (0.2ms)[0m   [0;1mSELECT * FROM `blacklisted_terms` [0m
+  [4;35;1mBlacklistedTerm Columns (0.7ms)[0m   [0mSHOW FIELDS FROM `blacklisted_terms`[0m
+  [4;36;1mSQL (16.1ms)[0m   [0;1mSELECT count(*) AS count_all FROM `blacklisted_terms` [0m
+Rendering template within layouts/application
+Rendering messages/index
+Rendered messages/_table (111.6ms)
+Completed in 896ms (View: 185, DB: 17) | 200 OK [http://localhost/]
+  [4;35;1mSQL (0.1ms)[0m   [0mSET NAMES 'utf8'[0m
+  [4;36;1mSQL (0.1ms)[0m   [0;1mSET SQL_AUTO_IS_NULL=0[0m
+
+
+Processing MessagesController#index (for 127.0.0.1 at 2010-05-30 01:25:11) [GET]
+  [4;35;1mBlacklistedTerm Load (0.2ms)[0m   [0mSELECT * FROM `blacklisted_terms` [0m
+  [4;36;1mBlacklistedTerm Columns (0.7ms)[0m   [0;1mSHOW FIELDS FROM `blacklisted_terms`[0m
+  [4;35;1mSQL (0.1ms)[0m   [0mSELECT count(*) AS count_all FROM `blacklisted_terms` [0m
+Rendering template within layouts/application
+Rendering messages/index
+Rendered messages/_table (119.2ms)
+Completed in 211ms (View: 126, DB: 1) | 200 OK [http://localhost/]
+  [4;36;1mSQL (0.1ms)[0m   [0;1mSET NAMES 'utf8'[0m
+  [4;35;1mSQL (0.1ms)[0m   [0mSET SQL_AUTO_IS_NULL=0[0m
+
+
+Processing StreamsController#index (for 127.0.0.1 at 2010-05-30 01:25:12) [GET]
+  [4;36;1mStream Columns (1.7ms)[0m   [0;1mSHOW FIELDS FROM `streams`[0m
+  [4;35;1mBlacklistedTerm Load (0.2ms)[0m   [0mSELECT * FROM `blacklisted_terms` [0m
+  [4;36;1mBlacklistedTerm Columns (1.8ms)[0m   [0;1mSHOW FIELDS FROM `blacklisted_terms`[0m
+Rendering template within layouts/application
+Rendering streams/index
+Completed in 106ms (View: 51, DB: 4) | 200 OK [http://localhost/streams]
+  [4;35;1mSQL (0.1ms)[0m   [0mSET NAMES 'utf8'[0m
+  [4;36;1mSQL (0.1ms)[0m   [0;1mSET SQL_AUTO_IS_NULL=0[0m
+
+
+Processing ApplicationController#index (for 127.0.0.1 at 2010-05-30 01:25:13) [GET]
+
+ActionController::RoutingError (No route matches "/hosts" with {:method=>:get}):
+  /usr/lib/ruby/1.8/webrick/httpserver.rb:104:in `service'
+  /usr/lib/ruby/1.8/webrick/httpserver.rb:65:in `run'
+  /usr/lib/ruby/1.8/webrick/server.rb:173:in `start_thread'
+  /usr/lib/ruby/1.8/webrick/server.rb:162:in `start'
+  /usr/lib/ruby/1.8/webrick/server.rb:162:in `start_thread'
+  /usr/lib/ruby/1.8/webrick/server.rb:95:in `start'
+  /usr/lib/ruby/1.8/webrick/server.rb:92:in `each'
+  /usr/lib/ruby/1.8/webrick/server.rb:92:in `start'
+  /usr/lib/ruby/1.8/webrick/server.rb:23:in `start'
+  /usr/lib/ruby/1.8/webrick/server.rb:82:in `start'
+
+Rendering rescues/layout (not_found)
+  [4;35;1mSQL (0.1ms)[0m   [0mSET NAMES 'utf8'[0m
+  [4;36;1mSQL (0.1ms)[0m   [0;1mSET SQL_AUTO_IS_NULL=0[0m
+
+
+Processing ApplicationController#index (for 127.0.0.1 at 2010-05-30 01:25:14) [GET]
+
+ActionController::RoutingError (No route matches "/statistics" with {:method=>:get}):
+  /usr/lib/ruby/1.8/webrick/httpserver.rb:104:in `service'
+  /usr/lib/ruby/1.8/webrick/httpserver.rb:65:in `run'
+  /usr/lib/ruby/1.8/webrick/server.rb:173:in `start_thread'
+  /usr/lib/ruby/1.8/webrick/server.rb:162:in `start'
+  /usr/lib/ruby/1.8/webrick/server.rb:162:in `start_thread'
+  /usr/lib/ruby/1.8/webrick/server.rb:95:in `start'
+  /usr/lib/ruby/1.8/webrick/server.rb:92:in `each'
+  /usr/lib/ruby/1.8/webrick/server.rb:92:in `start'
+  /usr/lib/ruby/1.8/webrick/server.rb:23:in `start'
+  /usr/lib/ruby/1.8/webrick/server.rb:82:in `start'
+
+Rendering rescues/layout (not_found)
+  [4;35;1mSQL (0.1ms)[0m   [0mSET NAMES 'utf8'[0m
+  [4;36;1mSQL (0.1ms)[0m   [0;1mSET SQL_AUTO_IS_NULL=0[0m
+
+
+Processing BlacklistsController#index (for 127.0.0.1 at 2010-05-30 01:25:15) [GET]
+  [4;35;1mBlacklist Load (0.5ms)[0m   [0mSELECT * FROM `blacklists` [0m
+  [4;36;1mBlacklist Columns (0.8ms)[0m   [0;1mSHOW FIELDS FROM `blacklists`[0m
+Rendering template within layouts/application
+Rendering blacklists/index
+  [4;35;1mBlacklistedTerm Load (17.3ms)[0m   [0mSELECT * FROM `blacklisted_terms` WHERE (`blacklisted_terms`.blacklist_id = 1) [0m
+  [4;36;1mBlacklistedTerm Columns (1.7ms)[0m   [0;1mSHOW FIELDS FROM `blacklisted_terms`[0m
+  [4;35;1mBlacklistedTerm Load (0.4ms)[0m   [0mSELECT * FROM `blacklisted_terms` WHERE (`blacklisted_terms`.blacklist_id = 2) [0m
+  [4;36;1mBlacklistedTerm Load (0.4ms)[0m   [0;1mSELECT * FROM `blacklisted_terms` WHERE (`blacklisted_terms`.blacklist_id = 3) [0m
+  [4;35;1mBlacklistedTerm Load (0.4ms)[0m   [0mSELECT * FROM `blacklisted_terms` WHERE (`blacklisted_terms`.blacklist_id = 4) [0m
+  [4;36;1mBlacklistedTerm Load (0.4ms)[0m   [0;1mSELECT * FROM `blacklisted_terms` WHERE (`blacklisted_terms`.blacklist_id = 5) [0m
+  [4;35;1mBlacklistedTerm Load (0.4ms)[0m   [0mSELECT * FROM `blacklisted_terms` WHERE (`blacklisted_terms`.blacklist_id = 6) [0m
+  [4;36;1mBlacklistedTerm Load (1.9ms)[0m   [0;1mSELECT * FROM `blacklisted_terms` WHERE (`blacklisted_terms`.blacklist_id = 8) [0m
+  [4;35;1mBlacklistedTerm Load (0.5ms)[0m   [0mSELECT * FROM `blacklisted_terms` WHERE (`blacklisted_terms`.blacklist_id = 9) [0m
+  [4;36;1mBlacklistedTerm Load (0.4ms)[0m   [0;1mSELECT * FROM `blacklisted_terms` WHERE (`blacklisted_terms`.blacklist_id = 12) [0m
+Completed in 219ms (View: 146, DB: 25) | 200 OK [http://localhost/blacklists]
+  [4;35;1mSQL (0.1ms)[0m   [0mSET NAMES 'utf8'[0m
+  [4;36;1mSQL (0.1ms)[0m   [0;1mSET SQL_AUTO_IS_NULL=0[0m
+
+
+Processing MessagesController#index (for 127.0.0.1 at 2010-05-30 01:25:17) [GET]
+  [4;35;1mBlacklistedTerm Load (0.2ms)[0m   [0mSELECT * FROM `blacklisted_terms` [0m
+  [4;36;1mBlacklistedTerm Columns (0.6ms)[0m   [0;1mSHOW FIELDS FROM `blacklisted_terms`[0m
+  [4;35;1mSQL (0.1ms)[0m   [0mSELECT count(*) AS count_all FROM `blacklisted_terms` [0m
+Rendering template within layouts/application
+Rendering messages/index
+Rendered messages/_table (122.2ms)
+Completed in 226ms (View: 131, DB: 1) | 200 OK [http://localhost/]
+  [4;36;1mSQL (0.1ms)[0m   [0;1mSET NAMES 'utf8'[0m
+  [4;35;1mSQL (0.2ms)[0m   [0mSET SQL_AUTO_IS_NULL=0[0m
+
+
+Processing MessagesController#index (for 127.0.0.1 at 2010-05-30 01:26:58) [GET]
+  [4;36;1mBlacklistedTerm Load (0.2ms)[0m   [0;1mSELECT * FROM `blacklisted_terms` [0m
+  [4;35;1mBlacklistedTerm Columns (0.7ms)[0m   [0mSHOW FIELDS FROM `blacklisted_terms`[0m
+  [4;36;1mSQL (0.1ms)[0m   [0;1mSELECT count(*) AS count_all FROM `blacklisted_terms` [0m
+Rendering template within layouts/application
+Rendering messages/index
+Rendered messages/_table (111.9ms)
+Completed in 200ms (View: 118, DB: 1) | 200 OK [http://localhost/]
+Starting the New Relic Agent.
+NewRelic Agent Developer Mode enabled.
+To view performance information, go to http://localhost:3000/newrelic
+New Relic RPM Agent 2.12.1 Initialized: pid = 3389
+Agent Log found in /home/lennart/workspace/graylog2-web/log/newrelic_agent.log
+  [4;36;1mSQL (0.3ms)[0m   [0;1mSET NAMES 'utf8'[0m
+  [4;35;1mSQL (0.2ms)[0m   [0mSET SQL_AUTO_IS_NULL=0[0m
+  [4;36;1mSQL (0.6ms)[0m   [0;1mSHOW TABLES[0m
+  [4;35;1mSQL (14.9ms)[0m   [0mSELECT version FROM schema_migrations[0m
+  [4;36;1mSQL (0.1ms)[0m   [0;1mSET NAMES 'utf8'[0m
+  [4;35;1mSQL (0.1ms)[0m   [0mSET SQL_AUTO_IS_NULL=0[0m
+
+
+Processing MessagesController#index (for 127.0.0.1 at 2010-05-31 19:59:10) [GET]
+  [4;36;1mBlacklistedTerm Load (0.4ms)[0m   [0;1mSELECT * FROM `blacklisted_terms` [0m
+  [4;35;1mBlacklistedTerm Columns (0.6ms)[0m   [0mSHOW FIELDS FROM `blacklisted_terms`[0m
+  [4;36;1mSQL (0.3ms)[0m   [0;1mSELECT count(*) AS count_all FROM `blacklisted_terms` [0m
+Rendering template within layouts/application
+Rendering messages/index
+Rendered messages/_table (100.6ms)
+Completed in 1142ms (View: 296, DB: 2) | 200 OK [http://localhost/]
+  [4;35;1mSQL (0.2ms)[0m   [0mSET NAMES 'utf8'[0m
+  [4;36;1mSQL (0.2ms)[0m   [0;1mSET SQL_AUTO_IS_NULL=0[0m
+
+
+Processing MessagesController#index (for 127.0.0.1 at 2010-05-31 19:59:13) [GET]
+  [4;35;1mBlacklistedTerm Load (0.1ms)[0m   [0mSELECT * FROM `blacklisted_terms` [0m
+  [4;36;1mBlacklistedTerm Columns (0.9ms)[0m   [0;1mSHOW FIELDS FROM `blacklisted_terms`[0m
+  [4;35;1mSQL (0.1ms)[0m   [0mSELECT count(*) AS count_all FROM `blacklisted_terms` [0m
+Rendering template within layouts/application
+Rendering messages/index
+Rendered messages/_table (112.3ms)
+Completed in 288ms (View: 199, DB: 1) | 200 OK [http://localhost/]
+  [4;36;1mSQL (0.2ms)[0m   [0;1mSET NAMES 'utf8'[0m
+  [4;35;1mSQL (0.2ms)[0m   [0mSET SQL_AUTO_IS_NULL=0[0m
+
+
+Processing BlacklistsController#index (for 127.0.0.1 at 2010-05-31 19:59:16) [GET]
+  [4;36;1mBlacklist Load (0.4ms)[0m   [0;1mSELECT * FROM `blacklists` [0m
+  [4;35;1mBlacklist Columns (0.7ms)[0m   [0mSHOW FIELDS FROM `blacklists`[0m
+Rendering template within layouts/application
+Rendering blacklists/index
+  [4;36;1mBlacklistedTerm Load (0.4ms)[0m   [0;1mSELECT * FROM `blacklisted_terms` WHERE (`blacklisted_terms`.blacklist_id = 1) [0m
+  [4;35;1mBlacklistedTerm Columns (0.8ms)[0m   [0mSHOW FIELDS FROM `blacklisted_terms`[0m
+  [4;36;1mBlacklistedTerm Load (0.3ms)[0m   [0;1mSELECT * FROM `blacklisted_terms` WHERE (`blacklisted_terms`.blacklist_id = 2) [0m
+  [4;35;1mBlacklistedTerm Load (0.3ms)[0m   [0mSELECT * FROM `blacklisted_terms` WHERE (`blacklisted_terms`.blacklist_id = 3) [0m
+  [4;36;1mBlacklistedTerm Load (0.3ms)[0m   [0;1mSELECT * FROM `blacklisted_terms` WHERE (`blacklisted_terms`.blacklist_id = 4) [0m
+  [4;35;1mBlacklistedTerm Load (0.3ms)[0m   [0mSELECT * FROM `blacklisted_terms` WHERE (`blacklisted_terms`.blacklist_id = 5) [0m
+  [4;36;1mBlacklistedTerm Load (0.3ms)[0m   [0;1mSELECT * FROM `blacklisted_terms` WHERE (`blacklisted_terms`.blacklist_id = 6) [0m
+  [4;35;1mBlacklistedTerm Load (0.4ms)[0m   [0mSELECT * FROM `blacklisted_terms` WHERE (`blacklisted_terms`.blacklist_id = 8) [0m
+  [4;36;1mBlacklistedTerm Load (0.3ms)[0m   [0;1mSELECT * FROM `blacklisted_terms` WHERE (`blacklisted_terms`.blacklist_id = 9) [0m
+  [4;35;1mBlacklistedTerm Load (0.3ms)[0m   [0mSELECT * FROM `blacklisted_terms` WHERE (`blacklisted_terms`.blacklist_id = 12) [0m
+Completed in 149ms (View: 89, DB: 5) | 200 OK [http://localhost/blacklists]
+  [4;36;1mSQL (0.1ms)[0m   [0;1mSET NAMES 'utf8'[0m
+  [4;35;1mSQL (0.1ms)[0m   [0mSET SQL_AUTO_IS_NULL=0[0m
+
+
+Processing MessagesController#index (for 127.0.0.1 at 2010-05-31 19:59:17) [GET]
+  [4;36;1mBlacklistedTerm Load (0.2ms)[0m   [0;1mSELECT * FROM `blacklisted_terms` [0m
+  [4;35;1mBlacklistedTerm Columns (0.6ms)[0m   [0mSHOW FIELDS FROM `blacklisted_terms`[0m
+  [4;36;1mSQL (0.1ms)[0m   [0;1mSELECT count(*) AS count_all FROM `blacklisted_terms` [0m
+Rendering template within layouts/application
+Rendering messages/index
+Rendered messages/_table (107.5ms)
+Completed in 199ms (View: 113, DB: 1) | 200 OK [http://localhost/]
+  [4;35;1mSQL (0.1ms)[0m   [0mSET NAMES 'utf8'[0m
+  [4;36;1mSQL (0.1ms)[0m   [0;1mSET SQL_AUTO_IS_NULL=0[0m
+
+
+Processing MessagesController#index (for 127.0.0.1 at 2010-05-31 19:59:18) [GET]
+  [4;35;1mBlacklistedTerm Load (0.2ms)[0m   [0mSELECT * FROM `blacklisted_terms` [0m
+  [4;36;1mBlacklistedTerm Columns (0.8ms)[0m   [0;1mSHOW FIELDS FROM `blacklisted_terms`[0m
+  [4;35;1mSQL (0.1ms)[0m   [0mSELECT count(*) AS count_all FROM `blacklisted_terms` [0m
+Rendering template within layouts/application
+Rendering messages/index
+Rendered messages/_table (112.9ms)
+Completed in 283ms (View: 120, DB: 1) | 200 OK [http://localhost/]
+  [4;36;1mSQL (0.1ms)[0m   [0;1mSET NAMES 'utf8'[0m
+  [4;35;1mSQL (0.1ms)[0m   [0mSET SQL_AUTO_IS_NULL=0[0m
+
+
+Processing StreamsController#index (for 127.0.0.1 at 2010-05-31 19:59:25) [GET]
+  [4;36;1mStream Columns (1.0ms)[0m   [0;1mSHOW FIELDS FROM `streams`[0m
+  [4;35;1mBlacklistedTerm Load (0.1ms)[0m   [0mSELECT * FROM `blacklisted_terms` [0m
+  [4;36;1mBlacklistedTerm Columns (0.6ms)[0m   [0;1mSHOW FIELDS FROM `blacklisted_terms`[0m
+Rendering template within layouts/application
+Rendering streams/index
+Completed in 78ms (View: 43, DB: 2) | 200 OK [http://localhost/streams]
+  [4;35;1mSQL (0.2ms)[0m   [0mSET NAMES 'utf8'[0m
+  [4;36;1mSQL (0.1ms)[0m   [0;1mSET SQL_AUTO_IS_NULL=0[0m
+
+
+Processing MessagesController#index (for 127.0.0.1 at 2010-05-31 19:59:28) [GET]
+  [4;35;1mBlacklistedTerm Load (0.1ms)[0m   [0mSELECT * FROM `blacklisted_terms` [0m
+  [4;36;1mBlacklistedTerm Columns (0.8ms)[0m   [0;1mSHOW FIELDS FROM `blacklisted_terms`[0m
+  [4;35;1mSQL (0.1ms)[0m   [0mSELECT count(*) AS count_all FROM `blacklisted_terms` [0m
+Rendering template within layouts/application
+Rendering messages/index
+Rendered messages/_table (98.6ms)
+Completed in 189ms (View: 104, DB: 1) | 200 OK [http://localhost/]
+  [4;36;1mSQL (0.1ms)[0m   [0;1mSET NAMES 'utf8'[0m
+  [4;35;1mSQL (0.1ms)[0m   [0mSET SQL_AUTO_IS_NULL=0[0m
+
+
+Processing ApplicationController#index (for 127.0.0.1 at 2010-05-31 19:59:29) [GET]
+
+ActionController::RoutingError (No route matches "/hosts" with {:method=>:get}):
+  /usr/lib/ruby/1.8/webrick/httpserver.rb:104:in `service'
+  /usr/lib/ruby/1.8/webrick/httpserver.rb:65:in `run'
+  /usr/lib/ruby/1.8/webrick/server.rb:173:in `start_thread'
+  /usr/lib/ruby/1.8/webrick/server.rb:162:in `start'
+  /usr/lib/ruby/1.8/webrick/server.rb:162:in `start_thread'
+  /usr/lib/ruby/1.8/webrick/server.rb:95:in `start'
+  /usr/lib/ruby/1.8/webrick/server.rb:92:in `each'
+  /usr/lib/ruby/1.8/webrick/server.rb:92:in `start'
+  /usr/lib/ruby/1.8/webrick/server.rb:23:in `start'
+  /usr/lib/ruby/1.8/webrick/server.rb:82:in `start'
+
+Rendering rescues/layout (not_found)
+  [4;36;1mSQL (0.1ms)[0m   [0;1mSET NAMES 'utf8'[0m
+  [4;35;1mSQL (0.1ms)[0m   [0mSET SQL_AUTO_IS_NULL=0[0m
+
+
+Processing BlacklistsController#index (for 127.0.0.1 at 2010-05-31 19:59:30) [GET]
+  [4;36;1mBlacklist Load (0.1ms)[0m   [0;1mSELECT * FROM `blacklists` [0m
+  [4;35;1mBlacklist Columns (0.9ms)[0m   [0mSHOW FIELDS FROM `blacklists`[0m
+Rendering template within layouts/application
+Rendering blacklists/index
+  [4;36;1mBlacklistedTerm Load (0.1ms)[0m   [0;1mSELECT * FROM `blacklisted_terms` WHERE (`blacklisted_terms`.blacklist_id = 1) [0m
+  [4;35;1mBlacklistedTerm Columns (0.8ms)[0m   [0mSHOW FIELDS FROM `blacklisted_terms`[0m
+  [4;36;1mBlacklistedTerm Load (0.1ms)[0m   [0;1mSELECT * FROM `blacklisted_terms` WHERE (`blacklisted_terms`.blacklist_id = 2) [0m
+  [4;35;1mBlacklistedTerm Load (0.1ms)[0m   [0mSELECT * FROM `blacklisted_terms` WHERE (`blacklisted_terms`.blacklist_id = 3) [0m
+  [4;36;1mBlacklistedTerm Load (0.1ms)[0m   [0;1mSELECT * FROM `blacklisted_terms` WHERE (`blacklisted_terms`.blacklist_id = 4) [0m
+  [4;35;1mBlacklistedTerm Load (0.1ms)[0m   [0mSELECT * FROM `blacklisted_terms` WHERE (`blacklisted_terms`.blacklist_id = 5) [0m
+  [4;36;1mBlacklistedTerm Load (0.1ms)[0m   [0;1mSELECT * FROM `blacklisted_terms` WHERE (`blacklisted_terms`.blacklist_id = 6) [0m
+  [4;35;1mBlacklistedTerm Load (0.1ms)[0m   [0mSELECT * FROM `blacklisted_terms` WHERE (`blacklisted_terms`.blacklist_id = 8) [0m
+  [4;36;1mBlacklistedTerm Load (0.1ms)[0m   [0;1mSELECT * FROM `blacklisted_terms` WHERE (`blacklisted_terms`.blacklist_id = 9) [0m
+  [4;35;1mBlacklistedTerm Load (0.1ms)[0m   [0mSELECT * FROM `blacklisted_terms` WHERE (`blacklisted_terms`.blacklist_id = 12) [0m
+Completed in 42ms (View: 32, DB: 3) | 200 OK [http://localhost/blacklists]
+  [4;36;1mSQL (0.2ms)[0m   [0;1mSET NAMES 'utf8'[0m
+  [4;35;1mSQL (0.3ms)[0m   [0mSET SQL_AUTO_IS_NULL=0[0m
+
+
+Processing BlacklistsController#show (for 127.0.0.1 at 2010-05-31 19:59:35) [GET]
+  Parameters: {"id"=>"1"}
+  [4;36;1mBlacklist Columns (0.7ms)[0m   [0;1mSHOW FIELDS FROM `blacklists`[0m
+  [4;35;1mBlacklist Load (0.4ms)[0m   [0mSELECT * FROM `blacklists` WHERE (`blacklists`.`id` = 1) [0m
+  [4;36;1mBlacklistedTerm Columns (0.8ms)[0m   [0;1mSHOW FIELDS FROM `blacklisted_terms`[0m
+  [4;35;1mBlacklistedTerm Load (0.4ms)[0m   [0mSELECT * FROM `blacklisted_terms` WHERE (`blacklisted_terms`.`blacklist_id` = 1) [0m
+Rendering template within layouts/application
+Rendering blacklists/show
+  [4;36;1mBlacklistedTerm Load (0.2ms)[0m   [0;1mSELECT * FROM `blacklisted_terms` WHERE (`blacklisted_terms`.blacklist_id = 1) [0m
+Rendered messages/_table (164.6ms)
+Completed in 1733ms (View: 198, DB: 3) | 200 OK [http://localhost/blacklists/show/1]
+  [4;35;1mSQL (0.1ms)[0m   [0mSET NAMES 'utf8'[0m
+  [4;36;1mSQL (0.1ms)[0m   [0;1mSET SQL_AUTO_IS_NULL=0[0m
+
+
+Processing BlacklistsController#show (for 127.0.0.1 at 2010-05-31 19:59:40) [GET]
+  Parameters: {"id"=>"4"}
+  [4;35;1mBlacklist Columns (0.8ms)[0m   [0mSHOW FIELDS FROM `blacklists`[0m
+  [4;36;1mBlacklist Load (0.4ms)[0m   [0;1mSELECT * FROM `blacklists` WHERE (`blacklists`.`id` = 4) [0m
+  [4;35;1mBlacklistedTerm Columns (0.8ms)[0m   [0mSHOW FIELDS FROM `blacklisted_terms`[0m
+  [4;36;1mBlacklistedTerm Load (0.3ms)[0m   [0;1mSELECT * FROM `blacklisted_terms` WHERE (`blacklisted_terms`.`blacklist_id` = 4) [0m
+Rendering template within layouts/application
+Rendering blacklists/show
+  [4;35;1mBlacklistedTerm Load (0.2ms)[0m   [0mSELECT * FROM `blacklisted_terms` WHERE (`blacklisted_terms`.blacklist_id = 4) [0m
+Rendered messages/_table (0.3ms)
+Completed in 19165ms (View: 12, DB: 3) | 200 OK [http://localhost/blacklists/show/4]
+  [4;36;1mSQL (0.1ms)[0m   [0;1mSET NAMES 'utf8'[0m
+  [4;35;1mSQL (0.1ms)[0m   [0mSET SQL_AUTO_IS_NULL=0[0m
+
+
+Processing ApplicationController#index (for 127.0.0.1 at 2010-05-31 20:00:28) [GET]
+
+ActionController::RoutingError (No route matches "/hosts" with {:method=>:get}):
+  /usr/lib/ruby/1.8/webrick/httpserver.rb:104:in `service'
+  /usr/lib/ruby/1.8/webrick/httpserver.rb:65:in `run'
+  /usr/lib/ruby/1.8/webrick/server.rb:173:in `start_thread'
+  /usr/lib/ruby/1.8/webrick/server.rb:162:in `start'
+  /usr/lib/ruby/1.8/webrick/server.rb:162:in `start_thread'
+  /usr/lib/ruby/1.8/webrick/server.rb:95:in `start'
+  /usr/lib/ruby/1.8/webrick/server.rb:92:in `each'
+  /usr/lib/ruby/1.8/webrick/server.rb:92:in `start'
+  /usr/lib/ruby/1.8/webrick/server.rb:23:in `start'
+  /usr/lib/ruby/1.8/webrick/server.rb:82:in `start'
+
+Rendering rescues/layout (not_found)
+  [4;36;1mSQL (0.1ms)[0m   [0;1mSET NAMES 'utf8'[0m
+  [4;35;1mSQL (0.1ms)[0m   [0mSET SQL_AUTO_IS_NULL=0[0m
+
+
+Processing StreamsController#index (for 127.0.0.1 at 2010-05-31 20:00:30) [GET]
+  [4;36;1mStream Columns (0.7ms)[0m   [0;1mSHOW FIELDS FROM `streams`[0m
+  [4;35;1mBlacklistedTerm Load (0.2ms)[0m   [0mSELECT * FROM `blacklisted_terms` [0m
+  [4;36;1mBlacklistedTerm Columns (0.6ms)[0m   [0;1mSHOW FIELDS FROM `blacklisted_terms`[0m
+Rendering template within layouts/application
+Rendering streams/index
+Completed in 103ms (View: 7, DB: 2) | 200 OK [http://localhost/streams]
+  [4;35;1mSQL (0.1ms)[0m   [0mSET NAMES 'utf8'[0m
+  [4;36;1mSQL (0.1ms)[0m   [0;1mSET SQL_AUTO_IS_NULL=0[0m
+
+
+Processing MessagesController#index (for 127.0.0.1 at 2010-05-31 20:00:32) [GET]
+  [4;35;1mBlacklistedTerm Load (0.2ms)[0m   [0mSELECT * FROM `blacklisted_terms` [0m
+  [4;36;1mBlacklistedTerm Columns (0.7ms)[0m   [0;1mSHOW FIELDS FROM `blacklisted_terms`[0m
+  [4;35;1mSQL (0.1ms)[0m   [0mSELECT count(*) AS count_all FROM `blacklisted_terms` [0m
+Rendering template within layouts/application
+Rendering messages/index
+Rendered messages/_table (96.1ms)
+Completed in 180ms (View: 102, DB: 1) | 200 OK [http://localhost/]
+  [4;36;1mSQL (0.1ms)[0m   [0;1mSET NAMES 'utf8'[0m
+  [4;35;1mSQL (0.1ms)[0m   [0mSET SQL_AUTO_IS_NULL=0[0m
+
+
+Processing StreamsController#index (for 127.0.0.1 at 2010-05-31 20:00:34) [GET]
+  [4;36;1mStream Columns (0.7ms)[0m   [0;1mSHOW FIELDS FROM `streams`[0m
+  [4;35;1mBlacklistedTerm Load (0.2ms)[0m   [0mSELECT * FROM `blacklisted_terms` [0m
+  [4;36;1mBlacklistedTerm Columns (0.6ms)[0m   [0;1mSHOW FIELDS FROM `blacklisted_terms`[0m
+Rendering template within layouts/application
+Rendering streams/index
+Completed in 32ms (View: 7, DB: 2) | 200 OK [http://localhost/streams]
+  [4;35;1mSQL (0.2ms)[0m   [0mSET NAMES 'utf8'[0m
+  [4;36;1mSQL (0.1ms)[0m   [0;1mSET SQL_AUTO_IS_NULL=0[0m
+
+
+Processing MessagesController#index (for 127.0.0.1 at 2010-05-31 20:00:35) [GET]
+  [4;35;1mBlacklistedTerm Load (0.2ms)[0m   [0mSELECT * FROM `blacklisted_terms` [0m
+  [4;36;1mBlacklistedTerm Columns (0.6ms)[0m   [0;1mSHOW FIELDS FROM `blacklisted_terms`[0m
+  [4;35;1mSQL (0.1ms)[0m   [0mSELECT count(*) AS count_all FROM `blacklisted_terms` [0m
+Rendering template within layouts/application
+Rendering messages/index
+Rendered messages/_table (180.0ms)
+Completed in 271ms (View: 188, DB: 1) | 200 OK [http://localhost/]
+  [4;36;1mSQL (0.1ms)[0m   [0;1mSET NAMES 'utf8'[0m
+  [4;35;1mSQL (0.1ms)[0m   [0mSET SQL_AUTO_IS_NULL=0[0m
+
+
+Processing MessagesController#index (for 127.0.0.1 at 2010-05-31 20:12:23) [GET]
+  [4;36;1mBlacklistedTerm Load (0.2ms)[0m   [0;1mSELECT * FROM `blacklisted_terms` [0m
+  [4;35;1mBlacklistedTerm Columns (0.7ms)[0m   [0mSHOW FIELDS FROM `blacklisted_terms`[0m
+  [4;36;1mSQL (0.1ms)[0m   [0;1mSELECT count(*) AS count_all FROM `blacklisted_terms` [0m
+Rendering template within layouts/application
+Rendering messages/index
+Rendered messages/_table (104.4ms)
+Completed in 163ms (View: 111, DB: 1) | 200 OK [http://localhost/]
+  [4;35;1mSQL (0.1ms)[0m   [0mSET NAMES 'utf8'[0m
+  [4;36;1mSQL (0.1ms)[0m   [0;1mSET SQL_AUTO_IS_NULL=0[0m
+
+
+Processing MessagesController#index (for 127.0.0.1 at 2010-05-31 20:12:27) [GET]
+  [4;35;1mBlacklistedTerm Load (0.2ms)[0m   [0mSELECT * FROM `blacklisted_terms` [0m
+  [4;36;1mBlacklistedTerm Columns (0.6ms)[0m   [0;1mSHOW FIELDS FROM `blacklisted_terms`[0m
+  [4;35;1mSQL (0.1ms)[0m   [0mSELECT count(*) AS count_all FROM `blacklisted_terms` [0m
+Rendering template within layouts/application
+Rendering messages/index
+Rendered messages/_table (95.3ms)
+Completed in 154ms (View: 101, DB: 1) | 200 OK [http://localhost/]
+  [4;36;1mSQL (0.1ms)[0m   [0;1mSET NAMES 'utf8'[0m
+  [4;35;1mSQL (0.1ms)[0m   [0mSET SQL_AUTO_IS_NULL=0[0m
+
+
+Processing MessagesController#index (for 127.0.0.1 at 2010-05-31 20:12:37) [GET]
+  [4;36;1mBlacklistedTerm Load (0.1ms)[0m   [0;1mSELECT * FROM `blacklisted_terms` [0m
+  [4;35;1mBlacklistedTerm Columns (0.7ms)[0m   [0mSHOW FIELDS FROM `blacklisted_terms`[0m
+  [4;36;1mSQL (0.1ms)[0m   [0;1mSELECT count(*) AS count_all FROM `blacklisted_terms` [0m
+Rendering template within layouts/application
+Rendering messages/index
+Rendered messages/_table (96.0ms)
+Completed in 226ms (View: 102, DB: 1) | 200 OK [http://localhost/]
+  [4;35;1mSQL (0.1ms)[0m   [0mSET NAMES 'utf8'[0m
+  [4;36;1mSQL (0.1ms)[0m   [0;1mSET SQL_AUTO_IS_NULL=0[0m
+
+
+Processing MessagesController#index (for 127.0.0.1 at 2010-05-31 20:12:38) [GET]
+  [4;35;1mBlacklistedTerm Load (0.2ms)[0m   [0mSELECT * FROM `blacklisted_terms` [0m
+  [4;36;1mBlacklistedTerm Columns (0.7ms)[0m   [0;1mSHOW FIELDS FROM `blacklisted_terms`[0m
+  [4;35;1mSQL (0.1ms)[0m   [0mSELECT count(*) AS count_all FROM `blacklisted_terms` [0m
+Rendering template within layouts/application
+Rendering messages/index
+Rendered messages/_table (98.4ms)
+Completed in 226ms (View: 105, DB: 1) | 200 OK [http://localhost/]
+  [4;36;1mSQL (0.1ms)[0m   [0;1mSET NAMES 'utf8'[0m
+  [4;35;1mSQL (0.1ms)[0m   [0mSET SQL_AUTO_IS_NULL=0[0m
+
+
+Processing MessagesController#index (for 127.0.0.1 at 2010-05-31 20:12:51) [GET]
+  [4;36;1mBlacklistedTerm Load (0.1ms)[0m   [0;1mSELECT * FROM `blacklisted_terms` [0m
+  [4;35;1mBlacklistedTerm Columns (0.7ms)[0m   [0mSHOW FIELDS FROM `blacklisted_terms`[0m
+  [4;36;1mSQL (0.1ms)[0m   [0;1mSELECT count(*) AS count_all FROM `blacklisted_terms` [0m
+Rendering template within layouts/application
+Rendering messages/index
+Rendered messages/_table (172.4ms)
+Completed in 230ms (View: 178, DB: 1) | 200 OK [http://localhost/]
+  [4;35;1mSQL (0.1ms)[0m   [0mSET NAMES 'utf8'[0m
+  [4;36;1mSQL (0.1ms)[0m   [0;1mSET SQL_AUTO_IS_NULL=0[0m
+
+
+Processing MessagesController#index (for 127.0.0.1 at 2010-05-31 20:12:52) [GET]
+  [4;35;1mBlacklistedTerm Load (0.1ms)[0m   [0mSELECT * FROM `blacklisted_terms` [0m
+  [4;36;1mBlacklistedTerm Columns (0.8ms)[0m   [0;1mSHOW FIELDS FROM `blacklisted_terms`[0m
+  [4;35;1mSQL (0.1ms)[0m   [0mSELECT count(*) AS count_all FROM `blacklisted_terms` [0m
+Rendering template within layouts/application
+Rendering messages/index
+Rendered messages/_table (170.1ms)
+Completed in 227ms (View: 176, DB: 1) | 200 OK [http://localhost/]
+  [4;36;1mSQL (0.1ms)[0m   [0;1mSET NAMES 'utf8'[0m
+  [4;35;1mSQL (0.1ms)[0m   [0mSET SQL_AUTO_IS_NULL=0[0m
+
+
+Processing MessagesController#index (for 127.0.0.1 at 2010-05-31 20:12:55) [GET]
+  [4;36;1mBlacklistedTerm Load (0.2ms)[0m   [0;1mSELECT * FROM `blacklisted_terms` [0m
+  [4;35;1mBlacklistedTerm Columns (0.7ms)[0m   [0mSHOW FIELDS FROM `blacklisted_terms`[0m
+  [4;36;1mSQL (0.1ms)[0m   [0;1mSELECT count(*) AS count_all FROM `blacklisted_terms` [0m
+Rendering template within layouts/application
+Rendering messages/index
+Rendered messages/_table (95.8ms)
+Completed in 155ms (View: 102, DB: 1) | 200 OK [http://localhost/]
+  [4;35;1mSQL (0.1ms)[0m   [0mSET NAMES 'utf8'[0m
+  [4;36;1mSQL (0.1ms)[0m   [0;1mSET SQL_AUTO_IS_NULL=0[0m
+
+
+Processing BlacklistsController#index (for 127.0.0.1 at 2010-05-31 20:13:03) [GET]
+  [4;35;1mBlacklist Load (0.2ms)[0m   [0mSELECT * FROM `blacklists` [0m
+  [4;36;1mBlacklist Columns (0.8ms)[0m   [0;1mSHOW FIELDS FROM `blacklists`[0m
+Rendering template within layouts/application
+Rendering blacklists/index
+  [4;35;1mBlacklistedTerm Load (0.1ms)[0m   [0mSELECT * FROM `blacklisted_terms` WHERE (`blacklisted_terms`.blacklist_id = 1) [0m
+  [4;36;1mBlacklistedTerm Columns (0.8ms)[0m   [0;1mSHOW FIELDS FROM `blacklisted_terms`[0m
+  [4;35;1mBlacklistedTerm Load (0.1ms)[0m   [0mSELECT * FROM `blacklisted_terms` WHERE (`blacklisted_terms`.blacklist_id = 2) [0m
+  [4;36;1mBlacklistedTerm Load (0.1ms)[0m   [0;1mSELECT * FROM `blacklisted_terms` WHERE (`blacklisted_terms`.blacklist_id = 3) [0m
+  [4;35;1mBlacklistedTerm Load (0.1ms)[0m   [0mSELECT * FROM `blacklisted_terms` WHERE (`blacklisted_terms`.blacklist_id = 4) [0m
+  [4;36;1mBlacklistedTerm Load (0.1ms)[0m   [0;1mSELECT * FROM `blacklisted_terms` WHERE (`blacklisted_terms`.blacklist_id = 5) [0m
+  [4;35;1mBlacklistedTerm Load (0.1ms)[0m   [0mSELECT * FROM `blacklisted_terms` WHERE (`blacklisted_terms`.blacklist_id = 6) [0m
+  [4;36;1mBlacklistedTerm Load (0.1ms)[0m   [0;1mSELECT * FROM `blacklisted_terms` WHERE (`blacklisted_terms`.blacklist_id = 8) [0m
+  [4;35;1mBlacklistedTerm Load (0.1ms)[0m   [0mSELECT * FROM `blacklisted_terms` WHERE (`blacklisted_terms`.blacklist_id = 9) [0m
+  [4;36;1mBlacklistedTerm Load (0.1ms)[0m   [0;1mSELECT * FROM `blacklisted_terms` WHERE (`blacklisted_terms`.blacklist_id = 12) [0m
+Completed in 44ms (View: 34, DB: 3) | 200 OK [http://localhost/blacklists]
+  [4;35;1mSQL (0.1ms)[0m   [0mSET NAMES 'utf8'[0m
+  [4;36;1mSQL (0.1ms)[0m   [0;1mSET SQL_AUTO_IS_NULL=0[0m
+
+
+Processing BlacklistsController#show (for 127.0.0.1 at 2010-05-31 20:13:07) [GET]
+  Parameters: {"id"=>"2"}
+  [4;35;1mBlacklist Columns (0.7ms)[0m   [0mSHOW FIELDS FROM `blacklists`[0m
+  [4;36;1mBlacklist Load (0.3ms)[0m   [0;1mSELECT * FROM `blacklists` WHERE (`blacklists`.`id` = 2) [0m
+  [4;35;1mBlacklistedTerm Columns (0.7ms)[0m   [0mSHOW FIELDS FROM `blacklisted_terms`[0m
+  [4;36;1mBlacklistedTerm Load (0.3ms)[0m   [0;1mSELECT * FROM `blacklisted_terms` WHERE (`blacklisted_terms`.`blacklist_id` = 2) [0m
+Rendering template within layouts/application
+Rendering blacklists/show
+  [4;35;1mBlacklistedTerm Load (0.2ms)[0m   [0mSELECT * FROM `blacklisted_terms` WHERE (`blacklisted_terms`.blacklist_id = 2) [0m
+Rendered messages/_table (100.7ms)
+Completed in 285ms (View: 112, DB: 2) | 200 OK [http://localhost/blacklists/show/2]
+  [4;36;1mSQL (0.1ms)[0m   [0;1mSET NAMES 'utf8'[0m
+  [4;35;1mSQL (0.1ms)[0m   [0mSET SQL_AUTO_IS_NULL=0[0m
+
+
+Processing BlacklistsController#show (for 127.0.0.1 at 2010-05-31 20:13:10) [GET]
+  Parameters: {"id"=>"1"}
+  [4;36;1mBlacklist Columns (0.8ms)[0m   [0;1mSHOW FIELDS FROM `blacklists`[0m
+  [4;35;1mBlacklist Load (0.1ms)[0m   [0mSELECT * FROM `blacklists` WHERE (`blacklists`.`id` = 1) [0m
+  [4;36;1mBlacklistedTerm Columns (0.8ms)[0m   [0;1mSHOW FIELDS FROM `blacklisted_terms`[0m
+  [4;35;1mBlacklistedTerm Load (0.1ms)[0m   [0mSELECT * FROM `blacklisted_terms` WHERE (`blacklisted_terms`.`blacklist_id` = 1) [0m
+Rendering template within layouts/application
+Rendering blacklists/show
+  [4;36;1mBlacklistedTerm Load (0.1ms)[0m   [0;1mSELECT * FROM `blacklisted_terms` WHERE (`blacklisted_terms`.blacklist_id = 1) [0m
+Rendered messages/_table (94.7ms)
+Completed in 308ms (View: 105, DB: 2) | 200 OK [http://localhost/blacklists/show/1]
+  [4;35;1mSQL (0.1ms)[0m   [0mSET NAMES 'utf8'[0m
+  [4;36;1mSQL (0.1ms)[0m   [0;1mSET SQL_AUTO_IS_NULL=0[0m
+
+
+Processing BlacklistsController#show (for 127.0.0.1 at 2010-05-31 20:13:21) [GET]
+  Parameters: {"id"=>"1"}
+  [4;35;1mBlacklist Columns (0.6ms)[0m   [0mSHOW FIELDS FROM `blacklists`[0m
+  [4;36;1mBlacklist Load (0.1ms)[0m   [0;1mSELECT * FROM `blacklists` WHERE (`blacklists`.`id` = 1) [0m
+  [4;35;1mBlacklistedTerm Columns (0.7ms)[0m   [0mSHOW FIELDS FROM `blacklisted_terms`[0m
+  [4;36;1mBlacklistedTerm Load (0.1ms)[0m   [0;1mSELECT * FROM `blacklisted_terms` WHERE (`blacklisted_terms`.`blacklist_id` = 1) [0m
+Rendering template within layouts/application
+Rendering blacklists/show
+  [4;35;1mBlacklistedTerm Load (0.1ms)[0m   [0mSELECT * FROM `blacklisted_terms` WHERE (`blacklisted_terms`.blacklist_id = 1) [0m
+Rendered messages/_table (116.8ms)
+Completed in 411ms (View: 127, DB: 2) | 200 OK [http://localhost/blacklists/show/1]
+  [4;36;1mSQL (0.1ms)[0m   [0;1mSET NAMES 'utf8'[0m
+  [4;35;1mSQL (0.1ms)[0m   [0mSET SQL_AUTO_IS_NULL=0[0m
+
+
+Processing BlacklistsController#show (for 127.0.0.1 at 2010-05-31 20:14:03) [GET]
+  Parameters: {"id"=>"1"}
+  [4;36;1mBlacklist Columns (0.7ms)[0m   [0;1mSHOW FIELDS FROM `blacklists`[0m
+  [4;35;1mBlacklist Load (0.1ms)[0m   [0mSELECT * FROM `blacklists` WHERE (`blacklists`.`id` = 1) [0m
+  [4;36;1mBlacklistedTerm Columns (0.9ms)[0m   [0;1mSHOW FIELDS FROM `blacklisted_terms`[0m
+  [4;35;1mBlacklistedTerm Load (0.1ms)[0m   [0mSELECT * FROM `blacklisted_terms` WHERE (`blacklisted_terms`.`blacklist_id` = 1) [0m
+Rendering template within layouts/application
+Rendering blacklists/show
+  [4;36;1mBlacklistedTerm Load (0.1ms)[0m   [0;1mSELECT * FROM `blacklisted_terms` WHERE (`blacklisted_terms`.blacklist_id = 1) [0m
+Rendered messages/_table (97.1ms)
+Completed in 241ms (View: 107, DB: 2) | 200 OK [http://localhost/blacklists/show/1]
+  [4;35;1mSQL (0.1ms)[0m   [0mSET NAMES 'utf8'[0m
+  [4;36;1mSQL (0.1ms)[0m   [0;1mSET SQL_AUTO_IS_NULL=0[0m
+
+
+Processing MessagesController#index (for 127.0.0.1 at 2010-05-31 20:14:06) [GET]
+  [4;35;1mBlacklistedTerm Load (0.2ms)[0m   [0mSELECT * FROM `blacklisted_terms` [0m
+  [4;36;1mBlacklistedTerm Columns (0.8ms)[0m   [0;1mSHOW FIELDS FROM `blacklisted_terms`[0m
+  [4;35;1mSQL (0.2ms)[0m   [0mSELECT count(*) AS count_all FROM `blacklisted_terms` [0m
+Rendering template within layouts/application
+Rendering messages/index
+Rendered messages/_table (0.3ms)
+Completed in 1526ms (View: 7, DB: 1) | 200 OK [http://localhost/]
+  [4;36;1mSQL (0.2ms)[0m   [0;1mSET NAMES 'utf8'[0m
+  [4;35;1mSQL (0.2ms)[0m   [0mSET SQL_AUTO_IS_NULL=0[0m
+
+
+Processing MessagesController#index (for 127.0.0.1 at 2010-05-31 20:14:19) [GET]
+  [4;36;1mBlacklistedTerm Load (0.2ms)[0m   [0;1mSELECT * FROM `blacklisted_terms` [0m
+  [4;35;1mBlacklistedTerm Columns (0.9ms)[0m   [0mSHOW FIELDS FROM `blacklisted_terms`[0m
+  [4;36;1mSQL (0.1ms)[0m   [0;1mSELECT count(*) AS count_all FROM `blacklisted_terms` [0m
+Rendering template within layouts/application
+Rendering messages/index
+Rendered messages/_table (98.7ms)
+Completed in 252ms (View: 105, DB: 2) | 200 OK [http://localhost/]
+  [4;35;1mSQL (0.1ms)[0m   [0mSET NAMES 'utf8'[0m
+  [4;36;1mSQL (0.1ms)[0m   [0;1mSET SQL_AUTO_IS_NULL=0[0m
+
+
+Processing MessagesController#index (for 127.0.0.1 at 2010-05-31 20:14:27) [GET]
+  [4;35;1mSQL (0.3ms)[0m   [0mSHOW TABLES[0m
+  [4;36;1mBlacklistedTerm Columns (0.6ms)[0m   [0;1mSHOW FIELDS FROM `blacklisted_terms`[0m
+
+NoMethodError (undefined method `get_all_as_condition_hash' for #<Class:0x7f3690864188>):
+  app/models/message.rb:23:in `all_with_blacklist'
+  app/controllers/messages_controller.rb:3:in `index'
+  /usr/lib/ruby/1.8/webrick/httpserver.rb:104:in `service'
+  /usr/lib/ruby/1.8/webrick/httpserver.rb:65:in `run'
+  /usr/lib/ruby/1.8/webrick/server.rb:173:in `start_thread'
+  /usr/lib/ruby/1.8/webrick/server.rb:162:in `start'
+  /usr/lib/ruby/1.8/webrick/server.rb:162:in `start_thread'
+  /usr/lib/ruby/1.8/webrick/server.rb:95:in `start'
+  /usr/lib/ruby/1.8/webrick/server.rb:92:in `each'
+  /usr/lib/ruby/1.8/webrick/server.rb:92:in `start'
+  /usr/lib/ruby/1.8/webrick/server.rb:23:in `start'
+  /usr/lib/ruby/1.8/webrick/server.rb:82:in `start'
+
+Rendered rescues/_trace (124.2ms)
+Rendered rescues/_request_and_response (4.0ms)
+Rendering rescues/layout (internal_server_error)
+  [4;35;1mSQL (0.1ms)[0m   [0mSET NAMES 'utf8'[0m
+  [4;36;1mSQL (0.1ms)[0m   [0;1mSET SQL_AUTO_IS_NULL=0[0m
+
+
+Processing MessagesController#index (for 127.0.0.1 at 2010-05-31 20:14:31) [GET]
+  [4;35;1mSQL (0.4ms)[0m   [0mSHOW TABLES[0m
+  [4;36;1mBlacklistedTerm Columns (0.6ms)[0m   [0;1mSHOW FIELDS FROM `blacklisted_terms`[0m
+
+NoMethodError (undefined method `get_all_as_condition_hash' for #<Class:0x7f3690d40580>):
+  app/models/message.rb:23:in `all_with_blacklist'
+  app/controllers/messages_controller.rb:3:in `index'
+  /usr/lib/ruby/1.8/webrick/httpserver.rb:104:in `service'
+  /usr/lib/ruby/1.8/webrick/httpserver.rb:65:in `run'
+  /usr/lib/ruby/1.8/webrick/server.rb:173:in `start_thread'
+  /usr/lib/ruby/1.8/webrick/server.rb:162:in `start'
+  /usr/lib/ruby/1.8/webrick/server.rb:162:in `start_thread'
+  /usr/lib/ruby/1.8/webrick/server.rb:95:in `start'
+  /usr/lib/ruby/1.8/webrick/server.rb:92:in `each'
+  /usr/lib/ruby/1.8/webrick/server.rb:92:in `start'
+  /usr/lib/ruby/1.8/webrick/server.rb:23:in `start'
+  /usr/lib/ruby/1.8/webrick/server.rb:82:in `start'
+
+Rendered rescues/_trace (33.8ms)
+Rendered rescues/_request_and_response (0.6ms)
+Rendering rescues/layout (internal_server_error)
+  [4;35;1mSQL (0.1ms)[0m   [0mSET NAMES 'utf8'[0m
+  [4;36;1mSQL (0.1ms)[0m   [0;1mSET SQL_AUTO_IS_NULL=0[0m
+
+
+Processing MessagesController#index (for 127.0.0.1 at 2010-05-31 20:14:36) [GET]
+  [4;35;1mBlacklistedTerm Load (0.2ms)[0m   [0mSELECT * FROM `blacklisted_terms` [0m
+  [4;36;1mBlacklistedTerm Columns (0.6ms)[0m   [0;1mSHOW FIELDS FROM `blacklisted_terms`[0m
+  [4;35;1mSQL (0.1ms)[0m   [0mSELECT count(*) AS count_all FROM `blacklisted_terms` [0m
+Rendering template within layouts/application
+Rendering messages/index
+Rendered messages/_table (129.1ms)
+Completed in 294ms (View: 136, DB: 1) | 200 OK [http://localhost/]
+  [4;36;1mSQL (0.1ms)[0m   [0;1mSET NAMES 'utf8'[0m
+  [4;35;1mSQL (0.1ms)[0m   [0mSET SQL_AUTO_IS_NULL=0[0m
+
+
+Processing MessagesController#index (for 127.0.0.1 at 2010-05-31 20:14:52) [GET]
+  [4;36;1mBlacklistedTerm Load (0.2ms)[0m   [0;1mSELECT * FROM `blacklisted_terms` [0m
+  [4;35;1mBlacklistedTerm Columns (0.6ms)[0m   [0mSHOW FIELDS FROM `blacklisted_terms`[0m
+  [4;36;1mSQL (0.1ms)[0m   [0;1mSELECT count(*) AS count_all FROM `blacklisted_terms` [0m
+Rendering template within layouts/application
+Rendering messages/index
+Rendered messages/_table (176.7ms)
+Completed in 243ms (View: 183, DB: 1) | 200 OK [http://localhost/]
+  [4;35;1mSQL (0.1ms)[0m   [0mSET NAMES 'utf8'[0m
+  [4;36;1mSQL (0.1ms)[0m   [0;1mSET SQL_AUTO_IS_NULL=0[0m
+
+
+Processing BlacklistsController#index (for 127.0.0.1 at 2010-05-31 20:14:56) [GET]
+  [4;35;1mBlacklist Load (0.1ms)[0m   [0mSELECT * FROM `blacklists` [0m
+  [4;36;1mBlacklist Columns (0.8ms)[0m   [0;1mSHOW FIELDS FROM `blacklists`[0m
+Rendering template within layouts/application
+Rendering blacklists/index
+  [4;35;1mBlacklistedTerm Load (0.2ms)[0m   [0mSELECT * FROM `blacklisted_terms` WHERE (`blacklisted_terms`.blacklist_id = 1) [0m
+  [4;36;1mBlacklistedTerm Columns (0.8ms)[0m   [0;1mSHOW FIELDS FROM `blacklisted_terms`[0m
+  [4;35;1mBlacklistedTerm Load (0.1ms)[0m   [0mSELECT * FROM `blacklisted_terms` WHERE (`blacklisted_terms`.blacklist_id = 2) [0m
+  [4;36;1mBlacklistedTerm Load (0.2ms)[0m   [0;1mSELECT * FROM `blacklisted_terms` WHERE (`blacklisted_terms`.blacklist_id = 3) [0m
+  [4;35;1mBlacklistedTerm Load (0.1ms)[0m   [0mSELECT * FROM `blacklisted_terms` WHERE (`blacklisted_terms`.blacklist_id = 4) [0m
+  [4;36;1mBlacklistedTerm Load (0.1ms)[0m   [0;1mSELECT * FROM `blacklisted_terms` WHERE (`blacklisted_terms`.blacklist_id = 5) [0m
+  [4;35;1mBlacklistedTerm Load (0.1ms)[0m   [0mSELECT * FROM `blacklisted_terms` WHERE (`blacklisted_terms`.blacklist_id = 6) [0m
+  [4;36;1mBlacklistedTerm Load (0.1ms)[0m   [0;1mSELECT * FROM `blacklisted_terms` WHERE (`blacklisted_terms`.blacklist_id = 8) [0m
+  [4;35;1mBlacklistedTerm Load (0.1ms)[0m   [0mSELECT * FROM `blacklisted_terms` WHERE (`blacklisted_terms`.blacklist_id = 9) [0m
+  [4;36;1mBlacklistedTerm Load (0.2ms)[0m   [0;1mSELECT * FROM `blacklisted_terms` WHERE (`blacklisted_terms`.blacklist_id = 12) [0m
+Completed in 43ms (View: 33, DB: 3) | 200 OK [http://localhost/blacklists]
+  [4;35;1mSQL (0.1ms)[0m   [0mSET NAMES 'utf8'[0m
+  [4;36;1mSQL (0.1ms)[0m   [0;1mSET SQL_AUTO_IS_NULL=0[0m
+
+
+Processing BlacklistsController#show (for 127.0.0.1 at 2010-05-31 20:14:57) [GET]
+  Parameters: {"id"=>"3"}
+  [4;35;1mBlacklist Columns (0.7ms)[0m   [0mSHOW FIELDS FROM `blacklists`[0m
+  [4;36;1mBlacklist Load (0.3ms)[0m   [0;1mSELECT * FROM `blacklists` WHERE (`blacklists`.`id` = 3) [0m
+  [4;35;1mBlacklistedTerm Columns (0.7ms)[0m   [0mSHOW FIELDS FROM `blacklisted_terms`[0m
+  [4;36;1mBlacklistedTerm Load (0.4ms)[0m   [0;1mSELECT * FROM `blacklisted_terms` WHERE (`blacklisted_terms`.`blacklist_id` = 3) [0m
+Rendering template within layouts/application
+Rendering blacklists/show
+  [4;35;1mBlacklistedTerm Load (0.1ms)[0m   [0mSELECT * FROM `blacklisted_terms` WHERE (`blacklisted_terms`.blacklist_id = 3) [0m
+Rendered messages/_table (0.4ms)
+Completed in 1439ms (View: 13, DB: 2) | 200 OK [http://localhost/blacklists/show/3]
+  [4;36;1mSQL (0.1ms)[0m   [0;1mSET NAMES 'utf8'[0m
+  [4;35;1mSQL (0.1ms)[0m   [0mSET SQL_AUTO_IS_NULL=0[0m
+
+
+Processing BlacklistsController#show (for 127.0.0.1 at 2010-05-31 20:15:01) [GET]
+  Parameters: {"id"=>"2"}
+  [4;36;1mBlacklist Columns (0.7ms)[0m   [0;1mSHOW FIELDS FROM `blacklists`[0m
+  [4;35;1mBlacklist Load (0.1ms)[0m   [0mSELECT * FROM `blacklists` WHERE (`blacklists`.`id` = 2) [0m
+  [4;36;1mBlacklistedTerm Columns (0.8ms)[0m   [0;1mSHOW FIELDS FROM `blacklisted_terms`[0m
+  [4;35;1mBlacklistedTerm Load (0.1ms)[0m   [0mSELECT * FROM `blacklisted_terms` WHERE (`blacklisted_terms`.`blacklist_id` = 2) [0m
+Rendering template within layouts/application
+Rendering blacklists/show
+  [4;36;1mBlacklistedTerm Load (0.1ms)[0m   [0;1mSELECT * FROM `blacklisted_terms` WHERE (`blacklisted_terms`.blacklist_id = 2) [0m
+Rendered messages/_table (96.1ms)
+Completed in 282ms (View: 107, DB: 2) | 200 OK [http://localhost/blacklists/show/2]
+  [4;35;1mSQL (0.1ms)[0m   [0mSET NAMES 'utf8'[0m
+  [4;36;1mSQL (0.1ms)[0m   [0;1mSET SQL_AUTO_IS_NULL=0[0m
+
+
+Processing BlacklistsController#show (for 127.0.0.1 at 2010-05-31 20:15:05) [GET]
+  Parameters: {"id"=>"4"}
+  [4;35;1mBlacklist Columns (0.7ms)[0m   [0mSHOW FIELDS FROM `blacklists`[0m
+  [4;36;1mBlacklist Load (0.1ms)[0m   [0;1mSELECT * FROM `blacklists` WHERE (`blacklists`.`id` = 4) [0m
+  [4;35;1mBlacklistedTerm Columns (0.7ms)[0m   [0mSHOW FIELDS FROM `blacklisted_terms`[0m
+  [4;36;1mBlacklistedTerm Load (0.1ms)[0m   [0;1mSELECT * FROM `blacklisted_terms` WHERE (`blacklisted_terms`.`blacklist_id` = 4) [0m
+Rendering template within layouts/application
+Rendering blacklists/show
+  [4;35;1mBlacklistedTerm Load (0.2ms)[0m   [0mSELECT * FROM `blacklisted_terms` WHERE (`blacklisted_terms`.blacklist_id = 4) [0m
+Rendered messages/_table (0.3ms)
+Completed in 1414ms (View: 13, DB: 2) | 200 OK [http://localhost/blacklists/show/4]
+  [4;36;1mSQL (0.1ms)[0m   [0;1mSET NAMES 'utf8'[0m
+  [4;35;1mSQL (0.1ms)[0m   [0mSET SQL_AUTO_IS_NULL=0[0m
+
+
+Processing BlacklistsController#index (for 127.0.0.1 at 2010-05-31 20:16:05) [GET]
+  [4;36;1mBlacklist Load (0.1ms)[0m   [0;1mSELECT * FROM `blacklists` [0m
+  [4;35;1mBlacklist Columns (0.7ms)[0m   [0mSHOW FIELDS FROM `blacklists`[0m
+Rendering template within layouts/application
+Rendering blacklists/index
+  [4;36;1mBlacklistedTerm Load (0.1ms)[0m   [0;1mSELECT * FROM `blacklisted_terms` WHERE (`blacklisted_terms`.blacklist_id = 1) [0m
+  [4;35;1mBlacklistedTerm Columns (0.7ms)[0m   [0mSHOW FIELDS FROM `blacklisted_terms`[0m
+  [4;36;1mBlacklistedTerm Load (0.1ms)[0m   [0;1mSELECT * FROM `blacklisted_terms` WHERE (`blacklisted_terms`.blacklist_id = 2) [0m
+  [4;35;1mBlacklistedTerm Load (0.1ms)[0m   [0mSELECT * FROM `blacklisted_terms` WHERE (`blacklisted_terms`.blacklist_id = 3) [0m
+  [4;36;1mBlacklistedTerm Load (0.1ms)[0m   [0;1mSELECT * FROM `blacklisted_terms` WHERE (`blacklisted_terms`.blacklist_id = 4) [0m
+  [4;35;1mBlacklistedTerm Load (0.1ms)[0m   [0mSELECT * FROM `blacklisted_terms` WHERE (`blacklisted_terms`.blacklist_id = 5) [0m
+  [4;36;1mBlacklistedTerm Load (0.1ms)[0m   [0;1mSELECT * FROM `blacklisted_terms` WHERE (`blacklisted_terms`.blacklist_id = 6) [0m
+  [4;35;1mBlacklistedTerm Load (0.1ms)[0m   [0mSELECT * FROM `blacklisted_terms` WHERE (`blacklisted_terms`.blacklist_id = 8) [0m
+  [4;36;1mBlacklistedTerm Load (0.1ms)[0m   [0;1mSELECT * FROM `blacklisted_terms` WHERE (`blacklisted_terms`.blacklist_id = 9) [0m
+  [4;35;1mBlacklistedTerm Load (0.1ms)[0m   [0mSELECT * FROM `blacklisted_terms` WHERE (`blacklisted_terms`.blacklist_id = 12) [0m
+Completed in 38ms (View: 28, DB: 3) | 200 OK [http://localhost/blacklists]
+  [4;36;1mSQL (0.1ms)[0m   [0;1mSET NAMES 'utf8'[0m
+  [4;35;1mSQL (0.1ms)[0m   [0mSET SQL_AUTO_IS_NULL=0[0m
+
+
+Processing BlacklistsController#show (for 127.0.0.1 at 2010-05-31 20:16:07) [GET]
+  Parameters: {"id"=>"3"}
+  [4;36;1mBlacklist Columns (0.8ms)[0m   [0;1mSHOW FIELDS FROM `blacklists`[0m
+  [4;35;1mBlacklist Load (0.2ms)[0m   [0mSELECT * FROM `blacklists` WHERE (`blacklists`.`id` = 3) [0m
+  [4;36;1mBlacklistedTerm Columns (0.8ms)[0m   [0;1mSHOW FIELDS FROM `blacklisted_terms`[0m
+  [4;35;1mBlacklistedTerm Load (0.1ms)[0m   [0mSELECT * FROM `blacklisted_terms` WHERE (`blacklisted_terms`.`blacklist_id` = 3) [0m
+Rendering template within layouts/application
+Rendering blacklists/show
+  [4;36;1mBlacklistedTerm Load (0.1ms)[0m   [0;1mSELECT * FROM `blacklisted_terms` WHERE (`blacklisted_terms`.blacklist_id = 3) [0m
+Rendered messages/_table (0.3ms)
+Completed in 1338ms (View: 11, DB: 2) | 200 OK [http://localhost/blacklists/show/3]
+  [4;35;1mSQL (0.1ms)[0m   [0mSET NAMES 'utf8'[0m
+  [4;36;1mSQL (0.1ms)[0m   [0;1mSET SQL_AUTO_IS_NULL=0[0m
+
+
+Processing BlacklistsController#show (for 127.0.0.1 at 2010-05-31 20:16:10) [GET]
+  Parameters: {"id"=>"1"}
+  [4;35;1mBlacklist Columns (0.8ms)[0m   [0mSHOW FIELDS FROM `blacklists`[0m
+  [4;36;1mBlacklist Load (0.1ms)[0m   [0;1mSELECT * FROM `blacklists` WHERE (`blacklists`.`id` = 1) [0m
+  [4;35;1mBlacklistedTerm Columns (0.8ms)[0m   [0mSHOW FIELDS FROM `blacklisted_terms`[0m
+  [4;36;1mBlacklistedTerm Load (0.1ms)[0m   [0;1mSELECT * FROM `blacklisted_terms` WHERE (`blacklisted_terms`.`blacklist_id` = 1) [0m
+Rendering template within layouts/application
+Rendering blacklists/show
+  [4;35;1mBlacklistedTerm Load (0.2ms)[0m   [0mSELECT * FROM `blacklisted_terms` WHERE (`blacklisted_terms`.blacklist_id = 1) [0m
+Rendered messages/_table (94.0ms)
+Completed in 389ms (View: 105, DB: 2) | 200 OK [http://localhost/blacklists/show/1]
+  [4;36;1mSQL (0.1ms)[0m   [0;1mSET NAMES 'utf8'[0m
+  [4;35;1mSQL (0.1ms)[0m   [0mSET SQL_AUTO_IS_NULL=0[0m
+
+
+Processing BlacklistsController#show (for 127.0.0.1 at 2010-05-31 20:16:12) [GET]
+  Parameters: {"id"=>"6"}
+  [4;36;1mBlacklist Columns (0.7ms)[0m   [0;1mSHOW FIELDS FROM `blacklists`[0m
+  [4;35;1mBlacklist Load (0.3ms)[0m   [0mSELECT * FROM `blacklists` WHERE (`blacklists`.`id` = 6) [0m
+  [4;36;1mBlacklistedTerm Columns (0.8ms)[0m   [0;1mSHOW FIELDS FROM `blacklisted_terms`[0m
+  [4;35;1mBlacklistedTerm Load (0.4ms)[0m   [0mSELECT * FROM `blacklisted_terms` WHERE (`blacklisted_terms`.`blacklist_id` = 6) [0m
+Rendering template within layouts/application
+Rendering blacklists/show
+  [4;36;1mBlacklistedTerm Load (0.1ms)[0m   [0;1mSELECT * FROM `blacklisted_terms` WHERE (`blacklisted_terms`.blacklist_id = 6) [0m
+Rendered messages/_table (0.3ms)
+Completed in 1170ms (View: 11, DB: 2) | 200 OK [http://localhost/blacklists/show/6]

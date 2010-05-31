@@ -1,9 +1,8 @@
 class BlacklistedTerm < ActiveRecord::Base
   belongs_to :blacklist
 
-  def self.get_all_as_condition_hash negated = true, id = nil
-    regex_string = String.new
 
+  def self.get_all_as_condition_hash negated = true, id = nil
     if id.blank?
       terms = self.all
     else
@@ -11,14 +10,16 @@ class BlacklistedTerm < ActiveRecord::Base
     end
 
     return nil if terms.blank?
+
+    conditions = Array.new
     terms.each do |term|
-      regex_string += "#{Regexp.escape(term.term)}|"
+      conditions << /#{Regexp.escape(term.term)}/
     end
 
-    if negated
-      return { '$not' => /#{regex_string.chop}/ }
-    else
-      return /#{regex_string.chop}/
-    end
+    modifier = "$all"
+
+    modifier = "$nin" if negated
+
+   return { modifier => conditions }
   end
 end
