@@ -81,7 +81,6 @@ label {
     padding: 7px;
     color: #000;
     text-transform: lowercase;
-    text-shadow: #000 3px 3px 2px;
 }
 
 #topmenu a:hover {
@@ -90,10 +89,6 @@ label {
 
 .topmenu-active {
    background-color: #fd0c99;
-}
-
-.topmenu-active a {
-    text-shadow: #333 2px 1px 1px;
 }
 
 .topmenu-active a:hover {

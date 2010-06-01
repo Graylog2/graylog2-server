@@ -2,7 +2,7 @@ class StreamsController < ApplicationController
   def index
     @new_stream = Stream.new
 
-    @messages = Message.all_with_blacklist(10)
+    #@messages = Message.all_with_blacklist(10)
   end
 
   def create

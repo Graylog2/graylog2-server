@@ -21,7 +21,7 @@ class Message
     conditions = Hash.new
 
     (blacklist = BlacklistedTerm.get_all_as_condition_hash).blank? ? nil : conditions[:message] = blacklist;
-    
+
     return self.all :limit => limit, :order => "_id DESC", :conditions => conditions
   end
 end
