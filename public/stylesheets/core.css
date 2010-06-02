@@ -1,8 +1,8 @@
 body {
   background-color: #d4d4d4;
   color: #000;
-  font-size: 12px;
-  font-family: Helvetica,Arial,'Liberation Sans',FreeSans,sans-serif;
+  font-size: 11px;
+  font-family: 'Lucida Grande',Verdana,sans-serif;
   line-height: 16px;
 }
 
@@ -29,11 +29,11 @@ th {
     text-align: left;
     padding-right: 15px;
     padding-bottom: 2px;
-    border-bottom: 2px dashed #222222;
+    border-bottom: 1px dashed #222222;
     font-size: 12px;
 }
 
-tr:hover {
+tbody tr:hover {
     background-color: #ffdddd;
 }
 
@@ -99,7 +99,8 @@ label {
 }
 
 .messages {
-    font-family: Helvetica,Arial,'Liberation Sans',FreeSans,sans-serif;
+    font-family: 'Lucida Grande',Verdana,sans-serif;
+    font-size: 9px;
 }
 
 .messages tr {
@@ -111,9 +112,9 @@ label {
 }
 
 .tr-light {
-    background-color: #f6f6f6;
+    background-color: #fff;
 }
 
 .tr-dark {
-    background-color: #eee;
+    background-color: #fff;
 }
