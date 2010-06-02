@@ -100,7 +100,7 @@ label {
 
 .messages {
     font-family: 'Lucida Grande',Verdana,sans-serif;
-    font-size: 9px;
+    font-size: 10px;
 }
 
 .messages tr {
@@ -108,7 +108,7 @@ label {
 }
 
 .messages td {
-    padding: 4px;
+    padding: 2px;
 }
 
 .tr-light {
