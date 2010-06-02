@@ -1,0 +1,23 @@
+<h1>Create new user</h1>
+<% @user.password = @user.password_confirmation = nil %>
+
+<%= error_messages_for :user %>
+<% form_for :user, :url => users_path do |f| -%>
+
+<dl>
+  <dt><%= label_tag 'login', "Username" %></dt>
+  <dd><%= f.text_field :login %></dd>
+
+  <dt><%= label_tag 'email' %></dt>
+  <dd><%= f.text_field :email %></dd>
+
+  <dt><%= label_tag 'password' %></dt>
+  <dd><%= f.password_field :password %></dd>
+
+  <dt><%= label_tag 'password_confirmation', 'Confirm Password' %></dt>
+  <dd><%= f.password_field :password_confirmation %></dd>
+
+  <dt>&nbsp;</dt>
+  <dd><%= submit_tag 'Create' %></dd>
+</dl>
+<% end -%>

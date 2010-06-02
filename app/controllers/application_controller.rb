@@ -2,11 +2,15 @@
 # Likewise, all the methods added will be available for all controllers.
 
 class ApplicationController < ActionController::Base
+  include AuthenticatedSystem
+  
   helper :all # include all helpers, all the time
   protect_from_forgery # See ActionController::RequestForgeryProtection for details
-
+  
   # Scrub sensitive parameters from your log
-  # filter_parameter_logging :password
+  filter_parameter_logging :password
+
+  before_filter :login_required
 
   def rescue_action e
     # Connection to MongoDB failed.
@@ -22,6 +26,31 @@ class ApplicationController < ActionController::Base
     end
 
     # Default 500 error.
+    logger.error "ERROR: #{e.to_str}"
     render :file  => "#{RAILS_ROOT}/public/500.html", :status => 500
+  end
+
+  helper_method :has_users
+  def has_users
+    return false if User.find(:all).size == 0
+    return true
+  end
+
+  private
+
+  def logged_in?
+    begin
+      return true if current_user
+    end
+    return false
+  end
+  
+  def login_required
+    if !logged_in?
+      redirect_to :controller => "sessions", :action => "new"
+    else
+      return true
+    end
+    return false
   end
 end

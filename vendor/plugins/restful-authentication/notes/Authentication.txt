@@ -1,0 +1,5 @@
+Guides to best practices:
+* "The OWASP Guide to Building Secure Web Applications":http://www.owasp.org/index.php/Category:OWASP_Guide_Project
+** specifically, of course, the chapter on Authentication.
+* "Secure Programming for Linux and Unix HOWTO":http://www.dwheeler.com/secure-programs/Secure-Programs-HOWTO/web-authentication.html
+* "Authentication and Identification,":http://www.downes.ca/post/12 by Stephen Downes **Highly Recommended**

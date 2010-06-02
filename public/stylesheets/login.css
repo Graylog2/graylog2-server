@@ -1,0 +1,63 @@
+body {
+  background-color: #000;
+  font-family: Helvetica,Arial,'Liberation Sans',FreeSans,sans-serif;
+  color: #fff;
+}
+
+a {
+    color: #fd0c99;
+    text-decoration: none;
+}
+
+h1 {
+  color: #fd0c99;
+  font-size: 20px;
+  margin-bottom: 15px;
+}
+
+input {
+    font-size: 12px;
+    padding: 2px;
+    margin-top: 2px;
+    margin-bottom: 2px;
+    width: 235px;
+}
+
+label {
+    font-size: 14px;
+}
+
+dt {
+  float: left;
+}
+
+dd {
+  padding-left: 150px;
+}
+
+#submit {
+  width: 100px;
+  float: right;
+}
+
+#loginbox {
+  width: 500px;
+  margin: 50px auto;
+  background-color: #333;
+  background-image: url(/images/graylog.png);
+  background-repeat: no-repeat;
+  padding: 110px 25px 10px;
+}
+
+#inner {
+  width: 
+}
+
+#username {
+  float: left;
+  padding-right: 10px;
+}
+
+#rememberme {
+  margin-top: 5px;
+}

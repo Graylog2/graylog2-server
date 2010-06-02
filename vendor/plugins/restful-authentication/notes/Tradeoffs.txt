@@ -1,0 +1,126 @@
+Guides to best practices:
+* "The OWASP Guide to Building Secure Web Applications":http://www.owasp.org/index.php/Category:OWASP_Guide_Project
+* "Secure Programming for Linux and Unix HOWTO":http://www.dwheeler.com/secure-programs/Secure-Programs-HOWTO/web-authentication.html
+* [[http://www.coresecuritypatterns.com/patterns.htm]]
+
+***************************************************************************
+h2. Session resetting
+
+Best practices recommend that you regenerate all session tokens (for us, the
+browser session ID and the remember_token cookie) on any privilege change (for
+us, logging in or logging out) -- see http://tinyurl.com/5vdvuq.  This release
+properly regenerates remember_token cookies, but does *not* by default
+reset_session.
+
+Calling reset_session can interact with Form Authentication tokens (a *much*
+more important security feature).  If a visitor logs in but has a form open in
+another tab, or uses the back button to pull one up from their history (perhaps
+the one that required them to log in), they will get the exceedingly unpleasant
+Request Forgery error.  Imagine spending twenty minutes crafting a devastating
+critique of this week's Battlestar Galactica episode, finding you need to log in
+before posting -- but then getting a Request Forgery when you re-attempt the
+post.  Frak!  Thus, it's disabled by default.
+
+On the other hand, this does moderately reduce your defense-in-depth against a
+"Cross-Site Request Forgery":http://en.wikipedia.org/wiki/CSRF attack.  To
+enable session_resetting, look for any
+   # reset session
+lines in the app/controllers/session_controller.rb and
+app/controllers/users_controller.rb and uncomment them.
+
+***************************************************************************
+h2. Site Key
+
+A Site key gives additional protection against a dictionary attack if your
+DB is ever compromised.  With no site key, we store
+  DB_password = hash(user_password, DB_user_salt)
+If your database were to be compromised you'd be vulnerable to a dictionary
+attack on all your stupid users' passwords.  With a site key, we store
+  DB_password = hash(user_password, DB_user_salt, Code_site_key)
+That means an attacker needs access to both your site's code *and* its
+database to mount an "offline dictionary attack.":http://www.dwheeler.com/secure-programs/Secure-Programs-HOWTO/web-authentication.html
+
+It's probably of minor importance, but recommended by best practices: 'defense
+in depth'.  Needless to say, if you upload this to github or the youtubes or
+otherwise place it in public view you'll kinda defeat the point.  Your users'
+passwords are still secure, and the world won't end, but defense_in_depth -= 1.
+
+Please note: if you change this, all the passwords will be invalidated, so DO
+keep it someplace secure.  Use the random value given or type in the lyrics to
+your favorite Jay-Z song or something; any moderately long, unpredictable text.
+
+***************************************************************************
+h2. Password stretching
+
+If someone were to capture your user accounts database, they could farm it out
+for brute-force or dictionary-attack password cracking.  "Password Stretching"
+makes brute force (even with a compromised database and site key) attacks
+harder, and scales with Moore's law.  Basically, you apply the password
+encryption process several times, meaning that each brute-force attempt takes
+that much longer.  Hash your password ten times, and a brute-force attack takes
+ten times longer; hash 100,000 times and an attack takes 100,000 times longer.
+
+  bq. "To squeeze the most security out of a limited-entropy password or
+  passphrase, we can use two techniques [salting and stretching]... that are so
+  simple and obvious that they should be used in every password system.  There
+  is really no excuse not to use them. ... Choose stretching factor so computing
+  K from (salt, passwd) takes 200-1000 ms. Store r with the user's password, and
+  increase it as computers get faster." -- http://tinyurl.com/37lb73
+  Practical Security (Ferguson & Scheier) p350
+
+Now, adding even a 0.2s delay to page requests isn't justifiable for most online
+applications, and storing r is unnecessary (at least on your first design
+iteration).  But 
+  On a 1G Slicehost already under moderate load:
+  irb(main):005:0> puts Time.now; (10**6).times{ secure_digest(Time.now, rand) }; puts Time.now
+  Fri May 16 08:26:16 +0000 2008
+  Fri May 16 08:30:58 +0000 2008
+  => 280s/1M ~= 0.000_3 ms / digest
+A modest 10 (the default here) foldings makes brute forcing, even given the site
+key and database, 10 times harder at a 3ms penalty.  An app that otherwise
+serves 100 reqs/s is reduced to 78 signin reqs/s; an app that does 10reqs/s is
+reduced to 9.7 signin reqs/s
+
+* http://www.owasp.org/index.php/Hashing_Java
+* "An Illustrated Guide to Cryptographic Hashes":http://www.unixwiz.net/techtips/iguide-crypto-hashes.html
+
+The default of 10 is a reasonable compromise, but the security-paranoid and
+resource-rich may consider increasing REST_AUTH_DIGEST_STRETCHES to match the
+one-second best-practices value, while those with existing userbases (whose
+passwords would otherwise no longer work) should leave the value at one.
+
+***************************************************************************
+h2. Token regeneration
+
+The session and the remember_token should both be expired and regenerated
+every time we cross the logged out / logged in barrier by either password
+or cookie.  ("To reduce the risk from session hijacking":http://www.owasp.org/index.php/Session_Management#Regeneration_of_Session_Tokens
+and brute force attacks, the HTTP server can seamlessly expire and
+regenerate tokens. This decreases the window of opportunity for a replay or
+brute force attack.)  It does mean we set the cookie more often.
+
+  http://www.owasp.org/index.php/Session_Management#Regeneration_of_Session_Tokens
+  http://palisade.plynt.com/issues/2004Jul/safe-auth-practices/
+
+
+***************************************************************************
+h2. Field validation
+
+We restrict login names to only contain the characters
+<nowiki>A-Za-z0-9.-_@</nowiki> This allows (most) email addresses and is safe
+for urls, database expressions (the at sign, technically reserved in a url, will
+survive in most browsers).  If you want to be more permissive:
+*  "URL-legal characters":http://www.blooberry.com/indexdot/html/topics/urlencoding.htm are <nowiki>-_.!~*'()</nowiki>
+*  "XML-legal characters":http://www.sklar.com/blog/archives/96-XML-vs.-Control-Characters.html are <nowiki>Char ::= #x9 | #xA | #xD | [#x20-#xD7FF] | [#xE000-#xFFFD] | [#x10000-#x10FFFF]</nowiki>
+*  "Email-address legal characters":http://tools.ietf.org/html/rfc2822#section-3.4.1 are <nowiki>0-9a-zA-Z!#\$%\&\'\*\+_/=\?^\-`\{|\}~\.</nowiki> but see "this discussion of what is sane"http://www.regular-expressions.info/email.html (as opposed to legal)
+
+We restrict email addresses to match only those actually seen in the wild,
+invalidating some that are technically allowed (characters such as % and ! that
+date back to UUCP days.  The line to allow all RFC-2822 emails is commented out,
+so feel free to enable it, or remove this validation.  See "this discussion of
+what is sane"http://www.regular-expressions.info/email.html as opposed to what
+is legal.  Also understand that this is just a cursory bogus-input check --
+there's no guarantee that this email matches an account or is even well-formed.
+
+If you change these validations you should change the RSpec tests as well.
+

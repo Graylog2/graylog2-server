@@ -1,0 +1,78 @@
+h1. Rails Authentication, Authorization and Access Control plugins
+
+h2. Authentication plugins
+
+* http://github.com/technoweenie/restful-authentication/tree/master -- the accepted standard for authentication
+* http://github.com/mrflip/restful-authentication/tree/master -- my fork of restful_authentication with more modularity, more specs and a few security tweaks
+* http://github.com/josh/open_id_authentication/tree/master -- OpenID authentication
+
+h2. Authorization plugins
+
+From
+* http://agilewebdevelopment.com/plugins/tag/security
+* http://www.vaporbase.com/postings/Authorization_in_Rails
+
+* http://github.com/jbarket/restful-authorization/tree/master
+
+* http://agilewebdevelopment.com/plugins/rolerequirement
+  http://code.google.com/p/rolerequirement/
+  http://rolerequirement.googlecode.com/svn/tags/role_requirement/
+  9 votes
+
+* http://github.com/ezmobius/acl_system2/
+  http://agilewebdevelopment.com/plugins/acl_system
+  http://opensvn.csie.org/ezra/rails/plugins/dev/acl_system2/
+  last touched 2006
+  57 votes on AWD
+  * also: http://agilewebdevelopment.com/plugins/acl_system2_ownership
+
+  bq. access_control [:new, :create, :update, :edit] => '(admin | user |
+                      moderator)', :delete => 'admin'
+      <% restrict_to "(admin | moderator) & !blacklist" do %>
+        <%= link_to "Admin & Moderator only link", :action =>'foo' %>
+      <% end %>
+
+* Authorization Recipe (from Rails Recipes #32)
+  http://www.vaporbase.com/postings/Authorization_in_Rails
+  http://opensvn.csie.org/mabs29/plugins/simple_access_control
+
+* Active ACL
+  http://phpgacl.sourceforge.net/demo/phpgacl/docs/manual.html
+  (Access-matrix driven)
+
+* http://github.com/aiwilliams/access_controlled_system
+
+* http://agilewebdevelopment.com/plugins/access
+
+* http://robzon.aenima.pl/2007/12/base-auth-is-out.html
+  http://agilewebdevelopment.com/plugins/base_auth
+  http://base-auth.googlecode.com/svn/trunk/
+  40 votes
+
+* http://agilewebdevelopment.com/plugins/authorization
+  http://www.writertopia.com/developers/authorization
+  http://github.com/DocSavage/rails-authorization-plugin/tree/master
+  Opaque policy descriptions
+  19 votes
+
+* http://github.com/shuber/access_control_list/
+  Not much there yet
+
+* https://opensvn.csie.org/traccgi/tobionrails
+  http://agilewebdevelopment.com/plugins/access_control
+  http://opensvn.csie.org/tobionrails/plugins/access_control
+  last touched 1 year ago
+
+* http://github.com/mdarby/restful_acl/
+  -- google code too --
+  Just does REST?  More of an app than a plugin.
+
+* http://github.com/stonean/lockdown/tree/master
+  http://lockdown.rubyforge.org
+  http://groups.google.com/group/stonean_lockdown?hl=en
+  "Lockdown stores an array of access rights in the session"
+
+h2. Trust / Validation etc. plugins
+
+
+* http://agilewebdevelopment.com/plugins/recaptcha
