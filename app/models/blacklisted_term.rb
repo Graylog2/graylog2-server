@@ -16,7 +16,7 @@ class BlacklistedTerm < ActiveRecord::Base
       conditions << /#{Regexp.escape(term.term)}/
     end
 
-    modifier = "$all"
+    modifier = "$in"
 
     modifier = "$nin" if negated
 
