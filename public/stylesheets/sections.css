@@ -1,6 +1,5 @@
 .blocks {
     margin-top: 15px;
-    font-family: Georgia;
     float: left;
     margin: 25px;
 }
@@ -16,7 +15,6 @@
 
 #blocks-terms {
     margin-top: 15px;
-    font-family: Georgia;
 }
 
 #blocks-terms h2 {
@@ -47,7 +45,6 @@
     margin-top: 15px;
     padding: 15px;
     border: 1px dashed #333;
-    font-family: Georgia;
 }
 
 .stream-title {

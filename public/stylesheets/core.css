@@ -7,8 +7,7 @@ body {
 }
 
 h1 {
-    font-family: Georgia;
-    font-size: 45px;
+    font-size: 30px;
     margin-top: 15px;
     margin-bottom: 25px;
     display: block;
@@ -39,14 +38,12 @@ tr:hover {
 }
 
 input {
-    font-size: 16px;
+    font-size: 14px;
     padding: 2px;
-    font-family: Georgia;
 }
 
 label {
     font-size: 16px;
-    font-family: Georgia;
 }
 
 .highlighted {
