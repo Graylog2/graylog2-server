@@ -1,8 +1,28 @@
 <h1>Streams</h1>
 
+<div class="description">
+  Streams can be used to store specific views on the syslog messages. Define filter rules for each stream and quickly select
+  them later. Example: Create a stream "All database messages of host www15" that only shows messages from host "www15" which
+  include the string "MySQL".
+</div>
+
 <% form_for @new_stream, :url => { :action => "create" } do |f| %>
   <%= f.label :title, "Title:" %>
   <%= f.text_field :title %>
   <%= submit_tag "Create Stream" %>
 <% end %>
 
+<% @streams.each do |stream| %>
+  <div class="blocks">
+    <span class="blocks-title"><%= link_to h(stream.title), { :action => "show", :id => stream.id } %></span>
+    <ul class="blocks-termslist">
+      <% if stream.streamrules.blank? %>
+        <li>No rules</li>
+      <% else %>
+        
+      <% end %>
+    </ul>
+  </div>
+<% end %>
+
+<br style="clear: both;" />

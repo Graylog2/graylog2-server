@@ -50,6 +50,13 @@ label {
     color: #fd0c99;
 }
 
+.description {
+  position: relative;
+  top: -10px;
+  margin-bottom: 10px;
+  width: 70%;
+}
+
 #top {
     height: 100px;
     width: 100%;

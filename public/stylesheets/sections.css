@@ -34,6 +34,11 @@
     color: #000;
 }
 
+/* Blacklist */
+#blacklist-delete {
+  float: right;
+}
+
 /* Streams */
 #streams-notice {
     margin-top: 10px;

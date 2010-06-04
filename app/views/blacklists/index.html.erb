@@ -1,5 +1,11 @@
 <h1>Blacklists</h1>
 
+<div class="description">
+  Use blacklists to filter certain strings out of the results in every section of Graylog2. Example: Blacklist the term "foo"
+  and no syslog messages that contain "foo" will appear in the overview, streams, statistics, alerts etc. - Click on a
+  blacklist to see all messages filtered out.
+</div>
+
 <% form_for @new_blacklist, :url => { :action => "create" } do |f| %>
   <%= f.label :title, "Title:" %>
   <%= f.text_field :title %>

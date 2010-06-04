@@ -8,9 +8,15 @@
   <%= stylesheet_link_tag "reset" %>
   <%= stylesheet_link_tag "core" %>
   <%= stylesheet_link_tag "sections" %>
+  <%= stylesheet_link_tag "jquery.gritter" %>
+  <%= javascript_include_tag "jquery-1.4.2.min" %>
+  <%= javascript_include_tag "jquery.gritter.min" %>
   <%= javascript_include_tag "application" %>
 </head>
 <body>
+
+  <div id="notification-notice" style="display: none;"><%= flash[:notice] %></div>
+  <div id="notification-error" style="display: none;"><%= flash[:error] %></div>
 
   <div id="top">
     <%= image_tag "graylog.png", :id => "toplogo" %>

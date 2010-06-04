@@ -22,9 +22,14 @@ class BlacklistsController < ApplicationController
   end
 
   def destroy
-    BlacklistedTerm.delete_all [ "blacklist_id = ?", params[:id] ]
-    blacklist = Blacklist.find params[:id]
-    blacklist.destroy
+    begin
+      BlacklistedTerm.delete_all [ "blacklist_id = ?", params[:id] ]
+      blacklist = Blacklist.find params[:id]
+      blacklist.destroy
+      flash[:notice] = "Blacklist has been deleted"
+    rescue
+      flash[:error] = "Could not delete blacklist"
+    end
     redirect_to :action => "index"
   end
 
