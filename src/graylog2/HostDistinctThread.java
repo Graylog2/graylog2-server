@@ -47,7 +47,7 @@ public class HostDistinctThread extends Thread {
             }
             
            // Run every minute.
-           try { Thread.sleep(30000); } catch(InterruptedException e) {}
+           try { Thread.sleep(10000); } catch(InterruptedException e) {}
         }
     }
 
