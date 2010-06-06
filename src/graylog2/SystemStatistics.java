@@ -24,7 +24,7 @@
 
 package graylog2;
 
-import graylog2.database.MongoMapper;
+import graylog2.database.MongoBridge;
 
 public final class SystemStatistics {
     private static SystemStatistics INSTANCE;
@@ -39,7 +39,7 @@ public final class SystemStatistics {
     }
 
     public void clearCollection() throws Exception {
-        MongoMapper m = new MongoMapper(
+        MongoBridge m = new MongoBridge(
                 Main.masterConfig.getProperty("mongodb_user"),
                 Main.masterConfig.getProperty("mongodb_password"),
                 Main.masterConfig.getProperty("mongodb_host"),

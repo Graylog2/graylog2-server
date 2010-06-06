@@ -19,17 +19,14 @@
  */
 
 /**
- * MongoMapper.java: lennart | Apr 13, 2010 9:13:03 PM
+ * MongoBridge.java: lennart | Apr 13, 2010 9:13:03 PM
  */
 
 package graylog2.database;
 
-import com.mongodb.Mongo;
-import com.mongodb.DB;
 import com.mongodb.DBCollection;
 import com.mongodb.BasicDBObject;
 import com.mongodb.BasicDBObjectBuilder;
-import com.mongodb.MongoException;
 
 import graylog2.Log;
 
@@ -38,13 +35,10 @@ import java.util.List;
 
 import org.productivity.java.syslog4j.server.SyslogServerEventIF;
 
-public class MongoMapper {
+public class MongoBridge {
     // TODO: make configurable
     public static final int MAX_MESSAGE_SIZE = 500000000;
     public static final int STANDARD_PORT = 27017;
-
-    private Mongo m = null;
-    private DB db = null;
     
     private String username = null;
     private String password = null;
@@ -52,45 +46,33 @@ public class MongoMapper {
     private String database = null;
     private int    port = 27017;
 
-    public MongoMapper(String username, String password, String hostname, String database, int port) {
+    public MongoBridge(String username, String password, String hostname, String database, int port) throws Exception {
         this.username = username;
         this.password = password;
         this.hostname = hostname;
         this.database = database;
         if (port == 0) {
-            this.port = MongoMapper.STANDARD_PORT;
+            this.port = MongoBridge.STANDARD_PORT;
         } else {
             this.port = port;
         }
+
+        MongoConnection.getInstance().connect(this.username, this.password, this.hostname, this.database, this.port);
     }
 
-    private void connect() throws Exception {
-        try {
-            this.m = new Mongo(this.hostname, this.port);
-            this.db = m.getDB(this.database);
-
-            // Try to authenticate.
-            if(!db.authenticate(this.username, this.password.toCharArray())) {
-                throw new Exception("Could not authenticate to database '" + this.database + "' with user '" + this.username + "'.");
-            }
-        } catch (MongoException.Network e) {
-            throw new Exception("Could not connect to Mongo DB.");
-        }
-    }
 
     public void dropCollection(String databaseName) throws Exception {
-        this.connect();
-        m.dropDatabase(databaseName);
+        MongoConnection.getInstance().getConnection().dropDatabase(databaseName);
     }
 
     public DBCollection getMessagesColl() {
         DBCollection coll = null;
 
         // Create a capped collection if the collection does not yet exist.
-        if(db.getCollectionNames().contains("messages")) {
-            coll = db.getCollection("messages");
+        if(MongoConnection.getInstance().getDatabase().getCollectionNames().contains("messages")) {
+            coll = MongoConnection.getInstance().getDatabase().getCollection("messages");
         } else {
-            coll = db.createCollection("messages", BasicDBObjectBuilder.start().add("capped", true).add("size", MongoMapper.MAX_MESSAGE_SIZE).get());
+            coll = MongoConnection.getInstance().getDatabase().createCollection("messages", BasicDBObjectBuilder.start().add("capped", true).add("size", MongoBridge.MAX_MESSAGE_SIZE).get());
         }
 
         coll.ensureIndex(new BasicDBObject("created_at", 1));
@@ -102,8 +84,6 @@ public class MongoMapper {
     }
 
     public void insert(SyslogServerEventIF event) throws Exception {
-        this.connect();
-
         DBCollection coll = this.getMessagesColl();
 
         BasicDBObject dbObj = new BasicDBObject();
@@ -116,16 +96,14 @@ public class MongoMapper {
         coll.insert(dbObj);
     }
     
-    public void insertSystemStatisticValue(String key, long value) throws Exception {
-        this.connect();
-        
+    public void insertSystemStatisticValue(String key, long value) throws Exception {       
         DBCollection coll = null;
 
         // Create a capped collection if the collection does not yet exist.
-        if(db.getCollectionNames().contains("systemstatistics")) {
-            coll = db.getCollection("systemstatistics");
+        if(MongoConnection.getInstance().getDatabase().getCollectionNames().contains("systemstatistics")) {
+            coll = MongoConnection.getInstance().getDatabase().getCollection("systemstatistics");
         } else {
-            coll = db.createCollection("systemstatistics", BasicDBObjectBuilder.start().add("capped", true).add("size", 5242880).get());
+            coll = MongoConnection.getInstance().getDatabase().createCollection("systemstatistics", BasicDBObjectBuilder.start().add("capped", true).add("size", 5242880).get());
         }
         
         BasicDBObject dbObj = new BasicDBObject();
@@ -135,8 +113,6 @@ public class MongoMapper {
     }
 
     public void distinctHosts() throws Exception {
-        this.connect();
-
         // Fetch all hosts.
         DBCollection messages = this.getMessagesColl();
         List hosts = messages.distinct("host");
@@ -144,10 +120,10 @@ public class MongoMapper {
         DBCollection coll = null;
 
         // Create a capped collection if the collection does not yet exist.
-        if(db.getCollectionNames().contains("hosts")) {
-            coll = db.getCollection("hosts");
+        if(MongoConnection.getInstance().getDatabase().getCollectionNames().contains("hosts")) {
+            coll = MongoConnection.getInstance().getDatabase().getCollection("hosts");
         } else {
-            coll = db.createCollection("hosts", new BasicDBObject());
+            coll = MongoConnection.getInstance().getDatabase().createCollection("hosts", new BasicDBObject());
         }
 
         coll.ensureIndex(new BasicDBObject("name", 1));

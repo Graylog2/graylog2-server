@@ -24,7 +24,7 @@
 
 package graylog2;
 
-import graylog2.database.MongoMapper;
+import graylog2.database.MongoBridge;
 
 public class SystemStatisticThread extends Thread {
 
@@ -35,7 +35,7 @@ public class SystemStatisticThread extends Thread {
             try { Thread.sleep(60000); } catch(InterruptedException e) {}
 
             try {
-                MongoMapper m = new MongoMapper(
+                MongoBridge m = new MongoBridge(
                     Main.masterConfig.getProperty("mongodb_user"),
                     Main.masterConfig.getProperty("mongodb_password"),
                     Main.masterConfig.getProperty("mongodb_host"),

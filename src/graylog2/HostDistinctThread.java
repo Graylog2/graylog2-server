@@ -24,7 +24,7 @@
 
 package graylog2;
 
-import graylog2.database.MongoMapper;
+import graylog2.database.MongoBridge;
 
 public class HostDistinctThread extends Thread {
 
@@ -32,7 +32,7 @@ public class HostDistinctThread extends Thread {
         // Run forever.
         while (true) {
             try {
-                MongoMapper m = new MongoMapper(
+                MongoBridge m = new MongoBridge(
                     Main.masterConfig.getProperty("mongodb_user"),
                     Main.masterConfig.getProperty("mongodb_password"),
                     Main.masterConfig.getProperty("mongodb_host"),
