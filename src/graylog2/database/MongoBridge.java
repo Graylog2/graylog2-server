@@ -56,8 +56,6 @@ public class MongoBridge {
         } else {
             this.port = port;
         }
-
-        MongoConnection.getInstance().connect(this.username, this.password, this.hostname, this.database, this.port);
     }
 
 

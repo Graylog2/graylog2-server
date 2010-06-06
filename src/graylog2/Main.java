@@ -20,6 +20,7 @@
 
 package graylog2;
 
+import graylog2.database.MongoConnection;
 import java.io.FileInputStream;
 import java.util.ArrayList;
 import java.util.Properties;
@@ -84,6 +85,20 @@ public class Main {
             Main.debugMode = true;
         } else {
             System.out.println("[x] Not in Debug mode.");
+        }
+
+        try {
+            MongoConnection.getInstance().connect(
+                    Main.masterConfig.getProperty("mongodb_user"),
+                    Main.masterConfig.getProperty("mongodb_password"),
+                    Main.masterConfig.getProperty("mongodb_host"),
+                    Main.masterConfig.getProperty("mongodb_database"),
+                    Integer.valueOf(Main.masterConfig.getProperty("mongodb_port"))
+            );
+        } catch (Exception e) {
+            System.out.println("Could not create MongoDB connection: " + e.toString());
+            e.printStackTrace();
+            System.exit(1); // Exit with error.
         }
 
         // Clear systemstatistics collection.

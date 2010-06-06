@@ -31,8 +31,8 @@ import com.mongodb.MongoException;
 public class MongoConnection {
     private static MongoConnection INSTANCE;
 
-    private Mongo m = null;
-    private DB db = null;
+    private static Mongo m = null;
+    private static DB db = null;
 
     private MongoConnection() {}
 
