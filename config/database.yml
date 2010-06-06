@@ -5,7 +5,7 @@ development:
   database: graylog2_development
   pool: 5
   username: root
-  password: 123
+  password: 123123123
   socket: /var/run/mysqld/mysqld.sock
 
 test:

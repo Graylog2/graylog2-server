@@ -19,7 +19,11 @@
       <% if stream.streamrules.blank? %>
         <li>No rules</li>
       <% else %>
-        
+        <% stream.streamrules.each do |rule| %>
+        <li>
+          <%= streamrule_type_to_human rule.rule_type  %>: <i><%=h rule.value %></i>
+        </li>
+        <% end %>
       <% end %>
     </ul>
   </div>

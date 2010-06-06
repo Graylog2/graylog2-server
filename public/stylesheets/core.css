@@ -37,7 +37,7 @@ tbody tr:hover {
     background-color: #ffdddd;
 }
 
-input {
+input, select {
     font-size: 14px;
     padding: 2px;
 }
@@ -55,6 +55,10 @@ label {
   top: -10px;
   margin-bottom: 10px;
   width: 70%;
+}
+
+.black {
+    color: #000 !important;
 }
 
 #top {

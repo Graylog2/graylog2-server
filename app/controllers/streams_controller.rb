@@ -1,8 +1,13 @@
 class StreamsController < ApplicationController
   def index
     @new_stream = Stream.new
-
     @streams = Stream.all
+  end
+
+  def show
+    @stream = Stream.find params[:id]
+    @messages = Message.all_of_stream @stream.id
+    @new_rule = Streamrule.new
   end
 
   def create
@@ -14,4 +19,17 @@ class StreamsController < ApplicationController
     end
     redirect_to :action => "index"
   end
+
+  def destroy
+    begin
+      Streamrule.delete_all [ "stream_id = ?", params[:id] ]
+      stream = Stream.find params[:id]
+      stream.destroy
+      flash[:notice] = "Stream has been deleted"
+    rescue
+      flash[:error] = "Could not delete stream"
+    end
+    redirect_to :action => "index"
+  end
+
 end

@@ -7,3 +7,19 @@
 [06/04/10 15:44:16 +0200 linux (11524)] INFO : Application: My Application
 [06/04/10 15:44:16 +0200 linux (11524)] INFO : New Relic RPM Agent 2.12.1 Initialized: pid = 11524
 [06/04/10 15:44:16 +0200 linux (11524)] INFO : Agent Log found in /home/lennart/workspace/gs-web/log/newrelic_agent.log
+[06/06/10 00:20:21 +0200 sundaysister (6001)] INFO : Dispatcher: webrick
+[06/06/10 00:20:21 +0200 sundaysister (6001)] INFO : Application: My Application
+[06/06/10 00:20:21 +0200 sundaysister (6001)] INFO : New Relic RPM Agent 2.12.1 Initialized: pid = 6001
+[06/06/10 00:20:21 +0200 sundaysister (6001)] INFO : Agent Log found in /home/lennart/workspace/graylog2-web/log/newrelic_agent.log
+[06/06/10 00:21:10 +0200 sundaysister (6067)] INFO : Dispatcher: webrick
+[06/06/10 00:21:10 +0200 sundaysister (6067)] INFO : Application: My Application
+[06/06/10 00:21:10 +0200 sundaysister (6067)] INFO : New Relic RPM Agent 2.12.1 Initialized: pid = 6067
+[06/06/10 00:21:10 +0200 sundaysister (6067)] INFO : Agent Log found in /home/lennart/workspace/graylog2-web/log/newrelic_agent.log
+[06/06/10 03:58:37 +0200 sundaysister (11439)] INFO : Dispatcher: webrick
+[06/06/10 03:58:37 +0200 sundaysister (11439)] INFO : Application: My Application
+[06/06/10 03:58:37 +0200 sundaysister (11439)] INFO : New Relic RPM Agent 2.12.1 Initialized: pid = 11439
+[06/06/10 03:58:37 +0200 sundaysister (11439)] INFO : Agent Log found in /home/lennart/workspace/graylog2-web/log/newrelic_agent.log
+[06/06/10 03:59:24 +0200 sundaysister (11529)] INFO : Dispatcher: webrick
+[06/06/10 03:59:24 +0200 sundaysister (11529)] INFO : Application: My Application
+[06/06/10 03:59:24 +0200 sundaysister (11529)] INFO : New Relic RPM Agent 2.12.1 Initialized: pid = 11529
+[06/06/10 03:59:24 +0200 sundaysister (11529)] INFO : Agent Log found in /home/lennart/workspace/graylog2-web/log/newrelic_agent.log

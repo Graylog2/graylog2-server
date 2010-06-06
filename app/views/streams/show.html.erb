@@ -1,0 +1,37 @@
+<div id="streams-delete">
+  <%= link_to "Delete this stream", { :action => "destroy", :id => @stream.id }, :confirm => "Really delete this stream with all it's filter rules?" %>
+</div>
+
+<h1>Stream &raquo;<%= @stream.title %>&laquo;</h1>
+
+<% form_for @new_rule, :url => { :controller => "streamrules", :action => "create" } do |f| %>
+  <%= f.hidden_field :stream_id, :value => @stream.id %>
+  <%= f.label :term, "New Rule:" %>
+  <%= f.select :rule_type, options_for_select(Streamrule.get_types_for_select_options, :selected => Streamrule::TYPE_MESSAGE) %>
+  <%= f.text_field :value, :class => "stream-value-field stream-value-message" %>
+  <%= f.select :value, options_for_select(get_ordered_facilities_for_select), {}, { :disabled => true, :style => "display: none;", :class => "stream-value-field stream-value-facility" } %>
+  <%= f.select :value, options_for_select(get_ordered_severities_for_select), {}, { :disabled => true, :style => "display: none;", :class => "stream-value-field stream-value-severity" } %>
+  <%= f.select :value, Host.all.collect {|host| [ h(host.host) ] }, {}, { :disabled => true, :style => "display: none;", :class => "stream-value-field stream-value-host" } %>
+  <%= submit_tag "Add" %>
+<% end %>
+
+<div id="blocks-terms">
+  <h2>Filter rules:</h2>
+  <ul>
+    <% if @stream.streamrules.blank? %>
+      <li>none</li>
+    <% else %>
+      <% @stream.streamrules.each do |rule| %>
+        <li>
+          <span class="black"><%= streamrule_type_to_human rule.rule_type  %>:</span><%=h rule.value %>
+          <%= link_to image_tag("icons/delete.png", :style => "position: relative; top: -2px"), { :controller => "streamrules", :action => "destroy", :id => rule.id, :stream_id => @stream.id }, :class => "blocks-terms-delete" %>
+        </li>
+      <% end %>
+    <% end %>
+  </ul>
+  <br style="clear: both;" />
+</div>
+
+<% unless @stream.streamrules.blank? %>
+  <%= render :partial => "messages/table", :locals => { :messages => @messages } %>
+<% end %>

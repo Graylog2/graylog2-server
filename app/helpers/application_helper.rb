@@ -15,6 +15,46 @@ module ApplicationHelper
     return tmp.strftime "%d.%m.%Y - %H:%M:%S"
   end
 
+  def get_ordered_facilities_for_select
+      [
+        ["Kernel (0)", 0],
+        ["User-Level (1)", 1],
+        ["Mail (2)", 2],
+        ["System Daemon (3)", 3],
+        ["Security/Authorization (4/10)", 4],
+        ["Syslogd (5)", 5],
+        ["Line Printer (6)", 6],
+        ["News (7)", 7],
+        ["UUCP (8)", 8],
+        ["Clock (9/15)", 9],
+        ["FTP (11)", 11],
+        ["NTP (12)", 12],
+        ["Log Audit (13)", 13],
+        ["Log Alert (14)", 14],
+        ["local0 (16)", 16],
+        ["local1 (17)", 17],
+        ["local2 (18)", 18],
+        ["local3 (19)", 19],
+        ["local4 (20)", 20],
+        ["local5 (21)", 21],
+        ["local6 (22)", 22],
+        ["local7 (23)", 23]
+      ]
+  end
+
+  def get_ordered_severities_for_select
+      [
+        ["Emergency", 0],
+        ["Alert", 1],
+        ["Critical", 2],
+        ["Error", 3],
+        ["Warning", 4],
+        ["Notice", 5],
+        ["Informational", 6],
+        ["Debug", 7]
+      ]
+  end
+
   def syslog_level_to_human level
     case level
       when 0 then return "Emergency"

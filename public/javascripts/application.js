@@ -4,7 +4,7 @@ $(document).ready(function(){
         title = $('#notification-notice strong').html();
         text = $('#notification-notice span').html();
 
-        if (title == null || title.length == 0) { title = "Notice"; }
+        if (title == null || title.length == 0) {title = "Notice";}
         if (text == null || text.length == 0) {
             text = $('#notification-notice').html();
             
@@ -25,13 +25,13 @@ $(document).ready(function(){
         title = $('#notification-error strong').html();
         text = $('#notification-error span').html();
 
-        if (title == null || title.length == 0) { title = "Notice"; }
+        if (title == null || title.length == 0) {title = "Notice";}
         if (text == null || text.length == 0) {
             text = $('#notification-error').html();
 
             // Fallback if we still have nothing at all.
             if (text == null || text.length == 0) {
-                text = "Success."
+                text = "Success.";
             }
         }
 
@@ -41,5 +41,27 @@ $(document).ready(function(){
             image: '/images/icons/error.png'
         });
     }
+
+    // Stream rule form.
+    $('#streamrule_rule_type').bind('change', function() {
+        $('.stream-value-field').hide();
+        $('.stream-value-field').attr("disabled", true);
+        switch(this.value) {
+            case '1':
+                field = $('.stream-value-message');
+                break;
+            case '2':
+                field = $('.stream-value-host');
+                break;
+            case '3':
+                field = $('.stream-value-severity');
+                break;
+            case '4':
+                field = $('.stream-value-facility');
+                break;
+        }
+        field.removeAttr("disabled");
+        field.show();
+    });
 
 });

@@ -24,4 +24,17 @@ class Message
 
     return self.all :limit => limit, :order => "_id DESC", :conditions => conditions
   end
+
+  def self.all_of_stream stream_id
+    conditions = Hash.new
+
+    # Filter by message.
+    (by_message = Streamrule.get_message_condition_hash(stream_id)).blank? ? nil : conditions[:message] = by_message;
+
+    # Filter by host.
+    (by_host = Streamrule.get_host_condition_hash(stream_id)).blank? ? nil : conditions[:host] = by_host;
+
+    return self.all :limit => 100, :order => "_id DESC", :conditions => conditions
+  end
+
 end

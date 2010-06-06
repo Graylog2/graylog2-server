@@ -15,6 +15,7 @@
 
 #blocks-terms {
     margin-top: 15px;
+    margin-bottom: 15px;
 }
 
 #blocks-terms h2 {
@@ -42,6 +43,10 @@
 /* Streams */
 #streams-notice {
     margin-top: 10px;
+}
+
+#streams-delete {
+  float: right;
 }
 
 .stream {

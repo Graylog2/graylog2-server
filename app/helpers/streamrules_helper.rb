@@ -1,0 +1,2 @@
+module StreamrulesHelper
+end
