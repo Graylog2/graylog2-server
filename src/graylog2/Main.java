@@ -106,6 +106,11 @@ public class Main {
             System.exit(1); // Exit with error.
         }
 
+        // Start the thread that distincts hosts.
+        HostDistinctThread hostDistinctThread = new HostDistinctThread();
+        hostDistinctThread.start();
+        System.out.println("[x] Host distinction thread is up.");
+
         // Start the thread that continously collects system information.
         SystemStatisticThread systemStatisticThread = new SystemStatisticThread();
         systemStatisticThread.start();

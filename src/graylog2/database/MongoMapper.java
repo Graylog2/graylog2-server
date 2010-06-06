@@ -31,6 +31,11 @@ import com.mongodb.BasicDBObject;
 import com.mongodb.BasicDBObjectBuilder;
 import com.mongodb.MongoException;
 
+import graylog2.Log;
+
+import java.util.Iterator;
+import java.util.List;
+
 import org.productivity.java.syslog4j.server.SyslogServerEventIF;
 
 public class MongoMapper {
@@ -78,9 +83,7 @@ public class MongoMapper {
         m.dropDatabase(databaseName);
     }
 
-    public void insert(SyslogServerEventIF event) throws Exception {
-        this.connect();
-
+    public DBCollection getMessagesColl() {
         DBCollection coll = null;
 
         // Create a capped collection if the collection does not yet exist.
@@ -88,11 +91,20 @@ public class MongoMapper {
             coll = db.getCollection("messages");
         } else {
             coll = db.createCollection("messages", BasicDBObjectBuilder.start().add("capped", true).add("size", MongoMapper.MAX_MESSAGE_SIZE).get());
-            coll.createIndex(new BasicDBObject("created_at", 1));
-            coll.createIndex(new BasicDBObject("host", 1));
-            coll.createIndex(new BasicDBObject("facility", 1));
-            coll.createIndex(new BasicDBObject("level", 1));
         }
+
+        coll.ensureIndex(new BasicDBObject("created_at", 1));
+        coll.ensureIndex(new BasicDBObject("host", 1));
+        coll.ensureIndex(new BasicDBObject("facility", 1));
+        coll.ensureIndex(new BasicDBObject("level", 1));
+
+        return coll;
+    }
+
+    public void insert(SyslogServerEventIF event) throws Exception {
+        this.connect();
+
+        DBCollection coll = this.getMessagesColl();
 
         BasicDBObject dbObj = new BasicDBObject();
         dbObj.put("message", event.getMessage());
@@ -120,6 +132,53 @@ public class MongoMapper {
         dbObj.put(key, value);
 
         coll.insert(dbObj);
+    }
+
+    public void distinctHosts() throws Exception {
+        this.connect();
+
+        // Fetch all hosts.
+        DBCollection messages = this.getMessagesColl();
+        List hosts = messages.distinct("host");
+
+        DBCollection coll = null;
+
+        // Create a capped collection if the collection does not yet exist.
+        if(db.getCollectionNames().contains("hosts")) {
+            coll = db.getCollection("hosts");
+        } else {
+            coll = db.createCollection("hosts", BasicDBObjectBuilder.start().add("capped", true).add("size", 5242880).get());
+        }
+
+        coll.ensureIndex(new BasicDBObject("name", 1));
+        
+        // Truncate hosts collection.
+
+        coll.remove(new BasicDBObject());
+
+        // Go trough every host and insert.
+        for (Iterator<String> i = hosts.iterator(); i.hasNext( ); ) {
+            try {
+                String host = i.next();
+
+                // Get message count of this host.
+                BasicDBObject countQuery = new BasicDBObject();
+                countQuery.put("host", host);
+                long messageCount = messages.getCount(countQuery);
+
+                // Build document.
+                BasicDBObject doc = new BasicDBObject();
+                doc.put("host", host);
+                doc.put("message_count", messageCount);
+                doc.put("created_at", (int) (System.currentTimeMillis()/1000));
+
+                // Store document.
+                coll.insert(doc);
+            } catch (Exception e) {
+                Log.crit("Could not insert distinct host: " + e.toString());
+                continue;
+            }
+        }
     }
 
 }
