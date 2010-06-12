@@ -129,3 +129,47 @@ label {
 .tr-dark {
     background-color: #fff;
 }
+
+/* AUTOCOMPLETE */
+.ac_results {
+    padding: 0px;
+    background-color: white;
+    overflow: hidden;
+    z-index: 99999;
+}
+
+.ac_results ul {
+    width: 100%;
+    list-style-position: outside;
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.ac_results li {
+    margin: 0px;
+    padding: 2px 5px;
+    cursor: default;
+    display: block;
+    font: menu;
+    font-size: 12px;
+    line-height: 16px;
+    overflow: hidden;
+}
+
+.ac_loading {
+    background: white url('indicator.gif') right center no-repeat;
+}
+
+.ac_odd {
+    border-bottom: 1px solid #ccc;
+}
+
+.ac_even {
+    border-bottom: 1px solid #ccc;
+}
+
+.ac_over {
+    background-color: #fd0c99;
+    color: white;
+}

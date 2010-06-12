@@ -37,4 +37,12 @@ class Message
     return self.all :limit => 100, :order => "_id DESC", :conditions => conditions
   end
 
+  def self.all_of_host host
+    return self.all :limit => 100, :order => "_id DESC", :conditions => { "host" => host }
+  end
+
+  def self.delete_all_of_host host
+    self.delete_all :conditions => { "host" => host }
+  end
+
 end
