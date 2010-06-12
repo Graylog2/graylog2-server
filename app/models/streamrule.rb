@@ -1,6 +1,10 @@
 class Streamrule < ActiveRecord::Base
   belongs_to :stream
 
+  validates_presence_of :stream_id
+  validates_presence_of :rule_type
+  validates_presence_of :value
+
   TYPE_MESSAGE = 1
   TYPE_HOST = 2
   TYPE_SEVERITY = 3
