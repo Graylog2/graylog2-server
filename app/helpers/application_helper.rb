@@ -100,6 +100,11 @@ module ApplicationHelper
     return "Unknown"
   end
 
+  def build_controller_action_uri
+    request.path_parameters['id'].blank? ? id = String.new : id = request.path_parameters['id']+ '/'
+    '/' + request.path_parameters['controller'] + '/' + request.path_parameters['action'] + '/' + id
+  end
+
   private
 
   def is_current_menu_item? item

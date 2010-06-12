@@ -7,7 +7,7 @@ class BlacklistsController < ApplicationController
 
   def show
     @blacklist = Blacklist.find params[:id]
-    @messages = Message.all_of_blacklist @blacklist.id
+    @messages = Message.all_of_blacklist @blacklist.id, params[:page]
     @new_term = BlacklistedTerm.new
   end
 

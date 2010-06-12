@@ -22,7 +22,6 @@ a {
 table {
     font-size: 11px;
     width: 100%;
-    margin-top: 10px;
 }
 
 th {
@@ -112,6 +111,7 @@ label {
 .messages {
     font-family: 'Lucida Grande',Verdana,sans-serif;
     font-size: 10px;
+    margin-top: 10px;
 }
 
 .messages tr {
@@ -120,6 +120,18 @@ label {
 
 .messages td {
     padding: 2px;
+}
+
+#messages-bottom {
+    margin-top: 10px;
+}
+
+.previous-page {
+    float: left;
+}
+
+.next-page {
+    float: right;
 }
 
 .tr-light {

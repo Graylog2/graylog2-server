@@ -6,7 +6,7 @@ class HostsController < ApplicationController
 
   def show
     @host = Host.find_by_host params[:id]
-    @messages = Message.all_of_host params[:id]
+    @messages = Message.all_of_host params[:id], params[:page]
 
     if @host.blank?
       flash[:error] = "<strong>Unknown host</strong> <span>Could not find host</span>"
