@@ -23,7 +23,7 @@
     <% else %>
       <% @stream.streamrules.each do |rule| %>
         <li>
-          <span class="black"><%= streamrule_type_to_human rule.rule_type  %>:</span><%=h rule.value %>
+          <%= streamrule_to_human rule %>
           <%= link_to image_tag("icons/delete.png", :style => "position: relative; top: -2px"), { :controller => "streamrules", :action => "destroy", :id => rule.id, :stream_id => @stream.id }, :class => "blocks-terms-delete" %>
         </li>
       <% end %>

@@ -2,7 +2,7 @@ class BlacklistedTerm < ActiveRecord::Base
   belongs_to :blacklist
 
 
-  def self.get_all_as_condition_hash negated = true, id = nil
+  def self.get_all_as_condition_hash negated = true, id = nil, without_modifier = false
     if id.blank?
       terms = self.all
     else
@@ -15,6 +15,8 @@ class BlacklistedTerm < ActiveRecord::Base
     terms.each do |term|
       conditions << /#{Regexp.escape(term.term)}/
     end
+
+    return conditions if without_modifier
 
     modifier = "$in"
 

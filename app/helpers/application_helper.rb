@@ -56,7 +56,7 @@ module ApplicationHelper
   end
 
   def syslog_level_to_human level
-    case level
+    case level.to_i
       when 0 then return "Emergency"
       when 1 then return "Alert"
       when 2 then return "Critical"
@@ -70,7 +70,7 @@ module ApplicationHelper
   end
 
   def syslog_facility_to_human facility
-    case facility
+    case facility.to_i
       when  0 then return "kernel"
       when  1 then return "user-level"
       when  2 then return "mail"

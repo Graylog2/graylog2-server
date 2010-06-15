@@ -15,7 +15,7 @@ class Streamrule < ActiveRecord::Base
     }
   end
 
-  def self.get_message_condition_hash stream_id = nil
+  def self.get_message_condition_array  stream_id = nil
     if stream_id.blank?
       return nil
     end
@@ -29,7 +29,7 @@ class Streamrule < ActiveRecord::Base
       conditions << /#{Regexp.escape(term.value)}/
     end
 
-    return { "$in" => conditions }
+    return conditions
   end
 
   def self.get_host_condition_hash stream_id = nil
@@ -44,6 +44,40 @@ class Streamrule < ActiveRecord::Base
     conditions = Array.new
     hosts.each do |host|
       conditions << host.value
+    end
+
+    return { "$in" => conditions }
+  end
+
+  def self.get_facility_condition_hash stream_id = nil
+    if stream_id.blank?
+      return nil
+    end
+
+    facilities = self.find_all_by_stream_id_and_rule_type stream_id, self::TYPE_FACILITY
+
+    return nil if facilities.blank?
+
+    conditions = Array.new
+    facilities.each do |facility|
+      conditions << facility.value.to_i
+    end
+
+    return { "$in" => conditions }
+  end
+
+  def self.get_severity_condition_hash stream_id = nil
+    if stream_id.blank?
+      return nil
+    end
+
+    severities = self.find_all_by_stream_id_and_rule_type stream_id, self::TYPE_SEVERITY
+
+    return nil if severities.blank?
+
+    conditions = Array.new
+    severities.each do |severity|
+      conditions << severity.value.to_i
     end
 
     return { "$in" => conditions }
