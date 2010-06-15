@@ -61,3 +61,12 @@
     font-size: 25px;
     color: #fd0c99;
 }
+
+/* Hosts */
+#hosts-quickjump {
+    margin-bottom: 15px;
+}
+
+#hosts-delete {
+  float: right;
+}

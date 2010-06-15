@@ -6,7 +6,7 @@ class StreamsController < ApplicationController
 
   def show
     @stream = Stream.find params[:id]
-    @messages = Message.all_of_stream @stream.id
+    @messages = Message.all_of_stream @stream.id, params[:page]
     @new_rule = Streamrule.new
   end
 

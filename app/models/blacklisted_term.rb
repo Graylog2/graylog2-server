@@ -1,6 +1,8 @@
 class BlacklistedTerm < ActiveRecord::Base
   belongs_to :blacklist
 
+  validates_presence_of :term
+  validates_presence_of :blacklist_id
 
   def self.get_all_as_condition_hash negated = true, id = nil, without_modifier = false
     if id.blank?

@@ -9,23 +9,30 @@ class Message
   key :level, Integer
   key :facility, Integer
 
-  def self.all_of_blacklist id
+  LIMIT = 100
+
+  def self.all_of_blacklist id, page = 1
+    page = 1 if page.blank?
+    
     conditions = Hash.new
 
     (blacklist = BlacklistedTerm.get_all_as_condition_hash(false, id)).blank? ? nil : conditions[:message] = blacklist;
 
-    return self.all :limit => 100, :order => "_id DESC", :conditions => conditions
+    return self.all :limit => LIMIT, :order => "_id DESC", :conditions => conditions, :offset => self.get_offset(page)
   end
 
-  def self.all_with_blacklist limit = 100
+  def self.all_with_blacklist page = 1
+    page = 1 if page.blank?
+
     conditions = Hash.new
 
     (blacklist = BlacklistedTerm.get_all_as_condition_hash).blank? ? nil : conditions[:message] = blacklist;
 
-    return self.all :limit => limit, :order => "_id DESC", :conditions => conditions
+    return self.all :limit => LIMIT, :order => "_id DESC", :conditions => conditions, :offset => self.get_offset(page)
   end
 
-  def self.all_of_stream stream_id
+  def self.all_of_stream stream_id, page = 1
+    page = 1 if page.blank?
     conditions = Hash.new
 
     # Filter by message.
@@ -56,7 +63,27 @@ class Message
 
     RAILS_DEFAULT_LOGGER.info conditions[:message].inspect
 
-    return self.all :limit => 100, :order => "_id DESC", :conditions => conditions
+    return self.all :limit => LIMIT, :order => "_id DESC", :conditions => conditions, :offset => self.get_offset(page)
   end
+
+  def self.all_of_host host, page
+    page = 1 if page.blank?
+    return self.all :limit => LIMIT, :order => "_id DESC", :conditions => { "host" => host }, :offset => self.get_offset(page)
+  end
+
+  def self.delete_all_of_host host
+    self.delete_all :conditions => { "host" => host }
+  end
+
+  private
+
+  def self.get_offset page
+    if page.to_i <= 1
+      return 0
+    else
+      return (LIMIT*page.to_i)
+    end
+  end
+
 
 end
