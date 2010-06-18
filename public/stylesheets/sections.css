@@ -1,3 +1,15 @@
+/* Messages */
+#messages-favorited-streams {
+    float: right;
+}
+
+#messages-favorited-streams select {
+    font-size: 11px;
+    padding: 0px;
+}
+
+/* Blocks */
+
 .blocks {
     margin-top: 15px;
     float: left;
@@ -33,6 +45,13 @@
 
 .blocks-terms-delete {
     color: #000;
+}
+
+.blocks-statistic {
+    display: block;
+    background-color: #ff0;
+    margin-bottom: 2px;
+    padding: 3px;
 }
 
 /* Blacklist */

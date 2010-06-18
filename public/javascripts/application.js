@@ -64,4 +64,16 @@ $(document).ready(function(){
         field.show();
     });
 
+    // Stream Quick chooser
+    $('#favoritestreamchooser_id').bind('change', function() {
+       window.location = "/streams/show/" + parseInt(this.value);
+    });
+
+    // Show stream statistics
+    $('#streams-show-statistics').bind('click', function() {
+        $.post("/streams/get_hosts_statistic/" + parseInt($('#streamid').html()), function(data) {
+                $('#blocks-statistics').html(data);
+        });
+    });
+
 });

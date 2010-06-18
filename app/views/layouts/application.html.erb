@@ -20,6 +20,9 @@
   <div id="notification-error" style="display: none;"><%= flash[:error] %></div>
 
   <div id="top">
+    <div id="userbar">
+      Logged in as <%= current_user.login %> <%= link_to "&nbsp; (Log out)", "/logout" %>
+    </div>
     <%= image_tag "graylog.png", :id => "toplogo" %>
     <ul id="topmenu">
       <%= menu_item({ :title => "Messages", :controller => "/" }) %>
@@ -28,7 +31,6 @@
       <%= menu_item({ :title => "Blacklists", :controller => "blacklists" }) %>
       <%= menu_item({ :title => "Statistics", :controller => "statistics" }) %>
       <%= menu_item({ :title => "Settings", :controller => "settings" }) %>
-      <%= menu_item({ :title => "Logout", :controller => "logout" }) %>
     </ul>
   </div>
 

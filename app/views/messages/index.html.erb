@@ -1,7 +1,11 @@
+<div id="messages-favorited-streams">
+  <% unless @favorites.blank? %>
+    Favorite streams: <%= select("favoritestreamchooser", "id", @favorites.collect {|p| [ p.stream.title, p.stream.id ] }, { :include_blank => true }) %>
+  <% end %>
+</div>
+
 <h1>Messages</h1>
 
-<% #TODO: Make user customizable
-%>
 Currently containing <span class="highlighted"><%= number_with_delimiter(@total_count, :delimiter => '.') %></span> messages,
 filtered by <span class="highlighted"><%=h @total_blacklisted_terms %></span> blacklisted terms.
 

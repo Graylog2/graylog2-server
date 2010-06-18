@@ -70,6 +70,23 @@ label {
     float: left;
 }
 
+#userbar {
+    float: right;
+    background-color: #fd0c99;
+    background-image: url(/images/userbar.png);
+    background-repeat: no-repeat;
+    padding: 3px;
+    padding-right: 5px;
+    padding-left: 18px;
+    position: relative;
+    top: 5px;
+    color: #fff;
+}
+
+#userbar a {
+    color: #000;
+}
+
 #topmenu {
     margin-left: 325px;
     color: #fff;

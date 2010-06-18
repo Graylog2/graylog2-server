@@ -1,3 +1,5 @@
+<div id="streamid" style="display: none;"><%=h @stream.id %></div>
+
 <div id="streams-delete">
   <%= link_to "Delete this stream", { :action => "destroy", :id => @stream.id }, :confirm => "Really delete this stream with all it's filter rules?" %>
 </div>
@@ -30,6 +32,11 @@
     <% end %>
   </ul>
   <br style="clear: both;" />
+</div>
+
+<a href="#" id="streams-show-statistics">Show statistics</a>
+
+<div id="blocks-statistics">
 </div>
 
 <% unless @stream.streamrules.blank? %>

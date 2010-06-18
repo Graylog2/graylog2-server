@@ -31,7 +31,7 @@ class Message
     return self.all :limit => LIMIT, :order => "_id DESC", :conditions => conditions, :offset => self.get_offset(page)
   end
 
-  def self.all_of_stream stream_id, page = 1
+  def self.all_of_stream stream_id, page = 1, conditions_only = false
     page = 1 if page.blank?
     conditions = Hash.new
 
@@ -61,7 +61,8 @@ class Message
      # Filter by severity.
     (by_severity = Streamrule.get_severity_condition_hash(stream_id)).blank? ? nil : conditions[:severity] = by_severity;
 
-    RAILS_DEFAULT_LOGGER.info conditions[:message].inspect
+    # Return only conditions hash if requested.
+    return conditions if conditions_only === true
 
     return self.all :limit => LIMIT, :order => "_id DESC", :conditions => conditions, :offset => self.get_offset(page)
   end
