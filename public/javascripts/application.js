@@ -71,6 +71,8 @@ $(document).ready(function(){
 
     // Show stream statistics
     $('#streams-show-statistics').bind('click', function() {
+        $('#blocks-statistics').show();
+        $('#streams-show-statistics').hide();
         $.post("/streams/get_hosts_statistic/" + parseInt($('#streamid').html()), function(data) {
                 $('#blocks-statistics').html(data);
         });

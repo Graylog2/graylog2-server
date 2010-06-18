@@ -47,15 +47,19 @@
     color: #000;
 }
 
-.blocks-statistic {
-    display: block;
-    background-color: #ff0;
-    margin-bottom: 2px;
-    padding: 3px;
+#blocks-statistics {
+    margin-top: 10px;
+    margin-bottom: 10px;
 }
 
-#blocks-statistics-canvas {
-    width: 100% !important;
+.blocks-statistic-line {
+    display: block;
+    background-color: #ffdddd;
+    border-top: 1px solid #ffcccc;
+    border-bottom: 1px solid #ffcccc;
+    border-right: 1px solid #ffcccc;
+    margin-bottom: 2px;
+    padding: 3px;
 }
 
 .legend {

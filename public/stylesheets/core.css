@@ -60,6 +60,14 @@ label {
     color: #000 !important;
 }
 
+.loading {
+    height: 200px;
+    width: 100%;
+    background-image: url(/images/loading.gif);
+    background-repeat: no-repeat;
+    background-position: center center;
+}
+
 #top {
     height: 100px;
     width: 100%;
