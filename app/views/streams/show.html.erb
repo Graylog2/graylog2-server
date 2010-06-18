@@ -39,6 +39,12 @@
 <div id="blocks-statistics">
 </div>
 
+<br style="clear: both;" />
+
+<%= flot_includes %>
+
+<%= flot_canvas("blocks-statistics-canvas") %>
+
 <% unless @stream.streamrules.blank? %>
   <%= render :partial => "messages/table", :locals => { :messages => @messages } %>
 <% end %>

@@ -1,0 +1,18 @@
+    <h1>Flotomatic Setting Options</h1>
+
+    <p>There are plenty of options you can set to control the precise
+    looks of your plot. You can control the axes, the legend, the
+    default graph type, the look of grid, etc.</p>
+
+    <p>The idea is that Flot goes to great lengths to provide <b>sensible
+    defaults</b> which you can then customize as needed for your
+    particular application. If you've found a use case where the
+    defaults can be improved, please don't hesitate to give your
+    feedback.</p>
+
+	<%= flot_includes %>
+	<%= flot_canvas("graph") %>
+	
+	<% flot_graph("graph", @flot) do %>
+	   <%= flot_plot %>
+	<% end %>

@@ -1,0 +1,103 @@
+== Flotomatic
+
+Flotomatic is a Rails wrapper around the flot javascript graphing library.
+
+Flotomatic was originally developed for graphing migraine histories on http://MigraineLiving.com.
+
+Known issues:
+* Zooming in / out with overview plot only works after zooming in with the main plot one initial time
+* When selecting datasets using the flot_selections div, the plot zoom is lost... it zooms all the way out
+
+== Installation
+
+To install the flotomatic plugin:
+
+  script/plugin install git://github.com/xdotcommer/flotomatic.git
+
+The following rake tasks are also available:
+* rake  		# spec by default, runs specs
+* rake rdoc  	# create documentation in rdoc folder
+* rake install	# (re)copies the public javascript and stylesheet files - this is done automatically on install
+
+== Example
+
+Please note this is not intended to be a complete working an example.  It's purpose is only to illustrate some of what you can do through the API.  
+
+It assumes a couple of collections have been created (@journals, @migraines) with very specific attributes on them.  For a working example see the walk through here:
+http://xdotcommer.wordpress.com/2009/11/30/flotomatic-a-new-graphing-plugin-for-rails/
+
+=== Controller
+
+  @flot = TimeFlot.new('graph') do |f|
+    f.bars
+    f.grid :hoverable => true
+    f.selection :mode => "xy"
+    f.filter {|collection| collection.select {|j| j.entry_date < Date.parse("7/8/2007")}}
+    f.series_for("Stress", @journals, :x => :entry_date, :y => :stress_rating)
+    f.series_for("Hours of Sleep", @migraines, :x => :entry_date, :y => :hours_of_sleep)
+    f.series_for("Restful Night?", @migraines, :x => :entry_date, :y => lambda {|record| record.restful_night ? 5 : 0 }, :options => {:points => {:show => true}, :bars => {:show => false}})
+    f.series_for("Migraines", @migraines, :x => :entry_date, :y => lambda {|record| record.migraine? ? 4 : nil }, :options => {:points => {:show => true}, :bars => {:show => false}})
+  end
+
+=== View
+
+  <%= flot_includes %>
+
+  <h2>Graph the following items</h2>
+
+  <div class='flot_dataset_picker'>
+  	<%= flot_selections %>
+  </div>
+
+  <h2>My Graph</h2>
+
+  <%= flot_canvas("graph") %>
+
+  <h2>Zoom In / Out</h2>
+
+  <%= flot_overview("asdflkjasdf") %>
+
+  <!-- do the actual plotting... -->
+  <% flot_graph("graph", @flot) do %>
+  	<%= flot_plot(:dynamic => true, :overview => true) %>
+  	<%= flot_tooltip %>
+  <% end %>
+
+== Flotomatic Javascript Reference
+
+Within the <% flot_graph %> block you will have access to the <tt>flotomatic</tt> variable.
+
+The flotomatic variable is created with the id of the canvas div, the data, and options supplied through the Flot object passed in to the <tt>flot_graph</tt> call.  For instance:
+
+  <% flot_graph("canvas", @flot) %> 
+
+  // Results in the following:
+  var flotomatic = new Flotomatic("canvas", @flot.data, @flot.options)
+
+=== Flotomatic methods
+
+Plotting Methods
+  // actually draws the plot with $.plot
+  draw: function(placeholder, data, initialOptions, ranges, dynamic, zoom)
+
+  // calls draw & sets flotomatic.plot to the returned plot handle 
+  graph: function(overview, dynamic)
+
+  // dynamically graphs with choice input checkboxes for each dataset in flotomatic.data
+  graphDynamic: function()
+
+  // plots the overview (zoom in / out) graph
+  graphOverview: function()
+
+Tooltip Methods
+  createTooltip: function(tooltipFormatter)
+
+  // default tooltipFormatter
+  tooltipFormatter: function(item) {
+  	var date 	 = new Date(item.datapoint[0]),
+  		label    = item.series.label;
+
+  	return label + ": " + item.datapoint[1] + " on " + (date.getMonth() + 1) + "/" + date.getDate() + "</a>";
+  }
+
+Copyright (c) 2009 Michael Cowden, released under the MIT license

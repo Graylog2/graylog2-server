@@ -1,0 +1,12 @@
+    <h1>Flotomatic Graph Types</h1>
+
+    <p>Flot supports lines, points, filled areas, bars and any
+    combinations of these, in the same plot and even on the same data
+    series.</p>
+
+	<%= flot_includes %>
+	<%= flot_canvas("graph") %>
+	
+	<% flot_graph("graph", @flot) do %>
+	   <%= flot_plot %>
+	<% end %>

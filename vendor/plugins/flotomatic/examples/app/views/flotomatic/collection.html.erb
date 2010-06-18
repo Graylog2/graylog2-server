@@ -1,0 +1,11 @@
+<h1>Flotomatic Collection Graph</h1>
+
+<p>This is an example of how to use flot to do a collection based graph (take a look at the controller for more details)</p>
+
+<%= flot_includes %>
+
+<%= flot_canvas("graph") %>
+
+<% flot_graph("graph", @flot) do %>
+   <%= flot_plot %>
+<% end %>

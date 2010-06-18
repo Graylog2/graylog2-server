@@ -1,3 +1,7 @@
-<% hosts.each do |host| %>
+<!--<% hosts.each do |host| %>
   <div class="blocks-statistic" style="width: <%=h host['percent'] %>%;"><%=h host['name'] %></div>
+<% end %>-->
+
+<% flot_graph("blocks-statistics-canvas", @flot) do %>
+   <%= flot_plot :legend => false %>
 <% end %>

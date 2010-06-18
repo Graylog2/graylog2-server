@@ -1,0 +1,9 @@
+Description:
+    Copies the css and javascript files into the public directory of your project
+
+Example:
+    ./script/generate flotomatic
+
+    This will create:
+        public/javascripts/flotomatic.js
+		public/stylesheets/flotomatic.css

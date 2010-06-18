@@ -53,6 +53,17 @@ class StreamsController < ApplicationController
       return
     end
 
+    ####
+    @flot = Flot.new('blocks-statistics-canvas') do |f|
+      f.bars
+
+      i = 0
+      ready_hosts.each do |host|
+        f.series(host['name'], [[i,host['percent']]])
+        i += 1
+      end
+    end
+    ####
     render :partial => 'statistics', :locals => { :hosts => ready_hosts }
   end
 

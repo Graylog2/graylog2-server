@@ -1,0 +1,11 @@
+<h1>Flotomatic Basic Graph</h1>
+
+<p>This is the simplest example of how to use flot</p>
+
+<%= flot_includes %>
+
+<%= flot_canvas("graph") %>
+
+<% flot_graph("graph", @flot) do %>
+   <%= flot_plot %>
+<% end %>

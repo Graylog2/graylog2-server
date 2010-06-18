@@ -1,0 +1,13 @@
+    <h1>Flotomatic Stacked Graphs</h1>
+
+    <p>With the stack plugin, you can have Flot stack the
+    series. This is useful if you wish to display both a total and the
+    constituents it is made of. The only requirement is that you provide
+    the input sorted on x.</p>
+
+	<%= flot_includes %>
+	<%= flot_canvas("graph") %>
+	
+	<% flot_graph("graph", @flot) do %>
+	   <%= flot_plot %>
+	<% end %>

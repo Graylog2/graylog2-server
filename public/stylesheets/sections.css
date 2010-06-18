@@ -54,6 +54,14 @@
     padding: 3px;
 }
 
+#blocks-statistics-canvas {
+    width: 100% !important;
+}
+
+.legend {
+    display: none !important;
+}
+
 /* Blacklist */
 #blacklist-delete {
   float: right;
