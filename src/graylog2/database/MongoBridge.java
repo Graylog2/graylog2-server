@@ -113,7 +113,7 @@ public class MongoBridge {
     public void distinctHosts() throws Exception {
         // Fetch all hosts.
         DBCollection messages = this.getMessagesColl();
-        List hosts = messages.distinct("host");
+        List<String> hosts = messages.distinct("host");
 
         DBCollection coll = null;
 
