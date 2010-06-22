@@ -60,6 +60,7 @@ public class Main {
         // Define required configuration fields.
         ArrayList<String> requiredConfigFields = new ArrayList<String>();
         requiredConfigFields.add("syslog_listen_port");
+        requiredConfigFields.add("mongodb_useauth");
         requiredConfigFields.add("mongodb_user");
         requiredConfigFields.add("mongodb_password");
         requiredConfigFields.add("mongodb_host");
@@ -93,7 +94,8 @@ public class Main {
                     Main.masterConfig.getProperty("mongodb_password"),
                     Main.masterConfig.getProperty("mongodb_host"),
                     Main.masterConfig.getProperty("mongodb_database"),
-                    Integer.valueOf(Main.masterConfig.getProperty("mongodb_port"))
+                    Integer.valueOf(Main.masterConfig.getProperty("mongodb_port")),
+                    Main.masterConfig.getProperty("mongodb_useauth")
             );
         } catch (Exception e) {
             System.out.println("Could not create MongoDB connection: " + e.toString());

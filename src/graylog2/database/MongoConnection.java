@@ -43,25 +43,28 @@ public class MongoConnection {
         return INSTANCE;
     }
 
-    public void connect(String username, String password, String hostname, String database, int port) throws Exception {
+    public void connect(String username, String password, String hostname, String database, int port, String useAuth) throws Exception {
         try {
-            this.m = new Mongo(hostname, port);
-            this.db = m.getDB(database);
+            MongoConnection.m = new Mongo(hostname, port);
+            MongoConnection.db = m.getDB(database);
 
-            // Try to authenticate.
-            if(!db.authenticate(username, password.toCharArray())) {
-                throw new Exception("Could not authenticate to database '" + database + "' with user '" + username + "'.");
+
+            // Try to authenticate if configured.
+            if (useAuth.equals("true")) {
+                if(!db.authenticate(username, password.toCharArray())) {
+                    throw new Exception("Could not authenticate to database '" + database + "' with user '" + username + "'.");
+                }
             }
         } catch (MongoException.Network e) {
-            throw new Exception("Could not connect to Mongo DB.");
+            throw new Exception("Could not connect to Mongo DB. (" + e.toString() + ")");
         }
     }
 
     public Mongo getConnection() {
-        return this.m;
+        return MongoConnection.m;
     }
 
     public DB getDatabase() {
-        return this.db;
+        return MongoConnection.db;
     }
 }
