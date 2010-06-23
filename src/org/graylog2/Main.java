@@ -18,9 +18,15 @@
  *
  */
 
-package graylog2;
+package org.graylog2;
 
-import graylog2.database.MongoConnection;
+import org.graylog2.periodical.HostDistinctThread;
+import org.graylog2.periodical.SystemStatisticThread;
+import org.graylog2.periodical.SystemStatistics;
+import org.graylog2.messagehandlers.syslog.SyslogServerThread;
+import org.graylog2.messagehandlers.gelf.GELFMainThread;
+import org.graylog2.messagehandlers.gelf.GELF;
+import org.graylog2.database.MongoConnection;
 import java.io.FileInputStream;
 import java.util.ArrayList;
 import java.util.Properties;
@@ -118,9 +124,18 @@ public class Main {
 
         // Check if the thread started up completely.
         try { Thread.sleep(1000); } catch(InterruptedException e) {}
-        if(!syslogCoreThread.isAlive()) {
+        if(syslogCoreThread.isAlive()) {
+            System.out.println("[x] Syslog server thread is up.");
+        } else {
             System.out.println("Could not start syslog server core thread. Do you have permissions to listen on UDP port " + Main.masterConfig.getProperty("syslog_listen_port") + "?");
             System.exit(1); // Exit with error.
+        }
+
+        // Start GELF thread.
+        if (GELF.isEnabled()) {
+            GELFMainThread gelfThread = new GELFMainThread(Integer.parseInt(Main.masterConfig.getProperty("gelf_listen_port")));
+            gelfThread.start();
+            System.out.println("[x] GELF thread is up.");
         }
 
         // Start the thread that distincts hosts.
@@ -133,7 +148,7 @@ public class Main {
         systemStatisticThread.start();
         System.out.println("[x] System statistic thread is up.");
 
-        System.out.println("[x] Syslog server up and running.");
+        System.out.println("[x] Graylog2 up and running.");
     }
 
 }

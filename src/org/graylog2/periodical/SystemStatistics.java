@@ -22,9 +22,10 @@
  * SystemStatistics.java: Lennart Koopmann <lennart@scopeport.org> | May 21, 2010 8:12:56 PM
  */
 
-package graylog2;
+package org.graylog2.periodical;
 
-import graylog2.database.MongoBridge;
+import org.graylog2.Main;
+import org.graylog2.database.MongoBridge;
 
 public final class SystemStatistics {
     private static SystemStatistics INSTANCE;

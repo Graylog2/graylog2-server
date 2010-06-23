@@ -23,7 +23,7 @@
  * Log.java: Lennart Koopmann <lennart@scopeport.org> | May 17, 2010 9:29:29 PM
  */
 
-package graylog2;
+package org.graylog2;
 
 import java.util.Date;
 

@@ -1,0 +1,72 @@
+/**
+ * Copyright 2010 Lennart Koopmann <lennart@scopeport.org>
+ *
+ * This file is part of Graylog2.
+ *
+ * Graylog2 is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * Graylog2 is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with Graylog2.  If not, see <http://www.gnu.org/licenses/>.
+ *
+ */
+
+/**
+ * GELFThread.java: Lennart Koopmann <lennart@scopeport.org> | Jun 23, 2010 6:58:07 PM
+ */
+
+package org.graylog2.messagehandlers.gelf;
+
+import org.graylog2.Log;
+
+import java.net.*;
+import java.io.*;
+
+public class GELFServer {
+    private ServerSocket serverSocket = null;
+
+    public GELFServer() {
+        Runtime.getRuntime().addShutdownHook(new Thread(new Runnable() {
+            @Override public void run() {
+                Log.info("Closing server socket.");
+                tearDown();
+            }
+        }));
+    }
+
+    public boolean create(int port) {
+        try {
+            this.serverSocket = new ServerSocket(port);
+        } catch(IOException e) {
+            Log.emerg("Could not create ServerSocket in GELFServer::create(): " + e.toString());
+            return false;
+        }
+
+        return true;
+    }
+
+    public Socket listen() {
+        try {
+            return serverSocket.accept();
+        } catch(IOException e) {
+            Log.emerg("Could not accept on ServerSocket in GELFServer::listen(): " + e.toString());
+        }
+
+        return null;
+    }
+
+    public void tearDown() {
+         try {
+             if (this.serverSocket != null) {
+                this.serverSocket.close();
+             }
+         } catch(IOException e) {}
+    }
+}

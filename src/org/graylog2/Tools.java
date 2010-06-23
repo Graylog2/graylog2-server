@@ -22,7 +22,7 @@
  * Tools.java: Lennart Koopmann <lennart@scopeport.org> | May 17, 2010 9:46:31 PM
  */
 
-package graylog2;
+package org.graylog2;
 
 public class Tools {
 

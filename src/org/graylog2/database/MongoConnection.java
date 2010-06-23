@@ -22,7 +22,7 @@
  * MongoConnection.java: Lennart Koopmann <lennart@scopeport.org> | Jun 6, 2010 1:36:19 PM
  */
 
-package graylog2.database;
+package org.graylog2.database;
 
 import com.mongodb.Mongo;
 import com.mongodb.DB;
@@ -47,7 +47,6 @@ public class MongoConnection {
         try {
             MongoConnection.m = new Mongo(hostname, port);
             MongoConnection.db = m.getDB(database);
-
 
             // Try to authenticate if configured.
             if (useAuth.equals("true")) {

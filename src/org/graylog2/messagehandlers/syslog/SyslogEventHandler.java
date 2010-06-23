@@ -22,9 +22,13 @@
  * SyslogEventHandler.java: Lennart Koopmann <lennart@scopeport.org> | May 17, 2010 8:58:18 PM
  */
 
-package graylog2;
+package org.graylog2.messagehandlers.syslog;
 
-import graylog2.database.MongoBridge;
+import org.graylog2.Log;
+import org.graylog2.Main;
+import org.graylog2.periodical.SystemStatistics;
+import org.graylog2.Tools;
+import org.graylog2.database.MongoBridge;
 import org.productivity.java.syslog4j.server.SyslogServerEventHandlerIF;
 import org.productivity.java.syslog4j.server.SyslogServerEventIF;
 import org.productivity.java.syslog4j.server.SyslogServerIF;

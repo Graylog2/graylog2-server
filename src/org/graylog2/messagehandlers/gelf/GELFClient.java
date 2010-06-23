@@ -19,30 +19,35 @@
  */
 
 /**
- * SyslogServerThread.java: Lennart Koopmann <lennart@scopeport.org> | May 17, 2010 9:23:33 PM
+ * GELFClient.java: Lennart Koopmann <lennart@scopeport.org> | Jun 23, 2010 7:15:12 PM
  */
 
-package graylog2;
+package org.graylog2.messagehandlers.gelf;
 
-import org.productivity.java.syslog4j.server.SyslogServer;
-import org.productivity.java.syslog4j.server.SyslogServerIF;
+public class GELFClient {
 
-public class SyslogServerThread extends Thread {
+    private String clientMessage = null;
 
-    private int port = 0;
-
-    public SyslogServerThread(int port) {
-        this.port = port;
+    public GELFClient(String clientMessage, String threadName) {
+        this.clientMessage = clientMessage;
     }
 
-    public void run() {
-        SyslogServerIF syslogServer = SyslogServer.getInstance("udp");
-        
-        syslogServer.getConfig().setPort(port);
-        syslogServer.getConfig().addEventHandler(new SyslogEventHandler());
+    public boolean isValidAndJSON() {
+        if(!this.clientMessage.contains("{")) {
+            return false;
+        }
+        return true;
+    }
 
-        syslogServer = SyslogServer.getThreadedInstance("udp");
-        Main.syslogCoreThread = syslogServer.getThread();
+    public boolean handle() {
+        // Do a quick check if this could be valid JSON.
+        if (!this.isValidAndJSON()) {
+            return false;
+        }
+
+        System.out.println("HANDLING CLIENT! " + this.clientMessage);
+
+        return true;
     }
 
 }

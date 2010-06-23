@@ -22,9 +22,11 @@
  * SystemStatisticThread.java: Lennart Koopmann <lennart@scopeport.org> | May 21, 2010 6:42:25 PM
  */
 
-package graylog2;
+package org.graylog2.periodical;
 
-import graylog2.database.MongoBridge;
+import org.graylog2.Log;
+import org.graylog2.Main;
+import org.graylog2.database.MongoBridge;
 
 public class HostDistinctThread extends Thread {
 

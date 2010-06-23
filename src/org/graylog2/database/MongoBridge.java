@@ -22,13 +22,13 @@
  * MongoBridge.java: lennart | Apr 13, 2010 9:13:03 PM
  */
 
-package graylog2.database;
+package org.graylog2.database;
 
 import com.mongodb.DBCollection;
 import com.mongodb.BasicDBObject;
 import com.mongodb.BasicDBObjectBuilder;
 
-import graylog2.Log;
+import org.graylog2.Log;
 
 import java.util.Iterator;
 import java.util.List;
