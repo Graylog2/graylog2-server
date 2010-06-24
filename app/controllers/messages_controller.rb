@@ -5,5 +5,6 @@ class MessagesController < ApplicationController
     @total_blacklisted_terms = BlacklistedTerm.count
 
     @favorites = FavoritedStream.find_all_by_user_id current_user.id
+
   end
 end

@@ -80,6 +80,10 @@
   float: right;
 }
 
+#streams-favorite {
+    float: right;
+}
+
 .stream {
     width: 98%;
     margin: 0px auto;

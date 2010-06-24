@@ -1,0 +1,2 @@
+module FavoritedstreamsHelper
+end

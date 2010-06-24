@@ -6,6 +6,18 @@
 
 <h1>Stream &raquo;<%= @stream.title %>&laquo;</h1>
 
+<div id="streams-favorite">
+  <% if @is_favorited %>
+    <% form_tag "/favoritedstreams/destroy/#{h(@stream.id)}" do %>
+      <%= submit_tag "Remove this stream from your favorites" %>
+    <% end %>
+  <% else %>
+    <% form_tag "/favoritedstreams/create/#{h(@stream.id)}" do %>
+      <%= submit_tag "Add this stream to your favorites" %>
+    <% end %>
+  <% end %>
+</div>
+
 <% form_for @new_rule, :url => { :controller => "streamrules", :action => "create" } do |f| %>
   <%= f.hidden_field :stream_id, :value => @stream.id %>
   <%= f.label :term, "New Rule:" %>

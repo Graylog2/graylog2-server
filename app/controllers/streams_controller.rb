@@ -8,6 +8,9 @@ class StreamsController < ApplicationController
     @stream = Stream.find params[:id]
     @messages = Message.all_of_stream @stream.id, params[:page]
     @new_rule = Streamrule.new
+
+    # Find out if this stream is favorited by the current user.
+    FavoritedStream.find_by_stream_id_and_user_id(params[:id], current_user.id).blank? ? @is_favorited = false : @is_favorited = true
   end
 
   def create
