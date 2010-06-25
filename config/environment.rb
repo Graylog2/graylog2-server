@@ -33,7 +33,8 @@ Rails::Initializer.run do |config|
 
   # Set Time.zone default to the specified zone and make Active Record auto-convert to this zone.
   # Run "rake -D time" for a list of tasks for finding time zone names.
-  config.time_zone = 'UTC'
+  #config.time_zone = 'UTC'
+  config.time_zone = 'Berlin'
   
   config.cache_store = [:mem_cache_store, '127.0.0.1', { :namespace => 'graylog2' }]
 

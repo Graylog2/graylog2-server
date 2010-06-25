@@ -1,0 +1,52 @@
+body {
+  background-color: #000;
+  margin: 10px;
+  margin-top: 25px;
+  font-family: Arial;
+  font-size: 10px;
+  color: #fff;
+}
+
+h1 {
+    text-transform: uppercase;
+    letter-spacing: -4px;
+    font-size: 55px;
+    font-family: Arial, sans-serif;
+    text-shadow: 1px 1px 1px #777;
+    font-weight: bold;
+    line-height: 75px;
+    color: #fff;
+    margin-top: 30px;
+}
+
+
+#datetime {
+    text-transform: uppercase;
+    letter-spacing: -4px;
+    font-size: 65px;
+    font-family: Arial, sans-serif;
+    text-shadow: 1px 1px 1px #777;
+    font-weight: bold;
+    line-height: 75px;
+    color: #FD0C99;
+    text-align: center;
+}
+
+.graph {
+    margin-top: 15px;
+}
+
+.graph-subtitle {
+    margin-top: 10px;
+    font-size: 25px;
+}
+
+#state {
+    width: 1000px;
+    margin: 70px auto;
+    text-align: center;
+    font-size: 40px;
+    background-color: #FD0C99;
+    padding-top: 20px;
+    padding-bottom: 20px;
+}

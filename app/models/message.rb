@@ -21,14 +21,14 @@ class Message
     return self.all :limit => LIMIT, :order => "_id DESC", :conditions => conditions, :offset => self.get_offset(page)
   end
 
-  def self.all_with_blacklist page = 1
+  def self.all_with_blacklist page = 1, limit = LIMIT
     page = 1 if page.blank?
 
     conditions = Hash.new
 
     (blacklist = BlacklistedTerm.get_all_as_condition_hash).blank? ? nil : conditions[:message] = blacklist;
 
-    return self.all :limit => LIMIT, :order => "_id DESC", :conditions => conditions, :offset => self.get_offset(page)
+    return self.all :limit => limit, :order => "_id DESC", :conditions => conditions, :offset => self.get_offset(page)
   end
 
   def self.all_of_stream stream_id, page = 1, conditions_only = false

@@ -1,11 +1,28 @@
-<!--<script type="text/javascript">
-$(function(){
-  $.plot($("#placeholder"), [ [[0, 0], [1, 1], [2, 0], [3,2]] ]);
-});
+<script type="text/javascript">
+  $(document).ready(function(){
+    var d = <%= Systemstatistic.get_array_for_flot %>;
+    $.plot($("#placeholder"), [ d ], {
+        xaxis: { mode: "time" },
+        grid: {show: false, color: '#555', borderWidth: 2},
+        series: { lines: { lineWidth: 3 } },
+        colors: ['#FD0C99']
+    });
+  });
 </script>
 
-<div id="placeholder" style="width:600px;height:300px"></div>-->
+<div id="datetime">
+  <%= Time.now  %>
+</div>
 
-<% @host5stats.each do |stat| %>
-  <%= stat.date %>
-<% end %>
+<center>
+  <h1>Log messages</h1>
+  <div id="placeholder" class="graph" style="width:1000px;height:150px"></div>
+  <div class="graph-subtitle">
+    <%= Systemstatistic.get_message_count_of_last_minute %> messages in the last minute
+  </div>
+  <br style="clear: both;" />
+</center>
+
+<div id="state">
+  Currently no known problems
+</div>
