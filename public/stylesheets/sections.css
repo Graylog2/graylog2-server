@@ -105,3 +105,22 @@
 #hosts-delete {
   float: right;
 }
+
+/* Statistics */
+#statistics {
+    text-transform: uppercase;
+    letter-spacing: -4px;
+    font-size: 85px;
+    font-family: Arial, sans-serif;
+    text-shadow: 1px 1px 1px #666;
+    font-weight: bold;
+    line-height: 75px;
+}
+
+.statistics-number {
+    color: #FD0C99;
+}
+
+.statistics-title {
+    color: #000;
+}
