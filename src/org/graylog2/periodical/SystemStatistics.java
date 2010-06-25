@@ -30,6 +30,8 @@ import org.graylog2.database.MongoBridge;
 public final class SystemStatistics {
     private static SystemStatistics INSTANCE;
 
+    public static final int TYPE_HANDLED_SYSLOG_EVENTS = 1;
+
     private SystemStatistics() {}
 
     public synchronized static SystemStatistics getInstance() {
@@ -49,6 +51,14 @@ public final class SystemStatistics {
         );
 
         m.dropCollection("systemstatistics");
+    }
+
+    public void resetValue(int key) {
+        switch (key) {
+            case TYPE_HANDLED_SYSLOG_EVENTS:
+                handledSyslogEvents = 0;
+                break;
+        }
     }
 
     //// Handled syslog events ////

@@ -32,6 +32,7 @@ import org.graylog2.Log;
 
 import java.util.Iterator;
 import java.util.List;
+import org.graylog2.periodical.SystemStatistics;
 
 import org.productivity.java.syslog4j.server.SyslogServerEventIF;
 
@@ -60,7 +61,6 @@ public class MongoBridge {
 
 
     public void dropCollection(String collectionName) throws Exception {
-        System.out.println("PAPA");
         MongoConnection.getInstance().getDatabase().getCollection(collectionName).drop();
     }
 
@@ -107,8 +107,12 @@ public class MongoBridge {
         
         BasicDBObject dbObj = new BasicDBObject();
         dbObj.put(key, value);
+        dbObj.put("created_at", (int) (System.currentTimeMillis()/1000));
 
         coll.insert(dbObj);
+
+        // Reset
+        SystemStatistics.getInstance().resetValue(SystemStatistics.TYPE_HANDLED_SYSLOG_EVENTS);
     }
 
     public void distinctHosts() throws Exception {
