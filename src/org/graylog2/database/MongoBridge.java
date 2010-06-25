@@ -59,8 +59,9 @@ public class MongoBridge {
     }
 
 
-    public void dropCollection(String databaseName) throws Exception {
-        MongoConnection.getInstance().getConnection().dropDatabase(databaseName);
+    public void dropCollection(String collectionName) throws Exception {
+        System.out.println("PAPA");
+        MongoConnection.getInstance().getDatabase().getCollection(collectionName).drop();
     }
 
     public DBCollection getMessagesColl() {
