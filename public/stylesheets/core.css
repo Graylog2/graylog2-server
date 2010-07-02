@@ -76,6 +76,7 @@ label {
 
 #toplogo {
     float: left;
+    margin-left: 13px;
 }
 
 #userbar {

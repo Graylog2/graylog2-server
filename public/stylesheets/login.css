@@ -2,6 +2,7 @@ body {
   background-color: #000;
   font-family: Helvetica,Arial,'Liberation Sans',FreeSans,sans-serif;
   color: #fff;
+  font-size: 13px;
 }
 
 a {
@@ -16,15 +17,17 @@ h1 {
 }
 
 input {
-    font-size: 12px;
-    padding: 2px;
+    font-size: 9px;
+    padding: 1px;
     margin-top: 2px;
     margin-bottom: 2px;
-    width: 235px;
+    width: 200px;
 }
 
 label {
-    font-size: 14px;
+    font-size: 11px;
+    text-transform: uppercase;
+    text-shadow: -1px -1px 0 #111;
 }
 
 dt {
@@ -40,17 +43,21 @@ dd {
   float: right;
 }
 
-#loginbox {
-  width: 500px;
-  margin: 50px auto;
-  background-color: #333;
-  background-image: url(/images/graylog.png);
-  background-repeat: no-repeat;
-  padding: 110px 25px 10px;
+#logintop {
+    margin: 10px auto 0px;
+    width: 508px;
 }
 
-#inner {
-  width: 
+#loginbox {
+  width: 100%;
+  border-top: 8px solid #826e61;
+  padding-top: 15px;
+  padding-bottom: 15px;
+}
+
+#loginbox-inner {
+    width: 430px;
+    margin: 0px auto;
 }
 
 #username {
@@ -60,4 +67,9 @@ dd {
 
 #rememberme {
   margin-top: 5px;
+}
+
+#rememberme input {
+    position: relative;
+    top: 2px;
 }

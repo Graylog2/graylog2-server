@@ -10,8 +10,14 @@
 </head>
 <body>
 
+
+  <div id="logintop">
+    <%= image_tag "logintop.png" %>
+  </div>
   <div id="loginbox">
-    <%= yield %>
+    <div id="loginbox-inner">
+      <%= yield %>
+    </div>
   </div>
 </body>
 </html>

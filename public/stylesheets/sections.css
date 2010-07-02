@@ -8,6 +8,30 @@
     padding: 0px;
 }
 
+#messages-quickfilter {
+    margin-top: 15px;
+    margin-bottom: 10px;
+    width: auto;
+    display: none;
+}
+
+#messages-quickfilter th {
+    border: 0;
+}
+
+#messages-quickfilter td {
+    padding-right: 5px;
+}
+
+#messages-quickfilter tr:hover {
+    background-color: #fff !important;
+}
+
+#messages-quickfilter input,select {
+    font-size: 11px;
+    padding: 0px;
+}
+
 /* Blocks */
 
 .blocks {

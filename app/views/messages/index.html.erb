@@ -9,4 +9,27 @@
 Currently containing <span class="highlighted"><%= number_with_delimiter(@total_count, :delimiter => '.') %></span> messages,
 filtered by <span class="highlighted"><%=h @total_blacklisted_terms %></span> blacklisted terms.
 
+<% form_tag "/" do -%>
+  <table id="messages-quickfilter">
+    <thead>
+      <tr>
+        <th>Message</th>
+        <th>Facility</th>
+        <th>Severity</th>
+        <th>Host</th>
+        <th>&nbsp;</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><%= text_field :rule, :message, :class => "stream-value-field stream-value-message" %></td>
+        <td><%= select_tag "facility", options_for_select(get_ordered_facilities_for_select) %></td>
+        <td><%= select_tag "severity", options_for_select(get_ordered_severities_for_select) %></td>
+        <td><%= select_tag "host", options_for_select(Host.all.collect {|host| [ h(host.host) ] }) %></td>
+        <td><%= submit_tag "Quickfilter!" %></td>
+      </tr>
+    </tbody>
+  </table>
+<% end -%>
+
 <%= render :partial => "messages/table", :locals => { :messages => @messages } %>

@@ -1,4 +1,4 @@
-body {
+/*body {
   background-color: #000;
   margin: 10px;
   margin-top: 25px;
@@ -49,4 +49,67 @@ h1 {
     background-color: #FD0C99;
     padding-top: 20px;
     padding-bottom: 20px;
+}*/
+
+body {
+    font-family: Helvetica,Arial,sans-serif;
 }
+
+#top {
+    margin: 15px auto;
+    width: 800px;
+    height: 50px;
+}
+
+#top-timestamp {
+    float: right;
+    font-size: 12px;
+    margin-top: 43px;
+    color: #444;
+}
+
+#statuscontainer {
+    width: 100%;
+    color: #fff;
+}
+
+#status {
+    margin: 0px auto;
+    padding: 30px;
+    width: 800px;
+}
+
+#status h1 {
+    text-shadow: -1px -1px 0 #060;
+    font-size: 50px;
+}
+
+.status-problems {
+    background-color: #ff2500;
+}
+
+.status-okay {
+    background-color: #58b300;
+}
+
+.problem-timestamp {
+    border-bottom: 1px solid #ccc;
+    padding-bottom: 2px;
+    font-size: 14px;
+}
+
+.problem-title {
+    margin-top: 4px;
+    text-shadow: -1px -1px 0 #eee;
+    font-size: 25px;
+}
+
+/* Slider */
+.anythingSlider                         { width: 800px; height: 360px; position: relative; margin: 25px auto; }
+.anythingSlider .wrapper                { width: 800px; overflow: auto; height: 341px; position: absolute; top: 0; left: 0; }
+.anythingSlider .wrapper ul             { width: 32700px; list-style: none; position: absolute; top: 0; left: 0; background: #fff; margin: 0; }
+.anythingSlider ul li                   { display: block; float: left; padding: 0; height: 317px; width: 800px; margin: 0; }
+.anythingSlider .wrapper ul ul          { position: static; margin: 0; background: none; overflow: visible; width: auto; border: 0; }
+.anythingSlider .wrapper ul ul li       { float: none; height: auto; width: auto; background: none; }
+.arrow                                  { display: none; }
+#start-stop                             { display: none; }
