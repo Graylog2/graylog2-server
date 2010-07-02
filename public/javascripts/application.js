@@ -78,4 +78,13 @@ $(document).ready(function(){
         });
     });
 
+    // Quickfilter
+    $('#messages-show-quickfilter').toggle(function() {
+          $('#messages-quickfilter').show();
+          $('#messages-show-quickfilter').animate({width: 150}, 100);
+        }, function() {
+          $('#messages-quickfilter').hide();
+          $('#messages-show-quickfilter').animate({width: 125}, 100);
+    });
+
 });

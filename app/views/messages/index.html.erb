@@ -1,3 +1,9 @@
+<div id="messages-show-quickfilter">
+  Quickfilter
+</div>
+
+<div id="messages-content">
+
 <div id="messages-favorited-streams">
   <% unless @favorites.blank? %>
     Favorite streams: <%= select("favoritestreamchooser", "id", @favorites.collect {|p| [ p.stream.title, p.stream.id ] }, { :include_blank => true }) %>
@@ -9,8 +15,8 @@
 Currently containing <span class="highlighted"><%= number_with_delimiter(@total_count, :delimiter => '.') %></span> messages,
 filtered by <span class="highlighted"><%=h @total_blacklisted_terms %></span> blacklisted terms.
 
-<% form_tag "/" do -%>
-  <table id="messages-quickfilter">
+<% form_tag('/', :method => :get) do -%>
+  <table id="messages-quickfilter" style="display: <%= params[:filters].blank? ? 'none' : 'block' %>">
     <thead>
       <tr>
         <th>Message</th>
@@ -22,10 +28,10 @@ filtered by <span class="highlighted"><%=h @total_blacklisted_terms %></span> bl
     </thead>
     <tbody>
       <tr>
-        <td><%= text_field :rule, :message, :class => "stream-value-field stream-value-message" %></td>
-        <td><%= select_tag "facility", options_for_select(get_ordered_facilities_for_select) %></td>
-        <td><%= select_tag "severity", options_for_select(get_ordered_severities_for_select) %></td>
-        <td><%= select_tag "host", options_for_select(Host.all.collect {|host| [ h(host.host) ] }) %></td>
+        <td><%= text_field_tag "filters[message]", params[:filters].blank? ? nil : params[:filters][:message] %></td>
+        <td><%= select_tag "filters[facility]", "<option></option>" + options_for_select(get_ordered_facilities_for_select, :selected => get_quickfilter_selected(params[:filters], :facility)) %></td>
+        <td><%= select_tag "filters[severity]", "<option></option>" + options_for_select(get_ordered_severities_for_select, :selected => get_quickfilter_selected(params[:filters], :severity)) %></td>
+        <td><%= select_tag "filters[host]", "<option></option>" + options_for_select(Host.all.collect {|host| [ h(host.host) ] }, :selected => get_quickfilter_selected(params[:filters], :host, true)) %></td>
         <td><%= submit_tag "Quickfilter!" %></td>
       </tr>
     </tbody>
@@ -33,3 +39,4 @@ filtered by <span class="highlighted"><%=h @total_blacklisted_terms %></span> bl
 <% end -%>
 
 <%= render :partial => "messages/table", :locals => { :messages => @messages } %>
+</div>

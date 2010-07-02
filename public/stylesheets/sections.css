@@ -8,11 +8,29 @@
     padding: 0px;
 }
 
+#messages-content {
+    position: relative;
+    top: -20px;
+}
+
+#messages-show-quickfilter {
+    width: 125px;
+    height: 17px;
+    padding-top: 1px;
+    position: relative;
+    top: -15px;
+    margin: 0px auto;
+    text-align: center;
+    background-color: #FD0C99;
+    font-size: 10px;
+    color: #fff;
+    cursor: pointer;
+}
+
 #messages-quickfilter {
     margin-top: 15px;
     margin-bottom: 10px;
     width: auto;
-    display: none;
 }
 
 #messages-quickfilter th {
