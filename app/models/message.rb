@@ -31,6 +31,30 @@ class Message
     return self.all :limit => limit, :order => "_id DESC", :conditions => conditions, :offset => self.get_offset(page)
   end
 
+  def self.all_by_quickfilter filters, page = 1, limit = LIMIT
+    page = 1 if page.blank?
+
+    conditions = Hash.new
+
+    RAILS_DEFAULT_LOGGER.debug "MAMA: " + filters.inspect
+
+    unless filters.blank?
+      # Message
+      filters[:message].blank? ? nil : conditions[:message] = /#{Regexp.escape(filters[:message])}/
+
+      # Facility
+      filters[:facility].blank? ? nil : conditions[:facility] = filters[:facility].to_i
+
+      # Severity
+      filters[:severity].blank? ? nil : conditions[:level] = filters[:severity].to_i
+
+      # Host
+      filters[:host].blank? ? nil : conditions[:host] = filters[:host]
+    end
+
+    return self.all :limit => limit, :order => "_id DESC", :conditions => conditions, :offset => self.get_offset(page)
+  end
+
   def self.all_of_stream stream_id, page = 1, conditions_only = false
     page = 1 if page.blank?
     conditions = Hash.new
@@ -59,7 +83,7 @@ class Message
     (by_facility = Streamrule.get_facility_condition_hash(stream_id)).blank? ? nil : conditions[:facility] = by_facility;
 
      # Filter by severity.
-    (by_severity = Streamrule.get_severity_condition_hash(stream_id)).blank? ? nil : conditions[:severity] = by_severity;
+    (by_severity = Streamrule.get_severity_condition_hash(stream_id)).blank? ? nil : conditions[:level] = by_severity;
 
     # Return only conditions hash if requested.
     return conditions if conditions_only === true

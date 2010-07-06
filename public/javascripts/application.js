@@ -79,12 +79,21 @@ $(document).ready(function(){
     });
 
     // Quickfilter
-    $('#messages-show-quickfilter').toggle(function() {
-          $('#messages-quickfilter').show();
-          $('#messages-show-quickfilter').animate({width: 150}, 100);
-        }, function() {
-          $('#messages-quickfilter').hide();
-          $('#messages-show-quickfilter').animate({width: 125}, 100);
+    $('#messages-show-quickfilter').bind('click', function() {
+        var showLink = $('#messages-show-quickfilter');
+        if (showLink.hasClass('messages-show-quickfilter-expanded')) {
+            // Quickfilter is expanded. Small down on click.
+            showLink.removeClass('messages-show-quickfilter-expanded');
+
+            // Hide quickfilters.
+            $('#messages-quickfilter').hide();
+        } else {
+            // Quickfilter is not expanded. Expand on click.
+            showLink.addClass('messages-show-quickfilter-expanded');
+
+            // Show quickfilters.
+            $('#messages-quickfilter').show();
+        }
     });
 
 });

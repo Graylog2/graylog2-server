@@ -1,6 +1,10 @@
 class MessagesController < ApplicationController
   def index
-    @messages = Message.all_with_blacklist params[:page]
+    if params[:filters].blank?
+      @messages = Message.all_with_blacklist params[:page]
+    else
+      @messages = Message.all_by_quickfilter params[:filters], params[:page]
+    end
     @total_count =  Message.count
     @total_blacklisted_terms = BlacklistedTerm.count
 

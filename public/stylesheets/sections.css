@@ -27,6 +27,10 @@
     cursor: pointer;
 }
 
+.messages-show-quickfilter-expanded {
+    width: 150px !important;
+}
+
 #messages-quickfilter {
     margin-top: 15px;
     margin-bottom: 10px;
