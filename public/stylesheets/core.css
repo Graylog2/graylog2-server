@@ -45,6 +45,11 @@ label {
     font-size: 16px;
 }
 
+.code {
+    font-family: monospace;
+    font-size: 10px;
+}
+
 .highlighted {
     color: #fd0c99;
 }

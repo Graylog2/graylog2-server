@@ -178,3 +178,15 @@
 .statistics-title {
     color: #000;
 }
+
+/* Settings */
+.setting {
+    margin-bottom: 15px;
+}
+
+.setting label {
+    display: block;
+    font-size: 12px;
+    font-weight: bold;
+    margin-bottom: 2px;
+}

@@ -1,0 +1,16 @@
+<h1>Settings</h1>
+
+<div class="description">
+  The options you can set here only affect your user.
+</div>
+
+<div class="setting">
+  <label>Message length</label>
+  <% form_tag '/settings/store' do -%>
+    <%= hidden_field_tag 'setting_type', Setting::TYPE_MESSAGE_LENGTH %>
+    <%= text_field_tag 'value', Setting.get_message_length(current_user) %>
+    <%= submit_tag 'Store' %>
+    <br />
+    The length of messages before they are cut with a <span class="code">[more]</span> link. (Default: <%=h Setting::TYPE_MESSAGE_LENGTH_STANDARD %>)
+  <% end -%>
+</div>
