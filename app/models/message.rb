@@ -32,6 +32,7 @@ class Message
   end
 
   def self.all_by_quickfilter filters, page = 1, limit = LIMIT
+    RAILS_DEFAULT_LOGGER.debug "PAGE: #{page}"
     page = 1 if page.blank?
 
     conditions = Hash.new

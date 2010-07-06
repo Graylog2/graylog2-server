@@ -100,9 +100,26 @@ module ApplicationHelper
     return "Unknown"
   end
 
-  def build_controller_action_uri
+  def build_controller_action_uri append = nil
+    ret = String.new
+    appender = String.new
+
     request.path_parameters['id'].blank? ? id = String.new : id = request.path_parameters['id']+ '/'
-    '/' + request.path_parameters['controller'] + '/' + request.path_parameters['action'] + '/' + id
+    if params[:filters].blank?
+      ret = '/' + request.path_parameters['controller'] + '/' + request.path_parameters['action'] + '/' + id
+      appender = '?'
+    else
+      ret = '/' + request.path_parameters['controller'] + '/' + request.path_parameters['action'] + '/' + id + '?'
+      params[:filters].each { |k,v| ret += "filters[#{CGI.escape(k)}]=#{CGI.escape(v)}&" }
+      ret = ret.chop
+      appender = '&'
+    end
+
+    if append.blank?
+      return ret
+    else
+       return ret + appender + append + '='
+    end
   end
 
   private

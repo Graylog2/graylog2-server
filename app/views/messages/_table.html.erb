@@ -31,9 +31,9 @@
 
 <div id="messages-bottom">
   <% unless current_page <= 1 %>
-    <a href="<%=h build_controller_action_uri %>?page=<%= previous_page %>" class="previous-page">previous page</a>
+    <a href="<%=h build_controller_action_uri 'page' %><%= previous_page %>" class="previous-page">previous page</a>
   <% end %>
-  <a href="<%=h build_controller_action_uri %>?page=<%= next_page  %>" class="next-page">next page</a>
+  <a href="<%=h build_controller_action_uri 'page' %><%= next_page  %>" class="next-page">next page</a>
 </div>
 
 <br style="clear: both;" />
