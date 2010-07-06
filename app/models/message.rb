@@ -36,8 +36,6 @@ class Message
 
     conditions = Hash.new
 
-    RAILS_DEFAULT_LOGGER.debug "MAMA: " + filters.inspect
-
     unless filters.blank?
       # Message
       filters[:message].blank? ? nil : conditions[:message] = /#{Regexp.escape(filters[:message])}/
