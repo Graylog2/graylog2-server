@@ -92,7 +92,7 @@ $(document).ready(function(){
             showLink.addClass('messages-show-quickfilter-expanded');
 
             // Show quickfilters.
-            $('#messages-quickfilter').show();
+            $('#messages-quickfilter').fadeIn(800);
         }
     });
 

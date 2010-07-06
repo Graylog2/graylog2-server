@@ -62,6 +62,10 @@
     padding: 0px;
 }
 
+.messages-quickfilter-c-message input {
+    width: 300px;
+}
+
 /* Blocks */
 
 .blocks {
