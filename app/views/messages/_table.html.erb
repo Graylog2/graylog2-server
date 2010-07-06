@@ -1,10 +1,10 @@
 <table class="messages">
   <thead>
     <tr>
-      <th>Date</th>
-      <th>Host</th>
-      <th>Severity</th>
-      <th>Facility</th>
+      <th class="messages-c-date">Date</th>
+      <th class="messages-c-host">Host</th>
+      <th class="messages-c-severity">Severity</th>
+      <th class="messages-c-facility">Facility</th>
       <th>Message</th>
     </tr>
   </thead>
@@ -12,11 +12,11 @@
     <% i = 0 %>
     <% @messages.each do |message|  %>
       <tr class="<%= i.modulo(2) == 1 ? "tr-light" : "tr-dark" %>">
-        <td class="messages-c-date"><%= gl_date(Time.at(message.created_at).to_s) %></td>
+        <td><%= gl_date(Time.at(message.created_at).to_s) %></td>
         <td><%=h message.host %></td>
         <td><%= syslog_level_to_human(message.level) %></td>
         <td><%= syslog_facility_to_human(message.facility) %></td>
-        <td><%=h message.message[0..200] %></td>
+        <td id="message-<%=h message.id %>"><%=h message.message[0..150] %><%= (message.message.length > 150) ? " <a href=\"#\" class=\"messages-more\" id=\"#{h(message.id)}\">[more]</a>" : nil %></td>
       </tr>
       <% i+=1 %>
     <% end %>

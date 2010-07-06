@@ -96,4 +96,14 @@ $(document).ready(function(){
         }
     });
 
+    // "more" link in message tables
+    $('.messages-more').bind('click', function() {
+        var message_id = this.id;
+        $('#message-' + message_id).html('<img src="/images/loading-small.gif" alt="loading" style="position: relative; top: 2px;"/>');
+        $.post("/messages/getcompletemessage", {id: message_id}, function(data) {
+            $('#message-' + message_id).html(data);
+        });
+        return false;
+    });
+
 });

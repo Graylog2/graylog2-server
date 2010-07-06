@@ -1,4 +1,12 @@
 /* Messages */
+.messages-c-date {
+    width: 115px;
+}
+
+.messages-c-severity {
+    width: 70px;
+}
+
 #messages-favorited-streams {
     float: right;
 }

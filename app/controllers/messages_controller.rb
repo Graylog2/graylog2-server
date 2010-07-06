@@ -10,4 +10,9 @@ class MessagesController < ApplicationController
 
     @favorites = FavoritedStream.find_all_by_user_id current_user.id
   end
+
+  def getcompletemessage
+    message = Message.find params[:id]
+    render :text => CGI.escapeHTML(message.message)
+  end
 end
