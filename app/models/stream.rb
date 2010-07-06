@@ -1,5 +1,6 @@
 class Stream < ActiveRecord::Base
   has_many :streamrules
+  has_many :favoritedStreams, :dependent => :destroy
 
   validates_presence_of :title
 
