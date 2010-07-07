@@ -31,6 +31,8 @@
       <%= menu_item({ :title => "Blacklists", :controller => "blacklists" }) %>
       <%= menu_item({ :title => "Settings", :controller => "settings" }) %>
     </ul>
+
+    <div id="new-message-count"><strong><%= Message.count_of_last_minutes(10) %></strong> / 10 minutes</div>
   </div>
 
   <div id="content">

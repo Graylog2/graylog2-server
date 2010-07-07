@@ -102,11 +102,12 @@ label {
 }
 
 #topmenu {
-    margin-left: 325px;
+    float: left;
     color: #fff;
     padding-top: 40px;
     font-size: 16px;
     height: 60px;
+    width: 520px;
 }
 
 #topmenu a {
@@ -131,6 +132,15 @@ label {
 
 .topmenu-active a:hover {
     color: #fff !important;
+}
+
+#new-message-count {
+    padding: 0px 4px 2px;
+    color: #fff;
+    font-size: 9px;
+    position: absolute;
+    left: 159px;
+    
 }
 
 #content {

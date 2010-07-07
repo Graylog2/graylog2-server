@@ -99,6 +99,16 @@ class Message
     self.delete_all :conditions => { "host" => host }
   end
 
+  def self.count_of_last_minutes x
+    conditions = Hash.new
+
+    (blacklist = BlacklistedTerm.get_all_as_condition_hash).blank? ? nil : conditions[:message] = blacklist;
+
+    conditions[:created_at] = { '$gt' => (x.minutes.ago).to_i }
+
+    return self.count :conditions => conditions
+  end
+
   private
 
   def self.get_offset page

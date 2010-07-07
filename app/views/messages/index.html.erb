@@ -15,6 +15,8 @@
 Currently containing <span class="highlighted"><%= number_with_delimiter(@total_count, :delimiter => '.') %></span> messages,
 filtered by <span class="highlighted"><%=h @total_blacklisted_terms %></span> blacklisted terms.
 
+<span class="highlighted"><%= Message.count_of_last_minutes(10) %></span> messages in the last 10 minutes.
+
 <% form_tag('/', :method => :get) do -%>
   <table id="messages-quickfilter" style="display: <%= params[:filters].blank? ? 'none' : 'block' %>">
     <thead>
