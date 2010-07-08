@@ -40,17 +40,14 @@ public class Log {
 
     public static void warn(String logMessage) {
         Log.toStdOut(logMessage, SEVERITY_WARN);
-        Log.toMongo(logMessage, SEVERITY_WARN);
     }
 
     public static void crit(String logMessage) {
         Log.toStdOut(logMessage, Log.SEVERITY_CRIT);
-        Log.toMongo(logMessage, SEVERITY_CRIT);
     }
 
     public static void emerg(String logMessage) {
         Log.toStdOut(logMessage, Log.SEVERITY_EMERG);
-        Log.toMongo(logMessage, SEVERITY_EMERG);
     }
 
     public static void toStdOut(String logMessage, int Severity) {
@@ -77,12 +74,6 @@ public class Log {
                 break;
         }
         return severityString;
-    }
-
-    private static void toMongo(String logMessage, int severity) {
-        // TODO: Log to Mongo
-        //MongoMapper m = new MongoMapper();
-        //m.log(logMessage, severity);
     }
 
 }
