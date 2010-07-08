@@ -15,7 +15,9 @@
 <body>
 
   <div id="top">
-    <%= image_tag('jimdo_dashboard.png') %>
+    <% if File.exist?(RAILS_ROOT + "/public/images/dashboard_logo.png") %>
+        <%= image_tag('dashboard_logo.png') %>
+    <% end %>
     <div id="top-timestamp">
       <%= Time.now %>
     </div>
