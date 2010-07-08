@@ -37,12 +37,13 @@ public class SyslogServerThread extends Thread {
     }
 
     public void run() {
-        SyslogServerIF syslogServer = SyslogServer.getInstance("udp");
+        String syslog_protocol = Main.masterConfig.getProperty("syslog_protocol");
+        SyslogServerIF syslogServer = SyslogServer.getInstance(syslog_protocol);
         
         syslogServer.getConfig().setPort(port);
         syslogServer.getConfig().addEventHandler(new SyslogEventHandler());
 
-        syslogServer = SyslogServer.getThreadedInstance("udp");
+        syslogServer = SyslogServer.getThreadedInstance(syslog_protocol);
         Main.syslogCoreThread = syslogServer.getThread();
     }
 

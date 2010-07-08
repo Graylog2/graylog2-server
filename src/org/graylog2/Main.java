@@ -66,6 +66,7 @@ public class Main {
         // Define required configuration fields.
         ArrayList<String> requiredConfigFields = new ArrayList<String>();
         requiredConfigFields.add("syslog_listen_port");
+        requiredConfigFields.add("syslog_protocol");
         requiredConfigFields.add("mongodb_useauth");
         requiredConfigFields.add("mongodb_user");
         requiredConfigFields.add("mongodb_password");
@@ -84,6 +85,15 @@ public class Main {
                 System.out.println("Missing configuration variable '" + requiredConfigField + "' - Terminating. (" + e.toString() + ")");
                 System.exit(1); // Exit with error.
             }
+        }
+
+        // Is the syslog_procotol valid? ("tcp"/"udp")
+        ArrayList<String> allowedSyslogProtocols = new ArrayList<String>();
+        allowedSyslogProtocols.add("tcp");
+        allowedSyslogProtocols.add("udp");
+        if(!allowedSyslogProtocols.contains(Main.masterConfig.getProperty("syslog_protocol"))) {
+            System.out.println("Invalid syslog_protocol: " + Main.masterConfig.getProperty("syslog_protocol"));
+            System.exit(1); // Exit with error.
         }
 
         // Are we in debug mode?
