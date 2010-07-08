@@ -24,8 +24,8 @@ import org.graylog2.periodical.HostDistinctThread;
 import org.graylog2.periodical.SystemStatisticThread;
 import org.graylog2.periodical.SystemStatistics;
 import org.graylog2.messagehandlers.syslog.SyslogServerThread;
-import org.graylog2.messagehandlers.gelf.GELFMainThread;
-import org.graylog2.messagehandlers.gelf.GELF;
+//import org.graylog2.messagehandlers.gelf.GELFMainThread;
+//import org.graylog2.messagehandlers.gelf.GELF;
 import org.graylog2.database.MongoConnection;
 import java.io.FileInputStream;
 import java.util.ArrayList;
@@ -141,12 +141,12 @@ public class Main {
             System.exit(1); // Exit with error.
         }
 
-        // Start GELF thread.
-        if (GELF.isEnabled()) {
+        // Start GELF thread. (Disabled in release)
+        /*if (GELF.isEnabled()) {
             GELFMainThread gelfThread = new GELFMainThread(Integer.parseInt(Main.masterConfig.getProperty("gelf_listen_port")));
             gelfThread.start();
             System.out.println("[x] GELF thread is up.");
-        }
+        }*/
 
         // Start the thread that distincts hosts.
         HostDistinctThread hostDistinctThread = new HostDistinctThread();
