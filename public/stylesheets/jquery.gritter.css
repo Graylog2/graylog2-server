@@ -22,7 +22,7 @@
 /* the norm */
 #gritter-notice-wrapper {
 	position:fixed;
-	top:15px;
+	top:10px;
 	right:20px;
 	width:301px;
 	z-index:9999;
