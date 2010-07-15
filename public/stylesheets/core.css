@@ -7,11 +7,12 @@ body {
 }
 
 h1 {
-    font-size: 30px;
+    font-size: 34px;
     margin-top: 15px;
     margin-bottom: 25px;
     display: block;
     font-weight: normal;
+    font-family: Georgia,"Times New Roman",Times,serif;
 }
 
 a {
@@ -59,6 +60,10 @@ label {
   top: -10px;
   margin-bottom: 10px;
   width: 70%;
+  color: #333;
+  font-family: Georgia,"Times New Roman",Times,serif;
+  font-size: 15px;
+  line-height: 19px;
 }
 
 .black {
@@ -76,7 +81,7 @@ label {
 #top {
     height: 90px;
     width: 100%;
-    background-color: #333;
+    background-color: #363636;
 }
 
 #toplogo {
