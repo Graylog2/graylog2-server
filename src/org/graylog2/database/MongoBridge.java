@@ -32,6 +32,7 @@ import org.graylog2.Log;
 
 import java.util.Iterator;
 import java.util.List;
+import org.graylog2.messagehandlers.gelf.GELFMessage;
 import org.graylog2.periodical.SystemStatistics;
 
 import org.productivity.java.syslog4j.server.SyslogServerEventIF;
@@ -90,6 +91,25 @@ public class MongoBridge {
         dbObj.put("host", event.getHost());
         dbObj.put("facility", event.getFacility());
         dbObj.put("level", event.getLevel());
+        dbObj.put("created_at", (int) (System.currentTimeMillis()/1000));
+
+        coll.insert(dbObj);
+    }
+
+    public void insertGelfMessage(GELFMessage message) throws Exception {
+        DBCollection coll = this.getMessagesColl();
+
+        BasicDBObject dbObj = new BasicDBObject();
+
+        dbObj.put("gelf", true);
+        dbObj.put("message", message.shortMessage);
+        dbObj.put("full_message", message.fullMessage);
+        dbObj.put("type", message.type);
+        dbObj.put("file", message.file);
+        dbObj.put("line", message.line);
+        dbObj.put("host", message.host);
+        dbObj.put("facility", null);
+        dbObj.put("level", message.level);
         dbObj.put("created_at", (int) (System.currentTimeMillis()/1000));
 
         coll.insert(dbObj);

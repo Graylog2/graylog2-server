@@ -26,8 +26,6 @@ package org.graylog2.messagehandlers.gelf;
 
 import org.graylog2.Log;
 
-import java.net.Socket;
-
 public class GELFMainThread extends Thread {
 
     private int port = 0;
@@ -39,7 +37,7 @@ public class GELFMainThread extends Thread {
     @Override public void run() {
         GELFServer server = new GELFServer();
         if (!server.create(this.port)) {
-            System.out.println("Could not start GELF server. Do you have permissions to listen on TCP port " + this.port + "?");
+            System.out.println("Could not start GELF server. Do you have permissions to listen on UDP port " + this.port + "?");
             System.exit(1); // Exit with error.
         }
 
@@ -47,9 +45,10 @@ public class GELFMainThread extends Thread {
         while (true) {
             try {
                 // Listen on socket.
-                Socket clientSocket = server.listen();
+                String receivedGelfSentence = server.listen();
+                
                 // We got a connected client. Start a GELFClientHandlerThread() and wait for next client.
-                GELFClientHandlerThread thread = new GELFClientHandlerThread(clientSocket);
+                GELFClientHandlerThread thread = new GELFClientHandlerThread(receivedGelfSentence);
                 thread.start();
             } catch (Exception e) {
                 Log.crit("Skipping GELF client. Error: " + e.toString());

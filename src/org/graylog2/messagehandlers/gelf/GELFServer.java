@@ -30,7 +30,9 @@ import java.net.*;
 import java.io.*;
 
 public class GELFServer {
-    private ServerSocket serverSocket = null;
+    private static final int MAX_PACKET_SIZE = 4096;
+
+    private DatagramSocket serverSocket = null;
 
     public GELFServer() {
         Runtime.getRuntime().addShutdownHook(new Thread(new Runnable() {
@@ -43,7 +45,7 @@ public class GELFServer {
 
     public boolean create(int port) {
         try {
-            this.serverSocket = new ServerSocket(port);
+            this.serverSocket = new DatagramSocket(port);
         } catch(IOException e) {
             Log.emerg("Could not create ServerSocket in GELFServer::create(): " + e.toString());
             return false;
@@ -52,21 +54,20 @@ public class GELFServer {
         return true;
     }
 
-    public Socket listen() {
+    public String listen() {
         try {
-            return serverSocket.accept();
+            byte[] receiveData = new byte[MAX_PACKET_SIZE];
+            DatagramPacket receivedPacket = new DatagramPacket(receiveData, receiveData.length);
+            serverSocket.receive(receivedPacket);
+            return new String(receivedPacket.getData(), 0, receivedPacket.getLength());
         } catch(IOException e) {
-            Log.emerg("Could not accept on ServerSocket in GELFServer::listen(): " + e.toString());
+            Log.emerg("Could not receive on ServerSocket in GELFServer::listen(): " + e.toString());
         }
 
         return null;
     }
 
     public void tearDown() {
-         try {
-             if (this.serverSocket != null) {
-                this.serverSocket.close();
-             }
-         } catch(IOException e) {}
+        this.serverSocket.close();
     }
 }

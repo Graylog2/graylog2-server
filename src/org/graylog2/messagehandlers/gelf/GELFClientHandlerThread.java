@@ -24,22 +24,18 @@
 
 package org.graylog2.messagehandlers.gelf;
 
-import java.net.Socket;
-import java.net.SocketException;
 
 public class GELFClientHandlerThread extends Thread {
 
-    private Socket clientSocket = null;
+    private String receivedGelfSentence = null;
 
-    GELFClientHandlerThread(Socket socket) throws SocketException {
-        this.clientSocket = socket;
-        socket.setSoTimeout(GELF.CLIENT_TIMEOUT);
+    GELFClientHandlerThread(String receivedGelfSentence) {
+        this.receivedGelfSentence = receivedGelfSentence;
     }
 
     @Override public void run() {
-        GELFClientHandler thisHandler = new GELFClientHandler(this.clientSocket, this.getName());
-        thisHandler.handle();
-
+        GELFClient client = new GELFClient(this.receivedGelfSentence, this.getName());
+        client.handle();
         // This thread terminates here after the client has been handled.
     }
 
