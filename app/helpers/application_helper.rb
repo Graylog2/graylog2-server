@@ -56,6 +56,8 @@ module ApplicationHelper
   end
 
   def syslog_level_to_human level
+    return "None" if level == nil
+    
     case level.to_i
       when 0 then return "Emergency"
       when 1 then return "Alert"
@@ -70,6 +72,8 @@ module ApplicationHelper
   end
 
   def syslog_facility_to_human facility
+    return "GELF" if facility == nil
+
     case facility.to_i
       when  0 then return "kernel"
       when  1 then return "user-level"
