@@ -15,12 +15,14 @@
     <% @messages.each do |message|  %>
       <tr class="<%= i.modulo(2) == 1 ? "tr-light" : "tr-dark" %>">
         <td><%= gl_date(Time.at(message.created_at).to_s) %></td>
-        <td><%=h message.host %></td>
-        <td><%= syslog_level_to_human(message.level) %></td>
-        <td><%= syslog_facility_to_human(message.facility) %></td>
+        <td><%= message.host.blank? ? nil : h(message.host) %></td>
+        <td><%= message.level.blank? ? nil : syslog_level_to_human(message.level) %></td>
+        <td><%= message.facility.blank? ? nil : syslog_facility_to_human(message.facility) %></td>
         <td id="message-<%=h message.id %>">
-          <%=h message.message[0..message_length] %>
-          <%= (message.message.length > message_length) ? "<a href=\"#\" class=\"messages-more\" id=\"#{h(message.id)}\">[more]</a>" : nil %>
+          <% unless message.message.blank? %>
+            <%=h message.message[0..message_length] %>
+            <%= (message.message.length > message_length) ? "<a href=\"#\" class=\"messages-more\" id=\"#{h(message.id)}\">[more]</a>" : nil %>
+          <% end %>
           <%= !message.gelf.blank? && message.gelf == true ? "<a href=\"/messages/show/#{h(message.id)}\" class=\"messages-full\">[full]</a>" : nil %>
         </td>
       </tr>

@@ -10,6 +10,11 @@
       <dd><%= syslog_level_to_human(@message.level) %></dd>
     <% end %>
 
+    <% unless @message.type.blank? or @message.type == 0 %>
+      <dt>Type:</dt>
+      <dd><%= @message.type %></dd>
+    <% end %>
+
     <% unless @message.file.blank?  %>
       <dt>File:</dt>
       <dd>
