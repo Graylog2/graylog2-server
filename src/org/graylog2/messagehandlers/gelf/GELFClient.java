@@ -84,7 +84,7 @@ public class GELFClient {
             // Insert message into MongoDB.
             m.insertGelfMessage(message);
         } catch(Exception e) {
-            Log.warn("Could not handle GELF client: " + e.getMessage());
+            Log.warn("Could not handle GELF client: " + e.toString());
             return false;
         }
 

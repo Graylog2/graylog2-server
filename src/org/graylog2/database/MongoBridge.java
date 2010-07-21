@@ -97,6 +97,10 @@ public class MongoBridge {
     }
 
     public void insertGelfMessage(GELFMessage message) throws Exception {
+        // Check if all required parameters are set.
+        if (message.shortMessage == null || message.shortMessage.length() == 0 || message.host == null || message.host.length() == 0) {
+            throw new Exception("Missing GELF message parameters. short_message and host are required.");
+        }
         DBCollection coll = this.getMessagesColl();
 
         BasicDBObject dbObj = new BasicDBObject();
