@@ -1,0 +1,37 @@
+<div id="messages-show">
+  <h1>Message <span class="highlighted"><%=h @message.id %></span> from <span class="highlighted"><%= @message.host %></span></h1>
+
+  <dl>
+    <dt>Received:</dt>
+    <dd><%= gl_date gl_date(Time.at(@message.created_at).to_s) %></dd>
+
+    <% unless @message.level.blank?  %>
+      <dt>Severity:</dt>
+      <dd><%= syslog_level_to_human(@message.level) %></dd>
+    <% end %>
+
+    <% unless @message.file.blank?  %>
+      <dt>File:</dt>
+      <dd>
+        <%=h @message.file %><%= @message.line.blank? ? nil : ":#{h(@message.line)}" %>
+      </dd>
+    <% end %>
+  </dl>
+
+
+  <% unless @message.message.blank? %>
+    <fieldset class="messages-show-message">
+      <legend>Message:</legend>
+      <p><%=h @message.message %></p>
+    </fieldset>
+  <% end %>
+
+    <% unless @message.full_message.blank? %>
+      <fieldset class="messages-show-message">
+        <legend>Full message:</legend>
+        <% escaped_fullmsg = h(@message.full_message) %>
+        <p id="messages-show-message-full"><%= escaped_fullmsg.gsub!(/\n/, '<br />')  %></p>
+      </fieldset>
+    <% end %>
+
+  </div>

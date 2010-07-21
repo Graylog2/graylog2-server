@@ -66,6 +66,36 @@
     width: 300px;
 }
 
+#messages-show dt {
+    float: left;
+    font-weight: bold;
+}
+
+#messages-show dd {
+    padding-left: 70px;
+}
+
+.messages-show-message {
+    padding: 6px;
+    padding-bottom: 10px;
+    margin-top: 15px;
+    font-size: 18px;
+    border: 1px solid #ccc;
+    font-family: monospace;
+}
+
+.messages-show-message legend {
+    font-size: 11px;
+    font-weight: bold;
+    font-family: 'Lucida Grande',Verdana,sans-serif;
+}
+
+#messages-show-message-full {
+    font-size: 11px;
+    font-family: monospace;
+    line-height: 11px;
+}
+
 /* Blocks */
 
 .blocks {

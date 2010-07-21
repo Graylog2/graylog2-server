@@ -9,6 +9,13 @@ class Message
   key :level, Integer
   key :facility, Integer
 
+  # GELF fields
+  key :gelf, Boolean
+  key :full_message, String
+  key :type, Integer
+  key :file, String
+  key :line, Integer
+
   LIMIT = 100
 
   def self.all_of_blacklist id, page = 1

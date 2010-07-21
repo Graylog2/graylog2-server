@@ -58,6 +58,7 @@ gems\:unpack=Unpacks all required gems into vendor/gems.
 gems\:unpack\:dependencies=Unpacks all required gems and their dependencies into vendor/gems.
 log\:clear=Truncates all *.log files in log/ to zero bytes
 middleware=Prints out your Rack middleware stack
+nagios\:check=Check if the number of new log messages in the last X minutes is too high. Usage:
 newrelic\:install=install a default config/newrelic.yml file
 notes=Enumerate all annotations
 notes\:custom=Enumerate a custom annotation, specify with ANNOTATION=WTFHAX
