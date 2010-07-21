@@ -21,7 +21,7 @@
         <td id="message-<%=h message.id %>">
           <%=h message.message[0..message_length] %>
           <%= (message.message.length > message_length) ? "<a href=\"#\" class=\"messages-more\" id=\"#{h(message.id)}\">[more]</a>" : nil %>
-          <%= !message.gelf.blank? && message.gelf == true ? "<a href=\"/messages/show/#{h(message.id)}\" class=\"messages-full\">[full]</a>" : "nil" %>
+          <%= !message.gelf.blank? && message.gelf == true ? "<a href=\"/messages/show/#{h(message.id)}\" class=\"messages-full\">[full]</a>" : nil %>
         </td>
       </tr>
       <% i+=1 %>
