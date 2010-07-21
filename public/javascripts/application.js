@@ -106,4 +106,5 @@ $(document).ready(function(){
         return false;
     });
 
+    $('#messages-show-message-full').css('width', parseInt($('#content').css('width'))-15);
 });

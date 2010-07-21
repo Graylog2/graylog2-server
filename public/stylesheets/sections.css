@@ -94,6 +94,7 @@
     font-size: 11px;
     font-family: monospace;
     line-height: 11px;
+    overflow: scroll;
 }
 
 /* Blocks */
