@@ -40,24 +40,11 @@ public class GELFClient {
         this.clientMessage = clientMessage;
     }
 
-    public boolean isValidAndJSON() {
-        if(!this.clientMessage.contains("{")) {
-            return false;
-        }
-        return true;
-    }
-
     public boolean handle() {
-        // Do a quick check if this could be valid JSON.
-        /*if (!this.isValidAndJSON()) {
-            Log.info("Got invalid GELF message: " + this.clientMessage);
-            return false;
-        }*/
-
         try {
             JSONObject json = this.getJSON(this.clientMessage);
             if (json == null) {
-                Log.warn("JSON is null - clientMessage was: " + this.clientMessage);
+                Log.warn("JSON is null/could not be parsed (invalid JSON) - clientMessage was: " + this.clientMessage);
                 return false;
             }
 
@@ -79,7 +66,7 @@ public class GELFClient {
 
 
             // Log if we are in debug mode.
-            Log.info("Got GELF message: \n" + message.toString());
+            Log.info("Got GELF message: " + message.toString());
 
             // Insert message into MongoDB.
             m.insertGelfMessage(message);
@@ -101,22 +88,22 @@ public class GELFClient {
         this.message.line = this.jsonToInt(json.get("line"));
     }
 
-    private JSONObject getJSON(String value) {
-        try {
-            Object obj=JSONValue.parse(value);
-            if (obj.getClass().toString().equals("class org.json.simple.JSONArray")) {
-                // Return the k/v of ths JSON array if this is an array.
-                JSONArray array=(JSONArray)obj;
-                return (JSONObject) array.get(0);
-            } else if(obj.getClass().toString().equals("class org.json.simple.JSONObject")) {
-                // This is not an array. Convert it to an JSONObject directly without choosing first k/v.
-                return (JSONObject)obj;
+    private JSONObject getJSON(String value) throws Exception {
+        if (value != null) {
+            Object obj = JSONValue.parse(value);
+            if (obj != null) {
+                if (obj.getClass().toString().equals("class org.json.simple.JSONArray")) {
+                    // Return the k/v of ths JSON array if this is an array.
+                    JSONArray array = (JSONArray)obj;
+                    return (JSONObject) array.get(0);
+                } else if(obj.getClass().toString().equals("class org.json.simple.JSONObject")) {
+                    // This is not an array. Convert it to an JSONObject directly without choosing first k/v.
+                    return (JSONObject)obj;
+                }
             }
-        } catch(Exception e) {
-            Log.warn("ScopeportClient::getJSON() failed: " + e.toString() + " - Tried to convert: " + value);
         }
 
-        return new JSONObject();
+        return null;
     }
 
     private String jsonToString(Object json) {

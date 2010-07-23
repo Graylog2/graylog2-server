@@ -36,16 +36,23 @@ public class GELFMessage {
 
 
     @Override public String toString() {
-        String str = "======================\n";
-        str += "shortMessage: " + shortMessage + "\n";
-        str += "fullMessage: " + fullMessage + "\n";
-        str += "level: " + level + "\n";
-        str += "type: " + type + "\n";
-        str += "host: " + host + "\n";
-        str += "file: " + file + "\n";
-        str += "line: " + line + "\n";
-        str += "======================";
-        
-        return str;
+        String str = "shortMessage: " + shortMessage + " | ";
+        str += "fullMessage: " + fullMessage + " | ";
+        str += "level: " + level + " | ";
+        str += "type: " + type + " | ";
+        str += "host: " + host + " | ";
+        str += "file: " + file + " | ";
+        str += "line: " + line;
+
+        // Replace all newlines and tabs.
+        String ret = str.replaceAll("\\n", "").replaceAll("\\t", "");
+
+        // Cut to 100 chars if the message is too long.
+        if (ret.length() > 150) {
+            ret = ret.substring(0, 150);
+            ret += " (...)";
+        }
+
+        return ret;
     }
 }

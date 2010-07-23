@@ -46,7 +46,7 @@ public class GELFMainThread extends Thread {
             try {
                 // Listen on socket.
                 String receivedGelfSentence = server.listen();
-                
+
                 // We got a connected client. Start a GELFClientHandlerThread() and wait for next client.
                 GELFClientHandlerThread thread = new GELFClientHandlerThread(receivedGelfSentence);
                 thread.start();
