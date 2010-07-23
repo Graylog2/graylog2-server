@@ -78,6 +78,11 @@ label {
     background-position: center center;
 }
 
+.center {
+    width: 100%;
+    text-align: center;
+}
+
 #top {
     height: 90px;
     width: 100%;
@@ -158,6 +163,11 @@ label {
     font-family: 'Lucida Grande',Verdana,sans-serif;
     font-size: 10px;
     margin-top: 10px;
+}
+
+.messages-inline {
+    margin: 0px auto;
+    width: 98%;
 }
 
 .messages tr {

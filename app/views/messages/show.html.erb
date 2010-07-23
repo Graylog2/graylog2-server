@@ -1,3 +1,5 @@
+<div id="message-id" style="display: none;"><%=h @message.id %></div>
+
 <div id="messages-show">
   <h1>Message <span class="highlighted"><%=h @message.id %></span> from <span class="highlighted"><%= @message.host %></span></h1>
 
@@ -31,12 +33,22 @@
     </fieldset>
   <% end %>
 
-    <% unless @message.full_message.blank? %>
-      <fieldset class="messages-show-message">
-        <legend>Full message:</legend>
-        <% escaped_fullmsg = h(@message.full_message) %>
-        <p id="messages-show-message-full"><%= escaped_fullmsg.gsub!(/\n/, '<br />')  %></p>
-      </fieldset>
-    <% end %>
+  <% unless @message.full_message.blank? %>
+    <fieldset class="messages-show-message">
+      <legend>Full message:</legend>
+      <% escaped_fullmsg = h(@message.full_message) %>
+      <p id="messages-show-message-full"><%= escaped_fullmsg.gsub!(/\n/, '<br />') %></p>
+    </fieldset>
+  <% end %>
+
+  <fieldset class="messages-show-message" id="messages-show-similar-messages-fs">
+    <legend>Similar messages</legend
+    <div id="messages-show-similar-messages">
+      <div class="center">
+        <a id="messages-show-similar-messages-link" href="#">Click here to load similar messages</a>
+        <div class="loading" style="display: none; height: 100px;"></div>
+      </div>
+    </div>
+  </fieldset>
 
   </div>

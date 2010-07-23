@@ -106,6 +106,17 @@ $(document).ready(function(){
         return false;
     });
 
+    // Show similar messages in GELF show view.
+    $('#messages-show-similar-messages-link').bind('click', function() {
+        $('#messages-show-similar-messages-link').hide();
+        $('.loading').show();
+
+        $.post("/messages/getsimilarmessages", {id: $('#message-id').html()}, function(data) {
+            $('#messages-show-similar-messages').html(data);
+        });
+        return false;
+    });
+
     $('#messages-show-message-full').css('width', parseInt($('#content').css('width'))-15);
     $('#messages-show-message-full').css('height', parseInt($('#messages-show-message-full').css('height'))+10);
 });
