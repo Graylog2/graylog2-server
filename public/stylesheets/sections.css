@@ -195,6 +195,10 @@
     color: #fd0c99;
 }
 
+#streams-show-statistics {
+    font-weight: bold;
+}
+
 /* Hosts */
 #hosts-quickjump {
     margin-bottom: 15px;

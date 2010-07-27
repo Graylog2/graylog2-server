@@ -37,8 +37,6 @@ class StreamsController < ApplicationController
 
   def get_hosts_statistic
     throw "Missing stream ID" if params[:id].blank?
-    
-    ret = String.new
 
     total_message_count = Stream.get_message_count(params[:id]).to_i
     hosts = Stream.get_distinct_hosts params[:id]
@@ -50,6 +48,9 @@ class StreamsController < ApplicationController
       percent = 100-(((total_message_count-message_count)*100)/total_message_count)
       ready_hosts << { 'name' => host, 'percent' => percent.to_i }
     end
+
+    # Sort the result.
+    ready_hosts = ready_hosts.sort { |a,b| b['percent'] <=> a['percent'] }
 
     if hosts.blank?
       render :text => 'No messages found.'
