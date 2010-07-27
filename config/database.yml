@@ -8,6 +8,14 @@ development:
   password: 123123123
   socket: /var/run/mysqld/mysqld.sock
 
+mongodb:
+  hostname: localhost
+  database: graylog2
+  port: 27017
+  authenticate: false
+  username:
+  password:
+
 test:
   adapter: mysql
   encoding: utf8
