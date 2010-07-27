@@ -150,13 +150,31 @@ label {
     font-size: 9px;
     position: absolute;
     left: 159px;
-    
 }
 
 #content {
     margin: 15px;
     padding: 15px;
+    margin-bottom: 0px;
     background-color: #fff;
+}
+
+#content-bottom {
+    height: 7px;
+    margin-right: 15px;
+    margin-left: 15px;
+    background-image: url(/images/contentedge.png);
+    background-repeat: repeat-x;
+}
+
+#content-bottom-left {
+    width: 262px;
+    float: left;
+}
+
+#content-bottom-right {
+    width: 262px;
+    float: right;
 }
 
 .messages {
