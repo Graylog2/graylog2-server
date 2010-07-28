@@ -19,6 +19,7 @@ Rails::Initializer.run do |config|
   # Specify gems that this application depends on and have them installed with rake gems:install
   config.gem "mongo", :version => '1.0.1'
   config.gem "bson_ext", :version => '1.0.1'
+  config.gem "mysql", :version => '2.8.1'
 
   # Only load the plugins named here, in the order given (default is alphabetical).
   # :all can be used as a placeholder for all plugins not explicitly named

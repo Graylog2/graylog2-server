@@ -1,0 +1,17 @@
+mongodb:
+  hostname: localhost
+  database: graylog2
+  port: 27017
+  authenticate: false
+  username:
+  password:
+
+production:
+  adapter: mysql
+  encoding: utf8
+  reconnect: false
+  database: graylog2
+  pool: 5
+  username: graylog2user
+  password: graylog2pw
+  socket: /var/run/mysqld/mysqld.sock
