@@ -42,6 +42,11 @@ cd $BUILD_DIR
 RAILS_ENV=production
 export RAILS_ENV
 
+# Set Standard rails environment
+echo "RAILS_ENV = 'production'" > temp_env
+cat config/environment.rb >> temp_env
+mv temp_env config/environment.rb
+
 # Remove newrelic_rpm plugin which is not needed for production
 script/plugin remove newrelic_rpm >> $LOGFILE 2>&1
 rm config/newrelic.yml
@@ -54,10 +59,14 @@ rake rails:freeze:gems >> $LOGFILE 2>&1
 # Freeze the gems
 rake gems:unpack >> $LOGFILE 2>&1
 
+# Remove gem requirements that cause errors later. Only needed as freeze definition. (TODO: There must be a better way to do that)
+sed '/bson_ext/d' config/environment.rb > environment.rb_tmp && mv environment.rb_tmp config/environment.rb
+sed '/nunemaker-validatable/d' config/environment.rb > environment.rb_tmp && mv environment.rb_tmp config/environment.rb
+
 # tar it
 cd ..
 echo "Building Tarball ..."
 tar cfz $BUILD_NAME.tar.gz $FULL_BUILD_NAME
-rm -rf ./$FULL_BUILD_NAME
+#rm -rf ./$FULL_BUILD_NAME
 
 echo "DONE! Created Graylog2 release $BUILD_NAME on $BUILD_DATE"
