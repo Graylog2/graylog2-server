@@ -1,3 +1,6 @@
 log/*
 nbproject/*
 config/database.yml
+
+build/builds/*
+build/logs/*
