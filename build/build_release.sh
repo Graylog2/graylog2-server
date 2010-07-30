@@ -2,10 +2,9 @@
 
 BUILD_NUMBER=$1
 BUILD_NAME=graylog2-web-interface-$BUILD_NUMBER
-FULL_BUILD_NAME=`date +%s`.$BUILD_NAME
-BUILD_DIR=builds/$FULL_BUILD_NAME
+BUILD_DIR=builds/$BUILD_NAME
 BUILD_DATE=`date`
-LOGFILE=`pwd`/logs/$FULL_BUILD_NAME
+LOGFILE=`pwd`/logs/$BUILD_NAME
 
 # Check if required version parameter is given
 if [ -z $BUILD_NUMBER ]; then
@@ -66,7 +65,7 @@ sed '/nunemaker-validatable/d' config/environment.rb > environment.rb_tmp && mv 
 # tar it
 cd ..
 echo "Building Tarball ..."
-tar cfz $BUILD_NAME.tar.gz $FULL_BUILD_NAME
-#rm -rf ./$FULL_BUILD_NAME
+tar cfz $BUILD_NAME.tar.gz $BUILD_NAME
+rm -rf ./$BUILD_NAME
 
 echo "DONE! Created Graylog2 release $BUILD_NAME on $BUILD_DATE"
