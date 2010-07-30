@@ -24,7 +24,7 @@
     <div id="userbar">
       Logged in as <%= current_user.login %> <%= link_to "&nbsp; (Log out)", "/logout" %>
     </div>
-    <%= image_tag "graylog.png", :id => "toplogo" %>
+    <%= link_to image_tag("graylog.png", :id => "toplogo"), '/' %>
     <ul id="topmenu">
       <%= menu_item({ :title => "Messages", :controller => "/" }) %>
       <%= menu_item({ :title => "Streams", :controller => "streams" }) %>
