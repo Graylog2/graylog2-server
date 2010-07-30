@@ -1,0 +1,37 @@
+#!/bin/bash
+
+CMD=$1
+NOHUP=`which nohup`
+
+
+start() {
+	echo "Starting graylog2-server ..."
+	$NOHUP java -jar ../dist/graylog2-server.jar > graylog2.log 2>&1 &
+}
+
+stop() {
+        PID=`cat /tmp/graylog2.pid`
+	echo "Stopping graylog2-server ($PID) ..."
+        kill $PID
+}
+
+restart() {
+	echo "Restarting graylog2-server ..."
+        stop
+        start
+}
+
+case "$CMD" in
+	start)
+		start
+		;;
+	stop)
+		stop
+		;;
+	restart)
+		restart
+		;;
+	*)
+		echo "Usage $0 {start|stop|restart}"
+		RETVAL=1
+esac
