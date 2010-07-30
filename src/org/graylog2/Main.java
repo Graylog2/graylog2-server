@@ -73,6 +73,9 @@ public class Main {
         requiredConfigFields.add("mongodb_host");
         requiredConfigFields.add("mongodb_database");
         requiredConfigFields.add("mongodb_port");
+        requiredConfigFields.add("messages_collection_size");
+        requiredConfigFields.add("use_gelf");
+        requiredConfigFields.add("gelf_listen_port");
 
         // Check if all required configuration fields are set.
         for (Object requiredConfigFieldO : requiredConfigFields) {

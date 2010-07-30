@@ -24,7 +24,6 @@
 
 package org.graylog2.periodical;
 
-import org.graylog2.Main;
 import org.graylog2.database.MongoBridge;
 
 public final class SystemStatistics {
@@ -42,13 +41,7 @@ public final class SystemStatistics {
     }
 
     public void clearCollection() throws Exception {
-        MongoBridge m = new MongoBridge(
-                Main.masterConfig.getProperty("mongodb_user"),
-                Main.masterConfig.getProperty("mongodb_password"),
-                Main.masterConfig.getProperty("mongodb_host"),
-                Main.masterConfig.getProperty("mongodb_database"),
-                Integer.valueOf(Main.masterConfig.getProperty("mongodb_port"))
-        );
+        MongoBridge m = new MongoBridge();
 
         m.dropCollection("systemstatistics");
     }

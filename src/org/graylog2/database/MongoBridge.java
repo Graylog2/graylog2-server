@@ -32,6 +32,7 @@ import org.graylog2.Log;
 
 import java.util.Iterator;
 import java.util.List;
+import org.graylog2.Main;
 import org.graylog2.messagehandlers.gelf.GELFMessage;
 import org.graylog2.periodical.SystemStatistics;
 
@@ -39,27 +40,7 @@ import org.productivity.java.syslog4j.server.SyslogServerEventIF;
 
 public class MongoBridge {
     // TODO: make configurable
-    public static final int MAX_MESSAGE_SIZE = 500000000;
     public static final int STANDARD_PORT = 27017;
-    
-    private String username = null;
-    private String password = null;
-    private String hostname = null;
-    private String database = null;
-    private int    port = 27017;
-
-    public MongoBridge(String username, String password, String hostname, String database, int port) throws Exception {
-        this.username = username;
-        this.password = password;
-        this.hostname = hostname;
-        this.database = database;
-        if (port == 0) {
-            this.port = MongoBridge.STANDARD_PORT;
-        } else {
-            this.port = port;
-        }
-    }
-
 
     public void dropCollection(String collectionName) throws Exception {
         MongoConnection.getInstance().getDatabase().getCollection(collectionName).drop();
@@ -72,7 +53,8 @@ public class MongoBridge {
         if(MongoConnection.getInstance().getDatabase().getCollectionNames().contains("messages")) {
             coll = MongoConnection.getInstance().getDatabase().getCollection("messages");
         } else {
-            coll = MongoConnection.getInstance().getDatabase().createCollection("messages", BasicDBObjectBuilder.start().add("capped", true).add("size", MongoBridge.MAX_MESSAGE_SIZE).get());
+            int messagesCollSize = Integer.parseInt(Main.masterConfig.getProperty("messages_collection_size").trim());
+            coll = MongoConnection.getInstance().getDatabase().createCollection("messages", BasicDBObjectBuilder.start().add("capped", true).add("size", messagesCollSize).get());
         }
 
         coll.ensureIndex(new BasicDBObject("created_at", 1));

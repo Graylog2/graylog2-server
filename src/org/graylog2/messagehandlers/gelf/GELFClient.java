@@ -56,13 +56,7 @@ public class GELFClient {
 
             // Store in MongoDB.
             // Connect to database.
-            MongoBridge m = new MongoBridge(
-                    Main.masterConfig.getProperty("mongodb_user"),
-                    Main.masterConfig.getProperty("mongodb_password"),
-                    Main.masterConfig.getProperty("mongodb_host"),
-                    Main.masterConfig.getProperty("mongodb_database"),
-                    Integer.valueOf(Main.masterConfig.getProperty("mongodb_port"))
-            );
+            MongoBridge m = new MongoBridge();
 
 
             // Log if we are in debug mode.

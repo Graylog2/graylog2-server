@@ -47,13 +47,7 @@ public class SyslogEventHandler implements SyslogServerEventHandlerIF {
          // Insert into database.
         try {
             // Connect to database.
-            MongoBridge m = new MongoBridge(
-                    Main.masterConfig.getProperty("mongodb_user"),
-                    Main.masterConfig.getProperty("mongodb_password"),
-                    Main.masterConfig.getProperty("mongodb_host"),
-                    Main.masterConfig.getProperty("mongodb_database"),
-                    Integer.valueOf(Main.masterConfig.getProperty("mongodb_port"))
-            );
+            MongoBridge m = new MongoBridge();
 
 
             m.insert(event);

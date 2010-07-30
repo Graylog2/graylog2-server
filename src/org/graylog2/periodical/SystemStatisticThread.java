@@ -25,7 +25,6 @@
 package org.graylog2.periodical;
 
 import org.graylog2.Log;
-import org.graylog2.Main;
 import org.graylog2.database.MongoBridge;
 
 public class SystemStatisticThread extends Thread {
@@ -37,13 +36,7 @@ public class SystemStatisticThread extends Thread {
             try { Thread.sleep(60000); } catch(InterruptedException e) {}
 
             try {
-                MongoBridge m = new MongoBridge(
-                    Main.masterConfig.getProperty("mongodb_user"),
-                    Main.masterConfig.getProperty("mongodb_password"),
-                    Main.masterConfig.getProperty("mongodb_host"),
-                    Main.masterConfig.getProperty("mongodb_database"),
-                    Integer.valueOf(Main.masterConfig.getProperty("mongodb_port"))
-                );
+                MongoBridge m = new MongoBridge();
 
                 // Handled syslog events.
                 m.insertSystemStatisticValue("handled_syslog_events", SystemStatistics.getInstance().getHandledSyslogEvents());

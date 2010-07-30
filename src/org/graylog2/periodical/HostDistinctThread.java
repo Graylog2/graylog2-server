@@ -25,7 +25,6 @@
 package org.graylog2.periodical;
 
 import org.graylog2.Log;
-import org.graylog2.Main;
 import org.graylog2.database.MongoBridge;
 
 public class HostDistinctThread extends Thread {
@@ -34,13 +33,7 @@ public class HostDistinctThread extends Thread {
         // Run forever.
         while (true) {
             try {
-                MongoBridge m = new MongoBridge(
-                    Main.masterConfig.getProperty("mongodb_user"),
-                    Main.masterConfig.getProperty("mongodb_password"),
-                    Main.masterConfig.getProperty("mongodb_host"),
-                    Main.masterConfig.getProperty("mongodb_database"),
-                    Integer.valueOf(Main.masterConfig.getProperty("mongodb_port"))
-                );
+                MongoBridge m = new MongoBridge();
 
                 // Handled syslog events.
                 m.distinctHosts();
