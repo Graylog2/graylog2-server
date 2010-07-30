@@ -141,7 +141,7 @@ public class Main {
             System.exit(1); // Exit with error.
         }
 
-        // Start GELF thread. (Disabled in release)
+        // Start GELF thread.
         if (GELF.isEnabled()) {
             GELFMainThread gelfThread = new GELFMainThread(Integer.parseInt(Main.masterConfig.getProperty("gelf_listen_port")));
             gelfThread.start();

@@ -36,7 +36,6 @@ public class GELFClientHandlerThread extends Thread {
     @Override public void run() {
         GELFClient client = new GELFClient(this.receivedGelfSentence, this.getName());
         client.handle();
-        // This thread terminates here after the client has been handled.
     }
 
 }
