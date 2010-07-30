@@ -1,7 +1,11 @@
 nbproject
-build*
+build/*
 manifest.mf
 nbbuild*
 dist/*
+build-before-profiler.xml
 
 misc/convert_rsyslog_db_to_mongo.rb
+
+build_script/builds/*
+build_script/logs/*
