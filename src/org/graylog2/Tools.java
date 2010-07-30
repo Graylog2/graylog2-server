@@ -26,6 +26,14 @@ package org.graylog2;
 
 public class Tools {
 
+    public static String getPID() throws Exception {
+        byte[] bo = new byte[100];
+        String[] cmd = {"bash", "-c", "echo $PPID"};
+        Process p = Runtime.getRuntime().exec(cmd);
+        p.getInputStream().read(bo);
+        return new String(bo);
+    }
+
     /*
      * Converts integer syslog loglevel to human readable string
      *
