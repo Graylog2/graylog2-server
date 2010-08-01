@@ -46,8 +46,8 @@ class MessagesController < ApplicationController
     conditions[:message]['$in'] = [/#{Regexp.escape(message)}/]
 
     # Don't search for the message we used to compare.
-    #conditions[:id] = Hash.new
-    #conditions[:id]['$nin'] = [message_id]
+    conditions[:id] = Hash.new
+    conditions[:id]['$nin'] = [message_id]
 
     # Get the messages.
     @messages = Message.all :limit => 50, :order => "_id DESC", :conditions => conditions
