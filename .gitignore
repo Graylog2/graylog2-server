@@ -4,3 +4,5 @@ config/database.yml
 
 build/builds/*
 build/logs/*
+
+public/images/dashboard_logo.png

@@ -7,12 +7,13 @@
   <link rel="shortcut icon" href="/favicon.ico" />
   <%= stylesheet_link_tag "reset" %>
   <%= stylesheet_link_tag "dashboard" %>
+  <%= stylesheet_link_tag "messages" %>
   <%= javascript_include_tag "jquery-1.4.2.min" %>
-  <%= javascript_include_tag "jquery.anythingslider" %>
   <%= javascript_include_tag "dashboard" %>
-  <!-- <%= javascript_include_tag "flot/jquery.flot.min" %> -->
 </head>
 <body>
+
+  <% message_count_interval = Setting.get_message_count_interval(current_user) %>
 
   <div id="top">
     <% if File.exist?(RAILS_ROOT + "/public/images/dashboard_logo.png") %>
@@ -23,25 +24,14 @@
     </div>
   </div>
 
-  <div id="statuscontainer" class="status-problems">
+  <div id="statuscontainer" class="status-<%=h Message.count_of_last_minutes(message_count_interval) > Setting.get_message_max_count(current_user) ? 'problems' : 'okay' %>">
     <div id="status">
-      <h1>3 known problems</h1>
+      <h1><%= Message.count_of_last_minutes(message_count_interval) %> messages / <%=h message_count_interval %> minutes</h1>
     </div>
   </div>
-  
-  <div id="problems" class="anythingSlider">
-    <div class="wrapper">
-      <ul>
-        <li>
-          <div class="problem-timestamp"><%= 5.minutes.ago %> (<%= time_ago_in_words(5.minutes.ago, true) %> ago)</div>
-          <div class="problem-title">www11 HDD RAID failure</div>
-        </li>
-        <li>
-          <div class="problem-timestamp"><%= 8.minutes.ago %> (<%= time_ago_in_words(8.minutes.ago, true) %> ago)</div>
-          <div class="problem-title">MGMT MySQL Replication to China dead</div>
-        </li>
-      </ul>
-    </div>
+
+  <div id="content">
+    <%= yield %>
   </div>
 
 </body>

@@ -177,25 +177,6 @@ label {
     float: right;
 }
 
-.messages {
-    font-family: 'Lucida Grande',Verdana,sans-serif;
-    font-size: 10px;
-    margin-top: 10px;
-}
-
-.messages-inline {
-    margin: 0px auto;
-    width: 98%;
-}
-
-.messages tr {
-    border-bottom: 1px solid #ccc;
-}
-
-.messages td {
-    padding: 2px;
-}
-
 #messages-bottom {
     margin-top: 10px;
 }
