@@ -117,7 +117,7 @@ label {
     padding-top: 40px;
     font-size: 16px;
     height: 60px;
-    width: 520px;
+    width: 575px;
 }
 
 #topmenu a {
@@ -179,6 +179,16 @@ label {
 
 #messages-bottom {
     margin-top: 10px;
+}
+
+#errorExplanation {
+    margin-top: 10px;
+    margin-bottom: 10px;
+}
+
+#errorExplanation ul {
+    margin-left: 15px;
+    list-style-type: square;
 }
 
 .previous-page {

@@ -238,3 +238,9 @@
     font-weight: bold;
     margin-bottom: 2px;
 }
+
+/* Users */
+#users ul {
+    list-style-type: square;
+    margin-left: 15px;
+}

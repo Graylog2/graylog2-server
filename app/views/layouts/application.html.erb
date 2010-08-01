@@ -32,6 +32,7 @@
       <%= menu_item({ :title => "Hosts", :controller => "hosts" }) %>
       <%= menu_item({ :title => "Blacklists", :controller => "blacklists" }) %>
       <%= menu_item({ :title => "Settings", :controller => "settings" }) %>
+      <%= menu_item({ :title => "Users", :controller => "users" }) %>
     </ul>
 
     <% message_count_interval = Setting.get_message_count_interval(current_user) %>
