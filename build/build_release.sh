@@ -34,6 +34,9 @@ cp ../app ../config ../db ../lib ../public ../Rakefile ../README ../script ../te
 # Copy example database.yml file
 cp database.yml.example $BUILD_DIR/config/database.yml
 
+# Remove not needed files
+rm $BUILD_DIR/public/images/dashboard_logo.png
+
 echo "Configuring release ..."
 
 # We are not in the build directory
