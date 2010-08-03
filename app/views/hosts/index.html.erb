@@ -20,7 +20,7 @@ Monitoring <%=h @host_count %> hosts. (Sorted by total message count)
 <% @hosts.each do |host| %>
   <% next if host.host.blank? %>
   <div class="blocks">
-    <span class="blocks-title"><%= link_to h(host.host), { :action => "show", :id => URI.escape(host.host) } %></span>
+    <span class="blocks-title"><%= link_to h(host.host), { :action => "show", :id => URI.escape(Base64.encode64(host.host)) } %></span>
     <ul class="blocks-termslist">
       <%=h host.message_count.to_i %> messages
     </ul>
