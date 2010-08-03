@@ -29,7 +29,7 @@ echo $BUILD_DATE > $BUILD_DIR/build_date
 echo "Copying files ..."
 
 # Copy files.
-cp ../dist ../README $BUILD_DIR -r
+cp ../dist ../README ../COPYING $BUILD_DIR -r
 
 # Copy example config file
 cp ../misc/graylog2.conf $BUILD_DIR/graylog2.conf.example
