@@ -1,15 +1,18 @@
-<div id="users-new" class="users-form">
+<div id="users-edit" class="users-form">
 
-<h1>Create new user</h1>
+<div id="users-delete">
+  <% form_tag '/users/delete/' + @user.id.to_s do -%>
+    <%= submit_tag 'Delete user', :confirm => 'Really delete this user?' %>
+  <% end -%>
+</div>
+
+<h1>Edit user &raquo;<%=h @user.login %>&laquo;</h1>
 <% @user.password = @user.password_confirmation = nil %>
 
 <%= error_messages_for :user %>
-<% form_for :user, :url => { :action => 'create' } do |f| -%>
+<% form_for :user, :url => { :action => 'update', :id => @user.id } do |f| -%>
 
 <dl>
-  <dt><%= label_tag 'login', "Username" %></dt>
-  <dd><%= f.text_field :login %></dd>
-
   <dt><%= label_tag 'email' %></dt>
   <dd><%= f.text_field :email %></dd>
 
@@ -20,8 +23,7 @@
   <dd><%= f.password_field :password_confirmation %></dd>
 
   <dt>&nbsp;</dt>
-  <dd><%= submit_tag 'Create' %></dd>
+  <dd><%= submit_tag 'Edit' %></dd>
 </dl>
 <% end -%>
-
 </div>

@@ -12,16 +12,32 @@ class UsersController < ApplicationController
   def new
     @user = User.new
   end
- 
+
+  def edit
+    @user = User.find params[:id]
+  end
+
   def create
     @user = User.new(params[:user])
     success = @user && @user.save
     if success && @user.errors.empty?
-      redirect_back_or_default('/')
+      redirect_to :action => 'index'
       flash[:notice] = "User has been created."
     else
       flash[:error]  = "Could not create user."
       render :action => 'new'
+    end
+  end
+
+  def update
+    @user = User.update params[:id], params[:user]
+
+    if @user.save
+      flash[:notice] = 'User has been updated'
+      redirect_to :action => 'index'
+    else
+      flash[:error] = 'Could not update user'
+      render :action => 'edit'
     end
   end
 

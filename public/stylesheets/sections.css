@@ -242,5 +242,15 @@
 /* Users */
 #users ul {
     list-style-type: square;
-    margin-left: 15px;
+    margin-left: 25px;
+}
+
+.users-form label {
+    font-size: 12px;
+}
+
+#users-delete {
+    float: right;
+    position: relative;
+    top: -15px;
 }
