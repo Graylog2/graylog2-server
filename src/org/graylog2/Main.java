@@ -22,8 +22,6 @@ package org.graylog2;
 
 import java.io.BufferedWriter;
 import org.graylog2.periodical.HostDistinctThread;
-import org.graylog2.periodical.SystemStatisticThread;
-import org.graylog2.periodical.SystemStatistics;
 import org.graylog2.messagehandlers.syslog.SyslogServerThread;
 import org.graylog2.messagehandlers.gelf.GELFMainThread;
 import org.graylog2.messagehandlers.gelf.GELF;
@@ -141,15 +139,6 @@ public class Main {
             System.exit(1); // Exit with error.
         }
 
-        // Clear systemstatistics collection.
-        try {
-            SystemStatistics.getInstance().clearCollection();
-        } catch (Exception e) {
-            System.out.println("Could not clear system statistic collection: " + e.toString());
-            e.printStackTrace();
-            System.exit(1); // Exit with error.
-        }
-
         // Start the Syslog thread that accepts syslog packages.
         SyslogServerThread syslogServerThread = new SyslogServerThread(Integer.parseInt(Main.masterConfig.getProperty("syslog_listen_port")));
         syslogServerThread.start();
@@ -174,11 +163,6 @@ public class Main {
         HostDistinctThread hostDistinctThread = new HostDistinctThread();
         hostDistinctThread.start();
         System.out.println("[x] Host distinction thread is up.");
-
-        // Start the thread that continously collects system information.
-        SystemStatisticThread systemStatisticThread = new SystemStatisticThread();
-        systemStatisticThread.start();
-        System.out.println("[x] System statistic thread is up.");
 
         System.out.println("[x] Graylog2 up and running.");
     }

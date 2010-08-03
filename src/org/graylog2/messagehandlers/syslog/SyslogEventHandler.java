@@ -26,7 +26,6 @@ package org.graylog2.messagehandlers.syslog;
 
 import org.graylog2.Log;
 import org.graylog2.Main;
-import org.graylog2.periodical.SystemStatistics;
 import org.graylog2.Tools;
 import org.graylog2.database.MongoBridge;
 import org.productivity.java.syslog4j.server.SyslogServerEventHandlerIF;
@@ -55,8 +54,6 @@ public class SyslogEventHandler implements SyslogServerEventHandlerIF {
             Log.crit("Could not insert syslog event into database: " + e.toString());
         }
 
-        // Count up for statistics.
-        SystemStatistics.getInstance().countUpHandledSyslogEvents();
     }
 
 }

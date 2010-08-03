@@ -34,7 +34,6 @@ import java.util.Iterator;
 import java.util.List;
 import org.graylog2.Main;
 import org.graylog2.messagehandlers.gelf.GELFMessage;
-import org.graylog2.periodical.SystemStatistics;
 
 import org.productivity.java.syslog4j.server.SyslogServerEventIF;
 
@@ -99,26 +98,6 @@ public class MongoBridge {
         dbObj.put("created_at", (int) (System.currentTimeMillis()/1000));
 
         coll.insert(dbObj);
-    }
-    
-    public void insertSystemStatisticValue(String key, long value) throws Exception {       
-        DBCollection coll = null;
-
-        // Create a capped collection if the collection does not yet exist.
-        if(MongoConnection.getInstance().getDatabase().getCollectionNames().contains("systemstatistics")) {
-            coll = MongoConnection.getInstance().getDatabase().getCollection("systemstatistics");
-        } else {
-            coll = MongoConnection.getInstance().getDatabase().createCollection("systemstatistics", BasicDBObjectBuilder.start().add("capped", true).add("size", 5242880).get());
-        }
-        
-        BasicDBObject dbObj = new BasicDBObject();
-        dbObj.put(key, value);
-        dbObj.put("created_at", (int) (System.currentTimeMillis()/1000));
-
-        coll.insert(dbObj);
-
-        // Reset
-        SystemStatistics.getInstance().resetValue(SystemStatistics.TYPE_HANDLED_SYSLOG_EVENTS);
     }
 
     public void distinctHosts() throws Exception {

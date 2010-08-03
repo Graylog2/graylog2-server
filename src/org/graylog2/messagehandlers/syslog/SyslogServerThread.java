@@ -38,12 +38,11 @@ public class SyslogServerThread extends Thread {
 
     public void run() {
         String syslog_protocol = Main.masterConfig.getProperty("syslog_protocol");
-        SyslogServerIF syslogServer = SyslogServer.getInstance(syslog_protocol);
+        SyslogServerIF syslogServer = SyslogServer.getThreadedInstance(syslog_protocol);
         
         syslogServer.getConfig().setPort(port);
         syslogServer.getConfig().addEventHandler(new SyslogEventHandler());
 
-        syslogServer = SyslogServer.getThreadedInstance(syslog_protocol);
         Main.syslogCoreThread = syslogServer.getThread();
     }
 
