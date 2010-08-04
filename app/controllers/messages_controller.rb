@@ -20,6 +20,30 @@ class MessagesController < ApplicationController
     render :text => CGI.escapeHTML(message.message)
   end
 
+  def deletebyquickfilter
+    begin
+      filters = JSON.parse(params[:filters])
+
+      filters_with_symbols = Hash.new
+      filters_with_symbols[:message] = filters["message"]
+      filters_with_symbols[:facility] = filters["facility"]
+      filters_with_symbols[:severity] = filters["severity"]
+      filters_with_symbols[:host] = filters["host"]
+
+      conditions = Message.all_by_quickfilter(filters_with_symbols, 0, 0, true)
+      throw "Missing conditions" if conditions.blank?
+
+      Message.delete_all(conditions)
+
+      flash[:notice] = "Messages have been deleted."
+    rescue => e
+      logger.info e
+      flash[:error] = "Could not delete messages."
+    end
+
+    redirect_to :action => 'index'
+  end
+
   def getsimilarmessages
     # Get the message we want to compare.
     message = Message.find params[:id]

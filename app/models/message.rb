@@ -36,8 +36,7 @@ class Message
     return self.all :limit => limit, :order => "_id DESC", :conditions => conditions, :offset => self.get_offset(page)
   end
 
-  def self.all_by_quickfilter filters, page = 1, limit = LIMIT
-    RAILS_DEFAULT_LOGGER.debug "PAGE: #{page}"
+  def self.all_by_quickfilter filters, page = 1, limit = LIMIT, conditions_only = false
     page = 1 if page.blank?
 
     conditions = Hash.new
@@ -55,6 +54,8 @@ class Message
       # Host
       filters[:host].blank? ? nil : conditions[:host] = filters[:host]
     end
+
+    return conditions if conditions_only
 
     return self.all :limit => limit, :order => "_id DESC", :conditions => conditions, :offset => self.get_offset(page)
   end

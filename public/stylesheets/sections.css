@@ -42,7 +42,8 @@
 #messages-quickfilter {
     margin-top: 15px;
     margin-bottom: 10px;
-    width: auto;
+    width: 50%;
+    float: left;
 }
 
 #messages-quickfilter th {
@@ -64,6 +65,16 @@
 
 .messages-quickfilter-c-message input {
     width: 300px;
+}
+
+#messages-quickfilter-delete {
+    float: right;
+    margin-top: 35px;
+}
+
+#messages-quickfilter-delete input,select {
+    font-size: 11px;
+    padding: 0px;
 }
 
 #messages-show dt {
