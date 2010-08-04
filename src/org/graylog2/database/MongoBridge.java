@@ -124,20 +124,24 @@ public class MongoBridge {
             try {
                 String host = i.next();
 
-                // Get message count of this host.
-                BasicDBObject countQuery = new BasicDBObject();
-                countQuery.put("host", host);
-                long messageCount = messages.getCount(countQuery);
+                // Skip hosts with no name.
+                if (host != null && host.length() > 0) {
+                    // Get message count of this host.
+                    BasicDBObject countQuery = new BasicDBObject();
+                    countQuery.put("host", host);
+                    long messageCount = messages.getCount(countQuery);
 
-                // Build document.
-                BasicDBObject doc = new BasicDBObject();
-                doc.put("host", host);
-                doc.put("message_count", messageCount);
+                    // Build document.
+                    BasicDBObject doc = new BasicDBObject();
+                    doc.put("host", host);
+                    doc.put("message_count", messageCount);
 
-                // Store document.
-                coll.insert(doc);
+                    // Store document.
+                    coll.insert(doc);
+                }
             } catch (Exception e) {
                 Log.crit("Could not insert distinct host: " + e.toString());
+                e.printStackTrace();
                 continue;
             }
         }
