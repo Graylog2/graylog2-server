@@ -61,6 +61,7 @@ class Message
   end
 
   def self.all_of_stream stream_id, page = 1, conditions_only = false
+    throw "Missing stream_id" if stream_id.blank?
     page = 1 if page.blank?
     conditions = Hash.new
 
