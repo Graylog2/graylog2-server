@@ -37,7 +37,7 @@
     <fieldset class="messages-show-message">
       <legend>Full message:</legend>
       <% escaped_fullmsg = h(@message.full_message) %>
-      <p id="messages-show-message-full"><%= escaped_fullmsg.gsub!(/\n/, '<br />') %></p>
+      <p id="messages-show-message-full"><%= escaped_fullmsg.gsub(/\n/, '<br />') %></p>
     </fieldset>
   <% end %>
 
