@@ -31,7 +31,7 @@ public class Tools {
         String[] cmd = {"bash", "-c", "echo $PPID"};
         Process p = Runtime.getRuntime().exec(cmd);
         p.getInputStream().read(bo);
-        return new String(bo);
+        return new String(bo).trim();
     }
 
     /*
