@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project basedir="." default="echoit" name="Coverage Tasks">
+
+    <target name="echoit" description="test target">
+        <echo message="Test succeeded."/>
+    </target>  
+    
+    
+    <target name="instr" description="Instrumenting jars">
+        <echo message="Instrumenting started."/>
+        
+        <java classname="emma" fork="true">            
+            <classpath >
+                <pathelement location="${emma}"/>
+            </classpath>
+            <arg line="instr -verbose -m overwrite -cp '${jarfiles}' -outdir '${output.dir}' -outfile '${output.dir}/template.emma'"/>
+        </java> 
+        <echo message="Instrumenting done."/>
+    </target>
+    
+    
+</project>
+

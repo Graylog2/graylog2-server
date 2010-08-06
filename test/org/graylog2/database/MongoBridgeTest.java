@@ -17,6 +17,7 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 import static org.junit.Assert.*;
 import org.productivity.java.syslog4j.server.SyslogServerEventIF;
+import org.productivity.java.syslog4j.server.impl.event.SyslogServerEvent;
 
 /**
  *
@@ -57,30 +58,13 @@ public class MongoBridgeTest {
     }
 
     /**
-     * Test of dropCollection method, of class MongoBridge.
-     */
-    @Test
-    public void testDropCollection() throws Exception {
-        System.out.println("dropCollection");
-        String collectionName = "";
-        MongoBridge instance = new MongoBridge();
-        instance.dropCollection(collectionName);
-        // TODO review the generated test code and remove the default call to fail.
-        fail("The test case is a prototype.");
-    }
-
-    /**
      * Test of getMessagesColl method, of class MongoBridge.
      */
     @Test
     public void testGetMessagesColl() {
-        System.out.println("getMessagesColl");
         MongoBridge instance = new MongoBridge();
-        DBCollection expResult = null;
-        DBCollection result = instance.getMessagesColl();
-        assertEquals(expResult, result);
-        // TODO review the generated test code and remove the default call to fail.
-        fail("The test case is a prototype.");
+        DBCollection coll = instance.getMessagesColl();
+        assertTrue(coll.getName().equals("messages"));
     }
 
     /**
@@ -88,12 +72,18 @@ public class MongoBridgeTest {
      */
     @Test
     public void testInsert() throws Exception {
-        System.out.println("insert");
-        SyslogServerEventIF event = null;
+        System.out.println("A");
+        // Build an event.
+        SyslogServerEventIF event = new SyslogServerEvent(null, 0, null);
+        event.setMessage("testmessage");
+        event.setHost("testhost");
+        event.setFacility(4);
+        event.setLevel(5);
+        System.out.println("B");
+
+        // Insert the event.
         MongoBridge instance = new MongoBridge();
         instance.insert(event);
-        // TODO review the generated test code and remove the default call to fail.
-        fail("The test case is a prototype.");
     }
 
     /**
