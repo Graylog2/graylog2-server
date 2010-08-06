@@ -1,6 +1,4 @@
-nbproject
 build/*
-manifest.mf
 dist/*
 build-before-profiler.xml
 
