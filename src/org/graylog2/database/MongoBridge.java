@@ -61,7 +61,6 @@ public class MongoBridge {
     }
 
     public void insert(SyslogServerEventIF event) throws Exception {
-        System.out.println("IN INSERT");
         DBCollection coll = this.getMessagesColl();
 
         BasicDBObject dbObj = new BasicDBObject();
@@ -70,8 +69,6 @@ public class MongoBridge {
         dbObj.put("facility", event.getFacility());
         dbObj.put("level", event.getLevel());
         dbObj.put("created_at", (int) (System.currentTimeMillis()/1000));
-
-        System.out.println(event.getMessage());
 
         coll.insert(dbObj);
     }

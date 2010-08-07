@@ -16,7 +16,6 @@ import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import static org.junit.Assert.*;
-import org.productivity.java.syslog4j.server.SyslogServerEventIF;
 import org.productivity.java.syslog4j.server.impl.event.SyslogServerEvent;
 
 /**
@@ -51,6 +50,11 @@ public class MongoBridgeTest {
             Integer.valueOf(27017),
             "false"
         );
+
+        // TODO: Truncate messages collection.
+        DB db = MongoConnection.getInstance().getDatabase();
+        DBCollection coll = db.getCollection("messages");
+        coll.drop();
     }
 
     @After
@@ -72,18 +76,28 @@ public class MongoBridgeTest {
      */
     @Test
     public void testInsert() throws Exception {
-        System.out.println("A");
         // Build an event.
-        SyslogServerEventIF event = new SyslogServerEvent(null, 0, null);
+        byte[] msg = "mama".getBytes();
+        SyslogServerEvent event = new SyslogServerEvent(msg, msg.length, null);
         event.setMessage("testmessage");
         event.setHost("testhost");
         event.setFacility(4);
         event.setLevel(5);
-        System.out.println("B");
 
         // Insert the event.
         MongoBridge instance = new MongoBridge();
         instance.insert(event);
+
+        // Fetch the event and compare.
+        DBCollection coll = instance.getMessagesColl();
+        long count = coll.getCount();
+        assertTrue(count == 1);
+
+        DBObject res = coll.findOne();
+        assertEquals(res.get("message"), "testmessage");
+        assertEquals(res.get("host"), "testhost");
+        assertEquals(res.get("facility"), 4);
+        assertEquals(res.get("level"), 5);
     }
 
     /**
@@ -91,12 +105,32 @@ public class MongoBridgeTest {
      */
     @Test
     public void testInsertGelfMessage() throws Exception {
-        System.out.println("insertGelfMessage");
-        GELFMessage message = null;
+        GELFMessage message = new GELFMessage();
+        message.shortMessage = "gelftest";
+        message.fullMessage = "full gelftest\nstuff";
+        message.level = 1;
+        message.type = 8;
+        message.host = "junit-test";
+        message.file = "junit-testfile";
+        message.line = 9001;
+
+        // Insert the message.
         MongoBridge instance = new MongoBridge();
         instance.insertGelfMessage(message);
-        // TODO review the generated test code and remove the default call to fail.
-        fail("The test case is a prototype.");
+
+        // Fetch the event and compare
+        DBCollection coll = instance.getMessagesColl();
+        long count = coll.getCount();
+        assertTrue(count == 1);
+
+        DBObject res = coll.findOne();
+        assertEquals(res.get("message"), "gelftest");
+        assertEquals(res.get("full_message"), "full gelftest\nstuff");
+        assertEquals(res.get("level"), 1);
+        assertEquals(res.get("type"), 8);
+        assertEquals(res.get("host"), "junit-test");
+        assertEquals(res.get("file"), "junit-testfile");
+        assertEquals(res.get("line"), 9001);
     }
 
     /**
