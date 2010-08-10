@@ -24,11 +24,15 @@
 
 package org.graylog2.messagehandlers.gelf;
 
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import org.graylog2.Log;
 
 public class GELFMainThread extends Thread {
 
     private int port = 0;
+
+    ExecutorService threadPool = Executors.newCachedThreadPool();
 
     public GELFMainThread(int port) {
         this.port = port;
@@ -52,9 +56,8 @@ public class GELFMainThread extends Thread {
                     continue;
                 }
 
-                // We got a connected client. Start a GELFClientHandlerThread() and wait for next client.
-                GELFClientHandlerThread thread = new GELFClientHandlerThread(receivedGelfSentence);
-                thread.start();
+                // We got a connected client. Start a GELFClientHandlerThread() in our thread pool and wait for next client.
+                threadPool.execute(new GELFClientHandlerThread(receivedGelfSentence));
             } catch (Exception e) {
                 Log.crit("Skipping GELF client. Error: " + e.toString());
                 continue;

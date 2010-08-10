@@ -4,6 +4,7 @@ build-before-profiler.xml
 nbbuild.xml
 nbproject/*
 coverage
+build.xml
 
 misc/convert_rsyslog_db_to_mongo.rb
 

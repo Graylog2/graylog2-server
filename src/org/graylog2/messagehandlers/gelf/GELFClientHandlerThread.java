@@ -34,6 +34,7 @@ public class GELFClientHandlerThread extends Thread {
     }
 
     @Override public void run() {
+        System.out.println("I AM THREAD: " + this.currentThread());
         GELFClient client = new GELFClient(this.receivedGelfSentence, this.getName());
         client.handle();
     }
