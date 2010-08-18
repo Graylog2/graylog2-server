@@ -28,7 +28,6 @@ import org.graylog2.messagehandlers.gelf.GELF;
 import org.graylog2.database.MongoConnection;
 import java.io.FileInputStream;
 import java.io.FileWriter;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Properties;
 
@@ -77,6 +76,7 @@ public class Main {
         requiredConfigFields.add("messages_collection_size");
         requiredConfigFields.add("use_gelf");
         requiredConfigFields.add("gelf_listen_port");
+        requiredConfigFields.add("rrd_storage_dir");
 
         // Check if all required configuration fields are set.
         for (Object requiredConfigFieldO : requiredConfigFields) {
