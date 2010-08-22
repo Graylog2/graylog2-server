@@ -25,8 +25,9 @@
 package org.graylog2.messagehandlers.gelf;
 
 import org.graylog2.Log;
-import org.graylog2.Main;
 import org.graylog2.database.MongoBridge;
+import org.graylog2.messagehandlers.common.MessageCounterHook;
+import org.graylog2.messagehandlers.common.ReceiveHookManager;
 
 import org.json.simple.*;
 
@@ -64,6 +65,9 @@ public class GELFClient {
 
             // Insert message into MongoDB.
             m.insertGelfMessage(message);
+
+            // This is doing the upcounting for RRD.
+            ReceiveHookManager.postProcess(new MessageCounterHook());
         } catch(Exception e) {
             Log.warn("Could not handle GELF client: " + e.toString());
             return false;

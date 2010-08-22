@@ -36,34 +36,141 @@ class RRDInvalidStorageException extends Exception {
     }
 }
 
-public class RRD {
+class RRDInvalidFileException extends Exception {
+    public RRDInvalidFileException(){
+    }
 
-    String name = null;
+    public RRDInvalidFileException(String msg){
+        super(msg);
+    }
+}
+
+public class RRD {
+    public static final int INTERVAL = 60;
+    public static final int HOLD_DAYS = 7;
+
+    public static final int GRAPH_TYPE_TOTAL = 1;
+
+    int type = 0;
     File folder = null;
+    File rrdFile = null;
+    String rrdFilePath = null;
+
+    public static String getStorageFolderPath() {
+        return Main.masterConfig.getProperty("rrd_storage_dir");
+    }
+
+    public static String getFilename(int type) throws Exception {
+        switch (type) {
+            case RRD.GRAPH_TYPE_TOTAL:
+                return "totalmessages.rrd";
+            default:
+                throw new Exception("Invalid graph type supplied.");
+        }
+    }
 
     public static File getStorageFolder() throws RRDInvalidStorageException {
-        String directory = Main.masterConfig.getProperty("rrd_storage_dir");
-        File file = new File(directory);
+        String directory = RRD.getStorageFolderPath();
+        File folder = new File(directory);
 
-        if (!file.exists()) {
+        if (!folder.exists()) {
             throw new RRDInvalidStorageException("Directory does not exist. (" + directory + ")");
         }
 
-        if (!file.isDirectory()) {
+        if (!folder.isDirectory()) {
             throw new RRDInvalidStorageException("Is not a directory. (" + directory + ")");
         }
 
-        return file;
+        return folder;
     }
 
-    public RRD(String name) throws Exception {
-        this.name = name;
+    public static File getFile(int type) throws RRDInvalidFileException {
+        String directory = RRD.getStorageFolderPath();
+        String path = null;
+
+        try {
+            String filename = RRD.getFilename(type);
+            path = directory + "/" + filename;
+        } catch (Exception e) {
+            throw new RRDInvalidFileException(e.toString());
+        }
+
+        File rrd = new File(path);
+
+        return rrd;
+    }
+
+    public RRD(int type) throws Exception {
+        this.type = type;
 
         try {
             this.folder = RRD.getStorageFolder();
         } catch (RRDInvalidStorageException e) {
             throw new Exception("Error: " + e.toString());
         }
+
+        // Find the RRD.
+        try {
+            this.rrdFile = RRD.getFile(type);
+            this.rrdFilePath = this.rrdFile.getAbsolutePath();
+        } catch (RRDInvalidFileException e) {
+            throw new Exception("Error: " + e.toString());
+        }
+
+        // Check if RRD exists and create lazy if it doesnt.
+        if (!this.rrdFile.exists()) {
+            if (!this.create()) {
+                throw new Exception("Error: Not able to create RRD. Possibly not writable.");
+            }
+        }
+
+        // Is the RRD writable?
+        if (!this.rrdFile.canWrite()) {
+            throw new Exception("Error: RRD is not writable.");
+        }
+
+    }
+
+    public boolean write(int value) throws Exception {
+        Runtime rt = Runtime.getRuntime();
+        Process p;
+
+        try {
+            p = rt.exec("rrdtool update " + this.rrdFilePath + " " + System.currentTimeMillis()/1000 + ":" + value);
+            p.waitFor();
+            
+            if (p.exitValue() == 1) {
+                return false;
+            }
+        } catch (InterruptedException e) {}
+
+        return true;
+    }
+
+    private String getCreationString() throws Exception {
+        switch (this.type) {
+            case RRD.GRAPH_TYPE_TOTAL:
+                return "rrdtool create " + this.rrdFilePath + " --start NOW --step " + RRD.INTERVAL + " DS:messages:GAUGE:" + RRD.INTERVAL*2 + ":0:9000000 RRA:AVERAGE:0.5:5:" + (RRD.HOLD_DAYS*24*60)/5;
+            default:
+                throw new Exception("Invalid graph type supplied.");
+        }
+    }
+
+    private boolean create() throws Exception {
+        Runtime rt = Runtime.getRuntime();
+        Process p;
+
+        try {
+            p = rt.exec(this.getCreationString());
+            p.waitFor();
+
+            // Did the call succeed?
+            if (p.exitValue() == 1) {
+                return false;
+            }
+        } catch (InterruptedException e) {}
+        
+        return true;
     }
 
 }

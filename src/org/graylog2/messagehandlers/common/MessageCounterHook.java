@@ -19,23 +19,13 @@
  */
 
 /**
- * GELFClientHandlerThread.java: Lennart Koopmann <lennart@scopeport.org> | Jun 23, 2010 7:09:40 PM
+ * MessageCounterHook.java: Lennart Koopmann <lennart@scopeport.org> | Aug 19, 2010 5:56:21 PM
  */
 
-package org.graylog2.messagehandlers.gelf;
+package org.graylog2.messagehandlers.common;
 
-
-public class GELFClientHandlerThread extends Thread {
-
-    private String receivedGelfSentence = null;
-
-    GELFClientHandlerThread(String receivedGelfSentence) {
-        this.receivedGelfSentence = receivedGelfSentence;
+public class MessageCounterHook implements MessagePostReceiveHookIF {
+    public void process() {
+        MessageCounter.getInstance().countUp(MessageCounter.ALL_HOSTS);
     }
-
-    @Override public void run() {
-        GELFClient client = new GELFClient(this.receivedGelfSentence, this.getName());
-        client.handle();
-    }
-
 }
