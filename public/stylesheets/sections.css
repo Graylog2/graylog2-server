@@ -175,6 +175,18 @@
     display: none !important;
 }
 
+/* Hosts */
+#hosts-hosts {
+    position: relative;
+    top: -15px;
+}
+
+#hosts-graph {
+    float: right;
+    position: relative;
+    top: -25px;
+}
+
 /* Blacklist */
 #blacklist-delete {
   float: right;

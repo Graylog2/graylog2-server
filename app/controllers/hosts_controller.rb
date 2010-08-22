@@ -2,6 +2,7 @@ class HostsController < ApplicationController
   def index
     @hosts = Host.all :order => "message_count DESC"
     @host_count = Host.count
+    Graph.update_total
   end
 
   def show

@@ -1,0 +1,4 @@
+graphs:
+  enable_graphs: true
+  rrdtool_binary_path: /usr/bin/rrdtool
+  rrd_storage_path: /var/graylog2/rrds/

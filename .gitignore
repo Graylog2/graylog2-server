@@ -6,3 +6,4 @@ build/builds/*
 build/logs/*
 
 public/images/dashboard_logo.png
+public/images/graphs/*
