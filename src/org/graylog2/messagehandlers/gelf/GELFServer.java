@@ -31,7 +31,7 @@ import java.io.*;
 import java.util.zip.Inflater;
 
 public class GELFServer {
-    private static final int MAX_PACKET_SIZE = 4096;
+    private static final int MAX_PACKET_SIZE = 8192;
 
     private DatagramSocket serverSocket = null;
 
