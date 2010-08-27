@@ -12,7 +12,7 @@ Rails::Initializer.run do |config|
   config.gem 'jnunemaker-validatable', :version => '1.8.4' # Dependency of mongo_mapper
   config.gem 'plucky', :version => '0.3.4' # Dependency of mongo_mapper
   config.gem 'mysql', :version => '2.8.1'
-  config.gem 'rack', :version => '1.2.1'
+  config.gem 'rack', :version => '1.1.0'
 
   config.time_zone = 'Berlin'
 end
