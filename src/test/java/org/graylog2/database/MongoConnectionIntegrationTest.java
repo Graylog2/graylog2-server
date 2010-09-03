@@ -18,9 +18,9 @@ import static org.junit.Assert.*;
  *
  * @author lennart
  */
-public class MongoConnectionTest {
+public class MongoConnectionIntegrationTest {
 
-    public MongoConnectionTest() {
+    public MongoConnectionIntegrationTest() {
     }
 
     @BeforeClass

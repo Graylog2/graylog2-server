@@ -22,9 +22,9 @@ import org.productivity.java.syslog4j.server.impl.event.SyslogServerEvent;
  *
  * @author lennart
  */
-public class MongoBridgeTest {
+public class MongoBridgeIntegrationTest {
 
-    public MongoBridgeTest() {
+    public MongoBridgeIntegrationTest() {
     }
 
     @BeforeClass
