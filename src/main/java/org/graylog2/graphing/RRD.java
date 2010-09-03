@@ -95,9 +95,7 @@ public class RRD {
             throw new RRDInvalidFileException(e.toString());
         }
 
-        File rrd = new File(path);
-
-        return rrd;
+        return new File(path);
     }
 
     public RRD(int type) throws Exception {

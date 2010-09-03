@@ -60,7 +60,6 @@ public class GELFMainThread extends Thread {
                 threadPool.execute(new GELFClientHandlerThread(receivedGelfSentence));
             } catch (Exception e) {
                 Log.crit("Skipping GELF client. Error: " + e.toString());
-                continue;
             }
         }
     }

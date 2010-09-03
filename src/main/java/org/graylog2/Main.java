@@ -29,6 +29,7 @@ import org.graylog2.database.MongoConnection;
 import java.io.FileInputStream;
 import java.io.FileWriter;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Properties;
 import org.graylog2.periodical.RRDThread;
 
@@ -65,7 +66,7 @@ public class Main {
         }
 
         // Define required configuration fields.
-        ArrayList<String> requiredConfigFields = new ArrayList<String>();
+        List<String> requiredConfigFields = new ArrayList<String>();
         requiredConfigFields.add("syslog_listen_port");
         requiredConfigFields.add("syslog_protocol");
         requiredConfigFields.add("mongodb_useauth");
@@ -80,8 +81,7 @@ public class Main {
         requiredConfigFields.add("rrd_storage_dir");
 
         // Check if all required configuration fields are set.
-        for (Object requiredConfigFieldO : requiredConfigFields) {
-            String requiredConfigField = (String) requiredConfigFieldO;
+        for (String requiredConfigField : requiredConfigFields) {
             try {
                 if (Main.masterConfig.getProperty(requiredConfigField).length() <= 0) {
                     throw new Exception("Not set");
@@ -93,7 +93,7 @@ public class Main {
         }
 
         // Is the syslog_procotol valid? ("tcp"/"udp")
-        ArrayList<String> allowedSyslogProtocols = new ArrayList<String>();
+        List<String> allowedSyslogProtocols = new ArrayList<String>();
         allowedSyslogProtocols.add("tcp");
         allowedSyslogProtocols.add("udp");
         if(!allowedSyslogProtocols.contains(Main.masterConfig.getProperty("syslog_protocol"))) {

@@ -116,10 +116,8 @@ public class MongoBridge {
         coll.remove(new BasicDBObject());
         
         // Go trough every host and insert.
-        for (Iterator<String> i = hosts.iterator(); i.hasNext( ); ) {
+        for (String host : hosts) {
             try {
-                String host = i.next();
-
                 // Skip hosts with no name.
                 if (host != null && host.length() > 0) {
                     // Get message count of this host.
@@ -138,7 +136,6 @@ public class MongoBridge {
             } catch (Exception e) {
                 Log.crit("Could not insert distinct host: " + e.toString());
                 e.printStackTrace();
-                continue;
             }
         }
     }
