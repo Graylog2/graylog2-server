@@ -1,3 +1,5 @@
+.idea
+target
 build/*
 dist/*
 build-before-profiler.xml
