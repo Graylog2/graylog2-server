@@ -66,4 +66,6 @@
             </plugin>
         </plugins>
     </build>
+    <name>graylog2-server</name>
+    <description>http://www.graylog2.org/</description>
 </project>

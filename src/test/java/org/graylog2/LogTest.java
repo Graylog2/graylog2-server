@@ -41,7 +41,6 @@ public class LogTest {
 
     @After
     public void tearDown() {
-        System.setOut(null);
     }
 
     /**
