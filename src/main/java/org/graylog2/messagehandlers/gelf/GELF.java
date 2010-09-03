@@ -31,11 +31,7 @@ public class GELF {
     public static final int CLIENT_TIMEOUT = 5000;
 
     public static boolean isEnabled() {
-        if (Main.masterConfig.getProperty("use_gelf").equals("true")) {
-            return true;
-        }
-
-        return false;
+        return Main.masterConfig.getProperty("use_gelf").equals("true");
     }
 
 }
