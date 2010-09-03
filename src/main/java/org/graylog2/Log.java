@@ -23,6 +23,8 @@
  * Log.java: Lennart Koopmann <lennart@scopeport.org> | May 17, 2010 9:29:29 PM
  */
 
+// This has to die. Use Log4j or another logging framework
+
 package org.graylog2;
 
 import java.util.Date;

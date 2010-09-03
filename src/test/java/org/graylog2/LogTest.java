@@ -14,6 +14,8 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 import static org.junit.Assert.*;
 
+// This has to die. Use Log4j or another logging framework
+
 /**
  *
  * @author lennart
