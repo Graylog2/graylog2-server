@@ -1,5 +1,5 @@
 /**
- * Copyright 2010 Lennart Koopmann <lennart@scopeport.org>
+ * Copyright 2010 Lennart Koopmann <lennart@socketfeed.com>
  *
  * This file is part of Graylog2.
  *
@@ -18,10 +18,6 @@
  *
  */
 
-/**
- * MongoBridge.java: lennart | Apr 13, 2010 9:13:03 PM
- */
-
 package org.graylog2.database;
 
 import com.mongodb.DBCollection;
@@ -30,17 +26,32 @@ import com.mongodb.BasicDBObjectBuilder;
 
 import org.graylog2.Log;
 
-import java.util.Iterator;
 import java.util.List;
 import org.graylog2.Main;
 import org.graylog2.messagehandlers.gelf.GELFMessage;
 
 import org.productivity.java.syslog4j.server.SyslogServerEventIF;
 
+/**
+ * MongoBridge.java: Apr 13, 2010 9:13:03 PM
+ *
+ * Simple mapping methods to MongoDB.
+ *
+ * @author: Lennart Koopmann <lennart@socketfeed.com>
+ */
 public class MongoBridge {
-    // TODO: make configurable
+
+    /**
+     * The standard MongoDB port.
+     */
     public static final int STANDARD_PORT = 27017;
 
+    /**
+     * Get the messages collection. Lazily creates a new, capped one based on the
+     * messages_collection_size from graylog2.conf if there is none.
+     *
+     * @return The messages collection
+     */
     public DBCollection getMessagesColl() {
         DBCollection coll = null;
 
@@ -60,6 +71,12 @@ public class MongoBridge {
         return coll;
     }
 
+    /**
+     * Inserts a Syslog message into the messages collection.
+     *
+     * @param event The syslog event/message
+     * @throws Exception
+     */
     public void insert(SyslogServerEventIF event) throws Exception {
         DBCollection coll = this.getMessagesColl();
 
@@ -73,6 +90,12 @@ public class MongoBridge {
         coll.insert(dbObj);
     }
 
+    /**
+     * Inserts a GELF message into the messages collection.
+     *
+     * @param message The GELF message
+     * @throws Exception
+     */
     public void insertGelfMessage(GELFMessage message) throws Exception {
         // Check if all required parameters are set.
         if (message.shortMessage == null || message.shortMessage.length() == 0 || message.host == null || message.host.length() == 0) {
@@ -96,6 +119,12 @@ public class MongoBridge {
         coll.insert(dbObj);
     }
 
+    /**
+     * Builds the "host" collection by distincting all hosts
+     * from the messages table.
+     *
+     * @throws Exception
+     */
     public void distinctHosts() throws Exception {
         // Fetch all hosts.
         DBCollection messages = this.getMessagesColl();

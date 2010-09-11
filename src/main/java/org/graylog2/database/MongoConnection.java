@@ -1,5 +1,5 @@
 /**
- * Copyright 2010 Lennart Koopmann <lennart@scopeport.org>
+ * Copyright 2010 Lennart Koopmann <lennart@socketfeed.com>
  *
  * This file is part of Graylog2.
  *
@@ -18,16 +18,19 @@
  *
  */
 
-/**
- * MongoConnection.java: Lennart Koopmann <lennart@scopeport.org> | Jun 6, 2010 1:36:19 PM
- */
-
 package org.graylog2.database;
 
 import com.mongodb.Mongo;
 import com.mongodb.DB;
 import com.mongodb.MongoException;
 
+/**
+ * MongoConnection.java: Jun 6, 2010 1:36:19 PM
+ *
+ * MongoDB connection singleton
+ *
+ * @author: Lennart Koopmann <lennart@socketfeed.com>
+ */
 public class MongoConnection {
     private static MongoConnection INSTANCE;
 
@@ -36,6 +39,10 @@ public class MongoConnection {
 
     private MongoConnection() {}
 
+    /**
+     * Get the connection instance
+     * @return MongoConnection instance
+     */
     public synchronized static MongoConnection getInstance() {
         if (INSTANCE == null) {
             INSTANCE = new MongoConnection();
@@ -43,6 +50,17 @@ public class MongoConnection {
         return INSTANCE;
     }
 
+    /**
+     * Connect the instance.
+     *
+     * @param username MongoDB user
+     * @param password MongoDB password
+     * @param hostname MongoDB host
+     * @param database MongoDB database
+     * @param port MongoDB port
+     * @param useAuth Use authentication?
+     * @throws Exception
+     */
     public void connect(String username, String password, String hostname, String database, int port, String useAuth) throws Exception {
         try {
             MongoConnection.m = new Mongo(hostname, port);
@@ -59,10 +77,18 @@ public class MongoConnection {
         }
     }
 
+    /**
+     * Returns the raw connection.
+     * @return connection
+     */
     public Mongo getConnection() {
         return MongoConnection.m;
     }
 
+    /**
+     * Returns the raw database object.
+     * @return database
+     */
     public DB getDatabase() {
         return MongoConnection.db;
     }
