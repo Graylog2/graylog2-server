@@ -1,5 +1,5 @@
 /**
- * Copyright 2010 Lennart Koopmann <lennart@scopeport.org>
+ * Copyright 2010 Lennart Koopmann <lennart@socketfeed.com>
  *
  * This file is part of Graylog2.
  *
@@ -18,21 +18,31 @@
  *
  */
 
-/**
- * MessageCounter.java: Lennart Koopmann <lennart@scopeport.org> | Aug 19, 2010 6:06:20 PM
- */
-
 package org.graylog2.messagehandlers.common;
 
+/**
+ * MessageCounter.java: Aug 19, 2010 6:06:20 PM
+ *
+ * Singleton holding the number of received messages.
+ *
+ * @author: Lennart Koopmann <lennart@socketfeed.com>
+ */
 public class MessageCounter {
     private static MessageCounter INSTANCE;
 
+    /**
+     * The API methods in this class require a hostname as String. This constant
+     * defines the "all hosts/total messages" graph.
+     */
     public static final String ALL_HOSTS = "all";
 
     private int totalCount = 0;
 
     private MessageCounter() {}
 
+    /**
+     * @return MessageCounter singleton instance
+     */
     public synchronized static MessageCounter getInstance() {
         if (INSTANCE == null) {
             INSTANCE = new MessageCounter();
@@ -40,18 +50,31 @@ public class MessageCounter {
         return INSTANCE;
     }
 
+    /**
+     * Reset count of a host
+     * @param host The host to select
+     */
     public void reset(String host) {
         if (host.equals(ALL_HOSTS)) {
             totalCount = 0;
         }
     }
 
+    /**
+     * Increment count of a host
+     * @param host The host to select
+     */
     public void countUp(String host) {
         if (host.equals(ALL_HOSTS)) {
             totalCount++;
         }
     }
 
+    /**
+     * Get the count of a host
+     * @param host The host to select
+     * @return Count of the host
+     */
     public int getCount(String host) {
         if (host.equals(ALL_HOSTS)) {
             return totalCount;

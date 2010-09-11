@@ -1,5 +1,5 @@
 /**
- * Copyright 2010 Lennart Koopmann <lennart@scopeport.org>
+ * Copyright 2010 Lennart Koopmann <llennart@socketfeed.com>
  *
  * This file is part of Graylog2.
  *
@@ -18,14 +18,18 @@
  *
  */
 
-/**
- * MessagePostReceiveHookIF.java: Lennart Koopmann <lennart@scopeport.org> | Aug 19, 2010 5:46:32 PM
- */
-
 package org.graylog2.messagehandlers.common;
 
+/**
+ * MessagePostReceiveHookIF.java: Aug 19, 2010 5:46:32 PM
+ *
+ * @author: Lennart Koopmann <lennart@socketfeed.com>
+ */
 public interface MessagePostReceiveHookIF {
 
+    /**
+     * Process the hook.
+     */
     public void process();
 
 }

@@ -1,5 +1,5 @@
 /**
- * Copyright 2010 Lennart Koopmann <lennart@scopeport.org>
+ * Copyright 2010 Lennart Koopmann <lennart@socketfeed.com>
  *
  * This file is part of Graylog2.
  *
@@ -18,13 +18,19 @@
  *
  */
 
-/**
- * ReceiveHookManager.java: Lennart Koopmann <lennart@scopeport.org> | Aug 19, 2010 5:57:52 PM
- */
-
 package org.graylog2.messagehandlers.common;
 
+/**
+ * ReceiveHookManager.java: Aug 19, 2010 5:57:52 PM
+ *
+ * Allows to call ReceiveHooks. Called on message events.
+ *
+ * @author: Lennart Koopmann <lennart@socketfeed.com>
+ */
 public class ReceiveHookManager {
+    /**
+     * @param hook The hook to call.
+     */
     public static void postProcess(MessagePostReceiveHookIF hook) {
         hook.process();
     }

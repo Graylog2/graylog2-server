@@ -1,5 +1,5 @@
 /**
- * Copyright 2010 Lennart Koopmann <lennart@scopeport.org>
+ * Copyright 2010 Lennart Koopmann <lennart@socketfeed.com>
  *
  * This file is part of Graylog2.
  *
@@ -18,13 +18,20 @@
  *
  */
 
-/**
- * MessageCounterHook.java: Lennart Koopmann <lennart@scopeport.org> | Aug 19, 2010 5:56:21 PM
- */
-
 package org.graylog2.messagehandlers.common;
 
+/**
+ * MessageCounterHook.java: Aug 19, 2010 5:56:21 PM
+ *
+ * Counts up the total of received messages.
+ *
+ * @author: Lennart Koopmann <lennart@socketfeed.com>
+ */
 public class MessageCounterHook implements MessagePostReceiveHookIF {
+
+    /**
+     * Process the hook.
+     */
     public void process() {
         MessageCounter.getInstance().countUp(MessageCounter.ALL_HOSTS);
     }
