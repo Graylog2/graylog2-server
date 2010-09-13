@@ -1,5 +1,5 @@
 /**
- * Copyright 2010 Lennart Koopmann <lennart@scopeport.org>
+ * Copyright 2010 Lennart Koopmann <lennart@socketfeed.com>
  *
  * This file is part of Graylog2.
  *
@@ -18,18 +18,24 @@
  *
  */
 
-/**
- * RRDThread.java: Lennart Koopmann <lennart@scopeport.org> | Aug 19, 2010 6:10:11 PM
- */
-
 package org.graylog2.periodical;
 
 import org.graylog2.Log;
 import org.graylog2.graphing.RRD;
 import org.graylog2.messagehandlers.common.MessageCounter;
 
+/**
+ * RRDThread.java: Aug 19, 2010 6:10:11 PM
+ *
+ * Writes RRDs
+ *
+ * @author: Lennart Koopmann <lennart@socketfeed.com>
+ */
 public class RRDThread extends Thread {
 
+    /**
+     * Start the thread. Runs forever.
+     */
     @Override public void run() {
         while (true) {
             try {

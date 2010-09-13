@@ -28,10 +28,19 @@ package org.graylog2.graphing;
  * @author: Lennart Koopmann <lennart@socketfeed.com>
  */
 public class RRDInvalidStorageException extends Exception {
+
+    /**
+     *
+     */
     public RRDInvalidStorageException(){
     }
 
+    /**
+     *
+     * @param msg
+     */
     public RRDInvalidStorageException(String msg){
         super(msg);
     }
+    
 }

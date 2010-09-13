@@ -1,5 +1,5 @@
 /**
- * Copyright 2010 Lennart Koopmann <lennart@scopeport.org>
+ * Copyright 2010 Lennart Koopmann <lennart@socketfeed.coms>
  *
  * This file is part of Graylog2.
  *
@@ -18,26 +18,37 @@
  *
  */
 
-/**
- * GELFMainThread.java: Lennart Koopmann <lennart@scopeport.org> | Jun 23, 2010 6:43:21 PM
- */
-
 package org.graylog2.messagehandlers.gelf;
 
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import org.graylog2.Log;
 
+/**
+ * GELFMainThread.java: Jun 23, 2010 6:43:21 PM
+ *
+ * Thread responsible for listening for GELF messages.
+ *
+ * @author: Lennart Koopmann <lennart@socketfeed.com>
+ */
 public class GELFMainThread extends Thread {
 
     private int port = 0;
 
     ExecutorService threadPool = Executors.newCachedThreadPool();
 
+    /**
+     * Thread responsible for listening for GELF messages.
+     *
+     * @param port The TCP port to listen on
+     */
     public GELFMainThread(int port) {
         this.port = port;
     }
 
+    /**
+     * Run the thread. Runs forever!
+     */
     @Override public void run() {
         GELFServer server = new GELFServer();
         if (!server.create(this.port)) {

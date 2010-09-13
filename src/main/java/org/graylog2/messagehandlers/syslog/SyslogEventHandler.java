@@ -1,5 +1,5 @@
 /**
- * Copyright 2010 Lennart Koopmann <lennart@scopeport.org>
+ * Copyright 2010 Lennart Koopmann <lennart@socketfeed.com>
  * 
  * This file is part of Graylog2.
  *
@@ -18,10 +18,6 @@
  *
  */
 
-/**
- * SyslogEventHandler.java: Lennart Koopmann <lennart@scopeport.org> | May 17, 2010 8:58:18 PM
- */
-
 package org.graylog2.messagehandlers.syslog;
 
 import org.graylog2.Log;
@@ -34,8 +30,21 @@ import org.productivity.java.syslog4j.server.SyslogServerEventHandlerIF;
 import org.productivity.java.syslog4j.server.SyslogServerEventIF;
 import org.productivity.java.syslog4j.server.SyslogServerIF;
 
+/**
+ * SyslogEventHandler.java: May 17, 2010 8:58:18 PM
+ *
+ * Handles incoming Syslog messages
+ *
+ * @author: Lennart Koopmann <lennart@socketfeed.com>
+ */
 public class SyslogEventHandler implements SyslogServerEventHandlerIF {
     
+    /**
+     * Handle an incoming syslog message: Output if in debug mode, store in MongoDB, ReceiveHooks
+     *
+     * @param syslogServer The syslog server
+     * @param event The event to handle
+     */
     @Override public void event(SyslogServerIF syslogServer, SyslogServerEventIF event) {
         if (Main.debugMode) {
             Log.info("Received message: " + event.getMessage());

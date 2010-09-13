@@ -1,5 +1,5 @@
 /**
- * Copyright 2010 Lennart Koopmann <lennart@scopeport.org>
+ * Copyright 2010 Lennart Koopmann <lennart@socketfeed.com>
  *
  * This file is part of Graylog2.
  *
@@ -18,18 +18,23 @@
  *
  */
 
-/**
- * GELFThread.java: Lennart Koopmann <lennart@scopeport.org> | Jun 23, 2010 6:46:45 PM
- */
-
 package org.graylog2.messagehandlers.gelf;
 
 import org.graylog2.Main;
 
+/**
+ * GELF.java: Jun 23, 2010 6:46:45 PM
+ *
+ * GELF utility class
+ *
+ * @author: Lennart Koopmann <lennart@socketfeed.com>
+ */
 public class GELF {
 
-    public static final int CLIENT_TIMEOUT = 5000;
-
+    /**
+     * Is GELF enabled? Decision based on /etc/graylog2.conf "use_gelf" parameter.
+     * @return boolean
+     */
     public static boolean isEnabled() {
         return Main.masterConfig.getProperty("use_gelf").equals("true");
     }

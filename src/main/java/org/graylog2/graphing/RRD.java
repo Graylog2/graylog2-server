@@ -94,6 +94,7 @@ public class RRD {
 
     /**
      * Get the RRD file
+     * @param type Type of the graph. Use constant like RRD.GRAPH_TYPE_TOTAL
      * @return RRD file
      * @throws RRDInvalidFileException
      */

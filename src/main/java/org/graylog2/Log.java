@@ -1,5 +1,5 @@
 /**
- * Copyright 2010 Lennart Koopmann <lennart@scopeport.org>
+ * Copyright 2010 Lennart Koopmann <lennart@socketfeed.com>
  * 
  * This file is part of Graylog2.
  *
@@ -18,40 +18,73 @@
  *
  */
 
-
-/**
- * Log.java: Lennart Koopmann <lennart@scopeport.org> | May 17, 2010 9:29:29 PM
- */
-
-// This has to die. Use Log4j or another logging framework
-
 package org.graylog2;
 
 import java.util.Date;
 
+/**
+ * Log.java: May 17, 2010 9:29:29 PM
+ *
+ * This has to die. Use Log4j or another logging framework
+ *
+ * @author: Lennart Koopmann <lennart@socketfeed.com>
+ */
 public class Log {
     
+    /**
+     * INFO
+     */
     public static final int SEVERITY_INFO = 1;
+    /**
+     * WARNING
+     */
     public static final int SEVERITY_WARN = 2;
+    /**
+     * CRITICAL
+     */
     public static final int SEVERITY_CRIT = 3;
+    /**
+     * EMERGENCY
+     */
     public static final int SEVERITY_EMERG = 4;
     
+    /**
+     * Log a message with severity INFO
+     * @param logMessage The message to log
+     */
     public static void info(String logMessage) {
         Log.toStdOut(logMessage, Log.SEVERITY_INFO);
     }
 
+    /**
+     * Log a message with severity WARNING
+     * @param logMessage The message to log
+     */
     public static void warn(String logMessage) {
         Log.toStdOut(logMessage, SEVERITY_WARN);
     }
 
+    /**
+     * Log a message with severity CRITICAL
+     * @param logMessage The message to log
+     */
     public static void crit(String logMessage) {
         Log.toStdOut(logMessage, Log.SEVERITY_CRIT);
     }
 
+    /**
+     * Log a message with severity EMERGENCY
+     * @param logMessage The message to log
+     */
     public static void emerg(String logMessage) {
         Log.toStdOut(logMessage, Log.SEVERITY_EMERG);
     }
 
+    /**
+     * Log a message to STDOUT with given severity.
+     * @param logMessage The message to log
+     * @param Severity The severity of this message
+     */
     public static void toStdOut(String logMessage, int Severity) {
         if (Main.debugMode) {
             String finalMessage = new Date().toString() + " - " + Log.severityToString(Severity) + " - "+ logMessage;
@@ -59,6 +92,11 @@ public class Log {
         }
     }
     
+    /**
+     * Get the human readable name of a severity
+     * @param Severity The severity
+     * @return The name of the severity
+     */
     public static String severityToString(int Severity) {
         String severityString = "UNSPECIFIED";
         switch(Severity) {

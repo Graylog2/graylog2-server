@@ -1,5 +1,5 @@
 /**
- * Copyright 2010 Lennart Koopmann <lennart@scopeport.org>
+ * Copyright 2010 Lennart Koopmann <lennart@socketfeed.com>
  *
  * This file is part of Graylog2.
  *
@@ -18,25 +18,35 @@
  *
  */
 
-/**
- * SyslogServerThread.java: Lennart Koopmann <lennart@scopeport.org> | May 17, 2010 9:23:33 PM
- */
-
 package org.graylog2.messagehandlers.syslog;
 
 import org.graylog2.Main;
 import org.productivity.java.syslog4j.server.SyslogServer;
 import org.productivity.java.syslog4j.server.SyslogServerIF;
 
+/**
+ * SyslogServerThread.java: May 17, 2010 9:23:33 PM
+ *
+ * Listen for Syslog messages
+ *
+ * @author: Lennart Koopmann <lennart@socketfeed.com>
+ */
 public class SyslogServerThread extends Thread {
 
     private int port = 0;
 
+    /**
+     * Listen for Syslog messages
+     * @param port On which port to listen?
+     */
     public SyslogServerThread(int port) {
         this.port = port;
     }
 
-    public void run() {
+    /**
+     * Start the thread. Runs forever.
+     */
+    @Override public void run() {
         String syslog_protocol = Main.masterConfig.getProperty("syslog_protocol");
         SyslogServerIF syslogServer = SyslogServer.getThreadedInstance(syslog_protocol);
         

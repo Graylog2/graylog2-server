@@ -1,5 +1,5 @@
 /**
- * Copyright 2010 Lennart Koopmann <lennart@scopeport.org>
+ * Copyright 2010 Lennart Koopmann <lennart@socketfeed.com>
  *
  * This file is part of Graylog2.
  *
@@ -18,17 +18,23 @@
  *
  */
 
-/**
- * SystemStatisticThread.java: Lennart Koopmann <lennart@scopeport.org> | May 21, 2010 6:42:25 PM
- */
-
 package org.graylog2.periodical;
 
 import org.graylog2.Log;
 import org.graylog2.database.MongoBridge;
 
+/**
+ * SystemStatisticThread.java: May 21, 2010 6:42:25 PM
+ *
+ * Calls MongoBridge.distinctHosts() every 10 seconds.
+ *
+ * @author: Lennart Koopmann <lennart@socketfeed.com>
+ */
 public class HostDistinctThread extends Thread {
 
+    /**
+     * Start the thread. Runs forever.
+     */
     @Override public void run() {
         // Run forever.
         while (true) {

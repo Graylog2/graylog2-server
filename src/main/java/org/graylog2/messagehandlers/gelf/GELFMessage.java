@@ -1,5 +1,5 @@
 /**
- * Copyright 2010 Lennart Koopmann <lennart@scopeport.org>
+ * Copyright 2010 Lennart Koopmann <lennart@socketfeed.com>
  *
  * This file is part of Graylog2.
  *
@@ -18,23 +18,56 @@
  *
  */
 
-/**
- * GELFMessage.java: Lennart Koopmann <lennart@scopeport.org> | Jul 20, 2010 6:57:28 PM
- */
 package org.graylog2.messagehandlers.gelf;
 
+/**
+ * GELFMessage.java: Jul 20, 2010 6:57:28 PM
+ *
+ * A GELF message
+ *
+ * @author: Lennart Koopmann <lennart@socketfeed.com>
+ */
 public class GELFMessage {
 
-    // This is more a dummy class. Maybe it will be extended later.
+    /**
+     * Short message
+     */
     public String shortMessage = null;
+
+    /**
+     * Full message. i.e. for Stacktracke and environment variables.
+     */
     public String fullMessage = null;
+
+    /**
+     * The severity level. Follows BSD Syslog RFC
+     */
     public int    level = 0;
+
+    /**
+     * Type. Currently not used.
+     */
     public int    type = 0;
+
+    /**
+     * Hostname
+     */
     public String host = null;
+
+    /**
+     * File
+     */
     public String file = null;
+
+    /**
+     * Line of file
+     */
     public int    line = 0;
 
 
+    /**
+     * @return Human readable, descriptive and formatted string of this GELF message.
+     */
     @Override public String toString() {
         String str = "shortMessage: " + shortMessage + " | ";
         str += "fullMessage: " + fullMessage + " | ";

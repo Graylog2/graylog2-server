@@ -1,5 +1,5 @@
 /**
- * Copyright 2010 Lennart Koopmann <lennart@scopeport.org>
+ * Copyright 2010 Lennart Koopmann <lennart@socketfeed.com>
  * 
  * This file is part of Graylog2.
  *
@@ -18,14 +18,23 @@
  *
  */
 
-/**
- * Tools.java: Lennart Koopmann <lennart@scopeport.org> | May 17, 2010 9:46:31 PM
- */
-
 package org.graylog2;
 
+/**
+ * Tools.java: May 17, 2010 9:46:31 PM
+ *
+ * Utilty class for various tool/helper functions.
+ *
+ * @author: Lennart Koopmann <lennart@socketfeed.com>
+ */
 public class Tools {
 
+    /**
+     * Get the own PID of this process.
+     *
+     * @return PID
+     * @throws Exception
+     */
     public static String getPID() throws Exception {
         byte[] bo = new byte[100];
         String[] cmd = {"bash", "-c", "echo $PPID"};
@@ -34,7 +43,7 @@ public class Tools {
         return new String(bo).trim();
     }
 
-    /*
+    /**
      * Converts integer syslog loglevel to human readable string
      *
      * @param level The level to convert
@@ -63,7 +72,7 @@ public class Tools {
         return "Invalid";
     }
 
-    /*
+    /**
      * Converts integer syslog facility to human readable string
      *
      * @param facility The facility to convert
@@ -102,8 +111,8 @@ public class Tools {
         return "Unknown";
     }
 
-    /*
-     * 
+    /**
+     * Get a String containing version information of JRE, OS, ...
      * @return Descriptive string of JRE and OS
      */
     public static String getSystemInformation() {

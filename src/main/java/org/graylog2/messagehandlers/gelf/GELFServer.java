@@ -1,5 +1,5 @@
 /**
- * Copyright 2010 Lennart Koopmann <lennart@scopeport.org>
+ * Copyright 2010 Lennart Koopmann <lennart@socketfeed.com>
  *
  * This file is part of Graylog2.
  *
@@ -18,10 +18,6 @@
  *
  */
 
-/**
- * GELFThread.java: Lennart Koopmann <lennart@scopeport.org> | Jun 23, 2010 6:58:07 PM
- */
-
 package org.graylog2.messagehandlers.gelf;
 
 import org.graylog2.Log;
@@ -30,11 +26,21 @@ import java.net.*;
 import java.io.*;
 import java.util.zip.Inflater;
 
+/**
+ * GELFThread.java: Jun 23, 2010 6:58:07 PM
+ *
+ * Server that can listen for GELF messages.
+ *
+ * @author: Lennart Koopmann <lennart@socketfeed.com>
+ */
 public class GELFServer {
     private static final int MAX_PACKET_SIZE = 8192;
 
     private DatagramSocket serverSocket = null;
 
+    /**
+     * Server that can listen for GELF messages.
+     */
     public GELFServer() {
         Runtime.getRuntime().addShutdownHook(new Thread(new Runnable() {
             @Override public void run() {
@@ -44,6 +50,12 @@ public class GELFServer {
         }));
     }
 
+    /**
+     * Create the UDP socket.
+     *
+     * @param port The port to listen on.
+     * @return boolean
+     */
     public boolean create(int port) {
         try {
             this.serverSocket = new DatagramSocket(port);
@@ -55,6 +67,13 @@ public class GELFServer {
         return true;
     }
 
+    /**
+     * Listens on the formerly created (create()) socket and returns
+     * unzipped (GZIP) raw message that can be parsed to a GELFMessage.
+     *
+     * @return Received message
+     * @throws Exception
+     */
     public String listen() throws Exception {
 
         // Reveive and fill buffer.
@@ -76,6 +95,9 @@ public class GELFServer {
         return new String(receiveData, 0, finalLength, "UTF-8");
     }
 
+    /**
+     * Tear down the server. Closes the socket.
+     */
     public void tearDown() {
         this.serverSocket.close();
     }

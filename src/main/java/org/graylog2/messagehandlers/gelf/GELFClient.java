@@ -1,5 +1,5 @@
 /**
- * Copyright 2010 Lennart Koopmann <lennart@scopeport.org>
+ * Copyright 2010 Lennart Koopmann <lennart@socketfeed.com>
  *
  * This file is part of Graylog2.
  *
@@ -18,10 +18,6 @@
  *
  */
 
-/**
- * GELFClient.java: Lennart Koopmann <lennart@scopeport.org> | Jun 23, 2010 7:15:12 PM
- */
-
 package org.graylog2.messagehandlers.gelf;
 
 import org.graylog2.Log;
@@ -31,16 +27,34 @@ import org.graylog2.messagehandlers.common.ReceiveHookManager;
 
 import org.json.simple.*;
 
+/**
+ * GELFClient.java: Jun 23, 2010 7:15:12 PM
+ *
+ * Representing a GELF client. Allows i.e. decoding of sent data.
+ *
+ * @author: Lennart Koopmann <lennart@socketfeed.com>
+ */
 public class GELFClient {
 
     private String clientMessage = null;
 
     private GELFMessage message = new GELFMessage();
 
+    /**
+     * Representing a GELF client. Allows i.e. decoding of sent data.
+     * 
+     * @param clientMessage The raw data the GELF client sent. (JSON string)
+     * @param threadName The name of the GELFClientHandlerThread that called this.
+     */
     public GELFClient(String clientMessage, String threadName) {
         this.clientMessage = clientMessage;
     }
-
+    
+    /**
+     * Handles the client: Decodes JSON, Stores in MongoDB, ReceiveHooks
+     * 
+     * @return boolean
+     */
     public boolean handle() {
         try {
             JSONObject json = this.getJSON(this.clientMessage);

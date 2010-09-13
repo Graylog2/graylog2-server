@@ -23,14 +23,22 @@ package org.graylog2.graphing;
 /**
  * RRDInvalidFileException.java: Sep 11, 2010 9:10:45 PM
  *
- *  Thrown in case of invalid RRD file.
+ * Thrown in case of invalid RRD file.
  *
  * @author: Lennart Koopmann <lennart@socketfeed.com>
  */
 public class RRDInvalidFileException extends Exception {
+
+    /**
+     *
+     */
     public RRDInvalidFileException(){
     }
 
+    /**
+     * 
+     * @param msg
+     */
     public RRDInvalidFileException(String msg){
         super(msg);
     }

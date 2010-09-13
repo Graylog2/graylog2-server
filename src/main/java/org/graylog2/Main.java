@@ -1,5 +1,5 @@
 /**
- * Copyright 2010 Lennart Koopmann <lennart@scopeport.org>
+ * Copyright 2010 Lennart Koopmann <lennart@socketfeed.com>
  * 
  * This file is part of Graylog2.
  *
@@ -33,19 +33,26 @@ import java.util.List;
 import java.util.Properties;
 import org.graylog2.periodical.RRDThread;
 
-// TODO: indizes richtig setzen
-
 /**
+ * Main class of Graylog2.
  *
- * @author Lennart Koopmann <lennart@scopeport.org>
+ * @author Lennart Koopmann <lennart@socketfeed.com>
  */
 public class Main {
 
+    /**
+     * Controlled by parameter "debug". Enabled more verbose output.
+     */
     public static boolean debugMode = false;
 
-    // This holds the configuration from /etc/graylog2.conf
+    /**
+     * This holds the configuration from /etc/graylog2.conf
+     */
     public static Properties masterConfig = null;
 
+    /**
+     * This is the thread syslog4j is using.
+     */
     public static Thread syslogCoreThread = null;
 
     /**

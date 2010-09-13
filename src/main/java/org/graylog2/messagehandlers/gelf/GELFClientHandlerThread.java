@@ -1,5 +1,5 @@
 /**
- * Copyright 2010 Lennart Koopmann <lennart@scopeport.org>
+ * Copyright 2010 Lennart Koopmann <lennart@socketfeed.com>
  *
  * This file is part of Graylog2.
  *
@@ -18,21 +18,31 @@
  *
  */
 
-/**
- * GELFClientHandlerThread.java: Lennart Koopmann <lennart@scopeport.org> | Jun 23, 2010 7:09:40 PM
- */
-
 package org.graylog2.messagehandlers.gelf;
 
 
+/**
+ * GELFClientHandlerThread.java: Jun 23, 2010 7:09:40 PM
+ *
+ * Thread that handles a GELF client.
+ *
+ * @author: Lennart Koopmann <lennart@socketfeed.com>
+ */
 public class GELFClientHandlerThread extends Thread {
 
     private String receivedGelfSentence = null;
 
-    GELFClientHandlerThread(String receivedGelfSentence) {
+    /**
+     * Thread that handles a GELF client.
+     * @param receivedGelfSentence Raw GELF message
+     */
+    public GELFClientHandlerThread(String receivedGelfSentence) {
         this.receivedGelfSentence = receivedGelfSentence;
     }
 
+    /**
+     * Start the thread. Exits when the client has been completely handled.
+     */
     @Override public void run() {
         GELFClient client = new GELFClient(this.receivedGelfSentence, this.getName());
         client.handle();
