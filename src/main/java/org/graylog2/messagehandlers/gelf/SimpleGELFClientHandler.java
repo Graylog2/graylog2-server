@@ -21,6 +21,7 @@
 package org.graylog2.messagehandlers.gelf;
 
 import java.io.UnsupportedEncodingException;
+import java.net.DatagramPacket;
 import java.util.zip.DataFormatException;
 import java.util.zip.Inflater;
 import org.graylog2.Log;
@@ -38,7 +39,7 @@ import sun.reflect.generics.reflectiveObjects.NotImplementedException;
  *
  * @author: Lennart Koopmann <lennart@socketfeed.com>
  */
-public class SimpleGELFClientHandler extends GELFClientHandler implements GELFClientHandlerIF {
+public class SimpleGELFClientHandler extends GELFClientHandlerBase implements GELFClientHandlerIF {
 
     /**
      * Representing a GELF client consisting of only one UDP message.
@@ -46,7 +47,7 @@ public class SimpleGELFClientHandler extends GELFClientHandler implements GELFCl
      * @param clientMessage The raw data the GELF client sent. (JSON string)
      * @param threadName The name of the GELFClientHandlerThread that called this.
      */
-    public SimpleGELFClientHandler(byte[] clientMessage, String threadName) throws DataFormatException, UnsupportedEncodingException, InvalidGELFCompressionMethodException, InvalidGELFTypeException {
+    public SimpleGELFClientHandler(DatagramPacket clientMessage, String threadName) throws DataFormatException, UnsupportedEncodingException, InvalidGELFCompressionMethodException, InvalidGELFTypeException {
 
         // Determine compression type.
         int type = GELF.getGELFType(clientMessage);
@@ -55,9 +56,9 @@ public class SimpleGELFClientHandler extends GELFClientHandler implements GELFCl
         switch (type) {
             case GELF.TYPE_ZLIB:
                 Inflater decompresser = new Inflater();
-                decompresser.setInput(clientMessage, 0, clientMessage.length);
-                int finalLength = decompresser.inflate(clientMessage);
-                this.clientMessage = new String(clientMessage, 0, finalLength, "UTF-8");
+                decompresser.setInput(clientMessage.getData(), 0, clientMessage.getLength());
+                int finalLength = decompresser.inflate(clientMessage.getData());
+                this.clientMessage = new String(clientMessage.getData(), 0, finalLength, "UTF-8");
                 break;
             case GELF.TYPE_GZIP:
                 throw new NotImplementedException();

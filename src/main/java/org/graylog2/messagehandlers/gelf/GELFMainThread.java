@@ -20,6 +20,7 @@
 
 package org.graylog2.messagehandlers.gelf;
 
+import java.net.DatagramPacket;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import org.graylog2.Log;
@@ -60,10 +61,10 @@ public class GELFMainThread extends Thread {
         while (true) {
             try {
                 // Listen on socket.
-                byte[] receivedGelfSentence = server.listen();
+                DatagramPacket receivedGelfSentence = server.listen();
 
                 // Skip empty sentences.
-                if (receivedGelfSentence.length == 0) {
+                if (receivedGelfSentence.getLength() == 0) {
                     continue;
                 }
 

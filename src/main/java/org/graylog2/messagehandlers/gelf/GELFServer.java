@@ -61,19 +61,16 @@ public class GELFServer {
      * @return Received message
      * @throws Exception
      */
-    public byte[] listen() throws Exception {
+    public DatagramPacket listen() throws SocketException, IOException {
 
-        // Reveive and fill buffer.
+        // Create buffer.
         byte[] receiveData = new byte[MAX_PACKET_SIZE];
         DatagramPacket receivedPacket = new DatagramPacket(receiveData, receiveData.length);
 
-        try {
-            serverSocket.receive(receivedPacket);
-        } catch (SocketException e) {
-            return new byte[0];
-        }
+        // Reveive and fill buffer.
+        serverSocket.receive(receivedPacket);
 
-        return receivedPacket.getData();
+        return receivedPacket;
     }
 
 }

@@ -20,6 +20,8 @@
 
 package org.graylog2.messagehandlers.gelf;
 
+import java.net.DatagramPacket;
+
 /**
  * ChunkedGELFClient.java: Sep 14, 2010 6:38:38 PM
  *
@@ -27,7 +29,7 @@ package org.graylog2.messagehandlers.gelf;
  *
  * @author: Lennart Koopmann <lennart@socketfeed.com>
  */
-public class ChunkedGELFClientHandler extends GELFClientHandler implements GELFClientHandlerIF {
+public class ChunkedGELFClientHandler extends GELFClientHandlerBase implements GELFClientHandlerIF {
 
     /**
      * Representing a GELF client based on more than one UDP message.
@@ -35,7 +37,7 @@ public class ChunkedGELFClientHandler extends GELFClientHandler implements GELFC
      * @param clientMessage The raw data the GELF client sent. (JSON string)
      * @param threadName The name of the GELFClientHandlerThread that called this.
      */
-    public ChunkedGELFClientHandler(byte[] clientMessage, String threadName) {
+    public ChunkedGELFClientHandler(DatagramPacket clientMessage, String threadName) {
         //this.clientMessage = clientMessage;
     }
 

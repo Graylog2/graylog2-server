@@ -34,7 +34,7 @@ import org.json.simple.JSONValue;
  *
  * @author: Lennart Koopmann <lennart@socketfeed.com>
  */
-public class GELFClientHandler {
+class GELFClientHandlerBase {
 
     protected String clientMessage = null;
     protected GELFMessage message = new GELFMessage();

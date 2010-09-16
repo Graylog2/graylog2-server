@@ -20,6 +20,7 @@
 
 package org.graylog2.messagehandlers.gelf;
 
+import java.net.DatagramPacket;
 import org.graylog2.Log;
 
 
@@ -32,7 +33,7 @@ import org.graylog2.Log;
  */
 public class GELFClientHandlerThread extends Thread {
 
-    private byte[] receivedGelfSentence;
+    private DatagramPacket receivedGelfSentence;
 
     /**
      * Thread that handles a GELF client.
@@ -40,7 +41,7 @@ public class GELFClientHandlerThread extends Thread {
      * @param receivedGelfSentence Raw GELF message
      * @param chunked Is the message to handle a chunked message?
      */
-    public GELFClientHandlerThread(byte[] receivedGelfSentence) {
+    public GELFClientHandlerThread(DatagramPacket receivedGelfSentence) {
         this.receivedGelfSentence = receivedGelfSentence;
     }
 

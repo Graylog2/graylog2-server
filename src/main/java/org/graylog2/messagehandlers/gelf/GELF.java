@@ -20,6 +20,7 @@
 
 package org.graylog2.messagehandlers.gelf;
 
+import java.net.DatagramPacket;
 import org.graylog2.Main;
 
 /**
@@ -62,9 +63,9 @@ public class GELF {
      * @return boolean
      * @throws InvalidGELFTypeException
      */
-    public static boolean isChunkedMessage(byte[] message) throws InvalidGELFTypeException {
+    public static boolean isChunkedMessage(DatagramPacket message) throws InvalidGELFTypeException {
         // Message must be longer than 4 byte. (Needed to find out header)
-        if (message.length <= 4) {
+        if (message.getLength() <= 4) {
             throw new InvalidGELFTypeException();
         }
 
@@ -87,11 +88,11 @@ public class GELF {
         throw new InvalidGELFTypeException();
     }
 
-    public static int getGELFType(byte[] message) throws InvalidGELFCompressionMethodException {
+    public static int getGELFType(DatagramPacket message) throws InvalidGELFCompressionMethodException {
         // Convert first two byte to string.
         String result = "";
         for (int i=0; i < 2; i++) {
-            result += Integer.toString((message[i] & 0xff) + 0x100, 16).substring(1);
+            result += Integer.toString((message.getData()[i] & 0xff) + 0x100, 16).substring(1);
         }
 
         if (result.equals(GELF.HEADER_GZIP_COMPRESSION)) {
