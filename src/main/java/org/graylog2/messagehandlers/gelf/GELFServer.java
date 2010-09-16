@@ -33,7 +33,7 @@ import java.io.*;
  * @author: Lennart Koopmann <lennart@socketfeed.com>
  */
 public class GELFServer {
-    private static final int MAX_PACKET_SIZE = 8192;
+    public static final int MAX_PACKET_SIZE = 8192;
 
     private DatagramSocket serverSocket = null;
 

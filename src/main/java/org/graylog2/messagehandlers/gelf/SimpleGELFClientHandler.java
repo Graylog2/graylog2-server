@@ -20,9 +20,13 @@
 
 package org.graylog2.messagehandlers.gelf;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.DatagramPacket;
 import java.util.zip.DataFormatException;
+import java.util.zip.GZIPInputStream;
 import java.util.zip.Inflater;
 import org.graylog2.Log;
 import org.graylog2.database.MongoBridge;
@@ -30,7 +34,6 @@ import org.graylog2.messagehandlers.common.MessageCounterHook;
 import org.graylog2.messagehandlers.common.ReceiveHookManager;
 
 import org.json.simple.*;
-import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
 /**
  * GELFClient.java: Jun 23, 2010 7:15:12 PM
@@ -47,23 +50,35 @@ public class SimpleGELFClientHandler extends GELFClientHandlerBase implements GE
      * @param clientMessage The raw data the GELF client sent. (JSON string)
      * @param threadName The name of the GELFClientHandlerThread that called this.
      */
-    public SimpleGELFClientHandler(DatagramPacket clientMessage, String threadName) throws DataFormatException, UnsupportedEncodingException, InvalidGELFCompressionMethodException, InvalidGELFTypeException {
+    public SimpleGELFClientHandler(DatagramPacket clientMessage, String threadName) throws DataFormatException, UnsupportedEncodingException, InvalidGELFCompressionMethodException, IOException {
 
         // Determine compression type.
         int type = GELF.getGELFType(clientMessage);
 
         // Decompress.
         switch (type) {
+            // Decompress ZLIB
             case GELF.TYPE_ZLIB:
                 Inflater decompresser = new Inflater();
                 decompresser.setInput(clientMessage.getData(), 0, clientMessage.getLength());
                 int finalLength = decompresser.inflate(clientMessage.getData());
                 this.clientMessage = new String(clientMessage.getData(), 0, finalLength, "UTF-8");
                 break;
+
+            // Decompress GZIP
             case GELF.TYPE_GZIP:
-                throw new NotImplementedException();
+                ByteArrayOutputStream out = new ByteArrayOutputStream();
+                byte[] buffer = new byte[GELFServer.MAX_PACKET_SIZE];
+                GZIPInputStream in = new GZIPInputStream(new ByteArrayInputStream(clientMessage.getData()));
+                for (int bytesRead; (bytesRead = in.read(buffer)) != -1;) {
+                    out.write(buffer, 0, bytesRead);
+                }
+                this.clientMessage = new String(out.toByteArray(), "UTF-8");
+
+                System.out.println("MAGIC NUMBER: " + GZIPInputStream.GZIP_MAGIC); //////////// REMOVE ME
+                break;
             default:
-                throw new InvalidGELFTypeException();
+                throw new UnsupportedEncodingException();
         }
         
     }
