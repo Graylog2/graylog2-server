@@ -31,12 +31,82 @@ import org.graylog2.Main;
  */
 public class GELF {
 
+    public static final int TYPE_ZLIB = 0;
+    public static final int TYPE_GZIP = 1;
+    public static final int TYPE_CHUNKED = 2;
+
+    /**
+     * First bytes identifying a ZLIB compressed message. (RFC 1950)
+     */
+    public static final String HEADER_ZLIB_COMPRESSION = "789c";
+
+    /**
+     * First bytes identifying a GZIP compressed message. (RFC 1952)
+     */
+    public static final String HEADER_GZIP_COMPRESSION = "1f8b";
+
+    public static final String HEADER_TYPE_CHUNKED_GELF = "3045";
+
     /**
      * Is GELF enabled? Decision based on /etc/graylog2.conf "use_gelf" parameter.
      * @return boolean
      */
     public static boolean isEnabled() {
         return Main.masterConfig.getProperty("use_gelf").equals("true");
+    }
+
+    /**
+     * Find out if the given string is a chunked GELF message or not.
+     *
+     * @param message The message to inspect
+     * @return boolean
+     * @throws InvalidGELFTypeException
+     */
+    public static boolean isChunkedMessage(byte[] message) throws InvalidGELFTypeException {
+        // Message must be longer than 4 byte. (Needed to find out header)
+        if (message.length <= 4) {
+            throw new InvalidGELFTypeException();
+        }
+
+        int gelfType;
+        try {
+            gelfType = GELF.getGELFType(message);
+        } catch (InvalidGELFCompressionMethodException e) {
+            throw new InvalidGELFTypeException("Unknown compression method.");
+        }
+
+        switch(gelfType) {
+            case GELF.TYPE_GZIP:
+            case GELF.TYPE_ZLIB:
+                return false;
+            case GELF.TYPE_CHUNKED:
+                return true;
+        }
+
+        // THROW EXCEPTION IF NOT 1 OR 2
+        throw new InvalidGELFTypeException();
+    }
+
+    public static int getGELFType(byte[] message) throws InvalidGELFCompressionMethodException {
+        // Convert first two byte to string.
+        String result = "";
+        for (int i=0; i < 2; i++) {
+            result += Integer.toString((message[i] & 0xff) + 0x100, 16).substring(1);
+        }
+
+        if (result.equals(GELF.HEADER_GZIP_COMPRESSION)) {
+            return GELF.TYPE_GZIP;
+        }
+
+        if (result.equals(GELF.HEADER_ZLIB_COMPRESSION)) {
+            return GELF.TYPE_ZLIB;
+        }
+
+        if (result.equals(GELF.HEADER_TYPE_CHUNKED_GELF)) {
+            return GELF.TYPE_CHUNKED;
+        }
+
+        throw new InvalidGELFCompressionMethodException();
     }
 
 }

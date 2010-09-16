@@ -24,7 +24,6 @@ import org.graylog2.Log;
 
 import java.net.*;
 import java.io.*;
-import java.util.zip.Inflater;
 
 /**
  * GELFThread.java: Jun 23, 2010 6:58:07 PM
@@ -37,18 +36,6 @@ public class GELFServer {
     private static final int MAX_PACKET_SIZE = 8192;
 
     private DatagramSocket serverSocket = null;
-
-    /**
-     * Server that can listen for GELF messages.
-     */
-    public GELFServer() {
-        Runtime.getRuntime().addShutdownHook(new Thread(new Runnable() {
-            @Override public void run() {
-                Log.info("Closing server socket.");
-                tearDown();
-            }
-        }));
-    }
 
     /**
      * Create the UDP socket.
@@ -74,7 +61,7 @@ public class GELFServer {
      * @return Received message
      * @throws Exception
      */
-    public String listen() throws Exception {
+    public byte[] listen() throws Exception {
 
         // Reveive and fill buffer.
         byte[] receiveData = new byte[MAX_PACKET_SIZE];
@@ -83,22 +70,10 @@ public class GELFServer {
         try {
             serverSocket.receive(receivedPacket);
         } catch (SocketException e) {
-            return new String();
+            return new byte[0];
         }
 
-        // Uncompress.
-        Inflater decompresser = new Inflater();
-        decompresser.setInput(receiveData, 0, receiveData.length);
-        int finalLength = decompresser.inflate(receiveData);
-
-        // Convert to String and return.
-        return new String(receiveData, 0, finalLength, "UTF-8");
+        return receivedPacket.getData();
     }
 
-    /**
-     * Tear down the server. Closes the socket.
-     */
-    public void tearDown() {
-        this.serverSocket.close();
-    }
 }

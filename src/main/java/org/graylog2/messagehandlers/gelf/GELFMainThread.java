@@ -60,10 +60,10 @@ public class GELFMainThread extends Thread {
         while (true) {
             try {
                 // Listen on socket.
-                String receivedGelfSentence = server.listen();
+                byte[] receivedGelfSentence = server.listen();
 
                 // Skip empty sentences.
-                if (receivedGelfSentence.length() == 0) {
+                if (receivedGelfSentence.length == 0) {
                     continue;
                 }
 

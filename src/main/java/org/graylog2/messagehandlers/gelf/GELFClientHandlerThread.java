@@ -20,6 +20,8 @@
 
 package org.graylog2.messagehandlers.gelf;
 
+import org.graylog2.Log;
+
 
 /**
  * GELFClientHandlerThread.java: Jun 23, 2010 7:09:40 PM
@@ -30,13 +32,15 @@ package org.graylog2.messagehandlers.gelf;
  */
 public class GELFClientHandlerThread extends Thread {
 
-    private String receivedGelfSentence = null;
+    private byte[] receivedGelfSentence;
 
     /**
      * Thread that handles a GELF client.
+     *
      * @param receivedGelfSentence Raw GELF message
+     * @param chunked Is the message to handle a chunked message?
      */
-    public GELFClientHandlerThread(String receivedGelfSentence) {
+    public GELFClientHandlerThread(byte[] receivedGelfSentence) {
         this.receivedGelfSentence = receivedGelfSentence;
     }
 
@@ -44,8 +48,25 @@ public class GELFClientHandlerThread extends Thread {
      * Start the thread. Exits when the client has been completely handled.
      */
     @Override public void run() {
-        GELFClient client = new GELFClient(this.receivedGelfSentence, this.getName());
-        client.handle();
+        try {
+            GELFClientHandlerIF client = null;
+            if (GELF.isChunkedMessage(this.receivedGelfSentence)) {
+                System.out.println("RECEIVED CHUNKED MESSAGE");
+                client = new ChunkedGELFClientHandler(this.receivedGelfSentence, this.getName());
+            } else {
+                System.out.println("RECEIVED SIMPLE MESSAGE");
+                client = new SimpleGELFClientHandler(this.receivedGelfSentence, this.getName());
+            }
+            client.handle();
+        } catch (InvalidGELFTypeException e) {
+            Log.crit("Invalid GELF type in message: " + e.toString());
+        } catch (InvalidGELFCompressionMethodException e) {
+            Log.crit("Invalid compression method of GELF message: " + e.toString());
+        } catch (java.util.zip.DataFormatException e) {
+            Log.crit("Invalid compression data format in GELF message: " + e.toString());
+        } catch (java.io.UnsupportedEncodingException e) {
+            Log.crit("Invalid enconding of GELF message: " + e.toString());
+        }
     }
 
 }

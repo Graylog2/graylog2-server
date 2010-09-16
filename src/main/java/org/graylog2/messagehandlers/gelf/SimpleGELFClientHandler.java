@@ -20,34 +20,51 @@
 
 package org.graylog2.messagehandlers.gelf;
 
+import java.io.UnsupportedEncodingException;
+import java.util.zip.DataFormatException;
+import java.util.zip.Inflater;
 import org.graylog2.Log;
 import org.graylog2.database.MongoBridge;
 import org.graylog2.messagehandlers.common.MessageCounterHook;
 import org.graylog2.messagehandlers.common.ReceiveHookManager;
 
 import org.json.simple.*;
+import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
 /**
  * GELFClient.java: Jun 23, 2010 7:15:12 PM
  *
- * Representing a GELF client. Allows i.e. decoding of sent data.
+ * Handling a GELF client message consisting of only one UDP message.
  *
  * @author: Lennart Koopmann <lennart@socketfeed.com>
  */
-public class GELFClient {
-
-    private String clientMessage = null;
-
-    private GELFMessage message = new GELFMessage();
+public class SimpleGELFClientHandler extends GELFClientHandler implements GELFClientHandlerIF {
 
     /**
-     * Representing a GELF client. Allows i.e. decoding of sent data.
+     * Representing a GELF client consisting of only one UDP message.
      * 
      * @param clientMessage The raw data the GELF client sent. (JSON string)
      * @param threadName The name of the GELFClientHandlerThread that called this.
      */
-    public GELFClient(String clientMessage, String threadName) {
-        this.clientMessage = clientMessage;
+    public SimpleGELFClientHandler(byte[] clientMessage, String threadName) throws DataFormatException, UnsupportedEncodingException, InvalidGELFCompressionMethodException, InvalidGELFTypeException {
+
+        // Determine compression type.
+        int type = GELF.getGELFType(clientMessage);
+
+        // Decompress.
+        switch (type) {
+            case GELF.TYPE_ZLIB:
+                Inflater decompresser = new Inflater();
+                decompresser.setInput(clientMessage, 0, clientMessage.length);
+                int finalLength = decompresser.inflate(clientMessage);
+                this.clientMessage = new String(clientMessage, 0, finalLength, "UTF-8");
+                break;
+            case GELF.TYPE_GZIP:
+                throw new NotImplementedException();
+            default:
+                throw new InvalidGELFTypeException();
+        }
+        
     }
     
     /**
@@ -57,7 +74,7 @@ public class GELFClient {
      */
     public boolean handle() {
         try {
-            JSONObject json = this.getJSON(this.clientMessage);
+            JSONObject json = this.getJSON(this.clientMessage.toString());
             if (json == null) {
                 Log.warn("JSON is null/could not be parsed (invalid JSON) - clientMessage was: " + this.clientMessage);
                 return false;
@@ -88,57 +105,6 @@ public class GELFClient {
         }
 
         return true;
-    }
-
-    private void parse(JSONObject json) throws Exception{
-        this.message.shortMessage = this.jsonToString(json.get("short_message"));
-        this.message.fullMessage = this.jsonToString(json.get("full_message"));
-        this.message.level = this.jsonToInt(json.get("level"));
-        this.message.type = this.jsonToInt(json.get("type"));
-        this.message.host = this.jsonToString(json.get("host"));
-        this.message.file = this.jsonToString(json.get("file"));
-        this.message.line = this.jsonToInt(json.get("line"));
-    }
-
-    private JSONObject getJSON(String value) throws Exception {
-        if (value != null) {
-            Object obj = JSONValue.parse(value);
-            if (obj != null) {
-                if (obj.getClass().toString().equals("class org.json.simple.JSONArray")) {
-                    // Return the k/v of ths JSON array if this is an array.
-                    JSONArray array = (JSONArray)obj;
-                    return (JSONObject) array.get(0);
-                } else if(obj.getClass().toString().equals("class org.json.simple.JSONObject")) {
-                    // This is not an array. Convert it to an JSONObject directly without choosing first k/v.
-                    return (JSONObject)obj;
-                }
-            }
-        }
-
-        return null;
-    }
-
-    private String jsonToString(Object json) {
-        try {
-            if (json != null) {
-                return json.toString();
-            }
-        } catch(Exception e) {}
-
-        return null;
-    }
-
-    private int jsonToInt(Object json) {
-        try {
-            if (json != null) {
-                String str = this.jsonToString(json);
-                if (str != null) {
-                    return Integer.parseInt(str);
-                }
-            }
-        } catch(Exception e) {}
-
-        return 0;
     }
 
 }
