@@ -37,7 +37,7 @@ public class ChunkedGELFClientHandler extends GELFClientHandlerBase implements G
      * @param clientMessage The raw data the GELF client sent. (JSON string)
      * @param threadName The name of the GELFClientHandlerThread that called this.
      */
-    public ChunkedGELFClientHandler(DatagramPacket clientMessage, String threadName) {
+    public ChunkedGELFClientHandler(DatagramPacket clientMessage) {
         //this.clientMessage = clientMessage;
     }
 

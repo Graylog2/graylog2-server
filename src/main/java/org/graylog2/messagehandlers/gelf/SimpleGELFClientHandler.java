@@ -54,7 +54,7 @@ public class SimpleGELFClientHandler extends GELFClientHandlerBase implements GE
      * @throws InvalidGELFCompressionMethodException
      * @throws IOException
      */
-    public SimpleGELFClientHandler(DatagramPacket clientMessage, String threadName) throws DataFormatException, UnsupportedEncodingException, InvalidGELFCompressionMethodException, IOException {
+    public SimpleGELFClientHandler(DatagramPacket clientMessage) throws DataFormatException, UnsupportedEncodingException, InvalidGELFCompressionMethodException, IOException {
 
         // Determine compression type.
         int type = GELF.getGELFType(clientMessage);
