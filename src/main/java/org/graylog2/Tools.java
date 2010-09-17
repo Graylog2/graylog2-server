@@ -84,18 +84,16 @@ public class Tools {
             case 1:  return "user-level";
             case 2:  return "mail";
             case 3:  return "system daemon";
-            case 4:  return "security/authorization";
+            case 4: case 10: return "security/authorization";
             case 5:  return "syslogd";
             case 6:  return "line printer";
             case 7:  return "network news";
             case 8:  return "UUCP";
-            case 9:  return "clock";
-            case 10: return "security/authorization";
+            case 9: case 15: return "clock";
             case 11: return "FTP";
             case 12: return "NTP";
             case 13: return "log audit";
             case 14: return "log alert";
-            case 15: return "clock";
 
             // TODO: Make user definable?
             case 16: return "local0";
