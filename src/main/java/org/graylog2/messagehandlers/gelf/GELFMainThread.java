@@ -20,6 +20,7 @@
 
 package org.graylog2.messagehandlers.gelf;
 
+import java.io.IOException;
 import java.net.DatagramPacket;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -53,8 +54,7 @@ public class GELFMainThread extends Thread {
     @Override public void run() {
         GELFServer server = new GELFServer();
         if (!server.create(this.port)) {
-            System.out.println("Could not start GELF server. Do you have permissions to listen on UDP port " + this.port + "?");
-            System.exit(1); // Exit with error.
+            throw new RuntimeException("Could not start GELF server. Do you have permissions to listen on UDP port " + this.port + "?");
         }
 
         // Run forever.
