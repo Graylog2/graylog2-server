@@ -27,7 +27,7 @@ package org.graylog2;
  *
  * @author: Lennart Koopmann <lennart@socketfeed.com>
  */
-public class Tools {
+public final class Tools {
 
     private Tools() { }
 
