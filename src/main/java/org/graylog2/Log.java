@@ -85,9 +85,9 @@ public class Log {
      * @param logMessage The message to log
      * @param Severity The severity of this message
      */
-    public static void toStdOut(String logMessage, int Severity) {
+    public static void toStdOut(String logMessage, int severity) {
         if (Main.debugMode) {
-            String finalMessage = new Date().toString() + " - " + Log.severityToString(Severity) + " - "+ logMessage;
+            String finalMessage = new Date().toString() + " - " + Log.severityToString(severity) + " - "+ logMessage;
             System.out.println(finalMessage);
         }
     }
@@ -97,9 +97,9 @@ public class Log {
      * @param Severity The severity
      * @return The name of the severity
      */
-    public static String severityToString(int Severity) {
+    public static String severityToString(int severity) {
         String severityString = "UNSPECIFIED";
-        switch(Severity) {
+        switch(severity) {
             case Log.SEVERITY_INFO:
                 severityString = "INFO";
                 break;
