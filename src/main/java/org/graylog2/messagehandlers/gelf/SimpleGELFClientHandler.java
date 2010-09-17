@@ -49,6 +49,10 @@ public class SimpleGELFClientHandler extends GELFClientHandlerBase implements GE
      * 
      * @param clientMessage The raw data the GELF client sent. (JSON string)
      * @param threadName The name of the GELFClientHandlerThread that called this.
+     * @throws DataFormatException
+     * @throws UnsupportedEncodingException
+     * @throws InvalidGELFCompressionMethodException
+     * @throws IOException
      */
     public SimpleGELFClientHandler(DatagramPacket clientMessage, String threadName) throws DataFormatException, UnsupportedEncodingException, InvalidGELFCompressionMethodException, IOException {
 
@@ -68,7 +72,7 @@ public class SimpleGELFClientHandler extends GELFClientHandlerBase implements GE
             // Decompress GZIP
             case GELF.TYPE_GZIP:
                 ByteArrayOutputStream out = new ByteArrayOutputStream();
-                byte[] buffer = new byte[GELFServer.MAX_PACKET_SIZE];
+                byte[] buffer = new byte[clientMessage.getLength()]; // CHECK THIS STUFF HERE
                 GZIPInputStream in = new GZIPInputStream(new ByteArrayInputStream(clientMessage.getData()));
                 for (int bytesRead; (bytesRead = in.read(buffer)) != -1;) {
                     out.write(buffer, 0, bytesRead);

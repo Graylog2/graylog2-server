@@ -32,8 +32,19 @@ import org.graylog2.Main;
  */
 public class GELF {
 
+    /**
+     * A ZLIB compressed message (RFC 1950)
+     */
     public static final int TYPE_ZLIB = 0;
+
+    /**
+     * A GZIP compressed message (RFC 1952)
+     */
     public static final int TYPE_GZIP = 1;
+
+    /**
+     * A chunked GELF message
+     */
     public static final int TYPE_CHUNKED = 2;
 
     /**
@@ -46,6 +57,9 @@ public class GELF {
      */
     public static final String HEADER_GZIP_COMPRESSION = "1f8b";
 
+    /**
+     *
+     */
     public static final String HEADER_TYPE_CHUNKED_GELF = "3045";
 
     /**
@@ -88,6 +102,12 @@ public class GELF {
         throw new InvalidGELFTypeException();
     }
 
+    /**
+     *
+     * @param message
+     * @return
+     * @throws InvalidGELFCompressionMethodException
+     */
     public static int getGELFType(DatagramPacket message) throws InvalidGELFCompressionMethodException {
         // Convert first two byte to string.
         String result = "";

@@ -41,6 +41,11 @@ public class ChunkedGELFClientHandler extends GELFClientHandlerBase implements G
         //this.clientMessage = clientMessage;
     }
 
+    /**
+     * Handles the client: Decodes JSON, Stores in MongoDB, ReceiveHooks
+     * 
+     * @return
+     */
     public boolean handle() {
         return true;
     }

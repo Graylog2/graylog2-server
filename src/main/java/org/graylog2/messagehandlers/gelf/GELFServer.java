@@ -33,6 +33,10 @@ import java.io.*;
  * @author: Lennart Koopmann <lennart@socketfeed.com>
  */
 public class GELFServer {
+
+    /**
+     * The maximum packet size. (8192 is reasonable UDP limit)
+     */
     public static final int MAX_PACKET_SIZE = 8192;
 
     private DatagramSocket serverSocket = null;
@@ -59,7 +63,8 @@ public class GELFServer {
      * unzipped (GZIP) raw message that can be parsed to a GELFMessage.
      *
      * @return Received message
-     * @throws Exception
+     * @throws SocketException
+     * @throws IOException
      */
     public DatagramPacket listen() throws SocketException, IOException {
 

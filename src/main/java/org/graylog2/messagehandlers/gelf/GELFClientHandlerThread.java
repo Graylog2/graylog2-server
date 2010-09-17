@@ -39,7 +39,6 @@ public class GELFClientHandlerThread extends Thread {
      * Thread that handles a GELF client.
      *
      * @param receivedGelfSentence Raw GELF message
-     * @param chunked Is the message to handle a chunked message?
      */
     public GELFClientHandlerThread(DatagramPacket receivedGelfSentence) {
         this.receivedGelfSentence = receivedGelfSentence;
@@ -67,6 +66,8 @@ public class GELFClientHandlerThread extends Thread {
             Log.crit("Invalid compression data format in GELF message: " + e.toString());
         } catch (java.io.UnsupportedEncodingException e) {
             Log.crit("Invalid enconding of GELF message: " + e.toString());
+        } catch (java.io.IOException e) {
+            Log.crit("");
         }
     }
 
