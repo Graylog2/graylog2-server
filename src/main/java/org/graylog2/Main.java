@@ -49,12 +49,7 @@ public class Main {
      * This holds the configuration from /etc/graylog2.conf
      */
     public static Properties masterConfig = null;
-
-    /**
-     * This is the thread syslog4j is using.
-     */
-    public static Thread syslogCoreThread = null;
-
+    
     /**
      * @param args the command line arguments
      */
@@ -153,7 +148,7 @@ public class Main {
 
         // Check if the thread started up completely.
         try { Thread.sleep(1000); } catch(InterruptedException e) {}
-        if(syslogCoreThread.isAlive()) {
+        if(syslogServerThread.getCoreThread().isAlive()) {
             System.out.println("[x] Syslog server thread is up.");
         } else {
             System.out.println("Could not start syslog server core thread. Do you have permissions to listen on port " + Main.masterConfig.getProperty("syslog_listen_port") + "?");

@@ -35,6 +35,8 @@ public class SyslogServerThread extends Thread {
 
     private int port = 0;
 
+    private Thread coreThread = null;
+
     /**
      * Listen for Syslog messages
      * @param port On which port to listen?
@@ -53,7 +55,11 @@ public class SyslogServerThread extends Thread {
         syslogServer.getConfig().setPort(port);
         syslogServer.getConfig().addEventHandler(new SyslogEventHandler());
 
-        Main.syslogCoreThread = syslogServer.getThread();
+        this.coreThread = syslogServer.getThread();
+    }
+
+    public Thread getCoreThread() {
+        return this.coreThread;
     }
 
 }
