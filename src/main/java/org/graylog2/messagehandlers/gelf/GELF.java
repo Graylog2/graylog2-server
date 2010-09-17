@@ -62,6 +62,8 @@ public class GELF {
      */
     public static final String HEADER_TYPE_CHUNKED_GELF = "3045";
 
+    private GELF() { }
+
     /**
      * Is GELF enabled? Decision based on /etc/graylog2.conf "use_gelf" parameter.
      * @return boolean
