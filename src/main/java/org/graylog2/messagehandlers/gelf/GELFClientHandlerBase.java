@@ -89,4 +89,8 @@ class GELFClientHandlerBase {
 
         return 0;
     }
+
+    protected String getClientMessage() {
+        return clientMessage;
+    }
 }
