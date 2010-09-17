@@ -20,7 +20,6 @@
 
 package org.graylog2.messagehandlers.gelf;
 
-import java.io.IOException;
 import java.net.DatagramPacket;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
