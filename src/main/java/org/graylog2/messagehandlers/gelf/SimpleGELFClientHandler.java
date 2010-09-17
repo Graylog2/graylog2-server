@@ -77,7 +77,7 @@ public class SimpleGELFClientHandler extends GELFClientHandlerBase implements GE
                 Log.info("Handling GZIP compressed SimpleGELFClient");
                 ByteArrayOutputStream out = new ByteArrayOutputStream();
                 GZIPInputStream in = new GZIPInputStream(new ByteArrayInputStream(clientMessage.getData()));
-                for (int bytesRead; (bytesRead = in.read(buffer)) != -1;) {
+                for (int bytesRead = 0; bytesRead != -1; bytesRead = in.read(buffer)) {
                     out.write(buffer, 0, bytesRead);
                 }
                 this.clientMessage = new String(out.toByteArray(), "UTF-8");
