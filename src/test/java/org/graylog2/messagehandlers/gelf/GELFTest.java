@@ -25,40 +25,56 @@ import org.junit.Test;
 import static org.junit.Assert.*;
 
 /**
- * SimpleGELFClientHandlerTest.java: Sep 17, 2010 6:50:42 PM
+ * GELFTest.java: Sep 17, 2010 8:19:07 PM
  *
  * @author: Lennart Koopmann <lennart@socketfeed.com>
  */
-public class SimpleGELFClientHandlerTest {
+public class GELFTest {
 
     private String originalMessage = "{\"short_message\":\"something.\",\"full_message\":\"lol!\",\"host\":\"somehost\",\"level\":2,\"file\":\"example.php\",\"line\":1337}";
-    
+
     /**
-     * Test if ZLIB compressed non-chunked GELF messages are correctly decompressed.
+     * Test isChunkedMessage with a ZLIB encrypted message
      */
     @Test
-    public void testDecompressionWithZLIB() throws Exception {
+    public void testIsChunkedMessageWithZLIBEncryption() throws Exception {
         // Build a datagram packet.
         DatagramPacket gelfMessage = GELFTestHelper.buildZLIBCompressedDatagramPacket(this.originalMessage);
 
-        // Let the decompression take place.
-        SimpleGELFClientHandler handler = new SimpleGELFClientHandler(gelfMessage, "foo");
-
-        assertEquals(handler.getClientMessage(), this.originalMessage);
+        assertFalse(GELF.isChunkedMessage(gelfMessage));
     }
 
     /**
-     * Test if GZIP compressed non-chunked GELF messages are correctly decompressed.
+     * Test isChunkedMessage with a GZIP encrypted message
      */
     @Test
-    public void testDecompressionWithGZIP() throws Exception {
+    public void testIsChunkedMessageWithGZIPEncryption() throws Exception {
         // Build a datagram packet.
         DatagramPacket gelfMessage = GELFTestHelper.buildGZIPCompressedDatagramPacket(this.originalMessage);
 
-        // Let the decompression take place.
-        SimpleGELFClientHandler handler = new SimpleGELFClientHandler(gelfMessage, "foo");
+        assertFalse(GELF.isChunkedMessage(gelfMessage));
+    }
 
-        assertEquals(handler.getClientMessage(), this.originalMessage);
+    /**
+     * Test getGELFType method with a ZLIB encrypted message
+     */
+    @Test
+    public void testGetGELFTypeWithZLIBEncryption() throws Exception {
+        // Build a datagram packet.
+        DatagramPacket gelfMessage = GELFTestHelper.buildZLIBCompressedDatagramPacket(this.originalMessage);
+
+        assertEquals(GELF.TYPE_ZLIB, GELF.getGELFType(gelfMessage));
+    }
+
+    /**
+     * Test getGELFType method with a GZIP encrypted message
+     */
+    @Test
+    public void testGetGELFTypeWithGZIPEncryption() throws Exception {
+        // Build a datagram packet.
+        DatagramPacket gelfMessage = GELFTestHelper.buildGZIPCompressedDatagramPacket(this.originalMessage);
+
+        assertEquals(GELF.TYPE_GZIP, GELF.getGELFType(gelfMessage));
     }
 
 }
