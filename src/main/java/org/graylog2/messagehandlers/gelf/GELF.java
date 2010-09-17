@@ -112,7 +112,7 @@ public class GELF {
         // Convert first two byte to string.
         String result = "";
         for (int i=0; i < 2; i++) {
-            result += Integer.toString((message.getData()[i] & 0xff) + 0x100, 16).substring(1);
+            result = result.concat(Integer.toString((message.getData()[i] & 0xff) + 0x100, 16).substring(1));
         }
 
         if (result.equals(GELF.HEADER_GZIP_COMPRESSION)) {
