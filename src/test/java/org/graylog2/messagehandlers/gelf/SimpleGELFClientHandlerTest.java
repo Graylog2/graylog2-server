@@ -20,8 +20,8 @@
 
 package org.graylog2.messagehandlers.gelf;
 
-import com.sun.xml.internal.messaging.saaj.util.ByteInputStream;
-import com.sun.xml.internal.messaging.saaj.util.ByteOutputStream;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.net.DatagramPacket;
 import java.util.zip.Deflater;
 import java.util.zip.GZIPOutputStream;
@@ -65,8 +65,8 @@ public class SimpleGELFClientHandlerTest {
     @Test
     public void testDecompressionWithGZIP() throws Exception {
         // GZIP compress message.
-        ByteInputStream compressMe = new ByteInputStream(this.originalMessage.getBytes(), this.originalMessage.getBytes().length);
-        ByteOutputStream compressedMessage = new ByteOutputStream();
+        ByteArrayInputStream compressMe = new ByteArrayInputStream(this.originalMessage.getBytes());
+        ByteArrayOutputStream compressedMessage = new ByteArrayOutputStream();
         GZIPOutputStream out = new GZIPOutputStream(compressedMessage);
         for (int c = compressMe.read(); c != -1; c = compressMe.read()) {
             out.write(c);
@@ -74,7 +74,7 @@ public class SimpleGELFClientHandlerTest {
         out.close();
 
         // Build a datagram packet.
-        DatagramPacket gelfMessage = new DatagramPacket(compressedMessage.getBytes(), compressedMessage.getBytes().length);
+        DatagramPacket gelfMessage = new DatagramPacket(compressedMessage.toByteArray(), compressedMessage.size());
 
         // Let the decompression take place.
         SimpleGELFClientHandler handler = new SimpleGELFClientHandler(gelfMessage, "foo");
