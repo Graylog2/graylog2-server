@@ -31,7 +31,7 @@ import com.mongodb.MongoException;
  *
  * @author: Lennart Koopmann <lennart@socketfeed.com>
  */
-public class MongoConnection {
+public final class MongoConnection {
     private static MongoConnection INSTANCE;
 
     private static Mongo m = null;
