@@ -98,7 +98,7 @@ public class GELF {
                 return true;
         }
 
-        // THROW EXCEPTION IF NOT 1 OR 2
+        // Throw exception if not GZIP, ZLIB or chunked
         throw new InvalidGELFTypeException();
     }
 

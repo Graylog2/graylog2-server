@@ -77,4 +77,17 @@ public class GELFTest {
         assertEquals(GELF.TYPE_GZIP, GELF.getGELFType(gelfMessage));
     }
 
+    /**
+     * Test getGELFType method with an invalid encryption
+     */
+    @Test(expected=InvalidGELFCompressionMethodException.class)
+    public void testGetGELFTypeWithInvalidEncryption() throws Exception {
+        // Build a datagram packet.
+        String invalidEncryptedString = "mamamamamamamamamamamama";
+        DatagramPacket invalidGELFMessage = new DatagramPacket(invalidEncryptedString.getBytes(), invalidEncryptedString.getBytes().length);
+
+        // Cause the exception we expect.
+        GELF.getGELFType(invalidGELFMessage);
+    }
+
 }
