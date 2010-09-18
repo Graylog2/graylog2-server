@@ -20,6 +20,7 @@
 
 package org.graylog2.messagehandlers.gelf;
 
+import java.io.UnsupportedEncodingException;
 import java.net.DatagramPacket;
 
 /**
@@ -37,8 +38,18 @@ public class ChunkedGELFClientHandler extends GELFClientHandlerBase implements G
      * @param clientMessage The raw data the GELF client sent. (JSON string)
      * @param threadName The name of the GELFClientHandlerThread that called this.
      */
-    public ChunkedGELFClientHandler(DatagramPacket clientMessage) {
-        //this.clientMessage = clientMessage;
+    public ChunkedGELFClientHandler(DatagramPacket clientMessage) throws UnsupportedEncodingException, InvalidGELFHeaderException {
+
+        // 70 byte / 140 chars:
+        // 3765 3335383765646265393165323131396537373066383266383363383432373733366661393430366534656436646665643833376366373239636437636661 0000 0002
+        // 1: 0-2 byte: MAGIC NUMBER
+        // 2: 2-66 byte: MESSAGE ID
+        // 3: 66-68 byte: SEQUENCE NUMBER
+        // 4: 68-70 byte: SEQUENCE COUNT
+
+        GELFHeader header = GELF.extractGELFHeader(clientMessage);
+
+        System.out.println("GOT MESSAGE: " + header.getSequenceNumber() + "/" + header.getSequenceNumber());
     }
 
     /**

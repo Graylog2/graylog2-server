@@ -51,10 +51,10 @@ public class GELFClientHandlerThread extends Thread {
         try {
             GELFClientHandlerIF client = null;
             if (GELF.isChunkedMessage(this.receivedGelfSentence)) {
-                System.out.println("RECEIVED CHUNKED MESSAGE");
+                Log.info("Received message is chunked. Handling now.");
                 client = new ChunkedGELFClientHandler(this.receivedGelfSentence);
             } else {
-                System.out.println("RECEIVED SIMPLE MESSAGE");
+                Log.info("Received message is not chunked. Handling now.");
                 client = new SimpleGELFClientHandler(this.receivedGelfSentence);
             }
             client.handle();
@@ -62,12 +62,14 @@ public class GELFClientHandlerThread extends Thread {
             Log.crit("Invalid GELF type in message: " + e.toString());
         } catch (InvalidGELFCompressionMethodException e) {
             Log.crit("Invalid compression method of GELF message: " + e.toString());
+        } catch (InvalidGELFHeaderException e) {
+            Log.crit("Invalid header of chunked GELF message: " + e.toString());
         } catch (java.util.zip.DataFormatException e) {
             Log.crit("Invalid compression data format in GELF message: " + e.toString());
         } catch (java.io.UnsupportedEncodingException e) {
             Log.crit("Invalid enconding of GELF message: " + e.toString());
         } catch (java.io.IOException e) {
-            Log.crit("");
+            Log.crit("IO Error while handling GELF message: " + e.toString());
         }
     }
 

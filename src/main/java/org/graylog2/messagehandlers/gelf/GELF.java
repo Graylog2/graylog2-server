@@ -58,9 +58,14 @@ public final class GELF {
     public static final String HEADER_GZIP_COMPRESSION = "1f8b";
 
     /**
-     *
+     * First bytes identifying a chunked GELF message.
      */
-    public static final String HEADER_TYPE_CHUNKED_GELF = "3045";
+    public static final String HEADER_TYPE_CHUNKED_GELF = "1e0f";
+
+    /**
+     * GELF header is 70 bytes long.
+     */
+    private static final int GELF_HEADER_LENGTH = 70;
 
     private GELF() { }
 
@@ -130,6 +135,20 @@ public final class GELF {
         }
 
         throw new InvalidGELFCompressionMethodException();
+    }
+
+    public static GELFHeader extractGELFHeader(DatagramPacket message) throws InvalidGELFHeaderException {
+        if (message.getLength() <= GELF.GELF_HEADER_LENGTH) {
+            throw new InvalidGELFHeaderException();
+        }
+
+        // GELF header is GELF_HEADER_LENGTH bytes long. Select these bytes.
+        byte[] rawGELFHeader = new byte[GELF.GELF_HEADER_LENGTH];
+        for (int i = 0; i < GELF.GELF_HEADER_LENGTH; i++) {
+            rawGELFHeader[i] = message.getData()[i];
+        }
+
+        return new GELFHeader(rawGELFHeader);
     }
 
 }
