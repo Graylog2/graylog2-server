@@ -39,6 +39,8 @@ class GELFClientHandlerBase {
     protected String clientMessage = null;
     protected GELFMessage message = new GELFMessage();
 
+    protected GELFClientHandlerBase() { }
+
     protected void parse(JSONObject json) throws Exception{
         this.message.shortMessage = this.jsonToString(json.get("short_message"));
         this.message.fullMessage = this.jsonToString(json.get("full_message"));

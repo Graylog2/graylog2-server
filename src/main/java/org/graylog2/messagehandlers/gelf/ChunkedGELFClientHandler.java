@@ -49,7 +49,7 @@ public class ChunkedGELFClientHandler extends GELFClientHandlerBase implements G
 
         GELFHeader header = GELF.extractGELFHeader(clientMessage);
 
-        System.out.println("GOT MESSAGE: " + header.getSequenceNumber() + "/" + header.getSequenceNumber());
+        System.out.println("GOT MESSAGE: " + header.getSequenceNumber() + "/" + header.getSequenceCount());
     }
 
     /**
