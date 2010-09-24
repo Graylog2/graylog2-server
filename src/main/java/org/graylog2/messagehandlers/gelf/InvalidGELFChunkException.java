@@ -18,38 +18,19 @@
  *
  */
 
-package org.graylog2.periodical;
-
-import org.graylog2.Log;
-import org.graylog2.database.MongoBridge;
+package org.graylog2.messagehandlers.gelf;
 
 /**
- * SystemStatisticThread.java: May 21, 2010 6:42:25 PM
+ * InvalidGELFChunkException.java: Sep 24, 2010 4:53:44 PM
  *
- * Calls MongoBridge.distinctHosts() every 10 seconds.
+ * [description]
  *
  * @author: Lennart Koopmann <lennart@socketfeed.com>
  */
-public class HostDistinctThread extends Thread {
+class InvalidGELFChunkException extends Exception {
 
-    /**
-     * Start the thread. Runs forever.
-     */
-    @Override public void run() {
-        // Run forever.
-        while (true) {
-            try {
-                MongoBridge m = new MongoBridge();
-
-                // Handled syslog events.
-                m.distinctHosts();
-            } catch (Exception e) {
-                Log.warn("Error in HostDistinctThread: " + e.toString());
-            }
-            
-           // Run every 10 seconds.
-           try { Thread.sleep(10000); } catch(InterruptedException e) {}
-        }
+    public InvalidGELFChunkException(String msg) {
+        super(msg);
     }
 
 }

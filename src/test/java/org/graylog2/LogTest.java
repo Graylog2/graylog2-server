@@ -43,6 +43,7 @@ public class LogTest {
 
     @After
     public void tearDown() {
+
     }
 
     /**

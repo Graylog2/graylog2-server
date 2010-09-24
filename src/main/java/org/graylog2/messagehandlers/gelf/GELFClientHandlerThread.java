@@ -60,10 +60,10 @@ public class GELFClientHandlerThread extends Thread {
             client.handle();
         } catch (InvalidGELFTypeException e) {
             Log.crit("Invalid GELF type in message: " + e.toString());
+        } catch (InvalidGELFHeaderException e) {
+            Log.crit("Invalid GELF header in message: " + e.toString());
         } catch (InvalidGELFCompressionMethodException e) {
             Log.crit("Invalid compression method of GELF message: " + e.toString());
-        } catch (InvalidGELFHeaderException e) {
-            Log.crit("Invalid header of chunked GELF message: " + e.toString());
         } catch (java.util.zip.DataFormatException e) {
             Log.crit("Invalid compression data format in GELF message: " + e.toString());
         } catch (java.io.UnsupportedEncodingException e) {

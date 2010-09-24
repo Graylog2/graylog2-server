@@ -20,8 +20,13 @@
 
 package org.graylog2.messagehandlers.gelf;
 
+import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.DatagramPacket;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import java.util.zip.DataFormatException;
+import java.util.zip.Inflater;
 
 /**
  * ChunkedGELFClient.java: Sep 14, 2010 6:38:38 PM
@@ -38,18 +43,41 @@ public class ChunkedGELFClientHandler extends GELFClientHandlerBase implements G
      * @param clientMessage The raw data the GELF client sent. (JSON string)
      * @param threadName The name of the GELFClientHandlerThread that called this.
      */
-    public ChunkedGELFClientHandler(DatagramPacket clientMessage) throws UnsupportedEncodingException, InvalidGELFHeaderException {
-
-        // 70 byte / 140 chars:
-        // 3765 3335383765646265393165323131396537373066383266383363383432373733366661393430366534656436646665643833376366373239636437636661 0000 0002
-        // 1: 0-2 byte: MAGIC NUMBER
-        // 2: 2-66 byte: MESSAGE ID
-        // 3: 66-68 byte: SEQUENCE NUMBER
-        // 4: 68-70 byte: SEQUENCE COUNT
-
+    public ChunkedGELFClientHandler(DatagramPacket clientMessage) throws UnsupportedEncodingException, InvalidGELFHeaderException, IOException {
         GELFHeader header = GELF.extractGELFHeader(clientMessage);
 
-        System.out.println("GOT MESSAGE: " + header.getSequenceNumber() + "/" + header.getSequenceCount());
+        GELFClientChunk chunk = new GELFClientChunk();
+        chunk.setHash(header.getHash());
+        chunk.setSequenceCount(header.getSequenceCount());
+        chunk.setSequenceNumber(header.getSequenceNumber());
+        chunk.setData(GELF.extractData(clientMessage));
+
+
+        // Insert the chunk.
+        int messageState = 0;
+        try {
+            messageState = ChunkedGELFClientManager.getInstance().insertChunk(chunk);
+        } catch (InvalidGELFChunkException e) {
+            throw new InvalidGELFHeaderException(e.toString());
+        } catch (ForeignGELFChunkException e) {
+            throw new InvalidGELFHeaderException(e.toString());
+        }
+
+        //// DEBUG
+        /*try {
+            DatagramPacket bla = new DatagramPacket(chunk.getData(), chunk.getData().length);
+            System.out.println(chunk.getSequenceNumber() + ":" + GELF.getGELFType(bla));
+        } catch (InvalidGELFCompressionMethodException ex) {
+            System.out.println(chunk.getSequenceNumber() + ":" + ex.toString());
+        }*/
+        ///////
+
+        // Fully handle message if complete.
+        if (messageState == ChunkedGELFClientManager.MESSAGE_IS_COMPLETE) {
+            // ALSO TEST IF MESSAGE HAS ALL CHUNKS NOT ONLY IF ENOUGH CHUNKS!
+            System.out.println("MESSAGE IS COMPLETE! HANDLING NOW!");
+
+        }
     }
 
     /**

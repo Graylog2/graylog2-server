@@ -20,6 +20,15 @@
 
 package org.graylog2.messagehandlers.gelf;
 
+import java.io.ByteArrayOutputStream;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Set;
+
 /**
  * ChunkedGELFMessage.java: Sep 18, 2010 3:37:43 PM
  *
@@ -28,5 +37,66 @@ package org.graylog2.messagehandlers.gelf;
  * @author: Lennart Koopmann <lennart@socketfeed.com>
  */
 public class ChunkedGELFMessage extends GELFMessage {
+
+    // <SequenceNumber, Chunk>
+    private HashMap<Integer, GELFClientChunk> chunkMap = new HashMap<Integer, GELFClientChunk>();
+    
+    private int sequenceCount = -1;
+    private String hash;
+
+    public void insertChunk(GELFClientChunk chunk) throws InvalidGELFChunkException, ForeignGELFChunkException {
+        chunk.checkStructure();
+
+        // Update sequenceCount and hash if this is the first chunk (first chunk if sequenceCount not set yet)
+        if (this.sequenceCount == -1) {
+            this.sequenceCount = chunk.getSequenceCount();
+            this.hash = chunk.getHash();
+        }
+
+        if (!chunk.getHash().equals(this.hash)) {
+            throw new ForeignGELFChunkException("Chunk does not belong to this message.");
+        }
+
+        // Insert chunk.
+        this.chunkMap.put(chunk.getSequenceNumber(), chunk);
+    }
+
+    public HashMap<Integer, GELFClientChunk> getChunkMap() {
+        return chunkMap;
+    }
+
+    public int getSequenceCount() {
+        return this.sequenceCount;
+    }
+
+    public boolean isComplete () {
+        if (sequenceCount == chunkMap.size()) {
+            return true;
+        }
+
+        return false;
+    }
+    
+    public Collection<GELFClientChunk> getChunks() {
+        return this.chunkMap.values();
+    }
+
+    public byte[] getData() {
+        ByteArrayOutputStream out = new ByteArrayOutputStream();
+
+        // Sort chunkMap first
+        List<Integer> sortedList = new ArrayList<Integer>();
+        sortedList.addAll(this.chunkMap.keySet());
+        Collections.sort(sortedList);
+
+        Iterator<Integer> iter = sortedList.iterator();
+        while (iter.hasNext()) {
+            GELFClientChunk chunk = this.chunkMap.get(iter.next());
+            System.out.println("ADDING TO BUFFER: " + chunk.getSequenceNumber());
+            out.write(chunk.getData(), 0, chunk.getData().length);
+        }
+
+        return out.toByteArray();
+    }
 
 }

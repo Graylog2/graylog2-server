@@ -20,7 +20,12 @@
 
 package org.graylog2.messagehandlers.gelf;
 
+import java.io.IOException;
+import java.math.BigInteger;
 import java.net.DatagramPacket;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import org.graylog2.Log;
 import org.junit.Test;
 import static org.junit.Assert.*;
 
@@ -83,11 +88,27 @@ public class GELFTest {
     @Test(expected=InvalidGELFCompressionMethodException.class)
     public void testGetGELFTypeWithInvalidEncryption() throws Exception {
         // Build a datagram packet.
-        String invalidEncryptedString = "mamamamamamamamamamamama";
-        DatagramPacket invalidGELFMessage = new DatagramPacket(invalidEncryptedString.getBytes(), invalidEncryptedString.getBytes().length);
+        String invalidlyEncryptedString = "mamamamamamamamamamamama";
+        DatagramPacket invalidGELFMessage = new DatagramPacket(invalidlyEncryptedString.getBytes(), invalidlyEncryptedString.getBytes().length);
 
         // Cause the exception we expect.
         GELF.getGELFType(invalidGELFMessage);
+    }
+
+    /**
+     * Test of extractGELFHeader method, of class GELF.
+     */
+    @Test
+    public void testExtractGELFHeader() throws IOException {
+
+    }
+
+    /**
+     * Test of extractData method, of class GELF.
+     */
+    @Test
+    public void testExtractData() throws Exception {
+
     }
 
 }

@@ -20,6 +20,8 @@
 
 package org.graylog2.messagehandlers.gelf;
 
+import java.io.IOException;
+
 /**
  * GELFHeader.java: Sep 18, 2010 6:07:45 PM
  *
@@ -31,13 +33,16 @@ public class GELFHeader {
 
     private byte[] rawHeader;
 
+    private String hash = null;
     private int sequenceNumber = -1;
     private int sequenceCount = -1;
 
-    public static final int HEADER_PART_SEQNUM_START = 66;
+    public static final int HEADER_PART_SEQNUM_START = 34;
     public static final int HEADER_PART_SEQNUM_LENGTH = 2;
-    public static final int HEADER_PART_SEQCNT_START = 68;
+    public static final int HEADER_PART_SEQCNT_START = 36;
     public static final int HEADER_PART_SEQCNT_LENGTH = 2;
+    public static final int HEADER_PART_HASH_START = 2;
+    public static final int HEADER_PART_HASH_LENGTH = 32;
 
     public GELFHeader(byte[] rawHeader) {
         this.rawHeader = rawHeader;
@@ -51,11 +56,24 @@ public class GELFHeader {
         return Integer.parseInt(tmp);
     }
 
+    public String getHash() throws InvalidGELFHeaderException, IOException {
+
+        if (this.hash == null) {
+            String tmp = "";
+            for (int i = 0; i < GELFHeader.HEADER_PART_HASH_LENGTH; i++) {
+                tmp += Integer.toString( ( this.rawHeader[i+GELFHeader.HEADER_PART_HASH_START] & 0xff ) + 0x100, 16).substring( 1 );
+            }
+            this.hash = tmp;
+        }
+
+        return this.hash;
+    }
+
     public int getSequenceNumber() throws InvalidGELFHeaderException {
         // Lazy calculate sequence number.
         if (this.sequenceNumber == -1) {
             int seqNum = this.extract(GELFHeader.HEADER_PART_SEQNUM_START, GELFHeader.HEADER_PART_SEQNUM_LENGTH);
-            if (seqNum > 0) {
+            if (seqNum >= 0) {
                 this.sequenceNumber = seqNum;
             } else {
                 throw new InvalidGELFHeaderException("Could not extract sequence number");
@@ -69,7 +87,7 @@ public class GELFHeader {
         // Lazy calculate sequence count.
         if (this.sequenceCount == -1) {
             int seqCnt = this.extract(GELFHeader.HEADER_PART_SEQCNT_START, GELFHeader.HEADER_PART_SEQCNT_LENGTH);
-            if (seqCnt > 0) {
+            if (seqCnt >= 0) {
                 this.sequenceCount = seqCnt;
             } else {
                 throw new InvalidGELFHeaderException("Could not extract sequence count");

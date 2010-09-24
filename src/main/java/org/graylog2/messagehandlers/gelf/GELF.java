@@ -20,7 +20,11 @@
 
 package org.graylog2.messagehandlers.gelf;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.net.DatagramPacket;
+import java.nio.ByteBuffer;
 import org.graylog2.Main;
 
 /**
@@ -65,7 +69,9 @@ public final class GELF {
     /**
      * GELF header is 70 bytes long.
      */
-    private static final int GELF_HEADER_LENGTH = 70;
+    public static final int GELF_HEADER_LENGTH = 38;
+
+    public static final int GELF_DATA_PART_MAX_LENGTH = 8192-GELF_HEADER_LENGTH;
 
     private GELF() { }
 
@@ -139,7 +145,7 @@ public final class GELF {
 
     public static GELFHeader extractGELFHeader(DatagramPacket message) throws InvalidGELFHeaderException {
         if (message.getLength() <= GELF.GELF_HEADER_LENGTH) {
-            throw new InvalidGELFHeaderException();
+            throw new InvalidGELFHeaderException("Message too short. The GELF header might not even fit here.");
         }
 
         // GELF header is GELF_HEADER_LENGTH bytes long. Select these bytes.
@@ -148,7 +154,28 @@ public final class GELF {
             rawGELFHeader[i] = message.getData()[i];
         }
 
+        // Make sure that GELF header begins with 30,15 (lol, boris erdmann)
+        if (rawGELFHeader[0] != 30 || rawGELFHeader[1] != 15) {
+            throw new InvalidGELFHeaderException("Invalid GELF ID.");
+        }
+
         return new GELFHeader(rawGELFHeader);
+    }
+
+    public static byte[] extractData(DatagramPacket message) throws InvalidGELFHeaderException, IOException {
+        if (message.getLength() <= GELF.GELF_HEADER_LENGTH) {
+            throw new InvalidGELFHeaderException();
+        }
+
+        byte[] data = new byte[GELF.GELF_DATA_PART_MAX_LENGTH];
+
+        int j = 0;
+        for (int i = GELF.GELF_HEADER_LENGTH; i < GELF.GELF_DATA_PART_MAX_LENGTH+GELF.GELF_HEADER_LENGTH; i++) {
+            data[j] = message.getData()[i];
+            j++;
+        }
+
+        return data;
     }
 
 }
