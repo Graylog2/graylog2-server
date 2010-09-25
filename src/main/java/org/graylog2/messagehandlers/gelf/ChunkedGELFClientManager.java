@@ -21,7 +21,6 @@
 package org.graylog2.messagehandlers.gelf;
 
 import java.util.HashMap;
-import java.util.zip.DataFormatException;
 import java.util.zip.Inflater;
 
 /**
@@ -65,7 +64,7 @@ public final class ChunkedGELFClientManager {
         messageMap.put(chunk.getHash(), fullMessage);
 
         if (fullMessage.isComplete()) {
-            /////
+            ///// DEBUG
             try {
                 byte[] result = new byte[8192*3];
                 Inflater decompresser = new Inflater();

@@ -59,15 +59,6 @@ public class ChunkedGELFClientHandler extends GELFClientHandlerBase implements G
             throw new InvalidGELFHeaderException(e.toString());
         }
 
-        //// DEBUG
-        /*try {
-            DatagramPacket bla = new DatagramPacket(chunk.getData(), chunk.getData().length);
-            System.out.println(chunk.getSequenceNumber() + ":" + GELF.getGELFType(bla));
-        } catch (InvalidGELFCompressionMethodException ex) {
-            System.out.println(chunk.getSequenceNumber() + ":" + ex.toString());
-        }*/
-        ///////
-
         // Fully handle message if complete.
         if (messageState == ChunkedGELFClientManager.MESSAGE_IS_COMPLETE) {
             // ALSO TEST IF MESSAGE HAS ALL CHUNKS NOT ONLY IF ENOUGH CHUNKS!
