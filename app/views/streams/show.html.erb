@@ -4,7 +4,7 @@
   <%= link_to "Delete this stream", { :action => "destroy", :id => @stream.id }, :confirm => "Really delete this stream with all it's filter rules?" %>
 </div>
 
-<h1>Stream &raquo;<%= @stream.title %>&laquo;</h1>
+<h1>Stream <span class="highlighted"><%= @stream.title %></span></h1>
 
 <div id="streams-right">
   <% if @is_favorited %>

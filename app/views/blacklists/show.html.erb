@@ -2,7 +2,7 @@
   <%= link_to "Delete this blacklist", { :action => "destroy", :id => @blacklist.id }, :confirm => "Really delete this blacklist with all it's terms?" %>
 </div>
 
-<h1>Blacklist &raquo;<%= @blacklist.title %>&laquo;</h1>
+<h1>Blacklist <span class="highlighted"><%= @blacklist.title %></span></h1>
 
 <% form_for @new_term, :url => { :controller => "blacklistedterms", :action => "create" } do |f| %>
   <%= f.hidden_field :blacklist_id, :value => @blacklist.id %>

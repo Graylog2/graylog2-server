@@ -6,7 +6,7 @@
   <% end -%>
 </div>
 
-<h1>Edit user &raquo;<%=h @user.login %>&laquo;</h1>
+<h1>Edit user <span class="highlighted"><%=h @user.login %></span></h1>
 <% @user.password = @user.password_confirmation = nil %>
 
 <%= error_messages_for :user %>
