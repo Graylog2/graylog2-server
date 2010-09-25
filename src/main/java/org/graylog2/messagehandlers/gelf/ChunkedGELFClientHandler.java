@@ -23,10 +23,6 @@ package org.graylog2.messagehandlers.gelf;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.DatagramPacket;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-import java.util.zip.DataFormatException;
-import java.util.zip.Inflater;
 
 /**
  * ChunkedGELFClient.java: Sep 14, 2010 6:38:38 PM
