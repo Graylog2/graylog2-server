@@ -22,6 +22,7 @@ package org.graylog2.periodical;
 
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.Map;
 import java.util.Set;
 import org.graylog2.Log;
 import org.graylog2.messagehandlers.gelf.ChunkedGELFClientManager;
@@ -44,7 +45,7 @@ public class ChunkedGELFClientManagerThread extends Thread {
         while (true) {
             try {
                 ////////// DEBUG ONLY
-                HashMap<String, ChunkedGELFMessage> messageMap = ChunkedGELFClientManager.getInstance().getMessageMap();
+                Map<String, ChunkedGELFMessage> messageMap = ChunkedGELFClientManager.getInstance().getMessageMap();
                 Set set = messageMap.keySet();
                 Iterator iter = set.iterator();
                 int i = 0;
