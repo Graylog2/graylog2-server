@@ -21,6 +21,7 @@
 package org.graylog2.messagehandlers.gelf;
 
 import java.util.HashMap;
+import java.util.Map;
 import java.util.zip.Inflater;
 
 /**
@@ -33,9 +34,9 @@ import java.util.zip.Inflater;
  */
 public final class ChunkedGELFClientManager {
 
-    private static HashMap<String, ChunkedGELFMessage> messageMap = new HashMap<String, ChunkedGELFMessage>();
+    private static Map<String, ChunkedGELFMessage> messageMap = new HashMap<String, ChunkedGELFMessage>();
 
-    private static ChunkedGELFClientManager INSTANCE;
+    private static ChunkedGELFClientManager instance;
 
     public static final int MESSAGE_IS_COMPLETE = 1;
     public static final int MESSAGE_IS_INCOMPLETE = 2;
@@ -43,10 +44,10 @@ public final class ChunkedGELFClientManager {
     private ChunkedGELFClientManager() { }
 
     public synchronized static ChunkedGELFClientManager getInstance() {
-        if (INSTANCE == null) {
-            INSTANCE = new ChunkedGELFClientManager();
+        if (instance == null) {
+            instance = new ChunkedGELFClientManager();
         }
-        return INSTANCE;
+        return instance;
     }
 
     public int insertChunk(GELFClientChunk chunk) throws ForeignGELFChunkException, InvalidGELFChunkException {
@@ -81,7 +82,7 @@ public final class ChunkedGELFClientManager {
         return MESSAGE_IS_INCOMPLETE;
     }
 
-    public HashMap<String, ChunkedGELFMessage> getMessageMap() {
+    public Map<String, ChunkedGELFMessage> getMessageMap() {
         return messageMap;
     }
 

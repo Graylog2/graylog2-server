@@ -27,6 +27,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 
 /**
  * ChunkedGELFMessage.java: Sep 18, 2010 3:37:43 PM
@@ -38,7 +39,7 @@ import java.util.List;
 public class ChunkedGELFMessage extends GELFMessage {
 
     // <SequenceNumber, Chunk>
-    private HashMap<Integer, GELFClientChunk> chunkMap = new HashMap<Integer, GELFClientChunk>();
+    private Map<Integer, GELFClientChunk> chunkMap = new HashMap<Integer, GELFClientChunk>();
     
     private int sequenceCount = -1;
     private String hash;
@@ -60,7 +61,7 @@ public class ChunkedGELFMessage extends GELFMessage {
         this.chunkMap.put(chunk.getSequenceNumber(), chunk);
     }
 
-    public HashMap<Integer, GELFClientChunk> getChunkMap() {
+    public Map<Integer, GELFClientChunk> getChunkMap() {
         return chunkMap;
     }
 

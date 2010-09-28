@@ -61,7 +61,7 @@ public class GELFHeader {
         if (this.hash == null) {
             String tmp = "";
             for (int i = 0; i < GELFHeader.HEADER_PART_HASH_LENGTH; i++) {
-                tmp += Integer.toString( ( this.rawHeader[i+GELFHeader.HEADER_PART_HASH_START] & 0xff ) + 0x100, 16).substring( 1 );
+                tmp = tmp.concat(Integer.toString( ( this.rawHeader[i+GELFHeader.HEADER_PART_HASH_START] & 0xff ) + 0x100, 16).substring(1));
             }
             this.hash = tmp;
         }

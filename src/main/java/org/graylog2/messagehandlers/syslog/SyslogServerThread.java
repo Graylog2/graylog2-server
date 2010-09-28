@@ -49,8 +49,8 @@ public class SyslogServerThread extends Thread {
      * Start the thread. Runs forever.
      */
     @Override public void run() {
-        String syslog_protocol = Main.masterConfig.getProperty("syslog_protocol");
-        SyslogServerIF syslogServer = SyslogServer.getThreadedInstance(syslog_protocol);
+        String syslogProtocol = Main.masterConfig.getProperty("syslog_protocol");
+        SyslogServerIF syslogServer = SyslogServer.getThreadedInstance(syslogProtocol);
         
         syslogServer.getConfig().setPort(port);
         syslogServer.getConfig().addEventHandler(new SyslogEventHandler());
