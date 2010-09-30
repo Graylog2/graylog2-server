@@ -23,7 +23,7 @@ class Message
 
     (blacklist = BlacklistedTerm.get_all_as_condition_hash(false, id)).blank? ? nil : conditions[:message] = blacklist;
 
-    return self.all :limit => LIMIT, :order => "_id DESC", :conditions => conditions, :offset => self.get_offset(page)
+    return self.all :limit => LIMIT, :order => "_id DESC", :conditions => conditions, :offset => self.get_offset(page), :fields => { :full_message => 0 }
   end
 
   def self.all_with_blacklist page = 1, limit = LIMIT
@@ -33,7 +33,7 @@ class Message
 
     (blacklist = BlacklistedTerm.get_all_as_condition_hash).blank? ? nil : conditions[:message] = blacklist;
 
-    return self.all :limit => limit, :order => "_id DESC", :conditions => conditions, :offset => self.get_offset(page)
+    return self.all :limit => limit, :order => "_id DESC", :conditions => conditions, :offset => self.get_offset(page), :fields => { :full_message => 0 }
   end
 
   def self.all_by_quickfilter filters, page = 1, limit = LIMIT, conditions_only = false
@@ -57,7 +57,7 @@ class Message
 
     return conditions if conditions_only
 
-    return self.all :limit => limit, :order => "_id DESC", :conditions => conditions, :offset => self.get_offset(page)
+    return self.all :limit => limit, :order => "_id DESC", :conditions => conditions, :offset => self.get_offset(page), :fields => { :full_message => 0 }
   end
 
   def self.all_of_stream stream_id, page = 1, conditions_only = false
@@ -94,12 +94,12 @@ class Message
     # Return only conditions hash if requested.
     return conditions if conditions_only === true
 
-    return self.all :limit => LIMIT, :order => "_id DESC", :conditions => conditions, :offset => self.get_offset(page)
+    return self.all :limit => LIMIT, :order => "_id DESC", :conditions => conditions, :offset => self.get_offset(page), :fields => { :full_message => 0 }
   end
 
   def self.all_of_host host, page
     page = 1 if page.blank?
-    return self.all :limit => LIMIT, :order => "_id DESC", :conditions => { "host" => host }, :offset => self.get_offset(page)
+    return self.all :limit => LIMIT, :order => "_id DESC", :conditions => { "host" => host }, :offset => self.get_offset(page), :fields => { :full_message => 0 }
   end
 
   def self.delete_all_of_host host
