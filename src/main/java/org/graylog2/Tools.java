@@ -20,6 +20,15 @@
 
 package org.graylog2;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.UnsupportedEncodingException;
+import java.util.zip.DataFormatException;
+import java.util.zip.GZIPInputStream;
+import java.util.zip.Inflater;
+import java.util.zip.InflaterInputStream;
+
 /**
  * Tools.java: May 17, 2010 9:46:31 PM
  *
@@ -121,6 +130,42 @@ public final class Tools {
         ret += " on " + System.getProperty("os.name");
         ret += " " + System.getProperty("os.version");
         return ret;
+    }
+
+
+    /**
+     * Decompress ZLIB (RFC 1950) compressed data
+     *
+     * @param compressedData
+     * @return A string containing the decompressed data
+     * @throws DataFormatException
+     * @throws UnsupportedEncodingException
+     */
+    public static String decompressZlib(byte[] compressedData) throws IOException {
+        byte[] buffer = new byte[compressedData.length];
+        ByteArrayOutputStream out = new ByteArrayOutputStream();
+        InflaterInputStream in = new InflaterInputStream(new ByteArrayInputStream(compressedData));
+        for (int bytesRead = 0; bytesRead != -1; bytesRead = in.read(buffer)) {
+            out.write(buffer, 0, bytesRead);
+        }
+        return new String(out.toByteArray(), "UTF-8");
+    }
+
+    /**
+     * Decompress GZIP (RFC 1952) compressed data
+     * 
+     * @param compressedData
+     * @return A string containing the decompressed data
+     * @throws IOException
+     */
+    public static String decompressGzip(byte[] compressedData) throws IOException {
+        byte[] buffer = new byte[compressedData.length];
+        ByteArrayOutputStream out = new ByteArrayOutputStream();
+        GZIPInputStream in = new GZIPInputStream(new ByteArrayInputStream(compressedData));
+        for (int bytesRead = 0; bytesRead != -1; bytesRead = in.read(buffer)) {
+            out.write(buffer, 0, bytesRead);
+        }
+        return new String(out.toByteArray(), "UTF-8");
     }
 
 }

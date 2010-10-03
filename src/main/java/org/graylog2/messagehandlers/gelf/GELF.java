@@ -68,6 +68,9 @@ public final class GELF {
      */
     public static final int GELF_HEADER_LENGTH = 38;
 
+    /**
+     * The maximum size of the GELF data part
+     */
     public static final int GELF_DATA_PART_MAX_LENGTH = 8192-GELF_HEADER_LENGTH;
 
     private GELF() { }
@@ -95,7 +98,7 @@ public final class GELF {
 
         int gelfType;
         try {
-            gelfType = GELF.getGELFType(message);
+            gelfType = GELF.getGELFType(message.getData());
         } catch (InvalidGELFCompressionMethodException e) {
             throw new InvalidGELFTypeException("Unknown compression method.");
         }
@@ -113,16 +116,16 @@ public final class GELF {
     }
 
     /**
-     *
-     * @param message
-     * @return
+     * Find out GELF type of given byte array.
+     * @param data
+     * @return GELF.TYPE_[xxx] constants
      * @throws InvalidGELFCompressionMethodException
      */
-    public static int getGELFType(DatagramPacket message) throws InvalidGELFCompressionMethodException {
+    public static int getGELFType(byte[] data) throws InvalidGELFCompressionMethodException {
         // Convert first two byte to string.
         String result = "";
         for (int i=0; i < 2; i++) {
-            result = result.concat(Integer.toString((message.getData()[i] & 0xff) + 0x100, 16).substring(1));
+            result = result.concat(Integer.toString((data[i] & 0xff) + 0x100, 16).substring(1));
         }
 
         if (result.equals(GELF.HEADER_GZIP_COMPRESSION)) {
@@ -140,6 +143,13 @@ public final class GELF {
         throw new InvalidGELFCompressionMethodException();
     }
 
+    /**
+     * Extract the GELF header from a chunked GELF message datagram
+     *
+     * @param message
+     * @return
+     * @throws InvalidGELFHeaderException
+     */
     public static GELFHeader extractGELFHeader(DatagramPacket message) throws InvalidGELFHeaderException {
         if (message.getLength() <= GELF.GELF_HEADER_LENGTH) {
             throw new InvalidGELFHeaderException("Message too short. The GELF header might not even fit here.");
@@ -159,6 +169,14 @@ public final class GELF {
         return new GELFHeader(rawGELFHeader);
     }
 
+    /**
+     * Extract the data part of a chunked GELF message datagram
+     *
+     * @param message
+     * @return
+     * @throws InvalidGELFHeaderException
+     * @throws IOException
+     */
     public static byte[] extractData(DatagramPacket message) throws InvalidGELFHeaderException, IOException {
         if (message.getLength() <= GELF.GELF_HEADER_LENGTH) {
             throw new InvalidGELFHeaderException();

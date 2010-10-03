@@ -20,6 +20,7 @@
 
 package org.graylog2.messagehandlers.gelf;
 
+import org.graylog2.Log;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.JSONValue;
@@ -41,7 +42,13 @@ class GELFClientHandlerBase {
 
     protected GELFClientHandlerBase() { }
 
-    protected void parse(JSONObject json) throws Exception{
+    protected boolean parse() throws Exception{
+        JSONObject json = this.getJSON(this.clientMessage.toString());
+        if (json == null) {
+            Log.warn("JSON is null/could not be parsed (invalid JSON) - clientMessage was: " + this.clientMessage);
+            return false;
+        }
+
         this.message.shortMessage = this.jsonToString(json.get("short_message"));
         this.message.fullMessage = this.jsonToString(json.get("full_message"));
         this.message.level = this.jsonToInt(json.get("level"));
@@ -49,6 +56,8 @@ class GELFClientHandlerBase {
         this.message.host = this.jsonToString(json.get("host"));
         this.message.file = this.jsonToString(json.get("file"));
         this.message.line = this.jsonToInt(json.get("line"));
+
+        return true;
     }
 
     protected JSONObject getJSON(String value) throws Exception {

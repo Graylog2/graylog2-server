@@ -32,40 +32,94 @@ public class GELFClientChunk {
     private String hash = null;
     private byte[] data = null;
     private int sequenceNumber = -1;
-    private int sequenceCount = -1;;
+    private int sequenceCount = -1;
+    private int arrival = -1;
 
+    /**
+     *
+     * @return
+     */
+    public int getArrival() {
+        return arrival;
+    }
+
+    /**
+     *
+     * @param arrival
+     */
+    public void setArrival(int arrival) {
+        this.arrival = arrival;
+    }
+
+    /**
+     *
+     * @return
+     */
     public byte[] getData() {
         return data;
     }
 
+    /**
+     *
+     * @param data
+     */
     public void setData(byte[] data) {
         this.data = data;
     }
 
+    /**
+     *
+     * @return
+     */
     public String getHash() {
         return hash;
     }
 
+    /**
+     *
+     * @param hash
+     */
     public void setHash(String hash) {
         this.hash = hash;
     }
 
+    /**
+     *
+     * @return
+     */
     public int getSequenceCount() {
         return sequenceCount;
     }
 
+    /**
+     *
+     * @param sequenceCount
+     */
     public void setSequenceCount(int sequenceCount) {
         this.sequenceCount = sequenceCount;
     }
 
+    /**
+     *
+     * @return
+     */
     public int getSequenceNumber() {
         return sequenceNumber;
     }
 
+    /**
+     *
+     * @param sequenceNumber
+     */
     public void setSequenceNumber(int sequenceNumber) {
         this.sequenceNumber = sequenceNumber;
     }
 
+    /**
+     *
+     * @return
+     * @throws InvalidGELFChunkException
+     */
     public boolean checkStructure() throws InvalidGELFChunkException {
         if (this.hash == null || this.hash.length() == 0) {
             throw new InvalidGELFChunkException("Invalid GELF chunk: No hash set.");

@@ -21,11 +21,7 @@
 package org.graylog2.messagehandlers.gelf;
 
 import java.io.IOException;
-import java.math.BigInteger;
 import java.net.DatagramPacket;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-import org.graylog2.Log;
 import org.junit.Test;
 import static org.junit.Assert.*;
 
@@ -68,7 +64,7 @@ public class GELFTest {
         // Build a datagram packet.
         DatagramPacket gelfMessage = GELFTestHelper.buildZLIBCompressedDatagramPacket(this.originalMessage);
 
-        assertEquals(GELF.TYPE_ZLIB, GELF.getGELFType(gelfMessage));
+        assertEquals(GELF.TYPE_ZLIB, GELF.getGELFType(gelfMessage.getData()));
     }
 
     /**
@@ -79,7 +75,7 @@ public class GELFTest {
         // Build a datagram packet.
         DatagramPacket gelfMessage = GELFTestHelper.buildGZIPCompressedDatagramPacket(this.originalMessage);
 
-        assertEquals(GELF.TYPE_GZIP, GELF.getGELFType(gelfMessage));
+        assertEquals(GELF.TYPE_GZIP, GELF.getGELFType(gelfMessage.getData()));
     }
 
     /**
@@ -92,7 +88,7 @@ public class GELFTest {
         DatagramPacket invalidGELFMessage = new DatagramPacket(invalidlyEncryptedString.getBytes(), invalidlyEncryptedString.getBytes().length);
 
         // Cause the exception we expect.
-        GELF.getGELFType(invalidGELFMessage);
+        GELF.getGELFType(invalidGELFMessage.getData());
     }
 
     /**
