@@ -20,13 +20,13 @@
 
 package org.graylog2.periodical;
 
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 import org.graylog2.Log;
 import org.graylog2.messagehandlers.gelf.ChunkedGELFClientManager;
 import org.graylog2.messagehandlers.gelf.ChunkedGELFMessage;
+import org.graylog2.messagehandlers.gelf.EmptyGELFMessageException;
 
 /**
  * ChunkedGELFClientManagerThread.java: Sep 20, 2010 9:28:37 PM
@@ -53,9 +53,14 @@ public class ChunkedGELFClientManagerThread extends Thread {
                     ChunkedGELFMessage message = messageMap.get(messageId);
 
                     int fiveSecondsAgo = (int) (System.currentTimeMillis()/1000)-5;
-                    if (message.getFirstChunkArrival() < fiveSecondsAgo) {
-                        Log.info("Dropping incomplete chunked GELF message <" + message.getHash() + ">");
-                        ChunkedGELFClientManager.getInstance().dropMessage(messageId);
+
+                    try {
+                        if (message.getFirstChunkArrival() < fiveSecondsAgo) {
+                            this.dropMessage(messageId);
+                        }
+                    } catch (EmptyGELFMessageException e) {
+                        // getFirstChunkArrival() did not work because first part did not arrive yet. Drop anyways.
+                        this.dropMessage(messageId);
                     }
                     i++;
                 }
@@ -67,6 +72,11 @@ public class ChunkedGELFClientManagerThread extends Thread {
            // Run every 10 seconds.
            try { Thread.sleep(10000); } catch(InterruptedException e) {}
         }
+    }
+
+    public void dropMessage(String messageId) {
+        Log.info("Dropping incomplete chunked GELF message <" + messageId + ">");
+        ChunkedGELFClientManager.getInstance().dropMessage(messageId);
     }
 
 }
