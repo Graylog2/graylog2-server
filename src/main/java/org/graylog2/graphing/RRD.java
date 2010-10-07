@@ -46,9 +46,9 @@ public class RRD {
      */
     public static final int GRAPH_TYPE_TOTAL = 1;
 
-    int type = 0;
-    File rrdFile = null;
-    String rrdFilePath = null;
+    private int type = 0;
+    private File rrdFile = null;
+    private String rrdFilePath = null;
 
     /**
      * @return the path of the RRD storage dir as defined in graylog2.conf

@@ -36,7 +36,7 @@ public class GELFMainThread extends Thread {
 
     private int port = 0;
 
-    ExecutorService threadPool = Executors.newCachedThreadPool();
+    private ExecutorService threadPool = Executors.newCachedThreadPool();
 
     /**
      * Thread responsible for listening for GELF messages.
