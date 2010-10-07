@@ -85,7 +85,7 @@ public final class Log {
     /**
      * Log a message to STDOUT with given severity.
      * @param logMessage The message to log
-     * @param Severity The severity of this message
+     * @param severity
      */
     public static void toStdOut(String logMessage, int severity) {
         if (Main.debugMode) {
@@ -96,7 +96,7 @@ public final class Log {
     
     /**
      * Get the human readable name of a severity
-     * @param Severity The severity
+     * @param severity
      * @return The name of the severity
      */
     public static String severityToString(int severity) {

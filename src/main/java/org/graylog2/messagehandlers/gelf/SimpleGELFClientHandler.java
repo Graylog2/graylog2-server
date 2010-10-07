@@ -30,8 +30,6 @@ import org.graylog2.database.MongoBridge;
 import org.graylog2.messagehandlers.common.MessageCounterHook;
 import org.graylog2.messagehandlers.common.ReceiveHookManager;
 
-import org.json.simple.*;
-
 /**
  * GELFClient.java: Jun 23, 2010 7:15:12 PM
  *
@@ -45,7 +43,6 @@ public class SimpleGELFClientHandler extends GELFClientHandlerBase implements GE
      * Representing a GELF client consisting of only one UDP message.
      * 
      * @param clientMessage The raw data the GELF client sent. (JSON string)
-     * @param threadName The name of the GELFClientHandlerThread that called this.
      * @throws DataFormatException
      * @throws UnsupportedEncodingException
      * @throws InvalidGELFCompressionMethodException

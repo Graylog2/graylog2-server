@@ -37,13 +37,41 @@ public class GELFHeader {
     private int sequenceNumber = -1;
     private int sequenceCount = -1;
 
+    /**
+     * The start byte of the sequence number
+     */
     public static final int HEADER_PART_SEQNUM_START = 34;
+
+    /**
+     * The length of the sequence number
+     */
     public static final int HEADER_PART_SEQNUM_LENGTH = 2;
+
+    /**
+     * The start byte of the sequence count
+     */
     public static final int HEADER_PART_SEQCNT_START = 36;
+
+    /**
+     * The length of the sequence count
+     */
     public static final int HEADER_PART_SEQCNT_LENGTH = 2;
+
+    /**
+     * The start byte of the message hash
+     */
     public static final int HEADER_PART_HASH_START = 2;
+
+    /**
+     * The length of the message hash
+     */
     public static final int HEADER_PART_HASH_LENGTH = 32;
 
+    /**
+     * Representing the header of chunked GELF messages
+     *
+     * @param rawHeader The raw byte array of the header
+     */
     public GELFHeader(byte[] rawHeader) {
         this.rawHeader = rawHeader;
     }
@@ -56,6 +84,13 @@ public class GELFHeader {
         return Integer.parseInt(tmp);
     }
 
+    /**
+     * Get the message hash identifying this message
+     *
+     * @return
+     * @throws InvalidGELFHeaderException
+     * @throws IOException
+     */
     public String getHash() throws InvalidGELFHeaderException, IOException {
 
         if (this.hash == null) {
@@ -69,6 +104,12 @@ public class GELFHeader {
         return this.hash;
     }
 
+    /**
+     * Get the sequence number
+     *
+     * @return
+     * @throws InvalidGELFHeaderException
+     */
     public int getSequenceNumber() throws InvalidGELFHeaderException {
         // Lazy calculate sequence number.
         if (this.sequenceNumber == -1) {
@@ -83,6 +124,12 @@ public class GELFHeader {
         return this.sequenceNumber;
     }
 
+    /**
+     * Get the sequence count
+     * 
+     * @return
+     * @throws InvalidGELFHeaderException
+     */
     public int getSequenceCount() throws InvalidGELFHeaderException {
         // Lazy calculate sequence count.
         if (this.sequenceCount == -1) {

@@ -74,6 +74,12 @@ public class ChunkedGELFClientManagerThread extends Thread {
         }
     }
 
+    /**
+     * Drop a messasge from the ChunkedGELFClientManager message map. Also causes
+     * INFO log message
+     *
+     * @param messageId The message to delete
+     */
     public void dropMessage(String messageId) {
         Log.info("Dropping incomplete chunked GELF message <" + messageId + ">");
         ChunkedGELFClientManager.getInstance().dropMessage(messageId);
