@@ -1,29 +1,17 @@
 development:
-  adapter: mysql
+  adapter: mysql2
   encoding: utf8
   reconnect: false
   database: graylog2_development
   pool: 5
   username: root
-  password: 123123123
-  socket: /var/run/mysqld/mysqld.sock
-
-test:
-  adapter: mysql
-  encoding: utf8
-  reconnect: false
-  database: graylog2_test
-  pool: 5
-  username: root
-  password:
-  socket: /var/run/mysqld/mysqld.sock
+  password: 
 
 production:
-  adapter: mysql
+  adapter: mysql2
   encoding: utf8
   reconnect: false
   database: graylog2_production
   pool: 5
   username: root
   password: 
-  socket: /var/run/mysqld/mysqld.sock

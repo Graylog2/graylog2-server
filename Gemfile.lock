@@ -1,0 +1,52 @@
+GEM
+  remote: http://rubygems.org/
+  remote: http://gems.github.com/
+  specs:
+    actionmailer (2.3.9)
+      actionpack (= 2.3.9)
+    actionpack (2.3.9)
+      activesupport (= 2.3.9)
+      rack (~> 1.1.0)
+    activerecord (2.3.9)
+      activesupport (= 2.3.9)
+    activeresource (2.3.9)
+      activesupport (= 2.3.9)
+    activesupport (2.3.9)
+    bson (1.0.4)
+    bson_ext (1.0.4)
+    jnunemaker-validatable (1.8.4)
+      activesupport (>= 2.3.4)
+    json (1.4.6)
+    mongo (1.0.7)
+      bson (>= 1.0.4)
+    mongo_mapper (0.8.3)
+      activesupport (>= 2.3.4)
+      jnunemaker-validatable (~> 1.8.4)
+      plucky (~> 0.3.3)
+    mysql2 (0.2.4)
+    plucky (0.3.4)
+      mongo (~> 1.0.7)
+    rack (1.1.0)
+    rails (2.3.9)
+      actionmailer (= 2.3.9)
+      actionpack (= 2.3.9)
+      activerecord (= 2.3.9)
+      activeresource (= 2.3.9)
+      activesupport (= 2.3.9)
+      rake (>= 0.8.3)
+    rake (0.8.7)
+
+PLATFORMS
+  ruby
+
+DEPENDENCIES
+  bson (= 1.0.4)
+  bson_ext (= 1.0.4)
+  jnunemaker-validatable (= 1.8.4)
+  json (= 1.4.6)
+  mongo (= 1.0.7)
+  mongo_mapper (= 0.8.3)
+  mysql2 (= 0.2.4)
+  plucky (= 0.3.4)
+  rack (= 1.1.0)
+  rails (~> 2.3.5)
