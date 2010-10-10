@@ -7,6 +7,7 @@
     <groupId>org.graylog2</groupId>
     <artifactId>graylog2-server</artifactId>
     <version>0.9.3-SNAPSHOT</version>
+    <packaging>jar</packaging>
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -62,6 +63,17 @@
                     <excludes>
                         <exclude>**/*IntegrationTest.java</exclude>
                     </excludes>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-jar-plugin</artifactId>
+                <configuration>
+                    <archive>
+                        <manifest>
+                            <mainClass>org.graylog2.Main</mainClass>
+                        </manifest>
+                    </archive>
                 </configuration>
             </plugin>
         </plugins>
