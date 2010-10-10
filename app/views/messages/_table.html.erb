@@ -44,7 +44,10 @@
   <% unless current_page <= 1 %>
     <a href="<%=h build_controller_action_uri 'page' %><%= previous_page %>" class="previous-page">previous page</a>
   <% end %>
-  <a href="<%=h build_controller_action_uri 'page' %><%= next_page  %>" class="next-page">next page</a>
+
+  <% if total_messages > (Message::LIMIT*current_page) %>
+    <a href="<%=h build_controller_action_uri 'page' %><%= next_page  %>" class="next-page">next page</a>
+  <% end %>
 </div>
 
 <br style="clear: both;" />

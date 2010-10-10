@@ -8,6 +8,7 @@ class HostsController < ApplicationController
   def show
     @host = Host.find_by_host Base64.decode64(params[:id])
     @messages = Message.all_of_host @host.host, params[:page]
+    @total_count = Message.count_of_host @host.host
 
     if @host.blank?
       flash[:error] = "<strong>Unknown host</strong> <span>Could not find host</span>"

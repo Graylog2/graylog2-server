@@ -29,5 +29,5 @@
 </div>
 
 <% unless @blacklist.blacklisted_terms.blank? %>
-  <%= render :partial => "messages/table", :locals => { :messages => @messages } %>
+  <%= render :partial => "messages/table", :locals => { :messages => @messages, :total_messages => @total_count } %>
 <% end %>

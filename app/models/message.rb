@@ -26,13 +26,21 @@ class Message
     return self.all :limit => LIMIT, :order => "_id DESC", :conditions => conditions, :offset => self.get_offset(page), :fields => { :full_message => 0 }
   end
 
+  def self.count_of_blacklist id
+    conditions = Hash.new
+
+    (blacklist = BlacklistedTerm.get_all_as_condition_hash(false, id)).blank? ? nil : conditions[:message] = blacklist;
+    
+    return self.count :conditions => conditions
+  end
+
   def self.all_with_blacklist page = 1, limit = LIMIT
     page = 1 if page.blank?
 
     conditions = Hash.new
 
     (blacklist = BlacklistedTerm.get_all_as_condition_hash).blank? ? nil : conditions[:message] = blacklist;
-
+logger.info self.get_offset(page)
     return self.all :limit => limit, :order => "_id DESC", :conditions => conditions, :offset => self.get_offset(page), :fields => { :full_message => 0 }
   end
 
@@ -97,9 +105,18 @@ class Message
     return self.all :limit => LIMIT, :order => "_id DESC", :conditions => conditions, :offset => self.get_offset(page), :fields => { :full_message => 0 }
   end
 
+  def self.count_stream stream_id
+    conditions = self.all_of_stream stream_id, 0, true
+    return self.count :conditions => conditions
+  end
+
   def self.all_of_host host, page
     page = 1 if page.blank?
     return self.all :limit => LIMIT, :order => "_id DESC", :conditions => { "host" => host }, :offset => self.get_offset(page), :fields => { :full_message => 0 }
+  end
+
+  def self.count_of_host host
+    return self.count :conditions => { "host" => host }
   end
 
   def self.delete_all_of_host host
@@ -122,7 +139,7 @@ class Message
     if page.to_i <= 1
       return 0
     else
-      return (LIMIT*page.to_i)
+      return (LIMIT*(page.to_i-1))
     end
   end
 

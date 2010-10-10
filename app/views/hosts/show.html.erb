@@ -7,4 +7,4 @@
 Messages from <span class="highlighted"><%= gl_date(Time.at(@last_message.created_at).to_s) %></span> available
 for this host.
 
-<%= render :partial => "messages/table", :locals => { :messages => @messages } %>
+<%= render :partial => "messages/table", :locals => { :messages => @messages, :total_messages => @total_count } %>
