@@ -153,6 +153,7 @@ public class MongoBridge {
                 if (host != null && host.length() > 0) {
                     // Get message count of this host.
                     BasicDBObject countQuery = new BasicDBObject();
+                    countQuery.put("deleted", false);
                     countQuery.put("host", host);
                     long messageCount = messages.getCount(countQuery);
 
