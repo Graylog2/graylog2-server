@@ -1,6 +1,8 @@
 log/*
 nbproject/*
 config/database.yml
+config/mongodb.yml
+config/graphs.yml
 
 build/builds/*
 build/logs/*
