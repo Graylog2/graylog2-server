@@ -1,11 +1,11 @@
-# osx
 development:
   enable_graphs: true
-  rrdtool_binary_path: /usr/local/bin/rrdtool
+  rrdtool_binary_path: /usr/bin/rrdtool
   rrd_storage_path: /tmp/rrd/
 
-# ubuntu  
 production:
   enable_graphs: true
   rrdtool_binary_path: /usr/bin/rrdtool
-  rrd_storage_path: /var/lib/rrd
+  rrd_storage_path: /var/graylog2/rrds/
+
+# osx rrdtool_binary_path is /usr/local/bin/rrdtool
