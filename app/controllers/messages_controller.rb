@@ -33,7 +33,7 @@ class MessagesController < ApplicationController
       conditions = Message.all_by_quickfilter(filters_with_symbols, 0, 0, true)
       throw "Missing conditions" if conditions.blank?
 
-      Message.delete_all(conditions)
+      Message.set(conditions, :deleted => true )
 
       flash[:notice] = "Messages have been deleted."
     rescue
@@ -48,7 +48,7 @@ class MessagesController < ApplicationController
       conditions = Message.all_of_stream params[:id].to_i, 0, true
       throw "Missing conditions" if conditions.blank?
 
-      Message.delete_all(conditions)
+      Message.set(conditions, :deleted => true )
 
       flash[:notice] = "Messages have been deleted."
     rescue

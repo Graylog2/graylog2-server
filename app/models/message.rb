@@ -6,6 +6,7 @@ class Message
   key :host, String
   key :level, Integer
   key :facility, Integer
+  key :deleted, Boolean
 
   # GELF fields
   key :gelf, Boolean
@@ -23,6 +24,8 @@ class Message
 
     (blacklist = BlacklistedTerm.get_all_as_condition_hash(false, id)).blank? ? nil : conditions[:message] = blacklist;
 
+    conditions[:deleted] = false
+
     return self.all :limit => LIMIT, :order => "_id DESC", :conditions => conditions, :offset => self.get_offset(page), :fields => { :full_message => 0 }
   end
 
@@ -30,6 +33,7 @@ class Message
     conditions = Hash.new
 
     (blacklist = BlacklistedTerm.get_all_as_condition_hash(false, id)).blank? ? nil : conditions[:message] = blacklist;
+    conditions[:deleted] = false
     
     return self.count :conditions => conditions
   end
@@ -40,7 +44,9 @@ class Message
     conditions = Hash.new
 
     (blacklist = BlacklistedTerm.get_all_as_condition_hash).blank? ? nil : conditions[:message] = blacklist;
-logger.info self.get_offset(page)
+    
+    conditions[:deleted] = false
+    
     return self.all :limit => limit, :order => "_id DESC", :conditions => conditions, :offset => self.get_offset(page), :fields => { :full_message => 0 }
   end
 
@@ -62,6 +68,8 @@ logger.info self.get_offset(page)
       # Host
       filters[:host].blank? ? nil : conditions[:host] = filters[:host]
     end
+
+    conditions[:deleted] = false
 
     return conditions if conditions_only
 
@@ -98,6 +106,8 @@ logger.info self.get_offset(page)
 
      # Filter by severity.
     (by_severity = Streamrule.get_severity_condition_hash(stream_id)).blank? ? nil : conditions[:level] = by_severity;
+    
+    conditions[:deleted] = false
 
     # Return only conditions hash if requested.
     return conditions if conditions_only === true
@@ -107,20 +117,21 @@ logger.info self.get_offset(page)
 
   def self.count_stream stream_id
     conditions = self.all_of_stream stream_id, 0, true
+    conditions[:deleted] = false
     return self.count :conditions => conditions
   end
 
   def self.all_of_host host, page
     page = 1 if page.blank?
-    return self.all :limit => LIMIT, :order => "_id DESC", :conditions => { "host" => host }, :offset => self.get_offset(page), :fields => { :full_message => 0 }
+    return self.all :limit => LIMIT, :order => "_id DESC", :conditions => { :host => host, :deleted => false }, :offset => self.get_offset(page), :fields => { :full_message => 0 }
   end
 
   def self.count_of_host host
-    return self.count :conditions => { "host" => host }
+    return self.count :conditions => { :host => host, :deleted => false }
   end
 
   def self.delete_all_of_host host
-    self.delete_all :conditions => { "host" => host }
+    self.delete_all :conditions => { :host => host, :deleted => false }
   end
 
   def self.count_of_last_minutes x
@@ -129,6 +140,7 @@ logger.info self.get_offset(page)
     (blacklist = BlacklistedTerm.get_all_as_condition_hash).blank? ? nil : conditions[:message] = blacklist;
 
     conditions[:created_at] = { '$gt' => (x.minutes.ago).to_i }
+    conditions[:deleted] = false
 
     return self.count :conditions => conditions
   end
