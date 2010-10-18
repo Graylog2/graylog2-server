@@ -26,7 +26,7 @@ class ApplicationController < ActionController::Base
     end
 
     # Default 500 error.
-    logger.error "ERROR: #{e.to_str}"
+    logger.error "ERROR: #{e.to_s}"
     render :file  => "#{RAILS_ROOT}/public/500.html", :status => 500
   end
 

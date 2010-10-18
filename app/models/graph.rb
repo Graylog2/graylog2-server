@@ -3,7 +3,7 @@ class Graph
 
   def self.get_title graph_type
     case graph_type
-      when self::GRAPH_TYPE_TOTAL:
+      when self::GRAPH_TYPE_TOTAL then
           return "Total messages received"
     end
 
