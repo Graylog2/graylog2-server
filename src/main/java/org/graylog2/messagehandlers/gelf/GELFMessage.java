@@ -20,6 +20,9 @@
 
 package org.graylog2.messagehandlers.gelf;
 
+import java.util.HashMap;
+import java.util.Map;
+
 /**
  * GELFMessage.java: Jul 20, 2010 6:57:28 PM
  *
@@ -29,41 +32,137 @@ package org.graylog2.messagehandlers.gelf;
  */
 public class GELFMessage {
 
-    /**
-     * Short message
-     */
-    public String shortMessage = null;
+    private String shortMessage = null;
+    private String fullMessage = null;
+    private int level = 0;
+    private String host = null;
+    private String file = null;
+    private int line = 0;
+    private Map<String, String> additionalData = new HashMap<String, String>();
 
     /**
-     * Full message. i.e. for Stacktracke and environment variables.
+     * Get the short message
+     * 
+     * @return
      */
-    public String fullMessage = null;
+    public String getShortMessage() {
+        return shortMessage;
+    }
 
     /**
-     * The severity level. Follows BSD Syslog RFC
+     * Set the short message
+     *
+     * @param shortMessage
      */
-    public int    level = 0;
+    public void setShortMessage(String shortMessage) {
+        this.shortMessage = shortMessage;
+    }
 
     /**
-     * Type. Currently not used.
+     * Get the full message. i.e. for Stacktracke and environment variables.
+     *
+     * @return
      */
-    public int    type = 0;
+    public String getFullMessage() {
+        return fullMessage;
+    }
 
     /**
-     * Hostname
+     * Set the full message. i.e. for Stacktracke and environment variables.
+     *
+     * @param fullMessage
      */
-    public String host = null;
+    public void setFullMessage(String fullMessage) {
+        this.fullMessage = fullMessage;
+    }
 
     /**
-     * File
+     * Get the hostname
+     *
+     * @return
      */
-    public String file = null;
+    public String getHost() {
+        return host;
+    }
 
     /**
-     * Line of file
+     * Set the hostname
+     *
+     * @param host
      */
-    public int    line = 0;
+    public void setHost(String host) {
+        this.host = host;
+    }
 
+    /**
+     * Get the severity level. Follows BSD Syslog RFC
+     *
+     * @return
+     */
+    public int getLevel() {
+        return level;
+    }
+
+    /**
+     * Set the severity level. Follows BSD Syslog RFC
+     *
+     * @param level
+     */
+    public void setLevel(int level) {
+        this.level = level;
+    }
+
+    /**
+     * Get filename
+     * 
+     * @return
+     */
+    public String getFile() {
+        return file;
+    }
+
+    /**
+     * Set filename
+     *
+     * @param file
+     */
+    public void setFile(String file) {
+        this.file = file;
+    }
+
+    /**
+     * Get line number
+     *
+     * @return
+     */
+    public int getLine() {
+        return line;
+    }
+
+    /**
+     * Set line number
+     *
+     * @param line
+     */
+    public void setLine(int line) {
+        this.line = line;
+    }
+
+    /**
+     * Get additional data map. (Fully user defined key/value pairs)
+     *
+     * @return The whole additional data map.
+     */
+    public Map<String, String> getAdditionalData() {
+        return this.additionalData;
+    }
+
+    /**
+     * Add a key/value pair
+     */
+    public void addAdditionalData(String key, String value) {
+        this.additionalData.put(key, value);
+    }
 
     /**
      * @return Human readable, descriptive and formatted string of this GELF message.
@@ -72,17 +171,17 @@ public class GELFMessage {
         String str = "shortMessage: " + shortMessage + " | ";
         str += "fullMessage: " + fullMessage + " | ";
         str += "level: " + level + " | ";
-        str += "type: " + type + " | ";
         str += "host: " + host + " | ";
         str += "file: " + file + " | ";
-        str += "line: " + line;
+        str += "line: " + line + " | ";
+        str += "additional: " + this.additionalData.size();
 
         // Replace all newlines and tabs.
         String ret = str.replaceAll("\\n", "").replaceAll("\\t", "");
 
         // Cut to 100 chars if the message is too long.
-        if (ret.length() > 150) {
-            ret = ret.substring(0, 150);
+        if (ret.length() > 225) {
+            ret = ret.substring(0, 225);
             ret += " (...)";
         }
 

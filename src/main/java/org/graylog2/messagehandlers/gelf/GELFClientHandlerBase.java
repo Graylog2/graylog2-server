@@ -20,6 +20,10 @@
 
 package org.graylog2.messagehandlers.gelf;
 
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Set;
 import org.graylog2.Log;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
@@ -37,10 +41,19 @@ import org.json.simple.JSONValue;
  */
 class GELFClientHandlerBase {
 
+    private List<String> standardFields = new ArrayList<String>();
+
     protected String clientMessage = null;
     protected GELFMessage message = new GELFMessage();
 
-    protected GELFClientHandlerBase() { }
+    protected GELFClientHandlerBase() {
+        this.standardFields.add("short_message");
+        this.standardFields.add("full_message");
+        this.standardFields.add("level");
+        this.standardFields.add("host");
+        this.standardFields.add("file");
+        this.standardFields.add("line");
+    }
 
     protected boolean parse() throws Exception{
         JSONObject json = this.getJSON(this.clientMessage.toString());
@@ -49,13 +62,28 @@ class GELFClientHandlerBase {
             return false;
         }
 
-        this.message.shortMessage = this.jsonToString(json.get("short_message"));
-        this.message.fullMessage = this.jsonToString(json.get("full_message"));
-        this.message.level = this.jsonToInt(json.get("level"));
-        this.message.type = this.jsonToInt(json.get("type"));
-        this.message.host = this.jsonToString(json.get("host"));
-        this.message.file = this.jsonToString(json.get("file"));
-        this.message.line = this.jsonToInt(json.get("line"));
+        // Add standard fields.
+        this.message.setShortMessage(this.jsonToString(json.get("short_message")));
+        this.message.setFullMessage(this.jsonToString(json.get("full_message")));
+        this.message.setLevel(this.jsonToInt(json.get("level")));
+        this.message.setHost(this.jsonToString(json.get("host")));
+        this.message.setFile(this.jsonToString(json.get("file")));
+        this.message.setLine(this.jsonToInt(json.get("line")));
+
+        // Add additional data if there is some.
+        Set<String> set = json.keySet();
+        Iterator<String> iter = set.iterator();
+        while(iter.hasNext()) {
+            String key = iter.next();
+
+            // Skip standard fields.
+            if (this.standardFields.contains(key)) {
+                continue;
+            }
+
+            // Add to message.
+            this.message.addAdditionalData(key, this.jsonToString(json.get(key)));
+        }
 
         return true;
     }

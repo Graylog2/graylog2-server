@@ -106,13 +106,13 @@ public class MongoBridgeIntegrationTest {
     @Test
     public void testInsertGelfMessage() throws Exception {
         GELFMessage message = new GELFMessage();
-        message.shortMessage = "gelftest";
-        message.fullMessage = "full gelftest\nstuff";
-        message.level = 1;
-        message.type = 8;
-        message.host = "junit-test";
-        message.file = "junit-testfile";
-        message.line = 9001;
+        message.setShortMessage("gelftest");
+        message.setFullMessage("full gelftest\nstuff");
+        message.setLevel(1);
+        message.setHost("junit-test");
+        message.setFile("junit-testfile");
+        message.setLine(9001);
+        message.addAdditionalData("something", "yepp");
 
         // Insert the message.
         MongoBridge instance = new MongoBridge();
@@ -131,6 +131,7 @@ public class MongoBridgeIntegrationTest {
         assertEquals(res.get("host"), "junit-test");
         assertEquals(res.get("file"), "junit-testfile");
         assertEquals(res.get("line"), 9001);
+        assertEquals(res.get("something"), "yepp");
     }
 
     /**
@@ -143,12 +144,12 @@ public class MongoBridgeIntegrationTest {
 
         // Insert a message.
         GELFMessage message = new GELFMessage();
-        message.shortMessage = "test";
-        message.host = "host1";
+        message.setShortMessage("test");
+        message.setHost("host1");
         m.insertGelfMessage(message);
 
         // Second message from another host
-        message.host = "host2";
+        message.setHost("host2");
         m.insertGelfMessage(message);
 
         // Distinct the hosts.

@@ -23,10 +23,13 @@ package org.graylog2.database;
 import com.mongodb.DBCollection;
 import com.mongodb.BasicDBObject;
 import com.mongodb.BasicDBObjectBuilder;
+import java.util.Iterator;
 
 import org.graylog2.Log;
 
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import org.graylog2.Main;
 import org.graylog2.messagehandlers.gelf.GELFMessage;
 
@@ -98,7 +101,7 @@ public class MongoBridge {
      */
     public void insertGelfMessage(GELFMessage message) throws Exception {
         // Check if all required parameters are set.
-        if (message.shortMessage == null || message.shortMessage.length() == 0 || message.host == null || message.host.length() == 0) {
+        if (message.getShortMessage() == null || message.getShortMessage().length() == 0 || message.getHost() == null || message.getHost().length() == 0) {
             throw new Exception("Missing GELF message parameters. short_message and host are required.");
         }
         DBCollection coll = this.getMessagesColl();
@@ -106,14 +109,24 @@ public class MongoBridge {
         BasicDBObject dbObj = new BasicDBObject();
 
         dbObj.put("gelf", true);
-        dbObj.put("message", message.shortMessage);
-        dbObj.put("full_message", message.fullMessage);
-        dbObj.put("type", message.type);
-        dbObj.put("file", message.file);
-        dbObj.put("line", message.line);
-        dbObj.put("host", message.host);
+        dbObj.put("message", message.getShortMessage());
+        dbObj.put("full_message", message.getFullMessage());
+        dbObj.put("file", message.getFile());
+        dbObj.put("line", message.getLine());
+        dbObj.put("host", message.getHost());
         dbObj.put("facility", null);
-        dbObj.put("level", message.level);
+        dbObj.put("level", message.getLevel());
+
+        // Add additional fields.
+        Map<String,String> additionalFields = message.getAdditionalData();
+        Set<String> set = additionalFields.keySet();
+        Iterator<String> iter = set.iterator();
+        while(iter.hasNext()) {
+            String key = iter.next();
+            String value = additionalFields.get(key);
+            dbObj.put(key, value);
+        }
+
         dbObj.put("created_at", (int) (System.currentTimeMillis()/1000));
         // Documents in capped collections cannot grow so we have to do that now and cannot just add 'deleted => true' later.
         dbObj.put("deleted", false);

@@ -146,6 +146,7 @@ public class ChunkedGELFClientHandler extends GELFClientHandlerBase implements G
             ReceiveHookManager.postProcess(new MessageCounterHook());
         } catch(Exception e) {
             Log.warn("Could not handle GELF client: " + e.toString());
+            e.printStackTrace();
             return false;
         }
 
