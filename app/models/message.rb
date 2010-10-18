@@ -145,6 +145,24 @@ class Message
     return self.count :conditions => conditions
   end
 
+  def has_additional_fields
+    return true if self.additional_fields.count > 0
+    return false
+  end
+  
+  def additional_fields
+    additional = Array.new
+
+    standard_fields = [ "created_at", "full_message", "line", "level", "_id", "deleted", "facility", "date", "type", "gelf", "file", "host", "message" ]
+
+    self.keys.each do |key, value|
+      next if standard_fields.include? key
+      additional << { :key => key, :value => self[key] }
+    end
+
+    return additional
+  end
+
   private
 
   def self.get_offset page
@@ -154,6 +172,5 @@ class Message
       return (LIMIT*(page.to_i-1))
     end
   end
-
 
 end

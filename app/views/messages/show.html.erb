@@ -25,11 +25,19 @@
     <% end %>
   </dl>
 
-
   <% unless @message.message.blank? %>
     <fieldset class="messages-show-message">
       <legend>Message:</legend>
       <p><%=h @message.message %></p>
+    </fieldset>
+  <% end %>
+
+  <% if @message.has_additional_fields %>
+    <fieldset class="messages-show-message">
+      <legend>Additional fields:</legend>
+      <% @message.additional_fields.each do |field| %>
+        <%=h field[:key] %>: <%=h field[:value] %><br />
+      <% end %>
     </fieldset>
   <% end %>
 
