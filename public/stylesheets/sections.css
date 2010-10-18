@@ -101,7 +101,7 @@
     font-family: 'Lucida Grande',Verdana,sans-serif;
 }
 
-#messages-show-message-full {
+.messages-show-message-full {
     font-size: 11px;
     font-family: monospace;
     line-height: 11px;
