@@ -89,6 +89,8 @@ public class MongoBridge {
         dbObj.put("facility", event.getFacility());
         dbObj.put("level", event.getLevel());
         dbObj.put("created_at", (int) (System.currentTimeMillis()/1000));
+        // Documents in capped collections cannot grow so we have to do that now and cannot just add 'deleted => true' later.
+        dbObj.put("deleted", false);
 
         coll.insert(dbObj);
     }
