@@ -10,7 +10,8 @@ gem 'jnunemaker-validatable', '1.8.4'
 gem 'plucky', '0.3.4'
 gem 'mongo_mapper', '0.8.3'
 gem 'mysql2', '0.2.4'
-gem 'rack', '1.1.0'
+gem 'rack'
+gem 'SyslogLogger', '1.4.0'
 
 group :development do
   # bundler requires these gems in development
