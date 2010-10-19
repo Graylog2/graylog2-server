@@ -9,6 +9,8 @@ module StreamsHelper
         return "Severity"
       when Streamrule::TYPE_FACILITY then
         return "Facility"
+      when Streamrule::TYPE_TIMEFRAME then
+        return "Timeframe"
     end
     return "Invalid Rule"
   end
