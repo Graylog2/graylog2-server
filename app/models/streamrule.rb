@@ -9,10 +9,12 @@ class Streamrule < ActiveRecord::Base
   TYPE_HOST = 2
   TYPE_SEVERITY = 3
   TYPE_FACILITY = 4
+  TYPE_TIMEFRAME = 5
 
   def self.get_types_for_select_options
     {
       "Message" => self::TYPE_MESSAGE,
+      "Timeframe" => self::TYPE_TIMEFRAME,
       "Host" => self::TYPE_HOST,
       "Severity" => self::TYPE_SEVERITY,
       "Facility" => self::TYPE_FACILITY
@@ -85,6 +87,18 @@ class Streamrule < ActiveRecord::Base
     end
 
     return { "$in" => conditions }
+  end
+  
+  def self.get_timeframe_condition_hash stream_id = nil
+    if stream_id.blank?
+      return nil
+    end
+
+    timeframe = self.find_all_by_stream_id_and_rule_type stream_id, self::TYPE_TIMEFRAME
+
+    return nil if timeframe.blank?
+
+    return Message.get_conditions_from_date(timeframe.first.value)
   end
 
 end

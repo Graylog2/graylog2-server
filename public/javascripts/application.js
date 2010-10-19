@@ -59,6 +59,9 @@ $(document).ready(function(){
             case '4':
                 field = $('.stream-value-facility');
                 break;
+            case '5':
+                field = $('.stream-value-timeframe');
+                break;
         }
         field.removeAttr("disabled");
         field.show();
