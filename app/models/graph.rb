@@ -40,7 +40,7 @@ class Graph
     build_string += " DEF:mymessages=#{self.rrd_storage_path}/#{name}.rrd:messages:AVERAGE"
     build_string += " LINE1:mymessages#FD0C99"
     build_string += " --title \"#{title} - #{Time.now}\""
-    build_string += " --width 750 --height 120"
+    build_string += " --width 550 --height 120"
     build_string += " --color BACK#FFFFFF --color CANVAS#FFFFFF --color SHADEA#FFFFFF --color SHADEB#FFFFFF"
 
     # Execute
