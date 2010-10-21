@@ -231,6 +231,10 @@
   float: right;
 }
 
+#hosts-new-hostgroup-link {
+  margin-bottom: 10px;
+}
+
 /* Statistics */
 #statistics {
     text-transform: uppercase;
