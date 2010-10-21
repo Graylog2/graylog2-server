@@ -25,7 +25,6 @@
     <% end %>
   </dl>
 
-
   <% unless @message.message.blank? %>
     <fieldset class="messages-show-message">
       <legend>Message:</legend>
@@ -33,11 +32,22 @@
     </fieldset>
   <% end %>
 
+  <% if @message.has_additional_fields %>
+    <fieldset class="messages-show-message">
+      <legend>Additional fields:</legend>
+      <p class="messages-show-message-full">
+        <% @message.additional_fields.each do |field| %>
+          <%=h field[:key] %>: <%=h field[:value] %><br />
+        <% end %>
+      </p>
+    </fieldset>
+  <% end %>
+
   <% unless @message.full_message.blank? %>
     <fieldset class="messages-show-message">
       <legend>Full message:</legend>
       <% escaped_fullmsg = h(@message.full_message) %>
-      <p id="messages-show-message-full"><%= escaped_fullmsg.gsub(/\n/, '<br />') %></p>
+      <p class="messages-show-message-full"><%= escaped_fullmsg.gsub(/\n/, '<br />') %></p>
     </fieldset>
   <% end %>
 
