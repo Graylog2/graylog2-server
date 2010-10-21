@@ -9,7 +9,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20100706201650) do
+ActiveRecord::Schema.define(:version => 20101023192804) do
 
   create_table "blacklisted_terms", :force => true do |t|
     t.string   "term"
@@ -27,6 +27,19 @@ ActiveRecord::Schema.define(:version => 20100706201650) do
   create_table "favorited_streams", :force => true do |t|
     t.integer  "stream_id"
     t.integer  "user_id"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
+  create_table "hostgroup_hosts", :force => true do |t|
+    t.integer  "hostgroup_id"
+    t.string   "hostname"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
+  create_table "hostgroups", :force => true do |t|
+    t.string   "name"
     t.datetime "created_at"
     t.datetime "updated_at"
   end
