@@ -72,4 +72,5 @@ dd {
 #rememberme input {
     position: relative;
     top: 2px;
+    width: 15px;
 }
