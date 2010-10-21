@@ -1,12 +1,14 @@
-<div id="users-new" class="users-form">
-
 <h1>Create new user</h1>
 <% @user.password = @user.password_confirmation = nil %>
+
+<div class="description">
+  Use this form to create a new user that can log in to the web interface.
+</div>
 
 <%= error_messages_for :user %>
 <% form_for :user, :url => { :action => 'create' } do |f| -%>
 
-<dl>
+<dl id="users-form">
   <dt><%= label_tag 'login', "Username" %></dt>
   <dd><%= f.text_field :login %></dd>
 
@@ -20,8 +22,6 @@
   <dd><%= f.password_field :password_confirmation %></dd>
 
   <dt>&nbsp;</dt>
-  <dd><%= submit_tag 'Create' %></dd>
+  <dd><%= submit_tag 'Create user' %></dd>
 </dl>
 <% end -%>
-
-</div>

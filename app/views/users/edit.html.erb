@@ -12,7 +12,7 @@
 <%= error_messages_for :user %>
 <% form_for :user, :url => { :action => 'update', :id => @user.id } do |f| -%>
 
-<dl>
+<dl id="users-form">
   <dt><%= label_tag 'email' %></dt>
   <dd><%= f.text_field :email %></dd>
 
@@ -23,7 +23,7 @@
   <dd><%= f.password_field :password_confirmation %></dd>
 
   <dt>&nbsp;</dt>
-  <dd><%= submit_tag 'Edit' %></dd>
+  <dd><%= submit_tag 'Edit user' %></dd>
 </dl>
 <% end -%>
 </div>
