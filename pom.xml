@@ -27,11 +27,6 @@
             <version>1.1</version>
         </dependency>
         <dependency>
-            <groupId>org.mongodb</groupId>
-            <artifactId>mongo-java-driver</artifactId>
-            <version>1.4</version>
-        </dependency>
-        <dependency>
             <groupId>org.clojars.amit</groupId>
             <artifactId>syslog4j</artifactId>
             <version>0.9.37</version>
@@ -41,6 +36,11 @@
             <artifactId>junit</artifactId>
             <version>4.8.1</version>
             <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.mongodb</groupId>
+            <artifactId>mongo-java-driver</artifactId>
+            <version>2.2</version>
         </dependency>
     </dependencies>
 
@@ -94,3 +94,5 @@
     <name>graylog2-server</name>
     <description>http://www.graylog2.org/</description>
 </project>
+
+

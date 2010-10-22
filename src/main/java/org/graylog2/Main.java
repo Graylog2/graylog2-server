@@ -77,7 +77,6 @@ public final class Main {
         requiredConfigFields.add("mongodb_useauth");
         requiredConfigFields.add("mongodb_user");
         requiredConfigFields.add("mongodb_password");
-        requiredConfigFields.add("mongodb_host");
         requiredConfigFields.add("mongodb_database");
         requiredConfigFields.add("mongodb_port");
         requiredConfigFields.add("messages_collection_size");
@@ -95,6 +94,12 @@ public final class Main {
                 System.out.println("Missing configuration variable '" + requiredConfigField + "' - Terminating. (" + e.toString() + ")");
                 System.exit(1); // Exit with error.
             }
+        }
+
+        // Check if a MongoDB replica set or host is defined.
+        if (Main.masterConfig.getProperty("mongodb_host") == null && Main.masterConfig.getProperty("mongodb_replica_set") == null) {
+            System.out.println("No MongoDB host (mongodb_host) or replica set (mongodb_replica_set) defined. Terminating.");
+            System.exit(1); // Exit with error.
         }
 
         // Is the syslog_procotol valid? ("tcp"/"udp")
@@ -137,7 +142,8 @@ public final class Main {
                     Main.masterConfig.getProperty("mongodb_host"),
                     Main.masterConfig.getProperty("mongodb_database"),
                     Integer.valueOf(Main.masterConfig.getProperty("mongodb_port")),
-                    Main.masterConfig.getProperty("mongodb_useauth")
+                    Main.masterConfig.getProperty("mongodb_useauth"),
+                    Configuration.getMongoDBReplicaSetServers(Main.masterConfig)
             );
         } catch (Exception e) {
             System.out.println("Could not create MongoDB connection: " + e.toString());
