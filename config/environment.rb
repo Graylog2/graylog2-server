@@ -13,7 +13,6 @@ Rails::Initializer.run do |config|
   config.gem 'plucky', :version => '0.3.4' # Dependency of mongo_mapper
   config.gem 'mysql', :version => '2.8.1'
   config.gem 'rack', :version => '1.1.0'
-  config.gem 'chronic', :version => '0.2.3'
 
   config.time_zone = 'Berlin'
 end

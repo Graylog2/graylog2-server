@@ -17,23 +17,6 @@ class Message
 
   LIMIT = 100
 
-  def self.get_conditions_from_date(timeframe)
-    conditions = {}
-    re = /^(from (.+)){0,1}?(to (.+))$/
-    re2 = /^(from (.+))$/
-    
-    if (matches = (re.match(timeframe) or re2.match(timeframe)))
-    
-      from = matches[2]
-      to = matches[4]
-      
-      conditions.merge!('$gt' => Chronic::parse(from).to_i) unless from.blank?
-      conditions.merge!('$lt' => Chronic::parse(to).to_i) unless to.blank?
-    end
-    
-    return conditions
-  end
-  
   def self.all_of_blacklist id, page = 1
     page = 1 if page.blank?
     
@@ -76,19 +59,6 @@ class Message
       # Message
       filters[:message].blank? ? nil : conditions[:message] = /#{Regexp.escape(filters[:message])}/
 
-      # Time Frame
-      filters[:date].blank? ? nil : conditions[:created_at] = get_conditions_from_date(filters[:date])
-      
-      #unless filters[:date_from].blank?
-      #  from = Chronic::parse(filters[:date_from]).to_i
-      #  conditions[:created_at] = {'$gt' => from}
-      #end
-      
-      #unless filters[:date_to].blank?
-      #  to = Chronic::parse(filters[:date_to]).to_i
-      #  (conditions[:created_at] ||= {}).merge!({'$lt' => to})
-      #end
-      
       # Facility
       filters[:facility].blank? ? nil : conditions[:facility] = filters[:facility].to_i
 
@@ -136,9 +106,6 @@ class Message
 
      # Filter by severity.
     (by_severity = Streamrule.get_severity_condition_hash(stream_id)).blank? ? nil : conditions[:level] = by_severity;
-    
-    # Filter by timeframe
-    (by_timeframe = Streamrule.get_timeframe_condition_hash(stream_id)).blank? ? nil : conditions[:created_at] = by_timeframe;
     
     conditions[:deleted] = [false, nil]
 
