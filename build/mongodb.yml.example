@@ -1,6 +1,6 @@
 production:
   hostname: localhost
-  database: graylog2_development
+  database: graylog2
   port: 27017
   authenticate: false
   username:
