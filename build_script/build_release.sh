@@ -29,7 +29,10 @@ echo $BUILD_DATE > $BUILD_DIR/build_date
 echo "Copying files ..."
 
 # Copy files.
-cp ../dist ../README ../COPYING $BUILD_DIR -r
+cp ../target/*-with-dependencies.jar ../README ../COPYING $BUILD_DIR -r
+
+# Rename jar
+mv $BUILD_DIR/*-with-dependencies.jar $BUILD_DIR/graylog2-server.jar
 
 # Copy example config file
 cp ../misc/graylog2.conf $BUILD_DIR/graylog2.conf.example
