@@ -57,7 +57,7 @@ class Message
 
     unless filters.blank?
       # Message
-      filters[:message].blank? ? nil : conditions[:message] = /#{Regexp.escape(filters[:message])}/
+      filters[:message].blank? ? nil : conditions[:message] = /#{Regexp.escape(filters[:message].strip)}/
 
       # Facility
       filters[:facility].blank? ? nil : conditions[:facility] = filters[:facility].to_i
