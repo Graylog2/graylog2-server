@@ -17,6 +17,17 @@ class HostgroupsController < ApplicationController
     @new_host = HostgroupHost.new
   end
 
+  def create  
+    @hostgroup = Hostgroup.new(params[:hostgroup])
+    if @hostgroup.save
+      redirect_to :controller => 'hosts', :action => 'index'
+      flash[:notice] = "Host group has been created."
+    else
+      flash[:error]  = "Could not create host group."
+      render :controller => 'hosts', :action => 'new'
+    end
+  end
+
   def destroy
     hostgroup = Hostgroup.find params[:id]
     if hostgroup.destroy
