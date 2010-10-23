@@ -117,7 +117,7 @@ label {
     position: relative;
     top: 15px;
     font-size: 16px;
-    height: 60px;
+    height: 40px;
     width: 575px;
 }
 
@@ -250,4 +250,22 @@ label {
 .ac_over {
     background-color: #fd0c99;
     color: white;
+}
+
+#new-messages-bar {
+    position: relative;
+    top: -16px;
+    text-align: center;
+    background-color: #FD0C99;
+    font-size: 10px;
+    color: #fff;
+    background-image: url('/images/newmessagebarbg.png');
+    background-repeat: no-repeat;
+    padding-top: 2px;
+    padding-bottom: 2px;
+}
+
+#new-messages-bar a {
+    color: #fff;
+    font-weight: bold;
 }

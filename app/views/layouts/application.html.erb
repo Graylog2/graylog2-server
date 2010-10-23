@@ -13,11 +13,12 @@
   <%= javascript_include_tag "jquery-1.4.2.min" %>
   <%= javascript_include_tag "jquery.gritter.min" %>
   <%= javascript_include_tag "jquery.autocomplete.min"  %>
-  <%= javascript_include_tag "highlight.pack" %>
   <%= javascript_include_tag "application" %>
 </head>
 <body>
 
+  <div id="pageload" style="display: none;"><%= Time.now.to_i %></div>
+  
   <div id="notification-notice" style="display: none;"><%= flash[:notice] %></div>
   <div id="notification-error" style="display: none;"><%= flash[:error] %></div>
 
@@ -38,6 +39,9 @@
     <% message_count_interval = Setting.get_message_count_interval(current_user) %>
     <div id="new-message-count"><strong><%= Message.count_of_last_minutes(message_count_interval) %></strong> / <%=h message_count_interval %> minutes</div>
   </div>
+
+  <br style="clear: both;" />
+  <div id="new-messages-bar" style="display: none;"></div>
 
   <div id="content">
     <%= yield %>

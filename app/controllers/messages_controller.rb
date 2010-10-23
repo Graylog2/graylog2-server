@@ -5,7 +5,7 @@ class MessagesController < ApplicationController
     else
       @messages = Message.all_by_quickfilter params[:filters], params[:page]
     end
-    @total_count =  Message.count
+    @total_count =  Message.count_since(0)
     @total_blacklisted_terms = BlacklistedTerm.count
 
     @favorites = FavoritedStream.find_all_by_user_id current_user.id
