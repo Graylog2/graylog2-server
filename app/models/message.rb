@@ -167,15 +167,19 @@ class Message
     self.delete_all :conditions => { :host => host, :deleted => [false, nil] }
   end
 
-  def self.count_of_last_minutes x
+  def self.count_since x
     conditions = Hash.new
 
     (blacklist = BlacklistedTerm.get_all_as_condition_hash).blank? ? nil : conditions[:message] = blacklist;
 
-    conditions[:created_at] = { '$gt' => (x.minutes.ago).to_i }
+    conditions[:created_at] = { '$gt' => (x).to_i }
     conditions[:deleted] = [false, nil]
 
     return self.count :conditions => conditions
+  end
+
+  def self.count_of_last_minutes x
+    return self.count_since x.minutes.ago
   end
 
   def has_additional_fields

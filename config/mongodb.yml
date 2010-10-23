@@ -7,9 +7,6 @@ development:
   password:
 
 production:
-  hostname: localhost
+  hostname: [["localhost", 27017], ["localhost", 27018], ["localhost", 27019]]
   database: graylog2_production
-  port: 27017
   authenticate: false
-  username:
-  password:
