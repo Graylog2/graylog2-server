@@ -5,7 +5,7 @@ class HostgroupsController < ApplicationController
   def new
     @hostgroup = Hostgroup.new
   end
-
+  
   def show
     @hosts = Host.all
     @hostgroup = Hostgroup.find params[:id]
@@ -15,17 +15,6 @@ class HostgroupsController < ApplicationController
     @last_message = Message.last :conditions => { "host" => { "$in" => @hostgroup.get_hostnames } }, :order => "created_at DESC"
 
     @new_host = HostgroupHost.new
-  end
-
-  def create  
-    @hostgroup = Hostgroup.new(params[:hostgroup])
-    if @hostgroup.save
-      redirect_to :controller => 'hosts', :action => 'index'
-      flash[:notice] = "Host group has been created."
-    else
-      flash[:error]  = "Could not create host group."
-      render :controller => 'hosts', :action => 'new'
-    end
   end
 
   def destroy

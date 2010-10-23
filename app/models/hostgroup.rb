@@ -1,5 +1,4 @@
 class Hostgroup < ActiveRecord::Base
-
   has_many :hostgroup_hosts
 
   def message_count
@@ -25,5 +24,4 @@ class Hostgroup < ActiveRecord::Base
 
     return names
   end
-
 end
