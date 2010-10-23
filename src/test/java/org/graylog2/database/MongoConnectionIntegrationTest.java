@@ -59,7 +59,8 @@ public class MongoConnectionIntegrationTest {
             "localhost",
             "graylog2test",
             Integer.valueOf(27017),
-            "false"
+            "false",
+            null
         );
 
         Mongo connection = instance.getConnection();
