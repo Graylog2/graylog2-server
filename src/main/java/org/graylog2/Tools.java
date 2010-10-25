@@ -23,10 +23,7 @@ package org.graylog2;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.io.UnsupportedEncodingException;
-import java.util.zip.DataFormatException;
 import java.util.zip.GZIPInputStream;
-import java.util.zip.Inflater;
 import java.util.zip.InflaterInputStream;
 
 /**

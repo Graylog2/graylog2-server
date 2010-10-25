@@ -70,4 +70,17 @@ public class Configuration {
         return replicaServers;
     }
 
+    public static int getMaximumMongoDBConnections(Properties config) {
+        String val = config.getProperty("mongodb_max_connections");
+        if (val != null) {
+            int res = Integer.parseInt(val);
+            if (res > 0) {
+                return res;
+            }
+        }
+
+        // Default value.
+        return 1000;
+    }
+
 }
