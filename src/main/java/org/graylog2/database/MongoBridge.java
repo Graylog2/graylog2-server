@@ -66,6 +66,7 @@ public class MongoBridge {
             coll = MongoConnection.getInstance().getDatabase().createCollection("messages", BasicDBObjectBuilder.start().add("capped", true).add("size", messagesCollSize).get());
         }
 
+        // XXX PERFORMANCE
         coll.ensureIndex(new BasicDBObject("created_at", 1));
         coll.ensureIndex(new BasicDBObject("host", 1));
         coll.ensureIndex(new BasicDBObject("facility", 1));
@@ -103,7 +104,7 @@ public class MongoBridge {
      */
     public void insertGelfMessage(GELFMessage message) throws Exception {
         // Check if all required parameters are set.
-        if (message.getShortMessage() == null || message.getShortMessage().length() == 0 || message.getHost() == null || message.getHost().length() == 0) {
+        if (message.getShortMessage() == null || message.getHost() == null  || message.getShortMessage().length() == 0 || message.getHost().length() == 0) {
             throw new Exception("Missing GELF message parameters. short_message and host are required.");
         }
         DBCollection coll = this.getMessagesColl();
@@ -119,7 +120,7 @@ public class MongoBridge {
         dbObj.put("facility", null);
         dbObj.put("level", message.getLevel());
 
-        // Add additional fields.
+        // Add additional fields. XXX PERFORMANCE
         Map<String,String> additionalFields = message.getAdditionalData();
         Set<String> set = additionalFields.keySet();
         Iterator<String> iter = set.iterator();
