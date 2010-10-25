@@ -20,6 +20,8 @@
 
 package org.graylog2.messagehandlers.common;
 
+import org.graylog2.Main;
+
 /**
  * MessageCounter.java: Aug 19, 2010 6:06:20 PM
  *
@@ -37,6 +39,9 @@ public final class MessageCounter {
     public static final String ALL_HOSTS = "all";
 
     private int totalCount = 0;
+    private int totalSecondCount = 0;
+
+    private int highestSecondCount = 0;
 
     private MessageCounter() {}
 
@@ -61,12 +66,28 @@ public final class MessageCounter {
     }
 
     /**
-     * Increment count of a host
+     * Reset count of the messages per second counter.
+     */
+    public void resetTotalSecondCount() {
+        // Possibly update highest count?
+        if (totalSecondCount > highestSecondCount) {
+            highestSecondCount = totalSecondCount;
+        }
+
+        totalSecondCount = 0;
+    }
+
+    /**
+     * Increment count of a host (Also counts of totalSecondCounter if enabled)
      * @param host The host to select
      */
     public void countUp(String host) {
         if (host.equals(ALL_HOSTS)) {
             totalCount++;
+
+            if (Main.printLoadStats) {
+                totalSecondCount++;
+            }
         }
     }
 
@@ -83,4 +104,18 @@ public final class MessageCounter {
         return 0;
     }
     
+   /**
+    * Get the count of the messages per second counter.
+    */
+    public int getTotalSecondCount() {
+        return totalSecondCount;
+    }
+
+   /**
+     * Get the highest recorded count of messages per second.
+     */
+    public int getHighestSecondCount() {
+        return highestSecondCount;
+    }
+
 }

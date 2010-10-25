@@ -23,6 +23,7 @@ package org.graylog2.database;
 import com.mongodb.Mongo;
 import com.mongodb.DB;
 import com.mongodb.MongoException;
+import com.mongodb.MongoOptions;
 import com.mongodb.ServerAddress;
 import java.util.List;
 
@@ -65,11 +66,15 @@ public final class MongoConnection {
      */
     public void connect(String username, String password, String hostname, String database, int port, String useAuth, List<ServerAddress> replicaServers) throws Exception {
         try {
+            MongoOptions options = new MongoOptions();
+            options.connectionsPerHost = 500;
+
             // Connect to replica servers if given. Else the standard way to one server.
             if (replicaServers != null && replicaServers.size() > 0) {
-                MongoConnection.m = new Mongo(replicaServers);
+                MongoConnection.m = new Mongo(replicaServers, options);
             } else {
-                MongoConnection.m = new Mongo(hostname, port);
+                ServerAddress address = new ServerAddress(hostname, port);
+                MongoConnection.m = new Mongo(address, options);
             }
 
             MongoConnection.db = m.getDB(database);
