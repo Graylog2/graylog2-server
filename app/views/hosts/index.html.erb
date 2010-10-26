@@ -1,37 +1,45 @@
 <h1>Hosts</h1>
 
-
 <div id="hosts-graph">
   <%= image_tag "graphs/totalmessages.png" if Graph.enabled? %>
 </div>
 
 <div id="hosts-quickjump">
   <% form_tag '/hosts/quickjump/' do %>
-    <label for="hosts-quickjump-input">Quick jump:</label>
+    <label for="hosts-quickjump-input">Quick jump to host:</label>
     <input type="text" name="host" id="hosts-quickjump-input"/>
     <input type="submit" value="Go!" />
   <% end %>
+</div>
+
+<script type="text/javascript">
+  var data = "<%= @hosts.map { |h| h(h.host) }.join ',' %> ".split(",");
+    $("#hosts-quickjump-input").autocomplete(data);
+</script>
+
+<div id="hosts-new-hostgroup-link">
+  <%= link_to "Create a hostgroup", :controller => "hostgroups", :action => "new" %>
 </div>
 
 <div>
 Monitoring <%=h @host_count %> hosts. (Sorted by total message count)
 </div>
 
-<script type="text/javascript">
-  var data = "<%= @hosts.map { |h| h(h.host) }.join ' ' %> ".split(" ");
-    $("#hosts-quickjump-input").autocomplete(data);
-</script>
-
 <br style="clear: both;" />
 
 <div id="hosts-hosts">
-  <% @hosts.each do |host| %>
-    <% next if host.host.blank? %>
+  <% @hosts_and_groups.each do |host| %>
+    <% next if (host.is_a?(Host) and host.host.blank?) or (host.is_a?(Hostgroup) and host.name.blank?) %>
     <div class="blocks">
-      <span class="blocks-title"><%= link_to h(host.host), { :action => "show", :id => URI.escape(Base64.encode64(host.host)) } %></span>
-      <ul class="blocks-termslist">
+      <% if host.is_a?(Host) %>
+        <span class="blocks-title"><%= link_to h(host.host), { :action => "show", :id => URI.escape(Base64.encode64(host.host)) } %></span>
+        <br />
         <%=h host.message_count.to_i %> messages
-      </ul>
+      <% elsif host.is_a?(Hostgroup) %>
+        <span class="blocks-title"><span class="black">Group:</span> <%= link_to h(host.name), { :controller => "hostgroups", :action => "show", :id => host.id } %></span>
+        <br />
+        <%=h host.message_count.to_i %> messages
+      <% end %>
     </div>
   <% end %>
 </div>

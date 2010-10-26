@@ -1,6 +1,10 @@
 class HostsController < ApplicationController
   def index
     @hosts = Host.all :order => "message_count DESC"
+    @hostgroups = Hostgroup.all
+
+    @hosts_and_groups = @hosts | @hostgroups
+
     @host_count = Host.count
     Graph.update_total
   end
@@ -15,7 +19,6 @@ class HostsController < ApplicationController
       redirect_to :action => "index"
     end
 
-    @first_message = Message.first :conditions => { "host" => @host.host }, :order => "created_at DESC"
     @last_message = Message.last :conditions => { "host" => @host.host }, :order => "created_at DESC"
   end
 
@@ -49,13 +52,13 @@ class HostsController < ApplicationController
   end
 
   def quickjump
-    @host = Host.find_by_host params[:host]
+    @host = Host.find_by_host params[:host].strip
 
     if @host.blank?
       flash[:error] = "<strong>Unknown host</strong> <span>Could not find host</span>"
       redirect_to :action => "index"
     else
-      redirect_to :action => "show", :id => Base64.encode64(params[:host])
+      redirect_to :action => "show", :id => Base64.encode64(params[:host].strip)
     end
   end
 end

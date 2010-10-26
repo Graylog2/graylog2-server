@@ -1,0 +1,41 @@
+<div id="hosts-delete">
+  <%= link_to "Delete this hostgroup", { :action => "destroy", :id => @hostgroup.id }, :confirm => "Really delete this hostgroup?" %>
+</div>
+
+<h1>Hostgroup <span class="highlighted"><%=h @hostgroup.name %></span></h1>
+
+<% form_for :new_host, :url => { :controller => "hostgrouphosts", :action => 'create' } do |f| -%>
+  <%= label_tag 'hostname' %>:
+  <%= f.text_field :hostname %>
+  <%= hidden_field_tag 'new_host[hostgroup_id]', @hostgroup.id %>
+  <%= submit_tag "Add host to group" %> 
+<% end %>
+<br />
+
+<script type="text/javascript">
+  var data = "<%= @hosts.map { |h| h.is_a?(Hostgroup) ? h(h.name) : h(h.host) }.join ',' %> ".split(",");
+    $("#new_host_hostname").autocomplete(data);
+</script>
+
+<% if @last_message.blank? %>
+  No messages or hosts in this hostgroup.
+<% else %>
+  Including messages from the hosts
+  <% @hostnames = @hostgroup.get_hostnames %>
+  <% i = 0 %>
+  <% @hostnames.each do |host| %>
+    <% if i == @hostnames.size-2
+         connector = ' and'
+       else
+         connector = ','
+       end %>
+    <%= link_to host, { :controller => "hostgrouphosts", :action => "destroy", :hostgroup => @hostgroup.id, :name => Base64.encode64(host) }, :confirm => "Remove host from hostgroup?" %><%= connector unless i == @hostnames.size-1 %>
+    <% i+=1 %>
+  <% end %>
+
+  <br /><br />
+  Messages from <span class="highlighted"><%= gl_date(Time.at(@last_message.created_at).to_s) %></span> available
+  for this host.
+<% end %>
+
+<%= render :partial => "messages/table", :locals => { :messages => @messages, :total_messages => @total_count } %>

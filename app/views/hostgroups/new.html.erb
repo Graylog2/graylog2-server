@@ -1,0 +1,13 @@
+<h1>Create host group</h1>
+
+<div class="description">
+  Use this form to create a hostgroup and add some hosts to the new group later. The group will appear
+  between the hosts and aggregates all messages of the included hosts.
+</div>
+
+<% form_for :hostgroup, :url => { :action => 'create' } do |f| %>
+  <%= label_tag 'name', "Name:" %>
+  <%= f.text_field :name %>
+
+  <%= submit_tag 'Create group' %>
+<% end %>

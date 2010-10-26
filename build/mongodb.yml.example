@@ -1,0 +1,9 @@
+production:
+  hostname: localhost
+  database: graylog2
+  port: 27017
+  authenticate: false
+  username:
+  password:
+
+# connect to replica sets like this: hostname: [["localhost", 27017], ["localhost", 27018], ["localhost", 27019]]

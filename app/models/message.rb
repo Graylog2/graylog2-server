@@ -74,7 +74,7 @@ class Message
 
     unless filters.blank?
       # Message
-      filters[:message].blank? ? nil : conditions[:message] = /#{Regexp.escape(filters[:message])}/
+      filters[:message].blank? ? nil : conditions[:message] = /#{Regexp.escape(filters[:message].strip)}/
 
       # Time Frame
       filters[:date].blank? ? nil : conditions[:created_at] = get_conditions_from_date(filters[:date])
@@ -158,9 +158,19 @@ class Message
     page = 1 if page.blank?
     return self.all :limit => LIMIT, :order => "_id DESC", :conditions => { :host => host, :deleted => [false, nil] }, :offset => self.get_offset(page), :fields => { :full_message => 0 }
   end
+  
+  def self.all_of_hostgroup hostgroup, page
+    page = 1 if page.blank?
+
+    return self.all :limit => LIMIT, :order => "_id DESC", :conditions => { :host => { "$in" => hostgroup.get_hostnames }, :deleted => [false, nil] }, :offset => self.get_offset(page), :fields => { :full_message => 0 }
+  end
 
   def self.count_of_host host
     return self.count :conditions => { :host => host, :deleted => [false, nil] }
+  end
+
+  def self.count_of_hostgroup hostgroup
+    return self.count :conditions => { :host => { "$in" => hostgroup.get_hostnames }, :deleted => [false, nil] }
   end
 
   def self.delete_all_of_host host

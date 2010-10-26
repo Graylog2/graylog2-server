@@ -129,6 +129,6 @@ module ApplicationHelper
   private
 
   def is_current_menu_item? item
-    true if (params[:controller] == "messages" and item == "/") or params[:controller] == item
+    true if (params[:controller] == "messages" and item == "/") or (params[:controller] == "hostgroups" and item == "hosts") or params[:controller] == item
   end
 end

@@ -32,7 +32,7 @@ class Streamrule < ActiveRecord::Base
 
     conditions = Array.new
     terms.each do |term|
-      conditions << /#{Regexp.escape(term.value)}/
+      conditions << /#{Regexp.escape(term.value.strip)}/
     end
 
     return conditions
