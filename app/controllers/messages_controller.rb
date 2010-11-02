@@ -88,7 +88,7 @@ class MessagesController < ApplicationController
     conditions[:id]['$nin'] = [message_id]
 
     # Get the messages.
-    @messages = Message.all :limit => 50, :order => "_id DESC", :conditions => conditions
+    @messages = Message.all :limit => 50, :order => "$natural DESC", :conditions => conditions
 
     if @messages.blank?
       render :text => "No similar messages found"

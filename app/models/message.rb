@@ -26,7 +26,7 @@ class Message
 
     conditions[:deleted] = [false, nil]
 
-    return self.all :limit => LIMIT, :order => "_id DESC", :conditions => conditions, :offset => self.get_offset(page), :fields => { :full_message => 0 }
+    return self.all :limit => LIMIT, :order => "$natural DESC", :conditions => conditions, :offset => self.get_offset(page), :fields => { :full_message => 0 }
   end
 
   def self.count_of_blacklist id
@@ -47,7 +47,7 @@ class Message
     
     conditions[:deleted] = [false, nil]
     
-    return self.all :limit => limit, :order => "_id DESC", :conditions => conditions, :offset => self.get_offset(page), :fields => { :full_message => 0 }
+    return self.all :limit => limit, :order => "$natural DESC", :conditions => conditions, :offset => self.get_offset(page), :fields => { :full_message => 0 }
   end
 
   def self.all_by_quickfilter filters, page = 1, limit = LIMIT, conditions_only = false
@@ -73,7 +73,7 @@ class Message
 
     return conditions if conditions_only
 
-    return self.all :limit => limit, :order => "_id DESC", :conditions => conditions, :offset => self.get_offset(page), :fields => { :full_message => 0 }
+    return self.all :limit => limit, :order => "$natural DESC", :conditions => conditions, :offset => self.get_offset(page), :fields => { :full_message => 0 }
   end
 
   def self.all_of_stream stream_id, page = 1, conditions_only = false
@@ -112,7 +112,7 @@ class Message
     # Return only conditions hash if requested.
     return conditions if conditions_only === true
 
-    return self.all :limit => LIMIT, :order => "_id DESC", :conditions => conditions, :offset => self.get_offset(page), :fields => { :full_message => 0 }
+    return self.all :limit => LIMIT, :order => "$natural DESC", :conditions => conditions, :offset => self.get_offset(page), :fields => { :full_message => 0 }
   end
 
   def self.count_stream stream_id
@@ -123,13 +123,13 @@ class Message
 
   def self.all_of_host host, page
     page = 1 if page.blank?
-    return self.all :limit => LIMIT, :order => "_id DESC", :conditions => { :host => host, :deleted => [false, nil] }, :offset => self.get_offset(page), :fields => { :full_message => 0 }
+    return self.all :limit => LIMIT, :order => "$natural DESC", :conditions => { :host => host, :deleted => [false, nil] }, :offset => self.get_offset(page), :fields => { :full_message => 0 }
   end
   
   def self.all_of_hostgroup hostgroup, page
     page = 1 if page.blank?
 
-    return self.all :limit => LIMIT, :order => "_id DESC", :conditions => { :host => { "$in" => hostgroup.get_hostnames }, :deleted => [false, nil] }, :offset => self.get_offset(page), :fields => { :full_message => 0 }
+    return self.all :limit => LIMIT, :order => "$natural DESC", :conditions => { :host => { "$in" => hostgroup.get_hostnames }, :deleted => [false, nil] }, :offset => self.get_offset(page), :fields => { :full_message => 0 }
   end
 
   def self.count_of_host host
