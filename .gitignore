@@ -4,6 +4,9 @@ config/database.yml
 config/mongodb.yml
 config/graphs.yml
 
+Capfile
+config/deploy.rb
+
 build/builds/*
 build/logs/*
 
