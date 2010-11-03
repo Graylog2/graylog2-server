@@ -9,7 +9,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20101023192804) do
+ActiveRecord::Schema.define(:version => 20101103025007) do
 
   create_table "blacklisted_terms", :force => true do |t|
     t.string   "term"
@@ -68,6 +68,7 @@ ActiveRecord::Schema.define(:version => 20101023192804) do
     t.integer  "filter_level"
     t.datetime "created_at"
     t.datetime "updated_at"
+    t.boolean  "alertable",       :default => false
   end
 
   create_table "users", :force => true do |t|

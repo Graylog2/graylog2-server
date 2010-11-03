@@ -7,6 +7,15 @@
 <h1>Stream <span class="highlighted"><%= @stream.title %></span></h1>
 
 <div id="streams-right">
+  <% form_tag "/streams/alertable/#{h(@stream.id)}" do %>
+  	<% if @is_alertable %>
+      <%= submit_tag "Stop receiving alerts for this stream" %>
+	<% else %>
+	  <%= submit_tag "Receive alerts for this stream" %>
+	<% end %>
+  <% end %>
+
+  <br />
   <% if @is_favorited %>
     <% form_tag "/favoritedstreams/destroy/#{h(@stream.id)}" do %>
       <%= submit_tag "Remove this stream from your favorites" %>
