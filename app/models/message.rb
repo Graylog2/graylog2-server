@@ -16,6 +16,18 @@ class Message
   key :line, Integer
 
   LIMIT = 100
+  scope :not_deleted, :deleted => [false, nil]
+  scope :by_blacklisted_terms, lambda { |terms|
+    where(:message.nin => terms.collect { |term| /#{Regexp.escape term}/})
+  }
+  scope :by_blacklist, lambda {|blacklist| by_blacklisted_terms(blacklist.all_terms)}
+  #scope :by_blacklist, lambda {|blacklist|
+  #  where(:message.nin => blacklist.all_terms.collect { |term|
+  #    /#{Regexp.escape term}/
+  #  })
+  #}
+  scope :page, lambda {|number| skip(self.get_offset(number))}
+  scope :default_scope, fields(:full_message => 0).order("_id DESC").not_deleted.limit(LIMIT)
 
   def self.get_conditions_from_date(timeframe)
     conditions = {}
@@ -37,34 +49,30 @@ class Message
   def self.all_of_blacklist id, page = 1
     page = 1 if page.blank?
     
-    conditions = Hash.new
-
-    (blacklist = BlacklistedTerm.get_all_as_condition_hash(false, id)).blank? ? nil : conditions[:message] = blacklist;
-
-    conditions[:deleted] = [false, nil]
-
-    return self.all :limit => LIMIT, :order => "_id DESC", :conditions => conditions, :offset => self.get_offset(page), :fields => { :full_message => 0 }
+    b = Blacklist.find(id)
+    #return by_blacklist(b).not_deleted.limit(LIMIT).order("_id DESC").offset(self.get_offset(page)).fields(:full_message => 0).all
+    return by_blacklist(b).default_scope.page(page).all
   end
 
   def self.count_of_blacklist id
-    conditions = Hash.new
+    b = Blacklist.find(id)
 
-    (blacklist = BlacklistedTerm.get_all_as_condition_hash(false, id)).blank? ? nil : conditions[:message] = blacklist;
-    conditions[:deleted] = [false, nil]
-    
-    return self.count :conditions => conditions
+    return by_blacklist(b).count
   end
 
   def self.all_with_blacklist page = 1, limit = LIMIT
     page = 1 if page.blank?
 
-    conditions = Hash.new
+    #conditions = Hash.new
 
-    (blacklist = BlacklistedTerm.get_all_as_condition_hash).blank? ? nil : conditions[:message] = blacklist;
+    #(blacklist = BlacklistedTerm.get_all_as_condition_hash).blank? ? nil : conditions[:message] = blacklist;
     
-    conditions[:deleted] = [false, nil]
+    #conditions[:deleted] = [false, nil]
     
-    return self.all :limit => limit, :order => "_id DESC", :conditions => conditions, :offset => self.get_offset(page), :fields => { :full_message => 0 }
+    #return self.all :limit => limit, :order => "_id DESC", :conditions => conditions, :offset => self.get_offset(page), :fields => { :full_message => 0 }
+    
+    terms = Blacklist.all_terms
+    Message.by_blacklisted_terms(terms).default_scope.page(page)
   end
 
   def self.all_by_quickfilter filters, page = 1, limit = LIMIT, conditions_only = false
@@ -74,10 +82,12 @@ class Message
 
     unless filters.blank?
       # Message
-      conditions = (filters[:message].blank? ? conditions : conditions.where(:message => /#{Regexp.escape(filters[:message].strip)}/))
+      conditions = conditions.where(:message => /#{Regexp.escape(filters[:message].strip)}/) unless filters[:message].blank?
+      #conditions = (filters[:message].blank? ? conditions : conditions.where(:message => /#{Regexp.escape(filters[:message].strip)}/))
 
       # Time Frame
-      conditions = (filters[:date].blank? ? conditions : conditions.where(:created_at => get_conditions_from_date(filters[:date])))
+      conditions = conditions.where(:created_at => get_conditions_from_date(filters[:date])) unless filters[:date].blank?
+      #conditions = (filters[:date].blank? ? conditions : conditions.where(:created_at => get_conditions_from_date(filters[:date])))
       
       #unless filters[:date_from].blank?
       #  from = Chronic::parse(filters[:date_from]).to_i
@@ -90,20 +100,23 @@ class Message
       #end
       
       # Facility
-      conditions = (filters[:facility].blank? ? conditions : conditions.where(:facility => filters[:facility].to_i))
+      conditions = conditions.where(:facility => filters[:facility].to_i) unless filters[:facility].blank?
+      #conditions = (filters[:facility].blank? ? conditions : conditions.where(:facility => filters[:facility].to_i))
 
       # Severity
-      conditions = (filters[:severity].blank? ? conditions : conditions.where(:level => filters[:severity].to_i))
+      conditions = conditions.where(:level => filters[:severity].to_i) unless filters[:severity].blank?
+      #conditions = (filters[:severity].blank? ? conditions : conditions.where(:level => filters[:severity].to_i))
 
       # Host
-      conditions = (filters[:host].blank? ? conditions : conditions.where(:host => filters[:host]))
+      conditions = conditions.where(:host => filters[:host]) unless filters[:host].blank?
+      #conditions = (filters[:host].blank? ? conditions : conditions.where(:host => filters[:host]))
     end
-
-    conditions = conditions.where(:deleted => [false, nil])
+    
+    Rails.logger.warn("CONDITIONS FOR MONGO: #{conditions.inspect}")
 
     return (conditions_only ?
       conditions :
-      conditions.limit(limit).offset(self.get_offset(page)).order("_id DESC").fields(:full_message => 0)
+      conditions.default_scope.page(page)
     )
   end
 
