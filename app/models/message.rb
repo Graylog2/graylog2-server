@@ -70,14 +70,14 @@ class Message
   def self.all_by_quickfilter filters, page = 1, limit = LIMIT, conditions_only = false
     page = 1 if page.blank?
 
-    conditions = Hash.new
+    conditions = self
 
     unless filters.blank?
       # Message
-      filters[:message].blank? ? nil : conditions[:message] = /#{Regexp.escape(filters[:message].strip)}/
+      conditions = (filters[:message].blank? ? conditions : conditions.where(:message => /#{Regexp.escape(filters[:message].strip)}/))
 
       # Time Frame
-      filters[:date].blank? ? nil : conditions[:created_at] = get_conditions_from_date(filters[:date])
+      conditions = (filters[:date].blank? ? conditions : conditions.where(:created_at => get_conditions_from_date(filters[:date])))
       
       #unless filters[:date_from].blank?
       #  from = Chronic::parse(filters[:date_from]).to_i
@@ -90,20 +90,21 @@ class Message
       #end
       
       # Facility
-      filters[:facility].blank? ? nil : conditions[:facility] = filters[:facility].to_i
+      conditions = (filters[:facility].blank? ? conditions : conditions.where(:facility => filters[:facility].to_i))
 
       # Severity
-      filters[:severity].blank? ? nil : conditions[:level] = filters[:severity].to_i
+      conditions = (filters[:severity].blank? ? conditions : conditions.where(:level => filters[:severity].to_i))
 
       # Host
-      filters[:host].blank? ? nil : conditions[:host] = filters[:host]
+      conditions = (filters[:host].blank? ? conditions : conditions.where(:host => filters[:host]))
     end
 
-    conditions[:deleted] = [false, nil]
+    conditions = conditions.where(:deleted => [false, nil])
 
-    return conditions if conditions_only
-
-    return self.all :limit => limit, :order => "_id DESC", :conditions => conditions, :offset => self.get_offset(page), :fields => { :full_message => 0 }
+    return (conditions_only ?
+      conditions :
+      conditions.limit(limit).offset(self.get_offset(page)).order("_id DESC").fields(:full_message => 0)
+    )
   end
 
   def self.all_of_stream stream_id, page = 1, conditions_only = false

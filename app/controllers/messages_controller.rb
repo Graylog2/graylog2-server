@@ -1,9 +1,19 @@
 class MessagesController < ApplicationController
+  before_filter :set_scoping
+  
+  def set_scoping
+    if params[:host_id]
+      @scope = Message.where(:host => Base64.decode64(params[:host_id]))
+    else
+      @scope = Message
+    end
+  end
+  
   def index
     if params[:filters].blank?
-      @messages = Message.all_with_blacklist params[:page]
+      @messages = @scope.limit(100).all #all_with_blacklist params[:page]
     else
-      @messages = Message.all_by_quickfilter params[:filters], params[:page]
+      @messages = @scope.all_by_quickfilter params[:filters], params[:page]
     end
     @total_count =  Message.count_since(0)
     @total_blacklisted_terms = BlacklistedTerm.count

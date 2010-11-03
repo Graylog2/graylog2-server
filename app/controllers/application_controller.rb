@@ -12,7 +12,7 @@ class ApplicationController < ActionController::Base
 
   before_filter :login_required
 
-  def rescue_action e
+  def rescue_action_disabled e
     # Connection to MongoDB failed.
     if e.class == Mongo::ConnectionFailure
         render :file => "#{RAILS_ROOT}/public/mongo_connectionfailure.html", :status => 500
