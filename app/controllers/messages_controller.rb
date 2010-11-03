@@ -11,7 +11,7 @@ class MessagesController < ApplicationController
   
   def index
     if params[:filters].blank?
-      @messages = @scope.limit(100).all #all_with_blacklist params[:page]
+      @messages = @scope.all_with_blacklist params[:page]
     else
       @messages = @scope.all_by_quickfilter params[:filters], params[:page]
     end
@@ -40,7 +40,7 @@ class MessagesController < ApplicationController
       filters_with_symbols[:severity] = filters["severity"]
       filters_with_symbols[:host] = filters["host"]
 
-      conditions = Message.all_by_quickfilter(filters_with_symbols, 0, 0, true)
+      conditions = Message.all_by_quickfilter(filters_with_symbols, 0, 0).criteria.sources
       throw "Missing conditions" if conditions.blank?
 
       Message.set(conditions, :deleted => true )
@@ -55,7 +55,7 @@ class MessagesController < ApplicationController
 
   def deletebystream
     begin
-      conditions = Message.all_of_stream params[:id].to_i, 0, true
+      conditions = Message.all_of_stream(params[:id].to_i, 0).criteria.sources
       throw "Missing conditions" if conditions.blank?
 
       Message.set(conditions, :deleted => true )
@@ -64,8 +64,8 @@ class MessagesController < ApplicationController
     rescue
       flash[:error] = "Could not delete messages."
     end
-
-    redirect_to :controller => 'streams', :action => 'show', :id => params[:id]
+    
+    redirect_to stream_path(params[:id])
   end
 
   def getsimilarmessages
@@ -86,19 +86,22 @@ class MessagesController < ApplicationController
 
     ## Get the messages
     # Blacklist
-    conditions = Hash.new
-    (blacklist = BlacklistedTerm.get_all_as_condition_hash).blank? ? nil : conditions[:message] = blacklist;
+    conditions = Message.by_blacklisted_terms(Blacklist.all_terms)
 
     # Add our search condition.
-    conditions[:message] = Hash.new if conditions[:message].blank?
-    conditions[:message]['$in'] = [/#{Regexp.escape(message)}/]
+    #conditions[:message] = Hash.new if conditions[:message].blank?
+    #conditions[:message]['$in'] = [/#{Regexp.escape(message)}/]
+    
+    conditions = conditions.where(:message.in => [/#{Regexp.escape(message)}/])
 
     # Don't search for the message we used to compare.
-    conditions[:id] = Hash.new
-    conditions[:id]['$nin'] = [message_id]
+    #conditions[:id] = Hash.new
+    #conditions[:id]['$nin'] = [message_id]
+    conditions = conditions.where(:id.nin => [message_id])
 
     # Get the messages.
-    @messages = Message.all :limit => 50, :order => "_id DESC", :conditions => conditions
+    @messages = conditions.limit(50).order("_id DESC")
+    #@messages = Message.all :limit => 50, :order => "_id DESC", :conditions => conditions
 
     if @messages.blank?
       render :text => "No similar messages found"

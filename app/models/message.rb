@@ -82,10 +82,7 @@ class Message
       conditions = conditions.where(:host => filters[:host]) unless filters[:host].blank?
     end
     
-    return (conditions_only ?
-      conditions :
-      conditions.default_scope.page(page).all
-    )
+    conditions.default_scope.limit(LIMIT).page(page)
   end
 
   def self.by_stream(stream_id)
