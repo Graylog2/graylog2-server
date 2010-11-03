@@ -29,7 +29,7 @@ GEM
       activesupport (>= 2.3.4)
       jnunemaker-validatable (~> 1.8.4)
       plucky (~> 0.3.6)
-    mysql2 (0.2.4)
+    mysql (2.8.1)
     plucky (0.3.6)
       mongo (~> 1.1)
     rack (1.1.0)
@@ -41,6 +41,8 @@ GEM
       activesupport (= 2.3.10)
       rake (>= 0.8.3)
     rake (0.8.7)
+    rubyforge (2.0.4)
+      json_pure (>= 1.1.7)
 
 PLATFORMS
   ruby
@@ -53,7 +55,7 @@ DEPENDENCIES
   json (= 1.4.6)
   mongo (= 1.1.1)
   mongo_mapper (= 0.8.6)
-  mysql2 (= 0.2.4)
+  mysql (= 2.8.1)
   plucky (= 0.3.6)
   rack (= 1.1.0)
   rails (~> 2.3.5)
