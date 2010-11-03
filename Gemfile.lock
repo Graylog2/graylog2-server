@@ -19,10 +19,17 @@ GEM
     hoe (2.6.2)
       rake (>= 0.8.7)
       rubyforge (>= 2.0.4)
+    i18n (0.4.2)
     jnunemaker-validatable (1.8.4)
       activesupport (>= 2.3.4)
     json (1.4.6)
     json_pure (1.4.6)
+    mail (2.2.9)
+      activesupport (>= 2.3.6)
+      i18n (~> 0.4.1)
+      mime-types (~> 1.16)
+      treetop (~> 1.4.8)
+    mime-types (1.16)
     mongo (1.1.1)
       bson (>= 1.1.1)
     mongo_mapper (0.8.6)
@@ -32,6 +39,9 @@ GEM
     mysql2 (0.2.4)
     plucky (0.3.6)
       mongo (~> 1.1)
+    polyglot (0.3.1)
+    pony (1.1)
+      mail (> 2.0)
     rack (1.1.0)
     rails (2.3.10)
       actionmailer (= 2.3.10)
@@ -43,6 +53,8 @@ GEM
     rake (0.8.7)
     rubyforge (2.0.4)
       json_pure (>= 1.1.7)
+    treetop (1.4.8)
+      polyglot (>= 0.3.1)
 
 PLATFORMS
   ruby
@@ -57,5 +69,6 @@ DEPENDENCIES
   mongo_mapper (= 0.8.6)
   mysql2 (= 0.2.4)
   plucky (= 0.3.6)
+  pony
   rack (= 1.1.0)
   rails (~> 2.3.5)
