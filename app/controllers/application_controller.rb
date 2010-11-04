@@ -18,23 +18,12 @@ class ApplicationController < ActionController::Base
         render :file => "#{RAILS_ROOT}/public/mongo_connectionfailure.html", :status => 500
         return
     end
-  end
 
-  rescue_from ActionView::TemplateError do |e|
-    # This rescue_from handling all kind of errors which is raised during template rendering.
-    # So, if environment is development, we should handle it as usual.
-    # If environment is test or production, we should handle it in particular way –
-    # just reraise the exception so that other rescue_from can handle it.
-    if Rails.env.development?
-      rescue_action_without_handler e
-    else
-      rescue_with_handler e.original_exception
+    # Default 404 error.
+    if e.class == ActionController::RoutingError
+      render :file  => "#{RAILS_ROOT}/public/404.html", :status => 404
+      return
     end
-  end
-
-  rescue_from Mongo::ConnectionFailure do |e|
-    render :file => "#{RAILS_ROOT}/public/mongo_connectionfailure.html", :status => 500
-  end
 
     # Default 500 error.
     logger.error "ERROR: #{e.to_s}"
