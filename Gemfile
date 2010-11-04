@@ -9,7 +9,7 @@ gem 'bson_ext', '1.1.1'
 gem 'jnunemaker-validatable', '1.8.4'
 gem 'plucky', '0.3.6'
 gem 'mongo_mapper', '0.8.6'
-gem 'mysql', '2.8.1'
+gem 'mysql2', '0.2.4'
 gem 'rack', '1.1.0'
 gem 'SyslogLogger', '1.4.0'
 
