@@ -2,7 +2,7 @@ class StreamrulesController < ApplicationController
   def create
     new_rule = Streamrule.new params[:streamrule]
     if new_rule.save
-      flash[:notice] = "Rule has been addded."
+      flash[:notice] = "Rule has been added."
     else
       flash[:error] = "Could not add rule."
     end

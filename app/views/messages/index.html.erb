@@ -26,6 +26,7 @@ messages in the last <%=h message_count_interval %> minutes.
     <thead>
       <tr>
         <th>Message</th>
+        <th>Timeframe</th>
         <th>Facility</th>
         <th>Severity</th>
         <th>Host</th>
@@ -35,6 +36,7 @@ messages in the last <%=h message_count_interval %> minutes.
     <tbody>
       <tr>
         <td class="messages-quickfilter-c-message"><%= text_field_tag "filters[message]", params[:filters].blank? ? nil : params[:filters][:message] %></td>
+        <td><%= text_field_tag "filters[date]", params[:filters].blank? ? nil : params[:filters][:date] %></td>
         <td><%= select_tag "filters[facility]", "<option></option>" + options_for_select(get_ordered_facilities_for_select, :selected => get_quickfilter_selected(params[:filters], :facility)) %></td>
         <td><%= select_tag "filters[severity]", "<option></option>" + options_for_select(get_ordered_severities_for_select, :selected => get_quickfilter_selected(params[:filters], :severity)) %></td>
         <td><%= select_tag "filters[host]", "<option></option>" + options_for_select(Host.all.collect {|host| [ h(host.host) ] }, :selected => get_quickfilter_selected(params[:filters], :host, true)) %></td>

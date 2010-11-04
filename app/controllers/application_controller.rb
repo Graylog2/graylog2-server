@@ -12,12 +12,11 @@ class ApplicationController < ActionController::Base
 
   before_filter :login_required
 
-  rescue_from Exception do |e|
-    if consider_all_requests_local || local_request?
-      rescue_action_without_handler e
-    else
-      logger.error "ERROR: #{e.to_s}"
-      render :file  => "#{RAILS_ROOT}/public/500.html", :status => 500
+  def rescue_action e
+    # Connection to MongoDB failed.
+    if e.class == Mongo::ConnectionFailure
+        render :file => "#{RAILS_ROOT}/public/mongo_connectionfailure.html", :status => 500
+        return
     end
   end
 
@@ -37,8 +36,9 @@ class ApplicationController < ActionController::Base
     render :file => "#{RAILS_ROOT}/public/mongo_connectionfailure.html", :status => 500
   end
 
-  rescue_from ActionController::RoutingError do |e|
-    render :file  => "#{RAILS_ROOT}/public/404.html", :status => 404
+    # Default 500 error.
+    logger.error "ERROR: #{e.to_s}"
+    render :file  => "#{RAILS_ROOT}/public/500.html", :status => 500
   end
 
   helper_method :has_users
