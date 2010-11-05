@@ -3,6 +3,7 @@ nbproject/*
 config/database.yml
 config/mongodb.yml
 config/graphs.yml
+config/general.yml
 
 Capfile
 config/deploy.rb
