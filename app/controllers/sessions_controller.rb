@@ -1,4 +1,5 @@
 class SessionsController < ApplicationController
+  filter_resource_access
 
   skip_before_filter :login_required, :except => :destroy
 

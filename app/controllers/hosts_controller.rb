@@ -1,4 +1,5 @@
 class HostsController < ApplicationController
+  filter_resource_access
   def index
     @hosts = Host.all :order => "message_count DESC"
     @hostgroups = Hostgroup.all

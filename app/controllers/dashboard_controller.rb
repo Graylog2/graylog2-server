@@ -1,4 +1,5 @@
 class DashboardController < ApplicationController
+  filter_resource_access
 
   layout "dashboard"
 

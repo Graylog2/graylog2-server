@@ -1,8 +1,10 @@
 <div id="streamid" style="display: none;"><%=h @stream.id %></div>
 
-<div id="streams-delete">
-  <%= link_to "Delete this stream", { :action => "destroy", :id => @stream.id }, :confirm => "Really delete this stream with all it's filter rules?" %>
-</div>
+<% permitted_to? :delete, :streams do %>
+  <div id="streams-delete">
+    <%= link_to "Delete this stream", { :action => "destroy", :id => @stream.id }, :confirm => "Really delete this stream with all it's filter rules?" %>
+  </div>
+<% end %>
 
 <h1>Stream <span class="highlighted"><%= @stream.title %></span></h1>
 
@@ -18,21 +20,25 @@
   <% end %>
 
   <br />
-  <% form_tag("/messages/deletebystream/#{h(@stream.id)}") do -%>
-    <%= submit_tag "Delete all messages hit by this stream", :confirm => "Really delete all messages hit by this stream?" %>
-  <% end -%>
+  <% permitted_to? :delete, :messages do %>
+    <% form_tag("/messages/deletebystream/#{h(@stream.id)}") do -%>
+      <%= submit_tag "Delete all messages hit by this stream", :confirm => "Really delete all messages hit by this stream?" %>
+    <% end -%>
+  <% end %>
 </div>
 
-<% form_for @new_rule, :url => { :controller => "streamrules", :action => "create" } do |f| %>
-  <%= f.hidden_field :stream_id, :value => @stream.id %>
-  <%= f.label :term, "New Rule:" %>
-  <%= f.select :rule_type, options_for_select(Streamrule.get_types_for_select_options, :selected => Streamrule::TYPE_MESSAGE) %>
-  <%= f.text_field :value, :class => "stream-value-field stream-value-message" %>
-  <%= f.text_field :value, {:class => "stream-value-field stream-value-timeframe", :style => "display: none;", :disabled => true} %>
-  <%= f.select :value, options_for_select(get_ordered_facilities_for_select), {}, { :disabled => true, :style => "display: none;", :class => "stream-value-field stream-value-facility" } %>
-  <%= f.select :value, options_for_select(get_ordered_severities_for_select), {}, { :disabled => true, :style => "display: none;", :class => "stream-value-field stream-value-severity" } %>
-  <%= f.select :value, Host.all.collect {|host| [ h(host.host) ] }, {}, { :disabled => true, :style => "display: none;", :class => "stream-value-field stream-value-host" } %>
-  <%= submit_tag "Add" %>
+<% permitted_to? :create, :streamrules do %>
+  <% form_for @new_rule, :url => { :controller => "streamrules", :action => "create" } do |f| %>
+    <%= f.hidden_field :stream_id, :value => @stream.id %>
+    <%= f.label :term, "New Rule:" %>
+    <%= f.select :rule_type, options_for_select(Streamrule.get_types_for_select_options, :selected => Streamrule::TYPE_MESSAGE) %>
+    <%= f.text_field :value, :class => "stream-value-field stream-value-message" %>
+    <%= f.text_field :value, {:class => "stream-value-field stream-value-timeframe", :style => "display: none;", :disabled => true} %>
+    <%= f.select :value, options_for_select(get_ordered_facilities_for_select), {}, { :disabled => true, :style => "display: none;", :class => "stream-value-field stream-value-facility" } %>
+    <%= f.select :value, options_for_select(get_ordered_severities_for_select), {}, { :disabled => true, :style => "display: none;", :class => "stream-value-field stream-value-severity" } %>
+    <%= f.select :value, Host.all.collect {|host| [ h(host.host) ] }, {}, { :disabled => true, :style => "display: none;", :class => "stream-value-field stream-value-host" } %>
+    <%= submit_tag "Add" %>
+  <% end %>
 <% end %>
 
 <div id="blocks-terms">
@@ -44,7 +50,9 @@
       <% @stream.streamrules.each do |rule| %>
         <li>
           <%= streamrule_to_human rule %>
-          <%= link_to image_tag("icons/delete.png", :style => "position: relative; top: -2px"), { :controller => "streamrules", :action => "destroy", :id => rule.id, :stream_id => @stream.id }, :class => "blocks-terms-delete" %>
+          <% permitted_to? :delete, :streamrules do %>
+            <%= link_to image_tag("icons/delete.png", :style => "position: relative; top: -2px"), { :controller => "streamrules", :action => "destroy", :id => rule.id, :stream_id => @stream.id }, :class => "blocks-terms-delete" %>
+          <% end %>
         </li>
       <% end %>
     <% end %>

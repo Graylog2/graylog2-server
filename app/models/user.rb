@@ -24,6 +24,8 @@ class User < ActiveRecord::Base
   # prevents a user from submitting a crafted form that bypasses activation
   # anything else you want your user to change should be added here.
   attr_accessible :login, :email, :name, :password, :password_confirmation
+  
+  has_and_belongs_to_many :streams
 
 
 
@@ -47,8 +49,8 @@ class User < ActiveRecord::Base
     write_attribute :email, (value ? value.downcase : nil)
   end
 
-  protected
-    
 
-
+  def roles
+    [role.to_sym]
+  end
 end

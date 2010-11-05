@@ -1,4 +1,5 @@
 class HostgrouphostsController < ApplicationController
+  filter_resource_access
 
   def create
     # Check if that host exists.

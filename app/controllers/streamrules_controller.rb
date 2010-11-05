@@ -1,4 +1,5 @@
 class StreamrulesController < ApplicationController
+  filter_resource_access
   def create
     new_rule = Streamrule.new params[:streamrule]
     if new_rule.save

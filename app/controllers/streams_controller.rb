@@ -1,11 +1,16 @@
 class StreamsController < ApplicationController
+  filter_resource_access
   def index
     @new_stream = Stream.new
-    @streams = Stream.all
+    #if has_role? :admin
+    #  @streams = Stream.all
+    #else
+      @streams = current_user.streams
+    #end
   end
 
   def show
-    @stream = Stream.find params[:id]
+    #@stream = Stream.find params[:id]
     @messages = Message.all_of_stream @stream.id, params[:page]
     @new_rule = Streamrule.new
     @total_count = Message.count_stream @stream.id

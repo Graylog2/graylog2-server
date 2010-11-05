@@ -9,7 +9,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20101023192804) do
+ActiveRecord::Schema.define(:version => 20101105114745) do
 
   create_table "blacklisted_terms", :force => true do |t|
     t.string   "term"
@@ -70,6 +70,11 @@ ActiveRecord::Schema.define(:version => 20101023192804) do
     t.datetime "updated_at"
   end
 
+  create_table "streams_users", :force => true do |t|
+    t.integer "stream_id"
+    t.integer "user_id"
+  end
+
   create_table "users", :force => true do |t|
     t.string   "login",                     :limit => 40
     t.string   "name",                      :limit => 100, :default => ""
@@ -80,6 +85,7 @@ ActiveRecord::Schema.define(:version => 20101023192804) do
     t.datetime "updated_at"
     t.string   "remember_token",            :limit => 40
     t.datetime "remember_token_expires_at"
+    t.string   "role"
   end
 
   add_index "users", ["login"], :name => "index_users_on_login", :unique => true

@@ -1,4 +1,5 @@
 class SettingsController < ApplicationController
+  filter_resource_access
   def index
   end
 

@@ -1,5 +1,6 @@
 class MessagesController < ApplicationController
   before_filter :set_scoping
+  filter_resource_access
   
   def set_scoping
     if params[:host_id]
