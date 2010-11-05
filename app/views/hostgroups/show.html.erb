@@ -6,16 +6,11 @@
 
 <% form_for :new_host, :url => { :controller => "hostgrouphosts", :action => 'create' } do |f| -%>
   <%= label_tag 'hostname' %>:
-  <%= f.text_field :hostname %>
+  <%= f.select :hostname, Host.all.collect {|host| [h(host.host)]} %>
   <%= hidden_field_tag 'new_host[hostgroup_id]', @hostgroup.id %>
   <%= submit_tag "Add host to group" %> 
 <% end %>
 <br />
-
-<script type="text/javascript">
-  var data = "<%= @hosts.map { |h| h.is_a?(Hostgroup) ? h(h.name) : h(h.host) }.join ',' %> ".split(",");
-    $("#new_host_hostname").autocomplete(data);
-</script>
 
 <% if @last_message.blank? %>
   No messages or hosts in this hostgroup.
