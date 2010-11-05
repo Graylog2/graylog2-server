@@ -89,19 +89,13 @@ class MessagesController < ApplicationController
     conditions = Message.by_blacklisted_terms(Blacklist.all_terms)
 
     # Add our search condition.
-    #conditions[:message] = Hash.new if conditions[:message].blank?
-    #conditions[:message]['$in'] = [/#{Regexp.escape(message)}/]
-    
     conditions = conditions.where(:message.in => [/#{Regexp.escape(message)}/])
 
     # Don't search for the message we used to compare.
-    #conditions[:id] = Hash.new
-    #conditions[:id]['$nin'] = [message_id]
     conditions = conditions.where(:id.nin => [message_id])
 
     # Get the messages.
     @messages = conditions.limit(50).order("_id DESC")
-    #@messages = Message.all :limit => 50, :order => "_id DESC", :conditions => conditions
 
     if @messages.blank?
       render :text => "No similar messages found"
