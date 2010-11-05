@@ -1,4 +1,7 @@
 namespace :alert do
+  general_config = YAML::load(File.read(RAILS_ROOT + "/config/general.yml"))
+  alert_config = general_config['alerts']
+  
   desc "Alert users if an alertable stream contains new messages"
   task :send => :environment do
     # get the previous alert timestamp
@@ -26,7 +29,7 @@ namespace :alert do
       # send an alert email to every user
       users = User.all
       users.each do |user|
-        Pony.mail(:to => user.email, :from => 'alerts@graylog2.org', :subject => 'GrayLog2 Alert!', :body => body)
+        Pony.mail(:to => user.email, :from => alert_config['from'], :subject => alert_config['subject'], :body => body)
       end
     end
   end

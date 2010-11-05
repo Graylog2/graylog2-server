@@ -1,0 +1,3 @@
+alerts:
+  from: alerts@graylog2.org
+  subject: GrayLog2 Alert!
