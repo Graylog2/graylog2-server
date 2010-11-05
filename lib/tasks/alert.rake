@@ -11,7 +11,7 @@ namespace :alert do
     # group messages
     streams = Stream.find(:all, :conditions => "alertable = true")
     streams.each do |stream|
-      messages = Message.all_of_stream(stream.id, nil, nil, newer_than).group_by {|message| message.host + message.message}.collect do |message, occurrences|
+      messages = Message.all_of_stream(stream.id, nil, newer_than).group_by {|message| message.host + message.message}.collect do |message, occurrences|
         body += "(" + occurrences.size.to_s + ") Host: '" + occurrences.first.host + "'   Message: '" + occurrences.first.message + "'\n"
         body += "       Occurrences:\n"
         occurrences.each do |occurrence|
