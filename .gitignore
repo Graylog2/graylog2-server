@@ -4,6 +4,7 @@ config/database.yml
 config/mongodb.yml
 config/graphs.yml
 config/general.yml
+config/email.yml
 
 Capfile
 config/deploy.rb

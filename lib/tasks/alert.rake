@@ -1,9 +1,10 @@
 namespace :alert do
-  general_config = YAML::load(File.read(RAILS_ROOT + "/config/general.yml"))
-  alert_config = general_config['alerts']
-  
+
   desc "Alert users if an alertable stream contains new messages"
   task :send => :environment do
+    # Include helpers. (for gl_date etc)
+    include ActionController::ApplicationHelper
+
     # get the previous alert timestamp
     newer_than = Alert.last ? Alert.last.created_at : nil
     # start alert body
@@ -11,11 +12,11 @@ namespace :alert do
     # group messages
     streams = Stream.find(:all, :conditions => "alertable = true")
     streams.each do |stream|
-      messages = Message.all_of_stream(stream.id, nil, newer_than).group_by {|message| message.host + message.message}.collect do |message, occurrences|
+      messages = Message.all_of_stream(stream.id, nil, newer_than.to_i).group_by {|message| message.host + message.message}.collect do |message, occurrences|
         body += "(" + occurrences.size.to_s + ") Host: '" + occurrences.first.host + "'   Message: '" + occurrences.first.message + "'\n"
         body += "       Occurrences:\n"
         occurrences.each do |occurrence|
-          body += "           " + occurrence.date + "\n"
+          body += "           " + gl_date(Time.at(occurrence.created_at).to_s) + "\n"
         end
         body += "\n\n"
       end
@@ -29,7 +30,14 @@ namespace :alert do
       # send an alert email to every user
       users = User.all
       users.each do |user|
-        Pony.mail(:to => user.email, :from => alert_config['from'], :subject => alert_config['subject'], :body => body)
+        Pony.mail(
+          :to => user.email,
+          :from => Configuration.alert_from_address,
+          :subject => Configuration.alert_subject,
+          :body => body,
+          :via => Configuration.email_transport_type,
+          :smtp => Configuration.email_smtp_settings # Only used when :via => :smtp
+        )
       end
     end
   end
