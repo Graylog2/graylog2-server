@@ -2,11 +2,11 @@ class StreamsController < ApplicationController
   filter_resource_access
   def index
     @new_stream = Stream.new
-    #if has_role? :admin
-    #  @streams = Stream.all
-    #else
+    if current_user.role_symbols.include? :admin
+      @streams = Stream.all
+    else
       @streams = current_user.streams
-    #end
+    end
   end
 
   def show
