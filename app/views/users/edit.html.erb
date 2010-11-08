@@ -22,6 +22,14 @@
   <dt><%= label_tag 'password_confirmation', 'Confirm Password' %></dt>
   <dd><%= f.password_field :password_confirmation %></dd>
 
+  <dt><%= label_tag 'role', 'Rolle'%></dt>
+  <dd><%= f.select(:role, @user.valid_roles.collect {|r| [r.to_s.capitalize, r.to_s]})%></dd>
+
+  <dt><%= label_tag 'streams', 'Streams' %></dt>
+  <dd><% Stream.all.each do |stream| %>
+      <%= check_box_tag "user[stream_ids][]", stream.id, @user.streams.include?(stream) -%><%= stream.title -%>
+      <% end %></dd>
+
   <dt>&nbsp;</dt>
   <dd><%= submit_tag 'Edit user' %></dd>
 </dl>

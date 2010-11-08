@@ -26,7 +26,7 @@
     <div id="userbar">
       Logged in as <%= current_user.login %> <%= link_to "&nbsp; (Log out)", "/logout" %>
     </div>
-    <%= link_to image_tag("graylog.png", :id => "toplogo"), '/' %>
+    <%= link_to image_tag("graylog.png", :id => "toplogo"), (permitted_to?(:index, :messages) ? "/" : streams_path)%>
     <ul id="topmenu">
       <% permitted_to? :index, :messages do %><%= menu_item({ :title => "Messages", :controller => "/" }) %><% end %>
       <% permitted_to? :index, :streams do %><%= menu_item({ :title => "Streams", :controller => "streams" }) %><% end %>

@@ -12,13 +12,16 @@ authorization do
     
     has_permission_on :settings, :to => [:index, :store]
     
-    has_permission_on :users, :to => [:index, :create, :edit, :delete]
+    has_permission_on :users, :to => [:new, :index, :create, :edit, :delete, :update]
+    
+    has_permission_on :sessions, :to => [:destroy]
   end
   
   role :reader do
     has_permission_on :streams, :to => [:index, :show] do
       if_attribute :users => contains { user }
     end
+    has_permission_on :sessions, :to => [:destroy]
   end
 end
 

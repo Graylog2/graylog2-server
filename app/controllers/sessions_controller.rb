@@ -1,5 +1,4 @@
 class SessionsController < ApplicationController
-  filter_resource_access
 
   skip_before_filter :login_required, :except => :destroy
 
@@ -19,7 +18,7 @@ class SessionsController < ApplicationController
       self.current_user = user
       new_cookie_flag = (params[:remember_me] == "1")
       handle_remember_cookie! new_cookie_flag
-      redirect_back_or_default('/')
+      redirect_back_or_default(permitted_to?(:index, :messages) ? "/" : streams_path)
       flash[:notice] = "<strong>Login</strong><span>Logged in successfully</span>"
     else
       note_failed_signin
