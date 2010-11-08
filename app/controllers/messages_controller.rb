@@ -96,7 +96,7 @@ class MessagesController < ApplicationController
     conditions = conditions.where(:id.nin => [message_id])
 
     # Get the messages.
-    @messages = conditions.limit(50).order("_id DESC")
+    @messages = conditions.limit(50).order("$natural DESC")
 
     if @messages.blank?
       render :text => "No similar messages found"

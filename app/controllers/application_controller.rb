@@ -3,16 +3,16 @@
 
 class ApplicationController < ActionController::Base
   include AuthenticatedSystem
-  
+
   helper :all # include all helpers, all the time
   protect_from_forgery # See ActionController::RequestForgeryProtection for details
-  
+
   # Scrub sensitive parameters from your log
   filter_parameter_logging :password
 
   before_filter :login_required
 
-  def rescue_action_disabled e
+  def rescue_action e
     # Connection to MongoDB failed.
     if e.class == Mongo::ConnectionFailure
         render :file => "#{RAILS_ROOT}/public/mongo_connectionfailure.html", :status => 500
@@ -44,7 +44,7 @@ class ApplicationController < ActionController::Base
     end
     return false
   end
-  
+
   def login_required
     if !logged_in?
       redirect_to :controller => "sessions", :action => "new"

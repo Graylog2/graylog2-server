@@ -22,7 +22,7 @@ class Message
   }
   scope :by_blacklist, lambda {|blacklist| by_blacklisted_terms(blacklist.all_terms)}
   scope :page, lambda {|number| skip(self.get_offset(number))}
-  scope :default_scope, fields(:full_message => 0).order("_id DESC").not_deleted.limit(LIMIT)
+  scope :default_scope, fields(:full_message => 0).order("$natural DESC").not_deleted.limit(LIMIT)
 
   def self.get_conditions_from_date(timeframe)
     conditions = {}
@@ -94,11 +94,21 @@ class Message
 
     conditions
   end
-    
-  def self.all_of_stream stream_id, page = 1
+
+  def self.all_of_stream stream_id, page = 1, newer_than = nil
     page = 1 if page.blank?
+
+    # XXX: something like this:
+    #if newer_than
+    #  by_stream(stream_id).where(:created_at => { '$gt' => newer_than.to_i}).default_scope.page(page)
+    #end
+
     by_stream(stream_id).default_scope.page(page).all
   end
+
+    #unless newer_than.nil?
+    #  conditions[:created_at] = { '$gt' => newer_than.to_i }
+    #end
 
   def self.count_stream stream_id
     return by_stream(stream_id).count
@@ -106,13 +116,11 @@ class Message
 
   def self.all_of_host host, page
     page = 1 if page.blank?
-    
     where(:host => host).default_scope.page(page)
   end
   
   def self.all_of_hostgroup hostgroup, page
     page = 1 if page.blank?
-    
     where(:host.in => hostgroup.get_hostnames).default_scope.page(page)
   end
 

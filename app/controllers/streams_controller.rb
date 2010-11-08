@@ -15,6 +15,9 @@ class StreamsController < ApplicationController
     @new_rule = Streamrule.new
     @total_count = Message.count_stream @stream.id
 
+    # Find out if this stream is alertable.
+    @is_alertable = @stream.alertable || false
+    
     # Find out if this stream is favorited by the current user.
     FavoritedStream.find_by_stream_id_and_user_id(params[:id], current_user.id).blank? ? @is_favorited = false : @is_favorited = true
   end
@@ -66,4 +69,10 @@ class StreamsController < ApplicationController
     render :partial => 'statistics', :locals => { :hosts => ready_hosts }
   end
 
+  def alertable
+    stream = Stream.find params[:id]
+    stream.alertable = !stream.alertable
+    stream.save
+    redirect_to :action => "show", :id => params[:id]
+  end
 end
