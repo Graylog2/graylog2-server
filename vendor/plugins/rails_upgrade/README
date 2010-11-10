@@ -1,0 +1,20 @@
+= rails-upgrade
+
+A simple battery of scripts for upgrading Rails app/checking them for required updates.  This application should work on Rails 2.x and 3.0, with a focus on upgrading to 3.0.
+
+== Usage
+
+    # Check your app for required upgrades
+    rake rails:upgrade:check
+    
+    # Backup your likely modified files that might be overwritten by the generator
+    rake rails:upgrade:backup
+    
+    # Generate a new route file
+    rake rails:upgrade:routes
+    
+    # Generate a Gemfile from your config.gem directives
+    rake rails:upgrade:gems
+
+    # Generate code for a new config/application.rb from your environment.rb
+    rake rails:upgrade:configuration
