@@ -1,10 +1,5 @@
-RAILS_GEM_VERSION = '2.3.5' unless defined? RAILS_GEM_VERSION
+# Load the rails application
+require File.expand_path('../application', __FILE__)
 
-# Bootstrap the Rails environment, frameworks, and default configuration
-require File.join(File.dirname(__FILE__), 'boot')
-
-require 'mongo_mapper'
-
-Rails::Initializer.run do |config|
-  # nothing
-end
+# Initialize the rails application
+Graylog2WebInterface::Application.initialize!

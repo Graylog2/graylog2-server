@@ -28,12 +28,12 @@
     </div>
     <%= link_to image_tag("graylog.png", :id => "toplogo"), '/' %>
     <ul id="topmenu">
-      <%= menu_item({ :title => "Messages", :controller => "/" }) %>
-      <%= menu_item({ :title => "Streams", :controller => "streams" }) %>
-      <%= menu_item({ :title => "Hosts", :controller => "hosts" }) %>
-      <%= menu_item({ :title => "Blacklists", :controller => "blacklists" }) %>
-      <%= menu_item({ :title => "Settings", :controller => "settings" }) %>
-      <%= menu_item({ :title => "Users", :controller => "users" }) %>
+      <%=raw menu_item({ :title => "Messages", :controller => "/" }) %>
+      <%=raw menu_item({ :title => "Streams", :controller => "streams" }) %>
+      <%=raw menu_item({ :title => "Hosts", :controller => "hosts" }) %>
+      <%=raw menu_item({ :title => "Blacklists", :controller => "blacklists" }) %>
+      <%=raw menu_item({ :title => "Settings", :controller => "settings" }) %>
+      <%=raw menu_item({ :title => "Users", :controller => "users" }) %>
     </ul>
 
     <% message_count_interval = Setting.get_message_count_interval(current_user) %>
