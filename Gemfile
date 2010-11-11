@@ -11,7 +11,6 @@ gem 'plucky', '0.3.6'
 gem 'mongo_mapper', '0.8.6'
 gem 'mysql2', '0.2.4'
 gem 'rack', '1.2.1'
-gem 'SyslogLogger', '1.4.0'
 gem 'pony'
 
 group :development do
