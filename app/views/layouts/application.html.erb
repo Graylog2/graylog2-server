@@ -19,12 +19,12 @@
 
   <div id="pageload" style="display: none;"><%= Time.now.to_i %></div>
   
-  <div id="notification-notice" style="display: none;"><%= flash[:notice] %></div>
-  <div id="notification-error" style="display: none;"><%= flash[:error] %></div>
+  <div id="notification-notice" style="display: none;"><%=raw flash[:notice] %></div>
+  <div id="notification-error" style="display: none;"><%=raw flash[:error] %></div>
 
   <div id="top">
     <div id="userbar">
-      Logged in as <%= current_user.login %> <%= link_to "&nbsp; (Log out)", "/logout" %>
+      Logged in as <%= current_user.login %> &nbsp;<%= link_to "(Log out)", "/logout" %>
     </div>
     <%= link_to image_tag("graylog.png", :id => "toplogo"), '/' %>
     <ul id="topmenu">
