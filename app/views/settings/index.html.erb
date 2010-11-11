@@ -6,7 +6,7 @@
 
 <div class="setting">
   <label>Message length</label>
-  <% form_tag '/settings/store' do -%>
+  <%= form_tag '/settings/store' do -%>
     <%= hidden_field_tag 'setting_type', Setting::TYPE_MESSAGE_LENGTH %>
     <%= text_field_tag 'value', Setting.get_message_length(current_user) %>
     <%= submit_tag 'Store' %>
@@ -17,7 +17,7 @@
 
 <div class="setting">
   <label>Message count interval</label>
-  <% form_tag '/settings/store' do -%>
+  <%= form_tag '/settings/store' do -%>
     <%= hidden_field_tag 'setting_type', Setting::TYPE_MESSAGE_COUNT_INTERVAL %>
     <%= text_field_tag 'value', Setting.get_message_count_interval(current_user) %>
     <%= submit_tag 'Store' %>
@@ -28,7 +28,7 @@
 
 <div class="setting">
   <label>Maximum messages</label>
-  <% form_tag '/settings/store' do -%>
+  <%= form_tag '/settings/store' do -%>
     <%= hidden_field_tag 'setting_type', Setting::TYPE_MESSAGE_MAX_COUNT %>
     <%= text_field_tag 'value', Setting.get_message_max_count(current_user) %>
     <%= submit_tag 'Store' %>

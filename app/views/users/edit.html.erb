@@ -10,7 +10,7 @@
 <% @user.password = @user.password_confirmation = nil %>
 
 <%= error_messages_for :user %>
-<% form_for :user, :url => { :action => 'update', :id => @user.id } do |f| -%>
+<%= form_for :user, :url => { :action => 'update', :id => @user.id } do |f| -%>
 
 <dl id="users-form">
   <dt><%= label_tag 'email' %></dt>

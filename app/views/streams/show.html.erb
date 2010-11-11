@@ -32,7 +32,7 @@
   <% end -%>
 </div>
 
-<% form_for @new_rule, :url => { :controller => "streamrules", :action => "create" } do |f| %>
+<%= form_for @new_rule, :url => { :controller => "streamrules", :action => "create" } do |f| %>
   <%= f.hidden_field :stream_id, :value => @stream.id %>
   <%= f.label :term, "New Rule:" %>
   <%= f.select :rule_type, options_for_select(Streamrule.get_types_for_select_options, :selected => Streamrule::TYPE_MESSAGE) %>

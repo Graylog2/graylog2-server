@@ -6,7 +6,7 @@
 </div>
 
 <%= error_messages_for :user %>
-<% form_for :user, :url => { :action => 'create' } do |f| -%>
+<%= form_for :user, :url => { :action => 'create' } do |f| -%>
 
 <dl id="users-form">
   <dt><%= label_tag 'login', "Username" %></dt>

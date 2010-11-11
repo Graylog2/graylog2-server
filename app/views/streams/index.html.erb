@@ -6,7 +6,7 @@
   include the string "MySQL".
 </div>
 
-<% form_for @new_stream, :url => { :action => "create" } do |f| %>
+<%= form_for @new_stream, :url => { :action => "create" } do |f| %>
   <%= f.label :title, "Title:" %>
   <%= f.text_field :title %>
   <%= submit_tag "Create Stream" %>

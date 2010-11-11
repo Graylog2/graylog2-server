@@ -4,7 +4,7 @@
 
 <h1>Blacklist <span class="highlighted"><%= @blacklist.title %></span></h1>
 
-<% form_for @new_term, :url => { :controller => "blacklistedterms", :action => "create" } do |f| %>
+<%= form_for @new_term, :url => { :controller => "blacklistedterms", :action => "create" } do |f| %>
   <%= f.hidden_field :blacklist_id, :value => @blacklist.id %>
   <%= f.label :term, "New term:" %>
   <%= f.text_field :term %>

@@ -6,7 +6,7 @@
   blacklist to see all messages filtered out.
 </div>
 
-<% form_for @new_blacklist, :url => { :action => "create" } do |f| %>
+<%= form_for @new_blacklist, :url => { :action => "create" } do |f| %>
   <%= f.label :title, "Title:" %>
   <%= f.text_field :title %>
   <%= submit_tag "Create blacklist" %>

@@ -21,7 +21,7 @@ filtered by <span class="highlighted"><%=h @total_blacklisted_terms %></span> bl
 <span class="highlighted"><%=h Message.count_of_last_minutes(Setting.get_message_count_interval(message_count_interval)) %></span>
 messages in the last <%=h message_count_interval %> minutes.
 
-<% form_tag('/', :method => :get) do -%>
+<%= form_tag('/', :method => :get) do -%>
   <table id="messages-quickfilter" style="display: <%= params[:filters].blank? ? 'none' : 'block' %>">
     <thead>
       <tr>
@@ -48,7 +48,7 @@ messages in the last <%=h message_count_interval %> minutes.
 
 <% unless params[:filters].blank? %>
 <div id="messages-quickfilter-delete">
-  <% form_tag('/messages/deletebyquickfilter') do -%>
+  <%= form_tag('/messages/deletebyquickfilter') do -%>
     <%= hidden_field_tag 'filters', params[:filters].to_json %>
     <%= submit_tag "Delete all messages hit by this quickfilter", :confirm => "Really delete all messages hit by this quickfilter?" %>
   <% end -%>

@@ -4,7 +4,7 @@
 
 <h1>Hostgroup <span class="highlighted"><%=h @hostgroup.name %></span></h1>
 
-<% form_for :new_host, :url => { :controller => "hostgrouphosts", :action => 'create' } do |f| -%>
+<%= form_for :new_host, :url => { :controller => "hostgrouphosts", :action => 'create' } do |f| -%>
   <%= label_tag 'hostname' %>:
   <%= f.select :hostname, Host.all.collect {|host| [h(host.host)]} %>
   <%= hidden_field_tag 'new_host[hostgroup_id]', @hostgroup.id %>
