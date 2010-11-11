@@ -67,6 +67,12 @@ class StreamsController < ApplicationController
   def alertable
     stream = Stream.find params[:id]
     stream.alertable = !stream.alertable
+    # don't alert the user of past events, only from this point forward
+    if stream.alertable
+      alert = Alert.new
+      alert.body = "Alerts enabled for stream: '#{stream.title}'"
+      alert.save
+    end
     stream.save
     redirect_to :action => "show", :id => params[:id]
   end

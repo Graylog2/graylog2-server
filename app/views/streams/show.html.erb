@@ -7,7 +7,7 @@
 <h1>Stream <span class="highlighted"><%= @stream.title %></span></h1>
 
 <div id="streams-right">
-  <% form_tag "/streams/alertable/#{h(@stream.id)}" do %>
+  <%= form_tag "/streams/alertable/#{h(@stream.id)}" do %>
   	<% if @is_alertable %>
       <%= submit_tag "Stop receiving alerts for this stream" %>
 	<% else %>
@@ -17,17 +17,17 @@
 
   <br />
   <% if @is_favorited %>
-    <% form_tag "/favoritedstreams/destroy/#{h(@stream.id)}" do %>
+    <%= form_tag "/favoritedstreams/destroy/#{h(@stream.id)}" do %>
       <%= submit_tag "Remove this stream from your favorites" %>
     <% end %>
   <% else %>
-    <% form_tag "/favoritedstreams/create/#{h(@stream.id)}" do %>
+    <%= form_tag "/favoritedstreams/create/#{h(@stream.id)}" do %>
       <%= submit_tag "Add this stream to your favorites" %>
     <% end %>
   <% end %>
 
   <br />
-  <% form_tag("/messages/deletebystream/#{h(@stream.id)}") do -%>
+  <%= form_tag("/messages/deletebystream/#{h(@stream.id)}") do -%>
     <%= submit_tag "Delete all messages hit by this stream", :confirm => "Really delete all messages hit by this stream?" %>
   <% end -%>
 </div>
