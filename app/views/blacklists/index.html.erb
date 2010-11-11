@@ -20,7 +20,9 @@
       <% if blacklist.blacklisted_terms.blank? %>
         <li>Filtering nothing</li>
       <% else %>
-        <%= blacklist.blacklisted_terms.map{|t| "<li>#{t.term}</li>" } %>
+        <% blacklist.blacklisted_terms.each do |term| %>
+          <li><%= term.term %></li>
+        <% end %>
       <% end %>
     </ul>
   </div>
