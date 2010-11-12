@@ -19,3 +19,4 @@ public/images/dashboard_logo.png
 public/images/graphs/*
 
 .bundle/
+Gemfile.lock

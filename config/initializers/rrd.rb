@@ -1,10 +1,10 @@
-rrd_config = YAML::load(File.read(RAILS_ROOT + "/config/graphs.yml"))
+rrd_config = YAML::load(File.read(Rails.root.to_s + "/config/graphs.yml"))
 
 begin
 
   # Is graphing enabled?
   $rrd_graphs_enabled = true
-  if rrd_config[Rails.env]["enable_graphs"].blank? or rrd_config[Rails.env]["enable_graphs"] == false
+  if rrd_config[Rails.env].blank? or rrd_config[Rails.env]["enable_graphs"].blank? or rrd_config[Rails.env]["enable_graphs"] == false
     $rrd_graphs_enabled = false
   end
 
