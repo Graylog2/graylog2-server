@@ -70,9 +70,9 @@ public final class Main {
         // Read config.
         System.out.println("[x] Reading config.");
         Main.masterConfig = new Properties();
-        /* Allow -DconfigPath=/some/different/config */
+        // Allow -DconfigPath=/some/different/config.
         String configPath = System.getProperty("configPath", "/etc/graylog2.conf");
-        System.out.println("Using config: " + configPath);
+        System.out.println("[x] Using config: " + configPath);
 
         try {
             FileInputStream configStream = new FileInputStream(configPath);
