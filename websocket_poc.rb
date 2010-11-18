@@ -2,8 +2,14 @@ require 'rubygems'
 require 'em-websocket'
 require 'mongo'
 require 'json'
+require 'cgi'
+require 'date'
 
 include Mongo
+
+# We need our helpers from Rails to format and convert message parts.
+require './app/helpers/application_helper.rb'
+include ApplicationHelper
 
 def subscribe_client(socket)
   Thread.new do
@@ -27,9 +33,14 @@ def subscribe_client(socket)
           next
         end
         doc = cursor.next_document
-        message = doc['message']
-        host = doc['host']
-        socket.send({"short_message" => message, "host" => host}.to_json)
+        
+        short_message = CGI.escapeHTML(doc['message'])
+        host = CGI.escapeHTML(doc['host'])
+        level = syslog_level_to_human(doc['level'])
+        facility = syslog_facility_to_human(doc['facility'])
+        created_at = gl_date(Time.at(doc['created_at']).to_s)
+
+        socket.send({"short_message" => short_message, "host" => host, "level" => level, "facility" => facility, "created_at" => created_at}.to_json)
       end
     end 
   end
