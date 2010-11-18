@@ -1,0 +1,11 @@
+<script type='text/javascript'>
+  var ws = new WebSocket('ws://localhost:12500');
+  ws.onmessage = function (message) {
+    data = eval('(' + message.data + ')');
+    $("#livestream li:first").prepend("<li>" + data.short_message + "</li>");
+  };
+</script>
+
+<ul id="livestream">
+  <li>bla</li>
+</ul>
