@@ -1,7 +1,7 @@
 development:
-  enable_graphs: true
-  rrdtool_binary_path: /usr/bin/rrdtool
-  rrd_storage_path: /tmp/graylog2/rrds/
+  enable_graphs: false
+  rrdtool_binary_path: /usr/local/bin/rrdtool
+  rrd_storage_path: /Users/dennis/Coding/graylog2-web-interface/db
 
 production:
   enable_graphs: true

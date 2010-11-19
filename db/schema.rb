@@ -9,7 +9,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20101104081003) do
+ActiveRecord::Schema.define(:version => 20101105114745) do
 
   create_table "alerts", :force => true do |t|
     t.text     "body"
@@ -77,7 +77,7 @@ ActiveRecord::Schema.define(:version => 20101104081003) do
     t.boolean  "alertable",       :default => false
   end
 
-  create_table "streams_users", :force => true do |t|
+  create_table "streams_users", :id => false, :force => true do |t|
     t.integer "stream_id"
     t.integer "user_id"
   end

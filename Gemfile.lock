@@ -16,6 +16,7 @@ GEM
     activesupport (2.3.10)
     bson (1.1.1)
     bson_ext (1.1.1)
+    declarative_authorization (0.5.1)
     hoe (2.6.2)
       rake (>= 0.8.7)
       rubyforge (>= 2.0.4)
@@ -63,6 +64,7 @@ DEPENDENCIES
   SyslogLogger (= 1.4.0)
   bson (= 1.1.1)
   bson_ext (= 1.1.1)
+  declarative_authorization
   jnunemaker-validatable (= 1.8.4)
   json (= 1.4.6)
   mongo (= 1.1.1)
