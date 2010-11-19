@@ -13,6 +13,7 @@ gem 'mysql2', '0.2.4'
 gem 'rack', '1.1.0'
 gem 'SyslogLogger', '1.4.0'
 gem 'pony'
+gem 'declarative_authorization'
 
 group :development do
   # bundler requires these gems in development
