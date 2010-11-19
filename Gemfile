@@ -12,6 +12,7 @@ gem 'mongo_mapper', '0.8.6'
 gem 'mysql2', '0.2.4'
 gem 'rack', '1.2.1'
 gem 'pony'
+gem 'em-websocket', '0.1.4'
 
 group :development do
   # bundler requires these gems in development

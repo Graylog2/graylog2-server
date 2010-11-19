@@ -15,5 +15,6 @@ begin
   end
 rescue => e
   puts "ERROR: Could not connect to MongoDB or read config: #{e}"
+  puts e.backtrace
   exit
 end
