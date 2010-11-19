@@ -7,7 +7,7 @@
 </div>
 
 <% permitted_to? :create, :streams do %>
-  <% form_for @new_stream, :url => { :action => "create" } do |f| %>
+  <%= form_for @new_stream, :url => { :action => "create" } do |f| %>
     <%= f.label :title, "Title:" %>
     <%= f.text_field :title %>
     <%= submit_tag "Create Stream" %>
@@ -23,7 +23,7 @@
       <% else %>
         <% stream.streamrules.each do |rule| %>
         <li>
-          <%= streamrule_to_human rule %>
+          <%=raw streamrule_to_human rule %>
         </li>
         <% end %>
       <% end %>

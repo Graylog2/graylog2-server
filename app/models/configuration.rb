@@ -1,6 +1,6 @@
 class Configuration
-  @general_config = YAML::load(File.read(RAILS_ROOT + "/config/general.yml"))
-  @email_config = YAML::load(File.read(RAILS_ROOT + "/config/email.yml"))
+  @general_config = YAML::load(File.read(Rails.root.to_s + "/config/general.yml"))
+  @email_config = YAML::load(File.read(Rails.root.to_s + "/config/email.yml"))
 
   @alert_config = @general_config['alerts']
 

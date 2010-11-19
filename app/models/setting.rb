@@ -15,7 +15,7 @@ class Setting < ActiveRecord::Base
   end
 
   def self.get_message_count_interval current_user
-    setting = Setting.find_by_user_id_and_setting_type current_user.id, TYPE_MESSAGE_COUNT_INTERVAL
+    setting = Setting.find_by_user_id_and_setting_type current_user, TYPE_MESSAGE_COUNT_INTERVAL
     return TYPE_MESSAGE_COUNT_INTERVAL_STANDARD if setting.blank?
     return setting.value
   end

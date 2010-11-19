@@ -1,8 +1,5 @@
-# Bootstrap the Rails environment, frameworks, and default configuration
-require File.join(File.dirname(__FILE__), 'boot')
+# Load the rails application
+require File.expand_path('../application', __FILE__)
 
-require 'mongo_mapper'
-
-Rails::Initializer.run do |config|
-  # nothing
-end
+# Initialize the rails application
+Graylog2WebInterface::Application.initialize!

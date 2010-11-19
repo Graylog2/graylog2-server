@@ -1,4 +1,4 @@
-db_config = YAML::load(File.read(RAILS_ROOT + "/config/mongodb.yml"))
+db_config = YAML::load(File.read(Rails.root.to_s + "/config/mongodb.yml"))
 
 begin
   if db_config[Rails.env]

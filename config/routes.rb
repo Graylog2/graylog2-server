@@ -1,19 +1,17 @@
-ActionController::Routing::Routes.draw do |map|
-  map.logout '/logout', :controller => 'sessions', :action => 'destroy'
-  map.login '/login', :controller => 'sessions', :action => 'new'
+Graylog2WebInterface::Application.routes.draw do
+  match '/logout' => 'sessions#destroy', :as => :logout
+  match '/login' => 'sessions#new', :as => :login
+  resource :session
 
-  map.resource :session
-  
-  map.resources :hosts do |hosts|
-    hosts.resources :messages
-  end
-  
-  map.resources :streams do |streams|
-    streams.resources :messages
+  resources :hosts do
+    resources :messages
   end
 
-  map.root :controller => "messages"
+  resources :streams do
+    resources :messages
+  end
   
-  map.connect ':controller/:action/:id'
-  map.connect ':controller/:action/:id.:format'
+  match '/' => 'messages#index'
+  match '/:controller(/:action(/:id))'
 end
+

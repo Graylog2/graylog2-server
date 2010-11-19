@@ -19,21 +19,21 @@
 
   <div id="pageload" style="display: none;"><%= Time.now.to_i %></div>
   
-  <div id="notification-notice" style="display: none;"><%= flash[:notice] %></div>
-  <div id="notification-error" style="display: none;"><%= flash[:error] %></div>
+  <div id="notification-notice" style="display: none;"><%=raw flash[:notice] %></div>
+  <div id="notification-error" style="display: none;"><%=raw flash[:error] %></div>
 
   <div id="top">
     <div id="userbar">
-      Logged in as <%= current_user.login %> <%= link_to "&nbsp; (Log out)", "/logout" %>
+      Logged in as <%= current_user.login %> &nbsp;<%= link_to "(Log out)", "/logout" %>
     </div>
     <%= link_to image_tag("graylog.png", :id => "toplogo"), (permitted_to?(:index, :messages) ? "/" : streams_path)%>
     <ul id="topmenu">
-      <% permitted_to? :index, :messages do %><%= menu_item({ :title => "Messages", :controller => "/" }) %><% end %>
-      <% permitted_to? :index, :streams do %><%= menu_item({ :title => "Streams", :controller => "streams" }) %><% end %>
-      <% permitted_to? :index, :hosts do %><%= menu_item({ :title => "Hosts", :controller => "hosts" }) %><% end %>
-      <% permitted_to? :index, :blacklists do %><%= menu_item({ :title => "Blacklists", :controller => "blacklists" }) %><% end %>
-      <% permitted_to? :index, :settings do %><%= menu_item({ :title => "Settings", :controller => "settings" }) %><% end %>
-      <% permitted_to? :index, :users do %><%= menu_item({ :title => "Users", :controller => "users" }) %><% end %>
+      <% permitted_to? :index, :messages do %><%=raw menu_item({ :title => "Messages", :controller => "/" }) %><% end %>
+      <% permitted_to? :index, :streams do %><%=raw menu_item({ :title => "Streams", :controller => "streams" }) %><% end %>
+      <% permitted_to? :index, :hosts do %><%=raw menu_item({ :title => "Hosts", :controller => "hosts" }) %><% end %>
+      <% permitted_to? :index, :blacklists do %><%=raw menu_item({ :title => "Blacklists", :controller => "blacklists" }) %><% end %>
+      <% permitted_to? :index, :settings do %><%=raw menu_item({ :title => "Settings", :controller => "settings" }) %><% end %>
+      <% permitted_to? :index, :users do %><%=raw menu_item({ :title => "Users", :controller => "users" }) %><% end %>
     </ul>
 
     <% message_count_interval = Setting.get_message_count_interval(current_user) %>

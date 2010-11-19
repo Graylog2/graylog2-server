@@ -1,5 +1,8 @@
 log/*
+tmp/*
+
 nbproject/*
+
 config/database.yml
 config/mongodb.yml
 config/graphs.yml
@@ -16,3 +19,4 @@ public/images/dashboard_logo.png
 public/images/graphs/*
 
 .bundle/
+Gemfile.lock
