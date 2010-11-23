@@ -19,7 +19,7 @@ begin
         :mongo_password => mongodb_config["password"]
       }
 
-      Thread.new do
+      fork do
         server = LiveTail::Server.new(args)
         server.run();
       end

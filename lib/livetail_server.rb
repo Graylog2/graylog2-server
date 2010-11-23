@@ -33,12 +33,9 @@ module LiveTail
     end
 
     def run
-      puts "RUN"
       loop do
-        puts "IN LOOP 1"
         cursor = Cursor.new(@coll, :tailable => true, :order => [['$natural', 1]]).skip(@coll.count)
         loop do
-          puts "IN LOOP 2"
           unless cursor.has_next?
             # Has the cursor been closed? (Will break and create a new one in the underlying loop)
             if cursor.closed?
@@ -76,7 +73,6 @@ module LiveTail
     attr_reader :args
 
     def initialize(args = {})
-      puts "CALLED"
       standard_args = {
         :port => 12500,
         :mongo_host => 'localhost',
@@ -92,7 +88,6 @@ module LiveTail
     end
 
     def run
-      puts "RUNNING"
       EventMachine::WebSocket.start(:host => "0.0.0.0", :port => @args[:port]) do |socket|
         socket.onopen do
           # XXX TODO: log somewhere
