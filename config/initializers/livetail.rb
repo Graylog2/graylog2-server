@@ -19,9 +19,14 @@ begin
         :mongo_password => mongodb_config["password"]
       }
 
-      fork do
-        server = LiveTail::Server.new(args)
-        server.run();
+      # Check if livetail secret is set.
+      unless livetail_config["secret"].blank?
+        fork do
+          server = LiveTail::Server.new(args)
+          server.run(livetail_config["secret"]);
+        end
+      else
+        puts "NO LIVETAIL SECRET SET! NOT STARTING!"
       end
     end
   end

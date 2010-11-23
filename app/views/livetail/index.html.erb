@@ -1,4 +1,6 @@
 <h1 class="livetail-head">Live tail</h1>
+
+<% if Configuration.livetail_enabled %>
 <span id="livetail-status" class="livetail-status-connecting">(Connecting...)</span>
 <br />
 
@@ -19,8 +21,10 @@
     var max_msg_length = <%= Setting.get_message_length(current_user) %>;
     var max_msg_count = <%= Setting.get_livetail_row_count(current_user) %>;
     var ws = new WebSocket('ws://localhost:12500');
+    var secret = '<%= Configuration.livetail_secret %>';
 
     ws.onopen = function() {
+      ws.send(secret);
       $("#livetail-status").removeClass();
       $("#livetail-status").addClass("livetail-status-connected");
       $("#livetail-status").html("(Connected)");
@@ -63,3 +67,9 @@
         $("#livetail-status").html("(Sorry, your Browser does not support WebSockets!)");
     }
   </script>
+
+<% else %>
+
+<span id="livetail-status" class="livetail-status-connecting">(Disabled)</span>
+
+<% end %>

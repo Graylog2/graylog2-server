@@ -39,7 +39,6 @@ module LiveTail
           unless cursor.has_next?
             # Has the cursor been closed? (Will break and create a new one in the underlying loop)
             if cursor.closed?
-              # XXX TODO: log somewhere
               sleep(3)
               break
             end
@@ -87,19 +86,22 @@ module LiveTail
       @args = standard_args.merge(args)
     end
 
-    def run
+    def run(secret)
       EventMachine::WebSocket.start(:host => "0.0.0.0", :port => @args[:port]) do |socket|
-        socket.onopen do
-          # XXX TODO: log somewhere
-          @thread = Thread.new do 
-            @loop = MongoCursorDispatcher.new(socket, @args)
-            @loop.run
+
+        socket.onmessage do |message|
+          if message == secret
+            @thread = Thread.new do 
+              @loop = MongoCursorDispatcher.new(socket, @args)
+              @loop.run
+            end
+          else
+            socket.close_with_error("wrong secret")
           end
         end
 
         socket.onclose do
-          # XXX TODO: log somewhere
-          @thread.exit
+          @thread.exit unless @thread == nil
         end
       end
     end
