@@ -5,6 +5,11 @@ class Configuration
   @alert_config = @general_config['alerts']
   @livetail_config = @general_config['livetail']
 
+  def self.external_hostname
+    return "localhost" if @general_config.blank? or @general_config['general'].blank? or @general_config['general']['external_hostname'].blank?
+    return @general_config['general']['external_hostname']
+  end
+
   def self.alert_from_address
     return @alert_config['from'] unless @alert_config.blank? or @alert_config['from'].blank?
     return "graylog2@example.org"

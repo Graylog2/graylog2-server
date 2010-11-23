@@ -1,3 +1,6 @@
+general:
+ external_hostname: "your-graylog2.example.org"
+
 alerts:
   from: graylog2alerts@example.org
   subject: GrayLog2 Alert!
