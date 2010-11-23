@@ -1,21 +1,20 @@
-<%= error_messages_for :user %>
 <% form_for :user, :url => { :action => form_action, :id => @user.id } do |f| -%>
 
 <dl id="users-form">
   <dt><%= label_tag 'login', "Username" %></dt>
-  <dd><%= f.text_field :login %></dd>
+  <dd><%= f.text_field :login %><%= @user.errors[:login].join(" and ")%></dd>
 
   <dt><%= label_tag 'email' %></dt>
-  <dd><%= f.text_field :email %></dd>
+  <dd><%= f.text_field :email %><%= @user.errors[:email].join(" and ")%></dd>
 
   <dt><%= label_tag 'password' %></dt>
-  <dd><%= f.password_field :password %></dd>
+  <dd><%= f.password_field :password %><%= @user.errors[:password].join(" and ")%></dd>
 
   <dt><%= label_tag 'password_confirmation', 'Confirm Password' %></dt>
-  <dd><%= f.password_field :password_confirmation %></dd>
+  <dd><%= f.password_field :password_confirmation %><%= @user.errors[:password_confirmation].join(" and ")%></dd>
 
   <dt><%= label_tag 'role', 'Rolle'%></dt>
-  <dd><%= f.select(:role, user.valid_roles.collect {|r| [r.to_s.capitalize, r.to_s]})%></dd>
+  <dd><%= f.select(:role, user.valid_roles.collect {|r| [r.to_s.capitalize, r.to_s]})%><%= @user.errors[:role].join(" and ")%></dd>
 
   <dt><%= label_tag 'streams', 'Streams' %></dt>
   <dd><% Stream.all.each do |stream| %>
