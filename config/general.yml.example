@@ -2,5 +2,10 @@ alerts:
   from: graylog2alerts@example.org
   subject: GrayLog2 Alert!
 
+# Make sure to only allow TCP port 12500 (livetail port) for trusted networks as the secret
+# will be transmitted in plain text and visible in the livetail HTML code. Everybody who
+# knows this passphrase and has access to TCP port 12500 on this machine can connect to the
+# livetail and fetch the log message stream!
 livetail:
-  enable: true
+  enable: false
+  secret: # Add a secret/password here. Use many chars and read the security hint above.
