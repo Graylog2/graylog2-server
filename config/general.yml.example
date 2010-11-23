@@ -1,3 +1,6 @@
 alerts:
   from: graylog2alerts@example.org
   subject: GrayLog2 Alert!
+
+livetail:
+  enable: true
