@@ -44,8 +44,8 @@ class Configuration
   end
 
   def self.livetail_enabled
-    return false if @livetail_config.blank? or @livetail_config['enabled'].blank?
-    return true if @livetail_config['enabled'] == true
+    return false if @livetail_config.blank? or @livetail_config['enable'].blank?
+    return true if @livetail_config['enable'] == true
     return false
   end
 
