@@ -33,6 +33,18 @@
     <%= text_field_tag 'value', Setting.get_message_max_count(current_user) %>
     <%= submit_tag 'Store' %>
     <br />
-    The number of maximum messages per [message count interval] minutes. Everything above this value is an alarm. (i.e. visible in the dashboard)
+    The number of maximum messages per [message count interval] minutes. Everything above this value is an alarm. For example visible in the dashboard. 
+    (Default: <%=h Setting::TYPE_MESSAGE_MAX_COUNT %>)
+  <% end -%>
+</div>
+
+<div class="setting">
+  <label>Live tail message history</label>
+  <%= form_tag '/settings/store' do -%>
+    <%= hidden_field_tag 'setting_type', Setting::TYPE_LIVETAIL_ROW_COUNT %>
+    <%= text_field_tag 'value', Setting.get_livetail_row_count(current_user) %>
+    <%= submit_tag 'Store' %>
+    <br />
+    The number of messages to keep as history in the live tail view. (Default: <%=h Setting::TYPE_LIVETAIL_ROW_COUNT_STANDARD %>)
   <% end -%>
 </div>

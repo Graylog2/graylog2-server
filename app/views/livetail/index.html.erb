@@ -1,0 +1,76 @@
+<h1 class="livetail-head">Live tail</h1>
+
+<% if Configuration.livetail_enabled %>
+<span id="livetail-status" class="livetail-status-connecting">(Connecting...)</span>
+<br />
+
+<table id="livetail">
+  <tbody>
+    <tr>
+      <td>&nbsp;</td>
+      <td>&nbsp;</td>
+      <td>&nbsp;</td>
+      <td>&nbsp;</td>
+      <td>&nbsp;</td>
+    </tr>
+  </tbody>
+</table>
+
+<script type='text/javascript'>
+  if ("WebSocket" in window) {
+    var max_msg_length = <%= Setting.get_message_length(current_user) %>;
+    var max_msg_count = <%= Setting.get_livetail_row_count(current_user) %>;
+    var ws = new WebSocket('ws://<%= Configuration.external_hostname %>:12500');
+    var secret = '<%= Configuration.livetail_secret %>';
+
+    ws.onopen = function() {
+      ws.send(secret);
+      $("#livetail-status").removeClass();
+      $("#livetail-status").addClass("livetail-status-connected");
+      $("#livetail-status").html("(Connected)");
+    }
+
+    ws.onclose = function() {
+      $("#livetail-status").removeClass();
+      $("#livetail-status").addClass("livetail-status-disconnected");
+      $("#livetail-status").html("(Disconnected)");
+    }
+
+    ws.onmessage = function (message) {
+      data = eval('(' + message.data + ')');
+
+      // Build possibly truncated message
+      if (data.short_message.length > max_msg_length) {
+        msg = data.short_message.substring(0, max_msg_length) + " [...]"
+      } else {
+        msg = data.short_message
+      }
+
+      $("#livetail tr:first").before(
+        "<tr>" + 
+          "<td class='livetail-c-date'>" + data.created_at + "</td>" +
+          "<td>" + data.host + "</td>" +
+          "<td>" + data.level + "</td>" +
+          "<td>" + data.facility + "</td>" +
+          "<td class='livetail-c-message'>" + msg + "</td>" +
+        "</tr>"
+      );
+
+        // Remove last element if the limit is reached.
+        if ($("#livetail tr").size() > max_msg_count) {
+          $("#livetail tr:last").remove();
+        }
+      };
+    } else {
+        $("#livetail-status").removeClass();
+        $("#livetail-status").addClass("livetail-status-disconnected");
+        $("#livetail-status").html("(Sorry, your Browser does not support WebSockets!)");
+    }
+  </script>
+
+<% else %>
+
+<span id="livetail-status" class="livetail-status-connecting">(Disabled)</span>
+<br /><br />
+Check the wiki for more information about the live tail and how to configure it: <%= link_to "https://github.com/Graylog2/graylog2-web-interface/wiki/Live-Tail", "https://github.com/Graylog2/graylog2-web-interface/wiki/Live-Tail" %>
+<% end %>

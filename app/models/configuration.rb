@@ -3,6 +3,12 @@ class Configuration
   @email_config = YAML::load(File.read(Rails.root.to_s + "/config/email.yml"))
 
   @alert_config = @general_config['alerts']
+  @livetail_config = @general_config['livetail']
+
+  def self.external_hostname
+    return "localhost" if @general_config.blank? or @general_config['general'].blank? or @general_config['general']['external_hostname'].blank?
+    return @general_config['general']['external_hostname']
+  end
 
   def self.alert_from_address
     return @alert_config['from'] unless @alert_config.blank? or @alert_config['from'].blank?
@@ -40,6 +46,17 @@ class Configuration
     end
 
     return ret
+  end
+
+  def self.livetail_enabled
+    return false if @livetail_config.blank? or @livetail_config['enable'].blank?
+    return true if @livetail_config['enable'] == true
+    return false
+  end
+
+  def self.livetail_secret
+    return nil if @livetail_config.blank? or @livetail_config['secret'].blank?
+    return @livetail_config['secret'].to_s
   end
 
 end

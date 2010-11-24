@@ -10,7 +10,7 @@ module ApplicationHelper
   end
 
   def gl_date date
-    return String.new if date.blank?
+    return String.new if date == nil or date.length == 0
     tmp = DateTime.parse(date)
     return tmp.strftime "%d.%m.%Y - %H:%M:%S"
   end

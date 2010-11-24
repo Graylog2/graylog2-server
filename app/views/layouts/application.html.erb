@@ -37,13 +37,17 @@
     </ul>
 
     <% message_count_interval = Setting.get_message_count_interval(current_user) %>
-    <div id="new-message-count"><strong><%= Message.count_of_last_minutes(message_count_interval) %></strong> / <%=h message_count_interval %> minutes</div>
+    <div id="new-message-count">
+      <% unless @hide_stats %>
+        <strong><%= Message.count_of_last_minutes(message_count_interval) %></strong> / <%=h message_count_interval %> minutes
+      <% end %>
+    </div>
   </div>
 
   <br style="clear: both;" />
   <div id="new-messages-bar" style="display: none;"></div>
 
-  <div id="content">
+  <div id="content" <%=raw @content_class.blank? ? '' : 'class="content-' + @content_class + '"' %>>
     <%= yield %>
   </div>
   <div id="content-bottom">

@@ -14,6 +14,7 @@ gem 'rack', '1.2.1'
 gem 'chronic', '0.3.0'
 gem 'pony'
 gem 'declarative_authorization'
+gem 'em-websocket', '0.1.4'
 
 group :development do
   # bundler requires these gems in development
