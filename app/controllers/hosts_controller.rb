@@ -22,6 +22,25 @@ class HostsController < ApplicationController
     @last_message = Message.last :conditions => { "host" => @host.host }, :order => "created_at DESC"
   end
 
+  def statistics
+    @load_jit = true
+  end
+
+  def load_statistics
+    hosts = Host.all
+    response = { 'label' => ['Total messages'] }
+    response['values'] = Array.new
+
+    hosts.each do |host|
+      bar = Hash.new
+      bar['label'] = host.host
+      bar['values'] = Array.new << host.message_count
+      response['values'] << bar
+    end
+
+    render :text => response.to_json
+  end
+
   def destroy
     host = Host.find_by_host Base64.decode64(params[:id])
     if host.blank?

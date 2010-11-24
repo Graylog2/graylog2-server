@@ -1,0 +1,38 @@
+<h1>Statistics</h1>
+
+<div id="infovis" style="height: 300px;"></div>
+
+<script type="text/javascript">
+
+var barChart = new $jit.BarChart({  
+  injectInto: 'infovis',  
+  animate: true,  
+  orientation: 'horizontal',  
+  barsOffset: 0.5,  
+  Margin: {  
+    top: 5,  
+    left: 5,  
+    right: 5,  
+    bottom: 5  
+  },  
+  labelOffset:5,  
+  type:'stacked',  
+  //whether to show the aggregation of the values  
+  showAggregates:false,  
+  showLabels:true,  
+  Label: {  
+    type: 'HTML', //Native or HTML  
+    size: 13,  
+    family: 'Arial',  
+    color: '#000000'  
+  },  
+  Tips: {  
+    enable: false,  
+  }  
+});  
+
+$.post("/hosts/load_statistics", function(data) {
+  json = eval('(' + data + ')');
+  barChart.loadJSON(json);  
+});
+</script>
