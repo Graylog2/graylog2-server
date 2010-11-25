@@ -1,0 +1,44 @@
+<h1>Spread of <span class="highlighted"><%= @term %></span></h1>
+
+<div id="infovis" style="height: 380px; width: 380px;"></div>
+
+<script type="text/javascript">
+
+ var sb = new $jit.Sunburst({  
+     //id container for the visualization  
+     injectInto: 'infovis',
+     //Distance between levels  
+     levelDistance: 80,
+
+     //Change node and edge styles such as  
+     //color, width and dimensions.  
+     Node: {  
+       overridable: true,  
+       type: 'multipie'
+     },  
+     //Change styles when hovering and clicking nodes  
+     NodeStyles: {  
+       enable: true,  
+       type: 'Native',  
+       stylesHover: {  
+         'color': '#000'  
+       }  
+     }, 
+
+     //implement event handlers  
+     Events: {  
+       enable: true,  
+       onClick: function(node) {  
+       }  
+     },  
+});  
+
+$.post("/visuals/fetch/messagespread?term=<%= params[:term] %>", function(data) {
+  json = eval('(' + data + ')');
+ //load JSON data.  
+ sb.loadJSON(json);  
+ //compute positions and plot.  
+ sb.refresh();  
+});
+
+</script>
