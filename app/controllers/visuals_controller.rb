@@ -21,12 +21,10 @@ class VisualsController < ApplicationController
 
   def get_random_color
     random_colors = [
-      "FF0000", "FFFF00", "00FF00",
-      "000033", "000099", "0000FF",
-      "009933", "009999", "0099FF",
-      "330033", "330099", "3300FF",
-      "993300", "993399", "9933FF",
-      "CCCC00", "CCCC99", "00FF00"
+      "FF0000", "FF8000", "FFFF00",
+      "80FF00", "00FF00", "00FF80",
+      "00FFFF", "0080FF", "0000FF",
+      "8000FF", "FF00FF", "FF0080"
     ]
     
     random_colors[rand(random_colors.size)]
@@ -51,7 +49,7 @@ class VisualsController < ApplicationController
           "$color" => get_random_color,
           "$angularWidth" => count
         }
-        value["id"] = host.host
+        value["id"] = Base64.encode64(host.host).chomp
         value["name"] = host.host
 
         values << value

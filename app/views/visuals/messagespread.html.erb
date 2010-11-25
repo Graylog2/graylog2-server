@@ -1,8 +1,24 @@
 <h1>Spread of <span class="highlighted"><%= @term %></span></h1>
 
+<table id="hosts">
+  <tr></tr>
+</table>
 <div id="infovis" style="height: 380px; width: 380px;"></div>
 
 <script type="text/javascript">
+
+function displayHosts(hosts) {
+  for (i = 0; i < hosts.length; i++) {
+    host = hosts[i];
+    console.log(host);
+    $("#hosts tr:first").before(
+      "<tr>" + 
+        "<td>" + host.name + "</td>" +
+        "<td>" + host.data.$angularWidth + "</td>" +
+      "</tr>"
+    );
+  }
+}
 
  var sb = new $jit.Sunburst({  
      //id container for the visualization  
@@ -35,10 +51,13 @@
 
 $.post("/visuals/fetch/messagespread?term=<%= params[:term] %>", function(data) {
   json = eval('(' + data + ')');
- //load JSON data.  
- sb.loadJSON(json);  
- //compute positions and plot.  
- sb.refresh();  
+
+  hosts = json.children[0].children
+
+  displayHosts(hosts);
+
+  sb.loadJSON(json);  
+  sb.refresh();  
 });
 
 </script>
