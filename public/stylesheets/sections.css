@@ -349,3 +349,19 @@
   float: left;
   padding-right: 15px;
 }
+
+/* Visuals */
+#visuals-spread-vis {
+ height: 380px;
+ width: 380px;
+}
+
+#visuals-spread-hosts {
+  float: left;
+  margin-left: 450px;
+  width: 300px;
+}
+
+#visuals-spread-hosts td {
+  padding-right: 20px;
+}

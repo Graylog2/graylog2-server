@@ -1,63 +1,82 @@
 <h1>Spread of <span class="highlighted"><%= @term %></span></h1>
 
-<table id="hosts">
-  <tr></tr>
-</table>
-<div id="infovis" style="height: 380px; width: 380px;"></div>
+<p>
+  <table id="visuals-spread-hosts">
+    <thead>
+      <tr>
+        <th>Host</th>
+        <th>Messages <span id="visuals-spread-total"></span></th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr></tr>
+    </tbody>
+  </table>
+  <div id="visuals-spread-vis"></div>
+</p>
+
+<br style="clear: both;" />
 
 <script type="text/javascript">
 
 function displayHosts(hosts) {
+  totalCount = 0;
   for (i = 0; i < hosts.length; i++) {
     host = hosts[i];
-    console.log(host);
-    $("#hosts tr:first").before(
-      "<tr>" + 
+    count = host.data.$angularWidth;
+    totalCount += count;
+    $("#visuals-spread-hosts tbody > tr:first").after(
+      "<tr id=\"" + buildHostCssId(host.id) + "\" class=\"visuals-spread-hosts-host\">" + 
         "<td>" + host.name + "</td>" +
-        "<td>" + host.data.$angularWidth + "</td>" +
+        "<td>" + count + "</td>" +
       "</tr>"
     );
   }
+
+  // Add totals.
+  $("#visuals-spread-total").html("(Total: " + totalCount + ")");
 }
 
- var sb = new $jit.Sunburst({  
-     //id container for the visualization  
-     injectInto: 'infovis',
-     //Distance between levels  
-     levelDistance: 80,
+var sb = new $jit.Sunburst({
+  injectInto: 'visuals-spread-vis',
+  levelDistance: 80,
+  
+  Node: {
+    overridable: true,
+    type: 'multipie'
+  },
 
-     //Change node and edge styles such as  
-     //color, width and dimensions.  
-     Node: {  
-       overridable: true,  
-       type: 'multipie'
-     },  
-     //Change styles when hovering and clicking nodes  
-     NodeStyles: {  
-       enable: true,  
-       type: 'Native',  
-       stylesHover: {  
-         'color': '#000'  
-       }  
-     }, 
+  NodeStyles: {
+    enable: true,
+    type: 'Native',
+    stylesHover: {
+      'color': '#363636'
+    },
+    stylesClick: {
+      'color': '#fd0c99'
+    }
+  },
 
-     //implement event handlers  
-     Events: {  
-       enable: true,  
-       onClick: function(node) {  
-       }  
-     },  
-});  
+  Events: {
+    enable: true,
+    onClick: function(host) {
+      if (host) {
+        $("#visuals-spread-hosts .highlighted").removeClass('highlighted');
+        h = $("#" + buildHostCssId(host.id));
+        h.toggleClass('highlighted', !!host.selected);
+      }
+    }
+  },
+});
 
 $.post("/visuals/fetch/messagespread?term=<%= params[:term] %>", function(data) {
   json = eval('(' + data + ')');
-
   hosts = json.children[0].children
 
   displayHosts(hosts);
 
-  sb.loadJSON(json);  
-  sb.refresh();  
+  sb.loadJSON(json);
+  sb.refresh();
 });
 
 </script>

@@ -19,17 +19,6 @@ class VisualsController < ApplicationController
 
   private
 
-  def get_random_color
-    random_colors = [
-      "FF0000", "FF8000", "FFFF00",
-      "80FF00", "00FF00", "00FF80",
-      "00FFFF", "0080FF", "0000FF",
-      "8000FF", "FF00FF", "FF0080"
-    ]
-    
-    random_colors[rand(random_colors.size)]
-  end
-
   def calculate_messagespread(params)
     values = Array.new
 
@@ -39,29 +28,40 @@ class VisualsController < ApplicationController
 
     hosts = Host.all
 
+    highest = 0
     hosts.each do |host|
       conditions["host"] = host.host
       count = Message.count :conditions => conditions
 
       if count > 0
         value = Hash.new
-        value["data"] = {
-          "$color" => get_random_color,
-          "$angularWidth" => count
-        }
+        value["data"] = { "$angularWidth" => count }
         value["id"] = Base64.encode64(host.host).chomp
         value["name"] = host.host
 
         values << value
       end
+
+      highest = count if count > highest
     end
 
     # Sort values.
     values = values.sort_by { |v| v["data"]["$angularWidth"] } 
 
+    # Add weighted colors.
+    colored_values = Array.new
+    values.each do |value|
+      red = (value["data"]["$angularWidth"].to_f/highest.to_f*255).to_i.floor.to_s(16)
+      red = "0#{red}" if red.length == 1
+      value["data"]["$color"] = "##{red}0010"
+      colored_values << value
+    end
+
     r = Hash.new
+    r["data"] = Hash.new
+    r["data"]["$color"] = "#fff"
     r["children"] = Array.new
-    r["children"] << { "children" => values }
+    r["children"] << { "children" => colored_values }
 
     return r.to_json
   end

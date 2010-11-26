@@ -123,3 +123,7 @@ $(document).ready(function(){
     $('#messages-show-message-full').css('width', parseInt($('#content').css('width'))-15);
     $('#messages-show-message-full').css('height', parseInt($('#messages-show-message-full').css('height'))+10);
 });
+
+function buildHostCssId(id) {
+  return "visuals-spread-hosts-" + id.replace(/=/g, '');
+}
