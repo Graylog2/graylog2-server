@@ -1,4 +1,3 @@
-require File.dirname(__FILE__) + '/../test_helper'
 require 'sessions_controller'
 
 class SessionsControllerTest < ActionController::TestCase
