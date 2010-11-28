@@ -343,3 +343,9 @@
 .livetail-c-message {
   color: #f00;
 }
+
+/* Hostgroups */
+#hostgroups-add-hosts-simple {
+  float: left;
+  padding-right: 15px;
+}

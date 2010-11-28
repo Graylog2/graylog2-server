@@ -14,6 +14,8 @@
   <%= javascript_include_tag "jquery.gritter.min" %>
   <%= javascript_include_tag "jquery.autocomplete.min"  %>
   <%= javascript_include_tag "application" %>
+  <%= javascript_include_tag "rails" %>
+  <%= csrf_meta_tag %>
 </head>
 <body>
 
@@ -46,6 +48,17 @@
 
   <br style="clear: both;" />
   <div id="new-messages-bar" style="display: none;"></div>
+
+  <div id="content-top">
+  <% unless @tabs.blank? %>
+    <div id="content-tabs">
+    <% @tabs.each do |tab| %>
+      <%=raw tab_link(tab) %> 
+    <% end %>
+      <br style="clear: both;" />
+    </div>
+  <% end %>
+  </div>
 
   <div id="content" <%=raw @content_class.blank? ? '' : 'class="content-' + @content_class + '"' %>>
     <%= yield %>

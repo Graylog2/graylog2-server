@@ -1,0 +1,13 @@
+<h1>Settings of group <span class="highlighted"><%= @hostgroup.name %></span></h1>
+
+<h2>Rename group</h2>
+<%= form_tag '/hostgroups/rename/' do %>
+  <%= label_tag 'name', 'New name:' %>
+  <%= text_field_tag 'name' %>
+  <%= hidden_field_tag :group_id, @hostgroup.id%>
+  <%= submit_tag 'Rename' %>
+<% end %>
+<br />
+
+<h2>Delete group</h2>
+<%= link_to "Delete this hostgroup", { :action => "destroy", :id => @hostgroup.id }, :confirm => "Really delete this hostgroup?", :class => "bigger" %>

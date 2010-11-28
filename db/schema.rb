@@ -10,7 +10,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20101104081003) do
+ActiveRecord::Schema.define(:version => 20101126200327) do
 
   create_table "alerts", :force => true do |t|
     t.text     "body"
@@ -43,6 +43,7 @@ ActiveRecord::Schema.define(:version => 20101104081003) do
     t.string   "hostname"
     t.datetime "created_at"
     t.datetime "updated_at"
+    t.integer  "ruletype"
   end
 
   create_table "hostgroups", :force => true do |t|

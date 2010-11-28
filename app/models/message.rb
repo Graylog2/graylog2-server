@@ -121,15 +121,12 @@ class Message
   
   def self.all_of_hostgroup hostgroup, page
     page = 1 if page.blank?
-    where(:host.in => hostgroup.get_hostnames).default_scope.page(page)
-  end
 
-  def self.count_of_host host
-    where(:host => host).not_deleted.count
+    return where(:host.in => hostgroup.all_conditions ).default_scope.page(page)
   end
 
   def self.count_of_hostgroup hostgroup
-    where(:host.in => hostgroup.get_hostnames).not_deleted.count
+    where(:host.in => hostgroup.all_conditions).not_deleted.count
   end
 
   def self.delete_all_of_host host
