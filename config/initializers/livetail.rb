@@ -21,9 +21,11 @@ begin
 
       # Check if livetail secret is set.
       unless livetail_config["secret"].blank?
-        fork do
-          server = LiveTail::Server.new(args)
-          server.run(livetail_config["secret"]);
+        unless Rails.env == "test"
+          fork do
+            server = LiveTail::Server.new(args)
+            server.run(livetail_config["secret"]);
+          end
         end
       else
         puts "NO LIVETAIL SECRET SET! NOT STARTING!"
