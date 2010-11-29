@@ -84,32 +84,33 @@ public class ChunkedGELFClientHandler extends GELFClientHandlerBase implements G
                 return;
             }
 
-
-
-            // Determine compression type.
-            int type = GELF.getGELFType(data);
-
-            // Decompress.
-            switch (type) {
-                // Decompress ZLIB
-                case GELF.TYPE_ZLIB:
-                    Log.info("Chunked GELF message <" + hash + "> is ZLIB compressed.");
-                    this.clientMessage = Tools.decompressZlib(data);
-                    break;
-
-                // Decompress GZIP
-                case GELF.TYPE_GZIP:
-                    Log.info("Chunked GELF message <" + hash + "> is GZIP compressed.");
-                    this.clientMessage = Tools.decompressGzip(data);
-                    break;
-
-                // Unsupported encoding if not handled by prior cases.
-                default:
-                    throw new UnsupportedEncodingException();
+            try {
+                decompress(data, hash);
+            } catch(IOException e) {
+                Log.warn("Error while trying to decompress complete message: " + e.toString());
+            } finally {
+                // Remove message from chunk manager as it is being handled next.
+                ChunkedGELFClientManager.getInstance().dropMessage(hash);
             }
+        }
+    }
 
-            // Remove message from chunk manager as it is being handled next.
-            ChunkedGELFClientManager.getInstance().dropMessage(hash);
+    private void decompress(byte[] data, String hash) throws InvalidGELFCompressionMethodException, IOException {
+        // Determine compression type.
+        int type = GELF.getGELFType(data);
+        // Decompress.
+        switch (type) {
+            // Decompress ZLIB
+            case GELF.TYPE_ZLIB:
+                Log.info("Chunked GELF message <" + hash + "> is ZLIB compressed.");
+                this.clientMessage = Tools.decompressZlib(data);
+                break;
+            case GELF.TYPE_GZIP:
+                Log.info("Chunked GELF message <" + hash + "> is GZIP compressed.");
+                this.clientMessage = Tools.decompressGzip(data);
+                break;
+            default:
+                throw new InvalidGELFCompressionMethodException("Unknown compression type.");
         }
     }
 
