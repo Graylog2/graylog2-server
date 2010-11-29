@@ -161,4 +161,14 @@ public class ChunkedGELFMessage extends GELFMessage {
         return out.toByteArray();
     }
 
+    @Override
+    public String toString() {
+        StringBuilder sb = new StringBuilder();
+        sb.append("Message <");
+        sb.append(hash);
+        sb.append("> ");
+        sb.append(getChunkMap());
+        return sb.toString();
+    }
+
 }

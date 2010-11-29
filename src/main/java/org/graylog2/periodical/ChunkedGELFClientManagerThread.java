@@ -54,8 +54,6 @@ public class ChunkedGELFClientManagerThread extends Thread {
 
                     int fiveSecondsAgo = (int) (System.currentTimeMillis()/1000)-5;
 
-
-
                     try {
                         if (message.getFirstChunkArrival() < fiveSecondsAgo) {
                             this.dropMessage(messageId, "Did not completely arrive in time.");

@@ -182,10 +182,10 @@ public final class GELF {
             throw new InvalidGELFHeaderException();
         }
 
-        byte[] data = new byte[GELF.GELF_DATA_PART_MAX_LENGTH];
+        byte[] data = new byte[message.getLength()-GELF.GELF_HEADER_LENGTH];
 
         int j = 0;
-        for (int i = GELF.GELF_HEADER_LENGTH; i < GELF.GELF_DATA_PART_MAX_LENGTH+GELF.GELF_HEADER_LENGTH; i++) {
+        for (int i = GELF.GELF_HEADER_LENGTH; i < message.getLength(); i++) {
             data[j] = message.getData()[i];
             j++;
         }
