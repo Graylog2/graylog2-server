@@ -1,11 +1,35 @@
-# Read about fixtures at http://ar.rubyonrails.org/classes/Fixtures.html
+group1_1:
+  hostgroup_id: 1
+  hostname: host1
+  ruletype: <%= HostgroupHost::TYPE_SIMPLE %>
+  
+group1_2:
+  hostgroup_id: 1
+  hostname: host2
+  ruletype: <%= HostgroupHost::TYPE_SIMPLE %>
 
-# This model initially had no columns defined.  If you add columns to the
-# model remove the '{}' from the fixture names and add the columns immediately
-# below each fixture, per the syntax in the comments below
-#
-one: {}
-# column: value
-#
-two: {}
-#  column: value
+group2_1:
+  hostgroup_id: 2
+  hostname: host1
+  ruletype: <%= HostgroupHost::TYPE_REGEX %>
+
+group2_2:
+  hostgroup_id: 2
+  hostname: host2
+  ruletype: <%= HostgroupHost::TYPE_REGEX %>
+
+group3_1:
+  hostgroup_id: 3
+  hostname: host1
+  ruletype: <%= HostgroupHost::TYPE_REGEX %>
+  
+group3_2:
+  hostgroup_id: 3
+  hostname: host2
+  ruletype: <%= HostgroupHost::TYPE_REGEX %>
+  
+group3_3:
+  hostgroup_id: 3
+  hostname: host3
+  ruletype: <%= HostgroupHost::TYPE_SIMPLE %>
+  

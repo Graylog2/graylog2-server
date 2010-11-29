@@ -44,5 +44,5 @@ class Hostgroup < ActiveRecord::Base
     end
     
     return p
-  end
+end
 end

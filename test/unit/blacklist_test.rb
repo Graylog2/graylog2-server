@@ -1,4 +1,5 @@
-require 'test_helper'
+#require 'test_helper'
+require File.expand_path(File.dirname(__FILE__) + "/../test_helper")
 
 class BlacklistTest < ActiveSupport::TestCase
   # Replace this with your real tests.

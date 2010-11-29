@@ -20,3 +20,5 @@ public/images/graphs/*
 
 .bundle/
 Gemfile.lock
+
+coverage/

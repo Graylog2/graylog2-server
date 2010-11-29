@@ -15,9 +15,9 @@ gem 'pony'
 gem 'em-websocket', '0.1.4'
 
 group :development do
-  # bundler requires these gems in development
+  gem 'machinist_mongo', :require => 'machinist/mongo_mapper'
+  gem "rails_code_qa"
 end
 
 group :test do
-  # bundler requires these gems while running tests
 end
