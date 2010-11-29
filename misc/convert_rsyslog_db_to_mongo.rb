@@ -23,7 +23,7 @@ begin
       level = row[4].to_i
 
       # store in mongo
-      doc = {"message" => message, "date" => date, "created_at" => created_at, "host" => host, "facility" => facility, "level" => level}
+      doc = {"message" => message, "date" => date, "created_at" => created_at, "host" => host, "facility" => facility, "level" => level, "deleted" => false}
       coll.insert(doc)
     rescue Exception => e
       puts "Skipped. (#{e})"
