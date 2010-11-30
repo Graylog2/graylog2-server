@@ -32,4 +32,8 @@ group3_3:
   hostgroup_id: 3
   hostname: host3
   ruletype: <%= HostgroupHost::TYPE_SIMPLE %>
-  
+
+group_4_1:
+  hostgroup_id: 4
+  hostname: host1
+  ruletype: nil

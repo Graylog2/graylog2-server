@@ -86,4 +86,15 @@ class HostgroupTest < ActiveSupport::TestCase
     assert conditions[0].length > 0
   end
 
+  # Check that hosts with no type (nil) are treated as hostnames.
+  test "hostname softmigration" do
+    group = Hostgroup.find(4)
+    conditions = group.hostname_conditions
+
+    assert_instance_of Array, conditions
+    assert conditions.count == 1
+    
+    assert_equal "host1", conditions[0]
+  end
+
 end
