@@ -1,8 +1,9 @@
-require 'test_helper'
+#require 'test_helper'
+require File.expand_path(File.dirname(__FILE__) + "/../test_helper")
 
 class HostgroupsControllerTest < ActionController::TestCase
 
-  test "create a new hostg roup" do
+  test "create a new host group" do
     assert_difference("Hostgroup.count") do
       post :create, :hostgroup => { :name => "some group" }
     end
