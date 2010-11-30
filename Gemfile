@@ -16,6 +16,6 @@ gem 'em-websocket', '0.1.4'
 
 group :development, :test do
   gem 'machinist_mongo', :require => 'machinist/mongo_mapper'
-  gem 'rails_code_qa'
+  gem 'metric_fu'
   gem 'ci_reporter'
 end
