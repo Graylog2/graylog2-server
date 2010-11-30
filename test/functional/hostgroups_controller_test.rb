@@ -11,6 +11,13 @@ class HostgroupsControllerTest < ActionController::TestCase
     assert_redirected_to( :controller => "hosts", :action => "index" )
   end
 
+  test "rename a host group" do
+    post :rename, :name => "hey my new name", :group_id => 1
+    
+    renamed_group = Hostgroup.find(1)
+    assert renamed_group.name == "hey my new name"
+  end
+
   test "tabs are shown" do
     get(:show, :id => 3)
 
