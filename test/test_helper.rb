@@ -11,4 +11,22 @@ class ActiveSupport::TestCase
   # -- they do not yet inherit this setting
   fixtures :all
 
+
+  # Log in user.
+  def setup
+    # Only for functionals.
+    unless @request == nil or @request.cookies == nil
+      @request.cookies["auth_token"] = cookie_for(:quentin)
+    end
+  end
+  
+  protected
+    def auth_token(token)
+      CGI::Cookie.new('name' => 'auth_token', 'value' => token)
+    end
+    
+    def cookie_for(user)
+      auth_token users(user).remember_token
+    end
+
 end

@@ -67,12 +67,4 @@ class SessionsControllerTest < ActionController::TestCase
     assert !@controller.send(:logged_in?)
   end
 
-  protected
-    def auth_token(token)
-      CGI::Cookie.new('name' => 'auth_token', 'value' => token)
-    end
-    
-    def cookie_for(user)
-      auth_token users(user).remember_token
-    end
 end

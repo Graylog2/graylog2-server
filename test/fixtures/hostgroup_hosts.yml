@@ -10,22 +10,22 @@ group1_2:
 
 group2_1:
   hostgroup_id: 2
-  hostname: host1
+  hostname: "host."
   ruletype: <%= HostgroupHost::TYPE_REGEX %>
 
 group2_2:
   hostgroup_id: 2
-  hostname: host2
+  hostname: "^ĥost"
   ruletype: <%= HostgroupHost::TYPE_REGEX %>
 
 group3_1:
   hostgroup_id: 3
-  hostname: host1
+  hostname: "ho.t"
   ruletype: <%= HostgroupHost::TYPE_REGEX %>
   
 group3_2:
   hostgroup_id: 3
-  hostname: host2
+  hostname: "host.+"
   ruletype: <%= HostgroupHost::TYPE_REGEX %>
   
 group3_3:
