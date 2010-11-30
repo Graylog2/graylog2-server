@@ -5,3 +5,5 @@ require File.expand_path('../config/application', __FILE__)
 require 'rake'
 
 Graylog2WebInterface::Application.load_tasks
+
+require 'ci/reporter/rake/test_unit'

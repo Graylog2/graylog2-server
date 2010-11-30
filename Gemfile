@@ -14,10 +14,8 @@ gem 'rack', '1.2.1'
 gem 'pony'
 gem 'em-websocket', '0.1.4'
 
-group :development do
+group :development, :test do
   gem 'machinist_mongo', :require => 'machinist/mongo_mapper'
-  gem "rails_code_qa"
-end
-
-group :test do
+  gem 'rails_code_qa'
+  gem 'ci_reporter'
 end
