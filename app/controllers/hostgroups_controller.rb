@@ -54,9 +54,6 @@ class HostgroupsController < ApplicationController
   def destroy
     hostgroup = Hostgroup.find params[:id]
  
-    # Delete all hosts of this hostgroup.
-    HostgroupHost.delete_all(["hostgroup_id = ?", params[:id]])
-
     if hostgroup.destroy
       flash[:notice] = "<strong>Hostgroup has been deleted</strong>"
     else
