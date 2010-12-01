@@ -8,7 +8,15 @@ class HostgroupsControllerTest < ActionController::TestCase
       post :create, :hostgroup => { :name => "some group" }
     end
 
-    assert_redirected_to( :controller => "hosts", :action => "index" )
+    assert_redirected_to(:controller => "hosts", :action => "index")
+  end
+
+  test "delete a host group" do
+    assert_difference("Hostgroup.count", -1) do
+      post :destroy, :id => 1
+    end
+
+    assert_redirected_to(:controller => "hosts", :action => "index");
   end
 
   test "rename a host group" do
