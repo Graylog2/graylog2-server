@@ -41,7 +41,6 @@ class VisualsController < ApplicationController
 
         values << value
       end
-
       highest = count if count > highest
     end
 
