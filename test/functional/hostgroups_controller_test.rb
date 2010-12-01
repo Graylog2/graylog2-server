@@ -19,6 +19,11 @@ class HostgroupsControllerTest < ActionController::TestCase
     assert_redirected_to(:controller => "hosts", :action => "index");
   end
 
+  test "hosts are deleted with hostgroup" do
+      post :destroy, :id => 1
+      assert(HostgroupHost.count(:conditions => ["hostgroup_id = 1"]) == 0, "Hosts were not deleted.")
+  end
+
   test "rename a host group" do
     post :rename, :name => "hey my new name", :group_id => 1
     
