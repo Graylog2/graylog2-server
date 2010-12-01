@@ -11,6 +11,11 @@ class ActiveSupport::TestCase
   # -- they do not yet inherit this setting
   fixtures :all
 
+  setup { Sham.reset }
+
+  # Reset MongoDB test databases.
+  Host.delete_all
+  Message.delete_all
 
   # Log in user.
   def setup

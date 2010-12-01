@@ -20,17 +20,17 @@ group2_2:
 
 group3_1:
   hostgroup_id: 3
-  hostname: "ho.t"
+  hostname: "^foo"
   ruletype: <%= HostgroupHost::TYPE_REGEX %>
   
 group3_2:
   hostgroup_id: 3
-  hostname: "host.+"
+  hostname: "foo.oo"
   ruletype: <%= HostgroupHost::TYPE_REGEX %>
   
 group3_3:
   hostgroup_id: 3
-  hostname: host3
+  hostname: somehost
   ruletype: <%= HostgroupHost::TYPE_SIMPLE %>
 
 group_4_1:
