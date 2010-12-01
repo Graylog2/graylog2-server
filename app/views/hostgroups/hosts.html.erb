@@ -12,7 +12,7 @@
   <%= submit_tag "Add" %> 
 <% end %>
 </div>
-
+  
 <div id="hostgroups-add-hosts-regex">
 <%= form_for :new_host, :url => { :controller => "hostgrouphosts", :action => 'create' } do |f| -%>
   <%= label_tag 'hostname', 'Regular expression' %>:
@@ -24,35 +24,112 @@
 </div>
 <br style="clear: both;" />
 
-<h2>Rules</h2>
-<div class="short-description">Click on a rule to remove it.</div>
+<div id="hostgroups-add-left">
+  <h2>Rules</h2>
+  <div class="short-description">Click on a rule to remove it.</div>
 
-<ul>
-<% if @hostgroup.hostname_conditions.blank? and @hostgroup.regex_conditions.blank? %>
-  No rules in this group.
-<% else %>
-  <% @hostgroup.hostname_conditions(true).each do |rule| %>
-    <li>Host: <%= link_to rule[:value], :controller => "hostgrouphosts", :action => "destroy", :id => rule[:id], :group_id => @hostgroup.id %></li>
-  <% end %>
-  <% @hostgroup.regex_conditions(true).each do |rule| %>
-    <li>Regex: <%= link_to rule[:value].source, :controller => "hostgrouphosts", :action => "destroy", :id => rule[:id], :group_id => @hostgroup.id %></li>
-  <% end %>
-<% end %>
-</ul>
-<br />
-
-<h2>Currently collected hosts</h2>
-
-<ul>
-<% if @hostgroup.hostgroup_hosts.blank? %>
-  No rules in this group.
-<% else %>
-  <% if @collected_hosts.count == 0 %>
-    No hosts collected.
+  <ul>
+  <% if @hostgroup.hostname_conditions.blank? and @hostgroup.regex_conditions.blank? %>
+    No rules in this group.
   <% else %>
-    <% @collected_hosts.each do |host| %>
-      <li><%= host.host %></li>
+    <% @hostgroup.hostname_conditions(true).each do |rule| %>
+      <li>Host: <%= link_to rule[:value], :controller => "hostgrouphosts", :action => "destroy", :id => rule[:id], :group_id => @hostgroup.id %></li>
+    <% end %>
+    <% @hostgroup.regex_conditions(true).each do |rule| %>
+      <li>Regex: <%= link_to rule[:value].source, :controller => "hostgrouphosts", :action => "destroy", :id => rule[:id], :group_id => @hostgroup.id %></li>
     <% end %>
   <% end %>
-<% end %>
-</ul>
+  </ul>
+  <br />
+
+  <h2>Currently collected hosts</h2>
+
+  <ul>
+  <% if @hostgroup.hostgroup_hosts.blank? %>
+    No rules in this group.
+  <% else %>
+    <% if @collected_hosts.count == 0 %>
+      No hosts collected.
+    <% else %>
+      <% @collected_hosts.each do |host| %>
+        <li><%= host.host %></li>
+      <% end %>
+    <% end %>
+  <% end %>
+  </ul>
+</div>
+
+<div id="hostgroups-add-right">
+  <script type="text/javascript">
+  var rgraph = new $jit.RGraph({  
+      injectInto: 'hostgroups-add-right', 
+      
+      background: {  
+        CanvasStyles: {  
+          strokeStyle: '#eee' 
+        }  
+      },
+
+      Navigation: {  
+        enable: true,
+        panning: true,
+        zooming: 10  
+      },  
+      
+      Node: {  
+          color: '#ccc'  
+      },  
+        
+      Edge: {  
+        color: '#FD0C99',  
+        lineWidth:1 
+      },  
+    
+      onCreateLabel: function(domElement, node){  
+          domElement.innerHTML = node.name;  
+          domElement.onclick = function(){  
+              rgraph.onClick(node.id);  
+          };  
+      },  
+      
+      onPlaceLabel: function(domElement, node){  
+          var style = domElement.style;  
+          style.display = '';  
+          style.cursor = 'pointer';  
+   
+          if (node._depth == 0) {  
+              style.fontSize = "1.5em";  
+              style.color = "#000";  
+          } else if(node._depth == 1) {
+              style.fontSize = "0.9em";  
+              style.color = "#000";  
+          } else if(node._depth == 2){  
+              style.fontSize = "0.8em";  
+              style.color = "#111";  
+            
+          } else {  
+              style.display = 'none';  
+          }  
+    
+          var left = parseInt(style.left);  
+          var w = domElement.offsetWidth;  
+          style.left = (left - w / 2) + 'px';
+      }  
+  });
+
+  $.post("/visuals/fetch/hostgrouprelation?group=<%= @hostgroup.id %>", function(data) {
+    json = eval('(' + data + ')');
+    rgraph.loadJSON(json);  
+    
+    rgraph.compute('end');  
+    rgraph.fx.animate({  
+      modes:['polar'],
+      transition: $jit.Trans.Bounce.easeOut,
+      duration: 500  
+    }); 
+  });
+
+  </script> 
+</div>
+
+<br style="clear: both;" />

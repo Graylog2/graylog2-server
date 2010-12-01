@@ -350,6 +350,18 @@
   padding-right: 15px;
 }
 
+#hostgroups-add-left {
+  float: left;
+  padding-right: 150px;
+}
+
+#hostgroups-add-right {
+  width: 430px;
+  height: 430px;
+  overflow: hidden;
+  margin-top: 40px;
+}
+
 /* Visuals */
 #visuals-spread-vis {
  height: 380px;
