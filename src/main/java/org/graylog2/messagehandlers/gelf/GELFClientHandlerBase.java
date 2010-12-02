@@ -40,20 +40,10 @@ import org.json.simple.JSONValue;
  * @author: Lennart Koopmann <lennart@socketfeed.com>
  */
 class GELFClientHandlerBase {
-
-    private List<String> standardFields = new ArrayList<String>();
-
     protected String clientMessage = null;
     protected GELFMessage message = new GELFMessage();
 
-    protected GELFClientHandlerBase() {
-        this.standardFields.add("short_message");
-        this.standardFields.add("full_message");
-        this.standardFields.add("level");
-        this.standardFields.add("host");
-        this.standardFields.add("file");
-        this.standardFields.add("line");
-    }
+    protected GELFClientHandlerBase() { }
 
     protected boolean parse() throws Exception{
         JSONObject json = this.getJSON(this.clientMessage.toString());
@@ -63,12 +53,12 @@ class GELFClientHandlerBase {
         }
 
         // Add standard fields.
-        this.message.setShortMessage(this.jsonToString(json.get("short_message")));
-        this.message.setFullMessage(this.jsonToString(json.get("full_message")));
-        this.message.setLevel(this.jsonToInt(json.get("level")));
-        this.message.setHost(this.jsonToString(json.get("host")));
-        this.message.setFile(this.jsonToString(json.get("file")));
-        this.message.setLine(this.jsonToInt(json.get("line")));
+        this.message.setShortMessage(this.jsonToString(json.get(GELF.STANDARD_FIELD_PREFIX + "_short_message")));
+        this.message.setFullMessage(this.jsonToString(json.get(GELF.STANDARD_FIELD_PREFIX + "_full_message")));
+        this.message.setLevel(this.jsonToInt(json.get(GELF.STANDARD_FIELD_PREFIX + "_level")));
+        this.message.setHost(this.jsonToString(json.get(GELF.STANDARD_FIELD_PREFIX + "_host")));
+        this.message.setFile(this.jsonToString(json.get(GELF.STANDARD_FIELD_PREFIX + "_file")));
+        this.message.setLine(this.jsonToInt(json.get(GELF.STANDARD_FIELD_PREFIX + "_line")));
 
         // Add additional data if there is some.
         Set<String> set = json.keySet();
@@ -77,7 +67,7 @@ class GELFClientHandlerBase {
             String key = iter.next();
 
             // Skip standard fields.
-            if (this.standardFields.contains(key)) {
+            if (key.startsWith(GELF.STANDARD_FIELD_PREFIX)) {
                 continue;
             }
 

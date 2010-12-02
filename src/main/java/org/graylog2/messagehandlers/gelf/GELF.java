@@ -73,6 +73,12 @@ public final class GELF {
      */
     public static final int GELF_DATA_PART_MAX_LENGTH = 8192-GELF_HEADER_LENGTH;
 
+    /**
+     * The prefix for GELF standard fields.
+     * https://github.com/Graylog2/graylog2-docs/wiki/GELF
+     */
+    public static final String STANDARD_FIELD_PREFIX = "gelf";
+
     private GELF() { }
 
     /**
