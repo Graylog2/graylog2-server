@@ -1,5 +1,5 @@
 class Hostgroup < ActiveRecord::Base
-  has_many :hostgroup_hosts
+  has_many :hostgroup_hosts, :dependent => :delete_all
 
   def all_conditions
     hostname_conditions | regex_conditions

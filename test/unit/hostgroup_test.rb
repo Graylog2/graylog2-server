@@ -70,7 +70,7 @@ class HostgroupTest < ActiveSupport::TestCase
   test "all_conditions" do
     # Create the host that is defined as hostname in the group
     # because all_conditions() will check if the host exists.
-    Host.make(:host => "host3").save
+    Host.make(:host => "somehost").save
     group = Hostgroup.find(3)
     conditions = group.all_conditions
 

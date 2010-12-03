@@ -29,6 +29,8 @@ class HostgroupsControllerTest < ActionController::TestCase
     
     renamed_group = Hostgroup.find(1)
     assert renamed_group.name == "hey my new name"
+  
+    assert_redirected_to(:controller => "hostgroups", :action => "settings", :id => 1)
   end
 
   test "tabs are shown" do

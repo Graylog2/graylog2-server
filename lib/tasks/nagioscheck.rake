@@ -5,7 +5,7 @@ namespace :nagios do
     # Check if all parameters are set.
     if ENV['minutes'].blank? or ENV['messages'].blank?
       puts "status: error (missing parameters)"
-      exit
+      exit 3
     end
 
     minutes = ENV['minutes'].to_i
@@ -15,8 +15,10 @@ namespace :nagios do
     message_count = Message.count_of_last_minutes minutes
     if message_count > max_messages
       puts "status: alert"
+      exit 2
     else
       puts "status: okay"
+      exit 0
     end
 
   end
