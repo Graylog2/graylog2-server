@@ -3,7 +3,7 @@ class VisualsController < ApplicationController
   def fetch
     case params[:id]
       when "messagespread" then
-        r = calculate_messagespread(params[:term])
+        r = calculate_messagespread((params[:regex] == "true" ? true : false), params[:term])
       when "hostgrouprelation" then
         r = calculate_hostgrouprelation(false, params[:group])
     end
@@ -13,11 +13,21 @@ class VisualsController < ApplicationController
 
   private
 
-  def calculate_messagespread(message)
+  def calculate_messagespread(is_regex, message)
     values = Array.new
 
     conditions = Hash.new
-    conditions["message"] = /#{Regexp.escape(message)}/
+
+    logger.info "IS REGEX? #{is_regex}"
+    logger.info "MESSAGE: " + message
+
+    if is_regex
+      search_for = message
+    else
+      search_for = Regexp.escape(message)
+    end
+
+    conditions["message"] = /#{search_for}/
     #conditions["short_message"] = Blacklistedterm.get_all_as_condition_hash
 
     hosts = Host.all
