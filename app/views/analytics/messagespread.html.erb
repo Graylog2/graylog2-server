@@ -1,5 +1,10 @@
 <h1>Spread of <span class="highlighted"><%= @term %></span></h1>
 
+- search running zeigen
+- breadcrumbs
+- formular für erneute suche
+- dauer der suche (nur visualscontroller fetch)
+
 Spread of log messages containing the term <span class="highlighted"><%= @term %></span>.
 <br />
 <br />
@@ -73,7 +78,7 @@ var sb = new $jit.Sunburst({
   },
 });
 
-$.post("/visuals/fetch/messagespread?term=<%= params[:term] %>", function(data) {
+$.post("/visuals/fetch/messagespread?term=<%= CGI.escape(params[:term]) %>&amp;regex=<%= @term_is_regex %>", function(data) {
   json = eval('(' + data + ')');
   hosts = json.children[0].children
 

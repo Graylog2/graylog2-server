@@ -4,9 +4,13 @@ class AnalyticsController < ApplicationController
   
   def messagespread
     @load_jit = true
+
+    @term_is_regex = params[:regex].blank? ? false : true
+
     @term = params[:term]
     if @term.blank?
-      redirect_to :controller => "messages"
+      flash[:error] = "Missing term."
+      redirect_to :controller => "analytics"
       return
     end
   end
