@@ -5,7 +5,8 @@ class AnalyticsController < ApplicationController
   def messagespread
     @load_jit = true
 
-    @term_is_regex = params[:regex].blank? ? false : true
+    @term_is_regex = params[:regex] == "true" ? true : false
+    @term_is_case_insensitive = params[:notcase] == "true" ? true : false
 
     @term = params[:term]
     if @term.blank?

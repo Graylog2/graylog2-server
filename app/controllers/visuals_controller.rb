@@ -1,19 +1,27 @@
 class VisualsController < ApplicationController
 
   def fetch
-    case params[:id]
-      when "messagespread" then
-        r = calculate_messagespread((params[:regex] == "true" ? true : false), params[:term])
-      when "hostgrouprelation" then
-        r = calculate_hostgrouprelation(false, params[:group])
+    r = Hash.new
+
+    time = Benchmark.realtime do
+      case params[:id]
+        when "messagespread" then
+          case_sensitive = params[:case] == "true" ? false : true
+          is_regex = params[:regex] == "true" ? true : false
+          r["data"] = calculate_messagespread(is_regex, case_sensitive, params[:term])
+        when "hostgrouprelation" then
+          r["data"] = calculate_hostgrouprelation(false, params[:group])
+      end
     end
 
-    render :text => r
+    r["time"] = sprintf("%#.2f", time*1000);
+
+    render :text => r.to_json
   end
 
   private
 
-  def calculate_messagespread(is_regex, message)
+  def calculate_messagespread(is_regex, case_sensitive, message)
     values = Array.new
 
     conditions = Hash.new
@@ -27,7 +35,12 @@ class VisualsController < ApplicationController
       search_for = Regexp.escape(message)
     end
 
-    conditions["message"] = /#{search_for}/
+    if case_sensitive
+      conditions["message"] = /#{search_for}/
+    else
+      conditions["message"] = /#{search_for}/i
+    end
+
     #conditions["short_message"] = Blacklistedterm.get_all_as_condition_hash
 
     hosts = Host.all
@@ -66,7 +79,7 @@ class VisualsController < ApplicationController
     r["children"] = Array.new
     r["children"] << { "children" => colored_values }
 
-    return r.to_json
+    return r
   end
 
   def calculate_hostgrouprelation(all_hosts, group_id)
@@ -108,7 +121,7 @@ class VisualsController < ApplicationController
     r["name"] = "Group: #{escape(group.name)}"
     r["children"] = values
 
-    return r.to_json
+    return r
   end
 
   def escape(what)

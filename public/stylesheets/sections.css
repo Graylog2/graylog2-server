@@ -377,3 +377,7 @@
 #visuals-spread-hosts td {
   padding-right: 20px;
 }
+
+#visuals-spread-hosts-permalink-content input {
+  width: 700px;
+}

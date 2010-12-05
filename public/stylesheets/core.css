@@ -106,6 +106,12 @@ label {
     text-align: center;
 }
 
+.top-right {
+  width: 25%;
+  text-align: right;
+  float: right;
+}
+
 #top {
     height: 90px;
     width: 100%;

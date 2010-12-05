@@ -5,9 +5,13 @@
 <% form_tag "/analytics/messagespread" do %>
   <%= label_tag :term, "Term:" %>
   <%= text_field_tag :term %>
-
-  <%= check_box_tag :regex %>
-  <%= label_tag :regex, "Regular expression" %>
-
+  
   <%= submit_tag "Analyze" %>
+
+  <br />
+  <%= check_box_tag :regex, "true" %>
+  <%= label_tag :regex, "Regular expression" %>
+  
+  <%= check_box_tag :notcase, "true" %>
+  <%= label_tag :notcase, "Case insensitive" %>
 <% end %>

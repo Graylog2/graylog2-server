@@ -119,7 +119,7 @@
 
   $.post("/visuals/fetch/hostgrouprelation?group=<%= @hostgroup.id %>", function(data) {
     json = eval('(' + data + ')');
-    rgraph.loadJSON(json);  
+    rgraph.loadJSON(json.data);  
     
     rgraph.compute('end');  
     rgraph.fx.animate({  

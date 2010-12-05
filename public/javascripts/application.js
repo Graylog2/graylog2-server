@@ -120,8 +120,16 @@ $(document).ready(function(){
         return false;
     });
 
+    // Full message view resizing.
     $('#messages-show-message-full').css('width', parseInt($('#content').css('width'))-15);
     $('#messages-show-message-full').css('height', parseInt($('#messages-show-message-full').css('height'))+10);
+
+    // Visuals: Message spread permalink
+    $('#visuals-spread-hosts-permalink-link').bind('click', function() {
+      $('#visuals-spread-hosts-permalink-link').hide();
+      $('#visuals-spread-hosts-permalink-content').show();
+      return false;
+    });
 });
 
 function buildHostCssId(id) {
