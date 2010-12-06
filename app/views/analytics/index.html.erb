@@ -1,5 +1,41 @@
 <h1>Analytics</h1>
 
+<h2>Count of new messages</h2>
+<div id="analytics-new-messages"></div>
+<div class="short-description" style="width: 100%;">Count of number of messages from all hosts. The red line indicates your configured maximum message warn limit.</div>
+
+<script type="text/javascript">
+function plot(data){
+    var limit = <%= Setting.get_message_max_count(current_user) %>;
+
+    $.plot($("#analytics-new-messages"),
+      [ {
+          color: "#f00",
+          shadowSize: 10,
+          data: data,
+          threshold: { below: limit, color: "#fd0c99" },
+          points: { show: false, },
+          lines: { show: true, fill: true }
+      } ],
+      {
+        xaxis: { mode: "time" },
+        grid: {
+          show: true,
+          color: "#ccc",
+          borderWidth: 0,
+          markings: [ { yaxis: { from: limit, to: limit }, color: "#ff9797" } ]
+        }
+      }
+    );
+  }
+
+  $.post("/visuals/fetch/graph?hosts=all&amp;from=0", function(data) {
+    json = eval('(' + data + ')');
+    plot(json.data);
+  });
+</script>
+
+<br />
 <h2>Spread of message</h2>
 <div class="short-description">Enter a term or regular expression and see the spread of messages that include the term or match the regular expression over your hosts.</div>
 <% form_tag "/analytics/messagespread" do %>

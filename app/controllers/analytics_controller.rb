@@ -1,5 +1,6 @@
 class AnalyticsController < ApplicationController
   def index
+    @load_flot = true
   end
   
   def messagespread

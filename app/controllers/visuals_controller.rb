@@ -11,6 +11,8 @@ class VisualsController < ApplicationController
           r["data"] = calculate_messagespread(is_regex, case_sensitive, params[:term])
         when "hostgrouprelation" then
           r["data"] = calculate_hostgrouprelation(false, params[:group])
+        when "graph" then
+          r["data"] = calculate_graph(params[:host], params[:from])
       end
     end
 
@@ -120,6 +122,19 @@ class VisualsController < ApplicationController
     r["id"] = "root"
     r["name"] = "Group: #{escape(group.name)}"
     r["children"] = values
+
+    return r
+  end
+
+  def calculate_graph(host, from)
+    entries = Graph.all_of_host("all", from)
+
+    r = Array.new
+
+    entries.each do |entry|
+      p = [ entry.created_at*1000, entry.value]
+      r << p
+    end
 
     return r
   end

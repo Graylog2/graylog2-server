@@ -112,6 +112,10 @@ label {
   float: right;
 }
 
+.tickLabel {
+ color: #000 !important;
+}
+
 #top {
     height: 90px;
     width: 100%;
