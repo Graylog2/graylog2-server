@@ -188,4 +188,14 @@ public class MongoBridge {
         }
     }
 
+    public void writeGraphInformation(String host, int value) {
+        DBCollection coll = MongoConnection.getInstance().getDatabase().getCollection("graphs");
+
+        BasicDBObject obj = new BasicDBObject();
+        obj.put("host", host);
+        obj.put("value", value);
+        obj.put("created_at", (int) (System.currentTimeMillis()/1000));
+
+        coll.insert(obj);
+    }
 }

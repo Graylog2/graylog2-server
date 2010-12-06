@@ -21,17 +21,19 @@
 package org.graylog2.periodical;
 
 import org.graylog2.Log;
-import org.graylog2.graphing.RRD;
+import org.graylog2.database.MongoBridge;
 import org.graylog2.messagehandlers.common.MessageCounter;
 
 /**
- * RRDThread.java: Aug 19, 2010 6:10:11 PM
+ * GraphWriterThread.java: Dec 6, 2010 1:37:41 AM
  *
- * Writes RRDs
+ * Writes data needed to generate graphs in web interface to MongoDB.
  *
  * @author: Lennart Koopmann <lennart@socketfeed.com>
  */
-public class RRDThread extends Thread {
+public class GraphWriterThread extends Thread {
+
+    public final static int INTERVAL = 60;
 
     /**
      * Start the thread. Runs forever.
@@ -39,21 +41,18 @@ public class RRDThread extends Thread {
     @Override public void run() {
         while (true) {
             try {
-                // Write to RRD.
-                RRD rrd = new RRD(RRD.GRAPH_TYPE_TOTAL);
-
-                // Write the value.
-                if (!rrd.write(MessageCounter.getInstance().getCount(MessageCounter.ALL_HOSTS))) {
-                    Log.crit("Could not write to RRD. Possibly not writable.");
-                }
+                // Insert count.
+                int count = MessageCounter.getInstance().getCount(MessageCounter.ALL_HOSTS);
+                MongoBridge m = new MongoBridge();
+                m.writeGraphInformation(MessageCounter.ALL_HOSTS, count);
 
                 // Reset the counter.
                 MessageCounter.getInstance().reset(MessageCounter.ALL_HOSTS);
             } catch(Exception e) {
-                Log.warn("Error in RRDThread: " + e.toString());
+                Log.warn("Error in GraphWriterThread: " + e.toString());
             }
 
-            try { sleep(RRD.INTERVAL*1000); } catch(InterruptedException e) {}
+            try { sleep(GraphWriterThread.INTERVAL*1000); } catch(InterruptedException e) {}
         }
     }
 
