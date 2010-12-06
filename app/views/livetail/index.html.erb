@@ -20,7 +20,7 @@
   if ("WebSocket" in window) {
     var max_msg_length = <%= Setting.get_message_length(current_user) %>;
     var max_msg_count = <%= Setting.get_livetail_row_count(current_user) %>;
-    var ws = new WebSocket('ws://<%= Configuration.external_hostname %>:12500');
+    var ws = new WebSocket('ws://<%= Configuration.external_hostname.split(':')[0] %>:12500');
     var secret = '<%= Configuration.livetail_secret %>';
 
     ws.onopen = function() {
