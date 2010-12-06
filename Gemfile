@@ -16,10 +16,8 @@ gem 'pony'
 gem 'declarative_authorization'
 gem 'em-websocket', '0.1.4'
 
-group :development do
-  # bundler requires these gems in development
-end
-
-group :test do
-  # bundler requires these gems while running tests
+group :development, :test do
+  gem 'machinist_mongo', :require => 'machinist/mongo_mapper'
+  gem 'metric_fu'
+  gem 'ci_reporter'
 end

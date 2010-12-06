@@ -19,8 +19,8 @@ begin
     throw "'rrd_storage_path' does not exist!" if !File.directory? $rrd_storage_path
 
     # Create graph storage path if not existant.
-    if !File.directory?(RAILS_ROOT + "/public/images/graphs")
-      Dir.mkdir(RAILS_ROOT + "/public/images/graphs")
+    if !File.directory?(Rails.root.to_s + "/public/images/graphs")
+      Dir.mkdir(Rails.root.to_s + "/public/images/graphs")
     end
   end
 

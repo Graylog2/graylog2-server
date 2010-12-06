@@ -6,7 +6,13 @@ module ApplicationHelper
       destination = "/" + where[:controller]
     end
 
-    "<li class=\"#{"topmenu-active" if is_current_menu_item? where[:controller]}\">#{link_to(where[:title], destination)}</li>"
+    "<li class=\"#{"topmenu-active" if is_current_menu_item?(where[:controller])}\">#{link_to(where[:title], destination)}</li>"
+  end
+
+  def tab_link tab
+    "<div class=\"content-tabs-tab#{" content-tabs-tab-active" if is_current_tab?(tab)}\" >
+      #{link_to tab, :controller => params[:controller], :action => tab.downcase, :id => params[:id] }
+    </div>"
   end
 
   def gl_date date
@@ -130,5 +136,9 @@ module ApplicationHelper
 
   def is_current_menu_item? item
     true if (params[:controller] == "messages" and item == "/") or (params[:controller] == "hostgroups" and item == "hosts") or params[:controller] == item
+  end
+  
+  def is_current_tab? tab
+    true if params[:action] == tab.downcase
   end
 end

@@ -1,0 +1,58 @@
+<h1>Hosts of group <span class="highlighted"><%= @hostgroup.name %></span></h1>
+
+<h2>Add Rules</h2>
+<div class="short-description">You can add hosts based on their name or on <%= link_to "regular expressions", "http://en.wikipedia.org/wiki/Regular_Expression" %>. All hosts that names start with <span class="highlighted">web</span> will appear in this group when you add <span class="highlighted">^web</span> as regular expression. It will always run on your current set of hosts so there is no need to re-add the expression when you have a new host that starts with <span class="highlighted">web</span>.</div>
+
+<div id="hostgroups-add-hosts-simple">
+<%= form_for :new_host, :url => { :controller => "hostgrouphosts", :action => 'create' } do |f| -%>
+  <%= label_tag 'hostname', 'Hostname' %>:
+  <%= f.select :hostname, Host.all.collect {|host| [h(host.host)]} %>
+  <%= hidden_field_tag 'new_host[hostgroup_id]', @hostgroup.id %>
+  <%= hidden_field_tag 'new_host[ruletype]', HostgroupHost::TYPE_SIMPLE %>
+  <%= submit_tag "Add" %> 
+<% end %>
+</div>
+
+<div id="hostgroups-add-hosts-regex">
+<%= form_for :new_host, :url => { :controller => "hostgrouphosts", :action => 'create' } do |f| -%>
+  <%= label_tag 'hostname', 'Regular expression' %>:
+  <%= f.text_field :hostname %>
+  <%= hidden_field_tag 'new_host[hostgroup_id]', @hostgroup.id %>
+  <%= hidden_field_tag 'new_host[ruletype]', HostgroupHost::TYPE_REGEX %>
+  <%= submit_tag "Add" %> 
+<% end %>
+</div>
+<br style="clear: both;" />
+
+<h2>Rules</h2>
+<div class="short-description">Click on a rule to remove it.</div>
+
+<ul>
+<% if @hostgroup.hostname_conditions.blank? and @hostgroup.regex_conditions.blank? %>
+  No rules in this group.
+<% else %>
+  <% @hostgroup.hostname_conditions(true).each do |rule| %>
+    <li>Host: <%= link_to rule[:value], :controller => "hostgrouphosts", :action => "destroy", :id => rule[:id], :group_id => @hostgroup.id %></li>
+  <% end %>
+  <% @hostgroup.regex_conditions(true).each do |rule| %>
+    <li>Regex: <%= link_to rule[:value].source, :controller => "hostgrouphosts", :action => "destroy", :id => rule[:id], :group_id => @hostgroup.id %></li>
+  <% end %>
+<% end %>
+</ul>
+<br />
+
+<h2>Currently collected hosts</h2>
+
+<ul>
+<% if @hostgroup.hostgroup_hosts.blank? %>
+  No rules in this group.
+<% else %>
+  <% if @collected_hosts.count == 0 %>
+    No hosts collected.
+  <% else %>
+    <% @collected_hosts.each do |host| %>
+      <li><%= host.host %></li>
+    <% end %>
+  <% end %>
+<% end %>
+</ul>

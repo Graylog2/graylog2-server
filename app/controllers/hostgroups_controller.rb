@@ -1,5 +1,7 @@
 class HostgroupsController < ApplicationController
   filter_resource_access
+  before_filter :tabs
+
   def index
   end
 
@@ -8,14 +10,22 @@ class HostgroupsController < ApplicationController
   end
   
   def show
-    @hosts = Host.all
     @hostgroup = Hostgroup.find params[:id]
 
     @messages = Message.all_of_hostgroup @hostgroup, params[:page]
     @total_count = Message.count_of_hostgroup @hostgroup
-    @last_message = Message.last :conditions => { "host" => { "$in" => @hostgroup.get_hostnames } }, :order => "created_at DESC"
+    @last_message = Message.last :conditions => { "host" => { "$in" => @hostgroup.all_conditions } }, :order => "created_at DESC"
+  end
 
+  def hosts
+    @hostgroup = Hostgroup.find params[:id]
     @new_host = HostgroupHost.new
+
+    @collected_hosts = Host.all_of_group(@hostgroup).sort_by { |h| h.host }
+  end
+
+  def settings
+    @hostgroup = Hostgroup.find params[:id]
   end
 
   def create  
@@ -29,8 +39,22 @@ class HostgroupsController < ApplicationController
     end
   end
 
+  def rename
+    group = Hostgroup.find params[:group_id]
+    group.name = params[:name]
+    
+    if group.save
+      flash[:notice] = "Host group has been renamed."
+    else
+      flash[:error] = "Could not rename host group."
+    end
+
+    redirect_to :controller => "hostgroups", :action => "settings", :id => params[:group_id]
+  end
+
   def destroy
     hostgroup = Hostgroup.find params[:id]
+ 
     if hostgroup.destroy
       flash[:notice] = "<strong>Hostgroup has been deleted</strong>"
     else
@@ -38,6 +62,12 @@ class HostgroupsController < ApplicationController
     end
 
     redirect_to :controller => "hosts", :action => "index"
+  end
+
+  private
+
+  def tabs
+    @tabs = [ "Show", "Hosts", "Settings" ]
   end
 
 end
