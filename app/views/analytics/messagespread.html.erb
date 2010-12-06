@@ -1,0 +1,139 @@
+<div class="top-right"><%= link_to "Back to analytics", :controller => "analytics" %></div>
+
+<h1>Spread of <span class="highlighted"><%= @term %></span></h1>
+
+Spread of log messages containing the term <span class="highlighted"><%= @term %></span>
+<% if @term_is_regex or @term_is_case_insensitive %>
+  <% if @term_is_regex %>
+    <% if @term_is_case_insensitive %>
+      (Regular expression, not case sensitive)
+    <% else %>
+      (Regular expression, case sensitive)
+    <% end %>
+  <% else %>
+    <% if @term_is_case_insensitive %>
+      (Not a regular expression, not case sensitive)
+    <% else %>
+      (Not a regular expression, case sensitive)
+    <% end %>
+  <% end %>
+<% else %>
+  (Not a regular expression, case sensitive)
+<% end %>
+<br />
+<br />
+
+<div id="loading"><%= image_tag 'loading-small.gif' %> Calculating...</div>
+
+
+<div id="nohits" style="display: none;">
+  <h2>Not found on any host.</h2>
+</div>
+
+<div id="result" style="display: none;">
+  <table id="visuals-spread-hosts">
+    <thead>
+      <tr>
+        <th>Host</th>
+        <th>Messages <span id="visuals-spread-total"></span></th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr></tr>
+    </tbody>
+  </table>
+</div>
+<div id="visuals-spread-vis"></div>
+
+<br style="clear: both;" />
+
+<div id="visuals-spread-time" style="display: none;">
+  Time: <span></span>ms
+</div>
+<br />
+
+<br />
+<div id="visuals-spread-hosts-permalink">
+  <a href="#" id="visuals-spread-hosts-permalink-link">Generate permalink</a>
+  <div id="visuals-spread-hosts-permalink-content" style="display: none;">
+    <input type="text" value="http://<%= Configuration.external_hostname %>/analytics/messagespread/?term=<%= CGI.escape(@term) %>&regex=<%= @term_is_regex.to_s %>&notcase=<%= @term_is_case_insensitive.to_s %>" />
+  </div>
+</div>
+
+<script type="text/javascript">
+
+function displayHosts(hosts) {
+  totalCount = 0;
+  for (i = 0; i < hosts.length; i++) {
+    host = hosts[i];
+    count = host.data.$angularWidth;
+    totalCount += count;
+    $("#visuals-spread-hosts tbody > tr:first").after(
+      "<tr id=\"" + buildHostCssId(host.id) + "\" class=\"visuals-spread-hosts-host\">" + 
+        "<td>" + host.name + "</td>" +
+        "<td>" + count + "</td>" +
+      "</tr>"
+    );
+  }
+
+  // Add totals.
+  $("#visuals-spread-total").html("(Total: " + totalCount + ")");
+}
+
+var sb = new $jit.Sunburst({
+  injectInto: 'visuals-spread-vis',
+  levelDistance: 80,
+  
+  Node: {
+    overridable: true,
+    type: 'multipie'
+  },
+
+  NodeStyles: {
+    enable: true,
+    type: 'Native',
+    stylesHover: {
+      'color': '#363636'
+    },
+    stylesClick: {
+      'color': '#fd0c99'
+    }
+  },
+
+  Events: {
+    enable: true,
+    onClick: function(host) {
+      if (host) {
+        $("#visuals-spread-hosts .highlighted").removeClass('highlighted');
+        h = $("#" + buildHostCssId(host.id));
+        h.toggleClass('highlighted', !!host.selected);
+      }
+    }
+  },
+});
+
+$.post("/visuals/fetch/messagespread?term=<%= CGI.escape(params[:term]) %>&amp;regex=<%= @term_is_regex.to_s %>&amp;case=<%= @term_is_case_insensitive.to_s %>", function(data) {
+  json = eval('(' + data + ')');
+  hosts = json.data.children[0].children
+  
+  $('#loading').hide();
+
+  console.log(hosts);
+
+  if (hosts.length > 0) {
+    displayHosts(hosts);
+
+    sb.loadJSON(json.data);  
+    sb.refresh();
+
+    $("#result").show();
+  } else {
+    $("#visuals-spread-vis").hide();
+    $("#nohits").show();
+  }
+  
+  $("#visuals-spread-time span").html(json.time);
+  $("#visuals-spread-time").show();
+});
+
+</script>

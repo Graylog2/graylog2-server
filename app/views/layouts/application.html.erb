@@ -12,7 +12,13 @@
   <%= stylesheet_link_tag "jquery.gritter" %>
   <%= javascript_include_tag "jquery-1.4.2.min" %>
   <%= javascript_include_tag "jquery.gritter.min" %>
-  <%= javascript_include_tag "jquery.autocomplete.min"  %>
+  <%= javascript_include_tag "jquery.autocomplete.min" %>
+  <%= javascript_include_tag "jquery.numeric" %>
+  <%= javascript_include_tag("jit") if @load_jit %>
+  <% if @load_flot %>
+    <%= javascript_include_tag("jquery.flot.min") %>
+    <%= javascript_include_tag("jquery.flot.threshold.min") %>
+  <% end %>
   <%= javascript_include_tag "application" %>
   <%= javascript_include_tag "rails" %>
   <%= csrf_meta_tag %>
@@ -33,6 +39,7 @@
       <%=raw menu_item({ :title => "Messages", :controller => "/" }) %>
       <%=raw menu_item({ :title => "Streams", :controller => "streams" }) %>
       <%=raw menu_item({ :title => "Hosts", :controller => "hosts" }) %>
+      <%=raw menu_item({ :title => "Analytics", :controller => "analytics" }) %>
       <%=raw menu_item({ :title => "Blacklists", :controller => "blacklists" }) %>
       <%=raw menu_item({ :title => "Settings", :controller => "settings" }) %>
       <%=raw menu_item({ :title => "Users", :controller => "users" }) %>

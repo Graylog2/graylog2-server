@@ -181,12 +181,6 @@
     top: -15px;
 }
 
-#hosts-graph {
-    float: right;
-    position: relative;
-    top: -25px;
-}
-
 /* Blacklist */
 #blacklist-delete {
   float: right;
@@ -348,4 +342,47 @@
 #hostgroups-add-hosts-simple {
   float: left;
   padding-right: 15px;
+}
+
+#hostgroups-add-left {
+  float: left;
+  padding-right: 150px;
+}
+
+#hostgroups-add-right {
+  width: 430px;
+  height: 430px;
+  overflow: hidden;
+  margin-top: 40px;
+}
+
+/* Visuals */
+#visuals-spread-vis {
+ height: 380px;
+ width: 380px;
+}
+
+#visuals-spread-hosts {
+  float: left;
+  margin-left: 450px;
+  width: 300px;
+}
+
+#visuals-spread-hosts td {
+  padding-right: 20px;
+}
+
+#visuals-spread-hosts-permalink-content input {
+  width: 700px;
+}
+
+#analytics-new-messages {
+  width: 100%;
+  height: 200px;
+  margin-top: 10px;
+  margin-bottom: 10px;
+}
+
+#analytics-new-messages-update-hours {
+  width: 25px;
 }
