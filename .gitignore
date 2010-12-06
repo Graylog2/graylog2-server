@@ -23,3 +23,5 @@ Gemfile.lock
 
 coverage/
 test/reports/
+
+.DS_Store
