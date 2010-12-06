@@ -33,7 +33,15 @@ import org.graylog2.messagehandlers.common.MessageCounter;
  */
 public class GraphWriterThread extends Thread {
 
+    /**
+     * How many seconds to sleep between cycles.
+     */
     public final static int INTERVAL = 60;
+
+    /**
+     * How many hours to keep the collected data.
+     */
+    public final static int KEEP_HOURS = 1290; // 3 Months.
 
     /**
      * Start the thread. Runs forever.
@@ -45,6 +53,11 @@ public class GraphWriterThread extends Thread {
                 int count = MessageCounter.getInstance().getCount(MessageCounter.ALL_HOSTS);
                 MongoBridge m = new MongoBridge();
                 m.writeGraphInformation(MessageCounter.ALL_HOSTS, count);
+
+                // Purge old data.
+                int now = (int) (System.currentTimeMillis()/1000);
+                int purgeTo = now-(GraphWriterThread.KEEP_HOURS*60*60);
+                m.purgeOldGraphInformation(MessageCounter.ALL_HOSTS, purgeTo);
 
                 // Reset the counter.
                 MessageCounter.getInstance().reset(MessageCounter.ALL_HOSTS);
