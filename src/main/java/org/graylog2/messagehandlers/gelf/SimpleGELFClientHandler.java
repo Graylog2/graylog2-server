@@ -97,7 +97,7 @@ public class SimpleGELFClientHandler extends GELFClientHandlerBase implements GE
             // Insert message into MongoDB.
             m.insertGelfMessage(message);
 
-            // This is doing the upcounting for RRD.
+            // This is doing the upcounting for Graphs.
             ReceiveHookManager.postProcess(new MessageCounterHook());
         } catch(Exception e) {
             Log.warn("Could not handle GELF client: " + e.toString());

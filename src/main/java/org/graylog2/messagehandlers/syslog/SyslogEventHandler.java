@@ -61,7 +61,7 @@ public class SyslogEventHandler implements SyslogServerEventHandlerIF {
 
             m.insert(event);
 
-            // This is doing the upcounting for RRD.
+            // This is doing the upcounting for Graphs.
             ReceiveHookManager.postProcess(new MessageCounterHook());
         } catch (Exception e) {
             Log.crit("Could not insert syslog event into database: " + e.toString());
