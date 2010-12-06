@@ -6,7 +6,6 @@ class HostsController < ApplicationController
     @hosts_and_groups = @hosts | @hostgroups
 
     @host_count = Host.count
-    Graph.update_total
   end
 
   def show
