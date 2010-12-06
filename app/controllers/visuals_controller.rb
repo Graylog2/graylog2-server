@@ -12,7 +12,7 @@ class VisualsController < ApplicationController
         when "hostgrouprelation" then
           r["data"] = calculate_hostgrouprelation(false, params[:group])
         when "graph" then
-          r["data"] = calculate_graph(params[:host], params[:from])
+          r["data"] = calculate_graph(params[:host], params[:hours])
       end
     end
 
@@ -126,8 +126,8 @@ class VisualsController < ApplicationController
     return r
   end
 
-  def calculate_graph(host, from)
-    entries = Graph.all_of_host("all", from)
+  def calculate_graph(host, x)
+    entries = Graph.all_of_host("all", x.to_i.hours.ago.to_i)
 
     r = Array.new
 
