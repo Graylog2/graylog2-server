@@ -130,6 +130,36 @@ $(document).ready(function(){
       $('#visuals-spread-hosts-permalink-content').show();
       return false;
     });
+
+    $('#analytics-new-messages-update-hours').numeric();
+    // Visuals: Update of new messages graph.
+    $('#analytics-new-messages-update-submit').bind('click', function() {
+      i = $('#analytics-new-messages-update-hours');
+      v = parseInt(i.val());
+      
+      if (v <= 0) {
+        return false;
+      }
+
+      // Show loading message.
+      $("#analytics-new-messages-update-loading").show();
+
+      // Update graph.
+      $.post("/visuals/fetch/graph?hosts=all&amp;hours=" + v, function(data) {
+        json = eval('(' + data + ')');
+      
+        // Plot is defined inline. (I suck at JavaScript)
+        plot(json.data);
+      
+        // Update title.
+        $('#analytics-new-messages-hours').html(v);
+        
+        // Hide loading message.
+        $("#analytics-new-messages-update-loading").hide();
+      });
+
+      return false;
+    });
 });
 
 function buildHostCssId(id) {
