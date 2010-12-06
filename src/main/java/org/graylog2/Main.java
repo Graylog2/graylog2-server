@@ -94,7 +94,6 @@ public final class Main {
         requiredConfigFields.add("messages_collection_size");
         requiredConfigFields.add("use_gelf");
         requiredConfigFields.add("gelf_listen_port");
-        requiredConfigFields.add("rrd_storage_dir");
 
         // Check if all required configuration fields are set.
         for (String requiredConfigField : requiredConfigFields) {
@@ -121,6 +120,11 @@ public final class Main {
         if(!allowedSyslogProtocols.contains(Main.masterConfig.getProperty("syslog_protocol"))) {
             System.out.println("Invalid syslog_protocol: " + Main.masterConfig.getProperty("syslog_protocol"));
             System.exit(1); // Exit with error.
+        }
+
+        // Print out a deprecation warning if "rrd_storage_dir" is set.
+        if (Main.masterConfig.getProperty("rrd_storage_dir") != null) {
+            System.out.println("[!] Deprecation warning: Config parameter rrd_storage_dir is no longer needed.");
         }
 
         // Are we in debug mode?
