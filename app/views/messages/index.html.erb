@@ -1,7 +1,16 @@
 <% content_for :sidebar do %>
   <h2>Welcome, <span class="highlighted">lennart</span>!</h2>
 
-  favorite streams, quick graphs, general overview stuff
+  <h3>Favorite streams</h3>
+  <ul id="favorite-streams">
+   <% @favorites.each do |favorite| %>
+    <li>
+      <span class="favorite-stream-sparkline">1, 4, 4, 7, 5, 9, 10, 3, 4, 7</span>
+      <%= favorite.stream.title %>
+      <span class="favorite-stream-limits status-okay-text">(<%= rand(5000) %>/<%= rand(5000) %>)</span>
+    </li>
+   <% end %>
+  </ul>
 
   <br /><br />
   javascript update after click on "full" link of a messages. it's #newtwitter!
@@ -14,12 +23,6 @@
 </div>
 
 <div id="messages-content">
-
-<div id="messages-favorited-streams">
-  <% unless @favorites.blank? %>
-    Favorite streams: <%= select("favoritestreamchooser", "id", @favorites.collect {|p| [ p.stream.title, p.stream.id ] }, { :include_blank => true }) %>
-  <% end %>
-</div>
 
 <h1>Messages</h1>
 

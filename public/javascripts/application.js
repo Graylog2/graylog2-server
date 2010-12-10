@@ -167,6 +167,20 @@ $(document).ready(function(){
       $("#main-left").animate({ width: '100%' }, 700);
       return false;
     });
+
+    // Favorite streams: Sparklines.
+    $(".favorite-stream-sparkline").sparkline(
+      "html",
+      {
+        type: "line",
+        width: "40px",
+        lineColor: "#fd0c99",
+        fillColor: "#fdd",
+        spotColor: false,
+        minSpotColor: false,
+        maxSpotColor: false
+      }
+    );
 });
 
 function buildHostCssId(id) {
