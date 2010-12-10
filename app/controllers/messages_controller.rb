@@ -10,6 +10,8 @@ class MessagesController < ApplicationController
   end
   
   def index
+    @has_sidebar = true
+    
     if params[:filters].blank?
       @messages = @scope.all_with_blacklist params[:page]
     else

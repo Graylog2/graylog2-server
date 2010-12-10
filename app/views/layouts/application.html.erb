@@ -67,14 +67,36 @@
   <% end %>
   </div>
 
+  <%=raw "<div id='main-left'>" if @has_sidebar %>
+
   <div id="content" <%=raw @content_class.blank? ? '' : 'class="content-' + @content_class + '"' %>>
-    <%= yield %>
+    <div id="content-inner">
+      <%= yield %>
+    </div>
+    
+    <div class="content-bottom">
+      <div class="content-bottom-left"><%= image_tag "contentedge_l.png" %></div>
+      <div class="content-bottom-right"><%= image_tag "contentedge_r.png" %></div>
+      <br style="clear: both;">
+    </div>
   </div>
-  <div id="content-bottom">
-    <div id="content-bottom-left"><%= image_tag "contentedge_l.png" %></div>
-    <div id="content-bottom-right"><%= image_tag "contentedge_r.png" %></div>
-    <br style="clear: both;">
-  </div>
+
+  <% if @has_sidebar %>
+    </div>
+    <div id="main-right">
+      <div id="sidebar">
+        <div id="sidebar-inner">
+          <%= yield :sidebar %>
+        </div>
+
+        <div class="content-bottom content-bottom-sidebar">
+          <div class="content-bottom-left"><%= image_tag "contentedge_l.png" %></div>
+          <div class="content-bottom-right"><%= image_tag "contentedge_r.png" %></div>
+          <br style="clear: both;">
+        </div>
+      </div>
+    </div>
+  <% end %>
 
 </body>
 </html>
