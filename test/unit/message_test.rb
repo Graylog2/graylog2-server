@@ -4,6 +4,8 @@ class MessageTest < ActiveSupport::TestCase
   should "test all_of_hostgroup"
 
   should "test count_of_hostgroup" do
+    Host.make(:host => "somehost").save
+
     Message.make(:host => "foobar", :message => "bla").save
     Message.make(:host => "foobarish", :message => "gdfgdfhh").save
     Message.make(:host => "foofoo", :message => "foobarish").save

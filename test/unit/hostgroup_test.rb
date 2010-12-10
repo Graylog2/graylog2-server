@@ -86,7 +86,9 @@ class HostgroupTest < ActiveSupport::TestCase
     assert conditions[0].length > 0
   end
 
-  should "treat host with no type as hostname" do
+  test "treat host with no type as hostname" do
+    Host.make(:host => "host1").save
+
     group = Hostgroup.find(4)
     conditions = group.hostname_conditions
 
@@ -96,3 +98,4 @@ class HostgroupTest < ActiveSupport::TestCase
     assert_equal "host1", conditions[0]
   end
 end
+
