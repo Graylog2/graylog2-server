@@ -18,4 +18,5 @@ group :development, :test do
   gem 'machinist_mongo', :require => 'machinist/mongo_mapper'
   gem 'metric_fu'
   gem 'ci_reporter'
+  gem 'database_cleaner', '~> 0.6.0'
 end

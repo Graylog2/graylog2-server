@@ -49,6 +49,7 @@ GEM
     ci_reporter (1.6.3)
       builder (>= 2.1.2)
     colored (1.2)
+    database_cleaner (0.6.0)
     em-websocket (0.1.4)
       addressable (>= 2.1.1)
       eventmachine (>= 0.12.9)
@@ -160,6 +161,7 @@ DEPENDENCIES
   bson (= 1.1.1)
   bson_ext (= 1.1.1)
   ci_reporter
+  database_cleaner (~> 0.6.0)
   em-websocket (= 0.1.4)
   jnunemaker-validatable (= 1.8.4)
   json (= 1.4.6)
