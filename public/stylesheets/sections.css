@@ -7,15 +7,6 @@
   width: 70px;
 }
 
-#messages-favorited-streams {
-  float: right;
-}
-
-#messages-favorited-streams select {
-    font-size: 11px;
-    padding: 0px;
-}
-
 #messages-content {
     position: relative;
     top: -20px;
@@ -385,4 +376,22 @@
 
 #analytics-new-messages-update-hours {
   width: 25px;
+}
+
+/* Sidebar */
+#favorite-streams {
+  margin-top: 7px;
+  font-size: 13px;
+}
+
+#favorite-streams li {
+  padding-top: 1px;
+  padding-bottom: 1px;
+  padding-left: 5px;
+  margin-top: 1px;
+  margin-bottom: 1px;
+}
+
+.favorite-stream-limits {
+  font-size: 11px;
 }

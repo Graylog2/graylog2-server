@@ -11,7 +11,8 @@ class MessagesController < ApplicationController
   
   def index
     @has_sidebar = true
-    
+    @load_sparkline = true 
+
     if params[:filters].blank?
       @messages = @scope.all_with_blacklist params[:page]
     else
@@ -20,7 +21,7 @@ class MessagesController < ApplicationController
     @total_count =  Message.count_since(0)
     @total_blacklisted_terms = BlacklistedTerm.count
 
-    @favorites = FavoritedStream.find_all_by_user_id current_user.id
+    @favorites = FavoritedStream.all_of_user(current_user.id)
   end
 
   def show

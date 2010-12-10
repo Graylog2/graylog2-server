@@ -24,6 +24,15 @@ h2 {
     font-family: Georgia,"Times New Roman",Times,serif;
 }
 
+h3 {
+    font-size: 18px;
+    margin-top: 15px;
+    margin-bottom: 5px;
+    display: block;
+    font-weight: normal;
+    font-family: Georgia,"Times New Roman",Times,serif;
+}
+
 a {
     color: #fd0c99;
     text-decoration: none;
@@ -113,7 +122,15 @@ label {
 }
 
 .tickLabel {
- color: #000 !important;
+  color: #000 !important;
+}
+
+.status-okay-text {
+  color: green;
+}
+
+.status-alarm-text {
+  color: red;
 }
 
 #top {
