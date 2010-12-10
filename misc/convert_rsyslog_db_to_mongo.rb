@@ -16,14 +16,13 @@ begin
   while row = res.fetch_row do
     begin
       message = row[0]
-      date = row[1]
       created_at = Time.parse(row[1]).to_i
       host = row[2]
       facility =  row[3].to_i
       level = row[4].to_i
 
       # store in mongo
-      doc = {"message" => message, "date" => date, "created_at" => created_at, "host" => host, "facility" => facility, "level" => level, "deleted" => false}
+      doc = {"message" => message, "created_at" => created_at, "host" => host, "facility" => facility, "level" => level, "deleted" => false}
       coll.insert(doc)
     rescue Exception => e
       puts "Skipped. (#{e})"
