@@ -17,13 +17,12 @@ class ActiveSupport::TestCase
     DatabaseCleaner.clean
     Sham.reset
   end
+end
 
-  # Log in user.
-  def setup
-    # Only for functionals.
-    unless @request == nil or @request.cookies == nil
-      @request.cookies["auth_token"] = cookie_for(:quentin)
-    end
+
+class ActionController::TestCase
+  setup do
+    @request.cookies["auth_token"] = cookie_for(:quentin)
   end
 
 protected
