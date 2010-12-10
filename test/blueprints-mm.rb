@@ -6,7 +6,7 @@ Host.blueprint do
 end
 
 Message.blueprint do
- message { "lalalalala" }
+ message { Faker::Lorem.words(15) }
  facility { rand(15) }
  level { rand(8) }
  host { "host-#{sn}" }

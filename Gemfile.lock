@@ -56,6 +56,7 @@ GEM
     erubis (2.6.6)
       abstract (>= 1.0.0)
     eventmachine (0.12.10)
+    faker (0.3.1)
     fattr (2.2.0)
     flay (1.4.1)
       ruby_parser (~> 2.0)
@@ -166,6 +167,7 @@ DEPENDENCIES
   ci_reporter
   database_cleaner (~> 0.6.0)
   em-websocket (= 0.1.4)
+  faker (~> 0.3.1)
   jnunemaker-validatable (= 1.8.4)
   json (= 1.4.6)
   machinist_mongo
