@@ -160,6 +160,13 @@ $(document).ready(function(){
 
       return false;
     });
+
+    // Hide sidebar.
+    $("#sidebar-hide-link").bind('click', function() {
+      $("#main-right").hide();
+      $("#main-left").animate({ width: '100%' }, 700);
+      return false;
+    });
 });
 
 function buildHostCssId(id) {

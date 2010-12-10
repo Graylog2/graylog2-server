@@ -241,6 +241,17 @@ label {
   padding: 15px;
 }
 
+#sidebar-hide-link {
+  float: right;
+  position: relative;
+  top: -10px;
+  right: -5px;
+}
+
+#sidebar-hide-link:hover {
+  font-weight: bold;
+}
+
 .content-bottom {
   height: 7px;
   background-image: url(/images/contentedge.png);
