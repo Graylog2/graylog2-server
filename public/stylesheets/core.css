@@ -26,7 +26,7 @@ h2 {
 
 h3 {
     font-size: 18px;
-    margin-top: 15px;
+    margin-top: 11px;
     margin-bottom: 5px;
     display: block;
     font-weight: normal;
@@ -237,6 +237,7 @@ label {
 
 #content-inner {
   padding: 15px;
+  overflow: hidden;
 }
 
 #main-left {

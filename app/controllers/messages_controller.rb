@@ -12,6 +12,7 @@ class MessagesController < ApplicationController
   def index
     @has_sidebar = true
     @load_sparkline = true 
+    @load_flot = true
 
     if params[:filters].blank?
       @messages = @scope.all_with_blacklist params[:page]

@@ -395,3 +395,11 @@
 .favorite-stream-limits {
   font-size: 11px;
 }
+
+#message-collection-stats {
+  margin-top: 6px;
+}
+
+#sidebar-graph {
+  margin-top: 10px;
+}
