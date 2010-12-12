@@ -1,4 +1,6 @@
 class StreamsController < ApplicationController
+  before_filter :tabs
+  
   def index
     @new_stream = Stream.new
     @streams = Stream.all
@@ -75,5 +77,9 @@ class StreamsController < ApplicationController
     end
     stream.save
     redirect_to :action => "show", :id => params[:id]
+  end
+  
+  def tabs
+    @tabs = [ "Show", "Rules", "Settings", "Statistics" ]
   end
 end
