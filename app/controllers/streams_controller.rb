@@ -1,5 +1,5 @@
 class StreamsController < ApplicationController
-  before_filter :tabs
+  before_filter :tabs, :except => :index
   
   def index
     @new_stream = Stream.new
