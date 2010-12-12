@@ -72,15 +72,6 @@ $(document).ready(function(){
        window.location = "/streams/show/" + parseInt(this.value);
     });
 
-    // Show stream statistics
-    $('#streams-show-statistics').bind('click', function() {
-        $('#blocks-statistics').show();
-        $('#streams-show-statistics').hide();
-        $.post("/streams/get_hosts_statistic/" + parseInt($('#streamid').html()), function(data) {
-                $('#blocks-statistics').html(data);
-        });
-    });
-
     // Quickfilter
     $('#messages-show-quickfilter').bind('click', function() {
         var showLink = $('#messages-show-quickfilter');
