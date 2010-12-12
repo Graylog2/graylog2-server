@@ -14,36 +14,13 @@
   </span>
 </div>
 
-<script type="text/javascript">
-function plot(data){
-    var limit = <%= Setting.get_message_max_count(current_user) %>;
-
-    $.plot($("#analytics-new-messages"),
-      [ {
-          color: "#f00",
-          shadowSize: 10,
-          data: data,
-          threshold: { below: limit, color: "#fd0c99" },
-          points: { show: false, },
-          lines: { show: true, fill: true }
-      } ],
-      {
-        xaxis: { mode: "time" },
-        grid: {
-          show: true,
-          color: "#ccc",
-          borderWidth: 0,
-          markings: [ { yaxis: { from: limit, to: limit }, color: "#ff9797" } ]
-        }
-      }
-    );
-  }
-
-  $.post("/visuals/fetch/graph?hosts=all&amp;hours=12", function(data) {
-    json = eval('(' + data + ')');
-    plot(json.data);
-  });
-</script>
+<%=raw flot_graph_loader(
+    :max_count => Setting.get_message_max_count(current_user),
+    :inject => "#analytics-new-messages",
+    :host => "all",
+    :hours => 12
+  )
+%>
 
 <br />
 <h2>Spread of message</h2>
