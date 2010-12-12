@@ -132,6 +132,39 @@ module ApplicationHelper
     end
   end
 
+  def flot_graph_loader(options)
+   "<script type='text/javascript'>
+      function plot(data){
+        var limit = #{options[:max_count]};
+
+        $.plot($('#{options[:inject]}'),
+          [ {
+              color: '#f00',
+              shadowSize: 10,
+              data: data,
+              threshold: { below: limit, color: '#fd0c99' },
+              points: { show: false, },
+              lines: { show: true, fill: true }
+          } ],
+          {
+            xaxis: { mode: 'time' },
+            grid: {
+              show: true,
+              color: '#ccc',
+              borderWidth: 0,
+              markings: [ { yaxis: { from: limit, to: limit }, color: '#ff9797' } ]
+            }
+          }
+        );
+      }
+
+      $.post('/visuals/fetch/graph?hosts=#{options[:host]}&amp;hours=#{options[:hours]}', function(data) {
+        json = eval('(' + data + ')');
+        plot(json.data);
+      });
+    </script>"
+  end
+
   private
 
   def is_current_menu_item? item

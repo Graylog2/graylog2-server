@@ -162,6 +162,10 @@ class Message
     return additional
   end
 
+  def self.get_stuff
+    self.collection.stats
+  end
+
   private
 
   def self.get_offset page

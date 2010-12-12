@@ -1,5 +1,15 @@
 <% content_for :sidebar do %>
   <h2>Welcome, <span class="highlighted">lennart</span>!</h2>
+  Your current time: <%= gl_date(Time.now.to_s) %>
+
+  <div id="sidebar-graph" style="height: 100px;"></div>  
+  <%=raw flot_graph_loader(
+        :max_count => Setting.get_message_max_count(current_user),
+        :inject => "#sidebar-graph",
+        :host => "all",
+        :hours => 2
+      )
+  %>
 
   <h3>Favorite streams</h3>
   <ul id="favorite-streams">
@@ -12,8 +22,23 @@
    <% end %>
   </ul>
 
-  <br /><br />
-  javascript update after click on "full" link of a messages. it's #newtwitter!
+  <h3>Message collection</h3>
+  <ul id="message-collection-stats">
+    <li>
+      Capped:
+      <% if MessageCollection.is_capped? %>
+        <span class="status-okay-text">OK</span>
+      <% else %>
+        <strong><span class="status-alarm-text">NO</span></strong>
+      <% end %>
+    </li>
+
+    <li>Size: <%= number_to_human_size(MessageCollection.size) %></li>
+    <li>Capped to: <%= number_to_human_size(MessageCollection.storage_size) %></li>
+    <li>Objects: <%= MessageCollection.count %></li>
+    <li>Average object size: <%= number_to_human_size(MessageCollection.average_object_size) %></li>
+  </ul>
+
 <% end %>
 
 <%= javascript_include_tag 'messageupdater' %>
