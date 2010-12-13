@@ -242,11 +242,11 @@ label {
 
 #main-left {
   float: left;
-  width: 60%;
+  width: 70%;
 }
 
 #main-right {
-  width: 40%;
+  width: 30%;
   float: right;
 }
 
