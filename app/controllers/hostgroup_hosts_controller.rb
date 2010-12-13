@@ -8,8 +8,8 @@ class HostgroupHostsController < ApplicationController
       redirect_to :controller => "hosts"
       return
     end
-    
-    if params[:new_host][:ruletype] == HostgroupHost::TYPE_SIMPLE
+
+    if params[:new_host][:ruletype].to_i == HostgroupHost::TYPE_SIMPLE
       # Check if that host exists.
       if Host.find_by_host(params[:new_host][:hostname]).blank?
         flash[:error] = "Host does not exist!"
