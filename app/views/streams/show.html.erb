@@ -1,9 +1,3 @@
-<div id="streamid" style="display: none;"><%=h @stream.id %></div>
-
-<div id="streams-delete">
-  <%= link_to "Delete this stream", { :action => "destroy", :id => @stream.id }, :confirm => "Really delete this stream with all it's filter rules?" %>
-</div>
-
 <h1>Stream <span class="highlighted"><%= @stream.title %></span></h1>
 
 <div id="streams-right">

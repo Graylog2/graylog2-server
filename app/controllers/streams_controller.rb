@@ -23,6 +23,10 @@ class StreamsController < ApplicationController
     @new_rule = Streamrule.new
   end
 
+  def settings
+    @stream = Stream.find params[:id]
+  end
+
   def create
     new_stream = Stream.new params[:stream]
     if new_stream.save
@@ -34,14 +38,13 @@ class StreamsController < ApplicationController
   end
 
   def destroy
-    begin
-      Streamrule.delete_all [ "stream_id = ?", params[:id] ]
-      stream = Stream.find params[:id]
-      stream.destroy
+    stream = Stream.find params[:id]
+    if stream.destroy
       flash[:notice] = "Stream has been deleted"
-    rescue
+    else
       flash[:error] = "Could not delete stream"
     end
+
     redirect_to :action => "index"
   end
 
