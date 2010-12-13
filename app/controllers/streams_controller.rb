@@ -84,6 +84,6 @@ class StreamsController < ApplicationController
   end
   
   def tabs
-    @tabs = [ "Show", "Rules", "Settings", "Statistics" ]
+    @tabs = [ "Show", "Rules", "Statistics", "Settings" ]
   end
 end
