@@ -1,0 +1,13 @@
+<h1>Settings of stream <span class="highlighted"><%= @stream.title %></span></h1>
+
+<h2>Rename stream</h2>
+<%= form_tag '/streams/rename/' do %>
+  <%= label_tag 'title', 'New name:' %>
+  <%= text_field_tag 'title' %>
+  <%= hidden_field_tag :stream_id, @stream.id%>
+  <%= submit_tag 'Rename' %>
+<% end %>
+<br />
+
+<h2>Delete stream</h2>
+<%= link_to "Delete this stream", { :action => "destroy", :id => @stream.id }, :confirm => "Really delete this stream?", :class => "bigger" %>
