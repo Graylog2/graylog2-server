@@ -36,6 +36,19 @@ class StreamsController < ApplicationController
     end
     redirect_to :action => "index"
   end
+  
+  def rename
+    stream = Stream.find params[:stream_id]
+    stream.title = params[:title]
+    
+    if stream.save
+      flash[:notice] = "Stream has been renamed."
+    else
+      flash[:error] = "Could not rename stream."
+    end
+
+    redirect_to :controller => "streams", :action => "settings", :id => params[:stream_id]
+  end
 
   def destroy
     stream = Stream.find params[:id]
