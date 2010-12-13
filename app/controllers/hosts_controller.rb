@@ -1,5 +1,9 @@
 class HostsController < ApplicationController
-  filter_resource_access
+  #filter_resource_access
+  filter_access_to :index
+  filter_access_to :destroy
+  filter_access_to :show
+  
   def index
     @hosts = Host.all :order => "message_count DESC"
     @hostgroups = Hostgroup.all
@@ -12,6 +16,7 @@ class HostsController < ApplicationController
 
   def show
     @host = Host.find_by_host Base64.decode64(params[:id])
+    #@host = Host.find(params[:id])
     @messages = Message.all_of_host @host.host, params[:page]
     @total_count = @host.message_count
 

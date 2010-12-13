@@ -1,4 +1,4 @@
-class HostgrouphostsController < ApplicationController
+class HostgroupHostsController < ApplicationController
   filter_resource_access
 
   def create

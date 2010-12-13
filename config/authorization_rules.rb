@@ -5,8 +5,9 @@ authorization do
     has_permission_on :streams, :to => [:index, :show, :create, :delete, :alertable]
     has_permission_on :streamrules, :to => [:create, :delete]
     
-    has_permission_on :hosts, :to => [:index]
-    has_permission_on :hostgroups, :to => [:new, :create, :index, :show, :destroy]
+    has_permission_on :hosts, :to => [:index, :show]
+    has_permission_on :hostgroups, :to => [:new, :create, :hosts, :index, :settings, :show, :destroy]
+    has_permission_on :hostgroup_hosts, :to => [:create]
     
     has_permission_on :blacklists, :to => [:index, :create, :delete]
     has_permission_on :blacklist_terms, :to => [:create, :delete]
