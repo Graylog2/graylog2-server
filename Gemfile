@@ -20,4 +20,8 @@ group :development, :test do
   gem 'machinist_mongo', :require => 'machinist/mongo_mapper'
   gem 'metric_fu'
   gem 'ci_reporter'
+  gem 'shoulda', '~> 2.11.3'
+  gem 'mocha', '~> 0.9.10'
+  gem 'database_cleaner', '~> 0.6.0'
+  gem 'faker', '~> 0.3.1'
 end

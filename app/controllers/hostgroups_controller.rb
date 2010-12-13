@@ -18,6 +18,7 @@ class HostgroupsController < ApplicationController
   end
 
   def hosts
+    @load_jit = true
     @hostgroup = Hostgroup.find params[:id]
     @new_host = HostgroupHost.new
 

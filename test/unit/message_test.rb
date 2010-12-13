@@ -1,11 +1,11 @@
 require File.expand_path(File.dirname(__FILE__) + "/../test_helper")
 
 class MessageTest < ActiveSupport::TestCase
-  test "all_of_hostgroup" do
-    
-  end
+  should "test all_of_hostgroup"
 
-  test "count_of_hostgroup" do
+  should "test count_of_hostgroup" do
+    Host.make(:host => "somehost").save
+
     Message.make(:host => "foobar", :message => "bla").save
     Message.make(:host => "foobarish", :message => "gdfgdfhh").save
     Message.make(:host => "foofoo", :message => "foobarish").save

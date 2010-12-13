@@ -33,6 +33,21 @@ class HostgroupsControllerTest < ActionController::TestCase
     assert_redirected_to(:controller => "hostgroups", :action => "settings", :id => 1)
   end
 
+  test "renaming a host group does not work if no name is given" do
+    old_group = Hostgroup.find(1)
+    post :rename, :name => "", :group_id => 1
+
+    renamed_group = Hostgroup.find(1)
+
+    # Name did not change.
+    assert renamed_group.name == old_group.name, "Oh no, group was renamed!"
+  
+    # Error is set.
+    assert_not_nil flash[:error]
+
+    assert_redirected_to(:controller => "hostgroups", :action => "settings", :id => 1)
+  end
+
   test "tabs are shown" do
     get(:show, :id => 3)
 

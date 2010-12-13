@@ -33,7 +33,6 @@ cp ../app ../config ../db ../lib ../public ../Rakefile ../README ../script ../te
 
 # Copy example database.yml file
 cp database.yml.example $BUILD_DIR/config/database.yml
-cp graphs.yml.example $BUILD_DIR/config/graphs.yml
 cp mongodb.yml.example $BUILD_DIR/config/mongodb.yml
 
 # Remove not needed files

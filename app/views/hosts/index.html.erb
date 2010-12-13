@@ -1,9 +1,5 @@
 <h1>Hosts</h1>
 
-<div id="hosts-graph">
-  <%= image_tag "graphs/totalmessages.png" if Graph.enabled? %>
-</div>
-
 <div id="hosts-quickjump">
   <%= form_tag '/hosts/quickjump/' do %>
     <label for="hosts-quickjump-input">Quick jump to host:</label>

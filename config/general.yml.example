@@ -1,5 +1,5 @@
 general:
- external_hostname: "your-graylog2.example.org"
+ external_hostname: "your-graylog2.example.org" # Used for example to generate permalinks. Don't add 'http://' or trailing slashes.
 
 alerts:
   from: graylog2alerts@example.org

@@ -1,5 +1,7 @@
 class UsersController < ApplicationController
-  filter_resource_access
+  if User.all.size > 0
+    filter_resource_access
+  end
 
   if User.find(:all).size == 0
     skip_before_filter :login_required, :only => [:new, :create]

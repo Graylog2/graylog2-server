@@ -49,12 +49,14 @@ GEM
       builder (>= 2.1.2)
     colored (1.2)
     declarative_authorization (0.5.1)
+    database_cleaner (0.6.0)
     em-websocket (0.1.4)
       addressable (>= 2.1.1)
       eventmachine (>= 0.12.9)
     erubis (2.6.6)
       abstract (>= 1.0.0)
     eventmachine (0.12.10)
+    faker (0.3.1)
     fattr (2.2.0)
     flay (1.4.1)
       ruby_parser (~> 2.0)
@@ -91,6 +93,8 @@ GEM
       reek (>= 1.2.6)
       roodi (>= 2.1.0)
     mime-types (1.16)
+    mocha (0.9.10)
+      rake
     mongo (1.1.1)
       bson (>= 1.1.1)
     mongo_mapper (0.8.6)
@@ -143,6 +147,7 @@ GEM
     ruby_parser (2.0.5)
       sexp_processor (~> 3.0)
     sexp_processor (3.0.5)
+    shoulda (2.11.3)
     thor (0.14.6)
     treetop (1.4.9)
       polyglot (>= 0.3.1)
@@ -157,11 +162,14 @@ DEPENDENCIES
   chronic (= 0.3.0)
   ci_reporter
   declarative_authorization
+  database_cleaner (~> 0.6.0)
   em-websocket (= 0.1.4)
+  faker (~> 0.3.1)
   jnunemaker-validatable (= 1.8.4)
   json (= 1.4.6)
   machinist_mongo
   metric_fu
+  mocha (~> 0.9.10)
   mongo (= 1.1.1)
   mongo_mapper (= 0.8.6)
   mysql2 (= 0.2.4)
@@ -169,3 +177,4 @@ DEPENDENCIES
   pony
   rack (= 1.2.1)
   rails (= 3.0.1)
+  shoulda (~> 2.11.3)
