@@ -25,7 +25,7 @@ authorization do
     end
     has_permission_on :sessions, :to => [:destroy]
     
-    has_permission :messages, :ti => [:show]
+    has_permission :messages, :to => [:show]
   end
 end
 
