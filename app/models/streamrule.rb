@@ -26,11 +26,11 @@ class Streamrule < ActiveRecord::Base
     when TYPE_MESSAGE then
       return {:message => /#{Regexp.escape value}/}
     when TYPE_HOST then
-      return {:host => {op => value}}
+      return {:host => {op => [value]}}
     when TYPE_SEVERITY then
-      return {:level => {op => value.to_i}}
+      return {:level => {op => [value.to_i]}}
     when TYPE_FACILITY then
-      return {:facility => {op => value.to_i}}
+      return {:facility => {op => [value.to_i]}}
     when TYPE_TIMEFRAME then
       return {:timeframe => value}
     end
