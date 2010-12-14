@@ -1,8 +1,8 @@
 <div id="streamid" style="display: none;"><%=h @stream.id %></div>
 
-<% permitted_to? :delete, :streams do %>
+<% permitted_to? :destroy, :streams do %>
   <div id="streams-delete">
-    <%= link_to "Delete this stream", { :action => "destroy", :id => @stream.id }, :confirm => "Really delete this stream with all it's filter rules?" %>
+    <%= link_to "Delete this stream", stream_path(@stream), :method => :delete, :confirm => "Really delete this stream with all it's filter rules?" %>
   </div>
 <% end %>
 
