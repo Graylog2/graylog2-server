@@ -27,9 +27,7 @@ class VisualsController < ApplicationController
     values = Array.new
 
     conditions = Hash.new
-
-    logger.info "IS REGEX? #{is_regex}"
-    logger.info "MESSAGE: " + message
+    conditions["deleted"] = false
 
     if is_regex
       search_for = message
@@ -42,8 +40,6 @@ class VisualsController < ApplicationController
     else
       conditions["message"] = /#{search_for}/i
     end
-
-    #conditions["short_message"] = Blacklistedterm.get_all_as_condition_hash
 
     hosts = Host.all
 
