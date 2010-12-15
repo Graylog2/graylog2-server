@@ -11,7 +11,6 @@ class MessagesController < ApplicationController
   
   def index
     @has_sidebar = true
-    @load_sparkline = true 
     @load_flot = true
 
     if params[:filters].blank?
@@ -33,6 +32,29 @@ class MessagesController < ApplicationController
     message = Message.find params[:id]
     render :text => CGI.escapeHTML(message.message)
   end
+  
+  def deletebystream
+    begin
+      conditions = Message.all_of_stream(params[:id].to_i, 0).criteria.sources
+      throw "Missing conditions" if conditions.blank?
+
+      Message.set(conditions, :deleted => true )
+
+      flash[:notice] = "Messages have been deleted."
+    rescue => e
+      flash[:error] = "Could not delete messages."
+    end
+    
+    redirect_to :controller => "streams", :action => "show", :id => params[:id]
+  end
+
+#  def get_hosts_statistic
+#    throw "Missing stream ID" if params[:id].blank?
+#
+#    total_message_count = Stream.get_message_count(params[:id]).to_i
+#    hosts = Stream.get_distinct_hosts params[:id]
+#
+#    ready_hosts = Array.new
 
   def deletebyquickfilter
     begin
@@ -55,21 +77,6 @@ class MessagesController < ApplicationController
     end
 
     redirect_to :action => 'index'
-  end
-
-  def deletebystream
-    begin
-      conditions = Message.all_of_stream(params[:id].to_i, 0).criteria.sources
-      throw "Missing conditions" if conditions.blank?
-
-      Message.set(conditions, :deleted => true )
-
-      flash[:notice] = "Messages have been deleted."
-    rescue
-      flash[:error] = "Could not delete messages."
-    end
-    
-    redirect_to stream_path(params[:id])
   end
 
   def getsimilarmessages

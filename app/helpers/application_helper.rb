@@ -165,6 +165,13 @@ module ApplicationHelper
     </script>"
   end
 
+  def ajaxtrigger(title, description, url, checked)
+   "#{check_box_tag(title, nil, checked, :class => "ajaxtrigger", "data-target" => url)}
+    #{label_tag(title, description)}
+    <span id=\"#{title.to_s}-ajaxtrigger-loading\" style=\"display: none;\">#{image_tag('loading-small.gif')} Saving...</span>
+    <span id=\"#{title.to_s}-ajaxtrigger-done\" class=\"status-okay-text\" style=\"display: none;\">Saved!</span>"
+  end
+
   private
 
   def is_current_menu_item? item

@@ -11,9 +11,6 @@ class StreamsController < ApplicationController
     @messages = Message.all_of_stream @stream.id, params[:page]
     @total_count = Message.count_stream @stream.id
 
-    # Find out if this stream is alertable.
-    @is_alertable = @stream.alertable || false
-    
     # Find out if this stream is favorited by the current user.
     FavoritedStream.find_by_stream_id_and_user_id(params[:id], current_user.id).blank? ? @is_favorited = false : @is_favorited = true
   end
@@ -60,7 +57,7 @@ class StreamsController < ApplicationController
 
     redirect_to :action => "index"
   end
-
+  
 #  def get_hosts_statistic
 #    throw "Missing stream ID" if params[:id].blank?
 #
@@ -86,19 +83,6 @@ class StreamsController < ApplicationController
 #    render :partial => 'statistics', :locals => { :hosts => ready_hosts }
 #  end
 
-  def alertable
-    stream = Stream.find params[:id]
-    stream.alertable = !stream.alertable
-    # don't alert the user of past events, only from this point forward
-    if stream.alertable
-      alert = Alert.new
-      alert.body = "Alerts enabled for stream: '#{stream.title}'"
-      alert.save
-    end
-    stream.save
-    redirect_to :action => "show", :id => params[:id]
-  end
-  
   def tabs
     @tabs = [ "Show", "Rules", "Analytics", "Settings" ]
   end

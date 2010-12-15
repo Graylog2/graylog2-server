@@ -1,34 +1,39 @@
 class FavoritedstreamsController < ApplicationController
-  def create
+
+  def toggle
+    stream_id = params[:id]
     # Check if the stream to favorite exists.
+    stream = nil 
     begin
-      Stream.find params[:id]
+      stream = Stream.find(stream_id)
     rescue
       flash[:error] = "<strong>Could not favorite stream</strong><span>Stream does not exist.</span>"
       redirect_to :controller => "streams"
       return
     end
 
-    favorite = FavoritedStream.new
-    favorite.stream_id = params[:id]
-    favorite.user_id = current_user.id
-
-    if favorite.save
-      flash[:notice] = "Stream has been added to favorites."
+    if stream.favorited?(current_user)
+      destroy(stream_id)
     else
-      flash[:error] = "Could not add stream to favorites."
+      create(stream_id)
     end
-
-    redirect_to :controller => "streams", :action => "show", :id => params[:id]
+    
+    # Only intended to be called via AJAX.
+    render :text => ""
   end
 
-  def destroy
-    favorite = FavoritedStream.find_by_stream_id_and_user_id params[:id], current_user.id
-    if favorite.destroy
-      flash[:notice] = "Favorite has been removed."
-    else
-      flash[:error] = "Could not remove favorite."
-    end
-    redirect_to :controller => "streams", :action => "show", :id => params[:id]
+  private
+
+  def create(stream_id)
+    favorite = FavoritedStream.new
+    favorite.stream_id = stream_id
+    favorite.user_id = current_user.id
+
+    favorite.save
+  end
+
+  def destroy(stream_id)
+    favorite = FavoritedStream.find_by_stream_id_and_user_id(stream_id, current_user.id)
+    favorite.destroy
   end
 end
