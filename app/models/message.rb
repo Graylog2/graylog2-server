@@ -102,7 +102,7 @@ class Message
   end
 
   def self.all_of_stream_since(stream_id, since)
-    by_stream(stream_id).where(:created_at => {'$gt' => since.to_i}).all
+    by_stream(stream_id).where(:created_at => {'$gt' => since.to_i}).default_scope.all
   end
 
   def self.count_stream stream_id
