@@ -95,20 +95,15 @@ class Message
     conditions
   end
 
-  def self.all_of_stream stream_id, page = 1, newer_than = nil
+  def self.all_of_stream stream_id, page = 1
     page = 1 if page.blank?
-
-    # XXX: something like this:
-    #if newer_than
-    #  by_stream(stream_id).where(:created_at => { '$gt' => newer_than.to_i}).default_scope.page(page)
-    #end
 
     by_stream(stream_id).default_scope.page(page).all
   end
 
-    #unless newer_than.nil?
-    #  conditions[:created_at] = { '$gt' => newer_than.to_i }
-    #end
+  def self.all_of_stream_since(stream_id, since)
+    by_stream(stream_id).where(:created_at => {'$gt' => since.to_i}).all
+  end
 
   def self.count_stream stream_id
     return by_stream(stream_id).count

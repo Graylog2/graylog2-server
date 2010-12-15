@@ -17,6 +17,15 @@ class Stream < ActiveRecord::Base
     FavoritedStream.favorited?(self.id, user_id)
   end
 
+  def self.all_with_subscribers
+    ids = Array.new
+    self.joins(:subscribedStreams).each do |s|
+      next if ids.include?(s.id)
+      ids << s.id
+    end
+    return ids
+  end
+
   def self.get_message_count(stream_id)
     conditions = Message.all_of_stream stream_id, nil, true
     return Message.count(:conditions => conditions)
