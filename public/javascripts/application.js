@@ -172,6 +172,23 @@ $(document).ready(function(){
         maxSpotColor: false
       }
     );
+
+    // AJAX trigger
+    $(".ajaxtrigger").bind("click", function() {
+      field = $(this);
+      loading = $("#" + field.attr("id") + "-ajaxtrigger-loading");
+      done = $("#" + field.attr("id") + "-ajaxtrigger-done");
+     
+      field.attr("disabled","disabled");
+      done.hide();
+      loading.show();
+      $.post(field.attr("data-target"), function(data) {
+        field.removeAttr("disabled");
+        loading.hide();
+        done.show();
+      });
+    });
+
 });
 
 function buildHostCssId(id) {

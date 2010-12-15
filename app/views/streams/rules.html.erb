@@ -22,7 +22,7 @@
 <div class="short-description">Click on a rule to remove it</div>
 <ul>
   <% if @stream.streamrules.blank? %>
-    <li>none</li>
+    <li>No rules defined.</li>
   <% else %>
     <% @stream.streamrules.each do |rule| %>
       <li>
