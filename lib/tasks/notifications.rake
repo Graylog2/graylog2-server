@@ -44,8 +44,8 @@ namespace :subscriptions do
         puts "\tNo new messages."
       end
         
-      ###stream.last_subscription_check = Time.now
-      ###stream.save
+      stream.last_subscription_check = Time.now
+      stream.save
     end
 
     puts "All done."
