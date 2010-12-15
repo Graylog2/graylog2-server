@@ -12,6 +12,6 @@ class NewStreamSubscriptions < ActiveRecord::Migration
   def self.down
     add_column :streams, :alertable, :boolean
 
-    remove_table :subscribed_streama
+    drop_table :subscribed_streama
   end
 end

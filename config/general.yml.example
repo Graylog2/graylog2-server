@@ -1,9 +1,9 @@
 general:
  external_hostname: "your-graylog2.example.org" # Used for example to generate permalinks. Don't add 'http://' or trailing slashes.
 
-alerts:
+subscriptions:
   from: graylog2alerts@example.org
-  subject: GrayLog2 Alert!
+  subject: "Graylog2 subscriptions: "
 
 # Make sure to only allow TCP port 12500 (livetail port) for trusted networks as the secret
 # will be transmitted in plain text and visible in the livetail HTML code. Everybody who
