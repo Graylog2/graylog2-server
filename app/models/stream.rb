@@ -6,7 +6,7 @@ class Stream < ActiveRecord::Base
   validates_presence_of :title
 
   def alerted?(user_id)
-    false
+    AlertedStream.alerted?(self.id, user_id)
   end
 
   def subscribed?(user_id)

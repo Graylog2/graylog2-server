@@ -10,7 +10,14 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20101215010728) do
+ActiveRecord::Schema.define(:version => 20101215230522) do
+
+  create_table "alerted_streams", :force => true do |t|
+    t.integer  "stream_id"
+    t.integer  "user_id"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
 
   create_table "blacklisted_terms", :force => true do |t|
     t.string   "term"
@@ -71,6 +78,11 @@ ActiveRecord::Schema.define(:version => 20101215010728) do
     t.datetime "created_at"
     t.datetime "updated_at"
     t.datetime "last_subscription_check"
+    t.datetime "last_alert_check"
+    t.boolean  "alarm_active"
+    t.boolean  "alarm_force"
+    t.integer  "alarm_limit"
+    t.integer  "alarm_timespan"
   end
 
   create_table "subscribed_streams", :force => true do |t|
