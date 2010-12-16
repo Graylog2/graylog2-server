@@ -58,7 +58,7 @@ class MessagesController < ApplicationController
 
   def deletebystream
     begin
-      conditions = Message.all_of_stream(params[:id].to_i, 0).criteria.sources
+      conditions = Message.by_stream(params[:id].to_i, 0).criteria.sources
       throw "Missing conditions" if conditions.blank?
 
       Message.set(conditions, :deleted => true )
