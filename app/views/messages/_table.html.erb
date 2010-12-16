@@ -24,7 +24,7 @@
               <%= message.message[0..message_length] %>
               <%=raw (message.message.length > message_length) && !defined?(dont_show_links) ? "<a href=\"#\" class=\"messages-more\" id=\"#{h(message.id)}\">[more]</a>" : nil %>
             <% end %>
-            <%=raw !message.gelf.blank? && message.gelf == true && !defined?(dont_show_links) ? "<a href=\"/messages/show/#{h(message.id)}\" class=\"messages-full\">[full]</a>" : nil %>
+            <%=raw !message.gelf.blank? && message.gelf == true && !defined?(dont_show_links) ? link_to(message_path(message.id), :class => "messages-full") : nil %>
           </td>
         </tr>
         <% i+=1 %>
