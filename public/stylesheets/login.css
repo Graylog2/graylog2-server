@@ -65,7 +65,7 @@ a {
   margin-top: 3px;
   float: right;
   font-size: 12px;
-  background: #a9014b url(/images/alert-overlay.png) repeat-x;
+  background-color: #a9014b;
   display: inline-block;
   padding: 5px 10px 6px;
   color: #fff;
