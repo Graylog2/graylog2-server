@@ -41,4 +41,5 @@ class Stream < ActiveRecord::Base
     conditions[:host] = host
     return Message.count(:conditions => conditions).to_s
   end
+
 end
