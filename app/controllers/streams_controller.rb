@@ -37,6 +37,20 @@ class StreamsController < ApplicationController
     # Intended to be called via AJAX only.
     render :text => ""
   end
+  
+  def togglealarmforce
+    stream = Stream.find(params[:id])
+    if stream.alarm_force
+      stream.alarm_force = false
+    else
+      stream.alarm_force = true
+    end
+
+    stream.save
+
+    # Intended to be called via AJAX only.
+    render :text => ""
+  end
 
   def create
     new_stream = Stream.new params[:stream]

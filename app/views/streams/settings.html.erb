@@ -20,7 +20,7 @@ of the alarm. You can also define that all users are alarmed, no matter what the
 <%=raw ajaxtrigger(:active, "Active", "/streams/togglealarmactive/#{@stream.id}", @stream.alarm_active) %>
 <br />
 
-<%=raw ajaxtrigger(:allusers, "Force for all users", "/favoritedstreams/toggle/#{@stream.id}", @stream.favorited?(current_user)) %>
+<%=raw ajaxtrigger(:allusers, "Force for all users", "/streams/togglealarmforce/#{@stream.id}", @stream.alarm_force) %>
 <br />
 
 - limit / minute
