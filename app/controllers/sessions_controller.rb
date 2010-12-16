@@ -4,6 +4,10 @@ class SessionsController < ApplicationController
 
   layout "login"
 
+  def show
+    render :action => :new
+  end
+
   def new
   end
 
