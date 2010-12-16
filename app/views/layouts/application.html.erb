@@ -32,7 +32,7 @@
 
   <div id="top">
     <div id="userbar">
-      Logged in as <%= current_user.login %> &nbsp;<%= link_to "(Log out)", "/logout" %>
+      Logged in as <%= current_user.login %> &nbsp;<%= link_to "(Log out)", logout_path %>
     </div>
     <%= link_to image_tag("graylog.png", :id => "toplogo"), (permitted_to?(:index, :messages) ? messages_path : streams_path)%>
     <ul id="topmenu">
