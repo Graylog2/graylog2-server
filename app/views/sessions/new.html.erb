@@ -1,25 +1,15 @@
 <% if has_users %>
   <%= form_tag session_path do -%>
-
-  <div id="inner">
-    <div id="username">
-      <%= label_tag "login", "Username" %><br />
-      <%= text_field_tag 'login', @login %>
-    </div>
-
-    <div id="password">
-      <%= label_tag 'password' %><br />
-      <%= password_field_tag 'password', nil %>
-    </div>
-
-    <%= submit_tag 'Log in', :id => "submit" %>
-    <div id="rememberme">
-      <%= check_box_tag 'remember_me', '1', @remember_me %>
-      <%= label_tag 'remember_me', 'Remember me' %>
-    </div>
-  </div>
+      
+    <%= text_field_tag 'login', "Username", :class => "login-credentials initial", "data-stdtext" => "Username" %>
+    <%= password_field_tag 'password', "Password", :class => "login-credentials initial", "data-stdtext" => "Password" %>
+    
+    <%= check_box_tag 'remember_me', '1', @remember_me %>
+    <%= label_tag 'remember_me', 'Remember me', :id => "remember-me" %>
+    
+    <%= submit_tag 'Start Graylog2', :id => "submit" %>
+  
   <% end -%>
-  <br style="clear: both;" />
 <% else %>
   Welcome to Graylog2! Click <%= link_to "here", :controller => "users", :action => "new" %> to create your first user.
 <% end %>
