@@ -13,3 +13,7 @@ alerts:
 livetail:
   enable: false
   secret: # Add a secret/password here. Use many chars and read the security hint above.
+
+app:
+  #url_prefix: "graylog2" # enable to define string which prefixes all urls generated
+

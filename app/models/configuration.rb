@@ -4,6 +4,7 @@ class Configuration
 
   @alert_config = @general_config['alerts']
   @livetail_config = @general_config['livetail']
+  @app_config = @general_config['app']
 
   def self.external_hostname
     return "localhost" if @general_config.blank? or @general_config['general'].blank? or @general_config['general']['external_hostname'].blank?
@@ -57,6 +58,10 @@ class Configuration
   def self.livetail_secret
     return nil if @livetail_config.blank? or @livetail_config['secret'].blank?
     return @livetail_config['secret'].to_s
+  end
+  
+  def self.general_url_prefix
+    (@app_config.blank? or @app_config['url_prefix'].blank?) ? "/" : @app_config['url_prefix']
   end
 
 end

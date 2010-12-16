@@ -1,9 +1,9 @@
 module ApplicationHelper
   def menu_item where
-    if where[:controller] == "/"
-      destination = "/"
+    if where[:controller] == root_path
+      destination = root_path
     else
-      destination = "/" + where[:controller]
+      destination = root_path + "/" + where[:controller]
     end
 
     "<li class=\"#{"topmenu-active" if is_current_menu_item?(where[:controller])}\">#{link_to(where[:title], destination)}</li>"
