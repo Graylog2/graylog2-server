@@ -1,5 +1,5 @@
 body {
-  background-color: #000;
+  background-color: #d4d4d4;
   font-family: Helvetica,Arial,'Liberation Sans',FreeSans,sans-serif;
   color: #fff;
   font-size: 13px;
@@ -10,67 +10,35 @@ a {
     text-decoration: none;
 }
 
-h1 {
-  color: #fd0c99;
-  font-size: 20px;
-  margin-bottom: 15px;
+#loginbox {
+  background-color: #363636;
+  margin: 0px auto;
+  padding: 15px;
+  margin-top: 200px;
+  width: 400px;
 }
 
-input {
-    font-size: 9px;
-    padding: 1px;
-    margin-top: 2px;
-    margin-bottom: 2px;
-    width: 200px;
+.login-credentials {
+  width: 380px;
+  font-size: 14px;
+  font-weight: bold;
+  padding: 8px 5px 9px 11px;
 }
 
-label {
-    font-size: 11px;
-    text-transform: uppercase;
-    text-shadow: -1px -1px 0 #111;
+.initial {
+  text-align: right;
+  text-transform: uppercase;
+  color: #ccc;
 }
 
-dt {
-  float: left;
-}
-
-dd {
-  padding-left: 150px;
+#remember-me {
+  text-transform: uppercase;
+  font-size: 11px;
+  position: relative;
+  top: -2px;
+  left: -3px;
 }
 
 #submit {
-  width: 100px;
   float: right;
-}
-
-#logintop {
-    margin: 10px auto 0px;
-    width: 508px;
-}
-
-#loginbox {
-  width: 100%;
-  border-top: 8px solid #826e61;
-  padding-top: 15px;
-  padding-bottom: 15px;
-}
-
-#loginbox-inner {
-    width: 430px;
-    margin: 0px auto;
-}
-
-#username {
-  float: left;
-  padding-right: 10px;
-}
-
-#rememberme {
-  margin-top: 5px;
-}
-
-#rememberme input {
-    position: relative;
-    top: 2px;
-    width: 15px;
 }
