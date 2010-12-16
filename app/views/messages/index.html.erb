@@ -7,8 +7,8 @@
 <div id="messages-content">
 
 <div id="messages-favorited-streams">
-  <% unless @favorites.blank? %>
-    Favorite streams: <%= select("favoritestreamchooser", "id", @favorites.collect {|p| [ p.stream.title, p.stream.id ] }, { :include_blank => true }) %>
+  <% unless @favorites.empty? %>
+    Favorite streams: <%= select("favoritestreamchooser", "id", @favorites.collect {|stream| [ stream.title, stream.id ] }, { :include_blank => true }) %>
   <% end %>
 </div>
 
