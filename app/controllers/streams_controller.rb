@@ -19,7 +19,7 @@ class StreamsController < ApplicationController
     @is_alertable = @stream.alertable || false
     
     # Find out if this stream is favorited by the current user.
-    FavoritedStream.find_by_stream_id_and_user_id(params[:id], current_user.id).blank? ? @is_favorited = false : @is_favorited = true
+    @is_favorited = current_user.favorite_streams.include?(@stream)
   end
 
   def create
@@ -80,5 +80,20 @@ class StreamsController < ApplicationController
     end
     stream.save
     redirect_to :action => "show", :id => params[:id]
+  end
+  
+  def favorite
+    stream = Stream.find params[:id]
+    current_user.favorite_streams << stream
+    
+    flash[:notice] = "Stream has been added as a favorite!"
+    redirect_to stream_path(stream)
+  end
+
+  def unfavorite
+    stream = Stream.find params[:id]
+    current_user.favorite_streams.delete stream
+    flash[:notice] = "Stream has been removed from favorites!"
+    redirect_to stream_path(stream)
   end
 end

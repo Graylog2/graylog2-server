@@ -26,6 +26,7 @@ class User < ActiveRecord::Base
   attr_accessible :login, :email, :name, :password, :password_confirmation, :role, :stream_ids
   
   has_and_belongs_to_many :streams
+  has_and_belongs_to_many :favorite_streams, :join_table => "favorite_streams", :class_name => "Stream"
 
   # Authenticates a user by their login name and unencrypted password.  Returns the user or nil.
   #
