@@ -21,7 +21,7 @@ class MessagesController < ApplicationController
     @total_count =  Message.count_since(0)
     @total_blacklisted_terms = BlacklistedTerm.count
 
-    @favorites = FavoritedStream.find_all_by_user_id current_user.id
+    @favorites = current_user.favorite_streams
   end
 
   def show
