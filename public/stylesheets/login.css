@@ -5,17 +5,31 @@ body {
   font-size: 13px;
 }
 
+h1 {
+  font-size: 25px;
+  margin-bottom: 12px;
+  display: block;
+  font-weight: normal;
+  font-family: Georgia,"Times New Roman",Times,serif;
+}
+
 a {
-    color: #fd0c99;
-    text-decoration: none;
+  color: #fd0c99;
+  text-decoration: none;
 }
 
 #loginbox {
   background-color: #363636;
   margin: 0px auto;
   padding: 15px;
-  margin-top: 200px;
   width: 400px;
+  height: 142px;
+
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  margin-left: -215px;
+  margin-top: -86px;
 }
 
 .login-credentials {
