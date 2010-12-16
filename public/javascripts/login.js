@@ -14,8 +14,20 @@ $(document).ready(function(){
     });
 
     $("#submit").bind("click", function() {
+      $("#loginform").submit();
+    });
+
+    $(".login-credentials").bind("keypress", function(e) {
+      code = (e.keyCode ? e.keyCode : e.which);
+      if (code == 13) {
+        $("#loginform").submit();
+      }
+    });
+
+    $("#loginform").bind("submit", function() {
+      button = $("#submit");
       // No mutiple submit.
-      if ($(this).hasClass("submit-disabled")) {
+      if (button.hasClass("submit-disabled")) {
         return false;
       }
 
@@ -26,10 +38,9 @@ $(document).ready(function(){
         "Preparing gorilla party"
       ]
 
-      $(this).html(vals[Math.floor(Math.random() * vals.length)] + "...");
-      $(this).addClass("submit-disabled");
+      button.html(vals[Math.floor(Math.random() * vals.length)] + "...");
+      button.addClass("submit-disabled");
 
-      $("#loginform").submit();
-      return false;
+      $(this).submit();
     });
 });
