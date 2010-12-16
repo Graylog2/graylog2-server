@@ -79,6 +79,21 @@ class MessagesController < ApplicationController
     redirect_to :action => 'index'
   end
 
+  def deletebystream
+    begin
+      conditions = Message.by_stream(params[:id].to_i, 0).criteria.sources
+      throw "Missing conditions" if conditions.blank?
+
+      Message.set(conditions, :deleted => true )
+
+      flash[:notice] = "Messages have been deleted."
+    rescue
+      flash[:error] = "Could not delete messages."
+    end
+    
+    redirect_to stream_path(params[:id])
+  end
+
   def getsimilarmessages
     # Get the message we want to compare.
     message = Message.find params[:id]
