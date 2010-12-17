@@ -5,6 +5,9 @@ class Stream < ActiveRecord::Base
 
   validates_presence_of :title
 
+  validates_numericality_of :alarm_limit, :allow_nil => true
+  validates_numericality_of :alarm_timespan, :allow_nil => true, :greater_than => 0
+
   def alerted?(user_id)
     AlertedStream.alerted?(self.id, user_id)
   end

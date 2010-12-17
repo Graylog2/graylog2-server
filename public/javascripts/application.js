@@ -188,6 +188,10 @@ $(document).ready(function(){
         done.show();
       });
     });
+    
+    // Stream alerts: Inputs only numeric.
+    $('#streams-alerts-limit').numeric();
+    $('#streams-alerts-timespan').numeric();
 
 });
 

@@ -52,6 +52,25 @@ class StreamsController < ApplicationController
     render :text => ""
   end
 
+  def setalarmvalues
+    stream = Stream.find(params[:id])
+
+    unless params[:limit].blank? or params[:timespan].blank?
+      stream.alarm_limit = params[:limit]
+      stream.alarm_timespan = params[:timespan]
+
+      if stream.save
+        flash[:notice] = "Alarm settings updated."
+      else
+        flash[:error] = "Could not update alarm settings."
+      end
+    else
+        flash[:error] = "Could not update alarm settings: Missing parameters."
+    end
+
+    redirect_to :action => "settings", :id => params[:id]
+  end
+
   def create
     new_stream = Stream.new params[:stream]
     if new_stream.save

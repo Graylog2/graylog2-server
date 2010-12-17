@@ -203,8 +203,12 @@
     color: #fd0c99;
 }
 
-#streams-show-statistics {
-    font-weight: bold;
+#streams-alerts-limit {
+  width: 50px;
+}
+
+#streams-alerts-timespan {
+  width: 25px;
 }
 
 /* Hosts */
