@@ -118,8 +118,6 @@ $.post("/visuals/fetch/messagespread?term=<%= CGI.escape(params[:term]) %>&amp;r
   
   $('#loading').hide();
 
-  console.log(hosts);
-
   if (hosts.length > 0) {
     displayHosts(hosts);
 
