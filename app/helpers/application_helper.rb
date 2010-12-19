@@ -1,12 +1,12 @@
 module ApplicationHelper
-  def menu_item where
-    if where[:controller] == root_path
-      destination = root_path
-    else
-      destination = (root_path = "/" ? where[:controller] : root_path + "/" + where[:controller])
+  def menu_item title, where
+    li_class = ""
+    link = link_to_unless_current(title, where) do
+      li_class = " class=\"topmenu-active\""
+      title
     end
-
-    "<li class=\"#{"topmenu-active" if is_current_menu_item?(where[:controller])}\">#{link_to(where[:title], destination)}</li>"
+    "<li#{li_class}>#{link}</li>"
+    #"<li class=\"#{"topmenu-active" if is_current_menu_item?(where[:controller])}\">#{link_to(where[:title], destination)}</li>"
   end
 
   def tab_link tab
@@ -140,5 +140,17 @@ module ApplicationHelper
   
   def is_current_tab? tab
     true if params[:action] == tab.downcase
+  end
+  
+  def current_page
+    params[:page].blank? ? 1 : params[:page].to_i
+  end
+  
+  def next_page
+    current_page + 1
+  end
+  
+  def previous_page
+    current_page <= 2 ? 1 : current_page - 1
   end
 end

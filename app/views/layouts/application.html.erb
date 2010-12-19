@@ -36,12 +36,12 @@
     </div>
     <%= link_to image_tag("graylog.png", :id => "toplogo"), (permitted_to?(:index, :messages) ? messages_path : streams_path)%>
     <ul id="topmenu">
-      <% permitted_to? :index, :messages do %><%=raw menu_item({ :title => "Messages", :controller => "messages" }) %><% end %>
-      <% permitted_to? :index, :streams do %><%=raw menu_item({ :title => "Streams", :controller => "streams" }) %><% end %>
-      <% permitted_to? :index, :hosts do %><%=raw menu_item({ :title => "Hosts", :controller => "hosts" }) %><% end %>
-      <% permitted_to? :index, :blacklists do %><%=raw menu_item({ :title => "Blacklists", :controller => "blacklists" }) %><% end %>
-      <% permitted_to? :index, :settings do %><%=raw menu_item({ :title => "Settings", :controller => "settings" }) %><% end %>
-      <% permitted_to? :index, :users do %><%=raw menu_item({ :title => "Users", :controller => "users" }) %><% end %>
+      <% permitted_to? :index, :messages do %><%=raw menu_item("Messages", messages_path) %><% end %>
+      <% permitted_to? :index, :streams do %><%=raw menu_item("Streams", streams_path) %><% end %>
+      <% permitted_to? :index, :hosts do %><%=raw menu_item("Hosts", hosts_path) %><% end %>
+      <% permitted_to? :index, :blacklists do %><%=raw menu_item("Blacklists", {:controller => :blacklists}) %><% end %>
+      <% permitted_to? :index, :settings do %><%=raw menu_item("Settings", {:controller => :settings}) %><% end %>
+      <% permitted_to? :index, :users do %><%=raw menu_item("Users", {:controller => :users}) %><% end %>
     </ul>
 
     <% message_count_interval = Setting.get_message_count_interval(current_user) %>
