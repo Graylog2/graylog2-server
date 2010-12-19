@@ -2,6 +2,7 @@ class Stream < ActiveRecord::Base
   has_many :streamrules
   has_many :favoritedStreams, :dependent => :destroy
   has_many :subscribedStreams, :dependent => :destroy
+  has_many :alertedStreams, :dependent => :destroy
 
   validates_presence_of :title
 
@@ -20,6 +21,15 @@ class Stream < ActiveRecord::Base
     FavoritedStream.favorited?(self.id, user_id)
   end
 
+  def self.all_with_enabled_alerts
+    ids = Array.new
+    self.joins(:alertedStreams).each do |s|
+      next if ids.include?(s.id)
+      ids << s.id
+    end
+    return ids
+  end
+
   def self.all_with_subscribers
     ids = Array.new
     self.joins(:subscribedStreams).each do |s|
@@ -30,19 +40,25 @@ class Stream < ActiveRecord::Base
   end
 
   def self.get_message_count(stream_id)
-    conditions = Message.all_of_stream stream_id, nil, true
+    conditions = Message.by_stream(stream_id).criteria
+    return Message.count(:conditions => conditions)
+  end
+
+  def self.message_count_since(stream_id, since)
+    conditions = Message.by_stream(stream_id).criteria
+    conditions[:created_at] = { "$gte" => since }
     return Message.count(:conditions => conditions)
   end
 
   def self.get_distinct_hosts(stream_id)
-    conditions = Message.all_of_stream stream_id, nil, true
+    conditions = Message.by_stream(stream_id).criteria
     return Message.collection.distinct(:host, conditions)
   end
 
   def self.get_count_by_host(stream_id, host)
-    conditions = Message.all_of_stream stream_id, nil, true
+    conditions = Message.by_stream(stream_id).criteria
     conditions[:host] = host
     return Message.count(:conditions => conditions).to_s
   end
 
-end
+  end

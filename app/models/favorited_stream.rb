@@ -1,5 +1,6 @@
 class FavoritedStream < ActiveRecord::Base
   belongs_to :stream
+  belongs_to :user
 
   def self.favorited?(stream_id, user_id)
     self.count(:conditions => { :user_id => user_id, :stream_id => stream_id }) > 0
