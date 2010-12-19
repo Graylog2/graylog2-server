@@ -21,10 +21,10 @@ class Stream < ActiveRecord::Base
     FavoritedStream.favorited?(self.id, user_id)
   end
 
+  # giving back IDs because all_with_subscribers does too
   def self.all_with_enabled_alerts
     ids = Array.new
-    self.joins(:alertedStreams).each do |s|
-      next if ids.include?(s.id)
+    self.find_all_by_alarm_active(true).each do |s|
       ids << s.id
     end
     return ids
