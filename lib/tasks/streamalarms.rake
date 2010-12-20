@@ -22,13 +22,13 @@ namespace :streamalarms do
         puts "\t#{count} messages: Above limit! Sending alarm to #{subscribers.count} subscribed users."
 
         # Build email body.
-        body = "# Stream >#{stream.title}< has #{count} new messages in the last #{stream.alarm_timespan} minutes. Limit: #{stream.alarm_limit}"
+        body = "# Stream >#{stream.title}< has #{count} new messages in the last #{stream.alarm_timespan} minutes. Limit: #{stream.alarm_limit}\n"
 
         # Add description to body.
         if stream.description.blank?
           body += "# No stream description set."
         else
-          body += "# Stream description: #{stream.description}"
+          body += "# Description: #{stream.description}"
         end
 
         # Send messages.
