@@ -23,6 +23,8 @@
   </div>
 </div>
 
-<% unless @stream.streamrules.blank? %>
+<% if @stream.streamrules.blank? %>
+  <center>No messages in this stream.</center>
+<% else %>
   <%= render :partial => "messages/table", :locals => { :messages => @messages, :total_messages => @total_count } %>
 <% end %>
