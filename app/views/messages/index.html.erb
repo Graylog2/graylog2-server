@@ -17,7 +17,13 @@
     <li>
       <span class="favorite-stream-sparkline">1, 4, 4, 7, 5, 9, 10, 3, 4, 7</span>
       <%= favorite.stream.title %>
-      <span class="favorite-stream-limits status-okay-text">(<%= rand(5000) %>/<%= rand(5000) %>)</span>
+
+      <% if favorite.stream.alarm_active and !favorite.stream.alarm_limit.blank? and !favorite.stream.alarm_timespan.blank? %>
+        <% stream_count = favorite.stream.message_count_since(favorite.stream.alarm_timespan.minutes.ago.to_i) %>
+        <span class="favorite-stream-limits <%= stream_count > favorite.stream.alarm_limit ? "status-alarm-text" : "status-okay-text" %>">
+          (<%= stream_count %>/<%= favorite.stream.alarm_limit %>/<%= favorite.stream.alarm_timespan %>m)
+        </span>
+      <% end %>
     </li>
    <% end %>
   </ul>

@@ -44,6 +44,10 @@ class Stream < ActiveRecord::Base
     return Message.count(:conditions => conditions)
   end
 
+  def message_count_since(since)
+    return Stream.message_count_since(id, since)
+  end
+
   def self.message_count_since(stream_id, since)
     conditions = Message.by_stream(stream_id).criteria
     conditions[:created_at] = { "$gte" => since }
