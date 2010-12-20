@@ -24,6 +24,13 @@ namespace :streamalarms do
         # Build email body.
         body = "# Stream >#{stream.title}< has #{count} new messages in the last #{stream.alarm_timespan} minutes. Limit: #{stream.alarm_limit}"
 
+        # Add description to body.
+        if stream.description.blank?
+          body += "# No stream description set."
+        else
+          body += "# Stream description: #{stream.description}"
+        end
+
         # Send messages.
         subscribers.each do |subscriber|
           begin
