@@ -135,14 +135,11 @@ module ApplicationHelper
   def flot_graph_loader(options)
    "<script type='text/javascript'>
       function plot(data){
-        var limit = #{options[:max_count]};
-
         $.plot($('#{options[:inject]}'),
           [ {
-              color: '#f00',
+              color: '#fd0c99',
               shadowSize: 10,
               data: data,
-              threshold: { below: limit, color: '#fd0c99' },
               points: { show: false, },
               lines: { show: true, fill: true }
           } ],
@@ -152,7 +149,6 @@ module ApplicationHelper
               show: true,
               color: '#ccc',
               borderWidth: 0,
-              markings: [ { yaxis: { from: limit, to: limit }, color: '#ff9797' } ]
             }
           }
         );

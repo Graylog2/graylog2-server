@@ -15,7 +15,6 @@
 </div>
 
 <%=raw flot_graph_loader(
-    :max_count => Setting.get_message_max_count(current_user),
     :inject => "#analytics-new-messages",
     :host => "all",
     :hours => 12

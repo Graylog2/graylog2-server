@@ -4,7 +4,6 @@
 
   <div id="sidebar-graph" style="height: 100px;"></div>  
   <%=raw flot_graph_loader(
-        :max_count => Setting.get_message_max_count(current_user),
         :inject => "#sidebar-graph",
         :host => "all",
         :hours => 2
