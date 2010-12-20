@@ -24,6 +24,19 @@ class StreamsController < ApplicationController
     @stream = Stream.find params[:id]
   end
 
+  def setdescription
+    @stream = Stream.find(params[:id])
+    @stream.description = params[:description]
+
+    if @stream.save
+      flash[:notice] = "Description has been saved."
+    else
+      flash[:error] = "Could not save description."
+    end
+
+    redirect_to :action => "show", :id => params[:id]
+  end
+
   def togglealarmactive
     stream = Stream.find(params[:id])
     if stream.alarm_active

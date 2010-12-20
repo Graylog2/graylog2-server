@@ -193,6 +193,12 @@ $(document).ready(function(){
     $('#streams-alerts-limit').numeric();
     $('#streams-alerts-timespan').numeric();
 
+    // Stream descriptions.
+    $(".stream-description-change").bind("click", function() {
+      $("#streams-description-text").hide();
+      $("#streams-set-description").show();
+    });
+
 });
 
 function buildHostCssId(id) {
