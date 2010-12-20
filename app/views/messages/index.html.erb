@@ -16,7 +16,7 @@
    <% @favorites.each do |favorite| %>
     <li>
       <span class="favorite-stream-sparkline">1, 4, 4, 7, 5, 9, 10, 3, 4, 7</span>
-      <%= favorite.stream.title %>
+      <%= link_to favorite.stream.title, { :controller => "streams", :action => "show", :id => favorite.stream.id }, :class => "favorite-streams-title" %>
 
       <% if favorite.stream.alarm_active and !favorite.stream.alarm_limit.blank? and !favorite.stream.alarm_timespan.blank? %>
         <% stream_count = favorite.stream.message_count_since(favorite.stream.alarm_timespan.minutes.ago.to_i) %>

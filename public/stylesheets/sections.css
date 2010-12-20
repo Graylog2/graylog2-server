@@ -412,6 +412,10 @@
   font-size: 13px;
 }
 
+.favorite-streams-title {
+  color: #000;
+}
+
 #favorite-streams li {
   padding-top: 1px;
   padding-bottom: 1px;
