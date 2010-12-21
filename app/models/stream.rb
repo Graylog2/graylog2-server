@@ -65,4 +65,4 @@ class Stream < ActiveRecord::Base
     return Message.count(:conditions => conditions).to_s
   end
 
-  end
+end

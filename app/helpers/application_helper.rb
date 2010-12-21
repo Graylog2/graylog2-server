@@ -168,6 +168,18 @@ module ApplicationHelper
     <span id=\"#{title.to_s}-ajaxtrigger-done\" class=\"status-okay-text\" style=\"display: none;\">Saved!</span>"
   end
 
+  def sparkline_values values
+    res = ""
+    i = 1
+    values.each do |v|
+      res += v.to_s
+      res += "," unless i == values.size
+      i += 1
+    end
+
+    return res
+  end
+
   private
 
   def is_current_menu_item? item

@@ -109,6 +109,31 @@ class Message
     return by_stream(stream_id).count
   end
 
+  def self.stream_counts_of_last_minutes(stream_id, minutes)
+    res = Array.new
+    minutes.times do |m|
+      m += 1 # Offset by one because we don't want to start with the current minute.
+      t = m.minutes.ago
+      
+      # Get first second of minute.
+      t -= t.sec
+
+      # Try to read from cache.
+      obj = { :stream_id => stream_id, :minute => t.to_i }
+      c = Rails.cache.read(obj)
+      
+      if c == nil
+        # Cache miss. Perform counting and add to cache.
+        c = Message.by_stream(stream_id).where(:created_at => {"$gt" => t.to_i}).where(:created_at => {"$lt" => (t+60).to_i}).count
+        Rails.cache.write(obj, c)
+      end
+
+      res << { :minute => t, :count => c}
+    end
+
+    return res.reverse
+  end
+
   def self.all_of_host host, page
     page = 1 if page.blank?
     where(:host => host).default_scope.page(page)
