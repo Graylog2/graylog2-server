@@ -60,7 +60,7 @@ class UsersController < ApplicationController
       # Send back to login page if the user deleted himself.
       if current_user.id == params[:id]
         logout_killing_session!
-        redirect_to '/'
+        redirect_to root_path
         return
       end
 

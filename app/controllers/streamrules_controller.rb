@@ -7,7 +7,7 @@ class StreamrulesController < ApplicationController
     else
       flash[:error] = "Could not add rule."
     end
-    redirect_to :controller => "streams", :action => "show", :id => params[:streamrule][:stream_id]
+    redirect_to stream_path(new_rule.stream_id)
   end
 
   def destroy
@@ -17,6 +17,6 @@ class StreamrulesController < ApplicationController
     else
       flash[:error] = "Could not remove rule from stream."
     end
-    redirect_to :controller => "streams", :action => "show", :id => params[:stream_id]
+    redirect_to stream_path(params[:id])
   end
 end

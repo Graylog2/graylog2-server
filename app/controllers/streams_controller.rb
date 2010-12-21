@@ -29,7 +29,7 @@ class StreamsController < ApplicationController
     else
       flash[:error] = "Could not create stream"
     end
-    redirect_to :action => "index"
+    redirect_to streams_path
   end
 
   def destroy
@@ -41,7 +41,7 @@ class StreamsController < ApplicationController
     rescue
       flash[:error] = "Could not delete stream"
     end
-    redirect_to :action => "index"
+    redirect_to streams_path
   end
 
   def get_hosts_statistic
@@ -79,7 +79,7 @@ class StreamsController < ApplicationController
       alert.save
     end
     stream.save
-    redirect_to :action => "show", :id => params[:id]
+    redirect_to stream_path(stream)
   end
   
   def favorite
