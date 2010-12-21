@@ -20,6 +20,11 @@ class StreamsController < ApplicationController
     @new_rule = Streamrule.new
   end
 
+  def analytics
+    @load_flot = true
+    @stream = Stream.find params[:id]
+  end
+
   def settings
     @stream = Stream.find params[:id]
   end
@@ -118,31 +123,6 @@ class StreamsController < ApplicationController
     redirect_to :action => "index"
   end
   
-#  def get_hosts_statistic
-#    throw "Missing stream ID" if params[:id].blank?
-#
-#    total_message_count = Stream.get_message_count(params[:id]).to_i
-#    hosts = Stream.get_distinct_hosts params[:id]
-#
-#    ready_hosts = Array.new
-#    hosts.each do |host|
-#      message_count = Stream.get_count_by_host(params[:id], host).to_i
-#      # Thanks to Sarah and her wicked percentage calculation skills. (<3)
-#      percent = 100-(((total_message_count-message_count)*100)/total_message_count)
-#      ready_hosts << { 'name' => host, 'percent' => percent.to_i }
-#    end
-#
-#    # Sort the result.
-#    ready_hosts = ready_hosts.sort { |a,b| b['percent'] <=> a['percent'] }
-#
-#    if hosts.blank?
-#      render :text => 'No messages found.'
-#      return
-#    end
-#
-#    render :partial => 'statistics', :locals => { :hosts => ready_hosts }
-#  end
-
   def tabs
     @tabs = [ "Show", "Rules", "Analytics", "Settings" ]
   end

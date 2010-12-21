@@ -13,6 +13,8 @@ class VisualsController < ApplicationController
           r["data"] = calculate_hostgrouprelation(false, params[:group])
         when "graph" then
           r["data"] = calculate_graph(params[:host], params[:hours])
+        when "streamgraph" then
+          r["data"] = calculate_streamgraph(params[:stream_id], params[:hours])
       end
     end
 
@@ -130,6 +132,22 @@ class VisualsController < ApplicationController
     entries.each do |entry|
       p = [ entry.created_at*1000, entry.value]
       r << p
+    end
+
+    return r
+  end
+  
+  def calculate_streamgraph(stream_id, x)
+    stream = Stream.find(stream_id)
+    
+    hours = 12
+    unless x.blank?
+      hours = x.to_i
+    end
+    
+    r = Array.new
+    Message.stream_counts_of_last_minutes(stream.id, hours*60).each do |c|
+      r << [ c[:minute].to_i*1000, c[:count] ]
     end
 
     return r

@@ -235,6 +235,13 @@
   width: 500px;
 }
 
+#streams-analytics-new-messages {
+  width: 100%;
+  height: 200px;
+  margin-top: 10px;
+  margin-bottom: 10px;
+}
+
 /* Hosts */
 #hosts-quickjump {
     margin-bottom: 15px;

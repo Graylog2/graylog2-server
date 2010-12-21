@@ -133,6 +133,12 @@ module ApplicationHelper
   end
 
   def flot_graph_loader(options)
+   if options[:stream_id].blank?
+     url = "/visuals/fetch/graph?hosts=#{options[:host]}&amp;hours=#{options[:hours]}"
+   else
+     url = "/visuals/fetch/streamgraph?stream_id=#{options[:stream_id]}&amp;hours=#{options[:hours]}"
+   end
+   
    "<script type='text/javascript'>
       function plot(data){
         $.plot($('#{options[:inject]}'),
@@ -153,11 +159,10 @@ module ApplicationHelper
           }
         );
       }
-
-      $.post('/visuals/fetch/graph?hosts=#{options[:host]}&amp;hours=#{options[:hours]}', function(data) {
+      $.post('#{url}', function(data) {
         json = eval('(' + data + ')');
-        plot(json.data);
-      });
+          plot(json.data);
+        });
     </script>"
   end
 
