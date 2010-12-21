@@ -33,7 +33,6 @@ import java.util.List;
 import java.util.Properties;
 import org.graylog2.periodical.ChunkedGELFClientManagerThread;
 import org.graylog2.periodical.LoadStatisticsThread;
-import org.graylog2.periodical.GraphWriterThread;
 
 /**
  * Main class of Graylog2.
@@ -196,11 +195,6 @@ public final class Main {
             
             System.out.println("[x] GELF threads are up.");
         }
-
-         // Start graph writer thread.
-         GraphWriterThread graphThread = new GraphWriterThread();
-         graphThread.start();
-         System.out.println("[x] Graph writers are up.");
 
         // Start the thread that distincts hosts.
         HostDistinctThread hostDistinctThread = new HostDistinctThread();
