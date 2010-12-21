@@ -11,8 +11,8 @@ class VisualsController < ApplicationController
           r["data"] = calculate_messagespread(is_regex, case_sensitive, params[:term])
         when "hostgrouprelation" then
           r["data"] = calculate_hostgrouprelation(false, params[:group])
-        when "graph" then
-          r["data"] = calculate_graph(params[:host], params[:hours])
+        when "totalgraph" then
+          r["data"] = calculate_totalgraph(params[:hours])
         when "streamgraph" then
           r["data"] = calculate_streamgraph(params[:stream_id], params[:hours])
       end
@@ -124,14 +124,15 @@ class VisualsController < ApplicationController
     return r
   end
 
-  def calculate_graph(host, x)
-    entries = Graph.all_of_host("all", x.to_i.hours.ago.to_i)
-
+  def calculate_totalgraph(x)
+    hours = 12
+    unless x.blank?
+      hours = x.to_i
+    end
+   
     r = Array.new
-
-    entries.each do |entry|
-      p = [ entry.created_at*1000, entry.value]
-      r << p
+    Message.counts_of_last_minutes(hours*60).each do |c|
+      r << [ c[:minute].to_i*1000, c[:count] ]
     end
 
     return r

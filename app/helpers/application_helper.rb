@@ -134,7 +134,7 @@ module ApplicationHelper
 
   def flot_graph_loader(options)
    if options[:stream_id].blank?
-     url = "/visuals/fetch/graph?hosts=#{options[:host]}&amp;hours=#{options[:hours]}"
+     url = "/visuals/fetch/totalgraph?hours=#{options[:hours]}"
    else
      url = "/visuals/fetch/streamgraph?stream_id=#{options[:stream_id]}&amp;hours=#{options[:hours]}"
    end
