@@ -39,7 +39,7 @@ namespace :subscriptions do
               :subject => "#{Configuration.subscription_subject} (Stream: #{stream.title})",
               :body => body,
               :via => Configuration.email_transport_type,
-              :smtp => Configuration.email_smtp_settings, # Only used when :via => :smtp
+              :smtp => Configuration.email_smtp_settings # Only used when :via => :smtp
             )
             puts "\t[->] #{subscriber}"
           rescue => e
