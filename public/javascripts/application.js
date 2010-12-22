@@ -72,15 +72,6 @@ $(document).ready(function(){
        window.location = "/streams/show/" + parseInt(this.value);
     });
 
-    // Show stream statistics
-    $('#streams-show-statistics').bind('click', function() {
-        $('#blocks-statistics').show();
-        $('#streams-show-statistics').hide();
-        $.post("/streams/get_hosts_statistic/" + parseInt($('#streamid').html()), function(data) {
-                $('#blocks-statistics').html(data);
-        });
-    });
-
     // Quickfilter
     $('#messages-show-quickfilter').bind('click', function() {
         var showLink = $('#messages-show-quickfilter');
@@ -143,9 +134,9 @@ $(document).ready(function(){
 
       // Show loading message.
       $("#analytics-new-messages-update-loading").show();
-
+      
       // Update graph.
-      $.post("/visuals/fetch/graph?hosts=all&amp;hours=" + v, function(data) {
+      $.post($(this).attr("data-updateurl") + v, function(data) {
         json = eval('(' + data + ')');
       
         // Plot is defined inline. (I suck at JavaScript)
@@ -160,6 +151,54 @@ $(document).ready(function(){
 
       return false;
     });
+
+    // Hide sidebar.
+    $("#sidebar-hide-link").bind('click', function() {
+      $("#main-right").hide();
+      $("#main-left").animate({ width: '100%' }, 700);
+      return false;
+    });
+
+    // Favorite streams: Sparklines.
+    $(".favorite-stream-sparkline").sparkline(
+      "html",
+      {
+        type: "line",
+        width: "40px",
+        lineColor: "#fd0c99",
+        fillColor: "#fdd",
+        spotColor: false,
+        minSpotColor: false,
+        maxSpotColor: false
+      }
+    );
+
+    // AJAX trigger
+    $(".ajaxtrigger").bind("click", function() {
+      field = $(this);
+      loading = $("#" + field.attr("id") + "-ajaxtrigger-loading");
+      done = $("#" + field.attr("id") + "-ajaxtrigger-done");
+     
+      field.attr("disabled","disabled");
+      done.hide();
+      loading.show();
+      $.post(field.attr("data-target"), function(data) {
+        field.removeAttr("disabled");
+        loading.hide();
+        done.show();
+      });
+    });
+    
+    // Stream alerts: Inputs only numeric.
+    $('#streams-alerts-limit').numeric();
+    $('#streams-alerts-timespan').numeric();
+
+    // Stream descriptions.
+    $(".stream-description-change").bind("click", function() {
+      $("#streams-description-text").hide();
+      $("#streams-set-description").show();
+    });
+
 });
 
 function buildHostCssId(id) {

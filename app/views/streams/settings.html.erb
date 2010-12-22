@@ -1,0 +1,51 @@
+<h1>Settings of stream <span class="highlighted"><%= @stream.title %></span></h1>
+
+<h2>General</h2>
+<div class="short-description">All these settings are only applied for your user.</div>
+
+<%=raw ajaxtrigger(:favorite, "Favorite", "/favoritedstreams/toggle/#{@stream.id}", @stream.favorited?(current_user)) %>
+<br />
+
+<%=raw ajaxtrigger(:alarm, "Receive alarms of this stream", "/alertedstreams/toggle/#{@stream.id}", @stream.alerted?(current_user) ) %>
+<br />
+
+<%=raw ajaxtrigger(:subscribe, "Subscribe to stream", "/subscribedstreams/toggle/#{@stream.id}", @stream.subscribed?(current_user) ) %>
+<br /><br />
+
+<h2>Alarms</h2>
+<div class="short-description">An alarm is triggered when the number of messages in the defined timespan
+is higher than the maximum. All users who enabled receiving of alerts will be notified
+of the alarm. You can also define that all users are alarmed, no matter what they defined.</div>
+
+<%=raw ajaxtrigger(:active, "Active", "/streams/togglealarmactive/#{@stream.id}", @stream.alarm_active) %>
+<br />
+
+<%=raw ajaxtrigger(:allusers, "Force for all users", "/streams/togglealarmforce/#{@stream.id}", @stream.alarm_force) %>
+<br /><br />
+
+<%= form_tag "/streams/setalarmvalues/#{@stream.id}" do %>
+  <%= label_tag :limit, "Maximum number of messages:" %>
+  <%= text_field_tag :limit, @stream.alarm_limit, :id => "streams-alerts-limit" %> &nbsp;
+
+  <%= label_tag :timespan, "Minutes:" %>
+  <%= text_field_tag :timespan, @stream.alarm_timespan, :id => "streams-alerts-timespan" %> &nbsp;
+
+  <%= submit_tag "Save" %>
+<% end %>
+<br />
+
+<h2>Rename stream</h2>
+<%= form_tag '/streams/rename/' do %>
+  <%= label_tag 'title', 'New name:' %>
+  <%= text_field_tag 'title' %>
+  <%= hidden_field_tag :stream_id, @stream.id%>
+  <%= submit_tag 'Rename' %>
+<% end %>
+<br />
+  
+<h2>Delete messages</h2>
+<%= link_to "Delete all messages hit by this stream", { :controller => "messages", :action => "deletebystream", :id => @stream.id }, :confirm => "Really delete the messages?", :class => "bigger" %>
+<br /><br />
+
+<h2>Delete stream</h2>
+<%= link_to "Delete this stream", { :action => "destroy", :id => @stream.id }, :confirm => "Really delete this stream?", :class => "bigger" %>

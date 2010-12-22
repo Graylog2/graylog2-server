@@ -21,16 +21,16 @@ class Streamrule < ActiveRecord::Base
     }
   end
   
-  def to_condition
+  def to_condition(op = "$in")
     case rule_type
     when TYPE_MESSAGE then
       return {:message => /#{Regexp.escape value}/}
     when TYPE_HOST then
-      return {:host => value}
+      return {:host => {op => [value]}}
     when TYPE_SEVERITY then
-      return {:level => value.to_i}
+      return {:level => {op => [value.to_i]}}
     when TYPE_FACILITY then
-      return {:facility => value.to_i}
+      return {:facility => {op => [value.to_i]}}
     when TYPE_TIMEFRAME then
       return {:timeframe => value}
     end

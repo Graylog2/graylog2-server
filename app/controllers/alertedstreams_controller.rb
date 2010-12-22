@@ -1,4 +1,4 @@
-class FavoritedstreamsController < ApplicationController
+class AlertedstreamsController < ApplicationController
 
   def toggle
     stream_id = params[:id]
@@ -12,7 +12,7 @@ class FavoritedstreamsController < ApplicationController
       return
     end
 
-    if stream.favorited?(current_user)
+    if stream.alerted?(current_user)
       destroy(stream_id)
     else
       create(stream_id)
@@ -25,15 +25,15 @@ class FavoritedstreamsController < ApplicationController
   private
 
   def create(stream_id)
-    favorite = FavoritedStream.new
-    favorite.stream_id = stream_id
-    favorite.user_id = current_user.id
+    alert = AlertedStream.new
+    alert.stream_id = stream_id
+    alert.user_id = current_user.id
 
-    favorite.save
+    alert.save
   end
 
   def destroy(stream_id)
-    favorite = FavoritedStream.find_by_stream_id_and_user_id(stream_id, current_user.id)
-    favorite.destroy
+    alert = AlertedStream.find_by_stream_id_and_user_id(stream_id, current_user.id)
+    alert.destroy
   end
 end

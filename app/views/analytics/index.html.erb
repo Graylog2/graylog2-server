@@ -1,49 +1,26 @@
 <h1>Analytics</h1>
 
 <h2>Count of new messages (last <span id="analytics-new-messages-hours">12</span> hours.)</h2>
-<div id="analytics-new-messages"></div>
-<div class="short-description" style="width: 100%;">Count of number of messages from all hosts. The red line indicates your configured maximum message warn limit.</div>
+<div id="analytics-new-messages">
+  <%= image_tag "loading.gif", :class => "ajaxloader" %>
+</div>
+<div class="short-description" style="width: 100%;">Count of number of messages from all hosts.</div>
 
 <div id="analytics-new-messages-settings">
   <%= label_tag :hours, "Hours:" %>
   <%= text_field_tag :hours, 12, { :id => "analytics-new-messages-update-hours" } %>
 
-  <%= submit_tag "Update graph", :id => "analytics-new-messages-update-submit" %>
+  <%= submit_tag "Update graph", :id => "analytics-new-messages-update-submit", "data-updateurl" => "/visuals/fetch/totalgraph?hosts=all&amp;hours=" %>
   <span id="analytics-new-messages-update-loading" style="display: none;">
     <%= image_tag 'loading-small.gif' %> Calculating...
   </span>
 </div>
 
-<script type="text/javascript">
-function plot(data){
-    var limit = <%= Setting.get_message_max_count(current_user) %>;
-
-    $.plot($("#analytics-new-messages"),
-      [ {
-          color: "#f00",
-          shadowSize: 10,
-          data: data,
-          threshold: { below: limit, color: "#fd0c99" },
-          points: { show: false, },
-          lines: { show: true, fill: true }
-      } ],
-      {
-        xaxis: { mode: "time" },
-        grid: {
-          show: true,
-          color: "#ccc",
-          borderWidth: 0,
-          markings: [ { yaxis: { from: limit, to: limit }, color: "#ff9797" } ]
-        }
-      }
-    );
-  }
-
-  $.post("/visuals/fetch/graph?hosts=all&amp;hours=12", function(data) {
-    json = eval('(' + data + ')');
-    plot(json.data);
-  });
-</script>
+<%=raw flot_graph_loader(
+    :inject => "#analytics-new-messages",
+    :hours => 12
+  )
+%>
 
 <br />
 <h2>Spread of message</h2>

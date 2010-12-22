@@ -132,6 +132,59 @@ module ApplicationHelper
     end
   end
 
+  def flot_graph_loader(options)
+   if options[:stream_id].blank?
+     url = "/visuals/fetch/totalgraph?hours=#{options[:hours]}"
+   else
+     url = "/visuals/fetch/streamgraph?stream_id=#{options[:stream_id]}&amp;hours=#{options[:hours]}"
+   end
+   
+   "<script type='text/javascript'>
+      function plot(data){
+        $.plot($('#{options[:inject]}'),
+          [ {
+              color: '#fd0c99',
+              shadowSize: 10,
+              data: data,
+              points: { show: false, },
+              lines: { show: true, fill: true }
+          } ],
+          {
+            xaxis: { mode: 'time' },
+            grid: {
+              show: true,
+              color: '#ccc',
+              borderWidth: 0,
+            }
+          }
+        );
+      }
+      $.post('#{url}', function(data) {
+        json = eval('(' + data + ')');
+          plot(json.data);
+        });
+    </script>"
+  end
+
+  def ajaxtrigger(title, description, url, checked)
+   "#{check_box_tag(title, nil, checked, :class => "ajaxtrigger", "data-target" => url)}
+    #{label_tag(title, description)}
+    <span id=\"#{title.to_s}-ajaxtrigger-loading\" style=\"display: none;\">#{image_tag('loading-small.gif')} Saving...</span>
+    <span id=\"#{title.to_s}-ajaxtrigger-done\" class=\"status-okay-text\" style=\"display: none;\">Saved!</span>"
+  end
+
+  def sparkline_values values
+    res = ""
+    i = 1
+    values.each do |v|
+      res += v.to_s
+      res += "," unless i == values.size
+      i += 1
+    end
+
+    return res
+  end
+
   private
 
   def is_current_menu_item? item

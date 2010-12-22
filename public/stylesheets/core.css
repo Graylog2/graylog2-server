@@ -24,6 +24,15 @@ h2 {
     font-family: Georgia,"Times New Roman",Times,serif;
 }
 
+h3 {
+    font-size: 18px;
+    margin-top: 11px;
+    margin-bottom: 5px;
+    display: block;
+    font-weight: normal;
+    font-family: Georgia,"Times New Roman",Times,serif;
+}
+
 a {
     color: #fd0c99;
     text-decoration: none;
@@ -113,7 +122,15 @@ label {
 }
 
 .tickLabel {
- color: #000 !important;
+  color: #000 !important;
+}
+
+.status-okay-text {
+  color: green;
+}
+
+.status-alarm-text {
+  color: red;
 }
 
 #top {
@@ -210,52 +227,101 @@ label {
   font-weight: bold;
 }
 
+.ajaxloader {
+  display: block;
+  margin: 0px auto;
+  position: relative;
+  top: 25px;
+}
+
 #content {
-    clear: both;
-    margin: 0px 15px;
-    padding: 15px;
-    margin-bottom: 0px;
-    background-color: #fff;
+  clear: both;
+  margin: 0px 15px;
+  margin-bottom: 0px;
+  background-color: #fff;
+  padding-bottom: 7px;
 }
 
-#content-bottom {
-    height: 7px;
-    margin-right: 15px;
-    margin-left: 15px;
-    background-image: url(/images/contentedge.png);
-    background-repeat: repeat-x;
+#content-inner {
+  padding: 15px;
+  overflow: hidden;
 }
 
-#content-bottom-left {
-    width: 262px;
-    float: left;
+#main-left {
+  float: left;
+  width: 65%;
 }
 
-#content-bottom-right {
-    width: 262px;
-    float: right;
+#main-right {
+  width: 35%;
+  float: right;
+}
+
+#sidebar {
+  margin-right: 15px;
+}
+
+#sidebar-inner {
+  background-color: #fff;
+  padding: 15px;
+}
+
+#sidebar-hide-link {
+  float: right;
+  position: relative;
+  top: -10px;
+  right: -5px;
+}
+
+#sidebar-hide-link:hover {
+  font-weight: bold;
+}
+
+.content-bottom {
+  height: 7px;
+  background-image: url(/images/contentedge.png);
+  background-repeat: repeat-x;
+  background-color: #D4D4D4;
+  overflow: hidden;
+  position: relative;
+  top: 7px;
+}
+
+.content-bottom-sidebar {
+  top: 0px;
+}
+
+.content-bottom-left {
+  width: 40%;
+  float: left;
+}
+
+.content-bottom-right {
+  width: 40%;
+  float: right;
+  text-align: right;
 }
 
 #messages-bottom {
-    margin-top: 10px;
+  margin-top: 10px;
 }
 
 #errorExplanation {
-    margin-top: 10px;
-    margin-bottom: 10px;
+  margin-top: 10px;
+  margin-bottom: 10px;
 }
 
 #errorExplanation ul {
-    margin-left: 15px;
-    list-style-type: square;
+  margin-left: 15px;
+  list-style-type: square;
 }
 
 .previous-page {
-    float: left;
+  float: left;
 }
 
 .next-page {
-    float: right;
+  float: right;
 }
 
 .tr-light {

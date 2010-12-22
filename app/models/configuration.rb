@@ -2,7 +2,8 @@ class Configuration
   @general_config = YAML::load(File.read(Rails.root.to_s + "/config/general.yml"))
   @email_config = YAML::load(File.read(Rails.root.to_s + "/config/email.yml"))
 
-  @alert_config = @general_config['alerts']
+  @subscr_config = @general_config['subscriptions']
+  @streamalarm_config = @general_config['streamalarms']
   @livetail_config = @general_config['livetail']
 
   def self.external_hostname
@@ -10,14 +11,24 @@ class Configuration
     return @general_config['general']['external_hostname']
   end
 
-  def self.alert_from_address
-    return @alert_config['from'] unless @alert_config.blank? or @alert_config['from'].blank?
+  def self.subscription_from_address
+    return @subscr_config['from'] unless @subscr_config.blank? or @subscr_config['from'].blank?
     return "graylog2@example.org"
   end
 
-  def self.alert_subject
-    return @alert_config['subject'] unless @alert_config.blank? or @alert_config['subject'].blank?
-    return "Graylog2 stream alert!"
+  def self.subscription_subject
+    return @subscr_config['subject'] unless @subscr_config.blank? or @subscr_config['subject'].blank?
+    return "[graylog2] Subscription"
+  end
+  
+  def self.streamalarm_from_address
+    return @streamalarm_config['from'] unless @streamalarm_config.blank? or @streamalarm_config['from'].blank?
+    return "graylog2@example.org"
+  end
+
+  def self.streamalarm_subject
+    return @streamalarm_config['subject'] unless @streamalarm_config.blank? or @streamalarm_config['subject'].blank?
+    return "[graylog2] Stream alarm!"
   end
 
   def self.email_transport_type

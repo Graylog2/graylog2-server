@@ -14,11 +14,9 @@
   <%= javascript_include_tag "jquery.gritter.min" %>
   <%= javascript_include_tag "jquery.autocomplete.min" %>
   <%= javascript_include_tag "jquery.numeric" %>
+  <%= javascript_include_tag "jquery.sparkline.min" %>
   <%= javascript_include_tag("jit") if @load_jit %>
-  <% if @load_flot %>
-    <%= javascript_include_tag("jquery.flot.min") %>
-    <%= javascript_include_tag("jquery.flot.threshold.min") %>
-  <% end %>
+  <%= javascript_include_tag("jquery.flot.min") if @load_flot %>
   <%= javascript_include_tag "application" %>
   <%= javascript_include_tag "rails" %>
   <%= csrf_meta_tag %>
@@ -67,14 +65,38 @@
   <% end %>
   </div>
 
+  <%=raw "<div id='main-left'>" if @has_sidebar %>
+
   <div id="content" <%=raw @content_class.blank? ? '' : 'class="content-' + @content_class + '"' %>>
-    <%= yield %>
-  </div>
-  <div id="content-bottom">
-    <div id="content-bottom-left"><%= image_tag "contentedge_l.png" %></div>
-    <div id="content-bottom-right"><%= image_tag "contentedge_r.png" %></div>
-    <br style="clear: both;">
+    <div id="content-inner">
+      <%= yield %>
+    </div>
+    
+    <div class="content-bottom">
+      <div class="content-bottom-left"><%= image_tag "contentedge_l.png" %></div>
+      <div class="content-bottom-right"><%= image_tag "contentedge_r.png" %></div>
+      <br style="clear: both;">
+    </div>
   </div>
 
+  <% if @has_sidebar %>
+    </div>
+    <div id="main-right">
+      <div id="sidebar">
+        <div id="sidebar-inner">
+          <a href="#" id="sidebar-hide-link" title="Close sidebar">x</a>
+          <%= yield :sidebar %>
+        </div>
+
+        <div class="content-bottom content-bottom-sidebar">
+          <div class="content-bottom-left"><%= image_tag "contentedge_l.png" %></div>
+          <div class="content-bottom-right"><%= image_tag "contentedge_r.png" %></div>
+          <br style="clear: both;">
+        </div>
+      </div>
+    </div>
+  <% end %>
+
+  <br style="clear: both;" /><br />
 </body>
 </html>
