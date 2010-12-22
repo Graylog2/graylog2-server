@@ -141,6 +141,8 @@ class VisualsController < ApplicationController
   def calculate_streamgraph(stream_id, x)
     stream = Stream.find(stream_id)
     
+    return Array.new if stream.streamrules.blank?
+
     hours = 12
     unless x.blank?
       hours = x.to_i

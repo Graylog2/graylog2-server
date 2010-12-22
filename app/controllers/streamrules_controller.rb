@@ -18,4 +18,5 @@ class StreamrulesController < ApplicationController
     end
     redirect_to :controller => "streams", :action => "rules", :id => params[:stream_id]
   end
+
 end

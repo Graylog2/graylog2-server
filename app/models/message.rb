@@ -136,6 +136,9 @@ class Message
   end
 
   def self.stream_counts_of_last_minutes(stream_id, minutes)
+    stream = Stream.find(stream_id)
+    return Array.new if stream.blank?
+
     res = Array.new
     minutes.times do |m|
       m += 1 # Offset by one because we don't want to start with the current minute.
@@ -145,7 +148,7 @@ class Message
       t -= t.sec
 
       # Try to read from cache.
-      obj = { :type => :graphvalue, :stream_id => stream_id, :minute => t.to_i }
+      obj = { :type => :graphvalue, :rules => stream.rule_hash, :stream_id => stream_id, :minute => t.to_i }
       c = Rails.cache.read(obj)
       
       if c == nil

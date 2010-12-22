@@ -48,6 +48,15 @@ class Stream < ActiveRecord::Base
     return Stream.message_count_since(id, since)
   end
 
+  def rule_hash
+    hashme = String.new
+    self.streamrules.each do |rule|
+      hashme += rule.rule_type.to_s + rule.value
+    end
+
+    return Digest::MD5.hexdigest(hashme)
+  end
+
   def self.message_count_since(stream_id, since)
     conditions = Message.by_stream(stream_id).criteria
     conditions[:created_at] = { "$gte" => since }
