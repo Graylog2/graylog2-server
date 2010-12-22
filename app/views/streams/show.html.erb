@@ -1,3 +1,35 @@
+<% content_for :sidebar do %>
+  <h2>
+    <% if @stream.alarm_active and !@stream.alarm_limit.blank? and !@stream.alarm_timespan.blank? %>
+      <% stream_count = @stream.message_count_since(@stream.alarm_timespan.minutes.ago.to_i) %>
+      <% if stream_count > @stream.alarm_limit %>
+        <span class="status-alarm-text">ALARM:</span>
+        <%= stream_count %> messages in last <%= @stream.alarm_timespan %> minutes!
+      <% else %>
+        <span class="status-okay-text">OK:</span>
+        <%= stream_count %> messages in last <%= @stream.alarm_timespan %> minutes.
+      <% end %>
+      <span id="streams-sidebar-limit">(Limit: <%= @stream.alarm_limit %>)</span>
+    <% else %>
+      <%= @stream.message_count_since(5.minutes.ago) %> messages in last 5 minutes.
+    <% end %>
+  </h2>
+  
+  <div id="sidebar-graph" style="height: 100px;"></div>  
+  <%=raw flot_graph_loader(
+        :inject => "#sidebar-graph",
+        :stream_id => @stream.id,
+        :hours => 2
+      )
+  %>
+  
+  <h3>Total: <%= @stream.message_count %></h3>
+
+  <br />
+  <h3>Created: <%= gl_date(@stream.created_at) %></h3>
+  <h3>Last change: <%= gl_date(@stream.updated_at) %></h3>
+<% end %>
+
 <h1>Stream <span class="highlighted"><%= @stream.title %></span></h1>
 
 <div id="streams-description">

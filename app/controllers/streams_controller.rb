@@ -7,6 +7,9 @@ class StreamsController < ApplicationController
   end
 
   def show
+    @has_sidebar = true
+    @load_flot = 3
+
     @stream = Stream.find params[:id]
     @messages = Message.all_of_stream @stream.id, params[:page]
     @total_count = Message.count_stream @stream.id

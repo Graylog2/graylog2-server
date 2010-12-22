@@ -231,7 +231,7 @@
 }
 
 #streams-set-description-input {
-  width: 500px;
+  width: 300px;
 }
 
 #streams-analytics-new-messages {
@@ -239,6 +239,10 @@
   height: 200px;
   margin-top: 10px;
   margin-bottom: 10px;
+}
+
+#streams-sidebar-limit {
+  font-size: 15px;
 }
 
 /* Hosts */
