@@ -134,9 +134,9 @@ $(document).ready(function(){
 
       // Show loading message.
       $("#analytics-new-messages-update-loading").show();
-
+      
       // Update graph.
-      $.post("/visuals/fetch/graph?hosts=all&amp;hours=" + v, function(data) {
+      $.post($(this).attr("data-updateurl") + v, function(data) {
         json = eval('(' + data + ')');
       
         // Plot is defined inline. (I suck at JavaScript)
