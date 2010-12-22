@@ -227,6 +227,13 @@ label {
   font-weight: bold;
 }
 
+.ajaxloader {
+  display: block;
+  margin: 0px auto;
+  position: relative;
+  top: 25px;
+}
+
 #content {
   clear: both;
   margin: 0px 15px;

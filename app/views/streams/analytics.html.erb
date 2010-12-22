@@ -1,7 +1,9 @@
 <h1>Analytics for stream <span class="highlighted"><%= @stream.title %></span></h1>
 
 <h2>Count of new messages (last <span id="analytics-new-messages-hours">12</span> hours.)</h2>
-<div id="streams-analytics-new-messages"></div>
+<div id="streams-analytics-new-messages">
+  <%= image_tag "loading.gif", :class => "ajaxloader" %>
+</div>
 
 <div id="analytics-new-messages-settings">
   <%= label_tag :hours, "Hours:" %>
@@ -12,7 +14,6 @@
     <%= image_tag 'loading-small.gif' %> Calculating...
   </span>
 </div>
-
 
 <%=raw flot_graph_loader(
     :inject => "#streams-analytics-new-messages",

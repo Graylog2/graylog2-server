@@ -1,7 +1,9 @@
 <h1>Analytics</h1>
 
 <h2>Count of new messages (last <span id="analytics-new-messages-hours">12</span> hours.)</h2>
-<div id="analytics-new-messages"></div>
+<div id="analytics-new-messages">
+  <%= image_tag "loading.gif", :class => "ajaxloader" %>
+</div>
 <div class="short-description" style="width: 100%;">Count of number of messages from all hosts. The red line indicates your configured maximum message warn limit.</div>
 
 <div id="analytics-new-messages-settings">
