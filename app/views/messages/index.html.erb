@@ -46,6 +46,27 @@
     <li>Average object size: <%= number_to_human_size(MessageCollection.average_object_size) %></li>
   </ul>
 
+  <h3>Jobs & Tasks</h3>
+  <ul id="jobsandtasks">
+    <li>
+      Stream subscriptions:
+      <% if SubscribedStream.job_active? %>
+        <span class="status-okay-text">running</span>
+      <% else %>
+        <span class="status-alarm-text">not running</span>
+      <% end %>
+    </li>
+    
+    <li>
+      Stream alerts:
+      <% if AlertedStream.job_active? %>
+        <span class="status-okay-text">running</span>
+      <% else %>
+        <span class="status-alarm-text">not running</span>
+      <% end %>
+    </li>
+  </ul>
+
 <% end %>
 
 <%= javascript_include_tag 'messageupdater' %>

@@ -15,4 +15,12 @@ class SubscribedStream < ActiveRecord::Base
 
     return emails
   end
+
+  def self.job_active?
+    last_check = Stream.maximum('last_subscription_check')
+    return false if last_check.blank?
+    
+    last_check > 15.minutes.ago
+  end
+
 end
