@@ -395,3 +395,7 @@ label {
     color: #fff;
     font-weight: bold;
 }
+
+#graph-rangeselector {
+  float: right;
+}

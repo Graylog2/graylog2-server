@@ -16,7 +16,10 @@
   <%= javascript_include_tag "jquery.numeric" %>
   <%= javascript_include_tag "jquery.sparkline.min" %>
   <%= javascript_include_tag("jit") if @load_jit %>
-  <%= javascript_include_tag("jquery.flot.min") if @load_flot %>
+  <% if @load_flot %>
+    <%= javascript_include_tag("jquery.flot.min") %>
+    <%= javascript_include_tag("jquery.flot.selection.min") %>
+  <% end %>
   <%= javascript_include_tag "application" %>
   <%= javascript_include_tag "rails" %>
   <%= csrf_meta_tag %>

@@ -1,7 +1,14 @@
-<h2>Welcome, <span class="highlighted">lennart</span>!</h2>
+<h2><%=raw headline %></h2>
 Your current time: <%= gl_date(Time.now.to_s) %>
 
 <div id="sidebar-graph" style="height: 100px;"></div>  
+<div id="graph-rangeselector" style="display: none;">
+  <%= form_tag "/messages/showrange" do %>
+    <%= hidden_field_tag :from, nil, :id => "graph-rangeselector-from" %>
+    <%= hidden_field_tag :to, nil, :id => "graph-rangeselector-to" %>
+    <%= submit_tag "Show messages in range" %>
+  <% end %>
+</div>
 <%=raw flot_graph_loader(
       :inject => "#sidebar-graph",
       :host => "all",

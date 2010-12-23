@@ -111,26 +111,30 @@ module ApplicationHelper
     return "Unknown"
   end
 
-  def build_controller_action_uri append = nil
+  def build_controller_action_uri append_params = nil
     ret = String.new
     appender = String.new
 
     request.path_parameters[:id].blank? ? id = String.new : id = request.path_parameters[:id]+ '/'
     if params[:filters].blank?
       ret = '/' + request.path_parameters[:controller] + '/' + request.path_parameters[:action] + '/' + id
-      appender = '?'
+      appender = "?"
     else
       ret = '/' + request.path_parameters[:controller] + '/' + request.path_parameters[:action] + '/' + id + '?'
       params[:filters].each { |k,v| ret += "filters[#{CGI.escape(k)}]=#{CGI.escape(v)}&" }
       ret = ret.chop
-      appender = '&'
+      appender = "&"
     end
 
-    if append.blank?
-      return ret
-    else
-       return ret + appender + append + '='
+    # apped possible params
+    unless append_params.blank?
+      append_params.each do |param|
+        ret += appender + "#{param[:key]}=#{param[:value]}"
+        appender = "&" # Set after first run.
+      end
     end
+
+    return ret
   end
 
   def flot_graph_loader(options)
@@ -156,10 +160,20 @@ module ApplicationHelper
               show: true,
               color: '#ccc',
               borderWidth: 0,
-            }
+            },
+            selection: { mode: 'x' }
           }
         );
       }
+
+      $('#{options[:inject]}').bind('plotselected', function(event, ranges) {
+        from = (ranges.xaxis.from/1000).toFixed(0);
+        to = (ranges.xaxis.to/1000).toFixed(0);
+        $('#graph-rangeselector').show();
+        $('#graph-rangeselector-from').val(from);
+        $('#graph-rangeselector-to').val(to);
+      });
+
       $.post('#{url}', function(data) {
         json = eval('(' + data + ')');
           plot(json.data);

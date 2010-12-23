@@ -4,7 +4,7 @@
 <div id="analytics-new-messages">
   <%= image_tag "loading.gif", :class => "ajaxloader" %>
 </div>
-<div class="short-description" style="width: 100%;">Count of number of messages from all hosts.</div>
+<div class="short-description" style="width: 100%;">Count of number of messages from all hosts. Select a range with your mouse and click the button to see all messages in the selected range.</div>
 
 <div id="analytics-new-messages-settings">
   <%= label_tag :hours, "Hours:" %>
@@ -14,11 +14,19 @@
   <span id="analytics-new-messages-update-loading" style="display: none;">
     <%= image_tag 'loading-small.gif' %> Calculating...
   </span>
+
+  <div id="graph-rangeselector" style="display: none;">
+    <%= form_tag "/messages/showrange" do %>
+      <%= hidden_field_tag :from, nil, :id => "graph-rangeselector-from" %>
+      <%= hidden_field_tag :to, nil, :id => "graph-rangeselector-to" %>
+      <%= submit_tag "Show messages in range" %>
+    <% end %>
+  </div>
 </div>
 
 <%=raw flot_graph_loader(
     :inject => "#analytics-new-messages",
-    :hours => 12
+    :hours => 12,
   )
 %>
 
