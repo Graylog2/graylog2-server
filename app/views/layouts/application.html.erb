@@ -60,7 +60,7 @@
   <% unless @tabs.blank? %>
     <div id="content-tabs">
     <% @tabs.each do |tab| %>
-      <% permitted_to?(tab.downcase.to_sym, @strea) do %>
+      <% permitted_to?(tab.downcase.to_sym, @stream) do %>
         <%=raw tab_link(tab) %> 
       <% end %>
     <% end %>
