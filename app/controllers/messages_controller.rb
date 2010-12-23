@@ -48,14 +48,6 @@ class MessagesController < ApplicationController
     redirect_to :controller => "streams", :action => "show", :id => params[:id]
   end
 
-#  def get_hosts_statistic
-#    throw "Missing stream ID" if params[:id].blank?
-#
-#    total_message_count = Stream.get_message_count(params[:id]).to_i
-#    hosts = Stream.get_distinct_hosts params[:id]
-#
-#    ready_hosts = Array.new
-
   def deletebyquickfilter
     begin
       filters = JSON.parse(params[:filters])
