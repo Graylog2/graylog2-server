@@ -39,6 +39,7 @@
     <ul id="topmenu">
       <% permitted_to? :index, :messages do %><%=raw menu_item("Messages", messages_path) %><% end %>
       <% permitted_to? :index, :streams do %><%=raw menu_item("Streams", streams_path) %><% end %>
+      <% permitted_to? :index, :analytics do %><%=raw menu_item("Analytics", analytics_path) %><% end %>
       <% permitted_to? :index, :hosts do %><%=raw menu_item("Hosts", hosts_path) %><% end %>
       <% permitted_to? :index, :blacklists do %><%=raw menu_item("Blacklists", {:controller => :blacklists}) %><% end %>
       <% permitted_to? :index, :settings do %><%=raw menu_item("Settings", {:controller => :settings}) %><% end %>

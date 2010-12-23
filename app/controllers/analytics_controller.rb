@@ -1,4 +1,6 @@
 class AnalyticsController < ApplicationController
+  filter_resource_access
+  
   def index
     @load_flot = true
   end
