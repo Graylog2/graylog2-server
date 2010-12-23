@@ -27,7 +27,6 @@ module StreamsHelper
         value = "#{syslog_facility_to_human(rule.value)} (#{h(rule.value.to_i)})"
     end
 
-    #return "<span class=\"black\">#{type}</span>: <i>#{value}</i>"
-    return [type, value]
+    return "<span class=\"black\">#{type}</span>: <i>#{value}</i>"
   end
 end

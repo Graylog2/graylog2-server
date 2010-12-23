@@ -23,7 +23,7 @@
       <% else %>
         <% stream.streamrules.each do |rule| %>
         <li>
-          <%=raw streamrule_to_human rule %>
+          <%=raw streamrule_to_human(rule) %>
         </li>
         <% end %>
       <% end %>
