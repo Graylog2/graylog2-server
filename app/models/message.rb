@@ -129,7 +129,7 @@ class Message
       
       # Get first second of minute.
       t -= t.sec
-
+      
       # Try to read from cache.
       obj = { :type => :graphvalue, :allhosts => true, :minute => t.to_i }
       c = Rails.cache.read(obj)
