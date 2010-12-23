@@ -35,13 +35,13 @@
 
 <% unless defined? @inline_version %>
 <div id="messages-bottom">
+  <% append_params = Array.new if !defined?(append_params) or append_params.blank? %>
   <% unless current_page <= 1 %>
-    <%= link_to "previous page", {:page => previous_page}, {:class => "previous-page"} %>
+    <a href="<%=h build_controller_action_uri(append_params + [{ :key => "page", :value => previous_page }]) %>" class="previous-page">previous page</a>
   <% end %>
 
   <% if total_messages > (Message::LIMIT*current_page) %>
-    <%= link_to "next page", {:page => next_page}, {:class => "next-page"} %>
-
+    <a href="<%=h build_controller_action_uri(append_params + [{ :key => "page", :value => next_page }]) %>" class="next-page">next page</a>  
   <% end %>
 </div>
 
