@@ -20,7 +20,7 @@ authorization do
   end
   
   role :reader do
-    has_permission_on :streams, :to => [:index, :show, :favorite, :unfavorite, :alertable, :get_hosts_statistic] do
+    has_permission_on :streams, :to => [:index, :show, :analytics, :favorite, :unfavorite, :alertable, :get_hosts_statistic] do
       if_attribute :users => contains { user }
     end
     has_permission_on :sessions, :to => [:destroy]

@@ -11,7 +11,7 @@ module ApplicationHelper
 
   def tab_link tab
     "<div class=\"content-tabs-tab#{" content-tabs-tab-active" if is_current_tab?(tab)}\" >
-      #{link_to tab, :controller => params[:controller], :action => tab.downcase, :id => params[:id] }
+      #{link_to tab, params.merge(:action => tab.downcase.to_sym) }
     </div>"
   end
 
