@@ -208,6 +208,10 @@ module ApplicationHelper
     </span>"
   end
 
+  def awesome_submit_link(title)
+    link_to(title, "#", :class => "awesome-submit-link")
+  end
+
   private
 
   def is_current_menu_item? item

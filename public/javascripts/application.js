@@ -199,6 +199,12 @@ $(document).ready(function(){
       $("#streams-set-description").show();
     });
 
+    // Awesome submit links
+    $(".awesome-submit-link").bind("click", function() {
+      $(this).html("Please wait...");
+      $(this).parent().submit();
+    });
+
 });
 
 function buildHostCssId(id) {

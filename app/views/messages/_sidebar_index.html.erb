@@ -6,7 +6,7 @@ Your current time: <%= gl_date(Time.now.to_s) %>
   <%= form_tag "/messages/showrange" do %>
     <%= hidden_field_tag :from, nil, :id => "graph-rangeselector-from" %>
     <%= hidden_field_tag :to, nil, :id => "graph-rangeselector-to" %>
-    <%= submit_tag "Show messages in range" %>
+    <%= awesome_submit_link "Show messages in range" %>
   <% end %>
 </div>
 <%=raw flot_graph_loader(
