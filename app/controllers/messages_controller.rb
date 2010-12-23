@@ -53,7 +53,7 @@ class MessagesController < ApplicationController
   
   def deletebystream
     begin
-      conditions = Message.all_of_stream(params[:id].to_i, 0).criteria.sources
+      conditions = Message.by_stream(params[:id].to_i).criteria.to_hash
       throw "Missing conditions" if conditions.blank?
 
       Message.set(conditions, :deleted => true )
@@ -87,21 +87,6 @@ class MessagesController < ApplicationController
     end
 
     redirect_to :action => 'index'
-  end
-
-  def deletebystream
-    begin
-      conditions = Message.by_stream(params[:id].to_i, 0).criteria.sources
-      throw "Missing conditions" if conditions.blank?
-
-      Message.set(conditions, :deleted => true)
-
-      flash[:notice] = "Messages have been deleted."
-    rescue
-      flash[:error] = "Could not delete messages."
-    end
-    
-    redirect_to :controller => "streams", :action => "settings", :id => params[:id]
   end
 
   def getsimilarmessages
