@@ -18,10 +18,10 @@ Your current time: <%= gl_date(Time.now.to_s) %>
 
 <h3>Favorite streams</h3>
 <ul id="favorite-streams">
-<% if @favorites.blank? %>
+<% if current_user.favorite_streams.blank? %>
   <li>No favorites.</li>
 <% else %>
-  <% @favorites.each do |favorite| %>
+  <% current_user.favorite_streams.each do |favorite| %>
     <li>
       <span class="favorite-stream-sparkline">
         <%= sparkline_values(Message.stream_counts_of_last_minutes(favorite.id, 10).map { |c| c[:count] }) %>
