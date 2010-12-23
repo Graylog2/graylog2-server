@@ -1,6 +1,6 @@
 authorization do
   role :admin do
-    has_permission_on :messages, :to => [:index, :show, :getcompletemessage]
+    has_permission_on :messages, :to => [:index, :show, :getcompletemessage, :showrange]
     
     has_permission_on :streams, :to => [:index, :show, :create, :destroy, :alertable, :get_hosts_statistic, :favorite, :rules, :analytics, :settings, :unfavorite]
     has_permission_on :streamrules, :to => [:create, :destroy]
