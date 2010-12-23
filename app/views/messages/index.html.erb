@@ -37,7 +37,7 @@ messages in the last <%=h message_count_interval %> minutes.
         <td><%= text_field_tag "filters[date]", params[:filters].blank? ? nil : params[:filters][:date] %></td>
         <td><%= select_tag "filters[facility]", raw("<option></option>" + options_for_select(get_ordered_facilities_for_select, :selected => get_quickfilter_selected(params[:filters], :facility))) %></td>
         <td><%= select_tag "filters[severity]", raw("<option></option>" + options_for_select(get_ordered_severities_for_select, :selected => get_quickfilter_selected(params[:filters], :severity))) %></td>
-        <td><%= select_tag "filters[host]", raw("<option></option>" + options_for_select(Host.all.collect {|host| [ h(host.host) ] }, :selected => get_quickfilter_selected(params[:filters], :host, true))) %></td>
+        <td><%= select_tag "filters[host]", raw("<option></option>" + options_for_select(Host.all.collect {|host| [ h(host.host) ]}.sort, :selected => get_quickfilter_selected(params[:filters], :host, true))) %></td>
         <td><%= submit_tag "Quickfilter!" %></td>
       </tr>
     </tbody>
