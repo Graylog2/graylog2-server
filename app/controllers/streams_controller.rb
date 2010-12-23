@@ -48,6 +48,18 @@ class StreamsController < ApplicationController
     redirect_to stream_path(params[:id])
   end
 
+  def togglefavorited
+    stream = Stream.find(params[:id])
+    if !stream.favorited?(current_user)
+      stream.favoritedStreams.create
+    else
+      stream.favoritedStreams.delete
+    end
+
+    # Intended to be called via AJAX only.
+    render :text => ""
+  end
+  
   def togglealarmactive
     stream = Stream.find(params[:id])
     if stream.alarm_active
@@ -126,21 +138,6 @@ class StreamsController < ApplicationController
       flash[:error] = "Could not delete stream"
     end
     stream.save
-    redirect_to stream_path(stream)
-  end
-  
-  def favorite
-    stream = Stream.find params[:id]
-    current_user.favorite_streams << stream
-    
-    flash[:notice] = "Stream has been added as a favorite!"
-    redirect_to stream_path(stream)
-  end
-
-  def unfavorite
-    stream = Stream.find params[:id]
-    current_user.favorite_streams.delete stream
-    flash[:notice] = "Stream has been removed from favorites!"
     redirect_to stream_path(stream)
   end
   

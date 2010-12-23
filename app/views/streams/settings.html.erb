@@ -3,7 +3,7 @@
 <h2>General</h2>
 <div class="short-description">All these settings are only applied for your user.</div>
 
-<%=raw ajaxtrigger(:favorite, "Favorite", "/favoritedstreams/toggle/#{@stream.id}", @stream.favorited?(current_user)) %>
+<%=raw ajaxtrigger(:favorite, "Favorite", "/streams/togglefavorited/#{@stream.id}", @stream.favorited?(current_user)) %>
 <br />
 
 <%=raw ajaxtrigger(:alarm, "Receive alarms of this stream", "/alertedstreams/toggle/#{@stream.id}", @stream.alerted?(current_user) ) %>
