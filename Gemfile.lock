@@ -45,7 +45,7 @@ GEM
       main
       ruby_parser (~> 2.0.4)
       sexp_processor (~> 3.0.3)
-    ci_reporter (1.6.3)
+    ci_reporter (1.6.4)
       builder (>= 2.1.2)
     colored (1.2)
     database_cleaner (0.6.0)
@@ -73,7 +73,7 @@ GEM
     machinist (1.0.6)
     machinist_mongo (1.1.1)
       machinist (~> 1.0.4)
-    mail (2.2.12)
+    mail (2.2.13)
       activesupport (>= 2.3.6)
       i18n (>= 0.4.0)
       mime-types (~> 1.16)
@@ -107,7 +107,6 @@ GEM
     polyglot (0.3.1)
     pony (1.1)
       mail (> 2.0)
-    progressbar (0.9.0)
     rack (1.2.1)
     rack-mount (0.6.13)
       rack (>= 1.0.0)
@@ -121,12 +120,12 @@ GEM
       activesupport (= 3.0.1)
       bundler (~> 1.0.0)
       railties (= 3.0.1)
-    rails_best_practices (0.5.5)
+    rails_best_practices (0.5.6)
       activesupport
       colored (~> 1.2)
       erubis (~> 2.6.6)
       i18n
-      progressbar (~> 0.9.0)
+      ruby-progressbar (~> 0.0.9)
       ruby_parser (~> 2.0.4)
     railties (3.0.1)
       actionpack (= 3.0.1)
@@ -141,6 +140,7 @@ GEM
       sexp_processor (~> 3.0)
     roodi (2.1.0)
       ruby_parser
+    ruby-progressbar (0.0.9)
     ruby2ruby (1.2.5)
       ruby_parser (~> 2.0)
       sexp_processor (~> 3.0)
