@@ -1,0 +1,33 @@
+<h1>Rules of stream <span class="highlighted"><%= @stream.title %></span></h1>
+<div class="description">
+  Streams can be used to store specific views on the syslog messages. Define filter rules for each stream and quickly select
+  them later. Example: Create a stream "All database messages of host www15" that only shows messages from host "www15" which
+  include the string "MySQL".
+</div>
+
+<h2>Add rule:</h2>
+<%= form_for @new_rule, :url => { :controller => "streamrules", :action => "create" } do |f| %>
+  <%= f.hidden_field :stream_id, :value => @stream.id %>
+  <%= f.select :rule_type, options_for_select(Streamrule.get_types_for_select_options, :selected => Streamrule::TYPE_MESSAGE) %>
+  <%= f.text_field :value, :class => "stream-value-field stream-value-message" %>
+  <%= f.text_field :value, {:class => "stream-value-field stream-value-timeframe", :style => "display: none;", :disabled => true} %>
+  <%= f.select :value, options_for_select(get_ordered_facilities_for_select), {}, { :disabled => true, :style => "display: none;", :class => "stream-value-field stream-value-facility" } %>
+  <%= f.select :value, options_for_select(get_ordered_severities_for_select), {}, { :disabled => true, :style => "display: none;", :class => "stream-value-field stream-value-severity" } %>
+  <%= f.select :value, Host.all.collect {|host| [ h(host.host) ] }, {}, { :disabled => true, :style => "display: none;", :class => "stream-value-field stream-value-host" } %>
+  <%= submit_tag "Add" %>
+<% end %>
+
+<br />
+<h2>Filter rules:</h2>
+<div class="short-description">Click on a rule to remove it</div>
+<ul>
+  <% if @stream.streamrules.blank? %>
+    <li>No rules defined.</li>
+  <% else %>
+    <% @stream.streamrules.each do |rule| %>
+      <li>
+        <%= link_to(raw(streamrule_to_human(rule)), :controller => "streamrules", :action => "destroy", :id => rule.id, :stream_id => @stream.id) %>
+      </li>
+    <% end %>
+  <% end %>
+<ul>

@@ -1,6 +1,4 @@
 <% if has_users %>
-  <h1>Login</h1>
-
   <%= form_tag(session_path, :id => "loginform") do -%>
       
     <%= text_field_tag 'login', "Username", :class => "login-credentials initial", "data-stdtext" => "Username" %>

@@ -1,3 +1,7 @@
+<% content_for :sidebar do %>
+  <%= render :partial => "sidebar_index", :locals => { :headline => "Welcome, <span class=\"highlighted\">#{current_user.login}</span>!" } %>
+<% end %>
+
 <%= javascript_include_tag 'messageupdater' %>
 
 <div id="messages-show-quickfilter" <%= params[:filters].blank? ? nil : "class=\"messages-show-quickfilter-expanded\""  %>>
@@ -5,12 +9,6 @@
 </div>
 
 <div id="messages-content">
-
-<div id="messages-favorited-streams">
-  <% unless @favorites.empty? %>
-    Favorite streams: <%= select("favoritestreamchooser", "id", @favorites.collect {|stream| [ stream.title, stream.id ] }, { :include_blank => true }) %>
-  <% end %>
-</div>
 
 <h1>Messages</h1>
 

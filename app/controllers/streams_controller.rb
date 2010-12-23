@@ -1,5 +1,7 @@
 class StreamsController < ApplicationController
   filter_resource_access
+  before_filter :tabs, :except => :index
+  
   def index
     @new_stream = Stream.new
     if current_user.role_symbols.include? :admin
@@ -10,16 +12,87 @@ class StreamsController < ApplicationController
   end
 
   def show
-    #@stream = Stream.find params[:id]
+    @has_sidebar = true
+    @load_flot = 3
+
     @messages = Message.all_of_stream @stream.id, params[:page]
-    @new_rule = Streamrule.new
     @total_count = Message.count_stream @stream.id
 
-    # Find out if this stream is alertable.
-    @is_alertable = @stream.alertable || false
-    
     # Find out if this stream is favorited by the current user.
     @is_favorited = current_user.favorite_streams.include?(@stream)
+  end
+
+  def rules
+    @stream = Stream.find params[:id]
+    @new_rule = Streamrule.new
+  end
+
+  def analytics
+    @load_flot = true
+    @stream = Stream.find params[:id]
+  end
+
+  def settings
+    @stream = Stream.find params[:id]
+  end
+
+  def setdescription
+    @stream = Stream.find(params[:id])
+    @stream.description = params[:description]
+
+    if @stream.save
+      flash[:notice] = "Description has been saved."
+    else
+      flash[:error] = "Could not save description."
+    end
+    redirect_to stream_path(params[:id])
+  end
+
+  def togglealarmactive
+    stream = Stream.find(params[:id])
+    if stream.alarm_active
+      stream.alarm_active = false
+    else
+      stream.alarm_active = true
+    end
+
+    stream.save
+
+    # Intended to be called via AJAX only.
+    render :text => ""
+  end
+  
+  def togglealarmforce
+    stream = Stream.find(params[:id])
+    if stream.alarm_force
+      stream.alarm_force = false
+    else
+      stream.alarm_force = true
+    end
+
+    stream.save
+
+    # Intended to be called via AJAX only.
+    render :text => ""
+  end
+
+  def setalarmvalues
+    stream = Stream.find(params[:id])
+
+    unless params[:limit].blank? or params[:timespan].blank?
+      stream.alarm_limit = params[:limit]
+      stream.alarm_timespan = params[:timespan]
+
+      if stream.save
+        flash[:notice] = "Alarm settings updated."
+      else
+        flash[:error] = "Could not update alarm settings."
+      end
+    else
+        flash[:error] = "Could not update alarm settings: Missing parameters."
+    end
+
+    redirect_to :action => "settings", :id => params[:id]
   end
 
   def create
@@ -29,54 +102,28 @@ class StreamsController < ApplicationController
     else
       flash[:error] = "Could not create stream"
     end
-    redirect_to streams_path
+    redirect_to :action => "index"
+  end
+  
+  def rename
+    stream = Stream.find params[:stream_id]
+    stream.title = params[:title]
+    
+    if stream.save
+      flash[:notice] = "Stream has been renamed."
+    else
+      flash[:error] = "Could not rename stream."
+    end
+
+    redirect_to :controller => "streams", :action => "settings", :id => params[:stream_id]
   end
 
   def destroy
-    begin
-      Streamrule.delete_all [ "stream_id = ?", params[:id] ]
-      stream = Stream.find params[:id]
-      stream.destroy
-      flash[:notice] = "Stream has been deleted"
-    rescue
-      flash[:error] = "Could not delete stream"
-    end
-    redirect_to streams_path
-  end
-
-  def get_hosts_statistic
-    throw "Missing stream ID" if params[:id].blank?
-
-    total_message_count = Stream.get_message_count(params[:id]).to_i
-    hosts = Stream.get_distinct_hosts params[:id]
-
-    ready_hosts = Array.new
-    hosts.each do |host|
-      message_count = Stream.get_count_by_host(params[:id], host).to_i
-      # Thanks to Sarah and her wicked percentage calculation skills. (<3)
-      percent = 100-(((total_message_count-message_count)*100)/total_message_count)
-      ready_hosts << { 'name' => host, 'percent' => percent.to_i }
-    end
-
-    # Sort the result.
-    ready_hosts = ready_hosts.sort { |a,b| b['percent'] <=> a['percent'] }
-
-    if hosts.blank?
-      render :text => 'No messages found.'
-      return
-    end
-
-    render :partial => 'statistics', :locals => { :hosts => ready_hosts }
-  end
-
-  def alertable
     stream = Stream.find params[:id]
-    stream.alertable = !stream.alertable
-    # don't alert the user of past events, only from this point forward
-    if stream.alertable
-      alert = Alert.new
-      alert.body = "Alerts enabled for stream: '#{stream.title}'"
-      alert.save
+    if stream.destroy
+      flash[:notice] = "Stream has been deleted"
+    else
+      flash[:error] = "Could not delete stream"
     end
     stream.save
     redirect_to stream_path(stream)
@@ -95,5 +142,9 @@ class StreamsController < ApplicationController
     current_user.favorite_streams.delete stream
     flash[:notice] = "Stream has been removed from favorites!"
     redirect_to stream_path(stream)
+  end
+  
+  def tabs
+    @tabs = [ "Show", "Rules", "Analytics", "Settings" ]
   end
 end

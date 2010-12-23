@@ -13,6 +13,9 @@ class MessagesController < ApplicationController
   end
   
   def index
+    @has_sidebar = true
+    @load_flot = true
+
     if params[:filters].blank?
       @messages = @scope.all_with_blacklist params[:page]
     else
@@ -28,9 +31,39 @@ class MessagesController < ApplicationController
     @message = Message.find params[:id]
   end
 
+  def showrange
+    @has_sidebar = true
+    @load_flot = true
+    
+    begin
+      @from = Time.at(params[:from].to_i)
+      @to = Time.at(params[:to].to_i)
+    rescue
+      flash[:error] = "Missing or invalid range parameters."
+    end
+
+    @messages = Message.all_in_range(params[:page], @from.to_i, @to.to_i)
+    @total_count = Message.count_all_in_range(@from.to_i, @to.to_i)
+  end
+
   def getcompletemessage
     message = Message.find params[:id]
     render :text => CGI.escapeHTML(message.message)
+  end
+  
+  def deletebystream
+    begin
+      conditions = Message.all_of_stream(params[:id].to_i, 0).criteria.sources
+      throw "Missing conditions" if conditions.blank?
+
+      Message.set(conditions, :deleted => true )
+
+      flash[:notice] = "Messages have been deleted."
+    rescue => e
+      flash[:error] = "Could not delete messages."
+    end
+    
+    redirect_to :controller => "streams", :action => "show", :id => params[:id]
   end
 
   def deletebyquickfilter
@@ -61,14 +94,14 @@ class MessagesController < ApplicationController
       conditions = Message.by_stream(params[:id].to_i, 0).criteria.sources
       throw "Missing conditions" if conditions.blank?
 
-      Message.set(conditions, :deleted => true )
+      Message.set(conditions, :deleted => true)
 
       flash[:notice] = "Messages have been deleted."
     rescue
       flash[:error] = "Could not delete messages."
     end
     
-    redirect_to stream_path(params[:id])
+    redirect_to :controller => "streams", :action => "settings", :id => params[:id]
   end
 
   def getsimilarmessages

@@ -41,6 +41,7 @@
 
   <% if total_messages > (Message::LIMIT*current_page) %>
     <%= link_to "next page", {:page => next_page}, {:class => "next-page"} %>
+
   <% end %>
 </div>
 

@@ -95,23 +95,84 @@ class Message
     conditions
   end
 
-  def self.all_of_stream stream_id, page = 1, newer_than = nil
+  def self.all_of_stream stream_id, page = 1
     page = 1 if page.blank?
-
-    # XXX: something like this:
-    #if newer_than
-    #  by_stream(stream_id).where(:created_at => { '$gt' => newer_than.to_i}).default_scope.page(page)
-    #end
 
     by_stream(stream_id).default_scope.page(page).all
   end
 
-    #unless newer_than.nil?
-    #  conditions[:created_at] = { '$gt' => newer_than.to_i }
-    #end
+  def self.all_of_stream_since(stream_id, since)
+    by_stream(stream_id).where(:created_at => {'$gt' => since.to_i}).default_scope.all
+  end
 
   def self.count_stream stream_id
     return by_stream(stream_id).count
+  end
+
+  def self.all_in_range(page, from, to)
+    page = 1 if page.blank?
+    
+    terms = Blacklist.all_terms
+    by_blacklisted_terms(terms).default_scope.where(:created_at => {"$gte" => from}).where(:created_at => {"$lte" => to}).page(page)
+  end
+
+  def self.count_all_in_range(from, to)
+    terms = Blacklist.all_terms
+    by_blacklisted_terms(terms).where(:created_at => {"$gte" => from}).where(:created_at => {"$lte" => to}).count
+  end
+
+  def self.counts_of_last_minutes(minutes)
+    res = Array.new
+    minutes.times do |m|
+      m += 1 # Offset by one because we don't want to start with the current minute.
+      t = m.minutes.ago
+      
+      # Get first second of minute.
+      t -= t.sec
+
+      # Try to read from cache.
+      obj = { :type => :graphvalue, :allhosts => true, :minute => t.to_i }
+      c = Rails.cache.read(obj)
+      
+      if c == nil
+        # Cache miss. Perform counting and add to cache.
+        terms = Blacklist.all_terms
+        c = Message.by_blacklisted_terms(terms).where(:created_at => {"$gt" => t.to_i}).where(:created_at => {"$lt" => (t+60).to_i}).count
+        Rails.cache.write(obj, c)
+      end
+
+      res << { :minute => t, :count => c}
+    end
+
+    return res.reverse
+  end
+
+  def self.stream_counts_of_last_minutes(stream_id, minutes)
+    stream = Stream.find(stream_id)
+    return Array.new if stream.blank?
+
+    res = Array.new
+    minutes.times do |m|
+      m += 1 # Offset by one because we don't want to start with the current minute.
+      t = m.minutes.ago
+      
+      # Get first second of minute.
+      t -= t.sec
+
+      # Try to read from cache.
+      obj = { :type => :graphvalue, :rules => stream.rule_hash, :stream_id => stream_id, :minute => t.to_i }
+      c = Rails.cache.read(obj)
+      
+      if c == nil
+        # Cache miss. Perform counting and add to cache.
+        c = Message.by_stream(stream_id).where(:created_at => {"$gt" => t.to_i}).where(:created_at => {"$lt" => (t+60).to_i}).count
+        Rails.cache.write(obj, c)
+      end
+
+      res << { :minute => t, :count => c}
+    end
+
+    return res.reverse
   end
 
   def self.all_of_host host, page
@@ -160,6 +221,10 @@ class Message
     end
 
     return additional
+  end
+
+  def self.get_stuff
+    self.collection.stats
   end
 
   private

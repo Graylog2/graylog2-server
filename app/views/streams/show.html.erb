@@ -1,80 +1,36 @@
 <div id="streamid" style="display: none;"><%=h @stream.id %></div>
 
-<% permitted_to? :destroy, :streams do %>
-  <div id="streams-delete">
-    <%= link_to "Delete this stream", stream_path(@stream), :method => :delete, :confirm => "Really delete this stream with all it's filter rules?" %>
-  </div>
+<% content_for :sidebar do %>
+  <%= render :partial => "sidebar_show" %>
 <% end %>
 
 <h1>Stream <span class="highlighted"><%= @stream.title %></span></h1>
 
-<div id="streams-right">
-  <%= form_tag alertable_stream_path(@stream) do %>
-  	<% if @is_alertable %>
-      <%= submit_tag "Stop receiving alerts for this stream" %>
-	<% else %>
-	  <%= submit_tag "Receive alerts for this stream" %>
-	<% end %>
-  <% end %>
-
-  <br />
-  <% if @is_favorited %>
-    <%= form_tag unfavorite_stream_path(@stream) do %>
-      <%= submit_tag "Remove this stream from your favorites" %>
-    <% end %>
-  <% else %>
-    <%= form_tag favorite_stream_path(@stream) do %>
-      <%= submit_tag "Add this stream to your favorites" %>
-    <% end %>
-  <% end %>
-
-  <br />
-  <% permitted_to? :destroy, :messages do %>
-    <% form_tag("/messages/deletebystream/#{h(@stream.id)}") do -%>
-      <%= submit_tag "Delete all messages hit by this stream", :confirm => "Really delete all messages hit by this stream?" %>
-    <% end -%>
-  <% end %>
-</div>
-
-<% permitted_to? :create, :streamrules do %>
-  <% form_for @new_rule, :url => { :controller => "streamrules", :action => "create" } do |f| %>
-    <%= f.hidden_field :stream_id, :value => @stream.id %>
-    <%= f.label :term, "New Rule:" %>
-    <%= f.select :rule_type, options_for_select(Streamrule.get_types_for_select_options, :selected => Streamrule::TYPE_MESSAGE) %>
-    <%= f.text_field :value, :class => "stream-value-field stream-value-message" %>
-    <%= f.text_field :value, {:class => "stream-value-field stream-value-timeframe", :style => "display: none;", :disabled => true} %>
-    <%= f.select :value, options_for_select(get_ordered_facilities_for_select), {}, { :disabled => true, :style => "display: none;", :class => "stream-value-field stream-value-facility" } %>
-    <%= f.select :value, options_for_select(get_ordered_severities_for_select), {}, { :disabled => true, :style => "display: none;", :class => "stream-value-field stream-value-severity" } %>
-    <%= f.select :value, Host.all.collect {|host| [ h(host.host) ] }, {}, { :disabled => true, :style => "display: none;", :class => "stream-value-field stream-value-host" } %>
-    <%= submit_tag "Add" %>
-  <% end %>
-<% end %>
-
-<div id="blocks-terms">
-  <h2>Filter rules:</h2>
-  <ul>
-    <% if @stream.streamrules.blank? %>
-      <li>none</li>
+<div id="streams-description">
+  <span id="streams-description-text">
+    <% if @stream.description.blank? %>
+      <span id="streams-set-description-link" class="stream-description-change">
+        Click to set description.
+      </span>
     <% else %>
-      <% @stream.streamrules.each do |rule| %>
-        <li>
-          <span class=\"black\"><%= streamrule_to_human(rule)[0] %></span>: <i><%= streamrule_to_human(rule)[1] %></i>
-          <% permitted_to? :destroy, :streamrules do %>
-            <%= link_to image_tag("icons/delete.png", :style => "position: relative; top: -2px"), { :controller => "streamrules", :action => "destroy", :id => rule.id, :stream_id => @stream.id }, :class => "blocks-terms-delete" %>
-          <% end %>
-        </li>
-      <% end %>
+      <%= @stream.description %>
+      <span id="streams-edit-description-link" class="stream-description-change">
+        Click to edit description.
+      </span>
     <% end %>
-  </ul>
-  <br style="clear: both;" />
+  </span>
+
+  <div id="streams-set-description" style="display: none;">
+    <%= form_tag "/streams/setdescription/#{@stream.id}" do %>
+      <%= label_tag :description, "Description:" %>
+      <%= text_field_tag :description, @stream.description, :id => "streams-set-description-input" %>
+      <%= submit_tag "Set" %>
+    <% end %>
+  </div>
 </div>
 
-<a href="#" id="streams-show-statistics">&raquo; Show statistics</a>
-<%= link_to raw("&raquo; back"), :back %>
-<div id="blocks-statistics" style="display: none;">
-  <div class="loading"></div>
-</div>
-
-<% unless @stream.streamrules.blank? %>
+<% if @stream.streamrules.blank? %>
+  <center>No messages in this stream.</center>
+<% else %>
   <%= render :partial => "messages/table", :locals => { :messages => @messages, :total_messages => @total_count } %>
 <% end %>

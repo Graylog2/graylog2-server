@@ -17,6 +17,7 @@ class StreamrulesController < ApplicationController
     else
       flash[:error] = "Could not remove rule from stream."
     end
-    redirect_to stream_path(params[:id])
+    redirect_to stream_path(params[:stream_id])
   end
+
 end

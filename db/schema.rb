@@ -10,10 +10,11 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20101126200327) do
+ActiveRecord::Schema.define(:version => 20101219231441) do
 
-  create_table "alerts", :force => true do |t|
-    t.text     "body"
+  create_table "alerted_streams", :force => true do |t|
+    t.integer  "stream_id"
+    t.integer  "user_id"
     t.datetime "created_at"
     t.datetime "updated_at"
   end
@@ -31,11 +32,9 @@ ActiveRecord::Schema.define(:version => 20101126200327) do
     t.datetime "updated_at"
   end
 
-  create_table "favorited_streams", :force => true do |t|
-    t.integer  "stream_id"
-    t.integer  "user_id"
-    t.datetime "created_at"
-    t.datetime "updated_at"
+  create_table "favorite_streams", :id => false, :force => true do |t|
+    t.integer "stream_id"
+    t.integer "user_id"
   end
 
   create_table "hostgroup_hosts", :force => true do |t|
@@ -76,12 +75,25 @@ ActiveRecord::Schema.define(:version => 20101126200327) do
     t.integer  "filter_level"
     t.datetime "created_at"
     t.datetime "updated_at"
-    t.boolean  "alertable",       :default => false
+    t.datetime "last_subscription_check"
+    t.datetime "last_alarm_check"
+    t.boolean  "alarm_active"
+    t.boolean  "alarm_force"
+    t.integer  "alarm_limit"
+    t.integer  "alarm_timespan"
+    t.text     "description"
   end
 
   create_table "streams_users", :id => false, :force => true do |t|
     t.integer "stream_id"
     t.integer "user_id"
+  end
+
+  create_table "subscribed_streams", :force => true do |t|
+    t.integer  "stream_id"
+    t.integer  "user_id"
+    t.datetime "created_at"
+    t.datetime "updated_at"
   end
 
   create_table "users", :force => true do |t|

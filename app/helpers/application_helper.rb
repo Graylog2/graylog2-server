@@ -16,6 +16,7 @@ module ApplicationHelper
   end
 
   def gl_date date
+    date = date.to_s
     return String.new if date == nil or date.length == 0
     tmp = DateTime.parse(date)
     return tmp.strftime "%d.%m.%Y - %H:%M:%S"
@@ -110,26 +111,101 @@ module ApplicationHelper
     return "Unknown"
   end
 
-  def build_controller_action_uri append = nil
+  def build_controller_action_uri append_params = nil
     ret = String.new
     appender = String.new
 
     request.path_parameters[:id].blank? ? id = String.new : id = request.path_parameters[:id]+ '/'
     if params[:filters].blank?
       ret = '/' + request.path_parameters[:controller] + '/' + request.path_parameters[:action] + '/' + id
-      appender = '?'
+      appender = "?"
     else
       ret = '/' + request.path_parameters[:controller] + '/' + request.path_parameters[:action] + '/' + id + '?'
       params[:filters].each { |k,v| ret += "filters[#{CGI.escape(k)}]=#{CGI.escape(v)}&" }
       ret = ret.chop
-      appender = '&'
+      appender = "&"
     end
 
-    if append.blank?
-      return ret
-    else
-       return ret + appender + append + '='
+    # apped possible params
+    unless append_params.blank?
+      append_params.each do |param|
+        ret += appender + "#{param[:key]}=#{param[:value]}"
+        appender = "&" # Set after first run.
+      end
     end
+
+    return ret
+  end
+
+  def flot_graph_loader(options)
+   if options[:stream_id].blank?
+     url = "/visuals/fetch/totalgraph?hours=#{options[:hours]}"
+   else
+     url = "/visuals/fetch/streamgraph?stream_id=#{options[:stream_id]}&amp;hours=#{options[:hours]}"
+   end
+   
+   "<script type='text/javascript'>
+      function plot(data){
+        $.plot($('#{options[:inject]}'),
+          [ {
+              color: '#fd0c99',
+              shadowSize: 10,
+              data: data,
+              points: { show: false, },
+              lines: { show: true, fill: true }
+          } ],
+          {
+            xaxis: { mode: 'time' },
+            grid: {
+              show: true,
+              color: '#ccc',
+              borderWidth: 0,
+            },
+            selection: { mode: 'x' }
+          }
+        );
+      }
+
+      $('#{options[:inject]}').bind('plotselected', function(event, ranges) {
+        from = (ranges.xaxis.from/1000).toFixed(0);
+        to = (ranges.xaxis.to/1000).toFixed(0);
+        $('#graph-rangeselector').show();
+        $('#graph-rangeselector-from').val(from);
+        $('#graph-rangeselector-to').val(to);
+      });
+
+      $.post('#{url}', function(data) {
+        json = eval('(' + data + ')');
+          plot(json.data);
+        });
+    </script>"
+  end
+
+  def ajaxtrigger(title, description, url, checked)
+   "#{check_box_tag(title, nil, checked, :class => "ajaxtrigger", "data-target" => url)}
+    #{label_tag(title, description)}
+    <span id=\"#{title.to_s}-ajaxtrigger-loading\" style=\"display: none;\">#{image_tag('loading-small.gif')} Saving...</span>
+    <span id=\"#{title.to_s}-ajaxtrigger-done\" class=\"status-okay-text\" style=\"display: none;\">Saved!</span>"
+  end
+
+  def sparkline_values values
+    res = ""
+    i = 1
+    values.each do |v|
+      res += v.to_s
+      res += "," unless i == values.size
+      i += 1
+    end
+
+    return res
+  end
+
+  def user_link(user)
+    return String.new if user.blank? or !user.instance_of?(User)
+
+    "<span class=\"user-link\">
+      #{image_tag "icons/user.png", :class => "user-link-img" }#{link_to(user.login, { :controller => "users", :action => "show", :id => user.id })}
+    </span>"
   end
 
   private

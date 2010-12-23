@@ -48,8 +48,8 @@ GEM
     ci_reporter (1.6.3)
       builder (>= 2.1.2)
     colored (1.2)
-    declarative_authorization (0.5.1)
     database_cleaner (0.6.0)
+    declarative_authorization (0.5.1)
     em-websocket (0.1.4)
       addressable (>= 2.1.1)
       eventmachine (>= 0.12.9)
@@ -161,8 +161,8 @@ DEPENDENCIES
   bson_ext (= 1.1.1)
   chronic (= 0.3.0)
   ci_reporter
-  declarative_authorization
   database_cleaner (~> 0.6.0)
+  declarative_authorization
   em-websocket (= 0.1.4)
   faker (~> 0.3.1)
   jnunemaker-validatable (= 1.8.4)
