@@ -79,4 +79,28 @@ class Stream < ActiveRecord::Base
     return Message.count(:conditions => conditions).to_s
   end
 
+  def all_users_with_favorite
+    uids = FavoritedStream.find_all_by_stream_id(id)
+    
+    users = Array.new
+    uids.each do |uid|
+      user = User.find(uid.user_id)
+      users << user unless user.blank?
+    end
+    
+    return users
+  end
+
+  def all_users_with_alarm
+    uids = AlertedStream.find_all_by_stream_id(id)
+    
+    users = Array.new
+    uids.each do |uid|
+      user = User.find(uid.user_id)
+      users << user unless user.blank?
+    end
+    
+    return users
+  end
+
 end

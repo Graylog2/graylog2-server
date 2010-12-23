@@ -23,7 +23,39 @@
       )
   %>
   
-  <h3>Total: <%= @stream.message_count %></h3>
+  <h3 id="streams-sidebar-totalcount">Total messages: <%= @stream.message_count %></h3>
+
+  <h3>Favorited by:</h3>
+  <ul id="streams-sidebar-favorites">
+    <% users = @stream.all_users_with_favorite %>
+    <% if users.blank? %>
+      <li>Nobody</li>
+    <% else %>
+      <% users.each do |u| %>
+        <li><%=raw user_link(u) %></li>
+      <% end %>
+    <% end %>
+  </ul>
+
+  <h3>Alarmed users:</h3>
+  <ul id="streams-sidebar-alarms">
+    <% if @stream.alarm_active and !@stream.alarm_limit.blank? and !@stream.alarm_timespan.blank? %>
+      <% if @stream.alarm_force == true %>
+        <li>All users</li>
+      <% else %>
+        <% users = @stream.all_users_with_alarm %>
+        <% if users.blank? %>
+          <li>None</li>
+        <% else %>
+          <% users.each do |u| %>
+            <li><%=raw user_link(u) %></li>
+          <% end %>
+        <% end %>
+      <% end %>
+    <% else %>
+      <li>Alarms are not active for this stream</li>
+    <% end %>
+  </ul>
 
   <br />
   <h3>Created: <%= gl_date(@stream.created_at) %></h3>

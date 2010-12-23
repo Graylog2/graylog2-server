@@ -230,6 +230,12 @@ label {
   top: 25px;
 }
 
+.user-link-img {
+  width: 10px;
+  height: 10px;
+  margin-right: 2px;
+}
+
 #content {
   clear: both;
   margin: 0px 15px;

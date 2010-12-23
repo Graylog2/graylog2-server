@@ -245,6 +245,21 @@
   font-size: 15px;
 }
 
+#streams-sidebar-totalcount {
+  float: right;
+  margin-right: 10px;
+}
+
+#streams-sidebar-favorites {
+  margin-left: 10px;
+  font-size: 13px;
+}
+
+#streams-sidebar-alarms {
+  margin-left: 10px;
+  font-size: 13px;
+}
+
 /* Hosts */
 #hosts-quickjump {
     margin-bottom: 15px;
