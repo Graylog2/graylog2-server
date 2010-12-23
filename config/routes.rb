@@ -1,5 +1,5 @@
 Graylog2WebInterface::Application.routes.draw do
- scope Configuration.general_url_prefix do
+ #scope Configuration.general_url_prefix do
   match 'logout' => 'sessions#destroy', :as => :logout
   match 'login' => 'sessions#new', :as => :login
   resource :session
@@ -21,7 +21,7 @@ Graylog2WebInterface::Application.routes.draw do
   
   match '/' => 'messages#index', :as => "root"
   match '/:controller(/:action(/:id))'
- end
+ #end
  
  match '/' => 'messages#index'
 end
