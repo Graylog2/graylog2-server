@@ -208,8 +208,14 @@ module ApplicationHelper
     </span>"
   end
 
-  def awesome_submit_link(title)
-    link_to(title, "#", :class => "awesome-submit-link")
+  def awesome_submit_link(title, options = Hash.new)
+    if options[:class].blank?
+      options[:class] = "awesome-submit-link"
+    else
+      options[:class] += " awesome-submit-link"
+    end
+
+    link_to(title, "#", options)
   end
 
   private

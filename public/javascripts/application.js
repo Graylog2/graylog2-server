@@ -201,8 +201,11 @@ $(document).ready(function(){
 
     // Awesome submit links
     $(".awesome-submit-link").bind("click", function() {
-      $(this).html("Please wait...");
+      if ($(this).attr("data-nowait") == undefined) {
+        $(this).html("Please wait...");
+      }
       $(this).parent().submit();
+      return false;
     });
 
 });

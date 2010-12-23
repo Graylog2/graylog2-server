@@ -10,7 +10,7 @@
   <%= label_tag :hours, "Hours:" %>
   <%= text_field_tag :hours, 12, { :id => "analytics-new-messages-update-hours" } %>
 
-  <%= submit_tag "Update graph", :id => "analytics-new-messages-update-submit", "data-updateurl" => "/visuals/fetch/totalgraph?hosts=all&amp;hours=" %>
+  <%= awesome_submit_link "Update graph", { :id => "analytics-new-messages-update-submit", "data-updateurl" => "/visuals/fetch/totalgraph?hosts=all&amp;hours=", "data-nowait" => "true" } %>
   <span id="analytics-new-messages-update-loading" style="display: none;">
     <%= image_tag 'loading-small.gif' %> Calculating...
   </span>
@@ -19,7 +19,7 @@
     <%= form_tag "/messages/showrange" do %>
       <%= hidden_field_tag :from, nil, :id => "graph-rangeselector-from" %>
       <%= hidden_field_tag :to, nil, :id => "graph-rangeselector-to" %>
-      <%= submit_tag "Show messages in range" %>
+      <%= awesome_submit_link "Show messages in range" %>
     <% end %>
   </div>
 </div>
