@@ -1,5 +1,6 @@
 class AnalyticsController < ApplicationController
-  filter_resource_access
+  filter_access_to :index
+  filter_access_to :messagespread
   
   def index
     @load_flot = true
