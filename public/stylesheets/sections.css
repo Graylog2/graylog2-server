@@ -68,34 +68,22 @@
     padding: 0px;
 }
 
-#messages-show dt {
-    float: left;
-    font-weight: bold;
-}
-
-#messages-show dd {
-    padding-left: 70px;
-}
-
 .messages-show-message {
-    padding: 6px;
-    padding-bottom: 10px;
-    margin-top: 15px;
-    font-size: 18px;
-    border: 1px solid #ccc;
+    margin-bottom: 10px;
+    font-size: 13px;
     font-family: monospace;
+    line-height: 15px;
 }
 
-.messages-show-message legend {
-    font-size: 11px;
-    font-weight: bold;
-    font-family: 'Lucida Grande',Verdana,sans-serif;
+.messages-full-message {
+  padding: 5px;
+  margin-top: 5px;
+  overflow: auto;
 }
 
-.messages-show-message-full {
-    font-size: 11px;
-    font-family: monospace;
-    line-height: 11px;
+#messages-show-permalink {
+  margin-top: 5px;
+  float: right;
 }
 
 #messages-show-similar-messages-fs {

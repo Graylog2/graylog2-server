@@ -33,6 +33,15 @@ h3 {
     font-family: Georgia,"Times New Roman",Times,serif;
 }
 
+h4 {
+    font-size: 14px;
+    margin-top: 7px;
+    margin-bottom: 3px;
+    display: block;
+    font-weight: normal;
+    font-family: Georgia,"Times New Roman",Times,serif;
+}
+
 a {
     color: #fd0c99;
     text-decoration: none;
@@ -92,6 +101,11 @@ label {
 
 .highlighted {
     color: #fd0c99;
+}
+
+.light {
+  color: #333;
+  font-family: Georgia,"Times New Roman",Times,serif;
 }
 
 .bigger {
@@ -285,6 +299,7 @@ label {
 }
 
 #sidebar {
+  position: fixed;
   margin-right: 15px;
 }
 
@@ -296,12 +311,18 @@ label {
 #sidebar-hide-link {
   float: right;
   position: relative;
-  top: -10px;
-  right: -5px;
+  top: 5px;
+  right: 10px;
 }
 
 #sidebar-hide-link:hover {
   font-weight: bold;
+}
+
+#sidebar-inner h2 {
+  line-height: 23px;
+  margin-bottom: 6px;
+  margin-top: 0px;
 }
 
 .content-bottom {

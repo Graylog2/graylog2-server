@@ -1,55 +1,37 @@
-<h1>Message <span class="highlighted"><%=h @message.id %></span> from <span class="highlighted"><%= @message.host %></span></h1>
-
-<dl>
-  <dt>Received:</dt>
-  <dd><%= gl_date gl_date(Time.at(@message.created_at).to_s) %></dd>
-
-  <% unless @message.level.blank?  %>
-    <dt>Severity:</dt>
-    <dd><%= syslog_level_to_human(@message.level) %></dd>
-  <% end %>
-
-  <% unless @message.type.blank? or @message.type == 0 %>
-    <dt>Type:</dt>
-    <dd><%= @message.type %></dd>
-  <% end %>
-
-  <% unless @message.file.blank?  %>
-    <dt>File:</dt>
-    <dd>
-      <%=h @message.file %><%= @message.line.blank? ? nil : ":#{h(@message.line)}" %>
-    </dd>
-  <% end %>
-</dl>
+<h2>Message <span class="highlighted"><%=h @message.id %></span></h2>
 
 <% unless @message.message.blank? %>
-  <fieldset class="messages-show-message">
-    <legend>Message:</legend>
-    <p><%=h @message.message %></p>
-  </fieldset>
+  <p class="messages-show-message"><%=h @message.message %></p>
+<% end %>
+
+<h4>From: <span class="highlighted"><%= @message.host %></span></h4>
+<h4>Received: <span class="highlighted"><%= gl_date(Time.at(@message.created_at)) %></span></h4>
+<h4>Severity: <span class="highlighted"><%= syslog_level_to_human(@message.level) %></span></h4>
+
+<% unless @message.file.blank?  %>
+  <h4>File: <span class="highlighted"><%=h @message.file %><%= @message.line.blank? ? nil : ":#{h(@message.line)}" %></span></h4>
 <% end %>
 
 <% if @message.has_additional_fields %>
-  <fieldset class="messages-show-message">
-    <legend>Additional fields:</legend>
-    <p class="messages-show-message-full">
-      <% @message.additional_fields.each do |field| %>
-        <%=h field[:key] %>: <%=h field[:value] %><br />
-      <% end %>
-    </p>
-  </fieldset>
+  <% @message.additional_fields.each do |field| %>
+    <h4><%=h field[:key] %>: <span class="highlighted"><%=h field[:value] %></span></h4>
+  <% end %>
 <% end %>
 
 <% unless @message.full_message.blank? %>
-  <fieldset class="messages-show-message">
-    <legend>Full message:</legend>
-    <% escaped_fullmsg = h(@message.full_message) %>
-    <p class="messages-show-message-full">
-      <%= auto_link(escaped_fullmsg.gsub(/\n/, '<br />'), :html => { :target => "blank" }, :link => :urls) %>
-    </p>
-  </fieldset>
+  <% escaped_fullmsg = h(@message.full_message) %>
+  <h3>Full message:</h3>
+  <p class="messages-show-message messages-full-message">
+    <%= auto_link(escaped_fullmsg.gsub(/\n/, '<br />'), :html => { :target => "blank" }, :link => :urls) %>
+  </p>
 <% end %>
 
+<% if params[:partial] %>
+  <%= link_to "Permalink", { :controller => "messages", :action => "show", :id => @message.id }, :id => "messages-show-permalink" %>
+  <br style="clear: both;" />
+<% end %>
+
+<!--
 <fieldset class="messages-show-message" id="messages-show-similar-messages-fs">
   <legend>Similar messages</legend
   <div id="messages-show-similar-messages">
@@ -58,4 +40,4 @@
       <div class="loading" style="display: none; height: 100px;"></div>
     </div>
   </div>
-</fieldset>
+</fieldset>-->
