@@ -14,7 +14,7 @@
   <%= f.select :value, options_for_select(get_ordered_facilities_for_select), {}, { :disabled => true, :style => "display: none;", :class => "stream-value-field stream-value-facility" } %>
   <%= f.select :value, options_for_select(get_ordered_severities_for_select), {}, { :disabled => true, :style => "display: none;", :class => "stream-value-field stream-value-severity" } %>
   <%= f.select :value, Host.all.collect {|host| [ h(host.host) ]}.sort, {}, { :disabled => true, :style => "display: none;", :class => "stream-value-field stream-value-host" } %>
-  <%= submit_tag "Add" %>
+  <%= awesome_submit_link "Add" %>
 <% end %>
 
 <br />

@@ -9,7 +9,7 @@
 <%= form_for @new_blacklist, :url => { :action => "create" } do |f| %>
   <%= f.label :title, "Title:" %>
   <%= f.text_field :title %>
-  <%= submit_tag "Create blacklist" %>
+  <%= awesome_submit_link "Create blacklist" %>
 <% end %>
 
 

@@ -1,9 +1,8 @@
 <div id="users-edit" class="users-form">
 
 <div id="users-delete">
-  <% form_tag '/users/delete/' + @user.id.to_s do -%>
-    <%= submit_tag 'Delete user', :confirm => 'Really delete this user?' %>
-  <% end -%>
+  <br />
+  <%= link_to "Delete user", { :action => "delete", :id => @user }, :confirm => "Really delete ths user?" %>
 </div>
 
 <h1>Edit user <span class="highlighted"><%=h @user.login %></span></h1>

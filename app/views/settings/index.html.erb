@@ -9,7 +9,7 @@
   <%= form_tag '/settings/store' do -%>
     <%= hidden_field_tag 'setting_type', Setting::TYPE_MESSAGE_LENGTH %>
     <%= text_field_tag 'value', Setting.get_message_length(current_user) %>
-    <%= submit_tag 'Store' %>
+    <%= awesome_submit_link 'Store' %>
     <br />
     The length of messages before they are cut with a <span class="code">[more]</span> link. (Default: <%=h Setting::TYPE_MESSAGE_LENGTH_STANDARD %>)
   <% end -%>
@@ -20,7 +20,7 @@
   <%= form_tag '/settings/store' do -%>
     <%= hidden_field_tag 'setting_type', Setting::TYPE_MESSAGE_COUNT_INTERVAL %>
     <%= text_field_tag 'value', Setting.get_message_count_interval(current_user) %>
-    <%= submit_tag 'Store' %>
+    <%= awesome_submit_link 'Store' %>
     <br />
     Graylog2 can display the number of handled log messages in the last X minutes. Define X here. (Default: <%=h Setting::TYPE_MESSAGE_COUNT_INTERVAL_STANDARD %>)
   <% end -%>
@@ -31,7 +31,7 @@
   <%= form_tag '/settings/store' do -%>
     <%= hidden_field_tag 'setting_type', Setting::TYPE_MESSAGE_MAX_COUNT %>
     <%= text_field_tag 'value', Setting.get_message_max_count(current_user) %>
-    <%= submit_tag 'Store' %>
+    <%= awesome_submit_link 'Store' %>
     <br />
     The number of maximum messages per [message count interval] minutes. Everything above this value is an alarm. For example visible in the dashboard. 
     (Default: <%=h Setting::TYPE_MESSAGE_MAX_COUNT %>)
@@ -43,7 +43,7 @@
   <%= form_tag '/settings/store' do -%>
     <%= hidden_field_tag 'setting_type', Setting::TYPE_LIVETAIL_ROW_COUNT %>
     <%= text_field_tag 'value', Setting.get_livetail_row_count(current_user) %>
-    <%= submit_tag 'Store' %>
+    <%= awesome_submit_link 'Store' %>
     <br />
     The number of messages to keep as history in the live tail view. (Default: <%=h Setting::TYPE_LIVETAIL_ROW_COUNT_STANDARD %>)
   <% end -%>

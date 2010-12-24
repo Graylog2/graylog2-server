@@ -10,7 +10,7 @@
   <%= form_for @new_stream, :url => { :action => "create" } do |f| %>
     <%= f.label :title, "Title:" %>
     <%= f.text_field :title %>
-    <%= submit_tag "Create Stream" %>
+    <%= awesome_submit_link "Create Stream" %>
   <% end %>
 <% end %>
 
