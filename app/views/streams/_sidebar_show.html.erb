@@ -15,6 +15,13 @@
 </h2>
 
 <div id="sidebar-graph" style="height: 100px;"></div>  
+<div id="graph-rangeselector" class="graph-rangeselector-sidebar" style="display: none;">
+  <%= form_tag "/streams/showrange/#{@stream.id}" do %>
+    <%= hidden_field_tag :from, nil, :id => "graph-rangeselector-from" %>
+    <%= hidden_field_tag :to, nil, :id => "graph-rangeselector-to" %>
+    <%= awesome_submit_link "Show messages in range" %>
+  <% end %>
+</div>
 <%=raw flot_graph_loader(
       :inject => "#sidebar-graph",
       :stream_id => @stream.id,

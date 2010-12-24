@@ -4,6 +4,13 @@
 <div id="streams-analytics-new-messages">
   <%= image_tag "loading.gif", :class => "ajaxloader" %>
 </div>
+<div id="graph-rangeselector" class="graph-rangeselector-sidebar" style="display: none;">
+  <%= form_tag "/streams/showrange/#{@stream.id}" do %>
+    <%= hidden_field_tag :from, nil, :id => "graph-rangeselector-from" %>
+    <%= hidden_field_tag :to, nil, :id => "graph-rangeselector-to" %>
+    <%= awesome_submit_link "Show messages in range" %>
+  <% end %>
+</div>
 
 <div id="analytics-new-messages-settings">
   <%= label_tag :hours, "Hours:" %>

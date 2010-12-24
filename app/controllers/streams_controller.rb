@@ -22,6 +22,21 @@ class StreamsController < ApplicationController
     @is_favorited = current_user.favorite_streams.include?(@stream)
   end
 
+  def showrange
+    @has_sidebar = true
+    @load_flot = true
+    
+    begin
+      @from = Time.at(params[:from].to_i-Time.now.utc_offset)
+      @to = Time.at(params[:to].to_i-Time.now.utc_offset)
+    rescue
+      flash[:error] = "Missing or invalid range parameters."
+    end
+    
+    @messages = Message.all_of_stream_in_range(@stream.id, params[:page], @from.to_i, @to.to_i)
+    @total_count = Message.count_all_of_stream_in_range(@stream.id, @from.to_i, @to.to_i)
+  end
+
   def rules
     @stream = Stream.find params[:id]
     @new_rule = Streamrule.new
