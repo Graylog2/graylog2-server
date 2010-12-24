@@ -1,5 +1,7 @@
 class BlacklistedtermsController < ApplicationController
-  filter_resource_access
+  filter_access_to :create
+  filter_access_to :destroy
+
   def create
     term = BlacklistedTerm.new params[:blacklisted_term]
     if term.save
