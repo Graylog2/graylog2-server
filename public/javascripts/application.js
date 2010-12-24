@@ -208,6 +208,13 @@ $(document).ready(function(){
       return false;
     });
 
+    // Show full message in sidebar.
+    $(".message-row").bind("click", function(){
+      $.post("/messages/show/" + $(this).attr("id") + "?partial=true", function(data) {
+        $("#sidebar-inner").html(data);
+      });
+    });
+
 });
 
 function buildHostCssId(id) {

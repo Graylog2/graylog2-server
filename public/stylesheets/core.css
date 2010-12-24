@@ -154,6 +154,10 @@ label {
   color: red;
 }
 
+.message-row {
+  cursor: pointer;
+}
+
 #top {
     height: 90px;
     width: 100%;

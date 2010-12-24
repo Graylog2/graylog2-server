@@ -27,6 +27,11 @@ class MessagesController < ApplicationController
 
   def show
     @message = Message.find params[:id]
+
+    if params[:partial]
+      render :partial => "full_message"
+      return
+    end
   end
 
   def showrange

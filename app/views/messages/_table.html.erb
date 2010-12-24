@@ -14,12 +14,12 @@
     <% i = 0 %>
     <% unless @messages.blank? %>
       <% @messages.each do |message|  %>
-        <tr class="<%= i.modulo(2) == 1 ? "tr-light" : "tr-dark" %>">
+        <tr id="<%= message.id %>" class="<%= i.modulo(2) == 1 ? "tr-light" : "tr-dark" %> message-row">
           <td><%= gl_date(Time.at(message.created_at).to_s) %></td>
           <td><%= message.host.blank? ? nil : h(message.host) %></td>
           <td><%= syslog_level_to_human(message.level) %></td>
           <td><%= syslog_facility_to_human(message.facility) %></td>
-          <td id="message-<%=h message.id %>">
+          <td>
             <% unless message.message.blank? %>
               <%= message.message[0..message_length] %>
               <%=raw (message.message.length > message_length) && !defined?(dont_show_links) ? "<a href=\"#\" class=\"messages-more\" id=\"#{h(message.id)}\">[more]</a>" : nil %>
