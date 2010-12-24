@@ -107,6 +107,10 @@
     margin: 0px auto;
 }
 
+.graph-rangeselector-sidebar {
+  margin-top: 5px;
+}
+
 /* Blocks */
 
 .blocks {
