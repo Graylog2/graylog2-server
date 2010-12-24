@@ -167,6 +167,7 @@ module ApplicationHelper
       }
 
       $('#{options[:inject]}').bind('plotselected', function(event, ranges) {
+        $('#streams-sidebar-totalcount').hide();
         from = (ranges.xaxis.from/1000).toFixed(0);
         to = (ranges.xaxis.to/1000).toFixed(0);
         $('#graph-rangeselector').show();
