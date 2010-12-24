@@ -27,7 +27,8 @@
 <body>
 
   <div id="pageload" style="display: none;"><%= Time.now.to_i %></div>
-  
+  <div id="gln" style="display: none;"><%= image_tag "loading-small.gif" %></div>
+
   <div id="notification-notice" style="display: none;"><%=raw flash[:notice] %></div>
   <div id="notification-error" style="display: none;"><%=raw flash[:error] %></div>
 

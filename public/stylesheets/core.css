@@ -446,3 +446,13 @@ label {
 #graph-rangeselector {
   float: right;
 }
+
+/* General Loading Notification :) */
+#gln {
+  position: fixed;
+  top: 96%;
+  left: 98%;
+  padding: 5px;
+  color: #000;
+  background-color: #fff;
+}

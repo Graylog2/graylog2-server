@@ -210,20 +210,21 @@ $(document).ready(function(){
 
     // Show full message in sidebar.
     $(".message-row").bind("click", function(){
-      $("body").css("cursor", "wait");
+      $("#gln").show();
+
       $.post("/messages/show/" + $(this).attr("id") + "?partial=true", function(data) {
         $("#sidebar-inner").html(data);
-
-        // Reset cursor icon.
-        $("body").css("cursor", "default");
 
         // Show sidebar if hidden.
         if (!$("#main-right").is(":visible")) {
           $("#main-left").animate({ width: '65%' }, 700, function() {
+            
             // Show sidebar when main body is completely squeezed.
             $("#main-right").show();
           });
         }
+        
+        $("#gln").hide();
       });
     });
 
