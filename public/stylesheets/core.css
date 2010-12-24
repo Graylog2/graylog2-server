@@ -295,11 +295,12 @@ label {
 
 #main-right {
   width: 35%;
+  margin-left: 65%;
   float: right;
+  position: fixed;
 }
 
 #sidebar {
-  position: fixed;
   margin-right: 15px;
 }
 

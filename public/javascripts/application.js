@@ -219,8 +219,10 @@ $(document).ready(function(){
 
         // Show sidebar if hidden.
         if (!$("#main-right").is(":visible")) {
-          $("#main-right").animate({ width: '35%' }, 700);
-          $("#main-left").animate({ width: '65%' }, 700);
+          $("#main-left").animate({ width: '65%' }, 700, function() {
+            // Show sidebar when main body is completely squeezed.
+            $("#main-right").show();
+          });
         }
       });
     });
