@@ -150,7 +150,7 @@ class VisualsController < ApplicationController
     
     r = Array.new
     Message.stream_counts_of_last_minutes(stream.id, hours*60).each do |c|
-      r << [ c[:minute].to_i*1000, c[:count] ]
+      r << [ (c[:minute].to_i+Time.now.utc_offset)*1000, c[:count] ]
     end
 
     return r
