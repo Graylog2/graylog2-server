@@ -8,8 +8,8 @@ body {
 
 h1 {
     font-size: 34px;
-    margin-top: 15px;
-    margin-bottom: 25px;
+    margin-bottom: 10px;
+    line-height: 32px;
     display: block;
     font-weight: normal;
     font-family: Georgia,"Times New Roman",Times,serif;
