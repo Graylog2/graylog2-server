@@ -3,26 +3,28 @@
 <h2>Add Rules</h2>
 <div class="short-description">You can add hosts based on their name or on <%= link_to "regular expressions", "http://en.wikipedia.org/wiki/Regular_Expression" %>. All hosts that names start with <span class="highlighted">web</span> will appear in this group when you add <span class="highlighted">^web</span> as regular expression. It will always run on your current set of hosts so there is no need to re-add the expression when you have a new host that starts with <span class="highlighted">web</span>.</div>
 
-<div id="hostgroups-add-hosts-simple">
-<%= form_for :new_host, :url => { :controller => "hostgroup_hosts", :action => 'create' } do |f| -%>
-  <%= label_tag 'hostname', 'Hostname' %>:
-  <%= f.select :hostname, Host.all.collect {|host| [h(host.host)]} %>
-  <%= hidden_field_tag 'new_host[hostgroup_id]', @hostgroup.id %>
-  <%= hidden_field_tag 'new_host[ruletype]', HostgroupHost::TYPE_SIMPLE %>
-  <%= submit_tag "Add" %> 
-<% end %>
+<div id="hostgroups-add-hosts">
+  <div id="hostgroups-add-hosts-simple">
+  <%= form_for :new_host, :url => { :controller => "hostgroup_hosts", :action => 'create' } do |f| -%>
+    <%= label_tag 'hostname', 'Hostname' %>:
+    <%= f.select :hostname, Host.all.collect {|host| [h(host.host)]} %>
+    <%= hidden_field_tag 'new_host[hostgroup_id]', @hostgroup.id %>
+    <%= hidden_field_tag 'new_host[ruletype]', HostgroupHost::TYPE_SIMPLE %>
+    <%= awesome_submit_link "Add" %> 
+  <% end %>
+  </div>
+
+  <div id="hostgroups-add-hosts-regex">
+  <%= form_for :new_host, :url => { :controller => "hostgrouphosts", :action => 'create' } do |f| -%>
+    <%= label_tag 'hostname', 'Regular expression' %>:
+    <%= f.text_field :hostname %>
+    <%= hidden_field_tag 'new_host[hostgroup_id]', @hostgroup.id %>
+    <%= hidden_field_tag 'new_host[ruletype]', HostgroupHost::TYPE_REGEX %>
+    <%= awesome_submit_link "Add" %> 
+  <% end %>
+  </div>
+  <br style="clear: both;" />
 </div>
-  
-<div id="hostgroups-add-hosts-regex">
-<%= form_for :new_host, :url => { :controller => "hostgrouphosts", :action => 'create' } do |f| -%>
-  <%= label_tag 'hostname', 'Regular expression' %>:
-  <%= f.text_field :hostname %>
-  <%= hidden_field_tag 'new_host[hostgroup_id]', @hostgroup.id %>
-  <%= hidden_field_tag 'new_host[ruletype]', HostgroupHost::TYPE_REGEX %>
-  <%= submit_tag "Add" %> 
-<% end %>
-</div>
-<br style="clear: both;" />
 
 <div id="hostgroups-add-left">
   <h2>Rules</h2>

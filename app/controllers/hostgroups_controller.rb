@@ -10,6 +10,9 @@ class HostgroupsController < ApplicationController
   end
   
   def show
+    @has_sidebar = true
+    @load_flot = true
+    
     @hostgroup = Hostgroup.find params[:id]
 
     @messages = Message.all_of_hostgroup @hostgroup, params[:page]

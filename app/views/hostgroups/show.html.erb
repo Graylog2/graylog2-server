@@ -1,3 +1,7 @@
+<% content_for :sidebar do %>
+  <%= render :partial => "messages/sidebar_index", :locals => { :headline => "Hello, <span class=\"highlighted\">#{current_user.login}</span>!" } %>
+<% end %>
+
 <h1>Hostgroup <span class="highlighted"><%=h @hostgroup.name %></span></h1>
 
 <% if @messages.blank? %>

@@ -73,12 +73,12 @@
     font-size: 13px;
     font-family: monospace;
     line-height: 15px;
+    overflow: auto;
 }
 
 .messages-full-message {
   padding: 5px;
   margin-top: 5px;
-  overflow: auto;
 }
 
 #messages-show-permalink {
@@ -366,9 +366,18 @@
 }
 
 /* Hostgroups */
+#hostgroups-add-hosts {
+  width: 800px;
+}
+
 #hostgroups-add-hosts-simple {
   float: left;
-  padding-right: 15px;
+}
+
+#hostgroups-add-hosts-regex {
+  position: relative;
+  top: -4px;
+  float: right;
 }
 
 #hostgroups-add-left {
