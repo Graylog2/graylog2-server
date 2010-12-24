@@ -86,15 +86,6 @@
   float: right;
 }
 
-#messages-show-similar-messages-fs {
-    font-size: 11px;
-    font-family: 'Lucida Grande',Verdana,sans-serif;
-}
-
-#messages-show-similar-messages-link {
-    margin: 0px auto;
-}
-
 .graph-rangeselector-sidebar {
   margin-top: 5px;
 }

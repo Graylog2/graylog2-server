@@ -1,3 +1,7 @@
+<% content_for :sidebar do %>
+  <%= render :partial => "sidebar_index", :locals => { :headline => "Hello, <span class=\"highlighted\">#{current_user.login}</span>!" } %>
+<% end %>
+
 <div id="message-id" style="display: none;"><%=h @message.id %></div>
 
 <div id="messages-show">

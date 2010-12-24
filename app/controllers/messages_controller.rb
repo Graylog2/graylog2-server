@@ -26,6 +26,8 @@ class MessagesController < ApplicationController
   end
 
   def show
+    @has_sidebar = true
+    @load_flot = true
     @message = Message.find params[:id]
 
     if params[:partial]
@@ -92,41 +94,4 @@ class MessagesController < ApplicationController
     redirect_to :action => 'index'
   end
 
-  def getsimilarmessages
-    # Get the message we want to compare.
-    message = Message.find params[:id]
-    message_id = message.id
-    message = message.message
-
-    ## Prepare comparison
-    # Cut until first ':' if there is one and it is in the first half of the message (this is usually the hostname)
-    if message.include?(':') and message.index(':') <= message.length/2
-      message = message[message.index(':')+1..message.length].strip
-    end
-
-    # Get first 30% chars of message. This is what we will do a REGEX search over all messages.
-    get_chars = ((message.length.to_f)/100*30).to_i
-    message = message[0..get_chars]
-
-    ## Get the messages
-    # Blacklist
-    conditions = Message.by_blacklisted_terms(Blacklist.all_terms)
-
-    # Add our search condition.
-    conditions = conditions.where(:message.in => [/#{Regexp.escape(message)}/])
-
-    # Don't search for the message we used to compare.
-    conditions = conditions.where(:id.nin => [message_id])
-
-    # Get the messages.
-    @messages = conditions.limit(50).order("$natural DESC")
-
-    if @messages.blank?
-      render :text => "No similar messages found"
-      return
-    end
-
-    @inline_version = true
-    render :partial => "table"
-  end
 end
