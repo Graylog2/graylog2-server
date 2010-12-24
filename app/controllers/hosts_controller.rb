@@ -1,8 +1,8 @@
 class HostsController < ApplicationController
-  #filter_resource_access
   filter_access_to :index
   filter_access_to :destroy
   filter_access_to :show
+  filter_access_to :quickjump
   
   def index
     @hosts = Host.all :order => "message_count DESC"

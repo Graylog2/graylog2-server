@@ -1,3 +1,7 @@
+<% content_for :sidebar do %>
+  <%= render :partial => "messages/sidebar_index", :locals => { :headline => "Hello, <span class=\"highlighted\">#{current_user.login}</span>!" } %>
+<% end %>
+
 <div id="blacklist-delete">
   <%= link_to "Delete this blacklist", { :action => "destroy", :id => @blacklist.id }, :confirm => "Really delete this blacklist with all it's terms?" %>
 </div>
