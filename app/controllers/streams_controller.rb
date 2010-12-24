@@ -66,9 +66,9 @@ class StreamsController < ApplicationController
   def togglefavorited
     stream = Stream.find(params[:id])
     if !stream.favorited?(current_user)
-      stream.favoritedStreams.create
+      current_user.favorite_streams << stream
     else
-      stream.favoritedStreams.delete
+      current_user.favorite_streams.delete(stream)
     end
 
     # Intended to be called via AJAX only.
