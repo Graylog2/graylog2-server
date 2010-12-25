@@ -22,19 +22,7 @@ Your current time: <%= gl_date(Time.now.to_s) %>
   <li>No favorites.</li>
 <% else %>
   <% current_user.favorite_streams.each do |favorite| %>
-    <li>
-      <span class="favorite-stream-sparkline">
-        <%= sparkline_values(Message.stream_counts_of_last_minutes(favorite.id, 10).map { |c| c[:count] }) %>
-      </span>
-      <%= link_to favorite.title, { :controller => "streams", :action => "show", :id => favorite.id }, :class => "favorite-streams-title" %>
-
-      <% if favorite.alarm_active and !favorite.alarm_limit.blank? and !favorite.alarm_timespan.blank? %>
-        <% stream_count = favorite.message_count_since(favorite.alarm_timespan.minutes.ago.to_i) %>
-        <span class="favorite-stream-limits <%= stream_count > favorite.alarm_limit ? "status-alarm-text" : "status-okay-text" %>">
-          (<%= stream_count %>/<%= favorite.alarm_limit %>/<%= favorite.alarm_timespan %>m)
-        </span>
-      <% end %>
-    </li>
+    <li><%=raw stream_link(favorite) %></li>
   <% end %>
 <% end %>
 </ul>

@@ -201,6 +201,28 @@ module ApplicationHelper
     return res
   end
 
+  def stream_link(stream)
+    ret = "
+      <li>
+        <span class=\"favorite-stream-sparkline\">
+          #{sparkline_values(Message.stream_counts_of_last_minutes(stream.id, 10).map { |c| c[:count] })}
+        </span>
+        #{link_to(h(stream.title), { :controller => 'streams', :action => 'show', :id => stream.id }, :class => 'favorite-streams-title')}
+    "
+
+    if stream.alarm_active and !stream.alarm_limit.blank? and !stream.alarm_timespan.blank?
+      stream_count = stream.message_count_since(stream.alarm_timespan.minutes.ago.to_i)
+      ret += "
+        <span class=\"favorite-stream-limits #{stream_count > stream.alarm_limit ? "status-alarm-text" : "status-okay-text"}\">
+          (#{stream_count}/#{stream.alarm_limit}/#{stream.alarm_timespan}m)
+        </span>
+      "
+    end
+    ret += "</li>"
+
+    return ret
+  end
+
   def user_link(user)
     return String.new if user.blank? or !user.instance_of?(User)
 

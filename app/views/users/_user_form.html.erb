@@ -6,6 +6,9 @@
 
   <dt><%= label_tag 'email' %></dt>
   <dd><%= f.text_field :email %><%= @user.errors[:email].join(" and ")%></dd>
+  
+  <dt><%= label_tag 'name' %></dt>
+  <dd><%= f.text_field :name %><%= @user.errors[:name].join(" and ")%></dd>
 
   <dt><%= label_tag 'password' %></dt>
   <dd><%= f.password_field :password %><%= @user.errors[:password].join(" and ")%></dd>
@@ -17,9 +20,11 @@
   <dd><%= f.select(:role, user.valid_roles.collect {|r| [r.to_s.capitalize, r.to_s]})%><%= @user.errors[:role].join(" and ")%></dd>
 
   <dt><%= label_tag 'streams', 'Streams' %></dt>
-  <dd><% Stream.all.each do |stream| %>
+  <dd>
+    <% Stream.all.each do |stream| %>
       <%= check_box_tag "user[stream_ids][]", stream.id, user.streams.include?(stream) -%><%= stream.title -%>
-      <% end %></dd>
+    <% end %>
+  </dd>
 
   <dt>&nbsp;</dt>
   <dd><%= submit_tag "#{form_action.capitalize} user" %></dd>
