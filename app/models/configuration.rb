@@ -75,4 +75,9 @@ class Configuration
     (@app_config.blank? or @app_config['url_prefix'].blank?) ? "/" : @app_config['url_prefix']
   end
 
+  def self.date_format
+    default = "%d.%m.%Y - %H:%M:%S"
+    (@general_config.blank? or @general_config["general"].blank? or @general_config["general"]["date_format"].blank?) ? default : @general_config["general"]["date_format"]
+  end
+
 end

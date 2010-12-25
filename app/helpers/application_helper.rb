@@ -15,13 +15,6 @@ module ApplicationHelper
     </div>"
   end
 
-  def gl_date date
-    date = date.to_s
-    return String.new if date == nil or date.length == 0
-    tmp = DateTime.parse(date)
-    return tmp.strftime "%d.%m.%Y - %H:%M:%S"
-  end
-
   def get_ordered_facilities_for_select
       [
         ["Kernel (0)", 0],

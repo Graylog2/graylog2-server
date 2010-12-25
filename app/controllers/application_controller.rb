@@ -29,6 +29,14 @@ class ApplicationController < ActionController::Base
     return false if User.find(:all).size == 0
     return true
   end
+  
+  helper_method :gl_date
+  def gl_date(date)
+    date = date.to_s
+    return String.new if date == nil or date.length == 0
+    tmp = DateTime.parse(date)
+    return tmp.strftime(Configuration.date_format)
+  end
 
   private
 

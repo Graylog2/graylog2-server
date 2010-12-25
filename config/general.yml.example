@@ -1,5 +1,6 @@
 general:
  external_hostname: "your-graylog2.example.org" # Used for example to generate permalinks. Don't add 'http://' or trailing slashes.
+ date_format: "%d.%m.%Y - %H:%M:%S" # http://ruby-doc.org/core/classes/Time.html#M000298 (strftime syntax)
 
 # Settings for stream subscription emails. 
 subscriptions:
