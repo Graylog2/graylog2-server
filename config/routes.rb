@@ -5,7 +5,7 @@ Graylog2WebInterface::Application.routes.draw do
   resource :session
   resources :messages
 
-  resources :analytics
+  #resources :analytics
 
   resources :hosts do
     resources :messages
