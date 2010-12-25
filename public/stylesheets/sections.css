@@ -33,39 +33,32 @@
 #messages-quickfilter {
     margin-top: 15px;
     margin-bottom: 10px;
-    width: 50%;
-    float: left;
 }
 
-#messages-quickfilter th {
-    border: 0;
+#messages-quickfilter-fields label {
+    font-size: 14px;
+    font-weight: normal;
+    font-family: Georgia,"Times New Roman",Times,serif;
 }
 
-#messages-quickfilter td {
-    padding-right: 5px;
+#messages-quickfilter-fields input {
+  width: 250px;
 }
 
-#messages-quickfilter tr:hover {
-    background-color: #fff !important;
+#messages-quickfilter-fields input, select {
+  font-size: 11px;
 }
 
-#messages-quickfilter input,select {
-    font-size: 11px;
-    padding: 0px;
+#messages-quickfilter-fields dt {
+  float: left;
 }
 
-.messages-quickfilter-c-message input {
-    width: 300px;
+#messages-quickfilter-fields dd {
+  margin-left: 80px;
 }
 
 #messages-quickfilter-delete {
-    float: right;
-    margin-top: 35px;
-}
-
-#messages-quickfilter-delete input,select {
-    font-size: 11px;
-    padding: 0px;
+  float: right;
 }
 
 .messages-show-message {

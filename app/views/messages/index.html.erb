@@ -19,36 +19,36 @@ filtered by <span class="highlighted"><%=h @total_blacklisted_terms %></span> bl
 <span class="highlighted"><%=h Message.count_of_last_minutes(Setting.get_message_count_interval(message_count_interval)) %></span>
 messages in the last <%=h message_count_interval %> minutes.
 
+<div id="messages-quickfilter" style="display: none;">
 <%= form_tag('/', :method => :get) do -%>
-  <table id="messages-quickfilter" style="display: <%= params[:filters].blank? ? 'none' : 'block' %>">
-    <thead>
-      <tr>
-        <th>Message</th>
-        <th>Timeframe</th>
-        <th>Facility</th>
-        <th>Severity</th>
-        <th>Host</th>
-        <th>&nbsp;</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr>
-        <td class="messages-quickfilter-c-message"><%= text_field_tag "filters[message]", params[:filters].blank? ? nil : params[:filters][:message] %></td>
-        <td><%= text_field_tag "filters[date]", params[:filters].blank? ? nil : params[:filters][:date] %></td>
-        <td><%= select_tag "filters[facility]", raw("<option></option>" + options_for_select(get_ordered_facilities_for_select, :selected => get_quickfilter_selected(params[:filters], :facility))) %></td>
-        <td><%= select_tag "filters[severity]", raw("<option></option>" + options_for_select(get_ordered_severities_for_select, :selected => get_quickfilter_selected(params[:filters], :severity))) %></td>
-        <td><%= select_tag "filters[host]", raw("<option></option>" + options_for_select(Host.all.collect {|host| [ h(host.host) ]}.sort, :selected => get_quickfilter_selected(params[:filters], :host, true))) %></td>
-        <td><%= submit_tag "Quickfilter!" %></td>
-      </tr>
-    </tbody>
-  </table>
+  <dl id="messages-quickfilter-fields">
+    <dt><%= label_tag "filters[:message]", "Message:" %></dt>
+    <dd><%= text_field_tag "filters[message]", params[:filters].blank? ? nil : params[:filters][:message] %></dd>
+
+    <dt><%= label_tag "filters[date]", "Timeframe:" %></dt>
+    <dd><%= text_field_tag "filters[date]", params[:filters].blank? ? nil : params[:filters][:date] %></dd>
+   
+    <dt><%= label_tag "filters[facility]", "Facility:" %></dt>
+    <dd><%= select_tag "filters[facility]", raw("<option></option>" + options_for_select(get_ordered_facilities_for_select, :selected => get_quickfilter_selected(params[:filters], :facility))) %></dd>
+    
+    <dt><%= label_tag "filters[severity]", "Severity:" %></dt>
+    <dd><%= select_tag "filters[severity]", raw("<option></option>" + options_for_select(get_ordered_severities_for_select, :selected => get_quickfilter_selected(params[:filters], :severity))) %></dd>
+    
+    <dt><%= label_tag "filters[host]", "Host:" %></dt>
+    <dd>
+      <%= select_tag "filters[host]", raw("<option></option>" + options_for_select(Host.all.collect {|host| [ h(host.host) ]}.sort, :selected => get_quickfilter_selected(params[:filters], :host, true))) %>
+ 
+    </dd>
+  </dl>
+  <%= awesome_submit_link "Filter" %>
 <% end -%>
+</div>
 
 <% unless params[:filters].blank? %>
 <div id="messages-quickfilter-delete">
   <%= form_tag('/messages/deletebyquickfilter') do -%>
     <%= hidden_field_tag 'filters', params[:filters].to_json %>
-    <%= submit_tag "Delete all messages hit by this quickfilter", :confirm => "Really delete all messages hit by this quickfilter?" %>
+    <%= awesome_submit_link "Delete all messages hit by this quickfilter" %>
   <% end -%>
 </div>
 <% end %>

@@ -81,7 +81,7 @@ class MessagesController < ApplicationController
       filters_with_symbols[:severity] = filters["severity"]
       filters_with_symbols[:host] = filters["host"]
 
-      conditions = Message.all_by_quickfilter(filters_with_symbols, 0, 0).criteria.sources
+      conditions = Message.all_by_quickfilter(filters_with_symbols, 0, 0).criteria.to_hash
       throw "Missing conditions" if conditions.blank?
 
       Message.set(conditions, :deleted => true )
