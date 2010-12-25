@@ -15,7 +15,7 @@ class AnalyticsController < ApplicationController
     @term = params[:term]
     if @term.blank?
       flash[:error] = "Missing term."
-      redirect_to :controller => "analytics"
+      redirect_to :action => "index"
       return
     end
   end

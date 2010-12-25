@@ -54,7 +54,7 @@ Spread of log messages containing the term <span class="highlighted"><%= @term %
 
 <br />
 <div id="visuals-spread-hosts-permalink">
-  <a href="#" id="visuals-spread-hosts-permalink-link">Generate permalink</a>
+  <%= awesome_link "Generate permalink", "#", { :id => "visuals-spread-hosts-permalink-link" } %>
   <div id="visuals-spread-hosts-permalink-content" style="display: none;">
     <input type="text" value="http://<%= Configuration.external_hostname %>/analytics/messagespread/?term=<%= CGI.escape(@term) %>&regex=<%= @term_is_regex.to_s %>&notcase=<%= @term_is_case_insensitive.to_s %>" />
   </div>

@@ -189,7 +189,7 @@ $(document).ready(function(){
     });
 
     // Awesome submit links
-    $(".awesome-submit-link").bind("click", function() {
+    $(".submit-link").bind("click", function() {
       if ($(this).attr("data-nowait") == undefined) {
         $(this).html("Please wait...");
       }
