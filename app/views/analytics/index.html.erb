@@ -33,7 +33,7 @@
 <br />
 <h2>Spread of message</h2>
 <div class="short-description">Enter a term or regular expression and see the spread of messages that include the term or match the regular expression over your hosts.</div>
-<% form_tag "/analytics/messagespread" do %>
+<%= form_tag "/analytics/messagespread" do %>
   <%= label_tag :term, "Term:" %>
   <%= text_field_tag :term %>
   

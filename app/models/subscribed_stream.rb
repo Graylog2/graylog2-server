@@ -8,7 +8,7 @@ class SubscribedStream < ActiveRecord::Base
 
   def self.all_subscribers(stream_id)
     emails = Array.new
-    self.find(:all, :conditions => ["stream_id = ?", stream_id]).each do |s|
+    self.all(:conditions => ["stream_id = ?", stream_id]).each do |s|
       next if s.user.blank? or s.user.email.blank?
       emails << s.user.email
     end

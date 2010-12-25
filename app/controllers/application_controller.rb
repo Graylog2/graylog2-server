@@ -9,24 +9,24 @@ class ApplicationController < ActionController::Base
   def rescue_action e
     # Connection to MongoDB failed.
     if e.class == Mongo::ConnectionFailure
-        render :file => "#{RAILS_ROOT}/public/mongo_connectionfailure.html", :status => 500
+        render :file => "#{Rails.root.to_s}/public/mongo_connectionfailure.html", :status => 500
         return
     end
 
     # Default 404 error.
     if e.class == ActionController::RoutingError
-      render :file  => "#{RAILS_ROOT}/public/404.html", :status => 404
+      render :file  => "#{Rails.root.to_s}/public/404.html", :status => 404
       return
     end
 
     # Default 500 error.
     logger.error "ERROR: #{e.to_s}"
-    render :file  => "#{RAILS_ROOT}/public/500.html", :status => 500
+    render :file  => "#{Rails.root.to_s}/public/500.html", :status => 500
   end
 
   helper_method :has_users
   def has_users
-    return false if User.find(:all).size == 0
+    return false if User.count == 0
     return true
   end
   

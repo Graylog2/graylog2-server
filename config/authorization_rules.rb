@@ -19,6 +19,8 @@ authorization do
     has_permission_on :users, :to => [:new, :index, :show, :create, :edit, :delete, :update]
     
     has_permission_on :sessions, :to => [:destroy]
+
+    has_permission_on :dashboard, :to => [:index]
   end
   
   role :reader do

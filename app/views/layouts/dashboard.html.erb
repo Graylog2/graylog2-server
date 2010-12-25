@@ -17,7 +17,7 @@
   <% message_count_interval = Setting.get_message_count_interval(current_user) %>
 
   <div id="top">
-    <% if File.exist?(RAILS_ROOT + "/public/images/dashboard_logo.png") %>
+    <% if File.exist?(Rails.root.to_s + "/public/images/dashboard_logo.png") %>
         <%= image_tag('dashboard_logo.png') %>
     <% end %>
     <div id="top-timestamp">
