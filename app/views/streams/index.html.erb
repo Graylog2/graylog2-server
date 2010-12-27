@@ -16,7 +16,7 @@
 
 <% @streams.each do |stream| %>
   <div class="blocks">
-    <span class="blocks-title"><%= link_to h(stream.title), { :action => "show", :id => stream.id } %></span>
+    <span class="blocks-title"><%= link_to h(stream.title), stream_path(stream) %></span>
     <ul class="blocks-termslist">
       <% if stream.streamrules.blank? %>
         <li>No rules</li>

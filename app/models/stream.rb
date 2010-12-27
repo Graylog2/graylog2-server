@@ -21,6 +21,10 @@ class Stream < ActiveRecord::Base
   def favorited?(user_id)
     favoritedStreams.include? user_id
   end
+  
+  def to_param
+    "#{id}-#{title.parameterize}"
+  end
 
   # giving back IDs because all_with_subscribers does too
   def self.all_with_enabled_alerts
