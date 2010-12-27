@@ -3,12 +3,12 @@
 <% end %>
 
 <div id="blacklist-delete">
-  <%= link_to "Delete this blacklist", { :action => "destroy", :id => @blacklist.id }, :confirm => "Really delete this blacklist with all it's terms?" %>
+  <%= link_to "Delete this blacklist", blacklist_path(@blacklist), :method => :delete, :confirm => "Really delete this blacklist with all it's terms?" %>
 </div>
 
 <h1>Blacklist <span class="highlighted"><%= @blacklist.title %></span></h1>
 
-<%= form_for @new_term, :url => { :controller => "blacklistedterms", :action => "create" } do |f| %>
+<%= form_for @new_term, :url => blacklist_terms_path(@blacklist) do |f| %>
   <%= f.hidden_field :blacklist_id, :value => @blacklist.id %>
   <%= f.label :term, "New term:" %>
   <%= f.text_field :term %>
@@ -24,7 +24,7 @@
       <% @blacklist.blacklisted_terms.each do |term| %>
         <li>
           <%=h term.term %>
-          <%= link_to image_tag("icons/delete.png", :style => "position: relative; top: -2px"), { :controller => "blacklistedterms", :action => "destroy", :id => term.id, :blacklist_id => @blacklist.id }, :class => "blocks-terms-delete" %>
+          <%= link_to image_tag("icons/delete.png", :style => "position: relative; top: -2px"), blacklist_term_path(@blacklist, term), :method => :delete, :class => "blocks-terms-delete" %>
         </li>
       <% end %>
     <% end %>

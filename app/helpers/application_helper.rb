@@ -200,7 +200,7 @@ module ApplicationHelper
         <span class=\"favorite-stream-sparkline\">
           #{sparkline_values(Message.stream_counts_of_last_minutes(stream.id, 10).map { |c| c[:count] })}
         </span>
-        #{link_to(h(stream.title), { :controller => 'streams', :action => 'show', :id => stream.id }, :class => 'favorite-streams-title')}
+        #{link_to(h(stream.title), stream_path(stream), :class => 'favorite-streams-title')}
     "
 
     if stream.alarm_active and !stream.alarm_limit.blank? and !stream.alarm_timespan.blank?
