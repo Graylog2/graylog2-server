@@ -13,11 +13,14 @@ Graylog2WebInterface::Application.routes.draw do
 
   resources :streams do
     resources :messages
+    resources :streamrules
     
     member do
       post :favorite
       post :unfavorite
       post :alertable
+      post :setdescription
+      post :showrange
     end
   end
   
