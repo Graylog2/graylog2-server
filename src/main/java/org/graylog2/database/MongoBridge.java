@@ -188,37 +188,4 @@ public class MongoBridge {
         }
     }
 
-    /**
-     * Write graph value for current time and given host to MongoDB graph collection.
-     *
-     * @param host
-     * @param value
-     */
-    public void writeGraphInformation(String host, int value) {
-        DBCollection coll = MongoConnection.getInstance().getDatabase().getCollection("graphs");
-
-        BasicDBObject obj = new BasicDBObject();
-        obj.put("host", host);
-        obj.put("value", value);
-        obj.put("created_at", (int) (System.currentTimeMillis()/1000));
-
-        coll.insert(obj);
-    }
-
-    /**
-     * Purge graph information from MongoDB graph collection that is older than
-     * the given date.
-     *
-     * @param host
-     * @param since Date to purge to as UNIX timestamp
-     */
-    public void purgeOldGraphInformation(String host, int since) {
-        DBCollection coll = MongoConnection.getInstance().getDatabase().getCollection("graphs");
-
-        BasicDBObject query = new BasicDBObject();
-        query.put("host", host);
-        query.put("created_at", new BasicDBObject("$lt", since));
-
-        coll.remove(query);
-    }
 }
