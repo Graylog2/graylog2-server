@@ -72,7 +72,7 @@ module ApplicationHelper
   end
 
   def syslog_facility_to_human facility
-    return "GELF" if facility == nil
+    return "GELF" if facility == nil or facility < 0
 
     case facility.to_i
       when  0 then return "kernel"
