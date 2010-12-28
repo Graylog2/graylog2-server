@@ -1,17 +1,18 @@
 class Message
   include MongoMapper::Document
 
-  FIELDS = %w(message date host level facility deleted  gelf full_message type file line)
-  SPECIAL_FIELDS = %w(_id created_at)
+  FIELDS = %w(message date host level facility deleted  gelf full_message type file line version timestamp created_at)
+  SPECIAL_FIELDS = %w(_id)
 
+  key :_version, Integer
+  key :_timestamp, Integer
   key :_message, String
   key :_date, String
   key :_host, String
   key :_level, Integer
   key :_facility, Integer
   key :_deleted, Boolean
-
-  # GELF fields
+  key :_created_at, Integer
   key :_gelf, Boolean
   key :_full_message, String
   key :_type, Integer
@@ -241,9 +242,8 @@ class Message
   
   def additional_fields
     additional = []
-    all_fields = FIELDS + SPECIAL_FIELDS
     self.keys.each do |key, value|
-      next if all_fields.include?(key)
+      next if key[0] == "_"
       additional << { :key => key, :value => self[key] }
     end
     return additional

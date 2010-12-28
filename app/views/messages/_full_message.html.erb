@@ -9,7 +9,7 @@
 <h4>Severity: <span class="highlighted"><%= syslog_level_to_human(@message.level) %></span></h4>
 
 <% unless @message.file.blank?  %>
-  <h4>File: <span class="highlighted"><%=h @message.file %><%= @message.line.blank? ? nil : ":#{h(@message.line)}" %></span></h4>
+  <h4>File: <span class="highlighted"><%=h @message.file %><%= @message.line.blank? or @message.line == -1 ? nil : ":#{h(@message.line)}" %></span></h4>
 <% end %>
 
 <% if @message.has_additional_fields %>
