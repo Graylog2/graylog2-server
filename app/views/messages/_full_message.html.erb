@@ -6,7 +6,13 @@
 
 <h4>From: <span class="highlighted"><%= @message.host %></span></h4>
 <h4>Received: <span class="highlighted"><%= gl_date(Time.at(@message.created_at)) %></span></h4>
+
+<% unless @message.timestamp.blank? %>
+  <h4>Local time: <span class="highlighted"><%= gl_date(Time.at(@message.timestamp)-Time.now.utc_offset) %></span></h4>
+<% end %>
+
 <h4>Severity: <span class="highlighted"><%= syslog_level_to_human(@message.level) %></span></h4>
+<h4>Facility: <span class="highlighted"><%= syslog_facility_to_human(@message.facility) %></span></h4>
 
 <% unless @message.file.blank?  %>
   <h4>File: <span class="highlighted"><%=h @message.file %><%= @message.line.blank? or @message.line == -1 ? nil : ":#{h(@message.line)}" %></span></h4>
