@@ -32,13 +32,34 @@ import java.util.Map;
  */
 public class GELFMessage {
 
+    private String version = null;
     private String shortMessage = null;
     private String fullMessage = null;
     private int level = 0;
     private String host = null;
     private String file = null;
     private int line = 0;
+    private int timestamp = 0;
+    private String facility = null;
     private Map<String, String> additionalData = new HashMap<String, String>();
+
+    /**
+     * Get the version
+     *
+     * @return
+     */
+    public String getVersion() {
+        return version;
+    }
+
+    /**
+     * Set the version
+     *
+     * @param version
+     */
+    public void setVersion(String version) {
+        this.version = version;
+    }
 
     /**
      * Get the short message
@@ -149,6 +170,34 @@ public class GELFMessage {
     }
 
     /**
+     * @return the timestamp
+     */
+    public int getTimestamp() {
+        return timestamp;
+    }
+
+    /**
+     * @param timestamp the timestamp to set
+     */
+    public void setTimestamp(int timestamp) {
+        this.timestamp = timestamp;
+    }
+
+    /**
+     * @return the facility
+     */
+    public String getFacility() {
+        return facility;
+    }
+
+    /**
+     * @param facility the facility to set
+     */
+    public void setFacility(String facility) {
+        this.facility = facility;
+    }
+
+    /**
      * Get additional data map. (Fully user defined key/value pairs)
      *
      * @return The whole additional data map.
@@ -165,6 +214,20 @@ public class GELFMessage {
     }
 
     /**
+     * GELF specs (https://github.com/Graylog2/graylog2-docs/wiki/GELF) define that the following fields
+     * must be set: _version, _short_message, _host
+     *
+     * @return boolean
+     */
+    public boolean allRequiredFieldsSet() {
+        if(this.getVersion() == null || this.getShortMessage() == null || this.getHost() == null
+                || this.getVersion().length() == 0 || this.getShortMessage().length() == 0 || this.getHost().length() == 0) {
+            return false;
+        }
+        return true;
+    }
+
+    /**
      * @return Human readable, descriptive and formatted string of this GELF message.
      */
     @Override public String toString() {
@@ -174,6 +237,8 @@ public class GELFMessage {
         str += "host: " + host + " | ";
         str += "file: " + file + " | ";
         str += "line: " + line + " | ";
+        str += "facility: " + facility + " | ";
+        str += "version: " + version + " | ";
         str += "additional: " + this.additionalData.size();
 
         // Replace all newlines and tabs.
@@ -187,4 +252,5 @@ public class GELFMessage {
 
         return ret;
     }
+
 }

@@ -74,10 +74,22 @@ public final class GELF {
     public static final int GELF_DATA_PART_MAX_LENGTH = 8192-GELF_HEADER_LENGTH;
 
     /**
+     * The standard value of the _facility field.
+     * https://github.com/Graylog2/graylog2-docs/wiki/GELF
+     */
+    public static final String STANDARD_FACILITY_VALUE = "GELF";
+
+    /**
+     * The standard value of the _level field.
+     * https://github.com/Graylog2/graylog2-docs/wiki/GELF
+     */
+    public static final int STANDARD_LEVEL_VALUE = 4;
+
+    /**
      * The prefix for GELF standard fields.
      * https://github.com/Graylog2/graylog2-docs/wiki/GELF
      */
-    public static final String STANDARD_FIELD_PREFIX = "gelf";
+    public static final String STANDARD_FIELD_PREFIX = "_";
 
     private GELF() { }
 

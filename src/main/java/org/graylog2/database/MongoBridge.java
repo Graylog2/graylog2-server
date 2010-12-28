@@ -31,6 +31,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import org.graylog2.Main;
+import org.graylog2.Tools;
 import org.graylog2.messagehandlers.gelf.GELFMessage;
 
 import org.productivity.java.syslog4j.server.SyslogServerEventIF;
@@ -89,7 +90,7 @@ public class MongoBridge {
         dbObj.put("host", event.getHost());
         dbObj.put("facility", event.getFacility());
         dbObj.put("level", event.getLevel());
-        dbObj.put("created_at", (int) (System.currentTimeMillis()/1000));
+        dbObj.put("created_at", Tools.getUTCTimestamp());
         // Documents in capped collections cannot grow so we have to do that now and cannot just add 'deleted => true' later.
         dbObj.put("deleted", false);
 
@@ -104,21 +105,24 @@ public class MongoBridge {
      */
     public void insertGelfMessage(GELFMessage message) throws Exception {
         // Check if all required parameters are set.
-        if (message.getShortMessage() == null || message.getHost() == null  || message.getShortMessage().length() == 0 || message.getHost().length() == 0) {
-            throw new Exception("Missing GELF message parameters. short_message and host are required.");
+        if (!message.allRequiredFieldsSet()) {
+            throw new Exception("Missing GELF message parameters. _version, _short_message and _host are required.");
         }
+
         DBCollection coll = this.getMessagesColl();
 
         BasicDBObject dbObj = new BasicDBObject();
 
         dbObj.put("gelf", true);
+        dbObj.put("version", message.getVersion());
         dbObj.put("message", message.getShortMessage());
         dbObj.put("full_message", message.getFullMessage());
         dbObj.put("file", message.getFile());
         dbObj.put("line", message.getLine());
         dbObj.put("host", message.getHost());
-        dbObj.put("facility", null);
+        dbObj.put("facility", message.getFacility());
         dbObj.put("level", message.getLevel());
+        dbObj.put("timestamp", message.getTimestamp());
 
         // Add additional fields. XXX PERFORMANCE
         Map<String,String> additionalFields = message.getAdditionalData();
@@ -130,7 +134,7 @@ public class MongoBridge {
             dbObj.put(key, value);
         }
 
-        dbObj.put("created_at", (int) (System.currentTimeMillis()/1000));
+        dbObj.put("created_at", Tools.getUTCTimestamp());
         // Documents in capped collections cannot grow so we have to do that now and cannot just add 'deleted => true' later.
         dbObj.put("deleted", false);
 

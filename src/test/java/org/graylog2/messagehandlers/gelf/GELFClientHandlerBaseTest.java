@@ -31,8 +31,8 @@ import static org.junit.Assert.*;
  */
 public class GELFClientHandlerBaseTest {
 
-    private String originalMessage = "{\"gelf_short_message\":\"something.\",\"gelf_full_message\":\"lol!\",\"gelf_host\":\"somehost\",\"gelf_level\":2,\"gelf_file\":\"example.php\",\"gelf_line\":1337}";
-    private String originalMessageWithAdditionalData = "{\"gelf_short_message\":\"something.\",\"gelf_full_message\":\"lol!\",\"gelf_host\":\"somehost\",\"gelf_level\":2,\"gelf_file\":\"example.php\",\"gelf_line\":1337,\"s1\":\"yes\", ,\"s2\":\"yes, really\"}";
+    private String originalMessage = "{\"_short_message\":\"something.\",\"_full_message\":\"lol!\",\"_host\":\"somehost\",\"_level\":2,\"_file\":\"example.php\",\"_line\":1337}";
+    private String originalMessageWithAdditionalData = "{\"_short_message\":\"something.\",\"_full_message\":\"lol!\",\"_host\":\"somehost\",\"_level\":2,\"_file\":\"example.php\",\"_line\":1337,\"s1\":\"yes\", ,\"s2\":\"yes, really\"}";
 
     public GELFClientHandlerBaseTest() {
     }

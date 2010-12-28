@@ -20,11 +20,10 @@
 
 package org.graylog2.messagehandlers.gelf;
 
-import java.util.ArrayList;
 import java.util.Iterator;
-import java.util.List;
 import java.util.Set;
 import org.graylog2.Log;
+import org.graylog2.Tools;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.JSONValue;
@@ -53,12 +52,37 @@ class GELFClientHandlerBase {
         }
 
         // Add standard fields.
-        this.message.setShortMessage(this.jsonToString(json.get(GELF.STANDARD_FIELD_PREFIX + "_short_message")));
-        this.message.setFullMessage(this.jsonToString(json.get(GELF.STANDARD_FIELD_PREFIX + "_full_message")));
-        this.message.setLevel(this.jsonToInt(json.get(GELF.STANDARD_FIELD_PREFIX + "_level")));
-        this.message.setHost(this.jsonToString(json.get(GELF.STANDARD_FIELD_PREFIX + "_host")));
-        this.message.setFile(this.jsonToString(json.get(GELF.STANDARD_FIELD_PREFIX + "_file")));
-        this.message.setLine(this.jsonToInt(json.get(GELF.STANDARD_FIELD_PREFIX + "_line")));
+
+        this.message.setVersion(this.jsonToString(json.get(GELF.STANDARD_FIELD_PREFIX + "version")));
+        this.message.setHost(this.jsonToString(json.get(GELF.STANDARD_FIELD_PREFIX + "host")));
+        this.message.setShortMessage(this.jsonToString(json.get(GELF.STANDARD_FIELD_PREFIX + "short_message")));
+        this.message.setFullMessage(this.jsonToString(json.get(GELF.STANDARD_FIELD_PREFIX + "full_message")));
+        this.message.setFile(this.jsonToString(json.get(GELF.STANDARD_FIELD_PREFIX + "file")));
+        this.message.setLine(this.jsonToInt(json.get(GELF.STANDARD_FIELD_PREFIX + "line")));
+
+        // Level is set by server if not specified by client.
+        int level = this.jsonToInt(json.get(GELF.STANDARD_FIELD_PREFIX + "level"));
+        if (level > -1) {
+            this.message.setLevel(level);
+        } else {
+            this.message.setLevel(GELF.STANDARD_LEVEL_VALUE);
+        }
+
+        // Facility is set by server if not specified by client.
+        String facility = this.jsonToString(json.get(GELF.STANDARD_FIELD_PREFIX + "facility"));
+        if (facility == null || facility.length() == 0) {
+            this.message.setFacility(GELF.STANDARD_FACILITY_VALUE);
+        } else {
+            this.message.setFacility(facility);
+        }
+
+        // Timestamp is set by server if not specified by client.
+        int ts = this.jsonToInt(json.get(GELF.STANDARD_FIELD_PREFIX + "timestamp"));
+        if (ts > -1) {
+            this.message.setTimestamp(ts);
+        } else {
+            this.message.setTimestamp(Tools.getUTCTimestamp());
+        }
 
         // Add additional data if there is some.
         Set<String> set = json.keySet();
@@ -116,7 +140,7 @@ class GELFClientHandlerBase {
             }
         } catch(Exception e) {}
 
-        return 0;
+        return -1;
     }
 
     protected String getClientMessage() {

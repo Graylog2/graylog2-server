@@ -164,4 +164,12 @@ public final class Tools {
         return new String(out.toByteArray(), "UTF-8");
     }
 
+    /**
+     *
+     * @return The current UTC UNIX timestamp.
+     */
+    public static int getUTCTimestamp() {
+       return (int) (System.currentTimeMillis()/1000);
+    }
+
 }
