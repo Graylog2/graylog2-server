@@ -152,8 +152,8 @@ class StreamsController < ApplicationController
     else
       flash[:error] = "Could not delete stream"
     end
-    stream.save
-    redirect_to stream_path(stream)
+    
+    redirect_to :action => "index"
   end
   
   def tabs
