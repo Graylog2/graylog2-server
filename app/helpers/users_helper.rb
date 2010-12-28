@@ -90,4 +90,8 @@ module UsersHelper
     end
   end
 
+  def show_streams?(user)
+    user.role.blank? or user.role == "admin" ? "none" : "block"
+  end
+
 end

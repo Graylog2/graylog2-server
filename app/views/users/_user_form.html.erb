@@ -17,10 +17,13 @@
   <dd><%= f.password_field :password_confirmation %><%= @user.errors[:password_confirmation].join(" and ")%></dd>
 
   <dt><%= label_tag 'role', 'Rolle'%></dt>
-  <dd><%= f.select(:role, user.valid_roles.collect {|r| [r.to_s.capitalize, r.to_s]}, :selected => "admin")%><%= @user.errors[:role].join(" and ")%></dd>
+  <dd>
+    <%= f.select(:role, user.valid_roles.collect {|r| [r.to_s.capitalize, r.to_s]}, :selected => (@user.role.blank? ? "admin" : @user.role)) %>
+    <%= @user.errors[:role].join(" and ")%>
+  </dd>
 
-  <dt class="users-streams"><%= label_tag 'streams', 'Streams' %></dt>
-  <dd class="users-streams">
+  <dt class="users-streams" style="display: <%= show_streams?(@user) %>;"><%= label_tag 'streams', 'Streams' %></dt>
+  <dd class="users-streams" style="display: <%= show_streams?(@user) %>">
     <% Stream.all.each do |stream| %>
       <%= check_box_tag "user[stream_ids][]", stream.id, user.streams.include?(stream) -%><%= stream.title -%>
     <% end %>
