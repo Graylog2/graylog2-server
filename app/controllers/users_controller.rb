@@ -4,7 +4,7 @@ class UsersController < ApplicationController
   end
 
   if User.count == 0
-    skip_before_filter :login_required, :only => [:new, :create]
+    skip_before_filter :login_required, :only => [:first, :create]
     layout "login"
   end
 
@@ -17,6 +17,10 @@ class UsersController < ApplicationController
   end
 
   def new
+    @user = User.new
+  end
+
+  def first
     @user = User.new
   end
 
