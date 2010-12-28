@@ -40,7 +40,7 @@ public class GELFMessage {
     private String file = null;
     private int line = 0;
     private int timestamp = 0;
-    private String facility = null;
+    private int facility = -1;
     private Map<String, String> additionalData = new HashMap<String, String>();
 
     /**
@@ -186,14 +186,14 @@ public class GELFMessage {
     /**
      * @return the facility
      */
-    public String getFacility() {
+    public int getFacility() {
         return facility;
     }
 
     /**
      * @param facility the facility to set
      */
-    public void setFacility(String facility) {
+    public void setFacility(int facility) {
         this.facility = facility;
     }
 

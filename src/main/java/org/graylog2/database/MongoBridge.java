@@ -114,15 +114,15 @@ public class MongoBridge {
         BasicDBObject dbObj = new BasicDBObject();
 
         dbObj.put("gelf", true);
-        dbObj.put("version", message.getVersion());
-        dbObj.put("message", message.getShortMessage());
-        dbObj.put("full_message", message.getFullMessage());
-        dbObj.put("file", message.getFile());
-        dbObj.put("line", message.getLine());
-        dbObj.put("host", message.getHost());
-        dbObj.put("facility", message.getFacility());
-        dbObj.put("level", message.getLevel());
-        dbObj.put("timestamp", message.getTimestamp());
+        dbObj.put("_version", message.getVersion());
+        dbObj.put("_message", message.getShortMessage());
+        dbObj.put("_full_message", message.getFullMessage());
+        dbObj.put("_file", message.getFile());
+        dbObj.put("_line", message.getLine());
+        dbObj.put("_host", message.getHost());
+        dbObj.put("_facility", message.getFacility()); 
+        dbObj.put("_level", message.getLevel());
+        dbObj.put("_timestamp", message.getTimestamp());
 
         // Add additional fields. XXX PERFORMANCE
         Map<String,String> additionalFields = message.getAdditionalData();
