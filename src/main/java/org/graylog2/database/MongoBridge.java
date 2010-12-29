@@ -64,11 +64,12 @@ public class MongoBridge {
             coll = MongoConnection.getInstance().getDatabase().createCollection("messages", BasicDBObjectBuilder.start().add("capped", true).add("size", messagesCollSize).get());
         }
 
-        // XXX PERFORMANCE
         coll.ensureIndex(new BasicDBObject("created_at", 1));
-        coll.ensureIndex(new BasicDBObject("host", 1));
-        coll.ensureIndex(new BasicDBObject("facility", 1));
-        coll.ensureIndex(new BasicDBObject("level", 1));
+        coll.ensureIndex(new BasicDBObject("deleted", 1));
+        coll.ensureIndex(new BasicDBObject("_host", 1));
+        coll.ensureIndex(new BasicDBObject("_message", 1));
+        coll.ensureIndex(new BasicDBObject("_facility", 1));
+        coll.ensureIndex(new BasicDBObject("_level", 1));
 
         return coll;
     }
@@ -83,10 +84,10 @@ public class MongoBridge {
         DBCollection coll = this.getMessagesColl();
 
         BasicDBObject dbObj = new BasicDBObject();
-        dbObj.put("message", event.getMessage());
-        dbObj.put("host", event.getHost());
-        dbObj.put("facility", event.getFacility());
-        dbObj.put("level", event.getLevel());
+        dbObj.put("_message", event.getMessage());
+        dbObj.put("_host", event.getHost());
+        dbObj.put("_facility", event.getFacility());
+        dbObj.put("_level", event.getLevel());
         dbObj.put("created_at", Tools.getUTCTimestamp());
         // Documents in capped collections cannot grow so we have to do that now and cannot just add 'deleted => true' later.
         dbObj.put("deleted", false);
