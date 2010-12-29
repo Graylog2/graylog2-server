@@ -23,11 +23,8 @@ package org.graylog2.database;
 import com.mongodb.DBCollection;
 import com.mongodb.BasicDBObject;
 import com.mongodb.BasicDBObjectBuilder;
+import com.mongodb.WriteConcern;
 import java.util.Iterator;
-
-import org.graylog2.Log;
-
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import org.graylog2.Main;
@@ -142,54 +139,19 @@ public class MongoBridge {
     }
 
     /**
-     * Builds the "host" collection by distincting all hosts
-     * from the messages table.
+     * Atomically increments counter of host in "hosts" collection by one.
      *
-     * @throws Exception
+     * @param hostname The host to increment.
      */
-    public void distinctHosts() throws Exception {
-        // Fetch all hosts.
-        DBCollection messages = this.getMessagesColl();
-        List<String> hosts = messages.distinct("host");
+    public void upsertHost(String hostname) {
+        BasicDBObject query = new BasicDBObject();
+        query.put("host", hostname);
 
-        DBCollection coll = null;
+        BasicDBObject update = new BasicDBObject();
+        update.put("$inc", new BasicDBObject("message_count", 1));
 
-        // Create a capped collection if the collection does not yet exist.
-        if(MongoConnection.getInstance().getDatabase().getCollectionNames().contains("hosts")) {
-            coll = MongoConnection.getInstance().getDatabase().getCollection("hosts");
-        } else {
-            coll = MongoConnection.getInstance().getDatabase().createCollection("hosts", new BasicDBObject());
-        }
-
-        coll.ensureIndex(new BasicDBObject("name", 1));
-
-        // Truncate host collection.
-        coll.remove(new BasicDBObject());
-        
-        // Go trough every host and insert.
-        for (String host : hosts) {
-            try {
-                // Skip hosts with no name.
-                if (host != null && host.length() > 0) {
-                    // Get message count of this host.
-                    BasicDBObject countQuery = new BasicDBObject();
-                    countQuery.put("deleted", false);
-                    countQuery.put("host", host);
-                    long messageCount = messages.getCount(countQuery);
-
-                    // Build document.
-                    BasicDBObject doc = new BasicDBObject();
-                    doc.put("host", host);
-                    doc.put("message_count", messageCount);
-
-                    // Store document.
-                    coll.insert(doc);
-                }
-            } catch (Exception e) {
-                Log.crit("Could not insert distinct host: " + e.toString());
-                e.printStackTrace();
-            }
-        }
+        DBCollection coll = MongoConnection.getInstance().getDatabase().getCollection("hosts");
+        coll.update(query, update, true, false);
     }
 
 }

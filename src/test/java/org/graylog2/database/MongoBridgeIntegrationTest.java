@@ -135,31 +135,4 @@ public class MongoBridgeIntegrationTest {
         assertEquals(res.get("something"), "yepp");
     }
 
-    /**
-     * Test of distinctHosts method, of class MongoBridge.
-     */
-    @Test
-    public void testDistinctHosts() throws Exception {
-        DB db = MongoConnection.getInstance().getDatabase();
-        MongoBridge m = new MongoBridge();
-
-        // Insert a message.
-        GELFMessage message = new GELFMessage();
-        message.setShortMessage("test");
-        message.setHost("host1");
-        m.insertGelfMessage(message);
-
-        // Second message from another host
-        message.setHost("host2");
-        m.insertGelfMessage(message);
-
-        // Distinct the hosts.
-        m.distinctHosts();
-
-        DBCollection coll = db.getCollection("hosts");
-
-        List<String> hosts = coll.distinct("host");
-        assertTrue(hosts.size() == 2);
-    }
-
 }

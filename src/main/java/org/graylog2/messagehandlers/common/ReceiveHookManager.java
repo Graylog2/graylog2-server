@@ -34,7 +34,7 @@ public final class ReceiveHookManager {
     /**
      * @param hook The hook to call.
      */
-    public static void postProcess(MessagePostReceiveHookIF hook) {
-        hook.process();
+    public static void postProcess(MessagePostReceiveHookIF hook, Object message) {
+        hook.process(message);
     }
 }

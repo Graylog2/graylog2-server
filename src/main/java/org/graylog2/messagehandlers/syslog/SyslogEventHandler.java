@@ -24,6 +24,7 @@ import org.graylog2.Log;
 import org.graylog2.Main;
 import org.graylog2.Tools;
 import org.graylog2.database.MongoBridge;
+import org.graylog2.messagehandlers.common.HostUpsertHook;
 import org.graylog2.messagehandlers.common.MessageCounterHook;
 import org.graylog2.messagehandlers.common.ReceiveHookManager;
 import org.productivity.java.syslog4j.server.SyslogServerEventHandlerIF;
@@ -61,8 +62,11 @@ public class SyslogEventHandler implements SyslogServerEventHandlerIF {
 
             m.insert(event);
 
-            // This is doing the upcounting for Graphs.
-            ReceiveHookManager.postProcess(new MessageCounterHook());
+            // This is doing the upcounting for statistics.
+            ReceiveHookManager.postProcess(new MessageCounterHook(), event);
+
+            // Counts up host in hosts collection.
+            ReceiveHookManager.postProcess(new HostUpsertHook(), event);
         } catch (Exception e) {
             Log.crit("Could not insert syslog event into database: " + e.toString());
         }

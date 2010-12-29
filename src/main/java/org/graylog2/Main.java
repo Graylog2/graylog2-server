@@ -21,7 +21,6 @@
 package org.graylog2;
 
 import java.io.BufferedWriter;
-import org.graylog2.periodical.HostDistinctThread;
 import org.graylog2.messagehandlers.syslog.SyslogServerThread;
 import org.graylog2.messagehandlers.gelf.GELFMainThread;
 import org.graylog2.messagehandlers.gelf.GELF;
@@ -195,11 +194,6 @@ public final class Main {
             
             System.out.println("[x] GELF threads are up.");
         }
-
-        // Start the thread that distincts hosts.
-        HostDistinctThread hostDistinctThread = new HostDistinctThread();
-        hostDistinctThread.start();
-        System.out.println("[x] Host distinction thread is up.");
 
         if (Main.printLoadStats) {
             // Start thread that prints out load statistics.

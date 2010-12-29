@@ -20,19 +20,34 @@
 
 package org.graylog2.messagehandlers.common;
 
+import org.graylog2.database.MongoBridge;
+import org.graylog2.messagehandlers.gelf.GELFMessage;
+import org.productivity.java.syslog4j.server.impl.event.SyslogServerEvent;
+
 /**
- * MessageCounterHook.java: Aug 19, 2010 5:56:21 PM
+ * HostUpsertHook.java: Dec 29, 2010 2:57:52 PM
  *
- * Counts up the total of received messages.
+ * Updates the host collection.
  *
  * @author: Lennart Koopmann <lennart@socketfeed.com>
  */
-public class MessageCounterHook implements MessagePostReceiveHookIF {
+public class HostUpsertHook implements MessagePostReceiveHookIF {
 
     /**
      * Process the hook.
      */
     public void process(Object message) {
-        MessageCounter.getInstance().countUp(MessageCounter.ALL_HOSTS);
+        String hostname = "";
+        if (message.getClass().toString().equals("class org.graylog2.messagehandlers.gelf.GELFMessage")) {
+            GELFMessage msg = (GELFMessage) message;
+            hostname = msg.getHost();
+        } else if (message.getClass().toString().equals("class org.productivity.java.syslog4j.server.impl.event.SyslogServerEvent")) {
+            SyslogServerEvent msg = (SyslogServerEvent) message;
+            hostname = msg.getHost();
+        }
+
+        MongoBridge m = new MongoBridge();
+        m.upsertHost(hostname);
     }
+
 }
