@@ -242,9 +242,9 @@ class Message
   
   def additional_fields
     additional = []
-    self.keys.each do |key, value|
-      next if key[0] == "_"
-      additional << { :key => key, :value => self[key] }
+    self.attributes.each do |key, value|
+      next if key.length <= 2 or key[0] == "_" or key[0..1] != "a_"
+      additional << { :key => key[2..-1], :value => self[key] }
     end
     return additional
   end
