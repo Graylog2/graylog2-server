@@ -26,7 +26,7 @@ messages in the last <%=h message_count_interval %> minutes.
     <dd><%= text_field_tag "filters[message]", params[:filters].blank? ? nil : params[:filters][:message] %></dd>
 
     <dt><%= label_tag "filters[date]", "Timeframe:" %></dt>
-    <dd><%= text_field_tag "filters[date]", params[:filters].blank? ? nil : params[:filters][:date] %></dd>
+    <dd><%= text_field_tag "filters[date]", params[:filters].blank? ? nil : params[:filters][:date] %> <%=raw tooltip("Timeframe-Filters") %></dd>
    
     <dt><%= label_tag "filters[facility]", "Facility:" %></dt>
     <dd><%= select_tag "filters[facility]", raw("<option></option>" + options_for_select(get_ordered_facilities_for_select, :selected => get_quickfilter_selected(params[:filters], :facility))) %></dd>

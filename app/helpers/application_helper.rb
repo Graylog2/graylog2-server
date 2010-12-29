@@ -242,6 +242,10 @@ module ApplicationHelper
     link_to(title, "#", options)
   end
 
+  def tooltip(to)
+    link_to(image_tag("icons/tooltip.png"), "https://github.com/Graylog2/graylog2-web-interface/wiki/" + to, :class => "tooltip", :target => "_blank", :title => "Help page in the wiki")
+  end
+
   private
 
   def is_current_menu_item? item
