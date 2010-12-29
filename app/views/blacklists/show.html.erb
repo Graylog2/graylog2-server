@@ -10,7 +10,7 @@
 
 <%= form_for @new_term, :url => { :controller => "blacklistedterms", :action => "create" } do |f| %>
   <%= f.hidden_field :blacklist_id, :value => @blacklist.id %>
-  <%= f.label :term, "New term:" %>
+  <%= f.label :term, "New term (regex):" %>
   <%= f.text_field :term %>
   <%= awesome_submit_link "Add" %>
 <% end %>

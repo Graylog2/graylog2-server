@@ -13,7 +13,7 @@ class Streamrule < ActiveRecord::Base
 
   def self.get_types_for_select_options
     {
-      "Message" => self::TYPE_MESSAGE,
+      "Message (regex)" => self::TYPE_MESSAGE,
       "Timeframe" => self::TYPE_TIMEFRAME,
       "Host" => self::TYPE_HOST,
       "Severity" => self::TYPE_SEVERITY,
@@ -24,7 +24,7 @@ class Streamrule < ActiveRecord::Base
   def to_condition(op = "$in")
     case rule_type
     when TYPE_MESSAGE then
-      return {:message => /#{Regexp.escape value}/}
+      return {:message => /#{value}/}
     when TYPE_HOST then
       return {:host => {op => [value]}}
     when TYPE_SEVERITY then

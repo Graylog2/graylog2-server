@@ -22,7 +22,7 @@ messages in the last <%=h message_count_interval %> minutes.
 <div id="messages-quickfilter" style="display: none;">
 <%= form_tag('/', :method => :get) do -%>
   <dl id="messages-quickfilter-fields">
-    <dt><%= label_tag "filters[:message]", "Message:" %></dt>
+    <dt><%= label_tag "filters[:message]", "Message (regex):" %></dt>
     <dd><%= text_field_tag "filters[message]", params[:filters].blank? ? nil : params[:filters][:message] %></dd>
 
     <dt><%= label_tag "filters[date]", "Timeframe:" %></dt>
@@ -40,6 +40,7 @@ messages in the last <%=h message_count_interval %> minutes.
  
     </dd>
   </dl>
+
   <%= awesome_submit_link "Filter" %>
 <% end -%>
 </div>

@@ -15,7 +15,7 @@ class BlacklistedTerm < ActiveRecord::Base
 
     conditions = Array.new
     terms.each do |term|
-      conditions << /#{Regexp.escape(term.term)}/
+      conditions << /#{term.term}/
     end
 
     return conditions if without_modifier

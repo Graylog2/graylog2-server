@@ -36,10 +36,10 @@ class Message
 
   LIMIT = 100
   scope :not_deleted, :deleted => [false, nil]
-  scope :by_blacklisted_terms, lambda { |terms|
-    where(:message.nin => terms.collect { |term| /#{Regexp.escape term}/})
-  }
+  scope :by_blacklisted_terms, lambda { |terms| where(:message.nin => terms.collect { |term| /#{term}/}) }
+  scope :of_blacklisted_terms, lambda { |terms| where(:message.in => terms.collect { |term| /#{term}/}) }
   scope :by_blacklist, lambda {|blacklist| by_blacklisted_terms(blacklist.all_terms)}
+  scope :of_blacklist, lambda {|blacklist| of_blacklisted_terms(blacklist.all_terms)}
   scope :page, lambda {|number| skip(self.get_offset(number))}
   scope :default_scope, fields(:full_message => 0).order("$natural DESC").not_deleted.limit(LIMIT)
 
@@ -64,7 +64,7 @@ class Message
     page = 1 if page.blank?
     
     b = Blacklist.find(id)
-    return by_blacklist(b).default_scope.page(page).all
+    return of_blacklist(b).default_scope.page(page).all
   end
 
   def self.count_of_blacklist id
@@ -86,7 +86,7 @@ class Message
 
     unless filters.blank?
       # Message
-      conditions = conditions.where(:message => /#{Regexp.escape(filters[:message].strip)}/) unless filters[:message].blank?
+      conditions = conditions.where(:message => /#{filters[:message].strip}/) unless filters[:message].blank?
 
       # Time Frame
       conditions = conditions.where(:created_at => get_conditions_from_date(filters[:date])) unless filters[:date].blank?
