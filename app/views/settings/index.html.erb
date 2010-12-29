@@ -33,8 +33,9 @@
     <%= text_field_tag 'value', Setting.get_message_max_count(current_user) %>
     <%= awesome_submit_link 'Store' %>
     <br />
-    The number of maximum messages per [message count interval] minutes. Everything above this value is an alarm. For example visible in the dashboard. 
-    (Default: <%=h Setting::TYPE_MESSAGE_MAX_COUNT %>)
+    The number of maximum messages per [message count interval] minutes. Everything above this value is an alarm. For example visible in the dashboard. Get alarms
+    via the Nagios hook <%= tooltip("Nagios-hook") %> or general notifications <%= tooltip("Notifications") %>.
+    (Default: <%=h Setting::TYPE_MESSAGE_MAX_COUNT_STANDARD %>)
   <% end -%>
 </div>
 
