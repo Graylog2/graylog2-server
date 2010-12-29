@@ -217,6 +217,9 @@ $(document).ready(function(){
       });
     });
 
+    // Set sidebar to a fixed height to get the scrollbar in lower resolutions.
+    $("#sidebar").css("height", $(window).height()-120);
+
 });
 
 function buildHostCssId(id) {

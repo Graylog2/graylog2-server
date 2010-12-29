@@ -302,6 +302,7 @@ label {
 
 #sidebar {
   margin-right: 15px;
+  overflow: auto;
 }
 
 #sidebar-inner {
