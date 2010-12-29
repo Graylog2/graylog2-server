@@ -95,6 +95,11 @@ class GELFClientHandlerBase {
                 continue;
             }
 
+            // Skip if not starting with correct prefix.
+            if (!key.startsWith(GELF.USER_DEFINED_FIELD_PREFIX)) {
+                continue;
+            }
+
             // Add to message.
             this.message.addAdditionalData(key, this.jsonToString(json.get(key)));
         }
