@@ -72,7 +72,7 @@ module ApplicationHelper
   end
 
   def syslog_facility_to_human facility
-    return "GELF" if facility == nil or facility < 0
+    return "GELF" if facility == nil or facility.to_i < 0
 
     case facility.to_i
       when  0 then return "kernel"
@@ -196,7 +196,6 @@ module ApplicationHelper
 
   def stream_link(stream)
     ret = "
-      <li>
         <span class=\"favorite-stream-sparkline\">
           #{sparkline_values(Message.stream_counts_of_last_minutes(stream.id, 10).map { |c| c[:count] })}
         </span>
@@ -211,7 +210,6 @@ module ApplicationHelper
         </span>
       "
     end
-    ret += "</li>"
 
     return ret
   end
