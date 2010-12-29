@@ -1,19 +1,38 @@
 class Message
   include MongoMapper::Document
 
-  key :message, String
-  key :date, String
-  key :host, String
-  key :level, Integer
-  key :facility, Integer
-  key :deleted, Boolean
+  FIELDS = %w(message date host level facility deleted  gelf full_message type file line version timestamp created_at)
+  SPECIAL_FIELDS = %w(_id)
 
-  # GELF fields
-  key :gelf, Boolean
-  key :full_message, String
-  key :type, Integer
-  key :file, String
-  key :line, Integer
+  key :_version, Integer
+  key :_timestamp, Integer
+  key :_message, String
+  key :_date, String
+  key :_host, String
+  key :_level, Integer
+  key :_facility, Integer
+  key :_deleted, Boolean
+  key :_created_at, Integer
+  key :_gelf, Boolean
+  key :_full_message, String
+  key :_type, Integer
+  key :_file, String
+  key :_line, Integer
+
+
+  # temporary wrappers
+  FIELDS.each do |field|
+    _field = "_#{field}"
+
+    define_method(field) do
+      self.__send__(_field)
+    end
+
+    define_method(field + '=') do |value|
+      self.__send__(_field + '=', value)
+    end
+  end
+
 
   LIMIT = 100
   scope :not_deleted, :deleted => [false, nil]
@@ -222,15 +241,11 @@ class Message
   end
   
   def additional_fields
-    additional = Array.new
-
-    standard_fields = [ "created_at", "full_message", "line", "level", "_id", "deleted", "facility", "date", "type", "gelf", "file", "host", "message" ]
-
-    self.keys.each do |key, value|
-      next if standard_fields.include? key
-      additional << { :key => key, :value => self[key] }
+    additional = []
+    self.attributes.each do |key, value|
+      next if key.length <= 2 or key[0] == "_" or key[0..1] != "a_"
+      additional << { :key => key[2..-1], :value => self[key] }
     end
-
     return additional
   end
 

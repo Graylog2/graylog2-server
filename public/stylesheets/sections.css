@@ -304,6 +304,10 @@
     top: -15px;
 }
 
+.users-streams {
+  display: none;
+}
+
 /* Livetail */
 .content-livetail {
   background-color: #000 !important;

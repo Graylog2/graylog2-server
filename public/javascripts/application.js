@@ -217,6 +217,15 @@ $(document).ready(function(){
       });
     });
 
+    // User role settings in new user form.
+    $("#user_role").bind("change", function() {
+        if ($(this).val() == "reader") {
+          $(".users-streams").show();
+        } else {
+          $(".users-streams").hide();
+        }
+    });
+    
     // Set sidebar to a fixed height to get the scrollbar in lower resolutions.
     $("#sidebar").css("height", $(window).height()-120);
 

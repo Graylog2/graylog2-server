@@ -93,6 +93,7 @@ a {
 }
 
 .description {
-  display: none;
+  font-family: Georgia,"Times New Roman",Times,serif;
+  font-size: 15px;
+  line-height: 16px;
 }
-
