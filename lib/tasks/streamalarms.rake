@@ -1,6 +1,6 @@
 namespace :streamalarms do
 
-  desc "Alert all users who subscribed to a stream if it contains new messages"
+  desc "Alert all enabled users of a stream if it is above it's alarm limit."
   task :send => :environment do
     # Go through every stream that has enabled alerts.
     Stream.all_with_enabled_alerts.each do |stream_id|
