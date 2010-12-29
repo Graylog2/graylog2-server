@@ -19,6 +19,6 @@
 <h3>Favorited streams:</h3>
 <ul id="favorite-streams">
   <% @user.favorite_streams.each do |stream| %>
-    <%=raw stream_link(stream) %>
+    <li><%=raw stream_link(stream) %></li>
   <% end %>
 </ul>
