@@ -7,7 +7,7 @@
 </div>
 
 <% permitted_to? :create, :streams do %>
-  <%= form_for @new_stream, :url => { :action => "create" } do |f| %>
+  <%= form_for @new_stream, :url => streams_path do |f| %>
     <%= f.label :title, "Title:" %>
     <%= f.text_field :title %>
     <%= awesome_submit_link "Create Stream" %>
@@ -16,7 +16,7 @@
 
 <% @streams.each do |stream| %>
   <div class="blocks">
-    <span class="blocks-title"><%= link_to h(stream.title), { :action => "show", :id => stream.id } %></span>
+    <span class="blocks-title"><%= link_to h(stream.title), stream_path(stream) %></span>
     <ul class="blocks-termslist">
       <% if stream.streamrules.blank? %>
         <li>No rules</li>

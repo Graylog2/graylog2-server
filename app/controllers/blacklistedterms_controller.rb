@@ -9,7 +9,8 @@ class BlacklistedtermsController < ApplicationController
     else
       flash[:error] = "Could not add term to blacklist!"
     end
-    redirect_to :controller => "blacklists", :action => "show", :id => params[:blacklisted_term][:blacklist_id]
+    #redirect_to :controller => "blacklists", :action => "show", :id => params[:blacklisted_term][:blacklist_id]
+    redirect_to blacklist_path(params[:blacklist_id])
   end
   
   def destroy
@@ -19,6 +20,7 @@ class BlacklistedtermsController < ApplicationController
     else
       flash[:error] = "Could not remove term from blacklist."
     end
-    redirect_to :controller => "blacklists", :action => "show", :id => params[:blacklist_id]
+    #redirect_to :controller => "blacklists", :action => "show", :id => params[:blacklist_id]
+    redirect_to blacklist_path(params[:blacklist_id])
   end
 end

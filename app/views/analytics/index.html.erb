@@ -16,7 +16,7 @@
   </span>
 
   <div id="graph-rangeselector" style="display: none;">
-    <%= form_tag "/messages/showrange" do %>
+    <%= form_tag showrange_messages_path do %>
       <%= hidden_field_tag :from, nil, :id => "graph-rangeselector-from" %>
       <%= hidden_field_tag :to, nil, :id => "graph-rangeselector-to" %>
       <%= awesome_submit_link "Show messages in range" %>

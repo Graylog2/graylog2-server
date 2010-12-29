@@ -6,7 +6,7 @@
 </div>
 
 <h2>Add rule:</h2>
-<%= form_for @new_rule, :url => { :controller => "streamrules", :action => "create" } do |f| %>
+<%= form_for @new_rule, :url => stream_streamrules_path(@stream) do |f| %>
   <%= f.hidden_field :stream_id, :value => @stream.id %>
   <%= f.select :rule_type, options_for_select(Streamrule.get_types_for_select_options, :selected => Streamrule::TYPE_MESSAGE) %>
   <%= f.text_field :value, :class => "stream-value-field stream-value-message" %>
@@ -26,7 +26,7 @@
   <% else %>
     <% @stream.streamrules.each do |rule| %>
       <li>
-        <%= link_to(raw(streamrule_to_human(rule)), :controller => "streamrules", :action => "destroy", :id => rule.id, :stream_id => @stream.id) %>
+        <%= link_to(raw(streamrule_to_human(rule)), stream_streamrule_path(@stream, rule), :method => :delete) %>
       </li>
     <% end %>
   <% end %>
