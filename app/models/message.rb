@@ -36,12 +36,12 @@ class Message
 
   LIMIT = 100
   scope :not_deleted, :deleted => [false, nil]
-  scope :by_blacklisted_terms, lambda { |terms| where(:message.nin => terms.collect { |term| /#{term}/}) }
-  scope :of_blacklisted_terms, lambda { |terms| where(:message.in => terms.collect { |term| /#{term}/}) }
+  scope :by_blacklisted_terms, lambda { |terms| where(:_message.nin => terms.collect { |term| /#{term}/}) }
+  scope :of_blacklisted_terms, lambda { |terms| where(:_message.in => terms.collect { |term| /#{term}/}) }
   scope :by_blacklist, lambda {|blacklist| by_blacklisted_terms(blacklist.all_terms)}
   scope :of_blacklist, lambda {|blacklist| of_blacklisted_terms(blacklist.all_terms)}
   scope :page, lambda {|number| skip(self.get_offset(number))}
-  scope :default_scope, fields(:full_message => 0).order("$natural DESC").not_deleted.limit(LIMIT)
+  scope :default_scope, fields(:_full_message => 0).order("$natural DESC").not_deleted.limit(LIMIT)
 
   def self.get_conditions_from_date(timeframe)
     conditions = {}
@@ -86,19 +86,19 @@ class Message
 
     unless filters.blank?
       # Message
-      conditions = conditions.where(:message => /#{filters[:message].strip}/) unless filters[:message].blank?
+      conditions = conditions.where(:_message => /#{filters[:message].strip}/) unless filters[:message].blank?
 
       # Time Frame
       conditions = conditions.where(:created_at => get_conditions_from_date(filters[:date])) unless filters[:date].blank?
       
       # Facility
-      conditions = conditions.where(:facility => filters[:facility].to_i) unless filters[:facility].blank?
+      conditions = conditions.where(:_facility => filters[:facility].to_i) unless filters[:facility].blank?
 
       # Severity
-      conditions = conditions.where(:level => filters[:severity].to_i) unless filters[:severity].blank?
+      conditions = conditions.where(:_level => filters[:severity].to_i) unless filters[:severity].blank?
 
       # Host
-      conditions = conditions.where(:host => filters[:host]) unless filters[:host].blank?
+      conditions = conditions.where(:_host => filters[:host]) unless filters[:host].blank?
     end
     
     conditions.default_scope.limit(LIMIT).page(page)
@@ -221,7 +221,7 @@ class Message
   end
 
   def self.delete_all_of_host host
-    self.delete_all :conditions => { :host => host, :deleted => [false, nil] }
+    self.delete_all :conditions => { :_host => host, :deleted => [false, nil] }
   end
 
   def self.count_since x
