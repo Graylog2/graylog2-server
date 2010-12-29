@@ -24,15 +24,15 @@ class Streamrule < ActiveRecord::Base
   def to_condition(op = "$in")
     case rule_type
     when TYPE_MESSAGE then
-      return {:message => /#{value}/}
+      return {:_message => /#{value}/}
     when TYPE_HOST then
-      return {:host => {op => [value]}}
+      return {:_host => {op => [value]}}
     when TYPE_SEVERITY then
-      return {:level => {op => [value.to_i]}}
+      return {:_level => {op => [value.to_i]}}
     when TYPE_FACILITY then
-      return {:facility => {op => [value.to_i]}}
+      return {:_facility => {op => [value.to_i]}}
     when TYPE_TIMEFRAME then
-      return {:timeframe => value}
+      return {:_timeframe => value}
     end
   end
 
