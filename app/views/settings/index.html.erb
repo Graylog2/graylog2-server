@@ -38,6 +38,7 @@
   <% end -%>
 </div>
 
+<% if Configuration.livetail_enabled %>
 <div class="setting">
   <label>Live tail message history</label>
   <%= form_tag '/settings/store' do -%>
@@ -48,3 +49,4 @@
     The number of messages to keep as history in the live tail view. (Default: <%=h Setting::TYPE_LIVETAIL_ROW_COUNT_STANDARD %>)
   <% end -%>
 </div>
+<% end %>
