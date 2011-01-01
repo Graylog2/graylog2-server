@@ -1,0 +1,2 @@
+module FacilitiesHelper
+end

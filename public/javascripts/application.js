@@ -229,6 +229,13 @@ $(document).ready(function(){
     // Set sidebar to a fixed height to get the scrollbar in lower resolutions.
     $("#sidebar").css("height", $(window).height()-120);
 
+    // Facilities title change.
+    $(".facilities-edit-link").bind("click", function() {
+      $(this).hide();
+      $(this).parent().next().show();
+      return false;
+    });
+
 });
 
 function buildHostCssId(id) {

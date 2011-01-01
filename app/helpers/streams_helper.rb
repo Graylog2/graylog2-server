@@ -24,7 +24,7 @@ module StreamsHelper
       when Streamrule::TYPE_SEVERITY then
         value = "#{syslog_level_to_human(rule.value)} (#{h(rule.value.to_i)})"
       when Streamrule::TYPE_FACILITY then
-        value = "#{syslog_facility_to_human(rule.value)} (#{h(rule.value.to_i)})"
+        value = Facility.to_human(rule.value)
     end
 
     return "<span class=\"black\">#{type}</span>: <i>#{value}</i>"

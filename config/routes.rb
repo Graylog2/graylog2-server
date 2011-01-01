@@ -13,10 +13,14 @@ Graylog2WebInterface::Application.routes.draw do
     resources :blacklistedterms, :as => "terms"
   end
 
-  #resources :analytics
-
   resources :hosts do
     resources :messages
+  end
+
+  resources :facilities do
+    member do
+      post :changetitle
+    end
   end
 
   resources :streams do

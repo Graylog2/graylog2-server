@@ -447,3 +447,19 @@
 #sidebar-graph {
   margin-top: 10px;
 }
+
+/* Facilities */
+.facilities-edit {
+  display: none;
+  margin-left: 10px;
+}
+
+.facilities-edit label {
+  font-family: Georgia,"Times New Roman",Times,serif;
+  font-size: 16px;
+}
+
+.facilities-edit-link {
+  font-size: 12px;
+  color: #ccc;
+}
