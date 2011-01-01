@@ -54,6 +54,7 @@ namespace :subscriptions do
       stream.save
     end
 
+    Job.done(SubscribedStream::JOB_TITLE)
     puts "All done."
   end
 end

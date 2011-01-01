@@ -10,7 +10,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20101229202122) do
+ActiveRecord::Schema.define(:version => 20110101193142) do
 
   create_table "alerted_streams", :force => true do |t|
     t.integer  "stream_id"
@@ -54,6 +54,13 @@ ActiveRecord::Schema.define(:version => 20101229202122) do
 
   create_table "hostgroups", :force => true do |t|
     t.string   "name"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
+  create_table "jobs", :force => true do |t|
+    t.string   "title"
+    t.integer  "last_run"
     t.datetime "created_at"
     t.datetime "updated_at"
   end

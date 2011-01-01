@@ -2,6 +2,8 @@ class SubscribedStream < ActiveRecord::Base
   belongs_to :stream
   belongs_to :user
 
+  JOB_TITLE = "streamsubscription_check"
+
   def self.subscribed?(stream_id, user_id)
     self.count(:conditions => { :user_id => user_id, :stream_id => stream_id }) > 0
   end
@@ -17,10 +19,10 @@ class SubscribedStream < ActiveRecord::Base
   end
 
   def self.job_active?
-    last_check = Stream.maximum('last_subscription_check')
-    return false if last_check.blank?
-    
-    last_check > 15.minutes.ago
+    last_run = Job.last_run(JOB_TITLE)
+    return false if last_run.blank?
+
+    last_run > 15.minutes.ago.to_i
   end
 
 end

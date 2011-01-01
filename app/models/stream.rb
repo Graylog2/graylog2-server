@@ -48,6 +48,10 @@ class Stream < ActiveRecord::Base
     return 0 if Stream.find(stream_id).streamrules.blank?
     Message.count(:conditions => Message.by_stream(stream_id).criteria)
   end
+  
+  def has_subscribers?
+    Stream.all_with_subscribers.include?(self.id)
+  end
 
   def message_count
     Stream.get_message_count(self.id)

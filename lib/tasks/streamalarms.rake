@@ -55,6 +55,7 @@ namespace :streamalarms do
       stream.save
     end
 
+    Job.done(AlertedStream::JOB_TITLE)
     puts "All done."
   end
 end
