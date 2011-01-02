@@ -76,14 +76,6 @@ class GELFClientHandlerBase {
             this.message.setFacility(GELF.STANDARD_FACILITY_VALUE);
         }
 
-        // Timestamp is set by server if not specified by client.
-        int ts = this.jsonToInt(json.get(GELF.STANDARD_FIELD_PREFIX + "timestamp"));
-        if (ts > -1) {
-            this.message.setTimestamp(ts);
-        } else {
-            this.message.setTimestamp(Tools.getUTCTimestamp());
-        }
-
         // Add additional data if there is some.
         Set<String> set = json.keySet();
         Iterator<String> iter = set.iterator();
