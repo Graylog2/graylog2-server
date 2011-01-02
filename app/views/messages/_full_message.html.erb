@@ -7,7 +7,7 @@
 <h4>From: <span class="highlighted"><%= @message.host %></span></h4>
 <h4>Received: <span class="highlighted"><%= gl_date(Time.at(@message.created_at)) %></span></h4>
 
-<% unless @message.timestamp.blank? %>
+<% unless @message.timestamp.blank? or @message.timestamp == 0 %>
   <h4>Local time: <span class="highlighted"><%= gl_date(Time.at(@message.timestamp)) %></span></h4>
 <% end %>
 
