@@ -112,7 +112,7 @@ var sb = new $jit.Sunburst({
   },
 });
 
-$.post("/visuals/fetch/messagespread?term=<%= CGI.escape(params[:term]) %>&amp;regex=<%= @term_is_regex.to_s %>&amp;case=<%= @term_is_case_insensitive.to_s %>", function(data) {
+$.post("<%= visuals_path("messagespread", :term => CGI.escape(params[:term]), :regex=> @term_is_regex.to_s, :case=> @term_is_case_insensitive.to_s %>", function(data) {
   json = eval('(' + data + ')');
   hosts = json.data.children[0].children
   

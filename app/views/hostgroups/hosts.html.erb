@@ -119,7 +119,7 @@
       }  
   });
 
-  $.post("/visuals/fetch/hostgrouprelation?group=<%= @hostgroup.id %>", function(data) {
+  $.post("<%= visuals_path("hostgrouprelation", :group => @hostgroup %>", function(data) {
     json = eval('(' + data + ')');
     rgraph.loadJSON(json.data);  
     

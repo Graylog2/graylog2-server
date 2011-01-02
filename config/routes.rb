@@ -38,7 +38,14 @@ Graylog2WebInterface::Application.routes.draw do
         post :showrange
       end
     end
-  
+    
+    resource :analytics do
+      get :index
+      get :messagespread
+    end
+    
+    match '/visuals/fetch/:id' => 'visuals#fetch',:as => "visuals"
+    
     match '/' => 'messages#index', :as => "root"
     match '/:controller(/:action(/:id))'
   end

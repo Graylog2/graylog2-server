@@ -10,7 +10,7 @@
   <%= label_tag :hours, "Hours:" %>
   <%= text_field_tag :hours, 12, { :id => "analytics-new-messages-update-hours" } %>
 
-  <%= awesome_submit_link "Update graph", { :id => "analytics-new-messages-update-submit", "data-updateurl" => "/visuals/fetch/totalgraph?hosts=all&amp;hours=", "data-nowait" => "true" } %>
+  <%= awesome_submit_link "Update graph", { :id => "analytics-new-messages-update-submit", "data-updateurl" => visuals_path("totalgraph", :hosts => "all"), "data-nowait" => "true" } %>
   <span id="analytics-new-messages-update-loading" style="display: none;">
     <%= image_tag 'loading-small.gif' %> Calculating...
   </span>
@@ -33,7 +33,7 @@
 <br />
 <h2>Spread of message</h2>
 <div class="short-description">Enter a term or regular expression and see the spread of messages that include the term or match the regular expression over your hosts.</div>
-<%= form_tag "/analytics/messagespread" do %>
+<%= form_tag messagespread_analytics_path do %>
   <%= label_tag :term, "Term:" %>
   <%= text_field_tag :term %>
   

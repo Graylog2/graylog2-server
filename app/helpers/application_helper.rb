@@ -73,9 +73,9 @@ module ApplicationHelper
 
   def flot_graph_loader(options)
    if options[:stream_id].blank?
-     url = "/visuals/fetch/totalgraph?hours=#{options[:hours]}"
+     url = visuals_path("totalgraph", :hours => options[:hours])
    else
-     url = "/visuals/fetch/streamgraph?stream_id=#{options[:stream_id]}&amp;hours=#{options[:hours]}"
+     url = visuals_path("streamgraph", :stream_id => options[:stream_id], :hours => options[:hours])
    end
    
    "<script type='text/javascript'>

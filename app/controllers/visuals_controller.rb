@@ -124,36 +124,20 @@ class VisualsController < ApplicationController
     return r
   end
 
-  def calculate_totalgraph(x)
-    hours = 12
-    unless x.blank?
-      hours = x.to_i
+  def calculate_totalgraph(hours = 12)
+    Message.counts_of_last_minutes(hours.to_i*60).collect do |c|
+      [ (c[:minute].to_i+Time.now.utc_offset)*1000, c[:count] ]
     end
-   
-    r = Array.new
-    Message.counts_of_last_minutes(hours*60).each do |c|
-      r << [ (c[:minute].to_i+Time.now.utc_offset)*1000, c[:count] ]
-    end
-
-    return r
   end
   
-  def calculate_streamgraph(stream_id, x)
+  def calculate_streamgraph(stream_id, hours=12)
     stream = Stream.find(stream_id)
     
     return Array.new if stream.streamrules.blank?
-
-    hours = 12
-    unless x.blank?
-      hours = x.to_i
+  
+    Message.stream_counts_of_last_minutes(stream.id, hours.to_i*60).collect do |c|
+      [ (c[:minute].to_i+Time.now.utc_offset)*1000, c[:count] ]
     end
-    
-    r = Array.new
-    Message.stream_counts_of_last_minutes(stream.id, hours*60).each do |c|
-      r << [ (c[:minute].to_i+Time.now.utc_offset)*1000, c[:count] ]
-    end
-
-    return r
   end
 
   def escape(what)
