@@ -1,12 +1,13 @@
 module ApplicationHelper
   def menu_item title, where
-    li_class = ""
-    link = link_to_unless_current(title, where) do
-      li_class = " class=\"topmenu-active\""
-      title
+    current = String.new
+    if where.instance_of?(Hash)
+      current = where[:controller].to_s
+    else
+      current = where[1..where.length]
     end
-    "<li#{li_class}>#{link}</li>"
-    #"<li class=\"#{"topmenu-active" if is_current_menu_item?(where[:controller])}\">#{link_to(where[:title], destination)}</li>"
+
+    "<li class=\"#{"topmenu-active" if is_current_menu_item?(current)}\">#{link_to(current, "/#{current}")}</li>"
   end
 
   def tab_link tab
