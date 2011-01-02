@@ -61,7 +61,7 @@ class MessagesController < ApplicationController
   
   def deletebystream
     begin
-      conditions = Message.by_stream(params[:id].to_i).criteria.to_hash
+      conditions = Message.by_stream(params[:stream_id].to_i).criteria.to_hash
       throw "Missing conditions" if conditions.blank?
 
       Message.set(conditions, :deleted => true )
@@ -71,7 +71,7 @@ class MessagesController < ApplicationController
       flash[:error] = "Could not delete messages."
     end
     
-    redirect_to :controller => "streams", :action => "show", :id => params[:id]
+    redirect_to :controller => "streams", :action => "show", :id => params[:stream_id]
   end
 
   def deletebyquickfilter
