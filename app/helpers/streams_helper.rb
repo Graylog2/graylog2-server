@@ -11,6 +11,8 @@ module StreamsHelper
         return "Facility"
       when Streamrule::TYPE_TIMEFRAME then
         return "Timeframe"
+      when Streamrule::TYPE_ADDITIONAL then
+        return "Additional field"
     end
     return "Invalid Rule"
   end

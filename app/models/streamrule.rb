@@ -10,6 +10,7 @@ class Streamrule < ActiveRecord::Base
   TYPE_SEVERITY = 3
   TYPE_FACILITY = 4
   TYPE_TIMEFRAME = 5
+  TYPE_ADDITIONAL = 6
 
   def self.get_types_for_select_options
     {
@@ -17,7 +18,8 @@ class Streamrule < ActiveRecord::Base
       "Timeframe" => self::TYPE_TIMEFRAME,
       "Host" => self::TYPE_HOST,
       "Severity" => self::TYPE_SEVERITY,
-      "Facility" => self::TYPE_FACILITY
+      "Facility" => self::TYPE_FACILITY,
+      "Additional field" => self::TYPE_ADDITIONAL
     }
   end
   
@@ -33,6 +35,11 @@ class Streamrule < ActiveRecord::Base
       return {:_facility => {op => [value.to_i]}}
     when TYPE_TIMEFRAME then
       return {:_timeframe => value}
+    when TYPE_ADDITIONAL then
+      parts = value.split("=")
+      return Hash.new if parts[0].blank? or parts[1].blank?
+
+      return {"a_#{parts[0]}".to_sym => parts[1]}
     end
   end
 

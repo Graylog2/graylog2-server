@@ -45,7 +45,10 @@ $(document).ready(function(){
     // Stream rule form.
     $('#streamrule_rule_type').bind('change', function() {
         $('.stream-value-field').hide();
+        $('.stream-value-help').hide();
         $('.stream-value-field').attr("disabled", true);
+
+        help = null;
         switch(this.value) {
             case '1':
                 field = $('.stream-value-message');
@@ -62,9 +65,17 @@ $(document).ready(function(){
             case '5':
                 field = $('.stream-value-timeframe');
                 break;
+            case '6':
+                field = $('.stream-value-additional-field');
+                help = $('#stream-value-additional-field-help').show();
+                break;
         }
         field.removeAttr("disabled");
         field.show();
+
+        if (help != null) {
+          help.show();
+        }
     });
 
     // Stream Quick chooser
