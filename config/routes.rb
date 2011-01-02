@@ -36,6 +36,21 @@ Graylog2WebInterface::Application.routes.draw do
         post :alertable
         post :setdescription
         post :showrange
+        post :setalarmvalue
+        post :togglealarmactive
+        post :togglefavorited
+      end
+    end
+    
+    resources :alertedstreams do
+      member do
+        post :toggle
+      end
+    end
+    
+    resources :subscribedstreams do
+      member do
+        post :toggle
       end
     end
     
