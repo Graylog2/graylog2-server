@@ -23,7 +23,6 @@ package org.graylog2.database;
 import com.mongodb.DBCollection;
 import com.mongodb.BasicDBObject;
 import com.mongodb.BasicDBObjectBuilder;
-import com.mongodb.WriteConcern;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
@@ -60,7 +59,7 @@ public class MongoBridge {
         if(MongoConnection.getInstance().getDatabase().getCollectionNames().contains("messages")) {
             coll = MongoConnection.getInstance().getDatabase().getCollection("messages");
         } else {
-            int messagesCollSize = Integer.parseInt(Main.masterConfig.getProperty("messages_collection_size").trim());
+            long messagesCollSize = Long.parseLong(Main.masterConfig.getProperty("messages_collection_size").trim());
             coll = MongoConnection.getInstance().getDatabase().createCollection("messages", BasicDBObjectBuilder.start().add("capped", true).add("size", messagesCollSize).get());
         }
 
