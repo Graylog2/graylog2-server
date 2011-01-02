@@ -1,9 +1,0 @@
-production:
-  adapter: mysql
-  encoding: utf8
-  reconnect: false
-  database: graylog2
-  pool: 5
-  username: graylog2
-  password: 
-  socket: /var/run/mysqld/mysqld.sock

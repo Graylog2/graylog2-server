@@ -1,12 +1,3 @@
-development:
-  adapter: mysql2
-  encoding: utf8
-  reconnect: false
-  database: graylog2_development
-  pool: 5
-  username: graylog2
-  password: yourpass
-
 production:
   adapter: mysql2
   encoding: utf8
@@ -14,4 +5,4 @@ production:
   database: graylog2_production
   pool: 5
   username: root
-  password: 
+  password: yourpass

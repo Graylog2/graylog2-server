@@ -29,11 +29,7 @@ echo $BUILD_DATE > $BUILD_DIR/build_date
 echo "Copying files ..."
 
 # Copy files.
-cp ../app ../config ../db ../lib ../public ../Rakefile ../README ../script ../test ../vendor $BUILD_DIR -r
-
-# Copy example database.yml file
-cp database.yml.example $BUILD_DIR/config/database.yml
-cp mongodb.yml.example $BUILD_DIR/config/mongodb.yml
+cp ../app ../config ../db ../lib ../public ../Rakefile ../README ../Gemfile ../Gemfile.lock ../config.ru ../script ../vendor $BUILD_DIR -r
 
 # Remove not needed files
 rm $BUILD_DIR/public/images/dashboard_logo.png
@@ -42,6 +38,13 @@ echo "Configuring release ..."
 
 # We are not in the build directory
 cd $BUILD_DIR
+
+# Change config files.
+mv config/database.yml.example config/database.yml
+mv config/email.yml.example config/email.yml
+mv config/general.yml.example config/general.yml
+mv config/mongodb.yml.example config/mongodb.yml
+
 RAILS_ENV=production
 export RAILS_ENV
 
@@ -49,22 +52,6 @@ export RAILS_ENV
 echo "RAILS_ENV = 'production'" > temp_env
 cat config/environment.rb >> temp_env
 mv temp_env config/environment.rb
-
-# Remove newrelic_rpm plugin which is not needed for production
-script/plugin remove newrelic_rpm >> $LOGFILE 2>&1
-rm config/newrelic.yml
-
-echo "Freezing Rails and gems ..."
-
-# Freeze Rails
-rake rails:freeze:gems >> $LOGFILE 2>&1
-
-# Freeze the gems
-rake gems:unpack >> $LOGFILE 2>&1
-
-# Remove gem requirements that cause errors later. Only needed as freeze definition. (TODO: There must be a better way to do that)
-sed '/bson_ext/d' config/environment.rb > environment.rb_tmp && mv environment.rb_tmp config/environment.rb
-sed '/nunemaker-validatable/d' config/environment.rb > environment.rb_tmp && mv environment.rb_tmp config/environment.rb
 
 # tar it
 cd ..

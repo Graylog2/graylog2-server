@@ -1,8 +1,5 @@
-development:
-  via: sendmail
-
 production:
-  via: smtp
+  via: smtp # via: sendmail
   host: smtp.example.org
   port: 25
   auth: plain # plain, login, cram_md5, none
