@@ -12,15 +12,6 @@ streamalarms:
   from: graylog2alarms@example.org
   subject: "[graylog2] Stream alarm!"
 
-# Make sure to only allow TCP port 12500 (livetail port) for trusted networks as the secret
-# will be transmitted in plain text and visible in the livetail HTML code. Everybody who
-# knows this passphrase and has access to TCP port 12500 on this machine can connect to the
-# livetail and fetch the log message stream!
-# More information in the wiki: https://github.com/Graylog2/graylog2-web-interface/wiki/Live-Tail
-livetail:
-  enable: false
-  secret: # Add a secret/password here. Use many chars and read the security hint above.
-
 app:
   #url_prefix: "graylog2" # enable to define string which prefixes all urls generated
 

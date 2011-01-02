@@ -24,7 +24,14 @@ begin
         unless Rails.env == "test"
           fork do
             server = LiveTail::Server.new(args)
-            server.run(livetail_config["secret"]);
+
+            begin
+              server.run(livetail_config["secret"]);
+            rescue RuntimeError => e
+              unless e.message == "no acceptor"
+                raise e
+              end
+            end
           end
         end
       else
