@@ -15,13 +15,14 @@ class MessagesController < ApplicationController
   def index
     @has_sidebar = true
     @load_flot = true
-
+  
     if params[:filters].blank?
       @messages = @scope.all_with_blacklist params[:page]
     else
+      @additional_filters = Message.extract_additional_from_quickfilter(params[:filters])
       @messages = @scope.all_by_quickfilter params[:filters], params[:page]
     end
-    @total_count =  Message.count_since(0)
+    @total_count = Message.count_since(0)
     @total_blacklisted_terms = BlacklistedTerm.count
   end
 

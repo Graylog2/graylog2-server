@@ -57,6 +57,10 @@
   margin-left: 115px;
 }
 
+.messages-quickfilter-additional-key {
+  width: 100px !important;
+}
+
 #messages-quickfilter-delete {
   float: right;
 }

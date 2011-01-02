@@ -99,9 +99,27 @@ class Message
 
       # Host
       conditions = conditions.where(:_host => filters[:host]) unless filters[:host].blank?
+
+      self.extract_additional_from_quickfilter(filters).each do |key, value|
+        conditions = conditions.where(key => value)
+      end
     end
     
     conditions.default_scope.limit(LIMIT).page(page)
+  end
+      
+  def self.extract_additional_from_quickfilter(filters)
+    return Hash.new if filters[:additional].blank? or filters[:additional][:keys].blank? or filters[:additional][:values].blank?
+
+    ret = Hash.new
+    i = 0
+    filters[:additional][:keys].each do |key|
+      next if key.blank? or filters[:additional][:values][i].blank?
+      ret["a_#{key}".to_sym] = filters[:additional][:values][i]
+      i += 1
+    end
+
+    return ret
   end
 
   def self.by_stream(stream_id)

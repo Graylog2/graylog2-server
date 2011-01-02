@@ -236,6 +236,15 @@ $(document).ready(function(){
       return false;
     });
 
+
+    // Additional field quickfilter.
+    $("#messages-quickfilter-add-additional").bind("click", function() {
+      field = "<dt><input name='filters[additional][keys][]' type='text' class='messages-quickfilter-additional-key' /></dt>"
+      field += "<dd><input name='filters[additional][values][]' type='text' class='messages-quickfilter-additional-value' /></dd>"
+
+      $("#messages-quickfilter-fields").append(field);
+      return false;
+    })
 });
 
 function buildHostCssId(id) {
