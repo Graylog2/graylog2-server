@@ -463,3 +463,13 @@
   font-size: 12px;
   color: #ccc;
 }
+
+/* Message comments */
+#messagecomments-form textarea {
+  margin-top: 5px;
+  margin-bottom: 5px;
+}
+
+#messagecomments li {
+  margin-bottom: 3px;
+}

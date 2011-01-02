@@ -26,7 +26,7 @@ class HostsController < ApplicationController
       redirect_to :action => "index"
     end
 
-    @last_message = Message.last :conditions => { "host" => @host.host }, :order => "created_at DESC"
+    @last_message = Message.last :conditions => { "_host" => @host.host }, :order => "created_at DESC"
   end
 
   def destroy

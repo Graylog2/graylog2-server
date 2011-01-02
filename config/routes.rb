@@ -23,6 +23,9 @@ Graylog2WebInterface::Application.routes.draw do
     end
   end
 
+  resources :messagecomments do
+  end
+
   resources :streams do
     resources :messages
     resources :streamrules

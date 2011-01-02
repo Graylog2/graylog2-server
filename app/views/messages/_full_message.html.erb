@@ -32,6 +32,18 @@
   </p>
 <% end %>
 
+<% unless @comments.blank? %>
+  <h3>Comments</h3>
+  <ul id="messagecomments">
+  <% @comments.each do |comment| %>
+    <li>
+      <%= link_to comment.title, messagecomment_path(comment) %>: <i><%= comment.comment %></i>
+      (<%=raw user_link(comment.user) %> / <%= gl_date(comment.created_at) %>)
+    </li>
+  <% end %>
+  </ul>
+<% end %>
+
 <% if params[:partial] %>
   <%= link_to "Permalink", { :controller => "messages", :action => "show", :id => @message.id }, :id => "messages-show-permalink" %>
   <br style="clear: both;" />

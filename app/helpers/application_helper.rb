@@ -155,7 +155,7 @@ module ApplicationHelper
   end
 
   def user_link(user)
-    return String.new if user.blank? or !user.instance_of?(User)
+    return "Unknown or deleted user" if user.blank? or !user.instance_of?(User)
 
     "<span class=\"user-link\">
       #{image_tag "icons/user.png", :class => "user-link-img" }#{link_to(user.login, { :controller => "users", :action => "show", :id => user.id })}

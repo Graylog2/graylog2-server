@@ -30,6 +30,8 @@ class MessagesController < ApplicationController
     @load_flot = true
     @message = Message.find params[:id]
 
+    @comments = Messagecomment.all_matched(@message)
+
     if params[:partial]
       render :partial => "full_message"
       return
