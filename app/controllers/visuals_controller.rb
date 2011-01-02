@@ -38,16 +38,16 @@ class VisualsController < ApplicationController
     end
 
     if case_sensitive
-      conditions["message"] = /#{search_for}/
+      conditions["_message"] = /#{search_for}/
     else
-      conditions["message"] = /#{search_for}/i
+      conditions["_message"] = /#{search_for}/i
     end
 
     hosts = Host.all
 
     highest = 0
     hosts.each do |host|
-      conditions["host"] = escape(host.host)
+      conditions["_host"] = escape(host.host)
       count = Message.count :conditions => conditions
 
       if count > 0
