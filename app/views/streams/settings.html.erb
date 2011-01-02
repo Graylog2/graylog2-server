@@ -6,16 +6,16 @@
 <%=raw ajaxtrigger(:favorite, "Favorite", "/streams/togglefavorited/#{@stream.id}", @stream.favorited?(current_user)) %>
 <br />
 
-<%=raw ajaxtrigger(:alarm, "Receive alarms of this stream", "/alertedstreams/toggle/#{@stream.id}", @stream.alerted?(current_user) ) %>
+<%=raw ajaxtrigger(:alarm, "Receive alarms of this stream", "/alertedstreams/toggle/#{@stream.id}", @stream.alerted?(current_user) ) %> <%= tooltip("Notifications") %>
 <br />
 
-<%=raw ajaxtrigger(:subscribe, "Subscribe to stream", "/subscribedstreams/toggle/#{@stream.id}", @stream.subscribed?(current_user) ) %>
+<%=raw ajaxtrigger(:subscribe, "Subscribe to stream", "/subscribedstreams/toggle/#{@stream.id}", @stream.subscribed?(current_user) ) %> <%= tooltip("Notifications") %>
 <br /><br />
 
 <h2>Alarms</h2>
 <div class="short-description">An alarm is triggered when the number of messages in the defined timespan
 is higher than the maximum. All users who enabled receiving of alerts will be notified
-of the alarm. You can also define that all users are alarmed, no matter what they defined.</div>
+of the alarm. You can also define that all users are alarmed, no matter what they defined. <%= tooltip("Notifications") %></div>
 
 <%=raw ajaxtrigger(:active, "Active", "/streams/togglealarmactive/#{@stream.id}", @stream.alarm_active) %>
 <br />
