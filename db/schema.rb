@@ -10,7 +10,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20110101214808) do
+ActiveRecord::Schema.define(:version => 20110102160835) do
 
   create_table "alerted_streams", :force => true do |t|
     t.integer  "stream_id"
@@ -73,7 +73,7 @@ ActiveRecord::Schema.define(:version => 20110101214808) do
     t.datetime "updated_at"
   end
 
-  create_table "settings", :force => true do |t|
+  create_table "settings", :id => false, :force => true do |t|
     t.integer  "user_id"
     t.integer  "setting_type"
     t.integer  "value"

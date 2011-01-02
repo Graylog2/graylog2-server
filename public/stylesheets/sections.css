@@ -113,6 +113,7 @@
     font-size: 15px;
     float: left;
     margin-right: 10px;
+    margin-top: 0px !important;
 }
 
 #blocks-terms li {

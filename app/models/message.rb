@@ -225,13 +225,13 @@ class Message
 
   def self.all_of_host host, page
     page = 1 if page.blank?
-    where(:host => host).default_scope.page(page)
+    where(:_host => host).default_scope.page(page)
   end
   
   def self.all_of_hostgroup hostgroup, page
     page = 1 if page.blank?
 
-    return where(:host.in => hostgroup.all_conditions ).default_scope.page(page)
+    return where(:_host.in => hostgroup.all_conditions ).default_scope.page(page)
   end
 
   def self.count_of_hostgroup hostgroup

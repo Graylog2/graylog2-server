@@ -15,7 +15,7 @@
   </div>
 
   <div id="hostgroups-add-hosts-regex">
-  <%= form_for :new_host, :url => { :controller => "hostgrouphosts", :action => 'create' } do |f| -%>
+  <%= form_for :new_host, :url => { :controller => "hostgroup_hosts", :action => 'create' } do |f| -%>
     <%= label_tag 'hostname', 'Regular expression' %>:
     <%= f.text_field :hostname %>
     <%= hidden_field_tag 'new_host[hostgroup_id]', @hostgroup.id %>
@@ -35,10 +35,10 @@
     No rules in this group.
   <% else %>
     <% @hostgroup.hostname_conditions(true).each do |rule| %>
-      <li>Host: <%= link_to rule[:value], :controller => "hostgrouphosts", :action => "destroy", :id => rule[:id], :group_id => @hostgroup.id %></li>
+      <li>Host: <%= link_to rule[:value], :controller => "hostgroup_hosts", :action => "destroy", :id => rule[:id], :group_id => @hostgroup.id %></li>
     <% end %>
     <% @hostgroup.regex_conditions(true).each do |rule| %>
-      <li>Regex: <%= link_to rule[:value].source, :controller => "hostgrouphosts", :action => "destroy", :id => rule[:id], :group_id => @hostgroup.id %></li>
+      <li>Regex: <%= link_to rule[:value].source, :controller => "hostgroup_hosts", :action => "destroy", :id => rule[:id], :group_id => @hostgroup.id %></li>
     <% end %>
   <% end %>
   </ul>
