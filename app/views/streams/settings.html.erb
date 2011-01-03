@@ -20,7 +20,7 @@ of the alarm. You can also define that all users are alarmed, no matter what the
 <%=raw ajaxtrigger(:active, "Active", togglealarmactive_stream_path(@stream), @stream.alarm_active) %>
 <br />
 
-<%=raw ajaxtrigger(:allusers, "Force for all users", "/streams/togglealarmforce/#{@stream.id}", @stream.alarm_force) %>
+<%=raw ajaxtrigger(:allusers, "Force for all users", togglealarmforce_stream_path(@stream), @stream.alarm_force) %>
 <br /><br />
 
 <%= form_tag setalarmvalue_stream_path(@stream) do %>
@@ -35,7 +35,7 @@ of the alarm. You can also define that all users are alarmed, no matter what the
 <br />
 
 <h2>Rename stream</h2>
-<%= form_tag '/streams/rename/' do %>
+<%= form_tag rename_stream_path(:stream_id => @stream) do %>
   <%= label_tag 'title', 'New name:' %>
   <%= text_field_tag 'title' %>
   <%= hidden_field_tag :stream_id, @stream.id%>

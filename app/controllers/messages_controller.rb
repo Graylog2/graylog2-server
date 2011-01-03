@@ -71,7 +71,7 @@ class MessagesController < ApplicationController
       flash[:error] = "Could not delete messages."
     end
     
-    redirect_to :controller => "streams", :action => "show", :id => params[:stream_id]
+    redirect_to stream_path(params[:stream_id])
   end
 
   def deletebyquickfilter

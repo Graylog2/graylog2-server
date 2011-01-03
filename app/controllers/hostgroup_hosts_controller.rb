@@ -5,7 +5,7 @@ class HostgroupHostsController < ApplicationController
     # Check if hostgroup exists.
     if Hostgroup.count(:conditions => { :id => params[:new_host][:hostgroup_id] }) == 0
       flash[:error] = "Group does not exist."
-      redirect_to :controller => "hosts"
+      redirect_to hosts_path
       return
     end
 

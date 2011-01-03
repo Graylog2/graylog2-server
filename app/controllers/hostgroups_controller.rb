@@ -35,7 +35,7 @@ class HostgroupsController < ApplicationController
   def create  
     @hostgroup = Hostgroup.new(params[:hostgroup])
     if @hostgroup.save
-      redirect_to :controller => 'hosts', :action => 'index'
+      redirect_to hosts_path
       flash[:notice] = "Host group has been created."
     else
       flash[:error]  = "Could not create host group."
@@ -65,7 +65,7 @@ class HostgroupsController < ApplicationController
       flash[:error] = "<strong>Could not delete hostgroup</strong>"
     end
 
-    redirect_to :controller => "hosts", :action => "index"
+    redirect_to hosts_path
   end
 
   private

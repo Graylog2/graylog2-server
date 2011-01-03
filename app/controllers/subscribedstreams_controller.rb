@@ -8,7 +8,7 @@ def toggle
       stream = Stream.find(stream_id)
     rescue
       flash[:error] = "<strong>Could not subscribe to stream</strong><span>Stream does not exist.</span>"
-      redirect_to :controller => "streams"
+      redirect_to streams_path
       return
     end
 

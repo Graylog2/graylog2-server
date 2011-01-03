@@ -119,7 +119,7 @@ class StreamsController < ApplicationController
         flash[:error] = "Could not update alarm settings: Missing parameters."
     end
 
-    redirect_to :action => "settings", :id => params[:id]
+    redirect_to settings_stream_path(stream)
   end
 
   def create
@@ -129,7 +129,7 @@ class StreamsController < ApplicationController
     else
       flash[:error] = "Could not create stream"
     end
-    redirect_to :action => "index"
+    redirect_to streams_path
   end
   
   def rename
@@ -142,7 +142,7 @@ class StreamsController < ApplicationController
       flash[:error] = "Could not rename stream."
     end
 
-    redirect_to :controller => "streams", :action => "settings", :id => params[:stream_id]
+    redirect_to settings_stream_path(stream)
   end
 
   def destroy
@@ -153,7 +153,7 @@ class StreamsController < ApplicationController
       flash[:error] = "Could not delete stream"
     end
     
-    redirect_to :action => "index"
+    redirect_to streams_path
   end
   
   def tabs

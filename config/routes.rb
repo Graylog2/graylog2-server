@@ -39,6 +39,9 @@ Graylog2WebInterface::Application.routes.draw do
         post :setalarmvalue
         post :togglealarmactive
         post :togglefavorited
+        post :togglealarmforce
+        post :rename
+        get :settings
       end
     end
     
