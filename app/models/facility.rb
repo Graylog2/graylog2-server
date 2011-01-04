@@ -46,7 +46,7 @@ class Facility < ActiveRecord::Base
   end
 
   def self.ordered_for_select
-    self.get_all.map { |n,f| [f,n] }
+    self.get_all.map { |n,f| [f,n] }.sort_by { |f| f[1] }
   end
 
   def self.to_human(facility_id)
