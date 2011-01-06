@@ -15,5 +15,13 @@ class Job < ActiveRecord::Base
 
     job.last_run.to_i
   end
+  
+  def active?(interval=15.minutes.ago)
+    !last_run.blank? and (last_run > interval)
+  end
+  
+  def self.[](name)
+    find_by_title(name)
+  end
 
 end

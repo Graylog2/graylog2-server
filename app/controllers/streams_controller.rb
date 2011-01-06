@@ -159,4 +159,18 @@ class StreamsController < ApplicationController
   def tabs
     @tabs = [ "Show", "Rules", "Analytics", "Settings" ]
   end
+  
+  def subscribe
+    current_user.subscribed_streams << @stream
+    render :json => {:status => :success}
+  end
+  
+  def unsubscribe
+    current_user.subscribed_streams.delete @stream
+    render :json => {:status => :success}
+  end
+  
+  def togglesubscription
+    @stream.subscribed?(current_user) ? unsubscribe : subscribe
+  end
 end

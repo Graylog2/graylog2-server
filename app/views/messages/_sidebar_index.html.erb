@@ -48,7 +48,8 @@ Your current time: <%= gl_date(Time.now.to_s) %>
 <ul id="jobsandtasks">
   <li>
     Stream subscriptions:
-    <% if SubscribedStream.job_active? %>
+    <% job = Job["streamsubscription_check"] %>
+    <% if job and job.active? %>
       <span class="status-okay-text">running</span>
     <% else %>
       <span class="status-alarm-text">not running</span>

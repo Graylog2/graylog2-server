@@ -40,8 +40,11 @@ Graylog2WebInterface::Application.routes.draw do
         post :togglealarmactive
         post :togglefavorited
         post :togglealarmforce
+        post :togglesubscription
         post :rename
         get :settings
+        post :subscribe
+        post :unsubscribe
       end
     end
     
