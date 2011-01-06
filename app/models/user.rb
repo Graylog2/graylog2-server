@@ -27,7 +27,8 @@ class User < ActiveRecord::Base
   
   has_and_belongs_to_many :streams
   has_and_belongs_to_many :favorite_streams, :join_table => "favorite_streams", :class_name => "Stream"
-  has_many :subscribed_streams, :dependent => :destroy
+  #has_many :subscribed_streams, :dependent => :destroy
+  has_and_belongs_to_many :subscribed_streams, :join_table => "subscribed_streams", :class_name => "Stream"
   has_many :alerted_streams, :dependent => :destroy
 
   # Authenticates a user by their login name and unencrypted password.  Returns the user or nil.

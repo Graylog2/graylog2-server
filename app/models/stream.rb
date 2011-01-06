@@ -4,6 +4,7 @@ class Stream < ActiveRecord::Base
   has_and_belongs_to_many :users
   has_many :subscribedStreams, :dependent => :destroy
   has_many :alertedStreams, :dependent => :destroy
+  has_and_belongs_to_many :subscribers, :join_table => "subscribed_streams", :class_name => "User"
 
   validates_presence_of :title
 
@@ -14,8 +15,12 @@ class Stream < ActiveRecord::Base
     AlertedStream.alerted?(self.id, user_id)
   end
 
-  def subscribed?(user_id)
-    SubscribedStream.subscribed?(self.id, user_id)
+  def subscribed?(user)
+    if user.is_a?(User)
+      subscribers.include?(user)
+    else
+      subscriber_ids.include? user
+    end
   end
 
   def favorited?(user_id)
@@ -49,10 +54,6 @@ class Stream < ActiveRecord::Base
     Message.count(:conditions => Message.by_stream(stream_id).criteria)
   end
   
-  def has_subscribers?
-    Stream.all_with_subscribers.include?(self.id)
-  end
-
   def message_count
     Stream.get_message_count(self.id)
   end

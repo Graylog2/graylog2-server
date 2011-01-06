@@ -21,7 +21,7 @@ namespace :subscriptions do
       count = messages.count
       if count > 0
         # Get all subscribers.
-        subscribers = SubscribedStream.all_subscribers(stream_id)
+        subscribers = stream.subscribers
         puts "\t#{count} new messages. Sending notifications to #{subscribers.count} subscribers."
 
         # Build body.
@@ -54,7 +54,7 @@ namespace :subscriptions do
       stream.save
     end
 
-    Job.done(SubscribedStream::JOB_TITLE)
+    Job.done("streamsubscription_check")
     puts "All done."
   end
 end
