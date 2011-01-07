@@ -83,7 +83,7 @@ public final class GELF {
      * The standard value of the _level field.
      * https://github.com/Graylog2/graylog2-docs/wiki/GELF
      */
-    public static final int STANDARD_LEVEL_VALUE = 4;
+    public static final int STANDARD_LEVEL_VALUE = 1;
 
     /**
      * The prefix for GELF standard fields.
