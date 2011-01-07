@@ -86,16 +86,10 @@ public final class GELF {
     public static final int STANDARD_LEVEL_VALUE = 1;
 
     /**
-     * The prefix for GELF standard fields.
-     * https://github.com/Graylog2/graylog2-docs/wiki/GELF
-     */
-    public static final String STANDARD_FIELD_PREFIX = "_";
-
-    /**
      * The prefix for user defined GELF fields.
      * https://github.com/Graylog2/graylog2-docs/wiki/GELF
      */
-    public static final String USER_DEFINED_FIELD_PREFIX = "a_";
+    public static final String USER_DEFINED_FIELD_PREFIX = "_";
 
     private GELF() { }
 

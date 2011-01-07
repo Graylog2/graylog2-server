@@ -65,10 +65,10 @@ public class MongoBridge {
 
         coll.ensureIndex(new BasicDBObject("created_at", 1));
         coll.ensureIndex(new BasicDBObject("deleted", 1));
-        coll.ensureIndex(new BasicDBObject("_host", 1));
-        coll.ensureIndex(new BasicDBObject("_message", 1));
-        coll.ensureIndex(new BasicDBObject("_facility", 1));
-        coll.ensureIndex(new BasicDBObject("_level", 1));
+        coll.ensureIndex(new BasicDBObject("host", 1));
+        coll.ensureIndex(new BasicDBObject("message", 1));
+        coll.ensureIndex(new BasicDBObject("facility", 1));
+        coll.ensureIndex(new BasicDBObject("level", 1));
 
         return coll;
     }
@@ -83,10 +83,10 @@ public class MongoBridge {
         DBCollection coll = this.getMessagesColl();
 
         BasicDBObject dbObj = new BasicDBObject();
-        dbObj.put("_message", event.getMessage());
-        dbObj.put("_host", event.getHost());
-        dbObj.put("_facility", event.getFacility());
-        dbObj.put("_level", event.getLevel());
+        dbObj.put("message", event.getMessage());
+        dbObj.put("host", event.getHost());
+        dbObj.put("facility", event.getFacility());
+        dbObj.put("level", event.getLevel());
         dbObj.put("created_at", Tools.getUTCTimestamp());
         // Documents in capped collections cannot grow so we have to do that now and cannot just add 'deleted => true' later.
         dbObj.put("deleted", false);
@@ -103,7 +103,7 @@ public class MongoBridge {
     public void insertGelfMessage(GELFMessage message) throws Exception {
         // Check if all required parameters are set.
         if (!message.allRequiredFieldsSet()) {
-            throw new Exception("Missing GELF message parameters. _version, _short_message and _host are required.");
+            throw new Exception("Missing GELF message parameters. version, short_message and host are required.");
         }
 
         DBCollection coll = this.getMessagesColl();
@@ -111,15 +111,15 @@ public class MongoBridge {
         BasicDBObject dbObj = new BasicDBObject();
 
         dbObj.put("gelf", true);
-        dbObj.put("_version", message.getVersion());
-        dbObj.put("_message", message.getShortMessage());
-        dbObj.put("_full_message", message.getFullMessage());
-        dbObj.put("_file", message.getFile());
-        dbObj.put("_line", message.getLine());
-        dbObj.put("_host", message.getHost());
-        dbObj.put("_facility", message.getFacility()); 
-        dbObj.put("_level", message.getLevel());
-        dbObj.put("_timestamp", message.getTimestamp());
+        dbObj.put("version", message.getVersion());
+        dbObj.put("message", message.getShortMessage());
+        dbObj.put("full_message", message.getFullMessage());
+        dbObj.put("file", message.getFile());
+        dbObj.put("line", message.getLine());
+        dbObj.put("host", message.getHost());
+        dbObj.put("facility", message.getFacility()); 
+        dbObj.put("level", message.getLevel());
+        dbObj.put("timestamp", message.getTimestamp());
 
         // Add additional fields. XXX PERFORMANCE
         Map<String,String> additionalFields = message.getAdditionalData();

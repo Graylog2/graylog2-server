@@ -53,15 +53,15 @@ class GELFClientHandlerBase {
 
         // Add standard fields.
 
-        this.message.setVersion(this.jsonToString(json.get(GELF.STANDARD_FIELD_PREFIX + "version")));
-        this.message.setHost(this.jsonToString(json.get(GELF.STANDARD_FIELD_PREFIX + "host")));
-        this.message.setShortMessage(this.jsonToString(json.get(GELF.STANDARD_FIELD_PREFIX + "short_message")));
-        this.message.setFullMessage(this.jsonToString(json.get(GELF.STANDARD_FIELD_PREFIX + "full_message")));
-        this.message.setFile(this.jsonToString(json.get(GELF.STANDARD_FIELD_PREFIX + "file")));
-        this.message.setLine(this.jsonToInt(json.get(GELF.STANDARD_FIELD_PREFIX + "line")));
+        this.message.setVersion(this.jsonToString(json.get("version")));
+        this.message.setHost(this.jsonToString(json.get("host")));
+        this.message.setShortMessage(this.jsonToString(json.get("short_message")));
+        this.message.setFullMessage(this.jsonToString(json.get("full_message")));
+        this.message.setFile(this.jsonToString(json.get("file")));
+        this.message.setLine(this.jsonToInt(json.get("line")));
 
         // Level is set by server if not specified by client.
-        int level = this.jsonToInt(json.get(GELF.STANDARD_FIELD_PREFIX + "level"));
+        int level = this.jsonToInt(json.get("level"));
         if (level > -1) {
             this.message.setLevel(level);
         } else {
@@ -69,7 +69,7 @@ class GELFClientHandlerBase {
         }
 
         // Facility is set by server if not specified by client.
-        String facility = this.jsonToString(json.get(GELF.STANDARD_FIELD_PREFIX + "facility"));
+        String facility = this.jsonToString(json.get("facility"));
         if (facility == null) {
             this.message.setFacility(GELF.STANDARD_FACILITY_VALUE);
         } else {
@@ -83,11 +83,6 @@ class GELFClientHandlerBase {
             String key = iter.next();
 
             // Skip standard fields.
-            if (key.startsWith(GELF.STANDARD_FIELD_PREFIX)) {
-                continue;
-            }
-
-            // Skip if not starting with correct prefix.
             if (!key.startsWith(GELF.USER_DEFINED_FIELD_PREFIX)) {
                 continue;
             }

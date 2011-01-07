@@ -31,8 +31,8 @@ import static org.junit.Assert.*;
  */
 public class GELFClientHandlerBaseTest {
 
-    private String originalMessage = "{\"_short_message\":\"something.\",\"_full_message\":\"lol!\",\"_host\":\"somehost\",\"_level\":2,\"_file\":\"example.php\",\"_line\":1337}";
-    private String originalMessageWithAdditionalData = "{\"_short_message\":\"something.\",\"_full_message\":\"lol!\",\"_host\":\"somehost\",\"_level\":2,\"_file\":\"example.php\",\"_line\":1337,\"a_s1\":\"yes\",\"a_s2\":\"yes, really\"}";
+    private String originalMessage = "{\"short_message\":\"something.\",\"full_message\":\"lol!\",\"host\":\"somehost\",\"level\":2,\"file\":\"example.php\",\"line\":1337}";
+    private String originalMessageWithAdditionalData = "{\"short_message\":\"something.\",\"full_message\":\"lol!\",\"host\":\"somehost\",\"level\":2,\"file\":\"example.php\",\"line\":1337,\"_a_s1\":\"yes\",\"_a_s2\":\"yes, really\"}";
 
     public GELFClientHandlerBaseTest() {
     }
@@ -84,8 +84,8 @@ public class GELFClientHandlerBaseTest {
 
         // Test additional fields.
         Map<String, String> additionalData = message.getAdditionalData();
-        assertEquals("yes", additionalData.get("a_s1"));
-        assertEquals("yes, really", additionalData.get("a_s2"));
+        assertEquals("yes", additionalData.get("_a_s1"));
+        assertEquals("yes, really", additionalData.get("_a_s2"));
     }
 
     /**
