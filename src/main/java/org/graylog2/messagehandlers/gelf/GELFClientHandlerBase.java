@@ -69,11 +69,11 @@ class GELFClientHandlerBase {
         }
 
         // Facility is set by server if not specified by client.
-        int facility = this.jsonToInt(json.get(GELF.STANDARD_FIELD_PREFIX + "facility"));
-        if (facility > -1) {
-            this.message.setFacility(facility);
-        } else {
+        String facility = this.jsonToString(json.get(GELF.STANDARD_FIELD_PREFIX + "facility"));
+        if (facility == null) {
             this.message.setFacility(GELF.STANDARD_FACILITY_VALUE);
+        } else {
+            this.message.setFacility(facility);
         }
 
         // Add additional data if there is some.
