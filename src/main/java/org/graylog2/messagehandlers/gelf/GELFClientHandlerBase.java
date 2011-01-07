@@ -87,6 +87,12 @@ class GELFClientHandlerBase {
                 continue;
             }
 
+            // Don'T allow to override _id. (just to make sure...)
+            if (key.equals("_id")) {
+                Log.warn("Client tried to override _id field! Skipped field, but still storing message.");
+                continue;
+            }
+
             // Add to message.
             this.message.addAdditionalData(key, this.jsonToString(json.get(key)));
         }

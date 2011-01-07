@@ -33,6 +33,9 @@ public class GELFClientHandlerBaseTest {
 
     private String originalMessage = "{\"short_message\":\"something.\",\"full_message\":\"lol!\",\"host\":\"somehost\",\"level\":2,\"file\":\"example.php\",\"line\":1337}";
     private String originalMessageWithAdditionalData = "{\"short_message\":\"something.\",\"full_message\":\"lol!\",\"host\":\"somehost\",\"level\":2,\"file\":\"example.php\",\"line\":1337,\"_a_s1\":\"yes\",\"_a_s2\":\"yes, really\"}";
+    private String originalMessageWithIDField = "{\"short_message\":\"something.\",\"full_message\":\"lol!\",\"host\":\"somehost\",\"level\":2,\"file\":\"example.php\",\"line\":1337,\"_id\":\"foo\"}";
+
+
 
     public GELFClientHandlerBaseTest() {
     }
@@ -86,6 +89,18 @@ public class GELFClientHandlerBaseTest {
         Map<String, String> additionalData = message.getAdditionalData();
         assertEquals("yes", additionalData.get("_a_s1"));
         assertEquals("yes, really", additionalData.get("_a_s2"));
+    }
+
+    @Test
+    public void testIdFieldIsSkipped() throws Exception {
+        GELFClientHandlerBase instance = new GELFClientHandlerBase();
+        instance.clientMessage = this.originalMessageWithIDField;
+        instance.parse();
+
+        GELFMessage message = instance.message;
+
+        assertFalse(message.getAdditionalData().containsKey("_id"));
+        assertFalse(message.getAdditionalData().containsKey("id"));
     }
 
     /**
