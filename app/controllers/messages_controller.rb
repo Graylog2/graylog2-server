@@ -4,7 +4,7 @@ class MessagesController < ApplicationController
   
   def set_scoping
     if params[:host_id]
-      @scope = Message.where(:_host => Base64.decode64(params[:host_id]))
+      @scope = Message.where(:host => Base64.decode64(params[:host_id]))
     elsif params[:stream_id]
       @scope = Message.by_stream(params[:stream_id])
     else

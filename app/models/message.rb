@@ -4,34 +4,20 @@ class Message
   FIELDS = %w(message date host level facility deleted  gelf full_message type file line version timestamp created_at)
   SPECIAL_FIELDS = %w(_id)
 
-  key :_version, Integer
-  key :_timestamp, Integer
-  key :_message, String
-  key :_date, String
-  key :_host, String
-  key :_level, Integer
-  key :_facility, Object
-  key :_deleted, Boolean
-  key :_created_at, Integer
-  key :_gelf, Boolean
-  key :_full_message, String
-  key :_type, Integer
-  key :_file, String
-  key :_line, Integer
-
-
-  # temporary wrappers
-  FIELDS.each do |field|
-    _field = "_#{field}"
-
-    define_method(field) do
-      self.__send__(_field)
-    end
-
-    define_method(field + '=') do |value|
-      self.__send__(_field + '=', value)
-    end
-  end
+  key :version, Integer
+  key :timestamp, Integer
+  key :message, String
+  key :date, String
+  key :host, String
+  key :level, Integer
+  key :facility, Object
+  key :deleted, Boolean
+  key :created_at, Integer
+  key :gelf, Boolean
+  key :full_message, String
+  key :type, Integer
+  key :file, String
+  key :line, Integer
 
 
   LIMIT = 100
@@ -41,7 +27,7 @@ class Message
   scope :by_blacklist, lambda {|blacklist| by_blacklisted_terms(blacklist.all_terms)}
   scope :of_blacklist, lambda {|blacklist| of_blacklisted_terms(blacklist.all_terms)}
   scope :page, lambda {|number| skip(self.get_offset(number))}
-  scope :default_scope, fields(:_full_message => 0).order("$natural DESC").not_deleted.limit(LIMIT)
+  scope :default_scope, fields(:full_message => 0).order("$natural DESC").not_deleted.limit(LIMIT)
 
   def self.get_conditions_from_date(timeframe)
     conditions = {}
@@ -86,19 +72,19 @@ class Message
 
     unless filters.blank?
       # Message
-      conditions = conditions.where(:_message => /#{filters[:message].strip}/) unless filters[:message].blank?
+      conditions = conditions.where(:message => /#{filters[:message].strip}/) unless filters[:message].blank?
 
       # Time Frame
       conditions = conditions.where(:created_at => get_conditions_from_date(filters[:date])) unless filters[:date].blank?
       
       # Facility
-      conditions = conditions.where(:_facility => filters[:facility].to_i) unless filters[:facility].blank?
+      conditions = conditions.where(:facility => filters[:facility].to_i) unless filters[:facility].blank?
 
       # Severity
-      conditions = conditions.where(:_level => filters[:severity].to_i) unless filters[:severity].blank?
+      conditions = conditions.where(:level => filters[:severity].to_i) unless filters[:severity].blank?
 
       # Host
-      conditions = conditions.where(:_host => filters[:host]) unless filters[:host].blank?
+      conditions = conditions.where(:host => filters[:host]) unless filters[:host].blank?
 
       self.extract_additional_from_quickfilter(filters).each do |key, value|
         conditions = conditions.where(key => value)
@@ -115,7 +101,7 @@ class Message
     i = 0
     filters[:additional][:keys].each do |key|
       next if key.blank? or filters[:additional][:values][i].blank?
-      ret["a_#{key}".to_sym] = filters[:additional][:values][i]
+      ret["_#{key}".to_sym] = filters[:additional][:values][i]
       i += 1
     end
 
@@ -225,13 +211,13 @@ class Message
 
   def self.all_of_host host, page
     page = 1 if page.blank?
-    where(:_host => host).default_scope.page(page)
+    where(:host => host).default_scope.page(page)
   end
   
   def self.all_of_hostgroup hostgroup, page
     page = 1 if page.blank?
 
-    return where(:_host.in => hostgroup.all_conditions ).default_scope.page(page)
+    return where(:host.in => hostgroup.all_conditions ).default_scope.page(page)
   end
 
   def self.count_of_hostgroup hostgroup
@@ -239,7 +225,7 @@ class Message
   end
 
   def self.delete_all_of_host host
-    self.delete_all :conditions => { :_host => host, :deleted => [false, nil] }
+    self.delete_all :conditions => { :host => host, :deleted => [false, nil] }
   end
 
   def self.count_since x
@@ -261,8 +247,8 @@ class Message
   def additional_fields
     additional = []
     self.attributes.each do |key, value|
-      next if key.length <= 2 or key[0] == "_" or key[0..1] != "a_"
-      additional << { :key => key[2..-1], :value => self[key] }
+      next if SPECIAL_FIELDS.include?(key) or key.length <= 1 or key[0] != "_"
+      additional << { :key => key[1..key.length], :value => self[key] }
     end
     return additional
   end
