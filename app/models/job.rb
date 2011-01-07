@@ -16,7 +16,7 @@ class Job < ActiveRecord::Base
     job.last_run.to_i
   end
   
-  def active?(interval=15.minutes.ago)
+  def active?(interval=15.minutes.ago.to_i)
     !last_run.blank? and (last_run > interval)
   end
   
