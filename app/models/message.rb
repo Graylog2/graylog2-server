@@ -22,8 +22,8 @@ class Message
 
   LIMIT = 100
   scope :not_deleted, :deleted => [false, nil]
-  scope :by_blacklisted_terms, lambda { |terms| where(:_message.nin => terms.collect { |term| /#{term}/}) }
-  scope :of_blacklisted_terms, lambda { |terms| where(:_message.in => terms.collect { |term| /#{term}/}) }
+  scope :by_blacklisted_terms, lambda { |terms| where(:message.nin => terms.collect { |term| /#{term}/}) }
+  scope :of_blacklisted_terms, lambda { |terms| where(:message.in => terms.collect { |term| /#{term}/}) }
   scope :by_blacklist, lambda {|blacklist| by_blacklisted_terms(blacklist.all_terms)}
   scope :of_blacklist, lambda {|blacklist| of_blacklisted_terms(blacklist.all_terms)}
   scope :page, lambda {|number| skip(self.get_offset(number))}
