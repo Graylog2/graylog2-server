@@ -10,7 +10,7 @@ class Message
   key :_date, String
   key :_host, String
   key :_level, Integer
-  key :_facility, Integer
+  key :_facility, Object
   key :_deleted, Boolean
   key :_created_at, Integer
   key :_gelf, Boolean
