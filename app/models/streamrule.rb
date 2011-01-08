@@ -34,7 +34,7 @@ class Streamrule < ActiveRecord::Base
     when TYPE_FACILITY then
       return {:facility => {op => [value.to_i]}}
     when TYPE_TIMEFRAME then
-      return {:timeframe => value}
+      return {:created_at => Message.get_conditions_from_date(value)}
     when TYPE_ADDITIONAL then
       parts = value.split("=")
       return Hash.new if parts[0].blank? or parts[1].blank?
