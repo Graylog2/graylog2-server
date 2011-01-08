@@ -33,20 +33,7 @@ class Stream < ActiveRecord::Base
 
   # giving back IDs because all_with_subscribers does too
   def self.all_with_enabled_alerts
-    ids = Array.new
-    self.find_all_by_alarm_active(true).each do |s|
-      ids << s.id
-    end
-    return ids
-  end
-
-  def self.all_with_subscribers
-    ids = Array.new
-    self.joins(:subscribedStreams).each do |s|
-      next if ids.include?(s.id)
-      ids << s.id
-    end
-    return ids
+    find_all_by_alarm_active(true).collect &:id
   end
 
   def self.get_message_count(stream_id)
