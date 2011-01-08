@@ -71,8 +71,8 @@ class Message
     conditions = self
 
     unless filters.blank?
-      # Message
-      conditions = conditions.where(:message => /#{filters[:message].strip}/) unless filters[:message].blank?
+      # Message (seems like there is a bug in the Plucky condition overwriting. Setting blacklisted terms here.)
+      conditions = conditions.where(:message => { "$nin" => BlacklistedTerm.all_as_array, "$in" => [/#{filters[:message].strip}/] }) unless filters[:message].blank?
 
       # Time Frame
       conditions = conditions.where(:created_at => get_conditions_from_date(filters[:date])) unless filters[:date].blank?
@@ -114,6 +114,14 @@ class Message
     s.streamrules.each do |rule|
       conditions = conditions.where(rule.to_condition)
     end
+
+    # Plucky bug workaround. Same as in quickfilters.
+    unless conditions[:message].blank?
+      # Make it search via $in so we can easily add the $nin next. It does not have a $in when there is just one message condition.
+      conditions[:message] = { "$in" => [conditions[:message]] } if conditions[:message].is_a?(Regexp)
+      conditions[:message]["$nin"] = BlacklistedTerm.all_as_array
+    end
+    # Plucky bug woraround END. (this sucks, but is okay for now. really fix after release.)
 
     conditions
   end
