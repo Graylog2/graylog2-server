@@ -261,8 +261,11 @@ class Message
     return additional
   end
 
-  def self.get_stuff
-    self.collection.stats
+  def self.recalculate_host_counts
+    Host.all.each do |host|
+      host.message_count = Message.count(:host => host.host, :deleted => { "$in" => [false, nil]})
+      host.save
+    end
   end
 
   private
