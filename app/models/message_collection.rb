@@ -28,7 +28,11 @@ class MessageCollection
   private
 
   def self.stats
-    Message.collection.stats
+    begin
+      return Message.collection.stats
+    rescue
+      return Hash.new
+    end
   end
 
 end
