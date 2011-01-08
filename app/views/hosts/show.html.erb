@@ -3,7 +3,7 @@
 <% end %>
 
 <div id="hosts-delete">
-  <%= link_to "Delete this host", { :action => "destroy", :id => URI.escape(Base64.encode64(@host.host)) }, :confirm => "Really delete this host with all it's messages?" %>
+  <%= link_to "Delete this host", { :action => "destroy", :id => URI.escape(Base64.encode64(@host.host)) }, :confirm => "Really delete this host with all it's messages?", :method => :delete %>
 </div>
 
 <h1>Host <span class="highlighted"><%=h @host.host %></span></h1>

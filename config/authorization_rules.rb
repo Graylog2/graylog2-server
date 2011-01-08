@@ -7,7 +7,7 @@ authorization do
 
     has_permission_on :analytics, :to => [:index, :messagespread]
 
-    has_permission_on :hosts, :to => [:index, :show]
+    has_permission_on :hosts, :to => [:index, :show, :destroy]
     has_permission_on :hostgroups, :to => [:new, :create, :hosts, :index, :settings, :show, :destroy, :rename]
     has_permission_on :hostgroup_hosts, :to => [:create, :destroy]
     

@@ -233,7 +233,7 @@ class Message
   end
 
   def self.delete_all_of_host host
-    self.delete_all :conditions => { :host => host, :deleted => [false, nil] }
+    Message.set({:host => host}, :deleted => true )
   end
 
   def self.count_since x
