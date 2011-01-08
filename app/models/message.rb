@@ -256,7 +256,9 @@ class Message
     additional = []
     self.attributes.each do |key, value|
       next if SPECIAL_FIELDS.include?(key) or key.length <= 1 or key[0] != "_"
-      additional << { :key => key[1..key.length], :value => self[key] }
+      # Cut off underscore if there is one. (There is one if it's coming directly from MongoDB)
+      cut_key = (key[0] == "_" ? key[1..key.length] : key)
+      additional << { :key => cut_key, :value => self[key] }
     end
     return additional
   end
