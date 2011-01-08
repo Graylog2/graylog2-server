@@ -5,6 +5,7 @@ Graylog2WebInterface::Application.routes.draw do
   resources :messages do
     collection do
       post :showrange
+      get :showrange
     end
   end
 
@@ -35,6 +36,7 @@ Graylog2WebInterface::Application.routes.draw do
       post :alertable
       post :setdescription
       post :showrange
+      get :showrange
       post :setalarmvalue
       post :togglealarmactive
       post :togglefavorited
