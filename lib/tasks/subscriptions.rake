@@ -35,7 +35,7 @@ namespace :subscriptions do
         subscribers.each do |subscriber|
           begin
             Pony.mail(
-              :to => subscriber,
+              :to => subscriber.email,
               :from => Configuration.subscription_from_address,
               :subject => "#{Configuration.subscription_subject} (Stream: #{stream.title})",
               :body => body,
