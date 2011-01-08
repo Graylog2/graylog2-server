@@ -1,7 +1,7 @@
 #require 'test_helper'
 require File.expand_path(File.dirname(__FILE__) + "/../test_helper")
 
-class HostgrouphostsControllerTest < ActionController::TestCase
+class HostgroupHostsControllerTest < ActionController::TestCase
 
   test "add host with type simple" do
     Host.make(:host => "foo").save

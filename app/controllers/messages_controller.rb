@@ -4,7 +4,7 @@ class MessagesController < ApplicationController
   
   def set_scoping
     if params[:host_id]
-      @scope = Message.where(:_host => Base64.decode64(params[:host_id]))
+      @scope = Message.where(:host => Base64.decode64(params[:host_id]))
     elsif params[:stream_id]
       @scope = Message.by_stream(params[:stream_id])
     else
@@ -64,6 +64,7 @@ class MessagesController < ApplicationController
       conditions = Message.by_stream(params[:stream_id].to_i).criteria.to_hash
       throw "Missing conditions" if conditions.blank?
 
+      Message.recalculate_host_counts
       Message.set(conditions, :deleted => true )
 
       flash[:notice] = "Messages have been deleted."
@@ -87,6 +88,7 @@ class MessagesController < ApplicationController
       conditions = Message.all_by_quickfilter(filters_with_symbols, 0, 0).criteria.to_hash
       throw "Missing conditions" if conditions.blank?
 
+      Message.recalculate_host_counts
       Message.set(conditions, :deleted => true )
 
       flash[:notice] = "Messages have been deleted."

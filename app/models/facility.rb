@@ -5,8 +5,7 @@ class Facility < ActiveRecord::Base
   validates_numericality_of :number
 
   def self.standards
-    { -1 => "GELF (-1)",
-      0 => "Kernel (0)",
+    { 0 => "Kernel (0)",
       1 => "User-Level (1)",
       2 =>  "Mail (2)",
       3 => "System Daemon (3)",
@@ -49,8 +48,14 @@ class Facility < ActiveRecord::Base
     self.get_all.map { |n,f| [f,n] }.sort_by { |f| f[1] }
   end
 
-  def self.to_human(facility_id)
-    self.get_all[facility_id.to_i].blank? ? "Unknown (#{facility_id})" : self.get_all[facility_id.to_i]
+  def self.to_human(facility)
+    if facility.is_a?(Integer) or (facility.is_a?(String) and facility =~ /\d+/)
+      self.get_all[facility.to_i].blank? ? "N/A (#{facility})" : self.get_all[facility.to_i]
+    elsif facility.is_a?(String)
+      facility
+    else
+      "N/A"
+    end
   end
 
 end

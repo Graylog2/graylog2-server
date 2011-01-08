@@ -58,11 +58,10 @@ ActiveRecord::Schema.define(:version => 20110103121018) do
     t.datetime "updated_at"
   end
 
-  create_table "jobs", :force => true do |t|
+  create_table "jobs", :id => false, :force => true do |t|
     t.string   "title"
     t.integer  "last_run"
     t.datetime "created_at"
-    t.datetime "updated_at"
   end
 
   create_table "messagecomments", :force => true do |t|
@@ -113,10 +112,8 @@ ActiveRecord::Schema.define(:version => 20110103121018) do
   end
 
   create_table "subscribed_streams", :id => false, :force => true do |t|
-    t.integer  "stream_id"
-    t.integer  "user_id"
-    t.datetime "created_at"
-    t.datetime "updated_at"
+    t.integer "stream_id"
+    t.integer "user_id"
   end
 
   create_table "users", :force => true do |t|

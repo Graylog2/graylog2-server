@@ -70,10 +70,6 @@ class Configuration
     return nil if @livetail_config.blank? or @livetail_config['secret'].blank?
     return @livetail_config['secret'].to_s
   end
-  
-  def self.general_url_prefix
-    (@app_config.blank? or @app_config['url_prefix'].blank?) ? "/" : @app_config['url_prefix']
-  end
 
   def self.date_format
     default = "%d.%m.%Y - %H:%M:%S"

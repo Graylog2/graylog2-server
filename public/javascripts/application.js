@@ -64,6 +64,7 @@ $(document).ready(function(){
                 break;
             case '5':
                 field = $('.stream-value-timeframe');
+                help = $('#stream-value-timeframe-help').show();
                 break;
             case '6':
                 field = $('.stream-value-additional-field');
@@ -136,7 +137,7 @@ $(document).ready(function(){
       $("#analytics-new-messages-update-loading").show();
       
       // Update graph.
-      $.post($(this).attr("data-updateurl") + v, function(data) {
+      $.post($(this).attr("data-updateurl") + "&hours=" + v, function(data) {
         json = eval('(' + data + ')');
       
         // Plot is defined inline. (I suck at JavaScript)

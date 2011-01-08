@@ -11,7 +11,3 @@ subscriptions:
 streamalarms:
   from: graylog2alarms@example.org
   subject: "[graylog2] Stream alarm!"
-
-app:
-  #url_prefix: "graylog2" # enable to define string which prefixes all urls generated
-

@@ -17,7 +17,7 @@ class HostgroupsController < ApplicationController
 
     @messages = Message.all_of_hostgroup @hostgroup, params[:page]
     @total_count = Message.count_of_hostgroup @hostgroup
-    @last_message = Message.last :conditions => { "_host" => { "$in" => @hostgroup.all_conditions } }, :order => "created_at DESC"
+    @last_message = Message.last :conditions => { "host" => { "$in" => @hostgroup.all_conditions } }, :order => "created_at DESC"
   end
 
   def hosts
@@ -44,7 +44,7 @@ class HostgroupsController < ApplicationController
   end
 
   def rename
-    group = Hostgroup.find params[:group_id]
+    group = Hostgroup.find params[:id]
     group.name = params[:name]
     
     if group.save
@@ -53,7 +53,7 @@ class HostgroupsController < ApplicationController
       flash[:error] = "Could not rename host group."
     end
 
-    redirect_to :controller => "hostgroups", :action => "settings", :id => params[:group_id]
+    redirect_to :controller => "hostgroups", :action => "settings", :id => params[:id]
   end
 
   def destroy
