@@ -3,7 +3,8 @@ namespace :subscriptions do
   desc "Alert all users who subscribed to a stream if it contains new messages"
   task :send => :environment do
     # Go through every stream that has subscribers.
-    Stream.all_with_subscribers.each do |stream_id|
+    streams = Stream.all.find_all { |s| s.subscribers.count > 0}
+    streams.each do |stream_id|
       stream = Stream.find(stream_id)
 
       if stream.last_subscription_check.blank?
