@@ -23,7 +23,7 @@ of the alarm. You can also define that all users are alarmed, no matter what the
 <%=raw ajaxtrigger(:allusers, "Force for all users", togglealarmforce_stream_path(@stream), @stream.alarm_force) %>
 <br /><br />
 
-<%= form_tag setalarmvalue_stream_path(@stream) do %>
+<%= form_tag setalarmvalues_stream_path(@stream) do %>
   <%= label_tag :limit, "Maximum number of messages:" %>
   <%= text_field_tag :limit, @stream.alarm_limit, :id => "streams-alerts-limit" %> &nbsp;
 
