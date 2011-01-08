@@ -64,6 +64,7 @@ $(document).ready(function(){
                 break;
             case '5':
                 field = $('.stream-value-timeframe');
+                help = $('#stream-value-timeframe-help').show();
                 break;
             case '6':
                 field = $('.stream-value-additional-field');
