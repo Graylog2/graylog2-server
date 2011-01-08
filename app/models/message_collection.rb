@@ -1,19 +1,20 @@
 class MessageCollection
 
   def self.storage_size
-    stats["storageSize"].to_i
+    (stats["storageSize"] || 0).to_i
   end
 
   def self.size
-    stats["size"].to_i
+    (stats["size"] || 0).to_i
   end
 
   def self.index_size
-    stats["totalIndexSize"].to_i
+    (stats["totalIndexSize"] || 0).to_i
   end
 
   def self.average_object_size
-    stats["avgObjSize"].to_f
+    x = stats["avgObjSize"].to_f
+    x.nan? ? 0 : x
   end
 
   def self.is_capped?
@@ -21,7 +22,7 @@ class MessageCollection
   end
 
   def self.count
-    stats["count"].to_i
+    (stats["count"] || 0).to_i
   end
 
   private

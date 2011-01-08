@@ -44,7 +44,7 @@ class HostgroupsController < ApplicationController
   end
 
   def rename
-    group = Hostgroup.find params[:group_id]
+    group = Hostgroup.find params[:id]
     group.name = params[:name]
     
     if group.save
@@ -53,7 +53,7 @@ class HostgroupsController < ApplicationController
       flash[:error] = "Could not rename host group."
     end
 
-    redirect_to :controller => "hostgroups", :action => "settings", :id => params[:group_id]
+    redirect_to :controller => "hostgroups", :action => "settings", :id => params[:id]
   end
 
   def destroy

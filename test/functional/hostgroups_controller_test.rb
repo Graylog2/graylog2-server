@@ -25,7 +25,7 @@ class HostgroupsControllerTest < ActionController::TestCase
   end
 
   test "rename a host group" do
-    post :rename, :name => "hey my new name", :group_id => 1
+    post :rename, :name => "hey my new name", :id => 1
     
     renamed_group = Hostgroup.find(1)
     assert renamed_group.name == "hey my new name"
@@ -35,7 +35,7 @@ class HostgroupsControllerTest < ActionController::TestCase
 
   test "renaming a host group does not work if no name is given" do
     old_group = Hostgroup.find(1)
-    post :rename, :name => "", :group_id => 1
+    post :rename, :name => "", :id => 1
 
     renamed_group = Hostgroup.find(1)
 
@@ -49,7 +49,7 @@ class HostgroupsControllerTest < ActionController::TestCase
   end
 
   test "tabs are shown" do
-    get(:show, :id => 3)
+    get :show, :id => 3
 
     assert_select("#content-tabs")
     assert_select(".content-tabs-tab", :minimum => 1)
