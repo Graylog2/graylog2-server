@@ -451,9 +451,15 @@ label {
 /* General Loading Notification :) */
 #gln {
   position: fixed;
-  top: 96%;
-  left: 98%;
-  padding: 5px;
+  top: 5px;
+  left: 50%;
+  padding: 2px 5px 2px 25px;
   color: #000;
-  background-color: #fff;
+  background-color: #000;
+  text-transform: uppercase;
+  z-index: 9001;
+  color: #fff;
+  background-image: url(/images/top-load.gif);
+  background-repeat: no-repeat;
+  background-position: left center;
 }
