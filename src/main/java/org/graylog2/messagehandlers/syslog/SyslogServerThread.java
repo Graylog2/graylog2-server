@@ -53,6 +53,7 @@ public class SyslogServerThread extends Thread {
         SyslogServerIF syslogServer = SyslogServer.getThreadedInstance(syslogProtocol);
         
         syslogServer.getConfig().setPort(port);
+        syslogServer.getConfig().setUseStructuredData(true);
         syslogServer.getConfig().addEventHandler(new SyslogEventHandler());
 
         this.coreThread = syslogServer.getThread();

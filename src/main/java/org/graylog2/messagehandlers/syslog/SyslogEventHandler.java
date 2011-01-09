@@ -30,6 +30,7 @@ import org.graylog2.messagehandlers.common.ReceiveHookManager;
 import org.productivity.java.syslog4j.server.SyslogServerEventHandlerIF;
 import org.productivity.java.syslog4j.server.SyslogServerEventIF;
 import org.productivity.java.syslog4j.server.SyslogServerIF;
+import org.productivity.java.syslog4j.server.impl.event.structured.StructuredSyslogServerEvent;
 
 /**
  * SyslogEventHandler.java: May 17, 2010 8:58:18 PM
@@ -47,6 +48,25 @@ public class SyslogEventHandler implements SyslogServerEventHandlerIF {
      * @param event The event to handle
      */
     @Override public void event(SyslogServerIF syslogServer, SyslogServerEventIF event) {
+        // Structured messages.
+        StructuredSyslogServerEvent structure = new StructuredSyslogServerEvent(event.getRaw(), event.getRaw().length, null);
+        boolean isStructured = false;
+
+        // Extract host from message if it is structured. Will do DNS reverse lookup if not set.
+        String host = structure.getHost();
+        if (host != null && host.length() > 0) {
+            event.setHost(host);
+
+            // BETA: Trying out it this reliably detects structured messages.
+            isStructured = true;
+        }
+
+        // BETA: See if this reliably works.
+        if (isStructured)  {
+            event.setFacility(event.getFacility()/8);
+        }
+
+        // Print out debug information.
         if (Main.debugMode) {
             Log.info("Received message: " + event.getMessage());
             Log.info("Host: " + event.getHost());
@@ -55,7 +75,7 @@ public class SyslogEventHandler implements SyslogServerEventHandlerIF {
             Log.info("=======");
         }
 
-         // Insert into database.
+        // Insert into database.
         try {
             // Connect to database.
             MongoBridge m = new MongoBridge();
