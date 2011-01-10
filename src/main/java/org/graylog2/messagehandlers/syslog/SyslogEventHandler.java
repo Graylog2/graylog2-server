@@ -1,5 +1,5 @@
 /**
- * Copyright 2010 Lennart Koopmann <lennart@socketfeed.com>
+ * Copyright 2010, 2011 Lennart Koopmann <lennart@socketfeed.com>
  * 
  * This file is part of Graylog2.
  *
@@ -47,24 +47,9 @@ public class SyslogEventHandler implements SyslogServerEventHandlerIF {
      * @param syslogServer The syslog server
      * @param event The event to handle
      */
-    @Override public void event(SyslogServerIF syslogServer, SyslogServerEventIF event) {
-        // Structured messages.
-        StructuredSyslogServerEvent structure = new StructuredSyslogServerEvent(event.getRaw(), event.getRaw().length, null);
-        boolean isStructured = false;
-
-        // Extract host from message if it is structured. Will do DNS reverse lookup if not set.
-        String host = structure.getHost();
-        if (host != null && host.length() > 0) {
-            event.setHost(host);
-
-            // BETA: Trying out it this reliably detects structured messages.
-            isStructured = true;
-        }
-
-        // BETA: See if this reliably works.
-        if (isStructured)  {
-            event.setFacility(event.getFacility()/8);
-        }
+    public void event(SyslogServerIF syslogServer, SyslogServerEventIF event) {
+        // Yeah, syslog.
+        event.setFacility(event.getFacility()/8);
 
         // Print out debug information.
         if (Main.debugMode) {
@@ -72,6 +57,7 @@ public class SyslogEventHandler implements SyslogServerEventHandlerIF {
             Log.info("Host: " + event.getHost());
             Log.info("Facility: " + event.getFacility() + " (" + Tools.syslogFacilityToReadable(event.getFacility()) + ")");
             Log.info("Level: " + event.getLevel() + " (" + Tools.syslogLevelToReadable(event.getLevel()) + ")");
+            Log.info("Raw: " + new String(event.getRaw()));
             Log.info("=======");
         }
 
