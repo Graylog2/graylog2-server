@@ -15,7 +15,13 @@ class StreamsController < ApplicationController
     @has_sidebar = true
     @load_flot = 3
 
-    @messages = Message.all_of_stream @stream.id, params[:page]
+    if params[:filters].blank?
+      @messages = Message.all_of_stream @stream.id, params[:page]
+    else
+      @additional_filters = Message.extract_additional_from_quickfilter(params[:filters])
+      @messages = Message.by_stream(@stream).all_by_quickfilter params[:filters], params[:page]
+    end
+    
     @total_count = Message.count_stream @stream.id
 
     # Find out if this stream is favorited by the current user.

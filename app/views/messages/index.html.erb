@@ -19,40 +19,7 @@ filtered by <span class="highlighted"><%=h @total_blacklisted_terms %></span> bl
 <span class="highlighted"><%=h Message.count_of_last_minutes(Setting.get_message_count_interval(message_count_interval)) %></span>
 messages in the last <%=h message_count_interval %> minutes.
 
-<div id="messages-quickfilter" style="display: none;">
-<%= form_tag('/', :method => :get) do -%>
-  <dl id="messages-quickfilter-fields">
-    <dt><%= label_tag "filters[:message]", "Message (regex):" %></dt>
-    <dd><%= text_field_tag "filters[message]", params[:filters].blank? ? nil : params[:filters][:message] %></dd>
-
-    <dt><%= label_tag "filters[date]", "Timeframe:" %></dt>
-    <dd><%= text_field_tag "filters[date]", params[:filters].blank? ? nil : params[:filters][:date] %> <%=raw tooltip("Timeframe-Filters") %></dd>
-   
-    <dt><%= label_tag "filters[facility]", "Facility:" %></dt>
-    <dd><%= select_tag "filters[facility]", raw("<option></option>" + options_for_select(Facility.ordered_for_select, :selected => get_quickfilter_selected(params[:filters], :facility))) %></dd>
-    
-    <dt><%= label_tag "filters[severity]", "Severity:" %></dt>
-    <dd><%= select_tag "filters[severity]", raw("<option></option>" + options_for_select(get_ordered_severities_for_select, :selected => get_quickfilter_selected(params[:filters], :severity))) %></dd>
-    
-    <dt><%= label_tag "filters[host]", "Host:" %></dt>
-    <dd>
-      <%= select_tag "filters[host]", raw("<option></option>" + options_for_select(Host.all.collect {|host| [ h(host.host) ]}.sort, :selected => get_quickfilter_selected(params[:filters], :host, true))) %>
-    </dd>
-
-    <% unless @additional_filters.blank? %>
-      <% @additional_filters.each do |k,v| %>
-        <dt><%= text_field_tag "filters[additional][keys][]", (k[0] == '_' ? k[1..k.length] : k), :class => "messages-quickfilter-additional-key" %></dt>
-        <dd><%= text_field_tag "filters[additional][values][]", v, :class => "messages-quickfilter-additional-value" %></dd>
-      <% end %>
-    <% end %>
-  </dl>
-
-  <br />
-  <%= awesome_link "Add additional field", "#", :id => "messages-quickfilter-add-additional" %>
-  <%= awesome_submit_link "Run filter" %>
-<% end -%>
-
-</div>
+<%= render :partial => "quickfilter" %>
 
 <% unless params[:filters].blank? %>
 <div id="messages-quickfilter-delete">

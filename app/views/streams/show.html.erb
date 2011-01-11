@@ -4,6 +4,10 @@
   <%= render :partial => "sidebar_show" %>
 <% end %>
 
+<div id="messages-show-quickfilter" <%= params[:filters].blank? ? nil : "class=\"messages-show-quickfilter-expanded\""  %>>
+  Quickfilter
+</div>
+
 <h1>Stream <span class="highlighted"><%= @stream.title %></span></h1>
 
 <div id="streams-description">
@@ -29,8 +33,11 @@
   </div>
 </div>
 
+<%= render :partial => "messages/quickfilter" %>
+
 <% if @stream.streamrules.blank? %>
   <center>No messages in this stream.</center>
 <% else %>
   <%= render :partial => "messages/table", :locals => { :messages => @messages, :total_messages => @total_count } %>
 <% end %>
+
