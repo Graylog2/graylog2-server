@@ -67,7 +67,7 @@ Your current time: <%= gl_date(Time.now.to_s) %>
 </ul>
 
 <br />
-<%= awesome_link "Open dashboard", { :controller => "dashboard" }, :style => "display: inline;", :target => "_blank" %>
+<%= awesome_link "Open dashboard", dashboard_index_path, :style => "display: inline;", :target => "_blank" %>
 
 <% if Configuration.livetail_enabled %>
   <%= awesome_link "Go to live tail", :controller => "livetail" %>
