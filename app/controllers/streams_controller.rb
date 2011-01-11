@@ -135,7 +135,7 @@ class StreamsController < ApplicationController
     else
       flash[:error] = "Could not create stream"
     end
-    redirect_to streams_path
+    redirect_to rules_stream_path(new_stream)
   end
   
   def rename

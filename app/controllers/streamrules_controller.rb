@@ -7,7 +7,7 @@ class StreamrulesController < ApplicationController
     else
       flash[:error] = "Could not add rule."
     end
-    redirect_to stream_path(new_rule.stream_id)
+    redirect_to rules_stream_path(new_rule.stream_id)
   end
 
   def destroy

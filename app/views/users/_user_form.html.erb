@@ -1,4 +1,4 @@
-<%= form_for :user, :url => { :action => form_action, :id => @user.id } do |f| -%>
+<%= form_for @user do |f| -%>
 
 <dl id="users-form">
   <dt><%= label_tag 'login', "Username" %></dt>

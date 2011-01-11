@@ -7,7 +7,7 @@ module ApplicationHelper
       current = where[1..where.length]
     end
 
-    "<li class=\"#{"topmenu-active" if is_current_menu_item?(current)}\">#{link_to(current, "/#{current}")}</li>"
+    "<li class=\"#{"topmenu-active" if is_current_menu_item?(current)}\">#{link_to(title, "/#{current}")}</li>"
   end
 
   def tab_link tab
