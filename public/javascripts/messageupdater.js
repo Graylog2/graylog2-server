@@ -5,7 +5,7 @@ $(document).ready(function(){
   
 function showNewMessagesBar() {
   // Fetch count of new messages since page load.
-  $.post("/api/get_new_message_count", {since: $('#pageload').html()}, function(data) {
+  $.post("/messages/getnewmessagecount", {since: $('#pageload').html()}, function(data) {
     response = eval('(' + data + ')');
 
     if (response.status == 'success') {
