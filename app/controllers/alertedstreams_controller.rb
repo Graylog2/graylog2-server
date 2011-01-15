@@ -7,7 +7,7 @@ class AlertedstreamsController < ApplicationController
     begin
       stream = Stream.find(stream_id)
     rescue
-      flash[:error] = "<strong>Could not favorite stream</strong><span>Stream does not exist.</span>"
+      flash[:error] = "Could not favorite stream: Stream does not exist."
       redirect_to streams_path
       return
     end

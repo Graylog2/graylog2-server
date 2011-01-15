@@ -60,9 +60,9 @@ class HostgroupsController < ApplicationController
     hostgroup = Hostgroup.find params[:id]
  
     if hostgroup.destroy
-      flash[:notice] = "<strong>Hostgroup has been deleted</strong>"
+      flash[:notice] = "Hostgroup has been deleted."
     else
-      flash[:error] = "<strong>Could not delete hostgroup</strong>"
+      flash[:error] = "Could not delete hostgroup!"
     end
 
     redirect_to hosts_path

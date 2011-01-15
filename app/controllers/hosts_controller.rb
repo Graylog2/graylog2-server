@@ -22,7 +22,7 @@ class HostsController < ApplicationController
     @total_count = @host.message_count
 
     if @host.blank?
-      flash[:error] = "<strong>Unknown host</strong> <span>Could not find host</span>"
+      flash[:error] = "Could not find host!"
       redirect_to :action => "index"
     end
 
@@ -32,7 +32,7 @@ class HostsController < ApplicationController
   def destroy
     host = Host.find_by_host Base64.decode64(params[:id])
     if host.blank?
-      flash[:error] = "<strong>Could not delete host</strong> <span>Could not find host</span>"
+      flash[:error] = "Could not delete host!"
       redirect_to :action => "index"
       return
     end
@@ -41,16 +41,16 @@ class HostsController < ApplicationController
     begin
       Message.delete_all_of_host host.host
     rescue => e
-      flash[:error] = "<strong>Could not delete host</strong> <span>Could not delete messages of host</span>"
+      flash[:error] = "Could not delete messages of host"
       redirect_to :action => "index"
       return
     end
 
     # Delete host.
     if host.destroy
-      flash[:notice] = "<strong>Host has been deleted</strong>"
+      flash[:notice] = "Host has been deleted"
     else
-      flash[:error] = "<strong>Could not delete host</strong>"
+      flash[:error] = "Could not delete host"
       redirect_to :action => "index"
       return
     end
@@ -62,7 +62,7 @@ class HostsController < ApplicationController
     @host = Host.find_by_host params[:host].strip
 
     if @host.blank?
-      flash[:error] = "<strong>Unknown host</strong> <span>Could not find host</span>"
+      flash[:error] = "Unknown host"
       redirect_to :action => "index"
     else
       redirect_to :action => "show", :id => Base64.encode64(params[:host].strip)
