@@ -21,6 +21,7 @@
 package org.graylog2.periodical;
 
 import org.graylog2.Log;
+import org.graylog2.database.MongoBridge;
 import org.graylog2.messagehandlers.common.MessageCounter;
 
 /**
@@ -30,7 +31,7 @@ import org.graylog2.messagehandlers.common.MessageCounter;
  *
  * @author: Lennart Koopmann <lennart@socketfeed.com>
  */
-public class LoadStatisticsThread extends Thread {
+public class TroughputWriterThread extends Thread {
 
     /**
      * Start the thread. Runs forever.
@@ -40,7 +41,9 @@ public class LoadStatisticsThread extends Thread {
         while (true) {
             try {
                 MessageCounter counter = MessageCounter.getInstance();
-                Log.stats(counter.getTotalSecondCount(), counter.getHighestSecondCount());
+                MongoBridge m = new MongoBridge();
+
+                m.writeThroughput(counter.getTotalSecondCount(), counter.getHighestSecondCount());
                 counter.resetTotalSecondCount();
             } catch (Exception e) {
                 Log.warn("Error in LoadStatisticsThread: " + e.toString());

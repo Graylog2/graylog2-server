@@ -31,7 +31,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
 import org.graylog2.periodical.ChunkedGELFClientManagerThread;
-import org.graylog2.periodical.LoadStatisticsThread;
+import org.graylog2.periodical.TroughputWriterThread;
 
 /**
  * Main class of Graylog2.
@@ -44,11 +44,6 @@ public final class Main {
      * Controlled by parameter "debug". Enables more verbose output.
      */
     public static boolean debugMode = false;
-
-    /**
-     * Controlled by parameter "debug". Enables output of messages/second for benchmarking.
-     */
-    public static boolean printLoadStats = false;
 
     /**
      * This holds the configuration from /etc/graylog2.conf
@@ -131,12 +126,6 @@ public final class Main {
             Main.debugMode = true;
         } else {
             System.out.println("[x] Not in Debug mode.");
-
-            // Maybe print out messages/second? (Only available if not in debug mode)
-            if (args.length > 0 && args[0].equalsIgnoreCase("loadstats")) {
-                Main.printLoadStats = true;
-                System.out.println("[x] Printing load stats.");
-            }
         }
 
         // Write a PID file.
@@ -195,11 +184,9 @@ public final class Main {
             System.out.println("[x] GELF threads are up.");
         }
 
-        if (Main.printLoadStats) {
-            // Start thread that prints out load statistics.
-            LoadStatisticsThread loadStatThread = new LoadStatisticsThread();
-            loadStatThread.start();
-        }
+        // Start thread that stores throughput info.
+        TroughputWriterThread throughputThread = new TroughputWriterThread();
+        throughputThread.start();
 
         System.out.println("[x] Graylog2 up and running.");
     }

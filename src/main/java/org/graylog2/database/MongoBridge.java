@@ -154,4 +154,17 @@ public class MongoBridge {
         coll.update(query, update, true, false);
     }
 
+    public void writeThroughput(int current, int highest) {
+        BasicDBObject query = new BasicDBObject();
+        query.put("type", "total_throughput");
+        
+        BasicDBObject update = new BasicDBObject();
+        update.put("type", "total_throughput");
+        update.put("current", current);
+        update.put("highest", highest);
+        
+        DBCollection coll = MongoConnection.getInstance().getDatabase().getCollection("server_values");
+        coll.update(query, update, true, false);
+    }
+
 }
