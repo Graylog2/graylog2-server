@@ -172,6 +172,31 @@ label {
   cursor: pointer;
 }
 
+.notification {
+  height: 28px;
+  padding-left: 15px;
+  padding-top: 8px;
+  width: 100%;
+  color: #fff;
+  font-size: 16px;
+  text-shadow: 0 -1px 1px #111;
+  font-weight: bold;
+  background-repeat: repeat-x;
+}
+
+.notification-title {
+  margin-right: 25px;
+  font-size: 20px;
+}
+
+#notification-notice {
+  background-image: url(/images/notificationbar-green.png);
+}
+
+#notification-error {
+  background-image: url(/images/notificationbar-red.png);
+}
+
 #top {
     height: 90px;
     width: 100%;

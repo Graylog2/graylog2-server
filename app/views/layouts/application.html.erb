@@ -9,9 +9,7 @@
   <%= stylesheet_link_tag "core" %>
   <%= stylesheet_link_tag "sections" %>
   <%= stylesheet_link_tag "messages" %>
-  <%= stylesheet_link_tag "jquery.gritter" %>
   <%= javascript_include_tag "jquery-1.4.2.min" %>
-  <%= javascript_include_tag "jquery.gritter.min" %>
   <%= javascript_include_tag "jquery.autocomplete.min" %>
   <%= javascript_include_tag "jquery.numeric" %>
   <%= javascript_include_tag "jquery.sparkline.min" %>
@@ -29,8 +27,19 @@
   <div id="pageload" style="display: none;"><%= Time.now.to_i %></div>
   <div id="gln" style="display: none;">&nbsp;Loading&hellip;</div>
 
-  <div id="notification-notice" style="display: none;"><%=raw flash[:notice] %></div>
-  <div id="notification-error" style="display: none;"><%=raw flash[:error] %></div>
+  <% unless flash[:notice].blank? %>
+    <div id="notification-notice" class="notification">
+      <span class="notification-title">Success!</span>
+      <%=raw flash[:notice] %>
+    </div>
+  <% end %>
+
+  <% unless flash[:error].blank? %>
+    <div id="notification-error" class="notification">
+      <span class="notification-title">Error!</span>
+      <%=raw flash[:error] %>
+    </div>
+  <% end %>
 
   <div id="top">
     <div id="userbar">
