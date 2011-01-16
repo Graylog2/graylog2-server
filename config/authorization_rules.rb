@@ -21,6 +21,8 @@ authorization do
     has_permission_on :sessions, :to => [:destroy]
 
     has_permission_on :dashboard, :to => [:index]
+
+    has_permission_on :health, :to => [:index, :currentthroughput]
   end
   
   role :reader do

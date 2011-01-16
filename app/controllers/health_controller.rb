@@ -1,4 +1,6 @@
 class HealthController < ApplicationController
+  filter_access_to :index
+  filter_access_to :currentthroughput
 
   def index
     @load_flot = true

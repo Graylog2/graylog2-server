@@ -72,3 +72,6 @@ Your current time: <%= gl_date(Time.now.to_s) %>
 <% if Configuration.livetail_enabled %>
   <%= awesome_link "Go to live tail", :controller => "livetail" %>
 <% end %>
+
+<br /><br />
+<%= awesome_link "Server health", :controller => "health" %>
