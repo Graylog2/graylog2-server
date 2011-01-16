@@ -31,7 +31,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
 import org.graylog2.periodical.ChunkedGELFClientManagerThread;
-import org.graylog2.periodical.TroughputWriterThread;
+import org.graylog2.periodical.ServerValueHistoryWriterThread;
+import org.graylog2.periodical.ThroughputWriterThread;
 
 /**
  * Main class of Graylog2.
@@ -49,7 +50,8 @@ public final class Main {
      * This holds the configuration from /etc/graylog2.conf
      */
     public static Properties masterConfig = null;
-    
+
+    public static final String GRAYLOG2_VERSION = "0.9.5-dev";
     
 
     private Main() { }
@@ -131,7 +133,7 @@ public final class Main {
         // Write a PID file.
         try {
             String pid = Tools.getPID();
-            if (pid == null || pid.length() == 0) {
+            if (pid == null || pid.length() == 0 || pid.equals("unknown")) {
                 throw new Exception("Could not determine PID.");
             }
 
@@ -160,6 +162,14 @@ public final class Main {
             System.exit(1); // Exit with error.
         }
 
+        // Fill some stuff into the server_values collection.
+        ServerValue.setStartupTime(Tools.getUTCTimestamp());
+        ServerValue.setPID(Integer.parseInt(Tools.getPID()));
+        ServerValue.setJREInfo(Tools.getSystemInformation());
+        ServerValue.setGraylog2Version(GRAYLOG2_VERSION);
+        ServerValue.setAvailableProcessors(HostSystem.getAvailableProcessors());
+        ServerValue.setLocalHostname(Tools.getLocalHostname());
+
         // Start the Syslog thread that accepts syslog packages.
         SyslogServerThread syslogServerThread = new SyslogServerThread(Integer.parseInt(Main.masterConfig.getProperty("syslog_listen_port")));
         syslogServerThread.start();
@@ -185,8 +195,12 @@ public final class Main {
         }
 
         // Start thread that stores throughput info.
-        TroughputWriterThread throughputThread = new TroughputWriterThread();
+        ThroughputWriterThread throughputThread = new ThroughputWriterThread();
         throughputThread.start();
+
+        // Start thread that stores system information periodically.
+        ServerValueHistoryWriterThread serverValueHistoryThread = new ServerValueHistoryWriterThread();
+        serverValueHistoryThread.start();
 
         System.out.println("[x] Graylog2 up and running.");
     }

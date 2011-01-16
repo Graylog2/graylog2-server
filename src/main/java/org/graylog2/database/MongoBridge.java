@@ -60,7 +60,12 @@ public class MongoBridge {
             coll = MongoConnection.getInstance().getDatabase().getCollection("messages");
         } else {
             long messagesCollSize = Long.parseLong(Main.masterConfig.getProperty("messages_collection_size").trim());
-            coll = MongoConnection.getInstance().getDatabase().createCollection("messages", BasicDBObjectBuilder.start().add("capped", true).add("size", messagesCollSize).get());
+            coll = MongoConnection.getInstance()
+                    .getDatabase()
+                    .createCollection("messages", BasicDBObjectBuilder.start()
+                    .add("capped", true)
+                    .add("size", messagesCollSize)
+                    .get());
         }
 
         coll.ensureIndex(new BasicDBObject("created_at", 1));
@@ -69,6 +74,26 @@ public class MongoBridge {
         coll.ensureIndex(new BasicDBObject("message", 1));
         coll.ensureIndex(new BasicDBObject("facility", 1));
         coll.ensureIndex(new BasicDBObject("level", 1));
+
+        return coll;
+    }
+
+    public DBCollection getHistoricServerValuesColl() {
+        DBCollection coll = null;
+
+        // Create a capped collection if the collection does not yet exist.
+        if(MongoConnection.getInstance().getDatabase().getCollectionNames().contains("historic_server_values")) {
+            coll = MongoConnection.getInstance().getDatabase().getCollection("historic_server_values");
+        } else {
+            coll = MongoConnection.getInstance()
+                    .getDatabase().createCollection("historic_server_values", BasicDBObjectBuilder.start()
+                    .add("capped", true)
+                    .add("size", 10000000) // 10 MB
+                    .get());
+        }
+
+        coll.ensureIndex(new BasicDBObject("type", 1));
+        coll.ensureIndex(new BasicDBObject("created_at", 1));
 
         return coll;
     }
@@ -165,6 +190,28 @@ public class MongoBridge {
         
         DBCollection coll = MongoConnection.getInstance().getDatabase().getCollection("server_values");
         coll.update(query, update, true, false);
+    }
+
+    public void setSimpleServerValue(String key, Object value) {
+        BasicDBObject query = new BasicDBObject();
+        query.put("type", key);
+
+        BasicDBObject update = new BasicDBObject();
+        update.put("value", value);
+        update.put("type", key);
+
+        DBCollection coll = MongoConnection.getInstance().getDatabase().getCollection("server_values");
+        coll.update(query, update, true, false);
+    }
+
+    public void writeHistoricServerValue(String key, Object value) {
+        BasicDBObject obj = new BasicDBObject();
+        obj.put("type", key);
+        obj.put("value", value);
+        obj.put("created_at", Tools.getUTCTimestamp());
+
+        DBCollection coll = getHistoricServerValuesColl();
+        coll.insert(obj);
     }
 
 }
