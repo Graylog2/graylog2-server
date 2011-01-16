@@ -187,6 +187,17 @@ module ApplicationHelper
     link_to(image_tag("icons/tooltip.png"), "https://github.com/Graylog2/graylog2-web-interface/wiki/" + to, :class => "tooltip", :target => "_blank", :title => "Help page in the wiki")
   end
 
+  def array_for_flot_with_timeseries(values)
+    ret = "["
+    values.each do |value|
+      ret += "[#{value[0]},#{value[1]}],"
+    end
+    ret.chop! # remove last comma
+    ret += "]"
+
+    return ret
+  end
+
   private
 
   def is_current_menu_item? item

@@ -1,0 +1,67 @@
+<h1>Health of <span class="highlighted">graylog2-server-<%= ServerValue.graylog2_version %></span> on <span class="highlighted"><%= ServerValue.local_hostname %></span></h1>
+
+<div id="health-throughput">
+  <span class="health-throughput-title">Throughput:</span>
+
+  <span id="health-throughput-current">
+    <%= ServerValue.throughput[:current] %>
+  </span>
+  <span class="health-throughput-label">Current</span>
+
+  &nbsp;
+
+  <span id="health-throughput-highest"><%= ServerValue.throughput[:highest] %></span>
+  <span class="health-throughput-label">Highest</span>
+  
+  &nbsp;
+ 
+  <span class="health-throughput-explanation">(messages/second)</span>
+</div>
+
+<br />
+<h3><span class="highlighted">Started:</span> <%= gl_date(Time.at(ServerValue.startup_time)) %></h3>
+<h3><span class="highlighted">Available processors:</span> <%= ServerValue.available_processors %></h3>
+<h3><span class="highlighted">JRE:</span> <%= ServerValue.jre %></h3>
+<h3><span class="highlighted">PID:</span> <%= ServerValue.pid %></h3>
+
+<br />
+<h2>Used memory (Megabyte):</h2>
+<div id="graph-used-memory" style="width: 100%; height: 200px;"></div>
+
+<script type='text/javascript'>
+  function plot(inject, data){
+    $.plot($(inject),
+      [ {
+          color: '#fd0c99',
+          shadowSize: 10,
+          data: data,
+          points: { show: false, },
+          lines: { show: true, fill: true }
+      } ],
+      {
+        xaxis: { mode: 'time' },
+        yaxis: { ticks: 10 },
+        grid: {
+          show: true,
+          color: '#ccc',
+          borderWidth: 0,
+        },
+        selection: { mode: 'x' }
+      }
+    );
+  }
+
+  plot("#graph-used-memory", <%= array_for_flot_with_timeseries(@used_memory) %>)
+
+  // Update current throughput every seconds
+  setInterval(function(){
+      $.post("/health/currentthroughput", function(data) {
+        json = eval('(' + data + ')');
+        count = $("#health-throughput-current");
+        count.html(json.count);
+        count.fadeOut(200, function() {
+          count.fadeIn(200);
+        });
+      });
+  }, 1000);
+</script>

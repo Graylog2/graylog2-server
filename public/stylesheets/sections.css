@@ -478,3 +478,30 @@
 #messagecomments li {
   margin-bottom: 3px;
 }
+
+/* Health */
+#health-throughput {
+  padding: 15px;
+  padding-top: 25px;
+  background-color: #333;
+  color: #fff;
+  font-size: 60px;
+  font-family: Georgia,"Times New Roman",Times,serif;
+}
+
+#health-throughput-current {
+  color: #FD0C99;
+}
+
+.health-throughput-title {
+  font-size: 30px;
+}
+
+.health-throughput-label {
+  text-transform: uppercase;
+  font-size: 16px;
+}
+
+.health-throughput-explanation {
+  font-size: 15px;
+}
