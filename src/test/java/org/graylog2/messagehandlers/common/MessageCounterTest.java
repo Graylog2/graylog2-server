@@ -20,10 +20,7 @@
 
 package org.graylog2.messagehandlers.common;
 
-import org.junit.After;
-import org.junit.AfterClass;
 import org.junit.Before;
-import org.junit.BeforeClass;
 import org.junit.Test;
 import static org.junit.Assert.*;
 
@@ -34,53 +31,72 @@ import static org.junit.Assert.*;
  */
 public class MessageCounterTest {
 
-    public MessageCounterTest() {
-    }
-
-    @BeforeClass
-    public static void setUpClass() throws Exception {
-    }
-
-    @AfterClass
-    public static void tearDownClass() throws Exception {
-    }
-
     @Before
     public void setUp() {
+        MessageCounter.getInstance().reset(MessageCounter.ALL_HOSTS);
+        MessageCounter.getInstance().resetTotalSecondCount();
     }
 
-    @After
-    public void tearDown() {
-    }
-
-    /**
-     * Test of getInstance method, of class MessageCounter.
-     */
     @Test
     public void testGetInstance() {
         assertNotNull(MessageCounter.getInstance());
     }
 
-    /**
-     * Test of reset method, of class MessageCounter.
-     */
     @Test
     public void testReset() {
         MessageCounter.getInstance().countUp(MessageCounter.ALL_HOSTS);
         MessageCounter.getInstance().reset(MessageCounter.ALL_HOSTS);
-        assertEquals(MessageCounter.getInstance().getCount(MessageCounter.ALL_HOSTS), 0);
+        assertEquals(0, MessageCounter.getInstance().getCount(MessageCounter.ALL_HOSTS));
     }
 
-    /**
-     * Test of countUp method, of class MessageCounter.
-     */
     @Test
     public void testCountUp() {
         int setCount = 4;
         for (int i = 0; i < setCount; i++) {
             MessageCounter.getInstance().countUp(MessageCounter.ALL_HOSTS);
         }
-        assertEquals(MessageCounter.getInstance().getCount(MessageCounter.ALL_HOSTS), setCount);
+        assertEquals(setCount, MessageCounter.getInstance().getCount(MessageCounter.ALL_HOSTS));
+    }
+
+    @Test
+    public void testGetCount() {
+        int count_to = 15;
+        for (int i = 0; i < count_to; i++) {
+            MessageCounter.getInstance().countUp(MessageCounter.ALL_HOSTS);
+        }
+
+        assertEquals(count_to,MessageCounter.getInstance().getCount(MessageCounter.ALL_HOSTS));
+    }
+
+    @Test
+    public void testResetTotalSecondCount() {
+        MessageCounter.getInstance().countUp(MessageCounter.ALL_HOSTS);
+        MessageCounter.getInstance().resetTotalSecondCount();
+        assertEquals(0, MessageCounter.getInstance().getTotalSecondCount());
+        assertEquals(1, MessageCounter.getInstance().getCount(MessageCounter.ALL_HOSTS));
+    }
+
+    @Test
+    public void testGetTotalSecondCount() {
+        int count_to = 21;
+        for (int i = 0; i < count_to; i++) {
+            MessageCounter.getInstance().countUp(MessageCounter.ALL_HOSTS);
+        }
+
+        assertEquals(count_to,MessageCounter.getInstance().getTotalSecondCount());
+    }
+
+    @Test
+    public void testGetHighestSecondCount() {
+        int count_to = 126;
+        for (int i = 0; i < count_to; i++) {
+            MessageCounter.getInstance().countUp(MessageCounter.ALL_HOSTS);
+        }
+
+        MessageCounter.getInstance().reset(MessageCounter.ALL_HOSTS);
+        MessageCounter.getInstance().resetTotalSecondCount();
+
+        assertEquals(count_to,MessageCounter.getInstance().getHighestSecondCount());
     }
 
 }
