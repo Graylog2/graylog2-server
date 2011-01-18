@@ -1,12 +1,15 @@
 class UsersController < ApplicationController
-  if User.all.size > 0
-    filter_resource_access
-  end
+  filter_access_to :index
+  filter_access_to :show
+  filter_access_to :new
+  filter_access_to :edit
+  filter_access_to :create
+  filter_access_to :update
+  filter_access_to :delete
 
-  if User.count == 0
-    skip_before_filter :login_required, :only => [:first, :create]
-    layout "login"
-  end
+  skip_before_filter :login_required, :only => [:first, :createfirst]
+
+  layout :choose_layout
 
   def index
     @users = User.find :all
@@ -17,10 +20,6 @@ class UsersController < ApplicationController
   end
 
   def new
-    @user = User.new
-  end
-
-  def first
     @user = User.new
   end
 
@@ -78,6 +77,43 @@ class UsersController < ApplicationController
     end
 
     redirect_to :action => 'index'
+  end
+  
+  def first
+    # This action is allowed without login. Block after first user is created.
+    if User.count > 0
+      block_access
+      return
+    end
+
+    @user = User.new
+  end
+
+  def createfirst
+    # This action is allowed without login. Block after first user is created.
+    if User.count > 0
+      block_access
+      return
+    end
+
+    @user = User.new(params[:user])
+    success = @user && @user.save
+    if success && @user.errors.empty?
+      redirect_to :action => 'index'
+      flash[:notice] = "Your first user has been created. Welcome to Graylog2!"
+    else
+      render :action => 'first'
+    end
+  end
+
+  private
+  def block_access
+    render :text => "not authorized", :status => 401
+    return
+  end
+
+  def choose_layout
+    action_name == "first" || action_name == "createfirst" ? "login" : "application"
   end
 
 end
