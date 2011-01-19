@@ -1,5 +1,5 @@
 /**
- * Copyright 2010 Lennart Koopmann <lennart@socketfeed.com>
+ * Copyright 2010, 2011 Lennart Koopmann <lennart@socketfeed.com>
  * 
  * This file is part of Graylog2.
  *
@@ -30,6 +30,10 @@ import java.io.FileWriter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
+import org.graylog2.messagehandlers.amqp.AMQP;
+import org.graylog2.messagehandlers.amqp.AMQPBroker;
+import org.graylog2.messagehandlers.amqp.AMQPSubscribedQueue;
+import org.graylog2.messagehandlers.amqp.AMQPSubscriberThread;
 import org.graylog2.periodical.ChunkedGELFClientManagerThread;
 import org.graylog2.periodical.ServerValueHistoryWriterThread;
 import org.graylog2.periodical.ThroughputWriterThread;
@@ -152,7 +156,7 @@ public final class Main {
                     Main.masterConfig.getProperty("mongodb_password"),
                     Main.masterConfig.getProperty("mongodb_host"),
                     Main.masterConfig.getProperty("mongodb_database"),
-                    Integer.valueOf(Main.masterConfig.getProperty("mongodb_port")),
+                    (Main.masterConfig.getProperty("mongodb_port") == null) ? 0 : Integer.parseInt(Main.masterConfig.getProperty("mongodb_port")),
                     Main.masterConfig.getProperty("mongodb_useauth"),
                     Configuration.getMongoDBReplicaSetServers(Main.masterConfig)
             );
@@ -192,6 +196,30 @@ public final class Main {
             gelfManager.start();
             
             System.out.println("[x] GELF threads are up.");
+        }
+
+        // AMQP.
+         if (AMQP.isEnabled(Main.masterConfig)) {
+            // Connect to AMQP broker.
+            AMQPBroker amqpBroker = new AMQPBroker(
+                    Main.masterConfig.getProperty("amqp_host"),
+                    (Main.masterConfig.getProperty("amqp_port") == null) ? 0 : Integer.parseInt(Main.masterConfig.getProperty("amqp_port")),
+                    Main.masterConfig.getProperty("amqp_username"),
+                    Main.masterConfig.getProperty("amqp_password"),
+                    Main.masterConfig.getProperty("amqp_virtualhost")
+            );
+
+            List<AMQPSubscribedQueue> amqpQueues = Configuration.getAMQPSubscribedQueues(Main.masterConfig);
+
+            if (amqpQueues != null) {
+                // Start AMQP subscriber thread for each queue to listen on.
+                for (AMQPSubscribedQueue queue : amqpQueues) {
+                    AMQPSubscriberThread amqpThread = new AMQPSubscriberThread(queue, amqpBroker);
+                    amqpThread.start();
+                }
+
+                System.out.println("[x] AMQP threads are up. (" + amqpQueues.size() + " queues)");
+            }
         }
 
         // Start thread that stores throughput info.

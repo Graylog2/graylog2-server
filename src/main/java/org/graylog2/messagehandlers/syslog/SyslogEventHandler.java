@@ -30,7 +30,6 @@ import org.graylog2.messagehandlers.common.ReceiveHookManager;
 import org.productivity.java.syslog4j.server.SyslogServerEventHandlerIF;
 import org.productivity.java.syslog4j.server.SyslogServerEventIF;
 import org.productivity.java.syslog4j.server.SyslogServerIF;
-import org.productivity.java.syslog4j.server.impl.event.structured.StructuredSyslogServerEvent;
 
 /**
  * SyslogEventHandler.java: May 17, 2010 8:58:18 PM
@@ -40,7 +39,9 @@ import org.productivity.java.syslog4j.server.impl.event.structured.StructuredSys
  * @author: Lennart Koopmann <lennart@socketfeed.com>
  */
 public class SyslogEventHandler implements SyslogServerEventHandlerIF {
-    
+
+    private static String amqpQueue = null;
+
     /**
      * Handle an incoming syslog message: Output if in debug mode, store in MongoDB, ReceiveHooks
      *
@@ -53,7 +54,7 @@ public class SyslogEventHandler implements SyslogServerEventHandlerIF {
 
         // Print out debug information.
         if (Main.debugMode) {
-            Log.info("Received message: " + event.getMessage());
+            Log.info("Received syslog message (via AMQP): " + event.getMessage());
             Log.info("Host: " + event.getHost());
             Log.info("Facility: " + event.getFacility() + " (" + Tools.syslogFacilityToReadable(event.getFacility()) + ")");
             Log.info("Level: " + event.getLevel() + " (" + Tools.syslogLevelToReadable(event.getLevel()) + ")");

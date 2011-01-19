@@ -31,6 +31,7 @@ import org.graylog2.Log;
 import org.graylog2.Main;
 import org.graylog2.Tools;
 import org.graylog2.messagehandlers.gelf.GELFMessage;
+import org.graylog2.messagehandlers.syslog.GraylogSyslogServerEvent;
 
 import org.productivity.java.syslog4j.server.SyslogServerEventIF;
 
@@ -117,6 +118,12 @@ public class MongoBridge {
         dbObj.put("created_at", Tools.getUTCTimestamp());
         // Documents in capped collections cannot grow so we have to do that now and cannot just add 'deleted => true' later.
         dbObj.put("deleted", false);
+
+        // Add AMQP receiver queue if this is an extended event.
+        if (event instanceof GraylogSyslogServerEvent) {
+            GraylogSyslogServerEvent extendedEvent = (GraylogSyslogServerEvent) event;
+            dbObj.put("_amqp_queue", extendedEvent.getAmqpReceiverQueue());
+        }
 
         coll.insert(dbObj);
     }
