@@ -30,6 +30,7 @@ import java.io.FileWriter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
+import org.graylog2.messagehandlers.amqp.AMQPSubscriberThread;
 import org.graylog2.periodical.ChunkedGELFClientManagerThread;
 import org.graylog2.periodical.ServerValueHistoryWriterThread;
 import org.graylog2.periodical.ThroughputWriterThread;
@@ -61,7 +62,7 @@ public final class Main {
      */
     public static void main(String[] args) {
         System.out.println("[x] Graylog2 starting up. (JRE: " + Tools.getSystemInformation() + ")");
-
+/*
         // Read config.
         System.out.println("[x] Reading config.");
         Main.masterConfig = new Properties();
@@ -193,7 +194,11 @@ public final class Main {
             
             System.out.println("[x] GELF threads are up.");
         }
-
+*/
+        // Start AMQP subscriber thread.
+        AMQPSubscriberThread amqpThread = new AMQPSubscriberThread();
+        amqpThread.start();
+/*
         // Start thread that stores throughput info.
         ThroughputWriterThread throughputThread = new ThroughputWriterThread();
         throughputThread.start();
@@ -201,7 +206,7 @@ public final class Main {
         // Start thread that stores system information periodically.
         ServerValueHistoryWriterThread serverValueHistoryThread = new ServerValueHistoryWriterThread();
         serverValueHistoryThread.start();
-
+*/
         System.out.println("[x] Graylog2 up and running.");
     }
 
