@@ -2,7 +2,14 @@ Graylog2WebInterface::Application.routes.draw do
   match 'logout' => 'sessions#destroy', :as => :logout
   match 'login' => 'sessions#new', :as => :login
   resource :session
-  resources :settings, :users, :dashboard
+  resources :settings, :dashboard
+
+  resources :users do
+    collection do
+      get :first
+    end
+  end
+
   resources :messages do
     collection do
       post :showrange
