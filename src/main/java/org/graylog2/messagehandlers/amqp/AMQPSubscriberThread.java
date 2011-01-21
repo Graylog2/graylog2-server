@@ -20,11 +20,11 @@
 
 package org.graylog2.messagehandlers.amqp;
 
-import com.rabbitmq.client.ConnectionFactory;
+import com.rabbitmq.client.AlreadyClosedException;
+import com.rabbitmq.client.Channel;
+import com.rabbitmq.client.Connection;
 import com.rabbitmq.client.QueueingConsumer;
 import java.io.IOException;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import org.graylog2.Log;
 
 /**
@@ -36,45 +36,74 @@ import org.graylog2.Log;
  */
 public class AMQPSubscriberThread extends Thread {
 
+    private String queue = null;
+    private AMQPBroker broker = null;
+
+    public final static int SLEEP_INTERVAL = 10;
+
+    public AMQPSubscriberThread(String queue, AMQPBroker broker) {
+        this.queue = queue;
+        this.broker = broker;
+    }
+
     /**
      * Run the thread. Runs forever!
      */
     @Override public void run() {
-        ConnectionFactory factory = new ConnectionFactory();
-        factory.setUsername("guest");
-        factory.setPassword("guest");
-        factory.setVirtualHost("/");
-        factory.setHost("localhost");
-        factory.setPort(5672);
-        boolean autoAck = false;
-
-        com.rabbitmq.client.Connection conn = null;
-        com.rabbitmq.client.Channel channel = null;
-        QueueingConsumer consumer = new QueueingConsumer(channel);
-        try {
-            conn = factory.newConnection();
-            channel = conn.createChannel();
-            channel.basicConsume("graylog2-logs", autoAck, consumer);
-        } catch (IOException e) {
-            Log.crit("Could not connect to AMQP broker or channel: " + e.toString());
-        }
-
-        while (true) {
-            QueueingConsumer.Delivery delivery;
+        while(true) {
+            Connection connection = null;
+            Channel channel = null;
+            QueueingConsumer consumer = new QueueingConsumer(channel);
+            
             try {
-                delivery = consumer.nextDelivery();
-            } catch (InterruptedException ie) {
+                connection = broker.getConnection();
+                channel = connection.createChannel();
+                channel.basicConsume(this.queue, false, consumer);
+            } catch (Exception e) {
+                Log.crit("AMQP queue '" + this.queue + "': Could not connect to AMQP broker or channel (Make sure that "
+                        + "the queue exists. Retrying in " + SLEEP_INTERVAL + " seconds. (" + e.toString() + ")");
+                
+                // Retry after waiting for SLEEP_INTERVAL seconds.
+                try { Thread.sleep(SLEEP_INTERVAL*1000); } catch(InterruptedException foo) {}
                 continue;
             }
 
-            System.out.println("HANDLED MESSAGE: " + new String(delivery.getBody()));
-            
-            try {
-                channel.basicAck(delivery.getEnvelope().getDeliveryTag(), false);
-            } catch (IOException e) {
-                Log.crit("Could not ack AMQP message: " + e.toString());
-            }
+            while (true) {
+                try {
+                    QueueingConsumer.Delivery delivery;
+                    try {
+                        delivery = consumer.nextDelivery();
+                    } catch (InterruptedException ie) {
+                        continue;
+                    }
 
+                    System.out.println("HANDLED MESSAGE: " + new String(delivery.getBody()));
+
+                    try {
+                        channel.basicAck(delivery.getEnvelope().getDeliveryTag(), false);
+                    } catch (IOException e) {
+                        Log.crit("Could not ack AMQP message: " + e.toString());
+                    }
+                } catch(Exception e) {
+                    // Error while receiving. i.e. when AMQP broker breaks down.
+                    Log.crit("AMQP queue '" + this.queue + "': Error while subscribed (rebuilding connection "
+                            + "in " + SLEEP_INTERVAL + " seconds. (" + e.toString() + ")");
+
+                    // Better close connection stuff it is still active.
+                    try {
+                        channel.close();
+                        connection.close();
+                    } catch (IOException ex) {
+                        // I don't care.
+                    } catch (AlreadyClosedException ex) {
+                        // I don't care.
+                    }
+
+                    // Retry after waiting for SLEEP_INTERVAL seconds.
+                    try { Thread.sleep(SLEEP_INTERVAL*1000); } catch(InterruptedException foo) {}
+                    break;
+                }
+            }
         }
     }
 

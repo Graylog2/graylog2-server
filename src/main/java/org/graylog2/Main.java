@@ -20,6 +20,7 @@
 
 package org.graylog2;
 
+import com.rabbitmq.client.ConnectionFactory;
 import java.io.BufferedWriter;
 import org.graylog2.messagehandlers.syslog.SyslogServerThread;
 import org.graylog2.messagehandlers.gelf.GELFMainThread;
@@ -30,6 +31,7 @@ import java.io.FileWriter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
+import org.graylog2.messagehandlers.amqp.AMQPBroker;
 import org.graylog2.messagehandlers.amqp.AMQPSubscriberThread;
 import org.graylog2.periodical.ChunkedGELFClientManagerThread;
 import org.graylog2.periodical.ServerValueHistoryWriterThread;
@@ -62,7 +64,7 @@ public final class Main {
      */
     public static void main(String[] args) {
         System.out.println("[x] Graylog2 starting up. (JRE: " + Tools.getSystemInformation() + ")");
-/*
+
         // Read config.
         System.out.println("[x] Reading config.");
         Main.masterConfig = new Properties();
@@ -153,7 +155,7 @@ public final class Main {
                     Main.masterConfig.getProperty("mongodb_password"),
                     Main.masterConfig.getProperty("mongodb_host"),
                     Main.masterConfig.getProperty("mongodb_database"),
-                    Integer.valueOf(Main.masterConfig.getProperty("mongodb_port")),
+                    (Main.masterConfig.getProperty("mongodb_port") == null) ? 0 : Integer.parseInt(Main.masterConfig.getProperty("mongodb_port")),
                     Main.masterConfig.getProperty("mongodb_useauth"),
                     Configuration.getMongoDBReplicaSetServers(Main.masterConfig)
             );
@@ -194,11 +196,32 @@ public final class Main {
             
             System.out.println("[x] GELF threads are up.");
         }
-*/
-        // Start AMQP subscriber thread.
-        AMQPSubscriberThread amqpThread = new AMQPSubscriberThread();
-        amqpThread.start();
-/*
+
+        // XXXXXXXXX TODO
+        boolean useAMQPSubscription = true;
+        if (useAMQPSubscription) {
+            // Connect to AMQP broker.
+            AMQPBroker amqpBroker = new AMQPBroker(
+                    Main.masterConfig.getProperty("amqp_host"),
+                    (Main.masterConfig.getProperty("amqp_port") == null) ? 0 : Integer.parseInt(Main.masterConfig.getProperty("amqp_port")),
+                    Main.masterConfig.getProperty("amqp_username"),
+                    Main.masterConfig.getProperty("amqp_password"),
+                    Main.masterConfig.getProperty("amqp_virtualhost")
+            );
+
+            List<String> amqpQueues = Configuration.getAMQPSubscribedQueues(Main.masterConfig);
+
+            if (amqpQueues != null) {
+                // Start AMQP subscriber thread for each queue to listen on.
+                for (String queue : amqpQueues) {
+                    AMQPSubscriberThread amqpThread = new AMQPSubscriberThread(queue, amqpBroker);
+                    amqpThread.start();
+                }
+            }
+
+            System.out.println("[x] AMQP threads are up. (" + amqpQueues.size() + " queues)");
+        }
+
         // Start thread that stores throughput info.
         ThroughputWriterThread throughputThread = new ThroughputWriterThread();
         throughputThread.start();
@@ -206,7 +229,7 @@ public final class Main {
         // Start thread that stores system information periodically.
         ServerValueHistoryWriterThread serverValueHistoryThread = new ServerValueHistoryWriterThread();
         serverValueHistoryThread.start();
-*/
+
         System.out.println("[x] Graylog2 up and running.");
     }
 
