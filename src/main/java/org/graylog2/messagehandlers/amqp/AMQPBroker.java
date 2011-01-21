@@ -25,7 +25,7 @@ import com.rabbitmq.client.ConnectionFactory;
 import java.io.IOException;
 
 /**
- * AMQPSubscriberThread.java: Jun 23, 2010 5:58:26 PM
+ * AMQPBroker.java: Jan 20, 2011 7:58:26 PM
  *
  * Representing the AMQP broker. Has standard parameters to
  * connect to local AMQP broker with standard settings.

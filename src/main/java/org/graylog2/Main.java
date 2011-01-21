@@ -1,5 +1,5 @@
 /**
- * Copyright 2010 Lennart Koopmann <lennart@socketfeed.com>
+ * Copyright 2010, 2011 Lennart Koopmann <lennart@socketfeed.com>
  * 
  * This file is part of Graylog2.
  *
@@ -20,7 +20,6 @@
 
 package org.graylog2;
 
-import com.rabbitmq.client.ConnectionFactory;
 import java.io.BufferedWriter;
 import org.graylog2.messagehandlers.syslog.SyslogServerThread;
 import org.graylog2.messagehandlers.gelf.GELFMainThread;
@@ -31,7 +30,9 @@ import java.io.FileWriter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
+import org.graylog2.messagehandlers.amqp.AMQP;
 import org.graylog2.messagehandlers.amqp.AMQPBroker;
+import org.graylog2.messagehandlers.amqp.AMQPSubscribedQueue;
 import org.graylog2.messagehandlers.amqp.AMQPSubscriberThread;
 import org.graylog2.periodical.ChunkedGELFClientManagerThread;
 import org.graylog2.periodical.ServerValueHistoryWriterThread;
@@ -197,9 +198,8 @@ public final class Main {
             System.out.println("[x] GELF threads are up.");
         }
 
-        // XXXXXXXXX TODO
-        boolean useAMQPSubscription = true;
-        if (useAMQPSubscription) {
+        // AMQP.
+         if (AMQP.isEnabled(Main.masterConfig)) {
             // Connect to AMQP broker.
             AMQPBroker amqpBroker = new AMQPBroker(
                     Main.masterConfig.getProperty("amqp_host"),
@@ -209,17 +209,17 @@ public final class Main {
                     Main.masterConfig.getProperty("amqp_virtualhost")
             );
 
-            List<String> amqpQueues = Configuration.getAMQPSubscribedQueues(Main.masterConfig);
+            List<AMQPSubscribedQueue> amqpQueues = Configuration.getAMQPSubscribedQueues(Main.masterConfig);
 
             if (amqpQueues != null) {
                 // Start AMQP subscriber thread for each queue to listen on.
-                for (String queue : amqpQueues) {
+                for (AMQPSubscribedQueue queue : amqpQueues) {
                     AMQPSubscriberThread amqpThread = new AMQPSubscriberThread(queue, amqpBroker);
                     amqpThread.start();
                 }
-            }
 
-            System.out.println("[x] AMQP threads are up. (" + amqpQueues.size() + " queues)");
+                System.out.println("[x] AMQP threads are up. (" + amqpQueues.size() + " queues)");
+            }
         }
 
         // Start thread that stores throughput info.

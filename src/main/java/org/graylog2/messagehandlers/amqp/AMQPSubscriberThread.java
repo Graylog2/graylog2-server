@@ -28,7 +28,7 @@ import java.io.IOException;
 import org.graylog2.Log;
 
 /**
- * AMQPSubscriberThread.java: Jun 23, 2010 7:19:52 PM
+ * AMQPSubscriberThread.java: Jan 20, 2011 7:19:52 PM
  *
  * Thread responsible for subscribing to AMQP queues.
  *
@@ -36,12 +36,12 @@ import org.graylog2.Log;
  */
 public class AMQPSubscriberThread extends Thread {
 
-    private String queue = null;
+    private AMQPSubscribedQueue queue = null;
     private AMQPBroker broker = null;
 
     public final static int SLEEP_INTERVAL = 10;
 
-    public AMQPSubscriberThread(String queue, AMQPBroker broker) {
+    public AMQPSubscriberThread(AMQPSubscribedQueue queue, AMQPBroker broker) {
         this.queue = queue;
         this.broker = broker;
     }
@@ -58,7 +58,7 @@ public class AMQPSubscriberThread extends Thread {
             try {
                 connection = broker.getConnection();
                 channel = connection.createChannel();
-                channel.basicConsume(this.queue, false, consumer);
+                channel.basicConsume(this.queue.getName(), false, consumer);
             } catch (Exception e) {
                 Log.crit("AMQP queue '" + this.queue + "': Could not connect to AMQP broker or channel (Make sure that "
                         + "the queue exists. Retrying in " + SLEEP_INTERVAL + " seconds. (" + e.toString() + ")");

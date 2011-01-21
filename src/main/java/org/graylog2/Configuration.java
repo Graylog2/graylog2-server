@@ -25,6 +25,10 @@ import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import org.graylog2.messagehandlers.amqp.AMQPSubscribedQueue;
+import org.graylog2.messagehandlers.amqp.InvalidQueueTypeException;
 
 /**
  * Configuration.java: Oct 22, 2010 10:57:48 PM
@@ -57,13 +61,11 @@ public class Configuration {
             }
 
             // Get host and port.
-            for (int j = 0; j < 2; j++) {
-                try {
-                    replicaServers.add(new ServerAddress(replicaTarget[0], Integer.parseInt(replicaTarget[1])));
-                } catch (UnknownHostException e) {
-                    Log.crit("Unknown host in mongodb_replica_set: " + e.toString());
-                    return null;
-                }
+            try {
+                replicaServers.add(new ServerAddress(replicaTarget[0], Integer.parseInt(replicaTarget[1])));
+            } catch (UnknownHostException e) {
+                Log.crit("Unknown host in mongodb_replica_set: " + e.toString());
+                return null;
             }
         }
 
@@ -83,8 +85,8 @@ public class Configuration {
         return 1000;
     }
 
-    static List<String> getAMQPSubscribedQueues(Properties config) {
-        List<String> queueList = new ArrayList<String>();
+    static List<AMQPSubscribedQueue> getAMQPSubscribedQueues(Properties config) {
+        List<AMQPSubscribedQueue> queueList = new ArrayList<AMQPSubscribedQueue>();
 
         String rawQueues = config.getProperty("amqp_subscribed_queues");
 
@@ -95,14 +97,22 @@ public class Configuration {
         // Get every queue.
         String[] queues = rawQueues.split(",");
         for (int i = 0; i < queues.length; i++) {
-            String queue = queues[i];
+            String[] queueDefinition = queues[i].split(":");
+
             // Check if valid.
-            if (queue == null || queue.isEmpty()) {
+            if (queueDefinition == null || queueDefinition.length != 2) {
                 Log.crit("Malformed amqp_subscribed_queues configuration.");
                 return null;
             }
-
-            queueList.add(queues[i]);
+            try {
+                queueList.add(new AMQPSubscribedQueue(queueDefinition[0], queueDefinition[1]));
+            } catch (InvalidQueueTypeException e) {
+                Log.crit("Invalid queue type in amqp_subscribed_queues");
+                return null;
+            } catch (Exception e) {
+                Log.crit("Could not parse amqp_subscribed_queues: " + e.toString());
+                return null;
+            }
         }
 
         return queueList;
