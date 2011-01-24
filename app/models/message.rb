@@ -152,7 +152,21 @@ class Message
     terms = Blacklist.all_terms
     by_blacklisted_terms(terms).default_scope.where(:created_at => {"$gte" => from}).where(:created_at => {"$lte" => to}).page(page)
   end
- 
+  
+  def self.all_around(id, nb=200)
+    m = find(id)
+    terms = Blacklist.all_terms
+    from = by_blacklisted_terms(terms).default_scope.where(:_id => { "$lte" => m.id }).order({ :_id => -1 }).skip(nb).first
+    by_blacklisted_terms(terms).default_scope.where(:_id => {"$gte" => from.id}).limit(1 + nb.to_i * 2).order({:_id => 1})
+  end
+  
+  def self.count_all_around(id, nb=200)
+    m = find(id)
+    terms = Blacklist.all_terms
+    from = by_blacklisted_terms(terms).default_scope.where(:_id => { "$lte" => m.id }).order({ :_id => -1 }).skip(nb).first
+    by_blacklisted_terms(terms).default_scope.where(:_id => {"$gte" => from.id}).limit(1 + nb.to_i * 2).count
+  end
+  
   def self.count_all_of_stream_in_range(stream_id, from, to)
     terms = Blacklist.all_terms
     by_stream(stream_id).where(:created_at => {"$gte" => from}).where(:created_at => {"$lte" => to}).count

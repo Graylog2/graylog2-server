@@ -48,3 +48,8 @@
   <%= link_to "Permalink", { :controller => "messages", :action => "show", :id => @message.id }, :id => "messages-show-permalink" %>
   <br style="clear: both;" />
 <% end %>
+
+
+<hr/>
+
+<%= link_to "Show messages around", showaround_messages_path(:message_id => @message.id, :nb => 50), :class => "awesome submit-link" %>

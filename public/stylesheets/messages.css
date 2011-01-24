@@ -16,3 +16,7 @@
 .messages td {
     padding: 2px;
 }
+
+.messages .highlighted {
+  color: red;
+}

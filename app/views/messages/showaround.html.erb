@@ -1,0 +1,31 @@
+<% content_for :sidebar do %>
+  <%= render :partial => "sidebar_index", :locals => { :headline => "Hello, <span class=\"highlighted\">#{current_user.login}</span>!" } %>
+<% end %>
+
+<h1>Messages around <span class="highlighted"><%= @id %></span></h1>
+A total of <span class="highlighted"><%= @total_count %></span> messages in this time range.
+
+
+
+<%= form_tag showaround_messages_path, :method => "get" do %>
+  <%= hidden_field_tag :message_id, @id %>
+  Show 
+  <%= text_field_tag :nb, params[:nb], :size => 3 %>
+  <%= submit_tag "messages around" %>
+<% end %>
+
+
+
+<%= render :partial => "messages/table", :locals => {
+  :messages => @messages,
+  :inline_version => true,
+  :total_messages => @total_count,
+  :append_params => [{ :key => "message_id", :value => params[:message_id]} ]
+} %>
+
+
+<script>
+  $(function() {
+    document.location.hash = "<%= params[:message_id] %>";
+  });
+</script>
