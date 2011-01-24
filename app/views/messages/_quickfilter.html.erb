@@ -11,7 +11,10 @@
     <dd><%= select_tag "filters[facility]", raw("<option></option>" + options_for_select(Facility.ordered_for_select, :selected => get_quickfilter_selected(params[:filters], :facility))) %></dd>
     
     <dt><%= label_tag "filters[severity]", "Severity:" %></dt>
-    <dd><%= select_tag "filters[severity]", raw("<option></option>" + options_for_select(get_ordered_severities_for_select, :selected => get_quickfilter_selected(params[:filters], :severity))) %></dd>
+    <dd>
+      <%= select_tag "filters[severity]", raw("<option></option>" + options_for_select(get_ordered_severities_for_select, :selected => get_quickfilter_selected(params[:filters], :severity))) %>
+       above ? <%= check_box_tag "filters[severity_above]", true, get_quickfilter_selected(params[:filters], :severity_above) || false %>
+    </dd>
     
     <dt><%= label_tag "filters[host]", "Host:" %></dt>
     <dd>

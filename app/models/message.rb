@@ -81,7 +81,11 @@ class Message
       conditions = conditions.where(:facility => filters[:facility].to_i) unless filters[:facility].blank?
 
       # Severity
-      conditions = conditions.where(:level => filters[:severity].to_i) unless filters[:severity].blank?
+      if filters[:severity_above]
+        conditions = conditions.where(:level => { "$lte" => filters[:severity].to_i }) unless filters[:severity].blank?
+      else
+        conditions = conditions.where(:level => filters[:severity].to_i) unless filters[:severity].blank?
+      end
 
       # Host
       conditions = conditions.where(:host => filters[:host]) unless filters[:host].blank?
