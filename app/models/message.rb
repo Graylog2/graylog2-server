@@ -156,14 +156,14 @@ class Message
   def self.all_around(id, nb=200)
     m = find(id)
     terms = Blacklist.all_terms
-    from = by_blacklisted_terms(terms).default_scope.where(:_id => { "$lte" => m.id }).order({ :_id => -1 }).skip(nb).first
-    by_blacklisted_terms(terms).default_scope.where(:_id => {"$gte" => from.id}).limit(1 + nb.to_i * 2).order({:_id => 1})
+    from = by_blacklisted_terms(terms).default_scope.where(:_id => { "$lte" => m.id }).order([["_id", "descending"]]).skip(nb).first
+    by_blacklisted_terms(terms).default_scope.where(:_id => {"$gte" => from.id}).limit(1 + nb.to_i * 2).order([["_id", "ascending"]])
   end
   
   def self.count_all_around(id, nb=200)
     m = find(id)
     terms = Blacklist.all_terms
-    from = by_blacklisted_terms(terms).default_scope.where(:_id => { "$lte" => m.id }).order({ :_id => -1 }).skip(nb).first
+    from = by_blacklisted_terms(terms).default_scope.where(:_id => { "$lte" => m.id }).order([["_id", "descending"]]).skip(nb).first
     by_blacklisted_terms(terms).default_scope.where(:_id => {"$gte" => from.id}).limit(1 + nb.to_i * 2).count
   end
   
