@@ -3,18 +3,17 @@
 <% end %>
 
 <h1>Messages around <span class="highlighted"><%= @id %></span></h1>
-A total of <span class="highlighted"><%= @total_count %></span> messages in this time range.
 
+<div id="messages-showaround-selector">
+  <%= form_tag showaround_messages_path, :method => "get" do %>
+    <%= hidden_field_tag :message_id, @id %>
+    <label for="nb">Show</label>
+    <%= text_field_tag :nb, params[:nb], :size => 3 %>
+    <%= awesome_submit_link "messages around" %>
+  <% end %>
+</div>
 
-
-<%= form_tag showaround_messages_path, :method => "get" do %>
-  <%= hidden_field_tag :message_id, @id %>
-  Show 
-  <%= text_field_tag :nb, params[:nb], :size => 3 %>
-  <%= submit_tag "messages around" %>
-<% end %>
-
-
+<br style="clear: both;" />
 
 <%= render :partial => "messages/table", :locals => {
   :messages => @messages,
@@ -22,7 +21,6 @@ A total of <span class="highlighted"><%= @total_count %></span> messages in this
   :total_messages => @total_count,
   :append_params => [{ :key => "message_id", :value => params[:message_id]} ]
 } %>
-
 
 <script>
   $(function() {

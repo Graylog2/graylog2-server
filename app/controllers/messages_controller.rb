@@ -44,8 +44,8 @@ class MessagesController < ApplicationController
     @load_flot = true
     
     begin
-      @from = Time.at(params[:from].to_i)
-      @to = Time.at(params[:to].to_i)
+      @from = Time.at(params[:from].to_i-Time.now.utc_offset)
+      @to = Time.at(params[:to].to_i-Time.now.utc_offset)
     rescue
       flash[:error] = "Missing or invalid range parameters."
     end
@@ -63,7 +63,6 @@ class MessagesController < ApplicationController
       flash[:error] = "Missing or invalid range parameters."
     end
     @messages = Message.all_around(@id, @nb)
-    @total_count = Message.count_all_around(@id, @nb)
   end
 
   def getcompletemessage

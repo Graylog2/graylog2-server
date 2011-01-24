@@ -83,6 +83,10 @@
   float: right;
 }
 
+#messages-showaround-selector {
+  float: right;
+}
+
 .graph-rangeselector-sidebar {
   margin-top: 5px;
 }

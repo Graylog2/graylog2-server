@@ -30,7 +30,7 @@ authorization do
       if_attribute :users => contains { user }
     end
     has_permission_on :sessions, :to => [:destroy]
-    has_permission_on :messages, :to => [:show]
+    has_permission_on :messages, :to => [:show, :showaround]
   end
 end
 
