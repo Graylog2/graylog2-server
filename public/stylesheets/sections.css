@@ -87,6 +87,11 @@
   float: right;
 }
 
+#messages-showaround-download {
+  position: relative;
+  top: 4px;
+}
+
 .graph-rangeselector-sidebar {
   margin-top: 5px;
 }

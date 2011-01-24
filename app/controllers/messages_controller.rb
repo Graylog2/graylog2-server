@@ -63,6 +63,13 @@ class MessagesController < ApplicationController
       flash[:error] = "Missing or invalid range parameters."
     end
     @messages = Message.all_around(@id, @nb)
+    
+    respond_to do |format|
+      format.html 
+      format.text { 
+        send_data @messages.map(&:message).join("\n"), :type => "text/plain", :filename => "#{@id.to_s}-#{@nb}.log"  
+      }
+    end
   end
 
   def getcompletemessage

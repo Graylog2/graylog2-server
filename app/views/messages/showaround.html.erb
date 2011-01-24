@@ -3,6 +3,7 @@
 <% end %>
 
 <h1>Messages around <span class="highlighted"><%= @id %></span></h1>
+<%=  awesome_link "Download as log file", showaround_messages_path(:message_id => @id, :nb => @nb, :format => "txt"), :id => "messages-showaround-download" %>
 
 <div id="messages-showaround-selector">
   <%= form_tag showaround_messages_path, :method => "get" do %>
