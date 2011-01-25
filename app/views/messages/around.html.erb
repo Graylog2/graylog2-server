@@ -1,0 +1,30 @@
+<% content_for :sidebar do %>
+  <%= render :partial => "sidebar_index", :locals => { :headline => "Hello, <span class=\"highlighted\">#{current_user.login}</span>!" } %>
+<% end %>
+
+<h1>Messages around <span class="highlighted"><%= @message.id %></span></h1>
+<%=  awesome_link "Download as log file", around_message_path(@message, :nb => @nb, :format => "txt"), :id => "messages-showaround-download" %>
+
+<div id="messages-showaround-selector">
+  <%= form_tag around_message_path(@message), :method => "get" do %>
+    <%= hidden_field_tag :message_id, @message.id %>
+    <label for="nb">Show</label>
+    <%= text_field_tag :nb, params[:nb], :size => 3 %>
+    <%= awesome_submit_link "messages around" %>
+  <% end %>
+</div>
+
+<br style="clear: both;" />
+
+<%= render :partial => "messages/table", :locals => {
+  :messages => @messages,
+  :inline_version => true,
+  :total_messages => @total_count,
+  :append_params => [{ :key => "message_id", :value => params[:message_id]} ]
+} %>
+
+<script>
+  $(function() {
+    document.location.hash = "<%= params[:message_id] %>";
+  });
+</script>

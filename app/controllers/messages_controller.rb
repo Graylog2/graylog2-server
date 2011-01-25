@@ -2,6 +2,9 @@ class MessagesController < ApplicationController
   before_filter :set_scoping
   filter_resource_access
   
+  rescue_from MongoMapper::DocumentNotFound, :with => :not_found
+  rescue_from BSON::InvalidObjectId, :with => :not_found
+  
   def set_scoping
     if params[:host_id]
       @scope = Message.where(:host => Base64.decode64(params[:host_id]))
@@ -53,16 +56,12 @@ class MessagesController < ApplicationController
     @total_count = Message.count_all_in_range(@from.to_i, @to.to_i)
   end
 
-  def showaround
+  def around
+    @message = Message.find!(params[:id])
     @has_sidebar = true
     @load_flot = true
-    begin
-      @id = params[:message_id] || Message.last.id.to_s
-      @nb = params[:nb] || 200
-    rescue
-      flash[:error] = "Missing or invalid range parameters."
-    end
-    @messages = Message.all_around(@id, @nb)
+    @nb = (params[:nb] || 100).to_i
+    @messages = @message.around(@nb)
     
     respond_to do |format|
       format.html 

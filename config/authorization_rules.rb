@@ -1,6 +1,6 @@
 authorization do
   role :admin do
-    has_permission_on :messages, :to => [:index, :show, :getcompletemessage, :getsimilarmessages, :showrange, :showaround, :deletebyquickfilter, :deletebystream, :getnewmessagecount]
+    has_permission_on :messages, :to => [:index, :show, :getcompletemessage, :getsimilarmessages, :showrange, :around, :deletebyquickfilter, :deletebystream, :getnewmessagecount]
     
     has_permission_on :streams, :to => [:index, :show, :showrange, :create, :destroy, :setdescription, :setalarmvalues, :togglefavorited, :togglealarmactive, :togglealarmforce, :rules, :analytics, :settings, :subscribe, :togglesubscription, :rename]
     has_permission_on :streamrules, :to => [:create, :destroy]
@@ -30,7 +30,7 @@ authorization do
       if_attribute :users => contains { user }
     end
     has_permission_on :sessions, :to => [:destroy]
-    has_permission_on :messages, :to => [:show, :showaround]
+    has_permission_on :messages, :to => [:show, :around]
   end
 end
 

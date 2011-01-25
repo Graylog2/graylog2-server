@@ -156,14 +156,7 @@ class Message
     terms = Blacklist.all_terms
     by_blacklisted_terms(terms).default_scope.where(:created_at => {"$gte" => from}).where(:created_at => {"$lte" => to}).page(page)
   end
-  
-  def self.all_around(id, nb=200)
-    m = find(id)
-    terms = Blacklist.all_terms
-    from = by_blacklisted_terms(terms).default_scope.where(:_id => { "$lte" => m.id }, :host => m.host).order("$natural DESC").skip(nb).first
-    by_blacklisted_terms(terms).default_scope.where(:_id => {"$gte" => from.id}, :host => m.host).limit(1 + nb.to_i * 2).order("$natural DESC")
-  end
-  
+    
   def self.count_all_of_stream_in_range(stream_id, from, to)
     terms = Blacklist.all_terms
     by_stream(stream_id).where(:created_at => {"$gte" => from}).where(:created_at => {"$lte" => to}).count
@@ -279,6 +272,28 @@ class Message
       host.message_count = Message.count(:host => host.host, :deleted => { "$in" => [false, nil]})
       host.save
     end
+  end
+  
+  def around(*args)
+    opts = {
+      :same_host => true,
+      :same_facility => false,
+      :same_level => false,
+      :order => :desc
+    }.merge(args.extract_options!)
+    
+    qry = self.attributes.select { |k,v| opts["same_#{k}".to_sym] }
+    nb = args.first || 100
+    terms = Blacklist.all_terms
+    from = self.class.by_blacklisted_terms(terms).default_scope.where(qry.merge(:_id => { "$lte" => self.id })).order("$natural DESC").skip(nb).first
+    return nil unless from
+    res = self.class.by_blacklisted_terms(terms).default_scope.where(qry.merge(:_id => {"$gte" => from.id})).limit(1 + nb.to_i * 2).order("$natural ASC").to_a
+    res.reverse! if opts[:order] == :desc
+    res
+  end
+  
+  def time
+    Time.at(self.created_at) rescue nil
   end
 
   private
