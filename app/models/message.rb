@@ -282,7 +282,7 @@ class Message
       :order => :desc
     }.merge(args.extract_options!)
     
-    qry = self.attributes.select { |k,v| opts["same_#{k}".to_sym] }
+    qry = self.attributes.dup.delete_if { |k,v| !opts["same_#{k}".to_sym] }
     nb = args.first || 100
     terms = Blacklist.all_terms
     from = self.class.by_blacklisted_terms(terms).default_scope.where(qry.merge(:_id => { "$lte" => self.id })).order("$natural DESC").skip(nb).first
