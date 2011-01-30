@@ -167,6 +167,20 @@
 }
 
 /* Streams */
+#streams-table {
+  margin-top: 15px;
+}
+
+#streams-table td {
+  padding-top: 7px;
+  padding-bottom: 7px;
+}
+
+.streams-table-title {
+  font-size: 20px;
+  font-family: Georgia,"Times New Roman",Times,serif;
+}
+
 #streams-notice {
     margin-top: 10px;
 }

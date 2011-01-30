@@ -14,7 +14,15 @@
   <% end %>
 <% end %>
 
-<% @streams.each do |stream| %>
+<table id="streams-table">
+  <% @streams.each do |stream| %>
+    <tr>
+      <td class="streams-table-title"><%= link_to(stream.title, stream_path(stream)) %></td>
+    </tr>
+  <% end %>
+</table>
+
+<!--<% @streams.each do |stream| %>
   <div class="blocks">
     <span class="blocks-title"><%= link_to h(stream.title), stream_path(stream) %></span>
     <ul class="blocks-termslist">
@@ -29,6 +37,6 @@
       <% end %>
     </ul>
   </div>
-<% end %>
+<% end %>-->
 
 <br style="clear: both;" />
