@@ -10,3 +10,7 @@ end
 Stream.blueprint do
   title { "stream-#{sn}" }
 end
+
+FilteredTerm.blueprint do
+  term { "foo" }
+end

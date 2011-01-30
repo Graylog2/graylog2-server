@@ -80,7 +80,9 @@ Graylog2WebInterface::Application.routes.draw do
     get :index
     get :messagespread
   end
-  
+
+  resources :filteredterms
+
   match '/visuals/fetch/:id' => 'visuals#fetch',:as => "visuals"
   
   match '/' => 'messages#index', :as => "root"

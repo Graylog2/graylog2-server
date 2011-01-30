@@ -29,6 +29,28 @@ class Message
   scope :page, lambda {|number| skip(self.get_offset(number))}
   scope :default_scope, fields(:full_message => 0).order("$natural DESC").not_deleted.limit(LIMIT)
 
+  # Overwriting the message getter. This always applies the filtering of
+  # filtered terms.
+  def message
+    if FilteredTerm.exists?
+      msg = read_attribute(:message)
+      FilteredTerm.all.each do |t|
+        next if msg.blank?
+        begin
+          msg[/#{t.term}/] = "[FILTERED]" 
+        rescue => e
+          Rails.logger.warn "Skipping filtered term: #{e}"
+          next
+        end
+      end
+
+      return msg
+    end
+
+    # No filtered terms set.
+    read_attribute(:message)
+  end
+
   def self.get_conditions_from_date(timeframe)
     conditions = {}
     re = /^(from (.+)){0,1}?(to (.+))$/

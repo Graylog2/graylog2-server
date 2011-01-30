@@ -1,0 +1,26 @@
+<h1>Filtered terms</h1>
+<div class="description">You can filter out sensitive parts of messages. Matched parts will be replaced
+by <span class="highlighted">[FILTERED]</span>. The message <span class="highlighted">User login with
+password foobar failed</span> will look like this after filtering out <span class="highlighted">
+password\s(.+)\s</span>: <span class="highlighted">User login with [FILTERED] failed</span>. Note
+that the filtering takes place in the web interface and the messages stay unfiltered in the database.</div>
+
+<h2>Active terms</h2>
+<div class="short-description">Click on a term to delete it.</div>
+<ul>
+  <% if @filteredterms.blank? %>
+    <li>No filtered terms</li>
+  <% else %>
+    <% @filteredterms.each do |term| %>
+      <li><%= link_to(term.term, filteredterm_path(term.id), :method => :delete) %></li>
+    <% end %>
+  <% end %>
+</ul>
+
+<br />
+<h2>Add term</h2>
+<%= form_for @new_filteredterm, :url => filteredterms_path do |f| %>
+  <%= f.text_field :term %>
+
+  <%= awesome_submit_link "Add term" %>
+<% end %>
