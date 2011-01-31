@@ -12,6 +12,7 @@ $(document).ready(function(){
         $('.stream-value-field').attr("disabled", true);
 
         help = null;
+        master = null;
         switch(this.value) {
             case '1':
                 field = $('.stream-value-message');
@@ -21,6 +22,7 @@ $(document).ready(function(){
                 break;
             case '3':
                 field = $('.stream-value-severity');
+                master = $('#stream-value-severity-master');
                 break;
             case '4':
                 field = $('.stream-value-facility');
@@ -37,9 +39,8 @@ $(document).ready(function(){
         field.removeAttr("disabled");
         field.show();
 
-        if (help != null) {
-          help.show();
-        }
+        if (help != null) { help.show(); }
+        if (master != null) { master.show(); }
     });
 
     // Stream Quick chooser
