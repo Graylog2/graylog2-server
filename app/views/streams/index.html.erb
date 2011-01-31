@@ -14,13 +14,14 @@
   <% end %>
 <% end %>
 
-<table id="streams-table">
+<div id="streams-streams">
   <% @streams.each do |stream| %>
-    <tr>
-      <td class="streams-table-title"><%= link_to(stream.title, stream_path(stream)) %></td>
-    </tr>
+    <div id="streams-stream">
+      <span class="streams-stream-title"><%= link_to(stream.title, stream_path(stream)) %></span>
+      <%= stream.message_count_since(5.minutes.ago) %>
+    </div>
   <% end %>
-</table>
+</div>
 
 <!--<% @streams.each do |stream| %>
   <div class="blocks">

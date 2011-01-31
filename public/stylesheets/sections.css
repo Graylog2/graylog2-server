@@ -167,17 +167,17 @@
 }
 
 /* Streams */
-#streams-table {
+#streams-streams {
   margin-top: 15px;
 }
 
-#streams-table td {
-  padding-top: 7px;
-  padding-bottom: 7px;
+#streams-stream {
+  padding-top: 5px;
+  padding-bottom: 5px;
 }
 
-.streams-table-title {
-  font-size: 20px;
+.streams-stream-title {
+  font-size: 26px;
   font-family: Georgia,"Times New Roman",Times,serif;
 }
 
