@@ -168,17 +168,55 @@
 
 /* Streams */
 #streams-streams {
-  margin-top: 15px;
+  margin-top: 25px;
 }
 
-#streams-stream {
-  padding-top: 5px;
+.streams-title {
+  font-size: 28px;
+  font-family: Georgia,"Times New Roman",Times,serif;
+  display: block;
   padding-bottom: 5px;
 }
 
+#streams-stream {
+  margin-top: 6px;
+  margin-bottom: 6px;
+  margin-left: 15px;
+  padding-top: 3px;
+  padding-bottom: 3px;
+  border-bottom: 1px solid #ccc;
+  clear: both;
+}
+
+.streams-stream-middle {
+  float: left;
+  padding-right: 15px;
+}
+
+.streams-stream-right {
+
+}
+
 .streams-stream-title {
-  font-size: 26px;
+  font-size: 27px;
   font-family: Georgia,"Times New Roman",Times,serif;
+  display: block;
+}
+
+.streams-stream-count {
+  padding-top: 2px;
+  padding-left: 1px;
+  display: block;
+}
+
+.streams-stream-last {
+  font-size: 12px;
+  display: block;
+}
+
+.streams-stream-description {
+  color: #aaa;
+  display: block;
 }
 
 #streams-notice {
