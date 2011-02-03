@@ -34,6 +34,16 @@ of the alarm. You can also define that all users are alarmed, no matter what the
 <% end %>
 <br />
 
+<h2>Category</h2>
+<%= form_tag categorize_stream_path(:stream_id => @stream) do %>
+  <%= label_tag 'streamcategory_id', 'Category:' %>
+  <%= hidden_field_tag :stream_id, @stream.id%>
+  <%= select_tag(:streamcategory_id,
+      (options_from_collection_for_select(Streamcategory.all, "id", "title", 0) + raw("<option value='0' selected='selected'>Uncategorized</option>"))) %>
+  <%= submit_tag 'Set category' %>
+<% end %>
+<br />
+
 <h2>Rename stream</h2>
 <%= form_tag rename_stream_path(:stream_id => @stream) do %>
   <%= label_tag 'title', 'New name:' %>

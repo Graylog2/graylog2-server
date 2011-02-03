@@ -61,6 +61,7 @@ Graylog2WebInterface::Application.routes.draw do
       get :settings
       post :subscribe
       post :unsubscribe
+      post :categorize
     end
   end
   
@@ -75,6 +76,8 @@ Graylog2WebInterface::Application.routes.draw do
       post :toggle
     end
   end
+    
+  resources :streamcategories
   
   resource :analytics do
     get :index

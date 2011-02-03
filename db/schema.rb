@@ -10,7 +10,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20110130212941) do
+ActiveRecord::Schema.define(:version => 20110203162747) do
 
   create_table "alerted_streams", :force => true do |t|
     t.integer  "stream_id"
@@ -97,6 +97,18 @@ ActiveRecord::Schema.define(:version => 20110130212941) do
     t.datetime "updated_at"
   end
 
+  create_table "stream_categories", :force => true do |t|
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
+  create_table "streamcategories", :force => true do |t|
+    t.string   "title"
+    t.integer  "sorting"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
   create_table "streamrules", :force => true do |t|
     t.integer  "stream_id"
     t.integer  "rule_type"
@@ -120,6 +132,7 @@ ActiveRecord::Schema.define(:version => 20110130212941) do
     t.integer  "alarm_limit"
     t.integer  "alarm_timespan"
     t.text     "description"
+    t.integer  "streamcategory_id"
   end
 
   create_table "streams_users", :id => false, :force => true do |t|

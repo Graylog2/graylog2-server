@@ -168,7 +168,7 @@
 
 /* Streams */
 #streams-streams {
-  margin-top: 25px;
+  margin-top: 20px;
 }
 
 .streams-title {
@@ -176,6 +176,7 @@
   font-family: Georgia,"Times New Roman",Times,serif;
   display: block;
   padding-bottom: 5px;
+  padding-top: 8px;
 }
 
 #streams-stream {
@@ -191,10 +192,6 @@
 .streams-stream-middle {
   float: left;
   padding-right: 15px;
-}
-
-.streams-stream-right {
-
 }
 
 .streams-stream-title {

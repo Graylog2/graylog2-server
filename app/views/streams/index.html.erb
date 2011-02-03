@@ -10,45 +10,32 @@
   <%= form_for @new_stream, :url => streams_path do |f| %>
     <%= f.label :title, "Title:" %>
     <%= f.text_field :title %>
-    <%= awesome_submit_link "Create Stream" %>
+    <%= awesome_submit_link "Create stream" %>
+  <% end %>
+<% end %>
+
+<% permitted_to? :create, :streamcategories do %>
+  <%= form_for @new_streamcategory, :url => streamcategories_path do |f| %>
+    <%= f.label :title, "Title:" %>
+    <%= f.text_field :title %>
+    <%= awesome_submit_link "Create category" %>
   <% end %>
 <% end %>
 
 <div id="streams-streams">
-  <h2 class="streams-title">XWS consumers</h2>
-  <% @streams.each do |stream| %>
-    <div id="streams-stream">
-      <div class="streams-stream-middle">
-        <span class="streams-stream-title"><%= link_to(stream.title, stream_path(stream)) %></span>
-        <span class="streams-stream-count"><%= stream.message_count_since(5.minutes.ago) %> / 5 min</span>
-      </div>
+  <% Streamcategory.all.each do |category| %>
+    <h2 class="streams-title"><%= category.title %></h2>
+    <% category.streams.each do |stream| %>
+      <%= render :partial => "streamrow", :locals => { :stream => stream } %>
+    <% end %>
+  <% end %>
 
-      <div class="streams-stream-right">
-        <span class="streams-stream-last">
-          <strong>Last message:</strong> <%= gl_date(Time.now) %>
-          (<%= time_ago_in_words(rand(5000).seconds.ago) %> ago)
-        </span>
-        <span class="streams-stream-description"><%= stream.description.blank? ? "No description" : stream.description %></span>
-      </div>
-    </div>
+  <% unless @streams_with_no_category.blank? %>
+    <h2 class="streams-title">Uncategorized</h2>
+    <% @streams_with_no_category.each do |stream| %>
+      <%= render :partial => "streamrow", :locals => { :stream => stream } %>
+    <% end %>
   <% end %>
 </div>
-
-<!--<% @streams.each do |stream| %>
-  <div class="blocks">
-    <span class="blocks-title"><%= link_to h(stream.title), stream_path(stream) %></span>
-    <ul class="blocks-termslist">
-      <% if stream.streamrules.blank? %>
-        <li>No rules</li>
-      <% else %>
-        <% stream.streamrules.each do |rule| %>
-        <li>
-          <%=raw streamrule_to_human(rule) %>
-        </li>
-        <% end %>
-      <% end %>
-    </ul>
-  </div>
-<% end %>-->
 
 <br style="clear: both;" />

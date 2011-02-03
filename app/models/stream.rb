@@ -6,6 +6,8 @@ class Stream < ActiveRecord::Base
   has_many :alertedStreams, :dependent => :destroy
   has_and_belongs_to_many :subscribers, :join_table => "subscribed_streams", :class_name => "User"
 
+  belongs_to :streamcategory
+
   validates_presence_of :title
 
   validates_numericality_of :alarm_limit, :allow_nil => true
@@ -47,6 +49,11 @@ class Stream < ActiveRecord::Base
 
   def message_count_since(since)
     return Stream.message_count_since(id, since)
+  end
+
+  def last_message
+    return nil if self.streamrules.blank?
+    Message.first(:conditions => Message.by_stream(self.id).criteria, :order => "created_at DESC")
   end
 
   def rule_hash
