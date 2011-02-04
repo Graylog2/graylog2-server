@@ -138,6 +138,21 @@ $(document).ready(function(){
       }
     );
 
+    // Streams overview: Sparklines.
+    $(".streams-stream-sparkline").sparkline(
+      "html",
+      {
+        type: "line",
+        width: "70px",
+        height: "36px",
+        lineColor: "#fd0c99",
+        fillColor: "#fdd",
+        spotColor: false,
+        minSpotColor: false,
+        maxSpotColor: false
+      }
+    );
+
     // AJAX trigger
     $(".ajaxtrigger").bind("click", function() {
       field = $(this);

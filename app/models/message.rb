@@ -217,7 +217,7 @@ class Message
 
   def self.stream_counts_of_last_minutes(stream_id, minutes)
     stream = Stream.find(stream_id)
-    return Array.new if stream.blank?
+    return [{:count => 0}, {:count =>0}] if stream.blank? or stream.streamrules.blank? # sparklines needs at least two elements..
 
     res = Array.new
     minutes.times do |m|

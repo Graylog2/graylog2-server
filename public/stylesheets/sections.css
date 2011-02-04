@@ -1,10 +1,6 @@
 /* Messages */
 .messages-c-date {
-  width: 115px;
-}
-
-.messages-c-severity {
-  width: 70px;
+  width: 125px;
 }
 
 #messages-content {
@@ -187,6 +183,11 @@
   padding-bottom: 3px;
   border-bottom: 1px solid #ccc;
   clear: both;
+}
+
+.streams-stream-left {
+  width: 85px;
+  float: left;
 }
 
 .streams-stream-middle {

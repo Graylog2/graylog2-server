@@ -20,3 +20,7 @@
 .messages .highlighted {
   color: #ff0000;
 }
+
+.messages-c-host {
+  width: 110px;
+}

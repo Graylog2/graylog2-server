@@ -1,10 +1,18 @@
+<% minutes = params[:ms].blank? ? 15 : params[:ms].to_i %>
+
 <div id="streams-stream">
+  <div class="streams-stream-left">
+    <span class="streams-stream-sparkline">
+      <%= sparkline_values(Message.stream_counts_of_last_minutes(stream.id, minutes).map { |c| c[:count] }) %>
+    </span>
+  </div>
+
   <div class="streams-stream-middle">
     <span class="streams-stream-title"><%= link_to(stream.title, stream_path(stream)) %></span>
     <span class="streams-stream-count">
-      <%= stream.message_count_since(params[:ms].blank? ? 5.minutes.ago : params[:ms].to_i.minutes.ago) %>
+      <%= stream.message_count_since(minutes.minutes.ago) %>
       /
-      <%= params[:ms].blank? ? 5 : params[:ms].to_i %> min
+      <%= minutes %> min
     </span>
   </div>
 
