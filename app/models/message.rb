@@ -21,7 +21,7 @@ class Message
 
 
   LIMIT = 100
-  scope :not_deleted, :deleted => [false, nil]
+  scope :not_deleted, :deleted => false
   scope :by_blacklisted_terms, lambda { |terms| where(:message.nin => terms.collect { |term| /#{term}/}) }
   scope :of_blacklisted_terms, lambda { |terms| where(:message.in => terms.collect { |term| /#{term}/}) }
   scope :by_blacklist, lambda {|blacklist| by_blacklisted_terms(blacklist.all_terms)}
@@ -263,8 +263,16 @@ class Message
   end
 
   def self.count_since x
-    conditions = not_deleted.where(:created_at.gt => x.to_i)
-    conditions = conditions.by_blacklisted_terms(Blacklist.all_terms)
+    if x.to_i > 0
+      conditions = not_deleted.where(:created_at.gt => x.to_i)
+    else
+      conditions = not_deleted
+    end
+
+    terms = Blacklist.all_terms
+    unless terms.blank?
+      conditions = conditions.by_blacklisted_terms(terms)
+    end
     
     conditions.count
   end
@@ -291,7 +299,7 @@ class Message
 
   def self.recalculate_host_counts
     Host.all.each do |host|
-      host.message_count = Message.count(:host => host.host, :deleted => { "$in" => [false, nil]})
+      host.message_count = Message.count(:host => host.host, :deleted => false)
       host.save
     end
   end
