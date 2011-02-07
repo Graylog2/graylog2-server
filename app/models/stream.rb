@@ -53,7 +53,7 @@ class Stream < ActiveRecord::Base
 
   def last_message
     return nil if self.streamrules.blank?
-    Message.first(:conditions => Message.by_stream(self.id).criteria, :order => "created_at DESC")
+    Message.first(:conditions => Message.by_stream(self.id).criteria, :order => "$natural DESC")
   end
 
   def rule_hash
