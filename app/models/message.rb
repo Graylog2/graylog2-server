@@ -145,7 +145,9 @@ class Message
     unless conditions[:message].blank?
       # Make it search via $in so we can easily add the $nin next. It does not have a $in when there is just one message condition.
       conditions[:message] = { "$in" => [conditions[:message]] } if conditions[:message].is_a?(Regexp)
-      conditions[:message]["$nin"] = BlacklistedTerm.all_as_array
+
+      terms = BlacklistedTerm.all_as_array
+      conditions[:message]["$nin"] = terms unless terms.blank?
     end
     # Plucky bug woraround END. (this sucks, but is okay for now. really fix after release.)
 
