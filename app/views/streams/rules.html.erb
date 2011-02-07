@@ -12,7 +12,11 @@
   <%= f.text_field :value, :class => "stream-value-field stream-value-message" %>
   <%= f.text_field :value, {:class => "stream-value-field stream-value-timeframe", :style => "display: none;", :disabled => true} %>
   <%= f.select :value, options_for_select(Facility.ordered_for_select), {}, { :disabled => true, :style => "display: none;", :class => "stream-value-field stream-value-facility" } %>
-  <%= f.select :value, options_for_select(get_ordered_severities_for_select), {}, { :disabled => true, :style => "display: none;", :class => "stream-value-field stream-value-severity" } %>
+  
+  <div id="stream-value-severity-master" style="display: none;">
+    <%= f.select :value, options_for_select(get_ordered_severities_for_select), {}, { :disabled => true, :class => "stream-value-field stream-value-severity" } %>
+  </div>
+
   <%= f.select :value, Host.all.collect {|host| [ h(host.host) ]}.sort, {}, { :disabled => true, :style => "display: none;", :class => "stream-value-field stream-value-host" } %>
   <%= f.text_field :value, :class => "stream-value-field stream-value-additional-field", :disabled => true, :style => "display: none;" %>
   <span id="stream-value-additional-field-help" class="stream-value-help" style="display: none;"><%= tooltip("Additional-field-filters-in-streams") %></span>
