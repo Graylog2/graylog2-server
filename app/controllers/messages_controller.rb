@@ -32,7 +32,6 @@ class MessagesController < ApplicationController
   def show
     @has_sidebar = true
     @load_flot = true
-    @message = Message.find params[:id]
 
     @comments = Messagecomment.all_matched(@message)
 
