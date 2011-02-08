@@ -21,7 +21,14 @@ class Message
 
 
   LIMIT = 100
-  scope :not_deleted, :deleted => false
+  
+  # This is controlled by general.yml. Disabling it gives great performance improve.
+  if Configuration.allow_deleting
+    scope :not_deleted, :deleted => false
+  else
+    scope :not_deleted, Hash.new
+  end
+
   scope :by_blacklisted_terms, lambda { |terms| where(:message.nin => terms.collect { |term| /#{term}/}) }
   scope :of_blacklisted_terms, lambda { |terms| where(:message.in => terms.collect { |term| /#{term}/}) }
   scope :by_blacklist, lambda {|blacklist| by_blacklisted_terms(blacklist.all_terms)}
