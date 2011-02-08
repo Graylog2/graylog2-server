@@ -12,22 +12,20 @@
   </thead>
   <tbody>
     <% i = 0 %>
-    <% unless @messages.blank? %>
-      <% @messages.each do |message|  %>
-        <tr id="<%= message.id %>" class="<%= i.modulo(2) == 1 ? "tr-light" : "tr-dark" %> message-row <%= "highlighted" if message.id.to_s == params[:message_id] %>">
-          <td><%= gl_date(Time.at(message.created_at).to_s) %></td>
-          <td><%= message.host.blank? ? nil : h(message.host) %></td>
-          <td><%= syslog_level_to_human(message.level) %></td>
-          <td><%= Facility.to_human(message.facility) %></td>
-          <td>
-            <% unless message.message.blank? %>
-              <%= message.message[0..message_length] %>
-              <%=raw (message.message.length > message_length) && !defined?(dont_show_links) ? "<span class='light'>...</span>" : nil %>
-            <% end %>
-          </td>
-        </tr>
-        <% i+=1 %>
-      <% end %>
+    <% @messages.each do |message|  %>
+      <tr id="<%= message.id %>" class="<%= i.modulo(2) == 1 ? "tr-light" : "tr-dark" %> message-row <%= "highlighted" if message.id.to_s == params[:message_id] %>">
+        <td><%= gl_date(Time.at(message.created_at).to_s) %></td>
+        <td><%= message.host.blank? ? nil : h(message.host) %></td>
+        <td><%= syslog_level_to_human(message.level) %></td>
+        <td><%= Facility.to_human(message.facility) %></td>
+        <td>
+          <% unless message.message.blank? %>
+            <%= message.message[0..message_length] %>
+            <%=raw (message.message.length > message_length) && !defined?(dont_show_links) ? "<span class='light'>...</span>" : nil %>
+          <% end %>
+        </td>
+      </tr>
+      <% i+=1 %>
     <% end %>
   </tbody>
 </table>
