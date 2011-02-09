@@ -32,6 +32,8 @@ import java.util.TimerTask;
 import java.util.zip.GZIPInputStream;
 import java.util.zip.InflaterInputStream;
 
+import org.productivity.java.syslog4j.Syslog;
+
 /**
  * Tools.java: May 17, 2010 9:46:31 PM
  *
@@ -190,9 +192,9 @@ public final class Tools {
 					FileInputStream regexStream = new FileInputStream(file);
 					Main.regexConfig.load(regexStream);
 					regexStream.close();
-					System.out.println(file.getName() + " has changed. Updating properties file.");
+					Syslog.getInstance("udp").alert(file.getName() + " has changed. Updating regexConfig properties.");
 				} catch (java.io.IOException e) {
-					System.out.println("Could not read regex config file: " + e.toString());
+					Syslog.getInstance("udp").debug("Could not read regex config file: " + e.toString());
 				}
 			}
 		};

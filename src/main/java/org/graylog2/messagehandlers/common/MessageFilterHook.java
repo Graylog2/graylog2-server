@@ -24,6 +24,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.graylog2.Main;
+import org.productivity.java.syslog4j.Syslog;
 import org.productivity.java.syslog4j.server.SyslogServerEventIF;
 
 /**
@@ -55,10 +56,7 @@ public class MessageFilterHook implements MessagePostReceiveHookIF {
     		matcher = pattern.matcher(msg);
 
     	   	if(matcher.matches()){
-    	   		System.out.println("++++++++++++++++++++++++++++");
-    	   		System.out.println("Filter Matched: " + regex);
-    	   		System.out.println("Message: " + msg);
-    	   		System.out.println("++++++++++++++++++++++++++++");
+    	   		Syslog.getInstance("udp").debug("Message Filtered :" + msg);
     			((SyslogServerEventIF) message).setMessage("GRAYLOG2_FILTEROUT");
     			break;
     	   	}
