@@ -66,18 +66,19 @@ public class SyslogEventHandler implements SyslogServerSessionlessEventHandlerIF
             MongoBridge m = new MongoBridge();
 
             // Process the message before inserting into the database
-            ReceiveHookManager.preProcess(new MessageFilterHook(), event);
-            if( event.getMessage() == "FILTEROUT" ) {
+            ReceiveHookManager.postProcess(new MessageFilterHook(), event);
+            if( event.getMessage() == "GRAYLOG2_FILTEROUT" ) {
             	System.out.println("Message filtered out");
             } else {
             	m.insert(event);
+                // This is doing the upcounting for statistics.
+                ReceiveHookManager.postProcess(new MessageCounterHook(), event);
+
+                // Counts up host in hosts collection.
+                ReceiveHookManager.postProcess(new HostUpsertHook(), event);
             }
 
-            // This is doing the upcounting for statistics.
-            ReceiveHookManager.postProcess(new MessageCounterHook(), event);
 
-            // Counts up host in hosts collection.
-            ReceiveHookManager.postProcess(new HostUpsertHook(), event);
         } catch (Exception e) {
             Log.crit("Could not insert syslog event into database: " + e.toString());
         }
