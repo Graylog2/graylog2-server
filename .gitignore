@@ -2,6 +2,7 @@ log/*
 tmp/*
 
 nbproject/*
+.idea
 
 config/database.yml
 config/mongodb.yml
