@@ -27,6 +27,7 @@ import org.graylog2.Tools;
 import org.graylog2.database.MongoBridge;
 import org.graylog2.messagehandlers.common.HostUpsertHook;
 import org.graylog2.messagehandlers.common.MessageCounterHook;
+import org.graylog2.messagehandlers.common.MessageFilterHook;
 import org.graylog2.messagehandlers.common.ReceiveHookManager;
 import org.productivity.java.syslog4j.server.SyslogServerEventIF;
 import org.productivity.java.syslog4j.server.SyslogServerIF;
@@ -64,7 +65,13 @@ public class SyslogEventHandler implements SyslogServerSessionlessEventHandlerIF
             // Connect to database.
             MongoBridge m = new MongoBridge();
 
-            m.insert(event);
+            // Process the message before inserting into the database
+            ReceiveHookManager.preProcess(new MessageFilterHook(), event);
+            if( event.getMessage() == "FILTEROUT" ) {
+            	System.out.println("Message filtered out");
+            } else {
+            	m.insert(event);
+            }
 
             // This is doing the upcounting for statistics.
             ReceiveHookManager.postProcess(new MessageCounterHook(), event);

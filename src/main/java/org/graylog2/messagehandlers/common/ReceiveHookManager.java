@@ -28,7 +28,7 @@ package org.graylog2.messagehandlers.common;
  * @author: Lennart Koopmann <lennart@socketfeed.com>
  */
 public final class ReceiveHookManager {
-
+	
     private ReceiveHookManager() { }
 
     /**
@@ -36,5 +36,9 @@ public final class ReceiveHookManager {
      */
     public static void postProcess(MessagePostReceiveHookIF hook, Object message) {
         hook.process(message);
+    }
+    
+    public static void preProcess(MessagePostReceiveHookIF hook, Object message){
+    	hook.process(message);
     }
 }

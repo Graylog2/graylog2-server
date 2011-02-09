@@ -55,7 +55,10 @@ public final class Main {
      */
     public static Properties masterConfig = null;
     
-    
+    /**
+     * This holds the filter out regular expressions from /etc/graylog2.d/filterout.properties
+     */
+    public static Properties regexConfig = null;
 
     private Main() { }
 
@@ -68,9 +71,12 @@ public final class Main {
         // Read config.
         System.out.println("[x] Reading config.");
         Main.masterConfig = new Properties();
+        Main.regexConfig = new Properties();
         // Allow -DconfigPath=/some/different/config.
         String configPath = System.getProperty("configPath", "/etc/graylog2.conf");
+        String regexPath = System.getProperty("regexPath", "/etc/graylog2.d/filterout.properties");
         System.out.println("[x] Using config: " + configPath);
+        System.out.println("[x] Using filter out rules: " + regexPath);
 
         try {
             FileInputStream configStream = new FileInputStream(configPath);
@@ -78,6 +84,14 @@ public final class Main {
             configStream.close();
         } catch(java.io.IOException e) {
             System.out.println("Could not read config file: " + e.toString());
+        }
+        
+        try {
+        	FileInputStream regexStream = new FileInputStream(regexPath);
+        	Main.regexConfig.load(regexStream);
+        	regexStream.close();
+        } catch(java.io.IOException e) {
+        	System.out.println("Could not read regex config file: " + e.toString());
         }
 
         // Define required configuration fields.
