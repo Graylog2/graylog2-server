@@ -9,6 +9,6 @@ class HealthController < ApplicationController
   end
 
   def currentthroughput
-    render :text => { :count => ServerValue.throughput[:current] }.to_json
+    render :js => { :count => ServerValue.throughput[:current] }.to_json
   end
 end
