@@ -37,7 +37,6 @@ public abstract class FileWatcher extends TimerTask {
   public FileWatcher( File file ) {
       this.file = file;
       this.timeStamp = file.lastModified();
-      System.out.println("watching " + this.file.getName());
   }
 
   public final void run() {
@@ -45,7 +44,6 @@ public abstract class FileWatcher extends TimerTask {
 
       if( this.timeStamp != timeStamp ) {
 	      this.timeStamp = timeStamp;
-	      System.out.println("changed detected in " + this.file.getName());
 	      onChange(file);
       }
   }
