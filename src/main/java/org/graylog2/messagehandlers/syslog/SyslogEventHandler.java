@@ -68,7 +68,7 @@ public class SyslogEventHandler implements SyslogServerSessionlessEventHandlerIF
             // Process the message before inserting into the database
             ReceiveHookManager.postProcess(new MessageFilterHook(), event);
             if( event.getMessage() == "GRAYLOG2_FILTEROUT" ) {
-            	System.out.println("Message filtered out");
+            	System.out.println("Not inserting event into database.");
             } else {
             	m.insert(event);
                 // This is doing the upcounting for statistics.

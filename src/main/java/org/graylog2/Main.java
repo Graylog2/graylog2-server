@@ -90,6 +90,7 @@ public final class Main {
         	FileInputStream regexStream = new FileInputStream(regexPath);
         	Main.regexConfig.load(regexStream);
         	regexStream.close();
+			Tools.watchFilterFile(regexPath);
         } catch(java.io.IOException e) {
         	System.out.println("Could not read regex config file: " + e.toString());
         }

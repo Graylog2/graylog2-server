@@ -55,6 +55,10 @@ public class MessageFilterHook implements MessagePostReceiveHookIF {
     		matcher = pattern.matcher(msg);
 
     	   	if(matcher.matches()){
+    	   		System.out.println("++++++++++++++++++++++++++++");
+    	   		System.out.println("Filter Matched: " + regex);
+    	   		System.out.println("Message: " + msg);
+    	   		System.out.println("++++++++++++++++++++++++++++");
     			((SyslogServerEventIF) message).setMessage("GRAYLOG2_FILTEROUT");
     			break;
     	   	}
