@@ -176,11 +176,11 @@
 }
 
 #streams-stream {
-  margin-top: 6px;
-  margin-bottom: 6px;
+  margin-top: 10px;
+  margin-bottom: 10px;
   margin-left: 15px;
-  padding-top: 3px;
-  padding-bottom: 3px;
+  padding-top: 6px;
+  padding-bottom: 6px;
   border-bottom: 1px solid #ccc;
   clear: both;
 }
@@ -201,20 +201,11 @@
   display: block;
 }
 
-.streams-stream-count {
-  padding-top: 2px;
-  padding-left: 1px;
-  display: block;
-}
-
-.streams-stream-last {
-  font-size: 12px;
-  display: block;
-}
-
 .streams-stream-description {
   color: #aaa;
   display: block;
+  position: relative;
+  top: 5px;
 }
 
 #streams-notice {

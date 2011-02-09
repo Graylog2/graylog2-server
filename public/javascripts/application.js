@@ -144,7 +144,7 @@ $(document).ready(function(){
       {
         type: "line",
         width: "70px",
-        height: "36px",
+        height: "23px",
         lineColor: "#fd0c99",
         fillColor: "#fdd",
         spotColor: false,
