@@ -77,7 +77,8 @@ Graylog2WebInterface::Application.routes.draw do
     end
   end
     
-  resources :streamcategories
+  resources :streamcategories do
+  end
   
   resource :analytics do
     get :index

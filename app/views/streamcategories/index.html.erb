@@ -1,0 +1,15 @@
+<h1>Stream categories</h1>
+
+<%= form_for @new_streamcategory, :url => streamcategories_path do |f| %>
+  <%= f.label :title, "Title:" %>
+  <%= f.text_field :title %>
+  <%= awesome_submit_link "Create category" %>
+<% end %>
+
+<ul id="streamcategories-list">
+<% @categories.each do |category| %>
+  <li>
+    <%= category.title %>
+  </li>
+<% end %>
+</ul>

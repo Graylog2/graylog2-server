@@ -1,5 +1,10 @@
 class StreamcategoriesController < ApplicationController
 
+  def index
+    @new_streamcategory = Streamcategory.new
+    @categories = Streamcategory.all
+  end
+
   def create
     category = Streamcategory.new(params[:streamcategory])
 

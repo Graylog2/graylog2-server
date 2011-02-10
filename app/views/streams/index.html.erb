@@ -6,6 +6,7 @@
   include the string "MySQL".
 </div>
 
+<div id="streams-new-stream">
 <% permitted_to? :create, :streams do %>
   <%= form_for @new_stream, :url => streams_path do |f| %>
     <%= f.label :title, "Title:" %>
@@ -13,14 +14,15 @@
     <%= awesome_submit_link "Create stream" %>
   <% end %>
 <% end %>
+</div>
 
+<div id="streams-manage-categories-link">
 <% permitted_to? :create, :streamcategories do %>
-  <%= form_for @new_streamcategory, :url => streamcategories_path do |f| %>
-    <%= f.label :title, "Title:" %>
-    <%= f.text_field :title %>
-    <%= awesome_submit_link "Create category" %>
-  <% end %>
+  <%= awesome_link "Manage categories", streamcategories_path %>
 <% end %>
+</div>
+
+<br style="clear: both;" />
 
 <div id="streams-streams">
   <% Streamcategory.all.each do |category| %>

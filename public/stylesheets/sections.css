@@ -163,6 +163,16 @@
 }
 
 /* Streams */
+#streams-new-stream {
+  float: left;
+  padding-right: 15px;
+}
+
+#streams-manage-categories-link {
+  position: relative;
+  top: 5px;
+}
+
 #streams-streams {
   margin-top: 20px;
 }
@@ -554,4 +564,9 @@
 
 .health-throughput-explanation {
   font-size: 15px;
+}
+
+/* Stream categories */
+#streamcategories-list {
+  margin-top: 15px;
 }

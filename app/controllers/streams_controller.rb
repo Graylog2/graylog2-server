@@ -4,7 +4,6 @@ class StreamsController < ApplicationController
   
   def index
     @new_stream = Stream.new
-    @new_streamcategory = Streamcategory.new
 
     if current_user.role_symbols.include? :admin
       @all_streams = Stream.all
