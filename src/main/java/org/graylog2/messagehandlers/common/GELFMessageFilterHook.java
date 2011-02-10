@@ -24,17 +24,18 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.graylog2.Main;
+import org.graylog2.messagehandlers.gelf.GELFMessage;
 import org.productivity.java.syslog4j.Syslog;
 import org.productivity.java.syslog4j.server.SyslogServerEventIF;
 
 /**
- * MessageFilterHook.java: Feb 7, 2011 5:56:21 PM
+ * GELFMessageFilterHook.java: Feb 9, 2011 
  *
- * Filters events based on regular expression.
+ * Filters GELF messages based on regular expression.
  *
  * @author: Joshua Spaulding <joshua.spaulding@gmail.com>
  */
-public class MessageFilterHook implements MessagePostReceiveHookIF {
+public class GELFMessageFilterHook implements MessagePostReceiveHookIF {
 
     /**
      * Process the hook.
@@ -43,21 +44,21 @@ public class MessageFilterHook implements MessagePostReceiveHookIF {
 		/**
 		 * Convert message Object to string for regex match
 		 */
-    	String msg = new String(((SyslogServerEventIF) message).getRaw());
+    	String msg = new String(((GELFMessage) message).toString());
     	String regex = null;
     	Pattern pattern = null;
     	Matcher matcher = null;
 		 
-    	int regex_count = Integer.parseInt(Main.regexConfig.getProperty("filter.out.syslog.count"));
+    	int regex_count = Integer.parseInt(Main.regexConfig.getProperty("filter.out.gelf.count"));
     	
     	for( int i = 0; i < regex_count; i++) {
-    		regex = Main.regexConfig.getProperty("filter.out.syslog.regex." + i);
+    		regex = Main.regexConfig.getProperty("filter.out.gelf.regex." + i);
     		pattern = Pattern.compile(regex);
     		matcher = pattern.matcher(msg);
 
     	   	if(matcher.matches()){
     	   		Syslog.getInstance("udp").debug("Message Filtered :" + msg);
-    			((SyslogServerEventIF) message).setMessage("GRAYLOG2_FILTEROUT");
+    			((GELFMessage) message).setShortMessage("GRAYLOG2_FILTEROUT");
     			break;
     	   	}
     	}
