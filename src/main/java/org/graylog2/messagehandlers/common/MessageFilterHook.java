@@ -34,12 +34,12 @@ import org.productivity.java.syslog4j.server.SyslogServerEventIF;
  *
  * @author: Joshua Spaulding <joshua.spaulding@gmail.com>
  */
-public class MessageFilterHook implements MessagePostReceiveHookIF {
+public class MessageFilterHook implements MessagePreReceiveHookIF {
 
     /**
      * Process the hook.
      */
-    public void process(Object message) {
+    public boolean process(Object message) {
 		/**
 		 * Convert message Object to string for regex match
 		 */
@@ -57,9 +57,9 @@ public class MessageFilterHook implements MessagePostReceiveHookIF {
 
     	   	if(matcher.matches()){
     	   		Syslog.getInstance("udp").debug("Message Filtered :" + msg);
-    			((SyslogServerEventIF) message).setMessage("GRAYLOG2_FILTEROUT");
-    			break;
+    	   		return true;
     	   	}
     	}
+    	return false;
     }
 }

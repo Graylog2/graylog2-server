@@ -67,8 +67,8 @@ public class SyslogEventHandler implements SyslogServerSessionlessEventHandlerIF
             MongoBridge m = new MongoBridge();
 
             // Process the message before inserting into the database
-            ReceiveHookManager.postProcess(new MessageFilterHook(), event);
-            if( event.getMessage() == "GRAYLOG2_FILTEROUT" ) {
+            boolean filterOut = ReceiveHookManager.preProcess(new MessageFilterHook(), event);
+            if( filterOut ) {
             	Syslog.getInstance("udp").debug("Not inserting event into database.");
             } else {
             	m.insert(event);

@@ -144,8 +144,8 @@ public class ChunkedGELFClientHandler extends GELFClientHandlerBase implements G
             Log.info("Got GELF message: " + message.toString());
 
             // Insert message into MongoDB.
-            ReceiveHookManager.postProcess(new GELFMessageFilterHook(), message);
-            if( message.getShortMessage() == "GRAYLOG2_FILTEROUT" ) {
+            boolean filterOut = ReceiveHookManager.preProcess(new GELFMessageFilterHook(), message);
+            if( filterOut ) {
             	Syslog.getInstance("udp").debug("Not inserting event into database.");
             } else {
                 m.insertGelfMessage(message);
