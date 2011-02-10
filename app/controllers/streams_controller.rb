@@ -168,12 +168,12 @@ class StreamsController < ApplicationController
   
   def subscribe
     current_user.subscribed_streams << @stream
-    render :js => {:status => :success}
+    render :json => {:status => :success}
   end
   
   def unsubscribe
     current_user.subscribed_streams.delete @stream
-    render :js => {:status => :success}
+    render :json => {:status => :success}
   end
   
   def togglesubscription
