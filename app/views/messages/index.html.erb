@@ -32,5 +32,5 @@ messages in the last <%=h message_count_interval %> minutes.
 
 <br style="clear: both;" />
 
-<%= render :partial => "messages/table", :locals => { :messages => @messages, :inline_version => false, :total_messages => @total_count } %>
+<%= render :partial => "messages/table", :locals => { :messages => @messages, :total_messages => @total_count } %>
 </div>

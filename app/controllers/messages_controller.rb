@@ -120,10 +120,10 @@ class MessagesController < ApplicationController
   def getnewmessagecount
     since = params[:since].to_i
     if since <= 0
-      render :text => { 'status' => 'error', 'payload' => "Missing or invalid parameter: since" }.to_json
+      render :js => { 'status' => 'error', 'payload' => "Missing or invalid parameter: since" }.to_json
       return
     end
-    render :text => { 'status' => 'success', 'payload' => Message.count_since(since) }.to_json
+    render :js => { 'status' => 'success', 'payload' => Message.count_since(since) }.to_json
   end
 
 end
