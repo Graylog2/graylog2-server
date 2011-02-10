@@ -72,6 +72,8 @@ public class GELFClientHandlerThread extends Thread {
             Log.crit("IO Error while handling GELF message: " + e.toString());
         } catch (jave.io.EOFException e) {
             Log.crit("EOF Exception while handling GELF message: " + e.toString());
+        } catch (java.net.SocketException e) {
+            Log.crit("SocketException while handling GELF message: " + e.toString());
         }
     }
 
