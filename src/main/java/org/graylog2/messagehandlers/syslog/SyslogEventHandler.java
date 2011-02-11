@@ -69,7 +69,8 @@ public class SyslogEventHandler implements SyslogServerSessionlessEventHandlerIF
             // Process the message before inserting into the database
             boolean filterOut = ReceiveHookManager.preProcess(new MessageFilterHook(), event);
             if( filterOut ) {
-            	Syslog.getInstance("udp").debug("Not inserting event into database.");
+            	if(Main.debugMode)
+            		Syslog.getInstance("udp").debug("Not inserting event into database.");
             } else {
             	m.insert(event);
                 // This is doing the upcounting for statistics.

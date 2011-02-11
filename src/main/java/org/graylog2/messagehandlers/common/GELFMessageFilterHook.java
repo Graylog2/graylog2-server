@@ -48,6 +48,8 @@ public class GELFMessageFilterHook implements MessagePreReceiveHookIF {
     	String regex = null;
     	Pattern pattern = null;
     	Matcher matcher = null;
+    	
+    	System.out.println(msg);
 		 
     	int regex_count = Integer.parseInt(Main.regexConfig.getProperty("filter.out.gelf.count"));
     	
@@ -57,7 +59,8 @@ public class GELFMessageFilterHook implements MessagePreReceiveHookIF {
     		matcher = pattern.matcher(msg);
 
     	   	if(matcher.matches()){
-    	   		Syslog.getInstance("udp").debug("Message Filtered :" + msg);
+    	   		if(Main.debugMode)
+    	   			Syslog.getInstance("udp").debug("Message Filtered :" + msg);
     			return true;
     	   	}
     	}
