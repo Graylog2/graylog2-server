@@ -26,7 +26,6 @@ import java.util.regex.Pattern;
 import org.graylog2.Main;
 import org.graylog2.messagehandlers.gelf.GELFMessage;
 import org.productivity.java.syslog4j.Syslog;
-import org.productivity.java.syslog4j.server.SyslogServerEventIF;
 
 /**
  * GELFMessageFilterHook.java: Feb 9, 2011 
