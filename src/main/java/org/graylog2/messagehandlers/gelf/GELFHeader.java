@@ -73,7 +73,7 @@ public class GELFHeader {
      * @param rawHeader The raw byte array of the header
      */
     public GELFHeader(byte[] rawHeader) {
-        this.rawHeader = rawHeader;
+        this.rawHeader = rawHeader.clone();
     }
 
     private int extract(int start, int length) {

@@ -1,5 +1,5 @@
 /**
- * Copyright 2010 Lennart Koopmann <lennart@socketfeed.com>
+ * Copyright 2010, 2011 Lennart Koopmann <lennart@socketfeed.com>
  *
  * This file is part of Graylog2.
  *
@@ -40,6 +40,8 @@ import org.graylog2.messagehandlers.common.ReceiveHookManager;
  */
 public class SimpleGELFClientHandler extends GELFClientHandlerBase implements GELFClientHandlerIF {
 
+    private String amqpReceiverQueue = null;
+
     /**
      * Representing a GELF client consisting of only one UDP message.
      * 
@@ -49,28 +51,33 @@ public class SimpleGELFClientHandler extends GELFClientHandlerBase implements GE
      * @throws InvalidGELFCompressionMethodException
      * @throws IOException
      */
-    public SimpleGELFClientHandler(DatagramPacket clientMessage) throws DataFormatException, UnsupportedEncodingException, InvalidGELFCompressionMethodException, IOException {
+    public SimpleGELFClientHandler(Object clientMessage) throws DataFormatException, UnsupportedEncodingException, InvalidGELFCompressionMethodException, IOException {
 
-        // Determine compression type.
-        int type = GELF.getGELFType(clientMessage.getData());
+        if (clientMessage instanceof DatagramPacket) {
+            DatagramPacket msg = (DatagramPacket) clientMessage;
+            // Determine compression type.
+            int type = GELF.getGELFType(msg.getData());
 
-        // Decompress.
-        switch (type) {
-            // Decompress ZLIB
-            case GELF.TYPE_ZLIB:
-                Log.info("Handling ZLIB compressed SimpleGELFClient");
-                this.clientMessage = Tools.decompressZlib(clientMessage.getData());
-                break;
+            // Decompress.
+            switch (type) {
+                // Decompress ZLIB
+                case GELF.TYPE_ZLIB:
+                    Log.info("Handling ZLIB compressed SimpleGELFClient");
+                    this.clientMessage = Tools.decompressZlib(msg.getData());
+                    break;
 
-            // Decompress GZIP
-            case GELF.TYPE_GZIP:
-                Log.info("Handling GZIP compressed SimpleGELFClient");
-                this.clientMessage = Tools.decompressGzip(clientMessage.getData());
-                break;
+                // Decompress GZIP
+                case GELF.TYPE_GZIP:
+                    Log.info("Handling GZIP compressed SimpleGELFClient");
+                    this.clientMessage = Tools.decompressGzip(msg.getData());
+                    break;
 
-            // Unsupported encoding if not handled by prior cases.
-            default:
-                throw new UnsupportedEncodingException();
+                // Unsupported encoding if not handled by prior cases.
+                default:
+                    throw new UnsupportedEncodingException();
+            }
+        } else if(clientMessage instanceof String) {
+            this.clientMessage = (String) clientMessage;
         }
         
     }
@@ -88,28 +95,46 @@ public class SimpleGELFClientHandler extends GELFClientHandlerBase implements GE
                 return false;
             }
 
+            // Add AMQP receiver queue as additional field if set.
+            if (this.getAmqpReceiverQueue() != null) {
+                this.message.addAdditionalData("_amqp_queue", this.getAmqpReceiverQueue());
+            }
+
             // Store in MongoDB.
             // Connect to database.
             MongoBridge m = new MongoBridge();
 
             // Log if we are in debug mode.
-            Log.info("Got GELF message: " + message.toString());
+            Log.info("Got GELF message: " + this.message.toString());
 
             // Insert message into MongoDB.
-            m.insertGelfMessage(message);
+            m.insertGelfMessage(this.message);
 
             // This is doing the upcounting for statistics.
-            ReceiveHookManager.postProcess(new MessageCounterHook(), message);
+            ReceiveHookManager.postProcess(new MessageCounterHook(), this.message);
 
             // Counts up host in hosts collection.
-            ReceiveHookManager.postProcess(new HostUpsertHook(), message);
+            ReceiveHookManager.postProcess(new HostUpsertHook(), this.message);
         } catch(Exception e) {
             Log.warn("Could not handle GELF client: " + e.toString());
-            e.printStackTrace();
             return false;
         }
 
         return true;
+    }
+
+    /**
+     * @return the amqpReceiverQueue
+     */
+    public String getAmqpReceiverQueue() {
+        return this.amqpReceiverQueue;
+    }
+
+    /**
+     * @param amqpReceiverQueue the amqpReceiverQueue to set
+     */
+    public void setAmqpReceiverQueue(String amqpReceiverQueue) {
+        this.amqpReceiverQueue = amqpReceiverQueue;
     }
 
 }
