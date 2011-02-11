@@ -59,7 +59,7 @@ public class MongoBridge {
         DBCollection coll = null;
 
         // Create a capped collection if the collection does not yet exist.
-        if(MongoConnection.getInstance().getDatabase().getCollectionNames().contains("messages")) {
+        if(MongoConnection.getInstance().getDatabase().collectionExists("messages")) {
             coll = MongoConnection.getInstance().getDatabase().getCollection("messages");
         } else {
             long messagesCollSize = Long.parseLong(Main.masterConfig.getProperty("messages_collection_size").trim());
@@ -74,7 +74,6 @@ public class MongoBridge {
         coll.ensureIndex(new BasicDBObject("created_at", 1));
         coll.ensureIndex(new BasicDBObject("deleted", 1));
         coll.ensureIndex(new BasicDBObject("host", 1));
-        coll.ensureIndex(new BasicDBObject("message", 1));
         coll.ensureIndex(new BasicDBObject("facility", 1));
         coll.ensureIndex(new BasicDBObject("level", 1));
 
@@ -178,7 +177,8 @@ public class MongoBridge {
      * @param hostname The host to increment.
      */
     public void upsertHost(String hostname) {
-        BasicDBObject query = new BasicDBObject();
+        return;
+        /*BasicDBObject query = new BasicDBObject();
         query.put("host", hostname);
 
         BasicDBObject update = new BasicDBObject();
@@ -190,7 +190,7 @@ public class MongoBridge {
             Log.emerg("MongoBridge::upsertHost(): Could not get hosts collection.");
         } else {
             db.getCollection("hosts").update(query, update, true, false);
-        }
+        }*/
     }
 
     public void writeThroughput(int current, int highest) {

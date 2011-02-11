@@ -33,6 +33,8 @@ import org.graylog2.messagehandlers.gelf.InvalidGELFCompressionMethodException;
 import org.graylog2.messagehandlers.gelf.SimpleGELFClientHandler;
 import org.graylog2.messagehandlers.syslog.GraylogSyslogServerEvent;
 import org.graylog2.messagehandlers.syslog.SyslogEventHandler;
+import org.productivity.java.syslog4j.server.SyslogServer;
+import org.productivity.java.syslog4j.server.SyslogServerIF;
 
 /**
  * AMQPSubscriberThread.java: Jan 20, 2011 7:19:52 PM
@@ -135,7 +137,7 @@ public class AMQPSubscriberThread extends Thread {
                 GraylogSyslogServerEvent message = new GraylogSyslogServerEvent(amqpBody, amqpBody.length, InetAddress.getLocalHost());
                 SyslogEventHandler syslogHandler = new SyslogEventHandler();
                 message.setAmqpReceiverQueue(this.queue.getName());
-                syslogHandler.event(null, message);
+                syslogHandler.event(null, null, message);
                 break;
             default:
                 Log.crit("Invalid type of AMQP message. This should not be possible.");
