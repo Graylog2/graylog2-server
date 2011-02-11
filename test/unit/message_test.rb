@@ -17,4 +17,12 @@ class MessageTest < ActiveSupport::TestCase
     hostgroup = Hostgroup.find(3)
     assert_equal 5, Message.count_of_hostgroup(hostgroup)
   end
+
+  should "find additional fields" do
+    Message.make(:host => "local", :message => "hi!", :_foo => "bar").save
+    message = Message.last
+    assert message.has_additional_fields
+    expected = [{:value => 'bar', :key => 'foo' }]
+    assert_equal expected, message.additional_fields
+  end
 end
