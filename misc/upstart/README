@@ -12,3 +12,5 @@ You can test if it is running or not with the following command
     status graylog2-server
 
 Tested on Ubuntu Lucid.
+
+Contributed by Mick Pollard <twitter.com/aussielunix>
