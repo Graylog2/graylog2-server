@@ -1,5 +1,5 @@
 /**
- * Copyright 2010 Lennart Koopmann <lennart@socketfeed.com>
+ * Copyright 2011 Lennart Koopmann <lennart@socketfeed.com>
  *
  * This file is part of Graylog2.
  *
@@ -18,20 +18,35 @@
  *
  */
 
-package org.graylog2.messagehandlers.gelf;
+package org.graylog2;
+
+import org.junit.Test;
+import static org.junit.Assert.*;
 
 /**
- * InvalidGELFCompressionMethodException.java: Sep 15, 2010 10:40:00 PM
  *
- * Received GELF message has an unknown compression type.
- *
- * @author: Lennart Koopmann <lennart@socketfeed.com>
+ * @author lennart
  */
-public class InvalidGELFCompressionMethodException extends Exception {
-    public InvalidGELFCompressionMethodException() {
+public class HostSystemTest {
+
+    @Test
+    public void testGetAvailableProcessors() {
+        assertTrue(HostSystem.getAvailableProcessors() > 0);
     }
 
-    public InvalidGELFCompressionMethodException(String msg) {
-        super(msg);
+    @Test
+    public void testGetUsedMemory() {
+        assertTrue(HostSystem.getUsedMemory() > 0);
     }
+
+    @Test
+    public void testGetMaxMemory() {
+        assertTrue(HostSystem.getMaxMemory() >= 0);
+    }
+
+    @Test
+    public void testGetFreeMemory() {
+        assertTrue(HostSystem.getFreeMemory() > 0);
+    }
+
 }

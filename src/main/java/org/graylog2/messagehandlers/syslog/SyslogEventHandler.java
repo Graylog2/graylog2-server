@@ -51,7 +51,13 @@ public class SyslogEventHandler implements SyslogServerSessionlessEventHandlerIF
 
         // Print out debug information.
         if (Main.debugMode) {
-            Log.info("Received message: " + event.getMessage());
+            if (event instanceof GraylogSyslogServerEvent) {
+                GraylogSyslogServerEvent glEvent = (GraylogSyslogServerEvent) event;
+                Log.info("Received syslog message (via AMQP): " + event.getMessage());
+                Log.info("AMQP queue: " + glEvent.getAmqpReceiverQueue());
+            } else {
+                Log.info("Received syslog message: " + event.getMessage());
+            }
             Log.info("Host: " + event.getHost());
             Log.info("Facility: " + event.getFacility() + " (" + Tools.syslogFacilityToReadable(event.getFacility()) + ")");
             Log.info("Level: " + event.getLevel() + " (" + Tools.syslogLevelToReadable(event.getLevel()) + ")");

@@ -1,5 +1,5 @@
 /**
- * Copyright 2010 Lennart Koopmann <lennart@socketfeed.com>
+ * Copyright 2011 Lennart Koopmann <lennart@socketfeed.com>
  *
  * This file is part of Graylog2.
  *
@@ -20,8 +20,8 @@
 
 package org.graylog2.periodical;
 
+import org.graylog2.HostSystem;
 import org.graylog2.Log;
-import org.graylog2.messagehandlers.common.MessageCounter;
 
 /**
  * SystemStatisticThread.java: Oct 25, 2010 6:36:05 PM
@@ -30,7 +30,7 @@ import org.graylog2.messagehandlers.common.MessageCounter;
  *
  * @author: Lennart Koopmann <lennart@socketfeed.com>
  */
-public class LoadStatisticsThread extends Thread {
+public class ServerValueHistoryWriterThread extends Thread {
 
     /**
      * Start the thread. Runs forever.
@@ -39,15 +39,13 @@ public class LoadStatisticsThread extends Thread {
         // Run forever.
         while (true) {
             try {
-                MessageCounter counter = MessageCounter.getInstance();
-                Log.stats(counter.getTotalSecondCount(), counter.getHighestSecondCount());
-                counter.resetTotalSecondCount();
+                HostSystem.writeSystemHealthHistorically();
             } catch (Exception e) {
-                Log.warn("Error in LoadStatisticsThread: " + e.toString());
+                Log.warn("Error in SystemValueHistoryWriterThread: " + e.toString());
             }
             
-           // Run every 10 seconds.
-           try { Thread.sleep(1000); } catch(InterruptedException e) {}
+           // Run every 60 seconds.
+           try { Thread.sleep(60000); } catch(InterruptedException e) {}
         }
     }
 

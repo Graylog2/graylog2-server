@@ -1,5 +1,5 @@
 /**
- * Copyright 2010 Lennart Koopmann <lennart@socketfeed.com>
+ * Copyright 2011 Lennart Koopmann <lennart@socketfeed.com>
  *
  * This file is part of Graylog2.
  *
@@ -18,20 +18,19 @@
  *
  */
 
-package org.graylog2.messagehandlers.gelf;
+package org.graylog2.messagehandlers.amqp;
 
 /**
- * InvalidGELFCompressionMethodException.java: Sep 15, 2010 10:40:00 PM
- *
- * Received GELF message has an unknown compression type.
+ * InvalidQueueTypeException.java: Jan 21, 2011 7:59:46 PM
  *
  * @author: Lennart Koopmann <lennart@socketfeed.com>
  */
-public class InvalidGELFCompressionMethodException extends Exception {
-    public InvalidGELFCompressionMethodException() {
+public class InvalidQueueTypeException extends Exception {
+
+    /**
+     *
+     */
+    public InvalidQueueTypeException() {
     }
 
-    public InvalidGELFCompressionMethodException(String msg) {
-        super(msg);
-    }
 }
