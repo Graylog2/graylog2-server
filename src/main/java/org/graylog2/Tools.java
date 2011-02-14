@@ -25,17 +25,14 @@ import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
-<<<<<<< HEAD
 import java.util.Date;
 import java.util.Properties;
 import java.util.Timer;
 import java.util.TimerTask;
-=======
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
->>>>>>> upstream/master
 import java.util.zip.GZIPInputStream;
 import java.util.zip.InflaterInputStream;
 
@@ -192,7 +189,6 @@ public final class Tools {
        return (int) (System.currentTimeMillis()/1000);
     }
 
-<<<<<<< HEAD
 	/**
 	 * Watch for file changes in the regular expression file.
 	 * This will allow you to add/remove/modify filters without restarting the server.
@@ -215,7 +211,7 @@ public final class Tools {
 		Timer timer = new Timer();
 		timer.schedule(task, new Date(), 60000);
 	}
-=======
+
     public static String getLocalHostname() {
         InetAddress addr = null;
         try {
@@ -226,6 +222,4 @@ public final class Tools {
 
         return addr.getHostName();
     }
-
->>>>>>> upstream/master
 }

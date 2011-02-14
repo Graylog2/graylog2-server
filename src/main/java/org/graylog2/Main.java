@@ -54,18 +54,14 @@ public final class Main {
      * This holds the configuration from /etc/graylog2.conf
      */
     public static Properties masterConfig = null;
-<<<<<<< HEAD
     
     /**
      * This holds the filter out regular expressions. Defined in masterConfig
      */
     public static Properties regexConfig = null;
-=======
 
     public static final String GRAYLOG2_VERSION = "0.9.5-dev";
     
->>>>>>> upstream/master
-
     private Main() { }
 
     /**

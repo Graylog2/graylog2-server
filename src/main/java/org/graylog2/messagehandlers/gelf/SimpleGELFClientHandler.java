@@ -111,7 +111,6 @@ public class SimpleGELFClientHandler extends GELFClientHandlerBase implements GE
             Log.info("Got GELF message: " + this.message.toString());
 
             // Insert message into MongoDB.
-<<<<<<< HEAD
             boolean filterOut = ReceiveHookManager.preProcess(new GELFMessageFilterHook(), message);
             if( filterOut ) {
             	if(Main.debugMode)
@@ -125,7 +124,6 @@ public class SimpleGELFClientHandler extends GELFClientHandlerBase implements GE
                 ReceiveHookManager.postProcess(new HostUpsertHook(), message);
             }
 
-=======
             m.insertGelfMessage(this.message);
 
             // This is doing the upcounting for statistics.
@@ -133,7 +131,6 @@ public class SimpleGELFClientHandler extends GELFClientHandlerBase implements GE
 
             // Counts up host in hosts collection.
             ReceiveHookManager.postProcess(new HostUpsertHook(), this.message);
->>>>>>> upstream/master
         } catch(Exception e) {
             Log.warn("Could not handle GELF client: " + e.toString());
             return false;
