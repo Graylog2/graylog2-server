@@ -20,8 +20,6 @@
 
 package org.graylog2.messagehandlers.common;
 
-import org.graylog2.Main;
-
 /**
  * MessageCounter.java: Aug 19, 2010 6:06:20 PM
  *
@@ -84,10 +82,7 @@ public final class MessageCounter {
     public void countUp(String host) {
         if (host.equals(ALL_HOSTS)) {
             totalCount++;
-
-            if (Main.printLoadStats) {
-                totalSecondCount++;
-            }
+            totalSecondCount++;
         }
     }
 

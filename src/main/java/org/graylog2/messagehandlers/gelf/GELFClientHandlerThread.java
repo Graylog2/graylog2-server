@@ -68,8 +68,14 @@ public class GELFClientHandlerThread extends Thread {
             Log.crit("Invalid compression data format in GELF message: " + e.toString());
         } catch (java.io.UnsupportedEncodingException e) {
             Log.crit("Invalid enconding of GELF message: " + e.toString());
+        } catch (java.io.EOFException e) {
+            Log.crit("EOF Exception while handling GELF message: " + e.toString());
+        } catch (java.net.SocketException e) {
+            Log.crit("SocketException while handling GELF message: " + e.toString());
         } catch (java.io.IOException e) {
             Log.crit("IO Error while handling GELF message: " + e.toString());
+        } catch (Exception e) {
+            Log.crit("Exception caught while handling GELF message: " + e.toString());
         }
     }
 

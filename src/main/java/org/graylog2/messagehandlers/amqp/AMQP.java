@@ -1,5 +1,5 @@
 /**
- * Copyright 2010 Lennart Koopmann <lennart@socketfeed.com>
+ * Copyright 2011 Lennart Koopmann <lennart@socketfeed.com>
  *
  * This file is part of Graylog2.
  *
@@ -18,20 +18,26 @@
  *
  */
 
-package org.graylog2.messagehandlers.gelf;
+package org.graylog2.messagehandlers.amqp;
+
+import java.util.Properties;
 
 /**
- * InvalidGELFCompressionMethodException.java: Sep 15, 2010 10:40:00 PM
+ * AMQP.java: Jan 21, 2011 8:41:51 PM
  *
- * Received GELF message has an unknown compression type.
+ * Utility class for AMQP.
  *
  * @author: Lennart Koopmann <lennart@socketfeed.com>
  */
-public class InvalidGELFCompressionMethodException extends Exception {
-    public InvalidGELFCompressionMethodException() {
-    }
+public class AMQP {
 
-    public InvalidGELFCompressionMethodException(String msg) {
-        super(msg);
+    /**
+     * Is AMQP subscribing enabled? Decision based on /etc/graylog2.conf
+     * "use_amqp" parameter.
+     *
+     * @return boolean
+     */
+    public static boolean isEnabled(Properties config) {
+        return config.getProperty("amqp_enabled").equals("true");
     }
 }

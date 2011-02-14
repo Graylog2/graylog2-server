@@ -82,10 +82,6 @@ public final class Log {
         Log.toStdOut(logMessage, Log.SEVERITY_EMERG);
     }
 
-    public static void stats(int count, int highestCount) {
-        System.out.println(new Date().toString() +  " - Messages: " + count + " (H: " + highestCount + ")");
-    }
-
     /**
      * Log a message to STDOUT with given severity.
      * @param logMessage The message to log

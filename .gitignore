@@ -1,4 +1,7 @@
 .idea
+.classpath
+.project
+.settings
 target
 build/*
 dist/*

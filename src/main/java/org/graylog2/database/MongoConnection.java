@@ -1,5 +1,5 @@
 /**
- * Copyright 2010 Lennart Koopmann <lennart@socketfeed.com>
+ * Copyright 2010, 2011 Lennart Koopmann <lennart@socketfeed.com>
  *
  * This file is part of Graylog2.
  *
@@ -39,8 +39,8 @@ import org.graylog2.Main;
 public final class MongoConnection {
     private static MongoConnection instance;
 
-    private static Mongo m = null;
-    private static DB db = null;
+    private Mongo m = null;
+    private DB db = null;
 
     private MongoConnection() {}
 
@@ -73,13 +73,13 @@ public final class MongoConnection {
 
             // Connect to replica servers if given. Else the standard way to one server.
             if (replicaServers != null && replicaServers.size() > 0) {
-                MongoConnection.m = new Mongo(replicaServers, options);
+                m = new Mongo(replicaServers, options);
             } else {
                 ServerAddress address = new ServerAddress(hostname, port);
-                MongoConnection.m = new Mongo(address, options);
+                m = new Mongo(address, options);
             }
 
-            MongoConnection.db = m.getDB(database);
+            db = m.getDB(database);
 
             // Try to authenticate if configured.
             if (useAuth.equals("true")) {
@@ -97,7 +97,7 @@ public final class MongoConnection {
      * @return connection
      */
     public Mongo getConnection() {
-        return MongoConnection.m;
+        return m;
     }
 
     /**
@@ -105,6 +105,6 @@ public final class MongoConnection {
      * @return database
      */
     public DB getDatabase() {
-        return MongoConnection.db;
+        return db;
     }
 }
