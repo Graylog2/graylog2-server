@@ -20,12 +20,16 @@
 
 package org.graylog2.messagehandlers.common;
 
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
-import org.graylog2.Main;
-import org.productivity.java.syslog4j.Syslog;
-import org.productivity.java.syslog4j.server.SyslogServerEventIF;
+import org.drools.KnowledgeBase;
+import org.drools.KnowledgeBaseFactory;
+import org.drools.builder.KnowledgeBuilder;
+import org.drools.builder.KnowledgeBuilderError;
+import org.drools.builder.KnowledgeBuilderErrors;
+import org.drools.builder.KnowledgeBuilderFactory;
+import org.drools.builder.ResourceType;
+import org.drools.io.ResourceFactory;
+import org.drools.runtime.StatefulKnowledgeSession;
+import org.graylog2.messagehandlers.gelf.GELFMessage;
 
 /**
  * MessageParserHook.java: Feb 11, 2011
@@ -39,27 +43,36 @@ public class MessageParserHook implements MessagePreReceiveHookIF {
     /**
      * Process the hook.
      */
-    public boolean process(Object message) {
+    public void process(Object message) {
 		/**
-		 * Convert message Object to string for regex match
+		 * Run GELFMessage through the rules engine
 		 */
-    	String msg = new String(((SyslogServerEventIF) message).getMessage());
-    	String regex = null;
-    	Pattern pattern = null;
-    	Matcher matcher = null;
-		 
-    	int regex_count = Integer.parseInt(Main.regexConfig.getProperty("filter.out.syslog.count"));
+    	GELFMessage gmsg = (GELFMessage) message;
     	
-    	for( int i = 0; i < regex_count; i++) {
-    		regex = Main.regexConfig.getProperty("filter.out.syslog.regex." + i);
-    		pattern = Pattern.compile(regex);
-    		matcher = pattern.matcher(msg);
-
-    	   	if(matcher.matches()){
-    	   		Syslog.getInstance("udp").debug("Message Filtered :" + msg);
-    	   		return true;
-    	   	}
-    	}
-    	return false;
+		try {
+			// load up the knowledge base
+			KnowledgeBase kbase = readKnowledgeBase();
+			StatefulKnowledgeSession ksession = kbase.newStatefulKnowledgeSession();
+			ksession.insert(gmsg);
+			ksession.fireAllRules();
+			ksession.dispose();
+		} catch (Throwable t) {
+			t.printStackTrace();
+		}
     }
+    
+	private static KnowledgeBase readKnowledgeBase() throws Exception {
+		KnowledgeBuilder kbuilder = KnowledgeBuilderFactory.newKnowledgeBuilder();
+		kbuilder.add(ResourceFactory.newFileResource("/etc/graylog2.d/rules/Sample.drl"), ResourceType.DRL);
+		KnowledgeBuilderErrors errors = kbuilder.getErrors();
+		if (errors.size() > 0) {
+			for (KnowledgeBuilderError error: errors) {
+				System.err.println(error);
+			}
+			throw new IllegalArgumentException("Could not parse knowledge.");
+		}
+		KnowledgeBase kbase = KnowledgeBaseFactory.newKnowledgeBase();
+		kbase.addKnowledgePackages(kbuilder.getKnowledgePackages());
+		return kbase;
+	}
 }

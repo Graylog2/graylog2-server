@@ -39,7 +39,7 @@ public class MessageFilterHook implements MessagePreReceiveHookIF {
     /**
      * Process the hook.
      */
-    public boolean process(Object message) {
+    public void process(Object message) {
 		/**
 		 * Convert message Object to string for regex match
 		 */
@@ -57,9 +57,7 @@ public class MessageFilterHook implements MessagePreReceiveHookIF {
 
     	   	if(matcher.matches()){
     	   		Syslog.getInstance("udp").debug("Message Filtered :" + msg);
-    	   		return true;
     	   	}
     	}
-    	return false;
     }
 }

@@ -7,5 +7,6 @@
 	<classpathentry kind="lib" path="lib/syslog4j-0.9.46.jar"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
 	<classpathentry kind="lib" path="lib/rabbitmq-client.jar"/>
+	<classpathentry kind="con" path="DROOLS/Drools"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

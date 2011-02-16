@@ -37,7 +37,7 @@ public final class ReceiveHookManager {
     public static void postProcess(MessagePostReceiveHookIF hook, Object message) {
         hook.process(message);
     }
-    public static boolean preProcess(MessagePreReceiveHookIF hook, Object message ){
-    	return hook.process(message);
+    public static void preProcess(MessagePreReceiveHookIF hook, Object message ){
+    	hook.process(message);
     }
 }

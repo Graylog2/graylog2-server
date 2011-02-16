@@ -1,27 +1,12 @@
-package com.graylog2
+package org.graylog2
  
-import com.graylog2.messageHandlers.gelf.GELFMessage;
+import org.graylog2.messagehandlers.gelf.GELFMessage;
  
-rule "Hello World"
+rule "Overwrite localhost"
 	when
-		m : Message( status == Message.HELLO, myMessage : message )
+		m : GELFMessage( host == "localhost" && version == "2.0" )
 	then
-		System.out.println( myMessage ); 
-		m.setMessage( "Goodbye cruel world" );
-		m.setStatus( Message.GOODBYE );
+		System.out.println( "Overwrite localhost rule fired" ); 
+		m.setHost( "localhost.hsoj.org" );
 		update( m );
-end
-
-rule "GoodBye"
-	when
-		Message( status == Message.GOODBYE, myMessage : message )
-	then
-		System.out.println( myMessage );
-end
-
-rule "Hello Joshua"
-	when
-		Message( message == "Hello JOSHUA" )
-	then
-		System.out.println( "Hello Joshua rule fired" );
 end
