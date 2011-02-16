@@ -24,18 +24,11 @@ import java.net.SocketAddress;
 import org.graylog2.Log;
 import org.graylog2.Main;
 import org.graylog2.Tools;
-import org.graylog2.database.MongoBridge;
-import org.graylog2.messagehandlers.common.HostUpsertHook;
-import org.graylog2.messagehandlers.common.MessageCounterHook;
-import org.graylog2.messagehandlers.common.MessageFilterHook;
-import org.graylog2.messagehandlers.common.ReceiveHookManager;
 import org.graylog2.messagehandlers.gelf.GELFMessage;
 import org.graylog2.messagehandlers.gelf.SimpleGELFClientHandler;
-import org.productivity.java.syslog4j.Syslog;
 import org.productivity.java.syslog4j.server.SyslogServerEventIF;
 import org.productivity.java.syslog4j.server.SyslogServerIF;
 import org.productivity.java.syslog4j.server.SyslogServerSessionlessEventHandlerIF;
-import java.util.zip.DataFormatException;
 
 /**
  * SyslogEventHandler.java: May 17, 2010 8:58:18 PM
