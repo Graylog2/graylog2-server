@@ -1,0 +1,27 @@
+package com.graylog2
+ 
+import com.graylog2.messageHandlers.gelf.GELFMessage;
+ 
+rule "Hello World"
+	when
+		m : Message( status == Message.HELLO, myMessage : message )
+	then
+		System.out.println( myMessage ); 
+		m.setMessage( "Goodbye cruel world" );
+		m.setStatus( Message.GOODBYE );
+		update( m );
+end
+
+rule "GoodBye"
+	when
+		Message( status == Message.GOODBYE, myMessage : message )
+	then
+		System.out.println( myMessage );
+end
+
+rule "Hello Joshua"
+	when
+		Message( message == "Hello JOSHUA" )
+	then
+		System.out.println( "Hello Joshua rule fired" );
+end
