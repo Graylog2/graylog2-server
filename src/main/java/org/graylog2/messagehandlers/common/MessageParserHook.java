@@ -62,7 +62,7 @@ public class MessageParserHook implements MessagePreReceiveHookIF {
     
 	private static KnowledgeBase readKnowledgeBase() throws Exception {
 		KnowledgeBuilder kbuilder = KnowledgeBuilderFactory.newKnowledgeBuilder();
-		kbuilder.add(ResourceFactory.newFileResource("/etc/graylog2.d/rules/Sample.drl"), ResourceType.DRL);
+		kbuilder.add(ResourceFactory.newFileResource("/etc/graylog2.d/rules/graylog2.drl"), ResourceType.DRL);
 		KnowledgeBuilderErrors errors = kbuilder.getErrors();
 		if (errors.size() > 0) {
 			for (KnowledgeBuilderError error: errors) {
