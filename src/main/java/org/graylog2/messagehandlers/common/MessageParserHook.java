@@ -43,17 +43,16 @@ public class MessageParserHook implements MessagePreReceiveHookIF {
     /**
      * Process the hook.
      */
-    public void process(Object message) {
+    public void process(GELFMessage message) {
 		/**
 		 * Run GELFMessage through the rules engine
 		 */
-    	GELFMessage gmsg = (GELFMessage) message;
     	
 		try {
 			// load up the knowledge base
 			KnowledgeBase kbase = readKnowledgeBase();
 			StatefulKnowledgeSession ksession = kbase.newStatefulKnowledgeSession();
-			ksession.insert(gmsg);
+			ksession.insert(message);
 			ksession.fireAllRules();
 			ksession.dispose();
 		} catch (Throwable t) {
