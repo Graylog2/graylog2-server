@@ -82,6 +82,8 @@ public class SimpleGELFClientHandler extends GELFClientHandlerBase implements GE
             }
         } else if(clientMessage instanceof String) {
             this.clientMessage = (String) clientMessage;
+        } else if(clientMessage instanceof GELFMessage) {
+        	this.message = (GELFMessage) clientMessage;
         }
         
     }
@@ -94,11 +96,13 @@ public class SimpleGELFClientHandler extends GELFClientHandlerBase implements GE
     public boolean handle() {
         try {
              // Fills properties with values from JSON.
-            try { this.parse(); } catch(Exception e) {
-                Log.warn("Could not parse GELF JSON: " + e.toString() + " - clientMessage was: " + this.clientMessage);
-                return false;
-            }
-
+        	if(this.clientMessage instanceof String) {
+	            try { this.parse(); } catch(Exception e) {
+	                Log.warn("Could not parse GELF JSON: " + e.toString() + " - clientMessage was: " + this.clientMessage);
+	                return false;
+	            }
+        	} 
+        	
             // Add AMQP receiver queue as additional field if set.
             if (this.getAmqpReceiverQueue() != null) {
                 this.message.addAdditionalData("_amqp_queue", this.getAmqpReceiverQueue());

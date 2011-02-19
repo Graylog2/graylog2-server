@@ -62,6 +62,8 @@ public final class Main {
 
     public static final String GRAYLOG2_VERSION = "0.9.5-dev";
     
+    public static RulesEngine drools = null;
+    
     private Main() { }
 
     /**
@@ -190,6 +192,10 @@ public final class Main {
         ServerValue.setAvailableProcessors(HostSystem.getAvailableProcessors());
         ServerValue.setLocalHostname(Tools.getLocalHostname());
 
+        // Create Rules Engine
+        Main.drools = new RulesEngine();
+		Main.drools.addRules(Main.masterConfig.getProperty("rulesFile"));
+		
         // Start the Syslog thread that accepts syslog packages.
         SyslogServerThread syslogServerThread = new SyslogServerThread(Integer.parseInt(Main.masterConfig.getProperty("syslog_listen_port")));
         syslogServerThread.start();
@@ -213,6 +219,7 @@ public final class Main {
             
             System.out.println("[x] GELF threads are up.");
         }
+        
 
         // AMQP.
          if (AMQP.isEnabled(Main.masterConfig)) {

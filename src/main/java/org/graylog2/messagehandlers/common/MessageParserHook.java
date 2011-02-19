@@ -29,6 +29,7 @@ import org.drools.builder.KnowledgeBuilderFactory;
 import org.drools.builder.ResourceType;
 import org.drools.io.ResourceFactory;
 import org.drools.runtime.StatefulKnowledgeSession;
+import org.graylog2.Main;
 import org.graylog2.messagehandlers.gelf.GELFMessage;
 
 /**
@@ -47,31 +48,6 @@ public class MessageParserHook implements MessagePreReceiveHookIF {
 		/**
 		 * Run GELFMessage through the rules engine
 		 */
-    	
-		try {
-			// load up the knowledge base
-			KnowledgeBase kbase = readKnowledgeBase();
-			StatefulKnowledgeSession ksession = kbase.newStatefulKnowledgeSession();
-			ksession.insert(message);
-			ksession.fireAllRules();
-			ksession.dispose();
-		} catch (Throwable t) {
-			t.printStackTrace();
-		}
+    	Main.drools.evaluate(message);
     }
-    
-	private static KnowledgeBase readKnowledgeBase() throws Exception {
-		KnowledgeBuilder kbuilder = KnowledgeBuilderFactory.newKnowledgeBuilder();
-		kbuilder.add(ResourceFactory.newFileResource("/etc/graylog2.d/rules/graylog2.drl"), ResourceType.DRL);
-		KnowledgeBuilderErrors errors = kbuilder.getErrors();
-		if (errors.size() > 0) {
-			for (KnowledgeBuilderError error: errors) {
-				System.err.println(error);
-			}
-			throw new IllegalArgumentException("Could not parse knowledge.");
-		}
-		KnowledgeBase kbase = KnowledgeBaseFactory.newKnowledgeBase();
-		kbase.addKnowledgePackages(kbuilder.getKnowledgePackages());
-		return kbase;
-	}
 }
