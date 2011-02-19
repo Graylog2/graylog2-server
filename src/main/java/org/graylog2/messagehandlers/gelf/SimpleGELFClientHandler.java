@@ -104,35 +104,26 @@ public class SimpleGELFClientHandler extends GELFClientHandlerBase implements GE
                 this.message.addAdditionalData("_amqp_queue", this.getAmqpReceiverQueue());
             }
 
-            // Store in MongoDB.
-            // Connect to database.
-            MongoBridge m = new MongoBridge();
 
             // Log if we are in debug mode.
             Log.info("Got GELF message: " + this.message.toString());
 
             // Insert message into MongoDB.
-            ReceiveHookManager.preProcess(new MessageFilterHook(), message);
             ReceiveHookManager.preProcess(new MessageParserHook(), message);
             if( message.getFilterOut() ) {
             	if(Main.debugMode)
             		Syslog.getInstance("udp").debug("Not inserting event into database.");
             } else {
-                m.insertGelfMessage(message);
+                // Store in MongoDB.
+                // Connect to database.
+            	MongoBridge m = new MongoBridge();
+            	m.insertGelfMessage(message);
                 // This is doing the upcounting for statistics.
                 ReceiveHookManager.postProcess(new MessageCounterHook(), message);
 
                 // Counts up host in hosts collection.
                 ReceiveHookManager.postProcess(new HostUpsertHook(), message);
             }
-
-            m.insertGelfMessage(this.message);
-
-            // This is doing the upcounting for statistics.
-            ReceiveHookManager.postProcess(new MessageCounterHook(), this.message);
-
-            // Counts up host in hosts collection.
-            ReceiveHookManager.postProcess(new HostUpsertHook(), this.message);
         } catch(Exception e) {
             Log.warn("Could not handle GELF client: " + e.toString());
             return false;

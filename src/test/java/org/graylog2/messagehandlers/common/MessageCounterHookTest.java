@@ -5,6 +5,7 @@
 
 package org.graylog2.messagehandlers.common;
 
+import org.graylog2.messagehandlers.gelf.GELFMessage;
 import org.junit.Before;
 import org.junit.Test;
 import static org.junit.Assert.*;
@@ -25,7 +26,7 @@ public class MessageCounterHookTest {
      */
     @Test
     public void testProcess() {
-        Object message = null;
+        GELFMessage message = null;
 
         int count_to = 12;
         for (int i = 0; i < count_to; i++) {

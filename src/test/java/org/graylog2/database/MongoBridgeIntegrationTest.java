@@ -45,7 +45,7 @@ public class MongoBridgeIntegrationTest {
         MongoConnection.getInstance().connect(
             null,
             null,
-            "localhost",
+            "127.0.0.1",
             "graylog2test",
             Integer.valueOf(27017),
             "false",
@@ -112,6 +112,7 @@ public class MongoBridgeIntegrationTest {
         message.setLevel(1);
         message.setHost("junit-test");
         message.setFile("junit-testfile");
+        message.setVersion("1.0");
         message.setLine(9001);
         message.addAdditionalData("something", "yepp");
 
@@ -128,10 +129,10 @@ public class MongoBridgeIntegrationTest {
         assertEquals(res.get("message"), "gelftest");
         assertEquals(res.get("full_message"), "full gelftest\nstuff");
         assertEquals(res.get("level"), 1);
-        assertEquals(res.get("type"), 8);
         assertEquals(res.get("host"), "junit-test");
         assertEquals(res.get("file"), "junit-testfile");
         assertEquals(res.get("line"), 9001);
+        assertEquals(res.get("version"), "1.0");
         assertEquals(res.get("something"), "yepp");
     }
 

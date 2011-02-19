@@ -22,11 +22,11 @@ public class HostUpsertHookTest {
         instance.process(message);
     }
 
-    @Test
+/*    @Test
     public void testProcessWithSyslogMessage() {
         SyslogServerEvent message = new SyslogServerEvent("foo".getBytes(), "foo".getBytes().length, null);
         HostUpsertHook instance = new HostUpsertHook();
         instance.process(message);
     }
-
+*/
 }
