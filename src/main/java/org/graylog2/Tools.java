@@ -189,29 +189,6 @@ public final class Tools {
        return (int) (System.currentTimeMillis()/1000);
     }
 
-	/**
-	 * Watch for file changes in the regular expression file.
-	 * This will allow you to add/remove/modify filters without restarting the server.
-	 * 
-	 */
-	public static void watchFilterFile(String regexPath) {
-		TimerTask task = new FileWatcher( new File(regexPath)) {
-			protected void onChange(File file) {
-				try {
-					FileInputStream regexStream = new FileInputStream(file);
-					Main.regexConfig.load(regexStream);
-					regexStream.close();
-					Syslog.getInstance("udp").alert(file.getName() + " has changed. Updating regexConfig properties.");
-				} catch (java.io.IOException e) {
-					Syslog.getInstance("udp").debug("Could not read regex config file: " + e.toString());
-				}
-			}
-		};
-		
-		Timer timer = new Timer();
-		timer.schedule(task, new Date(), 60000);
-	}
-
     public static String getLocalHostname() {
         InetAddress addr = null;
         try {

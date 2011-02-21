@@ -30,7 +30,7 @@ import org.graylog2.Tools;
 import org.graylog2.database.MongoBridge;
 import org.graylog2.messagehandlers.common.HostUpsertHook;
 import org.graylog2.messagehandlers.common.MessageCounterHook;
-import org.graylog2.messagehandlers.common.MessageFilterHook;
+import org.graylog2.messagehandlers.common.MessageParserHook;
 import org.graylog2.messagehandlers.common.ReceiveHookManager;
 import org.productivity.java.syslog4j.Syslog;
 
@@ -145,7 +145,7 @@ public class ChunkedGELFClientHandler extends GELFClientHandlerBase implements G
             Log.info("Got GELF message: " + message.toString());
 
             // PreProcess message based on filters. Insert message into MongoDB.
-            ReceiveHookManager.preProcess(new MessageFilterHook(), message);
+            ReceiveHookManager.preProcess(new MessageParserHook(), message);
             if( message.getFilterOut() ) {
             	if(Main.debugMode)
             		Syslog.getInstance("udp").debug("Not inserting event into database.");
