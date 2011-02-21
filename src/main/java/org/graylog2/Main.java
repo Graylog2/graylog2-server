@@ -181,6 +181,7 @@ public final class Main {
         // Create Rules Engine
         Main.drools = new RulesEngine();
 		Main.drools.addRules(Main.masterConfig.getProperty("rulesFile"));
+		System.out.println("[x] Using rules: " + Main.masterConfig.getProperty("rulesFile"));
 		
         // Start the Syslog thread that accepts syslog packages.
         SyslogServerThread syslogServerThread = new SyslogServerThread(Integer.parseInt(Main.masterConfig.getProperty("syslog_listen_port")));
