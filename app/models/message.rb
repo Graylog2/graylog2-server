@@ -100,8 +100,19 @@ class Message
     conditions = self
 
     unless filters.blank?
-      # Message (seems like there is a bug in the Plucky condition overwriting. Setting blacklisted terms here.)
-      conditions = conditions.where(:message => { "$nin" => BlacklistedTerm.all_as_array, "$in" => [/#{filters[:message].strip}/] }) unless filters[:message].blank?
+      unless filters[:messages].blank?
+        # Message (seems like there is a bug in the Plucky condition overwriting. Setting blacklisted terms here.)
+        message_conditions = Hash.new
+        message_conditions[:message] = Hash.new
+        message_conditions[:message]["$in"] = [/#{filters[:message].strip}/]
+
+        blacklisted_terms = BlacklistedTerm.all_as_array
+        if blacklisted_terms.count > 0
+          message_conditions[:message]["$nin"] = blacklisted_terms
+        end
+
+        conditions = conditions.where(message_conditions)
+      end
 
       # Time Frame
       conditions = conditions.where(:created_at => get_conditions_from_date(filters[:date])) unless filters[:date].blank?
