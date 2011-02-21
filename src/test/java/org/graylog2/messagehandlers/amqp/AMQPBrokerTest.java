@@ -46,9 +46,9 @@ public class AMQPBrokerTest {
     public void testAMQPConnection() {
     	try {
     	ConnectionFactory factory = new ConnectionFactory();
-    	factory.setHost("hsoj.org");
+    	factory.setHost("localhost");
     	factory.setUsername("guest");
-    	factory.setPassword("benkusky");
+    	factory.setPassword("guest");
     	Connection conn = factory.newConnection();
     	Channel chan = conn.createChannel();
     	chan.exchangeDeclare("logs","fanout");
