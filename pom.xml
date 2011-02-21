@@ -19,6 +19,10 @@
             <url>http://clojars.org/repo</url>
         </repository>
         <repository>
+            <id>jboss</id>
+            <url>http://repository.jboss.com/maven2</url>
+        </repository>
+        <repository>
             <id>scala-tools.org releases</id>
             <name>Scala-tools Maven2 Releases Repository</name>
             <url>http://scala-tools.org/repo-releases</url>
@@ -77,6 +81,21 @@
             <artifactId>amqp-client</artifactId>
             <version>2.2.0</version>
         </dependency>
+		<dependency> 
+		    <groupId>org.drools</groupId> 
+		    <artifactId>drools-core</artifactId> 
+		    <version>5.0.1</version> 
+		</dependency>
+		<dependency> 
+		    <groupId>org.drools</groupId> 
+		    <artifactId>drools-compiler</artifactId> 
+		    <version>5.0.1</version> 
+		</dependency>
+		<dependency> 
+		    <groupId>org.drools</groupId> 
+		    <artifactId>drools-api</artifactId> 
+		    <version>5.0.1</version> 
+		</dependency>
     </dependencies>
 
     <build>
