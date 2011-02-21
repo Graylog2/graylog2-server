@@ -10,7 +10,6 @@ A total of <span class="highlighted"><%= @total_count %></span> messages in this
 
 <%= render :partial => "messages/table", :locals => {
   :messages => @messages,
-  :inline_version => true,
   :total_messages => @total_count,
   :append_params => [{ :key => "from", :value => @from.to_i}, {:key => "to", :value => @to.to_i} ]
 } %>
