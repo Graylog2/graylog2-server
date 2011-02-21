@@ -68,7 +68,7 @@ class Stream < ActiveRecord::Base
   def self.message_count_since(stream_id, since)
     return 0 if Stream.find(stream_id).streamrules.blank?
     conditions = Message.by_stream(stream_id).criteria
-    conditions[:created_at] = { "$gte" => since }
+    conditions[:created_at] = { "$gte" => since.to_i }
     return Message.count(:conditions => conditions)
   end
 
