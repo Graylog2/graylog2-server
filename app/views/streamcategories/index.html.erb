@@ -6,10 +6,19 @@
   <%= awesome_submit_link "Create category" %>
 <% end %>
 
+<br />
+<h2>Categories</h2>
 <ul id="streamcategories-list">
 <% @categories.each do |category| %>
   <li>
     <%= category.title %>
+    <ul>
+      <li>
+        <%= link_to "Rename", rename_streamcategory_path(category.id) %>
+        / 
+        <%= link_to "Delete", streamcategory_path(category.id), :method => :delete, :confirm => "Really delete stream category?" %>
+      </li>
+    </ul>
   </li>
 <% end %>
 </ul>

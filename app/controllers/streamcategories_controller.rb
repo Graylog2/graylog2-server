@@ -14,7 +14,19 @@ class StreamcategoriesController < ApplicationController
       flash[:error] = "Could not create stream category!"
     end
 
-    redirect_to :controller => "streams", :action => "index"
+    redirect_to :action => "index"
+  end
+
+  def destroy
+    category = Streamcategory.find(params[:id])
+
+    if category.destroy
+      flash[:notice] = "Stream category has been deleted."
+    else
+      flash[:error] = "Could not delete stream category!"
+    end
+    
+    redirect_to :action => "index"
   end
 
 end

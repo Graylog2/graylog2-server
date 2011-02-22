@@ -32,16 +32,6 @@ ActiveRecord::Schema.define(:version => 20110203162747) do
     t.datetime "updated_at"
   end
 
-  create_table "correlation_rules", :force => true do |t|
-    t.integer  "stream_id"
-    t.integer  "correlation_type"
-    t.string   "value"
-    t.integer  "timeframe"
-    t.boolean  "global",           :default => false
-    t.datetime "created_at"
-    t.datetime "updated_at"
-  end
-
   create_table "facilities", :force => true do |t|
     t.integer  "number"
     t.string   "title"
@@ -93,11 +83,6 @@ ActiveRecord::Schema.define(:version => 20110203162747) do
     t.integer  "user_id"
     t.integer  "setting_type"
     t.integer  "value"
-    t.datetime "created_at"
-    t.datetime "updated_at"
-  end
-
-  create_table "stream_categories", :force => true do |t|
     t.datetime "created_at"
     t.datetime "updated_at"
   end

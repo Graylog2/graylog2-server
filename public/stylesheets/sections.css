@@ -568,5 +568,19 @@
 
 /* Stream categories */
 #streamcategories-list {
-  margin-top: 15px;
+  list-style-type: square;
+  margin-left: 25px;
+}
+
+#streamcategories-list li {
+  font-size: 13px;
+}
+
+#streamcategories-list ul { /* Sublevel */
+  list-style-type: none;
+  margin-left: 10px;
+}
+
+#streamcategories-list a {
+  font-size: 11px !important;
 }
