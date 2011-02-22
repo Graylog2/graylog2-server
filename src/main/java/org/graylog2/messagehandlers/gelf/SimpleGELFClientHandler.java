@@ -113,10 +113,7 @@ public class SimpleGELFClientHandler extends GELFClientHandlerBase implements GE
 
             // Insert message into MongoDB.
             ReceiveHookManager.preProcess(new MessageParserHook(), message);
-            if( message.getFilterOut() ) {
-            	if(Main.debugMode)
-            		Syslog.getInstance("udp").debug("Not inserting event into database.");
-            } else {
+            if(!message.getFilterOut()) {
                 // Store in MongoDB.
                 // Connect to database.
             	MongoBridge m = new MongoBridge();

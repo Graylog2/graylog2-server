@@ -146,10 +146,7 @@ public class ChunkedGELFClientHandler extends GELFClientHandlerBase implements G
 
             // PreProcess message based on filters. Insert message into MongoDB.
             ReceiveHookManager.preProcess(new MessageParserHook(), message);
-            if( message.getFilterOut() ) {
-            	if(Main.debugMode)
-            		Syslog.getInstance("udp").debug("Not inserting event into database.");
-            } else {
+            if(!message.getFilterOut()) {
                 m.insertGelfMessage(message);
                 // This is doing the upcounting for statistics.
                 ReceiveHookManager.postProcess(new MessageCounterHook(), message);
