@@ -5,6 +5,10 @@ class StreamcategoriesController < ApplicationController
     @categories = Streamcategory.all
   end
 
+  def rename
+    @category = Streamcategory.find(params[:id])
+  end
+
   def create
     category = Streamcategory.new(params[:streamcategory])
 
@@ -12,6 +16,20 @@ class StreamcategoriesController < ApplicationController
       flash[:notice] = "Stream category has been created."
     else
       flash[:error] = "Could not create stream category!"
+    end
+
+    redirect_to :action => "index"
+  end
+
+  # Actually only renaming as it is the only attribute.
+  def update
+    category = Streamcategory.find(params[:id])
+    category.title = params[:title] unless params[:title].blank?
+
+    if category.save
+      flash[:notice] = "Stream category has been renamed."
+    else
+      flash[:error] = "Could not rename stream category!"
     end
 
     redirect_to :action => "index"

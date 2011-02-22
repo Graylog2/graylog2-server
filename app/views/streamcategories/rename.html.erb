@@ -1,0 +1,7 @@
+<h1>Rename stream category <span class="highlighted"><%= @category.title %></span></h1>
+
+<%= form_tag streamcategory_path(@category.id), :method => :put do %>
+  <%= label_tag "title", "New title:" %>
+  <%= text_field_tag "title", @category.title, :style => "width: 300px;" %>
+  <%= awesome_submit_link "Rename" %>
+<% end %>
