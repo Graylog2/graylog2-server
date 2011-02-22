@@ -179,9 +179,20 @@ public final class Main {
         ServerValue.setLocalHostname(Tools.getLocalHostname());
 
         // Create Rules Engine
-        Main.drools = new RulesEngine();
-		Main.drools.addRules(Main.masterConfig.getProperty("rulesFile"));
-		System.out.println("[x] Using rules: " + Main.masterConfig.getProperty("rulesFile"));
+        try {
+            String rulesFilePath = Main.masterConfig.getProperty("rulesFile");
+            if (rulesFilePath != null && !rulesFilePath.isEmpty()) {
+                Main.drools = new RulesEngine();
+                Main.drools.addRules(rulesFilePath);
+                System.out.println("[x] Using rules: " + rulesFilePath);
+            } else {
+                System.out.println("[x] Not using rules");
+            }
+        } catch (Exception e) {
+            System.out.println("Could not load rules engine: " + e.toString());
+            e.printStackTrace();
+            System.exit(1); // Exit with error.
+        }
 		
         // Start the Syslog thread that accepts syslog packages.
         SyslogServerThread syslogServerThread = new SyslogServerThread(Integer.parseInt(Main.masterConfig.getProperty("syslog_listen_port")));
