@@ -192,6 +192,7 @@
   padding-top: 6px;
   padding-bottom: 6px;
   border-bottom: 1px solid #ccc;
+  height: 16px;
   clear: both;
 }
 
@@ -203,6 +204,10 @@
 .streams-stream-middle {
   float: left;
   padding-right: 15px;
+}
+
+.streams-stream-right {
+  float: left;
 }
 
 .streams-stream-title {
