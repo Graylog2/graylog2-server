@@ -62,22 +62,18 @@ public class AMQPSubscriberThread extends Thread {
         while(true) {
             Connection connection = null;
             Channel channel = null;
-            String queueName = null;
             QueueingConsumer consumer = new QueueingConsumer(channel);
-            
+
             try {
                 connection = broker.getConnection();
                 channel = connection.createChannel();
-                channel.exchangeDeclare("logs", "fanout");
-                queueName = channel.queueDeclare().getQueue();
-                channel.queueBind(queueName, "logs", "");
-                channel.basicConsume(queueName, false, consumer);
+                channel.basicConsume(this.queue.getName(), false, consumer);
 
-                Log.info("Successfully connected to queue '" + queueName + "'");
-            } catch (IOException e) {
-                Log.crit("AMQP queue '" + queueName + "': Could not connect to AMQP broker or channel (Make sure that "
+                Log.info("Successfully connected to queue '" + this.queue.getName() + "'");
+            } catch (Exception e) {
+                Log.crit("AMQP queue '" + this.queue.getName() + "': Could not connect to AMQP broker or channel (Make sure that "
                         + "the queue exists. Retrying in " + SLEEP_INTERVAL + " seconds. (" + e.toString() + ")");
-                
+
                 // Retry after waiting for SLEEP_INTERVAL seconds.
                 try { Thread.sleep(SLEEP_INTERVAL*1000); } catch(InterruptedException foo) {}
                 continue;
