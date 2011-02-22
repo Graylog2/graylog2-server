@@ -6,29 +6,38 @@
   include the string "MySQL".
 </div>
 
+<div id="streams-new-stream">
 <% permitted_to? :create, :streams do %>
   <%= form_for @new_stream, :url => streams_path do |f| %>
     <%= f.label :title, "Title:" %>
     <%= f.text_field :title %>
-    <%= awesome_submit_link "Create Stream" %>
+    <%= awesome_submit_link "Create stream" %>
   <% end %>
 <% end %>
+</div>
 
-<% @streams.each do |stream| %>
-  <div class="blocks">
-    <span class="blocks-title"><%= link_to h(stream.title), stream_path(stream) %></span>
-    <ul class="blocks-termslist">
-      <% if stream.streamrules.blank? %>
-        <li>No rules</li>
-      <% else %>
-        <% stream.streamrules.each do |rule| %>
-        <li>
-          <%=raw streamrule_to_human(rule) %>
-        </li>
-        <% end %>
-      <% end %>
-    </ul>
-  </div>
+<div id="streams-manage-categories-link">
+<% permitted_to? :create, :streamcategories do %>
+  <%= awesome_link "Manage categories", streamcategories_path %>
 <% end %>
+</div>
+
+<br style="clear: both;" />
+
+<div id="streams-streams">
+  <% Streamcategory.all.each do |category| %>
+    <h2 class="streams-title"><%= category.title %></h2>
+    <% category.streams.each do |stream| %>
+      <%= render :partial => "streamrow", :locals => { :stream => stream } %>
+    <% end %>
+  <% end %>
+
+  <% unless @streams_with_no_category.blank? %>
+    <h2 class="streams-title">Uncategorized</h2>
+    <% @streams_with_no_category.each do |stream| %>
+      <%= render :partial => "streamrow", :locals => { :stream => stream } %>
+    <% end %>
+  <% end %>
+</div>
 
 <br style="clear: both;" />

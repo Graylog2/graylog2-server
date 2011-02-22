@@ -21,7 +21,14 @@ class Message
 
 
   LIMIT = 100
-  scope :not_deleted, :deleted => [false, nil]
+  
+  # This is controlled by general.yml. Disabling it gives great performance improve.
+  if Configuration.allow_deleting
+    scope :not_deleted, :deleted => false
+  else
+    scope :not_deleted, Hash.new
+  end
+
   scope :by_blacklisted_terms, lambda { |terms| where(:message.nin => terms.collect { |term| /#{term}/}) }
   scope :of_blacklisted_terms, lambda { |terms| where(:message.in => terms.collect { |term| /#{term}/}) }
   scope :by_blacklist, lambda {|blacklist| by_blacklisted_terms(blacklist.all_terms)}
@@ -93,8 +100,19 @@ class Message
     conditions = self
 
     unless filters.blank?
-      # Message (seems like there is a bug in the Plucky condition overwriting. Setting blacklisted terms here.)
-      conditions = conditions.where(:message => { "$nin" => BlacklistedTerm.all_as_array, "$in" => [/#{filters[:message].strip}/] }) unless filters[:message].blank?
+      unless filters[:messages].blank?
+        # Message (seems like there is a bug in the Plucky condition overwriting. Setting blacklisted terms here.)
+        message_conditions = Hash.new
+        message_conditions[:message] = Hash.new
+        message_conditions[:message]["$in"] = [/#{filters[:message].strip}/]
+
+        blacklisted_terms = BlacklistedTerm.all_as_array
+        if blacklisted_terms.count > 0
+          message_conditions[:message]["$nin"] = blacklisted_terms
+        end
+
+        conditions = conditions.where(message_conditions)
+      end
 
       # Time Frame
       conditions = conditions.where(:created_at => get_conditions_from_date(filters[:date])) unless filters[:date].blank?
@@ -145,7 +163,9 @@ class Message
     unless conditions[:message].blank?
       # Make it search via $in so we can easily add the $nin next. It does not have a $in when there is just one message condition.
       conditions[:message] = { "$in" => [conditions[:message]] } if conditions[:message].is_a?(Regexp)
-      conditions[:message]["$nin"] = BlacklistedTerm.all_as_array
+
+      terms = BlacklistedTerm.all_as_array
+      conditions[:message]["$nin"] = terms unless terms.blank?
     end
     # Plucky bug woraround END. (this sucks, but is okay for now. really fix after release.)
 
@@ -217,7 +237,7 @@ class Message
 
   def self.stream_counts_of_last_minutes(stream_id, minutes)
     stream = Stream.find(stream_id)
-    return Array.new if stream.blank?
+    return [{:count => 0}, {:count =>0}] if stream.blank? or stream.streamrules.blank? # sparklines needs at least two elements..
 
     res = Array.new
     minutes.times do |m|
@@ -263,8 +283,16 @@ class Message
   end
 
   def self.count_since x
-    conditions = not_deleted.where(:created_at.gt => x.to_i)
-    conditions = conditions.by_blacklisted_terms(Blacklist.all_terms)
+    if x.to_i > 0
+      conditions = not_deleted.where(:created_at.gt => x.to_i)
+    else
+      conditions = not_deleted
+    end
+
+    terms = Blacklist.all_terms
+    unless terms.blank?
+      conditions = conditions.by_blacklisted_terms(terms)
+    end
     
     conditions.count
   end
@@ -291,7 +319,7 @@ class Message
 
   def self.recalculate_host_counts
     Host.all.each do |host|
-      host.message_count = Message.count(:host => host.host, :deleted => { "$in" => [false, nil]})
+      host.message_count = Message.count(:host => host.host, :deleted => false)
       host.save
     end
   end

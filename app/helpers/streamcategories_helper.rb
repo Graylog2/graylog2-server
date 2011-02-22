@@ -1,0 +1,2 @@
+module StreamcategoriesHelper
+end

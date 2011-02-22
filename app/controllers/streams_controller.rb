@@ -4,26 +4,39 @@ class StreamsController < ApplicationController
   
   def index
     @new_stream = Stream.new
+
     if current_user.role_symbols.include? :admin
-      @streams = Stream.all
+      @all_streams = Stream.all
     else
-      @streams = current_user.streams
+      @all_streams = current_user.streams
     end
+
+    @streams_with_no_category = Array.new
+
+    # Sort streams in own array if they have no category. Done here to avoid confusion
+    # in reader/admin rights decision above
+    @all_streams.each { |stream| (stream.streamcategory_id.blank? or stream.streamcategory_id == 0 or !Streamcategory.exists?(stream.streamcategory_id)) ? @streams_with_no_category << stream : nil }
   end
 
   def show
     @has_sidebar = true
     @load_flot = 3
-
-    if params[:filters].blank?
-      @messages = Message.all_of_stream @stream.id, params[:page]
-    else
-      @additional_filters = Message.extract_additional_from_quickfilter(params[:filters])
-      @messages = Message.by_stream(@stream).all_by_quickfilter params[:filters], params[:page]
-    end
     
     @total_count = Message.count_stream @stream.id
 
+    # Don't try to find messages if the count shows that there are none because this will
+    # cause long MongoDB query times as no index seems to be used.
+    if @total_count > 0
+      if params[:filters].blank?
+        @messages = Message.all_of_stream @stream.id, params[:page]
+      else
+        @additional_filters = Message.extract_additional_from_quickfilter(params[:filters])
+        @messages = Message.by_stream(@stream).all_by_quickfilter params[:filters], params[:page]
+      end
+    else
+      @messages = Hash.new
+    end
+    
     # Find out if this stream is favorited by the current user.
     @is_favorited = current_user.favorite_streams.include?(@stream)
   end
@@ -146,6 +159,20 @@ class StreamsController < ApplicationController
       flash[:notice] = "Stream has been renamed."
     else
       flash[:error] = "Could not rename stream."
+    end
+
+    redirect_to settings_stream_path(stream)
+  end
+
+  # This should now really be changed to /update soon.
+  def categorize
+    stream = Stream.find params[:stream_id]
+    stream.streamcategory_id = params[:streamcategory_id]
+    
+    if stream.save
+      flash[:notice] = "Stream has been categorized."
+    else
+      flash[:error] = "Could not categorize stream."
     end
 
     redirect_to settings_stream_path(stream)

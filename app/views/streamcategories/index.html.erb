@@ -1,0 +1,28 @@
+<h1>Stream categories</h1>
+
+<%= form_for @new_streamcategory, :url => streamcategories_path do |f| %>
+  <%= f.label :title, "Title:" %>
+  <%= f.text_field :title %>
+  <%= awesome_submit_link "Create category" %>
+<% end %>
+
+<br />
+<h2>Categories</h2>
+<ul id="streamcategories-list">
+<% if @categories.blank? %>
+  <li>None</li>
+<% else %>
+<% @categories.each do |category| %>
+  <li>
+    <%= category.title %>
+    <ul>
+      <li>
+        <%= link_to "Rename", rename_streamcategory_path(category.id) %>
+        / 
+        <%= link_to "Delete", streamcategory_path(category.id), :method => :delete, :confirm => "Really delete stream category?" %>
+      </li>
+    </ul>
+  </li>
+<% end %>
+</ul>
+<% end %>

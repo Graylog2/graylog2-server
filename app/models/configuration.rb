@@ -12,6 +12,11 @@ class Configuration
     return @general_config['general']['external_hostname']
   end
 
+  def self.allow_deleting
+    return false if @general_config.blank? or @general_config['general'].blank? or @general_config['general']['allow_deleting'].blank?
+    return @general_config['general']['allow_deleting']
+  end
+
   def self.subscription_from_address
     return @subscr_config['from'] unless @subscr_config.blank? or @subscr_config['from'].blank?
     return "graylog2@example.org"
