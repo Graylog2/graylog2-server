@@ -21,7 +21,7 @@ public class MessageKnowledgeBaseTest {
 	@Test
 	public void testKsessionRuleFire() throws Exception {
 		RulesEngine drools = new RulesEngine();
-		drools.addRules("/etc/graylog2.d/rules/graylog2.drl");
+		drools.addRules("misc/graylog2.drl");
 		drools.evaluate(this.message); 
 	}
 
