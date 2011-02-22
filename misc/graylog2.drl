@@ -2,9 +2,9 @@ import org.graylog2.messagehandlers.gelf.GELFMessage
  
 rule "Overwrite localhost host"
 	when
-		m : GELFMessage( host == "localhost" && version == "2.0" )
+		m : GELFMessage( host == "localhost" && version == "1.0" )
 	then 
-		m.setHost( "localhost.hsoj.org" );
+		m.setHost( "localhost.example.com" );
 		System.out.println( "[Overwrite localhost rule fired] : " + m.toString() );
 end
 

@@ -20,13 +20,8 @@
 
 package org.graylog2.messagehandlers.amqp;
 
-import java.io.IOException;
 import java.net.ConnectException;
-
-import com.rabbitmq.client.Channel;
 import com.rabbitmq.client.Connection;
-import com.rabbitmq.client.ConnectionFactory;
-
 import org.junit.Test;
 import static org.junit.Assert.*;
 
@@ -42,23 +37,6 @@ public class AMQPBrokerTest {
     protected final static String STANDARD_PASS  = "guest";
     protected final static String STANDARD_VHOST = "/";
 
-    @Test
-    public void testAMQPConnection() {
-    	try {
-    	ConnectionFactory factory = new ConnectionFactory();
-    	factory.setHost("localhost");
-    	factory.setUsername("guest");
-    	factory.setPassword("guest");
-    	Connection conn = factory.newConnection();
-    	Channel chan = conn.createChannel();
-    	chan.exchangeDeclare("logs","fanout");
-    	System.out.println(chan.queueDeclare().getQueue());
-    	chan.close();
-    	conn.close();
-    	} catch (IOException e) {
-    		e.printStackTrace();
-    	}
-    }
     @Test
     public void testGetConnection() throws Exception {
         AMQPBroker instance = new AMQPBroker(null, 0, null, null, null);
