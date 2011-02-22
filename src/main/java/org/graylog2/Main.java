@@ -180,7 +180,7 @@ public final class Main {
 
         // Create Rules Engine
         try {
-            String rulesFilePath = Main.masterConfig.getProperty("rulesFile");
+            String rulesFilePath = Main.masterConfig.getProperty("rules_file");
             if (rulesFilePath != null && !rulesFilePath.isEmpty()) {
                 Main.drools = new RulesEngine();
                 Main.drools.addRules(rulesFilePath);
