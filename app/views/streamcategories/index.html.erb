@@ -9,6 +9,9 @@
 <br />
 <h2>Categories</h2>
 <ul id="streamcategories-list">
+<% if @categories.blank? %>
+  <li>None</li>
+<% else %>
 <% @categories.each do |category| %>
   <li>
     <%= category.title %>
@@ -22,3 +25,4 @@
   </li>
 <% end %>
 </ul>
+<% end %>
