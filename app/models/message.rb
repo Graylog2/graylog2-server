@@ -42,7 +42,7 @@ class Message
     if FilteredTerm.exists?
       msg = read_attribute(:message)
       FilteredTerm.all.each do |t|
-        next if msg.blank?
+        next if msg.blank? or t.term.blank?
         begin
           msg[/#{t.term}/] = "[FILTERED]" 
         rescue => e
