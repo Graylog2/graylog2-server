@@ -1,0 +1,15 @@
+<% streams = Stream.all(:order => "title ASC") %>
+
+<h2>Streams</h2>
+
+<h4>Go to the <%= link_to "streams overview", streams_path %>.</h4>
+
+<ul id="modal-stream-chooser-list">
+<% if streams.blank? %>
+  <li>No streams defined</li>
+<% else %>
+  <% streams.each do |stream| %>
+    <li><%= link_to stream.title, stream_path(stream.id) %></li>
+  <% end %>
+<% end %>
+</ul>

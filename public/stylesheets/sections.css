@@ -589,3 +589,28 @@
 #streamcategories-list a {
   font-size: 11px !important;
 }
+
+/* Modals */
+#modal-stream-chooser-list {
+  margin-top: 15px;
+  margin-left: 20px;
+  list-style-type: square;
+}
+
+#modal-stream-chooser-list li {
+  font-size: 13px;
+  padding-bottom: 2px;
+  padding-top: 2px;
+}
+
+#modal-host-chooser-list {
+  margin-top: 15px;
+  margin-left: 20px;
+  list-style-type: square;
+}
+
+#modal-host-chooser-list li {
+  font-size: 13px;
+  padding-bottom: 2px;
+  padding-top: 2px;
+}

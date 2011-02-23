@@ -1,0 +1,15 @@
+<% hosts = Host.all(:order => "host ASC" ) %>
+
+<h2>Hosts</h2>
+
+<h4>Go to the <%= link_to "hosts overview", hosts_path %>.</h4>
+
+<ul id="modal-host-chooser-list">
+<% if hosts.blank? %>
+  <li>No hosts defined</li>
+<% else %>
+  <% hosts.each do |host| %>
+    <li><%= link_to host.host, { :controller => "hosts", :action => "show", :id => URI.escape(Base64.encode64(host.host)) } %></li>
+  <% end %>
+<% end %>
+</ul>

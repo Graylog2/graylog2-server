@@ -12,6 +12,8 @@
   <%= javascript_include_tag "jquery-1.4.2.min" %>
   <%= javascript_include_tag "jquery.autocomplete.min" %>
   <%= javascript_include_tag "jquery.numeric" %>
+  <%= javascript_include_tag "jquery.mapkey.min" %>
+  <%= javascript_include_tag "jquery.simplemodal.min" %>
   <%= javascript_include_tag "jquery.sparkline.min" %>
   <%= javascript_include_tag("jit") if @load_jit %>
   <% if @load_flot %>
@@ -26,6 +28,9 @@
 
   <div id="pageload" style="display: none;"><%= Time.now.to_i %></div>
   <div id="gln" style="display: none;">&nbsp;Loading&hellip;</div>
+
+  <div id="modal-stream-chooser" style="display: none;"><%= render :partial => "modals/stream_chooser" %></div>
+  <div id="modal-host-chooser" style="display: none;"><%= render :partial => "modals/host_chooser" %></div>
 
   <% unless flash[:notice].blank? %>
     <div id="notification-notice" class="notification">

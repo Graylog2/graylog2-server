@@ -488,3 +488,17 @@ label {
   background-repeat: no-repeat;
   background-position: left center;
 }
+
+#simplemodal-container a.modalCloseImg {
+  background:url(/images/x.png) no-repeat;
+  width:25px;
+  height:29px;
+  display:inline;
+  z-index:3200;
+  position:absolute;
+  top:-15px;
+  right:-18px;
+  cursor:pointer;
+}
+#simplemodal-overlay {background-color:#000;}
+#simplemodal-container {background-color:#333; border:8px solid #444; padding:12px; color: #fff;}

@@ -236,6 +236,12 @@ $(document).ready(function(){
       $("#messages-quickfilter-fields").append(field);
       return false;
     })
+
+    // Key bindings.
+    standardMapKeyOptions = { overlayClose:true }
+    $.mapKey("s", function() { $("#modal-stream-chooser").modal(standardMapKeyOptions); });
+    $.mapKey("h", function() { $("#modal-host-chooser").modal(standardMapKeyOptions); });
+
 });
 
 function buildHostCssId(id) {
