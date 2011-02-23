@@ -25,14 +25,12 @@ import java.io.UnsupportedEncodingException;
 import java.net.DatagramPacket;
 import java.util.zip.DataFormatException;
 import org.graylog2.Log;
-import org.graylog2.Main;
 import org.graylog2.Tools;
 import org.graylog2.database.MongoBridge;
 import org.graylog2.messagehandlers.common.HostUpsertHook;
 import org.graylog2.messagehandlers.common.MessageCounterHook;
 import org.graylog2.messagehandlers.common.MessageParserHook;
 import org.graylog2.messagehandlers.common.ReceiveHookManager;
-import org.productivity.java.syslog4j.Syslog;
 
 /**
  * GELFClient.java: Jun 23, 2010 7:15:12 PM

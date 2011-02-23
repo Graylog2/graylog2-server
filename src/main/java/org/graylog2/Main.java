@@ -35,6 +35,7 @@ import org.graylog2.messagehandlers.amqp.AMQPBroker;
 import org.graylog2.messagehandlers.amqp.AMQPSubscribedQueue;
 import org.graylog2.messagehandlers.amqp.AMQPSubscriberThread;
 import org.graylog2.periodical.ChunkedGELFClientManagerThread;
+import org.graylog2.periodical.HostCounterCacheWriterThread;
 import org.graylog2.periodical.ServerValueHistoryWriterThread;
 import org.graylog2.periodical.ThroughputWriterThread;
 
@@ -217,7 +218,11 @@ public final class Main {
             
             System.out.println("[x] GELF threads are up.");
         }
-        
+
+        // Host counter cache.
+        HostCounterCacheWriterThread hostCounterCacheWriterThread = new HostCounterCacheWriterThread();
+        hostCounterCacheWriterThread.start();
+        System.out.println("[x] Host count cache is up.");
 
         // AMQP.
          if (AMQP.isEnabled(Main.masterConfig)) {

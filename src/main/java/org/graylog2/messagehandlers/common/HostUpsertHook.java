@@ -20,9 +20,8 @@
 
 package org.graylog2.messagehandlers.common;
 
-import org.graylog2.database.MongoBridge;
+import org.graylog2.database.HostCounterCache;
 import org.graylog2.messagehandlers.gelf.GELFMessage;
-import org.productivity.java.syslog4j.server.impl.event.SyslogServerEvent;
 
 /**
  * HostUpsertHook.java: Dec 29, 2010 2:57:52 PM
@@ -37,8 +36,7 @@ public class HostUpsertHook implements MessagePostReceiveHookIF {
      * Process the hook.
      */
     public void process(GELFMessage message) {
-        MongoBridge m = new MongoBridge();
-        m.upsertHost(message.getHost());
+        HostCounterCache.getInstance().increment(message.getHost());
     }
 
 }

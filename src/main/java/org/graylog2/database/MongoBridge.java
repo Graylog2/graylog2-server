@@ -1,5 +1,5 @@
 /**
- * Copyright 2010 Lennart Koopmann <lennart@socketfeed.com>
+ * Copyright 2010, 2011 Lennart Koopmann <lennart@socketfeed.com>
  *
  * This file is part of Graylog2.
  *
@@ -172,17 +172,17 @@ public class MongoBridge {
     }
 
     /**
-     * Atomically increments counter of host in "hosts" collection by one.
+     * Adds x to the counter of host in "hosts" collection.
      *
      * @param hostname The host to increment.
+     * @param add The value to add to the current counter value.
      */
-    public void upsertHost(String hostname) {
-        return;
-        /*BasicDBObject query = new BasicDBObject();
+    public void upsertHostCount(String hostname, int add) {
+        BasicDBObject query = new BasicDBObject();
         query.put("host", hostname);
 
         BasicDBObject update = new BasicDBObject();
-        update.put("$inc", new BasicDBObject("message_count", 1));
+        update.put("$inc", new BasicDBObject("message_count", add));
 
         DB db = MongoConnection.getInstance().getDatabase();
         if (db == null) {
@@ -190,7 +190,7 @@ public class MongoBridge {
             Log.emerg("MongoBridge::upsertHost(): Could not get hosts collection.");
         } else {
             db.getCollection("hosts").update(query, update, true, false);
-        }*/
+        }
     }
 
     public void writeThroughput(int current, int highest) {
