@@ -47,9 +47,19 @@ public class SyslogEventHandler implements SyslogServerSessionlessEventHandlerIF
      */
     public void event(SyslogServerIF syslogServer, SocketAddress socketAddress, SyslogServerEventIF event) {
 
+        GELFMessage gelf = new GELFMessage();
+
         // Print out debug information.
         if (Main.debugMode) {
-            Log.info("Received message: " + event.getMessage());
+            if (event instanceof GraylogSyslogServerEvent) {
+                GraylogSyslogServerEvent glEvent = (GraylogSyslogServerEvent) event;
+                Log.info("Received syslog message (via AMQP): " + event.getMessage());
+                Log.info("AMQP queue: " + glEvent.getAmqpReceiverQueue());
+
+                gelf.addAdditionalData("_amqp_queue", glEvent.getAmqpReceiverQueue());
+            } else {
+                Log.info("Received syslog message: " + event.getMessage());
+            }
             Log.info("Host: " + event.getHost());
             Log.info("Facility: " + event.getFacility() + " (" + Tools.syslogFacilityToReadable(event.getFacility()) + ")");
             Log.info("Level: " + event.getLevel() + " (" + Tools.syslogLevelToReadable(event.getLevel()) + ")");
@@ -58,19 +68,19 @@ public class SyslogEventHandler implements SyslogServerSessionlessEventHandlerIF
         }
         
         // Convert SyslogServerEventIF to GELFMessage and pass to SimpleGELFClientHandler
-        GELFMessage gelf = new GELFMessage();
         gelf.setVersion("1.0");
         gelf.setShortMessage(event.getMessage());
         gelf.setHost(event.getHost());
         gelf.setFacility(Tools.syslogFacilityToReadable(event.getFacility()));
         gelf.setLevel(event.getLevel());
         gelf.setFullMessage(new String(event.getRaw()));
-		try {
-        	SimpleGELFClientHandler gelfHandler = new SimpleGELFClientHandler(gelf);
-			gelfHandler.handle();
-		} catch ( Exception e ) {
-			// I don't care
-		}
+        
+        try {
+            SimpleGELFClientHandler gelfHandler = new SimpleGELFClientHandler(gelf);
+            gelfHandler.handle();
+        } catch ( Exception e ) {
+                // I don't care
+        }
     }
 
     public void exception(SyslogServerIF syslogServer, SocketAddress socketAddress, Exception exception) {
