@@ -18,29 +18,6 @@ class StreamsController < ApplicationController
     @all_streams.each { |stream| (stream.streamcategory_id.blank? or stream.streamcategory_id == 0 or !Streamcategory.exists?(stream.streamcategory_id)) ? @streams_with_no_category << stream : nil }
   end
 
-  def show
-    @has_sidebar = true
-    @load_flot = 3
-    
-    @total_count = Message.count_stream @stream.id
-
-    # Don't try to find messages if the count shows that there are none because this will
-    # cause long MongoDB query times as no index seems to be used.
-    if @total_count > 0
-      if params[:filters].blank?
-        @messages = Message.all_of_stream @stream.id, params[:page]
-      else
-        @additional_filters = Message.extract_additional_from_quickfilter(params[:filters])
-        @messages = Message.by_stream(@stream).all_by_quickfilter params[:filters], params[:page]
-      end
-    else
-      @messages = Hash.new
-    end
-    
-    # Find out if this stream is favorited by the current user.
-    @is_favorited = current_user.favorite_streams.include?(@stream)
-  end
-
   def showrange
     @has_sidebar = true
     @load_flot = true

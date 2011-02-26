@@ -219,4 +219,10 @@ module ApplicationHelper
   def previous_page
     current_page <= 2 ? 1 : current_page - 1
   end
+  
+  def partial_for(element, scoping="shared", action="")
+    scoping = scoping.to_s.pluralize unless scoping == "shared"
+    element = element.to_s + "_#{action}" unless action == ""
+    "#{scoping}/#{element}"
+  end
 end

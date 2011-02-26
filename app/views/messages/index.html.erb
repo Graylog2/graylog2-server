@@ -1,36 +1,26 @@
 <% content_for :sidebar do %>
-  <%= render :partial => "sidebar_index", :locals => { :headline => "Welcome, <span class=\"highlighted\">#{current_user.login}</span>!" } %>
+  <%= render :partial => partial_for(:sidebar, @scoping, params[:action]) %>
 <% end %>
 
 <%= javascript_include_tag 'messageupdater' %>
 
-<div id="messages-show-quickfilter" <%= params[:filters].blank? ? nil : "class=\"messages-show-quickfilter-expanded\""  %>>
-  Quickfilter
-</div>
+<%= render :partial => partial_for(:quickfilter_button) %>
 
 <div id="messages-content">
+  <%= render :partial => partial_for(:message_table_header, @scoping)%>
 
-<h1>Messages</h1>
+  <%= render :partial => "quickfilter"%>
 
-Currently containing <span class="highlighted"><%= number_with_delimiter(@total_count, :delimiter => '.') %></span> messages,
-filtered by <span class="highlighted"><%=h @total_blacklisted_terms %></span> blacklisted terms.
+  <% unless params[:filters].blank? %>
+  <div id="messages-quickfilter-delete">
+    <%= form_tag('deletebyquickfilter') do -%>
+      <%= hidden_field_tag 'filters', params[:filters].to_json %>
+      <%= awesome_submit_link "Delete all messages hit by this quickfilter" %>
+    <% end -%>
+  </div>
+  <% end %>
 
-<% message_count_interval = Setting.get_message_count_interval(current_user) %>
-<span class="highlighted"><%=h Message.count_of_last_minutes(Setting.get_message_count_interval(message_count_interval)) %></span>
-messages in the last <%=h message_count_interval %> minutes.
+  <br style="clear: both;" />
 
-<%= render :partial => "quickfilter" %>
-
-<% unless params[:filters].blank? %>
-<div id="messages-quickfilter-delete">
-  <%= form_tag('/messages/deletebyquickfilter') do -%>
-    <%= hidden_field_tag 'filters', params[:filters].to_json %>
-    <%= awesome_submit_link "Delete all messages hit by this quickfilter" %>
-  <% end -%>
-</div>
-<% end %>
-
-<br style="clear: both;" />
-
-<%= render :partial => "messages/table", :locals => { :messages => @messages, :total_messages => @total_count } %>
+  <%= render :partial => "messages/table", :locals => { :messages => @messages, :total_messages => @total_count } %>
 </div>
