@@ -614,3 +614,13 @@
   padding-bottom: 2px;
   padding-top: 2px;
 }
+
+/* Version check */
+#version-check {
+  font-size: 20px;
+  font-family: Georgia,"Times New Roman",Times,serif;
+}
+
+#version-check-status {
+  font-weight: bold;
+}

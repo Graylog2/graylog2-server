@@ -5,9 +5,13 @@ require 'rails/all'
 # If you have a Gemfile, require the gems listed there, including any gems
 # you've limited to :test, :development, or :production.
 Bundler.require(:default, Rails.env) if defined?(Bundler)
+    
+GRAYLOG2_VERSION = "0.9.5"
+GRAYLOG2_VERSION_TIMESTAMP = 1299000179
 
 module Graylog2WebInterface
   class Application < Rails::Application
+
     # Settings in config/environments/* take precedence over those specified here.
     # Application configuration should go into files in config/initializers
     # -- all .rb files in that directory are automatically loaded.

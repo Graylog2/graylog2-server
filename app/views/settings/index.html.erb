@@ -6,6 +6,10 @@
 <%= awesome_link "Manage facilities", facilities_path %>
 <%= awesome_link "Manage message comments", messagecomments_path %>
 <%= awesome_link "Filtered terms", filteredterms_path %>
+
+<% if Configuration.allow_version_check %>
+  <%= awesome_link "Check Graylog2 version", versioncheck_index_path %>
+<% end %>
 <br />
 <br />
 

@@ -1,0 +1,14 @@
+<h1>Version check</h1>
+
+<div class="description">
+  This function checks if your Graylog2 version is up to date or not. It does this by calling graylog2.org via HTTP. You can disable this functionality in your general.yml config file.
+</div>
+
+<div id="version-check">
+<span id="version-check-status">Status:</span>
+<% if @outdated %>
+  Your Graylog2 version (<%= ::GRAYLOG2_VERSION %>) is outdated. Get the current package from <%= link_to "http://www.graylog2.org/", "http://www.graylog2.org/", :target => "_blank" %>.
+<% else %>
+  Your Graylog2 version (<%= ::GRAYLOG2_VERSION %>) is up to date. No update required.
+<% end %>
+</div>
