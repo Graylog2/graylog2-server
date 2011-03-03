@@ -1,0 +1,9 @@
+
+<div id="hosts-delete">
+  <%= link_to "Delete this host", { :action => "destroy", :id => URI.escape(@host.host) }, :confirm => "Really delete this host with all it's messages?", :method => :delete %>
+</div>
+
+<h1>Host <span class="highlighted"><%=h @host.host %></span></h1>
+
+Messages from <span class="highlighted"><%= gl_date(Time.at(@last_message.created_at).to_s) %></span> available
+for this host.

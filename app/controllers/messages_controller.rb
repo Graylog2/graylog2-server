@@ -7,7 +7,8 @@ class MessagesController < ApplicationController
   
   def set_scoping
     if params[:host_id]
-      @scope = Message.where(:host => Base64.decode64(params[:host_id]))
+      @scope = Message.where(:host => params[:host_id])
+      @host = Host.find_by_host(params[:host_id])
       @scoping = :host
     elsif params[:stream_id]
       @scope = Message.by_stream(params[:stream_id])
@@ -32,6 +33,7 @@ class MessagesController < ApplicationController
     #@total_count = Message.count_since(0)
     @total_count = @scope.count
     @total_blacklisted_terms = BlacklistedTerm.count
+    @last_message = @scope.last :order => "created_at DESC"
     
     if params[:stream_id]
       @is_favorited = current_user.favorite_streams.include?(params[:stream_id])

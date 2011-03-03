@@ -17,7 +17,7 @@ class HostsController < ApplicationController
     @has_sidebar = true
     @load_flot = true
     
-    @host = Host.find_by_host Base64.decode64(params[:id])
+    @host = Host.find_by_host(params[:id])
     @messages = Message.all_of_host @host.host, params[:page]
     @total_count = @host.message_count
 
@@ -30,7 +30,7 @@ class HostsController < ApplicationController
   end
 
   def destroy
-    host = Host.find_by_host Base64.decode64(params[:id])
+    host = Host.find_by_host params[:id]
     if host.blank?
       flash[:error] = "Could not delete host!"
       redirect_to :action => "index"
@@ -65,7 +65,7 @@ class HostsController < ApplicationController
       flash[:error] = "Unknown host"
       redirect_to :action => "index"
     else
-      redirect_to :action => "show", :id => Base64.encode64(params[:host].strip)
+      redirect_to :action => "show", :id => params[:host].strip
     end
   end
 end

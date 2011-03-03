@@ -56,7 +56,7 @@ class StreamsController < ApplicationController
     else
       flash[:error] = "Could not save description."
     end
-    redirect_to stream_path(params[:id])
+    redirect_to stream_messages_path(params[:id])
   end
 
   def togglefavorited
