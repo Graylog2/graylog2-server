@@ -9,7 +9,7 @@ class VersioncheckController < ApplicationController
   def perform
     current_user.last_version_check = Time.now.to_i
     current_user.save
-    render :text => !Version.outdated? ? "true" : "false"
+    render :text => Version.outdated? ? "true" : "false"
   end
 
   private
