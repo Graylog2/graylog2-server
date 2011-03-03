@@ -18,7 +18,11 @@ class MessagesController < ApplicationController
   def index
     @has_sidebar = true
     @load_flot = true
-  
+
+    if Configuration.allow_version_check
+      @last_version_check = current_user.last_version_check
+    end
+
     if params[:filters].blank?
       @messages = @scope.all_with_blacklist params[:page]
     else
