@@ -1,5 +1,5 @@
 /**
- * Copyright 2010 Lennart Koopmann <lennart@socketfeed.com>
+ * Copyright 2010, 2011 Lennart Koopmann <lennart@socketfeed.com>
  *
  * This file is part of Graylog2.
  *
@@ -29,6 +29,7 @@ import org.graylog2.Tools;
 import org.graylog2.database.MongoBridge;
 import org.graylog2.messagehandlers.common.HostUpsertHook;
 import org.graylog2.messagehandlers.common.MessageCounterHook;
+import org.graylog2.messagehandlers.common.MessageParserHook;
 import org.graylog2.messagehandlers.common.ReceiveHookManager;
 
 /**
@@ -141,14 +142,16 @@ public class ChunkedGELFClientHandler extends GELFClientHandlerBase implements G
             // Log if we are in debug mode.
             Log.info("Got GELF message: " + message.toString());
 
-            // Insert message into MongoDB.
-            m.insertGelfMessage(message);
+            // PreProcess message based on filters. Insert message into MongoDB.
+            ReceiveHookManager.preProcess(new MessageParserHook(), message);
+            if(!message.getFilterOut()) {
+                m.insertGelfMessage(message);
+                // This is doing the upcounting for statistics.
+                ReceiveHookManager.postProcess(new MessageCounterHook(), message);
 
-            // This is doing the upcounting for statistics.
-            ReceiveHookManager.postProcess(new MessageCounterHook(), message);
-            
-            // Counts up host in hosts collection.
-            ReceiveHookManager.postProcess(new HostUpsertHook(), message);
+                // Counts up host in hosts collection.
+                ReceiveHookManager.postProcess(new HostUpsertHook(), message);
+            }
         } catch(Exception e) {
             Log.warn("Could not handle GELF client: " + e.toString());
             e.printStackTrace();

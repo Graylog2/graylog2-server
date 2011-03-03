@@ -21,13 +21,8 @@
 package org.graylog2.messagehandlers.gelf;
 
 import java.io.ByteArrayOutputStream;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
 import java.util.Map;
+import java.util.TreeMap;
 
 /**
  * ChunkedGELFMessage.java: Sep 18, 2010 3:37:43 PM
@@ -41,7 +36,7 @@ public class ChunkedGELFMessage extends GELFMessage {
     /*
      * <SequenceNumber, Chunk>
      */
-    private Map<Integer, GELFClientChunk> chunkMap = new HashMap<Integer, GELFClientChunk>();
+    private Map<Integer, GELFClientChunk> chunkMap = new TreeMap<Integer, GELFClientChunk>();
     
     private int sequenceCount = -1;
     private String hash;
@@ -49,9 +44,9 @@ public class ChunkedGELFMessage extends GELFMessage {
     /**
      * Add a chunk of this message
      *
-     * @param chunk
-     * @throws InvalidGELFChunkException
-     * @throws ForeignGELFChunkException
+     * @param chunk a chunk belonging to this message
+     * @throws InvalidGELFChunkException when chunk is malformed
+     * @throws ForeignGELFChunkException when chunk belongs to a different message
      */
     public void insertChunk(GELFClientChunk chunk) throws InvalidGELFChunkException, ForeignGELFChunkException {
         chunk.checkStructure();
@@ -74,7 +69,7 @@ public class ChunkedGELFMessage extends GELFMessage {
      * Get all chunks of this message
      * @return 
      */
-    public Map<Integer, GELFClientChunk> getChunkMap() {
+    protected Map<Integer, GELFClientChunk> getChunkMap() {
         return chunkMap;
     }
 
@@ -97,14 +92,6 @@ public class ChunkedGELFMessage extends GELFMessage {
 
         return false;
     }
-    
-    /**
-     * Get all chunks of this message.
-     * @return
-     */
-    public Collection<GELFClientChunk> getChunks() {
-        return this.chunkMap.values();
-    }
 
     /**
      * Get the timestamp of when the first chunk of this message arrived.
@@ -121,41 +108,26 @@ public class ChunkedGELFMessage extends GELFMessage {
 
     /**
      * Get the hash/ID of this message.
-     * @return
-     * @throws IncompleteGELFMessageException
+     * @return the hash/id of this message
      */
-    public String getHash() throws IncompleteGELFMessageException {
-        if (chunkMap.size() <= 0 || !chunkMap.containsKey(0)) {
-            throw new IncompleteGELFMessageException();
-        }
-
-        return chunkMap.get(0).getHash();
+    public String getHash() {
+        return this.hash;
     }
 
     /**
      * Get the correctly arranged and combined data of all chunks. Message must
      * be complete to call this.
-     *
-     * @return
-     * @throws IncompleteGELFMessageException
+     * @return a byte array representing this message's data
+     * @throws IncompleteGELFMessageException if message is incomplete
      */
     public byte[] getData() throws IncompleteGELFMessageException {
-        if (chunkMap.size() <= 0 || !this.isComplete()) {
+        if (chunkMap.isEmpty() || !this.isComplete()) {
             throw new IncompleteGELFMessageException();
         }
 
-        // Sort chunkMap first
-        List<Integer> sortedList = new ArrayList<Integer>();
-        sortedList.addAll(this.chunkMap.keySet());
-        Collections.sort(sortedList);
-
         ByteArrayOutputStream out = new ByteArrayOutputStream();
-
-        Iterator<Integer> iter = sortedList.iterator();
-        while (iter.hasNext()) {
-            GELFClientChunk chunk = this.chunkMap.get(iter.next());
+        for (GELFClientChunk chunk : chunkMap.values()) {
             out.write(chunk.getData(), 0, chunk.getData().length);
-
         }
 
         return out.toByteArray();

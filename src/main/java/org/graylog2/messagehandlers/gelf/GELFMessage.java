@@ -42,6 +42,7 @@ public class GELFMessage {
     private int timestamp = 0;
     private String facility = null;
     private Map<String, String> additionalData = new HashMap<String, String>();
+    private boolean filterOut = false;
 
     /**
      * Get the version
@@ -211,6 +212,24 @@ public class GELFMessage {
      */
     public void addAdditionalData(String key, String value) {
         this.additionalData.put(key, value);
+    }
+    
+    /**
+     * Set the filterOut
+     *
+     * @param filterOut
+     */
+    public void setFilterOut(boolean value) {
+        this.filterOut = value;
+    }
+
+    /**
+     * Get the filterOut flag
+     * 
+     * @return
+     */
+    public boolean getFilterOut() {
+        return this.filterOut;
     }
 
     /**

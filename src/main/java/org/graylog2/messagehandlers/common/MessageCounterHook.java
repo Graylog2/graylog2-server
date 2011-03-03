@@ -20,6 +20,8 @@
 
 package org.graylog2.messagehandlers.common;
 
+import org.graylog2.messagehandlers.gelf.GELFMessage;
+
 /**
  * MessageCounterHook.java: Aug 19, 2010 5:56:21 PM
  *
@@ -32,7 +34,7 @@ public class MessageCounterHook implements MessagePostReceiveHookIF {
     /**
      * Process the hook.
      */
-    public void process(Object message) {
+    public void process(GELFMessage message) {
         MessageCounter.getInstance().countUp(MessageCounter.ALL_HOSTS);
     }
 }

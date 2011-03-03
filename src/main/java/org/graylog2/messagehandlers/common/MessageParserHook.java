@@ -18,20 +18,27 @@
  *
  */
 
-package org.graylog2.messagehandlers.gelf;
+package org.graylog2.messagehandlers.common;
+
+import org.graylog2.Main;
+import org.graylog2.messagehandlers.gelf.GELFMessage;
 
 /**
- * InvalidGELFCompressionMethodException.java: Sep 15, 2010 10:40:00 PM
+ * MessageParserHook.java: Feb 11, 2011
  *
- * Received GELF message has an unknown compression type.
+ * Filters events based on regular expression.
  *
- * @author: Lennart Koopmann <lennart@socketfeed.com>
+ * @author: Joshua Spaulding <joshua.spaulding@gmail.com>
  */
-public class InvalidGELFCompressionMethodException extends Exception {
-    public InvalidGELFCompressionMethodException() {
-    }
+public class MessageParserHook implements MessagePreReceiveHookIF {
 
-    public InvalidGELFCompressionMethodException(String msg) {
-        super(msg);
+    /**
+     * Process the hook.
+     */
+    public void process(GELFMessage message) {
+		/**
+		 * Run GELFMessage through the rules engine
+		 */
+    	Main.drools.evaluate(message);
     }
 }

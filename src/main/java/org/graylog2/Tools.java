@@ -22,9 +22,21 @@ package org.graylog2;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
+import java.util.Date;
+import java.util.Properties;
+import java.util.Timer;
+import java.util.TimerTask;
+import java.net.InetAddress;
+import java.net.UnknownHostException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import java.util.zip.GZIPInputStream;
 import java.util.zip.InflaterInputStream;
+
+import org.productivity.java.syslog4j.Syslog;
 
 /**
  * Tools.java: May 17, 2010 9:46:31 PM
@@ -43,11 +55,16 @@ public final class Tools {
      * @return PID
      * @throws Exception
      */
-    public static String getPID() throws Exception {
+    public static String getPID() {
         byte[] bo = new byte[100];
         String[] cmd = {"bash", "-c", "echo $PPID"};
-        Process p = Runtime.getRuntime().exec(cmd);
-        p.getInputStream().read(bo);
+        try {
+            Process p = Runtime.getRuntime().exec(cmd);
+            p.getInputStream().read(bo);
+        } catch (IOException e) {
+            Log.emerg("Could not determine own PID! " + e.toString());
+            return "unknown";
+        }
         return new String(bo).trim();
     }
 
@@ -172,4 +189,14 @@ public final class Tools {
        return (int) (System.currentTimeMillis()/1000);
     }
 
+    public static String getLocalHostname() {
+        InetAddress addr = null;
+        try {
+            addr = InetAddress.getLocalHost();
+        } catch (UnknownHostException ex) {
+            return "Unknown";
+        }
+
+        return addr.getHostName();
+    }
 }
