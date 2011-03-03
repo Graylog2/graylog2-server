@@ -39,6 +39,9 @@ public class MessageParserHook implements MessagePreReceiveHookIF {
 		/**
 		 * Run GELFMessage through the rules engine
 		 */
-    	Main.drools.evaluate(message);
+    	if (Main.drools != null)
+    	{
+    		Main.drools.evaluate(message);
+    	}
     }
 }
