@@ -7,14 +7,18 @@ class VersioncheckController < ApplicationController
   end
 
   def perform
+    current_user.last_version_check = Time.now.to_i
+    current_user.save
     render :text => Version.outdated? ? "true" : "false"
   end
 
   private
 
   def allowed?
-    redirect_to :controller => "messages" if !Configuration.allow_version_check
-    return
+    if !Configuration.allow_version_check
+      render :text => "not allowed", :status => :forbidden
+      return false
+    end
   end
 
 end

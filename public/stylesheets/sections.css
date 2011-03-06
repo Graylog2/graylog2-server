@@ -171,6 +171,7 @@
 #streams-manage-categories-link {
   position: relative;
   top: 5px;
+  margin-left: 400px;
 }
 
 #streams-streams {
@@ -623,4 +624,12 @@
 
 #version-check-status {
   font-weight: bold;
+}
+
+#new-version {
+  font-size: 12px;
+  font-weight: bold;
+  font-family: Georgia,"Times New Roman",Times,serif;
+  margin-bottom: 10px;
+  display: none;
 }

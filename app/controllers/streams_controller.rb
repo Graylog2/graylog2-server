@@ -145,10 +145,11 @@ class StreamsController < ApplicationController
     new_stream = Stream.new params[:stream]
     if new_stream.save
       flash[:notice] = "Stream has been created"
+      redirect_to rules_stream_path(new_stream)
     else
       flash[:error] = "Could not create stream"
+      redirect_to streams_path
     end
-    redirect_to rules_stream_path(new_stream)
   end
   
   def rename

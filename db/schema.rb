@@ -10,7 +10,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20110203162747) do
+ActiveRecord::Schema.define(:version => 20110303170931) do
 
   create_table "alerted_streams", :force => true do |t|
     t.integer  "stream_id"
@@ -28,6 +28,16 @@ ActiveRecord::Schema.define(:version => 20110203162747) do
 
   create_table "blacklists", :force => true do |t|
     t.string   "title"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
+  create_table "correlation_rules", :force => true do |t|
+    t.integer  "stream_id"
+    t.integer  "correlation_type"
+    t.string   "value"
+    t.integer  "timeframe"
+    t.boolean  "global",           :default => false
     t.datetime "created_at"
     t.datetime "updated_at"
   end
@@ -141,6 +151,7 @@ ActiveRecord::Schema.define(:version => 20110203162747) do
     t.string   "remember_token",            :limit => 40
     t.datetime "remember_token_expires_at"
     t.string   "role"
+    t.integer  "last_version_check"
   end
 
   add_index "users", ["login"], :name => "index_users_on_login", :unique => true
