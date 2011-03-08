@@ -36,7 +36,7 @@ import org.graylog2.messagehandlers.amqp.AMQPSubscribedQueue;
 import org.graylog2.messagehandlers.amqp.AMQPSubscriberThread;
 import org.graylog2.periodical.ChunkedGELFClientManagerThread;
 import org.graylog2.periodical.HostCounterCacheWriterThread;
-import org.graylog2.periodical.ServerValueHistoryWriterThread;
+import org.graylog2.periodical.ServerValueWriterThread;
 import org.graylog2.periodical.ThroughputWriterThread;
 
 /**
@@ -253,8 +253,8 @@ public final class Main {
         throughputThread.start();
 
         // Start thread that stores system information periodically.
-        ServerValueHistoryWriterThread serverValueHistoryThread = new ServerValueHistoryWriterThread();
-        serverValueHistoryThread.start();
+        ServerValueWriterThread serverValueThread = new ServerValueWriterThread();
+        serverValueThread.start();
 
         System.out.println("[x] Graylog2 up and running.");
     }

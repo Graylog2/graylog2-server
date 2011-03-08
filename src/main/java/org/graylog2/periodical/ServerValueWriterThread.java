@@ -22,15 +22,17 @@ package org.graylog2.periodical;
 
 import org.graylog2.HostSystem;
 import org.graylog2.Log;
+import org.graylog2.Tools;
+import org.graylog2.database.MongoBridge;
 
 /**
- * SystemStatisticThread.java: Oct 25, 2010 6:36:05 PM
+ * ServerValueWriterThread.java
  *
- * Prints out load statistic information every second.
+ * Periodically writes server values to MongoDB.
  *
  * @author: Lennart Koopmann <lennart@socketfeed.com>
  */
-public class ServerValueHistoryWriterThread extends Thread {
+public class ServerValueWriterThread extends Thread {
 
     /**
      * Start the thread. Runs forever.
@@ -40,6 +42,11 @@ public class ServerValueHistoryWriterThread extends Thread {
         while (true) {
             try {
                 HostSystem.writeSystemHealthHistorically();
+
+                // Ping. (Server is running.)
+                MongoBridge m = new MongoBridge();
+                m.setSimpleServerValue("ping", Tools.getUTCTimestamp());
+
             } catch (Exception e) {
                 Log.warn("Error in SystemValueHistoryWriterThread: " + e.toString());
             }
