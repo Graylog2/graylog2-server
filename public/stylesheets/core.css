@@ -517,3 +517,7 @@ label {
   color: #333;
   font-size: 11px;
 }
+
+#server-not-running {
+  background-image: url(/images/notificationbar-red.png);
+}

@@ -2,7 +2,7 @@ $(document).ready(function(){
 
     // Hide notifications after some time.
     setInterval(function() {
-      $(".notification").hide("drop");
+      $(".notification-flash").hide("drop");
     }, 3500);
 
     // Stream rule form.
