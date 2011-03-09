@@ -13,7 +13,8 @@
     <dt><%= label_tag "filters[severity]", "Severity:" %></dt>
     <dd>
       <%= select_tag "filters[severity]", raw("<option></option>" + options_for_select(get_ordered_severities_for_select, :selected => get_quickfilter_selected(params[:filters], :severity))) %>
-      <%= check_box_tag "filters[severity_above]", true, get_quickfilter_selected(params[:filters], :severity_above), :style => "width: 15px;" || false %> or higher
+      <%= check_box_tag "filters[severity_above]", true, get_quickfilter_selected(params[:filters], :severity_above), :style => "width: 15px;" || false %>
+      <label for="filters_severity_above">or higher</label>
     </dd>
     
     <dt><%= label_tag "filters[host]", "Host:" %></dt>
