@@ -1,5 +1,9 @@
 <h1>Messages</h1>
 
+<% if Configuration.allow_version_check and (@last_version_check.nil? or @last_version_check < 30.minutes.ago.to_i) %>
+  <%= render :partial => "version_check" %>
+<% end %>
+
 Currently containing <span class="highlighted"><%= number_with_delimiter(@total_count, :delimiter => '.') %></span> messages,
 filtered by <span class="highlighted"><%=h @total_blacklisted_terms %></span> blacklisted terms.
 

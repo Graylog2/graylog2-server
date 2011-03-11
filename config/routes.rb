@@ -89,6 +89,12 @@ Graylog2WebInterface::Application.routes.draw do
     get :messagespread
   end
 
+  resources :versioncheck do
+    collection do
+      get :perform
+    end
+  end
+
   resources :filteredterms
 
   match '/visuals/fetch/:id' => 'visuals#fetch',:as => "visuals"

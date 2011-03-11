@@ -36,6 +36,10 @@ class ServerValue
     get("startup_time")
   end
 
+  def self.ping
+    get("ping")
+  end
+
   private
   def self.get(key)
     val = self.first(:conditions => { "type" => key })

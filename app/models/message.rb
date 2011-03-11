@@ -101,7 +101,7 @@ class Message
     conditions = self
 
     unless filters.blank?
-      unless filters[:messages].blank?
+      unless filters[:message].blank?
         # Message (seems like there is a bug in the Plucky condition overwriting. Setting blacklisted terms here.)
         message_conditions = Hash.new
         message_conditions[:message] = Hash.new
@@ -135,7 +135,7 @@ class Message
         conditions = conditions.where(key => value)
       end
     end
-    
+
     conditions.default_scope.limit(LIMIT).page(page)
   end
       
