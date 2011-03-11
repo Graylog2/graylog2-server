@@ -2,6 +2,10 @@ class StreamsController < ApplicationController
   filter_resource_access
   before_filter :tabs, :except => :index
   
+  def show
+    redirect_to stream_messages_path(@stream)
+  end
+  
   def index
     @new_stream = Stream.new
 

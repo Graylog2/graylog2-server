@@ -4,7 +4,7 @@ module ApplicationHelper
     if where.instance_of?(Hash)
       current = where[:controller].to_s
     else
-      current = where[1..where.length]
+      current = where[1..-1]
     end
 
     "<li class=\"#{"topmenu-active" if is_current_menu_item?(current)}\">#{link_to(title, "/#{current}")}</li>"
@@ -201,7 +201,9 @@ module ApplicationHelper
   private
 
   def is_current_menu_item? item
-    true if (params[:controller] == "messages" and item == "/") or (params[:controller] == "hostgroups" and item == "hosts") or params[:controller] == item
+    return (@scoping.to_s.pluralize == item) unless @scoping.nil?
+    
+    true if (@scoping == item) or (params[:controller] == root_path and item == "/") or (params[:controller] == "hostgroups" and item == "hosts") or params[:controller] == item
   end
   
   def is_current_tab? tab

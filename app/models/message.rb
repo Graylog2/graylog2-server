@@ -35,6 +35,7 @@ class Message
   scope :of_blacklist, lambda {|blacklist| of_blacklisted_terms(blacklist.all_terms)}
   scope :page, lambda {|number| skip(self.get_offset(number))}
   scope :default_scope, fields(:full_message => 0).order("$natural DESC").not_deleted.limit(LIMIT)
+  scope :time_range, lambda {|from, to| where(:created_at => {"$gte" => from}).where(:created_at => {"$lte" => to})}
 
   # Overwriting the message getter. This always applies the filtering of
   # filtered terms.
@@ -189,24 +190,28 @@ class Message
   def self.all_of_stream_in_range(stream_id, page, from, to)
     page = 1 if page.blank?
     
-    by_stream(stream_id).default_scope.where(:created_at => {"$gte" => from}).where(:created_at => {"$lte" => to}).page(page)
+    #by_stream(stream_id).default_scope.where(:created_at => {"$gte" => from}).where(:created_at => {"$lte" => to}).page(page)
+    by_stream(stream_id).default_scope.time_range(from, to).page(page)
   end
 
   def self.all_in_range(page, from, to)
     page = 1 if page.blank?
     
     terms = Blacklist.all_terms
-    by_blacklisted_terms(terms).default_scope.where(:created_at => {"$gte" => from}).where(:created_at => {"$lte" => to}).page(page)
+    #by_blacklisted_terms(terms).default_scope.where(:created_at => {"$gte" => from}).where(:created_at => {"$lte" => to}).page(page)
+    by_blacklisted_terms(terms).default_scope.time_range(from, to).page(page)
   end
     
   def self.count_all_of_stream_in_range(stream_id, from, to)
     terms = Blacklist.all_terms
-    by_stream(stream_id).where(:created_at => {"$gte" => from}).where(:created_at => {"$lte" => to}).count
+    #by_stream(stream_id).where(:created_at => {"$gte" => from}).where(:created_at => {"$lte" => to}).count
+    by_stream(stream_id).time_range(from, to).count
   end
 
   def self.count_all_in_range(from, to)
     terms = Blacklist.all_terms
-    by_blacklisted_terms(terms).where(:created_at => {"$gte" => from}).where(:created_at => {"$lte" => to}).count
+    #by_blacklisted_terms(terms).where(:created_at => {"$gte" => from}).where(:created_at => {"$lte" => to}).count
+    by_blacklisted_terms(terms).time_range(from, to).count
   end
 
   def self.counts_of_last_minutes(minutes)

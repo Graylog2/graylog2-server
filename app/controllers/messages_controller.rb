@@ -45,7 +45,8 @@ class MessagesController < ApplicationController
     @load_flot = true
 
     @comments = Messagecomment.all_matched(@message)
-
+    @message = @scope.where({"id" => params[:id]}).all.first
+    
     if params[:partial]
       render :partial => "full_message"
       return
@@ -75,8 +76,9 @@ class MessagesController < ApplicationController
     
     respond_to do |format|
       format.html 
-      format.text { 
-        send_data @messages.map(&:message).join("\n"), :type => "text/plain", :filename => "#{@id.to_s}-#{@nb}.log"  
+      format.text {
+        send_data render_to_string("messages/message_log.txt", :locals => {:messages => @messages}), :type => "text/plain", :filename => "#{@message.id.to_s}-#{@nb}.log"   
+        #send_data @messages.collect {|m| "#{m.created_at.to_s} #{m.host} #{m.facility} #{m.full_message}"}.join("\n"), :type => "text/plain", :filename => "#{@message.id.to_s}-#{@nb}.log"  
       }
     end
   end

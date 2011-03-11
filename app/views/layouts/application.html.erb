@@ -85,8 +85,10 @@
   <% end %>
   </div>
 
-  <%=raw "<div id='main-left'>" if @has_sidebar %>
-
+ <% if @has_sidebar %>
+  <div id='main-left'>
+ <% end %>
+ 
   <div id="content" <%=raw @content_class.blank? ? '' : 'class="content-' + @content_class + '"' %>>
     <div id="content-inner">
       <%= yield %>

@@ -44,6 +44,7 @@ Graylog2WebInterface::Application.routes.draw do
     resources :dashboard
   
     member do
+      get :analytics
       post :favorite
       post :unfavorite
       post :alertable
