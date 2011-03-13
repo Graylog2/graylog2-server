@@ -38,6 +38,10 @@ public class AMQP {
      * @return boolean
      */
     public static boolean isEnabled(Properties config) {
-        return config.getProperty("amqp_enabled").equals("true");
+      if(config.getProperty("amqp_enabled") == null) {
+        return false;
+      }
+      
+      return config.getProperty("amqp_enabled").equals("true");
     }
 }
