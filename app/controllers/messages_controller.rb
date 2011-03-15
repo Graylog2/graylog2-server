@@ -5,6 +5,7 @@ class MessagesController < ApplicationController
   rescue_from MongoMapper::DocumentNotFound, :with => :not_found
   rescue_from BSON::InvalidObjectId, :with => :not_found
   
+  protected
   def set_scoping
     if params[:host_id]
       @scope = Message.where(:host => params[:host_id])
@@ -14,12 +15,17 @@ class MessagesController < ApplicationController
       @scope = Message.by_stream(params[:stream_id])
       @stream = Stream.find(params[:stream_id])
       @scoping = :stream
+    elsif params[:hostgroup_id]
+      @hostgroup = Hostgroup.find params[:hostgroup_id]
+      @scope = Message.all_of_hostgroup @hostgroup, params[:page]
+      @scoping = :hostgroup
     else
       @scope = Message
       @scoping = :messages
     end
   end
   
+  public
   def index
     @has_sidebar = true
     @load_flot = true
@@ -43,7 +49,7 @@ class MessagesController < ApplicationController
       @is_favorited = current_user.favorite_streams.include?(params[:stream_id])
     end
   end
-
+  
   def show
     @has_sidebar = true
     @load_flot = true
@@ -141,5 +147,4 @@ class MessagesController < ApplicationController
     end
     render :js => { 'status' => 'success', 'payload' => Message.count_since(since) }.to_json
   end
-
 end

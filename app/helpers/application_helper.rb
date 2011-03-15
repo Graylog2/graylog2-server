@@ -12,7 +12,7 @@ module ApplicationHelper
 
   def tab_link tab
     "<div class=\"content-tabs-tab#{" content-tabs-tab-active" if is_current_tab?(tab)}\" >
-      #{link_to tab, params.merge(:action => tab.downcase.to_sym) }
+      #{link_to tab.first, tab.second}
     </div>"
   end
 
@@ -201,13 +201,14 @@ module ApplicationHelper
   private
 
   def is_current_menu_item? item
+    return true if (@scoping == :hostgroup and item == "hosts")
     return (@scoping.to_s.pluralize == item) unless @scoping.nil?
     
-    true if (@scoping == item) or (params[:controller] == root_path and item == "/") or (params[:controller] == "hostgroups" and item == "hosts") or params[:controller] == item
+    (@scoping == item) or (params[:controller] == root_path and item == "/") or (params[:controller] == "hostgroups" and item == "hosts") or (params[:controller] == item)
   end
   
   def is_current_tab? tab
-    true if params[:action] == tab.downcase
+    current_page?(tab.second) 
   end
   
   def current_page
@@ -226,5 +227,9 @@ module ApplicationHelper
     scoping = scoping.to_s.pluralize unless scoping == "shared"
     element = element.to_s + "_#{action}" unless action == ""
     "#{scoping}/#{element}"
+  end
+  
+  def tabs
+    []
   end
 end

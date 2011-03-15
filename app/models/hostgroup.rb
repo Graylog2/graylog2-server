@@ -15,6 +15,10 @@ class Hostgroup < ActiveRecord::Base
     fetch_payload(HostgroupHost::TYPE_REGEX, with_id)
   end
 
+  def to_param
+    "#{id}-#{name.parameterize}"
+  end
+
   private
 
   def fetch_payload(type, with_id = false)

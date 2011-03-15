@@ -27,6 +27,14 @@ Graylog2WebInterface::Application.routes.draw do
   resources :hosts, :constraints => {:id => /[\w\d-]+(\.[\w\d]+)*/} do
     resources :messages
   end
+  
+  resources :hostgroups do
+    resources :messages
+    member do
+      get :hosts
+      get :settings
+    end
+  end
 
   resources :facilities do
     member do

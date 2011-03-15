@@ -1,6 +1,6 @@
 class StreamsController < ApplicationController
   filter_resource_access
-  before_filter :tabs, :except => :index
+#  before_filter :tabs, :except => :index
   
   def show
     redirect_to stream_messages_path(@stream)
@@ -169,10 +169,6 @@ class StreamsController < ApplicationController
     end
     
     redirect_to streams_path
-  end
-  
-  def tabs
-    @tabs = [ "Show", "Rules", "Analytics", "Settings" ]
   end
   
   def subscribe

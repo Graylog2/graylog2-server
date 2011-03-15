@@ -1,6 +1,6 @@
 class HostgroupsController < ApplicationController
   filter_resource_access
-  before_filter :tabs, :except => [ :new ]
+#  before_filter :tabs, :except => [ :new ]
 
   def index
   end
@@ -67,11 +67,4 @@ class HostgroupsController < ApplicationController
 
     redirect_to hosts_path
   end
-
-  private
-
-  def tabs
-    @tabs = [ "Show", "Hosts", "Settings" ]
-  end
-
 end

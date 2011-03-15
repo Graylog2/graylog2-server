@@ -48,7 +48,7 @@
     </div>
   <% end %>
 
-  <% if Time.at(ServerValue.ping) < 65.seconds.ago %>
+  <% if ServerValue.ping == "unknown" or Time.at(ServerValue.ping) < 65.seconds.ago %>
     <div id="server-not-running" class="notification">
       <span class="notification-title">Warning!</span> It seems like your Graylog2 server is not running.
     </div>
@@ -81,16 +81,12 @@
   <div id="new-messages-bar" style="display: none;"></div>
 
   <div id="content-top">
-  <% unless @tabs.blank? %>
     <div id="content-tabs">
-    <% @tabs.each do |tab| %>
-      <% permitted_to?(tab.downcase.to_sym, @stream) do %>
-        <%=raw tab_link(tab) %> 
-      <% end %>
-    <% end %>
+	<% tabs.each do |tab| %>
+	  <%= raw tab_link(tab)%>
+	<% end %>
       <br style="clear: both;" />
     </div>
-  <% end %>
   </div>
 
  <% if @has_sidebar %>

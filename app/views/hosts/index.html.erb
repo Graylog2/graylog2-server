@@ -30,7 +30,7 @@ Monitoring <span class="highlighted"><%=h @host_count %></span> hosts. (Sorted b
         <br />
         <%=h host.message_count.to_i %> messages
       <% elsif host.is_a?(Hostgroup) %>
-        <span class="blocks-title"><span class="black">Group:</span> <%= link_to h(host.name), { :controller => "hostgroups", :action => "show", :id => host.id } %></span>
+        <span class="blocks-title"><span class="black">Group:</span> <%= link_to h(host.name), hostgroup_messages_path(host) %></span>
         <br />
       <% end %>
     </div>
