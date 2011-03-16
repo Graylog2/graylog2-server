@@ -23,7 +23,6 @@ package org.graylog2.messagehandlers.gelf;
 import java.util.Iterator;
 import java.util.Set;
 import org.graylog2.Log;
-import org.graylog2.Tools;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.JSONValue;
@@ -52,7 +51,6 @@ class GELFClientHandlerBase {
         }
 
         // Add standard fields.
-
         this.message.setVersion(this.jsonToString(json.get("version")));
         this.message.setHost(this.jsonToString(json.get("host")));
         this.message.setShortMessage(this.jsonToString(json.get("short_message")));

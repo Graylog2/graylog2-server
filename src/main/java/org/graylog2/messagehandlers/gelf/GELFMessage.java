@@ -20,8 +20,11 @@
 
 package org.graylog2.messagehandlers.gelf;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import org.graylog2.streams.Router;
 
 /**
  * GELFMessage.java: Jul 20, 2010 6:57:28 PM
@@ -42,6 +45,8 @@ public class GELFMessage {
     private int timestamp = 0;
     private String facility = null;
     private Map<String, String> additionalData = new HashMap<String, String>();
+    private List<Integer> streams = null;
+
     private boolean filterOut = false;
 
     /**
@@ -244,6 +249,19 @@ public class GELFMessage {
             return false;
         }
         return true;
+    }
+
+
+    public void setStreams(List<Integer> streams) {
+        this.streams = streams;
+    }
+
+    public List<Integer> getStreams() {
+        if (this.streams != null) {
+            return this.streams;
+        }
+
+        return Router.route(this);
     }
 
     /**

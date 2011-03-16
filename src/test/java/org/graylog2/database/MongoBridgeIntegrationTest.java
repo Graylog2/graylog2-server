@@ -73,35 +73,6 @@ public class MongoBridgeIntegrationTest {
     }
 
     /**
-     * Test of insert method, of class MongoBridge.
-     */
-    @Test
-    public void testInsert() throws Exception {
-        // Build an event.
-        byte[] msg = "mama".getBytes();
-        SyslogServerEvent event = new SyslogServerEvent(msg, msg.length, null);
-        event.setMessage("testmessage");
-        event.setHost("testhost");
-        event.setFacility(4);
-        event.setLevel(5);
-
-        // Insert the event.
-        MongoBridge instance = new MongoBridge();
-        instance.insert(event);
-
-        // Fetch the event and compare.
-        DBCollection coll = instance.getMessagesColl();
-        long count = coll.getCount();
-        assertTrue(count == 1);
-
-        DBObject res = coll.findOne();
-        assertEquals(res.get("message"), "testmessage");
-        assertEquals(res.get("host"), "testhost");
-        assertEquals(res.get("facility"), 4);
-        assertEquals(res.get("level"), 5);
-    }
-
-    /**
      * Test of insertGelfMessage method, of class MongoBridge.
      */
     @Test

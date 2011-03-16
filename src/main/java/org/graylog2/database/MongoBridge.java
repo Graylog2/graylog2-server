@@ -31,9 +31,6 @@ import org.graylog2.Log;
 import org.graylog2.Main;
 import org.graylog2.Tools;
 import org.graylog2.messagehandlers.gelf.GELFMessage;
-import org.graylog2.messagehandlers.syslog.GraylogSyslogServerEvent;
-
-import org.productivity.java.syslog4j.server.SyslogServerEventIF;
 
 /**
  * MongoBridge.java: Apr 13, 2010 9:13:03 PM
@@ -76,6 +73,7 @@ public class MongoBridge {
         coll.ensureIndex(new BasicDBObject("host", 1));
         coll.ensureIndex(new BasicDBObject("facility", 1));
         coll.ensureIndex(new BasicDBObject("level", 1));
+        coll.ensureIndex(new BasicDBObject("streams", 1));
 
         return coll;
     }
@@ -99,34 +97,7 @@ public class MongoBridge {
 
         return coll;
     }
-
-    /**
-     * Inserts a Syslog message into the messages collection.
-     *
-     * @param event The syslog event/message
-     * @throws Exception
-     */
-    public void insert(SyslogServerEventIF event) throws Exception {
-        DBCollection coll = this.getMessagesColl();
-
-        BasicDBObject dbObj = new BasicDBObject();
-        dbObj.put("message", event.getMessage());
-        dbObj.put("host", event.getHost());
-        dbObj.put("facility", event.getFacility());
-        dbObj.put("level", event.getLevel());
-        dbObj.put("created_at", Tools.getUTCTimestamp());
-        // Documents in capped collections cannot grow so we have to do that now and cannot just add 'deleted => true' later.
-        dbObj.put("deleted", false);
-
-        // Add AMQP receiver queue if this is an extended event.
-        if (event instanceof GraylogSyslogServerEvent) {
-            GraylogSyslogServerEvent extendedEvent = (GraylogSyslogServerEvent) event;
-            dbObj.put("_amqp_queue", extendedEvent.getAmqpReceiverQueue());
-        }
-
-        coll.insert(dbObj);
-    }
-
+    
     /**
      * Inserts a GELF message into the messages collection.
      *
@@ -153,7 +124,7 @@ public class MongoBridge {
         dbObj.put("facility", message.getFacility()); 
         dbObj.put("level", message.getLevel());
         dbObj.put("timestamp", message.getTimestamp());
-
+        
         // Add additional fields. XXX PERFORMANCE
         Map<String,String> additionalFields = message.getAdditionalData();
         Set<String> set = additionalFields.keySet();
@@ -167,6 +138,8 @@ public class MongoBridge {
         dbObj.put("created_at", Tools.getUTCTimestamp());
         // Documents in capped collections cannot grow so we have to do that now and cannot just add 'deleted => true' later.
         dbObj.put("deleted", false);
+
+        dbObj.put("streams", message.getStreams());
 
         coll.insert(dbObj);
     }
