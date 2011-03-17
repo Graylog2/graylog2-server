@@ -26,7 +26,7 @@ Monitoring <span class="highlighted"><%=h @host_count %></span> hosts. (Sorted b
     <% next if (host.is_a?(Host) and host.host.blank?) or (host.is_a?(Hostgroup) and host.name.blank?) %>
     <div class="blocks">
       <% if host.is_a?(Host) %>
-        <span class="blocks-title"><%= link_to h(host.host), "/hosts/#{host.host}/messages" %></span>
+        <span class="blocks-title"><%= link_to h(host.host), host_messages_path(host.host) %></span>
         <br />
         <%=h host.message_count.to_i %> messages
       <% elsif host.is_a?(Hostgroup) %>

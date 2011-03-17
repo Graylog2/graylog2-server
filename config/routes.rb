@@ -24,7 +24,8 @@ Graylog2WebInterface::Application.routes.draw do
     resources :blacklistedterms, :as => "terms"
   end
 
-  resources :hosts, :constraints => {:id => /[\w\d-]+(\.[\w\d]+)*/} do
+  # this regular expression matches on invalid hostnames as well. this is not a problem in this case
+  resources :hosts , :constraints => {:id => /[a-z0-9-\.]+/} do
     resources :messages
   end
   
