@@ -307,6 +307,14 @@
   font-size: 13px;
 }
 
+#streamrule_rule_type {
+  float: left;
+}
+
+.stream-value-field {
+  float: left;
+}
+
 /* Hosts */
 #hosts-quickjump {
     margin-bottom: 15px;
