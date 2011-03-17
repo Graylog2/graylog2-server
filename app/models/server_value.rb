@@ -37,7 +37,8 @@ class ServerValue
   end
 
   def self.ping
-    get("ping")
+    ping = get("ping")
+    ping == "unknown" ? Time.at(0) : Time.at(ping)
   end
 
   private

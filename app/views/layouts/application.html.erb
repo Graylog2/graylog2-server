@@ -48,7 +48,7 @@
     </div>
   <% end %>
 
-  <% if ServerValue.ping == "unknown" or Time.at(ServerValue.ping) < 65.seconds.ago %>
+  <% if ServerValue.ping < 65.seconds.ago %>
     <div id="server-not-running" class="notification">
       <span class="notification-title">Warning!</span> It seems like your Graylog2 server is not running.
     </div>

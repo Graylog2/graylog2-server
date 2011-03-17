@@ -1,5 +1,5 @@
 class Stream < ActiveRecord::Base
-  has_many :streamrules
+  has_many :streamrules, :dependent => :destroy
   has_and_belongs_to_many :favoritedStreams, :join_table => "favorite_streams", :class_name => "User"
   has_and_belongs_to_many :users
   #has_many :subscribedStreams, :dependent => :destroy
