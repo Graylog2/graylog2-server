@@ -1,5 +1,5 @@
 class Message
-  include MongoMapper::Document
+  include Mongoid::Document
 
   FIELDS = %w(message date host level facility deleted  gelf full_message type file line version timestamp created_at)
   SPECIAL_FIELDS = %w(_id)
@@ -34,9 +34,14 @@ class Message
   scope :by_blacklist, lambda {|blacklist| by_blacklisted_terms(blacklist.all_terms)}
   scope :of_blacklist, lambda {|blacklist| of_blacklisted_terms(blacklist.all_terms)}
   scope :page, lambda {|number| skip(self.get_offset(number))}
-  scope :default_scope, fields(:full_message => 0).order("$natural DESC").not_deleted.limit(LIMIT)
+  scope :default_scope, order_by("$natural DESC").not_deleted.limit(LIMIT)
+#  scope :default_scope, fields(:full_message => 0).order("$natural DESC").not_deleted.limit(LIMIT)
   scope :time_range, lambda {|from, to| where(:created_at => {"$gte" => from}).where(:created_at => {"$lte" => to})}
 
+  def timestamp
+    Time.at(created_at)
+  end
+  
   # Overwriting the message getter. This always applies the filtering of
   # filtered terms.
   def message
@@ -92,7 +97,7 @@ class Message
     page = 1 if page.blank?
     
     terms = Blacklist.all_terms
-    by_blacklisted_terms(terms).default_scope.page(page)
+    by_blacklisted_terms(terms).default_scope #.page(page)
   end
 
   def self.all_by_quickfilter filters, page = 1, limit = LIMIT, conditions_only = false
@@ -161,13 +166,13 @@ class Message
     end
 
     # Plucky bug workaround. Same as in quickfilters.
-    unless conditions[:message].blank?
+#    unless conditions[:message].blank?
       # Make it search via $in so we can easily add the $nin next. It does not have a $in when there is just one message condition.
-      conditions[:message] = { "$in" => [conditions[:message]] } if conditions[:message].is_a?(Regexp)
+#      conditions[:message] = { "$in" => [conditions[:message]] } if conditions[:message].is_a?(Regexp)
 
-      terms = BlacklistedTerm.all_as_array
-      conditions[:message]["$nin"] = terms unless terms.blank?
-    end
+#      terms = BlacklistedTerm.all_as_array
+#      conditions[:message]["$nin"] = terms unless terms.blank?
+#    end
     # Plucky bug woraround END. (this sucks, but is okay for now. really fix after release.)
 
     conditions
@@ -258,7 +263,7 @@ class Message
       
       if c == nil
         # Cache miss. Perform counting and add to cache.
-        c = Message.by_stream(stream_id).where(:created_at => {"$gt" => t.to_i}).where(:created_at => {"$lt" => (t+60).to_i}).count
+        c = Message.by_stream(stream_id).time_range(t.to_i, (t+60).to_i).count
         Rails.cache.write(obj, c)
       end
 

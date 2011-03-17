@@ -5,28 +5,12 @@ class HostsController < ApplicationController
   filter_access_to :quickjump
   
   def index
-    @hosts = Host.all :order => "message_count DESC"
+    @hosts = Host.desc :message_count
     @hostgroups = Hostgroup.all
 
     @hosts_and_groups = @hosts | @hostgroups
 
     @host_count = Host.count
-  end
-
-  def show
-    @has_sidebar = true
-    @load_flot = true
-    
-    @host = Host.find_by_host(params[:id])
-    @messages = Message.all_of_host @host.host, params[:page]
-    @total_count = @host.message_count
-
-    if @host.blank?
-      flash[:error] = "Could not find host!"
-      redirect_to :action => "index"
-    end
-
-    @last_message = Message.last :conditions => { "host" => @host.host }, :order => "created_at DESC"
   end
 
   def destroy

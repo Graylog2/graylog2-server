@@ -1,15 +1,16 @@
 class MessagesController < ApplicationController
   before_filter :set_scoping
-  filter_resource_access
+  #filter_resource_access
+  filter_access_to :all
   
-  rescue_from MongoMapper::DocumentNotFound, :with => :not_found
+  rescue_from Mongoid::Errors::DocumentNotFound, :with => :not_found
   rescue_from BSON::InvalidObjectId, :with => :not_found
   
   protected
   def set_scoping
     if params[:host_id]
       @scope = Message.where(:host => params[:host_id])
-      @host = Host.find_by_host(params[:host_id])
+      @host = Host.find(:first, :conditions => {:host=> params[:host_id]})
       @scoping = :host
     elsif params[:stream_id]
       @scope = Message.by_stream(params[:stream_id])
@@ -43,7 +44,7 @@ class MessagesController < ApplicationController
     #@total_count = Message.count_since(0)
     @total_count = @scope.count
     @total_blacklisted_terms = BlacklistedTerm.count
-    @last_message = @scope.last :order => "created_at DESC"
+    @last_message = @scope.order_by(:created_at.desc).limit(1).first #last :order => "created_at DESC"
     
     if params[:stream_id]
       @is_favorited = current_user.favorite_streams.include?(params[:stream_id])
@@ -55,7 +56,7 @@ class MessagesController < ApplicationController
     @load_flot = true
 
     @comments = Messagecomment.all_matched(@message)
-    @message = @scope.where({"id" => params[:id]}).all.first
+    @message = @scope.where(:_id => BSON::ObjectId(params[:id])).all.first
     
     if params[:partial]
       render :partial => "full_message"

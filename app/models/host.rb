@@ -1,5 +1,5 @@
 class Host
-  include MongoMapper::Document
+  include Mongoid::Document
 
   key :host, String
   key :message_count, Float
