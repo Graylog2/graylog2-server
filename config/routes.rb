@@ -34,6 +34,7 @@ Graylog2WebInterface::Application.routes.draw do
     member do
       get :hosts
       get :settings
+      post :rename
     end
   end
 

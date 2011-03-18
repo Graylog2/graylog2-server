@@ -1,32 +1,51 @@
-class Stream < ActiveRecord::Base
-  has_many :streamrules, :dependent => :destroy
-  has_and_belongs_to_many :favoritedStreams, :join_table => "favorite_streams", :class_name => "User"
-  has_and_belongs_to_many :users
+class Stream
+  include Mongoid::Document
+  
+  #has_many :streamrules, :dependent => :destroy
+  embeds_many :streamrules
+  
+  #has_and_belongs_to_many :favoritedStreams, :join_table => "favorite_streams", :class_name => "User"
+  references_and_referenced_in_many :favoritedStreams, :class_name => "User", :inverse_of => :favorite_streams
+  
+  #has_and_belongs_to_many :users
+  references_and_referenced_in_many :users
+  
   #has_many :subscribedStreams, :dependent => :destroy
-  has_many :alertedStreams, :dependent => :destroy
-  has_and_belongs_to_many :subscribers, :join_table => "subscribed_streams", :class_name => "User"
+  #has_many :alertedStreams, :dependent => :destroy
+  #has_and_belongs_to_many :subscribers, :join_table => "subscribed_streams", :class_name => "User"
+  references_and_referenced_in_many :subscribers, :class_name => "User", :inverse_of => :subscribed_streams
 
-  belongs_to :streamcategory
+  #belongs_to :streamcategory
+  referenced_in :streamcategory
 
   validates_presence_of :title
-
   validates_numericality_of :alarm_limit, :allow_nil => true
   validates_numericality_of :alarm_timespan, :allow_nil => true, :greater_than => 0
+  
+  field :title, :type => String
+  field :alarm_limit, :type => Integer
+  field :alarm_timespan, :type => Integer
+  field :description, :type => Integer
+  field :alarm_active, :type => Boolean
+  field :created_at, :type => DateTime
+  field :updated_at, :type => DateTime
+  field :alarm_force, :type => Boolean
+  
+  def self.find_by_id(_id)
+    _id = $1 if /^([0-9a-f]+)-/ =~ _id
+    first(:conditions => { :_id => BSON::ObjectId(_id)})
+  end
 
-  def alerted?(user_id)
-    AlertedStream.alerted?(self.id, user_id)
+  def alerted?(user)
+    AlertedStream.alerted?(self.id, user.id)
   end
 
   def subscribed?(user)
-    if user.is_a?(User)
-      subscribers.include?(user)
-    else
-      subscriber_ids.include? user
-    end
+    !subscribers.nil? and subscribes.include?(user)
   end
 
   def favorited?(user_id)
-    favoritedStreams.include? user_id
+    !favoritedStreams.nil? and favoritedStreams.include? user_id
   end
   
   def to_param

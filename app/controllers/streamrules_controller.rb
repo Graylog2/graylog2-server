@@ -1,23 +1,32 @@
 class StreamrulesController < ApplicationController
-  filter_resource_access
+  filter_access_to :all
+  
+  before_filter :fetch_stream
+  
   def create
-    new_rule = Streamrule.new params[:streamrule]
+    new_rule = @stream.streamrules.new params[:streamrule]
     if new_rule.save
       flash[:notice] = "Rule has been added."
     else
       flash[:error] = "Could not add rule."
     end
-    redirect_to rules_stream_path(new_rule.stream_id)
+    redirect_to rules_stream_path(@stream)
   end
 
   def destroy
-    rule = Streamrule.find params[:id]
+    rule = @stream.streamrules.find(:first, :conditions => {:_id => BSON::ObjectId(params[:id])})
     if rule.destroy
       flash[:notice] = "Rule has been removed from stream."
     else
       flash[:error] = "Could not remove rule from stream."
     end
-    redirect_to stream_path(params[:stream_id])
+    redirect_to rules_stream_path(@stream)
   end
-
+  
+  protected
+  def fetch_stream
+    if params[:stream_id]
+      @stream = Stream.find_by_id(params[:stream_id])
+    end
+  end
 end

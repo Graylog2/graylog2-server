@@ -1,8 +1,9 @@
 class StreamsController < ApplicationController
-  filter_resource_access
+  filter_resource_access :additional_member => [:rules, :settings]
 #  before_filter :tabs, :except => :index
   
   def show
+    @stream = Stream.find_by_id(params[:id])
     redirect_to stream_messages_path(@stream)
   end
   
@@ -38,21 +39,21 @@ class StreamsController < ApplicationController
   end
 
   def rules
-    @stream = Stream.find params[:id]
+    @stream = Stream.find_by_id params[:id]
     @new_rule = Streamrule.new
   end
 
   def analytics
     @load_flot = true
-    @stream = Stream.find params[:id]
+    @stream = Stream.find_by_id params[:id]
   end
 
   def settings
-    @stream = Stream.find params[:id]
+    @stream = Stream.find_by_id params[:id]
   end
 
   def setdescription
-    @stream = Stream.find(params[:id])
+    @stream = Stream.find_by_id(params[:id])
     @stream.description = params[:description]
 
     if @stream.save
@@ -64,7 +65,7 @@ class StreamsController < ApplicationController
   end
 
   def togglefavorited
-    stream = Stream.find(params[:id])
+    stream = Stream.find_by_id(params[:id])
     if !stream.favorited?(current_user)
       current_user.favorite_streams << stream
     else
@@ -76,7 +77,7 @@ class StreamsController < ApplicationController
   end
   
   def togglealarmactive
-    stream = Stream.find(params[:id])
+    stream = Stream.find_by_id(params[:id])
     if stream.alarm_active
       stream.alarm_active = false
     else
@@ -90,7 +91,7 @@ class StreamsController < ApplicationController
   end
   
   def togglealarmforce
-    stream = Stream.find(params[:id])
+    stream = Stream.find_by_id(params[:id])
     if stream.alarm_force
       stream.alarm_force = false
     else
@@ -104,7 +105,7 @@ class StreamsController < ApplicationController
   end
 
   def setalarmvalues
-    stream = Stream.find(params[:id])
+    stream = Stream.find_by_id(params[:id])
 
     unless params[:limit].blank? or params[:timespan].blank?
       stream.alarm_limit = params[:limit]
@@ -134,7 +135,7 @@ class StreamsController < ApplicationController
   end
   
   def rename
-    stream = Stream.find params[:stream_id]
+    stream = Stream.find_by_id params[:stream_id]
     stream.title = params[:title]
     
     if stream.save
@@ -148,7 +149,7 @@ class StreamsController < ApplicationController
 
   # This should now really be changed to /update soon.
   def categorize
-    stream = Stream.find params[:stream_id]
+    stream = Stream.find_by_id params[:stream_id]
     stream.streamcategory_id = params[:streamcategory_id]
     
     if stream.save
@@ -161,7 +162,7 @@ class StreamsController < ApplicationController
   end
 
   def destroy
-    stream = Stream.find params[:id]
+    stream = Stream.find_by_id params[:id]
     if stream.destroy
       flash[:notice] = "Stream has been deleted"
     else
@@ -183,5 +184,10 @@ class StreamsController < ApplicationController
   
   def togglesubscription
     @stream.subscribed?(current_user) ? unsubscribe : subscribe
+  end
+  
+  protected
+  def load_stream
+    @stream = Stream.find_by_id params["id"]
   end
 end

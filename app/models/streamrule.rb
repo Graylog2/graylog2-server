@@ -1,9 +1,14 @@
-class Streamrule < ActiveRecord::Base
-  belongs_to :stream
+class Streamrule
+  include Mongoid::Document
+  
+  #belongs_to :stream
+  embedded_in :stream, :inverse_of => :streamrules
 
-  validates_presence_of :stream_id
   validates_presence_of :rule_type
   validates_presence_of :value
+  
+  field :rule_type, :type => Integer
+  field :value, :type => String
 
   TYPE_MESSAGE = 1
   TYPE_HOST = 2

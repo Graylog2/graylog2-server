@@ -1,6 +1,7 @@
-class Streamcategory < ActiveRecord::Base
+class Streamcategory
+  include Mongoid::Document
 
-  has_many :streams
+  references_many :streams
 
   validates_presence_of :title
 

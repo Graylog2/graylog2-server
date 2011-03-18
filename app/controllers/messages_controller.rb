@@ -13,11 +13,11 @@ class MessagesController < ApplicationController
       @host = Host.find(:first, :conditions => {:host=> params[:host_id]})
       @scoping = :host
     elsif params[:stream_id]
-      @scope = Message.by_stream(params[:stream_id])
-      @stream = Stream.find(params[:stream_id])
+      @stream = Stream.find_by_id(params[:stream_id])
+      @scope = Message.by_stream(@stream.id)
       @scoping = :stream
     elsif params[:hostgroup_id]
-      @hostgroup = Hostgroup.find params[:hostgroup_id]
+      @hostgroup = Hostgroup.find_by_id params[:hostgroup_id]
       @scope = Message.all_of_hostgroup @hostgroup, params[:page]
       @scoping = :hostgroup
     else

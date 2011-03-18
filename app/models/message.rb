@@ -281,7 +281,7 @@ class Message
   def self.all_of_hostgroup hostgroup, page
     page = 1 if page.blank?
 
-    return where(:host.in => hostgroup.all_conditions ).default_scope.page(page)
+    return where(:host.in => hostgroup.all_conditions ).default_scope #.page(page)
   end
 
   def self.count_of_hostgroup hostgroup
