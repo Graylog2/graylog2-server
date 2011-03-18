@@ -265,6 +265,17 @@ public class GELFMessage {
     }
 
     /**
+     * Converts message to a String consisting of the host and the short message
+     * separated by a dash. Gives syslog-ish format but hides inforamtion like
+     * PRIORITY.
+     *
+     * @return boolean
+     */
+    public String toOneLiner() {
+        return this.getHost() + " - " + this.getShortMessage();
+    }
+
+    /**
      * @return Human readable, descriptive and formatted string of this GELF message.
      */
     @Override public String toString() {
