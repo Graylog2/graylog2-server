@@ -22,8 +22,11 @@ package org.graylog2.messagehandlers.gelf;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
+import org.graylog2.Tools;
 import org.graylog2.streams.Router;
 
 /**
@@ -266,13 +269,37 @@ public class GELFMessage {
 
     /**
      * Converts message to a String consisting of the host and the short message
-     * separated by a dash. Gives syslog-ish format but hides inforamtion like
-     * PRIORITY.
+     * separated by a dash. Optimized for later full text searching.
      *
      * @return boolean
      */
     public String toOneLiner() {
-        return this.getHost() + " - " + this.getShortMessage();
+        String msg = this.getHost() + " - " + this.getShortMessage();
+
+        msg += " severity=" + Tools.syslogLevelToReadable(this.getLevel());
+        msg += ",facility=" + this.getFacility();
+
+        if (this.getFile() != null) {
+            msg += ",file=" + this.getFile();
+        }
+
+        if (this.getLine() != 0) {
+            msg += ",line=" + this.getLine();
+        }
+
+        if (this.getAdditionalData().size() > 0) {
+            // Add additional fields. XXX PERFORMANCE
+            Map<String,String> additionalFields = this.getAdditionalData();
+            Set<String> set = additionalFields.keySet();
+            Iterator<String> iter = set.iterator();
+            while(iter.hasNext()) {
+                String key = iter.next();
+                String value = additionalFields.get(key);
+                msg += "," + key + "=" + value;
+            }
+        }
+
+        return msg;
     }
 
     /**
