@@ -16,7 +16,7 @@
   <dt><%= label_tag 'password_confirmation', 'Confirm Password' %></dt>
   <dd><%= f.password_field :password_confirmation %><%= @user.errors[:password_confirmation].join(" and ")%></dd>
 
-  <dt><%= label_tag 'role', 'Rolle'%></dt>
+  <dt><%= label_tag 'role', 'Role'%></dt>
   <dd>
     <%= f.select(:role, user.valid_roles.collect {|r| [r.to_s.capitalize, r.to_s]}, :selected => (@user.role.blank? ? "admin" : @user.role)) %>
     <%= @user.errors[:role].join(" and ")%>
