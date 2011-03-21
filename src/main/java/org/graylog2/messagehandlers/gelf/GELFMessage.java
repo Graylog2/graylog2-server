@@ -20,7 +20,6 @@
 
 package org.graylog2.messagehandlers.gelf;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;

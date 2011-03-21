@@ -20,6 +20,10 @@
 
 package org.graylog2.streams;
 
+import com.mongodb.DBCollection;
+import com.mongodb.DBCursor;
+import org.graylog2.database.MongoBridge;
+
 /**
  * ReIndexer.java: Mar 16, 2011 10:07:21 PM
  *
@@ -36,7 +40,15 @@ public class ReIndexer {
     public static final int ALL_STREAMS = 0;
 
     public static boolean run(int stream_id) {
+        MongoBridge m = new MongoBridge();
+        DBCollection coll = m.getMessagesColl();
+
         // Cycle trough every message.
+        DBCursor cur = coll.find();
+        while(cur.hasNext()) {
+            System.out.println(cur.next());
+        }
+
         return true;
     }
 
