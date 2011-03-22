@@ -51,7 +51,8 @@ class ApplicationController < ActionController::Base
 
   def login_required
     if !logged_in?
-      redirect_to login_path #:controller => "sessions", :action => "new"
+      store_location
+      redirect_to login_path
     else
       return true
     end

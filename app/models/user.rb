@@ -39,7 +39,7 @@ class User
   field :stream_ids
   
 #  has_and_belongs_to_many :streams
-  references_and_referenced_in_many :streams
+  references_and_referenced_in_many :streams, :inverse_of => :users
   references_and_referenced_in_many :favorite_streams, :class_name => "Stream"
   references_and_referenced_in_many :subscribed_streams, :class_name => "Stream"
   references_many :alerted_streams

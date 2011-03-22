@@ -33,11 +33,16 @@ class Message
   scope :of_blacklisted_terms, lambda { |terms| where(:message.in => terms.collect { |term| /#{term}/}) }
   scope :by_blacklist, lambda {|blacklist| by_blacklisted_terms(blacklist.all_terms)}
   scope :of_blacklist, lambda {|blacklist| of_blacklisted_terms(blacklist.all_terms)}
+  #scope :find_by_id, lambda {|_id| where(:_id => BSON::ObjectId(_id)).first }
   scope :page, lambda {|number| skip(self.get_offset(number))}
   scope :default_scope, order_by("$natural DESC").not_deleted.limit(LIMIT)
 #  scope :default_scope, fields(:full_message => 0).order("$natural DESC").not_deleted.limit(LIMIT)
   scope :time_range, lambda {|from, to| where(:created_at => {"$gte" => from}).where(:created_at => {"$lte" => to})}
 
+  def self.find_by_id(_id)
+    where(:_id => BSON::ObjectId(_id)).first
+  end
+  
   def timestamp
     Time.at(created_at)
   end
@@ -85,7 +90,7 @@ class Message
     page = 1 if page.blank?
     
     b = Blacklist.find(id)
-    return of_blacklist(b).default_scope.page(page).all
+    return of_blacklist(b).default_scope.paginate(:page => page)
   end
 
   def self.count_of_blacklist id
@@ -97,7 +102,7 @@ class Message
     page = 1 if page.blank?
     
     terms = Blacklist.all_terms
-    by_blacklisted_terms(terms).default_scope #.page(page)
+    by_blacklisted_terms(terms).default_scope.paginate(:page => page)
   end
 
   def self.all_by_quickfilter filters, page = 1, limit = LIMIT, conditions_only = false
@@ -141,7 +146,7 @@ class Message
       end
     end
 
-    conditions.default_scope.limit(LIMIT).page(page)
+    conditions.default_scope.limit(LIMIT).paginate(:page => page)
   end
       
   def self.extract_additional_from_quickfilter(filters)
@@ -181,7 +186,7 @@ class Message
   def self.all_of_stream stream_id, page = 1
     page = 1 if page.blank?
 
-    by_stream(stream_id).default_scope.page(page).all
+    by_stream(stream_id).default_scope.paginate(:page => page).all
   end
 
   def self.all_of_stream_since(stream_id, since)
@@ -195,16 +200,16 @@ class Message
   def self.all_of_stream_in_range(stream_id, page, from, to)
     page = 1 if page.blank?
     
-    #by_stream(stream_id).default_scope.where(:created_at => {"$gte" => from}).where(:created_at => {"$lte" => to}).page(page)
-    by_stream(stream_id).default_scope.time_range(from, to).page(page)
+    #by_stream(stream_id).default_scope.where(:created_at => {"$gte" => from}).where(:created_at => {"$lte" => to}).paginate(:page => page)
+    by_stream(stream_id).default_scope.time_range(from, to).paginate(:page => page)
   end
 
   def self.all_in_range(page, from, to)
     page = 1 if page.blank?
     
     terms = Blacklist.all_terms
-    #by_blacklisted_terms(terms).default_scope.where(:created_at => {"$gte" => from}).where(:created_at => {"$lte" => to}).page(page)
-    by_blacklisted_terms(terms).default_scope.time_range(from, to).page(page)
+    #by_blacklisted_terms(terms).default_scope.where(:created_at => {"$gte" => from}).where(:created_at => {"$lte" => to}).paginate(:page => page)
+    by_blacklisted_terms(terms).default_scope.time_range(from, to).paginate(:page => page)
   end
     
   def self.count_all_of_stream_in_range(stream_id, from, to)
@@ -235,7 +240,7 @@ class Message
       if c == nil
         # Cache miss. Perform counting and add to cache.
         terms = Blacklist.all_terms
-        c = Message.by_blacklisted_terms(terms).where(:created_at => {"$gt" => t.to_i}).where(:created_at => {"$lt" => (t+60).to_i}).count
+        c = Message.by_blacklisted_terms(terms).time_range(t.to_i, (t+60).to_i).count
         Rails.cache.write(obj, c)
       end
 
@@ -275,13 +280,13 @@ class Message
 
   def self.all_of_host host, page
     page = 1 if page.blank?
-    where(:host => host).default_scope.page(page)
+    where(:host => host).default_scope.paginate(:page => page)
   end
   
   def self.all_of_hostgroup hostgroup, page
     page = 1 if page.blank?
 
-    return where(:host.in => hostgroup.all_conditions ).default_scope #.page(page)
+    return where(:host.in => hostgroup.all_conditions ).default_scope #.paginate(:page => page)
   end
 
   def self.count_of_hostgroup hostgroup

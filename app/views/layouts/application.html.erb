@@ -69,7 +69,6 @@
       <% permitted_to? :index, :users do %><%=raw menu_item("Users", users_path) %><% end %>
     </ul>
 
-    <% message_count_interval = Setting.get_message_count_interval(current_user) %>
     <div id="new-message-count">
       <% unless @hide_stats %>
         <strong><%= Message.count_of_last_minutes(message_count_interval) %></strong> / <%=h message_count_interval %> minutes

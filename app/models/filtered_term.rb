@@ -1,4 +1,7 @@
-class FilteredTerm < ActiveRecord::Base
+class FilteredTerm
+  include Mongoid::Document
+  
+  field :term, :type => String
 
   validates_presence_of :term
 

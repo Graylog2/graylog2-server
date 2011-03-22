@@ -8,7 +8,7 @@ class Stream
   references_and_referenced_in_many :favoritedStreams, :class_name => "User", :inverse_of => :favorite_streams
   
   #has_and_belongs_to_many :users
-  references_and_referenced_in_many :users
+  references_and_referenced_in_many :users, :inverse_of => :streams
   
   #has_many :subscribedStreams, :dependent => :destroy
   #has_many :alertedStreams, :dependent => :destroy
@@ -30,7 +30,7 @@ class Stream
   field :created_at, :type => DateTime
   field :updated_at, :type => DateTime
   field :alarm_force, :type => Boolean
-  
+
   def self.find_by_id(_id)
     _id = $1 if /^([0-9a-f]+)-/ =~ _id
     first(:conditions => { :_id => BSON::ObjectId(_id)})

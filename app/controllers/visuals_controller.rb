@@ -1,5 +1,4 @@
 class VisualsController < ApplicationController
-
   def fetch
     r = Hash.new
 
@@ -19,7 +18,7 @@ class VisualsController < ApplicationController
     end
 
     r["time"] = sprintf("%#.2f", time*1000);
-
+    
     render :js => r.to_json
   end
 
@@ -28,8 +27,8 @@ class VisualsController < ApplicationController
   def calculate_messagespread(is_regex, case_sensitive, message)
     values = Array.new
 
-    conditions = Hash.new
-    conditions["deleted"] = false
+    conditions = Message.not_deleted
+    #conditions["deleted"] = false
 
     if is_regex
       search_for = message
@@ -38,17 +37,17 @@ class VisualsController < ApplicationController
     end
 
     if case_sensitive
-      conditions["message"] = /#{search_for}/
+      conditions = conditions.where(:message => /#{search_for}/)
     else
-      conditions["message"] = /#{search_for}/i
+      conditions = conditions.where(:message => /#{search_for}/i)
     end
 
     hosts = Host.all
 
     highest = 0
     hosts.each do |host|
-      conditions["host"] = escape(host.host)
-      count = Message.count :conditions => conditions
+      conditions = conditions.where(:host => escape(host.host))
+      count = conditions.count
 
       if count > 0
         value = Hash.new

@@ -1,4 +1,12 @@
-class Job < ActiveRecord::Base
+class Job
+  include Mongoid::Document
+  
+  field :title, :type => String
+  field :last_run, :type => Integer
+  
+  def self.find_by_title(name)
+    first(:conditions => {:title => name})
+  end
 
   def self.done(title)
     delete_all("title = '#{title}'")

@@ -79,7 +79,7 @@ class MessagesController < ApplicationController
   end
 
   def around
-    @message = Message.find!(params[:id])
+    @message = @scope.find_by_id(params[:id])
     @has_sidebar = true
     @load_flot = true
     @nb = (params[:nb] || 100).to_i

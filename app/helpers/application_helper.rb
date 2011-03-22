@@ -229,6 +229,10 @@ module ApplicationHelper
     "#{scoping}/#{element}"
   end
   
+  def message_count_interval
+    Setting.get_message_count_interval(current_user)
+  end
+
   def tabs
     @tabs = []
     if (@scoping == :stream and @stream)

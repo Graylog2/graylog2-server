@@ -1,6 +1,12 @@
-class Messagecomment < ActiveRecord::Base
-  belongs_to :user
+class Messagecomment
+  include Mongoid::Document
+  
+  references_one :user
 
+  field :title, :type => String
+  field :comment, :type => String
+  field :match, :type => String
+  
   validates_presence_of :title
   validates_presence_of :comment
   validates_presence_of :match

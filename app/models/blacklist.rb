@@ -1,5 +1,9 @@
-class Blacklist < ActiveRecord::Base
-  has_many :blacklisted_terms
+class Blacklist
+  include Mongoid::Document
+  
+  embeds_many :blacklisted_terms
+  
+  field :title, :type => String
 
   validates_presence_of :title
   

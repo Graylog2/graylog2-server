@@ -14,8 +14,10 @@ Graylog2WebInterface::Application.routes.draw do
     collection do
       post :showrange
       get :showrange
+      post :getnewmessagecount
     end
     member do 
+      post :show
       get :around
     end
   end
@@ -54,6 +56,7 @@ Graylog2WebInterface::Application.routes.draw do
     resources :dashboard
   
     member do
+      get :deletebystream
       get :analytics
       post :favorite
       post :unfavorite
@@ -106,9 +109,16 @@ Graylog2WebInterface::Application.routes.draw do
   end
 
   resources :filteredterms
+  
+  resource :health
+  resources :visuals, :constraints => {:id => /[a-z]+/} do
+    member do
+      post :fetch
+    end
+  end
 
   match '/visuals/fetch/:id' => 'visuals#fetch',:as => "visuals"
   
   match '/' => 'messages#index', :as => "root"
-  match '/:controller(/:action(/:id))'
+#  match '/:controller(/:action(/:id))'
 end
