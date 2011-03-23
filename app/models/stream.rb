@@ -1,6 +1,7 @@
 class Stream
   include Mongoid::Document
-  
+  include Mongoid::Timestamps
+
   #has_many :streamrules, :dependent => :destroy
   embeds_many :streamrules
   
