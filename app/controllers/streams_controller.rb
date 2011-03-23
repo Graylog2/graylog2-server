@@ -1,7 +1,7 @@
 class StreamsController < ApplicationController
   filter_access_to :all
 #  before_filter :tabs, :except => :index, :new, :create
-  before_filter :load_stream, :except => :index
+  before_filter :load_stream, :except => [ :index, :create ]
   
   def show
     @stream = Stream.find_by_id(params[:id])
