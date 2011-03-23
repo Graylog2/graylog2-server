@@ -6,6 +6,7 @@ Graylog2WebInterface::Application.routes.draw do
 
   resources :users do
     collection do
+      post :createfirst
       get :first
     end
   end

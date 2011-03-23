@@ -37,7 +37,8 @@ class User
   field :remember_token, :type => String
   field :remember_token_expires_at
   field :stream_ids
-  
+  field :last_version_check, :type => Integer
+
 #  has_and_belongs_to_many :streams
   references_and_referenced_in_many :streams, :inverse_of => :users
   references_and_referenced_in_many :favorite_streams, :class_name => "Stream"
