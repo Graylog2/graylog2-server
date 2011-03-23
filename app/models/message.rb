@@ -164,29 +164,7 @@ class Message
   end
 
   def self.by_stream(stream_id)
-    s = Stream.find(stream_id)
-    conditions = not_deleted
-    s.streamrules.each do |rule|
-      conditions = conditions.where(rule.to_condition)
-    end
-
-    # Plucky bug workaround. Same as in quickfilters.
-#    unless conditions[:message].blank?
-      # Make it search via $in so we can easily add the $nin next. It does not have a $in when there is just one message condition.
-#      conditions[:message] = { "$in" => [conditions[:message]] } if conditions[:message].is_a?(Regexp)
-
-#      terms = BlacklistedTerm.all_as_array
-#      conditions[:message]["$nin"] = terms unless terms.blank?
-#    end
-    # Plucky bug woraround END. (this sucks, but is okay for now. really fix after release.)
-
-    conditions
-  end
-
-  def self.all_of_stream stream_id, page = 1
-    page = 1 if page.blank?
-
-    by_stream(stream_id).default_scope.paginate(:page => page).all
+    not_deleted.where({:streams => stream_id})
   end
 
   def self.all_of_stream_since(stream_id, since)
