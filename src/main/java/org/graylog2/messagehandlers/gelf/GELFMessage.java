@@ -23,6 +23,7 @@ package org.graylog2.messagehandlers.gelf;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import org.bson.types.ObjectId;
 import org.graylog2.streams.Router;
 
 /**
@@ -44,7 +45,7 @@ public class GELFMessage {
     private int timestamp = 0;
     private String facility = null;
     private Map<String, String> additionalData = new HashMap<String, String>();
-    private List<Integer> streams = null;
+    private List<ObjectId> streams = null;
 
     private boolean filterOut = false;
 
@@ -251,11 +252,11 @@ public class GELFMessage {
     }
 
 
-    public void setStreams(List<Integer> streams) {
+    public void setStreams(List<ObjectId> streams) {
         this.streams = streams;
     }
 
-    public List<Integer> getStreams() {
+    public List<ObjectId> getStreams() {
         if (this.streams != null) {
             return this.streams;
         }
