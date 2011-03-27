@@ -21,6 +21,8 @@
 package org.graylog2;
 
 import java.io.BufferedWriter;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import org.graylog2.messagehandlers.syslog.SyslogServerThread;
 import org.graylog2.messagehandlers.gelf.GELFMainThread;
 import org.graylog2.messagehandlers.gelf.GELF;
@@ -38,6 +40,7 @@ import org.graylog2.periodical.ChunkedGELFClientManagerThread;
 import org.graylog2.periodical.HostCounterCacheWriterThread;
 import org.graylog2.periodical.ServerValueWriterThread;
 import org.graylog2.periodical.ThroughputWriterThread;
+import org.graylog2.streams.Stream;
 
 /**
  * Main class of Graylog2.

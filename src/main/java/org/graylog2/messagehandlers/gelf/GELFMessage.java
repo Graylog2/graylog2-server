@@ -21,7 +21,13 @@
 package org.graylog2.messagehandlers.gelf;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import org.bson.types.ObjectId;
+import org.graylog2.Log;
+import org.graylog2.streams.Router;
+import org.graylog2.streams.StreamRule;
+import org.graylog2.streams.matchers.StreamRuleMatcherIF;
 
 /**
  * GELFMessage.java: Jul 20, 2010 6:57:28 PM
@@ -42,6 +48,8 @@ public class GELFMessage {
     private int timestamp = 0;
     private String facility = null;
     private Map<String, String> additionalData = new HashMap<String, String>();
+    private List<ObjectId> streams = null;
+
     private boolean filterOut = false;
 
     /**
@@ -244,6 +252,28 @@ public class GELFMessage {
             return false;
         }
         return true;
+    }
+
+
+    public void setStreams(List<ObjectId> streams) {
+        this.streams = streams;
+    }
+
+    public List<ObjectId> getStreams() {
+        if (this.streams != null) {
+            return this.streams;
+        }
+
+        return Router.route(this);
+    }
+
+    public boolean matchStreamRule(StreamRuleMatcherIF matcher, StreamRule rule) {
+        try {
+            return matcher.match(this, rule);
+        } catch (Exception e) {
+            Log.warn("Could not match stream rule <" + rule.getRuleType() + "/" + rule.getValue() + ">: " + e.toString());
+            return false;
+        }
     }
 
     /**

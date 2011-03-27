@@ -80,7 +80,7 @@ public class SimpleGELFClientHandler extends GELFClientHandlerBase implements GE
         } else if(clientMessage instanceof String) {
             this.clientMessage = (String) clientMessage;
         } else if(clientMessage instanceof GELFMessage) {
-        	this.message = (GELFMessage) clientMessage;
+            this.message = (GELFMessage) clientMessage;
         }
         
     }
