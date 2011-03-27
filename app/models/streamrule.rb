@@ -1,7 +1,6 @@
 class Streamrule
   include Mongoid::Document
   
-  #belongs_to :stream
   embedded_in :stream, :inverse_of => :streamrules
 
   validates_presence_of :rule_type
@@ -28,23 +27,4 @@ class Streamrule
     }
   end
   
-  def to_condition(op = "$in")
-    case rule_type
-    when TYPE_MESSAGE then
-      return {:message => /#{value}/}
-    when TYPE_HOST then
-      return {:host => {op => [value]}}
-    when TYPE_SEVERITY then
-      return {:level => {op => [value.to_i]}}
-    when TYPE_FACILITY then
-      return {:facility => {op => [value.to_i]}}
-    when TYPE_TIMEFRAME then
-      return {:created_at => Message.get_conditions_from_date(value)}
-    when TYPE_ADDITIONAL then
-      parts = value.split("=")
-      return Hash.new if parts[0].blank? or parts[1].blank?
-      return {"_#{parts[0]}".to_sym => parts[1]}
-    end
-  end
-
 end
