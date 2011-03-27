@@ -1,12 +1,14 @@
 <h1>Settings of group <span class="highlighted"><%= @hostgroup.name %></span></h1>
 
 <h2>Rename group</h2>
-<%= form_tag "/hostgroups/rename/#{@hostgroup.id}" do %>
+<%= form_tag rename_hostgroup_path(@hostgroup) do %>
   <%= label_tag 'name', 'New name:' %>
   <%= text_field_tag 'name' %>
   <%= awesome_submit_link 'Rename' %>
 <% end %>
 <br />
 
+<% if permitted_to? :destroy, @hostgroup %>
 <h2>Delete group</h2>
-<%= link_to "Delete this hostgroup", { :action => "destroy", :id => @hostgroup.id }, :confirm => "Really delete this hostgroup?", :class => "bigger" %>
+<%= link_to "Delete this hostgroup", hostgroup_path(@hostgroup), :method => :delete, :confirm => "Really delete this hostgroup?", :class => "bigger" %>
+<% end %>

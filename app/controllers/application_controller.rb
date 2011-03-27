@@ -1,8 +1,10 @@
 class ApplicationController < ActionController::Base
   include AuthenticatedSystem
 
-  helper :all # include all helpers, all the time
+  clear_helpers
+#  helper :all # include all helpers, all the time
   protect_from_forgery # See ActionController::RequestForgeryProtection for details
+  helper Authorization::AuthorizationHelper
 
   before_filter :login_required
 
@@ -49,7 +51,8 @@ class ApplicationController < ActionController::Base
 
   def login_required
     if !logged_in?
-      redirect_to login_path #:controller => "sessions", :action => "new"
+      store_location
+      redirect_to login_path
     else
       return true
     end

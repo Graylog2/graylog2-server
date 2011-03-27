@@ -1,20 +1,32 @@
 class MessagesController < ApplicationController
   before_filter :set_scoping
-  filter_resource_access
+  #filter_resource_access
+  filter_access_to :all
   
-  rescue_from MongoMapper::DocumentNotFound, :with => :not_found
+  rescue_from Mongoid::Errors::DocumentNotFound, :with => :not_found
   rescue_from BSON::InvalidObjectId, :with => :not_found
   
+  protected
   def set_scoping
     if params[:host_id]
-      @scope = Message.where(:host => Base64.decode64(params[:host_id]))
+      @scope = Message.where(:host => params[:host_id])
+      @host = Host.find(:first, :conditions => {:host=> params[:host_id]})
+      @scoping = :host
     elsif params[:stream_id]
-      @scope = Message.by_stream(params[:stream_id])
+      @stream = Stream.find_by_id(params[:stream_id])
+      @scope = Message.by_stream(@stream.id)
+      @scoping = :stream
+    elsif params[:hostgroup_id]
+      @hostgroup = Hostgroup.find_by_id params[:hostgroup_id]
+      @scope = Message.all_of_hostgroup @hostgroup, params[:page]
+      @scoping = :hostgroup
     else
       @scope = Message
+      @scoping = :messages
     end
   end
   
+  public
   def index
     @has_sidebar = true
     @load_flot = true
@@ -29,16 +41,23 @@ class MessagesController < ApplicationController
       @additional_filters = Message.extract_additional_from_quickfilter(params[:filters])
       @messages = @scope.all_by_quickfilter params[:filters], params[:page]
     end
-    @total_count = Message.count_since(0)
+    #@total_count = Message.count_since(0)
+    @total_count = @scope.count
     @total_blacklisted_terms = BlacklistedTerm.count
+    @last_message = @scope.order_by(:created_at.desc).limit(1).first #last :order => "created_at DESC"
+    
+    if params[:stream_id]
+      @is_favorited = current_user.favorite_streams.include?(params[:stream_id])
+    end
   end
-
+  
   def show
     @has_sidebar = true
     @load_flot = true
 
     @comments = Messagecomment.all_matched(@message)
-
+    @message = @scope.where(:_id => BSON::ObjectId(params[:id])).all.first
+    
     if params[:partial]
       render :partial => "full_message"
       return
@@ -60,7 +79,7 @@ class MessagesController < ApplicationController
   end
 
   def around
-    @message = Message.find!(params[:id])
+    @message = @scope.find_by_id(params[:id])
     @has_sidebar = true
     @load_flot = true
     @nb = (params[:nb] || 100).to_i
@@ -68,8 +87,9 @@ class MessagesController < ApplicationController
     
     respond_to do |format|
       format.html 
-      format.text { 
-        send_data @messages.map(&:message).join("\n"), :type => "text/plain", :filename => "#{@id.to_s}-#{@nb}.log"  
+      format.text {
+        send_data render_to_string("messages/message_log.txt", :locals => {:messages => @messages}), :type => "text/plain", :filename => "#{@message.id.to_s}-#{@nb}.log"   
+        #send_data @messages.collect {|m| "#{m.created_at.to_s} #{m.host} #{m.facility} #{m.full_message}"}.join("\n"), :type => "text/plain", :filename => "#{@message.id.to_s}-#{@nb}.log"  
       }
     end
   end
@@ -128,5 +148,4 @@ class MessagesController < ApplicationController
     end
     render :js => { 'status' => 'success', 'payload' => Message.count_since(since) }.to_json
   end
-
 end

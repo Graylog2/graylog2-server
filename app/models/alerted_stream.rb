@@ -1,6 +1,8 @@
-class AlertedStream < ActiveRecord::Base
-  belongs_to :stream
-  belongs_to :user
+class AlertedStream
+  include Mongoid::Document
+  
+  referenced_in :user
+  referenced_in :stream
 
   JOB_TITLE = "streamalarm_check"
 

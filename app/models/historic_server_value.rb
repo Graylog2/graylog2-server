@@ -1,5 +1,5 @@
 class HistoricServerValue
-  include MongoMapper::Document
+  include Mongoid::Document
 
   key :type, String
   key :created_at, Integer

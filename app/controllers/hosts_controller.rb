@@ -5,7 +5,7 @@ class HostsController < ApplicationController
   filter_access_to :quickjump
   
   def index
-    @hosts = Host.all :order => "message_count DESC"
+    @hosts = Host.desc :message_count
     @hostgroups = Hostgroup.all
 
     @hosts_and_groups = @hosts | @hostgroups
@@ -13,24 +13,8 @@ class HostsController < ApplicationController
     @host_count = Host.count
   end
 
-  def show
-    @has_sidebar = true
-    @load_flot = true
-    
-    @host = Host.find_by_host Base64.decode64(params[:id])
-    @messages = Message.all_of_host @host.host, params[:page]
-    @total_count = @host.message_count
-
-    if @host.blank?
-      flash[:error] = "Could not find host!"
-      redirect_to :action => "index"
-    end
-
-    @last_message = Message.last :conditions => { "host" => @host.host }, :order => "created_at DESC"
-  end
-
   def destroy
-    host = Host.find_by_host Base64.decode64(params[:id])
+    host = Host.find_by_host params[:id]
     if host.blank?
       flash[:error] = "Could not delete host!"
       redirect_to :action => "index"
@@ -65,7 +49,7 @@ class HostsController < ApplicationController
       flash[:error] = "Unknown host"
       redirect_to :action => "index"
     else
-      redirect_to :action => "show", :id => Base64.encode64(params[:host].strip)
+      redirect_to :action => "show", :id => params[:host].strip
     end
   end
 end

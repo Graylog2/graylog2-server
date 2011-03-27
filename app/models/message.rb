@@ -1,5 +1,5 @@
 class Message
-  include MongoMapper::Document
+  include Mongoid::Document
 
   FIELDS = %w(message date host level facility deleted  gelf full_message type file line version timestamp created_at)
   SPECIAL_FIELDS = %w(_id)
@@ -33,9 +33,20 @@ class Message
   scope :of_blacklisted_terms, lambda { |terms| where(:message.in => terms.collect { |term| /#{term}/}) }
   scope :by_blacklist, lambda {|blacklist| by_blacklisted_terms(blacklist.all_terms)}
   scope :of_blacklist, lambda {|blacklist| of_blacklisted_terms(blacklist.all_terms)}
+  #scope :find_by_id, lambda {|_id| where(:_id => BSON::ObjectId(_id)).first }
   scope :page, lambda {|number| skip(self.get_offset(number))}
-  scope :default_scope, fields(:full_message => 0).order("$natural DESC").not_deleted.limit(LIMIT)
+  scope :default_scope, order_by({"$natural" => "-1"}).not_deleted.limit(LIMIT)
+#  scope :default_scope, fields(:full_message => 0).order("$natural DESC").not_deleted.limit(LIMIT)
+  scope :time_range, lambda {|from, to| where(:created_at => {"$gte" => from}).where(:created_at => {"$lte" => to})}
 
+  def self.find_by_id(_id)
+    where(:_id => BSON::ObjectId(_id)).first
+  end
+  
+  def timestamp
+    Time.at(created_at)
+  end
+  
   # Overwriting the message getter. This always applies the filtering of
   # filtered terms.
   def message
@@ -79,7 +90,7 @@ class Message
     page = 1 if page.blank?
     
     b = Blacklist.find(id)
-    return of_blacklist(b).default_scope.page(page).all
+    return of_blacklist(b).default_scope.paginate(:page => page)
   end
 
   def self.count_of_blacklist id
@@ -91,7 +102,7 @@ class Message
     page = 1 if page.blank?
     
     terms = Blacklist.all_terms
-    by_blacklisted_terms(terms).default_scope.page(page)
+    by_blacklisted_terms(terms).default_scope.paginate(:page => page)
   end
 
   def self.all_by_quickfilter filters, page = 1, limit = LIMIT, conditions_only = false
@@ -135,7 +146,7 @@ class Message
       end
     end
 
-    conditions.default_scope.limit(LIMIT).page(page)
+    conditions.default_scope.limit(LIMIT).paginate(:page => page)
   end
       
   def self.extract_additional_from_quickfilter(filters)
@@ -153,29 +164,7 @@ class Message
   end
 
   def self.by_stream(stream_id)
-    s = Stream.find(stream_id)
-    conditions = not_deleted
-    s.streamrules.each do |rule|
-      conditions = conditions.where(rule.to_condition)
-    end
-
-    # Plucky bug workaround. Same as in quickfilters.
-    unless conditions[:message].blank?
-      # Make it search via $in so we can easily add the $nin next. It does not have a $in when there is just one message condition.
-      conditions[:message] = { "$in" => [conditions[:message]] } if conditions[:message].is_a?(Regexp)
-
-      terms = BlacklistedTerm.all_as_array
-      conditions[:message]["$nin"] = terms unless terms.blank?
-    end
-    # Plucky bug woraround END. (this sucks, but is okay for now. really fix after release.)
-
-    conditions
-  end
-
-  def self.all_of_stream stream_id, page = 1
-    page = 1 if page.blank?
-
-    by_stream(stream_id).default_scope.page(page).all
+    not_deleted.where({:streams => stream_id})
   end
 
   def self.all_of_stream_since(stream_id, since)
@@ -189,24 +178,28 @@ class Message
   def self.all_of_stream_in_range(stream_id, page, from, to)
     page = 1 if page.blank?
     
-    by_stream(stream_id).default_scope.where(:created_at => {"$gte" => from}).where(:created_at => {"$lte" => to}).page(page)
+    #by_stream(stream_id).default_scope.where(:created_at => {"$gte" => from}).where(:created_at => {"$lte" => to}).paginate(:page => page)
+    by_stream(stream_id).default_scope.time_range(from, to).paginate(:page => page)
   end
 
   def self.all_in_range(page, from, to)
     page = 1 if page.blank?
     
     terms = Blacklist.all_terms
-    by_blacklisted_terms(terms).default_scope.where(:created_at => {"$gte" => from}).where(:created_at => {"$lte" => to}).page(page)
+    #by_blacklisted_terms(terms).default_scope.where(:created_at => {"$gte" => from}).where(:created_at => {"$lte" => to}).paginate(:page => page)
+    by_blacklisted_terms(terms).default_scope.time_range(from, to).paginate(:page => page)
   end
     
   def self.count_all_of_stream_in_range(stream_id, from, to)
     terms = Blacklist.all_terms
-    by_stream(stream_id).where(:created_at => {"$gte" => from}).where(:created_at => {"$lte" => to}).count
+    #by_stream(stream_id).where(:created_at => {"$gte" => from}).where(:created_at => {"$lte" => to}).count
+    by_stream(stream_id).time_range(from, to).count
   end
 
   def self.count_all_in_range(from, to)
     terms = Blacklist.all_terms
-    by_blacklisted_terms(terms).where(:created_at => {"$gte" => from}).where(:created_at => {"$lte" => to}).count
+    #by_blacklisted_terms(terms).where(:created_at => {"$gte" => from}).where(:created_at => {"$lte" => to}).count
+    by_blacklisted_terms(terms).time_range(from, to).count
   end
 
   def self.counts_of_last_minutes(minutes)
@@ -225,7 +218,7 @@ class Message
       if c == nil
         # Cache miss. Perform counting and add to cache.
         terms = Blacklist.all_terms
-        c = Message.by_blacklisted_terms(terms).where(:created_at => {"$gt" => t.to_i}).where(:created_at => {"$lt" => (t+60).to_i}).count
+        c = Message.by_blacklisted_terms(terms).time_range(t.to_i, (t+60).to_i).count
         Rails.cache.write(obj, c)
       end
 
@@ -253,7 +246,7 @@ class Message
       
       if c == nil
         # Cache miss. Perform counting and add to cache.
-        c = Message.by_stream(stream_id).where(:created_at => {"$gt" => t.to_i}).where(:created_at => {"$lt" => (t+60).to_i}).count
+        c = Message.by_stream(stream_id).time_range(t.to_i, (t+60).to_i).count
         Rails.cache.write(obj, c)
       end
 
@@ -265,13 +258,13 @@ class Message
 
   def self.all_of_host host, page
     page = 1 if page.blank?
-    where(:host => host).default_scope.page(page)
+    where(:host => host).default_scope.paginate(:page => page)
   end
   
   def self.all_of_hostgroup hostgroup, page
     page = 1 if page.blank?
 
-    return where(:host.in => hostgroup.all_conditions ).default_scope.page(page)
+    return where(:host.in => hostgroup.all_conditions ).default_scope #.paginate(:page => page)
   end
 
   def self.count_of_hostgroup hostgroup
@@ -335,9 +328,9 @@ class Message
     qry = self.attributes.dup.delete_if { |k,v| !opts["same_#{k}".to_sym] }
     nb = args.first || 100
     terms = Blacklist.all_terms
-    from = self.class.by_blacklisted_terms(terms).default_scope.where(qry.merge(:_id => { "$lte" => self.id })).order("$natural DESC").skip(nb).first
+    from = self.class.by_blacklisted_terms(terms).default_scope.where(qry.merge(:_id => { "$lte" => self.id })).order({"$natural" => "-1"}).skip(nb).first
     return nil unless from
-    res = self.class.by_blacklisted_terms(terms).default_scope.where(qry.merge(:_id => {"$gte" => from.id})).limit(1 + nb.to_i * 2).order("$natural ASC").to_a
+    res = self.class.by_blacklisted_terms(terms).default_scope.where(qry.merge(:_id => {"$gte" => from.id})).limit(1 + nb.to_i * 2).order({"$natural" => "1"}).to_a
     res.reverse! if opts[:order] == :desc
     res
   end
