@@ -25,6 +25,7 @@ import java.util.List;
 import org.bson.types.ObjectId;
 import org.graylog2.Log;
 import org.graylog2.messagehandlers.gelf.GELFMessage;
+import org.graylog2.streams.matchers.StreamRuleMatcherIF;
 
 /**
  * Router.java: Mar 16, 2011 9:40:24 PM
@@ -49,12 +50,17 @@ public class Router {
 
         for (Stream stream : streams) {
             boolean missed = false;
-            
-            Log.info("[router] Matching on " + stream.toString()); // TODO: REMOVE
-            Log.info("[router] Has " + stream.getStreamRules().size() + " rules."); // TODO: REMOVE
 
             for (StreamRule rule : stream.getStreamRules()) {
-                // break and set missed to true if a rule does not match.
+                try {
+                    StreamRuleMatcherIF matcher = StreamRuleMatcherFactory.build(rule.getRuleType());
+                    if (!msg.matchStreamRule(matcher, rule)) {
+                        missed = true;
+                        break;
+                    }
+                } catch (InvalidStreamRuleTypeException e) {
+                    Log.warn("Invalid stream rule type. Skipping matching for this rule. " + e.toString());
+                }
             }
 
             // All rules were matched.
