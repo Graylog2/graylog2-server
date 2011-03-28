@@ -32,13 +32,13 @@
 
   <ul>
   <% if @hostgroup.hostname_conditions.blank? and @hostgroup.regex_conditions.blank? %>
-    No rules in this group.
+  ^  No rules in this group.
   <% else %>
     <% @hostgroup.hostname_conditions(true).each do |rule| %>
-      <li>Host: <%= link_to rule[:value], :controller => "hostgroup_hosts", :action => "destroy", :id => rule[:id], :group_id => @hostgroup.id %></li>
+      <li>Host: <%= link_to rule[:value], { :controller => "hostgroup_hosts", :action => "destroy", :id => rule[:id], :group_id => @hostgroup.id }, :method => :delete %></li>
     <% end %>
     <% @hostgroup.regex_conditions(true).each do |rule| %>
-      <li>Regex: <%= link_to rule[:value].source, :controller => "hostgroup_hosts", :action => "destroy", :id => rule[:id], :group_id => @hostgroup.id %></li>
+      <li>Regex: <%= link_to rule[:value], { :controller => "hostgroup_hosts", :action => "destroy", :id => rule[:id], :group_id => @hostgroup.id }, :method => :delete %></li>
     <% end %>
   <% end %>
   </ul>
@@ -119,7 +119,7 @@
       }  
   });
 
-  $.post("<%= visuals_path("hostgrouprelation", :group => @hostgroup) %>", function(data) {
+  $.post("<%= visuals_path("hostgrouprelation", :group => @hostgroup.id) %>", function(data) {
     json = eval('(' + data + ')');
     rgraph.loadJSON(json.data);  
     

@@ -2,13 +2,13 @@ class Hostgroup
   
   include Mongoid::Document
   
-  embeds_many :hostgroup_hosts do
+  references_many :hostgroup_hosts do
     def simple
       @target.select { |host| host.simple? }
     end
     
     def regex
-      @target.select { |hosts| host.regex? }
+      @target.select { |host| host.regex? }
     end
   end
 

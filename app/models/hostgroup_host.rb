@@ -5,8 +5,8 @@ class HostgroupHost
   
   embedded_in :hostgroup
   
-  field :ruletype
-  field :hostname
+  field :ruletype, :type => Integer
+  field :hostname, :type => String
 
   TYPE_SIMPLE = 0
   TYPE_REGEX = 1

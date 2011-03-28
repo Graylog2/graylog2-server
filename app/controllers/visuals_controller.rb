@@ -82,7 +82,7 @@ class VisualsController < ApplicationController
   end
 
   def calculate_hostgrouprelation(all_hosts, group_id)
-    group = Hostgroup.find(group_id)
+    group = Hostgroup.find(BSON::ObjectId(group_id))
     values = Array.new
 
     # Add hostname conditions
@@ -98,7 +98,7 @@ class VisualsController < ApplicationController
     regexes = group.regex_conditions(true)
     regexes.each do |regex|
       # Get machtching hosts.
-      hosts = Host.all :conditions => { :host.in => regex }
+      hosts = Host.all :conditions => { :host => /#{regex[:value]}/ }
       children = Array.new
       hosts.each do |host|
         children << {
@@ -109,7 +109,7 @@ class VisualsController < ApplicationController
 
       values << {
         "id" => escape(regex[:id]),
-        "name" => "Regex: #{escape(regex[:value].source)}",
+        "name" => "Regex: #{escape(regex[:value])}",
         "children" => children
       }
     end

@@ -18,7 +18,7 @@ class HostgroupHostsController < ApplicationController
       end
 
       # Check if that host is already in the hostgroup.
-      if HostgroupHost.exists?(:conditions => { "hostname" => params[:new_host][:hostname], "hostgroup_id" => params[:new_host][:hostgroup_id] })
+      if HostgroupHost.exists?(:conditions => { "hostname" => params[:new_host][:hostname], "hostgroup_id" => BSON::ObjectId.from_string(params[:new_host][:hostgroup_id]) })
         flash[:error] = "Host already in group."
         back_to_hostgroup params[:new_host][:hostgroup_id]
         return
@@ -26,6 +26,7 @@ class HostgroupHostsController < ApplicationController
     end
 
     host = HostgroupHost.new params[:new_host]
+    host["hostgroup_id"] = BSON::ObjectId.from_string(params[:new_host][:hostgroup_id])
     if host.save
       flash[:notice] = "Added to hostgroup."
     else
