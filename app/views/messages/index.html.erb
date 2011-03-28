@@ -1,5 +1,5 @@
 <% content_for :sidebar do %>
-  <%= render :partial => "sidebar_index", :locals => { :headline => "Welcome, <span class=\"highlighted\">#{current_user.name}</span>!" } %>
+  <%= render :partial => "sidebar_index", :locals => { :headline => "Welcome, <span class=\"highlighted\">#{current_user.display_name}</span>!" } %>
 <% end %>
 
 <%= javascript_include_tag 'messageupdater' %>
