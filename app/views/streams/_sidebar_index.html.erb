@@ -65,7 +65,7 @@
 </ul>
 
 <br />
-<% if @stream.subscribers.any? %>
+<% unless @stream.subscribers.nil? %>
 <h3>
   Last run of subscription check:
   <span class="highlighted">

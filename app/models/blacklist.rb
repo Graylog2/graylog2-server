@@ -1,7 +1,15 @@
-class Blacklist < ActiveRecord::Base
-  has_many :blacklisted_terms
+class Blacklist
+  include Mongoid::Document
+  
+  embeds_many :blacklisted_terms
+  
+  field :title, :type => String
 
   validates_presence_of :title
+  
+  def self.find_by_id(_id)
+    first(:conditions => {:_id => BSON::ObjectId(_id)})
+  end
   
   def self.all_terms
     self.all.collect {|b|

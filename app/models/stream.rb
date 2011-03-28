@@ -1,32 +1,53 @@
-class Stream < ActiveRecord::Base
-  has_many :streamrules, :dependent => :destroy
-  has_and_belongs_to_many :favoritedStreams, :join_table => "favorite_streams", :class_name => "User"
-  has_and_belongs_to_many :users
-  #has_many :subscribedStreams, :dependent => :destroy
-  has_many :alertedStreams, :dependent => :destroy
-  has_and_belongs_to_many :subscribers, :join_table => "subscribed_streams", :class_name => "User"
+class Stream
+  include Mongoid::Document
+  include Mongoid::Timestamps
 
-  belongs_to :streamcategory
+  #has_many :streamrules, :dependent => :destroy
+  embeds_many :streamrules
+  
+  #has_and_belongs_to_many :favoritedStreams, :join_table => "favorite_streams", :class_name => "User"
+  references_and_referenced_in_many :favoritedStreams, :class_name => "User", :inverse_of => :favorite_streams
+  
+  #has_and_belongs_to_many :users
+  references_and_referenced_in_many :users, :inverse_of => :streams
+  
+  #has_many :subscribedStreams, :dependent => :destroy
+  #has_many :alertedStreams, :dependent => :destroy
+  #has_and_belongs_to_many :subscribers, :join_table => "subscribed_streams", :class_name => "User"
+  references_and_referenced_in_many :subscribers, :class_name => "User", :inverse_of => :subscribed_streams
+
+  #belongs_to :streamcategory
+  referenced_in :streamcategory
 
   validates_presence_of :title
-
   validates_numericality_of :alarm_limit, :allow_nil => true
   validates_numericality_of :alarm_timespan, :allow_nil => true, :greater_than => 0
+  
+  field :title, :type => String
+  field :alarm_limit, :type => Integer
+  field :alarm_timespan, :type => Integer
+  field :description, :type => Integer
+  field :alarm_active, :type => Boolean
+  field :created_at, :type => DateTime
+  field :updated_at, :type => DateTime
+  field :alarm_force, :type => Boolean
+  field :last_subscription_check, :type => Integer
 
-  def alerted?(user_id)
-    AlertedStream.alerted?(self.id, user_id)
+  def self.find_by_id(_id)
+    _id = $1 if /^([0-9a-f]+)-/ =~ _id
+    first(:conditions => { :_id => BSON::ObjectId(_id)})
+  end
+
+  def alerted?(user)
+    AlertedStream.alerted?(self.id, user.id)
   end
 
   def subscribed?(user)
-    if user.is_a?(User)
-      subscribers.include?(user)
-    else
-      subscriber_ids.include? user
-    end
+    !subscribers.nil? and subscribes.include?(user)
   end
 
   def favorited?(user_id)
-    favoritedStreams.include? user_id
+    !favoritedStreams.nil? and favoritedStreams.include? user_id
   end
   
   def to_param
@@ -67,9 +88,7 @@ class Stream < ActiveRecord::Base
 
   def self.message_count_since(stream_id, since)
     return 0 if Stream.find(stream_id).streamrules.blank?
-    conditions = Message.by_stream(stream_id).criteria
-    conditions[:created_at] = { "$gte" => since.to_i }
-    return Message.count(:conditions => conditions)
+    Message.by_stream(stream_id).where(:created_at.gt => since.to_i).count
   end
 
   def self.get_distinct_hosts(stream_id)

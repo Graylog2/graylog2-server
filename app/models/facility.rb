@@ -1,5 +1,9 @@
-class Facility < ActiveRecord::Base
-
+class Facility
+  include Mongoid::Document
+  
+  field :number, :type => Integer
+  field :title, :type => String
+  
   validates_presence_of :number
   validates_presence_of :title
   validates_numericality_of :number

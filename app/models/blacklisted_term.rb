@@ -1,8 +1,11 @@
-class BlacklistedTerm < ActiveRecord::Base
-  belongs_to :blacklist
+class BlacklistedTerm
+  include Mongoid::Document
+  
+  embedded_in :blacklist
 
+  field :term, :type => String
+  
   validates_presence_of :term
-  validates_presence_of :blacklist_id
 
   def self.all_as_array
     self.all.collect { |t| /#{t.term}/ }

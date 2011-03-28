@@ -1,0 +1,24 @@
+<h1>Stream <span class="highlighted"><%= @stream.title %></span></h1>
+
+<div id="streams-description">
+  <span id="streams-description-text">
+    <% if @stream.description.blank? %>
+      <span id="streams-set-description-link" class="stream-description-change">
+        Click to set description.
+      </span>
+    <% else %>
+      <%= @stream.description %>
+      <span id="streams-edit-description-link" class="stream-description-change">
+        Click to edit description.
+      </span>
+    <% end %>
+  </span>
+
+  <div id="streams-set-description" style="display: none;">
+    <%= form_tag setdescription_stream_path(@stream) do %>
+      <%= label_tag :description, "Description:" %>
+      <%= text_field_tag :description, @stream.description, :id => "streams-set-description-input" %>
+      <%= submit_tag "Set" %>
+    <% end %>
+  </div>
+</div>

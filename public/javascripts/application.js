@@ -192,7 +192,7 @@ $(document).ready(function(){
     $(".message-row").bind("click", function() {
       $("#gln").show();
 
-      $.post("/messages/show/" + $(this).attr("id") + "?partial=true", function(data) {
+      $.post("/messages/" + $(this).attr("id") + "?partial=true", function(data) {
         $("#sidebar-inner").html(data);
 
         // Show sidebar if hidden.

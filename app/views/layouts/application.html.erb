@@ -69,7 +69,6 @@
       <% permitted_to? :index, :users do %><%=raw menu_item("Users", users_path) %><% end %>
     </ul>
 
-    <% message_count_interval = Setting.get_message_count_interval(current_user) %>
     <div id="new-message-count">
       <% unless @hide_stats %>
         <strong><%= Message.count_of_last_minutes(message_count_interval) %></strong> / <%=h message_count_interval %> minutes
@@ -81,20 +80,18 @@
   <div id="new-messages-bar" style="display: none;"></div>
 
   <div id="content-top">
-  <% unless @tabs.blank? %>
     <div id="content-tabs">
-    <% @tabs.each do |tab| %>
-      <% permitted_to?(tab.downcase.to_sym, @stream) do %>
-        <%=raw tab_link(tab) %> 
-      <% end %>
-    <% end %>
+	<% tabs.each do |tab| %>
+	  <%= raw tab_link(tab)%>
+	<% end %>
       <br style="clear: both;" />
     </div>
-  <% end %>
   </div>
 
-  <%=raw "<div id='main-left'>" if @has_sidebar %>
-
+ <% if @has_sidebar %>
+  <div id='main-left'>
+ <% end %>
+ 
   <div id="content" <%=raw @content_class.blank? ? '' : 'class="content-' + @content_class + '"' %>>
     <div id="content-inner">
       <%= yield %>

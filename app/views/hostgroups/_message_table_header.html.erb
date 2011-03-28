@@ -1,0 +1,7 @@
+<h1>Hostgroup <span class="highlighted"><%=h @hostgroup.name %></span></h1>
+
+<% if @messages.blank? %>
+  No messages found.
+<% else %>
+  Messages from <span class="highlighted"><%= gl_date(Time.at(@last_message.created_at).to_s) %></span> available for this hostgroup.
+<% end %>

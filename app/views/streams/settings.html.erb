@@ -53,7 +53,7 @@ of the alarm. You can also define that all users are alarmed, no matter what the
 <% end %>
 <br />
   
-<%= awesome_link "Delete all messages hit by this stream", { :controller => "messages", :action => "deletebystream", :stream_id => @stream.id }, :confirm => "Really delete the messages?", :method => :post %>
+<%= awesome_link "Delete all messages hit by this stream", deletebystream_stream_path(@stream), :confirm => "Really delete the messages?", :method => :post %>
 <br /><br />
 
 <%= awesome_link "Delete this stream", stream_path(@stream.id), :confirm => "Really delete this stream?", :method => :delete %>

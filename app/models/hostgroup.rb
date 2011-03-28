@@ -1,50 +1,56 @@
-class Hostgroup < ActiveRecord::Base
-  has_many :hostgroup_hosts, :dependent => :delete_all
+class Hostgroup
+  
+  include Mongoid::Document
+  
+  embeds_many :hostgroup_hosts do
+    def simple
+      @target.select { |host| host.simple? }
+    end
+    
+    def regex
+      @target.select { |hosts| host.regex? }
+    end
+  end
 
   validates_presence_of :name
+  
+  field :name, :type => String
+  
+  def self.find_by_id(_id)
+    _id = $1 if /^([0-9a-f]+)-/ =~ _id
+    first(:conditions => {:_id => BSON::ObjectId(_id)});
+  end
 
   def all_conditions
     hostname_conditions | regex_conditions
   end
 
   def hostname_conditions(with_id = false)
-    fetch_payload(HostgroupHost::TYPE_SIMPLE, with_id)
+    fetch_payload(:simple, with_id)
   end
 
   def regex_conditions(with_id = false)
-    fetch_payload(HostgroupHost::TYPE_REGEX, with_id)
+    fetch_payload(:regex, with_id)
+  end
+
+  def to_param
+    name.nil? ? "#{id}" : "#{id}-#{name.parameterize}"
   end
 
   private
 
   def fetch_payload(type, with_id = false)
-    p = Array.new
-
-    self.hostgroup_hosts.each do |hostdescription|
-      next if hostdescription.ruletype != type
-
-      # Skip if host does not exist anymore.
-      if type == HostgroupHost::TYPE_SIMPLE
-        host = Host.find_by_host hostdescription.hostname
-        next if host.blank?
-      end
-
-      case type
-        when HostgroupHost::TYPE_SIMPLE then
-          if with_id
-            p << { :id => hostdescription.id, :value => hostdescription.hostname }
-          else
-            p << hostdescription.hostname
-          end
-        when HostgroupHost::TYPE_REGEX then
-          if with_id
-            p << { :id => hostdescription.id, :value => /#{hostdescription.hostname}/ }
-          else
-            p << /#{hostdescription.hostname}/ 
-          end
-      end
+    case type
+    when :simple then
+      hosts = hostgroup_hosts.simple
+    when :regex then
+      hosts = hostgroup_hosts.regex
     end
     
-    return p
-end
+    if with_id then
+      hosts.collect {|host| {:id => host.id, :value => host.hostname}}
+    else
+      hosts.collect &:to_condition
+    end
+  end
 end
