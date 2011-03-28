@@ -3,7 +3,7 @@ class HostgroupHostsController < ApplicationController
 
   def create
     # Check if hostgroup exists.
-    if Hostgroup.count(:conditions => { :id => params[:new_host][:hostgroup_id] }) == 0
+    if !Hostgroup.exists?(:conditions => { "_id" => BSON::ObjectId.from_string(params[:new_host][:hostgroup_id]) })
       flash[:error] = "Group does not exist."
       redirect_to hosts_path
       return
@@ -11,14 +11,14 @@ class HostgroupHostsController < ApplicationController
 
     if params[:new_host][:ruletype].to_i == HostgroupHost::TYPE_SIMPLE
       # Check if that host exists.
-      if Host.find_by_host(params[:new_host][:hostname]).blank?
+      if !Host.exists?(:conditions => { "host" => params[:new_host][:hostname] })
         flash[:error] = "Host does not exist!"
         back_to_hostgroup params[:new_host][:hostgroup_id]
         return
       end
 
       # Check if that host is already in the hostgroup.
-      unless HostgroupHost.find_by_hostname_and_hostgroup_id(params[:new_host][:hostname], params[:new_host][:hostgroup_id]).blank?
+      if HostgroupHost.exists?(:conditions => { "hostname" => params[:new_host][:hostname], "hostgroup_id" => params[:new_host][:hostgroup_id] })
         flash[:error] = "Host already in group."
         back_to_hostgroup params[:new_host][:hostgroup_id]
         return

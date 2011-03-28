@@ -3,6 +3,8 @@ class Streamcategory
 
   references_many :streams
 
-  validates_presence_of :title
+  validates_presence_of :title 
+
+  field :title, :type => String 
 
 end

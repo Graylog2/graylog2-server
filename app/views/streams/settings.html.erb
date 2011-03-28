@@ -42,7 +42,13 @@ of the alarm. You can also define that all users are alarmed, no matter what the
       (options_from_collection_for_select(Streamcategory.all, "id", "title", 0) + raw("<option value='0' selected='selected'>Uncategorized</option>"))) %>
   <%= submit_tag 'Set category' %>
 <% end %>
-<br />
+
+<% if @stream.streamcategory.blank? %>
+  Currently in no category.
+<% else %>
+  Currently in category <span class="highlighted"><%= @stream.streamcategory.title %></span>.
+<% end %>
+<br /><br />
 
 <h2>Rename stream</h2>
 <%= form_tag rename_stream_path(:stream_id => @stream) do %>

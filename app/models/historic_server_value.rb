@@ -10,7 +10,7 @@ class HistoricServerValue
 
   private
   def self.get(what, minutes)
-    self.all(:conditions => { :type => what }, :order => "$natural DESC", :limit => minutes).collect { |v| [v.created_at*1000, (v.value/1024/1024).to_i] }
+    self.all(:conditions => { :type => what }, :sort => ["$natural", "descending"], :limit => minutes).collect { |v| [v.created_at*1000, (v.value/1024/1024).to_i] }
   end
 
 end

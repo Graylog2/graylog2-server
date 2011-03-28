@@ -3,7 +3,7 @@ Graylog2WebInterface::Application.routes.draw do
   match 'login' => 'sessions#new', :as => :login
   resource :session
   resources :settings, :dashboard
-
+  
   resources :users do
     collection do
       post :createfirst
@@ -40,6 +40,8 @@ Graylog2WebInterface::Application.routes.draw do
       post :rename
     end
   end
+
+  resources :hostgroup_hosts
 
   resources :facilities do
     member do
@@ -111,10 +113,15 @@ Graylog2WebInterface::Application.routes.draw do
 
   resources :filteredterms
   
-  resource :health
   resources :visuals, :constraints => {:id => /[a-z]+/} do
     member do
       post :fetch
+    end
+  end
+  
+  resources :health do
+    collection do
+      post :currentthroughput
     end
   end
 

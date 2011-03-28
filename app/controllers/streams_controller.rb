@@ -21,7 +21,11 @@ class StreamsController < ApplicationController
 
     # Sort streams in own array if they have no category. Done here to avoid confusion
     # in reader/admin rights decision above
-    @all_streams.each { |stream| (stream.streamcategory_id.blank? or stream.streamcategory_id == 0 or !Streamcategory.exists?(stream.streamcategory_id)) ? @streams_with_no_category << stream : nil }
+    @all_streams.each do |stream|
+      if (stream.streamcategory_id.blank? or stream.streamcategory_id == 0 or !Streamcategory.exists?(:conditions => {"_id" => stream.streamcategory_id}))
+        @streams_with_no_category << stream
+      end
+    end
   end
 
   def showrange
@@ -144,8 +148,14 @@ class StreamsController < ApplicationController
   # This should now really be changed to /update soon.
   def categorize
     @stream = Stream.find_by_id params[:stream_id]
-    @stream.streamcategory_id = params[:streamcategory_id]
-    
+
+    if params[:streamcategory_id] == "0"
+      # Reset to "no category".
+      @stream.streamcategory_id = nil
+    else
+      @stream.streamcategory_id = params[:streamcategory_id]
+    end
+
     if @stream.save
       flash[:notice] = "Stream has been categorized."
     else

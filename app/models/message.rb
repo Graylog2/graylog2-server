@@ -29,7 +29,7 @@ class Message
     scope :not_deleted, Hash.new
   end
 
-  scope :by_blacklisted_terms, lambda { |terms| where(:message.nin => terms.collect { |term| /#{term}/}) }
+  scope :by_blacklisted_terms, lambda { |terms| terms.blank? ? where : where(:message.nin => terms.collect { |term| /#{term}/}) }
   scope :of_blacklisted_terms, lambda { |terms| where(:message.in => terms.collect { |term| /#{term}/}) }
   scope :by_blacklist, lambda {|blacklist| by_blacklisted_terms(blacklist.all_terms)}
   scope :of_blacklist, lambda {|blacklist| of_blacklisted_terms(blacklist.all_terms)}
