@@ -76,6 +76,10 @@ class User
   def login=(value)
     write_attribute :login, (value ? value.downcase : nil)
   end
+  
+  def display_name
+    self.name.blank? ? self.login : self.name
+  end
 
   def email=(value)
     write_attribute :email, (value ? value.downcase : nil)
