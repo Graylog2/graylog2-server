@@ -17,7 +17,6 @@ class HostgroupsController < ApplicationController
 
     @messages = Message.all_of_hostgroup @hostgroup, params[:page]
     @total_count = Message.count_of_hostgroup @hostgroup
-    @last_message = Message.where(:host.in => @hostgroup.all_conditions).order_by(:created_at.desc).limit(1) #Message.last :conditions => { "host" => { "$in" => @hostgroup.all_conditions } }, :order => "created_at DESC"
   end
 
   def hosts
