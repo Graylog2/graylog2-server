@@ -69,10 +69,7 @@ public class MongoBridge {
         }
 
         coll.ensureIndex(new BasicDBObject("created_at", 1));
-        coll.ensureIndex(new BasicDBObject("deleted", 1));
         coll.ensureIndex(new BasicDBObject("host", 1));
-        coll.ensureIndex(new BasicDBObject("facility", 1));
-        coll.ensureIndex(new BasicDBObject("level", 1));
         coll.ensureIndex(new BasicDBObject("streams", 1));
 
         return coll;

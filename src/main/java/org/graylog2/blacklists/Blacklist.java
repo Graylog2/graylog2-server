@@ -54,9 +54,9 @@ public class Blacklist {
     }
 
     public static ArrayList<Blacklist> fetchAll() throws Exception {
-        /*if (StreamCache.getInstance().valid()) {
-            return StreamCache.getInstance().get();
-        }*/
+        if (BlacklistCache.getInstance().valid()) {
+            return BlacklistCache.getInstance().get();
+        }
 
         ArrayList<Blacklist> blacklists = new ArrayList<Blacklist>();
 
@@ -71,7 +71,7 @@ public class Blacklist {
             }
         }
 
-        //StreamCache.getInstance().set(streams);
+        BlacklistCache.getInstance().set(blacklists);
 
         return blacklists;
     }

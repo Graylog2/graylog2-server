@@ -26,6 +26,7 @@ import java.net.DatagramPacket;
 import java.util.zip.DataFormatException;
 import org.graylog2.Log;
 import org.graylog2.Tools;
+import org.graylog2.blacklists.Blacklist;
 import org.graylog2.database.MongoBridge;
 import org.graylog2.messagehandlers.common.HostUpsertHook;
 import org.graylog2.messagehandlers.common.MessageCounterHook;
@@ -105,9 +106,13 @@ public class SimpleGELFClientHandler extends GELFClientHandlerBase implements GE
                 this.message.addAdditionalData("_amqp_queue", this.getAmqpReceiverQueue());
             }
 
-
             // Log if we are in debug mode.
             Log.info("Got GELF message: " + this.message.toString());
+
+            // Blacklisted?
+            if (this.message.blacklisted(Blacklist.fetchAll())) {
+                return true;
+            }
 
             // Insert message into MongoDB.
             ReceiveHookManager.preProcess(new MessageParserHook(), message);

@@ -1,5 +1,5 @@
 /**
- * Copyright 2010 Lennart Koopmann <lennart@socketfeed.com>
+ * Copyright 2010, 2011 Lennart Koopmann <lennart@socketfeed.com>
  *
  * This file is part of Graylog2.
  *
@@ -25,6 +25,8 @@ import java.util.List;
 import java.util.Map;
 import org.bson.types.ObjectId;
 import org.graylog2.Log;
+import org.graylog2.blacklists.Blacklist;
+import org.graylog2.blacklists.BlacklistRule;
 import org.graylog2.streams.Router;
 import org.graylog2.streams.StreamRule;
 import org.graylog2.streams.matchers.StreamRuleMatcherIF;
@@ -274,6 +276,20 @@ public class GELFMessage {
             Log.warn("Could not match stream rule <" + rule.getRuleType() + "/" + rule.getValue() + ">: " + e.toString());
             return false;
         }
+    }
+
+    public boolean blacklisted(List<Blacklist> blacklists) {
+        for (Blacklist blacklist : blacklists) {
+            for (BlacklistRule rule : blacklist.getRules()) {
+                if (this.getShortMessage().matches(rule.getTerm())) {
+                    Log.info("Message <" + this.toString() + "> is blacklisted. First match on " + rule.getTerm());
+                    return true;
+                }
+            }
+        }
+
+        // No rule hit.
+        return false;
     }
 
     /**
