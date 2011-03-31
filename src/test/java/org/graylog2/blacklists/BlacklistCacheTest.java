@@ -20,32 +20,28 @@
 
 package org.graylog2.blacklists;
 
-import com.mongodb.DBObject;
-import org.bson.types.ObjectId;
+import java.util.ArrayList;
+import org.junit.Test;
+import static org.junit.Assert.*;
 
-/**
- * BlacklistRule.java: Mar 30, 2011 10:26:22 PM
- *
- * Representing rule of a blacklist.
- *
- * @author: Lennart Koopmann <lennart@socketfeed.com>
- */
-public class BlacklistRule {
+public class BlacklistCacheTest {
 
-    private ObjectId id = null;
-    private String term = null;
+    @Test
+    public void testGetInstance() {
+        // First call should create instance.
+        assertNotNull(BlacklistCache.getInstance());
 
-    public BlacklistRule(DBObject blacklistRule) {
-        this.id = (ObjectId) blacklistRule.get("_id");
-        this.term = (String) blacklistRule.get("term");
+        // Second call should give back formerly created instance.
+        assertNotNull(BlacklistCache.getInstance());
     }
 
-    public String getTerm() {
-        return this.term;
+    @Test
+    public void testSetAndGet() {
+        BlacklistCache.getInstance().set(new ArrayList<Blacklist>());
+        BlacklistCache.getInstance().get();
+        assertTrue(BlacklistCache.getInstance().valid());
     }
 
-    public ObjectId getId() {
-        return this.id;
-    }
+
 
 }
