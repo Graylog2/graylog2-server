@@ -17,40 +17,43 @@
  * along with Graylog2.  If not, see <http://www.gnu.org/licenses/>.
  *
  */
-
-package org.graylog2.streams;
-
-import java.util.ArrayList;
-import org.graylog2.SimpleObjectCache;
+package org.graylog2;
 
 /**
- * StreamCache.java: Mar 26, 2011 11:25:41 PM
+ * SimpleObjectCache.java: Apr 1, 2011 4:54:25 PM
  *
- * Singleton caching the already fetched streams.
+ * Singleton caching objects. Derive from this like StreamCache and
+ * BlacklistCache.
  *
  * @author: Lennart Koopmann <lennart@socketfeed.com>
  */
-public class StreamCache extends SimpleObjectCache {
+public class SimpleObjectCache {
 
-    private static StreamCache instance;
+    public static final int STANDARD_TIMEOUT_SECONDS = 5;
 
-    private StreamCache() { }
+    protected int timeoutSeconds = STANDARD_TIMEOUT_SECONDS;
+    private int lastSet = 0;
 
-    public synchronized static StreamCache getInstance() {
-        if (instance == null) {
-            instance = new StreamCache();
+    private Object subject = null;
+
+    protected SimpleObjectCache() { }
+
+    protected void set(Object what) {
+        this.subject = what;
+        this.lastSet = Tools.getUTCTimestamp();
+    }
+
+    protected Object get() {
+        return subject;
+    }
+
+    public boolean valid() {
+        // For the first request.
+        if (this.lastSet == 0) {
+            return false;
         }
-        
-        return instance;
-    }
 
-    @Override
-    public ArrayList<Stream> get() {
-        return (ArrayList<Stream>) super.get();
-    }
-
-    public void set(ArrayList<Stream> streams) {
-        super.set(streams);
+        return this.lastSet >= (Tools.getUTCTimestamp()-timeoutSeconds);
     }
 
 }
