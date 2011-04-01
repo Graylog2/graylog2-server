@@ -84,9 +84,11 @@ public class Stream {
         ArrayList<StreamRule> rules = new ArrayList<StreamRule>();
 
         BasicDBList rawRules = (BasicDBList) this.mongoObject.get("streamrules");
-        for (Object ruleObj : rawRules) {
-            StreamRule rule = new StreamRule((DBObject) ruleObj);
-            rules.add(rule);
+        if (rawRules != null && rawRules.size() > 0) {
+            for (Object ruleObj : rawRules) {
+                StreamRule rule = new StreamRule((DBObject) ruleObj);
+                rules.add(rule);
+            }
         }
 
         this.streamRules = rules;

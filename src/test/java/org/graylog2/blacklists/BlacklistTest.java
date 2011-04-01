@@ -71,9 +71,8 @@ public class BlacklistTest {
     @Test
     public void testGetStreamRulesWithBlacklistThatHasNoRules() {
         BasicDBObject mongoList = this.buildMongoBlacklist();
-        BasicDBList rules = new BasicDBList();
 
-        mongoList.put("blacklisted_terms", rules);
+        mongoList.put("blacklisted_terms", null);
 
         Blacklist blacklist = new Blacklist(mongoList);
 

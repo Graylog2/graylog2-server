@@ -67,6 +67,18 @@ public class StreamTest {
     }
 
     @Test
+    public void testGetStreamRulesWithStreamThatHasNoRules() {
+        BasicDBObject mongo = this.buildMongoStream();
+        mongo.put("streamrules", null);
+
+        Stream stream = new Stream(mongo);
+
+        assertEquals(0, stream.getStreamRules().size());
+
+        // All is fine if there are no exceptions thrown and we get here.
+    }
+
+    @Test
     public void testGetId() {
         BasicDBObject mongo = this.buildMongoStream();
         Stream stream = new Stream(mongo);
