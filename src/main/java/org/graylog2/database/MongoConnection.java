@@ -70,6 +70,7 @@ public final class MongoConnection {
         try {
             MongoOptions options = new MongoOptions();
             options.connectionsPerHost = Configuration.getMaximumMongoDBConnections(Main.masterConfig);
+            options.threadsAllowedToBlockForConnectionMultiplier = Configuration.getThreadsAllowedToBlockMultiplier(Main.masterConfig);
 
             // Connect to replica servers if given. Else the standard way to one server.
             if (replicaServers != null && replicaServers.size() > 0) {

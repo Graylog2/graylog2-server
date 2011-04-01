@@ -85,6 +85,20 @@ public class Configuration {
         return 1000;
     }
 
+
+    public static int getThreadsAllowedToBlockMultiplier(Properties config) {
+        String val = config.getProperty("mongodb_threads_allowed_to_block_multiplier");
+        if (val != null) {
+            int res = Integer.parseInt(val);
+            if (res > 0) {
+                return res;
+            }
+        }
+
+        // Default value.
+        return 5;
+    }
+
     static List<AMQPSubscribedQueue> getAMQPSubscribedQueues(Properties config) {
         List<AMQPSubscribedQueue> queueList = new ArrayList<AMQPSubscribedQueue>();
 
