@@ -20,8 +20,11 @@
 
 package org.graylog2.database;
 
+import com.mongodb.BasicDBObject;
+import com.mongodb.BasicDBObjectBuilder;
 import com.mongodb.Mongo;
 import com.mongodb.DB;
+import com.mongodb.DBCollection;
 import com.mongodb.MongoException;
 import com.mongodb.MongoOptions;
 import com.mongodb.ServerAddress;
@@ -41,6 +44,9 @@ public final class MongoConnection {
 
     private Mongo m = null;
     private DB db = null;
+
+    private DBCollection messagesCollection = null;
+    private DBCollection historicServerValuesCollection = null;
 
     private MongoConnection() {}
 
@@ -108,4 +114,66 @@ public final class MongoConnection {
     public DB getDatabase() {
         return db;
     }
+
+    /**
+     * Get the messages collection. Lazily creates a new, capped one based on the
+     * messages_collection_size from graylog2.conf if there is none.
+     *
+     * @return The messages collection
+     */
+    public DBCollection getMessagesColl() {
+        if (this.messagesCollection != null) {
+            return this.messagesCollection;
+        }
+
+        // Collection has not been cached yet. Do it now.
+        DBCollection coll = null;
+
+        // Create a capped collection if the collection does not yet exist.
+        if(MongoConnection.getInstance().getDatabase().collectionExists("messages")) {
+            coll = MongoConnection.getInstance().getDatabase().getCollection("messages");
+        } else {
+            long messagesCollSize = Long.parseLong(Main.masterConfig.getProperty("messages_collection_size").trim());
+            coll = MongoConnection.getInstance()
+                    .getDatabase()
+                    .createCollection("messages", BasicDBObjectBuilder.start()
+                    .add("capped", true)
+                    .add("size", messagesCollSize)
+                    .get());
+        }
+
+        coll.ensureIndex(new BasicDBObject("created_at", 1));
+        coll.ensureIndex(new BasicDBObject("host", 1));
+        coll.ensureIndex(new BasicDBObject("streams", 1));
+
+        this.messagesCollection = coll;
+        return coll;
+    }
+
+    public DBCollection getHistoricServerValuesColl() {
+        if (this.historicServerValuesCollection != null) {
+            return this.historicServerValuesCollection;
+        }
+
+        // Collection has not been cached yet. Do it now.
+        DBCollection coll = null;
+
+        // Create a capped collection if the collection does not yet exist.
+        if(MongoConnection.getInstance().getDatabase().collectionExists("historic_server_values")) {
+            coll = MongoConnection.getInstance().getDatabase().getCollection("historic_server_values");
+        } else {
+            coll = MongoConnection.getInstance()
+                    .getDatabase().createCollection("historic_server_values", BasicDBObjectBuilder.start()
+                    .add("capped", true)
+                    .add("size", 10000000) // 10 MB
+                    .get());
+        }
+
+        coll.ensureIndex(new BasicDBObject("type", 1));
+        coll.ensureIndex(new BasicDBObject("created_at", 1));
+
+        this.historicServerValuesCollection = coll;
+        return coll;
+    }
+
 }

@@ -40,61 +40,7 @@ import org.graylog2.messagehandlers.gelf.GELFMessage;
  * @author: Lennart Koopmann <lennart@socketfeed.com>
  */
 public class MongoBridge {
-
-    /**
-     * The standard MongoDB port.
-     */
-    public static final int STANDARD_PORT = 27017;
-
-    /**
-     * Get the messages collection. Lazily creates a new, capped one based on the
-     * messages_collection_size from graylog2.conf if there is none.
-     *
-     * @return The messages collection
-     */
-    public DBCollection getMessagesColl() {
-        DBCollection coll = null;
-
-        // Create a capped collection if the collection does not yet exist.
-        if(MongoConnection.getInstance().getDatabase().collectionExists("messages")) {
-            coll = MongoConnection.getInstance().getDatabase().getCollection("messages");
-        } else {
-            long messagesCollSize = Long.parseLong(Main.masterConfig.getProperty("messages_collection_size").trim());
-            coll = MongoConnection.getInstance()
-                    .getDatabase()
-                    .createCollection("messages", BasicDBObjectBuilder.start()
-                    .add("capped", true)
-                    .add("size", messagesCollSize)
-                    .get());
-        }
-
-        coll.ensureIndex(new BasicDBObject("created_at", 1));
-        coll.ensureIndex(new BasicDBObject("host", 1));
-        coll.ensureIndex(new BasicDBObject("streams", 1));
-
-        return coll;
-    }
-
-    public DBCollection getHistoricServerValuesColl() {
-        DBCollection coll = null;
-
-        // Create a capped collection if the collection does not yet exist.
-        if(MongoConnection.getInstance().getDatabase().getCollectionNames().contains("historic_server_values")) {
-            coll = MongoConnection.getInstance().getDatabase().getCollection("historic_server_values");
-        } else {
-            coll = MongoConnection.getInstance()
-                    .getDatabase().createCollection("historic_server_values", BasicDBObjectBuilder.start()
-                    .add("capped", true)
-                    .add("size", 10000000) // 10 MB
-                    .get());
-        }
-
-        coll.ensureIndex(new BasicDBObject("type", 1));
-        coll.ensureIndex(new BasicDBObject("created_at", 1));
-
-        return coll;
-    }
-    
+ 
     /**
      * Inserts a GELF message into the messages collection.
      *
@@ -107,7 +53,7 @@ public class MongoBridge {
             throw new Exception("Missing GELF message parameters. version, short_message and host are required.");
         }
 
-        DBCollection coll = this.getMessagesColl();
+        DBCollection coll = MongoConnection.getInstance().getMessagesColl();
 
         BasicDBObject dbObj = new BasicDBObject();
 
@@ -194,7 +140,7 @@ public class MongoBridge {
         obj.put("value", value);
         obj.put("created_at", Tools.getUTCTimestamp());
 
-        DBCollection coll = getHistoricServerValuesColl();
+        DBCollection coll = MongoConnection.getInstance().getHistoricServerValuesColl();
         coll.insert(obj);
     }
 
