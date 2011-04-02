@@ -165,7 +165,8 @@ public final class MongoConnection {
             coll = MongoConnection.getInstance()
                     .getDatabase().createCollection("historic_server_values", BasicDBObjectBuilder.start()
                     .add("capped", true)
-                    .add("size", 10000000) // 10 MB
+                    .add("size", 10485760) // 10 MB
+                    .add("max", 720) // Minutes. -> 12 hours.
                     .get());
         }
 
