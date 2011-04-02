@@ -68,7 +68,8 @@ public class SyslogEventHandler implements SyslogServerSessionlessEventHandlerIF
         }
         
         // Convert SyslogServerEventIF to GELFMessage and pass to SimpleGELFClientHandler
-        gelf.setVersion("1.0");
+        gelf.setConvertedFromSyslog(true);
+        gelf.setVersion("0");
         gelf.setShortMessage(event.getMessage());
         gelf.setHost(event.getHost());
         gelf.setFacility(Tools.syslogFacilityToReadable(event.getFacility()));

@@ -22,13 +22,11 @@ package org.graylog2.database;
 
 import com.mongodb.DBCollection;
 import com.mongodb.BasicDBObject;
-import com.mongodb.BasicDBObjectBuilder;
 import com.mongodb.DB;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 import org.graylog2.Log;
-import org.graylog2.Main;
 import org.graylog2.Tools;
 import org.graylog2.messagehandlers.gelf.GELFMessage;
 
@@ -57,8 +55,12 @@ public class MongoBridge {
 
         BasicDBObject dbObj = new BasicDBObject();
 
-        dbObj.put("gelf", true);
-        dbObj.put("version", message.getVersion());
+        // Some fields must not be set if this message was converted from a syslog message.
+        if (!message.convertedFromSyslog()) {
+            dbObj.put("gelf", true);
+            dbObj.put("version", message.getVersion());
+        }
+
         dbObj.put("message", message.getShortMessage());
         dbObj.put("full_message", message.getFullMessage());
         dbObj.put("file", message.getFile());

@@ -5,10 +5,6 @@
 
 package org.graylog2.systemjobs;
 
-/**
- *
- * @author XING\lennart.koopmann
- */
 public class Systemjob {
 
 }

@@ -106,8 +106,9 @@ public class SimpleGELFClientHandler extends GELFClientHandlerBase implements GE
                 this.message.addAdditionalData("_amqp_queue", this.getAmqpReceiverQueue());
             }
 
-            // Log if we are in debug mode.
-            Log.info("Got GELF message: " + this.message.toString());
+            if (!this.message.convertedFromSyslog()) {
+                Log.info("Got GELF message: " + this.message.toString());
+            }
 
             // Blacklisted?
             if (this.message.blacklisted(Blacklist.fetchAll())) {

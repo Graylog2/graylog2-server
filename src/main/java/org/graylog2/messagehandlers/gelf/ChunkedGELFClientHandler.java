@@ -139,8 +139,9 @@ public class ChunkedGELFClientHandler extends GELFClientHandlerBase implements G
             MongoBridge m = new MongoBridge();
 
 
-            // Log if we are in debug mode.
-            Log.info("Got GELF message: " + message.toString());
+            if (!this.message.convertedFromSyslog()) {
+                Log.info("Got GELF message: " + this.message.toString());
+            }
 
             // PreProcess message based on filters. Insert message into MongoDB.
             ReceiveHookManager.preProcess(new MessageParserHook(), message);
