@@ -21,12 +21,15 @@
 package org.graylog2.messagehandlers.gelf;
 
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import org.bson.types.ObjectId;
 import org.graylog2.Log;
 import org.graylog2.blacklists.Blacklist;
 import org.graylog2.blacklists.BlacklistRule;
+import java.util.Set;
+import org.graylog2.Tools;
 import org.graylog2.streams.Router;
 import org.graylog2.streams.StreamRule;
 import org.graylog2.streams.matchers.StreamRuleMatcherIF;
@@ -299,6 +302,41 @@ public class GELFMessage {
 
     public boolean convertedFromSyslog() {
         return this.convertedFromSyslog;
+    }
+
+    /**
+     * Converts message to a String consisting of the host and the short message
+     * separated by a dash. Optimized for later full text searching.
+     *
+     * @return boolean
+     */
+    public String toOneLiner() {
+        String msg = this.getHost() + " - " + this.getShortMessage();
+
+        msg += " severity=" + Tools.syslogLevelToReadable(this.getLevel());
+        msg += ",facility=" + this.getFacility();
+
+        if (this.getFile() != null) {
+            msg += ",file=" + this.getFile();
+        }
+
+        if (this.getLine() != 0) {
+            msg += ",line=" + this.getLine();
+        }
+
+        if (this.getAdditionalData().size() > 0) {
+            // Add additional fields. XXX PERFORMANCE
+            Map<String,String> additionalFields = this.getAdditionalData();
+            Set<String> set = additionalFields.keySet();
+            Iterator<String> iter = set.iterator();
+            while(iter.hasNext()) {
+                String key = iter.next();
+                String value = additionalFields.get(key);
+                msg += "," + key + "=" + value;
+            }
+        }
+
+        return msg;
     }
 
     /**
