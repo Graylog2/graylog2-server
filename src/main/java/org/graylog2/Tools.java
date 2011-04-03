@@ -20,23 +20,16 @@
 
 package org.graylog2;
 
+import org.apache.log4j.Logger;
+import org.productivity.java.syslog4j.Syslog;
+
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
-import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
-import java.util.Date;
-import java.util.Properties;
-import java.util.Timer;
-import java.util.TimerTask;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import java.util.zip.GZIPInputStream;
 import java.util.zip.InflaterInputStream;
-
-import org.productivity.java.syslog4j.Syslog;
 
 /**
  * Tools.java: May 17, 2010 9:46:31 PM
@@ -46,6 +39,8 @@ import org.productivity.java.syslog4j.Syslog;
  * @author: Lennart Koopmann <lennart@socketfeed.com>
  */
 public final class Tools {
+
+    private static final Logger LOG = Logger.getLogger(Tools.class);
 
     private Tools() { }
 
@@ -62,7 +57,7 @@ public final class Tools {
             Process p = Runtime.getRuntime().exec(cmd);
             p.getInputStream().read(bo);
         } catch (IOException e) {
-            Log.emerg("Could not determine own PID! " + e.toString());
+            LOG.fatal("Could not determine own PID! " + e.getMessage(), e);
             return "unknown";
         }
         return new String(bo).trim();
