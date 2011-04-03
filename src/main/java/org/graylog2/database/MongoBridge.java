@@ -20,15 +20,16 @@
 
 package org.graylog2.database;
 
-import com.mongodb.DBCollection;
 import com.mongodb.BasicDBObject;
 import com.mongodb.DB;
+import com.mongodb.DBCollection;
+import org.apache.log4j.Logger;
+import org.graylog2.Tools;
+import org.graylog2.messagehandlers.gelf.GELFMessage;
+
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
-import org.graylog2.Log;
-import org.graylog2.Tools;
-import org.graylog2.messagehandlers.gelf.GELFMessage;
 
 /**
  * MongoBridge.java: Apr 13, 2010 9:13:03 PM
@@ -38,6 +39,8 @@ import org.graylog2.messagehandlers.gelf.GELFMessage;
  * @author: Lennart Koopmann <lennart@socketfeed.com>
  */
 public class MongoBridge {
+
+    private static final Logger LOG = Logger.getLogger(MongoBridge.class);
  
     /**
      * Inserts a GELF message into the messages collection.
@@ -105,7 +108,7 @@ public class MongoBridge {
         DB db = MongoConnection.getInstance().getDatabase();
         if (db == null) {
             // Not connected to DB.
-            Log.emerg("MongoBridge::upsertHost(): Could not get hosts collection.");
+            LOG.error("MongoBridge::upsertHost(): Could not get hosts collection.");
         } else {
             db.getCollection("hosts").update(query, update, true, false);
         }
