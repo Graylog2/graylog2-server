@@ -28,6 +28,7 @@ import org.graylog2.Log;
 import org.graylog2.Tools;
 import org.graylog2.blacklists.Blacklist;
 import org.graylog2.database.MongoBridge;
+import org.graylog2.forwarders.Forwarder;
 import org.graylog2.messagehandlers.common.HostUpsertHook;
 import org.graylog2.messagehandlers.common.MessageCounterHook;
 import org.graylog2.messagehandlers.common.MessageParserHook;
@@ -128,6 +129,10 @@ public class SimpleGELFClientHandler extends GELFClientHandlerBase implements GE
                 // Counts up host in hosts collection.
                 ReceiveHookManager.postProcess(new HostUpsertHook(), message);
             }
+
+            // Forward.
+            int forwardCount = Forwarder.forward(this.message);
+            Log.info("Forwarded message to " + forwardCount + "endpoints");
         } catch(Exception e) {
             Log.warn("Could not handle GELF client: " + e.toString());
             e.printStackTrace();

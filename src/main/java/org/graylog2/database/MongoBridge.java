@@ -84,7 +84,7 @@ public class MongoBridge {
         // Documents in capped collections cannot grow so we have to do that now and cannot just add 'deleted => true' later.
         dbObj.put("deleted", false);
 
-        dbObj.put("streams", message.getStreams());
+        dbObj.put("streams", message.getStreamIds());
 
         coll.insert(dbObj);
     }

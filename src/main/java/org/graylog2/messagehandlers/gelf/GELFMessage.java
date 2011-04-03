@@ -20,6 +20,7 @@
 
 package org.graylog2.messagehandlers.gelf;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -31,6 +32,7 @@ import org.graylog2.blacklists.BlacklistRule;
 import java.util.Set;
 import org.graylog2.Tools;
 import org.graylog2.streams.Router;
+import org.graylog2.streams.Stream;
 import org.graylog2.streams.StreamRule;
 import org.graylog2.streams.matchers.StreamRuleMatcherIF;
 
@@ -53,7 +55,7 @@ public class GELFMessage {
     private int timestamp = 0;
     private String facility = null;
     private Map<String, String> additionalData = new HashMap<String, String>();
-    private List<ObjectId> streams = null;
+    private List<Stream> streams = null;
     private boolean convertedFromSyslog = false;
 
     private boolean filterOut = false;
@@ -261,16 +263,26 @@ public class GELFMessage {
     }
 
 
-    public void setStreams(List<ObjectId> streams) {
+    public void setStreams(List<Stream> streams) {
         this.streams = streams;
     }
 
-    public List<ObjectId> getStreams() {
+    public List<Stream> getStreams() {
         if (this.streams != null) {
             return this.streams;
         }
 
         return Router.route(this);
+    }
+
+    public List<ObjectId> getStreamIds() {
+        ArrayList<ObjectId> ids = new ArrayList<ObjectId>();
+
+        for (Stream stream : this.getStreams()) {
+            ids.add(stream.getId());
+        }
+
+        return ids;
     }
 
     public boolean matchStreamRule(StreamRuleMatcherIF matcher, StreamRule rule) {

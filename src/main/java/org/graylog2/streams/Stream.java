@@ -30,6 +30,7 @@ import java.util.List;
 import org.bson.types.ObjectId;
 import org.graylog2.Log;
 import org.graylog2.database.MongoConnection;
+import org.graylog2.forwarders.ForwardEndpoint;
 
 /**
  * Stream.java: Mar 26, 2011 10:39:40 PM
@@ -43,7 +44,9 @@ public class Stream {
 
     private ObjectId id = null;
     private String title = null;
+
     private List<StreamRule> streamRules = null;
+    private List<ForwardEndpoint> forwardedTo = null;
 
     private DBObject mongoObject = null;
 
@@ -53,7 +56,7 @@ public class Stream {
         this.mongoObject = stream;
     }
 
-    public static ArrayList<Stream> fetchAll() throws Exception {
+    public static ArrayList<Stream> fetchAll() {
         if (StreamCache.getInstance().valid()) {
             return StreamCache.getInstance().get();
         }
@@ -86,13 +89,42 @@ public class Stream {
         BasicDBList rawRules = (BasicDBList) this.mongoObject.get("streamrules");
         if (rawRules != null && rawRules.size() > 0) {
             for (Object ruleObj : rawRules) {
-                StreamRule rule = new StreamRule((DBObject) ruleObj);
-                rules.add(rule);
+                try {
+                    StreamRule rule = new StreamRule((DBObject) ruleObj);
+                    rules.add(rule);
+                } catch (Exception e) {
+                    Log.warn("Skipping stream rule in Stream.getStreamRules(): " + e.toString());
+                    continue;
+                }
             }
         }
 
         this.streamRules = rules;
         return rules;
+    }
+
+    public List<ForwardEndpoint> getForwardedTo() {
+        if (this.forwardedTo != null) {
+            return this.forwardedTo;
+        }
+        
+        ArrayList<ForwardEndpoint> fwds = new ArrayList<ForwardEndpoint>();
+
+        BasicDBList rawFwds = (BasicDBList) this.mongoObject.get("forwarders");
+        if (rawFwds != null && rawFwds.size() > 0) {
+            for (Object fwdObj : rawFwds) {
+                try {
+                    ForwardEndpoint fwd = new ForwardEndpoint((DBObject) fwdObj);
+                    fwds.add(fwd);
+                } catch (Exception e) {
+                    Log.warn("Skipping forward endpoint in Stream.getForwardedTo(): " + e.toString());
+                    continue;
+                }
+            }
+        }
+
+        this.forwardedTo = fwds;
+        return fwds;
     }
 
     /**

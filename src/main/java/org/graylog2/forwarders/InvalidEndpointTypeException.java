@@ -21,19 +21,13 @@
 package org.graylog2.forwarders;
 
 /**
- * MessageForwarderConfigurationException.java: Mar 18, 2011 9:38:20 PM
+ * InvalidStreamRuleTypeException.java: Mar 27, 2011 4:55:18 PM
+ *
+ * Exception thrown in case of an invalid endpoint type. Allowed types are
+ * defined in ForwardEndpoint.
  *
  * @author: Lennart Koopmann <lennart@socketfeed.com>
  */
-public class MessageForwarderConfigurationException extends Exception {
-
-    /**
-     * Thrown in case of missing or invalid configuration of an MessageForwarder.
-     *
-     * @param msg
-     */
-    public MessageForwarderConfigurationException(String msg) {
-        super(msg);
-    }
+public class InvalidEndpointTypeException extends Exception {
 
 }

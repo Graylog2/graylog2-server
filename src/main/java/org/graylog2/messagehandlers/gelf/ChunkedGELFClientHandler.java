@@ -26,7 +26,9 @@ import java.net.DatagramPacket;
 import java.util.zip.DataFormatException;
 import org.graylog2.Log;
 import org.graylog2.Tools;
+import org.graylog2.blacklists.Blacklist;
 import org.graylog2.database.MongoBridge;
+import org.graylog2.forwarders.Forwarder;
 import org.graylog2.messagehandlers.common.HostUpsertHook;
 import org.graylog2.messagehandlers.common.MessageCounterHook;
 import org.graylog2.messagehandlers.common.MessageParserHook;
@@ -138,9 +140,13 @@ public class ChunkedGELFClientHandler extends GELFClientHandlerBase implements G
             // Connect to database.
             MongoBridge m = new MongoBridge();
 
-
             if (!this.message.convertedFromSyslog()) {
                 Log.info("Got GELF message: " + this.message.toString());
+            }
+
+            // Blacklisted?
+            if (this.message.blacklisted(Blacklist.fetchAll())) {
+                return true;
             }
 
             // PreProcess message based on filters. Insert message into MongoDB.
@@ -153,6 +159,10 @@ public class ChunkedGELFClientHandler extends GELFClientHandlerBase implements G
                 // Counts up host in hosts collection.
                 ReceiveHookManager.postProcess(new HostUpsertHook(), message);
             }
+
+            // Forward.
+            int forwardCount = Forwarder.forward(this.message);
+            Log.info("Forwarded message to " + forwardCount + "endpoints");
         } catch(Exception e) {
             Log.warn("Could not handle GELF client: " + e.toString());
             e.printStackTrace();
