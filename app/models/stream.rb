@@ -2,21 +2,13 @@ class Stream
   include Mongoid::Document
   include Mongoid::Timestamps
 
-  #has_many :streamrules, :dependent => :destroy
   embeds_many :streamrules
-  
-  #has_and_belongs_to_many :favoritedStreams, :join_table => "favorite_streams", :class_name => "User"
+  embeds_many :forwarders
+
   references_and_referenced_in_many :favoritedStreams, :class_name => "User", :inverse_of => :favorite_streams
-  
-  #has_and_belongs_to_many :users
   references_and_referenced_in_many :users, :inverse_of => :streams
-  
-  #has_many :subscribedStreams, :dependent => :destroy
-  #has_many :alertedStreams, :dependent => :destroy
-  #has_and_belongs_to_many :subscribers, :join_table => "subscribed_streams", :class_name => "User"
   references_and_referenced_in_many :subscribers, :class_name => "User", :inverse_of => :subscribed_streams
 
-  #belongs_to :streamcategory
   referenced_in :streamcategory
 
   validates_presence_of :title

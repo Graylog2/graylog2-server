@@ -1,15 +1,55 @@
 authorization do
   role :admin do
-    has_permission_on :messages, :to => [:index, :show, :getcompletemessage, :getsimilarmessages, :showrange, :around, :deletebyquickfilter, :deletebystream, :getnewmessagecount]
+    has_permission_on :messages, :to => [
+      :index,
+      :show,
+      :getcompletemessage,
+      :getsimilarmessages,
+      :showrange,
+      :around,
+      :deletebyquickfilter,
+      :deletebystream,
+      :getnewmessagecount
+    ]
     
-    has_permission_on :streams, :to => [:index, :show, :showrange, :create, :destroy, :setdescription, :setalarmvalues, :togglefavorited, :togglealarmactive, :togglealarmforce, :rules, :analytics, :settings, :subscribe, :togglesubscription, :rename, :categorize]
+    has_permission_on :streams, :to => [
+      :index,
+      :show,
+      :showrange,
+      :create,
+      :destroy,
+      :setdescription,
+      :setalarmvalues,
+      :togglefavorited,
+      :togglealarmactive,
+      :togglealarmforce,
+      :rules,
+      :forward,
+      :analytics,
+      :settings,
+      :subscribe,
+      :togglesubscription,
+      :rename,
+      :categorize
+    ]
     has_permission_on :streamrules, :to => [:create, :destroy]
     has_permission_on :streamcategories, :to => [:create, :destroy]
+
+    has_permission_on :forwarders, :to => [:create, :destroy]
 
     has_permission_on :analytics, :to => [:index, :messagespread]
 
     has_permission_on :hosts, :to => [:index, :show, :destroy, :quickjump]
-    has_permission_on :hostgroups, :to => [:new, :create, :hosts, :index, :settings, :show, :destroy, :rename]
+    has_permission_on :hostgroups, :to => [
+      :new,
+      :create,
+      :hosts,
+      :index,
+      :settings,
+      :show,
+      :destroy,
+      :rename
+    ]
     has_permission_on :hostgroup_hosts, :to => [:create, :destroy]
     
     has_permission_on :blacklists, :to => [:index, :show, :create, :destroy]
