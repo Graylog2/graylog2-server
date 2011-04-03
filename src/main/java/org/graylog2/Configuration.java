@@ -21,14 +21,14 @@
 package org.graylog2;
 
 import com.mongodb.ServerAddress;
+import org.apache.log4j.Logger;
+import org.graylog2.messagehandlers.amqp.AMQPSubscribedQueue;
+import org.graylog2.messagehandlers.amqp.InvalidQueueTypeException;
+
 import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-import org.graylog2.messagehandlers.amqp.AMQPSubscribedQueue;
-import org.graylog2.messagehandlers.amqp.InvalidQueueTypeException;
 
 /**
  * Configuration.java: Oct 22, 2010 10:57:48 PM
@@ -38,6 +38,8 @@ import org.graylog2.messagehandlers.amqp.InvalidQueueTypeException;
  * @author: Lennart Koopmann <lennart@socketfeed.com>
  */
 public class Configuration {
+
+    private static final Logger LOG = Logger.getLogger(Configuration.class);
 
     public static List<ServerAddress> getMongoDBReplicaSetServers(Properties config) {
         List<ServerAddress> replicaServers = new ArrayList<ServerAddress>();
@@ -56,7 +58,7 @@ public class Configuration {
 
             // Check if valid.
             if (replicaTarget == null || replicaTarget.length != 2) {
-                Log.crit("Malformed mongodb_replica_set configuration.");
+                LOG.error("Malformed mongodb_replica_set configuration.");
                 return null;
             }
 
@@ -64,7 +66,7 @@ public class Configuration {
             try {
                 replicaServers.add(new ServerAddress(replicaTarget[0], Integer.parseInt(replicaTarget[1])));
             } catch (UnknownHostException e) {
-                Log.crit("Unknown host in mongodb_replica_set: " + e.toString());
+                LOG.error("Unknown host in mongodb_replica_set: " + e.getMessage(), e);
                 return null;
             }
         }
@@ -115,16 +117,16 @@ public class Configuration {
 
             // Check if valid.
             if (queueDefinition == null || queueDefinition.length != 2) {
-                Log.crit("Malformed amqp_subscribed_queues configuration.");
+                LOG.error("Malformed amqp_subscribed_queues configuration.");
                 return null;
             }
             try {
                 queueList.add(new AMQPSubscribedQueue(queueDefinition[0], queueDefinition[1]));
             } catch (InvalidQueueTypeException e) {
-                Log.crit("Invalid queue type in amqp_subscribed_queues");
+                LOG.error("Invalid queue type in amqp_subscribed_queues");
                 return null;
             } catch (Exception e) {
-                Log.crit("Could not parse amqp_subscribed_queues: " + e.toString());
+                LOG.error("Could not parse amqp_subscribed_queues: " + e.getMessage(), e);
                 return null;
             }
         }
