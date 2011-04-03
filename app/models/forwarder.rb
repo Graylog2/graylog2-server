@@ -11,6 +11,7 @@ class Forwarder
   # Other validations done when saving because they depend too muc on the endpoint_type.
   validates_presence_of :title
   validates_presence_of :endpoint_type
+  validates_numericality_of :port
 
   def human_endpoint_type
     return "Unknown" if self.endpoint_type.blank?
