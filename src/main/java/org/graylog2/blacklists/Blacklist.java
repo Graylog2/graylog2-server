@@ -23,7 +23,6 @@ package org.graylog2.blacklists;
 import com.mongodb.*;
 import org.apache.log4j.Logger;
 import org.bson.types.ObjectId;
-import org.graylog2.Log;
 import org.graylog2.database.MongoConnection;
 
 import java.util.ArrayList;
