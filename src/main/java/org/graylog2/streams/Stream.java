@@ -20,17 +20,14 @@
 
 package org.graylog2.streams;
 
-import com.mongodb.BasicDBList;
-import com.mongodb.BasicDBObject;
-import com.mongodb.DBCollection;
-import com.mongodb.DBCursor;
-import com.mongodb.DBObject;
-import java.util.ArrayList;
-import java.util.List;
+import com.mongodb.*;
+import org.apache.log4j.Logger;
 import org.bson.types.ObjectId;
-import org.graylog2.Log;
 import org.graylog2.database.MongoConnection;
 import org.graylog2.forwarders.ForwardEndpoint;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Stream.java: Mar 26, 2011 10:39:40 PM
@@ -41,6 +38,8 @@ import org.graylog2.forwarders.ForwardEndpoint;
  * @author: Lennart Koopmann <lennart@socketfeed.com>
  */
 public class Stream {
+
+    private static final Logger LOG = Logger.getLogger(Stream.class);
 
     private ObjectId id = null;
     private String title = null;
@@ -70,7 +69,7 @@ public class Stream {
             try {
                 streams.add(new Stream(cur.next()));
             } catch (Exception e) {
-                Log.warn("Can't fetch stream. Skipping. " + e.toString());
+                LOG.warn("Can't fetch stream. Skipping. " + e.getMessage(), e);
             }
         }
 
@@ -93,7 +92,7 @@ public class Stream {
                     StreamRule rule = new StreamRule((DBObject) ruleObj);
                     rules.add(rule);
                 } catch (Exception e) {
-                    Log.warn("Skipping stream rule in Stream.getStreamRules(): " + e.toString());
+                    LOG.warn("Skipping stream rule in Stream.getStreamRules(): " + e.getMessage(), e);
                     continue;
                 }
             }
@@ -117,7 +116,7 @@ public class Stream {
                     ForwardEndpoint fwd = new ForwardEndpoint((DBObject) fwdObj);
                     fwds.add(fwd);
                 } catch (Exception e) {
-                    Log.warn("Skipping forward endpoint in Stream.getForwardedTo(): " + e.toString());
+                    LOG.warn("Skipping forward endpoint in Stream.getForwardedTo(): " + e.getMessage(), e);
                     continue;
                 }
             }
