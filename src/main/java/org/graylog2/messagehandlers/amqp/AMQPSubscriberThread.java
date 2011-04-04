@@ -24,17 +24,18 @@ import com.rabbitmq.client.AlreadyClosedException;
 import com.rabbitmq.client.Channel;
 import com.rabbitmq.client.Connection;
 import com.rabbitmq.client.QueueingConsumer;
-import java.io.IOException;
-import java.io.UnsupportedEncodingException;
-import java.net.InetAddress;
-import java.util.zip.DataFormatException;
-import org.graylog2.Log;
+import org.apache.log4j.Logger;
 import org.graylog2.messagehandlers.gelf.InvalidGELFCompressionMethodException;
 import org.graylog2.messagehandlers.gelf.SimpleGELFClientHandler;
 import org.graylog2.messagehandlers.syslog.GraylogSyslogServerEvent;
 import org.graylog2.messagehandlers.syslog.SyslogEventHandler;
 import org.productivity.java.syslog4j.server.SyslogServer;
 import org.productivity.java.syslog4j.server.SyslogServerIF;
+
+import java.io.IOException;
+import java.io.UnsupportedEncodingException;
+import java.net.InetAddress;
+import java.util.zip.DataFormatException;
 
 /**
  * AMQPSubscriberThread.java: Jan 20, 2011 7:19:52 PM
@@ -44,6 +45,8 @@ import org.productivity.java.syslog4j.server.SyslogServerIF;
  * @author: Lennart Koopmann <lennart@socketfeed.com>
  */
 public class AMQPSubscriberThread extends Thread {
+
+    private static final Logger LOG = Logger.getLogger(AMQPSubscriberThread.class);
 
     private AMQPSubscribedQueue queue = null;
     private AMQPBroker broker = null;
@@ -69,10 +72,10 @@ public class AMQPSubscriberThread extends Thread {
                 channel = connection.createChannel();
                 channel.basicConsume(this.queue.getName(), false, consumer);
 
-                Log.info("Successfully connected to queue '" + this.queue.getName() + "'");
+                LOG.info("Successfully connected to queue '" + this.queue.getName() + "'");
             } catch (Exception e) {
-                Log.crit("AMQP queue '" + this.queue.getName() + "': Could not connect to AMQP broker or channel (Make sure that "
-                        + "the queue exists. Retrying in " + SLEEP_INTERVAL + " seconds. (" + e.toString() + ")");
+                LOG.error("AMQP queue '" + this.queue.getName() + "': Could not connect to AMQP broker or channel (Make sure that "
+                        + "the queue exists. Retrying in " + SLEEP_INTERVAL + " seconds. (" + e.getMessage() + ")");
 
                 // Retry after waiting for SLEEP_INTERVAL seconds.
                 try { Thread.sleep(SLEEP_INTERVAL*1000); } catch(InterruptedException foo) {}
@@ -92,18 +95,18 @@ public class AMQPSubscriberThread extends Thread {
                     try {
                         handleMessage(delivery.getBody());
                     } catch(Exception e) {
-                        Log.crit("Could not handle AMQP message: " + e.toString());
+                        LOG.error("Could not handle AMQP message: " + e.toString());
                     }
 
                     try {
                         channel.basicAck(delivery.getEnvelope().getDeliveryTag(), false);
                     } catch (IOException e) {
-                        Log.crit("Could not ack AMQP message: " + e.toString());
+                        LOG.error("Could not ack AMQP message: " + e.toString());
                     }
                 } catch(Exception e) {
                     // Error while receiving. i.e. when AMQP broker breaks down.
-                    Log.crit("AMQP queue '" + this.queue.getName() + "': Error while subscribed (rebuilding connection "
-                            + "in " + SLEEP_INTERVAL + " seconds. (" + e.toString() + ")");
+                    LOG.error("AMQP queue '" + this.queue.getName() + "': Error while subscribed (rebuilding connection "
+                            + "in " + SLEEP_INTERVAL + " seconds. (" + e.getMessage() + ")");
 
                     // Better close connection stuff it is still active.
                     try {
@@ -140,7 +143,7 @@ public class AMQPSubscriberThread extends Thread {
                 syslogHandler.event(null, null, message);
                 break;
             default:
-                Log.crit("Invalid type of AMQP message. This should not be possible.");
+                LOG.error("Invalid type of AMQP message. This should not be possible.");
         }
     }
 

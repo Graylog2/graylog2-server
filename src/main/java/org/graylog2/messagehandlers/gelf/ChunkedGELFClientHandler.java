@@ -20,11 +20,7 @@
 
 package org.graylog2.messagehandlers.gelf;
 
-import java.io.IOException;
-import java.io.UnsupportedEncodingException;
-import java.net.DatagramPacket;
-import java.util.zip.DataFormatException;
-import org.graylog2.Log;
+import org.apache.log4j.Logger;
 import org.graylog2.Tools;
 import org.graylog2.blacklists.Blacklist;
 import org.graylog2.database.MongoBridge;
@@ -34,6 +30,11 @@ import org.graylog2.messagehandlers.common.MessageCounterHook;
 import org.graylog2.messagehandlers.common.MessageParserHook;
 import org.graylog2.messagehandlers.common.ReceiveHookManager;
 
+import java.io.IOException;
+import java.io.UnsupportedEncodingException;
+import java.net.DatagramPacket;
+import java.util.zip.DataFormatException;
+
 /**
  * ChunkedGELFClient.java: Sep 14, 2010 6:38:38 PM
  *
@@ -42,6 +43,8 @@ import org.graylog2.messagehandlers.common.ReceiveHookManager;
  * @author: Lennart Koopmann <lennart@socketfeed.com>
  */
 public class ChunkedGELFClientHandler extends GELFClientHandlerBase implements GELFClientHandlerIF {
+
+    private static final Logger LOG = Logger.getLogger(ChunkedGELFClientHandler.class);
 
     /**
      * Representing a GELF client based on more than one UDP message.
@@ -81,17 +84,17 @@ public class ChunkedGELFClientHandler extends GELFClientHandlerBase implements G
             String hash = null;
             try {
                 hash = completeMessage.getHash();
-                Log.info("Chunked GELF message <" + hash + "> complete. Handling now.");
+                LOG.info("Chunked GELF message <" + hash + "> complete. Handling now.");
                 data = completeMessage.getData();
             } catch (IncompleteGELFMessageException e) {
-                Log.warn("Tried to fetch information from incomplete chunked GELF message");
+                LOG.warn("Tried to fetch information from incomplete chunked GELF message", e);
                 return;
             }
 
             try {
                 decompress(data, hash);
             } catch(IOException e) {
-                Log.warn("Error while trying to decompress complete message: " + e.toString());
+                LOG.warn("Error while trying to decompress complete message: " + e.toString());
             } finally {
                 // Remove message from chunk manager as it is being handled next.
                 ChunkedGELFClientManager.getInstance().dropMessage(hash);
@@ -106,11 +109,11 @@ public class ChunkedGELFClientHandler extends GELFClientHandlerBase implements G
         switch (type) {
             // Decompress ZLIB
             case GELF.TYPE_ZLIB:
-                Log.info("Chunked GELF message <" + hash + "> is ZLIB compressed.");
+                LOG.info("Chunked GELF message <" + hash + "> is ZLIB compressed.");
                 this.clientMessage = Tools.decompressZlib(data);
                 break;
             case GELF.TYPE_GZIP:
-                Log.info("Chunked GELF message <" + hash + "> is GZIP compressed.");
+                LOG.info("Chunked GELF message <" + hash + "> is GZIP compressed.");
                 this.clientMessage = Tools.decompressGzip(data);
                 break;
             default:
@@ -132,7 +135,7 @@ public class ChunkedGELFClientHandler extends GELFClientHandlerBase implements G
         try {
              // Fills properties with values from JSON.
             try { this.parse(); } catch(Exception e) {
-                Log.warn("Could not parse GELF JSON: " + e.toString() + " - clientMessage was: " + this.clientMessage);
+                LOG.warn("Could not parse GELF JSON: " + e.getMessage() + " - clientMessage was: " + this.clientMessage, e);
                 return false;
             }
 
@@ -141,7 +144,7 @@ public class ChunkedGELFClientHandler extends GELFClientHandlerBase implements G
             MongoBridge m = new MongoBridge();
 
             if (!this.message.convertedFromSyslog()) {
-                Log.info("Got GELF message: " + this.message.toString());
+                LOG.info("Got GELF message: " + this.message.toString());
             }
 
             // Blacklisted?
@@ -162,10 +165,9 @@ public class ChunkedGELFClientHandler extends GELFClientHandlerBase implements G
 
             // Forward.
             int forwardCount = Forwarder.forward(this.message);
-            Log.info("Forwarded message to " + forwardCount + "endpoints");
+            LOG.info("Forwarded message to " + forwardCount + "endpoints");
         } catch(Exception e) {
-            Log.warn("Could not handle GELF client: " + e.toString());
-            e.printStackTrace();
+            LOG.warn("Could not handle GELF client: " + e.getMessage(), e);
             return false;
         }
 
