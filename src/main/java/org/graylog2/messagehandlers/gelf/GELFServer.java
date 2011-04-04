@@ -20,10 +20,12 @@
 
 package org.graylog2.messagehandlers.gelf;
 
-import org.graylog2.Log;
+import org.apache.log4j.Logger;
 
-import java.net.*;
-import java.io.*;
+import java.io.IOException;
+import java.net.DatagramPacket;
+import java.net.DatagramSocket;
+import java.net.SocketException;
 
 /**
  * GELFThread.java: Jun 23, 2010 6:58:07 PM
@@ -33,6 +35,8 @@ import java.io.*;
  * @author: Lennart Koopmann <lennart@socketfeed.com>
  */
 public class GELFServer {
+
+    private static final Logger LOG = Logger.getLogger(GELFServer.class);
 
     /**
      * The maximum packet size. (8192 is reasonable UDP limit)
@@ -51,7 +55,7 @@ public class GELFServer {
         try {
             this.serverSocket = new DatagramSocket(port);
         } catch(IOException e) {
-            Log.emerg("Could not create ServerSocket in GELFServer::create(): " + e.toString());
+            LOG.fatal("Could not create ServerSocket in GELFServer::create(): " + e.getMessage(), e);
             return false;
         }
 

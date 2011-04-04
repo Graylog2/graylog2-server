@@ -20,21 +20,18 @@
 
 package org.graylog2.messagehandlers.gelf;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
+import org.apache.log4j.Logger;
 import org.bson.types.ObjectId;
-import org.graylog2.Log;
+import org.graylog2.Tools;
 import org.graylog2.blacklists.Blacklist;
 import org.graylog2.blacklists.BlacklistRule;
-import java.util.Set;
-import org.graylog2.Tools;
+import org.graylog2.messagehandlers.syslog.SyslogEventHandler;
 import org.graylog2.streams.Router;
 import org.graylog2.streams.Stream;
 import org.graylog2.streams.StreamRule;
 import org.graylog2.streams.matchers.StreamRuleMatcherIF;
+
+import java.util.*;
 
 /**
  * GELFMessage.java: Jul 20, 2010 6:57:28 PM
@@ -44,6 +41,8 @@ import org.graylog2.streams.matchers.StreamRuleMatcherIF;
  * @author: Lennart Koopmann <lennart@socketfeed.com>
  */
 public class GELFMessage {
+
+    private static final Logger LOG = Logger.getLogger(GELFMessage.class);
 
     private String version = null;
     private String shortMessage = null;
@@ -289,7 +288,7 @@ public class GELFMessage {
         try {
             return matcher.match(this, rule);
         } catch (Exception e) {
-            Log.warn("Could not match stream rule <" + rule.getRuleType() + "/" + rule.getValue() + ">: " + e.toString());
+            LOG.warn("Could not match stream rule <" + rule.getRuleType() + "/" + rule.getValue() + ">: " + e.getMessage(), e);
             return false;
         }
     }
@@ -298,7 +297,7 @@ public class GELFMessage {
         for (Blacklist blacklist : blacklists) {
             for (BlacklistRule rule : blacklist.getRules()) {
                 if (this.getShortMessage().matches(rule.getTerm())) {
-                    Log.info("Message <" + this.toString() + "> is blacklisted. First match on " + rule.getTerm());
+                    LOG.info("Message <" + this.toString() + "> is blacklisted. First match on " + rule.getTerm());
                     return true;
                 }
             }

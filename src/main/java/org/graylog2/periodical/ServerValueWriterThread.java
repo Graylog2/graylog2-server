@@ -20,8 +20,8 @@
 
 package org.graylog2.periodical;
 
+import org.apache.log4j.Logger;
 import org.graylog2.HostSystem;
-import org.graylog2.Log;
 import org.graylog2.Tools;
 import org.graylog2.database.MongoBridge;
 
@@ -33,6 +33,8 @@ import org.graylog2.database.MongoBridge;
  * @author: Lennart Koopmann <lennart@socketfeed.com>
  */
 public class ServerValueWriterThread extends Thread {
+
+    private static final Logger LOG = Logger.getLogger(ServerValueWriterThread.class);
 
     /**
      * Start the thread. Runs forever.
@@ -48,7 +50,7 @@ public class ServerValueWriterThread extends Thread {
                 m.setSimpleServerValue("ping", Tools.getUTCTimestamp());
 
             } catch (Exception e) {
-                Log.warn("Error in SystemValueHistoryWriterThread: " + e.toString());
+                LOG.warn("Error in SystemValueHistoryWriterThread: " + e.getMessage(), e);
             }
             
            // Run every 60 seconds.
