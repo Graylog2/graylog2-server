@@ -315,6 +315,43 @@
   float: left;
 }
 
+.streams-forwarder-form {
+  float: left;
+  padding-right: 20px;
+}
+
+#streams-forwarders li {
+  height: 40px;
+  margin-top: 2px;
+  margin-bottom: 2px;
+}
+
+.streams-forwarders-forwarder-left {
+  height: 15px;
+  float: left;
+}
+
+.streams-forwarders-forwarder-right {
+  padding-left: 65px;
+}
+
+.streams-forwarders-forwarder-type {
+  font-size: 17px;
+  font-family: Georgia,"Times New Roman",Times,serif;
+}
+
+.streams-forwarders-forwarder-delete {
+  font-size: 9px;
+}
+
+.streams-forwarders-forwarder-title {
+  color: #FD0C99;
+}
+
+.streams-forwarders-forwarder-details {
+  font-style: italic;
+}
+
 /* Hosts */
 #hosts-quickjump {
     margin-bottom: 15px;

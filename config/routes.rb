@@ -55,7 +55,8 @@ Graylog2WebInterface::Application.routes.draw do
   resources :streams do
     resources :messages
     resources :streamrules
-    
+    resources :forwarders
+
     resources :dashboard
   
     member do
@@ -69,6 +70,8 @@ Graylog2WebInterface::Application.routes.draw do
       get :showrange
       post :rules
       get :rules
+      post :forward
+      get :forward
       post :setalarmvalues
       post :togglealarmactive
       post :togglefavorited

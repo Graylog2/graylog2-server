@@ -7,7 +7,5 @@
 <% if @messages.blank? %>
   No messages found.
 <% else %>
-  Messages from <span class="highlighted"><%= gl_date(Time.at(@last_message.created_at).to_s) %></span> available for this hostgroup.
-
   <%= render :partial => "messages/table", :locals => { :messages => @messages, :total_messages => @total_count } %>
 <% end %>

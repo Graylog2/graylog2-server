@@ -1,8 +1,7 @@
 class StreamsController < ApplicationController
   filter_access_to :all
-#  before_filter :tabs, :except => :index, :new, :create
   before_filter :load_stream, :except => [ :index, :create ]
-  
+ 
   def show
     @stream = Stream.find_by_id(params[:id])
     redirect_to stream_messages_path(@stream)
@@ -45,6 +44,10 @@ class StreamsController < ApplicationController
 
   def rules
     @new_rule = Streamrule.new
+  end
+
+  def forward
+    @new_forwarder = Forwarder.new
   end
 
   def analytics
