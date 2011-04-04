@@ -20,11 +20,12 @@
 
 package org.graylog2.streams;
 
-import java.util.ArrayList;
-import java.util.List;
-import org.graylog2.Log;
+import org.apache.log4j.Logger;
 import org.graylog2.messagehandlers.gelf.GELFMessage;
 import org.graylog2.streams.matchers.StreamRuleMatcherIF;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Router.java: Mar 16, 2011 9:40:24 PM
@@ -35,6 +36,8 @@ import org.graylog2.streams.matchers.StreamRuleMatcherIF;
  */
 public class Router {
 
+    private static final Logger LOG = Logger.getLogger(Router.class);
+
     // Hidden.
     private Router() { }
 
@@ -44,7 +47,7 @@ public class Router {
         try {
             streams = Stream.fetchAll();
         } catch (Exception e) {
-            Log.emerg("Could not fetch streams: " + e.toString());
+            LOG.error("Could not fetch streams: " + e.getMessage(), e);
         }
 
         for (Stream stream : streams) {
@@ -58,7 +61,7 @@ public class Router {
                         break;
                     }
                 } catch (InvalidStreamRuleTypeException e) {
-                    Log.warn("Invalid stream rule type. Skipping matching for this rule. " + e.toString());
+                    LOG.warn("Invalid stream rule type. Skipping matching for this rule. " + e.getMessage(), e);
                 }
             }
 
