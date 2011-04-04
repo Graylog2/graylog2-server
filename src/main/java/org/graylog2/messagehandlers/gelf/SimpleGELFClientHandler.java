@@ -135,7 +135,9 @@ public class SimpleGELFClientHandler extends GELFClientHandlerBase implements GE
 
             // Forward.
             int forwardCount = Forwarder.forward(this.message);
-            LOG.info("Forwarded message to " + forwardCount + "endpoints");
+            if (forwardCount > 0) {
+                LOG.info("Forwarded message to " + forwardCount + " endpoints");
+            }
         } catch(Exception e) {
             LOG.warn("Could not handle GELF client: " + e.getMessage(), e);
             return false;

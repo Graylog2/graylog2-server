@@ -23,7 +23,6 @@ package org.graylog2.messagehandlers.syslog;
 import org.apache.log4j.Logger;
 import org.graylog2.Main;
 import org.graylog2.Tools;
-import org.graylog2.messagehandlers.gelf.ChunkedGELFClientHandler;
 import org.graylog2.messagehandlers.gelf.GELFMessage;
 import org.graylog2.messagehandlers.gelf.SimpleGELFClientHandler;
 import org.productivity.java.syslog4j.server.SyslogServerEventIF;
@@ -54,21 +53,19 @@ public class SyslogEventHandler implements SyslogServerSessionlessEventHandlerIF
         GELFMessage gelf = new GELFMessage();
 
         // Print out debug information.
-        if ( LOG.isDebugEnabled() ) {
-            if (event instanceof GraylogSyslogServerEvent) {
-                GraylogSyslogServerEvent glEvent = (GraylogSyslogServerEvent) event;
-                LOG.debug("Received syslog message (via AMQP): " + event.getMessage());
-                LOG.debug("AMQP queue: " + glEvent.getAmqpReceiverQueue());
+        if (event instanceof GraylogSyslogServerEvent) {
+            GraylogSyslogServerEvent glEvent = (GraylogSyslogServerEvent) event;
+            LOG.info("Received syslog message (via AMQP): " + event.getMessage());
+            LOG.info("AMQP queue: " + glEvent.getAmqpReceiverQueue());
 
-                gelf.addAdditionalData("_amqp_queue", glEvent.getAmqpReceiverQueue());
-            } else {
-                LOG.debug("Received syslog message: " + event.getMessage());
-            }
-            LOG.debug("Host: " + event.getHost());
-            LOG.debug("Facility: " + event.getFacility() + " (" + Tools.syslogFacilityToReadable(event.getFacility()) + ")");
-            LOG.debug("Level: " + event.getLevel() + " (" + Tools.syslogLevelToReadable(event.getLevel()) + ")");
-            LOG.debug("Raw: " + new String(event.getRaw()));
+            gelf.addAdditionalData("_amqp_queue", glEvent.getAmqpReceiverQueue());
+        } else {
+            LOG.info("Received syslog message: " + event.getMessage());
         }
+        LOG.info("Host: " + event.getHost());
+        LOG.info("Facility: " + event.getFacility() + " (" + Tools.syslogFacilityToReadable(event.getFacility()) + ")");
+        LOG.info("Level: " + event.getLevel() + " (" + Tools.syslogLevelToReadable(event.getLevel()) + ")");
+        LOG.info("Raw: " + new String(event.getRaw()));
         
         // Convert SyslogServerEventIF to GELFMessage and pass to SimpleGELFClientHandler
         gelf.setConvertedFromSyslog(true);

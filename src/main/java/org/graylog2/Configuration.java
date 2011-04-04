@@ -101,6 +101,19 @@ public class Configuration {
         return 5;
     }
 
+    public static int getLogglyTimeout(Properties config) {
+        String val = config.getProperty("forwarder_loggly_timeout");
+        if (val != null) {
+            int res = Integer.parseInt(val);
+            if (res > 0) {
+                return res*1000;
+            }
+        }
+
+        // Default value.
+        return 3000;
+    }
+
     static List<AMQPSubscribedQueue> getAMQPSubscribedQueues(Properties config) {
         List<AMQPSubscribedQueue> queueList = new ArrayList<AMQPSubscribedQueue>();
 

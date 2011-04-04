@@ -48,7 +48,7 @@ public class ForwardEndpoint {
     public ForwardEndpoint(DBObject endpoint) throws InvalidEndpointTypeException {
         this.id = (ObjectId) endpoint.get("_id");
         this.title = (String) endpoint.get("title");
-        this.port = Integer.valueOf((String) endpoint.get("title"));
+        this.port = (Integer) endpoint.get("port");
         this.host = (String) endpoint.get("host");
         this.endpointType = endpointTypeToNumber((String) endpoint.get("endpoint_type"));
 

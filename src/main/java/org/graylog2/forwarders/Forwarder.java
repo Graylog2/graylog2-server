@@ -49,7 +49,10 @@ public class Forwarder {
                 for (ForwardEndpoint endpoint : stream.getForwardedTo()) {
                     MessageForwarderIF launchPad = endpoint.getForwarder();
                     launchPad.forward(message);
-                    succeeded++;
+
+                    if (launchPad.succeeded()) {
+                        succeeded++;
+                    }
                 }
             } catch (Exception e) {
                 LOG.warn("Skipping forwarding of message for a stream: " + e.getMessage(), e);
@@ -57,7 +60,7 @@ public class Forwarder {
             }
         }
 
-        return 0;
+        return succeeded;
     }
 
 }

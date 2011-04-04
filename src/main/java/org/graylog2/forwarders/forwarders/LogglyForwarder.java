@@ -27,6 +27,8 @@ import org.graylog2.messagehandlers.gelf.GELFMessage;
 import java.io.DataOutputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import org.graylog2.Configuration;
+import org.graylog2.Main;
 
 /**
  * LogglyForwarder.java: Mar 18, 2011 9:32:24 PM
@@ -75,10 +77,10 @@ public class LogglyForwarder implements MessageForwarderIF {
             connection.setDoInput(true);
             connection.setDoOutput(true);
 
-            connection.setConnectTimeout(2);
-            connection.setReadTimeout(2);
+            connection.setConnectTimeout(Configuration.getLogglyTimeout(Main.masterConfig));
+            connection.setReadTimeout(Configuration.getLogglyTimeout(Main.masterConfig));
             
-            connection.addRequestProperty("X-GRAYLOG2", "forwarded");
+            connection.addRequestProperty("x-graylog2", "stream-forwarded");
 
             //Send request
             DataOutputStream wr = new DataOutputStream (
