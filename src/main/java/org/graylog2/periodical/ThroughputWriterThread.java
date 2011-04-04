@@ -20,7 +20,7 @@
 
 package org.graylog2.periodical;
 
-import org.graylog2.Log;
+import org.apache.log4j.Logger;
 import org.graylog2.ServerValue;
 import org.graylog2.messagehandlers.common.MessageCounter;
 
@@ -32,6 +32,8 @@ import org.graylog2.messagehandlers.common.MessageCounter;
  * @author: Lennart Koopmann <lennart@socketfeed.com>
  */
 public class ThroughputWriterThread extends Thread {
+
+    private static final Logger LOG = Logger.getLogger(ThroughputWriterThread.class);
 
     /**
      * Start the thread. Runs forever.
@@ -45,9 +47,9 @@ public class ThroughputWriterThread extends Thread {
                 ServerValue.writeThroughput(counter.getTotalSecondCount(), counter.getHighestSecondCount());
                 counter.resetTotalSecondCount();
             } catch (Exception e) {
-                Log.warn("Error in ThroughputWriterThread: " + e.toString());
+                LOG.warn("Error in ThroughputWriterThread: " + e.getMessage(), e);
             }
-            
+
            // Run every second.
            try { Thread.sleep(1000); } catch(InterruptedException e) {}
         }
