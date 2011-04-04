@@ -20,9 +20,7 @@
 
 package org.graylog2;
 
-import org.apache.log4j.BasicConfigurator;
 import org.apache.log4j.Logger;
-import org.apache.log4j.xml.DOMConfigurator;
 import org.graylog2.database.MongoConnection;
 import org.graylog2.messagehandlers.amqp.AMQP;
 import org.graylog2.messagehandlers.amqp.AMQPBroker;
@@ -37,10 +35,8 @@ import org.graylog2.periodical.ServerValueWriterThread;
 import org.graylog2.periodical.ThroughputWriterThread;
 
 import java.io.BufferedWriter;
-import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileWriter;
-import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
@@ -53,11 +49,6 @@ import java.util.Properties;
 public final class Main {
 
     private static final Logger LOG = Logger.getLogger(Main.class);
-
-    /**
-     * Controlled by parameter "debug". Enables more verbose output.
-     */
-    public static boolean debugMode = false;
 
     /**
      * This holds the configuration from /etc/graylog2.conf
@@ -77,19 +68,6 @@ public final class Main {
      * @param args the command line arguments
      */
     public static void main(String[] args) {
-
-        try {
-            URL log4jConfig = Main.class.getResource("log4j.xml");
-            File f = new File(log4jConfig.toURI());
-            if ( f.exists() && f.canRead() ) {
-                DOMConfigurator.configureAndWatch(f.getAbsolutePath());
-            } else {
-                //basic config that just logs to console
-                BasicConfigurator.configure();
-            }
-        } catch ( Exception e ) {
-
-        }
 
         LOG.info("[x] Graylog2 starting up. (JRE: " + Tools.getSystemInformation() + ")");
 
