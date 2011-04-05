@@ -65,12 +65,13 @@ tbody tr:hover {
 }
 
 input, select {
-    font-size: 14px;
-    padding: 2px;
+    font-size: 12px;
+    padding: 1px;
 }
 
 label {
-    font-size: 16px;
+    font-size: 13px;
+    font-weight: bold;
 }
 
 .awesome {
