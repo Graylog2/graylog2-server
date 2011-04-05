@@ -10,7 +10,7 @@ gem 'bson_ext', "~> 1.2"
 gem 'rack', '1.2.1'
 gem 'chronic', '0.3.0'
 gem 'pony'
-gem 'declarative_authorization', :git => "git://github.com/cipherpunk/declarative_authorization.git"
+gem 'declarative_authorization', :git => "http://github.com/cipherpunk/declarative_authorization.git"
 gem 'em-websocket', '0.1.4'
 
 group :development, :test do
