@@ -30,9 +30,9 @@
 </ul>
 
 <div class="streams-forwarder-form">
-<h3>Add <span class="highlighted">syslog</span> forwarder</h3>
+<h3>Add <span class="highlighted">UDP syslog</span> forwarder</h3>
 <div class="short-description">
-  Forward messages to another syslog server.
+  Forward messages to another syslog server via UDP.
 </div>
 <%= form_for @new_forwarder, :url => stream_forwarders_path(@stream) do |f| %>
   <%= hidden_field_tag "forwarder[endpoint_type]", :syslog %>
