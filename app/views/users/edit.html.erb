@@ -1,6 +1,6 @@
 <div id="users-delete">
   <br />
-  <%= awesome_link "Delete user", { :action => "delete", :id => @user }, :confirm => "Really delete ths user?" %>
+  <%= awesome_link "Delete user", user_path(@user), :method => :delete, :confirm => "Really delete ths user?" %>
 </div>
 
 <h1>Edit user <span class="highlighted"><%=h @user.login %></span></h1>
