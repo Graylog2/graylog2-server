@@ -21,7 +21,6 @@
 package org.graylog2.messagehandlers.syslog;
 
 import org.apache.log4j.Logger;
-import org.graylog2.Main;
 import org.graylog2.Tools;
 import org.graylog2.messagehandlers.gelf.GELFMessage;
 import org.graylog2.messagehandlers.gelf.SimpleGELFClientHandler;
@@ -80,7 +79,7 @@ public class SyslogEventHandler implements SyslogServerSessionlessEventHandlerIF
             SimpleGELFClientHandler gelfHandler = new SimpleGELFClientHandler(gelf);
             gelfHandler.handle();
         } catch ( Exception e ) {
-                // I don't care
+            // I don't care
         }
     }
 

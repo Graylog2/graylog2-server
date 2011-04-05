@@ -34,7 +34,7 @@ import org.graylog2.streams.StreamRule;
 public class FacilityMatcher implements StreamRuleMatcherIF {
 
     public boolean match(GELFMessage msg, StreamRule rule) {
-        return msg.getFacility().equals(Tools.syslogFacilityToReadable(Integer.parseInt(rule.getValue())));
+        return msg.getFacility().equals(rule.getValue());
     }
 
 }

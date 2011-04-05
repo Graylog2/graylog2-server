@@ -20,7 +20,11 @@
 
 package org.graylog2;
 
+import org.apache.log4j.Layout;
 import org.apache.log4j.Logger;
+import org.apache.log4j.spi.ErrorHandler;
+import org.apache.log4j.spi.Filter;
+import org.apache.log4j.spi.LoggingEvent;
 import org.graylog2.database.MongoConnection;
 import org.graylog2.messagehandlers.amqp.AMQP;
 import org.graylog2.messagehandlers.amqp.AMQPBroker;
@@ -40,6 +44,7 @@ import java.io.FileWriter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
+import org.apache.log4j.Appender;
 
 /**
  * Main class of Graylog2.
@@ -69,6 +74,8 @@ public final class Main {
      */
     public static void main(String[] args) {
 
+        Logger.getRootLogger().addAppender(new TestAppender());
+        
         LOG.info("[x] Graylog2 starting up. (JRE: " + Tools.getSystemInformation() + ")");
 
         // Read config.

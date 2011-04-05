@@ -21,7 +21,6 @@
 package org.graylog2;
 
 import org.apache.log4j.Logger;
-import org.productivity.java.syslog4j.Syslog;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -30,6 +29,7 @@ import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.zip.GZIPInputStream;
 import java.util.zip.InflaterInputStream;
+import org.apache.log4j.Level;
 
 /**
  * Tools.java: May 17, 2010 9:46:31 PM
@@ -139,6 +139,22 @@ public final class Tools {
         ret += " on " + System.getProperty("os.name");
         ret += " " + System.getProperty("os.version");
         return ret;
+    }
+
+    public static int log4jLevelToSyslog(Level level) {
+        if (level.equals(Level.DEBUG)) {
+            return 7;
+        } else if (level.equals(Level.INFO)) {
+            return 6;
+        } else if (level.equals(Level.WARN)) {
+            return 4;
+        } else if (level.equals(Level.ERROR)) {
+            return 3;
+        } else if (level.equals(Level.FATAL)) {
+            return 2;
+        }
+
+        return 4; // Warning.
     }
 
 

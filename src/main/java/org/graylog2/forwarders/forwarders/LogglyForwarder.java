@@ -33,7 +33,7 @@ import org.graylog2.Main;
 /**
  * LogglyForwarder.java: Mar 18, 2011 9:32:24 PM
  *
- * Forwards messages to Logg.ly. (via HTTP/S API(
+ * Forwards messages to Logg.ly. (via HTTP/S API)
  *
  * @author: Lennart Koopmann <lennart@socketfeed.com>
  */
@@ -62,7 +62,7 @@ public class LogglyForwarder implements MessageForwarderIF {
         }
 
         this.succeeded = this.send(message.toOneLiner());
-        return this.succeeded;
+        return this.succeeded();
     }
 
     private boolean send(String what) {
@@ -82,7 +82,7 @@ public class LogglyForwarder implements MessageForwarderIF {
             
             connection.addRequestProperty("x-graylog2", "stream-forwarded");
 
-            //Send request
+            // Send request
             DataOutputStream wr = new DataOutputStream (
             connection.getOutputStream ());
             wr.writeBytes(what);

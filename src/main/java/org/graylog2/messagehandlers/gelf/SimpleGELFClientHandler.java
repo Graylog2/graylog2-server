@@ -97,13 +97,13 @@ public class SimpleGELFClientHandler extends GELFClientHandlerBase implements GE
      */
     public boolean handle() {
         try {
-             // Fills properties with values from JSON.
-        	if(this.clientMessage instanceof String) {
-	            try { this.parse(); } catch(Exception e) {
-	                LOG.warn("Could not parse GELF JSON: " + e.getMessage() + " - clientMessage was: " + this.clientMessage, e);
-	                return false;
-	            }
-        	} 
+            // Fills properties with values from JSON.
+            if (this.clientMessage instanceof String) {
+                try { this.parse(); } catch(Exception e) {
+                    LOG.warn("Could not parse GELF JSON: " + e.getMessage() + " - clientMessage was: " + this.clientMessage, e);
+                    return false;
+                }
+            }
         	
             // Add AMQP receiver queue as additional field if set.
             if (this.getAmqpReceiverQueue() != null) {

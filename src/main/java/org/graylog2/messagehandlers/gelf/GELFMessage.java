@@ -25,7 +25,6 @@ import org.bson.types.ObjectId;
 import org.graylog2.Tools;
 import org.graylog2.blacklists.Blacklist;
 import org.graylog2.blacklists.BlacklistRule;
-import org.graylog2.messagehandlers.syslog.SyslogEventHandler;
 import org.graylog2.streams.Router;
 import org.graylog2.streams.Stream;
 import org.graylog2.streams.StreamRule;

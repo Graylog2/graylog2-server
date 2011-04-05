@@ -23,6 +23,7 @@ package org.graylog2.forwarders;
 import com.mongodb.DBObject;
 import org.bson.types.ObjectId;
 import org.graylog2.forwarders.forwarders.LogglyForwarder;
+import org.graylog2.forwarders.forwarders.UDPSyslogForwarder;
 
 /**
  * ForwardEndpoint.java: Apr 3, 2011 11:42:58 PM
@@ -33,7 +34,7 @@ import org.graylog2.forwarders.forwarders.LogglyForwarder;
  */
 public class ForwardEndpoint {
 
-    public static final int ENDPOINT_TYPE_SYSLOG = 0;
+    public static final int ENDPOINT_TYPE_UDP_SYSLOG = 0;
     public static final int ENDPOINT_TYPE_GELF = 1;
     public static final int ENDPOINT_TYPE_LOGGLY = 2;
 
@@ -57,8 +58,8 @@ public class ForwardEndpoint {
 
     public MessageForwarderIF getForwarder() throws InvalidEndpointTypeException {
         switch (endpointType) {
-            case ENDPOINT_TYPE_SYSLOG:
-                throw new UnsupportedOperationException("Syslog forwarding not yet implemented");
+            case ENDPOINT_TYPE_UDP_SYSLOG:
+                return new UDPSyslogForwarder(this.getHost(), this.getPort());
             case ENDPOINT_TYPE_GELF:
                 throw new UnsupportedOperationException("GELF forwarding not yet implemented");
             case ENDPOINT_TYPE_LOGGLY:
@@ -110,7 +111,7 @@ public class ForwardEndpoint {
     public static int endpointTypeToNumber(String endpointType) throws InvalidEndpointTypeException {
         // lol no switch for strings.
         if(endpointType.equals("syslog")) {
-            return ENDPOINT_TYPE_SYSLOG;
+            return ENDPOINT_TYPE_UDP_SYSLOG;
         } else if(endpointType.equals("gelf")) {
             return ENDPOINT_TYPE_GELF;
         } else if(endpointType.equals("loggly")) {
@@ -122,7 +123,7 @@ public class ForwardEndpoint {
 
     public static String endpointTypeToHuman(int endpointType) throws InvalidEndpointTypeException {
         switch (endpointType) {
-            case ENDPOINT_TYPE_SYSLOG:
+            case ENDPOINT_TYPE_UDP_SYSLOG:
                 return "syslog";
             case ENDPOINT_TYPE_GELF:
                 return "gelf";
