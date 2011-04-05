@@ -17,7 +17,7 @@
         <td><%= gl_date(Time.at(message.created_at.to_i).to_s) %></td>
         <td><%= message.host.blank? ? nil : h(message.host) %></td>
         <td><%= syslog_level_to_human(message.level) %></td>
-        <td><%= Facility.to_human(message.facility) %></td>
+        <td><%= message.facility %></td>
         <td>
           <% unless message.message.blank? %>
             <%= message.message[0..message_length] %>

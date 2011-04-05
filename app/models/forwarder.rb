@@ -16,7 +16,7 @@ class Forwarder
   def human_endpoint_type
     return "Unknown" if self.endpoint_type.blank?
     case self.endpoint_type.to_sym
-      when :syslog then return "Syslog"
+      when :syslog then return "UDP Syslog"
       when :gelf then return "GELF"
       when :loggly then return "Logg.ly"
       else return "Unknown"
