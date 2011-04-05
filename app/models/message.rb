@@ -33,10 +33,8 @@ class Message
   scope :of_blacklisted_terms, lambda { |terms| where(:message.in => terms.collect { |term| /#{term}/}) }
   scope :by_blacklist, lambda {|blacklist| by_blacklisted_terms(blacklist.all_terms)}
   scope :of_blacklist, lambda {|blacklist| of_blacklisted_terms(blacklist.all_terms)}
-  #scope :find_by_id, lambda {|_id| where(:_id => BSON::ObjectId(_id)).first }
   scope :page, lambda {|number| skip(self.get_offset(number))}
-  scope :default_scope, order_by({"$natural" => "-1"}).not_deleted.limit(LIMIT)
-#  scope :default_scope, fields(:full_message => 0).order("$natural DESC").not_deleted.limit(LIMIT)
+  scope :default_scope, order_by({"_id" => "-1"}).not_deleted.limit(LIMIT)
   scope :time_range, lambda {|from, to| where(:created_at => {"$gte" => from}).where(:created_at => {"$lte" => to})}
 
   def self.find_by_id(_id)
@@ -129,7 +127,7 @@ class Message
       conditions = conditions.where(:created_at => get_conditions_from_date(filters[:date])) unless filters[:date].blank?
       
       # Facility
-      conditions = conditions.where(:facility => filters[:facility].to_i) unless filters[:facility].blank?
+      conditions = conditions.where(:facility => filters[:facility]) unless filters[:facility].blank?
 
       # Severity
       if filters[:severity_above]
@@ -328,9 +326,9 @@ class Message
     qry = self.attributes.dup.delete_if { |k,v| !opts["same_#{k}".to_sym] }
     nb = args.first || 100
     terms = Blacklist.all_terms
-    from = self.class.by_blacklisted_terms(terms).default_scope.where(qry.merge(:_id => { "$lte" => self.id })).order({"$natural" => "-1"}).skip(nb).first
+    from = self.class.by_blacklisted_terms(terms).default_scope.where(qry.merge(:_id => { "$lte" => self.id })).order({"_id" => "-1"}).skip(nb).first
     return nil unless from
-    res = self.class.by_blacklisted_terms(terms).default_scope.where(qry.merge(:_id => {"$gte" => from.id})).limit(1 + nb.to_i * 2).order({"$natural" => "1"}).to_a
+    res = self.class.by_blacklisted_terms(terms).default_scope.where(qry.merge(:_id => {"$gte" => from.id})).limit(1 + nb.to_i * 2).order({"_id" => "1"}).to_a
     res.reverse! if opts[:order] == :desc
     res
   end

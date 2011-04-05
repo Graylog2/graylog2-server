@@ -10,8 +10,8 @@
   <%= f.hidden_field :stream_id, :value => @stream.id %>
   <%= f.select :rule_type, options_for_select(Streamrule.get_types_for_select_options, :selected => Streamrule::TYPE_MESSAGE) %>
   <%= f.text_field :value, :class => "stream-value-field stream-value-message" %>
-  <%= f.text_field :value, {:class => "stream-value-field stream-value-timeframe", :style => "display: none;", :disabled => true} %>
-  <%= f.select :value, options_for_select(Facility.ordered_for_select), {}, { :disabled => true, :style => "display: none;", :class => "stream-value-field stream-value-facility" } %>
+  <%= f.text_field :value, { :class => "stream-value-field stream-value-timeframe", :style => "display: none;", :disabled => true } %>
+  <%= f.text_field :value, { :class => "stream-value-field stream-value-facility", :style => "display: none;", :disabled => true } %>
   
   <div id="stream-value-severity-master" style="display: none;">
     <%= f.select :value, options_for_select(get_ordered_severities_for_select), {}, { :disabled => true, :class => "stream-value-field stream-value-severity" } %>
