@@ -130,6 +130,5 @@ Graylog2WebInterface::Application.routes.draw do
 
   match '/visuals/fetch/:id' => 'visuals#fetch',:as => "visuals"
   
-  match '/' => 'messages#index', :as => "root"
-#  match '/:controller(/:action(/:id))'
+  root :to => 'messages#index'
 end
