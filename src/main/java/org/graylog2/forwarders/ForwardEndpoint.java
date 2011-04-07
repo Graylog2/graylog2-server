@@ -22,6 +22,7 @@ package org.graylog2.forwarders;
 
 import com.mongodb.DBObject;
 import org.bson.types.ObjectId;
+import org.graylog2.forwarders.forwarders.GELFMessageForwarder;
 import org.graylog2.forwarders.forwarders.LogglyForwarder;
 import org.graylog2.forwarders.forwarders.UDPSyslogForwarder;
 
@@ -61,7 +62,7 @@ public class ForwardEndpoint {
             case ENDPOINT_TYPE_UDP_SYSLOG:
                 return new UDPSyslogForwarder(this.getHost(), this.getPort());
             case ENDPOINT_TYPE_GELF:
-                throw new UnsupportedOperationException("GELF forwarding not yet implemented");
+                return new GELFMessageForwarder(this.getHost(), this.getPort());
             case ENDPOINT_TYPE_LOGGLY:
                 return new LogglyForwarder(this.getHost());
         }

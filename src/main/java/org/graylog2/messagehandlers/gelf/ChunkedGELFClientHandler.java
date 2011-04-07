@@ -46,6 +46,7 @@ public class ChunkedGELFClientHandler extends GELFClientHandlerBase implements G
 
     private static final Logger LOG = Logger.getLogger(ChunkedGELFClientHandler.class);
 
+
     /**
      * Representing a GELF client based on more than one UDP message.
      *
@@ -92,7 +93,12 @@ public class ChunkedGELFClientHandler extends GELFClientHandlerBase implements G
             }
 
             try {
+                // Decompress and store in this.clientMessage
                 decompress(data, hash);
+
+                // Store message chunks for easy later forwarding.
+                this.message.storeMessageChunks(completeMessage.getChunkMap());
+                this.message.setIsChunked(true);
             } catch(IOException e) {
                 LOG.warn("Error while trying to decompress complete message: " + e.toString());
             } finally {

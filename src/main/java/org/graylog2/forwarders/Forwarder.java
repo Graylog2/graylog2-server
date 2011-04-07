@@ -20,7 +20,10 @@
 
 package org.graylog2.forwarders;
 
+import java.util.ArrayList;
+import java.util.List;
 import org.apache.log4j.Logger;
+import org.graylog2.messagehandlers.gelf.ChunkedGELFMessage;
 import org.graylog2.messagehandlers.gelf.GELFMessage;
 import org.graylog2.streams.Stream;
 

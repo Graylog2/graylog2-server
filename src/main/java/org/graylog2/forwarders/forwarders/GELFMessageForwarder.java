@@ -22,22 +22,23 @@ package org.graylog2.forwarders.forwarders;
 
 import org.apache.log4j.Logger;
 import org.graylog2.forwarders.MessageForwarderIF;
+import org.graylog2.messagehandlers.gelf.GELFClientChunk;
 import org.graylog2.messagehandlers.gelf.GELFMessage;
 
 /**
- * SyslogForwarder.java: Apr 5, 2011 8:23:14 PM
+ * ForwardEndpoint.java: Apr 7, 2011 8:10:23 PM
  *
- * Forwards syslog messages to other syslog endpoints.
+ * [description]
  *
  * @author: Lennart Koopmann <lennart@socketfeed.com>
  */
-public class UDPSyslogForwarder extends UDPForwarder implements MessageForwarderIF {
+public class GELFMessageForwarder extends UDPForwarder implements MessageForwarderIF {
 
-    private static final Logger LOG = Logger.getLogger(LogglyForwarder.class);
+    private static final Logger LOG = Logger.getLogger(GELFMessageForwarder.class);
     
     private boolean succeeded = false;
 
-    public UDPSyslogForwarder(String host, int port) {
+    public GELFMessageForwarder(String host, int port) {
         this.setHost(host);
         this.setPort(port);
     }
@@ -47,16 +48,20 @@ public class UDPSyslogForwarder extends UDPForwarder implements MessageForwarder
             throw new MessageForwarderConfigurationException("Host is empty or port is invalid.");
         }
 
-        this.succeeded = this.send(message.getShortMessage().getBytes());
-        return this.succeeded();
+        if (message.isChunked()) {
+            LOG.info("Forwarding a chunked message.");
+            for (GELFClientChunk chunk : message.getMessageChunks().values()) {
+                LOG.info("Fowarding chunked GELF message chunk: <" + chunk.getHash() + ">");
+                this.send(chunk.getData());
+            }
+        } else {
+            // TODO: THIS NEEDS TO BE GZIPPED.
+            this.succeeded = this.send(message.getShortMessage().getBytes());
+        }
+
+        return false;
     }
 
-    /**
-     * Indicates if the last forward has succeeded. This is not guaranteeing
-     * delivery for the SyslogForwarder as it it sending UDP.
-     *
-     * @return
-     */
     public boolean succeeded() {
         return this.succeeded;
     }

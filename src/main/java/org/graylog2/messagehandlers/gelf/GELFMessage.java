@@ -60,6 +60,9 @@ public class GELFMessage {
     private boolean doRouting = true;
     private boolean doBlacklisting = true;
 
+    private Map<Integer, GELFClientChunk> chunks = null;
+    private boolean chunked = false;
+
     /**
      * Get the version
      *
@@ -391,6 +394,22 @@ public class GELFMessage {
 
     public void disableBlacklisting() {
         this.doBlacklisting = false;
+    }
+
+    public void storeMessageChunks(Map<Integer, GELFClientChunk> chunks) {
+        this.chunks = chunks;
+    }
+
+    public Map<Integer, GELFClientChunk> getMessageChunks() {
+        return this.chunks;
+    }
+
+    public void setIsChunked(boolean b) {
+        this.chunked = true;
+    }
+
+    public boolean isChunked() {
+        return this.chunked;
     }
 
 }
