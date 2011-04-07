@@ -69,4 +69,27 @@ public class MessageMatcherTest {
         assertFalse(matcher.match(msg, rule));
     }
 
+    /*
+     * http://jira.graylog2.org/browse/SERVER-11
+     */
+    @Test
+    public void testSpecificMatch1() {
+        String message = "su: (to myuser) root on none";
+        String regex = "^(su|sudo).+";
+
+        BasicDBObject mongoRule = new BasicDBObject();
+        mongoRule.put("_id", new ObjectId());
+        mongoRule.put("rule_type", StreamRule.TYPE_MESSAGE);
+        mongoRule.put("value",  regex);
+
+        StreamRule rule = new StreamRule(mongoRule);
+
+        GELFMessage msg = new GELFMessage();
+        msg.setShortMessage(message);
+
+        MessageMatcher matcher = new MessageMatcher();
+
+        assertTrue(matcher.match(msg, rule));
+    }
+
 }
