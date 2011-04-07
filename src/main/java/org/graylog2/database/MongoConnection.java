@@ -142,6 +142,7 @@ public final class MongoConnection {
                     .get());
         }
 
+        coll.ensureIndex(new BasicDBObject("_id", 1));
         coll.ensureIndex(new BasicDBObject("created_at", 1));
         coll.ensureIndex(new BasicDBObject("host", 1));
         coll.ensureIndex(new BasicDBObject("streams", 1));
