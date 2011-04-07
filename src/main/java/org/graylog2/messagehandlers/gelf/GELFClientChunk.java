@@ -35,6 +35,8 @@ public class GELFClientChunk {
     private int sequenceCount = -1;
     private int arrival = -1;
 
+    private byte[] raw = null;
+
     /**
      *
      * @return
@@ -115,6 +117,14 @@ public class GELFClientChunk {
         this.sequenceNumber = sequenceNumber;
     }
 
+    public byte[] getRaw() {
+        return this.raw;
+    }
+
+    public void setRaw(byte[] raw) {
+        this.raw = raw;
+    }
+
     /**
      *
      * @return
@@ -154,7 +164,6 @@ public class GELFClientChunk {
         sb.append(this.arrival);
         sb.append("\tData size: ");
         sb.append(this.data.length);
-        sb.append("\n");
 
         return sb.toString();
     }

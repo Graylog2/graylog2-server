@@ -66,6 +66,7 @@ public class ChunkedGELFClientHandler extends GELFClientHandlerBase implements G
         chunk.setSequenceNumber(header.getSequenceNumber());
         chunk.setData(GELF.extractData(clientMessage));
         chunk.setArrival((int) (System.currentTimeMillis()/1000));
+        chunk.setRaw(clientMessage.getData());
 
         // Insert the chunk.
         ChunkedGELFMessage possiblyCompleteMessage = null;
