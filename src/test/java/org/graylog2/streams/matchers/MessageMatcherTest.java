@@ -75,7 +75,7 @@ public class MessageMatcherTest {
     @Test
     public void testSpecificMatch1() {
         String message = "su: (to myuser) root on none";
-        String regex = "^(su|sudo).+";
+        String regex = "(su|sudo).+";
 
         BasicDBObject mongoRule = new BasicDBObject();
         mongoRule.put("_id", new ObjectId());

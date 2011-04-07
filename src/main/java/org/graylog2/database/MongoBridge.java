@@ -41,7 +41,7 @@ import java.util.Set;
 public class MongoBridge {
 
     private static final Logger LOG = Logger.getLogger(MongoBridge.class);
- 
+
     /**
      * Inserts a GELF message into the messages collection.
      *

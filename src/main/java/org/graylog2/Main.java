@@ -74,7 +74,7 @@ public final class Main {
      */
     public static void main(String[] args) {
 
-        Logger.getRootLogger().addAppender(new TestAppender());
+        Logger.getRootLogger().addAppender(new SelfLogAppender());
         
         LOG.info("[x] Graylog2 starting up. (JRE: " + Tools.getSystemInformation() + ")");
 
