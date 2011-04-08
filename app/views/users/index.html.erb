@@ -11,7 +11,6 @@
     <% @users.each do |user| %>
       <li>
         <%= link_to h(user.login), :action =>'edit', :id => user.id %>
-		<%= link_to 'Delete', user_path(user), :method => :delete, :confirm => "Really delete this user?" %>
       </li>
     <% end %>
   </ul>
