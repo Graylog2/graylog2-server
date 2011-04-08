@@ -1,3 +1,9 @@
+GIT
+  remote: http://github.com/cipherpunk/declarative_authorization.git
+  revision: f4bbb06573319c7a2b994f6227cf50f64ed51e7e
+  specs:
+    declarative_authorization (0.5.2)
+
 GEM
   remote: http://rubygems.org/
   remote: http://gems.github.com/
@@ -49,7 +55,6 @@ GEM
       builder (>= 2.1.2)
     colored (1.2)
     database_cleaner (0.6.6)
-    declarative_authorization (0.5.2)
     em-websocket (0.1.4)
       addressable (>= 2.1.1)
       eventmachine (>= 0.12.9)
@@ -103,7 +108,6 @@ GEM
       mongo (~> 1.2)
       tzinfo (~> 0.3.22)
       will_paginate (~> 3.0.pre)
-    mysql2 (0.2.4)
     plucky (0.3.6)
       mongo (~> 1.1)
     polyglot (0.3.1)
@@ -166,7 +170,7 @@ DEPENDENCIES
   chronic (= 0.3.0)
   ci_reporter
   database_cleaner (~> 0.6.0)
-  declarative_authorization
+  declarative_authorization!
   em-websocket (= 0.1.4)
   faker (~> 0.3.1)
   jnunemaker-validatable (= 1.8.4)
@@ -175,7 +179,6 @@ DEPENDENCIES
   metric_fu
   mocha (~> 0.9.10)
   mongoid (= 2.0.0.rc.6)
-  mysql2 (= 0.2.4)
   plucky (= 0.3.6)
   pony
   rack (= 1.2.1)
