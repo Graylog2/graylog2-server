@@ -8,9 +8,8 @@
 <h2>Add rule:</h2>
 <%= form_for @new_rule, :url => stream_streamrules_path(@stream) do |f| %>
   <%= f.hidden_field :stream_id, :value => @stream.id %>
-  <%= f.select :rule_type, options_for_select(Streamrule.get_types_for_select_options, :selected => Streamrule::TYPE_MESSAGE) %>
+  <%= f.select :rule_type, options_for_select(Streamrule.get_types_for_select_options(:streams), :selected => Streamrule::TYPE_MESSAGE) %>
   <%= f.text_field :value, :class => "stream-value-field stream-value-message" %>
-  <%= f.text_field :value, { :class => "stream-value-field stream-value-timeframe", :style => "display: none;", :disabled => true } %>
   <%= f.text_field :value, { :class => "stream-value-field stream-value-facility", :style => "display: none;", :disabled => true } %>
   
   <div id="stream-value-severity-master" style="display: none;">
@@ -20,7 +19,6 @@
   <%= f.select :value, Host.all.collect {|host| [ h(host.host) ]}.sort, {}, { :disabled => true, :style => "display: none;", :class => "stream-value-field stream-value-host" } %>
   <%= f.text_field :value, :class => "stream-value-field stream-value-additional-field", :disabled => true, :style => "display: none;" %>
   <span id="stream-value-additional-field-help" class="stream-value-help" style="display: none;"><%= tooltip("Additional-field-filters-in-streams") %></span>
-  <span id="stream-value-timeframe-help" class="stream-value-help" style="display: none;"><%= tooltip("Timeframe-Filters") %></span>
   <%= awesome_submit_link "Add" %>
 <% end %>
 

@@ -16,10 +16,9 @@ class Streamrule
   TYPE_TIMEFRAME = 5
   TYPE_ADDITIONAL = 6
 
-  def self.get_types_for_select_options
-    {
+  def self.get_types_for_select_options(special = nil)
+    h = {
       "Message (regex)" => self::TYPE_MESSAGE,
-      "Timeframe" => self::TYPE_TIMEFRAME,
       "Host" => self::TYPE_HOST,
       "Severity" => self::TYPE_SEVERITY,
       "Facility" => self::TYPE_FACILITY,
