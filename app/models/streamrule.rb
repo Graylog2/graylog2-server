@@ -5,6 +5,7 @@ class Streamrule
 
   validates_presence_of :rule_type
   validates_presence_of :value
+  validate :valid_regex
   
   field :rule_type, :type => Integer
   field :value, :type => String
@@ -17,7 +18,7 @@ class Streamrule
   TYPE_ADDITIONAL = 6
 
   def self.get_types_for_select_options(special = nil)
-    h = {
+    {
       "Message (regex)" => self::TYPE_MESSAGE,
       "Host" => self::TYPE_HOST,
       "Severity" => self::TYPE_SEVERITY,
@@ -26,4 +27,15 @@ class Streamrule
     }
   end
   
+  private 
+  
+  def valid_regex
+    return if rule_type != TYPE_MESSAGE
+
+    begin
+      String.new =~ /#{value}/
+    rescue RegexpError
+      errors.add(:value, "invalid regular expression")
+    end
+  end
 end
