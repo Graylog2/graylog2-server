@@ -28,8 +28,7 @@ class BlacklistsController < ApplicationController
 
   def destroy
     begin
-      BlacklistedTerm.delete_all [ "blacklist_id = ?", params[:id] ]
-      blacklist = Blacklist.find params[:id]
+      blacklist = Blacklist.find(BSON::ObjectId(params[:id]))
       blacklist.destroy
       flash[:notice] = "Blacklist has been deleted"
     rescue
