@@ -22,11 +22,8 @@ module StreamsHelper
     value = h(rule.value)
 
     # Add human readable value type for SEVERITY and FACILITY.
-    case rule.rule_type
-      when Streamrule::TYPE_SEVERITY then
+    if rule.rule_type == Streamrule::TYPE_SEVERITY
         value = "#{syslog_level_to_human(rule.value)} (#{h(rule.value.to_i)})"
-      when Streamrule::TYPE_FACILITY then
-        value = Facility.to_human(rule.value)
     end
 
     return "<span class=\"black\">#{type}</span>: <i>#{value}</i>"
