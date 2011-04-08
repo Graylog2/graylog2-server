@@ -64,6 +64,8 @@ public class SimpleGELFClientHandler extends GELFClientHandlerBase implements GE
             // Determine compression type.
             int type = GELF.getGELFType(msg.getData());
 
+            this.message.setRaw(msg.getData());
+
             // Decompress.
             switch (type) {
                 // Decompress ZLIB
