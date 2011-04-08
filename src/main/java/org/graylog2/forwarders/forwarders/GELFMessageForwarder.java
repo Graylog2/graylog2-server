@@ -52,14 +52,13 @@ public class GELFMessageForwarder extends UDPForwarder implements MessageForward
             LOG.info("Forwarding a chunked message.");
             for (GELFClientChunk chunk : message.getMessageChunks().values()) {
                 LOG.info("Fowarding chunked GELF message chunk: <" + chunk.getHash() + ">");
-                this.send(chunk.getData());
+                this.succeeded = this.send(chunk.getData());
             }
         } else {
-            // TODO: THIS NEEDS TO BE GZIPPED.
             this.succeeded = this.send(message.getShortMessage().getBytes());
         }
 
-        return false;
+        return this.succeeded;
     }
 
     public boolean succeeded() {
