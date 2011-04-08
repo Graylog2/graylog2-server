@@ -2,24 +2,39 @@
 
 <dl id="users-form">
   <dt><%= label_tag 'login', "Username" %></dt>
-  <dd><%= f.text_field :login %><%= @user.errors[:login].join(" and ")%></dd>
+  <dd>
+    <%= f.text_field :login %>
+    <span class="highlighted"><%= @user.errors[:login].join(" and ")%></span>
+  </dd>
 
   <dt><%= label_tag 'email' %></dt>
-  <dd><%= f.text_field :email %><%= @user.errors[:email].join(" and ")%></dd>
+  <dd>
+    <%= f.text_field :email %>
+    <span class="highlighted"><%= @user.errors[:email].join(" and ")%></span>
+  </dd>
   
   <dt><%= label_tag 'name' %></dt>
-  <dd><%= f.text_field :name %><%= @user.errors[:name].join(" and ")%></dd>
+  <dd>
+    <%= f.text_field :name %>
+    <span class="highlighted"><%= @user.errors[:name].join(" and ")%></span>
+  </dd>
 
   <dt><%= label_tag 'password' %></dt>
-  <dd><%= f.password_field :password %><%= @user.errors[:password].join(" and ")%></dd>
+  <dd>
+    <%= f.password_field :password %>
+    <span class="highlighted"><%= @user.errors[:password].join(" and ")%></span>
+  </dd>
 
   <dt><%= label_tag 'password_confirmation', 'Confirm Password' %></dt>
-  <dd><%= f.password_field :password_confirmation %><%= @user.errors[:password_confirmation].join(" and ")%></dd>
+  <dd>
+    <%= f.password_field :password_confirmation %>
+    <span class="highlighted"><%= @user.errors[:password_confirmation].join(" and ")%></span>
+  </dd>
 
   <dt><%= label_tag 'role', 'Role'%></dt>
   <dd>
     <%= f.select(:role, user.valid_roles.collect {|r| [r.to_s.capitalize, r.to_s]}, :selected => (@user.role.blank? ? "admin" : @user.role)) %>
-    <%= @user.errors[:role].join(" and ")%>
+    <span class="highlighted"><%= @user.errors[:role].join(" and ")%></span>
   </dd>
 
   <dt class="users-streams" style="display: <%= show_streams?(@user) %>;"><%= label_tag 'streams', 'Streams' %></dt>
