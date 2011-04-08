@@ -44,7 +44,7 @@ Your current time: <%= gl_date(Time.now.to_s) %>
   <li>Average object size: <%= number_to_human_size(MessageCollection.average_object_size) %></li>
 </ul>
 
-<h3>Jobs & Tasks</h3>
+<h3>Jobs & Tasks <%= tooltip("Notifications") %></h3>
 <ul id="jobsandtasks">
   <li>
     Stream subscriptions:
