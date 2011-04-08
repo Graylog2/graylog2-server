@@ -35,6 +35,8 @@ public class GELFClientChunk {
     private int sequenceCount = -1;
     private int arrival = -1;
 
+    private byte[] raw = null;
+
     /**
      *
      * @return
@@ -65,6 +67,26 @@ public class GELFClientChunk {
      */
     public void setData(byte[] data) {
         this.data = data.clone();
+    }
+
+    /**
+     *
+     * @return
+     */
+    public byte[] getRaw() {
+        return this.raw;
+    }
+
+    /**
+     *
+     * @param data
+     */
+    public void setRaw(byte[] raw, int length) {
+        // Datagram is filled up to total size. Slice down to the actual length.
+        byte[] slicedRaw = new byte[length];
+        System.arraycopy(raw, 0, slicedRaw, 0, length);
+
+        this.raw = slicedRaw;
     }
 
     /**
