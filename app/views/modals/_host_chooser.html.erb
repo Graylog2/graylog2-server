@@ -10,7 +10,7 @@
 <% else %>
   <% hosts.each do |host| %>
     <% next if host.blank? or host.host.blank? %>
-    <li><%= link_to host.host, host_path(host.host) %></li>
+    <li><%= link_to host.host, host_messages_path(host.host) %></li>
   <% end %>
 <% end %>
 </ul>
