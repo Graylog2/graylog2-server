@@ -41,7 +41,7 @@ module Rails
         lines = grep_for("named_scope", "app/models/")
         files = extract_filenames(lines)
 
-        if files
+        unless files.empty?
           alert(
             "named_scope is now just scope",
             "The named_scope method has been renamed to just scope.",
@@ -173,9 +173,10 @@ module Rails
       # Check for old-style config.gem calls
       def check_gems
         lines = grep_for("config.gem ", "config/*.rb")
+        lines += grep_for("config.gem ", "config/**/*.rb")
         files = extract_filenames(lines)
 
-        if files
+        unless files.empty?
           alert(
             "Old gem bundling (config.gems)",
             "The old way of bundling is gone now.  You need a Gemfile for bundler.",
@@ -191,7 +192,7 @@ module Rails
         lines = grep_for("deliver_", "app/models/ #{base_path}app/controllers/ #{base_path}app/observers/")
         files = extract_filenames(lines)
 
-        if files
+        unless files.empty?
           alert(
             "Deprecated ActionMailer API",
             "You're using the old ActionMailer API to send e-mails in a controller, model, or observer.",
@@ -225,7 +226,7 @@ module Rails
                     grep_for("def manifest", g).empty? 
                   end.compact
 
-          if !files.empty?
+          unless files.empty?
             alert(
               "Old Rails generator API",
               "A plugin in the app is using the old generator API (a new one may be available at http://github.com/trydionel/rails3-generators).",
@@ -269,7 +270,7 @@ module Rails
         
         files = extract_filenames(lines)
 
-        if files
+        if !files.blank?
           alert(
             "Deprecated ERb helper calls",
             "Block helpers that use concat (e.g., form_for) should use <%= instead of <%.  The current form will continue to work for now, but you will get deprecation warnings since this form will go away in the future.",
@@ -303,7 +304,7 @@ module Rails
         lines = grep_for("ActionController::Base.cookie_verifier_secret = ", "config/**/*")
         files = extract_filenames(lines)
 
-        if files
+        unless files.empty?
           alert(
             "Deprecated cookie secret setting",
             "Previously, cookie secret was set directly on ActionController::Base; it's now config.secret_token.",
@@ -317,7 +318,7 @@ module Rails
         lines = grep_for("ActionController::Base.session = {", "config/**/*")
         files = extract_filenames(lines)
 
-        if files
+        unless files.empty?
           alert(
             "Deprecated session secret setting",
             "Previously, session secret was set directly on ActionController::Base; it's now config.secret_token.",
@@ -332,7 +333,7 @@ module Rails
         lines = grep_for("ActionController::Base.session_store", "config/**/*")
         files = extract_filenames(lines)
 
-        if files
+        unless files.empty?
           alert(
             "Old session store setting",
             "Previously, session store was set directly on ActionController::Base; it's now config.session_store :whatever.",
@@ -378,11 +379,11 @@ module Rails
         value = ""
         # Specifically double quote for finding 'test_help'
         command = if double_quote
-                    "grep -r #{"-P" if perl_regex} --exclude=\*.svn\* \"#{text}\" #{where}"
+                    "grep -rH #{"-P" if perl_regex} \"#{text}\" #{where} | grep -v \.svn"
                   else
-                    "grep -r #{"-P" if perl_regex} --exclude=\*.svn\* '#{text}' #{where}"
+                    "grep -rH #{"-P" if perl_regex} '#{text}' #{where} | grep -v \.svn"
                   end
-        
+
         Open3.popen3(command) do |stdin, stdout, stderr|
           value = stdout.read
         end
@@ -401,14 +402,18 @@ module Rails
       # Extract the filenames from the grep output
       def extract_filenames(output)
         if @probably_has_grep
-          extract_filenames_from_grep(output)
+          filenames = extract_filenames_from_grep(output)
         else
-          extract_filenames_from_rak(output)
+          filenames = extract_filenames_from_rak(output)
+        end
+
+        filenames.compact.map do |f|
+          f.gsub(base_path, "")
         end
       end
 
       def extract_filenames_from_grep(output)
-        return nil if output.empty?
+        return [] if output.empty?
 
         output.split("\n").map do |fn|
           if m = fn.match(/^(.+?):/)
@@ -418,7 +423,7 @@ module Rails
       end
 
       def extract_filenames_from_rak(output)
-        return nil if output.empty?
+        return [] if output.empty?
 
         output.split("\n").uniq
       end

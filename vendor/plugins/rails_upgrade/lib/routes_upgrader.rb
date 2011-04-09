@@ -251,11 +251,15 @@ module Rails
           if @options[:conditions]
             @options[:via] = @options.delete(:conditions).delete(:method)
           end
-        
+
+          if @options[:method]
+            @options[:via] = @options.delete(:method).to_s
+          end
+
           @options ||= {}
           base = (base % [@path, @options.delete(:controller), (@options.delete(:action) || "index")])
           opts = opts_to_string(@options)
-          
+
           route_pieces = ([base] + extra_options + [opts])
           route_pieces.delete("")
           
@@ -275,14 +279,19 @@ module Rails
       end
       
       def to_route_code
+        # preserve :only & :except options
+        copied_options = @options.reject { |k,v| ![:only, :except].member?(k) }
+        unless copied_options.empty?
+          copied_options_str = ", " + copied_options.map { |k, v| "#{k.inspect} => #{v.inspect}" }.join(",")
+        end
         
         if !@children.empty? || @options.has_key?(:collection) || @options.has_key?(:member)
-          prefix = ["#{route_method} :#{@name} do"]
+          prefix = ["#{route_method} :#{@name}#{copied_options_str} do"]
           lines = prefix + custom_methods + [@children.map {|r| r.to_route_code}.join("\n"), "end"]
         
           indent_lines(lines)
         else
-          base = "#{route_method} :%s"
+          base = "#{route_method} :%s#{copied_options_str}"
           indent_lines [base % [@name]]
         end
       end
@@ -299,8 +308,10 @@ module Rails
         method_code = []
         
         RouteRedrawer.stack << self
-        @options[group].each do |k, v|
-          method_code << "#{v} :#{k}"
+        @options[group].each do |name, methods|
+          [*methods].each do |method|
+            method_code << "#{method} :#{name}"
+          end
         end
         RouteRedrawer.stack.pop
         

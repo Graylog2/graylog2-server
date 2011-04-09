@@ -89,6 +89,11 @@ end
     assert_equal "resources :hats do\ncollection do\npost :toss\nend\nmember do\nget :wear\nend\n\nend\n", route.to_route_code
   end
   
+  def test_generates_code_for_resources_with_multiple_special_methods_per_name
+    route = Rails::Upgrading::FakeResourceRoute.new("hats", {:member => {:wear => [:get, :put]}, :collection => {:toss => [:get, :post]}})
+      assert_equal "resources :hats do\ncollection do\nget :toss\npost :toss\nend\nmember do\nget :wear\nput :wear\nend\n\nend\n", route.to_route_code
+  end
+
   def test_generates_code_for_route_with_extra_params
     route = Rails::Upgrading::FakeRoute.new("/about", {:controller => 'static', :action => 'about', :something => 'extra'})
     assert_equal "match '/about' => 'static#about', :something => 'extra'", route.to_route_code
@@ -138,5 +143,34 @@ end
     result = upgrader.generate_new_routes
 
     assert_equal new_routes_code, result
+  end
+
+
+  def test_preserves_resources_except_option
+    route = Rails::Upgrading::FakeResourceRoute.new("hats", :except => [:index])
+    assert_equal "resources :hats, :except => [:index]", route.to_route_code
+  end
+
+  def test_preserves_resources_only_option
+    route = Rails::Upgrading::FakeResourceRoute.new("hats", :only => :show)
+    assert_equal "resources :hats, :only => :show", route.to_route_code
+  end
+
+  def test_generates_code_for_delete_route
+    routes_code = %Q{
+ActionController::Routing::Routes.draw do |map|
+  map.sign_out '/sign_out', :controller => 'sessions', :action => 'destroy', :method => :delete
+end
+    }
+
+    new_routes_code = %Q{
+MyApplication::Application.routes.draw do
+  match '/sign_out' => 'sessions#destroy', :as => :sign_out, :via => 'delete'
+end
+    }
+
+    upgrader = Rails::Upgrading::RoutesUpgrader.new
+    upgrader.routes_code = routes_code
+    assert_equal new_routes_code.strip, upgrader.generate_new_routes.strip
   end
 end

@@ -4,6 +4,12 @@ A simple battery of scripts for upgrading Rails app/checking them for required u
 
 == Usage
 
+You need to install this plugin first:
+
+    script/plugin install git://github.com/rails/rails_upgrade.git
+
+Then you can run its rake tasks to check your application:
+
     # Check your app for required upgrades
     rake rails:upgrade:check
     

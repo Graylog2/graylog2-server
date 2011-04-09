@@ -2,7 +2,7 @@ require 'test_helper'
 require 'application_checker'
 require 'fileutils'
 
-tmp_dir = "#{File.dirname(__FILE__)}/fixtures/tmp"
+tmp_dir = File.expand_path("#{File.dirname(__FILE__)}/fixtures/tmp")
 
 if defined? BASE_ROOT
   BASE_ROOT.replace tmp_dir
@@ -15,7 +15,7 @@ FileUtils.mkdir_p BASE_ROOT
 module Rails
   module Upgrading
     class ApplicationChecker
-      attr_reader :alerts
+      attr_reader :alerts, :culprits
 
       def base_path
         BASE_ROOT + "/"
@@ -27,10 +27,12 @@ module Rails
 
       def initialize
         @alerts = {}
+        @culprits = {}
       end
 
       def alert(title, text, more_info_url, culprits)
-        @alerts[title] = [text, more_info_url, culprits]
+        @alerts[title] = [text, more_info_url]
+        @culprits[title] = culprits
       end
     end
   end
@@ -55,7 +57,15 @@ class ApplicationCheckerTest < ActiveSupport::TestCase
     make_file("app/models", "post.rb", "Post.find(:all)")
     @checker.check_ar_methods
 
-    assert @checker.alerts.has_key?("Soon-to-be-deprecated ActiveRecord calls")
+    key = "Soon-to-be-deprecated ActiveRecord calls"
+    assert @checker.alerts.has_key?(key)
+    assert_equal "app/models/post.rb", @checker.culprits[key].first
+  end
+
+  def test_check_svn_subdirs_are_not_included
+    make_file("app/models/.svn/text-base", "foo.rb.tmp", "Post.find(:all)")
+    @checker.check_ar_methods
+    assert @checker.alerts.empty?
   end
   
   def test_check_validation_on_methods
@@ -125,6 +135,18 @@ class ApplicationCheckerTest < ActiveSupport::TestCase
     @checker.check_gems
 
     assert @checker.alerts.has_key?("Old gem bundling (config.gems)")
+  end
+
+  def test_check_gems_finds_nothing
+    @checker.check_gems
+
+    assert_equal false, @checker.alerts.has_key?("Old gem bundling (config.gems)")
+  end
+
+  def test_check_mailer_finds_nothing
+    @checker.check_mailers
+
+    assert_equal false, @checker.alerts.has_key?("Old ActionMailer class API")
   end
 
   def test_check_mailer_syntax
@@ -218,6 +240,11 @@ class ApplicationCheckerTest < ActiveSupport::TestCase
     assert @checker.alerts.has_key?("Deprecated constant(s)")
   end
 
+  def test_check_deprecated_cookie_finds_nothing
+    @checker.check_old_cookie_secret
+    assert_equal false, @checker.alerts.has_key?("Deprecated cookie secret setting")
+  end
+
   def test_check_deprecated_cookie_settings
     make_file("config/initializers/", "more_settings.rb", "ActionController::Base.cookie_verifier_secret = 'OMG'")
     @checker.check_old_cookie_secret
@@ -225,11 +252,21 @@ class ApplicationCheckerTest < ActiveSupport::TestCase
     assert @checker.alerts.has_key?("Deprecated cookie secret setting")
   end
 
+  def test_check_deprecated_session_finds_nothing
+    @checker.check_old_session_secret
+    assert_equal false, @checker.alerts.has_key?("Deprecated session secret setting")
+  end
+
   def test_check_deprecated_session_secret
     make_file("config/initializers/", "more_settings.rb", "ActionController::Base.session = {\n:whatever => 'woot'\n}")
     @checker.check_old_session_secret
 
     assert @checker.alerts.has_key?("Deprecated session secret setting")
+  end
+
+  def test_check_old_session_setting_finds_nothing
+    @checker.check_old_session_setting
+    assert_equal false, @checker.alerts.has_key?("Old session store setting")
   end
 
   def test_check_deprecated_session_settings
@@ -258,7 +295,7 @@ class ApplicationCheckerTest < ActiveSupport::TestCase
     make_file("app/views/users/", "another_test.html.erb", "<b>blah blah blah</b><% @some_items.each do |item| %> <label>doo dah</label> <%= item %> <% end %>")
     @checker.check_old_helpers
 
-    assert_equal @checker.alerts.has_key?("Deprecated ERb helper calls"), false
+    assert_equal false, @checker.alerts.has_key?("Deprecated ERb helper calls")
   end
 
   def test_check_old_ajax_helpers
