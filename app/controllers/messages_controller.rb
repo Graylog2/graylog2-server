@@ -55,8 +55,8 @@ class MessagesController < ApplicationController
     @has_sidebar = true
     @load_flot = true
 
-    @comments = Messagecomment.all_matched(@message)
     @message = @scope.where(:_id => BSON::ObjectId(params[:id])).all.first
+    @comments = Messagecomment.all_matched(@message)
     
     if params[:partial]
       render :partial => "full_message"
