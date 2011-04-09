@@ -6,7 +6,7 @@ NOHUP=`which nohup`
 
 start() {
 	echo "Starting graylog2-server ..."
-	$NOHUP java -jar ../graylog2-server.jar > /dev/null
+	$NOHUP java -jar ../graylog2-server.jar
 }
 
 stop() {
