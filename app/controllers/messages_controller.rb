@@ -63,10 +63,7 @@ class MessagesController < ApplicationController
   end
 
   def destroy
-    Message.where(_id: BSON::ObjectId(params[:id])).update(
-      deleted: true
-    )
-    
+    Message.where(:_id => BSON::ObjectId(params[:id])).update(:deleted => true)
     redirect_to :action => "index"
   end
 

@@ -9,7 +9,7 @@ class Job
   end
 
   def self.done(title)
-    where(title: title).delete_all
+    where(:title => title).delete_all
     
     job = Job.new
     job.title = title
