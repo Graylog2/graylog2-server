@@ -19,7 +19,6 @@ class Message
   key :file, String
   key :line, Integer
 
-
   LIMIT = 100
   
   # This is controlled by general.yml. Disabling it gives great performance improve.
@@ -332,7 +331,21 @@ class Message
     res.reverse! if opts[:order] == :desc
     res
   end
-  
+
+  # Workaround for migration problems. #WEBINTERFACE-24
+  def referenced_streams
+    ret_streams = Array.new
+    streams.each do |stream_id|
+      begin
+        ret_streams << Stream.find_by_id(stream_id.to_s)
+      rescue
+        next
+      end
+    end
+
+    return ret_streams
+  end
+
   def time
     Time.at(self.created_at) rescue nil
   end

@@ -88,6 +88,11 @@
   top: 4px;
 }
 
+#message-referenced-streams {
+  list-style-type: square;
+  margin-left: 25px;
+}
+
 .graph-rangeselector-sidebar {
   margin-top: 5px;
 }

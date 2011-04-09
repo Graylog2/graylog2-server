@@ -32,6 +32,16 @@
   </p>
 <% end %>
 
+<% unless @message.streams.blank? %>
+  <br />
+  <h3>Filed in following streams:</h3>
+  <ul id="message-referenced-streams">
+  <% @message.referenced_streams.each do |stream| %>
+    <li><%= link_to stream.title, stream_path(stream) %></li>
+  <% end %>
+  </ul>
+<% end %>
+
 <% unless @comments.blank? %>
   <h3>Comments</h3>
   <ul id="messagecomments">
