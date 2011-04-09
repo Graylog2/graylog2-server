@@ -11,9 +11,7 @@ gem 'chronic', '~> 0.3.0'
 gem 'pony', '~> 1.1'  # yes, unusual version number
 gem 'declarative_authorization', :git => "http://github.com/cipherpunk/declarative_authorization.git"
 
-# TODO move to another group
-gem 'eventmachine', '~> 0.12.10'
-gem 'em-websocket', '~> 0.1.4'  # TODO upgrade to 0.2.x
+# gem 'mongo' wants it
 if RUBY_VERSION.start_with?('1.8')
   gem 'SystemTimer', '~> 1.2.3'
 end
