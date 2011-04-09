@@ -14,7 +14,7 @@ gem 'declarative_authorization', :git => "http://github.com/cipherpunk/declarati
 gem 'em-websocket', '0.1.4'
 
 group :development, :test do
-  gem 'machinist_mongo'
+  gem 'machinist_mongo', '~> 1.2.0', :require => 'machinist/mongoid'
   gem 'metric_fu'
   gem 'ci_reporter'
   gem 'shoulda', '~> 2.11.3'

@@ -5,8 +5,6 @@ require 'rails/test_help'
 require File.expand_path(File.dirname(__FILE__) + "/blueprints-mm.rb")
 require File.expand_path(File.dirname(__FILE__) + "/blueprints-ar.rb")
 
-DatabaseCleaner[:mongo_mapper].strategy = :truncation
-
 
 class ActiveSupport::TestCase
   fixtures :all

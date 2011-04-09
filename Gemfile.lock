@@ -175,7 +175,7 @@ DEPENDENCIES
   faker (~> 0.3.1)
   jnunemaker-validatable (= 1.8.4)
   json (= 1.4.6)
-  machinist_mongo
+  machinist_mongo (~> 1.2.0)
   metric_fu
   mocha (~> 0.9.10)
   mongoid (= 2.0.0.rc.6)
