@@ -42,6 +42,12 @@
   </ul>
 <% end %>
 
+<% if Configuration.allow_deleting %>
+  <br />
+  <%= awesome_link "Delete message", message_path(@message), :confirm => "Really delete this message?", :method => :delete %>
+  <br />
+<% end %>
+
 <% unless @comments.blank? %>
   <h3>Comments</h3>
   <ul id="messagecomments">

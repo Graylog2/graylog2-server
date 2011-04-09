@@ -3,6 +3,7 @@ authorization do
     has_permission_on :messages, :to => [
       :index,
       :show,
+      :destroy,
       :getcompletemessage,
       :getsimilarmessages,
       :showrange,

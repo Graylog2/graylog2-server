@@ -64,6 +64,14 @@ class MessagesController < ApplicationController
     end
   end
 
+  def destroy
+    Message.where(_id: BSON::ObjectId(params[:id])).update(
+      deleted: true
+    )
+    
+    redirect_to :action => "index"
+  end
+
   def showrange
     @has_sidebar = true
     @load_flot = true
