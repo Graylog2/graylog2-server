@@ -7,7 +7,7 @@ class Stream
 
   references_and_referenced_in_many :favoritedStreams, :class_name => "User", :inverse_of => :favorite_streams
   references_and_referenced_in_many :users, :inverse_of => :streams
-  references_and_referenced_in_many :subscribers, :class_name => "User", :inverse_of => :subscribed_streams
+  references_and_referenced_in_many :subscribedStreams, :class_name => "User", :inverse_of => :subscribed_streams
 
   referenced_in :streamcategory
 
@@ -37,7 +37,7 @@ class Stream
   end
 
   def subscribed?(user)
-    !subscribers.nil? and subscribers.include?(user)
+    !subscribedStreams.nil? and subscribedStreams.include?(user)
   end
 
   def favorited?(user_id)

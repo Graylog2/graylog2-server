@@ -304,7 +304,8 @@ class Message
     ret_streams = Array.new
     streams.each do |stream_id|
       begin
-        ret_streams << Stream.find_by_id(stream_id.to_s)
+        stream = Stream.find_by_id(stream_id.to_s)
+        ret_streams << stream unless stream.blank?
       rescue
         next
       end
