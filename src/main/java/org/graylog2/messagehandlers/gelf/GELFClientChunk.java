@@ -137,14 +137,6 @@ public class GELFClientChunk {
         this.sequenceNumber = sequenceNumber;
     }
 
-    public byte[] getRaw() {
-        return this.raw;
-    }
-
-    public void setRaw(byte[] raw) {
-        this.raw = raw;
-    }
-
     /**
      *
      * @return
