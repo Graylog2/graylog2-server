@@ -27,7 +27,7 @@ Graylog2WebInterface::Application.routes.draw do
     resources :blacklistedterms, :as => "terms"
   end
 
-  resources :hosts do
+  resources :hosts, :constraints => { :id => /.*/ } do
     resources :messages
   end
   
