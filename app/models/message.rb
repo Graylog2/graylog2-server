@@ -23,7 +23,7 @@ class Message
   
   # This is controlled by general.yml. Disabling it gives great performance improve.
   if Configuration.allow_deleting
-    scope :not_deleted, :deleted => false
+    scope :not_deleted, where({ :deleted => false })
   else
     scope :not_deleted, Hash.new
   end
