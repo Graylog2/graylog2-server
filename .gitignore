@@ -5,7 +5,7 @@ nbproject/*
 .idea
 
 config/database.yml
-config/mongodb.yml
+config/mongoid.yml
 config/graphs.yml
 config/general.yml
 config/email.yml
