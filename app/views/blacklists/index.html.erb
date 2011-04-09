@@ -1,9 +1,8 @@
 <h1>Blacklists</h1>
 
 <div class="description">
-  Use blacklists to filter certain strings out of the results in every section of Graylog2. Example: Blacklist the term "foo"
-  and no syslog messages that contain "foo" will appear in the overview, streams, statistics, alerts etc. - Click on a
-  blacklist to see all messages filtered out.
+  Use blacklists to filter out certain messages. Example: Blacklist the term <span class="highlighted">.+foo.+</span> and
+  all messages containing <span class="highlighted">foo</span> will be dropped by the server.
 </div>
 
 <%= form_for @new_blacklist, :url => blacklists_path do |f| %>
@@ -12,20 +11,24 @@
   <%= awesome_submit_link "Create blacklist" %>
 <% end %>
 
-
+<br />
+<h2>Configured blacklists</h2>
+<ul id="blacklists">
+<% if @blacklists.blank? %>
+  <li><h3>No blacklists configured</h3></li>
+<% else %>
 <% @blacklists.each do |blacklist| %>
-  <div class="blocks">
-    <span class="blocks-title"><%= link_to h(blacklist.title), blacklist_path(blacklist) %></span>
-    <ul class="blocks-termslist">
-      <% if blacklist.blacklisted_terms.blank? %>
-        <li>Filtering nothing</li>
-      <% else %>
-        <% blacklist.blacklisted_terms.each do |term| %>
-          <li><%= term.term %></li>
-        <% end %>
+  <li>
+    <h3 style="display: inline;"><%= blacklist.title %></h3>
+    <%= link_to "Manage terms", blacklist_path(blacklist) %>
+    /
+    <%= link_to "Delete", blacklist_path(blacklist), :method => :delete, :confirm => "Really delete this blacklist with all it's terms?" %>
+    <ul class="blacklist-terms">
+      <% blacklist.blacklisted_terms.each do |term| %>
+        <li><h4><%= term.term %></h4></li>
       <% end %>
     </ul>
-  </div>
+  </li>
 <% end %>
-
-<br style="clear: both;" />
+<% end %>
+</ul>

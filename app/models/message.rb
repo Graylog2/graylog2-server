@@ -28,10 +28,6 @@ class Message
     scope :not_deleted, Hash.new
   end
 
-  scope :by_blacklisted_terms, lambda { |terms| terms.blank? ? where : where(:message.nin => terms.collect { |term| /#{term}/}) }
-  scope :of_blacklisted_terms, lambda { |terms| where(:message.in => terms.collect { |term| /#{term}/}) }
-  scope :by_blacklist, lambda {|blacklist| by_blacklisted_terms(blacklist.all_terms)}
-  scope :of_blacklist, lambda {|blacklist| of_blacklisted_terms(blacklist.all_terms)}
   scope :page, lambda {|number| skip(self.get_offset(number))}
   scope :default_scope, order_by({"_id" => "-1"}).not_deleted.limit(LIMIT)
   scope :time_range, lambda {|from, to| where(:created_at => {"$gte" => from}).where(:created_at => {"$lte" => to})}
@@ -66,6 +62,12 @@ class Message
     read_attribute(:message)
   end
 
+  def self.all_paginated page = 1, limit = LIMIT
+    page = 1 if page.blank?
+            
+    default_scope.paginate(:page => page)
+  end
+
   def self.get_conditions_from_date(timeframe)
     conditions = {}
     re = /^(from (.+)){0,1}?(to (.+))$/
@@ -83,25 +85,6 @@ class Message
     return conditions
   end
   
-  def self.all_of_blacklist id, page = 1
-    page = 1 if page.blank?
-    
-    b = Blacklist.find(id)
-    return of_blacklist(b).default_scope.paginate(:page => page)
-  end
-
-  def self.count_of_blacklist id
-    b = Blacklist.find(id)
-    return by_blacklist(b).count
-  end
-
-  def self.all_with_blacklist page = 1, limit = LIMIT
-    page = 1 if page.blank?
-    
-    terms = Blacklist.all_terms
-    by_blacklisted_terms(terms).default_scope.paginate(:page => page)
-  end
-
   def self.all_by_quickfilter filters, page = 1, limit = LIMIT, conditions_only = false
     page = 1 if page.blank?
 
@@ -109,15 +92,9 @@ class Message
 
     unless filters.blank?
       unless filters[:message].blank?
-        # Message (seems like there is a bug in the Plucky condition overwriting. Setting blacklisted terms here.)
         message_conditions = Hash.new
         message_conditions[:message] = Hash.new
         message_conditions[:message]["$in"] = [/#{filters[:message].strip}/]
-
-        blacklisted_terms = BlacklistedTerm.all_as_array
-        if blacklisted_terms.count > 0
-          message_conditions[:message]["$nin"] = blacklisted_terms
-        end
 
         conditions = conditions.where(message_conditions)
       end
@@ -182,9 +159,7 @@ class Message
   def self.all_in_range(page, from, to)
     page = 1 if page.blank?
     
-    terms = Blacklist.all_terms
-    #by_blacklisted_terms(terms).default_scope.where(:created_at => {"$gte" => from}).where(:created_at => {"$lte" => to}).paginate(:page => page)
-    by_blacklisted_terms(terms).default_scope.time_range(from, to).paginate(:page => page)
+    default_scope.time_range(from, to).paginate(:page => page)
   end
     
   def self.count_all_of_stream_in_range(stream_id, from, to)
@@ -194,9 +169,7 @@ class Message
   end
 
   def self.count_all_in_range(from, to)
-    terms = Blacklist.all_terms
-    #by_blacklisted_terms(terms).where(:created_at => {"$gte" => from}).where(:created_at => {"$lte" => to}).count
-    by_blacklisted_terms(terms).time_range(from, to).count
+    time_range(from, to).count
   end
 
   def self.counts_of_last_minutes(minutes)
@@ -214,8 +187,7 @@ class Message
       
       if c == nil
         # Cache miss. Perform counting and add to cache.
-        terms = Blacklist.all_terms
-        c = Message.by_blacklisted_terms(terms).time_range(t.to_i, (t+60).to_i).count
+        c = Message.time_range(t.to_i, (t+60).to_i).count
         Rails.cache.write(obj, c)
       end
 
@@ -278,11 +250,6 @@ class Message
     else
       conditions = not_deleted
     end
-
-    terms = Blacklist.all_terms
-    unless terms.blank?
-      conditions = conditions.by_blacklisted_terms(terms)
-    end
     
     conditions.count
   end
@@ -325,9 +292,9 @@ class Message
     qry = self.attributes.dup.delete_if { |k,v| !opts["same_#{k}".to_sym] }
     nb = args.first || 100
     terms = Blacklist.all_terms
-    from = self.class.by_blacklisted_terms(terms).default_scope.where(qry.merge(:_id => { "$lte" => self.id })).order({"_id" => "-1"}).skip(nb).first
+    from = self.class.default_scope.where(qry.merge(:_id => { "$lte" => self.id })).order({"_id" => "-1"}).skip(nb).first
     return Array.new unless from
-    res = self.class.by_blacklisted_terms(terms).default_scope.where(qry.merge(:_id => {"$gte" => from.id})).limit(1 + nb.to_i * 2).order({"_id" => "1"}).to_a
+    res = self.class.default_scope.where(qry.merge(:_id => {"$gte" => from.id})).limit(1 + nb.to_i * 2).order({"_id" => "1"}).to_a
     res.reverse! if opts[:order] == :desc
     res
   end

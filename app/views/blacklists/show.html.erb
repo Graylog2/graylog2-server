@@ -1,12 +1,4 @@
-<% content_for :sidebar do %>
-  <%= render :partial => "messages/sidebar_index", :locals => { :headline => "Hello, <span class=\"highlighted\">#{current_user.login}</span>!" } %>
-<% end %>
-
-<div id="blacklist-delete">
-  <%= link_to "Delete this blacklist", blacklist_path(@blacklist), :method => :delete, :confirm => "Really delete this blacklist with all it's terms?" %>
-</div>
-
-<h1>Blacklist <span class="highlighted"><%= @blacklist.title %></span></h1>
+<h1>Terms of blacklist <span class="highlighted"><%= @blacklist.title %></span></h1>
 
 <%= form_for @new_term, :url => blacklist_terms_path(@blacklist) do |f| %>
   <%= f.hidden_field :blacklist_id, :value => @blacklist.id %>
@@ -15,23 +7,20 @@
   <%= awesome_submit_link "Add" %>
 <% end %>
 
-<div id="blocks-terms">
-  <h2>Filtering:</h2>
-  <ul>
-    <% if @blacklist.blacklisted_terms.blank? %>
-      <li>nothing</li>
-    <% else %>
-      <% @blacklist.blacklisted_terms.each do |term| %>
-        <li>
-          <%=h term.term %>
-          <%= link_to image_tag("icons/delete.png", :style => "position: relative; top: -2px"), blacklist_term_path(@blacklist, term), :method => :delete, :class => "blocks-terms-delete" %>
-        </li>
-      <% end %>
-    <% end %>
-  </ul>
-  <br style="clear: both;" />
-</div>
-
-<% unless @blacklist.blacklisted_terms.blank? %>
-  <%= render :partial => "messages/table", :locals => { :messages => @messages, :total_messages => @total_count } %>
+<br />
+<h2>Configured terms</h2>
+<ul id="blacklist-terms">
+<% if @blacklist.blacklisted_terms.blank? %>
+  <li><h3>No terms configured</h3></li>
+<% else %>
+<% @blacklist.blacklisted_terms.each do |term| %>
+  <li>
+    <h3 style="display: inline;"><%= term.term %></h3>
+    <%= link_to "Delete", blacklist_term_path(@blacklist, term), :method => :delete, :confirm => "Really delete this term?" %>
+  </li>
 <% end %>
+<% end %>
+</ul>
+
+<br />
+<h3><%= link_to "Back to blacklist overview", blacklists_path %></h3>
