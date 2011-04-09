@@ -40,6 +40,8 @@ import java.io.FileWriter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
+import org.apache.log4j.Level;
+import org.apache.log4j.Priority;
 
 /**
  * Main class of Graylog2.
@@ -70,7 +72,14 @@ public final class Main {
     public static void main(String[] args) {
 
         Logger.getRootLogger().addAppender(new SelfLogAppender());
-        
+
+        // Are we in debug mode?
+        if (args.length > 0 && args[0].equalsIgnoreCase("debug")) {
+            LOG.info("[x] Running in Debug mode");
+            Logger.getRootLogger().setLevel(Level.ALL);
+            Logger.getLogger("org.graylog2").setLevel(Level.ALL);
+        }
+
         LOG.info("[x] Graylog2 starting up. (JRE: " + Tools.getSystemInformation() + ")");
 
         // Read config.

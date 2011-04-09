@@ -12,12 +12,12 @@
 	
 	<!-- Application Loggers -->
 	<logger name="org.graylog2">
-		<level value="info" />
+		<level value="warn" />
 	</logger>
 	
 	<!-- Root Logger -->
 	<root>
-		<priority value="info" />
+		<priority value="warn" />
 		<appender-ref ref="console" />
 	</root>
 	
