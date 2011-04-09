@@ -30,8 +30,9 @@
     <li>No rules defined.</li>
   <% else %>
     <% @stream.streamrules.each do |rule| %>
-      <li>
-        <%= link_to(raw(streamrule_to_human(rule)), stream_streamrule_path(@stream, rule), :method => :delete) %>
+      <li style="margin-bottom: 2px;">
+        <h4 style="display: inline;"><%= raw(streamrule_to_human(rule)) %></h4>
+        <%= link_to("Delete", stream_streamrule_path(@stream, rule), :method => :delete) %>
       </li>
     <% end %>
   <% end %>
