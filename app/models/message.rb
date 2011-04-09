@@ -326,7 +326,7 @@ class Message
     nb = args.first || 100
     terms = Blacklist.all_terms
     from = self.class.by_blacklisted_terms(terms).default_scope.where(qry.merge(:_id => { "$lte" => self.id })).order({"_id" => "-1"}).skip(nb).first
-    return nil unless from
+    return Array.new unless from
     res = self.class.by_blacklisted_terms(terms).default_scope.where(qry.merge(:_id => {"$gte" => from.id})).limit(1 + nb.to_i * 2).order({"_id" => "1"}).to_a
     res.reverse! if opts[:order] == :desc
     res
