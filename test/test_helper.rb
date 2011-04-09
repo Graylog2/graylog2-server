@@ -2,15 +2,9 @@ ENV["RAILS_ENV"] = "test"
 require File.expand_path('../../config/environment', __FILE__)
 require 'rails/test_help'
 
-require File.expand_path(File.dirname(__FILE__) + "/blueprints-mm.rb")
-require File.expand_path(File.dirname(__FILE__) + "/blueprints-ar.rb")
-
+require File.expand_path(File.dirname(__FILE__) + "/blueprints.rb")
 
 class ActiveSupport::TestCase
-  fixtures :all
-  self.use_instantiated_fixtures = false
-  self.use_transactional_fixtures = true
-
   setup do
     DatabaseCleaner.clean
     Sham.reset
