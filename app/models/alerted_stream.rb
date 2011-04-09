@@ -20,7 +20,7 @@ class AlertedStream
         emails << u.email
       end
     else
-      self.all(:conditions => ["stream_id = ?", stream.id]).each do |s|
+      self.where(:stream_id => stream.id).each do |s|
         next if s.user.blank? or s.user.email.blank?
         emails << s.user.email
       end

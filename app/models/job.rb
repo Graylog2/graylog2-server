@@ -9,7 +9,7 @@ class Job
   end
 
   def self.done(title)
-    delete_all("title = '#{title}'")
+    where(title: title).delete_all
     
     job = Job.new
     job.title = title

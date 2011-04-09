@@ -24,6 +24,8 @@ class Stream
   field :updated_at, :type => DateTime
   field :alarm_force, :type => Boolean
   field :last_subscription_check, :type => Integer
+  field :last_alarm_check, :type => Integer
+  field :alarm_active, :type => Boolean
 
   def self.find_by_id(_id)
     _id = $1 if /^([0-9a-f]+)-/ =~ _id
@@ -48,7 +50,7 @@ class Stream
 
   # giving back IDs because all_with_subscribers does too
   def self.all_with_enabled_alerts
-    find_all_by_alarm_active(true).collect &:id
+    all.where({:alarm_active => true}).collect &:id
   end
 
   def self.get_message_count(stream_id)
