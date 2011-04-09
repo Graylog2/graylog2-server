@@ -44,6 +44,10 @@ class Stream
     !favoritedStreams.nil? and favoritedStreams.include? user_id
   end
   
+  def subscribers
+    subscriber_ids
+  end
+
   def to_param
     "#{id}-#{title.parameterize}"
   end
