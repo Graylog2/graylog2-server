@@ -1,3 +1,5 @@
+require 'net/http'
+
 class Version
   ENDPOINT = "http://versioncheck.graylog2.org/check"
 
