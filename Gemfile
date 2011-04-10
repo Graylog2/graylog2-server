@@ -1,7 +1,7 @@
 source :rubygems
 
 gem 'rack', '1.2.1'                       # FIXME ~> 1.2.2
-gem 'rails', '3.0.1', :require => nil     # FIXME ~> 3.0.6, drop ':require => nil'
+gem 'rails', '3.0.6'
 gem 'json', '~> 1.5.1'
 gem 'plucky', '0.3.6'                     # TODO ~> 0.3.7
 gem 'chronic', '~> 0.3.0'
