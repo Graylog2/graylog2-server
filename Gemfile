@@ -10,6 +10,11 @@ gem 'declarative_authorization', :git => "http://github.com/cipherpunk/declarati
 gem 'mongoid', '2.0.0.rc.6'               # TODO 2.0.1
 gem 'bson_ext', "~> 1.3.0"
 
+# TODO https://github.com/ph7/system-timer/issues/15
+if RUBY_VERSION.start_with?('1.8')
+  gem 'SystemTimer', '~> 1.2.3'
+end
+
 group :development, :test do
   # might be useful to generate fake data in development
   gem 'machinist_mongo', '~> 1.2.0', :require => 'machinist/mongoid'
