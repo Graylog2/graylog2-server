@@ -38,15 +38,10 @@ class User
   field :stream_ids
   field :last_version_check, :type => Integer
 
-#  has_and_belongs_to_many :streams
-  references_and_referenced_in_many :streams, :inverse_of => :users
-  references_and_referenced_in_many :favorite_streams, :class_name => "Stream"
-  references_and_referenced_in_many :subscribed_streams, :class_name => "Stream"
+  has_and_belongs_to_many :streams, :inverse_of => :users
+  has_and_belongs_to_many :favorite_streams,   :class_name => "Stream", :inverse_of => :favorited_streams
+  has_and_belongs_to_many :subscribed_streams, :class_name => "Stream", :inverse_of => :subscribers
   references_many :alerted_streams
-#  has_and_belongs_to_many :favorite_streams, :join_table => "favorite_streams", :class_name => "Stream"
-  #has_many :subscribed_streams, :dependent => :destroy
-#  has_and_belongs_to_many :subscribed_streams, :join_table => "subscribed_streams", :class_name => "Stream"
-#  has_many :alerted_streams, :dependent => :destroy
 
   # Authenticates a user by their login name and unencrypted password.  Returns the user or nil.
   #
@@ -82,10 +77,6 @@ class User
 
   def email=(value)
     write_attribute :email, (value ? value.downcase : nil)
-  end
-
-  def favorite_streams
-    []
   end
 
   def roles

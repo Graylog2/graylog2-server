@@ -10,7 +10,7 @@ class StreamTest < ActiveSupport::TestCase
       @user = User.make
     end
 
-    %w(favoritedStreams users subscribers).each do |rel|
+    %w(favorited_streams users subscribers).each do |rel|
       should "have #{rel} association" do
         @stream.send(rel + '=', [@user])
         @stream.save!

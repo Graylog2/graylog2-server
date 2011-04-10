@@ -5,9 +5,9 @@ class Stream
   embeds_many :streamrules
   embeds_many :forwarders
 
-  references_and_referenced_in_many :favoritedStreams, :class_name => "User", :inverse_of => :favorite_streams
-  references_and_referenced_in_many :users, :inverse_of => :streams
-  references_and_referenced_in_many :subscribers, :class_name => "User", :inverse_of => :subscribed_streams
+  has_and_belongs_to_many :users, :inverse_of => :streams
+  has_and_belongs_to_many :favorited_streams, :class_name => "User", :inverse_of => :favorite_streams
+  has_and_belongs_to_many :subscribers,       :class_name => "User", :inverse_of => :subscribed_streams
 
   referenced_in :streamcategory
 
@@ -41,11 +41,7 @@ class Stream
   end
 
   def favorited?(user_id)
-    !favoritedStreams.nil? and favoritedStreams.include? user_id
-  end
-
-  def subscribers
-    subscriber_ids
+    !favorited_streams.nil? and favorited_streams.include? user_id
   end
 
   def to_param
@@ -96,7 +92,7 @@ class Stream
   end
 
   def all_users_with_favorite
-    favoritedStreams
+    favorited_streams
   end
 
   def all_users_with_alarm
