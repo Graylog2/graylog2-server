@@ -2,7 +2,7 @@ Graylog2WebInterface::Application.routes.draw do
   match 'logout' => 'sessions#destroy', :as => :logout
   match 'login' => 'sessions#new', :as => :login
   resource :session
-  resources :settings, :dashboard
+  resources :dashboard
   
   resources :users do
     collection do
@@ -125,6 +125,12 @@ Graylog2WebInterface::Application.routes.draw do
   resources :health do
     collection do
       post :currentthroughput
+    end
+  end
+
+  resources :settings do
+    collection do
+      post :store
     end
   end
 
