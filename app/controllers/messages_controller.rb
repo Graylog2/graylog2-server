@@ -40,8 +40,10 @@ class MessagesController < ApplicationController
 
   # Not possible to do this via before_filter because of scope decision by params hash
   def block_access_for_non_admins
-    flash[:error] = "You have no access rights for this section."
-    redirect_to :controller => "streams", :action => "index"
+    if current_user.role != "admin"
+      flash[:error] = "You have no access rights for this section."
+      redirect_to :controller => "streams", :action => "index"
+    end
   end
 
   public
