@@ -23,7 +23,7 @@ class User
   # HACK HACK HACK -- how to do attr_accessible from here?
   # prevents a user from submitting a crafted form that bypasses activation
   # anything else you want your user to change should be added here.
-  attr_accessible :login, :email, :name, :password, :password_confirmation, :role, :stream_ids
+  attr_accessible :login, :email, :name, :password, :password_confirmation, :role
 
   field :login, :type => String
   field :email, :type => String
@@ -35,7 +35,6 @@ class User
   field :salt, :type => String
   field :remember_token, :type => String
   field :remember_token_expires_at
-  field :stream_ids
   field :last_version_check, :type => Integer
 
   has_and_belongs_to_many :streams, :inverse_of => :users
