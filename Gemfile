@@ -24,6 +24,7 @@ end
 group :test do
   gem 'ci_reporter'
   gem 'shoulda', '~> 2.11.3'
+  gem 'shoulda-activemodel', '0.0.2', :require => 'shoulda/active_model'  # fixed version - too hacky
   gem 'mocha', '~> 0.9.12'
   gem 'database_cleaner', '~> 0.6.0'
 end
