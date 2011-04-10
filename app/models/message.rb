@@ -32,10 +32,6 @@ class Message
   scope :default_scope, order_by({"_id" => "-1"}).not_deleted.limit(LIMIT)
   scope :time_range, lambda {|from, to| where(:created_at => {"$gte" => from}).where(:created_at => {"$lte" => to})}
 
-  def self.find_by_id(_id)
-    where(:_id => BSON::ObjectId(_id)).first
-  end
-
   def timestamp
     Time.at(created_at)
   end
