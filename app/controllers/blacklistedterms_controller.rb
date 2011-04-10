@@ -15,7 +15,7 @@ class BlacklistedtermsController < ApplicationController
   end
 
   def destroy
-    term = @blacklist.blacklisted_terms.find(:conditions => {:_id => BSON::ObjectId(params[:id])})
+    term = @blacklist.blacklisted_terms.where({:_id => BSON::ObjectId(params[:id])})
     if term.destroy
       flash[:notice] = "Term has been removed from blacklist."
     else
