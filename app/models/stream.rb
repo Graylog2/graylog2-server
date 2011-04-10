@@ -7,7 +7,7 @@ class Stream
 
   references_and_referenced_in_many :favoritedStreams, :class_name => "User", :inverse_of => :favorite_streams
   references_and_referenced_in_many :users, :inverse_of => :streams
-  references_and_referenced_in_many :subscribedStreams, :class_name => "User", :inverse_of => :subscribed_streams
+  references_and_referenced_in_many :subscribers, :class_name => "User", :inverse_of => :subscribed_streams
 
   referenced_in :streamcategory
 
@@ -68,11 +68,6 @@ class Stream
 
   def message_count_since(since)
     return Stream.message_count_since(id, since)
-  end
-
-  def last_message
-    return nil if self.streamrules.blank?
-    Message.first(:conditions => Message.by_stream(self.id).criteria, :order => "$natural DESC")
   end
 
   def rule_hash
