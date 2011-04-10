@@ -54,7 +54,7 @@ class UsersController < ApplicationController
     end
   end
 
-  def delete
+  def destroy
     # Don't let the user delete the last user.
     if User.count == 1
       flash[:error] = "You cannot delete all users."
