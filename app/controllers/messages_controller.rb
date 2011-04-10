@@ -128,17 +128,9 @@ class MessagesController < ApplicationController
   end
 
   def deletebystream
-    begin
-      conditions = Message.by_stream(params[:stream_id].to_i).criteria.to_hash
-      throw "Missing conditions" if conditions.blank?
-
-      Message.recalculate_host_counts
-      Message.set(conditions, :deleted => true )
-
-      flash[:notice] = "Messages have been deleted."
-    rescue => e
-      flash[:error] = "Could not delete messages."
-    end
+    Message.where(:streams => BSON::ObjectId(params[:stream_id])).update_all(
+      :deleted => true
+    )
 
     redirect_to stream_path(params[:stream_id])
   end
