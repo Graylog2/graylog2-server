@@ -32,7 +32,7 @@
 
   <ul>
   <% if @hostgroup.hostname_conditions.blank? and @hostgroup.regex_conditions.blank? %>
-  ^  No rules in this group.
+    No rules in this group.
   <% else %>
     <% @hostgroup.hostname_conditions(true).each do |rule| %>
       <li>Host: <%= link_to rule[:value], { :controller => "hostgroup_hosts", :action => "destroy", :id => rule[:id], :group_id => @hostgroup.id }, :method => :delete %></li>

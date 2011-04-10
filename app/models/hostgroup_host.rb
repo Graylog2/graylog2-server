@@ -3,7 +3,7 @@ class HostgroupHost
 
   validates_presence_of :ruletype, :hostname
 
-  embedded_in :hostgroup
+  referenced_in :hostgroup
 
   field :ruletype, :type => Integer
   field :hostname, :type => String
