@@ -105,6 +105,7 @@ Graylog2WebInterface::Application.routes.draw do
   resource :analytics do
     get :index
     get :messagespread
+    post :messagespread
   end
 
   resources :versioncheck do
