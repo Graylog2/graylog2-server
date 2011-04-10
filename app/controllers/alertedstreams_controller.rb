@@ -33,7 +33,6 @@ class AlertedstreamsController < ApplicationController
   end
 
   def destroy(stream_id)
-    alert = AlertedStream.find_by_stream_id_and_user_id(stream_id, current_user.id)
-    alert.destroy
+    AlertedStream.where(:stream_id => stream_id, :user_id => current_user.id).destroy
   end
 end
