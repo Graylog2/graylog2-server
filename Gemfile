@@ -2,7 +2,6 @@ source :rubygems
 
 gem 'rails', '3.0.1', :require => nil
 gem 'json', '1.4.6'
-gem 'jnunemaker-validatable', '1.8.4'
 gem 'plucky', '0.3.6'
 gem 'mongoid', '2.0.0.rc.6'
 gem 'bson_ext', "~> 1.2"

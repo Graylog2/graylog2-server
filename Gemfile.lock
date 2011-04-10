@@ -66,8 +66,6 @@ GEM
     haml (3.0.25)
     hirb (0.4.3)
     i18n (0.4.2)
-    jnunemaker-validatable (1.8.4)
-      activesupport (>= 2.3.4)
     json (1.4.6)
     json_pure (1.5.1)
     machinist (1.0.6)
@@ -166,7 +164,6 @@ DEPENDENCIES
   database_cleaner (~> 0.6.0)
   declarative_authorization!
   faker (~> 0.3.1)
-  jnunemaker-validatable (= 1.8.4)
   json (= 1.4.6)
   machinist_mongo (~> 1.2.0)
   metric_fu
