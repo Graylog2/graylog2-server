@@ -13,7 +13,7 @@
 
   <% unless params[:filters].blank? or !Configuration.allow_deleting %>
   <div id="messages-quickfilter-delete">
-    <%= form_tag('deletebyquickfilter') do -%>
+    <%= form_tag('/messages/deletebyquickfilter') do -%>
       <%= hidden_field_tag 'filters', params[:filters].to_json %>
       <%= awesome_submit_link "Delete all messages hit by this quickfilter" %>
     <% end -%>

@@ -16,6 +16,8 @@ Graylog2WebInterface::Application.routes.draw do
       post :showrange
       get :showrange
       post :getnewmessagecount
+      post :deletebystream
+      post :deletebyquickfilter
     end
     member do
       post :show
@@ -63,7 +65,6 @@ Graylog2WebInterface::Application.routes.draw do
     resources :dashboard
 
     member do
-      get :deletebystream
       get :analytics
       post :favorite
       post :unfavorite
