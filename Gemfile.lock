@@ -35,7 +35,6 @@ GEM
       activemodel (= 3.0.1)
       activesupport (= 3.0.1)
     activesupport (3.0.1)
-    addressable (2.2.4)
     arel (1.0.1)
       activesupport (~> 3.0.0)
     arrayfields (4.7.4)
@@ -54,12 +53,8 @@ GEM
       builder (>= 2.1.2)
     colored (1.2)
     database_cleaner (0.6.6)
-    em-websocket (0.1.4)
-      addressable (>= 2.1.1)
-      eventmachine (>= 0.12.9)
     erubis (2.6.6)
       abstract (>= 1.0.0)
-    eventmachine (0.12.10)
     faker (0.3.1)
     fattr (2.2.0)
     flay (1.4.2)
@@ -170,7 +165,6 @@ DEPENDENCIES
   ci_reporter
   database_cleaner (~> 0.6.0)
   declarative_authorization!
-  em-websocket (= 0.1.4)
   faker (~> 0.3.1)
   jnunemaker-validatable (= 1.8.4)
   json (= 1.4.6)
