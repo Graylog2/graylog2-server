@@ -642,3 +642,61 @@
   margin-bottom: 10px;
   display: none;
 }
+
+/* Blocks */
+.blocks {
+    margin-top: 15px;
+    float: left;
+    margin: 25px;
+}
+
+.blocks-title {
+    font-size: 25px;
+    color: #fd0c99;
+}
+
+.blocks-termslist {
+    margin-top: 10px;
+}
+
+#blocks-terms {
+    margin-top: 15px;
+    margin-bottom: 15px;
+}
+
+#blocks-terms h2 {
+    font-size: 15px;
+    float: left;
+    margin-right: 10px;
+    margin-top: 0px !important;
+}
+
+#blocks-terms li {
+    float: left;
+    margin-right: 15px;
+   font-size: 15px;
+    color: #fd0c99;
+}
+
+.blocks-terms-delete {
+    color: #000;
+}
+
+#blocks-statistics {
+    margin-top: 10px;
+    margin-bottom: 10px;
+}
+
+.blocks-statistic-line {
+    display: block;
+    background-color: #ffdddd;
+    border-top: 1px solid #ffcccc;
+    border-bottom: 1px solid #ffcccc;
+    border-right: 1px solid #ffcccc;
+    margin-bottom: 2px;
+    padding: 3px;
+}
+
+.legend {
+    display: none !important;
+}
