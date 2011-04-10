@@ -12,7 +12,6 @@ gem 'declarative_authorization', :git => "http://github.com/cipherpunk/declarati
 
 group :development, :test do
   gem 'machinist_mongo', '~> 1.2.0', :require => 'machinist/mongoid'
-  gem 'metric_fu'
   gem 'ci_reporter'
   gem 'shoulda', '~> 2.11.3'
   gem 'mocha', '~> 0.9.10'
