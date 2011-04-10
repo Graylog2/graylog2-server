@@ -1,23 +1,6 @@
-#require 'test_helper'
 require File.expand_path(File.dirname(__FILE__) + "/../test_helper")
 
 class StreamTest < ActiveSupport::TestCase
-
-  test "rules are deleted with stream" do
-    stream_id = 25
-    Stream.make(:id => stream_id).save
-
-    # Create rules.
-    Streamrule.make(:stream_id => stream_id, :rule_type => 0, :value => "foo").save
-    Streamrule.make(:stream_id => stream_id, :rule_type => 0, :value => "bar").save
-
-    # Delete stream.
-    Stream.find(stream_id).destroy
-
-    # Check that all rules were deleted.
-    assert Streamrule.find_by_stream_id(stream_id).blank? == true
-  end
-
 # Disable for now.
 #
 #  test "favorites are deleted with stream" do
