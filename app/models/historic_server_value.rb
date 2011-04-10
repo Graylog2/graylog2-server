@@ -1,8 +1,8 @@
 class HistoricServerValue
   include Mongoid::Document
 
-  key :type, String
-  key :created_at, Integer
+  field :type, :type => String
+  field :created_at, :type => Integer
 
   def self.used_memory(minutes)
     get("used_memory", minutes)

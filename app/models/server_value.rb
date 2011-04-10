@@ -1,7 +1,7 @@
 class ServerValue
   include Mongoid::Document
 
-  key :type, String
+  field :type, :type => String
 
   def self.throughput
     val = self.first(:conditions => { "type" => "total_throughput" })

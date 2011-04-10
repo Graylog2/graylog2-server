@@ -4,20 +4,20 @@ class Message
   FIELDS = %w(message date host level facility deleted  gelf full_message type file line version timestamp created_at)
   SPECIAL_FIELDS = %w(_id)
 
-  key :version, Integer
-  key :timestamp, Integer
-  key :message, String
-  key :date, String
-  key :host, String
-  key :level, Integer
-  key :facility, Object
-  key :deleted, Boolean
-  key :created_at, Integer
-  key :gelf, Boolean
-  key :full_message, String
-  key :type, Integer
-  key :file, String
-  key :line, Integer
+  field :version,       :type => Integer
+  field :timestamp,     :type => Integer
+  field :message,       :type => String
+  field :date,          :type => String
+  field :host,          :type => String
+  field :level,         :type => Integer
+  field :facility,      :type => Object
+  field :deleted,       :type => Boolean
+  field :created_at,    :type => Integer
+  field :gelf,          :type => Boolean
+  field :full_message,  :type => String
+  field :type,          :type => Integer
+  field :file,          :type => String
+  field :line,          :type => Integer
 
   LIMIT = 100
 
