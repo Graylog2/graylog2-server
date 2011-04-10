@@ -47,7 +47,13 @@ public class UDPSyslogForwarder extends UDPForwarder implements MessageForwarder
             throw new MessageForwarderConfigurationException("Host is empty or port is invalid.");
         }
 
-        this.succeeded = this.send(message.getShortMessage().getBytes());
+        if (message.convertedFromSyslog()) {
+            this.succeeded = this.send(message.getRaw());
+        } else {
+            LOG.info("Not forwarding GELF messages via UDP syslog.");
+            this.succeeded = false;
+        }
+        
         return this.succeeded();
     }
 

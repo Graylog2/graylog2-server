@@ -31,6 +31,9 @@ import org.graylog2.streams.StreamRule;
 import org.graylog2.streams.matchers.StreamRuleMatcherIF;
 
 import java.util.*;
+import java.util.zip.Deflater;
+import org.json.simple.JSONObject;
+import org.json.simple.JSONValue;
 
 /**
  * GELFMessage.java: Jul 20, 2010 6:57:28 PM
@@ -420,6 +423,31 @@ public class GELFMessage {
 
     public void setRaw(byte[] raw) {
         this.raw = raw;
+    }
+
+    public byte[] compress() {
+        byte[] compressMe = this.toJson().getBytes();
+        byte[] compressedMessage = new byte[compressMe.length];
+        Deflater compressor = new Deflater();
+        compressor.setInput(compressMe);
+        compressor.finish();
+        compressor.deflate(compressedMessage);
+
+        return compressedMessage;
+    }
+
+    private String toJson() {
+        LinkedHashMap<String, Object> obj = new LinkedHashMap<String, Object>();
+        obj.put("short_message", this.getShortMessage());
+        obj.put("full_message", this.getFullMessage());
+        obj.put("host", this.getHost());
+        obj.put("facility", this.getFacility());
+        obj.put("level", this.getLevel());
+        obj.put("file", this.getFile());
+        obj.put("line", this.getLine());
+        obj.put("version", this.getVersion());
+
+        return JSONValue.toJSONString(obj);
     }
 
 }
