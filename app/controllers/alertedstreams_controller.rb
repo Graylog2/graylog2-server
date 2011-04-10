@@ -1,21 +1,21 @@
 class AlertedstreamsController < ApplicationController
 
+  # wtf is this shit? heavy refactoring needed here
+
   def toggle
-    stream_id = params[:id]
-    # Check if the stream to favorite exists.
     stream = nil
     begin
-      stream = Stream.find(stream_id)
-    rescue
+      stream = Stream.find_by_id(params[:id])
+    rescue => e
       flash[:error] = "Could not favorite stream: Stream does not exist."
       redirect_to streams_path
       return
     end
 
     if stream.alerted?(current_user)
-      destroy(stream_id)
+      destroy(stream.id)
     else
-      create(stream_id)
+      create(stream.id)
     end
 
     # Only intended to be called via AJAX.
