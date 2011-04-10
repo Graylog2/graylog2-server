@@ -33,7 +33,7 @@ class SessionsControllerTest < ActionController::TestCase
     post :create, :login => 'quentin', :password => 'monkey', :remember_me => "0"
     assert @response.cookies["auth_token"].blank?, "Cookie contains #{@response.cookies["auth_token"]}"
   end
-  
+
   def test_should_delete_token_on_logout
     login_as :quentin
     get :destroy

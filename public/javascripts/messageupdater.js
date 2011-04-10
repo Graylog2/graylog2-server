@@ -2,7 +2,7 @@ $(document).ready(function(){
   setInterval("showNewMessagesBar()", 30000);
 
 });
-  
+
 function showNewMessagesBar() {
   // Fetch count of new messages since page load.
   $.post("/messages/getnewmessagecount", {since: $('#pageload').html()}, function(data) {
@@ -12,11 +12,11 @@ function showNewMessagesBar() {
       // Make sure to get a number.
       newCount = parseInt(response.payload);
 
-      // Only do something if the new count is greater than 0. 
+      // Only do something if the new count is greater than 0.
       if (newCount > 0) {
         // Hide the new messages bar
         $('#new-messages-bar').hide();
-        
+
         // Display with new content again,
         $('#new-messages-bar').html("<a href='#' onclick='window.location.reload()'>" + newCount + " new messages</a>");
         $('#new-messages-bar').show();

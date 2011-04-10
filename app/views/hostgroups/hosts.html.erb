@@ -10,7 +10,7 @@
     <%= f.select :hostname, Host.all.collect {|host| [h(host.host)]} %>
     <%= hidden_field_tag 'new_host[hostgroup_id]', @hostgroup.id %>
     <%= hidden_field_tag 'new_host[ruletype]', HostgroupHost::TYPE_SIMPLE %>
-    <%= awesome_submit_link "Add" %> 
+    <%= awesome_submit_link "Add" %>
   <% end %>
   </div>
 
@@ -20,7 +20,7 @@
     <%= f.text_field :hostname %>
     <%= hidden_field_tag 'new_host[hostgroup_id]', @hostgroup.id %>
     <%= hidden_field_tag 'new_host[ruletype]', HostgroupHost::TYPE_REGEX %>
-    <%= awesome_submit_link "Add" %> 
+    <%= awesome_submit_link "Add" %>
   <% end %>
   </div>
   <br style="clear: both;" />
@@ -63,75 +63,75 @@
 
 <div id="hostgroups-add-right">
   <script type="text/javascript">
-  var rgraph = new $jit.RGraph({  
-      injectInto: 'hostgroups-add-right', 
-      
-      background: {  
-        CanvasStyles: {  
-          strokeStyle: '#eee' 
-        }  
+  var rgraph = new $jit.RGraph({
+      injectInto: 'hostgroups-add-right',
+
+      background: {
+        CanvasStyles: {
+          strokeStyle: '#eee'
+        }
       },
 
-      Navigation: {  
+      Navigation: {
         enable: true,
         panning: true,
-        zooming: 10  
-      },  
-      
-      Node: {  
-          color: '#ccc'  
-      },  
-        
-      Edge: {  
-        color: '#FD0C99',  
-        lineWidth:1 
-      },  
-    
-      onCreateLabel: function(domElement, node){  
-          domElement.innerHTML = node.name;  
-          domElement.onclick = function(){  
-              rgraph.onClick(node.id);  
-          };  
-      },  
-      
-      onPlaceLabel: function(domElement, node){  
-          var style = domElement.style;  
-          style.display = '';  
-          style.cursor = 'pointer';  
-   
-          if (node._depth == 0) {  
-              style.fontSize = "1.5em";  
-              style.color = "#000";  
+        zooming: 10
+      },
+
+      Node: {
+          color: '#ccc'
+      },
+
+      Edge: {
+        color: '#FD0C99',
+        lineWidth:1
+      },
+
+      onCreateLabel: function(domElement, node){
+          domElement.innerHTML = node.name;
+          domElement.onclick = function(){
+              rgraph.onClick(node.id);
+          };
+      },
+
+      onPlaceLabel: function(domElement, node){
+          var style = domElement.style;
+          style.display = '';
+          style.cursor = 'pointer';
+
+          if (node._depth == 0) {
+              style.fontSize = "1.5em";
+              style.color = "#000";
           } else if(node._depth == 1) {
-              style.fontSize = "0.9em";  
-              style.color = "#000";  
-          } else if(node._depth == 2){  
-              style.fontSize = "0.8em";  
-              style.color = "#111";  
-            
-          } else {  
-              style.display = 'none';  
-          }  
-    
-          var left = parseInt(style.left);  
-          var w = domElement.offsetWidth;  
+              style.fontSize = "0.9em";
+              style.color = "#000";
+          } else if(node._depth == 2){
+              style.fontSize = "0.8em";
+              style.color = "#111";
+
+          } else {
+              style.display = 'none';
+          }
+
+          var left = parseInt(style.left);
+          var w = domElement.offsetWidth;
           style.left = (left - w / 2) + 'px';
-      }  
+      }
   });
 
   $.post("<%= visuals_path("hostgrouprelation", :group => @hostgroup.id) %>", function(data) {
     json = eval('(' + data + ')');
-    rgraph.loadJSON(json.data);  
-    
-    rgraph.compute('end');  
-    rgraph.fx.animate({  
+    rgraph.loadJSON(json.data);
+
+    rgraph.compute('end');
+    rgraph.fx.animate({
       modes:['polar'],
       transition: $jit.Trans.Bounce.easeOut,
-      duration: 500  
-    }); 
+      duration: 500
+    });
   });
 
-  </script> 
+  </script>
 </div>
 
 <br style="clear: both;" />

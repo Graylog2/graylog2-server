@@ -1,12 +1,12 @@
 class Streamrule
   include Mongoid::Document
-  
+
   embedded_in :stream, :inverse_of => :streamrules
 
   validates_presence_of :rule_type
   validates_presence_of :value
   validate :valid_regex
-  
+
   field :rule_type, :type => Integer
   field :value, :type => String
 
@@ -26,9 +26,9 @@ class Streamrule
       "Additional field" => self::TYPE_ADDITIONAL
     }
   end
-  
-  private 
-  
+
+  private
+
   def valid_regex
     return if rule_type != TYPE_MESSAGE
 

@@ -20,7 +20,7 @@ class Message
   key :line, Integer
 
   LIMIT = 100
-  
+
   # This is controlled by general.yml. Disabling it gives great performance improve.
   if Configuration.allow_deleting
     scope :not_deleted, where({ :deleted => false })
@@ -35,11 +35,11 @@ class Message
   def self.find_by_id(_id)
     where(:_id => BSON::ObjectId(_id)).first
   end
-  
+
   def timestamp
     Time.at(created_at)
   end
-  
+
   # Overwriting the message getter. This always applies the filtering of
   # filtered terms.
   def message
@@ -48,7 +48,7 @@ class Message
       FilteredTerm.all.each do |t|
         next if msg.blank? or t.term.blank?
         begin
-          msg[/#{t.term}/] = "[FILTERED]" 
+          msg[/#{t.term}/] = "[FILTERED]"
         rescue => e
           Rails.logger.warn "Skipping filtered term: #{e}"
           next
@@ -64,7 +64,7 @@ class Message
 
   def self.all_paginated page = 1, limit = LIMIT
     page = 1 if page.blank?
-            
+
     default_scope.paginate(:page => page)
   end
 
@@ -72,19 +72,19 @@ class Message
     conditions = {}
     re = /^(from (.+)){0,1}?(to (.+))$/
     re2 = /^(from (.+))$/
-    
+
     if (matches = (re.match(timeframe) or re2.match(timeframe)))
-    
+
       from = matches[2]
       to = matches[4]
-      
+
       conditions.merge!('$gt' => Chronic::parse(from).to_i) unless from.blank?
       conditions.merge!('$lt' => Chronic::parse(to).to_i) unless to.blank?
     end
-    
+
     return conditions
   end
-  
+
   def self.all_by_quickfilter filters, page = 1, limit = LIMIT, conditions_only = false
     page = 1 if page.blank?
 
@@ -101,7 +101,7 @@ class Message
 
       # Time Frame
       conditions = conditions.where(:created_at => get_conditions_from_date(filters[:date])) unless filters[:date].blank?
-      
+
       # Facility
       conditions = conditions.where(:facility => filters[:facility]) unless filters[:facility].blank?
 
@@ -122,7 +122,7 @@ class Message
 
     conditions.default_scope.limit(LIMIT).paginate(:page => page)
   end
-      
+
   def self.extract_additional_from_quickfilter(filters)
     return Hash.new if filters[:additional].blank? or filters[:additional][:keys].blank? or filters[:additional][:values].blank?
 
@@ -148,20 +148,20 @@ class Message
   def self.count_stream stream_id
     return by_stream(stream_id).count
   end
-  
+
   def self.all_of_stream_in_range(stream_id, page, from, to)
     page = 1 if page.blank?
-    
+
     #by_stream(stream_id).default_scope.where(:created_at => {"$gte" => from}).where(:created_at => {"$lte" => to}).paginate(:page => page)
     by_stream(stream_id).default_scope.time_range(from, to).paginate(:page => page)
   end
 
   def self.all_in_range(page, from, to)
     page = 1 if page.blank?
-    
+
     default_scope.time_range(from, to).paginate(:page => page)
   end
-    
+
   def self.count_all_of_stream_in_range(stream_id, from, to)
     terms = Blacklist.all_terms
     #by_stream(stream_id).where(:created_at => {"$gte" => from}).where(:created_at => {"$lte" => to}).count
@@ -177,14 +177,14 @@ class Message
     minutes.times do |m|
       m += 1 # Offset by one because we don't want to start with the current minute.
       t = m.minutes.ago
-      
+
       # Get first second of minute.
       t -= t.sec
-      
+
       # Try to read from cache.
       obj = { :type => :graphvalue, :allhosts => true, :minute => t.to_i }
       c = Rails.cache.read(obj)
-      
+
       if c == nil
         # Cache miss. Perform counting and add to cache.
         c = Message.time_range(t.to_i, (t+60).to_i).count
@@ -205,14 +205,14 @@ class Message
     minutes.times do |m|
       m += 1 # Offset by one because we don't want to start with the current minute.
       t = m.minutes.ago
-      
+
       # Get first second of minute.
       t -= t.sec
 
       # Try to read from cache.
       obj = { :type => :graphvalue, :rules => stream.rule_hash, :stream_id => stream_id, :minute => t.to_i }
       c = Rails.cache.read(obj)
-      
+
       if c == nil
         # Cache miss. Perform counting and add to cache.
         c = Message.by_stream(stream_id).time_range(t.to_i, (t+60).to_i).count
@@ -229,7 +229,7 @@ class Message
     page = 1 if page.blank?
     where(:host => host).default_scope.paginate(:page => page)
   end
-  
+
   def self.all_of_hostgroup hostgroup, page
     page = 1 if page.blank?
 
@@ -250,7 +250,7 @@ class Message
     else
       conditions = not_deleted
     end
-    
+
     conditions.count
   end
 
@@ -262,7 +262,7 @@ class Message
     return true if self.additional_fields.count > 0
     return false
   end
-  
+
   def additional_fields
     additional = []
     self.attributes.each do |key, value|
@@ -280,7 +280,7 @@ class Message
       host.save
     end
   end
-  
+
   def around(*args)
     opts = {
       :same_host => true,
@@ -288,7 +288,7 @@ class Message
       :same_level => false,
       :order => :desc
     }.merge(args.extract_options!)
-    
+
     qry = self.attributes.dup.delete_if { |k,v| !opts["same_#{k}".to_sym] }
     nb = args.first || 100
     terms = Blacklist.all_terms

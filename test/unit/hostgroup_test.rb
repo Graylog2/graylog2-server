@@ -2,13 +2,13 @@
 require File.expand_path(File.dirname(__FILE__) + "/../test_helper")
 
 class HostgroupTest < ActiveSupport::TestCase
-  
+
   test "hostname_conditions with ids in returned hash" do
     # Create the hosts that are defined as hostnames in the group
     # because hostname_conditions() will check if the hosts exist.
     Host.make(:host => "host1").save
     Host.make(:host => "host2").save
-    
+
     group = Hostgroup.find(1)
     conditions = group.hostname_conditions(true)
 
@@ -31,7 +31,7 @@ class HostgroupTest < ActiveSupport::TestCase
 
     group = Hostgroup.find(1)
     conditions = group.hostname_conditions
-    
+
     assert_instance_of Array, conditions
     assert conditions.count == 2
 
@@ -76,7 +76,7 @@ class HostgroupTest < ActiveSupport::TestCase
 
     assert_instance_of Array, conditions
     assert conditions.count == 3
-    
+
     # Check regex types.
     assert_instance_of Regexp, conditions[2]
     assert_instance_of Regexp, conditions[1]

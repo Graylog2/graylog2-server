@@ -3,7 +3,7 @@ Graylog2WebInterface::Application.routes.draw do
   match 'login' => 'sessions#new', :as => :login
   resource :session
   resources :dashboard
-  
+
   resources :users do
     collection do
       post :createfirst
@@ -17,7 +17,7 @@ Graylog2WebInterface::Application.routes.draw do
       get :showrange
       post :getnewmessagecount
     end
-    member do 
+    member do
       post :show
       get :around
     end
@@ -34,7 +34,7 @@ Graylog2WebInterface::Application.routes.draw do
       post :quickjump
     end
   end
-  
+
   resources :hostgroups do
     resources :messages
     member do
@@ -61,7 +61,7 @@ Graylog2WebInterface::Application.routes.draw do
     resources :forwarders
 
     resources :dashboard
-  
+
     member do
       get :deletebystream
       get :analytics
@@ -87,25 +87,25 @@ Graylog2WebInterface::Application.routes.draw do
       post :categorize
     end
   end
-  
+
   resources :alertedstreams do
     member do
       post :toggle
     end
   end
-  
+
   resources :subscribedstreams do
     member do
       post :toggle
     end
   end
-    
+
   resources :streamcategories do
     member do
       get :rename
     end
   end
-  
+
   resource :analytics do
     get :index
     get :messagespread
@@ -119,13 +119,13 @@ Graylog2WebInterface::Application.routes.draw do
   end
 
   resources :filteredterms
-  
+
   resources :visuals, :constraints => {:id => /[a-z]+/} do
     member do
       post :fetch
     end
   end
-  
+
   resources :health do
     collection do
       post :currentthroughput
@@ -139,6 +139,6 @@ Graylog2WebInterface::Application.routes.draw do
   end
 
   match '/visuals/fetch/:id' => 'visuals#fetch',:as => "visuals"
-  
+
   root :to => 'messages#index'
 end

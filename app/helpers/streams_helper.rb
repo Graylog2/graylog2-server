@@ -28,7 +28,7 @@ module StreamsHelper
 
     return "<span class=\"black\">#{type}</span>: <i>#{value}</i>"
   end
-  
+
   def tabs
     @tabs = []
     if @stream
@@ -38,10 +38,10 @@ module StreamsHelper
       @tabs.push ["Analytics", analytics_stream_path(@stream)] if permitted_to?(:analytics, @stream)
       @tabs.push ["Settings", settings_stream_path(@stream)] if permitted_to?(:show, @stream)
     end
-    
+
     @tabs
   end
-  
+
   def forwarder_details(forwarder)
     return String.new if forwarder.endpoint_type.blank?
 

@@ -1,5 +1,5 @@
 class Facility
-  
+
   def self.standards
     { 0 => "Kernel (0)",
       1 => "User-Level (1)",

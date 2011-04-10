@@ -1,12 +1,12 @@
 class StreamsController < ApplicationController
   filter_access_to :all
   before_filter :load_stream, :except => [ :index, :create ]
- 
+
   def show
     @stream = Stream.find_by_id(params[:id])
     redirect_to stream_messages_path(@stream)
   end
-  
+
   def index
     @new_stream = Stream.new
 
@@ -30,14 +30,14 @@ class StreamsController < ApplicationController
   def showrange
     @has_sidebar = true
     @load_flot = true
-    
+
     begin
       @from = Time.at(params[:from].to_i-Time.now.utc_offset)
       @to = Time.at(params[:to].to_i-Time.now.utc_offset)
     rescue
       flash[:error] = "Missing or invalid range parameters."
     end
-    
+
     @messages = Message.all_of_stream_in_range(@stream.id, params[:page], @from.to_i, @to.to_i)
     @total_count = Message.count_all_of_stream_in_range(@stream.id, @from.to_i, @to.to_i)
   end
@@ -78,7 +78,7 @@ class StreamsController < ApplicationController
     # Intended to be called via AJAX only.
     render :text => ""
   end
-  
+
   def togglealarmactive
     if @stream.alarm_active
       @stream.alarm_active = false
@@ -91,7 +91,7 @@ class StreamsController < ApplicationController
     # Intended to be called via AJAX only.
     render :text => ""
   end
-  
+
   def togglealarmforce
     @stream = Stream.find_by_id(params[:id])
     if @stream.alarm_force
@@ -135,10 +135,10 @@ class StreamsController < ApplicationController
       redirect_to streams_path
     end
   end
-  
+
   def rename
     @stream.title = params[:title]
-    
+
     if @stream.save
       flash[:notice] = "Stream has been renamed."
     else
@@ -175,24 +175,24 @@ class StreamsController < ApplicationController
     else
       flash[:error] = "Could not delete stream"
     end
-    
+
     redirect_to streams_path
   end
-  
+
   def subscribe
     current_user.subscribed_streams << @stream
     render :json => {:status => :success}
   end
-  
+
   def unsubscribe
     current_user.subscribed_streams.delete @stream
     render :json => {:status => :success}
   end
-  
+
   def togglesubscription
     @stream.subscribed?(current_user) ? unsubscribe : subscribe
   end
-  
+
   protected
   def load_stream
     @stream = Stream.find_by_id params["id"]

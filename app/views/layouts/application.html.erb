@@ -91,12 +91,12 @@
  <% if @has_sidebar %>
   <div id='main-left'>
  <% end %>
- 
+
   <div id="content" <%=raw @content_class.blank? ? '' : 'class="content-' + @content_class + '"' %>>
     <div id="content-inner">
       <%= yield %>
     </div>
-    
+
     <div class="content-bottom">
       <div class="content-bottom-left"><%= image_tag "contentedge_l.png" %></div>
       <div class="content-bottom-right"><%= image_tag "contentedge_r.png" %></div>

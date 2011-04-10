@@ -1,7 +1,7 @@
 class Messagecomment
   include Mongoid::Document
   include Mongoid::Timestamps
-  
+
   references_one :user
 
   field :title, :type => String
@@ -13,7 +13,7 @@ class Messagecomment
   validates_presence_of :comment
   validates_presence_of :match
   validates_presence_of :user_id
-  
+
   validate :valid_regex
 
   def self.all_matched(message)
@@ -24,9 +24,9 @@ class Messagecomment
 
     return matched
   end
-  
+
   private
-  
+
   def valid_regex
     begin
       String.new =~ /#{match}/

@@ -78,7 +78,7 @@ class UsersController < ApplicationController
 
     redirect_to :action => 'index'
   end
-  
+
   def first
     # This action is allowed without login. Block after first user is created.
     if User.count > 0

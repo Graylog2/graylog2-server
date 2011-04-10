@@ -69,7 +69,7 @@ function displayHosts(hosts) {
     count = host.data.$angularWidth;
     totalCount += count;
     $("#visuals-spread-hosts tbody > tr:first").after(
-      "<tr id=\"" + buildHostCssId(host.id) + "\" class=\"visuals-spread-hosts-host\">" + 
+      "<tr id=\"" + buildHostCssId(host.id) + "\" class=\"visuals-spread-hosts-host\">" +
         "<td>" + host.name + "</td>" +
         "<td>" + count + "</td>" +
       "</tr>"
@@ -83,7 +83,7 @@ function displayHosts(hosts) {
 var sb = new $jit.Sunburst({
   injectInto: 'visuals-spread-vis',
   levelDistance: 80,
-  
+
   Node: {
     overridable: true,
     type: 'multipie'
@@ -115,13 +115,13 @@ var sb = new $jit.Sunburst({
 $.post("<%= visuals_path("messagespread", :term => CGI.escape(params[:term]), :regex=> @term_is_regex.to_s, :case=> @term_is_case_insensitive.to_s) %>", function(data) {
   json = eval('(' + data + ')');
   hosts = json.data.children[0].children
-  
+
   $('#loading').hide();
 
   if (hosts.length > 0) {
     displayHosts(hosts);
 
-    sb.loadJSON(json.data);  
+    sb.loadJSON(json.data);
     sb.refresh();
 
     $("#result").show();
@@ -129,7 +129,7 @@ $.post("<%= visuals_path("messagespread", :term => CGI.escape(params[:term]), :r
     $("#visuals-spread-vis").hide();
     $("#nohits").show();
   }
-  
+
   $("#visuals-spread-time span").html(json.time);
   $("#visuals-spread-time").show();
 });

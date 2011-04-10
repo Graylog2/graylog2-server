@@ -19,7 +19,7 @@ class ServerValue
   def self.local_hostname
     get("local_hostname")
   end
-  
+
   def self.pid
     get("pid")
   end
@@ -27,7 +27,7 @@ class ServerValue
   def self.jre
     get("jre")
   end
-  
+
   def self.available_processors
     get("available_processors")
   end

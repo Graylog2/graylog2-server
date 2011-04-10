@@ -1,21 +1,21 @@
 class Hostgroup
-  
+
   include Mongoid::Document
-  
+
   references_many :hostgroup_hosts do
     def simple
       @target.select { |host| host.simple? }
     end
-    
+
     def regex
       @target.select { |host| host.regex? }
     end
   end
 
   validates_presence_of :name
-  
+
   field :name, :type => String
-  
+
   def self.find_by_id(_id)
     _id = $1 if /^([0-9a-f]+)-/ =~ _id
     first(:conditions => {:_id => BSON::ObjectId(_id)});
@@ -46,7 +46,7 @@ class Hostgroup
     when :regex then
       hosts = hostgroup_hosts.regex
     end
-    
+
     if with_id then
       hosts.collect {|host| {:id => host.id, :value => host.hostname}}
     else

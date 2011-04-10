@@ -31,7 +31,7 @@ module ApplicationHelper
 
   def syslog_level_to_human level
     return "None" if level == nil
-    
+
     case level.to_i
       when 0 then return "Emergency"
       when 1 then return "Alert"
@@ -77,7 +77,7 @@ module ApplicationHelper
    else
      url = visuals_path("streamgraph", :stream_id => options[:stream_id], :hours => options[:hours])
    end
-   
+
    "<script type='text/javascript'>
       function plot(data){
         $.plot($('#{options[:inject]}'),
@@ -203,32 +203,32 @@ module ApplicationHelper
   def is_current_menu_item? item
     return true if (@scoping == :hostgroup and item == "hosts")
     return (@scoping.to_s.pluralize == item) unless @scoping.nil?
-    
+
     (@scoping == item) or (params[:controller] == root_path and item == "/") or (params[:controller] == "hostgroups" and item == "hosts") or (params[:controller] == item)
   end
-  
+
   def is_current_tab? tab
-    current_page?(tab.second) 
+    current_page?(tab.second)
   end
-  
+
   def current_page
     params[:page].blank? ? 1 : params[:page].to_i
   end
-  
+
   def next_page
     current_page + 1
   end
-  
+
   def previous_page
     current_page <= 2 ? 1 : current_page - 1
   end
-  
+
   def partial_for(element, scoping="shared", action="")
     scoping = scoping.to_s.pluralize unless scoping == "shared"
     element = element.to_s + "_#{action}" unless action == ""
     "#{scoping}/#{element}"
   end
-  
+
   def message_count_interval
     Setting.get_message_count_interval(current_user)
   end
@@ -246,7 +246,7 @@ module ApplicationHelper
       @tabs.push ["Hosts", hosts_hostgroup_path(@hostgroup)]
       @tabs.push ["Settings", settings_hostgroup_path(@hostgroup)]
     end
-    
+
     @tabs
   end
 end

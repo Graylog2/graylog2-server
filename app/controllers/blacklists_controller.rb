@@ -7,7 +7,7 @@ class BlacklistsController < ApplicationController
   end
 
   def show
-   @new_term = BlacklistedTerm.new 
+   @new_term = BlacklistedTerm.new
   end
 
   def create

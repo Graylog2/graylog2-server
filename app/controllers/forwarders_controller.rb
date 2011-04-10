@@ -1,6 +1,6 @@
 class ForwardersController < ApplicationController
   filter_access_to :all
-  
+
   before_filter :fetch_stream
 
   def create
@@ -10,10 +10,10 @@ class ForwardersController < ApplicationController
     else
       flash[:error] = "Could not add forwarder."
     end
-    
+
     redirect_to forward_stream_path(@stream)
   end
-  
+
   def destroy
     fwd = @stream.forwarders.find(:first, :conditions => {:_id => BSON::ObjectId(params[:id])})
     if fwd.destroy
@@ -23,7 +23,7 @@ class ForwardersController < ApplicationController
     end
     redirect_to forward_stream_path(@stream)
   end
-  
+
   protected
   def fetch_stream
     if params[:stream_id]

@@ -13,7 +13,7 @@ class MessageTest < ActiveSupport::TestCase
     Message.make(:host => "somehost", :message => "wat").save
     Message.make(:host => "anotherhost", :message => "foobar").save
     Message.make(:host => "anotherfoohost", :message => "don't match me").save
-    
+
     hostgroup = Hostgroup.find(3)
     assert_equal 5, Message.count_of_hostgroup(hostgroup)
   end

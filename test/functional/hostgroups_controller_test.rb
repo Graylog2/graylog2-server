@@ -26,10 +26,10 @@ class HostgroupsControllerTest < ActionController::TestCase
 
   test "rename a host group" do
     post :rename, :name => "hey my new name", :id => 1
-    
+
     renamed_group = Hostgroup.find(1)
     assert renamed_group.name == "hey my new name"
-  
+
     assert_redirected_to(:controller => "hostgroups", :action => "settings", :id => 1)
   end
 
@@ -41,7 +41,7 @@ class HostgroupsControllerTest < ActionController::TestCase
 
     # Name did not change.
     assert renamed_group.name == old_group.name, "Oh no, group was renamed!"
-  
+
     # Error is set.
     assert_not_nil flash[:error]
 

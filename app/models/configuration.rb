@@ -31,7 +31,7 @@ class Configuration
     return @subscr_config['subject'] unless @subscr_config.blank? or @subscr_config['subject'].blank?
     return "[graylog2] Subscription"
   end
-  
+
   def self.streamalarm_from_address
     return @streamalarm_config['from'] unless @streamalarm_config.blank? or @streamalarm_config['from'].blank?
     return "graylog2@example.org"

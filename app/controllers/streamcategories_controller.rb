@@ -43,7 +43,7 @@ class StreamcategoriesController < ApplicationController
     else
       flash[:error] = "Could not delete stream category!"
     end
-    
+
     redirect_to :action => "index"
   end
 

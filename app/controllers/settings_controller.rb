@@ -12,7 +12,7 @@ class SettingsController < ApplicationController
     setting.user_id = current_user.id
     setting.setting_type = params[:setting_type]
     setting.value = params[:value].to_i
-    
+
     if setting.save
       flash[:notice] = "Setting has been saved!"
     else

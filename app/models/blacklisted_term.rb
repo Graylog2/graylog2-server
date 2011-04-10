@@ -1,10 +1,10 @@
 class BlacklistedTerm
   include Mongoid::Document
-  
+
   embedded_in :blacklist
 
   field :term, :type => String
-  
+
   validates_presence_of :term
   validate :valid_regex
 
