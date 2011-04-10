@@ -55,7 +55,11 @@ public class GELFMessageForwarder extends UDPForwarder implements MessageForward
                 this.send(chunk.getRaw());
             }
         } else {
-            this.succeeded = this.send(message.getRaw());
+            if (!message.convertedFromSyslog()) {
+                this.succeeded = this.send(message.getRaw());
+            } else {
+                this.succeeded = this.send(message.compress());
+            }
         }
 
         return this.succeeded;
