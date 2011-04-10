@@ -6,17 +6,17 @@
 
     <dt><%= label_tag "filters[date]", "Timeframe:" %></dt>
     <dd><%= text_field_tag "filters[date]", params[:filters].blank? ? nil : params[:filters][:date] %> <%=raw tooltip("Timeframe-Filters") %></dd>
-   
+
     <dt><%= label_tag "filters[facility]", "Facility:" %></dt>
     <dd><%= text_field_tag "filters[facility]", params[:filters].blank? ? nil : params[:filters][:facility] %></dd>
-    
+
     <dt><%= label_tag "filters[severity]", "Severity:" %></dt>
     <dd>
       <%= select_tag "filters[severity]", raw("<option></option>" + options_for_select(get_ordered_severities_for_select, :selected => get_quickfilter_selected(params[:filters], :severity))) %>
       <%= check_box_tag "filters[severity_above]", true, get_quickfilter_selected(params[:filters], :severity_above), :style => "width: 15px;" || false %>
       <label for="filters_severity_above">or higher</label>
     </dd>
-    
+
     <dt><%= label_tag "filters[host]", "Host:" %></dt>
     <dd>
       <%= select_tag "filters[host]", raw("<option></option>" + options_for_select(Host.all.collect {|host| [ h(host.host) ]}.sort, :selected => get_quickfilter_selected(params[:filters], :host, true))) %>

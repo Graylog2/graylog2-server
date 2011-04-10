@@ -24,7 +24,7 @@
 <%= form_for @comment, :url => messagecomments_path do |f| %>
   <%= label_tag :title, "Title:" %>
   <%= f.text_field :title %>
-  
+
   &nbsp;
   <%= label_tag :match, "Regular expression:" %>
   <%= f.text_field :match %>
@@ -32,7 +32,7 @@
   <br />
   <%= text_area_tag "messagecomment[comment]", nil, :size => "100x10" %>
   <br />
-  
+
   <%= awesome_submit_link "Create comment" %>
 <% end %>
 </div>

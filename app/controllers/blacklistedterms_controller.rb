@@ -1,6 +1,6 @@
 class BlacklistedtermsController < ApplicationController
   filter_access_to :all
-  
+
   before_filter :load_blacklist
 
   def create
@@ -10,10 +10,10 @@ class BlacklistedtermsController < ApplicationController
     else
       flash[:error] = "Could not add term to blacklist!"
     end
-    
+
     redirect_to blacklist_path(params[:blacklist_id])
   end
-  
+
   def destroy
     term = @blacklist.blacklisted_terms.find(:conditions => {:_id => BSON::ObjectId(params[:id])})
     if term.destroy
@@ -21,10 +21,10 @@ class BlacklistedtermsController < ApplicationController
     else
       flash[:error] = "Could not remove term from blacklist."
     end
-    
+
     redirect_to blacklist_path(params[:blacklist_id])
   end
-  
+
   protected
   def load_blacklist
     @blacklist = Blacklist.find_by_id(params[:blacklist_id])

@@ -1,6 +1,6 @@
 class Forwarder
   include Mongoid::Document
- 
+
   field :title, :type => String
   field :endpoint_type, :type => String
   field :host, :type => String

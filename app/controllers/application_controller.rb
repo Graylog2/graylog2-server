@@ -22,7 +22,7 @@ class ApplicationController < ActionController::Base
     end
 
     # Default 500 error.
-    logger.error "ERROR: #{e.to_s}"
+    Rails.logger.error "ERROR: #{e.to_s}"
     render :file  => "#{Rails.root.to_s}/public/500.html", :status => 500
   end
 
@@ -31,7 +31,7 @@ class ApplicationController < ActionController::Base
     return false if User.count == 0
     return true
   end
-  
+
   helper_method :gl_date
   def gl_date(date)
     date = date.to_s
@@ -58,7 +58,7 @@ class ApplicationController < ActionController::Base
     end
     return false
   end
-  
+
   def not_found
     render :file  => "#{Rails.root.to_s}/public/404.html", :status => 404, :layout => false
   end

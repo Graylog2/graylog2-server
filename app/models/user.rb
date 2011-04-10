@@ -24,7 +24,7 @@ class User
   # prevents a user from submitting a crafted form that bypasses activation
   # anything else you want your user to change should be added here.
   attr_accessible :login, :email, :name, :password, :password_confirmation, :role, :stream_ids
-  
+
   field :login, :type => String
   field :email, :type => String
   field :name, :type => String
@@ -50,7 +50,7 @@ class User
 
   # Authenticates a user by their login name and unencrypted password.  Returns the user or nil.
   #
-  # uff.  this is really an authorization, not authentication routine.  
+  # uff.  this is really an authorization, not authentication routine.
   # We really need a Dispatch Chain here or something.
   # This will also let us return a human error message.
   #
@@ -59,15 +59,15 @@ class User
     u = find_by_login(login.downcase) # need to get the salt
     u && u.authenticated?(password) ? u : nil
   end
-  
+
   def self.find_by_id(_id)
     find(:first, :conditions => {:_id => BSON::ObjectId(_id)})
   end
-  
+
   def self.find_by_remember_token(token)
     find(:first, :conditions => {:remember_token => token})
   end
-  
+
   def self.find_by_login(login)
     find(:first, :conditions => {:login => login})
   end
@@ -75,7 +75,7 @@ class User
   def login=(value)
     write_attribute :login, (value ? value.downcase : nil)
   end
-  
+
   def display_name
     self.name.blank? ? self.login : self.name
   end
@@ -83,7 +83,7 @@ class User
   def email=(value)
     write_attribute :email, (value ? value.downcase : nil)
   end
-  
+
   def favorite_streams
     []
   end
@@ -91,11 +91,11 @@ class User
   def roles
     role_symbols
   end
-  
+
   def role_symbols
     [(role.blank? ? STANDARD_ROLE : role.to_sym)]
   end
-  
+
   def valid_roles
     [:admin, :reader]
   end

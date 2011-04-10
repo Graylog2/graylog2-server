@@ -1,7 +1,7 @@
 <h2>Welcome, <span class=\"highlighted\"><%= current_user.display_name %></span>!</h2>
 Your current time: <%= gl_date(Time.now.to_s) %>
 
-<div id="sidebar-graph" style="height: 100px;"></div>  
+<div id="sidebar-graph" style="height: 100px;"></div>
 <div id="graph-rangeselector" class="graph-rangeselector-sidebar" style="display: none;">
   <%= form_tag showrange_messages_path do %>
     <%= hidden_field_tag :from, nil, :id => "graph-rangeselector-from" %>
@@ -55,7 +55,7 @@ Your current time: <%= gl_date(Time.now.to_s) %>
       <span class="status-alarm-text">not running</span>
     <% end %>
   </li>
-  
+
   <li>
     Stream alerts:
     <% if AlertedStream.job_active? %>

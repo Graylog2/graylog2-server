@@ -14,7 +14,7 @@ class Stream
   validates_presence_of :title
   validates_numericality_of :alarm_limit, :allow_nil => true
   validates_numericality_of :alarm_timespan, :allow_nil => true, :greater_than => 0
-  
+
   field :title, :type => String
   field :alarm_limit, :type => Integer
   field :alarm_timespan, :type => Integer
@@ -43,7 +43,7 @@ class Stream
   def favorited?(user_id)
     !favoritedStreams.nil? and favoritedStreams.include? user_id
   end
-  
+
   def subscribers
     subscriber_ids
   end
@@ -61,7 +61,7 @@ class Stream
     return 0 if Stream.find(stream_id).streamrules.blank?
     Message.count(:conditions => Message.by_stream(stream_id).criteria)
   end
-  
+
   def message_count
     Stream.get_message_count(self.id)
   end
@@ -101,13 +101,13 @@ class Stream
 
   def all_users_with_alarm
     uids = AlertedStream.find_all_by_stream_id(id)
-    
+
     users = Array.new
     uids.each do |uid|
       user = User.find(uid.user_id)
       users << user unless user.blank?
     end
-    
+
     return users
   end
 

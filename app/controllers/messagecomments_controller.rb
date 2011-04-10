@@ -12,7 +12,7 @@ class MessagecommentsController < ApplicationController
   def create
     comment = Messagecomment.new(params[:messagecomment])
     comment.user_id = current_user.id
-    
+
     if comment.save
       flash[:notice] = "Message comment has been created."
     else

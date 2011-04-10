@@ -97,24 +97,24 @@ $(document).ready(function(){
     $('#analytics-new-messages-update-submit').bind('click', function() {
       i = $('#analytics-new-messages-update-hours');
       v = parseInt(i.val());
-      
+
       if (v <= 0) {
         return false;
       }
 
       // Show loading message.
       $("#analytics-new-messages-update-loading").show();
-      
+
       // Update graph.
       $.post($(this).attr("data-updateurl") + "&hours=" + v, function(data) {
         json = eval('(' + data + ')');
-      
+
         // Plot is defined inline. (I suck at JavaScript)
         plot(json.data);
-      
+
         // Update title.
         $('#analytics-new-messages-hours').html(v);
-        
+
         // Hide loading message.
         $("#analytics-new-messages-update-loading").hide();
       });
@@ -163,7 +163,7 @@ $(document).ready(function(){
       field = $(this);
       loading = $("#" + field.attr("id") + "-ajaxtrigger-loading");
       done = $("#" + field.attr("id") + "-ajaxtrigger-done");
-     
+
       field.attr("disabled","disabled");
       done.hide();
       loading.show();
@@ -173,7 +173,7 @@ $(document).ready(function(){
         done.show();
       });
     });
-    
+
     // Stream alerts: Inputs only numeric.
     $('#streams-alerts-limit').numeric();
     $('#streams-alerts-timespan').numeric();
@@ -203,12 +203,12 @@ $(document).ready(function(){
         // Show sidebar if hidden.
         if (!$("#main-right").is(":visible")) {
           $("#main-left").animate({ width: '65%' }, 700, function() {
-            
+
             // Show sidebar when main body is completely squeezed.
             $("#main-right").show();
           });
         }
-        
+
         $("#gln").hide();
       });
     });
@@ -221,7 +221,7 @@ $(document).ready(function(){
           $(".users-streams").hide();
         }
     });
-    
+
     // Set sidebar to a fixed height to get the scrollbar in lower resolutions.
     $("#sidebar").css("height", $(window).height()-120);
 
@@ -246,17 +246,17 @@ $(document).ready(function(){
     standardMapKeyOptions = { overlayClose:true }
     $.mapKey("s", function() { $("#modal-stream-chooser").modal(standardMapKeyOptions); });
     $.mapKey("h", function() { $("#modal-host-chooser").modal(standardMapKeyOptions); });
- 
+
     $('#back-to-top').bind("click", function() {
       $('body,html').animate({scrollTop:0},500);
-    }); 
+    });
 
 });
-    
+
 // Back to top.
 $(window).scroll(function() {
   if($(this).scrollTop() > 150) {
-    $('#back-to-top').fadeIn(); 
+    $('#back-to-top').fadeIn();
   } else {
     $('#back-to-top').fadeOut();
   }

@@ -18,7 +18,7 @@ class VisualsController < ApplicationController
     end
 
     r["time"] = sprintf("%#.2f", time*1000);
-    
+
     render :js => r.to_json
   end
 
@@ -61,7 +61,7 @@ class VisualsController < ApplicationController
     end
 
     # Sort values.
-    values = values.sort_by { |v| v["data"]["$angularWidth"] } 
+    values = values.sort_by { |v| v["data"]["$angularWidth"] }
 
     # Add weighted colors.
     colored_values = Array.new
@@ -128,12 +128,12 @@ class VisualsController < ApplicationController
       [ (c[:minute].to_i+Time.now.utc_offset)*1000, c[:count] ]
     end
   end
-  
+
   def calculate_streamgraph(stream_id, hours=12)
     stream = Stream.find(stream_id)
-    
+
     return Array.new if stream.streamrules.blank?
-  
+
     Message.stream_counts_of_last_minutes(stream.id, hours.to_i*60).collect do |c|
       [ (c[:minute].to_i+Time.now.utc_offset)*1000, c[:count] ]
     end

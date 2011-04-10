@@ -50,7 +50,7 @@ namespace :streamalarms do
       else
         puts "\t#{count} messages: Not above limit."
       end
-       
+
       stream.last_alarm_check = Time.now
       stream.save
     end

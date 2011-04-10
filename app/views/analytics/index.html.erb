@@ -36,13 +36,13 @@
 <%= form_tag messagespread_analytics_path do %>
   <%= label_tag :term, "Term:" %>
   <%= text_field_tag :term %>
-  
+
   <%= awesome_submit_link "Analyze" %>
 
   <br />
   <%= check_box_tag :regex, "true" %>
   <%= label_tag :regex, "Regular expression" %>
-  
+
   <%= check_box_tag :notcase, "true" %>
   <%= label_tag :notcase, "Case insensitive" %>
 <% end %>

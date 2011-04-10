@@ -9,7 +9,7 @@ require "rails/test_unit/railtie"
 # If you have a Gemfile, require the gems listed there, including any gems
 # you've limited to :test, :development, or :production.
 Bundler.require(:default, Rails.env) if defined?(Bundler)
-    
+
 GRAYLOG2_VERSION = "0.9.5"
 GRAYLOG2_VERSION_TIMESTAMP = 1299000179
 

@@ -12,7 +12,7 @@ authorization do
       :deletebystream,
       :getnewmessagecount
     ]
-    
+
     has_permission_on :streams, :to => [
       :index,
       :show,
@@ -52,21 +52,21 @@ authorization do
       :rename
     ]
     has_permission_on :hostgroup_hosts, :to => [:create, :destroy]
-    
+
     has_permission_on :blacklists, :to => [:index, :show, :create, :destroy]
     has_permission_on :blacklistedterms, :to => [:create, :destroy]
-    
+
     has_permission_on :settings, :to => [:index, :store]
-    
+
     has_permission_on :users, :to => [:new, :index, :show, :create, :edit, :delete, :update]
-    
+
     has_permission_on :sessions, :to => [:destroy]
 
     has_permission_on :dashboard, :to => [:index]
 
     has_permission_on :health, :to => [:index, :currentthroughput]
   end
-  
+
   role :reader do
     has_permission_on :streams, :to => [:index, :show, :analytics, :favorite, :unfavorite, :alertable, :showrange] do
       if_attribute :users => contains { user }

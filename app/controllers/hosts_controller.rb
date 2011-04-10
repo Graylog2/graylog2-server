@@ -3,7 +3,7 @@ class HostsController < ApplicationController
   filter_access_to :destroy
   filter_access_to :show
   filter_access_to :quickjump
-  
+
   def index
     @hosts = Host.desc :message_count
     @hostgroups = Hostgroup.all
@@ -49,7 +49,7 @@ class HostsController < ApplicationController
       flash[:error] = "Unknown host"
       redirect_to :action => "index"
     else
-      redirect_to host_messages_path(host.host) 
+      redirect_to host_messages_path(host.host)
     end
   end
 end

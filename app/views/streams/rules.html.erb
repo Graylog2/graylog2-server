@@ -11,7 +11,7 @@
   <%= f.select :rule_type, options_for_select(Streamrule.get_types_for_select_options(:streams), :selected => Streamrule::TYPE_MESSAGE) %>
   <%= f.text_field :value, :class => "stream-value-field stream-value-message" %>
   <%= f.text_field :value, { :class => "stream-value-field stream-value-facility", :style => "display: none;", :disabled => true } %>
-  
+
   <div id="stream-value-severity-master" style="display: none;">
     <%= f.select :value, options_for_select(get_ordered_severities_for_select), {}, { :disabled => true, :class => "stream-value-field stream-value-severity" } %>
   </div>

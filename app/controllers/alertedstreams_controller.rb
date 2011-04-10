@@ -3,7 +3,7 @@ class AlertedstreamsController < ApplicationController
   def toggle
     stream_id = params[:id]
     # Check if the stream to favorite exists.
-    stream = nil 
+    stream = nil
     begin
       stream = Stream.find(stream_id)
     rescue
@@ -17,7 +17,7 @@ class AlertedstreamsController < ApplicationController
     else
       create(stream_id)
     end
-    
+
     # Only intended to be called via AJAX.
     render :text => ""
   end

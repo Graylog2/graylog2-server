@@ -29,7 +29,7 @@ class FacilitiesController < ApplicationController
     else
       flash[:error] = "Could not delete facility!"
     end
-    
+
     redirect_to :action => "index"
   end
 

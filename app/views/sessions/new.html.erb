@@ -1,14 +1,14 @@
 <% if has_users %>
   <%= form_tag(session_path, :id => "loginform") do -%>
-      
+
     <%= text_field_tag 'login', "Username", :class => "login-credentials initial", "data-stdtext" => "Username" %>
     <%= password_field_tag 'password', "Password", :class => "login-credentials initial", "data-stdtext" => "Password" %>
-    
+
     <%= check_box_tag 'remember_me', '1', @remember_me %>
     <%= label_tag 'remember_me', 'Remember me', :id => "remember-me" %>
-    
+
     <a href="#" id="submit">Start Graylog2</a>
-  
+
   <% end -%>
 <% else %>
   <strong>Welcome to Graylog2!</strong> Click <%= link_to "here", :controller => "users", :action => "first" %> to create your first user.

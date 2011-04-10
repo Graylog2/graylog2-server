@@ -2,10 +2,10 @@ class MessagesController < ApplicationController
   before_filter :set_scoping
   
   filter_access_to :all
-  
+
   rescue_from Mongoid::Errors::DocumentNotFound, :with => :not_found
   rescue_from BSON::InvalidObjectId, :with => :not_found
-  
+
   protected
   def set_scoping
     if params[:host_id]
@@ -61,12 +61,12 @@ class MessagesController < ApplicationController
     end
     @total_count = @scope.count
     @last_message = @scope.order_by(:created_at.desc).limit(1).first #last :order => "created_at DESC"
-    
+
     if params[:stream_id]
       @is_favorited = current_user.favorite_streams.include?(params[:stream_id])
     end
   end
-  
+
   def show
     @has_sidebar = true
     @load_flot = true
@@ -78,7 +78,7 @@ class MessagesController < ApplicationController
     end
 
     @comments = Messagecomment.all_matched(@message)
-    
+
     if params[:partial]
       render :partial => "full_message"
       return
@@ -93,7 +93,7 @@ class MessagesController < ApplicationController
   def showrange
     @has_sidebar = true
     @load_flot = true
-    
+
     begin
       @from = Time.at(params[:from].to_i-Time.now.utc_offset)
       @to = Time.at(params[:to].to_i-Time.now.utc_offset)
@@ -110,12 +110,12 @@ class MessagesController < ApplicationController
     @load_flot = true
     @nb = (params[:nb] || 100).to_i
     @messages = @message.around(@nb)
-    
+
     respond_to do |format|
-      format.html 
+      format.html
       format.text {
-        send_data render_to_string("messages/message_log.txt", :locals => {:messages => @messages}), :type => "text/plain", :filename => "#{@message.id.to_s}-#{@nb}.log"   
-        #send_data @messages.collect {|m| "#{m.created_at.to_s} #{m.host} #{m.facility} #{m.full_message}"}.join("\n"), :type => "text/plain", :filename => "#{@message.id.to_s}-#{@nb}.log"  
+        send_data render_to_string("messages/message_log.txt", :locals => {:messages => @messages}), :type => "text/plain", :filename => "#{@message.id.to_s}-#{@nb}.log"
+        #send_data @messages.collect {|m| "#{m.created_at.to_s} #{m.host} #{m.facility} #{m.full_message}"}.join("\n"), :type => "text/plain", :filename => "#{@message.id.to_s}-#{@nb}.log"
       }
     end
   end
@@ -124,7 +124,7 @@ class MessagesController < ApplicationController
     message = Message.find params[:id]
     render :text => CGI.escapeHTML(message.message)
   end
-  
+
   def deletebystream
     begin
       conditions = Message.by_stream(params[:stream_id].to_i).criteria.to_hash
@@ -137,7 +137,7 @@ class MessagesController < ApplicationController
     rescue => e
       flash[:error] = "Could not delete messages."
     end
-    
+
     redirect_to stream_path(params[:stream_id])
   end
 

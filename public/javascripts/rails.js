@@ -5,7 +5,7 @@
  *
  * This rails.js file supports jQuery 1.4, 1.4.1 and 1.4.2 .
  *
- */ 
+ */
 
 jQuery(function ($) {
     var csrf_token = $('meta[name=csrf-token]').attr('content'),
@@ -35,7 +35,7 @@ jQuery(function ($) {
          * - ajax:success  - is executed when status is success
          * - ajax:complete - is execute when status is complete
          * - ajax:failure  - is execute in case of error
-         * - ajax:after    - is execute every single time at the end of ajax call 
+         * - ajax:after    - is execute every single time at the end of ajax call
          */
         callRemote: function () {
             var el      = this,
@@ -84,7 +84,7 @@ jQuery(function ($) {
             }
         }
     });
-  
+
 
 
     /**

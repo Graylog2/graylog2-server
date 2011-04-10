@@ -16,7 +16,7 @@ namespace :subscriptions do
       end
 
       puts "Stream >#{stream.title}< has subscribers. Checking for new messages since #{stream.last_subscription_check}"
-      
+
       # Are there new messages?
       messages = Message.all_of_stream_since(stream_id, stream.last_subscription_check)
       count = messages.count
@@ -50,7 +50,7 @@ namespace :subscriptions do
       else
         puts "\tNo new messages."
       end
-        
+
       stream.last_subscription_check = Time.now
       stream.save
     end
