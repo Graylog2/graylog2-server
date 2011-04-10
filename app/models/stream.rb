@@ -37,7 +37,7 @@ class Stream
   end
 
   def subscribed?(user)
-    !subscribedStreams.nil? and subscribedStreams.include?(user)
+    !subscribed_streams.nil? and subscribed_streams.include?(user)
   end
 
   def favorited?(user_id)
