@@ -11,10 +11,14 @@ gem 'mongoid', '2.0.0.rc.6'               # TODO 2.0.1
 gem 'bson_ext', "~> 1.3.0"
 
 group :development, :test do
+  # might be useful to generate fake data in development
   gem 'machinist_mongo', '~> 1.2.0', :require => 'machinist/mongoid'
+  gem 'faker', '~> 0.3.1'   # TODO ~> 0.9.5
+end
+
+group :test do
   gem 'ci_reporter'
   gem 'shoulda', '~> 2.11.3'
   gem 'mocha', '~> 0.9.12'
   gem 'database_cleaner', '~> 0.6.0'
-  gem 'faker', '~> 0.3.1'   # TODO ~> 0.9.5
 end
