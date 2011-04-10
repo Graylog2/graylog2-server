@@ -1,6 +1,10 @@
 class Setting
   include Mongoid::Document
   
+  field :user_id, :type => BSON::ObjectId
+  field :setting_type, :type => Integer
+  field :value, :type => Integer
+  
   TYPE_MESSAGE_LENGTH = 1
   TYPE_MESSAGE_LENGTH_STANDARD = 150
 
@@ -14,30 +18,27 @@ class Setting
   TYPE_LIVETAIL_ROW_COUNT_STANDARD = 200
 
   def self.get_message_length current_user
-    setting = Setting.find_by_user_id_and_setting_type current_user.id, TYPE_MESSAGE_LENGTH
+    setting = Setting.where(:user_id => current_user.id, :setting_type => TYPE_MESSAGE_LENGTH).first
     return TYPE_MESSAGE_LENGTH_STANDARD if setting.blank?
     return setting.value
   end
 
   def self.get_message_count_interval current_user
-    setting = Setting.find_by_user_id_and_setting_type current_user, TYPE_MESSAGE_COUNT_INTERVAL
+    setting = Setting.where(:user_id => current_user.id, :setting_type => TYPE_MESSAGE_COUNT_INTERVAL).first
     return TYPE_MESSAGE_COUNT_INTERVAL_STANDARD if setting.blank?
     return setting.value
   end
 
   def self.get_message_max_count current_user
-    setting = Setting.find_by_user_id_and_setting_type current_user.id, TYPE_MESSAGE_MAX_COUNT
+    setting = Setting.where(:user_id => current_user.id, :setting_type => TYPE_MESSAGE_MAX_COUNT).first
     return TYPE_MESSAGE_MAX_COUNT_STANDARD if setting.blank?
     return setting.value
   end
   
   def self.get_livetail_row_count current_user
-    setting = Setting.find_by_user_id_and_setting_type current_user.id, TYPE_LIVETAIL_ROW_COUNT
+    setting = Setting.where(:user_id => current_user.id, :setting_type => TYPE_LIVETAIL_ROW_COUNT).first
     return TYPE_LIVETAIL_ROW_COUNT_STANDARD if setting.blank?
     return setting.value
   end
   
-  def self.find_by_user_id_and_setting_type(_id, _type)
-    #criteria.and(:user_id => BSON::ObjectId(_id), :setting_type => _type).first
-  end
 end
