@@ -40,10 +40,9 @@ echo "Configuring release ..."
 cd $BUILD_DIR
 
 # Change config files.
-mv config/database.yml.example config/database.yml
 mv config/email.yml.example config/email.yml
 mv config/general.yml.example config/general.yml
-mv config/mongodb.yml.example config/mongodb.yml
+mv config/mongoid.yml.example config/mongoid.yml
 
 RAILS_ENV=production
 export RAILS_ENV

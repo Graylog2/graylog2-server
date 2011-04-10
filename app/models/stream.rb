@@ -95,7 +95,7 @@ class Stream
   end
 
   def all_users_with_alarm
-    uids = AlertedStream.find_all_by_stream_id(id)
+    uids = AlertedStream.where(:stream_id => id)
 
     users = Array.new
     uids.each do |uid|
