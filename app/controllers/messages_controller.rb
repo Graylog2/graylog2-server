@@ -1,6 +1,6 @@
 class MessagesController < ApplicationController
   before_filter :set_scoping
-  
+
   filter_access_to :all
 
   rescue_from Mongoid::Errors::DocumentNotFound, :with => :not_found
@@ -10,7 +10,7 @@ class MessagesController < ApplicationController
   def set_scoping
     if params[:host_id]
       block_access_for_non_admins
-      
+
       @scope = Message.where(:host => params[:host_id])
       @host = Host.find(:first, :conditions => {:host=> params[:host_id]})
       @scoping = :host
@@ -19,12 +19,12 @@ class MessagesController < ApplicationController
 
       # Check streams for reader.
       block_access_for_non_admins if !@stream.accessable_for_user?(current_user)
-      
+
       @scope = Message.by_stream(@stream.id)
       @scoping = :stream
     elsif params[:hostgroup_id]
       block_access_for_non_admins
-      
+
       @hostgroup = Hostgroup.find_by_id params[:hostgroup_id]
       @scope = Message.all_of_hostgroup @hostgroup, params[:page]
       @scoping = :hostgroup
