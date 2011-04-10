@@ -19,7 +19,6 @@ class Stream
   field :alarm_limit, :type => Integer
   field :alarm_timespan, :type => Integer
   field :description, :type => Integer
-  field :alarm_active, :type => Boolean
   field :created_at, :type => DateTime
   field :updated_at, :type => DateTime
   field :alarm_force, :type => Boolean
