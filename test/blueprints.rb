@@ -1,3 +1,6 @@
+Sham.login { Faker::Internet.user_name }
+Sham.password { Faker::Internet.user_name }
+Sham.email { Faker::Internet.email }
 Sham.title { Faker::Lorem.words(15) }
 Sham.host { Faker::Internet.domain_name }
 
@@ -23,4 +26,11 @@ Streamrule.blueprint do
 end
 
 FilteredTerm.blueprint do
+end
+
+User.blueprint do
+  login
+  password
+  password_confirmation { password }
+  email
 end

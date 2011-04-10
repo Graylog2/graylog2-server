@@ -3,6 +3,24 @@ require File.expand_path(File.dirname(__FILE__) + "/../test_helper")
 class UserTest < ActiveSupport::TestCase
   include AuthenticatedTestHelper
 
+  setup do
+    @user = User.make
+  end
+
+  context "with stream" do
+    setup do
+      @stream = Stream.make
+    end
+
+    %w(streams favorite_streams subscribed_streams).each do |rel|
+      should "have #{rel} association" do
+        @user.send(rel + '=', [@stream])
+        @user.save!
+        assert_equal [@stream], @user.send(rel)
+      end
+    end
+  end
+
   def test_should_create_user
     assert_difference 'User.count' do
       user = create_user

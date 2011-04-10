@@ -1,6 +1,24 @@
 require File.expand_path(File.dirname(__FILE__) + "/../test_helper")
 
 class StreamTest < ActiveSupport::TestCase
+  setup do
+    @stream = Stream.make
+  end
+
+  context "with user" do
+    setup do
+      @user = User.make
+    end
+
+    %w(favoritedStreams users subscribers).each do |rel|
+      should "have #{rel} association" do
+        @stream.send(rel + '=', [@user])
+        @stream.save!
+        assert_equal [@user], @stream.send(rel)
+      end
+    end
+  end
+
 # Disable for now.
 #
 #  test "favorites are deleted with stream" do
