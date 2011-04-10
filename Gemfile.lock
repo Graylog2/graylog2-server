@@ -6,7 +6,6 @@ GIT
 
 GEM
   remote: http://rubygems.org/
-  remote: http://gems.github.com/
   specs:
     Saikuro (1.1.0)
     abstract (1.0.0)
