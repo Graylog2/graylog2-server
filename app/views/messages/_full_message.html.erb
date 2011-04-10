@@ -33,7 +33,6 @@
 <% end %>
 
 <% unless @message.streams.blank? %>
-  <br />
   <h3>Filed in following streams:</h3>
   <ul id="message-referenced-streams">
   <% @message.referenced_streams.each do |stream| %>
