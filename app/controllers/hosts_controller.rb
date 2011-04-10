@@ -43,13 +43,13 @@ class HostsController < ApplicationController
   end
 
   def quickjump
-    @host = Host.find_by_host params[:host].strip
+    host = Host.where(:host => params[:host].strip).first
 
-    if @host.blank?
+    if host.blank?
       flash[:error] = "Unknown host"
       redirect_to :action => "index"
     else
-      redirect_to :action => "show", :id => params[:host].strip
+      redirect_to host_messages_path(host.host) 
     end
   end
 end
