@@ -29,10 +29,16 @@
 <% end %>
 </ul>
 
-<div class="streams-forwarder-form">
+<br />
+<h3 style="display: inline;">Add forwarder:</h3>
+<a href="#" onClick="$('#udp-syslog-forwarder').modal({ overlayClose:true })" class="streams-forwarder-add">UDP Syslog</a> | 
+<a href="#" onClick="$('#gelf-forwarder').modal({ overlayClose:true })" class="streams-forwarder-add">GELF</a> |
+<a href="#" onClick="$('#loggly-forwarder').modal({ overlayClose:true })" class="streams-forwarder-add">Logg.ly</a>
+
+<div class="streams-forwarder-form" id="udp-syslog-forwarder">
 <h3>Add <span class="highlighted">UDP syslog</span> forwarder</h3>
 <div class="short-description">
-  Forward messages to another syslog server via UDP.
+  Forward messages to another syslog server via UDP. (Not forwarding GELF messages)
 </div>
 <%= form_for @new_forwarder, :url => stream_forwarders_path(@stream) do |f| %>
   <%= hidden_field_tag "forwarder[endpoint_type]", :syslog %>
@@ -54,7 +60,7 @@
 <% end %>
 </div>
 
-<div class="streams-forwarder-form">
+<div class="streams-forwarder-form" id="gelf-forwarder">
 <h3>Add <span class="highlighted">GELF</span> forwarder</h3>
 <div class="short-description">
   Forward messages to another GELF server.
@@ -79,7 +85,7 @@
 <% end %>
 </div>
 
-<div class="streams-forwarder-form">
+<div class="streams-forwarder-form" id="loggly-forwarder">
 <h3>Add <span class="highlighted">Logg.ly</span> forwarder</h3>
 <div class="short-description">
   Forward messages to Logg.ly's HTTPS API. URL including https://
