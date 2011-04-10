@@ -60,7 +60,7 @@
     </div>
     <%= link_to image_tag("graylog.png", :id => "toplogo"), (permitted_to?(:index, :messages) ? messages_path : streams_path)%>
     <ul id="topmenu">
-      <% permitted_to? :index, :messages do %><%=raw menu_item("Messages", messages_path) %><% end %>
+      <% current_user.role == "admin" and permitted_to? :index, :messages do %><%=raw menu_item("Messages", messages_path) %><% end %>
       <% permitted_to? :index, :streams do %><%=raw menu_item("Streams", streams_path) %><% end %>
       <% permitted_to? :index, :analytics do %><%=raw menu_item("Analytics", analytics_path) %><% end %>
       <% permitted_to? :index, :hosts do %><%=raw menu_item("Hosts", hosts_path) %><% end %>

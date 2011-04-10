@@ -318,6 +318,18 @@ class Message
     Time.at(self.created_at) rescue nil
   end
 
+  def accessable_for_user?(current_user)
+    return true if current_user.role == "admin"
+
+    # Check if any of the streams this message is filed in is accessible by the user
+    self.streams.each do |stream_id|
+      stream = Stream.find(stream_id)
+      return true if stream.accessable_for_user?(current_user)
+    end
+
+    return false
+  end
+
   private
 
   def self.get_offset page

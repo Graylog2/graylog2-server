@@ -1,6 +1,6 @@
 class MessagesController < ApplicationController
   before_filter :set_scoping
-  #filter_resource_access
+  
   filter_access_to :all
   
   rescue_from Mongoid::Errors::DocumentNotFound, :with => :not_found
@@ -9,23 +9,41 @@ class MessagesController < ApplicationController
   protected
   def set_scoping
     if params[:host_id]
+      block_access_for_non_admins
+      
       @scope = Message.where(:host => params[:host_id])
       @host = Host.find(:first, :conditions => {:host=> params[:host_id]})
       @scoping = :host
     elsif params[:stream_id]
       @stream = Stream.find_by_id(params[:stream_id])
+
+      # Check streams for reader.
+      block_access_for_non_admins if !@stream.accessable_for_user?(current_user)
+      
       @scope = Message.by_stream(@stream.id)
       @scoping = :stream
     elsif params[:hostgroup_id]
+      block_access_for_non_admins
+      
       @hostgroup = Hostgroup.find_by_id params[:hostgroup_id]
       @scope = Message.all_of_hostgroup @hostgroup, params[:page]
       @scoping = :hostgroup
     else
+      unless (params[:action] == "show")
+        block_access_for_non_admins
+      end
+
       @scope = Message
       @scoping = :messages
     end
   end
-  
+
+  # Not possible to do this via before_filter because of scope decision by params hash
+  def block_access_for_non_admins
+    flash[:error] = "You have no access rights for this section."
+    redirect_to :controller => "streams", :action => "index"
+  end
+
   public
   def index
     @has_sidebar = true
@@ -54,6 +72,11 @@ class MessagesController < ApplicationController
     @load_flot = true
 
     @message = @scope.where(:_id => BSON::ObjectId(params[:id])).all.first
+
+    unless @message.accessable_for_user?(current_user)
+      block_access_for_non_admins
+    end
+
     @comments = Messagecomment.all_matched(@message)
     
     if params[:partial]
@@ -151,4 +174,5 @@ class MessagesController < ApplicationController
     end
     render :js => { 'status' => 'success', 'payload' => Message.count_since(since) }.to_json
   end
+
 end

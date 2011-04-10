@@ -111,4 +111,12 @@ class Stream
     return users
   end
 
+  def accessable_for_user?(user)
+    return true if user.role == "admin"
+
+    allowed_streams = user.streams.collect { |s| s.id.to_s }
+    return false unless allowed_streams.include?(self.id.to_s)
+
+    return true
+  end
 end

@@ -36,6 +36,7 @@
   <h3>Filed in following streams:</h3>
   <ul id="message-referenced-streams">
   <% @message.referenced_streams.each do |stream| %>
+    <% next if !stream.accessable_for_user?(current_user) %>
     <li><%= link_to stream.title, stream_path(stream) %></li>
   <% end %>
   </ul>
