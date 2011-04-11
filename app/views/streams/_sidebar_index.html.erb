@@ -72,7 +72,7 @@
     <% if @stream.last_subscription_check.blank? %>
       Never
     <% else %>
-      <%= time_ago_in_words(@stream.last_subscription_check) %> ago
+      <%= time_ago_in_words(Time.at(@stream.last_subscription_check)) %> ago
     <% end %>
   </span>
 </h3>
@@ -85,7 +85,7 @@
     <% if @stream.last_alarm_check.blank? %>
       Never
     <% else %>
-      <%= time_ago_in_words(@stream.last_alarm_check) %> ago
+      <%= time_ago_in_words(Time.at(@stream.last_alarm_check)) %> ago
     <% end %>
   </span>
 </h3>

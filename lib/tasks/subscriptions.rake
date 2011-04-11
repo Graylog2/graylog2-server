@@ -4,8 +4,8 @@ namespace :subscriptions do
   task :send => :environment do
     # Go through every stream that has subscribers.
     streams = Stream.all.find_all { |s| s.subscribers.count > 0}
-    streams.each do |stream_id|
-      stream = Stream.find(stream_id)
+    streams.each do |stream|
+      stream = Stream.find(stream.id)
 
       if stream.last_subscription_check.blank?
         puts "Stream >#{stream.title}< has subscribers but was never checked before. Setting first check date now and skipping."
@@ -15,10 +15,10 @@ namespace :subscriptions do
         next
       end
 
-      puts "Stream >#{stream.title}< has subscribers. Checking for new messages since #{stream.last_subscription_check}"
+      puts "Stream >#{stream.title}< has subscribers. Checking for new messages since #{Time.at(stream.last_subscription_check)}"
 
       # Are there new messages?
-      messages = Message.all_of_stream_since(stream_id, stream.last_subscription_check)
+      messages = Message.all_of_stream_since(stream.id, stream.last_subscription_check)
       count = messages.count
       if count > 0
         # Get all subscribers.

@@ -72,7 +72,19 @@ class StreamsController < ApplicationController
     if !@stream.favorited?(current_user)
       current_user.favorite_streams << @stream
     else
-      current_user.favorite_streams.delete(@stream)
+      # SHITSTORM BEGIN
+      user_ids = @stream.favorited_stream_ids
+      user_ids = Array.new if !user_ids.is_a?(Array)
+      user_ids.delete(current_user.id)
+      @stream.favorited_stream_ids = user_ids
+      @stream.save
+
+      stream_ids = current_user.favorite_stream_ids
+      stream_ids = Array.new if !stream_ids.is_a?(Array)
+      stream_ids.delete(@stream.id)
+      current_user.favorite_stream_ids = stream_ids
+      current_user.save
+      # SHITSTORM END
     end
 
     # Intended to be called via AJAX only.
@@ -185,7 +197,20 @@ class StreamsController < ApplicationController
   end
 
   def unsubscribe
-    current_user.subscribed_streams.delete @stream
+    # SHITSTORM BEGIN
+    user_ids = @stream.subscriber_ids
+    user_ids = Array.new if !user_ids.is_a?(Array)
+    user_ids.delete(current_user.id)
+    @stream.subscriber_ids = user_ids
+    @stream.save
+
+    stream_ids = current_user.subscribed_stream_ids
+    stream_ids = Array.new if !stream_ids.is_a?(Array)
+    stream_ids.delete(@stream.id)
+    current_user.subscribed_stream_ids = stream_ids
+    current_user.save
+    # SHITSTORM END
+
     render :json => {:status => :success}
   end
 

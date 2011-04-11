@@ -128,41 +128,31 @@ class MessagesController < ApplicationController
   end
 
   def deletebystream
-    begin
-      conditions = Message.by_stream(params[:stream_id].to_i).criteria.to_hash
-      throw "Missing conditions" if conditions.blank?
-
-      Message.recalculate_host_counts
-      Message.set(conditions, :deleted => true )
-
-      flash[:notice] = "Messages have been deleted."
-    rescue => e
-      flash[:error] = "Could not delete messages."
-    end
+    Message.where(:streams => BSON::ObjectId(params[:stream_id])).update_all(
+      :deleted => true
+    )
+      
+    Message.recalculate_host_counts
 
     redirect_to stream_path(params[:stream_id])
   end
 
   def deletebyquickfilter
-    begin
-      filters = JSON.parse(params[:filters])
+    filters = JSON.parse(params[:filters])
 
-      filters_with_symbols = Hash.new
-      filters_with_symbols[:message] = filters["message"]
-      filters_with_symbols[:facility] = filters["facility"]
-      filters_with_symbols[:severity] = filters["severity"]
-      filters_with_symbols[:host] = filters["host"]
+    filters_with_symbols = Hash.new
+    filters_with_symbols[:message] = filters["message"]
+    filters_with_symbols[:facility] = filters["facility"]
+    filters_with_symbols[:severity] = filters["severity"]
+    filters_with_symbols[:host] = filters["host"]
 
-      conditions = Message.all_by_quickfilter(filters_with_symbols, 0, 0).criteria.to_hash
-      throw "Missing conditions" if conditions.blank?
+    Message.all_by_quickfilter(filters_with_symbols, 0, 0, true).update_all(
+      :deleted => true
+    )
+      
+    Message.recalculate_host_counts
 
-      Message.recalculate_host_counts
-      Message.set(conditions, :deleted => true )
-
-      flash[:notice] = "Messages have been deleted."
-    rescue
-      flash[:error] = "Could not delete messages."
-    end
+    flash[:notice] = "Messages have been deleted."
 
     redirect_to :action => 'index'
   end

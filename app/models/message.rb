@@ -116,6 +116,8 @@ class Message
       end
     end
 
+    return conditions if conditions_only
+
     conditions.default_scope.limit(LIMIT).paginate(:page => page)
   end
 
@@ -272,7 +274,7 @@ class Message
 
   def self.recalculate_host_counts
     Host.all.each do |host|
-      host.message_count = Message.count(:host => host.host, :deleted => false)
+      host.message_count = Message.where(:host => host.host, :deleted => false).count
       host.save
     end
   end

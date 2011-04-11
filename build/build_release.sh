@@ -29,7 +29,7 @@ echo $BUILD_DATE > $BUILD_DIR/build_date
 echo "Copying files ..."
 
 # Copy files.
-cp ../app ../config ../db ../lib ../public ../Rakefile ../README ../Gemfile ../Gemfile.lock ../config.ru ../script ../vendor $BUILD_DIR -r
+cp ../app ../config ../lib ../public ../Rakefile ../README ../Gemfile ../Gemfile.lock ../config.ru ../script ../vendor $BUILD_DIR -r
 
 # Remove not needed files
 rm $BUILD_DIR/public/images/dashboard_logo.png
@@ -40,10 +40,9 @@ echo "Configuring release ..."
 cd $BUILD_DIR
 
 # Change config files.
-mv config/database.yml.example config/database.yml
 mv config/email.yml.example config/email.yml
 mv config/general.yml.example config/general.yml
-mv config/mongodb.yml.example config/mongodb.yml
+mv config/mongoid.yml.example config/mongoid.yml
 
 RAILS_ENV=production
 export RAILS_ENV
