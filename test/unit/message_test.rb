@@ -19,10 +19,8 @@ class MessageTest < ActiveSupport::TestCase
   end
 
   should "find additional fields" do
-    Message.make(:host => "local", :message => "hi!", :_foo => "bar").save
-    message = Message.last
-    assert message.has_additional_fields
-    expected = [{:value => 'bar', :key => 'foo' }]
-    assert_equal expected, message.additional_fields
+    message = Message.make(:host => "local", :message => "hi!", :_foo => "bar")
+    assert message.additional_fields?
+    assert_equal [{:value => 'bar', :key => 'foo' }], message.additional_fields
   end
 end

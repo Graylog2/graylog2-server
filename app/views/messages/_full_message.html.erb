@@ -18,7 +18,7 @@
   <h4>File: <span class="highlighted"><%=h @message.file %><%= @message.line.blank? or @message.line == -1 ? nil : ":#{h(@message.line)}" %></span></h4>
 <% end %>
 
-<% if @message.has_additional_fields %>
+<% if @message.additional_fields? %>
   <% @message.additional_fields.each do |field| %>
     <h4><%=h field[:key] %>: <span class="highlighted"><%=h field[:value] %></span></h4>
   <% end %>

@@ -260,9 +260,8 @@ class Message
     return self.count_since x.minutes.ago
   end
 
-  def has_additional_fields
-    return true if self.additional_fields.count > 0
-    return false
+  def additional_fields?
+    self.additional_fields.count > 0
   end
 
   def additional_fields
