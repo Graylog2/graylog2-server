@@ -1,4 +1,4 @@
-require File.expand_path(File.dirname(__FILE__) + "/../test_helper")
+require 'test_helper'
 
 class LivetailControllerTest < ActionController::TestCase
   # Replace this with your real tests.
