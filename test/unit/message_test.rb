@@ -1,19 +1,7 @@
 require 'test_helper'
 
 class MessageTest < ActiveSupport::TestCase
-  setup do
-    @stream = Stream.make
-  end
-
-  test "find by id" do
-    id = @stream.id
-
-    assert_equal @stream, Stream.find(id)
-    assert_equal @stream, Stream.find(id.to_s)
-    assert_equal @stream, Stream.find_by_id(id.to_s)
-
-    assert_raise(TypeError) { Stream.find_by_id(id) }
-  end
+  should "test all_of_hostgroup"
 
   should "test count_of_hostgroup" do
     Host.make(:host => "somehost").save
