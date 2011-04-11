@@ -6,7 +6,7 @@ gem 'json', '~> 1.5.1'
 gem 'plucky', '~> 0.3.6'
 gem 'chronic', '~> 0.3.0'
 gem 'pony', '~> 1.1'  # unusual version number
-gem 'declarative_authorization', :git => "http://github.com/cipherpunk/declarative_authorization.git"
+gem 'graylog2-declarative_authorization'
 gem 'mongoid', '~> 2.0.1'
 gem 'bson_ext', "~> 1.3.0"
 
