@@ -1,6 +1,7 @@
 production:
   via: smtp # via: sendmail
   host: smtp.example.org
+  enable_starttls_auto: true # or false
   port: 25
   auth: plain # plain, login, cram_md5, none
   user: somebody
