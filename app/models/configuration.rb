@@ -58,11 +58,12 @@ class Configuration
     ret = Hash.new
 
     if config['via'] == 'smtp'
-      ret[:host] = config['host'] unless config['host'].blank?
+      ret[:address] = config['host'] unless config['host'].blank?
       ret[:port] = config['port'] unless config['port'].blank?
-      ret[:user] = config['user'] unless config['user'].blank?
+      ret[:user_name] = config['user'] unless config['user'].blank?
+      ret[:enable_starttls_auto] = config['enable_starttls_auto'] unless config['enable_starttls_auto']
       ret[:password] = config['password'] unless config['password'].blank?
-      ret[:auth] = config['auth'] unless config['auth'].blank?
+      ret[:authentication] = config['auth'] unless config['auth'].blank?
       ret[:domain] = config['domain'] unless config['domain'].blank?
       ret[:enable_starttls_auto] = config['enable_starttls_auto'] unless config['enable_starttls_auto'].blank?
       return ret
