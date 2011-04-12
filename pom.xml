@@ -6,7 +6,7 @@
 
     <groupId>org.graylog2</groupId>
     <artifactId>graylog2-server</artifactId>
-    <version>0.9.5</version>
+    <version>0.9.5p1</version>
     <packaging>jar</packaging>
 
     <properties>
@@ -40,7 +40,7 @@
         <dependency>
             <groupId>org.syslog4j</groupId>
             <artifactId>syslog4j</artifactId>
-            <version>0.9.47-fixed</version>
+            <version>0.9.46</version>
         </dependency>
         <dependency>
             <groupId>com.googlecode.json-simple</groupId>
