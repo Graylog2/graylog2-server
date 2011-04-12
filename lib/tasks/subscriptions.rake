@@ -26,7 +26,7 @@ namespace :subscriptions do
         puts "\t#{count} new messages. Sending notifications to #{subscribers.count} subscribers."
 
         # Build body.
-        body = "# Stream >#{stream.title}< has #{count} new messages since #{stream.last_subscription_check}\n\n"
+        body = "# Stream >#{stream.title}< has #{count} new messages since #{Time.at(stream.last_subscription_check)}\n\n"
         messages.each do |message|
           body += "#{Time.at(message.created_at)} from >#{message.host}<\n\t#{message.message}\n\n"
         end
