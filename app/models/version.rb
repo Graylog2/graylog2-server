@@ -13,7 +13,7 @@ private
       return Net::HTTP.get(URI.parse(ENDPOINT)).to_i
     rescue => e
       Rails.logger.warn("Could not get current Graylog2 version: #{e}")
-      return ::GRAYLOG2_VERSION_TIMESTAMP + 1
+      return ::GRAYLOG2_VERSION_TIMESTAMP - 1 # Not outdated.
     end
   end
 end
