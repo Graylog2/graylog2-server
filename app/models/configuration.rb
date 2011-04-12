@@ -64,6 +64,7 @@ class Configuration
       ret[:password] = config['password'] unless config['password'].blank?
       ret[:auth] = config['auth'] unless config['auth'].blank?
       ret[:domain] = config['domain'] unless config['domain'].blank?
+      ret[:enable_starttls_auto] = config['enable_starttls_auto'] unless config['enable_starttls_auto'].blank?
       return ret
     end
 

@@ -42,9 +42,9 @@ namespace :subscriptions do
               :via => Configuration.email_transport_type,
               :smtp => Configuration.email_smtp_settings # Only used when :via => :smtp
             )
-            puts "\t[->] #{subscriber}"
+            puts "\t[->] #{subscriber.email}"
           rescue => e
-            puts "\t [!!] #{subscriber} (#{e.to_s.delete("\n")})"
+            puts "\t [!!] #{subscriber.email} (#{e.to_s.delete("\n")})"
           end
         end
       else
