@@ -1,9 +1,7 @@
 class ApplicationController < ActionController::Base
   include AuthenticatedSystem
 
-  clear_helpers
-#  helper :all # include all helpers, all the time
-  protect_from_forgery # See ActionController::RequestForgeryProtection for details
+  protect_from_forgery
   helper Authorization::AuthorizationHelper
 
   before_filter :login_required

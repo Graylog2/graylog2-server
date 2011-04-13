@@ -13,3 +13,8 @@ subscriptions:
 streamalarms:
   from: graylog2alarms@example.org
   subject: "[graylog2] Stream alarm!"
+
+hoptoad:
+  enabled: false
+  ssl: false
+  api_key: 123
