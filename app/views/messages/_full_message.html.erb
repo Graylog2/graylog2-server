@@ -20,7 +20,18 @@
 
 <% if @message.additional_fields? %>
   <% @message.additional_fields.each do |field| %>
-    <h4><%=h field[:key] %>: <span class="highlighted"><%=h field[:value] %></span></h4>
+    <h4>
+      <%=h field[:key] %>:
+      <span class="highlighted">
+        <%= link_to h(field[:value]), {
+                :controller => :messages,
+                "filters[additional][keys][]" => field[:key],
+                "filters[additional][values][]" => field[:value]
+              },
+              :title => "Search for value of this additional field"
+        %>
+      </span>
+    </h4>
   <% end %>
 <% end %>
 
