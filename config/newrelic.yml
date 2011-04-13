@@ -169,6 +169,13 @@ common: &default_settings
   # disable_memcache_instrumentation: true
   disable_dj: true
 
+  # rpm_contrib
+  disable_paperclip: true
+  disable_mongodb: false
+  disable_resque: true
+  disable_redis: true
+  disable_aws-s3: true
+
   # Certain types of instrumentation such as GC stats will not work if
   # you are running multi-threaded.  Please let us know.
   # multi_threaded = false
