@@ -50,6 +50,7 @@ class MessagesController < ApplicationController
   def index
     @has_sidebar = true
     @load_flot = true
+    @use_backtotop = true
 
     if Configuration.allow_version_check
       @last_version_check = current_user.last_version_check
@@ -95,6 +96,7 @@ class MessagesController < ApplicationController
   def showrange
     @has_sidebar = true
     @load_flot = true
+    @use_backtotop = true
 
     begin
       @from = Time.at(params[:from].to_i-Time.now.utc_offset)
@@ -110,6 +112,7 @@ class MessagesController < ApplicationController
     @message = @scope.find_by_id(params[:id])
     @has_sidebar = true
     @load_flot = true
+    @use_backtotop = true
     @nb = (params[:nb] || 100).to_i
     @messages = @message.around(@nb)
 

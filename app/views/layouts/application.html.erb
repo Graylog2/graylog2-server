@@ -22,6 +22,7 @@
     <%= javascript_include_tag("jquery.flot.min") %>
     <%= javascript_include_tag("jquery.flot.selection.min") %>
   <% end %>
+  <%= javascript_include_tag "backtotop" if @use_backtotop %>
   <%= javascript_include_tag "application" %>
   <%= javascript_include_tag "rails" %>
 </head>

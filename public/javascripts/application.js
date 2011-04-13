@@ -247,19 +247,6 @@ $(document).ready(function(){
     $.mapKey("s", function() { $("#modal-stream-chooser").modal(standardMapKeyOptions); });
     $.mapKey("h", function() { $("#modal-host-chooser").modal(standardMapKeyOptions); });
 
-    $('#back-to-top').bind("click", function() {
-      $('body,html').animate({scrollTop:0},500);
-    });
-
-});
-
-// Back to top.
-$(window).scroll(function() {
-  if($(this).scrollTop() > 150) {
-    $('#back-to-top').fadeIn();
-  } else {
-    $('#back-to-top').fadeOut();
-  }
 });
 
 function buildHostCssId(id) {
