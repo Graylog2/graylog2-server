@@ -5,10 +5,11 @@
   <title>Login - Graylog2</title>
   <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
   <link rel="shortcut icon" href="/favicon.ico" />
-  <%= javascript_include_tag "jquery-1.4.2.min" %>
-  <%= javascript_include_tag "login" %>
   <%= stylesheet_link_tag "reset" %>
   <%= stylesheet_link_tag "login" %>
+  <%= hoptoad_javascript_notifier if Configuration.hoptoad_enabled? %>
+  <%= javascript_include_tag "jquery-1.4.2.min" %>
+  <%= javascript_include_tag "login" %>
 </head>
 <body>
 

@@ -87,4 +87,16 @@ class Configuration
     (@general_config.blank? or @general_config["general"].blank? or @general_config["general"]["date_format"].blank?) ? default : @general_config["general"]["date_format"]
   end
 
+  def self.hoptoad_enabled?
+    return false if @general_config.blank? or @general_config['hoptoad'].blank? or @general_config['hoptoad']['enabled'].blank?
+    return @general_config['hoptoad']['enabled']
+  end
+
+  def self.hoptoad_ssl?
+    return @general_config['hoptoad']['ssl']
+  end
+
+  def self.hoptoad_key
+    return @general_config['hoptoad']['api_key']
+  end
 end
