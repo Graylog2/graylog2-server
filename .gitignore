@@ -18,6 +18,7 @@ public/images/dashboard_logo.png
 public/images/graphs/*
 
 .bundle/
+vendor/bundle/
 
 coverage/
 test/reports/
