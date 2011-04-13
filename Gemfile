@@ -8,6 +8,7 @@ gem 'chronic', '~> 0.3.0'
 gem 'pony', '~> 1.1'  # unusual version number
 gem 'graylog2-declarative_authorization', :require => 'declarative_authorization'
 gem 'hoptoad_notifier', '~> 2.4.9'
+gem 'newrelic_rpm', '~> 2.14.1'
 gem 'mongoid', '~> 2.0.1'
 gem 'bson_ext', "~> 1.3.0"
 
