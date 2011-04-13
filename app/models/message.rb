@@ -113,7 +113,8 @@ class Message
       end
 
       # Host
-      conditions = conditions.where(:host => filters[:host]) unless filters[:host].blank?
+      hostgroup = Hostgroup.find(BSON::ObjectId(filters[:hostgroup])) unless filters[:hostgroup].blank?
+      conditions = conditions.where(:host => filters[:host] | hostgroup.all_conditions) unless filters[:host].blank?
 
       self.extract_additional_from_quickfilter(filters).each do |key, value|
         conditions = conditions.where(key => value)

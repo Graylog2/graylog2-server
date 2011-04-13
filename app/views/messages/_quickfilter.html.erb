@@ -21,6 +21,10 @@
     <dd>
       <%= select_tag "filters[host]", raw("<option></option>" + options_for_select(Host.all.collect {|host| [ h(host.host) ]}.sort, :selected => get_quickfilter_selected(params[:filters], :host, true))) %>
     </dd>
+    
+    <dt><%= label_tag "filters[hostgroup]", "Hostgroup:" %></dt>
+    <dd>
+      <%= select_tag "filters[hostgroup]", raw("<option></option>" + options_for_select(Hostgroup.all.collect {|group| [ group.name, group.id] }, :selected => get_quickfilter_selected(params[:hostgroup], :hostgroup, true))) %>
 
     <% unless @additional_filters.blank? %>
       <% @additional_filters.each do |k,v| %>
