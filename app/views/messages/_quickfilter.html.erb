@@ -24,7 +24,7 @@
 
     <% unless @additional_filters.blank? %>
       <% @additional_filters.each do |k,v| %>
-        <dt><%= text_field_tag "filters[additional][keys][]", (k[0] == '_' ? k[1..k.length] : k), :class => "messages-quickfilter-additional-key" %></dt>
+        <dt><%= text_field_tag "filters[additional][keys][]", (k.to_s.at(0) == '_' ? k.to_s[1..k.to_s.length] : k.to_s), :class => "messages-quickfilter-additional-key" %></dt>
         <dd><%= text_field_tag "filters[additional][values][]", v, :class => "messages-quickfilter-additional-value" %></dd>
       <% end %>
     <% end %>

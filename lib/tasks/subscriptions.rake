@@ -26,7 +26,7 @@ namespace :subscriptions do
         puts "\t#{count} new messages. Sending notifications to #{subscribers.count} subscribers."
 
         # Build body.
-        body = "# Stream >#{stream.title}< has #{count} new messages since #{stream.last_subscription_check}\n\n"
+        body = "# Stream >#{stream.title}< has #{count} new messages since #{Time.at(stream.last_subscription_check)}\n\n"
         messages.each do |message|
           body += "#{Time.at(message.created_at)} from >#{message.host}<\n\t#{message.message}\n\n"
         end
@@ -40,11 +40,11 @@ namespace :subscriptions do
               :subject => "#{Configuration.subscription_subject} (Stream: #{stream.title})",
               :body => body,
               :via => Configuration.email_transport_type,
-              :smtp => Configuration.email_smtp_settings # Only used when :via => :smtp
+              :via_options => Configuration.email_smtp_settings # Only used when :via => :smtp
             )
-            puts "\t[->] #{subscriber}"
+            puts "\t[->] #{subscriber.email}"
           rescue => e
-            puts "\t [!!] #{subscriber} (#{e.to_s.delete("\n")})"
+            puts "\t [!!] #{subscriber.email} (#{e.to_s.delete("\n")})"
           end
         end
       else
