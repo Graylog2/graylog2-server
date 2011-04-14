@@ -1,6 +1,7 @@
-
 <div id="hosts-delete">
-  <%= link_to "Delete this host", { :action => "destroy", :id => URI.escape(@host.host) }, :confirm => "Really delete this host with all it's messages?", :method => :delete %>
+  <% if Configuration.allow_deleting %>
+    <%= link_to "Delete this host", { :action => "destroy", :id => URI.escape(@host.host) }, :confirm => "Really delete this host with all it's messages?", :method => :delete %>
+  <% end %>
 </div>
 
 <h1>Host <span class="highlighted"><%=h @host.host %></span></h1>
