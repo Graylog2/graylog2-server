@@ -242,10 +242,6 @@ class Message
     where(:host.in => hostgroup.all_conditions).not_deleted.count
   end
 
-  def self.delete_all_of_host host
-    Message.set({:host => host}, :deleted => true )
-  end
-
   def self.count_since x
     if x.to_i > 0
       conditions = not_deleted.where(:created_at.gt => x.to_i)
