@@ -51,6 +51,9 @@ public class StreamRuleMatcherFactory {
             case StreamRule.TYPE_ADDITIONAL:
                 matcher = new AdditionalFieldMatcher();
                 break;
+            case StreamRule.TYPE_HOSTGROUP:
+                matcher = new HostgroupMatcher();
+                break;
             default:
                 throw new InvalidStreamRuleTypeException();
         }
