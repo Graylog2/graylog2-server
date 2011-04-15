@@ -14,7 +14,7 @@ Message.blueprint do
  facility { rand(15) }
  level { rand(8) }
  host
- created_at { Time.now.to_i }
+ created_at { Time.now.to_f }
  deleted { false }
 end
 

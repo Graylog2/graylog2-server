@@ -5,15 +5,15 @@ class Message
 
   field :message,       :type => String
   field :full_message,  :type => String
-  field :created_at,    :type => Integer    # from server, UTC timestamp
-  field :timestamp,     :type => Integer    # from message, timestamp     # FIXME redefined below
-  field :date,          :type => String     # FIXME ???
-  field :facility,      :type => Object     # object?
+  field :created_at,    :type => Float    # stamped by server, UTC UNIX timestamp (seconds since epoch)
+  field :facility,      :type => Object   # object?
   field :level,         :type => Integer
   field :host,          :type => String
   field :file,          :type => String
   field :line,          :type => Integer
   field :deleted,       :type => Boolean
+
+   # TODO replace 'created_at' with native type for mongo and mongoid (http://bsonspec.org/#/specification)
 
   LIMIT = 100
 
@@ -30,11 +30,6 @@ class Message
 
   def self.find_by_id(_id)
     where(:_id => BSON::ObjectId(_id)).first
-  end
-
-  # FIXME ?!
-  def timestamp
-    Time.at(created_at)
   end
 
   # Overwriting the message getter. This always applies the filtering of
