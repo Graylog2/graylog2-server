@@ -10,19 +10,3 @@ class ActiveSupport::TestCase
     Sham.reset
   end
 end
-
-
-class ActionController::TestCase
-  setup do
-    @request.cookies["auth_token"] = cookie_for(:quentin)
-  end
-
-protected
-  def auth_token(token)
-    CGI::Cookie.new('name' => 'auth_token', 'value' => token)
-  end
-
-  def cookie_for(user)
-    auth_token users(user).remember_token
-  end
-end
