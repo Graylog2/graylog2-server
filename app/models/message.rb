@@ -1,23 +1,19 @@
 class Message
   include Mongoid::Document
 
-  FIELDS = %w(message date host level facility deleted  gelf full_message type file line version timestamp created_at)
   SPECIAL_FIELDS = %w(_id)
 
-  field :version,       :type => Integer
-  field :timestamp,     :type => Integer
   field :message,       :type => String
-  field :date,          :type => String
-  field :host,          :type => String
-  field :level,         :type => Integer
-  field :facility,      :type => Object
-  field :deleted,       :type => Boolean
-  field :created_at,    :type => Integer
-  field :gelf,          :type => Boolean
   field :full_message,  :type => String
-  field :type,          :type => Integer
+  field :created_at,    :type => Integer    # from server, UTC timestamp
+  field :timestamp,     :type => Integer    # from message, timestamp     # FIXME redefined below
+  field :date,          :type => String     # FIXME ???
+  field :facility,      :type => Object     # object?
+  field :level,         :type => Integer
+  field :host,          :type => String
   field :file,          :type => String
   field :line,          :type => Integer
+  field :deleted,       :type => Boolean
 
   LIMIT = 100
 
@@ -36,6 +32,7 @@ class Message
     where(:_id => BSON::ObjectId(_id)).first
   end
 
+  # FIXME ?!
   def timestamp
     Time.at(created_at)
   end
