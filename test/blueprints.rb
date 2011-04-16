@@ -2,6 +2,7 @@ Sham.login { Faker::Internet.user_name }
 Sham.password { Faker::Internet.user_name }
 Sham.email { Faker::Internet.email }
 Sham.title { Faker::Lorem.words(15) }
+Sham.name { Faker::Lorem.words(15) }
 Sham.host { Faker::Internet.domain_name }
 
 Host.blueprint do
@@ -33,4 +34,12 @@ User.blueprint do
   password
   password_confirmation { password }
   email
+end
+
+Hostgroup.blueprint do
+  name
+end
+
+HostgroupHost.blueprint do
+  hostname { "example.org" }
 end
