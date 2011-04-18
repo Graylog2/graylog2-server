@@ -43,6 +43,8 @@
   </p>
 <% end %>
 
+<%
+=begin %>
 <% unless @message.streams.blank? %>
   <h3>Filed in following streams:</h3>
   <ul id="message-referenced-streams">
@@ -52,6 +54,8 @@
   <% end %>
   </ul>
 <% end %>
+<%
+=end %>
 
 <% if Configuration.allow_deleting %>
   <br />
