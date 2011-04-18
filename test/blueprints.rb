@@ -5,11 +5,6 @@ Sham.title { Faker::Lorem.words(15) }
 Sham.name { Faker::Lorem.words(15) }
 Sham.host { Faker::Internet.domain_name }
 
-Host.blueprint do
- host
- message_count { rand(50000) }
-end
-
 Message.blueprint do
  message { Faker::Lorem.words(15) }
  facility { rand(15) }
@@ -36,10 +31,15 @@ User.blueprint do
   email
 end
 
+Host.blueprint do
+ host
+ message_count { rand(50000) }
+end
+
 Hostgroup.blueprint do
   name
 end
 
 HostgroupHost.blueprint do
-  hostname { "example.org" }
+  hostname { host }
 end
