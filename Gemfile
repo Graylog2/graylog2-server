@@ -4,6 +4,7 @@ gem 'rack', '~> 1.2.2'
 gem 'rails', '~> 3.0.6'
 gem 'json', '~> 1.5.1'
 gem 'plucky', '~> 0.3.6'
+gem 'home_run', '~> 1.0.2'
 gem 'chronic', '~> 0.3.0'
 gem 'pony', '~> 1.1'  # unusual version number
 gem 'graylog2-declarative_authorization', :require => 'declarative_authorization'

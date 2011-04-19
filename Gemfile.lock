@@ -41,6 +41,7 @@ GEM
     faker (0.9.5)
       i18n (~> 0.4)
     graylog2-declarative_authorization (0.5.2)
+    home_run (1.0.2)
     hoptoad_notifier (2.4.9)
       activesupport
       builder
@@ -109,6 +110,7 @@ DEPENDENCIES
   database_cleaner (~> 0.6.0)
   faker (~> 0.9.5)
   graylog2-declarative_authorization
+  home_run (~> 1.0.2)
   hoptoad_notifier (~> 2.4.9)
   json (~> 1.5.1)
   machinist_mongo (~> 1.2.0)
