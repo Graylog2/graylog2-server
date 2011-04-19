@@ -97,4 +97,37 @@ public class GELFMessageTest {
         assertTrue(msg.blacklisted(blacklists));
     }
 
+    @Test
+    public void testBlacklistedWithPositiveResultAndNewline() {
+        BasicDBObject mongoList = new BasicDBObject();
+        mongoList.put("_id", new ObjectId());
+        mongoList.put("title", "foo");
+
+        BasicDBObject mongoRule1 = new BasicDBObject();
+        mongoRule1.put("_id", new ObjectId());
+        mongoRule1.put("blacklist_id", mongoList.get("_id"));
+        mongoRule1.put("term", "^ohai.+");
+
+        BasicDBObject mongoRule2 = new BasicDBObject();
+        mongoRule2.put("_id", new ObjectId());
+        mongoRule1.put("blacklist_id", mongoList.get("_id"));
+        mongoRule2.put("term", ".+aarrghhhllll");
+
+        BasicDBList rules = new BasicDBList();
+        rules.add(mongoRule1);
+        rules.add(mongoRule2);
+
+        mongoList.put("blacklisted_terms", rules);
+
+        Blacklist blacklist = new Blacklist(mongoList);
+
+        GELFMessage msg = new GELFMessage();
+        msg.setShortMessage("ohai thar\nfoo");
+
+        List<Blacklist> blacklists = new ArrayList<Blacklist>();
+        blacklists.add(blacklist);
+
+        assertTrue(msg.blacklisted(blacklists));
+    }
+
 }
