@@ -1,5 +1,5 @@
 <h2>Welcome, <span class=\"highlighted\"><%= current_user.display_name %></span>!</h2>
-Your current time: <%= gl_date(Time.now.to_s) %>
+Your current time: <%= time_to_formatted_s(Time.zone.now) %>
 
 <div id="sidebar-graph" style="height: 100px;"></div>
 <div id="graph-rangeselector" class="graph-rangeselector-sidebar" style="display: none;">
