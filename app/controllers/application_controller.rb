@@ -30,6 +30,7 @@ class ApplicationController < ActionController::Base
     return true
   end
 
+  # TODO remove, replace with time_to_formatted_s
   helper_method :gl_date
   def gl_date(date)
     date = date.to_s
