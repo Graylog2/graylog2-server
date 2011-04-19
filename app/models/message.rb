@@ -303,10 +303,6 @@ class Message
     return ret_streams
   end
 
-  def time
-    Time.at(self.created_at) rescue nil
-  end
-
   def accessable_for_user?(current_user)
     return true if current_user.role == "admin"
 
