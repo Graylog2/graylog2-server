@@ -15,6 +15,11 @@ class Message
   field :line,          :type => Integer
   field :deleted,       :type => Boolean
 
+  # Returns +created_at+ as +Time+ in request's timezone
+  def created_at_time
+    @created_at_time ||= Time.zone.at(self.created_at)
+  end
+
   LIMIT = 100
 
   # This is controlled by general.yml. Disabling it gives great performance improve.
@@ -306,10 +311,6 @@ class Message
     end
 
     return ret_streams
-  end
-
-  def time
-    Time.at(self.created_at) rescue nil
   end
 
   def accessable_for_user?(current_user)

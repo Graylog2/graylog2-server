@@ -3,6 +3,24 @@ require 'test_helper'
 class MessageTest < ActiveSupport::TestCase
   should "test all_of_hostgroup"
 
+  context "creation time" do
+    setup do
+      @message = Message.make
+    end
+
+    should "be returned in request's timezone" do
+      assert_in_delta(Time.now.utc.to_f, @message.created_at, 3.0)
+
+      assert_equal 'UTC', Time.zone.name, "Please do not change default timezone"
+      assert_equal Time.zone.name, @message.created_at_time.zone
+      assert_equal Time.zone.at(@message.created_at),  @message.created_at_time
+
+      Time.zone = "TOT"
+      assert_equal Time.zone.name, @message.created_at_time.zone
+      assert_equal Time.zone.at(@message.created_at),  @message.created_at_time
+    end
+  end
+
   should "test count_of_hostgroup" do
     Host.make(:host => "somehost").save
 
