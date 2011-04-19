@@ -58,12 +58,6 @@ public class MongoBridge {
 
         BasicDBObject dbObj = new BasicDBObject();
 
-        // Some fields must not be set if this message was converted from a syslog message.
-        if (!message.convertedFromSyslog()) {
-            dbObj.put("gelf", true);
-            dbObj.put("version", message.getVersion());
-        }
-
         dbObj.put("message", message.getShortMessage());
         dbObj.put("full_message", message.getFullMessage());
         dbObj.put("file", message.getFile());
