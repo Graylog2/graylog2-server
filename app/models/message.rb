@@ -8,7 +8,7 @@ class Message
   field :created_at,    :type => Integer    # from server, UTC timestamp
   field :timestamp,     :type => Integer    # from message, timestamp     # FIXME redefined below
   field :date,          :type => String     # FIXME ???
-  field :facility,      :type => Object     # object?
+  field :facility,      :type => String
   field :level,         :type => Integer
   field :host,          :type => String
   field :file,          :type => String

@@ -48,12 +48,6 @@ Graylog2WebInterface::Application.routes.draw do
 
   resources :hostgroup_hosts
 
-  resources :facilities do
-    member do
-      post :changetitle
-    end
-  end
-
   resources :messagecomments do
   end
 
