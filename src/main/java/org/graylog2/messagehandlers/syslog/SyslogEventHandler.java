@@ -67,17 +67,22 @@ public class SyslogEventHandler implements SyslogServerSessionlessEventHandlerIF
         LOG.info("Level: " + event.getLevel() + " (" + Tools.syslogLevelToReadable(event.getLevel()) + ")");
         LOG.info("Raw: " + new String(event.getRaw()));
 
-        DateTime jt = new DateTime(event.getDate().getTime());
-        String unixTime = String.valueOf(event.getDate().getTime()/1000L);
-        String millis = String.valueOf(jt.getMillisOfSecond());
-        Float milliSecondTime = new Float(unixTime + "." + millis);
-
-        LOG.info(String.valueOf(new Float("1303317717.65384")));
+        // Use JodaTime to easy get the milliseconds and construct a float. (This looks dumb but is the easiest and safest way)
+        try {
+            DateTime jt = new DateTime(event.getDate().getTime());
+            String unixTime = String.valueOf(event.getDate().getTime()/1000L);
+            String millis = String.valueOf(jt.getMillisOfSecond());
+            Double milliSecondTime = new Double(unixTime + "." + millis);
+            gelf.setCreatedAt(milliSecondTime.doubleValue());
+        } catch (NumberFormatException e) {
+            LOG.error("Could not determine milliseconds of syslog message. (NumberFormatException)");
+        }
+        
 
         gelf.setConvertedFromSyslog(true);
         gelf.setVersion("0");
         gelf.setShortMessage(event.getMessage());
-        gelf.setCreatedAt(milliSecondTime.floatValue());
+        
         gelf.setHost(event.getHost());
         gelf.setFacility(Tools.syslogFacilityToReadable(event.getFacility()));
         gelf.setLevel(event.getLevel());

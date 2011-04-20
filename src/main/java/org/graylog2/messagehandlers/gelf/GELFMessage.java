@@ -33,7 +33,6 @@ import org.graylog2.streams.matchers.StreamRuleMatcherIF;
 import java.util.*;
 import java.util.regex.Pattern;
 import java.util.zip.Deflater;
-import org.json.simple.JSONObject;
 import org.json.simple.JSONValue;
 
 /**
@@ -58,7 +57,7 @@ public class GELFMessage {
     private Map<String, String> additionalData = new HashMap<String, String>();
     private List<Stream> streams = null;
     private boolean convertedFromSyslog = false;
-    private float createdAt = 0;
+    private double createdAt = 0;
 
     private boolean filterOut = false;
     private boolean doRouting = true;
@@ -440,14 +439,14 @@ public class GELFMessage {
     /**
      * @return the createdAt
      */
-    public float getCreatedAt() {
+    public double getCreatedAt() {
         return createdAt;
     }
 
     /**
      * @param createdAt the createdAt to set
      */
-    public void setCreatedAt(float createdAt) {
+    public void setCreatedAt(double createdAt) {
         this.createdAt = createdAt;
     }
 
