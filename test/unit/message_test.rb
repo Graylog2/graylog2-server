@@ -33,6 +33,12 @@ class MessageTest < ActiveSupport::TestCase
     assert_equal '', message.message
   end
 
+  should "return file and line without absent values" do
+    assert_equal 'foo.rb:42', Message.make(:file => 'foo.rb', :line => 42).file_and_line
+    assert_equal 'foo.rb', Message.make(:file => 'foo.rb').file_and_line
+    assert_equal '', Message.make.file_and_line
+  end
+
   should "test count_of_hostgroup" do
     Host.make(:host => "somehost").save
 

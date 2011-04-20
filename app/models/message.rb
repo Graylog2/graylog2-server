@@ -3,15 +3,15 @@ class Message
 
   SPECIAL_FIELDS = %w(_id)
 
-  field :message,       :type => String
+  field :message,       :type => String                    # overloaded below
   field :full_message,  :type => String
-  field :created_at,    :type => Float    # stamped by server, UTC UNIX timestamp (seconds since epoch)
-  field :facility,      :type => String
-  field :level,         :type => Integer  # syslog level (0..7)
-  field :host,          :type => String
-  field :file,          :type => String
-  field :line,          :type => Integer
-  field :deleted,       :type => Boolean
+  field :created_at,    :type => Float,   :default => 0.0  # stamped by server, UTC UNIX timestamp (seconds since epoch)
+  field :facility,      :type => String,  :default => ''
+  field :level,         :type => Integer                   # syslog level (0..7)
+  field :host,          :type => String,  :default => ''
+  field :file,          :type => String,  :default => ''
+  field :line,          :type => Integer, :default => 0
+  field :deleted,       :type => Boolean, :default => false
 
   # Overwriting the message getter. This always applies the filtering of filtered terms.
   def message
@@ -35,6 +35,10 @@ class Message
   # Returns +created_at+ as +Time+ in request's timezone
   def created_at_time
     @created_at_time ||= Time.zone.at(self.created_at)
+  end
+
+  def file_and_line
+    @file_and_line ||= file + (":#{line}" if line > 0).to_s
   end
 
   LIMIT = 100

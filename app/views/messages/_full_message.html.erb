@@ -6,10 +6,7 @@
 <h4>Received: <span class="highlighted"><%= time_to_formatted_s(@message.created_at_time) %></span></h4>
 <h4>Severity: <span class="highlighted"><%= syslog_level_to_human(@message.level) %></span></h4>
 <h4>Facility: <span class="highlighted"><%= @message.facility %></span></h4>
-
-<% unless @message.file.blank?  %>
-  <h4>File: <span class="highlighted"><%=h @message.file %><%= @message.line.blank? or @message.line == -1 ? nil : ":#{h(@message.line)}" %></span></h4>
-<% end %>
+<h4>File: <span class="highlighted"><%=h @message.file_and_line %></span></h4>
 
 <% if @message.additional_fields? %>
   <% @message.additional_fields.each do |field| %>
