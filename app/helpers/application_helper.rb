@@ -2,9 +2,7 @@ module ApplicationHelper
 
   # Returns formatted time
   def time_to_formatted_s(t)
-    res = t.strftime('%Y-%m-%d %H:%M:%S.%L')
-    res[-1, 3] = t.usec.to_s[0,3] if RUBY_VERSION < '1.9'
-    res
+    t.strftime('%Y-%m-%d %H:%M:%S.') + t.usec.to_s[0,3]
   end
 
   def menu_item title, where
