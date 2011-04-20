@@ -13,6 +13,25 @@ class Message
   field :line,          :type => Integer
   field :deleted,       :type => Boolean
 
+  # Overwriting the message getter. This always applies the filtering of filtered terms.
+  def message
+    msg = read_attribute(:message).to_s
+
+    if FilteredTerm.exists?
+      FilteredTerm.all.each do |t|
+        next if msg.blank? or t.term.blank?
+        begin
+          msg[/#{t.term}/] = "[FILTERED]"
+        rescue => e
+          Rails.logger.warn "Skipping filtered term: #{e}"
+          next
+        end
+      end
+    end
+
+    return msg
+  end
+
   # Returns +created_at+ as +Time+ in request's timezone
   def created_at_time
     @created_at_time ||= Time.zone.at(self.created_at)
@@ -33,28 +52,6 @@ class Message
 
   def self.find_by_id(_id)
     where(:_id => BSON::ObjectId(_id)).first
-  end
-
-  # Overwriting the message getter. This always applies the filtering of
-  # filtered terms.
-  def message
-    if FilteredTerm.exists?
-      msg = read_attribute(:message)
-      FilteredTerm.all.each do |t|
-        next if msg.blank? or t.term.blank?
-        begin
-          msg[/#{t.term}/] = "[FILTERED]"
-        rescue => e
-          Rails.logger.warn "Skipping filtered term: #{e}"
-          next
-        end
-      end
-
-      return msg
-    end
-
-    # No filtered terms set.
-    read_attribute(:message)
   end
 
   def self.all_paginated page = 1, limit = LIMIT

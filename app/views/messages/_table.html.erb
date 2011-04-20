@@ -19,10 +19,8 @@
         <td><%= syslog_level_to_human(message.level) %></td>
         <td><%= message.facility %></td>
         <td>
-          <% unless message.message.blank? %>
-            <%= message.message[0..message_length] %>
-            <%=raw (message.message.length > message_length) && !defined?(dont_show_links) ? "<span class='light'>...</span>" : nil %>
-          <% end %>
+          <%= message.message[0..message_length] %>
+          <%=raw (message.message.length > message_length) && !defined?(dont_show_links) ? "<span class='light'>...</span>" : nil %>
         </td>
       </tr>
       <% i+=1 %>

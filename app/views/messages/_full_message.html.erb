@@ -1,8 +1,6 @@
 <h2>Message <span class="highlighted"><%=h @message.id %></span></h2>
 
-<% unless @message.message.blank? %>
-  <p class="messages-show-message"><%=h @message.message %></p>
-<% end %>
+<p class="messages-show-message"><%=h @message.message %></p>
 
 <h4>From: <span class="highlighted"><%= @message.host %></span></h4>
 <h4>Received: <span class="highlighted"><%= time_to_formatted_s(@message.created_at_time) %></span></h4>

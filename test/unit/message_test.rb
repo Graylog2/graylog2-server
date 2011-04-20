@@ -28,6 +28,11 @@ class MessageTest < ActiveSupport::TestCase
     end
   end
 
+  should "always return message" do
+    message = Message.make(:message => nil)  # due to a bug in server, for example
+    assert_equal '', message.message
+  end
+
   should "test count_of_hostgroup" do
     Host.make(:host => "somehost").save
 
