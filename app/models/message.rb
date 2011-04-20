@@ -5,11 +5,9 @@ class Message
 
   field :message,       :type => String
   field :full_message,  :type => String
-  field :created_at,    :type => Integer    # from server, UTC timestamp
-  field :timestamp,     :type => Integer    # from message, timestamp     # FIXME redefined below
-  field :date,          :type => String     # FIXME ???
+  field :created_at,    :type => Float    # stamped by server, UTC UNIX timestamp (seconds since epoch)
   field :facility,      :type => String
-  field :level,         :type => Integer
+  field :level,         :type => Integer  # syslog level (0..7)
   field :host,          :type => String
   field :file,          :type => String
   field :line,          :type => Integer
@@ -35,11 +33,6 @@ class Message
 
   def self.find_by_id(_id)
     where(:_id => BSON::ObjectId(_id)).first
-  end
-
-  # FIXME ?!
-  def timestamp
-    Time.at(created_at)
   end
 
   # Overwriting the message getter. This always applies the filtering of

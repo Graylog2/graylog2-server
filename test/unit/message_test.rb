@@ -1,7 +1,13 @@
 require 'test_helper'
 
 class MessageTest < ActiveSupport::TestCase
-  should "test all_of_hostgroup"
+  should "have few time fields" do
+    message = Message.make
+
+    assert_kind_of(Float, message.created_at)
+    assert !message.respond_to?(:timestamp), "Is it _really_ used?"
+    assert !message.respond_to?(:date), "Is it _really_ used?"
+  end
 
   context "creation time" do
     setup do
