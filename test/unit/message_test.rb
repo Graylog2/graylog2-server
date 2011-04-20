@@ -36,6 +36,8 @@ class MessageTest < ActiveSupport::TestCase
   should "return file and line without absent values" do
     assert_equal 'foo.rb:42', Message.make(:file => 'foo.rb', :line => 42).file_and_line
     assert_equal 'foo.rb', Message.make(:file => 'foo.rb').file_and_line
+    assert_equal '', Message.make(:file => nil).file_and_line
+    assert_equal '', Message.make(:line => 42).file_and_line
     assert_equal '', Message.make.file_and_line
   end
 

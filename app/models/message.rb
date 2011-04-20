@@ -38,6 +38,7 @@ class Message
   end
 
   def file_and_line
+    return String.new if file.blank? or (file.blank? and !line.blank?)
     @file_and_line ||= file + (":#{line}" if line > 0).to_s
   end
 
