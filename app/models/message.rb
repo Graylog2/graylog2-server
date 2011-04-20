@@ -3,7 +3,7 @@ class Message
 
   SPECIAL_FIELDS = %w(_id)
 
-  field :message,       :type => String                    # overloaded below
+  field :message,       :type => String,  :default => ''   # overloaded below
   field :full_message,  :type => String
   field :created_at,    :type => Float,   :default => 0.0  # stamped by server, UTC UNIX timestamp (seconds since epoch)
   field :facility,      :type => String,  :default => ''
