@@ -5,8 +5,9 @@ class MessageTest < ActiveSupport::TestCase
     message = Message.make
 
     assert_kind_of(Float, message.created_at)
-    assert !message.respond_to?(:timestamp), "Is it _really_ used?"
-    assert !message.respond_to?(:date), "Is it _really_ used?"
+    assert !message.respond_to?(:timestamp), "Do not define method like this."
+    assert !message.respond_to?(:date), "Do not define method like this."
+    assert !message.respond_to?(:time), "Do not define method like this."
   end
 
   context "creation time" do
