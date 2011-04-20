@@ -54,11 +54,11 @@ public class GELFMessage {
     private String host = null;
     private String file = null;
     private int line = 0;
-    private int timestamp = 0;
     private String facility = null;
     private Map<String, String> additionalData = new HashMap<String, String>();
     private List<Stream> streams = null;
     private boolean convertedFromSyslog = false;
+    private float createdAt = 0;
 
     private boolean filterOut = false;
     private boolean doRouting = true;
@@ -193,20 +193,6 @@ public class GELFMessage {
      */
     public void setLine(int line) {
         this.line = line;
-    }
-
-    /**
-     * @return the timestamp
-     */
-    public int getTimestamp() {
-        return timestamp;
-    }
-
-    /**
-     * @param timestamp the timestamp to set
-     */
-    public void setTimestamp(int timestamp) {
-        this.timestamp = timestamp;
     }
 
     /**
@@ -449,6 +435,20 @@ public class GELFMessage {
         obj.put("version", this.getVersion());
 
         return JSONValue.toJSONString(obj);
+    }
+
+    /**
+     * @return the createdAt
+     */
+    public float getCreatedAt() {
+        return createdAt;
+    }
+
+    /**
+     * @param createdAt the createdAt to set
+     */
+    public void setCreatedAt(float createdAt) {
+        this.createdAt = createdAt;
     }
 
 }
