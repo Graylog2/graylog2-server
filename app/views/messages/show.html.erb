@@ -2,7 +2,7 @@
   <%= render :partial => "sidebar_index", :locals => { :headline => "Hello, <span class=\"highlighted\">#{current_user.login}</span>!" } %>
 <% end %>
 
-<div id="message-id" style="display: none;"><%=h @message.id %></div>
+<div id="message-id" style="display: none;"><%= @message.id %></div>
 
 <div id="messages-show">
   <%= render :partial => "full_message" %>

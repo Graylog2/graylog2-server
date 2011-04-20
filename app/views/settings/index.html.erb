@@ -19,7 +19,7 @@
     <%= text_field_tag 'value', Setting.get_message_length(current_user) %>
     <%= awesome_submit_link 'Store' %>
     <br />
-    The length of messages before they are cut with a <span class="code">[more]</span> link. (Default: <%=h Setting::TYPE_MESSAGE_LENGTH_STANDARD %>)
+    The length of messages before they are cut with a <span class="code">[more]</span> link. (Default: <%= Setting::TYPE_MESSAGE_LENGTH_STANDARD %>)
   <% end -%>
 </div>
 
@@ -30,7 +30,7 @@
     <%= text_field_tag 'value', Setting.get_message_count_interval(current_user) %>
     <%= awesome_submit_link 'Store' %>
     <br />
-    Graylog2 can display the number of handled log messages in the last X minutes. Define X here. (Default: <%=h Setting::TYPE_MESSAGE_COUNT_INTERVAL_STANDARD %>)
+    Graylog2 can display the number of handled log messages in the last X minutes. Define X here. (Default: <%= Setting::TYPE_MESSAGE_COUNT_INTERVAL_STANDARD %>)
   <% end -%>
 </div>
 
@@ -43,7 +43,7 @@
     <br />
     The number of maximum messages per [message count interval] minutes. Everything above this value is an alarm. For example visible in the dashboard. Get alarms
     via the Nagios hook <%= tooltip("Nagios-hook") %> or general notifications <%= tooltip("Notifications") %>.
-    (Default: <%=h Setting::TYPE_MESSAGE_MAX_COUNT_STANDARD %>)
+    (Default: <%= Setting::TYPE_MESSAGE_MAX_COUNT_STANDARD %>)
   <% end -%>
 </div>
 
@@ -55,7 +55,7 @@
     <%= text_field_tag 'value', Setting.get_livetail_row_count(current_user) %>
     <%= awesome_submit_link 'Store' %>
     <br />
-    The number of messages to keep as history in the live tail view. (Default: <%=h Setting::TYPE_LIVETAIL_ROW_COUNT_STANDARD %>)
+    The number of messages to keep as history in the live tail view. (Default: <%= Setting::TYPE_LIVETAIL_ROW_COUNT_STANDARD %>)
   <% end -%>
 </div>
 <% end %>

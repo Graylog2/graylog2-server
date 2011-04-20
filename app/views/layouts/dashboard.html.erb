@@ -26,9 +26,9 @@
     </div>
   </div>
 
-  <div id="statuscontainer" class="status-<%=h Message.count_of_last_minutes(message_count_interval) > Setting.get_message_max_count(current_user) ? 'problems' : 'okay' %>">
+  <div id="statuscontainer" class="status-<%= Message.count_of_last_minutes(message_count_interval) > Setting.get_message_max_count(current_user) ? 'problems' : 'okay' %>">
     <div id="status">
-      <h1><%= Message.count_of_last_minutes(message_count_interval) %> messages / <%=h message_count_interval %> minutes</h1>
+      <h1><%= Message.count_of_last_minutes(message_count_interval) %> messages / <%= message_count_interval %> minutes</h1>
     </div>
   </div>
 

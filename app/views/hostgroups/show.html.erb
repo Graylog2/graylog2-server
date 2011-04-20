@@ -2,7 +2,7 @@
   <%= render :partial => "messages/sidebar_index", :locals => { :headline => "Hello, <span class=\"highlighted\">#{current_user.login}</span>!" } %>
 <% end %>
 
-<h1>Hostgroup <span class="highlighted"><%=h @hostgroup.name %></span></h1>
+<h1>Hostgroup <span class="highlighted"><%= @hostgroup.name %></span></h1>
 
 <% if @messages.blank? %>
   No messages found.

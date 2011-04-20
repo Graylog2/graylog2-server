@@ -73,7 +73,7 @@
 
     <div id="new-message-count">
       <% unless @hide_stats %>
-        <strong><%= Message.count_of_last_minutes(message_count_interval) %></strong> / <%=h message_count_interval %> minutes
+        <strong><%= Message.count_of_last_minutes(message_count_interval) %></strong> / <%= message_count_interval %> minutes
       <% end %>
     </div>
   </div>
