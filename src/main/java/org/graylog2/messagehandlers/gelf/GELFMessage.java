@@ -31,6 +31,7 @@ import org.graylog2.streams.StreamRule;
 import org.graylog2.streams.matchers.StreamRuleMatcherIF;
 
 import java.util.*;
+import java.util.regex.Pattern;
 import java.util.zip.Deflater;
 import org.json.simple.JSONObject;
 import org.json.simple.JSONValue;
@@ -313,7 +314,7 @@ public class GELFMessage {
 
         for (Blacklist blacklist : blacklists) {
             for (BlacklistRule rule : blacklist.getRules()) {
-                if (this.getShortMessage().matches(rule.getTerm())) {
+                if (Pattern.compile(rule.getTerm(), Pattern.DOTALL).matcher(this.getShortMessage()).matches()) {
                     LOG.info("Message <" + this.toString() + "> is blacklisted. First match on " + rule.getTerm());
                     return true;
                 }

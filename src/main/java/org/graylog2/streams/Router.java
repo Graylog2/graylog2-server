@@ -53,6 +53,10 @@ public class Router {
         for (Stream stream : streams) {
             boolean missed = false;
 
+            if (stream.getStreamRules().isEmpty()) {
+                continue;
+            }
+
             for (StreamRule rule : stream.getStreamRules()) {
                 try {
                     StreamRuleMatcherIF matcher = StreamRuleMatcherFactory.build(rule.getRuleType());
