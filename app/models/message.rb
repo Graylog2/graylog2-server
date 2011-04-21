@@ -1,17 +1,19 @@
+# Single log message, created by server
 class Message
   include Mongoid::Document
 
   SPECIAL_FIELDS = %w(_id)
 
-  field :message,       :type => String,  :default => ''   # overloaded below
+  # object is created by server, so defaults and validations will not work
+  field :message,       :type => String   # overloaded below
   field :full_message,  :type => String
-  field :created_at,    :type => Float,   :default => 0.0  # stamped by server, UTC UNIX timestamp (seconds since epoch)
-  field :facility,      :type => String,  :default => ''
-  field :level,         :type => Integer                   # syslog level (0..7)
-  field :host,          :type => String,  :default => ''
-  field :file,          :type => String,  :default => ''
-  field :line,          :type => Integer, :default => 0
-  field :deleted,       :type => Boolean, :default => false
+  field :created_at,    :type => Float    # stamped by server, UTC UNIX timestamp (seconds since epoch)
+  field :facility,      :type => String
+  field :level,         :type => Integer  # syslog level (0..7)
+  field :host,          :type => String
+  field :file,          :type => String
+  field :line,          :type => Integer
+  field :deleted,       :type => Boolean
 
   # Overwriting the message getter. This always applies the filtering of filtered terms.
   def message
@@ -38,8 +40,7 @@ class Message
   end
 
   def file_and_line
-    return String.new if file.blank? or (file.blank? and !line.blank?)
-    @file_and_line ||= file + (":#{line}" if line > 0).to_s
+    @file_and_line ||= file.to_s + (":#{line}" if line.present? && line > 0).to_s
   end
 
   LIMIT = 100
