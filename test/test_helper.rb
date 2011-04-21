@@ -10,3 +10,8 @@ class ActiveSupport::TestCase
     Sham.reset
   end
 end
+
+
+class ActionController::TestCase
+  include AuthenticatedTestHelper
+end

@@ -1,8 +1,6 @@
 require 'sessions_controller'
 
 class SessionsControllerTest < ActionController::TestCase
-  include AuthenticatedTestHelper
-
   def test_should_login_and_redirect
     post :create, :login => 'quentin', :password => 'monkey'
     assert session[:user_id]
