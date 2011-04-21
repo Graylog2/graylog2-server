@@ -1,4 +1,4 @@
-# Single log message, created by server
+# Single log message, created by server.
 class Message
   include Mongoid::Document
 
@@ -20,20 +20,7 @@ class Message
   # Overwriting the message getter. This always applies the filtering of filtered terms.
   def message
     msg = read_attribute(:message).to_s
-
-    if FilteredTerm.exists?
-      FilteredTerm.all.each do |t|
-        next if msg.blank? or t.term.blank?
-        begin
-          msg[/#{t.term}/] = "[FILTERED]"
-        rescue => e
-          Rails.logger.warn "Skipping filtered term: #{e}"
-          next
-        end
-      end
-    end
-
-    return msg
+    FilteredTerm.apply(msg)
   end
 
   # Returns +created_at+ as +Time+ in request's timezone
