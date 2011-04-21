@@ -7,4 +7,10 @@ module MessagesHelper
       return filters[filter].to_i
     end
   end
+
+  def format_additional_field_value(key, value)
+    res = html_escape(value)
+    res = "<pre>#{res}</pre>" if %w(backtrace stacktrace traceback).include?(key.downcase)
+    res.html_safe
+  end
 end

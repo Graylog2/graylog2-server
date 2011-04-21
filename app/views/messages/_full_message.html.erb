@@ -15,7 +15,7 @@
     <h4>
       <%= key %>:
       <span class="highlighted">
-        <%= link_to h(value), {
+        <%= link_to format_additional_field_value(key, value), {
                 :controller => :messages,
                 "filters[additional][keys][]" => key,
                 "filters[additional][values][]" => value
