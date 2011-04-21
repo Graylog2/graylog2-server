@@ -30,6 +30,7 @@ import java.net.UnknownHostException;
 import java.util.zip.GZIPInputStream;
 import java.util.zip.InflaterInputStream;
 import org.apache.log4j.Level;
+import org.joda.time.DateTime;
 
 /**
  * Tools.java: May 17, 2010 9:46:31 PM
@@ -198,6 +199,20 @@ public final class Tools {
      */
     public static int getUTCTimestamp() {
        return (int) (System.currentTimeMillis()/1000);
+    }
+
+    /**
+     *
+     * @return The current UTC UNIX timestamp with milliseconds.
+     */
+    public static double getUTCTimestampWithMilliseconds() throws NumberFormatException {
+        // Use JodaTime to easy get the milliseconds and construct a float. (This looks dumb but is the easiest and safest way)
+        long now = System.currentTimeMillis();
+        DateTime jt = new DateTime(now);
+        String unixTime = String.valueOf(now/1000);
+        String millis = String.valueOf(jt.getMillisOfSecond());
+        Double milliSecondTime = new Double(unixTime + "." + millis);
+        return milliSecondTime.doubleValue();
     }
 
     public static String getLocalHostname() {
