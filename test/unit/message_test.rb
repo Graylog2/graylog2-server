@@ -55,8 +55,8 @@ class MessageTest < ActiveSupport::TestCase
   end
 
   should "find additional fields" do
-    message = Message.make(:host => "local", :message => "hi!", :_foo => "bar")
+    message = Message.make(:host => "local", :message => "hi!", :_foo => "bar", :_baz => "1", :invalid => "123")
     assert message.additional_fields?
-    assert_equal [{:value => 'bar', :key => 'foo' }], message.additional_fields
+    assert_equal({'foo' => 'bar', 'baz' => '1'}, message.additional_fields)
   end
 end

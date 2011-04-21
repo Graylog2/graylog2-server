@@ -15,6 +15,8 @@ class Message
   field :line,          :type => Integer
   field :deleted,       :type => Boolean
 
+  # all addition fields should start with '_'
+
   # Overwriting the message getter. This always applies the filtering of filtered terms.
   def message
     msg = read_attribute(:message).to_s
@@ -41,6 +43,21 @@ class Message
 
   def file_and_line
     @file_and_line ||= file.to_s + (":#{line}" if line.present? && line > 0).to_s
+  end
+
+  def additional_fields?
+    self.additional_fields.count > 0
+  end
+
+  def additional_fields
+    return @additional unless @additional.nil?
+
+    @additional = {}
+    attributes.each_pair do |key, value|
+      next unless key[0,1] == '_' && SPECIAL_FIELDS.exclude?(key)
+      @additional[key[1, key.length]] = value
+    end
+    return @additional
   end
 
   LIMIT = 100
@@ -252,21 +269,6 @@ class Message
 
   def self.count_of_last_minutes x
     return self.count_since x.minutes.ago
-  end
-
-  def additional_fields?
-    self.additional_fields.count > 0
-  end
-
-  def additional_fields
-    additional = []
-    self.attributes.each do |key, value|
-      next if SPECIAL_FIELDS.include?(key) or key.length <= 1 or key.at(0) != "_"
-      # Cut off underscore if there is one. (There is one if it's coming directly from MongoDB)
-      cut_key = (key.at(0) == "_" ? key[1..key.length] : key)
-      additional << { :key => cut_key, :value => self[key] }
-    end
-    return additional
   end
 
   def self.recalculate_host_counts
