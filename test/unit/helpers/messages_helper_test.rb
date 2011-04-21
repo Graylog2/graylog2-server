@@ -6,10 +6,9 @@ class MessagesHelperTest < ActionView::TestCase
     assert actual.html_safe?, actual.inspect + ' is not html safe'
   end
 
-  should "wrap backtraces with <pre>" do
-    assert_equal_and_safe 'abc', format_additional_field_value('something', 'abc')
-    assert_equal_and_safe '<pre>backtrace</pre>', format_additional_field_value('backtrace', 'backtrace')
-    assert_equal_and_safe '<pre>stacktrace</pre>', format_additional_field_value('stacktrace', 'stacktrace')
-    assert_equal_and_safe '<pre>traceback</pre>', format_additional_field_value('traceback', 'traceback')
+  should "wrap long additional fields with <pre>" do
+    assert_equal_and_safe "", format_additional_field_value('backtrace', nil)
+    assert_equal_and_safe "backtrace", format_additional_field_value('backtrace', "backtrace")
+    assert_equal_and_safe "<pre>backtrace\nline 1</pre>", format_additional_field_value('backtrace', "backtrace\nline 1")
   end
 end
