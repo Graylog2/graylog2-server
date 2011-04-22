@@ -14,15 +14,12 @@ end
 
 class ActionController::TestCase
   setup do
-    @request.cookies["auth_token"] = cookie_for(:quentin)
+    login!
   end
 
-protected
-  def auth_token(token)
-    CGI::Cookie.new('name' => 'auth_token', 'value' => token)
-  end
-
-  def cookie_for(user)
-    auth_token users(user).remember_token
+  def login!(options = {})
+    user = User.make(options)
+    @request.session[:user_id] = user.id
+    user
   end
 end
