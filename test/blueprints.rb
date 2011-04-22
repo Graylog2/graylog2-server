@@ -11,12 +11,12 @@ Host.blueprint do
 end
 
 Message.blueprint do
- message { Faker::Lorem.words(100).join }
- facility { rand(15) }
- level { rand(8) }
- host
- created_at { Time.now.to_i }
- deleted { false }
+  message { Faker::Lorem.words(100).join }
+  facility { rand(15) }
+  level { rand(8) }
+  host
+  created_at { Time.now.to_i }
+  deleted { false }
 end
 
 Stream.blueprint do
@@ -34,6 +34,7 @@ User.blueprint do
   password 'testing'
   password_confirmation { password }
   email
+  role { :admin }
 end
 
 Hostgroup.blueprint do
