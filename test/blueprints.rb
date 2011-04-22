@@ -6,12 +6,12 @@ Sham.name { Faker::Lorem.words(15).join }
 Sham.host { Faker::Internet.domain_name }
 
 Message.blueprint do
- message { Faker::Lorem.words(100).join }
- facility { rand(15) }
- level { rand(8) }
- host
- created_at { Time.now.to_f }
- deleted { false }
+  message { Faker::Lorem.words(100).join }
+  facility { rand(15) }
+  level { rand(8) }
+  host
+  created_at { Time.now.to_i }
+  deleted { false }
 end
 
 Stream.blueprint do
@@ -29,6 +29,7 @@ User.blueprint do
   password 'testing'
   password_confirmation { password }
   email
+  role { :admin }
 end
 
 Host.blueprint do

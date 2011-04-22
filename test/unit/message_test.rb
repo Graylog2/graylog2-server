@@ -59,4 +59,16 @@ class MessageTest < ActiveSupport::TestCase
     assert message.additional_fields?
     assert_equal({'foo' => 'bar', 'baz' => '1'}, message.additional_fields)
   end
+
+  should "correctly paginate" do
+    (Message::LIMIT+10).times { Message.make }
+    assert_equal Message::LIMIT, Message.all_paginated(1).count
+    assert_equal 10, Message.all_paginated(2).count
+  end
+
+  should "corretly paginate when no page count is given" do
+    (Message::LIMIT+10).times { Message.make }
+    assert_equal Message::LIMIT, Message.all_paginated().count
+    assert_equal 10, Message.all_paginated(2).count
+  end
 end

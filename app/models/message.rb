@@ -77,10 +77,10 @@ class Message
     where(:_id => BSON::ObjectId(_id)).first
   end
 
-  def self.all_paginated page = 1, limit = LIMIT
+  def self.all_paginated page = 1
     page = 1 if page.blank?
 
-    default_scope.paginate(:page => page)
+    default_scope.paginate(:page => page, :per_page => LIMIT)
   end
 
   def self.get_conditions_from_date(timeframe)
