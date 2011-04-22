@@ -75,7 +75,6 @@ class Stream
   end
 
   def self.message_count_since(stream_id, since)
-    return 0 if Stream.find(stream_id).streamrules.blank?
     Message.by_stream(stream_id).where(:created_at.gt => since.to_i).count
   end
 

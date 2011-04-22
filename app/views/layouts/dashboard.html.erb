@@ -14,8 +14,6 @@
 </head>
 <body>
 
-  <% message_count_interval = Setting.get_message_count_interval(current_user) %>
-
   <div id="top">
     <% if File.exist?(Rails.root.to_s + "/public/images/dashboard_logo.png") %>
         <%= image_tag('dashboard_logo.png') %>
@@ -25,9 +23,9 @@
     </div>
   </div>
 
-  <div id="statuscontainer" class="status-<%=h Message.count_of_last_minutes(message_count_interval) > Setting.get_message_max_count(current_user) ? 'problems' : 'okay' %>">
+  <div id="statuscontainer" class="status-<%=h @message_count > @max_messages ? 'problems' : 'okay' %>">
     <div id="status">
-      <h1><%= Message.count_of_last_minutes(message_count_interval) %> messages / <%=h message_count_interval %> minutes</h1>
+      <h1><%= @message_count %> messages / <%= @timespan %> minutes</h1>
     </div>
   </div>
 
