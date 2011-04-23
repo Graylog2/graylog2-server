@@ -1,5 +1,5 @@
 <% content_for :sidebar do %>
-  <%= render :partial => "sidebar_index", :locals => { :headline => "Hello, <span class=\"highlighted\">#{current_user.login}</span>!" } %>
+  <%= render :partial => "sidebar_index" %>
 <% end %>
 
 <h1>Messages from <span class="highlighted"><%= gl_date(@from) %></span> to <span class="highlighted"><%= gl_date(@to) %></span></h1>
