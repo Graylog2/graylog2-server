@@ -1,11 +1,13 @@
 module HostgroupsHelper
-  def tabs
-    @tabs = []
+
+  def hostgroup_tabs
+    tabs = []
     if @hostgroup
-      @tabs.push [ "Show", hostgroup_path(@hostgroup)]
-      @tabs.push ["Hosts", hosts_hostgroup_path(@hostgroup)]
-      @tabs.push ["Settings", settings_hostgroup_path(@hostgroup)]
+      tabs.push ["Show", hostgroup_path(@hostgroup)]
+      tabs.push ["Hosts", hosts_hostgroup_path(@hostgroup)]
+      tabs.push ["Settings", settings_hostgroup_path(@hostgroup)]
     end
-    @tabs
+    tabs
   end
+
 end

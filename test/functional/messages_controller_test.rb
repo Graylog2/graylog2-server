@@ -2,17 +2,6 @@ require 'test_helper'
 
 class MessagesControllerTest < ActionController::TestCase
   context "message overview" do
-    setup do
-      @message = Message.make
-    end
-
-    context "GET index" do
-      setup do
-        get :index
-      end
-
-      should_respond_with :success
-    end
 
     should "correctly paginate" do
       (Message::LIMIT+10).times { Message.make }
@@ -41,7 +30,6 @@ class MessagesControllerTest < ActionController::TestCase
       assert_equal 10, assigns(:messages).count
     end
 
->>>>>>> hotfix/broken-host-pagination-37
   end
 
   context "messages of a host" do

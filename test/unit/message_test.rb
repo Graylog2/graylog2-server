@@ -50,8 +50,11 @@ class MessageTest < ActiveSupport::TestCase
     Message.make(:host => "anotherhost", :message => "foobar").save
     Message.make(:host => "anotherfoohost", :message => "don't match me").save
 
-    hostgroup = Hostgroup.find(3)
-    assert_equal 5, Message.count_of_hostgroup(hostgroup)
+    hostgroup = Hostgroup.make
+    HostgroupHost.make(:hostname => /^foo/, :ruletype => HostgroupHost::TYPE_REGEX, :hostgroup_id => hostgroup.id)
+    HostgroupHost.make(:hostname => "somehost", :ruletype => HostgroupHost::TYPE_SIMPLE, :hostgroup_id => hostgroup.id)
+    HostgroupHost.make(:hostname => /^another/, :ruletype => HostgroupHost::TYPE_REGEX, :hostgroup_id => hostgroup.id)
+    assert_equal 7, Message.count_of_hostgroup(hostgroup)
   end
 
   should "find additional fields" do

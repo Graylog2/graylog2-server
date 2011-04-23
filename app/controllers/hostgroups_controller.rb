@@ -1,6 +1,5 @@
 class HostgroupsController < ApplicationController
   filter_resource_access :additional_member => [:hosts, :settings, :rename]
-#  before_filter :tabs, :except => [ :new ]
 
   def index
   end

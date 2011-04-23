@@ -38,7 +38,7 @@
       <li>Host: <%= link_to rule[:value], { :controller => "hostgroup_hosts", :action => "destroy", :id => rule[:id], :group_id => @hostgroup.id }, :method => :delete %></li>
     <% end %>
     <% @hostgroup.regex_conditions(true).each do |rule| %>
-      <li>Regex: <%= link_to rule[:value], { :controller => "hostgroup_hosts", :action => "destroy", :id => rule[:id], :group_id => @hostgroup.id }, :method => :delete %></li>
+      <li>Regex: <%= link_to rule[:value].source, { :controller => "hostgroup_hosts", :action => "destroy", :id => rule[:id], :group_id => @hostgroup.id }, :method => :delete %></li>
     <% end %>
   <% end %>
   </ul>
