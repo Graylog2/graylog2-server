@@ -11,9 +11,9 @@ class HostgroupTest < ActiveSupport::TestCase
     group = Hostgroup.make
     HostgroupHost.make(:hostgroup_id => group.id, :hostname => "host1", :ruletype => HostgroupHost::TYPE_SIMPLE)
     HostgroupHost.make(:hostgroup_id => group.id, :hostname => "host2", :ruletype => HostgroupHost::TYPE_SIMPLE)
-    
+
     conditions = group.hostname_conditions(true)
-    
+
     assert_instance_of Array, conditions
     assert conditions.count == 2
 
@@ -34,7 +34,7 @@ class HostgroupTest < ActiveSupport::TestCase
     group = Hostgroup.make
     HostgroupHost.make(:hostgroup_id => group.id, :hostname => "host1", :ruletype => HostgroupHost::TYPE_SIMPLE)
     HostgroupHost.make(:hostgroup_id => group.id, :hostname => "host2", :ruletype => HostgroupHost::TYPE_SIMPLE)
-    
+
     conditions = group.hostname_conditions
 
     assert_instance_of Array, conditions
@@ -51,7 +51,7 @@ class HostgroupTest < ActiveSupport::TestCase
 
     HostgroupHost.make(:hostgroup_id => group.id, :hostname => /^foo/, :ruletype => HostgroupHost::TYPE_REGEX)
     HostgroupHost.make(:hostgroup_id => group.id, :hostname => /bar.+baz/, :ruletype => HostgroupHost::TYPE_REGEX)
-    
+
     conditions = group.regex_conditions(true)
 
     assert_instance_of Array, conditions
@@ -83,9 +83,9 @@ class HostgroupTest < ActiveSupport::TestCase
     # Create the host that is defined as hostname in the group
     # because all_conditions() will check if the host exists.
     Host.make(:host => "somehost")
-    
+
     group = Hostgroup.make
-    
+
     HostgroupHost.make(:hostgroup_id => group.id, :hostname => "somehost", :ruletype => HostgroupHost::TYPE_SIMPLE)
     HostgroupHost.make(:hostgroup_id => group.id, :hostname => /bar.+baz/, :ruletype => HostgroupHost::TYPE_REGEX)
     HostgroupHost.make(:hostgroup_id => group.id, :hostname => /foo.+baz/, :ruletype => HostgroupHost::TYPE_REGEX)
