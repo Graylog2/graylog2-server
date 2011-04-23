@@ -2,7 +2,7 @@ class ApplicationController < ActionController::Base
   include AuthenticatedSystem
 
   clear_helpers
-#  helper :all # include all helpers, all the time
+  helper :all # include all helpers, all the time
   protect_from_forgery # See ActionController::RequestForgeryProtection for details
   helper Authorization::AuthorizationHelper
 
