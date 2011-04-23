@@ -82,7 +82,7 @@
 
   <div id="content-top">
     <div id="content-tabs">
-	<% tabs.each do |tab| %>
+  <% (messages_tabs | hostgroup_tabs | stream_tabs).each do |tab| %>
 	  <%= raw tab_link(tab)%>
 	<% end %>
       <br style="clear: both;" />

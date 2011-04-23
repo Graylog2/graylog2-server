@@ -88,7 +88,7 @@ class HostgroupTest < ActiveSupport::TestCase
     
     HostgroupHost.make(:hostgroup_id => group.id, :hostname => "somehost", :ruletype => HostgroupHost::TYPE_SIMPLE)
     HostgroupHost.make(:hostgroup_id => group.id, :hostname => /bar.+baz/, :ruletype => HostgroupHost::TYPE_REGEX)
-    HostgroupHost.make(:hostgroup_id => group.id, :hostname => /bar.+baz/, :ruletype => HostgroupHost::TYPE_REGEX)
+    HostgroupHost.make(:hostgroup_id => group.id, :hostname => /foo.+baz/, :ruletype => HostgroupHost::TYPE_REGEX)
     conditions = group.all_conditions
 
     assert_instance_of Array, conditions

@@ -29,17 +29,17 @@ module StreamsHelper
     return "<span class=\"black\">#{type}</span>: <i>#{value}</i>"
   end
 
-  def tabs
-    @tabs = []
+  def stream_tabs
+    tabs = []
     if @stream
-      @tabs.push ["Show", stream_path(@stream)] if permitted_to?(:show, @stream)
-      @tabs.push ["Rules", rules_stream_path(@stream)] if permitted_to?(:rules, @stream)
-      @tabs.push ["Forwarders", forward_stream_path(@stream)] if permitted_to?(:forward, @stream)
-      @tabs.push ["Analytics", analytics_stream_path(@stream)] if permitted_to?(:analytics, @stream)
-      @tabs.push ["Settings", settings_stream_path(@stream)] if permitted_to?(:show, @stream)
+      tabs.push ["Show", stream_path(@stream)] if permitted_to?(:show, @stream)
+      tabs.push ["Rules", rules_stream_path(@stream)] if permitted_to?(:rules, @stream)
+      tabs.push ["Forwarders", forward_stream_path(@stream)] if permitted_to?(:forward, @stream)
+      tabs.push ["Analytics", analytics_stream_path(@stream)] if permitted_to?(:analytics, @stream)
+      tabs.push ["Settings", settings_stream_path(@stream)] if permitted_to?(:show, @stream)
     end
 
-    @tabs
+    tabs
   end
 
   def forwarder_details(forwarder)

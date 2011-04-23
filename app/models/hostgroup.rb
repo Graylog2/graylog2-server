@@ -2,7 +2,7 @@ class Hostgroup
 
   include Mongoid::Document
 
-  references_many :hostgroup_hosts do
+  references_many :hostgroup_hosts, :dependent => :destroy do
     def simple
       @target.select { |host| host.simple? }
     end
@@ -48,7 +48,7 @@ class Hostgroup
     end
 
     if with_id then
-      hosts.collect {|host| {:id => host.id, :value => host.hostname}}
+      hosts.collect {|host| {:id => host.id, :value => host.to_condition}}
     else
       hosts.collect &:to_condition
     end
