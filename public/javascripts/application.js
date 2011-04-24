@@ -40,6 +40,9 @@ $(document).ready(function(){
                 field = $('.stream-value-additional-field');
                 help = $('#stream-value-additional-field-help').show();
                 break;
+            case '7':
+                field = $('.stream-value-hostgroup');
+                break;
         }
         field.removeAttr("disabled");
         field.show();

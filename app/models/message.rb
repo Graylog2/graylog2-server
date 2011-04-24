@@ -114,8 +114,14 @@ class Message
         conditions = conditions.where(:level => filters[:severity].to_i) unless filters[:severity].blank?
       end
 
-      # Host
-      conditions = conditions.where(:host => filters[:host]) unless filters[:host].blank?
+      # Host (and hostgroup)
+      host_conditions = Array.new
+      host_conditions << filters[:host] unless filters[:host].blank?
+      unless filters[:hostgroup].blank?
+        hostgroup = Hostgroup.find(BSON::ObjectId(filters[:hostgroup]))
+        host_conditions = host_conditions | hostgroup.all_conditions
+      end
+      conditions = conditions.any_in(:host => host_conditions) unless host_conditions.size == 0
 
       self.extract_additional_from_quickfilter(filters).each do |key, value|
         conditions = conditions.where(key => value)
