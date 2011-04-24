@@ -17,6 +17,7 @@
   </div>
 
   <%= f.select :value, Host.all.collect {|host| [ h(host.host) ]}.sort, {}, { :disabled => true, :style => "display: none;", :class => "stream-value-field stream-value-host" } %>
+  <%= f.select :value, Hostgroup.all.collect {|group| [ group.name, group.id]}.sort, {}, { :disabled => true, :style => "display: none;", :class => "stream-value-field stream-value-hostgroup" } %>
   <%= f.text_field :value, :class => "stream-value-field stream-value-additional-field", :disabled => true, :style => "display: none;" %>
   <span id="stream-value-additional-field-help" class="stream-value-help" style="display: none;"><%= tooltip("Additional-field-filters-in-streams") %></span>
   <%= awesome_submit_link "Add" %>
