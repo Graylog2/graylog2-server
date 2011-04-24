@@ -5,6 +5,8 @@ module StreamsHelper
         return "Message"
       when Streamrule::TYPE_HOST then
         return "Host"
+      when Streamrule::TYPE_HOSTGROUP then
+        return "Hostgroup"
       when Streamrule::TYPE_SEVERITY then
         return "Severity"
       when Streamrule::TYPE_FACILITY then
@@ -18,12 +20,20 @@ module StreamsHelper
   end
 
   def streamrule_to_human rule
-    type = streamrule_type_to_human rule.rule_type
+    type = streamrule_type_to_human(rule.rule_type)
     value = h(rule.value)
 
-    # Add human readable value type for SEVERITY and FACILITY.
+    # Add human readable value type for SEVERITY
     if rule.rule_type == Streamrule::TYPE_SEVERITY
         value = "#{syslog_level_to_human(rule.value)} (#{h(rule.value.to_i)})"
+    end
+
+    if rule.rule_type == Streamrule::TYPE_HOSTGROUP
+      begin
+        value = Hostgroup.find(BSON::ObjectId(rule.value)).name
+      rescue
+        value = "Unknown (#{h(rule.value)})"
+      end
     end
 
     return "<span class=\"black\">#{type}</span>: <i>#{value}</i>"
