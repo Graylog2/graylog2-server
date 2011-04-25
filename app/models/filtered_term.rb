@@ -8,9 +8,20 @@ class FilteredTerm
 
   # TODO validate regexp on save
 
-  def self.apply(str)
-    all.each { |ft| str = ft.apply(str) }
-    str
+  class << self
+    def apply(str)
+      all_cached.each { |ft| str = ft.apply(str) }
+      str
+    end
+
+    # to prevent hitting db for every message
+    def all_cached
+      @all_cached ||= all.to_a  # to_a is essential
+    end
+
+    def expire_cache
+      @all_cached = nil
+    end
   end
 
   def apply(str)

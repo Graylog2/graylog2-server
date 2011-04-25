@@ -8,6 +8,8 @@ class ActiveSupport::TestCase
   setup do
     DatabaseCleaner.clean
     Sham.reset
+
+    FilteredTerm.expire_cache
   end
 end
 

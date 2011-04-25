@@ -4,7 +4,7 @@ class ApplicationController < ActionController::Base
   protect_from_forgery
   helper Authorization::AuthorizationHelper
 
-  before_filter :login_required
+  before_filter :login_required, :clear_terms_cache
 
   def rescue_action e
     # Connection to MongoDB failed.
@@ -62,4 +62,7 @@ class ApplicationController < ActionController::Base
     render :file  => "#{Rails.root.to_s}/public/404.html", :status => 404, :layout => false
   end
 
+  def clear_terms_cache
+    FilteredTerm.expire_cache
+  end
 end
