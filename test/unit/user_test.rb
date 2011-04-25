@@ -67,7 +67,8 @@ class UserTest < ActiveSupport::TestCase
   end
 
   def test_should_authenticate_user
-    assert_equal @user, User.authenticate(@user.login, @user.password)
+    user = User.make(:login => "foo", :password => "bar")
+    assert_equal user, User.authenticate(user.login, user.password)
   end
 
   def test_should_set_remember_token
