@@ -9,6 +9,8 @@ class FilteredTerm
   # TODO validate regexp on save
 
   class << self
+    extend ActiveSupport::Memoizable
+
     def apply(str)
       all_cached.each { |ft| str = ft.apply(str) }
       str
@@ -16,11 +18,12 @@ class FilteredTerm
 
     # to prevent hitting db for every message
     def all_cached
-      @all_cached ||= all.to_a  # to_a is essential
+      all.to_a  # to_a is essential
     end
+    memoize :all_cached
 
     def expire_cache
-      @all_cached = nil
+      flush_cache(:all_cached)
     end
   end
 
