@@ -15,6 +15,8 @@ class Message
   field :line,          :type => Integer
   field :deleted,       :type => Boolean
 
+  index :created_at, :background => true
+
   # all addition fields should start with '_'
 
   # Overwriting the message getter. This always applies the filtering of filtered terms.
