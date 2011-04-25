@@ -55,6 +55,16 @@ public class Hostgroup {
         this.mongoObject = group;
     }
 
+    public static Hostgroup getById(ObjectId id) throws Exception {
+        DBObject query = new BasicDBObject();
+        query.put("_id", id);
+
+        DBCollection coll = MongoConnection.getInstance().getDatabase().getCollection("hostgroups");
+        DBObject group = coll.findOne(query);
+
+        return new Hostgroup(group);
+    }
+
     public static ArrayList<Hostgroup> fetchAll() {
         if (HostgroupCache.getInstance().valid()) {
             return HostgroupCache.getInstance().get();
@@ -76,6 +86,30 @@ public class Hostgroup {
         HostgroupCache.getInstance().set(groups);
 
         return groups;
+    }
+
+    public List<HostgroupHost> getHosts() {
+        if (this.hosts != null) {
+            return this.hosts;
+        }
+
+        List<HostgroupHost> tmpHosts = new ArrayList<HostgroupHost>();
+
+        DBCollection coll = MongoConnection.getInstance().getDatabase().getCollection("hostgroup_hosts");
+        DBObject query = new BasicDBObject();
+        query.put("hostgroup_id", this.id);
+        DBCursor cur = coll.find(query);
+
+        while (cur.hasNext()) {
+            try {
+                tmpHosts.add(new HostgroupHost(cur.next()));
+            } catch (Exception e) {
+                LOG.warn("Can't fetch hostgroup host. Skipping. " + e.getMessage(), e);
+            }
+        }
+
+        this.hosts = tmpHosts;
+        return this.hosts;
     }
 
     /**

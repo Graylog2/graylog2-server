@@ -20,6 +20,11 @@
 
 package org.graylog2.streams.matchers;
 
+import java.util.regex.Pattern;
+import org.apache.log4j.Logger;
+import org.bson.types.ObjectId;
+import org.graylog2.hostgroups.Hostgroup;
+import org.graylog2.hostgroups.HostgroupHost;
 import org.graylog2.messagehandlers.gelf.GELFMessage;
 import org.graylog2.streams.StreamRule;
 
@@ -32,10 +37,35 @@ import org.graylog2.streams.StreamRule;
  */
 public class HostgroupMatcher implements StreamRuleMatcherIF {
 
+    private static final Logger LOG = Logger.getLogger(HostgroupMatcher.class);
+
     public boolean match(GELFMessage msg, StreamRule rule) {
-        throw new UnsupportedOperationException();
-        // Get hostgroup. Interate over it and return true if a host in there is matched.
-        //return msg.getHost().equals(rule.getValue());
+        ObjectId groupId = ObjectId.massageToObjectId(rule.getValue());
+
+        Hostgroup group = null;
+        try {
+            group = Hostgroup.getById(groupId);
+        } catch (Exception e) {
+            LOG.info("Skipping hostgroup in hostgroup matcher: " + e.getMessage(), e);
+            return false;
+        }
+
+         for (HostgroupHost host : group.getHosts()) {
+             if (host.getType() == HostgroupHost.TYPE_SIMPLE) {
+                if(msg.getHost().equals(host.getHostname())) {
+                   return true;
+                }
+             } else if (host.getType() == HostgroupHost.TYPE_REGEX) {
+                if (Pattern.compile(host.getHostname(), Pattern.DOTALL).matcher(msg.getHost()).matches()) {
+                    return true;
+                }
+             } else {
+                 LOG.info("Skipping hostgroup host in hostgroup matcher: Invalid rule type.");
+             }
+         }
+
+        // Nothing matched.
+         return false;
     }
 
 }
