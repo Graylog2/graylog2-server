@@ -25,6 +25,10 @@ group :development, :test do
   gem 'faker', '~> 0.9.5'
 end
 
+group :development do
+  # gem 'ruby-prof', '~> 0.10.5'  # works nice with NewRelic RPM Developer Mode
+end
+
 group :test do
   gem 'ci_reporter'
   gem 'shoulda', '~> 2.11.3'
