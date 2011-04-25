@@ -25,11 +25,11 @@ class Message
 
   # Returns +created_at+ as +Time+ in request's timezone
   def created_at_time
-    @created_at_time ||= Time.zone.at(self.created_at)
+    Time.zone.at(self.created_at)
   end
 
   def file_and_line
-    @file_and_line ||= file.to_s + (":#{line}" if line.present? && line > 0).to_s
+    file.to_s + (":#{line}" if line.present? && line > 0).to_s
   end
 
   def additional_fields?
