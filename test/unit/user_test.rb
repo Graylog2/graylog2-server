@@ -67,7 +67,7 @@ class UserTest < ActiveSupport::TestCase
   end
 
   def test_should_authenticate_user
-    user = User.make(:login => "foo", :password => "bar")
+    user = User.make(:login => "foo", :password => "barbarbar")
     assert_equal user, User.authenticate(user.login, user.password)
   end
 
