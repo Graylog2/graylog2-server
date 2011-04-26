@@ -2,6 +2,12 @@ require 'test_helper'
 
 class MessagesControllerTest < ActionController::TestCase
   context "message overview" do
+    should "be shown" do
+      10.times { Message.make }
+      get :index
+      assert_equal 10, assigns(:messages).count
+      assert_select 'tr.message-row', 10
+    end
 
     should "correctly paginate" do
       (Message::LIMIT+10).times { Message.make }
@@ -12,7 +18,6 @@ class MessagesControllerTest < ActionController::TestCase
       get :index, :page => 2
       assert_equal 10, assigns(:messages).count
     end
-
   end
 
   context "messages of a stream" do

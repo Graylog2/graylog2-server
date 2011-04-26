@@ -26,12 +26,13 @@
     <dd>
       <%= select_tag "filters[hostgroup]", raw("<option></option>" + options_for_select(Hostgroup.all.collect {|group| [ group.name, group.id] }, :selected => get_quickfilter_selected(params[:filters], :hostgroup, :bson_id))) %>
 
-    <% unless @additional_filters.blank? %>
-      <% @additional_filters.each do |k,v| %>
-        <dt><%= text_field_tag "filters[additional][keys][]", (k.to_s.at(0) == '_' ? k.to_s[1..k.to_s.length] : k.to_s), :class => "messages-quickfilter-additional-key" %></dt>
-        <dd><%= text_field_tag "filters[additional][values][]", v, :class => "messages-quickfilter-additional-value" %></dd>
+      <% unless @additional_filters.blank? %>
+        <% @additional_filters.each do |k,v| %>
+          <dt><%= text_field_tag "filters[additional][keys][]", (k.to_s.at(0) == '_' ? k.to_s[1..k.to_s.length] : k.to_s), :class => "messages-quickfilter-additional-key" %></dt>
+          <dd><%= text_field_tag "filters[additional][values][]", v, :class => "messages-quickfilter-additional-value" %></dd>
+        <% end %>
       <% end %>
-    <% end %>
+    </dd>
   </dl>
 
   <br />
