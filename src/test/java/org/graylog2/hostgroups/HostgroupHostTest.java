@@ -1,68 +1,41 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
+/**
+ * Copyright 2011 Lennart Koopmann <lennart@socketfeed.com>
+ *
+ * This file is part of Graylog2.
+ *
+ * Graylog2 is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * Graylog2 is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with Graylog2.  If not, see <http://www.gnu.org/licenses/>.
+ *
  */
 
 package org.graylog2.hostgroups;
 
+import com.mongodb.BasicDBObject;
+import com.mongodb.DBObject;
 import org.bson.types.ObjectId;
-import org.junit.After;
-import org.junit.AfterClass;
-import org.junit.Before;
-import org.junit.BeforeClass;
+
 import org.junit.Test;
 import static org.junit.Assert.*;
 
-/**
- *
- * @author local
- */
 public class HostgroupHostTest {
 
-    public HostgroupHostTest() {
-    }
+    public DBObject buildMongoHostgroupHost() {
+        DBObject m = new BasicDBObject();
+        m.put("hostgroup_id", new ObjectId());
+        m.put("ruletype", HostgroupHost.TYPE_SIMPLE);
+        m.put("hostname", "example.org");
 
-    @BeforeClass
-    public static void setUpClass() throws Exception {
-    }
-
-    @AfterClass
-    public static void tearDownClass() throws Exception {
-    }
-
-    @Before
-    public void setUp() {
-    }
-
-    @After
-    public void tearDown() {
-    }
-
-    /**
-     * Test of getObjectId method, of class HostgroupHost.
-     */
-    @Test
-    public void testGetObjectId() {
-        System.out.println("getObjectId");
-        HostgroupHost instance = null;
-        ObjectId expResult = null;
-        ObjectId result = instance.getObjectId();
-        assertEquals(expResult, result);
-        // TODO review the generated test code and remove the default call to fail.
-        fail("The test case is a prototype.");
-    }
-
-    /**
-     * Test of setObjectId method, of class HostgroupHost.
-     */
-    @Test
-    public void testSetObjectId() {
-        System.out.println("setObjectId");
-        ObjectId objectId = null;
-        HostgroupHost instance = null;
-        instance.setObjectId(objectId);
-        // TODO review the generated test code and remove the default call to fail.
-        fail("The test case is a prototype.");
+        return m;
     }
 
     /**
@@ -70,26 +43,9 @@ public class HostgroupHostTest {
      */
     @Test
     public void testGetHostgroupId() {
-        System.out.println("getHostgroupId");
-        HostgroupHost instance = null;
-        int expResult = 0;
-        int result = instance.getHostgroupId();
-        assertEquals(expResult, result);
-        // TODO review the generated test code and remove the default call to fail.
-        fail("The test case is a prototype.");
-    }
-
-    /**
-     * Test of setHostgroupId method, of class HostgroupHost.
-     */
-    @Test
-    public void testSetHostgroupId() {
-        System.out.println("setHostgroupId");
-        int hostgroupId = 0;
-        HostgroupHost instance = null;
-        instance.setHostgroupId(hostgroupId);
-        // TODO review the generated test code and remove the default call to fail.
-        fail("The test case is a prototype.");
+        DBObject m = this.buildMongoHostgroupHost();
+        HostgroupHost hh = new HostgroupHost(m);
+        assertEquals(m.get("hostgroup_id"), hh.getHostgroupId());
     }
 
     /**
@@ -97,26 +53,9 @@ public class HostgroupHostTest {
      */
     @Test
     public void testGetType() {
-        System.out.println("getType");
-        HostgroupHost instance = null;
-        int expResult = 0;
-        int result = instance.getType();
-        assertEquals(expResult, result);
-        // TODO review the generated test code and remove the default call to fail.
-        fail("The test case is a prototype.");
-    }
-
-    /**
-     * Test of setType method, of class HostgroupHost.
-     */
-    @Test
-    public void testSetType() {
-        System.out.println("setType");
-        int type = 0;
-        HostgroupHost instance = null;
-        instance.setType(type);
-        // TODO review the generated test code and remove the default call to fail.
-        fail("The test case is a prototype.");
+        DBObject m = this.buildMongoHostgroupHost();
+        HostgroupHost hh = new HostgroupHost(m);
+        assertEquals(m.get("ruletype"), hh.getType());
     }
 
     /**
@@ -124,26 +63,9 @@ public class HostgroupHostTest {
      */
     @Test
     public void testGetHostname() {
-        System.out.println("getHostname");
-        HostgroupHost instance = null;
-        String expResult = "";
-        String result = instance.getHostname();
-        assertEquals(expResult, result);
-        // TODO review the generated test code and remove the default call to fail.
-        fail("The test case is a prototype.");
-    }
-
-    /**
-     * Test of setHostname method, of class HostgroupHost.
-     */
-    @Test
-    public void testSetHostname() {
-        System.out.println("setHostname");
-        String hostname = "";
-        HostgroupHost instance = null;
-        instance.setHostname(hostname);
-        // TODO review the generated test code and remove the default call to fail.
-        fail("The test case is a prototype.");
+        DBObject m = this.buildMongoHostgroupHost();
+        HostgroupHost hh = new HostgroupHost(m);
+        assertEquals(m.get("hostname"), hh.getHostname());
     }
 
 }

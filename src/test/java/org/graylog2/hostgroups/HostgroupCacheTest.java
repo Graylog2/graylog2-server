@@ -1,81 +1,46 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
+/**
+ * Copyright 2011 Lennart Koopmann <lennart@socketfeed.com>
+ *
+ * This file is part of Graylog2.
+ *
+ * Graylog2 is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * Graylog2 is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with Graylog2.  If not, see <http://www.gnu.org/licenses/>.
+ *
  */
 
 package org.graylog2.hostgroups;
 
 import java.util.ArrayList;
-import org.junit.After;
-import org.junit.AfterClass;
-import org.junit.Before;
-import org.junit.BeforeClass;
 import org.junit.Test;
 import static org.junit.Assert.*;
 
-/**
- *
- * @author local
- */
 public class HostgroupCacheTest {
 
-    public HostgroupCacheTest() {
-    }
-
-    @BeforeClass
-    public static void setUpClass() throws Exception {
-    }
-
-    @AfterClass
-    public static void tearDownClass() throws Exception {
-    }
-
-    @Before
-    public void setUp() {
-    }
-
-    @After
-    public void tearDown() {
-    }
-
-    /**
-     * Test of getInstance method, of class HostgroupCache.
-     */
     @Test
     public void testGetInstance() {
-        System.out.println("getInstance");
-        HostgroupCache expResult = null;
-        HostgroupCache result = HostgroupCache.getInstance();
-        assertEquals(expResult, result);
-        // TODO review the generated test code and remove the default call to fail.
-        fail("The test case is a prototype.");
+        // First call should create instance.
+        assertNotNull(HostgroupCache.getInstance());
+
+        // Second call should give back formerly created instance.
+        assertNotNull(HostgroupCache.getInstance());
     }
 
-    /**
-     * Test of get method, of class HostgroupCache.
-     */
     @Test
-    public void testGet() {
-        System.out.println("get");
-        HostgroupCache instance = null;
-        ArrayList expResult = null;
-        ArrayList result = instance.get();
-        assertEquals(expResult, result);
-        // TODO review the generated test code and remove the default call to fail.
-        fail("The test case is a prototype.");
+    public void testSetAndGet() {
+        HostgroupCache.getInstance().set(new ArrayList<Hostgroup>());
+        HostgroupCache.getInstance().get();
+        assertTrue(HostgroupCache.getInstance().valid());
     }
 
-    /**
-     * Test of set method, of class HostgroupCache.
-     */
-    @Test
-    public void testSet() {
-        System.out.println("set");
-        ArrayList<Hostgroup> groups = null;
-        HostgroupCache instance = null;
-        instance.set(groups);
-        // TODO review the generated test code and remove the default call to fail.
-        fail("The test case is a prototype.");
-    }
 
 }

@@ -21,25 +21,27 @@
 package org.graylog2.hostgroups;
 
 import com.mongodb.BasicDBObject;
-import java.util.ArrayList;
-import java.util.List;
 import org.bson.types.ObjectId;
-import org.junit.After;
-import org.junit.AfterClass;
-import org.junit.Before;
-import org.junit.BeforeClass;
 import org.junit.Test;
 import static org.junit.Assert.*;
 
 
 public class HostgroupTest {
 
-     public BasicDBObject buildMongoHostgroup() {
+    @Test
+    public void testStream() {
         BasicDBObject mongo = new BasicDBObject();
-        mongo.put("_id", new ObjectId());
+
+        ObjectId id = new ObjectId();
+        mongo.put("_id", id);
         mongo.put("name", "foo");
 
-        return mongo;
+        Hostgroup group = new Hostgroup(mongo);
+
+        assertEquals(id, group.getId());
+        assertEquals("foo", group.getName());
     }
+
+    // Get hosts not really testable because it is not an embedded doc of hostgroup yet.
 
 }

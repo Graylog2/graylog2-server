@@ -35,9 +35,8 @@ public class HostgroupHost {
     public static final int TYPE_SIMPLE = 0;
     public static final int TYPE_REGEX = 1;
 
-
     private ObjectId objectId = null;
-    private int hostgroupId = 0;
+    private ObjectId hostgroupId = null;
     private int type = -1;
     private String hostname = null;
 
@@ -45,7 +44,7 @@ public class HostgroupHost {
 
     public HostgroupHost(DBObject rule) {
         this.objectId = (ObjectId) rule.get("_id");
-        this.hostgroupId = (Integer) rule.get("hostgroup_id");
+        this.hostgroupId = (ObjectId) rule.get("hostgroup_id");
         this.type = (Integer) rule.get("ruletype");
         this.hostname = (String) rule.get("hostname");
 
@@ -53,31 +52,10 @@ public class HostgroupHost {
     }
 
     /**
-     * @return the objectId
-     */
-    public ObjectId getObjectId() {
-        return objectId;
-    }
-
-    /**
-     * @param objectId the objectId to set
-     */
-    public void setObjectId(ObjectId objectId) {
-        this.objectId = objectId;
-    }
-
-    /**
      * @return the hostgroupId
      */
-    public int getHostgroupId() {
+    public ObjectId getHostgroupId() {
         return hostgroupId;
-    }
-
-    /**
-     * @param hostgroupId the hostgroupId to set
-     */
-    public void setHostgroupId(int hostgroupId) {
-        this.hostgroupId = hostgroupId;
     }
 
     /**
@@ -88,24 +66,10 @@ public class HostgroupHost {
     }
 
     /**
-     * @param type the type to set
-     */
-    public void setType(int type) {
-        this.type = type;
-    }
-
-    /**
      * @return the hostname
      */
     public String getHostname() {
         return hostname;
-    }
-
-    /**
-     * @param hostname the hostname to set
-     */
-    public void setHostname(String hostname) {
-        this.hostname = hostname;
     }
 
 }
