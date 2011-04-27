@@ -7,6 +7,11 @@ require 'blueprints'
 class ActiveSupport::TestCase
   setup do
     DatabaseCleaner.clean
+
+    # to test actual performance - WEBINTERFACE-46
+    Message.db.drop_collection("messages")
+    Message.db.create_collection("messages", :capped => true, :size => 1.megabyte)
+
     Sham.reset
 
     FilteredTerm.expire_cache
