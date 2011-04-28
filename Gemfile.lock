@@ -50,7 +50,7 @@ GEM
     machinist (1.0.6)
     machinist_mongo (1.2.0)
       machinist (~> 1.0.6)
-    mail (2.2.17)
+    mail (2.2.19)
       activesupport (>= 2.3.6)
       i18n (>= 0.4.0)
       mime-types (~> 1.16)
@@ -97,7 +97,7 @@ GEM
     thor (0.14.6)
     treetop (1.4.9)
       polyglot (>= 0.3.1)
-    tzinfo (0.3.26)
+    tzinfo (0.3.27)
     will_paginate (3.0.pre2)
 
 PLATFORMS
