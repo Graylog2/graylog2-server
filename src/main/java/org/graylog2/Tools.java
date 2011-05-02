@@ -140,6 +140,11 @@ public final class Tools {
         ret += " " + System.getProperty("os.version");
         return ret;
     }
+    
+    public static boolean isWindows() {
+    	String osName = System.getProperty("os.name");
+    	return osName.indexOf("Windows") > -1;
+    }
 
     public static int log4jLevelToSyslog(Level level) {
         if (level.equals(Level.DEBUG)) {
