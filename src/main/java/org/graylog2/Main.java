@@ -148,14 +148,17 @@ public final class Main {
         	LOG.info("[x] Assuming Unix, writing PID file.");
 	        try {
 	            String pid = Tools.getPID();
+	            
 	            if (pid == null || pid.length() == 0 || pid.equals("unknown")) {
 	                throw new Exception("Could not determine PID.");
 	            }
+	            
+	            ServerValue.setPID(Integer.parseInt(pid));
 	
 	            FileWriter fstream = new FileWriter("/tmp/graylog2.pid");
 	            BufferedWriter out = new BufferedWriter(fstream);
 	            out.write(pid);
-	            out.close();
+	            out.close();	            
 	        } catch (Exception e) {
 	            LOG.fatal("Could not write PID file: " + e.getMessage(), e);
 	            System.exit(1); // Exit with error.
@@ -179,7 +182,6 @@ public final class Main {
 
         // Fill some stuff into the server_values collection.
         ServerValue.setStartupTime(Tools.getUTCTimestamp());
-        ServerValue.setPID(Integer.parseInt(Tools.getPID()));
         ServerValue.setJREInfo(Tools.getSystemInformation());
         ServerValue.setGraylog2Version(GRAYLOG2_VERSION);
         ServerValue.setAvailableProcessors(HostSystem.getAvailableProcessors());
