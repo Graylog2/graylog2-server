@@ -15,6 +15,7 @@ class Message
   field :line,          :type => Integer
   field :deleted,       :type => Boolean
 
+  index :_id,        :background => true
   index :created_at, :background => true
 
   # all addition fields should start with '_'
