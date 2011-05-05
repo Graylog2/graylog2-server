@@ -60,7 +60,7 @@ class Message
   end
 
   scope :page, lambda {|number| skip(self.get_offset(number))}
-  scope :default_scope, order_by({"_id" => "-1"}).not_deleted.limit(LIMIT)
+  scope :default_scope, order_by({"created_at" => "-1"}).not_deleted.limit(LIMIT)
   scope :time_range, lambda {|from, to| where(:created_at => {"$gte" => from}).where(:created_at => {"$lte" => to})}
 
   def self.find_by_id(_id)
