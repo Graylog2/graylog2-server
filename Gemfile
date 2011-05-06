@@ -1,7 +1,7 @@
 source :rubygems
 
 gem 'rack', '~> 1.2.2'
-gem 'rails', '~> 3.0.6'
+gem 'rails', '~> 3.0.7'
 gem 'json', '~> 1.5.1'
 gem 'plucky', '~> 0.3.6'
 gem 'home_run', '~> 1.0.2'
