@@ -23,7 +23,7 @@ a {
   width: 500px;
   margin: 50px auto;
   background-color: #333333;
-  background-image: url(/images/errorlogo.png);
+  background-image: url(../images/errorlogo.png);
   background-repeat: no-repeat;
   padding: 90px 25px 10px;
 }
