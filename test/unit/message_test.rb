@@ -57,16 +57,25 @@ class MessageTest < ActiveSupport::TestCase
     assert_equal 7, Message.count_of_hostgroup(hostgroup)
   end
 
-  should "count by minutes" do
+  should "counts of last minutes" do
     Timecop.freeze(2011, 5, 12, rand(24), rand(60), 5)   # sec > 0 is important
     (0..2).to_a.each do |i|
-      (i + 1).times { Message.make(:created_at => i.minutes.ago.to_f) }
+      (i * 2 + 1).times { Message.make(:created_at => i.minutes.ago.to_f) }
     end
 
     expected = [ {:minute=>3.minutes.ago - 5, :count=>0},
-                 {:minute=>2.minutes.ago - 5, :count=>3},
-                 {:minute=>1.minute.ago  - 5, :count=>2} ]
+                 {:minute=>2.minutes.ago - 5, :count=>5},
+                 {:minute=>1.minute.ago  - 5, :count=>3} ]
     assert_equal expected, Message.counts_of_last_minutes(3), "All messages:\n#{Message.all.to_a.map(&:created_at_time).join("\n")}"
+  end
+
+  should "count of last minutes" do
+    Timecop.freeze(2011, 5, 12, rand(24), rand(60), 5)   # sec > 0 is important
+    (0..2).to_a.each do |i|
+      (i * 2 + 1).times { Message.make(:created_at => i.minutes.ago.to_f) }
+    end
+
+    assert_equal 4, Message.count_of_last_minutes(2), "All messages:\n#{Message.all.to_a.map(&:created_at_time).join("\n")}"
   end
 
   should "find additional fields" do
