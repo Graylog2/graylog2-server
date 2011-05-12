@@ -35,4 +35,5 @@ group :test do
   gem 'shoulda-activemodel', '0.0.2', :require => 'shoulda/active_model'  # fixed version - too hacky
   gem 'mocha', '~> 0.9.12'
   gem 'database_cleaner', '~> 0.6.0'
+  gem 'timecop', '~> 0.3.5'
 end

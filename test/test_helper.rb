@@ -6,6 +6,8 @@ require 'blueprints'
 
 class ActiveSupport::TestCase
   setup do
+    Timecop.return
+
     DatabaseCleaner.clean
 
     # to test actual performance - WEBINTERFACE-46
@@ -14,6 +16,7 @@ class ActiveSupport::TestCase
 
     Sham.reset
 
+    Rails.cache.clear
     FilteredTerm.expire_cache
   end
 end

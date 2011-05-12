@@ -188,23 +188,18 @@ class Message
   def self.counts_of_last_minutes(minutes)
     res = Array.new
     minutes.times do |m|
-      m += 1 # Offset by one because we don't want to start with the current minute.
-      t = m.minutes.ago
+      t = (m + 1).minutes.ago  # Offset by one because we don't want to start with the current minute.
+      t -= t.sec               # set second = 0
 
-      # Get first second of minute.
-      t -= t.sec
+      key = { :type => :graphvalue, :allhosts => true, :minute => t.to_i }
+      count = Rails.cache.read(key)
 
-      # Try to read from cache.
-      obj = { :type => :graphvalue, :allhosts => true, :minute => t.to_i }
-      c = Rails.cache.read(obj)
-
-      if c == nil
-        # Cache miss. Perform counting and add to cache.
-        c = Message.time_range(t.to_i, (t+60).to_i).count
-        Rails.cache.write(obj, c)
+      unless count
+        count = Message.time_range(t.to_i, (t + 60).to_i).count
+        Rails.cache.write(key, count)
       end
 
-      res << { :minute => t, :count => c}
+      res << { :minute => t, :count => count}
     end
 
     return res.reverse
