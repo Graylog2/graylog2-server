@@ -1,11 +1,11 @@
 #
-# This file configures the New Relic RPM Agent.  New Relic RPM monitors
+# This file configures the New Relic Agent.  New Relic monitors
 # Rails and Java applications with deep visibility and low overhead.  For more
 # information, visit www.newrelic.com.
 #
-# Generated April 13, 2011
+# Generated May 12, 2011
 #
-# This configuration file is custom generated for qik-stage
+# This configuration file is custom generated for Graylog2
 
 # Here are the settings that are common to all environments:
 common: &default_settings
@@ -13,7 +13,7 @@ common: &default_settings
 
   # You must specify the license key associated with your New Relic
   # account.  This key binds your Agent's data to your account in the
-  # New Relic RPM service.
+  # New Relic service.
   license_key: 'here'
 
   # Agent Enabled (Rails Only)
@@ -27,8 +27,8 @@ common: &default_settings
 
   # Application Name
   # Set this to be the name of your application as you'd like it show
-  # up in RPM.  RPM will then auto-map instances of your application
-  # into a RPM "application" on your home dashboard page. If you want
+  # up in New Relic.  New Relic will then auto-map instances of your application
+  # into a New Relic "application" on your home dashboard page. If you want
   # to map this instance into multiple apps, like "AJAX Requests" and
   # "All UI" then specify a semicolon separated list of up to three
   # distinct names.  If you comment this out, it defaults to the
@@ -37,13 +37,14 @@ common: &default_settings
 
   # Overwritten below for specific environments
   monitor_mode: false
+  developer_mode: false
 
   # The newrelic agent generates its own log file to keep its logging
   # information separate from that of your application.  Specify its
   # log level here.
   log_level: info
 
-  # The newrelic agent communicates with the RPM service via http by
+  # The newrelic agent communicates with the New Relic service via http by
   # default.  If you want to communicate via https to increase
   # security, then turn on SSL by setting this value to true.  Note,
   # this will result in increased CPU overhead to perform the
@@ -58,7 +59,7 @@ common: &default_settings
   # you send us needs end-to-end verified certificates.
   #
   # This means we cannot cache the DNS lookup, so each request to the
-  # RPM service will perform a lookup. It also means that we cannot
+  # New Relic service will perform a lookup. It also means that we cannot
   # use a non-blocking lookup, so in a worst case, if you have DNS
   # problems, your app may block indefinitely.
   # verify_certificate: true
@@ -73,9 +74,9 @@ common: &default_settings
   # For more about the Apdex standard, see
   # http://support.newrelic.com/faqs/general/apdex
 
-  apdex_t: 0.5
+  apdex_t: 0.4
 
-  # Proxy settings for connecting to the RPM server.
+  # Proxy settings for connecting to the New Relic server.
   #
   # If a proxy is used, the host setting is required.  Other settings
   # are optional.  Default port is 8080.
@@ -97,7 +98,7 @@ common: &default_settings
 
 
   # Transaction tracer captures deep information about slow
-  # transactions and sends this to the RPM service once a
+  # transactions and sends this to the New Relic service once a
   # minute. Included in the transaction is the exact call sequence of
   # the transactions including any SQL statements issued.
   transaction_tracer:
@@ -110,7 +111,7 @@ common: &default_settings
     # Threshold in seconds for when to collect a transaction
     # trace. When the response time of a controller action exceeds
     # this threshold, a transaction trace will be recorded and sent to
-    # RPM. Valid values are any float value, or (default) "apdex_f",
+    # New Relic. Valid values are any float value, or (default) "apdex_f",
     # which will use the threshold for an dissatisfying Apdex
     # controller action - four times the Apdex T value.
     transaction_threshold: apdex_f
@@ -123,7 +124,7 @@ common: &default_settings
 
     # Threshold in seconds for when to collect stack trace for a SQL
     # call. In other words, when SQL statements exceed this threshold,
-    # then capture and send to RPM the current stack trace. This is
+    # then capture and send to New Relic the current stack trace. This is
     # helpful for pinpointing where long SQL calls originate from
     stack_trace_threshold: 0.500
 
@@ -137,7 +138,7 @@ common: &default_settings
     # explain_threshold: 0.5
 
   # Error collector captures information about uncaught exceptions and
-  # sends them to RPM for viewing
+  # sends them to New Relic for viewing
   error_collector:
 
     # Error collector is enabled by default. Set this to false to turn
@@ -150,7 +151,7 @@ common: &default_settings
     # related.
     capture_source: true
 
-    # To stop specific errors from reporting to RPM, set this property
+    # To stop specific errors from reporting to New Relic, set this property
     # to comma separated values.  Default is to ignore routing errors
     # which are how 404's get triggered.
     #
@@ -192,7 +193,7 @@ common: &default_settings
 
 development:
   <<: *default_settings
-  # Turn off communication to RPM service in development mode (also
+  # Turn off communication to New Relic service in development mode (also
   # 'enabled').
   # NOTE: for initial evaluation purposes, you may want to temporarily
   # turn the agent on in development mode.
