@@ -2,6 +2,9 @@
   <%= render :partial => partial_for(:sidebar, @scoping, params[:action]) %>
 <% end %>
 
+<% if @stream %>
+  <%= javascript_tag "var stream_id = '#{@stream.id}';" %>
+<% end %>
 <%= javascript_include_tag 'messageupdater' %>
 
 <%= render :partial => partial_for(:quickfilter_button) %>

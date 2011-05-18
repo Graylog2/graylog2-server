@@ -1,5 +1,5 @@
 <script type="text/javascript">
-  $.get('/versioncheck/perform', function(response) {
+  $.get( relative_url_root + '/versioncheck/perform', function(response) {
     if (response == "true") {
       $("#new-version").show();
     }

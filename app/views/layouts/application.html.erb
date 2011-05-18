@@ -4,7 +4,7 @@
 <head>
   <title>Graylog2</title>
   <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-  <link rel="shortcut icon" href="/favicon.ico" />
+  <%= favicon_link_tag "/favicon.ico" %> 
   <%= csrf_meta_tag %>
   <%= stylesheet_link_tag "reset" %>
   <%= stylesheet_link_tag "core" %>
@@ -27,6 +27,7 @@
   <%= javascript_include_tag "rails" %>
 </head>
 <body>
+  <%= javascript_tag("var relative_url_root = '#{controller.config.relative_url_root}';") %>
 
   <div id="pageload" style="display: none;"><%= Time.now.to_i %></div>
   <div id="gln" style="display: none;">&nbsp;Loading&hellip;</div>

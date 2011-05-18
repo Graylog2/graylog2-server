@@ -5,7 +5,11 @@ $(document).ready(function(){
 
 function showNewMessagesBar() {
   // Fetch count of new messages since page load.
-  $.post("/messages/getnewmessagecount", {since: $('#pageload').html()}, function(data) {
+  var params = {since: $('#pageload').html()};
+  if (typeof stream_id != 'undefined') {
+    params['stream_id'] = stream_id;
+  }
+  $.post( relative_url_root + "/messages/getnewmessagecount", params, function(data) {
     response = eval('(' + data + ')');
 
     if (response.status == 'success') {
