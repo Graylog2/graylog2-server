@@ -27,6 +27,7 @@
   <%= javascript_include_tag "rails" %>
 </head>
 <body>
+  <%= javascript_tag("var relative_url_root = '#{controller.config.relative_url_root}';") %>
 
   <div id="pageload" style="display: none;"><%= Time.now.to_i %></div>
   <div id="gln" style="display: none;">&nbsp;Loading&hellip;</div>

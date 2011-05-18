@@ -78,7 +78,7 @@ $(document).ready(function(){
     $('.messages-more').bind('click', function() {
         var message_id = this.id;
         $('#message-' + message_id).html('<img src="/images/loading-small.gif" alt="loading" style="position: relative; top: 2px;"/>');
-        $.post("/messages/getcompletemessage", {id: message_id}, function(data) {
+        $.post(relative_url_root + "/messages/getcompletemessage", {id: message_id}, function(data) {
             $('#message-' + message_id).html(data);
         });
         return false;
@@ -200,7 +200,7 @@ $(document).ready(function(){
     $(".message-row").bind("click", function() {
       $("#gln").show();
 
-      $.post("/messages/" + $(this).attr("id") + "?partial=true", function(data) {
+      $.post( relative_url_root + "/messages/" + $(this).attr("id") + "?partial=true", function(data) {
         $("#sidebar-inner").html(data);
 
         // Show sidebar if hidden.
