@@ -1,6 +1,9 @@
 require File.expand_path('../boot', __FILE__)
 
-require "home_run"
+begin
+  require "home_run"
+rescue LoadError
+end
 
 # all but active_record
 require "action_controller/railtie"
