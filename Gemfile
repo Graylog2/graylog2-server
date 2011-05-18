@@ -4,9 +4,6 @@ gem 'rack', '~> 1.2.2'
 gem 'rails', '~> 3.0.7'
 gem 'json', '~> 1.5.1'
 gem 'plucky', '~> 0.3.6'
-if RUBY_PLATFORM !~ /java/
-  gem 'home_run', '~> 1.0.2'
-end
 gem 'chronic', '~> 0.3.0'
 gem 'pony', '~> 1.1'  # unusual version number
 gem 'graylog2-declarative_authorization', :require => 'declarative_authorization'
@@ -14,16 +11,15 @@ gem 'hoptoad_notifier', '~> 2.4.9'
 gem 'newrelic_rpm', '~> 3.0.0', :require => nil  # loaded by rpm_contrib
 gem 'rpm_contrib', '~> 2.1.0'
 gem 'mongoid', '~> 2.0.1'
-if RUBY_PLATFORM =~ /java/
+
+if RUBY_PLATFORM =~ /java/i
   gem 'bson', "~> 1.3.1"
 else
+  gem 'home_run', '~> 1.0.2'
   gem 'bson_ext', "~> 1.3.1"
+  gem 'SystemTimer', '~> 1.2.3' if RUBY_VERSION.start_with?('1.8')
 end
 
-# TODO https://github.com/ph7/system-timer/issues/15
-if RUBY_VERSION.start_with?('1.8') && RUBY_PLATFORM !~ /java/
-  gem 'SystemTimer', '~> 1.2.3'
-end
 
 group :development, :test do
   # might be useful to generate fake data in development
