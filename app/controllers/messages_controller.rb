@@ -167,7 +167,18 @@ class MessagesController < ApplicationController
       render :js => { 'status' => 'error', 'payload' => "Missing or invalid parameter: since" }.to_json
       return
     end
-    render :js => { 'status' => 'success', 'payload' => Message.count_since(since) }.to_json
+
+    if params[:stream_id]
+      stream = Stream.find_by_id params[:stream_id]
+      if stream.nil?
+        render :js => {'status' => 'error',
+                       'payload' => "Cannot find stream with id #{params[:stream_id]}" }.to_json
+        return
+      end
+      render :js => { 'status' => 'success', 'payload' => stream.message_count_since(since) }.to_json
+    else
+      render :js => { 'status' => 'success', 'payload' => Message.count_since(since) }.to_json
+    end
   end
 
 end
