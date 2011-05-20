@@ -63,4 +63,55 @@ public class AdditionalFieldMatcherTest {
         assertFalse(matcher.match(msg, rule));
     }
 
+    @Test
+    public void testSuccessfulRegexMatch() {
+        BasicDBObject mongoRule = new BasicDBObject();
+        mongoRule.put("_id", new ObjectId());
+        mongoRule.put("rule_type", StreamRule.TYPE_ADDITIONAL);
+        mongoRule.put("value", "foo=baz|bar");
+
+        StreamRule rule = new StreamRule(mongoRule);
+
+        GELFMessage msg = new GELFMessage();
+        msg.addAdditionalData("_foo", "bar");
+
+        AdditionalFieldMatcher matcher = new AdditionalFieldMatcher();
+
+        assertTrue(matcher.match(msg, rule));
+    }
+
+    @Test
+    public void testMissedRegexMatch() {
+        BasicDBObject mongoRule = new BasicDBObject();
+        mongoRule.put("_id", new ObjectId());
+        mongoRule.put("rule_type", StreamRule.TYPE_ADDITIONAL);
+        mongoRule.put("value", "foo=baz|bar");
+
+        StreamRule rule = new StreamRule(mongoRule);
+
+        GELFMessage msg = new GELFMessage();
+        msg.addAdditionalData("_foo", "wat");
+
+        AdditionalFieldMatcher matcher = new AdditionalFieldMatcher();
+
+        assertFalse(matcher.match(msg, rule));
+    }
+
+    @Test
+    public void testSuccessfulComplexButUnrealisticRegexMatch() {
+        BasicDBObject mongoRule = new BasicDBObject();
+        mongoRule.put("_id", new ObjectId());
+        mongoRule.put("rule_type", StreamRule.TYPE_ADDITIONAL);
+        mongoRule.put("value", "foo=^foo|bar\\d.+wat");
+
+        StreamRule rule = new StreamRule(mongoRule);
+
+        GELFMessage msg = new GELFMessage();
+        msg.addAdditionalData("_foo", "bar1foowat");
+
+        AdditionalFieldMatcher matcher = new AdditionalFieldMatcher();
+
+        assertTrue(matcher.match(msg, rule));
+    }
+
 }
