@@ -1,24 +1,19 @@
 source :rubygems
 
 gem 'rack', '~> 1.2.2'
+gem 'rake', '~> 0.8.7'
 gem 'rails', '~> 3.0.7'
 gem 'json', '~> 1.5.1'
-gem 'plucky', '~> 0.3.6'
 gem 'chronic', '~> 0.3.0'
 gem 'pony', '~> 1.1'  # unusual version number
-gem 'graylog2-declarative_authorization', :require => 'declarative_authorization'
+gem 'graylog2-declarative_authorization', '~> 0.5.2', :require => 'declarative_authorization'
 gem 'hoptoad_notifier', '~> 2.4.9'
-gem 'newrelic_rpm', '~> 3.0.0', :require => nil  # loaded by rpm_contrib
-gem 'rpm_contrib', '~> 2.1.0'
-gem 'mongoid', '~> 2.0.1'
-
-if RUBY_PLATFORM =~ /java/i
-  gem 'bson', "~> 1.3.1"
-else
-  gem 'home_run', '~> 1.0.2'
-  gem 'bson_ext', "~> 1.3.1"
-  gem 'SystemTimer', '~> 1.2.3' if RUBY_VERSION.start_with?('1.8')
-end
+gem 'rpm_contrib', '~> 2.1.1'
+gem 'mongoid', '2.0.1'  # 2.0.2 dropped paggination. TODO: update
+gem 'bson', "~> 1.3.1"
+gem 'bson_ext', "~> 1.3.1", :platforms => :ruby
+gem 'home_run', '~> 1.0.2', :platforms => :ruby
+gem 'SystemTimer', '~> 1.2.3', :require => 'system_timer', :platforms => :ruby_18
 
 
 group :development, :test do
@@ -32,7 +27,7 @@ group :development do
 end
 
 group :test do
-  gem 'ci_reporter'
+  gem 'ci_reporter', '~> 1.6.4'
   gem 'shoulda', '~> 2.11.3'
   gem 'shoulda-activemodel', '0.0.2', :require => 'shoulda/active_model'  # fixed version - too hacky
   gem 'mocha', '~> 0.9.12'
