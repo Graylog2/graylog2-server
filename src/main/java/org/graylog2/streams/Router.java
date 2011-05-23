@@ -25,6 +25,8 @@ import org.graylog2.messagehandlers.gelf.GELFMessage;
 import org.graylog2.streams.matchers.StreamRuleMatcherIF;
 
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.List;
 
 /**
@@ -51,26 +53,53 @@ public class Router {
         }
 
         for (Stream stream : streams) {
-            boolean missed = false;
 
             if (stream.getStreamRules().isEmpty()) {
                 continue;
             }
 
+            HashMap<Integer, ArrayList<StreamRule>> rules = new HashMap<Integer, ArrayList<StreamRule>>();
+            HashMap<Integer, Boolean> streamMatch = new HashMap<Integer, Boolean>();
+
+            // Build a hash of rules organized by rule type.
             for (StreamRule rule : stream.getStreamRules()) {
-                try {
-                    StreamRuleMatcherIF matcher = StreamRuleMatcherFactory.build(rule.getRuleType());
-                    if (!msg.matchStreamRule(matcher, rule)) {
-                        missed = true;
-                        break;
+                Integer ruleType = rule.getRuleType();
+
+                if (!rules.containsKey(ruleType)) {
+                    rules.put(ruleType, new ArrayList<StreamRule>());
+                }
+
+                if (!streamMatch.containsKey(ruleType)) {
+                    streamMatch.put(ruleType, false);
+                }
+
+                rules.get(ruleType).add(rule);
+            }
+
+            // Check to see if ANY rule of a given rule type matches.
+            for (Integer ruleType : rules.keySet()) {
+                boolean match = false;
+
+                for (StreamRule rule : rules.get(ruleType)) {
+
+                    try {
+                        StreamRuleMatcherIF matcher = StreamRuleMatcherFactory.build(ruleType);
+
+                        if (msg.matchStreamRule(matcher, rule)) {
+                            match = true;
+                            break;
+                        }
+                    } catch (InvalidStreamRuleTypeException e) {
+                        LOG.warn("Invalid stream rule type. Skipping matching for this rule. " + e.getMessage(), e);
                     }
-                } catch (InvalidStreamRuleTypeException e) {
-                    LOG.warn("Invalid stream rule type. Skipping matching for this rule. " + e.getMessage(), e);
+                }
+
+                if (match) {
+                    streamMatch.put(ruleType, true);
                 }
             }
 
-            // All rules were matched.
-            if (!missed) {
+            if (!streamMatch.containsValue(false)) {
                 matches.add(stream);
             }
         }
