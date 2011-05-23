@@ -15,6 +15,8 @@ module StreamsHelper
         return "Timeframe"
       when Streamrule::TYPE_ADDITIONAL then
         return "Additional field"
+      when Streamrule::TYPE_SEVERITY_OR_HIGHER then
+        return "Severity (or higher)"
     end
     return "Invalid Rule"
   end
@@ -24,7 +26,7 @@ module StreamsHelper
     value = h(rule.value)
 
     # Add human readable value type for SEVERITY
-    if rule.rule_type == Streamrule::TYPE_SEVERITY
+    if rule.rule_type == Streamrule::TYPE_SEVERITY or rule.rule_type == Streamrule::TYPE_SEVERITY_OR_HIGHER
         value = "#{syslog_level_to_human(rule.value)} (#{h(rule.value.to_i)})"
     end
 

@@ -27,7 +27,6 @@ $(document).ready(function(){
                 break;
             case '3':
                 field = $('.stream-value-severity');
-                master = $('#stream-value-severity-master');
                 break;
             case '4':
                 field = $('.stream-value-facility');
@@ -43,12 +42,14 @@ $(document).ready(function(){
             case '7':
                 field = $('.stream-value-hostgroup');
                 break;
+            case '8':
+                field = $('.stream-value-severity-or-higher');
+                break;
         }
         field.removeAttr("disabled");
         field.show();
 
         if (help != null) { help.show(); }
-        if (master != null) { master.show(); }
     });
 
     // Stream Quick chooser

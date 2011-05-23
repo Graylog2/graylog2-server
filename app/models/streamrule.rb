@@ -17,6 +17,7 @@ class Streamrule
   TYPE_TIMEFRAME = 5
   TYPE_ADDITIONAL = 6
   TYPE_HOSTGROUP = 7
+  TYPE_SEVERITY_OR_HIGHER = 8
 
   def self.get_types_for_select_options(special = nil)
     {
@@ -24,6 +25,7 @@ class Streamrule
       "Host" => self::TYPE_HOST,
       "Hostgroup" => self::TYPE_HOSTGROUP,
       "Severity" => self::TYPE_SEVERITY,
+      "Severity (or higher)" => self::TYPE_SEVERITY_OR_HIGHER,
       "Facility" => self::TYPE_FACILITY,
       "Additional field" => self::TYPE_ADDITIONAL
     }
