@@ -180,6 +180,34 @@ class StreamsController < ApplicationController
     redirect_to settings_stream_path(@stream)
   end
 
+  def toggledisabled
+    @stream = Stream.find_by_id params[:id]
+    if @stream.disabled.blank?
+      @stream.disabled = true
+    else
+      @stream.disabled = !@stream.disabled
+    end
+    @stream.save
+    redirect_to stream_path(@stream)
+  end
+
+  def clone
+    if params[:title].blank?
+      flash[:error] = "Missing parameter: Title of new stream"
+      redirect_to streams_path
+    end
+
+    original = Stream.find_by_id(params[:id])
+    @new_stream = Stream.new
+
+    @new_stream.title = params[:title]
+    @new_stream.streamrules = original.streamrules
+    @new_stream.disabled = true
+    @new_stream.save
+
+    redirect_to stream_path(@new_stream)
+  end
+
   def destroy
     @stream = Stream.find_by_id params[:id]
     if @stream.destroy

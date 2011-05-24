@@ -75,7 +75,9 @@ Graylog2WebInterface::Application.routes.draw do
       post :togglefavorited
       post :togglealarmforce
       post :togglesubscription
+      post :toggledisabled
       post :rename
+      post :clone
       get :settings
       post :subscribe
       post :unsubscribe

@@ -31,7 +31,9 @@ authorization do
       :subscribe,
       :togglesubscription,
       :rename,
-      :categorize
+      :categorize,
+      :clone,
+      :toggledisabled
     ]
     has_permission_on :streamrules, :to => [:create, :destroy]
     has_permission_on :streamcategories, :to => [:create, :destroy]

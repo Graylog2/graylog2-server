@@ -316,6 +316,11 @@
   font-style: italic;
 }
 
+#streams-settings-clone-modal {
+  width: 500px;
+  display: none;
+}
+
 /* Hosts */
 #hosts-quickjump {
     margin-bottom: 15px;

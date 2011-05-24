@@ -25,6 +25,7 @@ class Stream
   field :last_subscription_check, :type => Integer
   field :last_alarm_check, :type => Integer
   field :alarm_active, :type => Boolean
+  field :disabled, :type => Boolean
 
   def self.find_by_id(_id)
     _id = $1 if /^([0-9a-f]+)-/ =~ _id

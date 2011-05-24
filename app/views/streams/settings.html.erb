@@ -1,5 +1,8 @@
 <h1>Settings of stream <span class="highlighted"><%= @stream.title %></span></h1>
 
+<%=raw ajaxtrigger(:disable_stream, "Stream disabled", toggledisabled_stream_path(@stream), @stream.disabled) %>
+<br /><br />
+
 <h2>General</h2>
 <div class="short-description">All these settings are only applied for your user.</div>
 
@@ -65,3 +68,13 @@ of the alarm. You can also define that all users are alarmed, no matter what the
 <% end %>
 
 <%= awesome_link "Delete this stream", stream_path(@stream.id), :confirm => "Really delete this stream?", :method => :delete %>
+
+<div id="streams-settings-clone-modal">
+  <%= form_tag(clone_stream_path(@stream)) do %>
+    <%= label_tag "title", "Title of new stream:" %>
+    <%= text_field_tag "title" %>
+    <%= awesome_submit_link "Clone" %>
+  <% end %>
+  This will create a new disabled stream with all rules copied from this stream.
+</div>
+<%= awesome_link "Clone this stream", "#", { :onclick => "$('#streams-settings-clone-modal').modal({ overlayClose:true })" } %>
