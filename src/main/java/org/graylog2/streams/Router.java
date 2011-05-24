@@ -45,7 +45,7 @@ public class Router {
         ArrayList<Stream> matches = new ArrayList<Stream>();
         ArrayList<Stream> streams = null;
         try {
-            streams = Stream.fetchAll();
+            streams = Stream.fetchAllEnabled();
         } catch (Exception e) {
             LOG.error("Could not fetch streams: " + e.getMessage(), e);
         }
