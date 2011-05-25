@@ -27,14 +27,14 @@
 <div id="streams-streams">
   <% Streamcategory.all.each do |category| %>
     <h2 class="streams-title"><%= category.title %></h2>
-    <% category.streams.each do |stream| %>
+    <% category.streams.sort{ |a,b| a.title <=> b.title }.each do |stream| %>
       <%= render :partial => "streamrow", :locals => { :stream => stream } %>
     <% end %>
   <% end %>
 
   <% unless @streams_with_no_category.blank? %>
     <h2 class="streams-title">Uncategorized</h2>
-    <% @streams_with_no_category.each do |stream| %>
+    <% @streams_with_no_category.sort{ |a,b| b.title <=> a.title }.each do |stream| %>
       <%= render :partial => "streamrow", :locals => { :stream => stream } %>
     <% end %>
   <% end %>
