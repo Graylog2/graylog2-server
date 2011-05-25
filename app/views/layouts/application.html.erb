@@ -72,11 +72,6 @@
       <% permitted_to? :index, :users do %><%=raw menu_item("Users", users_path) %><% end %>
     </ul>
 
-    <div id="new-message-count">
-      <% unless @hide_stats %>
-        <strong><%= Message.count_of_last_minutes(message_count_interval) %></strong> / <%= message_count_interval %> minutes
-      <% end %>
-    </div>
   </div>
 
   <br style="clear: both;" />
