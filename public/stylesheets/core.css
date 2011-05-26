@@ -522,3 +522,11 @@ label {
 #server-not-running {
   background-image: url(../images/notificationbar-red.png);
 }
+
+.time-light {
+  color: #ccc;
+}
+
+.highlighted .time-light {
+  color: #fd9dd5;
+}
