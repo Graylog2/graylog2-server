@@ -37,7 +37,7 @@ public class AdditionalFieldMatcher implements StreamRuleMatcherIF {
         String key = "_" + parts[0];
         String value = parts[1];
 
-        if (msg.getAdditionalData().containsKey(key)) {
+        if (msg.getAdditionalData().containsKey(key) && msg.getAdditionalData().get(key) != null) {
             // Message contains additional field.
             if (msg.getAdditionalData().get(key).matches(value)) {
                 return true;
