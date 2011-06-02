@@ -109,7 +109,7 @@ class VisualsController < ApplicationController
 
       values << {
         "id" => escape(regex[:id]),
-        "name" => "Regex: #{escape(regex[:value])}",
+        "name" => "Regex: #{escape(regex[:value].source)}",
         "children" => children
       }
     end
