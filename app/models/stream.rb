@@ -32,6 +32,10 @@ class Stream
     first(:conditions => { :_id => BSON::ObjectId(_id)})
   end
 
+  def title
+    disabled ? super + " (disabled)" : super
+  end
+
   def alerted?(user)
     AlertedStream.alerted?(self.id, user.id)
   end
