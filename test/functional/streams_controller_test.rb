@@ -11,7 +11,7 @@ class StreamsControllerTest < ActionController::TestCase
       assert_response :redirect
       assert assigns(:stream).disabled
     end
-    
+
     should "disable a stream that is enabled" do
       stream = Stream.make(:disabled => false)
       post :toggledisabled, :id => stream.id.to_s
@@ -19,7 +19,7 @@ class StreamsControllerTest < ActionController::TestCase
       assert_response :redirect
       assert assigns(:stream).disabled
     end
-    
+
     should "enable a stream that is disabled" do
       stream = Stream.make(:disabled => true)
       post :toggledisabled, :id => stream.id.to_s
@@ -27,7 +27,7 @@ class StreamsControllerTest < ActionController::TestCase
       assert_response :redirect
       assert !assigns(:stream).disabled
     end
-    
+
   end
 
   context "cloning" do
