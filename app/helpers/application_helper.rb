@@ -2,7 +2,7 @@ module ApplicationHelper
 
   # Returns formatted time
   def time_to_formatted_s(t)
-    t.strftime('%Y-%m-%d %H:%M:%S') + "<span class='time-light'>." + t.usec.to_s[0,3] + "</span>"
+    (t.strftime('%Y-%m-%d %H:%M:%S') + "<span class='time-light'>.#{t.usec.to_s[0,3]}</span>").html_safe
   end
 
   def menu_item title, where
