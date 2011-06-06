@@ -17,7 +17,7 @@ class Message
 
   index :_id,        :background => true
   index :created_at, :background => true
-  index [ [:streams, Mongo::ASCENDING], [:created_at, Mongo::DESCENDING] ]
+  index [ [:streams, Mongo::ASCENDING], [:created_at, Mongo::DESCENDING] ], :background => true
 
   # all addition fields should start with '_'
 
