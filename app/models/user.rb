@@ -37,6 +37,9 @@ class User
   field :remember_token_expires_at
   field :last_version_check, :type => Integer
 
+  index :login,          :background => true, :unique => true
+  index :remember_token, :background => true, :unique => true
+
   has_and_belongs_to_many :streams, :inverse_of => :users
   has_and_belongs_to_many :favorite_streams,   :class_name => "Stream", :inverse_of => :favorited_streams
   has_and_belongs_to_many :subscribed_streams, :class_name => "Stream", :inverse_of => :subscribers
