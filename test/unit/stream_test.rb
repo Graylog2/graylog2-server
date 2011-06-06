@@ -17,6 +17,25 @@ class StreamTest < ActiveSupport::TestCase
         assert_equal [@user], @stream.send(rel)
       end
     end
+
+    context "disabling streams" do
+
+      should "append disabled hint after title if stream is disabled" do
+        @stream.disabled = true
+        assert_equal "#{@stream.title} (disabled)", @stream.title_possibly_disabled
+      end
+
+      should "not append disabled hint after title if stream is not disabled" do
+        @stream.disabled = false
+        assert_equal @stream.title, @stream.title_possibly_disabled
+      end
+
+      should "possibly_disabled title should return nil if original title is nil" do
+        @stream.title = nil
+        assert_nil @stream.title_possibly_disabled
+      end
+
+    end
   end
 
 # Disable for now.

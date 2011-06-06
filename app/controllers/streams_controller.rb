@@ -194,7 +194,7 @@ class StreamsController < ApplicationController
   def clone
     if params[:title].blank?
       flash[:error] = "Missing parameter: Title of new stream"
-      redirect_to streams_path
+      redirect_to streams_path and return
     end
 
     original = Stream.find_by_id(params[:id])

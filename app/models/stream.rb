@@ -32,8 +32,8 @@ class Stream
     first(:conditions => { :_id => BSON::ObjectId(_id)})
   end
 
-  def title
-    disabled ? super + " (disabled)" : super
+  def title_possibly_disabled
+    disabled ? title + " (disabled)" : title if title
   end
 
   def alerted?(user)
@@ -49,7 +49,7 @@ class Stream
   end
 
   def to_param
-    "#{id}-#{title.parameterize}"
+    title.blank? ? id.to_s : "#{id}-#{title.parameterize}"
   end
 
   # giving back IDs because all_with_subscribers does too
