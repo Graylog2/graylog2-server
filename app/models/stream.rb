@@ -33,7 +33,9 @@ class Stream
   end
 
   def title
-    disabled ? super + " (disabled)" : super
+    t = read_attribute(:title).to_s
+    t += " (disabled)" if disabled?
+    t
   end
 
   def alerted?(user)
