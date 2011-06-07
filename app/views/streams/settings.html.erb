@@ -1,4 +1,4 @@
-<h1>Settings of stream <span class="highlighted"><%= @stream.title %></span></h1>
+<h1>Settings of stream <span class="highlighted"><%= @stream.title_possibly_disabled %></span></h1>
 
 <%=raw ajaxtrigger(:disable_stream, "Stream disabled", toggledisabled_stream_path(@stream), @stream.disabled) %>
 <br /><br />
