@@ -2,6 +2,38 @@ require 'test_helper'
 
 class StreamsControllerTest < ActionController::TestCase
 
+  context "creating" do
+    
+    should "create and redirect" do
+      assert_difference('Stream.count') do
+        post :create, :stream => { :title => 'foo' }
+      end
+
+      assert_nil flash[:error]
+      assert_redirected_to rules_stream_path(assigns(:new_stream))
+    end
+
+    should "be disabled from the beginning" do
+      assert_difference('Stream.count') do
+        post :create, :stream => { :title => 'foo' }
+      end
+
+      assert assigns(:new_stream).disabled
+      assert_nil flash[:error]
+      assert_redirected_to rules_stream_path(assigns(:new_stream))
+    end
+
+    should "redirect to stream index in case of error" do
+      assert_no_difference('Stream.count') do
+        post :create # no parameters
+      end
+
+      assert_not_nil flash[:error]
+      assert_redirected_to streams_path
+    end
+
+  end
+
   context "enabling and disabling" do
 
     should "disable a stream that has no disabled attribute yet" do

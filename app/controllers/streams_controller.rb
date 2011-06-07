@@ -138,10 +138,11 @@ class StreamsController < ApplicationController
   end
 
   def create
-    new_stream = Stream.new params[:stream]
-    if new_stream.save
+    @new_stream = Stream.new params[:stream]
+    @new_stream.disabled = true
+    if @new_stream.save
       flash[:notice] = "Stream has been created"
-      redirect_to rules_stream_path(new_stream)
+      redirect_to rules_stream_path(@new_stream)
     else
       flash[:error] = "Could not create stream"
       redirect_to streams_path
