@@ -251,6 +251,11 @@ $(document).ready(function(){
     $.mapKey("s", function() { $("#modal-stream-chooser").modal(standardMapKeyOptions); });
     $.mapKey("h", function() { $("#modal-host-chooser").modal(standardMapKeyOptions); });
 
+    // Confirmation for links in full message.
+    $(".messages-full-message a").bind("click", function() {
+      return confirm("Really follow this link?");
+    });
+
 });
 
 function buildHostCssId(id) {
