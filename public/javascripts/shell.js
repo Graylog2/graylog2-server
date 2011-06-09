@@ -25,6 +25,13 @@ var Shell = new function() {
     _cmd.bind('keypress', function(e) {
       var code = (e.keyCode ? e.keyCode : e.which);
       if(code == 13) { // "Enter" key
+
+        // Empty line for empty input.
+        if ($.trim(_cmd.val().trim()).length == 0) {
+          empty_line();
+          return false;
+        }
+
         render_result(Interpreter.cmd(_cmd.val()));
         eternalize(); // Move command out of input into static text.
         new_cmd();
@@ -62,6 +69,11 @@ var Shell = new function() {
 
   var output = function(content) {
     new_line("<li>" + timestamp() + " - " + content + "</li>");
+  }
+
+  var empty_line = function() {
+    eternalize(); // Move command out of input into static text.
+    new_cmd();
   }
 
   var new_line = function(content) {
