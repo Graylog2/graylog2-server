@@ -4,10 +4,6 @@ class VisualsController < ApplicationController
 
     time = Benchmark.realtime do
       case params[:id]
-        when "messagespread" then
-          case_sensitive = params[:case] == "true" ? false : true
-          is_regex = params[:regex] == "true" ? true : false
-          r["data"] = calculate_messagespread(is_regex, case_sensitive, params[:term])
         when "hostgrouprelation" then
           r["data"] = calculate_hostgrouprelation(false, params[:group])
         when "totalgraph" then
@@ -23,63 +19,6 @@ class VisualsController < ApplicationController
   end
 
   private
-
-  def calculate_messagespread(is_regex, case_sensitive, message)
-    values = Array.new
-
-    conditions = Message.not_deleted
-    #conditions["deleted"] = false
-
-    if is_regex
-      search_for = message
-    else
-      search_for = Regexp.escape(message)
-    end
-
-    if case_sensitive
-      conditions = conditions.where(:message => /#{search_for}/)
-    else
-      conditions = conditions.where(:message => /#{search_for}/i)
-    end
-
-    hosts = Host.all
-
-    highest = 0
-    hosts.each do |host|
-      conditions = conditions.where(:host => escape(host.host))
-      count = conditions.count
-
-      if count > 0
-        value = Hash.new
-        value["data"] = { "$angularWidth" => count }
-        value["id"] = Base64.encode64(host.host).chomp
-        value["name"] = escape(host.host)
-
-        values << value
-      end
-      highest = count if count > highest
-    end
-
-    # Sort values.
-    values = values.sort_by { |v| v["data"]["$angularWidth"] }
-
-    # Add weighted colors.
-    colored_values = Array.new
-    values.each do |value|
-      red = (value["data"]["$angularWidth"].to_f/highest.to_f*255).to_i.floor.to_s(16)
-      red = "0#{red}" if red.length == 1
-      value["data"]["$color"] = "##{red}0010"
-      colored_values << value
-    end
-
-    r = Hash.new
-    r["data"] = Hash.new
-    r["data"]["$color"] = "#fff"
-    r["children"] = Array.new
-    r["children"] << { "children" => colored_values }
-
-    return r
-  end
 
   def calculate_hostgrouprelation(all_hosts, group_id)
     group = Hostgroup.find(BSON::ObjectId(group_id))
