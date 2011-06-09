@@ -10,6 +10,7 @@
   <%= stylesheet_link_tag "core" %>
   <%= stylesheet_link_tag "sections" %>
   <%= stylesheet_link_tag "messages" %>
+  <%= stylesheet_link_tag "shell" %>
   <%= hoptoad_javascript_notifier if Configuration.hoptoad_enabled? %>
   <%= javascript_include_tag "jquery-1.4.2.min" %>
   <%= javascript_include_tag "jquery.autocomplete.min" %>
@@ -24,6 +25,7 @@
   <% end %>
   <%= javascript_include_tag "backtotop" if @use_backtotop %>
   <%= javascript_include_tag "application" %>
+  <%= javascript_include_tag "shell" if @has_shell %>
   <%= javascript_include_tag "rails" %>
 </head>
 <body>
@@ -76,6 +78,24 @@
 
   <br style="clear: both;" />
   <div id="new-messages-bar" style="display: none;"></div>
+
+  <% if @has_shell %>
+    <div id="shell-container">
+      <ul id="shell">
+        <!--<li><span class="shell-prompt">lennart $</span> <span class="shell-command">a.distinct('oauth_consumer_key')</span></li>
+        <li>
+          <span class="shell-result">
+            <span class="shell-result-return">Success</span>
+            <span class="shell-result-ms">5371ms</span>
+          </span>
+        </li>-->
+        <li>
+          <div class="shell-prompt"><%= current_user.login %> $</div>
+          <input id="shell-command-input" class="shell-command" type="text"></input>
+        </li>
+      </ul>
+    </div>
+  <% end %>
 
   <div id="content-top">
     <div id="content-tabs">
