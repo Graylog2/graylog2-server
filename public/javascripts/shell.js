@@ -108,11 +108,18 @@ var Interpreter = new function() {
   }
 
   var validate = function(what) {
-    console.log(what.target);
+    console.log(what);
+
     // Validate target.
     allowed_targets = [ "all", "streams" ];
     if (what.target == null || $.inArray(what.target, allowed_targets) == -1) {
       return "Invalid target";
+    }
+
+    // Validate type.
+    allowed_types = [ "count", "find", "distinct" ];
+    if (what.type == null || $.inArray(what.type, allowed_types) == -1) {
+      return "Invalid type"
     }
 
     // All validations passed.
@@ -143,16 +150,29 @@ var Parser = new function() {
 
     return {
       target: target(),
-      type: "count",
-      parameters: [
-        [ "_http_response_code", "200" ],
-        [ "_http_verb", "GET" ]
-      ]
+      type: type(),
+      //parameters: [
+      //  [ "_http_response_code", "200" ],
+      //  [ "_http_verb", "GET" ]
+      //]
+      parameters: parameters()
     }
   }
 
   var target = function() {
     return extract(/^(.+?)\./);
+  }
+
+  var type = function() {
+    return extract(/^.+\.(.+?)\(/);
+  }
+
+  var parameters = function() {
+    ps = extract(/\((.+)\)/);
+    if (ps[0] != null) {
+      // XXX continue here XXX XXX cut and trim parameters
+    }
+    return ps;
   }
 
   var extract = function(regex) {
