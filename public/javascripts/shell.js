@@ -2,12 +2,12 @@
 
 $(document).ready(function(){
 
-  shell.init();
-  shell.listen();
+  Shell.init();
+  Shell.listen();
 
 });
 
-var shell = new function() {
+var Shell = new function() {
 
   this.init = function() {
     _cmd = $("#shell-command-input");
@@ -25,7 +25,7 @@ var shell = new function() {
     _cmd.bind('keypress', function(e) {
       var code = (e.keyCode ? e.keyCode : e.which);
       if(code == 13) { // "Enter" key
-        render_result(interpreter.cmd(_cmd.val()));
+        render_result(Interpreter.cmd(_cmd.val()));
         eternalize(); // Move command out of input into static text.
         new_cmd();
         return false;
@@ -34,10 +34,8 @@ var shell = new function() {
   }
 
   var resize_cmd = function() {
-    margin_left = 20;
     container_width = parseInt($('#shell-container').css('width'));
-    _cmd.css("width", container_width-_uprompt.width()-margin_left-20);
-    _cmd.css("margin-left", margin_left);
+    _cmd.css("width", container_width-_uprompt.width()-30);
   }
 
   var eternalize = function() {
@@ -47,10 +45,11 @@ var shell = new function() {
 
   var new_cmd = function() {
     prompt_html = "<span class=\"shell-prompt\">" + $(".shell-prompt").first().html() + "</span>";
-    new_line(prompt_html + " <input id=\"shell-command-input\" class=\"shell-command\" type=\"text\"></input>");
+    new_line(prompt_html + " <input id=\"shell-command-input\" class=\"shell-command\" type=\"text\" spellcheck=\"false\"></input>");
     _cmd = $("#shell-command-input"); // XXX fuckery
     resize_cmd();
     _cmd.focus();
+    Shell.listen();
   }
 
   var render_result = function(res) {
@@ -84,10 +83,29 @@ var shell = new function() {
 
 }
 
-var interpreter = new function() {
+var Interpreter = new function() {
 
-  this.cmd = function(cmd) {
-    return error("fuck this shit");
+  this.cmd = function(command) {
+    var _parsed_cmd = Parser.parse(command);
+
+    if ((err = validate(_parsed_cmd)) != true) {
+      return error(err);
+    }
+
+    allowed_types = [ "find", "count", "distinct" ];
+
+    return success();
+  }
+
+  var validate = function(what) {
+    // Validate target.
+    allowed_targets = [ "find", "count", "distinct" ];
+    if (what.target == null || !$.inArray(what.target, allowed_targets)) {
+      return "Invalid target";
+    }
+
+    // All validations passed.
+    return true;
   }
 
   var error = function(reason) {
@@ -103,6 +121,37 @@ var interpreter = new function() {
       ms: 251,
       content: result
     }
+  }
+
+}
+
+var Parser = new function() {
+  
+  this.parse = function(command) {
+    _command = command;
+
+    return {
+      target: target(),
+      type: "count",
+      parameters: [
+        [ "_http_response_code", "200" ],
+        [ "_http_verb", "GET" ]
+      ]
+    }
+  }
+
+  var target = function() {
+    return extract(/^(.+?)\./);
+  }
+
+  var extract = function(regex) {
+    x = _command.match(regex);
+    
+    if(x == null || x[1] == null) {
+      return null
+    }
+    
+    return x;
   }
 
 }

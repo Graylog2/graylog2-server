@@ -82,16 +82,9 @@
   <% if @has_shell %>
     <div id="shell-container">
       <ul id="shell">
-        <!--<li><span class="shell-prompt">lennart $</span> <span class="shell-command">a.distinct('oauth_consumer_key')</span></li>
         <li>
-          <span class="shell-result">
-            <span class="shell-result-return">Success</span>
-            <span class="shell-result-ms">5371ms</span>
-          </span>
-        </li>-->
-        <li>
-          <div class="shell-prompt"><%= current_user.login %> $</div>
-          <input id="shell-command-input" class="shell-command" type="text"></input>
+          <span class="shell-prompt"><%= current_user.login %> #</span>
+          <input id="shell-command-input" class="shell-command" type="text" spellcheck="false"></input>
         </li>
       </ul>
     </div>
