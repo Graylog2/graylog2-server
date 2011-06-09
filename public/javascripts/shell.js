@@ -92,15 +92,14 @@ var Interpreter = new function() {
       return error(err);
     }
 
-    allowed_types = [ "find", "count", "distinct" ];
-
     return success();
   }
 
   var validate = function(what) {
+    console.log(what.target);
     // Validate target.
-    allowed_targets = [ "find", "count", "distinct" ];
-    if (what.target == null || !$.inArray(what.target, allowed_targets)) {
+    allowed_targets = [ "all", "streams" ];
+    if (what.target == null || $.inArray(what.target, allowed_targets) == -1) {
       return "Invalid target";
     }
 
@@ -151,7 +150,7 @@ var Parser = new function() {
       return null
     }
     
-    return x;
+    return x[1];
   }
 
 }
