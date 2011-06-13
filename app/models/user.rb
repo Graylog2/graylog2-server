@@ -29,7 +29,6 @@ class User
   field :email, :type => String
   field :name, :type => String
   field :password, :type => String
-  field :password_confirmation, :type => String
   field :role, :type => String
   field :crypted_password, :type => String
   field :salt, :type => String
