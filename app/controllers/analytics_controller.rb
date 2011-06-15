@@ -8,18 +8,19 @@ class AnalyticsController < ApplicationController
   def shell
     render_error("Empty input.") and return if params[:cmd].blank?
     
+    result = String.new
+    shell = Shell.new(params[:cmd])
+
     time = Benchmark.realtime do
-      100000.times do
-        puts "LOL"
-      end
+      result = shell.compute
     end
 
     ms = sprintf("%#.2f", time*1000);
 
-
-    render_success(ms, "IMPLEMENT ME!") and return
-  rescue
-    render_error("Internal error.");
+    render_success(ms, result) and return
+  rescue => e
+    logger.warn("Error while computing shell command: " + e.to_s + e.backtrace.join("\n"))
+    render_error("Internal error.")
   end
 
   private
