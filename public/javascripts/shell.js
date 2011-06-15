@@ -1,5 +1,5 @@
 // ZOMG my JS sucks but I don't care
-
+  
 $(document).ready(function(){
 
   Shell.init();
@@ -32,12 +32,51 @@ var Shell = new function() {
           return false;
         }
 
-        render_result(Interpreter.cmd(_cmd.val()));
-        eternalize(); // Move command out of input into static text.
-        new_cmd();
+        process(_cmd.val());
         return false;
       }
     });
+  }
+
+  var process = function(cmd) {
+    waiting_line();
+    _cmd.attr("disabled", "disabled");
+
+    $.ajax({
+      type: "POST",
+      url: "analytics/shell",
+      data: { cmd : cmd },
+      success: function(data) {
+        result = eval('(' + data + ')');
+        if (result.code == "success") {
+          render_result(success(result.ms, result.content));
+        } else {
+          render_result(error(result.reason));
+        }
+        
+        eternalize(); // Move command out of input into static text.
+      },
+      error: function(data) {
+        render_result(error("Internal error."));
+        
+        eternalize(); // Move command out of input into static text.
+      }
+    });
+  }
+
+  var error = function(reason) {
+    return {
+      code: "error",
+      reason: reason
+    }
+  }
+
+  var success = function(ms, content) {
+    return {
+      code: "success",
+      ms: result.ms,
+      content: result.content
+    }
   }
 
   var resize_cmd = function() {
@@ -46,11 +85,13 @@ var Shell = new function() {
   }
 
   var eternalize = function() {
-    _cmd.attr("disabled", "disabled");
     _cmd.removeAttr("id");
+
+    new_cmd();
   }
 
   var new_cmd = function() {
+    $(".shell-wait").remove();
     prompt_html = "<span class=\"shell-prompt\">" + $(".shell-prompt").first().html() + "</span>";
     new_line(prompt_html + " <input id=\"shell-command-input\" class=\"shell-command\" type=\"text\" spellcheck=\"false\"></input>");
     _cmd = $("#shell-command-input"); // XXX fuckery
@@ -59,7 +100,16 @@ var Shell = new function() {
     Shell.listen();
   }
 
+  var waiting_line = function() {
+    new_line("<li class=\"shell-wait\"><img src=\"images/loading-shell.gif\" /> Calculating</li>");
+  }
+
   var render_result = function(res) {
+    if (res == undefined) {
+      output("Internal error - Undefined result.");
+      return;
+    }
+
     if (res.code == "success") {
       output("Completed in " + res.ms + "ms");
     } else {
@@ -91,98 +141,6 @@ var Shell = new function() {
     }
 
     return i;
-  }
-
-}
-
-var Interpreter = new function() {
-
-  this.cmd = function(command) {
-    var _parsed_cmd = Parser.parse(command);
-
-    if ((err = validate(_parsed_cmd)) != true) {
-      return error(err);
-    }
-
-    return success();
-  }
-
-  var validate = function(what) {
-    console.log(what);
-
-    // Validate target.
-    allowed_targets = [ "all", "streams" ];
-    if (what.target == null || $.inArray(what.target, allowed_targets) == -1) {
-      return "Invalid target";
-    }
-
-    // Validate type.
-    allowed_types = [ "count", "find", "distinct" ];
-    if (what.type == null || $.inArray(what.type, allowed_types) == -1) {
-      return "Invalid type"
-    }
-
-    // All validations passed.
-    return true;
-  }
-
-  var error = function(reason) {
-    return {
-      code: "error",
-      reason: reason
-    };
-  }
-
-  var success = function(result) {
-    return {
-      code: "success",
-      ms: 251,
-      content: result
-    }
-  }
-
-}
-
-var Parser = new function() {
-  
-  this.parse = function(command) {
-    _command = command;
-
-    return {
-      target: target(),
-      type: type(),
-      //parameters: [
-      //  [ "_http_response_code", "200" ],
-      //  [ "_http_verb", "GET" ]
-      //]
-      parameters: parameters()
-    }
-  }
-
-  var target = function() {
-    return extract(/^(.+?)\./);
-  }
-
-  var type = function() {
-    return extract(/^.+\.(.+?)\(/);
-  }
-
-  var parameters = function() {
-    ps = extract(/\((.+)\)/);
-    if (ps[0] != null) {
-      // XXX continue here XXX XXX cut and trim parameters
-    }
-    return ps;
-  }
-
-  var extract = function(regex) {
-    x = _command.match(regex);
-    
-    if(x == null || x[1] == null) {
-      return null
-    }
-    
-    return x[1];
   }
 
 }

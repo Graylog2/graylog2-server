@@ -105,6 +105,7 @@ Graylog2WebInterface::Application.routes.draw do
 
   resource :analytics do
     get :index
+    post :shell
   end
 
   resources :versioncheck do

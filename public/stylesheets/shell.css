@@ -31,3 +31,13 @@
 .shell-prompt {
   font-weight: bold;
 }
+
+.shell-wait img {
+  position: relative;
+  top: 3px;
+}
+
+.shell-wait {
+  position: relative;
+  top: -3px;
+}

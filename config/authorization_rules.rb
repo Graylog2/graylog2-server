@@ -40,7 +40,7 @@ authorization do
 
     has_permission_on :forwarders, :to => [:create, :destroy]
 
-    has_permission_on :analytics, :to => [:index]
+    has_permission_on :analytics, :to => [:index, :shell]
 
     has_permission_on :hosts, :to => [:index, :show, :destroy, :quickjump]
     has_permission_on :hostgroups, :to => [
