@@ -26,9 +26,8 @@ var Shell = new function() {
       var code = (e.keyCode ? e.keyCode : e.which);
       if(code == 13) { // "Enter" key
 
-        // Empty line for empty input.
+        // Do nothing for empty input.
         if ($.trim(_cmd.val().trim()).length == 0) {
-          empty_line();
           return false;
         }
 
@@ -93,7 +92,7 @@ var Shell = new function() {
   var new_cmd = function() {
     $(".shell-wait").remove();
     prompt_html = "<span class=\"shell-prompt\">" + $(".shell-prompt").first().html() + "</span>";
-    new_line(prompt_html + " <input id=\"shell-command-input\" class=\"shell-command\" type=\"text\" spellcheck=\"false\"></input>");
+    new_line("<li>" + prompt_html + " <input id=\"shell-command-input\" class=\"shell-command\" type=\"text\" spellcheck=\"false\"></input></li>");
     _cmd = $("#shell-command-input"); // XXX fuckery
     resize_cmd();
     _cmd.focus();
@@ -119,11 +118,6 @@ var Shell = new function() {
 
   var output = function(content) {
     new_line("<li>" + timestamp() + " - " + content + "</li>");
-  }
-
-  var empty_line = function() {
-    eternalize(); // Move command out of input into static text.
-    new_cmd();
   }
 
   var new_line = function(content) {
