@@ -111,9 +111,15 @@ var Shell = new function() {
 
     if (res.code == "success") {
       output("Completed in " + res.ms + "ms");
+
+      render_result_content(res);
     } else {
       output("Error: " + res.reason);
     }
+  }
+
+  var render_result_content = function(result) {
+    $("#content-inner").html(result.content);
   }
 
   var output = function(content) {
