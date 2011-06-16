@@ -28,8 +28,9 @@ class Shell
 
     return {
       :operation => @operator,
-      :result => @result
-    }.to_json
+      :result => @result,
+      :operator_options => @operator_options
+    }
   end
 
   private
@@ -53,12 +54,12 @@ class Shell
     string = @command.scan(/\..+\((.+?)\)/)[0][0]
     singles = string.split(",")
 
-    parsed = Array.new
+    parsed = Hash.new
     singles.each do |single|
       key = single.scan(/^(.+?)(\s|=)/)[0][0].strip
       value = typify_value(single.scan(/>(.+)$/)[0][0].strip)
 
-      parsed << { key => value }
+      parsed[key.to_s] = value
     end
 
     @operator_options = parsed
@@ -76,14 +77,22 @@ class Shell
     return String.new
   end
 
+  def mongofy(options)
+    criteria = Hash.new
+    options.each do |k,v|
+      criteria[k] = v
+    end
+
+    return criteria
+  end
+
   def validate
     raise InvalidSelectorException unless ALLOWED_SELECTORS.include?(@selector)
     raise InvalidOperatorException unless ALLOWED_OPERATORS.include?(@operator)
   end
 
-
   def perform_count
-    @result = Message.not_deleted.count
+    @result = Message.not_deleted.where(mongofy(@operator_options)).count
   end
 
 end
