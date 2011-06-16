@@ -57,7 +57,7 @@ class Shell
     parsed = Hash.new
     singles.each do |single|
       key = single.scan(/^(.+?)(\s|=)/)[0][0].strip
-      value = typify_value(single.scan(/>(.+)$/)[0][0].strip)
+      value = typify_value(single.scan(/=(.+)$/)[0][0].strip)
 
       parsed[key.to_s] = value
     end
@@ -80,10 +80,14 @@ class Shell
   def mongofy(options)
     criteria = Hash.new
     options.each do |k,v|
-      criteria[k] = v
+      criteria[k] = conditions(v)
     end
 
     return criteria
+  end
+
+  def conditions(v)
+    v
   end
 
   def validate
