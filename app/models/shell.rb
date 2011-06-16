@@ -9,6 +9,7 @@ class Shell
 
   ALLOWED_SELECTORS = %w(all stream streams)
   ALLOWED_OPERATORS = %w(count find distinct)
+  ALLOWED_CONDITIONALS = %w(>= <= > < = !=)
 
   attr_reader :command, :selector, :operator, :operator_options, :modifiers, :result
 
@@ -53,13 +54,24 @@ class Shell
   def parse_operator_options
     string = @command.scan(/\..+\((.+?)\)/)[0][0]
     singles = string.split(",")
-
+    
     parsed = Hash.new
     singles.each do |single|
-      key = single.scan(/^(.+?)(\s|=)/)[0][0].strip
-      value = typify_value(single.scan(/=(.+)$/)[0][0].strip)
+      key = single.scan(/^(.+?)(\s|#{ALLOWED_CONDITIONALS.join('|')})/)[0][0].strip
+      p_value = single.scan(/(#{ALLOWED_CONDITIONALS.join('|')})(.+)$/)
+      value = { :value => typify_value(p_value[0][1].strip), :condition => p_value[0][0].strip }
 
-      parsed[key.to_s] = value
+      # Avoid overwriting of same keys. Exampke (:_http_return_code >= 200, :_http_return_code < 300)
+      if parsed[key].blank?
+        # No double assignment.
+        parsed[key] = value # XXX OVERWRITE!
+      else
+        if parsed[key].is_a?(Array)
+          parsed[key] << value
+        else
+          parsed[key] = [ parsed[key], value ]
+        end
+      end
     end
 
     @operator_options = parsed
@@ -80,14 +92,39 @@ class Shell
   def mongofy(options)
     criteria = Hash.new
     options.each do |k,v|
-      criteria[k] = conditions(v)
+      puts "CONDITION ME: #{v.inspect}"
+      criteria[k] = mongo_conditionize(v)
+      puts "CONDITIONIZED: #{mongo_conditionize(v).inspect}"
     end
 
     return criteria
   end
 
-  def conditions(v)
-    v
+  def mongo_conditionize(v)
+    if v.is_a?(Hash)
+      raise InvalidOptionException if !ALLOWED_CONDITIONALS.include?(v[:condition])
+      
+      if v[:condition] == "="
+        return v[:value] # No special mongo treatment for = needed.
+      else
+        return { map_mongo_condition(v[:condition]) => v[:value] }
+      end
+    elsif v.is_a?(Array)
+    
+    else
+      raise InvalidOptionException
+    end
+  end
+
+  def map_mongo_condition(c)
+    case c
+      when ">=" then return "$gte"
+      when "<=" then return "$lte"
+      when ">" then return "$gt"
+      when "<" then return "$lt"
+      when "!=" then return "$ne"
+      else raise InvalidOptionException
+    end
   end
 
   def validate
