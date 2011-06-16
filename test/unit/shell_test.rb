@@ -17,21 +17,46 @@ class ShellTest < ActiveSupport::TestCase
     should "parse operator options" do
       s = Shell.new('all.find(_http_response_code = 500, host = "example.org")')
       expected = Hash.new
-      expected["_http_response_code"] = 500
-      expected["host"] = "example.org"
+      expected["_http_response_code"] = { :value => 500, :condition => "=" }
+      expected["host"] =  { :value => "example.org", :condition => "=" }
+      assert_equal expected, s.operator_options
+    end
+
+    should "not overwrite multiple operator options of the same type" do
+      s = Shell.new('all.find(foo > 500, foo < 600, foo >= 700)') # i know, these conditions do not make sense
+      expected = Hash.new
+      expected["foo"] = Array.new
+      expected["foo"] << { :value => 500, :condition => ">" }
+      expected["foo"] << { :value => 600, :condition => "<" }
+      expected["foo"] << { :value => 700, :condition => ">=" }
       assert_equal expected, s.operator_options
     end
 
     should "respect conditional operators" do
-      #3.times { Message.make(:host => "example.org", :_http_response_code => 500) }
-      #7.times { Message.make(:host => "example.com", :_http_response_code => 500) }
-      #8.times { Message.make(:host => "example.org", :_http_response_code => 200) }
+      3.times { Message.make(:host => "example.org", :_http_response_code => 500) }
+      7.times { Message.make(:host => "example.com", :_http_response_code => 500) }
+      8.times { Message.make(:host => "example.com", :_http_response_code => 200) }
+      10.times { Message.make(:host => "example.com", :_http_response_code => 201) }
+      1.times { Message.make(:host => "example.com", :_http_response_code => 300) }
 
-      #s = Shell.new('all.count(host !=> "example.org", _http_response_code => 500)')
-      #result = s.compute
+      s = Shell.new('all.count(host != "example.org", _http_response_code < 400, _http_response_code >= 300)')
+      result = s.compute
       
-      #assert_equal "count", result[:operation]
-      #assert_equal 3, result[:result]
+      assert_equal "count", result[:operation]
+      assert_equal 18, result[:result]
+   end
+
+    should "TEST" do
+      3.times { Message.make(:host => "example.org", :_http_response_code => 500) }
+      3.times { Message.make(:host => "example.org", :_http_response_code => 550) }
+      3.times { Message.make(:host => "example.org", :_http_response_code => 600) }
+
+      c = {
+        :_http_response_code => { "$lte" => 600, "$gte" => 550 }
+      }
+      res = Message.where(c).count
+
+      puts "RESULT: #{res}"
     end
 
     should "throw exception for not allowed selector" do
