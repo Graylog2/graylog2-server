@@ -37,7 +37,7 @@ class AnalyticsController < ApplicationController
     res = {
       :code => "success",
       :ms => ms,
-      :content => content
+      :content => content.to_json
     }
 
     render :text => res.to_json
