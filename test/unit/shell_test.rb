@@ -31,7 +31,7 @@ class ShellTest < ActiveSupport::TestCase
       expected["foo"] << { :value => 700, :condition => ">=" }
       assert_equal expected, s.operator_options
     end
-
+    
     should "respect conditional operators" do
       3.times { Message.make(:host => "example.org", :_http_response_code => 500) }
       7.times { Message.make(:host => "example.com", :_http_response_code => 500) }
@@ -39,24 +39,36 @@ class ShellTest < ActiveSupport::TestCase
       10.times { Message.make(:host => "example.com", :_http_response_code => 201) }
       1.times { Message.make(:host => "example.com", :_http_response_code => 300) }
 
-      s = Shell.new('all.count(host != "example.org", _http_response_code < 400, _http_response_code >= 300)')
+      s = Shell.new('all.count(host != "example.org", _http_response_code < 300, _http_response_code >= 200)')
       result = s.compute
       
       assert_equal "count", result[:operation]
       assert_equal 18, result[:result]
-   end
+    end
 
-    should "TEST" do
-      3.times { Message.make(:host => "example.org", :_http_response_code => 500) }
-      3.times { Message.make(:host => "example.org", :_http_response_code => 550) }
-      3.times { Message.make(:host => "example.org", :_http_response_code => 600) }
+    should "work with different conditional operators on the same key" do
+      5.times { Message.make(:_foo => 1) }
+      2.times { Message.make(:_foo => 2) }
+      2.times { Message.make(:_foo => 3) }
+      2.times { Message.make(:_foo => 4) }
 
-      c = {
-        :_http_response_code => { "$lte" => 600, "$gte" => 550 }
-      }
-      res = Message.where(c).count
+      s = Shell.new('all.count(_foo > 0, _foo != 3, _foo != 4)')
+      result = s.compute
+      
+      assert_equal "count", result[:operation]
+      assert_equal 7, result[:result]
+    end
 
-      puts "RESULT: #{res}"
+    should "work with regex operator options" do
+      5.times { Message.make(:host => "example.org") }
+      5.times { Message.make(:host => "example.com") }
+      5.times { Message.make(:host => "foo.example.com") }
+
+      s = Shell.new('all.count(host = /^example\.(org|com)$/)')
+      result = s.compute
+
+      assert_equal "count", result[:operation]
+      assert_equal 10, result[:result]
     end
 
     should "throw exception for not allowed selector" do
