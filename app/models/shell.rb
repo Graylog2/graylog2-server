@@ -52,10 +52,9 @@ class Shell
   end
 
   def parse_operator_options
-puts @command.inspect
-    string = @command.scan(/\..+\((.+?)\)/)[0][0]
+    string = @command.scan(/\((.+)\)/)[0][0]
     singles = string.split(",")
-puts singles.inspect
+    
     parsed = Hash.new
     singles.each do |single|
       key = single.scan(/^(.+?)(\s|#{ALLOWED_CONDITIONALS.join('|')})/)[0][0].strip
@@ -84,7 +83,6 @@ puts singles.inspect
     if option.start_with?('"') and option.end_with?('"')
       return option[1..-2]
     elsif option.start_with?("/") and option.end_with?("/")
-puts "REGEXXXXX"
       # lol, regex
       return /#{option[1..-2]}/
     else
@@ -97,9 +95,7 @@ puts "REGEXXXXX"
   def mongofy(options)
     criteria = Hash.new
     options.each do |k,v|
-      puts "CONDITION ME: #{v.inspect}"
       criteria[k] = mongo_conditionize(v)
-      puts "CONDITIONIZED: #{mongo_conditionize(v).inspect}"
     end
 
     return criteria
