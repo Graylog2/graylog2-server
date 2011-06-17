@@ -22,6 +22,19 @@ class ShellTest < ActiveSupport::TestCase
       assert_equal expected, s.operator_options
     end
 
+    should "accept negative integers in option values" do
+      3.times { Message.make(:_foo => -9001) }
+      1.times { Message.make(:_foo => 9001) }
+      1.times { Message.make(:_foo => 5000) }
+      1.times { Message.make(:_foo => 0) }
+
+      s = Shell.new('all.count(_foo = -9001)')
+      result = s.compute
+      
+      assert_equal "count", result[:operation]
+      assert_equal 3, result[:result]
+    end
+
     should "not overwrite multiple operator options of the same type" do
       s = Shell.new('all.find(foo > 500, foo < 600, foo >= 700)') # i know, these conditions do not make sense
       expected = Hash.new
