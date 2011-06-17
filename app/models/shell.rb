@@ -52,19 +52,20 @@ class Shell
   end
 
   def parse_operator_options
+puts @command.inspect
     string = @command.scan(/\..+\((.+?)\)/)[0][0]
     singles = string.split(",")
-    
+puts singles.inspect
     parsed = Hash.new
     singles.each do |single|
       key = single.scan(/^(.+?)(\s|#{ALLOWED_CONDITIONALS.join('|')})/)[0][0].strip
       p_value = single.scan(/(#{ALLOWED_CONDITIONALS.join('|')})(.+)$/)
       value = { :value => typify_value(p_value[0][1].strip), :condition => p_value[0][0].strip }
 
-      # Avoid overwriting of same keys. Exampke (:_http_return_code >= 200, :_http_return_code < 300)
+      # Avoid overwriting of same keys. Exampke (_http_return_code >= 200, _http_return_code < 300)
       if parsed[key].blank?
         # No double assignment.
-        parsed[key] = value # XXX OVERWRITE!
+        parsed[key] = value
       else
         if parsed[key].is_a?(Array)
           parsed[key] << value
@@ -82,6 +83,10 @@ class Shell
   def typify_value(option)
     if option.start_with?('"') and option.end_with?('"')
       return option[1..-2]
+    elsif option.start_with?("/") and option.end_with?("/")
+puts "REGEXXXXX"
+      # lol, regex
+      return /#{option[1..-2]}/
     else
       return option.to_i
     end
@@ -110,7 +115,20 @@ class Shell
         return { map_mongo_condition(v[:condition]) => v[:value] }
       end
     elsif v.is_a?(Array)
-    
+      conditions = Hash.new
+      v.each do |condition|
+        # Return if there is a = condition as this can't be combined with other conditions.
+        if condition[:condition] == "="
+          return condition[:value] # No special mongo treatment for = needed.
+        elsif condition[:condition] == "!=" # This needs special treatment with $nin mongo operator.
+          conditions["$nin"] = Array.new if conditions["$nin"].blank?
+          conditions["$nin"] << condition[:value]
+        else
+          conditions[map_mongo_condition(condition[:condition])] = condition[:value]
+        end
+      end
+
+      return conditions
     else
       raise InvalidOptionException
     end
@@ -133,6 +151,7 @@ class Shell
   end
 
   def perform_count
+    puts "ZOMG FINAL MONGO OPTIONS: #{mongofy(@operator_options).inspect}"
     @result = Message.not_deleted.where(mongofy(@operator_options)).count
   end
 
