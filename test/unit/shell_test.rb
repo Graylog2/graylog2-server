@@ -98,6 +98,63 @@ class ShellTest < ActiveSupport::TestCase
     
   end
 
+  context "stream selectors" do
+
+    should "correctly parse stream selector" do
+      s = Shell.new('stream(4dadf47c96d3ad76db000002).count()')
+      assert_equal "stream", s.selector
+      assert_equal ["4dadf47c96d3ad76db000002"], s.stream_narrows
+      assert_equal "count", s.operator
+    end
+    
+    should "correctly parse streams selector" do
+      s = Shell.new('streams(4dadf47c96d3ad76db000002, 4dadf47c96d3ad76db000003).count()')
+      assert_equal "streams", s.selector
+      assert_equal ["4dadf47c96d3ad76db000002", "4dadf47c96d3ad76db000003"], s.stream_narrows
+      assert_equal "count", s.operator
+    end
+
+    should "correctly parse streams selector with only one stream" do
+      s = Shell.new('streams(4dadf47c96d3ad76db000002).count()')
+      assert_equal "streams", s.selector
+      assert_equal ["4dadf47c96d3ad76db000002"], s.stream_narrows
+      assert_equal "count", s.operator
+    end
+
+    should "work with stream selector" do
+      wrong_stream_id = BSON::ObjectId.new
+      correct_stream_id = BSON::ObjectId.new
+
+      5.times { Message.make() }
+      2.times { Message.make(:streams => wrong_stream_id) }
+      3.times { Message.make(:streams => correct_stream_id) }
+
+      s = Shell.new("stream(#{correct_stream_id}).count()")
+      result = s.compute
+
+      assert_equal 3, result[:result]
+      assert_equal "count", s.operator
+    end
+    
+    should "work with streams selector" do
+      wrong_stream_id = BSON::ObjectId.new
+      correct_stream_ids = [BSON::ObjectId.new, BSON::ObjectId.new]
+
+      5.times { Message.make() }
+      2.times { Message.make(:streams => wrong_stream_id) }
+      3.times { Message.make(:streams => correct_stream_ids[0]) }
+      4.times { Message.make(:streams => correct_stream_ids[1]) }
+      1.times { Message.make(:streams => correct_stream_ids) }
+
+      s = Shell.new("stream(#{correct_stream_ids.join(',')}).count()")
+      result = s.compute
+
+      assert_equal 8, result[:result]
+      assert_equal "count", s.operator
+    end
+
+  end
+
   context "counting" do
 
     should "count all with no options" do

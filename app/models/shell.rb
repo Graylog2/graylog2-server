@@ -11,7 +11,7 @@ class Shell
   ALLOWED_OPERATORS = %w(count find distinct)
   ALLOWED_CONDITIONALS = %w(>= <= > < = !=)
 
-  attr_reader :command, :selector, :operator, :operator_options, :modifiers, :result
+  attr_reader :command, :selector, :operator, :operator_options, :stream_narrows, :modifiers, :mongo_selector, :result
 
   def initialize(cmd)
     @command = cmd
@@ -30,7 +30,8 @@ class Shell
     return {
       :operation => @operator,
       :result => @result,
-      :operator_options => @operator_options
+      :operator_options => @operator_options,
+      :mongo_selector => @mongo_selector
     }
   end
 
@@ -39,16 +40,33 @@ class Shell
     parse_selector
     parse_operator
     parse_operator_options
-
+    
     validate
+
+    if selector == "stream" or selector == "streams"
+      parse_stream_narrows
+    end
+
   end
 
   def parse_selector
-    @selector = @command.scan(/^(.+?)\./)[0][0]
+    return @selector = @command.scan(/^(.+?)(\.|\()/)[0][0]
   end
 
   def parse_operator
-    @operator = @command.scan(/\.(.+?)\(/)[0][0]
+    return @operator = @command.scan(/\.(.+?)\(/)[0][0]
+  end
+
+  def parse_stream_narrows
+    string = @command.scan(/^streams?\((.+?)\)/)[0][0]
+    streams = string.split(",")
+
+    parsed = Array.new
+    streams.each do |stream|
+      parsed << stream.strip
+    end
+
+    @stream_narrows = parsed
   end
 
   def parse_operator_options
@@ -92,10 +110,29 @@ class Shell
     return String.new
   end
 
-  def mongofy(options)
+  def mongofy_options(options)
     criteria = Hash.new
     options.each do |k,v|
       criteria[k] = mongo_conditionize(v)
+    end
+
+    return criteria
+  end
+
+  def mongofy_stream_narrows(streams)
+    return nil if streams.blank?
+
+    criteria = Hash.new
+
+    if streams.count == 1
+      criteria = { :streams => BSON::ObjectId(streams[0]) }
+    else
+      stream_arr = Array.new
+      streams.each do |stream|
+        stream_arr << BSON::ObjectId(stream)
+      end
+      
+      criteria = { :streams => { "$in" => stream_arr } }
     end
 
     return criteria
@@ -147,8 +184,10 @@ class Shell
   end
 
   def perform_count
-    puts "ZOMG FINAL MONGO OPTIONS: #{mongofy(@operator_options).inspect}"
-    @result = Message.not_deleted.where(mongofy(@operator_options)).count
+    criteria = Message.not_deleted.where(mongofy_options(@operator_options)).where(mongofy_stream_narrows(@stream_narrows))
+    @mongo_selector = criteria.selector
+puts "ZOMG FINAL COUNT CRITERIA: #{@mongo_selector}"
+    @result = criteria.count
   end
 
 end
