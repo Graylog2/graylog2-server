@@ -11,7 +11,7 @@ class Shell
   ALLOWED_OPERATORS = %w(count find distinct)
   ALLOWED_CONDITIONALS = %w(>= <= > < = !=)
 
-  attr_reader :command, :selector, :operator, :operator_options, :stream_narrows, :modifiers, :mongo_selector, :result
+  attr_reader :command, :selector, :operator, :operator_options, :stream_narrows, :modifiers, :result, :mongo_selector
 
   def initialize(cmd)
     @command = cmd
@@ -26,6 +26,8 @@ class Shell
       when "distinct" then perform_distinct
       else raise InvalidOperatorException
     end
+
+    @mongo_selector = criteria.selector
 
     return {
       :operation => @operator,
@@ -183,11 +185,16 @@ class Shell
     raise InvalidOperatorException unless ALLOWED_OPERATORS.include?(@operator)
   end
 
+  def criteria
+    Message.not_deleted.where(mongofy_options(@operator_options)).where(mongofy_stream_narrows(@stream_narrows))
+  end
+
   def perform_count
-    criteria = Message.not_deleted.where(mongofy_options(@operator_options)).where(mongofy_stream_narrows(@stream_narrows))
-    @mongo_selector = criteria.selector
-puts "ZOMG FINAL COUNT CRITERIA: #{@mongo_selector}"
     @result = criteria.count
+  end
+
+  def perform_find
+    @result = criteria.all
   end
 
 end
