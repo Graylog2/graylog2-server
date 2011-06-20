@@ -10,6 +10,7 @@ class Shell
   ALLOWED_SELECTORS = %w(all stream streams)
   ALLOWED_OPERATORS = %w(count find distinct)
   ALLOWED_CONDITIONALS = %w(>= <= > < = !=)
+  ALLOWED_OPTIONS = %w(limit offset query)
 
   attr_reader :command, :selector, :operator, :operator_options, :stream_narrows, :modifiers, :result, :mongo_selector
 
@@ -42,6 +43,7 @@ class Shell
     parse_selector
     parse_operator
     parse_operator_options
+    parse modifiers
     
     validate
 
@@ -72,9 +74,14 @@ class Shell
   end
 
   def parse_operator_options
-    string = @command.scan(/\((.+)\)/)[0][0]
+    string = @command.scan(/\.(#{ALLOWED_OPERATORS.join('|')})\((.+)\)/)
+
+    if string.blank?
+      return Array.new
+    end
+
+    string = string[0][1]
     singles = string.split(",")
-    
     parsed = Hash.new
     singles.each do |single|
       key = single.scan(/^(.+?)(\s|#{ALLOWED_CONDITIONALS.join('|')})/)[0][0].strip
@@ -95,8 +102,13 @@ class Shell
     end
 
     @operator_options = parsed
-  rescue
-    @operator_options = Array.new
+  rescue => e
+    Rails.logger.error "Could not parse operator options: #{e.message + e.backtrace.join("\n")}"
+    raise InvalidOperatorException
+  end
+
+  def parse_modifiers # \.(limit|offset|query)\((.+?)\)
+  
   end
 
   def typify_value(option)
@@ -114,8 +126,10 @@ class Shell
 
   def mongofy_options(options)
     criteria = Hash.new
-    options.each do |k,v|
-      criteria[k] = mongo_conditionize(v)
+    unless options.blank?
+      options.each do |k,v|
+        criteria[k] = mongo_conditionize(v)
+      end
     end
 
     return criteria
