@@ -84,6 +84,20 @@ class ShellTest < ActiveSupport::TestCase
       assert_equal 10, result[:result]
     end
 
+    should "parse modifiers" do
+      s = Shell.new('stream(423423423).find(host = /^ba.\.example.(com|org)/, _foo > 10).limit(10).query(foo > 5, bar >= "baz").offset(5)')
+      result = s.compute
+
+      assert_equal "find", result[:operation]
+      assert_equal [ :limit => 10, :query => 'foo > 5, bar >= "baz"', :offset => 5 } ], s.modifiers
+    end
+
+    should "parse modifiers with all selector" do
+    end
+
+    should "parse single selector" do
+    end
+
     should "throw exception for not allowed selector" do
       assert_raise InvalidSelectorException do
         Shell.new('nothing.find(_http_response_code = 500, host = "example.org")')
@@ -291,7 +305,19 @@ class ShellTest < ActiveSupport::TestCase
     end
     
     should "find in a stream with options" do
+      correct_stream_id = BSON::ObjectId.new
+      wrong_stream_id = BSON::ObjectId.new
+      4.times { Message.make(:host => "baz.example.org", :_foo => 12, :streams => correct_stream_id) }
+      3.times { Message.make(:host => "bar.example.com", :_foo => 9001, :streams => correct_stream_id) }
+      8.times { Message.make(:host => "bar.example.org", :_foo => 50, :streams => correct_stream_id) }
+      4.times { Message.make(:host => "foo.example.org", :_foo => 5, :streams => correct_stream_id) }
+      6.times { Message.make(:host => "baz.example.org", :_foo => 12, :streams => wrong_stream_id) }
 
+      s = Shell.new("stream(#{correct_stream_id}).find(host = /^ba.\.example.(com|org)/, _foo > 10)")
+      result = s.compute
+
+      assert_equal "find", result[:operation]
+      assert_equal 15, result[:result].count
     end
 
     should "find in streams with options" do
@@ -304,10 +330,8 @@ class ShellTest < ActiveSupport::TestCase
       2.times { Message.make(:host => "foo.example.org", :_foo => 5, :streams => correct_stream_ids[0]) }
       6.times { Message.make(:host => "baz.example.org", :_foo => 12, :streams => wrong_stream_id) }
 
-      s = Shell.new("stream(#{correct_stream_ids.join(',')}).find(host = /^ba.\.example.(com|org)/, _foo > 10)")
+      s = Shell.new("streams(#{correct_stream_ids.join(',')}).find(host = /^ba.\.example.(com|org)/, _foo > 10)")
       result = s.compute
-
-      puts s.mongo_selector
 
       assert_equal "find", result[:operation]
       assert_equal 11, result[:result].count
