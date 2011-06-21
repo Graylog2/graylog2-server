@@ -45,6 +45,9 @@ $(document).ready(function(){
             case '8':
                 field = $('.stream-value-severity-or-higher');
                 break;
+            case '9':
+                field = $('.stream-value-host-regex');
+                break;
         }
         field.removeAttr("disabled");
         field.show();

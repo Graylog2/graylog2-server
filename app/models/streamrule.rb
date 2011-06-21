@@ -18,11 +18,13 @@ class Streamrule
   TYPE_ADDITIONAL = 6
   TYPE_HOSTGROUP = 7
   TYPE_SEVERITY_OR_HIGHER = 8
+  TYPE_HOST_REGEX = 9
 
   def self.get_types_for_select_options(special = nil)
     {
       "Message (regex)" => self::TYPE_MESSAGE,
       "Host" => self::TYPE_HOST,
+      "Host (regex)" => self::TYPE_HOST_REGEX,
       "Hostgroup" => self::TYPE_HOSTGROUP,
       "Severity" => self::TYPE_SEVERITY,
       "Severity (or higher)" => self::TYPE_SEVERITY_OR_HIGHER,
