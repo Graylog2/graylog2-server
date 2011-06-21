@@ -57,6 +57,9 @@ public class StreamRuleMatcherFactory {
             case StreamRule.TYPE_SEVERITY_OR_HIGHER:
                 matcher = new SeverityOrHigherMatcher();
                 break;
+            case StreamRule.TYPE_HOST_REGEX:
+                matcher = new HostRegexMatcher();;
+                break;
             default:
                 throw new InvalidStreamRuleTypeException();
         }
