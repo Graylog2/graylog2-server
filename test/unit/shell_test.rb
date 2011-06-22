@@ -84,20 +84,6 @@ class ShellTest < ActiveSupport::TestCase
       assert_equal 10, result[:result]
     end
 
-    should "parse modifiers" do
-      s = Shell.new('stream(423423423).find(host = /^ba.\.example.(com|org)/, _foo > 10).limit(10).query(foo > 5, bar >= "baz").offset(5)')
-      result = s.compute
-
-      assert_equal "find", result[:operation]
-      assert_equal [ :limit => 10, :query => 'foo > 5, bar >= "baz"', :offset => 5 } ], s.modifiers
-    end
-
-    should "parse modifiers with all selector" do
-    end
-
-    should "parse single selector" do
-    end
-
     should "throw exception for not allowed selector" do
       assert_raise InvalidSelectorException do
         Shell.new('nothing.find(_http_response_code = 500, host = "example.org")')
@@ -335,6 +321,102 @@ class ShellTest < ActiveSupport::TestCase
 
       assert_equal "find", result[:operation]
       assert_equal 11, result[:result].count
+    end
+
+  end
+
+  context "distinction" do
+
+    should "distinct with no query options" do
+      4.times { Message.make(:host => "baz.example.org") }
+      3.times { Message.make(:host => "bar.example.com") }
+  
+      s = Shell.new("all.distinct({host})")
+      result = s.compute
+
+      assert_equal "distinct", result[:operation]
+      assert_equal ["baz.example.org", "bar.example.com"], result[:result]
+    end
+    
+    should "distinct with some query options" do
+      4.times { Message.make(:host => "baz.example.org", :_foo => "bar", :_something => "foo") }
+      3.times { Message.make(:host => "bar.example.com", :_foo => "bar", :_something => "foo") }
+      3.times { Message.make(:host => "foo.example.com", :_foo => "baz", :_something => "foo") }
+      3.times { Message.make(:host => "wat.example.com", :_foo => "baz", :_something => "bar") }
+  
+      s = Shell.new('all.distinct({host}, _foo = "bar", _something = "foo")')
+      result = s.compute
+
+      assert_equal "distinct", result[:operation]
+      assert_equal ["baz.example.org", "bar.example.com"], result[:result]
+    end
+
+    should "distinct with regex and one query option" do
+      4.times { Message.make(:host => "baz.example.org", :_foo => "bar") }
+      3.times { Message.make(:host => "example.com", :_foo => "bar") }
+      5.times { Message.make(:host => "foo.example.com", :_foo => "baz") }
+      
+      s = Shell.new('all.distinct({host}, _foo = "bar")')
+      result = s.compute
+      
+      assert_equal "distinct", result[:operation]
+      assert_equal ["baz.example.org", "example.com"], result[:result]
+    end
+    
+    should "distinct with regex query options" do
+      4.times { Message.make(:host => "baz.example.org", :_foo => "bar1") }
+      3.times { Message.make(:host => "example.com", :_foo => "bar1") }
+      5.times { Message.make(:host => "foo.example.com", :_foo => "baz") }
+      
+      s = Shell.new('all.distinct({host}, _foo = /^bar\d$/)')
+      result = s.compute
+      
+      assert_equal "distinct", result[:operation]
+      assert_equal ["baz.example.org", "example.com"], result[:result]
+    end
+
+    should "distinct with no query options on stream" do
+      correct_stream_id = BSON::ObjectId.new
+      wrong_stream_id = BSON::ObjectId.new
+      4.times { Message.make(:host => "baz.example.org", :streams => correct_stream_id) }
+      10.times { Message.make(:host => "not.example.org", :streams => wrong_stream_id) }
+      3.times { Message.make(:host => "bar.example.com", :streams => correct_stream_id) }
+  
+      s = Shell.new("stream(#{correct_stream_id}).distinct({host})")
+      result = s.compute
+
+      assert_equal "distinct", result[:operation]
+      assert_equal ["baz.example.org", "bar.example.com"], result[:result]
+    end
+    
+    should "distinct with one query option on stream" do
+      correct_stream_id = BSON::ObjectId.new
+      wrong_stream_id = BSON::ObjectId.new
+      4.times { Message.make(:host => "baz.example.org", :streams => correct_stream_id, :_foo => "bar") }
+      4.times { Message.make(:host => "foo.example.org", :streams => correct_stream_id, :_foo => "moo") }
+      10.times { Message.make(:host => "not.example.org", :streams => wrong_stream_id, :_foo => "bar" ) }
+      3.times { Message.make(:host => "bar.example.com", :streams => correct_stream_id, :_foo => "bar") }
+  
+      s = Shell.new("stream(#{correct_stream_id}).distinct({host}, _foo = \"bar\")")
+      result = s.compute
+
+      assert_equal "distinct", result[:operation]
+      assert_equal ["baz.example.org", "bar.example.com"], result[:result]
+    end
+    
+    should "distinct with no query options on streams" do
+      correct_stream_ids = [ BSON::ObjectId.new, BSON::ObjectId.new ]
+      wrong_stream_id = BSON::ObjectId.new
+      4.times { Message.make(:host => "baz.example.org", :streams => correct_stream_ids[0]) }
+      10.times { Message.make(:host => "not.example.org", :streams => wrong_stream_id) }
+      3.times { Message.make(:host => "bar.example.com", :streams => correct_stream_ids[1]) }
+      2.times { Message.make(:host => "foo.example.com", :streams => correct_stream_ids) }
+  
+      s = Shell.new("streams(#{correct_stream_ids.join(',')}).distinct({host})")
+      result = s.compute
+
+      assert_equal "distinct", result[:operation]
+      assert_equal ["baz.example.org", "bar.example.com", "foo.example.com"], result[:result]
     end
 
   end

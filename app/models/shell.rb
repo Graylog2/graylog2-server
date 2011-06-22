@@ -4,6 +4,8 @@ class InvalidOperatorException < RuntimeError
 end
 class InvalidOptionException < RuntimeError
 end
+class MissingDistinctTargetException < RuntimeError
+end
 
 class Shell
 
@@ -12,7 +14,7 @@ class Shell
   ALLOWED_CONDITIONALS = %w(>= <= > < = !=)
   ALLOWED_OPTIONS = %w(limit offset query)
 
-  attr_reader :command, :selector, :operator, :operator_options, :stream_narrows, :modifiers, :result, :mongo_selector
+  attr_reader :command, :selector, :operator, :operator_options, :distinct_target, :stream_narrows, :result, :mongo_selector
 
   def initialize(cmd)
     @command = cmd
@@ -43,7 +45,6 @@ class Shell
     parse_selector
     parse_operator
     parse_operator_options
-    parse_modifiers
     
     validate
 
@@ -84,11 +85,17 @@ class Shell
     singles = string.split(",")
     parsed = Hash.new
     singles.each do |single|
+      if single.start_with?("{") and single.end_with?("}")
+        # This is the distinct target.
+        @distinct_target = single[1..-2].strip
+        next
+      end
+
       key = single.scan(/^(.+?)(\s|#{ALLOWED_CONDITIONALS.join('|')})/)[0][0].strip
       p_value = single.scan(/(#{ALLOWED_CONDITIONALS.join('|')})(.+)$/)
       value = { :value => typify_value(p_value[0][1].strip), :condition => p_value[0][0].strip }
 
-      # Avoid overwriting of same keys. Exampke (_http_return_code >= 200, _http_return_code < 300)
+      # Avoid overwriting of same keys. Example (_http_return_code >= 200, _http_return_code < 300)
       if parsed[key].blank?
         # No double assignment.
         parsed[key] = value
@@ -105,10 +112,6 @@ class Shell
   rescue => e
     Rails.logger.error "Could not parse operator options: #{e.message + e.backtrace.join("\n")}"
     raise InvalidOperatorException
-  end
-
-  def parse_modifiers # \.(limit|offset|query)\((.+?)\)
-  
   end
 
   def typify_value(option)
@@ -209,6 +212,14 @@ class Shell
 
   def perform_find
     @result = criteria.all
+  end
+
+  def perform_distinct
+    if @distinct_target.blank?
+      raise MissingDistinctTargetException
+    end
+
+    @result = criteria.distinct(@distinct_target.to_sym)
   end
 
 end
