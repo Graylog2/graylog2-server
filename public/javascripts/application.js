@@ -201,24 +201,7 @@ $(document).ready(function(){
     });
 
     // Show full message in sidebar.
-    $(".message-row").bind("click", function() {
-      $("#gln").show();
-
-      $.post( relative_url_root + "/messages/" + $(this).attr("id") + "?partial=true", function(data) {
-        $("#sidebar-inner").html(data);
-
-        // Show sidebar if hidden.
-        if (!$("#main-right").is(":visible")) {
-          $("#main-left").animate({ width: '65%' }, 700, function() {
-
-            // Show sidebar when main body is completely squeezed.
-            $("#main-right").show();
-          });
-        }
-
-        $("#gln").hide();
-      });
-    });
+    bindMessageSidebarClicks();
 
     // User role settings in new user form.
     $("#user_role").bind("change", function() {
@@ -263,4 +246,24 @@ $(document).ready(function(){
 
 function buildHostCssId(id) {
   return "visuals-spread-hosts-" + id.replace(/=/g, '');
+}
+
+function bindMessageSidebarClicks() {
+  $(".message-row").bind("click", function() {
+    $("#gln").show();
+
+    $.post( relative_url_root + "/messages/" + $(this).attr("id") + "?partial=true", function(data) {
+      $("#sidebar-inner").html(data);
+
+      // Show sidebar if hidden.
+      if (!$("#main-right").is(":visible")) {
+        $("#main-left").animate({ width: '65%' }, 700, function() {
+          // Show sidebar when main body is completely squeezed.
+          $("#main-right").show();
+        });
+      }
+
+      $("#gln").hide();
+    });
+  });
 }

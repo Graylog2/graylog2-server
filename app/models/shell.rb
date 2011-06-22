@@ -14,6 +14,8 @@ class Shell
   ALLOWED_CONDITIONALS = %w(>= <= > < = !=)
   ALLOWED_OPTIONS = %w(limit offset query)
 
+  MAX_LIMIT = 500
+
   attr_reader :command, :selector, :operator, :operator_options, :distinct_target, :stream_narrows, :result, :mongo_selector
 
   def initialize(cmd)
@@ -211,7 +213,7 @@ class Shell
   end
 
   def perform_find
-    @result = criteria.all
+    @result = criteria.limit(MAX_LIMIT).all.to_a
   end
 
   def perform_distinct

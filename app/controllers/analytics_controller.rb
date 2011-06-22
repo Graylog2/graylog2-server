@@ -3,27 +3,37 @@ class AnalyticsController < ApplicationController
 
   def index
     @has_shell = true
+    @has_sidebar = true
   end
 
   def shell
     render_error("Empty input.") and return if params[:cmd].blank?
     
-    result = String.new
     shell = Shell.new(params[:cmd])
 
     time = Benchmark.realtime do
-      result = shell.compute
+      @result = shell.compute
     end
 
     ms = sprintf("%#.2f", time*1000);
 
-    render_success(ms, result) and return
+    html_result = render_to_string(decide_result_partial(@result[:operation]), :layout => false)
+
+    render_success(ms, html_result)
   rescue => e
     logger.warn("Error while computing shell command: " + e.to_s + e.backtrace.join("\n"))
     render_error("Internal error.")
   end
 
   private
+  def decide_result_partial(type)
+    case type
+      when "count" then return "_count_result"
+      when "find" then return "_find_result"
+      when "distinct" then return "_distinct_result"
+    end
+  end
+
   def render_error(reason)
     res = {
       :code => "error",
@@ -37,7 +47,7 @@ class AnalyticsController < ApplicationController
     res = {
       :code => "success",
       :ms => ms,
-      :content => content.to_json
+      :content => content
     }
 
     render :text => res.to_json

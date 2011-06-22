@@ -53,6 +53,8 @@ var Shell = new function() {
           render_result(error(result.reason));
         }
         
+        bindMessageSidebarClicks();
+
         eternalize(); // Move command out of input into static text.
       },
       error: function(data) {
