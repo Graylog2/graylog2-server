@@ -79,17 +79,6 @@
   <br style="clear: both;" />
   <div id="new-messages-bar" style="display: none;"></div>
 
-  <% if @has_shell %>
-    <div id="shell-container">
-      <ul id="shell">
-        <li>
-          <span class="shell-prompt"><%= current_user.login %> #</span>
-          <input id="shell-command-input" class="shell-command" type="text" spellcheck="false"></input>
-        </li>
-      </ul>
-    </div>
-  <% end %>
-
   <div id="content-top">
     <div id="content-tabs">
   <% (messages_tabs | hostgroup_tabs | stream_tabs).each do |tab| %>
@@ -101,6 +90,17 @@
 
  <% if @has_sidebar %>
   <div id='main-left'>
+  
+  <% if @has_shell %>
+    <div id="shell-container">
+      <ul id="shell">
+        <li>
+          <span class="shell-prompt"><%= current_user.login %> #</span>
+          <input id="shell-command-input" class="shell-command" type="text" spellcheck="false"></input>
+        </li>
+      </ul>
+    </div>
+  <% end %>
  <% end %>
 
   <div id="content" <%=raw @content_class.blank? ? '' : 'class="content-' + @content_class + '"' %>>
