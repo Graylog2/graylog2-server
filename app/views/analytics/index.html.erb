@@ -1,3 +1,52 @@
 <%= content_for :sidebar do %>
-  lol sidebar - hints and stuff here
+  <h2>The analytics shell</h2>
+
+  This shell allows you to query all messages in a structured
+  and dynamic way. The complete syntax description and examples
+  are documented in the
+  <%= link_to "Graylog2 wiki", "https://github.com/Graylog2/graylog2-web-interface/wiki/The-Analytics-shell", :target => "_blank" %>.
+
+  <br /><br />
+  <strong>Selectors</strong>
+  <ul class="analytics-shell-explanation">
+    <li>all</li>
+    <li>stream([stream_id])</li>
+    <li>streams([stream_id], [stream_id], ...)</li>
+  </ul>
+
+  <br />
+  <strong>Operators</strong>
+  <ul class="analytics-shell-explanation">
+    <li>find</li>
+    <li>count</li>
+    <li>distinct</li>
+  </ul>
+
+  <br />
+  <strong>Conditional operators</strong>
+  <ul class="analytics-shell-explanation">
+    <li>&lt;</li>
+    <li>&gt;</li>
+    <li>&lt;=</li>
+    <li>&gt;=</li>
+    <li>=</li>
+    <li>!=</li>
+  </ul>
+  
+  <br />
+  <strong>Data types</strong>
+  <ul class="analytics-shell-explanation">
+    <li>String: "something"</li>
+    <li>Regex: /^example\.(org|com)$/</li>
+    <li>Integer: 9001</li>
+  </ul>
+
+  <br />
+  Additional fields must be prefixed with an underscore. Find queries
+  are limited to <%= Shell::MAX_LIMIT %> results. Use the quickfiltering
+  if you need more and pagination.
+
+  <br><br />
+  <strong>Example:</strong>
+  all.count(facility = "clock", host = /^example\.(org|com)$/, _http_response_code = 204)
 <% end %>
