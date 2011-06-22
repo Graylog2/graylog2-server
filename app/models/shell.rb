@@ -43,7 +43,7 @@ class Shell
     parse_selector
     parse_operator
     parse_operator_options
-    parse modifiers
+    parse_modifiers
     
     validate
 
