@@ -97,7 +97,7 @@ class GELFClientHandlerBase {
             }
 
             // Add to message.
-            this.message.addAdditionalData(key, this.jsonToString(json.get(key)));
+            this.message.addAdditionalData(key, json.get(key));
         }
 
         return true;

@@ -54,7 +54,7 @@ public class GELFMessage {
     private String file = null;
     private int line = 0;
     private String facility = null;
-    private Map<String, String> additionalData = new HashMap<String, String>();
+    private Map<String, Object> additionalData = new HashMap<String, Object>();
     private List<Stream> streams = null;
     private boolean convertedFromSyslog = false;
     private double createdAt = 0;
@@ -213,16 +213,27 @@ public class GELFMessage {
      *
      * @return The whole additional data map.
      */
-    public Map<String, String> getAdditionalData() {
+    public Map<String, Object> getAdditionalData() {
         return this.additionalData;
     }
 
     /**
      * Add a key/value pair
      */
-    public void addAdditionalData(String key, String value) {
+    public void addAdditionalData(String key, Object value) {
         if (key != null && value != null) {
-            this.additionalData.put(key, value);
+
+            if (value instanceof Long) {
+                this.additionalData.put(key, (Long) value);
+                return;
+            }
+
+            if (value instanceof String) {
+                this.additionalData.put(key, (String) value);
+                return;
+            }
+
+            LOG.info("Skipping additional data field in not allowed format. Allowed: String or Integral");
         }
     }
     
@@ -342,12 +353,12 @@ public class GELFMessage {
 
         if (this.getAdditionalData().size() > 0) {
             // Add additional fields. XXX PERFORMANCE
-            Map<String,String> additionalFields = this.getAdditionalData();
+            Map<String,Object> additionalFields = this.getAdditionalData();
             Set<String> set = additionalFields.keySet();
             Iterator<String> iter = set.iterator();
             while(iter.hasNext()) {
                 String key = iter.next();
-                String value = additionalFields.get(key);
+                String value = (String) additionalFields.get(key);
                 msg += "," + key + "=" + value;
             }
         }

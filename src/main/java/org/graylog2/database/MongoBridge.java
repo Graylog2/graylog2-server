@@ -67,12 +67,12 @@ public class MongoBridge {
         dbObj.put("level", message.getLevel());
         
         // Add additional fields. XXX PERFORMANCE
-        Map<String,String> additionalFields = message.getAdditionalData();
+        Map<String,Object> additionalFields = message.getAdditionalData();
         Set<String> set = additionalFields.keySet();
         Iterator<String> iter = set.iterator();
         while(iter.hasNext()) {
             String key = iter.next();
-            String value = additionalFields.get(key);
+            Object value = additionalFields.get(key);
             dbObj.put(key, value);
         }
 
