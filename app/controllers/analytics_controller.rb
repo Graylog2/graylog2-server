@@ -19,7 +19,7 @@ class AnalyticsController < ApplicationController
 
     html_result = render_to_string(decide_result_partial(@result[:operation]), :layout => false)
 
-    render_success(ms, html_result)
+    render_success(ms, html_result, shell.operator, @result[:result])
   rescue => e
     logger.warn("Error while computing shell command: " + e.to_s + e.backtrace.join("\n"))
     render_error("Internal error.")
@@ -43,12 +43,17 @@ class AnalyticsController < ApplicationController
     render :text => res.to_json
   end
 
-  def render_success(ms, content)
+  def render_success(ms, content, operation, result)
     res = {
       :code => "success",
       :ms => ms,
-      :content => content
+      :content => content,
+      :op => operation
     }
+
+    if operation == "count" or operation == "distinct"
+      res[:result] = result;
+    end
 
     render :text => res.to_json
   end

@@ -58,7 +58,7 @@ var Shell = new function() {
       success: function(data) {
         result = eval('(' + data + ')');
         if (result.code == "success") {
-          render_result(success(result.ms, result.content));
+          render_result(success(result.ms, result.content, result.op, result.result));
         } else {
           render_result(error(result.reason));
         }
@@ -82,11 +82,13 @@ var Shell = new function() {
     }
   }
 
-  var success = function(ms, content) {
+  var success = function(ms, content, op, result) {
     return {
       code: "success",
-      ms: result.ms,
-      content: result.content
+      ms: ms,
+      content: content,
+      op: op,
+      result: result
     }
   }
 
@@ -122,7 +124,18 @@ var Shell = new function() {
     }
 
     if (res.code == "success") {
-      output("Completed in " + res.ms + "ms");
+      x = "Completed in " + res.ms + "ms";
+
+      switch (res.op) {
+        case "count":
+          x += " - Count result: " + res.result
+          break;
+        case "distinct":
+          x += " - Distinct result: " + res.result
+          break;
+      }
+
+      output(x);
 
       render_result_content(res);
     } else {
