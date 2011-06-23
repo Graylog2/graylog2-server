@@ -727,3 +727,14 @@
 .analytics-shell-distinct-result li {
   margin-bottom: 7px;
 }
+
+.analytics-shell-debug-link {
+  margin-top: 15px;
+  float: right;
+}
+
+.analytics-shell-debug {
+  margin-top: 15px;
+  font-family: monospace;
+  display: none;
+}
