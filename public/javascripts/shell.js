@@ -13,6 +13,7 @@ var Shell = new function() {
     _cmd = $("#shell-command-input");
     _uprompt = $(".shell-prompt");
     _shell = $("#shell");
+    _last_command = "";
 
     // Set command input to full width.
     resize_cmd();
@@ -22,17 +23,26 @@ var Shell = new function() {
   }
 
   this.listen = function() {
-    _cmd.bind('keypress', function(e) {
+    _cmd.bind('keydown', function(e) {
       var code = (e.keyCode ? e.keyCode : e.which);
-      if(code == 13) { // "Enter" key
+      if (code == 13) { // "Enter" key
 
         // Do nothing for empty input.
-        if ($.trim(_cmd.val().trim()).length == 0) {
+        if ($.trim($(this).val().trim()).length == 0) {
           return false;
         }
 
-        process(_cmd.val());
+        process($(this).val());
+        _last_command = $(this).val();
+
         return false;
+      }
+      
+      // Show last command.
+      if (code == 38) { // "Up arrow" key
+        if ($(this).val != _last_command) {
+          $(this).val(_last_command);
+        }
       }
     });
   }
