@@ -213,7 +213,7 @@ class Shell
   end
 
   def perform_find
-    @result = criteria.limit(MAX_LIMIT).all.to_a
+    @result = criteria.order_by({"created_at" => "-1"}).limit(MAX_LIMIT).all.to_a
   end
 
   def perform_distinct
