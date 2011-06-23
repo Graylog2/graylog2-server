@@ -71,8 +71,6 @@ public final class Main {
      */
     public static void main(String[] args) {
 
-        Logger.getRootLogger().addAppender(new SelfLogAppender());
-
         // Are we in debug mode?
         if (args.length > 0 && args[0].equalsIgnoreCase("debug")) {
             LOG.info("[x] Running in Debug mode");
