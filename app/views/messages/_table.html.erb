@@ -4,15 +4,21 @@
   // Inline to avoid re-binding problems when loaded via AJAX. lolzomg JS fuckery
 
   $(document).ready(function(){
-    // Show messages from today link.
+    // Highlight messages from today.
     $(".messages-from-today-link").bind("click", function() {
-      d = new Date();
-      $(".udate-" + d.getFullYear() + "-" + (d.getMonth()+1) + "-" + d.getDate()).addClass("messages-today");
+      if ($(this).hasClass("active")) {
+        $("tr").removeClass("messages-today");
+        $(this).removeClass("active");
+        $(this).attr("src", "/images/icons/sun.png");
+      } else {
+        d = new Date();
+        $(".udate-" + d.getFullYear() + "-" + (d.getMonth()+1) + "-" + d.getDate()).addClass("messages-today");
+        $(this).attr("src", "/images/icons/sun_active.png");
+        $(this).addClass("active");
+      }
     })
   });
 </script>
-
-<a href="#" class="messages-from-today-link">show man!</a>
 
 <table class="messages<%= defined?(@inline_version) ? " messages-inline" : nil %>">
   <thead>
@@ -22,6 +28,9 @@
       <th class="messages-c-severity">Severity</th>
       <th class="messages-c-facility">Facility</th>
       <th>Message</th>
+      <th class="messages-c-tools">
+        <%= image_tag "icons/sun.png", :class => "messages-from-today-link", :title => "Highlight messages from today" %>
+      </th>
     </tr>
   </thead>
   <tbody>
@@ -33,7 +42,7 @@
         <td><%= message.host.blank? ? nil : h(message.host) %></td>
         <td><%= syslog_level_to_human(message.level) %></td>
         <td><%= message.facility %></td>
-        <td>
+        <td colspan="2">
           <%= message.message[0..message_length] %>
           <%=raw (message.message.length > message_length) && !defined?(dont_show_links) ? "<span class='light'>...</span>" : nil %>
         </td>
