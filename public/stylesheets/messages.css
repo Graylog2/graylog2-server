@@ -25,6 +25,15 @@
   width: 110px;
 }
 
-.messages-today {
-  background-color: #ff0;
+.messages-c-tools {
+  text-align: right;
 }
+
+.messages-from-today-link {
+  cursor: pointer;
+}
+
+.messages-today {
+  background-color: #ffdf93;
+}
+
