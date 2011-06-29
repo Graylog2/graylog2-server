@@ -24,3 +24,7 @@
 .messages-c-host {
   width: 110px;
 }
+
+.messages-today {
+  background-color: #ff0;
+}

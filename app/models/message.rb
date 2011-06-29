@@ -315,6 +315,11 @@ class Message
     return false
   end
 
+  def uniform_date_string
+    d = Time.at(self.created_at)
+    "#{d.year}-#{d.month}-#{d.day}"
+  end
+
   private
 
   def self.get_offset page
