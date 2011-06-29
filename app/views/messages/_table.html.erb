@@ -1,5 +1,7 @@
 <% message_length = Setting.get_message_length(current_user) %>
 
+<a href="#" class="messages-from-today-link">show man!</a>
+
 <table class="messages<%= defined?(@inline_version) ? " messages-inline" : nil %>">
   <thead>
     <tr>
@@ -13,7 +15,8 @@
   <tbody>
     <% i = 0 %>
     <% @messages.each do |message|  %>
-      <tr id="<%= message.id %>" class="<%= i.modulo(2) == 1 ? "tr-light" : "tr-dark" %> message-row <%= "highlighted" if message.id.to_s == params[:message_id] %>">
+      <tr id="<%= message.id %>"
+          class="<%= i.modulo(2) == 1 ? "tr-light" : "tr-dark" %> message-row udate-<%= message.uniform_date_string %> <%= "highlighted" if message.id.to_s == params[:message_id] %>">
         <td><%= time_to_formatted_s(message.created_at_time) %></td>
         <td><%= message.host.blank? ? nil : h(message.host) %></td>
         <td><%= syslog_level_to_human(message.level) %></td>

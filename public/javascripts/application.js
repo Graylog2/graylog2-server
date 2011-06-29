@@ -259,6 +259,12 @@ $(document).ready(function(){
       return confirm("Really follow this link?");
     });
 
+    // Show messages from today link.
+    $(".messages-from-today-link").bind("click", function() {
+      d = new Date();
+      $(".udate-" + d.getFullYear() + "-" + (d.getMonth()+1) + "-" + d.getDate()).addClass("messages-today");
+    })
+
 });
 
 function buildHostCssId(id) {
