@@ -47,8 +47,12 @@
   if you need more and pagination.
 
   <br><br />
-  <strong>Example:</strong>
-  all.count(facility = "clock", host = /^example\.(org|com)$/, _http_response_code = 204)
+  <strong>Examples:</strong>
+  <ul class="analytics-shell-explanation">
+    <li>all.find()</li>
+    <li>all.count(host = /^example\.(org|com)$/, _http_response_code = 204)</li>
+    <li>all.distinct({host}, _http_response_code &gt; 500)</li>
+  </ul>
 <% end %>
 
 <h1>Analytics</h1>
