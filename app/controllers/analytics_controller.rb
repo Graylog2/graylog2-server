@@ -2,6 +2,7 @@ class AnalyticsController < ApplicationController
   filter_access_to :index, :shell
 
   def index
+    @load_flot = true
     @has_shell = true
     @has_sidebar = true
   end
