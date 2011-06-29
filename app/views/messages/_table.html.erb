@@ -1,4 +1,14 @@
 <% message_length = Setting.get_message_length(current_user) %>
+    
+<script type="text/javascript">
+    // Inline to avoid re-binding problems when loaded via AJAX. lolzomg JS fuckery
+
+    // Show messages from today link.
+    $(".messages-from-today-link").bind("click", function() {
+      d = new Date();
+      $(".udate-" + d.getFullYear() + "-" + (d.getMonth()+1) + "-" + d.getDate()).addClass("messages-today");
+    })
+</script>
 
 <a href="#" class="messages-from-today-link">show man!</a>
 
