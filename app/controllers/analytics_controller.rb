@@ -18,7 +18,11 @@ class AnalyticsController < ApplicationController
 
     ms = sprintf("%#.2f", time*1000);
 
-    html_result = render_to_string(decide_result_partial(@result[:operation]), :layout => false)
+    if @result[:operation] == "find"
+      html_result = render_to_string("_find_result", :layout => false)
+    else
+      html_result = ""
+    end
 
     render_success(ms, html_result, shell.operator, @result[:result])
   rescue => e
@@ -27,13 +31,6 @@ class AnalyticsController < ApplicationController
   end
 
   private
-  def decide_result_partial(type)
-    case type
-      when "count" then return "_count_result"
-      when "find" then return "_find_result"
-      when "distinct" then return "_distinct_result"
-    end
-  end
 
   def render_error(reason)
     res = {

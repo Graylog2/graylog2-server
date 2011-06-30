@@ -42,3 +42,7 @@
   position: relative;
   top: -3px;
 }
+
+.shell-result-string {
+  color: #fd0c99;
+}

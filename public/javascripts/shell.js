@@ -128,16 +128,27 @@ var Shell = new function() {
 
       switch (res.op) {
         case "count":
-          x += " - Count result: " + res.result
+          x += " - Count result: " + "<span class=\"shell-result-string\">" + res.result + "</span>";
           break;
         case "distinct":
-          x += " - Distinct result: " + res.result
+          x += " - Distinct result: " + "<span class=\"shell-result-string\">";
+          if (res.result.length == 0) {
+            x += "No matches.";
+          } else {
+            for (key in res.result) {
+              x += res.result[key] + ", ";
+            }
+            x = x.substring(0, x.length - 2); // Remove last comma and whitespace.
+            x += "</span>"
+          }
           break;
       }
 
       output(x);
 
-      render_result_content(res);
+      if (res.op == "find") {
+        render_result_content(res);
+      }
     } else {
       output("Error: " + res.reason);
     }
