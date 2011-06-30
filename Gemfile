@@ -7,7 +7,7 @@ gem 'plucky', '~> 0.3.6'
 gem 'chronic', '~> 0.3.0'
 gem 'pony', '~> 1.1'  # unusual version number
 gem 'graylog2-declarative_authorization', :require => 'declarative_authorization'
-gem 'mongoid', '~> 2.0.1'
+gem 'mongoid', '2.0.1' # 2.0.2 dropped paggination. TODO: update
 gem 'bson_ext', "~> 1.3.0"
 
 # TODO https://github.com/ph7/system-timer/issues/15
