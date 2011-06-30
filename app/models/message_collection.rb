@@ -25,6 +25,11 @@ class MessageCollection
     (stats["count"] || 0).to_i
   end
 
+  def self.oldest_message
+    m = Message.first
+    m.blank? ? "No messages" : Time.at(m.created_at)
+  end
+
   private
 
   def self.stats
