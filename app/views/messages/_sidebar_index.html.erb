@@ -42,6 +42,7 @@ Your current time: <%= gl_date(Time.zone.now) %>
   <li>Capped to: <%= number_to_human_size(MessageCollection.storage_size) %></li>
   <li>Objects: <%= MessageCollection.count %></li>
   <li>Average object size: <%= number_to_human_size(MessageCollection.average_object_size) %></li>
+  <li>Oldest entry: <%= time_ago_in_words(Time.at(Message.first.created_at)) %></li>
 </ul>
 
 <h3>Jobs & Tasks <%= tooltip("Notifications") %></h3>
