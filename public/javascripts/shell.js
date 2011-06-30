@@ -13,6 +13,7 @@ var Shell = new function() {
     _cmd = $("#shell-command-input");
     _uprompt = $(".shell-prompt");
     _shell = $("#shell");
+    _last_command = "";
 
     // Set command input to full width.
     resize_cmd();
@@ -22,17 +23,26 @@ var Shell = new function() {
   }
 
   this.listen = function() {
-    _cmd.bind('keypress', function(e) {
+    _cmd.bind('keydown', function(e) {
       var code = (e.keyCode ? e.keyCode : e.which);
-      if(code == 13) { // "Enter" key
+      if (code == 13) { // "Enter" key
 
         // Do nothing for empty input.
-        if ($.trim(_cmd.val().trim()).length == 0) {
+        if ($.trim($(this).val().trim()).length == 0) {
           return false;
         }
 
-        process(_cmd.val());
+        process($(this).val());
+        _last_command = $(this).val();
+
         return false;
+      }
+      
+      // Show last command.
+      if (code == 38) { // "Up arrow" key
+        if ($(this).val != _last_command) {
+          $(this).val(_last_command);
+        }
       }
     });
   }
@@ -48,11 +58,13 @@ var Shell = new function() {
       success: function(data) {
         result = eval('(' + data + ')');
         if (result.code == "success") {
-          render_result(success(result.ms, result.content));
+          render_result(success(result.ms, result.content, result.op, result.result));
         } else {
           render_result(error(result.reason));
         }
         
+        bindMessageSidebarClicks();
+
         eternalize(); // Move command out of input into static text.
       },
       error: function(data) {
@@ -70,11 +82,13 @@ var Shell = new function() {
     }
   }
 
-  var success = function(ms, content) {
+  var success = function(ms, content, op, result) {
     return {
       code: "success",
-      ms: result.ms,
-      content: result.content
+      ms: ms,
+      content: content,
+      op: op,
+      result: result
     }
   }
 
@@ -110,9 +124,31 @@ var Shell = new function() {
     }
 
     if (res.code == "success") {
-      output("Completed in " + res.ms + "ms");
+      x = "Completed in " + res.ms + "ms";
 
-      render_result_content(res);
+      switch (res.op) {
+        case "count":
+          x += " - Count result: " + "<span class=\"shell-result-string\">" + res.result + "</span>";
+          break;
+        case "distinct":
+          x += " - Distinct result: " + "<span class=\"shell-result-string\">";
+          if (res.result.length == 0) {
+            x += "No matches.";
+          } else {
+            for (key in res.result) {
+              x += res.result[key] + ", ";
+            }
+            x = x.substring(0, x.length - 2); // Remove last comma and whitespace.
+            x += "</span>"
+          }
+          break;
+      }
+
+      output(x);
+
+      if (res.op == "find") {
+        render_result_content(res);
+      }
     } else {
       output("Error: " + res.reason);
     }

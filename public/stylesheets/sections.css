@@ -710,3 +710,31 @@
 .legend {
     display: none !important;
 }
+
+/* Analytics shell - Shell itself is in shell.css */
+.analytics-shell-explanation {
+  list-style-type: square;
+  margin-left: 20px;
+}
+
+.analytics-shell-distinct-result {
+  list-style-type: square;
+  margin-left: 40px;
+  font-size: 18px;
+  font-family: Georgia,"Times New Roman",Times,serif;
+}
+
+.analytics-shell-distinct-result li {
+  margin-bottom: 7px;
+}
+
+.analytics-shell-debug-link {
+  margin-top: 15px;
+  float: right;
+}
+
+.analytics-shell-debug {
+  margin-top: 15px;
+  font-family: monospace;
+  display: none;
+}

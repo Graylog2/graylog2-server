@@ -3,6 +3,7 @@
   margin: 0px 15px;
   background-color: #000;
   padding: 5px;
+  margin-bottom: 10px;
 }
 
 #shell {
@@ -40,4 +41,8 @@
 .shell-wait {
   position: relative;
   top: -3px;
+}
+
+.shell-result-string {
+  color: #fd0c99;
 }

@@ -4,14 +4,21 @@ class InvalidOperatorException < RuntimeError
 end
 class InvalidOptionException < RuntimeError
 end
+class MissingDistinctTargetException < RuntimeError
+end
+class MissingStreamTargetException < RuntimeError
+end
 
 class Shell
 
   ALLOWED_SELECTORS = %w(all stream streams)
   ALLOWED_OPERATORS = %w(count find distinct)
   ALLOWED_CONDITIONALS = %w(>= <= > < = !=)
+  ALLOWED_OPTIONS = %w(limit offset query)
 
-  attr_reader :command, :selector, :operator, :operator_options, :modifiers, :result
+  MAX_LIMIT = 500
+
+  attr_reader :command, :selector, :operator, :operator_options, :distinct_target, :stream_narrows, :result, :mongo_selector
 
   def initialize(cmd)
     @command = cmd
@@ -27,10 +34,13 @@ class Shell
       else raise InvalidOperatorException
     end
 
+    @mongo_selector = criteria.selector
+
     return {
       :operation => @operator,
       :result => @result,
-      :operator_options => @operator_options
+      :operator_options => @operator_options,
+      :mongo_selector => @mongo_selector
     }
   end
 
@@ -39,29 +49,65 @@ class Shell
     parse_selector
     parse_operator
     parse_operator_options
-
+    
     validate
+
+    if selector == "stream" or selector == "streams"
+      parse_stream_narrows
+    end
+
   end
 
   def parse_selector
-    @selector = @command.scan(/^(.+?)\./)[0][0]
+    return @selector = @command.scan(/^(.+?)(\.|\()/)[0][0]
   end
 
   def parse_operator
-    @operator = @command.scan(/\.(.+?)\(/)[0][0]
+    return @operator = @command.scan(/\.(.+?)\(/)[0][0]
+  end
+
+  def parse_stream_narrows
+    string = @command.scan(/^streams?\((.+?)\)/)[0][0]
+
+    # Detect empty stream selector. Result would look like this: ).find(
+    raise MissingStreamTargetException if string.start_with?(').')
+
+    streams = string.split(",")
+
+    parsed = Array.new
+    streams.each do |stream|
+      parsed << stream.strip
+    end
+
+    @stream_narrows = parsed
+
+    raise MissingStreamTargetException if @stream_narrows.blank?
+  rescue
+    raise MissingStreamTargetException
   end
 
   def parse_operator_options
-    string = @command.scan(/\((.+)\)/)[0][0]
+    string = @command.scan(/\.(#{ALLOWED_OPERATORS.join('|')})\((.+)\)/)
+
+    if string.blank?
+      return Array.new
+    end
+
+    string = string[0][1]
     singles = string.split(",")
-    
     parsed = Hash.new
     singles.each do |single|
+      if single.start_with?("{") and single.end_with?("}")
+        # This is the distinct target.
+        @distinct_target = single[1..-2].strip
+        next
+      end
+
       key = single.scan(/^(.+?)(\s|#{ALLOWED_CONDITIONALS.join('|')})/)[0][0].strip
       p_value = single.scan(/(#{ALLOWED_CONDITIONALS.join('|')})(.+)$/)
       value = { :value => typify_value(p_value[0][1].strip), :condition => p_value[0][0].strip }
 
-      # Avoid overwriting of same keys. Exampke (_http_return_code >= 200, _http_return_code < 300)
+      # Avoid overwriting of same keys. Example (_http_return_code >= 200, _http_return_code < 300)
       if parsed[key].blank?
         # No double assignment.
         parsed[key] = value
@@ -75,8 +121,9 @@ class Shell
     end
 
     @operator_options = parsed
-  rescue
-    @operator_options = Array.new
+  rescue => e
+    Rails.logger.error "Could not parse operator options: #{e.message + e.backtrace.join("\n")}"
+    raise InvalidOperatorException
   end
 
   def typify_value(option)
@@ -92,10 +139,31 @@ class Shell
     return String.new
   end
 
-  def mongofy(options)
+  def mongofy_options(options)
     criteria = Hash.new
-    options.each do |k,v|
-      criteria[k] = mongo_conditionize(v)
+    unless options.blank?
+      options.each do |k,v|
+        criteria[k] = mongo_conditionize(v)
+      end
+    end
+
+    return criteria
+  end
+
+  def mongofy_stream_narrows(streams)
+    return nil if streams.blank?
+
+    criteria = Hash.new
+
+    if streams.count == 1
+      criteria = { :streams => BSON::ObjectId(streams[0]) }
+    else
+      stream_arr = Array.new
+      streams.each do |stream|
+        stream_arr << BSON::ObjectId(stream)
+      end
+      
+      criteria = { :streams => { "$in" => stream_arr } }
     end
 
     return criteria
@@ -146,9 +214,24 @@ class Shell
     raise InvalidOperatorException unless ALLOWED_OPERATORS.include?(@operator)
   end
 
+  def criteria
+    Message.not_deleted.where(mongofy_options(@operator_options)).where(mongofy_stream_narrows(@stream_narrows))
+  end
+
   def perform_count
-    puts "ZOMG FINAL MONGO OPTIONS: #{mongofy(@operator_options).inspect}"
-    @result = Message.not_deleted.where(mongofy(@operator_options)).count
+    @result = criteria.count
+  end
+
+  def perform_find
+    @result = criteria.order_by({"created_at" => "-1"}).limit(MAX_LIMIT).all.to_a
+  end
+
+  def perform_distinct
+    if @distinct_target.blank?
+      raise MissingDistinctTargetException
+    end
+
+    @result = criteria.distinct(@distinct_target.to_sym)
   end
 
 end
