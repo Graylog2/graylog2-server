@@ -5,6 +5,8 @@ module StreamsHelper
         return "Message"
       when Streamrule::TYPE_HOST then
         return "Host"
+      when Streamrule::TYPE_HOST_REGEX then
+        return "Host (regex)"
       when Streamrule::TYPE_HOSTGROUP then
         return "Hostgroup"
       when Streamrule::TYPE_SEVERITY then

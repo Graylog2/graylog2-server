@@ -24,3 +24,16 @@
 .messages-c-host {
   width: 110px;
 }
+
+.messages-c-tools {
+  text-align: right;
+}
+
+.messages-from-today-link {
+  cursor: pointer;
+}
+
+.messages-today {
+  background-color: #ffdf93;
+}
+

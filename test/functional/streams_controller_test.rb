@@ -3,7 +3,7 @@ require 'test_helper'
 class StreamsControllerTest < ActionController::TestCase
 
   context "creating" do
-    
+
     should "create and redirect" do
       assert_difference('Stream.count') do
         post :create, :stream => { :title => 'foo' }
