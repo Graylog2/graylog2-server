@@ -106,7 +106,7 @@ DEPENDENCIES
   json (~> 1.5.1)
   machinist_mongo (~> 1.2.0)
   mocha (~> 0.9.12)
-  mongoid (~> 2.0.1)
+  mongoid (= 2.0.1)
   plucky (~> 0.3.6)
   pony (~> 1.1)
   rack (~> 1.2.2)
