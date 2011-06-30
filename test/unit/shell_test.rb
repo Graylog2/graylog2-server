@@ -153,6 +153,22 @@ class ShellTest < ActiveSupport::TestCase
       assert_equal "count", s.operator
     end
 
+    should "raise MissingStreamTargetException for empty stream target" do
+      tests = Array.new
+      tests << "stream().find()"
+      tests << "streams().find()"
+      tests << "streams.find()"
+      tests << "stream.find()"
+      tests << "stream().find(_foo = 9001)"
+
+      tests.each do |test|
+        assert_raises MissingStreamTargetException do
+          s = Shell.new(test)
+          s.compute
+        end
+      end
+    end
+
   end
 
   context "counting" do

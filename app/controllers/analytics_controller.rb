@@ -25,9 +25,19 @@ class AnalyticsController < ApplicationController
     end
 
     render_success(ms, html_result, shell.operator, @result[:result])
+  rescue InvalidSelectorException
+    render_error("Invalid selector.")
+  rescue InvalidOperatorException
+    render_error("Invalid operator.")
+  rescue InvalidOptionException
+    render_error("Invalid options.")
+  rescue MissingDistinctTargetException
+    render_error("Missing distinct target.")
+  rescue MissingStreamTargetException
+    render_error("Missing stream target(s).")
   rescue => e
     logger.warn("Error while computing shell command: " + e.to_s + e.backtrace.join("\n"))
-    render_error("Internal error.")
+    render_error("Could not parse command or encountered internal error.")
   end
 
   private

@@ -6,6 +6,8 @@ class InvalidOptionException < RuntimeError
 end
 class MissingDistinctTargetException < RuntimeError
 end
+class MissingStreamTargetException < RuntimeError
+end
 
 class Shell
 
@@ -66,6 +68,10 @@ class Shell
 
   def parse_stream_narrows
     string = @command.scan(/^streams?\((.+?)\)/)[0][0]
+
+    # Detect empty stream selector. Result would look like this: ).find(
+    raise MissingStreamTargetException if string.start_with?(').')
+
     streams = string.split(",")
 
     parsed = Array.new
@@ -74,6 +80,10 @@ class Shell
     end
 
     @stream_narrows = parsed
+
+    raise MissingStreamTargetException if @stream_narrows.blank?
+  rescue
+    raise MissingStreamTargetException
   end
 
   def parse_operator_options
