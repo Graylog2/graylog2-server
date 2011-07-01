@@ -107,7 +107,16 @@ var Shell = new function() {
     $(".shell-wait").remove();
     prompt_html = "<span class=\"shell-prompt\">" + $(".shell-prompt").first().html() + "</span>";
     new_line("<li>" + prompt_html + " <input id=\"shell-command-input\" class=\"shell-command\" type=\"text\" spellcheck=\"false\"></input></li>");
+
+    // Check if there are more shell lines than allowed. Remove first if so. (to limit size)
+    if ($("#shell li").length >= 15) {
+      $("#shell li:first").remove();
+      $("#shell li:first").remove();
+    }
+
     _cmd = $("#shell-command-input"); // XXX fuckery
+    _uprompt = $(".shell-prompt"); // XXX fuckery (because original prompt has possibly been removed)
+
     resize_cmd();
     _cmd.focus();
     Shell.listen();
