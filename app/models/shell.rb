@@ -21,7 +21,7 @@ class Shell
   attr_reader :command, :selector, :operator, :operator_options, :distinct_target, :stream_narrows, :result, :mongo_selector
 
   def initialize(cmd)
-    @command = cmd
+    @command = cmd.strip
 
     parse
   end

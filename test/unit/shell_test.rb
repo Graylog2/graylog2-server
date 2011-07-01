@@ -22,6 +22,20 @@ class ShellTest < ActiveSupport::TestCase
       assert_equal expected, s.operator_options
     end
 
+    should "work with whitespaces before or after command" do
+      s = Shell.new(' all.find(_http_response_code = 500, host = "example.org")')
+      assert_equal "find", s.operator
+
+      s = Shell.new(' all.find(_http_response_code = 500, host = "example.org") ')
+      assert_equal "find", s.operator
+
+      s = Shell.new('all.find(_http_response_code = 500, host = "example.org") ')
+      assert_equal "find", s.operator
+
+      s = Shell.new('       all.find(_http_response_code = 500, host = "example.org") ')
+      assert_equal "find", s.operator
+    end
+
     should "accept negative integers in option values" do
       3.times { Message.make(:_foo => -9001) }
       1.times { Message.make(:_foo => 9001) }
