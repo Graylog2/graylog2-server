@@ -161,6 +161,35 @@ class StreamsController < ApplicationController
     redirect_to settings_stream_path(@stream)
   end
 
+  def addcolumn
+    @stream.additional_columns << params[:column]
+    duplicates = @stream.additional_columns.uniq!
+
+    if duplicates
+      flash[:error] = "Column '#{params[:column]}' already exists."
+    elsif @stream.save
+      flash[:notice] = "Added additional column."
+    else
+      flash[:error] = "Could not add additional column."
+    end
+
+    redirect_to settings_stream_path(@stream)
+  end
+
+  def removecolumn
+    deleted_column = @stream.additional_columns.delete(params[:column])
+
+    if deleted_column.nil?
+      flash[:error] = "Column '#{params[:column]}' doesn't exist."
+    elsif @stream.save
+      flash[:notice] = "Removed additional column '#{params[:column]}'."
+    else
+      flash[:error] = "Could not remove column '#{params[:column]}'."
+    end
+
+    redirect_to settings_stream_path(@stream)
+  end
+
   # This should now really be changed to /update soon.
   def categorize
     @stream = Stream.find_by_id params[:stream_id]

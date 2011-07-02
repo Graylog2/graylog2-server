@@ -62,6 +62,32 @@ of the alarm. You can also define that all users are alarmed, no matter what the
 <% end %>
 <br />
 
+<h2>Additional Columns</h2>
+<div class="short-description">Add additional columns to display GELF message fields.</div>
+<ul>
+<% if @stream.additional_columns.empty? %>
+  <li><h3>No additional columns configured.</h3></li>
+<% else %>
+  <% @stream.additional_columns.each do |col| %>
+  <li>
+    <h3 style="display: inline;"><%= col %></h3>
+    <%= link_to "Delete", removecolumn_stream_path(:stream_id => @stream, :column => col),
+                          :method => :delete,
+                          :confirm => "Really delete this column?" %>
+  </li>
+  <% end %>
+<% end %>
+</ul>
+
+<%= form_tag addcolumn_stream_path(:stream_id => @stream) do %>
+  <%= label_tag 'column', 'New column:' %>
+  <%= text_field_tag 'column' %>
+  <%= hidden_field_tag :stream_id, @stream.id %>
+  <%= submit_tag 'Add' %>
+<% end %>
+
+<br/><br/>
+
 <% if Configuration.allow_deleting %>
 <%= awesome_link "Delete all messages hit by this stream", deletebystream_messages_path(:stream_id => @stream.id), :confirm => "Really delete the messages?", :method => :post %>
 <br /><br />

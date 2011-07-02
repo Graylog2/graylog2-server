@@ -33,7 +33,9 @@ authorization do
       :rename,
       :categorize,
       :clone,
-      :toggledisabled
+      :toggledisabled,
+      :addcolumn,
+      :removecolumn
     ]
     has_permission_on :streamrules, :to => [:create, :destroy]
     has_permission_on :streamcategories, :to => [:create, :destroy]

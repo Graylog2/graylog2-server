@@ -1,4 +1,7 @@
-<% message_length = Setting.get_message_length(current_user) %>
+<%
+message_length = Setting.get_message_length(current_user)
+additional_columns ||= []
+%>
 
 <table class="messages<%= defined?(@inline_version) ? " messages-inline" : nil %>">
   <thead>
@@ -7,6 +10,9 @@
       <th class="messages-c-host">Host</th>
       <th class="messages-c-severity">Severity</th>
       <th class="messages-c-facility">Facility</th>
+      <% additional_columns.each do |col| %>
+      <th><%= col.titleize %></th>
+      <% end %>
       <th>Message</th>
     </tr>
   </thead>
@@ -18,6 +24,9 @@
         <td><%= message.host.blank? ? nil : h(message.host) %></td>
         <td><%= syslog_level_to_human(message.level) %></td>
         <td><%= message.facility %></td>
+        <% additional_columns.each do |col| %>
+        <td><%= message.additional_fields[col] %></td>
+        <% end %>
         <td>
           <%= message.message[0..message_length] %>
           <%=raw (message.message.length > message_length) && !defined?(dont_show_links) ? "<span class='light'>...</span>" : nil %>
