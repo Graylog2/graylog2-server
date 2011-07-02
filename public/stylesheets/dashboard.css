@@ -29,6 +29,14 @@ th {
     color: #444;
 }
 
+#top-title {
+    float: left;
+    font-size: 17px;
+    margin-top: 40px;
+    color: #444;
+    margin-left: 15px;
+}
+
 #statuscontainer {
     width: 100%;
     color: #fff;
