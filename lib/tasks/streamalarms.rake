@@ -24,11 +24,22 @@ namespace :streamalarms do
         # Build email body.
         body = "# Stream >#{stream.title}< has #{count} new messages in the last #{stream.alarm_timespan} minutes. Limit: #{stream.alarm_limit}\n"
 
+        # TODO: Include the actual path to the stream.
+        body += "View stream at #{Configuration.external_hostname}\n"
+
         # Add description to body.
         if stream.description.blank?
-          body += "# No stream description set."
+          body += "# No stream description set.\n"
         else
-          body += "# Description: #{stream.description}"
+          body += "# Description: #{stream.description}\n"
+        end
+
+        # Add a few messages for context
+        body += "Last #{Configuration.streamalarm_message_count} messages:\n"
+        Message.by_stream(stream_id).order(:id).desc.limit(Configuration.streamalarm_message_count).each do |msg|
+          body += "#{Time.at(msg.created_at)} #{msg.facility} #{msg.host} #{msg.level} #{msg.message}"
+          body += " #{msg.additional_fields.inspect}" unless msg.additional_fields.empty?
+          body += "\n"
         end
 
         # Send messages.
