@@ -29,14 +29,6 @@ th {
     color: #444;
 }
 
-#top-title {
-    float: left;
-    font-size: 17px;
-    margin-top: 40px;
-    color: #444;
-    margin-left: 15px;
-}
-
 #statuscontainer {
     width: 100%;
     color: #fff;
@@ -52,6 +44,7 @@ th {
     text-shadow: -1px -1px 0 #060;
     font-size: 50px;
     margin-left: 15px;
+    display: inline;
 }
 
 .status-problems {
