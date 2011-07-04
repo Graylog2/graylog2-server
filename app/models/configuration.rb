@@ -42,6 +42,11 @@ class Configuration
     return "[graylog2] Stream alarm!"
   end
 
+  def self.streamalarm_message_count
+    return @streamalarm_config['message_count'].to_i unless @streamalarm_config.blank? or @streamalarm_config['message_count'].to_i.zero?
+    return 25
+  end
+
   def self.email_transport_type
     standard = :sendmail
     return standard if @email_config[Rails.env].blank? or @email_config[Rails.env]['via'].blank?
