@@ -18,6 +18,11 @@ class StreamTest < ActiveSupport::TestCase
       end
     end
 
+    should "have additional_columns field" do
+      stream = Stream.make
+      assert_equal stream.additional_columns, []
+    end
+
     context "disabling streams" do
 
       should "append disabled hint after title if stream is disabled" do

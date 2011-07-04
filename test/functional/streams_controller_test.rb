@@ -85,4 +85,50 @@ class StreamsControllerTest < ActionController::TestCase
 
   end
 
+  context "columns" do
+
+    should "add a new column" do
+      stream = Stream.make
+      post :addcolumn, :id => stream.to_param, :column => "MAMA"
+      assert_response :redirect
+      assert_not_nil flash[:notice]
+
+      assert_equal "MAMA", assigns(:stream).additional_columns.first
+    end
+
+    should "not add a new column twice" do
+      stream = Stream.make
+      post :addcolumn, :id => stream.to_param, :column => "MAMA"
+      post :addcolumn, :id => stream.to_param, :column => "MAMA"
+
+      assert_not_nil flash[:error]
+
+      assert_equal 1, assigns(:stream).additional_columns.count
+    end
+
+    should "remove a column" do
+      stream = Stream.make
+      stream.additional_columns << "MAMA"
+      stream.save!
+
+      delete :removecolumn, :id => stream.to_param, :column => "MAMA"
+
+      assert_response :redirect
+      assert_not_nil flash[:notice]
+
+      assert_equal 0, assigns(:stream).additional_columns.count
+    end
+
+    should "remove a non-existant column" do
+      stream = Stream.make
+      stream.additional_columns << "MAMA"
+      stream.save!
+
+      delete :removecolumn, :id => stream.to_param, :column => "PAPA"
+
+      assert_not_nil flash[:error]
+    end
+
+  end
+
 end

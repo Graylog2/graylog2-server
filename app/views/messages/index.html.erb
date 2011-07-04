@@ -25,5 +25,7 @@
 
   <br style="clear: both;" />
 
-  <%= render :partial => "messages/table", :locals => { :messages => @messages, :total_messages => @total_count } %>
+  <%= render :partial => "messages/table", :locals => { :messages => @messages,
+                                                        :total_messages => @total_count,
+                                                        :additional_columns => @stream ? @stream.additional_columns : [] } %>
 </div>
