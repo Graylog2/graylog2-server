@@ -20,6 +20,11 @@
     <div id="top-timestamp">
       <%= Time.now %>
     </div>
+    <% if @stream_title %>
+    <div id="top-title">
+      <%= @stream_title %>
+    </div>
+    <% end %>
   </div>
 
   <div id="statuscontainer" class="status-<%=h @message_count > @max_messages ? 'problems' : 'okay' %>">
