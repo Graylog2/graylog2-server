@@ -31,7 +31,7 @@ additional_columns ||= []
       <th class="messages-c-severity">Severity</th>
       <th class="messages-c-facility">Facility</th>
       <% additional_columns.each do |col| %>
-      <th><%= col.titleize %></th>
+      <th><%= col %></th>
       <% end %>
       <th>Message</th>
       <th class="messages-c-tools">
@@ -49,7 +49,7 @@ additional_columns ||= []
         <td><%= syslog_level_to_human(message.level) %></td>
         <td><%= message.facility %></td>
         <% additional_columns.each do |col| %>
-          <td><%= message.additional_fields[col] %></td>
+          <td><%= message.additional_fields[col].blank? ? "-" : message.additional_fields[col] %></td>
         <% end %>
         <td colspan="2">
           <%= message.message[0..message_length] %>
