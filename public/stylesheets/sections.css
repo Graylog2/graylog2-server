@@ -326,6 +326,20 @@
   display: none;
 }
 
+#streams-additional-colums-list {
+  list-style-type: square;
+  margin-left: 20px;
+  margin-bottom: 5px;
+}
+
+#streams-additional-colums-list {
+  font-size: 13px;
+}
+
+#streams-additional-colums-list a {
+  font-size: 11px;
+}
+
 /* Hosts */
 #hosts-quickjump {
     margin-bottom: 15px;
