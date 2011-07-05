@@ -15,6 +15,7 @@ Message.blueprint do
 end
 
 Stream.blueprint do
+  shortname ActiveSupport::SecureRandom.hex(6)
   title
 end
 
