@@ -8,6 +8,8 @@ class MissingDistinctTargetException < RuntimeError
 end
 class MissingStreamTargetException < RuntimeError
 end
+class UnknownStreamException < RuntimeError
+end
 
 class Shell
 
@@ -73,16 +75,28 @@ class Shell
     raise MissingStreamTargetException if string.start_with?(').')
 
     streams = string.split(",")
-
     parsed = Array.new
+
     streams.each do |stream|
-      parsed << stream.strip
+      stream = stream.strip
+
+      if stream.length < 24 # shortnames are limited to less than 24 chars
+        s = Stream.where(:shortname => stream).first
+      else
+        s = Stream.find_by_id(stream)
+      end
+
+      raise UnknownStreamException if s.blank?
+
+      parsed << s.id.to_s
     end
 
     @stream_narrows = parsed
 
     raise MissingStreamTargetException if @stream_narrows.blank?
-  rescue
+  rescue Mongoid::Errors::DocumentNotFound
+    raise UnknownStreamException
+  rescue NoMethodError
     raise MissingStreamTargetException
   end
 

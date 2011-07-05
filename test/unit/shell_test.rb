@@ -115,29 +115,34 @@ class ShellTest < ActiveSupport::TestCase
   context "stream selectors" do
 
     should "correctly parse stream selector" do
-      s = Shell.new('stream(4dadf47c96d3ad76db000002).count()')
+      stream_id = Stream.make().id
+      s = Shell.new("stream(#{stream_id}).count()")
       assert_equal "stream", s.selector
-      assert_equal ["4dadf47c96d3ad76db000002"], s.stream_narrows
+      assert_equal [stream_id.to_s], s.stream_narrows
       assert_equal "count", s.operator
     end
     
-    should "correctly parse streams selector" do
-      s = Shell.new('streams(4dadf47c96d3ad76db000002, 4dadf47c96d3ad76db000003).count()')
+    should "correctly parse streams selector with two streams" do
+      streams = [Stream.make(), Stream.make()]
+      stream_ids = streams.map { |s| s.id.to_s }
+
+      s = Shell.new("streams(#{stream_ids.join(',')}).count()")
       assert_equal "streams", s.selector
-      assert_equal ["4dadf47c96d3ad76db000002", "4dadf47c96d3ad76db000003"], s.stream_narrows
+      assert_equal stream_ids, s.stream_narrows
       assert_equal "count", s.operator
     end
 
     should "correctly parse streams selector with only one stream" do
-      s = Shell.new('streams(4dadf47c96d3ad76db000002).count()')
+      stream_id = Stream.make().id
+      s = Shell.new("streams(#{stream_id}).count()")
       assert_equal "streams", s.selector
-      assert_equal ["4dadf47c96d3ad76db000002"], s.stream_narrows
+      assert_equal [stream_id.to_s], s.stream_narrows
       assert_equal "count", s.operator
     end
 
     should "work with stream selector" do
       wrong_stream_id = BSON::ObjectId.new
-      correct_stream_id = BSON::ObjectId.new
+      correct_stream_id = Stream.make().id
 
       5.times { Message.make() }
       2.times { Message.make(:streams => wrong_stream_id) }
@@ -152,7 +157,8 @@ class ShellTest < ActiveSupport::TestCase
     
     should "work with streams selector" do
       wrong_stream_id = BSON::ObjectId.new
-      correct_stream_ids = [BSON::ObjectId.new, BSON::ObjectId.new]
+      streams = [Stream.make(), Stream.make()]
+      correct_stream_ids = streams.map { |s| s.id }
 
       5.times { Message.make() }
       2.times { Message.make(:streams => wrong_stream_id) }
@@ -177,6 +183,71 @@ class ShellTest < ActiveSupport::TestCase
 
       tests.each do |test|
         assert_raises MissingStreamTargetException do
+          s = Shell.new(test)
+          s.compute
+        end
+      end
+    end
+
+    should "work with stream shortname" do
+      stream = Stream.make(:shortname => "lolstream")
+      wrong_stream_id = BSON::ObjectId.new
+
+      5.times { Message.make(:streams => stream.id )}
+      2.times { Message.make(:streams => wrong_stream_id) }
+      1.times { Message.make() }
+
+      s = Shell.new("stream(lolstream).count()")
+      result = s.compute
+
+      assert_equal 5, result[:result]
+      assert_equal "count", s.operator
+    end
+
+    should "work with multiple streams shortnames" do
+      stream1 = Stream.make(:shortname => "lolstream")
+      stream2 = Stream.make(:shortname => "zomgstream")
+      wrong_stream_id = BSON::ObjectId.new
+
+      4.times { Message.make(:streams => stream1.id )}
+      6.times { Message.make(:streams => stream2.id )}
+      2.times { Message.make(:streams => wrong_stream_id) }
+      1.times { Message.make() }
+
+      s = Shell.new("streams(lolstream, zomgstream).count()")
+      result = s.compute
+
+      assert_equal 10, result[:result]
+      assert_equal "count", s.operator
+    end
+
+    should "work with both stream shortnames and ids" do
+      stream1 = Stream.make(:shortname => "lolstream")
+      stream2 = Stream.make(:shortname => "zomgstream")
+      wrong_stream_id = BSON::ObjectId.new
+
+      3.times { Message.make(:streams => stream1.id )}
+      2.times { Message.make(:streams => stream2.id )}
+      2.times { Message.make(:streams => wrong_stream_id) }
+      1.times { Message.make() }
+
+      s = Shell.new("streams(#{stream1.id}, #{stream2.shortname}).count()")
+      result = s.compute
+
+      assert_equal 5, result[:result]
+      assert_equal "count", s.operator
+    end
+
+    should "correctly report invalid stream id" do
+      existing_stream = Stream.make(:shortname => "zomg")
+      tests = Array.new
+      tests << "stream(#{BSON::ObjectId.new}).find()"
+      tests << "streams(#{BSON::ObjectId.new}, #{existing_stream.id}).find()"
+      tests << "streams(wat).find()"
+      tests << "streams(wat,#{existing_stream.shortname}).count()"
+
+      tests.each do |test|
+        assert_raises UnknownStreamException do
           s = Shell.new(test)
           s.compute
         end
@@ -292,7 +363,7 @@ class ShellTest < ActiveSupport::TestCase
     end
 
     should "find in a stream" do
-      correct_stream_id = BSON::ObjectId.new
+      correct_stream_id = Stream.make().id
       wrong_stream_id = BSON::ObjectId.new
       2.times { Message.make(:streams => correct_stream_id) }
       3.times { Message.make(:streams => wrong_stream_id) }
@@ -306,7 +377,8 @@ class ShellTest < ActiveSupport::TestCase
     end
 
     should "find in streams" do
-      correct_stream_ids = [ BSON::ObjectId.new, BSON::ObjectId.new ]
+      streams = [Stream.make(), Stream.make()]
+      correct_stream_ids = streams.map { |s| s.id }
       wrong_stream_id = BSON::ObjectId.new
       5.times { Message.make(:streams => correct_stream_ids[0]) }
       2.times { Message.make(:streams => correct_stream_ids[1]) }
@@ -321,7 +393,7 @@ class ShellTest < ActiveSupport::TestCase
     end
     
     should "find in a stream with options" do
-      correct_stream_id = BSON::ObjectId.new
+      correct_stream_id = Stream.make().id
       wrong_stream_id = BSON::ObjectId.new
       4.times { Message.make(:host => "baz.example.org", :_foo => 12, :streams => correct_stream_id) }
       3.times { Message.make(:host => "bar.example.com", :_foo => 9001, :streams => correct_stream_id) }
@@ -337,7 +409,8 @@ class ShellTest < ActiveSupport::TestCase
     end
 
     should "find in streams with options" do
-      correct_stream_ids = [ BSON::ObjectId.new, BSON::ObjectId.new ]
+      streams = [Stream.make(), Stream.make()]
+      correct_stream_ids = streams.map { |s| s.id }
       wrong_stream_id = BSON::ObjectId.new
       6.times { Message.make(:host => "baz.example.org", :_foo => 12, :streams => correct_stream_ids[0]) }
       1.times { Message.make(:host => "bar.example.com", :_foo => 9001, :streams => correct_stream_ids[1]) }
@@ -406,42 +479,43 @@ class ShellTest < ActiveSupport::TestCase
     end
 
     should "distinct with no query options on stream" do
-      correct_stream_id = BSON::ObjectId.new
+      correct_stream = Stream.make()
       wrong_stream_id = BSON::ObjectId.new
-      4.times { Message.make(:host => "baz.example.org", :streams => correct_stream_id) }
+      4.times { Message.make(:host => "baz.example.org", :streams => correct_stream.id) }
       10.times { Message.make(:host => "not.example.org", :streams => wrong_stream_id) }
-      3.times { Message.make(:host => "bar.example.com", :streams => correct_stream_id) }
+      3.times { Message.make(:host => "bar.example.com", :streams => correct_stream.id) }
   
-      s = Shell.new("stream(#{correct_stream_id}).distinct({host})")
+      s = Shell.new("stream(#{correct_stream.id}).distinct({host})")
       result = s.compute
 
       assert_equal "distinct", result[:operation]
       assert_equal ["baz.example.org", "bar.example.com"], result[:result]
     end
-    
+
     should "distinct with one query option on stream" do
-      correct_stream_id = BSON::ObjectId.new
+      correct_stream = Stream.make()
       wrong_stream_id = BSON::ObjectId.new
-      4.times { Message.make(:host => "baz.example.org", :streams => correct_stream_id, :_foo => "bar") }
-      4.times { Message.make(:host => "foo.example.org", :streams => correct_stream_id, :_foo => "moo") }
+      4.times { Message.make(:host => "baz.example.org", :streams => correct_stream.id, :_foo => "bar") }
+      4.times { Message.make(:host => "foo.example.org", :streams => correct_stream.id, :_foo => "moo") }
       10.times { Message.make(:host => "not.example.org", :streams => wrong_stream_id, :_foo => "bar" ) }
-      3.times { Message.make(:host => "bar.example.com", :streams => correct_stream_id, :_foo => "bar") }
-  
-      s = Shell.new("stream(#{correct_stream_id}).distinct({host}, _foo = \"bar\")")
+      3.times { Message.make(:host => "bar.example.com", :streams => correct_stream.id, :_foo => "bar") }
+
+      s = Shell.new("stream(#{correct_stream.id}).distinct({host}, _foo = \"bar\")")
       result = s.compute
 
       assert_equal "distinct", result[:operation]
       assert_equal ["baz.example.org", "bar.example.com"], result[:result]
     end
-    
+
     should "distinct with no query options on streams" do
-      correct_stream_ids = [ BSON::ObjectId.new, BSON::ObjectId.new ]
+      streams = [ Stream.make(), Stream.make() ]
+      correct_stream_ids = streams.map {|s| s.id }
       wrong_stream_id = BSON::ObjectId.new
       4.times { Message.make(:host => "baz.example.org", :streams => correct_stream_ids[0]) }
       10.times { Message.make(:host => "not.example.org", :streams => wrong_stream_id) }
       3.times { Message.make(:host => "bar.example.com", :streams => correct_stream_ids[1]) }
       2.times { Message.make(:host => "foo.example.com", :streams => correct_stream_ids) }
-  
+
       s = Shell.new("streams(#{correct_stream_ids.join(',')}).distinct({host})")
       result = s.compute
 

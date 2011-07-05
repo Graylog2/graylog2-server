@@ -27,6 +27,7 @@ class Stream
   field :alarm_active, :type => Boolean
   field :disabled, :type => Boolean
   field :additional_columns, :type => Array, :default => []
+  field :shortname, :type => String
 
   def self.find_by_id(_id)
     _id = $1 if /^([0-9a-f]+)-/ =~ _id
