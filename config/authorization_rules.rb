@@ -35,7 +35,8 @@ authorization do
       :clone,
       :toggledisabled,
       :addcolumn,
-      :removecolumn
+      :removecolumn,
+      :shortname
     ]
     has_permission_on :streamrules, :to => [:create, :destroy]
     has_permission_on :streamcategories, :to => [:create, :destroy]

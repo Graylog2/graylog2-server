@@ -131,4 +131,53 @@ class StreamsControllerTest < ActionController::TestCase
 
   end
 
+  context "shortnames" do
+
+    should "set a new shortname" do
+      stream = Stream.make
+      post :shortname, :id => stream.to_param, :shortname => "foo"
+
+      assert_response :redirect
+      assert_not_nil flash[:notice]
+
+      assert_equal "foo", assigns(:stream).shortname
+    end
+
+    should "change an exiting shortname" do
+      stream = Stream.make(:shortname => "foo")
+      post :shortname, :id => stream.to_param, :shortname => "bar"
+
+      assert_response :redirect
+      assert_not_nil flash[:notice]
+
+      assert_equal "bar", assigns(:stream).shortname
+    end
+
+    should "not accept shortnames that are already assigned to another stream" do
+      stream = Stream.make(:shortname => "foo")
+      stream2 = Stream.make
+      post :shortname, :id => stream2.to_param, :shortname => "foo"
+
+      assert_response :redirect
+      assert_not_nil flash[:error]
+    end
+
+    should "complain about missing shortname" do
+      stream = Stream.make()
+      post :shortname, :id => stream.to_param
+
+      assert_response :redirect
+      assert_not_nil flash[:error]
+    end
+
+    should "complain about too long shortname" do
+      stream = Stream.make()
+      post :shortname, :id => stream.to_param, :shortname => "fooooooooooooooooooobaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaarrrrrrrrrrrrrr"
+
+      assert_response :redirect
+      assert_not_nil flash[:error]
+    end
+
+  end
+
 end

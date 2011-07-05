@@ -14,6 +14,8 @@ class Stream
   validates_presence_of :title
   validates_numericality_of :alarm_limit, :allow_nil => true
   validates_numericality_of :alarm_timespan, :allow_nil => true, :greater_than => 0
+  validates_length_of :shortname, :maximum => 23
+  validates_uniqueness_of :shortname
 
   field :title, :type => String
   field :alarm_limit, :type => Integer

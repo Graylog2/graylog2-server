@@ -276,6 +276,24 @@ class StreamsController < ApplicationController
     @stream.subscribed?(current_user) ? unsubscribe : subscribe
   end
 
+  def shortname
+    if params[:shortname].blank?
+      flash[:error] = "No short name given"
+      redirect_to settings_stream_path(@stream)
+      return
+    end
+
+    @stream.shortname = params[:shortname]
+
+    if @stream.save
+      flash[:notice] = "Short name has been set."
+    else
+      flash[:error] = "Coult not set short name!"
+    end
+
+    redirect_to settings_stream_path(@stream)
+  end
+
   protected
   def load_stream
     @stream = Stream.find_by_id params["id"]
