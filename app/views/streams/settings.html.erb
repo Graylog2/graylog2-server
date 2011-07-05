@@ -54,7 +54,7 @@ of the alarm. You can also define that all users are alarmed, no matter what the
 <br /><br />
 
 <h2>Short name</h2>
-<div class="short-description">Used to identify streams in the Analytics Shell without knowing the whole ID. Must be unique.</div>
+<div class="short-description">Used to identify streams in the Analytics Shell without knowing the whole ID. Must be unique and only contain alphanumeric characters or underscores.</div>
 <%= form_tag shortname_stream_path(:stream_id => @stream) do %>
   <%= label_tag 'shortname', 'Short name:' %>
   <%= text_field_tag 'shortname', @stream.shortname %>

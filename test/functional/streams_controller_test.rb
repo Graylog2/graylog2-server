@@ -135,12 +135,12 @@ class StreamsControllerTest < ActionController::TestCase
 
     should "set a new shortname" do
       stream = Stream.make
-      post :shortname, :id => stream.to_param, :shortname => "foo"
+      post :shortname, :id => stream.to_param, :shortname => "foo9001"
 
       assert_response :redirect
       assert_not_nil flash[:notice]
 
-      assert_equal "foo", assigns(:stream).shortname
+      assert_equal "foo9001", assigns(:stream).shortname
     end
 
     should "change an exiting shortname" do
@@ -151,6 +151,34 @@ class StreamsControllerTest < ActionController::TestCase
       assert_not_nil flash[:notice]
 
       assert_equal "bar", assigns(:stream).shortname
+    end
+
+    should "accept underscores in shortnames" do
+      stream = Stream.make
+      post :shortname, :id => stream.to_param, :shortname => "foo_9001"
+
+      assert_response :redirect
+      assert_not_nil flash[:notice]
+
+      assert_equal "foo_9001", assigns(:stream).shortname
+    end
+
+    should "only accept alphanumerical and underscore shortnames" do
+      tests = Array.new
+      tests << "lol wat"
+      tests << "lol.wat"
+      tests << "lol wat"
+      tests << "lol\nwat"
+      tests << "--fsdfsdrwerw"
+      tests << "fdsfsd "
+
+      tests.each do |test|
+        stream = Stream.make
+        post :shortname, :id => stream.to_param, :shortname => "lol wat"
+
+        assert_response :redirect
+        assert_not_nil flash[:error]
+      end
     end
 
     should "not accept shortnames that are already assigned to another stream" do
