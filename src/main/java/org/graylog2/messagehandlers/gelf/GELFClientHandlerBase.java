@@ -28,6 +28,7 @@ import org.json.simple.JSONValue;
 
 import java.util.Iterator;
 import java.util.Set;
+import org.graylog2.Tools;
 
 /**
  * GELFClient.java: Sep 14, 2010 6:43:00 PM
@@ -77,6 +78,14 @@ class GELFClientHandlerBase {
             this.message.setFacility(GELF.STANDARD_FACILITY_VALUE);
         } else {
             this.message.setFacility(facility);
+        }
+
+        // Set createdAt to provided timestamp - Set to current time if not set.
+        double timestamp = this.jsonToDouble(json.get("timestamp"));
+        if (timestamp <= 0) {
+            this.message.setCreatedAt(Tools.getUTCTimestampWithMilliseconds());
+        } else {
+            this.message.setCreatedAt(timestamp);
         }
 
         // Add additional data if there is some.
@@ -137,6 +146,19 @@ class GELFClientHandlerBase {
                 String str = this.jsonToString(json);
                 if (str != null) {
                     return Integer.parseInt(str);
+                }
+            }
+        } catch(Exception e) {}
+
+        return -1;
+    }
+
+    private double jsonToDouble(Object json) {
+        try {
+            if (json != null) {
+                String str = this.jsonToString(json);
+                if (str != null) {
+                    return Double.parseDouble(str);
                 }
             }
         } catch(Exception e) {}
