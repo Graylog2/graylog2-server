@@ -9,7 +9,7 @@ class AnalyticsController < ApplicationController
 
   def shell
     render_error("Empty input.") and return if params[:cmd].blank?
-    
+
     shell = Shell.new(params[:cmd])
 
     time = Benchmark.realtime do

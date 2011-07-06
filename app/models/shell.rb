@@ -51,7 +51,7 @@ class Shell
     parse_selector
     parse_operator
     parse_operator_options
-    
+
     validate
 
     if selector == "stream" or selector == "streams"
@@ -176,7 +176,7 @@ class Shell
       streams.each do |stream|
         stream_arr << BSON::ObjectId(stream)
       end
-      
+
       criteria = { :streams => { "$in" => stream_arr } }
     end
 
@@ -186,7 +186,7 @@ class Shell
   def mongo_conditionize(v)
     if v.is_a?(Hash)
       raise InvalidOptionException if !ALLOWED_CONDITIONALS.include?(v[:condition])
-      
+
       if v[:condition] == "="
         return v[:value] # No special mongo treatment for = needed.
       else

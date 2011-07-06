@@ -8,12 +8,12 @@ class ShellTest < ActiveSupport::TestCase
       s = Shell.new('all.find(_http_response_code = 500, host = "example.org")')
       assert_equal "all", s.selector
     end
-    
+
     should "parse operator" do
       s = Shell.new('all.find(_http_response_code = 500, host = "example.org")')
       assert_equal "find", s.operator
     end
-    
+
     should "parse operator options" do
       s = Shell.new('all.find(_http_response_code = 500, host = "example.org")')
       expected = Hash.new
@@ -44,7 +44,7 @@ class ShellTest < ActiveSupport::TestCase
 
       s = Shell.new('all.count(_foo = -9001)')
       result = s.compute
-      
+
       assert_equal "count", result[:operation]
       assert_equal 3, result[:result]
     end
@@ -58,7 +58,7 @@ class ShellTest < ActiveSupport::TestCase
       expected["foo"] << { :value => 700, :condition => ">=" }
       assert_equal expected, s.operator_options
     end
-    
+
     should "respect conditional operators" do
       3.times { Message.make(:host => "example.org", :_http_response_code => 500) }
       7.times { Message.make(:host => "example.com", :_http_response_code => 500) }
@@ -68,7 +68,7 @@ class ShellTest < ActiveSupport::TestCase
 
       s = Shell.new('all.count(host != "example.org", _http_response_code < 300, _http_response_code >= 200)')
       result = s.compute
-      
+
       assert_equal "count", result[:operation]
       assert_equal 18, result[:result]
     end
@@ -81,7 +81,7 @@ class ShellTest < ActiveSupport::TestCase
 
       s = Shell.new('all.count(_foo > 0, _foo != 3, _foo != 4)')
       result = s.compute
-      
+
       assert_equal "count", result[:operation]
       assert_equal 7, result[:result]
     end
@@ -103,13 +103,13 @@ class ShellTest < ActiveSupport::TestCase
         Shell.new('nothing.find(_http_response_code = 500, host = "example.org")')
       end
     end
-    
+
     should "throw exception for not allowed operator" do
       assert_raise InvalidOperatorException do
         Shell.new('all.something(_http_response_code = 500, host = "example.org")')
       end
     end
-    
+
   end
 
   context "stream selectors" do
@@ -121,7 +121,7 @@ class ShellTest < ActiveSupport::TestCase
       assert_equal [stream_id.to_s], s.stream_narrows
       assert_equal "count", s.operator
     end
-    
+
     should "correctly parse streams selector with two streams" do
       streams = [Stream.make(), Stream.make()]
       stream_ids = streams.map { |s| s.id.to_s }
@@ -154,7 +154,7 @@ class ShellTest < ActiveSupport::TestCase
       assert_equal 3, result[:result]
       assert_equal "count", s.operator
     end
-    
+
     should "work with streams selector" do
       wrong_stream_id = BSON::ObjectId.new
       streams = [Stream.make(), Stream.make()]
@@ -262,7 +262,7 @@ class ShellTest < ActiveSupport::TestCase
       17.times { Message.make }
       s = Shell.new("all.count()")
       result = s.compute
-      
+
       assert_equal "count", result[:operation]
       assert_equal 17, result[:result]
     end
@@ -273,11 +273,11 @@ class ShellTest < ActiveSupport::TestCase
 
       s = Shell.new('all.count(host = "example.com")')
       result = s.compute
-      
+
       assert_equal "count", result[:operation]
       assert_equal 15, result[:result]
     end
-    
+
     should "count all with options including integer option" do
       3.times { Message.make(:host => "example.org", :_http_response_code => 500) }
       7.times { Message.make(:host => "example.com", :_http_response_code => 500) }
@@ -285,7 +285,7 @@ class ShellTest < ActiveSupport::TestCase
 
       s = Shell.new('all.count(host = "example.org", _http_response_code = 500)')
       result = s.compute
-      
+
       assert_equal "count", result[:operation]
       assert_equal 3, result[:result]
     end
@@ -329,7 +329,7 @@ class ShellTest < ActiveSupport::TestCase
         assert_equal "bar", message.message
       end
     end
-    
+
     should "find multiple messages with combined options and regex" do
       pattern = /^ba.\.example.(com|org)/
 
@@ -357,7 +357,7 @@ class ShellTest < ActiveSupport::TestCase
 
       s = Shell.new('all.find(host != "example.org", _http_response_code < 300, _http_response_code >= 200)')
       result = s.compute
-      
+
       assert_equal "find", result[:operation]
       assert_equal 18, result[:result].count
     end
@@ -391,7 +391,7 @@ class ShellTest < ActiveSupport::TestCase
       assert_equal "find", result[:operation]
       assert_equal 9, result[:result].count
     end
-    
+
     should "find in a stream with options" do
       correct_stream_id = Stream.make().id
       wrong_stream_id = BSON::ObjectId.new
@@ -433,20 +433,20 @@ class ShellTest < ActiveSupport::TestCase
     should "distinct with no query options" do
       4.times { Message.make(:host => "baz.example.org") }
       3.times { Message.make(:host => "bar.example.com") }
-  
+
       s = Shell.new("all.distinct({host})")
       result = s.compute
 
       assert_equal "distinct", result[:operation]
       assert_equal ["baz.example.org", "bar.example.com"], result[:result]
     end
-    
+
     should "distinct with some query options" do
       4.times { Message.make(:host => "baz.example.org", :_foo => "bar", :_something => "foo") }
       3.times { Message.make(:host => "bar.example.com", :_foo => "bar", :_something => "foo") }
       3.times { Message.make(:host => "foo.example.com", :_foo => "baz", :_something => "foo") }
       3.times { Message.make(:host => "wat.example.com", :_foo => "baz", :_something => "bar") }
-  
+
       s = Shell.new('all.distinct({host}, _foo = "bar", _something = "foo")')
       result = s.compute
 
@@ -458,22 +458,22 @@ class ShellTest < ActiveSupport::TestCase
       4.times { Message.make(:host => "baz.example.org", :_foo => "bar") }
       3.times { Message.make(:host => "example.com", :_foo => "bar") }
       5.times { Message.make(:host => "foo.example.com", :_foo => "baz") }
-      
+
       s = Shell.new('all.distinct({host}, _foo = "bar")')
       result = s.compute
-      
+
       assert_equal "distinct", result[:operation]
       assert_equal ["baz.example.org", "example.com"], result[:result]
     end
-    
+
     should "distinct with regex query options" do
       4.times { Message.make(:host => "baz.example.org", :_foo => "bar1") }
       3.times { Message.make(:host => "example.com", :_foo => "bar1") }
       5.times { Message.make(:host => "foo.example.com", :_foo => "baz") }
-      
+
       s = Shell.new('all.distinct({host}, _foo = /^bar\d$/)')
       result = s.compute
-      
+
       assert_equal "distinct", result[:operation]
       assert_equal ["baz.example.org", "example.com"], result[:result]
     end
@@ -484,7 +484,7 @@ class ShellTest < ActiveSupport::TestCase
       4.times { Message.make(:host => "baz.example.org", :streams => correct_stream.id) }
       10.times { Message.make(:host => "not.example.org", :streams => wrong_stream_id) }
       3.times { Message.make(:host => "bar.example.com", :streams => correct_stream.id) }
-  
+
       s = Shell.new("stream(#{correct_stream.id}).distinct({host})")
       result = s.compute
 

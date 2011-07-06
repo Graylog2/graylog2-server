@@ -16,7 +16,7 @@ class AnalyticsControllerTest < ActionController::TestCase
       assert_equal "count", result[:operation]
       assert_equal 15, result[:result]
     end
-    
+
     should "find" do
       10.times { Message.make(:host => "example.org") }
       msg1 = Message.make(:host => "example.com")
@@ -42,7 +42,7 @@ class AnalyticsControllerTest < ActionController::TestCase
       assert_equal "distinct", result[:operation]
       assert_equal ["foo.example.org", "baz.example.org"], result[:result]
     end
-      
+
   end
 
 end

@@ -1,5 +1,5 @@
 // ZOMG my JS sucks but I don't care
-  
+
 $(document).ready(function(){
 
   Shell.init();
@@ -37,7 +37,7 @@ var Shell = new function() {
 
         return false;
       }
-      
+
       // Show last command.
       if (code == 38) { // "Up arrow" key
         if ($(this).val != _last_command) {
@@ -62,14 +62,14 @@ var Shell = new function() {
         } else {
           render_result(error(result.reason));
         }
-        
+
         bindMessageSidebarClicks();
 
         eternalize(); // Move command out of input into static text.
       },
       error: function(data) {
         render_result(error("Internal error."));
-        
+
         eternalize(); // Move command out of input into static text.
       }
     });

@@ -25,7 +25,7 @@
   <div id="statuscontainer" class="status-<%=h @message_count > @max_messages ? 'problems' : 'okay' %>">
     <div id="status">
       <h1><%= @message_count %> messages / <%= @timespan %> minutes</h1>
-    
+
       <% unless @stream_title.blank? %>
         <h1>- <%= @stream_title %></h1>
       <% end %>
