@@ -1,3 +1,12 @@
+<script type="text/javascript">
+  $(document).ready(function(){
+    // Confirmation for links in full message. - Inline to avoid JS re-binding shitfuck
+    $(".messages-full-message a").bind("click", function() {
+      return confirm("Really follow this link?");
+    });
+  });
+</script>
+
 <h2>Message <span class="highlighted"><%= @message.id %></span></h2>
 
 <p class="messages-show-message"><%= @message.message %></p>
