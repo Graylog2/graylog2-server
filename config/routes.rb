@@ -85,6 +85,7 @@ Graylog2WebInterface::Application.routes.draw do
       post :addcolumn
       delete :removecolumn
       post :shortname
+      post :related
     end
   end
 

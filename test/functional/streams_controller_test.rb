@@ -208,4 +208,44 @@ class StreamsControllerTest < ActionController::TestCase
 
   end
 
+  context "related streams" do
+
+    should "set related streams matcher" do
+      m = 'foo\d'
+      stream = Stream.make
+      post :related, :id => stream.to_param, :related_streams_matcher => m
+
+      assert_equal m, assigns(:stream).related_streams_matcher
+      assert_response :redirect
+      assert_not_nil flash[:notice]
+    end
+
+    should "change existing related streams matcher" do
+      m = '^foo'
+      stream = Stream.make(:related_streams_matcher => "zomg")
+      post :related, :id => stream.to_param, :related_streams_matcher => m
+
+      assert_equal m, assigns(:stream).related_streams_matcher
+      assert_response :redirect
+      assert_not_nil flash[:notice]
+    end
+
+    should "not accept empty related streams matcher" do
+      stream = Stream.make
+      post :related, :id => stream.to_param, :related_streams_matcher => ''
+
+      assert_response :redirect
+      assert_not_nil flash[:error]
+    end
+
+    should "not accept invalid regex related streams matcher" do
+      stream = Stream.make
+      post :related, :id => stream.to_param, :related_streams_matcher => '*'
+
+      assert_response :redirect
+      assert_not_nil flash[:error]
+    end
+
+  end
+
 end

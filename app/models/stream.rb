@@ -17,6 +17,7 @@ class Stream
   validates_length_of :shortname, :maximum => 23
   validates_uniqueness_of :shortname
   validates_format_of :shortname, :with => /^[A-Za-z0-9_]+$/, :allow_nil => true
+  validate :valid_regexes
 
   field :title, :type => String
   field :alarm_limit, :type => Integer
@@ -31,6 +32,7 @@ class Stream
   field :disabled, :type => Boolean
   field :additional_columns, :type => Array, :default => []
   field :shortname, :type => String
+  field :related_streams_matcher, :type => String
 
   def self.find_by_id(_id)
     _id = $1 if /^([0-9a-f]+)-/ =~ _id
@@ -122,5 +124,21 @@ class Stream
     return false unless allowed_streams.include?(self.id.to_s)
 
     return true
+  end
+
+  def related_streams
+    return Array.new if self.related_streams_matcher.blank?
+    Stream.where(:title => /#{self.related_streams_matcher}/, :_id => { "$ne" => self.id }).all
+  end
+
+  private
+  def valid_regexes
+    unless self.related_streams_matcher.blank?
+      begin
+        Regexp.new(/#{self.related_streams_matcher}/)
+      rescue RegexpError
+        errors.add(:related_streams_matcher, "Invalid regular expression")
+      end
+    end
   end
 end

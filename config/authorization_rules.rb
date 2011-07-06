@@ -36,7 +36,8 @@ authorization do
       :toggledisabled,
       :addcolumn,
       :removecolumn,
-      :shortname
+      :shortname,
+      :related
     ]
     has_permission_on :streamrules, :to => [:create, :destroy]
     has_permission_on :streamcategories, :to => [:create, :destroy]

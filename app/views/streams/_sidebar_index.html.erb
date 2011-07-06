@@ -64,6 +64,18 @@
   <% end %>
 </ul>
 
+<h3>Related streams</h3>
+<ul id="related-streams">
+  <% related_streams = @stream.related_streams %>
+  <% if related_streams.blank? %>
+    <li>None</li>
+  <% else %>
+    <% related_streams.each do |s| %>
+      <li><%=raw stream_link(s) %></li>
+    <% end %>
+  <% end %>
+</ul>
+
 <br />
 <% unless @stream.subscribers.nil? %>
 <h3>

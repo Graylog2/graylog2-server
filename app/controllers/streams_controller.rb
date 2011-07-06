@@ -294,6 +294,24 @@ class StreamsController < ApplicationController
     redirect_to settings_stream_path(@stream)
   end
 
+  def related
+    if params[:related_streams_matcher].blank?
+      flash[:error] = "No matcher given"
+      redirect_to settings_stream_path(@stream)
+      return
+    end
+
+    @stream.related_streams_matcher = params[:related_streams_matcher]
+
+    if @stream.save
+      flash[:notice] = "Related streams matcher has been set."
+    else
+      flash[:error] = "Coult not set related streams matcher! Make sure that the regular expression is valid."
+    end
+
+    redirect_to settings_stream_path(@stream)
+  end
+
   protected
   def load_stream
     @stream = Stream.find_by_id params["id"]

@@ -43,6 +43,31 @@ class StreamTest < ActiveSupport::TestCase
     end
   end
 
+  context "related streams" do
+
+    should "find related streams" do
+      related_streams = Array.new
+      titles = ["foo9001", "foo9002", "foo9003", "foo9004"]
+      titles.each { |t| related_streams << Stream.make(:title => t) }
+      stream = Stream.make(:related_streams_matcher => '^foo\d{4}')
+      assert_equal related_streams.map{ |s| s.id }, stream.related_streams.map { |s| s.id }
+    end
+
+    should "return empty array if no matcher is set" do
+      titles = ["foo9001", "foo9002", "foo9003", "foo9004"]
+      titles.each { |t| Stream.make(:title => t) }
+      stream = Stream.make(:related_streams_matcher => nil)
+      assert_equal [], stream.related_streams.map { |s| s.id }
+    end
+
+    should "not include itself in matches" do
+      Stream.make(:title => "foo9001")
+      stream = Stream.make(:title => "foo9002", :related_streams_matcher => '^foo\d{4}')
+      assert !stream.related_streams.map{ |s| s.id }.include?(stream.id)
+    end
+
+  end
+
 # Disable for now.
 #
 #  test "favorites are deleted with stream" do

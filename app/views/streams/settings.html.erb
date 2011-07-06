@@ -71,6 +71,16 @@ of the alarm. You can also define that all users are alarmed, no matter what the
 <% end %>
 <br />
 
+<h2>Related streams regex</h2>
+<div class="short-description">All streams with titles that match this regular expression will be listed as related streams</div>
+<%= form_tag related_stream_path(:stream_id => @stream) do %>
+  <%= label_tag 'related_streams_matcher', 'Matcher (regex):' %>
+  <%= text_field_tag 'related_streams_matcher', @stream.related_streams_matcher %>
+  <%= awesome_submit_link 'Set' %>
+<% end %>
+<br />
+
+
 <h2>Additional Columns</h2>
 <div class="short-description">Add additional columns to display GELF message fields.</div>
 <ul id="streams-additional-colums-list">

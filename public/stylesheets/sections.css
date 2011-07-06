@@ -340,6 +340,20 @@
   font-size: 11px;
 }
 
+#related-streams {
+  margin-top: 7px;
+  font-size: 13px;
+}
+
+#related-streams li {
+  padding-top: 1px;
+  padding-bottom: 1px;
+  padding-left: 5px;
+  margin-top: 1px;
+  margin-bottom: 1px;
+}
+
+
 /* Hosts */
 #hosts-quickjump {
     margin-bottom: 15px;
