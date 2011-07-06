@@ -31,7 +31,7 @@
   <% escaped_fullmsg = h(@message.full_message) %>
   <h3>Full message:</h3>
   <p class="messages-show-message messages-full-message">
-    <%= auto_link(escaped_fullmsg.gsub(/\n/, '<br />'), :html => { :target => "blank" }, :link => :urls) %>
+    <%= raw(auto_link(escaped_fullmsg.gsub(/\n/, '<br />'), :html => { :target => "blank" }, :link => :urls)) %>
   </p>
 <% end %>
 
