@@ -65,7 +65,7 @@ of the alarm. You can also define that all users are alarmed, no matter what the
 <h2>Rename stream</h2>
 <%= form_tag rename_stream_path(:stream_id => @stream) do %>
   <%= label_tag 'title', 'New name:' %>
-  <%= text_field_tag 'title' %>
+  <%= text_field_tag 'title', @stream.title %>
   <%= hidden_field_tag :stream_id, @stream.id%>
   <%= awesome_submit_link 'Rename' %>
 <% end %>
