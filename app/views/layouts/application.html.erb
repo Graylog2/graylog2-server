@@ -36,6 +36,7 @@
 
   <div id="modal-stream-chooser" style="display: none;"><%= render :partial => "modals/stream_chooser" %></div>
   <div id="modal-host-chooser" style="display: none;"><%= render :partial => "modals/host_chooser" %></div>
+  <div id="modal-current-operations" style="display: none;"><%= render :partial => "modals/current_operations" %></div>
 
   <div id="back-to-top">Back to top</div>
 
@@ -58,6 +59,10 @@
       <span class="notification-title">Warning!</span> It seems like your Graylog2 server is not running.
     </div>
   <% end %>
+
+  <div id="current-operations">
+    5 <span id="current-operations-desc">ops</span>
+  </div>
 
   <div id="top">
     <div id="userbar">

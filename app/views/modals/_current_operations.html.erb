@@ -1,0 +1,5 @@
+<h2>Current operations</h2>
+
+<% OperationInterface.new.get_all.each do |op| %>
+  <%= op.inspect %><br />
+<% end %>

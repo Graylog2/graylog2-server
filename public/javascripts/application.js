@@ -236,7 +236,12 @@ $(document).ready(function(){
     standardMapKeyOptions = { overlayClose:true }
     $.mapKey("s", function() { $("#modal-stream-chooser").modal(standardMapKeyOptions); });
     $.mapKey("h", function() { $("#modal-host-chooser").modal(standardMapKeyOptions); });
+    $.mapKey("o", function() { $("#modal-current-operations").modal(standardMapKeyOptions); });
 
+    // Open current operations modal after click on operation count
+    $("#current-operations").bind("click", function() {
+      $("#modal-current-operations").modal(standardMapKeyOptions);
+    });
 });
 
 function buildHostCssId(id) {

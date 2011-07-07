@@ -530,3 +530,19 @@ label {
 .highlighted .time-light {
   color: #fd9dd5;
 }
+
+#current-operations {
+  position: absolute;
+  right: 0px;
+  top: 50px;
+  padding: 3px;
+  padding-left: 7px;
+  background-color: #000;
+  font-weight: bold;
+  color: #fff;
+  cursor: pointer;
+}
+
+#current-operations-desc {
+  font-weight: normal;
+}
