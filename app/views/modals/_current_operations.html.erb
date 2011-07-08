@@ -1,5 +1,24 @@
+<% ops = OperationInterface.new.get_all %>
+
 <h2>Current operations</h2>
 
-<% OperationInterface.new.get_all.each do |op| %>
-  <%= op.inspect %><br />
+<% if ops.blank? %>
+  <strong>No active operations</strong>
+<% else %>
+  <table>
+    <tr>
+      <th>OPID</th>
+      <th>Type</th>
+      <th>Secs</th>
+      <th>Query</th>
+    </tr>
+  <% ops.each do |op| %>
+    <tr>
+      <td><%= op["opid"] %></td>
+      <td><%= op["query"].keys.first %></td>
+      <td><%= op["secs_running"] %></td>
+      <td><%= truncate(op["query"]["query"].to_s, :length => 50, :omission => "... (cut") %></td>
+    </tr>
+  <% end %>
+</table>
 <% end %>

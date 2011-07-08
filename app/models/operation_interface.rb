@@ -7,6 +7,11 @@ class OperationInterface
   end
 
   def get_all
+  return [
+{"opid"=>9260, "active"=>true, "lockType"=>"read", "waitingForLock"=>false, "secs_running"=>41, "op"=>"query", "ns"=>"graylog2.messages", "query"=>{"count"=>"messages", "query"=>{"_foo"=>0}, "fields"=>nil}, "client"=>"127.0.0.1:55770", "desc"=>"conn"},
+{"opid"=>9315, "active"=>true, "lockType"=>"read", "waitingForLock"=>false, "secs_running"=>3, "op"=>"query", "ns"=>"graylog2.messages", "query"=>{"count"=>"messages", "query"=>{"bar"=>"foo"}, "fields"=>nil}, "client"=>"127.0.0.1:56501", "desc"=>"conn"}
+  ]
+
     res = Array.new
     @ops["inprog"].each do |op|
       next unless allowed_op?(op)
