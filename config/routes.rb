@@ -3,6 +3,7 @@ Graylog2WebInterface::Application.routes.draw do
   match 'login' => 'sessions#new', :as => :login
   resource :session
   resources :dashboard
+  resources :operations
 
   resources :users do
     collection do

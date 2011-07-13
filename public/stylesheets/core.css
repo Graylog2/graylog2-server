@@ -546,3 +546,11 @@ label {
 #current-operations-desc {
   font-weight: normal;
 }
+
+#current-operations-list td,th {
+  padding-right: 10px;
+}
+
+#current-operations-list tr:hover {
+  background-color: #333;
+}

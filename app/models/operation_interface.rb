@@ -7,11 +7,6 @@ class OperationInterface
   end
 
   def get_all
-  return [
-{"opid"=>9260, "active"=>true, "lockType"=>"read", "waitingForLock"=>false, "secs_running"=>41, "op"=>"query", "ns"=>"graylog2.messages", "query"=>{"count"=>"messages", "query"=>{"_foo"=>0}, "fields"=>nil}, "client"=>"127.0.0.1:55770", "desc"=>"conn"},
-{"opid"=>9315, "active"=>true, "lockType"=>"read", "waitingForLock"=>false, "secs_running"=>3, "op"=>"query", "ns"=>"graylog2.messages", "query"=>{"count"=>"messages", "query"=>{"bar"=>"foo"}, "fields"=>nil}, "client"=>"127.0.0.1:56501", "desc"=>"conn"}
-  ]
-
     res = Array.new
     @ops["inprog"].each do |op|
       next unless allowed_op?(op)
@@ -23,12 +18,23 @@ class OperationInterface
         :query => op["query"]["query"]
       }
     end
+
+    return res
   rescue => e
     Rails.logger.error "Could not get current operations: #{e.message + e.backtrace.join("\n")}"
     return Array.new
   end
 
+  def count
+    get_all.count
+  end
+
   def kill(opid)
+    op = get_all
+    return false unless allowed_op?(opid)
+    Mongoid.database["$cmd.sys.killop"].find_one({:op => opid.to_i})
+
+    true
   end
 
   private

@@ -5,19 +5,20 @@
 <% if ops.blank? %>
   <strong>No active operations</strong>
 <% else %>
-  <table>
+  <table id="current-operations-list">
     <tr>
       <th>OPID</th>
       <th>Type</th>
       <th>Secs</th>
-      <th>Query</th>
+      <th colspan="2">Query</th>
     </tr>
   <% ops.each do |op| %>
     <tr>
       <td><%= op["opid"] %></td>
       <td><%= op["query"].keys.first %></td>
       <td><%= op["secs_running"] %></td>
-      <td><%= truncate(op["query"]["query"].to_s, :length => 50, :omission => "... (cut") %></td>
+      <td><%= truncate(op["query"]["query"].to_s, :length => 200, :omission => "...") %></td>
+      <td><%= link_to "kill", operation_path(op["opid"]), :method => :delete, :confirm => "Really kill this operation?" %></td>
     </tr>
   <% end %>
 </table>
