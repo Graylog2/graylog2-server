@@ -14,7 +14,7 @@
 
 <div class="setting">
   <h4><label>Message length</h4>
-  <%= form_tag '/settings/store' do -%>
+  <%= form_tag store_settings_path do -%>
     <%= hidden_field_tag 'setting_type', Setting::TYPE_MESSAGE_LENGTH %>
     <%= text_field_tag 'value', Setting.get_message_length(current_user) %>
     <%= awesome_submit_link 'Store' %>
@@ -25,7 +25,7 @@
 
 <div class="setting">
   <h4><label>Message count interval</label></h4>
-  <%= form_tag '/settings/store' do -%>
+  <%= form_tag store_settings_path do -%>
     <%= hidden_field_tag 'setting_type', Setting::TYPE_MESSAGE_COUNT_INTERVAL %>
     <%= text_field_tag 'value', Setting.get_message_count_interval(current_user) %>
     <%= awesome_submit_link 'Store' %>
@@ -36,7 +36,7 @@
 
 <div class="setting">
   <h4><label>Maximum messages</label></h4>
-  <%= form_tag '/settings/store' do -%>
+  <%= form_tag store_settings_path do -%>
     <%= hidden_field_tag 'setting_type', Setting::TYPE_MESSAGE_MAX_COUNT %>
     <%= text_field_tag 'value', Setting.get_message_max_count(current_user) %>
     <%= awesome_submit_link 'Store' %>
@@ -50,7 +50,7 @@
 <% if Configuration.livetail_enabled %>
 <div class="setting">
   <h4><label>Live tail message history</label></h4>
-  <%= form_tag '/settings/store' do -%>
+  <%= form_tag store_settings_path do -%>
     <%= hidden_field_tag 'setting_type', Setting::TYPE_LIVETAIL_ROW_COUNT %>
     <%= text_field_tag 'value', Setting.get_livetail_row_count(current_user) %>
     <%= awesome_submit_link 'Store' %>
