@@ -25,6 +25,7 @@ import org.graylog2.database.MongoConnection;
 import org.graylog2.messagehandlers.amqp.AMQP;
 import org.graylog2.messagehandlers.amqp.AMQPBroker;
 import org.graylog2.messagehandlers.amqp.AMQPSubscribedQueue;
+import org.graylog2.messagehandlers.amqp.AMQPSubscribedExchange;
 import org.graylog2.messagehandlers.amqp.AMQPSubscriberThread;
 import org.graylog2.messagehandlers.gelf.GELF;
 import org.graylog2.messagehandlers.gelf.GELFMainThread;
@@ -245,6 +246,11 @@ public final class Main {
                 }
 
                 LOG.info("[x] AMQP threads are up. (" + amqpQueues.size() + " queues)");
+            }
+            
+            AMQPSubscribedExchange amqpExchange = Configuration.getAMQPSubscribedExchange(Main.masterConfig);
+            if (amqpExchange != null) {
+              LOG.info("[x] AMQP topic exchange '" + amqpExchange.getName() + "' with routing key '" + amqpExchange.getRoutingKey() + "'");
             }
         }
 

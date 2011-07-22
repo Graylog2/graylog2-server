@@ -23,7 +23,9 @@ package org.graylog2;
 import com.mongodb.ServerAddress;
 import org.apache.log4j.Logger;
 import org.graylog2.messagehandlers.amqp.AMQPSubscribedQueue;
+import org.graylog2.messagehandlers.amqp.AMQPSubscribedExchange;
 import org.graylog2.messagehandlers.amqp.InvalidQueueTypeException;
+import org.graylog2.messagehandlers.amqp.InvalidExchangeTypeException;
 
 import java.net.UnknownHostException;
 import java.util.ArrayList;
@@ -147,4 +149,30 @@ public class Configuration {
         return queueList;
     }
 
+    static AMQPSubscribedExchange getAMQPSubscribedExchange(Properties config) {
+
+        AMQPSubscribedExchange exchange = null;
+        String exchangeName = config.getProperty("amqp_subscribed_topic_exchange");
+        if (exchangeName == null || exchangeName.isEmpty()) {
+	          LOG.error("Malformed amqp_subscribed_topic_exchange configuration.");
+            return null;
+        }
+        String routingKey = config.getProperty("amqp_topic_exchange_routingkey");
+        if (routingKey == null || routingKey.isEmpty()) {
+	          LOG.error("Malformed amqp_subscribed_topic_exchange_routingkey configuration.");
+            return null;
+        }
+        String type = "gelf"; // too lazy to implement switching...
+         try {
+             exchange = new AMQPSubscribedExchange(exchangeName, routingKey, type);
+         } catch (InvalidExchangeTypeException e) {
+             LOG.error("Invalid queue type in amqp_subscribed_topic_exchange (can't happen)");
+             return null;
+         } catch (Exception e) {
+             LOG.error("Could not parse amqp_subscribed_topic_exchange: " + e.getMessage(), e);
+             return null;
+         }
+
+        return exchange;
+    }
 }
