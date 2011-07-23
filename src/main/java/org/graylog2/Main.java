@@ -27,6 +27,7 @@ import org.graylog2.messagehandlers.amqp.AMQPBroker;
 import org.graylog2.messagehandlers.amqp.AMQPSubscribedQueue;
 import org.graylog2.messagehandlers.amqp.AMQPSubscribedExchange;
 import org.graylog2.messagehandlers.amqp.AMQPSubscriberThread;
+import org.graylog2.messagehandlers.amqp.AMQPExchangeSubscriberThread;
 import org.graylog2.messagehandlers.gelf.GELF;
 import org.graylog2.messagehandlers.gelf.GELFMainThread;
 import org.graylog2.messagehandlers.syslog.SyslogServerThread;
@@ -250,7 +251,9 @@ public final class Main {
             
             AMQPSubscribedExchange amqpExchange = Configuration.getAMQPSubscribedExchange(Main.masterConfig);
             if (amqpExchange != null) {
-              LOG.info("[x] AMQP topic exchange '" + amqpExchange.getName() + "' with routing key '" + amqpExchange.getRoutingKey() + "'");
+              AMQPExchangeSubscriberThread amqpExchangeThread = new AMQPExchangeSubscriberThread(amqpExchange, amqpBroker);
+              amqpExchangeThread.start();
+              LOG.info("[x] AMQP topic exchange '" + amqpExchange.getName() + "' is up (routing key '" + amqpExchange.getRoutingKey() + "')");
             }
         }
 

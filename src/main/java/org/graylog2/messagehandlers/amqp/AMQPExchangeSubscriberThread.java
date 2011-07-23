@@ -1,0 +1,153 @@
+/**
+ * Copyright 2011 Dick Davies <rasputnik@hellooperator.net>
+ *
+ * This file is part of Graylog2.
+ *
+ * Graylog2 is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * Graylog2 is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with Graylog2.  If not, see <http://www.gnu.org/licenses/>.
+ *
+ */
+
+package org.graylog2.messagehandlers.amqp;
+
+import com.rabbitmq.client.AlreadyClosedException;
+import com.rabbitmq.client.Channel;
+import com.rabbitmq.client.Connection;
+import com.rabbitmq.client.QueueingConsumer;
+import org.apache.log4j.Logger;
+import org.graylog2.messagehandlers.gelf.InvalidGELFCompressionMethodException;
+import org.graylog2.messagehandlers.gelf.SimpleGELFClientHandler;
+import org.graylog2.messagehandlers.syslog.GraylogSyslogServerEvent;
+import org.graylog2.messagehandlers.syslog.SyslogEventHandler;
+import org.productivity.java.syslog4j.server.SyslogServer;
+import org.productivity.java.syslog4j.server.SyslogServerIF;
+
+import java.io.IOException;
+import java.io.UnsupportedEncodingException;
+import java.net.InetAddress;
+import java.util.zip.DataFormatException;
+
+/**
+ * AMQPExchangeSubscriberThread.java: July 22, 2011 6:52:12 PM
+ *
+ * Thread responsible for subscribing to AMQP topic exchanges.
+ *
+ * @author: Dick Davies <rasputnik@hellooperator.net>
+ */
+public class AMQPExchangeSubscriberThread extends Thread {
+
+    private static final Logger LOG = Logger.getLogger(AMQPExchangeSubscriberThread.class);
+
+    private AMQPSubscribedExchange ex = null;
+    private AMQPBroker broker = null;
+
+    public final static int SLEEP_INTERVAL = 10;
+
+    public AMQPExchangeSubscriberThread(AMQPSubscribedExchange exchange, AMQPBroker broker) {
+        this.ex = exchange;
+        this.broker = broker;
+    }
+
+    /**
+     * Run the thread. Runs forever!
+     */
+    @Override public void run() {
+        while(true) {
+            Connection connection = null;
+            Channel channel = null;
+            QueueingConsumer consumer = new QueueingConsumer(channel);
+
+            try {
+                connection = broker.getConnection();
+                channel = connection.createChannel();
+                channel.exchangeDeclare(this.ex.getName(), "topic", false);
+                // get any old queue, and bind it to the topic exchange with our routing key
+                String queueName = channel.queueDeclare().getQueue();
+                channel.queueBind(queueName, this.ex.getName(), this.ex.getRoutingKey());
+                channel.basicConsume(queueName, false, consumer);
+
+                LOG.info("Successfully bound to exchange '" + this.ex.getName() + "' (queuename: " + queueName +")");
+            } catch (Exception e) {
+                LOG.error("AMQP exchange '" + this.ex.getName() + "': Could not connect to AMQP. Retrying in " + SLEEP_INTERVAL + " seconds. (" + e.getMessage() + ")");
+
+                // Retry after waiting for SLEEP_INTERVAL seconds.
+                try { Thread.sleep(SLEEP_INTERVAL*1000); } catch(InterruptedException foo) {}
+                continue;
+            }
+
+            while (true) {
+                try {
+                    QueueingConsumer.Delivery delivery;
+                    try {
+                        delivery = consumer.nextDelivery();
+                    } catch (InterruptedException ie) {
+                        continue;
+                    }
+
+                    // Handle the message. (Store in MongoDB etc)
+                    try {
+                        handleMessage(delivery.getBody());
+                    } catch(Exception e) {
+                        LOG.error("Could not handle AMQP message: " + e.toString());
+                    }
+
+                    try {
+                        channel.basicAck(delivery.getEnvelope().getDeliveryTag(), false);
+                    } catch (IOException e) {
+                        LOG.error("Could not ack AMQP message: " + e.toString());
+                    }
+                } catch(Exception e) {
+                    // Error while receiving. i.e. when AMQP broker breaks down.
+                    LOG.error("AMQP exchange '" + this.ex.getName() + "': Error while subscribed (rebuilding connection "
+                            + "in " + SLEEP_INTERVAL + " seconds. (" + e.getMessage() + ")");
+
+                    // Better close connection stuff it is still active.
+                    try {
+                        channel.close();
+                        connection.close();
+                    } catch (IOException ex) {
+                        // I don't care.
+                    } catch (AlreadyClosedException ex) {
+                        // I don't care.
+                    }
+
+                    // Retry after waiting for SLEEP_INTERVAL seconds.
+                    try { Thread.sleep(SLEEP_INTERVAL*1000); } catch(InterruptedException foo) {}
+                    break;
+                }
+            }
+        }
+    }
+
+    private void handleMessage(byte[] amqpBody) throws DataFormatException, UnsupportedEncodingException, InvalidGELFCompressionMethodException, IOException {
+        // Handle message.
+        switch (this.ex.getType()) {
+            case AMQPSubscribedExchange.TYPE_GELF:
+                // Handle GELF message.
+                SimpleGELFClientHandler gelfHandler = new SimpleGELFClientHandler(new String(amqpBody));
+                gelfHandler.setAmqpReceiverQueue(this.ex.getName());
+                gelfHandler.handle();
+                break;
+            case AMQPSubscribedExchange.TYPE_SYSLOG:
+                // Handle syslog message.
+                GraylogSyslogServerEvent message = new GraylogSyslogServerEvent(amqpBody, amqpBody.length, InetAddress.getLocalHost());
+                SyslogEventHandler syslogHandler = new SyslogEventHandler();
+                message.setAmqpReceiverQueue(this.ex.getName());
+                syslogHandler.event(null, null, message);
+                break;
+            default:
+                LOG.error("Invalid type of AMQP message. This should not be possible.");
+        }
+    }
+
+}
