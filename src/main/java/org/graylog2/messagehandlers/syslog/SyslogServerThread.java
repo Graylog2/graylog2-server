@@ -22,6 +22,7 @@ package org.graylog2.messagehandlers.syslog;
 
 import org.graylog2.Main;
 import org.productivity.java.syslog4j.server.SyslogServer;
+import org.productivity.java.syslog4j.server.SyslogServerConfigIF;
 import org.productivity.java.syslog4j.server.SyslogServerIF;
 
 /**
@@ -50,11 +51,15 @@ public class SyslogServerThread extends Thread {
      */
     @Override public void run() {
         String syslogProtocol = Main.masterConfig.getProperty("syslog_protocol");
-        SyslogServerIF syslogServer = SyslogServer.getThreadedInstance(syslogProtocol);
+
+        SyslogServerIF syslogServer = SyslogServer.getInstance(syslogProtocol);
+        SyslogServerConfigIF syslogServerConfig = syslogServer.getConfig();
         
-        syslogServer.getConfig().setPort(port);
-        syslogServer.getConfig().setUseStructuredData(true);
-        syslogServer.getConfig().addEventHandler(new SyslogEventHandler());
+        syslogServerConfig.setPort(port);
+        syslogServerConfig.setUseStructuredData(true);
+        syslogServerConfig.addEventHandler(new SyslogEventHandler());
+
+        syslogServer = SyslogServer.getThreadedInstance(syslogProtocol);
 
         this.coreThread = syslogServer.getThread();
     }
@@ -69,3 +74,4 @@ public class SyslogServerThread extends Thread {
     }
 
 }
+
