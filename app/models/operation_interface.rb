@@ -2,20 +2,16 @@ class OperationInterface
 
   ALLOWED_OPERATIONS = %w(count find distinct)
 
-  def initialize
-    @ops = Mongoid.database["$cmd.sys.inprog"].find_one
-  end
-
   def get_all
     res = Array.new
-    @ops["inprog"].each do |op|
-      next unless allowed_op?(op)
+    ops["inprog"].each do |op|
+      next if !allowed_op?(op)
 
       res << {
         :opid => op["opid"],
         :secs_running => op["secs_running"],
         :type => extract_type(op),
-        :query => op["query"]["query"]
+        :query => extract_query(op)
       }
     end
 
@@ -30,8 +26,8 @@ class OperationInterface
   end
 
   def kill(opid)
-    op = get_all
-    return false unless allowed_op?(opid)
+    op = ops["inprog"].keep_if{ |o| o["opid"] == opid.to_i }.first
+    return false if op.blank? || !allowed_op?(op)
     Mongoid.database["$cmd.sys.killop"].find_one({:op => opid.to_i})
 
     true
@@ -39,10 +35,14 @@ class OperationInterface
 
   private
 
+  def ops
+    Mongoid.database["$cmd.sys.inprog"].find_one
+  end
+
   def allowed_op?(op)
-    return false unless op["ns"] =~ /^#{Mongoid.database.name}\.messages$/ # Only messages collection of graylog2 database.
+    return false unless op["ns"] =~ /^#{Mongoid.database.name}/ # Only graylog2 database.
     return false unless op["op"] == "query" # Only query operations.
-    return false unless ALLOWED_OPERATIONS.include?(extract_type(op["query"])) # Only count, find or distinct queries.
+    return false unless ALLOWED_OPERATIONS.include?(extract_type(op)) # Only count, find or distinct queries.
 
     return true
   rescue => e
@@ -51,7 +51,17 @@ class OperationInterface
   end
 
   def extract_type(op)
-    op["query"].keys.first
+    if op["query"]["$query"].blank?
+      # This is not a find query.
+      op["query"].keys.first
+    else
+      "find"
+    end 
+  end
+
+  # ZOMG mongodb naming
+  def extract_query(op)
+    op["query"]["$query"].blank? ? op["query"]["query"] : op["query"]["$query"]
   end
 
 end
