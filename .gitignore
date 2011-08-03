@@ -24,3 +24,5 @@ coverage/
 test/reports/
 
 .DS_Store
+
+*.swp
