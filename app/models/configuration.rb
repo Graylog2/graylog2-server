@@ -50,6 +50,10 @@ class Configuration
     hoptoad_config :api_key
   end
 
+  def self.hoptoad_host
+    hoptoad_config :host
+  end
+
   def self.subscr_config(key, default)
     nested_general_config :subscriptions, key, default
   end
