@@ -113,8 +113,10 @@ class Configuration
 
   def self.email_smtp_settings
     Hash.new.tap do |ret|
-      email_config.each_pair do |key, value|
-        ret[key.to_sym] = value unless value.blank?
+      if email_transport_type == :smtp
+        email_config.each_pair do |key, value|
+          ret[key.to_sym] = value unless value.blank?
+        end
       end
     end
   end
