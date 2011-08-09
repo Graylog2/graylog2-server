@@ -39,6 +39,9 @@ public class StreamRuleMatcherFactory {
             case StreamRule.TYPE_MESSAGE:
                 matcher = new MessageMatcher();
                 break;
+			case StreamRule.TYPE_FULL_MESSAGE:
+				matcher = new FullMessageMatcher();
+				break;
             case StreamRule.TYPE_HOST:
                 matcher = new HostMatcher();
                 break;
