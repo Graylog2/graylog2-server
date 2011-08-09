@@ -8,7 +8,7 @@
 <h2>Add rule:</h2>
 <%= form_for @new_rule, :url => stream_streamrules_path(@stream) do |f| %>
   <%= f.hidden_field :stream_id, :value => @stream.id %>
-  <%= f.select :rule_type, options_for_select(Streamrule.get_types_for_select_options(:streams), :selected => Streamrule::TYPE_MESSAGE) %>
+  <%= f.select :rule_type, options_for_select(Streamrule.get_types_for_select_options(:streams).sort, :selected => Streamrule::TYPE_MESSAGE) %>
   <%= f.text_field :value, :class => "stream-value-field stream-value-message" %>
   <%= f.text_field :value, { :class => "stream-value-field stream-value-facility", :style => "display: none;", :disabled => true } %>
   <%= f.text_field :value, { :class => "stream-value-field stream-value-host-regex", :style => "display: none;", :disabled => true } %>

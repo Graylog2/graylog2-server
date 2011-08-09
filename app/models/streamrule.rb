@@ -19,10 +19,12 @@ class Streamrule
   TYPE_HOSTGROUP = 7
   TYPE_SEVERITY_OR_HIGHER = 8
   TYPE_HOST_REGEX = 9
+  TYPE_FULL_MESSAGE = 10
 
   def self.get_types_for_select_options(special = nil)
     {
-      "Message (regex)" => self::TYPE_MESSAGE,
+      "Short Message (regex)" => self::TYPE_MESSAGE,
+      "Full Message (regex)" => self::TYPE_FULL_MESSAGE,
       "Host" => self::TYPE_HOST,
       "Host (regex)" => self::TYPE_HOST_REGEX,
       "Hostgroup" => self::TYPE_HOSTGROUP,
@@ -36,7 +38,7 @@ class Streamrule
   private
 
   def valid_regex
-    return if rule_type != TYPE_MESSAGE
+    return if [TYPE_MESSAGE, TYPE_FULL_MESSAGE].include?(rule_type)
 
     begin
       String.new =~ /#{value}/
