@@ -134,7 +134,7 @@ class Message
 
     return conditions if conditions_only
 
-    conditions.default_scope.limit(LIMIT).paginate(:page => page)
+    conditions.default_scope.paginate(:page => page, :per_page => LIMIT)
   end
 
   def self.extract_additional_from_quickfilter(filters)
