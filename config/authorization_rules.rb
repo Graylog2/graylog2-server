@@ -71,6 +71,8 @@ authorization do
     has_permission_on :dashboard, :to => [:index]
 
     has_permission_on :health, :to => [:index, :currentthroughput]
+
+    has_permission_on :operations, :to => [:kill]
   end
 
   role :reader do

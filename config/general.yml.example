@@ -3,6 +3,7 @@ general:
   date_format: "%d.%m.%Y - %H:%M:%S" # http://ruby-doc.org/core/classes/Time.html#M000298 (strftime syntax)
   allow_deleting: false # Big performance improvement if you don't allow to delete messages. Please add an index if you allow deleting: https://github.com/Graylog2/graylog2-docs/wiki/Indexes
   allow_version_check: true # Enables manual (/versioncheck/index) and automatic (every 30min from overview page) version checking against graylog2.org via HTTP. 
+  # custom_cookie_name: graylog2_staging1 # Set an own cookie name - Useful for multiple deployments on same host like example.org/staging1/graylog2, example.org/staging2/graylog2
 
 # Settings for stream subscription emails. 
 subscriptions:

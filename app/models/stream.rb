@@ -15,7 +15,7 @@ class Stream
   validates_numericality_of :alarm_limit, :allow_nil => true
   validates_numericality_of :alarm_timespan, :allow_nil => true, :greater_than => 0
   validates_length_of :shortname, :maximum => 23
-  validates_uniqueness_of :shortname
+  validates_uniqueness_of :shortname, :allow_nil => true
   validates_format_of :shortname, :with => /^[A-Za-z0-9_]+$/, :allow_nil => true
   validate :valid_regexes
 

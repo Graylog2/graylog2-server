@@ -104,4 +104,9 @@ class Configuration
   def self.hoptoad_key
     return @general_config['hoptoad']['api_key']
   end
+
+  def self.custom_cookie_name
+    return nil if @general_config.blank? or @general_config['general'].blank? or @general_config['general']['custom_cookie_name'].blank?
+    return @general_config['general']['custom_cookie_name']
+  end
 end
