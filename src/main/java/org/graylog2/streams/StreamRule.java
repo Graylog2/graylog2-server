@@ -36,11 +36,12 @@ public class StreamRule {
     public final static int TYPE_HOST = 2;
     public final static int TYPE_SEVERITY = 3;
     public final static int TYPE_FACILITY = 4;
-	public final static int TYPE_FULL_MESSAGE = 5;
+	// Type 5 is reserved for frontend usage (timeframe filter)
     public final static int TYPE_ADDITIONAL = 6;
     public final static int TYPE_HOSTGROUP = 7;
     public final static int TYPE_SEVERITY_OR_HIGHER = 8;
     public final static int TYPE_HOST_REGEX = 9;
+	public final static int TYPE_FULL_MESSAGE = 10;
 
     private ObjectId objectId = null;
     private int ruleType = 0;
