@@ -36,7 +36,6 @@ public class StreamRule {
     public final static int TYPE_HOST = 2;
     public final static int TYPE_SEVERITY = 3;
     public final static int TYPE_FACILITY = 4;
-	public final static int TYPE_FULL_MESSAGE = 5;
     public final static int TYPE_ADDITIONAL = 6;
 
     private ObjectId objectId = null;
