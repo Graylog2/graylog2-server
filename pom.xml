@@ -27,11 +27,6 @@
             <name>Scala-tools Maven2 Releases Repository</name>
             <url>http://scala-tools.org/repo-releases</url>
         </repository>
-        <repository>
-            <id>morphia-googlecode</id>
-            <name>Morphia from GoogleCode</name>
-            <url>http://morphia.googlecode.com/svn/mavenrepo/</url>
-        </repository>
     </repositories>
     <pluginRepositories>
         <pluginRepository>
@@ -110,11 +105,6 @@
             <groupId>log4j</groupId>
             <artifactId>log4j</artifactId>
             <version>1.2.16</version>
-        </dependency>
-        <dependency>
-            <groupId>com.google.code.morphia</groupId>
-            <artifactId>morphia</artifactId>
-            <version>0.99</version>
         </dependency>
     </dependencies>
 
