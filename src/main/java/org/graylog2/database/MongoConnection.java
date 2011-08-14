@@ -20,17 +20,9 @@
 
 package org.graylog2.database;
 
-import com.mongodb.BasicDBObject;
-import com.mongodb.BasicDBObjectBuilder;
-import com.mongodb.Mongo;
-import com.mongodb.DB;
-import com.mongodb.DBCollection;
-import com.mongodb.MongoException;
-import com.mongodb.MongoOptions;
-import com.mongodb.ServerAddress;
+import com.mongodb.*;
+
 import java.util.List;
-import org.graylog2.Configuration;
-import org.graylog2.Main;
 
 /**
  * MongoConnection.java: Jun 6, 2010 1:36:19 PM
@@ -47,6 +39,8 @@ public final class MongoConnection {
 
     private DBCollection messagesCollection = null;
     private DBCollection historicServerValuesCollection = null;
+
+    private long messagesCollSize;
 
     private MongoConnection() {}
 
@@ -70,13 +64,22 @@ public final class MongoConnection {
      * @param database MongoDB database
      * @param port MongoDB port
      * @param useAuth Use authentication?
+     * @param maxConnections
+     * @param threadsAllowedToBlockForConnectionMultiplier
+     * @param replicaServers
+     *
      * @throws Exception
      */
-    public void connect(String username, String password, String hostname, String database, int port, String useAuth, List<ServerAddress> replicaServers) throws Exception {
+    public void connect(String username, String password, String hostname, String database, int port, String useAuth,
+                        int maxConnections, int threadsAllowedToBlockForConnectionMultiplier,
+                        List<ServerAddress> replicaServers, long messagesCollSize) throws Exception {
+        MongoOptions options = new MongoOptions();
+        options.connectionsPerHost = maxConnections;
+        options.threadsAllowedToBlockForConnectionMultiplier = threadsAllowedToBlockForConnectionMultiplier;
+
+        this.messagesCollSize = messagesCollSize;
+
         try {
-            MongoOptions options = new MongoOptions();
-            options.connectionsPerHost = Configuration.getMaximumMongoDBConnections(Main.masterConfig);
-            options.threadsAllowedToBlockForConnectionMultiplier = Configuration.getThreadsAllowedToBlockMultiplier(Main.masterConfig);
 
             // Connect to replica servers if given. Else the standard way to one server.
             if (replicaServers != null && replicaServers.size() > 0) {
@@ -133,7 +136,6 @@ public final class MongoConnection {
         if(MongoConnection.getInstance().getDatabase().collectionExists("messages")) {
             coll = MongoConnection.getInstance().getDatabase().getCollection("messages");
         } else {
-            long messagesCollSize = Long.parseLong(Main.masterConfig.getProperty("messages_collection_size").trim());
             coll = MongoConnection.getInstance()
                     .getDatabase()
                     .createCollection("messages", BasicDBObjectBuilder.start()

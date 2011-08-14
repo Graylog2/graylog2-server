@@ -24,6 +24,7 @@ import com.mongodb.DBObject;
 import org.bson.types.ObjectId;
 import org.graylog2.forwarders.forwarders.GELFMessageForwarder;
 import org.graylog2.forwarders.forwarders.LogglyForwarder;
+import org.graylog2.forwarders.forwarders.MessageForwarderConfigurationException;
 import org.graylog2.forwarders.forwarders.UDPSyslogForwarder;
 
 /**
@@ -57,7 +58,8 @@ public class ForwardEndpoint {
         this.mongoObject = endpoint;
     }
 
-    public MessageForwarderIF getForwarder() throws InvalidEndpointTypeException {
+    public MessageForwarderIF getForwarder() throws InvalidEndpointTypeException, MessageForwarderConfigurationException {
+
         switch (endpointType) {
             case ENDPOINT_TYPE_UDP_SYSLOG:
                 return new UDPSyslogForwarder(this.getHost(), this.getPort());
