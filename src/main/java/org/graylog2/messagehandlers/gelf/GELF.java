@@ -22,7 +22,6 @@ package org.graylog2.messagehandlers.gelf;
 
 import java.io.IOException;
 import java.net.DatagramPacket;
-import org.graylog2.Main;
 
 /**
  * GELF.java: Jun 23, 2010 6:46:45 PM
@@ -92,14 +91,6 @@ public final class GELF {
     public static final String USER_DEFINED_FIELD_PREFIX = "_";
 
     private GELF() { }
-
-    /**
-     * Is GELF enabled? Decision based on /etc/graylog2.conf "use_gelf" parameter.
-     * @return boolean
-     */
-    public static boolean isEnabled() {
-        return Main.masterConfig.getProperty("use_gelf").equals("true");
-    }
 
     /**
      * Find out if the given string is a chunked GELF message or not.

@@ -20,17 +20,18 @@
 
 package org.graylog2;
 
+import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
+import org.joda.time.DateTime;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.lang.management.ManagementFactory;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.zip.GZIPInputStream;
 import java.util.zip.InflaterInputStream;
-import org.apache.log4j.Level;
-import org.joda.time.DateTime;
 
 /**
  * Tools.java: May 17, 2010 9:46:31 PM
@@ -52,16 +53,8 @@ public final class Tools {
      * @throws Exception
      */
     public static String getPID() {
-        byte[] bo = new byte[100];
-        String[] cmd = {"bash", "-c", "echo $PPID"};
-        try {
-            Process p = Runtime.getRuntime().exec(cmd);
-            p.getInputStream().read(bo);
-        } catch (IOException e) {
-            LOG.fatal("Could not determine own PID! " + e.getMessage(), e);
-            return "unknown";
-        }
-        return new String(bo).trim();
+        return ManagementFactory.getRuntimeMXBean().getName().split("@")[0];
+
     }
 
     /**
