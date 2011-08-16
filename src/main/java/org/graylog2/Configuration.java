@@ -27,24 +27,63 @@ import org.graylog2.messagehandlers.amqp.InvalidQueueTypeException;
 
 import java.net.UnknownHostException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Properties;
 
 /**
- * Configuration.java: Oct 22, 2010 10:57:48 PM
+ * Helper class to hold configuration of Graylog2
  *
- * This will become the general class to fetch configuration from MongoDB or graylog2.conf with.
- *
- * @author: Lennart Koopmann <lennart@socketfeed.com>
+ * @author Lennart Koopmann <lennart@socketfeed.com>
+ * @author Jochen Schalanda <jochen@schalanda.name>
  */
 public class Configuration {
 
     private static final Logger LOG = Logger.getLogger(Configuration.class);
 
-    public static List<ServerAddress> getMongoDBReplicaSetServers(Properties config) {
+    // Define required configuration fields.
+    private static final String[] requiredProperties = {
+            "syslog_listen_port",
+            "syslog_protocol",
+            "mongodb_useauth",
+            "mongodb_user",
+            "mongodb_password",
+            "mongodb_database",
+            "mongodb_port",
+            "messages_collection_size",
+            "use_gelf",
+            "gelf_listen_port",
+    };
+
+    private static final String[] allowedSyslogProtocols = { "tcp", "udp" };
+    private static final String[] deprecatedProperties = { "rrd_storage_dir" };
+    private static final String[] numericalPositiveProperties = {
+            "mongodb_port",
+            "mongodb_max_connections",
+            "mongodb_threads_allowed_to_block_multiplier",
+            "messages_collection_size",
+            "gelf_listen_port",
+            "syslog_listen_port",
+            "amqp_port",
+            "forwarder_loggly_timeout",
+    };
+
+
+    private Properties properties;
+
+    public Configuration(Properties properties) {
+
+        if(properties == null) {
+            throw new IllegalArgumentException("Properties must not be null");
+        }
+
+        this.properties = properties;
+    }
+
+    public List<ServerAddress> getMongoDBReplicaSetServers() {
         List<ServerAddress> replicaServers = new ArrayList<ServerAddress>();
 
-        String rawSet = config.getProperty("mongodb_replica_set");
+        String rawSet = get("mongodb_replica_set");
 
         if (rawSet == null || rawSet.isEmpty()) {
             return null;
@@ -52,9 +91,10 @@ public class Configuration {
 
         // Get every host:port pair
         String[] hosts = rawSet.split(",");
-        for (int i = 0; i < hosts.length; i++) {
+
+        for (String host : hosts) {
             // Split host:port.
-            String[] replicaTarget = hosts[i].split(":");
+            String[] replicaTarget = host.split(":");
 
             // Check if valid.
             if (replicaTarget == null || replicaTarget.length != 2) {
@@ -74,50 +114,25 @@ public class Configuration {
         return replicaServers;
     }
 
-    public static int getMaximumMongoDBConnections(Properties config) {
-        String val = config.getProperty("mongodb_max_connections");
-        if (val != null) {
-            int res = Integer.parseInt(val);
-            if (res > 0) {
-                return res;
-            }
-        }
-
-        // Default value.
-        return 1000;
+    public int getMaximumMongoDBConnections() {
+        return getInteger("mongodb_max_connections", 1000);
     }
 
 
-    public static int getThreadsAllowedToBlockMultiplier(Properties config) {
-        String val = config.getProperty("mongodb_threads_allowed_to_block_multiplier");
-        if (val != null) {
-            int res = Integer.parseInt(val);
-            if (res > 0) {
-                return res;
-            }
-        }
-
-        // Default value.
-        return 5;
+    public int getThreadsAllowedToBlockMultiplier() {
+        return getInteger("mongodb_threads_allowed_to_block_multiplier", 5);
     }
 
-    public static int getLogglyTimeout(Properties config) {
-        String val = config.getProperty("forwarder_loggly_timeout");
-        if (val != null) {
-            int res = Integer.parseInt(val);
-            if (res > 0) {
-                return res*1000;
-            }
-        }
+    public int getLogglyTimeout() {
+        int timeout = getInteger("forwarder_loggly_timeout", 3);
 
-        // Default value.
-        return 3000;
+        return timeout*1000;
     }
 
-    static List<AMQPSubscribedQueue> getAMQPSubscribedQueues(Properties config) {
+    public List<AMQPSubscribedQueue> getAMQPSubscribedQueues() {
         List<AMQPSubscribedQueue> queueList = new ArrayList<AMQPSubscribedQueue>();
 
-        String rawQueues = config.getProperty("amqp_subscribed_queues");
+        String rawQueues = get("amqp_subscribed_queues");
 
         if (rawQueues == null || rawQueues.isEmpty()) {
             return null;
@@ -125,8 +140,8 @@ public class Configuration {
 
         // Get every queue.
         String[] queues = rawQueues.split(",");
-        for (int i = 0; i < queues.length; i++) {
-            String[] queueDefinition = queues[i].split(":");
+        for (String queue : queues) {
+            String[] queueDefinition = queue.split(":");
 
             // Check if valid.
             if (queueDefinition == null || queueDefinition.length != 2) {
@@ -138,13 +153,94 @@ public class Configuration {
             } catch (InvalidQueueTypeException e) {
                 LOG.error("Invalid queue type in amqp_subscribed_queues");
                 return null;
-            } catch (Exception e) {
-                LOG.error("Could not parse amqp_subscribed_queues: " + e.getMessage(), e);
-                return null;
             }
         }
 
         return queueList;
     }
 
+    public void validate() throws ConfigurationException {
+
+        for (String requiredProperty : requiredProperties) {
+            String value = get(requiredProperty);
+
+            if (value == null || value.isEmpty()) {
+                throw new ConfigurationException("Mandatory configuration option " + requiredProperty + " not set.");
+            }
+        }
+
+        // Check if numerical properties are positive
+        for (String property : numericalPositiveProperties) {
+
+            int value = getInteger(property, 0);
+
+            if (value < 0) {
+                throw new ConfigurationException("Configuration option " + property + " must be a positive integer.");
+            }
+        }
+
+        // Check if a MongoDB replica set or host is defined.
+        if (!contains("mongodb_host") && !contains("mongodb_replica_set")) {
+            throw new ConfigurationException("Neither MongoDB host (mongodb_host) nor replica set (mongodb_replica_set) has been defined.");
+        }
+
+        // Is the syslog_procotol valid?
+        if(!Arrays.asList(allowedSyslogProtocols).contains(get("syslog_protocol"))) {
+            throw new ConfigurationException("Invalid syslog_protocol: " + get("syslog_protocol"));
+        }
+
+        // Print out a deprecation warning if any deprecated configuration option is set.
+        for (String deprecatedProperty : deprecatedProperties) {
+
+            if (get(deprecatedProperty) != null) {
+                LOG.warn("Configuration option " + deprecatedProperty + " has been deprecated.");
+            }
+        }
+    }
+
+    public String get(String property) {
+
+        return properties.getProperty(property);
+    }
+
+    public int getInteger(String property, int defaultValue) {
+
+        String value = get(property);
+        int result = defaultValue;
+
+        if(value != null) {
+            try {
+                result = Integer.parseInt(value);
+            } catch (NumberFormatException ex) {
+                LOG.warn("Couldn't convert configuration property " + property + " to Integer", ex);
+            }
+        }
+
+        return result;
+    }
+
+    public long getLong(String property, long defaultValue) {
+
+        String value = get(property);
+        long result = defaultValue;
+
+        if(value != null) {
+            try {
+                result = Long.parseLong(value);
+            } catch (NumberFormatException ex) {
+                LOG.warn("Couldn't convert configuration property " + property + " to Long", ex);
+            }
+        }
+
+        return result;
+    }
+
+    public boolean contains(String property) {
+        return properties.containsKey(property);
+    }
+
+    public boolean getBoolean(String property) {
+
+        return Boolean.parseBoolean(get(property));
+    }
 }
