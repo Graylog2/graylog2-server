@@ -4,6 +4,8 @@ class Configuration
 
   def self.config_value(root, nesting, key, default = nil)
     [root, root[nesting.to_s], root[nesting.to_s][key.to_s]].any?(&:blank?) ? default : root[nesting.to_s][key.to_s]
+  rescue
+    nil
   end
 
   def self.nested_general_config(nesting, key, default = nil)
