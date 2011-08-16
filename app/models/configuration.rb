@@ -66,7 +66,7 @@ class Configuration
     subscr_config :subject, "[graylog2] Subscription"
   end
 
-  def self.streamalarm_config.value(key, default)
+  def self.streamalarm_config(key, default)
     nested_general_config :streamalarms, key, default
   end
 
