@@ -1,112 +1,123 @@
 class Configuration
-  @general_config = YAML::load(File.read(Rails.root.to_s + "/config/general.yml"))
-  @email_config = YAML::load(File.read(Rails.root.to_s + "/config/email.yml"))
+  @general_config = YAML::load File.read(Rails.root.to_s + "/config/general.yml")
+  @email_config = YAML::load File.read(Rails.root.to_s + "/config/email.yml")
 
-  @subscr_config = @general_config['subscriptions']
-  @streamalarm_config = @general_config['streamalarms']
-  @livetail_config = @general_config['livetail']
-  @app_config = @general_config['app']
+  def self.config_value(root, nesting, key, default = nil)
+    [root, root[nesting.to_s], root[nesting.to_s][key.to_s]].any?(&:blank?) ? default : root[nesting.to_s][key.to_s]
+  end
+
+  def self.nested_general_config(nesting, key, default = nil)
+    config_value @general_config, nesting, key, default
+  end
+
+  def self.general_config(key, default = nil)
+    nested_general_config :general, key, default
+  end
 
   def self.external_hostname
-    return "localhost" if @general_config.blank? or @general_config['general'].blank? or @general_config['general']['external_hostname'].blank?
-    return @general_config['general']['external_hostname']
+    general_config :external_hostname, 'localhost'
   end
 
   def self.allow_version_check
-    return false if @general_config.blank? or @general_config['general'].blank? or @general_config['general']['allow_version_check'].blank?
-    return @general_config['general']['allow_version_check']
+    general_config :allow_version_check, false
   end
 
   def self.allow_deleting
-    return false if @general_config.blank? or @general_config['general'].blank? or @general_config['general']['allow_deleting'].blank?
-    return @general_config['general']['allow_deleting']
-  end
-
-  def self.subscription_from_address
-    return @subscr_config['from'] unless @subscr_config.blank? or @subscr_config['from'].blank?
-    return "graylog2@example.org"
-  end
-
-  def self.subscription_subject
-    return @subscr_config['subject'] unless @subscr_config.blank? or @subscr_config['subject'].blank?
-    return "[graylog2] Subscription"
-  end
-
-  def self.streamalarm_from_address
-    return @streamalarm_config['from'] unless @streamalarm_config.blank? or @streamalarm_config['from'].blank?
-    return "graylog2@example.org"
-  end
-
-  def self.streamalarm_subject
-    return @streamalarm_config['subject'] unless @streamalarm_config.blank? or @streamalarm_config['subject'].blank?
-    return "[graylog2] Stream alarm!"
-  end
-
-  def self.streamalarm_message_count
-    return @streamalarm_config['message_count'].to_i unless @streamalarm_config.blank? or @streamalarm_config['message_count'].to_i.zero?
-    return 25
-  end
-
-  def self.email_transport_type
-    standard = :sendmail
-    return standard if @email_config[Rails.env].blank? or @email_config[Rails.env]['via'].blank?
-    # Only sendmail or SMTP allowed.
-    allowed = ['sendmail', 'smtp']
-    return standard unless allowed.include? @email_config[Rails.env]['via']
-
-    return @email_config[Rails.env]['via'].to_sym
-  end
-
-  def self.email_smtp_settings
-    return Hash.new if @email_config[Rails.env].blank? or @email_config[Rails.env]['via'].blank?
-    config = @email_config[Rails.env]
-    ret = Hash.new
-
-    if config['via'] == 'smtp'
-      ret[:address] = config['host'] unless config['host'].blank?
-      ret[:port] = config['port'] unless config['port'].blank?
-      ret[:user_name] = config['user'] unless config['user'].blank?
-      ret[:password] = config['password'] unless config['password'].blank?
-      ret[:authentication] = config['auth'] unless config['auth'].blank?
-      ret[:domain] = config['domain'] unless config['domain'].blank?
-      ret[:enable_starttls_auto] = config['enable_starttls_auto'] unless config['enable_starttls_auto'].blank?
-      return ret
-    end
-
-    return ret
-  end
-
-  def self.livetail_enabled
-    return false if @livetail_config.blank? or @livetail_config['enable'].blank?
-    return true if @livetail_config['enable'] == true
-    return false
-  end
-
-  def self.livetail_secret
-    return nil if @livetail_config.blank? or @livetail_config['secret'].blank?
-    return @livetail_config['secret'].to_s
-  end
-
-  def self.date_format
-    default = "%d.%m.%Y - %H:%M:%S"
-    (@general_config.blank? or @general_config["general"].blank? or @general_config["general"]["date_format"].blank?) ? default : @general_config["general"]["date_format"]
-  end
-
-  def self.hoptoad_enabled?
-    return false if @general_config.blank? or @general_config['hoptoad'].blank? or @general_config['hoptoad']['enabled'].blank?
-    return @general_config['hoptoad']['enabled']
-  end
-
-  def self.hoptoad_ssl?
-    return @general_config['hoptoad']['ssl']
-  end
-
-  def self.hoptoad_key
-    return @general_config['hoptoad']['api_key']
+    general_config :allow_deleting, false
   end
 
   def self.custom_cookie_name
-    return nil if @general_config.blank? or @general_config['general'].blank? or @general_config['general']['custom_cookie_name'].blank?
-    return @general_config['general']['custom_cookie_name']
+    general_config :custom_cookie_name
+  end
+
+  def self.date_format
+    general_config :date_format, "%d.%m.%Y - %H:%M:%S"
+  end
+
+  def self.hoptoad_config(key, default = nil)
+    nested_general_config :hoptoad, key, default
+  end
+
+  def self.hoptoad_enabled?
+    hoptoad_config :enabled, false
+  end
+
+  def self.hoptoad_ssl?
+    hoptoad_config :ssl
+  end
+
+  def self.hoptoad_key
+    hoptoad_config :api_key
+  end
+
+  def self.hoptoad_host
+    hoptoad_config :host
+  end
+
+  def self.subscr_config(key, default)
+    nested_general_config :subscriptions, key, default
+  end
+
+  def self.subscription_from_address
+    subscr_config :from, 'graylog2@example.org'
+  end
+
+  def self.subscription_subject
+    subscr_config :subject, "[graylog2] Subscription"
+  end
+
+  def self.streamalarm_config.value(key, default)
+    nested_general_config :streamalarms, key, default
+  end
+
+  def self.streamalarm_from_address
+    streamalarm_config :from, "graylog2@example.org"
+  end
+
+  def self.streamalarm_subject
+    streamalarm_config :subject, "[graylog2] Stream alarm!"
+  end
+
+  def self.streamalarm_message_count
+    streamalarm_config('message_count', 25).tap do |c|
+      c = 25 if c.zero?
+    end
+  end
+
+  def self.livetail_config(key, default = nil)
+    nested_general_config :livetail, key, default
+  end
+
+  def self.livetail_enabled
+    !!livetail_config('enable')
+  end
+
+  def self.livetail_secret
+    livetail_config 'secret'
+  end
+
+  def self.email_config(key = nil, default = nil)
+    if key
+      config_value @email_config, Rails.env, key, default
+    else
+      @email_config[Rails.env]
+    end
+  end
+
+  def self.email_transport_type
+    default = :sendmail
+    email_config('via', default).to_sym.tap do |value|
+      value = default unless [:sendmail, :smtp].include?(value) # Only sendmail or SMTP allowed.
+    end
+  end
+
+  def self.email_smtp_settings
+    Hash.new.tap do |ret|
+      if email_transport_type == :smtp
+        email_config.each_pair do |key, value|
+          ret[key.to_sym] = value unless value.blank?
+        end
+      end
+    end
   end
 end
