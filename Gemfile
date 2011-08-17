@@ -2,7 +2,7 @@ source :rubygems
 
 gem 'rack', '~> 1.2.2'
 gem 'rake', '~> 0.8.7'
-gem 'rails', '~> 3.0.7'
+gem 'rails', '~> 3.0.10'
 gem 'json', '~> 1.5.1'
 gem 'chronic', '~> 0.3.0'
 gem 'pony', '~> 1.1'  # unusual version number
