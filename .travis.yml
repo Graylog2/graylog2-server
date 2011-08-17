@@ -1,0 +1,8 @@
+rvm:
+  - 1.8.7
+  - ree
+  - 1.9.2
+  - jruby
+
+notifications:
+  irc: "irc.freenode.org#graylog2"
