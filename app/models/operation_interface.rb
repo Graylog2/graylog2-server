@@ -16,9 +16,6 @@ class OperationInterface
     end
 
     return res
-  rescue => e
-    Rails.logger.error "Could not get current operations: #{e.message + e.backtrace.join("\n")}"
-    return Array.new
   end
 
   def count
