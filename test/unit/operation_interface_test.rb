@@ -72,10 +72,15 @@ class OperationInterfaceTest < ActiveSupport::TestCase
   end
 
   should "not fail at killing an operation" do
+    stub = Hash.new
+    stub["inprog"] = Array.new
+    stub["inprog"] << generate_stub(:find)
+    OperationInterface.any_instance.stubs(:ops).returns(stub)
+
     assert_nothing_raised do
       OperationInterface.any_instance.stubs(:allowed_op?).returns(true)
       oi = OperationInterface.new
-      assert oi.kill(9001)
+      assert oi.kill(stub["inprog"][0]["opid"])
     end
   end
 
