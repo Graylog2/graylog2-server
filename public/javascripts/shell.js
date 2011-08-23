@@ -151,6 +151,18 @@ var Shell = new function() {
             x += "</span>"
           }
           break;
+        case "distribution":
+          x += " - Distribution result: " + "<span class=\"shell-result-string\">";
+          if (res.result.length == 0) {
+            x += "No matches.";
+          } else {
+            for (key in res.result) {
+              x += res.result[key]["distinct"] + "(" + parseInt(res.result[key]["count"]) + "), ";
+            }
+            x = x.substring(0, x.length - 2); // Remove last comma and whitespace.
+            x += "</span>"
+          }
+          break;
       }
 
       output(x);

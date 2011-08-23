@@ -14,9 +14,8 @@ end
 class Shell
 
   ALLOWED_SELECTORS = %w(all stream streams)
-  ALLOWED_OPERATORS = %w(count find distinct)
+  ALLOWED_OPERATORS = %w(count find distinct distribution)
   ALLOWED_CONDITIONALS = %w(>= <= > < = !=)
-  ALLOWED_OPTIONS = %w(limit offset query)
 
   MAX_LIMIT = 500
 
@@ -33,6 +32,7 @@ class Shell
       when "count" then perform_count
       when "find" then perform_find
       when "distinct" then perform_distinct
+      when "distribution" then perform_distribution
       else raise InvalidOperatorException
     end
 
@@ -246,6 +246,19 @@ class Shell
     end
 
     @result = criteria.distinct(@distinct_target.to_sym)
+  end
+
+  def perform_distribution
+    if @distinct_target.blank?
+      raise MissingDistinctTargetException
+    end
+
+    @result = Array.new
+    criteria.distinct(@distinct_target.to_sym).each do |r|
+      @result << { :distinct => r, :count => criteria.where(@distinct_target.to_sym => r).count }
+    end
+
+    @result.sort! { |a,b| b[:count] <=> a[:count] }
   end
 
 end

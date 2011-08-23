@@ -61,7 +61,7 @@ class AnalyticsController < ApplicationController
       :op => operation
     }
 
-    if operation == "count" or operation == "distinct"
+    if operation == "count" || operation == "distinct" || operation == "distribution"
       res[:result] = result;
     end
 
