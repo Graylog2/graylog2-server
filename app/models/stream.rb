@@ -131,6 +131,13 @@ class Stream
     Stream.where(:title => /#{self.related_streams_matcher}/, :_id => { "$ne" => self.id }).all
   end
 
+  def alarm_status
+    return :disabled if !self.alarm_active or self.alarm_limit.blank? or self.alarm_timespan.blank?
+
+    stream_count = self.message_count_since(self.alarm_timespan.minutes.ago.to_i)
+    return stream_count > self.alarm_limit ? :alarm : :no_alarm
+  end
+
   private
   def valid_regexes
     unless self.related_streams_matcher.blank?

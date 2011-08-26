@@ -1,17 +1,19 @@
 <h2>
-  <% if @stream.alarm_active and !@stream.alarm_limit.blank? and !@stream.alarm_timespan.blank? %>
-    <% stream_count = @stream.message_count_since(@stream.alarm_timespan.minutes.ago.to_i) %>
-    <% if stream_count > @stream.alarm_limit %>
-      <span class="status-alarm-text">ALARM:</span>
-      <%= stream_count %> messages in last <%= @stream.alarm_timespan %> minutes!
-    <% else %>
-      <span class="status-okay-text">OK:</span>
-      <%= stream_count %> messages in last <%= @stream.alarm_timespan %> minutes.
+    <% case @stream.alarm_status %>
+      <% when :alarm then %>
+        <span class="status-alarm-text">ALARM:</span>
+        <%= @stream.message_count_since(@stream.alarm_timespan.minutes.ago.to_i) %> messages in last <%= @stream.alarm_timespan %> minutes!
+      <% when :no_alarm then %>
+        <span class="status-okay-text">OK:</span>
+        <%= @stream.message_count_since(@stream.alarm_timespan.minutes.ago.to_i) %> messages in last <%= @stream.alarm_timespan %>
+        messages in last <%= @stream.alarm_timespan %> minutes.
+      <% when :disabled then %>
+        <%= @stream.message_count_since(5.minutes.ago) %> messages in last 5 minutes.
     <% end %>
-    <span id="streams-sidebar-limit">(Limit: <%= @stream.alarm_limit %>)</span>
-  <% else %>
-    <%= @stream.message_count_since(5.minutes.ago) %> messages in last 5 minutes.
-  <% end %>
+
+    <% if @stream.alarm_status != :disabled %>
+      <span id="streams-sidebar-limit">(Limit: <%= @stream.alarm_limit %>)</span>
+    <% end %>
 </h2>
 
 <div id="sidebar-graph" style="height: 100px;"></div>
