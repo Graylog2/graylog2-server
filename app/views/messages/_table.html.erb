@@ -35,7 +35,9 @@ additional_columns ||= []
       <% end %>
       <th>Message</th>
       <th class="messages-c-tools">
-        <%= image_tag "icons/sun.png", :class => "messages-from-today-link", :title => "Highlight messages from today" %>
+        <% unless defined?(@inline_version) %>
+          <%= image_tag "icons/sun.png", :class => "messages-from-today-link", :title => "Highlight messages from today" %>
+        <% end %>
       </th>
     </tr>
   </thead>
