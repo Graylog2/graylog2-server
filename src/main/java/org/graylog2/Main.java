@@ -52,7 +52,7 @@ public final class Main {
     private static final Logger LOG = Logger.getLogger(Main.class);
     private static final String GRAYLOG2_VERSION = "0.9.5";
     
-    private static RulesEngine drools = null;
+    public static RulesEngine drools = null;
     
     private Main() { }
 
