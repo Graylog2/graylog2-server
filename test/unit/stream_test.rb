@@ -68,6 +68,40 @@ class StreamTest < ActiveSupport::TestCase
 
   end
 
+  context "alarm status" do
+
+    should "mark stream as disabled if alarms are disabled" do
+      stream = Stream.make(:alarm_active => false)
+      assert_equal :disabled, stream.alarm_status
+    end
+
+    should "mark stream as disabled if alarms are enabled but no alarm limit is set" do
+      stream = Stream.make(:alarm_active => true, :alarm_limit => nil)
+      assert_equal :disabled, stream.alarm_status
+    end
+
+    should "mark stream as disabled if alarms are enabled but no alarm timespan is set" do
+      stream = Stream.make(:alarm_active => true, :alarm_timespan => nil)
+      assert_equal :disabled, stream.alarm_status
+    end
+
+    should "mark stream as not alarmed if under limit" do
+      stream = Stream.make(:alarm_active => true, :alarm_limit => 5, :alarm_timespan => 10)
+      4.times { Message.make(:streams => stream.id) }
+
+      assert_equal :no_alarm, stream.alarm_status
+    end
+
+    should "mark stream as alarmed if over limit" do
+      stream = Stream.make(:alarm_active => true, :alarm_limit => 10, :alarm_timespan => 10)
+      8.times { Message.make(:streams => stream.id) }
+      5.times { Message.make(:streams => [ stream.id, Stream.make.id ]) } # this goes over the alarm_limit
+
+      assert_equal :alarm, stream.alarm_status
+    end
+
+  end
+
 # Disable for now.
 #
 #  test "favorites are deleted with stream" do
