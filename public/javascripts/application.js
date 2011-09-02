@@ -78,16 +78,6 @@ $(document).ready(function(){
         }
     });
 
-    // "more" link in message tables
-    $('.messages-more').bind('click', function() {
-        var message_id = this.id;
-        $('#message-' + message_id).html('<img src="/images/loading-small.gif" alt="loading" style="position: relative; top: 2px;"/>');
-        $.post(relative_url_root + "/messages/getcompletemessage", {id: message_id}, function(data) {
-            $('#message-' + message_id).html(data);
-        });
-        return false;
-    });
-
     // Full message view resizing.
     $('#messages-show-message-full').css('width', parseInt($('#content').css('width'))-15);
     $('#messages-show-message-full').css('height', parseInt($('#messages-show-message-full').css('height'))+10);
