@@ -94,7 +94,7 @@ class OperationInterfaceTest < ActiveSupport::TestCase
         "waitingForLock"=>false,
         "secs_running"=>369,
         "op"=>"query",
-        "ns"=>"graylog2_web_interface_test.messages",
+        "ns"=>"#{Mongoid.database.name}.messages",
         "query"=>{"$query"=>{"foo"=>"bar"}, "$orderby"=>{"created_at"=>-1}},
         "client"=>"127.0.0.1:38047",
         "desc"=>"conn"
@@ -106,7 +106,7 @@ class OperationInterfaceTest < ActiveSupport::TestCase
         "waitingForLock"=>false,
         "secs_running"=>4,
         "op"=>"query",
-        "ns"=>"graylog2_web_interface_test.messages",
+        "ns"=>"#{Mongoid.database.name}.messages",
         "query"=>{"count"=>"messages", "query"=>{"foo"=>"bar"}, "fields"=>nil},
         "client"=>"127.0.0.1:47539",
         "desc"=>"conn"
@@ -118,7 +118,7 @@ class OperationInterfaceTest < ActiveSupport::TestCase
         "waitingForLock"=>false,
         "secs_running"=>2,
         "op"=>"query",
-        "ns"=>"graylog2_web_interface_test",
+        "ns"=>"#{Mongoid.database.name}.messages",
         "query"=>{"distinct"=>"messages", "key"=>"foo", "query"=>{}},
         "client"=>"127.0.0.1:47539",
         "desc"=>"conn"
