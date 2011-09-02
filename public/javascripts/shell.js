@@ -137,7 +137,7 @@ var Shell = new function() {
 
       switch (res.op) {
         case "count":
-          x += " - Count result: " + "<span class=\"shell-result-string\">" + res.result + "</span>";
+          x += " - Count result: " + "<span class=\"shell-result-string\">" + htmlEncode(res.result) + "</span>";
           break;
         case "distinct":
           x += " - Distinct result: " + "<span class=\"shell-result-string\">";
@@ -145,7 +145,7 @@ var Shell = new function() {
             x += "No matches.";
           } else {
             for (key in res.result) {
-              x += res.result[key] + ", ";
+              x += htmlEncode(res.result[key]) + ", ";
             }
             x = x.substring(0, x.length - 2); // Remove last comma and whitespace.
             x += "</span>"
@@ -157,7 +157,7 @@ var Shell = new function() {
             x += "No matches.";
           } else {
             for (key in res.result) {
-              x += res.result[key]["distinct"] + "(" + parseInt(res.result[key]["count"]) + "), ";
+              x += htmlEncode(res.result[key]["distinct"]) + "(" + parseInt(res.result[key]["count"]) + "), ";
             }
             x = x.substring(0, x.length - 2); // Remove last comma and whitespace.
             x += "</span>"
@@ -171,7 +171,7 @@ var Shell = new function() {
         render_result_content(res);
       }
     } else {
-      output("Error: " + res.reason);
+      output("Error: " + htmlEncode(res.reason));
     }
   }
 

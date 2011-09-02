@@ -257,3 +257,8 @@ function bindMessageSidebarClicks() {
     });
   });
 }
+
+// srsly, javascript... - http://stackoverflow.com/questions/1219860/javascript-jquery-html-encoding
+function htmlEncode(v) {
+  return $('<div/>').text(v).html();
+}
