@@ -9,11 +9,9 @@
 
   <div class="streams-stream-middle">
     <span class="streams-stream-title <%= "streams-stream-title-disabled" if stream.disabled %>">
-      <% if stream.alerted?(current_user) %>
-        <span class="streams-stream-title-alarm">!!!</span>
-      <% end %>
+      <% stream.alarm_status(current_user) == :alarm ? alarm_class = "status-alarm-text" : alarm_class = nil %>
 
-      <%= link_to(stream.title_possibly_disabled, stream_messages_path(stream)) %>
+      <%= link_to(stream.title_possibly_disabled, stream_messages_path(stream), :class => alarm_class) %>
     </span>
   </div>
 

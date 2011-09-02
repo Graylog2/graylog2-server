@@ -45,3 +45,6 @@ end
 HostgroupHost.blueprint do
   hostname { host }
 end
+
+AlertedStream.blueprint do
+end

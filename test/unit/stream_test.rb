@@ -70,34 +70,51 @@ class StreamTest < ActiveSupport::TestCase
 
   context "alarm status" do
 
-    should "mark stream as disabled if alarms are disabled" do
-      stream = Stream.make(:alarm_active => false)
-      assert_equal :disabled, stream.alarm_status
+    should "mark alarms as disabled if alarms are disabled" do
+      stream = Stream.make(:alarm_active => false, :alarm_force => true)
+      assert_equal :disabled, stream.alarm_status(User.make)
     end
 
-    should "mark stream as disabled if alarms are enabled but no alarm limit is set" do
-      stream = Stream.make(:alarm_active => true, :alarm_limit => nil)
-      assert_equal :disabled, stream.alarm_status
+    should "mark alarms as disabled if alarms are enabled but no alarm limit is set" do
+      stream = Stream.make(:alarm_active => true, :alarm_limit => nil, :alarm_force => true)
+      assert_equal :disabled, stream.alarm_status(User.make)
     end
 
-    should "mark stream as disabled if alarms are enabled but no alarm timespan is set" do
-      stream = Stream.make(:alarm_active => true, :alarm_timespan => nil)
-      assert_equal :disabled, stream.alarm_status
+    should "mark alarms as disabled if alarms are enabled but no alarm timespan is set" do
+      stream = Stream.make(:alarm_active => true, :alarm_timespan => nil, :alarm_force => true)
+      assert_equal :disabled, stream.alarm_status(User.make)
+    end
+
+    should "mark alarms as disabled if user has not enabled alarms for this stream" do
+      stream = Stream.make(:alarm_active => true, :alarm_timespan => 10, :alarm_limit => 10, :alarm_force => false)
+      assert_equal :disabled, stream.alarm_status(User.make)
+    end
+
+    should "not mark alarms as disabled if user has not enabled alarms for this stream but alarm force is active" do
+      stream = Stream.make(:alarm_active => true, :alarm_timespan => 10, :alarm_limit => 10, :alarm_force => true)
+      assert_equal :no_alarm, stream.alarm_status(User.make)
+    end
+
+    should "not mark alarms as disabled if user has enabled alarm for this stream and alarm_force is not active" do
+      user = User.make
+      stream = Stream.make(:alarm_active => true, :alarm_timespan => 10, :alarm_limit => 10, :alarm_force => false)
+      AlertedStream.make(:stream_id => stream.id, :user_id => user.id)
+      assert_equal :no_alarm, stream.alarm_status(user)
     end
 
     should "mark stream as not alarmed if under limit" do
-      stream = Stream.make(:alarm_active => true, :alarm_limit => 5, :alarm_timespan => 10)
+      stream = Stream.make(:alarm_active => true, :alarm_limit => 5, :alarm_timespan => 10, :alarm_force => true)
       4.times { Message.make(:streams => stream.id) }
 
-      assert_equal :no_alarm, stream.alarm_status
+      assert_equal :no_alarm, stream.alarm_status(User.make)
     end
 
     should "mark stream as alarmed if over limit" do
-      stream = Stream.make(:alarm_active => true, :alarm_limit => 10, :alarm_timespan => 10)
+      stream = Stream.make(:alarm_active => true, :alarm_limit => 10, :alarm_timespan => 10, :alarm_force => true)
       8.times { Message.make(:streams => stream.id) }
       5.times { Message.make(:streams => [ stream.id, Stream.make.id ]) } # this goes over the alarm_limit
 
-      assert_equal :alarm, stream.alarm_status
+      assert_equal :alarm, stream.alarm_status(User.make)
     end
 
   end

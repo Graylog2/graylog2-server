@@ -1,5 +1,5 @@
 <h2>
-    <% case @stream.alarm_status %>
+    <% case @stream.alarm_status(current_user) %>
       <% when :alarm then %>
         <span class="status-alarm-text">ALARM:</span>
         <%= @stream.message_count_since(@stream.alarm_timespan.minutes.ago.to_i) %> messages in last <%= @stream.alarm_timespan %> minutes!
@@ -11,7 +11,7 @@
         <%= @stream.message_count_since(5.minutes.ago) %> messages in last 5 minutes.
     <% end %>
 
-    <% if @stream.alarm_status != :disabled %>
+    <% if @stream.alarm_status(current_user) != :disabled %>
       <span id="streams-sidebar-limit">(Limit: <%= @stream.alarm_limit %>)</span>
     <% end %>
 </h2>

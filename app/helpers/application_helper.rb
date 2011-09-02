@@ -149,10 +149,11 @@ module ApplicationHelper
         #{link_to(h(stream.title_possibly_disabled), stream_path(stream), :class => 'favorite-streams-title')}
     "
 
-    if stream.alarm_active and !stream.alarm_limit.blank? and !stream.alarm_timespan.blank?
+    alarm_status = stream.alarm_status(current_user)
+    unless alarm_status == :disabled
       stream_count = stream.message_count_since(stream.alarm_timespan.minutes.ago.to_i)
       ret += "
-        <span class=\"favorite-stream-limits #{stream_count > stream.alarm_limit ? "status-alarm-text" : "status-okay-text"}\">
+        <span class=\"favorite-stream-limits #{alarm_status == :alarm ? "status-alarm-text" : "status-okay-text"}\">
           (#{stream_count}/#{stream.alarm_limit}/#{stream.alarm_timespan}m)
         </span>
       "
