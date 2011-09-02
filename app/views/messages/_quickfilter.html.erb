@@ -17,6 +17,7 @@
       <label for="filters_severity_above">or higher</label>
     </dd>
 
+    <% if @host.blank? %>
     <dt><%= label_tag "filters[host]", "Host:" %></dt>
     <dd>
       <%= select_tag "filters[host]", raw("<option></option>" + options_for_select(Host.all.collect {|host| [ h(host.host) ]}.sort, :selected => get_quickfilter_selected(params[:filters], :host, :bson_id))) %>
@@ -33,9 +34,19 @@
         <% end %>
       <% end %>
     </dd>
+    <% end %>
+
   </dl>
 
   <br />
+
+  <% if !@stream.blank? %>
+    <%= hidden_field_tag "stream_id", @stream.id %>
+  <% end %>
+  <% if !@host.blank? %>
+    <%= hidden_field_tag "host_id", @host.host %>
+  <% end %>
+
   <%= awesome_link "Add additional field", "#", :id => "messages-quickfilter-add-additional" %>
   <%= awesome_submit_link "Run filter" %>
 <% end -%>
