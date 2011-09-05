@@ -62,8 +62,7 @@ class MessagesController < ApplicationController
       @additional_filters = Message.extract_additional_from_quickfilter(params[:filters])
       @messages = @scope.all_by_quickfilter params[:filters], params[:page]
     end
-    @total_count = @scope.count
-    @last_message = @scope.order_by(:created_at.desc).limit(1).first #last :order => "created_at DESC"
+    @total_count = @scope.search("*").total
 
     if params[:stream_id]
       @is_favorited = current_user.favorite_streams.include?(params[:stream_id])

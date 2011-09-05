@@ -10,6 +10,7 @@ gem 'graylog2-declarative_authorization', '~> 0.5.2', :require => 'declarative_a
 gem 'hoptoad_notifier', '~> 2.4.9'
 gem 'rpm_contrib', '~> 2.1.1'
 gem 'mongoid', '2.0.1'  # 2.0.2 dropped paggination. TODO: update
+gem "tire", "~> 0.3.2"
 gem 'bson', "~> 1.3.1"
 gem 'bson_ext', "~> 1.3.1", :platforms => :ruby
 gem 'home_run', '~> 1.0.2', :platforms => :ruby
