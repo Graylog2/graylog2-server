@@ -6,22 +6,16 @@ class ApplicationController < ActionController::Base
 
   before_filter :login_required, :clear_terms_cache
 
-  def rescue_action e
-    # Connection to MongoDB failed.
-    if e.class == Mongo::ConnectionFailure
-        render :file => "#{Rails.root.to_s}/public/mongo_connectionfailure.html", :status => 500
-        return
-    end
+  rescue_from "Mongo::ConnectionFailure" do
+      render_custom_error_page("mongo_connectionfailure") and return
+  end
 
-    # Default 404 error.
-    if e.class == ActionController::RoutingError
-      render :file  => "#{Rails.root.to_s}/public/404.html", :status => 404
-      return
-    end
+  rescue_from "RestClient::ResourceNotFound" do
+      render_custom_error_page("elasticsearch_noindex") and return
+  end
 
-    # Default 500 error.
-    Rails.logger.error "ERROR: #{e.to_s}"
-    render :file  => "#{Rails.root.to_s}/public/500.html", :status => 500
+  rescue_from "Errno::ECONNREFUSED" do
+      render_custom_error_page("elasticsearch_noconnection") and return
   end
 
   helper_method :has_users
@@ -64,5 +58,10 @@ class ApplicationController < ActionController::Base
 
   def clear_terms_cache
     FilteredTerm.expire_cache
+  end
+
+  def render_custom_error_page(tpl)
+    render :file => "#{Rails.root.to_s}/public/#{tpl}.html", :status => 500, :layout => false
+    return
   end
 end
