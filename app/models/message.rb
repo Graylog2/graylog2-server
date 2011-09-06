@@ -1,16 +1,30 @@
 class Message
   include Mongoid::Document
 
-  include Tire::Model::Search
-
-  index_name "graylog2"
-
   LIMIT = 100
 
-  # mongoid compat
-  def to_indexed_json
-    to_json :methods => [ 'created_at_time' ]
+  @fields = [ :message, :full_message, :created_at, :facility, :level, :host, :file, :line, :deleted ]
+  @fields.each { |f| attr_accessor(f) }
+
+  def self.parse_from_elastic(x)
+    Rails.logger.info "FFFFFFFFFFFFFFFFFFFFFFFFFFFF #{x.inspect}"
+    m = self.new
+    @fields.each do |f|
+      m.__send__(:"#{f}=", x[f.to_s])
+    end
+
+    return m
   end
+
+
+
+
+
+
+
+
+
+
 
   # Overwriting the message getter. This always applies the filtering of filtered terms.
   #def message
@@ -53,9 +67,9 @@ class Message
     scope :not_deleted, Hash.new
   end
 
-  scope :page, lambda {|number| skip(self.get_offset(number))}
-  scope :default_scope, order_by({"created_at" => "-1"}).not_deleted.limit(LIMIT)
-  scope :time_range, lambda {|from, to| where(:created_at => {"$gte" => from}).where(:created_at => {"$lte" => to})}
+  #scope :page, lambda {|number| skip(self.get_offset(number))}
+  #scope :default_scope, order_by({"created_at" => "-1"}).not_deleted.limit(LIMIT)
+  #scope :time_range, lambda {|from, to| where(:created_at => {"$gte" => from}).where(:created_at => {"$lte" => to})}
 
   def self.find_by_id(_id)
     #where(:_id => BSON::ObjectId(_id)).first

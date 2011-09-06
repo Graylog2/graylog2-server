@@ -33,7 +33,7 @@ class MessagesController < ApplicationController
         block_access_for_non_admins
       end
 
-      @scope = Message
+      @scope = MessageGateway
       @scoping = :messages
     end
   end

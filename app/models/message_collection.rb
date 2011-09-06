@@ -26,8 +26,9 @@ class MessageCollection
   end
 
   def self.oldest_message
-    m = Message.first
-    m.blank? ? "No messages" : Time.at(m.created_at)
+    #m = Message.first
+    #m.blank? ? "No messages" : Time.at(m.created_at)
+    "foo"
   end
 
   private
