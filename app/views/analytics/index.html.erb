@@ -20,6 +20,7 @@
     <li>find</li>
     <li>count</li>
     <li>distinct</li>
+    <li>distribution</li>
   </ul>
 
   <br />
@@ -42,7 +43,7 @@
   </ul>
 
   <br />
-  Additional fields must be prefixed with an underscore. Find queries
+  <strong>Additional fields must be prefixed with an underscore.</strong> Find queries
   are limited to <%= Shell::MAX_LIMIT %> results. Use the quickfiltering
   if you need more and pagination.
 
@@ -52,6 +53,7 @@
     <li>all.find()</li>
     <li>all.count(host = /^example\.(org|com)$/, _http_response_code = 204)</li>
     <li>all.distinct({host}, _http_response_code &gt; 500)</li>
+    <li>stream(some_stream).distribution({_processed_controller}, :_http_response_code = 500)</li>
   </ul>
 <% end %>
 

@@ -72,10 +72,15 @@ class OperationInterfaceTest < ActiveSupport::TestCase
   end
 
   should "not fail at killing an operation" do
+    stub = Hash.new
+    stub["inprog"] = Array.new
+    stub["inprog"] << generate_stub(:find)
+    OperationInterface.any_instance.stubs(:ops).returns(stub)
+
     assert_nothing_raised do
       OperationInterface.any_instance.stubs(:allowed_op?).returns(true)
       oi = OperationInterface.new
-      assert oi.kill(9001)
+      assert oi.kill(stub["inprog"][0]["opid"])
     end
   end
 
@@ -89,7 +94,7 @@ class OperationInterfaceTest < ActiveSupport::TestCase
         "waitingForLock"=>false,
         "secs_running"=>369,
         "op"=>"query",
-        "ns"=>"graylog2_web_interface_test.messages",
+        "ns"=>"#{Mongoid.database.name}.messages",
         "query"=>{"$query"=>{"foo"=>"bar"}, "$orderby"=>{"created_at"=>-1}},
         "client"=>"127.0.0.1:38047",
         "desc"=>"conn"
@@ -101,7 +106,7 @@ class OperationInterfaceTest < ActiveSupport::TestCase
         "waitingForLock"=>false,
         "secs_running"=>4,
         "op"=>"query",
-        "ns"=>"graylog2_web_interface_test.messages",
+        "ns"=>"#{Mongoid.database.name}.messages",
         "query"=>{"count"=>"messages", "query"=>{"foo"=>"bar"}, "fields"=>nil},
         "client"=>"127.0.0.1:47539",
         "desc"=>"conn"
@@ -113,7 +118,7 @@ class OperationInterfaceTest < ActiveSupport::TestCase
         "waitingForLock"=>false,
         "secs_running"=>2,
         "op"=>"query",
-        "ns"=>"graylog2_web_interface_test",
+        "ns"=>"#{Mongoid.database.name}.messages",
         "query"=>{"distinct"=>"messages", "key"=>"foo", "query"=>{}},
         "client"=>"127.0.0.1:47539",
         "desc"=>"conn"

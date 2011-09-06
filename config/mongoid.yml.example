@@ -22,6 +22,6 @@ development:
   host: localhost
   database: graylog2_development
 
-development:
+test:
   host: localhost
   database: graylog2_test

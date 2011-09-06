@@ -43,6 +43,30 @@ class AnalyticsControllerTest < ActionController::TestCase
       assert_equal ["foo.example.org", "baz.example.org"], result[:result]
     end
 
+    should "return a general error if the mongo operation failed" do
+      Shell.any_instance.expects(:perform_find).raises(Mongo::OperationFailure)
+
+      query = 'all.find(foo = "bar")'
+      post :shell, :cmd => query
+
+      r = JSON.parse(@response.body)
+
+      assert_equal "error", r["code"]
+      assert_match /^Mongo operation failed/, r["reason"]
+    end
+
+    should "return a descriptive error if the mongo operation was interrupted" do
+      Shell.any_instance.expects(:perform_find).raises(Mongo::OperationFailure, "interrupted")
+
+      query = 'all.find(foo = "bar")'
+      post :shell, :cmd => query
+
+      r = JSON.parse(@response.body)
+
+      assert_equal "error", r["code"]
+      assert_match /^Mongo operation was interrupted/, r["reason"]
+    end
+
   end
 
 end

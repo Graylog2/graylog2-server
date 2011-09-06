@@ -12,11 +12,11 @@ additional_columns ||= []
       if ($(this).hasClass("active")) {
         $("tr").removeClass("messages-today");
         $(this).removeClass("active");
-        $(this).attr("src", "/images/icons/sun.png");
+        $(this).attr("src", "../images/icons/sun.png");
       } else {
         d = new Date();
         $(".udate-" + d.getFullYear() + "-" + (d.getMonth()+1) + "-" + d.getDate()).addClass("messages-today");
-        $(this).attr("src", "/images/icons/sun_active.png");
+        $(this).attr("src", "../images/icons/sun_active.png");
         $(this).addClass("active");
       }
     })
@@ -35,7 +35,9 @@ additional_columns ||= []
       <% end %>
       <th>Message</th>
       <th class="messages-c-tools">
-        <%= image_tag "icons/sun.png", :class => "messages-from-today-link", :title => "Highlight messages from today" %>
+        <% unless defined?(@inline_version) %>
+          <%= image_tag "icons/sun.png", :class => "messages-from-today-link", :title => "Highlight messages from today" %>
+        <% end %>
       </th>
     </tr>
   </thead>

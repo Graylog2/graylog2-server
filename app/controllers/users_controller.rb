@@ -45,12 +45,12 @@ class UsersController < ApplicationController
 
     @user = User.find(params[:id])
 
-    if @user.update_attributes!(params[:user]) then
+    if @user.update_attributes(params[:user]) then
       flash[:notice] = 'User has been updated'
       redirect_to users_path
     else
       flash[:error] = 'Could not update user'
-      redirect_to edit_user_path(@user)
+      render :action => :edit
     end
   end
 

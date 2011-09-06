@@ -16,9 +16,6 @@ class OperationInterface
     end
 
     return res
-  rescue => e
-    Rails.logger.error "Could not get current operations: #{e.message + e.backtrace.join("\n")}"
-    return Array.new
   end
 
   def count
@@ -26,7 +23,13 @@ class OperationInterface
   end
 
   def kill(opid)
-    op = ops["inprog"].keep_if{ |o| o["opid"] == opid.to_i }.first
+    cleaned = Array.new
+    ops["inprog"].each do |o|
+      cleaned << o if o["opid"] == opid.to_i
+    end
+
+    op = cleaned.first
+
     return false if op.blank? || !allowed_op?(op)
     Mongoid.database["$cmd.sys.killop"].find_one({:op => opid.to_i})
 
@@ -53,7 +56,8 @@ class OperationInterface
   def extract_type(op)
     if op["query"]["$query"].blank?
       # This is not a find query.
-      op["query"].keys.first
+      return 'count' if op["query"].has_key?('count')
+      return 'distinct' if op["query"].has_key?('distinct')
     else
       "find"
     end 

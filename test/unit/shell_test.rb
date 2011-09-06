@@ -454,7 +454,7 @@ class ShellTest < ActiveSupport::TestCase
       assert_equal ["baz.example.org", "bar.example.com"], result[:result]
     end
 
-    should "distinct with regex and one query option" do
+    should "distinct with one query option" do
       4.times { Message.make(:host => "baz.example.org", :_foo => "bar") }
       3.times { Message.make(:host => "example.com", :_foo => "bar") }
       5.times { Message.make(:host => "foo.example.com", :_foo => "baz") }
@@ -521,6 +521,125 @@ class ShellTest < ActiveSupport::TestCase
 
       assert_equal "distinct", result[:operation]
       assert_equal ["baz.example.org", "bar.example.com", "foo.example.com"], result[:result]
+    end
+
+  end
+
+  context "distribution" do
+
+    should "work with no query options" do
+      4.times { Message.make(:host => "baz.example.org") }
+      3.times { Message.make(:host => "bar.example.com") }
+
+      s = Shell.new("all.distribution({host})")
+      result = s.compute
+
+      assert_equal "distribution", result[:operation]
+      assert_equal [
+        { :distinct => "baz.example.org", :count => 4 },
+        { :distinct => "bar.example.com", :count => 3 },
+      ], result[:result]
+    end
+
+    should "work with some query options" do
+      4.times { Message.make(:host => "baz.example.org", :_foo => "bar", :_something => "foo") }
+      3.times { Message.make(:host => "bar.example.com", :_foo => "bar", :_something => "foo") }
+      3.times { Message.make(:host => "foo.example.com", :_foo => "baz", :_something => "foo") }
+      3.times { Message.make(:host => "wat.example.com", :_foo => "baz", :_something => "bar") }
+
+      s = Shell.new('all.distribution({host}, _foo = "bar", _something = "foo")')
+      result = s.compute
+
+      assert_equal "distribution", result[:operation]
+      assert_equal [
+        { :distinct => "baz.example.org", :count => 4 },
+        { :distinct => "bar.example.com", :count => 3 }
+      ], result[:result]
+    end
+
+    should "work with one query option" do
+      4.times { Message.make(:host => "baz.example.org", :_foo => "bar") }
+      3.times { Message.make(:host => "example.com", :_foo => "bar") }
+      5.times { Message.make(:host => "foo.example.com", :_foo => "baz") }
+
+      s = Shell.new('all.distribution({host}, _foo = "bar")')
+      result = s.compute
+
+      assert_equal "distribution", result[:operation]
+      assert_equal [
+        { :distinct => "baz.example.org", :count => 4 },
+        { :distinct => "example.com", :count => 3 }
+      ], result[:result]
+    end
+
+    should "work with regex query options" do
+      4.times { Message.make(:host => "baz.example.org", :_foo => "bar1") }
+      3.times { Message.make(:host => "example.com", :_foo => "bar1") }
+      5.times { Message.make(:host => "foo.example.com", :_foo => "baz") }
+
+      s = Shell.new('all.distribution({host}, _foo = /^bar\d$/)')
+      result = s.compute
+
+      assert_equal "distribution", result[:operation]
+      assert_equal [
+        { :distinct => "baz.example.org", :count => 4 },
+        { :distinct => "example.com", :count => 3 }
+      ], result[:result]
+    end
+
+    should "work with no query options on stream" do
+      correct_stream = Stream.make()
+      wrong_stream_id = BSON::ObjectId.new
+      4.times { Message.make(:host => "baz.example.org", :streams => correct_stream.id) }
+      10.times { Message.make(:host => "not.example.org", :streams => wrong_stream_id) }
+      3.times { Message.make(:host => "bar.example.com", :streams => correct_stream.id) }
+
+      s = Shell.new("stream(#{correct_stream.id}).distribution({host})")
+      result = s.compute
+
+      assert_equal "distribution", result[:operation]
+      assert_equal [
+       { :distinct => "baz.example.org", :count => 4 },
+       { :distinct => "bar.example.com", :count => 3 }
+      ], result[:result]
+    end
+
+    should "work with one query option on stream" do
+      correct_stream = Stream.make()
+      wrong_stream_id = BSON::ObjectId.new
+      4.times { Message.make(:host => "baz.example.org", :streams => correct_stream.id, :_foo => "bar") }
+      4.times { Message.make(:host => "foo.example.org", :streams => correct_stream.id, :_foo => "moo") }
+      10.times { Message.make(:host => "not.example.org", :streams => wrong_stream_id, :_foo => "bar" ) }
+      3.times { Message.make(:host => "bar.example.com", :streams => correct_stream.id, :_foo => "bar") }
+
+      s = Shell.new("stream(#{correct_stream.id}).distribution({host}, _foo = \"bar\")")
+      result = s.compute
+
+      assert_equal "distribution", result[:operation]
+      assert_equal [
+        { :distinct => "baz.example.org", :count => 4 },
+        { :distinct => "bar.example.com", :count => 3 }
+      ], result[:result]
+    end
+
+    should "distinct with no query options on streams" do
+      streams = [ Stream.make(), Stream.make() ]
+      correct_stream_ids = streams.map {|s| s.id }
+      wrong_stream_id = BSON::ObjectId.new
+      4.times { Message.make(:host => "baz.example.org", :streams => correct_stream_ids[0]) }
+      10.times { Message.make(:host => "not.example.org", :streams => wrong_stream_id) }
+      3.times { Message.make(:host => "bar.example.com", :streams => correct_stream_ids[1]) }
+      2.times { Message.make(:host => "foo.example.com", :streams => correct_stream_ids) }
+
+      s = Shell.new("streams(#{correct_stream_ids.join(',')}).distribution({host})")
+      result = s.compute
+
+      assert_equal "distribution", result[:operation]
+      assert_equal [
+        { :distinct => "baz.example.org", :count => 4 },
+        { :distinct => "bar.example.com", :count => 3 },
+        { :distinct => "foo.example.com", :count => 2 }
+      ], result[:result]
     end
 
   end

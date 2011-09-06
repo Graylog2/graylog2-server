@@ -459,7 +459,7 @@ label {
     background-color: #FD0C99;
     font-size: 10px;
     color: #fff;
-    background-image: url('/images/newmessagebarbg.png');
+    background-image: url('../images/newmessagebarbg.png');
     background-repeat: no-repeat;
     padding-top: 2px;
     padding-bottom: 2px;

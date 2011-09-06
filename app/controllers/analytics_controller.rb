@@ -37,6 +37,12 @@ class AnalyticsController < ApplicationController
     render_error("Missing stream target(s).")
   rescue UnknownStreamException
     render_error("Unknown stream(s).")
+  rescue Mongo::OperationFailure => e
+    if e.message == "interrupted"
+      render_error("Mongo operation was interrupted/killed.")
+    else
+      render_error("Mongo operation failed. (#{e.message})")
+    end
   rescue => e
     logger.warn("Error while computing shell command: " + e.to_s + e.backtrace.join("\n"))
     render_error("Could not parse command or encountered internal error.")
@@ -61,7 +67,7 @@ class AnalyticsController < ApplicationController
       :op => operation
     }
 
-    if operation == "count" or operation == "distinct"
+    if operation == "count" || operation == "distinct" || operation == "distribution"
       res[:result] = result;
     end
 
