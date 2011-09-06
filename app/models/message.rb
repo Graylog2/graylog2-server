@@ -9,7 +9,7 @@ class Message
 
   # mongoid compat
   def to_indexed_json
-    self.to_json
+    to_json :methods => [ 'created_at_time' ]
   end
 
   # Overwriting the message getter. This always applies the filtering of filtered terms.

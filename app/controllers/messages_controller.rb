@@ -73,11 +73,13 @@ class MessagesController < ApplicationController
     @has_sidebar = true
     @load_flot = true
 
-    @message = @scope.where(:_id => BSON::ObjectId(params[:id])).all.first
+    # XXX ELASTIC: sucks
+    @message = Tire.index('graylog2').retrieve("message", params[:id])
 
-    unless @message.accessable_for_user?(current_user)
-      block_access_for_non_admins
-    end
+    # XXX ELASTIC: re-enable
+    #unless @message.accessable_for_user?(current_user)
+    #  block_access_for_non_admins
+    #end
 
     @comments = Messagecomment.all_matched(@message)
 
