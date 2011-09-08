@@ -7,5 +7,5 @@
 Currently containing <span class="highlighted"><%= number_with_delimiter(@total_count, :delimiter => '.') %></span> messages.
 
 <% message_count_interval = Setting.get_message_count_interval(current_user) %>
-<span class="highlighted"><%= Message.count_of_last_minutes(Setting.get_message_count_interval(current_user)) %></span>
+<span class="highlighted"><%= MessageGateway.count_of_last_minutes(Setting.get_message_count_interval(current_user)) %></span>
 messages in the last <%= message_count_interval %> minutes.

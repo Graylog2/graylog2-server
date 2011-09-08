@@ -1,36 +1,46 @@
 class Message
-  include Mongoid::Document
 
   LIMIT = 100
+  ADDITIONAL_FIELD_SEPARATOR = '_'
+  RESERVED_ADDITIONAL_FIELDS = %w(_type _index _version)
 
-  @fields = [ :message, :full_message, :created_at, :facility, :level, :host, :file, :line, :deleted ]
+  @fields = [ :id, :message, :full_message, :created_at, :facility, :level, :host, :file, :line, :deleted ]
   @fields.each { |f| attr_accessor(f) }
 
+  attr_accessor :plain
+
+  # XXX ELASTIC: possibly do this with Tire.configuration.wrapper
   def self.parse_from_elastic(x)
-    Rails.logger.info "FFFFFFFFFFFFFFFFFFFFFFFFFFFF #{x.inspect}"
     m = self.new
+    m.plain = x
     @fields.each do |f|
-      m.__send__(:"#{f}=", x[f.to_s])
+      m.__send__(:"#{f}=", x.__send__(f))
+
+      # XXX ELASTIC: zomg workaround
+      # - __send__ creates a Rake::FileTask instead of a string. not sure why yet
+      m.file = x[:file] if f == :file
     end
 
     return m
   end
 
+  # you best lazy evaluate that
+  def additional_fields
+    return @additionals unless @additionals.blank?
 
-
-
-
-
-
-
-
-
+    @additionals = Hash.new
+    plain.to_hash.keys.each do |key|
+      value = plain[key]
+      if key[0,1] == ADDITIONAL_FIELD_SEPARATOR and !RESERVED_ADDITIONAL_FIELDS.include?(key.to_s)
+        @additionals[key[1, key.length]] = value
+      end
+    end
+  end
 
   # Overwriting the message getter. This always applies the filtering of filtered terms.
-  #def message
-  #  msg = read_attribute(:message).to_s
-  #  FilteredTerm.apply(msg)
-  #end
+  def message
+    FilteredTerm.apply(@message)
+  end
 
   # Returns +created_at+ as +Time+ in request's timezone
   def created_at_time
@@ -38,49 +48,20 @@ class Message
   end
 
   def file_and_line
-    #file.to_s + (":#{line}" if line.present? && line > 0).to_s
-    String.new
+    self.file + (":#{@line}" unless @line.blank?).to_s
   end
 
   def additional_fields?
-    #self.additional_fields.count > 0
-    false
+    self.additional_fields.count > 0
   end
 
-  def additional_fields
-    #return @additional unless @additional.nil?
-    #
-    #@additional = {}
-    #attributes.each_pair do |key, value|
-    #  next unless key[0,1] == '_' && SPECIAL_FIELDS.exclude?(key)
-    #  @additional[key[1, key.length]] = value
-    #end
-    #return @additional
-
-    Array.new
-  end
-
+  # XXX ELASTIC
   # This is controlled by general.yml. Disabling it gives great performance improve.
-  if Configuration.allow_deleting
-    scope :not_deleted, where({ :deleted => false })
-  else
-    scope :not_deleted, Hash.new
-  end
-
-  #scope :page, lambda {|number| skip(self.get_offset(number))}
-  #scope :default_scope, order_by({"created_at" => "-1"}).not_deleted.limit(LIMIT)
-  #scope :time_range, lambda {|from, to| where(:created_at => {"$gte" => from}).where(:created_at => {"$lte" => to})}
-
-  def self.find_by_id(_id)
-    #where(:_id => BSON::ObjectId(_id)).first
-    return Message.new
-  end
-
-  def self.all_paginated page = 1
-    page = 1 if page.blank?
-
-    search("*", :per_page => LIMIT, :page => page, :sort => "created_at desc" )
-  end
+  #if Configuration.allow_deleting
+  #  scope :not_deleted, where({ :deleted => false })
+  #else
+  #  scope :not_deleted, Hash.new
+  #end
 
   def self.get_conditions_from_date(timeframe)
     conditions = {}
@@ -161,145 +142,11 @@ class Message
     return ret
   end
 
-  def self.by_stream(stream_id)
-    #not_deleted.where({:streams => stream_id})
-    Array.new
-  end
-
-  def self.all_of_stream_since(stream_id, since)
-    #by_stream(stream_id).where(:created_at => {'$gt' => since.to_i}).default_scope.all
-    Array.new
-  end
-
-  def self.count_stream stream_id
-    #return by_stream(stream_id).count
-    0
-  end
-
-  def self.all_of_stream_in_range(stream_id, page, from, to)
-    #page = 1 if page.blank?
-    #
-    #by_stream(stream_id).default_scope.time_range(from, to).paginate(:page => page)
-
-    Array.new
-  end
-
-  def self.all_in_range(page, from, to)
-    #page = 1 if page.blank?
-    #
-    #default_scope.time_range(from, to).paginate(:page => page)
-
-    Array.new
-  end
-
-  def self.count_all_of_stream_in_range(stream_id, from, to)
-    #terms = Blacklist.all_terms
-    #by_stream(stream_id).where(:created_at => {"$gte" => from}).where(:created_at => {"$lte" => to}).count
-    #by_stream(stream_id).time_range(from, to).count
-
-    0
-  end
-
-  def self.count_all_in_range(from, to)
-    #time_range(from, to).count
-    0
-  end
-
-  def self.counts_of_last_minutes(minutes)
-#    res = Array.new
-#    minutes.times do |m|
-#      t = (m + 1).minutes.ago  # Offset by one because we don't want to start with the current minute.
-#      t -= t.sec               # set second = 0
-#
-#      key = { :type => :graphvalue, :allhosts => true, :minute => t.to_i }
-#      count = Rails.cache.read(key)
-#
-#      unless count
-#        count = Message.time_range(t.to_i, (t + 60).to_i).count
-#        Rails.cache.write(key, count)
-#      end
-#
-#      res << { :minute => t, :count => count}
-#    end
-#
-#    return res.reverse
-
-    [ 0 => 0 ]
-  end
-
-  def self.stream_counts_of_last_minutes(stream_id, minutes)
-#    stream = Stream.find(stream_id)
-#    return [{:count => 0}, {:count =>0}] if stream.blank? or stream.streamrules.blank? # sparklines needs at least two elements..
-#
-#    res = Array.new
-#    minutes.times do |m|
-#      m += 1 # Offset by one because we don't want to start with the current minute.
-#      t = m.minutes.ago
-#
-#      # Get first second of minute.
-#      t -= t.sec
-#
-#      # Try to read from cache.
-#      obj = { :type => :graphvalue, :rules => stream.rule_hash, :stream_id => stream_id, :minute => t.to_i }
-#      c = Rails.cache.read(obj)
-#
-#      if c == nil
-#        # Cache miss. Perform counting and add to cache.
-#        c = Message.by_stream(stream_id).time_range(t.to_i, (t+60).to_i).count
-#        Rails.cache.write(obj, c)
-#      end
-#
-#      res << { :minute => t, :count => c}
-#    end
-#
-#    return res.reverse
-
-    [ 0 => 0 ]
-  end
-
-  def self.all_of_host host, page
-    #page = 1 if page.blank?
-    #where(:host => host).default_scope.paginate(:page => page)
-
-    Array.new
-  end
-
-  def self.all_of_hostgroup hostgroup, page
-    #page = 1 if page.blank?
-    #
-    #return where(:host.in => hostgroup.all_conditions ).default_scope #.paginate(:page => page)
-
-    Array.new
-  end
-
-  def self.count_of_hostgroup hostgroup
-    #where(:host.in => hostgroup.all_conditions).not_deleted.count
-
-    0
-  end
-
-  def self.count_since x
-    #if x.to_i > 0
-    #  conditions = not_deleted.where(:created_at.gt => x.to_i)
-    #else
-    #  conditions = not_deleted
-    #end
-
-    #conditions.count
-
-    0
-  end
-
-  def self.count_of_last_minutes x
-    #return self.count_since x.minutes.ago
-    0
-  end
-
   def self.recalculate_host_counts
-    #Host.all.each do |host|
-    #  host.message_count = Message.where(:host => host.host, :deleted => false).count
-    #  host.save
-    #end
+    Host.all.each do |host|
+      host.message_count = Message.where(:host => host.host, :deleted => false).count
+      host.save
+    end
   end
 
   def around(*args)
@@ -324,48 +171,35 @@ class Message
 
   # Workaround for migration problems. #WEBINTERFACE-24
   def referenced_streams
-    #ret_streams = Array.new
-    #streams.each do |stream_id|
-    #  begin
-    #    stream = Stream.find_by_id(stream_id.to_s)
-    #    ret_streams << stream unless stream.blank?
-    #  rescue
-    #    next
-    #  end
-    #end
-    #
-    #return ret_streams
+    ret_streams = Array.new
+    streams.each do |stream_id|
+      begin
+        stream = Stream.find_by_id(stream_id.to_s)
+        ret_streams << stream unless stream.blank?
+      rescue
+        next
+      end
+    end
 
-    Array.new
+    return ret_streams
   end
 
+  # XXX ELASTIC: test with reader user
   def accessable_for_user?(current_user)
-#    return true if current_user.role == "admin"
-#
-#    # Check if any of the streams this message is filed in is accessible by the user
-#    self.streams.each do |stream_id|
-#      stream = Stream.find(stream_id)
-#      return true if stream.accessable_for_user?(current_user)
-#    end
-#
-#    return false
+    return true if current_user.role == "admin"
 
-    false
+    # Check if any of the streams this message is filed in is accessible by the user
+    streams.each do |stream_id|
+      stream = Stream.find(stream_id)
+      return true if stream.accessable_for_user?(current_user)
+    end
+
+    return false
   end
 
   def uniform_date_string
     d = Time.at(self.created_at)
     "#{d.year}-#{d.month}-#{d.day}"
-  end
-
-  private
-
-  def self.get_offset page
-    if page.to_i <= 1
-      return 0
-    else
-      return (LIMIT*(page.to_i-1))
-    end
   end
 
 end

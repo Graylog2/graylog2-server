@@ -73,13 +73,11 @@ class MessagesController < ApplicationController
     @has_sidebar = true
     @load_flot = true
 
-    # XXX ELASTIC: sucks
-    @message = Tire.index('graylog2').retrieve("message", params[:id])
+    @message = MessageGateway.retrieve_by_id(params[:id])
 
-    # XXX ELASTIC: re-enable
-    #unless @message.accessable_for_user?(current_user)
-    #  block_access_for_non_admins
-    #end
+    unless @message.accessable_for_user?(current_user)
+      block_access_for_non_admins
+    end
 
     @comments = Messagecomment.all_matched(@message)
 
