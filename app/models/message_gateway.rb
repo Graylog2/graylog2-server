@@ -11,6 +11,7 @@ end
 
 # XXX ELASTIC: possibly rename to MessageSearch or similar as it is not always returning Message objects
 #              but can also return e.g. counts (integer)
+# XXX ELASTIC: try curb as HTTP adapter for tire. reported to be faster: https://gist.github.com/1204159
 class MessageGateway
   include Tire::Model::Search
   include Mongoid::Document
