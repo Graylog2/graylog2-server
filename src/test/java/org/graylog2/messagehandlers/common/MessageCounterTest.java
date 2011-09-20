@@ -8,10 +8,7 @@ package org.graylog2.messagehandlers.common;
 import java.util.HashMap;
 import java.util.Map;
 import org.bson.types.ObjectId;
-import org.junit.After;
-import org.junit.AfterClass;
 import org.junit.Before;
-import org.junit.BeforeClass;
 import org.junit.Test;
 import static org.junit.Assert.*;
 
@@ -97,47 +94,77 @@ public class MessageCounterTest {
 
     @Test
     public void testResetHostCounts() {
-        fail("The test case is a prototype.");
+        counter.countUpHost("lolwat", 200);
+        counter.resetHostCounts();
+        assertEquals(new HashMap<String, Integer>(), counter.getHostCounts());
     }
 
     @Test
     public void testResetStreamCounts() {
-        fail("The test case is a prototype.");
-    }
+        counter.countUpStream(new ObjectId(), 100);
+        counter.resetStreamCounts();
+        assertEquals(new HashMap<ObjectId, Integer>(), counter.getStreamCounts());    }
 
     @Test
     public void testResetTotal() {
-        fail("The test case is a prototype.");
+        counter.countUpTotal(1000);
+        assertEquals(1000, counter.getTotalCount());
+        counter.resetTotal();
+        assertEquals(0, counter.getTotalCount());
     }
 
     @Test
     public void testIncrementTotal() {
-        fail("The test case is a prototype.");
+        counter.countUpTotal(10);
+        counter.incrementTotal();
+        assertEquals(11, counter.getTotalCount());
     }
 
     @Test
     public void testCountUpTotal() {
-        fail("The test case is a prototype.");
+        counter.countUpTotal(500);
+        counter.countUpTotal(50);
+        assertEquals(550, counter.getTotalCount());
     }
 
     @Test
     public void testIncrementStream() {
-        fail("The test case is a prototype.");
+        ObjectId streamId = new ObjectId();
+        counter.countUpStream(streamId, 100);
+        counter.incrementStream(streamId);
+
+        int res = counter.getStreamCounts().get(streamId);
+        assertEquals(101, res);
     }
 
     @Test
     public void testCountUpStream() {
-        fail("The test case is a prototype.");
+        ObjectId streamId = new ObjectId();
+        counter.countUpStream(streamId, 100);
+        counter.countUpStream(streamId, 150);
+
+        int res = counter.getStreamCounts().get(streamId);
+        assertEquals(250, res);
     }
 
     @Test
     public void testIncrementHost() {
-        fail("The test case is a prototype.");
+        String hostname = "foobar";
+        counter.countUpHost(hostname, 10);
+        counter.incrementHost(hostname);
+
+        int res = counter.getHostCounts().get(hostname);
+        assertEquals(11, res);
     }
 
     @Test
     public void testCountUpHost() {
-        fail("The test case is a prototype.");
+        String hostname = "foo.example.org";
+        counter.countUpHost(hostname, 25);
+        counter.countUpHost(hostname, 40);
+
+        int res = counter.getHostCounts().get(hostname);
+        assertEquals(65, res);
     }
 
 }

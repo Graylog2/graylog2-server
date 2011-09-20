@@ -40,7 +40,6 @@ public final class MessageCounter {
     private Map<String, Integer> hosts;
 
     private MessageCounter() {
-        System.out.println("INIT");
         // Initialize.
         this.resetAllCounts();
     }
@@ -50,11 +49,9 @@ public final class MessageCounter {
      */
     public synchronized static MessageCounter getInstance() {
         if (instance == null) {
-            System.out.println("NEW INIT");
             instance = new MessageCounter();
         }
 
-        System.out.println("ZZZZZZZZZOMG");
         return instance;
     }
 
