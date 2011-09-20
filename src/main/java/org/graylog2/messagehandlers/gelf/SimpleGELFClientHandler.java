@@ -33,6 +33,7 @@ import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.DatagramPacket;
 import java.util.zip.DataFormatException;
+import org.graylog2.messagehandlers.common.MessageCountUpdateHook;
 
 /**
  * GELFClient.java: Jun 23, 2010 7:15:12 PM
@@ -120,10 +121,13 @@ public class SimpleGELFClientHandler extends GELFClientHandlerBase implements GE
                 return true;
             }
 
-            // Insert message into MongoDB.
+            // PreProcess message based on filters. Insert message into indexer.
             ReceiveHookManager.preProcess(new MessageParserHook(), message);
             if(!message.getFilterOut()) {
                 Indexer.index(message);
+
+                // Update periodic counts collection.
+                ReceiveHookManager.postProcess(new MessageCountUpdateHook(), message);
 
                 // Counts up host in hosts collection.
                 ReceiveHookManager.postProcess(new HostUpsertHook(), message);
