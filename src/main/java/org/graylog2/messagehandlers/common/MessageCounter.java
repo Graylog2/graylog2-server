@@ -30,16 +30,6 @@ package org.graylog2.messagehandlers.common;
 public final class MessageCounter {
     private static MessageCounter instance;
 
-    /**
-     * The API methods in this class require a hostname as String. This constant
-     * defines the "all hosts/total messages" graph.
-     */
-    public static final String ALL_HOSTS = "all";
-
-    private int totalCount = 0;
-    private int totalSecondCount = 0;
-
-    private int highestSecondCount = 0;
 
     private MessageCounter() {}
 
@@ -53,64 +43,6 @@ public final class MessageCounter {
         return instance;
     }
 
-    /**
-     * Reset count of a host
-     * @param host The host to select
-     */
-    public void reset(String host) {
-        if (host.equals(ALL_HOSTS)) {
-            totalCount = 0;
-        }
-    }
 
-    /**
-     * Reset count of the messages per second counter.
-     */
-    public void resetTotalSecondCount() {
-        // Possibly update highest count?
-        if (totalSecondCount > highestSecondCount) {
-            highestSecondCount = totalSecondCount;
-        }
-
-        totalSecondCount = 0;
-    }
-
-    /**
-     * Increment count of a host (Also counts of totalSecondCounter if enabled)
-     * @param host The host to select
-     */
-    public void countUp(String host) {
-        if (host.equals(ALL_HOSTS)) {
-            totalCount++;
-            totalSecondCount++;
-        }
-    }
-
-    /**
-     * Get the count of a host
-     * @param host The host to select
-     * @return Count of the host
-     */
-    public int getCount(String host) {
-        if (host.equals(ALL_HOSTS)) {
-            return totalCount;
-        }
-
-        return 0;
-    }
-    
-   /**
-    * Get the count of the messages per second counter.
-    */
-    public int getTotalSecondCount() {
-        return totalSecondCount;
-    }
-
-   /**
-     * Get the highest recorded count of messages per second.
-     */
-    public int getHighestSecondCount() {
-        return highestSecondCount;
-    }
 
 }

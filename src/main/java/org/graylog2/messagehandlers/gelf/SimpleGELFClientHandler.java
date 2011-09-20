@@ -24,10 +24,8 @@ import indexer.Indexer;
 import org.apache.log4j.Logger;
 import org.graylog2.Tools;
 import org.graylog2.blacklists.Blacklist;
-import org.graylog2.database.MongoBridge;
 import org.graylog2.forwarders.Forwarder;
 import org.graylog2.messagehandlers.common.HostUpsertHook;
-import org.graylog2.messagehandlers.common.MessageCounterHook;
 import org.graylog2.messagehandlers.common.MessageParserHook;
 import org.graylog2.messagehandlers.common.ReceiveHookManager;
 
@@ -125,10 +123,7 @@ public class SimpleGELFClientHandler extends GELFClientHandlerBase implements GE
             // Insert message into MongoDB.
             ReceiveHookManager.preProcess(new MessageParserHook(), message);
             if(!message.getFilterOut()) {
-                ////////////////////////////m.insertGelfMessage(message);
                 Indexer.index(message);
-                // This is doing the upcounting for statistics.
-                ReceiveHookManager.postProcess(new MessageCounterHook(), message);
 
                 // Counts up host in hosts collection.
                 ReceiveHookManager.postProcess(new HostUpsertHook(), message);
