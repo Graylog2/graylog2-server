@@ -33,7 +33,6 @@ import org.graylog2.messagehandlers.gelf.GELFMainThread;
 import org.graylog2.messagehandlers.syslog.SyslogServerThread;
 import org.graylog2.periodical.ChunkedGELFClientManagerThread;
 import org.graylog2.periodical.HostCounterCacheWriterThread;
-import org.graylog2.periodical.ThroughputWriterThread;
 
 import java.io.FileReader;
 import java.io.FileWriter;
@@ -123,10 +122,6 @@ public final class Main {
         if (configuration.getBoolean("amqp_enabled")) {
              initializeAMQP(configuration);
          }
-
-        // Start thread that stores throughput info.
-        ThroughputWriterThread throughputThread = new ThroughputWriterThread();
-        throughputThread.start();
 
         LOG.info("Graylog2 up and running.");
     }
