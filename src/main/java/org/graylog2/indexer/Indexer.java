@@ -48,7 +48,7 @@ public class Indexer {
     public static final String INDEX = "graylog2";
     public static final String TYPE = "message";
     
-    public static void index(GELFMessage message) {
+    public static boolean index(GELFMessage message) {
         Map obj = new HashMap();
         obj.put("message", message.getShortMessage());
         obj.put("full_message", message.getFullMessage());
@@ -85,12 +85,18 @@ public class Indexer {
             OutputStreamWriter writer = new OutputStreamWriter(conn.getOutputStream());
             writer.write(JSONValue.toJSONString(obj));
             writer.close();
-
-            // TODO: REMOVE
-            String response = IOUtils.toString(conn.getInputStream());
+            if (conn.getResponseCode() == 201) {
+                return true;
+            } else {
+                LOG.warn("Indexer response code was not 201, but " + conn.getResponseCode());
+                return false; 
+            }
         } catch (IOException e) {
             LOG.warn("IO error when trying to index message: " + e.getMessage(), e);
         }
+
+        // Not reached.
+        return false;
     }
 
     private static String buildTargetUrl() {

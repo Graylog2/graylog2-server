@@ -124,13 +124,14 @@ public class SimpleGELFClientHandler extends GELFClientHandlerBase implements GE
             // PreProcess message based on filters. Insert message into indexer.
             ReceiveHookManager.preProcess(new MessageParserHook(), message);
             if(!message.getFilterOut()) {
-                Indexer.index(message);
+                // Index message and post-process if it was successful.
+                if (Indexer.index(message)) {
+                    // Update periodic counts collection.
+                    ReceiveHookManager.postProcess(new MessageCountUpdateHook(), message);
 
-                // Update periodic counts collection.
-                ReceiveHookManager.postProcess(new MessageCountUpdateHook(), message);
-
-                // Counts up host in hosts collection.
-                ReceiveHookManager.postProcess(new HostUpsertHook(), message);
+                    // Counts up host in hosts collection.
+                    ReceiveHookManager.postProcess(new HostUpsertHook(), message);
+                }
             }
 
             // Forward.
