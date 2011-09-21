@@ -44,7 +44,7 @@ class MessageGateway
       size 0
     end.total
   end
-
+  
   private
   def self.wrap(x)
     case(x)

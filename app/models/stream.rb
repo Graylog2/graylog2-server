@@ -87,7 +87,8 @@ class Stream
   end
 
   def self.message_count_since(stream_id, since)
-    Message.by_stream(stream_id).where(:created_at.gt => since.to_i).count
+    #Message.by_stream(stream_id).where(:created_at.gt => since.to_i).count
+    0
   end
 
   def self.get_distinct_hosts(stream_id)

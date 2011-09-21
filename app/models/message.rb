@@ -35,6 +35,8 @@ class Message
         @additionals[key[1, key.length]] = value
       end
     end
+
+    # XXX ELASTIC: sort alphabetically
   end
 
   # Overwriting the message getter. This always applies the filtering of filtered terms.

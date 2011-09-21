@@ -63,8 +63,8 @@ class VisualsController < ApplicationController
   end
 
   def calculate_totalgraph(hours = 12)
-    Message.counts_of_last_minutes(hours.to_i*60).collect do |c|
-      [ (c[:minute].to_i+Time.now.utc_offset)*1000, c[:count] ]
+    MessageCount.counts_of_last_minutes(hours.to_i*60).collect do |c|
+      [ (c[:timestamp].to_i+Time.now.utc_offset)*1000, c[:count] ]
     end
   end
 

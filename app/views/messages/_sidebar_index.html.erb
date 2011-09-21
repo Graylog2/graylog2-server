@@ -11,7 +11,6 @@ Your current time: <%= gl_date(Time.zone.now) %>
 </div>
 <%=raw flot_graph_loader(
       :inject => "#sidebar-graph",
-      :host => "all",
       :hours => 2
     )
 %>
