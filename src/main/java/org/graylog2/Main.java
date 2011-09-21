@@ -40,6 +40,7 @@ import java.io.Reader;
 import java.io.Writer;
 import java.util.List;
 import java.util.Properties;
+import org.graylog2.periodical.MessageCountWriterThread;
 
 /**
  * Main class of Graylog2.
@@ -113,6 +114,9 @@ public final class Main {
         initializeSyslogServer(configuration.get("syslog_protocol"), configuration.getInteger("syslog_listen_port", 514));
         initializeHostCounterCache();
 
+        // Start message counter thread.
+        initializeMessageCounters();
+
         // Start GELF threads
         if (configuration.getBoolean("use_gelf")) {
             initializeGELFThreads(configuration.getInteger("gelf_listen_port", 12201));
@@ -146,6 +150,12 @@ public final class Main {
         HostCounterCacheWriterThread hostCounterCacheWriterThread = new HostCounterCacheWriterThread();
         hostCounterCacheWriterThread.start();
         LOG.info("Host count cache is up.");
+    }
+
+    private static void initializeMessageCounters() {
+        MessageCountWriterThread messageCountWriterThread = new MessageCountWriterThread();
+        messageCountWriterThread.start();
+        LOG.info("Message counters initialized.");
     }
 
     private static void initializeGELFThreads(int gelfPort) {

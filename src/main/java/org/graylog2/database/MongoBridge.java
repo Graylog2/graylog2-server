@@ -30,6 +30,7 @@ import org.graylog2.messagehandlers.gelf.GELFMessage;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
+import org.bson.types.ObjectId;
 
 /**
  * MongoBridge.java: Apr 13, 2010 9:13:03 PM
@@ -144,8 +145,17 @@ public class MongoBridge {
         obj.put("value", value);
         obj.put("created_at", Tools.getUTCTimestamp());
 
-        DBCollection coll = MongoConnection.getInstance().getHistoricServerValuesColl();
-        coll.insert(obj);
+        MongoConnection.getInstance().getHistoricServerValuesColl().insert(obj);
+    }
+
+    public void writeMessageCounts(int total, Map<ObjectId, Integer> streams, Map<String, Integer> hosts) {
+        BasicDBObject obj = new BasicDBObject();
+        obj.put("timestamp", Tools.getUTCTimestamp());
+        obj.put("total", total);
+        obj.put("streams", streams);
+        obj.put("hosts", hosts);
+
+        MongoConnection.getInstance().getMessageCountsColl().insert(obj);
     }
 
 }
