@@ -36,13 +36,8 @@ class MessageGateway
   end
 
   def self.count_of_last_minutes(x)
-    # XXX ELASTIC: returns whole result set with all the messages in it. use *real* count.
-    search do
-      filter 'range', {
-        :created_at => { :from => x.minutes.ago.to_i, :include_upper => true  }
-      }
-      size 0
-    end.total
+    # Delegating for backward compatibility reasons. Should be removed soon. (XXX ELASTIC)
+    MessageCount.total_count_of_last_minutes(x)
   end
   
   private
