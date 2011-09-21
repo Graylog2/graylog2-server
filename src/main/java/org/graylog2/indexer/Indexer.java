@@ -24,12 +24,15 @@ import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import org.apache.commons.io.IOUtils;
 import org.apache.log4j.Logger;
+import org.bson.types.ObjectId;
 import org.graylog2.Tools;
 import org.graylog2.messagehandlers.gelf.GELFMessage;
 import org.json.simple.JSONValue;
@@ -75,7 +78,14 @@ public class Indexer {
             obj.put("created_at", message.getCreatedAt());
         }
 
-        ///// TODO: obj.put("streams", message.getStreamIds());
+        ////// REQUIRED?
+        List<String> streamIds = new ArrayList<String>();
+        for (ObjectId id : message.getStreamIds()) {
+            streamIds.add(id.toString());
+        }
+
+        obj.put("streams", streamIds);
+        ///////////////
 
         try {
             URL url = new URL(Indexer.buildTargetUrl());
