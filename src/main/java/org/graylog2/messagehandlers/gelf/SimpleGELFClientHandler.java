@@ -20,7 +20,7 @@
 
 package org.graylog2.messagehandlers.gelf;
 
-import indexer.Indexer;
+import org.graylog2.indexer.Indexer;
 import org.apache.log4j.Logger;
 import org.graylog2.Tools;
 import org.graylog2.blacklists.Blacklist;

@@ -18,7 +18,7 @@
  *
  */
 
-package indexer;
+package org.graylog2.indexer;
 
 import java.io.IOException;
 import java.io.OutputStreamWriter;
