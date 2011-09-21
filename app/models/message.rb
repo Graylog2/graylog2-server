@@ -4,7 +4,7 @@ class Message
   ADDITIONAL_FIELD_SEPARATOR = '_'
   RESERVED_ADDITIONAL_FIELDS = %w(_type _index _version)
 
-  @fields = [ :id, :message, :full_message, :created_at, :facility, :level, :host, :file, :line, :deleted ]
+  @fields = [ :id, :message, :full_message, :created_at, :facility, :level, :host, :file, :line, :deleted, :streams ]
   @fields.each { |f| attr_accessor(f) }
 
   attr_accessor :plain
