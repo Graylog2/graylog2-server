@@ -73,8 +73,8 @@ class VisualsController < ApplicationController
 
     return Array.new if stream.streamrules.blank?
 
-    Message.stream_counts_of_last_minutes(stream.id, hours.to_i*60).collect do |c|
-      [ (c[:minute].to_i+Time.now.utc_offset)*1000, c[:count] ]
+    MessageCount.counts_of_last_minutes(hours.to_i*60, :stream_id => stream.id).collect do |c|
+      [ (c[:timestamp].to_i+Time.now.utc_offset)*1000, c[:count] ]
     end
   end
 
