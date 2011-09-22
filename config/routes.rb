@@ -16,7 +16,6 @@ Graylog2WebInterface::Application.routes.draw do
     collection do
       post :showrange
       get :showrange
-      post :getnewmessagecount
       post :deletebystream
       post :deletebyquickfilter
     end
