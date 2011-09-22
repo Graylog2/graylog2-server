@@ -31,6 +31,12 @@ class MessageGateway
     wrap search("*", { :per_page => Message::LIMIT, :page => page }.merge(@default_query_options))
   end
 
+  def self.all_of_stream_paginated(stream_id, page = 1)
+    page = 1 if page.blank?
+
+    wrap search("streams:#{stream_id}", { :per_page => Message::LIMIT, :page => page }.merge(@default_query_options))
+  end
+
   def self.retrieve_by_id(id)
     wrap @index.retrieve(TYPE_NAME, id)
   end
@@ -40,6 +46,16 @@ class MessageGateway
     MessageCount.total_count_of_last_minutes(x)
   end
   
+  def self.total_count
+    # search with size 0 instead of count because of this issue: https://github.com/karmi/tire/issues/100
+    search("*", :size => 0).total
+  end
+
+  def self.stream_count(stream_id)
+    # search with size 0 instead of count because of this issue: https://github.com/karmi/tire/issues/100
+    search("streams:#{stream_id}", :size => 0).total
+  end
+
   private
   def self.wrap(x)
     case(x)
