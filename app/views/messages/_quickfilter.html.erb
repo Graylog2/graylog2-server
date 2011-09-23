@@ -1,4 +1,4 @@
-<div id="messages-quickfilter" style="display: none;">
+<div id="messages-quickfilter" <%= params[:filters].blank? ? raw("style='display: none;'") : nil %>>
 <%= form_tag(params, :method => :get) do -%>
   <dl id="messages-quickfilter-fields">
     <dt><%= label_tag "filters[:message]", "Message (regex):" %></dt>

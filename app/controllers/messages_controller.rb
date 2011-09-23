@@ -16,6 +16,7 @@ class MessagesController < ApplicationController
     elsif params[:stream_id]
       @scoping = :stream
       @stream = Stream.find_by_id(params[:stream_id])
+      @is_favorited = current_user.favorite_streams.include?(params[:stream_id])
 
       # Check streams for reader.
       block_access_for_non_admins if !@stream.accessable_for_user?(current_user)
@@ -34,7 +35,12 @@ class MessagesController < ApplicationController
         block_access_for_non_admins
       end
 
-      @messages = MessageGateway.all_paginated(params[:page])
+      if params[:filters].blank?
+        @messages = MessageGateway.all_paginated(params[:page])
+      else
+        @additional_filters = extract_additional_from_quickfilter(params[:filters])
+        @messages = MessageGateway.all_by_quickfilter(params[:filters], params[:page])
+      end
       @total_count = MessageGateway.total_count
     end
   end
@@ -47,6 +53,20 @@ class MessagesController < ApplicationController
     end
   end
 
+  def extract_additional_from_quickfilter(filters)
+    return Hash.new if filters[:additional].blank? or filters[:additional][:keys].blank? or filters[:additional][:values].blank?
+
+    ret = Hash.new
+    i = 0
+    filters[:additional][:keys].each do |key|
+      next if key.blank? or filters[:additional][:values][i].blank?
+      ret["_#{key}".to_sym] = filters[:additional][:values][i]
+      i += 1
+    end
+
+    return ret
+  end
+
   public
   def index
     @has_sidebar = true
@@ -55,18 +75,6 @@ class MessagesController < ApplicationController
 
     if Configuration.allow_version_check
       @last_version_check = current_user.last_version_check
-    end
-
-    #if params[:filters].blank?
-    #  @messages = @scope.all_paginated(params[:page])
-    #else
-    #  @additional_filters = Message.extract_additional_from_quickfilter(params[:filters])
-    #  @messages = @scope.all_by_quickfilter params[:filters], params[:page]
-    #end
-    #@total_count = MessageGateway.total_count
-
-    if params[:stream_id]
-      @is_favorited = current_user.favorite_streams.include?(params[:stream_id])
     end
   end
 
