@@ -107,24 +107,15 @@ class Stream
   end
 
   def all_users_with_alarm
-    uids = AlertedStream.where(:stream_id => id)
-
-    users = Array.new
-    uids.each do |uid|
-      user = User.find(uid.user_id)
-      users << user unless user.blank?
-    end
-
-    return users
+    alerts = AlertedStream.where(:stream_id => id)
+    alerts.collect &:user
   end
 
   def accessable_for_user?(user)
     return true if user.role == "admin"
 
     allowed_streams = user.streams.collect { |s| s.id.to_s }
-    return false unless allowed_streams.include?(self.id.to_s)
-
-    return true
+    allowed_streams.include?(self.id.to_s)
   end
 
   def related_streams
