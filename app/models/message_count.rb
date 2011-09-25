@@ -32,6 +32,13 @@ class MessageCount
       end
     end
 
+    if opts[:fill] and opts[:fill] == true
+      # Fill with zeroes if there were not enough results.
+      remaining = x-res.count
+      ts = Time.now.to_i-1
+      remaining.times { res.insert(0, { :timestamp => ts, :count => 0 }) } if remaining > 0
+    end
+
     return res
   end
 
