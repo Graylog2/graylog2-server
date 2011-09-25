@@ -58,6 +58,7 @@ class MessageGateway
           # XXX ELASTIC: no exact match here. ffffufufufufufufufu full text search
           must { string("host:#{filters[:host]}") } unless filters[:host].blank?
 
+          # XXX ELASTIC: additional_fields missing
           # XXX ELASTIC: hostgroup missing.
           # XXX ELASTIC timeframe filter missing
         end
