@@ -82,11 +82,6 @@ class Message
     return conditions
   end
 
-  def self.all_by_quickfilter filters, page = 1, limit = LIMIT, conditions_only = false
-#    page = 1 if page.blank?
-#
-#    conditions = self
-#
 #    unless filters.blank?
 #      unless filters[:message].blank?
 #        message_conditions = Hash.new
@@ -123,27 +118,8 @@ class Message
 #      end
 #    end
 #
-#    return conditions if conditions_only
-#
-#    conditions.default_scope.paginate(:page => page, :per_page => LIMIT)
 
-    Array.new
-  end
-
-  def self.extract_additional_from_quickfilter(filters)
-    return Hash.new if filters[:additional].blank? or filters[:additional][:keys].blank? or filters[:additional][:values].blank?
-
-    ret = Hash.new
-    i = 0
-    filters[:additional][:keys].each do |key|
-      next if key.blank? or filters[:additional][:values][i].blank?
-      ret["_#{key}".to_sym] = filters[:additional][:values][i]
-      i += 1
-    end
-
-    return ret
-  end
-
+  # XXX ELASTIC - wat
   def self.recalculate_host_counts
     Host.all.each do |host|
       host.message_count = Message.where(:host => host.host, :deleted => false).count

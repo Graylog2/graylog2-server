@@ -10,7 +10,6 @@ authorization do
       :around,
       :deletebyquickfilter,
       :deletebystream,
-      :getnewmessagecount
     ]
 
     has_permission_on :streams, :to => [

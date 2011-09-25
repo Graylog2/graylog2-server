@@ -1,40 +1,47 @@
 class MessagesController < ApplicationController
-  before_filter :set_scoping
+  before_filter :do_scoping
 
   filter_access_to :all
 
   rescue_from Mongoid::Errors::DocumentNotFound, :with => :not_found
   rescue_from BSON::InvalidObjectId, :with => :not_found
 
-  protected
-  def set_scoping
+  def do_scoping
     if params[:host_id]
+      @scoping = :host
       block_access_for_non_admins
 
       @scope = Message.where(:host => params[:host_id])
       @host = Host.find(:first, :conditions => {:host=> params[:host_id]})
-      @scoping = :host
     elsif params[:stream_id]
+      @scoping = :stream
       @stream = Stream.find_by_id(params[:stream_id])
+      @is_favorited = current_user.favorite_streams.include?(params[:stream_id])
 
       # Check streams for reader.
       block_access_for_non_admins if !@stream.accessable_for_user?(current_user)
 
-      @scope = Message.by_stream(@stream.id)
-      @scoping = :stream
+      @messages = MessageGateway.all_of_stream_paginated(@stream.id, params[:page])
+      @total_count = MessageGateway.stream_count(@stream.id)
     elsif params[:hostgroup_id]
+      @scoping = :hostgroup
       block_access_for_non_admins
 
       @hostgroup = Hostgroup.find_by_id params[:hostgroup_id]
       @scope = Message.all_of_hostgroup @hostgroup, params[:page]
-      @scoping = :hostgroup
     else
+      @scoping = :messages
       unless (params[:action] == "show")
         block_access_for_non_admins
       end
 
-      @scope = MessageGateway
-      @scoping = :messages
+      if params[:filters].blank?
+        @messages = MessageGateway.all_paginated(params[:page])
+      else
+        @additional_filters = extract_additional_from_quickfilter(params[:filters])
+        @messages = MessageGateway.all_by_quickfilter(params[:filters], params[:page])
+      end
+      @total_count = MessageGateway.total_count
     end
   end
 
@@ -46,6 +53,20 @@ class MessagesController < ApplicationController
     end
   end
 
+  def extract_additional_from_quickfilter(filters)
+    return Hash.new if filters[:additional].blank? or filters[:additional][:keys].blank? or filters[:additional][:values].blank?
+
+    ret = Hash.new
+    i = 0
+    filters[:additional][:keys].each do |key|
+      next if key.blank? or filters[:additional][:values][i].blank?
+      ret["_#{key}".to_sym] = filters[:additional][:values][i]
+      i += 1
+    end
+
+    return ret
+  end
+
   public
   def index
     @has_sidebar = true
@@ -54,18 +75,6 @@ class MessagesController < ApplicationController
 
     if Configuration.allow_version_check
       @last_version_check = current_user.last_version_check
-    end
-
-    if params[:filters].blank?
-      @messages = @scope.all_paginated(params[:page])
-    else
-      @additional_filters = Message.extract_additional_from_quickfilter(params[:filters])
-      @messages = @scope.all_by_quickfilter params[:filters], params[:page]
-    end
-    @total_count = @scope.search("*").total
-
-    if params[:stream_id]
-      @is_favorited = current_user.favorite_streams.include?(params[:stream_id])
     end
   end
 
@@ -157,27 +166,6 @@ class MessagesController < ApplicationController
     flash[:notice] = "Messages have been deleted."
 
     redirect_to :action => 'index'
-  end
-
-  # Get the count of new messages since a given UNIX timestamp
-  def getnewmessagecount
-    since = params[:since].to_i
-    if since <= 0
-      render :js => { 'status' => 'error', 'payload' => "Missing or invalid parameter: since" }.to_json
-      return
-    end
-
-    if params[:stream_id]
-      stream = Stream.find_by_id params[:stream_id]
-      if stream.nil?
-        render :js => {'status' => 'error',
-                       'payload' => "Cannot find stream with id #{params[:stream_id]}" }.to_json
-        return
-      end
-      render :js => { 'status' => 'success', 'payload' => stream.message_count_since(since) }.to_json
-    else
-      render :js => { 'status' => 'success', 'payload' => Message.count_since(since) }.to_json
-    end
   end
 
 end
