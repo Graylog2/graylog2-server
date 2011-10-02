@@ -36,6 +36,8 @@ class Message
       end
     end
 
+    return @additionals
+
     # XXX ELASTIC: sort alphabetically
   end
 
@@ -50,7 +52,7 @@ class Message
   end
 
   def file_and_line
-    self.file + (":#{@line}" unless @line.blank?).to_s
+    self.file + (":#{@line}" unless @line.blank?).to_s unless self.file.blank?
   end
 
   def additional_fields?
