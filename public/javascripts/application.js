@@ -33,11 +33,11 @@ $(document).ready(function(){
                 break;
             case '5':
                 field = $('.stream-value-timeframe');
-                help = $('#stream-value-timeframe-help').show();
+                help = $('#stream-value-timeframe-help');
                 break;
             case '6':
                 field = $('.stream-value-additional-field');
-                help = $('#stream-value-additional-field-help').show();
+                help = $('#stream-value-additional-field-help');
                 break;
             case '7':
                 field = $('.stream-value-hostgroup');
@@ -47,12 +47,16 @@ $(document).ready(function(){
                 break;
             case '9':
                 field = $('.stream-value-host-regex');
+                notify("Remember to possibly escape characters in the regular expression." +
+                       "A typical mistake is forgetting to escape dots in host names.");
                 break;
             case '10':
                 field = $('.stream-value-fullmessage');
                 break;
             case '11':
                 field = $('.stream-value-filename');
+                notify("Remember to possibly escape characters in the regular expression." +
+                       "A typical mistake is forgetting to escape the dot in filenames.");
                 break;
         }
         field.removeAttr("disabled");
@@ -267,4 +271,11 @@ function bindMessageSidebarClicks() {
 // srsly, javascript... - http://stackoverflow.com/questions/1219860/javascript-jquery-html-encoding
 function htmlEncode(v) {
   return $('<div/>').text(v).html();
+}
+
+function notify(what) {
+  $.gritter.add({
+    title: "Notification",
+    text: what
+  })
 }

@@ -7,6 +7,7 @@
   <%= favicon_link_tag "/favicon.ico" %>
   <%= csrf_meta_tag %>
   <%= stylesheet_link_tag "reset" %>
+  <%= stylesheet_link_tag "jquery.gritter" %>
   <%= stylesheet_link_tag "core" %>
   <%= stylesheet_link_tag "sections" %>
   <%= stylesheet_link_tag "messages" %>
@@ -18,6 +19,7 @@
   <%= javascript_include_tag "jquery.mapkey.min" %>
   <%= javascript_include_tag "jquery.simplemodal.min" %>
   <%= javascript_include_tag "jquery.sparkline.min" %>
+  <%= javascript_include_tag "jquery.gritter.min" %>
   <%= javascript_include_tag("jit") if @load_jit %>
   <% if @load_flot %>
     <%= javascript_include_tag("jquery.flot.min") %>
