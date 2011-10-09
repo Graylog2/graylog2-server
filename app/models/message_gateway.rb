@@ -88,8 +88,14 @@ class MessageGateway
   end
 
   def self.stream_count(stream_id)
+    # XXX ELASTIC is that size 0 actually working?
     # search with size 0 instead of count because of this issue: https://github.com/karmi/tire/issues/100
     search("streams:#{stream_id}", :size => 0).total
+  end
+
+  def self.oldest_message
+    # XXX ELASTIC is that size 0 actually working?
+    wrap search("*", { :sort => "created_at asc", :size => 1 }).first
   end
 
   private
