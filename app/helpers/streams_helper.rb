@@ -1,26 +1,7 @@
 module StreamsHelper
-  def streamrule_type_to_human type
-    case type
-      when Streamrule::TYPE_MESSAGE then
-        return "Message"
-      when Streamrule::TYPE_HOST then
-        return "Host"
-      when Streamrule::TYPE_HOST_REGEX then
-        return "Host (regex)"
-      when Streamrule::TYPE_HOSTGROUP then
-        return "Hostgroup"
-      when Streamrule::TYPE_SEVERITY then
-        return "Severity"
-      when Streamrule::TYPE_FACILITY then
-        return "Facility"
-      when Streamrule::TYPE_TIMEFRAME then
-        return "Timeframe"
-      when Streamrule::TYPE_ADDITIONAL then
-        return "Additional field"
-      when Streamrule::TYPE_SEVERITY_OR_HIGHER then
-        return "Severity (or higher)"
-    end
-    return "Invalid Rule"
+  def streamrule_type_to_human(type)
+    name = Streamrule.rule_names[type]
+    name.blank? ? "Invalid rule" : name
   end
 
   def streamrule_to_human rule

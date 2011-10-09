@@ -48,6 +48,12 @@ $(document).ready(function(){
             case '9':
                 field = $('.stream-value-host-regex');
                 break;
+            case '10':
+                field = $('.stream-value-fullmessage');
+                break;
+            case '11':
+                field = $('.stream-value-filename');
+                break;
         }
         field.removeAttr("disabled");
         field.show();

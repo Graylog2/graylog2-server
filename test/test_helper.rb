@@ -10,9 +10,10 @@ class ActiveSupport::TestCase
 
     DatabaseCleaner.clean
 
+    # XXX ELASTIC
     # to test actual performance - WEBINTERFACE-46
-    Message.db.drop_collection("messages")
-    Message.db.create_collection("messages", :capped => true, :size => 1.megabyte)
+    #Message.db.drop_collection("messages")
+    #Message.db.create_collection("messages", :capped => true, :size => 1.megabyte)
 
     Sham.reset
 
