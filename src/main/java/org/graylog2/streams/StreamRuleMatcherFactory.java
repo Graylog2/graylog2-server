@@ -39,9 +39,9 @@ public class StreamRuleMatcherFactory {
             case StreamRule.TYPE_MESSAGE:
                 matcher = new MessageMatcher();
                 break;
-			case StreamRule.TYPE_FULL_MESSAGE:
-				matcher = new FullMessageMatcher();
-				break;
+            case StreamRule.TYPE_FULL_MESSAGE:
+                matcher = new FullMessageMatcher();
+                break;
             case StreamRule.TYPE_HOST:
                 matcher = new HostMatcher();
                 break;
@@ -61,7 +61,10 @@ public class StreamRuleMatcherFactory {
                 matcher = new SeverityOrHigherMatcher();
                 break;
             case StreamRule.TYPE_HOST_REGEX:
-                matcher = new HostRegexMatcher();;
+                matcher = new HostRegexMatcher();
+                break;
+            case StreamRule.TYPE_FILENAME_LINE:
+                matcher = new FileNameAndLineMatcher();
                 break;
             default:
                 throw new InvalidStreamRuleTypeException();
