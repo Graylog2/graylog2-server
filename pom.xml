@@ -15,16 +15,46 @@
 
     <repositories>
         <repository>
+            <id>repo1 maven</id>
+            <name>maven.org</name>
+            <url>http://repo1.maven.org/maven2</url>
+        </repository>
+        <repository>
+            <id>maven alfresco</id>
+            <name>maven alfresco</name>
+            <url>http://maven.alfresco.com/nexus/content/groups/public</url>
+        </repository>
+        <repository>
             <id>scala-tools.org releases</id>
             <name>Scala-tools Maven2 Releases Repository</name>
             <url>http://maven.androidknight.com/</url>
         </repository>
+        <repository>
+            <id>scala-tools.org r2eleases</id>
+            <name>Scala-tools Maven2 Releases Repository</name>
+            <url>http://mirrors.ibiblio.org/pub/mirrors/maven2</url>
+        </repository>
+        <repository>
+            <id>atlassian</id>
+            <name>atlassian</name>
+            <url>https://maven.atlassian.com/content/repositories/jboss-releases</url>
+        </repository>
     </repositories>
     <pluginRepositories>
         <pluginRepository>
-            <id>scala-tools.org releases</id>
+            <id>scala-tools.org 2eases</id>
             <name>Scala-tools Maven2 Releases Repository</name>
-            <url>http://maven.androidknight.com/</url>
+            <url>http://repo1.maven.org/maven2/org/codehaus</url>
+        </pluginRepository>
+        <pluginRepository>
+            <id>scala-tools.org 2releases</id>
+            <name>Scala-tools Maven2 Releases Repository</name>
+            <url>http://mirrors.ibiblio.org/pub/mirrors/maven2</url>
+        </pluginRepository>
+        <pluginRepository>
+            <id>atlassian</id>
+            <name>atlassian</name>
+            <url>https://maven.atlassian.com/content/repositories/jboss-releases</url>
         </pluginRepository>
     </pluginRepositories>
 
