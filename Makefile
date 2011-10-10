@@ -7,16 +7,18 @@ SERVER=target/graylog2-server-0.9.6-SNAPSHOT.jar
 INITD=contrib/distro/generic/graylog2-server.init.d
 CONF=misc/graylog2.conf
 
+MVN_OPTS=-Dmaven.repo.local
+
 all: $(SERVER) $(SERVER_W_DEP) test
 
 $(SERVER) $(SERVER_W_DEP):
-	mvn assembly:assembly
+	mvn $(MVN_OPTS) assembly:assembly
 
 test:
-	mvn test
+	mvn $(MVN_OPTS) test
 
 clean:
-	mvn clean
+	mvn $(MVN_OPTS) clean
 
 install: $(SERVER_W_DEP) $(INITD)
 	install -m 755 -d $(DESTDIR)$(PREFIX)/share/$(NAME)
