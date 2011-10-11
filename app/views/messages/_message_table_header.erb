@@ -8,7 +8,7 @@ Currently containing <span class="highlighted"><%= number_with_delimiter(@total_
 <span class="highlighted"><%= gl_date(Time.at(MessageGateway.oldest_message.created_at)) %></span>.
 
 <% message_count_interval = Setting.get_message_count_interval(current_user) %>
-<span class="highlighted">
+Stored <span class="highlighted">
   <%= number_with_delimiter(MessageGateway.count_of_last_minutes(Setting.get_message_count_interval(current_user)), :delimiter => '.') %>
 </span>
 messages in the last <%= message_count_interval %> minutes.
