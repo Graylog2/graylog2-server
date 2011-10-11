@@ -10,7 +10,9 @@
 ### END INIT INFO
 
 PREFIX=/usr
-SERVER_JAR=$PREFIX/share/graylog2-server/graylog2-server.jar
+SHAREDIR=$PREFIX/share/graylog2-server
+SERVER_JAR=$SHAREDIR/graylog2-server.jar
+SYSLOG4J_JAR=$SHAREDIR/syslog4j-0.9.46-bin.jar
 SVCNAME="graylog2-server"
 
 CONFIG="/etc/graylog2.conf"
@@ -24,7 +26,8 @@ start() {
     fi
 
     echo "Starting ${SVCNAME}"
-        nohup `which java` -jar $SERVER_JAR --pidfile ${PIDFILE} --configfile ${CONFIG} > $LOGFILE 2>&1
+        nohup `which java` -cp $SERVER_JAR:$SYSLOG4J_JAR org.graylog2.Main \
+			-p ${PIDFILE} -f ${CONFIG} > $LOGFILE 2>&1 &
 
     # There's no way to know if anything went wrong, so the only
     # thing we can do is wait and see if it's running afterwards
