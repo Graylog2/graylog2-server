@@ -140,8 +140,6 @@
             <groupId>log4j</groupId>
             <artifactId>log4j</artifactId>
             <version>1.2.16</version>
-	    <scope>system</scope>
-	    <systemPath>${project.basedir}/lib/log4j-1.2.16.jar</systemPath>
         </dependency>
         <dependency>
             <groupId>com.beust</groupId>
