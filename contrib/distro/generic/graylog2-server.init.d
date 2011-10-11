@@ -9,6 +9,8 @@
 # Short-Description: Start Graylog2 server
 ### END INIT INFO
 
+# Written by Lital Natan <litaln@gmail.com>
+
 PREFIX=/usr
 SHAREDIR=$PREFIX/share/graylog2-server
 SERVER_JAR=$SHAREDIR/graylog2-server.jar
@@ -20,8 +22,8 @@ LOGFILE="/var/log/graylog2.log"
 PIDFILE="/var/run/graylog2.pid"
 
 start() {
-    if [ ! -e ${CONFIG} ]; then
-        echo "${CONFIG} does not exist; cannot start ${SVCNAME}"
+    if [ ! -e $CONFIG ]; then
+        echo "Config file $CONFIG does not exist"
         return 1
     fi
 
@@ -29,9 +31,8 @@ start() {
         nohup `which java` -cp $SERVER_JAR:$SYSLOG4J_JAR org.graylog2.Main \
 			-p ${PIDFILE} -f ${CONFIG} > $LOGFILE 2>&1 &
 
-    # There's no way to know if anything went wrong, so the only
-    # thing we can do is wait and see if it's running afterwards
-    sleep 3
+    # Sleep before testing the service
+    sleep 2
 
     graylog2_test || return 1
 }
@@ -49,10 +50,10 @@ graylog2_test() {
         return 1
     fi
 
-    local PID=`cat ${PIDFILE}`
+    local pid=`cat ${PIDFILE}`
 
     # Graylog2 isn't running, so that means there was a problem
-    if [ ! -e /proc/${PID} ]; then
+    if [ ! -e /proc/$pid ]; then
         echo "Something went wrong, check ${LOGFILE}"
         rm -f ${PIDFILE}
         return 1
@@ -80,19 +81,19 @@ restart() {
 }
 
 case "$1" in
-	start)
-		start
-		;;
-	stop)
-		stop
-		;;
+    start)
+	start
+	;;
+    stop)
+	stop
+	;;
     status)
         status
         ;;
-	restart)
-		restart
-		;;
-	*)
-		echo "Usage $0 {start|stop|restart}"
-		RETVAL=1
+    restart)
+	restart
+	;;
+    *)
+	echo "Usage $0 {start|stop|restart|status}"
+	RETVAL=1
 esac
