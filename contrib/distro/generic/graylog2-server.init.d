@@ -10,7 +10,7 @@
 ### END INIT INFO
 
 PREFIX=/usr
-SERVER_JAR=$PREFIX/share/graylog2/graylog2-server.jar
+SERVER_JAR=$PREFIX/share/graylog2-server/graylog2-server.jar
 SVCNAME="graylog2-server"
 
 CONFIG="/etc/graylog2.conf"
