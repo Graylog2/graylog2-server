@@ -7,7 +7,8 @@ SERVER=target/graylog2-server-0.9.6-SNAPSHOT.jar
 INITD=contrib/distro/generic/graylog2-server.init.d
 CONF=misc/graylog2.conf
 
-MVN_OPTS=-Dmaven.repo.local
+MVN_REPO="/tmp/$(NAME)-build-${USER}"
+MVN_OPTS=-Dmaven.repo.local=${MVN_REPO}
 
 all: $(SERVER) $(SERVER_W_DEP) test
 
