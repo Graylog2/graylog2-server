@@ -30,7 +30,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import org.apache.commons.io.IOUtils;
 import org.apache.log4j.Logger;
 import org.bson.types.ObjectId;
 import org.graylog2.Tools;
@@ -51,6 +50,83 @@ public class Indexer {
     public static final String INDEX = "graylog2";
     public static final String TYPE = "message";
     
+    /**
+     * Checks if the index exists.
+     * 
+     * http://www.elasticsearch.org/guide/reference/api/admin-indices-indices-exists.html
+     */
+    public static boolean indexExists() {
+        try {
+            URL url = new URL(Indexer.buildIndexURL());
+            HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+            conn.setRequestMethod("HEAD");
+            if (conn.getResponseCode() == 200) {
+                return true;
+            } else {
+                if (conn.getResponseCode() != 404) {
+                    LOG.warn("Indexer response code was not 200 or 404, but " + conn.getResponseCode());
+                }
+                
+                return false;
+            }
+        } catch (IOException e) {
+            LOG.warn("IO error when trying to check if index exists: " + e.getMessage(), e);
+        }
+
+        return false;
+    }
+
+    public static boolean createIndex() {
+        // lol refactor
+        // set default to not_analyzed!
+        Map default_all = new HashMap();
+        default_all.put("match", "*");
+        Map foo = new HashMap();
+        foo.put("index", "not_analyzed");
+        default_all.put("mapping", foo);
+
+        Map dynamic_templates = new HashMap();
+        dynamic_templates.put("store_generic", default_all);
+
+        Map properties = new HashMap();
+        Map foo1 = new HashMap();
+        foo1.put("index", "analyzed");
+        properties.put("message", foo1);
+        properties.put("full_message", foo1);
+
+        Map mapping = new HashMap();
+        mapping.put("properties", properties);
+        mapping.put("dynamic_templates", dynamic_templates);
+
+        Map messageMapping = new HashMap();
+        messageMapping.put(TYPE, mapping);
+
+        Map spec = new HashMap();
+        spec.put("mappings", messageMapping);
+System.out.println("MAPPING: " + JSONValue.toJSONString(spec));
+
+// DYNAMIC TEMPLATES HAS TO BE A LIST LOL
+        try {
+            URL url = new URL(Indexer.buildIndexURL());
+            HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+            conn.setDoOutput(true);
+            conn.setRequestMethod("POST");
+            OutputStreamWriter writer = new OutputStreamWriter(conn.getOutputStream());
+            writer.write(JSONValue.toJSONString(spec));
+            writer.close();
+            if (conn.getResponseCode() == 201) {
+                return true;
+            } else {
+                LOG.warn("Response code of create index operation was not 201, but " + conn.getResponseCode());
+                return false;
+            }
+        } catch (IOException e) {
+            LOG.warn("IO error when trying to create index: " + e.getMessage(), e);
+        }
+
+        return false;
+    }
+
     public static boolean index(GELFMessage message) {
         Map obj = new HashMap();
         obj.put("message", message.getShortMessage());
@@ -88,7 +164,7 @@ public class Indexer {
         ///////////////
 
         try {
-            URL url = new URL(Indexer.buildTargetUrl());
+            URL url = new URL(Indexer.buildIndexWithTypeUrl());
             HttpURLConnection conn = (HttpURLConnection) url.openConnection();
             conn.setDoOutput(true);
             conn.setRequestMethod("POST");
@@ -109,8 +185,12 @@ public class Indexer {
         return false;
     }
 
-    private static String buildTargetUrl() {
-        return "http://localhost:9200/" + Indexer.INDEX + "/" + Indexer.TYPE;
+    private static String buildIndexURL() {
+        return "http://localhost:9200/" + Indexer.INDEX;
+    }
+
+    private static String buildIndexWithTypeUrl() {
+        return buildIndexURL() + "/" + Indexer.TYPE;
     }
 
 }

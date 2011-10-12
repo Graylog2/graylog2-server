@@ -40,6 +40,7 @@ import java.io.Reader;
 import java.io.Writer;
 import java.util.List;
 import java.util.Properties;
+import org.graylog2.indexer.Indexer;
 import org.graylog2.periodical.MessageCountWriterThread;
 
 /**
@@ -101,6 +102,19 @@ public final class Main {
         // If we only want to check our configuration, we can gracefully exit here
         if(commandLineArguments.isConfigTest()) {
             System.exit(0);
+        }
+
+        // Check if the index exists. Create it if not.
+        if (Indexer.indexExists()) {
+            LOG.info("Index exists. Not creating it.");
+        } else {
+            LOG.info("Index does not exist! Trying to create it ...");
+            if (Indexer.createIndex()) {
+                LOG.info("Successfully created index.");
+            } else {
+                LOG.fatal("Could not create Index. Terminating.");
+                System.exit(1);
+            }
         }
 
         savePidFile(commandLineArguments.getPidFile());
