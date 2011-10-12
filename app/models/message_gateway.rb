@@ -39,6 +39,9 @@ class MessageGateway
     wrap @index.retrieve(TYPE_NAME, id)
   end
 
+  # XXX ELASTIC that downcasing sucks. really required? possibly escape it somehow? example: http_verb = POST / post
+  # XXX ELASTIC not escaped. search for hostname foo-bar.foo.org won't work because of minus sign.
+  # XXX ELASTIC update create index docs with mapping stuff for this to work.
   def self.all_by_quickfilter filters, page = 1
     r = search pagination_options(page).merge(@default_query_options) do
       query do
@@ -47,24 +50,27 @@ class MessageGateway
           must { string("message:#{filters[:message]}") } unless filters[:message].blank?
 
           # Facility
-          must { string("facility:#{filters[:facility]}") } unless filters[:facility].blank?
+          must { term(:facility, filters[:facility].downcase) } unless filters[:facility].blank?
 
           # Severity
           if !filters[:severity].blank? and filters[:severity_above].blank?
-            must { string("level:#{filters[:severity]}") }
+            must { term(:level, filters[:severity]) }
           end
 
           # Host
-          # XXX ELASTIC: no exact match here. ffffufufufufufufufu full text search
-          must { string("host:#{filters[:host]}") } unless filters[:host].blank?
+          must { term(:host, filters[:host]) } unless filters[:host].blank?
 
-          # XXX ELASTIC: additional_fields missing
-          # XXX ELASTIC: hostgroup missing.
+          # XXX ELASTIC hostgroup missing.
           # XXX ELASTIC timeframe filter missing
+      
+          # Additional fields.
+          MessageGateway.extract_additional_from_quickfilter(filters).each do |key, value|
+            must { term("_#{key.downcase}".to_sym, value.downcase) }
+          end
         end
       end
-
-      # Severity (or higher) - XXX ELASTIC - possible to integrate in query block above?
+      
+      # Severity (or higher)
       if !filters[:severity].blank? and !filters[:severity_above].blank?
         filter 'range', { :level => { :to => filters[:severity].to_i } }
       end
@@ -72,9 +78,6 @@ class MessageGateway
     end
 
     return wrap(r)
-
-    # XXX ELASTIC - building that string directly sucks. find a way to use the Tire DSL.
-    #wrap search(quickfilter_condition_string(filters), { :per_page => Message::LIMIT, :page => page }.merge(@default_query_options))
   end
 
   def self.count_of_last_minutes(x)
@@ -117,6 +120,20 @@ class MessageGateway
     page = 1 if page.blank?
 
     { :per_page => Message::LIMIT, :page => page }
+  end
+  
+  def self.extract_additional_from_quickfilter(filters)
+    return Hash.new if filters[:additional].blank? or filters[:additional][:keys].blank? or filters[:additional][:values].blank?
+
+    ret = Hash.new
+    i = 0
+    filters[:additional][:keys].each do |key|
+      next if key.blank? or filters[:additional][:values][i].blank?
+      ret[key] = filters[:additional][:values][i]
+      i += 1
+    end
+
+    return ret
   end
 
 end

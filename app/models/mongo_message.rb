@@ -1,3 +1,5 @@
+# XXX ELASTIC: remove me
+
 # Single log message, created by server.
 class MongoMessage
   include Mongoid::Document
