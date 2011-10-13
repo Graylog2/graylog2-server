@@ -61,7 +61,7 @@ class MessageGateway
           # XXX ELASTIC timeframe filter missing
       
           # Additional fields.
-          MessageGateway.extract_additional_from_quickfilter(filters).each do |key, value|
+          Quickfilter.extract_additional_fields_from_request(filters).each do |key, value|
             must { term("_#{key}".to_sym, value) }
           end
         end
@@ -70,6 +70,12 @@ class MessageGateway
       # Severity (or higher)
       if !filters[:severity].blank? and !filters[:severity_above].blank?
         filter 'range', { :level => { :to => filters[:severity].to_i } }
+      end
+
+      # Timeframe.
+      if !filters[:date].blank?
+        range = Quickfilter.get_conditions_timeframe(filters[:date])
+        filter 'range', { :created_at => { :gt => range[:greater], :lt => range[:lower],  } }
       end
 
     end
@@ -121,18 +127,4 @@ class MessageGateway
     { :per_page => Message::LIMIT, :page => page }
   end
   
-  def self.extract_additional_from_quickfilter(filters)
-    return Hash.new if filters[:additional].blank? or filters[:additional][:keys].blank? or filters[:additional][:values].blank?
-
-    ret = Hash.new
-    i = 0
-    filters[:additional][:keys].each do |key|
-      next if key.blank? or filters[:additional][:values][i].blank?
-      ret[key] = filters[:additional][:values][i]
-      i += 1
-    end
-
-    return ret
-  end
-
 end
