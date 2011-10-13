@@ -40,10 +40,11 @@ class MessagesController < ApplicationController
       if params[:filters].blank?
         @messages = MessageGateway.all_paginated(params[:page])
       else
-        @additional_filters = extract_additional_from_quickfilter(params[:filters])
+        @additional_filters = Quickfilter.extract_additional_fields_from_request(params[:filters])
         @messages = MessageGateway.all_by_quickfilter(params[:filters], params[:page])
+        @quickfilter_result_count = @messages.total
       end
-      @total_count = @messages.total
+      @total_count = MessageGateway.total_count # XXX ELASTIC Possibly read cached from first all_paginated result?!
     end
   end
 
