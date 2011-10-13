@@ -9,8 +9,6 @@ module Tire::Model::Naming::ClassMethods
   end
 end
 
-# XXX ELASTIC: possibly rename to MessageSearch or similar as it is not always returning Message objects
-#              but can also return e.g. counts (integer)
 # XXX ELASTIC: try curb as HTTP adapter for tire. reported to be faster: https://gist.github.com/1204159
 class MessageGateway
   include Tire::Model::Search
@@ -35,7 +33,6 @@ class MessageGateway
   end
 
   def self.retrieve_by_id(id)
-    # XXX ELASTIC sucks to use @index - fix.
     wrap @index.retrieve(TYPE_NAME, id)
   end
 
@@ -58,7 +55,6 @@ class MessageGateway
           must { term(:host, filters[:host]) } unless filters[:host].blank?
 
           # XXX ELASTIC hostgroup missing.
-          # XXX ELASTIC timeframe filter missing
       
           # Additional fields.
           Quickfilter.extract_additional_fields_from_request(filters).each do |key, value|
@@ -83,11 +79,6 @@ class MessageGateway
     return wrap(r)
   end
 
-  def self.count_of_last_minutes(x)
-    # Delegating for backward compatibility reasons. Should be removed soon. (XXX ELASTIC)
-    MessageCount.total_count_of_last_minutes(x)
-  end
-  
   def self.total_count
     # search with size 0 instead of count because of this issue: https://github.com/karmi/tire/issues/100
     search("*", :size => 0).total

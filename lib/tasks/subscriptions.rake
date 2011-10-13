@@ -1,3 +1,5 @@
+# XXX ELASTIC test this
+
 namespace :subscriptions do
 
   desc "Alert all users who subscribed to a stream if it contains new messages"

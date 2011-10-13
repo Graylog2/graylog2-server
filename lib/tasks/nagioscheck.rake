@@ -1,3 +1,5 @@
+# XXX ELASTIC test this
+
 namespace :nagios do
   desc "Check if the number of new log messages in the last X minutes is too high. Usage: "
 
@@ -12,7 +14,7 @@ namespace :nagios do
     max_messages = ENV['messages'].to_i
 
     # Get message count of defined last minutes and compare to given maximum.
-    message_count = Message.count_of_last_minutes minutes
+    message_count = Message.total_count_of_last_minutes(minutes)
     if message_count > max_messages
       puts "status: alert"
       exit 2

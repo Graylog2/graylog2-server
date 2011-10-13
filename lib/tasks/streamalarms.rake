@@ -1,3 +1,5 @@
+# XXX ELASTIC test this
+
 namespace :streamalarms do
 
   desc "Alert all enabled users of a stream if it is above it's alarm limit."
