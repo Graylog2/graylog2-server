@@ -1,3 +1,5 @@
+# XXX ELASTIC "messages from today button" is not working
+
 class MessagesController < ApplicationController
   before_filter :do_scoping
 
@@ -22,7 +24,7 @@ class MessagesController < ApplicationController
       block_access_for_non_admins if !@stream.accessable_for_user?(current_user)
 
       @messages = MessageGateway.all_of_stream_paginated(@stream.id, params[:page])
-      @total_count = MessageGateway.stream_count(@stream.id)
+      @total_count = @messages.total
     elsif params[:hostgroup_id]
       @scoping = :hostgroup
       block_access_for_non_admins
@@ -41,7 +43,7 @@ class MessagesController < ApplicationController
         @additional_filters = extract_additional_from_quickfilter(params[:filters])
         @messages = MessageGateway.all_by_quickfilter(params[:filters], params[:page])
       end
-      @total_count = MessageGateway.total_count
+      @total_count = @messages.total
     end
   end
 
@@ -51,20 +53,6 @@ class MessagesController < ApplicationController
       flash[:error] = "You have no access rights for this section."
       redirect_to :controller => "streams", :action => "index"
     end
-  end
-
-  def extract_additional_from_quickfilter(filters)
-    return Hash.new if filters[:additional].blank? or filters[:additional][:keys].blank? or filters[:additional][:values].blank?
-
-    ret = Hash.new
-    i = 0
-    filters[:additional][:keys].each do |key|
-      next if key.blank? or filters[:additional][:values][i].blank?
-      ret["_#{key}".to_sym] = filters[:additional][:values][i]
-      i += 1
-    end
-
-    return ret
   end
 
   public
@@ -106,14 +94,12 @@ class MessagesController < ApplicationController
     @load_flot = true
     @use_backtotop = true
 
-    begin
-      @from = Time.at(params[:from].to_i-Time.now.utc_offset)
-      @to = Time.at(params[:to].to_i-Time.now.utc_offset)
-    rescue
-      flash[:error] = "Missing or invalid range parameters."
-    end
-    @messages = Message.all_in_range(params[:page], @from.to_i, @to.to_i)
-    @total_count = Message.count_all_in_range(@from.to_i, @to.to_i)
+    @from = Time.at(params[:from].to_i-Time.now.utc_offset)
+    @to = Time.at(params[:to].to_i-Time.now.utc_offset)
+
+    @messages = MessageGateway.all_in_range(params[:page], @from.to_i, @to.to_i)
+    @total_count = @messages.total
+    # XXX ELASTIC pagination is broken
   end
 
   def around
