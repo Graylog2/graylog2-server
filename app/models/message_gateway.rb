@@ -39,9 +39,6 @@ class MessageGateway
     wrap @index.retrieve(TYPE_NAME, id)
   end
 
-  # XXX ELASTIC that downcasing sucks. really required? possibly escape it somehow? example: http_verb = POST / post
-  # XXX ELASTIC not escaped. search for hostname foo-bar.foo.org won't work because of minus sign.
-  # XXX ELASTIC update create index docs with mapping stuff for this to work.
   def self.all_by_quickfilter filters, page = 1
     r = search pagination_options(page).merge(@default_query_options) do
       query do
@@ -50,7 +47,7 @@ class MessageGateway
           must { string("message:#{filters[:message]}") } unless filters[:message].blank?
 
           # Facility
-          must { term(:facility, filters[:facility].downcase) } unless filters[:facility].blank?
+          must { term(:facility, filters[:facility]) } unless filters[:facility].blank?
 
           # Severity
           if !filters[:severity].blank? and filters[:severity_above].blank?
@@ -65,7 +62,7 @@ class MessageGateway
       
           # Additional fields.
           MessageGateway.extract_additional_from_quickfilter(filters).each do |key, value|
-            must { term("_#{key.downcase}".to_sym, value.downcase) }
+            must { term("_#{key}".to_sym, value) }
           end
         end
       end
@@ -103,6 +100,8 @@ class MessageGateway
 
   private
   def self.wrap(x)
+    return nil if x.nil?
+
     case(x)
       when Tire::Results::Item then Message.parse_from_elastic(x)
       when Tire::Results::Collection then wrap_collection(x)

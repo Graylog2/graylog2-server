@@ -4,8 +4,11 @@
   <%= render :partial => "version_check" %>
 <% end %>
 
-Currently containing <span class="highlighted"><%= number_with_delimiter(@total_count, :delimiter => '.') %></span> messages. Oldest message is from
-<span class="highlighted"><%= gl_date(Time.at(MessageGateway.oldest_message.created_at)) %></span>.
+Currently containing <span class="highlighted"><%= number_with_delimiter(@total_count, :delimiter => '.') %></span> messages.
+
+<% if @total_count > 0 %>
+  Oldest message is from <span class="highlighted"><%= gl_date(Time.at(MessageGateway.oldest_message.created_at)) %></span>.
+<% end %>
 
 <% message_count_interval = Setting.get_message_count_interval(current_user) %>
 Stored <span class="highlighted">
