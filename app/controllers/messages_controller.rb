@@ -96,6 +96,7 @@ class MessagesController < ApplicationController
     redirect_to :action => "index"
   end
 
+  # XXX ELASTIC protect from readers
   def showrange
     @has_sidebar = true
     @load_flot = true
@@ -106,24 +107,6 @@ class MessagesController < ApplicationController
 
     @messages = MessageGateway.all_in_range(params[:page], @from.to_i, @to.to_i)
     @total_count = @messages.total
-    # XXX ELASTIC pagination is broken
-  end
-
-  def around
-    @message = @scope.find_by_id(params[:id])
-    @has_sidebar = true
-    @load_flot = true
-    @use_backtotop = true
-    @nb = (params[:nb] || 100).to_i
-    @messages = @message.around(@nb)
-
-    respond_to do |format|
-      format.html
-      format.text {
-        send_data render_to_string("messages/message_log.txt", :locals => {:messages => @messages}), :type => "text/plain", :filename => "#{@message.id.to_s}-#{@nb}.log"
-        #send_data @messages.collect {|m| "#{m.created_at.to_s} #{m.host} #{m.facility} #{m.full_message}"}.join("\n"), :type => "text/plain", :filename => "#{@message.id.to_s}-#{@nb}.log"
-      }
-    end
   end
 
   def getcompletemessage

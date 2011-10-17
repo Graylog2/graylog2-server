@@ -72,9 +72,6 @@
   </ul>
 <% end %>
 
-<br />
-<%= awesome_link "Show messages of this host around", around_message_path(@message, :nb => 50 )%>
-
 <% if params[:partial] %>
   <%= link_to "Permalink", { :controller => "messages", :action => "show", :id => @message.id }, :id => "messages-show-permalink" %>
   <br style="clear: both;" />
