@@ -144,7 +144,7 @@ module ApplicationHelper
   def stream_link(stream)
     ret = "
         <span class=\"favorite-stream-sparkline\">
-          #{sparkline_values(MessageCount.counts_of_last_minutes(10, :stream_id => stream.id).map { |c| c[:count] })}
+          #{sparkline_values(MessageCount.counts_of_last_minutes(10, :stream_id => stream.id, :fill => true).map { |c| c[:count] })}
         </span>
         #{link_to(h(stream.title_possibly_disabled), stream_path(stream), :class => 'favorite-streams-title')}
     "
