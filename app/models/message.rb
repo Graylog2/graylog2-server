@@ -84,43 +84,6 @@ class Message
     return conditions
   end
 
-#    unless filters.blank?
-#      unless filters[:message].blank?
-#        message_conditions = Hash.new
-#        message_conditions[:message] = Hash.new
-#        message_conditions[:message]["$in"] = [/#{filters[:message].strip}/]
-#
-#        conditions = conditions.where(message_conditions)
-#      end
-#
-#      # Time Frame
-#      conditions = conditions.where(:created_at => get_conditions_from_date(filters[:date])) unless filters[:date].blank?
-#
-#      # Facility
-#      conditions = conditions.where(:facility => filters[:facility]) unless filters[:facility].blank?
-#
-#      # Severity
-#      if filters[:severity_above]
-#        conditions = conditions.where(:level => { "$lte" => filters[:severity].to_i }) unless filters[:severity].blank?
-#      else
-#        conditions = conditions.where(:level => filters[:severity].to_i) unless filters[:severity].blank?
-#      end
-#
-#      # Host (and hostgroup)
-#      host_conditions = Array.new
-#      host_conditions << filters[:host] unless filters[:host].blank?
-#      unless filters[:hostgroup].blank?
-#        hostgroup = Hostgroup.find(BSON::ObjectId(filters[:hostgroup]))
-#        host_conditions = host_conditions | hostgroup.all_conditions
-#      end
-#      conditions = conditions.any_in(:host => host_conditions) unless host_conditions.size == 0
-#
-#      self.extract_additional_from_quickfilter(filters).each do |key, value|
-#        conditions = conditions.where(key => value)
-#      end
-#    end
-#
-
   # XXX ELASTIC - wat
   def self.recalculate_host_counts
     Host.all.each do |host|

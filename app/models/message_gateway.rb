@@ -25,19 +25,19 @@ class MessageGateway
   @default_query_options = { :sort => "created_at desc" }
 
   def self.all_paginated(page = 1)
-    search("*", pagination_options(page).merge(@default_query_options))
+    wrap search("*", pagination_options(page).merge(@default_query_options))
   end
 
   def self.all_of_stream_paginated(stream_id, page = 1)
-    search("streams:#{stream_id}", pagination_options(page).merge(@default_query_options))
+    wrap search("streams:#{stream_id}", pagination_options(page).merge(@default_query_options))
   end
 
   def self.retrieve_by_id(id)
-    @index.retrieve(TYPE_NAME, id)
+    wrap @index.retrieve(TYPE_NAME, id)
   end
 
   def self.all_by_quickfilter filters, page = 1
-    search pagination_options(page).merge(@default_query_options) do
+    wrap search pagination_options(page).merge(@default_query_options) do
       query do
         boolean do
           # Short message
@@ -90,11 +90,11 @@ class MessageGateway
 
   def self.oldest_message
     # XXX ELASTIC is that size 0 actually working?
-    search("*", { :sort => "created_at asc", :size => 1 }).first
+    wrap search("*", { :sort => "created_at asc", :size => 1 }).first
   end
 
   def self.all_in_range(page, from, to)
-    search pagination_options(page).merge(@default_query_options) do
+    wrap search pagination_options(page).merge(@default_query_options) do
       query { string("*") }
         
       filter 'range', { :created_at => { :gte => from, :lte => to } }
@@ -102,6 +102,22 @@ class MessageGateway
   end
 
   private
+
+  def self.wrap(x)
+    return nil if x.nil?
+
+    case(x)
+      when Tire::Results::Item then Message.parse_from_elastic(x)
+      when Tire::Results::Collection then wrap_collection(x)
+      else
+        Rails.logger.error "Unsupported result type while trying to wrap ElasticSearch response: #{x.class}"
+        raise UnsupportedResultType
+    end
+  end
+
+  def self.wrap_collection(c)
+    c.results.map { |i| wrap(i) }
+  end
 
   def self.pagination_options(page)
     page = 1 if page.blank?
