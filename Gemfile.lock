@@ -136,7 +136,7 @@ DEPENDENCIES
   machinist_mongo (~> 1.2.0)
   mocha (~> 0.9.12)
   mongoid (= 2.0.1)
-  passenger (~> 3.0.7)
+  passenger (~> 3.0.9)
   pony (~> 1.1)
   rack (~> 1.2.2)
   rails (~> 3.0.10)
