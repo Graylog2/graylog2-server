@@ -147,4 +147,8 @@ class Message
     "#{d.year}-#{d.month}-#{d.day}"
   end
 
+  def to_param
+    self.id.to_s
+  end
+
 end
