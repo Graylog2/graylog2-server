@@ -36,7 +36,7 @@ class MessageGateway
     wrap @index.retrieve(TYPE_NAME, id)
   end
 
-  def self.all_by_quickfilter filters, page = 1
+  def self.all_by_quickfilter(filters, page = 1, opts = {})
     r = search pagination_options(page).merge(@default_query_options) do
       query do
         boolean do
@@ -59,6 +59,11 @@ class MessageGateway
           # Additional fields.
           Quickfilter.extract_additional_fields_from_request(filters).each do |key, value|
             must { term("_#{key}".to_sym, value) }
+          end
+
+          # Possibly narrow down to stream?
+          unless opts[:stream_id].blank?
+            must { term(:streams, opts[:stream_id]) }
           end
         end
       end
