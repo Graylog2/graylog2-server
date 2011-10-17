@@ -7,12 +7,14 @@ class Message
   @fields = [ :id, :message, :full_message, :created_at, :facility, :level, :host, :file, :line, :deleted, :streams ]
   @fields.each { |f| attr_accessor(f) }
 
-  attr_accessor :plain
+  attr_accessor :plain, :total_result_count
 
   # XXX ELASTIC: possibly do this with Tire.configuration.wrapper
   def self.parse_from_elastic(x)
     m = self.new
+
     m.plain = x
+    m.total_result_count = x.total
     @fields.each do |f|
       m.__send__(:"#{f}=", x.__send__(f))
 

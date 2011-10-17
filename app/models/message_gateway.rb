@@ -37,7 +37,7 @@ class MessageGateway
   end
 
   def self.all_by_quickfilter filters, page = 1
-    wrap search pagination_options(page).merge(@default_query_options) do
+    r = search pagination_options(page).merge(@default_query_options) do
       query do
         boolean do
           # Short message
@@ -75,6 +75,8 @@ class MessageGateway
       end
 
     end
+
+    wrap(r)
   end
 
   def self.total_count
@@ -116,7 +118,9 @@ class MessageGateway
   end
 
   def self.wrap_collection(c)
-    c.results.map { |i| wrap(i) }
+    r = MessageResult.new(c.results.map { |i| wrap(i) })
+    r.total_result_count = c.total
+    return r
   end
 
   def self.pagination_options(page)
