@@ -38,7 +38,7 @@ public class StreamRule {
     public final static int TYPE_FACILITY = 4;
     // Type 5 is reserved for frontend usage (timeframe filter)
     public final static int TYPE_ADDITIONAL = 6;
-    public final static int TYPE_HOSTGROUP = 7;
+    // Type 7 used to be for the removed hostgroup feature.
     public final static int TYPE_SEVERITY_OR_HIGHER = 8;
     public final static int TYPE_HOST_REGEX = 9;
     public final static int TYPE_FULL_MESSAGE = 10;

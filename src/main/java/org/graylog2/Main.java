@@ -36,6 +36,7 @@ import org.graylog2.periodical.HostCounterCacheWriterThread;
 
 import java.io.FileReader;
 import java.io.FileWriter;
+import java.io.IOException;
 import java.io.Reader;
 import java.io.Writer;
 import java.util.List;
@@ -104,17 +105,23 @@ public final class Main {
             System.exit(0);
         }
 
+        // XXX ELASTIC: put in own method
         // Check if the index exists. Create it if not.
-        if (Indexer.indexExists()) {
-            LOG.info("Index exists. Not creating it.");
-        } else {
-            LOG.info("Index does not exist! Trying to create it ...");
-            if (Indexer.createIndex()) {
-                LOG.info("Successfully created index.");
+        try {
+            if (Indexer.indexExists()) {
+                LOG.info("Index exists. Not creating it.");
             } else {
-                LOG.fatal("Could not create Index. Terminating.");
-                System.exit(1);
+                LOG.info("Index does not exist! Trying to create it ...");
+                if (Indexer.createIndex()) {
+                    LOG.info("Successfully created index.");
+                } else {
+                    LOG.fatal("Could not create Index. Terminating.");
+                    System.exit(1);
+                }
             }
+        } catch(IOException e) {
+            LOG.fatal("IOException while trying to check Index. Make sure that your ElasticSearch server is running.", e);
+            System.exit(1);
         }
 
         savePidFile(commandLineArguments.getPidFile());
