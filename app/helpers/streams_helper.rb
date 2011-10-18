@@ -13,14 +13,6 @@ module StreamsHelper
         value = "#{syslog_level_to_human(rule.value)} (#{h(rule.value.to_i)})"
     end
 
-    if rule.rule_type == Streamrule::TYPE_HOSTGROUP
-      begin
-        value = Hostgroup.find(BSON::ObjectId(rule.value)).name
-      rescue
-        value = "Unknown (#{h(rule.value)})"
-      end
-    end
-
     return "<span class=\"black\">#{type}</span>: <i>#{value}</i>"
   end
 

@@ -39,9 +39,6 @@ $(document).ready(function(){
                 field = $('.stream-value-additional-field');
                 help = $('#stream-value-additional-field-help');
                 break;
-            case '7':
-                field = $('.stream-value-hostgroup');
-                break;
             case '8':
                 field = $('.stream-value-severity-or-higher');
                 break;

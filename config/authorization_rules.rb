@@ -46,17 +46,6 @@ authorization do
     has_permission_on :analytics, :to => [:index, :shell]
 
     has_permission_on :hosts, :to => [:index, :show, :destroy, :quickjump]
-    has_permission_on :hostgroups, :to => [
-      :new,
-      :create,
-      :hosts,
-      :index,
-      :settings,
-      :show,
-      :destroy,
-      :rename
-    ]
-    has_permission_on :hostgroup_hosts, :to => [:create, :destroy]
 
     has_permission_on :blacklists, :to => [:index, :show, :create, :destroy]
     has_permission_on :blacklistedterms, :to => [:create, :destroy]

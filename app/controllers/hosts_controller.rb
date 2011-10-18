@@ -6,10 +6,6 @@ class HostsController < ApplicationController
 
   def index
     @hosts = Host.desc :message_count
-    @hostgroups = Hostgroup.all
-
-    @hosts_and_groups = @hosts | @hostgroups
-
     @host_count = Host.count
   end
 

@@ -37,17 +37,6 @@ Graylog2WebInterface::Application.routes.draw do
     end
   end
 
-  resources :hostgroups do
-    resources :messages
-    member do
-      get :hosts
-      get :settings
-      post :rename
-    end
-  end
-
-  resources :hostgroup_hosts
-
   resources :messagecomments do
   end
 

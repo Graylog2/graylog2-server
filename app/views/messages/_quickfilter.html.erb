@@ -23,10 +23,6 @@
       <%= select_tag "filters[host]", raw("<option></option>" + options_for_select(Host.all.collect {|host| [ h(host.host) ]}.sort, :selected => get_quickfilter_selected(params[:filters], :host, :bson_id))) %>
     </dd>
 
-    <dt><%= label_tag "filters[hostgroup]", "Hostgroup:" %></dt>
-    <dd>
-      <%= select_tag "filters[hostgroup]", raw("<option></option>" + options_for_select(Hostgroup.all.collect {|group| [ group.name, group.id] }, :selected => get_quickfilter_selected(params[:filters], :hostgroup, :bson_id))) %>
-
       <% unless @additional_filters.blank? %>
         <% @additional_filters.each do |k,v| %>
           <dt><%= text_field_tag "filters[additional][keys][]", (k.to_s.at(0) == '_' ? k.to_s[1..k.to_s.length] : k.to_s), :class => "messages-quickfilter-additional-key" %></dt>

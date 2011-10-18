@@ -39,13 +39,5 @@ Host.blueprint do
  message_count { rand(50000) }
 end
 
-Hostgroup.blueprint do
-  name
-end
-
-HostgroupHost.blueprint do
-  hostname { host }
-end
-
 AlertedStream.blueprint do
 end

@@ -16,7 +16,6 @@ class Streamrule
   TYPE_FACILITY = 4
   TYPE_TIMEFRAME = 5
   TYPE_ADDITIONAL = 6
-  TYPE_HOSTGROUP = 7
   TYPE_SEVERITY_OR_HIGHER = 8
   TYPE_HOST_REGEX = 9
   TYPE_FULL_MESSAGE = 10
@@ -33,7 +32,6 @@ class Streamrule
       self::TYPE_FULL_MESSAGE => "Full Message (regex)",
       self::TYPE_HOST => "Host",
       self::TYPE_HOST_REGEX => "Host (regex)",
-      self::TYPE_HOSTGROUP => "Hostgroup",
       self::TYPE_SEVERITY => "Severity",
       self::TYPE_SEVERITY_OR_HIGHER => "Severity (or higher)",
       self::TYPE_FACILITY => "Facility",

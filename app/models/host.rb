@@ -6,7 +6,4 @@ class Host
 
   validates_presence_of :host
 
-  def self.all_of_group(hostgroup)
-    return Host.all :conditions => { :host.in => hostgroup.all_conditions }
-  end
 end

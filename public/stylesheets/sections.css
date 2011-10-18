@@ -363,10 +363,6 @@
   float: right;
 }
 
-#hosts-new-hostgroup-link {
-  margin-bottom: 10px;
-}
-
 /* Statistics */
 #statistics {
     text-transform: uppercase;
@@ -476,33 +472,6 @@
 
 .livetail-c-message {
   color: #f00;
-}
-
-/* Hostgroups */
-#hostgroups-add-hosts {
-  width: 800px;
-}
-
-#hostgroups-add-hosts-simple {
-  float: left;
-}
-
-#hostgroups-add-hosts-regex {
-  position: relative;
-  top: -4px;
-  float: right;
-}
-
-#hostgroups-add-left {
-  float: left;
-  padding-right: 150px;
-}
-
-#hostgroups-add-right {
-  width: 430px;
-  height: 430px;
-  overflow: hidden;
-  margin-top: 40px;
 }
 
 /* Visuals */
