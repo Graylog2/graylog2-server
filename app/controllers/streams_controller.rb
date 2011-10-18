@@ -38,8 +38,8 @@ class StreamsController < ApplicationController
       flash[:error] = "Missing or invalid range parameters."
     end
 
-    @messages = Message.all_of_stream_in_range(@stream.id, params[:page], @from.to_i, @to.to_i)
-    @total_count = Message.count_all_of_stream_in_range(@stream.id, @from.to_i, @to.to_i)
+    @messages = MessageGateway.all_in_range(params[:page], @from.to_i, @to.to_i, :stream_id => @stream.id)
+    @total_count = @messages.total_result_count
   end
 
   def rules

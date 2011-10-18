@@ -106,7 +106,7 @@ class MessagesController < ApplicationController
     @to = Time.at(params[:to].to_i-Time.now.utc_offset)
 
     @messages = MessageGateway.all_in_range(params[:page], @from.to_i, @to.to_i)
-    @total_count = @messages.total
+    @total_count = @messages.total_result_count
   end
 
   def getcompletemessage

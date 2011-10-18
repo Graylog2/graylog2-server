@@ -100,12 +100,21 @@ class MessageGateway
     wrap search("*", { :sort => "created_at asc", :size => 1 }).first
   end
 
-  def self.all_in_range(page, from, to)
-    wrap search pagination_options(page).merge(@default_query_options) do
-      query { string("*") }
-        
+  def self.all_in_range(page, from, to, opts = {})
+    r = search pagination_options(page).merge(@default_query_options) do
+      query do
+        string("*")
+      
+        # Possibly narrow down to stream?
+        unless opts[:stream_id].blank?
+          term(:streams, opts[:stream_id])
+        end
+      end
+          
       filter 'range', { :created_at => { :gte => from, :lte => to } }
     end
+
+    wrap(r)
   end
 
   private
