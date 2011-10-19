@@ -34,12 +34,13 @@ class MessagesController < ApplicationController
       
       if params[:filters].blank?
         @messages = MessageGateway.all_of_stream_paginated(@stream.id, params[:page])
+        @total_count = @messages.total_result_count
       else
         @additional_filters = Quickfilter.extract_additional_fields_from_request(params[:filters])
         @messages = MessageGateway.all_by_quickfilter(params[:filters], params[:page], :stream_id => @stream.id)
         @quickfilter_result_count = @messages.total_result_count
+        @total_count = MessageGateway.stream_count(@stream.id) # XXX ELASTIC Possibly read cached from first all_paginated result?!
       end
-      @total_count = MessageGateway.stream_count(@stream.id) # XXX ELASTIC Possibly read cached from first all_paginated result?!
     else
       @scoping = :messages
       unless (params[:action] == "show")
@@ -48,12 +49,13 @@ class MessagesController < ApplicationController
 
       if params[:filters].blank?
         @messages = MessageGateway.all_paginated(params[:page])
+        @total_count = @messages.total_result_count
       else
         @additional_filters = Quickfilter.extract_additional_fields_from_request(params[:filters])
         @messages = MessageGateway.all_by_quickfilter(params[:filters], params[:page])
         @quickfilter_result_count = @messages.total_result_count
+        @total_count = MessageGateway.total_count # XXX ELASTIC Possibly read cached from first all_paginated result?!
       end
-      @total_count = MessageGateway.total_count # XXX ELASTIC Possibly read cached from first all_paginated result?!
     end
   end
 
