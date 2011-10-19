@@ -32,6 +32,10 @@ class MessageGateway
     wrap search("streams:#{stream_id}", pagination_options(page).merge(@default_query_options))
   end
 
+  def self.all_of_host_paginated(hostname, page = 1)
+    wrap search("host:#{hostname}", pagination_options(page).merge(@default_query_options))
+  end
+
   def self.retrieve_by_id(id)
     wrap @index.retrieve(TYPE_NAME, id)
   end
@@ -64,6 +68,10 @@ class MessageGateway
           # Possibly narrow down to stream?
           unless opts[:stream_id].blank?
             must { term(:streams, opts[:stream_id]) }
+          end
+          
+          unless opts[:hostname].blank?
+            must { term(:host, opts[:hostname]) }
           end
         end
       end

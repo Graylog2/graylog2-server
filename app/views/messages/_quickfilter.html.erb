@@ -1,4 +1,5 @@
 <div id="messages-quickfilter" <%= params[:filters].blank? ? raw("style='display: none;'") : nil %>>
+
 <%= form_tag(params, :method => :get) do -%>
   <dl id="messages-quickfilter-fields">
     <dt><%= label_tag "filters[:message]", "Message (regex):" %></dt>
@@ -22,14 +23,13 @@
     <dd>
       <%= select_tag "filters[host]", raw("<option></option>" + options_for_select(Host.all.collect {|host| [ h(host.host) ]}.sort, :selected => get_quickfilter_selected(params[:filters], :host, :bson_id))) %>
     </dd>
+    <% end %>
 
-      <% unless @additional_filters.blank? %>
-        <% @additional_filters.each do |k,v| %>
-          <dt><%= text_field_tag "filters[additional][keys][]", (k.to_s.at(0) == '_' ? k.to_s[1..k.to_s.length] : k.to_s), :class => "messages-quickfilter-additional-key" %></dt>
-          <dd><%= text_field_tag "filters[additional][values][]", v, :class => "messages-quickfilter-additional-value" %></dd>
-        <% end %>
+    <% unless @additional_filters.blank? %>
+      <% @additional_filters.each do |k,v| %>
+        <dt><%= text_field_tag "filters[additional][keys][]", (k.to_s.at(0) == '_' ? k.to_s[1..k.to_s.length] : k.to_s), :class => "messages-quickfilter-additional-key" %></dt>
+        <dd><%= text_field_tag "filters[additional][values][]", v, :class => "messages-quickfilter-additional-value" %></dd>
       <% end %>
-    </dd>
     <% end %>
 
   </dl>
@@ -46,5 +46,9 @@
   <%= awesome_link "Add additional field", "#", :id => "messages-quickfilter-add-additional" %>
   <%= awesome_submit_link "Run filter" %>
 <% end -%>
+
+<% unless @quickfilter_result_count.blank? %>
+  <br />Quickfilter hit <span class="highlighted"><%= number_with_delimiter(@quickfilter_result_count, :delimiter => '.')  %></span> messages.
+<% end %>
 
 </div>

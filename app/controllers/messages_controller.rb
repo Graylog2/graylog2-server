@@ -8,13 +8,22 @@ class MessagesController < ApplicationController
   rescue_from Mongoid::Errors::DocumentNotFound, :with => :not_found
   rescue_from BSON::InvalidObjectId, :with => :not_found
 
+  # XXX ELASTIC clean up triple-duplicated quickfilter shit
+  # XXX ELASTIC own host sidebar with total message count and own graph
   def do_scoping
     if params[:host_id]
       @scoping = :host
       block_access_for_non_admins
 
-      @scope = Message.where(:host => params[:host_id])
       @host = Host.find(:first, :conditions => {:host=> params[:host_id]})
+      if params[:filters].blank?
+        @messages = MessageGateway.all_of_host_paginated(@host.host, params[:page])
+      else
+        @additional_filters = Quickfilter.extract_additional_fields_from_request(params[:filters])
+        @messages = MessageGateway.all_by_quickfilter(params[:filters], params[:page], :hostname => @host.host)
+        @quickfilter_result_count = @messages.total_result_count
+      end
+      @total_count = @messages.total_result_count
     elsif params[:stream_id]
       @scoping = :stream
       @stream = Stream.find_by_id(params[:stream_id])
