@@ -31,12 +31,6 @@ class MessagesController < ApplicationController
         @quickfilter_result_count = @messages.total_result_count
       end
       @total_count = MessageGateway.stream_count(@stream.id) # XXX ELASTIC Possibly read cached from first all_paginated result?!
-    elsif params[:hostgroup_id]
-      @scoping = :hostgroup
-      block_access_for_non_admins
-
-      @hostgroup = Hostgroup.find_by_id params[:hostgroup_id]
-      @scope = Message.all_of_hostgroup @hostgroup, params[:page]
     else
       @scoping = :messages
       unless (params[:action] == "show")
