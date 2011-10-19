@@ -517,3 +517,47 @@ label {
 .highlighted .time-light {
   color: #fd9dd5;
 }
+
+/* entity list */
+
+#el-e {
+  margin-top: 10px;
+  margin-bottom: 10px;
+  margin-left: 15px;
+  padding-top: 6px;
+  padding-bottom: 6px;
+  border-bottom: 1px solid #ccc;
+  height: 16px;
+  clear: both;
+}
+
+.el-e-left {
+  width: 85px;
+  float: left;
+}
+
+.el-e-middle {
+  float: left;
+  padding-right: 15px;
+}
+
+.el-e-right {
+  float: left;
+}
+
+.el-e-title {
+  font-size: 27px;
+  font-family: Georgia,"Times New Roman",Times,serif;
+  display: block;
+}
+
+.el-e-title-disabled a {
+  color: #aaa;
+}
+
+.el-e-description {
+  color: #aaa;
+  display: block;
+  position: relative;
+  top: 5px;
+}

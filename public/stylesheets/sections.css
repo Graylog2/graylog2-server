@@ -100,8 +100,7 @@
 
 /* Hosts */
 #hosts-hosts {
-    position: relative;
-    top: -15px;
+  margin-top: 15px;
 }
 
 /* Blacklist */

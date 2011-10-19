@@ -147,8 +147,8 @@ $(document).ready(function(){
       }
     );
 
-    // Streams overview: Sparklines.
-    $(".streams-stream-sparkline").sparkline(
+    // Entity lists: Sparklines.
+    $(".el-e-sparkline").sparkline(
       "html",
       {
         type: "line",

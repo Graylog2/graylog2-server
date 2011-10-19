@@ -1,3 +1,4 @@
+<% minutes = params[:ms].blank? ? 15 : params[:ms].to_i %>
 <h1>Hosts</h1>
 
 <div id="hosts-quickjump">
@@ -20,11 +21,31 @@ Monitoring <span class="highlighted"><%= @host_count %></span> hosts. (Sorted by
 <div id="hosts-hosts">
   <% @hosts.each do |host| %>
     <% next if host.host.blank? %>
-    <div class="blocks">
+    <!--<div class="blocks">
         <span class="blocks-title"><%= link_to h(host.host), host_messages_path(host.host) %></span>
         <br />
         <%= host.message_count.to_i %> messages
+    </div>-->
+
+
+  <div id="el-e">
+    <div class="el-e-left">
+      <span class="el-e-sparkline">
+        <%= sparkline_values(MessageCount.counts_of_last_minutes(minutes, :hostname => host.host, :fill => true).map { |c| c[:count] }) %>
+      </span>
     </div>
+
+    <div class="el-e-middle">
+      <span class="el-e-title">
+        <%= link_to(host.host, host_messages_path(host.host)) %>
+      </span>
+    </div>
+
+    <div class="el-e-right">
+      <span class="el-e-description"><%= host.message_count.to_i %> messages total</span>
+    </div>
+  </div>
+
   <% end %>
 </div>
 
