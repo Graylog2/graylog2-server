@@ -66,6 +66,11 @@ public class Configuration {
             "syslog_listen_port",
             "amqp_port",
             "forwarder_loggly_timeout",
+            "scribe_port",
+            "scribe_rpc_timeout",
+            "scribe_thrift_length",
+            "scribe_min_threads",
+            "scribe_max_threads"
     };
 
 

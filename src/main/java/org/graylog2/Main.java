@@ -26,6 +26,7 @@ import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.graylog2.database.MongoConnection;
 import org.graylog2.forwarders.forwarders.LogglyForwarder;
+import org.graylog2.messagehandlers.scribe.ScribeServer;
 import org.graylog2.messagehandlers.amqp.AMQPBroker;
 import org.graylog2.messagehandlers.amqp.AMQPSubscribedQueue;
 import org.graylog2.messagehandlers.amqp.AMQPSubscriberThread;
@@ -124,6 +125,11 @@ public final class Main {
              initializeAMQP(configuration);
          }
 
+        // Initialize Scribe if enabled
+        if (configuration.getBoolean("scribe_enabled")) {
+            initializeScribe(configuration);
+        }
+        
         // Start thread that stores throughput info.
         ThroughputWriterThread throughputThread = new ThroughputWriterThread();
         throughputThread.start();
@@ -238,6 +244,21 @@ public final class Main {
         }
     }
 
+    private static void initializeScribe(Configuration configuration) {
+        // Start up the scribe server
+        ScribeServer scribeServer = new ScribeServer(
+                                               configuration.get("scribe_host"),
+                                               configuration.getInteger("scribe_port", 0),
+                                               configuration.getInteger("scribe_rpc_timeout", 15000),
+                                               configuration.getInteger("scribe_thrift_length", 15000),
+                                               configuration.getInteger("scribe_min_threads", 5),
+                                               configuration.getInteger("scribe_max_threads", 10)
+                                                 );
+        scribeServer.run();
+        LOG.info("Scribe threads started.");
+    }
+    
+    
     private static void savePidFile(String pidFile) {
 
         String pid = Tools.getPID();
