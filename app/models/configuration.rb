@@ -1,6 +1,7 @@
 class Configuration
   @general_config = YAML::load File.read(Rails.root.to_s + "/config/general.yml")
   @email_config = YAML::load File.read(Rails.root.to_s + "/config/email.yml")
+  @indexer_config = YAML::load File.read(Rails.root.to_s + "/config/indexer.yml")
 
   def self.config_value(root, nesting, key, default = nil)
     [root, root[nesting.to_s], root[nesting.to_s][key.to_s]].any?(&:blank?) ? default : root[nesting.to_s][key.to_s]
@@ -105,6 +106,14 @@ class Configuration
       @email_config[Rails.env]
     end
   end
+  
+  def self.indexer_config(key = nil, default = nil)
+    if key
+      config_value @indexer_config, Rails.env, key, default
+    else
+      @indexer_config[Rails.env]
+    end
+  end
 
   def self.email_transport_type
     default = :sendmail
@@ -121,5 +130,9 @@ class Configuration
         end
       end
     end
+  end
+
+  def self.indexer_host
+    indexer_config :url
   end
 end

@@ -14,7 +14,6 @@ class MessageGateway
   include Tire::Model::Search
   include Mongoid::Document
 
-  # XXX ELASTIC: make configurable. also host etc
   INDEX_NAME = "graylog2"
   TYPE_NAME = "message"
 
@@ -58,8 +57,6 @@ class MessageGateway
           # Host
           must { term(:host, filters[:host]) } unless filters[:host].blank?
 
-          # XXX ELASTIC hostgroup missing.
-      
           # Additional fields.
           Quickfilter.extract_additional_fields_from_request(filters).each do |key, value|
             must { term("_#{key}".to_sym, value) }

@@ -9,7 +9,6 @@ class Message
 
   attr_accessor :plain, :total_result_count
 
-  # XXX ELASTIC: possibly do this with Tire.configuration.wrapper
   def self.parse_from_elastic(x)
     m = self.new
 
