@@ -71,7 +71,7 @@ public final class MongoConnection {
      *
      * @throws Exception
      */
-    public void connect(String username, String password, String hostname, String database, int port, String useAuth,
+    public void connect(String username, String password, String hostname, String database, int port, boolean useAuth,
                         int maxConnections, int threadsAllowedToBlockForConnectionMultiplier,
                         List<ServerAddress> replicaServers, long messagesCollSize) throws Exception {
         MongoOptions options = new MongoOptions();
@@ -93,7 +93,7 @@ public final class MongoConnection {
             db = m.getDB(database);
 
             // Try to authenticate if configured.
-            if (useAuth.equals("true")) {
+            if (useAuth) {
                 if(!db.authenticate(username, password.toCharArray())) {
                     throw new Exception("Could not authenticate to database '" + database + "' with user '" + username + "'.");
                 }

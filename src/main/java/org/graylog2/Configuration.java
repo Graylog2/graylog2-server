@@ -20,6 +20,13 @@
 
 package org.graylog2;
 
+import com.github.joschi.jadconfig.Parameter;
+import com.github.joschi.jadconfig.ValidationException;
+import com.github.joschi.jadconfig.ValidatorMethod;
+import com.github.joschi.jadconfig.converters.StringListConverter;
+import com.github.joschi.jadconfig.validators.InetPortValidator;
+import com.github.joschi.jadconfig.validators.PositiveIntegerValidator;
+import com.github.joschi.jadconfig.validators.PositiveLongValidator;
 import com.mongodb.ServerAddress;
 import org.apache.log4j.Logger;
 import org.graylog2.messagehandlers.amqp.AMQPSubscribedQueue;
@@ -29,7 +36,6 @@ import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Properties;
 
 /**
  * Helper class to hold configuration of Graylog2
@@ -41,58 +47,169 @@ public class Configuration {
 
     private static final Logger LOG = Logger.getLogger(Configuration.class);
 
-    // Define required configuration fields.
-    private static final String[] requiredProperties = {
-            "syslog_listen_port",
-            "syslog_protocol",
-            "mongodb_useauth",
-            "mongodb_user",
-            "mongodb_password",
-            "mongodb_database",
-            "mongodb_port",
-            "messages_collection_size",
-            "use_gelf",
-            "gelf_listen_port",
-    };
+    @Parameter(value = "syslog_listen_port", required = true, validator = InetPortValidator.class)
+    private int syslogListenPort = 514;
 
-    private static final String[] allowedSyslogProtocols = { "tcp", "udp" };
-    private static final String[] deprecatedProperties = { "rrd_storage_dir" };
-    private static final String[] numericalPositiveProperties = {
-            "mongodb_port",
-            "mongodb_max_connections",
-            "mongodb_threads_allowed_to_block_multiplier",
-            "messages_collection_size",
-            "gelf_listen_port",
-            "syslog_listen_port",
-            "amqp_port",
-            "forwarder_loggly_timeout",
-    };
+    @Parameter(value = "syslog_protocol", required = true)
+    private String syslogProtocol = "udp";
 
+    @Parameter(value = "mongodb_useauth", required = true)
+    private boolean mongoUseAuth = false;
 
-    private Properties properties;
+    @Parameter(value = "mongodb_user", required = true)
+    private String mongoUser;
 
-    public Configuration(Properties properties) {
+    @Parameter(value = "mongodb_password", required = true)
+    private String mongoPassword;
 
-        if(properties == null) {
-            throw new IllegalArgumentException("Properties must not be null");
-        }
+    @Parameter(value = "mongodb_database", required = true)
+    private String mongoDatabase = "graylog2";
 
-        this.properties = properties;
+    @Parameter(value = "mongodb_host", required = true)
+    private String mongoHost = "localhost";
+
+    @Parameter(value = "mongodb_port", required = true, validator = InetPortValidator.class)
+    private int mongoPort = 27017;
+
+    @Parameter(value = "mongodb_max_connections", validator = PositiveIntegerValidator.class)
+    private int mongoMaxConnections = 1000;
+
+    @Parameter(value = "mongodb_threads_allowed_to_block_multiplier", validator = PositiveIntegerValidator.class)
+    private int mongoThreadsAllowedToBlockMultiplier = 5;
+
+    @Parameter(value = "mongodb_replica_set", converter = StringListConverter.class)
+    private List<String> mongoReplicaSet;
+
+    @Parameter(value = "messages_collection_size", required = true, validator = PositiveLongValidator.class)
+    private long messagesCollectionSize = 50*1000*1000;
+
+    @Parameter(value = "use_gelf", required = true)
+    private boolean useGELF = false;
+
+    @Parameter(value = "gelf_listen_port", required = true, validator = InetPortValidator.class)
+    private int gelfListenPort = 12201;
+
+    @Parameter("amqp_enabled")
+    private boolean amqpEnabled = false;
+
+    @Parameter("amqp_host")
+    private String amqpHost = "localhost";
+
+    @Parameter(value = "amqp_port", validator = InetPortValidator.class)
+    private int amqpPort = 5672;
+
+    @Parameter(value = "amqp_subscribed_queues", converter = StringListConverter.class)
+    private List<String> amqpSubscribedQueues;
+
+    @Parameter("amqp_username")
+    private String amqpUsername = "guest";
+
+    @Parameter("amqp_password")
+    private String amqpPassword = "guest";
+
+    @Parameter("amqp_virtualhost")
+    private String amqpVirtualhost = "/";
+
+    @Parameter(value = "forwarder_loggly_timeout", validator = PositiveIntegerValidator.class)
+    private int forwarderLogglyTimeout = 3;
+
+    @Parameter("rules_file")
+    private String droolsRulesFile;
+
+    public int getSyslogListenPort() {
+        return syslogListenPort;
     }
 
-    public List<ServerAddress> getMongoDBReplicaSetServers() {
+    public String getSyslogProtocol() {
+        return syslogProtocol;
+    }
+
+    public boolean isMongoUseAuth() {
+        return mongoUseAuth;
+    }
+
+    public String getMongoUser() {
+        return mongoUser;
+    }
+
+    public String getMongoPassword() {
+        return mongoPassword;
+    }
+
+    public String getMongoDatabase() {
+        return mongoDatabase;
+    }
+
+    public int getMongoPort() {
+        return mongoPort;
+    }
+
+    public String getMongoHost() {
+        return mongoHost;
+    }
+
+    public int getMongoMaxConnections() {
+        return mongoMaxConnections;
+    }
+
+    public int getMongoThreadsAllowedToBlockMultiplier() {
+        return mongoThreadsAllowedToBlockMultiplier;
+    }
+
+    public long getMessagesCollectionSize() {
+        return messagesCollectionSize;
+    }
+
+    public boolean isUseGELF() {
+        return useGELF;
+    }
+
+    public int getGelfListenPort() {
+        return gelfListenPort;
+    }
+
+    public boolean isAmqpEnabled() {
+        return amqpEnabled;
+    }
+
+    public String getAmqpHost() {
+        return amqpHost;
+    }
+
+    public int getAmqpPort() {
+        return amqpPort;
+    }
+
+    public String getAmqpUsername() {
+        return amqpUsername;
+    }
+
+    public String getAmqpPassword() {
+        return amqpPassword;
+    }
+
+    public String getAmqpVirtualhost() {
+        return amqpVirtualhost;
+    }
+
+    public int getForwarderLogglyTimeout() {
+        return forwarderLogglyTimeout*1000;
+    }
+
+    public String getDroolsRulesFile() {
+        return droolsRulesFile;
+    }
+
+    public List<ServerAddress> getMongoReplicaSet() {
         List<ServerAddress> replicaServers = new ArrayList<ServerAddress>();
 
-        String rawSet = get("mongodb_replica_set");
+        List<String> rawSet = mongoReplicaSet;
 
         if (rawSet == null || rawSet.isEmpty()) {
             return null;
         }
 
-        // Get every host:port pair
-        String[] hosts = rawSet.split(",");
-
-        for (String host : hosts) {
+        for (String host : rawSet) {
             // Split host:port.
             String[] replicaTarget = host.split(":");
 
@@ -114,33 +231,17 @@ public class Configuration {
         return replicaServers;
     }
 
-    public int getMaximumMongoDBConnections() {
-        return getInteger("mongodb_max_connections", 1000);
-    }
-
-
-    public int getThreadsAllowedToBlockMultiplier() {
-        return getInteger("mongodb_threads_allowed_to_block_multiplier", 5);
-    }
-
-    public int getLogglyTimeout() {
-        int timeout = getInteger("forwarder_loggly_timeout", 3);
-
-        return timeout*1000;
-    }
-
-    public List<AMQPSubscribedQueue> getAMQPSubscribedQueues() {
+    public List<AMQPSubscribedQueue> getAmqpSubscribedQueues() {
         List<AMQPSubscribedQueue> queueList = new ArrayList<AMQPSubscribedQueue>();
 
-        String rawQueues = get("amqp_subscribed_queues");
+        List<String> rawQueues = amqpSubscribedQueues;
 
         if (rawQueues == null || rawQueues.isEmpty()) {
             return null;
         }
 
         // Get every queue.
-        String[] queues = rawQueues.split(",");
-        for (String queue : queues) {
+        for (String queue : rawQueues) {
             String[] queueDefinition = queue.split(":");
 
             // Check if valid.
@@ -159,88 +260,12 @@ public class Configuration {
         return queueList;
     }
 
-    public void validate() throws ConfigurationException {
-
-        for (String requiredProperty : requiredProperties) {
-            String value = get(requiredProperty);
-
-            if (value == null || value.isEmpty()) {
-                throw new ConfigurationException("Mandatory configuration option " + requiredProperty + " not set.");
-            }
-        }
-
-        // Check if numerical properties are positive
-        for (String property : numericalPositiveProperties) {
-
-            int value = getInteger(property, 0);
-
-            if (value < 0) {
-                throw new ConfigurationException("Configuration option " + property + " must be a positive integer.");
-            }
-        }
-
-        // Check if a MongoDB replica set or host is defined.
-        if (!contains("mongodb_host") && !contains("mongodb_replica_set")) {
-            throw new ConfigurationException("Neither MongoDB host (mongodb_host) nor replica set (mongodb_replica_set) has been defined.");
-        }
+    @ValidatorMethod
+    public void validate() throws ValidationException {
 
         // Is the syslog_procotol valid?
-        if(!Arrays.asList(allowedSyslogProtocols).contains(get("syslog_protocol"))) {
-            throw new ConfigurationException("Invalid syslog_protocol: " + get("syslog_protocol"));
+        if(!Arrays.asList("tcp", "udp").contains(getSyslogProtocol())) {
+            throw new ValidationException("Invalid syslog_protocol: " + getSyslogProtocol());
         }
-
-        // Print out a deprecation warning if any deprecated configuration option is set.
-        for (String deprecatedProperty : deprecatedProperties) {
-
-            if (get(deprecatedProperty) != null) {
-                LOG.warn("Configuration option " + deprecatedProperty + " has been deprecated.");
-            }
-        }
-    }
-
-    public String get(String property) {
-
-        return properties.getProperty(property);
-    }
-
-    public int getInteger(String property, int defaultValue) {
-
-        String value = get(property);
-        int result = defaultValue;
-
-        if(value != null) {
-            try {
-                result = Integer.parseInt(value);
-            } catch (NumberFormatException ex) {
-                LOG.warn("Couldn't convert configuration property " + property + " to Integer", ex);
-            }
-        }
-
-        return result;
-    }
-
-    public long getLong(String property, long defaultValue) {
-
-        String value = get(property);
-        long result = defaultValue;
-
-        if(value != null) {
-            try {
-                result = Long.parseLong(value);
-            } catch (NumberFormatException ex) {
-                LOG.warn("Couldn't convert configuration property " + property + " to Long", ex);
-            }
-        }
-
-        return result;
-    }
-
-    public boolean contains(String property) {
-        return properties.containsKey(property);
-    }
-
-    public boolean getBoolean(String property) {
-
-        return Boolean.parseBoolean(get(property));
     }
 }

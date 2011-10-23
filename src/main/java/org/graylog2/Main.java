@@ -21,11 +21,16 @@
 package org.graylog2;
 
 import com.beust.jcommander.JCommander;
+import com.github.joschi.jadconfig.JadConfig;
+import com.github.joschi.jadconfig.RepositoryException;
+import com.github.joschi.jadconfig.ValidationException;
+import com.github.joschi.jadconfig.repositories.PropertiesRepository;
 import org.apache.commons.io.IOUtils;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.graylog2.database.MongoConnection;
 import org.graylog2.forwarders.forwarders.LogglyForwarder;
+import org.graylog2.indexer.Indexer;
 import org.graylog2.messagehandlers.amqp.AMQPBroker;
 import org.graylog2.messagehandlers.amqp.AMQPSubscribedQueue;
 import org.graylog2.messagehandlers.amqp.AMQPSubscriberThread;
@@ -33,16 +38,12 @@ import org.graylog2.messagehandlers.gelf.GELFMainThread;
 import org.graylog2.messagehandlers.syslog.SyslogServerThread;
 import org.graylog2.periodical.ChunkedGELFClientManagerThread;
 import org.graylog2.periodical.HostCounterCacheWriterThread;
+import org.graylog2.periodical.MessageCountWriterThread;
 
-import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.io.Reader;
 import java.io.Writer;
 import java.util.List;
-import java.util.Properties;
-import org.graylog2.indexer.Indexer;
-import org.graylog2.periodical.MessageCountWriterThread;
 
 /**
  * Main class of Graylog2.
@@ -90,13 +91,17 @@ public final class Main {
         String configFile = commandLineArguments.getConfigFile();
         LOG.info("Using config file: " + configFile);
 
-        Configuration configuration = new Configuration(loadProperties(configFile));
+        Configuration configuration = new Configuration();
+        JadConfig jadConfig = new JadConfig(new PropertiesRepository(configFile), configuration);
 
-        LOG.info("Checking configuration");
+        LOG.info("Loading configuration");
         try {
-            configuration.validate();
-        } catch (Exception e) {
-            LOG.fatal("Invalid configuration: " + e.getMessage(), e);
+            jadConfig.process();
+        } catch (RepositoryException e) {
+            LOG.fatal("Couldn't load configuration file " + configFile, e);
+            System.exit(1);
+        } catch (ValidationException e) {
+            LOG.fatal("Invalid configuration", e);
             System.exit(1);
         }
 
@@ -128,43 +133,27 @@ public final class Main {
 
         // Statically set timeout for LogglyForwarder.
         // TODO: This is a code smell and needs to be fixed.
-        LogglyForwarder.setTimeout(configuration.getInteger("forwarder_loggly_timeout", 3));
+        LogglyForwarder.setTimeout(configuration.getForwarderLogglyTimeout());
 
         initializeMongoConnection(configuration);
-        initializeRulesEngine(configuration.get("rules_file"));
-        initializeSyslogServer(configuration.get("syslog_protocol"), configuration.getInteger("syslog_listen_port", 514));
+        initializeRulesEngine(configuration.getDroolsRulesFile());
+        initializeSyslogServer(configuration.getSyslogProtocol(), configuration.getSyslogListenPort());
         initializeHostCounterCache();
 
         // Start message counter thread.
         initializeMessageCounters();
 
         // Start GELF threads
-        if (configuration.getBoolean("use_gelf")) {
-            initializeGELFThreads(configuration.getInteger("gelf_listen_port", 12201));
+        if (configuration.isUseGELF()) {
+            initializeGELFThreads(configuration.getGelfListenPort());
         }
 
         // Initialize AMQP Broker if enabled
-        if (configuration.getBoolean("amqp_enabled")) {
+        if (configuration.isAmqpEnabled()) {
              initializeAMQP(configuration);
          }
 
         LOG.info("Graylog2 up and running.");
-    }
-
-    private static Properties loadProperties(String configFile) {
-        Reader configFileReader = null;
-        Properties properties = new Properties();
-
-        try {
-            configFileReader = new FileReader(configFile);
-            properties.load(configFileReader);
-        } catch(java.io.IOException e) {
-            LOG.error("Could not read configuration file: " + e.getMessage(), e);
-        } finally {
-            IOUtils.closeQuietly(configFileReader);
-        }
-
-        return properties;
     }
 
     private static void initializeHostCounterCache() {
@@ -223,16 +212,16 @@ public final class Main {
     private static void initializeMongoConnection(Configuration configuration) {
         try {
             MongoConnection.getInstance().connect(
-                    configuration.get("mongodb_user"),
-                    configuration.get("mongodb_password"),
-                    configuration.get("mongodb_host"),
-                    configuration.get("mongodb_database"),
-                    configuration.getInteger("mongodb_port", 0),
-                    configuration.get("mongodb_useauth"),
-                    configuration.getMaximumMongoDBConnections(),
-                    configuration.getThreadsAllowedToBlockMultiplier(),
-                    configuration.getMongoDBReplicaSetServers(),
-                    configuration.getLong("messages_collection_size", 50000000)
+                    configuration.getMongoUser(),
+                    configuration.getMongoPassword(),
+                    configuration.getMongoHost(),
+                    configuration.getMongoDatabase(),
+                    configuration.getMongoPort(),
+                    configuration.isMongoUseAuth(),
+                    configuration.getMongoMaxConnections(),
+                    configuration.getMongoThreadsAllowedToBlockMultiplier(),
+                    configuration.getMongoReplicaSet(),
+                    configuration.getMessagesCollectionSize()
             );
         } catch (Exception e) {
             LOG.fatal("Could not create MongoDB connection: " + e.getMessage(), e);
@@ -244,14 +233,14 @@ public final class Main {
 
         // Connect to AMQP broker.
         AMQPBroker amqpBroker = new AMQPBroker(
-                configuration.get("amqp_host"),
-                configuration.getInteger("amqp_port", 0),
-                configuration.get("amqp_username"),
-                configuration.get("amqp_password"),
-                configuration.get("amqp_virtualhost")
+                configuration.getAmqpHost(),
+                configuration.getAmqpPort(),
+                configuration.getAmqpUsername(),
+                configuration.getAmqpPassword(),
+                configuration.getAmqpVirtualhost()
         );
 
-        List<AMQPSubscribedQueue> amqpQueues = configuration.getAMQPSubscribedQueues();
+        List<AMQPSubscribedQueue> amqpQueues = configuration.getAmqpSubscribedQueues();
 
         if (amqpQueues != null) {
             // Start AMQP subscriber thread for each queue to listen on.
