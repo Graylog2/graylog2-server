@@ -15,8 +15,8 @@ require "rails/test_unit/railtie"
 # you've limited to :test, :development, or :production.
 Bundler.require(:default, Rails.env) if defined?(Bundler)
 
-GRAYLOG2_VERSION = "0.9.5p2"
-GRAYLOG2_VERSION_TIMESTAMP = 1302475256
+GRAYLOG2_VERSION = "0.9.6-PREVIEW"
+GRAYLOG2_VERSION_TIMESTAMP = 1319387943
 
 module Graylog2WebInterface
   class Application < Rails::Application
