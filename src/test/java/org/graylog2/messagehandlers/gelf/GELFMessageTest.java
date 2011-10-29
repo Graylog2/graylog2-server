@@ -21,12 +21,14 @@
 package org.graylog2.messagehandlers.gelf;
 
 import com.mongodb.BasicDBList;
-import org.bson.types.ObjectId;
 import com.mongodb.BasicDBObject;
-import java.util.ArrayList;
-import java.util.List;
+import org.bson.types.ObjectId;
 import org.graylog2.blacklists.Blacklist;
 import org.junit.Test;
+
+import java.util.ArrayList;
+import java.util.List;
+
 import static org.junit.Assert.*;
 
 public class GELFMessageTest {
@@ -130,4 +132,79 @@ public class GELFMessageTest {
         assertTrue(msg.blacklisted(blacklists));
     }
 
+    @Test
+    public void testToOneliner() {
+
+        GELFMessage gelfMessage = createGELFMessage();
+
+        String oneLiner = "host.example.com - short message severity=Emergency,facility=local0,file=test.file,line=42,test=test";
+        assertEquals(oneLiner, gelfMessage.toOneLiner());
+    }
+
+    private GELFMessage createGELFMessage() {
+
+        GELFMessage gelfMessage = new GELFMessage();
+
+        gelfMessage.setHost("host.example.com");
+        gelfMessage.setShortMessage("short message");
+        gelfMessage.setFullMessage("full message");
+        gelfMessage.setVersion("1");
+        gelfMessage.setLevel(0);
+        gelfMessage.setFacility("local0");
+        gelfMessage.setFile("test.file");
+        gelfMessage.setLine(42);
+        gelfMessage.addAdditionalData("test", "test");
+
+        return gelfMessage;
+    }
+
+    @Test
+    public void testToString() {
+
+        String stringDelim = " | ";
+
+        GELFMessage gelfMessage = createGELFMessage();
+
+        String toString = "shortMessage: short message" + stringDelim;
+        toString += "fullMessage: full message" + stringDelim;
+        toString += "level: 0" + stringDelim;
+        toString += "host: host.example.com" + stringDelim;
+        toString += "file: test.file" + stringDelim;
+        toString += "line: 42" + stringDelim;
+        toString += "facility: local0" + stringDelim;
+        toString += "version: 1" + stringDelim;
+        toString += "additional: 1";
+
+        assertEquals(toString, gelfMessage.toString());
+    }
+
+    @Test
+    public void testToStringWithLongMessage() {
+
+        GELFMessage gelfMessage = createGELFMessage();
+        gelfMessage.setFullMessage("Really, really, really, really, really, really, really, really, really, really, "
+                + "really, really, really, really, really, really, really, really, really, really, really, really, "
+                + "really, really, really, really, really, really, really, really, really, really, really, really, "
+                + "really, really long");
+
+        String toString = "shortMessage: short message | fullMessage: Really, really, really, really, really, really, "
+                + "really, really, really, really, really, really, really, really, really, really, really, really, "
+                + "really, really, really, really, really (...)";
+
+        assertEquals(toString, gelfMessage.toString());
+    }
+
+    @Test
+    public void testAllRequiredFieldsSet() {
+
+        GELFMessage emptyGelfMessage = new GELFMessage();
+        assertFalse(emptyGelfMessage.allRequiredFieldsSet());
+
+        GELFMessage versionMissingGelfMessage = createGELFMessage();
+        versionMissingGelfMessage.setVersion("");
+        assertFalse(versionMissingGelfMessage.allRequiredFieldsSet());
+
+        GELFMessage gelfMessage = createGELFMessage();
+        assertTrue(gelfMessage.allRequiredFieldsSet());
+    }
 }

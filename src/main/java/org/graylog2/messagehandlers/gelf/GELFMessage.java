@@ -29,15 +29,15 @@ import org.graylog2.streams.Router;
 import org.graylog2.streams.Stream;
 import org.graylog2.streams.StreamRule;
 import org.graylog2.streams.matchers.StreamRuleMatcherIF;
+import org.json.simple.JSONValue;
 
 import java.util.*;
 import java.util.regex.Pattern;
 import java.util.zip.Deflater;
-import org.json.simple.JSONValue;
 
 /**
  * GELFMessage.java: Jul 20, 2010 6:57:28 PM
- *
+ * <p/>
  * A GELF message
  *
  * @author Lennart Koopmann <lennart@socketfeed.com>
@@ -45,6 +45,7 @@ import org.json.simple.JSONValue;
 public class GELFMessage {
 
     private static final Logger LOG = Logger.getLogger(GELFMessage.class);
+    private static final String STRING_DELIMITER = " | ";
 
     private String version = null;
     private String shortMessage = null;
@@ -65,7 +66,7 @@ public class GELFMessage {
 
     private Map<Integer, GELFClientChunk> chunks = null;
     private boolean chunked = false;
-    
+
     private byte[] raw;
 
     /**
@@ -88,7 +89,7 @@ public class GELFMessage {
 
     /**
      * Get the short message
-     * 
+     *
      * @return
      */
     public String getShortMessage() {
@@ -160,7 +161,7 @@ public class GELFMessage {
 
     /**
      * Get filename
-     * 
+     *
      * @return
      */
     public String getFile() {
@@ -219,6 +220,9 @@ public class GELFMessage {
 
     /**
      * Add a key/value pair
+     *
+     * @param key
+     * @param value
      */
     public void addAdditionalData(String key, Object value) {
         if (key != null && value != null) {
@@ -236,19 +240,19 @@ public class GELFMessage {
             LOG.info("Skipping additional data field in not allowed format. Allowed: String or Integral");
         }
     }
-    
+
     /**
      * Set the filterOut
      *
      * @param filterOut
      */
-    public void setFilterOut(boolean value) {
-        this.filterOut = value;
+    public void setFilterOut(boolean filterOut) {
+        this.filterOut = filterOut;
     }
 
     /**
      * Get the filterOut flag
-     * 
+     *
      * @return
      */
     public boolean getFilterOut() {
@@ -262,11 +266,8 @@ public class GELFMessage {
      * @return boolean
      */
     public boolean allRequiredFieldsSet() {
-        if(this.getVersion() == null || this.getShortMessage() == null || this.getHost() == null
-                || this.getVersion().length() == 0 || this.getShortMessage().length() == 0 || this.getHost().length() == 0) {
-            return false;
-        }
-        return true;
+        return !(getVersion() == null || getShortMessage() == null || getHost() == null
+                || getVersion().isEmpty() || getShortMessage().isEmpty() || getHost().isEmpty());
     }
 
 
@@ -296,7 +297,7 @@ public class GELFMessage {
         if (!this.doRouting) {
             return false;
         }
-        
+
         try {
             return matcher.match(this, rule);
         } catch (Exception e) {
@@ -338,52 +339,51 @@ public class GELFMessage {
      * @return boolean
      */
     public String toOneLiner() {
-        String msg = this.getHost() + " - " + this.getShortMessage();
+        StringBuilder msg = new StringBuilder();
+        msg.append(this.getHost()).append(" - ").append(this.getShortMessage());
 
-        msg += " severity=" + Tools.syslogLevelToReadable(this.getLevel());
-        msg += ",facility=" + this.getFacility();
+        msg.append(" severity=").append(Tools.syslogLevelToReadable(this.getLevel()));
+        msg.append(",facility=").append(this.getFacility());
 
         if (this.getFile() != null) {
-            msg += ",file=" + this.getFile();
+            msg.append(",file=").append(this.getFile());
         }
 
         if (this.getLine() != 0) {
-            msg += ",line=" + this.getLine();
+            msg.append(",line=").append(this.getLine());
         }
 
         if (this.getAdditionalData().size() > 0) {
             // Add additional fields. XXX PERFORMANCE
-            Map<String,Object> additionalFields = this.getAdditionalData();
-            Set<String> set = additionalFields.keySet();
-            Iterator<String> iter = set.iterator();
-            while(iter.hasNext()) {
-                String key = iter.next();
-                String value = (String) additionalFields.get(key);
-                msg += "," + key + "=" + value;
+            Map<String, Object> additionalFields = this.getAdditionalData();
+
+            for (Map.Entry<String, Object> entry : additionalFields.entrySet()) {
+                msg.append(",").append(entry.getKey()).append("=").append((String) entry.getValue());
             }
         }
 
-        return msg;
+        return msg.toString();
     }
 
     /**
      * @return Human readable, descriptive and formatted string of this GELF message.
      */
-    @Override public String toString() {
-        String str = "shortMessage: " + shortMessage + " | ";
-        str += "fullMessage: " + fullMessage + " | ";
-        str += "level: " + level + " | ";
-        str += "host: " + host + " | ";
-        str += "file: " + file + " | ";
-        str += "line: " + line + " | ";
-        str += "facility: " + facility + " | ";
-        str += "version: " + version + " | ";
+    @Override
+    public String toString() {
+        String str = "shortMessage: " + shortMessage + STRING_DELIMITER;
+        str += "fullMessage: " + fullMessage + STRING_DELIMITER;
+        str += "level: " + level + STRING_DELIMITER;
+        str += "host: " + host + STRING_DELIMITER;
+        str += "file: " + file + STRING_DELIMITER;
+        str += "line: " + line + STRING_DELIMITER;
+        str += "facility: " + facility + STRING_DELIMITER;
+        str += "version: " + version + STRING_DELIMITER;
         str += "additional: " + this.additionalData.size();
 
         // Replace all newlines and tabs.
         String ret = str.replaceAll("\\n", "").replaceAll("\\t", "");
 
-        // Cut to 100 chars if the message is too long.
+        // Cut to 225 chars if the message is too long.
         if (ret.length() > 225) {
             ret = ret.substring(0, 225);
             ret += " (...)";
