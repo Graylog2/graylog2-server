@@ -21,6 +21,7 @@
 package org.graylog2.database;
 
 import java.util.HashMap;
+import java.util.Map;
 import java.util.Set;
 
 /**
@@ -34,7 +35,7 @@ import java.util.Set;
 public class HostCounterCache {
     private static HostCounterCache instance;
 
-    private HashMap<String, Integer> cache = new HashMap<String, Integer>();
+    private Map<String, Integer> cache = new HashMap<String, Integer>();
 
     private HostCounterCache() { }
 
@@ -62,8 +63,6 @@ public class HostCounterCache {
         }
 
         this.cache.put(hostname, old+1);
-
-        return;
     }
 
     /**

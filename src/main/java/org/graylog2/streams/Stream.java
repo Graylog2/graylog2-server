@@ -55,12 +55,12 @@ public class Stream {
         this.mongoObject = stream;
     }
 
-    public static ArrayList<Stream> fetchAllEnabled() {
+    public static List<Stream> fetchAllEnabled() {
         if (StreamCache.getInstance().valid()) {
             return StreamCache.getInstance().get();
         }
         
-        ArrayList<Stream> streams = new ArrayList<Stream>();
+        List<Stream> streams = new ArrayList<Stream>();
 
         DBCollection coll = MongoConnection.getInstance().getDatabase().getCollection("streams");
         DBObject query = new BasicDBObject();
@@ -85,7 +85,7 @@ public class Stream {
             return this.streamRules;
         }
 
-        ArrayList<StreamRule> rules = new ArrayList<StreamRule>();
+        List<StreamRule> rules = new ArrayList<StreamRule>();
 
         BasicDBList rawRules = (BasicDBList) this.mongoObject.get("streamrules");
         if (rawRules != null && rawRules.size() > 0) {
@@ -95,7 +95,6 @@ public class Stream {
                     rules.add(rule);
                 } catch (Exception e) {
                     LOG.warn("Skipping stream rule in Stream.getStreamRules(): " + e.getMessage(), e);
-                    continue;
                 }
             }
         }
@@ -109,7 +108,7 @@ public class Stream {
             return this.forwardedTo;
         }
         
-        ArrayList<ForwardEndpoint> fwds = new ArrayList<ForwardEndpoint>();
+        List<ForwardEndpoint> fwds = new ArrayList<ForwardEndpoint>();
 
         BasicDBList rawFwds = (BasicDBList) this.mongoObject.get("forwarders");
         if (rawFwds != null && rawFwds.size() > 0) {
@@ -119,7 +118,6 @@ public class Stream {
                     fwds.add(fwd);
                 } catch (Exception e) {
                     LOG.warn("Skipping forward endpoint in Stream.getForwardedTo(): " + e.getMessage(), e);
-                    continue;
                 }
             }
         }
