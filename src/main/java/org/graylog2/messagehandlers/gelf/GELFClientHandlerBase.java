@@ -50,7 +50,7 @@ class GELFClientHandlerBase {
     protected GELFClientHandlerBase() { }
 
     protected boolean parse() throws Exception{
-        JSONObject json = this.getJSON(this.clientMessage.toString());
+        JSONObject json = this.getJSON(this.clientMessage);
         if (json == null) {
             LOG.warn("JSON is null/could not be parsed (invalid JSON) - clientMessage was: " + this.clientMessage);
             return false;
