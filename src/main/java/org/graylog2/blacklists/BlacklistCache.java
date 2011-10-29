@@ -20,8 +20,9 @@
 
 package org.graylog2.blacklists;
 
-import java.util.ArrayList;
 import org.graylog2.SimpleObjectCache;
+
+import java.util.List;
 
 /**
  * StreamCache.java: Mar 31, 2011 6:11:14 PM
@@ -30,7 +31,7 @@ import org.graylog2.SimpleObjectCache;
  *
  * @author Lennart Koopmann <lennart@socketfeed.com>
  */
-public class BlacklistCache extends SimpleObjectCache {
+public class BlacklistCache extends SimpleObjectCache<List<Blacklist>> {
     
     private static BlacklistCache instance;
 
@@ -42,14 +43,4 @@ public class BlacklistCache extends SimpleObjectCache {
         }
         return instance;
     }
-
-    @Override
-    public ArrayList<Blacklist> get() {
-        return (ArrayList<Blacklist>) super.get();
-    }
-
-    public void set(ArrayList<Blacklist> lists) {
-        super.set(lists);
-    }
-
 }
