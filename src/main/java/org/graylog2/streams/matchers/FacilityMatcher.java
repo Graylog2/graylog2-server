@@ -20,7 +20,6 @@
 
 package org.graylog2.streams.matchers;
 
-import org.graylog2.Tools;
 import org.graylog2.messagehandlers.gelf.GELFMessage;
 import org.graylog2.streams.StreamRule;
 
@@ -29,7 +28,7 @@ import org.graylog2.streams.StreamRule;
  *
  * [description]
  *
- * @author: Lennart Koopmann <lennart@socketfeed.com>
+ * @author Lennart Koopmann <lennart@socketfeed.com>
  */
 public class FacilityMatcher implements StreamRuleMatcherIF {
 

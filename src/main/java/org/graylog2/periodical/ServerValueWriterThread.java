@@ -30,7 +30,7 @@ import org.graylog2.database.MongoBridge;
  *
  * Periodically writes server values to MongoDB.
  *
- * @author: Lennart Koopmann <lennart@socketfeed.com>
+ * @author Lennart Koopmann <lennart@socketfeed.com>
  */
 public class ServerValueWriterThread extends Thread {
 

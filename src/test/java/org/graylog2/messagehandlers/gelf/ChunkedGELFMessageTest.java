@@ -27,7 +27,7 @@ import static org.junit.Assert.*;
 /**
  * ChunkedGELFMessageTest.java: Sep 24, 2010 4:10:24 PM
  *
- * @author: Lennart Koopmann <lennart@socketfeed.com>
+ * @author Lennart Koopmann <lennart@socketfeed.com>
  */
 public class ChunkedGELFMessageTest {
 

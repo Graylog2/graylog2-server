@@ -28,7 +28,7 @@ import org.bson.types.ObjectId;
  *
  * Representing rule of a blacklist.
  *
- * @author: Lennart Koopmann <lennart@socketfeed.com>
+ * @author Lennart Koopmann <lennart@socketfeed.com>
  */
 public class BlacklistRule {
 

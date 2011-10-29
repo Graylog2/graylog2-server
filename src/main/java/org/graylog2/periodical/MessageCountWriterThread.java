@@ -30,7 +30,7 @@ import org.graylog2.messagehandlers.common.MessageCounter;
  *
  * Periodically writes message counts to message count collection.
  *
- * @author: Lennart Koopmann <lennart@socketfeed.com>
+ * @author Lennart Koopmann <lennart@socketfeed.com>
  */
 public class MessageCountWriterThread extends Thread {
 

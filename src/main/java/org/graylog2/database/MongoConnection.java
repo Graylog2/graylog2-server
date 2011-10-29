@@ -29,7 +29,7 @@ import java.util.List;
  *
  * MongoDB connection singleton
  *
- * @author: Lennart Koopmann <lennart@socketfeed.com>
+ * @author Lennart Koopmann <lennart@socketfeed.com>
  */
 public final class MongoConnection {
     private static MongoConnection instance;
@@ -49,7 +49,7 @@ public final class MongoConnection {
      * Get the connection instance
      * @return MongoConnection instance
      */
-    public synchronized static MongoConnection getInstance() {
+    public static synchronized MongoConnection getInstance() {
         if (instance == null) {
             instance = new MongoConnection();
         }
@@ -99,7 +99,7 @@ public final class MongoConnection {
                 }
             }
         } catch (MongoException.Network e) {
-            throw new Exception("Could not connect to Mongo DB. (" + e.toString() + ")");
+            throw new Exception("Could not connect to Mongo DB.", e);
         }
     }
 

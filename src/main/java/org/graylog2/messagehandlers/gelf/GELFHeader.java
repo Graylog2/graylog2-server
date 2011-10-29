@@ -27,7 +27,7 @@ import java.io.IOException;
  *
  * Representing the header of chunked GELF messages
  *
- * @author: Lennart Koopmann <lennart@socketfeed.com>
+ * @author Lennart Koopmann <lennart@socketfeed.com>
  */
 public class GELFHeader {
 

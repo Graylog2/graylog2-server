@@ -20,9 +20,10 @@
 
 package org.graylog2.messagehandlers.common;
 
+import org.bson.types.ObjectId;
+
 import java.util.HashMap;
 import java.util.Map;
-import org.bson.types.ObjectId;
 
 /**
  * MessageCounter.java: Sep 20, 2011 6:47:42 PM
@@ -30,7 +31,7 @@ import org.bson.types.ObjectId;
  * Singleton holding the number of received messages for streams,
  * hosts and a total.
  *
- * @author: Lennart Koopmann <lennart@socketfeed.com>
+ * @author Lennart Koopmann <lennart@socketfeed.com>
  */
 public final class MessageCounter {
     private static MessageCounter instance;
@@ -47,7 +48,7 @@ public final class MessageCounter {
     /**
      * @return MessageCounter singleton instance
      */
-    public synchronized static MessageCounter getInstance() {
+    public static synchronized MessageCounter getInstance() {
         if (instance == null) {
             instance = new MessageCounter();
         }

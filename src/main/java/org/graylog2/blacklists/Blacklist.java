@@ -33,7 +33,7 @@ import java.util.List;
  *
  * Representing a blacklist stored in MongoDB.
  *
- * @author: Lennart Koopmann <lennart@socketfeed.com>
+ * @author Lennart Koopmann <lennart@socketfeed.com>
  */
 public class Blacklist {
 
@@ -52,12 +52,12 @@ public class Blacklist {
         this.mongoObject = blacklist;
     }
 
-    public static ArrayList<Blacklist> fetchAll() throws Exception {
+    public static List<Blacklist> fetchAll() {
         if (BlacklistCache.getInstance().valid()) {
             return BlacklistCache.getInstance().get();
         }
 
-        ArrayList<Blacklist> blacklists = new ArrayList<Blacklist>();
+        List<Blacklist> blacklists = new ArrayList<Blacklist>();
 
         DBCollection coll = MongoConnection.getInstance().getDatabase().getCollection("blacklists");
         DBCursor cur = coll.find(new BasicDBObject());

@@ -31,7 +31,7 @@ import java.util.concurrent.Executors;
  *
  * Thread responsible for listening for GELF messages.
  *
- * @author: Lennart Koopmann <lennart@socketfeed.com>
+ * @author Lennart Koopmann <lennart@socketfeed.com>
  */
 public class GELFMainThread extends Thread {
 

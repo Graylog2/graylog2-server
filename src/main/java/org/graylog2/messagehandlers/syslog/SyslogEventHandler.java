@@ -36,7 +36,7 @@ import org.joda.time.DateTime;
  *
  * Handles incoming Syslog messages
  *
- * @author: Lennart Koopmann <lennart@socketfeed.com>
+ * @author Lennart Koopmann <lennart@socketfeed.com>
  */
 public class SyslogEventHandler implements SyslogServerSessionlessEventHandlerIF {
 

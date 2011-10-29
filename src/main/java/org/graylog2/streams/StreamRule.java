@@ -28,34 +28,30 @@ import org.bson.types.ObjectId;
  *
  * Representing the rules of a single stream.
  *
- * @author: Lennart Koopmann <lennart@socketfeed.com>
+ * @author Lennart Koopmann <lennart@socketfeed.com>
  */
 public class StreamRule {
 
-    public final static int TYPE_MESSAGE = 1;
-    public final static int TYPE_HOST = 2;
-    public final static int TYPE_SEVERITY = 3;
-    public final static int TYPE_FACILITY = 4;
+    public static final int TYPE_MESSAGE = 1;
+    public static final int TYPE_HOST = 2;
+    public static final int TYPE_SEVERITY = 3;
+    public static final int TYPE_FACILITY = 4;
     // Type 5 is reserved for frontend usage (timeframe filter)
-    public final static int TYPE_ADDITIONAL = 6;
+    public static final int TYPE_ADDITIONAL = 6;
     // Type 7 used to be for the removed hostgroup feature.
-    public final static int TYPE_SEVERITY_OR_HIGHER = 8;
-    public final static int TYPE_HOST_REGEX = 9;
-    public final static int TYPE_FULL_MESSAGE = 10;
-    public final static int TYPE_FILENAME_LINE = 11;
+    public static final int TYPE_SEVERITY_OR_HIGHER = 8;
+    public static final int TYPE_HOST_REGEX = 9;
+    public static final int TYPE_FULL_MESSAGE = 10;
+    public static final int TYPE_FILENAME_LINE = 11;
 
     private ObjectId objectId = null;
     private int ruleType = 0;
     private String value = null;
 
-    private DBObject mongoObject = null;
-
     public StreamRule(DBObject rule) {
         this.objectId = (ObjectId) rule.get("_id");
         this.ruleType = (Integer) rule.get("rule_type");
         this.value = (String) rule.get("value");
-
-        this.mongoObject = rule;
     }
 
     /**

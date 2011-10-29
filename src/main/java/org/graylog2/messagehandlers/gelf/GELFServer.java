@@ -25,14 +25,13 @@ import org.apache.log4j.Logger;
 import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
-import java.net.SocketException;
 
 /**
  * GELFThread.java: Jun 23, 2010 6:58:07 PM
  *
  * Server that can listen for GELF messages.
  *
- * @author: Lennart Koopmann <lennart@socketfeed.com>
+ * @author Lennart Koopmann <lennart@socketfeed.com>
  */
 public class GELFServer {
 
@@ -67,10 +66,9 @@ public class GELFServer {
      * unzipped (GZIP) raw message that can be parsed to a GELFMessage.
      *
      * @return Received message
-     * @throws SocketException
      * @throws IOException
      */
-    public DatagramPacket listen() throws SocketException, IOException {
+    public DatagramPacket listen() throws IOException {
 
         // Create buffer.
         byte[] receiveData = new byte[MAX_PACKET_SIZE];

@@ -25,7 +25,7 @@ package org.graylog2.messagehandlers.gelf;
  *
  * Representing a GELF client. Allows i.e. decoding of sent data.
  *
- * @author: Lennart Koopmann <lennart@socketfeed.com>
+ * @author Lennart Koopmann <lennart@socketfeed.com>
  */
 public interface GELFClientHandlerIF {
 
@@ -35,6 +35,6 @@ public interface GELFClientHandlerIF {
      *
      * @return boolean
      */
-    public boolean handle();
+    boolean handle();
 
 }

@@ -32,7 +32,7 @@ import org.graylog2.database.MongoConnection;
  *
  * Filling the server_values collection
  *
- * @author: Lennart Koopmann <lennart@socketfeed.com>
+ * @author Lennart Koopmann <lennart@socketfeed.com>
  */
 public class ServerValue {
 

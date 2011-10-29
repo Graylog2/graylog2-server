@@ -22,14 +22,10 @@ package org.graylog2.messagehandlers.gelf;
 
 /**
  * IncompleteGELFMessageException.java: Sep 30, 2010 1:01:37 PM
- *
+ * <p/>
  * [description]
  *
- * @author: Lennart Koopmann <lennart@socketfeed.com>
+ * @author Lennart Koopmann <lennart@socketfeed.com>
  */
-class IncompleteGELFMessageException extends Exception {
-
-    public IncompleteGELFMessageException() {
-    }
-
+class IncompleteGELFMessageException extends GELFException {
 }
