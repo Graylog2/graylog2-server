@@ -37,7 +37,7 @@ public class BlacklistCache extends SimpleObjectCache<List<Blacklist>> {
 
     private BlacklistCache() { }
 
-    public synchronized static BlacklistCache getInstance() {
+    public static synchronized BlacklistCache getInstance() {
         if (instance == null) {
             instance = new BlacklistCache();
         }

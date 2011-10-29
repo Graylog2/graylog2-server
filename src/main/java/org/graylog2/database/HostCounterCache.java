@@ -43,7 +43,7 @@ public class HostCounterCache {
      *
      * @return
      */
-    public synchronized static HostCounterCache getInstance() {
+    public static synchronized HostCounterCache getInstance() {
         if (instance == null) {
             instance = new HostCounterCache();
         }

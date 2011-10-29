@@ -32,17 +32,17 @@ import org.bson.types.ObjectId;
  */
 public class StreamRule {
 
-    public final static int TYPE_MESSAGE = 1;
-    public final static int TYPE_HOST = 2;
-    public final static int TYPE_SEVERITY = 3;
-    public final static int TYPE_FACILITY = 4;
+    public static final int TYPE_MESSAGE = 1;
+    public static final int TYPE_HOST = 2;
+    public static final int TYPE_SEVERITY = 3;
+    public static final int TYPE_FACILITY = 4;
     // Type 5 is reserved for frontend usage (timeframe filter)
-    public final static int TYPE_ADDITIONAL = 6;
+    public static final int TYPE_ADDITIONAL = 6;
     // Type 7 used to be for the removed hostgroup feature.
-    public final static int TYPE_SEVERITY_OR_HIGHER = 8;
-    public final static int TYPE_HOST_REGEX = 9;
-    public final static int TYPE_FULL_MESSAGE = 10;
-    public final static int TYPE_FILENAME_LINE = 11;
+    public static final int TYPE_SEVERITY_OR_HIGHER = 8;
+    public static final int TYPE_HOST_REGEX = 9;
+    public static final int TYPE_FULL_MESSAGE = 10;
+    public static final int TYPE_FILENAME_LINE = 11;
 
     private ObjectId objectId = null;
     private int ruleType = 0;

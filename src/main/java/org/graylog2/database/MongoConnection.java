@@ -49,7 +49,7 @@ public final class MongoConnection {
      * Get the connection instance
      * @return MongoConnection instance
      */
-    public synchronized static MongoConnection getInstance() {
+    public static synchronized MongoConnection getInstance() {
         if (instance == null) {
             instance = new MongoConnection();
         }

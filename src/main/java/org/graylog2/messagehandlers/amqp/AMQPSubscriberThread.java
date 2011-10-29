@@ -49,7 +49,7 @@ public class AMQPSubscriberThread extends Thread {
     private AMQPSubscribedQueue queue = null;
     private AMQPBroker broker = null;
 
-    public final static int SLEEP_INTERVAL = 10;
+    public static final int SLEEP_INTERVAL = 10;
 
     public AMQPSubscriberThread(AMQPSubscribedQueue queue, AMQPBroker broker) {
         this.queue = queue;
