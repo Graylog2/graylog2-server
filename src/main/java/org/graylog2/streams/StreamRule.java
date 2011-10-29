@@ -48,14 +48,10 @@ public class StreamRule {
     private int ruleType = 0;
     private String value = null;
 
-    private DBObject mongoObject = null;
-
     public StreamRule(DBObject rule) {
         this.objectId = (ObjectId) rule.get("_id");
         this.ruleType = (Integer) rule.get("rule_type");
         this.value = (String) rule.get("value");
-
-        this.mongoObject = rule;
     }
 
     /**
