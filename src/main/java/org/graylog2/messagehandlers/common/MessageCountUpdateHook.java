@@ -28,7 +28,7 @@ import org.graylog2.streams.Stream;
  *
  * Updates the peridodic counts collection.
  *
- * @author: Lennart Koopmann <lennart@socketfeed.com>
+ * @author Lennart Koopmann <lennart@socketfeed.com>
  */
 public class MessageCountUpdateHook implements MessagePostReceiveHookIF {
 

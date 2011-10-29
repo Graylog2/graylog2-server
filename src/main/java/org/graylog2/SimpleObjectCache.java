@@ -21,39 +21,35 @@ package org.graylog2;
 
 /**
  * SimpleObjectCache.java: Apr 1, 2011 4:54:25 PM
- *
+ * <p/>
  * Singleton caching objects. Derive from this like StreamCache and
  * BlacklistCache.
  *
- * @author: Lennart Koopmann <lennart@socketfeed.com>
+ * @author Lennart Koopmann <lennart@socketfeed.com>
  */
-public class SimpleObjectCache {
+public class SimpleObjectCache<T> {
 
     public static final int STANDARD_TIMEOUT_SECONDS = 5;
 
     protected int timeoutSeconds = STANDARD_TIMEOUT_SECONDS;
     private int lastSet = 0;
 
-    private Object subject = null;
+    private T subject = null;
 
-    protected SimpleObjectCache() { }
+    protected SimpleObjectCache() {
+    }
 
-    protected void set(Object what) {
+    public void set(T what) {
         this.subject = what;
         this.lastSet = Tools.getUTCTimestamp();
     }
 
-    protected Object get() {
+    public T get() {
         return subject;
     }
 
     public boolean valid() {
-        // For the first request.
-        if (this.lastSet == 0) {
-            return false;
-        }
-
-        return this.lastSet >= (Tools.getUTCTimestamp()-timeoutSeconds);
+        return lastSet != 0 && this.lastSet >= (Tools.getUTCTimestamp() - timeoutSeconds);
     }
 
 }

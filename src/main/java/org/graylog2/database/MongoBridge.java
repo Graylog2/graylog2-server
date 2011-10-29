@@ -24,20 +24,19 @@ import com.mongodb.BasicDBObject;
 import com.mongodb.DB;
 import com.mongodb.DBCollection;
 import org.apache.log4j.Logger;
+import org.bson.types.ObjectId;
 import org.graylog2.Tools;
+import org.graylog2.messagehandlers.gelf.GELFException;
 import org.graylog2.messagehandlers.gelf.GELFMessage;
 
-import java.util.Iterator;
 import java.util.Map;
-import java.util.Set;
-import org.bson.types.ObjectId;
 
 /**
  * MongoBridge.java: Apr 13, 2010 9:13:03 PM
  *
  * Simple mapping methods to MongoDB.
  *
- * @author: Lennart Koopmann <lennart@socketfeed.com>
+ * @author Lennart Koopmann <lennart@socketfeed.com>
  */
 public class MongoBridge {
 
@@ -49,10 +48,10 @@ public class MongoBridge {
      * @param message The GELF message
      * @throws Exception
      */
-    public void insertGelfMessage(GELFMessage message) throws Exception {
+    public void insertGelfMessage(GELFMessage message) throws GELFException {
         // Check if all required parameters are set.
         if (!message.allRequiredFieldsSet()) {
-            throw new Exception("Missing GELF message parameters. version, short_message and host are required.");
+            throw new GELFException("Missing GELF message parameters. version, short_message and host are required.");
         }
 
         DBCollection coll = MongoConnection.getInstance().getMessagesColl();
@@ -68,13 +67,8 @@ public class MongoBridge {
         dbObj.put("level", message.getLevel());
         
         // Add additional fields. XXX PERFORMANCE
-        Map<String,Object> additionalFields = message.getAdditionalData();
-        Set<String> set = additionalFields.keySet();
-        Iterator<String> iter = set.iterator();
-        while(iter.hasNext()) {
-            String key = iter.next();
-            Object value = additionalFields.get(key);
-            dbObj.put(key, value);
+        for(Map.Entry<String, Object> entry : message.getAdditionalData().entrySet()) {
+            dbObj.put(entry.getKey(), entry.getValue());
         }
 
         if (message.getCreatedAt() <= 0) {

@@ -27,7 +27,7 @@ import org.graylog2.database.MongoBridge;
  *
  * Utility class that provides access to host system information.
  *
- * @author: Lennart Koopmann <lennart@socketfeed.com>
+ * @author Lennart Koopmann <lennart@socketfeed.com>
  */
 public class HostSystem  {
 

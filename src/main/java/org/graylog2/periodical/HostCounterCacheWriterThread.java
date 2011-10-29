@@ -30,7 +30,7 @@ import org.graylog2.database.MongoBridge;
  *
  * Periodically writes host counter cache to hosts collection.
  *
- * @author: Lennart Koopmann <lennart@socketfeed.com>
+ * @author Lennart Koopmann <lennart@socketfeed.com>
  */
 public class HostCounterCacheWriterThread extends Thread {
 

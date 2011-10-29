@@ -20,27 +20,26 @@
 
 package org.graylog2.messagehandlers.gelf;
 
-import org.graylog2.indexer.Indexer;
 import org.apache.log4j.Logger;
 import org.graylog2.Tools;
 import org.graylog2.blacklists.Blacklist;
 import org.graylog2.forwarders.Forwarder;
+import org.graylog2.indexer.Indexer;
 import org.graylog2.messagehandlers.common.HostUpsertHook;
+import org.graylog2.messagehandlers.common.MessageCountUpdateHook;
 import org.graylog2.messagehandlers.common.MessageParserHook;
 import org.graylog2.messagehandlers.common.ReceiveHookManager;
 
 import java.io.IOException;
-import java.io.UnsupportedEncodingException;
 import java.net.DatagramPacket;
 import java.util.zip.DataFormatException;
-import org.graylog2.messagehandlers.common.MessageCountUpdateHook;
 
 /**
  * ChunkedGELFClient.java: Sep 14, 2010 6:38:38 PM
  *
  * Handling a GELF client message consisting on more than one UDP message.
  *
- * @author: Lennart Koopmann <lennart@socketfeed.com>
+ * @author Lennart Koopmann <lennart@socketfeed.com>
  */
 public class ChunkedGELFClientHandler extends GELFClientHandlerBase implements GELFClientHandlerIF {
 
@@ -51,13 +50,12 @@ public class ChunkedGELFClientHandler extends GELFClientHandlerBase implements G
      * Representing a GELF client based on more than one UDP message.
      *
      * @param clientMessage The raw data the GELF client sent. (JSON string)
-     * @throws UnsupportedEncodingException
      * @throws InvalidGELFHeaderException
      * @throws IOException 
      * @throws DataFormatException
      * @throws InvalidGELFCompressionMethodException
      */
-    public ChunkedGELFClientHandler(DatagramPacket clientMessage) throws UnsupportedEncodingException, InvalidGELFHeaderException, IOException, DataFormatException, InvalidGELFCompressionMethodException {
+    public ChunkedGELFClientHandler(DatagramPacket clientMessage) throws GELFException, IOException, DataFormatException {
         GELFHeader header = GELF.extractGELFHeader(clientMessage);
 
         GELFClientChunk chunk = new GELFClientChunk();
@@ -73,9 +71,9 @@ public class ChunkedGELFClientHandler extends GELFClientHandlerBase implements G
         try {
             possiblyCompleteMessage = ChunkedGELFClientManager.getInstance().insertChunk(chunk);
         } catch (InvalidGELFChunkException e) {
-            throw new InvalidGELFHeaderException(e.toString());
+            throw new InvalidGELFHeaderException(e.toString(), e);
         } catch (ForeignGELFChunkException e) {
-            throw new InvalidGELFHeaderException(e.toString());
+            throw new InvalidGELFHeaderException(e.toString(), e);
         }
 
         LOG.info("Got GELF message chunk: " + chunk.toString());

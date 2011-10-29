@@ -25,16 +25,14 @@ import org.graylog2.messagehandlers.gelf.ChunkedGELFClientManager;
 import org.graylog2.messagehandlers.gelf.ChunkedGELFMessage;
 import org.graylog2.messagehandlers.gelf.EmptyGELFMessageException;
 
-import java.util.Iterator;
 import java.util.Map;
-import java.util.Set;
 
 /**
  * ChunkedGELFClientManagerThread.java: Sep 20, 2010 9:28:37 PM
  *
  * [description]
  *
- * @author: Lennart Koopmann <lennart@socketfeed.com>
+ * @author Lennart Koopmann <lennart@socketfeed.com>
  */
 public class ChunkedGELFClientManagerThread extends Thread {
 
@@ -48,12 +46,11 @@ public class ChunkedGELFClientManagerThread extends Thread {
         while (true) {
             try {
                 Map<String, ChunkedGELFMessage> messageMap = ChunkedGELFClientManager.getInstance().getMessageMap();
-                Set<String> set = messageMap.keySet();
-                Iterator<String> iter = set.iterator();
-                int i = 0;
-                while(iter.hasNext()) {
-                    String messageId = iter.next();
-                    ChunkedGELFMessage message = messageMap.get(messageId);
+
+                for(Map.Entry<String, ChunkedGELFMessage> entry : messageMap.entrySet()) {
+
+                    String messageId = entry.getKey();
+                    ChunkedGELFMessage message = entry.getValue();
 
                     int fiveSecondsAgo = (int) (System.currentTimeMillis()/1000)-5;
 
@@ -65,7 +62,6 @@ public class ChunkedGELFClientManagerThread extends Thread {
                         // getFirstChunkArrival() did not work because first part did not arrive yet. Drop anyways.
                         this.dropMessage(messageId, "First chunk did not arrive.");
                     }
-                    i++;
                 }
                 
             } catch (Exception e) {

@@ -38,7 +38,7 @@ import java.util.zip.InflaterInputStream;
  *
  * Utilty class for various tool/helper functions.
  *
- * @author: Lennart Koopmann <lennart@socketfeed.com>
+ * @author Lennart Koopmann <lennart@socketfeed.com>
  */
 public final class Tools {
 
@@ -198,7 +198,7 @@ public final class Tools {
      *
      * @return The current UTC UNIX timestamp with milliseconds.
      */
-    public static double getUTCTimestampWithMilliseconds() throws NumberFormatException {
+    public static double getUTCTimestampWithMilliseconds() {
         // Use JodaTime to easy get the milliseconds and construct a float. (This looks dumb but is the easiest and safest way)
         long now = System.currentTimeMillis();
         DateTime jt = new DateTime(now);

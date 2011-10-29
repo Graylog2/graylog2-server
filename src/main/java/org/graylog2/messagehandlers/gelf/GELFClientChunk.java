@@ -25,7 +25,7 @@ package org.graylog2.messagehandlers.gelf;
  *
  * Representing a GELF message chunk
  *
- * @author: Lennart Koopmann <lennart@socketfeed.com>
+ * @author Lennart Koopmann <lennart@socketfeed.com>
  */
 public class GELFClientChunk {
 

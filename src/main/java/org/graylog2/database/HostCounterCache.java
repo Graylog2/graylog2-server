@@ -21,6 +21,7 @@
 package org.graylog2.database;
 
 import java.util.HashMap;
+import java.util.Map;
 import java.util.Set;
 
 /**
@@ -29,12 +30,12 @@ import java.util.Set;
  * Acts as cache for count updates in the hosts collection. Written to MongoDB
  * by a periodically running thread.
  *
- * @author: Lennart Koopmann <lennart@socketfeed.com>
+ * @author Lennart Koopmann <lennart@socketfeed.com>
  */
 public class HostCounterCache {
     private static HostCounterCache instance;
 
-    private HashMap<String, Integer> cache = new HashMap<String, Integer>();
+    private Map<String, Integer> cache = new HashMap<String, Integer>();
 
     private HostCounterCache() { }
 
@@ -42,7 +43,7 @@ public class HostCounterCache {
      *
      * @return
      */
-    public synchronized static HostCounterCache getInstance() {
+    public static synchronized HostCounterCache getInstance() {
         if (instance == null) {
             instance = new HostCounterCache();
         }
@@ -62,8 +63,6 @@ public class HostCounterCache {
         }
 
         this.cache.put(hostname, old+1);
-
-        return;
     }
 
     /**

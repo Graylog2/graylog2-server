@@ -29,7 +29,7 @@ import org.graylog2.streams.StreamRule;
  *
  * [description]
  *
- * @author: Dennis Oelkers <dennis@lauschmusik.de>
+ * @author Dennis Oelkers <dennis@lauschmusik.de>
  */
 public class FullMessageMatcher implements StreamRuleMatcherIF {
 

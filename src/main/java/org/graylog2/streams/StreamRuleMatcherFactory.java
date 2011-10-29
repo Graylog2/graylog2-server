@@ -27,7 +27,7 @@ import org.graylog2.streams.matchers.*;
  *
  * [description]
  *
- * @author: Lennart Koopmann <lennart@socketfeed.com>
+ * @author Lennart Koopmann <lennart@socketfeed.com>
  */
 public class StreamRuleMatcherFactory {
 

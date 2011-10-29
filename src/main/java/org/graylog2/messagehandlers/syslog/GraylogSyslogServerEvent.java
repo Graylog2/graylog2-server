@@ -29,7 +29,7 @@ import org.productivity.java.syslog4j.server.impl.event.SyslogServerEvent;
  *
  * Extends the Syslog4j SyslogServerEvent with a AMQP receiver queue field.
  *
- * @author: Lennart Koopmann <lennart@socketfeed.com>
+ * @author Lennart Koopmann <lennart@socketfeed.com>
  */
 public class GraylogSyslogServerEvent extends SyslogServerEvent implements SyslogServerEventIF {
 

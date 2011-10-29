@@ -26,7 +26,7 @@ package org.graylog2.forwarders;
  * Exception thrown in case of an invalid endpoint type. Allowed types are
  * defined in ForwardEndpoint.
  *
- * @author: Lennart Koopmann <lennart@socketfeed.com>
+ * @author Lennart Koopmann <lennart@socketfeed.com>
  */
 public class InvalidEndpointTypeException extends Exception {
 

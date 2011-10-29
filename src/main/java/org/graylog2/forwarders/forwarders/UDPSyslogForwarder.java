@@ -29,7 +29,7 @@ import org.graylog2.messagehandlers.gelf.GELFMessage;
  *
  * Forwards syslog messages to other syslog endpoints.
  *
- * @author: Lennart Koopmann <lennart@socketfeed.com>
+ * @author Lennart Koopmann <lennart@socketfeed.com>
  */
 public class UDPSyslogForwarder extends UDPForwarder implements MessageForwarderIF {
 
