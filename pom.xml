@@ -18,8 +18,6 @@
             <groupId>org.syslog4j</groupId>
             <artifactId>syslog4j</artifactId>
             <version>0.9.46</version>
-            <scope>system</scope>
-            <systemPath>${project.basedir}/lib/syslog4j-0.9.46-bin.jar</systemPath>
         </dependency>
         <dependency>
             <groupId>com.googlecode.json-simple</groupId>
