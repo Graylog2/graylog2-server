@@ -35,6 +35,6 @@ public interface GELFClientHandlerIF {
      *
      * @return boolean
      */
-    public boolean handle();
+    boolean handle();
 
 }
