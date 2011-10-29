@@ -20,12 +20,13 @@
 
 package org.graylog2.messagehandlers.gelf;
 
-import org.graylog2.indexer.Indexer;
 import org.apache.log4j.Logger;
 import org.graylog2.Tools;
 import org.graylog2.blacklists.Blacklist;
 import org.graylog2.forwarders.Forwarder;
+import org.graylog2.indexer.Indexer;
 import org.graylog2.messagehandlers.common.HostUpsertHook;
+import org.graylog2.messagehandlers.common.MessageCountUpdateHook;
 import org.graylog2.messagehandlers.common.MessageParserHook;
 import org.graylog2.messagehandlers.common.ReceiveHookManager;
 
@@ -33,7 +34,6 @@ import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.DatagramPacket;
 import java.util.zip.DataFormatException;
-import org.graylog2.messagehandlers.common.MessageCountUpdateHook;
 
 /**
  * GELFClient.java: Jun 23, 2010 7:15:12 PM
@@ -100,11 +100,11 @@ public class SimpleGELFClientHandler extends GELFClientHandlerBase implements GE
     public boolean handle() {
         try {
             // Fills properties with values from JSON.
-            if (this.clientMessage instanceof String) {
-                try { this.parse(); } catch(Exception e) {
-                    LOG.warn("Could not parse GELF JSON: " + e.getMessage() + " - clientMessage was: " + this.clientMessage, e);
-                    return false;
-                }
+            try {
+                this.parse();
+            } catch (Exception e) {
+                LOG.warn("Could not parse GELF JSON: " + e.getMessage() + " - clientMessage was: " + this.clientMessage, e);
+                return false;
             }
         	
             // Add AMQP receiver queue as additional field if set.
