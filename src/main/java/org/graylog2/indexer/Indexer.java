@@ -41,7 +41,7 @@ import org.json.simple.JSONValue;
  *
  * Stores/indexes log messages in ElasticSearch.
  *
- * @author: Lennart Koopmann <lennart@socketfeed.com>
+ * @author Lennart Koopmann <lennart@socketfeed.com>
  */
 public class Indexer {
 

@@ -29,7 +29,7 @@ import org.graylog2.streams.Stream;
  *
  * Forwards messages to other endpoints. (i.e. other GELF or syslog servers)
  *
- * @author: Lennart Koopmann <lennart@socketfeed.com>
+ * @author Lennart Koopmann <lennart@socketfeed.com>
  */
 public class Forwarder {
 

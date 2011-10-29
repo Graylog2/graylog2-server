@@ -28,7 +28,7 @@ import java.net.DatagramPacket;
  *
  * GELF utility class
  *
- * @author: Lennart Koopmann <lennart@socketfeed.com>
+ * @author Lennart Koopmann <lennart@socketfeed.com>
  */
 public final class GELF {
 

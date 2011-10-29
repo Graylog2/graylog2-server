@@ -38,7 +38,7 @@ import java.util.zip.InflaterInputStream;
  *
  * Utilty class for various tool/helper functions.
  *
- * @author: Lennart Koopmann <lennart@socketfeed.com>
+ * @author Lennart Koopmann <lennart@socketfeed.com>
  */
 public final class Tools {
 

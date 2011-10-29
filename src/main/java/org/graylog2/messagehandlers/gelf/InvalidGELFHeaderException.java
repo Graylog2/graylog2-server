@@ -25,7 +25,7 @@ package org.graylog2.messagehandlers.gelf;
  *
  * Malformed GELF client header
  *
- * @author: Lennart Koopmann <lennart@socketfeed.com>
+ * @author Lennart Koopmann <lennart@socketfeed.com>
  */
 class InvalidGELFHeaderException extends Exception {
 

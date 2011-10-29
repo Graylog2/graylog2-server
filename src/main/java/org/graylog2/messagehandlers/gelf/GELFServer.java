@@ -32,7 +32,7 @@ import java.net.SocketException;
  *
  * Server that can listen for GELF messages.
  *
- * @author: Lennart Koopmann <lennart@socketfeed.com>
+ * @author Lennart Koopmann <lennart@socketfeed.com>
  */
 public class GELFServer {
 

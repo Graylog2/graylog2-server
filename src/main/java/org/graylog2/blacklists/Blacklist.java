@@ -33,7 +33,7 @@ import java.util.List;
  *
  * Representing a blacklist stored in MongoDB.
  *
- * @author: Lennart Koopmann <lennart@socketfeed.com>
+ * @author Lennart Koopmann <lennart@socketfeed.com>
  */
 public class Blacklist {
 

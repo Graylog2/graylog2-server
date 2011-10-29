@@ -23,7 +23,7 @@ package org.graylog2.messagehandlers.amqp;
 /**
  * InvalidQueueTypeException.java: Jan 21, 2011 7:59:46 PM
  *
- * @author: Lennart Koopmann <lennart@socketfeed.com>
+ * @author Lennart Koopmann <lennart@socketfeed.com>
  */
 public class InvalidQueueTypeException extends Exception {
 

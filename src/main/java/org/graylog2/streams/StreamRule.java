@@ -28,7 +28,7 @@ import org.bson.types.ObjectId;
  *
  * Representing the rules of a single stream.
  *
- * @author: Lennart Koopmann <lennart@socketfeed.com>
+ * @author Lennart Koopmann <lennart@socketfeed.com>
  */
 public class StreamRule {
 

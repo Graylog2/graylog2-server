@@ -40,7 +40,7 @@ import org.json.simple.JSONValue;
  *
  * A GELF message
  *
- * @author: Lennart Koopmann <lennart@socketfeed.com>
+ * @author Lennart Koopmann <lennart@socketfeed.com>
  */
 public class GELFMessage {
 

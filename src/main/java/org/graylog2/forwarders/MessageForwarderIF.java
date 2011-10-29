@@ -28,7 +28,7 @@ import org.graylog2.messagehandlers.gelf.GELFMessage;
  *
  * Interface for message forwarders to other endpoints.
  *
- * @author: Lennart Koopmann <lennart@socketfeed.com>
+ * @author Lennart Koopmann <lennart@socketfeed.com>
  */
 public interface MessageForwarderIF {
 

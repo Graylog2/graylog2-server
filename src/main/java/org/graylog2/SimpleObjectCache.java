@@ -25,7 +25,7 @@ package org.graylog2;
  * Singleton caching objects. Derive from this like StreamCache and
  * BlacklistCache.
  *
- * @author: Lennart Koopmann <lennart@socketfeed.com>
+ * @author Lennart Koopmann <lennart@socketfeed.com>
  */
 public class SimpleObjectCache {
 

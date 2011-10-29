@@ -42,7 +42,7 @@ import java.util.zip.DataFormatException;
  *
  * Thread responsible for subscribing to AMQP queues.
  *
- * @author: Lennart Koopmann <lennart@socketfeed.com>
+ * @author Lennart Koopmann <lennart@socketfeed.com>
  */
 public class AMQPSubscriberThread extends Thread {
 

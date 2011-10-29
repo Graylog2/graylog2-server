@@ -25,7 +25,7 @@ package org.graylog2.messagehandlers.gelf;
  *
  * Received GELF message has an unknown compression type.
  *
- * @author: Lennart Koopmann <lennart@socketfeed.com>
+ * @author Lennart Koopmann <lennart@socketfeed.com>
  */
 public class InvalidGELFCompressionMethodException extends Exception {
     public InvalidGELFCompressionMethodException() {

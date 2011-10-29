@@ -30,7 +30,7 @@ import java.io.IOException;
  * Representing the AMQP broker. Has standard parameters to
  * connect to local AMQP broker with standard settings.
  *
- * @author: Lennart Koopmann <lennart@socketfeed.com>
+ * @author Lennart Koopmann <lennart@socketfeed.com>
  */
 public final class AMQPBroker {
 

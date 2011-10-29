@@ -30,7 +30,7 @@ import java.net.DatagramPacket;
  *
  * Thread that handles a GELF client.
  *
- * @author: Lennart Koopmann <lennart@socketfeed.com>
+ * @author Lennart Koopmann <lennart@socketfeed.com>
  */
 public class GELFClientHandlerThread extends Thread {
 

@@ -40,7 +40,7 @@ import org.graylog2.messagehandlers.common.MessageCountUpdateHook;
  *
  * Handling a GELF client message consisting on more than one UDP message.
  *
- * @author: Lennart Koopmann <lennart@socketfeed.com>
+ * @author Lennart Koopmann <lennart@socketfeed.com>
  */
 public class ChunkedGELFClientHandler extends GELFClientHandlerBase implements GELFClientHandlerIF {
 

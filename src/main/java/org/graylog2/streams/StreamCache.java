@@ -28,7 +28,7 @@ import org.graylog2.SimpleObjectCache;
  *
  * Singleton caching the already fetched streams.
  *
- * @author: Lennart Koopmann <lennart@socketfeed.com>
+ * @author Lennart Koopmann <lennart@socketfeed.com>
  */
 public class StreamCache extends SimpleObjectCache {
 

@@ -38,7 +38,7 @@ import org.graylog2.Tools;
  *
  * Shared by Chunked/SimpleGELFClient
  *
- * @author: Lennart Koopmann <lennart@socketfeed.com>
+ * @author Lennart Koopmann <lennart@socketfeed.com>
  */
 class GELFClientHandlerBase {
 

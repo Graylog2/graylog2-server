@@ -34,7 +34,7 @@ import java.util.Set;
  *
  * [description]
  *
- * @author: Lennart Koopmann <lennart@socketfeed.com>
+ * @author Lennart Koopmann <lennart@socketfeed.com>
  */
 public class ChunkedGELFClientManagerThread extends Thread {
 

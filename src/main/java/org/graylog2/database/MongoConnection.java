@@ -29,7 +29,7 @@ import java.util.List;
  *
  * MongoDB connection singleton
  *
- * @author: Lennart Koopmann <lennart@socketfeed.com>
+ * @author Lennart Koopmann <lennart@socketfeed.com>
  */
 public final class MongoConnection {
     private static MongoConnection instance;

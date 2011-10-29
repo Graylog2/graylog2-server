@@ -29,7 +29,7 @@ import java.util.Map;
  * Singleton. Managing chunks of GELF messages. Ordering them, reporting when complete and
  * discards incomplete after a given time.
  *
- * @author: Lennart Koopmann <lennart@socketfeed.com>
+ * @author Lennart Koopmann <lennart@socketfeed.com>
  */
 public final class ChunkedGELFClientManager {
 

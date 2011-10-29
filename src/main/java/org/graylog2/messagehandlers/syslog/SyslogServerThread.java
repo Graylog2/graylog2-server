@@ -29,7 +29,7 @@ import org.productivity.java.syslog4j.server.SyslogServerIF;
  *
  * Listen for Syslog messages
  *
- * @author: Lennart Koopmann <lennart@socketfeed.com>
+ * @author Lennart Koopmann <lennart@socketfeed.com>
  */
 public class SyslogServerThread extends Thread {
 

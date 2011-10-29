@@ -26,7 +26,7 @@ package org.graylog2.messagehandlers.gelf;
  * Received GELF message is of unknown type. (i.e. cannot
  * find out if chunked or not because of invalid headers)
  *
- * @author: Lennart Koopmann <lennart@socketfeed.com>
+ * @author Lennart Koopmann <lennart@socketfeed.com>
  */
 public class InvalidGELFTypeException extends Exception {
 

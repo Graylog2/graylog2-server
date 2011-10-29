@@ -35,7 +35,7 @@ import java.util.List;
  * Representing a single stream from the streams collection. Also provides method
  * to get all streams of this collection.
  *
- * @author: Lennart Koopmann <lennart@socketfeed.com>
+ * @author Lennart Koopmann <lennart@socketfeed.com>
  */
 public class Stream {
 

@@ -29,7 +29,7 @@ import java.util.TreeMap;
  *
  * A GELF message containing of several chunks
  *
- * @author: Lennart Koopmann <lennart@socketfeed.com>
+ * @author Lennart Koopmann <lennart@socketfeed.com>
  */
 public class ChunkedGELFMessage extends GELFMessage {
 

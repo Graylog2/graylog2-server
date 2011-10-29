@@ -30,7 +30,7 @@ import org.bson.types.ObjectId;
  * Singleton holding the number of received messages for streams,
  * hosts and a total.
  *
- * @author: Lennart Koopmann <lennart@socketfeed.com>
+ * @author Lennart Koopmann <lennart@socketfeed.com>
  */
 public final class MessageCounter {
     private static MessageCounter instance;

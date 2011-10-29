@@ -32,7 +32,7 @@ import java.util.List;
  *
  * Routes a GELF Message to it's streams.
  *
- * @author: Lennart Koopmann <lennart@socketfeed.com>
+ * @author Lennart Koopmann <lennart@socketfeed.com>
  */
 public class Router {
 
