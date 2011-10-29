@@ -21,14 +21,14 @@
 package org.graylog2.messagehandlers.gelf;
 
 import org.apache.log4j.Logger;
+import org.graylog2.Tools;
 import org.graylog2.messagehandlers.syslog.SyslogEventHandler;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.JSONValue;
 
-import java.util.Iterator;
+import java.util.Map;
 import java.util.Set;
-import org.graylog2.Tools;
 
 /**
  * GELFClient.java: Sep 14, 2010 6:43:00 PM
@@ -89,24 +89,24 @@ class GELFClientHandlerBase {
         }
 
         // Add additional data if there is some.
-        Set<String> set = json.keySet();
-        Iterator<String> iter = set.iterator();
-        while(iter.hasNext()) {
-            String key = iter.next();
+        Set<Map.Entry<String, String>> entrySet = json.entrySet();
+        for(Map.Entry<String, String> entry : entrySet) {
+
+            String key = entry.getKey();
 
             // Skip standard fields.
             if (!key.startsWith(GELF.USER_DEFINED_FIELD_PREFIX)) {
                 continue;
             }
 
-            // Don'T allow to override _id. (just to make sure...)
+            // Don't allow to override _id. (just to make sure...)
             if (key.equals("_id")) {
                 LOG.warn("Client tried to override _id field! Skipped field, but still storing message.");
                 continue;
             }
 
             // Add to message.
-            this.message.addAdditionalData(key, json.get(key));
+            this.message.addAdditionalData(key, entry.getValue());
         }
 
         return true;
