@@ -27,7 +27,7 @@ package org.graylog2.messagehandlers.gelf;
  *
  * @author Lennart Koopmann <lennart@socketfeed.com>
  */
-class InvalidGELFChunkException extends Exception {
+class InvalidGELFChunkException extends GELFException {
 
     public InvalidGELFChunkException(String msg) {
         super(msg);

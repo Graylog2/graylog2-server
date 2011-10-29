@@ -26,6 +26,7 @@ import com.mongodb.DBCollection;
 import org.apache.log4j.Logger;
 import org.bson.types.ObjectId;
 import org.graylog2.Tools;
+import org.graylog2.messagehandlers.gelf.GELFException;
 import org.graylog2.messagehandlers.gelf.GELFMessage;
 
 import java.util.Map;
@@ -47,10 +48,10 @@ public class MongoBridge {
      * @param message The GELF message
      * @throws Exception
      */
-    public void insertGelfMessage(GELFMessage message) throws Exception {
+    public void insertGelfMessage(GELFMessage message) throws GELFException {
         // Check if all required parameters are set.
         if (!message.allRequiredFieldsSet()) {
-            throw new Exception("Missing GELF message parameters. version, short_message and host are required.");
+            throw new GELFException("Missing GELF message parameters. version, short_message and host are required.");
         }
 
         DBCollection coll = MongoConnection.getInstance().getMessagesColl();

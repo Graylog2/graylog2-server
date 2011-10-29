@@ -31,7 +31,6 @@ import org.graylog2.messagehandlers.syslog.GraylogSyslogServerEvent;
 import org.graylog2.messagehandlers.syslog.SyslogEventHandler;
 
 import java.io.IOException;
-import java.io.UnsupportedEncodingException;
 import java.net.InetAddress;
 import java.util.zip.DataFormatException;
 
@@ -124,7 +123,7 @@ public class AMQPSubscriberThread extends Thread {
         }
     }
 
-    private void handleMessage(byte[] amqpBody) throws DataFormatException, UnsupportedEncodingException, InvalidGELFCompressionMethodException, IOException {
+    private void handleMessage(byte[] amqpBody) throws DataFormatException, InvalidGELFCompressionMethodException, IOException {
         // Handle message.
         switch (this.queue.getType()) {
             case AMQPSubscribedQueue.TYPE_GELF:

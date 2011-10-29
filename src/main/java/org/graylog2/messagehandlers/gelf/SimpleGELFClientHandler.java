@@ -57,7 +57,7 @@ public class SimpleGELFClientHandler extends GELFClientHandlerBase implements GE
      * @throws InvalidGELFCompressionMethodException
      * @throws IOException
      */
-    public SimpleGELFClientHandler(Object clientMessage) throws DataFormatException, UnsupportedEncodingException, InvalidGELFCompressionMethodException, IOException {
+    public SimpleGELFClientHandler(Object clientMessage) throws DataFormatException, InvalidGELFCompressionMethodException, IOException {
 
         if (clientMessage instanceof DatagramPacket) {
             DatagramPacket msg = (DatagramPacket) clientMessage;

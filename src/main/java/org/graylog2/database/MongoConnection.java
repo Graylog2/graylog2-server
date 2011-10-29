@@ -99,7 +99,7 @@ public final class MongoConnection {
                 }
             }
         } catch (MongoException.Network e) {
-            throw new Exception("Could not connect to Mongo DB. (" + e.toString() + ")");
+            throw new Exception("Could not connect to Mongo DB.", e);
         }
     }
 

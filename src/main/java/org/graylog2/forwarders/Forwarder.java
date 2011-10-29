@@ -40,9 +40,8 @@ public class Forwarder {
      *
      * @param message The GELF message to forward.
      * @return Number of endpoints the message was successfully forwarded to.
-     * @throws Exception
      */
-    public static int forward(GELFMessage message) throws Exception {
+    public static int forward(GELFMessage message) {
         int succeeded = 0;
         for (Stream stream : message.getStreams()) {
             try {
