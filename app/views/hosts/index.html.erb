@@ -14,19 +14,13 @@
     $("#hosts-quickjump-input").autocomplete(data);
 </script>
 
-Monitoring <span class="highlighted"><%= @host_count %></span> hosts. (Sorted by total message count)
+Monitoring <span class="highlighted"><%= @host_count %></span> hosts.
 
 <br style="clear: both;" />
 
 <div id="hosts-hosts">
   <% @hosts.each do |host| %>
     <% next if host.host.blank? %>
-    <!--<div class="blocks">
-        <span class="blocks-title"><%= link_to h(host.host), host_messages_path(host.host) %></span>
-        <br />
-        <%= host.message_count.to_i %> messages
-    </div>-->
-
 
   <div id="el-e">
     <div class="el-e-left">
@@ -42,7 +36,7 @@ Monitoring <span class="highlighted"><%= @host_count %></span> hosts. (Sorted by
     </div>
 
     <div class="el-e-right">
-      <span class="el-e-description"><%= host.message_count.to_i %> messages total</span>
+      <span class="el-e-description"></span>
     </div>
   </div>
 

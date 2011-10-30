@@ -5,7 +5,7 @@ class HostsController < ApplicationController
   filter_access_to :quickjump
 
   def index
-    @hosts = Host.desc :message_count
+    @hosts = Host.asc :host # all hosts, sorted alphabetically by hostname
     @host_count = Host.count
   end
 
