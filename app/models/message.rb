@@ -32,7 +32,7 @@ class Message
     @additionals = Hash.new
     plain.to_hash.keys.each do |key|
       key = key.to_s
-      value = plain[key]
+      value = plain[key.to_sym]
       if key[0,1] == ADDITIONAL_FIELD_SEPARATOR and !RESERVED_ADDITIONAL_FIELDS.include?(key.to_s)
         @additionals[key[1, key.length]] = value
       end
