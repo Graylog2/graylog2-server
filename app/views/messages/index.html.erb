@@ -21,6 +21,6 @@
   <br style="clear: both;" />
 
   <%= render :partial => "messages/table", :locals => { :messages => @messages,
-                                                        :total_messages => @total_count,
+                                                        :total_messages => (@quickfilter_result_count.blank? ? @total_count : @quickfilter_result_count), 
                                                         :additional_columns => @stream ? @stream.additional_columns : [] } %>
 </div>
