@@ -35,6 +35,7 @@ import org.graylog2.messagehandlers.amqp.AMQPBroker;
 import org.graylog2.messagehandlers.amqp.AMQPSubscribedQueue;
 import org.graylog2.messagehandlers.amqp.AMQPSubscriberThread;
 import org.graylog2.messagehandlers.gelf.GELFMainThread;
+import org.graylog2.messagehandlers.kafka.KafkaHandler;
 import org.graylog2.messagehandlers.syslog.SyslogServerThread;
 import org.graylog2.periodical.ChunkedGELFClientManagerThread;
 import org.graylog2.periodical.HostCounterCacheWriterThread;
@@ -153,6 +154,11 @@ public final class Main {
              initializeAMQP(configuration);
          }
 
+        // Initialize Kafka Handler if enabled
+        if(configuration.isKafkaEnabled()) {
+            initializeKafka(configuration);
+        }
+
         LOG.info("Graylog2 up and running.");
     }
 
@@ -251,6 +257,14 @@ public final class Main {
 
             LOG.info("AMQP threads started. (" + amqpQueues.size() + " queues)");
         }
+    }
+
+    private static void initializeKafka(Configuration configuration) {
+        KafkaHandler.start(configuration.getKafkaHost(),
+                           configuration.getKafkaPort(),
+                           configuration.getKafkaTimeout(),
+                           configuration.getKafkaGroupId(),
+                           configuration.getKafkaTopics());
     }
 
     private static void savePidFile(String pidFile) {
