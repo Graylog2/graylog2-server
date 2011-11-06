@@ -27,33 +27,31 @@ import org.graylog2.messagehandlers.common.MessageCounter;
 
 /**
  * MessageCountWriterThread.java: Sep 21, 2011 4:09:55 PM
- *
+ * <p/>
  * Periodically writes message counts to message count collection.
  *
  * @author Lennart Koopmann <lennart@socketfeed.com>
  */
-public class MessageCountWriterThread extends Thread {
+public class MessageCountWriterThread implements Runnable {
 
     private static final Logger LOG = Logger.getLogger(MessageCountWriterThread.class);
+
+    public static final int INITIAL_DELAY = 60;
+    public static final int PERIOD = 60;
 
     /**
      * Start the thread. Runs forever.
      */
-    @Override public void run() {
-        // Run forever.
-        while (true) {
-            // Run every 60 seconds.
-            try { Thread.sleep(60000); } catch(InterruptedException e) {}
-
-            MessageCounter counter = MessageCounter.getInstance();
-            try {
-                MongoBridge m = new MongoBridge();
-                m.writeMessageCounts(counter.getTotalCount(), counter.getStreamCounts(), counter.getHostCounts());
-            } catch (Exception e) {
-                LOG.warn("Error in MessageCountWriterThread: " + e.getMessage(), e);
-            } finally {
-                counter.resetAllCounts();
-            }
+    @Override
+    public void run() {
+        MessageCounter counter = MessageCounter.getInstance();
+        try {
+            MongoBridge m = new MongoBridge();
+            m.writeMessageCounts(counter.getTotalCount(), counter.getStreamCounts(), counter.getHostCounts());
+        } catch (Exception e) {
+            LOG.warn("Error in MessageCountWriterThread: " + e.getMessage(), e);
+        } finally {
+            counter.resetAllCounts();
         }
     }
 
