@@ -1,7 +1,6 @@
 package org.graylog2;
 
 import com.github.joschi.jadconfig.JadConfig;
-import com.github.joschi.jadconfig.ParameterException;
 import com.github.joschi.jadconfig.RepositoryException;
 import com.github.joschi.jadconfig.ValidationException;
 import com.github.joschi.jadconfig.repositories.InMemoryRepository;
@@ -46,11 +45,15 @@ public class ConfigurationTest {
         validProperties.put("forwarder_loggly_timeout", "3");
     }
 
-    @Test(expected = ParameterException.class)
-    public void testValidateRequiredPropertiesMissing() throws RepositoryException, ValidationException {
+    @Test(expected = ValidationException.class)
+    public void testValidateMongoDbAuth() throws RepositoryException, ValidationException {
+
+        validProperties.put("mongodb_useauth", "true");
+        validProperties.remove("mongodb_user");
+        validProperties.remove("mongodb_password");
 
         Configuration configuration = new Configuration();
-        new JadConfig(new InMemoryRepository(), configuration).process();
+        new JadConfig(new InMemoryRepository(validProperties), configuration).process();
     }
 
     @Test(expected = ValidationException.class)

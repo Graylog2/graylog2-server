@@ -56,10 +56,10 @@ public class Configuration {
     @Parameter(value = "mongodb_useauth", required = true)
     private boolean mongoUseAuth = false;
 
-    @Parameter(value = "mongodb_user", required = true)
+    @Parameter(value = "mongodb_user")
     private String mongoUser;
 
-    @Parameter(value = "mongodb_password", required = true)
+    @Parameter(value = "mongodb_password")
     private String mongoPassword;
 
     @Parameter(value = "mongodb_database", required = true)
@@ -81,7 +81,7 @@ public class Configuration {
     private List<String> mongoReplicaSet;
 
     @Parameter(value = "messages_collection_size", required = true, validator = PositiveLongValidator.class)
-    private long messagesCollectionSize = 50*1000*1000;
+    private long messagesCollectionSize = 50 * 1000 * 1000;
 
     @Parameter(value = "use_gelf", required = true)
     private boolean useGELF = false;
@@ -193,7 +193,7 @@ public class Configuration {
     }
 
     public int getForwarderLogglyTimeout() {
-        return forwarderLogglyTimeout*1000;
+        return forwarderLogglyTimeout * 1000;
     }
 
     public String getDroolsRulesFile() {
@@ -263,8 +263,13 @@ public class Configuration {
     @ValidatorMethod
     public void validate() throws ValidationException {
 
+        if (isMongoUseAuth() && (null == getMongoUser() || null == getMongoPassword())) {
+
+            throw new ValidationException("mongodb_user and mongodb_password have to be set if mongodb_useauth is true");
+        }
+
         // Is the syslog_procotol valid?
-        if(!Arrays.asList("tcp", "udp").contains(getSyslogProtocol())) {
+        if (!Arrays.asList("tcp", "udp").contains(getSyslogProtocol())) {
             throw new ValidationException("Invalid syslog_protocol: " + getSyslogProtocol());
         }
     }
