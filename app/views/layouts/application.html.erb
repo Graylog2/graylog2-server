@@ -12,7 +12,7 @@
   <%= stylesheet_link_tag "sections" %>
   <%= stylesheet_link_tag "messages" %>
   <%= stylesheet_link_tag "shell" %>
-  <%= hoptoad_javascript_notifier if Configuration.hoptoad_enabled? %>
+  <%= hoptoad_javascript_notifier if ::Configuration.hoptoad_enabled? %>
   <%= javascript_include_tag "jquery-1.4.2.min" %>
   <%= javascript_include_tag "jquery.autocomplete.min" %>
   <%= javascript_include_tag "jquery.numeric" %>

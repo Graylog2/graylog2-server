@@ -9,7 +9,7 @@
 
   <%= render :partial => "quickfilter"%>
 
-  <% unless params[:filters].blank? or !Configuration.allow_deleting %>
+  <% unless params[:filters].blank? or !::Configuration.allow_deleting %>
   <div id="messages-quickfilter-delete">
     <%= form_tag('/messages/deletebyquickfilter') do -%>
       <%= hidden_field_tag 'filters', params[:filters].to_json %>

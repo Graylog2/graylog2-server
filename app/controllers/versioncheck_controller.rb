@@ -15,7 +15,7 @@ class VersioncheckController < ApplicationController
   private
 
   def allowed?
-    if !Configuration.allow_version_check
+    if !::Configuration.allow_version_check
       render :text => "not allowed", :status => :forbidden
       return false
     end

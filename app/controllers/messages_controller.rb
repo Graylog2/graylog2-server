@@ -73,7 +73,7 @@ class MessagesController < ApplicationController
     @load_flot = true
     @use_backtotop = true
 
-    if Configuration.allow_version_check
+    if ::Configuration.allow_version_check
       @last_version_check = current_user.last_version_check
     end
   end

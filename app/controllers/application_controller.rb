@@ -30,7 +30,7 @@ class ApplicationController < ActionController::Base
     date = date.to_s
     return String.new if date == nil or date.length == 0
     tmp = DateTime.parse(date)
-    return tmp.strftime(Configuration.date_format)
+    return tmp.strftime(::Configuration.date_format)
   end
 
   private
