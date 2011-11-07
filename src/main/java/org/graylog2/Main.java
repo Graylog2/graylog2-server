@@ -34,6 +34,7 @@ import org.graylog2.indexer.Indexer;
 import org.graylog2.messagehandlers.amqp.AMQPBroker;
 import org.graylog2.messagehandlers.amqp.AMQPSubscribedQueue;
 import org.graylog2.messagehandlers.amqp.AMQPSubscriberThread;
+import org.graylog2.messagehandlers.gelf.ChunkedGELFClientManager;
 import org.graylog2.messagehandlers.gelf.GELFMainThread;
 import org.graylog2.messagehandlers.syslog.SyslogServerThread;
 import org.graylog2.periodical.ChunkedGELFClientManagerThread;
@@ -172,7 +173,7 @@ public final class Main {
         GELFMainThread gelfThread = new GELFMainThread(gelfPort);
         gelfThread.start();
 
-        ChunkedGELFClientManagerThread gelfManager = new ChunkedGELFClientManagerThread();
+        ChunkedGELFClientManagerThread gelfManager = new ChunkedGELFClientManagerThread(ChunkedGELFClientManager.getInstance());
         gelfManager.start();
 
         LOG.info("GELF threads started");
