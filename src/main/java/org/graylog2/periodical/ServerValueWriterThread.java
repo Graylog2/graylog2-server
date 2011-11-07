@@ -27,35 +27,32 @@ import org.graylog2.database.MongoBridge;
 
 /**
  * ServerValueWriterThread.java
- *
+ * <p/>
  * Periodically writes server values to MongoDB.
  *
  * @author Lennart Koopmann <lennart@socketfeed.com>
  */
-public class ServerValueWriterThread extends Thread {
+public class ServerValueWriterThread implements Runnable {
 
     private static final Logger LOG = Logger.getLogger(ServerValueWriterThread.class);
+
+    public static final int PERIOD = 60;
+    public static final int INITIAL_DELAY = 0;
 
     /**
      * Start the thread. Runs forever.
      */
-    @Override public void run() {
-        // Run forever.
-        while (true) {
-            try {
-                HostSystem.writeSystemHealthHistorically();
+    @Override
+    public void run() {
+        try {
+            HostSystem.writeSystemHealthHistorically();
 
-                // Ping. (Server is running.)
-                MongoBridge m = new MongoBridge();
-                m.setSimpleServerValue("ping", Tools.getUTCTimestamp());
+            // Ping. (Server is running.)
+            MongoBridge m = new MongoBridge();
+            m.setSimpleServerValue("ping", Tools.getUTCTimestamp());
 
-            } catch (Exception e) {
-                LOG.warn("Error in SystemValueHistoryWriterThread: " + e.getMessage(), e);
-            }
-            
-           // Run every 60 seconds.
-           try { Thread.sleep(60000); } catch(InterruptedException e) {}
+        } catch (Exception e) {
+            LOG.warn("Error in SystemValueHistoryWriterThread: " + e.getMessage(), e);
         }
     }
-
 }
