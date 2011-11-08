@@ -11,32 +11,31 @@ class MessageTest < ActiveSupport::TestCase
   end
 
   context "creation time" do
-    setup do
-      @message = Message.make
-    end
-
     should "be returned in request's timezone" do
-      assert_in_delta(Time.now.utc.to_f, @message.created_at, 3.0)
+      message = Message.new()
+      message.created_at = Time.now.to_i
+
+      assert_in_delta(Time.now.utc.to_f, message.created_at, 3.0)
 
       assert_equal 'UTC', Time.zone.name, "Please do not change default timezone"
-      assert_equal Time.zone.name, @message.created_at_time.zone
-      assert_equal Time.zone.at(@message.created_at),  @message.created_at_time
+      assert_equal Time.zone.name, message.created_at_time.zone
+      assert_equal Time.zone.at(message.created_at), message.created_at_time
 
-      Time.zone = "TOT"
-      assert_equal Time.zone.name, @message.created_at_time.zone
-      assert_equal Time.zone.at(@message.created_at),  @message.created_at_time
+      Time.zone = "CET"
+      assert_equal Time.zone.name, message.created_at_time.zone
+      assert_equal Time.zone.at(message.created_at), message.created_at_time
     end
   end
 
   should "always return message" do
-    message = Message.make(:message => nil)  # due to a bug in server, for example
+    message = Message.parse_from_hash(:message => nil)  # due to a bug in server, for example
     assert_equal '', message.message
   end
 
   should "return file and line without absent values" do
-    assert_equal 'foo.rb:42', Message.make(:file => 'foo.rb', :line => 42).file_and_line
-    assert_equal 'foo.rb',    Message.make(:file => 'foo.rb', :line => nil).file_and_line
-    assert_equal '',          Message.make(:file => nil,      :line => nil).file_and_line
+    assert_equal 'foo.rb:42', Message.parse_from_hash(:file => 'foo.rb', :line => 42).file_and_line
+    assert_equal 'foo.rb',    Message.parse_from_hash(:file => 'foo.rb', :line => nil).file_and_line
+    assert_equal '',          Message.parse_from_hash(:file => nil,      :line => nil).file_and_line
   end
 
   should "test count_of_hostgroup" do
@@ -79,7 +78,7 @@ class MessageTest < ActiveSupport::TestCase
   end
 
   should "find additional fields" do
-    message = Message.make(:host => "local", :message => "hi!", :_foo => "bar", :_baz => "1", :invalid => "123")
+    message = Message.parse_from_hash(:host => "local", :message => "hi!", :_foo => "bar", :_baz => "1", :invalid => "123")
     assert message.additional_fields?
     assert_equal({'foo' => 'bar', 'baz' => '1'}, message.additional_fields)
   end

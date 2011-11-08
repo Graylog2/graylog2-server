@@ -13,13 +13,26 @@ class Message
     m = self.new
 
     m.plain = x
-    m.total_result_count = x.total
+    m.total_result_count = x.total rescue nil
     @fields.each do |f|
-      m.__send__(:"#{f}=", x.__send__(f))
+      m.__send__(:"#{f}=", x.__send__(f)) rescue nil
 
       # XXX ELASTIC: zomg workaround
       # - __send__ creates a Rake::FileTask instead of a string. not sure why yet
-      m.file = x[:file] if f == :file
+      m.file = x[:file] if f == :file rescue nil
+    end
+
+    return m
+  end
+
+  # XXX ELASTIC ZZZZOMMMGG
+  def self.parse_from_hash(x)
+    m = self.new
+
+    m.plain = x
+    m.total_result_count = x.total rescue nil
+    @fields.each do |f|
+      m.__send__(:"#{f}=", x[f]) rescue nil
     end
 
     return m
@@ -45,7 +58,7 @@ class Message
 
   # Overwriting the message getter. This always applies the filtering of filtered terms.
   def message
-    FilteredTerm.apply(@message)
+    FilteredTerm.apply(@message) || ''
   end
 
   # Returns +created_at+ as +Time+ in request's timezone
@@ -54,7 +67,7 @@ class Message
   end
 
   def file_and_line
-    self.file + (":#{@line}" unless @line.blank?).to_s unless self.file.blank?
+    (self.file + (":#{self.line}" unless self.line.blank?).to_s unless self.file.blank?) || ''
   end
 
   def additional_fields?
