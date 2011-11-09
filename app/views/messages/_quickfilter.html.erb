@@ -2,7 +2,7 @@
 
 <%= form_tag(params, :method => :get) do -%>
   <dl id="messages-quickfilter-fields">
-    <dt><%= label_tag "filters[:message]", "Message (regex):" %></dt>
+    <dt><%= label_tag "filters[:message]", "Message:" %></dt>
     <dd><%= text_field_tag "filters[message]", params[:filters].blank? ? nil : params[:filters][:message] %></dd>
 
     <dt><%= label_tag "filters[date]", "Timeframe:" %></dt>
