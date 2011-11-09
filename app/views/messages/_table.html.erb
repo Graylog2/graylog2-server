@@ -12,11 +12,11 @@ additional_columns ||= []
       if ($(this).hasClass("active")) {
         $("tr").removeClass("messages-today");
         $(this).removeClass("active");
-        $(this).attr("src", "../images/icons/sun.png");
+        $(this).attr("src", "/images/icons/sun.png");
       } else {
         d = new Date();
         $(".udate-" + d.getFullYear() + "-" + (d.getMonth()+1) + "-" + d.getDate()).addClass("messages-today");
-        $(this).attr("src", "../images/icons/sun_active.png");
+        $(this).attr("src", "/images/icons/sun_active.png");
         $(this).addClass("active");
       }
     })
