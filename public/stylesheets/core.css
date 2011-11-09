@@ -561,3 +561,13 @@ label {
   position: relative;
   top: 5px;
 }
+
+.pagination {
+  width: 100%;
+  text-align: right;
+  margin-top: 25px;
+}
+
+.pagination .page {
+  font-weight: bold;
+}

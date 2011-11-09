@@ -51,6 +51,8 @@ GEM
       builder
     i18n (0.6.0)
     json (1.5.4)
+    kaminari (0.12.4)
+      rails (>= 3.0.0)
     machinist (1.0.6)
     machinist_mongo (1.2.0)
       machinist (~> 1.0.6)
@@ -144,6 +146,7 @@ DEPENDENCIES
   home_run (~> 1.0.2)
   hoptoad_notifier (~> 2.4.9)
   json (~> 1.5.1)
+  kaminari (~> 0.12.4)
   machinist_mongo (~> 1.2.0)
   mocha (~> 0.9.12)
   mongoid (= 2.3.3)

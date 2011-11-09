@@ -5,7 +5,7 @@ class HostsController < ApplicationController
   filter_access_to :quickjump
 
   def index
-    @hosts = Host.asc :host # all hosts, sorted alphabetically by hostname
+    @hosts = Host.asc(:host).page(params[:page]) # all hosts, sorted alphabetically by hostname, paginated
     @host_count = Host.count
   end
 
