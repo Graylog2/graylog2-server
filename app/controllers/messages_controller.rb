@@ -57,6 +57,11 @@ class MessagesController < ApplicationController
         @total_count = MessageGateway.total_count # XXX ELASTIC Possibly read cached from first all_paginated result?!
       end
     end
+  rescue Tire::Search::SearchRequestFailed
+      flash[:error] = "Syntax error in search query."
+      @messages = MessageResult.new
+      @total_count = 0
+      @quickfilter_result_count = @messages.total_result_count
   end
 
   # Not possible to do this via before_filter because of scope decision by params hash
