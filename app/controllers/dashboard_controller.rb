@@ -9,9 +9,9 @@ class DashboardController < ApplicationController
   def index
     if params[:stream_id].blank?
       @timespan = Setting.get_message_count_interval(current_user)
-      @message_count = Message.count_of_last_minutes(@timespan)
+      @message_count = MessageCount.total_count_of_last_minutes(@timespan)
       @max_messages = Setting.get_message_max_count(current_user)
-      @messages = Message.all_paginated
+      @messages = MessageGateway.all_paginated
     else
       stream = Stream.find_by_id(params[:stream_id])
       @stream_title = stream.title
@@ -24,7 +24,7 @@ class DashboardController < ApplicationController
         @max_messages = STANDARD_MAX_MESSAGES
         @timespan = STANDARD_TIMESPAN
       end
-      @messages = Message.by_stream(stream.id).all_paginated
+      @messages = MessageGateway.all_of_stream_paginated(stream.id)
     end
   end
 

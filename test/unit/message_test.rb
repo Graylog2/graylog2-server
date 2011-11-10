@@ -2,7 +2,7 @@ require 'test_helper'
 
 class MessageTest < ActiveSupport::TestCase
   should "have few time fields" do
-    message = Message.make
+    message = Message.parse_from_hash({:created_at => Time.now.to_f})
 
     assert_kind_of(Float, message.created_at)
     assert !message.respond_to?(:timestamp), "Do not define method like this."
@@ -38,45 +38,6 @@ class MessageTest < ActiveSupport::TestCase
     assert_equal '',          Message.parse_from_hash(:file => nil,      :line => nil).file_and_line
   end
 
-  should "test count_of_hostgroup" do
-    Host.make(:host => "somehost").save
-
-    Message.make(:host => "foobar", :message => "bla").save
-    Message.make(:host => "foobarish", :message => "gdfgdfhh").save
-    Message.make(:host => "foofoo", :message => "foobarish").save
-    Message.make(:host => "somehost", :message => "gdfgfdd").save
-    Message.make(:host => "somehost", :message => "wat").save
-    Message.make(:host => "anotherhost", :message => "foobar").save
-    Message.make(:host => "anotherfoohost", :message => "don't match me").save
-
-    hostgroup = Hostgroup.make
-    HostgroupHost.make(:hostname => /^foo/, :ruletype => HostgroupHost::TYPE_REGEX, :hostgroup_id => hostgroup.id)
-    HostgroupHost.make(:hostname => "somehost", :ruletype => HostgroupHost::TYPE_SIMPLE, :hostgroup_id => hostgroup.id)
-    HostgroupHost.make(:hostname => /^another/, :ruletype => HostgroupHost::TYPE_REGEX, :hostgroup_id => hostgroup.id)
-    assert_equal 7, Message.count_of_hostgroup(hostgroup)
-  end
-
-  should "counts of last minutes" do
-    Timecop.freeze(2011, 5, 12, rand(24), rand(60), 5)   # sec > 0 is important
-    (0..2).to_a.each do |i|
-      (i * 2 + 1).times { Message.make(:created_at => i.minutes.ago.to_f) }
-    end
-
-    expected = [ {:minute=>3.minutes.ago - 5, :count=>0},
-                 {:minute=>2.minutes.ago - 5, :count=>5},
-                 {:minute=>1.minute.ago  - 5, :count=>3} ]
-    assert_equal expected, Message.counts_of_last_minutes(3), "All messages:\n#{Message.all.to_a.map(&:created_at_time).join("\n")}"
-  end
-
-  should "count of last minutes" do
-    Timecop.freeze(2011, 5, 12, rand(24), rand(60), 5)   # sec > 0 is important
-    (0..2).to_a.each do |i|
-      (i * 2 + 1).times { Message.make(:created_at => i.minutes.ago.to_f) }
-    end
-
-    assert_equal 4, Message.count_of_last_minutes(2), "All messages:\n#{Message.all.to_a.map(&:created_at_time).join("\n")}"
-  end
-
   should "find additional fields" do
     message = Message.parse_from_hash(:host => "local", :message => "hi!", :_foo => "bar", :_baz => "1", :invalid => "123")
     assert message.additional_fields?
@@ -84,14 +45,14 @@ class MessageTest < ActiveSupport::TestCase
   end
 
   should "correctly paginate" do
-    (Message::LIMIT+10).times { Message.make }
-    assert_equal Message::LIMIT, Message.all_paginated(1).count
-    assert_equal 10, Message.all_paginated(2).count
+    (Message::LIMIT+10).times { bm }
+    assert_equal Message::LIMIT, MessageGateway.all_paginated(1).count
+    assert_equal 10, MessageGateway.all_paginated(2).count
   end
 
-  should "corretly paginate when no page count is given" do
-    (Message::LIMIT+10).times { Message.make }
-    assert_equal Message::LIMIT, Message.all_paginated().count
-    assert_equal 10, Message.all_paginated(2).count
+  should "correctly paginate when no page count is given" do
+    (Message::LIMIT+10).times { bm }
+    assert_equal Message::LIMIT, MessageGateway.all_paginated().count
+    assert_equal 10, MessageGateway.all_paginated(2).count
   end
 end

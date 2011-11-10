@@ -15,11 +15,13 @@ class Message
     m.plain = x
     m.total_result_count = x.total rescue nil
     @fields.each do |f|
-      m.__send__(:"#{f}=", x.__send__(f)) rescue nil
-
       # XXX ELASTIC: zomg workaround
       # - __send__ creates a Rake::FileTask instead of a string. not sure why yet
-      m.file = x[:file] if f == :file rescue nil
+      if f != :file
+        m.__send__(:"#{f}=", x.__send__(f)) rescue nil
+      else
+        m.file = x[:file] rescue nil
+      end
     end
 
     return m

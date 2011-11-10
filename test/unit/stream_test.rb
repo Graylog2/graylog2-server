@@ -104,15 +104,15 @@ class StreamTest < ActiveSupport::TestCase
 
     should "mark stream as not alarmed if under limit" do
       stream = Stream.make(:alarm_active => true, :alarm_limit => 5, :alarm_timespan => 10, :alarm_force => true)
-      4.times { Message.make(:streams => stream.id) }
+      MessageCount.make(:timestamp => 1.minute.ago, :streams => { stream.id.to_s => 4 } )
 
       assert_equal :no_alarm, stream.alarm_status(User.make)
     end
 
     should "mark stream as alarmed if over limit" do
       stream = Stream.make(:alarm_active => true, :alarm_limit => 10, :alarm_timespan => 10, :alarm_force => true)
-      8.times { Message.make(:streams => stream.id) }
-      5.times { Message.make(:streams => [ stream.id, Stream.make.id ]) } # this goes over the alarm_limit
+      MessageCount.make(:timestamp => 1.minute.ago, :streams => { stream.id.to_s => 8 } )
+      MessageCount.make(:timestamp => 1.minute.ago, :streams => { stream.id.to_s => 5, Stream.make.id.to_s => 9001 } )
 
       assert_equal :alarm, stream.alarm_status(User.make)
     end

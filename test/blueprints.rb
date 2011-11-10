@@ -6,7 +6,7 @@ Sham.name { Faker::Lorem.words(15).join }
 Sham.host { Faker::Internet.domain_name }
 
 Stream.blueprint do
-  shortname ActiveSupport::SecureRandom.hex(6)
+  shortname SecureRandom.hex(6)
   title
 end
 
@@ -30,4 +30,7 @@ Host.blueprint do
 end
 
 AlertedStream.blueprint do
+end
+
+MessageCount.blueprint do
 end

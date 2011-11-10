@@ -14,7 +14,13 @@ class MessageGateway
   include Tire::Model::Search
   include Mongoid::Document
 
-  INDEX_NAME = "graylog2"
+  # XXX ELASTIC: sucks. read from yml
+  if Rails.env == "test"
+    INDEX_NAME = "graylog2_test"
+  else
+    INDEX_NAME = "graylog2"
+  end
+
   TYPE_NAME = "message"
 
   index_name(INDEX_NAME)

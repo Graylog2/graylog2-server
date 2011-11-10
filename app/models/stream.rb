@@ -64,15 +64,6 @@ class Stream
     all.where({:alarm_active => true}).collect &:id
   end
 
-  def self.get_message_count(stream_id)
-    return 0 if Stream.find(stream_id).streamrules.blank?
-    Message.count(:conditions => Message.by_stream(stream_id).criteria)
-  end
-
-  def message_count
-    Stream.get_message_count(self.id)
-  end
-
   def message_count_since(since)
     return Stream.message_count_since(id, since)
   end
@@ -87,8 +78,8 @@ class Stream
   end
 
   def self.message_count_since(stream_id, since)
-    #Message.by_stream(stream_id).where(:created_at.gt => since.to_i).count
-    0
+    minutes_ago = (Time.now.to_f-since.to_f)/60 rescue 0
+    MessageCount.total_count_of_last_minutes(minutes_ago, :stream_id => stream_id)
   end
 
   def self.get_distinct_hosts(stream_id)
@@ -130,7 +121,7 @@ class Stream
       return :disabled if !alerted?(user)
     end
 
-    stream_count = self.message_count_since(self.alarm_timespan.minutes.ago.to_i)
+    stream_count = self.message_count_since(self.alarm_timespan.minutes.ago.to_f)
     return stream_count > self.alarm_limit ? :alarm : :no_alarm
   end
 

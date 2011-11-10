@@ -6,12 +6,12 @@ class MessageCount
   field :streams, :type => Hash
   field :hosts, :type => Hash
   
-  def self.total_count_of_last_minutes(x)
+  def self.total_count_of_last_minutes(x, opts = {})
     return 0 if x == 0
 
     # XXX ELASTIC - this sucks. use map reduce here.
     total = 0
-    counts_of_last_minutes(x).each do |c|
+    counts_of_last_minutes(x, opts).each do |c|
       total += c[:count]
     end
 
