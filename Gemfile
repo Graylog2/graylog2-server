@@ -1,7 +1,7 @@
 source :rubygems
 
 gem 'rack', '~> 1.3.5'
-gem 'rake', '~> 0.8.7'
+gem 'rake', '~> 0.9.2'
 gem 'rails', '~> 3.1.1'
 gem 'json', '~> 1.5.1'
 gem 'chronic', '~> 0.3.0'
@@ -10,7 +10,7 @@ gem 'graylog2-declarative_authorization', '~> 0.5.2', :require => 'declarative_a
 gem 'hoptoad_notifier', '~> 2.4.9'
 gem 'rpm_contrib', '~> 2.1.1'
 gem 'mongoid', '2.3.3'
-gem "tire", "~> 0.3.2"
+gem "tire", "~> 0.3.10"
 gem 'bson', "~> 1.3.1"
 gem 'bson_ext', "~> 1.3.1", :platforms => :ruby
 gem 'home_run', '~> 1.0.2', :platforms => :ruby
