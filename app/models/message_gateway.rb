@@ -45,6 +45,11 @@ class MessageGateway
     wrap @index.retrieve(TYPE_NAME, id)
   end
 
+  def self.dynamic_search(what, with_default_query_options = false)
+    what = what.merge(@default_query_options) if with_default_query_options
+    wrap Tire.search(INDEX_NAME, what)
+  end
+
   def self.all_by_quickfilter(filters, page = 1, opts = {})
     r = search pagination_options(page).merge(@default_query_options) do
       query do

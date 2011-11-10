@@ -15,7 +15,9 @@ class Shell
 
   ALLOWED_SELECTORS = %w(all stream streams)
   ALLOWED_OPERATORS = %w(count find distinct distribution)
-  ALLOWED_CONDITIONALS = %w(>= <= > < = !=)
+  RANGE_QUERY_CONDITIONALS = %w(>= <= > <)
+  TEXT_QUERY_CONDITIONALS = %w(= !=)
+  ALLOWED_CONDITIONALS = RANGE_QUERY_CONDITIONALS | TEXT_QUERY_CONDITIONALS
 
   MAX_LIMIT = 500
 
@@ -23,7 +25,7 @@ class Shell
 
   def initialize(cmd)
     @command = cmd.strip
-
+    
     parse
   end
 
@@ -36,13 +38,11 @@ class Shell
       else raise InvalidOperatorException
     end
 
-    @mongo_selector = criteria.selector
-
     return {
       :operation => @operator,
       :result => @result,
       :operator_options => @operator_options,
-      :mongo_selector => @mongo_selector
+      :query_hash => @query_hash
     }
   end
 
@@ -153,19 +153,98 @@ class Shell
     return String.new
   end
 
-  def mongofy_options(options)
+  def elastify_options(options)
+    # options.inspect: {"host"=>{:value=>"example.org", :condition=>"!="}, "_http_response_code"=>[{:value=>300, :condition=>"<"}, {:value=>200, :condition=>">="}]}
+
+    range_queries = extract_range_queries(options)
+    text_queries = extract_text_queries(options)
+
+    # range_queries.inspect: [{"_http_response_code"=>{:value=>300, :condition=>"<"}}, {"_http_response_code"=>{:value=>200, :condition=>">="}}]
+    # text_queries.inspect:  [{"host"=>{:value=>"example.org", :condition=>"!="}}]
+
     criteria = Hash.new
-    unless options.blank?
-      options.each do |k,v|
-        criteria[k] = mongo_conditionize(v)
+    range_criterias = Array.new
+    elastic_conditionize_ranges(range_queries).each do |range|
+      range_criterias << { :range => range }
+    end
+
+    # Add range criterias.
+    unless range_criterias.blank?
+      criteria[:filtered] = Hash.new
+      criteria[:filtered][:query] = { "match_all" => Hash.new } # possibly plug text_queries here
+      criteria[:filtered][:filter] = Hash.new 
+      criteria[:filtered][:filter][:and] = range_criterias 
+    end
+
+    # Set to match all, if nothing was selected before.
+    criteria = { "match_all" => Hash.new } if criteria.blank?
+
+    return { :query => criteria } 
+  end
+
+  def elastic_conditionize_ranges(ranges)
+    result = Array.new
+    # normalize on key first
+    normalized = Hash.new
+    ranges.each do |range|
+      # XXX something smells here
+      # range.inspect: {"_http_response_code"=>{:value=>300, :condition=>"<"}}
+      range.each do |field, conditions|
+        normalized[field] = Array.new if normalized[field].nil?
+        normalized[field] << conditions
+      end
+    end
+  
+    # normalized.inspect: {"_http_response_code"=>[{:value=>300, :condition=>"<"}, {:value=>200, :condition=>">="}]} 
+    normalized.each do |field, conditions|
+      conditions.each do |condition|
+        result << { field => { map_elastic_condition(condition[:condition]) => condition[:value] }}
+      end
+    end
+   
+    # XXX result.inspect: 
+    return result
+  end
+
+  def extract_range_queries(options)
+    range_queries = Array.new
+    return range_queries if options.blank?
+
+    options.each do |k,v|
+      # XXX refactor
+      if v.is_a?(Hash)
+        range_queries << { k => v} if RANGE_QUERY_CONDITIONALS.include?(v[:condition])
+      elsif v.is_a?(Array)
+        v.each do |option|
+          range_queries << { k => option } if RANGE_QUERY_CONDITIONALS.include?(option[:condition])
+        end
       end
     end
 
-    return criteria
+    return range_queries
+  end
+  
+  # XXX refactor: merge with range query extractor
+  def extract_text_queries(options)
+    text_queries = Array.new
+    return text_queries if options.blank?
+
+    options.each do |k,v|
+      # XXX refactor
+      if v.is_a?(Hash)
+        text_queries << { k => v} if TEXT_QUERY_CONDITIONALS.include?(v[:condition])
+      elsif v.is_a?(Array)
+        v.each do |option|
+          text_queries << { k => option } if TEXT_QUERY_CONDITIONALS.include?(option[:condition])
+        end
+      end
+    end
+
+    return text_queries
   end
 
-  def mongofy_stream_narrows(streams)
-    return nil if streams.blank?
+  def elastify_stream_narrows(streams)
+    return Hash.new if streams.blank?
 
     criteria = Hash.new
 
@@ -183,42 +262,13 @@ class Shell
     return criteria
   end
 
-  def mongo_conditionize(v)
-    if v.is_a?(Hash)
-      raise InvalidOptionException if !ALLOWED_CONDITIONALS.include?(v[:condition])
-
-      if v[:condition] == "="
-        return v[:value] # No special mongo treatment for = needed.
-      else
-        return { map_mongo_condition(v[:condition]) => v[:value] }
-      end
-    elsif v.is_a?(Array)
-      conditions = Hash.new
-      v.each do |condition|
-        # Return if there is a = condition as this can't be combined with other conditions.
-        if condition[:condition] == "="
-          return condition[:value] # No special mongo treatment for = needed.
-        elsif condition[:condition] == "!=" # This needs special treatment with $nin mongo operator.
-          conditions["$nin"] = Array.new if conditions["$nin"].blank?
-          conditions["$nin"] << condition[:value]
-        else
-          conditions[map_mongo_condition(condition[:condition])] = condition[:value]
-        end
-      end
-
-      return conditions
-    else
-      raise InvalidOptionException
-    end
-  end
-
-  def map_mongo_condition(c)
+  # XXX REMOVE?
+  def map_elastic_condition(c)
     case c
-      when ">=" then return "$gte"
-      when "<=" then return "$lte"
-      when ">" then return "$gt"
-      when "<" then return "$lt"
-      when "!=" then return "$ne"
+      when ">=" then return "gte"
+      when "<=" then return "lte"
+      when ">" then return "gt"
+      when "<" then return "lt"
       else raise InvalidOptionException
     end
   end
@@ -229,11 +279,11 @@ class Shell
   end
 
   def criteria
-    Message.not_deleted.where(mongofy_options(@operator_options)).where(mongofy_stream_narrows(@stream_narrows))
+    elastify_options(@operator_options).merge(elastify_stream_narrows(@stream_narrows))
   end
 
   def perform_count
-    @result = criteria.count
+    @result = MessageGateway.dynamic_search(criteria).total_result_count
   end
 
   def perform_find

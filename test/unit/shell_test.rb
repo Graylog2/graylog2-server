@@ -37,10 +37,10 @@ class ShellTest < ActiveSupport::TestCase
     end
 
     should "accept negative integers in option values" do
-      3.times { Message.make(:_foo => -9001) }
-      1.times { Message.make(:_foo => 9001) }
-      1.times { Message.make(:_foo => 5000) }
-      1.times { Message.make(:_foo => 0) }
+      3.times { bm(:_foo => -9001) }
+      1.times { bm(:_foo => 9001) }
+      1.times { bm(:_foo => 5000) }
+      1.times { bm(:_foo => 0) }
 
       s = Shell.new('all.count(_foo = -9001)')
       result = s.compute
@@ -60,11 +60,11 @@ class ShellTest < ActiveSupport::TestCase
     end
 
     should "respect conditional operators" do
-      3.times { Message.make(:host => "example.org", :_http_response_code => 500) }
-      7.times { Message.make(:host => "example.com", :_http_response_code => 500) }
-      8.times { Message.make(:host => "example.com", :_http_response_code => 200) }
-      10.times { Message.make(:host => "example.com", :_http_response_code => 201) }
-      1.times { Message.make(:host => "example.com", :_http_response_code => 300) }
+      3.times { bm(:host => "example.org", :_http_response_code => 500) }
+      7.times { bm(:host => "example.com", :_http_response_code => 500) }
+      8.times { bm(:host => "example.com", :_http_response_code => 200) }
+      10.times { bm(:host => "example.com", :_http_response_code => 201) }
+      1.times { bm(:host => "example.com", :_http_response_code => 300) }
 
       s = Shell.new('all.count(host != "example.org", _http_response_code < 300, _http_response_code >= 200)')
       result = s.compute
