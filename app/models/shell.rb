@@ -153,6 +153,7 @@ class Shell
     return String.new
   end
 
+  # https://gist.github.com/995045
   def elastify_options(options)
     # options.inspect: {"host"=>{:value=>"example.org", :condition=>"!="}, "_http_response_code"=>[{:value=>300, :condition=>"<"}, {:value=>200, :condition=>">="}]}
 
