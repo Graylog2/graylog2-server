@@ -36,6 +36,17 @@ class ShellTest < ActiveSupport::TestCase
       assert_equal "find", s.operator
     end
 
+    should "work with a simple find equal string query" do
+      2.times { bm(:message => "OHAI thar") }
+      3.times { bm(:message => "wat") }
+
+      s = Shell.new('all.count(message = "OHAI thar")')
+      result = s.compute
+
+      assert_equal "count", result[:operation]
+      assert_equal 2, result[:result]
+    end
+
     should "accept negative integers in option values" do
       3.times { bm(:_foo => -9001) }
       1.times { bm(:_foo => 9001) }
