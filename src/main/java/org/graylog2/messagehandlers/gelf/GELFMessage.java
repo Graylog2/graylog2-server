@@ -463,4 +463,36 @@ public class GELFMessage {
         this.createdAt = createdAt;
     }
 
+    public Map<String, Object> toElasticSearchObject() {
+        Map<String, Object> obj = new HashMap<String, Object>();
+        obj.put("message", this.getShortMessage());
+        obj.put("full_message", this.getFullMessage());
+        obj.put("file", this.getFile());
+        obj.put("line", this.getLine());
+        obj.put("host", this.getHost());
+        obj.put("facility", this.getFacility());
+        obj.put("level", this.getLevel());
+
+        // Add additional fields. XXX PERFORMANCE
+        for(Map.Entry<String, Object> entry : this.getAdditionalData().entrySet()) {
+            obj.put(entry.getKey(), entry.getValue());
+        }
+
+        if (this.getCreatedAt() <= 0) {
+            // This should have already been set at receiving, but to make sure...
+            obj.put("created_at", Tools.getUTCTimestampWithMilliseconds());
+        } else {
+            obj.put("created_at", this.getCreatedAt());
+        }
+
+        // Manually converting stream ID to string - caused strange problems without it.
+        List<String> streamIds = new ArrayList<String>();
+        for (ObjectId id : this.getStreamIds()) {
+            streamIds.add(id.toString());
+        }
+        obj.put("streams", streamIds);
+
+        return obj;
+    }
+
 }

@@ -48,6 +48,8 @@ import java.util.List;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
+import org.graylog2.indexer.Mapping;
+import org.graylog2.periodical.BulkIndexerThread;
 
 /**
  * Main class of Graylog2.
@@ -60,7 +62,7 @@ public final class Main {
     private static final String GRAYLOG2_VERSION = "0.9.6-PREVIEW";
 
     public static RulesEngine drools = null;
-    private static final int SCHEDULED_THREADS_POOL_SIZE = 4;
+    private static final int SCHEDULED_THREADS_POOL_SIZE = 5;
 
     private Main() {
     }
@@ -151,6 +153,9 @@ public final class Main {
         // Start message counter thread.
         initializeMessageCounters(scheduler);
 
+        // Inizialize message queue.
+        initializeMessageQueue(scheduler, configuration);
+
         // Start GELF threads
         if (configuration.isUseGELF()) {
             initializeGELFThreads(configuration.getGelfListenPort(), scheduler);
@@ -169,6 +174,13 @@ public final class Main {
         scheduler.scheduleAtFixedRate(new HostCounterCacheWriterThread(), HostCounterCacheWriterThread.INITIAL_DELAY, HostCounterCacheWriterThread.PERIOD, TimeUnit.SECONDS);
 
         LOG.info("Host count cache is up.");
+    }
+
+    private static void initializeMessageQueue(ScheduledExecutorService scheduler, Configuration configuration) {
+
+        scheduler.scheduleAtFixedRate(new BulkIndexerThread(configuration), BulkIndexerThread.INITIAL_DELAY, configuration.getMessageQueuePollFrequency(), TimeUnit.SECONDS);
+
+        LOG.info("Message queue initialized .");
     }
 
     private static void initializeMessageCounters(ScheduledExecutorService scheduler) {

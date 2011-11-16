@@ -24,7 +24,6 @@ import org.apache.log4j.Logger;
 import org.graylog2.Tools;
 import org.graylog2.blacklists.Blacklist;
 import org.graylog2.forwarders.Forwarder;
-import org.graylog2.indexer.Indexer;
 import org.graylog2.messagehandlers.common.HostUpsertHook;
 import org.graylog2.messagehandlers.common.MessageCountUpdateHook;
 import org.graylog2.messagehandlers.common.MessageParserHook;
@@ -33,6 +32,7 @@ import org.graylog2.messagehandlers.common.ReceiveHookManager;
 import java.io.IOException;
 import java.net.DatagramPacket;
 import java.util.zip.DataFormatException;
+import org.graylog2.messagequeue.MessageQueue;
 
 /**
  * ChunkedGELFClient.java: Sep 14, 2010 6:38:38 PM
@@ -76,7 +76,7 @@ public class ChunkedGELFClientHandler extends GELFClientHandlerBase implements G
             throw new InvalidGELFHeaderException(e.toString(), e);
         }
 
-        LOG.info("Got GELF message chunk: " + chunk.toString());
+        LOG.debug("Got GELF message chunk: " + chunk.toString());
 
         // Catch the full message data if all chunks are complete.
         if (possiblyCompleteMessage != null) {
@@ -86,7 +86,7 @@ public class ChunkedGELFClientHandler extends GELFClientHandlerBase implements G
             String hash = null;
             try {
                 hash = completeMessage.getHash();
-                LOG.info("Chunked GELF message <" + hash + "> complete. Handling now.");
+                LOG.debug("Chunked GELF message <" + hash + "> complete. Handling now.");
                 data = completeMessage.getData();
             } catch (IncompleteGELFMessageException e) {
                 LOG.warn("Tried to fetch information from incomplete chunked GELF message", e);
@@ -116,11 +116,11 @@ public class ChunkedGELFClientHandler extends GELFClientHandlerBase implements G
         switch (type) {
             // Decompress ZLIB
             case GELF.TYPE_ZLIB:
-                LOG.info("Chunked GELF message <" + hash + "> is ZLIB compressed.");
+                LOG.debug("Chunked GELF message <" + hash + "> is ZLIB compressed.");
                 this.clientMessage = Tools.decompressZlib(data);
                 break;
             case GELF.TYPE_GZIP:
-                LOG.info("Chunked GELF message <" + hash + "> is GZIP compressed.");
+                LOG.debug("Chunked GELF message <" + hash + "> is GZIP compressed.");
                 this.clientMessage = Tools.decompressGzip(data);
                 break;
             default:
@@ -147,7 +147,7 @@ public class ChunkedGELFClientHandler extends GELFClientHandlerBase implements G
             }
 
             if (!this.message.convertedFromSyslog()) {
-                LOG.info("Got GELF message: " + this.message.toString());
+                LOG.debug("Got GELF message: " + this.message.toString());
             }
 
             // Blacklisted?
@@ -158,8 +158,8 @@ public class ChunkedGELFClientHandler extends GELFClientHandlerBase implements G
             // PreProcess message based on filters. Insert message into indexer.
             ReceiveHookManager.preProcess(new MessageParserHook(), message);
             if(!message.getFilterOut()) {
-                // Index message and post-process if it was successful.
-                if (Indexer.index(message)) {
+                // Add message to queue and post-process if it was successful.
+                if (MessageQueue.getInstance().add(message)) {
                     // Update periodic counts collection.
                     ReceiveHookManager.postProcess(new MessageCountUpdateHook(), message);
 

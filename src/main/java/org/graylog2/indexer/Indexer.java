@@ -95,49 +95,31 @@ public class Indexer {
     }
 
     /**
-     * Indexes a message.
+     * Bulk-indexes/persists messages to ElasticSearch.
+     * http://www.elasticsearch.org/guide/reference/api/bulk.html
      *
      * @param message The message to index.
      * @return
      */
-    public static boolean index(GELFMessage message) {
-        Map<String, Object> obj = new HashMap<String, Object>();
-        obj.put("message", message.getShortMessage());
-        obj.put("full_message", message.getFullMessage());
-        obj.put("file", message.getFile());
-        obj.put("line", message.getLine());
-        obj.put("host", message.getHost());
-        obj.put("facility", message.getFacility());
-        obj.put("level", message.getLevel());
-
-        // Add additional fields. XXX PERFORMANCE
-        for(Map.Entry<String, Object> entry : message.getAdditionalData().entrySet()) {
-            obj.put(entry.getKey(), entry.getValue());
+    public static boolean bulkIndex(List<GELFMessage> messages) {
+        if (messages.isEmpty()) {
+            return true;
         }
+        
+        String batch = "";
 
-        if (message.getCreatedAt() <= 0) {
-            // This should have already been set at receiving, but to make sure...
-            obj.put("created_at", Tools.getUTCTimestampWithMilliseconds());
-        } else {
-            obj.put("created_at", message.getCreatedAt());
+        for (GELFMessage message : messages) {
+            batch += "{\"index\":{\"_index\":\"" + INDEX + "\",\"_type\":\"" + TYPE + "\"}}\n";
+            batch += JSONValue.toJSONString(message.toElasticSearchObject()) + "\n";
         }
-
-        ////// XXX ELASTIC: required to manually convert to string? caused strange problems without it.
-        List<String> streamIds = new ArrayList<String>();
-        for (ObjectId id : message.getStreamIds()) {
-            streamIds.add(id.toString());
-        }
-
-        obj.put("streams", streamIds);
-        ///////////////
 
         try {
-            URL url = new URL(Indexer.buildIndexWithTypeUrl());
+            URL url = new URL("http://localhost:9200/_bulk");
             HttpURLConnection conn = (HttpURLConnection) url.openConnection();
             conn.setDoOutput(true);
             conn.setRequestMethod("POST");
             OutputStreamWriter writer = new OutputStreamWriter(conn.getOutputStream());
-            writer.write(JSONValue.toJSONString(obj));
+            writer.write(batch);
             writer.close();
             if (conn.getResponseCode() == 201) {
                 return true;
@@ -146,7 +128,7 @@ public class Indexer {
                 return false; 
             }
         } catch (IOException e) {
-            LOG.warn("IO error when trying to index message: " + e.getMessage(), e);
+            LOG.warn("IO error when trying to index messages: " + e.getMessage(), e);
         }
 
         // Not reached.

@@ -24,7 +24,6 @@ import org.apache.log4j.Logger;
 import org.graylog2.Tools;
 import org.graylog2.blacklists.Blacklist;
 import org.graylog2.forwarders.Forwarder;
-import org.graylog2.indexer.Indexer;
 import org.graylog2.messagehandlers.common.HostUpsertHook;
 import org.graylog2.messagehandlers.common.MessageCountUpdateHook;
 import org.graylog2.messagehandlers.common.MessageParserHook;
@@ -34,6 +33,7 @@ import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.DatagramPacket;
 import java.util.zip.DataFormatException;
+import org.graylog2.messagequeue.MessageQueue;
 
 /**
  * GELFClient.java: Jun 23, 2010 7:15:12 PM
@@ -70,13 +70,13 @@ public class SimpleGELFClientHandler extends GELFClientHandlerBase implements GE
             switch (type) {
                 // Decompress ZLIB
                 case GELF.TYPE_ZLIB:
-                    LOG.info("Handling ZLIB compressed SimpleGELFClient");
+                    LOG.debug("Handling ZLIB compressed SimpleGELFClient");
                     this.clientMessage = Tools.decompressZlib(msg.getData());
                     break;
 
                 // Decompress GZIP
                 case GELF.TYPE_GZIP:
-                    LOG.info("Handling GZIP compressed SimpleGELFClient");
+                    LOG.debug("Handling GZIP compressed SimpleGELFClient");
                     this.clientMessage = Tools.decompressGzip(msg.getData());
                     break;
 
@@ -113,7 +113,7 @@ public class SimpleGELFClientHandler extends GELFClientHandlerBase implements GE
             }
 
             if (!this.message.convertedFromSyslog()) {
-                LOG.info("Got GELF message: " + this.message.toString());
+                LOG.debug("Got GELF message: " + this.message.toString());
             }
 
             // Blacklisted?
@@ -124,8 +124,8 @@ public class SimpleGELFClientHandler extends GELFClientHandlerBase implements GE
             // PreProcess message based on filters. Insert message into indexer.
             ReceiveHookManager.preProcess(new MessageParserHook(), message);
             if(!message.getFilterOut()) {
-                // Index message and post-process if it was successful.
-                if (Indexer.index(message)) {
+                // Add message to queue and post-process if it was successful.
+                if (MessageQueue.getInstance().add(message)) {
                     // Update periodic counts collection.
                     ReceiveHookManager.postProcess(new MessageCountUpdateHook(), message);
 

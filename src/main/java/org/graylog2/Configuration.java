@@ -83,6 +83,12 @@ public class Configuration {
     @Parameter(value = "messages_collection_size", required = true, validator = PositiveLongValidator.class)
     private long messagesCollectionSize = 50 * 1000 * 1000;
 
+    @Parameter(value = "mq_batch_size", required = true, validator = PositiveIntegerValidator.class)
+    private int mqBatchSize = 500;
+
+    @Parameter(value = "mq_poll_freq", required = true, validator = PositiveIntegerValidator.class)
+    private int mqPollFreq = 1;
+
     @Parameter(value = "use_gelf", required = true)
     private boolean useGELF = false;
 
@@ -158,6 +164,14 @@ public class Configuration {
 
     public long getMessagesCollectionSize() {
         return messagesCollectionSize;
+    }
+
+    public int getMessageQueueBatchSize() {
+        return mqBatchSize;
+    }
+
+    public int getMessageQueuePollFrequency() {
+        return mqPollFreq;
     }
 
     public boolean isUseGELF() {

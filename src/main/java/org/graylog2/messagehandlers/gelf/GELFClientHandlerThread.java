@@ -54,10 +54,10 @@ public class GELFClientHandlerThread extends Thread {
         try {
             GELFClientHandlerIF client = null;
             if (GELF.isChunkedMessage(this.receivedGelfSentence)) {
-                LOG.info("Received message is chunked. Handling now.");
+                LOG.debug("Received message is chunked. Handling now.");
                 client = new ChunkedGELFClientHandler(this.receivedGelfSentence);
             } else {
-                LOG.info("Received message is not chunked. Handling now.");
+                LOG.debug("Received message is not chunked. Handling now.");
                 client = new SimpleGELFClientHandler(this.receivedGelfSentence);
             }
             client.handle();
