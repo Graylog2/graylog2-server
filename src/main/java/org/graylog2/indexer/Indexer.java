@@ -89,7 +89,7 @@ public class Indexer {
         if (conn.getResponseCode() == 200) {
             return true;
         } else {
-            LOG.warn("Response code of create index operation was not 201, but " + conn.getResponseCode());
+            LOG.warn("Response code of create index operation was not 200, but " + conn.getResponseCode());
             return false;
         }
     }
@@ -121,10 +121,10 @@ public class Indexer {
             OutputStreamWriter writer = new OutputStreamWriter(conn.getOutputStream());
             writer.write(batch);
             writer.close();
-            if (conn.getResponseCode() == 201) {
+            if (conn.getResponseCode() == 200) {
                 return true;
             } else {
-                LOG.warn("Indexer response code was not 201, but " + conn.getResponseCode());
+                LOG.warn("Indexer response code was not 200, but " + conn.getResponseCode());
                 return false; 
             }
         } catch (IOException e) {
