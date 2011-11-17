@@ -65,6 +65,8 @@ public final class Main {
     public static RulesEngine drools = null;
     private static final int SCHEDULED_THREADS_POOL_SIZE = 5;
 
+    public static Configuration configuration = null;
+
     private Main() {
     }
 
@@ -100,7 +102,7 @@ public final class Main {
         String configFile = commandLineArguments.getConfigFile();
         LOG.info("Using config file: " + configFile);
 
-        Configuration configuration = new Configuration();
+        configuration = new Configuration();
         JadConfig jadConfig = new JadConfig(new PropertiesRepository(configFile), configuration);
 
         LOG.info("Loading configuration");

@@ -21,8 +21,6 @@
 package org.graylog2.indexer;
 
 import org.apache.log4j.Logger;
-import org.bson.types.ObjectId;
-import org.graylog2.Tools;
 import org.graylog2.messagehandlers.gelf.GELFMessage;
 import org.json.simple.JSONValue;
 
@@ -30,10 +28,8 @@ import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.net.HttpURLConnection;
 import java.net.URL;
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
+import org.graylog2.Main;
 
 /**
  * Indexer.java: Sep 05, 2011 9:13:03 PM
@@ -114,7 +110,7 @@ public class Indexer {
         }
 
         try {
-            URL url = new URL("http://localhost:9200/_bulk");
+            URL url = new URL(buildElasticSearchURL() + "_bulk");
             HttpURLConnection conn = (HttpURLConnection) url.openConnection();
             conn.setDoOutput(true);
             conn.setRequestMethod("POST");
@@ -135,8 +131,12 @@ public class Indexer {
         return false;
     }
 
+    private static String buildElasticSearchURL() {
+        return Main.configuration.getElasticSearchUrl();
+    }
+
     private static String buildIndexURL() {
-        return "http://localhost:9200/" + Indexer.INDEX;
+        return buildElasticSearchURL() + Indexer.INDEX;
     }
 
     private static String buildIndexWithTypeUrl() {

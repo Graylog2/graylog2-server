@@ -26,6 +26,7 @@ public class ConfigurationTest {
         validProperties = new HashMap<String, String>();
 
         // Required properties
+        validProperties.put("elasticsearch_url", "http://localhost:9200/");
         validProperties.put("syslog_listen_port", "514");
         validProperties.put("syslog_protocol", "udp");
         validProperties.put("mongodb_useauth", "true");
@@ -63,6 +64,25 @@ public class ConfigurationTest {
 
         Configuration configuration = new Configuration();
         new JadConfig(new InMemoryRepository(validProperties), configuration).process();
+    }
+
+    @Test
+    public void testGetElasticSearchUrl() throws RepositoryException, ValidationException {
+
+        Configuration configuration = new Configuration();
+        new JadConfig(new InMemoryRepository(validProperties), configuration).process();
+
+        Assert.assertEquals("http://localhost:9200/", configuration.getElasticSearchUrl());
+    }
+
+    @Test
+    public void testGetElasticSearchUrlAddsTrailingSlashIfOmittedInConfigFile() throws RepositoryException, ValidationException {
+
+        validProperties.put("elasticsearch_url", "https://example.org:80");
+        Configuration configuration = new Configuration();
+        new JadConfig(new InMemoryRepository(validProperties), configuration).process();
+
+        Assert.assertEquals("https://example.org:80/", configuration.getElasticSearchUrl());
     }
 
     @Test

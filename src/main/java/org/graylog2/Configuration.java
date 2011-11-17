@@ -36,7 +36,6 @@ import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import org.graylog2.messagequeue.MessageQueue;
 
 /**
  * Helper class to hold configuration of Graylog2
@@ -56,6 +55,9 @@ public class Configuration {
 
     @Parameter(value = "mongodb_useauth", required = true)
     private boolean mongoUseAuth = false;
+
+    @Parameter(value = "elasticsearch_url", required = true)
+    private String elasticsearchUrl = "http://localhost:9200/";
 
     @Parameter(value = "mongodb_user")
     private String mongoUser;
@@ -132,6 +134,17 @@ public class Configuration {
 
     public String getSyslogProtocol() {
         return syslogProtocol;
+    }
+
+    public String getElasticSearchUrl() {
+        String ret = elasticsearchUrl;
+
+        // Possibly add the required trailing slash if omitted.
+        if (!elasticsearchUrl.endsWith("/")) {
+           ret = elasticsearchUrl + "/";
+        }
+
+        return ret;
     }
 
     public boolean isMongoUseAuth() {
