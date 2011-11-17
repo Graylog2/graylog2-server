@@ -48,6 +48,7 @@ import java.util.List;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
+import org.graylog2.messagequeue.MessageQueue;
 import org.graylog2.messagequeue.MessageQueueFlusher;
 import org.graylog2.periodical.BulkIndexerThread;
 
@@ -180,6 +181,10 @@ public final class Main {
     }
 
     private static void initializeMessageQueue(ScheduledExecutorService scheduler, Configuration configuration) {
+        // Set the maximum size if it was configured to something else than 0 (= UNLIMITED)
+        if (configuration.getMessageQueueMaximumSize() != MessageQueue.SIZE_LIMIT_UNLIMITED) {
+            MessageQueue.getInstance().setMaximumSize(configuration.getMessageQueueMaximumSize());
+        }
 
         scheduler.scheduleAtFixedRate(new BulkIndexerThread(configuration), BulkIndexerThread.INITIAL_DELAY, configuration.getMessageQueuePollFrequency(), TimeUnit.SECONDS);
 

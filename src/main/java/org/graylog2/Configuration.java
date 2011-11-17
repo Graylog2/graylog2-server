@@ -36,6 +36,7 @@ import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import org.graylog2.messagequeue.MessageQueue;
 
 /**
  * Helper class to hold configuration of Graylog2
@@ -88,6 +89,9 @@ public class Configuration {
 
     @Parameter(value = "mq_poll_freq", required = true, validator = PositiveIntegerValidator.class)
     private int mqPollFreq = 1;
+
+    @Parameter(value = "mq_max_size", required = false, validator = PositiveIntegerValidator.class)
+    private int mqMaxSize = 0;
 
     @Parameter(value = "use_gelf", required = true)
     private boolean useGELF = false;
@@ -172,6 +176,10 @@ public class Configuration {
 
     public int getMessageQueuePollFrequency() {
         return mqPollFreq;
+    }
+
+    public int getMessageQueueMaximumSize() {
+        return mqMaxSize;
     }
 
     public boolean isUseGELF() {

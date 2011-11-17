@@ -37,10 +37,14 @@ public class MessageQueue {
 
     private static final Logger LOG = Logger.getLogger(MessageQueue.class);
 
+    public static final int SIZE_LIMIT_UNLIMITED = 0;
+
     private static MessageQueue instance;
 
     public Queue<GELFMessage> queue = new ConcurrentLinkedQueue<GELFMessage>();
     private boolean closed = false;
+
+    private int sizeLimit = SIZE_LIMIT_UNLIMITED;
 
     private MessageQueue() { }
 
@@ -61,9 +65,15 @@ public class MessageQueue {
      * @param message The GELF message to add
      * @return true in case of success
      */
-    public boolean add(GELFMessage message) throws QueueClosedException {
+    public boolean add(GELFMessage message) throws QueueClosedException, QueueLimitReachedException {
         if (this.closed) {
             throw new QueueClosedException();
+        }
+
+        if (this.sizeLimit != SIZE_LIMIT_UNLIMITED) {
+            if (this.queue.size() >= this.sizeLimit) {
+                throw new QueueLimitReachedException();
+            }
         }
         
         return queue.add(message);
@@ -77,7 +87,18 @@ public class MessageQueue {
     public GELFMessage poll() {
         return queue.poll();
     }
-    
+
+    /**
+     * You can set a size (# of messages) to which the queue can grow as
+     * maximum. Set this to SIZE_LIMIT_UNLIMITED if you don't want to limit it.
+     * If no limit is set, the queue size is unlimited.
+     * 
+     * @param maximumSize The number of maximum messages
+     */
+    public void setMaximumSize(int maximumSize) {
+        this.sizeLimit = maximumSize;
+    }
+
     /**
      * @return the total size of the queue.
      */
