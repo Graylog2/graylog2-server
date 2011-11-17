@@ -40,6 +40,7 @@ public class MessageQueue {
     private static MessageQueue instance;
 
     public Queue<GELFMessage> queue = new ConcurrentLinkedQueue<GELFMessage>();
+    private boolean closed = false;
 
     private MessageQueue() { }
 
@@ -60,7 +61,11 @@ public class MessageQueue {
      * @param message The GELF message to add
      * @return true in case of success
      */
-    public boolean add(GELFMessage message) {
+    public boolean add(GELFMessage message) throws QueueClosedException {
+        if (this.closed) {
+            throw new QueueClosedException();
+        }
+        
         return queue.add(message);
     }
 
@@ -78,6 +83,21 @@ public class MessageQueue {
      */
     public int getSize() {
         return queue.size();
+    }
+
+    /**
+     * Closes the queue - No more messages can be added.
+     * Can be used before flushing whole queue at shutdown.
+     */
+    public void close() {
+        this.closed = true;
+    }
+
+    /**
+     * See close()
+     */
+    public void open() {
+        this.closed = false;
     }
 
     /**
@@ -106,6 +126,19 @@ public class MessageQueue {
         }
 
         return messages;
+    }
+
+    /**
+     * Reads all messages from the queue. IMPORTANT: The messags are
+     * removed from the queue while reading. Make sure to actually handle them
+     * in some way.
+     *
+     * It is also a good idea to close() the queue before calling this.
+     *
+     * @return A list containing all messages in the queue.
+     */
+    public List<GELFMessage> readAll() {
+        return this.readBatch(this.getSize());
     }
 
 }

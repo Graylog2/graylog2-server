@@ -59,7 +59,7 @@ public class BulkIndexerThread implements Runnable {
             LOG.info("About to index max " + this.batchSize + " messages. You have a total of "
                     + mq.getSize() + " messages in the queue. [freq:" + this.pollFreq + "s]");
 
-            List<GELFMessage> messages = MessageQueue.getInstance().readBatch(batchSize);
+            List<GELFMessage> messages = mq.readBatch(batchSize);
             LOG.info("... indexing " + messages.size() + " messages.");
             Indexer.bulkIndex(messages);
         } catch (Exception e) {

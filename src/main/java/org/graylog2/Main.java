@@ -48,7 +48,7 @@ import java.util.List;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
-import org.graylog2.indexer.Mapping;
+import org.graylog2.messagequeue.MessageQueueFlusher;
 import org.graylog2.periodical.BulkIndexerThread;
 
 /**
@@ -165,6 +165,9 @@ public final class Main {
         if (configuration.isAmqpEnabled()) {
             initializeAMQP(configuration);
         }
+
+        // Add a shutdown hook that tries to flush the message queue.
+	Runtime.getRuntime().addShutdownHook(new MessageQueueFlusher());
 
         LOG.info("Graylog2 up and running.");
     }
