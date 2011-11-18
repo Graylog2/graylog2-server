@@ -40,6 +40,9 @@ public final class MessageCounter {
     private Map<ObjectId, Integer> streams;
     private Map<String, Integer> hosts;
 
+    private int fiveSecondThroughput = 0;
+    private int highestFiveSecondThroughput = 0;
+
     private MessageCounter() {
         // Initialize.
         this.resetAllCounts();
@@ -68,6 +71,14 @@ public final class MessageCounter {
         return this.hosts;
     }
 
+    public int getFiveSecondThroughput() {
+        return this.fiveSecondThroughput;
+    }
+
+    public int getHighestFiveSecondThroughput() {
+        return this.highestFiveSecondThroughput;
+    }
+
     public void resetAllCounts() {
         this.resetTotal();
         this.resetStreamCounts();
@@ -86,11 +97,22 @@ public final class MessageCounter {
         this.total = 0;
     }
 
+    public void resetFiveSecondThroughput() {
+        this.fiveSecondThroughput = 0;
+    }
+
     /**
      * Increment total count by 1.
      */
     public void incrementTotal() {
         this.countUpTotal(1);
+    }
+
+    /**
+     * Increment five second throughput by 1.
+     */
+    public void incrementFiveSecondThroughput() {
+        this.countUpFiveSecondThroughput(1);
     }
 
     /**
@@ -100,6 +122,20 @@ public final class MessageCounter {
      */
     public void countUpTotal(int x) {
         this.total += x;
+    }
+
+    /**
+     * Counts up the five second througput counter which is handled and reset by
+     * the ServerValueWriterThread.
+     *
+     * @param x The value to add on top of five second throuput.
+     */
+    public void countUpFiveSecondThroughput(int x) {
+        this.fiveSecondThroughput += x;
+
+        if (this.fiveSecondThroughput > this.highestFiveSecondThroughput) {
+            this.highestFiveSecondThroughput = this.fiveSecondThroughput;
+        }
     }
 
     /**

@@ -51,6 +51,7 @@ import java.util.concurrent.TimeUnit;
 import org.graylog2.messagequeue.MessageQueue;
 import org.graylog2.messagequeue.MessageQueueFlusher;
 import org.graylog2.periodical.BulkIndexerThread;
+import org.graylog2.periodical.ServerValueWriterThread;
 
 /**
  * Main class of Graylog2.
@@ -63,7 +64,7 @@ public final class Main {
     private static final String GRAYLOG2_VERSION = "0.9.6-PREVIEW.2";
 
     public static RulesEngine drools = null;
-    private static final int SCHEDULED_THREADS_POOL_SIZE = 5;
+    private static final int SCHEDULED_THREADS_POOL_SIZE = 6;
 
     public static Configuration configuration = null;
 
@@ -159,6 +160,9 @@ public final class Main {
         // Inizialize message queue.
         initializeMessageQueue(scheduler, configuration);
 
+        // Write initial ServerValue information.
+        writeInitialServerValues();
+
         // Start GELF threads
         if (configuration.isUseGELF()) {
             initializeGELFThreads(configuration.getGelfListenPort(), scheduler);
@@ -168,6 +172,9 @@ public final class Main {
         if (configuration.isAmqpEnabled()) {
             initializeAMQP(configuration);
         }
+
+        // Start server value writer thread. (writes for example msg throughout and pings)
+        initializeServerValueWriter(scheduler);
 
         // Add a shutdown hook that tries to flush the message queue.
 	Runtime.getRuntime().addShutdownHook(new MessageQueueFlusher());
@@ -198,6 +205,13 @@ public final class Main {
         scheduler.scheduleAtFixedRate(new MessageCountWriterThread(), MessageCountWriterThread.INITIAL_DELAY, MessageCountWriterThread.PERIOD, TimeUnit.SECONDS);
 
         LOG.info("Message counters initialized.");
+    }
+
+    private static void initializeServerValueWriter(ScheduledExecutorService scheduler) {
+
+        scheduler.scheduleAtFixedRate(new ServerValueWriterThread(), ServerValueWriterThread.INITIAL_DELAY, ServerValueWriterThread.PERIOD, TimeUnit.SECONDS);
+
+        LOG.info("Server value writer up.");
     }
 
     private static void initializeGELFThreads(int gelfPort, ScheduledExecutorService scheduler) {
@@ -305,5 +319,15 @@ public final class Main {
         } finally {
             IOUtils.closeQuietly(pidFileWriter);
         }
+    }
+
+    public static void writeInitialServerValues() {
+        ServerValue.setStartupTime(Tools.getUTCTimestamp());
+        ServerValue.setPID(Integer.parseInt(Tools.getPID()));
+        ServerValue.setJREInfo(Tools.getSystemInformation());
+        ServerValue.setGraylog2Version(GRAYLOG2_VERSION);
+        ServerValue.setAvailableProcessors(HostSystem.getAvailableProcessors());
+        ServerValue.setLocalHostname(Tools.getLocalHostname());
+        ServerValue.setLocalHostname(Tools.getLocalHostname());
     }
 }

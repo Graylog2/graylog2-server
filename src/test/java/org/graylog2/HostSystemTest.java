@@ -34,19 +34,4 @@ public class HostSystemTest {
         assertTrue(HostSystem.getAvailableProcessors() > 0);
     }
 
-    @Test
-    public void testGetUsedMemory() {
-        assertTrue(HostSystem.getUsedMemory() > 0);
-    }
-
-    @Test
-    public void testGetMaxMemory() {
-        assertTrue(HostSystem.getMaxMemory() >= 0);
-    }
-
-    @Test
-    public void testGetFreeMemory() {
-        assertTrue(HostSystem.getFreeMemory() > 0);
-    }
-
 }

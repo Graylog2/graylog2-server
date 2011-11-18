@@ -133,15 +133,6 @@ public class MongoBridge {
         coll.update(query, update, true, false);
     }
 
-    public void writeHistoricServerValue(String key, Object value) {
-        BasicDBObject obj = new BasicDBObject();
-        obj.put("type", key);
-        obj.put("value", value);
-        obj.put("created_at", Tools.getUTCTimestamp());
-
-        MongoConnection.getInstance().getHistoricServerValuesColl().insert(obj);
-    }
-
     public void writeMessageCounts(int total, Map<ObjectId, Integer> streams, Map<String, Integer> hosts) {
         BasicDBObject obj = new BasicDBObject();
         obj.put("timestamp", Tools.getUTCTimestamp());
