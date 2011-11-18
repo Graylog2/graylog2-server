@@ -1,21 +1,50 @@
 <h1>Health of <span class="highlighted">graylog2-server-<%= ServerValue.graylog2_version %></span> on <span class="highlighted"><%= ServerValue.local_hostname %></span></h1>
 
-<div id="health-throughput">
-  <span class="health-throughput-title">Throughput:</span>
+<div class="health-numbers">
+  <span class="health-numbers-title">Throughput:</span>
 
-  <span id="health-throughput-current">
+  <span class="health-numbers-number-highlighted" id="health-throughput-current">
     <%= ServerValue.throughput[:current] %>
   </span>
-  <span class="health-throughput-label">Current</span>
+  <span class="health-numbers-label">Current</span>
 
   &nbsp;
 
-  <span id="health-throughput-highest"><%= ServerValue.throughput[:highest] %></span>
-  <span class="health-throughput-label">Highest</span>
+  <%= ServerValue.throughput[:highest] %>
+  <span class="health-numbers-label">Highest</span>
 
   &nbsp;
 
-  <span class="health-throughput-explanation">(messages / 5 seconds)</span>
+  <span class="health-numbers-explanation">(messages / 5 seconds)</span>
+</div>
+
+<br />
+
+<div class="health-numbers">
+  <span class="health-numbers-title">Message Queue:</span>
+
+  <span class="health-numbers-number-highlighted" id="health-mqsize-current">
+    <%= ServerValue.message_queue_current_size %>
+  </span>
+  <span class="health-numbers-label">in queue</span>
+
+  &nbsp;
+
+  <% if ServerValue.message_queue_maximum_size_unlimited? %>
+    <span class="health-numbers-number-as-text">
+  <% end %>
+    <%= ServerValue.message_queue_maximum_size_human %>
+  <% if ServerValue.message_queue_maximum_size_unlimited? %>
+  </span>
+  <% end %>
+  <span class="health-numbers-label">limit</span>
+
+  &nbsp;
+
+  <span class="health-numbers-explanation">
+    Batch size: <span class="health-numbers-number-highlighted"><%= ServerValue.message_queue_batch_size %></span> &nbsp;
+    Polling frequency: <span class="health-numbers-number-highlighted"><%= ServerValue.message_queue_poll_freq %>s</span>
+  </span>
 </div>
 
 <br />
@@ -25,7 +54,7 @@
 <h3><span class="highlighted">PID:</span> <%= ServerValue.pid %></h3>
 
 <script type="text/javascript">
-  // Update current throughput every seconds
+  // Update current throughput every 5 seconds
   setInterval(function(){
     $.post("/health/currentthroughput", function(data) {
       json = eval('(' + data + ')');
@@ -33,6 +62,18 @@
       count.html(json.count);
       count.fadeOut(200, function() {
         count.fadeIn(200);
+      });
+    });
+  }, 5000);
+  
+  // Update message queue size every 5 seconds
+  setInterval(function(){
+    $.post("/health/currentmqsize", function(data) {
+      mqjson = eval('(' + data + ')');
+      mqcount = $("#health-mqsize-current");
+      mqcount.html(mqjson.count);
+      mqcount.fadeOut(200, function() {
+        mqcount.fadeIn(200);
       });
     });
   }, 5000);

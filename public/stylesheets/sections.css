@@ -560,7 +560,7 @@
 }
 
 /* Health */
-#health-throughput {
+.health-numbers {
   padding: 15px;
   padding-top: 25px;
   background-color: #333;
@@ -569,20 +569,24 @@
   font-family: Georgia,"Times New Roman",Times,serif;
 }
 
-#health-throughput-current {
+.health-numbers-number-highlighted {
   color: #FD0C99;
 }
 
-.health-throughput-title {
+.health-numbers-number-as-text {
+  font-size: 46px;
+}
+
+.health-numbers-title {
   font-size: 30px;
 }
 
-.health-throughput-label {
+.health-numbers-label {
   text-transform: uppercase;
   font-size: 16px;
 }
 
-.health-throughput-explanation {
+.health-numbers-explanation {
   font-size: 15px;
 }
 

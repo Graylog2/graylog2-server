@@ -118,6 +118,7 @@ Graylog2WebInterface::Application.routes.draw do
   resources :health do
     collection do
       post :currentthroughput
+      post :currentmqsize
     end
   end
 
