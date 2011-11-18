@@ -26,6 +26,7 @@ import org.graylog2.ServerValue;
 import org.graylog2.Tools;
 import org.graylog2.database.MongoBridge;
 import org.graylog2.messagehandlers.common.MessageCounter;
+import org.graylog2.messagequeue.MessageQueue;
 
 /**
  * ServerValueWriterThread.java
@@ -53,11 +54,14 @@ public class ServerValueWriterThread implements Runnable {
             // Current throughput.
             MessageCounter c = MessageCounter.getInstance();
             ServerValue.writeThroughput(c.getFiveSecondThroughput(), c.getHighestFiveSecondThroughput());
+            c.resetFiveSecondThroughput(); // Reset five second throughput count.
 
-            // Reset five second throughput count.
-            c.resetFiveSecondThroughput();
+            /*
+             * Message queue size is written in BulkIndexerThread. More about the
+             * reason for that can be found there.
+             */
         } catch (Exception e) {
-            LOG.warn("Error in ServerValueWriterThread: " + e.getMessage(), e);
+            LOG.warn("Error in ServerValue  WriterThread: " + e.getMessage(), e);
         }
     }
 }

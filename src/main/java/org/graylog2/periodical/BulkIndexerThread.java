@@ -20,11 +20,10 @@
 
 package org.graylog2.periodical;
 
-
-import java.util.ArrayList;
 import java.util.List;
 import org.apache.log4j.Logger;
 import org.graylog2.Configuration;
+import org.graylog2.ServerValue;
 import org.graylog2.indexer.Indexer;
 import org.graylog2.messagehandlers.gelf.GELFMessage;
 import org.graylog2.messagequeue.MessageQueue;
@@ -62,6 +61,15 @@ public class BulkIndexerThread implements Runnable {
             List<GELFMessage> messages = mq.readBatch(batchSize);
             LOG.info("... indexing " + messages.size() + " messages.");
             Indexer.bulkIndex(messages);
+
+            /*
+             * Write message queue size information to server values. We do this
+             * here and not in the ServerValueWriterThread because it has too
+             * be in sync with the actual reading from the queue. We only want
+             * to see if the queue grows / if there are messages left *after*
+             * writing.
+             */
+            ServerValue.writeMessageQueueCurrentSize(MessageQueue.getInstance().getSize());
         } catch (Exception e) {
             LOG.fatal("You possibly lost messages! :( Error in BulkIndexerThread: " + e.getMessage(), e);
         }
