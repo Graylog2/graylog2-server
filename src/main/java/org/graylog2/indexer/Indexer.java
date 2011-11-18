@@ -102,11 +102,16 @@ public class Indexer {
             return true;
         }
         
-        String batch = "";
+        StringBuilder batchFactory = new StringBuilder();
 
         for (GELFMessage message : messages) {
-            batch += "{\"index\":{\"_index\":\"" + INDEX + "\",\"_type\":\"" + TYPE + "\"}}\n";
-            batch += JSONValue.toJSONString(message.toElasticSearchObject()) + "\n";
+            batchFactory.append("{\"index\":{\"_index\":\"");
+            batchFactory.append(INDEX);
+            batchFactory.append("\",\"_type\":\"");
+            batchFactory.append(TYPE);
+            batchFactory.append("\"}}\n");
+            batchFactory.append(JSONValue.toJSONString(message.toElasticSearchObject()));
+            batchFactory.append("\n");
         }
 
         try {
@@ -115,7 +120,7 @@ public class Indexer {
             conn.setDoOutput(true);
             conn.setRequestMethod("POST");
             OutputStreamWriter writer = new OutputStreamWriter(conn.getOutputStream());
-            writer.write(batch);
+            writer.write(batchFactory.toString());
             writer.close();
             if (conn.getResponseCode() == 200) {
                 return true;
