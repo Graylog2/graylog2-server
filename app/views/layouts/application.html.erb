@@ -62,6 +62,16 @@
     </div>
   <% end %>
 
+  <div id="current-throughputs">
+    <span class="health-throughput-current"><%= ServerValue.throughput[:current] %></span> /
+    <span class="health-mqsize-current"><%= ServerValue.message_queue_current_size %></span>
+  </div>
+  <script type="text/javascript">
+    $("#current-throughputs").bind("click", function() {
+      window.location = "<%= health_index_path %>";
+    })
+  </script>
+
   <div id="top">
     <div id="userbar">
       Logged in as <%= current_user.login %> &nbsp;<%= link_to "(Log out)", logout_path %>

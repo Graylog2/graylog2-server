@@ -3,7 +3,7 @@
 <div class="health-numbers">
   <span class="health-numbers-title">Throughput:</span>
 
-  <span class="health-numbers-number-highlighted" id="health-throughput-current">
+  <span class="health-numbers-number-highlighted health-throughput-current">
     <%= ServerValue.throughput[:current] %>
   </span>
   <span class="health-numbers-label">Current</span>
@@ -19,11 +19,10 @@
 </div>
 
 <br />
-
 <div class="health-numbers">
   <span class="health-numbers-title">Message Queue:</span>
 
-  <span class="health-numbers-number-highlighted" id="health-mqsize-current">
+  <span class="health-numbers-number-highlighted health-mqsize-current">
     <%= ServerValue.message_queue_current_size %>
   </span>
   <span class="health-numbers-label">in queue</span>
@@ -52,29 +51,3 @@
 <h3><span class="highlighted">Available processors:</span> <%= ServerValue.available_processors %></h3>
 <h3><span class="highlighted">JRE:</span> <%= ServerValue.jre %></h3>
 <h3><span class="highlighted">PID:</span> <%= ServerValue.pid %></h3>
-
-<script type="text/javascript">
-  // Update current throughput every 5 seconds
-  setInterval(function(){
-    $.post("/health/currentthroughput", function(data) {
-      json = eval('(' + data + ')');
-      count = $("#health-throughput-current");
-      count.html(json.count);
-      count.fadeOut(200, function() {
-        count.fadeIn(200);
-      });
-    });
-  }, 5000);
-  
-  // Update message queue size every 5 seconds
-  setInterval(function(){
-    $.post("/health/currentmqsize", function(data) {
-      mqjson = eval('(' + data + ')');
-      mqcount = $("#health-mqsize-current");
-      mqcount.html(mqjson.count);
-      mqcount.fadeOut(200, function() {
-        mqcount.fadeIn(200);
-      });
-    });
-  }, 5000);
-</script>
