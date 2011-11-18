@@ -41,6 +41,22 @@ class ServerValue
     ping == "unknown" ? Time.at(0) : Time.at(ping)
   end
 
+  def self.message_queue_maximum_size
+    get("message_queue_maximum_size")
+  end
+
+  def self.message_queue_batch_size
+    get("message_queue_batch_size")
+  end
+
+  def self.message_queue_poll_freq
+    get("message_queue_poll_freq")
+  end
+
+  def self.message_queue_current_size
+    get("message_queue_current_size")
+  end
+
   private
   def self.get(key)
     val = self.first(:conditions => { "type" => key })
