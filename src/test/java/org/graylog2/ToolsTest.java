@@ -24,12 +24,10 @@
 
 package org.graylog2;
 
-import org.junit.After;
-import org.junit.AfterClass;
-import org.junit.Before;
-import org.junit.BeforeClass;
 import org.junit.Test;
-import static org.junit.Assert.*;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 /**
  *
@@ -37,33 +35,24 @@ import static org.junit.Assert.*;
  */
 public class ToolsTest {
 
-    public ToolsTest() {
-    }
-
-    @BeforeClass
-    public static void setUpClass() throws Exception {
-    }
-
-    @AfterClass
-    public static void tearDownClass() throws Exception {
-    }
-
-    @Before
-    public void setUp() {
-    }
-
-    @After
-    public void tearDown() {
-    }
-
-    /**
-     * Test of getPID method, of class Tools.
-     */
     @Test
-    public void testGetPID() throws Exception {
+    public void testGetPID() {
         String result = Tools.getPID();
         assertTrue(Integer.parseInt(result) > 0);
     }
+
+    @Test
+    public void testGetUTCTimestamp() {
+
+        assertTrue(Tools.getUTCTimestamp() > 0);
+    }
+
+    @Test
+    public void testGetUTCTimestampWithMilliseconds() {
+
+        assertTrue(Tools.getUTCTimestampWithMilliseconds() > 0.0d);
+    }
+
 
     /**
      * Test of syslogLevelToReadable method, of class Tools.
