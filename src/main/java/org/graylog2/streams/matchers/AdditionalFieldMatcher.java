@@ -36,10 +36,10 @@ public class AdditionalFieldMatcher implements StreamRuleMatcherIF {
         String[] parts = rule.getValue().split("=");
         String key = "_" + parts[0];
         String value = parts[1];
+        String str = null;
 
         if (msg.getAdditionalData().containsKey(key) && msg.getAdditionalData().get(key) != null) {
             Object afValue = msg.getAdditionalData().get(key);
-            String str = null;
 
             if (afValue instanceof String) {
                 str = (String) afValue;
@@ -48,14 +48,8 @@ public class AdditionalFieldMatcher implements StreamRuleMatcherIF {
             if (afValue instanceof Long) {
                 str = String.valueOf(afValue);
             }
-
-            // Message contains additional field.
-            if (str.matches(value)) {
-                return true;
-            }
         }
 
-        return false;
+        return null != str && str.matches(value);
     }
-
 }
