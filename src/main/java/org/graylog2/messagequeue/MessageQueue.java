@@ -19,34 +19,35 @@
  */
 package org.graylog2.messagequeue;
 
+import org.apache.log4j.Logger;
+import org.graylog2.messagehandlers.gelf.GELFMessage;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
-import org.apache.log4j.Logger;
-import org.graylog2.messagehandlers.gelf.GELFMessage;
 
 /**
  * MessageQueue.java: Nov 16, 2011 5:28:26 PM
- *
+ * <p/>
  * Singleton holding messages to be flushed to ElasticSearch.
  *
  * @author Lennart Koopmann <lennart@socketfeed.com>
  */
 public class MessageQueue {
 
-    private static final Logger LOG = Logger.getLogger(MessageQueue.class);
-
     public static final int SIZE_LIMIT_UNLIMITED = 0;
+
+    private static final Logger LOG = Logger.getLogger(MessageQueue.class);
 
     private static MessageQueue instance;
 
-    public Queue<GELFMessage> queue = new ConcurrentLinkedQueue<GELFMessage>();
+    private Queue<GELFMessage> queue = new ConcurrentLinkedQueue<GELFMessage>();
     private boolean closed = false;
 
     private int sizeLimit = SIZE_LIMIT_UNLIMITED;
 
-    private MessageQueue() { }
+    private MessageQueue() {}
 
     /**
      * @return MessageCache singleton instance
@@ -60,10 +61,12 @@ public class MessageQueue {
     }
 
     /**
-     * Adds a new GELF message to the tail of the queue.
+     * Adds a new {@link GELFMessage} to the tail of the queue.
      *
-     * @param message The GELF message to add
-     * @return true in case of success
+     * @param message The {@link GELFMessage} to enqueue
+     * @return {@literal true} in case of success
+     * @throws QueueClosedException       if the queue has already been closed
+     * @throws QueueLimitReachedException if the maximum size of the queue has been reached
      */
     public boolean add(GELFMessage message) throws QueueClosedException, QueueLimitReachedException {
         if (this.closed) {
@@ -75,24 +78,25 @@ public class MessageQueue {
                 throw new QueueLimitReachedException();
             }
         }
-        
+
         return queue.add(message);
     }
 
     /**
      * Retrieves and removes the head of the queue.
      *
-     * @return the first GELFMessage in the queue.
+     * @return the first {@link GELFMessage} in the queue.
      */
     public GELFMessage poll() {
         return queue.poll();
     }
 
     /**
-     * You can set a size (# of messages) to which the queue can grow as
-     * maximum. Set this to SIZE_LIMIT_UNLIMITED if you don't want to limit it.
+     * You can set a size (# of messages) to which the queue can grow as maximum.
      * If no limit is set, the queue size is unlimited.
-     * 
+     * <p/>
+     * Set this to {@link #SIZE_LIMIT_UNLIMITED} if you don't want to limit it.
+     *
      * @param maximumSize The number of maximum messages
      */
     public void setMaximumSize(int maximumSize) {
@@ -100,66 +104,68 @@ public class MessageQueue {
     }
 
     /**
-     * @return the total size of the queue.
+     * Get the number of elements in the queue
+     *
+     * @return the total number of elements in the queue.
      */
     public int getSize() {
         return queue.size();
     }
 
     /**
-     * Closes the queue - No more messages can be added.
+     * Closes the queue so that no more messages can be added.
+     * <p/>
      * Can be used before flushing whole queue at shutdown.
+     *
+     * @see #open()
      */
     public void close() {
         this.closed = true;
     }
 
     /**
-     * See close()
+     * Reopens a formerly closed queue
+     *
+     * @see #close()
      */
     public void open() {
         this.closed = false;
     }
 
     /**
-     * Reads a batch of messages from the queue. IMPORTANT: The messags are
+     * Reads a batch of messages from the queue.
+     *
+     * IMPORTANT: The messages are
      * removed from the queue while reading. Make sure to actually handle them
      * in some way.
      *
-     * @param batchSize
-     * @return A list of messages.
+     * @param batchSize The number of messages to read from the queue
+     * @return A {@link List} of messages.
      */
     public List<GELFMessage> readBatch(int batchSize) {
         List<GELFMessage> messages = new ArrayList<GELFMessage>();
-        for(int i = 0; i < batchSize; i++) {
-            GELFMessage msg = this.poll();
 
-            if (msg == null) {
-                LOG.info("Reached end of message queue at element #" + i + " - Not reading any further.");
-                break;
-            } else {
-                messages.add(msg);
-
-                if (i == batchSize-1) {
-                    LOG.info("Read " + batchSize + " messages from queue.");
-                }
-            }
+        for (int i = 0; !queue.isEmpty() && i < batchSize; i++) {
+            messages.add(poll());
         }
+
+        LOG.debug("Read " + messages.size() + " messages from queue.");
 
         return messages;
     }
 
     /**
-     * Reads all messages from the queue. IMPORTANT: The messags are
-     * removed from the queue while reading. Make sure to actually handle them
-     * in some way.
+     * Reads all messages from the queue.
+     * <p/>
+     * IMPORTANT: The messages are removed from the queue while reading. Make sure to actually handle them in some way.
+     * <p/>
+     * It is also a good idea to call {@link #close()} on the queue before calling this.
      *
-     * It is also a good idea to close() the queue before calling this.
-     *
-     * @return A list containing all messages in the queue.
+     * @return A {@link List} containing all {@link GELFMessage}s in the queue.
      */
     public List<GELFMessage> readAll() {
-        return this.readBatch(this.getSize());
+
+        return readBatch(getSize());
     }
 
 }
