@@ -183,9 +183,18 @@ public final class Tools {
      */
     public static double getUTCTimestampWithMilliseconds() {
 
-        long now = Calendar.getInstance().getTimeInMillis();
+        return getUTCTimestampWithMilliseconds(Calendar.getInstance().getTimeInMillis());
+    }
 
-        return Double.parseDouble(String.format("%d.%d", now/1000, now%1000));
+    /**
+     * Get the UNIX epoch with milliseconds of the provided millisecond timestamp
+     *
+     * @param timestamp a millisecond timestamp (milliseconds since UNIX epoch)
+     * @return The current UTC UNIX timestamp with milliseconds.
+     */
+    public static double getUTCTimestampWithMilliseconds(long timestamp) {
+
+        return Double.parseDouble(String.format("%d.%d", timestamp/1000, timestamp%1000));
     }
 
     public static String getLocalHostname() {

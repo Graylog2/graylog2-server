@@ -29,6 +29,7 @@ import org.junit.Test;
 import java.io.ByteArrayOutputStream;
 import java.io.EOFException;
 import java.io.IOException;
+import java.util.Calendar;
 import java.util.zip.Deflater;
 import java.util.zip.GZIPOutputStream;
 
@@ -56,6 +57,7 @@ public class ToolsTest {
     public void testGetUTCTimestampWithMilliseconds() {
 
         assertTrue(Tools.getUTCTimestampWithMilliseconds() > 0.0d);
+        assertTrue(Tools.getUTCTimestampWithMilliseconds(Calendar.getInstance().getTimeInMillis()) > 0.0d);
     }
 
     @Test
