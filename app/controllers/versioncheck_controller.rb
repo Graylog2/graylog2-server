@@ -3,6 +3,7 @@ class VersioncheckController < ApplicationController
   before_filter :allowed?
 
   def index
+    @has_settings_tabs = true
     @outdated = Version.outdated?
   end
 

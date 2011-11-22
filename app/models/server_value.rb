@@ -67,11 +67,15 @@ class ServerValue
     get("message_queue_current_size")
   end
 
+  def self.message_retention_last_performed
+    get("message_retention_last_performed", nil)
+  end
+
   private
-  def self.get(key)
+  def self.get(key, if_not_found = "unknown")
     val = self.first(:conditions => { "type" => key })
 
-    val.blank? ? "unknown" : val.value
+    val.blank? ? if_not_found : val.value
   end
 
 end

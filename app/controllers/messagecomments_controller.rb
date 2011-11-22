@@ -1,11 +1,13 @@
 class MessagecommentsController < ApplicationController
 
   def index
+    @has_settings_tabs = true
     @comments = Messagecomment.all
     @comment = Messagecomment.new
   end
 
   def show
+    @has_settings_tabs = true
     @comment = Messagecomment.find(params[:id])
   end
 
