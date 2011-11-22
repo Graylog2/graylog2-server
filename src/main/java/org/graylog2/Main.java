@@ -51,7 +51,9 @@ import java.util.concurrent.TimeUnit;
 import org.graylog2.messagequeue.MessageQueue;
 import org.graylog2.messagequeue.MessageQueueFlusher;
 import org.graylog2.periodical.BulkIndexerThread;
+import org.graylog2.periodical.MessageRetentionThread;
 import org.graylog2.periodical.ServerValueWriterThread;
+import org.graylog2.settings.Setting;
 
 /**
  * Main class of Graylog2.
@@ -64,9 +66,10 @@ public final class Main {
     private static final String GRAYLOG2_VERSION = "0.9.6-PREVIEW.2";
 
     public static RulesEngine drools = null;
-    private static final int SCHEDULED_THREADS_POOL_SIZE = 6;
+    private static final int SCHEDULED_THREADS_POOL_SIZE = 7;
 
     public static Configuration configuration = null;
+    public static ScheduledExecutorService scheduler = null;
 
     private Main() {
     }
@@ -147,7 +150,7 @@ public final class Main {
         // TODO: This is a code smell and needs to be fixed.
         LogglyForwarder.setTimeout(configuration.getForwarderLogglyTimeout());
 
-        ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(SCHEDULED_THREADS_POOL_SIZE);
+        scheduler = Executors.newScheduledThreadPool(SCHEDULED_THREADS_POOL_SIZE);
 
         initializeMongoConnection(configuration);
         initializeRulesEngine(configuration.getDroolsRulesFile());
@@ -175,6 +178,9 @@ public final class Main {
 
         // Start server value writer thread. (writes for example msg throughout and pings)
         initializeServerValueWriter(scheduler);
+
+        // Start thread that automatically removes messages older than retention time.
+        initializeMessageRetentionThread(scheduler);
 
         // Add a shutdown hook that tries to flush the message queue.
 	Runtime.getRuntime().addShutdownHook(new MessageQueueFlusher());
@@ -212,6 +218,17 @@ public final class Main {
         scheduler.scheduleAtFixedRate(new ServerValueWriterThread(), ServerValueWriterThread.INITIAL_DELAY, ServerValueWriterThread.PERIOD, TimeUnit.SECONDS);
 
         LOG.info("Server value writer up.");
+    }
+
+    private static void initializeMessageRetentionThread(ScheduledExecutorService scheduler) {
+        // Schedule first run. This is NOT at fixed rate. Thread will itself schedule next run with current frequency setting from database.
+        scheduler.schedule(
+                new MessageRetentionThread(),
+                Setting.getRetentionFrequencyInMinutes(),
+                TimeUnit.MINUTES
+        );
+
+        LOG.info("Retention time management active.");
     }
 
     private static void initializeGELFThreads(int gelfPort, ScheduledExecutorService scheduler) {

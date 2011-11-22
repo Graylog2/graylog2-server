@@ -81,6 +81,10 @@ public class ServerValue {
         set("message_queue_poll_freq", freq);
     }
 
+    public static void writeMessageRetentionLastPerformed(int when) {
+        set("message_retention_last_performed", when);
+    }
+
     public static void ping() {
         set("ping", Tools.getUTCTimestamp());
     }

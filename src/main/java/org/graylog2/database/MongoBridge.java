@@ -23,6 +23,7 @@ package org.graylog2.database;
 import com.mongodb.BasicDBObject;
 import com.mongodb.DB;
 import com.mongodb.DBCollection;
+import com.mongodb.DBObject;
 import org.apache.log4j.Logger;
 import org.bson.types.ObjectId;
 import org.graylog2.Tools;
@@ -141,6 +142,20 @@ public class MongoBridge {
         obj.put("hosts", hosts);
 
         MongoConnection.getInstance().getMessageCountsColl().insert(obj);
+    }
+
+    /**
+     * Get a setting from the settings collection.
+     *
+     * @param type The TYPE (See constants in Setting class) to fetch.
+     * @return The settings - Can be null.
+     */
+    public DBObject getSetting(int type) {
+        DBCollection coll = MongoConnection.getInstance().getDatabase().getCollection("settings");
+
+        DBObject query = new BasicDBObject();
+        query.put("setting_type", type);
+        return coll.findOne(query);
     }
 
 }
