@@ -24,11 +24,15 @@
 
 package org.graylog2;
 
-import org.junit.After;
-import org.junit.AfterClass;
-import org.junit.Before;
-import org.junit.BeforeClass;
 import org.junit.Test;
+
+import java.io.ByteArrayOutputStream;
+import java.io.EOFException;
+import java.io.IOException;
+import java.util.Calendar;
+import java.util.zip.Deflater;
+import java.util.zip.GZIPOutputStream;
+
 import static org.junit.Assert.*;
 
 /**
@@ -37,37 +41,33 @@ import static org.junit.Assert.*;
  */
 public class ToolsTest {
 
-    public ToolsTest() {
-    }
-
-    @BeforeClass
-    public static void setUpClass() throws Exception {
-    }
-
-    @AfterClass
-    public static void tearDownClass() throws Exception {
-    }
-
-    @Before
-    public void setUp() {
-    }
-
-    @After
-    public void tearDown() {
-    }
-
-    /**
-     * Test of getPID method, of class Tools.
-     */
     @Test
-    public void testGetPID() throws Exception {
+    public void testGetPID() {
         String result = Tools.getPID();
         assertTrue(Integer.parseInt(result) > 0);
     }
 
-    /**
-     * Test of syslogLevelToReadable method, of class Tools.
-     */
+    @Test
+    public void testGetUTCTimestamp() {
+
+        assertTrue(Tools.getUTCTimestamp() > 0);
+    }
+
+    @Test
+    public void testGetUTCTimestampWithMilliseconds() {
+
+        assertTrue(Tools.getUTCTimestampWithMilliseconds() > 0.0d);
+        assertTrue(Tools.getUTCTimestampWithMilliseconds(Calendar.getInstance().getTimeInMillis()) > 0.0d);
+    }
+
+    @Test
+    public void testGetLocalHostname() {
+
+        String hostname = Tools.getLocalHostname();
+
+        assertFalse(hostname.isEmpty());
+    }
+
     @Test
     public void testSyslogLevelToReadable() {
         assertEquals(Tools.syslogLevelToReadable(1337), "Invalid");
@@ -76,9 +76,6 @@ public class ToolsTest {
         assertEquals(Tools.syslogLevelToReadable(6), "Informational");
     }
 
-    /**
-     * Test of syslogFacilityToReadable method, of class Tools.
-     */
     @Test
     public void testSyslogFacilityToReadable() {
         assertEquals(Tools.syslogFacilityToReadable(9001), "Unknown");
@@ -87,13 +84,45 @@ public class ToolsTest {
         assertEquals(Tools.syslogFacilityToReadable(22), "local6");
     }
 
-    /**
-     * Test of getSystemInformation method, of class Tools.
-     */
     @Test
     public void testGetSystemInformation() {
         String result = Tools.getSystemInformation();
         assertTrue(result.trim().length() > 0);
     }
 
+    @Test
+    public void testDecompressZlib() throws IOException {
+
+        String testString = "Teststring 123";
+        byte[] buffer = new byte[100];
+        Deflater deflater = new Deflater();
+
+        deflater.setInput(testString.getBytes());
+        deflater.finish();
+        deflater.deflate(buffer);
+        deflater.end();
+
+        assertEquals(testString, Tools.decompressZlib(buffer));
+    }
+
+    @Test
+    public void testDecompressGzip() throws IOException {
+
+        String testString = "Teststring 123";
+
+        ByteArrayOutputStream out = new ByteArrayOutputStream();
+        GZIPOutputStream gzip = new GZIPOutputStream(out);
+        gzip.write(testString.getBytes());
+        gzip.close();
+
+        byte[] buffer = out.toByteArray();
+
+        assertEquals(testString, Tools.decompressGzip(buffer));
+    }
+
+    @Test(expected = EOFException.class)
+    public void testDecompressGzipEmptyInput() throws IOException {
+
+        Tools.decompressGzip(new byte[0]);
+    }
 }
