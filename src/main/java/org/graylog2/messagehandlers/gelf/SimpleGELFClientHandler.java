@@ -47,6 +47,7 @@ public class SimpleGELFClientHandler extends GELFClientHandlerBase implements GE
     private static final Logger LOG = Logger.getLogger(SimpleGELFClientHandler.class);
 
     private String amqpReceiverQueue = null;
+    private boolean preParsed = false;
 
     /**
      * Representing a GELF client consisting of only one UDP message.
@@ -88,23 +89,26 @@ public class SimpleGELFClientHandler extends GELFClientHandlerBase implements GE
             this.clientMessage = (String) clientMessage;
         } else if(clientMessage instanceof GELFMessage) {
             this.message = (GELFMessage) clientMessage;
+            this.preParsed = true;
         }
         
     }
     
     /**
-     * Handles the client: Decodes JSON, Stores in MongoDB, ReceiveHooks
+     * Handles the client: Decodes JSON, Stores in Indexer, ReceiveHooks
      * 
      * @return boolean
      */
     public boolean handle() {
         try {
-            // Fills properties with values from JSON.
-            try {
-                this.parse();
-            } catch (Exception e) {
-                LOG.warn("Could not parse GELF JSON: " + e.getMessage() + " - clientMessage was: " + this.clientMessage, e);
-                return false;
+            // Parse JSON to GELFMessage if necessary.
+            if (!this.preParsed) {
+                try {
+                    this.parse();
+                } catch (Exception e) {
+                    LOG.warn("Could not parse GELF JSON: " + e.getMessage() + " - clientMessage was: " + this.clientMessage, e);
+                    return false;
+                }
             }
         	
             // Add AMQP receiver queue as additional field if set.
