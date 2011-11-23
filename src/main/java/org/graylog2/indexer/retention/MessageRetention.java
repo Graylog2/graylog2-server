@@ -23,6 +23,7 @@ package org.graylog2.indexer.retention;
 import org.apache.log4j.Logger;
 import org.graylog2.ServerValue;
 import org.graylog2.Tools;
+import org.graylog2.indexer.Indexer;
 
 /**
  * MessageRetention.java: Nov 22, 2011 6:58:31 PM
@@ -33,7 +34,10 @@ public class MessageRetention {
 
     private static final Logger LOG = Logger.getLogger(MessageRetention.class);
 
-    public static void performCleanup(int timeDays) {
+    public static boolean performCleanup(int timeDays) {
+        int to = Tools.getTimestampDaysAgo(Tools.getUTCTimestamp(), timeDays);
+        LOG.debug("Deleting all messages older than " + to + " (" + timeDays + " days ago)");
+        return Indexer.deleteMessagesByTimeRange(to);
     }
 
     public static void updateLastPerformedTime() {

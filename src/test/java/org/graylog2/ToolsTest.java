@@ -125,4 +125,13 @@ public class ToolsTest {
 
         Tools.decompressGzip(new byte[0]);
     }
+
+    /**
+     * ruby-1.9.2-p136 :001 > [Time.now.to_i, 2.days.ago.to_i]
+     *  => [1322063329, 1321890529]
+     */
+    @Test
+    public void testGetTimestampDaysAgo() {
+        assertEquals(1321890529, Tools.getTimestampDaysAgo(1322063329, 2));
+    }
 }

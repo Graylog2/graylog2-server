@@ -26,6 +26,9 @@ public class CommandLineArguments {
     @Parameter(names = {"-d", "--debug"}, description = "Run graylog2 in debug mode")
     private boolean debug = false;
 
+    @Parameter(names = {"-r", "--no-retention"}, description = "Do not automatically remove messages from index that are older than the retention time")
+    private boolean noRetention = false;
+
     @Parameter(names = "--version", description = "Show version of graylog2 and exit")
     private boolean showVersion = false;
 
@@ -62,6 +65,10 @@ public class CommandLineArguments {
 
     public void setDebug(boolean debug) {
         this.debug = debug;
+    }
+
+    public boolean performRetention() {
+        return !noRetention;
     }
 
     public boolean isShowVersion() {

@@ -155,6 +155,38 @@ public class Indexer {
         }
     }
 
+    /**
+     * Deletes all messages from index which are older than the specified timestamp.
+     *
+     * @param to UTC UNIX timestamp
+     * @return {@literal true} if the messages were successfully deleted, {@literal false} otherwise
+     */
+    public static boolean deleteMessagesByTimeRange(int to) {
+        int responseCode = 0;
+
+        try {
+            URL url = new URL(buildIndexWithTypeUrl() + buildDeleteByQuerySinceDate(to));
+            HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+            conn.setRequestMethod("DELETE");
+            conn.connect();
+
+            responseCode = conn.getResponseCode();
+        } catch (IOException e) {
+            LOG.warn("IO error when trying to delete messages older than date", e);
+        } 
+
+        if (responseCode == HttpURLConnection.HTTP_OK) {
+            return true;
+        } else {
+            LOG.warn("Indexer response code was not 200, but " + responseCode);
+            return false;
+        }
+    }
+
+    private static String buildDeleteByQuerySinceDate(int to) {
+        return "/_query?q=created_at%3A%5B0%20TO%20" + to + "%5D";
+    }
+
     private static String getJSONfromGELFMessages(List<GELFMessage> messages) {
         StringBuilder sb = new StringBuilder();
 
