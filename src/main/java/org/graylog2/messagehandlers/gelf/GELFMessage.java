@@ -20,6 +20,11 @@
 
 package org.graylog2.messagehandlers.gelf;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
 import org.apache.log4j.Logger;
 import org.bson.types.ObjectId;
 import org.graylog2.Tools;
@@ -31,7 +36,6 @@ import org.graylog2.streams.StreamRule;
 import org.graylog2.streams.matchers.StreamRuleMatcherIF;
 import org.json.simple.JSONValue;
 
-import java.util.*;
 import java.util.regex.Pattern;
 import java.util.zip.Deflater;
 
