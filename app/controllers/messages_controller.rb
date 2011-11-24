@@ -58,7 +58,7 @@ class MessagesController < ApplicationController
       end
     end
   rescue Tire::Search::SearchRequestFailed
-      flash[:error] = "Syntax error in search query."
+      flash[:error] = "Syntax error in search query or empty index."
       @messages = MessageResult.new
       @total_count = 0
       @quickfilter_result_count = @messages.total_result_count
