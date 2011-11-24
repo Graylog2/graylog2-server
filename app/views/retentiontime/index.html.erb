@@ -13,7 +13,7 @@ influenced by this, what means that even if you set the retention time to 7 days
   <%= label_tag :value, 'Retention time in days:' %>
   <%= text_field_tag :value, @retention_time, :size => 4 %>
 
-  <%= awesome_submit_link 'Update' %>
+  <%= awesome_submit_link 'Update', :confirm => "Really change?" %>
 <% end %>
 
 <br />
@@ -22,7 +22,7 @@ influenced by this, what means that even if you set the retention time to 7 days
   <%= label_tag :value, 'Retention frequency in minutes:' %>
   <%= text_field_tag :value, @retention_frequency, :size => 4 %>
 
-  <%= awesome_submit_link 'Update' %>
+  <%= awesome_submit_link 'Update', :confirm => "Really change?" %>
 <% end %>
 Note that this setting will only be accounted after next retention run.
 
