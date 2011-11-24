@@ -157,33 +157,6 @@ public final class MongoConnection {
         return coll;
     }
 
-    public DBCollection getHistoricServerValuesColl() {
-        if (this.historicServerValuesCollection != null) {
-            return this.historicServerValuesCollection;
-        }
-
-        // Collection has not been cached yet. Do it now.
-        DBCollection coll = null;
-
-        // Create a capped collection if the collection does not yet exist.
-        if(MongoConnection.getInstance().getDatabase().collectionExists("historic_server_values")) {
-            coll = MongoConnection.getInstance().getDatabase().getCollection("historic_server_values");
-        } else {
-            coll = MongoConnection.getInstance()
-                    .getDatabase().createCollection("historic_server_values", BasicDBObjectBuilder.start()
-                    .add("capped", true)
-                    .add("size", 10485760) // 10 MB
-                    .add("max", 720) // Minutes. -> 12 hours.
-                    .get());
-        }
-
-        coll.ensureIndex(new BasicDBObject("type", 1));
-        coll.ensureIndex(new BasicDBObject("created_at", 1));
-
-        this.historicServerValuesCollection = coll;
-        return coll;
-    }
-
     /**
      * Get the message_counts collection. Lazily checks if correct indizes are set.
      *
