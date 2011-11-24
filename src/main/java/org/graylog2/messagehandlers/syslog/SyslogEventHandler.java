@@ -47,6 +47,7 @@ public class SyslogEventHandler implements SyslogServerSessionlessEventHandlerIF
      * @param syslogServer The syslog server
      * @param event        The event to handle
      */
+    @Override
     public void event(SyslogServerIF syslogServer, SocketAddress socketAddress, SyslogServerEventIF event) {
 
         GELFMessage gelf = new GELFMessage();
@@ -84,14 +85,17 @@ public class SyslogEventHandler implements SyslogServerSessionlessEventHandlerIF
         }
     }
 
+    @Override
     public void exception(SyslogServerIF syslogServer, SocketAddress socketAddress, Exception exception) {
         throw new UnsupportedOperationException("Not supported yet.");
     }
 
+    @Override
     public void initialize(SyslogServerIF syslogServer) {
         throw new UnsupportedOperationException("Not supported yet.");
     }
 
+    @Override
     public void destroy(SyslogServerIF syslogServer) {
         throw new UnsupportedOperationException("Not supported yet.");
     }
