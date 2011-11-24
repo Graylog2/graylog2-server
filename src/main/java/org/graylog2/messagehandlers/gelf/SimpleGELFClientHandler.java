@@ -110,6 +110,11 @@ public class SimpleGELFClientHandler extends GELFClientHandlerBase implements GE
                     return false;
                 }
             }
+            
+            if (!this.message.allRequiredFieldsSet()) {
+                LOG.info("GELF message is not complete. Version, host and short_message must be set.");
+                return false;
+            }
         	
             // Add AMQP receiver queue as additional field if set.
             if (this.getAmqpReceiverQueue() != null) {

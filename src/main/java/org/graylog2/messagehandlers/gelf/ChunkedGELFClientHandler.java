@@ -145,6 +145,11 @@ public class ChunkedGELFClientHandler extends GELFClientHandlerBase implements G
                 LOG.warn("Could not parse GELF JSON: " + e.getMessage() + " - clientMessage was: " + this.clientMessage, e);
                 return false;
             }
+            
+            if (!this.message.allRequiredFieldsSet()) {
+                LOG.info("GELF message is not complete. Version, host and short_message must be set.");
+                return false;
+            }
 
             if (!this.message.convertedFromSyslog()) {
                 LOG.debug("Got GELF message: " + this.message.toString());
