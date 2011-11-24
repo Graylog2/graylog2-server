@@ -67,21 +67,35 @@ public class SyslogEventHandler implements SyslogServerSessionlessEventHandlerIF
         LOG.debug("Level: " + event.getLevel() + " (" + Tools.syslogLevelToReadable(event.getLevel()) + ")");
         LOG.debug("Raw: " + new String(event.getRaw()));
 
-        gelf.setCreatedAt(Tools.getUTCTimestampWithMilliseconds(event.getDate().getTime()));
-        gelf.setConvertedFromSyslog(true);
-        gelf.setVersion("0");
-        gelf.setShortMessage(event.getMessage());
-
-        gelf.setHost(event.getHost());
-        gelf.setFacility(Tools.syslogFacilityToReadable(event.getFacility()));
-        gelf.setLevel(event.getLevel());
-        gelf.setRaw(event.getRaw());
-
+        // Manually check for provided date because it's necessary to parse the GELF message. Second check for completness later.
+        if (event.getDate() == null) {
+            LOG.info("Syslog message is missing date or could not be parsed. Not further handling. Message was: " + event.getRaw());
+            return;
+        }
+        
         try {
-            SimpleGELFClientHandler gelfHandler = new SimpleGELFClientHandler(gelf);
-            gelfHandler.handle();
+            gelf.setCreatedAt(Tools.getUTCTimestampWithMilliseconds(event.getDate().getTime()));
+            gelf.setConvertedFromSyslog(true);
+            gelf.setVersion("0");
+            gelf.setShortMessage(event.getMessage());
+            gelf.setHost(event.getHost());
+            gelf.setFacility(Tools.syslogFacilityToReadable(event.getFacility()));
+            gelf.setLevel(event.getLevel());
+            gelf.setRaw(event.getRaw());
         } catch (Exception e) {
-            LOG.debug("Couldn't process message with GELF handler", e);
+            LOG.info("Could not parse syslog message to GELF: " + e.toString(), e);
+            return;
+        }
+        
+        if (gelf.allRequiredFieldsSet()) {
+            try {
+                SimpleGELFClientHandler gelfHandler = new SimpleGELFClientHandler(gelf);
+                gelfHandler.handle();
+            } catch (Exception e) {
+                LOG.debug("Couldn't process message with GELF handler", e);
+            }
+        } else {
+            LOG.info("Broken or incomplete syslog message. Not further handling. Message was: " + event.getRaw());
         }
     }
 
