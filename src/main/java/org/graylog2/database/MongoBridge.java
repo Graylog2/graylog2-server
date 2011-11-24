@@ -44,50 +44,6 @@ public class MongoBridge {
     private static final Logger LOG = Logger.getLogger(MongoBridge.class);
 
     /**
-     * Inserts a GELF message into the messages collection.
-     *
-     * @param message The GELF message
-     * @throws Exception
-     */
-    public void insertGelfMessage(GELFMessage message) throws GELFException {
-        // Check if all required parameters are set.
-        if (!message.allRequiredFieldsSet()) {
-            throw new GELFException("Missing GELF message parameters. version, short_message and host are required.");
-        }
-
-        DBCollection coll = MongoConnection.getInstance().getMessagesColl();
-
-        BasicDBObject dbObj = new BasicDBObject();
-
-        dbObj.put("message", message.getShortMessage());
-        dbObj.put("full_message", message.getFullMessage());
-        dbObj.put("file", message.getFile());
-        dbObj.put("line", message.getLine());
-        dbObj.put("host", message.getHost());
-        dbObj.put("facility", message.getFacility()); 
-        dbObj.put("level", message.getLevel());
-        
-        // Add additional fields. XXX PERFORMANCE
-        for(Map.Entry<String, Object> entry : message.getAdditionalData().entrySet()) {
-            dbObj.put(entry.getKey(), entry.getValue());
-        }
-
-        if (message.getCreatedAt() <= 0) {
-            // This should have already been set at receiving, but to make sure...
-            dbObj.put("created_at", Tools.getUTCTimestampWithMilliseconds());
-        } else {
-            dbObj.put("created_at", message.getCreatedAt());
-        }
-
-        // Documents in capped collections cannot grow so we have to do that now and cannot just add 'deleted => true' later.
-        dbObj.put("deleted", false);
-
-        dbObj.put("streams", message.getStreamIds());
-
-        coll.insert(dbObj);
-    }
-
-    /**
      * Adds x to the counter of host in "hosts" collection.
      *
      * @param hostname The host to increment.
