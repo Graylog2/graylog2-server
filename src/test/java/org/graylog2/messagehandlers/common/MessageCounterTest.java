@@ -43,10 +43,10 @@ public class MessageCounterTest {
         ObjectId stream2 = new ObjectId();
         ObjectId stream3 = new ObjectId();
 
-        Map expected = new HashMap<ObjectId, Integer>();
-        expected.put(stream1, 1);
-        expected.put(stream2, 5);
-        expected.put(stream3, 2);
+        Map expected = new HashMap<String, Integer>();
+        expected.put(stream1.toString(), 1);
+        expected.put(stream2.toString(), 5);
+        expected.put(stream3.toString(), 2);
 
         counter.countUpStream(stream1, 1);
         counter.countUpStream(stream2, 3);
@@ -133,7 +133,7 @@ public class MessageCounterTest {
         counter.countUpStream(streamId, 100);
         counter.incrementStream(streamId);
 
-        int res = counter.getStreamCounts().get(streamId);
+        int res = counter.getStreamCounts().get(streamId.toString());
         assertEquals(101, res);
     }
 
@@ -143,7 +143,7 @@ public class MessageCounterTest {
         counter.countUpStream(streamId, 100);
         counter.countUpStream(streamId, 150);
 
-        int res = counter.getStreamCounts().get(streamId);
+        int res = counter.getStreamCounts().get(streamId.toString());
         assertEquals(250, res);
     }
 

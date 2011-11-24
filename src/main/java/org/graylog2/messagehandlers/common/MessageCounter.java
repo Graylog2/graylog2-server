@@ -37,7 +37,7 @@ public final class MessageCounter {
     private static MessageCounter instance;
 
     private int total;
-    private Map<ObjectId, Integer> streams;
+    private Map<String, Integer> streams;
     private Map<String, Integer> hosts;
 
     private int fiveSecondThroughput = 0;
@@ -63,7 +63,7 @@ public final class MessageCounter {
         return this.total;
     }
 
-    public Map<ObjectId, Integer> getStreamCounts() {
+    public Map<String, Integer> getStreamCounts() {
         return this.streams;
     }
 
@@ -90,7 +90,7 @@ public final class MessageCounter {
     }
 
     public void resetStreamCounts() {
-        this.streams = new HashMap<ObjectId, Integer>();
+        this.streams = new HashMap<String, Integer>();
     }
 
     public void resetTotal() {
@@ -154,13 +154,13 @@ public final class MessageCounter {
      * @param x The value to add on top of the current stream count.
      */
     public void countUpStream(ObjectId streamId, int x) {
-        if (this.streams.containsKey(streamId)) {
+        if (this.streams.containsKey(streamId.toString())) {
             // There already is an entry. Increment.
-            int oldCount = this.streams.get(streamId);
-            this.streams.put(streamId, oldCount+x); // Overwrites old entry.
+            int oldCount = this.streams.get(streamId.toString());
+            this.streams.put(streamId.toString(), oldCount+x); // Overwrites old entry.
         } else {
             // First entry for this stream.
-            this.streams.put(streamId, x);
+            this.streams.put(streamId.toString(), x);
         }
     }
 

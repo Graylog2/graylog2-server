@@ -134,7 +134,7 @@ public class MongoBridge {
         coll.update(query, update, true, false);
     }
 
-    public void writeMessageCounts(int total, Map<ObjectId, Integer> streams, Map<String, Integer> hosts) {
+    public void writeMessageCounts(int total, Map<String, Integer> streams, Map<String, Integer> hosts) {
         BasicDBObject obj = new BasicDBObject();
         obj.put("timestamp", Tools.getUTCTimestamp());
         obj.put("total", total);
