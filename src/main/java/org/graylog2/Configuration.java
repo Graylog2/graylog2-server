@@ -59,6 +59,9 @@ public class Configuration {
     @Parameter(value = "elasticsearch_url", required = true)
     private String elasticsearchUrl = "http://localhost:9200/";
 
+    @Parameter(value = "elasticsearch_index_name", required = true)
+    private String elasticsearchIndexName = "graylog2";
+
     @Parameter(value = "mongodb_user")
     private String mongoUser;
 
@@ -145,6 +148,10 @@ public class Configuration {
         }
 
         return ret;
+    }
+
+    public String getElasticSearchIndexName() {
+        return this.elasticsearchIndexName;
     }
 
     public boolean isMongoUseAuth() {

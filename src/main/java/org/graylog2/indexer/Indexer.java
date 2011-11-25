@@ -45,7 +45,7 @@ public class Indexer {
 
     private static final Logger LOG = Logger.getLogger(Indexer.class);
 
-    public static final String INDEX = "graylog2";
+    public static final String INDEX = Main.configuration.getElasticSearchIndexName();
     public static final String TYPE = "message";
 
     /**

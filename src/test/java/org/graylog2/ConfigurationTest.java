@@ -27,6 +27,7 @@ public class ConfigurationTest {
 
         // Required properties
         validProperties.put("elasticsearch_url", "http://localhost:9200/");
+        validProperties.put("elasticsearch_index_name", "graylog2");
         validProperties.put("syslog_listen_port", "514");
         validProperties.put("syslog_protocol", "udp");
         validProperties.put("mongodb_useauth", "true");
@@ -83,6 +84,15 @@ public class ConfigurationTest {
         new JadConfig(new InMemoryRepository(validProperties), configuration).process();
 
         Assert.assertEquals("https://example.org:80/", configuration.getElasticSearchUrl());
+    }
+
+    @Test
+    public void testGetElasticSearchIndexName() throws RepositoryException, ValidationException {
+
+        Configuration configuration = new Configuration();
+        new JadConfig(new InMemoryRepository(validProperties), configuration).process();
+
+        Assert.assertEquals("graylog2", configuration.getElasticSearchIndexName());
     }
 
     @Test
