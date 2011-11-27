@@ -135,4 +135,8 @@ class Configuration
   def self.indexer_host
     indexer_config :url
   end
+  
+  def self.indexer_index_name
+    indexer_config :index_name
+  end
 end

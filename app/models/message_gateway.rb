@@ -14,11 +14,15 @@ class MessageGateway
   include Tire::Model::Search
   include Mongoid::Document
 
-  # XXX ELASTIC: sucks. read from yml
+  # used if not set in config
+  DEFAULT_INDEX_NAME = "graylog2"
+
+  # XXX ELASTIC: sucks.
   if Rails.env == "test"
     INDEX_NAME = "graylog2_test"
   else
-    INDEX_NAME = "graylog2"
+    config_index = Configuration.indexer_index_name
+    config_index.blank? ? INDEX_NAME = DEFAULT_INDEX_NAME : INDEX_NAME = config_index
   end
 
   TYPE_NAME = "message"
