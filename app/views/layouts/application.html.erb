@@ -56,11 +56,21 @@
     </div>
   <% end %>
 
-  <% if ServerValue.ping < 65.seconds.ago and Rails.env != "development" %>
+  <% if ServerValue.ping < 65.seconds.ago %>
     <div id="server-not-running" class="notification">
       <span class="notification-title">Warning!</span> It seems like your Graylog2 server is not running.
     </div>
   <% end %>
+
+  <div id="current-throughputs">
+    <span class="health-throughput-current"><%= ServerValue.throughput[:current] %></span> /
+    <span class="health-mqsize-current"><%= ServerValue.message_queue_current_size %></span>
+  </div>
+  <script type="text/javascript">
+    $("#current-throughputs").bind("click", function() {
+      window.location = "<%= health_index_path %>";
+    })
+  </script>
 
   <div id="top">
     <div id="userbar">
@@ -83,7 +93,7 @@
 
   <div id="content-top">
     <div id="content-tabs">
-  <% (messages_tabs | hostgroup_tabs | stream_tabs).each do |tab| %>
+  <% (messages_tabs | stream_tabs | settings_tabs).each do |tab| %>
 	  <%= raw tab_link(tab)%>
 	<% end %>
       <br style="clear: both;" />

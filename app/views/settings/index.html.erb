@@ -3,15 +3,6 @@
   The options you can set in the text boxes on the lower part only affect your own user.
 </div>
 
-<%= awesome_link "Manage message comments", messagecomments_path %>
-<%= awesome_link "Filtered terms", filteredterms_path %>
-
-<% if Configuration.allow_version_check %>
-  <%= awesome_link "Check Graylog2 version", versioncheck_index_path %>
-<% end %>
-<br />
-<br />
-
 <div class="setting">
   <h4><label>Message length</h4>
   <%= form_tag store_settings_path do -%>

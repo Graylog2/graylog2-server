@@ -10,7 +10,7 @@
 </div>
 
 <script type="text/javascript">
-  var data = "<%= @hosts.map { |h| h(h.host) }.join ',' %> ".split(",");
+  var data = "<%= @all_hosts.map { |h| h(h.host) }.join ',' %> ".split(",");
     $("#hosts-quickjump-input").autocomplete(data);
 </script>
 

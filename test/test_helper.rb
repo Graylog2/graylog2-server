@@ -60,7 +60,8 @@ class ActionController::TestCase
 
   def login!(options = {})
     user = User.make(options)
-    @request.session[:user_id] = user.id
+    @request.session[:user_id] = user._id
+    @logged_in_user = user
     user
   end
 end

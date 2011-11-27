@@ -1,7 +1,7 @@
 class Host
   include Mongoid::Document
 
-  PER_PAGE = 10
+  PER_PAGE = 30
   paginates_per(PER_PAGE)
 
   field :host, :type => String

@@ -34,3 +34,9 @@ end
 
 MessageCount.blueprint do
 end
+
+Setting.blueprint do
+end
+
+ServerValue.blueprint do
+end
