@@ -25,6 +25,7 @@ import org.apache.log4j.Logger;
 import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
+import java.net.InetSocketAddress;
 
 /**
  * GELFThread.java: Jun 23, 2010 6:58:07 PM
@@ -47,16 +48,18 @@ public class GELFServer {
     /**
      * Create the UDP socket.
      *
-     * @param port The port to listen on.
+     * @param socketAddress The {@link InetSocketAddress} to bind to
      * @return boolean
      */
-    public boolean create(int port) {
+    public boolean create(InetSocketAddress socketAddress) {
         try {
-            this.serverSocket = new DatagramSocket(port);
+            this.serverSocket = new DatagramSocket(socketAddress);
         } catch(IOException e) {
             LOG.fatal("Could not create ServerSocket in GELFServer::create(): " + e.getMessage(), e);
             return false;
         }
+
+        LOG.info("Started GELF server on " + socketAddress);
 
         return true;
     }

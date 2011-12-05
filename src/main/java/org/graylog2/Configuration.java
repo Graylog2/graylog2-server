@@ -101,6 +101,9 @@ public class Configuration {
     @Parameter(value = "use_gelf", required = true)
     private boolean useGELF = false;
 
+    @Parameter(value = "gelf_listen_address")
+    private String gelfListenAddress = "0.0.0.0";
+
     @Parameter(value = "gelf_listen_port", required = true, validator = InetPortValidator.class)
     private int gelfListenPort = 12201;
 
@@ -204,6 +207,10 @@ public class Configuration {
 
     public boolean isUseGELF() {
         return useGELF;
+    }
+
+    public String getGelfListenAddress() {
+        return gelfListenAddress;
     }
 
     public int getGelfListenPort() {
