@@ -37,22 +37,23 @@ import org.graylog2.messagehandlers.amqp.AMQPSubscriberThread;
 import org.graylog2.messagehandlers.gelf.ChunkedGELFClientManager;
 import org.graylog2.messagehandlers.gelf.GELFMainThread;
 import org.graylog2.messagehandlers.syslog.SyslogServerThread;
+import org.graylog2.messagequeue.MessageQueue;
+import org.graylog2.messagequeue.MessageQueueFlusher;
+import org.graylog2.periodical.BulkIndexerThread;
 import org.graylog2.periodical.ChunkedGELFClientManagerThread;
 import org.graylog2.periodical.HostCounterCacheWriterThread;
 import org.graylog2.periodical.MessageCountWriterThread;
+import org.graylog2.periodical.MessageRetentionThread;
+import org.graylog2.periodical.ServerValueWriterThread;
 
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.Writer;
+import java.net.InetSocketAddress;
 import java.util.List;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
-import org.graylog2.messagequeue.MessageQueue;
-import org.graylog2.messagequeue.MessageQueueFlusher;
-import org.graylog2.periodical.BulkIndexerThread;
-import org.graylog2.periodical.MessageRetentionThread;
-import org.graylog2.periodical.ServerValueWriterThread;
 
 /**
  * Main class of Graylog2.
@@ -167,7 +168,7 @@ public final class Main {
 
         // Start GELF threads
         if (configuration.isUseGELF()) {
-            initializeGELFThreads(configuration.getGelfListenPort(), scheduler);
+            initializeGELFThreads(configuration.getGelfListenAddress(), configuration.getGelfListenPort(), scheduler);
         }
 
         // Initialize AMQP Broker if enabled
@@ -230,8 +231,8 @@ public final class Main {
         LOG.info("Retention time management active.");
     }
 
-    private static void initializeGELFThreads(int gelfPort, ScheduledExecutorService scheduler) {
-        GELFMainThread gelfThread = new GELFMainThread(gelfPort);
+    private static void initializeGELFThreads(String gelfAddress, int gelfPort, ScheduledExecutorService scheduler) {
+        GELFMainThread gelfThread = new GELFMainThread(new InetSocketAddress(gelfAddress, gelfPort));
         gelfThread.start();
 
         scheduler.scheduleAtFixedRate(new ChunkedGELFClientManagerThread(ChunkedGELFClientManager.getInstance()), ChunkedGELFClientManagerThread.INITIAL_DELAY, ChunkedGELFClientManagerThread.PERIOD, TimeUnit.SECONDS);
