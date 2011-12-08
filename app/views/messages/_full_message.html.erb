@@ -11,7 +11,13 @@
 
 <p class="messages-show-message"><%= @message.message %></p>
 
-<h4>From: <span class="highlighted"><%= @message.host %></span></h4>
+<h4>
+  From:
+  <span class="highlighted">
+    <%= link_to(@message.host, host_messages_path(@message.host)) %>
+  </span>
+</h4>
+
 <h4>Date: <span class="highlighted"><%= Time.at(@message.created_at) %></span></h4>
 <h4>Severity: <span class="highlighted"><%= syslog_level_to_human(@message.level) %></span></h4>
 <h4>Facility: <span class="highlighted"><%= @message.facility %></span></h4>
