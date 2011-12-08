@@ -1,0 +1,15 @@
+<% content_for :sidebar do %>
+  <%= render :partial => "sidebar_index" %>
+<% end %>
+
+<h1>
+  Messages from <span class="highlighted"><%= gl_date(@from) %></span> to <span class="highlighted"><%= gl_date(@to) %></span>
+  of host <span class="highlighted"><%= @host.host %></span>
+  </h1>
+A total of <span class="highlighted"><%= @total_count %></span> messages in this time range.
+
+<%= render :partial => "messages/table", :locals => {
+  :messages => @messages,
+  :total_messages => @total_count,
+  :append_params => [{ :key => "from", :value => @from.to_i}, {:key => "to", :value => @to.to_i} ]
+} %>

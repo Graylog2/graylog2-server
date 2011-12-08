@@ -1,4 +1,6 @@
 class VisualsController < ApplicationController
+  STANDARD_TIMESPAN_HOURS = 12
+
   def fetch
     r = Hash.new
 
@@ -8,6 +10,8 @@ class VisualsController < ApplicationController
           r["data"] = calculate_totalgraph(params[:hours])
         when "streamgraph" then
           r["data"] = calculate_streamgraph(params[:stream_id], params[:hours])
+        when "hostgraph" then
+          r["data"] = calculate_hostgraph(params[:hostname], params[:hours])
       end
     end
 
@@ -18,18 +22,24 @@ class VisualsController < ApplicationController
 
   private
 
-  def calculate_totalgraph(hours = 12)
+  def calculate_totalgraph(hours = STANDARD_TIMESPAN_HOURS)
     MessageCount.counts_of_last_minutes(hours.to_i*60).collect do |c|
       [ (c[:timestamp].to_i+Time.now.utc_offset)*1000, c[:count] ]
     end
   end
 
-  def calculate_streamgraph(stream_id, hours=12)
+  def calculate_streamgraph(stream_id, hours = STANDARD_TIMESPAN_HOURS)
     stream = Stream.find(stream_id)
 
     return Array.new if stream.streamrules.blank?
 
     MessageCount.counts_of_last_minutes(hours.to_i*60, :stream_id => stream.id).collect do |c|
+      [ (c[:timestamp].to_i+Time.now.utc_offset)*1000, c[:count] ]
+    end
+  end
+
+  def calculate_hostgraph(hostname, hours = STANDARD_TIMESPAN_HOURS)
+    MessageCount.counts_of_last_minutes(hours.to_i*60, :hostname => hostname).collect do |c|
       [ (c[:timestamp].to_i+Time.now.utc_offset)*1000, c[:count] ]
     end
   end

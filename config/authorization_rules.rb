@@ -45,7 +45,7 @@ authorization do
 
     has_permission_on :analytics, :to => [:index, :shell]
 
-    has_permission_on :hosts, :to => [:index, :show, :destroy, :quickjump]
+    has_permission_on :hosts, :to => [:index, :show, :destroy, :quickjump, :showrange]
 
     has_permission_on :blacklists, :to => [:index, :show, :create, :destroy]
     has_permission_on :blacklistedterms, :to => [:create, :destroy]

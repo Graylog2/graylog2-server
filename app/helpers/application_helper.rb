@@ -78,11 +78,14 @@ module ApplicationHelper
   end
 
   def flot_graph_loader(options)
-   if options[:stream_id].blank?
-     url = visuals_path("totalgraph", :hours => options[:hours])
-   else
-     url = visuals_path("streamgraph", :stream_id => options[:stream_id], :hours => options[:hours])
-   end
+    raise "You can only pass stream_id OR hostname" if !options[:stream_id].blank? and !options[:hostname].blank?
+
+    if options[:stream_id].blank? and options[:hostname].blank?
+      url = visuals_path("totalgraph", :hours => options[:hours])
+    else
+      url = visuals_path("streamgraph", :stream_id => options[:stream_id], :hours => options[:hours]) if (!options[:stream_id].blank?)
+      url = visuals_path("hostgraph", :hostname => options[:hostname], :hours => options[:hours]) if (!options[:hostname].blank?)
+    end
 
    "<script type='text/javascript'>
       function plot(data){

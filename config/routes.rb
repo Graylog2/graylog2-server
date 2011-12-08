@@ -32,6 +32,11 @@ Graylog2WebInterface::Application.routes.draw do
   resources :hosts, :constraints => { :id => /.*/ } do
     resources :messages
 
+    member do
+      post :showrange
+      get :showrange
+    end
+
     collection do
       post :quickjump
     end
