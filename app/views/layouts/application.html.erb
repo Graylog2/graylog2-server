@@ -42,26 +42,6 @@
 
   <div id="back-to-top">Back to top</div>
 
-  <% unless flash[:notice].blank? %>
-    <div id="notification-notice" class="notification notification-flash">
-      <span class="notification-title">Success!</span>
-      <%=raw flash[:notice] %>
-    </div>
-  <% end %>
-
-  <% unless flash[:error].blank? %>
-    <div id="notification-error" class="notification notification-flash">
-      <span class="notification-title">Error!</span>
-      <%=raw flash[:error] %>
-    </div>
-  <% end %>
-
-  <% if ServerValue.ping < 65.seconds.ago %>
-    <div id="server-not-running" class="notification">
-      <span class="notification-title">Warning!</span> It seems like your Graylog2 server is not running.
-    </div>
-  <% end %>
-
   <div id="current-throughputs">
     <span class="health-throughput-current"><%= ServerValue.throughput[:current] %></span> /
     <span class="health-mqsize-current"><%= ServerValue.message_queue_current_size %></span>
@@ -146,5 +126,26 @@
   <% end %>
 
   <br style="clear: both;" /><br />
+  
+  <% if ServerValue.ping < 65.seconds.ago %>
+    <div id="server-not-running" class="notification">
+      <span class="notification-title">Warning!</span> It seems like your Graylog2 server is not running.
+    </div>
+  <% end %>
+  
+  <% unless flash[:notice].blank? %>
+    <div id="notification-notice" class="notification notification-flash">
+      <span class="notification-title">Success!</span>
+      <%=raw flash[:notice] %>
+    </div>
+  <% end %>
+
+  <% unless flash[:error].blank? %>
+    <div id="notification-error" class="notification notification-flash">
+      <span class="notification-title">Error!</span>
+      <%=raw flash[:error] %>
+    </div>
+  <% end %>
+  
 </body>
 </html>
