@@ -96,28 +96,41 @@ $(document).ready(function(){
       return false;
     });
 
-    $('#analytics-new-messages-update-hours').numeric();
+    $('#analytics-new-messages-update-range').numeric();
     // Visuals: Update of new messages graph.
     $('#analytics-new-messages-update-submit').bind('click', function() {
-      i = $('#analytics-new-messages-update-hours');
+      i = $('#analytics-new-messages-update-range');
       v = parseInt(i.val());
-
+      
       if (v <= 0) {
         return false;
+      }
+
+      // Possibly multiply if days or weeks was selected as range.
+      if ($('#range_type_days').attr("checked")) {
+        range_type = "days";
+        range_num = v*24;
+      } else if($('#range_type_weeks').attr("checked")) {
+        range_type = "weeks";
+        range_num = v*24*7;
+      } else {
+        range_type = "hours";
+        range_num = v;
       }
 
       // Show loading message.
       $("#analytics-new-messages-update-loading").show();
 
       // Update graph.
-      $.post($(this).attr("data-updateurl") + "&hours=" + v, function(data) {
+      $.post($(this).attr("data-updateurl") + "&hours=" + range_num, function(data) {
         json = eval('(' + data + ')');
 
         // Plot is defined inline. (I suck at JavaScript)
         plot(json.data);
 
         // Update title.
-        $('#analytics-new-messages-hours').html(v);
+        $('#analytics-new-messages-range').html(v);
+        $('#analytics-new-messages-range-type').html(range_type);
 
         // Hide loading message.
         $("#analytics-new-messages-update-loading").hide();

@@ -255,4 +255,23 @@ module ApplicationHelper
 
     tabs
   end
+
+  def analytics_range_headline
+    "Count of new messages (last <span id='analytics-new-messages-range'>12</span> <span id='analytics-new-messages-range-type'>hours</span>.)"
+  end
+
+  def analytics_range_selector_form_fields
+    "
+      #{text_field_tag :range, 12, { :id => "analytics-new-messages-update-range" }}
+
+      #{radio_button_tag :range_type, :hours, :selected => "selected"}
+      #{label_tag :range_type_hours, "Hours"}
+  
+      #{radio_button_tag :range_type, :days}
+      #{label_tag :range_type_days, "Days"}
+  
+      #{radio_button_tag :range_type, :weeks}
+      #{label_tag :range_type_weeks, "Weeks"}
+    "
+  end
 end

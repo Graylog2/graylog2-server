@@ -1,6 +1,6 @@
 <h1>Analytics for stream <span class="highlighted"><%= @stream.title_possibly_disabled %></span></h1>
 
-<h2>Count of new messages (last <span id="analytics-new-messages-hours">12</span> hours.)</h2>
+<h2><%=raw analytics_range_headline %></h2>
 <div id="streams-analytics-new-messages">
   <%= image_tag "loading.gif", :class => "ajaxloader" %>
 </div>
@@ -13,8 +13,7 @@
 </div>
 
 <div id="analytics-new-messages-settings">
-  <%= label_tag :hours, "Hours:" %>
-  <%= text_field_tag :hours, 12, { :id => "analytics-new-messages-update-hours" } %>
+  <%=raw analytics_range_selector_form_fields %>
 
   <%= awesome_submit_link "Update graph", { :id => "analytics-new-messages-update-submit", "data-updateurl" => visuals_path("streamgraph", :stream_id => @stream.id), "data-nowait" => "true" } %>
   <span id="analytics-new-messages-update-loading" style="display: none;">
