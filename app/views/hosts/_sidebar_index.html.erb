@@ -17,3 +17,6 @@
 %>
 
 <h3 id="hosts-sidebar-totalcount">Total messages: <%= number_with_delimiter(@total_count, :delimiter => '.') %></h3>
+
+<br />
+<%= awesome_link "Delete host", host_path(@host), :method => :delete, :confirm => "Really delete this host? No messages will be deleted." %>

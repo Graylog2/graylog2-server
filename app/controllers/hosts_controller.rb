@@ -30,13 +30,7 @@ class HostsController < ApplicationController
   def destroy
     host = Host.where(:_id => BSON::ObjectId(params[:id])).first
 
-    # Delete all messages of thist host.
-    Message.where(:host => host.host).update_all(
-      :deleted => true
-    )
-
-    # Delete host.
-    if host.delete
+    if !host.nil? and host.delete
       flash[:notice] = "Host has been deleted"
     else
       flash[:error] = "Could not delete host"
