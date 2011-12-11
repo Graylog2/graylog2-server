@@ -24,6 +24,7 @@ import org.bson.types.ObjectId;
 
 import java.util.HashMap;
 import java.util.Map;
+import org.graylog2.Tools;
 
 /**
  * MessageCounter.java: Sep 20, 2011 6:47:42 PM
@@ -180,6 +181,7 @@ public final class MessageCounter {
      * @param x The value to add on top of the current host count.
      */
     public void countUpHost(String hostname, int x) {
+        hostname = Tools.encodeBase64(hostname);
         if (this.hosts.containsKey(hostname)) {
             // There already is an entry. Increment.
             int oldCount = this.hosts.get(hostname);

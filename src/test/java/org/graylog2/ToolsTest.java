@@ -134,4 +134,14 @@ public class ToolsTest {
     public void testGetTimestampDaysAgo() {
         assertEquals(1321890529, Tools.getTimestampDaysAgo(1322063329, 2));
     }
+
+    @Test
+    public void testEncodeBase64() {
+        assertEquals("bG9sd2F0LmVuY29kZWQ=", Tools.encodeBase64("lolwat.encoded"));
+    }
+
+    @Test
+    public void testDecodeBase64() {
+        assertEquals("lolwat.encoded", Tools.decodeBase64("bG9sd2F0LmVuY29kZWQ="));
+    }
 }

@@ -25,10 +25,7 @@ import com.mongodb.DB;
 import com.mongodb.DBCollection;
 import com.mongodb.DBObject;
 import org.apache.log4j.Logger;
-import org.bson.types.ObjectId;
 import org.graylog2.Tools;
-import org.graylog2.messagehandlers.gelf.GELFException;
-import org.graylog2.messagehandlers.gelf.GELFMessage;
 
 import java.util.Map;
 

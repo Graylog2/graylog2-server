@@ -5,6 +5,7 @@
 
 package org.graylog2.messagehandlers.common;
 
+import org.graylog2.Tools;
 import java.util.HashMap;
 import java.util.Map;
 import org.bson.types.ObjectId;
@@ -64,9 +65,9 @@ public class MessageCounterTest {
         String host3 = "example.com";
 
         Map expected = new HashMap<String, Integer>();
-        expected.put(host1, 5);
-        expected.put(host2, 1);
-        expected.put(host3, 3);
+        expected.put(Tools.encodeBase64(host1), 5);
+        expected.put(Tools.encodeBase64(host2), 1);
+        expected.put(Tools.encodeBase64(host3), 3);
 
         counter.countUpStream(new ObjectId(), 5); // Add a stream count for complexity.
         counter.countUpHost(host1, 4);
@@ -153,7 +154,7 @@ public class MessageCounterTest {
         counter.countUpHost(hostname, 10);
         counter.incrementHost(hostname);
 
-        int res = counter.getHostCounts().get(hostname);
+        int res = counter.getHostCounts().get(Tools.encodeBase64(hostname));
         assertEquals(11, res);
     }
 
@@ -163,7 +164,7 @@ public class MessageCounterTest {
         counter.countUpHost(hostname, 25);
         counter.countUpHost(hostname, 40);
 
-        int res = counter.getHostCounts().get(hostname);
+        int res = counter.getHostCounts().get(Tools.encodeBase64(hostname));
         assertEquals(65, res);
     }
 

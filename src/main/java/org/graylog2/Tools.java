@@ -31,6 +31,7 @@ import java.net.UnknownHostException;
 import java.util.Calendar;
 import java.util.zip.GZIPInputStream;
 import java.util.zip.InflaterInputStream;
+import org.drools.util.codec.Base64;
 
 /**
  * Tools.java: May 17, 2010 9:46:31 PM
@@ -210,5 +211,13 @@ public final class Tools {
 
     public static int getTimestampDaysAgo(int ts, int days) {
         return (ts - (days*86400));
+    }
+
+    public static String encodeBase64(String what) {
+        return new String(Base64.encodeBase64(what.getBytes()));
+    }
+
+    public static String decodeBase64(String what) {
+        return new String(Base64.decodeBase64(what));
     }
 }
