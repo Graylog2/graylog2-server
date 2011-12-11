@@ -63,7 +63,7 @@ import java.util.concurrent.TimeUnit;
 public final class Main {
 
     private static final Logger LOG = Logger.getLogger(Main.class);
-    private static final String GRAYLOG2_VERSION = "0.9.6-PREVIEW.2";
+    private static final String GRAYLOG2_VERSION = "0.9.6-PREVIEW.3";
 
     public static RulesEngine drools = null;
     private static final int SCHEDULED_THREADS_POOL_SIZE = 7;
