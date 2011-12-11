@@ -27,7 +27,7 @@ class Message
     return m
   end
 
-  # XXX ELASTIC ZZZZOMMMGG
+  # XXX ELASTIC ZZZZOMMMGG, mega-duplication :/
   def self.parse_from_hash(x)
     m = self.new
 
@@ -99,14 +99,6 @@ class Message
     end
 
     return conditions
-  end
-
-  # XXX ELASTIC - wat
-  def self.recalculate_host_counts
-    Host.all.each do |host|
-      host.message_count = Message.where(:host => host.host, :deleted => false).count
-      host.save
-    end
   end
 
   # Workaround for migration problems. #WEBINTERFACE-24

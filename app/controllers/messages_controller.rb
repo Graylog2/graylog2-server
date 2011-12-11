@@ -129,8 +129,6 @@ class MessagesController < ApplicationController
       :deleted => true
     )
 
-    Message.recalculate_host_counts
-
     redirect_to stream_path(params[:stream_id])
   end
 
@@ -146,8 +144,6 @@ class MessagesController < ApplicationController
     Message.all_by_quickfilter(filters_with_symbols, 0, 0, true).update_all(
       :deleted => true
     )
-
-    Message.recalculate_host_counts
 
     flash[:notice] = "Messages have been deleted."
 
