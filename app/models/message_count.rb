@@ -28,7 +28,7 @@ class MessageCount
           sc.blank? ? count = 0 : count = sc
           res << { :timestamp => c.timestamp, :count => count }#
         when :host then
-          hc = c.hosts[opts[:hostname]]
+          hc = c.hosts[Base64.encode64(opts[:hostname]).chop]
           hc.blank? ? count = 0 : count = hc
           res << { :timestamp => c.timestamp, :count => count }#
         when :total then
