@@ -16,8 +16,8 @@ class Shell
   ALLOWED_SELECTORS = %w(all stream streams)
   ALLOWED_OPERATORS = %w(count find distinct distribution)
   RANGE_QUERY_CONDITIONALS = %w(>= <= > <)
-  TEXT_QUERY_CONDITIONALS = %w(= !=)
-  ALLOWED_CONDITIONALS = RANGE_QUERY_CONDITIONALS | TEXT_QUERY_CONDITIONALS
+  BOOLEAN_QUERY_CONDITIONALS = %w(= !=)
+  ALLOWED_CONDITIONALS = RANGE_QUERY_CONDITIONALS | BOOLEAN_QUERY_CONDITIONALS
 
   MAX_LIMIT = 500
 
@@ -57,7 +57,6 @@ class Shell
     if selector == "stream" or selector == "streams"
       parse_stream_narrows
     end
-
   end
 
   def parse_selector
@@ -143,9 +142,6 @@ class Shell
   def typify_value(option)
     if option.start_with?('"') and option.end_with?('"')
       return option[1..-2]
-    elsif option.start_with?("/") and option.end_with?("/")
-      # lol, regex
-      return /#{option[1..-2]}/
     else
       return option.to_i
     end
@@ -158,10 +154,10 @@ class Shell
     # options.inspect: {"host"=>{:value=>"example.org", :condition=>"!="}, "_http_response_code"=>[{:value=>300, :condition=>"<"}, {:value=>200, :condition=>">="}]}
 
     range_queries = extract_range_queries(options)
-    text_queries = extract_text_queries(options)
-
-    # range_queries.inspect: [{"_http_response_code"=>{:value=>300, :condition=>"<"}}, {"_http_response_code"=>{:value=>200, :condition=>">="}}]
-    # text_queries.inspect:  [{"host"=>{:value=>"example.org", :condition=>"!="}}]
+    bool_queries = extract_boolean_queries(options)
+    
+    # raw_range_queries.inspect: [{"_http_response_code"=>{:value=>300, :condition=>"<"}}, {"_http_response_code"=>{:value=>200, :condition=>">="}}]
+    # bool_queries.inspect:  {:equal=>[["message", "OHAI thar"]], :not_equal=>[]}
 
     criteria = Hash.new
     range_criterias = Array.new
@@ -171,16 +167,33 @@ class Shell
 
     # Add range criterias.
     unless range_criterias.blank?
-      criteria[:filtered] = Hash.new
-      criteria[:filtered][:query] = { "match_all" => Hash.new } # possibly plug text_queries here
-      criteria[:filtered][:filter] = Hash.new 
-      criteria[:filtered][:filter][:and] = range_criterias 
+      criteria = Hash.new
+      criteria[:query] = { :match_all => Hash.new }
+      criteria[:filter] = Hash.new 
+      criteria[:filter][:and] = range_criterias 
     end
 
-    # Set to match all, if nothing was selected before.
-    criteria = { "match_all" => Hash.new } if criteria.blank?
+    # Overwrite match_all query rule if there are non-range queries.
+    unless bool_queries[:equal].blank? and bool_queries[:not_equal].blank?
+      musts = []
+      must_nots = []
+      bool_queries[:equal].each do |q|
+        musts << { :term => { q[0] => q[1]} }
+      end
 
-    return { :query => criteria } 
+      bool_queries[:not_equal].each do |q|
+        must_nots << { :term => { q[0] => q[1]} }
+      end
+
+      criteria[:query] = {
+        :bool => {
+          :must => musts,
+          :must_not => must_nots
+        }
+      }
+    end
+
+    return criteria
   end
 
   def elastic_conditionize_ranges(ranges)
@@ -196,14 +209,17 @@ class Shell
       end
     end
   
-    # normalized.inspect: {"_http_response_code"=>[{:value=>300, :condition=>"<"}, {:value=>200, :condition=>">="}]} 
+    # normalized.inspect: {"_http_response_code"=>[{:value=>300, :condition=>"<"}, {:value=>200, :condition=>">="}], "_something"=>[{:value=>50, :condition=>">"}]}
     normalized.each do |field, conditions|
+      cs = Hash.new
       conditions.each do |condition|
-        result << { field => { map_elastic_condition(condition[:condition]) => condition[:value] }}
+        cs[map_elastic_condition(condition[:condition])] = condition[:value]
       end
+
+      result << { field => cs }
     end
-   
-    # XXX result.inspect: 
+
+    # result.inspect: {"_http_response_code"=>[{:value=>300, :condition=>"<"}, {:value=>200, :condition=>">="}], "_something"=>[{:value=>50, :condition=>">"}]}
     return result
   end
 
@@ -226,41 +242,54 @@ class Shell
   end
   
   # XXX refactor: merge with range query extractor
-  def extract_text_queries(options)
-    text_queries = Array.new
-    return text_queries if options.blank?
+  def extract_boolean_queries(options)
+    bool_queries = { :equal => [], :not_equal => [] }
+    return bool_queries if options.blank?
 
     options.each do |k,v|
       # XXX refactor
       if v.is_a?(Hash)
-        text_queries << { k => v} if TEXT_QUERY_CONDITIONALS.include?(v[:condition])
+        next if !BOOLEAN_QUERY_CONDITIONALS.include?(v[:condition])
+        if v[:condition] == "!="
+          bool_queries[:not_equal] << [ k, v[:value] ]
+        else
+          bool_queries[:equal] << [ k, v[:value] ]
+        end
       elsif v.is_a?(Array)
         v.each do |option|
-          text_queries << { k => option } if TEXT_QUERY_CONDITIONALS.include?(option[:condition])
+          next if !BOOLEAN_QUERY_CONDITIONALS.include?(option[:condition])
+          if option[:condition] == "!="
+            bool_queries[:not_equal] << [ k, option[:value] ]
+          else
+            bool_queries[:equal] << [ k, option[:value] ]
+          end
         end
       end
     end
-
-    return text_queries
+    
+    return bool_queries
   end
 
   def elastify_stream_narrows(streams)
     return Hash.new if streams.blank?
 
-    criteria = Hash.new
-
-    if streams.count == 1
-      criteria = { :streams => BSON::ObjectId(streams[0]) }
-    else
-      stream_arr = Array.new
-      streams.each do |stream|
-        stream_arr << BSON::ObjectId(stream)
-      end
-
-      criteria = { :streams => { "$in" => stream_arr } }
+    # XXX map
+    arr = Array.new
+    streams.each do |stream|
+      arr << BSON::ObjectId(stream)
     end
 
-    return criteria
+    {
+      :query => {
+        :bool => {
+          :must => {
+            :terms => {
+              :streams => arr
+            }
+          }
+        }
+      }
+    }
   end
 
   # XXX REMOVE?
@@ -288,7 +317,7 @@ class Shell
   end
 
   def perform_find
-    @result = criteria.order_by({"created_at" => "-1"}).limit(MAX_LIMIT).all.to_a
+    @result = MessageGateway.dynamic_search(criteria.merge(:size => 150), true)
   end
 
   def perform_distinct
