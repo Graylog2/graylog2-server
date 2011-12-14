@@ -409,17 +409,17 @@ class ShellTest < ActiveSupport::TestCase
       correct_stream_ids = streams.map { |s| s.id }
       wrong_stream_id = BSON::ObjectId.new
       6.times { bm(:host => "baz.example.org", :_foo => 12, :streams => correct_stream_ids[0]) }
-      1.times { bm(:host => "bar.example.com", :_foo => 9001, :streams => correct_stream_ids[1]) }
+      10.times { bm(:host => "bar.example.org", :_foo => 9001, :streams => correct_stream_ids[1]) }
       4.times { bm(:host => "bar.example.org", :_foo => 50, :streams => correct_stream_ids) }
-      2.times { bm(:host => "bar.example.org", :_foo => 1, :streams => correct_stream_ids[0]) }
+      2.times { bm(:host => "bar.example.com", :_foo => 11, :streams => correct_stream_ids[0]) }
       2.times { bm(:host => "foo.example.org", :_foo => 5, :streams => correct_stream_ids[0]) }
       6.times { bm(:host => "baz.example.org", :_foo => 12, :streams => wrong_stream_id) }
 
-      s = Shell.new("streams(#{correct_stream_ids.join(',')}).find(host = /^ba.\.example.(com|org)/, _foo > 10)")
+      s = Shell.new("streams(#{correct_stream_ids.join(',')}).find(host = \"bar.example.org\", _foo > 10)")
       result = s.compute
 
       assert_equal "find", result[:operation]
-      assert_equal 11, result[:result].count
+      assert_equal 14, result[:result].count
     end
 
   end

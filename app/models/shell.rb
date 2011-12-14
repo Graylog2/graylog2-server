@@ -164,33 +164,33 @@ class Shell
     elastic_conditionize_ranges(range_queries).each do |range|
       range_criterias << { :range => range }
     end
+      
+    criteria[:query] = {
+      :bool => {
+        :must => Array.new,
+        :must_not => Array.new
+      }
+    }
 
-    # Overwrite match_all query rule if there are non-range queries.
+    # Add boolean criterias.
     unless bool_queries[:equal].blank? and bool_queries[:not_equal].blank?
-      musts = []
-      must_nots = []
       bool_queries[:equal].each do |q|
-        musts << { :term => { q[0] => q[1]} }
+        criteria[:query][:bool][:must] << { :term => { q[0] => q[1]} }
       end
 
       bool_queries[:not_equal].each do |q|
-        must_nots << { :term => { q[0] => q[1]} }
+        criteria[:query][:bool][:must_not] << { :term => { q[0] => q[1]} }
       end
-
-      criteria[:query] = {
-        :bool => {
-          :must => musts,
-          :must_not => must_nots
-        }
-      }
-    end
-puts "CRIT:" + range_criterias.inspect    
-    # Add range criterias.
-    unless range_criterias.blank?
-      criteria[:query][:bool][:must] << range_criterias
     end
     
-    if criteria[:query].blank?
+    # Add range criterias to boolean queries.
+    unless range_criterias.blank?
+      criteria[:query][:bool][:must] << range_criterias unless criteria[:query].nil? or criteria[:query][:bool].nil? or criteria[:query][:bool][:must].nil?
+    end
+puts "BOOL QUERIES" + bool_queries.inspect
+puts "RANGE QUERIES" + range_queries.inspect
+    # Set query to match all if no query options were passed to the operator. MUST NOT overwrite stream narrows.
+    if @stream_narrows.blank? and range_queries.blank? and bool_queries[:equal].blank? and bool_queries[:not_equal].blank?
       criteria[:query] = { :match_all => Hash.new }
     end
 
@@ -280,19 +280,11 @@ puts "CRIT:" + range_criterias.inspect
       arr << BSON::ObjectId(stream)
     end
 
-#    {
-#      :query => {
-#        :bool => {
-#          :must => {
-            { 
-              :terms => {
-                :streams => arr
-              }
-            }
-#          }
-#        }
-#      }
-#    }
+    { 
+      :terms => {
+        :streams => arr
+      }
+    }
   end
 
   # XXX REMOVE?
@@ -315,7 +307,7 @@ puts "CRIT:" + range_criterias.inspect
     crit = elastify_options(@operator_options)
   
     narrows = elastify_stream_narrows(@stream_narrows)
-
+    
     # add stream narrows
     unless narrows.blank? or crit[:query].nil? or crit[:query][:bool].nil?
       if crit[:query][:bool][:must].nil?
@@ -329,6 +321,7 @@ puts "CRIT:" + range_criterias.inspect
   end
 
   def perform_count
+    puts criteria.to_json
     @result = MessageGateway.dynamic_search(criteria).total_result_count
   end
 
