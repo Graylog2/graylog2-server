@@ -341,7 +341,7 @@ class ShellTest < ActiveSupport::TestCase
         assert_equal "bar", message.message
       end
     end
-# {:query=>{:bool=>{:must=>[], :must_not=>[{:term=>{"host"=>"example.org"}}]}}, :filter=>{:and=>[{:range=>{"_http_response_code"=>{"lt"=>300, "gte"=>200}}}, {:range=>{"_something"=>{"gt"=>50}}}]}}
+    
     should "find with conditional operators" do
       # added :something to have 2x _http_response_code and 1x another key
       3.times { bm(:host => "example.org", :_http_response_code => 500, :_something => 100) }
@@ -390,13 +390,14 @@ class ShellTest < ActiveSupport::TestCase
     should "find in a stream with options" do
       correct_stream_id = Stream.make().id
       wrong_stream_id = BSON::ObjectId.new
-      4.times { bm(:host => "baz.example.org", :_foo => 12, :streams => correct_stream_id) }
-      3.times { bm(:host => "bar.example.com", :_foo => 9001, :streams => correct_stream_id) }
+      4.times { bm(:host => "bar.example.org", :_foo => 12, :streams => correct_stream_id) }
+      3.times { bm(:host => "bar.example.org", :_foo => 9001, :streams => correct_stream_id) }
       8.times { bm(:host => "bar.example.org", :_foo => 50, :streams => correct_stream_id) }
       4.times { bm(:host => "foo.example.org", :_foo => 5, :streams => correct_stream_id) }
-      6.times { bm(:host => "baz.example.org", :_foo => 12, :streams => wrong_stream_id) }
+      4.times { bm(:host => "foo.example.org", :_foo => 51, :streams => correct_stream_id) }
+      6.times { bm(:host => "bar.example.org", :_foo => 12, :streams => wrong_stream_id) }
 
-      s = Shell.new("stream(#{correct_stream_id}).find(host = /^ba.\.example.(com|org)/, _foo > 10)")
+      s = Shell.new("stream(#{correct_stream_id}).find(host = \"bar.example.org\", _foo > 10)")
       result = s.compute
 
       assert_equal "find", result[:operation]
