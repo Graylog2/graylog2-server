@@ -54,6 +54,29 @@ class MessageGateway
     wrap Tire.search(INDEX_NAME, what)
   end
 
+  def self.dynamic_distribution(target, query)
+    result = Array.new
+
+    query[:facets] = {
+      "distribution_result" => {
+        "terms" => {
+          "field" => target,
+          "all_terms" => true
+        }
+      }
+    }
+
+    r = Tire.search(INDEX_NAME, query)
+
+    # [{"term"=>"baz.example.org", "count"=>4}, {"term"=>"bar.example.com", "count"=>3}]
+    r.facets["distribution_result"]["terms"].each do |r|
+      next if r["count"] == 0 # ES returns the count for *every* field. Skip those that had no matches.
+      result << { :distinct => r["term"], :count => r["count"] }
+    end
+
+    return result
+  end
+
   def self.all_by_quickfilter(filters, page = 1, opts = {})
     r = search pagination_options(page).merge(@default_query_options) do
       query do

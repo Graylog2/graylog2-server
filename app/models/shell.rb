@@ -14,7 +14,7 @@ end
 class Shell
 
   ALLOWED_SELECTORS = %w(all stream streams)
-  ALLOWED_OPERATORS = %w(count find distinct distribution)
+  ALLOWED_OPERATORS = %w(count find distribution)
   RANGE_QUERY_CONDITIONALS = %w(>= <= > <)
   BOOLEAN_QUERY_CONDITIONALS = %w(= !=)
   ALLOWED_CONDITIONALS = RANGE_QUERY_CONDITIONALS | BOOLEAN_QUERY_CONDITIONALS
@@ -33,7 +33,6 @@ class Shell
     case @operator
       when "count" then perform_count
       when "find" then perform_find
-      when "distinct" then perform_distinct
       when "distribution" then perform_distribution
       else raise InvalidOperatorException
     end
@@ -187,8 +186,6 @@ class Shell
     unless range_criterias.blank?
       criteria[:query][:bool][:must] << range_criterias unless criteria[:query].nil? or criteria[:query][:bool].nil? or criteria[:query][:bool][:must].nil?
     end
-puts "BOOL QUERIES" + bool_queries.inspect
-puts "RANGE QUERIES" + range_queries.inspect
     # Set query to match all if no query options were passed to the operator. MUST NOT overwrite stream narrows.
     if @stream_narrows.blank? and range_queries.blank? and bool_queries[:equal].blank? and bool_queries[:not_equal].blank?
       criteria[:query] = { :match_all => Hash.new }
@@ -321,21 +318,11 @@ puts "RANGE QUERIES" + range_queries.inspect
   end
 
   def perform_count
-    puts criteria.to_json
-    @result = MessageGateway.dynamic_search(criteria).total_result_count
+    @result = MessageGateway.dynamic_search(criteria, true).total_result_count
   end
 
   def perform_find
-    puts criteria.to_json
     @result = MessageGateway.dynamic_search(criteria.merge(:size => 150), true)
-  end
-
-  def perform_distinct
-    if @distinct_target.blank?
-      raise MissingDistinctTargetException
-    end
-
-    @result = criteria.distinct(@distinct_target.to_sym)
   end
 
   def perform_distribution
@@ -344,8 +331,8 @@ puts "RANGE QUERIES" + range_queries.inspect
     end
 
     @result = Array.new
-    criteria.distinct(@distinct_target.to_sym).each do |r|
-      @result << { :distinct => r, :count => criteria.where(@distinct_target.to_sym => r).count }
+    MessageGateway.dynamic_distribution(@distinct_target, criteria).each do |r|
+      @result << { :distinct => r[:distinct], :count => r[:count] }
     end
 
     @result.sort! { |a,b| b[:count] <=> a[:count] }
