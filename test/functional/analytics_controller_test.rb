@@ -6,8 +6,8 @@ class AnalyticsControllerTest < ActionController::TestCase
   context "shell" do
 
     should "count" do
-      10.times { Message.make(:host => "example.org") }
-      15.times { Message.make(:host => "example.com") }
+      10.times { bm(:host => "example.org") }
+      15.times { bm(:host => "example.com") }
 
       query = 'all.count(host = "example.com")'
       post :shell, :cmd => query
@@ -18,9 +18,9 @@ class AnalyticsControllerTest < ActionController::TestCase
     end
 
     should "find" do
-      10.times { Message.make(:host => "example.org") }
-      msg1 = Message.make(:host => "example.com")
-      msg2 = Message.make(:host => "example.com")
+      10.times { bm(:host => "example.org") }
+      msg1 = bm(:host => "example.com")
+      msg2 = bm(:host => "example.com")
 
       query = 'all.find(host = "example.com")'
       post :shell, :cmd => query
@@ -31,9 +31,9 @@ class AnalyticsControllerTest < ActionController::TestCase
     end
 
     should "distinct" do
-      5.times { Message.make(:host => "foo.example.org") }
-      4.times { Message.make(:host => "bar.example.com") }
-      2.times { Message.make(:host => "baz.example.org") }
+      5.times { bm(:host => "foo.example.org") }
+      4.times { bm(:host => "bar.example.com") }
+      2.times { bm(:host => "baz.example.org") }
 
       query = 'all.distinct({host}, host = /^(foo|baz)/)'
       post :shell, :cmd => query
