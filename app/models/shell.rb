@@ -156,21 +156,13 @@ class Shell
     range_queries = extract_range_queries(options)
     bool_queries = extract_boolean_queries(options)
     
-    # raw_range_queries.inspect: [{"_http_response_code"=>{:value=>300, :condition=>"<"}}, {"_http_response_code"=>{:value=>200, :condition=>">="}}]
+    # range_queries.inspect: [{"_http_response_code"=>{:value=>300, :condition=>"<"}}, {"_http_response_code"=>{:value=>200, :condition=>">="}}]
     # bool_queries.inspect:  {:equal=>[["message", "OHAI thar"]], :not_equal=>[]}
 
     criteria = Hash.new
     range_criterias = Array.new
     elastic_conditionize_ranges(range_queries).each do |range|
       range_criterias << { :range => range }
-    end
-
-    # Add range criterias.
-    unless range_criterias.blank?
-      criteria = Hash.new
-      criteria[:query] = { :match_all => Hash.new }
-      criteria[:filter] = Hash.new 
-      criteria[:filter][:and] = range_criterias 
     end
 
     # Overwrite match_all query rule if there are non-range queries.
@@ -191,6 +183,15 @@ class Shell
           :must_not => must_nots
         }
       }
+    end
+puts "CRIT:" + range_criterias.inspect    
+    # Add range criterias.
+    unless range_criterias.blank?
+      criteria[:query][:bool][:must] << range_criterias
+    end
+    
+    if criteria[:query].blank?
+      criteria[:query] = { :match_all => Hash.new }
     end
 
     return criteria
@@ -279,17 +280,19 @@ class Shell
       arr << BSON::ObjectId(stream)
     end
 
-    {
-      :query => {
-        :bool => {
-          :must => {
-            :terms => {
-              :streams => arr
+#    {
+#      :query => {
+#        :bool => {
+#          :must => {
+            { 
+              :terms => {
+                :streams => arr
+              }
             }
-          }
-        }
-      }
-    }
+#          }
+#        }
+#      }
+#    }
   end
 
   # XXX REMOVE?
@@ -309,7 +312,20 @@ class Shell
   end
 
   def criteria
-    elastify_options(@operator_options).merge(elastify_stream_narrows(@stream_narrows))
+    crit = elastify_options(@operator_options)
+  
+    narrows = elastify_stream_narrows(@stream_narrows)
+
+    # add stream narrows
+    unless narrows.blank? or crit[:query].nil? or crit[:query][:bool].nil?
+      if crit[:query][:bool][:must].nil?
+        crit[:query][:bool][:must] = [ narrows ]
+      else
+        crit[:query][:bool][:must] << narrows
+      end
+    end
+    
+    return crit
   end
 
   def perform_count
@@ -317,6 +333,7 @@ class Shell
   end
 
   def perform_find
+    puts criteria.to_json
     @result = MessageGateway.dynamic_search(criteria.merge(:size => 150), true)
   end
 
