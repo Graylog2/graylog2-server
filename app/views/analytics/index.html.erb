@@ -19,7 +19,6 @@
   <ul class="analytics-shell-explanation">
     <li>find</li>
     <li>count</li>
-    <li>distinct</li>
     <li>distribution</li>
   </ul>
 
@@ -38,7 +37,6 @@
   <strong>Data types</strong>
   <ul class="analytics-shell-explanation">
     <li>String: "something"</li>
-    <li>Regex: /^example\.(org|com)$/</li>
     <li>Integer: 9001</li>
   </ul>
 
@@ -51,8 +49,8 @@
   <strong>Examples:</strong>
   <ul class="analytics-shell-explanation">
     <li>all.find()</li>
-    <li>all.count(host = /^example\.(org|com)$/, _http_response_code = 204)</li>
-    <li>all.distinct({host}, _http_response_code &gt; 500)</li>
+    <li>all.count(host = "example.ort", _http_response_code = 204)</li>
+    <li>all.distribution({host}, _http_response_code &gt; 500)</li>
     <li>stream(some_stream).distribution({_processed_controller}, :_http_response_code = 500)</li>
   </ul>
 <% end %>
