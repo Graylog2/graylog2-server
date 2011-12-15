@@ -324,7 +324,7 @@ class Shell
   end
 
   def perform_find
-    q = criteria.merge(:size => 150)
+    q = criteria.merge(:size => MAX_LIMIT)
     @query_hash = q
     @result = MessageGateway.dynamic_search(q, true)
   end
