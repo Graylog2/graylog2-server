@@ -50,7 +50,7 @@ class MessageGateway
   end
 
   def self.dynamic_search(what, with_default_query_options = false)
-    what = what.merge(@default_query_options) if with_default_query_options
+    what = what.merge({:sort => { :created_at => :desc }}) if with_default_query_options
     wrap Tire.search(INDEX_NAME, what)
   end
 
