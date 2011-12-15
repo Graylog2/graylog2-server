@@ -10,7 +10,7 @@ gem 'graylog2-declarative_authorization', '~> 0.5.2', :require => 'declarative_a
 gem 'hoptoad_notifier', '~> 2.4.9'
 gem 'rpm_contrib', '~> 2.1.1'
 gem 'mongoid', '2.3.3'
-gem "tire", "~> 0.3.10"
+gem "tire", "~> 0.3.12"
 gem 'bson', "~> 1.3.1"
 gem 'bson_ext', "~> 1.3.1", :platforms => :ruby
 gem 'home_run', '~> 1.0.2', :platforms => :ruby
