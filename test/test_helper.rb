@@ -5,8 +5,8 @@ require 'rails/test_help'
 require 'blueprints'
 
 # Must be equal to the one graylog2-server generates.
-#  - Generated via: System.out.println(Mapping.get());
-ES_MESSAGE_MAPPING = JSON.parse('{"mappings":{"message":{"dynamic_templates":[{"store_generic":{"mapping":{"index":"not_analyzed"}, "match":"*"}}], "properties":{"message":{"index":"analyzed", "type":"string"}, "full_message":{"index":"analyzed", "type":"string"}, "created_at":{"type":"double"}}}}}')
+#  - Generated via: System.out.println(Mapping.get()); - MAKE SURE TO HAVE HASH START WITH TYPE (message)
+ES_MESSAGE_MAPPING = JSON.parse('{"message":{"dynamic_templates":[{"store_generic":{"mapping":{"index":"not_analyzed"}, "match":"*"}}], "properties":{"message":{"index":"analyzed", "type":"string"}, "full_message":{"index":"analyzed", "type":"string"}, "created_at":{"type":"double"}}}}')
 ES_TEST_INDEX_NAME = "graylog2_test"
 
 class ActiveSupport::TestCase
@@ -18,7 +18,7 @@ class ActiveSupport::TestCase
     # Remove and re-create ElasticSearch index
     Tire.index(ES_TEST_INDEX_NAME) do
       delete
-      create(:mapping => ES_MESSAGE_MAPPING)
+      create(:mappings => ES_MESSAGE_MAPPING)
     end
 
     Sham.reset

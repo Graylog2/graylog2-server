@@ -60,6 +60,17 @@ class ShellTest < ActiveSupport::TestCase
       assert_equal 3, result[:result]
     end
 
+    should "find something that has special chars in it" do
+      4.times { bm(:_foo => "abcwat") }
+      7.times { bm(:_foo => "abc[wat") }
+
+      s = Shell.new('all.find(_foo = "abc[wat")')
+      result = s.compute
+
+      assert_equal "find", result[:operation]
+      assert_equal 7, result[:result].count
+    end
+
     should "not overwrite multiple operator options of the same type" do
       s = Shell.new('all.find(foo > 500, foo < 600, foo >= 700)') # i know, these conditions do not make sense
       expected = Hash.new

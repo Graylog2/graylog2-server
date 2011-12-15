@@ -174,11 +174,11 @@ class Shell
     # Add boolean criterias.
     unless bool_queries[:equal].blank? and bool_queries[:not_equal].blank?
       bool_queries[:equal].each do |q|
-        criteria[:query][:bool][:must] << { :term => { q[0] => MessageGateway.escape(q[1])} }
+        criteria[:query][:bool][:must] << { :term => { q[0] => q[1]} }
       end
 
       bool_queries[:not_equal].each do |q|
-        criteria[:query][:bool][:must_not] << { :term => { q[0] => MessageGateway.escape([1])} }
+        criteria[:query][:bool][:must_not] << { :term => { q[0] => q[1]} }
       end
     end
     
