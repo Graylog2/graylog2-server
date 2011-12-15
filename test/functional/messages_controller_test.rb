@@ -54,4 +54,24 @@ class MessagesControllerTest < ActionController::TestCase
 
   end
 
+  context "deleting" do
+
+    should "delete a single message" do
+      message = bm()
+      id = message["_id"]
+      delete :destroy, :id => id
+
+      assert_nil flash[:error]
+      assert_redirected_to messages_path
+    end
+
+    should "complain about non existent message" do
+      delete :destroy, :id => "lulz-idontexist"
+
+      assert_not_nil flash[:error]
+      assert_redirected_to messages_path
+    end
+
+  end
+
 end

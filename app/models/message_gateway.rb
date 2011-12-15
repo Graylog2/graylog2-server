@@ -166,6 +166,14 @@ class MessageGateway
     wrap(r)
   end
 
+  def self.delete_message(id)
+    result = Tire.index(INDEX_NAME).remove(TYPE_NAME, id)
+    Tire.index(INDEX_NAME).refresh
+    return false if result.nil? or result["ok"] != true
+
+    return true
+  end
+
   private
 
   def self.wrap(x)

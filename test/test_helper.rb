@@ -41,10 +41,11 @@ class ActiveSupport::TestCase
     }
     complete_message = standard_message.merge(message)
 
-    Tire.index(ES_TEST_INDEX_NAME) do
-      store complete_message
-      refresh
-    end
+    i = Tire.index(ES_TEST_INDEX_NAME)
+    stored_message = i.store(complete_message)
+    i.refresh
+
+    return stored_message
   end
 
   # shortcut

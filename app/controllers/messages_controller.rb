@@ -102,7 +102,12 @@ class MessagesController < ApplicationController
   end
 
   def destroy
-    Message.where(:_id => BSON::ObjectId(params[:id])).update(:deleted => true)
+    if MessageGateway.delete_message(params[:id])
+      flash[:notice] = "Message has been deleted."
+    else
+      flash[:error] = "Could not delete message."
+    end
+
     redirect_to :action => "index"
   end
 
