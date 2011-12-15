@@ -76,14 +76,6 @@ class Message
     self.additional_fields.count > 0
   end
 
-  # XXX ELASTIC
-  # This is controlled by general.yml. Disabling it gives great performance improve.
-  #if Configuration.allow_deleting
-  #  scope :not_deleted, where({ :deleted => false })
-  #else
-  #  scope :not_deleted, Hash.new
-  #end
-
   def self.get_conditions_from_date(timeframe)
     conditions = {}
     re = /^(from (.+)){0,1}?(to (.+))$/

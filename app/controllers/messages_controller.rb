@@ -102,6 +102,8 @@ class MessagesController < ApplicationController
   end
 
   def destroy
+    render :status => :forbidden, :text => "forbidden" and return if !::Configuration.allow_deleting
+
     if MessageGateway.delete_message(params[:id])
       flash[:notice] = "Message has been deleted."
     else
@@ -127,32 +129,6 @@ class MessagesController < ApplicationController
   def getcompletemessage
     message = Message.find params[:id]
     render :text => CGI.escapeHTML(message.message)
-  end
-
-  def deletebystream
-    Message.where(:streams => BSON::ObjectId(params[:stream_id])).update_all(
-      :deleted => true
-    )
-
-    redirect_to stream_path(params[:stream_id])
-  end
-
-  def deletebyquickfilter
-    filters = JSON.parse(params[:filters])
-
-    filters_with_symbols = Hash.new
-    filters_with_symbols[:message] = filters["message"]
-    filters_with_symbols[:facility] = filters["facility"]
-    filters_with_symbols[:severity] = filters["severity"]
-    filters_with_symbols[:host] = filters["host"]
-
-    Message.all_by_quickfilter(filters_with_symbols, 0, 0, true).update_all(
-      :deleted => true
-    )
-
-    flash[:notice] = "Messages have been deleted."
-
-    redirect_to :action => 'index'
   end
 
 end

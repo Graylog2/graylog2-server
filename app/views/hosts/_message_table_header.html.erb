@@ -1,7 +1,1 @@
-<div id="hosts-delete">
-  <% if ::Configuration.allow_deleting %>
-    <%= link_to "Delete this host", host_path(@host), :method => :delete, :confirm => "Really delete this host with all it's messages?", :method => :delete %>
-  <% end %>
-</div>
-
 <h1>Host <span class="highlighted"><%= @host.host %></span></h1>
