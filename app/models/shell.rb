@@ -174,11 +174,11 @@ class Shell
     # Add boolean criterias.
     unless bool_queries[:equal].blank? and bool_queries[:not_equal].blank?
       bool_queries[:equal].each do |q|
-        criteria[:query][:bool][:must] << { :term => { q[0] => q[1]} }
+        criteria[:query][:bool][:must] << { :term => { q[0] => MessageGateway.escape(q[1])} }
       end
 
       bool_queries[:not_equal].each do |q|
-        criteria[:query][:bool][:must_not] << { :term => { q[0] => q[1]} }
+        criteria[:query][:bool][:must_not] << { :term => { q[0] => MessageGateway.escape([1])} }
       end
     end
     
@@ -318,11 +318,15 @@ class Shell
   end
 
   def perform_count
-    @result = MessageGateway.dynamic_search(criteria, true).total_result_count
+    q = criteria
+    @query_hash = q
+    @result = MessageGateway.dynamic_search(q, true).total_result_count
   end
 
   def perform_find
-    @result = MessageGateway.dynamic_search(criteria.merge(:size => 150), true)
+    q = criteria.merge(:size => 150)
+    @query_hash = q
+    @result = MessageGateway.dynamic_search(q, true)
   end
 
   def perform_distribution
@@ -330,8 +334,10 @@ class Shell
       raise MissingDistinctTargetException
     end
 
+    q = criteria
     @result = Array.new
-    MessageGateway.dynamic_distribution(@distinct_target, criteria).each do |r|
+    @query_hash = q
+    MessageGateway.dynamic_distribution(@distinct_target, q).each do |r|
       @result << { :distinct => r[:distinct], :count => r[:count] }
     end
 
