@@ -61,7 +61,8 @@ class MessageGateway
       "distribution_result" => {
         "terms" => {
           "field" => target,
-          "all_terms" => true
+          "all_terms" => true,
+          "size" => 99999
         }
       }
     }
