@@ -35,6 +35,7 @@ public class HostUpsertHook implements MessagePostReceiveHookIF {
     /**
      * Process the hook.
      */
+    @Override
     public void process(GELFMessage message) {
         HostCounterCache.getInstance().increment(message.getHost());
     }
