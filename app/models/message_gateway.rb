@@ -145,7 +145,13 @@ class MessageGateway
   def self.all_in_range(page, from, to, opts = {})
     raise "You can only pass stream_id OR hostname" if !opts[:stream_id].blank? and !opts[:hostname].blank?
 
-    r = search pagination_options(page).merge(@default_query_options) do
+    if page.nil?
+      options = pagination_options(page).merge(@default_query_options)
+    else
+      options = @default_query_options
+    end
+
+    r = search options do
       query do
         string("*")
       

@@ -20,8 +20,8 @@ namespace :subscriptions do
       puts "Stream >#{stream.title}< has subscribers. Checking for new messages since #{Time.at(stream.last_subscription_check)}"
 
       # Are there new messages?
-      messages = Message.all_of_stream_since(stream.id, stream.last_subscription_check)
-      count = messages.count
+      messages = MessageGateway.all_in_range(nil, stream.last_subscription_check, Time.now.to_i, :stream_id => stream.id)
+      count = messages.total_result_count
       if count > 0
         # Get all subscribers.
         subscribers = stream.subscribers
