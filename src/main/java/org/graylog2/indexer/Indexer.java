@@ -94,7 +94,7 @@ public class Indexer {
 
             // Write Mapping.
             writer.write(JSONValue.toJSONString(Mapping.get()));
-
+            writer.flush();
             if (conn.getResponseCode() == HttpURLConnection.HTTP_OK) {
                 return true;
             } else {
