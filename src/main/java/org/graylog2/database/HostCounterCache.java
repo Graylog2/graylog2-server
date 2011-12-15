@@ -20,9 +20,9 @@
 
 package org.graylog2.database;
 
-import java.util.HashMap;
-import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
 
 /**
  * HostCounterCache.java: Feb 21, 2010 4:57:13 PM
@@ -35,9 +35,9 @@ import java.util.Set;
 public class HostCounterCache {
     private static HostCounterCache instance;
 
-    private Map<String, Integer> cache = new HashMap<String, Integer>();
+    private ConcurrentMap<String, Integer> cache = new ConcurrentHashMap<String, Integer>();
 
-    private HostCounterCache() { }
+    private HostCounterCache() {}
 
     /**
      *
