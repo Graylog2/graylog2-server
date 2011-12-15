@@ -174,11 +174,11 @@ class Shell
     # Add boolean criterias.
     unless bool_queries[:equal].blank? and bool_queries[:not_equal].blank?
       bool_queries[:equal].each do |q|
-        criteria[:query][:bool][:must] << { :term => { q[0] => q[1]} }
+        criteria[:query][:bool][:must] << { decide_text_or_term(q[0]) => { q[0] => q[1]} }
       end
 
       bool_queries[:not_equal].each do |q|
-        criteria[:query][:bool][:must_not] << { :term => { q[0] => q[1]} }
+        criteria[:query][:bool][:must_not] << { decide_text_or_term(q[0]) => { q[0] => q[1]} }
       end
     end
     
@@ -192,6 +192,11 @@ class Shell
     end
 
     return criteria
+  end
+
+  def decide_text_or_term(field)
+    return :text if field == "message" or field == "full_message"
+    return :term
   end
 
   def elastic_conditionize_ranges(ranges)

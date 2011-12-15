@@ -338,6 +338,28 @@ class ShellTest < ActiveSupport::TestCase
       assert_equal "bar", result[:result][0].message
     end
 
+    should "find a simple message via multiple terms" do
+      bm(:message => "a session was closed")
+      bm(:message => "foo bar")
+
+      s = Shell.new('all.find(message = "session closed")')
+      result = s.compute
+
+      assert_equal "find", result[:operation]
+      assert_equal "a session was closed", result[:result][0].message
+    end
+
+    should "find from a full_message" do
+      bm(:full_message => "there is something here\nand something there")
+      bm(:message => "foo bar")
+
+      s = Shell.new('all.find(full_message = "is something here")')
+      result = s.compute
+
+      assert_equal "find", result[:operation]
+      assert_equal "there is something here\nand something there", result[:result][0].full_message
+    end
+
     should "find multiple messages" do
       bm(:message => "foo")
       5.times { bm(:host => "bar.example.org", :message => "bar") }
