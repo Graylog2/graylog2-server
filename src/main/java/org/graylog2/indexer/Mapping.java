@@ -76,8 +76,8 @@ public class Mapping {
     public static Map partFieldProperties() {
         Map properties = new HashMap();
 
-        properties.put("message", notAnalyzedString());
-        properties.put("full_message", notAnalyzedString());
+        properties.put("message", analyzedString());
+        properties.put("full_message", analyzedString());
 
         // Required for the WI to not fail on empty indexes.
         properties.put("created_at", typeNumberDouble());
@@ -85,7 +85,7 @@ public class Mapping {
         return properties;
     }
 
-    public static Map notAnalyzedString() {
+    public static Map analyzedString() {
         Map type = new HashMap();
         type.put("index", "analyzed");
         type.put("type", "string");
