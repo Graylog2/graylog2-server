@@ -20,9 +20,10 @@
 
 package org.graylog2.database;
 
-import java.util.HashMap;
-import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
+import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * HostCounterCache.java: Feb 21, 2010 4:57:13 PM
@@ -35,7 +36,7 @@ import java.util.Set;
 public class HostCounterCache {
     private static HostCounterCache instance;
 
-    private Map<String, Integer> cache = new HashMap<String, Integer>();
+    private ConcurrentMap<String, AtomicInteger> cache = new ConcurrentHashMap<String, AtomicInteger>();
 
     private HostCounterCache() { }
 
@@ -56,34 +57,46 @@ public class HostCounterCache {
      * @param hostname The host of which the counter to increment.
      */
     public void increment(String hostname) {
-        int old = 0;
+        //http://stackoverflow.com/questions/2539654/java-concurrency-many-writers-one-reader/2539761#2539761
 
-        if (this.cache.containsKey(hostname)) {
-            old = this.cache.get(hostname);
+        AtomicInteger counter = cache.get(hostname);
+        if (counter == null) {
+            counter = cache.putIfAbsent(hostname, new AtomicInteger(1));
         }
 
-        this.cache.put(hostname, old+1);
-    }
-
-    /**
-     * Remove host from counter.
-     *
-     * @param hostname The host of which the counter to reset.
-     */
-    public void reset(String hostname) {
-        if (this.cache.containsKey(hostname)) {
-            this.cache.remove(hostname);
+        if (counter != null) {
+            counter.incrementAndGet();
         }
     }
 
     /**
-     * Get the current count of host.
+     * Get the current count of host and remove host from counter.
      *
-     * @param hostname The host of which the count to get.
+     * @param hostname The host of which the count to get and counter to reset.
      * @return
      */
-    public int getCount(String hostname) {
-        return this.cache.get(hostname) == null ? 0 : this.cache.get(hostname);
+    public int getCountAndReset(String hostname) {
+        //http://www.javamex.com/tutorials/synchronization_concurrency_8_hashmap2.shtml
+        //(section: "Truly atomic updates")
+
+        int count = 0;
+
+        while (true) {
+            AtomicInteger counter = cache.get(hostname);
+
+            if (counter == null) {
+                break; //_counter_ not found or removed. Exit loop with _count_ unmodified.
+            }
+
+            if (!cache.remove(hostname, counter)) {
+                continue; //Another thread removed _counter_. Retry loop.
+            }
+
+            count = counter.get();
+            break; //Successfully removed _counter_. Exit loop with new _count_ value.
+        }
+
+        return count;
     }
 
     /**
