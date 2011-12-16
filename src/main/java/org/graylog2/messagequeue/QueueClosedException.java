@@ -17,30 +17,17 @@
  * along with Graylog2.  If not, see <http://www.gnu.org/licenses/>.
  *
  */
+package org.graylog2.messagequeue;
 
-package org.graylog2.hostgroups;
+/**
+ * QueueClosedException.java: Nov 17, 2011 6:52:29 PM
+ *
+ * @author Lennart Koopmann <lennart@socketfeed.com>
+ */
+public class QueueClosedException extends Exception {
 
-import java.util.ArrayList;
-import org.junit.Test;
-import static org.junit.Assert.*;
-
-public class HostgroupCacheTest {
-
-    @Test
-    public void testGetInstance() {
-        // First call should create instance.
-        assertNotNull(HostgroupCache.getInstance());
-
-        // Second call should give back formerly created instance.
-        assertNotNull(HostgroupCache.getInstance());
+    public QueueClosedException() {
+        super();
     }
-
-    @Test
-    public void testSetAndGet() {
-        HostgroupCache.getInstance().set(new ArrayList<Hostgroup>());
-        HostgroupCache.getInstance().get();
-        assertTrue(HostgroupCache.getInstance().valid());
-    }
-
 
 }

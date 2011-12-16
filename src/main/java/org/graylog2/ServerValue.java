@@ -20,60 +20,17 @@
 
 package org.graylog2;
 
-import com.mongodb.BasicDBObject;
-import com.mongodb.DBCollection;
-import com.mongodb.DBCursor;
-import com.mongodb.DBObject;
 import org.graylog2.database.MongoBridge;
-import org.graylog2.database.MongoConnection;
+import org.graylog2.messagequeue.MessageQueue;
 
 /**
  * ServerValue.java: Jan 16, 2011 1:35:00 PM
  *
  * Filling the server_values collection
  *
- * @author: Lennart Koopmann <lennart@socketfeed.com>
+ * @author Lennart Koopmann <lennart@socketfeed.com>
  */
 public class ServerValue {
-
-    DBObject mongoInstance = null;
-
-    public ServerValue(String instanceId) {
-        this.removeDeadInstances();
-        
-        this.mongoInstance = findOrCreateMongoInstance(instanceId);
-        System.out.println("GOT: " + this.mongoInstance.toString());
-    }
-
-    private void removeDeadInstances() {
-        System.out.println("PLEASE IMPLEMENT ME - REMOVE DEAD INSTANCES");
-    }
-
-    private DBObject findOrCreateMongoInstance(String instanceId) {
-        DBCollection sv = MongoConnection.getInstance().getDatabase().getCollection("server_values");
-
-        // Doing it this way because java driver sucks in querying for subdoc keys. :(
-        DBCursor cur = sv.find(); // find all
-        while (cur.hasNext()) {
-            DBObject obj = cur.next();
-            if (obj.containsField(instanceId)) {
-                // Found the instance.
-                return obj;
-            }
-        }
-
-        // There is no such instance in the collection yet if we arrive here.
-        DBObject instance = new BasicDBObject();
-        instance.put(instanceId, null);
-        sv.insert(instance);
-
-        return instance;
-    }
-
-
-
-
-
 
     public static void setStartupTime(int timestamp) {
         set("startup_time", timestamp);
@@ -102,6 +59,34 @@ public class ServerValue {
     public static void writeThroughput(int current, int highest) {
         MongoBridge m = new MongoBridge();
         m.writeThroughput(current, highest);
+    }
+
+    public static void writeMessageQueueCurrentSize(int size) {
+        set("message_queue_current_size", size);
+    }
+
+    public static void writeMessageQueueMaximumSize(int size) {
+        if (size == MessageQueue.SIZE_LIMIT_UNLIMITED) {
+            // Abstraction for unlimited size limit to allow change in server without change in web interface.
+            size = -1;
+        }
+        set("message_queue_maximum_size", size);
+    }
+
+    public static void writeMessageQueueBatchSize(int size) {
+        set("message_queue_batch_size", size);
+    }
+
+    public static void writeMessageQueuePollFrequency(int freq) {
+        set("message_queue_poll_freq", freq);
+    }
+
+    public static void writeMessageRetentionLastPerformed(int when) {
+        set("message_retention_last_performed", when);
+    }
+
+    public static void ping() {
+        set("ping", Tools.getUTCTimestamp());
     }
 
     private static void set(String key, Object value) {

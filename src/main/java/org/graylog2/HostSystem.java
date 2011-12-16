@@ -20,14 +20,12 @@
 
 package org.graylog2;
 
-import org.graylog2.database.MongoBridge;
-
 /**
  * HostSystem.java: Jan 16, 2011 2:11:09 PM
  *
  * Utility class that provides access to host system information.
  *
- * @author: Lennart Koopmann <lennart@socketfeed.com>
+ * @author Lennart Koopmann <lennart@socketfeed.com>
  */
 public class HostSystem  {
 
@@ -36,34 +34,6 @@ public class HostSystem  {
      */
     public static int getAvailableProcessors() {
         return Runtime.getRuntime().availableProcessors();
-    }
-
-    /**
-     * @return Total amount of memory currently in use by the JVM (bytes)
-     */
-    public static long getUsedMemory() {
-        return Runtime.getRuntime().totalMemory();
-    }
-
-    /**
-     * @return Maximum amount of memory the JVM will attempt to use (bytes). (0 if unlimited)
-     */
-    public static long getMaxMemory() {
-        long max = Runtime.getRuntime().maxMemory();
-        return max == Long.MAX_VALUE ? 0 : max;
-    }
-
-    /**
-     * @return Total amount of free memory available to the JVM (bytes)
-     */
-    public static long getFreeMemory() {
-        return Runtime.getRuntime().freeMemory();
-    }
-
-    public static void writeSystemHealthHistorically() {
-        MongoBridge m = new MongoBridge();
-        m.writeHistoricServerValue("used_memory", getUsedMemory());
-        m.writeHistoricServerValue("max_memory", getMaxMemory());
     }
 
 }

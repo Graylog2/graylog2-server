@@ -29,13 +29,13 @@ import org.graylog2.streams.StreamRule;
  *
  * [description]
  *
- * @author: Dennis Oelkers <dennis@lauschmusik.de>
+ * @author Dennis Oelkers <dennis@lauschmusik.de>
  */
 public class FullMessageMatcher implements StreamRuleMatcherIF {
 
     public boolean match(GELFMessage msg, StreamRule rule) {
-		Pattern messagePattern = Pattern.compile(rule.getValue(), Pattern.DOTALL);
-		String fullMessage = msg.getFullMessage();
+	Pattern messagePattern = Pattern.compile(rule.getValue(), Pattern.DOTALL);
+	String fullMessage = msg.getFullMessage();
 		
         return (fullMessage != null && messagePattern.matcher(msg.getFullMessage()).matches());
     }

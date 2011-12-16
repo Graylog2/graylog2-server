@@ -1,6 +1,6 @@
 /**
  * Copyright 2010, 2011 Lennart Koopmann <lennart@socketfeed.com>
- * 
+ *
  * This file is part of Graylog2.
  *
  * Graylog2 is free software: you can redistribute it and/or modify
@@ -21,27 +21,40 @@
 package org.graylog2;
 
 import com.beust.jcommander.JCommander;
+import com.github.joschi.jadconfig.JadConfig;
+import com.github.joschi.jadconfig.RepositoryException;
+import com.github.joschi.jadconfig.ValidationException;
+import com.github.joschi.jadconfig.repositories.PropertiesRepository;
 import org.apache.commons.io.IOUtils;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.graylog2.database.MongoConnection;
 import org.graylog2.forwarders.forwarders.LogglyForwarder;
 import org.graylog2.messagehandlers.scribe.ScribeServer;
+import org.graylog2.indexer.Indexer;
 import org.graylog2.messagehandlers.amqp.AMQPBroker;
 import org.graylog2.messagehandlers.amqp.AMQPSubscribedQueue;
 import org.graylog2.messagehandlers.amqp.AMQPSubscriberThread;
+import org.graylog2.messagehandlers.gelf.ChunkedGELFClientManager;
 import org.graylog2.messagehandlers.gelf.GELFMainThread;
 import org.graylog2.messagehandlers.syslog.SyslogServerThread;
+import org.graylog2.messagequeue.MessageQueue;
+import org.graylog2.messagequeue.MessageQueueFlusher;
+import org.graylog2.periodical.BulkIndexerThread;
 import org.graylog2.periodical.ChunkedGELFClientManagerThread;
 import org.graylog2.periodical.HostCounterCacheWriterThread;
-import org.graylog2.periodical.ThroughputWriterThread;
+import org.graylog2.periodical.MessageCountWriterThread;
+import org.graylog2.periodical.MessageRetentionThread;
+import org.graylog2.periodical.ServerValueWriterThread;
 
-import java.io.FileReader;
 import java.io.FileWriter;
-import java.io.Reader;
+import java.io.IOException;
 import java.io.Writer;
+import java.net.InetSocketAddress;
 import java.util.List;
-import java.util.Properties;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 
 /**
  * Main class of Graylog2.
@@ -51,11 +64,16 @@ import java.util.Properties;
 public final class Main {
 
     private static final Logger LOG = Logger.getLogger(Main.class);
-    private static final String GRAYLOG2_VERSION = "0.9.5";
-    
+    private static final String GRAYLOG2_VERSION = "0.9.6-PREVIEW.3";
+
     public static RulesEngine drools = null;
-    
-    private Main() { }
+    private static final int SCHEDULED_THREADS_POOL_SIZE = 7;
+
+    public static Configuration configuration = null;
+    public static ScheduledExecutorService scheduler = null;
+
+    private Main() {
+    }
 
     /**
      * @param args the command line arguments
@@ -66,12 +84,12 @@ public final class Main {
         JCommander jCommander = new JCommander(commandLineArguments, args);
         jCommander.setProgramName("graylog2");
 
-        if(commandLineArguments.isShowHelp()) {
+        if (commandLineArguments.isShowHelp()) {
             jCommander.usage();
             System.exit(0);
         }
 
-        if(commandLineArguments.isShowVersion()) {
+        if (commandLineArguments.isShowVersion()) {
             System.out.println("Graylog2 Server " + GRAYLOG2_VERSION);
             System.out.println("JRE: " + Tools.getSystemInformation());
             System.exit(0);
@@ -89,41 +107,85 @@ public final class Main {
         String configFile = commandLineArguments.getConfigFile();
         LOG.info("Using config file: " + configFile);
 
-        Configuration configuration = new Configuration(loadProperties(configFile));
+        configuration = new Configuration();
+        JadConfig jadConfig = new JadConfig(new PropertiesRepository(configFile), configuration);
 
-        LOG.info("Checking configuration");
+        LOG.info("Loading configuration");
         try {
-            configuration.validate();
-        } catch (Exception e) {
-            LOG.fatal("Invalid configuration: " + e.getMessage(), e);
+            jadConfig.process();
+        } catch (RepositoryException e) {
+            LOG.fatal("Couldn't load configuration file " + configFile, e);
+            System.exit(1);
+        } catch (ValidationException e) {
+            LOG.fatal("Invalid configuration", e);
             System.exit(1);
         }
 
         // If we only want to check our configuration, we can gracefully exit here
-        if(commandLineArguments.isConfigTest()) {
+        if (commandLineArguments.isConfigTest()) {
             System.exit(0);
+        }
+
+        // XXX ELASTIC: put in own method
+        // Check if the index exists. Create it if not.
+        try {
+            if (Indexer.indexExists()) {
+                LOG.info("Index exists. Not creating it.");
+            } else {
+                LOG.info("Index does not exist! Trying to create it ...");
+                if (Indexer.createIndex()) {
+                    LOG.info("Successfully created index.");
+                } else {
+                    LOG.fatal("Could not create Index. Terminating.");
+                    System.exit(1);
+                }
+            }
+        } catch (IOException e) {
+            LOG.fatal("IOException while trying to check Index. Make sure that your ElasticSearch server is running.", e);
+            System.exit(1);
         }
 
         savePidFile(commandLineArguments.getPidFile());
 
         // Statically set timeout for LogglyForwarder.
         // TODO: This is a code smell and needs to be fixed.
-        LogglyForwarder.setTimeout(configuration.getInteger("forwarder_loggly_timeout", 3));
+        LogglyForwarder.setTimeout(configuration.getForwarderLogglyTimeout());
+
+        scheduler = Executors.newScheduledThreadPool(SCHEDULED_THREADS_POOL_SIZE);
 
         initializeMongoConnection(configuration);
-        initializeRulesEngine(configuration.get("rules_file"));
-        initializeSyslogServer(configuration.get("syslog_protocol"), configuration.getInteger("syslog_listen_port", 514));
-        initializeHostCounterCache();
+        initializeRulesEngine(configuration.getDroolsRulesFile());
+        initializeSyslogServer(configuration.getSyslogProtocol(), configuration.getSyslogListenPort());
+        initializeHostCounterCache(scheduler);
+
+        // Start message counter thread.
+        initializeMessageCounters(scheduler);
+
+        // Inizialize message queue.
+        initializeMessageQueue(scheduler, configuration);
+
+        // Write initial ServerValue information.
+        writeInitialServerValues(configuration);
 
         // Start GELF threads
-        if (configuration.getBoolean("use_gelf")) {
-            initializeGELFThreads(configuration.getInteger("gelf_listen_port", 12201));
+        if (configuration.isUseGELF()) {
+            initializeGELFThreads(configuration.getGelfListenAddress(), configuration.getGelfListenPort(), scheduler);
         }
 
         // Initialize AMQP Broker if enabled
-        if (configuration.getBoolean("amqp_enabled")) {
-             initializeAMQP(configuration);
-         }
+        if (configuration.isAmqpEnabled()) {
+            initializeAMQP(configuration);
+        }
+
+        // Start server value writer thread. (writes for example msg throughout and pings)
+        initializeServerValueWriter(scheduler);
+
+        // Start thread that automatically removes messages older than retention time.
+        if (commandLineArguments.performRetention()) {
+            initializeMessageRetentionThread(scheduler);
+        } else {
+            LOG.info("Not initializing retention time cleanup thread because --no-retention was passed.");
+        }
 
         // Initialize Scribe if enabled
         if (configuration.getBoolean("scribe_enabled")) {
@@ -134,37 +196,56 @@ public final class Main {
         ThroughputWriterThread throughputThread = new ThroughputWriterThread();
         throughputThread.start();
 
+        // Add a shutdown hook that tries to flush the message queue.
+        Runtime.getRuntime().addShutdownHook(new MessageQueueFlusher());
+
         LOG.info("Graylog2 up and running.");
     }
 
-    private static Properties loadProperties(String configFile) {
-        Reader configFileReader = null;
-        Properties properties = new Properties();
+    private static void initializeHostCounterCache(ScheduledExecutorService scheduler) {
 
-        try {
-            configFileReader = new FileReader(configFile);
-            properties.load(configFileReader);
-        } catch(java.io.IOException e) {
-            LOG.error("Could not read configuration file: " + e.getMessage(), e);
-        } finally {
-            IOUtils.closeQuietly(configFileReader);
-        }
+        scheduler.scheduleAtFixedRate(new HostCounterCacheWriterThread(), HostCounterCacheWriterThread.INITIAL_DELAY, HostCounterCacheWriterThread.PERIOD, TimeUnit.SECONDS);
 
-        return properties;
-    }
-
-    private static void initializeHostCounterCache() {
-        HostCounterCacheWriterThread hostCounterCacheWriterThread = new HostCounterCacheWriterThread();
-        hostCounterCacheWriterThread.start();
         LOG.info("Host count cache is up.");
     }
 
-    private static void initializeGELFThreads(int gelfPort) {
-        GELFMainThread gelfThread = new GELFMainThread(gelfPort);
+    private static void initializeMessageQueue(ScheduledExecutorService scheduler, Configuration configuration) {
+        // Set the maximum size if it was configured to something else than 0 (= UNLIMITED)
+        if (configuration.getMessageQueueMaximumSize() != MessageQueue.SIZE_LIMIT_UNLIMITED) {
+            MessageQueue.getInstance().setMaximumSize(configuration.getMessageQueueMaximumSize());
+        }
+
+        scheduler.scheduleAtFixedRate(new BulkIndexerThread(configuration), BulkIndexerThread.INITIAL_DELAY, configuration.getMessageQueuePollFrequency(), TimeUnit.SECONDS);
+
+        LOG.info("Message queue initialized .");
+    }
+
+    private static void initializeMessageCounters(ScheduledExecutorService scheduler) {
+
+        scheduler.scheduleAtFixedRate(new MessageCountWriterThread(), MessageCountWriterThread.INITIAL_DELAY, MessageCountWriterThread.PERIOD, TimeUnit.SECONDS);
+
+        LOG.info("Message counters initialized.");
+    }
+
+    private static void initializeServerValueWriter(ScheduledExecutorService scheduler) {
+
+        scheduler.scheduleAtFixedRate(new ServerValueWriterThread(), ServerValueWriterThread.INITIAL_DELAY, ServerValueWriterThread.PERIOD, TimeUnit.SECONDS);
+
+        LOG.info("Server value writer up.");
+    }
+
+    private static void initializeMessageRetentionThread(ScheduledExecutorService scheduler) {
+        // Schedule first run. This is NOT at fixed rate. Thread will itself schedule next run with current frequency setting from database.
+        scheduler.schedule(new MessageRetentionThread(),0,TimeUnit.SECONDS);
+
+        LOG.info("Retention time management active.");
+    }
+
+    private static void initializeGELFThreads(String gelfAddress, int gelfPort, ScheduledExecutorService scheduler) {
+        GELFMainThread gelfThread = new GELFMainThread(new InetSocketAddress(gelfAddress, gelfPort));
         gelfThread.start();
 
-        ChunkedGELFClientManagerThread gelfManager = new ChunkedGELFClientManagerThread();
-        gelfManager.start();
+        scheduler.scheduleAtFixedRate(new ChunkedGELFClientManagerThread(ChunkedGELFClientManager.getInstance()), ChunkedGELFClientManagerThread.INITIAL_DELAY, ChunkedGELFClientManagerThread.PERIOD, TimeUnit.SECONDS);
 
         LOG.info("GELF threads started");
     }
@@ -176,8 +257,11 @@ public final class Main {
         syslogServerThread.start();
 
         // Check if the thread started up completely.
-        try { Thread.sleep(1000); } catch(InterruptedException e) {}
-        if(syslogServerThread.getCoreThread().isAlive()) {
+        try {
+            Thread.sleep(1000);
+        } catch (InterruptedException e) {
+        }
+        if (syslogServerThread.getCoreThread().isAlive()) {
             LOG.info("Syslog server thread is up.");
         } else {
             LOG.fatal("Could not start syslog server core thread. Do you have permissions to listen on port " + syslogPort + "?");
@@ -203,16 +287,16 @@ public final class Main {
     private static void initializeMongoConnection(Configuration configuration) {
         try {
             MongoConnection.getInstance().connect(
-                    configuration.get("mongodb_user"),
-                    configuration.get("mongodb_password"),
-                    configuration.get("mongodb_host"),
-                    configuration.get("mongodb_database"),
-                    configuration.getInteger("mongodb_port", 0),
-                    configuration.get("mongodb_useauth"),
-                    configuration.getMaximumMongoDBConnections(),
-                    configuration.getThreadsAllowedToBlockMultiplier(),
-                    configuration.getMongoDBReplicaSetServers(),
-                    configuration.getLong("messages_collection_size", 50000000)
+                    configuration.getMongoUser(),
+                    configuration.getMongoPassword(),
+                    configuration.getMongoHost(),
+                    configuration.getMongoDatabase(),
+                    configuration.getMongoPort(),
+                    configuration.isMongoUseAuth(),
+                    configuration.getMongoMaxConnections(),
+                    configuration.getMongoThreadsAllowedToBlockMultiplier(),
+                    configuration.getMongoReplicaSet(),
+                    configuration.getMessagesCollectionSize()
             );
         } catch (Exception e) {
             LOG.fatal("Could not create MongoDB connection: " + e.getMessage(), e);
@@ -224,14 +308,14 @@ public final class Main {
 
         // Connect to AMQP broker.
         AMQPBroker amqpBroker = new AMQPBroker(
-                configuration.get("amqp_host"),
-                configuration.getInteger("amqp_port", 0),
-                configuration.get("amqp_username"),
-                configuration.get("amqp_password"),
-                configuration.get("amqp_virtualhost")
+                configuration.getAmqpHost(),
+                configuration.getAmqpPort(),
+                configuration.getAmqpUsername(),
+                configuration.getAmqpPassword(),
+                configuration.getAmqpVirtualhost()
         );
 
-        List<AMQPSubscribedQueue> amqpQueues = configuration.getAMQPSubscribedQueues();
+        List<AMQPSubscribedQueue> amqpQueues = configuration.getAmqpSubscribedQueues();
 
         if (amqpQueues != null) {
             // Start AMQP subscriber thread for each queue to listen on.
@@ -277,5 +361,17 @@ public final class Main {
         } finally {
             IOUtils.closeQuietly(pidFileWriter);
         }
+    }
+
+    public static void writeInitialServerValues(Configuration configuration) {
+        ServerValue.setStartupTime(Tools.getUTCTimestamp());
+        ServerValue.setPID(Integer.parseInt(Tools.getPID()));
+        ServerValue.setJREInfo(Tools.getSystemInformation());
+        ServerValue.setGraylog2Version(GRAYLOG2_VERSION);
+        ServerValue.setAvailableProcessors(HostSystem.getAvailableProcessors());
+        ServerValue.setLocalHostname(Tools.getLocalHostname());
+        ServerValue.writeMessageQueueMaximumSize(configuration.getMessageQueueMaximumSize());
+        ServerValue.writeMessageQueueBatchSize(configuration.getMessageQueueBatchSize());
+        ServerValue.writeMessageQueuePollFrequency(configuration.getMessageQueuePollFrequency());
     }
 }

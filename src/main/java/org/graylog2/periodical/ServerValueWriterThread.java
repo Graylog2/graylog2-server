@@ -22,40 +22,46 @@ package org.graylog2.periodical;
 
 import org.apache.log4j.Logger;
 import org.graylog2.HostSystem;
+import org.graylog2.ServerValue;
 import org.graylog2.Tools;
 import org.graylog2.database.MongoBridge;
+import org.graylog2.messagehandlers.common.MessageCounter;
+import org.graylog2.messagequeue.MessageQueue;
 
 /**
  * ServerValueWriterThread.java
- *
+ * <p/>
  * Periodically writes server values to MongoDB.
  *
- * @author: Lennart Koopmann <lennart@socketfeed.com>
+ * @author Lennart Koopmann <lennart@socketfeed.com>
  */
-public class ServerValueWriterThread extends Thread {
+public class ServerValueWriterThread implements Runnable {
 
     private static final Logger LOG = Logger.getLogger(ServerValueWriterThread.class);
+
+    public static final int PERIOD = 5;
+    public static final int INITIAL_DELAY = 0;
 
     /**
      * Start the thread. Runs forever.
      */
-    @Override public void run() {
-        // Run forever.
-        while (true) {
-            try {
-                HostSystem.writeSystemHealthHistorically();
+    @Override
+    public void run() {
+        try {
+            // ohai, we are alive. \o/
+            ServerValue.ping();
 
-                // Ping. (Server is running.)
-                MongoBridge m = new MongoBridge();
-                m.setSimpleServerValue("ping", Tools.getUTCTimestamp());
+            // Current throughput.
+            MessageCounter c = MessageCounter.getInstance();
+            ServerValue.writeThroughput(c.getFiveSecondThroughput(), c.getHighestFiveSecondThroughput());
+            c.resetFiveSecondThroughput(); // Reset five second throughput count.
 
-            } catch (Exception e) {
-                LOG.warn("Error in SystemValueHistoryWriterThread: " + e.getMessage(), e);
-            }
-            
-           // Run every 60 seconds.
-           try { Thread.sleep(60000); } catch(InterruptedException e) {}
+            /*
+             * Message queue size is written in BulkIndexerThread. More about the
+             * reason for that can be found there.
+             */
+        } catch (Exception e) {
+            LOG.warn("Error in ServerValue  WriterThread: " + e.getMessage(), e);
         }
     }
-
 }

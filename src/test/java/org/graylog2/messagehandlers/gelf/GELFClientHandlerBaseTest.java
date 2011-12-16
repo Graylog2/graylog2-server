@@ -27,7 +27,7 @@ import static org.junit.Assert.*;
 /**
  * GELFClientHandlerBaseTest.java: Oct 18, 2010 7:07:26 PM
  *
- * @author: Lennart Koopmann <lennart@socketfeed.com>
+ * @author Lennart Koopmann <lennart@socketfeed.com>
  */
 public class GELFClientHandlerBaseTest {
 

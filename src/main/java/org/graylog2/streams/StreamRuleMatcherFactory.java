@@ -27,7 +27,7 @@ import org.graylog2.streams.matchers.*;
  *
  * [description]
  *
- * @author: Lennart Koopmann <lennart@socketfeed.com>
+ * @author Lennart Koopmann <lennart@socketfeed.com>
  */
 public class StreamRuleMatcherFactory {
 
@@ -39,9 +39,9 @@ public class StreamRuleMatcherFactory {
             case StreamRule.TYPE_MESSAGE:
                 matcher = new MessageMatcher();
                 break;
-			case StreamRule.TYPE_FULL_MESSAGE:
-				matcher = new FullMessageMatcher();
-				break;
+            case StreamRule.TYPE_FULL_MESSAGE:
+                matcher = new FullMessageMatcher();
+                break;
             case StreamRule.TYPE_HOST:
                 matcher = new HostMatcher();
                 break;
@@ -54,14 +54,14 @@ public class StreamRuleMatcherFactory {
             case StreamRule.TYPE_ADDITIONAL:
                 matcher = new AdditionalFieldMatcher();
                 break;
-            case StreamRule.TYPE_HOSTGROUP:
-                matcher = new HostgroupMatcher();
-                break;
             case StreamRule.TYPE_SEVERITY_OR_HIGHER:
                 matcher = new SeverityOrHigherMatcher();
                 break;
             case StreamRule.TYPE_HOST_REGEX:
-                matcher = new HostRegexMatcher();;
+                matcher = new HostRegexMatcher();
+                break;
+            case StreamRule.TYPE_FILENAME_LINE:
+                matcher = new FileNameAndLineMatcher();
                 break;
             default:
                 throw new InvalidStreamRuleTypeException();

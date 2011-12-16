@@ -23,6 +23,7 @@ package org.graylog2.messagehandlers.gelf;
 import org.apache.log4j.Logger;
 
 import java.net.DatagramPacket;
+import java.net.InetSocketAddress;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -31,23 +32,23 @@ import java.util.concurrent.Executors;
  *
  * Thread responsible for listening for GELF messages.
  *
- * @author: Lennart Koopmann <lennart@socketfeed.com>
+ * @author Lennart Koopmann <lennart@socketfeed.com>
  */
 public class GELFMainThread extends Thread {
 
     private static final Logger LOG = Logger.getLogger(GELFMainThread.class);
 
-    private int port = 0;
+    private InetSocketAddress socketAddress;
 
     private ExecutorService threadPool = Executors.newCachedThreadPool();
 
     /**
      * Thread responsible for listening for GELF messages.
      *
-     * @param port The TCP port to listen on
+     * @param socketAddress The {@link InetSocketAddress} to bind to
      */
-    public GELFMainThread(int port) {
-        this.port = port;
+    public GELFMainThread(InetSocketAddress socketAddress) {
+        this.socketAddress = socketAddress;
     }
 
     /**
@@ -55,8 +56,8 @@ public class GELFMainThread extends Thread {
      */
     @Override public void run() {
         GELFServer server = new GELFServer();
-        if (!server.create(this.port)) {
-            throw new RuntimeException("Could not start GELF server. Do you have permissions to listen on UDP port " + this.port + "?");
+        if (!server.create(socketAddress)) {
+            throw new RuntimeException("Could not start GELF server. Do you have permissions to bind to " + socketAddress + "?");
         }
 
         // Run forever.

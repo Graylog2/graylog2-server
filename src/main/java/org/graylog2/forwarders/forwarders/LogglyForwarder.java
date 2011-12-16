@@ -33,7 +33,7 @@ import java.net.URL;
  *
  * Forwards messages to Logg.ly. (via HTTP/S API)
  *
- * @author: Lennart Koopmann <lennart@socketfeed.com>
+ * @author Lennart Koopmann <lennart@socketfeed.com>
  */
 public class LogglyForwarder implements MessageForwarderIF {
 

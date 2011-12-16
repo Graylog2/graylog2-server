@@ -32,7 +32,7 @@ import org.graylog2.forwarders.forwarders.UDPSyslogForwarder;
  *
  * [description]
  *
- * @author: Lennart Koopmann <lennart@socketfeed.com>
+ * @author Lennart Koopmann <lennart@socketfeed.com>
  */
 public class ForwardEndpoint {
 
@@ -46,16 +46,12 @@ public class ForwardEndpoint {
     private int port = 0;
     private String host = null;
 
-    private DBObject mongoObject = null;
-
     public ForwardEndpoint(DBObject endpoint) throws InvalidEndpointTypeException {
         this.id = (ObjectId) endpoint.get("_id");
         this.title = (String) endpoint.get("title");
         this.port = (Integer) endpoint.get("port");
         this.host = (String) endpoint.get("host");
         this.endpointType = endpointTypeToNumber((String) endpoint.get("endpoint_type"));
-
-        this.mongoObject = endpoint;
     }
 
     public MessageForwarderIF getForwarder() throws InvalidEndpointTypeException, MessageForwarderConfigurationException {

@@ -30,7 +30,7 @@ import static org.junit.Assert.*;
 /**
  * GELFTest.java: Sep 17, 2010 8:19:07 PM
  *
- * @author: Lennart Koopmann <lennart@socketfeed.com>
+ * @author Lennart Koopmann <lennart@socketfeed.com>
  */
 public class GELFTest {
 

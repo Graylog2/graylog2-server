@@ -30,7 +30,7 @@ import org.graylog2.messagehandlers.gelf.GELFMessage;
  *
  * [description]
  *
- * @author: Lennart Koopmann <lennart@socketfeed.com>
+ * @author Lennart Koopmann <lennart@socketfeed.com>
  */
 public class GELFMessageForwarder extends UDPForwarder implements MessageForwarderIF {
 

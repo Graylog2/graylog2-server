@@ -28,10 +28,10 @@ import org.graylog2.streams.StreamRule;
  *
  * [description]
  *
- * @author: Lennart Koopmann <lennart@socketfeed.com>
+ * @author Lennart Koopmann <lennart@socketfeed.com>
  */
 public interface StreamRuleMatcherIF {
 
-    public boolean match(GELFMessage msg, StreamRule rule);
+    boolean match(GELFMessage msg, StreamRule rule);
 
 }

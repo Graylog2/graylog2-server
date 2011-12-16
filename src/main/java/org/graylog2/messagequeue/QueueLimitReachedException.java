@@ -17,40 +17,17 @@
  * along with Graylog2.  If not, see <http://www.gnu.org/licenses/>.
  *
  */
-
-package org.graylog2.hostgroups;
-
-import java.util.ArrayList;
-import org.graylog2.SimpleObjectCache;
+package org.graylog2.messagequeue;
 
 /**
- * HostgroupCache.java: Apr 15, 2011 12:13:35 PM
+ * QueueLimitReachedException.java: Nov 17, 2011 7:21:25 PM
  *
- * Singleton caching the already fetched hostgroups.
- *
- * @author: Lennart Koopmann <lennart@socketfeed.com>
+ * @author Lennart Koopmann <lennart@socketfeed.com>
  */
-class HostgroupCache extends SimpleObjectCache {
+public class QueueLimitReachedException extends Exception {
 
-    private static HostgroupCache instance;
-
-    private HostgroupCache() { }
-
-    public synchronized static HostgroupCache getInstance() {
-        if (instance == null) {
-            instance = new HostgroupCache();
-        }
-
-        return instance;
-    }
-
-    @Override
-    public ArrayList<Hostgroup> get() {
-        return (ArrayList<Hostgroup>) super.get();
-    }
-
-    public void set(ArrayList<Hostgroup> groups) {
-        super.set(groups);
+    public QueueLimitReachedException() {
+        super();
     }
 
 }

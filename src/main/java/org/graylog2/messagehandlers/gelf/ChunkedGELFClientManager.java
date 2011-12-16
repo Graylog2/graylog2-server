@@ -20,8 +20,8 @@
 
 package org.graylog2.messagehandlers.gelf;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
 
 /**
  * ChunkedGELFClientManager.java: Sep 20, 2010 6:52:36 PM
@@ -29,11 +29,11 @@ import java.util.Map;
  * Singleton. Managing chunks of GELF messages. Ordering them, reporting when complete and
  * discards incomplete after a given time.
  *
- * @author: Lennart Koopmann <lennart@socketfeed.com>
+ * @author Lennart Koopmann <lennart@socketfeed.com>
  */
 public final class ChunkedGELFClientManager {
 
-    private static Map<String, ChunkedGELFMessage> messageMap = new HashMap<String, ChunkedGELFMessage>();
+    private static ConcurrentMap<String, ChunkedGELFMessage> messageMap = new ConcurrentHashMap<String, ChunkedGELFMessage>();
 
     private static ChunkedGELFClientManager instance;
 
@@ -43,7 +43,7 @@ public final class ChunkedGELFClientManager {
      *
      * @return
      */
-    public synchronized static ChunkedGELFClientManager getInstance() {
+    public static synchronized ChunkedGELFClientManager getInstance() {
         if (instance == null) {
             instance = new ChunkedGELFClientManager();
         }
@@ -93,7 +93,7 @@ public final class ChunkedGELFClientManager {
      *
      * @return
      */
-    public Map<String, ChunkedGELFMessage> getMessageMap() {
+    public ConcurrentMap<String, ChunkedGELFMessage> getMessageMap() {
         return messageMap;
     }
 

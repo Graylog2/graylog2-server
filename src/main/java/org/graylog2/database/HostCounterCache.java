@@ -20,8 +20,9 @@
 
 package org.graylog2.database;
 
-import java.util.HashMap;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
 
 /**
  * HostCounterCache.java: Feb 21, 2010 4:57:13 PM
@@ -29,20 +30,20 @@ import java.util.Set;
  * Acts as cache for count updates in the hosts collection. Written to MongoDB
  * by a periodically running thread.
  *
- * @author: Lennart Koopmann <lennart@socketfeed.com>
+ * @author Lennart Koopmann <lennart@socketfeed.com>
  */
 public class HostCounterCache {
     private static HostCounterCache instance;
 
-    private HashMap<String, Integer> cache = new HashMap<String, Integer>();
+    private ConcurrentMap<String, Integer> cache = new ConcurrentHashMap<String, Integer>();
 
-    private HostCounterCache() { }
+    private HostCounterCache() {}
 
     /**
      *
      * @return
      */
-    public synchronized static HostCounterCache getInstance() {
+    public static synchronized HostCounterCache getInstance() {
         if (instance == null) {
             instance = new HostCounterCache();
         }
@@ -62,18 +63,16 @@ public class HostCounterCache {
         }
 
         this.cache.put(hostname, old+1);
-
-        return;
     }
 
     /**
-     * Set counter cache to 0 for a host.
+     * Remove host from counter.
      *
      * @param hostname The host of which the counter to reset.
      */
     public void reset(String hostname) {
         if (this.cache.containsKey(hostname)) {
-            this.cache.put(hostname, 0);
+            this.cache.remove(hostname);
         }
     }
 

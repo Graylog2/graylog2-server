@@ -29,11 +29,8 @@ import org.graylog2.messagehandlers.gelf.InvalidGELFCompressionMethodException;
 import org.graylog2.messagehandlers.gelf.SimpleGELFClientHandler;
 import org.graylog2.messagehandlers.syslog.GraylogSyslogServerEvent;
 import org.graylog2.messagehandlers.syslog.SyslogEventHandler;
-import org.productivity.java.syslog4j.server.SyslogServer;
-import org.productivity.java.syslog4j.server.SyslogServerIF;
 
 import java.io.IOException;
-import java.io.UnsupportedEncodingException;
 import java.net.InetAddress;
 import java.util.zip.DataFormatException;
 
@@ -42,7 +39,7 @@ import java.util.zip.DataFormatException;
  *
  * Thread responsible for subscribing to AMQP queues.
  *
- * @author: Lennart Koopmann <lennart@socketfeed.com>
+ * @author Lennart Koopmann <lennart@socketfeed.com>
  */
 public class AMQPSubscriberThread extends Thread {
 
@@ -51,7 +48,7 @@ public class AMQPSubscriberThread extends Thread {
     private AMQPSubscribedQueue queue = null;
     private AMQPBroker broker = null;
 
-    public final static int SLEEP_INTERVAL = 10;
+    public static final int SLEEP_INTERVAL = 10;
 
     public AMQPSubscriberThread(AMQPSubscribedQueue queue, AMQPBroker broker) {
         this.queue = queue;
@@ -126,7 +123,7 @@ public class AMQPSubscriberThread extends Thread {
         }
     }
 
-    private void handleMessage(byte[] amqpBody) throws DataFormatException, UnsupportedEncodingException, InvalidGELFCompressionMethodException, IOException {
+    private void handleMessage(byte[] amqpBody) throws DataFormatException, InvalidGELFCompressionMethodException, IOException {
         // Handle message.
         switch (this.queue.getType()) {
             case AMQPSubscribedQueue.TYPE_GELF:

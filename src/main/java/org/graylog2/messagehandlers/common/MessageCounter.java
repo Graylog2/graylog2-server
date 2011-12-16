@@ -1,5 +1,5 @@
 /**
- * Copyright 2010 Lennart Koopmann <lennart@socketfeed.com>
+ * Copyright 2011 Lennart Koopmann <lennart@socketfeed.com>
  *
  * This file is part of Graylog2.
  *
@@ -20,97 +20,176 @@
 
 package org.graylog2.messagehandlers.common;
 
+import org.bson.types.ObjectId;
+
+import java.util.HashMap;
+import java.util.Map;
+import org.graylog2.Tools;
+
 /**
- * MessageCounter.java: Aug 19, 2010 6:06:20 PM
+ * MessageCounter.java: Sep 20, 2011 6:47:42 PM
  *
- * Singleton holding the number of received messages.
+ * Singleton holding the number of received messages for streams,
+ * hosts and a total.
  *
- * @author: Lennart Koopmann <lennart@socketfeed.com>
+ * @author Lennart Koopmann <lennart@socketfeed.com>
  */
 public final class MessageCounter {
     private static MessageCounter instance;
 
-    /**
-     * The API methods in this class require a hostname as String. This constant
-     * defines the "all hosts/total messages" graph.
-     */
-    public static final String ALL_HOSTS = "all";
+    private int total;
+    private Map<String, Integer> streams;
+    private Map<String, Integer> hosts;
 
-    private int totalCount = 0;
-    private int totalSecondCount = 0;
+    private int fiveSecondThroughput = 0;
+    private int highestFiveSecondThroughput = 0;
 
-    private int highestSecondCount = 0;
-
-    private MessageCounter() {}
+    private MessageCounter() {
+        // Initialize.
+        this.resetAllCounts();
+    }
 
     /**
      * @return MessageCounter singleton instance
      */
-    public synchronized static MessageCounter getInstance() {
+    public static synchronized MessageCounter getInstance() {
         if (instance == null) {
             instance = new MessageCounter();
         }
+
         return instance;
     }
 
+    public int getTotalCount() {
+        return this.total;
+    }
+
+    public Map<String, Integer> getStreamCounts() {
+        return this.streams;
+    }
+
+    public Map<String, Integer> getHostCounts() {
+        return this.hosts;
+    }
+
+    public int getFiveSecondThroughput() {
+        return this.fiveSecondThroughput;
+    }
+
+    public int getHighestFiveSecondThroughput() {
+        return this.highestFiveSecondThroughput;
+    }
+
+    public void resetAllCounts() {
+        this.resetTotal();
+        this.resetStreamCounts();
+        this.resetHostCounts();
+    }
+
+    public void resetHostCounts() {
+        this.hosts = new HashMap<String, Integer>();
+    }
+
+    public void resetStreamCounts() {
+        this.streams = new HashMap<String, Integer>();
+    }
+
+    public void resetTotal() {
+        this.total = 0;
+    }
+
+    public void resetFiveSecondThroughput() {
+        this.fiveSecondThroughput = 0;
+    }
+
     /**
-     * Reset count of a host
-     * @param host The host to select
+     * Increment total count by 1.
      */
-    public void reset(String host) {
-        if (host.equals(ALL_HOSTS)) {
-            totalCount = 0;
+    public void incrementTotal() {
+        this.countUpTotal(1);
+    }
+
+    /**
+     * Increment five second throughput by 1.
+     */
+    public void incrementFiveSecondThroughput() {
+        this.countUpFiveSecondThroughput(1);
+    }
+
+    /**
+     * Count up the total count.
+     *
+     * @param x The value to add on top of current total count.
+     */
+    public void countUpTotal(int x) {
+        this.total += x;
+    }
+
+    /**
+     * Counts up the five second througput counter which is handled and reset by
+     * the ServerValueWriterThread.
+     *
+     * @param x The value to add on top of five second throuput.
+     */
+    public void countUpFiveSecondThroughput(int x) {
+        this.fiveSecondThroughput += x;
+
+        if (this.fiveSecondThroughput > this.highestFiveSecondThroughput) {
+            this.highestFiveSecondThroughput = this.fiveSecondThroughput;
         }
     }
 
     /**
-     * Reset count of the messages per second counter.
+     * Increment stream count by 1.
+     *
+     * @param streamId The ID of the stream which count to increment.
      */
-    public void resetTotalSecondCount() {
-        // Possibly update highest count?
-        if (totalSecondCount > highestSecondCount) {
-            highestSecondCount = totalSecondCount;
-        }
-
-        totalSecondCount = 0;
+    public void incrementStream(ObjectId streamId) {
+        this.countUpStream(streamId, 1);
     }
 
     /**
-     * Increment count of a host (Also counts of totalSecondCounter if enabled)
-     * @param host The host to select
+     * Count up the count of a stream.
+     *
+     * @param streamId The ID of the stream which count to increment.
+     * @param x The value to add on top of the current stream count.
      */
-    public void countUp(String host) {
-        if (host.equals(ALL_HOSTS)) {
-            totalCount++;
-            totalSecondCount++;
+    public void countUpStream(ObjectId streamId, int x) {
+        if (this.streams.containsKey(streamId.toString())) {
+            // There already is an entry. Increment.
+            int oldCount = this.streams.get(streamId.toString());
+            this.streams.put(streamId.toString(), oldCount+x); // Overwrites old entry.
+        } else {
+            // First entry for this stream.
+            this.streams.put(streamId.toString(), x);
         }
     }
 
     /**
-     * Get the count of a host
-     * @param host The host to select
-     * @return Count of the host
+     * Increment host count by 1.
+     *
+     * @param hostname The name of the host which count to increment.
      */
-    public int getCount(String host) {
-        if (host.equals(ALL_HOSTS)) {
-            return totalCount;
+    public void incrementHost(String hostname) {
+        this.countUpHost(hostname, 1);
+    }
+
+    /**
+     * Count up the count of a host.
+     *
+     * @param hostname The name of the host which count to increment.
+     * @param x The value to add on top of the current host count.
+     */
+    public void countUpHost(String hostname, int x) {
+        hostname = Tools.encodeBase64(hostname);
+        if (this.hosts.containsKey(hostname)) {
+            // There already is an entry. Increment.
+            int oldCount = this.hosts.get(hostname);
+            this.hosts.put(hostname, oldCount+x); // Overwrites old entry.
+        } else {
+            // First entry for this stream.
+            this.hosts.put(hostname, x);
         }
-
-        return 0;
-    }
-    
-   /**
-    * Get the count of the messages per second counter.
-    */
-    public int getTotalSecondCount() {
-        return totalSecondCount;
-    }
-
-   /**
-     * Get the highest recorded count of messages per second.
-     */
-    public int getHighestSecondCount() {
-        return highestSecondCount;
     }
 
 }

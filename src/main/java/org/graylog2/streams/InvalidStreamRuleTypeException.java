@@ -26,7 +26,7 @@ package org.graylog2.streams;
  * Exception thrown in case of an invalid stream rule type. Allowed types are
  * defined in StreamRule.
  *
- * @author: Lennart Koopmann <lennart@socketfeed.com>
+ * @author Lennart Koopmann <lennart@socketfeed.com>
  */
 public class InvalidStreamRuleTypeException extends Exception {
 

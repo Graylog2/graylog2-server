@@ -29,16 +29,17 @@ import java.util.List;
  *
  * MongoDB connection singleton
  *
- * @author: Lennart Koopmann <lennart@socketfeed.com>
+ * @author Lennart Koopmann <lennart@socketfeed.com>
  */
 public final class MongoConnection {
     private static MongoConnection instance;
 
-    private Mongo m = null;
-    private DB db = null;
+    private Mongo m;
+    private DB db;
 
-    private DBCollection messagesCollection = null;
-    private DBCollection historicServerValuesCollection = null;
+    private DBCollection messagesCollection;
+    private DBCollection historicServerValuesCollection;
+    private DBCollection messageCountsCollection;
 
     private long messagesCollSize;
 
@@ -48,7 +49,7 @@ public final class MongoConnection {
      * Get the connection instance
      * @return MongoConnection instance
      */
-    public synchronized static MongoConnection getInstance() {
+    public static synchronized MongoConnection getInstance() {
         if (instance == null) {
             instance = new MongoConnection();
         }
@@ -70,7 +71,7 @@ public final class MongoConnection {
      *
      * @throws Exception
      */
-    public void connect(String username, String password, String hostname, String database, int port, String useAuth,
+    public void connect(String username, String password, String hostname, String database, int port, boolean useAuth,
                         int maxConnections, int threadsAllowedToBlockForConnectionMultiplier,
                         List<ServerAddress> replicaServers, long messagesCollSize) throws Exception {
         MongoOptions options = new MongoOptions();
@@ -92,13 +93,13 @@ public final class MongoConnection {
             db = m.getDB(database);
 
             // Try to authenticate if configured.
-            if (useAuth.equals("true")) {
+            if (useAuth) {
                 if(!db.authenticate(username, password.toCharArray())) {
                     throw new Exception("Could not authenticate to database '" + database + "' with user '" + username + "'.");
                 }
             }
         } catch (MongoException.Network e) {
-            throw new Exception("Could not connect to Mongo DB. (" + e.toString() + ")");
+            throw new Exception("Could not connect to Mongo DB.", e);
         }
     }
 
@@ -156,30 +157,22 @@ public final class MongoConnection {
         return coll;
     }
 
-    public DBCollection getHistoricServerValuesColl() {
-        if (this.historicServerValuesCollection != null) {
-            return this.historicServerValuesCollection;
+    /**
+     * Get the message_counts collection. Lazily checks if correct indizes are set.
+     *
+     * @return The messages collection
+     */
+    public DBCollection getMessageCountsColl() {
+        if (this.messageCountsCollection != null) {
+            return this.messageCountsCollection;
         }
 
         // Collection has not been cached yet. Do it now.
-        DBCollection coll = null;
+        DBCollection coll = MongoConnection.getInstance().getDatabase().getCollection("message_counts");
 
-        // Create a capped collection if the collection does not yet exist.
-        if(MongoConnection.getInstance().getDatabase().collectionExists("historic_server_values")) {
-            coll = MongoConnection.getInstance().getDatabase().getCollection("historic_server_values");
-        } else {
-            coll = MongoConnection.getInstance()
-                    .getDatabase().createCollection("historic_server_values", BasicDBObjectBuilder.start()
-                    .add("capped", true)
-                    .add("size", 10485760) // 10 MB
-                    .add("max", 720) // Minutes. -> 12 hours.
-                    .get());
-        }
+        coll.ensureIndex(new BasicDBObject("timestamp", 1));
 
-        coll.ensureIndex(new BasicDBObject("type", 1));
-        coll.ensureIndex(new BasicDBObject("created_at", 1));
-
-        this.historicServerValuesCollection = coll;
+        this.messageCountsCollection = coll;
         return coll;
     }
 

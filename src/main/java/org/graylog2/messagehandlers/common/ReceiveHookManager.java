@@ -27,7 +27,7 @@ import org.graylog2.messagehandlers.gelf.GELFMessage;
  *
  * Allows to call ReceiveHooks. Called on message events.
  *
- * @author: Lennart Koopmann <lennart@socketfeed.com>
+ * @author Lennart Koopmann <lennart@socketfeed.com>
  */
 public final class ReceiveHookManager {
 	

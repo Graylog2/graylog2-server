@@ -30,7 +30,7 @@ import java.net.DatagramPacket;
  *
  * Thread that handles a GELF client.
  *
- * @author: Lennart Koopmann <lennart@socketfeed.com>
+ * @author Lennart Koopmann <lennart@socketfeed.com>
  */
 public class GELFClientHandlerThread extends Thread {
 
@@ -54,10 +54,10 @@ public class GELFClientHandlerThread extends Thread {
         try {
             GELFClientHandlerIF client = null;
             if (GELF.isChunkedMessage(this.receivedGelfSentence)) {
-                LOG.info("Received message is chunked. Handling now.");
+                LOG.debug("Received message is chunked. Handling now.");
                 client = new ChunkedGELFClientHandler(this.receivedGelfSentence);
             } else {
-                LOG.info("Received message is not chunked. Handling now.");
+                LOG.debug("Received message is not chunked. Handling now.");
                 client = new SimpleGELFClientHandler(this.receivedGelfSentence);
             }
             client.handle();
