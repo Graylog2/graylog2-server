@@ -14,7 +14,6 @@ subscriptions:
 streamalarms:
   from: graylog2alarms@example.org
   subject: "[graylog2] Stream alarm!"
-  message_count: 25 # The number of last messages to include in email
 
 hoptoad:
   enabled: false

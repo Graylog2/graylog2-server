@@ -81,12 +81,6 @@ class Configuration
     streamalarm_config :subject, "[graylog2] Stream alarm!"
   end
 
-  def self.streamalarm_message_count
-    streamalarm_config('message_count', 25).tap do |c|
-      c = 25 if c.zero?
-    end
-  end
-
   def self.livetail_config(key, default = nil)
     nested_general_config :livetail, key, default
   end
