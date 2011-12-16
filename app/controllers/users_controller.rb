@@ -99,7 +99,7 @@ class UsersController < ApplicationController
     @user = User.new(params[:user])
     success = @user && @user.save
     if success && @user.errors.empty?
-      redirect_to :action => 'index'
+      redirect_to messages_path
       flash[:notice] = "Your first user has been created. Welcome to Graylog2!"
     else
       render :action => 'first'
