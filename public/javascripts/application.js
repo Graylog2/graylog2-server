@@ -206,8 +206,30 @@ $(document).ready(function(){
       if ($(this).attr("data-nowait") == undefined) {
         $(this).html("Please wait...");
       }
-      $(this).parent().submit();
+      
+      if ($(this).attr("data-confirm") == undefined) {
+        // Directly follow form if no confirmation was requested.
+        $(this).parent().submit();
+        return false;
+      }
+
+      if (confirm($(this).attr("data-confirm"))) {
+        $(this).parent().submit();
+      }
+
       return false;
+    });
+
+    $("a").bind("click", function(){
+      if ($(this).attr("data-confirm") == undefined) {
+        return true;
+      } else {
+        if (confirm($(this).attr("data-confirm"))) {
+          return true;
+        } else {
+          return false;
+        }
+      }
     });
 
     // Show full message in sidebar.
