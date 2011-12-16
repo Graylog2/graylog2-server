@@ -492,7 +492,7 @@ label {
   cursor:pointer;
 }
 #simplemodal-overlay {background-color:#000;}
-#simplemodal-container {background-color:#333; border:8px solid #444; padding:12px; color: #fff;}
+#simplemodal-container {background-color:#333; border:8px solid #444; padding:12px; color: #fff; height: 500px; }
 
 #back-to-top {
   width: 100px;
