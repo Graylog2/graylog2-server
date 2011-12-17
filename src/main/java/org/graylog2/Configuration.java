@@ -126,10 +126,16 @@ public class Configuration {
     private String amqpPassword = "guest";
 
     @Parameter("amqp_virtualhost")
-    private String amqpVirtualhost = "/";
+    private String amqpVirtualhost = "/"
+    ;
+    @Parameter("scribe_enabled")
+    private boolean scribeEnabled = false;
 
     @Parameter(value = "scribe_port", validator = InetPortValidator.class)
     private int scribePort = 5672;
+    
+    @Parameter("scribe_host")
+    private String scribeHost = "localhost";
     
     @Parameter(value = "scribe_rpc_timeout", validator = PositiveIntegerValidator.class)
     private int scribeRpcTimeout = 15000;
@@ -141,7 +147,7 @@ public class Configuration {
     private int scribeMinThreads = 5;
     
     @Parameter(value = "scribe_max_threads", validator = PositiveIntegerValidator.class)
-    private int scribeMinThreads = 10;
+    private int scribeMaxThreads = 10;
 
     @Parameter(value = "forwarder_loggly_timeout", validator = PositiveIntegerValidator.class)
     private int forwarderLogglyTimeout = 3;
@@ -255,6 +261,10 @@ public class Configuration {
     public String getAmqpVirtualhost() {
         return amqpVirtualhost;
     }
+    
+    public boolean isScribeEnabled() {
+        return scribeEnabled;
+    }
 
     public int getForwarderLogglyTimeout() {
         return forwarderLogglyTimeout * 1000;
@@ -262,6 +272,30 @@ public class Configuration {
 
     public String getDroolsRulesFile() {
         return droolsRulesFile;
+    }
+    
+    public String getScribeHost() {
+        return scribeHost;
+    }
+    
+    public int getScribePort() {
+        return scribePort;
+    }
+    
+    public int getScribeRPCTimeout() {
+        return scribeRpcTimeout;
+    }
+    
+    public int getScribeThriftLength() {
+        return scribeThriftLength;
+    }
+
+    public int getScribeMinThreads() {
+        return scribeMinThreads;
+    }
+    
+    public int getScribeMaxThreads() {
+        return scribeMaxThreads;
     }
 
     public List<ServerAddress> getMongoReplicaSet() {

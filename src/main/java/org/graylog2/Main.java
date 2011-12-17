@@ -188,13 +188,9 @@ public final class Main {
         }
 
         // Initialize Scribe if enabled
-        if (configuration.getBoolean("scribe_enabled")) {
+        if (configuration.isScribeEnabled()) {
             initializeScribe(configuration);
         }
-        
-        // Start thread that stores throughput info.
-        ThroughputWriterThread throughputThread = new ThroughputWriterThread();
-        throughputThread.start();
 
         // Add a shutdown hook that tries to flush the message queue.
         Runtime.getRuntime().addShutdownHook(new MessageQueueFlusher());
@@ -331,12 +327,12 @@ public final class Main {
     private static void initializeScribe(Configuration configuration) {
         // Start up the scribe server
         ScribeServer scribeServer = new ScribeServer(
-                                               configuration.get("scribe_host"),
-                                               configuration.getInteger("scribe_port", 0),
-                                               configuration.getInteger("scribe_rpc_timeout", 15000),
-                                               configuration.getInteger("scribe_thrift_length", 15000),
-                                               configuration.getInteger("scribe_min_threads", 5),
-                                               configuration.getInteger("scribe_max_threads", 10)
+                                               configuration.getScribeHost(),
+                                               configuration.getScribePort(),
+                                               configuration.getScribeRPCTimeout(),
+                                               configuration.getScribeThriftLength(),
+                                               configuration.getScribeMinThreads(),
+                                               configuration.getScribeMaxThreads()
                                                  );
         scribeServer.run();
         LOG.info("Scribe threads started.");
