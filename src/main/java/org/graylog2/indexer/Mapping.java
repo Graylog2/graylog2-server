@@ -34,6 +34,8 @@ import java.util.Map;
  * @author Lennart Koopmann <lennart@socketfeed.com>
  */
 public class Mapping {
+    
+    private static String TYPE = "message";
 
     public static Map<String, Object> get() {
         Map<String, Object> mapping = new HashMap<String, Object>();
@@ -41,7 +43,7 @@ public class Mapping {
         mapping.put("dynamic_templates", partDefaultAllInDynamicTemplate());
 
         Map<String, Map> completeMapping = new HashMap<String, Map>();
-        completeMapping.put(Indexer.TYPE, mapping);
+        completeMapping.put(TYPE, mapping);
 
         Map<String, Object> spec = new HashMap<String, Object>();
         spec.put("mappings", completeMapping);
@@ -52,7 +54,7 @@ public class Mapping {
     /*
      * Disable analyzing for every field by default.
      */
-    public static List<Map> partDefaultAllInDynamicTemplate() {
+    private static List<Map> partDefaultAllInDynamicTemplate() {
         List<Map> dynamicTemplates = new LinkedList<Map>();
         Map<String, Map> template = new HashMap<String, Map>();
         Map<String, Object> defaultAll = new HashMap<String, Object>();
@@ -73,7 +75,7 @@ public class Mapping {
     /*
      * Enable analyzing for some fields again. Like for message and full_message.
      */
-    public static Map partFieldProperties() {
+    private static Map partFieldProperties() {
         Map<String, Map<String, String>> properties = new HashMap<String, Map<String, String>>();
 
         properties.put("message", analyzedString());
@@ -85,7 +87,7 @@ public class Mapping {
         return properties;
     }
 
-    public static Map<String, String> analyzedString() {
+    private static Map<String, String> analyzedString() {
         Map<String, String> type = new HashMap<String, String>();
         type.put("index", "analyzed");
         type.put("type", "string");
@@ -93,7 +95,7 @@ public class Mapping {
         return type;
     }
 
-    public static Map<String, String> typeNumberDouble() {
+    private static Map<String, String> typeNumberDouble() {
         Map<String, String> type = new HashMap<String, String>();
         type.put("type", "double");
 
