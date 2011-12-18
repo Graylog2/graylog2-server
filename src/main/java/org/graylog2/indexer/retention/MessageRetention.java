@@ -34,10 +34,10 @@ public class MessageRetention {
 
     private static final Logger LOG = Logger.getLogger(MessageRetention.class);
 
-    public static boolean performCleanup(int timeDays) {
+    public static boolean performCleanup(int timeDays, Indexer indexer) {
         int to = Tools.getTimestampDaysAgo(Tools.getUTCTimestamp(), timeDays);
         LOG.debug("Deleting all messages older than " + to + " (" + timeDays + " days ago)");
-        return Indexer.deleteMessagesByTimeRange(to);
+        return indexer.deleteMessagesByTimeRange(to);
     }
 
     public static void updateLastPerformedTime() {

@@ -20,11 +20,13 @@
 
 package org.graylog2.periodical;
 
-import java.util.concurrent.TimeUnit;
 import org.apache.log4j.Logger;
 import org.graylog2.Main;
+import org.graylog2.indexer.Indexer;
 import org.graylog2.indexer.retention.MessageRetention;
 import org.graylog2.settings.Setting;
+
+import java.util.concurrent.TimeUnit;
 
 /**
  * MessageRetentionThread.java: Nov 22, 2011 7:35:10 PM
@@ -36,8 +38,12 @@ import org.graylog2.settings.Setting;
 public class MessageRetentionThread implements Runnable {
 
     private static final Logger LOG = Logger.getLogger(MessageRetentionThread.class);
+    
+    private Indexer indexer;
 
-    private int retentionTimeDays;
+    public MessageRetentionThread(Indexer indexer) {
+        this.indexer = indexer;
+    }
 
     @Override
     public void run() {
@@ -47,11 +53,11 @@ public class MessageRetentionThread implements Runnable {
              * to be sure to always have the *current* setting from database - even when
              * used with scheduler.
              */
-            this.retentionTimeDays = Setting.getRetentionTimeInDays();
+            int retentionTimeDays = Setting.getRetentionTimeInDays();
 
-            LOG.info("Initialized message retention thread - cleaning all messages older than <" + this.retentionTimeDays + " days>.");
+            LOG.info("Initialized message retention thread - cleaning all messages older than <" + retentionTimeDays + " days>.");
 
-            if (MessageRetention.performCleanup(this.retentionTimeDays)) {
+            if (MessageRetention.performCleanup(retentionTimeDays, indexer)) {
                 MessageRetention.updateLastPerformedTime();
             }
         } catch (Exception e) {
@@ -64,7 +70,7 @@ public class MessageRetentionThread implements Runnable {
     private void scheduleNextRun() {
         // Schedule next run in [current frequency setting from database] minutes.
         int when = Setting.getRetentionFrequencyInMinutes();
-        Main.scheduler.schedule(new MessageRetentionThread(), when, TimeUnit.MINUTES);
+        Main.scheduler.schedule(new MessageRetentionThread(indexer), when, TimeUnit.MINUTES);
         LOG.info("Scheduled next run of MessageRetentionThread in <" + when + " minutes>.");
     }
 }
