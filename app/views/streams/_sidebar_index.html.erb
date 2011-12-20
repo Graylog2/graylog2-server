@@ -5,8 +5,7 @@
         <%= @stream.message_count_since(@stream.alarm_timespan.minutes.ago.to_i) %> messages in last <%= @stream.alarm_timespan %> minutes!
       <% when :no_alarm then %>
         <span class="status-okay-text">OK:</span>
-        <%= @stream.message_count_since(@stream.alarm_timespan.minutes.ago.to_i) %> messages in last <%= @stream.alarm_timespan %>
-        messages in last <%= @stream.alarm_timespan %> minutes.
+        <%= @stream.message_count_since(@stream.alarm_timespan.minutes.ago.to_i) %> messages in last <%= @stream.alarm_timespan %> minutes.
       <% when :disabled then %>
         <%= @stream.message_count_since(5.minutes.ago) %> messages in last 5 minutes.
     <% end %>
