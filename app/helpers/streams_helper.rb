@@ -23,7 +23,7 @@ module StreamsHelper
       tabs.push ["Rules", rules_stream_path(@stream)] if permitted_to?(:rules, @stream)
       tabs.push ["Forwarders", forward_stream_path(@stream)] if permitted_to?(:forward, @stream)
       tabs.push ["Analytics", analytics_stream_path(@stream)] if permitted_to?(:analytics, @stream)
-      tabs.push ["Settings", settings_stream_path(@stream)] if permitted_to?(:show, @stream)
+      tabs.push ["Settings", settings_stream_path(@stream)] if permitted_to?(:settings, @stream)
     end
 
     tabs

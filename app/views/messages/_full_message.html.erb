@@ -60,7 +60,7 @@
   </ul>
 <% end %>
 
-<% if ::Configuration.allow_deleting %>
+<% if !current_user.reader? and ::Configuration.allow_deleting %>
   <br />
   <%= awesome_link "Delete message", message_path(@message), :method => :delete, :confirm => "Really delete message?" %>
   <br />
