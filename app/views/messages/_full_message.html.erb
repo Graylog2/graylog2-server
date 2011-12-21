@@ -13,8 +13,11 @@
 
 <div id="messages-show-terms-modal" style="display: none;">
   <h2>Terms of message <span class="highlighted"><%= @message.id %></span></h2>
+  <strong>|</strong>
   <% @terms.in_groups_of(20) do |group| %>
-    <%= group.delete_if {|t| t.nil? }.to_s %><br />
+    <% group.delete_if {|t| t.nil? }.each do |t| %>
+      <%= t %> <strong>|</strong>
+    <% end %><br />
   <% end %>
 </div>
 <%= link_to "In which terms was this message broken to?", "#", { :onclick => "$('#messages-show-terms-modal').modal({ overlayClose:true })" } %>
