@@ -7,7 +7,6 @@ authorization do
       :getcompletemessage,
       :getsimilarmessages,
       :showrange,
-      :around,
       :deletebyquickfilter,
       :deletebystream,
     ]
@@ -68,7 +67,7 @@ authorization do
       if_attribute :users => contains { user }
     end
     has_permission_on :sessions, :to => [:destroy]
-    has_permission_on :messages, :to => [:index, :show, :around]
+    has_permission_on :messages, :to => [:index, :show]
   end
 end
 

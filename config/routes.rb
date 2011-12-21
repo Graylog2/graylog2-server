@@ -21,7 +21,6 @@ Graylog2WebInterface::Application.routes.draw do
     end
     member do
       post :show
-      get :around
     end
   end
 

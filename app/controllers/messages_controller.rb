@@ -1,15 +1,9 @@
-# XXX ELASTIC "messages from today button" is not working
-
 class MessagesController < ApplicationController
   before_filter :do_scoping
 
   filter_access_to :all
 
-  rescue_from Mongoid::Errors::DocumentNotFound, :with => :not_found
-  rescue_from BSON::InvalidObjectId, :with => :not_found
-
   # XXX ELASTIC clean up triple-duplicated quickfilter shit
-  # XXX ELASTIC own host sidebar with total message count and own graph
   def do_scoping
     if params[:host_id]
       @scoping = :host
@@ -113,7 +107,6 @@ class MessagesController < ApplicationController
     redirect_to :action => "index"
   end
 
-  # XXX ELASTIC protect from readers
   def showrange
     @has_sidebar = true
     @load_flot = true

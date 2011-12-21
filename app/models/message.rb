@@ -108,7 +108,6 @@ class Message
     return ret_streams
   end
 
-  # XXX ELASTIC: test with reader user
   def accessable_for_user?(current_user)
     return true if current_user.role == "admin"
 
