@@ -1,3 +1,4 @@
+<% if stream.accessable_for_user?(current_user) %>
 <% minutes = params[:ms].blank? ? 15 : params[:ms].to_i %>
 
 <div id="el-e">
@@ -19,3 +20,4 @@
     <span class="el-e-description"><%= stream.description.blank? ? "No description" : stream.description %></span>
   </div>
 </div>
+<% end %>

@@ -26,6 +26,8 @@
 
 <div id="streams-streams">
   <% Streamcategory.all.each do |category| %>
+    <% next if !category.has_accessable_streams_for_user?(current_user) %>
+
     <h2 class="streams-title"><%= category.title %></h2>
     <% category.streams.sort{ |a,b| a.title <=> b.title }.each do |stream| %>
       <%= render :partial => "streamrow", :locals => { :stream => stream } %>
