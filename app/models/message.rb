@@ -54,6 +54,8 @@ class Message
     end
 
     return @additionals
+
+    # XXX ELASTIC: sort alphabetically
   end
 
   # Overwriting the message getter. This always applies the filtering of filtered terms.
