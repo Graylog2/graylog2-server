@@ -6,7 +6,7 @@ require 'blueprints'
 
 # Must be equal to the one graylog2-server generates.
 #  - Generated via: System.out.println(Mapping.get()); - MAKE SURE TO HAVE HASH START WITH TYPE (message)
-ES_MESSAGE_MAPPING = JSON.parse('{"message":{"dynamic_templates":[{"store_generic":{"mapping":{"index":"not_analyzed"}, "match":"*"}}], "properties":{"message":{"index":"analyzed", "type":"string"}, "full_message":{"index":"analyzed", "type":"string"}, "created_at":{"type":"double"}}}}')
+ES_MESSAGE_MAPPING = JSON.parse('{"message":{"dynamic_templates":[{"store_generic":{"mapping":{"index":"not_analyzed"}, "match":"*"}}], "properties":{"message":{"index":"analyzed", "analyzer":"whitespace", "type":"string"}, "full_message":{"index":"analyzed", "analyzer":"whitespace", "type":"string"}, "created_at":{"type":"double"}}}}')
 ES_TEST_INDEX_NAME = "graylog2_test"
 
 class ActiveSupport::TestCase

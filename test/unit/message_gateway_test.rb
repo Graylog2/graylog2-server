@@ -20,7 +20,8 @@ class MessageGatewayTest < ActiveSupport::TestCase
   context "analyzing" do
     
     should "correctly analyze a text" do
-      assert_equal ["lolwut", "zomg.wat", "ohai"], MessageGateway.analyze("LOLWUT zomg.wat, ohai", "message")
+      # !! this will FAIL if a wrong analyzer was provided in mapping
+      assert_equal ["LOLWUT", "zomg.wat,", "ohai"], MessageGateway.analyze("LOLWUT zomg.wat, ohai", "message")
     end
 
     should "not fail on empty text" do
