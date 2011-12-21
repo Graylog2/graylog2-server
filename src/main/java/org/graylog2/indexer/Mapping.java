@@ -89,6 +89,7 @@ public class Mapping {
         Map type = new HashMap();
         type.put("index", "analyzed");
         type.put("type", "string");
+        type.put("analyzer", "whitespace");
         
         return type;
     }
