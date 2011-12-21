@@ -6,11 +6,11 @@ module StreamsHelper
 
   def streamrule_to_human rule
     type = streamrule_type_to_human(rule.rule_type)
-    value = h(rule.value)
+    value = CGI::escapeHTML(rule.value)
 
     # Add human readable value type for SEVERITY
     if rule.rule_type == Streamrule::TYPE_SEVERITY or rule.rule_type == Streamrule::TYPE_SEVERITY_OR_HIGHER
-        value = "#{syslog_level_to_human(rule.value)} (#{h(rule.value.to_i)})"
+        value = "#{syslog_level_to_human(rule.value)} (#{rule.value.to_i})"
     end
 
     return "<span class=\"black\">#{type}</span>: <i>#{value}</i>"

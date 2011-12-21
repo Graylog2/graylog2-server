@@ -3,6 +3,10 @@
   <a href="#" onclick="$('.analytics-shell-debug').show(); $(this).hide(); return false;">Show debug information</a>
 </div>
 <div class="analytics-shell-debug">
-  <% @result.delete(:result) %>
-  <%= @result.to_json %>
+  <%
+    our_result = @result.dup
+    our_result.delete(:result)
+  %>
+
+  <%= our_result.to_json %>
 </div>

@@ -15,7 +15,8 @@ module MessagesHelper
   end
 
   def format_additional_field_value(key, value)
-    res = html_escape(value)
+    return "".html_safe if key.blank? or value.blank?
+    res = CGI::escapeHTML(value)
     res = "<pre>#{res}</pre>" if res.include?("\n")
     res.html_safe
   end

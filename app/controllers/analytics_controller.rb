@@ -15,7 +15,7 @@ class AnalyticsController < ApplicationController
     time = Benchmark.realtime do
       @result = shell.compute
     end
-
+    
     ms = sprintf("%#.2f", time*1000);
 
     if @result[:operation] == "find"

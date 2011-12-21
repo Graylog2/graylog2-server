@@ -11,7 +11,7 @@ class AnalyticsControllerTest < ActionController::TestCase
 
       query = 'all.count(host = "example.com")'
       post :shell, :cmd => query
-
+      
       result = assigns(:result)
       assert_equal "count", result[:operation]
       assert_equal 15, result[:result]
@@ -27,44 +27,20 @@ class AnalyticsControllerTest < ActionController::TestCase
 
       result = assigns(:result)
       assert_equal "find", result[:operation]
-      assert_equal [msg1, msg2], result[:result]
+      assert_equal 2, result[:result].count
     end
 
     should "distinct" do
-      5.times { bm(:host => "foo.example.org") }
-      4.times { bm(:host => "bar.example.com") }
-      2.times { bm(:host => "baz.example.org") }
+      5.times { bm(:host => "foo.example.org", :_something => "lolwat") }
+      2.times { bm(:host => "foo.example.org", :_something => "zomg" ) }
+      4.times { bm(:host => "bar.example.com", :_something => "nothing here") }
 
-      query = 'all.distinct({host}, host = /^(foo|baz)/)'
+      query = 'all.distribution({_something}, host = "foo.example.org")'
       post :shell, :cmd => query
 
       result = assigns(:result)
-      assert_equal "distinct", result[:operation]
-      assert_equal ["foo.example.org", "baz.example.org"], result[:result]
-    end
-
-    should "return a general error if the mongo operation failed" do
-      Shell.any_instance.expects(:perform_find).raises(Mongo::OperationFailure)
-
-      query = 'all.find(foo = "bar")'
-      post :shell, :cmd => query
-
-      r = JSON.parse(@response.body)
-
-      assert_equal "error", r["code"]
-      assert_match /^Mongo operation failed/, r["reason"]
-    end
-
-    should "return a descriptive error if the mongo operation was interrupted" do
-      Shell.any_instance.expects(:perform_find).raises(Mongo::OperationFailure, "interrupted")
-
-      query = 'all.find(foo = "bar")'
-      post :shell, :cmd => query
-
-      r = JSON.parse(@response.body)
-
-      assert_equal "error", r["code"]
-      assert_match /^Mongo operation was interrupted/, r["reason"]
+      assert_equal "distribution", result[:operation]
+      assert_equal [{"distinct"=>"lolwat", "count"=>5}, {"distinct"=>"zomg", "count"=>2}], result[:result]
     end
 
   end
