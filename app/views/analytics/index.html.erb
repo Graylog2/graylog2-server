@@ -25,12 +25,9 @@
   <br />
   <strong>Conditional operators</strong>
   <ul class="analytics-shell-explanation">
-    <li>&lt;</li>
-    <li>&gt;</li>
-    <li>&lt;=</li>
-    <li>&gt;=</li>
-    <li>=</li>
-    <li>!=</li>
+    <li>&lt; &gt;</li>
+    <li>&lt;= &gt;=</li>
+    <li>= !=</li>
   </ul>
 
   <br />
@@ -46,14 +43,18 @@
   if you need more and pagination.
 
       
-  <br><br />
-  The stream() and streams() selectors take stream ID's or stream shortnames as parameters.
+  <br /><br />
+  The stream() and streams() selectors also take stream shortnames as parameters.
+
+  <br /><br />
+  The fields <strong>message and full_message</strong> are broken to terms. This means that searches on them
+  do not mean <i>equals [search term]</i> but <i>contains [search term]</i>.
 
   <br><br />
   <strong>Examples:</strong>
   <ul class="analytics-shell-explanation">
     <li>all.find()</li>
-    <li>all.count(host = "example.ort", _http_response_code = 204)</li>
+    <li>all.count(host = "example.org", _http_response_code = 204)</li>
     <li>all.distribution({host}, _http_response_code &gt; 500)</li>
     <li>stream(some_stream).distribution({_processed_controller}, :_http_response_code = 500)</li>
   </ul>
