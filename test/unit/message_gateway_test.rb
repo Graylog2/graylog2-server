@@ -16,4 +16,17 @@ class MessageGatewayTest < ActiveSupport::TestCase
     end
 
   end
+
+  context "analyzing" do
+    
+    should "correctly analyze a text" do
+      assert_equal ["lolwut", "zomg.wat", "ohai"], MessageGateway.analyze("LOLWUT zomg.wat, ohai", "message")
+    end
+
+    should "not fail on empty text" do
+      assert_equal Array.new, MessageGateway.analyze("", "message")
+    end
+
+  end
+
 end

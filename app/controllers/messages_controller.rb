@@ -82,6 +82,7 @@ class MessagesController < ApplicationController
     @load_flot = true
 
     @message = MessageGateway.retrieve_by_id(params[:id])
+    @terms = MessageGateway.analyze(@message.message)
 
     unless @message.accessable_for_user?(current_user)
       block_access_for_non_admins
