@@ -53,7 +53,7 @@
     <div id="userbar">
       Logged in as <%= current_user.login %> &nbsp;<%= link_to "(Log out)", logout_path %>
     </div>
-    <%= link_to image_tag("graylog.png", :id => "toplogo"), (permitted_to?(:index, :messages) ? messages_path : streams_path)%>
+    <%= link_to image_tag("graylog.png", :id => "toplogo"), (current_user.reader? ? streams_path : messages_path)%>
     <ul id="topmenu">
       <% current_user.role == "admin" and permitted_to? :index, :messages do %><%=raw menu_item("Messages", messages_path) %><% end %>
       <% permitted_to? :index, :streams do %><%=raw menu_item("Streams", streams_path) %><% end %>
