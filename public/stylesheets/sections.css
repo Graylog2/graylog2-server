@@ -418,6 +418,10 @@
   display: none;
 }
 
+#users-streams-selector {
+  margin-top: 3px;
+}
+
 /* Livetail */
 .content-livetail {
   background-color: #000 !important;
