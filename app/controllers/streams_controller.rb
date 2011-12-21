@@ -28,6 +28,8 @@ class StreamsController < ApplicationController
   end
 
   def showrange
+    render :status => :forbidden if !@stream.accessable_for_user?(current_user_id)
+
     @has_sidebar = true
     @load_flot = true
 
@@ -315,5 +317,6 @@ class StreamsController < ApplicationController
   protected
   def load_stream
     @stream = Stream.find_by_id params["id"]
+    render :text => "Not accessible for your user.", :status => :forbidden and return if !@stream.accessable_for_user?(current_user)
   end
 end
