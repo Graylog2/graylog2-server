@@ -79,6 +79,10 @@ class User
     write_attribute :email, (value ? value.downcase : nil)
   end
 
+  def reader?
+    role == "reader"
+  end
+
   def roles
     role_symbols
   end
