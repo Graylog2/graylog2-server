@@ -20,8 +20,11 @@
 
 package org.graylog2.messagehandlers.common;
 
-import org.graylog2.Main;
+// import org.graylog2.Main;
 import org.graylog2.messagehandlers.gelf.GELFMessage;
+import com.nexage.graylog2.NXFields;
+
+import com.nexage.graylog2.NXFields;
 
 /**
  * MessageParserHook.java: Feb 11, 2011
@@ -36,12 +39,19 @@ public class MessageParserHook implements MessagePreReceiveHookIF {
      * Process the hook.
      */
     public void process(GELFMessage message) {
-		/**
-		 * Run GELFMessage through the rules engine
+		// /**
+		//  * Run GELFMessage through the rules engine
+		//  */
+    	// if (Main.drools != null)
+    	// {
+    	//	Main.drools.evaluate(message);
+    	// }
+    	/**
+		 * Check GELFMessage.shortMessage for actual content
 		 */
-    	if (Main.drools != null)
-    	{
-    		Main.drools.evaluate(message);
+    	if (message.getShortMessage().equals("")) {
+    		return;
     	}
+    	NXFields.amplify(message);
     }
 }
