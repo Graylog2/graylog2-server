@@ -29,6 +29,9 @@ import org.junit.Test;
 import java.io.ByteArrayOutputStream;
 import java.io.EOFException;
 import java.io.IOException;
+import java.net.InetSocketAddress;
+import java.net.SocketAddress;
+import java.net.UnknownHostException;
 import java.util.Calendar;
 import java.util.zip.Deflater;
 import java.util.zip.GZIPOutputStream;
@@ -143,5 +146,12 @@ public class ToolsTest {
     @Test
     public void testDecodeBase64() {
         assertEquals("lolwat.encoded", Tools.decodeBase64("bG9sd2F0LmVuY29kZWQ="));
+    }
+
+    @Test
+    public void testRdnsLookup() throws UnknownHostException {
+        // google.com - let's see for how long this works.
+        InetSocketAddress addr = new InetSocketAddress("173.194.69.99", 80);
+        assertEquals("bk-in-f99.1e100.net", Tools.rdnsLookup(addr));
     }
 }

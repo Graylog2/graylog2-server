@@ -53,6 +53,9 @@ public class Configuration {
     @Parameter(value = "syslog_protocol", required = true)
     private String syslogProtocol = "udp";
 
+    @Parameter(value = "force_syslog_rdns", required = true)
+    private boolean forceSyslogRdns = false;
+
     @Parameter(value = "mongodb_useauth", required = true)
     private boolean mongoUseAuth = false;
 
@@ -140,6 +143,10 @@ public class Configuration {
 
     public String getSyslogProtocol() {
         return syslogProtocol;
+    }
+
+    public boolean getForceSyslogRdns() {
+        return forceSyslogRdns;
     }
 
     public String getElasticSearchUrl() {
