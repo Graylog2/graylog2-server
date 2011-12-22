@@ -15,7 +15,10 @@ package com.nexage.graylog2;
 
 import java.util.Map;
 import java.util.HashMap;
-import org.json.simple.*;
+import org.json.simple.JSONArray;
+import org.json.simple.JSONObject;
+import org.json.simple.parser.JSONParser;
+import org.json.simple.parser.ParseException;
 import org.graylog2.messagehandlers.gelf.GELFMessage;
 
 /**
@@ -37,7 +40,7 @@ public class NXFields {
 	public static void amplify(GELFMessage target) {
 		String nxAppName = target.getFacility();
 		String nxMessType = target.getFile();
-		HashMap<String, Object> localData = new HashMap<String, Object>(50);
+		Map<String, Object> localData;
 		
 		localData = nxParseJSON(target.getShortMessage());
 		if(localData.isEmpty()) {
@@ -46,13 +49,22 @@ public class NXFields {
 		stuffGELF(target, localData);
 	}
 	
-	private static HashMap<String, Object> nxParseJSON(String jsonString) {
-	    HashMap<String, Object> result = null;	
+	private static Map<String, Object> nxParseJSON(String jsonString) {
+	    Map<String,Object> result;
+	    JSONParser parser = new JSONParser();
+	    JSONObject jsonRaw = new JSONObject();
 	    
+	    try {
+	        Object parsedObject = parser.parse(jsonString);
+	        JSONObject jsonRaw = (JSONObject) parsedObject;
+
+	    } catch (ParseException e) {
+			result.clear();
+		}
 	    return result;
 	}
 		
-	private static void stuffGELF(GELFMessage target, HashMap<String, Object> nxParsedJSON) {
+	private static void stuffGELF(GELFMessage target, Map<String, Object> nxParsedJSON) {
 		// iterate over local Map and use message.addAdditionalData to provide to GELF message
 		for (Map.Entry<String, Object> entry : nxParsedJSON.entrySet()) {
 		    String key = entry.getKey();
