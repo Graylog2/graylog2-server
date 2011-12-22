@@ -43,7 +43,7 @@ public class MessageQueueFlusher extends Thread {
             
             List<GELFMessage> messages = MessageQueue.getInstance().readAll();
             LOG.info("Flushing all " + messages.size() + " messages to indexer.");
-            Indexer.bulkIndex(messages);
+            Indexer.bulkIndex(messages, MessageQueue.getInstance().getTypes());
         } catch (Exception e) {
             LOG.warn("Error while flushing messages from queue: " + e.getMessage(), e);
         } finally {

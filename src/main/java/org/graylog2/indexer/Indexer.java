@@ -31,6 +31,7 @@ import java.io.Writer;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.List;
+import java.util.Set;
 
 /**
  * Indexer.java: Sep 05, 2011 9:13:03 PM
@@ -46,7 +47,6 @@ public class Indexer {
     private static final Logger LOG = Logger.getLogger(Indexer.class);
 
     public static final String INDEX = Main.configuration.getElasticSearchIndexName();
-    public static final String TYPE = "message";
 
     /**
      * Checks if the index for Graylog2 exists
@@ -91,9 +91,6 @@ public class Indexer {
 
         try {
             writer = new OutputStreamWriter(conn.getOutputStream());
-
-            // Write Mapping.
-            writer.write(JSONValue.toJSONString(Mapping.get()));
             writer.flush();
             if (conn.getResponseCode() == HttpURLConnection.HTTP_OK) {
                 return true;
@@ -114,9 +111,10 @@ public class Indexer {
      * See <a href="http://www.elasticsearch.org/guide/reference/api/bulk.html">elasticsearch Bulk API</a> for details
      *
      * @param messages The messages to index
+     * @param types a distinct list of types 
      * @return {@literal true} if the messages were successfully indexed, {@literal false} otherwise
      */
-    public static boolean bulkIndex(List<GELFMessage> messages) {
+    public static boolean bulkIndex(List<GELFMessage> messages, Set<String> types) {
 
         if (messages.isEmpty()) {
             return true;
@@ -124,18 +122,53 @@ public class Indexer {
 
         Writer writer = null;
         int responseCode = 0;
+        String jsonMapping = "";
+        String response = "";
+        for(String type : types) {
+        	try {
+        		URL mappingUrl = new URL(buildIndexURL() + "/" + type + "/_mapping?ignore_conflicts=true");
+        		HttpURLConnection conn = (HttpURLConnection) mappingUrl.openConnection();
+        		conn.setDoOutput(true);
+        		conn.setRequestMethod("PUT");
 
+        		writer = new OutputStreamWriter(conn.getOutputStream());
+        		jsonMapping = JSONValue.toJSONString(Mapping.get(type));
+        		writer.write(jsonMapping);
+        		writer.flush();
+
+        		responseCode = conn.getResponseCode();
+        		response = conn.getResponseMessage();
+        	} catch (IOException e) {
+        		LOG.warn("IO error when trying to index messages", e);
+        	} finally {
+        		if (null != writer) {
+        			try {
+        				writer.close();
+        			} catch (IOException e) {
+        				LOG.error("Couldn't close output stream", e);
+        			}
+        		}
+        	}
+        	 if (responseCode != HttpURLConnection.HTTP_OK) {
+                 LOG.warn("Put mapping response code was not 200, but " + responseCode);
+                 LOG.warn("String PUT was " + jsonMapping);
+                 LOG.warn("Response was " + response);
+             }
+        }
+
+       
+        
         try {
-            URL url = new URL(buildElasticSearchURL() + "_bulk");
-            HttpURLConnection conn = (HttpURLConnection) url.openConnection();
-            conn.setDoOutput(true);
-            conn.setRequestMethod("POST");
+            URL bulkUrl = new URL(buildElasticSearchURL() + "_bulk");
+            HttpURLConnection bulkConn = (HttpURLConnection) bulkUrl.openConnection();
+            bulkConn.setDoOutput(true);
+            bulkConn.setRequestMethod("POST");
 
-            writer = new OutputStreamWriter(conn.getOutputStream());
+            writer = new OutputStreamWriter(bulkConn.getOutputStream());
             writer.write(getJSONfromGELFMessages(messages));
             writer.flush();
 
-            responseCode = conn.getResponseCode();
+            responseCode = bulkConn.getResponseCode();
         } catch (IOException e) {
             LOG.warn("IO error when trying to index messages", e);
         } finally {
@@ -166,7 +199,7 @@ public class Indexer {
         int responseCode = 0;
 
         try {
-            URL url = new URL(buildIndexWithTypeUrl() + buildDeleteByQuerySinceDate(to));
+            URL url = new URL(buildIndexURL() + buildDeleteByQuerySinceDate(to));
             HttpURLConnection conn = (HttpURLConnection) url.openConnection();
             conn.setRequestMethod("DELETE");
             conn.connect();
@@ -195,7 +228,7 @@ public class Indexer {
             sb.append("{\"index\":{\"_index\":\"");
             sb.append(INDEX);
             sb.append("\",\"_type\":\"");
-            sb.append(TYPE);
+            sb.append(message.getFacility());
             sb.append("\"}}\n");
             sb.append(JSONValue.toJSONString(message.toElasticSearchObject()));
             sb.append("\n");
@@ -211,9 +244,4 @@ public class Indexer {
     private static String buildIndexURL() {
         return buildElasticSearchURL() + Indexer.INDEX;
     }
-
-    private static String buildIndexWithTypeUrl() {
-        return buildIndexURL() + "/" + Indexer.TYPE;
-    }
-
 }
