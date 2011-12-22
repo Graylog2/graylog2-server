@@ -23,7 +23,7 @@ package org.graylog2.messagehandlers.common;
 import org.graylog2.messagehandlers.gelf.GELFMessage;
 
 /**
- * MessagePostReceiveHookIF.java: Aug 19, 2010 5:46:32 PM
+ * MessagePreReceiveHookIF.java: Aug 19, 2010 5:46:32 PM
  *
  * @author Lennart Koopmann <lennart@socketfeed.com>
  */
