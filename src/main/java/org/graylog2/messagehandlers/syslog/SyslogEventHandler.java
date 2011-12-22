@@ -29,6 +29,8 @@ import org.productivity.java.syslog4j.server.SyslogServerIF;
 import org.productivity.java.syslog4j.server.SyslogServerSessionlessEventHandlerIF;
 
 import java.net.SocketAddress;
+import java.net.UnknownHostException;
+import org.graylog2.Main;
 
 /**
  * SyslogEventHandler.java: May 17, 2010 8:58:18 PM
@@ -66,20 +68,31 @@ public class SyslogEventHandler implements SyslogServerSessionlessEventHandlerIF
         LOG.debug("Facility: " + event.getFacility() + " (" + Tools.syslogFacilityToReadable(event.getFacility()) + ")");
         LOG.debug("Level: " + event.getLevel() + " (" + Tools.syslogLevelToReadable(event.getLevel()) + ")");
         LOG.debug("Raw: " + new String(event.getRaw()));
+        LOG.debug("Host stripped from message? " + event.isHostStrippedFromMessage());
 
         // Manually check for provided date because it's necessary to parse the GELF message. Second check for completness later.
         if (event.getDate() == null) {
             LOG.info("Syslog message is missing date or could not be parsed. Not further handling. Message was: " + event.getRaw());
             return;
         }
-        
+
+        // Possibly overwrite host with RNDS if configured.
+        String host = event.getHost();
+        try {
+            if (Main.configuration.getForceSyslogRdns()) {
+                host = Tools.rdnsLookup(socketAddress);
+            }
+        } catch (UnknownHostException e) {
+            LOG.warn("Reverse DNS lookup failed. Falling back to parsed hostname.", e);
+        }
+
         try {
             gelf.setCreatedAt(Tools.getUTCTimestampWithMilliseconds(event.getDate().getTime()));
             gelf.setConvertedFromSyslog(true);
             gelf.setVersion("0");
             gelf.setShortMessage(event.getMessage());
             gelf.setFullMessage(new String(event.getRaw()));
-            gelf.setHost(event.getHost());
+            gelf.setHost(host);
             gelf.setFacility(Tools.syslogFacilityToReadable(event.getFacility()));
             gelf.setLevel(event.getLevel());
             gelf.setRaw(event.getRaw());
