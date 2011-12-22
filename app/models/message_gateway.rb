@@ -9,6 +9,17 @@ module Tire::Model::Naming::ClassMethods
   end
 end
 
+# monkey patch, shmonkey patch (Raising Timeout from 60s to no timeout)
+module Tire::HTTP::Client
+  class RestClient
+    def self.get(url, data=nil)
+      perform ::RestClient::Request.new(:method => :get, :url => url, :payload => data, :timeout => -1).execute
+    rescue ::RestClient::Exception => e
+      Tire::HTTP::Response.new e.http_body, e.http_code
+    end
+  end
+end
+
 # XXX ELASTIC: try curb as HTTP adapter for tire. reported to be faster: https://gist.github.com/1204159
 class MessageGateway
   include Tire::Model::Search
