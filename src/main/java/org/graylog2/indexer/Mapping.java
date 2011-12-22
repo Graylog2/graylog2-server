@@ -20,11 +20,19 @@
 
 package org.graylog2.indexer;
 
+import java.io.IOException;
+import java.io.OutputStreamWriter;
+import java.io.Writer;
+import java.net.HttpURLConnection;
+import java.net.URL;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+
+import org.apache.log4j.Logger;
+import org.json.simple.JSONValue;
 
 /**
  * Mapping.java: Sep 05, 2011 3:34:57 PM
@@ -36,6 +44,8 @@ import java.util.Set;
  */
 public class Mapping {
 
+	private static final Logger LOG = Logger.getLogger(Indexer.class);
+
     public static Map get(String type) {
         Map mapping = new HashMap();
         mapping.put("properties", partFieldProperties());
@@ -46,15 +56,54 @@ public class Mapping {
 
         return completeMapping;
     }
+    
+    public static void updateMapping(String url, Set<String> types) {
+    	Writer writer = null;
+		int responseCode = 0;
+		String jsonMapping = "";
+		String response = "";
+		
+    	for(String type : types) {
+			try {
+				URL mappingUrl = new URL(url + "/" + type + "/_mapping?ignore_conflicts=true");
+				HttpURLConnection conn = (HttpURLConnection) mappingUrl.openConnection();
+				conn.setDoOutput(true);
+				conn.setRequestMethod("PUT");
+
+				writer = new OutputStreamWriter(conn.getOutputStream());
+				jsonMapping = JSONValue.toJSONString(Mapping.get(type));
+				writer.write(jsonMapping);
+				writer.flush();
+
+				responseCode = conn.getResponseCode();
+				response = conn.getResponseMessage();
+			} catch (IOException e) {
+				LOG.warn("IO error when trying to index messages", e);
+			} finally {
+				if (null != writer) {
+					try {
+						writer.close();
+					} catch (IOException e) {
+						LOG.error("Couldn't close output stream", e);
+					}
+				}
+			}
+			if (responseCode != HttpURLConnection.HTTP_OK) {
+				LOG.warn("Put mapping response code was not 200, but " + responseCode);
+				LOG.warn("String PUT was " + jsonMapping);
+				LOG.warn("Response was " + response);
+			}
+		}
+    }
 
     /*
      * Disable analyzing for every field by default.
      */
-    public static List partDefaultAllInDynamicTemplate() {
-        List dynamicTemplates = new LinkedList();
-        Map template = new HashMap();
-        Map defaultAll = new HashMap();
-        Map notAnalyzed = new HashMap();
+    private static List<Map> partDefaultAllInDynamicTemplate() {
+        List<Map> dynamicTemplates = new LinkedList<Map>();
+        Map<String, Map> template = new HashMap<String, Map>();
+        Map<String, Object> defaultAll = new HashMap<String, Object>();
+        Map<String, String> notAnalyzed = new HashMap<String, String>();
         notAnalyzed.put("index", "not_analyzed");
 
         // Match all.
@@ -71,8 +120,8 @@ public class Mapping {
     /*
      * Enable analyzing for some fields again. Like for message and full_message.
      */
-    public static Map partFieldProperties() {
-        Map properties = new HashMap();
+    private static Map partFieldProperties() {
+        Map<String, Map<String, String>> properties = new HashMap<String, Map<String, String>>();
 
         properties.put("message", analyzedString());
         properties.put("full_message", analyzedString());
@@ -83,8 +132,8 @@ public class Mapping {
         return properties;
     }
 
-    public static Map analyzedString() {
-        Map type = new HashMap();
+    private static Map<String, String> analyzedString() {
+        Map<String, String> type = new HashMap<String, String>();
         type.put("index", "analyzed");
         type.put("type", "string");
         type.put("analyzer", "whitespace");
@@ -92,8 +141,8 @@ public class Mapping {
         return type;
     }
 
-    public static Map typeNumberDouble() {
-        Map type = new HashMap();
+    private static Map<String, String> typeNumberDouble() {
+        Map<String, String> type = new HashMap<String, String>();
         type.put("type", "double");
 
         return type;

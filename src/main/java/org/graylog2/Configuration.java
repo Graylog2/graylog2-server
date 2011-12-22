@@ -64,6 +64,12 @@ public class Configuration {
 
     @Parameter(value = "elasticsearch_index_name", required = true)
     private String elasticsearchIndexName = "graylog2";
+    
+    @Parameter(value = "elasticsearch_cluster", required = true)
+    private String elasticsearchCluster = "elasticsearch";
+
+    @Parameter(value = "elasticsearch_indexing_strategy", required = true)
+    private String elasticsearchIndexingStrategy = "http";
 
     @Parameter(value = "mongodb_user")
     private String mongoUser;
@@ -163,6 +169,14 @@ public class Configuration {
     public String getElasticSearchIndexName() {
         return this.elasticsearchIndexName;
     }
+    
+    public String getElasticSearchCluster() {
+		return this.elasticsearchCluster;
+	}
+
+	public String getElasticSearchIndexingStrategy() {
+		return this.elasticsearchIndexingStrategy;
+	}
 
     public boolean isMongoUseAuth() {
         return mongoUseAuth;
@@ -329,4 +343,6 @@ public class Configuration {
             throw new ValidationException("Invalid syslog_protocol: " + getSyslogProtocol());
         }
     }
+
+	
 }
