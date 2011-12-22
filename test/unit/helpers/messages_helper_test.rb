@@ -8,6 +8,7 @@ class MessagesHelperTest < ActionView::TestCase
 
   should "wrap long additional fields with <pre>" do
     assert_equal_and_safe "", format_additional_field_value('backtrace', nil)
+    assert_equal_and_safe "9001", format_additional_field_value('bar', 9001)
     assert_equal_and_safe "backtrace", format_additional_field_value('backtrace', "backtrace")
     assert_equal_and_safe "<pre>backtrace\nline 1</pre>", format_additional_field_value('backtrace', "backtrace\nline 1")
   end
