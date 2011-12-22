@@ -221,6 +221,11 @@ $(document).ready(function(){
     });
 
     $("a").bind("click", function(){
+      // Avoid double handling.
+      if ($(this).hasClass("submit-link")) {
+        return false;
+      }
+
       if ($(this).attr("data-confirm") == undefined) {
         return true;
       } else {
