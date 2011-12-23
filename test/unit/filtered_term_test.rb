@@ -13,6 +13,12 @@ class FilteredTermTest < ActiveSupport::TestCase
       assert_equal "foo [FILTERED] bar [FILTERED]", message.message
     end
 
+    should "work with selectors" do
+      FilteredTerm.make(:term => 'password\s(.+)\s')
+      message = Message.parse_from_hash(:message => "User login with password foobar failed")
+      assert_equal "User login with [FILTERED]failed", message.message
+    end
+
     should "be cached" do
       terms = FilteredTerm.all.to_a
       FilteredTerm.expects(:all).once.with().returns(terms)
