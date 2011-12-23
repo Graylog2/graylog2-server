@@ -22,14 +22,13 @@ package org.graylog2.messagehandlers.gelf;
 
 import java.io.IOException;
 import java.net.DatagramPacket;
-import org.graylog2.Main;
 
 /**
  * GELF.java: Jun 23, 2010 6:46:45 PM
  *
  * GELF utility class
  *
- * @author: Lennart Koopmann <lennart@socketfeed.com>
+ * @author Lennart Koopmann <lennart@socketfeed.com>
  */
 public final class GELF {
 
@@ -64,9 +63,9 @@ public final class GELF {
     public static final String HEADER_TYPE_CHUNKED_GELF = "1e0f";
 
     /**
-     * GELF header is 70 bytes long.
+     * GELF header size.
      */
-    public static final int GELF_HEADER_LENGTH = 38;
+    public static final int GELF_HEADER_LENGTH = 12;
 
     /**
      * The maximum size of the GELF data part
@@ -94,14 +93,6 @@ public final class GELF {
     private GELF() { }
 
     /**
-     * Is GELF enabled? Decision based on /etc/graylog2.conf "use_gelf" parameter.
-     * @return boolean
-     */
-    public static boolean isEnabled() {
-        return Main.masterConfig.getProperty("use_gelf").equals("true");
-    }
-
-    /**
      * Find out if the given string is a chunked GELF message or not.
      *
      * @param message The message to inspect
@@ -118,7 +109,7 @@ public final class GELF {
         try {
             gelfType = GELF.getGELFType(message.getData());
         } catch (InvalidGELFCompressionMethodException e) {
-            throw new InvalidGELFTypeException("Unknown compression method.");
+            throw new InvalidGELFTypeException("Unknown compression method.", e);
         }
 
         switch(gelfType) {

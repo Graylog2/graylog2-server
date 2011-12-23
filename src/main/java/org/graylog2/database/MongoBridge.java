@@ -23,74 +23,22 @@ package org.graylog2.database;
 import com.mongodb.BasicDBObject;
 import com.mongodb.DB;
 import com.mongodb.DBCollection;
+import com.mongodb.DBObject;
 import org.apache.log4j.Logger;
 import org.graylog2.Tools;
-import org.graylog2.messagehandlers.gelf.GELFMessage;
 
-import java.util.Iterator;
 import java.util.Map;
-import java.util.Set;
 
 /**
  * MongoBridge.java: Apr 13, 2010 9:13:03 PM
  *
  * Simple mapping methods to MongoDB.
  *
- * @author: Lennart Koopmann <lennart@socketfeed.com>
+ * @author Lennart Koopmann <lennart@socketfeed.com>
  */
 public class MongoBridge {
 
     private static final Logger LOG = Logger.getLogger(MongoBridge.class);
-
-    /**
-     * Inserts a GELF message into the messages collection.
-     *
-     * @param message The GELF message
-     * @throws Exception
-     */
-    public void insertGelfMessage(GELFMessage message) throws Exception {
-        // Check if all required parameters are set.
-        if (!message.allRequiredFieldsSet()) {
-            throw new Exception("Missing GELF message parameters. version, short_message and host are required.");
-        }
-
-        DBCollection coll = MongoConnection.getInstance().getMessagesColl();
-
-        BasicDBObject dbObj = new BasicDBObject();
-
-        // Some fields must not be set if this message was converted from a syslog message.
-        if (!message.convertedFromSyslog()) {
-            dbObj.put("gelf", true);
-            dbObj.put("version", message.getVersion());
-        }
-
-        dbObj.put("message", message.getShortMessage());
-        dbObj.put("full_message", message.getFullMessage());
-        dbObj.put("file", message.getFile());
-        dbObj.put("line", message.getLine());
-        dbObj.put("host", message.getHost());
-        dbObj.put("facility", message.getFacility()); 
-        dbObj.put("level", message.getLevel());
-        dbObj.put("timestamp", message.getTimestamp());
-        
-        // Add additional fields. XXX PERFORMANCE
-        Map<String,String> additionalFields = message.getAdditionalData();
-        Set<String> set = additionalFields.keySet();
-        Iterator<String> iter = set.iterator();
-        while(iter.hasNext()) {
-            String key = iter.next();
-            String value = additionalFields.get(key);
-            dbObj.put(key, value);
-        }
-
-        dbObj.put("created_at", Tools.getUTCTimestamp());
-        // Documents in capped collections cannot grow so we have to do that now and cannot just add 'deleted => true' later.
-        dbObj.put("deleted", false);
-
-        dbObj.put("streams", message.getStreamIds());
-
-        coll.insert(dbObj);
-    }
 
     /**
      * Adds x to the counter of host in "hosts" collection.
@@ -139,14 +87,28 @@ public class MongoBridge {
         coll.update(query, update, true, false);
     }
 
-    public void writeHistoricServerValue(String key, Object value) {
+    public void writeMessageCounts(int total, Map<String, Integer> streams, Map<String, Integer> hosts) {
         BasicDBObject obj = new BasicDBObject();
-        obj.put("type", key);
-        obj.put("value", value);
-        obj.put("created_at", Tools.getUTCTimestamp());
+        obj.put("timestamp", Tools.getUTCTimestamp());
+        obj.put("total", total);
+        obj.put("streams", streams);
+        obj.put("hosts", hosts);
 
-        DBCollection coll = MongoConnection.getInstance().getHistoricServerValuesColl();
-        coll.insert(obj);
+        MongoConnection.getInstance().getMessageCountsColl().insert(obj);
+    }
+
+    /**
+     * Get a setting from the settings collection.
+     *
+     * @param type The TYPE (See constants in Setting class) to fetch.
+     * @return The settings - Can be null.
+     */
+    public DBObject getSetting(int type) {
+        DBCollection coll = MongoConnection.getInstance().getDatabase().getCollection("settings");
+
+        DBObject query = new BasicDBObject();
+        query.put("setting_type", type);
+        return coll.findOne(query);
     }
 
 }

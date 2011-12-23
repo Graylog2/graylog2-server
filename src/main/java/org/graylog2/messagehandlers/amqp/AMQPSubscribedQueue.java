@@ -25,7 +25,7 @@ package org.graylog2.messagehandlers.amqp;
  *
  * Representing an AMQP queue to subscribe to.
  *
- * @author: Lennart Koopmann <lennart@socketfeed.com>
+ * @author Lennart Koopmann <lennart@socketfeed.com>
  */
 public final class AMQPSubscribedQueue {
 

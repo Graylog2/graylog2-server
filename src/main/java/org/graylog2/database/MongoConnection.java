@@ -20,33 +20,28 @@
 
 package org.graylog2.database;
 
-import com.mongodb.BasicDBObject;
-import com.mongodb.BasicDBObjectBuilder;
-import com.mongodb.Mongo;
-import com.mongodb.DB;
-import com.mongodb.DBCollection;
-import com.mongodb.MongoException;
-import com.mongodb.MongoOptions;
-import com.mongodb.ServerAddress;
+import com.mongodb.*;
+
 import java.util.List;
-import org.graylog2.Configuration;
-import org.graylog2.Main;
 
 /**
  * MongoConnection.java: Jun 6, 2010 1:36:19 PM
  *
  * MongoDB connection singleton
  *
- * @author: Lennart Koopmann <lennart@socketfeed.com>
+ * @author Lennart Koopmann <lennart@socketfeed.com>
  */
 public final class MongoConnection {
     private static MongoConnection instance;
 
-    private Mongo m = null;
-    private DB db = null;
+    private Mongo m;
+    private DB db;
 
-    private DBCollection messagesCollection = null;
-    private DBCollection historicServerValuesCollection = null;
+    private DBCollection messagesCollection;
+    private DBCollection historicServerValuesCollection;
+    private DBCollection messageCountsCollection;
+
+    private long messagesCollSize;
 
     private MongoConnection() {}
 
@@ -54,7 +49,7 @@ public final class MongoConnection {
      * Get the connection instance
      * @return MongoConnection instance
      */
-    public synchronized static MongoConnection getInstance() {
+    public static synchronized MongoConnection getInstance() {
         if (instance == null) {
             instance = new MongoConnection();
         }
@@ -70,13 +65,22 @@ public final class MongoConnection {
      * @param database MongoDB database
      * @param port MongoDB port
      * @param useAuth Use authentication?
+     * @param maxConnections
+     * @param threadsAllowedToBlockForConnectionMultiplier
+     * @param replicaServers
+     *
      * @throws Exception
      */
-    public void connect(String username, String password, String hostname, String database, int port, String useAuth, List<ServerAddress> replicaServers) throws Exception {
+    public void connect(String username, String password, String hostname, String database, int port, boolean useAuth,
+                        int maxConnections, int threadsAllowedToBlockForConnectionMultiplier,
+                        List<ServerAddress> replicaServers, long messagesCollSize) throws Exception {
+        MongoOptions options = new MongoOptions();
+        options.connectionsPerHost = maxConnections;
+        options.threadsAllowedToBlockForConnectionMultiplier = threadsAllowedToBlockForConnectionMultiplier;
+
+        this.messagesCollSize = messagesCollSize;
+
         try {
-            MongoOptions options = new MongoOptions();
-            options.connectionsPerHost = Configuration.getMaximumMongoDBConnections(Main.masterConfig);
-            options.threadsAllowedToBlockForConnectionMultiplier = Configuration.getThreadsAllowedToBlockMultiplier(Main.masterConfig);
 
             // Connect to replica servers if given. Else the standard way to one server.
             if (replicaServers != null && replicaServers.size() > 0) {
@@ -89,13 +93,13 @@ public final class MongoConnection {
             db = m.getDB(database);
 
             // Try to authenticate if configured.
-            if (useAuth.equals("true")) {
+            if (useAuth) {
                 if(!db.authenticate(username, password.toCharArray())) {
                     throw new Exception("Could not authenticate to database '" + database + "' with user '" + username + "'.");
                 }
             }
         } catch (MongoException.Network e) {
-            throw new Exception("Could not connect to Mongo DB. (" + e.toString() + ")");
+            throw new Exception("Could not connect to Mongo DB.", e);
         }
     }
 
@@ -133,7 +137,6 @@ public final class MongoConnection {
         if(MongoConnection.getInstance().getDatabase().collectionExists("messages")) {
             coll = MongoConnection.getInstance().getDatabase().getCollection("messages");
         } else {
-            long messagesCollSize = Long.parseLong(Main.masterConfig.getProperty("messages_collection_size").trim());
             coll = MongoConnection.getInstance()
                     .getDatabase()
                     .createCollection("messages", BasicDBObjectBuilder.start()
@@ -154,30 +157,22 @@ public final class MongoConnection {
         return coll;
     }
 
-    public DBCollection getHistoricServerValuesColl() {
-        if (this.historicServerValuesCollection != null) {
-            return this.historicServerValuesCollection;
+    /**
+     * Get the message_counts collection. Lazily checks if correct indizes are set.
+     *
+     * @return The messages collection
+     */
+    public DBCollection getMessageCountsColl() {
+        if (this.messageCountsCollection != null) {
+            return this.messageCountsCollection;
         }
 
         // Collection has not been cached yet. Do it now.
-        DBCollection coll = null;
+        DBCollection coll = MongoConnection.getInstance().getDatabase().getCollection("message_counts");
 
-        // Create a capped collection if the collection does not yet exist.
-        if(MongoConnection.getInstance().getDatabase().collectionExists("historic_server_values")) {
-            coll = MongoConnection.getInstance().getDatabase().getCollection("historic_server_values");
-        } else {
-            coll = MongoConnection.getInstance()
-                    .getDatabase().createCollection("historic_server_values", BasicDBObjectBuilder.start()
-                    .add("capped", true)
-                    .add("size", 10485760) // 10 MB
-                    .add("max", 720) // Minutes. -> 12 hours.
-                    .get());
-        }
+        coll.ensureIndex(new BasicDBObject("timestamp", 1));
 
-        coll.ensureIndex(new BasicDBObject("type", 1));
-        coll.ensureIndex(new BasicDBObject("created_at", 1));
-
-        this.historicServerValuesCollection = coll;
+        this.messageCountsCollection = coll;
         return coll;
     }
 

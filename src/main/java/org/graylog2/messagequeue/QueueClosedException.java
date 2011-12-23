@@ -17,31 +17,17 @@
  * along with Graylog2.  If not, see <http://www.gnu.org/licenses/>.
  *
  */
-
-package org.graylog2.messagehandlers.amqp;
-
-import java.util.Properties;
+package org.graylog2.messagequeue;
 
 /**
- * AMQP.java: Jan 21, 2011 8:41:51 PM
+ * QueueClosedException.java: Nov 17, 2011 6:52:29 PM
  *
- * Utility class for AMQP.
- *
- * @author: Lennart Koopmann <lennart@socketfeed.com>
+ * @author Lennart Koopmann <lennart@socketfeed.com>
  */
-public class AMQP {
+public class QueueClosedException extends Exception {
 
-    /**
-     * Is AMQP subscribing enabled? Decision based on /etc/graylog2.conf
-     * "use_amqp" parameter.
-     *
-     * @return boolean
-     */
-    public static boolean isEnabled(Properties config) {
-      if(config.getProperty("amqp_enabled") == null) {
-        return false;
-      }
-      
-      return config.getProperty("amqp_enabled").equals("true");
+    public QueueClosedException() {
+        super();
     }
+
 }

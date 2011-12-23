@@ -28,7 +28,7 @@ import org.graylog2.streams.StreamRule;
  *
  * [description]
  *
- * @author: Lennart Koopmann <lennart@socketfeed.com>
+ * @author Lennart Koopmann <lennart@socketfeed.com>
  */
 public class AdditionalFieldMatcher implements StreamRuleMatcherIF {
 
@@ -36,15 +36,20 @@ public class AdditionalFieldMatcher implements StreamRuleMatcherIF {
         String[] parts = rule.getValue().split("=");
         String key = "_" + parts[0];
         String value = parts[1];
+        String str = null;
 
-        if (msg.getAdditionalData().containsKey(key)) {
-            // Message contains additional field.
-            if (msg.getAdditionalData().get(key).equals(value)) {
-                return true;
+        if (msg.getAdditionalData().containsKey(key) && msg.getAdditionalData().get(key) != null) {
+            Object afValue = msg.getAdditionalData().get(key);
+
+            if (afValue instanceof String) {
+                str = (String) afValue;
+            }
+
+            if (afValue instanceof Long) {
+                str = String.valueOf(afValue);
             }
         }
 
-        return false;
+        return null != str && str.matches(value);
     }
-
 }

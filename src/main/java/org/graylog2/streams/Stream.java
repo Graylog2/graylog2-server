@@ -35,7 +35,7 @@ import java.util.List;
  * Representing a single stream from the streams collection. Also provides method
  * to get all streams of this collection.
  *
- * @author: Lennart Koopmann <lennart@socketfeed.com>
+ * @author Lennart Koopmann <lennart@socketfeed.com>
  */
 public class Stream {
 
@@ -55,15 +55,17 @@ public class Stream {
         this.mongoObject = stream;
     }
 
-    public static ArrayList<Stream> fetchAll() {
+    public static List<Stream> fetchAllEnabled() {
         if (StreamCache.getInstance().valid()) {
             return StreamCache.getInstance().get();
         }
         
-        ArrayList<Stream> streams = new ArrayList<Stream>();
+        List<Stream> streams = new ArrayList<Stream>();
 
         DBCollection coll = MongoConnection.getInstance().getDatabase().getCollection("streams");
-        DBCursor cur = coll.find(new BasicDBObject());
+        DBObject query = new BasicDBObject();
+        query.put("disabled", new BasicDBObject("$ne", true));
+        DBCursor cur = coll.find(query);
 
         while (cur.hasNext()) {
             try {
@@ -83,7 +85,7 @@ public class Stream {
             return this.streamRules;
         }
 
-        ArrayList<StreamRule> rules = new ArrayList<StreamRule>();
+        List<StreamRule> rules = new ArrayList<StreamRule>();
 
         BasicDBList rawRules = (BasicDBList) this.mongoObject.get("streamrules");
         if (rawRules != null && rawRules.size() > 0) {
@@ -93,7 +95,6 @@ public class Stream {
                     rules.add(rule);
                 } catch (Exception e) {
                     LOG.warn("Skipping stream rule in Stream.getStreamRules(): " + e.getMessage(), e);
-                    continue;
                 }
             }
         }
@@ -107,7 +108,7 @@ public class Stream {
             return this.forwardedTo;
         }
         
-        ArrayList<ForwardEndpoint> fwds = new ArrayList<ForwardEndpoint>();
+        List<ForwardEndpoint> fwds = new ArrayList<ForwardEndpoint>();
 
         BasicDBList rawFwds = (BasicDBList) this.mongoObject.get("forwarders");
         if (rawFwds != null && rawFwds.size() > 0) {
@@ -117,7 +118,6 @@ public class Stream {
                     fwds.add(fwd);
                 } catch (Exception e) {
                     LOG.warn("Skipping forward endpoint in Stream.getForwardedTo(): " + e.getMessage(), e);
-                    continue;
                 }
             }
         }

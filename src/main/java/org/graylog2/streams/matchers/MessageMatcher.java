@@ -29,7 +29,7 @@ import org.graylog2.streams.StreamRule;
  *
  * [description]
  *
- * @author: Lennart Koopmann <lennart@socketfeed.com>
+ * @author Lennart Koopmann <lennart@socketfeed.com>
  */
 public class MessageMatcher implements StreamRuleMatcherIF {
 

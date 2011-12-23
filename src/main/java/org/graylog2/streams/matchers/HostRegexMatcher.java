@@ -1,5 +1,5 @@
 /**
- * Copyright 2010 Lennart Koopmann <lennart@socketfeed.com>
+ * Copyright 2011 Lennart Koopmann <lennart@socketfeed.com>
  *
  * This file is part of Graylog2.
  *
@@ -18,23 +18,23 @@
  *
  */
 
-package org.graylog2.messagehandlers.common;
+package org.graylog2.streams.matchers;
 
+import java.util.regex.Pattern;
 import org.graylog2.messagehandlers.gelf.GELFMessage;
+import org.graylog2.streams.StreamRule;
 
 /**
- * MessageCounterHook.java: Aug 19, 2010 5:56:21 PM
+ * HostRegeMatcher.java: Jun 21, 2011 9:56:31 PM
  *
- * Counts up the total of received messages.
+ * [description]
  *
- * @author: Lennart Koopmann <lennart@socketfeed.com>
+ * @author Lennart Koopmann <lennart@socketfeed.com>
  */
-public class MessageCounterHook implements MessagePostReceiveHookIF {
+public class HostRegexMatcher implements StreamRuleMatcherIF {
 
-    /**
-     * Process the hook.
-     */
-    public void process(GELFMessage message) {
-        MessageCounter.getInstance().countUp(MessageCounter.ALL_HOSTS);
+    public boolean match(GELFMessage msg, StreamRule rule) {
+        return Pattern.compile(rule.getValue(), Pattern.DOTALL).matcher(msg.getHost()).matches();
     }
+
 }

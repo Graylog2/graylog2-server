@@ -30,7 +30,7 @@ import static org.junit.Assert.*;
 /**
  * GELFTest.java: Sep 17, 2010 8:19:07 PM
  *
- * @author: Lennart Koopmann <lennart@socketfeed.com>
+ * @author Lennart Koopmann <lennart@socketfeed.com>
  */
 public class GELFTest {
 
@@ -107,7 +107,7 @@ public class GELFTest {
     @Test
     public void testExtractData() throws Exception {
         // A GELF chunk header. Sequence 2 of 7.
-        String header = "1e0fdf0fcb728fd5b73b0232ee2db47ca1e1e859725c7f0202631f8fcb6d4297c32a00020007";
+        String header = "1e0fdf0fcb728fd5b73b0232";
         String foo = asHex("foo".getBytes());
         header = header + foo;
         byte[] headerHex = Hex.decodeHex(header.toCharArray());

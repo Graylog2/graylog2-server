@@ -17,3 +17,7 @@ misc/convert_rsyslog_db_to_mongo.rb
 
 build_script/builds/*
 build_script/logs/*
+
+*.iml
+*.ipr
+*.iws

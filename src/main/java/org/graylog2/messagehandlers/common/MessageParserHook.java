@@ -28,7 +28,7 @@ import org.graylog2.messagehandlers.gelf.GELFMessage;
  *
  * Filters events based on regular expression.
  *
- * @author: Joshua Spaulding <joshua.spaulding@gmail.com>
+ * @author Joshua Spaulding <joshua.spaulding@gmail.com>
  */
 public class MessageParserHook implements MessagePreReceiveHookIF {
 

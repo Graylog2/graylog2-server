@@ -25,14 +25,12 @@ package org.graylog2.messagehandlers.gelf;
  *
  * Thrown if an GELF message is empty or first part did not arrive yet.
  *
- * @author: Lennart Koopmann <lennart@socketfeed.com>
+ * @author Lennart Koopmann <lennart@socketfeed.com>
  */
-public class EmptyGELFMessageException extends Exception {
+public class EmptyGELFMessageException extends GELFException {
 
-    /**
-     *
-     */
     public EmptyGELFMessageException() {
+        super();
     }
 
 }

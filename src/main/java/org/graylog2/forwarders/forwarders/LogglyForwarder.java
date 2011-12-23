@@ -27,39 +27,46 @@ import org.graylog2.messagehandlers.gelf.GELFMessage;
 import java.io.DataOutputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
-import org.graylog2.Configuration;
-import org.graylog2.Main;
 
 /**
  * LogglyForwarder.java: Mar 18, 2011 9:32:24 PM
  *
  * Forwards messages to Logg.ly. (via HTTP/S API)
  *
- * @author: Lennart Koopmann <lennart@socketfeed.com>
+ * @author Lennart Koopmann <lennart@socketfeed.com>
  */
 public class LogglyForwarder implements MessageForwarderIF {
 
     private static final Logger LOG = Logger.getLogger(LogglyForwarder.class);
 
+    private static int timeout;
+
     private boolean succeeded = false;
     private String url = null;
 
-    public LogglyForwarder(String where) {
-        this.url = where;
+    /**
+     *
+     * @param url URL API endpoint
+     *
+     * @throws MessageForwarderConfigurationException
+     */
+    public LogglyForwarder(String url) throws MessageForwarderConfigurationException {
+
+        if (url == null || url.isEmpty()) {
+            throw new MessageForwarderConfigurationException("No endpoint URL configured.");
+        }
+
+        this.url = url;
     }
 
     /**
      * Forward a GELF (or converted syslog) message to Logg.ly
      *
-     * @param where URL API endpoint
+     *
      * @param message The message to forward
      * @return true in case of success, otherwise false
-     * @throws MessageForwarderConfigurationException
      */
-    public boolean forward(GELFMessage message) throws MessageForwarderConfigurationException {
-        if (url == null || url.length() == 0) {
-            throw new MessageForwarderConfigurationException("No endpoint URL configured.");
-        }
+    public boolean forward(GELFMessage message) {
 
         this.succeeded = this.send(message.toOneLiner());
         return this.succeeded();
@@ -77,8 +84,8 @@ public class LogglyForwarder implements MessageForwarderIF {
             connection.setDoInput(true);
             connection.setDoOutput(true);
 
-            connection.setConnectTimeout(Configuration.getLogglyTimeout(Main.masterConfig));
-            connection.setReadTimeout(Configuration.getLogglyTimeout(Main.masterConfig));
+            connection.setConnectTimeout(timeout);
+            connection.setReadTimeout(timeout);
             
             connection.addRequestProperty("x-graylog2", "stream-forwarded");
 
@@ -122,4 +129,7 @@ public class LogglyForwarder implements MessageForwarderIF {
         return url;
     }
 
+    public static void setTimeout(int timeout) {
+        LogglyForwarder.timeout = timeout;
+    }
 }

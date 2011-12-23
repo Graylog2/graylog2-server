@@ -28,13 +28,14 @@ import org.graylog2.messagehandlers.gelf.GELFMessage;
  *
  * Updates the host collection.
  *
- * @author: Lennart Koopmann <lennart@socketfeed.com>
+ * @author Lennart Koopmann <lennart@socketfeed.com>
  */
 public class HostUpsertHook implements MessagePostReceiveHookIF {
 
     /**
      * Process the hook.
      */
+    @Override
     public void process(GELFMessage message) {
         HostCounterCache.getInstance().increment(message.getHost());
     }

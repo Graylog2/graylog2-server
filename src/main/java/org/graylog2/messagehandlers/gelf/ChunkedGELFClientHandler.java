@@ -23,24 +23,23 @@ package org.graylog2.messagehandlers.gelf;
 import org.apache.log4j.Logger;
 import org.graylog2.Tools;
 import org.graylog2.blacklists.Blacklist;
-import org.graylog2.database.MongoBridge;
 import org.graylog2.forwarders.Forwarder;
 import org.graylog2.messagehandlers.common.HostUpsertHook;
-import org.graylog2.messagehandlers.common.MessageCounterHook;
+import org.graylog2.messagehandlers.common.MessageCountUpdateHook;
 import org.graylog2.messagehandlers.common.MessageParserHook;
 import org.graylog2.messagehandlers.common.ReceiveHookManager;
 
 import java.io.IOException;
-import java.io.UnsupportedEncodingException;
 import java.net.DatagramPacket;
 import java.util.zip.DataFormatException;
+import org.graylog2.messagequeue.MessageQueue;
 
 /**
  * ChunkedGELFClient.java: Sep 14, 2010 6:38:38 PM
  *
  * Handling a GELF client message consisting on more than one UDP message.
  *
- * @author: Lennart Koopmann <lennart@socketfeed.com>
+ * @author Lennart Koopmann <lennart@socketfeed.com>
  */
 public class ChunkedGELFClientHandler extends GELFClientHandlerBase implements GELFClientHandlerIF {
 
@@ -51,13 +50,12 @@ public class ChunkedGELFClientHandler extends GELFClientHandlerBase implements G
      * Representing a GELF client based on more than one UDP message.
      *
      * @param clientMessage The raw data the GELF client sent. (JSON string)
-     * @throws UnsupportedEncodingException
      * @throws InvalidGELFHeaderException
      * @throws IOException 
      * @throws DataFormatException
      * @throws InvalidGELFCompressionMethodException
      */
-    public ChunkedGELFClientHandler(DatagramPacket clientMessage) throws UnsupportedEncodingException, InvalidGELFHeaderException, IOException, DataFormatException, InvalidGELFCompressionMethodException {
+    public ChunkedGELFClientHandler(DatagramPacket clientMessage) throws GELFException, IOException, DataFormatException {
         GELFHeader header = GELF.extractGELFHeader(clientMessage);
 
         GELFClientChunk chunk = new GELFClientChunk();
@@ -73,12 +71,12 @@ public class ChunkedGELFClientHandler extends GELFClientHandlerBase implements G
         try {
             possiblyCompleteMessage = ChunkedGELFClientManager.getInstance().insertChunk(chunk);
         } catch (InvalidGELFChunkException e) {
-            throw new InvalidGELFHeaderException(e.toString());
+            throw new InvalidGELFHeaderException(e.toString(), e);
         } catch (ForeignGELFChunkException e) {
-            throw new InvalidGELFHeaderException(e.toString());
+            throw new InvalidGELFHeaderException(e.toString(), e);
         }
 
-        LOG.info("Got GELF message chunk: " + chunk.toString());
+        LOG.debug("Got GELF message chunk: " + chunk.toString());
 
         // Catch the full message data if all chunks are complete.
         if (possiblyCompleteMessage != null) {
@@ -88,7 +86,7 @@ public class ChunkedGELFClientHandler extends GELFClientHandlerBase implements G
             String hash = null;
             try {
                 hash = completeMessage.getHash();
-                LOG.info("Chunked GELF message <" + hash + "> complete. Handling now.");
+                LOG.debug("Chunked GELF message <" + hash + "> complete. Handling now.");
                 data = completeMessage.getData();
             } catch (IncompleteGELFMessageException e) {
                 LOG.warn("Tried to fetch information from incomplete chunked GELF message", e);
@@ -118,11 +116,11 @@ public class ChunkedGELFClientHandler extends GELFClientHandlerBase implements G
         switch (type) {
             // Decompress ZLIB
             case GELF.TYPE_ZLIB:
-                LOG.info("Chunked GELF message <" + hash + "> is ZLIB compressed.");
+                LOG.debug("Chunked GELF message <" + hash + "> is ZLIB compressed.");
                 this.clientMessage = Tools.decompressZlib(data);
                 break;
             case GELF.TYPE_GZIP:
-                LOG.info("Chunked GELF message <" + hash + "> is GZIP compressed.");
+                LOG.debug("Chunked GELF message <" + hash + "> is GZIP compressed.");
                 this.clientMessage = Tools.decompressGzip(data);
                 break;
             default:
@@ -147,13 +145,14 @@ public class ChunkedGELFClientHandler extends GELFClientHandlerBase implements G
                 LOG.warn("Could not parse GELF JSON: " + e.getMessage() + " - clientMessage was: " + this.clientMessage, e);
                 return false;
             }
-
-            // Store in MongoDB.
-            // Connect to database.
-            MongoBridge m = new MongoBridge();
+            
+            if (!this.message.allRequiredFieldsSet()) {
+                LOG.info("GELF message is not complete. Version, host and short_message must be set.");
+                return false;
+            }
 
             if (!this.message.convertedFromSyslog()) {
-                LOG.info("Got GELF message: " + this.message.toString());
+                LOG.debug("Got GELF message: " + this.message.toString());
             }
 
             // Blacklisted?
@@ -161,15 +160,17 @@ public class ChunkedGELFClientHandler extends GELFClientHandlerBase implements G
                 return true;
             }
 
-            // PreProcess message based on filters. Insert message into MongoDB.
+            // PreProcess message based on filters. Insert message into indexer.
             ReceiveHookManager.preProcess(new MessageParserHook(), message);
             if(!message.getFilterOut()) {
-                m.insertGelfMessage(message);
-                // This is doing the upcounting for statistics.
-                ReceiveHookManager.postProcess(new MessageCounterHook(), message);
+                // Add message to queue and post-process if it was successful.
+                if (MessageQueue.getInstance().add(message)) {
+                    // Update periodic counts collection.
+                    ReceiveHookManager.postProcess(new MessageCountUpdateHook(), message);
 
-                // Counts up host in hosts collection.
-                ReceiveHookManager.postProcess(new HostUpsertHook(), message);
+                    // Counts up host in hosts collection.
+                    ReceiveHookManager.postProcess(new HostUpsertHook(), message);
+                }
             }
 
             // Forward.

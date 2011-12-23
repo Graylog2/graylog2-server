@@ -32,7 +32,7 @@ import java.util.List;
  *
  * Routes a GELF Message to it's streams.
  *
- * @author: Lennart Koopmann <lennart@socketfeed.com>
+ * @author Lennart Koopmann <lennart@socketfeed.com>
  */
 public class Router {
 
@@ -42,16 +42,15 @@ public class Router {
     private Router() { }
 
     public static List<Stream> route(GELFMessage msg) {
-        ArrayList<Stream> matches = new ArrayList<Stream>();
-        ArrayList<Stream> streams = null;
-        try {
-            streams = Stream.fetchAll();
-        } catch (Exception e) {
-            LOG.error("Could not fetch streams: " + e.getMessage(), e);
-        }
+        List<Stream> matches = new ArrayList<Stream>();
+        List<Stream> streams = Stream.fetchAllEnabled();
 
         for (Stream stream : streams) {
             boolean missed = false;
+
+            if (stream.getStreamRules().isEmpty()) {
+                continue;
+            }
 
             for (StreamRule rule : stream.getStreamRules()) {
                 try {

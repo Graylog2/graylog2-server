@@ -20,18 +20,17 @@
 
 package org.graylog2;
 
+import org.apache.log4j.Logger;
 import org.drools.KnowledgeBase;
 import org.drools.KnowledgeBaseFactory;
-import org.drools.builder.KnowledgeBuilder;
-import org.drools.builder.KnowledgeBuilderError;
-import org.drools.builder.KnowledgeBuilderErrors;
-import org.drools.builder.KnowledgeBuilderFactory;
-import org.drools.builder.ResourceType;
+import org.drools.builder.*;
 import org.drools.io.ResourceFactory;
 import org.drools.runtime.StatefulKnowledgeSession;
 import org.graylog2.messagehandlers.gelf.GELFMessage;
 
 public final class RulesEngine {
+
+    private static final Logger LOG = Logger.getLogger(RulesEngine.class);
 	
 	private KnowledgeBuilder kbuilder = null;
 	private KnowledgeBase kbase = null;
@@ -46,7 +45,7 @@ public final class RulesEngine {
 		KnowledgeBuilderErrors errors = kbuilder.getErrors();
 		if (errors.size() > 0) {
 			for (KnowledgeBuilderError error: errors) {
-				System.err.println(error);
+				LOG.error(error);
 			}
 			throw new IllegalArgumentException("Could not parse knowledge.");
 		}

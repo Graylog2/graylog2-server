@@ -7,7 +7,6 @@ package org.graylog2.messagehandlers.common;
 
 import org.graylog2.messagehandlers.gelf.GELFMessage;
 import org.junit.Test;
-import org.productivity.java.syslog4j.server.impl.event.SyslogServerEvent;
 
 /**
  *
@@ -18,15 +17,9 @@ public class HostUpsertHookTest {
     @Test
     public void testProcessWithGELFMessage() {
         GELFMessage message = new GELFMessage();
+        message.setHost("lolwat");
         HostUpsertHook instance = new HostUpsertHook();
         instance.process(message);
     }
 
-/*    @Test
-    public void testProcessWithSyslogMessage() {
-        SyslogServerEvent message = new SyslogServerEvent("foo".getBytes(), "foo".getBytes().length, null);
-        HostUpsertHook instance = new HostUpsertHook();
-        instance.process(message);
-    }
-*/
 }

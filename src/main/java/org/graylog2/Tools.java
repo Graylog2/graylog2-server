@@ -25,18 +25,22 @@ import org.apache.log4j.Logger;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.lang.management.ManagementFactory;
 import java.net.InetAddress;
+import java.net.InetSocketAddress;
+import java.net.SocketAddress;
 import java.net.UnknownHostException;
+import java.util.Calendar;
 import java.util.zip.GZIPInputStream;
 import java.util.zip.InflaterInputStream;
-import org.apache.log4j.Level;
+import org.drools.util.codec.Base64;
 
 /**
  * Tools.java: May 17, 2010 9:46:31 PM
  *
  * Utilty class for various tool/helper functions.
  *
- * @author: Lennart Koopmann <lennart@socketfeed.com>
+ * @author Lennart Koopmann <lennart@socketfeed.com>
  */
 public final class Tools {
 
@@ -47,20 +51,11 @@ public final class Tools {
     /**
      * Get the own PID of this process.
      *
-     * @return PID
-     * @throws Exception
+     * @return PID of the running process
      */
     public static String getPID() {
-        byte[] bo = new byte[100];
-        String[] cmd = {"bash", "-c", "echo $PPID"};
-        try {
-            Process p = Runtime.getRuntime().exec(cmd);
-            p.getInputStream().read(bo);
-        } catch (IOException e) {
-            LOG.fatal("Could not determine own PID! " + e.getMessage(), e);
-            return "unknown";
-        }
-        return new String(bo).trim();
+        return ManagementFactory.getRuntimeMXBean().getName().split("@")[0];
+
     }
 
     /**
@@ -141,22 +136,6 @@ public final class Tools {
         return ret;
     }
 
-    public static int log4jLevelToSyslog(Level level) {
-        if (level.equals(Level.DEBUG)) {
-            return 7;
-        } else if (level.equals(Level.INFO)) {
-            return 6;
-        } else if (level.equals(Level.WARN)) {
-            return 4;
-        } else if (level.equals(Level.ERROR)) {
-            return 3;
-        } else if (level.equals(Level.FATAL)) {
-            return 2;
-        }
-
-        return 4; // Warning.
-    }
-
 
     /**
      * Decompress ZLIB (RFC 1950) compressed data
@@ -197,7 +176,28 @@ public final class Tools {
      * @return The current UTC UNIX timestamp.
      */
     public static int getUTCTimestamp() {
-       return (int) (System.currentTimeMillis()/1000);
+       return (int) (Calendar.getInstance().getTimeInMillis()/1000);
+    }
+
+    /**
+     * Get the current UNIX epoch with milliseconds of the system
+     *
+     * @return The current UTC UNIX timestamp with milliseconds.
+     */
+    public static double getUTCTimestampWithMilliseconds() {
+
+        return getUTCTimestampWithMilliseconds(Calendar.getInstance().getTimeInMillis());
+    }
+
+    /**
+     * Get the UNIX epoch with milliseconds of the provided millisecond timestamp
+     *
+     * @param timestamp a millisecond timestamp (milliseconds since UNIX epoch)
+     * @return The current UTC UNIX timestamp with milliseconds.
+     */
+    public static double getUTCTimestampWithMilliseconds(long timestamp) {
+
+        return Double.parseDouble(String.format("%d.%d", timestamp/1000, timestamp%1000));
     }
 
     public static String getLocalHostname() {
@@ -209,5 +209,22 @@ public final class Tools {
         }
 
         return addr.getHostName();
+    }
+
+    public static int getTimestampDaysAgo(int ts, int days) {
+        return (ts - (days*86400));
+    }
+
+    public static String encodeBase64(String what) {
+        return new String(Base64.encodeBase64(what.getBytes()));
+    }
+
+    public static String decodeBase64(String what) {
+        return new String(Base64.decodeBase64(what));
+    }
+
+    public static String rdnsLookup(SocketAddress socketAddress) throws UnknownHostException {
+        InetSocketAddress addr = (InetSocketAddress) socketAddress;
+        return InetAddress.getByAddress(addr.getAddress().getAddress()).getCanonicalHostName();
     }
 }

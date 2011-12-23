@@ -1,102 +1,171 @@
-/**
- * Copyright 2010 Lennart Koopmann <lennart@socketfeed.com>
- *
- * This file is part of Graylog2.
- *
- * Graylog2 is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * Graylog2 is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with Graylog2.  If not, see <http://www.gnu.org/licenses/>.
- *
+/*
+ * To change this template, choose Tools | Templates
+ * and open the template in the editor.
  */
 
 package org.graylog2.messagehandlers.common;
 
+import org.graylog2.Tools;
+import java.util.HashMap;
+import java.util.Map;
+import org.bson.types.ObjectId;
 import org.junit.Before;
 import org.junit.Test;
 import static org.junit.Assert.*;
 
 /**
- * MessageCounterTest.java: Sep 17, 2010 9:01:45 PM
  *
- * @author: Lennart Koopmann <lennart@socketfeed.com>
+ * @author XING\lennart.koopmann
  */
 public class MessageCounterTest {
 
+    private MessageCounter counter = MessageCounter.getInstance();
+
     @Before
     public void setUp() {
-        MessageCounter.getInstance().reset(MessageCounter.ALL_HOSTS);
-        MessageCounter.getInstance().resetTotalSecondCount();
+        counter.resetAllCounts();
     }
 
     @Test
     public void testGetInstance() {
-        assertNotNull(MessageCounter.getInstance());
+        assertTrue(MessageCounter.getInstance() instanceof MessageCounter);
     }
 
     @Test
-    public void testReset() {
-        MessageCounter.getInstance().countUp(MessageCounter.ALL_HOSTS);
-        MessageCounter.getInstance().reset(MessageCounter.ALL_HOSTS);
-        assertEquals(0, MessageCounter.getInstance().getCount(MessageCounter.ALL_HOSTS));
+    public void testGetTotalCount() {
+        counter.countUpTotal(5);
+        counter.incrementTotal();
+        assertEquals(6, counter.getTotalCount());
     }
 
     @Test
-    public void testCountUp() {
-        int setCount = 4;
-        for (int i = 0; i < setCount; i++) {
-            MessageCounter.getInstance().countUp(MessageCounter.ALL_HOSTS);
-        }
-        assertEquals(setCount, MessageCounter.getInstance().getCount(MessageCounter.ALL_HOSTS));
+    public void testGetStreamCounts() {
+        ObjectId stream1 = new ObjectId();
+        ObjectId stream2 = new ObjectId();
+        ObjectId stream3 = new ObjectId();
+
+        Map expected = new HashMap<String, Integer>();
+        expected.put(stream1.toString(), 1);
+        expected.put(stream2.toString(), 5);
+        expected.put(stream3.toString(), 2);
+
+        counter.countUpStream(stream1, 1);
+        counter.countUpStream(stream2, 3);
+        counter.countUpStream(stream2, 2);
+        counter.countUpStream(stream3, 1);
+        counter.incrementStream(stream3);
+
+        assertEquals(expected, counter.getStreamCounts());
     }
 
     @Test
-    public void testGetCount() {
-        int count_to = 15;
-        for (int i = 0; i < count_to; i++) {
-            MessageCounter.getInstance().countUp(MessageCounter.ALL_HOSTS);
-        }
+    public void testGetHostCounts() {
+        String host1 = "example.org";
+        String host2 = "foo.example.org";
+        String host3 = "example.com";
 
-        assertEquals(count_to,MessageCounter.getInstance().getCount(MessageCounter.ALL_HOSTS));
+        Map expected = new HashMap<String, Integer>();
+        expected.put(Tools.encodeBase64(host1), 5);
+        expected.put(Tools.encodeBase64(host2), 1);
+        expected.put(Tools.encodeBase64(host3), 3);
+
+        counter.countUpStream(new ObjectId(), 5); // Add a stream count for complexity.
+        counter.countUpHost(host1, 4);
+        counter.countUpHost(host1, 1);
+        counter.incrementHost(host2);
+        counter.countUpHost(host3, 3);
+
+        assertEquals(expected, counter.getHostCounts());
     }
 
     @Test
-    public void testResetTotalSecondCount() {
-        MessageCounter.getInstance().countUp(MessageCounter.ALL_HOSTS);
-        MessageCounter.getInstance().resetTotalSecondCount();
-        assertEquals(0, MessageCounter.getInstance().getTotalSecondCount());
-        assertEquals(1, MessageCounter.getInstance().getCount(MessageCounter.ALL_HOSTS));
+    public void testResetAllCounts() {
+        counter.countUpTotal(100);
+        counter.countUpHost("foo.example.org", 9001);
+        counter.countUpStream(new ObjectId(), 5);
+
+        assertEquals(100, counter.getTotalCount()); // Just to make sure.
+
+        counter.resetAllCounts();
+
+        assertEquals(0, counter.getTotalCount());
+        assertEquals(0, counter.getHostCounts().size());
+        assertEquals(0, counter.getStreamCounts().size());
     }
 
     @Test
-    public void testGetTotalSecondCount() {
-        int count_to = 21;
-        for (int i = 0; i < count_to; i++) {
-            MessageCounter.getInstance().countUp(MessageCounter.ALL_HOSTS);
-        }
-
-        assertEquals(count_to,MessageCounter.getInstance().getTotalSecondCount());
+    public void testResetHostCounts() {
+        counter.countUpHost("lolwat", 200);
+        counter.resetHostCounts();
+        assertEquals(new HashMap<String, Integer>(), counter.getHostCounts());
     }
 
     @Test
-    public void testGetHighestSecondCount() {
-        int count_to = 126;
-        for (int i = 0; i < count_to; i++) {
-            MessageCounter.getInstance().countUp(MessageCounter.ALL_HOSTS);
-        }
+    public void testResetStreamCounts() {
+        counter.countUpStream(new ObjectId(), 100);
+        counter.resetStreamCounts();
+        assertEquals(new HashMap<ObjectId, Integer>(), counter.getStreamCounts());    }
 
-        MessageCounter.getInstance().reset(MessageCounter.ALL_HOSTS);
-        MessageCounter.getInstance().resetTotalSecondCount();
+    @Test
+    public void testResetTotal() {
+        counter.countUpTotal(1000);
+        assertEquals(1000, counter.getTotalCount());
+        counter.resetTotal();
+        assertEquals(0, counter.getTotalCount());
+    }
 
-        assertEquals(count_to,MessageCounter.getInstance().getHighestSecondCount());
+    @Test
+    public void testIncrementTotal() {
+        counter.countUpTotal(10);
+        counter.incrementTotal();
+        assertEquals(11, counter.getTotalCount());
+    }
+
+    @Test
+    public void testCountUpTotal() {
+        counter.countUpTotal(500);
+        counter.countUpTotal(50);
+        assertEquals(550, counter.getTotalCount());
+    }
+
+    @Test
+    public void testIncrementStream() {
+        ObjectId streamId = new ObjectId();
+        counter.countUpStream(streamId, 100);
+        counter.incrementStream(streamId);
+
+        int res = counter.getStreamCounts().get(streamId.toString());
+        assertEquals(101, res);
+    }
+
+    @Test
+    public void testCountUpStream() {
+        ObjectId streamId = new ObjectId();
+        counter.countUpStream(streamId, 100);
+        counter.countUpStream(streamId, 150);
+
+        int res = counter.getStreamCounts().get(streamId.toString());
+        assertEquals(250, res);
+    }
+
+    @Test
+    public void testIncrementHost() {
+        String hostname = "foobar";
+        counter.countUpHost(hostname, 10);
+        counter.incrementHost(hostname);
+
+        int res = counter.getHostCounts().get(Tools.encodeBase64(hostname));
+        assertEquals(11, res);
+    }
+
+    @Test
+    public void testCountUpHost() {
+        String hostname = "foo.example.org";
+        counter.countUpHost(hostname, 25);
+        counter.countUpHost(hostname, 40);
+
+        int res = counter.getHostCounts().get(Tools.encodeBase64(hostname));
+        assertEquals(65, res);
     }
 
 }
