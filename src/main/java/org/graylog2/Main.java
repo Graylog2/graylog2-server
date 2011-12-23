@@ -25,12 +25,14 @@ import com.github.joschi.jadconfig.JadConfig;
 import com.github.joschi.jadconfig.RepositoryException;
 import com.github.joschi.jadconfig.ValidationException;
 import com.github.joschi.jadconfig.repositories.PropertiesRepository;
+
 import org.apache.commons.io.IOUtils;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.graylog2.database.MongoConnection;
 import org.graylog2.forwarders.forwarders.LogglyForwarder;
 import org.graylog2.indexer.Indexer;
+import org.graylog2.jsonshortmessage.JsonAddData;
 import org.graylog2.messagehandlers.amqp.AMQPBroker;
 import org.graylog2.messagehandlers.amqp.AMQPSubscribedQueue;
 import org.graylog2.messagehandlers.amqp.AMQPSubscriberThread;
@@ -45,6 +47,7 @@ import org.graylog2.periodical.HostCounterCacheWriterThread;
 import org.graylog2.periodical.MessageCountWriterThread;
 import org.graylog2.periodical.MessageRetentionThread;
 import org.graylog2.periodical.ServerValueWriterThread;
+
 
 import java.io.FileWriter;
 import java.io.IOException;
@@ -66,6 +69,7 @@ public final class Main {
     private static final String GRAYLOG2_VERSION = "0.9.6-beta";
 
     public static RulesEngine drools = null;
+    public static JsonAddData shortMessageParser = null;
     private static final int SCHEDULED_THREADS_POOL_SIZE = 7;
 
     public static Configuration configuration = null;
@@ -165,6 +169,11 @@ public final class Main {
 
         // Write initial ServerValue information.
         writeInitialServerValues(configuration);
+        
+        // Activate JSON parse for Additional Data in shortMessage
+        if (configuration.isUseJsonAddData()) {
+        	initializeJsonAddData(configuration.getJsonAddDataFilterFile());
+        }
 
         // Start GELF threads
         if (configuration.isUseGELF()) {
@@ -272,6 +281,26 @@ public final class Main {
             LOG.fatal("Could not load rules engine: " + e.getMessage(), e);
             System.exit(1);
         }
+    }
+    
+    private static void initializeJsonAddData(String jsonAddDataFilePath) {
+    	if (configuration.isUseJsonAddData()) {
+    		shortMessageParser = new JsonAddData();
+    	} else {
+    		return;
+    	}
+    	// don't currently throw any exceptions
+    	// try {
+    	if (jsonAddDataFilePath != null && !jsonAddDataFilePath.isEmpty()) {
+    		shortMessageParser = new JsonAddData();
+    		shortMessageParser.setJsonAddDataFilter(jsonAddDataFilePath);
+    		LOG.info("Using shortMessage parser drop list: "+jsonAddDataFilePath);
+    	} else {
+    		LOG.info("Using shortMessage parser without drop list.");
+    	}
+    	// } catch (Exception e) {
+    	//    LOG.warn("JSON shortMessage parser is active, but could not iniitalize drop list.");
+    	// }
     }
 
     private static void initializeMongoConnection(Configuration configuration) {

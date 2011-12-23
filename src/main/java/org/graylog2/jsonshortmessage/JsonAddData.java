@@ -1,26 +1,100 @@
-package com.nexage.graylog2;
+/**
+ * Copyright 2010 Lennart Koopmann <lennart@socketfeed.com>
+ *
+ * This file is part of Graylog2.
+ *
+ * Graylog2 is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * Graylog2 is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with Graylog2.  If not, see <http://www.gnu.org/licenses/>.
+ *
+ */
 
+package org.graylog2.jsonshortmessage;
+
+import java.io.BufferedReader;
+import java.io.FileReader;
+import java.io.IOException;
+import java.util.HashSet;
+import java.util.ListIterator;
 import java.util.Map;
 import java.util.HashMap;
-import java.util.ListIterator;
-import org.json.simple.JSONObject;
+
 import org.json.simple.JSONArray;
+import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
+import org.graylog2.messagehandlers.gelf.GELFMessage;
 
-public class Nexage_Graylog2_JSON_Parser_Test {
+/**
+ * JsonAddData.java: Dec 22, 2011
+ *
+ * Extract JSON key value pairs in shortMessage part
+ * of GELF message
+ *
+ * @author Bob Webber <webber@panix.com>
+ * 
+ */
 
-	/**
-	 * @param args
-	 */
-	public static void main(String[] args) {
-		// TODO Auto-generated method stub
-		// String s="{\"foo\":{\"1\":2},\"bar\":[0,{\"1\":{\"2\":{\"3\":{\"4\":[5,{\"6\":7}]}}}}]}";
-		String s = "{\"startedOn\":1324390232727,\"endedOn\":1324390232810,\"executionTimeInMillis\":83,\"requestData\":{\"tag\":\"8a809449013131b07f6bbe6bd77402c1\",\"mode\":\"live\",\"h\":480,\"w\":320,\"spcat\":\"IAB9,IAB1\",\"dip\":\"99.255.144.138\",\"dcountry\":\"CAN\",\"dua\":\"Mozilla/5.0 (iPod touch; U; CPU iPhone OS 5_0_1 like Mac OS X; en-us) AppleWebKit/528.18 (KHTML, like Gecko) Version/4.0 Mobile/7A341 Safari/528.16\",\"dmake\":\"Apple\",\"dmodel\":\"iPod Touch\",\"dos\":\"iOS\",\"dosv\":\"3.0\",\"dpid\":\"30f1418d2f02f90c17a1adbd1b8377cb8172741b\",\"prettyLog\":false,\"hasUserData\":false,\"hasDeviceData\":true},\"auctionParticipants\":{\"119\":\"Status : NOBID, Offered Price : 0\",\"288\":\"Status : NOBID, Offered Price : 0\",\"327\":\"Status : NOBID, Offered Price : 0\",\"223\":\"Status : NOBID, Offered Price : 0\",\"236\":\"Status : NOBID, Offered Price : 0\",\"54\":\"Status : NOBID, Offered Price : 0\",\"353\":\"Status : NOBID, Offered Price : 0\",\"67\":\"Status : NOBID, Offered Price : 0\",\"41\":\"Status : NOBID, Offered Price : 0\",\"210\":\"Status : NOBID, Offered Price : 0\",\"379\":\"Status : NOBID, Offered Price : 0\"},\"output\":\"\",\"methodProfileStats\":[]}";
-		System.out.println("=======decode=======");
-		Map<String,Object> sausage;
-		sausage = nxParseJsonString(s);
-		System.out.println(sausage);
+
+public class JsonAddData {
+	private static boolean enableJsonAddData = false;
+	private static HashSet<String> dropList = null;
+	
+	public JsonAddData() {
+		enableJsonAddData = true;
+	}
+	
+	public static boolean useJsonAddData() {
+		return enableJsonAddData;
+	}
+	
+	public void setJsonAddDataFilter(String fileName) {
+		String dropString;
+		dropList = new HashSet<String>(100);
+		
+		if (fileName == null) {
+			return;
+		}
+			
+		try {
+			BufferedReader filterFile = new BufferedReader(new FileReader(fileName));
+			while ((dropString = filterFile.readLine()) != null) {
+				dropList.add(dropString.trim());
+			}
+		} catch (IOException e) {
+			// do something about bad file
+		}
+	}
+	
+	private static boolean isDrop(String candidate) {
+		if (dropList.isEmpty()) {
+			return false;
+		}
+		if (dropList.contains(candidate)) {
+			return true;
+		}
+		return false;
+	}
+		
+	public static void amplify(GELFMessage target) {
+		// String nxAppName = target.getFacility();
+		// String nxMessType = target.getFile();
+		Map<String, Object> localData;
+		
+		localData = nxParseJsonString(target.getShortMessage());
+		if(localData.isEmpty()) {
+			return;
+		}
+		stuffGELF(target, localData);
 	}
 	
 	private static Map<String,Object> nxParseJsonString(String jsonString) {
@@ -31,7 +105,7 @@ public class Nexage_Graylog2_JSON_Parser_Test {
 	    try {
 	        parsedJson = parser.parse(jsonString);
 	        // System.out.println("parsedJson is "+parsedJson.getClass());
-	    } catch (ParseException e) {
+	    } catch (ParseException pe) {
 	    	System.out.println("Caught parsing exception");
 	    	result.clear();
 	    	return result;
@@ -60,7 +134,9 @@ public class Nexage_Graylog2_JSON_Parser_Test {
 		// System.out.println(walkMap.entrySet());
 	    for (Map.Entry<String, Object> mapEntry : walkMap.entrySet()) {
 	        System.out.println(mapEntry.getKey()+" => "+mapEntry.getValue());
-
+	        if (isDrop(mapEntry.getKey())) {
+	        	continue;
+	        }
 			walkMapResult.put(mapEntry.getKey(), mapEntry.getValue());
 			
 			if (mapEntry.getValue().getClass().equals(JSONObject.class)) {
@@ -97,5 +173,15 @@ public class Nexage_Graylog2_JSON_Parser_Test {
 
 		}
 	    return walkArrayResult;
+	}
+
+	private static void stuffGELF(GELFMessage target, Map<String, Object> nxParsedJSON) {
+		// iterate over local Map and use message.addAdditionalData to provide to GELF message
+		for (Map.Entry<String, Object> entry : nxParsedJSON.entrySet()) {
+		    String key = entry.getKey();
+		    Object value = entry.getValue();
+		    // Stuff values from localData into GELF additionalData
+		    target.addAdditionalData("_"+key, value);
+		}		
 	}
 }

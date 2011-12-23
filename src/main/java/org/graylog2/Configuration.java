@@ -136,6 +136,12 @@ public class Configuration {
 
     @Parameter("rules_file")
     private String droolsRulesFile;
+    
+    @Parameter("use_json_add_data")
+    private boolean jsonAddDataActivate = false;
+    
+    @Parameter("json_add_data_filter_file")
+    private String jsonAddDataFilterFile;
 
     public int getSyslogListenPort() {
         return syslogListenPort;
@@ -254,6 +260,14 @@ public class Configuration {
 
     public String getDroolsRulesFile() {
         return droolsRulesFile;
+    }
+    
+    public boolean isUseJsonAddData() {
+    	return jsonAddDataActivate;
+    }
+    
+    public String getJsonAddDataFilterFile() {
+    	return jsonAddDataFilterFile;
     }
 
     public List<ServerAddress> getMongoReplicaSet() {
