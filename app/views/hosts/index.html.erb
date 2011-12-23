@@ -1,3 +1,4 @@
+<% minutes = params[:ms].blank? ? 15 : params[:ms].to_i %>
 <h1>Hosts</h1>
 
 <div id="hosts-quickjump">
@@ -9,32 +10,37 @@
 </div>
 
 <script type="text/javascript">
-  var data = "<%= @hosts.map { |h| h(h.host) }.join ',' %> ".split(",");
+  var data = "<%= @all_hosts.map { |h| h(h.host) }.join ',' %> ".split(",");
     $("#hosts-quickjump-input").autocomplete(data);
 </script>
 
-<div id="hosts-new-hostgroup-link">
-  <%= awesome_link "Create a hostgroup", { :controller => "hostgroups", :action => "new" } %>
-</div>
-
-Monitoring <span class="highlighted"><%=h @host_count %></span> hosts. (Sorted by total message count)
+Monitoring <span class="highlighted"><%= @host_count %></span> hosts.
 
 <br style="clear: both;" />
 
 <div id="hosts-hosts">
-  <% @hosts_and_groups.each do |host| %>
-    <% next if (host.is_a?(Host) and host.host.blank?) or (host.is_a?(Hostgroup) and host.name.blank?) %>
-    <div class="blocks">
-      <% if host.is_a?(Host) %>
-        <span class="blocks-title"><%= link_to h(host.host), host_messages_path(host.host) %></span>
-        <br />
-        <%=h host.message_count.to_i %> messages
-      <% elsif host.is_a?(Hostgroup) %>
-        <span class="blocks-title"><span class="black">Group:</span> <%= link_to h(host.name), hostgroup_messages_path(host) %></span>
-        <br />
-      <% end %>
+  <% @hosts.each do |host| %>
+    <% next if host.host.blank? %>
+
+  <div id="el-e">
+    <div class="el-e-left">
+      <span class="el-e-sparkline">
+        <%= sparkline_values(MessageCount.counts_of_last_minutes(minutes, :hostname => host.host, :fill => true).map { |c| c[:count] }) %>
+      </span>
     </div>
+
+    <div class="el-e-middle">
+      <span class="el-e-title">
+        <%= link_to(host.host, host_messages_path(host.host)) %>
+      </span>
+    </div>
+
+    <div class="el-e-right">
+      <span class="el-e-description"></span>
+    </div>
+  </div>
+
   <% end %>
 </div>
 
-<br style="clear: both;" />
+<%= paginate(@hosts) %>

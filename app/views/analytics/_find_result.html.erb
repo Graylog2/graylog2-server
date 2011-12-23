@@ -1,0 +1,7 @@
+<h2>Find result</h2>
+
+<% @messages = @result[:result] # XXX gnaahhhh
+%>
+<%= render :partial => "messages/table", :locals => { :inline_version => false } %>
+
+<%= render :partial => "shelldebug" %>

@@ -1,17 +1,18 @@
 <h2>
-  <% if @stream.alarm_active and !@stream.alarm_limit.blank? and !@stream.alarm_timespan.blank? %>
-    <% stream_count = @stream.message_count_since(@stream.alarm_timespan.minutes.ago.to_i) %>
-    <% if stream_count > @stream.alarm_limit %>
-      <span class="status-alarm-text">ALARM:</span>
-      <%= stream_count %> messages in last <%= @stream.alarm_timespan %> minutes!
-    <% else %>
-      <span class="status-okay-text">OK:</span>
-      <%= stream_count %> messages in last <%= @stream.alarm_timespan %> minutes.
+    <% case @stream.alarm_status(current_user) %>
+      <% when :alarm then %>
+        <span class="status-alarm-text">ALARM:</span>
+        <%= @stream.message_count_since(@stream.alarm_timespan.minutes.ago.to_i) %> messages in last <%= @stream.alarm_timespan %> minutes!
+      <% when :no_alarm then %>
+        <span class="status-okay-text">OK:</span>
+        <%= @stream.message_count_since(@stream.alarm_timespan.minutes.ago.to_i) %> messages in last <%= @stream.alarm_timespan %> minutes.
+      <% when :disabled then %>
+        <%= @stream.message_count_since(5.minutes.ago) %> messages in last 5 minutes.
     <% end %>
-    <span id="streams-sidebar-limit">(Limit: <%= @stream.alarm_limit %>)</span>
-  <% else %>
-    <%= @stream.message_count_since(5.minutes.ago) %> messages in last 5 minutes.
-  <% end %>
+
+    <% if @stream.alarm_status(current_user) != :disabled %>
+      <span id="streams-sidebar-limit">(Limit: <%= @stream.alarm_limit %>)</span>
+    <% end %>
 </h2>
 
 <div id="sidebar-graph" style="height: 100px;"></div>
@@ -30,7 +31,7 @@
     )
 %>
 
-<h3 id="streams-sidebar-totalcount">Total messages: <%= @total_count %></h3>
+<h3 id="streams-sidebar-totalcount">Total messages: <%= number_with_delimiter(@total_count, :delimiter => '.') %></h3>
 
 <h3>Favorited by:</h3>
 <ul id="streams-sidebar-favorites">
@@ -61,6 +62,18 @@
     <% end %>
   <% else %>
     <li>Alarms are not active for this stream</li>
+  <% end %>
+</ul>
+
+<h3>Related streams</h3>
+<ul id="related-streams">
+  <% related_streams = @stream.related_streams %>
+  <% if related_streams.blank? %>
+    <li>None</li>
+  <% else %>
+    <% related_streams.each do |s| %>
+      <li><%=raw stream_link(s) %></li>
+    <% end %>
   <% end %>
 </ul>
 

@@ -1,26 +1,55 @@
-<h2>Message <span class="highlighted"><%=h @message.id %></span></h2>
+<script type="text/javascript">
+  $(document).ready(function(){
+    // Confirmation for links in full message. - Inline to avoid JS re-binding shitfuck
+    $(".messages-full-message a").bind("click", function() {
+      return confirm("Really follow this link?");
+    });
+  });
+</script>
 
-<% unless @message.message.blank? %>
-  <p class="messages-show-message"><%=h @message.message %></p>
-<% end %>
+<h2>Message <span class="highlighted"><%= @message.id %></span></h2>
 
-<h4>From: <span class="highlighted"><%= @message.host %></span></h4>
-<h4>Received: <span class="highlighted"><%= gl_date(Time.at(@message.created_at)) %></span></h4>
+<p class="messages-show-message"><%= @message.message %></p>
 
-<% unless @message.timestamp.blank? or @message.timestamp == 0 %>
-  <h4>Local time: <span class="highlighted"><%= gl_date(Time.at(@message.timestamp)) %></span></h4>
-<% end %>
+<div id="messages-show-terms-modal" style="display: none;">
+  <h2>Terms of message <span class="highlighted"><%= @message.id %></span></h2>
+  <strong>|</strong>
+  <% @terms.in_groups_of(20) do |group| %>
+    <% group.delete_if {|t| t.nil? }.each do |t| %>
+      <%= t %> <strong>|</strong>
+    <% end %><br />
+  <% end %>
+</div>
+<%= link_to "In which terms was this message broken to?", "#", { :onclick => "$('#messages-show-terms-modal').modal({ overlayClose:true })" } %>
 
+<h4>
+  From:
+  <span class="highlighted">
+    <%= link_to(@message.host, host_messages_path(@message.host)) %>
+  </span>
+</h4>
+
+<h4>Date: <span class="highlighted"><%= Time.at(@message.created_at) %></span></h4>
 <h4>Severity: <span class="highlighted"><%= syslog_level_to_human(@message.level) %></span></h4>
 <h4>Facility: <span class="highlighted"><%= @message.facility %></span></h4>
-
-<% unless @message.file.blank?  %>
-  <h4>File: <span class="highlighted"><%=h @message.file %><%= @message.line.blank? or @message.line == -1 ? nil : ":#{h(@message.line)}" %></span></h4>
+<% if @message.file_and_line.present? %>
+  <h4>File: <span class="highlighted"><%= @message.file_and_line %></span></h4>
 <% end %>
 
-<% if @message.has_additional_fields %>
-  <% @message.additional_fields.each do |field| %>
-    <h4><%=h field[:key] %>: <span class="highlighted"><%=h field[:value] %></span></h4>
+<% if @message.additional_fields? %>
+  <% @message.additional_fields.each_pair do |key, value| %>
+    <h4>
+      <%= key %>:
+      <span class="highlighted">
+        <%= link_to format_additional_field_value(key, value), {
+                :controller => :messages,
+                "filters[additional][keys][]" => key,
+                "filters[additional][values][]" => value
+              },
+              :title => "Search for value of this additional field"
+        %>
+      </span>
+    </h4>
   <% end %>
 <% end %>
 
@@ -28,7 +57,7 @@
   <% escaped_fullmsg = h(@message.full_message) %>
   <h3>Full message:</h3>
   <p class="messages-show-message messages-full-message">
-    <%= auto_link(escaped_fullmsg.gsub(/\n/, '<br />'), :html => { :target => "blank" }, :link => :urls) %>
+    <%= raw(auto_link(escaped_fullmsg.gsub(/\n/, '<br />'), :html => { :target => "blank" }, :link => :urls)) %>
   </p>
 <% end %>
 
@@ -42,9 +71,9 @@
   </ul>
 <% end %>
 
-<% if Configuration.allow_deleting %>
+<% if !current_user.reader? and ::Configuration.allow_deleting %>
   <br />
-  <%= awesome_link "Delete message", message_path(@message), :confirm => "Really delete this message?", :method => :delete %>
+  <%= awesome_link "Delete message", message_path(@message), :method => :delete, :confirm => "Really delete message?" %>
   <br />
 <% end %>
 
@@ -54,16 +83,27 @@
   <% @comments.each do |comment| %>
     <li>
       <%= link_to comment.title, messagecomment_path(comment) %>: <i><%= comment.comment %></i>
-      (<%=raw user_link(comment.user) %> / <%= gl_date(comment.created_at) %>)
+      (<%=raw user_link(User.find(comment.user_id)) %> / <%= gl_date(comment.created_at) %>)
     </li>
   <% end %>
   </ul>
 <% end %>
 
-<br />
-<%= awesome_link "Show messages of this host around", around_message_path(@message, :nb => 50 )%>
-
 <% if params[:partial] %>
   <%= link_to "Permalink", { :controller => "messages", :action => "show", :id => @message.id }, :id => "messages-show-permalink" %>
   <br style="clear: both;" />
 <% end %>
+
+<script type="text/javascript">
+    $("a").bind("click", function(){
+      if ($(this).attr("data-confirm") == undefined) {
+        return true;
+      } else {
+        if (confirm($(this).attr("data-confirm"))) {
+          return true;
+        } else {
+          return false;
+        }
+      }
+    });
+</script>

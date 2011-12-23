@@ -77,7 +77,7 @@ label {
 .awesome {
   margin-left: 3px;
   font-size: 11px;
-  background: #a9014b url(/images/awesome-link-overlay.png) repeat-x;
+  background: #a9014b url(../images/awesome-link-overlay.png) repeat-x;
   display: inline-block;
   padding: 5px 10px 4px;
   color: #fff;
@@ -115,7 +115,7 @@ label {
 
 .description {
   position: relative;
-  top: -10px;
+  top: -5px;
   margin-bottom: 10px;
   width: 70%;
   color: #333;
@@ -141,7 +141,7 @@ label {
 .loading {
     height: 200px;
     width: 100%;
-    background-image: url(/images/loading.gif);
+    background-image: url(../images/loading.gif);
     background-repeat: no-repeat;
     background-position: center center;
 }
@@ -177,25 +177,28 @@ label {
   height: 28px;
   padding-left: 15px;
   padding-top: 8px;
-  width: 100%;
   color: #fff;
   font-size: 16px;
   text-shadow: 0 -1px 1px #111;
   font-weight: bold;
   background-repeat: repeat-x;
+  position: fixed;
+  bottom: 0px;
+  width: 100%;
 }
 
 .notification-title {
   margin-right: 25px;
   font-size: 20px;
+  z-index: 9000;
 }
 
 #notification-notice {
-  background-image: url(/images/notificationbar-green.png);
+  background-image: url(../images/notificationbar-green.png);
 }
 
 #notification-error {
-  background-image: url(/images/notificationbar-red.png);
+  background-image: url(../images/notificationbar-red.png);
 }
 
 #top {
@@ -212,7 +215,7 @@ label {
 #userbar {
     float: right;
     background-color: #fd0c99;
-    background-image: url(/images/userbar.png);
+    background-image: url(../images/userbar.png);
     background-repeat: no-repeat;
     padding: 3px;
     padding-right: 5px;
@@ -355,7 +358,7 @@ label {
 
 .content-bottom {
   height: 7px;
-  background-image: url(/images/contentedge.png);
+  background-image: url(../images/contentedge.png);
   background-repeat: repeat-x;
   background-color: #D4D4D4;
   overflow: hidden;
@@ -452,19 +455,6 @@ label {
     color: white;
 }
 
-#new-messages-bar {
-    position: relative;
-    top: -16px;
-    text-align: center;
-    background-color: #FD0C99;
-    font-size: 10px;
-    color: #fff;
-    background-image: url('/images/newmessagebarbg.png');
-    background-repeat: no-repeat;
-    padding-top: 2px;
-    padding-bottom: 2px;
-}
-
 #new-messages-bar a {
     color: #fff;
     font-weight: bold;
@@ -485,13 +475,13 @@ label {
   text-transform: uppercase;
   z-index: 9001;
   color: #fff;
-  background-image: url(/images/top-load.gif);
+  background-image: url(../images/top-load.gif);
   background-repeat: no-repeat;
   background-position: left center;
 }
 
 #simplemodal-container a.modalCloseImg {
-  background:url(/images/x.png) no-repeat;
+  background:url(../images/x.png) no-repeat;
   width:25px;
   height:29px;
   display:inline;
@@ -520,5 +510,79 @@ label {
 }
 
 #server-not-running {
-  background-image: url(/images/notificationbar-red.png);
+  background-image: url(../images/notificationbar-red.png);
+}
+
+.time-light {
+  color: #9a9a9a;
+}
+
+.highlighted .time-light {
+  color: #fd9dd5;
+}
+
+/* entity list */
+
+#el-e {
+  margin-top: 10px;
+  margin-bottom: 10px;
+  margin-left: 15px;
+  padding-top: 6px;
+  padding-bottom: 6px;
+  border-bottom: 1px solid #ccc;
+  height: 16px;
+  clear: both;
+}
+
+.el-e-left {
+  width: 85px;
+  float: left;
+}
+
+.el-e-middle {
+  float: left;
+  padding-right: 15px;
+}
+
+.el-e-right {
+  float: left;
+}
+
+.el-e-title {
+  font-size: 27px;
+  font-family: Georgia,"Times New Roman",Times,serif;
+  display: block;
+}
+
+.el-e-title-disabled a {
+  color: #aaa;
+}
+
+.el-e-description {
+  color: #aaa;
+  display: block;
+  position: relative;
+  top: 5px;
+}
+
+.pagination {
+  width: 100%;
+  text-align: right;
+  margin-top: 25px;
+}
+
+.pagination .page {
+  font-weight: bold;
+}
+
+#current-throughputs {
+  position: absolute;
+  right: 0px;
+  top: 50px;
+  padding: 3px;
+  padding-left: 7px;
+  background-color: #000;
+  font-weight: bold;
+  color: #fff;
+  cursor: pointer;
 }

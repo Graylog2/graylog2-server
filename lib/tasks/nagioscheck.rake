@@ -12,7 +12,8 @@ namespace :nagios do
     max_messages = ENV['messages'].to_i
 
     # Get message count of defined last minutes and compare to given maximum.
-    message_count = Message.count_of_last_minutes minutes
+    #message_count = Message.total_count_of_last_minutes(minutes)
+    message_count =  MessageGateway.all_in_range(nil, minutes.minutes.ago.to_i, Time.now.to_i).total_result_count
     if message_count > max_messages
       puts "status: alert"
       exit 2

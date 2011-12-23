@@ -8,7 +8,10 @@ class StreamrulesController < ApplicationController
     if new_rule.save
       flash[:notice] = "Rule has been added."
     else
-      flash[:error] = "Could not add rule."
+      msg = "Could not add rule."
+      # lololol this sucks. we are not prepared for an output of *all* possible errors yet (layout wise)
+      msg += " - Not a valid regular expression." if new_rule.errors[:value].include?("invalid regular expression")
+      flash[:error] = msg
     end
     redirect_to rules_stream_path(@stream)
   end

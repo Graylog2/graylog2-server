@@ -1,7 +1,6 @@
 .messages {
     font-family: 'Lucida Grande',Verdana,sans-serif !important;
     font-size: 10px;
-    margin-top: 10px;
 }
 
 .messages-inline {
@@ -21,6 +20,15 @@
   color: #ff0000;
 }
 
-.messages-c-host {
-  width: 110px;
+.messages-c-tools {
+  text-align: right;
 }
+
+.messages-from-today-link {
+  cursor: pointer;
+}
+
+.messages-today {
+  background-color: #ffdf93;
+}
+

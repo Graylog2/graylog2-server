@@ -1,0 +1,12 @@
+<!-- inline to avoid re-binding after AJAX call -->
+<div class="analytics-shell-debug-link">
+  <a href="#" onclick="$('.analytics-shell-debug').show(); $(this).hide(); return false;">Show debug information</a>
+</div>
+<div class="analytics-shell-debug">
+  <%
+    our_result = @result.dup
+    our_result.delete(:result)
+  %>
+
+  <%= our_result.to_json %>
+</div>

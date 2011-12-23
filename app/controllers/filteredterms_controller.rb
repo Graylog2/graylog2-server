@@ -3,6 +3,7 @@ class FilteredtermsController < ApplicationController
   def index
     @filteredterms = FilteredTerm.all
     @new_filteredterm = FilteredTerm.new
+    @has_settings_tabs = true
   end
 
   def create

@@ -1,29 +1,21 @@
 class ApplicationController < ActionController::Base
   include AuthenticatedSystem
 
-  clear_helpers
-  helper :all # include all helpers, all the time
-  protect_from_forgery # See ActionController::RequestForgeryProtection for details
+  protect_from_forgery
   helper Authorization::AuthorizationHelper
 
-  before_filter :login_required
+  before_filter :login_required, :clear_terms_cache
 
-  def rescue_action e
-    # Connection to MongoDB failed.
-    if e.class == Mongo::ConnectionFailure
-        render :file => "#{Rails.root.to_s}/public/mongo_connectionfailure.html", :status => 500
-        return
-    end
+  rescue_from "Mongo::ConnectionFailure" do
+      render_custom_error_page("mongo_connectionfailure") and return
+  end
 
-    # Default 404 error.
-    if e.class == ActionController::RoutingError
-      render :file  => "#{Rails.root.to_s}/public/404.html", :status => 404
-      return
-    end
+  rescue_from "RestClient::ResourceNotFound" do
+      render_custom_error_page("elasticsearch_noindex") and return
+  end
 
-    # Default 500 error.
-    Rails.logger.error "ERROR: #{e.to_s}"
-    render :file  => "#{Rails.root.to_s}/public/500.html", :status => 500
+  rescue_from "Errno::ECONNREFUSED" do
+      render_custom_error_page("elasticsearch_noconnection") and return
   end
 
   helper_method :has_users
@@ -32,12 +24,13 @@ class ApplicationController < ActionController::Base
     return true
   end
 
+  # TODO remove, replace with time_to_formatted_s
   helper_method :gl_date
   def gl_date(date)
     date = date.to_s
     return String.new if date == nil or date.length == 0
     tmp = DateTime.parse(date)
-    return tmp.strftime(Configuration.date_format)
+    return tmp.strftime(::Configuration.date_format)
   end
 
   private
@@ -63,4 +56,12 @@ class ApplicationController < ActionController::Base
     render :file  => "#{Rails.root.to_s}/public/404.html", :status => 404, :layout => false
   end
 
+  def clear_terms_cache
+    FilteredTerm.expire_cache
+  end
+
+  def render_custom_error_page(tpl)
+    render :file => "#{Rails.root.to_s}/public/#{tpl}.html", :status => 500, :layout => false
+    return
+  end
 end

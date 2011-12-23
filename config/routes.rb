@@ -3,6 +3,7 @@ Graylog2WebInterface::Application.routes.draw do
   match 'login' => 'sessions#new', :as => :login
   resource :session
   resources :dashboard
+  resources :operations
 
   resources :users do
     collection do
@@ -15,13 +16,11 @@ Graylog2WebInterface::Application.routes.draw do
     collection do
       post :showrange
       get :showrange
-      post :getnewmessagecount
       post :deletebystream
       post :deletebyquickfilter
     end
     member do
       post :show
-      get :around
     end
   end
 
@@ -32,25 +31,13 @@ Graylog2WebInterface::Application.routes.draw do
   resources :hosts, :constraints => { :id => /.*/ } do
     resources :messages
 
+    member do
+      post :showrange
+      get :showrange
+    end
+
     collection do
       post :quickjump
-    end
-  end
-
-  resources :hostgroups do
-    resources :messages
-    member do
-      get :hosts
-      get :settings
-      post :rename
-    end
-  end
-
-  resources :hostgroup_hosts
-
-  resources :facilities do
-    member do
-      post :changetitle
     end
   end
 
@@ -81,11 +68,17 @@ Graylog2WebInterface::Application.routes.draw do
       post :togglefavorited
       post :togglealarmforce
       post :togglesubscription
+      post :toggledisabled
       post :rename
+      post :clone
       get :settings
       post :subscribe
       post :unsubscribe
       post :categorize
+      post :addcolumn
+      delete :removecolumn
+      post :shortname
+      post :related
     end
   end
 
@@ -109,8 +102,7 @@ Graylog2WebInterface::Application.routes.draw do
 
   resource :analytics do
     get :index
-    get :messagespread
-    post :messagespread
+    post :shell
   end
 
   resources :versioncheck do
@@ -130,8 +122,11 @@ Graylog2WebInterface::Application.routes.draw do
   resources :health do
     collection do
       post :currentthroughput
+      post :currentmqsize
     end
   end
+
+  resources :retentiontime
 
   resources :settings do
     collection do

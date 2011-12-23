@@ -43,6 +43,7 @@ cd $BUILD_DIR
 mv config/email.yml.example config/email.yml
 mv config/general.yml.example config/general.yml
 mv config/mongoid.yml.example config/mongoid.yml
+mv config/indexer.yml.example config/indexer.yml
 
 RAILS_ENV=production
 export RAILS_ENV

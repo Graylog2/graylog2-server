@@ -3,6 +3,7 @@ class SettingsController < ApplicationController
   filter_access_to :store
 
   def index
+    @has_settings_tabs = true
   end
 
   def store
@@ -19,6 +20,12 @@ class SettingsController < ApplicationController
       flash[:error] = "Could not edit setting."
     end
 
-    redirect_to :action => "index"
+    if Setting.retentiontime_types.include?(params[:setting_type].to_i)
+      controller = "retentiontime"
+    else
+      controller = "settings"
+    end
+
+    redirect_to :controller => controller, :action => "index"
   end
 end

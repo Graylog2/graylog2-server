@@ -1,5 +1,5 @@
-<h2>Welcome, <span class=\"highlighted\"><%= current_user.display_name %></span>!</h2>
-Your current time: <%= gl_date(Time.now.to_s) %>
+<h2>Welcome, <span class="highlighted"><%= current_user.display_name %></span>!</h2>
+Your current time: <%= gl_date(Time.zone.now) %>
 
 <div id="sidebar-graph" style="height: 100px;"></div>
 <div id="graph-rangeselector" class="graph-rangeselector-sidebar" style="display: none;">
@@ -11,7 +11,6 @@ Your current time: <%= gl_date(Time.now.to_s) %>
 </div>
 <%=raw flot_graph_loader(
       :inject => "#sidebar-graph",
-      :host => "all",
       :hours => 2
     )
 %>
@@ -25,23 +24,6 @@ Your current time: <%= gl_date(Time.now.to_s) %>
     <li><%=raw stream_link(favorite) %></li>
   <% end %>
 <% end %>
-</ul>
-
-<h3>Message collection</h3>
-<ul id="message-collection-stats">
-  <li>
-    Capped:
-    <% if MessageCollection.is_capped? %>
-      <span class="status-okay-text">OK</span>
-    <% else %>
-      <strong><span class="status-alarm-text">NO</span></strong>
-    <% end %>
-  </li>
-
-  <li>Size: <%= number_to_human_size(MessageCollection.size) %></li>
-  <li>Capped to: <%= number_to_human_size(MessageCollection.storage_size) %></li>
-  <li>Objects: <%= MessageCollection.count %></li>
-  <li>Average object size: <%= number_to_human_size(MessageCollection.average_object_size) %></li>
 </ul>
 
 <h3>Jobs & Tasks <%= tooltip("Notifications") %></h3>
@@ -71,7 +53,7 @@ Your current time: <%= gl_date(Time.now.to_s) %>
 
 <%= awesome_link "Open dashboard", dashboard_index_path, :style => "display: inline;", :target => "_blank" %>
 
-<% if Configuration.livetail_enabled %>
+<% if ::Configuration.livetail_enabled %>
   <%= awesome_link "Go to live tail", :controller => "livetail" %>
 <% end %>
 
