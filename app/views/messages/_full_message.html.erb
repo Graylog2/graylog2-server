@@ -83,7 +83,7 @@
   <% @comments.each do |comment| %>
     <li>
       <%= link_to comment.title, messagecomment_path(comment) %>: <i><%= comment.comment %></i>
-      (<%=raw user_link(comment.user) %> / <%= gl_date(comment.created_at) %>)
+      (<%=raw user_link(User.find(comment.user_id)) %> / <%= gl_date(comment.created_at) %>)
     </li>
   <% end %>
   </ul>
