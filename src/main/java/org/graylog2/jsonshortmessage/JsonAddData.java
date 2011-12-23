@@ -1,21 +1,33 @@
 /**
- * Copyright 2011 Bob Webber <bob.webber@nexage.com>
+ * Copyright 2010 Lennart Koopmann <lennart@socketfeed.com>
  *
- * This file is part of the Nexage platform extension to Graylog2.
+ * This file is part of Graylog2.
  *
- * This extension to the Graylog2 free software is proprietary.
- * All rights to the software are reserved by Nexage, Inc. and the
- * original author. This software may not be reproduced or used as
- * the basis of a derived work without the express permission of the
- * copyright holders.
- * 
+ * Graylog2 is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * Graylog2 is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with Graylog2.  If not, see <http://www.gnu.org/licenses/>.
+ *
  */
 
-package com.nexage.graylog2;
+package org.graylog2.jsonshortmessage;
 
+import java.io.BufferedReader;
+import java.io.FileReader;
+import java.io.IOException;
+import java.util.HashSet;
 import java.util.ListIterator;
 import java.util.Map;
 import java.util.HashMap;
+
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
@@ -23,20 +35,55 @@ import org.json.simple.parser.ParseException;
 import org.graylog2.messagehandlers.gelf.GELFMessage;
 
 /**
- * NXFields.java: Dec 20, 2011
+ * JsonAddData.java: Dec 22, 2011
  *
- * Extract JSON key value pairs in Nexage application messages
+ * Extract JSON key value pairs in shortMessage part
+ * of GELF message
  *
- * @author Bob Webber <bob.webber@nexage.com>
+ * @author Bob Webber <webber@panix.com>
+ * 
  */
 
 
-public class NXFields {
-	// private static Map<String, Object> localData = new HashMap<String, Object>(50);
-	// use facility string to identify Nexage application
-	// private String nxAppName;
-	// use file name string to identify type of message from application
-	// private String nxMessType;
+public class JsonAddData {
+	private static boolean enableJsonAddData = false;
+	private static HashSet<String> dropList = null;
+	
+	public JsonAddData() {
+		enableJsonAddData = true;
+	}
+	
+	public static boolean useJsonAddData() {
+		return enableJsonAddData;
+	}
+	
+	public void setJsonAddDataFilter(String fileName) {
+		String dropString;
+		dropList = new HashSet<String>(100);
+		
+		if (fileName == null) {
+			return;
+		}
+			
+		try {
+			BufferedReader filterFile = new BufferedReader(new FileReader(fileName));
+			while ((dropString = filterFile.readLine()) != null) {
+				dropList.add(dropString.trim());
+			}
+		} catch (IOException e) {
+			// do something about bad file
+		}
+	}
+	
+	private static boolean isDrop(String candidate) {
+		if (dropList.isEmpty()) {
+			return false;
+		}
+		if (dropList.contains(candidate)) {
+			return true;
+		}
+		return false;
+	}
 		
 	public static void amplify(GELFMessage target) {
 		// String nxAppName = target.getFacility();
@@ -58,7 +105,7 @@ public class NXFields {
 	    try {
 	        parsedJson = parser.parse(jsonString);
 	        // System.out.println("parsedJson is "+parsedJson.getClass());
-	    } catch (ParseException e) {
+	    } catch (ParseException pe) {
 	    	System.out.println("Caught parsing exception");
 	    	result.clear();
 	    	return result;
@@ -87,7 +134,9 @@ public class NXFields {
 		// System.out.println(walkMap.entrySet());
 	    for (Map.Entry<String, Object> mapEntry : walkMap.entrySet()) {
 	        System.out.println(mapEntry.getKey()+" => "+mapEntry.getValue());
-
+	        if (isDrop(mapEntry.getKey())) {
+	        	continue;
+	        }
 			walkMapResult.put(mapEntry.getKey(), mapEntry.getValue());
 			
 			if (mapEntry.getValue().getClass().equals(JSONObject.class)) {
