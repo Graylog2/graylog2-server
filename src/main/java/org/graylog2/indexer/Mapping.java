@@ -24,6 +24,7 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * Mapping.java: Sep 05, 2011 3:34:57 PM
@@ -35,18 +36,15 @@ import java.util.Map;
  */
 public class Mapping {
 
-    public static Map get() {
+    public static Map get(String type) {
         Map mapping = new HashMap();
         mapping.put("properties", partFieldProperties());
         mapping.put("dynamic_templates", partDefaultAllInDynamicTemplate());
 
         Map completeMapping = new HashMap();
-        completeMapping.put(Indexer.TYPE, mapping);
+        completeMapping.put(type, mapping);
 
-        Map spec = new HashMap();
-        spec.put("mappings", completeMapping);
-
-        return spec;
+        return completeMapping;
     }
 
     /*
