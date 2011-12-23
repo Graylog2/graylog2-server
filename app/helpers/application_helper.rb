@@ -24,13 +24,13 @@ module ApplicationHelper
 
   def get_ordered_severities_for_select
       [
-        ["Emergency", 0],
+        ["Emerg", 0],
         ["Alert", 1],
-        ["Critical", 2],
+        ["Crit", 2],
         ["Error", 3],
-        ["Warning", 4],
+        ["Warn", 4],
         ["Notice", 5],
-        ["Informational", 6],
+        ["Info", 6],
         ["Debug", 7]
       ]
   end
@@ -39,13 +39,13 @@ module ApplicationHelper
     return "None" if level == nil
 
     case level.to_i
-      when 0 then return "Emergency"
+      when 0 then return "Emerg"
       when 1 then return "Alert"
-      when 2 then return "Critical"
+      when 2 then return "Crit"
       when 3 then return "Error"
-      when 4 then return "Warning"
+      when 4 then return "Warn"
       when 5 then return "Notice"
-      when 6 then return "Informational"
+      when 6 then return "Info"
       when 7 then return "Debug"
     end
     return "Invalid"
