@@ -27,7 +27,6 @@ import java.util.HashSet;
 import java.util.ListIterator;
 import java.util.Map;
 import java.util.HashMap;
-import org.apache.log4j.Logger;
 
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
@@ -95,36 +94,42 @@ public class JsonAddData {
 		// String nxMessType = target.getFile();
 		Map<String,Object> localData = null;
 		
-		localData = nxParseJsonString(target.getShortMessage());
+		localData = parseJsonString(target.getShortMessage());
 		if(localData == null || localData.isEmpty()) {
 			return;
 		}
 		stuffGELF(target, localData);
 	}
 	
-	private static Map<String,Object> nxParseJsonString(String jsonString) {
+	private static Map<String,Object> parseJsonString(String jsonString) {
 	    HashMap<String,Object> result = new HashMap<String,Object>(100);
-
 	    JSONParser parser = new JSONParser();
 	    Object parsedJson = new Object();
+	    
+	    if (jsonString == null || jsonString.isEmpty()) {
+	    	LOG.error("parseJsonString got bad JSON string to parse");
+	    	result.clear();
+	    	return result;
+	    }
 	    try {
 	        parsedJson = parser.parse(jsonString);
-	        // System.out.println("parsedJson is "+parsedJson.getClass());
+	        LOG.debug("parsedJson is "+parsedJson.getClass());
 	    } catch (ParseException pe) {
-	    	LOG.error("Caught parsing exception");
+	    	LOG.error("Caught parsing exception in: "+jsonString);
 	    	result.clear();
 	    	return result;
 	    }
 	    
-	    if (parsedJson.getClass().equals(JSONObject.class)) {
-	    	// result.putAll((Map<String,Object>) parsedJson);
-	    	// System.out.println("JSON object => "+parsedJson);
-	    	result.putAll(walkJsonMap((JSONObject) parsedJson));
-	    } else if (parsedJson.getClass().equals(JSONArray.class)) {
-	    	// System.out.println("JSON array => "+parsedJson);
-	    	result.putAll(walkJsonArray("root", (JSONArray) parsedJson));
-	    } else {
-	    	// System.out.println("Parser returned object not in class JSONOBject or JSONArray. This should never happen.");
+	    try {
+	    	if (parsedJson.getClass().equals(JSONObject.class)) {
+	    		// result.putAll((Map<String,Object>) parsedJson);
+	    		result.putAll(walkJsonMap((JSONObject) parsedJson));
+	    	} else if (parsedJson.getClass().equals(JSONArray.class)) {
+	 	    	result.putAll(walkJsonArray("root", (JSONArray) parsedJson));
+	    	}
+	    } catch (Exception e) {
+	    	LOG.warn("Problem saving parsed JSON Map or Array");
+	    	result.clear();
 	    }
 	    return result;
 	}
@@ -136,23 +141,23 @@ public class JsonAddData {
 		}
 
 		Map<String,Object> walkMap = jsonToWalk;
-		// System.out.println(walkMap.entrySet());
-	    for (Map.Entry<String, Object> mapEntry : walkMap.entrySet()) {
-	        System.out.println(mapEntry.getKey()+" => "+mapEntry.getValue());
-	        if (isDrop(mapEntry.getKey())) {
-	        	continue;
-	        }
-			walkMapResult.put(mapEntry.getKey(), mapEntry.getValue());
+
+		try {
+			for (Map.Entry<String, Object> mapEntry : walkMap.entrySet()) {
+				if (!dropList.isEmpty() && isDrop(mapEntry.getKey())) {
+					continue;
+				}
+				walkMapResult.put(mapEntry.getKey(), mapEntry.getValue());
 			
-			if (mapEntry.getValue().getClass().equals(JSONObject.class)) {
-				// System.out.println("walkJasonMap found a JSONObject");
-				walkMapResult.putAll(walkJsonMap((JSONObject) mapEntry.getValue()));
-			} else if (mapEntry.getValue().getClass().equals(JSONArray.class)) {
-				// System.out.println("walkJasonMap found a JSONArray");
-				walkMapResult.putAll(walkJsonArray((String) mapEntry.getKey(), (JSONArray) mapEntry.getValue()));
-			} else {
-				// System.out.println("walkJasonMap found a type not requiring further processing");
+				if (mapEntry.getValue().getClass().equals(JSONObject.class)) {
+					walkMapResult.putAll(walkJsonMap((JSONObject) mapEntry.getValue()));
+				} else if (mapEntry.getValue().getClass().equals(JSONArray.class)) {
+					walkMapResult.putAll(walkJsonArray((String) mapEntry.getKey(), (JSONArray) mapEntry.getValue()));
+				}
 			}
+	    } catch (Exception e) {
+	    	LOG.warn("Problem walking JSON object and converting to map");
+	    	walkMapResult.clear();
 	    }
 	    return walkMapResult;
 	}
@@ -162,31 +167,37 @@ public class JsonAddData {
 		if (jsonArray.isEmpty() || arrayLabel.equals("")) {
 			return walkArrayResult;
 		}
-		ListIterator<JSONArray> iterator = jsonArray.listIterator();
-		while (iterator.hasNext()) {
-			String arrayKey = arrayLabel+"_"+iterator.nextIndex();
-			Object arrayElement = iterator.next();
-			System.out.println(arrayKey+" => "+arrayElement);
-			walkArrayResult.put(arrayKey, arrayElement);
-			if (arrayElement.getClass().equals(JSONObject.class)) {
-			 	walkArrayResult.putAll(walkJsonMap((JSONObject) arrayElement));
-			} else if (arrayElement.getClass().equals(JSONArray.class)) {
-				walkArrayResult.putAll(walkJsonArray(arrayLabel, (JSONArray) arrayElement));
-			} else {
-				// System.out.println("walkJSONArray found a type not requiring further processing");
+		try {
+			ListIterator<JSONArray> iterator = jsonArray.listIterator();
+			while (iterator.hasNext()) {
+				String arrayKey = arrayLabel+"_"+iterator.nextIndex();
+				Object arrayElement = iterator.next();
+				
+				walkArrayResult.put(arrayKey, arrayElement);
+				if (arrayElement.getClass().equals(JSONObject.class)) {
+					walkArrayResult.putAll(walkJsonMap((JSONObject) arrayElement));
+				} else if (arrayElement.getClass().equals(JSONArray.class)) {
+					walkArrayResult.putAll(walkJsonArray(arrayLabel, (JSONArray) arrayElement));
+				}
 			}
-
+		} catch (Exception e) {
+			LOG.warn("Problem walking JSON array and adding to map with keys");
+			walkArrayResult.clear();
 		}
 	    return walkArrayResult;
 	}
 
-	private static void stuffGELF(GELFMessage target, Map<String, Object> nxParsedJSON) {
+	private static void stuffGELF(GELFMessage target, Map<String, Object> parsedLocalData) {
 		// iterate over local Map and use message.addAdditionalData to provide to GELF message
-		for (Map.Entry<String, Object> entry : nxParsedJSON.entrySet()) {
-		    String key = entry.getKey();
-		    Object value = entry.getValue();
-		    // Stuff values from localData into GELF additionalData
-		    target.addAdditionalData("_"+key, value);
-		}		
+		try {
+			for (Map.Entry<String, Object> entry : parsedLocalData.entrySet()) {
+				String key = entry.getKey();
+				Object value = entry.getValue();
+				// Stuff values from localData into GELF additionalData
+				target.addAdditionalData("_"+key, value);
+			}
+		} catch (Exception e) {
+			LOG.warn("Problem adding parsed Additional Data to GELF message");
+		}
 	}
 }
