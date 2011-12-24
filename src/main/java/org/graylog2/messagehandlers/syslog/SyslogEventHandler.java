@@ -72,7 +72,7 @@ public class SyslogEventHandler implements SyslogServerSessionlessEventHandlerIF
 
         // Manually check for provided date because it's necessary to parse the GELF message. Second check for completness later.
         if (event.getDate() == null) {
-            LOG.info("Syslog message is missing date or could not be parsed. Not further handling. Message was: " + event.getRaw());
+            LOG.info("Syslog message is missing date or could not be parsed. Not further handling. Message was: " + new String(event.getRaw()));
             return;
         }
 
