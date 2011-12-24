@@ -59,6 +59,9 @@ public class Configuration {
     @Parameter(value = "mongodb_useauth", required = true)
     private boolean mongoUseAuth = false;
 
+    @Parameter(value = "allow_override_syslog_date", required = true)
+    private boolean allowOverrideSyslogDate = true;
+
     @Parameter(value = "elasticsearch_url", required = true)
     private String elasticsearchUrl = "http://localhost:9200/";
 
@@ -147,6 +150,10 @@ public class Configuration {
 
     public boolean getForceSyslogRdns() {
         return forceSyslogRdns;
+    }
+
+    public boolean getAllowOverrideSyslogDate() {
+        return allowOverrideSyslogDate;
     }
 
     public String getElasticSearchUrl() {
