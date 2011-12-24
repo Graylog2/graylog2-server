@@ -90,8 +90,6 @@ public class JsonAddData {
 	}
 		
 	public static void amplify(GELFMessage target) {
-		// String nxAppName = target.getFacility();
-		// String nxMessType = target.getFile();
 		Map<String,Object> localData = null;
 		
 		localData = parseJsonString(target.getShortMessage());
