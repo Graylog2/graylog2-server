@@ -30,6 +30,7 @@ import org.productivity.java.syslog4j.server.SyslogServerSessionlessEventHandler
 
 import java.net.SocketAddress;
 import java.net.UnknownHostException;
+import java.util.Date;
 import org.graylog2.Main;
 
 /**
@@ -70,10 +71,17 @@ public class SyslogEventHandler implements SyslogServerSessionlessEventHandlerIF
         LOG.debug("Raw: " + new String(event.getRaw()));
         LOG.debug("Host stripped from message? " + event.isHostStrippedFromMessage());
 
-        // Manually check for provided date because it's necessary to parse the GELF message. Second check for completness later.
+        // Check if date could be parsed.
         if (event.getDate() == null) {
-            LOG.info("Syslog message is missing date or could not be parsed. Not further handling. Message was: " + new String(event.getRaw()));
-            return;
+            if (Main.configuration.getAllowOverrideSyslogDate()) {
+                // empty Date constructor allocates a Date object and initializes it so that it represents the time at which it was allocated.
+                event.setDate(new Date());
+                LOG.info("Date could not be parsed. Was set to NOW because allow_override_syslog_date is true.");
+            } else {
+                LOG.info("Syslog message is missing date or date could not be parsed. (Possibly set allow_override_syslog_date to true) "
+                        + "Not further handling. Message was: " + new String(event.getRaw()));
+                return;
+            }
         }
 
         // Possibly overwrite host with RNDS if configured.
