@@ -283,24 +283,31 @@ public final class Main {
         }
     }
     
-    private static void initializeJsonAddData(String jsonAddDataFilePath) {
-    	if (configuration.isUseJsonAddData()) {
-    		shortMessageParser = new JsonAddData();
-    	} else {
-    		return;
+    private static void initializeJsonAddData(String jsonAddDataFile) {
+    	try {
+    		if (configuration.isUseJsonAddData()) {
+    			shortMessageParser = new JsonAddData();
+    			shortMessageParser.setEnableJsonAddData(true);
+    			LOG.debug("Set parsing shortMessage for Additional Data in JSON format");
+    		} else {
+    			LOG.debug("No parsing of shortMessage for Additional Data in JSON format");
+    			return;
+    		}
+    	} catch (Exception e) {
+    		LOG.fatal("Exception instantiating JSON Additional Data parser, exiting");
+    		System.exit(2);
     	}
-    	// don't currently throw any exceptions
-    	// try {
-    	if (jsonAddDataFilePath != null && !jsonAddDataFilePath.isEmpty()) {
-    		shortMessageParser = new JsonAddData();
-    		shortMessageParser.setJsonAddDataFilter(jsonAddDataFilePath);
-    		LOG.info("Using shortMessage parser drop list: "+jsonAddDataFilePath);
-    	} else {
-    		LOG.info("Using shortMessage parser without drop list.");
+
+    	try {
+    		if (jsonAddDataFile != null && !jsonAddDataFile.isEmpty()) {
+    			shortMessageParser.setJsonAddDataFilter(jsonAddDataFile);
+    			LOG.info("Initializing shortMessage parser drop list: "+jsonAddDataFile);
+    		} else {
+    			LOG.info("Using shortMessage parser without drop list.");
+    		}
+    	} catch (Exception e) {
+    		LOG.fatal("Could not load drop list for keys in JSON-based shortMessage");
     	}
-    	// } catch (Exception e) {
-    	//    LOG.warn("JSON shortMessage parser is active, but could not iniitalize drop list.");
-    	// }
     }
 
     private static void initializeMongoConnection(Configuration configuration) {

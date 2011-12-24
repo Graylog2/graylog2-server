@@ -27,11 +27,14 @@ import java.util.HashSet;
 import java.util.ListIterator;
 import java.util.Map;
 import java.util.HashMap;
+import org.apache.log4j.Logger;
 
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
+import org.apache.log4j.Logger;
+// import org.graylog2.Main;
 import org.graylog2.messagehandlers.gelf.GELFMessage;
 
 /**
@@ -46,22 +49,27 @@ import org.graylog2.messagehandlers.gelf.GELFMessage;
 
 
 public class JsonAddData {
+	private static final Logger LOG = Logger.getLogger(JsonAddData.class);
 	private static boolean enableJsonAddData = false;
 	private static HashSet<String> dropList = null;
 	
 	public JsonAddData() {
-		enableJsonAddData = true;
 	}
 	
-	public static boolean useJsonAddData() {
+	public static void setEnableJsonAddData(Boolean b) {
+		enableJsonAddData = b;
+	}
+	
+	public static boolean getEnableJsonAddData() {
 		return enableJsonAddData;
 	}
 	
-	public void setJsonAddDataFilter(String fileName) {
+	public void setJsonAddDataFilter(String fileName) throws IOException {
 		String dropString;
 		dropList = new HashSet<String>(100);
 		
 		if (fileName == null) {
+			new IOException("Received null string for drop list file name");
 			return;
 		}
 			
@@ -71,27 +79,24 @@ public class JsonAddData {
 				dropList.add(dropString.trim());
 			}
 		} catch (IOException e) {
-			// do something about bad file
+			new IOException("Failed reading Key dropping list for JSON-based parsing of shortMessage for Additional Data");
 		}
 	}
 	
 	private static boolean isDrop(String candidate) {
-		if (dropList.isEmpty()) {
+		if (dropList == null || dropList.isEmpty()) {
 			return false;
 		}
-		if (dropList.contains(candidate)) {
-			return true;
-		}
-		return false;
+		return dropList.contains(candidate);
 	}
 		
 	public static void amplify(GELFMessage target) {
 		// String nxAppName = target.getFacility();
 		// String nxMessType = target.getFile();
-		Map<String, Object> localData;
+		Map<String,Object> localData = null;
 		
 		localData = nxParseJsonString(target.getShortMessage());
-		if(localData.isEmpty()) {
+		if(localData == null || localData.isEmpty()) {
 			return;
 		}
 		stuffGELF(target, localData);
@@ -106,17 +111,17 @@ public class JsonAddData {
 	        parsedJson = parser.parse(jsonString);
 	        // System.out.println("parsedJson is "+parsedJson.getClass());
 	    } catch (ParseException pe) {
-	    	System.out.println("Caught parsing exception");
+	    	LOG.error("Caught parsing exception");
 	    	result.clear();
 	    	return result;
 	    }
 	    
 	    if (parsedJson.getClass().equals(JSONObject.class)) {
-	    	result.putAll((Map<String,Object>) parsedJson);
-	    	System.out.println("JSON object => "+parsedJson);
+	    	// result.putAll((Map<String,Object>) parsedJson);
+	    	// System.out.println("JSON object => "+parsedJson);
 	    	result.putAll(walkJsonMap((JSONObject) parsedJson));
 	    } else if (parsedJson.getClass().equals(JSONArray.class)) {
-	    	System.out.println("JSON array => "+parsedJson);
+	    	// System.out.println("JSON array => "+parsedJson);
 	    	result.putAll(walkJsonArray("root", (JSONArray) parsedJson));
 	    } else {
 	    	// System.out.println("Parser returned object not in class JSONOBject or JSONArray. This should never happen.");
@@ -126,7 +131,7 @@ public class JsonAddData {
 	    
 	private static Map<String,Object> walkJsonMap(JSONObject jsonToWalk) {
 		HashMap<String,Object> walkMapResult = new HashMap<String,Object>(20);
-		if (jsonToWalk.isEmpty()) {
+		if (jsonToWalk == null || jsonToWalk.isEmpty()) {
 			return walkMapResult;
 		}
 
