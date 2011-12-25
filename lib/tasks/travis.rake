@@ -7,5 +7,10 @@ namespace :test do
         FileUtils.copy(from, to, :verbose => true)
       end
     end
+
+    desc "Downlaod and run elasticsearch"
+    task :run_elasticsearch do
+      system('test/run_elasticsearch.sh')
+    end
   end
 end
