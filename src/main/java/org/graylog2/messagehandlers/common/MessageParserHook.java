@@ -29,6 +29,11 @@ import org.graylog2.messagehandlers.gelf.GELFMessage;
  * Filters events based on regular expression.
  *
  * @author Joshua Spaulding <joshua.spaulding@gmail.com>
+ * 
+ * Extracts Additional Data from key-value pairs in
+ * JSON-formatted GELF shortMessage
+ * @author Bob Webber <webber@panix.com>
+ * 
  */
 public class MessageParserHook implements MessagePreReceiveHookIF {
 
@@ -37,11 +42,17 @@ public class MessageParserHook implements MessagePreReceiveHookIF {
      */
     public void process(GELFMessage message) {
 		/**
-		 * Run GELFMessage through the rules engine
-		 */
-    	if (Main.drools != null)
-    	{
+		  * Run GELFMessage through the rules engine
+		  */
+    	if (Main.drools != null) {
     		Main.drools.evaluate(message);
     	}
+    	/**
+		 * Run GELF shortMessages through a JSON parser
+		 *   and collect all key-value pairs as Additional Data
+		 */
+    	if (Main.shortMessageParser.useJsonAddData()) {
+    		Main.shortMessageParser.amplify(message);
+    	}	
     }
 }

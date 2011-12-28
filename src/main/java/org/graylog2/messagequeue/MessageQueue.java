@@ -23,8 +23,11 @@ import org.apache.log4j.Logger;
 import org.graylog2.messagehandlers.gelf.GELFMessage;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Queue;
+import java.util.Set;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
 /**
@@ -43,6 +46,8 @@ public class MessageQueue {
     private static MessageQueue instance;
 
     private Queue<GELFMessage> queue = new ConcurrentLinkedQueue<GELFMessage>();
+    private Set<String> mappedTypes = Collections.synchronizedSet(new HashSet<String>());
+    private Set<String> newTypes = Collections.synchronizedSet(new HashSet<String>());
     private boolean closed = false;
 
     private int sizeLimit = SIZE_LIMIT_UNLIMITED;
@@ -78,7 +83,7 @@ public class MessageQueue {
                 throw new QueueLimitReachedException();
             }
         }
-
+        newTypes.add(message.getFacility());
         return queue.add(message);
     }
 
@@ -167,5 +172,13 @@ public class MessageQueue {
 
         return readBatch(getSize());
     }
+
+	public synchronized Set<String> getTypes() {
+		newTypes.removeAll(mappedTypes);
+		mappedTypes.addAll(newTypes);
+		Set<String> copyOfNewTypes = new HashSet<String>();
+		copyOfNewTypes.addAll(newTypes);
+		return copyOfNewTypes;
+	}
 
 }

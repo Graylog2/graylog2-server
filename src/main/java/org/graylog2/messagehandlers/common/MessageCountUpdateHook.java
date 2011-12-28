@@ -39,7 +39,7 @@ public class MessageCountUpdateHook implements MessagePostReceiveHookIF {
      */
     @Override
     public void process(GELFMessage message) {
-        // Five second througput for health page.
+        // Five second throughput for health page.
         this.counter.incrementFiveSecondThroughput();
 
         // Total count.
