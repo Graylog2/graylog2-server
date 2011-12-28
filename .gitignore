@@ -4,6 +4,7 @@
 .settings
 .DS_Store
 target
+bin/*
 build/*
 dist/*
 build-before-profiler.xml
