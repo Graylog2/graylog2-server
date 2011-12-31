@@ -6,7 +6,7 @@
 
     <groupId>org.graylog2</groupId>
     <artifactId>graylog2-server</artifactId>
-    <version>0.9.6</version>
+    <version>0.9.6p1</version>
     <packaging>jar</packaging>
 
     <properties>
