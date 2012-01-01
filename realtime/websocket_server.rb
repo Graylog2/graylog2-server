@@ -32,7 +32,7 @@ EventMachine.run {
         target = c[:target]
         log("Registered client [#{sid}] to channel <#{c[:target][:type]}:#{c[:target][:name]}>.")
       rescue => e
-        log("Error: #{e}")
+        log("Error: #{e} \n#{e.backtrace.join("\n")}")
       end
 
       ws.onclose do

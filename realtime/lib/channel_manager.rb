@@ -3,7 +3,7 @@ class ChannelManager
   def initialize
     @channels = {
       :overall => EM::Channel.new,
-      :streams => []
+      :streams => Hash.new
     }
   end
 
@@ -38,12 +38,24 @@ class ChannelManager
   # unregisters client from all channels.
   def unregister_client(sid)
     @channels[:overall].unsubscribe(sid)
-    @channels[:streams].each { |c| c.unsubscribe(sid) }
+    @channels[:streams].each { |k,v| v.unsubscribe(sid) }
   end
 
   private
   def determine_channel_target(ws)
-    :overall
+    method = ws.request["method"]
+    path = ws.request["path"]
+    raise "Invalid HTTP method <#{method}>" unless method == "GET"
+    
+    return :overall if path == "/overall"
+    if path =~ /^\/stream\//
+      r = path.scan(/\/stream\/(.+)\/?/)[0][0]
+      r.chop if r[-1] == "/" # Remove possible trailing slash.
+      
+      return r
+    end
+
+    raise "Invalid path <#{path}>. Only /overall or /stream are supported."
   end
 
   def register_stream_client(ws, stream_id)
