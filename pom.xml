@@ -82,6 +82,11 @@
             <artifactId>slf4j-log4j12</artifactId>
             <version>1.6.1</version>
         </dependency>
+        <dependency>
+            <groupId>org.elasticsearch</groupId>
+            <artifactId>elasticsearch</artifactId>
+            <version>0.18.5</version>
+        </dependency>
     </dependencies>
 
     <build>
@@ -148,6 +153,20 @@
     </build>
     <name>graylog2-server</name>
     <description>http://www.graylog2.org/</description>
+
+    <repositories>
+        <repository>
+            <id>sonatype.oss.releases</id>
+            <name>Sonatype OSS Releases Repository</name>
+            <url>http://oss.sonatype.org/content/repositories/releases</url>
+            <releases>
+                <enabled>true</enabled>
+            </releases>
+            <snapshots>
+                <enabled>false</enabled>
+            </snapshots>
+        </repository>
+    </repositories>
 </project>
 
 
