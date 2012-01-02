@@ -20,6 +20,15 @@
 
 package org.graylog2;
 
+import java.net.UnknownHostException;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
+import org.apache.log4j.Logger;
+import org.graylog2.messagehandlers.amqp.AMQPSubscribedQueue;
+import org.graylog2.messagehandlers.amqp.InvalidQueueTypeException;
+
 import com.github.joschi.jadconfig.Parameter;
 import com.github.joschi.jadconfig.ValidationException;
 import com.github.joschi.jadconfig.ValidatorMethod;
@@ -28,14 +37,6 @@ import com.github.joschi.jadconfig.validators.InetPortValidator;
 import com.github.joschi.jadconfig.validators.PositiveIntegerValidator;
 import com.github.joschi.jadconfig.validators.PositiveLongValidator;
 import com.mongodb.ServerAddress;
-import org.apache.log4j.Logger;
-import org.graylog2.messagehandlers.amqp.AMQPSubscribedQueue;
-import org.graylog2.messagehandlers.amqp.InvalidQueueTypeException;
-
-import java.net.UnknownHostException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
 
 /**
  * Helper class to hold configuration of Graylog2
@@ -112,6 +113,12 @@ public class Configuration {
 
     @Parameter(value = "gelf_listen_port", required = true, validator = InetPortValidator.class)
     private int gelfListenPort = 12201;
+
+    @Parameter(value = "use_gelf_tcp")
+    private boolean useGelfTcp = false;
+
+    @Parameter(value = "gelf_http_listen_port")
+    private int gelfHttpListenPort = 0;
 
     @Parameter("amqp_enabled")
     private boolean amqpEnabled = false;
@@ -229,6 +236,14 @@ public class Configuration {
 
     public int getGelfListenPort() {
         return gelfListenPort;
+    }
+
+    public boolean isUseGelfTcp() {
+        return useGelfTcp;
+    }
+
+    public int getGelfHttpListenPort() {
+        return gelfHttpListenPort;
     }
 
     public boolean isAmqpEnabled() {

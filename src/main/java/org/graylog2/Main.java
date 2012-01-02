@@ -20,11 +20,15 @@
 
 package org.graylog2;
 
-import com.beust.jcommander.JCommander;
-import com.github.joschi.jadconfig.JadConfig;
-import com.github.joschi.jadconfig.RepositoryException;
-import com.github.joschi.jadconfig.ValidationException;
-import com.github.joschi.jadconfig.repositories.PropertiesRepository;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.Writer;
+import java.net.InetSocketAddress;
+import java.util.List;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
+
 import org.apache.commons.io.IOUtils;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
@@ -35,7 +39,7 @@ import org.graylog2.messagehandlers.amqp.AMQPBroker;
 import org.graylog2.messagehandlers.amqp.AMQPSubscribedQueue;
 import org.graylog2.messagehandlers.amqp.AMQPSubscriberThread;
 import org.graylog2.messagehandlers.gelf.ChunkedGELFClientManager;
-import org.graylog2.messagehandlers.gelf.GELFMainThread;
+import org.graylog2.messagehandlers.gelf.GELFServer;
 import org.graylog2.messagehandlers.syslog.SyslogServerThread;
 import org.graylog2.messagequeue.MessageQueue;
 import org.graylog2.messagequeue.MessageQueueFlusher;
@@ -46,14 +50,11 @@ import org.graylog2.periodical.MessageCountWriterThread;
 import org.graylog2.periodical.MessageRetentionThread;
 import org.graylog2.periodical.ServerValueWriterThread;
 
-import java.io.FileWriter;
-import java.io.IOException;
-import java.io.Writer;
-import java.net.InetSocketAddress;
-import java.util.List;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.TimeUnit;
+import com.beust.jcommander.JCommander;
+import com.github.joschi.jadconfig.JadConfig;
+import com.github.joschi.jadconfig.RepositoryException;
+import com.github.joschi.jadconfig.ValidationException;
+import com.github.joschi.jadconfig.repositories.PropertiesRepository;
 
 /**
  * Main class of Graylog2.
@@ -168,7 +169,10 @@ public final class Main {
 
         // Start GELF threads
         if (configuration.isUseGELF()) {
-            initializeGELFThreads(configuration.getGelfListenAddress(), configuration.getGelfListenPort(), scheduler);
+            initializeGELFThreads(configuration.getGelfListenAddress(),
+                    configuration.getGelfListenPort(),
+                    configuration.isUseGelfTcp(),
+                    configuration.getGelfHttpListenPort(), scheduler);
         }
 
         // Initialize AMQP Broker if enabled
@@ -231,13 +235,18 @@ public final class Main {
         LOG.info("Retention time management active.");
     }
 
-    private static void initializeGELFThreads(String gelfAddress, int gelfPort, ScheduledExecutorService scheduler) {
-        GELFMainThread gelfThread = new GELFMainThread(new InetSocketAddress(gelfAddress, gelfPort));
-        gelfThread.start();
+    private static void initializeGELFThreads(String gelfAddress, int gelfPort, boolean useTcp, int httpListenPort, ScheduledExecutorService scheduler) {
 
-        scheduler.scheduleAtFixedRate(new ChunkedGELFClientManagerThread(ChunkedGELFClientManager.getInstance()), ChunkedGELFClientManagerThread.INITIAL_DELAY, ChunkedGELFClientManagerThread.PERIOD, TimeUnit.SECONDS);
+        if (GELFServer.create(new InetSocketAddress(gelfAddress, gelfPort), useTcp, httpListenPort)) {
+            scheduler.scheduleAtFixedRate(new ChunkedGELFClientManagerThread(
+                    ChunkedGELFClientManager.getInstance()),
+                    ChunkedGELFClientManagerThread.INITIAL_DELAY,
+                    ChunkedGELFClientManagerThread.PERIOD, TimeUnit.SECONDS);
+            LOG.info("GELF threads started");
+        } else {
+            LOG.error("GELF threads could not be started.");
+        }
 
-        LOG.info("GELF threads started");
     }
 
     private static void initializeSyslogServer(String syslogProtocol, int syslogPort) {

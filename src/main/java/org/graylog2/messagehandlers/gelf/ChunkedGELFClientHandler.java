@@ -20,6 +20,10 @@
 
 package org.graylog2.messagehandlers.gelf;
 
+import java.io.IOException;
+import java.net.DatagramPacket;
+import java.util.zip.DataFormatException;
+
 import org.apache.log4j.Logger;
 import org.graylog2.Tools;
 import org.graylog2.blacklists.Blacklist;
@@ -28,10 +32,6 @@ import org.graylog2.messagehandlers.common.HostUpsertHook;
 import org.graylog2.messagehandlers.common.MessageCountUpdateHook;
 import org.graylog2.messagehandlers.common.MessageParserHook;
 import org.graylog2.messagehandlers.common.ReceiveHookManager;
-
-import java.io.IOException;
-import java.net.DatagramPacket;
-import java.util.zip.DataFormatException;
 import org.graylog2.messagequeue.MessageQueue;
 
 /**
@@ -107,6 +107,10 @@ public class ChunkedGELFClientHandler extends GELFClientHandlerBase implements G
                 ChunkedGELFClientManager.getInstance().dropMessage(hash);
             }
         }
+    }
+
+    public ChunkedGELFClientHandler(byte[] data) throws GELFException, IOException, DataFormatException {
+        this(new DatagramPacket(data, data.length));
     }
 
     private void decompress(byte[] data, String hash) throws InvalidGELFCompressionMethodException, IOException {
