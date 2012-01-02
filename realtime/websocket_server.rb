@@ -1,47 +1,51 @@
 require 'em-websocket'
 require 'json'
-require './lib/channel_manager.rb'
+require File.expand_path('../lib/channel_manager.rb', __FILE__)
 
 # auth token
 # configurable
 
-def log(what)
-  puts "#{Time.now} - #{what}"
-end
+class WebsocketServer
 
-def subscribe(msg)
-  puts msg.inspect
-end
+  def log(what)
+    puts "#{Time.now} - #{what}"
+  end
 
-@channel_manager = ChannelManager.new
+  def initialize
+    @channel_manager = ChannelManager.new
+  end
 
-Thread.new do
-  @channel_manager.send_fakes
-end
-
-EventMachine.run {
-  
-  EventMachine::WebSocket.start(:host => "0.0.0.0", :port => 9001) do |ws|
-
-    ws.onopen do
- 
-      begin
-        log("Client connected.")
-        c = @channel_manager.register_client(ws)
-        sid = c[:sid]
-        target = c[:target]
-        log("Registered client [#{sid}] to channel <#{c[:target][:type]}:#{c[:target][:name]}>.")
-      rescue => e
-        log("Error: #{e} \n#{e.backtrace.join("\n")}")
-      end
-
-      ws.onclose do
-        @channel_manager.unregister_client(sid)
-        log("Unregistered client [#{sid}] from all channels.")
-      end
-
+  def start
+    Thread.new do
+      @channel_manager.send_fakes
     end
 
+    EventMachine.run {
+      
+      EventMachine::WebSocket.start(:host => "0.0.0.0", :port => 9001) do |ws|
+
+        ws.onopen do
+     
+          begin
+            log("Client connected.")
+            c = @channel_manager.register_client(ws)
+            sid = c[:sid]
+            target = c[:target]
+            log("Registered client [#{sid}] to channel <#{c[:target][:type]}:#{c[:target][:name]}>.")
+          rescue => e
+            log("Error: #{e} \n#{e.backtrace.join("\n")}")
+          end
+
+          ws.onclose do
+            @channel_manager.unregister_client(sid)
+            log("Unregistered client [#{sid}] from all channels.")
+          end
+
+        end
+
+      end
+      
+    }
   end
-  
-}
+
+end
