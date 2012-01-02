@@ -54,12 +54,12 @@ public class UdpGELFHandler extends FrameDecoder {
             break;
         default: {
             // Unknown protocol; discard everything and close the connection.
+            LOG.info("unknown protocol for GELF message, discarding");
             buffer.skipBytes(buffer.readableBytes());
             ctx.getChannel().close();
             return null;
         }
         }
-        LOG.info("passing on bytes to next handler");
         return buffer.readBytes(buffer.readableBytes());
     }
 

@@ -39,7 +39,7 @@ import org.jboss.netty.util.CharsetUtil;
 
 public class HttpGELFHandler extends SimpleChannelUpstreamHandler {
     private static final Logger LOG = Logger.getLogger(HttpGELFHandler.class);
-    
+
     @Override
     public void messageReceived(final ChannelHandlerContext ctx, final MessageEvent event)
             throws Exception {

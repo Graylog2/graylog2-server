@@ -244,7 +244,8 @@ public final class Main {
                     ChunkedGELFClientManagerThread.PERIOD, TimeUnit.SECONDS);
             LOG.info("GELF threads started");
         } else {
-            LOG.error("GELF threads could not be started.");
+            LOG.fatal("GELF threads could not be started.");
+            System.exit(1);
         }
 
     }

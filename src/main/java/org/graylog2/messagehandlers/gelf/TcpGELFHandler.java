@@ -22,29 +22,61 @@ package org.graylog2.messagehandlers.gelf;
 
 import org.apache.log4j.Logger;
 import org.jboss.netty.buffer.ChannelBuffer;
+import org.jboss.netty.channel.Channel;
 import org.jboss.netty.channel.ChannelHandlerContext;
-import org.jboss.netty.channel.ExceptionEvent;
-import org.jboss.netty.channel.MessageEvent;
-import org.jboss.netty.channel.SimpleChannelUpstreamHandler;
-import org.jboss.netty.util.CharsetUtil;
+import org.jboss.netty.channel.ChannelPipeline;
+import org.jboss.netty.handler.codec.compression.ZlibDecoder;
+import org.jboss.netty.handler.codec.compression.ZlibWrapper;
+import org.jboss.netty.handler.codec.frame.FrameDecoder;
 
-public class TcpGELFHandler extends SimpleChannelUpstreamHandler {
+public class TcpGELFHandler extends FrameDecoder {
     private static final Logger LOG = Logger.getLogger(TcpGELFHandler.class);
-    
+
+    // TODO refactor, duplicated across a couple of places now.
     @Override
-    public void messageReceived(final ChannelHandlerContext ctx, final MessageEvent e)
-            throws Exception {
-        final ChannelBuffer buffer = (ChannelBuffer) e.getMessage();
-        LOG.info("received TCP GELF message from " + e.getRemoteAddress());
-        new SimpleGELFClientHandler(buffer.toString(CharsetUtil.UTF_8)).handle();
+    protected Object decode(ChannelHandlerContext ctx, Channel channel,
+            ChannelBuffer buffer) throws Exception {
+        if (buffer.readableBytes() < 2) {
+            return null;
+        }
+        final int magic1 = buffer.getUnsignedByte(buffer.readerIndex());
+        final int magic2 = buffer.getUnsignedByte(buffer.readerIndex() + 1);
+        final byte[] data = new byte[] {(byte) magic1, (byte) magic2};
+
+        switch (GELF.getGELFType(data)) {
+        case GELF.TYPE_GZIP:
+            enableGzip(ctx);
+            break;
+        case GELF.TYPE_ZLIB:
+            enableZlib(ctx);
+            break;
+        default: {
+            // Unknown protocol; discard everything and close the connection.
+            LOG.info("unknown protocol for GELF message, discarding");
+            buffer.skipBytes(buffer.readableBytes());
+            ctx.getChannel().close();
+            return null;
+        }
+        }
+        return buffer.readBytes(buffer.readableBytes());
     }
 
-    @Override
-    public void exceptionCaught(final ChannelHandlerContext ctx, final ExceptionEvent e)
-            throws Exception {
-        LOG.error("Could not handle TCP GELF message", e.getCause());
-        e.getChannel().close();
+    private void enableZlib(final ChannelHandlerContext ctx) {
+        LOG.debug("enabling handling of zlib gelf messages on this connection");
+
+        final ChannelPipeline pipeline = ctx.getPipeline();
+        pipeline.addLast("zlibdeflater", new ZlibDecoder(ZlibWrapper.ZLIB));
+        pipeline.addLast("handler", new SimpleGELFHandler());
+        pipeline.remove(this);
     }
 
-    
+    private void enableGzip(final ChannelHandlerContext ctx) {
+        LOG.debug("enabling handling of gzip gelf messages on this connection");
+
+        final ChannelPipeline pipeline = ctx.getPipeline();
+        pipeline.addLast("gzipdeflater", new ZlibDecoder(ZlibWrapper.GZIP));
+        pipeline.addLast("handler", new SimpleGELFHandler());
+        pipeline.remove(this);
+    }
+
 }
