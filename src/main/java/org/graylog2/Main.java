@@ -30,6 +30,7 @@ import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.graylog2.database.MongoConnection;
 import org.graylog2.forwarders.forwarders.LogglyForwarder;
+import org.graylog2.indexer.ElasticSearchHttpIndexer;
 import org.graylog2.indexer.Indexer;
 import org.graylog2.messagehandlers.amqp.AMQPBroker;
 import org.graylog2.messagehandlers.amqp.AMQPSubscribedQueue;
@@ -39,15 +40,9 @@ import org.graylog2.messagehandlers.gelf.GELFMainThread;
 import org.graylog2.messagehandlers.syslog.SyslogServerThread;
 import org.graylog2.messagequeue.MessageQueue;
 import org.graylog2.messagequeue.MessageQueueFlusher;
-import org.graylog2.periodical.BulkIndexerThread;
-import org.graylog2.periodical.ChunkedGELFClientManagerThread;
-import org.graylog2.periodical.HostCounterCacheWriterThread;
-import org.graylog2.periodical.MessageCountWriterThread;
-import org.graylog2.periodical.MessageRetentionThread;
-import org.graylog2.periodical.ServerValueWriterThread;
+import org.graylog2.periodical.*;
 
 import java.io.FileWriter;
-import java.io.IOException;
 import java.io.Writer;
 import java.net.InetSocketAddress;
 import java.util.List;
@@ -127,20 +122,12 @@ public final class Main {
 
         // XXX ELASTIC: put in own method
         // Check if the index exists. Create it if not.
+        Indexer indexer = null;
+
         try {
-            if (Indexer.indexExists()) {
-                LOG.info("Index exists. Not creating it.");
-            } else {
-                LOG.info("Index does not exist! Trying to create it ...");
-                if (Indexer.createIndex()) {
-                    LOG.info("Successfully created index.");
-                } else {
-                    LOG.fatal("Could not create Index. Terminating.");
-                    System.exit(1);
-                }
-            }
-        } catch (IOException e) {
-            LOG.fatal("IOException while trying to check Index. Make sure that your ElasticSearch server is running.", e);
+            indexer = new ElasticSearchHttpIndexer(configuration.getElasticSearchIndexName(), "message");
+        } catch (Exception e) {
+            LOG.fatal("Error while connecting to elasticsearch server. Make sure that your elasticsearch server is running.", e);
             System.exit(1);
         }
 
@@ -161,7 +148,7 @@ public final class Main {
         initializeMessageCounters(scheduler);
 
         // Inizialize message queue.
-        initializeMessageQueue(scheduler, configuration);
+        initializeMessageQueue(scheduler, configuration, indexer);
 
         // Write initial ServerValue information.
         writeInitialServerValues(configuration);
@@ -181,13 +168,13 @@ public final class Main {
 
         // Start thread that automatically removes messages older than retention time.
         if (commandLineArguments.performRetention()) {
-            initializeMessageRetentionThread(scheduler);
+            initializeMessageRetentionThread(scheduler, indexer);
         } else {
             LOG.info("Not initializing retention time cleanup thread because --no-retention was passed.");
         }
 
         // Add a shutdown hook that tries to flush the message queue.
-	Runtime.getRuntime().addShutdownHook(new MessageQueueFlusher());
+	    Runtime.getRuntime().addShutdownHook(new MessageQueueFlusher(indexer));
 
         LOG.info("Graylog2 up and running.");
     }
@@ -199,13 +186,13 @@ public final class Main {
         LOG.info("Host count cache is up.");
     }
 
-    private static void initializeMessageQueue(ScheduledExecutorService scheduler, Configuration configuration) {
+    private static void initializeMessageQueue(ScheduledExecutorService scheduler, Configuration configuration, Indexer indexer) {
         // Set the maximum size if it was configured to something else than 0 (= UNLIMITED)
         if (configuration.getMessageQueueMaximumSize() != MessageQueue.SIZE_LIMIT_UNLIMITED) {
             MessageQueue.getInstance().setMaximumSize(configuration.getMessageQueueMaximumSize());
         }
 
-        scheduler.scheduleAtFixedRate(new BulkIndexerThread(configuration), BulkIndexerThread.INITIAL_DELAY, configuration.getMessageQueuePollFrequency(), TimeUnit.SECONDS);
+        scheduler.scheduleAtFixedRate(new BulkIndexerThread(configuration, indexer), BulkIndexerThread.INITIAL_DELAY, configuration.getMessageQueuePollFrequency(), TimeUnit.SECONDS);
 
         LOG.info("Message queue initialized .");
     }
@@ -224,9 +211,9 @@ public final class Main {
         LOG.info("Server value writer up.");
     }
 
-    private static void initializeMessageRetentionThread(ScheduledExecutorService scheduler) {
+    private static void initializeMessageRetentionThread(ScheduledExecutorService scheduler, Indexer indexer) {
         // Schedule first run. This is NOT at fixed rate. Thread will itself schedule next run with current frequency setting from database.
-        scheduler.schedule(new MessageRetentionThread(),0,TimeUnit.SECONDS);
+        scheduler.schedule(new MessageRetentionThread(indexer), 0, TimeUnit.SECONDS);
 
         LOG.info("Retention time management active.");
     }

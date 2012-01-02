@@ -34,16 +34,18 @@ import java.util.Map;
  * @author Lennart Koopmann <lennart@socketfeed.com>
  */
 public class Mapping {
+    
+    private static String TYPE = "message";
 
-    public static Map get() {
-        Map mapping = new HashMap();
+    public static Map<String, Object> get() {
+        Map<String, Object> mapping = new HashMap<String, Object>();
         mapping.put("properties", partFieldProperties());
         mapping.put("dynamic_templates", partDefaultAllInDynamicTemplate());
 
-        Map completeMapping = new HashMap();
-        completeMapping.put(Indexer.TYPE, mapping);
+        Map<String, Map> completeMapping = new HashMap<String, Map>();
+        completeMapping.put(TYPE, mapping);
 
-        Map spec = new HashMap();
+        Map<String, Object> spec = new HashMap<String, Object>();
         spec.put("mappings", completeMapping);
 
         return spec;
@@ -52,11 +54,11 @@ public class Mapping {
     /*
      * Disable analyzing for every field by default.
      */
-    public static List partDefaultAllInDynamicTemplate() {
-        List dynamicTemplates = new LinkedList();
-        Map template = new HashMap();
-        Map defaultAll = new HashMap();
-        Map notAnalyzed = new HashMap();
+    private static List<Map> partDefaultAllInDynamicTemplate() {
+        List<Map> dynamicTemplates = new LinkedList<Map>();
+        Map<String, Map> template = new HashMap<String, Map>();
+        Map<String, Object> defaultAll = new HashMap<String, Object>();
+        Map<String, String> notAnalyzed = new HashMap<String, String>();
         notAnalyzed.put("index", "not_analyzed");
 
         // Match all.
@@ -73,8 +75,8 @@ public class Mapping {
     /*
      * Enable analyzing for some fields again. Like for message and full_message.
      */
-    public static Map partFieldProperties() {
-        Map properties = new HashMap();
+    private static Map partFieldProperties() {
+        Map<String, Map<String, String>> properties = new HashMap<String, Map<String, String>>();
 
         properties.put("message", analyzedString());
         properties.put("full_message", analyzedString());
@@ -85,8 +87,8 @@ public class Mapping {
         return properties;
     }
 
-    public static Map analyzedString() {
-        Map type = new HashMap();
+    private static Map<String, String> analyzedString() {
+        Map<String, String> type = new HashMap<String, String>();
         type.put("index", "analyzed");
         type.put("type", "string");
         type.put("analyzer", "whitespace");
@@ -94,8 +96,8 @@ public class Mapping {
         return type;
     }
 
-    public static Map typeNumberDouble() {
-        Map type = new HashMap();
+    private static Map<String, String> typeNumberDouble() {
+        Map<String, String> type = new HashMap<String, String>();
         type.put("type", "double");
 
         return type;

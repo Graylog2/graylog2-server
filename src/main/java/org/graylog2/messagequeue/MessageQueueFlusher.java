@@ -19,10 +19,11 @@
  */
 package org.graylog2.messagequeue;
 
-import java.util.List;
 import org.apache.log4j.Logger;
 import org.graylog2.indexer.Indexer;
 import org.graylog2.messagehandlers.gelf.GELFMessage;
+
+import java.util.List;
 
 /**
  * MessageQueueFlusher.java: Nov 17, 2011 7:02:40 PM
@@ -32,6 +33,12 @@ import org.graylog2.messagehandlers.gelf.GELFMessage;
 public class MessageQueueFlusher extends Thread {
 
     private static final Logger LOG = Logger.getLogger(MessageQueueFlusher.class);
+
+    private Indexer indexer;
+
+    public MessageQueueFlusher(Indexer indexer) {
+        this.indexer = indexer;
+    }
 
     @Override
     public void run() {
@@ -43,7 +50,7 @@ public class MessageQueueFlusher extends Thread {
             
             List<GELFMessage> messages = MessageQueue.getInstance().readAll();
             LOG.info("Flushing all " + messages.size() + " messages to indexer.");
-            Indexer.bulkIndex(messages);
+            indexer.bulkIndex(messages);
         } catch (Exception e) {
             LOG.warn("Error while flushing messages from queue: " + e.getMessage(), e);
         } finally {
