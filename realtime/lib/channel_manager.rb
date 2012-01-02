@@ -1,4 +1,11 @@
+class InvalidHTTPVerbException < RuntimeError
+end
+class InvalidPathException < RuntimeError
+end
+
 class ChannelManager
+
+  attr_reader :channels
 
   def initialize
     @channels = {
@@ -11,6 +18,9 @@ class ChannelManager
 
     loop do
       @channels[:overall].push("OHAI")
+      @channels[:streams].each do |k,v|
+        v.push("FOR STREAM #{k}")
+      end
       sleep 1
     end
 
@@ -45,24 +55,23 @@ class ChannelManager
   def determine_channel_target(ws)
     method = ws.request["method"]
     path = ws.request["path"]
-    raise "Invalid HTTP method <#{method}>" unless method == "GET"
+    raise(InvalidHTTPVerbException, "Invalid HTTP method <#{method}>") unless method == "GET"
     
     return :overall if path == "/overall"
     if path =~ /^\/stream\//
       r = path.scan(/\/stream\/(.+)\/?/)[0][0]
-      r.chop if r[-1] == "/" # Remove possible trailing slash.
+      r.chop! if r[-1] == "/" # Remove possible trailing slash.
       
       return r
     end
 
-    raise "Invalid path <#{path}>. Only /overall or /stream are supported."
+    raise(InvalidPathException, "Invalid path <#{path}>. Only /overall or /stream are supported.")
   end
 
   def register_stream_client(ws, stream_id)
     if @channels[:streams][stream_id].nil?
       @channels[:streams][stream_id] = EM::Channel.new
     end
-
     @channels[:streams][stream_id].subscribe { |msg| push_message(ws, msg) }
   end
 

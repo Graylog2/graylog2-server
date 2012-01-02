@@ -24,7 +24,7 @@ EventMachine.run {
   EventMachine::WebSocket.start(:host => "0.0.0.0", :port => 9001) do |ws|
 
     ws.onopen do
-
+ 
       begin
         log("Client connected.")
         c = @channel_manager.register_client(ws)
