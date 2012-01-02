@@ -14,16 +14,13 @@ class ChannelManager
     }
   end
 
-  def send_fakes
-
-    loop do
-      @channels[:overall].push("OHAI")
-      @channels[:streams].each do |k,v|
-        v.push("FOR STREAM #{k}")
-      end
-      sleep 1
+  def route_message(streams, message)
+    push_to_overall(message)
+    
+    # Possibly push to stream consumers.
+    if streams.is_a?(Array) and streams.size > 0
+      push_to_streams(streams, message)
     end
-
   end
 
   def register_client(ws)
@@ -78,6 +75,19 @@ class ChannelManager
   # actually sends the message to the client
   def push_message(ws, msg)
     ws.send(msg)
+  end
+  
+  def push_to_overall(message)
+    @channels[:overall].push(message)
+  end
+
+  def push_to_streams(streams, message)
+    streams.each do |stream|
+      # Just ignore if nobody subscribed to the stream.
+      next if @channels[:streams][stream].nil?
+
+      @channels[:streams][stream].push(message)
+    end
   end
 
 end

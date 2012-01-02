@@ -1,28 +1,35 @@
 require 'em-websocket'
 require 'json'
 require File.expand_path('../lib/channel_manager.rb', __FILE__)
+require File.expand_path('../lib/realtime.rb', __FILE__)
 
 # auth token
-# configurable
 
 class WebsocketServer
+
+  attr_reader :listen_host, :listen_port
 
   def log(what)
     puts "#{Time.now} - #{what}"
   end
 
-  def initialize
+  def initialize(listen_host, listen_port)
+    @listen_host = listen_host
+    @listen_port = listen_port
+
     @channel_manager = ChannelManager.new
   end
 
   def start
     Thread.new do
-      @channel_manager.send_fakes
+      Realtime.subscribe do |message|
+        @channel_manager.route_message(message["streams"], message["message"])
+      end
     end
 
     EventMachine.run {
       
-      EventMachine::WebSocket.start(:host => "0.0.0.0", :port => 9001) do |ws|
+      EventMachine::WebSocket.start(:host => @listen_host, :port => @listen_port) do |ws|
 
         ws.onopen do
      

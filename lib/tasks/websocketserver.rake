@@ -5,7 +5,7 @@ namespace :realtime do
 
     desc "Starts the websocket server"
     task :start_server do
-      s = WebsocketServer.new
+      s = WebsocketServer.new("127.0.0.1", 9001)
       s.start
     end
 
