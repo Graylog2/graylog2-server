@@ -24,10 +24,13 @@ import com.mongodb.BasicDBObject;
 import com.mongodb.DB;
 import com.mongodb.DBCollection;
 import com.mongodb.DBObject;
+import com.mongodb.WriteConcern;
+import com.mongodb.WriteResult;
 import org.apache.log4j.Logger;
 import org.graylog2.Tools;
 
 import java.util.Map;
+import org.graylog2.messagehandlers.gelf.GELFMessage;
 
 /**
  * MongoBridge.java: Apr 13, 2010 9:13:03 PM
@@ -95,6 +98,16 @@ public class MongoBridge {
         obj.put("hosts", hosts);
 
         MongoConnection.getInstance().getMessageCountsColl().insert(obj);
+    }
+
+    public void writeToRealtimeCollection(GELFMessage message) {
+        BasicDBObject obj = new BasicDBObject();
+
+        obj.put("received_at", Tools.getUTCTimestampWithMilliseconds());
+        obj.put("message", message.getShortMessage());
+        obj.put("streams", message.getStreamIds());
+
+        WriteResult result = MongoConnection.getInstance().getRealtimeMessagesColl().insert(obj, WriteConcern.NORMAL);
     }
 
     /**

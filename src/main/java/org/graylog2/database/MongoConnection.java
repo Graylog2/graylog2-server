@@ -37,11 +37,11 @@ public final class MongoConnection {
     private Mongo m;
     private DB db;
 
-    private DBCollection messagesCollection;
-    private DBCollection historicServerValuesCollection;
+    private DBCollection realtimeMessagesCollection;
     private DBCollection messageCountsCollection;
 
-    private long messagesCollSize;
+    private static final String REALTIME_MESSAGE_COLLECTION_NAME = "realtime_messages";
+    private static final int REALTIME_MESSAGE_COLLECTION_SIZE = 52428800; // 50 MB
 
     private MongoConnection() {}
 
@@ -77,8 +77,6 @@ public final class MongoConnection {
         MongoOptions options = new MongoOptions();
         options.connectionsPerHost = maxConnections;
         options.threadsAllowedToBlockForConnectionMultiplier = threadsAllowedToBlockForConnectionMultiplier;
-
-        this.messagesCollSize = messagesCollSize;
 
         try {
 
@@ -120,40 +118,33 @@ public final class MongoConnection {
     }
 
     /**
-     * Get the messages collection. Lazily creates a new, capped one based on the
-     * messages_collection_size from graylog2.conf if there is none.
+     * Get the message realtime collection. Lazily creates a new, capped one
+     * if there is none.
      *
      * @return The messages collection
      */
-    public DBCollection getMessagesColl() {
-        if (this.messagesCollection != null) {
-            return this.messagesCollection;
+    public DBCollection getRealtimeMessagesColl() {
+        // Return cached collection if it has been checked and created already.
+        if (this.realtimeMessagesCollection != null) {
+            return this.realtimeMessagesCollection;
         }
 
         // Collection has not been cached yet. Do it now.
         DBCollection coll = null;
 
         // Create a capped collection if the collection does not yet exist.
-        if(MongoConnection.getInstance().getDatabase().collectionExists("messages")) {
-            coll = MongoConnection.getInstance().getDatabase().getCollection("messages");
+        if(MongoConnection.getInstance().getDatabase().collectionExists(REALTIME_MESSAGE_COLLECTION_NAME)) {
+            coll = MongoConnection.getInstance().getDatabase().getCollection(REALTIME_MESSAGE_COLLECTION_NAME);
         } else {
             coll = MongoConnection.getInstance()
                     .getDatabase()
-                    .createCollection("messages", BasicDBObjectBuilder.start()
+                    .createCollection(REALTIME_MESSAGE_COLLECTION_NAME, BasicDBObjectBuilder.start()
                     .add("capped", true)
-                    .add("size", messagesCollSize)
+                    .add("size", REALTIME_MESSAGE_COLLECTION_SIZE)
                     .get());
         }
 
-        coll.ensureIndex(new BasicDBObject("_id", 1));
-        coll.ensureIndex(new BasicDBObject("created_at", 1));
-        coll.ensureIndex(new BasicDBObject("host", 1));
-        coll.ensureIndex(new BasicDBObject("streams", 1));
-
-        coll.ensureIndex(new BasicDBObject("facility", 1));
-        coll.ensureIndex(new BasicDBObject("level", 1));
-
-        this.messagesCollection = coll;
+        this.realtimeMessagesCollection = coll;
         return coll;
     }
 
