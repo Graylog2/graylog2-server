@@ -9,7 +9,7 @@ class Realtime
     db = Mongo::Connection.new().db(DB)
     coll = db.collection(COLLECTION)
 
-    cursor = Mongo::Cursor.new(coll, :tailable => true)
+    cursor = Mongo::Cursor.new(coll, :tailable => true, :skip => coll.count)
 
     loop do
       if message = cursor.next_document

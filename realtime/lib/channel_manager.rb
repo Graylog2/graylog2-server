@@ -14,12 +14,14 @@ class ChannelManager
     }
   end
 
-  def route_message(streams, message)
-    push_to_overall(message)
-    
+  def route_message(streams, received_at, message)
+    date = format_date(Time.at(received_at)) rescue "unknown"
+    full_message = "#{date} - #{message}"
+    push_to_overall(full_message)
+   
     # Possibly push to stream consumers.
     if streams.is_a?(Array) and streams.size > 0
-      push_to_streams(streams, message)
+      push_to_streams(streams, full_message)
     end
   end
 
@@ -89,6 +91,10 @@ class ChannelManager
 
       @channels[:streams][stream].push(message)
     end
+  end
+
+  def format_date(t)
+    "#{t.strftime('%H:%M:%S')}.#{t.usec.to_s[0,3]}" rescue "0"
   end
 
 end
