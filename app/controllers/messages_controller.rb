@@ -121,9 +121,10 @@ class MessagesController < ApplicationController
   end
 
   def realtime
+    render :text => "enable realtime in general.yml", :status => :forbidden and return if !::Configuration.realtime_enabled?
     @content_class = "console"
     @has_realtime = true
-    @websocket_target = ::Configuration.realtime_websocket_url + "/overall"
+    @websocket_target = ::Configuration.realtime_websocket_url + "/overall" rescue nil
     @auth_token = ::Configuration.realtime_websocket_token
   end
 

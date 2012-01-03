@@ -99,6 +99,8 @@ class Configuration
 
   def self.realtime_websocket_token
     token = realtime_config :token, nil
+    return nil if token.nil?
+
     raise "configured websocket token (general.yml) must be alphanumeric" unless token =~ /^\w+$/i
 
     return token
