@@ -83,6 +83,7 @@ class ChannelManager
 
   def push_to_streams(streams, message)
     streams.each do |stream|
+      stream = stream.to_s
       # Just ignore if nobody subscribed to the stream.
       next if @channels[:streams][stream].nil?
 
