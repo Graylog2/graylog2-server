@@ -7,7 +7,11 @@
   });
 </script>
 
-<h2>Message <span class="highlighted"><%= @message.id %></span></h2>
+<h2>Message
+  <span class="highlighted">
+    <%= link_to @message.id, { :controller => "messages", :action => "show", :id => @message.id } %>
+  </span>
+</h2>
 
 <p class="messages-show-message"><%= @message.message %></p>
 
