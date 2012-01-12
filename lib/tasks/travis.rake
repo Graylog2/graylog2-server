@@ -8,5 +8,9 @@ namespace :test do
       end
     end
 
+    desc "Downlaod and run elasticsearch"
+    task :run_elasticsearch do
+      system('test/run_elasticsearch.sh')
+    end
   end
 end
