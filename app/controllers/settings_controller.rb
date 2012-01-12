@@ -28,5 +28,4 @@ class SettingsController < ApplicationController
 
     redirect_to :controller => controller, :action => "index"
   end
-
 end

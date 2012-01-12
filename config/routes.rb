@@ -18,7 +18,6 @@ Graylog2WebInterface::Application.routes.draw do
       get :showrange
       post :deletebystream
       post :deletebyquickfilter
-      get :realtime
     end
     member do
       post :show

@@ -53,6 +53,10 @@ Your current time: <%= gl_date(Time.zone.now) %>
 
 <%= awesome_link "Open dashboard", dashboard_index_path, :style => "display: inline;", :target => "_blank" %>
 
+<% if ::Configuration.livetail_enabled %>
+  <%= awesome_link "Go to live tail", :controller => "livetail" %>
+<% end %>
+
 <br /><br />
 <%= awesome_link "Server health", health_index_path %>
 

@@ -14,6 +14,9 @@ class Setting
   TYPE_MESSAGE_MAX_COUNT = 3
   TYPE_MESSAGE_MAX_COUNT_STANDARD = 100
 
+  TYPE_LIVETAIL_ROW_COUNT = 4
+  TYPE_LIVETAIL_ROW_COUNT_STANDARD = 200
+
   TYPE_RETENTION_TIME_DAYS = 5
   TYPE_RETENTION_TIME_DAYS_STANDARD = 60
 
@@ -39,6 +42,12 @@ class Setting
   def self.get_message_max_count current_user
     setting = Setting.where(:user_id => current_user.id, :setting_type => TYPE_MESSAGE_MAX_COUNT).first
     return TYPE_MESSAGE_MAX_COUNT_STANDARD if setting.blank?
+    return setting.value
+  end
+
+  def self.get_livetail_row_count current_user
+    setting = Setting.where(:user_id => current_user.id, :setting_type => TYPE_LIVETAIL_ROW_COUNT).first
+    return TYPE_LIVETAIL_ROW_COUNT_STANDARD if setting.blank?
     return setting.value
   end
 

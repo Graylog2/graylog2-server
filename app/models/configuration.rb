@@ -81,31 +81,6 @@ class Configuration
     streamalarm_config :subject, "[graylog2] Stream alarm!"
   end
 
-  def self.realtime_config(key, default)
-    nested_general_config :realtime, key, default
-  end
-
-  def self.realtime_enabled?
-    realtime_config :enabled, false
-  end
-
-  def self.realtime_websocket_url
-    url = realtime_config :websocket_url, nil
-    return nil if url.nil?
-    url.chop! if url[-1] == "/"
-
-    return url
-  end
-
-  def self.realtime_websocket_token
-    token = realtime_config :token, nil
-    return nil if token.nil?
-
-    raise "configured websocket token (general.yml) must be alphanumeric" unless token =~ /^\w+$/i
-
-    return token
-  end
-
   def self.email_config(key = nil, default = nil)
     if key
       config_value @email_config, Rails.env, key, default
