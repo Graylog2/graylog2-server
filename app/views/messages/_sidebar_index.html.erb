@@ -48,6 +48,13 @@ Your current time: <%= gl_date(Time.zone.now) %>
   </li>
 </ul>
 
+<% if !MessageGateway.mapping_valid? %>
+  <div id="invalid-mapping-warning">
+    Your ElasticSearch mapping is invalid! Make sure it has been created by the graylog2-server.
+    <%= tooltip("Fixing-invalid-ElasticSearch-mappings") %>
+  </div>
+<% end %>
+
 <% if current_user.role == "admin" %>
 <br />
 

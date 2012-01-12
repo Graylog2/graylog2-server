@@ -601,3 +601,10 @@ label {
   padding: 5px;
   padding-left: 10px;
 }
+
+#invalid-mapping-warning {
+  margin-top: 10px;
+  margin-bottom: 10px;
+  font-weight: bold;
+  color: #f00;
+}
