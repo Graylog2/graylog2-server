@@ -120,9 +120,12 @@ class MessagesController < ApplicationController
     @total_count = @messages.total_result_count
   end
 
-  def getcompletemessage
-    message = Message.find params[:id]
-    render :text => CGI.escapeHTML(message.message)
+  def realtime
+    render :text => "enable realtime in general.yml", :status => :forbidden and return if !::Configuration.realtime_enabled?
+    @content_class = "console"
+    @has_realtime = true
+    @websocket_target = ::Configuration.realtime_websocket_url + "/overall" rescue nil
+    @auth_token = ::Configuration.realtime_websocket_token
   end
 
 end
