@@ -117,21 +117,27 @@ class MessageGateway
             must { term(:streams, opts[:stream_id]) }
           end
           
+          # Severity (or higher)
+          if !filters[:severity].blank? and !filters[:severity_above].blank?
+            must { range(:level, :to => filters[:severity].to_i) }
+          end
+      
+          # Timeframe.
+          if !filters[:date].blank?
+            range = Quickfilter.get_conditions_timeframe(filters[:date])
+            must { range(:created_at, :gt => range[:greater], :lt => range[:lower]) }
+          end
+          
           unless opts[:hostname].blank?
             must { term(:host, opts[:hostname]) }
           end
+          
+          # Possibly narrow down to stream?
+          unless opts[:stream_id].blank?
+            must { term(:streams, opts[:stream_id]) }
+          end
+          
         end
-      end
-      
-      # Severity (or higher)
-      if !filters[:severity].blank? and !filters[:severity_above].blank?
-        filter 'range', { :level => { :to => filters[:severity].to_i } }
-      end
-
-      # Timeframe.
-      if !filters[:date].blank?
-        range = Quickfilter.get_conditions_timeframe(filters[:date])
-        filter 'range', { :created_at => { :gt => range[:greater], :lt => range[:lower],  } }
       end
 
     end
