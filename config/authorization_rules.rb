@@ -7,10 +7,9 @@ authorization do
       :getcompletemessage,
       :getsimilarmessages,
       :showrange,
-      :around,
       :deletebyquickfilter,
       :deletebystream,
-      :getnewmessagecount
+      :realtime
     ]
 
     has_permission_on :streams, :to => [
@@ -31,27 +30,22 @@ authorization do
       :subscribe,
       :togglesubscription,
       :rename,
-      :categorize
+      :categorize,
+      :clone,
+      :toggledisabled,
+      :addcolumn,
+      :removecolumn,
+      :shortname,
+      :related
     ]
     has_permission_on :streamrules, :to => [:create, :destroy]
     has_permission_on :streamcategories, :to => [:create, :destroy]
 
     has_permission_on :forwarders, :to => [:create, :destroy]
 
-    has_permission_on :analytics, :to => [:index, :messagespread]
+    has_permission_on :analytics, :to => [:index, :shell]
 
-    has_permission_on :hosts, :to => [:index, :show, :destroy, :quickjump]
-    has_permission_on :hostgroups, :to => [
-      :new,
-      :create,
-      :hosts,
-      :index,
-      :settings,
-      :show,
-      :destroy,
-      :rename
-    ]
-    has_permission_on :hostgroup_hosts, :to => [:create, :destroy]
+    has_permission_on :hosts, :to => [:index, :show, :destroy, :quickjump, :showrange]
 
     has_permission_on :blacklists, :to => [:index, :show, :create, :destroy]
     has_permission_on :blacklistedterms, :to => [:create, :destroy]
@@ -64,15 +58,18 @@ authorization do
 
     has_permission_on :dashboard, :to => [:index]
 
-    has_permission_on :health, :to => [:index, :currentthroughput]
+    has_permission_on :health, :to => [:index]
+
+    has_permission_on :retentiontime, :to => [:index]
   end
 
   role :reader do
-    has_permission_on :streams, :to => [:index, :show, :analytics, :favorite, :unfavorite, :alertable, :showrange] do
+    has_permission_on :streams, :to => [:index, :show, :analytics, :showrange] do
       if_attribute :users => contains { user }
     end
     has_permission_on :sessions, :to => [:destroy]
-    has_permission_on :messages, :to => [:index, :show, :around]
+    has_permission_on :messages, :to => [:index, :show]
+    has_permission_on :health, :to => [ :index ]
   end
 end
 

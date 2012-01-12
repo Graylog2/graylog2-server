@@ -1,29 +1,16 @@
 module StreamsHelper
-  def streamrule_type_to_human type
-    case type
-      when Streamrule::TYPE_MESSAGE then
-        return "Message"
-      when Streamrule::TYPE_HOST then
-        return "Host"
-      when Streamrule::TYPE_SEVERITY then
-        return "Severity"
-      when Streamrule::TYPE_FACILITY then
-        return "Facility"
-      when Streamrule::TYPE_TIMEFRAME then
-        return "Timeframe"
-      when Streamrule::TYPE_ADDITIONAL then
-        return "Additional field"
-    end
-    return "Invalid Rule"
+  def streamrule_type_to_human(type)
+    name = Streamrule.rule_names[type]
+    name.blank? ? "Invalid rule" : name
   end
 
   def streamrule_to_human rule
-    type = streamrule_type_to_human rule.rule_type
-    value = h(rule.value)
+    type = streamrule_type_to_human(rule.rule_type)
+    value = CGI::escapeHTML(rule.value)
 
-    # Add human readable value type for SEVERITY and FACILITY.
-    if rule.rule_type == Streamrule::TYPE_SEVERITY
-        value = "#{syslog_level_to_human(rule.value)} (#{h(rule.value.to_i)})"
+    # Add human readable value type for SEVERITY
+    if rule.rule_type == Streamrule::TYPE_SEVERITY or rule.rule_type == Streamrule::TYPE_SEVERITY_OR_HIGHER
+        value = "#{syslog_level_to_human(rule.value)} (#{rule.value.to_i})"
     end
 
     return "<span class=\"black\">#{type}</span>: <i>#{value}</i>"
@@ -36,7 +23,7 @@ module StreamsHelper
       tabs.push ["Rules", rules_stream_path(@stream)] if permitted_to?(:rules, @stream)
       tabs.push ["Forwarders", forward_stream_path(@stream)] if permitted_to?(:forward, @stream)
       tabs.push ["Analytics", analytics_stream_path(@stream)] if permitted_to?(:analytics, @stream)
-      tabs.push ["Settings", settings_stream_path(@stream)] if permitted_to?(:show, @stream)
+      tabs.push ["Settings", settings_stream_path(@stream)] if permitted_to?(:settings, @stream)
     end
 
     tabs

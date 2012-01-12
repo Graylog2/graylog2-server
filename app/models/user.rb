@@ -16,7 +16,6 @@ class User
 
   validates_presence_of     :email
   validates_length_of       :email,    :within => 6..100 #r@a.wk
-  validates_format_of       :email,    :with => Authentication.email_regex, :message => Authentication.bad_email_message
 
   STANDARD_ROLE = :admin
 
@@ -29,14 +28,15 @@ class User
   field :email, :type => String
   field :name, :type => String
   field :password, :type => String
-  field :password_confirmation, :type => String
   field :role, :type => String
   field :crypted_password, :type => String
   field :salt, :type => String
   field :remember_token, :type => String
   field :remember_token_expires_at
-  field :stream_ids
   field :last_version_check, :type => Integer
+
+  index :login,          :background => true, :unique => true
+  index :remember_token, :background => true, :unique => true
 
   has_and_belongs_to_many :streams, :inverse_of => :users
   has_and_belongs_to_many :favorite_streams,   :class_name => "Stream", :inverse_of => :favorited_streams
@@ -77,6 +77,10 @@ class User
 
   def email=(value)
     write_attribute :email, (value ? value.downcase : nil)
+  end
+
+  def reader?
+    role == "reader"
   end
 
   def roles

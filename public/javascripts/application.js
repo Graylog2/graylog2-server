@@ -27,25 +27,39 @@ $(document).ready(function(){
                 break;
             case '3':
                 field = $('.stream-value-severity');
-                master = $('#stream-value-severity-master');
                 break;
             case '4':
                 field = $('.stream-value-facility');
                 break;
             case '5':
                 field = $('.stream-value-timeframe');
-                help = $('#stream-value-timeframe-help').show();
+                help = $('#stream-value-timeframe-help');
                 break;
             case '6':
                 field = $('.stream-value-additional-field');
-                help = $('#stream-value-additional-field-help').show();
+                help = $('#stream-value-additional-field-help');
+                break;
+            case '8':
+                field = $('.stream-value-severity-or-higher');
+                break;
+            case '9':
+                field = $('.stream-value-host-regex');
+                notify("Remember to possibly escape characters in the regular expression." +
+                       "A typical mistake is forgetting to escape dots in host names.");
+                break;
+            case '10':
+                field = $('.stream-value-fullmessage');
+                break;
+            case '11':
+                field = $('.stream-value-filename');
+                notify("Remember to possibly escape characters in the regular expression." +
+                       "A typical mistake is forgetting to escape the dot in filenames.");
                 break;
         }
         field.removeAttr("disabled");
         field.show();
 
         if (help != null) { help.show(); }
-        if (master != null) { master.show(); }
     });
 
     // Stream Quick chooser
@@ -71,16 +85,6 @@ $(document).ready(function(){
         }
     });
 
-    // "more" link in message tables
-    $('.messages-more').bind('click', function() {
-        var message_id = this.id;
-        $('#message-' + message_id).html('<img src="/images/loading-small.gif" alt="loading" style="position: relative; top: 2px;"/>');
-        $.post("/messages/getcompletemessage", {id: message_id}, function(data) {
-            $('#message-' + message_id).html(data);
-        });
-        return false;
-    });
-
     // Full message view resizing.
     $('#messages-show-message-full').css('width', parseInt($('#content').css('width'))-15);
     $('#messages-show-message-full').css('height', parseInt($('#messages-show-message-full').css('height'))+10);
@@ -92,28 +96,41 @@ $(document).ready(function(){
       return false;
     });
 
-    $('#analytics-new-messages-update-hours').numeric();
+    $('#analytics-new-messages-update-range').numeric();
     // Visuals: Update of new messages graph.
     $('#analytics-new-messages-update-submit').bind('click', function() {
-      i = $('#analytics-new-messages-update-hours');
+      i = $('#analytics-new-messages-update-range');
       v = parseInt(i.val());
-
+      
       if (v <= 0) {
         return false;
+      }
+
+      // Possibly multiply if days or weeks was selected as range.
+      if ($('#range_type_days').attr("checked")) {
+        range_type = "days";
+        range_num = v*24;
+      } else if($('#range_type_weeks').attr("checked")) {
+        range_type = "weeks";
+        range_num = v*24*7;
+      } else {
+        range_type = "hours";
+        range_num = v;
       }
 
       // Show loading message.
       $("#analytics-new-messages-update-loading").show();
 
       // Update graph.
-      $.post($(this).attr("data-updateurl") + "&hours=" + v, function(data) {
+      $.post($(this).attr("data-updateurl") + "&hours=" + range_num, function(data) {
         json = eval('(' + data + ')');
 
         // Plot is defined inline. (I suck at JavaScript)
         plot(json.data);
 
         // Update title.
-        $('#analytics-new-messages-hours').html(v);
+        $('#analytics-new-messages-range').html(v);
+        $('#analytics-new-messages-range-type').html(range_type);
 
         // Hide loading message.
         $("#analytics-new-messages-update-loading").hide();
@@ -143,8 +160,8 @@ $(document).ready(function(){
       }
     );
 
-    // Streams overview: Sparklines.
-    $(".streams-stream-sparkline").sparkline(
+    // Entity lists: Sparklines.
+    $(".el-e-sparkline").sparkline(
       "html",
       {
         type: "line",
@@ -189,29 +206,39 @@ $(document).ready(function(){
       if ($(this).attr("data-nowait") == undefined) {
         $(this).html("Please wait...");
       }
-      $(this).parent().submit();
+      
+      if ($(this).attr("data-confirm") == undefined) {
+        // Directly follow form if no confirmation was requested.
+        $(this).parent().submit();
+        return false;
+      }
+
+      if (confirm($(this).attr("data-confirm"))) {
+        $(this).parent().submit();
+      }
+
       return false;
     });
 
-    // Show full message in sidebar.
-    $(".message-row").bind("click", function() {
-      $("#gln").show();
+    $("a").bind("click", function(){
+      // Avoid double handling.
+      if ($(this).hasClass("submit-link")) {
+        return false;
+      }
 
-      $.post("/messages/" + $(this).attr("id") + "?partial=true", function(data) {
-        $("#sidebar-inner").html(data);
-
-        // Show sidebar if hidden.
-        if (!$("#main-right").is(":visible")) {
-          $("#main-left").animate({ width: '65%' }, 700, function() {
-
-            // Show sidebar when main body is completely squeezed.
-            $("#main-right").show();
-          });
+      if ($(this).attr("data-confirm") == undefined) {
+        return true;
+      } else {
+        if (confirm($(this).attr("data-confirm"))) {
+          return true;
+        } else {
+          return false;
         }
-
-        $("#gln").hide();
-      });
+      }
     });
+
+    // Show full message in sidebar.
+    bindMessageSidebarClicks();
 
     // User role settings in new user form.
     $("#user_role").bind("change", function() {
@@ -243,12 +270,65 @@ $(document).ready(function(){
     })
 
     // Key bindings.
-    standardMapKeyOptions = { overlayClose:true }
-    $.mapKey("s", function() { $("#modal-stream-chooser").modal(standardMapKeyOptions); });
-    $.mapKey("h", function() { $("#modal-host-chooser").modal(standardMapKeyOptions); });
-
+    //standardMapKeyOptions = { overlayClose:true }
+    //$.mapKey("s", function() { $("#modal-stream-chooser").modal(standardMapKeyOptions); });
+    //$.mapKey("h", function() { $("#modal-host-chooser").modal(standardMapKeyOptions); });
+  
+    setInterval(function(){
+      // Update current throughput every 5 seconds
+      $.post("/health/currentthroughput", function(data) {
+        json = eval('(' + data + ')');
+        count = $(".health-throughput-current");
+        count.html(json.count);
+        count.fadeOut(200, function() {
+          count.fadeIn(200);
+        });
+      });
+  
+      // Update message queue size every 5 seconds
+      $.post("/health/currentmqsize", function(data) {
+        mqjson = eval('(' + data + ')');
+        mqcount = $(".health-mqsize-current");
+        mqcount.html(mqjson.count);
+        mqcount.fadeOut(200, function() {
+          mqcount.fadeIn(200);
+        });
+      });
+    }, 5000);
 });
 
 function buildHostCssId(id) {
   return "visuals-spread-hosts-" + id.replace(/=/g, '');
+}
+
+function bindMessageSidebarClicks() {
+  $(".message-row").bind("click", function() {
+    $("#gln").show();
+
+    $.post( relative_url_root + "/messages/" + $(this).attr("id") + "?partial=true", function(data) {
+      $("#sidebar-inner").html(data);
+
+      // Show sidebar if hidden.
+      if (!$("#main-right").is(":visible")) {
+        $("#main-left").animate({ width: '65%' }, 700, function() {
+          // Show sidebar when main body is completely squeezed.
+          $("#main-right").show();
+        });
+      }
+
+      $("#gln").hide();
+    });
+  });
+}
+
+// srsly, javascript... - http://stackoverflow.com/questions/1219860/javascript-jquery-html-encoding
+function htmlEncode(v) {
+  return $('<div/>').text(v).html();
+}
+
+function notify(what) {
+  $.gritter.add({
+    title: "Notification",
+    text: what
+  })
 }

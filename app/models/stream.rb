@@ -14,6 +14,10 @@ class Stream
   validates_presence_of :title
   validates_numericality_of :alarm_limit, :allow_nil => true
   validates_numericality_of :alarm_timespan, :allow_nil => true, :greater_than => 0
+  validates_length_of :shortname, :maximum => 23
+  validates_uniqueness_of :shortname, :allow_nil => true
+  validates_format_of :shortname, :with => /^[A-Za-z0-9_]+$/, :allow_nil => true
+  validate :valid_regexes
 
   field :title, :type => String
   field :alarm_limit, :type => Integer
@@ -25,10 +29,18 @@ class Stream
   field :last_subscription_check, :type => Integer
   field :last_alarm_check, :type => Integer
   field :alarm_active, :type => Boolean
+  field :disabled, :type => Boolean
+  field :additional_columns, :type => Array, :default => []
+  field :shortname, :type => String
+  field :related_streams_matcher, :type => String
 
   def self.find_by_id(_id)
     _id = $1 if /^([0-9a-f]+)-/ =~ _id
     first(:conditions => { :_id => BSON::ObjectId(_id)})
+  end
+
+  def title_possibly_disabled
+    disabled ? title + " (disabled)" : title if title
   end
 
   def alerted?(user)
@@ -44,21 +56,12 @@ class Stream
   end
 
   def to_param
-    "#{id}-#{title.parameterize}"
+    title.blank? ? id.to_s : "#{id}-#{title.parameterize}"
   end
 
   # giving back IDs because all_with_subscribers does too
   def self.all_with_enabled_alerts
     all.where({:alarm_active => true}).collect &:id
-  end
-
-  def self.get_message_count(stream_id)
-    return 0 if Stream.find(stream_id).streamrules.blank?
-    Message.count(:conditions => Message.by_stream(stream_id).criteria)
-  end
-
-  def message_count
-    Stream.get_message_count(self.id)
   end
 
   def message_count_since(since)
@@ -75,7 +78,8 @@ class Stream
   end
 
   def self.message_count_since(stream_id, since)
-    Message.by_stream(stream_id).where(:created_at.gt => since.to_i).count
+    minutes_ago = (Time.now.to_f-since.to_f)/60 rescue 0
+    MessageCount.total_count_of_last_minutes(minutes_ago, :stream_id => stream_id)
   end
 
   def self.get_distinct_hosts(stream_id)
@@ -94,23 +98,41 @@ class Stream
   end
 
   def all_users_with_alarm
-    uids = AlertedStream.where(:stream_id => id)
-
-    users = Array.new
-    uids.each do |uid|
-      user = User.find(uid.user_id)
-      users << user unless user.blank?
-    end
-
-    return users
+    alerts = AlertedStream.where(:stream_id => id)
+    alerts.collect &:user
   end
 
   def accessable_for_user?(user)
     return true if user.role == "admin"
 
     allowed_streams = user.streams.collect { |s| s.id.to_s }
-    return false unless allowed_streams.include?(self.id.to_s)
+    allowed_streams.include?(self.id.to_s)
+  end
 
-    return true
+  def related_streams
+    return Array.new if self.related_streams_matcher.blank?
+    Stream.where(:title => /#{self.related_streams_matcher}/, :_id => { "$ne" => self.id }).all
+  end
+
+  def alarm_status(user)
+    return :disabled if !self.alarm_active or self.alarm_limit.blank? or self.alarm_timespan.blank?
+
+    unless alarm_force
+      return :disabled if !alerted?(user)
+    end
+
+    stream_count = self.message_count_since(self.alarm_timespan.minutes.ago.to_f)
+    return stream_count > self.alarm_limit ? :alarm : :no_alarm
+  end
+
+  private
+  def valid_regexes
+    unless self.related_streams_matcher.blank?
+      begin
+        Regexp.new(/#{self.related_streams_matcher}/)
+      rescue RegexpError
+        errors.add(:related_streams_matcher, "Invalid regular expression")
+      end
+    end
   end
 end

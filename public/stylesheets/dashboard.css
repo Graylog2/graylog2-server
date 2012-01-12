@@ -44,6 +44,7 @@ th {
     text-shadow: -1px -1px 0 #060;
     font-size: 50px;
     margin-left: 15px;
+    display: inline;
 }
 
 .status-problems {

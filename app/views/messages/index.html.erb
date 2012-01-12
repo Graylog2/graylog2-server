@@ -2,8 +2,6 @@
   <%= render :partial => partial_for(:sidebar, @scoping, params[:action]) %>
 <% end %>
 
-<%= javascript_include_tag 'messageupdater' %>
-
 <%= render :partial => partial_for(:quickfilter_button) %>
 
 <div id="messages-content">
@@ -11,16 +9,8 @@
 
   <%= render :partial => "quickfilter"%>
 
-  <% unless params[:filters].blank? or !Configuration.allow_deleting %>
-  <div id="messages-quickfilter-delete">
-    <%= form_tag('/messages/deletebyquickfilter') do -%>
-      <%= hidden_field_tag 'filters', params[:filters].to_json %>
-      <%= awesome_submit_link "Delete all messages hit by this quickfilter" %>
-    <% end -%>
-  </div>
-  <% end %>
-
-  <br style="clear: both;" />
-
-  <%= render :partial => "messages/table", :locals => { :messages => @messages, :total_messages => @total_count } %>
+  <br />
+  <%= render :partial => "messages/table", :locals => { :messages => @messages,
+                                                        :total_messages => (@quickfilter_result_count.blank? ? @total_count : @quickfilter_result_count), 
+                                                        :additional_columns => @stream ? @stream.additional_columns : [] } %>
 </div>

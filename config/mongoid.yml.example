@@ -1,3 +1,4 @@
+# Use environment variables
 production:
   host: <%= ENV['MONGOID_HOST'] %>
   port: <%= ENV['MONGOID_PORT'] %>
@@ -5,7 +6,22 @@ production:
   password: <%= ENV['MONGOID_PASSWORD'] %>
   database: <%= ENV['MONGOID_DATABASE'] %>
 
-#production:
-#  host: localhost
-#  port: 27017
-#  database: graylog2
+# or specify values manually
+# production:
+#   host: localhost
+#   port: 27017
+#   username:
+#   password:
+#   database: graylog2
+
+
+# Values below are for development and testing.
+# You may comment out them or just ignore.
+
+development:
+  host: localhost
+  database: graylog2_development
+
+test:
+  host: localhost
+  database: graylog2_test

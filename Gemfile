@@ -1,19 +1,22 @@
 source :rubygems
 
-gem 'rack', '~> 1.2.2'
-gem 'rails', '~> 3.0.6'
+gem 'rack', '~> 1.3.5'
+gem 'rake', '~> 0.9.2'
+gem 'rails', '~> 3.1.3'
 gem 'json', '~> 1.5.1'
-gem 'plucky', '~> 0.3.6'
 gem 'chronic', '~> 0.3.0'
 gem 'pony', '~> 1.1'  # unusual version number
-gem 'graylog2-declarative_authorization', :require => 'declarative_authorization'
-gem 'mongoid', '2.0.1' # 2.0.2 dropped paggination. TODO: update
-gem 'bson_ext', "~> 1.3.0"
-
-# TODO https://github.com/ph7/system-timer/issues/15
-if RUBY_VERSION.start_with?('1.8')
-  gem 'SystemTimer', '~> 1.2.3'
-end
+gem 'graylog2-declarative_authorization', '~> 0.5.2', :require => 'declarative_authorization'
+gem 'hoptoad_notifier', '~> 2.4.9'
+gem 'rpm_contrib', '~> 2.1.1'
+gem 'mongoid', '2.3.3'
+gem "tire", "~> 0.3.12"
+gem 'bson', "~> 1.3.1"
+gem 'bson_ext', "~> 1.3.1", :platforms => :ruby
+gem 'home_run', '~> 1.0.2', :platforms => :ruby
+gem 'SystemTimer', '~> 1.2.3', :require => 'system_timer', :platforms => :ruby_18
+gem 'rails_autolink', '~> 1.0.4'
+gem 'kaminari', '~> 0.12.4'
 
 group :development, :test do
   # might be useful to generate fake data in development
@@ -21,10 +24,16 @@ group :development, :test do
   gem 'faker', '~> 0.9.5'
 end
 
+group :development do
+  # gem 'ruby-prof', '~> 0.10.5'  # works nice with NewRelic RPM Developer Mode
+  gem 'passenger', '~> 3.0.9'
+end
+
 group :test do
-  gem 'ci_reporter'
+  gem 'ci_reporter', '~> 1.6.4'
   gem 'shoulda', '~> 2.11.3'
   gem 'shoulda-activemodel', '0.0.2', :require => 'shoulda/active_model'  # fixed version - too hacky
   gem 'mocha', '~> 0.9.12'
   gem 'database_cleaner', '~> 0.6.0'
+  gem 'timecop', '~> 0.3.5'
 end

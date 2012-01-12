@@ -5,21 +5,8 @@ Sham.title { Faker::Lorem.words(15).join }
 Sham.name { Faker::Lorem.words(15).join }
 Sham.host { Faker::Internet.domain_name }
 
-Host.blueprint do
- host
- message_count { rand(50000) }
-end
-
-Message.blueprint do
-  message { Faker::Lorem.words(100).join }
-  facility { rand(15) }
-  level { rand(8) }
-  host
-  created_at { Time.now.to_i }
-  deleted { false }
-end
-
 Stream.blueprint do
+  shortname SecureRandom.hex(6)
   title
 end
 
@@ -37,10 +24,19 @@ User.blueprint do
   role { :admin }
 end
 
-Hostgroup.blueprint do
-  name
+Host.blueprint do
+ host
+ message_count { rand(50000) }
 end
 
-HostgroupHost.blueprint do
-  hostname { "example.org" }
+AlertedStream.blueprint do
+end
+
+MessageCount.blueprint do
+end
+
+Setting.blueprint do
+end
+
+ServerValue.blueprint do
 end

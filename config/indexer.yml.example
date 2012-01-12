@@ -1,0 +1,3 @@
+production:
+  url: http://localhost:9200/
+  index_name: graylog2

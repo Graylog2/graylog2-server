@@ -28,7 +28,6 @@
 
 #messages-quickfilter {
     margin-top: 15px;
-    margin-bottom: 10px;
 }
 
 #messages-quickfilter-fields label {
@@ -66,7 +65,9 @@
     font-size: 13px;
     font-family: monospace;
     line-height: 15px;
-    overflow: auto;
+    overflow-y: hidden;
+    overflow-x: auto;
+    padding-bottom: 3px;
 }
 
 .messages-full-message {
@@ -99,8 +100,7 @@
 
 /* Hosts */
 #hosts-hosts {
-    position: relative;
-    top: -15px;
+  margin-top: 15px;
 }
 
 /* Blacklist */
@@ -171,6 +171,10 @@
   font-size: 27px;
   font-family: Georgia,"Times New Roman",Times,serif;
   display: block;
+}
+
+.streams-stream-title-disabled a {
+  color: #aaa;
 }
 
 .streams-stream-description {
@@ -316,6 +320,39 @@
   font-style: italic;
 }
 
+#streams-settings-clone-modal {
+  width: 500px;
+  display: none;
+}
+
+#streams-additional-colums-list {
+  list-style-type: square;
+  margin-left: 20px;
+  margin-bottom: 5px;
+}
+
+#streams-additional-colums-list {
+  font-size: 13px;
+}
+
+#streams-additional-colums-list a {
+  font-size: 11px;
+}
+
+#related-streams {
+  margin-top: 7px;
+  font-size: 13px;
+}
+
+#related-streams li {
+  padding-top: 1px;
+  padding-bottom: 1px;
+  padding-left: 5px;
+  margin-top: 1px;
+  margin-bottom: 1px;
+}
+
+
 /* Hosts */
 #hosts-quickjump {
     margin-bottom: 15px;
@@ -323,10 +360,6 @@
 
 #hosts-delete {
   float: right;
-}
-
-#hosts-new-hostgroup-link {
-  margin-bottom: 10px;
 }
 
 /* Statistics */
@@ -386,6 +419,10 @@
   display: none;
 }
 
+#users-streams-selector {
+  margin-top: 3px;
+}
+
 /* Livetail */
 .content-livetail {
   background-color: #000 !important;
@@ -440,33 +477,6 @@
   color: #f00;
 }
 
-/* Hostgroups */
-#hostgroups-add-hosts {
-  width: 800px;
-}
-
-#hostgroups-add-hosts-simple {
-  float: left;
-}
-
-#hostgroups-add-hosts-regex {
-  position: relative;
-  top: -4px;
-  float: right;
-}
-
-#hostgroups-add-left {
-  float: left;
-  padding-right: 150px;
-}
-
-#hostgroups-add-right {
-  width: 430px;
-  height: 430px;
-  overflow: hidden;
-  margin-top: 40px;
-}
-
 /* Visuals */
 #visuals-spread-vis {
  height: 380px;
@@ -494,7 +504,7 @@
   margin-bottom: 10px;
 }
 
-#analytics-new-messages-update-hours {
+#analytics-new-messages-update-range {
   width: 25px;
 }
 
@@ -505,6 +515,7 @@
 }
 
 .favorite-streams-title {
+  padding-left: 3px;
   color: #000;
 }
 
@@ -555,7 +566,7 @@
 }
 
 /* Health */
-#health-throughput {
+.health-numbers {
   padding: 15px;
   padding-top: 25px;
   background-color: #333;
@@ -564,20 +575,24 @@
   font-family: Georgia,"Times New Roman",Times,serif;
 }
 
-#health-throughput-current {
+.health-numbers-number-highlighted {
   color: #FD0C99;
 }
 
-.health-throughput-title {
+.health-numbers-number-as-text {
+  font-size: 46px;
+}
+
+.health-numbers-title {
   font-size: 30px;
 }
 
-.health-throughput-label {
+.health-numbers-label {
   text-transform: uppercase;
   font-size: 16px;
 }
 
-.health-throughput-explanation {
+.health-numbers-explanation {
   font-size: 15px;
 }
 
@@ -699,4 +714,67 @@
 
 .legend {
     display: none !important;
+}
+
+/* Analytics shell - Shell itself is in shell.css */
+.analytics-shell-explanation {
+  list-style-type: square;
+  margin-left: 20px;
+}
+
+.analytics-shell-distinct-result {
+  list-style-type: square;
+  margin-left: 40px;
+  font-size: 18px;
+  font-family: Georgia,"Times New Roman",Times,serif;
+}
+
+.analytics-shell-distinct-result li {
+  margin-bottom: 7px;
+}
+
+.analytics-shell-debug-link {
+  margin-top: 15px;
+  float: right;
+}
+
+.analytics-shell-debug {
+  margin-top: 15px;
+  font-family: monospace;
+  display: none;
+}
+
+/* Realtime view */
+#realtime-messages li {
+  font-family: monospace;
+  font-size: 13px;
+}
+
+.realtime-messages-message-date {
+  color: #fd0c99;
+}
+
+#realtime-debug-log-open {
+  float: right;
+  padding-right: 5px;
+}
+
+#realtime-debug-log {
+  display: none;
+  margin-bottom: 15px;
+  border: 1px dotted #f00;
+  padding: 3px;
+  font-weight: bold;
+}
+
+.realtime-debug-log-date {
+  font-weight: normal;
+}
+
+.realtime-status-disconnected {
+  color: #f00;
+}
+
+.realtime-status-connected {
+  color: #0f0;
 }

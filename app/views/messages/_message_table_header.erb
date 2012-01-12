@@ -1,11 +1,19 @@
 <h1>Messages</h1>
 
-<% if Configuration.allow_version_check and (@last_version_check.nil? or @last_version_check < 30.minutes.ago.to_i) %>
+<% if ::Configuration.allow_version_check and (@last_version_check.nil? or @last_version_check < 30.minutes.ago.to_i) %>
   <%= render :partial => "version_check" %>
 <% end %>
 
 Currently containing <span class="highlighted"><%= number_with_delimiter(@total_count, :delimiter => '.') %></span> messages.
 
+<% if @total_count > 0 %>
+  Oldest message is from <span class="highlighted"><%= gl_date(Time.at(MessageGateway.oldest_message.created_at)) %></span>.
+<% end %>
+
 <% message_count_interval = Setting.get_message_count_interval(current_user) %>
-<span class="highlighted"><%=h Message.count_of_last_minutes(Setting.get_message_count_interval(current_user)) %></span>
-messages in the last <%=h message_count_interval %> minutes.
+Stored <span class="highlighted">
+  <%= number_with_delimiter(MessageCount.total_count_of_last_minutes(Setting.get_message_count_interval(current_user)), :delimiter => '.') %>
+</span>
+messages in the last <%= message_count_interval %> minutes.
+
+<br />

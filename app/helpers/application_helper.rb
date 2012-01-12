@@ -1,4 +1,10 @@
 module ApplicationHelper
+
+  # Returns formatted time
+  def time_to_formatted_s(t)
+    (t.strftime('%Y-%m-%d %H:%M:%S') + "<span class='time-light'>.#{t.usec.to_s[0,3]}</span>").html_safe
+  end
+
   def menu_item title, where
     current = String.new
     if where.instance_of?(Hash)
@@ -18,13 +24,13 @@ module ApplicationHelper
 
   def get_ordered_severities_for_select
       [
-        ["Emergency", 0],
+        ["Emerg", 0],
         ["Alert", 1],
-        ["Critical", 2],
+        ["Crit", 2],
         ["Error", 3],
-        ["Warning", 4],
+        ["Warn", 4],
         ["Notice", 5],
-        ["Informational", 6],
+        ["Info", 6],
         ["Debug", 7]
       ]
   end
@@ -33,13 +39,13 @@ module ApplicationHelper
     return "None" if level == nil
 
     case level.to_i
-      when 0 then return "Emergency"
+      when 0 then return "Emerg"
       when 1 then return "Alert"
-      when 2 then return "Critical"
+      when 2 then return "Crit"
       when 3 then return "Error"
-      when 4 then return "Warning"
+      when 4 then return "Warn"
       when 5 then return "Notice"
-      when 6 then return "Informational"
+      when 6 then return "Info"
       when 7 then return "Debug"
     end
     return "Invalid"
@@ -72,11 +78,14 @@ module ApplicationHelper
   end
 
   def flot_graph_loader(options)
-   if options[:stream_id].blank?
-     url = visuals_path("totalgraph", :hours => options[:hours])
-   else
-     url = visuals_path("streamgraph", :stream_id => options[:stream_id], :hours => options[:hours])
-   end
+    raise "You can only pass stream_id OR hostname" if !options[:stream_id].blank? and !options[:hostname].blank?
+
+    if options[:stream_id].blank? and options[:hostname].blank?
+      url = visuals_path("totalgraph", :hours => options[:hours])
+    else
+      url = visuals_path("streamgraph", :stream_id => options[:stream_id], :hours => options[:hours]) if (!options[:stream_id].blank?)
+      url = visuals_path("hostgraph", :hostname => options[:hostname], :hours => options[:hours]) if (!options[:hostname].blank?)
+    end
 
    "<script type='text/javascript'>
       function plot(data){
@@ -138,15 +147,16 @@ module ApplicationHelper
   def stream_link(stream)
     ret = "
         <span class=\"favorite-stream-sparkline\">
-          #{sparkline_values(Message.stream_counts_of_last_minutes(stream.id, 10).map { |c| c[:count] })}
+          #{sparkline_values(MessageCount.counts_of_last_minutes(10, :stream_id => stream.id, :fill => true).map { |c| c[:count] })}
         </span>
-        #{link_to(h(stream.title), stream_path(stream), :class => 'favorite-streams-title')}
+        #{link_to(h(stream.title_possibly_disabled), stream_path(stream), :class => 'favorite-streams-title')}
     "
 
-    if stream.alarm_active and !stream.alarm_limit.blank? and !stream.alarm_timespan.blank?
+    alarm_status = stream.alarm_status(current_user)
+    unless alarm_status == :disabled
       stream_count = stream.message_count_since(stream.alarm_timespan.minutes.ago.to_i)
       ret += "
-        <span class=\"favorite-stream-limits #{stream_count > stream.alarm_limit ? "status-alarm-text" : "status-okay-text"}\">
+        <span class=\"favorite-stream-limits #{alarm_status == :alarm ? "status-alarm-text" : "status-okay-text"}\">
           (#{stream_count}/#{stream.alarm_limit}/#{stream.alarm_timespan}m)
         </span>
       "
@@ -240,13 +250,28 @@ module ApplicationHelper
       tabs.push ["Rules", rules_stream_path(@stream)] if permitted_to?(:rules, @stream)
       tabs.push ["Forwarders", forward_stream_path(@stream)] if permitted_to?(:forward, @stream)
       tabs.push ["Analytics", analytics_stream_path(@stream)] if permitted_to?(:analytics, @stream)
-      tabs.push ["Settings", settings_stream_path(@stream)] if permitted_to?(:show, @stream)
-    elsif (@scoping == :hostgroup and @hostgroup)
-      tabs.push ["Show", hostgroup_path(@hostgroup)]
-      tabs.push ["Hosts", hosts_hostgroup_path(@hostgroup)]
-      tabs.push ["Settings", settings_hostgroup_path(@hostgroup)]
+      tabs.push ["Settings", settings_stream_path(@stream)] if permitted_to?(:settings, @stream)
     end
 
     tabs
+  end
+
+  def analytics_range_headline
+    "Count of new messages (last <span id='analytics-new-messages-range'>12</span> <span id='analytics-new-messages-range-type'>hours</span>.)"
+  end
+
+  def analytics_range_selector_form_fields
+    "
+      #{text_field_tag :range, 12, { :id => "analytics-new-messages-update-range" }}
+
+      #{radio_button_tag :range_type, :hours, :selected => "selected"}
+      #{label_tag :range_type_hours, "Hours"}
+  
+      #{radio_button_tag :range_type, :days}
+      #{label_tag :range_type_days, "Days"}
+  
+      #{radio_button_tag :range_type, :weeks}
+      #{label_tag :range_type_weeks, "Weeks"}
+    "
   end
 end

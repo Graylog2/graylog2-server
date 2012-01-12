@@ -1,5 +1,10 @@
 require File.expand_path('../boot', __FILE__)
 
+begin
+  require "home_run"
+rescue LoadError
+end
+
 # all but active_record
 require "action_controller/railtie"
 require "action_mailer/railtie"
@@ -10,8 +15,8 @@ require "rails/test_unit/railtie"
 # you've limited to :test, :development, or :production.
 Bundler.require(:default, Rails.env) if defined?(Bundler)
 
-GRAYLOG2_VERSION = "0.9.5p2"
-GRAYLOG2_VERSION_TIMESTAMP = 1302475256
+GRAYLOG2_VERSION = "0.9.6"
+GRAYLOG2_VERSION_TIMESTAMP = 1324660530
 
 module Graylog2WebInterface
   class Application < Rails::Application
@@ -32,7 +37,7 @@ module Graylog2WebInterface
 
     # Set Time.zone default to the specified zone and make Active Record auto-convert to this zone.
     # Run "rake -D time" for a list of tasks for finding time zone names. Default is UTC.
-    config.time_zone = 'Berlin'
+    config.time_zone = 'UTC'  # do not change it
 
     # The default locale is :en and all translations from config/locales/*.rb,yml are auto loaded.
     # config.i18n.load_path += Dir[Rails.root.join('my', 'locales', '*.{rb,yml}').to_s]

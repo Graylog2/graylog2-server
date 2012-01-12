@@ -3,26 +3,34 @@ class HostsController < ApplicationController
   filter_access_to :destroy
   filter_access_to :show
   filter_access_to :quickjump
+  filter_access_to :showrange
 
   def index
-    @hosts = Host.desc :message_count
-    @hostgroups = Hostgroup.all
-
-    @hosts_and_groups = @hosts | @hostgroups
-
+    @all_hosts = Host.all
+    @hosts = Host.asc(:host).page(params[:page]) # all hosts, sorted alphabetically by hostname, paginated
     @host_count = Host.count
+  end
+
+  def showrange
+    @host = Host.where(:_id => BSON::ObjectId(params[:id])).first
+    @has_sidebar = true
+    @load_flot = true
+
+    begin
+      @from = Time.at(params[:from].to_i-Time.now.utc_offset)
+      @to = Time.at(params[:to].to_i-Time.now.utc_offset)
+    rescue
+      flash[:error] = "Missing or invalid range parameters."
+    end
+
+    @messages = MessageGateway.all_in_range(params[:page], @from.to_i, @to.to_i, :hostname => @host.host)
+    @total_count = @messages.total_result_count
   end
 
   def destroy
     host = Host.where(:_id => BSON::ObjectId(params[:id])).first
 
-    # Delete all messages of thist host.
-    Message.where(:host => host.host).update_all(
-      :deleted => true
-    )
-
-    # Delete host.
-    if host.delete
+    if !host.nil? and host.delete
       flash[:notice] = "Host has been deleted"
     else
       flash[:error] = "Could not delete host"

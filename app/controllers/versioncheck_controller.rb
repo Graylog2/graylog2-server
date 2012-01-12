@@ -3,6 +3,7 @@ class VersioncheckController < ApplicationController
   before_filter :allowed?
 
   def index
+    @has_settings_tabs = true
     @outdated = Version.outdated?
   end
 
@@ -15,7 +16,7 @@ class VersioncheckController < ApplicationController
   private
 
   def allowed?
-    if !Configuration.allow_version_check
+    if !::Configuration.allow_version_check
       render :text => "not allowed", :status => :forbidden
       return false
     end

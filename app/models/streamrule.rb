@@ -16,21 +16,42 @@ class Streamrule
   TYPE_FACILITY = 4
   TYPE_TIMEFRAME = 5
   TYPE_ADDITIONAL = 6
+  TYPE_SEVERITY_OR_HIGHER = 8
+  TYPE_HOST_REGEX = 9
+  TYPE_FULL_MESSAGE = 10
+  TYPE_FILENAME_LINE = 11
+
+  # All rules with these types will be checked for valid regex syntax.
+  def regex_rules
+    [ TYPE_MESSAGE, TYPE_FULL_MESSAGE, TYPE_HOST_REGEX, TYPE_FILENAME_LINE ]
+  end
+
+  def self.rule_names
+    {
+      self::TYPE_MESSAGE => "Short Message (regex)",
+      self::TYPE_FULL_MESSAGE => "Full Message (regex)",
+      self::TYPE_HOST => "Host",
+      self::TYPE_HOST_REGEX => "Host (regex)",
+      self::TYPE_SEVERITY => "Severity",
+      self::TYPE_SEVERITY_OR_HIGHER => "Severity (or higher)",
+      self::TYPE_FACILITY => "Facility",
+      self::TYPE_FILENAME_LINE => "Filename and line (regex)",
+      self::TYPE_ADDITIONAL => "Additional field"
+    }
+  end
 
   def self.get_types_for_select_options(special = nil)
-    {
-      "Message (regex)" => self::TYPE_MESSAGE,
-      "Host" => self::TYPE_HOST,
-      "Severity" => self::TYPE_SEVERITY,
-      "Facility" => self::TYPE_FACILITY,
-      "Additional field" => self::TYPE_ADDITIONAL
-    }
+    options = Hash.new
+    self.rule_names.each do |k,v|
+      options[v] = k
+    end
+    return options
   end
 
   private
 
   def valid_regex
-    return if rule_type != TYPE_MESSAGE
+    return unless self.regex_rules.include?(rule_type)
 
     begin
       String.new =~ /#{value}/

@@ -1,11 +1,13 @@
 class MessagecommentsController < ApplicationController
 
   def index
+    @has_settings_tabs = true
     @comments = Messagecomment.all
     @comment = Messagecomment.new
   end
 
   def show
+    @has_settings_tabs = true
     @comment = Messagecomment.find(params[:id])
   end
 
@@ -23,8 +25,9 @@ class MessagecommentsController < ApplicationController
   end
 
   def update
-    comment = Messagecomment.update(params[:id], params[:messagecomment])
-    if comment.save
+    comment = Messagecomment.find(params[:id])
+    
+    if comment.update_attributes(params[:messagecomment])
       flash[:notice] = "Message comment has been updated."
     else
       flash[:error] = "Could not update message comment!"

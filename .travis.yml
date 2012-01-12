@@ -1,0 +1,10 @@
+rvm:
+  - 1.8.7
+  - ree
+  - 1.9.3
+  - jruby
+
+before_script: "bundle exec rake test:travis:copy_configs test:travis:run_elasticsearch"
+
+notifications:
+  irc: "irc.freenode.org#graylog2"
