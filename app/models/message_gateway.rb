@@ -117,21 +117,27 @@ class MessageGateway
             must { term(:streams, opts[:stream_id]) }
           end
           
+          # Severity (or higher)
+          if !filters[:severity].blank? and !filters[:severity_above].blank?
+            must { range(:level, :to => filters[:severity].to_i) }
+          end
+      
+          # Timeframe.
+          if !filters[:date].blank?
+            range = Quickfilter.get_conditions_timeframe(filters[:date])
+            must { range(:created_at, :gt => range[:greater], :lt => range[:lower]) }
+          end
+          
           unless opts[:hostname].blank?
             must { term(:host, opts[:hostname]) }
           end
+          
+          # Possibly narrow down to stream?
+          unless opts[:stream_id].blank?
+            must { term(:streams, opts[:stream_id]) }
+          end
+          
         end
-      end
-      
-      # Severity (or higher)
-      if !filters[:severity].blank? and !filters[:severity_above].blank?
-        filter 'range', { :level => { :to => filters[:severity].to_i } }
-      end
-
-      # Timeframe.
-      if !filters[:date].blank?
-        range = Quickfilter.get_conditions_timeframe(filters[:date])
-        filter 'range', { :created_at => { :gt => range[:greater], :lt => range[:lower],  } }
       end
 
     end
@@ -197,6 +203,27 @@ class MessageGateway
     return Array.new if result == false
     
     result["tokens"].map { |t| t["token"] }
+  end
+
+  def self.message_mapping
+    Tire.index(INDEX_NAME).mapping["message"] rescue {}
+  end
+
+  def self.mapping_valid?
+    mapping = message_mapping
+
+    store_generic = mapping["dynamic_templates"][0]["store_generic"]
+    return false if store_generic["mapping"]["index"] != "not_analyzed"
+    return false if store_generic["match"] != "*"
+   
+    properties = mapping["properties"] 
+    expected = { "analyzer" => "whitespace", "type" => "string" }
+    return false if properties["full_message"] != expected
+    return false if properties["message"] != expected
+
+    true
+  rescue
+    false
   end
 
   private

@@ -7,5 +7,6 @@ namespace :test do
         FileUtils.copy(from, to, :verbose => true)
       end
     end
+
   end
 end

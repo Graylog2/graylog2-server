@@ -81,18 +81,6 @@ class Configuration
     streamalarm_config :subject, "[graylog2] Stream alarm!"
   end
 
-  def self.livetail_config(key, default = nil)
-    nested_general_config :livetail, key, default
-  end
-
-  def self.livetail_enabled
-    !!livetail_config('enable')
-  end
-
-  def self.livetail_secret
-    livetail_config 'secret'
-  end
-
   def self.email_config(key = nil, default = nil)
     if key
       config_value @email_config, Rails.env, key, default

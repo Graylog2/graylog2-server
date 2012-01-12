@@ -7,7 +7,11 @@
   });
 </script>
 
-<h2>Message <span class="highlighted"><%= @message.id %></span></h2>
+<h2>Message
+  <span class="highlighted">
+    <%= link_to @message.id, message_path(@message) %>
+  </span>
+</h2>
 
 <p class="messages-show-message"><%= @message.message %></p>
 
@@ -90,7 +94,7 @@
 <% end %>
 
 <% if params[:partial] %>
-  <%= link_to "Permalink", { :controller => "messages", :action => "show", :id => @message.id }, :id => "messages-show-permalink" %>
+  <%= link_to "Permalink", message_path(@message), :id => "messages-show-permalink" %>
   <br style="clear: both;" />
 <% end %>
 

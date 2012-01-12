@@ -67,6 +67,7 @@
     line-height: 15px;
     overflow-y: hidden;
     overflow-x: auto;
+    padding-bottom: 3px;
 }
 
 .messages-full-message {
@@ -420,60 +421,6 @@
 
 #users-streams-selector {
   margin-top: 3px;
-}
-
-/* Livetail */
-.content-livetail {
-  background-color: #000 !important;
-  color: #ccc !important;
-  font-family: monospace;
-}
-
-.livetail-head {
-  color: #fff;
-  font-family: monospace;
-  display: inline;
-}
-
-#livetail-status {
-  text-transform: uppercase;
-  font-size: 15px;
-}
-
-.livetail-status-connecting {
-  color: #ccc;
-}
-
-.livetail-status-connected {
-  color: #4cc417;
-}
-
-.livetail-status-disconnected {
-  color: #f00;
-}
-
-#livetail {
-  margin-top: 15px;
-}
-
-#livetail th {
-  color: #fff !important;
-}
-
-#livetail tr:hover {
-  background-color: #000 !important;
-}
-
-#livetail td {
-  padding-right: 8px;
-}
-
-.livetail-c-date {
-  width: 150px;
-}
-
-.livetail-c-message {
-  color: #f00;
 }
 
 /* Visuals */

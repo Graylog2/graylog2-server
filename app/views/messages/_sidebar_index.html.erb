@@ -48,14 +48,17 @@ Your current time: <%= gl_date(Time.zone.now) %>
   </li>
 </ul>
 
+<% if !MessageGateway.mapping_valid? %>
+  <div id="invalid-mapping-warning">
+    Your ElasticSearch mapping is invalid! Make sure it has been created by the graylog2-server.
+    <%= tooltip("Fixing-invalid-ElasticSearch-mappings") %>
+  </div>
+<% end %>
+
 <% if current_user.role == "admin" %>
 <br />
 
 <%= awesome_link "Open dashboard", dashboard_index_path, :style => "display: inline;", :target => "_blank" %>
-
-<% if ::Configuration.livetail_enabled %>
-  <%= awesome_link "Go to live tail", :controller => "livetail" %>
-<% end %>
 
 <br /><br />
 <%= awesome_link "Server health", health_index_path %>
