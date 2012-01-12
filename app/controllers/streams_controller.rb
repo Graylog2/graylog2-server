@@ -28,7 +28,7 @@ class StreamsController < ApplicationController
   end
 
   def showrange
-    render :status => :forbidden if !@stream.accessable_for_user?(current_user_id)
+    render :status => :forbidden if !@stream.accessable_for_user?(current_user)
 
     @has_sidebar = true
     @load_flot = true
