@@ -586,3 +586,10 @@ label {
   color: #fff;
   cursor: pointer;
 }
+
+#invalid-mapping-warning {
+  margin-top: 10px;
+  margin-bottom: 10px;
+  font-weight: bold;
+  color: #f00;
+}

@@ -205,6 +205,27 @@ class MessageGateway
     result["tokens"].map { |t| t["token"] }
   end
 
+  def self.message_mapping
+    Tire.index(INDEX_NAME).mapping["message"] rescue {}
+  end
+
+  def self.mapping_valid?
+    mapping = message_mapping
+
+    store_generic = mapping["dynamic_templates"][0]["store_generic"]
+    return false if store_generic["mapping"]["index"] != "not_analyzed"
+    return false if store_generic["match"] != "*"
+   
+    properties = mapping["properties"] 
+    expected = { "analyzer" => "whitespace", "type" => "string" }
+    return false if properties["full_message"] != expected
+    return false if properties["message"] != expected
+
+    true
+  rescue
+    false
+  end
+
   private
 
   def self.wrap(x)
