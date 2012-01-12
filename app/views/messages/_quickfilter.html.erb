@@ -1,5 +1,5 @@
-<%= form_tag((@stream ? stream_messages_path(@stream) : messages_path), :method => :get) do -%>
 <div id="messages-quickfilter" <%= params[:filters].blank? ? raw("style='display: none;'") : nil %>>
+  <%= form_tag((@stream ? stream_messages_path(@stream) : messages_path), :method => "GET") do -%>
   <dl id="messages-quickfilter-fields">
     <dt><%= label_tag "filters[:message]", "Message:" %></dt>
     <dd><%= text_field_tag "filters[message]", params[:filters].blank? ? nil : params[:filters][:message] %> <%=raw tooltip("Message-search-syntax") %></dd>
