@@ -67,6 +67,7 @@
     line-height: 15px;
     overflow-y: hidden;
     overflow-x: auto;
+    padding-bottom: 3px;
 }
 
 .messages-full-message {
