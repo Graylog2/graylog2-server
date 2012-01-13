@@ -82,6 +82,9 @@ public class Mapping {
         // Required for the WI to not fail on empty indexes.
         properties.put("created_at", typeNumberDouble());
 
+        // This is used building histograms. An own field to avoid mapping problems with oder versions.
+        properties.put("histogram_time", typeTimeNoMillis()); // yyyy-MM-dd HH-mm-ss
+
         return properties;
     }
 
@@ -97,6 +100,14 @@ public class Mapping {
     public static Map typeNumberDouble() {
         Map type = new HashMap();
         type.put("type", "double");
+
+        return type;
+    }
+
+    public static Map typeTimeNoMillis() {
+        Map type = new HashMap();
+        type.put("type", "date");
+        type.put("format", "yyyy-MM-dd HH-mm-ss");
 
         return type;
     }
