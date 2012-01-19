@@ -27,6 +27,8 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.lang.management.ManagementFactory;
 import java.net.InetAddress;
+import java.net.InetSocketAddress;
+import java.net.SocketAddress;
 import java.net.UnknownHostException;
 import java.util.Calendar;
 import java.util.zip.GZIPInputStream;
@@ -219,5 +221,10 @@ public final class Tools {
 
     public static String decodeBase64(String what) {
         return new String(Base64.decodeBase64(what));
+    }
+
+    public static String rdnsLookup(SocketAddress socketAddress) throws UnknownHostException {
+        InetSocketAddress addr = (InetSocketAddress) socketAddress;
+        return InetAddress.getByAddress(addr.getAddress().getAddress()).getCanonicalHostName();
     }
 }

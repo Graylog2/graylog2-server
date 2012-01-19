@@ -38,6 +38,7 @@ import org.json.simple.JSONValue;
 
 import java.util.regex.Pattern;
 import java.util.zip.Deflater;
+import org.graylog2.indexer.Indexer;
 
 /**
  * GELFMessage.java: Jul 20, 2010 6:57:28 PM
@@ -229,6 +230,10 @@ public class GELFMessage {
      * @param value
      */
     public void addAdditionalData(String key, Object value) {
+        if (!key.startsWith(GELF.USER_DEFINED_FIELD_PREFIX)) {
+           key = GELF.USER_DEFINED_FIELD_PREFIX + key;
+        }
+
         if (key != null && value != null) {
 
             if (value instanceof Long) {
@@ -242,6 +247,16 @@ public class GELFMessage {
             }
 
             LOG.info("Skipping additional data field in not allowed format. Allowed: String or Integral");
+        }
+    }
+
+    /**
+     * Add a whole set of additional fields.
+     * @param fields
+     */
+    public void addAdditionalData(Map<String, String> fields) {
+        for (Map.Entry<String, String> field : fields.entrySet()) {
+            addAdditionalData(field.getKey(), field.getValue());
         }
     }
 
@@ -483,11 +498,15 @@ public class GELFMessage {
         }
 
         if (this.getCreatedAt() <= 0) {
+            double timestamp = Tools.getUTCTimestampWithMilliseconds();
             // This should have already been set at receiving, but to make sure...
-            obj.put("created_at", Tools.getUTCTimestampWithMilliseconds());
+            obj.put("created_at", timestamp);
+            obj.put("histogram_time", Indexer.buildTimeFormat(timestamp));
         } else {
             obj.put("created_at", this.getCreatedAt());
+            obj.put("histogram_time", Indexer.buildTimeFormat(this.getCreatedAt()));
         }
+
 
         // Manually converting stream ID to string - caused strange problems without it.
         List<String> streamIds = new ArrayList<String>();

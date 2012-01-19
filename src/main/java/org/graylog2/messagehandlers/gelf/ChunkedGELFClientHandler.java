@@ -32,6 +32,7 @@ import org.graylog2.messagehandlers.common.ReceiveHookManager;
 import java.io.IOException;
 import java.net.DatagramPacket;
 import java.util.zip.DataFormatException;
+import org.graylog2.messagehandlers.common.RealtimeCollectionUpdateHook;
 import org.graylog2.messagequeue.MessageQueue;
 
 /**
@@ -170,6 +171,9 @@ public class ChunkedGELFClientHandler extends GELFClientHandlerBase implements G
 
                     // Counts up host in hosts collection.
                     ReceiveHookManager.postProcess(new HostUpsertHook(), message);
+
+                    // Update realtime collection-
+                    ReceiveHookManager.postProcess(new RealtimeCollectionUpdateHook(), message);
                 }
             }
 

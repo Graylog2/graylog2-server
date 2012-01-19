@@ -20,6 +20,8 @@
 
 package org.graylog2.messagehandlers.gelf;
 
+import java.util.Map;
+import java.lang.Object;
 import com.mongodb.BasicDBList;
 import com.mongodb.BasicDBObject;
 import org.bson.types.ObjectId;
@@ -27,6 +29,7 @@ import org.graylog2.blacklists.Blacklist;
 import org.junit.Test;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 import static org.junit.Assert.*;
@@ -137,7 +140,7 @@ public class GELFMessageTest {
 
         GELFMessage gelfMessage = createGELFMessage();
 
-        String oneLiner = "host.example.com - short message severity=Emergency,facility=local0,file=test.file,line=42,test=test";
+        String oneLiner = "host.example.com - short message severity=Emergency,facility=local0,file=test.file,line=42,_test=test";
         assertEquals(oneLiner, gelfMessage.toOneLiner());
     }
 
@@ -206,5 +209,30 @@ public class GELFMessageTest {
 
         GELFMessage gelfMessage = createGELFMessage();
         assertTrue(gelfMessage.allRequiredFieldsSet());
+    }
+
+    @Test
+    public void testAddAdditionalData() {
+        GELFMessage msg = new GELFMessage();
+        msg.addAdditionalData("_foo", "bar");
+        msg.addAdditionalData("lol", "wat"); // _ should be added automatically.
+
+        Map<String, Object> expected = new HashMap<String, Object>();
+        expected.put("_foo", "bar");
+        expected.put(("_lol"), "wat");
+
+        assertEquals(expected, msg.getAdditionalData());
+    }
+
+    @Test
+    public void testAddAdditionalDataWithMap() {
+        Map<String, String> fields = new HashMap<String, String>();
+        fields.put("_foo", "bar");
+        fields.put("_lol", "wat");
+
+        GELFMessage msg = new GELFMessage();
+        msg.addAdditionalData(fields);
+
+        assertEquals(fields, msg.getAdditionalData());
     }
 }

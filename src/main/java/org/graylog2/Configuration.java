@@ -53,8 +53,14 @@ public class Configuration {
     @Parameter(value = "syslog_protocol", required = true)
     private String syslogProtocol = "udp";
 
+    @Parameter(value = "force_syslog_rdns", required = true)
+    private boolean forceSyslogRdns = false;
+
     @Parameter(value = "mongodb_useauth", required = true)
     private boolean mongoUseAuth = false;
+
+    @Parameter(value = "allow_override_syslog_date", required = true)
+    private boolean allowOverrideSyslogDate = true;
 
     @Parameter(value = "elasticsearch_url", required = true)
     private String elasticsearchUrl = "http://localhost:9200/";
@@ -97,6 +103,9 @@ public class Configuration {
 
     @Parameter(value = "mq_max_size", required = false, validator = PositiveIntegerValidator.class)
     private int mqMaxSize = 0;
+
+    @Parameter(value = "enable_realtime_collection", required = true)
+    private boolean enableRealtimeCollection = true;
 
     @Parameter(value = "use_gelf", required = true)
     private boolean useGELF = false;
@@ -163,6 +172,14 @@ public class Configuration {
         return syslogProtocol;
     }
 
+    public boolean getForceSyslogRdns() {
+        return forceSyslogRdns;
+    }
+
+    public boolean getAllowOverrideSyslogDate() {
+        return allowOverrideSyslogDate;
+    }
+
     public String getElasticSearchUrl() {
         String ret = elasticsearchUrl;
 
@@ -224,6 +241,10 @@ public class Configuration {
 
     public int getMessageQueueMaximumSize() {
         return mqMaxSize;
+    }
+
+    public boolean enableRealtimeCollection() {
+        return enableRealtimeCollection;
     }
 
     public boolean isUseGELF() {
