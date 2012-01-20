@@ -79,30 +79,40 @@ module ApplicationHelper
 
   def flot_graph_loader(options)
     raise "You can only pass stream_id OR hostname" if !options[:stream_id].blank? and !options[:hostname].blank?
-
-    if options[:stream_id].blank? and options[:hostname].blank?
-      url = visuals_path("totalgraph", :hours => options[:hours])
+    
+    uid = ""
+    if !options[:quickfilter_graph].blank? and options[:quickfilter_graph] == true
+      url = visuals_path("quickfiltergraph", :filters => options[:filters], :timespan_type => options[:timespan_type])
+      uid = "quickfiltergraph"
+      lines_bars = "bars: { show: true, fill: true }"
+      grid_color = "#333"
     else
-      url = visuals_path("streamgraph", :stream_id => options[:stream_id], :hours => options[:hours]) if (!options[:stream_id].blank?)
-      url = visuals_path("hostgraph", :hostname => options[:hostname], :hours => options[:hours]) if (!options[:hostname].blank?)
+      if options[:stream_id].blank? and options[:hostname].blank?
+        url = visuals_path("totalgraph", :hours => options[:hours])
+      else
+        url = visuals_path("streamgraph", :stream_id => options[:stream_id], :hours => options[:hours]) if (!options[:stream_id].blank?)
+        url = visuals_path("hostgraph", :hostname => options[:hostname], :hours => options[:hours]) if (!options[:hostname].blank?)
+      end
+      lines_bars = "lines: { show: true, fill: true }"
+      grid_color = "#fff"
     end
 
    "<script type='text/javascript'>
-      function plot(data){
+      function plot#{uid}(data){
         $.plot($('#{options[:inject]}'),
           [ {
               color: '#fd0c99',
               shadowSize: 10,
               data: data,
               points: { show: false, },
-              lines: { show: true, fill: true }
+              #{lines_bars}
           } ],
           {
             xaxis: { mode: 'time' },
             grid: {
               show: true,
-              color: '#ccc',
-              borderWidth: 0,
+              color: '#{grid_color}',
+              borderWidth: 0
             },
             selection: { mode: 'x' }
           }
@@ -120,7 +130,7 @@ module ApplicationHelper
 
       $.post('#{url}', function(data) {
         json = eval('(' + data + ')');
-          plot(json.data);
+          plot#{uid}(json.data);
         });
     </script>"
   end

@@ -51,3 +51,16 @@
 <% end %>
 
 </div>
+
+<% unless params[:filters].blank? %>
+  <div id="messages-quickfilter-graph">
+    <%= image_tag "loading.gif", :class => "ajaxloader" %>
+  </div>
+  <%=raw flot_graph_loader(
+      :inject => "#messages-quickfilter-graph",
+      :filters => params[:filters],
+      :quickfilter_graph => true,
+      :timespan_type => :minute
+    )
+  %>
+<% end %>

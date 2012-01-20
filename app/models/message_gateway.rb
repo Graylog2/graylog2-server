@@ -92,7 +92,13 @@ class MessageGateway
   def self.all_by_quickfilter(filters, page = 1, opts = {})
     histogram_only = !opts[:date_histogram].blank? and opts[:date_histogram] == true
 
-    r = search pagination_options(page).merge(@default_query_options) do
+    if histogram_only
+      options = nil
+    else
+      options = pagination_options(page).merge(@default_query_options)
+    end
+
+    r = search(options) do
       query do
         boolean do
           # Short message
@@ -145,7 +151,7 @@ class MessageGateway
       # Request date histogram facet?
       if histogram_only
         facet 'date_histogram' do
-          date("histogram_time", :interval => 'minute')
+          date("histogram_time", :interval => opts[:date_histogram_interval])
         end
       end
 

@@ -12,6 +12,8 @@ class VisualsController < ApplicationController
           r["data"] = calculate_streamgraph(params[:stream_id], params[:hours])
         when "hostgraph" then
           r["data"] = calculate_hostgraph(params[:hostname], params[:hours])
+        when "quickfiltergraph" then
+          r["data"] = calculate_quickfiltergraph(params[:filters], params[:timespan_type], params[:timespan_value])
       end
     end
 
@@ -44,7 +46,19 @@ class VisualsController < ApplicationController
     end
   end
 
+  def calculate_quickfiltergraph(filters, timespan_type, timespan_value)
+    raise "Invalid timespan type" if !valid_timespan_type?(timespan_type)
+    MessageGateway.all_by_quickfilter(filters, 1, :date_histogram => true, :date_histogram_interval => timespan_type).collect do |c|
+      [ ((c["time"].to_i/1000)+Time.now.utc_offset)*1000, c["count"] ]
+    end
+  end
+
+  def valid_timespan_type?(type)
+    ["year", "month", "week", "day", "hour", "minute"].include?(type)
+  end
+
   def escape(what)
     CGI.escapeHTML(what.to_s)
   end
+
 end
