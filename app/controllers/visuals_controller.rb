@@ -49,7 +49,7 @@ class VisualsController < ApplicationController
   def calculate_quickfiltergraph(filters, timespan_type, timespan_value)
     raise "Invalid timespan type" if !valid_timespan_type?(timespan_type)
     MessageGateway.all_by_quickfilter(filters, 1, :date_histogram => true, :date_histogram_interval => timespan_type).collect do |c|
-      [ ((c["time"].to_i/1000)+Time.now.utc_offset)*1000, c["count"] ]
+      [ c["time"].to_i, c["count"] ]
     end
   end
 
