@@ -50,7 +50,7 @@ authorization do
     has_permission_on :blacklists, :to => [:index, :show, :create, :destroy]
     has_permission_on :blacklistedterms, :to => [:create, :destroy]
 
-    has_permission_on :settings, :to => [:index, :store]
+    has_permission_on :settings, :to => [:index, :store, :removecolumn]
 
     has_permission_on :users, :to => [:new, :index, :show, :create, :edit, :delete, :update]
 
@@ -61,6 +61,8 @@ authorization do
     has_permission_on :health, :to => [:index]
 
     has_permission_on :retentiontime, :to => [:index]
+    
+    has_permission_on :additionalcolumns, :to => [:index]
   end
 
   role :reader do

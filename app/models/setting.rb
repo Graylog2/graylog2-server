@@ -3,7 +3,7 @@ class Setting
 
   field :user_id, :type => BSON::ObjectId
   field :setting_type, :type => Integer
-  field :value, :type => Integer
+  field :value, :type => Object
 
   TYPE_MESSAGE_LENGTH = 1
   TYPE_MESSAGE_LENGTH_STANDARD = 150
@@ -19,6 +19,9 @@ class Setting
 
   TYPE_RETENTION_FREQ_MINUTES = 6
   TYPE_RETENTION_FREQ_MINUTES_STANDARD = 30
+  
+  TYPE_ADDITIONAL_COLUMNS = 7
+  TYPE_ADDITIONAL_COLUMNS_STANDARD = []
 
   def self.retentiontime_types
     [ TYPE_RETENTION_TIME_DAYS, TYPE_RETENTION_FREQ_MINUTES ]
@@ -51,6 +54,12 @@ class Setting
   def self.get_retention_frequency_minutes current_user
     setting = Setting.where(:user_id => current_user.id, :setting_type => TYPE_RETENTION_FREQ_MINUTES).first
     return TYPE_RETENTION_FREQ_MINUTES_STANDARD if setting.blank?
+    return setting.value
+  end
+  
+  def self.get_additional_columns current_user
+    setting = Setting.where(:user_id => current_user.id, :setting_type => TYPE_ADDITIONAL_COLUMNS).first
+    return TYPE_ADDITIONAL_COLUMNS_STANDARD if setting.blank?
     return setting.value
   end
 

@@ -1,0 +1,27 @@
+<h1>Additional columns</h1>
+<div class="description">This page allows you to define additional columns that will be displayed in the message overview table. By default, <span class="highlighted">no additional columns are shown</span>. If you for
+example have an additional field <span class="highlighted">http_return_code</span> that you want to be included in
+the overview table, just add it here.</div>
+
+<ul id="setting-additional-colums-list">
+<% additional_columns = Setting.get_additional_columns(current_user) %>
+<% if additional_columns.empty? %>
+  <li>No additional columns configured.</li>
+<% else %>
+  <% additional_columns.each do |col| %>
+  <li>
+    <span class="setting-additional-colums-title"><%= col %></span>
+    <%= link_to "Delete", removecolumn_setting_path(@additional_columns_setting, :column => col),
+                          :method => :delete,
+                          :confirm => "Really remove this column from the table?" %>
+  </li>
+  <% end %>
+<% end %>
+</ul>
+
+<%= form_tag store_settings_path do -%>
+	<%= hidden_field_tag 'setting_type', Setting::TYPE_ADDITIONAL_COLUMNS %>
+	<%= label_tag 'value', 'New column (field name):' %>
+  <%= text_field_tag 'value' %>
+  <%= awesome_submit_link 'Store' %>
+<% end -%>

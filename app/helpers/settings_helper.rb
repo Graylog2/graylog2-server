@@ -6,6 +6,7 @@ module SettingsHelper
 
     tabs = [
       ["General", settings_path],
+      ["Additional columns", additionalcolumns_path],
       ["Message retention time", retentiontime_index_path],
       ["Message comments", messagecomments_path],
       ["Filtered terms", filteredterms_path],
