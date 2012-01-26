@@ -164,15 +164,19 @@ class StreamsController < ApplicationController
   end
 
   def addcolumn
-    @stream.additional_columns << params[:column]
-    duplicates = @stream.additional_columns.uniq!
-
-    if duplicates
-      flash[:error] = "Column '#{params[:column]}' already exists."
-    elsif @stream.save
-      flash[:notice] = "Added additional column."
+    if params[:column].empty?
+      flash[:error] = "Column can't be empty."
     else
-      flash[:error] = "Could not add additional column."
+      @stream.additional_columns << params[:column]
+      duplicates = @stream.additional_columns.uniq!
+
+      if duplicates
+        flash[:error] = "Column '#{params[:column]}' already exists."
+      elsif @stream.save
+        flash[:notice] = "Added additional column."
+      else
+        flash[:error] = "Could not add additional column."
+      end
     end
 
     redirect_to settings_stream_path(@stream)
