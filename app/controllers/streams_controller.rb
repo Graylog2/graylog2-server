@@ -186,11 +186,11 @@ class StreamsController < ApplicationController
     deleted_column = @stream.additional_columns.delete(params[:column])
 
     if deleted_column.nil?
-      flash[:error] = "Column '#{params[:column]}' doesn't exist."
+      flash[:error] = "Column doesn't exist."
     elsif @stream.save
-      flash[:notice] = "Removed additional column '#{params[:column]}'."
+      flash[:notice] = "Removed additional column."
     else
-      flash[:error] = "Could not remove column '#{params[:column]}'."
+      flash[:error] = "Could not remove column."
     end
 
     redirect_to settings_stream_path(@stream)
