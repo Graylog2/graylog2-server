@@ -22,11 +22,11 @@ class SettingsController < ApplicationController
     deleted_column = setting.value.delete(params[:column])
     
     if deleted_column.nil?
-      flash[:error] = "Column '#{params[:column]}' doesn't exist."
+      flash[:error] = "Column doesn't exist."
     elsif setting.save
-      flash[:notice] = "Removed additional column '#{params[:column]}'."
+      flash[:notice] = "Removed additional column."
     else
-      flash[:error] = "Could not remove column '#{params[:column]}'."
+      flash[:error] = "Could not remove column."
     end
     
     redirect_to additionalcolumns_path
@@ -68,7 +68,7 @@ class SettingsController < ApplicationController
       if params[:value].empty?
         flash[:error] = "Column can't be empty."
       elsif setting.value.uniq!
-        flash[:error] = "Column '#{params[:value]}' is already configured."
+        flash[:error] = "Column already exists."
       else
         save_setting(setting)
       end
