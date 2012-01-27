@@ -171,7 +171,7 @@ class StreamsController < ApplicationController
       duplicates = @stream.additional_columns.uniq!
 
       if duplicates
-        flash[:error] = "Column '#{params[:column]}' already exists."
+        flash[:error] = "Column already exists."
       elsif @stream.save
         flash[:notice] = "Added additional column."
       else
