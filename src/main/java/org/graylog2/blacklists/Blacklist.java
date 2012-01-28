@@ -60,7 +60,9 @@ public class Blacklist {
         List<Blacklist> blacklists = new ArrayList<Blacklist>();
 
         DBCollection coll = MongoConnection.getInstance().getDatabase().getCollection("blacklists");
-        DBCursor cur = coll.find(new BasicDBObject());
+        DBObject query = new BasicDBObject();
+        query.put("disabled", new BasicDBObject("$ne", true));
+        DBCursor cur = coll.find(query);
 
         while (cur.hasNext()) {
             try {
