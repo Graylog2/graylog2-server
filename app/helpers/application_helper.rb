@@ -82,7 +82,7 @@ module ApplicationHelper
     
     uid = ""
     if !options[:quickfilter_graph].blank? and options[:quickfilter_graph] == true
-      url = visuals_path("quickfiltergraph", :filters => options[:filters], :timespan_type => options[:timespan_type])
+      url = visuals_path("quickfiltergraph", :filters => options[:filters], :interval => options[:interval], :hostname => options[:hostname], :stream_id => options[:stream_id])
       uid = "quickfiltergraph"
       lines_bars = "bars: { show: true, fill: true }"
       grid_color = "#333"
@@ -95,9 +95,10 @@ module ApplicationHelper
       end
       lines_bars = "lines: { show: true, fill: true }"
       grid_color = "#fff"
+      range_selector = true
     end
 
-   "<script type='text/javascript'>
+   r = "<script type='text/javascript'>
       function plot#{uid}(data){
         $.plot($('#{options[:inject]}'),
           [ {
@@ -114,25 +115,29 @@ module ApplicationHelper
               color: '#{grid_color}',
               borderWidth: 0
             },
-            selection: { mode: 'x' }
+            #{"selection: { mode: 'x' }" if range_selector}
           }
         );
-      }
+      }"
 
-      $('#{options[:inject]}').bind('plotselected', function(event, ranges) {
+    if range_selector
+      r += "$('#{options[:inject]}').bind('plotselected', function(event, ranges) {
         $('#streams-sidebar-totalcount').hide();
         from = (ranges.xaxis.from/1000).toFixed(0);
         to = (ranges.xaxis.to/1000).toFixed(0);
         $('#graph-rangeselector').show();
         $('#graph-rangeselector-from').val(from);
         $('#graph-rangeselector-to').val(to);
-      });
+      });"
+    end
 
-      $.post('#{url}', function(data) {
+    r += "$.post('#{url}', function(data) {
         json = eval('(' + data + ')');
           plot#{uid}(json.data);
         });
     </script>"
+
+    return r
   end
 
   def ajaxtrigger(title, description, url, checked)

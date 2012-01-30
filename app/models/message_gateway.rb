@@ -151,7 +151,7 @@ class MessageGateway
       # Request date histogram facet?
       if histogram_only
         facet 'date_histogram' do
-          date("histogram_time", :interval => opts[:date_histogram_interval])
+          date("histogram_time", :interval => (opts[:date_histogram_interval]))
         end
       end
 
@@ -268,5 +268,5 @@ class MessageGateway
 
     { :per_page => Message::LIMIT, :page => page }
   end
-  
+
 end

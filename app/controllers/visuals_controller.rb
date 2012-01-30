@@ -13,7 +13,7 @@ class VisualsController < ApplicationController
         when "hostgraph" then
           r["data"] = calculate_hostgraph(params[:hostname], params[:hours])
         when "quickfiltergraph" then
-          r["data"] = calculate_quickfiltergraph(params[:filters], params[:timespan_type], params[:timespan_value])
+          r["data"] = calculate_quickfiltergraph(params[:filters], params[:interval], params[:hostname], params[:stream_id])
       end
     end
 
@@ -46,19 +46,20 @@ class VisualsController < ApplicationController
     end
   end
 
-  def calculate_quickfiltergraph(filters, timespan_type, timespan_value)
-    raise "Invalid timespan type" if !valid_timespan_type?(timespan_type)
-    MessageGateway.all_by_quickfilter(filters, 1, :date_histogram => true, :date_histogram_interval => timespan_type).collect do |c|
+  def calculate_quickfiltergraph(filters, interval, hostname, stream_id)
+    raise "Invalid interval" unless valid_interval?(interval)
+
+    MessageGateway.all_by_quickfilter(filters, 1, :date_histogram => true, :date_histogram_interval => interval, :hostname => hostname, :stream_id => stream_id).collect do |c|
       [ c["time"].to_i, c["count"] ]
     end
   end
 
-  def valid_timespan_type?(type)
-    ["year", "month", "week", "day", "hour", "minute"].include?(type)
-  end
-
   def escape(what)
     CGI.escapeHTML(what.to_s)
+  end
+
+  def valid_interval?(interval)
+  ["year", "month", "week", "day", "hour", "minute"].include?(interval)
   end
 
 end

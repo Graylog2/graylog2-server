@@ -60,6 +60,21 @@
   margin-top: 15px;
 }
 
+.messages-quickfilter-interval-selector-first {
+  font-weight: bold;
+}
+
+#messages-quickfilter-interval-selector {
+  margin-top: 5px;
+  padding-top: 3px;
+  border-top: 1px dashed #ccc;
+}
+
+#messages-quickfilter-interval-selector li {
+  float: left;
+  margin-left: 5px;
+}
+
 .messages-show-message {
     margin-bottom: 10px;
     font-size: 13px;
