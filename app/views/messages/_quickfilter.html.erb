@@ -71,7 +71,7 @@
       <li>
         <a href="#" onClick="window.location.href = document.URL + '&interval=<%= i %>'; return false;">
           <% name = i.capitalize + "s" %>
-          <% if params[:interval] == i or (params[:interval].blank? and i == "day") %>
+          <% if params[:interval] == i or (params[:interval].blank? and i == "hour") %>
             <strong><%= name %></strong>
           <% else %>
             <%= name %>
