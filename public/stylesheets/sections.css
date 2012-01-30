@@ -391,6 +391,17 @@
     margin-bottom: 2px;
 }
 
+#setting-additional-colums-list {
+  font-size: 13px;
+  list-style-type: square;
+  margin-left: 20px;
+  margin-bottom: 5px;
+}
+
+#setting-additional-colums-list a {
+  font-size: 11px;
+}
+
 /* Users */
 #users ul {
     list-style-type: square;
