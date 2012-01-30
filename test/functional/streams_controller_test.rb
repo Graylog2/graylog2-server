@@ -105,6 +105,18 @@ class StreamsControllerTest < ActionController::TestCase
 
       assert_equal 1, assigns(:stream).additional_columns.count
     end
+    
+    should "not add an empty column" do
+      stream = Stream.make
+      stream.additional_columns = []
+      stream.save!
+      
+      post :addcolumn, :id => stream.to_param, :column => ""
+
+      assert_not_nil flash[:error]
+
+      assert_equal 0, assigns(:stream).additional_columns.count
+    end
 
     should "remove a column" do
       stream = Stream.make

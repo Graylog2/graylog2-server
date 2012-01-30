@@ -164,15 +164,19 @@ class StreamsController < ApplicationController
   end
 
   def addcolumn
-    @stream.additional_columns << params[:column]
-    duplicates = @stream.additional_columns.uniq!
-
-    if duplicates
-      flash[:error] = "Column '#{params[:column]}' already exists."
-    elsif @stream.save
-      flash[:notice] = "Added additional column."
+    if params[:column].empty?
+      flash[:error] = "Column can't be empty."
     else
-      flash[:error] = "Could not add additional column."
+      @stream.additional_columns << params[:column]
+      duplicates = @stream.additional_columns.uniq!
+
+      if duplicates
+        flash[:error] = "Column already exists."
+      elsif @stream.save
+        flash[:notice] = "Added additional column."
+      else
+        flash[:error] = "Could not add additional column."
+      end
     end
 
     redirect_to settings_stream_path(@stream)
@@ -182,11 +186,11 @@ class StreamsController < ApplicationController
     deleted_column = @stream.additional_columns.delete(params[:column])
 
     if deleted_column.nil?
-      flash[:error] = "Column '#{params[:column]}' doesn't exist."
+      flash[:error] = "Column doesn't exist."
     elsif @stream.save
-      flash[:notice] = "Removed additional column '#{params[:column]}'."
+      flash[:notice] = "Removed additional column."
     else
-      flash[:error] = "Could not remove column '#{params[:column]}'."
+      flash[:error] = "Could not remove column."
     end
 
     redirect_to settings_stream_path(@stream)
