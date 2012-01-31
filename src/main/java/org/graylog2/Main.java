@@ -154,7 +154,7 @@ public final class Main {
 
         initializeMongoConnection(configuration);
         initializeRulesEngine(configuration.getDroolsRulesFile());
-        initializeSyslogServer(configuration.getSyslogProtocol(), configuration.getSyslogListenPort());
+        initializeSyslogServer(configuration.getSyslogProtocol(), configuration.getSyslogListenPort(), configuration.getSyslogListenAddress());
         initializeHostCounterCache(scheduler);
 
         // Start message counter thread.
@@ -240,10 +240,10 @@ public final class Main {
         LOG.info("GELF threads started");
     }
 
-    private static void initializeSyslogServer(String syslogProtocol, int syslogPort) {
+    private static void initializeSyslogServer(String syslogProtocol, int syslogPort, String syslogHost) {
 
         // Start the Syslog thread that accepts syslog packages.
-        SyslogServerThread syslogServerThread = new SyslogServerThread(syslogProtocol, syslogPort);
+        SyslogServerThread syslogServerThread = new SyslogServerThread(syslogProtocol, syslogPort, syslogHost);
         syslogServerThread.start();
 
         // Check if the thread started up completely.

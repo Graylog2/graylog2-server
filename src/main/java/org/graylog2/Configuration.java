@@ -53,6 +53,9 @@ public class Configuration {
     @Parameter(value = "syslog_protocol", required = true)
     private String syslogProtocol = "udp";
 
+    @Parameter(value = "syslog_listen_address")
+    private String syslogListenAddress = "0.0.0.0";
+
     @Parameter(value = "force_syslog_rdns", required = true)
     private boolean forceSyslogRdns = false;
 
@@ -145,6 +148,10 @@ public class Configuration {
 
     public int getSyslogListenPort() {
         return syslogListenPort;
+    }
+
+    public String getSyslogListenAddress() {
+        return syslogListenAddress;
     }
 
     public String getSyslogProtocol() {
