@@ -220,7 +220,7 @@ public class ConfigurationTest {
 
     @Test
     public void testGetMongoDBReplicaSetServersUnknownHost() throws RepositoryException, ValidationException {
-        validProperties.put("mongodb_replica_set", "this-host-hopefully-does-not-exist:27017");
+        validProperties.put("mongodb_replica_set", "this-host-hopefully-does-not-exist.:27017");
         Configuration configuration = new Configuration();
         new JadConfig(new InMemoryRepository(validProperties), configuration).process();
 
