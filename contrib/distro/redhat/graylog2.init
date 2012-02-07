@@ -36,7 +36,7 @@ unset pid
 gl2_run() {
   # Disable csh style history expansion for safety
   set +H
-    daemon "( $JAVA_BIN -jar -DconfigPath=$configfile \"$jar\" >\"$logfile\" 2>&1 & echo \"\$!\" >\"$pidfile\" )"
+    daemon "( $JAVA_BIN -jar \"$jar\" --configfile $configfile > \"$logfile\" 2>&1 & echo \"\$!\" > \"$pidfile\" )"
     pid=$(<"$pidfile")
   sleep 1
     if kill -0 "$pid" >/dev/null 2>&1
