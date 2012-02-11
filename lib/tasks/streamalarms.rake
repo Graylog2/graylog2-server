@@ -16,7 +16,7 @@ namespace :streamalarms do
       puts "Stream >#{stream.title}< has enabled alarms. (max #{stream.alarm_limit} msgs/#{stream.alarm_timespan} min) Checking for message count since #{check_since}"
 
       # Check if above limit.
-      messages = MessageGateway.all_in_range(1, stream.last_subscription_check, Time.now.to_i, :stream_id => stream.id)
+      messages = MessageGateway.all_in_range(1, stream.last_alarm_check, Time.now.to_i, :stream_id => stream.id)
       count = messages.total_result_count
       if count > stream.alarm_limit
         subscribers = AlertedStream.all_subscribers(stream)
