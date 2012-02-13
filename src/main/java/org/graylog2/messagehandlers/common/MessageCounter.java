@@ -22,8 +22,9 @@ package org.graylog2.messagehandlers.common;
 
 import org.bson.types.ObjectId;
 
-import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+
 import org.graylog2.Tools;
 
 /**
@@ -38,6 +39,7 @@ public final class MessageCounter {
     private static MessageCounter instance;
 
     private int total;
+    // todo: may want to consider using a concurrent map in high-scale-lib.
     private Map<String, Integer> streams;
     private Map<String, Integer> hosts;
 
@@ -87,11 +89,11 @@ public final class MessageCounter {
     }
 
     public void resetHostCounts() {
-        this.hosts = new HashMap<String, Integer>();
+        this.hosts = new ConcurrentHashMap<String, Integer>();
     }
 
     public void resetStreamCounts() {
-        this.streams = new HashMap<String, Integer>();
+        this.streams = new ConcurrentHashMap<String, Integer>();
     }
 
     public void resetTotal() {
