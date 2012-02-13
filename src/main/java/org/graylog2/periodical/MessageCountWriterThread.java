@@ -24,8 +24,6 @@ import org.apache.log4j.Logger;
 import org.graylog2.database.MongoBridge;
 import org.graylog2.messagehandlers.common.MessageCounter;
 
-import java.util.Collections;
-
 
 /**
  * MessageCountWriterThread.java: Sep 21, 2011 4:09:55 PM
@@ -49,9 +47,7 @@ public class MessageCountWriterThread implements Runnable {
         MessageCounter counter = MessageCounter.getInstance();
         try {
             MongoBridge m = new MongoBridge();
-            m.writeMessageCounts(counter.getTotalCount(),
-                                 Collections.unmodifiableMap(counter.getStreamCounts()),
-                                 Collections.unmodifiableMap(counter.getHostCounts()));
+            m.writeMessageCounts(counter.getTotalCount(), counter.getStreamCounts(), counter.getHostCounts());
         } catch (Exception e) {
             LOG.warn("Error in MessageCountWriterThread: " + e.getMessage(), e);
         } finally {
