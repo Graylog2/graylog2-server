@@ -10,6 +10,12 @@
     <dt><%= label_tag "filters[facility]", "Facility:" %></dt>
     <dd><%= text_field_tag "filters[facility]", params[:filters].blank? ? nil : params[:filters][:facility] %></dd>
 
+    <dt><%= label_tag "filters[file]", "File:" %></dt>
+    <dd><%= text_field_tag "filters[file]", params[:filters].blank? ? nil : params[:filters][:file] %></dd>
+
+    <dt><%= label_tag "filters[line]", "Line number:" %></dt>
+    <dd><%= text_field_tag "filters[line]", params[:filters].blank? ? nil : params[:filters][:line] %></dd>
+
     <dt><%= label_tag "filters[severity]", "Severity:" %></dt>
     <dd>
       <%= select_tag "filters[severity]", raw("<option></option>" + options_for_select(get_ordered_severities_for_select, :selected => get_quickfilter_selected(params[:filters], :severity))) %>

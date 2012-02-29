@@ -132,11 +132,17 @@ class MessageGateway
             must { term(:host, opts[:hostname]) }
           end
           
+          # XXX Duplicated?
           # Possibly narrow down to stream?
           unless opts[:stream_id].blank?
             must { term(:streams, opts[:stream_id]) }
           end
           
+          # File name
+          must { term(:file, filters[:file]) } unless filters[:file].blank?
+
+          # Line number
+          must { term(:line, filters[:line]) } unless filters[:line].blank?
         end
       end
 
