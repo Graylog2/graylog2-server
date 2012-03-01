@@ -162,7 +162,7 @@ public final class MongoConnection {
      *
      * @return The messages collection
      */
-    public DBCollection getMessageCountsColl() {
+    public synchronized DBCollection getMessageCountsColl() {
         if (this.messageCountsCollection != null) {
             return this.messageCountsCollection;
         }
