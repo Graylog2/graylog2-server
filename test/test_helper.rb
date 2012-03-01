@@ -33,8 +33,10 @@ class ActiveSupport::TestCase
     standard_message = {
       :type => MessageGateway::TYPE_NAME,
       :message => Faker::Lorem.words(100).join,
-      :facility => rand(15),
-      :level => rand(8),
+      :facility => Faker::Lorem.words(50).join,
+      :file => Faker::Lorem.words(50).join('/'),
+      :line => rand(8),
+      :level => rand(7) + 1,
       :host => Faker::Lorem.words(3).join('-'),
       :created_at => Time.now.to_f,
       :deleted => false
