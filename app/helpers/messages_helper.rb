@@ -20,4 +20,19 @@ module MessagesHelper
     res = "<pre>#{res}</pre>" if res.include?("\n")
     res.html_safe
   end
+
+  def additional_field_link_target(key, value, stream_id)
+    res = {
+      :controller => :messages,
+      "filters[additional][keys][]" => key,
+      "filters[additional][values][]" => value
+    }
+
+    unless stream_id.blank?
+      res[:stream_id] = stream_id
+    end
+
+    res
+  end
+
 end
