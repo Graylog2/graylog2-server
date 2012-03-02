@@ -305,7 +305,14 @@ function bindMessageSidebarClicks() {
   $(".message-row").bind("click", function() {
     $("#gln").show();
 
-    $.post( relative_url_root + "/messages/" + $(this).attr("id") + "?partial=true", function(data) {
+    target = relative_url_root + "/messages/" + $(this).attr("id") + "?partial=true";
+    
+    stream_id = $("#stream_id").val();
+    if (stream_id != undefined) {
+      target += "&stream_id=" + stream_id;
+    }
+
+    $.post(target, function(data) {
       $("#sidebar-inner").html(data);
 
       // Show sidebar if hidden.

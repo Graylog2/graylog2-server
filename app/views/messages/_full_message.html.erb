@@ -45,13 +45,7 @@
     <h4>
       <%= key %>:
       <span class="highlighted">
-        <%= link_to format_additional_field_value(key, value), {
-                :controller => :messages,
-                "filters[additional][keys][]" => key,
-                "filters[additional][values][]" => value
-              },
-              :title => "Search for value of this additional field"
-        %>
+        <%= link_to format_additional_field_value(key, value), additional_field_link_target(key, value, params[:stream_id]), :title => "Search for value of this additional field" %>
       </span>
     </h4>
   <% end %>
