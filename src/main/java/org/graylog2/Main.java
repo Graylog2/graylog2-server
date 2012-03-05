@@ -46,6 +46,7 @@ import org.graylog2.periodical.MessageCountWriterThread;
 import org.graylog2.periodical.MessageRetentionThread;
 import org.graylog2.periodical.ServerValueWriterThread;
 
+import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.Writer;
@@ -70,6 +71,7 @@ public final class Main {
 
     public static Configuration configuration = null;
     public static ScheduledExecutorService scheduler = null;
+    private static CommandLineArguments commandLineArguments;
 
     private Main() {
     }
@@ -79,7 +81,7 @@ public final class Main {
      */
     public static void main(String[] args) {
 
-        CommandLineArguments commandLineArguments = new CommandLineArguments();
+        commandLineArguments = new CommandLineArguments();
         JCommander jCommander = new JCommander(commandLineArguments, args);
         jCommander.setProgramName("graylog2");
 
@@ -101,7 +103,7 @@ public final class Main {
             Logger.getLogger(Main.class.getPackage().getName()).setLevel(Level.ALL);
         }
 
-        LOG.info("Graylog2 starting up. (JRE: " + Tools.getSystemInformation() + ")");
+        LOG.info("Graylog2 " + GRAYLOG2_VERSION + " starting up. (JRE: " + Tools.getSystemInformation() + ")");
 
         String configFile = commandLineArguments.getConfigFile();
         LOG.info("Using config file: " + configFile);
@@ -125,6 +127,18 @@ public final class Main {
             System.exit(0);
         }
 
+        savePidFile(commandLineArguments.getPidFile());
+
+        // blocks until we shut down
+        new Main().run();
+
+        LOG.info("Graylog2 " + GRAYLOG2_VERSION + " exiting.");
+    }
+
+    /**
+     * main application run loop
+     */
+    private void run() {
         // XXX ELASTIC: put in own method
         // Check if the index exists. Create it if not.
         try {
@@ -143,8 +157,6 @@ public final class Main {
             LOG.fatal("IOException while trying to check Index. Make sure that your ElasticSearch server is running.", e);
             System.exit(1);
         }
-
-        savePidFile(commandLineArguments.getPidFile());
 
         // Statically set timeout for LogglyForwarder.
         // TODO: This is a code smell and needs to be fixed.
@@ -187,7 +199,7 @@ public final class Main {
         }
 
         // Add a shutdown hook that tries to flush the message queue.
-	Runtime.getRuntime().addShutdownHook(new MessageQueueFlusher());
+        Runtime.getRuntime().addShutdownHook(new MessageQueueFlusher());
 
         LOG.info("Graylog2 up and running.");
     }
@@ -335,6 +347,8 @@ public final class Main {
             System.exit(1);
         } finally {
             IOUtils.closeQuietly(pidFileWriter);
+            // make sure to remove our pid when we exit
+            new File(pidFile).deleteOnExit();
         }
     }
 
