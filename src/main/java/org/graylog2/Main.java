@@ -30,6 +30,7 @@ import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.graylog2.database.MongoConnection;
 import org.graylog2.forwarders.forwarders.LogglyForwarder;
+import org.graylog2.messagehandlers.scribe.ScribeServer;
 import org.graylog2.indexer.Indexer;
 import org.graylog2.messagehandlers.amqp.AMQPBroker;
 import org.graylog2.messagehandlers.amqp.AMQPSubscribedQueue;
@@ -198,6 +199,11 @@ public final class Main {
             LOG.info("Not initializing retention time cleanup thread because --no-retention was passed.");
         }
 
+        // Initialize Scribe if enabled
+        if (configuration.isScribeEnabled()) {
+            initializeScribe(configuration);
+        }
+
         // Add a shutdown hook that tries to flush the message queue.
         Runtime.getRuntime().addShutdownHook(new MessageQueueFlusher());
 
@@ -330,6 +336,21 @@ public final class Main {
         }
     }
 
+    private static void initializeScribe(Configuration configuration) {
+        // Start up the scribe server
+        ScribeServer scribeServer = new ScribeServer(
+                                               configuration.getScribeHost(),
+                                               configuration.getScribePort(),
+                                               configuration.getScribeRPCTimeout(),
+                                               configuration.getScribeThriftLength(),
+                                               configuration.getScribeMinThreads(),
+                                               configuration.getScribeMaxThreads()
+                                                 );
+        scribeServer.run();
+        LOG.info("Scribe threads started.");
+    }
+    
+    
     private static void savePidFile(String pidFile) {
 
         String pid = Tools.getPID();
