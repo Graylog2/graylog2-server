@@ -2,6 +2,7 @@
 .classpath
 .project
 .settings
+.DS_Store
 target
 build/*
 dist/*
@@ -11,7 +12,6 @@ nbproject/*
 coverage
 build.xml
 nbactions.xml
-
 
 misc/convert_rsyslog_db_to_mongo.rb
 

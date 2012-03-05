@@ -36,6 +36,7 @@ import org.graylog2.messagehandlers.amqp.AMQPSubscribedQueue;
 import org.graylog2.messagehandlers.amqp.AMQPSubscriberThread;
 import org.graylog2.messagehandlers.gelf.ChunkedGELFClientManager;
 import org.graylog2.messagehandlers.gelf.GELFMainThread;
+import org.graylog2.messagehandlers.kafka.KafkaHandler;
 import org.graylog2.messagehandlers.syslog.SyslogServerThread;
 import org.graylog2.messagequeue.MessageQueue;
 import org.graylog2.messagequeue.MessageQueueFlusher;
@@ -201,6 +202,11 @@ public final class Main {
         // Add a shutdown hook that tries to flush the message queue.
         Runtime.getRuntime().addShutdownHook(new MessageQueueFlusher());
 
+        // Initialize Kafka Handler if enabled
+        if(configuration.isKafkaEnabled()) {
+            initializeKafka(configuration);
+        }
+
         LOG.info("Graylog2 up and running.");
     }
 
@@ -328,6 +334,14 @@ public final class Main {
 
             LOG.info("AMQP threads started. (" + amqpQueues.size() + " queues)");
         }
+    }
+
+    private static void initializeKafka(Configuration configuration) {
+        KafkaHandler.start(configuration.getKafkaHost(),
+                           configuration.getKafkaPort(),
+                           configuration.getKafkaTimeout(),
+                           configuration.getKafkaGroupId(),
+                           configuration.getKafkaTopics());
     }
 
     private static void savePidFile(String pidFile) {

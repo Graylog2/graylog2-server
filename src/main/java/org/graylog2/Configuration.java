@@ -140,6 +140,24 @@ public class Configuration {
     @Parameter("amqp_virtualhost")
     private String amqpVirtualhost = "/";
 
+    @Parameter("kafka_enabled")
+    private boolean kafkaEnabled = false;
+
+    @Parameter("kafka_host")
+    private String kafkaHost = "localhost";
+
+    @Parameter("kafka_port")
+    private int kafkaPort = 2181;
+
+    @Parameter("kafka_group_id")
+    private String kafkaGroupId = "graylog_handlers";
+
+    @Parameter("kafka_timeout")
+    private int kafkaTimeout = 1000000;
+
+    @Parameter(value = "kafka_topics", converter = StringListConverter.class)
+    private List<String> kafkaTopics;
+
     @Parameter(value = "forwarder_loggly_timeout", validator = PositiveIntegerValidator.class)
     private int forwarderLogglyTimeout = 3;
 
@@ -268,6 +286,31 @@ public class Configuration {
     public String getAmqpVirtualhost() {
         return amqpVirtualhost;
     }
+
+    public boolean isKafkaEnabled() {
+        return kafkaEnabled;
+    }
+
+    public String getKafkaHost() {
+        return kafkaHost;
+    }
+
+    public int getKafkaPort() {
+        return kafkaPort;
+    }
+
+    public String getKafkaGroupId() {
+        return kafkaGroupId;
+    }
+
+    public int getKafkaTimeout() {
+        return kafkaTimeout;
+    }
+
+    public List<String> getKafkaTopics() {
+        return kafkaTopics;
+    }
+
 
     public int getForwarderLogglyTimeout() {
         return forwarderLogglyTimeout * 1000;
