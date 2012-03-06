@@ -20,7 +20,7 @@
 
 package org.graylog2.messagehandlers.common;
 
-import org.graylog2.Main;
+import org.graylog2.GraylogServer;
 import org.graylog2.messagehandlers.gelf.GELFMessage;
 
 /**
@@ -32,16 +32,23 @@ import org.graylog2.messagehandlers.gelf.GELFMessage;
  */
 public class MessageParserHook implements MessagePreReceiveHookIF {
 
+    private final GraylogServer server;
+
+    public MessageParserHook(GraylogServer server) {
+        this.server = server;
+    }
+
     /**
      * Process the hook.
      */
+    @Override
     public void process(GELFMessage message) {
-		/**
-		 * Run GELFMessage through the rules engine
-		 */
-    	if (Main.drools != null)
-    	{
-    		Main.drools.evaluate(message);
-    	}
+        /**
+         * Run GELFMessage through the rules engine
+         */
+        if (server.getDrools() != null)
+        {
+            server.getDrools().evaluate(message);
+        }
     }
 }

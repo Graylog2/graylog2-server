@@ -21,8 +21,9 @@
 package org.graylog2.periodical;
 
 import java.util.concurrent.TimeUnit;
+
 import org.apache.log4j.Logger;
-import org.graylog2.Main;
+import org.graylog2.GraylogServer;
 import org.graylog2.indexer.retention.MessageRetention;
 import org.graylog2.settings.Setting;
 
@@ -39,6 +40,17 @@ public class MessageRetentionThread implements Runnable {
 
     private int retentionTimeDays;
 
+    private final GraylogServer server;
+
+    private final MessageRetention messageRetention;
+    private final Setting settings;
+
+    public MessageRetentionThread(GraylogServer server) {
+        this.server = server;
+        this.messageRetention = new MessageRetention(server);
+        this.settings = new Setting(server);
+    }
+
     @Override
     public void run() {
         try {
@@ -47,12 +59,12 @@ public class MessageRetentionThread implements Runnable {
              * to be sure to always have the *current* setting from database - even when
              * used with scheduler.
              */
-            this.retentionTimeDays = Setting.getRetentionTimeInDays();
+            this.retentionTimeDays = settings.getRetentionTimeInDays();
 
             LOG.info("Initialized message retention thread - cleaning all messages older than <" + this.retentionTimeDays + " days>.");
 
-            if (MessageRetention.performCleanup(this.retentionTimeDays)) {
-                MessageRetention.updateLastPerformedTime();
+            if (messageRetention.performCleanup(this.retentionTimeDays)) {
+                messageRetention.updateLastPerformedTime();
             }
         } catch (Exception e) {
             LOG.fatal("Error in MessageRetentionThread: " + e.getMessage(), e);
@@ -63,8 +75,8 @@ public class MessageRetentionThread implements Runnable {
 
     private void scheduleNextRun() {
         // Schedule next run in [current frequency setting from database] minutes.
-        int when = Setting.getRetentionFrequencyInMinutes();
-        Main.scheduler.schedule(new MessageRetentionThread(), when, TimeUnit.MINUTES);
+        int when = settings.getRetentionFrequencyInMinutes();
+        server.getScheduler().schedule(new MessageRetentionThread(server), when, TimeUnit.MINUTES);
         LOG.info("Scheduled next run of MessageRetentionThread in <" + when + " minutes>.");
     }
 }

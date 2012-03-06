@@ -21,10 +21,10 @@
 package org.graylog2.periodical;
 
 import java.util.List;
+
 import org.apache.log4j.Logger;
 import org.graylog2.Configuration;
-import org.graylog2.ServerValue;
-import org.graylog2.indexer.Indexer;
+import org.graylog2.GraylogServer;
 import org.graylog2.messagehandlers.gelf.GELFMessage;
 import org.graylog2.messagequeue.MessageQueue;
 
@@ -44,7 +44,10 @@ public class BulkIndexerThread implements Runnable {
     private int batchSize;
     private int pollFreq;
 
-    public BulkIndexerThread(Configuration configuration) {
+    private final GraylogServer graylogServer;
+
+    public BulkIndexerThread(GraylogServer graylogServer, Configuration configuration) {
+        this.graylogServer = graylogServer;
         this.batchSize = configuration.getMessageQueueBatchSize();
         this.pollFreq = configuration.getMessageQueuePollFrequency();
 
@@ -60,7 +63,7 @@ public class BulkIndexerThread implements Runnable {
 
             List<GELFMessage> messages = mq.readBatch(batchSize);
             LOG.info("... indexing " + messages.size() + " messages.");
-            Indexer.bulkIndex(messages);
+            graylogServer.getIndexer().bulkIndex(messages);
 
             /*
              * Write message queue size information to server values. We do this
@@ -69,7 +72,7 @@ public class BulkIndexerThread implements Runnable {
              * to see if the queue grows / if there are messages left *after*
              * writing.
              */
-            ServerValue.writeMessageQueueCurrentSize(MessageQueue.getInstance().getSize());
+            graylogServer.getServerValue().writeMessageQueueCurrentSize(MessageQueue.getInstance().getSize());
         } catch (Exception e) {
             LOG.fatal("You possibly lost messages! :( Error in BulkIndexerThread: " + e.getMessage(), e);
         }

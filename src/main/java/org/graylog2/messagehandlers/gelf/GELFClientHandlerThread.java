@@ -20,9 +20,10 @@
 
 package org.graylog2.messagehandlers.gelf;
 
-import org.apache.log4j.Logger;
-
 import java.net.DatagramPacket;
+
+import org.apache.log4j.Logger;
+import org.graylog2.GraylogServer;
 
 
 /**
@@ -38,12 +39,16 @@ public class GELFClientHandlerThread extends Thread {
 
     private DatagramPacket receivedGelfSentence;
 
+    private final GraylogServer server;
+
     /**
      * Thread that handles a GELF client.
+     * @param graylogServer
      *
      * @param receivedGelfSentence Raw GELF message
      */
-    public GELFClientHandlerThread(DatagramPacket receivedGelfSentence) {
+    public GELFClientHandlerThread(GraylogServer graylogServer, DatagramPacket receivedGelfSentence) {
+        this.server = graylogServer;
         this.receivedGelfSentence = receivedGelfSentence;
     }
 
@@ -55,10 +60,10 @@ public class GELFClientHandlerThread extends Thread {
             GELFClientHandlerIF client = null;
             if (GELF.isChunkedMessage(this.receivedGelfSentence)) {
                 LOG.debug("Received message is chunked. Handling now.");
-                client = new ChunkedGELFClientHandler(this.receivedGelfSentence);
+                client = new ChunkedGELFClientHandler(server, this.receivedGelfSentence);
             } else {
                 LOG.debug("Received message is not chunked. Handling now.");
-                client = new SimpleGELFClientHandler(this.receivedGelfSentence);
+                client = new SimpleGELFClientHandler(server,this.receivedGelfSentence);
             }
             client.handle();
         } catch (InvalidGELFTypeException e) {

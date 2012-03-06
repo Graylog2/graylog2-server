@@ -21,7 +21,7 @@
 package org.graylog2.periodical;
 
 import org.apache.log4j.Logger;
-import org.graylog2.database.MongoBridge;
+import org.graylog2.GraylogServer;
 import org.graylog2.messagehandlers.common.MessageCounter;
 
 
@@ -39,6 +39,12 @@ public class MessageCountWriterThread implements Runnable {
     public static final int INITIAL_DELAY = 60;
     public static final int PERIOD = 60;
 
+    private final GraylogServer graylogServer;
+
+    public MessageCountWriterThread(GraylogServer graylogServer) {
+        this.graylogServer = graylogServer;
+    }
+
     /**
      * Start the thread. Runs forever.
      */
@@ -46,8 +52,7 @@ public class MessageCountWriterThread implements Runnable {
     public void run() {
         MessageCounter counter = MessageCounter.getInstance();
         try {
-            MongoBridge m = new MongoBridge();
-            m.writeMessageCounts(counter.getTotalCount(), counter.getStreamCounts(), counter.getHostCounts());
+            graylogServer.getMongoBridge().writeMessageCounts(counter.getTotalCount(), counter.getStreamCounts(), counter.getHostCounts());
         } catch (Exception e) {
             LOG.warn("Error in MessageCountWriterThread: " + e.getMessage(), e);
         } finally {

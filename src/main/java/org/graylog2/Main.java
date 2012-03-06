@@ -20,41 +20,19 @@
 
 package org.graylog2;
 
+import java.io.File;
+import java.io.FileWriter;
+import java.io.Writer;
+
+import org.apache.commons.io.IOUtils;
+import org.apache.log4j.Level;
+import org.apache.log4j.Logger;
+
 import com.beust.jcommander.JCommander;
 import com.github.joschi.jadconfig.JadConfig;
 import com.github.joschi.jadconfig.RepositoryException;
 import com.github.joschi.jadconfig.ValidationException;
 import com.github.joschi.jadconfig.repositories.PropertiesRepository;
-import org.apache.commons.io.IOUtils;
-import org.apache.log4j.Level;
-import org.apache.log4j.Logger;
-import org.graylog2.database.MongoConnection;
-import org.graylog2.forwarders.forwarders.LogglyForwarder;
-import org.graylog2.indexer.Indexer;
-import org.graylog2.messagehandlers.amqp.AMQPBroker;
-import org.graylog2.messagehandlers.amqp.AMQPSubscribedQueue;
-import org.graylog2.messagehandlers.amqp.AMQPSubscriberThread;
-import org.graylog2.messagehandlers.gelf.ChunkedGELFClientManager;
-import org.graylog2.messagehandlers.gelf.GELFMainThread;
-import org.graylog2.messagehandlers.syslog.SyslogServerThread;
-import org.graylog2.messagequeue.MessageQueue;
-import org.graylog2.messagequeue.MessageQueueFlusher;
-import org.graylog2.periodical.BulkIndexerThread;
-import org.graylog2.periodical.ChunkedGELFClientManagerThread;
-import org.graylog2.periodical.HostCounterCacheWriterThread;
-import org.graylog2.periodical.MessageCountWriterThread;
-import org.graylog2.periodical.MessageRetentionThread;
-import org.graylog2.periodical.ServerValueWriterThread;
-
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.io.Writer;
-import java.net.InetSocketAddress;
-import java.util.List;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.TimeUnit;
 
 /**
  * Main class of Graylog2.
@@ -64,25 +42,14 @@ import java.util.concurrent.TimeUnit;
 public final class Main {
 
     private static final Logger LOG = Logger.getLogger(Main.class);
-    private static final String GRAYLOG2_VERSION = "0.9.7-dev";
-
-    public static RulesEngine drools = null;
-    private static final int SCHEDULED_THREADS_POOL_SIZE = 7;
-
-    public static Configuration configuration = null;
-    public static ScheduledExecutorService scheduler = null;
-    private static CommandLineArguments commandLineArguments;
-
-    private Main() {
-    }
 
     /**
      * @param args the command line arguments
      */
     public static void main(String[] args) {
 
-        commandLineArguments = new CommandLineArguments();
-        JCommander jCommander = new JCommander(commandLineArguments, args);
+        final CommandLineArguments commandLineArguments = new CommandLineArguments();
+        final JCommander jCommander = new JCommander(commandLineArguments, args);
         jCommander.setProgramName("graylog2");
 
         if (commandLineArguments.isShowHelp()) {
@@ -91,7 +58,7 @@ public final class Main {
         }
 
         if (commandLineArguments.isShowVersion()) {
-            System.out.println("Graylog2 Server " + GRAYLOG2_VERSION);
+            System.out.println("Graylog2 Server " + GraylogServer.GRAYLOG2_VERSION);
             System.out.println("JRE: " + Tools.getSystemInformation());
             System.exit(0);
         }
@@ -103,12 +70,12 @@ public final class Main {
             Logger.getLogger(Main.class.getPackage().getName()).setLevel(Level.ALL);
         }
 
-        LOG.info("Graylog2 " + GRAYLOG2_VERSION + " starting up. (JRE: " + Tools.getSystemInformation() + ")");
+        LOG.info("Graylog2 " + GraylogServer.GRAYLOG2_VERSION + " starting up. (JRE: " + Tools.getSystemInformation() + ")");
 
         String configFile = commandLineArguments.getConfigFile();
         LOG.info("Using config file: " + configFile);
 
-        configuration = new Configuration();
+        final Configuration configuration = new Configuration();
         JadConfig jadConfig = new JadConfig(new PropertiesRepository(configFile), configuration);
 
         LOG.info("Loading configuration");
@@ -130,204 +97,9 @@ public final class Main {
         savePidFile(commandLineArguments.getPidFile());
 
         // blocks until we shut down
-        new Main().run();
+        new GraylogServer(configuration).run();
 
-        LOG.info("Graylog2 " + GRAYLOG2_VERSION + " exiting.");
-    }
-
-    /**
-     * main application run loop
-     */
-    private void run() {
-        // XXX ELASTIC: put in own method
-        // Check if the index exists. Create it if not.
-        try {
-            if (Indexer.indexExists()) {
-                LOG.info("Index exists. Not creating it.");
-            } else {
-                LOG.info("Index does not exist! Trying to create it ...");
-                if (Indexer.createIndex()) {
-                    LOG.info("Successfully created index.");
-                } else {
-                    LOG.fatal("Could not create Index. Terminating.");
-                    System.exit(1);
-                }
-            }
-        } catch (IOException e) {
-            LOG.fatal("IOException while trying to check Index. Make sure that your ElasticSearch server is running.", e);
-            System.exit(1);
-        }
-
-        // Statically set timeout for LogglyForwarder.
-        // TODO: This is a code smell and needs to be fixed.
-        LogglyForwarder.setTimeout(configuration.getForwarderLogglyTimeout());
-
-        scheduler = Executors.newScheduledThreadPool(SCHEDULED_THREADS_POOL_SIZE);
-
-        initializeMongoConnection(configuration);
-        initializeRulesEngine(configuration.getDroolsRulesFile());
-        initializeSyslogServer(configuration.getSyslogProtocol(), configuration.getSyslogListenPort(), configuration.getSyslogListenAddress());
-        initializeHostCounterCache(scheduler);
-
-        // Start message counter thread.
-        initializeMessageCounters(scheduler);
-
-        // Inizialize message queue.
-        initializeMessageQueue(scheduler, configuration);
-
-        // Write initial ServerValue information.
-        writeInitialServerValues(configuration);
-
-        // Start GELF threads
-        if (configuration.isUseGELF()) {
-            initializeGELFThreads(configuration.getGelfListenAddress(), configuration.getGelfListenPort(), scheduler);
-        }
-
-        // Initialize AMQP Broker if enabled
-        if (configuration.isAmqpEnabled()) {
-            initializeAMQP(configuration);
-        }
-
-        // Start server value writer thread. (writes for example msg throughout and pings)
-        initializeServerValueWriter(scheduler);
-
-        // Start thread that automatically removes messages older than retention time.
-        if (commandLineArguments.performRetention()) {
-            initializeMessageRetentionThread(scheduler);
-        } else {
-            LOG.info("Not initializing retention time cleanup thread because --no-retention was passed.");
-        }
-
-        // Add a shutdown hook that tries to flush the message queue.
-        Runtime.getRuntime().addShutdownHook(new MessageQueueFlusher());
-
-        LOG.info("Graylog2 up and running.");
-    }
-
-    private static void initializeHostCounterCache(ScheduledExecutorService scheduler) {
-
-        scheduler.scheduleAtFixedRate(new HostCounterCacheWriterThread(), HostCounterCacheWriterThread.INITIAL_DELAY, HostCounterCacheWriterThread.PERIOD, TimeUnit.SECONDS);
-
-        LOG.info("Host count cache is up.");
-    }
-
-    private static void initializeMessageQueue(ScheduledExecutorService scheduler, Configuration configuration) {
-        // Set the maximum size if it was configured to something else than 0 (= UNLIMITED)
-        if (configuration.getMessageQueueMaximumSize() != MessageQueue.SIZE_LIMIT_UNLIMITED) {
-            MessageQueue.getInstance().setMaximumSize(configuration.getMessageQueueMaximumSize());
-        }
-
-        scheduler.scheduleAtFixedRate(new BulkIndexerThread(configuration), BulkIndexerThread.INITIAL_DELAY, configuration.getMessageQueuePollFrequency(), TimeUnit.SECONDS);
-
-        LOG.info("Message queue initialized .");
-    }
-
-    private static void initializeMessageCounters(ScheduledExecutorService scheduler) {
-
-        scheduler.scheduleAtFixedRate(new MessageCountWriterThread(), MessageCountWriterThread.INITIAL_DELAY, MessageCountWriterThread.PERIOD, TimeUnit.SECONDS);
-
-        LOG.info("Message counters initialized.");
-    }
-
-    private static void initializeServerValueWriter(ScheduledExecutorService scheduler) {
-
-        scheduler.scheduleAtFixedRate(new ServerValueWriterThread(), ServerValueWriterThread.INITIAL_DELAY, ServerValueWriterThread.PERIOD, TimeUnit.SECONDS);
-
-        LOG.info("Server value writer up.");
-    }
-
-    private static void initializeMessageRetentionThread(ScheduledExecutorService scheduler) {
-        // Schedule first run. This is NOT at fixed rate. Thread will itself schedule next run with current frequency setting from database.
-        scheduler.schedule(new MessageRetentionThread(),0,TimeUnit.SECONDS);
-
-        LOG.info("Retention time management active.");
-    }
-
-    private static void initializeGELFThreads(String gelfAddress, int gelfPort, ScheduledExecutorService scheduler) {
-        GELFMainThread gelfThread = new GELFMainThread(new InetSocketAddress(gelfAddress, gelfPort));
-        gelfThread.start();
-
-        scheduler.scheduleAtFixedRate(new ChunkedGELFClientManagerThread(ChunkedGELFClientManager.getInstance()), ChunkedGELFClientManagerThread.INITIAL_DELAY, ChunkedGELFClientManagerThread.PERIOD, TimeUnit.SECONDS);
-
-        LOG.info("GELF threads started");
-    }
-
-    private static void initializeSyslogServer(String syslogProtocol, int syslogPort, String syslogHost) {
-
-        // Start the Syslog thread that accepts syslog packages.
-        SyslogServerThread syslogServerThread = new SyslogServerThread(syslogProtocol, syslogPort, syslogHost);
-        syslogServerThread.start();
-
-        // Check if the thread started up completely.
-        try {
-            Thread.sleep(1000);
-        } catch (InterruptedException e) {
-        }
-        if (syslogServerThread.getCoreThread().isAlive()) {
-            LOG.info("Syslog server thread is up.");
-        } else {
-            LOG.fatal("Could not start syslog server core thread. Do you have permissions to listen on port " + syslogPort + "?");
-            System.exit(1);
-        }
-    }
-
-    private static void initializeRulesEngine(String rulesFilePath) {
-        try {
-            if (rulesFilePath != null && !rulesFilePath.isEmpty()) {
-                drools = new RulesEngine();
-                drools.addRules(rulesFilePath);
-                LOG.info("Using rules: " + rulesFilePath);
-            } else {
-                LOG.info("Not using rules");
-            }
-        } catch (Exception e) {
-            LOG.fatal("Could not load rules engine: " + e.getMessage(), e);
-            System.exit(1);
-        }
-    }
-
-    private static void initializeMongoConnection(Configuration configuration) {
-        try {
-            MongoConnection.getInstance().connect(
-                    configuration.getMongoUser(),
-                    configuration.getMongoPassword(),
-                    configuration.getMongoHost(),
-                    configuration.getMongoDatabase(),
-                    configuration.getMongoPort(),
-                    configuration.isMongoUseAuth(),
-                    configuration.getMongoMaxConnections(),
-                    configuration.getMongoThreadsAllowedToBlockMultiplier(),
-                    configuration.getMongoReplicaSet(),
-                    configuration.getMessagesCollectionSize()
-            );
-        } catch (Exception e) {
-            LOG.fatal("Could not create MongoDB connection: " + e.getMessage(), e);
-            System.exit(1); // Exit with error.
-        }
-    }
-
-    private static void initializeAMQP(Configuration configuration) {
-
-        // Connect to AMQP broker.
-        AMQPBroker amqpBroker = new AMQPBroker(
-                configuration.getAmqpHost(),
-                configuration.getAmqpPort(),
-                configuration.getAmqpUsername(),
-                configuration.getAmqpPassword(),
-                configuration.getAmqpVirtualhost()
-        );
-
-        List<AMQPSubscribedQueue> amqpQueues = configuration.getAmqpSubscribedQueues();
-
-        if (amqpQueues != null) {
-            // Start AMQP subscriber thread for each queue to listen on.
-            for (AMQPSubscribedQueue queue : amqpQueues) {
-                AMQPSubscriberThread amqpThread = new AMQPSubscriberThread(queue, amqpBroker);
-                amqpThread.start();
-            }
-
-            LOG.info("AMQP threads started. (" + amqpQueues.size() + " queues)");
-        }
+        LOG.info("Graylog2 " + GraylogServer.GRAYLOG2_VERSION + " exiting.");
     }
 
     private static void savePidFile(String pidFile) {
@@ -352,15 +124,4 @@ public final class Main {
         }
     }
 
-    public static void writeInitialServerValues(Configuration configuration) {
-        ServerValue.setStartupTime(Tools.getUTCTimestamp());
-        ServerValue.setPID(Integer.parseInt(Tools.getPID()));
-        ServerValue.setJREInfo(Tools.getSystemInformation());
-        ServerValue.setGraylog2Version(GRAYLOG2_VERSION);
-        ServerValue.setAvailableProcessors(HostSystem.getAvailableProcessors());
-        ServerValue.setLocalHostname(Tools.getLocalHostname());
-        ServerValue.writeMessageQueueMaximumSize(configuration.getMessageQueueMaximumSize());
-        ServerValue.writeMessageQueueBatchSize(configuration.getMessageQueueBatchSize());
-        ServerValue.writeMessageQueuePollFrequency(configuration.getMessageQueuePollFrequency());
-    }
 }

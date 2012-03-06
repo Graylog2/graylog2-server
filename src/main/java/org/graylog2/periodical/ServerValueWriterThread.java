@@ -21,12 +21,8 @@
 package org.graylog2.periodical;
 
 import org.apache.log4j.Logger;
-import org.graylog2.HostSystem;
-import org.graylog2.ServerValue;
-import org.graylog2.Tools;
-import org.graylog2.database.MongoBridge;
+import org.graylog2.GraylogServer;
 import org.graylog2.messagehandlers.common.MessageCounter;
-import org.graylog2.messagequeue.MessageQueue;
 
 /**
  * ServerValueWriterThread.java
@@ -42,6 +38,12 @@ public class ServerValueWriterThread implements Runnable {
     public static final int PERIOD = 5;
     public static final int INITIAL_DELAY = 0;
 
+    private final GraylogServer graylogServer;
+
+    public ServerValueWriterThread(GraylogServer graylogServer) {
+        this.graylogServer = graylogServer;
+    }
+
     /**
      * Start the thread. Runs forever.
      */
@@ -49,11 +51,11 @@ public class ServerValueWriterThread implements Runnable {
     public void run() {
         try {
             // ohai, we are alive. \o/
-            ServerValue.ping();
+            graylogServer.getServerValue().ping();
 
             // Current throughput.
             MessageCounter c = MessageCounter.getInstance();
-            ServerValue.writeThroughput(c.getFiveSecondThroughput(), c.getHighestFiveSecondThroughput());
+            graylogServer.getServerValue().writeThroughput(c.getFiveSecondThroughput(), c.getHighestFiveSecondThroughput());
             c.resetFiveSecondThroughput(); // Reset five second throughput count.
 
             /*

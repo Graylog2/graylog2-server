@@ -20,20 +20,21 @@
 
 package org.graylog2.messagehandlers.gelf;
 
+import java.io.IOException;
+import java.io.UnsupportedEncodingException;
+import java.net.DatagramPacket;
+import java.util.zip.DataFormatException;
+
 import org.apache.log4j.Logger;
+import org.graylog2.GraylogServer;
 import org.graylog2.Tools;
 import org.graylog2.blacklists.Blacklist;
 import org.graylog2.forwarders.Forwarder;
 import org.graylog2.messagehandlers.common.HostUpsertHook;
 import org.graylog2.messagehandlers.common.MessageCountUpdateHook;
 import org.graylog2.messagehandlers.common.MessageParserHook;
-import org.graylog2.messagehandlers.common.ReceiveHookManager;
-
-import java.io.IOException;
-import java.io.UnsupportedEncodingException;
-import java.net.DatagramPacket;
-import java.util.zip.DataFormatException;
 import org.graylog2.messagehandlers.common.RealtimeCollectionUpdateHook;
+import org.graylog2.messagehandlers.common.ReceiveHookManager;
 import org.graylog2.messagequeue.MessageQueue;
 
 /**
@@ -52,14 +53,15 @@ public class SimpleGELFClientHandler extends GELFClientHandlerBase implements GE
 
     /**
      * Representing a GELF client consisting of only one UDP message.
-     * 
+     *
      * @param clientMessage The raw data the GELF client sent. (JSON string)
      * @throws DataFormatException
      * @throws UnsupportedEncodingException
      * @throws InvalidGELFCompressionMethodException
      * @throws IOException
      */
-    public SimpleGELFClientHandler(Object clientMessage) throws DataFormatException, InvalidGELFCompressionMethodException, IOException {
+    public SimpleGELFClientHandler(GraylogServer server, Object clientMessage) throws DataFormatException, InvalidGELFCompressionMethodException, IOException {
+        super(server);
 
         if (clientMessage instanceof DatagramPacket) {
             DatagramPacket msg = (DatagramPacket) clientMessage;
@@ -92,14 +94,15 @@ public class SimpleGELFClientHandler extends GELFClientHandlerBase implements GE
             this.message = (GELFMessage) clientMessage;
             this.preParsed = true;
         }
-        
+
     }
-    
+
     /**
      * Handles the client: Decodes JSON, Stores in Indexer, ReceiveHooks
-     * 
+     *
      * @return boolean
      */
+    @Override
     public boolean handle() {
         try {
             // Parse JSON to GELFMessage if necessary.
@@ -111,12 +114,12 @@ public class SimpleGELFClientHandler extends GELFClientHandlerBase implements GE
                     return false;
                 }
             }
-            
+
             if (!this.message.allRequiredFieldsSet()) {
                 LOG.info("GELF message is not complete. Version, host and short_message must be set.");
                 return false;
             }
-        	
+
             // Add AMQP receiver queue as additional field if set.
             if (this.getAmqpReceiverQueue() != null) {
                 this.message.addAdditionalData("_amqp_queue", this.getAmqpReceiverQueue());
@@ -132,7 +135,7 @@ public class SimpleGELFClientHandler extends GELFClientHandlerBase implements GE
             }
 
             // PreProcess message based on filters. Insert message into indexer.
-            ReceiveHookManager.preProcess(new MessageParserHook(), message);
+            ReceiveHookManager.preProcess(new MessageParserHook(getServer()), message);
             if(!message.getFilterOut()) {
                 // Add message to queue and post-process if it was successful.
                 if (MessageQueue.getInstance().add(message)) {
@@ -143,7 +146,7 @@ public class SimpleGELFClientHandler extends GELFClientHandlerBase implements GE
                     ReceiveHookManager.postProcess(new HostUpsertHook(), message);
 
                     // Update realtime collection-
-                    ReceiveHookManager.postProcess(new RealtimeCollectionUpdateHook(), message);
+                    ReceiveHookManager.postProcess(new RealtimeCollectionUpdateHook(getServer()), message);
                 }
             }
 

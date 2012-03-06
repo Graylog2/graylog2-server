@@ -21,9 +21,8 @@
 package org.graylog2.indexer.retention;
 
 import org.apache.log4j.Logger;
-import org.graylog2.ServerValue;
+import org.graylog2.GraylogServer;
 import org.graylog2.Tools;
-import org.graylog2.indexer.Indexer;
 
 /**
  * MessageRetention.java: Nov 22, 2011 6:58:31 PM
@@ -33,15 +32,20 @@ import org.graylog2.indexer.Indexer;
 public class MessageRetention {
 
     private static final Logger LOG = Logger.getLogger(MessageRetention.class);
+    private final GraylogServer graylogServer;
 
-    public static boolean performCleanup(int timeDays) {
-        int to = Tools.getTimestampDaysAgo(Tools.getUTCTimestamp(), timeDays);
-        LOG.debug("Deleting all messages older than " + to + " (" + timeDays + " days ago)");
-        return Indexer.deleteMessagesByTimeRange(to);
+    public MessageRetention(final GraylogServer server) {
+        this.graylogServer = server;
     }
 
-    public static void updateLastPerformedTime() {
-        ServerValue.writeMessageRetentionLastPerformed(Tools.getUTCTimestamp());
+    public boolean performCleanup(int timeDays) {
+        int to = Tools.getTimestampDaysAgo(Tools.getUTCTimestamp(), timeDays);
+        LOG.debug("Deleting all messages older than " + to + " (" + timeDays + " days ago)");
+        return graylogServer.getIndexer().deleteMessagesByTimeRange(to);
+    }
+
+    public void updateLastPerformedTime() {
+        graylogServer.getServerValue().writeMessageRetentionLastPerformed(Tools.getUTCTimestamp());
     }
 
 }

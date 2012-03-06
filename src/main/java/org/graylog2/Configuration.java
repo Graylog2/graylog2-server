@@ -20,6 +20,15 @@
 
 package org.graylog2;
 
+import java.net.UnknownHostException;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
+import org.apache.log4j.Logger;
+import org.graylog2.messagehandlers.amqp.AMQPSubscribedQueue;
+import org.graylog2.messagehandlers.amqp.InvalidQueueTypeException;
+
 import com.github.joschi.jadconfig.Parameter;
 import com.github.joschi.jadconfig.ValidationException;
 import com.github.joschi.jadconfig.ValidatorMethod;
@@ -28,14 +37,6 @@ import com.github.joschi.jadconfig.validators.InetPortValidator;
 import com.github.joschi.jadconfig.validators.PositiveIntegerValidator;
 import com.github.joschi.jadconfig.validators.PositiveLongValidator;
 import com.mongodb.ServerAddress;
-import org.apache.log4j.Logger;
-import org.graylog2.messagehandlers.amqp.AMQPSubscribedQueue;
-import org.graylog2.messagehandlers.amqp.InvalidQueueTypeException;
-
-import java.net.UnknownHostException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
 
 /**
  * Helper class to hold configuration of Graylog2
@@ -64,6 +65,9 @@ public class Configuration {
 
     @Parameter(value = "allow_override_syslog_date", required = true)
     private boolean allowOverrideSyslogDate = true;
+
+    @Parameter(value = "no_retention")
+    private boolean noRetention;
 
     @Parameter(value = "elasticsearch_url", required = true)
     private String elasticsearchUrl = "http://localhost:9200/";
@@ -164,6 +168,10 @@ public class Configuration {
 
     public boolean getAllowOverrideSyslogDate() {
         return allowOverrideSyslogDate;
+    }
+
+    public boolean performRetention() {
+        return !noRetention;
     }
 
     public String getElasticSearchUrl() {
@@ -350,4 +358,5 @@ public class Configuration {
             throw new ValidationException("Invalid syslog_protocol: " + getSyslogProtocol());
         }
     }
+
 }

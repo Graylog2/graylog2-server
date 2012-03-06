@@ -20,9 +20,12 @@
 
 package org.graylog2.messagehandlers.gelf;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+
 import java.util.Map;
+
 import org.junit.Test;
-import static org.junit.Assert.*;
 
 /**
  * GELFClientHandlerBaseTest.java: Oct 18, 2010 7:07:26 PM
@@ -45,7 +48,7 @@ public class GELFClientHandlerBaseTest {
      */
     @Test
     public void testParseWithoutAdditionalData() throws Exception {
-        GELFClientHandlerBase instance = new GELFClientHandlerBase();
+        GELFClientHandlerBase instance = new GELFClientHandlerBase(null);
         instance.clientMessage = this.originalMessage;
         instance.parse();
 
@@ -68,7 +71,7 @@ public class GELFClientHandlerBaseTest {
      */
     @Test
     public void testParseWithAdditionalData() throws Exception {
-        GELFClientHandlerBase instance = new GELFClientHandlerBase();
+        GELFClientHandlerBase instance = new GELFClientHandlerBase(null);
         instance.clientMessage = this.originalMessageWithAdditionalData;
         instance.parse();
 
@@ -93,7 +96,7 @@ public class GELFClientHandlerBaseTest {
 
     @Test
     public void testParseWithAdditionalDataAndDifferentDataTypes() throws Exception {
-        GELFClientHandlerBase instance = new GELFClientHandlerBase();
+        GELFClientHandlerBase instance = new GELFClientHandlerBase(null);
         instance.clientMessage = this.originalMessageWithAdditionalDataThatHasInts;
         instance.parse();
 
@@ -120,7 +123,7 @@ public class GELFClientHandlerBaseTest {
 
     @Test
     public void testIdFieldIsSkipped() throws Exception {
-        GELFClientHandlerBase instance = new GELFClientHandlerBase();
+        GELFClientHandlerBase instance = new GELFClientHandlerBase(null);
         instance.clientMessage = this.originalMessageWithIDField;
         instance.parse();
 
@@ -135,7 +138,7 @@ public class GELFClientHandlerBaseTest {
      */
     @Test
     public void testGetClientMessage() {
-        GELFClientHandlerBase instance = new GELFClientHandlerBase();
+        GELFClientHandlerBase instance = new GELFClientHandlerBase(null);
         instance.clientMessage = this.originalMessage;
         assertEquals(this.originalMessage, instance.clientMessage);
     }

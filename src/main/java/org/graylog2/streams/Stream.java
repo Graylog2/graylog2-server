@@ -20,14 +20,18 @@
 
 package org.graylog2.streams;
 
-import com.mongodb.*;
-import org.apache.log4j.Logger;
-import org.bson.types.ObjectId;
-import org.graylog2.database.MongoConnection;
-import org.graylog2.forwarders.ForwardEndpoint;
-
 import java.util.ArrayList;
 import java.util.List;
+
+import org.apache.log4j.Logger;
+import org.bson.types.ObjectId;
+import org.graylog2.forwarders.ForwardEndpoint;
+
+import com.mongodb.BasicDBList;
+import com.mongodb.BasicDBObject;
+import com.mongodb.DBCollection;
+import com.mongodb.DBCursor;
+import com.mongodb.DBObject;
 
 /**
  * Stream.java: Mar 26, 2011 10:39:40 PM
@@ -56,13 +60,14 @@ public class Stream {
     }
 
     public static List<Stream> fetchAllEnabled() {
-        if (StreamCache.getInstance().valid()) {
-            return StreamCache.getInstance().get();
+        StreamCache streamCache = StreamCache.getInstance();
+        if (streamCache.valid()) {
+            return streamCache.get();
         }
-        
+
         List<Stream> streams = new ArrayList<Stream>();
 
-        DBCollection coll = MongoConnection.getInstance().getDatabase().getCollection("streams");
+        DBCollection coll = streamCache.getGraylogServer().getMongoConnection().getDatabase().getCollection("streams");
         DBObject query = new BasicDBObject();
         query.put("disabled", new BasicDBObject("$ne", true));
         DBCursor cur = coll.find(query);
@@ -75,7 +80,7 @@ public class Stream {
             }
         }
 
-        StreamCache.getInstance().set(streams);
+        streamCache.set(streams);
 
         return streams;
     }
@@ -107,7 +112,7 @@ public class Stream {
         if (this.forwardedTo != null) {
             return this.forwardedTo;
         }
-        
+
         List<ForwardEndpoint> fwds = new ArrayList<ForwardEndpoint>();
 
         BasicDBList rawFwds = (BasicDBList) this.mongoObject.get("forwarders");

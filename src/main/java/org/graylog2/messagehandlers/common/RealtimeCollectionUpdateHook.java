@@ -20,8 +20,7 @@
 
 package org.graylog2.messagehandlers.common;
 
-import org.graylog2.Main;
-import org.graylog2.database.MongoBridge;
+import org.graylog2.GraylogServer;
 import org.graylog2.messagehandlers.gelf.GELFMessage;
 
 /**
@@ -33,14 +32,20 @@ import org.graylog2.messagehandlers.gelf.GELFMessage;
  */
 public class RealtimeCollectionUpdateHook implements MessagePostReceiveHookIF {
 
+    private final GraylogServer server;
+
+    // TODO code smell: either all hooks get access to 'server' or we do something different
+    public RealtimeCollectionUpdateHook(GraylogServer server) {
+        this.server = server;
+    }
+
     @Override
     public void process(GELFMessage message) {
-        if (!Main.configuration.enableRealtimeCollection()) {
+        if (!server.getConfiguration().enableRealtimeCollection()) {
             return;
         }
 
-        MongoBridge m = new MongoBridge();
-        m.writeToRealtimeCollection(message);
+        server.getMongoBridge().writeToRealtimeCollection(message);
     }
 
 }

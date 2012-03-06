@@ -20,12 +20,13 @@
 
 package org.graylog2.messagehandlers.gelf;
 
-import org.apache.log4j.Logger;
-
 import java.net.DatagramPacket;
 import java.net.InetSocketAddress;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+
+import org.apache.log4j.Logger;
+import org.graylog2.GraylogServer;
 
 /**
  * GELFMainThread.java: Jun 23, 2010 6:43:21 PM
@@ -42,12 +43,15 @@ public class GELFMainThread extends Thread {
 
     private ExecutorService threadPool = Executors.newCachedThreadPool();
 
+    private final GraylogServer graylogServer;
+
     /**
      * Thread responsible for listening for GELF messages.
      *
      * @param socketAddress The {@link InetSocketAddress} to bind to
      */
-    public GELFMainThread(InetSocketAddress socketAddress) {
+    public GELFMainThread(GraylogServer graylogServer, InetSocketAddress socketAddress) {
+        this.graylogServer = graylogServer;
         this.socketAddress = socketAddress;
     }
 
@@ -72,7 +76,7 @@ public class GELFMainThread extends Thread {
                 }
 
                 // We got a connected client. Start a GELFClientHandlerThread() in our thread pool and wait for next client.
-                threadPool.execute(new GELFClientHandlerThread(receivedGelfSentence));
+                threadPool.execute(new GELFClientHandlerThread(graylogServer, receivedGelfSentence));
             } catch (Exception e) {
                 LOG.error("Skipping GELF client. Error: " + e.getMessage(), e);
             }

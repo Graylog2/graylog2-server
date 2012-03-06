@@ -20,6 +20,7 @@
 
 package org.graylog2.blacklists;
 
+import org.graylog2.GraylogServer;
 import org.graylog2.SimpleObjectCache;
 
 import java.util.List;
@@ -34,13 +35,29 @@ import java.util.List;
 public class BlacklistCache extends SimpleObjectCache<List<Blacklist>> {
     
     private static BlacklistCache instance;
+    private GraylogServer server;
 
     private BlacklistCache() { }
+
+    public static synchronized BlacklistCache initialize(GraylogServer server) {
+        BlacklistCache blacklistCache = getInstance();
+        blacklistCache.setGraylogServer(server);
+        return blacklistCache;
+        
+    }
 
     public static synchronized BlacklistCache getInstance() {
         if (instance == null) {
             instance = new BlacklistCache();
         }
         return instance;
+    }
+
+    private void setGraylogServer(GraylogServer server) {
+        this.server = server;
+    }
+
+    public GraylogServer getGraylogServer() {
+        return server;
     }
 }

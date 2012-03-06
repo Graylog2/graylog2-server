@@ -20,6 +20,7 @@
 
 package org.graylog2.messagehandlers.syslog;
 
+import org.graylog2.GraylogServer;
 import org.productivity.java.syslog4j.server.SyslogServer;
 import org.productivity.java.syslog4j.server.SyslogServerConfigIF;
 import org.productivity.java.syslog4j.server.SyslogServerIF;
@@ -38,6 +39,7 @@ public class SyslogServerThread extends Thread {
     private String syslogProtocol;
 
     private Thread coreThread = null;
+    private final GraylogServer server;
 
     /**
      * Listen for Syslog messages
@@ -45,7 +47,8 @@ public class SyslogServerThread extends Thread {
      * @param syslogProtocol Protocol to use for the Syslog server (tcp/udp)
      * @param port On which port to listen?
      */
-    public SyslogServerThread(String syslogProtocol, int port, String host) {
+    public SyslogServerThread(GraylogServer server, String syslogProtocol, int port, String host) {
+        this.server = server;
         this.syslogProtocol = syslogProtocol;
         this.port = port;
         this.host = host;
@@ -58,11 +61,11 @@ public class SyslogServerThread extends Thread {
 
         SyslogServerIF syslogServer = SyslogServer.getInstance(syslogProtocol);
         SyslogServerConfigIF syslogServerConfig = syslogServer.getConfig();
-        
+
         syslogServerConfig.setPort(port);
         syslogServerConfig.setHost(host);
         syslogServerConfig.setUseStructuredData(true);
-        syslogServerConfig.addEventHandler(new SyslogEventHandler());
+        syslogServerConfig.addEventHandler(new SyslogEventHandler(server));
 
         syslogServer = SyslogServer.getThreadedInstance(syslogProtocol);
 
@@ -71,7 +74,7 @@ public class SyslogServerThread extends Thread {
 
     /**
      * Get the thread all syslog handling is running in
-     * 
+     *
      * @return
      */
     public Thread getCoreThread() {

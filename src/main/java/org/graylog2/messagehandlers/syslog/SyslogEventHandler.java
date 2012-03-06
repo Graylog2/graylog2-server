@@ -20,23 +20,19 @@
 
 package org.graylog2.messagehandlers.syslog;
 
-import java.net.InetAddress;
-import java.util.logging.Level;
+import java.net.SocketAddress;
+import java.net.UnknownHostException;
+import java.util.Date;
+import java.util.Map;
+
 import org.apache.log4j.Logger;
+import org.graylog2.GraylogServer;
 import org.graylog2.Tools;
 import org.graylog2.messagehandlers.gelf.GELFMessage;
 import org.graylog2.messagehandlers.gelf.SimpleGELFClientHandler;
 import org.productivity.java.syslog4j.server.SyslogServerEventIF;
 import org.productivity.java.syslog4j.server.SyslogServerIF;
 import org.productivity.java.syslog4j.server.SyslogServerSessionlessEventHandlerIF;
-
-import java.net.SocketAddress;
-import java.net.UnknownHostException;
-import java.util.Date;
-import java.util.Map;
-import org.graylog2.Main;
-import org.productivity.java.syslog4j.impl.message.structured.StructuredSyslogMessage;
-import org.productivity.java.syslog4j.server.impl.event.structured.StructuredSyslogServerEvent;
 
 /**
  * SyslogEventHandler.java: May 17, 2010 8:58:18 PM
@@ -48,7 +44,11 @@ import org.productivity.java.syslog4j.server.impl.event.structured.StructuredSys
 public class SyslogEventHandler implements SyslogServerSessionlessEventHandlerIF {
 
     private static final Logger LOG = Logger.getLogger(SyslogEventHandler.class);
+    private final GraylogServer server;
 
+    public SyslogEventHandler(GraylogServer server) {
+        this.server = server;
+    }
     /**
      * Handle an incoming syslog message: Output if in debug mode, store in MongoDB, ReceiveHooks
      *
@@ -78,7 +78,7 @@ public class SyslogEventHandler implements SyslogServerSessionlessEventHandlerIF
 
         // Check if date could be parsed.
         if (event.getDate() == null) {
-            if (Main.configuration.getAllowOverrideSyslogDate()) {
+            if (server.getConfiguration().getAllowOverrideSyslogDate()) {
                 // empty Date constructor allocates a Date object and initializes it so that it represents the time at which it was allocated.
                 event.setDate(new Date());
                 LOG.info("Date could not be parsed. Was set to NOW because allow_override_syslog_date is true.");
@@ -111,7 +111,7 @@ public class SyslogEventHandler implements SyslogServerSessionlessEventHandlerIF
         // Possibly overwrite host with RNDS if configured.
         String host = event.getHost();
         try {
-            if (Main.configuration.getForceSyslogRdns()) {
+            if (server.getConfiguration().getForceSyslogRdns()) {
                 host = Tools.rdnsLookup(socketAddress);
             }
         } catch (UnknownHostException e) {
@@ -132,10 +132,10 @@ public class SyslogEventHandler implements SyslogServerSessionlessEventHandlerIF
             LOG.info("Could not parse syslog message to GELF: " + e.toString(), e);
             return;
         }
-        
+
         if (gelf.allRequiredFieldsSet()) {
             try {
-                SimpleGELFClientHandler gelfHandler = new SimpleGELFClientHandler(gelf);
+                SimpleGELFClientHandler gelfHandler = new SimpleGELFClientHandler(server, gelf);
                 gelfHandler.handle();
             } catch (Exception e) {
                 LOG.debug("Couldn't process message with GELF handler", e);
