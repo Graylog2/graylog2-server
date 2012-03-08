@@ -13,6 +13,7 @@ import org.graylog2.database.MongoBridge;
 import org.graylog2.database.MongoConnection;
 import org.graylog2.forwarders.forwarders.LogglyForwarder;
 import org.graylog2.indexer.Indexer;
+import org.graylog2.indexer.EmbeddedElasticSearchClient;
 import org.graylog2.messagehandlers.amqp.AMQPBroker;
 import org.graylog2.messagehandlers.amqp.AMQPSubscribedQueue;
 import org.graylog2.messagehandlers.amqp.AMQPSubscriberThread;
@@ -49,7 +50,7 @@ public class GraylogServer implements Runnable {
 
     public GraylogServer(Configuration configuration) {
         this.configuration = configuration; // TODO use dependency injection
-        
+
         mongoConnection = new MongoConnection();    // TODO use dependency injection
         mongoConnection.setUser(configuration.getMongoUser());
         mongoConnection.setPassword(configuration.getMongoPassword());
@@ -64,9 +65,9 @@ public class GraylogServer implements Runnable {
 
         mongoBridge = new MongoBridge();
         mongoBridge.setConnection(mongoConnection); // TODO use dependency injection
-        
-        indexer = new Indexer(this);
-        
+
+        indexer = new EmbeddedElasticSearchClient(this);
+
         serverValue = new ServerValue(this);
     }
 
@@ -138,7 +139,7 @@ public class GraylogServer implements Runnable {
         Runtime.getRuntime().addShutdownHook(new MessageQueueFlusher(this));
 
         LOG.info("Graylog2 up and running.");
-        
+
         while (true) {
             try {
                 Thread.sleep(1000);
@@ -254,7 +255,7 @@ public class GraylogServer implements Runnable {
             LOG.info("AMQP threads started. (" + amqpQueues.size() + " queues)");
         }
     }
-    
+
     public void writeInitialServerValues(Configuration configuration) {
         serverValue.setStartupTime(Tools.getUTCTimestamp());
         serverValue.setPID(Integer.parseInt(Tools.getPID()));
@@ -266,7 +267,7 @@ public class GraylogServer implements Runnable {
         serverValue.writeMessageQueueBatchSize(configuration.getMessageQueueBatchSize());
         serverValue.writeMessageQueuePollFrequency(configuration.getMessageQueuePollFrequency());
     }
-    
+
     public MongoConnection getMongoConnection() {
         return mongoConnection;
     }

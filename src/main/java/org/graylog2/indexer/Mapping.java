@@ -25,6 +25,10 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
+import org.elasticsearch.action.admin.indices.mapping.put.PutMappingRequest;
+import org.elasticsearch.action.admin.indices.mapping.put.PutMappingRequestBuilder;
+import org.elasticsearch.client.Client;
+
 /**
  * Mapping.java: Sep 05, 2011 3:34:57 PM
  *
@@ -33,18 +37,35 @@ import java.util.Map;
  *
  * @author Lennart Koopmann <lennart@socketfeed.com>
  */
+@SuppressWarnings({"rawtypes", "unchecked"})
 public class Mapping {
 
-    public static Map get() {
-        Map mapping = new HashMap();
+    public static PutMappingRequest getPutMappingRequest(final Client client, final String index) {
+        final PutMappingRequestBuilder builder = client.admin().indices().preparePutMapping(new String[] {index});
+        builder.setType(Indexer.TYPE);
+
+        final Map<String, Object> mapping = new HashMap<String, Object>();
         mapping.put("properties", partFieldProperties());
         mapping.put("dynamic_templates", partDefaultAllInDynamicTemplate());
         mapping.put("_source", enabledAndCompressed()); // Compress source field..
 
-        Map completeMapping = new HashMap();
+        final Map completeMapping = new HashMap();
         completeMapping.put(Indexer.TYPE, mapping);
 
-        Map spec = new HashMap();
+        builder.setSource(completeMapping);
+        return builder.request();
+    }
+
+    public static Map get() {
+        final Map mapping = new HashMap();
+        mapping.put("properties", partFieldProperties());
+        mapping.put("dynamic_templates", partDefaultAllInDynamicTemplate());
+        mapping.put("_source", enabledAndCompressed()); // Compress source field..
+
+        final Map completeMapping = new HashMap();
+        completeMapping.put(Indexer.TYPE, mapping);
+
+        final Map spec = new HashMap();
         spec.put("mappings", completeMapping);
 
         return spec;
@@ -54,10 +75,10 @@ public class Mapping {
      * Disable analyzing for every field by default.
      */
     private static List partDefaultAllInDynamicTemplate() {
-        List dynamicTemplates = new LinkedList();
-        Map template = new HashMap();
-        Map defaultAll = new HashMap();
-        Map notAnalyzed = new HashMap();
+        final List dynamicTemplates = new LinkedList();
+        final Map template = new HashMap();
+        final Map defaultAll = new HashMap();
+        final Map notAnalyzed = new HashMap();
         notAnalyzed.put("index", "not_analyzed");
 
         // Match all.
@@ -75,7 +96,7 @@ public class Mapping {
      * Enable analyzing for some fields again. Like for message and full_message.
      */
     private static Map partFieldProperties() {
-        Map properties = new HashMap();
+        final Map properties = new HashMap();
 
         properties.put("message", analyzedString());
         properties.put("full_message", analyzedString());
@@ -90,23 +111,23 @@ public class Mapping {
     }
 
     private static Map analyzedString() {
-        Map type = new HashMap();
+        final Map type = new HashMap();
         type.put("index", "analyzed");
         type.put("type", "string");
         type.put("analyzer", "whitespace");
-        
+
         return type;
     }
 
     private static Map typeNumberDouble() {
-        Map type = new HashMap();
+        final Map type = new HashMap();
         type.put("type", "double");
 
         return type;
     }
 
     private static Map typeTimeNoMillis() {
-        Map type = new HashMap();
+        final Map type = new HashMap();
         type.put("type", "date");
         type.put("format", "yyyy-MM-dd HH-mm-ss");
 
@@ -114,7 +135,7 @@ public class Mapping {
     }
 
     private static Map enabledAndCompressed() {
-        Map e = new HashMap();
+        final Map e = new HashMap();
         e.put("enabled", true);
         e.put("compressed", true);
 

@@ -47,12 +47,12 @@ public class Indexer {
     private static final Logger LOG = Logger.getLogger(Indexer.class);
 
     public static final String TYPE = "message";
-    private final String INDEX;
+    private final String indexName;
     private final GraylogServer graylogServer;
 
     public Indexer(GraylogServer graylogServer) {
         this.graylogServer = graylogServer;
-        INDEX = graylogServer.getConfiguration().getElasticSearchIndexName();
+        indexName = graylogServer.getConfiguration().getElasticSearchIndexName();
     }
 
     /**
@@ -200,7 +200,7 @@ public class Indexer {
 
         for (GELFMessage message : messages) {
             sb.append("{\"index\":{\"_index\":\"");
-            sb.append(INDEX);
+            sb.append(getIndexName());
             sb.append("\",\"_type\":\"");
             sb.append(TYPE);
             sb.append("\"}}\n");
@@ -212,11 +212,12 @@ public class Indexer {
     }
 
     private String buildElasticSearchURL() {
-        return graylogServer.getConfiguration().getElasticSearchUrl();
+        // TODO remove all of the legacy ES connection support
+        throw new UnsupportedOperationException("HTTP based elasticsearch connection no longer supported");
     }
 
     private String buildIndexURL() {
-        return buildElasticSearchURL() + INDEX;
+        return buildElasticSearchURL() + getIndexName();
     }
 
     private String buildIndexWithTypeUrl() {
@@ -230,6 +231,10 @@ public class Indexer {
         cal.setTimeInMillis(System.currentTimeMillis());
 
         return String.format("%1$tY-%1$tm-%1$td %1$tH-%1$tM-%1$tS", cal); // ramtamtam
+    }
+
+    public String getIndexName() {
+        return indexName;
     }
 
 }

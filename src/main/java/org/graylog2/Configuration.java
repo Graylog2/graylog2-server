@@ -69,8 +69,8 @@ public class Configuration {
     @Parameter(value = "no_retention")
     private boolean noRetention;
 
-    @Parameter(value = "elasticsearch_url", required = true)
-    private String elasticsearchUrl = "http://localhost:9200/";
+    @Parameter(value = "elasticsearch_config_file", required = true, validator = FilePresentValidator.class)
+    private String elasticSearchConfigFile;
 
     @Parameter(value = "elasticsearch_index_name", required = true)
     private String elasticsearchIndexName = "graylog2";
@@ -174,15 +174,8 @@ public class Configuration {
         return !noRetention;
     }
 
-    public String getElasticSearchUrl() {
-        String ret = elasticsearchUrl;
-
-        // Possibly add the required trailing slash if omitted.
-        if (!elasticsearchUrl.endsWith("/")) {
-           ret = elasticsearchUrl + "/";
-        }
-
-        return ret;
+    public String getElasticSearchConfigFile() {
+        return elasticSearchConfigFile;
     }
 
     public String getElasticSearchIndexName() {
