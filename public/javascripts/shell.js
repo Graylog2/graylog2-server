@@ -33,7 +33,11 @@ var Shell = new function() {
         }
 
         process($(this).val());
-        _last_command = $(this).val();
+
+        // No need to have "clear" in the history.
+        if ($(this).val() != "clear") {
+          _last_command = $(this).val();
+        }
 
         return false;
       }
@@ -48,6 +52,11 @@ var Shell = new function() {
   }
 
   var process = function(cmd) {
+    if (cmd == "clear") {
+      clear();
+      return;
+    }
+    
     waiting_line();
     _cmd.attr("disabled", "disabled");
 
@@ -103,9 +112,14 @@ var Shell = new function() {
     new_cmd();
   }
 
-  var new_cmd = function() {
+  var new_cmd = function(prompt_html) {
     $(".shell-wait").remove();
-    prompt_html = "<span class=\"shell-prompt\">" + $(".shell-prompt").first().html() + "</span>";
+    
+    if (prompt_html == undefined) {
+      prompt_html = $(".shell-prompt").first().html();
+    }
+
+    prompt_html = "<span class=\"shell-prompt\">" + prompt_html + "</span>";
     new_line("<li>" + prompt_html + " <input id=\"shell-command-input\" class=\"shell-command\" type=\"text\" spellcheck=\"false\"></input></li>");
 
     // Check if there are more shell lines than allowed. Remove first if so. (to limit size)
@@ -198,6 +212,12 @@ var Shell = new function() {
     }
 
     return i;
+  }
+
+  var clear = function() {
+    prompt_name = $(".shell-prompt").first().html(); // We need to cache that, because it's gonna be removed next.
+    $("#shell li").remove();
+    new_cmd(prompt_name);
   }
 
 }
