@@ -166,7 +166,8 @@ label {
 }
 
 .status-alarm-text {
-  color: red;
+  color: #fff;
+  background-color: #f00;
 }
 
 .message-row {
