@@ -20,6 +20,7 @@
 
 package org.graylog2.database;
 
+import java.lang.Integer;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
@@ -78,7 +79,15 @@ public class HostCounterCache {
      * @return
      */
     public int getCount(String hostname) {
-        return this.cache.get(hostname) == null ? 0 : this.cache.get(hostname);
+        Integer result;
+
+        result = this.cache.get(hostname);
+
+        if (result == null) {
+            return 0;
+        }
+
+        return result;
     }
 
     /**
