@@ -56,13 +56,10 @@ public class HostCounterCache {
      * @param hostname The host of which the counter to increment.
      */
     public void increment(String hostname) {
-        int old = 0;
+        Integer old;
 
-        if (this.cache.containsKey(hostname)) {
-            old = this.cache.get(hostname);
-        }
-
-        this.cache.put(hostname, old+1);
+        old = this.cache.get(hostname);
+        this.cache.put(hostname, (old) ? (old + 1) : 1);
     }
 
     /**
@@ -71,9 +68,7 @@ public class HostCounterCache {
      * @param hostname The host of which the counter to reset.
      */
     public void reset(String hostname) {
-        if (this.cache.containsKey(hostname)) {
-            this.cache.remove(hostname);
-        }
+        this.cache.remove(hostname);
     }
 
     /**
@@ -94,5 +89,4 @@ public class HostCounterCache {
     public Set<String> getAllHosts() {
         return this.cache.keySet();
     }
-
 }
