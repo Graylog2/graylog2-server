@@ -60,7 +60,7 @@ public class SimpleGELFClientHandler extends GELFClientHandlerBase implements GE
      * @throws InvalidGELFCompressionMethodException
      * @throws IOException
      */
-    public SimpleGELFClientHandler(GraylogServer server, Object clientMessage) throws DataFormatException, InvalidGELFCompressionMethodException, IOException {
+    public SimpleGELFClientHandler(GraylogServer server, Object clientMessage) throws DataFormatException, InvalidGELFCompressionMethodException, IOException, InvalidGELFHeaderException {
         super(server);
 
         if (clientMessage instanceof DatagramPacket) {
@@ -84,6 +84,11 @@ public class SimpleGELFClientHandler extends GELFClientHandlerBase implements GE
                     this.clientMessage = Tools.decompressGzip(msg.getData());
                     break;
 
+                case GELF.TYPE_UNCOMPRESSED:
+                    LOG.debug("Handling uncompressed SimpleGELFClient");
+                    this.clientMessage = new String(GELF.extractUncompressedData(msg));
+                    break;
+                    
                 // Unsupported encoding if not handled by prior cases.
                 default:
                     throw new UnsupportedEncodingException();

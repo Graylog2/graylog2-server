@@ -48,6 +48,11 @@ public final class GELF {
     public static final int TYPE_CHUNKED = 2;
 
     /**
+     * An uncompressed message
+     */
+    public static final int TYPE_UNCOMPRESSED = 3;
+
+    /**
      * First bytes identifying a ZLIB compressed message. (RFC 1950)
      */
     public static final String HEADER_ZLIB_COMPRESSION = "789c";
@@ -60,7 +65,17 @@ public final class GELF {
     /**
      * First bytes identifying a chunked GELF message.
      */
-    public static final String HEADER_TYPE_CHUNKED_GELF = "1e0f";
+    public static final String HEADER_TYPE_CHUNKED_GELF = "1e0f"; // 30, 15 decimal
+
+    /**
+     * First bytes identifying an uncompressed GELF message.
+     */
+    public static final String HEADER_TYPE_UNCOMPRESSED_GELF = "1f3c"; // 30, 16 decimal
+
+    /**
+     * GELF header type size.
+     */
+    public static final int GELF_HEADER_TYPE_LENGTH = 2;
 
     /**
      * GELF header size.
@@ -115,6 +130,7 @@ public final class GELF {
         switch(gelfType) {
             case GELF.TYPE_GZIP:
             case GELF.TYPE_ZLIB:
+            case GELF.TYPE_UNCOMPRESSED:
                 return false;
             case GELF.TYPE_CHUNKED:
                 return true;
@@ -149,6 +165,10 @@ public final class GELF {
             return GELF.TYPE_CHUNKED;
         }
 
+        if (result.equals(GELF.HEADER_TYPE_UNCOMPRESSED_GELF)) {
+            return GELF.TYPE_UNCOMPRESSED;
+        }
+
         throw new InvalidGELFCompressionMethodException();
     }
 
@@ -178,23 +198,23 @@ public final class GELF {
         return new GELFHeader(rawGELFHeader);
     }
 
-    /**
-     * Extract the data part of a chunked GELF message datagram
-     *
-     * @param message
-     * @return
-     * @throws InvalidGELFHeaderException
-     * @throws IOException
-     */
     public static byte[] extractData(DatagramPacket message) throws InvalidGELFHeaderException, IOException {
         if (message.getLength() <= GELF.GELF_HEADER_LENGTH) {
             throw new InvalidGELFHeaderException();
         }
 
-        byte[] data = new byte[message.getLength()-GELF.GELF_HEADER_LENGTH];
+        return slice(message, GELF.GELF_HEADER_LENGTH);
+    }
+
+    public static byte[] extractUncompressedData(DatagramPacket message) {
+        return slice(message, GELF.GELF_HEADER_TYPE_LENGTH);
+    }
+
+    private static byte[] slice(DatagramPacket message, int cutOffLength) {
+        byte[] data = new byte[message.getLength()-cutOffLength];
 
         int j = 0;
-        for (int i = GELF.GELF_HEADER_LENGTH; i < message.getLength(); i++) {
+        for (int i = cutOffLength; i < message.getLength(); i++) {
             data[j] = message.getData()[i];
             j++;
         }

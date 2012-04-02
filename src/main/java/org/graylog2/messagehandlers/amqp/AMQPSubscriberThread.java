@@ -27,6 +27,7 @@ import java.util.zip.DataFormatException;
 import org.apache.log4j.Logger;
 import org.graylog2.GraylogServer;
 import org.graylog2.messagehandlers.gelf.InvalidGELFCompressionMethodException;
+import org.graylog2.messagehandlers.gelf.InvalidGELFHeaderException;
 import org.graylog2.messagehandlers.gelf.SimpleGELFClientHandler;
 import org.graylog2.messagehandlers.syslog.GraylogSyslogServerEvent;
 import org.graylog2.messagehandlers.syslog.SyslogEventHandler;
@@ -128,7 +129,7 @@ public class AMQPSubscriberThread extends Thread {
         }
     }
 
-    private void handleMessage(byte[] amqpBody) throws DataFormatException, InvalidGELFCompressionMethodException, IOException {
+    private void handleMessage(byte[] amqpBody) throws DataFormatException, InvalidGELFCompressionMethodException, IOException, InvalidGELFHeaderException {
         // Handle message.
         switch (this.queue.getType()) {
             case AMQPSubscribedQueue.TYPE_GELF:
