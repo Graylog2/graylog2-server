@@ -5,33 +5,33 @@ NOHUP=`which nohup`
 
 
 start() {
-	echo "Starting graylog2-server ..."
-	$NOHUP java -jar ../graylog2-server.jar &
+    echo "Starting graylog2-server ..."
+    $NOHUP java -jar ../graylog2-server.jar &
 }
 
 stop() {
-        PID=`cat /tmp/graylog2.pid`
-	echo "Stopping graylog2-server ($PID) ..."
-        kill $PID
+    PID=`cat /tmp/graylog2.pid`
+    echo "Stopping graylog2-server ($PID) ..."
+    kill $PID
 }
 
 restart() {
-	echo "Restarting graylog2-server ..."
-        stop
-        start
+    echo "Restarting graylog2-server ..."
+    stop
+    start
 }
 
 case "$CMD" in
-	start)
-		start
-		;;
-	stop)
-		stop
-		;;
-	restart)
-		restart
-		;;
-	*)
-		echo "Usage $0 {start|stop|restart}"
-		RETVAL=1
+    start)
+        start
+        ;;
+    stop)
+        stop
+        ;;
+    restart)
+        restart
+        ;;
+    *)
+        echo "Usage $0 {start|stop|restart}"
+        RETVAL=1
 esac
