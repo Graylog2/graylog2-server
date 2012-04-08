@@ -3,35 +3,83 @@
 CMD=$1
 NOHUP=`which nohup`
 
+# resolve links - $0 may be a softlink
+GRAYLOG2CTL="$0"
+
+while [ -h "$GRAYLOG2CTL" ]; do
+  ls=`ls -ld "$GRAYLOG2CTL"`
+  link=`expr "$ls" : '.*-> \(.*\)$'`
+  if expr "$link" : '/.*' > /dev/null; then
+    GRAYLOG2CTL="$link"
+  else
+    GRAYLOG2CTL=`dirname "$GRAYLOG2CTL"`/"$link"
+  fi
+done
+
+GRAYLOG2CTL_DIR=`dirname "$GRAYLOG2CTL"`
+GRAYLOG2_SERVER_JAR=${GRAYLOG2CTL_DIR}/../graylog2-server.jar
+GRAYLOG2_CONFIG_SH=${GRAYLOG2CTL_DIR}/graylog2_config.sh
+GRAYLOG2_CONF=/etc/graylog2.conf
+GRAYLOG2_PID=/tmp/graylog2.pid
+
+[ -f $GRAYLOG2_CONFIG_SH ] && . $GRAYLOG2_CONFIG_SH
 
 start() {
-	echo "Starting graylog2-server ..."
-	$NOHUP java -jar ../graylog2-server.jar &
+    echo "Starting graylog2-server ..."
+    $NOHUP java -jar ${GRAYLOG2_SERVER_JAR} -f ${GRAYLOG2_CONF} -p ${GRAYLOG2_PID} &
 }
 
 stop() {
-        PID=`cat /tmp/graylog2.pid`
-	echo "Stopping graylog2-server ($PID) ..."
-        kill $PID
+    PID=`cat ${GRAYLOG2_PID}`
+    echo "Stopping graylog2-server ($PID) ..."
+    if kill $PID; then
+        rm ${GRAYLOG2_PID}
+    fi
 }
 
 restart() {
-	echo "Restarting graylog2-server ..."
-        stop
-        start
+    echo "Restarting graylog2-server ..."
+    stop
+    start
+}
+
+status() {
+    pid=$(get_pid)
+    if [ ! -z $pid ]; then
+        if pid_running $pid; then
+            echo "graylog2-server running as pid $pid"
+            return 0
+        else
+            echo "Stale pid file with $pid - removing..."
+            rm ${GRAYLOG2_PID}
+        fi
+    fi
+
+    echo "graylog2-server not running"
+}
+
+get_pid() {
+    cat ${GRAYLOG2_PID} 2> /dev/null
+}
+
+pid_running() {
+    kill -0 $1 2> /dev/null
 }
 
 case "$CMD" in
-	start)
-		start
-		;;
-	stop)
-		stop
-		;;
-	restart)
-		restart
-		;;
-	*)
-		echo "Usage $0 {start|stop|restart}"
-		RETVAL=1
+    start)
+        start
+        ;;
+    stop)
+        stop
+        ;;
+    restart)
+        restart
+        ;;
+    status)
+        status
+        ;;
+    *)
+        echo "Usage $0 {start|stop|restart|status}"
+        RETVAL=1
 esac
