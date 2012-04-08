@@ -12,13 +12,38 @@ start() {
 stop() {
     PID=`cat /tmp/graylog2.pid`
     echo "Stopping graylog2-server ($PID) ..."
-    kill $PID
+    if kill $PID; then
+        rm /tmp/graylog2.pid
+    fi
 }
 
 restart() {
     echo "Restarting graylog2-server ..."
     stop
     start
+}
+
+status() {
+    pid=$(get_pid)
+    if [ ! -z $pid ]; then
+        if pid_running $pid; then
+            echo "graylog2-server running as pid $pid"
+            return 0
+        else
+            echo "Stale pid file with $pid - removing..."
+            rm /tmp/graylog2.pid
+        fi
+    fi
+
+    echo "graylog2-server not running"
+}
+
+get_pid() {
+    cat /tmp/graylog2.pid 2> /dev/null
+}
+
+pid_running() {
+    kill -0 $1 2> /dev/null
 }
 
 case "$CMD" in
@@ -31,7 +56,10 @@ case "$CMD" in
     restart)
         restart
         ;;
+    status)
+        status
+        ;;
     *)
-        echo "Usage $0 {start|stop|restart}"
+        echo "Usage $0 {start|stop|restart|status}"
         RETVAL=1
 esac
