@@ -1,5 +1,5 @@
 /**
- * Copyright 2010 Lennart Koopmann <lennart@socketfeed.com>
+ * Copyright 2012 Lennart Koopmann <lennart@socketfeed.com>
  *
  * This file is part of Graylog2.
  *
@@ -17,22 +17,20 @@
  * along with Graylog2.  If not, see <http://www.gnu.org/licenses/>.
  *
  */
+package org.graylog2.inputs;
 
-package org.graylog2.messagehandlers.gelf;
+import org.graylog2.Configuration;
+import org.graylog2.GraylogServer;
 
 /**
- * InvalidGELFCompressionMethodException.java: Sep 15, 2010 10:40:00 PM
- *
- * Received GELF message has an unknown compression type.
+ * MessageInput.java: 11.04.2012 22:29:50
  *
  * @author Lennart Koopmann <lennart@socketfeed.com>
  */
-public class InvalidGELFCompressionMethodException extends GELFException {
-    public InvalidGELFCompressionMethodException() {
-        super();
-    }
-
-    public InvalidGELFCompressionMethodException(String msg) {
-        super(msg);
-    }
+public interface MessageInput {
+    
+    public void initialize(Configuration configuration, GraylogServer graylogServer);
+   
+    public String getName();
+    
 }

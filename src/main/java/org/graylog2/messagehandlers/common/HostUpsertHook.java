@@ -20,8 +20,8 @@
 
 package org.graylog2.messagehandlers.common;
 
+import org.graylog2.LogMessage;
 import org.graylog2.database.HostCounterCache;
-import org.graylog2.messagehandlers.gelf.GELFMessage;
 
 /**
  * HostUpsertHook.java: Dec 29, 2010 2:57:52 PM
@@ -36,8 +36,8 @@ public class HostUpsertHook implements MessagePostReceiveHookIF {
      * Process the hook.
      */
     @Override
-    public void process(GELFMessage message) {
-        HostCounterCache.getInstance().increment(message.getHost());
+    public void process(LogMessage message) {
+        //HostCounterCache.getInstance().increment(message.getHost());
     }
 
 }

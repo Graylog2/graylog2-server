@@ -20,7 +20,7 @@
 
 package org.graylog2.streams.matchers;
 
-import org.graylog2.messagehandlers.gelf.GELFMessage;
+import org.graylog2.LogMessage;
 import org.graylog2.streams.StreamRule;
 
 /**
@@ -32,8 +32,8 @@ import org.graylog2.streams.StreamRule;
  */
 public class AdditionalFieldMatcher implements StreamRuleMatcherIF {
 
-    public boolean match(GELFMessage msg, StreamRule rule) {
-        String[] parts = rule.getValue().split("=");
+    public boolean match(LogMessage msg, StreamRule rule) {
+        /*String[] parts = rule.getValue().split("=");
         String key = "_" + parts[0];
         String value = parts[1];
         String str = null;
@@ -50,6 +50,6 @@ public class AdditionalFieldMatcher implements StreamRuleMatcherIF {
             }
         }
 
-        return null != str && str.matches(value);
+        return null != str && str.matches(value);*/ return false;
     }
 }

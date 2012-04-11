@@ -1,6 +1,6 @@
 package org.graylog2.messagequeue;
 
-import org.graylog2.messagehandlers.gelf.GELFMessage;
+import org.graylog2.LogMessage;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -50,7 +50,7 @@ public class MessageQueueTest {
     @Test
     public void testPoll() throws QueueLimitReachedException, QueueClosedException {
 
-        GELFMessage gelfMessage = new GELFMessage();
+        LogMessage gelfMessage = new LogMessage();
 
         messageQueue.add(gelfMessage);
 
@@ -140,7 +140,7 @@ public class MessageQueueTest {
     private void addGELFMessages(MessageQueue messageQueue, int numMessages) throws QueueLimitReachedException, QueueClosedException {
 
         for (int i = 0; i < numMessages; i++) {
-            messageQueue.add(new GELFMessage());
+            messageQueue.add(new LogMessage());
         }
     }
 }

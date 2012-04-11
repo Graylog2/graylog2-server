@@ -20,7 +20,7 @@
 
 package org.graylog2.streams.matchers;
 
-import org.graylog2.messagehandlers.gelf.GELFMessage;
+import org.graylog2.LogMessage;
 import org.graylog2.streams.StreamRule;
 
 /**
@@ -32,6 +32,6 @@ import org.graylog2.streams.StreamRule;
  */
 public interface StreamRuleMatcherIF {
 
-    boolean match(GELFMessage msg, StreamRule rule);
+    boolean match(LogMessage msg, StreamRule rule);
 
 }

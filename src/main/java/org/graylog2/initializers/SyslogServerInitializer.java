@@ -23,7 +23,6 @@ package org.graylog2.initializers;
 import org.apache.log4j.Logger;
 import org.graylog2.Configuration;
 import org.graylog2.GraylogServer;
-import org.graylog2.messagehandlers.syslog.SyslogServerThread;
 
 /**
  * SyslogServerInitializer.java: Apr 11, 2012 5:06:27 PM
@@ -44,7 +43,7 @@ public class SyslogServerInitializer implements Initializer {
 
     @Override
     public void initialize() {
-        // Start the Syslog thread that accepts syslog packages.
+        /*// Start the Syslog thread that accepts syslog packages.
         SyslogServerThread syslogServerThread = new SyslogServerThread(
                 graylogServer,
                 configuration.getSyslogProtocol(),
@@ -64,7 +63,7 @@ public class SyslogServerInitializer implements Initializer {
         } else {
             LOG.fatal("Could not start syslog server core thread. Do you have permissions to listen on port " + configuration.getSyslogListenPort() + "?");
             System.exit(1);
-        }
+        }*/
     }
 
 }

@@ -161,7 +161,7 @@ public class ConfigurationTest {
         Assert.assertEquals(3000, configuration.getForwarderLogglyTimeout());
     }
 
-    @Test
+    /*@Test
     public void testGetAMQPSubscribedQueuesEmpty() throws RepositoryException, ValidationException {
         validProperties.put("amqp_subscribed_queues", "");
         Configuration configuration = new Configuration();
@@ -195,7 +195,7 @@ public class ConfigurationTest {
         new JadConfig(new InMemoryRepository(validProperties), configuration).process();
 
         Assert.assertEquals(2, configuration.getAmqpSubscribedQueues().size());
-    }
+    }*/
 
     @Test
     public void testGetMongoDBReplicaSetServersEmpty() throws RepositoryException, ValidationException {

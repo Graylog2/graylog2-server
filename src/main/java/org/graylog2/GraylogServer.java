@@ -5,15 +5,16 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
-
 import org.apache.log4j.Logger;
 import org.graylog2.blacklists.BlacklistCache;
 import org.graylog2.database.MongoBridge;
 import org.graylog2.database.MongoConnection;
 import org.graylog2.forwarders.forwarders.LogglyForwarder;
-import org.graylog2.indexer.Indexer;
 import org.graylog2.indexer.EmbeddedElasticSearchClient;
+import org.graylog2.indexer.Indexer;
 import org.graylog2.initializers.Initializer;
+import org.graylog2.inputs.MessageInput;
+import org.graylog2.messagequeue.MessageQueue;
 import org.graylog2.messagequeue.MessageQueueFlusher;
 import org.graylog2.streams.StreamCache;
 
@@ -35,6 +36,7 @@ public class GraylogServer implements Runnable {
     private final Indexer indexer;
 
     private List<Initializer> initializers = new ArrayList<Initializer>();
+    private List<MessageInput> inputs = new ArrayList<MessageInput>();
 
     public GraylogServer(Configuration configuration) {
         this.configuration = configuration; // TODO use dependency injection
@@ -60,6 +62,10 @@ public class GraylogServer implements Runnable {
 
     public void registerInitializer(Initializer initializer) {
         this.initializers.add(initializer);
+    }
+    
+    public void registerInput(MessageInput input) {
+        this.inputs.add(input);
     }
 
     @Override
@@ -97,6 +103,12 @@ public class GraylogServer implements Runnable {
         for (Initializer initializer : this.initializers) {
             initializer.initialize();
             LOG.debug("Initialized: " + initializer.getClass().getSimpleName());
+        }
+        
+        // Call all registered inputs.
+        for (MessageInput input : this.inputs) {
+            input.initialize(this.configuration, this);
+            LOG.debug("Initialized input: " + input.getName());
         }
 
         // Add a shutdown hook that tries to flush the message queue.

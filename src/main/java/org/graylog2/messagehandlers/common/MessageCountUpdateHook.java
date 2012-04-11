@@ -20,7 +20,7 @@
 
 package org.graylog2.messagehandlers.common;
 
-import org.graylog2.messagehandlers.gelf.GELFMessage;
+import org.graylog2.LogMessage;
 import org.graylog2.streams.Stream;
 
 /**
@@ -38,8 +38,8 @@ public class MessageCountUpdateHook implements MessagePostReceiveHookIF {
      * Process the hook.
      */
     @Override
-    public void process(GELFMessage message) {
-        // Five second througput for health page.
+    public void process(LogMessage message) {
+        /*// Five second througput for health page.
         this.counter.incrementFiveSecondThroughput();
 
         // Total count.
@@ -51,7 +51,7 @@ public class MessageCountUpdateHook implements MessagePostReceiveHookIF {
         }
 
         // Host count.
-        this.counter.incrementHost(message.getHost());
+        this.counter.incrementHost(message.getHost());*/
     }
 
 }

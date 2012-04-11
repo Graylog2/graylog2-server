@@ -20,7 +20,7 @@
 
 package org.graylog2.messagehandlers.common;
 
-import org.graylog2.messagehandlers.gelf.GELFMessage;
+import org.graylog2.LogMessage;
 
 /**
  * MessagePostReceiveHookIF.java: Aug 19, 2010 5:46:32 PM
@@ -34,6 +34,6 @@ public interface MessagePreReceiveHookIF {
      *
      * @param payload
      */
-    void process(GELFMessage payload);
+    void process(LogMessage payload);
 
 }

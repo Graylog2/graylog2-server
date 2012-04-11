@@ -21,7 +21,7 @@
 package org.graylog2.streams.matchers;
 
 import java.util.regex.Pattern;
-import org.graylog2.messagehandlers.gelf.GELFMessage;
+import org.graylog2.LogMessage;
 import org.graylog2.streams.StreamRule;
 
 /**
@@ -33,13 +33,13 @@ import org.graylog2.streams.StreamRule;
  */
 public class FileNameAndLineMatcher implements StreamRuleMatcherIF {
 
-    public boolean match(GELFMessage msg, StreamRule rule) {
-        String file = msg.getFile();
+    public boolean match(LogMessage msg, StreamRule rule) {
+        /*String file = msg.getFile();
         if (msg.getLine() != 0) {
             file += ":" + msg.getLine();
         }
 
-        return Pattern.compile(rule.getValue(), Pattern.DOTALL).matcher(file).matches();
+        return Pattern.compile(rule.getValue(), Pattern.DOTALL).matcher(file).matches();*/ return false;
     }
 
 }

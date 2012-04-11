@@ -20,28 +20,32 @@
 
 package org.graylog2;
 
-import java.io.File;
-import java.io.FileWriter;
-import java.io.Writer;
-
-import org.apache.commons.io.IOUtils;
-import org.apache.log4j.Level;
-import org.apache.log4j.Logger;
-
 import com.beust.jcommander.JCommander;
 import com.github.joschi.jadconfig.JadConfig;
 import com.github.joschi.jadconfig.RepositoryException;
 import com.github.joschi.jadconfig.ValidationException;
 import com.github.joschi.jadconfig.repositories.PropertiesRepository;
-import org.graylog2.initializers.AMQPInitializer;
-import org.graylog2.initializers.DroolsInitializer;
-import org.graylog2.initializers.GELFInitializer;
-import org.graylog2.initializers.HostCounterCacheWriterInitializer;
-import org.graylog2.initializers.MessageCounterInitializer;
-import org.graylog2.initializers.MessageQueueInitializer;
-import org.graylog2.initializers.MessageRetentionInitializer;
-import org.graylog2.initializers.ServerValueWriterInitializer;
-import org.graylog2.initializers.SyslogServerInitializer;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.Writer;
+import org.apache.commons.io.IOUtils;
+import org.apache.log4j.Level;
+import org.apache.log4j.Logger;
+import org.graylog2.initializers.*;
+import org.graylog2.inputs.GELFUDPInput;
+import org.graylog2.inputs.MessageInput;
+
+/*
+ * 
+ * ZOMG TODOS:
+ * 
+ *  * Add two-queue system. Possibly use Disruptor.
+ *  * Add AMQP handling again.
+ *  * Move GELF handling to netty (chunked/non-chunked)
+ *  * Add GELF forwarder again.
+ *  * Add syslog handling again.
+ * 
+ */
 
 /**
  * Main class of Graylog2.
@@ -116,10 +120,8 @@ public final class Main {
         server.registerInitializer(new MessageCounterInitializer(server));
         server.registerInitializer(new SyslogServerInitializer(server, configuration));
         
-        // Moar initializers. Conditional for great fun and profit.
-        if (configuration.isUseGELF())        { server.registerInitializer(new GELFInitializer(server, configuration)); }
-        if (configuration.isAmqpEnabled())    { server.registerInitializer(new AMQPInitializer(server, configuration)); }
-        if (configuration.performRetention()) { server.registerInitializer(new MessageRetentionInitializer(server));    }
+        // Register inputs.
+        server.registerInput(new GELFUDPInput());
 
         // Blocks until we shut down.
         server.run();

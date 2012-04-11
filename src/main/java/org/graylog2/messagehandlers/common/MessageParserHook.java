@@ -21,7 +21,7 @@
 package org.graylog2.messagehandlers.common;
 
 import org.graylog2.GraylogServer;
-import org.graylog2.messagehandlers.gelf.GELFMessage;
+import org.graylog2.LogMessage;
 
 /**
  * MessageParserHook.java: Feb 11, 2011
@@ -42,7 +42,7 @@ public class MessageParserHook implements MessagePreReceiveHookIF {
      * Process the hook.
      */
     @Override
-    public void process(GELFMessage message) {
+    public void process(LogMessage message) {
         /**
          * Run GELFMessage through the rules engine
          */

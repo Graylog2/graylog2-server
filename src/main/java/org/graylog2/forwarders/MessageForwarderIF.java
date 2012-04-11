@@ -20,8 +20,8 @@
 
 package org.graylog2.forwarders;
 
+import org.graylog2.LogMessage;
 import org.graylog2.forwarders.forwarders.MessageForwarderConfigurationException;
-import org.graylog2.messagehandlers.gelf.GELFMessage;
 
 /**
  * MessageForwarderIF.java: Mar 18, 2011 9:31:05 PM
@@ -40,7 +40,7 @@ public interface MessageForwarderIF {
      * @return true in case of success, otherwise false
      * @throws MessageForwarderConfigurationException
      */
-    boolean forward(GELFMessage message) throws MessageForwarderConfigurationException;
+    boolean forward(LogMessage message) throws MessageForwarderConfigurationException;
 
     /**
      * Indicates if the last forward has succeeded.
