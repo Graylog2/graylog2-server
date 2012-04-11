@@ -19,13 +19,12 @@
  */
 package org.graylog2.messagequeue;
 
-import org.apache.log4j.Logger;
-import org.graylog2.messagehandlers.gelf.GELFMessage;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
+import org.apache.log4j.Logger;
+import org.graylog2.LogMessage;
 
 /**
  * MessageQueue.java: Nov 16, 2011 5:28:26 PM
@@ -42,7 +41,7 @@ public class MessageQueue {
 
     private static MessageQueue instance;
 
-    private Queue<GELFMessage> queue = new ConcurrentLinkedQueue<GELFMessage>();
+    private Queue<LogMessage> queue = new ConcurrentLinkedQueue<LogMessage>();
     private boolean closed = false;
 
     private int sizeLimit = SIZE_LIMIT_UNLIMITED;
@@ -68,7 +67,7 @@ public class MessageQueue {
      * @throws QueueClosedException       if the queue has already been closed
      * @throws QueueLimitReachedException if the maximum size of the queue has been reached
      */
-    public boolean add(GELFMessage message) throws QueueClosedException, QueueLimitReachedException {
+    public boolean add(LogMessage message) throws QueueClosedException, QueueLimitReachedException {
         if (this.closed) {
             throw new QueueClosedException();
         }
@@ -87,7 +86,7 @@ public class MessageQueue {
      *
      * @return the first {@link GELFMessage} in the queue.
      */
-    public GELFMessage poll() {
+    public LogMessage poll() {
         return queue.poll();
     }
 
@@ -142,8 +141,8 @@ public class MessageQueue {
      * @param batchSize The number of messages to read from the queue
      * @return A {@link List} of messages.
      */
-    public List<GELFMessage> readBatch(int batchSize) {
-        List<GELFMessage> messages = new ArrayList<GELFMessage>();
+    public List<LogMessage> readBatch(int batchSize) {
+        List<LogMessage> messages = new ArrayList<LogMessage>();
 
         for (int i = 0; !queue.isEmpty() && i < batchSize; i++) {
             messages.add(poll());
@@ -163,7 +162,7 @@ public class MessageQueue {
      *
      * @return A {@link List} containing all {@link GELFMessage}s in the queue.
      */
-    public List<GELFMessage> readAll() {
+    public List<LogMessage> readAll() {
 
         return readBatch(getSize());
     }

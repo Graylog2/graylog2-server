@@ -21,11 +21,11 @@
 package org.graylog2.streams;
 
 import org.apache.log4j.Logger;
-import org.graylog2.messagehandlers.gelf.GELFMessage;
 import org.graylog2.streams.matchers.StreamRuleMatcherIF;
 
 import java.util.ArrayList;
 import java.util.List;
+import org.graylog2.LogMessage;
 
 /**
  * Router.java: Mar 16, 2011 9:40:24 PM
@@ -41,9 +41,9 @@ public class Router {
     // Hidden.
     private Router() { }
 
-    public static List<Stream> route(GELFMessage msg) {
+    public static List<Stream> route(LogMessage msg) {
         List<Stream> matches = new ArrayList<Stream>();
-        List<Stream> streams = Stream.fetchAllEnabled();
+        /*List<Stream> streams = Stream.fetchAllEnabled();
 
         for (Stream stream : streams) {
             boolean missed = false;
@@ -68,7 +68,7 @@ public class Router {
             if (!missed) {
                 matches.add(stream);
             }
-        }
+        }*/
 
         return matches;
     }

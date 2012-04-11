@@ -23,7 +23,7 @@ import java.util.List;
 
 import org.apache.log4j.Logger;
 import org.graylog2.GraylogServer;
-import org.graylog2.messagehandlers.gelf.GELFMessage;
+import org.graylog2.LogMessage;
 
 /**
  * MessageQueueFlusher.java: Nov 17, 2011 7:02:40 PM
@@ -47,7 +47,7 @@ public class MessageQueueFlusher extends Thread {
             LOG.info("Closing message queue.");
             MessageQueue.getInstance().close();
 
-            List<GELFMessage> messages = MessageQueue.getInstance().readAll();
+            List<LogMessage> messages = MessageQueue.getInstance().readAll();
             LOG.info("Flushing all " + messages.size() + " messages to indexer.");
             graylogServer.getIndexer().bulkIndex(messages);
         } catch (Exception e) {

@@ -20,7 +20,7 @@
 
 package org.graylog2.streams.matchers;
 
-import org.graylog2.messagehandlers.gelf.GELFMessage;
+import org.graylog2.LogMessage;
 import org.graylog2.streams.StreamRule;
 
 /**
@@ -32,9 +32,10 @@ import org.graylog2.streams.StreamRule;
  */
 public class SeverityOrHigherMatcher implements StreamRuleMatcherIF {
 
-    public boolean match(GELFMessage msg, StreamRule rule) {
+    public boolean match(LogMessage msg, StreamRule rule) {
         // <= because 0 (EMERG) is lower than DEBUG (7)
-        return msg.getLevel() <= Integer.parseInt(rule.getValue());
+        //return msg.getLevel() <= Integer.parseInt(rule.getValue());
+        return false;
     }
 
 }

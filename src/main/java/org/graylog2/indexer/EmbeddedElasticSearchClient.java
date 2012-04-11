@@ -30,7 +30,7 @@ import org.elasticsearch.node.Node;
 import org.elasticsearch.node.NodeBuilder;
 import org.graylog2.Configuration;
 import org.graylog2.GraylogServer;
-import org.graylog2.messagehandlers.gelf.GELFMessage;
+import org.graylog2.LogMessage;
 import org.json.simple.JSONValue;
 
 // TODO this class blocks for most of its operations, but is called from the main thread for some of them
@@ -85,15 +85,14 @@ public class EmbeddedElasticSearchClient extends Indexer {
         return acknowledged && mappingCreated;
     }
 
-    @Override
-    public boolean bulkIndex(final List<GELFMessage> messages) {
-
+    public boolean bulkIndex(final List<LogMessage> messages) {
+/*
         if (messages.isEmpty()) {
             return true;
         }
 
         final BulkRequestBuilder b = client.prepareBulk();
-        for (GELFMessage msg : messages) {
+        for (LogMessage msg : messages) {
             final IndexRequestBuilder indexRequestBuilder = new IndexRequestBuilder(client);
             indexRequestBuilder.setIndex(getIndexName());
             indexRequestBuilder.setContentType(XContentType.JSON);
@@ -108,7 +107,9 @@ public class EmbeddedElasticSearchClient extends Indexer {
                 response.items().length,
                 response.getTookInMillis(),
                 response.hasFailures()));
-        return !response.hasFailures();
+        return !response.hasFailures();*/
+        
+        return false;
     }
 
     @Override

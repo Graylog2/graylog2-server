@@ -5,7 +5,7 @@
 
 package org.graylog2.messagehandlers.common;
 
-import org.graylog2.messagehandlers.gelf.GELFMessage;
+import org.graylog2.LogMessage;
 import org.junit.Test;
 
 /**
@@ -16,8 +16,8 @@ public class HostUpsertHookTest {
 
     @Test
     public void testProcessWithGELFMessage() {
-        GELFMessage message = new GELFMessage();
-        message.setHost("lolwat");
+        LogMessage message = new LogMessage();
+        //message.setHost("lolwat");
         HostUpsertHook instance = new HostUpsertHook();
         instance.process(message);
     }

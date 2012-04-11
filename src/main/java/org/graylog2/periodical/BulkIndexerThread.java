@@ -25,7 +25,7 @@ import java.util.List;
 import org.apache.log4j.Logger;
 import org.graylog2.Configuration;
 import org.graylog2.GraylogServer;
-import org.graylog2.messagehandlers.gelf.GELFMessage;
+import org.graylog2.LogMessage;
 import org.graylog2.messagequeue.MessageQueue;
 
 /**
@@ -61,7 +61,7 @@ public class BulkIndexerThread implements Runnable {
             LOG.info("About to index max " + this.batchSize + " messages. You have a total of "
                     + mq.getSize() + " messages in the queue. [freq:" + this.pollFreq + "s]");
 
-            List<GELFMessage> messages = mq.readBatch(batchSize);
+            List<LogMessage> messages = mq.readBatch(batchSize);
             LOG.info("... indexing " + messages.size() + " messages.");
             graylogServer.getIndexer().bulkIndex(messages);
 

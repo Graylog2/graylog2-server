@@ -26,8 +26,6 @@ import java.util.Arrays;
 import java.util.List;
 
 import org.apache.log4j.Logger;
-import org.graylog2.messagehandlers.amqp.AMQPSubscribedQueue;
-import org.graylog2.messagehandlers.amqp.InvalidQueueTypeException;
 
 import com.github.joschi.jadconfig.Parameter;
 import com.github.joschi.jadconfig.ValidationException;
@@ -302,7 +300,7 @@ public class Configuration {
         return replicaServers;
     }
 
-    public List<AMQPSubscribedQueue> getAmqpSubscribedQueues() {
+/*    public List<AMQPSubscribedQueue> getAmqpSubscribedQueues() {
         List<AMQPSubscribedQueue> queueList = new ArrayList<AMQPSubscribedQueue>();
 
         List<String> rawQueues = amqpSubscribedQueues;
@@ -329,7 +327,7 @@ public class Configuration {
         }
 
         return queueList;
-    }
+    }*/
 
     @ValidatorMethod
     public void validate() throws ValidationException {

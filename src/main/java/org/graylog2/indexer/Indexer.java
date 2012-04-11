@@ -30,7 +30,7 @@ import java.util.List;
 
 import org.apache.log4j.Logger;
 import org.graylog2.GraylogServer;
-import org.graylog2.messagehandlers.gelf.GELFMessage;
+import org.graylog2.LogMessage;
 import org.json.simple.JSONValue;
 
 /**
@@ -123,7 +123,7 @@ public class Indexer {
      * @param messages The messages to index
      * @return {@literal true} if the messages were successfully indexed, {@literal false} otherwise
      */
-    public boolean bulkIndex(List<GELFMessage> messages) {
+    public boolean bulkIndex(List<LogMessage> messages) {
 
         if (messages.isEmpty()) {
             return true;
@@ -195,18 +195,18 @@ public class Indexer {
         return "/_query?q=created_at%3A%5B0%20TO%20" + to + "%5D";
     }
 
-    private String getJSONfromGELFMessages(List<GELFMessage> messages) {
+    private String getJSONfromGELFMessages(List<LogMessage> messages) {
         StringBuilder sb = new StringBuilder();
 
-        for (GELFMessage message : messages) {
-            sb.append("{\"index\":{\"_index\":\"");
-            sb.append(getIndexName());
-            sb.append("\",\"_type\":\"");
-            sb.append(TYPE);
-            sb.append("\"}}\n");
-            sb.append(JSONValue.toJSONString(message.toElasticSearchObject()));
-            sb.append("\n");
-        }
+//        for (GELFMessage message : messages) {
+//            sb.append("{\"index\":{\"_index\":\"");
+//            sb.append(getIndexName());
+//            sb.append("\",\"_type\":\"");
+//            sb.append(TYPE);
+//            sb.append("\"}}\n");
+//            sb.append(JSONValue.toJSONString(message.toElasticSearchObject()));
+//            sb.append("\n");
+//        }
 
         return sb.toString();
     }

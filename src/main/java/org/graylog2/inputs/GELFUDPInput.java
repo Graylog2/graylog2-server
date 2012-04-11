@@ -1,5 +1,5 @@
 /**
- * Copyright 2010 Lennart Koopmann <lennart@socketfeed.com>
+ * Copyright 2012 Lennart Koopmann <lennart@socketfeed.com>
  *
  * This file is part of Graylog2.
  *
@@ -18,23 +18,39 @@
  *
  */
 
-package org.graylog2.messagehandlers.gelf;
+package org.graylog2.inputs;
+
+
+import org.graylog2.Configuration;
+import org.graylog2.GraylogServer;
 
 /**
- * GELFClientIF.java: Sep 14, 2010 6:35:13 PM
- *
- * Representing a GELF client. Allows i.e. decoding of sent data.
+ * GELFUDPInput.java: 11.04.2012 22:29:01
  *
  * @author Lennart Koopmann <lennart@socketfeed.com>
  */
-public interface GELFClientHandlerIF {
+public class GELFUDPInput implements MessageInput {
 
+    private static final String NAME = "GELF UDP";
+    
+    private Configuration configuration;
+    private GraylogServer graylogServer;
+    
+    @Override
+    public void initialize(Configuration configuration, GraylogServer graylogServer) {
+        this.configuration = configuration;
+        this.graylogServer = graylogServer;
+        
+        spinUp();
+    }
+    
+    private void spinUp() {
 
-    /**
-     * Handles the client: Decodes JSON, Stores in MongoDB, ReceiveHooks
-     *
-     * @return boolean
-     */
-    boolean handle();
+    }
 
+    @Override
+    public String getName() {
+        return NAME;
+    }
+    
 }
