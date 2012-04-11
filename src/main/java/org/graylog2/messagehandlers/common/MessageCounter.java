@@ -24,6 +24,7 @@ import org.bson.types.ObjectId;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 import org.graylog2.Tools;
 
 /**
@@ -87,11 +88,11 @@ public final class MessageCounter {
     }
 
     public void resetHostCounts() {
-        this.hosts = new HashMap<String, Integer>();
+        this.hosts = new ConcurrentHashMap<String, Integer>();
     }
 
     public void resetStreamCounts() {
-        this.streams = new HashMap<String, Integer>();
+        this.streams = new ConcurrentHashMap<String, Integer>();
     }
 
     public void resetTotal() {
