@@ -130,35 +130,6 @@ public final class MongoConnection {
         return db;
     }
 
-    /**
-     * Get the message realtime collection. Lazily creates a new, capped one
-     * if there is none.
-     *
-     * @return The messages collection
-     */
-    public DBCollection getRealtimeMessagesColl() {
-        // Return cached collection if it has been checked and created already.
-        if (this.realtimeMessagesCollection != null) {
-            return this.realtimeMessagesCollection;
-        }
-
-        // Collection has not been cached yet. Do it now.
-        DBCollection coll = null;
-
-        // Create a capped collection if the collection does not yet exist.
-        if(getDatabase().collectionExists(REALTIME_MESSAGE_COLLECTION_NAME)) {
-            coll = getDatabase().getCollection(REALTIME_MESSAGE_COLLECTION_NAME);
-        } else {
-            coll = getDatabase()
-                    .createCollection(REALTIME_MESSAGE_COLLECTION_NAME, BasicDBObjectBuilder.start()
-                    .add("capped", true)
-                    .add("size", REALTIME_MESSAGE_COLLECTION_SIZE)
-                    .get());
-        }
-
-        this.realtimeMessagesCollection = coll;
-        return coll;
-    }
 
     /**
      * Get the message_counts collection. Lazily checks if correct indizes are set.

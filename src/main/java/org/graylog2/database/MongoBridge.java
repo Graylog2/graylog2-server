@@ -116,16 +116,6 @@ public class MongoBridge {
         getConnection().getMessageCountsColl().insert(obj);
     }
 
-    public void writeToRealtimeCollection(GELFMessage message) {
-        BasicDBObject obj = new BasicDBObject();
-
-        obj.put("received_at", Tools.getUTCTimestampWithMilliseconds());
-        obj.put("message", message.getShortMessage());
-        obj.put("streams", message.getStreamIds());
-
-        WriteResult result = getConnection().getRealtimeMessagesColl().insert(obj, WriteConcern.NORMAL);
-    }
-
     /**
      * Get a setting from the settings collection.
      *

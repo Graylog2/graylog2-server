@@ -33,7 +33,6 @@ import org.graylog2.forwarders.Forwarder;
 import org.graylog2.messagehandlers.common.HostUpsertHook;
 import org.graylog2.messagehandlers.common.MessageCountUpdateHook;
 import org.graylog2.messagehandlers.common.MessageParserHook;
-import org.graylog2.messagehandlers.common.RealtimeCollectionUpdateHook;
 import org.graylog2.messagehandlers.common.ReceiveHookManager;
 import org.graylog2.messagequeue.MessageQueue;
 
@@ -149,9 +148,6 @@ public class SimpleGELFClientHandler extends GELFClientHandlerBase implements GE
 
                     // Counts up host in hosts collection.
                     ReceiveHookManager.postProcess(new HostUpsertHook(), message);
-
-                    // Update realtime collection-
-                    ReceiveHookManager.postProcess(new RealtimeCollectionUpdateHook(getServer()), message);
                 }
             }
 
