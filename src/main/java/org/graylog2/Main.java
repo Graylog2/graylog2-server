@@ -1,5 +1,5 @@
 /**
- * Copyright 2010, 2011 Lennart Koopmann <lennart@socketfeed.com>
+ * Copyright 2010, 2011, 2012 Lennart Koopmann <lennart@socketfeed.com>
  *
  * This file is part of Graylog2.
  *
@@ -33,6 +33,15 @@ import com.github.joschi.jadconfig.JadConfig;
 import com.github.joschi.jadconfig.RepositoryException;
 import com.github.joschi.jadconfig.ValidationException;
 import com.github.joschi.jadconfig.repositories.PropertiesRepository;
+import org.graylog2.initializers.AMQPInitializer;
+import org.graylog2.initializers.DroolsInitializer;
+import org.graylog2.initializers.GELFInitializer;
+import org.graylog2.initializers.HostCounterCacheWriterInitializer;
+import org.graylog2.initializers.MessageCounterInitializer;
+import org.graylog2.initializers.MessageQueueInitializer;
+import org.graylog2.initializers.MessageRetentionInitializer;
+import org.graylog2.initializers.ServerValueWriterInitializer;
+import org.graylog2.initializers.SyslogServerInitializer;
 
 /**
  * Main class of Graylog2.
@@ -96,8 +105,24 @@ public final class Main {
 
         savePidFile(commandLineArguments.getPidFile());
 
-        // blocks until we shut down
-        new GraylogServer(configuration).run();
+        // Le server object. This is where all the magic happens.
+        GraylogServer server = new GraylogServer(configuration);
+
+        // Register initializers.
+        server.registerInitializer(new ServerValueWriterInitializer(server, configuration));
+        server.registerInitializer(new MessageQueueInitializer(server, configuration));
+        server.registerInitializer(new DroolsInitializer(server, configuration));
+        server.registerInitializer(new HostCounterCacheWriterInitializer(server));
+        server.registerInitializer(new MessageCounterInitializer(server));
+        server.registerInitializer(new SyslogServerInitializer(server, configuration));
+        
+        // Moar initializers. Conditional for great fun and profit.
+        if (configuration.isUseGELF())        { server.registerInitializer(new GELFInitializer(server, configuration)); }
+        if (configuration.isAmqpEnabled())    { server.registerInitializer(new AMQPInitializer(server, configuration)); }
+        if (configuration.performRetention()) { server.registerInitializer(new MessageRetentionInitializer(server));    }
+
+        // Blocks until we shut down.
+        server.run();
 
         LOG.info("Graylog2 " + GraylogServer.GRAYLOG2_VERSION + " exiting.");
     }

@@ -43,7 +43,6 @@ public class BlacklistCache extends SimpleObjectCache<List<Blacklist>> {
         BlacklistCache blacklistCache = getInstance();
         blacklistCache.setGraylogServer(server);
         return blacklistCache;
-        
     }
 
     public static synchronized BlacklistCache getInstance() {

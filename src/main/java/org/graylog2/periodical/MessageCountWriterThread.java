@@ -50,6 +50,7 @@ public class MessageCountWriterThread implements Runnable {
      */
     @Override
     public void run() {
+
         MessageCounter counter = MessageCounter.getInstance();
         try {
             graylogServer.getMongoBridge().writeMessageCounts(counter.getTotalCount(), counter.getStreamCounts(), counter.getHostCounts());

@@ -51,6 +51,7 @@ public class HostCounterCacheWriterThread implements Runnable {
      */
     @Override
     public void run() {
+
         try {
             final MongoBridge m = graylogServer.getMongoBridge();
             for (String host : HostCounterCache.getInstance().getAllHosts()) {

@@ -51,11 +51,11 @@ public class ServerValueWriterThread implements Runnable {
     public void run() {
         try {
             // ohai, we are alive. \o/
-            graylogServer.getServerValue().ping();
+            graylogServer.getServerValues().ping();
 
             // Current throughput.
             MessageCounter c = MessageCounter.getInstance();
-            graylogServer.getServerValue().writeThroughput(c.getFiveSecondThroughput(), c.getHighestFiveSecondThroughput());
+            graylogServer.getServerValues().writeThroughput(c.getFiveSecondThroughput(), c.getHighestFiveSecondThroughput());
             c.resetFiveSecondThroughput(); // Reset five second throughput count.
 
             /*

@@ -45,7 +45,7 @@ public class MessageRetention {
     }
 
     public void updateLastPerformedTime() {
-        graylogServer.getServerValue().writeMessageRetentionLastPerformed(Tools.getUTCTimestamp());
+        graylogServer.getServerValues().writeMessageRetentionLastPerformed(Tools.getUTCTimestamp());
     }
 
 }

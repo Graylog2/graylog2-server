@@ -72,7 +72,7 @@ public class BulkIndexerThread implements Runnable {
              * to see if the queue grows / if there are messages left *after*
              * writing.
              */
-            graylogServer.getServerValue().writeMessageQueueCurrentSize(MessageQueue.getInstance().getSize());
+            graylogServer.getServerValues().writeMessageQueueCurrentSize(MessageQueue.getInstance().getSize());
         } catch (Exception e) {
             LOG.fatal("You possibly lost messages! :( Error in BulkIndexerThread: " + e.getMessage(), e);
         }
