@@ -8,6 +8,11 @@ import org.junit.Test;
 
 
 public class MessageKnowledgeBaseTest {
+    @Test
+    public void testTheTruthToWork() {
+        assertTrue(true);
+    }
+
 /*	private GELFMessage message = null;
 	private RulesEngine drools = null;
 	
