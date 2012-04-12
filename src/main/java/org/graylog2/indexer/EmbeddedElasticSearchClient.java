@@ -30,7 +30,7 @@ import org.elasticsearch.node.Node;
 import org.elasticsearch.node.NodeBuilder;
 import org.graylog2.Configuration;
 import org.graylog2.GraylogServer;
-import org.graylog2.LogMessage;
+import org.graylog2.logmessage.LogMessage;
 import org.json.simple.JSONValue;
 
 // TODO this class blocks for most of its operations, but is called from the main thread for some of them

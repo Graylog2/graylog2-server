@@ -24,7 +24,7 @@ import java.util.List;
 import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import org.apache.log4j.Logger;
-import org.graylog2.LogMessage;
+import org.graylog2.logmessage.LogMessage;
 
 /**
  * MessageQueue.java: Nov 16, 2011 5:28:26 PM

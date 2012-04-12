@@ -26,7 +26,7 @@ import org.graylog2.forwarders.MessageForwarderIF;
 import java.io.DataOutputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
-import org.graylog2.LogMessage;
+import org.graylog2.logmessage.LogMessage;
 
 /**
  * LogglyForwarder.java: Mar 18, 2011 9:32:24 PM

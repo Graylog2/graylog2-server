@@ -1,6 +1,6 @@
 package org.graylog2.messagequeue;
 
-import org.graylog2.LogMessage;
+import org.graylog2.logmessage.LogMessage;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;

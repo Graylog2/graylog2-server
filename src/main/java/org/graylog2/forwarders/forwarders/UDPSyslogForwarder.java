@@ -21,7 +21,7 @@
 package org.graylog2.forwarders.forwarders;
 
 import org.apache.log4j.Logger;
-import org.graylog2.LogMessage;
+import org.graylog2.logmessage.LogMessage;
 import org.graylog2.forwarders.MessageForwarderIF;
 
 /**

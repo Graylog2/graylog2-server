@@ -21,7 +21,7 @@
 package org.graylog2.messagehandlers.common;
 
 import org.graylog2.GraylogServer;
-import org.graylog2.LogMessage;
+import org.graylog2.logmessage.LogMessage;
 
 /**
  * MessageParserHook.java: Feb 11, 2011

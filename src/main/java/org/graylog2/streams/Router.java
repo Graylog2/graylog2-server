@@ -25,7 +25,7 @@ import org.graylog2.streams.matchers.StreamRuleMatcherIF;
 
 import java.util.ArrayList;
 import java.util.List;
-import org.graylog2.LogMessage;
+import org.graylog2.logmessage.LogMessage;
 
 /**
  * Router.java: Mar 16, 2011 9:40:24 PM

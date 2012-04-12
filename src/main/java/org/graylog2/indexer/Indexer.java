@@ -30,7 +30,7 @@ import java.util.List;
 
 import org.apache.log4j.Logger;
 import org.graylog2.GraylogServer;
-import org.graylog2.LogMessage;
+import org.graylog2.logmessage.LogMessage;
 import org.json.simple.JSONValue;
 
 /**
