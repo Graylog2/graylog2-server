@@ -18,18 +18,21 @@
  *
  */
 
-package org.graylog2.gelf;
+package org.graylog2.inputs.gelf;
 
 import java.util.Arrays;
+import org.graylog2.Tools;
 
 /**
- * GELFUtilities.java: 12.04.2012 11:20:43
+ * GELFMessage.java: 12.04.2012 17:26:01
  *
  * @author Lennart Koopmann <lennart@socketfeed.com>
  */
-public class GELFUtilities {
+public class GELFMessage {
 
-    private GELFUtilities() { /* Pure utility class */ }
+    private byte[] datagram;
+
+    public static final String ADDITIONAL_FIELD_PREFIX = "_";
 
     /**
      * A ZLIB compressed message (RFC 1950)
@@ -74,27 +77,50 @@ public class GELFUtilities {
     /**
      * GELF header type size.
      */
-    public static final int GELF_HEADER_TYPE_LENGTH = 2;
+    public static final int HEADER_TYPE_LENGTH = 2;
 
-    public static int getGELFType(byte[] magicBytes) throws Exception {
+    public GELFMessage(byte[] datagram) {
+        this.datagram = datagram;
+    }
 
-        if (Arrays.equals(magicBytes, HEADER_ZLIB_COMPRESSION)) {
+    public int getGELFType() throws Exception {
+
+        if (Arrays.equals(getMagicBytes(), HEADER_ZLIB_COMPRESSION)) {
             return TYPE_ZLIB;
         }
 
-        if (Arrays.equals(magicBytes, HEADER_GZIP_COMPRESSION)) {
+        if (Arrays.equals(getMagicBytes(), HEADER_GZIP_COMPRESSION)) {
             return TYPE_GZIP;
         }
 
-        if (Arrays.equals(magicBytes, HEADER_CHUNKED_GELF)) {
+        if (Arrays.equals(getMagicBytes(), HEADER_CHUNKED_GELF)) {
             return TYPE_CHUNKED;
         }
 
-        if (Arrays.equals(magicBytes, HEADER_UNCOMPRESSED_GELF)) {
+        if (Arrays.equals(getMagicBytes(), HEADER_UNCOMPRESSED_GELF)) {
             return TYPE_GZIP;
         }
-        
+
         throw new Exception("Unknown GELF type.");
     }
 
+    public String getJSON() throws Exception {
+        switch(getGELFType()) {
+            case TYPE_ZLIB:
+                return Tools.decompressZlib(datagram);
+            case TYPE_GZIP:
+                return Tools.decompressGzip(datagram);
+            default:
+                throw new UnsupportedOperationException("Unknown GELF type. Not supported.");
+        }
+    }
+
+    private byte[] getMagicBytes() throws Exception {
+        if (datagram.length < HEADER_TYPE_LENGTH) {
+            throw new Exception("GELF message is too short. Not even the type header would fit.");
+        }
+        
+        return new byte[] {(byte) datagram[0], (byte) datagram[1]};
+    }
+    
 }

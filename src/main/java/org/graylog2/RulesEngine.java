@@ -20,6 +20,7 @@
 
 package org.graylog2;
 
+import org.graylog2.logmessage.LogMessage;
 import org.apache.log4j.Logger;
 import org.drools.KnowledgeBase;
 import org.drools.KnowledgeBaseFactory;

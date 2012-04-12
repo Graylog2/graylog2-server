@@ -5,7 +5,7 @@
 
 package org.graylog2.messagehandlers.common;
 
-import org.graylog2.LogMessage;
+import org.graylog2.logmessage.LogMessage;
 import org.junit.Test;
 
 /**

@@ -21,7 +21,7 @@
 package org.graylog2.streams.matchers;
 
 import java.util.regex.Pattern;
-import org.graylog2.LogMessage;
+import org.graylog2.logmessage.LogMessage;
 import org.graylog2.streams.StreamRule;
 
 /**

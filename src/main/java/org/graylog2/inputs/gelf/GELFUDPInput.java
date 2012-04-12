@@ -67,7 +67,7 @@ public class GELFUDPInput implements MessageInput {
         bootstrap.setPipelineFactory(new ChannelPipelineFactory() {
             @Override
             public ChannelPipeline getPipeline() throws Exception {
-                return Channels.pipeline(new GELFUDPDecoder());
+                return Channels.pipeline(new GELFUDPDispatcher());
             }
         });
 

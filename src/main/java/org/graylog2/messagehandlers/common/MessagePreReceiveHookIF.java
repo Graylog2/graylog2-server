@@ -20,7 +20,7 @@
 
 package org.graylog2.messagehandlers.common;
 
-import org.graylog2.LogMessage;
+import org.graylog2.logmessage.LogMessage;
 
 /**
  * MessagePostReceiveHookIF.java: Aug 19, 2010 5:46:32 PM
