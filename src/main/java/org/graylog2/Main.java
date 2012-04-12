@@ -32,7 +32,7 @@ import org.apache.commons.io.IOUtils;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.graylog2.initializers.*;
-import org.graylog2.inputs.GELFUDPInput;
+import org.graylog2.inputs.gelf.GELFUDPInput;
 import org.graylog2.inputs.MessageInput;
 
 /*
@@ -115,7 +115,7 @@ public final class Main {
         // Register initializers.
         server.registerInitializer(new ServerValueWriterInitializer(server, configuration));
         server.registerInitializer(new MessageQueueInitializer(server, configuration));
-        server.registerInitializer(new DroolsInitializer(server, configuration));
+        //////server.registerInitializer(new DroolsInitializer(server, configuration));
         server.registerInitializer(new HostCounterCacheWriterInitializer(server));
         server.registerInitializer(new MessageCounterInitializer(server));
         server.registerInitializer(new SyslogServerInitializer(server, configuration));
