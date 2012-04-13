@@ -119,6 +119,10 @@ public class GELFMessage {
         }
     }
 
+    public GELFMessageChunk asChunk() throws Exception {
+        return new GELFMessageChunk(this.payload);
+    }
+
     private byte[] getMagicBytes() throws Exception {
         if (payload.length < HEADER_TYPE_LENGTH) {
             throw new Exception("GELF message is too short. Not even the type header would fit.");

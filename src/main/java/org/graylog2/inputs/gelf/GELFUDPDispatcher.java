@@ -25,6 +25,7 @@ import org.graylog2.GraylogServer;
 import org.jboss.netty.buffer.ChannelBuffer;
 import org.jboss.netty.channel.Channel;
 import org.jboss.netty.channel.ChannelHandlerContext;
+import org.jboss.netty.channel.ExceptionEvent;
 import org.jboss.netty.handler.codec.frame.FrameDecoder;
 
 /**
@@ -49,13 +50,19 @@ public class GELFUDPDispatcher extends FrameDecoder {
 
         if (msg.getGELFType() == GELFMessage.TYPE_CHUNKED) {
             // This is a GELF message chunk. Add chunk to manager.
-            //server.
+            server.getGELFChunkManager().insert(msg.asChunk()); // XXX IMPROVE: this msg.asChunk() is a bit bumpy. better have a chunk from the beginning on.
         } else {
             // This is a non-chunked/complete GELF message. Process it.
             processor.messageReceived(msg);
         }
 
         return buffer.readBytes(buffer.readableBytes());
+    }
+
+
+    @Override
+    public void exceptionCaught(ChannelHandlerContext ctx, ExceptionEvent e) throws Exception {
+        LOG.warn("Could not handle GELF message.", e.getCause());
     }
 
 }
