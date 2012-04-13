@@ -30,7 +30,7 @@ import org.graylog2.Tools;
  */
 public class GELFMessage {
 
-    private byte[] datagram;
+    private byte[] payload;
 
     public static final String ADDITIONAL_FIELD_PREFIX = "_";
 
@@ -79,8 +79,12 @@ public class GELFMessage {
      */
     public static final int HEADER_TYPE_LENGTH = 2;
 
-    public GELFMessage(byte[] datagram) {
-        this.datagram = datagram;
+    /**
+     *
+     * @param payload Compressed or uncompressed (See HEADER_* constants)
+     */
+    public GELFMessage(byte[] payload) {
+        this.payload = payload;
     }
 
     public int getGELFType() throws Exception {
@@ -107,20 +111,20 @@ public class GELFMessage {
     public String getJSON() throws Exception {
         switch(getGELFType()) {
             case TYPE_ZLIB:
-                return Tools.decompressZlib(datagram);
+                return Tools.decompressZlib(payload);
             case TYPE_GZIP:
-                return Tools.decompressGzip(datagram);
+                return Tools.decompressGzip(payload);
             default:
                 throw new UnsupportedOperationException("Unknown GELF type. Not supported.");
         }
     }
 
     private byte[] getMagicBytes() throws Exception {
-        if (datagram.length < HEADER_TYPE_LENGTH) {
+        if (payload.length < HEADER_TYPE_LENGTH) {
             throw new Exception("GELF message is too short. Not even the type header would fit.");
         }
         
-        return new byte[] {(byte) datagram[0], (byte) datagram[1]};
+        return new byte[] {(byte) payload[0], (byte) payload[1]};
     }
     
 }

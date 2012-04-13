@@ -31,9 +31,6 @@ import org.graylog2.Configuration;
 import org.graylog2.GraylogServer;
 import org.graylog2.inputs.MessageInput;
 import org.jboss.netty.bootstrap.ConnectionlessBootstrap;
-import org.jboss.netty.channel.ChannelPipeline;
-import org.jboss.netty.channel.ChannelPipelineFactory;
-import org.jboss.netty.channel.Channels;
 import org.jboss.netty.channel.socket.nio.NioDatagramChannelFactory;
 
 /**
@@ -64,12 +61,7 @@ public class GELFUDPInput implements MessageInput {
         final ExecutorService workerThreadPool = Executors.newCachedThreadPool();
         final ConnectionlessBootstrap bootstrap = new ConnectionlessBootstrap(new NioDatagramChannelFactory(workerThreadPool));
 
-        bootstrap.setPipelineFactory(new ChannelPipelineFactory() {
-            @Override
-            public ChannelPipeline getPipeline() throws Exception {
-                return Channels.pipeline(new GELFUDPDispatcher());
-            }
-        });
+        bootstrap.setPipelineFactory(new GELFPipelineFactory(graylogServer));
 
         try {
             bootstrap.bind(socketAddress);

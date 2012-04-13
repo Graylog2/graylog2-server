@@ -33,7 +33,6 @@ import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.graylog2.initializers.*;
 import org.graylog2.inputs.gelf.GELFUDPInput;
-import org.graylog2.inputs.MessageInput;
 
 /*
  * 
