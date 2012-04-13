@@ -21,7 +21,7 @@
 package org.graylog2.inputs.gelf;
 
 import org.apache.log4j.Logger;
-import org.graylog2.inputs.gelf.processing.GELFProcessor;
+import org.graylog2.GraylogServer;
 import org.jboss.netty.buffer.ChannelBuffer;
 import org.jboss.netty.channel.Channel;
 import org.jboss.netty.channel.ChannelHandlerContext;
@@ -36,10 +36,24 @@ public class GELFUDPDispatcher extends FrameDecoder {
 
     private static final Logger LOG = Logger.getLogger(GELFUDPDispatcher.class);
 
+    private final GELFProcessor processor = new GELFProcessor();
+    private GraylogServer server;
+
+    public GELFUDPDispatcher(GraylogServer server) {
+        this.server = server;
+    }
+
     @Override
     protected Object decode(ChannelHandlerContext ctx, Channel channel, ChannelBuffer buffer) throws Exception {
-        GELFProcessor processor = new GELFProcessor();
-        processor.messageReceived(new GELFMessage(buffer.array()));
+        GELFMessage msg = new GELFMessage(buffer.array());
+
+        if (msg.getGELFType() == GELFMessage.TYPE_CHUNKED) {
+            // This is a GELF message chunk. Add chunk to manager.
+            //server.
+        } else {
+            // This is a non-chunked/complete GELF message. Process it.
+            processor.messageReceived(msg);
+        }
 
         return buffer.readBytes(buffer.readableBytes());
     }

@@ -18,13 +18,12 @@
  *
  */
 
-package org.graylog2.inputs.gelf.processing;
+package org.graylog2.inputs.gelf;
 
 import java.util.Map;
 import java.util.Set;
 import org.apache.log4j.Logger;
 import org.graylog2.Tools;
-import org.graylog2.inputs.gelf.GELFMessage;
 import org.graylog2.logmessage.LogMessage;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;

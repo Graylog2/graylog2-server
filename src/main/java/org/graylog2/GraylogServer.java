@@ -14,7 +14,6 @@ import org.graylog2.indexer.EmbeddedElasticSearchClient;
 import org.graylog2.indexer.Indexer;
 import org.graylog2.initializers.Initializer;
 import org.graylog2.inputs.MessageInput;
-import org.graylog2.messagequeue.MessageQueue;
 import org.graylog2.messagequeue.MessageQueueFlusher;
 import org.graylog2.streams.StreamCache;
 
