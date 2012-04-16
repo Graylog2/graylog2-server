@@ -1,2 +1,2 @@
 language: java
-before_install: install-syslog4j-jar.sh # installs syslog4j jar to local maven repo
+before_install: ./install-syslog4j-jar.sh # installs syslog4j jar to local maven repo
