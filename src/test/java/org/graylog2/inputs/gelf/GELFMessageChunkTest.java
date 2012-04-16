@@ -5,10 +5,9 @@
 
 package org.graylog2.inputs.gelf;
 
-import org.junit.After;
-import org.junit.AfterClass;
-import org.junit.Before;
-import org.junit.BeforeClass;
+import java.io.IOException;
+import org.graylog2.TestHelper;
+import org.graylog2.Tools;
 import org.junit.Test;
 import static org.junit.Assert.*;
 
@@ -18,119 +17,48 @@ import static org.junit.Assert.*;
  */
 public class GELFMessageChunkTest {
 
-    public GELFMessageChunkTest() {
-    }
+    public final static String GELF_JSON = "{\"message\":\"foo\",\"host\":\"bar\",\"_lol_utf8\":\"ü\"}";
 
-    @BeforeClass
-    public static void setUpClass() throws Exception {
-    }
+    
+    private GELFMessageChunk buildChunk() throws Exception {
+        String id = "lolwat67";
+        int seqNum = 3;
+        int seqCnt = 4;
+        byte[] data = TestHelper.gzipCompress(GELF_JSON);
 
-    @AfterClass
-    public static void tearDownClass() throws Exception {
+        return new GELFMessageChunk(TestHelper.buildGELFMessageChunk(id, seqNum, seqCnt, data));
     }
-
-    @Before
-    public void setUp() {
-    }
-
-    @After
-    public void tearDown() {
-    }
-
-    /**
-     * Test of getArrival method, of class GELFMessageChunk.
-     */
+    
     @Test
-    public void testGetArrival() {
-        System.out.println("getArrival");
-        GELFMessageChunk instance = null;
-        int expResult = 0;
-        int result = instance.getArrival();
-        assertEquals(expResult, result);
-        // TODO review the generated test code and remove the default call to fail.
-        fail("The test case is a prototype.");
+    public void testGetArrival() throws Exception {
+        int timestamp = Tools.getUTCTimestamp();
+        GELFMessageChunk chunk = buildChunk();
+        assertTrue((timestamp - chunk.getArrival()) < 5); // delta shmelta
     }
 
-    /**
-     * Test of getId method, of class GELFMessageChunk.
-     */
     @Test
-    public void testGetId() {
-        System.out.println("getId");
-        GELFMessageChunk instance = null;
-        String expResult = "";
-        String result = instance.getId();
-        assertEquals(expResult, result);
-        // TODO review the generated test code and remove the default call to fail.
-        fail("The test case is a prototype.");
+    public void testGetId() throws Exception {      
+        assertEquals(TestHelper.toHex("lolwat67"), buildChunk().getId());
     }
 
-    /**
-     * Test of getData method, of class GELFMessageChunk.
-     */
     @Test
-    public void testGetData() {
-        System.out.println("getData");
-        GELFMessageChunk instance = null;
-        byte[] expResult = null;
-        byte[] result = instance.getData();
-        assertEquals(expResult, result);
-        // TODO review the generated test code and remove the default call to fail.
-        fail("The test case is a prototype.");
+    public void testGetData() throws Exception  {
+        assertArrayEquals(TestHelper.gzipCompress(GELF_JSON), buildChunk().getData());
     }
 
-    /**
-     * Test of getSequenceCount method, of class GELFMessageChunk.
-     */
     @Test
-    public void testGetSequenceCount() {
-        System.out.println("getSequenceCount");
-        GELFMessageChunk instance = null;
-        int expResult = 0;
-        int result = instance.getSequenceCount();
-        assertEquals(expResult, result);
-        // TODO review the generated test code and remove the default call to fail.
-        fail("The test case is a prototype.");
+    public void testGetSequenceCount() throws Exception  {
+        assertEquals(4, buildChunk().getSequenceCount());
     }
 
-    /**
-     * Test of getSequenceNumber method, of class GELFMessageChunk.
-     */
     @Test
-    public void testGetSequenceNumber() {
-        System.out.println("getSequenceNumber");
-        GELFMessageChunk instance = null;
-        int expResult = 0;
-        int result = instance.getSequenceNumber();
-        assertEquals(expResult, result);
-        // TODO review the generated test code and remove the default call to fail.
-        fail("The test case is a prototype.");
+    public void testGetSequenceNumber() throws Exception  {
+        assertEquals(3, buildChunk().getSequenceNumber());
     }
 
-    /**
-     * Test of read method, of class GELFMessageChunk.
-     */
     @Test
-    public void testRead() throws Exception {
-        System.out.println("read");
-        GELFMessageChunk instance = null;
-        instance.read();
-        // TODO review the generated test code and remove the default call to fail.
-        fail("The test case is a prototype.");
-    }
-
-    /**
-     * Test of toString method, of class GELFMessageChunk.
-     */
-    @Test
-    public void testToString() {
-        System.out.println("toString");
-        GELFMessageChunk instance = null;
-        String expResult = "";
-        String result = instance.toString();
-        assertEquals(expResult, result);
-        // TODO review the generated test code and remove the default call to fail.
-        fail("The test case is a prototype.");
+    public void testToString() throws Exception {
+        assertNotNull(buildChunk().toString());
     }
 
 }
