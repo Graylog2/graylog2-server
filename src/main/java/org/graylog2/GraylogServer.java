@@ -74,7 +74,7 @@ public class GraylogServer implements Runnable {
 
         // initiate the mongodb connection, this might fail but it will retry to establish the connection
         mongoConnection.connect();
-        gelfChunkManager.run();
+        gelfChunkManager.start();
         BlacklistCache.initialize(this);
         StreamCache.initialize(this);
 

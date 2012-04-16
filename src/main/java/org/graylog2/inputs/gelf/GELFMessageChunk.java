@@ -121,6 +121,7 @@ public final class GELFMessageChunk {
         return this.id;
     }
 
+    // lol duplication
     private int extractSequenceNumber() throws Exception {
         if (this.sequenceNumber == -1) {
             int seqNum = this.sliceInteger(HEADER_PART_SEQNUM_START, HEADER_PART_SEQNUM_LENGTH);
@@ -134,6 +135,7 @@ public final class GELFMessageChunk {
         return this.sequenceNumber;
     }
 
+    // lol duplication
     private int extractSequenceCount() throws Exception {
         if (this.sequenceCount == -1) {
             int seqCnt = this.sliceInteger(HEADER_PART_SEQCNT_START, HEADER_PART_SEQCNT_LENGTH);
@@ -176,8 +178,7 @@ public final class GELFMessageChunk {
         StringBuilder sb = new StringBuilder();
 
         try {
-            sb.append("GELF chunk:\n");
-            sb.append("\tID: ");
+            sb.append("ID: ");
             sb.append(this.id);
             sb.append("\tSequence: ");
             sb.append(this.sequenceNumber+1); // +1 for readability: 1/2 not 0/2

@@ -46,7 +46,11 @@ public class GELFUDPDispatcher extends FrameDecoder {
 
     @Override
     protected Object decode(ChannelHandlerContext ctx, Channel channel, ChannelBuffer buffer) throws Exception {
-        GELFMessage msg = new GELFMessage(buffer.array());
+
+        byte[] readable = new byte[buffer.readableBytes()];
+        buffer.toByteBuffer().get(readable, buffer.readerIndex(), buffer.readableBytes()); // I'm 12 years old and what is this? There must be a better way.
+
+        GELFMessage msg = new GELFMessage(readable);
 
         if (msg.getGELFType() == GELFMessage.TYPE_CHUNKED) {
             // This is a GELF message chunk. Add chunk to manager.

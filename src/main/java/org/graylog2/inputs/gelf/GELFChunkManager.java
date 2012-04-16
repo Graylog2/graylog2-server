@@ -28,8 +28,6 @@ import org.apache.log4j.Logger;
 /**
  * GELFChunkManager.java: 13.04.2012 22:38:40
  *
- * Describe me.
- *
  * @author Lennart Koopmann <lennart@socketfeed.com>
  */
 public class GELFChunkManager extends Thread {
@@ -40,7 +38,13 @@ public class GELFChunkManager extends Thread {
 
     @Override
     public void run() {
-        // Check for chunks to discard.
+        while (true) {
+            LOG.debug("Dumping GELF chunk map:\n" + humanReadableChunkMap());
+            
+            try {
+                Thread.sleep(1000);
+            } catch (InterruptedException ex) { /* trololol */}
+        }
     }
 
     public void insert(GELFMessageChunk chunk) {
@@ -56,6 +60,20 @@ public class GELFChunkManager extends Thread {
             chunks.put(chunk.getId(), c);
         }
 
+    }
+
+    public String humanReadableChunkMap() {
+        StringBuilder sb = new StringBuilder();
+
+        for (Map.Entry<String, Map<Integer, GELFMessageChunk>> entry : chunks.entrySet()) {
+            sb.append("Message <").append(entry.getKey()).append("> ");
+            sb.append("\tChunks:\n");
+            for(Map.Entry<Integer, GELFMessageChunk> chunk : entry.getValue().entrySet()) {
+                sb.append("\t\t").append(chunk.getValue()).append(("\n"));
+            }
+        }
+
+        return sb.toString();
     }
 
 }
