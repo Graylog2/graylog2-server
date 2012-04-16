@@ -102,7 +102,7 @@ public class GELFMessage {
         }
 
         if (Arrays.equals(getMagicBytes(), HEADER_UNCOMPRESSED_GELF)) {
-            return TYPE_GZIP;
+            return TYPE_UNCOMPRESSED;
         }
 
         throw new Exception("Unknown GELF type.");
@@ -114,6 +114,11 @@ public class GELFMessage {
                 return Tools.decompressZlib(payload);
             case TYPE_GZIP:
                 return Tools.decompressGzip(payload);
+            case TYPE_UNCOMPRESSED:
+                // Slice off header and return pure uncompressed bytes.
+                byte[] result = new byte[payload.length-2];
+                System.arraycopy(payload, 2, result, 0, payload.length-2);
+                return new String(result, "UTF-8");
             default:
                 throw new UnsupportedOperationException("Unknown GELF type. Not supported.");
         }

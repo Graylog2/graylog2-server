@@ -113,6 +113,7 @@ public final class GELFMessageChunk {
         if (this.id == null) {
             String tmp = "";
             for (int i = 0; i < HEADER_PART_HASH_LENGTH; i++) {
+                // Make a hex value out of it.
                 tmp = tmp.concat(Integer.toString((payload[i+HEADER_PART_HASH_START] & 0xff) + 0x100, 16).substring(1));
             }
             this.id = tmp;
