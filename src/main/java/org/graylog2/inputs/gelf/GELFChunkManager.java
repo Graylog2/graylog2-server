@@ -39,7 +39,7 @@ public class GELFChunkManager extends Thread {
     private final GELFProcessor processor = new GELFProcessor();
 
     // The number of seconds a chunk is valid. Every message with chunks older than this will be dropped.
-    private static final int SECONDS_VALID = 5;
+    public static final int SECONDS_VALID = 5;
 
     @Override
     public void run() {
@@ -134,6 +134,10 @@ public class GELFChunkManager extends Thread {
         }
 
         return out.toByteArray();
+    }
+    
+    public boolean hasMessage(String messageId) {
+        return chunks.containsKey(messageId);
     }
 
     public void insert(GELFMessageChunk chunk) {
