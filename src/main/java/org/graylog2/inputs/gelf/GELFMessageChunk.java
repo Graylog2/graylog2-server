@@ -65,7 +65,7 @@ public final class GELFMessageChunk {
     public static final int HEADER_TOTAL_LENGTH = 12;
 
     private String id;
-    private byte[] data;
+    private byte[] data = new byte[1];
     private int sequenceNumber = -1;
     private int sequenceCount = -1;
     private int arrival = -1;
@@ -122,7 +122,7 @@ public final class GELFMessageChunk {
     }
 
     // lol duplication
-    private int extractSequenceNumber() throws Exception {
+    private void extractSequenceNumber() throws Exception {
         if (this.sequenceNumber == -1) {
             int seqNum = this.sliceInteger(HEADER_PART_SEQNUM_START, HEADER_PART_SEQNUM_LENGTH);
             if (seqNum >= 0) {
@@ -131,12 +131,10 @@ public final class GELFMessageChunk {
                 throw new Exception("Could not extract sequence number");
             }
         }
-
-        return this.sequenceNumber;
     }
 
     // lol duplication
-    private int extractSequenceCount() throws Exception {
+    private void extractSequenceCount() throws Exception {
         if (this.sequenceCount == -1) {
             int seqCnt = this.sliceInteger(HEADER_PART_SEQCNT_START, HEADER_PART_SEQCNT_LENGTH);
             if (seqCnt >= 0) {
@@ -145,12 +143,10 @@ public final class GELFMessageChunk {
                 throw new Exception("Could not extract sequence count");
             }
         }
-
-        return this.sequenceCount;
     }
 
-    private byte[] extractData() {
-        return slice(HEADER_TOTAL_LENGTH); // Slice everything starting at the total header length.
+    private void extractData() {
+        this.data = slice(HEADER_TOTAL_LENGTH); // Slice everything starting at the total header length.
     }
 
     private int sliceInteger(int start, int length) {

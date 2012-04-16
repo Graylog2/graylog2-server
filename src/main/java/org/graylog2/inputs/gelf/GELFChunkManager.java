@@ -20,6 +20,7 @@
 
 package org.graylog2.inputs.gelf;
 
+import java.io.ByteArrayOutputStream;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -35,16 +36,104 @@ public class GELFChunkManager extends Thread {
     private static final Logger LOG = Logger.getLogger(GELFChunkManager.class);
 
     private Map<String, Map<Integer, GELFMessageChunk>> chunks = new ConcurrentHashMap<String, Map<Integer, GELFMessageChunk>>();
+    private final GELFProcessor processor = new GELFProcessor();
+
+    // The number of seconds a chunk is valid. Every message with chunks older than this will be dropped.
+    private static final int SECONDS_VALID = 5;
 
     @Override
     public void run() {
         while (true) {
-            LOG.debug("Dumping GELF chunk map:\n" + humanReadableChunkMap());
-            
             try {
-                Thread.sleep(1000);
-            } catch (InterruptedException ex) { /* trololol */}
+                LOG.debug("Dumping GELF chunk map [" + chunks.size() + "]:\n" + humanReadableChunkMap());
+
+                // Check for complete or outdated messages.
+                for (Map.Entry<String, Map<Integer, GELFMessageChunk>> message : chunks.entrySet()) {
+                    String messageId = message.getKey();
+
+                    // Outdated?
+                    if (isOutdated(messageId)) {
+                        LOG.debug("Not all chunks of <" + messageId + "> arrived in time. Dropping. [" + SECONDS_VALID + "s]");
+                        dropMessage(messageId);
+                        continue;
+                    }
+
+                    // Not oudated. Maybe complete?
+                    if (isComplete(messageId)) {
+                        // We got a complete message! Re-assemble and insert to GELFProcessor.
+                        LOG.debug("Message <" + messageId + "> seems to be complete. Handling now.");
+                        processor.messageReceived(new GELFMessage(chunksToByteArray(messageId)));
+
+                        // Message has been handled. Drop it.
+                        LOG.debug("Message <" + messageId + "> is now being processed. Dropping from chunk map.");
+                        dropMessage(messageId);
+                    }
+                }
+            } catch (Exception e) {
+                LOG.error("Error in GELFChunkManager", e);
+            }
+
+            try { Thread.sleep(1000); } catch (InterruptedException ex) { /* trololol */}
         }
+    }
+
+    public boolean isComplete(String messageId) {
+        if (!chunks.containsKey(messageId)) {
+            LOG.debug("Message <" + messageId + "> not in chunk map. Not checking if complete.");
+            return false;
+        }
+
+        if (!chunks.get(messageId).containsKey(0)) {
+            LOG.debug("Message <" + messageId + "> does not even contain first chunk. Not complete!");
+            return false;
+        }
+
+        int claimedSequenceCount = chunks.get(messageId).get(0).getSequenceCount();
+        if (claimedSequenceCount == chunks.get(messageId).size()) {
+            // Message seems to be complete.
+            return true;
+        }
+
+        return false;
+    }
+
+    public boolean isOutdated(String messageId) {
+        if (!chunks.containsKey(messageId)) {
+            LOG.debug("Message <" + messageId + "> not in chunk map. Not checking if outdated.");
+            return false;
+        }
+
+        int limit = (int) (System.currentTimeMillis() / 1000) - SECONDS_VALID;
+        
+        // Checks for oldest chunk arrival date.
+        for (Map.Entry<Integer, GELFMessageChunk> chunk : chunks.get(messageId).entrySet()) {
+            if (chunk.getValue().getArrival() < limit) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    public void dropMessage(String messageId) {
+        if (chunks.containsKey(messageId)) {
+            chunks.remove(messageId);
+        } else {
+            LOG.debug("Message <" + messageId + "> not in chunk map. Not dropping.");
+        }
+    }
+
+    public byte[] chunksToByteArray(String messageId) throws Exception {
+        if (!chunks.containsKey(messageId)) {
+            throw new Exception("Message <" + messageId + "> not in chunk map. Cannot re-assemble.");
+        }
+
+        ByteArrayOutputStream out = new ByteArrayOutputStream();
+        for (Map.Entry<Integer, GELFMessageChunk> chunk : chunks.get(messageId).entrySet()) {
+            out.write(chunk.getValue().getData(), 0, chunk.getValue().getData().length);
+        }
+
+        return out.toByteArray();
     }
 
     public void insert(GELFMessageChunk chunk) {
