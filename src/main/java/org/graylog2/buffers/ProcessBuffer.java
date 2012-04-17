@@ -20,7 +20,14 @@
 
 package org.graylog2.buffers;
 
+import com.lmax.disruptor.MultiThreadedClaimStrategy;
+import com.lmax.disruptor.RingBuffer;
+import com.lmax.disruptor.SleepingWaitStrategy;
+import com.lmax.disruptor.dsl.Disruptor;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import org.graylog2.GraylogServer;
+import org.graylog2.buffers.processors.ProcessBufferProcessor;
 import org.graylog2.logmessage.LogMessage;
 
 /**
@@ -30,12 +37,34 @@ import org.graylog2.logmessage.LogMessage;
  */
 public class ProcessBuffer {
 
+    protected static final int RING_SIZE = 1024;
+
+    GraylogServer server;
+    protected static RingBuffer<LogMessageEvent> ringBuffer;
+
     public ProcessBuffer(GraylogServer server) {
-        
+        this.server = server;
+    }
+
+    public void initialize() {
+        ExecutorService executor = Executors.newCachedThreadPool();
+
+        Disruptor disruptor = new Disruptor<LogMessageEvent>(
+                LogMessageEvent.EVENT_FACTORY,
+                executor,
+                new MultiThreadedClaimStrategy(RING_SIZE),
+                new SleepingWaitStrategy()
+        );
+
+        disruptor.handleEventsWith(new ProcessBufferProcessor());
+        ringBuffer = disruptor.start();
     }
 
     public void insert(LogMessage message) {
-
+        long sequence = ringBuffer.next();
+        LogMessageEvent event = ringBuffer.get(sequence);
+        event.setMessage(message);
+        ringBuffer.publish(sequence);
     }
 
 }

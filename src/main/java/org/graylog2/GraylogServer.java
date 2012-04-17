@@ -40,7 +40,7 @@ public class GraylogServer implements Runnable {
     private List<Initializer> initializers = new ArrayList<Initializer>();
     private List<MessageInput> inputs = new ArrayList<MessageInput>();
 
-    private ProcessBuffer processBuffer = new ProcessBuffer(this);
+    private ProcessBuffer processBuffer;
 
     public void initialize(Configuration configuration) {
         this.configuration = configuration; // TODO use dependency injection
@@ -56,6 +56,9 @@ public class GraylogServer implements Runnable {
         mongoConnection.setThreadsAllowedToBlockMultiplier(configuration.getMongoThreadsAllowedToBlockMultiplier());
         mongoConnection.setReplicaSet(configuration.getMongoReplicaSet());
         mongoConnection.setMessagesCollectionSize(configuration.getMessagesCollectionSize());
+
+        processBuffer = new ProcessBuffer(this);
+        processBuffer.initialize();
 
         mongoBridge = new MongoBridge();
         mongoBridge.setConnection(mongoConnection); // TODO use dependency injection
