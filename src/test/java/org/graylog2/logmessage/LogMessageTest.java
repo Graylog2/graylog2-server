@@ -75,6 +75,13 @@ public class LogMessageTest {
     }
 
     @Test
+    public void testAddAdditionalData() {
+        LogMessage lm = new LogMessage();
+        lm.addAdditionalData("ohai", "thar");
+        assertEquals("thar", lm.getAdditionalData().get("ohai"));
+    }
+
+    @Test
     public void testToString() {
         LogMessage lm = new LogMessage();
         lm.toString();
