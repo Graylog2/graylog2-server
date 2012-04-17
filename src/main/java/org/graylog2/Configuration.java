@@ -68,7 +68,7 @@ public class Configuration {
     private boolean noRetention;
 
     @Parameter(value = "elasticsearch_config_file", required = true, validator = FilePresentValidator.class)
-    private String elasticSearchConfigFile;
+    private String elasticSearchConfigFile = "/etc/graylog2-elasticsearch.yml";
 
     @Parameter(value = "elasticsearch_index_name", required = true)
     private String elasticsearchIndexName = "graylog2";

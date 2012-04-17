@@ -7,6 +7,7 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import org.apache.log4j.Logger;
 import org.graylog2.blacklists.BlacklistCache;
+import org.graylog2.buffers.ProcessBuffer;
 import org.graylog2.database.MongoBridge;
 import org.graylog2.database.MongoConnection;
 import org.graylog2.forwarders.forwarders.LogglyForwarder;
@@ -22,24 +23,26 @@ public class GraylogServer implements Runnable {
 
     private static final Logger LOG = Logger.getLogger(GraylogServer.class);
 
-    private final MongoConnection mongoConnection;
-    private final MongoBridge mongoBridge;
-    private final Configuration configuration;
+    private MongoConnection mongoConnection;
+    private MongoBridge mongoBridge;
+    private Configuration configuration;
     private RulesEngine rulesEngine;
     private ServerValue serverValues;
-    private GELFChunkManager gelfChunkManager = new GELFChunkManager();
+    private GELFChunkManager gelfChunkManager;
 
     private static final int SCHEDULED_THREADS_POOL_SIZE = 15;
     private ScheduledExecutorService scheduler;
 
     public static final String GRAYLOG2_VERSION = "0.9.7-dev";
 
-    private final Indexer indexer;
+    private Indexer indexer = null;
 
     private List<Initializer> initializers = new ArrayList<Initializer>();
     private List<MessageInput> inputs = new ArrayList<MessageInput>();
 
-    public GraylogServer(Configuration configuration) {
+    private ProcessBuffer processBuffer = new ProcessBuffer(this);
+
+    public void initialize(Configuration configuration) {
         this.configuration = configuration; // TODO use dependency injection
 
         mongoConnection = new MongoConnection();    // TODO use dependency injection
@@ -56,6 +59,8 @@ public class GraylogServer implements Runnable {
 
         mongoBridge = new MongoBridge();
         mongoBridge.setConnection(mongoConnection); // TODO use dependency injection
+
+        gelfChunkManager = new GELFChunkManager(this);
 
         indexer = new EmbeddedElasticSearchClient(this);
         serverValues = new ServerValue(this);
@@ -158,6 +163,10 @@ public class GraylogServer implements Runnable {
 
     public GELFChunkManager getGELFChunkManager() {
         return this.gelfChunkManager;
+    }
+
+    public ProcessBuffer getProcessBuffer() {
+        return this.processBuffer;
     }
 
 }

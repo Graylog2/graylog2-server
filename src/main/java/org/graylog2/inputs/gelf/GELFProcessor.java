@@ -23,6 +23,7 @@ package org.graylog2.inputs.gelf;
 import java.util.Map;
 import java.util.Set;
 import org.apache.log4j.Logger;
+import org.graylog2.GraylogServer;
 import org.graylog2.Tools;
 import org.graylog2.logmessage.LogMessage;
 import org.json.simple.JSONArray;
@@ -37,6 +38,11 @@ import org.json.simple.JSONValue;
 public class GELFProcessor {
 
     private static final Logger LOG = Logger.getLogger(GELFProcessor.class);
+    private GraylogServer server;
+
+    public GELFProcessor(GraylogServer server) {
+        this.server = server;
+    }
 
     public void messageReceived(GELFMessage message) throws Exception {
         // Convert to LogMessage
@@ -48,6 +54,7 @@ public class GELFProcessor {
 
         // Add to process buffer.
         LOG.debug("Adding received GELF message to process buffer: " + lm);
+        server.getProcessBuffer().insert(lm);
     }
 
     private LogMessage parse(String message) throws Exception {
@@ -120,7 +127,7 @@ public class GELFProcessor {
         return lm;
     }
 
-    protected JSONObject getJSON(String value) {
+    private JSONObject getJSON(String value) {
         if (value != null) {
             Object obj = JSONValue.parse(value);
             if (obj != null) {

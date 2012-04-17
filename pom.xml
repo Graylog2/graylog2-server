@@ -106,6 +106,17 @@
             <version>3.1</version>
             <scope>test</scope>
         </dependency>
+        <dependency>
+            <groupId>com.googlecode.disruptor</groupId>
+            <artifactId>disruptor</artifactId>
+            <version>2.9</version>
+        </dependency>
+        <dependency>
+            <groupId>org.jmock</groupId>
+            <artifactId>jmock</artifactId>
+            <version>2.5.1</version>
+            <scope>test</scope>
+        </dependency>
     </dependencies>
 
     <build>

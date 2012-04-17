@@ -37,11 +37,12 @@ public class GELFUDPDispatcher extends FrameDecoder {
 
     private static final Logger LOG = Logger.getLogger(GELFUDPDispatcher.class);
 
-    private final GELFProcessor processor = new GELFProcessor();
+    private GELFProcessor processor;
     private GraylogServer server;
 
     public GELFUDPDispatcher(GraylogServer server) {
         this.server = server;
+        this.processor = new GELFProcessor(server);
     }
 
     @Override

@@ -20,16 +20,20 @@
 
 package org.graylog2.inputs.gelf;
 
+import org.graylog2.GraylogServer;
 import org.apache.commons.lang3.ArrayUtils;
+import org.graylog2.Configuration;
 import org.graylog2.TestHelper;
 import org.junit.Test;
 import static org.junit.Assert.*;
 
 public class GELFChunkManagerTest {
 
+    private GraylogServer server = null;
+
     @Test
     public void testIsCompleteDetectsAsNotComplete() throws Exception {
-        GELFChunkManager mgr = new GELFChunkManager();
+        GELFChunkManager mgr = new GELFChunkManager(server);
  
         String msgId = "lolwat67";
         mgr.insert(new GELFMessageChunk(TestHelper.buildGELFMessageChunk(msgId, 0, 3, new byte[1])));
@@ -40,7 +44,7 @@ public class GELFChunkManagerTest {
     
     @Test
     public void testIsCompleteDetectsAsComplete() throws Exception {
-        GELFChunkManager mgr = new GELFChunkManager();
+        GELFChunkManager mgr = new GELFChunkManager(server);
  
         String msgId = "foobar00";
         mgr.insert(new GELFMessageChunk(TestHelper.buildGELFMessageChunk(msgId, 0, 3, new byte[1])));
@@ -52,13 +56,13 @@ public class GELFChunkManagerTest {
     
     @Test
     public void testIsCompleteWithEmptyChunkMap() throws Exception {
-        GELFChunkManager mgr = new GELFChunkManager();
+        GELFChunkManager mgr = new GELFChunkManager(server);
         assertFalse(mgr.isComplete(TestHelper.toHex("lolwat")));
     }
 
     @Test
     public void testIsOutdated() throws Exception {
-        GELFChunkManager mgr = new GELFChunkManager();
+        GELFChunkManager mgr = new GELFChunkManager(server);
  
         String msgId = "lolwat67";
         mgr.insert(new GELFMessageChunk(TestHelper.buildGELFMessageChunk(msgId, 0, 3, new byte[1])));
@@ -71,7 +75,7 @@ public class GELFChunkManagerTest {
     
     @Test
     public void testIsNotOutdated() throws Exception {
-        GELFChunkManager mgr = new GELFChunkManager();
+        GELFChunkManager mgr = new GELFChunkManager(server);
  
         String msgId = "lolwat67";
         mgr.insert(new GELFMessageChunk(TestHelper.buildGELFMessageChunk(msgId, 0, 3, new byte[1])));
@@ -84,13 +88,13 @@ public class GELFChunkManagerTest {
     
     @Test
     public void testIsNotOutdatedWithEmptyChunkMap() throws Exception {
-        GELFChunkManager mgr = new GELFChunkManager();
+        GELFChunkManager mgr = new GELFChunkManager(server);
         assertFalse(mgr.isOutdated(TestHelper.toHex("lolwat")));
     }
 
     @Test
     public void testDropMessageWithExistingMessage() throws Exception {
-        GELFChunkManager mgr = new GELFChunkManager();
+        GELFChunkManager mgr = new GELFChunkManager(server);
  
         String msgId = "foobaz11";
         mgr.insert(new GELFMessageChunk(TestHelper.buildGELFMessageChunk(msgId, 0, 2, new byte[1])));
@@ -104,7 +108,7 @@ public class GELFChunkManagerTest {
     
     @Test
     public void testDropMessageWithNotExistingMessage() throws Exception {
-        GELFChunkManager mgr = new GELFChunkManager();
+        GELFChunkManager mgr = new GELFChunkManager(server);
  
         mgr.insert(new GELFMessageChunk(TestHelper.buildGELFMessageChunk("lollol99", 1, 3, new byte[1])));
         mgr.insert(new GELFMessageChunk(TestHelper.buildGELFMessageChunk("lollol99", 0, 3, new byte[1])));
@@ -115,13 +119,13 @@ public class GELFChunkManagerTest {
     
     @Test
     public void testDropMessageWitEmptyChunkMap() throws Exception {
-        GELFChunkManager mgr = new GELFChunkManager();
+        GELFChunkManager mgr = new GELFChunkManager(server);
         mgr.dropMessage("lol");
     }
 
     @Test
     public void testChunksToByteArray() throws Exception {
-        GELFChunkManager mgr = new GELFChunkManager();
+        GELFChunkManager mgr = new GELFChunkManager(server);
  
         byte[] b1 = TestHelper.gzipCompress("nothing");
         byte[] b2 = TestHelper.gzipCompress("tosee");
@@ -143,7 +147,7 @@ public class GELFChunkManagerTest {
 
     @Test
     public void testInsert() throws Exception {
-        GELFChunkManager mgr = new GELFChunkManager();
+        GELFChunkManager mgr = new GELFChunkManager(server);
 
         String msgId = "lolwat99";
         
@@ -156,14 +160,14 @@ public class GELFChunkManagerTest {
 
     @Test
     public void testHumanReadableChunkMap() throws Exception {
-        GELFChunkManager mgr = new GELFChunkManager();
+        GELFChunkManager mgr = new GELFChunkManager(server);
         mgr.insert(new GELFMessageChunk(TestHelper.buildGELFMessageChunk("ohaithar", 0, 3, new byte[1])));
         mgr.humanReadableChunkMap();
     }
     
     @Test
     public void testHumanReadableChunkMapWithEmptyChunkMap() {
-        GELFChunkManager mgr = new GELFChunkManager();
+        GELFChunkManager mgr = new GELFChunkManager(server);
         mgr.humanReadableChunkMap();
     }
 

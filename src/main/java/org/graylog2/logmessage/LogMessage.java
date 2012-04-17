@@ -142,4 +142,8 @@ public class LogMessage {
         this.additionalData.put(key, value);
     }
 
+    public Map<String, Object> getAdditionalData() {
+        return this.additionalData;
+    }
+
 }

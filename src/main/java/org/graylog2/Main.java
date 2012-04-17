@@ -109,7 +109,8 @@ public final class Main {
         savePidFile(commandLineArguments.getPidFile());
 
         // Le server object. This is where all the magic happens.
-        GraylogServer server = new GraylogServer(configuration);
+        GraylogServer server = new GraylogServer();
+        server.initialize(configuration);
 
         // Register initializers.
         server.registerInitializer(new ServerValueWriterInitializer(server, configuration));

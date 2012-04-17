@@ -25,6 +25,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import org.apache.log4j.Logger;
+import org.graylog2.GraylogServer;
 
 /**
  * GELFChunkManager.java: 13.04.2012 22:38:40
@@ -36,10 +37,16 @@ public class GELFChunkManager extends Thread {
     private static final Logger LOG = Logger.getLogger(GELFChunkManager.class);
 
     private Map<String, Map<Integer, GELFMessageChunk>> chunks = new ConcurrentHashMap<String, Map<Integer, GELFMessageChunk>>();
-    private final GELFProcessor processor = new GELFProcessor();
+    private GELFProcessor processor;
+    private GraylogServer server;
 
     // The number of seconds a chunk is valid. Every message with chunks older than this will be dropped.
     public static final int SECONDS_VALID = 5;
+
+    public GELFChunkManager(GraylogServer server) {
+        this.server = server;
+        this.processor = new GELFProcessor(server);
+    }
 
     @Override
     public void run() {
