@@ -30,7 +30,7 @@ import org.graylog2.streams.StreamRule;
  *
  * @author Lennart Koopmann <lennart@socketfeed.com>
  */
-public class AdditionalFieldMatcher implements StreamRuleMatcherIF {
+public class AdditionalFieldMatcher implements StreamRuleMatcher {
 
     public boolean match(LogMessage msg, StreamRule rule) {
         /*String[] parts = rule.getValue().split("=");

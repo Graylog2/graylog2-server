@@ -1,5 +1,5 @@
 /**
- * Copyright 2011 Lennart Koopmann <lennart@socketfeed.com>
+ * Copyright 2011, 2012 Lennart Koopmann <lennart@socketfeed.com>
  *
  * This file is part of Graylog2.
  *
@@ -24,18 +24,14 @@ import org.graylog2.logmessage.LogMessage;
 import org.graylog2.streams.StreamRule;
 
 /**
- * SeverityMatcher.java: May 23, 2011 3:26:41 PM
+ * StreamRuleMatcher.java: Mar 27, 2011 4:42:31 PM
  *
  * [description]
  *
  * @author Lennart Koopmann <lennart@socketfeed.com>
  */
-public class SeverityOrHigherMatcher implements StreamRuleMatcher {
+public interface StreamRuleMatcher {
 
-    public boolean match(LogMessage msg, StreamRule rule) {
-        // <= because 0 (EMERG) is lower than DEBUG (7)
-        //return msg.getLevel() <= Integer.parseInt(rule.getValue());
-        return false;
-    }
+    boolean match(LogMessage msg, StreamRule rule);
 
 }

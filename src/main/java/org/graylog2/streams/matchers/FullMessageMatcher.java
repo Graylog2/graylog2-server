@@ -31,7 +31,7 @@ import org.graylog2.streams.StreamRule;
  *
  * @author Dennis Oelkers <dennis@lauschmusik.de>
  */
-public class FullMessageMatcher implements StreamRuleMatcherIF {
+public class FullMessageMatcher implements StreamRuleMatcher {
 
     public boolean match(LogMessage msg, StreamRule rule) {
 	/*Pattern messagePattern = Pattern.compile(rule.getValue(), Pattern.DOTALL);

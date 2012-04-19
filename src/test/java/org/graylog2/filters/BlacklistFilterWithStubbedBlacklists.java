@@ -1,5 +1,5 @@
 /**
- * Copyright 2011 Lennart Koopmann <lennart@socketfeed.com>
+ * Copyright 2012 Lennart Koopmann <lennart@socketfeed.com>
  *
  * This file is part of Graylog2.
  *
@@ -18,24 +18,28 @@
  *
  */
 
-package org.graylog2.streams.matchers;
+package org.graylog2.filters;
 
-import org.graylog2.logmessage.LogMessage;
-import org.graylog2.streams.StreamRule;
+import java.util.ArrayList;
+import java.util.List;
+import org.graylog2.blacklists.Blacklist;
 
 /**
- * SeverityMatcher.java: May 23, 2011 3:26:41 PM
- *
- * [description]
+ * BlacklistFilterWithStubbedBlacklists.java: 19.04.2012 16:45:01
  *
  * @author Lennart Koopmann <lennart@socketfeed.com>
  */
-public class SeverityOrHigherMatcher implements StreamRuleMatcher {
+public class BlacklistFilterWithStubbedBlacklists extends BlacklistFilter {
 
-    public boolean match(LogMessage msg, StreamRule rule) {
-        // <= because 0 (EMERG) is lower than DEBUG (7)
-        //return msg.getLevel() <= Integer.parseInt(rule.getValue());
-        return false;
+    List<Blacklist> stubbedBlacklists;
+
+    public BlacklistFilterWithStubbedBlacklists(List<Blacklist> stubbedBlacklists) {
+        this.stubbedBlacklists = stubbedBlacklists;
+    }
+
+    @Override
+    public List<Blacklist> fetchBlacklists() {
+        return stubbedBlacklists;
     }
 
 }

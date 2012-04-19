@@ -10,6 +10,7 @@ import org.graylog2.blacklists.BlacklistCache;
 import org.graylog2.buffers.ProcessBuffer;
 import org.graylog2.database.MongoBridge;
 import org.graylog2.database.MongoConnection;
+import org.graylog2.filters.MessageFilter;
 import org.graylog2.forwarders.forwarders.LogglyForwarder;
 import org.graylog2.indexer.EmbeddedElasticSearchClient;
 import org.graylog2.indexer.Indexer;
@@ -39,6 +40,7 @@ public class GraylogServer implements Runnable {
 
     private List<Initializer> initializers = new ArrayList<Initializer>();
     private List<MessageInput> inputs = new ArrayList<MessageInput>();
+    private List<Class> filters = new ArrayList<Class>();
 
     private ProcessBuffer processBuffer;
 
@@ -75,6 +77,10 @@ public class GraylogServer implements Runnable {
     
     public void registerInput(MessageInput input) {
         this.inputs.add(input);
+    }
+
+    public void registerFilter(Class klazz) {
+        this.filters.add(klazz);
     }
 
     @Override
@@ -170,6 +176,10 @@ public class GraylogServer implements Runnable {
 
     public ProcessBuffer getProcessBuffer() {
         return this.processBuffer;
+    }
+
+    public List<Class> getFilters() {
+        return this.filters;
     }
 
 }

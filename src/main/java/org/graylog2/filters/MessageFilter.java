@@ -1,5 +1,5 @@
 /**
- * Copyright 2011 Lennart Koopmann <lennart@socketfeed.com>
+ * Copyright 2012 Lennart Koopmann <lennart@socketfeed.com>
  *
  * This file is part of Graylog2.
  *
@@ -18,20 +18,19 @@
  *
  */
 
-package org.graylog2.streams.matchers;
+package org.graylog2.filters;
 
 import org.graylog2.logmessage.LogMessage;
-import org.graylog2.streams.StreamRule;
 
 /**
- * StreamRuleMatcherIF.java: Mar 27, 2011 4:42:31 PM
- *
- * [description]
+ * MessageFilter.java: 19.04.2012 11:46:59
  *
  * @author Lennart Koopmann <lennart@socketfeed.com>
  */
-public interface StreamRuleMatcherIF {
+public interface MessageFilter {
 
-    boolean match(LogMessage msg, StreamRule rule);
+    public LogMessage filter(LogMessage msg);
+    
+    public boolean discardMessage();
 
 }

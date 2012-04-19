@@ -56,7 +56,9 @@ public class ProcessBuffer {
                 new SleepingWaitStrategy()
         );
 
-        disruptor.handleEventsWith(new ProcessBufferProcessor());
+        ProcessBufferProcessor processor = new ProcessBufferProcessor(this.server);
+
+        disruptor.handleEventsWith(processor);
         ringBuffer = disruptor.start();
     }
 

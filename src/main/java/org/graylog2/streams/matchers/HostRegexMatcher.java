@@ -31,7 +31,7 @@ import org.graylog2.streams.StreamRule;
  *
  * @author Lennart Koopmann <lennart@socketfeed.com>
  */
-public class HostRegexMatcher implements StreamRuleMatcherIF {
+public class HostRegexMatcher implements StreamRuleMatcher {
 
     public boolean match(LogMessage msg, StreamRule rule) {
         //return Pattern.compile(rule.getValue(), Pattern.DOTALL).matcher(msg.getHost()).matches();

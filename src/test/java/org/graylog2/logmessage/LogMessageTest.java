@@ -26,6 +26,13 @@ import static org.junit.Assert.*;
 public class LogMessageTest {
 
     @Test
+    public void testIdGetsSet() {
+        LogMessage lm = new LogMessage();
+        assertNotNull(lm.getId());
+        assertFalse(lm.getId().isEmpty());
+    }
+
+    @Test
     public void testIsCompleteSucceeds() {
         LogMessage lm = new LogMessage();
         lm.setShortMessage("foo");

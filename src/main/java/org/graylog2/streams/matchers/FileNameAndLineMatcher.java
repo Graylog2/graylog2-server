@@ -31,7 +31,7 @@ import org.graylog2.streams.StreamRule;
  *
  * @author Lennart Koopmann <lennart@socketfeed.com>
  */
-public class FileNameAndLineMatcher implements StreamRuleMatcherIF {
+public class FileNameAndLineMatcher implements StreamRuleMatcher {
 
     public boolean match(LogMessage msg, StreamRule rule) {
         /*String file = msg.getFile();

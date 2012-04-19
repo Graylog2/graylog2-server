@@ -1,5 +1,5 @@
 /**
- * Copyright 2011 Lennart Koopmann <lennart@socketfeed.com>
+ * Copyright 2011, 2012 Lennart Koopmann <lennart@socketfeed.com>
  *
  * This file is part of Graylog2.
  *
@@ -21,29 +21,26 @@
 package org.graylog2.streams;
 
 import org.apache.log4j.Logger;
-import org.graylog2.streams.matchers.StreamRuleMatcherIF;
+import org.graylog2.streams.matchers.StreamRuleMatcher;
 
 import java.util.ArrayList;
 import java.util.List;
 import org.graylog2.logmessage.LogMessage;
 
 /**
- * Router.java: Mar 16, 2011 9:40:24 PM
+ * StreamRouter.java: Mar 16, 2011 9:40:24 PM
  *
  * Routes a GELF Message to it's streams.
  *
  * @author Lennart Koopmann <lennart@socketfeed.com>
  */
-public class Router {
+public class StreamRouter {
 
-    private static final Logger LOG = Logger.getLogger(Router.class);
+    private static final Logger LOG = Logger.getLogger(StreamRouter.class);
 
-    // Hidden.
-    private Router() { }
-
-    public static List<Stream> route(LogMessage msg) {
+    public List<Stream> route(LogMessage msg) {
         List<Stream> matches = new ArrayList<Stream>();
-        /*List<Stream> streams = Stream.fetchAllEnabled();
+        List<Stream> streams = Stream.fetchAllEnabled();
 
         for (Stream stream : streams) {
             boolean missed = false;
@@ -54,8 +51,8 @@ public class Router {
 
             for (StreamRule rule : stream.getStreamRules()) {
                 try {
-                    StreamRuleMatcherIF matcher = StreamRuleMatcherFactory.build(rule.getRuleType());
-                    if (!msg.matchStreamRule(matcher, rule)) {
+                    StreamRuleMatcher matcher = StreamRuleMatcherFactory.build(rule.getRuleType());
+                    if (!matchStreamRule(msg, matcher, rule)) {
                         missed = true;
                         break;
                     }
@@ -68,9 +65,18 @@ public class Router {
             if (!missed) {
                 matches.add(stream);
             }
-        }*/
+        }
 
         return matches;
+    }
+
+    public boolean matchStreamRule(LogMessage msg, StreamRuleMatcher matcher, StreamRule rule) {
+        try {
+            return matcher.match(msg, rule);
+        } catch (Exception e) {
+            LOG.warn("Could not match stream rule <" + rule.getRuleType() + "/" + rule.getValue() + ">: " + e.getMessage(), e);
+            return false;
+        }
     }
 
 }

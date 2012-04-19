@@ -21,7 +21,11 @@
 package org.graylog2.buffers.processors;
 
 import com.lmax.disruptor.EventHandler;
+import org.apache.log4j.Logger;
+import org.graylog2.GraylogServer;
 import org.graylog2.buffers.LogMessageEvent;
+import org.graylog2.filters.MessageFilter;
+import org.graylog2.logmessage.LogMessage;
 
 /**
  * ProcessBufferProcessor.java: 17.04.2012 16:19:19
@@ -30,9 +34,49 @@ import org.graylog2.buffers.LogMessageEvent;
  */
 public class ProcessBufferProcessor implements EventHandler<LogMessageEvent> {
 
+    private static final Logger LOG = Logger.getLogger(ProcessBufferProcessor.class);
+
+    private GraylogServer server;
+
+    public ProcessBufferProcessor(GraylogServer server) {
+        this.server = server;
+    }
+
     @Override
     public void onEvent(LogMessageEvent event, long sequence, boolean endOfBatch) throws Exception {
-        System.out.println("HERE I AM, ONCE AGAIN!" + event.toString());
+        LOG.debug("Starting to process message.");
+
+        LogMessage msg = event.getMessage();
+        String originalMsgId = msg.getId();
+        for (Class filterType : server.getFilters()) {
+            try {
+                // Always create a new instance of this filter.
+                MessageFilter filter = (MessageFilter) filterType.newInstance();
+
+                String name = filterType.getSimpleName();
+                LOG.debug("Applying filter [" + name +"] on message <" + msg.getId() + ">.");
+
+                LogMessage tmpMsg = filter.filter(msg);
+
+                // It is not allowed to create new LogMessage objects in a filter. Return the one you got passed.
+                if (!tmpMsg.getId().equals(originalMsgId)) {
+                    LOG.error("Filter [" + name + "] tried to instantia new LogMessage object of <" + msg.getId() + ">. Skipping filter.");
+                    continue;
+                }
+
+                // Same message instance. Safe to override.
+                msg = tmpMsg;
+
+                if (filter.discardMessage()) {
+                    LOG.debug("Filter [" + name + "] marked message <" + msg.getId() + "> to be discarded. Dropping message.");
+                    return;
+                }
+            } catch (Exception e) {
+                LOG.error("Could not apply filter [" + filterType.getSimpleName() +"] on message <" + msg.getId() +">: ", e);
+            }
+        }
+
+        LOG.debug("Finished processing message. Writing to output buffer.");
     }
 
 }

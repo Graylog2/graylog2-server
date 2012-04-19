@@ -24,6 +24,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 import org.graylog2.streams.Stream;
 
 /**
@@ -35,6 +36,8 @@ public class LogMessage {
 
     public static final int STANDARD_LEVEL = 1;
     public static final String STANDARD_FACILITY = "unknown";
+
+    private String id;
 
     // Standard fields.
     private String shortMessage;
@@ -50,8 +53,16 @@ public class LogMessage {
 
     private double createdAt = 0;
 
+    public LogMessage() {
+        this.id = UUID.randomUUID().toString();
+    }
+
     public boolean isComplete() {
         return (shortMessage != null && !shortMessage.isEmpty() && host != null && !host.isEmpty());
+    }
+
+    public String getId() {
+        return this.id;
     }
 
     @Override
@@ -144,6 +155,10 @@ public class LogMessage {
 
     public Map<String, Object> getAdditionalData() {
         return this.additionalData;
+    }
+
+    public void setStreams(List<Stream> streams) {
+        this.streams = streams;
     }
 
 }
