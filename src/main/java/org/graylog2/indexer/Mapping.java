@@ -137,7 +137,7 @@ public class Mapping {
     private static Map enabledAndCompressed() {
         final Map e = new HashMap();
         e.put("enabled", true);
-        e.put("compressed", true);
+        e.put("compress", true);
 
         return e;
     }
