@@ -260,6 +260,10 @@ public class GELFMessage {
         }
     }
 
+    public void removeAdditionalData(String key) {
+        this.additionalData.remove(key);
+    }
+
     /**
      * Set the filterOut
      *
