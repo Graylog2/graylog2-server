@@ -20,6 +20,7 @@
 
 package org.graylog2.filters;
 
+import org.graylog2.GraylogServer;
 import org.graylog2.logmessage.LogMessage;
 
 /**
@@ -30,6 +31,8 @@ import org.graylog2.logmessage.LogMessage;
 public interface MessageFilter {
 
     public LogMessage filter(LogMessage msg);
+
+    public void setServer(GraylogServer server);
     
     public boolean discardMessage();
 

@@ -23,6 +23,7 @@ package org.graylog2.filters;
 import java.util.List;
 import java.util.regex.Pattern;
 import org.apache.log4j.Logger;
+import org.graylog2.GraylogServer;
 import org.graylog2.blacklists.Blacklist;
 import org.graylog2.blacklists.BlacklistRule;
 import org.graylog2.logmessage.LogMessage;
@@ -63,6 +64,10 @@ public class BlacklistFilter implements MessageFilter {
     @Override
     public boolean discardMessage() {
         return this.discard;
+    }
+
+    @Override
+    public void setServer(GraylogServer server) {
     }
 
 }

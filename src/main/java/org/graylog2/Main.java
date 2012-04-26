@@ -32,6 +32,7 @@ import org.apache.commons.io.IOUtils;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.graylog2.filters.BlacklistFilter;
+import org.graylog2.filters.RewriteFilter;
 import org.graylog2.filters.StreamMatcherFilter;
 import org.graylog2.initializers.*;
 import org.graylog2.inputs.gelf.GELFUDPInput;
@@ -117,7 +118,7 @@ public final class Main {
         // Register initializers.
         server.registerInitializer(new ServerValueWriterInitializer(server, configuration));
         server.registerInitializer(new MessageQueueInitializer(server, configuration));
-        //////server.registerInitializer(new DroolsInitializer(server, configuration));
+        server.registerInitializer(new DroolsInitializer(server, configuration));
         server.registerInitializer(new HostCounterCacheWriterInitializer(server));
         server.registerInitializer(new MessageCounterInitializer(server));
         server.registerInitializer(new SyslogServerInitializer(server, configuration));
@@ -128,6 +129,7 @@ public final class Main {
         // Register message filters. - Passing classes here instead of objects, because we need to create a new instance in every filter. (they are stateful)
         server.registerFilter(BlacklistFilter.class);
         server.registerFilter(StreamMatcherFilter.class);
+        server.registerFilter(RewriteFilter.class);
 
         // Blocks until we shut down.
         server.run();
