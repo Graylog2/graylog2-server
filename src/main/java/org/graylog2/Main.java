@@ -32,6 +32,7 @@ import org.apache.commons.io.IOUtils;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.graylog2.filters.BlacklistFilter;
+import org.graylog2.filters.CounterUpdateFilter;
 import org.graylog2.filters.RewriteFilter;
 import org.graylog2.filters.StreamMatcherFilter;
 import org.graylog2.initializers.*;
@@ -127,9 +128,10 @@ public final class Main {
         server.registerInput(new GELFUDPInput());
 
         // Register message filters. - Passing classes here instead of objects, because we need to create a new instance in every filter. (they are stateful)
+        server.registerFilter(RewriteFilter.class);
         server.registerFilter(BlacklistFilter.class);
         server.registerFilter(StreamMatcherFilter.class);
-        server.registerFilter(RewriteFilter.class);
+        server.registerFilter(CounterUpdateFilter.class);
 
         // Blocks until we shut down.
         server.run();

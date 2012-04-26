@@ -38,6 +38,8 @@ public class GraylogServer implements Runnable {
 
     private Indexer indexer = null;
 
+    private MessageCounter messageCounter = null;
+
     private List<Initializer> initializers = new ArrayList<Initializer>();
     private List<MessageInput> inputs = new ArrayList<MessageInput>();
     private List<Class> filters = new ArrayList<Class>();
@@ -58,6 +60,8 @@ public class GraylogServer implements Runnable {
         mongoConnection.setThreadsAllowedToBlockMultiplier(configuration.getMongoThreadsAllowedToBlockMultiplier());
         mongoConnection.setReplicaSet(configuration.getMongoReplicaSet());
         mongoConnection.setMessagesCollectionSize(configuration.getMessagesCollectionSize());
+
+        messageCounter = new MessageCounter();
 
         processBuffer = new ProcessBuffer(this);
         processBuffer.initialize();
@@ -180,6 +184,10 @@ public class GraylogServer implements Runnable {
 
     public List<Class> getFilters() {
         return this.filters;
+    }
+
+    public MessageCounter getMessageCounter() {
+        return this.messageCounter;
     }
 
 }

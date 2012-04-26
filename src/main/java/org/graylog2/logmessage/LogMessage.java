@@ -161,4 +161,8 @@ public class LogMessage {
         this.streams = streams;
     }
 
+    public List<Stream> getStreams() {
+        return this.streams;
+    }
+
 }

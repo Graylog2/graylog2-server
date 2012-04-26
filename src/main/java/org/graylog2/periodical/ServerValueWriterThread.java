@@ -22,7 +22,7 @@ package org.graylog2.periodical;
 
 import org.apache.log4j.Logger;
 import org.graylog2.GraylogServer;
-import org.graylog2.messagehandlers.common.MessageCounter;
+import org.graylog2.MessageCounter;
 
 /**
  * ServerValueWriterThread.java
@@ -54,7 +54,7 @@ public class ServerValueWriterThread implements Runnable {
             graylogServer.getServerValues().ping();
 
             // Current throughput.
-            MessageCounter c = MessageCounter.getInstance();
+            MessageCounter c = this.graylogServer.getMessageCounter();
             graylogServer.getServerValues().writeThroughput(c.getFiveSecondThroughput(), c.getHighestFiveSecondThroughput());
             c.resetFiveSecondThroughput(); // Reset five second throughput count.
 

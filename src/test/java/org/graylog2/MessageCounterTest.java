@@ -3,13 +3,11 @@
  * and open the template in the editor.
  */
 
-package org.graylog2.messagehandlers.common;
+package org.graylog2;
 
-import org.graylog2.Tools;
 import java.util.HashMap;
 import java.util.Map;
 import org.bson.types.ObjectId;
-import org.junit.Before;
 import org.junit.Test;
 import static org.junit.Assert.*;
 
@@ -19,17 +17,7 @@ import static org.junit.Assert.*;
  */
 public class MessageCounterTest {
 
-    private MessageCounter counter = MessageCounter.getInstance();
-
-    @Before
-    public void setUp() {
-        counter.resetAllCounts();
-    }
-
-    @Test
-    public void testGetInstance() {
-        assertTrue(MessageCounter.getInstance() instanceof MessageCounter);
-    }
+    private MessageCounter counter = new MessageCounter();
 
     @Test
     public void testGetTotalCount() {

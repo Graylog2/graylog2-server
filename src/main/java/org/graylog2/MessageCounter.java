@@ -18,7 +18,7 @@
  *
  */
 
-package org.graylog2.messagehandlers.common;
+package org.graylog2;
 
 import org.bson.types.ObjectId;
 
@@ -36,7 +36,6 @@ import org.graylog2.Tools;
  * @author Lennart Koopmann <lennart@socketfeed.com>
  */
 public final class MessageCounter {
-    private static MessageCounter instance;
 
     private int total;
     private Map<String, Integer> streams;
@@ -45,20 +44,9 @@ public final class MessageCounter {
     private int fiveSecondThroughput = 0;
     private int highestFiveSecondThroughput = 0;
 
-    private MessageCounter() {
+    public MessageCounter() {
         // Initialize.
         this.resetAllCounts();
-    }
-
-    /**
-     * @return MessageCounter singleton instance
-     */
-    public static synchronized MessageCounter getInstance() {
-        if (instance == null) {
-            instance = new MessageCounter();
-        }
-
-        return instance;
     }
 
     public int getTotalCount() {
@@ -155,7 +143,7 @@ public final class MessageCounter {
      * @param streamId The ID of the stream which count to increment.
      * @param x The value to add on top of the current stream count.
      */
-    public void countUpStream(ObjectId streamId, int x) {
+    public synchronized void countUpStream(ObjectId streamId, int x) {
         if (this.streams.containsKey(streamId.toString())) {
             // There already is an entry. Increment.
             int oldCount = this.streams.get(streamId.toString());
@@ -181,7 +169,7 @@ public final class MessageCounter {
      * @param hostname The name of the host which count to increment.
      * @param x The value to add on top of the current host count.
      */
-    public void countUpHost(String hostname, int x) {
+    public synchronized void countUpHost(String hostname, int x) {
         hostname = Tools.encodeBase64(hostname);
         if (this.hosts.containsKey(hostname)) {
             // There already is an entry. Increment.

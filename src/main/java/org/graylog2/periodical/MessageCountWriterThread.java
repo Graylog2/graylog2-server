@@ -22,7 +22,7 @@ package org.graylog2.periodical;
 
 import org.apache.log4j.Logger;
 import org.graylog2.GraylogServer;
-import org.graylog2.messagehandlers.common.MessageCounter;
+import org.graylog2.MessageCounter;
 
 
 /**
@@ -51,7 +51,7 @@ public class MessageCountWriterThread implements Runnable {
     @Override
     public void run() {
 
-        MessageCounter counter = MessageCounter.getInstance();
+        MessageCounter counter = this.graylogServer.getMessageCounter();
         try {
             graylogServer.getMongoBridge().writeMessageCounts(counter.getTotalCount(), counter.getStreamCounts(), counter.getHostCounts());
         } catch (Exception e) {

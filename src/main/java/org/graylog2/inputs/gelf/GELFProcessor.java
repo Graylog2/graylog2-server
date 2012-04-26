@@ -53,7 +53,7 @@ public class GELFProcessor {
         }
 
         // Add to process buffer.
-        LOG.debug("Adding received GELF message to process buffer: " + lm);
+        LOG.debug("Adding received GELF message <" + lm.getId() +"> to process buffer: " + lm);
         server.getProcessBuffer().insert(lm);
     }
 
