@@ -17,7 +17,7 @@ $(document).ready(function(){
       $("#loginform").submit();
     });
 
-    $(".login-credentials").bind("keypress", function(e) {
+    $(".login-credentials, #remember_me").bind("keypress", function(e) {
       code = (e.keyCode ? e.keyCode : e.which);
       if (code == 13) {
         $("#loginform").submit();
