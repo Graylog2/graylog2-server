@@ -40,21 +40,18 @@ public class BlacklistFilter implements MessageFilter {
     private boolean discard = false;;
 
     @Override
-    public LogMessage filter(LogMessage msg, GraylogServer server) {
+    public void filter(LogMessage msg, GraylogServer server) {
         for (Blacklist blacklist : fetchBlacklists()) {
             for (BlacklistRule rule : blacklist.getRules()) {
                 if (Pattern.compile(rule.getTerm(), Pattern.DOTALL).matcher(msg.getShortMessage()).matches()) {
                     LOG.debug("Message <" + this.toString() + "> is blacklisted. First match on " + rule.getTerm());
                     this.discard = true;
                     
-                    // We are not changing the message. Return it untouched.
-                    return msg;
+                    // Done - This message is blacklisted. discardMessage() set to true.
+                    return;
                 }
             }
         }
-
-        // We are not changing the message. Return it untouched.
-        return msg;
     }
 
     public List<Blacklist> fetchBlacklists() {
