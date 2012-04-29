@@ -1,5 +1,5 @@
 /**
- * Copyright 2011 Lennart Koopmann <lennart@socketfeed.com>
+ * Copyright 2011, 2012 Lennart Koopmann <lennart@socketfeed.com>
  *
  * This file is part of Graylog2.
  *
@@ -19,8 +19,6 @@
  */
 
 package org.graylog2;
-
-import org.graylog2.messagequeue.MessageQueue;
 
 /**
  * ServerValue.java: Jan 16, 2011 1:35:00 PM
@@ -68,15 +66,7 @@ public class ServerValue {
     public void writeMessageQueueCurrentSize(int size) {
         set("message_queue_current_size", size);
     }
-
-    public void writeMessageQueueMaximumSize(int size) {
-        if (size == MessageQueue.SIZE_LIMIT_UNLIMITED) {
-            // Abstraction for unlimited size limit to allow change in server without change in web interface.
-            size = -1;
-        }
-        set("message_queue_maximum_size", size);
-    }
-
+    
     public void writeMessageQueueBatchSize(int size) {
         set("message_queue_batch_size", size);
     }

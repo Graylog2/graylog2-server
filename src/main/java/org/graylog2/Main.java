@@ -119,7 +119,6 @@ public final class Main {
 
         // Register initializers.
         server.registerInitializer(new ServerValueWriterInitializer(server, configuration));
-        server.registerInitializer(new MessageQueueInitializer(server, configuration));
         server.registerInitializer(new DroolsInitializer(server, configuration));
         server.registerInitializer(new HostCounterCacheWriterInitializer(server));
         server.registerInitializer(new MessageCounterInitializer(server));

@@ -17,7 +17,6 @@ import org.graylog2.indexer.Indexer;
 import org.graylog2.initializers.Initializer;
 import org.graylog2.inputs.MessageInput;
 import org.graylog2.inputs.gelf.GELFChunkManager;
-import org.graylog2.messagequeue.MessageQueueFlusher;
 import org.graylog2.streams.StreamCache;
 
 public class GraylogServer implements Runnable {
@@ -139,9 +138,6 @@ public class GraylogServer implements Runnable {
             input.initialize(this.configuration, this);
             LOG.debug("Initialized input: " + input.getName());
         }
-
-        // Add a shutdown hook that tries to flush the message queue.
-        Runtime.getRuntime().addShutdownHook(new MessageQueueFlusher(this));
 
         LOG.info("Graylog2 up and running.");
 
