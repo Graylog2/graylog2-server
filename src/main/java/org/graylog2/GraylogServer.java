@@ -7,10 +7,10 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import org.apache.log4j.Logger;
 import org.graylog2.blacklists.BlacklistCache;
+import org.graylog2.buffers.OutputBuffer;
 import org.graylog2.buffers.ProcessBuffer;
 import org.graylog2.database.MongoBridge;
 import org.graylog2.database.MongoConnection;
-import org.graylog2.filters.MessageFilter;
 import org.graylog2.forwarders.forwarders.LogglyForwarder;
 import org.graylog2.indexer.EmbeddedElasticSearchClient;
 import org.graylog2.indexer.Indexer;
@@ -43,8 +43,10 @@ public class GraylogServer implements Runnable {
     private List<Initializer> initializers = new ArrayList<Initializer>();
     private List<MessageInput> inputs = new ArrayList<MessageInput>();
     private List<Class> filters = new ArrayList<Class>();
+    private List<Class> outputs = new ArrayList<Class>();
 
     private ProcessBuffer processBuffer;
+    private OutputBuffer outputBuffer;
 
     public void initialize(Configuration configuration) {
         this.configuration = configuration; // TODO use dependency injection
@@ -66,6 +68,9 @@ public class GraylogServer implements Runnable {
         processBuffer = new ProcessBuffer(this);
         processBuffer.initialize();
 
+        outputBuffer = new OutputBuffer(this);
+        outputBuffer.initialize();
+
         mongoBridge = new MongoBridge();
         mongoBridge.setConnection(mongoConnection); // TODO use dependency injection
 
@@ -85,6 +90,10 @@ public class GraylogServer implements Runnable {
 
     public void registerFilter(Class klazz) {
         this.filters.add(klazz);
+    }
+
+    public void registerOutput(Class klazz) {
+        this.outputs.add(klazz);
     }
 
     @Override
@@ -182,8 +191,16 @@ public class GraylogServer implements Runnable {
         return this.processBuffer;
     }
 
+    public OutputBuffer getOutputBuffer() {
+        return this.outputBuffer;
+    }
+
     public List<Class> getFilters() {
         return this.filters;
+    }
+
+    public List<Class> getOutputs() {
+        return this.outputs;
     }
 
     public MessageCounter getMessageCounter() {

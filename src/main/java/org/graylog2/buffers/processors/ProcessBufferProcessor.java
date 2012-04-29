@@ -44,25 +44,24 @@ public class ProcessBufferProcessor implements EventHandler<LogMessageEvent> {
 
     @Override
     public void onEvent(LogMessageEvent event, long sequence, boolean endOfBatch) throws Exception {
-        LOG.debug("Starting to process message.");
-
         LogMessage msg = event.getMessage();
+
+        LOG.debug("Starting to process message <" + msg.getId() + ">.");
 
         String originalMsgId = msg.getId();
         for (Class filterType : server.getFilters()) {
             try {
                 // Always create a new instance of this filter.
                 MessageFilter filter = (MessageFilter) filterType.newInstance();
-                filter.setServer(server);
       
                 String name = filterType.getSimpleName();
                 LOG.debug("Applying filter [" + name +"] on message <" + msg.getId() + ">.");
 
-                LogMessage tmpMsg = filter.filter(msg);
+                LogMessage tmpMsg = filter.filter(msg, server);
 
                 // It is not allowed to create new LogMessage objects in a filter. Return the one you got passed.
                 if (!tmpMsg.getId().equals(originalMsgId)) {
-                    LOG.error("Filter [" + name + "] tried to instantia new LogMessage object of <" + msg.getId() + ">. Skipping filter.");
+                    LOG.error("Filter [" + name + "] tried to instantiate new LogMessage object of <" + msg.getId() + ">. Skipping filter.");
                     continue;
                 }
 
@@ -79,6 +78,7 @@ public class ProcessBufferProcessor implements EventHandler<LogMessageEvent> {
         }
 
         LOG.debug("Finished processing message. Writing to output buffer.");
+        server.getOutputBuffer().insert(msg);
     }
 
 }

@@ -35,10 +35,8 @@ public class RewriteFilter implements MessageFilter {
 
     private static final Logger LOG = Logger.getLogger(RewriteFilter.class);
 
-    private GraylogServer server;
-
     @Override
-    public LogMessage filter(LogMessage msg) {
+    public LogMessage filter(LogMessage msg, GraylogServer server) {
         if (server.getRulesEngine() != null) {
             server.getRulesEngine().evaluate(msg);
         }
@@ -49,11 +47,6 @@ public class RewriteFilter implements MessageFilter {
     @Override
     public boolean discardMessage() {
         return false;
-    }
-
-    @Override
-    public void setServer(GraylogServer server) {
-        this.server = server;
     }
 
 }

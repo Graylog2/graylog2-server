@@ -27,24 +27,24 @@ import com.lmax.disruptor.dsl.Disruptor;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import org.graylog2.GraylogServer;
-import org.graylog2.buffers.processors.ProcessBufferProcessor;
+import org.graylog2.buffers.processors.OutputBufferProcessor;
 import org.graylog2.logmessage.LogMessage;
 
 /**
- * ProcessBuffer.java: 17.04.2012 12:21:29
+ * OutputBuffer.java: 26.04.2012 17:56:24
  *
  * @author Lennart Koopmann <lennart@socketfeed.com>
  */
-public class ProcessBuffer {
+public class OutputBuffer {
 
     protected static final int RING_SIZE = 8192;
-    protected static RingBuffer<LogMessageEvent> ringBuffer;
+    protected RingBuffer<LogMessageEvent> ringBuffer;
 
     protected ExecutorService executor = Executors.newCachedThreadPool();
 
     GraylogServer server;
 
-    public ProcessBuffer(GraylogServer server) {
+    public OutputBuffer(GraylogServer server) {
         this.server = server;
     }
 
@@ -56,12 +56,12 @@ public class ProcessBuffer {
                 new SleepingWaitStrategy()
         );
 
-        ProcessBufferProcessor processor = new ProcessBufferProcessor(this.server);
+        OutputBufferProcessor processor = new OutputBufferProcessor(this.server);
 
         disruptor.handleEventsWith(processor);
         ringBuffer = disruptor.start();
     }
-    
+
     public void insert(LogMessage message) {
         long sequence = ringBuffer.next();
         LogMessageEvent event = ringBuffer.get(sequence);

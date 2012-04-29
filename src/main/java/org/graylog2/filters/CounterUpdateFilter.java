@@ -34,10 +34,8 @@ import org.graylog2.streams.Stream;
  */
 public class CounterUpdateFilter implements MessageFilter {
 
-    private GraylogServer server;
-
     @Override
-    public LogMessage filter(LogMessage msg) {
+    public LogMessage filter(LogMessage msg, GraylogServer server) {
         // Five second througput for health page.
         server.getMessageCounter().incrementFiveSecondThroughput();
 
@@ -54,11 +52,6 @@ public class CounterUpdateFilter implements MessageFilter {
 
         // Did not change message at all.
         return msg;
-    }
-
-    @Override
-    public void setServer(GraylogServer server) {
-        this.server = server;
     }
 
     @Override

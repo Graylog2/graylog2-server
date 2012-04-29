@@ -40,7 +40,7 @@ public class BlacklistFilter implements MessageFilter {
     private boolean discard = false;;
 
     @Override
-    public LogMessage filter(LogMessage msg) {
+    public LogMessage filter(LogMessage msg, GraylogServer server) {
         for (Blacklist blacklist : fetchBlacklists()) {
             for (BlacklistRule rule : blacklist.getRules()) {
                 if (Pattern.compile(rule.getTerm(), Pattern.DOTALL).matcher(msg.getShortMessage()).matches()) {
@@ -64,10 +64,6 @@ public class BlacklistFilter implements MessageFilter {
     @Override
     public boolean discardMessage() {
         return this.discard;
-    }
-
-    @Override
-    public void setServer(GraylogServer server) {
     }
 
 }

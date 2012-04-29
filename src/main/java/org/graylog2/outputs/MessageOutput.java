@@ -18,40 +18,18 @@
  *
  */
 
-package org.graylog2.filters;
+package org.graylog2.outputs;
 
-import java.util.List;
-import org.apache.log4j.Logger;
 import org.graylog2.GraylogServer;
 import org.graylog2.logmessage.LogMessage;
-import org.graylog2.streams.Stream;
-import org.graylog2.streams.StreamRouter;
 
 /**
- * StreamMatcherFilter.java: 19.04.2012 14:41:36
+ * MessageOutput.java: 29.04.2012 21:23:18
  *
  * @author Lennart Koopmann <lennart@socketfeed.com>
  */
-public class StreamMatcherFilter implements MessageFilter {
+public interface MessageOutput {
 
-    private static final Logger LOG = Logger.getLogger(StreamMatcherFilter.class);
-
-    private static final StreamRouter ROUTER = new StreamRouter();
-
-    @Override
-    public LogMessage filter(LogMessage msg, GraylogServer server) {
-        List<Stream> streams = ROUTER.route(msg);
-        msg.setStreams(streams);
-
-        LOG.debug("Routed message <" + msg.getId() + "> to " + streams.size() + " streams.");
-
-        return msg;
-    }
-
-    @Override
-    public boolean discardMessage() {
-        // We are never discarding messages in this filter.
-        return false;
-    }
+    public void write(LogMessage msg, GraylogServer server) throws Exception;
 
 }
