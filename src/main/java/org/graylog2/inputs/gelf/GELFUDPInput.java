@@ -44,13 +44,11 @@ public class GELFUDPInput implements MessageInput {
 
     private static final String NAME = "GELF UDP";
     
-    private Configuration configuration;
     private GraylogServer graylogServer;
     private InetSocketAddress socketAddress;
     
     @Override
     public void initialize(Configuration configuration, GraylogServer graylogServer) {
-        this.configuration = configuration;
         this.graylogServer = graylogServer;
         this.socketAddress = new InetSocketAddress(configuration.getGelfListenAddress(), configuration.getGelfListenPort());
 
