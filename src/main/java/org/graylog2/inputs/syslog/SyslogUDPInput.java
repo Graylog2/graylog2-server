@@ -18,54 +18,57 @@
  *
  */
 
-package org.graylog2.inputs.gelf;
-
-
+package org.graylog2.inputs.syslog;
 
 import java.net.InetSocketAddress;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import org.apache.log4j.Logger;
-import org.elasticsearch.common.netty.channel.ChannelException;
 import org.graylog2.Configuration;
 import org.graylog2.GraylogServer;
 import org.graylog2.inputs.MessageInput;
 import org.jboss.netty.bootstrap.ConnectionlessBootstrap;
+import org.jboss.netty.channel.ChannelException;
 import org.jboss.netty.channel.socket.nio.NioDatagramChannelFactory;
 
 /**
- * GELFUDPInput.java: 11.04.2012 22:29:01
+ * SyslogUDPInput.java: 30.04.2012 00:02:48
+ *
+ * Describe me.
  *
  * @author Lennart Koopmann <lennart@socketfeed.com>
  */
-public class GELFUDPInput implements MessageInput {
+public class SyslogUDPInput implements MessageInput {
 
-    private static final Logger LOG = Logger.getLogger(GELFUDPInput.class);
+    private static final Logger LOG = Logger.getLogger(SyslogUDPInput.class);
 
-    private static final String NAME = "GELF UDP";
-    
+    private static final String NAME = "Syslog UDP";
+
     private GraylogServer graylogServer;
     private InetSocketAddress socketAddress;
-    
+
     @Override
     public void initialize(Configuration configuration, GraylogServer graylogServer) {
         this.graylogServer = graylogServer;
-        this.socketAddress = new InetSocketAddress(configuration.getGelfListenAddress(), configuration.getGelfListenPort());
+        this.socketAddress = new InetSocketAddress(
+                configuration.getSyslogListenAddress(),
+                configuration.getSyslogListenPort()
+        );
 
         spinUp();
     }
-    
+
     private void spinUp() {
         final ExecutorService workerThreadPool = Executors.newCachedThreadPool();
         final ConnectionlessBootstrap bootstrap = new ConnectionlessBootstrap(new NioDatagramChannelFactory(workerThreadPool));
 
-        bootstrap.setPipelineFactory(new GELFPipelineFactory(graylogServer));
+        bootstrap.setPipelineFactory(new SyslogPipelineFactory(graylogServer));
 
         try {
             bootstrap.bind(socketAddress);
-            LOG.info("Started UDP GELF server on " + socketAddress);
+            LOG.info("Started UDP Syslog server on " + socketAddress);
         } catch (ChannelException e) {
-            LOG.fatal("Could not bind UDP GELF server to address " + socketAddress, e);
+            LOG.fatal("Could not bind Syslog UDP server to address " + socketAddress, e);
         }
     }
 
@@ -73,5 +76,5 @@ public class GELFUDPInput implements MessageInput {
     public String getName() {
         return NAME;
     }
-    
+
 }

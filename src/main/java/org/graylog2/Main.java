@@ -37,6 +37,7 @@ import org.graylog2.filters.RewriteFilter;
 import org.graylog2.filters.StreamMatcherFilter;
 import org.graylog2.initializers.*;
 import org.graylog2.inputs.gelf.GELFUDPInput;
+import org.graylog2.inputs.syslog.SyslogUDPInput;
 import org.graylog2.outputs.ElasticSearchOutput;
 
 /*
@@ -125,7 +126,10 @@ public final class Main {
         server.registerInitializer(new SyslogServerInitializer(server, configuration));
         
         // Register inputs.
-        server.registerInput(new GELFUDPInput());
+        if (configuration.isUseGELF()) { server.registerInput(new GELFUDPInput()); }
+        if (configuration.getSyslogProtocol().equals("udp")) {
+            server.registerInput(new SyslogUDPInput());
+        }
 
         // Register message filters. - Passing classes here instead of objects, because we need to create a new instance in every filter. (they are stateful)
         server.registerFilter(RewriteFilter.class);
