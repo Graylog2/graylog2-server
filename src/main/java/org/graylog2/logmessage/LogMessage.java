@@ -25,6 +25,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
+import org.graylog2.Tools;
+import org.graylog2.indexer.EmbeddedElasticSearchClient;
 import org.graylog2.streams.Stream;
 
 /**
@@ -63,6 +65,42 @@ public class LogMessage {
 
     public String getId() {
         return this.id;
+    }
+
+    public Map<String, Object> toElasticSearchObject() {
+        Map<String, Object> obj = new HashMap<String, Object>();
+        obj.put("message", this.getShortMessage());
+        obj.put("full_message", this.getFullMessage());
+        obj.put("file", this.getFile());
+        obj.put("line", this.getLine());
+        obj.put("host", this.getHost());
+        obj.put("facility", this.getFacility());
+        obj.put("level", this.getLevel());
+
+        // Add additional fields. XXX PERFORMANCE
+        for(Map.Entry<String, Object> entry : this.getAdditionalData().entrySet()) {
+            obj.put(entry.getKey(), entry.getValue());
+        }
+
+        if (this.getCreatedAt() <= 0) {
+            double timestamp = Tools.getUTCTimestampWithMilliseconds();
+            // This should have already been set at receiving, but to make sure...
+            obj.put("created_at", timestamp);
+            obj.put("histogram_time", EmbeddedElasticSearchClient.buildTimeFormat(timestamp));
+        } else {
+            obj.put("created_at", this.getCreatedAt());
+            obj.put("histogram_time", EmbeddedElasticSearchClient.buildTimeFormat(this.getCreatedAt()));
+        }
+
+
+        // Manually converting stream ID to string - caused strange problems without it.
+        List<String> streamIds = new ArrayList<String>();
+        for (Stream stream : this.getStreams()) {
+            streamIds.add(stream.getId().toString());
+        }
+        obj.put("streams", streamIds);
+
+        return obj;
     }
 
     @Override

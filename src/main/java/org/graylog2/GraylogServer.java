@@ -1,6 +1,5 @@
 package org.graylog2;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.Executors;
@@ -13,7 +12,6 @@ import org.graylog2.database.MongoBridge;
 import org.graylog2.database.MongoConnection;
 import org.graylog2.forwarders.forwarders.LogglyForwarder;
 import org.graylog2.indexer.EmbeddedElasticSearchClient;
-import org.graylog2.indexer.Indexer;
 import org.graylog2.initializers.Initializer;
 import org.graylog2.inputs.MessageInput;
 import org.graylog2.inputs.gelf.GELFChunkManager;
@@ -35,9 +33,9 @@ public class GraylogServer implements Runnable {
 
     public static final String GRAYLOG2_VERSION = "0.9.7-dev";
 
-    private Indexer indexer = null;
+    private EmbeddedElasticSearchClient indexer;
 
-    private MessageCounter messageCounter = null;
+    private MessageCounter messageCounter;
 
     private List<Initializer> initializers = new ArrayList<Initializer>();
     private List<MessageInput> inputs = new ArrayList<MessageInput>();
@@ -104,21 +102,16 @@ public class GraylogServer implements Runnable {
         BlacklistCache.initialize(this);
         StreamCache.initialize(this);
 
-        try {
-            if (indexer.indexExists()) {
-                LOG.info("Index exists. Not creating it.");
+        if (indexer.indexExists()) {
+            LOG.info("Index exists. Not creating it.");
+        } else {
+            LOG.info("Index does not exist! Trying to create it ...");
+            if (indexer.createIndex()) {
+                LOG.info("Successfully created index.");
             } else {
-                LOG.info("Index does not exist! Trying to create it ...");
-                if (indexer.createIndex()) {
-                    LOG.info("Successfully created index.");
-                } else {
-                    LOG.fatal("Could not create Index. Terminating.");
-                    System.exit(1);
-                }
+                LOG.fatal("Could not create Index. Terminating.");
+                System.exit(1);
             }
-        } catch (IOException e) {
-            LOG.fatal("IOException while trying to check Index. Make sure that your ElasticSearch server is running.", e);
-            System.exit(1);
         }
 
         // Statically set timeout for LogglyForwarder.
@@ -171,7 +164,7 @@ public class GraylogServer implements Runnable {
         return rulesEngine;
     }
 
-    public Indexer getIndexer() {
+    public EmbeddedElasticSearchClient getIndexer() {
         return indexer;
     }
 

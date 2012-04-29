@@ -32,8 +32,9 @@ import org.graylog2.streams.StreamRule;
  */
 public class AdditionalFieldMatcher implements StreamRuleMatcher {
 
+    @Override
     public boolean match(LogMessage msg, StreamRule rule) {
-        /*String[] parts = rule.getValue().split("=");
+        String[] parts = rule.getValue().split("=");
         String key = "_" + parts[0];
         String value = parts[1];
         String str = null;
@@ -50,6 +51,6 @@ public class AdditionalFieldMatcher implements StreamRuleMatcher {
             }
         }
 
-        return null != str && str.matches(value);*/ return false;
+        return null != str && str.matches(value);
     }
 }

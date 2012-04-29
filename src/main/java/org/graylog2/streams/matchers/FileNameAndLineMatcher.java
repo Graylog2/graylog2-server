@@ -33,13 +33,14 @@ import org.graylog2.streams.StreamRule;
  */
 public class FileNameAndLineMatcher implements StreamRuleMatcher {
 
+    @Override
     public boolean match(LogMessage msg, StreamRule rule) {
-        /*String file = msg.getFile();
+        String file = msg.getFile();
         if (msg.getLine() != 0) {
             file += ":" + msg.getLine();
         }
 
-        return Pattern.compile(rule.getValue(), Pattern.DOTALL).matcher(file).matches();*/ return false;
+        return Pattern.compile(rule.getValue(), Pattern.DOTALL).matcher(file).matches();
     }
 
 }

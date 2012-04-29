@@ -20,6 +20,7 @@
 
 package org.graylog2.streams.matchers;
 
+import org.graylog2.logmessage.LogMessage;
 import java.util.Map;
 import org.bson.types.ObjectId;
 import com.mongodb.BasicDBObject;
@@ -34,7 +35,6 @@ public class FullMessageMatcherTest {
         assertTrue(true);
     }
 
-/*
     @Test
     public void testSuccessfulMatch() {
         String message = "ohai thar|foo";
@@ -47,7 +47,7 @@ public class FullMessageMatcherTest {
 
         StreamRule rule = new StreamRule(mongoRule);
 
-        GELFMessage msg = new GELFMessage();
+        LogMessage msg = new LogMessage();
         msg.setFullMessage(message);
 
         FullMessageMatcher matcher = new FullMessageMatcher();
@@ -67,12 +67,12 @@ public class FullMessageMatcherTest {
 
         StreamRule rule = new StreamRule(mongoRule);
 
-        GELFMessage msg = new GELFMessage();
+        LogMessage msg = new LogMessage();
         msg.setFullMessage(message);
 
         FullMessageMatcher matcher = new FullMessageMatcher();
 
         assertFalse(matcher.match(msg, rule));
     }
-*/
+
 }

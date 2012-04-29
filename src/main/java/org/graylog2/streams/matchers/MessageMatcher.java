@@ -33,9 +33,9 @@ import org.graylog2.streams.StreamRule;
  */
 public class MessageMatcher implements StreamRuleMatcher {
 
+    @Override
     public boolean match(LogMessage msg, StreamRule rule) {
-        //return Pattern.compile(rule.getValue(), Pattern.DOTALL).matcher(msg.getShortMessage()).matches();
-        return false;
+        return Pattern.compile(rule.getValue(), Pattern.DOTALL).matcher(msg.getShortMessage()).matches();
     }
 
 }

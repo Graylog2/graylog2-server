@@ -20,6 +20,7 @@
 
 package org.graylog2.streams.matchers;
 
+import org.graylog2.logmessage.LogMessage;
 import org.bson.types.ObjectId;
 import com.mongodb.BasicDBObject;
 import org.graylog2.streams.StreamRule;
@@ -32,7 +33,6 @@ public class SeverityOrHigherMatcherTest {
         assertTrue(true);
     }
 
-/*
     @Test
     public void testSuccessfulMatch() {
         BasicDBObject mongoRule = new BasicDBObject();
@@ -42,7 +42,7 @@ public class SeverityOrHigherMatcherTest {
 
         StreamRule rule = new StreamRule(mongoRule);
 
-        GELFMessage msg = new GELFMessage();
+        LogMessage msg = new LogMessage();
         msg.setLevel(2);
 
         SeverityOrHigherMatcher matcher = new SeverityOrHigherMatcher();
@@ -59,7 +59,7 @@ public class SeverityOrHigherMatcherTest {
 
         StreamRule rule = new StreamRule(mongoRule);
 
-        GELFMessage msg = new GELFMessage();
+        LogMessage msg = new LogMessage();
         msg.setLevel(3);
 
         SeverityOrHigherMatcher matcher = new SeverityOrHigherMatcher();
@@ -76,12 +76,12 @@ public class SeverityOrHigherMatcherTest {
 
         StreamRule rule = new StreamRule(mongoRule);
 
-        GELFMessage msg = new GELFMessage();
+        LogMessage msg = new LogMessage();
         msg.setLevel(5);
 
         SeverityOrHigherMatcher matcher = new SeverityOrHigherMatcher();
 
         assertFalse(matcher.match(msg, rule));
     }
-*/
+
 }

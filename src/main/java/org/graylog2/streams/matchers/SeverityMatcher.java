@@ -32,9 +32,9 @@ import org.graylog2.streams.StreamRule;
  */
 public class SeverityMatcher implements StreamRuleMatcher {
 
+    @Override
     public boolean match(LogMessage msg, StreamRule rule) {
-        //return msg.getLevel() == Integer.parseInt(rule.getValue());
-        return false;
+        return msg.getLevel() == Integer.parseInt(rule.getValue());
     }
 
 }

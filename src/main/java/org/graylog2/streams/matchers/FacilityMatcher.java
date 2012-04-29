@@ -32,9 +32,9 @@ import org.graylog2.streams.StreamRule;
  */
 public class FacilityMatcher implements StreamRuleMatcher {
 
+    @Override
     public boolean match(LogMessage msg, StreamRule rule) {
-        //return msg.getFacility().equals(rule.getValue());
-        return false;
+        return msg.getFacility().equals(rule.getValue());
     }
 
 }

@@ -32,10 +32,10 @@ import org.graylog2.streams.StreamRule;
  */
 public class SeverityOrHigherMatcher implements StreamRuleMatcher {
 
+    @Override
     public boolean match(LogMessage msg, StreamRule rule) {
         // <= because 0 (EMERG) is lower than DEBUG (7)
-        //return msg.getLevel() <= Integer.parseInt(rule.getValue());
-        return false;
+        return msg.getLevel() <= Integer.parseInt(rule.getValue());
     }
 
 }

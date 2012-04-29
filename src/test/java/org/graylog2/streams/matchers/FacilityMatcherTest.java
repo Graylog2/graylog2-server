@@ -20,6 +20,7 @@
 
 package org.graylog2.streams.matchers;
 
+import org.graylog2.logmessage.LogMessage;
 import org.graylog2.Tools;
 import org.bson.types.ObjectId;
 import com.mongodb.BasicDBObject;
@@ -33,7 +34,7 @@ public class FacilityMatcherTest {
     public void testTheTruthToWork() {
         assertTrue(true);
     }
-/*
+
     @Test
     public void testSuccessfulMatch() {
         String facility = "foobar";
@@ -45,7 +46,7 @@ public class FacilityMatcherTest {
 
         StreamRule rule = new StreamRule(mongoRule);
 
-        GELFMessage msg = new GELFMessage();
+        LogMessage msg = new LogMessage();
         msg.setFacility(facility);
 
         FacilityMatcher matcher = new FacilityMatcher();
@@ -62,7 +63,7 @@ public class FacilityMatcherTest {
 
         StreamRule rule = new StreamRule(mongoRule);
 
-        GELFMessage msg = new GELFMessage();
+        LogMessage msg = new LogMessage();
         msg.setFacility("barfoo");
 
         FacilityMatcher matcher = new FacilityMatcher();
@@ -70,5 +71,4 @@ public class FacilityMatcherTest {
         assertFalse(matcher.match(msg, rule));
     }
 
-*/
 }

@@ -32,7 +32,7 @@ public class ElasticSearchOutput implements MessageOutput {
 
     @Override
     public void write(LogMessage msg, GraylogServer server) throws Exception {
-        System.out.println("LOL WRITE TO ELASTICSEARCH");
+        server.getIndexer().index(msg);
     }
 
 }

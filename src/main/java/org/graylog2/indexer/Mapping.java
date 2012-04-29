@@ -42,7 +42,7 @@ public class Mapping {
 
     public static PutMappingRequest getPutMappingRequest(final Client client, final String index) {
         final PutMappingRequestBuilder builder = client.admin().indices().preparePutMapping(new String[] {index});
-        builder.setType(Indexer.TYPE);
+        builder.setType(EmbeddedElasticSearchClient.TYPE);
 
         final Map<String, Object> mapping = new HashMap<String, Object>();
         mapping.put("properties", partFieldProperties());
@@ -50,7 +50,7 @@ public class Mapping {
         mapping.put("_source", enabledAndCompressed()); // Compress source field..
 
         final Map completeMapping = new HashMap();
-        completeMapping.put(Indexer.TYPE, mapping);
+        completeMapping.put(EmbeddedElasticSearchClient.TYPE, mapping);
 
         builder.setSource(completeMapping);
         return builder.request();
@@ -63,7 +63,7 @@ public class Mapping {
         mapping.put("_source", enabledAndCompressed()); // Compress source field..
 
         final Map completeMapping = new HashMap();
-        completeMapping.put(Indexer.TYPE, mapping);
+        completeMapping.put(EmbeddedElasticSearchClient.TYPE, mapping);
 
         final Map spec = new HashMap();
         spec.put("mappings", completeMapping);

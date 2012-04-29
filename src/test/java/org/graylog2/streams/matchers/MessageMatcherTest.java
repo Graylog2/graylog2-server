@@ -20,6 +20,7 @@
 
 package org.graylog2.streams.matchers;
 
+import org.graylog2.logmessage.LogMessage;
 import java.util.Map;
 import org.bson.types.ObjectId;
 import com.mongodb.BasicDBObject;
@@ -34,7 +35,6 @@ public class MessageMatcherTest {
         assertTrue(true);
     }
 
-/*
     @Test
     public void testSuccessfulMatch() {
         String message = "ohai thar|foo";
@@ -47,7 +47,7 @@ public class MessageMatcherTest {
 
         StreamRule rule = new StreamRule(mongoRule);
 
-        GELFMessage msg = new GELFMessage();
+        LogMessage msg = new LogMessage();
         msg.setShortMessage(message);
 
         MessageMatcher matcher = new MessageMatcher();
@@ -67,7 +67,7 @@ public class MessageMatcherTest {
 
         StreamRule rule = new StreamRule(mongoRule);
 
-        GELFMessage msg = new GELFMessage();
+        LogMessage msg = new LogMessage();
         msg.setShortMessage(message);
 
         MessageMatcher matcher = new MessageMatcher();
@@ -78,7 +78,6 @@ public class MessageMatcherTest {
     /*
      * Testing specific cases reported by users.
      */
-/*
     @Test
     public void testSpecificMatches() {
         Map<String, String> cases = new HashMap<String, String>();
@@ -98,7 +97,7 @@ public class MessageMatcherTest {
 
             StreamRule rule = new StreamRule(mongoRule);
 
-            GELFMessage msg = new GELFMessage();
+            LogMessage msg = new LogMessage();
             msg.setShortMessage(e.getKey());
 
             MessageMatcher matcher = new MessageMatcher();
@@ -106,6 +105,5 @@ public class MessageMatcherTest {
             assertTrue(matcher.match(msg, rule));
         }
     }
-*/
 
 }
