@@ -29,6 +29,9 @@ import org.graylog2.Tools;
 import org.graylog2.indexer.EmbeddedElasticSearchClient;
 import org.graylog2.streams.Stream;
 
+import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
+
 /**
  * LogMessage.java: 12.04.2012 13:06:01
  *
@@ -50,8 +53,8 @@ public class LogMessage {
     private String file;
     private int line;
 
-    private Map<String, Object> additionalData = new HashMap<String, Object>();
-    private List<Stream> streams = new ArrayList<Stream>();
+    private Map<String, Object> additionalData = Maps.newHashMap();
+    private List<Stream> streams = Lists.newArrayList();
 
     private double createdAt = 0;
 
@@ -68,7 +71,7 @@ public class LogMessage {
     }
 
     public Map<String, Object> toElasticSearchObject() {
-        Map<String, Object> obj = new HashMap<String, Object>();
+        Map<String, Object> obj = Maps.newHashMap();
         obj.put("message", this.getShortMessage());
         obj.put("full_message", this.getFullMessage());
         obj.put("file", this.getFile());
@@ -94,7 +97,7 @@ public class LogMessage {
 
 
         // Manually converting stream ID to string - caused strange problems without it.
-        List<String> streamIds = new ArrayList<String>();
+        List<String> streamIds = Lists.newArrayList();
         for (Stream stream : this.getStreams()) {
             streamIds.add(stream.getId().toString());
         }

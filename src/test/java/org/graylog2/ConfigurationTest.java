@@ -15,6 +15,7 @@ import com.github.joschi.jadconfig.JadConfig;
 import com.github.joschi.jadconfig.RepositoryException;
 import com.github.joschi.jadconfig.ValidationException;
 import com.github.joschi.jadconfig.repositories.InMemoryRepository;
+import com.google.common.collect.Maps;
 
 /**
  * Unit tests for {@link Configuration} class
@@ -29,7 +30,7 @@ public class ConfigurationTest {
     @Before
     public void setUp() {
 
-        validProperties = new HashMap<String, String>();
+        validProperties = Maps.newHashMap();
 
         try {
             tempFile = File.createTempFile("graylog", null);

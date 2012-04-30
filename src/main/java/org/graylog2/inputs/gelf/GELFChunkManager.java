@@ -21,11 +21,12 @@
 package org.graylog2.inputs.gelf;
 
 import java.io.ByteArrayOutputStream;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import org.apache.log4j.Logger;
 import org.graylog2.GraylogServer;
+
+import com.google.common.collect.Maps;
 
 /**
  * GELFChunkManager.java: 13.04.2012 22:38:40
@@ -155,7 +156,7 @@ public class GELFChunkManager extends Thread {
             chunks.get(chunk.getId()).put(chunk.getSequenceNumber(), chunk);
         } else {
             // First chunk of message.
-            Map<Integer, GELFMessageChunk> c = new HashMap<Integer, GELFMessageChunk>();
+            Map<Integer, GELFMessageChunk> c = Maps.newHashMap();
             c.put(chunk.getSequenceNumber(), chunk);
             chunks.put(chunk.getId(), c);
         }

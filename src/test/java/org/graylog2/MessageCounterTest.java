@@ -9,6 +9,9 @@ import java.util.HashMap;
 import java.util.Map;
 import org.bson.types.ObjectId;
 import org.junit.Test;
+
+import com.google.common.collect.Maps;
+
 import static org.junit.Assert.*;
 
 /**
@@ -32,7 +35,7 @@ public class MessageCounterTest {
         ObjectId stream2 = new ObjectId();
         ObjectId stream3 = new ObjectId();
 
-        Map expected = new HashMap<String, Integer>();
+        Map<String, Integer> expected = Maps.newHashMap();
         expected.put(stream1.toString(), 1);
         expected.put(stream2.toString(), 5);
         expected.put(stream3.toString(), 2);
@@ -52,7 +55,7 @@ public class MessageCounterTest {
         String host2 = "foo.example.org";
         String host3 = "example.com";
 
-        Map expected = new HashMap<String, Integer>();
+        Map<String, Integer> expected = Maps.newHashMap();
         expected.put(Tools.encodeBase64(host1), 5);
         expected.put(Tools.encodeBase64(host2), 1);
         expected.put(Tools.encodeBase64(host3), 3);

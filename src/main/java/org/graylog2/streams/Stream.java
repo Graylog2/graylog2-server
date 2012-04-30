@@ -27,6 +27,7 @@ import org.apache.log4j.Logger;
 import org.bson.types.ObjectId;
 import org.graylog2.forwarders.ForwardEndpoint;
 
+import com.google.common.collect.Lists;
 import com.mongodb.BasicDBList;
 import com.mongodb.BasicDBObject;
 import com.mongodb.DBCollection;
@@ -65,7 +66,7 @@ public class Stream {
             return streamCache.get();
         }
 
-        List<Stream> streams = new ArrayList<Stream>();
+        List<Stream> streams = Lists.newArrayList();
 
         DBCollection coll = streamCache.getGraylogServer().getMongoConnection().getDatabase().getCollection("streams");
         DBObject query = new BasicDBObject();
@@ -90,7 +91,7 @@ public class Stream {
             return this.streamRules;
         }
 
-        List<StreamRule> rules = new ArrayList<StreamRule>();
+        List<StreamRule> rules = Lists.newArrayList();
 
         BasicDBList rawRules = (BasicDBList) this.mongoObject.get("streamrules");
         if (rawRules != null && rawRules.size() > 0) {
@@ -113,7 +114,7 @@ public class Stream {
             return this.forwardedTo;
         }
 
-        List<ForwardEndpoint> fwds = new ArrayList<ForwardEndpoint>();
+        List<ForwardEndpoint> fwds = Lists.newArrayList();
 
         BasicDBList rawFwds = (BasicDBList) this.mongoObject.get("forwarders");
         if (rawFwds != null && rawFwds.size() > 0) {

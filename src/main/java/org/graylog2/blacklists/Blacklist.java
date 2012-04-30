@@ -20,6 +20,7 @@
 
 package org.graylog2.blacklists;
 
+import com.google.common.collect.Lists;
 import com.mongodb.*;
 import org.apache.log4j.Logger;
 import org.bson.types.ObjectId;
@@ -59,7 +60,7 @@ public class Blacklist {
             return blacklistCache.get();
         }
 
-        List<Blacklist> blacklists = new ArrayList<Blacklist>();
+        List<Blacklist> blacklists = Lists.newArrayList();
 
         DBCollection coll = blacklistCache.getGraylogServer().getMongoConnection().getDatabase().getCollection("blacklists");
         DBCursor cur = coll.find(new BasicDBObject());
@@ -99,7 +100,7 @@ public class Blacklist {
             return this.rules;
         }
 
-        ArrayList<BlacklistRule> tempRules = new ArrayList<BlacklistRule>();
+        ArrayList<BlacklistRule> tempRules = Lists.newArrayList();
 
         BasicDBList rawRules = (BasicDBList) this.mongoObject.get("blacklisted_terms");
         if (rawRules != null && rawRules.size() > 0) {
