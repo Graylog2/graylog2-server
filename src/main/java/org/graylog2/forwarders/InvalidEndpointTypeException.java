@@ -30,4 +30,6 @@ package org.graylog2.forwarders;
  */
 public class InvalidEndpointTypeException extends Exception {
 
+    private static final long serialVersionUID = -3896446098293697959L;
+
 }
