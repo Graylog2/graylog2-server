@@ -27,6 +27,8 @@ import java.util.ArrayList;
 import java.util.List;
 import org.graylog2.logmessage.LogMessage;
 
+import com.google.common.collect.Lists;
+
 /**
  * StreamRouter.java: Mar 16, 2011 9:40:24 PM
  *
@@ -39,7 +41,7 @@ public class StreamRouter {
     private static final Logger LOG = Logger.getLogger(StreamRouter.class);
 
     public List<Stream> route(LogMessage msg) {
-        List<Stream> matches = new ArrayList<Stream>();
+        List<Stream> matches = Lists.newArrayList();
         List<Stream> streams = Stream.fetchAllEnabled();
 
         for (Stream stream : streams) {

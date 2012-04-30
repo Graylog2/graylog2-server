@@ -1,6 +1,5 @@
 package org.graylog2;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
@@ -18,6 +17,8 @@ import org.graylog2.inputs.MessageInput;
 import org.graylog2.inputs.gelf.GELFChunkManager;
 import org.graylog2.outputs.MessageOutput;
 import org.graylog2.streams.StreamCache;
+
+import com.google.common.collect.Lists;
 
 public class GraylogServer implements Runnable {
 
@@ -39,10 +40,10 @@ public class GraylogServer implements Runnable {
 
     private MessageCounter messageCounter;
 
-    private List<Initializer> initializers = new ArrayList<Initializer>();
-    private List<MessageInput> inputs = new ArrayList<MessageInput>();
-    private List<Class<? extends MessageFilter>> filters = new ArrayList<Class<? extends MessageFilter>>();
-    private List<Class<? extends MessageOutput>> outputs = new ArrayList<Class<? extends MessageOutput>>();
+    private List<Initializer> initializers = Lists.newArrayList();
+    private List<MessageInput> inputs = Lists.newArrayList();
+    private List<Class<? extends MessageFilter>> filters = Lists.newArrayList();
+    private List<Class<? extends MessageOutput>> outputs = Lists.newArrayList();
 
     private ProcessBuffer processBuffer;
     private OutputBuffer outputBuffer;

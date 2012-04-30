@@ -23,6 +23,8 @@ package org.graylog2.streams.matchers;
 import org.graylog2.logmessage.LogMessage;
 import java.util.Map;
 import org.bson.types.ObjectId;
+
+import com.google.common.collect.Maps;
 import com.mongodb.BasicDBObject;
 import java.util.HashMap;
 import org.graylog2.streams.StreamRule;
@@ -80,7 +82,7 @@ public class MessageMatcherTest {
      */
     @Test
     public void testSpecificMatches() {
-        Map<String, String> cases = new HashMap<String, String>();
+        Map<String, String> cases = Maps.newHashMap();
 
         cases.put("su: (to myuser) root on none", "(su|sudo).+"); // http://jira.graylog2.org/browse/SERVER-11
         cases.put("MyHostname su: (to myuser) root on none\n", ".+su.+"); // http://jira.graylog2.org/browse/SERVER-11
