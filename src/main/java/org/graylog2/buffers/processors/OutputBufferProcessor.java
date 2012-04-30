@@ -49,10 +49,10 @@ public class OutputBufferProcessor implements EventHandler<LogMessageEvent> {
         LOG.debug("Processing message <" + msg.getId() + "> from OutputBuffer.");
 
         String originalMsgId = msg.getId();
-        for (Class outputType : server.getOutputs()) {
+        for (Class<? extends MessageOutput> outputType : server.getOutputs()) {
             try {
                 // Always create a new instance of this filter.
-                MessageOutput output = (MessageOutput) outputType.newInstance();
+                MessageOutput output = outputType.newInstance();
 
                 LOG.debug("Writing message <" + msg.getId() + "> to [" + outputType.getSimpleName() + "]");
 

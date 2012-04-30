@@ -10,11 +10,13 @@ import org.graylog2.buffers.OutputBuffer;
 import org.graylog2.buffers.ProcessBuffer;
 import org.graylog2.database.MongoBridge;
 import org.graylog2.database.MongoConnection;
+import org.graylog2.filters.MessageFilter;
 import org.graylog2.forwarders.forwarders.LogglyForwarder;
 import org.graylog2.indexer.EmbeddedElasticSearchClient;
 import org.graylog2.initializers.Initializer;
 import org.graylog2.inputs.MessageInput;
 import org.graylog2.inputs.gelf.GELFChunkManager;
+import org.graylog2.outputs.MessageOutput;
 import org.graylog2.streams.StreamCache;
 
 public class GraylogServer implements Runnable {
@@ -39,8 +41,8 @@ public class GraylogServer implements Runnable {
 
     private List<Initializer> initializers = new ArrayList<Initializer>();
     private List<MessageInput> inputs = new ArrayList<MessageInput>();
-    private List<Class> filters = new ArrayList<Class>();
-    private List<Class> outputs = new ArrayList<Class>();
+    private List<Class<? extends MessageFilter>> filters = new ArrayList<Class<? extends MessageFilter>>();
+    private List<Class<? extends MessageOutput>> outputs = new ArrayList<Class<? extends MessageOutput>>();
 
     private ProcessBuffer processBuffer;
     private OutputBuffer outputBuffer;
@@ -80,16 +82,16 @@ public class GraylogServer implements Runnable {
     public void registerInitializer(Initializer initializer) {
         this.initializers.add(initializer);
     }
-    
+
     public void registerInput(MessageInput input) {
         this.inputs.add(input);
     }
 
-    public void registerFilter(Class klazz) {
+    public <T extends MessageFilter> void registerFilter(Class<T> klazz) {
         this.filters.add(klazz);
     }
 
-    public void registerOutput(Class klazz) {
+    public <T extends MessageOutput> void registerOutput(Class<T> klazz) {
         this.outputs.add(klazz);
     }
 
@@ -125,7 +127,7 @@ public class GraylogServer implements Runnable {
             initializer.initialize();
             LOG.debug("Initialized: " + initializer.getClass().getSimpleName());
         }
-        
+
         // Call all registered inputs.
         for (MessageInput input : this.inputs) {
             input.initialize(this.configuration, this);
@@ -184,11 +186,11 @@ public class GraylogServer implements Runnable {
         return this.outputBuffer;
     }
 
-    public List<Class> getFilters() {
+    public List<Class<? extends MessageFilter>> getFilters() {
         return this.filters;
     }
 
-    public List<Class> getOutputs() {
+    public List<Class<? extends MessageOutput>> getOutputs() {
         return this.outputs;
     }
 
