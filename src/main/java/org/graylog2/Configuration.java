@@ -34,6 +34,7 @@ import com.github.joschi.jadconfig.converters.StringListConverter;
 import com.github.joschi.jadconfig.validators.InetPortValidator;
 import com.github.joschi.jadconfig.validators.PositiveIntegerValidator;
 import com.github.joschi.jadconfig.validators.PositiveLongValidator;
+import com.google.common.collect.Lists;
 import com.mongodb.ServerAddress;
 
 /**
@@ -249,7 +250,7 @@ public class Configuration {
     }
 
     public List<ServerAddress> getMongoReplicaSet() {
-        List<ServerAddress> replicaServers = new ArrayList<ServerAddress>();
+        List<ServerAddress> replicaServers = Lists.newArrayList();
 
         List<String> rawSet = mongoReplicaSet;
 
