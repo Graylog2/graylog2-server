@@ -72,13 +72,17 @@ public final class GELFMessageChunk {
 
     byte[] payload;
 
-    public GELFMessageChunk(byte[] payload) throws Exception {
+    public GELFMessageChunk(byte[] payload) {
         if (payload.length < HEADER_TOTAL_LENGTH) {
-            throw new Exception("This GELF message chunk is too short. Cannot even contain the required header.");
+            throw new IllegalArgumentException("This GELF message chunk is too short. Cannot even contain the required header.");
         }
         this.payload = payload;
 
         read();
+    }
+
+    public GELFMessageChunk(GELFMessage msg) {
+        this(msg.getPayload());
     }
 
     public int getArrival() {
@@ -101,7 +105,7 @@ public final class GELFMessageChunk {
         return this.sequenceNumber;
     }
 
-    private void read() throws Exception {
+    private void read() {
         extractId();
         extractSequenceCount();
         extractSequenceNumber();
@@ -109,7 +113,7 @@ public final class GELFMessageChunk {
         this.arrival = (int) (System.currentTimeMillis()/1000);
     }
 
-    private String extractId() throws Exception {
+    private String extractId() {
         if (this.id == null) {
             String tmp = "";
             for (int i = 0; i < HEADER_PART_HASH_LENGTH; i++) {
@@ -123,25 +127,25 @@ public final class GELFMessageChunk {
     }
 
     // lol duplication
-    private void extractSequenceNumber() throws Exception {
+    private void extractSequenceNumber() {
         if (this.sequenceNumber == -1) {
             int seqNum = this.sliceInteger(HEADER_PART_SEQNUM_START, HEADER_PART_SEQNUM_LENGTH);
             if (seqNum >= 0) {
                 this.sequenceNumber = seqNum;
             } else {
-                throw new Exception("Could not extract sequence number");
+                throw new IllegalStateException("Could not extract sequence number");
             }
         }
     }
 
     // lol duplication
-    private void extractSequenceCount() throws Exception {
+    private void extractSequenceCount() {
         if (this.sequenceCount == -1) {
             int seqCnt = this.sliceInteger(HEADER_PART_SEQCNT_START, HEADER_PART_SEQCNT_LENGTH);
             if (seqCnt >= 0) {
                 this.sequenceCount = seqCnt;
             } else {
-                throw new Exception("Could not extract sequence count");
+                throw new IllegalStateException("Could not extract sequence count");
             }
         }
     }

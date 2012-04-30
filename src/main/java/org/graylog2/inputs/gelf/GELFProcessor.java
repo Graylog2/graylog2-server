@@ -44,7 +44,7 @@ public class GELFProcessor {
         this.server = server;
     }
 
-    public void messageReceived(GELFMessage message) throws Exception {
+    public void messageReceived(GELFMessage message) {
         // Convert to LogMessage
         LogMessage lm = parse(message.getJSON());
 
@@ -57,7 +57,7 @@ public class GELFProcessor {
         server.getProcessBuffer().insert(lm);
     }
 
-    private LogMessage parse(String message) throws Exception {
+    private LogMessage parse(String message) {
         JSONObject json;
         LogMessage lm = new LogMessage();
         
@@ -69,7 +69,7 @@ public class GELFProcessor {
         }
 
         if (json == null) {
-            throw new Exception("JSON is null/could not be parsed (invalid JSON)");
+            throw new IllegalStateException("JSON is null/could not be parsed (invalid JSON)");
         }
 
         // Add standard fields.

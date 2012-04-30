@@ -148,6 +148,10 @@ public class GELFChunkManager extends Thread {
         return chunks.containsKey(messageId);
     }
 
+    public void insert(GELFMessage msg) {
+        insert(new GELFMessageChunk(msg));
+    }
+
     public void insert(GELFMessageChunk chunk) {
         LOG.debug("Handling GELF chunk: " + chunk);
         
