@@ -226,7 +226,7 @@ public class ConfigurationTest {
 
     @Test
     public void testGetMongoDBReplicaSetServers() throws RepositoryException, ValidationException {
-        validProperties.put("mongodb_replica_set", "localhost:27017,localhost:27018");
+        validProperties.put("mongodb_replica_set", "127.0.0.1:27017,127.0.0.1:27018");
 
         Configuration configuration = new Configuration();
         new JadConfig(new InMemoryRepository(validProperties), configuration).process();
