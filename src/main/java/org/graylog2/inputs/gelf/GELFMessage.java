@@ -20,6 +20,7 @@
 
 package org.graylog2.inputs.gelf;
 
+import java.io.IOException;
 import java.util.Arrays;
 import org.graylog2.Tools;
 
@@ -87,7 +88,7 @@ public class GELFMessage {
         this.payload = payload;
     }
 
-    public int getGELFType() throws Exception {
+    public int getGELFType() {
 
         if (Arrays.equals(getMagicBytes(), HEADER_ZLIB_COMPRESSION)) {
             return TYPE_ZLIB;
@@ -105,35 +106,41 @@ public class GELFMessage {
             return TYPE_UNCOMPRESSED;
         }
 
-        throw new Exception("Unknown GELF type.");
+        throw new IllegalStateException("Unknown GELF type.");
     }
 
-    public String getJSON() throws Exception {
-        switch(getGELFType()) {
-            case TYPE_ZLIB:
-                return Tools.decompressZlib(payload);
-            case TYPE_GZIP:
-                return Tools.decompressGzip(payload);
-            case TYPE_UNCOMPRESSED:
-                // Slice off header and return pure uncompressed bytes.
-                byte[] result = new byte[payload.length-2];
-                System.arraycopy(payload, 2, result, 0, payload.length-2);
-                return new String(result, "UTF-8");
-            default:
-                throw new UnsupportedOperationException("Unknown GELF type. Not supported.");
+    public String getJSON(){
+        try {
+            switch(getGELFType()) {
+                case TYPE_ZLIB:
+                    return Tools.decompressZlib(payload);
+                case TYPE_GZIP:
+                    return Tools.decompressGzip(payload);
+                case TYPE_UNCOMPRESSED:
+                    // Slice off header and return pure uncompressed bytes.
+                    byte[] result = new byte[payload.length-2];
+                    System.arraycopy(payload, 2, result, 0, payload.length-2);
+                    return new String(result, "UTF-8");
+                default:
+                    throw new IllegalStateException("Unknown GELF type. Not supported.");
+            }
+        }
+        catch (IOException e) {
+            // Note that the UnsupportedEncodingException thrown by 'new String' can never happen because UTF-8
+            // is a mandatory JRE encoding which is always present. So we only need to mention the decompress exceptions here.
+            throw new IllegalStateException("Failed to decompress the GELF message payload", e);
         }
     }
 
-    public GELFMessageChunk asChunk() throws Exception {
-        return new GELFMessageChunk(this.payload);
-    }
-
-    private byte[] getMagicBytes() throws Exception {
+    private byte[] getMagicBytes() {
         if (payload.length < HEADER_TYPE_LENGTH) {
-            throw new Exception("GELF message is too short. Not even the type header would fit.");
+            throw new IllegalStateException("GELF message is too short. Not even the type header would fit.");
         }
         
         return new byte[] {(byte) payload[0], (byte) payload[1]};
     }
-    
+
+    public byte[] getPayload() {
+        return payload;
+    }
 }
