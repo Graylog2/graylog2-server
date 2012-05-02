@@ -56,9 +56,7 @@ public class ProcessBufferProcessor implements EventHandler<LogMessageEvent> {
                 String name = filterType.getSimpleName();
                 LOG.debug("Applying filter [" + name +"] on message <" + msg.getId() + ">.");
 
-                filter.filter(msg, server);
-
-                if (filter.discardMessage()) {
+                if (filter.filter(msg, server)) {
                     LOG.debug("Filter [" + name + "] marked message <" + msg.getId() + "> to be discarded. Dropping message.");
                     return;
                 }

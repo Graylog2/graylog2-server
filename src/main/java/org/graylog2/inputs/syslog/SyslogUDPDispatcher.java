@@ -20,12 +20,17 @@
 
 package org.graylog2.inputs.syslog;
 
+import java.net.InetSocketAddress;
+import java.net.SocketAddress;
+import org.apache.log4j.Logger;
 import org.graylog2.GraylogServer;
 import org.jboss.netty.buffer.ChannelBuffer;
 import org.jboss.netty.channel.Channel;
 import org.jboss.netty.channel.ChannelHandlerContext;
+import org.jboss.netty.channel.ExceptionEvent;
+import org.jboss.netty.channel.MessageEvent;
+import org.jboss.netty.channel.SimpleChannelHandler;
 import org.jboss.netty.handler.codec.frame.FrameDecoder;
-import org.productivity.java.syslog4j.server.impl.event.structured.StructuredSyslogServerEvent;
 
 /**
  * SyslogUDPDispatcher.java: 30.04.2012 00:13:02
@@ -34,28 +39,40 @@ import org.productivity.java.syslog4j.server.impl.event.structured.StructuredSys
  *
  * @author Lennart Koopmann <lennart@socketfeed.com>
  */
-public class SyslogUDPDispatcher extends FrameDecoder {
+public class SyslogUDPDispatcher extends SimpleChannelHandler {
+
+    private static final Logger LOG = Logger.getLogger(SyslogUDPDispatcher.class);
 
     private GraylogServer server;
+    private SyslogProcessor processor;
 
     public SyslogUDPDispatcher(GraylogServer server) {
         this.server = server;
+        this.processor = new SyslogProcessor(server);
     }
 
     @Override
-    protected Object decode(ChannelHandlerContext ctx, Channel channel, ChannelBuffer buffer) throws Exception {
+    public void messageReceived(ChannelHandlerContext ctx, MessageEvent e) throws Exception {
+        InetSocketAddress remoteAddress = (InetSocketAddress) e.getRemoteAddress();
+
+        ChannelBuffer buffer = (ChannelBuffer) e.getMessage();
+
         byte[] readable = new byte[buffer.readableBytes()];
         buffer.toByteBuffer().get(readable, buffer.readerIndex(), buffer.readableBytes());
 
-        System.out.println(new String(readable));
+        this.processor.messageReceived(new String(readable), remoteAddress.getAddress());
+    }
 
-        // TODO: only working with structured messages?! this is where to continue tomorrow.
-        StructuredSyslogServerEvent e = new StructuredSyslogServerEvent(readable, readable.length, null);
-        System.out.println(e.getHost());
-        System.out.println(e.getMessage());
+    /*@Override
+    protected Object decode(ChannelHandlerContext ctx, Channel channel, ChannelBuffer buffer) throws Exception {
 
 
         return buffer.readBytes(buffer.readableBytes());
+    }*/
+
+    @Override
+    public void exceptionCaught(ChannelHandlerContext ctx, ExceptionEvent e) throws Exception {
+        LOG.warn("Could not handle syslog message.", e.getCause());
     }
 
 }
