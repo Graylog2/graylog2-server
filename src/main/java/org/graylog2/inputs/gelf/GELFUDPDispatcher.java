@@ -21,11 +21,11 @@
 package org.graylog2.inputs.gelf;
 
 import org.apache.log4j.Logger;
-import org.elasticsearch.common.netty.channel.MessageEvent;
 import org.graylog2.GraylogServer;
 import org.jboss.netty.buffer.ChannelBuffer;
 import org.jboss.netty.channel.ChannelHandlerContext;
 import org.jboss.netty.channel.ExceptionEvent;
+import org.jboss.netty.channel.MessageEvent;
 import org.jboss.netty.channel.SimpleChannelHandler;
 
 /**
@@ -45,6 +45,7 @@ public class GELFUDPDispatcher extends SimpleChannelHandler {
         this.processor = new GELFProcessor(server);
     }
 
+    @Override
     public void messageReceived(ChannelHandlerContext ctx, MessageEvent e) throws Exception {
         ChannelBuffer buffer = (ChannelBuffer) e.getMessage();
 
