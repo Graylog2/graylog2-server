@@ -20,6 +20,8 @@
 
 package org.graylog2.logmessage;
 
+import java.util.Map;
+import java.util.HashMap;
 import org.junit.Test;
 import static org.junit.Assert.*;
 
@@ -84,8 +86,35 @@ public class LogMessageTest {
     @Test
     public void testAddAdditionalData() {
         LogMessage lm = new LogMessage();
-        lm.addAdditionalData("ohai", "thar");
-        assertEquals("thar", lm.getAdditionalData().get("ohai"));
+        lm.addAdditionalData("_ohai", "thar");
+        assertEquals("thar", lm.getAdditionalData().get("_ohai"));
+    }
+
+    @Test
+    public void testAddAdditionalDataWithMap() {
+        LogMessage lm = new LogMessage();
+        lm.addAdditionalData("_ohai", "hai");
+
+        Map<String, String> map = new HashMap<String, String>();
+
+        map.put("_lol", "wut");
+        map.put("_aha", "pipes");
+
+        lm.addAdditionalData(map);
+        assertEquals(3, lm.getAdditionalData().size());
+        assertEquals("wut", lm.getAdditionalData().get("_lol"));
+        assertEquals("pipes", lm.getAdditionalData().get("_aha"));
+        assertEquals("hai", lm.getAdditionalData().get("_ohai"));
+    }
+
+    @Test
+    public void testAddAdditionalDataAddsUnderscoreIfNotGiven() {
+        LogMessage lm = new LogMessage();
+        lm.addAdditionalData("ohai", "lol");
+        lm.addAdditionalData("_wat", 9001);
+        assertEquals(2, lm.getAdditionalData().size());
+        assertEquals("lol", lm.getAdditionalData().get("_ohai"));
+        assertEquals(9001, lm.getAdditionalData().get("_wat"));
     }
 
     @Test

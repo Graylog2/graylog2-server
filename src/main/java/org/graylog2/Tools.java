@@ -223,8 +223,7 @@ public final class Tools {
         return new String(Base64.decodeBase64(what));
     }
 
-    public static String rdnsLookup(SocketAddress socketAddress) throws UnknownHostException {
-        InetSocketAddress addr = (InetSocketAddress) socketAddress;
-        return InetAddress.getByAddress(addr.getAddress().getAddress()).getCanonicalHostName();
+    public static String rdnsLookup(InetAddress socketAddress) throws UnknownHostException {
+        return socketAddress.getCanonicalHostName();
     }
 }

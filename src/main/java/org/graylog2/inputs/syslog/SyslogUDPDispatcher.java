@@ -43,11 +43,9 @@ public class SyslogUDPDispatcher extends SimpleChannelHandler {
 
     private static final Logger LOG = Logger.getLogger(SyslogUDPDispatcher.class);
 
-    private GraylogServer server;
     private SyslogProcessor processor;
 
     public SyslogUDPDispatcher(GraylogServer server) {
-        this.server = server;
         this.processor = new SyslogProcessor(server);
     }
 
@@ -62,13 +60,6 @@ public class SyslogUDPDispatcher extends SimpleChannelHandler {
 
         this.processor.messageReceived(new String(readable), remoteAddress.getAddress());
     }
-
-    /*@Override
-    protected Object decode(ChannelHandlerContext ctx, Channel channel, ChannelBuffer buffer) throws Exception {
-
-
-        return buffer.readBytes(buffer.readableBytes());
-    }*/
 
     @Override
     public void exceptionCaught(ChannelHandlerContext ctx, ExceptionEvent e) throws Exception {

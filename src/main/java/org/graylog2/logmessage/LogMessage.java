@@ -112,6 +112,7 @@ public class LogMessage {
         sb.append("level: ").append(level).append(" | ");
         sb.append("host: ").append(host).append(" | ");
         sb.append("facility: ").append(facility).append(" | ");
+        sb.append("add.: ").append(additionalData.size()).append(" | ");
         sb.append("shortMessage: ").append(shortMessage);
 
         // Replace all newlines and tabs.
@@ -191,7 +192,18 @@ public class LogMessage {
     }
 
     public void addAdditionalData(String key, Object value) {
+        // Add the required underscore if it was not set.
+        if (!key.startsWith("_")) {
+            key = "_" + key;
+        }
+        
         this.additionalData.put(key, value);
+    }
+
+    public void addAdditionalData(Map<String, String> fields) {
+        for (Map.Entry<String, String> field : fields.entrySet()) {
+            addAdditionalData(field.getKey(), field.getValue());
+        }
     }
 
     public Map<String, Object> getAdditionalData() {

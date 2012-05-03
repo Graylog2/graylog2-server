@@ -153,6 +153,10 @@ public class Configuration {
         return forceSyslogRdns;
     }
 
+    public void setForceSyslogRdns(boolean b) {
+        forceSyslogRdns = b;
+    }
+
     public boolean getAllowOverrideSyslogDate() {
         return allowOverrideSyslogDate;
     }

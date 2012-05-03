@@ -32,11 +32,25 @@ public class GraylogServerStub extends GraylogServer {
 
     public int callsToProcessBufferInserter = 0;
     public LogMessage lastInsertedToProcessBuffer = null;
+    private Configuration configurationStub;
 
     @Override
     public ProcessBuffer getProcessBuffer() {
         // The process buffer stuf writes back to our counter instance variables.
         return new ProcessBufferStub(this);
+    }
+
+    public void setConfigurationStub(Configuration stub) {
+        this.configurationStub = stub;
+    }
+
+    @Override
+    public Configuration getConfiguration() {
+        if (this.configurationStub == null) {
+            return new Configuration();
+        } else {
+            return this.configurationStub;
+        }
     }
 
 }
