@@ -39,7 +39,7 @@ public class SyslogProcessorTest {
     public void testMessageReceivedWithNonStructuredMessage() throws Exception {
         GraylogServerStub serverStub = new GraylogServerStub();
         Configuration configStub = new Configuration();
-        configStub.setForceSyslogRdns(false);
+        configStub.setForceSyslogRdns(true);
         serverStub.setConfigurationStub(configStub);
         SyslogProcessor processor = new SyslogProcessor(serverStub);
 
@@ -51,7 +51,7 @@ public class SyslogProcessorTest {
         assertEquals(2, serverStub.callsToProcessBufferInserter);
 
         assertEquals("Dec 24 17:05:01 foo-bar CRON[10049]: pam_unix(cron:session): session closed for user root", lm.getShortMessage());
-        assertEquals(InetAddress.getLocalHost().getHostName(), lm.getHost());
+        assertEquals(InetAddress.getLocalHost().getCanonicalHostName(), lm.getHost());
         assertEquals("security/authorization", lm.getFacility());
         assertEquals(6, lm.getLevel());
         assertEquals(ValidNonStructuredMessage, lm.getFullMessage());
@@ -63,7 +63,7 @@ public class SyslogProcessorTest {
     public void testMessageReceivedWithStructuredMessage() throws Exception {
         GraylogServerStub serverStub = new GraylogServerStub();
         Configuration configStub = new Configuration();
-        configStub.setForceSyslogRdns(false);
+        configStub.setForceSyslogRdns(true);
         serverStub.setConfigurationStub(configStub);
         SyslogProcessor processor = new SyslogProcessor(serverStub);
 
@@ -76,7 +76,7 @@ public class SyslogProcessorTest {
 
         assertEquals("1 2012-12-25T22:14:15.003Z mymachine.example.com evntslog - ID47 [exampleSDID@32473 iut=\"3\" eventSource=\"Application\" eventID=\"1011\"] BOMAn application event log entry",
                 lm.getShortMessage());
-        assertEquals(InetAddress.getLocalHost().getHostName(), lm.getHost());
+        assertEquals(InetAddress.getLocalHost().getCanonicalHostName(), lm.getHost());
         assertEquals("local4", lm.getFacility());
         assertEquals(5, lm.getLevel());
         assertEquals(ValidStructuredMessage, lm.getFullMessage());
@@ -88,7 +88,6 @@ public class SyslogProcessorTest {
     public void testMessageReceivedWithInvalidMessage() throws Exception {
         GraylogServerStub serverStub = new GraylogServerStub();
         Configuration configStub = new Configuration();
-        configStub.setForceSyslogRdns(false);
         serverStub.setConfigurationStub(configStub);
         SyslogProcessor processor = new SyslogProcessor(serverStub);
 
