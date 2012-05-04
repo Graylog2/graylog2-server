@@ -20,6 +20,7 @@
 
 package org.graylog2.outputs;
 
+import java.util.List;
 import org.graylog2.GraylogServer;
 import org.graylog2.logmessage.LogMessage;
 
@@ -31,8 +32,10 @@ import org.graylog2.logmessage.LogMessage;
 public class ElasticSearchOutput implements MessageOutput {
 
     @Override
-    public void write(LogMessage msg, GraylogServer server) throws Exception {
-        server.getIndexer().index(msg);
+    public void write(List<LogMessage> messages, GraylogServer server) throws Exception {
+        server.getIndexer().bulkIndex(messages);
     }
+
+
 
 }

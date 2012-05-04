@@ -20,6 +20,7 @@
 
 package org.graylog2.outputs;
 
+import java.util.List;
 import org.graylog2.GraylogServer;
 import org.graylog2.logmessage.LogMessage;
 
@@ -30,6 +31,6 @@ import org.graylog2.logmessage.LogMessage;
  */
 public interface MessageOutput {
 
-    public void write(LogMessage msg, GraylogServer server) throws Exception;
+    public void write(List<LogMessage> msg, GraylogServer server) throws Exception;
 
 }

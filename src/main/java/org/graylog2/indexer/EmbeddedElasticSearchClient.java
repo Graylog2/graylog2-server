@@ -6,6 +6,7 @@ import static org.elasticsearch.node.NodeBuilder.nodeBuilder;
 import java.io.File;
 import java.io.IOException;
 import java.util.Calendar;
+import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.io.FileUtils;
@@ -16,6 +17,8 @@ import org.elasticsearch.action.admin.indices.create.CreateIndexResponse;
 import org.elasticsearch.action.admin.indices.exists.IndicesExistsRequest;
 import org.elasticsearch.action.admin.indices.exists.IndicesExistsResponse;
 import org.elasticsearch.action.admin.indices.mapping.put.PutMappingRequest;
+import org.elasticsearch.action.bulk.BulkRequestBuilder;
+import org.elasticsearch.action.bulk.BulkResponse;
 import org.elasticsearch.action.deletebyquery.DeleteByQueryRequestBuilder;
 import org.elasticsearch.action.deletebyquery.DeleteByQueryResponse;
 import org.elasticsearch.action.index.IndexRequest.OpType;
@@ -82,6 +85,30 @@ public class EmbeddedElasticSearchClient {
         final PutMappingRequest mappingRequest = Mapping.getPutMappingRequest(client, getIndexName());
         final boolean mappingCreated = client.admin().indices().putMapping(mappingRequest).actionGet().acknowledged();
         return acknowledged && mappingCreated;
+    }
+
+    public boolean bulkIndex(final List<LogMessage> messages) {
+        if (messages.isEmpty()) {
+            return true;
+        }
+
+        final BulkRequestBuilder b = client.prepareBulk();
+        for (LogMessage msg : messages) {
+            final IndexRequestBuilder indexRequestBuilder = new IndexRequestBuilder(client);
+            indexRequestBuilder.setIndex(getIndexName());
+            indexRequestBuilder.setContentType(XContentType.JSON);
+            indexRequestBuilder.setOpType(OpType.INDEX);
+            indexRequestBuilder.setType(TYPE);
+            indexRequestBuilder.setSource(JSONValue.toJSONString(msg.toElasticSearchObject()));
+            b.add(indexRequestBuilder);
+        }
+        final ActionFuture<BulkResponse> bulkFuture = client.bulk(b.request());
+        final BulkResponse response = bulkFuture.actionGet();
+        LOG.info(String.format("Bulk indexed %d messages, took %d ms, failures: %b",
+                response.items().length,
+                response.getTookInMillis(),
+                response.hasFailures()));
+        return !response.hasFailures();
     }
 
     public boolean index(LogMessage msg) {
