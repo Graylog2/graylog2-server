@@ -21,7 +21,6 @@
 package org.graylog2.inputs.gelf;
 
 import java.io.IOException;
-import java.util.Arrays;
 import org.graylog2.Tools;
 
 /**
@@ -31,113 +30,98 @@ import org.graylog2.Tools;
  */
 public class GELFMessage {
 
-    private byte[] payload;
+    private final byte[] payload;
 
     public static final String ADDITIONAL_FIELD_PREFIX = "_";
 
-    /**
-     * A ZLIB compressed message (RFC 1950)
-     */
-    public static final int TYPE_ZLIB = 0;
+    public enum Type {
 
-    /**
-     * A GZIP compressed message (RFC 1952)
-     */
-    public static final int TYPE_GZIP = 1;
+        UNSUPPORTED( (byte) 0x00, (byte) 0x00),
 
-    /**
-     * A chunked GELF message
-     */
-    public static final int TYPE_CHUNKED = 2;
+        /**
+         * A ZLIB compressed message (RFC 1950)
+         */
+        ZLIB( (byte) 0x78, (byte) 0x9c ),
 
-    /**
-     * An uncompressed message
-     */
-    public static final int TYPE_UNCOMPRESSED = 3;
+        /**
+         * A GZIP compressed message (RFC 1952)
+         */
+        GZIP( (byte) 0x1f, (byte) 0x8b ),
 
-    /**
-     * First bytes identifying a ZLIB compressed message. (RFC 1950)
-     */
-    public static final byte[] HEADER_ZLIB_COMPRESSION = { (byte) 0x78, (byte) 0x9c };
+        /**
+         * A chunked GELF message
+         */
+        CHUNKED( (byte) 0x1e, (byte) 0x0f ),
 
-    /**
-     * First bytes identifying a GZIP compressed message. (RFC 1952)
-     */
-    public static final byte[] HEADER_GZIP_COMPRESSION = { (byte) 0x1f, (byte) 0x8b };
+        /**
+         * An uncompressed message
+         */
+        UNCOMPRESSED( (byte) 0x1f, (byte) 0x3c );
 
-    /**
-     * First bytes identifying a chunked GELF message.
-     */
-    public static final byte[] HEADER_CHUNKED_GELF = { (byte) 0x1e, (byte) 0x0f };
+        private static final int HEADER_SIZE = 2;
 
-    /**
-     * First bytes identifying an uncompressed GELF message.
-     */
-    public static final byte[] HEADER_UNCOMPRESSED_GELF = { (byte) 0x1f, (byte) 0x3c };
+        private final byte first;
+        private final byte second;
 
-    /**
-     * GELF header type size.
-     */
-    public static final int HEADER_TYPE_LENGTH = 2;
+        Type(final byte first, final byte second) {
+            this.first = first;
+            this.second = second;
+        };
+
+        static Type determineType(final byte first, final byte second) {
+            if (first == ZLIB.first && second == ZLIB.second) {
+                return ZLIB;
+            } else if (first == GZIP.first) { // GZIP and UNCOMPRESSED share first magic byte
+                if (second == GZIP.second) {
+                    return GZIP;
+                } else if (second == UNCOMPRESSED.second) {
+                    return UNCOMPRESSED;
+                }
+            } else if (first == CHUNKED.first && second == CHUNKED.second) {
+                return CHUNKED;
+            }
+            return UNSUPPORTED;
+        }
+    }
 
     /**
      *
      * @param payload Compressed or uncompressed (See HEADER_* constants)
      */
-    public GELFMessage(byte[] payload) {
+    public GELFMessage(final byte[] payload) {
         this.payload = payload;
     }
 
-    public int getGELFType() {
-
-        if (Arrays.equals(getMagicBytes(), HEADER_ZLIB_COMPRESSION)) {
-            return TYPE_ZLIB;
+    public Type getGELFType() {
+        if (payload.length < Type.HEADER_SIZE) {
+            throw new IllegalStateException("GELF message is too short. Not even the type header would fit.");
         }
-
-        if (Arrays.equals(getMagicBytes(), HEADER_GZIP_COMPRESSION)) {
-            return TYPE_GZIP;
-        }
-
-        if (Arrays.equals(getMagicBytes(), HEADER_CHUNKED_GELF)) {
-            return TYPE_CHUNKED;
-        }
-
-        if (Arrays.equals(getMagicBytes(), HEADER_UNCOMPRESSED_GELF)) {
-            return TYPE_UNCOMPRESSED;
-        }
-
-        throw new IllegalStateException("Unknown GELF type.");
+        return Type.determineType(payload[0], payload[1]);
     }
 
     public String getJSON(){
         try {
             switch(getGELFType()) {
-                case TYPE_ZLIB:
+                case ZLIB:
                     return Tools.decompressZlib(payload);
-                case TYPE_GZIP:
+                case GZIP:
                     return Tools.decompressGzip(payload);
-                case TYPE_UNCOMPRESSED:
+                case UNCOMPRESSED:
                     // Slice off header and return pure uncompressed bytes.
-                    byte[] result = new byte[payload.length-2];
+                    final byte[] result = new byte[payload.length-2];
                     System.arraycopy(payload, 2, result, 0, payload.length-2);
                     return new String(result, "UTF-8");
-                default:
+                case CHUNKED:
+                case UNSUPPORTED:
                     throw new IllegalStateException("Unknown GELF type. Not supported.");
             }
         }
-        catch (IOException e) {
+        catch (final IOException e) {
             // Note that the UnsupportedEncodingException thrown by 'new String' can never happen because UTF-8
             // is a mandatory JRE encoding which is always present. So we only need to mention the decompress exceptions here.
             throw new IllegalStateException("Failed to decompress the GELF message payload", e);
         }
-    }
-
-    private byte[] getMagicBytes() {
-        if (payload.length < HEADER_TYPE_LENGTH) {
-            throw new IllegalStateException("GELF message is too short. Not even the type header would fit.");
-        }
-        
-        return new byte[] {(byte) payload[0], (byte) payload[1]};
+        return null;
     }
 
     public byte[] getPayload() {

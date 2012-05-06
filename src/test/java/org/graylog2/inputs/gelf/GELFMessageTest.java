@@ -39,7 +39,7 @@ public class GELFMessageTest {
         fakeData[1] = (byte) 0x9c;
 
         GELFMessage msg = new GELFMessage(fakeData);
-        assertEquals(GELFMessage.TYPE_ZLIB, msg.getGELFType());
+        assertEquals(GELFMessage.Type.ZLIB, msg.getGELFType());
     }
 
     @Test
@@ -49,7 +49,7 @@ public class GELFMessageTest {
         fakeData[1] = (byte) 0x8b;
 
         GELFMessage msg = new GELFMessage(fakeData);
-        assertEquals(GELFMessage.TYPE_GZIP, msg.getGELFType());
+        assertEquals(GELFMessage.Type.GZIP, msg.getGELFType());
     }
 
     @Test
@@ -59,7 +59,7 @@ public class GELFMessageTest {
         fakeData[1] = (byte) 0x0f;
 
         GELFMessage msg = new GELFMessage(fakeData);
-        assertEquals(GELFMessage.TYPE_CHUNKED, msg.getGELFType());
+        assertEquals(GELFMessage.Type.CHUNKED, msg.getGELFType());
     }
 
     @Test
@@ -69,7 +69,7 @@ public class GELFMessageTest {
         fakeData[1] = (byte) 0x3c;
 
         GELFMessage msg = new GELFMessage(fakeData);
-        assertEquals(GELFMessage.TYPE_UNCOMPRESSED, msg.getGELFType());
+        assertEquals(GELFMessage.Type.UNCOMPRESSED, msg.getGELFType());
     }
 
     @Test

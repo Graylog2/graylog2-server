@@ -27,6 +27,8 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import org.graylog2.Tools;
 
+import com.google.common.collect.Maps;
+
 /**
  * MessageCounter.java: Sep 20, 2011 6:47:42 PM
  *
@@ -38,16 +40,11 @@ import org.graylog2.Tools;
 public final class MessageCounter {
 
     private int total;
-    private Map<String, Integer> streams;
-    private Map<String, Integer> hosts;
+    private final Map<String, Integer> streams = Maps.newConcurrentMap();
+    private final Map<String, Integer> hosts = Maps.newConcurrentMap();
 
     private int fiveSecondThroughput = 0;
     private int highestFiveSecondThroughput = 0;
-
-    public MessageCounter() {
-        // Initialize.
-        this.resetAllCounts();
-    }
 
     public int getTotalCount() {
         return this.total;
@@ -76,11 +73,11 @@ public final class MessageCounter {
     }
 
     public void resetHostCounts() {
-        this.hosts = new ConcurrentHashMap<String, Integer>();
+        this.hosts.clear();
     }
 
     public void resetStreamCounts() {
-        this.streams = new ConcurrentHashMap<String, Integer>();
+        this.streams.clear();
     }
 
     public void resetTotal() {
@@ -110,7 +107,7 @@ public final class MessageCounter {
      *
      * @param x The value to add on top of current total count.
      */
-    public void countUpTotal(int x) {
+    public void countUpTotal(final int x) {
         this.total += x;
     }
 
@@ -120,7 +117,7 @@ public final class MessageCounter {
      *
      * @param x The value to add on top of five second throuput.
      */
-    public void countUpFiveSecondThroughput(int x) {
+    public void countUpFiveSecondThroughput(final int x) {
         this.fiveSecondThroughput += x;
 
         if (this.fiveSecondThroughput > this.highestFiveSecondThroughput) {
@@ -133,7 +130,7 @@ public final class MessageCounter {
      *
      * @param streamId The ID of the stream which count to increment.
      */
-    public void incrementStream(ObjectId streamId) {
+    public void incrementStream(final ObjectId streamId) {
         this.countUpStream(streamId, 1);
     }
 
@@ -143,10 +140,10 @@ public final class MessageCounter {
      * @param streamId The ID of the stream which count to increment.
      * @param x The value to add on top of the current stream count.
      */
-    public synchronized void countUpStream(ObjectId streamId, int x) {
+    public synchronized void countUpStream(final ObjectId streamId, final int x) {
         if (this.streams.containsKey(streamId.toString())) {
             // There already is an entry. Increment.
-            int oldCount = this.streams.get(streamId.toString());
+            final int oldCount = this.streams.get(streamId.toString());
             this.streams.put(streamId.toString(), oldCount+x); // Overwrites old entry.
         } else {
             // First entry for this stream.
@@ -159,7 +156,7 @@ public final class MessageCounter {
      *
      * @param hostname The name of the host which count to increment.
      */
-    public void incrementHost(String hostname) {
+    public void incrementHost(final String hostname) {
         this.countUpHost(hostname, 1);
     }
 
@@ -169,11 +166,11 @@ public final class MessageCounter {
      * @param hostname The name of the host which count to increment.
      * @param x The value to add on top of the current host count.
      */
-    public synchronized void countUpHost(String hostname, int x) {
+    public synchronized void countUpHost(String hostname, final int x) {
         hostname = Tools.encodeBase64(hostname);
         if (this.hosts.containsKey(hostname)) {
             // There already is an entry. Increment.
-            int oldCount = this.hosts.get(hostname);
+            final int oldCount = this.hosts.get(hostname);
             this.hosts.put(hostname, oldCount+x); // Overwrites old entry.
         } else {
             // First entry for this stream.

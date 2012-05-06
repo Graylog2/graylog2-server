@@ -54,13 +54,18 @@ public class GELFUDPDispatcher extends SimpleChannelHandler {
 
         GELFMessage msg = new GELFMessage(readable);
 
-        if (msg.getGELFType() == GELFMessage.TYPE_CHUNKED) {
-            // This is a GELF message chunk. Add chunk to manager.
+        switch(msg.getGELFType()) {
+        case CHUNKED:
             server.getGELFChunkManager().insert(msg);
-        } else {
-            // This is a non-chunked/complete GELF message. Process it.
+            break;
+        case ZLIB:
+        case GZIP:
+        case UNCOMPRESSED:
+        case UNSUPPORTED:
             processor.messageReceived(msg);
+            break;
         }
+        super.messageReceived(ctx, e);
     }
 
 
