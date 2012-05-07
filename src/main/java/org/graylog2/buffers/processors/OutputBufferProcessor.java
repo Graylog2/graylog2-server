@@ -63,7 +63,7 @@ public class OutputBufferProcessor implements EventHandler<LogMessageEvent> {
 
                     output.write(buffer, server);
                 } catch (Exception e) {
-                    LOG.error("Could not write message batchto output [" + outputType.getSimpleName() +"].", e);
+                    LOG.error("Could not write message batch to output [" + outputType.getSimpleName() +"].", e);
                 } finally {
                     buffer.clear();
                 }

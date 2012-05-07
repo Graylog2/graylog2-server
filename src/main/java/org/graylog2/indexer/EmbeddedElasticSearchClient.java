@@ -104,7 +104,7 @@ public class EmbeddedElasticSearchClient {
         }
         final ActionFuture<BulkResponse> bulkFuture = client.bulk(b.request());
         final BulkResponse response = bulkFuture.actionGet();
-        LOG.info(String.format("Bulk indexed %d messages, took %d ms, failures: %b",
+        LOG.debug(String.format("Bulk indexed %d messages, took %d ms, failures: %b",
                 response.items().length,
                 response.getTookInMillis(),
                 response.hasFailures()));
