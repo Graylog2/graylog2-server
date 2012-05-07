@@ -118,6 +118,29 @@ public class LogMessageTest {
     }
 
     @Test
+    public void testRemoveAdditionalData() {
+        LogMessage lm = new LogMessage();
+        lm.addAdditionalData("_something", "foo");
+        lm.addAdditionalData("_something_else", "bar");
+
+        lm.removeAdditionalData("_something_else");
+
+        assertEquals(1, lm.getAdditionalData().size());
+        assertEquals("foo", lm.getAdditionalData().get("_something"));
+    }
+
+    @Test
+    public void testRemoveAdditionalDataWithNonExistentKey() {
+        LogMessage lm = new LogMessage();
+        lm.addAdditionalData("_something", "foo");
+        lm.addAdditionalData("_something_else", "bar");
+
+        lm.removeAdditionalData("_LOLIDONTEXIST");
+
+        assertEquals(2, lm.getAdditionalData().size());
+    }
+
+    @Test
     public void testToString() {
         LogMessage lm = new LogMessage();
         lm.toString();
