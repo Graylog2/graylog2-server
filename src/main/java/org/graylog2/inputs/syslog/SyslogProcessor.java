@@ -87,15 +87,6 @@ public class SyslogProcessor {
         if (structuredData.size() > 0) {
             LOG.debug("Parsed <" + structuredData.size() + "> structured data pairs."
                         + " Adding as additional_fields. Not using tokenizer.");
-        } else {
-            /*
-             * There was no structured data to be parsed or parsing failed.
-             *
-             * This means that we can safely extract values with the Tokenizer
-             * without interfering with structured data.
-             */
-             LOG.debug("No structured data was parsed from message. Using tokenizer.");
-            // XXX IMPLEMENT
         }
 
         return structuredData;

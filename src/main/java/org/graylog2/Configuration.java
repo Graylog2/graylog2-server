@@ -21,7 +21,6 @@
 package org.graylog2;
 
 import java.net.UnknownHostException;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -136,6 +135,9 @@ public class Configuration {
 
     @Parameter("rules_file")
     private String droolsRulesFile;
+
+    @Parameter(value = "enable_tokenizer_filter", required = true)
+    private boolean enableTokenizerFilter = true;
 
     public int getSyslogListenPort() {
         return syslogListenPort;
@@ -284,34 +286,9 @@ public class Configuration {
         return replicaServers;
     }
 
-/*    public List<AMQPSubscribedQueue> getAmqpSubscribedQueues() {
-        List<AMQPSubscribedQueue> queueList = new ArrayList<AMQPSubscribedQueue>();
-
-        List<String> rawQueues = amqpSubscribedQueues;
-
-        if (rawQueues == null || rawQueues.isEmpty()) {
-            return null;
-        }
-
-        // Get every queue.
-        for (String queue : rawQueues) {
-            String[] queueDefinition = queue.split(":");
-
-            // Check if valid.
-            if (queueDefinition == null || queueDefinition.length != 2) {
-                LOG.error("Malformed amqp_subscribed_queues configuration.");
-                return null;
-            }
-            try {
-                queueList.add(new AMQPSubscribedQueue(queueDefinition[0], queueDefinition[1]));
-            } catch (InvalidQueueTypeException e) {
-                LOG.error("Invalid queue type in amqp_subscribed_queues");
-                return null;
-            }
-        }
-
-        return queueList;
-    }*/
+    public boolean isEnableTokenizerFilter() {
+        return enableTokenizerFilter;
+    }
 
     @ValidatorMethod
     public void validate() throws ValidationException {
