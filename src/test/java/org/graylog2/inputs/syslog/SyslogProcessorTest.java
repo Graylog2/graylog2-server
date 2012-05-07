@@ -53,7 +53,6 @@ public class SyslogProcessorTest {
         assertEquals("security/authorization", lm.getFacility());
         assertEquals(6, lm.getLevel());
         assertEquals(ValidNonStructuredMessage, lm.getFullMessage());
-        assertEquals((int) Tools.getUTCTimestampWithMilliseconds(), (int) lm.getCreatedAt());
         assertEquals(0, lm.getAdditionalData().size());
     }
 
@@ -75,7 +74,6 @@ public class SyslogProcessorTest {
         assertEquals("local4", lm.getFacility());
         assertEquals(5, lm.getLevel());
         assertEquals(ValidStructuredMessage, lm.getFullMessage());
-        assertEquals((int) Tools.getUTCTimestampWithMilliseconds(), (int) lm.getCreatedAt());
         assertEquals(3, lm.getAdditionalData().size());
     }
 
