@@ -45,7 +45,13 @@ class MessageGateway
   @default_query_options = { :sort => "created_at desc" }
 
   def self.all_paginated(page = 1)
-    wrap search("*", pagination_options(page).merge(@default_query_options))
+    r = search(pagination_options(page).merge(@default_query_options)) do
+      query do
+        all
+      end
+    end
+
+    wrap(r)
   end
 
   def self.all_of_stream_paginated(stream_id, page = 1)
