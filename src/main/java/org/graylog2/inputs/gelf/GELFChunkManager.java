@@ -22,7 +22,7 @@ package org.graylog2.inputs.gelf;
 
 import java.io.ByteArrayOutputStream;
 import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
+
 import org.apache.log4j.Logger;
 import org.graylog2.GraylogServer;
 
@@ -37,15 +37,13 @@ public class GELFChunkManager extends Thread {
 
     private static final Logger LOG = Logger.getLogger(GELFChunkManager.class);
 
-    private Map<String, Map<Integer, GELFMessageChunk>> chunks = new ConcurrentHashMap<String, Map<Integer, GELFMessageChunk>>();
+    private Map<String, Map<Integer, GELFMessageChunk>> chunks = Maps.newConcurrentMap();
     private GELFProcessor processor;
-    private GraylogServer server;
 
     // The number of seconds a chunk is valid. Every message with chunks older than this will be dropped.
     public static final int SECONDS_VALID = 5;
 
     public GELFChunkManager(GraylogServer server) {
-        this.server = server;
         this.processor = new GELFProcessor(server);
     }
 

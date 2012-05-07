@@ -20,11 +20,10 @@
 
 package org.graylog2.logmessage;
 
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
+
 import org.graylog2.Tools;
 import org.graylog2.indexer.EmbeddedElasticSearchClient;
 import org.graylog2.streams.Stream;
