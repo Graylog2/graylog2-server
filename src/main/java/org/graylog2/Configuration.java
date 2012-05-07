@@ -67,6 +67,9 @@ public class Configuration {
     @Parameter(value = "no_retention")
     private boolean noRetention;
 
+    @Parameter(value = "output_batch_size", required = true, validator = PositiveIntegerValidator.class)
+    private int outputBatchSize = 5000;
+
     @Parameter(value = "elasticsearch_config_file", required = true, validator = FilePresentValidator.class)
     private String elasticSearchConfigFile = "/etc/graylog2-elasticsearch.yml";
 
@@ -165,6 +168,10 @@ public class Configuration {
 
     public boolean performRetention() {
         return !noRetention;
+    }
+
+    public int getOutputBatchSize() {
+        return outputBatchSize;
     }
 
     public String getElasticSearchConfigFile() {

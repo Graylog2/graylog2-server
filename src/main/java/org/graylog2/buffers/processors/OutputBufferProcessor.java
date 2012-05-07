@@ -53,7 +53,7 @@ public class OutputBufferProcessor implements EventHandler<LogMessageEvent> {
 
         buffer.add(msg);
 
-        if (endOfBatch || buffer.size() >= 5000) {
+        if (endOfBatch || buffer.size() >= server.getConfiguration().getOutputBatchSize()) {
             for (Class<? extends MessageOutput> outputType : server.getOutputs()) {
                 try {
                     // Always create a new instance of this filter.
