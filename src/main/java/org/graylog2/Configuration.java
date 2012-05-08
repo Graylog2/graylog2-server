@@ -151,6 +151,15 @@ public class Configuration {
     @Parameter(value = "graphite_carbon_udp_port", validator = InetPortValidator.class, required = false)
     private int graphiteCarbonUdpPort = 2003;
 
+    @Parameter(value = "enable_libratometrics_output", required = false)
+    private boolean enableLibratoMetricsOutput = false;
+
+    @Parameter(value = "libratometrics_api_user", required = false)
+    private String libratometricsApiUser;
+
+    @Parameter(value = "libratometrics_api_token", required = false)
+    private String libratometricsApiToken;
+
     public int getSyslogListenPort() {
         return syslogListenPort;
     }
@@ -316,6 +325,18 @@ public class Configuration {
 
     public int getGraphiteCarbonUdpPort() {
         return graphiteCarbonUdpPort;
+    }
+
+    public boolean isEnableLibratoMetricsOutput() {
+        return enableLibratoMetricsOutput;
+    }
+
+    public String getLibratoMetricsAPIUser() {
+        return libratometricsApiUser;
+    }
+
+    public String getLibratoMetricsAPIToken() {
+        return libratometricsApiToken;
     }
 
     @ValidatorMethod

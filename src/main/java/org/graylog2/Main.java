@@ -126,8 +126,9 @@ public final class Main {
         server.registerInitializer(new MessageCounterInitializer(server));
         server.registerInitializer(new SyslogServerInitializer(server, configuration));
         server.registerInitializer(new MessageRetentionInitializer(server));
-        if (configuration.isEnableGraphiteOutput()) { server.registerInitializer(new GraphiteInitializer(server)); }
-        
+        if (configuration.isEnableGraphiteOutput())       { server.registerInitializer(new GraphiteInitializer(server)); }
+        if (configuration.isEnableLibratoMetricsOutput()) { server.registerInitializer(new LibratoMetricsInitializer(server)); }
+
         // Register inputs.
         if (configuration.isUseGELF()) { server.registerInput(new GELFUDPInput()); }
         if (configuration.getSyslogProtocol().equals("udp")) {
