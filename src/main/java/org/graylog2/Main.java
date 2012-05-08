@@ -67,6 +67,8 @@ public final class Main {
      */
     public static void main(String[] args) {
 
+        // So jung kommen wir nicht mehr zusammen.
+
         final CommandLineArguments commandLineArguments = new CommandLineArguments();
         final JCommander jCommander = new JCommander(commandLineArguments, args);
         jCommander.setProgramName("graylog2");
