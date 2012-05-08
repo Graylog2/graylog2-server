@@ -63,7 +63,7 @@ import java.util.concurrent.TimeUnit;
 public final class Main {
 
     private static final Logger LOG = Logger.getLogger(Main.class);
-    private static final String GRAYLOG2_VERSION = "0.9.6p1";
+    private static final String GRAYLOG2_VERSION = "0.9.6p1-RC2";
 
     private static final int INDEX_CHECK_RETRIES = 15;
     private static final int INDEX_CHECK_INTERVAL_SEC = 5;
