@@ -68,6 +68,7 @@ public class GraphiteWriterThread implements Runnable {
         MessageCounter counter = this.graylogServer.getMessageCounterManager().get(COUNTER_NAME);
         try {
             int now = Tools.getUTCTimestamp();
+
             // Overall count.
             String val = "graylog2.messagecounts.total " + counter.getTotalCount() + " " + now;
             send(val.getBytes());
@@ -76,6 +77,12 @@ public class GraphiteWriterThread implements Runnable {
             for(Entry<String, Integer> stream : counter.getStreamCounts().entrySet()) {
                 String sval = "graylog2.messagecounts.streams." + stream.getKey() + " " + stream.getValue() + " " + now;
                 send(sval.getBytes());
+            }
+
+            // Host counts.
+            for(Entry<String, Integer> host : counter.getHostCounts().entrySet()) {
+                String hval = "graylog2.messagecounts.hosts." + host.getKey().replaceAll("[^a-zA-Z0-9]", "") + " " + host.getValue() + " " + now;
+                send(hval.getBytes());
             }
 
             LOG.debug("Sent message counts to Graphite at <" + carbonHost + ":" + carbonPort + ">.");
