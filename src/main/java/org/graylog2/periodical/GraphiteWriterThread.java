@@ -28,6 +28,7 @@ import java.net.SocketException;
 import java.net.UnknownHostException;
 import java.util.Map.Entry;
 import org.apache.log4j.Logger;
+import org.graylog2.GraphiteFormatter;
 import org.graylog2.GraylogServer;
 import org.graylog2.MessageCounter;
 import org.graylog2.Tools;
@@ -67,22 +68,10 @@ public class GraphiteWriterThread implements Runnable {
 
         MessageCounter counter = this.graylogServer.getMessageCounterManager().get(COUNTER_NAME);
         try {
-            int now = Tools.getUTCTimestamp();
+            GraphiteFormatter f = new GraphiteFormatter(counter);
 
-            // Overall count.
-            String val = "graylog2.messagecounts.total " + counter.getTotalCount() + " " + now;
-            send(val.getBytes());
-
-            // Stream counts.
-            for(Entry<String, Integer> stream : counter.getStreamCounts().entrySet()) {
-                String sval = "graylog2.messagecounts.streams." + stream.getKey() + " " + stream.getValue() + " " + now;
-                send(sval.getBytes());
-            }
-
-            // Host counts.
-            for(Entry<String, Integer> host : counter.getHostCounts().entrySet()) {
-                String hval = "graylog2.messagecounts.hosts." + Tools.decodeBase64(host.getKey()).replaceAll("[^a-zA-Z0-9]", "") + " " + host.getValue() + " " + now;
-                send(hval.getBytes());
+            for(byte[] b : f.getAllMetrics()) {
+                send(b);
             }
 
             LOG.debug("Sent message counts to Graphite at <" + carbonHost + ":" + carbonPort + ">.");

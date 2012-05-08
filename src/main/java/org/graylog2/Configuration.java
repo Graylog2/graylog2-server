@@ -142,6 +142,9 @@ public class Configuration {
     @Parameter(value = "enable_tokenizer_filter", required = true)
     private boolean enableTokenizerFilter = true;
 
+    @Parameter(value = "enable_graphite_output", required = false)
+    private boolean enableGraphiteOutput = false;
+
     @Parameter(value = "graphite_carbon_host", required = false)
     private String graphiteCarbonHost = "127.0.0.1";
 
@@ -301,6 +304,10 @@ public class Configuration {
 
     public boolean isEnableTokenizerFilter() {
         return enableTokenizerFilter;
+    }
+
+    public boolean isEnableGraphiteOutput() {
+        return enableGraphiteOutput;
     }
 
     public String getGraphiteCarbonHost() {
