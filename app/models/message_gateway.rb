@@ -180,7 +180,11 @@ class MessageGateway
   end
 
   def self.oldest_message
-    wrap search("*", { :sort => "created_at asc", :size => 1 }).first
+    r = search({ :sort => "created_at asc", :size => 1 }) do
+      query { all }
+    end.first
+
+    wrap(r)
   end
 
   def self.all_in_range(page, from, to, opts = {})
@@ -188,10 +192,10 @@ class MessageGateway
 
     options = pagination_options(page).merge(@default_query_options)
 
-    r = search options do
+    r = search(options) do
       query do
-        string("*")
-      
+        all
+
         # Possibly narrow down to stream?
         unless opts[:stream_id].blank?
           term(:streams, opts[:stream_id])
