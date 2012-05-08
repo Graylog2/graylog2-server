@@ -26,6 +26,7 @@ import java.net.DatagramSocket;
 import java.net.InetAddress;
 import java.net.SocketException;
 import java.net.UnknownHostException;
+import java.util.Map.Entry;
 import org.apache.log4j.Logger;
 import org.graylog2.GraylogServer;
 import org.graylog2.MessageCounter;
@@ -66,8 +67,17 @@ public class GraphiteWriterThread implements Runnable {
 
         MessageCounter counter = this.graylogServer.getMessageCounterManager().get(COUNTER_NAME);
         try {
-            String val = "graylog2.messagecounts.total " + counter.getTotalCount() + " " + Tools.getUTCTimestamp();
+            int now = Tools.getUTCTimestamp();
+            // Overall count.
+            String val = "graylog2.messagecounts.total " + counter.getTotalCount() + " " + now;
             send(val.getBytes());
+
+            // Stream counts.
+            for(Entry<String, Integer> stream : counter.getStreamCounts().entrySet()) {
+                String sval = "graylog2.messagecounts.streams." + stream.getKey() + " " + stream.getValue() + " " + now;
+                send(sval.getBytes());
+            }
+
             LOG.debug("Sent message counts to Graphite at <" + carbonHost + ":" + carbonPort + ">.");
         } catch (Exception e) {
             LOG.warn("Error in GraphiteWriterThread: " + e.getMessage(), e);
