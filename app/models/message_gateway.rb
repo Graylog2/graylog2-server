@@ -174,11 +174,6 @@ class MessageGateway
     return wrap(r)
   end
 
-  def self.total_count
-    # search with size 0 instead of count because of this issue: https://github.com/karmi/tire/issues/100
-    search("*", :size => 0).total
-  end
-
   def self.stream_count(stream_id)
     # search with size 0 instead of count because of this issue: https://github.com/karmi/tire/issues/100
     search("streams:#{stream_id}", :size => 0).total
