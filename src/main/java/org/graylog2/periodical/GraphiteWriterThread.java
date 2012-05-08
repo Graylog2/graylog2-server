@@ -20,23 +20,25 @@
 
 package org.graylog2.periodical;
 
+import java.io.IOException;
+import java.net.DatagramPacket;
+import java.net.DatagramSocket;
+import java.net.InetAddress;
+import java.net.SocketException;
+import java.net.UnknownHostException;
 import org.apache.log4j.Logger;
 import org.graylog2.GraylogServer;
 import org.graylog2.MessageCounter;
+import org.graylog2.Tools;
 
 /**
  * GraphiteWriterThread.java: 08.05.2012 16:13:29
- *
- * Describe me.
  *
  * @author Lennart Koopmann <lennart@socketfeed.com>
  */
 public class GraphiteWriterThread implements Runnable {
 
     private static final Logger LOG = Logger.getLogger(GraphiteWriterThread.class);
-
-    public static final String GRAPHITE_CARBON_HOST = "127.0.0.1";
-    public static final int    GRAPHITE_CARBON_PORT = 2003;
 
     public static final String COUNTER_NAME = "graphitecounter";
 
@@ -45,8 +47,14 @@ public class GraphiteWriterThread implements Runnable {
 
     private final GraylogServer graylogServer;
 
+    String carbonHost;
+    int carbonPort;
+
     public GraphiteWriterThread(GraylogServer graylogServer) {
         this.graylogServer = graylogServer;
+
+        carbonHost = graylogServer.getConfiguration().getGraphiteCarbonHost();
+        carbonPort = graylogServer.getConfiguration().getGraphiteCarbonUdpPort();
     }
 
     @Override
@@ -58,13 +66,38 @@ public class GraphiteWriterThread implements Runnable {
 
         MessageCounter counter = this.graylogServer.getMessageCounterManager().get(COUNTER_NAME);
         try {
-System.out.println("Overall count: " + counter.getTotalCount());
-            LOG.debug("Sent message counts to Graphite at <" + GRAPHITE_CARBON_HOST + ":" + GRAPHITE_CARBON_PORT + ">.");
+            String val = "graylog2.messagecounts.total " + counter.getTotalCount() + " " + Tools.getUTCTimestamp();
+            send(val.getBytes());
+            LOG.debug("Sent message counts to Graphite at <" + carbonHost + ":" + carbonPort + ">.");
         } catch (Exception e) {
             LOG.warn("Error in GraphiteWriterThread: " + e.getMessage(), e);
         } finally {
             counter.resetAllCounts();
         }
+    }
+
+    private boolean send(byte[] what) {
+        DatagramSocket sock = null;
+
+        try {
+            sock = new DatagramSocket();
+            InetAddress destination = InetAddress.getByName(carbonHost);
+
+            DatagramPacket pkg = new DatagramPacket(what, what.length, destination, carbonPort);
+            sock.send(pkg);
+        } catch (SocketException e) {
+            LOG.error("Could not send data to Graphite", e);
+        } catch (UnknownHostException e) {
+            LOG.error("Could not send data to Graphite (Unknown host: <" + carbonHost + ">)", e);
+        } catch (IOException e) {
+            LOG.error("Could not send data to Graphite (IO error):", e);
+        } finally {
+            if (sock != null) {
+                sock.close();
+            }
+        }
+
+        return true;
     }
 
 }

@@ -142,6 +142,12 @@ public class Configuration {
     @Parameter(value = "enable_tokenizer_filter", required = true)
     private boolean enableTokenizerFilter = true;
 
+    @Parameter(value = "graphite_carbon_host", required = false)
+    private String graphiteCarbonHost = "127.0.0.1";
+
+    @Parameter(value = "graphite_carbon_udp_port", validator = InetPortValidator.class, required = false)
+    private int graphiteCarbonUdpPort = 2003;
+
     public int getSyslogListenPort() {
         return syslogListenPort;
     }
@@ -295,6 +301,14 @@ public class Configuration {
 
     public boolean isEnableTokenizerFilter() {
         return enableTokenizerFilter;
+    }
+
+    public String getGraphiteCarbonHost() {
+        return graphiteCarbonHost;
+    }
+
+    public int getGraphiteCarbonUdpPort() {
+        return graphiteCarbonUdpPort;
     }
 
     @ValidatorMethod
