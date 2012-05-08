@@ -21,12 +21,7 @@
 package org.graylog2;
 
 import org.bson.types.ObjectId;
-
-import java.util.HashMap;
 import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
-import org.graylog2.Tools;
-
 import com.google.common.collect.Maps;
 
 /**
@@ -43,8 +38,8 @@ public final class MessageCounter {
     private final Map<String, Integer> streams = Maps.newConcurrentMap();
     private final Map<String, Integer> hosts = Maps.newConcurrentMap();
 
-    private int fiveSecondThroughput = 0;
-    private int highestFiveSecondThroughput = 0;
+    private int throughput = 0;
+    private int highestThroughput = 0;
 
     public int getTotalCount() {
         return this.total;
@@ -58,12 +53,12 @@ public final class MessageCounter {
         return this.hosts;
     }
 
-    public int getFiveSecondThroughput() {
-        return this.fiveSecondThroughput;
+    public int getThroughput() {
+        return this.throughput;
     }
 
-    public int getHighestFiveSecondThroughput() {
-        return this.highestFiveSecondThroughput;
+    public int getHighestThroughput() {
+        return this.highestThroughput;
     }
 
     public void resetAllCounts() {
@@ -84,8 +79,8 @@ public final class MessageCounter {
         this.total = 0;
     }
 
-    public void resetFiveSecondThroughput() {
-        this.fiveSecondThroughput = 0;
+    public void resetThroughput() {
+        this.throughput = 0;
     }
 
     /**
@@ -98,8 +93,8 @@ public final class MessageCounter {
     /**
      * Increment five second throughput by 1.
      */
-    public void incrementFiveSecondThroughput() {
-        this.countUpFiveSecondThroughput(1);
+    public void incrementThroughput() {
+        this.countUpThroughput(1);
     }
 
     /**
@@ -117,11 +112,11 @@ public final class MessageCounter {
      *
      * @param x The value to add on top of five second throuput.
      */
-    public void countUpFiveSecondThroughput(final int x) {
-        this.fiveSecondThroughput += x;
+    public void countUpThroughput(final int x) {
+        this.throughput += x;
 
-        if (this.fiveSecondThroughput > this.highestFiveSecondThroughput) {
-            this.highestFiveSecondThroughput = this.fiveSecondThroughput;
+        if (this.throughput > this.highestThroughput) {
+            this.highestThroughput = this.throughput;
         }
     }
 

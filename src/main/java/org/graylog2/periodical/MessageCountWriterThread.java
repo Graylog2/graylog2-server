@@ -45,13 +45,10 @@ public class MessageCountWriterThread implements Runnable {
         this.graylogServer = graylogServer;
     }
 
-    /**
-     * Start the thread. Runs forever.
-     */
     @Override
     public void run() {
 
-        MessageCounter counter = this.graylogServer.getMessageCounter();
+        MessageCounter counter = this.graylogServer.getMessageCounterManager().get(GraylogServer.MASTER_COUNTER_NAME);
         try {
             graylogServer.getMongoBridge().writeMessageCounts(counter.getTotalCount(), counter.getStreamCounts(), counter.getHostCounts());
         } catch (Exception e) {

@@ -21,6 +21,7 @@
 package org.graylog2.filters;
 
 import org.graylog2.GraylogServer;
+import org.graylog2.MessageCounter;
 import org.graylog2.logmessage.LogMessage;
 import org.graylog2.streams.Stream;
 
@@ -35,19 +36,22 @@ public class CounterUpdateFilter implements MessageFilter {
 
     @Override
     public boolean filter(LogMessage msg, GraylogServer server) {
-        // Five second throughput for health page.
-        server.getMessageCounter().incrementFiveSecondThroughput();
+        // Increment all registered message counters.
+        for (MessageCounter counter : server.getMessageCounterManager().getAllCounters().values()) {
+            // Five second throughput for health page.
+            counter.incrementThroughput();
 
-        // Total count.
-        server.getMessageCounter().incrementTotal();
+            // Total count.
+            counter.incrementTotal();
 
-        // Stream counts.
-        for (Stream stream : msg.getStreams()) {
-            server.getMessageCounter().incrementStream(stream.getId());
+            // Stream counts.
+            for (Stream stream : msg.getStreams()) {
+                counter.incrementStream(stream.getId());
+            }
+
+            // Host count.
+            counter.incrementHost(msg.getHost());
         }
-
-        // Host count.
-        server.getMessageCounter().incrementHost(msg.getHost());
 
         // Do not discard message.
         return false;

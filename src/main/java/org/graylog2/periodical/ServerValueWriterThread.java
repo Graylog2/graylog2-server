@@ -54,9 +54,9 @@ public class ServerValueWriterThread implements Runnable {
             graylogServer.getServerValues().ping();
 
             // Current throughput.
-            MessageCounter c = this.graylogServer.getMessageCounter();
-            graylogServer.getServerValues().writeThroughput(c.getFiveSecondThroughput(), c.getHighestFiveSecondThroughput());
-            c.resetFiveSecondThroughput(); // Reset five second throughput count.
+            MessageCounter c = this.graylogServer.getMessageCounterManager().get(GraylogServer.MASTER_COUNTER_NAME);
+            graylogServer.getServerValues().writeThroughput(c.getThroughput(), c.getHighestThroughput());
+            c.resetThroughput(); // Reset five second throughput count.
 
             /*
              * Message queue size is written in BulkIndexerThread. More about the

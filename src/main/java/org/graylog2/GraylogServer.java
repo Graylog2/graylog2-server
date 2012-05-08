@@ -36,9 +36,11 @@ public class GraylogServer implements Runnable {
 
     public static final String GRAYLOG2_VERSION = "0.9.7-dev";
 
+    public static final String MASTER_COUNTER_NAME = "master";
+
     private EmbeddedElasticSearchClient indexer;
 
-    private MessageCounter messageCounter;
+    private MessageCounterManager messageCounterManager;
 
     private List<Initializer> initializers = Lists.newArrayList();
     private List<MessageInput> inputs = Lists.newArrayList();
@@ -63,7 +65,8 @@ public class GraylogServer implements Runnable {
         mongoConnection.setReplicaSet(configuration.getMongoReplicaSet());
         mongoConnection.setMessagesCollectionSize(configuration.getMessagesCollectionSize());
 
-        messageCounter = new MessageCounter();
+        messageCounterManager = new MessageCounterManager();
+        messageCounterManager.register(MASTER_COUNTER_NAME);
 
         processBuffer = new ProcessBuffer(this);
         processBuffer.initialize();
@@ -195,8 +198,8 @@ public class GraylogServer implements Runnable {
         return this.outputs;
     }
 
-    public MessageCounter getMessageCounter() {
-        return this.messageCounter;
+    public MessageCounterManager getMessageCounterManager() {
+        return this.messageCounterManager;
     }
 
 }
