@@ -81,7 +81,7 @@ public class GraphiteWriterThread implements Runnable {
 
             // Host counts.
             for(Entry<String, Integer> host : counter.getHostCounts().entrySet()) {
-                String hval = "graylog2.messagecounts.hosts." + host.getKey().replaceAll("[^a-zA-Z0-9]", "") + " " + host.getValue() + " " + now;
+                String hval = "graylog2.messagecounts.hosts." + Tools.decodeBase64(host.getKey()).replaceAll("[^a-zA-Z0-9]", "") + " " + host.getValue() + " " + now;
                 send(hval.getBytes());
             }
 
