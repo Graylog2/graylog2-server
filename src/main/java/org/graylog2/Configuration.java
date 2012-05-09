@@ -148,8 +148,8 @@ public class Configuration {
     @Parameter(value = "graphite_carbon_host", required = false)
     private String graphiteCarbonHost = "127.0.0.1";
 
-    @Parameter(value = "graphite_carbon_udp_port", validator = InetPortValidator.class, required = false)
-    private int graphiteCarbonUdpPort = 2003;
+    @Parameter(value = "graphite_carbon_tcp_port", validator = InetPortValidator.class, required = false)
+    private int graphiteCarbonTcpPort = 2003;
 
     @Parameter(value = "enable_libratometrics_output", required = false)
     private boolean enableLibratoMetricsOutput = false;
@@ -335,8 +335,8 @@ public class Configuration {
         return graphiteCarbonHost;
     }
 
-    public int getGraphiteCarbonUdpPort() {
-        return graphiteCarbonUdpPort;
+    public int getGraphiteCarbonTcpPort() {
+        return graphiteCarbonTcpPort;
     }
 
     public boolean isEnableLibratoMetricsOutput() {
