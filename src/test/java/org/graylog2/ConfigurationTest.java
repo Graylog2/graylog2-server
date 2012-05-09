@@ -15,6 +15,7 @@ import com.github.joschi.jadconfig.JadConfig;
 import com.github.joschi.jadconfig.RepositoryException;
 import com.github.joschi.jadconfig.ValidationException;
 import com.github.joschi.jadconfig.repositories.InMemoryRepository;
+import com.google.common.collect.Maps;
 
 /**
  * Unit tests for {@link Configuration} class
@@ -29,7 +30,7 @@ public class ConfigurationTest {
     @Before
     public void setUp() {
 
-        validProperties = new HashMap<String, String>();
+        validProperties = Maps.newHashMap();
 
         try {
             tempFile = File.createTempFile("graylog", null);
@@ -161,7 +162,7 @@ public class ConfigurationTest {
         Assert.assertEquals(3000, configuration.getForwarderLogglyTimeout());
     }
 
-    @Test
+    /*@Test
     public void testGetAMQPSubscribedQueuesEmpty() throws RepositoryException, ValidationException {
         validProperties.put("amqp_subscribed_queues", "");
         Configuration configuration = new Configuration();
@@ -195,7 +196,7 @@ public class ConfigurationTest {
         new JadConfig(new InMemoryRepository(validProperties), configuration).process();
 
         Assert.assertEquals(2, configuration.getAmqpSubscribedQueues().size());
-    }
+    }*/
 
     @Test
     public void testGetMongoDBReplicaSetServersEmpty() throws RepositoryException, ValidationException {
@@ -226,7 +227,7 @@ public class ConfigurationTest {
 
     @Test
     public void testGetMongoDBReplicaSetServers() throws RepositoryException, ValidationException {
-        validProperties.put("mongodb_replica_set", "localhost:27017,localhost:27018");
+        validProperties.put("mongodb_replica_set", "127.0.0.1:27017,127.0.0.1:27018");
 
         Configuration configuration = new Configuration();
         new JadConfig(new InMemoryRepository(validProperties), configuration).process();

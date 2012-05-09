@@ -21,7 +21,7 @@
 package org.graylog2.streams.matchers;
 
 import java.util.regex.Pattern;
-import org.graylog2.messagehandlers.gelf.GELFMessage;
+import org.graylog2.logmessage.LogMessage;
 import org.graylog2.streams.StreamRule;
 
 /**
@@ -31,9 +31,10 @@ import org.graylog2.streams.StreamRule;
  *
  * @author Dennis Oelkers <dennis@lauschmusik.de>
  */
-public class FullMessageMatcher implements StreamRuleMatcherIF {
+public class FullMessageMatcher implements StreamRuleMatcher {
 
-    public boolean match(GELFMessage msg, StreamRule rule) {
+    @Override
+    public boolean match(LogMessage msg, StreamRule rule) {
 	Pattern messagePattern = Pattern.compile(rule.getValue(), Pattern.DOTALL);
 	String fullMessage = msg.getFullMessage();
 		

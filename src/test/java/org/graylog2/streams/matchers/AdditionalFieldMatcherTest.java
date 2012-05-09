@@ -20,14 +20,18 @@
 
 package org.graylog2.streams.matchers;
 
+import org.graylog2.logmessage.LogMessage;
 import org.bson.types.ObjectId;
 import com.mongodb.BasicDBObject;
-import org.graylog2.messagehandlers.gelf.GELFMessage;
 import org.graylog2.streams.StreamRule;
 import org.junit.Test;
 import static org.junit.Assert.*;
 
 public class AdditionalFieldMatcherTest {
+    @Test
+    public void testTheTruthToWork() {
+        assertTrue(true);
+    }
 
     @Test
     public void testSuccessfulMatch() {
@@ -38,7 +42,7 @@ public class AdditionalFieldMatcherTest {
 
         StreamRule rule = new StreamRule(mongoRule);
 
-        GELFMessage msg = new GELFMessage();
+        LogMessage msg = new LogMessage();
         msg.addAdditionalData("_foo", "bar");
 
         AdditionalFieldMatcher matcher = new AdditionalFieldMatcher();
@@ -55,7 +59,7 @@ public class AdditionalFieldMatcherTest {
 
         StreamRule rule = new StreamRule(mongoRule);
 
-        GELFMessage msg = new GELFMessage();
+        LogMessage msg = new LogMessage();
         msg.addAdditionalData("_foo", "bazbaz");
 
         AdditionalFieldMatcher matcher = new AdditionalFieldMatcher();
@@ -72,7 +76,7 @@ public class AdditionalFieldMatcherTest {
 
         StreamRule rule = new StreamRule(mongoRule);
 
-        GELFMessage msg = new GELFMessage();
+        LogMessage msg = new LogMessage();
         msg.addAdditionalData("_foo", "bar");
 
         AdditionalFieldMatcher matcher = new AdditionalFieldMatcher();
@@ -89,7 +93,7 @@ public class AdditionalFieldMatcherTest {
 
         StreamRule rule = new StreamRule(mongoRule);
 
-        GELFMessage msg = new GELFMessage();
+        LogMessage msg = new LogMessage();
         msg.addAdditionalData("_foo", "wat");
 
         AdditionalFieldMatcher matcher = new AdditionalFieldMatcher();
@@ -106,7 +110,7 @@ public class AdditionalFieldMatcherTest {
 
         StreamRule rule = new StreamRule(mongoRule);
 
-        GELFMessage msg = new GELFMessage();
+        LogMessage msg = new LogMessage();
         msg.addAdditionalData("_foo", "bar1foowat");
 
         AdditionalFieldMatcher matcher = new AdditionalFieldMatcher();

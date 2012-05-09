@@ -57,6 +57,7 @@ public class DroolsInitializer implements Initializer {
         } catch (Exception e) {
             LOG.fatal("Could not load rules engine: " + e.getMessage(), e);
             System.exit(1);
-        }    }
+        }
+    }
 
 }

@@ -20,14 +20,18 @@
 
 package org.graylog2.streams.matchers;
 
+import org.graylog2.logmessage.LogMessage;
 import org.bson.types.ObjectId;
 import com.mongodb.BasicDBObject;
-import org.graylog2.messagehandlers.gelf.GELFMessage;
 import org.graylog2.streams.StreamRule;
 import org.junit.Test;
 import static org.junit.Assert.*;
 
 public class FileNameAndLineMatcherTest {
+    @Test
+    public void testTheTruthToWork() {
+        assertTrue(true);
+    }
 
     @Test
     public void testSuccessfulMath() {
@@ -42,7 +46,7 @@ public class FileNameAndLineMatcherTest {
 
         StreamRule rule = new StreamRule(mongoRule);
         FileNameAndLineMatcher matcher = new FileNameAndLineMatcher();
-        GELFMessage msg = new GELFMessage();
+        LogMessage msg = new LogMessage();
         
         msg.setFile(filename);
         msg.setLine(17);
@@ -62,7 +66,7 @@ public class FileNameAndLineMatcherTest {
 
         StreamRule rule = new StreamRule(mongoRule);
         FileNameAndLineMatcher matcher = new FileNameAndLineMatcher();
-        GELFMessage msg = new GELFMessage();
+        LogMessage msg = new LogMessage();
 
         msg.setFile(filename);
         msg.setLine(9001);
@@ -82,7 +86,7 @@ public class FileNameAndLineMatcherTest {
 
         StreamRule rule = new StreamRule(mongoRule);
         FileNameAndLineMatcher matcher = new FileNameAndLineMatcher();
-        GELFMessage msg = new GELFMessage();
+        LogMessage msg = new LogMessage();
 
         msg.setFile(filename);
         assertTrue(matcher.match(msg, rule));
@@ -101,7 +105,7 @@ public class FileNameAndLineMatcherTest {
 
         StreamRule rule = new StreamRule(mongoRule);
         FileNameAndLineMatcher matcher = new FileNameAndLineMatcher();
-        GELFMessage msg = new GELFMessage();
+        LogMessage msg = new LogMessage();
 
         msg.setFile(filename);
         msg.setLine(line);

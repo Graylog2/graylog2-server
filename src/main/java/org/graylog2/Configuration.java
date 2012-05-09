@@ -21,13 +21,10 @@
 package org.graylog2;
 
 import java.net.UnknownHostException;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
 import org.apache.log4j.Logger;
-import org.graylog2.messagehandlers.amqp.AMQPSubscribedQueue;
-import org.graylog2.messagehandlers.amqp.InvalidQueueTypeException;
 
 import com.github.joschi.jadconfig.Parameter;
 import com.github.joschi.jadconfig.ValidationException;
@@ -36,6 +33,7 @@ import com.github.joschi.jadconfig.converters.StringListConverter;
 import com.github.joschi.jadconfig.validators.InetPortValidator;
 import com.github.joschi.jadconfig.validators.PositiveIntegerValidator;
 import com.github.joschi.jadconfig.validators.PositiveLongValidator;
+import com.google.common.collect.Lists;
 import com.mongodb.ServerAddress;
 
 /**
@@ -69,8 +67,11 @@ public class Configuration {
     @Parameter(value = "no_retention")
     private boolean noRetention;
 
+    @Parameter(value = "output_batch_size", required = true, validator = PositiveIntegerValidator.class)
+    private int outputBatchSize = 5000;
+
     @Parameter(value = "elasticsearch_config_file", required = true, validator = FilePresentValidator.class)
-    private String elasticSearchConfigFile;
+    private String elasticSearchConfigFile = "/etc/graylog2-elasticsearch.yml";
 
     @Parameter(value = "elasticsearch_index_name", required = true)
     private String elasticsearchIndexName = "graylog2";
@@ -101,15 +102,6 @@ public class Configuration {
 
     @Parameter(value = "messages_collection_size", required = true, validator = PositiveLongValidator.class)
     private long messagesCollectionSize = 50 * 1000 * 1000;
-
-    @Parameter(value = "mq_batch_size", required = true, validator = PositiveIntegerValidator.class)
-    private int mqBatchSize = 500;
-
-    @Parameter(value = "mq_poll_freq", required = true, validator = PositiveIntegerValidator.class)
-    private int mqPollFreq = 1;
-
-    @Parameter(value = "mq_max_size", required = false, validator = PositiveIntegerValidator.class)
-    private int mqMaxSize = 0;
 
     @Parameter(value = "use_gelf", required = true)
     private boolean useGELF = false;
@@ -147,6 +139,27 @@ public class Configuration {
     @Parameter("rules_file")
     private String droolsRulesFile;
 
+    @Parameter(value = "enable_tokenizer_filter", required = true)
+    private boolean enableTokenizerFilter = true;
+
+    @Parameter(value = "enable_graphite_output", required = false)
+    private boolean enableGraphiteOutput = false;
+
+    @Parameter(value = "graphite_carbon_host", required = false)
+    private String graphiteCarbonHost = "127.0.0.1";
+
+    @Parameter(value = "graphite_carbon_udp_port", validator = InetPortValidator.class, required = false)
+    private int graphiteCarbonUdpPort = 2003;
+
+    @Parameter(value = "enable_libratometrics_output", required = false)
+    private boolean enableLibratoMetricsOutput = false;
+
+    @Parameter(value = "libratometrics_api_user", required = false)
+    private String libratometricsApiUser;
+
+    @Parameter(value = "libratometrics_api_token", required = false)
+    private String libratometricsApiToken;
+
     public int getSyslogListenPort() {
         return syslogListenPort;
     }
@@ -163,12 +176,20 @@ public class Configuration {
         return forceSyslogRdns;
     }
 
+    public void setForceSyslogRdns(boolean b) {
+        forceSyslogRdns = b;
+    }
+
     public boolean getAllowOverrideSyslogDate() {
         return allowOverrideSyslogDate;
     }
 
     public boolean performRetention() {
         return !noRetention;
+    }
+
+    public int getOutputBatchSize() {
+        return outputBatchSize;
     }
 
     public String getElasticSearchConfigFile() {
@@ -213,18 +234,6 @@ public class Configuration {
 
     public long getMessagesCollectionSize() {
         return messagesCollectionSize;
-    }
-
-    public int getMessageQueueBatchSize() {
-        return mqBatchSize;
-    }
-
-    public int getMessageQueuePollFrequency() {
-        return mqPollFreq;
-    }
-
-    public int getMessageQueueMaximumSize() {
-        return mqMaxSize;
     }
 
     public boolean isUseGELF() {
@@ -272,7 +281,7 @@ public class Configuration {
     }
 
     public List<ServerAddress> getMongoReplicaSet() {
-        List<ServerAddress> replicaServers = new ArrayList<ServerAddress>();
+        List<ServerAddress> replicaServers = Lists.newArrayList();
 
         List<String> rawSet = mongoReplicaSet;
 
@@ -302,33 +311,32 @@ public class Configuration {
         return replicaServers;
     }
 
-    public List<AMQPSubscribedQueue> getAmqpSubscribedQueues() {
-        List<AMQPSubscribedQueue> queueList = new ArrayList<AMQPSubscribedQueue>();
+    public boolean isEnableTokenizerFilter() {
+        return enableTokenizerFilter;
+    }
 
-        List<String> rawQueues = amqpSubscribedQueues;
+    public boolean isEnableGraphiteOutput() {
+        return enableGraphiteOutput;
+    }
 
-        if (rawQueues == null || rawQueues.isEmpty()) {
-            return null;
-        }
+    public String getGraphiteCarbonHost() {
+        return graphiteCarbonHost;
+    }
 
-        // Get every queue.
-        for (String queue : rawQueues) {
-            String[] queueDefinition = queue.split(":");
+    public int getGraphiteCarbonUdpPort() {
+        return graphiteCarbonUdpPort;
+    }
 
-            // Check if valid.
-            if (queueDefinition == null || queueDefinition.length != 2) {
-                LOG.error("Malformed amqp_subscribed_queues configuration.");
-                return null;
-            }
-            try {
-                queueList.add(new AMQPSubscribedQueue(queueDefinition[0], queueDefinition[1]));
-            } catch (InvalidQueueTypeException e) {
-                LOG.error("Invalid queue type in amqp_subscribed_queues");
-                return null;
-            }
-        }
+    public boolean isEnableLibratoMetricsOutput() {
+        return enableLibratoMetricsOutput;
+    }
 
-        return queueList;
+    public String getLibratoMetricsAPIUser() {
+        return libratometricsApiUser;
+    }
+
+    public String getLibratoMetricsAPIToken() {
+        return libratometricsApiToken;
     }
 
     @ValidatorMethod

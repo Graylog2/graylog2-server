@@ -25,7 +25,7 @@ import org.graylog2.streams.matchers.SeverityMatcher;
 import org.graylog2.streams.matchers.HostMatcher;
 import org.graylog2.streams.matchers.FacilityMatcher;
 import org.graylog2.streams.matchers.MessageMatcher;
-import org.graylog2.streams.matchers.StreamRuleMatcherIF;
+import org.graylog2.streams.matchers.StreamRuleMatcher;
 import org.junit.Test;
 import static org.junit.Assert.*;
 
@@ -33,19 +33,19 @@ public class StreamRuleMatcherFactoryTest {
 
     @Test
     public void testBuild() throws Exception {
-        StreamRuleMatcherIF messageMatcher = StreamRuleMatcherFactory.build(StreamRule.TYPE_MESSAGE);
+        StreamRuleMatcher messageMatcher = StreamRuleMatcherFactory.build(StreamRule.TYPE_MESSAGE);
         assertTrue(messageMatcher instanceof MessageMatcher);
 
-        StreamRuleMatcherIF hostMatcher = StreamRuleMatcherFactory.build(StreamRule.TYPE_HOST);
+        StreamRuleMatcher hostMatcher = StreamRuleMatcherFactory.build(StreamRule.TYPE_HOST);
         assertTrue(hostMatcher instanceof HostMatcher);
 
-        StreamRuleMatcherIF severityMatcher = StreamRuleMatcherFactory.build(StreamRule.TYPE_SEVERITY);
+        StreamRuleMatcher severityMatcher = StreamRuleMatcherFactory.build(StreamRule.TYPE_SEVERITY);
         assertTrue(severityMatcher instanceof SeverityMatcher);
 
-        StreamRuleMatcherIF facilityMatcher = StreamRuleMatcherFactory.build(StreamRule.TYPE_FACILITY);
+        StreamRuleMatcher facilityMatcher = StreamRuleMatcherFactory.build(StreamRule.TYPE_FACILITY);
         assertTrue(facilityMatcher instanceof FacilityMatcher);
 
-        StreamRuleMatcherIF additionalFieldMatcher = StreamRuleMatcherFactory.build(StreamRule.TYPE_ADDITIONAL);
+        StreamRuleMatcher additionalFieldMatcher = StreamRuleMatcherFactory.build(StreamRule.TYPE_ADDITIONAL);
         assertTrue(additionalFieldMatcher instanceof AdditionalFieldMatcher);
     }
 
@@ -53,7 +53,7 @@ public class StreamRuleMatcherFactoryTest {
     public void testBuildWithInvalidStreamRuleType() {
         boolean exceptionThrown = false;
         try {
-            StreamRuleMatcherIF messageMatcher = StreamRuleMatcherFactory.build(9001);
+            StreamRuleMatcher messageMatcher = StreamRuleMatcherFactory.build(9001);
         } catch (InvalidStreamRuleTypeException e) {
             exceptionThrown = true;
         }

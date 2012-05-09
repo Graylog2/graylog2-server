@@ -1,5 +1,5 @@
 /**
- * Copyright 2011 Lennart Koopmann <lennart@socketfeed.com>
+ * Copyright 2011, 2012 Lennart Koopmann <lennart@socketfeed.com>
  *
  * This file is part of Graylog2.
  *
@@ -22,8 +22,7 @@ package org.graylog2.forwarders.forwarders;
 
 import org.apache.log4j.Logger;
 import org.graylog2.forwarders.MessageForwarderIF;
-import org.graylog2.messagehandlers.gelf.GELFClientChunk;
-import org.graylog2.messagehandlers.gelf.GELFMessage;
+import org.graylog2.logmessage.LogMessage;
 
 /**
  * ForwardEndpoint.java: Apr 7, 2011 8:10:23 PM
@@ -43,8 +42,8 @@ public class GELFMessageForwarder extends UDPForwarder implements MessageForward
         this.setPort(port);
     }
 
-    public boolean forward(GELFMessage message) throws MessageForwarderConfigurationException {
-        if (this.host.isEmpty() || this.port <= 0) {
+    public boolean forward(LogMessage message) throws MessageForwarderConfigurationException {
+ /*       if (this.host.isEmpty() || this.port <= 0) {
             throw new MessageForwarderConfigurationException("Host is empty or port is invalid.");
         }
         
@@ -60,7 +59,7 @@ public class GELFMessageForwarder extends UDPForwarder implements MessageForward
             } else {
                 this.succeeded = this.send(message.compress());
             }
-        }
+        }*/
 
         return this.succeeded;
     }

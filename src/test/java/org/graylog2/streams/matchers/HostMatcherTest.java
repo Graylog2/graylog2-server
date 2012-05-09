@@ -20,14 +20,18 @@
 
 package org.graylog2.streams.matchers;
 
+import org.graylog2.logmessage.LogMessage;
 import com.mongodb.BasicDBObject;
 import org.bson.types.ObjectId;
-import org.graylog2.messagehandlers.gelf.GELFMessage;
 import org.graylog2.streams.StreamRule;
 import org.junit.Test;
 import static org.junit.Assert.*;
 
 public class HostMatcherTest {
+    @Test
+    public void testTheTruthToWork() {
+        assertTrue(true);
+    }
 
     @Test
     public void testSuccessfulMatch() {
@@ -40,7 +44,7 @@ public class HostMatcherTest {
 
         StreamRule rule = new StreamRule(mongoRule);
 
-        GELFMessage msg = new GELFMessage();
+        LogMessage msg = new LogMessage();
         msg.setHost(host);
 
         HostMatcher matcher = new HostMatcher();
@@ -59,13 +63,12 @@ public class HostMatcherTest {
 
         StreamRule rule = new StreamRule(mongoRule);
 
-        GELFMessage msg = new GELFMessage();
+        LogMessage msg = new LogMessage();
         msg.setHost(host + "foo");
 
         HostMatcher matcher = new HostMatcher();
 
         assertFalse(matcher.match(msg, rule));
     }
-
 
 }

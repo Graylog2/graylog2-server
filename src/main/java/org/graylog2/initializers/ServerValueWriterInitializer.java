@@ -51,9 +51,6 @@ public class ServerValueWriterInitializer extends SimpleFixedRateScheduleInitial
         serverValue.setGraylog2Version(GraylogServer.GRAYLOG2_VERSION);
         serverValue.setAvailableProcessors(HostSystem.getAvailableProcessors());
         serverValue.setLocalHostname(Tools.getLocalHostname());
-        serverValue.writeMessageQueueMaximumSize(configuration.getMessageQueueMaximumSize());
-        serverValue.writeMessageQueueBatchSize(configuration.getMessageQueueBatchSize());
-        serverValue.writeMessageQueuePollFrequency(configuration.getMessageQueuePollFrequency());
 
         configureScheduler(
                 new ServerValueWriterThread(graylogServer),

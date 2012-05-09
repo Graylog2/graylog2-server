@@ -20,13 +20,13 @@
 
 package org.graylog2;
 
+import org.graylog2.logmessage.LogMessage;
 import org.apache.log4j.Logger;
 import org.drools.KnowledgeBase;
 import org.drools.KnowledgeBaseFactory;
 import org.drools.builder.*;
 import org.drools.io.ResourceFactory;
 import org.drools.runtime.StatefulKnowledgeSession;
-import org.graylog2.messagehandlers.gelf.GELFMessage;
 
 public final class RulesEngine {
 
@@ -52,7 +52,7 @@ public final class RulesEngine {
 		this.kbase.addKnowledgePackages(kbuilder.getKnowledgePackages());
 	}
 	
-	public void evaluate(GELFMessage message) {
+	public void evaluate(LogMessage message) {
 		// Create new session, insert fact and evaluate
 		StatefulKnowledgeSession ksession = this.kbase.newStatefulKnowledgeSession();
 		ksession.insert(message);

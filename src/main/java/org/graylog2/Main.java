@@ -20,28 +20,38 @@
 
 package org.graylog2;
 
-import java.io.File;
-import java.io.FileWriter;
-import java.io.Writer;
-
-import org.apache.commons.io.IOUtils;
-import org.apache.log4j.Level;
-import org.apache.log4j.Logger;
-
 import com.beust.jcommander.JCommander;
 import com.github.joschi.jadconfig.JadConfig;
 import com.github.joschi.jadconfig.RepositoryException;
 import com.github.joschi.jadconfig.ValidationException;
 import com.github.joschi.jadconfig.repositories.PropertiesRepository;
-import org.graylog2.initializers.AMQPInitializer;
-import org.graylog2.initializers.DroolsInitializer;
-import org.graylog2.initializers.GELFInitializer;
-import org.graylog2.initializers.HostCounterCacheWriterInitializer;
-import org.graylog2.initializers.MessageCounterInitializer;
-import org.graylog2.initializers.MessageQueueInitializer;
-import org.graylog2.initializers.MessageRetentionInitializer;
-import org.graylog2.initializers.ServerValueWriterInitializer;
-import org.graylog2.initializers.SyslogServerInitializer;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.Writer;
+import org.apache.commons.io.IOUtils;
+import org.apache.log4j.Level;
+import org.apache.log4j.Logger;
+import org.graylog2.filters.BlacklistFilter;
+import org.graylog2.filters.CounterUpdateFilter;
+import org.graylog2.filters.RewriteFilter;
+import org.graylog2.filters.StreamMatcherFilter;
+import org.graylog2.filters.TokenizerFilter;
+import org.graylog2.initializers.*;
+import org.graylog2.inputs.gelf.GELFUDPInput;
+import org.graylog2.inputs.syslog.SyslogUDPInput;
+import org.graylog2.outputs.ElasticSearchOutput;
+
+/*
+ * 
+ * ZOMG TODOS:
+ * 
+ *  * Add two-queue system. Possibly use Disruptor.
+ *  * Add AMQP handling again.
+ *  * Move GELF handling to netty (chunked/non-chunked)
+ *  * Add GELF forwarder again.
+ *  * Add syslog handling again.
+ * 
+ */
 
 /**
  * Main class of Graylog2.
@@ -56,6 +66,8 @@ public final class Main {
      * @param args the command line arguments
      */
     public static void main(String[] args) {
+
+        // So jung kommen wir nicht mehr zusammen.
 
         final CommandLineArguments commandLineArguments = new CommandLineArguments();
         final JCommander jCommander = new JCommander(commandLineArguments, args);
@@ -106,20 +118,34 @@ public final class Main {
         savePidFile(commandLineArguments.getPidFile());
 
         // Le server object. This is where all the magic happens.
-        GraylogServer server = new GraylogServer(configuration);
+        GraylogServer server = new GraylogServer();
+        server.initialize(configuration);
 
         // Register initializers.
         server.registerInitializer(new ServerValueWriterInitializer(server, configuration));
-        server.registerInitializer(new MessageQueueInitializer(server, configuration));
         server.registerInitializer(new DroolsInitializer(server, configuration));
         server.registerInitializer(new HostCounterCacheWriterInitializer(server));
         server.registerInitializer(new MessageCounterInitializer(server));
         server.registerInitializer(new SyslogServerInitializer(server, configuration));
-        
-        // Moar initializers. Conditional for great fun and profit.
-        if (configuration.isUseGELF())        { server.registerInitializer(new GELFInitializer(server, configuration)); }
-        if (configuration.isAmqpEnabled())    { server.registerInitializer(new AMQPInitializer(server, configuration)); }
-        if (configuration.performRetention()) { server.registerInitializer(new MessageRetentionInitializer(server));    }
+        server.registerInitializer(new MessageRetentionInitializer(server));
+        if (configuration.isEnableGraphiteOutput())       { server.registerInitializer(new GraphiteInitializer(server)); }
+        if (configuration.isEnableLibratoMetricsOutput()) { server.registerInitializer(new LibratoMetricsInitializer(server)); }
+
+        // Register inputs.
+        if (configuration.isUseGELF()) { server.registerInput(new GELFUDPInput()); }
+        if (configuration.getSyslogProtocol().equals("udp")) {
+            server.registerInput(new SyslogUDPInput());
+        }
+
+        // Register message filters. - Passing classes here instead of objects, because we need to create a new instance in every filter. (they are stateful)
+        server.registerFilter(RewriteFilter.class);
+        server.registerFilter(BlacklistFilter.class);
+        if (configuration.isEnableTokenizerFilter()) { server.registerFilter(TokenizerFilter.class); }
+        server.registerFilter(StreamMatcherFilter.class);
+        server.registerFilter(CounterUpdateFilter.class);
+
+        // Register outputs.
+        server.registerOutput(ElasticSearchOutput.class);
 
         // Blocks until we shut down.
         server.run();
