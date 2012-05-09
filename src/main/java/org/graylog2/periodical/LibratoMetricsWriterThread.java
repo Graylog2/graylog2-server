@@ -41,7 +41,6 @@ public class LibratoMetricsWriterThread implements Runnable {
     public static final String COUNTER_NAME = "libratocounter";
 
     public static final int INITIAL_DELAY = 0;
-    public static final int PERIOD = 1;
 
     private final GraylogServer graylogServer;
 
@@ -60,7 +59,12 @@ public class LibratoMetricsWriterThread implements Runnable {
 
         MessageCounter counter = this.graylogServer.getMessageCounterManager().get(COUNTER_NAME);
         try {
-            LibratoMetricsFormatter f = new LibratoMetricsFormatter(counter);
+            LibratoMetricsFormatter f = new LibratoMetricsFormatter(
+                    counter,
+                    graylogServer.getConfiguration().getLibratoMetricsPrefix(),
+                    graylogServer.getConfiguration().getLibratoMetricsStreamFilter(),
+                    graylogServer.getConfiguration().getLibratoMetricsHostsFilter()
+            );
 
             send(f.asJson());
 
@@ -90,8 +94,8 @@ public class LibratoMetricsWriterThread implements Runnable {
             connection.setDoInput(true);
             connection.setDoOutput(true);
 
-            connection.setConnectTimeout(950);
-            connection.setReadTimeout(950);
+            connection.setConnectTimeout(2000);
+            connection.setReadTimeout(2000);
 
             // Send request
             DataOutputStream wr = new DataOutputStream (

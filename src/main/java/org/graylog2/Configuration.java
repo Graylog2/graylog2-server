@@ -1,5 +1,5 @@
 /**
- * Copyright 2010 Lennart Koopmann <lennart@socketfeed.com>
+ * Copyright 2010, 2011, 2012 Lennart Koopmann <lennart@socketfeed.com>
  *
  * This file is part of Graylog2.
  *
@@ -159,6 +159,18 @@ public class Configuration {
 
     @Parameter(value = "libratometrics_api_token", required = false)
     private String libratometricsApiToken;
+
+    @Parameter(value = "libratometrics_stream_filter", required = false)
+    private String libratometricsStreamFilter = "";
+
+    @Parameter(value = "libratometrics_host_filter", required = false)
+    private String libratometricsHostFilter = "";
+
+    @Parameter(value = "libratometrics_interval", validator = PositiveIntegerValidator.class, required = false)
+    private int libratometricsInterval = 10;
+
+    @Parameter(value = "libratometrics_prefix", required = false)
+    private String libratometricsPrefix = "gl2";
 
     public int getSyslogListenPort() {
         return syslogListenPort;
@@ -337,6 +349,25 @@ public class Configuration {
 
     public String getLibratoMetricsAPIToken() {
         return libratometricsApiToken;
+    }
+
+    public List<String> getLibratoMetricsStreamFilter() {
+        List<String> r = Lists.newArrayList();
+        r.addAll(Arrays.asList(libratometricsStreamFilter.split(",")));
+
+        return r;
+    }
+
+    public String getLibratoMetricsHostsFilter() {
+        return libratometricsHostFilter;
+    }
+
+    public int getLibratoMetricsInterval() {
+        return libratometricsInterval;
+    }
+
+    public String getLibratoMetricsPrefix() {
+        return libratometricsPrefix;
     }
 
     @ValidatorMethod

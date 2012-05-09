@@ -25,6 +25,7 @@ import com.google.common.collect.Maps;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import org.apache.log4j.Logger;
 import org.json.simple.JSONValue;
 
 /**
@@ -34,12 +35,20 @@ import org.json.simple.JSONValue;
  */
 public class LibratoMetricsFormatter {
 
+    private static final Logger LOG = Logger.getLogger(LibratoMetricsFormatter.class);
+
     private static final String SOURCE = "graylog2";
 
     private MessageCounter counter;
+    List<String> streamFilter;
+    String hostFilter;
+    String prefix;
 
-    public LibratoMetricsFormatter (MessageCounter counter) {
+    public LibratoMetricsFormatter (MessageCounter counter, String prefix, List<String> streamFilter, String hostFilter) {
         this.counter = counter;
+        this.streamFilter = streamFilter;
+        this.hostFilter = hostFilter;
+        this.prefix = prefix;
     }
     
     /*
@@ -73,6 +82,11 @@ public class LibratoMetricsFormatter {
 
         // Streams.
         for(Entry<String, Integer> stream : counter.getStreamCounts().entrySet()) {
+            if (streamFilter.contains(stream.getKey())) {
+                LOG.debug("Not sending stream <" + stream.getKey() + "> to Librato Metrics because it is listed in libratometrics_stream_filter");
+                continue;
+            }
+
             Map<String, Object> s = Maps.newHashMap();
             s.put("value", stream.getValue());
             s.put("source", SOURCE);
@@ -82,6 +96,11 @@ public class LibratoMetricsFormatter {
 
         // Hosts.
         for(Entry<String, Integer> host : counter.getHostCounts().entrySet()) {
+            if (Tools.decodeBase64(host.getKey()).matches(hostFilter)) {
+                LOG.debug("Not sending host <" + host.getKey() + "> to Librato Metrics because it was matched by libratometrics_host_filter");
+                continue;
+            }
+
             Map<String, Object> h = Maps.newHashMap();
             h.put("value", host.getValue());
             h.put("source", SOURCE);
@@ -95,7 +114,7 @@ public class LibratoMetricsFormatter {
     }
 
     private String name(String name) {
-        return "gl2-" + name;
+        return prefix + "-" + name;
     }
 
 }

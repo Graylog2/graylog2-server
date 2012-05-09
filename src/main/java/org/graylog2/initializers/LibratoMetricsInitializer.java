@@ -39,7 +39,7 @@ public class LibratoMetricsInitializer extends SimpleFixedRateScheduleInitialize
         configureScheduler(
                 new LibratoMetricsWriterThread(this.graylogServer),
                 LibratoMetricsWriterThread.INITIAL_DELAY,
-                LibratoMetricsWriterThread.PERIOD
+                graylogServer.getConfiguration().getLibratoMetricsInterval()
         );
     }
 

@@ -2,7 +2,6 @@ package org.graylog2;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.HashMap;
 import java.util.Map;
 
 import junit.framework.Assert;
@@ -16,6 +15,7 @@ import com.github.joschi.jadconfig.RepositoryException;
 import com.github.joschi.jadconfig.ValidationException;
 import com.github.joschi.jadconfig.repositories.InMemoryRepository;
 import com.google.common.collect.Maps;
+import org.bson.types.ObjectId;
 
 /**
  * Unit tests for {@link Configuration} class
@@ -233,5 +233,39 @@ public class ConfigurationTest {
         new JadConfig(new InMemoryRepository(validProperties), configuration).process();
 
         Assert.assertEquals(2, configuration.getMongoReplicaSet().size());
+    }
+
+    @Test
+    public void testGetLibratoMetricsStreamFilter() throws RepositoryException, ValidationException {
+        ObjectId id1 = new ObjectId();
+        ObjectId id2 = new ObjectId();
+        ObjectId id3 = new ObjectId();
+        validProperties.put("libratometrics_stream_filter", id1.toString() + "," + id2.toString() + "," + id3.toString());
+
+        Configuration configuration = new Configuration();
+        new JadConfig(new InMemoryRepository(validProperties), configuration).process();
+
+        Assert.assertEquals(3, configuration.getLibratoMetricsStreamFilter().size());
+        Assert.assertTrue(configuration.getLibratoMetricsStreamFilter().contains(id1.toString()));
+        Assert.assertTrue(configuration.getLibratoMetricsStreamFilter().contains(id2.toString()));
+        Assert.assertTrue(configuration.getLibratoMetricsStreamFilter().contains(id3.toString()));
+    }
+
+    @Test
+    public void testGetLibratoMetricsPrefix() throws RepositoryException, ValidationException {
+        validProperties.put("libratometrics_prefix", "lolwut");
+        Configuration configuration = new Configuration();
+        new JadConfig(new InMemoryRepository(validProperties), configuration).process();
+
+        Assert.assertEquals("lolwut", configuration.getLibratoMetricsPrefix());
+    }
+
+    @Test
+    public void testGetLibratoMetricsPrefixHasStandardValue() throws RepositoryException, ValidationException {
+        // Nothing set.
+        Configuration configuration = new Configuration();
+        new JadConfig(new InMemoryRepository(validProperties), configuration).process();
+
+        Assert.assertEquals("gl2", configuration.getLibratoMetricsPrefix());
     }
 }
