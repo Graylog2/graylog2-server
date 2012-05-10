@@ -22,7 +22,9 @@ package org.graylog2.periodical;
 
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.net.InetSocketAddress;
 import java.net.Socket;
+import java.net.SocketAddress;
 import java.net.SocketException;
 import java.net.UnknownHostException;
 import java.util.List;
@@ -49,12 +51,14 @@ public class GraphiteWriterThread implements Runnable {
 
     String carbonHost;
     int carbonPort;
+    SocketAddress carbonServer;
 
     public GraphiteWriterThread(GraylogServer graylogServer) {
         this.graylogServer = graylogServer;
 
         carbonHost = graylogServer.getConfiguration().getGraphiteCarbonHost();
         carbonPort = graylogServer.getConfiguration().getGraphiteCarbonTcpPort();
+        this.carbonServer = new InetSocketAddress(carbonHost, carbonPort);
     }
 
     @Override
@@ -79,7 +83,8 @@ public class GraphiteWriterThread implements Runnable {
 
     private boolean send(List<String> metrics) {
         try {
-            Socket sock = new Socket(carbonHost, carbonPort);
+            Socket sock = new Socket();
+            sock.connect(this.carbonServer, 5000);
 
             PrintWriter out = new PrintWriter(sock.getOutputStream(), true);
 
