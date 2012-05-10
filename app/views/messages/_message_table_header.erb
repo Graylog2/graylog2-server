@@ -4,6 +4,7 @@
   <%= render :partial => "version_check" %>
 <% end %>
 
+<% unless ::Configuration.hide_message_stats? %>
 Currently containing <span class="highlighted"><%= number_with_delimiter(@total_count, :delimiter => '.') %></span> messages.
 
 <% if @total_count > 0 %>
@@ -15,5 +16,6 @@ Stored <span class="highlighted">
   <%= number_with_delimiter(MessageCount.total_count_of_last_minutes(Setting.get_message_count_interval(current_user)), :delimiter => '.') %>
 </span>
 messages in the last <%= message_count_interval %> minutes.
+<% end %>
 
 <br />

@@ -37,6 +37,10 @@ class Configuration
     general_config :date_format, "%d.%m.%Y - %H:%M:%S"
   end
 
+  def self.hide_message_stats?
+    general_config :hide_message_stats, false
+  end
+
   def self.hoptoad_config(key, default = nil)
     nested_general_config :hoptoad, key, default
   end
@@ -88,7 +92,7 @@ class Configuration
       @email_config[Rails.env]
     end
   end
-  
+
   def self.indexer_config(key = nil, default = nil)
     if key
       config_value @indexer_config, Rails.env, key, default
@@ -117,7 +121,7 @@ class Configuration
   def self.indexer_host
     indexer_config :url
   end
-  
+
   def self.indexer_index_name
     indexer_config :index_name
   end
