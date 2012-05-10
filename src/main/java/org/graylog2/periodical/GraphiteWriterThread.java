@@ -84,7 +84,7 @@ public class GraphiteWriterThread implements Runnable {
     private boolean send(List<String> metrics) {
         try {
             Socket sock = new Socket();
-            sock.connect(this.carbonServer, 5000);
+            sock.connect(this.carbonServer, 1000);
 
             PrintWriter out = new PrintWriter(sock.getOutputStream(), true);
 
