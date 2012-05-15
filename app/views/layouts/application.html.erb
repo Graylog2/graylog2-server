@@ -41,7 +41,7 @@
   <div id="back-to-top">Back to top</div>
 
   <div id="current-throughputs">
-    <span class="health-throughput-current"><%= ServerValue.throughput[:current]/5.to_i %></span> msgs / sec
+    <span class="health-throughput-current"><%= (ServerValue.throughput[:current].to_i)/5.to_i %></span> msgs / sec
   </div>
   <script type="text/javascript">
     $("#current-throughputs").bind("click", function() {
