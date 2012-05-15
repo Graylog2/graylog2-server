@@ -4,6 +4,7 @@ general:
   allow_deleting: false # Allowing deleting of messages negatively impacts performance
   allow_version_check: true # Enables manual (/versioncheck/index) and automatic (every 30min from overview page) version checking against graylog2.org via HTTP. 
   # custom_cookie_name: graylog2_staging1 # Set an own cookie name - Useful for multiple deployments on same host like example.org/staging1/graylog2, example.org/staging2/graylog2
+  # hide_message_stats: false # Hide the message statistics at the top of the messages page.
 
 # Settings for stream subscription emails. 
 subscriptions:
