@@ -89,6 +89,7 @@ public class LibratoMetricsWriterThread implements Runnable {
             connection.setRequestProperty("Authorization", "Basic " + Tools.encodeBase64(auth));
 
             connection.setRequestProperty("Content-Type", "application/json");
+            connection.setRequestProperty("User-Agent", "Graylog2 LibratoMetrics writer");
 
             connection.setUseCaches(false);
             connection.setDoInput(true);
