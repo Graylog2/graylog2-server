@@ -20,8 +20,10 @@
 
 package org.graylog2.inputs.gelf;
 
+import com.yammer.metrics.core.TimerContext;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.TimeUnit;
 import org.apache.log4j.Logger;
 import org.graylog2.GraylogServer;
 import org.graylog2.Tools;
@@ -45,19 +47,25 @@ public class GELFProcessor {
     }
 
     public void messageReceived(GELFMessage message) {
+        server.getMeter(GELFProcessor.class, "IncomingMessages", "messages").mark();
+        
         // Convert to LogMessage
         LogMessage lm = parse(message.getJSON());
 
         if (!lm.isComplete()) {
+            server.getMeter(GELFProcessor.class, "IncompleteMessages", "messages").mark();
             LOG.debug("Skipping incomplete message.");
         }
 
         // Add to process buffer.
         LOG.debug("Adding received GELF message <" + lm.getId() +"> to process buffer: " + lm);
+        server.getMeter(GELFProcessor.class, "ProcessedMessages", "messages").mark();
         server.getProcessBuffer().insert(lm);
     }
 
     private LogMessage parse(String message) {
+        TimerContext tcx = server.getTimer(GELFProcessor.class, "GELFParsed", TimeUnit.MILLISECONDS, TimeUnit.SECONDS).time();
+
         JSONObject json;
         LogMessage lm = new LogMessage();
         
@@ -123,6 +131,9 @@ public class GELFProcessor {
             // Add to message.
             lm.addAdditionalData(key, entry.getValue());
         }
+
+        // Stop metrics timer.
+        tcx.stop();
         
         return lm;
     }
