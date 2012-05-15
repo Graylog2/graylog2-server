@@ -20,6 +20,8 @@
 
 package org.graylog2.initializers;
 
+import com.yammer.metrics.reporting.GraphiteReporter;
+import java.util.concurrent.TimeUnit;
 import org.graylog2.GraylogServer;
 import org.graylog2.periodical.GraphiteWriterThread;
 
@@ -36,6 +38,15 @@ public class GraphiteInitializer extends SimpleFixedRateScheduleInitializer impl
 
     @Override
     public void initialize() {
+        // Enable graphite metrics reporter.
+        GraphiteReporter.enable(
+                30,
+                TimeUnit.SECONDS,
+                this.graylogServer.getConfiguration().getGraphiteCarbonHost(),
+                this.graylogServer.getConfiguration().getGraphiteCarbonTcpPort(),
+                "graylog2-server"
+        );
+
         configureScheduler(
                 new GraphiteWriterThread(this.graylogServer),
                 GraphiteWriterThread.INITIAL_DELAY,
