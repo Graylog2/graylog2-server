@@ -63,18 +63,6 @@ public class ServerValue {
         graylogServer.getMongoBridge().writeThroughput(current, highest);
     }
 
-    public void writeMessageQueueCurrentSize(int size) {
-        set("message_queue_current_size", size);
-    }
-    
-    public void writeMessageQueueBatchSize(int size) {
-        set("message_queue_batch_size", size);
-    }
-
-    public void writeMessageQueuePollFrequency(int freq) {
-        set("message_queue_poll_freq", freq);
-    }
-
     public void writeMessageRetentionLastPerformed(int when) {
         set("message_retention_last_performed", when);
     }
