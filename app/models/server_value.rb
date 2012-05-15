@@ -1,8 +1,6 @@
 class ServerValue
   include Mongoid::Document
 
-  MESSAGE_QUEUE_UNLIMITED_SIZE = -1
-
   field :type, :type => String
 
   def self.throughput
@@ -41,30 +39,6 @@ class ServerValue
   def self.ping
     ping = get("ping")
     ping == "unknown" ? Time.at(0) : Time.at(ping)
-  end
-
-  def self.message_queue_maximum_size_unlimited?
-    MESSAGE_QUEUE_UNLIMITED_SIZE == message_queue_maximum_size
-  end
-
-  def self.message_queue_maximum_size_human
-    message_queue_maximum_size_unlimited? ? "NO" : message_queue_maximum_size
-  end
-
-  def self.message_queue_maximum_size
-    get("message_queue_maximum_size")
-  end
-
-  def self.message_queue_batch_size
-    get("message_queue_batch_size")
-  end
-
-  def self.message_queue_poll_freq
-    get("message_queue_poll_freq")
-  end
-
-  def self.message_queue_current_size
-    get("message_queue_current_size")
   end
 
   def self.message_retention_last_performed

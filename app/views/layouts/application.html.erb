@@ -41,8 +41,7 @@
   <div id="back-to-top">Back to top</div>
 
   <div id="current-throughputs">
-    <span class="health-throughput-current"><%= ServerValue.throughput[:current] %></span> /
-    <span class="health-mqsize-current"><%= ServerValue.message_queue_current_size %></span>
+    <span class="health-throughput-current"><%= ServerValue.throughput[:current]/5.to_i %></span> msgs / sec
   </div>
   <script type="text/javascript">
     $("#current-throughputs").bind("click", function() {
