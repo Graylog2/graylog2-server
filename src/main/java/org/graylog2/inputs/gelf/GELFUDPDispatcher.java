@@ -58,14 +58,14 @@ public class GELFUDPDispatcher extends SimpleChannelHandler {
 
         switch(msg.getGELFType()) {
         case CHUNKED:
-            server.getMeter(GELFUDPDispatcher.class, "DispatchedMessagesChunked", "messages").mark();
+            server.getMeter(GELFUDPDispatcher.class, "DispatchedMessagesChunks", "messages").mark();
             server.getGELFChunkManager().insert(msg);
             break;
         case ZLIB:
         case GZIP:
         case UNCOMPRESSED:
         case UNSUPPORTED:
-            server.getMeter(GELFUDPDispatcher.class, "DispatchedMessagesNonChunked", "messages").mark();
+            server.getMeter(GELFUDPDispatcher.class, "DispatchedNonChunkedMessages", "messages").mark();
             processor.messageReceived(msg);
             break;
         }

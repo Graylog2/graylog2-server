@@ -40,8 +40,8 @@ public class GraphiteInitializer extends SimpleFixedRateScheduleInitializer impl
     public void initialize() {
         // Enable graphite metrics reporter.
         GraphiteReporter.enable(
-                30,
-                TimeUnit.SECONDS,
+                1,
+                TimeUnit.MINUTES,
                 this.graylogServer.getConfiguration().getGraphiteCarbonHost(),
                 this.graylogServer.getConfiguration().getGraphiteCarbonTcpPort(),
                 "graylog2-server"
