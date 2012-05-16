@@ -64,7 +64,7 @@ public class GELFProcessor {
     }
 
     private LogMessage parse(String message) {
-        TimerContext tcx = server.getTimer(GELFProcessor.class, "GELFParsedTime", TimeUnit.MILLISECONDS, TimeUnit.SECONDS).time();
+        TimerContext tcx = server.getTimer(GELFProcessor.class, "GELFParsedTime", TimeUnit.MICROSECONDS, TimeUnit.SECONDS).time();
 
         JSONObject json;
         LogMessage lm = new LogMessage();
