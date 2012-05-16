@@ -215,7 +215,7 @@ public class GraylogServer implements Runnable {
     }
 
     public Meter getMeter(Class meteredClass, String name, String eventType) {
-        String id = name + eventType;
+        String id = meteredClass.getSimpleName() + name + eventType;
         if (this.meters.containsKey(id)) {
             return this.meters.get(id);
         } else {
