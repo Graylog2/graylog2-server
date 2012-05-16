@@ -21,6 +21,7 @@ import org.graylog2.streams.StreamCache;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.yammer.metrics.Metrics;
+import com.yammer.metrics.core.Histogram;
 import com.yammer.metrics.core.Meter;
 import com.yammer.metrics.core.Timer;
 import java.util.Map;
@@ -56,6 +57,7 @@ public class GraylogServer implements Runnable {
     // Metrics.
     private Map<String, Meter> meters = Maps.newHashMap();
     private Map<String, Timer> timers = Maps.newHashMap();
+    private Map<String, Histogram> histograms = Maps.newHashMap();
 
     private ProcessBuffer processBuffer;
     private OutputBuffer outputBuffer;
@@ -232,6 +234,17 @@ public class GraylogServer implements Runnable {
             this.timers.put(name, timer);
 
             return timer;
+        }
+    }
+
+    public Histogram getHistogram(Class meteredClass, String name) {
+        if (this.histograms.containsKey(name)) {
+            return this.histograms.get(name);
+        } else {
+            Histogram histogram = Metrics.newHistogram(meteredClass, name);
+            this.histograms.put(name, histogram);
+
+            return histogram;
         }
     }
 

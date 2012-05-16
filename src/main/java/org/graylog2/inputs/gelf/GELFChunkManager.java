@@ -39,12 +39,14 @@ public class GELFChunkManager extends Thread {
 
     private Map<String, Map<Integer, GELFMessageChunk>> chunks = Maps.newConcurrentMap();
     private GELFProcessor processor;
+    private GraylogServer server;
 
     // The number of seconds a chunk is valid. Every message with chunks older than this will be dropped.
     public static final int SECONDS_VALID = 5;
 
     public GELFChunkManager(GraylogServer server) {
         this.processor = new GELFProcessor(server);
+        this.server = server;
     }
 
     @Override
@@ -59,6 +61,8 @@ public class GELFChunkManager extends Thread {
 
                     // Outdated?
                     if (isOutdated(messageId)) {
+                        server.getMeter(GELFChunkManager.class, "OutdatedMessagesDropped", "messages").mark();
+                        
                         LOG.debug("Not all chunks of <" + messageId + "> arrived in time. Dropping. [" + SECONDS_VALID + "s]");
                         dropMessage(messageId);
                         continue;

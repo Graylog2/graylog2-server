@@ -20,10 +20,12 @@
 
 package org.graylog2.inputs.syslog;
 
+import com.yammer.metrics.core.TimerContext;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.Date;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 import org.apache.log4j.Logger;
 import org.graylog2.GraylogServer;
 import org.graylog2.Tools;
@@ -45,26 +47,33 @@ public class SyslogProcessor {
     }
 
     public void messageReceived(String msg, InetAddress remoteAddress) throws Exception {
+        server.getMeter(SyslogProcessor.class, "IncomingMessages", "messages").mark();
+
         // Convert to LogMessage
         LogMessage lm;
         try {
             lm = parse(msg, remoteAddress);
         } catch (Exception e) {
+            server.getMeter(SyslogProcessor.class, "MessageParsingFailures", "failures").mark();
             LOG.error("Could not parse syslog message. Not further handling.", e);
             return;
         }
 
         if (!lm.isComplete()) {
+            server.getMeter(SyslogProcessor.class, "IncompleteMessages", "messages").mark();
             LOG.debug("Skipping incomplete message.");
             return;
         }
 
         // Add to process buffer.
         LOG.debug("Adding received syslog message <" + lm.getId() +"> to process buffer: " + lm);
+        server.getMeter(SyslogProcessor.class, "ProcessedMessages", "messages").mark();
         server.getProcessBuffer().insert(lm);
     }
 
     private LogMessage parse(String msg, InetAddress remoteAddress) throws UnknownHostException {
+        TimerContext tcx = server.getTimer(SyslogProcessor.class, "SyslogParsedTime", TimeUnit.MICROSECONDS, TimeUnit.SECONDS).time();
+
         LogMessage lm = new LogMessage();
 
         SyslogServerEvent e = new SyslogServerEvent(msg, remoteAddress);
@@ -76,6 +85,8 @@ public class SyslogProcessor {
         lm.setFullMessage(new String(e.getRaw()));
         lm.setCreatedAt(parseDate(e));
         lm.addAdditionalData(parseAdditionalData(e));
+
+        tcx.stop();
 
         return lm;
     }

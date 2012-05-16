@@ -41,13 +41,17 @@ public class SyslogUDPDispatcher extends SimpleChannelHandler {
     private static final Logger LOG = Logger.getLogger(SyslogUDPDispatcher.class);
 
     private SyslogProcessor processor;
+    private GraylogServer server;
 
     public SyslogUDPDispatcher(GraylogServer server) {
         this.processor = new SyslogProcessor(server);
+        this.server = server;
     }
 
     @Override
     public void messageReceived(ChannelHandlerContext ctx, MessageEvent e) throws Exception {
+        server.getMeter(SyslogUDPDispatcher.class, "ReceivedDatagrams", "datagrams").mark();
+
         InetSocketAddress remoteAddress = (InetSocketAddress) e.getRemoteAddress();
 
         ChannelBuffer buffer = (ChannelBuffer) e.getMessage();
