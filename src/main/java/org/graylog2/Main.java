@@ -41,18 +41,6 @@ import org.graylog2.inputs.gelf.GELFUDPInput;
 import org.graylog2.inputs.syslog.SyslogUDPInput;
 import org.graylog2.outputs.ElasticSearchOutput;
 
-/*
- * 
- * ZOMG TODOS:
- * 
- *  * Add two-queue system. Possibly use Disruptor.
- *  * Add AMQP handling again.
- *  * Move GELF handling to netty (chunked/non-chunked)
- *  * Add GELF forwarder again.
- *  * Add syslog handling again.
- * 
- */
-
 /**
  * Main class of Graylog2.
  *
