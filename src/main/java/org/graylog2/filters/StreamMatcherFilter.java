@@ -20,7 +20,9 @@
 
 package org.graylog2.filters;
 
+import com.yammer.metrics.core.TimerContext;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 import org.apache.log4j.Logger;
 import org.graylog2.GraylogServer;
 import org.graylog2.logmessage.LogMessage;
@@ -40,10 +42,14 @@ public class StreamMatcherFilter implements MessageFilter {
 
     @Override
     public boolean filter(LogMessage msg, GraylogServer server) {
+        TimerContext tcx = server.getTimer(StreamMatcherFilter.class, "ProcessTime", TimeUnit.MICROSECONDS, TimeUnit.SECONDS).time();
+
         List<Stream> streams = ROUTER.route(msg);
         msg.setStreams(streams);
 
         LOG.debug("Routed message <" + msg.getId() + "> to " + streams.size() + " streams.");
+
+        tcx.stop();
 
         // Do not discard message.
         return false;

@@ -55,25 +55,13 @@ public class ProcessBufferProcessor implements EventHandler<LogMessageEvent> {
 
         for (Class<? extends MessageFilter> filterType : server.getFilters()) {
             try {
-                // Time metric for single filter.
-                TimerContext filterTcx = server.getTimer(
-                        filterType.getClass(),
-                        "ProcessTime",
-                        TimeUnit.MICROSECONDS,
-                        TimeUnit.SECONDS
-                ).time();
-
                 // Always create a new instance of this filter.
                 MessageFilter filter = filterType.newInstance();
 
                 String name = filterType.getSimpleName();
                 LOG.debug("Applying filter [" + name +"] on message <" + msg.getId() + ">.");
 
-                boolean filterOut = filter.filter(msg, server);
-
-                filterTcx.stop();
-
-                if (filterOut) {
+                if (filter.filter(msg, server)) {
                     LOG.debug("Filter [" + name + "] marked message <" + msg.getId() + "> to be discarded. Dropping message.");
                     server.getMeter(ProcessBufferProcessor.class, "FilteredOutMessages", "messages").mark();
                     return;
