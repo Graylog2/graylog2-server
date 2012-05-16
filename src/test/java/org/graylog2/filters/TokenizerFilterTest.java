@@ -20,6 +20,7 @@
 
 package org.graylog2.filters;
 
+import org.graylog2.GraylogServerStub;
 import org.graylog2.logmessage.LogMessage;
 import org.junit.Test;
 import static org.junit.Assert.*;
@@ -35,7 +36,7 @@ public class TokenizerFilterTest {
         LogMessage msg = new LogMessage();
         msg.setShortMessage("Ohai I am a message k1=v1 k2=v2 Awesome!");
         TokenizerFilter f = new TokenizerFilter();
-        f.filter(msg, null);
+        f.filter(msg, new GraylogServerStub());
 
         assertEquals(2, msg.getAdditionalData().size());
         assertEquals("v1", msg.getAdditionalData().get("_k1"));
@@ -47,7 +48,7 @@ public class TokenizerFilterTest {
         LogMessage msg = new LogMessage();
         msg.setShortMessage("k1=v1 k2=v2 Awesome!");
         TokenizerFilter f = new TokenizerFilter();
-        f.filter(msg, null);
+        f.filter(msg, new GraylogServerStub());
 
         assertEquals(2, msg.getAdditionalData().size());
         assertEquals("v1", msg.getAdditionalData().get("_k1"));
@@ -59,7 +60,7 @@ public class TokenizerFilterTest {
         LogMessage msg = new LogMessage();
         msg.setShortMessage("lolwat Awesome! k1=v1");
         TokenizerFilter f = new TokenizerFilter();
-        f.filter(msg, null);
+        f.filter(msg, new GraylogServerStub());
 
         assertEquals(1, msg.getAdditionalData().size());
         assertEquals("v1", msg.getAdditionalData().get("_k1"));
@@ -70,7 +71,7 @@ public class TokenizerFilterTest {
         LogMessage msg = new LogMessage();
         msg.setShortMessage("foo k2=v2 lolwat Awesome! k1=v1");
         TokenizerFilter f = new TokenizerFilter();
-        f.filter(msg, null);
+        f.filter(msg, new GraylogServerStub());
 
         assertEquals(2, msg.getAdditionalData().size());
         assertEquals("v1", msg.getAdditionalData().get("_k1"));
@@ -82,7 +83,7 @@ public class TokenizerFilterTest {
         LogMessage msg = new LogMessage();
         msg.setShortMessage("k1=v1");
         TokenizerFilter f = new TokenizerFilter();
-        f.filter(msg, null);
+        f.filter(msg, new GraylogServerStub());
 
         assertEquals(1, msg.getAdditionalData().size());
         assertEquals("v1", msg.getAdditionalData().get("_k1"));
@@ -93,7 +94,7 @@ public class TokenizerFilterTest {
         LogMessage msg = new LogMessage();
         msg.setShortMessage("Ohai I am a message and this is a URL: index.php?foo=bar&baz=bar");
         TokenizerFilter f = new TokenizerFilter();
-        f.filter(msg, null);
+        f.filter(msg, new GraylogServerStub());
 
         assertEquals(0, msg.getAdditionalData().size());
     }
@@ -103,7 +104,7 @@ public class TokenizerFilterTest {
         LogMessage msg = new LogMessage();
         msg.setShortMessage("trolololololol");
         TokenizerFilter f = new TokenizerFilter();
-        f.filter(msg, null);
+        f.filter(msg, new GraylogServerStub());
 
         assertEquals(0, msg.getAdditionalData().size());
     }
@@ -113,7 +114,7 @@ public class TokenizerFilterTest {
         LogMessage msg = new LogMessage();
         msg.setShortMessage("Ohai I am a message and this is a URL: index.php?foo=bar");
         TokenizerFilter f = new TokenizerFilter();
-        f.filter(msg, null);
+        f.filter(msg, new GraylogServerStub());
 
         assertEquals(0, msg.getAdditionalData().size());
     }
@@ -124,7 +125,7 @@ public class TokenizerFilterTest {
         msg.addAdditionalData("_k1", "YOU BETTER NOT OVERWRITE");
         msg.setShortMessage("Ohai I am a message k1=v1 k2=v2 Awesome!");
         TokenizerFilter f = new TokenizerFilter();
-        f.filter(msg, null);
+        f.filter(msg, new GraylogServerStub());
 
         assertEquals(2, msg.getAdditionalData().size());
         assertEquals("YOU BETTER NOT OVERWRITE", msg.getAdditionalData().get("_k1"));
