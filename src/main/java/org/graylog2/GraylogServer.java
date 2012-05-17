@@ -25,7 +25,6 @@ import com.yammer.metrics.core.Histogram;
 import com.yammer.metrics.core.Meter;
 import com.yammer.metrics.core.Timer;
 import java.util.Map;
-import java.util.concurrent.Executor;
 import java.util.concurrent.TimeUnit;
 
 public class GraylogServer implements Runnable {
@@ -54,8 +53,6 @@ public class GraylogServer implements Runnable {
     private List<MessageInput> inputs = Lists.newArrayList();
     private List<Class<? extends MessageFilter>> filters = Lists.newArrayList();
     private List<Class<? extends MessageOutput>> outputs = Lists.newArrayList();
-
-    private Executor messageParserPool = Executors.newCachedThreadPool();
 
     // Metrics.
     private Map<String, Meter> meters = Maps.newHashMap();
@@ -251,10 +248,6 @@ public class GraylogServer implements Runnable {
 
             return histogram;
         }
-    }
-
-    public Executor getMessageParserPool() {
-        return this.messageParserPool;
     }
 
 }

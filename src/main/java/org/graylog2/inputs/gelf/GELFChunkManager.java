@@ -39,6 +39,8 @@ public class GELFChunkManager extends Thread {
 
     private static final Logger LOG = Logger.getLogger(GELFChunkManager.class);
 
+    Executor processorPool = Executors.newCachedThreadPool();
+
     private Map<String, Map<Integer, GELFMessageChunk>> chunks = Maps.newConcurrentMap();
     private GraylogServer server;
 
@@ -72,7 +74,7 @@ public class GELFChunkManager extends Thread {
                     if (isComplete(messageId)) {
                         // We got a complete message! Re-assemble and insert to GELFProcessor.
                         LOG.debug("Message <" + messageId + "> seems to be complete. Handling now.");
-                        server.getMessageParserPool().execute(new GELFProcessor(server, new GELFMessage(chunksToByteArray(messageId))));
+                        processorPool.execute(new GELFProcessor(server, new GELFMessage(chunksToByteArray(messageId))));
 
                         // Message has been handled. Drop it.
                         LOG.debug("Message <" + messageId + "> is now being processed. Dropping from chunk map.");
