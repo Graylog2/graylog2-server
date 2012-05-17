@@ -55,7 +55,7 @@ public class GELFUDPDispatcher extends SimpleChannelHandler {
         buffer.toByteBuffer().get(readable, buffer.readerIndex(), buffer.readableBytes());
 
         GELFMessage msg = new GELFMessage(readable);
-
+        
         switch(msg.getGELFType()) {
         case CHUNKED:
             server.getMeter(GELFUDPDispatcher.class, "DispatchedMessagesChunks", "messages").mark();
@@ -69,7 +69,6 @@ public class GELFUDPDispatcher extends SimpleChannelHandler {
             processor.messageReceived(msg);
             break;
         }
-        super.messageReceived(ctx, e);
     }
 
 
