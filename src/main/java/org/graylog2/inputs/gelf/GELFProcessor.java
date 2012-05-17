@@ -37,20 +37,16 @@ import org.json.simple.JSONValue;
  *
  * @author Lennart Koopmann <lennart@socketfeed.com>
  */
-public class GELFProcessor implements Runnable {
+public class GELFProcessor {
 
     private static final Logger LOG = Logger.getLogger(GELFProcessor.class);
     private GraylogServer server;
 
-    private GELFMessage message;
-
-    public GELFProcessor(GraylogServer server, GELFMessage message) {
-        this.message = message;
+    public GELFProcessor(GraylogServer server) {
         this.server = server;
     }
 
-    @Override
-    public void run() {
+    public void messageReceived(GELFMessage message) {
         server.getMeter(GELFProcessor.class, "IncomingMessages", "messages").mark();
         
         // Convert to LogMessage

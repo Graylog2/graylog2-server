@@ -20,8 +20,6 @@
 
 package org.graylog2.inputs.gelf;
 
-import java.util.concurrent.Executor;
-import java.util.concurrent.Executors;
 import org.apache.log4j.Logger;
 import org.graylog2.GraylogServer;
 import org.jboss.netty.buffer.ChannelBuffer;
@@ -39,12 +37,12 @@ public class GELFUDPDispatcher extends SimpleChannelHandler {
 
     private static final Logger LOG = Logger.getLogger(GELFUDPDispatcher.class);
 
-    Executor processorPool = Executors.newCachedThreadPool();
-
+    private GELFProcessor processor;
     private GraylogServer server;
 
     public GELFUDPDispatcher(GraylogServer server) {
         this.server = server;
+        this.processor = new GELFProcessor(server);
     }
 
     @Override
@@ -68,7 +66,7 @@ public class GELFUDPDispatcher extends SimpleChannelHandler {
         case UNCOMPRESSED:
         case UNSUPPORTED:
             server.getMeter(GELFUDPDispatcher.class, "DispatchedNonChunkedMessages", "messages").mark();
-            processorPool.execute(new GELFProcessor(server, msg));
+            processor.messageReceived(msg);
             break;
         }
     }
