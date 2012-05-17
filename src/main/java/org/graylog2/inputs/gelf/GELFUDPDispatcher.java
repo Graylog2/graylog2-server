@@ -39,8 +39,6 @@ public class GELFUDPDispatcher extends SimpleChannelHandler {
 
     private static final Logger LOG = Logger.getLogger(GELFUDPDispatcher.class);
 
-    Executor processorPool = Executors.newCachedThreadPool();
-
     private GraylogServer server;
 
     public GELFUDPDispatcher(GraylogServer server) {
@@ -68,7 +66,7 @@ public class GELFUDPDispatcher extends SimpleChannelHandler {
         case UNCOMPRESSED:
         case UNSUPPORTED:
             server.getMeter(GELFUDPDispatcher.class, "DispatchedNonChunkedMessages", "messages").mark();
-            processorPool.execute(new GELFProcessor(server, msg));
+            server.getMessageParserPool().execute(new GELFProcessor(server, msg));
             break;
         }
     }
