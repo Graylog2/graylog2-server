@@ -37,7 +37,7 @@ import org.graylog2.logmessage.LogMessage;
  */
 public class OutputBuffer {
 
-    protected static final int RING_SIZE = 8192;
+    protected static final int RING_SIZE = 524288;
     protected RingBuffer<LogMessageEvent> ringBuffer;
 
     protected ExecutorService executor = Executors.newCachedThreadPool();
