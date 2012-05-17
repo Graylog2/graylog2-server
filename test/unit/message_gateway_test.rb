@@ -142,6 +142,32 @@ class MessageGatewayTest < ActiveSupport::TestCase
 
     end
 
+    context "additional fields" do
+      
+      should "return all additional fields" do
+        expected = [ :something, :foo, :bar, :a ]
+        expected.each { |field| bm(("_"+field.to_s).to_sym => "VALUE") }
+        
+        results = MessageGateway.all_additional_fields
+
+        assert_equal expected.size, results.size
+        
+        results.each do |v|
+          assert results.include?(v)
+        end
+      end
+
+      should "not fail when there are not additional fields" do
+        bm()
+        assert_equal [], MessageGateway.all_additional_fields
+      end
+
+      should "not fail when there are no messages/fields at all" do
+        assert_equal [], MessageGateway.all_additional_fields
+      end
+
+    end
+
   end
 
 end

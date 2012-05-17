@@ -52,6 +52,13 @@
   <%= awesome_submit_link "Run filter" %>
 <% end -%>
 
+<script type="text/javascript">
+  function reloadAutoCompleteAdditionalFields() {
+    var data = "<%= MessageGateway.all_additional_fields.join ',' %> ".split(",");
+    $(".messages-quickfilter-additional-key").autocomplete(data);
+  }
+</script>
+
 <% unless @quickfilter_result_count.blank? %>
   <br />Quickfilter hit <span class="highlighted"><%= number_with_delimiter(@quickfilter_result_count, :delimiter => '.')  %></span> messages.
 <% end %>
@@ -89,3 +96,5 @@
   <br style="clear: both;" />
 
 <% end %>
+
+

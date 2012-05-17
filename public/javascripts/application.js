@@ -266,6 +266,7 @@ $(document).ready(function(){
       field += "<dd><input name='filters[additional][values][]' type='text' class='messages-quickfilter-additional-value' /></dd>"
 
       $("#messages-quickfilter-fields").append(field);
+      reloadAutoCompleteAdditionalFields(); // Defined in quickfilter partial.
       return false;
     })
 
