@@ -256,7 +256,7 @@ class MessageGateway
   end
 
   def self.all_additional_fields
-    message_mapping["properties"].keys.delete_if{ |field| field[0] != '_' or field.length < 2 }.map{ |field| field[1..-1].to_sym }
+    message_mapping["properties"].keys.delete_if{ |field| field.at(0) != '_' or field.length < 2 }.map{ |field| field[1..-1].to_sym }
   rescue
     []
   end
