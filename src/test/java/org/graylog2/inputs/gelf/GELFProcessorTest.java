@@ -42,10 +42,14 @@ public class GELFProcessorTest {
     @Test
     public void testMessageReceived() throws Exception {
         GraylogServerStub serverStub = new GraylogServerStub();
-        GELFProcessor processor = new GELFProcessor(serverStub);
+        GELFProcessor processor;
+        
+        processor = new GELFProcessor(serverStub, new GELFMessage(TestHelper.zlibCompress(GELF_JSON_COMPLETE)));
+        processor.run();
 
-        processor.messageReceived(new GELFMessage(TestHelper.zlibCompress(GELF_JSON_COMPLETE)));
-        processor.messageReceived(new GELFMessage(TestHelper.gzipCompress(GELF_JSON_COMPLETE)));
+        processor = new GELFProcessor(serverStub, new GELFMessage(TestHelper.gzipCompress(GELF_JSON_COMPLETE)));
+        processor.run();
+
         // All GELF types are tested in GELFMessageTest.
 
         LogMessage lm = serverStub.lastInsertedToProcessBuffer;
@@ -67,9 +71,9 @@ public class GELFProcessorTest {
     @Test
     public void testMessageReceivedSetsCreatedAtToNowIfNotSet() throws Exception {
         GraylogServerStub serverStub = new GraylogServerStub();
-        GELFProcessor processor = new GELFProcessor(serverStub);
+        GELFProcessor processor = new GELFProcessor(serverStub, new GELFMessage(TestHelper.zlibCompress(GELF_JSON_INCOMPLETE)));
+        processor.run();
 
-        processor.messageReceived(new GELFMessage(TestHelper.zlibCompress(GELF_JSON_INCOMPLETE)));
         // All GELF types are tested in GELFMessageTest.
 
         LogMessage lm = serverStub.lastInsertedToProcessBuffer;
@@ -81,9 +85,9 @@ public class GELFProcessorTest {
     @Test
     public void testMessageReceivedSetsLevelToDefaultIfNotSet() throws Exception {
         GraylogServerStub serverStub = new GraylogServerStub();
-        GELFProcessor processor = new GELFProcessor(serverStub);
+        GELFProcessor processor = new GELFProcessor(serverStub, new GELFMessage(TestHelper.zlibCompress(GELF_JSON_INCOMPLETE)));
+        processor.run();
 
-        processor.messageReceived(new GELFMessage(TestHelper.zlibCompress(GELF_JSON_INCOMPLETE)));
         // All GELF types are tested in GELFMessageTest.
 
         LogMessage lm = serverStub.lastInsertedToProcessBuffer;
@@ -95,9 +99,9 @@ public class GELFProcessorTest {
     @Test
     public void testMessageReceivedSetsFacilityToDefaultIfNotSet() throws Exception {
         GraylogServerStub serverStub = new GraylogServerStub();
-        GELFProcessor processor = new GELFProcessor(serverStub);
+        GELFProcessor processor = new GELFProcessor(serverStub, new GELFMessage(TestHelper.zlibCompress(GELF_JSON_INCOMPLETE)));
+        processor.run();
 
-        processor.messageReceived(new GELFMessage(TestHelper.zlibCompress(GELF_JSON_INCOMPLETE)));
         // All GELF types are tested in GELFMessageTest.
 
         LogMessage lm = serverStub.lastInsertedToProcessBuffer;
@@ -109,9 +113,9 @@ public class GELFProcessorTest {
     @Test
     public void testMessageReceivedSkipsSettingIDField() throws Exception {
         GraylogServerStub serverStub = new GraylogServerStub();
-        GELFProcessor processor = new GELFProcessor(serverStub);
+        GELFProcessor processor = new GELFProcessor(serverStub, new GELFMessage(TestHelper.zlibCompress(GELF_JSON_INCOMPLETE_WITH_ID)));
+        processor.run();
 
-        processor.messageReceived(new GELFMessage(TestHelper.zlibCompress(GELF_JSON_INCOMPLETE_WITH_ID)));
         // All GELF types are tested in GELFMessageTest.
 
         LogMessage lm = serverStub.lastInsertedToProcessBuffer;
@@ -125,9 +129,9 @@ public class GELFProcessorTest {
     @Test
     public void testMessageReceivedSkipsNonStandardFields() throws Exception {
         GraylogServerStub serverStub = new GraylogServerStub();
-        GELFProcessor processor = new GELFProcessor(serverStub);
+        GELFProcessor processor = new GELFProcessor(serverStub, new GELFMessage(TestHelper.zlibCompress(GELF_JSON_INCOMPLETE_WITH_NON_STANDARD_FIELD)));
+        processor.run();
 
-        processor.messageReceived(new GELFMessage(TestHelper.zlibCompress(GELF_JSON_INCOMPLETE_WITH_NON_STANDARD_FIELD)));
         // All GELF types are tested in GELFMessageTest.
 
         LogMessage lm = serverStub.lastInsertedToProcessBuffer;

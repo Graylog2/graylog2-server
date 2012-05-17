@@ -27,6 +27,8 @@ import org.apache.log4j.Logger;
 import org.graylog2.GraylogServer;
 
 import com.google.common.collect.Maps;
+import java.util.concurrent.Executor;
+import java.util.concurrent.Executors;
 
 /**
  * GELFChunkManager.java: 13.04.2012 22:38:40
@@ -37,15 +39,15 @@ public class GELFChunkManager extends Thread {
 
     private static final Logger LOG = Logger.getLogger(GELFChunkManager.class);
 
+    Executor processorPool = Executors.newCachedThreadPool();
+
     private Map<String, Map<Integer, GELFMessageChunk>> chunks = Maps.newConcurrentMap();
-    private GELFProcessor processor;
     private GraylogServer server;
 
     // The number of seconds a chunk is valid. Every message with chunks older than this will be dropped.
     public static final int SECONDS_VALID = 5;
 
     public GELFChunkManager(GraylogServer server) {
-        this.processor = new GELFProcessor(server);
         this.server = server;
     }
 
@@ -72,7 +74,7 @@ public class GELFChunkManager extends Thread {
                     if (isComplete(messageId)) {
                         // We got a complete message! Re-assemble and insert to GELFProcessor.
                         LOG.debug("Message <" + messageId + "> seems to be complete. Handling now.");
-                        processor.messageReceived(new GELFMessage(chunksToByteArray(messageId)));
+                        processorPool.execute(new GELFProcessor(server, new GELFMessage(chunksToByteArray(messageId))));
 
                         // Message has been handled. Drop it.
                         LOG.debug("Message <" + messageId + "> is now being processed. Dropping from chunk map.");
