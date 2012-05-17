@@ -56,7 +56,10 @@ public class CounterUpdateFilter implements MessageFilter {
             // Host count.
             counter.incrementHost(msg.getHost());
         }
-
+        
+        // Update hostcounters. Used to build hosts connection.
+        server.getHostCounterCache().increment(msg.getHost());
+        
         tcx.stop();
         
         // Do not discard message.

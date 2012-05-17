@@ -1,5 +1,5 @@
 /**
- * Copyright 2011 Lennart Koopmann <lennart@socketfeed.com>
+ * Copyright 2011, 2012 Lennart Koopmann <lennart@socketfeed.com>
  *
  * This file is part of Graylog2.
  *
@@ -25,7 +25,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
 /**
- * HostCounterCache.java: Feb 21, 2010 4:57:13 PM
+ * HostCounterCache.java: Feb 21, 2011 4:57:13 PM
  *
  * Acts as cache for count updates in the hosts collection. Written to MongoDB
  * by a periodically running thread.
@@ -33,22 +33,8 @@ import java.util.concurrent.ConcurrentMap;
  * @author Lennart Koopmann <lennart@socketfeed.com>
  */
 public class HostCounterCache {
-    private static HostCounterCache instance;
 
     private ConcurrentMap<String, Integer> cache = new ConcurrentHashMap<String, Integer>();
-
-    private HostCounterCache() {}
-
-    /**
-     *
-     * @return
-     */
-    public static synchronized HostCounterCache getInstance() {
-        if (instance == null) {
-            instance = new HostCounterCache();
-        }
-        return instance;
-    }
 
     /**
      * Increment counter cache by 1 for a host.

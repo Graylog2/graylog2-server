@@ -26,6 +26,7 @@ import com.yammer.metrics.core.Meter;
 import com.yammer.metrics.core.Timer;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
+import org.graylog2.database.HostCounterCache;
 
 public class GraylogServer implements Runnable {
 
@@ -46,6 +47,8 @@ public class GraylogServer implements Runnable {
     public static final String MASTER_COUNTER_NAME = "master";
 
     private EmbeddedElasticSearchClient indexer;
+
+    private HostCounterCache hostCounterCache;
 
     private MessageCounterManager messageCounterManager;
 
@@ -79,6 +82,8 @@ public class GraylogServer implements Runnable {
 
         messageCounterManager = new MessageCounterManager();
         messageCounterManager.register(MASTER_COUNTER_NAME);
+
+        hostCounterCache = new HostCounterCache();
 
         processBuffer = new ProcessBuffer(this);
         processBuffer.initialize();
@@ -248,6 +253,10 @@ public class GraylogServer implements Runnable {
 
             return histogram;
         }
+    }
+
+    public HostCounterCache getHostCounterCache() {
+        return this.hostCounterCache;
     }
 
 }
