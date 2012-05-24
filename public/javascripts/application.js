@@ -122,11 +122,10 @@ $(document).ready(function(){
       $("#analytics-new-messages-update-loading").show();
 
       // Update graph.
-      $.post($(this).attr("data-updateurl") + "&hours=" + range_num, function(data) {
-        json = eval('(' + data + ')');
+      $.post($(this).attr("data-updateurl") + "&hours=" + range_num, function(response) {
 
         // Plot is defined inline. (I suck at JavaScript)
-        plot(json.data);
+        plot(response.data);
 
         // Update title.
         $('#analytics-new-messages-range').html(v);
@@ -134,7 +133,7 @@ $(document).ready(function(){
 
         // Hide loading message.
         $("#analytics-new-messages-update-loading").hide();
-      });
+      }, "json");
 
       return false;
     });
@@ -275,23 +274,23 @@ $(document).ready(function(){
     //$.mapKey("s", function() { $("#modal-stream-chooser").modal(standardMapKeyOptions); });
     //$.mapKey("h", function() { $("#modal-host-chooser").modal(standardMapKeyOptions); });
   
+    var mqcount, count;
+
     setInterval(function(){
       // Update current throughput every 5 seconds
-      $.post("/health/currentthroughput", function(data) {
-        json = eval('(' + data + ')');
+      $.post("/health/currentthroughput", function(json) {
         count = $(".health-throughput-current");
         count.html(parseInt(parseInt(json.count)/5)); // /5, because this is the 5 second sum and we want only the 1 second average
         count.fadeOut(200, function() {
           count.fadeIn(200);
         });
-      });
-  
+      }, "json");
     }, 5000);
 });
 
 function buildHostCssId(id) {
   return "visuals-spread-hosts-" + id.replace(/=/g, '');
-}
+};
 
 function bindMessageSidebarClicks() {
   $(".message-row").bind("click", function() {
@@ -318,16 +317,16 @@ function bindMessageSidebarClicks() {
       $("#gln").hide();
     });
   });
-}
+};
 
 // srsly, javascript... - http://stackoverflow.com/questions/1219860/javascript-jquery-html-encoding
 function htmlEncode(v) {
   return $('<div/>').text(v).html();
-}
+};
 
 function notify(what) {
   $.gritter.add({
     title: "Notification",
     text: what
   })
-}
+};
