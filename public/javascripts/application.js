@@ -64,7 +64,7 @@ $(document).ready(function(){
 
     // Stream Quick chooser
     $('#favoritestreamchooser_id').bind('change', function() {
-       window.location = "/streams/show/" + parseInt(this.value);
+       window.location = "/streams/show/" + parseInt(this.value, 10);
     });
 
     // Quickfilter
@@ -86,8 +86,8 @@ $(document).ready(function(){
     });
 
     // Full message view resizing.
-    $('#messages-show-message-full').css('width', parseInt($('#content').css('width'))-15);
-    $('#messages-show-message-full').css('height', parseInt($('#messages-show-message-full').css('height'))+10);
+    $('#messages-show-message-full').css('width', parseInt($('#content').css('width'))-15, 10);
+    $('#messages-show-message-full').css('height', parseInt($('#messages-show-message-full').css('height'))+10, 10);
 
     // Visuals: Message spread permalink
     $('#visuals-spread-hosts-permalink-link').bind('click', function() {
@@ -100,7 +100,7 @@ $(document).ready(function(){
     // Visuals: Update of new messages graph.
     $('#analytics-new-messages-update-submit').bind('click', function() {
       i = $('#analytics-new-messages-update-range');
-      v = parseInt(i.val());
+      v = parseInt(i.val(), 10);
       
       if (v <= 0) {
         return false;
