@@ -27,6 +27,8 @@ import org.apache.log4j.Logger;
 import org.graylog2.GraylogServer;
 
 import com.google.common.collect.Maps;
+import com.yammer.metrics.Metrics;
+import java.util.concurrent.TimeUnit;
 
 /**
  * GELFChunkManager.java: 13.04.2012 22:38:40
@@ -61,7 +63,7 @@ public class GELFChunkManager extends Thread {
 
                     // Outdated?
                     if (isOutdated(messageId)) {
-                        server.getMeter(GELFChunkManager.class, "OutdatedMessagesDropped", "messages").mark();
+                        Metrics.newMeter(GELFChunkManager.class, "OutdatedMessagesDropped", "messages", TimeUnit.SECONDS).mark();
                         
                         LOG.debug("Not all chunks of <" + messageId + "> arrived in time. Dropping. [" + SECONDS_VALID + "s]");
                         dropMessage(messageId);

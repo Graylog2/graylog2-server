@@ -22,6 +22,7 @@ package org.graylog2.buffers.processors;
 
 import com.google.common.collect.Lists;
 import com.lmax.disruptor.EventHandler;
+import com.yammer.metrics.Metrics;
 import com.yammer.metrics.core.TimerContext;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
@@ -50,7 +51,7 @@ public class OutputBufferProcessor implements EventHandler<LogMessageEvent> {
 
     @Override
     public void onEvent(LogMessageEvent event, long sequence, boolean endOfBatch) throws Exception {
-        server.getMeter(OutputBufferProcessor.class, "IncomingMessages", "messages").mark();
+        Metrics.newMeter(OutputBufferProcessor.class, "IncomingMessages", "messages", TimeUnit.SECONDS).mark();
 
         LogMessage msg = event.getMessage();
         LOG.debug("Processing message <" + msg.getId() + "> from OutputBuffer.");
@@ -65,7 +66,7 @@ public class OutputBufferProcessor implements EventHandler<LogMessageEvent> {
 
                     LOG.debug("Writing message batch to [" + outputType.getSimpleName() + "]. Size <" + buffer.size() + ">");
 
-                    server.getHistogram(OutputBufferProcessor.class, "BatchSize").update(buffer.size());
+                    Metrics.newHistogram(OutputBufferProcessor.class, "BatchSize").update(buffer.size());
                     output.write(buffer, server);
                 } catch (Exception e) {
                     LOG.error("Could not write message batch to output [" + outputType.getSimpleName() +"].", e);

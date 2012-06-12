@@ -20,6 +20,8 @@
 
 package org.graylog2.inputs.gelf;
 
+import com.yammer.metrics.Metrics;
+import java.util.concurrent.TimeUnit;
 import org.apache.log4j.Logger;
 import org.graylog2.GraylogServer;
 import org.jboss.netty.buffer.ChannelBuffer;
@@ -47,7 +49,7 @@ public class GELFUDPDispatcher extends SimpleChannelHandler {
 
     @Override
     public void messageReceived(ChannelHandlerContext ctx, MessageEvent e) throws Exception {
-        server.getMeter(GELFUDPDispatcher.class, "ReceivedDatagrams", "datagrams").mark();
+        Metrics.newMeter(GELFUDPDispatcher.class, "ReceivedDatagrams", "datagrams", TimeUnit.SECONDS).mark();
         
         ChannelBuffer buffer = (ChannelBuffer) e.getMessage();
 
@@ -58,14 +60,14 @@ public class GELFUDPDispatcher extends SimpleChannelHandler {
         
         switch(msg.getGELFType()) {
         case CHUNKED:
-            server.getMeter(GELFUDPDispatcher.class, "DispatchedMessagesChunks", "messages").mark();
+            Metrics.newMeter(GELFUDPDispatcher.class, "DispatchedMessagesChunks", "messages", TimeUnit.SECONDS).mark();
             server.getGELFChunkManager().insert(msg);
             break;
         case ZLIB:
         case GZIP:
         case UNCOMPRESSED:
         case UNSUPPORTED:
-            server.getMeter(GELFUDPDispatcher.class, "DispatchedNonChunkedMessages", "messages").mark();
+            Metrics.newMeter(GELFUDPDispatcher.class, "DispatchedNonChunkedMessages", "messages", TimeUnit.SECONDS).mark();
             processor.messageReceived(msg);
             break;
         }

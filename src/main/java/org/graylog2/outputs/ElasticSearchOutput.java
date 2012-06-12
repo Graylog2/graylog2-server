@@ -20,6 +20,7 @@
 
 package org.graylog2.outputs;
 
+import com.yammer.metrics.Metrics;
 import com.yammer.metrics.core.TimerContext;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
@@ -35,9 +36,9 @@ public class ElasticSearchOutput implements MessageOutput {
 
     @Override
     public void write(List<LogMessage> messages, GraylogServer server) throws Exception {
-        server.getMeter(ElasticSearchOutput.class, "Writes", "messages").mark();
+        Metrics.newMeter(ElasticSearchOutput.class, "Writes", "messages", TimeUnit.SECONDS).mark();
 
-        TimerContext tcx = server.getTimer(ElasticSearchOutput.class, "ProcessTimeMilliseconds", TimeUnit.MILLISECONDS, TimeUnit.SECONDS).time();
+        TimerContext tcx = Metrics.newTimer(ElasticSearchOutput.class, "ProcessTimeMilliseconds", TimeUnit.MILLISECONDS, TimeUnit.SECONDS).time();
         server.getIndexer().bulkIndex(messages);
         tcx.stop();
     }

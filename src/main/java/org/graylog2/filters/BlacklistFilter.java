@@ -20,6 +20,7 @@
 
 package org.graylog2.filters;
 
+import com.yammer.metrics.Metrics;
 import com.yammer.metrics.core.TimerContext;
 import java.util.concurrent.TimeUnit;
 import java.util.regex.Pattern;
@@ -40,7 +41,7 @@ public class BlacklistFilter implements MessageFilter {
 
     @Override
     public boolean filter(LogMessage msg, GraylogServer server) {
-        TimerContext tcx = server.getTimer(BlacklistFilter.class, "ProcessTime", TimeUnit.MICROSECONDS, TimeUnit.SECONDS).time();
+        TimerContext tcx = Metrics.newTimer(BlacklistFilter.class, "ProcessTime", TimeUnit.MICROSECONDS, TimeUnit.SECONDS).time();
         for (Blacklist blacklist : Blacklist.fetchAll()) {
             for (BlacklistRule rule : blacklist.getRules()) {
                 if (Pattern.compile(rule.getTerm(), Pattern.DOTALL).matcher(msg.getShortMessage()).matches()) {

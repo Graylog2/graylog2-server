@@ -20,6 +20,7 @@
 
 package org.graylog2.filters;
 
+import com.yammer.metrics.Metrics;
 import com.yammer.metrics.core.TimerContext;
 import java.util.concurrent.TimeUnit;
 import java.util.regex.Pattern;
@@ -54,7 +55,7 @@ public class TokenizerFilter implements MessageFilter {
 
     @Override
     public boolean filter(LogMessage msg, GraylogServer server) {
-        TimerContext tcx = server.getTimer(TokenizerFilter.class, "ProcessTime", TimeUnit.MICROSECONDS, TimeUnit.SECONDS).time();
+        TimerContext tcx = Metrics.newTimer(TokenizerFilter.class, "ProcessTime", TimeUnit.MICROSECONDS, TimeUnit.SECONDS).time();
 
         int extracted = 0;
         if (msg.getShortMessage().contains("=")) {

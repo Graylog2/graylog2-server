@@ -20,6 +20,7 @@
 
 package org.graylog2.filters;
 
+import com.yammer.metrics.Metrics;
 import com.yammer.metrics.core.TimerContext;
 import java.util.concurrent.TimeUnit;
 import org.graylog2.GraylogServer;
@@ -38,7 +39,7 @@ public class CounterUpdateFilter implements MessageFilter {
 
     @Override
     public boolean filter(LogMessage msg, GraylogServer server) {
-        TimerContext tcx = server.getTimer(CounterUpdateFilter.class, "ProcessTime", TimeUnit.MICROSECONDS, TimeUnit.SECONDS).time();
+        TimerContext tcx = Metrics.newTimer(CounterUpdateFilter.class, "ProcessTime", TimeUnit.MICROSECONDS, TimeUnit.SECONDS).time();
 
         // Increment all registered message counters.
         for (MessageCounter counter : server.getMessageCounterManager().getAllCounters().values()) {

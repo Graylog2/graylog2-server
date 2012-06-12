@@ -20,6 +20,7 @@
 
 package org.graylog2.inputs.syslog;
 
+import com.yammer.metrics.Metrics;
 import com.yammer.metrics.core.TimerContext;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
@@ -47,32 +48,32 @@ public class SyslogProcessor {
     }
 
     public void messageReceived(String msg, InetAddress remoteAddress) throws Exception {
-        server.getMeter(SyslogProcessor.class, "IncomingMessages", "messages").mark();
+        Metrics.newMeter(SyslogProcessor.class, "IncomingMessages", "messages", TimeUnit.SECONDS).mark();
 
         // Convert to LogMessage
         LogMessage lm;
         try {
             lm = parse(msg, remoteAddress);
         } catch (Exception e) {
-            server.getMeter(SyslogProcessor.class, "MessageParsingFailures", "failures").mark();
+            Metrics.newMeter(SyslogProcessor.class, "MessageParsingFailures", "failures", TimeUnit.SECONDS).mark();
             LOG.error("Could not parse syslog message. Not further handling.", e);
             return;
         }
 
         if (!lm.isComplete()) {
-            server.getMeter(SyslogProcessor.class, "IncompleteMessages", "messages").mark();
+            Metrics.newMeter(SyslogProcessor.class, "IncompleteMessages", "messages", TimeUnit.SECONDS).mark();
             LOG.debug("Skipping incomplete message.");
             return;
         }
 
         // Add to process buffer.
         LOG.debug("Adding received syslog message <" + lm.getId() +"> to process buffer: " + lm);
-        server.getMeter(SyslogProcessor.class, "ProcessedMessages", "messages").mark();
+        Metrics.newMeter(SyslogProcessor.class, "ProcessedMessages", "messages", TimeUnit.SECONDS).mark();
         server.getProcessBuffer().insert(lm);
     }
 
     private LogMessage parse(String msg, InetAddress remoteAddress) throws UnknownHostException {
-        TimerContext tcx = server.getTimer(SyslogProcessor.class, "SyslogParsedTime", TimeUnit.MICROSECONDS, TimeUnit.SECONDS).time();
+        TimerContext tcx = Metrics.newTimer(SyslogProcessor.class, "SyslogParsedTime", TimeUnit.MICROSECONDS, TimeUnit.SECONDS).time();
 
         LogMessage lm = new LogMessage();
 
