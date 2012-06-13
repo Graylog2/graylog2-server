@@ -31,25 +31,25 @@ import org.jboss.netty.channel.MessageEvent;
 import org.jboss.netty.channel.SimpleChannelHandler;
 
 /**
- * GELFUDPDispatcher.java: 12.04.2012 10:40:21
+ * GELFDispatcher.java: 12.04.2012 10:40:21
  *
  * @author Lennart Koopmann <lennart@socketfeed.com>
  */
-public class GELFUDPDispatcher extends SimpleChannelHandler {
+public class GELFDispatcher extends SimpleChannelHandler {
 
-    private static final Logger LOG = Logger.getLogger(GELFUDPDispatcher.class);
+    private static final Logger LOG = Logger.getLogger(GELFDispatcher.class);
 
     private GELFProcessor processor;
     private GraylogServer server;
 
-    public GELFUDPDispatcher(GraylogServer server) {
+    public GELFDispatcher(GraylogServer server) {
         this.server = server;
         this.processor = new GELFProcessor(server);
     }
 
     @Override
     public void messageReceived(ChannelHandlerContext ctx, MessageEvent e) throws Exception {
-        Metrics.newMeter(GELFUDPDispatcher.class, "ReceivedDatagrams", "datagrams", TimeUnit.SECONDS).mark();
+        Metrics.newMeter(GELFDispatcher.class, "ReceivedDatagrams", "datagrams", TimeUnit.SECONDS).mark();
         
         ChannelBuffer buffer = (ChannelBuffer) e.getMessage();
 
@@ -57,17 +57,17 @@ public class GELFUDPDispatcher extends SimpleChannelHandler {
         buffer.toByteBuffer().get(readable, buffer.readerIndex(), buffer.readableBytes());
 
         GELFMessage msg = new GELFMessage(readable);
-        
+
         switch(msg.getGELFType()) {
         case CHUNKED:
-            Metrics.newMeter(GELFUDPDispatcher.class, "DispatchedMessagesChunks", "messages", TimeUnit.SECONDS).mark();
+            Metrics.newMeter(GELFDispatcher.class, "DispatchedMessagesChunks", "messages", TimeUnit.SECONDS).mark();
             server.getGELFChunkManager().insert(msg);
             break;
         case ZLIB:
         case GZIP:
         case UNCOMPRESSED:
         case UNSUPPORTED:
-            Metrics.newMeter(GELFUDPDispatcher.class, "DispatchedNonChunkedMessages", "messages", TimeUnit.SECONDS).mark();
+            Metrics.newMeter(GELFDispatcher.class, "DispatchedNonChunkedMessages", "messages", TimeUnit.SECONDS).mark();
             processor.messageReceived(msg);
             break;
         }

@@ -24,25 +24,28 @@ import org.graylog2.GraylogServer;
 import org.jboss.netty.channel.ChannelPipeline;
 import org.jboss.netty.channel.ChannelPipelineFactory;
 import org.jboss.netty.channel.Channels;
+import org.jboss.netty.handler.codec.frame.DelimiterBasedFrameDecoder;
+import org.jboss.netty.handler.codec.frame.Delimiters;
 
 /**
- * GELFPipelineFactory.java: 13.04.2012 22:21:33
- *
- * Describe me.
+ * GELFTCPPipelineFactory.java: 13.06.2012 15:31:40
  *
  * @author Lennart Koopmann <lennart@socketfeed.com>
  */
-public class GELFPipelineFactory implements ChannelPipelineFactory {
+public class GELFTCPPipelineFactory implements ChannelPipelineFactory {
 
     GraylogServer server;
 
-    public GELFPipelineFactory(GraylogServer server) {
+    public GELFTCPPipelineFactory(GraylogServer server) {
         this.server = server;
     }
 
     @Override
     public ChannelPipeline getPipeline() throws Exception {
-        return Channels.pipeline(new GELFUDPDispatcher(server));
+        ChannelPipeline p = Channels.pipeline();
+        p.addLast("framer", new DelimiterBasedFrameDecoder(2 * 1024 * 1024, Delimiters.lineDelimiter()));
+        p.addLast("handler", new GELFDispatcher(server));
+        return p;
     }
-    
+
 }

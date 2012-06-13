@@ -37,6 +37,7 @@ import org.graylog2.filters.RewriteFilter;
 import org.graylog2.filters.StreamMatcherFilter;
 import org.graylog2.filters.TokenizerFilter;
 import org.graylog2.initializers.*;
+import org.graylog2.inputs.gelf.GELFTCPInput;
 import org.graylog2.inputs.gelf.GELFUDPInput;
 import org.graylog2.inputs.syslog.SyslogUDPInput;
 import org.graylog2.outputs.ElasticSearchOutput;
@@ -124,7 +125,11 @@ public final class Main {
         if (configuration.isEnableLibratoMetricsOutput()) { server.registerInitializer(new LibratoMetricsInitializer(server)); }
 
         // Register inputs.
-        if (configuration.isUseGELF()) { server.registerInput(new GELFUDPInput()); }
+        if (configuration.isUseGELF()) {
+            server.registerInput(new GELFUDPInput());
+            server.registerInput(new GELFTCPInput());
+        }
+        
         if (configuration.getSyslogProtocol().equals("udp")) {
             server.registerInput(new SyslogUDPInput());
         }

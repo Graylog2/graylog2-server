@@ -20,34 +20,31 @@
 
 package org.graylog2.inputs.gelf;
 
-
-
 import java.net.InetSocketAddress;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import org.apache.log4j.Logger;
-import org.elasticsearch.common.netty.channel.ChannelException;
 import org.graylog2.Configuration;
 import org.graylog2.GraylogServer;
 import org.graylog2.inputs.MessageInput;
-import org.jboss.netty.bootstrap.ConnectionlessBootstrap;
-import org.jboss.netty.channel.FixedReceiveBufferSizePredictorFactory;
-import org.jboss.netty.channel.socket.nio.NioDatagramChannelFactory;
+import org.jboss.netty.bootstrap.ServerBootstrap;
+import org.jboss.netty.channel.ChannelException;
+import org.jboss.netty.channel.socket.nio.NioServerSocketChannelFactory;
 
 /**
- * GELFUDPInput.java: 11.04.2012 22:29:01
+ * GELFTCPInput.java: 13.06.2012 15:26:43
  *
  * @author Lennart Koopmann <lennart@socketfeed.com>
  */
-public class GELFUDPInput implements MessageInput {
+public class GELFTCPInput implements MessageInput {
 
-    private static final Logger LOG = Logger.getLogger(GELFUDPInput.class);
+    private static final Logger LOG = Logger.getLogger(GELFTCPInput.class);
 
-    private static final String NAME = "GELF UDP";
-    
+    private static final String NAME = "GELF TCP";
+
     private GraylogServer graylogServer;
     private InetSocketAddress socketAddress;
-    
+
     @Override
     public void initialize(Configuration configuration, GraylogServer graylogServer) {
         this.graylogServer = graylogServer;
@@ -55,20 +52,22 @@ public class GELFUDPInput implements MessageInput {
 
         spinUp();
     }
-    
-    private void spinUp() {
-        final ExecutorService workerThreadPool = Executors.newCachedThreadPool();
-        final ConnectionlessBootstrap bootstrap = new ConnectionlessBootstrap(new NioDatagramChannelFactory(workerThreadPool));
 
-        bootstrap.setOption("receiveBufferSize", 1048576);
-        bootstrap.setOption("receiveBufferSizePredictorFactory", new FixedReceiveBufferSizePredictorFactory(8192));
-        bootstrap.setPipelineFactory(new GELFUDPPipelineFactory(graylogServer));
+    private void spinUp() {
+        final ExecutorService bossThreadPool = Executors.newCachedThreadPool();
+        final ExecutorService workerThreadPool = Executors.newCachedThreadPool();
+
+        ServerBootstrap tcpBootstrap = new ServerBootstrap(
+            new NioServerSocketChannelFactory(bossThreadPool, workerThreadPool)
+        );
+
+        tcpBootstrap.setPipelineFactory(new GELFTCPPipelineFactory(this.graylogServer));
 
         try {
-            bootstrap.bind(socketAddress);
-            LOG.info("Started UDP GELF server on " + socketAddress);
+            tcpBootstrap.bind(socketAddress);
+            LOG.info("Started TCP GELF server on " + socketAddress);
         } catch (ChannelException e) {
-            LOG.fatal("Could not bind UDP GELF server to address " + socketAddress, e);
+            LOG.fatal("Could not bind TCP GELF server to address " + socketAddress, e);
         }
     }
 
@@ -76,5 +75,5 @@ public class GELFUDPInput implements MessageInput {
     public String getName() {
         return NAME;
     }
-    
+
 }
