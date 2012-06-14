@@ -42,14 +42,18 @@ public class GELFDispatcher extends SimpleChannelHandler {
     private GELFProcessor processor;
     private GraylogServer server;
 
-    public GELFDispatcher(GraylogServer server) {
+    private String parentInput;
+
+    public GELFDispatcher(GraylogServer server, String parentInput) {
         this.server = server;
         this.processor = new GELFProcessor(server);
+        this.parentInput = parentInput;
     }
 
     @Override
     public void messageReceived(ChannelHandlerContext ctx, MessageEvent e) throws Exception {
-        Metrics.newMeter(GELFDispatcher.class, "ReceivedDatagrams", "datagrams", TimeUnit.SECONDS).mark();
+        Metrics.newMeter(GELFDispatcher.class, "ReceivedMessagesVia" + this.parentInput, "messages", TimeUnit.SECONDS).mark();
+        Metrics.newMeter(GELFDispatcher.class, "ReceivedMessages", "messages", TimeUnit.SECONDS).mark();
         
         ChannelBuffer buffer = (ChannelBuffer) e.getMessage();
 

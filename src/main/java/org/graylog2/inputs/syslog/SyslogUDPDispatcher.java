@@ -45,14 +45,18 @@ public class SyslogUDPDispatcher extends SimpleChannelHandler {
     private SyslogProcessor processor;
     private GraylogServer server;
 
-    public SyslogUDPDispatcher(GraylogServer server) {
+    public String parentInput;
+
+    public SyslogUDPDispatcher(GraylogServer server, String parentInput) {
         this.processor = new SyslogProcessor(server);
         this.server = server;
+        this.parentInput = parentInput;
     }
 
     @Override
     public void messageReceived(ChannelHandlerContext ctx, MessageEvent e) throws Exception {
-        Metrics.newMeter(SyslogUDPDispatcher.class, "ReceivedDatagrams", "datagrams", TimeUnit.SECONDS).mark();
+        Metrics.newMeter(SyslogUDPDispatcher.class, "ReceivedMessagesVia" + this.parentInput, "messages", TimeUnit.SECONDS).mark();
+        Metrics.newMeter(SyslogUDPDispatcher.class, "ReceivedMessages", "messages", TimeUnit.SECONDS).mark();
 
         InetSocketAddress remoteAddress = (InetSocketAddress) e.getRemoteAddress();
 

@@ -44,7 +44,7 @@ public class GELFTCPPipelineFactory implements ChannelPipelineFactory {
     public ChannelPipeline getPipeline() throws Exception {
         ChannelPipeline p = Channels.pipeline();
         p.addLast("framer", new DelimiterBasedFrameDecoder(2 * 1024 * 1024, Delimiters.nulDelimiter()));
-        p.addLast("handler", new GELFDispatcher(server));
+        p.addLast("handler", new GELFDispatcher(server, "GELFTCP"));
         return p;
     }
 

@@ -42,7 +42,7 @@ public class GELFUDPPipelineFactory implements ChannelPipelineFactory {
 
     @Override
     public ChannelPipeline getPipeline() throws Exception {
-        return Channels.pipeline(new GELFDispatcher(server));
+        return Channels.pipeline(new GELFDispatcher(server, "GELFUDP"));
     }
     
 }
