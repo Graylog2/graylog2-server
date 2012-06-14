@@ -42,7 +42,7 @@ public class SyslogPipelineFactory implements ChannelPipelineFactory {
 
     @Override
     public ChannelPipeline getPipeline() throws Exception {
-        return Channels.pipeline(new SyslogUDPDispatcher(server, "SyslogUDP"));
+        return Channels.pipeline(new SyslogUDPDispatcher(server));
     }
 
 }
