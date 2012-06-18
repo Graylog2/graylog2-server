@@ -51,7 +51,7 @@ public final class ChunkedGELFClientManager {
     }
 
     /**
-     * Add a chunk to it's message
+     * Add a chunk to its message
      *
      * @param chunk
      * @return NULL if message is not yet complete, the complete ChunkedGELFMessage if this was the last missing chunk
@@ -60,23 +60,26 @@ public final class ChunkedGELFClientManager {
      */
     public ChunkedGELFMessage insertChunk(GELFClientChunk chunk) throws ForeignGELFChunkException, InvalidGELFChunkException {
         ChunkedGELFMessage fullMessage = messageMap.get(chunk.getHash());
-        
+
         if (fullMessage == null) {
             // This is the first chunk of this message. Create a new message.
-            fullMessage = new ChunkedGELFMessage();
-        }
-        
-        // Add this chunk to the message.
-        fullMessage.insertChunk(chunk);
-
-        // Save the message with the new chunk.
-        messageMap.put(chunk.getHash(), fullMessage);
-
-        if (fullMessage.isComplete()) {
-            return fullMessage;
+            final ChunkedGELFMessage newMessage = new ChunkedGELFMessage();
+            fullMessage = messageMap.putIfAbsent(chunk.getHash(), newMessage);
+            if (fullMessage == null) {
+                fullMessage = newMessage;
+            }
         }
 
-        return null;
+        synchronized (fullMessage) {
+            // Add this chunk to the message.
+            fullMessage.insertChunk(chunk);
+
+            if (fullMessage.isComplete()) {
+                return fullMessage;
+            }
+
+            return null;
+        }
     }
 
     /**
