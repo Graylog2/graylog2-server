@@ -26,7 +26,7 @@
     <% if @host.blank? %>
     <dt><%= label_tag "filters[host]", "Host:" %></dt>
     <dd>
-      <%= select_tag "filters[host]", raw("<option></option>" + options_for_select(Host.all.collect {|host| [ h(host.host) ]}.sort, :selected => get_quickfilter_selected(params[:filters], :host, :bson_id))) %>
+      <%= select_tag "filters[host]", raw("<option></option>" + options_for_select(Host.all_hostnames, :selected => get_quickfilter_selected(params[:filters], :host, :bson_id))) %>
     </dd>
     <% end %>
 
