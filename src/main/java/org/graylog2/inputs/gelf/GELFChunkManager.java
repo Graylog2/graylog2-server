@@ -28,7 +28,9 @@ import org.graylog2.GraylogServer;
 
 import com.google.common.collect.Maps;
 import com.yammer.metrics.Metrics;
+import com.yammer.metrics.core.MetricName;
 import java.util.concurrent.TimeUnit;
+import org.graylog2.buffers.processors.ProcessBufferProcessor;
 
 /**
  * GELFChunkManager.java: 13.04.2012 22:38:40
@@ -56,7 +58,7 @@ public class GELFChunkManager extends Thread {
         while (true) {
             try {
                 LOG.debug("Dumping GELF chunk map [" + chunks.size() + "]:\n" + humanReadableChunkMap());
-
+                
                 // Check for complete or outdated messages.
                 for (Map.Entry<String, Map<Integer, GELFMessageChunk>> message : chunks.entrySet()) {
                     String messageId = message.getKey();
