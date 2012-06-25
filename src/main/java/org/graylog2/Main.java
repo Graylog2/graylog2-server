@@ -147,7 +147,7 @@ public final class Main {
         server.registerOutput(ElasticSearchOutput.class);
 
         // Register health checks.
-        server.registerHealthCheck(new MessageFlowHealthCheck());
+        server.registerHealthCheck(new MessageFlowHealthCheck(server));
 
         // Blocks until we shut down.
         server.run();

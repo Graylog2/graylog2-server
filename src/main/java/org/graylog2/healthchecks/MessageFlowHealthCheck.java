@@ -20,11 +20,10 @@
 
 package org.graylog2.healthchecks;
 
-import com.yammer.metrics.Metrics;
+
 import com.yammer.metrics.core.HealthCheck;
-import com.yammer.metrics.core.Meter;
-import com.yammer.metrics.core.MetricName;
-import org.graylog2.buffers.processors.ProcessBufferProcessor;
+import org.graylog2.GraylogServer;
+import org.graylog2.Tools;
 
 /**
  * MessageFlowHealthCheck.java: 19.06.2012 16:04:38.
@@ -33,24 +32,27 @@ import org.graylog2.buffers.processors.ProcessBufferProcessor;
  */
 public class MessageFlowHealthCheck extends HealthCheck {
 
-    public MessageFlowHealthCheck() {
+    private GraylogServer server;
+    
+    public MessageFlowHealthCheck(GraylogServer server) {
         super("messageFlow");
+        this.server = server;
     }
 
     @Override
     protected Result check() throws Exception {
-        MetricName name = new MetricName(ProcessBufferProcessor.class, "IncomingMessagesMinutely");
-        Meter m = (Meter) Metrics.defaultRegistry().allMetrics().get(name);
+        int lastMessage = server.getLastReceivedMessageTimestamp();
+        int now = Tools.getUTCTimestamp();
         
-        if (m == null) {
-            return Result.unhealthy("No messages at all yet");
+        if (lastMessage == 0) {
+            return Result.healthy("No message at all received yet");
+        }
+ 
+        if (lastMessage < (now-60)) {
+            return Result.unhealthy("Message flow zero (last minute) (" + lastMessage + ")");
         }
 
-        if (String.valueOf(m.oneMinuteRate()).startsWith("0")) {
-            return Result.unhealthy("Message flow zero (" + m.oneMinuteRate() + ")");
-        }
-
-        return Result.healthy(String.valueOf(m.oneMinuteRate()));
+        return Result.healthy(String.valueOf(now-lastMessage));
     }
 
 }
