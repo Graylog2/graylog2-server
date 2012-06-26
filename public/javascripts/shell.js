@@ -102,7 +102,7 @@ var Shell = new function() {
   }
 
   var resize_cmd = function() {
-    container_width = parseInt($('#shell-container').css('width'));
+    container_width = parseInt($('#shell-container').css('width'), 10);
     _cmd.css("width", container_width-_uprompt.width()-30);
   }
 
@@ -171,7 +171,7 @@ var Shell = new function() {
             x += "No matches.";
           } else {
             for (key in res.result) {
-              x += htmlEncode(res.result[key]["distinct"]) + "(" + parseInt(res.result[key]["count"]) + "), ";
+              x += htmlEncode(res.result[key]["distinct"]) + "(" + parseInt(res.result[key]["count"], 10) + "), ";
             }
             x = x.substring(0, x.length - 2); // Remove last comma and whitespace.
             x += "</span>"

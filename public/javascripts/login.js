@@ -1,45 +1,56 @@
+
 $(document).ready(function(){
-    $(".login-credentials").bind("focusin", function() {
+
+    var vals = [
+          "Releasing gorillas",
+          "Mounting party hats",
+          "Enraging gorillas",
+          "Preparing gorilla party"
+        ],
+        $loginCredentials = $(".login-credentials"),
+        $loginForm = $("#loginform"),
+        $submitButton = $("#submit"),
+        code,
+        button;
+
+    $loginCredentials.bind("focusin", function(e) {
+      e && e.preventDefault();
+
       if ($(this).hasClass("initial")) {
         $(this).removeClass("initial");
         $(this).val("");
       }
     });
 
-    $(".login-credentials").bind("focusout", function() {
-      if ($(this).val() == "") {
+    $loginCredentials.bind("focusout", function(e) {
+      e && e.preventDefault();
+
+      if (!$(this).val()) {
         $(this).addClass("initial");
         $(this).val($(this).attr("data-stdtext"));
       }
     });
 
-    $("#submit").bind("click", function() {
-      $("#loginform").submit();
-    });
-
-    $(".login-credentials, #remember_me").bind("keypress", function(e) {
+    $loginCredentials.bind("keypress", function(e) {
       code = (e.keyCode ? e.keyCode : e.which);
-      if (code == 13) {
-        $("#loginform").submit();
+      if (code && code === 13) {
+        $loginForm.submit();
       }
     });
 
-    $("#loginform").bind("submit", function() {
-      button = $("#submit");
+    $submitButton.bind("click", function(e) {
+      e && e.preventDefault();
+
+      $loginForm.submit();
+    });
+
+    $loginForm.bind("submit", function(e) {
       // No mutiple submit.
-      if (button.hasClass("submit-disabled")) {
-        return false;
+      if ($submitButton.hasClass("submit-disabled")) {
+        return;
       }
-
-      vals = [
-        "Releasing gorillas",
-        "Mounting party hats",
-        "Enraging gorillas",
-        "Preparing gorilla party"
-      ]
-
-      button.html(vals[Math.floor(Math.random() * vals.length)] + "...");
-      button.addClass("submit-disabled");
+      $submitButton.html(vals[Math.floor(Math.random() * vals.length)] + "...");
+      $submitButton.addClass("submit-disabled");
 
       $(this).submit();
     });
