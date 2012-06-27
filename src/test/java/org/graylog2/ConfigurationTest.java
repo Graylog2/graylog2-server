@@ -76,15 +76,6 @@ public class ConfigurationTest {
         new JadConfig(new InMemoryRepository(validProperties), configuration).process();
     }
 
-    @Test(expected = ValidationException.class)
-    public void testValidateSyslogProtocol() throws RepositoryException, ValidationException {
-
-        validProperties.put("syslog_protocol", "noValidProtocol");
-
-        Configuration configuration = new Configuration();
-        new JadConfig(new InMemoryRepository(validProperties), configuration).process();
-    }
-
     @Test
     public void testForceSyslogRdns() throws RepositoryException, ValidationException {
         Configuration configuration = new Configuration();

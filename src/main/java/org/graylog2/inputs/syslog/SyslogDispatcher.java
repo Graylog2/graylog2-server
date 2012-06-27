@@ -32,27 +32,25 @@ import org.jboss.netty.channel.MessageEvent;
 import org.jboss.netty.channel.SimpleChannelHandler;
 
 /**
- * SyslogUDPDispatcher.java: 30.04.2012 00:13:02
+ * SyslogDispatcher.java: 30.04.2012 00:13:02
  *
  * Describe me.
  *
  * @author Lennart Koopmann <lennart@socketfeed.com>
  */
-public class SyslogUDPDispatcher extends SimpleChannelHandler {
+public class SyslogDispatcher extends SimpleChannelHandler {
 
-    private static final Logger LOG = Logger.getLogger(SyslogUDPDispatcher.class);
+    private static final Logger LOG = Logger.getLogger(SyslogDispatcher.class);
 
     private SyslogProcessor processor;
-    private GraylogServer server;
 
-    public SyslogUDPDispatcher(GraylogServer server) {
+    public SyslogDispatcher(GraylogServer server) {
         this.processor = new SyslogProcessor(server);
-        this.server = server;
     }
 
     @Override
     public void messageReceived(ChannelHandlerContext ctx, MessageEvent e) throws Exception {
-        Metrics.newMeter(SyslogUDPDispatcher.class, "ReceivedMessages", "messages", TimeUnit.SECONDS).mark();
+        Metrics.newMeter(SyslogDispatcher.class, "ReceivedMessages", "messages", TimeUnit.SECONDS).mark();
 
         InetSocketAddress remoteAddress = (InetSocketAddress) e.getRemoteAddress();
 

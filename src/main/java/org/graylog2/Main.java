@@ -40,6 +40,7 @@ import org.graylog2.healthchecks.MessageFlowHealthCheck;
 import org.graylog2.initializers.*;
 import org.graylog2.inputs.gelf.GELFTCPInput;
 import org.graylog2.inputs.gelf.GELFUDPInput;
+import org.graylog2.inputs.syslog.SyslogTCPInput;
 import org.graylog2.inputs.syslog.SyslogUDPInput;
 import org.graylog2.outputs.ElasticSearchOutput;
 
@@ -134,9 +135,8 @@ public final class Main {
             server.registerInput(new GELFTCPInput());
         }
         
-        if (configuration.getSyslogProtocol().equals("udp")) {
-            server.registerInput(new SyslogUDPInput());
-        }
+        if (configuration.isSyslogUdpEnabled()) { server.registerInput(new SyslogUDPInput()); }
+        if (configuration.isSyslogTcpEnabled()) { server.registerInput(new SyslogTCPInput()); }
 
         // Register message filters. - Passing classes here instead of objects, because we need to create a new instance in every filter. (they are stateful)
         server.registerFilter(RewriteFilter.class);

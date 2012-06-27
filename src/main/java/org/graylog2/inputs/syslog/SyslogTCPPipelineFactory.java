@@ -21,28 +21,41 @@
 package org.graylog2.inputs.syslog;
 
 import org.graylog2.GraylogServer;
+import org.jboss.netty.buffer.ChannelBuffer;
 import org.jboss.netty.channel.ChannelPipeline;
 import org.jboss.netty.channel.ChannelPipelineFactory;
 import org.jboss.netty.channel.Channels;
+import org.jboss.netty.handler.codec.frame.DelimiterBasedFrameDecoder;
+import org.jboss.netty.handler.codec.frame.Delimiters;
 
 /**
- * SyslogPipelineFactory.java: 30.04.2012 00:12:09
+ * SyslogTCPPipelineFactory.java: 27.06.2012 16:26:11
  *
  * Describe me.
  *
  * @author Lennart Koopmann <lennart@socketfeed.com>
  */
-public class SyslogPipelineFactory implements ChannelPipelineFactory {
-
+public class SyslogTCPPipelineFactory implements ChannelPipelineFactory {
+    
     GraylogServer server;
 
-    public SyslogPipelineFactory(GraylogServer server) {
+    public SyslogTCPPipelineFactory(GraylogServer server) {
         this.server = server;
     }
 
     @Override
     public ChannelPipeline getPipeline() throws Exception {
-        return Channels.pipeline(new SyslogDispatcher(server));
+        ChannelBuffer[] delimiter;
+        if (this.server.getConfiguration().isSyslogUseNulDelimiterEnabled()) {
+            delimiter = Delimiters.nulDelimiter();
+        } else {
+            delimiter = Delimiters.lineDelimiter();
+        }
+                
+        ChannelPipeline p = Channels.pipeline();
+        p.addLast("framer", new DelimiterBasedFrameDecoder(2 * 1024 * 1024, delimiter));
+        p.addLast("handler", new SyslogDispatcher(server));
+        return p;
     }
-
+    
 }

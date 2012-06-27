@@ -48,13 +48,19 @@ public class Configuration {
 
     @Parameter(value = "syslog_listen_port", required = true, validator = InetPortValidator.class)
     private int syslogListenPort = 514;
-
-    @Parameter(value = "syslog_protocol", required = true)
-    private String syslogProtocol = "udp";
-
+    
     @Parameter(value = "syslog_listen_address")
     private String syslogListenAddress = "0.0.0.0";
 
+    @Parameter(value = "syslog_enable_udp", required = true)
+    private boolean syslogEnableUdp = true;
+
+    @Parameter(value = "syslog_enable_tcp", required = true)
+    private boolean syslogEnableTcp = false;
+    
+    @Parameter(value = "syslog_use_nul_delimiter", required = false)
+    private boolean syslogUseNulDelimiter = false;
+    
     @Parameter(value = "force_syslog_rdns", required = true)
     private boolean forceSyslogRdns = false;
 
@@ -186,8 +192,16 @@ public class Configuration {
         return syslogListenAddress;
     }
 
-    public String getSyslogProtocol() {
-        return syslogProtocol;
+    public boolean isSyslogUdpEnabled() {
+        return syslogEnableUdp;
+    }
+    
+    public boolean isSyslogTcpEnabled() {
+        return syslogEnableTcp;
+    }
+    
+    public boolean isSyslogUseNulDelimiterEnabled() {
+        return syslogUseNulDelimiter;
     }
 
     public boolean getForceSyslogRdns() {
@@ -390,11 +404,6 @@ public class Configuration {
         if (isMongoUseAuth() && (null == getMongoUser() || null == getMongoPassword())) {
 
             throw new ValidationException("mongodb_user and mongodb_password have to be set if mongodb_useauth is true");
-        }
-
-        // Is the syslog_procotol valid?
-        if (!Arrays.asList("tcp", "udp").contains(getSyslogProtocol())) {
-            throw new ValidationException("Invalid syslog_protocol: " + getSyslogProtocol());
         }
     }
 
