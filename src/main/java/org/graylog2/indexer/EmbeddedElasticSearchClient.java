@@ -1,5 +1,6 @@
 package org.graylog2.indexer;
 
+import com.beust.jcommander.internal.Maps;
 import static org.elasticsearch.index.query.QueryBuilders.rangeQuery;
 import static org.elasticsearch.node.NodeBuilder.nodeBuilder;
 
@@ -11,8 +12,10 @@ import java.util.Map;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.log4j.Logger;
+import org.elasticsearch.Version;
 import org.elasticsearch.action.ActionFuture;
 import org.elasticsearch.action.admin.indices.create.CreateIndexRequest;
+import org.elasticsearch.action.admin.indices.create.CreateIndexRequestBuilder;
 import org.elasticsearch.action.admin.indices.create.CreateIndexResponse;
 import org.elasticsearch.action.admin.indices.exists.IndicesExistsRequest;
 import org.elasticsearch.action.admin.indices.exists.IndicesExistsResponse;
@@ -25,7 +28,14 @@ import org.elasticsearch.action.index.IndexRequest.OpType;
 import org.elasticsearch.action.index.IndexRequestBuilder;
 import org.elasticsearch.action.index.IndexResponse;
 import org.elasticsearch.client.Client;
+import org.elasticsearch.common.collect.ImmutableMap;
+import org.elasticsearch.common.settings.NoClassSettingsException;
+import org.elasticsearch.common.settings.Settings;
+import org.elasticsearch.common.settings.SettingsException;
 import org.elasticsearch.common.settings.loader.YamlSettingsLoader;
+import org.elasticsearch.common.unit.ByteSizeValue;
+import org.elasticsearch.common.unit.SizeValue;
+import org.elasticsearch.common.unit.TimeValue;
 import org.elasticsearch.common.xcontent.XContentType;
 import org.elasticsearch.index.query.QueryBuilder;
 import org.elasticsearch.node.Node;
@@ -41,6 +51,7 @@ public class EmbeddedElasticSearchClient {
 
     private Client client;
     public static final String TYPE = "message";
+    public static final String RECENT_INDEX_NAME = "graylog2_recent";
 
     final static Calendar cal = Calendar.getInstance();
 
@@ -78,6 +89,24 @@ public class EmbeddedElasticSearchClient {
 
     public boolean createIndex() {
         final ActionFuture<CreateIndexResponse> createFuture = client.admin().indices().create(new CreateIndexRequest(getIndexName()));
+        final boolean acknowledged = createFuture.actionGet().acknowledged();
+        if (!acknowledged) {
+            return false;
+        }
+        final PutMappingRequest mappingRequest = Mapping.getPutMappingRequest(client, getIndexName());
+        final boolean mappingCreated = client.admin().indices().putMapping(mappingRequest).actionGet().acknowledged();
+        return acknowledged && mappingCreated;
+    }
+    
+    public boolean createRecentIndex() {
+        Map<String, Object> settings = Maps.newHashMap();
+        settings.put("index.store.type", "memory");
+        
+        CreateIndexRequestBuilder crb = new CreateIndexRequestBuilder(client.admin().indices());
+        crb.setIndex(RECENT_INDEX_NAME);
+        crb.setSettings(settings);
+        
+        final ActionFuture<CreateIndexResponse> createFuture = client.admin().indices().create(crb.request());
         final boolean acknowledged = createFuture.actionGet().acknowledged();
         if (!acknowledged) {
             return false;
