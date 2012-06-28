@@ -190,13 +190,12 @@ public class LogMessage {
         this.shortMessage = shortMessage;
     }
 
-    public void addAdditionalData(String key, Object value) {
-        // Add the required underscore if it was not set.
-        if (!key.startsWith("_")) {
-            key = "_" + key;
-        }
-        
-        this.additionalData.put(key, value);
+    public void addAdditionalData(String key, Object value) {       
+        this.additionalData.put(prepareAdditionalDataKey(key), value);
+    }
+    
+    public void addAdditionalData(String key, String value) {
+        this.additionalData.put(prepareAdditionalDataKey(key), value.trim());
     }
 
     public void addAdditionalData(Map<String, String> fields) {
@@ -219,6 +218,17 @@ public class LogMessage {
 
     public List<Stream> getStreams() {
         return this.streams;
+    }
+    
+    private String prepareAdditionalDataKey(final String _key) {
+        String key = _key.trim();
+        
+        // Add the required underscore if it was not set.
+        if (!key.startsWith("_")) {
+            key = "_" + key;
+        }
+
+        return key;
     }
 
 }
