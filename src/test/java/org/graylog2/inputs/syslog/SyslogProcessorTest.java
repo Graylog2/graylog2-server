@@ -90,5 +90,21 @@ public class SyslogProcessorTest {
         assertEquals(0, serverStub.callsToProcessBufferInserter);
         assertNull(serverStub.lastInsertedToProcessBuffer);
     }
+    
+    @Test
+    public void testFullMessageIsNotStoredIfConfigured() throws Exception {
+        GraylogServerStub serverStub = new GraylogServerStub();
+        Configuration configStub = new Configuration();
+        configStub.setForceSyslogRdns(true);
+        configStub.setISyslogStoreFullMessageEnabled(false);
+        serverStub.setConfigurationStub(configStub);
+        SyslogProcessor processor = new SyslogProcessor(serverStub);
+        
+        processor.messageReceived(ValidNonStructuredMessage, InetAddress.getLocalHost());
+
+        LogMessage lm = serverStub.lastInsertedToProcessBuffer;
+
+        assertNull(lm.getFullMessage());
+    }
 
 }

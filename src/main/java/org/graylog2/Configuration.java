@@ -61,6 +61,9 @@ public class Configuration {
     @Parameter(value = "syslog_use_nul_delimiter", required = false)
     private boolean syslogUseNulDelimiter = false;
     
+    @Parameter(value = "syslog_store_full_message", required = false)
+    private boolean syslogStoreFullMessage = true;
+    
     @Parameter(value = "force_syslog_rdns", required = true)
     private boolean forceSyslogRdns = false;
 
@@ -202,6 +205,14 @@ public class Configuration {
     
     public boolean isSyslogUseNulDelimiterEnabled() {
         return syslogUseNulDelimiter;
+    }
+    
+    public boolean isSyslogStoreFullMessageEnabled() {
+        return syslogStoreFullMessage;
+    }
+    
+    public void setISyslogStoreFullMessageEnabled(boolean b) {
+        syslogStoreFullMessage = b;
     }
 
     public boolean getForceSyslogRdns() {

@@ -65,6 +65,11 @@ public class SyslogProcessor {
             LOG.debug("Skipping incomplete message.");
             return;
         }
+        
+        // Possibly remove full message.
+        if (!this.server.getConfiguration().isSyslogStoreFullMessageEnabled()) {
+            lm.setFullMessage(null);
+        }
 
         // Add to process buffer.
         LOG.debug("Adding received syslog message <" + lm.getId() +"> to process buffer: " + lm);
