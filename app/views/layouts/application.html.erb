@@ -28,7 +28,9 @@
   <% end %>
   <%= javascript_include_tag "backtotop" if @use_backtotop %>
   <%= javascript_include_tag "application" %>
-  <%= javascript_include_tag "shell" if @has_shell %>
+  <% if @has_shell %>
+    <%= javascript_include_tag "jquery.graylog2shell.js" %>
+  <% end %>
   <%= javascript_include_tag "realtime" if @has_realtime %>
   <%= javascript_include_tag "rails" %>
 </head>
@@ -82,13 +84,17 @@
 
   <% if @has_shell %>
     <div id="shell-container">
-      <ul id="shell">
-        <li>
+      <div id="shell">
+        <div id="shell-oldinput-container">
+
+        </div>
+        <div>
           <span class="shell-prompt"><%= current_user.login %> #</span>
-          <input id="shell-command-input" class="shell-command" type="text" spellcheck="false"></input>
-        </li>
-      </ul>
+          <input id="shell-command-input" class="shell-command" type="text" spellcheck="false">
+        </div>
+      </div>
     </div>
+    <%= javascript_tag("$('#shell-container').shell();") %>
   <% end %>
  <% end %>
 
