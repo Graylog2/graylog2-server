@@ -131,10 +131,9 @@ module ApplicationHelper
       });"
     end
 
-    r += "$.post('#{url}', function(data) {
-        json = eval('(' + data + ')');
-          plot#{uid}(json.data);
-        });
+    r += "$.post('#{url}', function(json) {
+            plot#{uid}(json.data);
+          }, 'json');
     </script>"
 
     return r
