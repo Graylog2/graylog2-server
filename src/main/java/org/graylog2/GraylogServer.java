@@ -141,20 +141,30 @@ public class GraylogServer implements Runnable {
         BlacklistCache.initialize(this);
         StreamCache.initialize(this);
 
-        if (indexer.indexExists()) {
-            LOG.info("Index exists. Not creating it.");
+        if (indexer.indexExists(indexer.getMainIndexName())) {
+            LOG.info("Main index exists. Not creating it.");
         } else {
-            LOG.info("Index does not exist! Trying to create it ...");
+            LOG.info("Main index does not exist! Trying to create it ...");
             if (indexer.createIndex()) {
-                LOG.info("Successfully created index.");
+                LOG.info("Successfully created main index.");
             } else {
-                LOG.fatal("Could not create Index. Terminating.");
+                LOG.fatal("Could not create main index. Terminating.");
                 System.exit(1);
             }
         }
         
-        ////// XXXXXXXXXXX
-        indexer.createRecentIndex();
+        // XXX TODO lol code duplication. make this smart.
+        if (indexer.indexExists(EmbeddedElasticSearchClient.RECENT_INDEX_NAME)) {
+            LOG.info("Recent index exists. Not creating it.");
+        } else {
+            LOG.info("Recent index does not exist! Trying to create it ...");
+            if (indexer.createRecentIndex()) {
+                LOG.info("Successfully created recent index.");
+            } else {
+                LOG.fatal("Could not create recent index. Terminating.");
+                System.exit(1);
+            }
+        }
 
         // Statically set timeout for LogglyForwarder.
         // TODO: This is a code smell and needs to be fixed.

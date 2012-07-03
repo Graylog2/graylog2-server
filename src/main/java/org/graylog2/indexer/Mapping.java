@@ -48,27 +48,13 @@ public class Mapping {
         mapping.put("properties", partFieldProperties());
         mapping.put("dynamic_templates", partDefaultAllInDynamicTemplate());
         mapping.put("_source", enabledAndCompressed()); // Compress source field..
+        mapping.put("_ttl", enabled()); // Enable purging by TTL.
 
         final Map completeMapping = new HashMap();
         completeMapping.put(EmbeddedElasticSearchClient.TYPE, mapping);
 
         builder.setSource(completeMapping);
         return builder.request();
-    }
-
-    public static Map get() {
-        final Map mapping = new HashMap();
-        mapping.put("properties", partFieldProperties());
-        mapping.put("dynamic_templates", partDefaultAllInDynamicTemplate());
-        mapping.put("_source", enabledAndCompressed()); // Compress source field..
-
-        final Map completeMapping = new HashMap();
-        completeMapping.put(EmbeddedElasticSearchClient.TYPE, mapping);
-
-        final Map spec = new HashMap();
-        spec.put("mappings", completeMapping);
-
-        return spec;
     }
 
     /*
@@ -134,6 +120,14 @@ public class Mapping {
         return type;
     }
 
+    private static Map enabled() {
+        final Map e = new HashMap();
+        e.put("enabled", true);
+
+        return e;
+    }
+
+    
     private static Map enabledAndCompressed() {
         final Map e = new HashMap();
         e.put("enabled", true);
