@@ -113,8 +113,8 @@ public class GELFProcessor {
         }
 
         // Add additional data if there is some.
-        Set<Map.Entry<String, String>> entrySet = json.entrySet();
-        for(Map.Entry<String, String> entry : entrySet) {
+        Set<Map.Entry<String, Object>> entrySet = json.entrySet();
+        for(Map.Entry<String, Object> entry : entrySet) {
 
             String key = entry.getKey();
 
