@@ -43,6 +43,15 @@ class ApplicationController < ActionController::Base
   end
 
   def login_required
+    if  request.format.json? then
+      return true if logged_in?
+      if user = authenticate_with_http_basic { |u, p| User.authenticate(u, p) }
+        current_user = user
+        return true
+      else
+        return request_http_basic_authentication
+      end
+    end
     if !logged_in?
       store_location
       redirect_to login_path
