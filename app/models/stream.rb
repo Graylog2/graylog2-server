@@ -38,6 +38,19 @@ class Stream
     _id = $1 if /^([0-9a-f]+)-/ =~ _id
     first(:conditions => { :_id => BSON::ObjectId(_id)})
   end
+  
+  def self.find_by_shortname(shortname)
+    first(:conditions => { :shortname => shortname})
+  end
+
+  def self.find_by_id_or_name(id_or_name)
+    begin
+      return self.find_by_id id_or_name
+    rescue 
+      return self.find_by_shortname id_or_name
+    end
+    return nil
+  end
 
   def title_possibly_disabled
     disabled ? title + " (disabled)" : title if title

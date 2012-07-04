@@ -20,7 +20,7 @@ class MessagesController < ApplicationController
       @total_count = @messages.total_result_count
     elsif params[:stream_id]
       @scoping = :stream
-      @stream = Stream.find_by_id(params[:stream_id])
+      @stream = Stream.find_by_id_or_name(params[:stream_id])
       @is_favorited = current_user.favorite_streams.include?(params[:stream_id])
 
       # Check streams for reader.
@@ -74,6 +74,10 @@ class MessagesController < ApplicationController
 
     if ::Configuration.allow_version_check
       @last_version_check = current_user.last_version_check
+    end
+    respond_to do |format|
+        format.html
+        format.json { render :json => @messages }
     end
   end
 
