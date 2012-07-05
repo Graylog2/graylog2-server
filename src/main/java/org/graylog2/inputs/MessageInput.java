@@ -29,8 +29,8 @@ import org.graylog2.GraylogServer;
  */
 public interface MessageInput {
     
-    public void initialize(Configuration configuration, GraylogServer graylogServer);
+    void initialize(Configuration configuration, GraylogServer graylogServer);
    
-    public String getName();
+    String getName();
     
 }

@@ -37,6 +37,6 @@ public interface MessageFilter {
      * @param server
      * @return true if this message should not further be handled (for example for blacklisting purposes)
      */
-    public boolean filter(LogMessage msg, GraylogServer server);
+    boolean filter(LogMessage msg, GraylogServer server);
     
 }
