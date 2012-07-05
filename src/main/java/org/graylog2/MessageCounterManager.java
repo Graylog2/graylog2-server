@@ -24,10 +24,6 @@ import com.google.common.collect.Maps;
 import java.util.Map;
 
 /**
- * MessageCounterManager.java: 08.05.2012 16:39:39
- *
- * Describe me.
- *
  * @author Lennart Koopmann <lennart@socketfeed.com>
  */
 public class MessageCounterManager {

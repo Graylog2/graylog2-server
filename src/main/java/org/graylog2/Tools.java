@@ -36,8 +36,6 @@ import java.util.zip.InflaterInputStream;
 import org.drools.util.codec.Base64;
 
 /**
- * Tools.java: May 17, 2010 9:46:31 PM
- *
  * Utilty class for various tool/helper functions.
  *
  * @author Lennart Koopmann <lennart@socketfeed.com>

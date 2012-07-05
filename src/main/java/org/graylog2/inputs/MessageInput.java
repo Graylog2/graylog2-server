@@ -23,8 +23,6 @@ import org.graylog2.Configuration;
 import org.graylog2.GraylogServer;
 
 /**
- * MessageInput.java: 11.04.2012 22:29:50
- *
  * @author Lennart Koopmann <lennart@socketfeed.com>
  */
 public interface MessageInput {

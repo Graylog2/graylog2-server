@@ -24,8 +24,6 @@ import com.mongodb.DBObject;
 import org.bson.types.ObjectId;
 
 /**
- * StreamRule.java: Mar 17, 2011 10:27:48 PM
- *
  * Representing the rules of a single stream.
  *
  * @author Lennart Koopmann <lennart@socketfeed.com>

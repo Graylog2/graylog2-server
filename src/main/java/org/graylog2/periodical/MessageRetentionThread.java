@@ -28,8 +28,6 @@ import org.graylog2.indexer.retention.MessageRetention;
 import org.graylog2.settings.Setting;
 
 /**
- * MessageRetentionThread.java: Nov 22, 2011 7:35:10 PM
- * <p/>
  * Removes messages from indexer that are older than specified retention time.
  *
  * @author Lennart Koopmann <lennart@socketfeed.com>

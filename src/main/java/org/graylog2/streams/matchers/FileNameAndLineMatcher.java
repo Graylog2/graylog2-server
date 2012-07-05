@@ -25,10 +25,6 @@ import org.graylog2.logmessage.LogMessage;
 import org.graylog2.streams.StreamRule;
 
 /**
- * FileNameAndLineMatcher.java: Oct 09, 2011 11:04:19 AM
- *
- * [description]
- *
  * @author Lennart Koopmann <lennart@socketfeed.com>
  */
 public class FileNameAndLineMatcher implements StreamRuleMatcher {

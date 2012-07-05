@@ -30,8 +30,6 @@ import org.elasticsearch.action.admin.indices.mapping.put.PutMappingRequestBuild
 import org.elasticsearch.client.Client;
 
 /**
- * Mapping.java: Sep 05, 2011 3:34:57 PM
- *
  * Representing the message type mapping in ElasticSearch. This is giving ES more
  * information about what the fields look like and how it should analyze them.
  *

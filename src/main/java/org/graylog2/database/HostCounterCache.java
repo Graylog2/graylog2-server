@@ -25,8 +25,6 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
 /**
- * HostCounterCache.java: Feb 21, 2011 4:57:13 PM
- *
  * Acts as cache for count updates in the hosts collection. Written to MongoDB
  * by a periodically running thread.
  *

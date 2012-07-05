@@ -33,8 +33,6 @@ import org.graylog2.logmessage.LogMessage;
 import org.graylog2.outputs.MessageOutput;
 
 /**
- * OutputBufferProcessor.java: 29.04.2012 21:05:44
- *
  * @author Lennart Koopmann <lennart@socketfeed.com>
  */
 public class OutputBufferProcessor implements EventHandler<LogMessageEvent> {

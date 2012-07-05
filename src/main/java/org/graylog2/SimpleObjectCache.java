@@ -20,8 +20,6 @@
 package org.graylog2;
 
 /**
- * SimpleObjectCache.java: Apr 1, 2011 4:54:25 PM
- * <p/>
  * Singleton caching objects. Derive from this like StreamCache and
  * BlacklistCache.
  *

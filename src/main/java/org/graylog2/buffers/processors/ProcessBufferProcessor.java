@@ -31,8 +31,6 @@ import org.graylog2.filters.MessageFilter;
 import org.graylog2.logmessage.LogMessage;
 
 /**
- * ProcessBufferProcessor.java: 17.04.2012 16:19:19
- *
  * @author Lennart Koopmann <lennart@socketfeed.com>
  */
 public class ProcessBufferProcessor implements EventHandler<LogMessageEvent> {

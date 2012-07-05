@@ -31,8 +31,6 @@ import org.graylog2.blacklists.BlacklistRule;
 import org.graylog2.logmessage.LogMessage;
 
 /**
- * BlacklistFilter.java: 19.04.2012 13:02:39
- *
  * @author Lennart Koopmann <lennart@socketfeed.com>
  */
 public class BlacklistFilter implements MessageFilter {

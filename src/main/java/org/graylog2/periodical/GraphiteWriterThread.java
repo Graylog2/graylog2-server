@@ -34,8 +34,6 @@ import org.graylog2.GraylogServer;
 import org.graylog2.MessageCounter;
 
 /**
- * GraphiteWriterThread.java: 08.05.2012 16:13:29
- *
  * @author Lennart Koopmann <lennart@socketfeed.com>
  */
 public class GraphiteWriterThread implements Runnable {

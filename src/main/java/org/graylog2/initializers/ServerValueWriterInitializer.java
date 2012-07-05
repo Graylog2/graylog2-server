@@ -28,8 +28,6 @@ import org.graylog2.Tools;
 import org.graylog2.periodical.ServerValueWriterThread;
 
 /**
- * ServerValueWriterInitializer.java: Apr 11, 2012 7:28:52 PM
- *
  * @author Lennart Koopmann <lennart@socketfeed.com>
  */
 public class ServerValueWriterInitializer extends SimpleFixedRateScheduleInitializer implements Initializer {

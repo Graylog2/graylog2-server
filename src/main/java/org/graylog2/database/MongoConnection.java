@@ -33,8 +33,6 @@ import com.mongodb.MongoOptions;
 import com.mongodb.ServerAddress;
 
 /**
- * MongoConnection.java: Jun 6, 2010 1:36:19 PM
- *
  * MongoDB connection singleton
  *
  * @author Lennart Koopmann <lennart@socketfeed.com>

@@ -30,8 +30,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Blacklist.java: Mar 30, 2011 10:05:34 PM
- *
  * Representing a blacklist stored in MongoDB.
  *
  * @author Lennart Koopmann <lennart@socketfeed.com>

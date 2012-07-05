@@ -24,10 +24,6 @@ import org.graylog2.logmessage.LogMessage;
 import org.graylog2.streams.StreamRule;
 
 /**
- * StreamRuleMatcher.java: Mar 27, 2011 4:42:31 PM
- *
- * [description]
- *
  * @author Lennart Koopmann <lennart@socketfeed.com>
  */
 public interface StreamRuleMatcher {

@@ -24,8 +24,6 @@ import org.graylog2.GraylogServer;
 import org.graylog2.logmessage.LogMessage;
 
 /**
- * MessageFilter.java: 19.04.2012 11:46:59
- *
  * @author Lennart Koopmann <lennart@socketfeed.com>
  */
 public interface MessageFilter {

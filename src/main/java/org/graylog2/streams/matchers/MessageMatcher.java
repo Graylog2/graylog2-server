@@ -25,10 +25,6 @@ import org.graylog2.logmessage.LogMessage;
 import org.graylog2.streams.StreamRule;
 
 /**
- * MessageMatcher.java: Mar 27, 2011 4:50:34 PM
- *
- * [description]
- *
  * @author Lennart Koopmann <lennart@socketfeed.com>
  */
 public class MessageMatcher implements StreamRuleMatcher {

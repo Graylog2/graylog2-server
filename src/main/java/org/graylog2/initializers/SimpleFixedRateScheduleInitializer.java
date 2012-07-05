@@ -24,8 +24,6 @@ import java.util.concurrent.TimeUnit;
 import org.graylog2.GraylogServer;
 
 /**
- * SimpleFixedRateScheduleInitializer.java: Apr 11, 2012 6:03:32 PM
- *
  * @author Lennart Koopmann <lennart@socketfeed.com>
  */
 public class SimpleFixedRateScheduleInitializer {

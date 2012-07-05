@@ -31,8 +31,6 @@ import java.util.Map;
 
 
 /**
- * MongoBridge.java: Apr 13, 2010 9:13:03 PM
- *
  * Simple mapping methods to MongoDB.
  *
  * @author Lennart Koopmann <lennart@socketfeed.com>

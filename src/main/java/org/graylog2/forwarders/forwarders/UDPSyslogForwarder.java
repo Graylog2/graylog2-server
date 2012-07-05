@@ -25,8 +25,6 @@ import org.graylog2.logmessage.LogMessage;
 import org.graylog2.forwarders.MessageForwarderIF;
 
 /**
- * SyslogForwarder.java: Apr 5, 2011 8:23:14 PM
- *
  * Forwards syslog messages to other syslog endpoints.
  *
  * @author Lennart Koopmann <lennart@socketfeed.com>

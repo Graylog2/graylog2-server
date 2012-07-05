@@ -29,8 +29,6 @@ import java.net.URL;
 import org.graylog2.logmessage.LogMessage;
 
 /**
- * LogglyForwarder.java: Mar 18, 2011 9:32:24 PM
- *
  * Forwards messages to Logg.ly. (via HTTP/S API)
  *
  * @author Lennart Koopmann <lennart@socketfeed.com>

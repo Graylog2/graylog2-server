@@ -35,8 +35,6 @@ import com.mongodb.DBCursor;
 import com.mongodb.DBObject;
 
 /**
- * Stream.java: Mar 26, 2011 10:39:40 PM
- *
  * Representing a single stream from the streams collection. Also provides method
  * to get all streams of this collection.
  *

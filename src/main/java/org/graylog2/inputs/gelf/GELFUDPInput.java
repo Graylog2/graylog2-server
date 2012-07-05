@@ -35,8 +35,6 @@ import org.jboss.netty.channel.FixedReceiveBufferSizePredictorFactory;
 import org.jboss.netty.channel.socket.nio.NioDatagramChannelFactory;
 
 /**
- * GELFUDPInput.java: 11.04.2012 22:29:01
- *
  * @author Lennart Koopmann <lennart@socketfeed.com>
  */
 public class GELFUDPInput implements MessageInput {

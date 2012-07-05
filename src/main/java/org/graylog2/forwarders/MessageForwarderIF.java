@@ -24,8 +24,6 @@ import org.graylog2.logmessage.LogMessage;
 import org.graylog2.forwarders.forwarders.MessageForwarderConfigurationException;
 
 /**
- * MessageForwarderIF.java: Mar 18, 2011 9:31:05 PM
- *
  * Interface for message forwarders to other endpoints.
  *
  * @author Lennart Koopmann <lennart@socketfeed.com>

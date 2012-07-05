@@ -23,10 +23,6 @@ package org.graylog2.streams;
 import org.graylog2.streams.matchers.*;
 
 /**
- * StreamRuleMatcherFactory.java: Mar 27, 2011 4:49:32 PM
- *
- * [description]
- *
  * @author Lennart Koopmann <lennart@socketfeed.com>
  */
 public class StreamRuleMatcherFactory {
