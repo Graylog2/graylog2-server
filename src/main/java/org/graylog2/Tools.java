@@ -138,9 +138,7 @@ public final class Tools {
     /**
      * Decompress ZLIB (RFC 1950) compressed data
      *
-     * @param compressedData
      * @return A string containing the decompressed data
-     * @throws IOException
      */
     public static String decompressZlib(byte[] compressedData) throws IOException {
         byte[] buffer = new byte[compressedData.length];
@@ -155,9 +153,7 @@ public final class Tools {
     /**
      * Decompress GZIP (RFC 1952) compressed data
      * 
-     * @param compressedData
      * @return A string containing the decompressed data
-     * @throws IOException
      */
     public static String decompressGzip(byte[] compressedData) throws IOException {
         byte[] buffer = new byte[compressedData.length];

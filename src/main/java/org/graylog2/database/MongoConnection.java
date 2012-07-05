@@ -73,9 +73,6 @@ public final class MongoConnection {
 
     /**
      * Connect the instance.
-     * @return
-     *
-     * @throws Exception
      */
     public synchronized Mongo connect() {
         if (m == null) {

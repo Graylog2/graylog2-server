@@ -43,10 +43,7 @@ public class LogglyForwarder implements MessageForwarderIF {
     private String url = null;
 
     /**
-     *
      * @param url URL API endpoint
-     *
-     * @throws MessageForwarderConfigurationException
      */
     public LogglyForwarder(String url) throws MessageForwarderConfigurationException {
 
@@ -114,8 +111,6 @@ public class LogglyForwarder implements MessageForwarderIF {
 
     /**
      * Indicates if the last forward has succeeded.
-     *
-     * @return
      */
     public boolean succeeded() {
         return this.succeeded;
