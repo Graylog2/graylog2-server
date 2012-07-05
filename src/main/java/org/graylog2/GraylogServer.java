@@ -90,7 +90,6 @@ public class GraylogServer implements Runnable {
         mongoConnection.setMaxConnections(configuration.getMongoMaxConnections());
         mongoConnection.setThreadsAllowedToBlockMultiplier(configuration.getMongoThreadsAllowedToBlockMultiplier());
         mongoConnection.setReplicaSet(configuration.getMongoReplicaSet());
-        mongoConnection.setMessagesCollectionSize(configuration.getMessagesCollectionSize());
 
         messageCounterManager = new MessageCounterManager();
         messageCounterManager.register(MASTER_COUNTER_NAME);
