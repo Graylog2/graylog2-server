@@ -49,7 +49,6 @@ public class ConfigurationTest {
         validProperties.put("mongodb_database", "test");
         validProperties.put("mongodb_host", "localhost");
         validProperties.put("mongodb_port", "27017");
-        validProperties.put("messages_collection_size", "1000");
         validProperties.put("use_gelf", "true");
         validProperties.put("gelf_listen_port", "12201");
 

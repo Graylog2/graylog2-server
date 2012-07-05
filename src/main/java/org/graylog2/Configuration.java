@@ -32,7 +32,6 @@ import com.github.joschi.jadconfig.ValidatorMethod;
 import com.github.joschi.jadconfig.converters.StringListConverter;
 import com.github.joschi.jadconfig.validators.InetPortValidator;
 import com.github.joschi.jadconfig.validators.PositiveIntegerValidator;
-import com.github.joschi.jadconfig.validators.PositiveLongValidator;
 import com.google.common.collect.Lists;
 import com.mongodb.ServerAddress;
 
@@ -108,9 +107,6 @@ public class Configuration {
 
     @Parameter(value = "mongodb_replica_set", converter = StringListConverter.class)
     private List<String> mongoReplicaSet;
-
-    @Parameter(value = "messages_collection_size", required = true, validator = PositiveLongValidator.class)
-    private long messagesCollectionSize = 50 * 1000 * 1000;
 
     @Parameter(value = "use_gelf", required = true)
     private boolean useGELF = false;
@@ -273,10 +269,6 @@ public class Configuration {
 
     public int getMongoThreadsAllowedToBlockMultiplier() {
         return mongoThreadsAllowedToBlockMultiplier;
-    }
-
-    public long getMessagesCollectionSize() {
-        return messagesCollectionSize;
     }
 
     public boolean isUseGELF() {

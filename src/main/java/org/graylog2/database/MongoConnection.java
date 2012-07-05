@@ -24,7 +24,6 @@ import java.net.UnknownHostException;
 import java.util.List;
 
 import com.mongodb.BasicDBObject;
-import com.mongodb.BasicDBObjectBuilder;
 import com.mongodb.DB;
 import com.mongodb.DBCollection;
 import com.mongodb.Mongo;
@@ -43,16 +42,9 @@ public final class MongoConnection {
     private Mongo m;
     private DB db;
 
-    private DBCollection realtimeMessagesCollection;
     private DBCollection messageCountsCollection;
 
-    private static final String REALTIME_MESSAGE_COLLECTION_NAME = "realtime_messages";
-    private static final int REALTIME_MESSAGE_COLLECTION_SIZE = 52428800; // 50 MB
-
     private String username;
-
-    @SuppressWarnings("unused")
-    private long messagesCollectionSize;
 
     private List<ServerAddress> replicaServers;
 
@@ -112,17 +104,6 @@ public final class MongoConnection {
     }
 
     /**
-     * Returns the raw connection.
-     * @return connection
-     */
-    public synchronized Mongo getConnection() {
-        if (m == null) {
-            return connect();
-        }
-        return m;
-    }
-
-    /**
      * Returns the raw database object.
      * @return database
      */
@@ -152,10 +133,6 @@ public final class MongoConnection {
 
     public void setUser(String mongoUser) {
         this.username = mongoUser;
-    }
-
-    public void setMessagesCollectionSize(long messagesCollectionSize) {
-        this.messagesCollectionSize = messagesCollectionSize;
     }
 
     public void setReplicaSet(List<ServerAddress> mongoReplicaSet) {
