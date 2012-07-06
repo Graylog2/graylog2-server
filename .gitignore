@@ -2,7 +2,14 @@ log/*
 tmp/*
 
 nbproject/*
-.idea
+
+# Idea project files
+/.idea
+/*.ipr
+/*.iml
+/*.iws
+/.generators
+/.rakeTasks
 
 config/mongoid.yml
 config/general.yml
