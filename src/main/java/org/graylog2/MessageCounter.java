@@ -25,8 +25,6 @@ import java.util.Map;
 import com.google.common.collect.Maps;
 
 /**
- * MessageCounter.java: Sep 20, 2011 6:47:42 PM
- *
  * Singleton holding the number of received messages for streams,
  * hosts and a total.
  *

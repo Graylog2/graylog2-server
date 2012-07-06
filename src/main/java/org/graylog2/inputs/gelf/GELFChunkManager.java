@@ -31,8 +31,6 @@ import com.yammer.metrics.Metrics;
 import java.util.concurrent.TimeUnit;
 
 /**
- * GELFChunkManager.java: 13.04.2012 22:38:40
- *
  * @author Lennart Koopmann <lennart@socketfeed.com>
  */
 public class GELFChunkManager extends Thread {

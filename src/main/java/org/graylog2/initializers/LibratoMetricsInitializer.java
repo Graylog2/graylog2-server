@@ -24,8 +24,6 @@ import org.graylog2.GraylogServer;
 import org.graylog2.periodical.LibratoMetricsWriterThread;
 
 /**
- * LibratoMetricsInitializer.java: 08.05.2012 19:30:26
- *
  * @author Lennart Koopmann <lennart@socketfeed.com>
  */
 public class LibratoMetricsInitializer extends SimpleFixedRateScheduleInitializer implements Initializer {

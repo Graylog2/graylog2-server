@@ -25,10 +25,6 @@ import org.graylog2.forwarders.MessageForwarderIF;
 import org.graylog2.logmessage.LogMessage;
 
 /**
- * ForwardEndpoint.java: Apr 7, 2011 8:10:23 PM
- *
- * [description]
- *
  * @author Lennart Koopmann <lennart@socketfeed.com>
  */
 public class GELFMessageForwarder extends UDPForwarder implements MessageForwarderIF {

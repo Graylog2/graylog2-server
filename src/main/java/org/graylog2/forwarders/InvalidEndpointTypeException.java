@@ -21,8 +21,6 @@
 package org.graylog2.forwarders;
 
 /**
- * InvalidStreamRuleTypeException.java: Mar 27, 2011 4:55:18 PM
- *
  * Exception thrown in case of an invalid endpoint type. Allowed types are
  * defined in ForwardEndpoint.
  *

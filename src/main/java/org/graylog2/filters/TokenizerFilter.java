@@ -30,8 +30,6 @@ import org.graylog2.GraylogServer;
 import org.graylog2.logmessage.LogMessage;
 
 /**
- * TokenizerFilter.java: 05.05.2012 12:59:24
- *
  * @author Lennart Koopmann <lennart@socketfeed.com>
  */
 public class TokenizerFilter implements MessageFilter {

@@ -21,10 +21,6 @@
 package org.graylog2.inputs.gelf;
 
 /**
- * GELFMessageChunk.java: 13.04.2012 22:46:09
- *
- * Describe me.
- *
  * @author Lennart Koopmann <lennart@socketfeed.com>
  */
 public final class GELFMessageChunk {

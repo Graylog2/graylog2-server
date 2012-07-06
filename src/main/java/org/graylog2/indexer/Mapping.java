@@ -30,14 +30,12 @@ import org.elasticsearch.action.admin.indices.mapping.put.PutMappingRequestBuild
 import org.elasticsearch.client.Client;
 
 /**
- * Mapping.java: Sep 05, 2011 3:34:57 PM
- *
  * Representing the message type mapping in ElasticSearch. This is giving ES more
  * information about what the fields look like and how it should analyze them.
  *
  * @author Lennart Koopmann <lennart@socketfeed.com>
  */
-@SuppressWarnings({"rawtypes", "unchecked"})
+@SuppressWarnings({"unchecked"})
 public class Mapping {
 
     public static PutMappingRequest getPutMappingRequest(final Client client, final String index) {

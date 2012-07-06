@@ -24,8 +24,6 @@ import org.graylog2.buffers.ProcessBuffer;
 import org.graylog2.logmessage.LogMessage;
 
 /**
- * GraylogServerStub.java: 17.04.2012 12:42:19
- *
  * @author Lennart Koopmann <lennart@socketfeed.com>
  */
 public class GraylogServerStub extends GraylogServer {

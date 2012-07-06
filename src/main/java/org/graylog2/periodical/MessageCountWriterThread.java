@@ -26,8 +26,6 @@ import org.graylog2.MessageCounter;
 
 
 /**
- * MessageCountWriterThread.java: Sep 21, 2011 4:09:55 PM
- * <p/>
  * Periodically writes message counts to message count collection.
  *
  * @author Lennart Koopmann <lennart@socketfeed.com>

@@ -21,8 +21,6 @@
 package org.graylog2;
 
 /**
- * ServerValue.java: Jan 16, 2011 1:35:00 PM
- *
  * Filling the server_values collection
  *
  * @author Lennart Koopmann <lennart@socketfeed.com>

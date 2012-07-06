@@ -31,8 +31,6 @@ import org.graylog2.streams.Stream;
 import org.graylog2.streams.StreamRouter;
 
 /**
- * StreamMatcherFilter.java: 19.04.2012 14:41:36
- *
  * @author Lennart Koopmann <lennart@socketfeed.com>
  */
 public class StreamMatcherFilter implements MessageFilter {

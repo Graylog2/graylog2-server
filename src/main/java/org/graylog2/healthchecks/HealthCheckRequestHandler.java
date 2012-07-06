@@ -38,10 +38,6 @@ import org.jboss.netty.handler.codec.http.HttpVersion;
 import org.jboss.netty.util.CharsetUtil;
 
 /**
- * HealthCheckRequestHandler.java: 19.06.2012 16:51:09
- *
- * Describe me.
- *
  * @author Lennart Koopmann <lennart@socketfeed.com>
  */
 public class HealthCheckRequestHandler extends SimpleChannelUpstreamHandler {

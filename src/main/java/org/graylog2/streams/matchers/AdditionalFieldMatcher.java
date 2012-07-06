@@ -24,10 +24,6 @@ import org.graylog2.logmessage.LogMessage;
 import org.graylog2.streams.StreamRule;
 
 /**
- * AdditionalFieldMatcher.java: Mar 27, 2011 5:50:53 PM
- *
- * [description]
- *
  * @author Lennart Koopmann <lennart@socketfeed.com>
  */
 public class AdditionalFieldMatcher implements StreamRuleMatcher {

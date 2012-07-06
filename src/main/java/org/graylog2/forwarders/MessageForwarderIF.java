@@ -24,8 +24,6 @@ import org.graylog2.logmessage.LogMessage;
 import org.graylog2.forwarders.forwarders.MessageForwarderConfigurationException;
 
 /**
- * MessageForwarderIF.java: Mar 18, 2011 9:31:05 PM
- *
  * Interface for message forwarders to other endpoints.
  *
  * @author Lennart Koopmann <lennart@socketfeed.com>
@@ -38,14 +36,11 @@ public interface MessageForwarderIF {
      *
      * @param message The message to forward
      * @return true in case of success, otherwise false
-     * @throws MessageForwarderConfigurationException
      */
     boolean forward(LogMessage message) throws MessageForwarderConfigurationException;
 
     /**
      * Indicates if the last forward has succeeded.
-     * 
-     * @return
      */
     boolean succeeded();
 

@@ -25,7 +25,6 @@ import org.junit.Test;
 import static org.junit.Assert.*;
 
 /**
- *
  * @author lennart.koopmann
  */
 public class GELFMessageTest {

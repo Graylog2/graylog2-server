@@ -26,10 +26,6 @@ import org.jboss.netty.channel.ChannelPipelineFactory;
 import org.jboss.netty.channel.Channels;
 
 /**
- * GELFUDPPipelineFactory.java: 13.04.2012 22:21:33
- *
- * Describe me.
- *
  * @author Lennart Koopmann <lennart@socketfeed.com>
  */
 public class GELFUDPPipelineFactory implements ChannelPipelineFactory {

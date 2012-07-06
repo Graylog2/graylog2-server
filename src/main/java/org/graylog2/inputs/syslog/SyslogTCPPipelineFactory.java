@@ -29,10 +29,6 @@ import org.jboss.netty.handler.codec.frame.DelimiterBasedFrameDecoder;
 import org.jboss.netty.handler.codec.frame.Delimiters;
 
 /**
- * SyslogTCPPipelineFactory.java: 27.06.2012 16:26:11
- *
- * Describe me.
- *
  * @author Lennart Koopmann <lennart@socketfeed.com>
  */
 public class SyslogTCPPipelineFactory implements ChannelPipelineFactory {

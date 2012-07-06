@@ -32,8 +32,6 @@ import org.jboss.netty.channel.ChannelException;
 import org.jboss.netty.channel.socket.nio.NioServerSocketChannelFactory;
 
 /**
- * GELFTCPInput.java: 13.06.2012 15:26:43
- *
  * @author Lennart Koopmann <lennart@socketfeed.com>
  */
 public class GELFTCPInput implements MessageInput {

@@ -24,8 +24,6 @@ import org.graylog2.GraylogServer;
 import org.graylog2.logmessage.LogMessage;
 
 /**
- * MessageFilter.java: 19.04.2012 11:46:59
- *
  * @author Lennart Koopmann <lennart@socketfeed.com>
  */
 public interface MessageFilter {
@@ -33,8 +31,6 @@ public interface MessageFilter {
     /**
      * Process a LogMessage
      *
-     * @param msg
-     * @param server
      * @return true if this message should not further be handled (for example for blacklisting purposes)
      */
     public boolean filter(LogMessage msg, GraylogServer server);

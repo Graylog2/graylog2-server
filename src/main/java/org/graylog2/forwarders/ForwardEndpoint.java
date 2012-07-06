@@ -27,10 +27,6 @@ import org.graylog2.forwarders.forwarders.MessageForwarderConfigurationException
 import org.graylog2.forwarders.forwarders.UDPSyslogForwarder;
 
 /**
- * ForwardEndpoint.java: Apr 3, 2011 11:42:58 PM
- *
- * [description]
- *
  * @author Lennart Koopmann <lennart@socketfeed.com>
  */
 public class ForwardEndpoint {

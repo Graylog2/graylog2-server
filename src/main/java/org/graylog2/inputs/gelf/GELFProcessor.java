@@ -34,8 +34,6 @@ import org.json.simple.JSONObject;
 import org.json.simple.JSONValue;
 
 /**
- * GELFProcessor.java: 12.04.2012 10:59:57
- *
  * @author Lennart Koopmann <lennart@socketfeed.com>
  */
 public class GELFProcessor {

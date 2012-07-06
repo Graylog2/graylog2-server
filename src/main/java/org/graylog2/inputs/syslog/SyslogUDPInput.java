@@ -33,10 +33,6 @@ import org.jboss.netty.channel.FixedReceiveBufferSizePredictorFactory;
 import org.jboss.netty.channel.socket.nio.NioDatagramChannelFactory;
 
 /**
- * SyslogUDPInput.java: 30.04.2012 00:02:48
- *
- * Describe me.
- *
  * @author Lennart Koopmann <lennart@socketfeed.com>
  */
 public class SyslogUDPInput implements MessageInput {

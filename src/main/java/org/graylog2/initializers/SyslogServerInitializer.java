@@ -25,8 +25,6 @@ import org.graylog2.Configuration;
 import org.graylog2.GraylogServer;
 
 /**
- * SyslogServerInitializer.java: Apr 11, 2012 5:06:27 PM
- *
  * @author Lennart Koopmann <lennart@socketfeed.com>
  */
 public class SyslogServerInitializer implements Initializer {

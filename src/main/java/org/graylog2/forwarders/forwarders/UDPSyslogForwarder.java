@@ -25,8 +25,6 @@ import org.graylog2.logmessage.LogMessage;
 import org.graylog2.forwarders.MessageForwarderIF;
 
 /**
- * SyslogForwarder.java: Apr 5, 2011 8:23:14 PM
- *
  * Forwards syslog messages to other syslog endpoints.
  *
  * @author Lennart Koopmann <lennart@socketfeed.com>
@@ -61,8 +59,6 @@ public class UDPSyslogForwarder extends UDPForwarder implements MessageForwarder
     /**
      * Indicates if the last forward has succeeded. This is not guaranteeing
      * delivery for the SyslogForwarder as it it sending UDP.
-     *
-     * @return
      */
     public boolean succeeded() {
         return this.succeeded;

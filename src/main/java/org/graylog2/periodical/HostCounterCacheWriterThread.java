@@ -27,8 +27,6 @@ import org.graylog2.database.MongoBridge;
 
 
 /**
- * HostCounterCacheWriterThread.java: Feb 23, 2011 5:59:58 PM
- * <p/>
  * Periodically writes host counter cache to hosts collection.
  *
  * @author Lennart Koopmann <lennart@socketfeed.com>

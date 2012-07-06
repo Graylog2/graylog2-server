@@ -26,8 +26,6 @@ import org.graylog2.GraylogServer;
 import org.graylog2.RulesEngine;
 
 /**
- * DroolsInitializer.java: Apr 11, 2012 5:19:03 PM
- *
  * @author Lennart Koopmann <lennart@socketfeed.com>
  */
 public class DroolsInitializer implements Initializer {

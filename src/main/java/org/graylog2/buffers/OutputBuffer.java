@@ -31,8 +31,6 @@ import org.graylog2.buffers.processors.OutputBufferProcessor;
 import org.graylog2.logmessage.LogMessage;
 
 /**
- * OutputBuffer.java: 26.04.2012 17:56:24
- *
  * @author Lennart Koopmann <lennart@socketfeed.com>
  */
 public class OutputBuffer {

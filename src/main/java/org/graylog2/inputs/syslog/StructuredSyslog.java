@@ -28,8 +28,6 @@ import org.apache.log4j.Logger;
 import org.productivity.java.syslog4j.server.impl.event.structured.StructuredSyslogServerEvent;
 
 /**
- * StructuredSyslog.java: Dec 24, 2011 5:32:06 PM
- *
  * Parses structured syslog data.
  *
  * @author Lennart Koopmann <lennart@socketfeed.com>

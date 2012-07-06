@@ -25,8 +25,6 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
 /**
- * HostCounterCache.java: Feb 21, 2011 4:57:13 PM
- *
  * Acts as cache for count updates in the hosts collection. Written to MongoDB
  * by a periodically running thread.
  *
@@ -66,7 +64,6 @@ public class HostCounterCache {
      * Get the current count of host.
      *
      * @param hostname The host of which the count to get.
-     * @return
      */
     public int getCount(String hostname) {
         return this.cache.get(hostname) == null ? 0 : this.cache.get(hostname);
@@ -74,8 +71,6 @@ public class HostCounterCache {
 
     /**
      * Get all hostnames that are currently in the cache.
-     * 
-     * @return
      */
     public Set<String> getAllHosts() {
         return this.cache.keySet();
