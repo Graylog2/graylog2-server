@@ -24,6 +24,6 @@ package org.graylog2.initializers;
  */
 public interface Initializer {
 
-    public void initialize();
+    void initialize();
 
 }

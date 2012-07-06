@@ -29,6 +29,6 @@ import org.graylog2.logmessage.LogMessage;
  */
 public interface MessageOutput {
 
-    public void write(List<LogMessage> msg, GraylogServer server) throws Exception;
+    void write(List<LogMessage> msg, GraylogServer server) throws Exception;
 
 }
