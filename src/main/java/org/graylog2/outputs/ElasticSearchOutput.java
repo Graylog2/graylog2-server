@@ -28,8 +28,6 @@ import org.graylog2.GraylogServer;
 import org.graylog2.logmessage.LogMessage;
 
 /**
- * ElasticSearchOutput.java: 29.04.2012 21:28:28
- *
  * @author Lennart Koopmann <lennart@socketfeed.com>
  */
 public class ElasticSearchOutput implements MessageOutput {

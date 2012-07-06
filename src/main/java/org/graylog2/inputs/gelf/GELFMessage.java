@@ -24,8 +24,6 @@ import java.io.IOException;
 import org.graylog2.Tools;
 
 /**
- * GELFMessage.java: 12.04.2012 17:26:01
- *
  * @author Lennart Koopmann <lennart@socketfeed.com>
  */
 public class GELFMessage {

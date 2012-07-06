@@ -34,8 +34,6 @@ import org.graylog2.logmessage.LogMessage;
 import org.productivity.java.syslog4j.server.impl.event.SyslogServerEvent;
 
 /**
- * SyslogProcessor.java: 30.04.2012 12:16:17
- *
  * @author Lennart Koopmann <lennart@socketfeed.com>
  */
 public class SyslogProcessor {

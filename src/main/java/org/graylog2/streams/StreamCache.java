@@ -26,8 +26,6 @@ import org.graylog2.GraylogServer;
 import org.graylog2.SimpleObjectCache;
 
 /**
- * StreamCache.java: Mar 26, 2011 11:25:41 PM
- *
  * Singleton caching the already fetched streams.
  *
  * @author Lennart Koopmann <lennart@socketfeed.com>

@@ -15,7 +15,6 @@ import com.google.common.collect.Maps;
 import static org.junit.Assert.*;
 
 /**
- *
  * @author XING\lennart.koopmann
  */
 public class MessageCounterTest {

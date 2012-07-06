@@ -31,8 +31,6 @@ import org.jboss.netty.channel.MessageEvent;
 import org.jboss.netty.channel.SimpleChannelHandler;
 
 /**
- * GELFDispatcher.java: 12.04.2012 10:40:21
- *
  * @author Lennart Koopmann <lennart@socketfeed.com>
  */
 public class GELFDispatcher extends SimpleChannelHandler {

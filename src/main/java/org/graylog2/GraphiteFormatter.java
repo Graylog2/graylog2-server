@@ -25,8 +25,6 @@ import java.util.List;
 import java.util.Map.Entry;
 
 /**
- * GraphiteFormatter.java: 08.05.2012 18:58:14
- *
  * @author Lennart Koopmann <lennart@socketfeed.com>
  */
 public class GraphiteFormatter {

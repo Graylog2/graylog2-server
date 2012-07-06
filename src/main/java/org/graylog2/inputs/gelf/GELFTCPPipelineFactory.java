@@ -28,8 +28,6 @@ import org.jboss.netty.handler.codec.frame.DelimiterBasedFrameDecoder;
 import org.jboss.netty.handler.codec.frame.Delimiters;
 
 /**
- * GELFTCPPipelineFactory.java: 13.06.2012 15:31:40
- *
  * @author Lennart Koopmann <lennart@socketfeed.com>
  */
 public class GELFTCPPipelineFactory implements ChannelPipelineFactory {

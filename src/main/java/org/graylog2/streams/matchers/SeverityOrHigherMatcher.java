@@ -24,10 +24,6 @@ import org.graylog2.logmessage.LogMessage;
 import org.graylog2.streams.StreamRule;
 
 /**
- * SeverityMatcher.java: May 23, 2011 3:26:41 PM
- *
- * [description]
- *
  * @author Lennart Koopmann <lennart@socketfeed.com>
  */
 public class SeverityOrHigherMatcher implements StreamRuleMatcher {

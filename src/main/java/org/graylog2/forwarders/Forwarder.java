@@ -25,8 +25,6 @@ import org.graylog2.logmessage.LogMessage;
 import org.graylog2.streams.Stream;
 
 /**
- * Forwarder.java: Apr 2, 2011 11:27:02 PM
- *
  * Forwards messages to other endpoints. (i.e. other GELF or syslog servers)
  *
  * @author Lennart Koopmann <lennart@socketfeed.com>

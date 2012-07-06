@@ -25,10 +25,6 @@ import org.graylog2.GraylogServer;
 import com.mongodb.DBObject;
 
 /**
- * Setting.java: Nov 22, 2011 7:08:46 PM
- *
- * Represents settings collection in MongoDB.
- *
  * @author Lennart Koopmann <lennart@socketfeed.com>
  */
 public class Setting {

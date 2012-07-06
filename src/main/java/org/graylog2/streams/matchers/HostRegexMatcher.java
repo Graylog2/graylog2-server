@@ -25,10 +25,6 @@ import org.graylog2.logmessage.LogMessage;
 import org.graylog2.streams.StreamRule;
 
 /**
- * HostRegeMatcher.java: Jun 21, 2011 9:56:31 PM
- *
- * [description]
- *
  * @author Lennart Koopmann <lennart@socketfeed.com>
  */
 public class HostRegexMatcher implements StreamRuleMatcher {

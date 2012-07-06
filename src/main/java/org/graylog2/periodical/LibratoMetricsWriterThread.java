@@ -30,8 +30,6 @@ import org.graylog2.MessageCounter;
 import org.graylog2.Tools;
 
 /**
- * LibratoMetricsWriterThread.java: 08.05.2012 19:31:21
- *
  * @author Lennart Koopmann <lennart@socketfeed.com>
  */
 public class LibratoMetricsWriterThread implements Runnable {

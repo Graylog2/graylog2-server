@@ -24,7 +24,6 @@ import org.junit.Test;
 import static org.junit.Assert.*;
 
 /**
- *
  * @author lennart
  */
 public class HostSystemTest {

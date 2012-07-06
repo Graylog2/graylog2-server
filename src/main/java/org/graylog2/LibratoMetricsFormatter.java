@@ -29,8 +29,6 @@ import org.apache.log4j.Logger;
 import org.json.simple.JSONValue;
 
 /**
- * LibratoMetricsFormatter.java: 08.05.2012 19:39:39
- *
  * @author Lennart Koopmann <lennart@socketfeed.com>
  */
 public class LibratoMetricsFormatter {

@@ -32,8 +32,6 @@ import com.mongodb.MongoOptions;
 import com.mongodb.ServerAddress;
 
 /**
- * MongoConnection.java: Jun 6, 2010 1:36:19 PM
- *
  * MongoDB connection singleton
  *
  * @author Lennart Koopmann <lennart@socketfeed.com>
@@ -67,9 +65,6 @@ public final class MongoConnection {
 
     /**
      * Connect the instance.
-     * @return
-     *
-     * @throws Exception
      */
     public synchronized Mongo connect() {
         if (m == null) {

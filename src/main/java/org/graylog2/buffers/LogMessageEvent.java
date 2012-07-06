@@ -24,8 +24,6 @@ import com.lmax.disruptor.EventFactory;
 import org.graylog2.logmessage.LogMessage;
 
 /**
- * LogMessageEvent.java: 17.04.2012 16:11:00
- *
  * @author Lennart Koopmann <lennart@socketfeed.com>
  */
 public class LogMessageEvent {

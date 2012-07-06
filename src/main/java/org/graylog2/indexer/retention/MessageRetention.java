@@ -25,8 +25,6 @@ import org.graylog2.GraylogServer;
 import org.graylog2.Tools;
 
 /**
- * MessageRetention.java: Nov 22, 2011 6:58:31 PM
- *
  * @author Lennart Koopmann <lennart@socketfeed.com>
  */
 public class MessageRetention {

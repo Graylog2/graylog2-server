@@ -32,10 +32,6 @@ import org.jboss.netty.channel.ChannelException;
 import org.jboss.netty.channel.socket.nio.NioServerSocketChannelFactory;
 
 /**
- * SyslogTCPInput.java: 27.06.2012 16:24:05
- *
- * Describe me.
- *
  * @author Lennart Koopmann <lennart@socketfeed.com>
  */
 public class SyslogTCPInput implements MessageInput {

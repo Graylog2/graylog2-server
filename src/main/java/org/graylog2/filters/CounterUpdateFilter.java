@@ -30,10 +30,6 @@ import org.graylog2.logmessage.LogMessage;
 import org.graylog2.streams.Stream;
 
 /**
- * CounterUpdateFilter.java: 26.04.2012 17:27:47
- *
- * Describe me.
- *
  * @author Lennart Koopmann <lennart@socketfeed.com>
  */
 public class CounterUpdateFilter implements MessageFilter {

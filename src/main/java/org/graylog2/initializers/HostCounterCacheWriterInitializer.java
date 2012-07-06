@@ -24,8 +24,6 @@ import org.graylog2.GraylogServer;
 import org.graylog2.periodical.HostCounterCacheWriterThread;
 
 /**
- * HostCounterCacheWriterInitializer.java: Apr 11, 2012 5:33:27 PM
- *
  * @author Lennart Koopmann <lennart@socketfeed.com>
  */
 public class HostCounterCacheWriterInitializer extends SimpleFixedRateScheduleInitializer implements Initializer {

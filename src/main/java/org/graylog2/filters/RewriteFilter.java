@@ -28,10 +28,6 @@ import org.graylog2.GraylogServer;
 import org.graylog2.logmessage.LogMessage;
 
 /**
- * RewriteFilter.java: 26.04.2012 16:14:47
- *
- * Describe me.
- *
  * @author Lennart Koopmann <lennart@socketfeed.com>
  */
 public class RewriteFilter implements MessageFilter {

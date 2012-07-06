@@ -25,10 +25,6 @@ import org.graylog2.logmessage.LogMessage;
 import org.graylog2.streams.StreamRule;
 
 /**
- * FullMessageMatcher.java: Mar 27, 2011 4:50:34 PM
- *
- * [description]
- *
  * @author Dennis Oelkers <dennis@lauschmusik.de>
  */
 public class FullMessageMatcher implements StreamRuleMatcher {

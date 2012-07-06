@@ -32,10 +32,6 @@ import org.jboss.netty.channel.MessageEvent;
 import org.jboss.netty.channel.SimpleChannelHandler;
 
 /**
- * SyslogDispatcher.java: 30.04.2012 00:13:02
- *
- * Describe me.
- *
  * @author Lennart Koopmann <lennart@socketfeed.com>
  */
 public class SyslogDispatcher extends SimpleChannelHandler {

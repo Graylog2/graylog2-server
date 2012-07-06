@@ -28,10 +28,6 @@ import org.jboss.netty.handler.codec.http.HttpRequestDecoder;
 import org.jboss.netty.handler.codec.http.HttpResponseEncoder;
 
 /**
- * HealthCheckServerPipelineFactory.java: 19.06.2012 16:47:10
- *
- * Describe me.
- *
  * @author Lennart Koopmann <lennart@socketfeed.com>
  */
 public class HealthCheckServerPipelineFactory implements ChannelPipelineFactory {

@@ -24,8 +24,6 @@ import org.graylog2.GraylogServer;
 import org.graylog2.periodical.MessageCountWriterThread;
 
 /**
- * MessageCounterInitializer.java: Apr 11, 2012 5:58:41 PM
- *
  * @author Lennart Koopmann <lennart@socketfeed.com>
  */
 public class MessageCounterInitializer extends SimpleFixedRateScheduleInitializer implements Initializer {

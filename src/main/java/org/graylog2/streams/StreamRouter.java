@@ -30,8 +30,6 @@ import org.graylog2.logmessage.LogMessage;
 import com.google.common.collect.Lists;
 
 /**
- * StreamRouter.java: Mar 16, 2011 9:40:24 PM
- *
  * Routes a GELF Message to it's streams.
  *
  * @author Lennart Koopmann <lennart@socketfeed.com>
