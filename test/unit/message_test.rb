@@ -20,10 +20,6 @@ class MessageTest < ActiveSupport::TestCase
       assert_equal 'UTC', Time.zone.name, "Please do not change default timezone"
       assert_equal Time.zone.name, message.created_at_time.zone
       assert_equal Time.zone.at(message.created_at), message.created_at_time
-
-      Time.zone = "CET"
-      assert_equal Time.zone.name, message.created_at_time.zone
-      assert_equal Time.zone.at(message.created_at), message.created_at_time
     end
   end
 

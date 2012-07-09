@@ -27,13 +27,18 @@ class MessageGateway
 
   # used if not set in config
   DEFAULT_INDEX_NAME = "graylog2"
+  DEFAULT_RECENT_INDEX_NAME = "graylog2_recent"
 
   # XXX ELASTIC: sucks.
   if Rails.env == "test"
     INDEX_NAME = "graylog2_test"
+    RECENT_INDEX_NAME = "graylog2_recent_test"
   else
     config_index = Configuration.indexer_index_name
     config_index.blank? ? INDEX_NAME = DEFAULT_INDEX_NAME : INDEX_NAME = config_index
+    
+    config_recent_index = Configuration.indexer_recent_index_name
+    config_recent_index.blank? ? RECENT_INDEX_NAME = DEFAULT_RECENT_INDEX_NAME : RECENT_INDEX_NAME = config_recent_index
   end
 
   TYPE_NAME = "message"
@@ -45,10 +50,10 @@ class MessageGateway
   @default_query_options = { :sort => "created_at desc" }
 
   def self.all_paginated(page = 1)
+    use_recent_index!
+
     r = search(pagination_options(page).merge(@default_query_options)) do
-      query do
-        all
-      end
+      query { all }
     end
 
     wrap(r)
@@ -263,9 +268,12 @@ class MessageGateway
 
   private
 
+  def self.use_recent_index!
+    index_name(RECENT_INDEX_NAME)
+  end
+
   def self.wrap(x)
     return nil if x.nil?
-
     case(x)
       when Tire::Results::Item then Message.parse_from_elastic(x)
       when Tire::Results::Collection then wrap_collection(x)

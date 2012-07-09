@@ -149,7 +149,7 @@ class MessageGatewayTest < ActiveSupport::TestCase
         expected.each { |field| bm(("_"+field.to_s).to_sym => "VALUE") }
         
         results = MessageGateway.all_additional_fields
-
+        sleep 1 # lol
         assert_equal expected.size, results.size
         
         results.each do |v|

@@ -150,4 +150,8 @@ class Configuration
   def self.indexer_index_name
     indexer_config :index_name
   end
+
+  def self.indexer_recent_index_name
+    indexer_config :recent_index_name
+  end
 end
