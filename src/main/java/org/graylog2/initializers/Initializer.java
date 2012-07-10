@@ -26,4 +26,6 @@ public interface Initializer {
 
     void initialize();
 
+    boolean masterOnly();
+    
 }

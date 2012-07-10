@@ -54,5 +54,10 @@ public class HealthCheckHTTPServerInitializer implements Initializer {
         bootstrap.bind(new InetSocketAddress(this.port));
 
     }
+    
+    @Override
+    public boolean masterOnly() {
+        return false;
+    }
 
 }

@@ -64,6 +64,10 @@ public class ServerValue {
     public void writeMessageRetentionLastPerformed(int when) {
         set("message_retention_last_performed", when);
     }
+    
+    public void setIsMaster(boolean isIt) {
+        set("is_master", isIt);
+    }
 
     public void ping() {
         set("ping", Tools.getUTCTimestamp());

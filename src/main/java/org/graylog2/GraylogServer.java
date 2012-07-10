@@ -116,6 +116,13 @@ public class GraylogServer implements Runnable {
     }
 
     public void registerInitializer(Initializer initializer) {
+        if (initializer.masterOnly() && !this.isMaster()) {
+            LOG.info("Not registering initializer " + initializer.getClass().getSimpleName()
+                    + " because it is marked as master only.");
+            return;
+        }
+        
+            
         this.initializers.add(initializer);
     }
 
@@ -248,6 +255,10 @@ public class GraylogServer implements Runnable {
     
     public void setLastReceivedMessageTimestamp(int t) {
         this.lastReceivedMessageTimestamp = t;
+    }
+    
+    public boolean isMaster() {
+        return this.configuration.isMaster();
     }
     
     public String getServerId() {

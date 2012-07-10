@@ -49,12 +49,18 @@ public class ServerValueWriterInitializer extends SimpleFixedRateScheduleInitial
         serverValue.setGraylog2Version(GraylogServer.GRAYLOG2_VERSION);
         serverValue.setAvailableProcessors(HostSystem.getAvailableProcessors());
         serverValue.setLocalHostname(Tools.getLocalHostname());
+        serverValue.setIsMaster(graylogServer.isMaster());
 
         configureScheduler(
                 new ServerValueWriterThread(graylogServer),
                 ServerValueWriterThread.INITIAL_DELAY,
                 ServerValueWriterThread.PERIOD
         );
+    }
+    
+    @Override
+    public boolean masterOnly() {
+        return false;
     }
 
 }

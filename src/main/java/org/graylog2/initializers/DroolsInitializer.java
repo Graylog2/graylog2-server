@@ -57,5 +57,10 @@ public class DroolsInitializer implements Initializer {
             System.exit(1);
         }
     }
+    
+    @Override
+    public boolean masterOnly() {
+        return false;
+    }
 
 }

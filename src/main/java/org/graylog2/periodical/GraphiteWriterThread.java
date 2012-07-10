@@ -68,7 +68,7 @@ public class GraphiteWriterThread implements Runnable {
 
         MessageCounter counter = this.graylogServer.getMessageCounterManager().get(COUNTER_NAME);
         try {
-            GraphiteFormatter f = new GraphiteFormatter(counter);
+            GraphiteFormatter f = new GraphiteFormatter(counter, graylogServer.getServerId());
             send(f.getAllMetrics());
 
             LOG.debug("Sent message counts to Graphite at <" + carbonHost + ":" + carbonPort + ">.");

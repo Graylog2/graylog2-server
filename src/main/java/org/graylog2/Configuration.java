@@ -45,6 +45,9 @@ public class Configuration {
 
     private static final Logger LOG = Logger.getLogger(Configuration.class);
 
+    @Parameter(value = "is_master", required = true)
+    private boolean isMaster = true;
+    
     @Parameter(value = "syslog_listen_port", required = true, validator = InetPortValidator.class)
     private int syslogListenPort = 514;
     
@@ -182,6 +185,10 @@ public class Configuration {
     
     @Parameter(value = "healthcheck_http_api_port", validator = InetPortValidator.class, required = false)
     private int healthcheckHttpApiPort = 8010;
+    
+    public boolean isMaster() {
+        return isMaster;
+    }
     
     public int getSyslogListenPort() {
         return syslogListenPort;
