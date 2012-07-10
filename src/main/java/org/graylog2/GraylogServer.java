@@ -76,8 +76,12 @@ public class GraylogServer implements Runnable {
 
     private ProcessBuffer processBuffer;
     private OutputBuffer outputBuffer;
+    
+    private String serverId;
 
     public void initialize(Configuration configuration) {
+        serverId = Tools.generateServerId();
+        
         this.configuration = configuration; // TODO use dependency injection
 
         mongoConnection = new MongoConnection();    // TODO use dependency injection
@@ -244,6 +248,10 @@ public class GraylogServer implements Runnable {
     
     public void setLastReceivedMessageTimestamp(int t) {
         this.lastReceivedMessageTimestamp = t;
+    }
+    
+    public String getServerId() {
+        return this.serverId;
     }
 
 }

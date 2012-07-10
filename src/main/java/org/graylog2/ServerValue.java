@@ -58,7 +58,7 @@ public class ServerValue {
     }
 
     public void writeThroughput(int current, int highest) {
-        graylogServer.getMongoBridge().writeThroughput(current, highest);
+        graylogServer.getMongoBridge().writeThroughput(graylogServer.getServerId(), current, highest);
     }
 
     public void writeMessageRetentionLastPerformed(int when) {
@@ -70,7 +70,7 @@ public class ServerValue {
     }
 
     private void set(String key, Object value) {
-        graylogServer.getMongoBridge().setSimpleServerValue(key, value);
+        graylogServer.getMongoBridge().setSimpleServerValue(graylogServer.getServerId(), key, value);
     }
 
 }

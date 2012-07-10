@@ -74,11 +74,13 @@ public class MongoBridge {
         }
     }
 
-    public void writeThroughput(int current, int highest) {
+    public void writeThroughput(String serverId, int current, int highest) {
         BasicDBObject query = new BasicDBObject();
+        query.put("server_id", serverId);
         query.put("type", "total_throughput");
 
         BasicDBObject update = new BasicDBObject();
+        update.put("server_id", serverId);
         update.put("type", "total_throughput");
         update.put("current", current);
         update.put("highest", highest);
@@ -87,11 +89,13 @@ public class MongoBridge {
         coll.update(query, update, true, false);
     }
 
-    public void setSimpleServerValue(String key, Object value) {
+    public void setSimpleServerValue(String serverId, String key, Object value) {
         BasicDBObject query = new BasicDBObject();
+        query.put("server_id", serverId);
         query.put("type", key);
 
         BasicDBObject update = new BasicDBObject();
+        update.put("server_id", serverId);
         update.put("value", value);
         update.put("type", key);
 

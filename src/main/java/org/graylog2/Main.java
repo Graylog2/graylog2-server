@@ -138,7 +138,7 @@ public final class Main {
         if (configuration.isSyslogUdpEnabled()) { server.registerInput(new SyslogUDPInput()); }
         if (configuration.isSyslogTcpEnabled()) { server.registerInput(new SyslogTCPInput()); }
 
-        // Register message filters. - Passing classes here instead of objects, because we need to create a new instance in every filter. (they are stateful)
+        // Register message filters.
         server.registerFilter(RewriteFilter.class);
         server.registerFilter(BlacklistFilter.class);
         if (configuration.isEnableTokenizerFilter()) { server.registerFilter(TokenizerFilter.class); }
