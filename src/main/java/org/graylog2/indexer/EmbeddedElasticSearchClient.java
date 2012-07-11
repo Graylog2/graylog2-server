@@ -85,8 +85,7 @@ public class EmbeddedElasticSearchClient {
             return false;
         }
         final PutMappingRequest mappingRequest = Mapping.getPutMappingRequest(client, getMainIndexName());
-        final boolean mappingCreated = client.admin().indices().putMapping(mappingRequest).actionGet().acknowledged();
-        return acknowledged && mappingCreated;
+        return client.admin().indices().putMapping(mappingRequest).actionGet().acknowledged();
     }
     
     public boolean createRecentIndex() {
@@ -103,8 +102,7 @@ public class EmbeddedElasticSearchClient {
             return false;
         }
         final PutMappingRequest mappingRequest = Mapping.getPutMappingRequest(client, RECENT_INDEX_NAME);
-        final boolean mappingCreated = client.admin().indices().putMapping(mappingRequest).actionGet().acknowledged();
-        return acknowledged && mappingCreated;
+        return client.admin().indices().putMapping(mappingRequest).actionGet().acknowledged();
     }
 
     public boolean bulkIndex(final List<LogMessage> messages) {
