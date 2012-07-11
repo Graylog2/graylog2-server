@@ -541,6 +541,7 @@
 .health-numbers {
   padding: 15px;
   padding-top: 25px;
+  margin-bottom: 15px;
   background-color: #333;
   color: #fff;
   font-size: 60px;
@@ -566,6 +567,21 @@
 
 .health-numbers-explanation {
   font-size: 15px;
+}
+
+.health-node {
+  margin-top: 10px;
+  margin-bottom: 10px;
+  padding: 5px;
+  border: 1px dashed #ccc;
+}
+
+.health-node h3 {
+  margin-top: 0px;
+}
+
+.health-master {
+  text-transform: uppercase;
 }
 
 /* Stream categories */
