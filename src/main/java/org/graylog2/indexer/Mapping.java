@@ -39,7 +39,7 @@ import org.elasticsearch.client.Client;
 public class Mapping {
 
     public static PutMappingRequest getPutMappingRequest(final Client client, final String index) {
-        final PutMappingRequestBuilder builder = client.admin().indices().preparePutMapping(new String[] {index});
+        final PutMappingRequestBuilder builder = client.admin().indices().preparePutMapping( index );
         builder.setType(EmbeddedElasticSearchClient.TYPE);
 
         final Map<String, Object> mapping = new HashMap<String, Object>();

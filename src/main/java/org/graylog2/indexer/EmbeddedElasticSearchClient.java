@@ -130,8 +130,8 @@ public class EmbeddedElasticSearchClient {
     }
 
     public boolean deleteMessagesByTimeRange(int to) {
-        DeleteByQueryRequestBuilder b = client.prepareDeleteByQuery(new String[] {getMainIndexName()});
-        b.setTypes(new String[] {TYPE});
+        DeleteByQueryRequestBuilder b = client.prepareDeleteByQuery( getMainIndexName() );
+        b.setTypes( TYPE );
         final QueryBuilder qb = rangeQuery("created_at").from(0).to(to);
         b.setQuery(qb);
         ActionFuture<DeleteByQueryResponse> future = client.deleteByQuery(b.request());
