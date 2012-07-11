@@ -223,7 +223,7 @@
       }
 
       if (data.code && data.code === "error") {
-        html = self._buildResultLine("shell-error shell-history-result-line", data.reason);
+        html = self._buildResultLine("shell-error shell-history-result-line", "Error: " + data.reason);
         $oldInputContainer.append(html);
         return;
       }
