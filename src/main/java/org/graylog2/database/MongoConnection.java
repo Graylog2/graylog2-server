@@ -89,8 +89,6 @@ public final class MongoConnection {
                         throw new RuntimeException("Could not authenticate to database '" + database + "' with user '" + username + "'.");
                     }
                 }
-            } catch (MongoException.Network e) {
-                throw e;
             } catch (UnknownHostException e) {
                 throw new RuntimeException("Cannot resolve host name for MongoDB", e);
             }
