@@ -99,12 +99,7 @@ public class GELFChunkManager extends Thread {
         }
 
         int claimedSequenceCount = chunks.get(messageId).get(0).getSequenceCount();
-        if (claimedSequenceCount == chunks.get(messageId).size()) {
-            // Message seems to be complete.
-            return true;
-        }
-
-        return false;
+        return claimedSequenceCount == chunks.get( messageId ).size();
     }
 
     public boolean isOutdated(String messageId) {
