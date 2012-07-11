@@ -20,7 +20,6 @@
 
 package org.graylog2.inputs.syslog;
 
-import org.graylog2.Tools;
 import org.graylog2.logmessage.LogMessage;
 import java.net.InetAddress;
 import org.graylog2.Configuration;
@@ -33,7 +32,6 @@ public class SyslogProcessorTest {
     // http://tools.ietf.org/rfc/rfc5424.txt
     public static String ValidStructuredMessage = "<165>1 2012-12-25T22:14:15.003Z mymachine.example.com evntslog - ID47 [exampleSDID@32473 iut=\"3\" eventSource=\"Application\" eventID=\"1011\"] BOMAn application event log entry";
     public static String ValidNonStructuredMessage = "<86>Dec 24 17:05:01 foo-bar CRON[10049]: pam_unix(cron:session): session closed for user root";
-    public static String MessageLookingLikeStructured = "<133>NOMA101FW01A: NetScreen device_id=NOMA101FW01A [Root]system-notification-00257(traffic): start_time=\"2011-12-23 17:33:43\" duration=0 reason=Creation";
 
     @Test
     public void testMessageReceivedWithNonStructuredMessage() throws Exception {
