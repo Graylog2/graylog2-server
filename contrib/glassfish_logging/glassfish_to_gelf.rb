@@ -31,7 +31,7 @@ def transform_level(level)
 end
 
 $stdin.each("#]\n\n") do |line|
-  if line =~ /^\[#/ then
+  if line =~ /^\[#/
     fields = line.chomp.split("|")
 
     message = { "host" => hostname,
