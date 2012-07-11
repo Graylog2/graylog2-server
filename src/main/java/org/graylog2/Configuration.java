@@ -123,27 +123,6 @@ public class Configuration {
     @Parameter(value = "gelf_listen_port", required = true, validator = InetPortValidator.class)
     private int gelfListenPort = 12201;
 
-    @Parameter("amqp_enabled")
-    private boolean amqpEnabled = false;
-
-    @Parameter("amqp_host")
-    private String amqpHost = "localhost";
-
-    @Parameter(value = "amqp_port", validator = InetPortValidator.class)
-    private int amqpPort = 5672;
-
-    @Parameter(value = "amqp_subscribed_queues", converter = StringListConverter.class)
-    private List<String> amqpSubscribedQueues;
-
-    @Parameter("amqp_username")
-    private String amqpUsername = "guest";
-
-    @Parameter("amqp_password")
-    private String amqpPassword = "guest";
-
-    @Parameter("amqp_virtualhost")
-    private String amqpVirtualhost = "/";
-
     @Parameter(value = "forwarder_loggly_timeout", validator = PositiveIntegerValidator.class)
     private int forwarderLogglyTimeout = 3;
 
@@ -295,30 +274,6 @@ public class Configuration {
 
     public int getGelfListenPort() {
         return gelfListenPort;
-    }
-
-    public boolean isAmqpEnabled() {
-        return amqpEnabled;
-    }
-
-    public String getAmqpHost() {
-        return amqpHost;
-    }
-
-    public int getAmqpPort() {
-        return amqpPort;
-    }
-
-    public String getAmqpUsername() {
-        return amqpUsername;
-    }
-
-    public String getAmqpPassword() {
-        return amqpPassword;
-    }
-
-    public String getAmqpVirtualhost() {
-        return amqpVirtualhost;
     }
 
     public int getForwarderLogglyTimeout() {
