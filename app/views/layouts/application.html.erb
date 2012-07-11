@@ -41,7 +41,8 @@
   <div id="back-to-top">Back to top</div>
 
   <div id="current-throughputs">
-    <span class="health-throughput-current"><%= (ServerValue.throughput[:current].to_i)/5.to_i %></span> msgs / sec
+    <span class="health-throughput-current"><%= (Cluster.throughput)/5.to_i %></span> msgs / sec
+    &nbsp; [ <%= Cluster.active_nodes.count %>n ]
   </div>
   <script type="text/javascript">
     $("#current-throughputs").bind("click", function() {
@@ -124,9 +125,9 @@
 
   <br style="clear: both;" /><br />
   
-  <% if ServerValue.ping < 65.seconds.ago %>
+  <% if Cluster.no_active_nodes? %>
     <div id="server-not-running" class="notification">
-      <span class="notification-title">Warning!</span> It seems like your Graylog2 server is not running.
+      <span class="notification-title">Warning!</span> It seems like you have no active Graylog2 node running.
     </div>
   <% end %>
   
