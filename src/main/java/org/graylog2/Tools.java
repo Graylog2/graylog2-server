@@ -20,15 +20,11 @@
 
 package org.graylog2;
 
-import org.apache.log4j.Logger;
-
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.lang.management.ManagementFactory;
 import java.net.InetAddress;
-import java.net.InetSocketAddress;
-import java.net.SocketAddress;
 import java.net.UnknownHostException;
 import java.util.Calendar;
 import java.util.UUID;
@@ -42,8 +38,6 @@ import org.drools.util.codec.Base64;
  * @author Lennart Koopmann <lennart@socketfeed.com>
  */
 public final class Tools {
-
-    private static final Logger LOG = Logger.getLogger(Tools.class);
 
     private Tools() { }
 
