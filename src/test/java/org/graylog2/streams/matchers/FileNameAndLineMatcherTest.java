@@ -36,7 +36,6 @@ public class FileNameAndLineMatcherTest {
     @Test
     public void testSuccessfulMath() {
         String filename = "main.rb";
-        int line = 17;
         String regex = "^main\\.rb:1\\d";
 
         BasicDBObject mongoRule = new BasicDBObject();
@@ -56,7 +55,6 @@ public class FileNameAndLineMatcherTest {
     @Test
     public void testSuccessfulMatchWithoutRegex() {
         String filename = "lol.php";
-        int line = 9001;
         String regex = "lol\\.php:9001";
 
         BasicDBObject mongoRule = new BasicDBObject();
