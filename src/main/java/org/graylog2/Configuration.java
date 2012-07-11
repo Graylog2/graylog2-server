@@ -216,10 +216,6 @@ public class Configuration {
         return recentIndexTtlMinutes;
     }
     
-    public boolean performRetention() {
-        return !noRetention;
-    }
-
     public int getOutputBatchSize() {
         return outputBatchSize;
     }
