@@ -109,7 +109,7 @@ public final class GELFMessageChunk {
         this.arrival = (int) (System.currentTimeMillis()/1000);
     }
 
-    private String extractId() {
+    private void extractId() {
         if (this.id == null) {
             String tmp = "";
             for (int i = 0; i < HEADER_PART_HASH_LENGTH; i++) {
@@ -118,8 +118,6 @@ public final class GELFMessageChunk {
             }
             this.id = tmp;
         }
-
-        return this.id;
     }
 
     // lol duplication
