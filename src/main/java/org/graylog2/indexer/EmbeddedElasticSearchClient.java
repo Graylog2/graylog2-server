@@ -53,7 +53,7 @@ public class EmbeddedElasticSearchClient {
 
         final NodeBuilder builder = nodeBuilder().client(true);
         String esSettings;
-        Map<String, String> settings = null;
+        Map<String, String> settings;
         try {
             esSettings = FileUtils.readFileToString(new File(graylogServer.getConfiguration().getElasticSearchConfigFile()));
             settings = new YamlSettingsLoader().load(esSettings);

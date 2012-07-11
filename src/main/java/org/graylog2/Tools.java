@@ -196,7 +196,7 @@ public final class Tools {
     }
 
     public static String getLocalHostname() {
-        InetAddress addr = null;
+        InetAddress addr;
         try {
             addr = InetAddress.getLocalHost();
         } catch (UnknownHostException ex) {
