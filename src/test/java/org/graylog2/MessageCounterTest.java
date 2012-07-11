@@ -94,7 +94,7 @@ public class MessageCounterTest {
     public void testResetStreamCounts() {
         counter.countUpStream(new ObjectId(), 100);
         counter.resetStreamCounts();
-        assertEquals(new HashMap<ObjectId, Integer>(), counter.getStreamCounts());    }
+        assertEquals(new HashMap<String, Integer>(), counter.getStreamCounts());    }
 
     @Test
     public void testResetTotal() {
