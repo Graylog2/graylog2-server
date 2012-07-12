@@ -20,7 +20,6 @@
 
 package org.graylog2.initializers;
 
-import org.graylog2.Configuration;
 import org.graylog2.GraylogServer;
 import org.graylog2.HostSystem;
 import org.graylog2.ServerValue;
@@ -32,11 +31,8 @@ import org.graylog2.periodical.ServerValueWriterThread;
  */
 public class ServerValueWriterInitializer extends SimpleFixedRateScheduleInitializer implements Initializer {
 
-    private Configuration configuration;
-
-    public ServerValueWriterInitializer(GraylogServer graylogServer, Configuration configuration) {
+    public ServerValueWriterInitializer(GraylogServer graylogServer) {
         this.graylogServer = graylogServer;
-        this.configuration = configuration;
     }
 
     @Override
