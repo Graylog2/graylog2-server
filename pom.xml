@@ -163,6 +163,7 @@
                 <artifactId>maven-jar-plugin</artifactId>
                 <version>2.3.1</version>
                 <configuration>
+                    <finalName>graylog2-server</finalName>
                     <archive>
                         <manifest>
                             <mainClass>org.graylog2.Main</mainClass>
@@ -175,6 +176,7 @@
                 <artifactId>maven-assembly-plugin</artifactId>
                 <version>2.2.1</version>
                 <configuration>
+                    <finalName>graylog2-server</finalName>
                     <archive>
                         <manifest>
                             <mainClass>org.graylog2.Main</mainClass>
