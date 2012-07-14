@@ -3,7 +3,7 @@ $(document).ajaxSend(function(e, xhr, options) {
   xhr.setRequestHeader("X-CSRF-Token", token);
 });
 
-$(document).ready(function(){
+$(document).ready(function() {
 
     // Hide notifications after some time.
     setInterval(function() {

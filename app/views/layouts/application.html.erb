@@ -26,6 +26,9 @@
     <%= javascript_include_tag("jquery.flot.selection.min") %>
     <%= javascript_include_tag("jquery.flot.resize.min") %>
   <% end %>
+  <% if @load_messages %>
+    <%= javascript_include_tag("messages.js") %>
+  <% end %>
   <%= javascript_include_tag "backtotop" if @use_backtotop %>
   <%= javascript_include_tag "application" %>
   <%= javascript_include_tag "shell" if @has_shell %>
