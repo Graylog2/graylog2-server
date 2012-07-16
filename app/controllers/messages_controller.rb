@@ -71,6 +71,7 @@ class MessagesController < ApplicationController
     @has_sidebar = true
     @load_flot = true
     @use_backtotop = true
+    @load_messages = true
 
     if ::Configuration.allow_version_check
       @last_version_check = current_user.last_version_check
@@ -80,6 +81,7 @@ class MessagesController < ApplicationController
   def show
     @has_sidebar = true
     @load_flot = true
+    @load_messages = true
 
     @message = MessageGateway.retrieve_by_id(params[:id])
     @terms = MessageGateway.analyze(@message.message)
