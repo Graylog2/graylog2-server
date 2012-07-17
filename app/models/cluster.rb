@@ -36,6 +36,11 @@ class Cluster
     master_count == 0
   end
 
+  def self.message_retention_last_performed
+    # Just in case somebody runs multiple masters, select the most recent run.
+    Cluster.active_nodes.collect { |n| n.message_retention_last_performed }.delete_if { |t| t.nil? }.max
+  end
+
   private
   def self.master_count
     active_nodes.count { |n| n.is_master? }

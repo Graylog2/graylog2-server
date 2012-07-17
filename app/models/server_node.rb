@@ -38,6 +38,12 @@ class ServerNode
     ServerValue.get("graylog2_version", @server_id).value
   end
 
+  def message_retention_last_performed
+    v = ServerValue.get("message_retention_last_performed", @server_id, nil)
+
+    v.blank? ? nil : v.value
+  end
+
   private
   def get_throughput(which)
     val = ServerValue.get("total_throughput", @server_id)
