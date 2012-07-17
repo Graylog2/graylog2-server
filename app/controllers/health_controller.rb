@@ -2,7 +2,8 @@ class HealthController < ApplicationController
   filter_access_to :index
 
   def index
-    @load_flot = true
+    # Delete outdated server values from instances not running anymore.
+    ServerValue.delete_outdated
   end
 
   def currentthroughput

@@ -10,4 +10,15 @@ class ServerValue
     val.blank? ? if_not_found : val
   end
 
+  def self.delete_outdated
+    delete_all(:server_id => { "$in" => outdated_nodes })
+  end
+
+  private
+  def self.outdated_nodes
+    all(:conditions => {:type => "ping", :value => { "$lt" => Cluster::PING_TIMEOUT.seconds.ago.to_i } }).collect { |s| s.server_id }
+  rescue
+    []
+  end
+
 end
