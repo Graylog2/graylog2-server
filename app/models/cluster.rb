@@ -6,7 +6,7 @@ class Cluster
   field :type, :type => String
   field :value, :type => Object
 
-  PING_TIMEOUT = 15
+  PING_TIMEOUT = 7
 
   def self.throughput
     return 0 if no_active_nodes?
