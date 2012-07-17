@@ -38,7 +38,7 @@ class Cluster
 
   private
   def self.master_count
-    active_nodes.select { |n| n.is_master? }.count
+    active_nodes.count { |n| n.is_master? }
   end
 
 end
