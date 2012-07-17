@@ -28,4 +28,17 @@ class Cluster
     []
   end
 
+  def self.multiple_masters?
+    master_count > 1
+  end
+
+  def self.no_masters?
+    master_count == 0
+  end
+
+  private
+  def self.master_count
+    active_nodes.select { |n| n.is_master? }.count
+  end
+
 end

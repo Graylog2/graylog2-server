@@ -132,6 +132,18 @@
     <div id="server-not-running" class="notification">
       <span class="notification-title">Warning!</span> It seems like you have no active Graylog2 node running.
     </div>
+  <% else %>
+    <% if Cluster.multiple_masters? %>
+      <div id="server-not-running" class="notification">
+        <span class="notification-title">Warning!</span> It seems like you have multiple Graylog2 master nodes running.
+      </div>
+    <% end %>
+    
+    <% if Cluster.no_masters? %>
+      <div id="server-not-running" class="notification">
+        <span class="notification-title">Warning!</span> It seems like you have no Graylog2 master nodes running. (all non-master)
+      </div>
+    <% end %>
   <% end %>
   
   <% unless flash[:notice].blank? %>
