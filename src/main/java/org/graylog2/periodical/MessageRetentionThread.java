@@ -36,8 +36,6 @@ public class MessageRetentionThread implements Runnable {
 
     private static final Logger LOG = Logger.getLogger(MessageRetentionThread.class);
 
-    private int retentionTimeDays;
-
     private final GraylogServer server;
 
     private final MessageRetention messageRetention;
@@ -57,11 +55,11 @@ public class MessageRetentionThread implements Runnable {
              * to be sure to always have the *current* setting from database - even when
              * used with scheduler.
              */
-            this.retentionTimeDays = settings.getRetentionTimeInDays();
+          final int retentionTimeDays = settings.getRetentionTimeInDays();
 
-            LOG.info("Initialized message retention thread - cleaning all messages older than <" + this.retentionTimeDays + " days>.");
+            LOG.info("Initialized message retention thread - cleaning all messages older than <" + retentionTimeDays + " days>.");
 
-            if (messageRetention.performCleanup(this.retentionTimeDays)) {
+            if (messageRetention.performCleanup( retentionTimeDays )) {
                 messageRetention.updateLastPerformedTime();
             }
         } catch (Exception e) {

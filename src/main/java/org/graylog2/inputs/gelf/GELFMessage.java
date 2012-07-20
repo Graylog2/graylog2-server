@@ -64,7 +64,7 @@ public class GELFMessage {
         Type(final byte first, final byte second) {
             this.first = first;
             this.second = second;
-        };
+        }
 
         static Type determineType(final byte first, final byte second) {
             if (first == ZLIB.first && second == ZLIB.second) {

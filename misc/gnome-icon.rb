@@ -16,7 +16,7 @@ end
 class Graylog2Icon
   def initialize
     @icon = Gtk::StatusIcon.new
-    @icon.pixbuf = Gdk::Pixbuf.new(TRAYICON, 20, 20);
+    @icon.pixbuf = Gdk::Pixbuf.new(TRAYICON, 20, 20)
     @icon.tooltip = "Graylog"
   end
 

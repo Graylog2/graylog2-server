@@ -45,7 +45,6 @@ public class HealthCheckRequestHandler extends SimpleChannelUpstreamHandler {
     @Override
     public void messageReceived(ChannelHandlerContext ctx, MessageEvent e) throws Exception {
         StringBuilder buffer = new StringBuilder();
-        HttpRequest request = (HttpRequest) e.getMessage();
 
         buffer.setLength(0);
         buffer.append(buildTextResponse());

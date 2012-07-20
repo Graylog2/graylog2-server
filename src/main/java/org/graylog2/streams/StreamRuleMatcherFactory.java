@@ -28,7 +28,7 @@ import org.graylog2.streams.matchers.*;
 public class StreamRuleMatcherFactory {
 
     public static StreamRuleMatcher build(int ruleType) throws InvalidStreamRuleTypeException {
-        StreamRuleMatcher matcher = null;
+        StreamRuleMatcher matcher;
 
         // IMPORTANT: Also add every new rule type to the unit test.
         switch (ruleType) {

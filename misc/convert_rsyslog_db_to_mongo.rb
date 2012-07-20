@@ -8,8 +8,8 @@ require 'time'
 
 begin
   dbh = Mysql.real_connect("localhost", "root", "mama", "Syslog")
-  res = dbh.query("SELECT Message, ReceivedAt, FromHost, Facility, Priority FROM SystemEvents ORDER BY ReceivedAt ASC");
-  
+  res = dbh.query("SELECT Message, ReceivedAt, FromHost, Facility, Priority FROM SystemEvents ORDER BY ReceivedAt ASC")
+
   db = Mongo::Connection.new.db("graylog2")
   coll = db.collection("messages")
 
