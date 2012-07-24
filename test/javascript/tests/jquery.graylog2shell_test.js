@@ -167,7 +167,7 @@
     instance._renderCallback({code: "error", reason: "Internal error."});
 
     strictEqual($('#shell').find('.shell-error').length, 1);
-    strictEqual($('#shell').find('.shell-error').text(), "01:00:00 - Internal error."); // sinon qunit date is always 01:00
+    strictEqual($('#shell').find('.shell-error').text(), "01:00:00 - Error: Internal error."); // sinon qunit date is always 01:00
   });
 
   test("renderCallback() renders count results", 3, function() {
