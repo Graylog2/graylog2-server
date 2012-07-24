@@ -80,6 +80,88 @@
     strictEqual($("#shell-command-input").val(), "graylog", "input should be graylog then");
   });
 
+  test("the shell history is 100 lines: integrational test", 4, function() {
+    this.ajaxStub = sinon.stub($, "ajax").returns(true);
+
+    this.elem.shell();
+    var e = $.Event("keyup"),
+        $input = $("#shell-command-input"),
+        i;
+
+    for (i = 0; i < 100; i++) {
+      this.enterText(i);
+    }
+
+    e.which = 38;
+    $input.trigger(e);
+
+    strictEqual($input.val(), "99");
+
+    $input.trigger(e);
+    $input.trigger(e);
+    $input.trigger(e);
+
+    strictEqual($input.val(), "96");
+
+    for (i = 0; i < 100; i++) {
+      $input.trigger(e);
+    }
+    strictEqual($input.val(), "0");
+
+    $input.trigger(e);
+    $input.trigger(e);
+    strictEqual($input.val(), "0");
+  });
+
+  test("the shell history: arrow down goes backward in history: integrational test", 4, function() {
+    this.ajaxStub = sinon.stub($, "ajax").returns(true);
+
+    this.elem.shell();
+    var e = $.Event("keyup"),
+        $input = $("#shell-command-input"),
+        i;
+
+    for (i = 0; i < 100; i++) {
+      this.enterText(i);
+    }
+
+    e.which = 38;
+    $input.trigger(e);
+
+    strictEqual($input.val(), "99");
+
+    $input.trigger(e);
+    $input.trigger(e);
+    $input.trigger(e);
+
+    strictEqual($input.val(), "96");
+
+    e.which = 40;
+
+    $input.trigger(e);
+    $input.trigger(e);
+    $input.trigger(e);
+
+    strictEqual($input.val(), "99");
+    $input.trigger(e);
+    strictEqual($input.val(), "99");
+  });
+
+  test("_handleHistory() sets up to 100 elements", 1, function() {
+    this.elem.shell();
+    var instance = $.data(this.elem[0], "shell"),
+        testinput = [],
+        i;
+
+    for (i = 0; i <= 100; i++) {
+      instance._handleHistory(i);
+      testinput[i] = i;
+    }
+
+    strictEqual(instance.history[99], 99);
+  });
+
+
   test("a loading div is shown after calling processInput", 1, function() {
     this.ajaxStub = sinon.stub($, "ajax").returns(true);
 
