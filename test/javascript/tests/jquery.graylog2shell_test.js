@@ -41,6 +41,8 @@
   });
 
   test("input is emptied after pressing enter", 2, function() {
+  this.ajaxStub = sinon.stub($, "ajax").returns(true);
+
     this.elem.shell();
     $("#shell-command-input").val('graylog');
     strictEqual($("#shell-command-input").val(), 'graylog', "input should be graylog");
@@ -61,6 +63,8 @@
   });
 
   test("arrow key up should give the last command", 2, function() {
+    this.ajaxStub = sinon.stub($, "ajax").returns(true);
+
     this.elem.shell();
     $("#shell-command-input").val('graylog');
     strictEqual($("#shell-command-input").val(), "graylog", "input should be graylog");
@@ -97,6 +101,8 @@
   });
 
   test("input 'clear' clears the shell", 2, function() {
+    this.ajaxStub = sinon.stub($, "ajax").returns(true);
+
     this.elem.shell();
     this.enterText("graylog");
     this.enterText("test");
@@ -117,6 +123,8 @@
   });
 
   test("if history is disabled, new input shows NOT up after submitting by pressing enter", 1, function() {
+    this.ajaxStub = sinon.stub($, "ajax").returns(true);
+
     this.elem.shell({history: false});
     this.enterText("graylog");
     this.enterText("test");
@@ -125,7 +133,8 @@
   });
 
   test("jQuery ajax should be called after pressing enter", 3, function() {
-    this.spy($, "ajax");
+    this.ajaxStub = sinon.stub($, "ajax").returns(true);
+
     this.elem.shell();
     this.enterText("test");
 
