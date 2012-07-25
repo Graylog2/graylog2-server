@@ -110,7 +110,9 @@ public final class Main {
             System.exit(0);
         }
 
-        savePidFile(commandLineArguments.getPidFile());
+        // Do not use a PID file if the user requested not to
+        if (!commandLineArguments.isNoPidFile())
+            savePidFile(commandLineArguments.getPidFile());
 
         // Le server object. This is where all the magic happens.
         GraylogServer server = new GraylogServer();
