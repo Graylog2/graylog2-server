@@ -20,7 +20,7 @@ public class CommandLineArguments {
     @Parameter(names = {"-p", "--pidfile"}, description = "File containing the PID of graylog2")
     private String pidFile = TMPDIR + FILE_SEPARATOR + "graylog2.pid";
 
-    @Parameter(names = {"-np", "--no-pid-file"}, description = "Do not use a PID file (overrides -p/--pidfile)")
+    @Parameter(names = {"-np", "--no-pid-file"}, description = "Do not write a PID file (overrides -p/--pidfile)")
     private boolean noPidFile = false;
 
     @Parameter(names = {"-t", "--configtest"}, description = "Validate graylog2 configuration and exit")
