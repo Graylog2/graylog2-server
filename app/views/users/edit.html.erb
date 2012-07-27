@@ -3,7 +3,16 @@
   <%= awesome_link "Delete user", user_path(@user), :method => :delete, :confirm => "Really delete ths user?" %>
 </div>
 
+
 <h1>Edit user <span class="highlighted"><%= @user.login %></span></h1>
 <% @user.password = @user.password_confirmation = nil %>
 
 <%= render :partial => "user_form", :locals => {:form_action => "update", :user => @user}%>
+
+<div id="users-apikey">
+  <br />
+  <% if not @user.api_key.blank? then %>
+    Api Key: <%=@user.api_key%>
+  <% end %>
+  <%= awesome_link "Generate Api Key", key_user_path(@user), :method => :post, :confirm => "Really reset key?" %>
+<div/>  

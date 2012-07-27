@@ -10,6 +10,9 @@ Graylog2WebInterface::Application.routes.draw do
       post :createfirst
       get :first
     end
+    member do
+      post :key
+    end
   end
 
   resources :messages do

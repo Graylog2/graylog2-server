@@ -79,6 +79,14 @@ class UsersController < ApplicationController
     redirect_to :action => 'index'
   end
 
+  def key
+    @user = User.find(params[:id])
+    key = @user.generate_api_key
+    @user.save()
+    flash[:notice] = "The new api key is: " + key
+    redirect_to :action => :edit
+  end
+
   def first
     # This action is allowed without login. Block after first user is created.
     if User.count > 0

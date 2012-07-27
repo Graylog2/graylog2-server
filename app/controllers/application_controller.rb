@@ -3,7 +3,7 @@ class ApplicationController < ActionController::Base
 
   protect_from_forgery
   helper Authorization::AuthorizationHelper
-
+  @@api_auth_only = []
   before_filter :login_required, :clear_terms_cache
 
   rescue_from "Mongo::ConnectionFailure" do
@@ -33,6 +33,15 @@ class ApplicationController < ActionController::Base
     return tmp.strftime(::Configuration.date_format)
   end
 
+  def self.api_auth(*actions)
+    @@api_auth_only = actions
+  end
+
+  def api_auth_only(action)
+    logger.info(action.to_s + " of " + @@api_auth_only.to_s + " " + @@api_auth_only.include?(action).to_s)
+    return @@api_auth_only.include?(action.to_sym)
+  end
+
   private
 
   def logged_in?
@@ -42,15 +51,22 @@ class ApplicationController < ActionController::Base
     return false
   end
 
+  def api_login
+    logger.info("using api login")
+    return authenticate_or_request_with_http_digest do |u|
+      logger.info("user " +  u)
+      user = User.find_by_login(u)
+      return false if (user || user.api_key.blank?)
+      logger.info("User has api access")
+      return user.api_key
+    end
+  end
+
   def login_required
     if  request.format.json? then
-      return true if logged_in?
-      if user = authenticate_with_http_basic { |u, p| User.authenticate(u, p) }
-        current_user = user
-        return true
-      else
-        return request_http_basic_authentication
-      end
+      return true if logged_in? and not api_auth_only(action_name)
+      user = api_login()
+      current_user = user
     end
     if !logged_in?
       store_location

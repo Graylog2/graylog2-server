@@ -1,6 +1,8 @@
 class MessagesController < ApplicationController
   before_filter :do_scoping
 
+  api_auth :index
+
   filter_access_to :all
 
   # XXX ELASTIC clean up triple-duplicated quickfilter shit
