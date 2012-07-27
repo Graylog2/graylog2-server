@@ -3,26 +3,6 @@ message_length = Setting.get_message_length(current_user)
 additional_columns ||= []
 %>
 
-<script type="text/javascript">
-  // Inline to avoid re-binding problems when loaded via AJAX. lolzomg JS fuckery
-
-  $(document).ready(function(){
-    // Highlight messages from today.
-    $(".messages-from-today-link").bind("click", function() {
-      if ($(this).hasClass("active")) {
-        $("tr").removeClass("messages-today");
-        $(this).removeClass("active");
-        $(this).attr("src", "/images/icons/sun.png");
-      } else {
-        d = new Date();
-        $(".udate-" + d.getFullYear() + "-" + (d.getMonth()+1) + "-" + d.getDate()).addClass("messages-today");
-        $(this).attr("src", "/images/icons/sun_active.png");
-        $(this).addClass("active");
-      }
-    })
-  });
-</script>
-
 <table class="messages<%= defined?(@inline_version) ? " messages-inline" : nil %>">
   <thead>
     <tr>
