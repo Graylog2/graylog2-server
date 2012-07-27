@@ -69,6 +69,10 @@ class User
   def self.find_by_login(login)
     find(:first, :conditions => {:login => login})
   end
+  
+  def self.find_by_key(key)
+    find(:first, :conditions => {:api_key => key})
+  end
 
   def login=(value)
     write_attribute :login, (value ? value.downcase : nil)
