@@ -58,12 +58,13 @@ public class TokenizerFilter implements MessageFilter {
         int extracted = 0;
         if (msg.getShortMessage().contains("=")) {
             try {
-                String[] parts = msg.getShortMessage().split(" ");
+                String nmsg = msg.getShortMessage().replaceAll("\\s?=\\s?", "=");
+                String[] parts = nmsg.split(" ");
                 if (parts != null) {
                     for (String part : parts) {
                         if (part.contains("=") && StringUtils.countMatches(part, "=") == 1) {
                             String[] kv = part.split("=");
-                            if (kv[0] != null && kv[1] != null && p.matcher(kv[0]).matches() && !msg.getAdditionalData().containsKey("_" + kv[0])) {
+                            if (kv.length == 2 && p.matcher(kv[0]).matches() && !msg.getAdditionalData().containsKey("_" + kv[0])) {
                                 msg.addAdditionalData(kv[0].trim(), kv[1].trim());
                                 extracted++;
                             }
