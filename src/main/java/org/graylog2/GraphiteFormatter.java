@@ -57,7 +57,7 @@ public class GraphiteFormatter {
 
         // Hosts.
         for(Entry<String, Integer> host : counter.getHostCounts().entrySet()) {
-            String hval = prefix() + "hosts." + Tools.decodeBase64(host.getKey()).replaceAll("[^a-zA-Z0-9]", "") + " " + host.getValue() + " " + Tools.getUTCTimestamp();
+            String hval = prefix() + "hosts." + Tools.decodeBase64(host.getKey()).replaceAll("[^a-zA-Z0-9\\.]", "") + " " + host.getValue() + " " + Tools.getUTCTimestamp();
             r.add(hval);
         }
 
