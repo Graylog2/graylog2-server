@@ -9,6 +9,10 @@ class HostsController < ApplicationController
     @all_hosts = Host.all
     @hosts = Host.asc(:host).page(params[:page]) # all hosts, sorted alphabetically by hostname, paginated
     @host_count = Host.count
+    respond_to do |format|
+        format.html
+        format.json { render :json => @hosts }
+    end
   end
 
   def showrange
