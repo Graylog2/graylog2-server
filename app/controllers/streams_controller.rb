@@ -1,6 +1,7 @@
 class StreamsController < ApplicationController
   filter_access_to :all
   before_filter :load_stream, :except => [ :index, :create ]
+  ignore_session_on_json :index
 
   def show
     load_stream

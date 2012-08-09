@@ -4,6 +4,9 @@ class HostsController < ApplicationController
   filter_access_to :show
   filter_access_to :quickjump
   filter_access_to :showrange
+  
+  ignore_session_on_json :index
+
 
   def index
     @all_hosts = Host.all

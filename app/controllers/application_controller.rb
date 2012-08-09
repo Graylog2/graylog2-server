@@ -3,7 +3,6 @@ class ApplicationController < ActionController::Base
 
   protect_from_forgery
   helper Authorization::AuthorizationHelper
-  @@api_auth_only = []
   before_filter :login_required, :clear_terms_cache
 
   rescue_from "Mongo::ConnectionFailure" do
@@ -33,12 +32,15 @@ class ApplicationController < ActionController::Base
     return tmp.strftime(::Configuration.date_format)
   end
 
-  def self.api_auth(*actions)
-    @@api_auth_only = actions
+  #carry around a list of actions that should not use the session for auth.
+  #we do this because of some non-api json routes like health that /do/ use the session.
+  @@session_ignorant_actions = []
+  def self.ignore_session_on_json(*actions)
+    @@session_ignorant_actions = actions
   end
 
-  def api_auth_only(action)
-    return @@api_auth_only.include?(action.to_sym)
+  def should_ignore_session?(action)
+    return @@session_ignorant_actions.include?(action.to_sym)
   end
 
   private
@@ -51,7 +53,6 @@ class ApplicationController < ActionController::Base
   end
 
   def api_login
-    logger.info("using api login")
     key = params[:api_key]
     return nil unless key
     return User.find_by_key(key)
@@ -59,7 +60,7 @@ class ApplicationController < ActionController::Base
 
   def login_required
     if  request.format.json? then
-      return true if logged_in? and not api_auth_only(action_name)
+      return true if logged_in? and not should_ignore_session?(action_name)
       @current_user = api_login() || false
       if !logged_in?
         render :json => {"error", "unauthorized"}, :status=>401

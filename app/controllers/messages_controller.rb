@@ -1,7 +1,7 @@
 class MessagesController < ApplicationController
   before_filter :do_scoping
 
-  api_auth :index
+  ignore_session_on_json :index, :show
 
   filter_access_to :all
 
