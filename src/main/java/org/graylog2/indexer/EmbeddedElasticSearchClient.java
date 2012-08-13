@@ -26,6 +26,7 @@ import org.elasticsearch.action.deletebyquery.DeleteByQueryResponse;
 import org.elasticsearch.action.index.IndexRequest.OpType;
 import org.elasticsearch.action.index.IndexRequestBuilder;
 import org.elasticsearch.client.Client;
+import org.elasticsearch.common.UUID;
 import org.elasticsearch.common.settings.loader.YamlSettingsLoader;
 import org.elasticsearch.common.xcontent.XContentType;
 import org.elasticsearch.index.query.QueryBuilder;
@@ -116,8 +117,11 @@ public class EmbeddedElasticSearchClient {
         for (LogMessage msg : messages) {
             String source = JSONValue.toJSONString(msg.toElasticSearchObject());
             
-            b.add(buildIndexRequest(getMainIndexName(), source, 0)); // Main index.
-            b.add(buildIndexRequest(RECENT_INDEX_NAME, source, server.getConfiguration().getRecentIndexTtlMinutes())); // Recent index.
+            // We manually set the same ID to allow linking between indices later.
+            final String id = UUID.randomBase64UUID();
+            
+            b.add(buildIndexRequest(getMainIndexName(), source, id, 0)); // Main index.
+            b.add(buildIndexRequest(RECENT_INDEX_NAME, source, id, server.getConfiguration().getRecentIndexTtlMinutes())); // Recent index.
         }
 
         final ActionFuture<BulkResponse> bulkFuture = client.bulk(b.request());
@@ -150,9 +154,14 @@ public class EmbeddedElasticSearchClient {
         return String.format("%1$tY-%1$tm-%1$td %1$tH-%1$tM-%1$tS", cal); // ramtamtam
     }
     
-    private IndexRequestBuilder buildIndexRequest(String index, String source, int ttlMinutes) {
+    private IndexRequestBuilder buildIndexRequest(String index, String source, String id, int ttlMinutes) {
         final IndexRequestBuilder b = new IndexRequestBuilder(client);
         
+        /*
+         * ID is set manually to allow inserting message into recent and total index
+         * with same ID. (Required for linking in frontend)
+         */
+        b.setId(id);
         b.setSource(source);
         b.setIndex(index);
         b.setContentType(XContentType.JSON);
