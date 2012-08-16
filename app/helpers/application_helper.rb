@@ -288,4 +288,20 @@ module ApplicationHelper
       #{label_tag :range_type_weeks, "Weeks"}
     "
   end
+
+  def recent_index_switcher(showall)
+    if showall == "true"
+      shown = "all"
+      not_shown = "recent"
+      link = "false"
+    else
+      shown = "recent"
+      not_shown = "all"
+      link = "true"
+    end
+
+    return ("<strong>Showing <span class='highlighted'>" + shown + "</span> messages.</strong>" +
+           " (Show " + link_to(not_shown, "?showall=" + link) + " messages)").html_safe
+
+  end
 end

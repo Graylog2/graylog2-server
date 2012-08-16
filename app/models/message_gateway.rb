@@ -49,8 +49,8 @@ class MessageGateway
   @index = Tire.index(INDEX_NAME)
   @default_query_options = { :sort => "created_at desc" }
 
-  def self.all_paginated(page = 1)
-    use_recent_index!
+  def self.all_paginated(page = 1, opts = {})
+    use_recent_index! if (opts[:all].blank? or opts[:all] == false)
 
     r = search(pagination_options(page).merge(@default_query_options)) do
       query { all }
@@ -59,13 +59,13 @@ class MessageGateway
     wrap(r)
   end
 
-  def self.all_of_stream_paginated(stream_id, page = 1)
-    use_recent_index!
+  def self.all_of_stream_paginated(stream_id, page = 1, opts = {})
+    use_recent_index! if (opts[:all].blank? or opts[:all] == false)
     wrap search("streams:#{stream_id}", pagination_options(page).merge(@default_query_options))
   end
 
-  def self.all_of_host_paginated(hostname, page = 1)
-    use_recent_index!
+  def self.all_of_host_paginated(hostname, page = 1, opts = {})
+    use_recent_index! if (opts[:all].blank? or opts[:all] == false)
     wrap search("host:#{hostname}", pagination_options(page).merge(@default_query_options))
   end
 
@@ -196,6 +196,7 @@ class MessageGateway
   end
 
   def self.oldest_message
+    index_name(DEFAULT_INDEX_NAME)  # just to make sure
     r = search({ :sort => "created_at asc", :size => 1 }) do
       query { all }
     end.first

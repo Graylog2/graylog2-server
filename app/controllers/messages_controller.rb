@@ -5,6 +5,8 @@ class MessagesController < ApplicationController
 
   # XXX ELASTIC clean up triple-duplicated quickfilter shit
   def do_scoping
+    (!params[:showall].blank? and params[:showall] == "true") ? showall = true : showall = false
+    
     if params[:host_id]
       @scoping = :host
       block_access_for_non_admins
@@ -14,7 +16,7 @@ class MessagesController < ApplicationController
       @total_count = MessageGateway.host_count(@host.host)
 
       if params[:filters].blank?
-        @messages = MessageGateway.all_of_host_paginated(@host.host, params[:page])
+        @messages = MessageGateway.all_of_host_paginated(@host.host, params[:page], :all => showall)
       else
         @additional_filters = Quickfilter.extract_additional_fields_from_request(params[:filters])
         @messages = MessageGateway.all_by_quickfilter(params[:filters], params[:page], :hostname => @host.host)
@@ -31,7 +33,7 @@ class MessagesController < ApplicationController
       @total_count = MessageGateway.stream_count(@stream.id)
       
       if params[:filters].blank?
-        @messages = MessageGateway.all_of_stream_paginated(@stream.id, params[:page])
+        @messages = MessageGateway.all_of_stream_paginated(@stream.id, params[:page], :all => showall)
       else
         @additional_filters = Quickfilter.extract_additional_fields_from_request(params[:filters])
         @messages = MessageGateway.all_by_quickfilter(params[:filters], params[:page], :stream_id => @stream.id)
@@ -46,7 +48,7 @@ class MessagesController < ApplicationController
       @total_count = MessageGateway.total_count # XXX ELASTIC Possibly read cached from first all_paginated result?!
 
       if params[:filters].blank?
-        @messages = MessageGateway.all_paginated(params[:page])
+        @messages = MessageGateway.all_paginated(params[:page], :all => showall)
       else
         @additional_filters = Quickfilter.extract_additional_fields_from_request(params[:filters])
         @messages = MessageGateway.all_by_quickfilter(params[:filters], params[:page])

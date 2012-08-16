@@ -30,5 +30,7 @@
   <% end %>
 </div>
 
-<strong>Showing recent messages</strong>
+<% if params[:filters].blank? %>
+<%= recent_index_switcher(params[:showall]) %>
 <br />
+<% end %>
