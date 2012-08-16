@@ -40,15 +40,15 @@ class MessagesController < ApplicationController
       unless (params[:action] == "show")
         block_access_for_non_admins
       end
+        
+      @total_count = MessageGateway.total_count # XXX ELASTIC Possibly read cached from first all_paginated result?!
 
       if params[:filters].blank?
         @messages = MessageGateway.all_paginated(params[:page])
-        @total_count = @messages.total_result_count
       else
         @additional_filters = Quickfilter.extract_additional_fields_from_request(params[:filters])
         @messages = MessageGateway.all_by_quickfilter(params[:filters], params[:page])
         @quickfilter_result_count = @messages.total_result_count
-        @total_count = MessageGateway.total_count # XXX ELASTIC Possibly read cached from first all_paginated result?!
       end
     end
   rescue Tire::Search::SearchRequestFailed
