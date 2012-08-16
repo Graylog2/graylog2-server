@@ -60,10 +60,12 @@ class MessageGateway
   end
 
   def self.all_of_stream_paginated(stream_id, page = 1)
+    use_recent_index!
     wrap search("streams:#{stream_id}", pagination_options(page).merge(@default_query_options))
   end
 
   def self.all_of_host_paginated(hostname, page = 1)
+    use_recent_index!
     wrap search("host:#{hostname}", pagination_options(page).merge(@default_query_options))
   end
 
