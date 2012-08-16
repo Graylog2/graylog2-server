@@ -10,6 +10,9 @@ class MessagesController < ApplicationController
       block_access_for_non_admins
 
       @host = Host.find(:first, :conditions => {:host=> params[:host_id]})
+      
+      @total_count = MessageGateway.host_count(@host.host)
+
       if params[:filters].blank?
         @messages = MessageGateway.all_of_host_paginated(@host.host, params[:page])
       else
@@ -17,7 +20,6 @@ class MessagesController < ApplicationController
         @messages = MessageGateway.all_by_quickfilter(params[:filters], params[:page], :hostname => @host.host)
         @quickfilter_result_count = @messages.total_result_count
       end
-      @total_count = @messages.total_result_count
     elsif params[:stream_id]
       @scoping = :stream
       @stream = Stream.find_by_id(params[:stream_id])
@@ -25,15 +27,15 @@ class MessagesController < ApplicationController
 
       # Check streams for reader.
       block_access_for_non_admins if !@stream.accessable_for_user?(current_user)
+        
+      @total_count = MessageGateway.stream_count(@stream.id)
       
       if params[:filters].blank?
         @messages = MessageGateway.all_of_stream_paginated(@stream.id, params[:page])
-        @total_count = @messages.total_result_count
       else
         @additional_filters = Quickfilter.extract_additional_fields_from_request(params[:filters])
         @messages = MessageGateway.all_by_quickfilter(params[:filters], params[:page], :stream_id => @stream.id)
         @quickfilter_result_count = @messages.total_result_count
-        @total_count = MessageGateway.stream_count(@stream.id) # XXX ELASTIC Possibly read cached from first all_paginated result?!
       end
     else
       @scoping = :messages

@@ -191,6 +191,10 @@ class MessageGateway
     search("streams:#{stream_id}", :size => 0).total
   end
 
+  def self.host_count(hostname)
+    search("host:#{hostname}", :size => 0).total
+  end
+
   def self.oldest_message
     r = search({ :sort => "created_at asc", :size => 1 }) do
       query { all }
