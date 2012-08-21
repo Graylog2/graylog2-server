@@ -29,7 +29,7 @@ import static org.junit.Assert.*;
  */
 public class GELFMessageTest {
 
-    public final static String GELF_JSON = "{\"message\":\"foo\",\"host\":\"bar\",\"_lol_utf8\":\"ü\"}";
+    public final static String GELF_JSON = "{\"message\":\"foo\",\"host\":\"bar\",\"_lol_utf8\":\"\u00FC\"}";
 
     @Test
     public void testGetGELFTypeDetectsZLIBCompressedMessage() throws Exception {
