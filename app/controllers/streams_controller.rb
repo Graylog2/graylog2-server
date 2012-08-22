@@ -1,9 +1,10 @@
 class StreamsController < ApplicationController
   filter_access_to :all
   before_filter :load_stream, :except => [ :index, :create ]
+  ignore_session_on_json :index
 
   def show
-    @stream = Stream.find_by_id(params[:id])
+    load_stream
     redirect_to stream_messages_path(@stream)
   end
 
@@ -25,6 +26,11 @@ class StreamsController < ApplicationController
         @streams_with_no_category << stream
       end
     end
+    respond_to do |format|
+        format.html
+        format.json { render :json => @all_streams }
+    end
+    
   end
 
   def showrange
@@ -320,7 +326,7 @@ class StreamsController < ApplicationController
 
   protected
   def load_stream
-    @stream = Stream.find_by_id params["id"]
+    @stream = Stream.find_by_id_or_name(params["id"])
     render :text => "Not accessible for your user.", :status => :forbidden and return if !@stream.accessable_for_user?(current_user)
   end
 end
