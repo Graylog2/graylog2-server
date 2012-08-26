@@ -243,7 +243,6 @@
           $input = $shell.find("#shell-command-input"),
           history = self.options.history,
           html,
-          $contentInner,
           result;
 
       $waiting.remove();
@@ -286,14 +285,19 @@
             break;
         }
 
-        if (data.op === "findresult") {
-          $contentInner = $("#content-inner");
-          $contentInner.html(data.content);
+        if (data.op === "find") {
+          self._replaceContent(data.content);
         }
 
         html = self._buildResultLine("shell-success shell-history-result-line", result);
         $oldInputContainer.append(html);
       }
+    },
+
+    _replaceContent: function(content) {
+      var $contentInner = $("#content-inner");
+
+      $contentInner.html(content);
     },
 
     /**

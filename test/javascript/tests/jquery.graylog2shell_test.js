@@ -340,14 +340,24 @@
     strictEqual($('#shell').find('.shell-success').text().match("No matches."), null);
   });
 
-  test("renderCallback() renders findresult result", 2, function() {
+  test("renderCallback() renders result of 'find'", 2, function() {
     this.elem.shell();
     var instance = $.data(this.elem[0], "shell");
 
-    instance._renderCallback({code: "success", op: "findresult", content: '<div id="bar">foo</div>'});
+    instance._renderCallback({code: "success", op: "find", content: '<div id="bar">foo</div>'});
 
     strictEqual($('body').find('#bar').length, 1);
     strictEqual($('body').find('#bar').text(), "foo");
+  });
+
+  test("renderCallback() calls _replaceContent if data.op is 'find'", 1, function() {
+    this.elem.shell();
+    var instance = $.data(this.elem[0], "shell");
+    this.spy(instance, "_replaceContent");
+
+    instance._renderCallback({code: "success", op: "find", content: '<div id="bar">foo</div>'});
+
+    ok(instance._replaceContent.calledOnce);
   });
 
   test("if the shell gets too long, old elements are removed", 1, function() {
