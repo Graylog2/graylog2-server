@@ -196,7 +196,7 @@ class MessageGateway
   end
 
   def self.oldest_message
-    index_name(DEFAULT_INDEX_NAME)  # just to make sure
+    index_name(INDEX_NAME)  # just to make sure
     r = search({ :sort => "created_at asc", :size => 1 }) do
       query { all }
     end.first
