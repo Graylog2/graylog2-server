@@ -63,7 +63,7 @@ class ApplicationController < ActionController::Base
       return true if logged_in? and not should_ignore_session?(action_name)
       @current_user = api_login() || false
       if !logged_in?
-        render :json => {"error", "unauthorized"}, :status=>401
+        render :json => {"error" => "unauthorized"}, :status=>401
         return false
       end
     end
