@@ -1,4 +1,5 @@
 require 'digest/sha1'
+require 'base64'
 
 class User
   include Mongoid::Document
@@ -22,7 +23,7 @@ class User
   # HACK HACK HACK -- how to do attr_accessible from here?
   # prevents a user from submitting a crafted form that bypasses activation
   # anything else you want your user to change should be added here.
-  attr_accessible :login, :email, :name, :password, :password_confirmation, :role, :stream_ids
+  attr_accessible :login, :email, :name, :password, :password_confirmation, :role, :stream_ids, :api_key
 
   field :login, :type => String
   field :email, :type => String
@@ -34,9 +35,11 @@ class User
   field :remember_token, :type => String
   field :remember_token_expires_at
   field :last_version_check, :type => Integer
+  field :api_key, :type => String
 
   index :login,          :background => true, :unique => true
   index :remember_token, :background => true, :unique => true
+  index :api_key,          :background => true, :unique => true
 
   has_and_belongs_to_many :streams, :inverse_of => :users
   has_and_belongs_to_many :favorite_streams,   :class_name => "Stream", :inverse_of => :favorited_streams
@@ -66,6 +69,10 @@ class User
   def self.find_by_login(login)
     find(:first, :conditions => {:login => login})
   end
+  
+  def self.find_by_key(key)
+    find(:first, :conditions => {:api_key => key})
+  end
 
   def login=(value)
     write_attribute :login, (value ? value.downcase : nil)
@@ -77,6 +84,12 @@ class User
 
   def email=(value)
     write_attribute :email, (value ? value.downcase : nil)
+  end
+  
+  def generate_api_key
+    key = Digest::SHA1.hexdigest(self.login + rand(1000000).to_s + ":" + Time.now.to_s)  
+    write_attribute :api_key, key
+    return key
   end
 
   def reader?
