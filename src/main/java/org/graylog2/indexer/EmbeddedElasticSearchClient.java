@@ -6,6 +6,7 @@ import static org.elasticsearch.node.NodeBuilder.nodeBuilder;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
 import java.util.Map;
@@ -44,6 +45,15 @@ public class EmbeddedElasticSearchClient {
     private Client client;
     public static final String TYPE = "message";
     public static final String RECENT_INDEX_NAME = "graylog2_recent";
+    
+    // http://www.elasticsearch.org/guide/reference/index-modules/store.html
+    public static final String STANDARD_RECENT_INDEX_STORE_TYPE = "niofs";
+    public static final List<String> ALLOWED_RECENT_INDEX_STORE_TYPES = new ArrayList<String>() {{ 
+        add("niofs");
+        add("simplefs");
+        add("mmapfs");
+        add("memory");
+    }};
 
     final static Calendar cal = Calendar.getInstance();
 
@@ -92,7 +102,7 @@ public class EmbeddedElasticSearchClient {
     
     public boolean createRecentIndex() {
         Map<String, Object> settings = Maps.newHashMap();
-        settings.put("index.store.type", "memory");
+        settings.put("index.store.type", server.getConfiguration().getRecentIndexStoreType());
         
         CreateIndexRequestBuilder crb = new CreateIndexRequestBuilder(client.admin().indices());
         crb.setIndex(RECENT_INDEX_NAME);

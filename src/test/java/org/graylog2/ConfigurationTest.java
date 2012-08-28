@@ -16,6 +16,7 @@ import com.github.joschi.jadconfig.ValidationException;
 import com.github.joschi.jadconfig.repositories.InMemoryRepository;
 import com.google.common.collect.Maps;
 import org.bson.types.ObjectId;
+import org.graylog2.indexer.EmbeddedElasticSearchClient;
 
 /**
  * Unit tests for {@link Configuration} class
@@ -257,5 +258,32 @@ public class ConfigurationTest {
         new JadConfig(new InMemoryRepository(validProperties), configuration).process();
 
         Assert.assertEquals("gl2", configuration.getLibratoMetricsPrefix());
+    }
+    
+    @Test
+    public void testGetRecentIndexStoreType() throws RepositoryException, ValidationException {
+        validProperties.put("recent_index_store_type", "mmapfs");
+        Configuration configuration = new Configuration();
+        new JadConfig(new InMemoryRepository(validProperties), configuration).process();
+
+        Assert.assertEquals("mmapfs", configuration.getRecentIndexStoreType());
+    }
+    
+    @Test
+    public void testGetRecentIndexStoreTypeHasStandardValue() throws RepositoryException, ValidationException {
+        // Nothing set.
+        Configuration configuration = new Configuration();
+        new JadConfig(new InMemoryRepository(validProperties), configuration).process();
+
+        Assert.assertEquals(EmbeddedElasticSearchClient.STANDARD_RECENT_INDEX_STORE_TYPE, configuration.getRecentIndexStoreType());
+    }
+    
+    @Test
+    public void testGetRecentIndexStoreTypeFallsBackToStandardInCaseOfInvalidType() throws RepositoryException, ValidationException {
+        validProperties.put("recent_index_store_type", "LOLSOMETHINGINVALID");
+        Configuration configuration = new Configuration();
+        new JadConfig(new InMemoryRepository(validProperties), configuration).process();
+
+        Assert.assertEquals(EmbeddedElasticSearchClient.STANDARD_RECENT_INDEX_STORE_TYPE, configuration.getRecentIndexStoreType());
     }
 }

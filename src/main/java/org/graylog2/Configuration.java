@@ -20,7 +20,6 @@
 
 package org.graylog2;
 
-import java.net.UnknownHostException;
 import java.util.Arrays;
 import java.util.List;
 
@@ -34,6 +33,8 @@ import com.github.joschi.jadconfig.validators.InetPortValidator;
 import com.github.joschi.jadconfig.validators.PositiveIntegerValidator;
 import com.google.common.collect.Lists;
 import com.mongodb.ServerAddress;
+import java.net.UnknownHostException;
+import org.graylog2.indexer.EmbeddedElasticSearchClient;
 
 /**
  * Helper class to hold configuration of Graylog2
@@ -77,6 +78,9 @@ public class Configuration {
     
     @Parameter(value = "recent_index_ttl_minutes", required = true, validator = PositiveIntegerValidator.class)
     private int recentIndexTtlMinutes = 60;
+    
+    @Parameter(value = "recent_index_store_type")
+    private String recentIndexStoreType = EmbeddedElasticSearchClient.STANDARD_RECENT_INDEX_STORE_TYPE;
 
     @Parameter(value = "no_retention")
     private boolean noRetention;
@@ -235,6 +239,14 @@ public class Configuration {
     
     public int getRecentIndexTtlMinutes() {
         return recentIndexTtlMinutes;
+    }
+    
+    public String getRecentIndexStoreType() {
+        if (!EmbeddedElasticSearchClient.ALLOWED_RECENT_INDEX_STORE_TYPES.contains(recentIndexStoreType)) {
+            LOG.error("Invalid recent index store type configured. Falling back to <" + EmbeddedElasticSearchClient.STANDARD_RECENT_INDEX_STORE_TYPE + ">");
+            return EmbeddedElasticSearchClient.STANDARD_RECENT_INDEX_STORE_TYPE;
+        }
+        return recentIndexStoreType;
     }
     
     public boolean performRetention() {
