@@ -141,10 +141,10 @@
     $input.trigger(e);
     $input.trigger(e);
     $input.trigger(e);
-
     strictEqual($input.val(), "99");
     $input.trigger(e);
-    strictEqual($input.val(), "99");
+
+    strictEqual($input.val(), "");
   });
 
   test("_handleHistory() sets up to 100 elements", 1, function() {
@@ -179,7 +179,7 @@
     var instance = $.data(this.elem[0], "shell");
     instance._processInput();
 
-    strictEqual($("#shell-command-input").attr("disabled"), true);
+    strictEqual($("#shell-command-input").prop("disabled"), true);
   });
 
   test("input 'clear' clears the shell", 2, function() {
