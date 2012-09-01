@@ -23,6 +23,8 @@ package org.graylog2.logmessage;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
+import java.net.InetAddress;
+import org.apache.log4j.Logger;
 
 import org.graylog2.Tools;
 import org.graylog2.indexer.EmbeddedElasticSearchClient;
@@ -36,8 +38,20 @@ import com.google.common.collect.Maps;
  */
 public class LogMessage {
 
+    private static final Logger LOG = Logger.getLogger(LogMessage.class);
     public static final int STANDARD_LEVEL = 1;
     public static final String STANDARD_FACILITY = "unknown";
+    private static final byte[] HOSTNAME = getBytesFromHostname();
+
+    private static byte[] getBytesFromHostname() {
+        try {
+            return InetAddress.getLocalHost().getHostName().getBytes("UTF-8");
+        } catch (Exception e) {
+            LOG.fatal("Could not get self hostname: " + e.getMessage(), e);
+            System.exit(1);
+            return null;
+        }
+    }
 
     private String id;
 
@@ -56,7 +70,7 @@ public class LogMessage {
     private double createdAt = 0;
 
     public LogMessage() {
-        this.id = UUID.randomUUID().toString();
+        this.id = UUID.nameUUIDFromBytes(HOSTNAME).toString();
     }
 
     public boolean isComplete() {
