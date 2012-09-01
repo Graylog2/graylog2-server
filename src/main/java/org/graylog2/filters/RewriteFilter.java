@@ -21,6 +21,7 @@
 package org.graylog2.filters;
 
 import com.yammer.metrics.Metrics;
+import com.yammer.metrics.core.Timer;
 import com.yammer.metrics.core.TimerContext;
 import java.util.concurrent.TimeUnit;
 import org.apache.log4j.Logger;
@@ -33,10 +34,11 @@ import org.graylog2.logmessage.LogMessage;
 public class RewriteFilter implements MessageFilter {
 
     private static final Logger LOG = Logger.getLogger(RewriteFilter.class);
+    protected static final Timer processTimer = Metrics.newTimer(RewriteFilter.class, "ProcessTime", TimeUnit.MICROSECONDS, TimeUnit.SECONDS);
 
     @Override
     public boolean filter(LogMessage msg, GraylogServer server) {
-        TimerContext tcx = Metrics.newTimer(RewriteFilter.class, "ProcessTime", TimeUnit.MICROSECONDS, TimeUnit.SECONDS).time();
+        TimerContext tcx = processTimer.time();
 
         if (server.getRulesEngine() != null) {
             server.getRulesEngine().evaluate(msg);
