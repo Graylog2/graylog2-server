@@ -154,6 +154,9 @@ public class Configuration {
     @Parameter("rules_file")
     private String droolsRulesFile;
 
+    @Parameter("pattern_rules_file")
+    private String patternRulesFile;
+
     @Parameter(value = "enable_tokenizer_filter", required = true)
     private boolean enableTokenizerFilter = true;
 
@@ -339,6 +342,10 @@ public class Configuration {
 
     public String getDroolsRulesFile() {
         return droolsRulesFile;
+    }
+
+    public String getPatternRulesFile() {
+        return patternRulesFile;
     }
 
     public List<ServerAddress> getMongoReplicaSet() {
