@@ -33,7 +33,8 @@ import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.graylog2.filters.BlacklistFilter;
 import org.graylog2.filters.CounterUpdateFilter;
-import org.graylog2.filters.RewriteFilter;
+//import org.graylog2.filters.RewriteFilter;
+import org.graylog2.filters.PatternFilter;
 import org.graylog2.filters.StreamMatcherFilter;
 import org.graylog2.filters.TokenizerFilter;
 import org.graylog2.healthchecks.MessageFlowHealthCheck;
@@ -118,7 +119,10 @@ public final class Main {
         GraylogServer server = new GraylogServer();
         server.initialize(configuration);
 
+	PatternFilter patternFilter = new PatternFilter(configuration);
+
         // Register initializers.
+        server.registerInitializer(patternFilter);
         server.registerInitializer(new ServerValueWriterInitializer(server, configuration));
         server.registerInitializer(new DroolsInitializer(server, configuration));
         server.registerInitializer(new HostCounterCacheWriterInitializer(server));
@@ -140,14 +144,15 @@ public final class Main {
         if (configuration.isSyslogTcpEnabled()) { server.registerInput(new SyslogTCPInput()); }
 
         // Register message filters.
-        server.registerFilter(RewriteFilter.class);
-        server.registerFilter(BlacklistFilter.class);
-        if (configuration.isEnableTokenizerFilter()) { server.registerFilter(TokenizerFilter.class); }
-        server.registerFilter(StreamMatcherFilter.class);
-        server.registerFilter(CounterUpdateFilter.class);
+        //server.registerFilter(RewriteFilter.class);
+        server.registerFilter(patternFilter);
+        server.registerFilter(new BlacklistFilter());
+        if (configuration.isEnableTokenizerFilter()) { server.registerFilter(new TokenizerFilter()); }
+        server.registerFilter(new StreamMatcherFilter());
+        server.registerFilter(new CounterUpdateFilter());
 
         // Register outputs.
-        server.registerOutput(ElasticSearchOutput.class);
+        server.registerOutput(new ElasticSearchOutput());
 
         // Register health checks.
         server.registerHealthCheck(new MessageFlowHealthCheck(server));
