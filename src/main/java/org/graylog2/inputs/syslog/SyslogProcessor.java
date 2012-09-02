@@ -22,6 +22,8 @@ package org.graylog2.inputs.syslog;
 
 import com.yammer.metrics.Metrics;
 import com.yammer.metrics.core.TimerContext;
+import com.yammer.metrics.core.Timer;
+import com.yammer.metrics.core.Meter;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.Date;
@@ -40,13 +42,16 @@ public class SyslogProcessor {
 
     private static final Logger LOG = Logger.getLogger(SyslogProcessor.class);
     private GraylogServer server;
+    protected static final Meter incomingMessagesMeter = Metrics.newMeter(SyslogProcessor.class, "IncomingMessages", "messages", TimeUnit.SECONDS);
+    protected static final Meter processedMessagesMeter = Metrics.newMeter(SyslogProcessor.class, "ProcessedMessages", "messages", TimeUnit.SECONDS);
+    protected static final Timer parsedTimer = Metrics.newTimer(SyslogProcessor.class, "SyslogParsedTime", TimeUnit.MICROSECONDS, TimeUnit.SECONDS);
 
     public SyslogProcessor(GraylogServer server) {
         this.server = server;
     }
 
     public void messageReceived(String msg, InetAddress remoteAddress) throws Exception {
-        Metrics.newMeter(SyslogProcessor.class, "IncomingMessages", "messages", TimeUnit.SECONDS).mark();
+        incomingMessagesMeter.mark();
 
         // Convert to LogMessage
         LogMessage lm;
@@ -71,12 +76,12 @@ public class SyslogProcessor {
 
         // Add to process buffer.
         LOG.debug("Adding received syslog message <" + lm.getId() +"> to process buffer: " + lm);
-        Metrics.newMeter(SyslogProcessor.class, "ProcessedMessages", "messages", TimeUnit.SECONDS).mark();
+        processedMessagesMeter.mark();
         server.getProcessBuffer().insert(lm);
     }
 
     private LogMessage parse(String msg, InetAddress remoteAddress) throws UnknownHostException {
-        TimerContext tcx = Metrics.newTimer(SyslogProcessor.class, "SyslogParsedTime", TimeUnit.MICROSECONDS, TimeUnit.SECONDS).time();
+        TimerContext tcx = parsedTimer.time();
 
         LogMessage lm = new LogMessage();
 

@@ -22,6 +22,8 @@ package org.graylog2.buffers.processors;
 
 import com.lmax.disruptor.EventHandler;
 import com.yammer.metrics.Metrics;
+import com.yammer.metrics.core.Meter;
+import com.yammer.metrics.core.Timer;
 import com.yammer.metrics.core.TimerContext;
 import java.util.concurrent.TimeUnit;
 import org.apache.log4j.Logger;
@@ -36,6 +38,11 @@ import org.graylog2.logmessage.LogMessage;
 public class ProcessBufferProcessor implements EventHandler<LogMessageEvent> {
 
     private static final Logger LOG = Logger.getLogger(ProcessBufferProcessor.class);
+    protected static final Meter incomingMessagesMeter = Metrics.newMeter(ProcessBufferProcessor.class, "IncomingMessages", "messages", TimeUnit.SECONDS);
+    protected static final Meter incomingMessagesMinutelyMeter = Metrics.newMeter(ProcessBufferProcessor.class, "IncomingMessagesMinutely", "messages", TimeUnit.MINUTES);
+    protected static final Meter outgoingMessagesMeter = Metrics.newMeter(ProcessBufferProcessor.class, "OutgoingMessages", "messages", TimeUnit.SECONDS);
+    protected static final Meter filteredOutMessagesMeter = Metrics.newMeter(ProcessBufferProcessor.class, "FilteredOutMessages", "messages", TimeUnit.SECONDS);
+    protected static final Timer processTimer = Metrics.newTimer(ProcessBufferProcessor.class, "ProcessTime", TimeUnit.MICROSECONDS, TimeUnit.SECONDS);
 
     private GraylogServer server;
 
@@ -45,34 +52,31 @@ public class ProcessBufferProcessor implements EventHandler<LogMessageEvent> {
 
     @Override
     public void onEvent(LogMessageEvent event, long sequence, boolean endOfBatch) throws Exception {
-        Metrics.newMeter(ProcessBufferProcessor.class, "IncomingMessages", "messages", TimeUnit.SECONDS).mark();
-        Metrics.newMeter(ProcessBufferProcessor.class, "IncomingMessagesMinutely", "messages", TimeUnit.MINUTES).mark();
-        TimerContext tcx = Metrics.newTimer(ProcessBufferProcessor.class, "ProcessTime", TimeUnit.MICROSECONDS, TimeUnit.SECONDS).time();
+        incomingMessagesMeter.mark();
+        incomingMessagesMinutelyMeter.mark();
+        TimerContext tcx = processTimer.time();
 
         LogMessage msg = event.getMessage();
 
         LOG.debug("Starting to process message <" + msg.getId() + ">.");
 
-        for (Class<? extends MessageFilter> filterType : server.getFilters()) {
+        for (MessageFilter filter : server.getFilters()) {
             try {
-                // Always create a new instance of this filter.
-                MessageFilter filter = filterType.newInstance();
-
-                String name = filterType.getSimpleName();
+                String name = filter.getClass().getSimpleName();
                 LOG.debug("Applying filter [" + name +"] on message <" + msg.getId() + ">.");
 
                 if (filter.filter(msg, server)) {
                     LOG.debug("Filter [" + name + "] marked message <" + msg.getId() + "> to be discarded. Dropping message.");
-                    Metrics.newMeter(ProcessBufferProcessor.class, "FilteredOutMessages", "messages", TimeUnit.SECONDS).mark();
+                    filteredOutMessagesMeter.mark();
                     return;
                 }
             } catch (Exception e) {
-                LOG.error("Could not apply filter [" + filterType.getSimpleName() +"] on message <" + msg.getId() +">: ", e);
+                LOG.error("Could not apply filter [" + filter.getClass().getSimpleName() +"] on message <" + msg.getId() +">: ", e);
             }
         }
 
         LOG.debug("Finished processing message. Writing to output buffer.");
-        Metrics.newMeter(ProcessBufferProcessor.class, "OutgoingMessages", "messages", TimeUnit.SECONDS).mark();
+        outgoingMessagesMeter.mark();
         server.getOutputBuffer().insert(msg);
         tcx.stop();
     }

@@ -21,8 +21,11 @@
 package org.graylog2.inputs.syslog;
 
 import com.yammer.metrics.Metrics;
+import com.yammer.metrics.core.Meter;
 import java.net.InetSocketAddress;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import org.apache.log4j.Logger;
 import org.graylog2.GraylogServer;
 import org.jboss.netty.buffer.ChannelBuffer;
@@ -37,6 +40,8 @@ import org.jboss.netty.channel.SimpleChannelHandler;
 public class SyslogDispatcher extends SimpleChannelHandler {
 
     private static final Logger LOG = Logger.getLogger(SyslogDispatcher.class);
+    protected final ExecutorService executor = Executors.newCachedThreadPool();
+    protected static final Meter receivedMessagesMeter = Metrics.newMeter(SyslogDispatcher.class, "ReceivedMessages", "messages", TimeUnit.SECONDS);
 
     private SyslogProcessor processor;
 
@@ -45,17 +50,25 @@ public class SyslogDispatcher extends SimpleChannelHandler {
     }
 
     @Override
-    public void messageReceived(ChannelHandlerContext ctx, MessageEvent e) throws Exception {
-        Metrics.newMeter(SyslogDispatcher.class, "ReceivedMessages", "messages", TimeUnit.SECONDS).mark();
+    public void messageReceived(ChannelHandlerContext ctx, final MessageEvent e) throws Exception {
+        executor.execute(new Runnable() {
+            public void run() {
+                try {
+                    receivedMessagesMeter.mark();
 
-        InetSocketAddress remoteAddress = (InetSocketAddress) e.getRemoteAddress();
+                    InetSocketAddress remoteAddress = (InetSocketAddress) e.getRemoteAddress();
 
-        ChannelBuffer buffer = (ChannelBuffer) e.getMessage();
+                    ChannelBuffer buffer = (ChannelBuffer) e.getMessage();
 
-        byte[] readable = new byte[buffer.readableBytes()];
-        buffer.toByteBuffer().get(readable, buffer.readerIndex(), buffer.readableBytes());
+                    byte[] readable = new byte[buffer.readableBytes()];
+                    buffer.toByteBuffer().get(readable, buffer.readerIndex(), buffer.readableBytes());
 
-        this.processor.messageReceived(new String(readable), remoteAddress.getAddress());
+                    processor.messageReceived(new String(readable), remoteAddress.getAddress());
+                } catch (Exception ex) {
+                    LOG.warn("Could not handle syslog message.", ex.getCause());
+                }
+            }
+        });
     }
 
     @Override

@@ -22,10 +22,14 @@ package org.graylog2.buffers;
 
 import com.lmax.disruptor.MultiThreadedClaimStrategy;
 import com.lmax.disruptor.RingBuffer;
-import com.lmax.disruptor.SleepingWaitStrategy;
+import com.lmax.disruptor.BlockingWaitStrategy;
 import com.lmax.disruptor.dsl.Disruptor;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.ThreadFactory;
+import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.ThreadPoolExecutor;
 import org.graylog2.GraylogServer;
 import org.graylog2.buffers.processors.ProcessBufferProcessor;
 import org.graylog2.logmessage.LogMessage;
@@ -35,36 +39,30 @@ import org.graylog2.logmessage.LogMessage;
  */
 public class ProcessBuffer {
 
-    protected static final int RING_SIZE = 524288;
-    protected static RingBuffer<LogMessageEvent> ringBuffer;
-
     protected ExecutorService executor = Executors.newCachedThreadPool();
 
     GraylogServer server;
+    ProcessBufferProcessor processor;
 
     public ProcessBuffer(GraylogServer server) {
         this.server = server;
+        this.processor = new ProcessBufferProcessor(this.server);
     }
 
     public void initialize() {
-        Disruptor disruptor = new Disruptor<LogMessageEvent>(
-                LogMessageEvent.EVENT_FACTORY,
-                executor,
-                new MultiThreadedClaimStrategy(RING_SIZE),
-                new SleepingWaitStrategy()
-        );
-
-        ProcessBufferProcessor processor = new ProcessBufferProcessor(this.server);
-
-        disruptor.handleEventsWith(processor);
-        ringBuffer = disruptor.start();
     }
     
     public void insert(LogMessage message) {
-        long sequence = ringBuffer.next();
-        LogMessageEvent event = ringBuffer.get(sequence);
+        final LogMessageEvent event = new LogMessageEvent();
         event.setMessage(message);
-        ringBuffer.publish(sequence);
+        executor.execute(new Runnable() {
+            public void run() {
+                try {
+                    processor.onEvent(event, 0, false);
+                } catch (Exception e) {
+                }
+            }
+        });
     }
 
 }

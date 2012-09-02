@@ -21,6 +21,7 @@
 package org.graylog2.filters;
 
 import com.yammer.metrics.Metrics;
+import com.yammer.metrics.core.Timer;
 import com.yammer.metrics.core.TimerContext;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
@@ -36,12 +37,13 @@ import org.graylog2.streams.StreamRouter;
 public class StreamMatcherFilter implements MessageFilter {
 
     private static final Logger LOG = Logger.getLogger(StreamMatcherFilter.class);
+    protected static final Timer processTimer = Metrics.newTimer(StreamMatcherFilter.class, "ProcessTime", TimeUnit.MICROSECONDS, TimeUnit.SECONDS);
 
     private static final StreamRouter ROUTER = new StreamRouter();
 
     @Override
     public boolean filter(LogMessage msg, GraylogServer server) {
-        TimerContext tcx = Metrics.newTimer(StreamMatcherFilter.class, "ProcessTime", TimeUnit.MICROSECONDS, TimeUnit.SECONDS).time();
+        TimerContext tcx = processTimer.time();
 
         List<Stream> streams = ROUTER.route(msg);
         msg.setStreams(streams);
