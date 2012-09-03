@@ -53,8 +53,7 @@ public class HostCounterCacheWriterThread implements Runnable {
         try {
             final MongoBridge m = graylogServer.getMongoBridge();
             for (String host : graylogServer.getHostCounterCache().getAllHosts()) {
-                m.upsertHostCount(host, graylogServer.getHostCounterCache().getCount(host));
-                graylogServer.getHostCounterCache().reset(host);
+                m.upsertHostCount(host, graylogServer.getHostCounterCache().getCountAndReset(host));
             }
         } catch (Exception e) {
             LOG.warn("Error in HostCounterCacheWriterThread: " + e.getMessage(), e);

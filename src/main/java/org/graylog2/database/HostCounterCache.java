@@ -23,6 +23,7 @@ package org.graylog2.database;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
+import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * Acts as cache for count updates in the hosts collection. Written to MongoDB
@@ -32,7 +33,7 @@ import java.util.concurrent.ConcurrentMap;
  */
 public class HostCounterCache {
 
-    private ConcurrentMap<String, Integer> cache = new ConcurrentHashMap<String, Integer>();
+    private ConcurrentMap<String, AtomicInteger> cache = new ConcurrentHashMap<String, AtomicInteger>();
 
     /**
      * Increment counter cache by 1 for a host.
@@ -40,33 +41,25 @@ public class HostCounterCache {
      * @param hostname The host of which the counter to increment.
      */
     public void increment(String hostname) {
-        int old = 0;
-
-        if (this.cache.containsKey(hostname)) {
-            old = this.cache.get(hostname);
+        AtomicInteger count = this.cache.putIfAbsent(hostname, new AtomicInteger(0));
+        if (count != null) {
+            count.incrementAndGet();
         }
 
-        this.cache.put(hostname, old+1);
     }
 
     /**
-     * Remove host from counter.
+     * Get the current message count for host and reset counter.
      *
-     * @param hostname The host of which the counter to reset.
+     * @param hostname The host for which the count to get.
      */
-    public void reset(String hostname) {
-        if (this.cache.containsKey(hostname)) {
-            this.cache.remove(hostname);
+    public int getCountAndReset(String hostname) {
+        AtomicInteger zero = new AtomicInteger(0);
+        if (this.cache.remove(hostname, zero)) {
+            return 0;
+        } else {
+            return this.cache.put(hostname, zero).get();
         }
-    }
-
-    /**
-     * Get the current count of host.
-     *
-     * @param hostname The host of which the count to get.
-     */
-    public int getCount(String hostname) {
-        return this.cache.get(hostname) == null ? 0 : this.cache.get(hostname);
     }
 
     /**
