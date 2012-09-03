@@ -62,11 +62,14 @@ public class ProcessBufferProcessor implements EventHandler<LogMessageEvent> {
 
         for (MessageFilter filter : server.getFilters()) {
             try {
-                String name = filter.getClass().getSimpleName();
-                LOG.debug("Applying filter [" + name +"] on message <" + msg.getId() + ">.");
+                if (LOG.isTraceEnabled()) {
+                    LOG.trace("Applying filter [" + filter.getClass().getSimpleName() +"] on message <" + msg.getId() + ">.");
+                }
 
                 if (filter.filter(msg, server)) {
-                    LOG.debug("Filter [" + name + "] marked message <" + msg.getId() + "> to be discarded. Dropping message.");
+                    if (LOG.isTraceEnabled()) {
+                        LOG.trace("Filter [" + filter.getClass().getSimpleName() + "] marked message <" + msg.getId() + "> to be discarded. Dropping message.");
+                    }
                     filteredOutMessagesMeter.mark();
                     return;
                 }
