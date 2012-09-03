@@ -46,9 +46,12 @@ public class PatternFilter implements MessageFilter, Initializer {
     private class MessagePattern {
         public Pattern regex;
         public List<String> groups;
+        public Timer timer;
 
-        public MessagePattern() {
-            groups = Lists.newArrayList();
+        public MessagePattern(String name, String regex) {
+            this.regex = Pattern.compile(regex);
+            this.groups = Lists.newArrayList();
+            this.timer = Metrics.newTimer(PatternFilter.class, "ProcessTime", name, TimeUnit.MICROSECONDS, TimeUnit.SECONDS);
         }
     }
     protected List<MessagePattern> patterns;
@@ -70,16 +73,19 @@ public class PatternFilter implements MessageFilter, Initializer {
 	try {
             BufferedReader reader = new BufferedReader(new FileReader(configuration.getPatternRulesFile()));
             for (String line = reader.readLine(); line != null; line = reader.readLine()) {
-               LOG.debug("parsing "+line);
-               MessagePattern pattern = new MessagePattern();
-               pattern.regex = Pattern.compile(line);
-               Matcher groupMatcher = groupPattern.matcher(line);
+               LOG.debug("parsing '"+line+"'");
+               String[] lineparts = line.split("\t");
+               String name = lineparts[0];
+               String regex = lineparts[1];
+               MessagePattern pattern = new MessagePattern(name, regex);
+               Matcher groupMatcher = groupPattern.matcher(regex);
                while (groupMatcher.find()) {
                     String group = groupMatcher.group(1);
                     pattern.groups.add(group);
                     LOG.debug("added group "+group);
-                    this.patterns.add(pattern);    
                 }
+                this.patterns.add(pattern);
+                LOG.debug("added pattern "+name);
             }
             LOG.info("Initialized pattern engine");
         } catch (Exception e) {
@@ -90,27 +96,35 @@ public class PatternFilter implements MessageFilter, Initializer {
 
     @Override
     public boolean filter(LogMessage msg, GraylogServer server) {
-        TimerContext tcx = processTimer.time();
-
-        for (MessagePattern pattern : this.patterns) {
-            parseMessage(msg, pattern);
+        final TimerContext tcx = processTimer.time();
+        
+        try {
+            for (MessagePattern pattern : this.patterns) {
+                parseMessage(msg, pattern);
+            }
+        } finally {
+            tcx.stop();
         }
-
-        tcx.stop();
 
         // Do not discard message.
         return false;
     }
 
     private void parseMessage(LogMessage m, MessagePattern pattern) {
-        Matcher matcher = pattern.regex.matcher(m.getShortMessage());
-        if (matcher.find()) {
-            for (String group : pattern.groups) {
-                String data = matcher.group(group);
-                if (data != null) {
-                    m.addAdditionalData(group.replace("X", "_"), data);
+        final TimerContext tcx = pattern.timer.time();
+
+        try {
+            Matcher matcher = pattern.regex.matcher(m.getShortMessage());
+            if (matcher.find()) {
+                for (String group : pattern.groups) {
+                    String data = matcher.group(group);
+                    if (data != null) {
+                        m.addAdditionalData(group.replace("X", "_"), data);
+                    }
                 }
             }
+        } finally {
+            tcx.stop();
         }
     }
 }
