@@ -91,8 +91,11 @@ public class Configuration {
     @Parameter(value = "elasticsearch_config_file", required = true, validator = FilePresentValidator.class)
     private String elasticSearchConfigFile = "/etc/graylog2-elasticsearch.yml";
 
-    @Parameter(value = "elasticsearch_index_name", required = true)
-    private String elasticsearchIndexName = "graylog2";
+    @Parameter(value = "elasticsearch_index_prefix", required = true)
+    private String elasticsearchIndexPrefix = "graylog2";
+    
+    @Parameter(value = "elasticsearch_max_docs_per_index", validator = PositiveIntegerValidator.class, required = true)
+    private int elasticsearchMaxDocsPerIndex = 80000000;
 
     @Parameter(value = "mongodb_user")
     private String mongoUser;
@@ -261,8 +264,12 @@ public class Configuration {
         return elasticSearchConfigFile;
     }
 
-    public String getElasticSearchIndexName() {
-        return this.elasticsearchIndexName;
+    public String getElasticSearchIndexPrefix() {
+        return this.elasticsearchIndexPrefix;
+    }
+    
+    public int getElasticSearchMaxDocsPerIndex() {
+        return this.elasticsearchMaxDocsPerIndex;
     }
 
     public boolean isMongoUseAuth() {

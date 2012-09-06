@@ -129,6 +129,7 @@ public final class Main {
         if (configuration.isEnableHealthCheckHttpApi()) {
             server.registerInitializer(new HealthCheckHTTPServerInitializer(configuration.getHealthCheckHttpApiPort()));
         }
+        server.registerInitializer(new DeflectorThreadsInitializer(server));
 
         // Register inputs.
         if (configuration.isUseGELF()) {

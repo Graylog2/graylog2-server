@@ -85,12 +85,12 @@ public class ConfigurationTest {
     }
 
     @Test
-    public void testGetElasticSearchIndexName() throws RepositoryException, ValidationException {
+    public void testGetElasticSearchIndexPrefix() throws RepositoryException, ValidationException {
 
         Configuration configuration = new Configuration();
         new JadConfig(new InMemoryRepository(validProperties), configuration).process();
 
-        Assert.assertEquals("graylog2", configuration.getElasticSearchIndexName());
+        Assert.assertEquals("graylog2", configuration.getElasticSearchIndexPrefix());
     }
 
     @Test

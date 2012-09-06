@@ -42,6 +42,7 @@ import com.google.common.collect.Lists;
 import com.yammer.metrics.HealthChecks;
 import com.yammer.metrics.core.HealthCheck;
 import org.graylog2.database.HostCounterCache;
+import org.graylog2.indexer.Deflector;
 
 public class GraylogServer implements Runnable {
 
@@ -76,6 +77,8 @@ public class GraylogServer implements Runnable {
 
     private ProcessBuffer processBuffer;
     private OutputBuffer outputBuffer;
+    
+    private Deflector deflector;
     
     private String serverId;
 
@@ -151,19 +154,13 @@ public class GraylogServer implements Runnable {
         BlacklistCache.initialize(this);
         StreamCache.initialize(this);
 
-        if (indexer.indexExists(indexer.getMainIndexName())) {
-            LOG.info("Main index exists. Not creating it.");
-        } else {
-            LOG.info("Main index does not exist! Trying to create it ...");
-            if (indexer.createIndex()) {
-                LOG.info("Successfully created main index.");
-            } else {
-                LOG.fatal("Could not create main index. Terminating.");
-                System.exit(1);
-            }
-        }
         
-        // XXX TODO lol code duplication. make this smart.
+        // Set up deflector.
+        LOG.info("Setting up deflector.");
+        deflector = new Deflector(this);
+        deflector.setUp();
+        
+        // Set up recent index.
         if (indexer.indexExists(EmbeddedElasticSearchClient.RECENT_INDEX_NAME)) {
             LOG.info("Recent index exists. Not creating it.");
         } else {
@@ -260,6 +257,10 @@ public class GraylogServer implements Runnable {
 
     public HostCounterCache getHostCounterCache() {
         return this.hostCounterCache;
+    }
+    
+    public Deflector getDeflector() {
+        return this.deflector;
     }
     
     public int getLastReceivedMessageTimestamp() {
