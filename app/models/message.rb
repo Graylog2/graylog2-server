@@ -7,13 +7,15 @@ class Message
   @fields = [ :id, :message, :full_message, :created_at, :facility, :level, :host, :file, :line, :deleted, :streams ]
   @fields.each { |f| attr_accessor(f) }
 
-  attr_accessor :plain, :total_result_count
+  attr_accessor :source_index, :plain, :total_result_count
 
   def self.parse_from_elastic(x)
     m = self.new
 
     m.plain = x
     m.total_result_count = x.total rescue nil
+    m.source_index = x[:_index]
+
     @fields.each do |f|
       # XXX ELASTIC: zomg workaround
       # - __send__ creates a Rake::FileTask instead of a string. not sure why yet

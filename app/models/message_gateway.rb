@@ -70,7 +70,7 @@ class MessageGateway
   end
 
   def self.retrieve_by_id(id)
-    wrap @index.retrieve(TYPE_NAME, id)
+    wrap search("_id:#{id}").first
   end
 
   def self.dynamic_search(what, with_default_query_options = false)
