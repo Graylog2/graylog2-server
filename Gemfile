@@ -17,6 +17,7 @@ gem 'home_run', '~> 1.0.2', :platforms => :ruby
 gem 'SystemTimer', '~> 1.2.3', :require => 'system_timer', :platforms => :ruby_18
 gem 'rails_autolink', '~> 1.0.4'
 gem 'kaminari', '~> 0.12.4'
+gem 'jquery-rails', '~> 2.1'
 
 group :development, :test do
   # might be useful to generate fake data in development
@@ -36,4 +37,11 @@ group :test do
   gem 'mocha', '~> 0.9.12'
   gem 'database_cleaner', '~> 0.6.0'
   gem 'timecop', '~> 0.3.5'
+end
+
+# Needed for the new asset pipeline
+group :assets do
+  gem 'sass-rails',   "~> 3.1.5"
+  gem 'coffee-rails', "~> 3.1.1"
+  gem 'uglifier',     ">= 1.0.3"
 end
