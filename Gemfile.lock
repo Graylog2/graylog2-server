@@ -59,6 +59,9 @@ GEM
       activesupport
       builder
     i18n (0.6.0)
+    jquery-rails (2.1.2)
+      railties (>= 3.1.0, < 5.0)
+      thor (~> 0.14)
     json (1.5.4)
     kaminari (0.12.4)
       rails (>= 3.0.0)
@@ -165,6 +168,7 @@ DEPENDENCIES
   graylog2-declarative_authorization (~> 0.5.2)
   home_run (~> 1.0.2)
   hoptoad_notifier (~> 2.4.9)
+  jquery-rails (~> 2.1)
   json (~> 1.5.1)
   kaminari (~> 0.12.4)
   machinist_mongo (~> 1.2.0)
