@@ -10,8 +10,8 @@
 // WARNING: THE FIRST BLANK LINE MARKS THE END OF WHAT'S TO BE PROCESSED, ANY BLANK LINE SHOULD
 // GO AFTER THE REQUIRES BELOW.
 //
-//= require jquery
-//= require jquery_ujs
+//= require files/jquery-1.8.1
+//= require files/rails
 //= require files/application
 //= require files/jquery.autocomplete.min
 //= require files/jquery.graylog2shell
