@@ -14,8 +14,8 @@
 <body>
 
   <div id="top">
-    <% if File.exist?(Rails.root.to_s + "/public/images/dashboard_logo.png") %>
-        <%= image_tag('dashboard_logo.png') %>
+    <% if File.exist?(asset_path "dashboard_logo.png") %>
+        <%= image_tag "dashboard_logo.png" %>
     <% end %>
     <div id="top-timestamp">
       <%= Time.now %>
