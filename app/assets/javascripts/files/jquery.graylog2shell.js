@@ -66,7 +66,7 @@
           code,
           value;
 
-      $input.bind("keyup", function(e) {
+      $input.on("keyup", function(e) {
 
         code = e.which;
 
@@ -168,7 +168,7 @@
         $oldInputContainer.append(htmlInput);
       }
 
-      $input.attr("disabled", "disabled");
+      $input.prop("disabled", "disabled");
       self._makeAjaxCall(input);
     },
 
@@ -246,7 +246,7 @@
           result;
 
       $waiting.remove();
-      $input.attr("disabled", "");
+      $input.prop("disabled", "");
 
       if ($oldInputContainer.find('.shell-history-line').length >= 15) {
         $oldInputContainer.find('.shell-history-line').first().remove();
