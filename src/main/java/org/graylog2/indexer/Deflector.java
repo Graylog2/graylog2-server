@@ -92,7 +92,11 @@ public class Deflector {
         String newTarget = buildIndexName(server.getConfiguration().getElasticSearchIndexPrefix(), newTargetNumber);
         String oldTarget = buildIndexName(server.getConfiguration().getElasticSearchIndexPrefix(), oldTargetNumber);
         
-        LOG.info("Cycling from <" + oldTarget + "> to <" + newTarget + ">");
+        if (oldTargetNumber == -1) {
+            LOG.info("Cycling from <none> to <" + newTarget + ">");
+        } else {
+            LOG.info("Cycling from <" + oldTarget + "> to <" + newTarget + ">");
+        }
         
         // Create new index.
         LOG.info("Creating index target <" + newTarget + ">...");
