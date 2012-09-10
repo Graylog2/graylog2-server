@@ -61,6 +61,9 @@
     <% end %>
     </ul>
   <% end %>
+  
+  <br /><br />
+  Stored in index <span class="highlighted"><%= @message.source_index %></span>
 
   <% if !current_user.reader? and ::Configuration.allow_deleting %>
     <br />

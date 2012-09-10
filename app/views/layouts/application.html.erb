@@ -13,29 +13,18 @@
   <%= stylesheet_link_tag "messages" %>
   <%= stylesheet_link_tag "shell" %>
   <%= hoptoad_javascript_notifier if ::Configuration.hoptoad_enabled? %>
-  <%= javascript_include_tag "jquery-1.4.2.min" %>
-  <%= javascript_include_tag "jquery.autocomplete.min" %>
-  <%= javascript_include_tag "jquery.numeric" %>
-  <%= javascript_include_tag "jquery.mapkey.min" %>
-  <%= javascript_include_tag "jquery.simplemodal.min" %>
-  <%= javascript_include_tag "jquery.sparkline.min" %>
-  <%= javascript_include_tag "jquery.gritter.min" %>
+  <%= javascript_include_tag "application" %>
   <%= javascript_include_tag("jit") if @load_jit %>
   <% if @load_flot %>
-    <%= javascript_include_tag("jquery.flot.min") %>
-    <%= javascript_include_tag("jquery.flot.selection.min") %>
-    <%= javascript_include_tag("jquery.flot.resize.min") %>
+    <%= javascript_include_tag("flot") %>
   <% end %>
   <% if @load_messages %>
     <%= javascript_include_tag("messages.js") %>
   <% end %>
+
   <%= javascript_include_tag "backtotop" if @use_backtotop %>
-  <%= javascript_include_tag "application" %>
-  <% if @has_shell %>
-    <%= javascript_include_tag "jquery.graylog2shell.js" %>
-  <% end %>
+
   <%= javascript_include_tag "realtime" if @has_realtime %>
-  <%= javascript_include_tag "rails" %>
 </head>
 <body>
   <%= javascript_tag("var relative_url_root = '#{controller.config.relative_url_root}';") %>
