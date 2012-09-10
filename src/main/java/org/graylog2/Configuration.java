@@ -196,6 +196,18 @@ public class Configuration {
     @Parameter(value = "healthcheck_http_api_port", validator = InetPortValidator.class, required = false)
     private int healthcheckHttpApiPort = 8010;
     
+    @Parameter(value = "enable_cm_twilio", required = false)
+    private boolean enableCommunicationMethodTwilio = false;
+    
+    @Parameter(value = "twilio_sid", required = false)
+    private String twilioSid = "";
+    
+    @Parameter(value = "twilio_auth_token", required = false)
+    private String twilioAuthToken = "";
+    
+    @Parameter(value = "twilio_sender", required = false)
+    private String twilioSender = "";
+    
     public boolean isMaster() {
         return isMaster;
     }
@@ -432,6 +444,22 @@ public class Configuration {
 
     public int getHealthCheckHttpApiPort() {
         return healthcheckHttpApiPort;
+    }
+    
+    public boolean isEnableCommunicationMethodTwilio() {
+        return enableCommunicationMethodTwilio;
+    }
+    
+    public String getTwilioSid() {
+        return twilioSid;
+    }
+    
+    public String getTwilioAuthToken() {
+        return twilioAuthToken;
+    }
+    
+    public String getTwilioSender() {
+        return twilioSender;
     }
     
     @ValidatorMethod

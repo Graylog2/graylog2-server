@@ -31,6 +31,7 @@ import java.io.Writer;
 import org.apache.commons.io.IOUtils;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
+import org.graylog2.communicator.methods.TwilioCommunicator;
 import org.graylog2.filters.BlacklistFilter;
 import org.graylog2.filters.CounterUpdateFilter;
 import org.graylog2.filters.RewriteFilter;
@@ -111,13 +112,19 @@ public final class Main {
         }
 
         // Do not use a PID file if the user requested not to
-        if (!commandLineArguments.isNoPidFile())
+        if (!commandLineArguments.isNoPidFile()) {
             savePidFile(commandLineArguments.getPidFile());
+        }
 
         // Le server object. This is where all the magic happens.
         GraylogServer server = new GraylogServer();
         server.initialize(configuration);
 
+        // Register communicator methods.
+        if (configuration.isEnableCommunicationMethodTwilio()) {
+            server.registerCommunicatorMethod(TwilioCommunicator.class);
+        }
+        
         // Register initializers.
         server.registerInitializer(new ServerValueWriterInitializer(server, configuration));
         server.registerInitializer(new DroolsInitializer(server, configuration));

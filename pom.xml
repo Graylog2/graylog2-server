@@ -131,6 +131,12 @@
             <artifactId>metrics-graphite</artifactId>
             <version>2.1.2</version>
         </dependency>
+        <dependency>
+            <groupId>com.twilio.sdk</groupId>
+            <artifactId>twilio-java-sdk</artifactId>
+            <version>3.3.9</version>
+            <classifier>jar-with-dependencies</classifier>
+        </dependency>
     </dependencies>
 
     <build>

@@ -23,10 +23,10 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
-import java.util.logging.Level;
 import org.apache.log4j.Logger;
 import org.elasticsearch.action.admin.indices.stats.IndexStats;
 import org.graylog2.GraylogServer;
+import org.graylog2.activities.Activity;
 
 /**
  *
@@ -65,10 +65,14 @@ public class Deflector {
             try {
                 String currentTarget = getCurrentTargetName();
                 LOG.info("Pointing to already existing index target <" + currentTarget + ">");
+                
                 pointTo(currentTarget);
             } catch(NoTargetIndexException ex) {
-                LOG.info("There is no index target to point to. Creating one now.");
-                cycle(); // No index, so automatically cycling to 0.
+                final String msg = "There is no index target to point to. Creating one now.";
+                LOG.info(msg);
+                server.getActivityWriter().write(new Activity(msg, Deflector.class));
+                
+                cycle(); // No index, so automatically cycling to a new one.
             }
         }
     }
@@ -105,6 +109,10 @@ public class Deflector {
             pointTo(newTarget, oldTarget);
         }
         LOG.info("Done!");
+        server.getActivityWriter().write(new Activity(
+                    "Cycled deflector from <" + oldTarget + "> to <" + newTarget + ">",
+                    Deflector.class
+                ));
     }
     
     public int getCurrentTargetNumber() throws NoTargetIndexException {
