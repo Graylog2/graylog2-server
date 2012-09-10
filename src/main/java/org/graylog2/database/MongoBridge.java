@@ -28,6 +28,7 @@ import com.mongodb.DB;
 import com.mongodb.DBCollection;
 import com.mongodb.DBObject;
 import java.util.Map;
+import org.graylog2.activities.Activity;
 
 
 /**
@@ -115,6 +116,15 @@ public class MongoBridge {
         getConnection().getMessageCountsColl().insert(obj);
     }
 
+    public void writeActivity(Activity activity) {
+        BasicDBObject obj = new BasicDBObject();
+        obj.put("timestamp", Tools.getUTCTimestamp());
+        obj.put("content", activity.getContent());
+        obj.put("caller", activity.getCaller().getCanonicalName());
+        
+        connection.getDatabase().getCollection("server_activities").insert(obj);
+    }
+    
     /**
      * Get a setting from the settings collection.
      *

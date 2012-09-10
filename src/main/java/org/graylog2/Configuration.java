@@ -91,8 +91,11 @@ public class Configuration {
     @Parameter(value = "elasticsearch_config_file", required = true, validator = FilePresentValidator.class)
     private String elasticSearchConfigFile = "/etc/graylog2-elasticsearch.yml";
 
-    @Parameter(value = "elasticsearch_index_name", required = true)
-    private String elasticsearchIndexName = "graylog2";
+    @Parameter(value = "elasticsearch_index_prefix", required = true)
+    private String elasticsearchIndexPrefix = "graylog2";
+    
+    @Parameter(value = "elasticsearch_max_docs_per_index", validator = PositiveIntegerValidator.class, required = true)
+    private int elasticsearchMaxDocsPerIndex = 80000000;
 
     @Parameter(value = "mongodb_user")
     private String mongoUser;
@@ -193,6 +196,18 @@ public class Configuration {
     @Parameter(value = "healthcheck_http_api_port", validator = InetPortValidator.class, required = false)
     private int healthcheckHttpApiPort = 8010;
     
+    @Parameter(value = "enable_cm_twilio", required = false)
+    private boolean enableCommunicationMethodTwilio = false;
+    
+    @Parameter(value = "twilio_sid", required = false)
+    private String twilioSid = "";
+    
+    @Parameter(value = "twilio_auth_token", required = false)
+    private String twilioAuthToken = "";
+    
+    @Parameter(value = "twilio_sender", required = false)
+    private String twilioSender = "";
+    
     public boolean isMaster() {
         return isMaster;
     }
@@ -261,8 +276,12 @@ public class Configuration {
         return elasticSearchConfigFile;
     }
 
-    public String getElasticSearchIndexName() {
-        return this.elasticsearchIndexName;
+    public String getElasticSearchIndexPrefix() {
+        return this.elasticsearchIndexPrefix;
+    }
+    
+    public int getElasticSearchMaxDocsPerIndex() {
+        return this.elasticsearchMaxDocsPerIndex;
     }
 
     public boolean isMongoUseAuth() {
@@ -425,6 +444,22 @@ public class Configuration {
 
     public int getHealthCheckHttpApiPort() {
         return healthcheckHttpApiPort;
+    }
+    
+    public boolean isEnableCommunicationMethodTwilio() {
+        return enableCommunicationMethodTwilio;
+    }
+    
+    public String getTwilioSid() {
+        return twilioSid;
+    }
+    
+    public String getTwilioAuthToken() {
+        return twilioAuthToken;
+    }
+    
+    public String getTwilioSender() {
+        return twilioSender;
     }
     
     @ValidatorMethod
