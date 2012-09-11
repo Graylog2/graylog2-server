@@ -18,6 +18,7 @@ gem 'SystemTimer', '~> 1.2.3', :require => 'system_timer', :platforms => :ruby_1
 gem 'rails_autolink', '~> 1.0.4'
 gem 'kaminari', '~> 0.12.4'
 gem 'jquery-rails', '~> 2.1'
+gem 'therubyracer', '~> 0.10.2'
 
 group :development, :test do
   # might be useful to generate fake data in development
