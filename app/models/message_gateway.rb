@@ -34,7 +34,7 @@ class MessageGateway
     INDEX_NAME = "graylog2_test"
     RECENT_INDEX_NAME = "graylog2_recent_test"
   else
-    config_index = Configuration.indexer_index_name
+    config_index = Configuration.indexer_index_prefix + "_*"
     config_index.blank? ? INDEX_NAME = DEFAULT_INDEX_NAME : INDEX_NAME = config_index
     
     config_recent_index = Configuration.indexer_recent_index_name

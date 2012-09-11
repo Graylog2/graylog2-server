@@ -147,8 +147,8 @@ class Configuration
     indexer_config :url
   end
 
-  def self.indexer_index_name
-    indexer_config :index_name
+  def self.indexer_index_prefix
+    indexer_config :index_prefix
   end
 
   def self.indexer_recent_index_name
