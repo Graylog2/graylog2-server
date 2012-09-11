@@ -31,10 +31,12 @@ public class GraphiteFormatter {
 
     private MessageCounter counter;
     String serverId;
+    String prefix;
     
-    public GraphiteFormatter(MessageCounter counter, String serverId) {
+    public GraphiteFormatter(MessageCounter counter, String serverId, String prefix) {
         this.counter = counter;
         this.serverId = serverId;
+        this.prefix = prefix;
     }
 
     public List<String> getAllMetrics() {
@@ -62,7 +64,7 @@ public class GraphiteFormatter {
     }
     
     private String prefix() {
-        return "graylog2" + "." + serverId + "." + "messagecounts" + ".";
+        return prefix + "." + serverId + "." + "messagecounts" + ".";
     }
 
 }
