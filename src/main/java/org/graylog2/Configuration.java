@@ -168,6 +168,9 @@ public class Configuration {
 
     @Parameter(value = "graphite_carbon_tcp_port", validator = InetPortValidator.class, required = false)
     private int graphiteCarbonTcpPort = 2003;
+    
+    @Parameter(value = "graphite_prefix", required = false)
+    private String graphitePrefix = "graylog2-server";
 
     @Parameter(value = "enable_libratometrics_output", required = false)
     private boolean enableLibratoMetricsOutput = false;
@@ -405,6 +408,10 @@ public class Configuration {
 
     public int getGraphiteCarbonTcpPort() {
         return graphiteCarbonTcpPort;
+    }
+    
+    public String getGraphitePrefix() {
+        return graphitePrefix;
     }
 
     public boolean isEnableLibratoMetricsOutput() {
