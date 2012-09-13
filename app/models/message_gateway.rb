@@ -36,7 +36,7 @@ class MessageGateway
   else
     config_index = Configuration.indexer_index_prefix + "_*"
     config_index.blank? ? INDEX_NAME = DEFAULT_INDEX_NAME : INDEX_NAME = config_index
-    
+
     config_recent_index = Configuration.indexer_recent_index_name
     config_recent_index.blank? ? RECENT_INDEX_NAME = DEFAULT_RECENT_INDEX_NAME : RECENT_INDEX_NAME = config_recent_index
   end
@@ -117,6 +117,9 @@ class MessageGateway
           # Short message
           must { string("message:#{filters[:message]}") } unless filters[:message].blank?
 
+          # Full message
+          must { string("full_message:#{filters[:full_message]}") } unless filters[:full_message].blank?
+
           # Facility
           must { term(:facility, filters[:facility]) } unless filters[:facility].blank?
 
@@ -137,28 +140,28 @@ class MessageGateway
           unless opts[:stream_id].blank?
             must { term(:streams, opts[:stream_id]) }
           end
-          
+
           # Severity (or higher)
           if !filters[:severity].blank? and !filters[:severity_above].blank?
             must { range(:level, :to => filters[:severity].to_i) }
           end
-      
+
           # Timeframe.
           if !filters[:date].blank?
             range = Quickfilter.get_conditions_timeframe(filters[:date])
             must { range(:created_at, :gt => range[:greater], :lt => range[:lower]) }
           end
-          
+
           unless opts[:hostname].blank?
             must { term(:host, opts[:hostname]) }
           end
-          
+
           # XXX Duplicated?
           # Possibly narrow down to stream?
           unless opts[:stream_id].blank?
             must { term(:streams, opts[:stream_id]) }
           end
-          
+
           # File name
           must { term(:file, filters[:file]) } unless filters[:file].blank?
 
@@ -166,7 +169,7 @@ class MessageGateway
           must { term(:line, filters[:line]) } unless filters[:line].blank?
         end
       end
-      
+
       # Request date histogram facet?
       if histogram_only
         facet 'date_histogram' do
@@ -175,7 +178,7 @@ class MessageGateway
       end
 
     end
-    
+
     return r.facets["date_histogram"]["entries"] if histogram_only rescue return []
 
     return wrap(r)
@@ -217,13 +220,13 @@ class MessageGateway
         unless opts[:stream_id].blank?
           term(:streams, opts[:stream_id])
         end
-        
+
         # Possibly narrow down to host?
         unless opts[:hostname].blank?
           term(:host, opts[:hostname])
         end
       end
-          
+
       filter 'range', { :created_at => { :gte => from, :lte => to } }
     end
 
@@ -242,7 +245,7 @@ class MessageGateway
   def self.analyze(text, field = "message")
     result = Tire.index(INDEX_NAME).analyze(text, :field => "message.#{field}")
     return Array.new if result == false
-    
+
     result["tokens"].map { |t| t["token"] }
   end
 
@@ -256,8 +259,8 @@ class MessageGateway
     store_generic = mapping["dynamic_templates"][0]["store_generic"]
     return false if store_generic["mapping"]["index"] != "not_analyzed"
     return false if store_generic["match"] != "*"
-   
-    properties = mapping["properties"] 
+
+    properties = mapping["properties"]
     expected = { "analyzer" => "whitespace", "type" => "string" }
     return false if properties["full_message"] != expected
     return false if properties["message"] != expected
