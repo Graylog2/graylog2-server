@@ -1,0 +1,10 @@
+Package: graylog2-server
+Version: [[version]]
+Architecture: all
+Maintainer: Nikolay Bryskin <devel.niks@gmail.com>
+Depends: java7-runtime-headless | java6-runtime-headless | java7-runtime | java6-runtime
+Section: web
+Priority: optional
+Homepage: http://www.graylog2.org/
+Description: Open source. Log management.
+  Manage your logs in the dark and have lasers going and make it look like you're from space. 

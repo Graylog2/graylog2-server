@@ -1,0 +1,10 @@
+JAVA_OPTS=""
+JAVA_OPTS="$JAVA_OPTS -Dlog4j.configuration=file:///etc/graylog2.d/log4j.conf"
+JAVA_OPTS="$JAVA_OPTS -Dlog4j.debug"
+JAVA_OPTS="$JAVA_OPTS -Xms16g -Xmx16g"
+#JAVA_OPTS="$JAVA_OPTS -Dcom.sun.management.jmxremote.port=9401 -Dcom.sun.management.jmxremote.authenticate=false -Dcom.sun.management.jmxremote.ssl=false"
+#JAVA_OPTS="$JAVA_OPTS -XX:+UseLinuxPosixThreadCPUClocks -agentpath:/home/nbryskin/profiler/lib/deployed/jdk16/linux-amd64/libprofilerinterface.so=/home/nbryskin/profiler/lib,5140"
+#JAVA_OPTS="$JAVA_OPTS -javaagent:/home/nbryskin/appserveragent/javaagent.jar"
+#JAVA_OPTS="$JAVA_OPTS -agentpath:/home/nbryskin/jprofiler/bin/linux-x64/libjprofilerti.so=port=8850,nowait"
+#GRAYLOG_OPTS="--debug"
+export JAVA_OPTS GRAYLOG_OPTS

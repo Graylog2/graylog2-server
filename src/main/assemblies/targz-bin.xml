@@ -1,0 +1,25 @@
+<?xml version="1.0"?>
+<assembly>
+    <id>targz</id>
+    <formats>
+        <format>tar.gz</format>
+    </formats>
+
+    <includeBaseDirectory>true</includeBaseDirectory>
+
+    <fileSets>
+        <fileSet>
+            <directory>bin</directory>
+            <outputDirectory>bin</outputDirectory>
+            <fileMode>0755</fileMode>
+            <directoryMode>0755</directoryMode>
+            <lineEnding>unix</lineEnding>
+            <filtered>true</filtered>
+        </fileSet>
+
+    </fileSets>
+
+    <componentDescriptors>
+        <componentDescriptor>src/main/assemblies/common-bin.xml</componentDescriptor>
+    </componentDescriptors>
+</assembly>

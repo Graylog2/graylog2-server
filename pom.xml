@@ -174,18 +174,151 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-assembly-plugin</artifactId>
-                <version>2.2.1</version>
+                <version>2.3</version>
                 <configuration>
-                    <finalName>graylog2-server</finalName>
                     <archive>
                         <manifest>
                             <mainClass>org.graylog2.Main</mainClass>
                         </manifest>
                     </archive>
-                    <descriptorRefs>
-                        <descriptorRef>jar-with-dependencies</descriptorRef>
-                    </descriptorRefs>
+                    <appendAssemblyId>false</appendAssemblyId>
+                    <outputDirectory>${project.build.directory}/releases/</outputDirectory>
+                    <descriptors>
+                        <descriptor>${basedir}/src/main/assemblies/targz-bin.xml</descriptor>
+                    </descriptors>
                 </configuration>
+                <executions>
+                    <execution>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>single</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <artifactId>maven-dependency-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <phase>prepare-package</phase>
+                        <goals>
+                            <goal>copy-dependencies</goal>
+                        </goals>
+                        <configuration>
+                            <outputDirectory>${project.build.directory}/lib</outputDirectory>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <!-- some infos https://github.com/tcurdt/jdeb/blob/master/docs/maven.md
+                -->
+                <artifactId>jdeb</artifactId>
+                <groupId>org.vafer</groupId>
+                <version>0.9</version>
+                <configuration>
+                    <deb>${project.build.directory}/releases/${project.artifactId}-${project.version}.deb</deb>
+                </configuration>
+                <executions>
+                    <execution>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>jdeb</goal>
+                        </goals>
+                        <configuration>
+                            <dataSet>
+                                <data>
+                                    <src>${project.basedir}/</src>
+                                    <includes>*.txt, *.textile</includes>
+                                    <type>directory</type>
+                                    <mapper>
+                                        <type>perm</type>
+                                        <prefix>/usr/share/graylog2-server</prefix>
+                                        <user>root</user>
+                                        <group>root</group>
+                                    </mapper>
+                                </data>
+                                <data>
+                                    <src>${project.build.directory}/</src>
+                                    <includes>${project.name}.jar</includes>
+                                    <type>directory</type>
+                                    <mapper>
+                                        <type>perm</type>
+                                        <prefix>/usr/share/graylog2-server/lib</prefix>
+                                        <user>root</user>
+                                        <group>root</group>
+                                    </mapper>
+                                </data>
+                                <data>
+                                    <src>${project.build.directory}/lib</src>
+                                    <type>directory</type>
+                                    <mapper>
+                                        <type>perm</type>
+                                        <prefix>/usr/share/graylog2-server/lib</prefix>
+                                        <user>root</user>
+                                        <group>root</group>
+                                    </mapper>
+                                </data>
+                                <data>
+                                    <src>${project.basedir}/src/deb/default/</src>
+                                    <type>directory</type>
+                                    <excludes>.DS_Store</excludes>
+                                    <mapper>
+                                        <type>perm</type>
+                                        <prefix>/etc/default</prefix>
+                                        <user>root</user>
+                                        <group>root</group>
+                                    </mapper>
+                                </data>
+                                <data>
+                                    <src>${project.basedir}/src/deb/init/</src>
+                                    <type>directory</type>
+                                    <excludes>.DS_Store</excludes>
+                                    <mapper>
+                                        <type>perm</type>
+                                        <prefix>/etc/init</prefix>
+                                        <filemode>755</filemode>
+                                        <user>root</user>
+                                        <group>root</group>
+                                    </mapper>
+                                </data>
+                                <data>
+                                    <src>${project.basedir}/config/graylog2.d</src>
+                                    <type>directory</type>
+                                    <excludes>.DS_Store</excludes>
+                                    <mapper>
+                                        <type>perm</type>
+                                        <prefix>/etc/graylog2.d</prefix>
+                                        <user>root</user>
+                                        <group>root</group>
+                                    </mapper>
+                                </data>
+                                <data>
+                                    <src>${project.basedir}/config/graylog2.conf</src>
+                                    <type>file</type>
+                                    <excludes>.DS_Store</excludes>
+                                    <mapper>
+                                        <type>perm</type>
+                                        <prefix>/etc</prefix>
+                                        <user>root</user>
+                                        <group>root</group>
+                                    </mapper>
+                                </data>
+                                <data>
+                                    <src>${project.basedir}/config/graylog2-elasticsearch.yml</src>
+                                    <type>file</type>
+                                    <excludes>.DS_Store</excludes>
+                                    <mapper>
+                                        <type>perm</type>
+                                        <prefix>/etc</prefix>
+                                        <user>root</user>
+                                        <group>root</group>
+                                    </mapper>
+                                </data>
+                            </dataSet>
+                        </configuration>
+                    </execution>
+                </executions>
             </plugin>
         </plugins>
         <testResources>

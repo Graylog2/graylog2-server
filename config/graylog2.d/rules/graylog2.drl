@@ -1,0 +1,76 @@
+import org.graylog2.logmessage.LogMessage
+import java.util.regex.Matcher
+import java.util.regex.Pattern
+import org.apache.log4j.Logger
+
+function void parseMessage(LogMessage m, String pattern) {
+	Matcher matcher = Pattern.compile(pattern).matcher(m.getShortMessage());
+	if (matcher.find()) {
+		Matcher groupMatcher = Pattern.compile("\\(\\?<(\\w+)>").matcher(pattern);
+		while (groupMatcher.find()) {
+			String group = groupMatcher.group(1);
+                        String data = matcher.group(group);
+                        if (data != null) {
+                            m.addAdditionalData(group.replace("X", "_"), data);
+                        }
+		}
+	}
+}
+
+rule "Message with process and pid"
+when
+	m : LogMessage( shortMessage matches "^.+\\[\\d+]: .*" )
+then
+	parseMessage(m, "^(?<program>.+)\\[(?<pid>\\d+)]: (?<msg>.*)");
+end
+
+rule "Message with process and pid (with dash)"
+when
+	m : LogMessage( shortMessage matches "^[a-zA-Z_]+\\-\\d+: .*" )
+then
+	parseMessage(m, "^(?<program>[a-zA-Z_]+)\\-(?<pid>\\d+): (?<msg>.*)");
+end
+
+rule "Python Logging Message"
+when
+	m : LogMessage( shortMessage matches ".* [A-Z]+: .*" )
+then
+	parseMessage(m, ".* (?<level>[A-Z]+): .*");
+end
+
+rule "HAProxy Access Log Message"
+when
+        m : LogMessage( shortMessage matches "haproxy\\[\\d+]: (?<clientXhost>\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}):(?<clientXport>\\d+) \\[(?<timestamp>.+)] (?<instance>.+) (?<frontend>.+)/(?<backend>.+) (\\-?\\d+)/(\\-?\\d+)/(\\-?\\d+)/(\\-?\\d+)/(\\-?\\d+) (?<httpXcode>\\d{3}) (?<contentXlength>\\d+) \\- \\- (?<error>.{4}) (\\d+)/(\\d+)/(\\d+)/(\\d+)/(\\d+) (\\d+)/(\\d+) \"(?<httpXmethod>[A-Z]+) (?<httpXurl>((?<urlXscheme>[a-zA-Z]+)://)?(?<urlXdomain>[0-9a-zA-Z\\-\\.]+)?(?<urlXpath>(?<urlXpathXonly>/[^?]*)(\\?(?<urlXquery>.*))?)?) HTTP/(?<httpXversion>\\d\\.\\d)\"" )
+then
+        parseMessage(m, "haproxy\\[\\d+]: (?<clientXhost>\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}):(?<clientXport>\\d+) \\[(?<timestamp>.+)] (?<instance>.+) (?<frontend>.+)/(?<backend>.+) (\\-?\\d+)/(\\-?\\d+)/(\\-?\\d+)/(\\-?\\d+)/(\\-?\\d+) (?<httpXcode>\\d{3}) (?<contentXlength>\\d+) \\- \\- (?<error>.{4}) (\\d+)/(\\d+)/(\\d+)/(\\d+)/(\\d+) (\\d+)/(\\d+) \"(?<httpXmethod>[A-Z]+) (?<httpXurl>((?<urlXscheme>[a-zA-Z]+)://)?(?<urlXdomain>[0-9a-zA-Z\\-\\.]+)?(?<urlXpath>(?<urlXpathXonly>/[^?]*)(\\?(?<urlXquery>.*))?)?) HTTP/(?<httpXversion>\\d\\.\\d)\"");
+end
+
+rule "Access Log Message"
+salience 10
+when
+	m : LogMessage( shortMessage matches ".* (\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}) (.+) (.+) \\[(.+)] \"([A-Z]+) (.+) HTTP/(\\d\\.\\d)\" (\\d{3}) (\\d+) \"([^\"]+)\" \"([^\"]+)\"( \"([^\"]+)\")?( (\\d+))?" )
+then
+	parseMessage(m, ".* (?<clientXhost>\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}) (?<httpXhost>.+) (?<ident>.+) \\[(?<timestamp>.+)] \"(?<httpXmethod>[A-Z]+) (?<httpXpath>.+) HTTP/(?<httpXversion>\\d\\.\\d)\" (?<httpXcode>\\d{3}) (?<contentXlength>\\d+) \"(?<referer>[^\"]+)\" \"(?<useragent>[^\"]+)\"( \"(?<cookie>[^\"]+)\")?( (?<serverXport>\\d+))?");
+end
+
+rule "HAProxy server status message"
+when
+	m : LogMessage( shortMessage matches "haproxy\\[\\d+]: Server (.+)/(.+) is ([A-Z]+), reason: (.*), check duration: (\\d+)ms\\. \\d+ active and \\d+ backup servers (left|online)\\.( \\d+ sessions active,)? \\d+( sessions)? requeued, \\d+ .+ in queue\\." )
+then
+	parseMessage(m, "haproxy\\[\\d+]: Server (?<backend>.+)/(?<frontend>.+) is (?<state>[A-Z]+), reason: (?<reason>.*), check duration: (\\d+)ms\\. \\d+ active and \\d+ backup servers (left|online)\\.( \\d+ sessions active,)? \\d+( sessions)? requeued, \\d+ .+ in queue\\.");
+end
+
+rule "Cookie Message"
+salience -10
+when
+    m : LogMessage()
+then
+    if (m.getAdditionalData().containsKey("_cookie")) {
+        for (String cookie : ((String)m.getAdditionalData().get("_cookie")).split(";")) {
+            String kv[] = cookie.trim().split("=");
+            if (kv.length == 2) {
+                m.addAdditionalData("cookie_"+kv[0], kv[1]);
+            }
+        }
+    }
+end
