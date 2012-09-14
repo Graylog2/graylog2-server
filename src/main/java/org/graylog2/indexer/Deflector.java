@@ -19,7 +19,7 @@
  */
 package org.graylog2.indexer;
 
-import com.beust.jcommander.internal.Lists;
+import com.google.common.collect.Lists;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
