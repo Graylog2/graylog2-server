@@ -23,6 +23,7 @@ package org.graylog2.indexer.retention;
 import org.apache.log4j.Logger;
 import org.graylog2.GraylogServer;
 import org.graylog2.Tools;
+import org.graylog2.activities.Activity;
 
 /**
  * @author Lennart Koopmann <lennart@socketfeed.com>
@@ -38,7 +39,9 @@ public class MessageRetention {
 
     public boolean performCleanup(int timeDays) {
         int to = Tools.getTimestampDaysAgo(Tools.getUTCTimestamp(), timeDays);
-        LOG.debug("Deleting all messages older than " + to + " (" + timeDays + " days ago)");
+        String msg = "Deleting all messages older than " + to + " (" + timeDays + " days ago)";
+        LOG.debug(msg);
+        graylogServer.getActivityWriter().write(new Activity(msg, MessageRetention.class));
         return graylogServer.getIndexer().deleteMessagesByTimeRange(to);
     }
 
