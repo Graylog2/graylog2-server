@@ -183,10 +183,13 @@ public class EmbeddedElasticSearchClient {
     }
 
     public boolean deleteMessagesByTimeRange(int to) {
-        DeleteByQueryRequestBuilder b = client.prepareDeleteByQuery(new String[] {allIndicesAlias()});
-        b.setTypes(new String[] {TYPE});
+        DeleteByQueryRequestBuilder b = client.prepareDeleteByQuery();
         final QueryBuilder qb = rangeQuery("created_at").from(0).to(to);
+        
+        b.setTypes(new String[] {TYPE});
+        b.setIndices(server.getDeflector().getAllIndexNames());
         b.setQuery(qb);
+        
         ActionFuture<DeleteByQueryResponse> future = client.deleteByQuery(b.request());
         return future.actionGet().index(allIndicesAlias()).failedShards() == 0;
     }

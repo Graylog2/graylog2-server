@@ -25,7 +25,7 @@ import org.graylog2.GraylogServer;
 /**
  * @author Lennart Koopmann <lennart@socketfeed.com>
  */
-public class DeflectorPointerThread implements Runnable {
+public class DeflectorPointerThread implements Runnable { // public class Klimperkiste
     
     private static final Logger LOG = Logger.getLogger(DeflectorPointerThread.class);
     

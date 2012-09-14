@@ -19,6 +19,7 @@
  */
 package org.graylog2.indexer;
 
+import com.beust.jcommander.internal.Lists;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -128,6 +129,10 @@ public class Deflector {
         List<Integer> indexNumbers = new ArrayList<Integer>();
         
         for(Map.Entry<String, IndexStats> e : indexes.entrySet()) {
+            if (!ourIndex(e.getKey())) {
+                continue;
+            }
+            
             try {
                 indexNumbers.add(extractIndexNumber(e.getKey()));
             } catch (NumberFormatException ex) {
@@ -140,6 +145,21 @@ public class Deflector {
         }
         
         return Collections.max(indexNumbers);
+    }
+    
+    public String[] getAllIndexNames() {
+        List<String> indices = Lists.newArrayList();
+        
+        int i = 0;
+        for(Map.Entry<String, IndexStats> e : server.getIndexer().getIndices().entrySet()) {
+            String name = e.getKey();
+            
+            if (ourIndex(name)) {
+                indices.add(name);
+            }
+        }
+        
+        return indices.toArray(new String[indices.size()]);
     }
     
     public String getCurrentTargetName() throws NoTargetIndexException {
@@ -159,6 +179,10 @@ public class Deflector {
             LOG.debug("Could not extract index number from index <" + indexName + ">.");
             throw new NumberFormatException();
         }
+    }
+    
+    private boolean ourIndex(String indexName) {
+        return indexName.startsWith(server.getConfiguration().getElasticSearchIndexPrefix() + "_");
     }
     
     private void pointTo(String newIndex, String oldIndex) {
