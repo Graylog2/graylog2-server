@@ -182,7 +182,7 @@ public class EmbeddedElasticSearchClient {
         return !response.hasFailures();
     }
 
-    public boolean deleteMessagesByTimeRange(int to) {
+    public void deleteMessagesByTimeRange(int to) {
         DeleteByQueryRequestBuilder b = client.prepareDeleteByQuery();
         final QueryBuilder qb = rangeQuery("created_at").from(0).to(to);
         
@@ -191,7 +191,7 @@ public class EmbeddedElasticSearchClient {
         b.setQuery(qb);
         
         ActionFuture<DeleteByQueryResponse> future = client.deleteByQuery(b.request());
-        return future.actionGet().index(allIndicesAlias()).failedShards() == 0;
+        future.actionGet();
     }
 
     // yyyy-MM-dd HH-mm-ss
