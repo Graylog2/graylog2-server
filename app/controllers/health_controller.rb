@@ -4,6 +4,8 @@ class HealthController < ApplicationController
   def index
     # Delete outdated server values from instances not running anymore.
     ServerValue.delete_outdated
+    
+      @server_activities = ServerActivity.all.desc(:timestamp).page(params[:page])
   end
 
   def currentthroughput
