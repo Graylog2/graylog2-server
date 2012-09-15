@@ -46,8 +46,8 @@
 <table class='messages'>
   <thead>
   <tr>
-    <th>Date</th>
-    <th>Caller</th>
+    <th style="width: 250px;">Date<%= sorting_link(:date, params[:sort], params[:order]) %></th>
+    <th>Caller<%= sorting_link(:caller, params[:sort], params[:order]) %></th>
     <th>Message</th>
   </tr>
   </thead>
