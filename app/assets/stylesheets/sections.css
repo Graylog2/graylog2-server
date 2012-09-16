@@ -584,6 +584,52 @@
   text-transform: uppercase;
 }
 
+.health-index {
+  margin-top: 10px;
+  margin-bottom: 10px;
+  padding: 5px;
+  border: 1px dashed #ccc;
+}
+
+.health-index h3 {
+  margin-top: 0px;
+  display: inline;
+}
+
+.health-shards {
+  margin-top: 7px;
+}
+
+.health-shard {
+  padding: 2px;
+  margin-top: 2px;
+  margin-bottom: 2px;
+}
+
+.health-shard-started {
+  background-color: #D1FFB3;
+}
+
+.health-shard-unassigned {
+  background-color: #CCCCCC;
+}
+
+.health-shard-relocating {
+  background-color: #FFE3FF;
+}
+
+.health-shard-initializing {
+  background-color: #FFF1C6;
+}
+
+.health-shard-name {
+  font-weight: bold;
+}
+
+.health-shard-primary {
+  font-weight: bold;
+}
+
 /* Stream categories */
 #streamcategories-list {
   list-style-type: square;

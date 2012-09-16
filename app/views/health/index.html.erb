@@ -43,6 +43,41 @@
 <h3><span class="highlighted">Web Interface version:</span> <%= GRAYLOG2_VERSION %></h3>
 
 <br />
+<h2>Indices &amp; Shards</h2>
+<strong>Current deflector target:</strong>
+<span class="highlighted"><%= @index_information.deflector_target %></span>
+<br />
+<strong>Number of messages per index:</strong>
+<span class="highlighted"><%= @index_information.max_messages_per_index %></span>
+
+<% @indices.each do |index, info| %>
+
+  <div class="health-index">
+    <h3><%= index %></h3>
+    <%= info["docs"] %> documents, <%= number_to_human_size(info["size"]*1024) %> |
+    <%= info["time_index"] %>s index, <%= info["time_query"] %>s query, <%= info["time_fetch"] %>s fetch, <%= info["time_get"] %>s get
+
+    <br />
+    <div class="health-shards">
+      <% info["shards"].each do |shard| %>
+        <div class="health-shard health-shard-<%= shard_status(shard).to_s %>">
+          <span class="health-shard-id"><%= shard["id"] %></span>
+          on <span class="health-shard-name"><%= shard["node_name"] %></span> (<%= shard["node_hostname"] %>)
+
+          <%= shard_status(shard).to_s.upcase %>
+
+          <% if shard["primary"] %>
+            <span class="health-shard-primary">[PRI]</span>
+          <% end %>
+        </div>
+      <% end %>
+    </div>
+  </div>
+<% end %>
+<i>Informaton last updated at <%= gl_date(Time.at(@index_information.timestamp)) %> by <%= @index_information.server_id %></i>
+
+<br /><br />
+<h2>Server messages</h2>
 <table class='messages'>
   <thead>
   <tr>
