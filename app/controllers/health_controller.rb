@@ -4,6 +4,13 @@ class HealthController < ApplicationController
   def index
     # Delete outdated server values from instances not running anymore.
     ServerValue.delete_outdated
+    
+    sort = params[:sort].blank? ? :timestamp : params[:sort].to_sym
+    order = params[:order].blank? ? :desc : params[:order].to_sym	
+ 	  @server_activities = ServerActivity.all.order_by([[sort, order]]).page(params[:page])
+
+ 	  @index_information = DeflectorInformation.first
+    @indices = @index_information.indices.sort_by { |k,v| k.split("_").last.  to_i }.reverse
   end
 
   def currentthroughput
