@@ -27,7 +27,6 @@ import java.util.Map;
 import org.elasticsearch.action.admin.indices.stats.IndexShardStats;
 import org.elasticsearch.action.admin.indices.stats.IndexStats;
 import org.elasticsearch.action.admin.indices.stats.ShardStats;
-import org.graylog2.GraylogServer;
 import org.graylog2.Tools;
 
 /**
@@ -35,16 +34,10 @@ import org.graylog2.Tools;
  */
 public class DeflectorInformation {
     
-    private GraylogServer graylogServer;
-    
     private Map<String, IndexStats> indices = Maps.newHashMap();
     private String deflectorTarget;
     private int maxMessagesPerIndex;
     private String serverId;
-    
-    public DeflectorInformation(GraylogServer server) {
-        this.graylogServer = server;
-    }
     
     public void addIndex(IndexStats index) {
         indices.put(index.index(), index);
@@ -73,11 +66,11 @@ public class DeflectorInformation {
         for (Map.Entry<String, IndexStats> e : indices.entrySet()) {
             Map<String, Object> info = Maps.newHashMap();
             info.put("docs", e.getValue().getTotal().getDocs().count());
-            info.put("size", e.getValue().getTotal().store().getSize().getKb());
-            info.put("time_index", e.getValue().getTotal().getIndexing().total().indexTime().getSeconds());
-            info.put("time_query", e.getValue().getTotal().getSearch().total().queryTime().getSeconds());
-            info.put("time_fetch", e.getValue().getTotal().getSearch().total().fetchTime().getSeconds());
-            info.put("time_get", e.getValue().getTotal().getGet().getTime().getSeconds());
+            info.put("size", e.getValue().getTotal().store().getSize().getGb());
+            info.put("time_index", e.getValue().getTotal().getIndexing().total().indexTime().getMinutes());
+            info.put("time_query", e.getValue().getTotal().getSearch().total().queryTime().getMinutes());
+            info.put("time_fetch", e.getValue().getTotal().getSearch().total().fetchTime().getMinutes());
+            info.put("time_get", e.getValue().getTotal().getGet().getTime().getMinutes());            
 
             List<Map<String, Object>> shards = Lists.newArrayList();
             for(Map.Entry<Integer, IndexShardStats> s : e.getValue().indexShards().entrySet()) {
@@ -87,17 +80,15 @@ public class DeflectorInformation {
                 while (iter.hasNext()) {
                     ShardStats ss = iter.next();
                     
-                    shard.put("node_hostname", graylogServer.getIndexer().nodeIdToHostName(ss.getShardRouting().currentNodeId()));
-                    shard.put("node_name", graylogServer.getIndexer().nodeIdToName(ss.getShardRouting().currentNodeId()));
                     shard.put("id", ss.getShardId());
                     shard.put("node_id", ss.getShardRouting().currentNodeId());
-                    shard.put("primary", ss.getShardRouting().primary());
+                    shard.put("primary", ss.getShardRouting().relocatingNodeId());
                     shard.put("is_initializing", ss.getShardRouting().initializing());
                     shard.put("is_started", ss.getShardRouting().started());
                     shard.put("is_unassigned", ss.getShardRouting().unassigned());
-                    shard.put("is_relocating", ss.getShardRouting().relocating());
-                    shard.put("relocating_to", graylogServer.getIndexer().nodeIdToName(ss.getShardRouting().relocatingNodeId()));
-                }
+                    shard.put("is_relocating", ss.getShardRouting().started());
+                    shard.put("relocating_to", ss.getShardRouting().relocatingNodeId());
+                    }
                 
                 shards.add(shard);
             }
