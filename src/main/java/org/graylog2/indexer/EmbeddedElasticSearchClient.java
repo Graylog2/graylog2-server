@@ -14,6 +14,9 @@ import java.util.Map;
 import org.apache.commons.io.FileUtils;
 import org.apache.log4j.Logger;
 import org.elasticsearch.action.ActionFuture;
+import org.elasticsearch.action.admin.cluster.health.ClusterHealthRequest;
+import org.elasticsearch.action.admin.cluster.node.info.NodesInfoRequest;
+import org.elasticsearch.action.admin.cluster.node.info.NodesInfoResponse;
 import org.elasticsearch.action.admin.indices.alias.IndicesAliasesRequest;
 import org.elasticsearch.action.admin.indices.alias.IndicesAliasesResponse;
 import org.elasticsearch.action.admin.indices.create.CreateIndexRequest;
@@ -90,7 +93,38 @@ public class EmbeddedElasticSearchClient {
     }
     
     public String allIndicesAlias() {
+
         return server.getConfiguration().getElasticSearchIndexPrefix() + "_*";
+    }
+    
+    public String nodeIdToName(String nodeId) {
+        if (nodeId == null || nodeId.isEmpty()) {
+            return null;
+        }
+        
+        try {
+            NodesInfoResponse r = client.admin().cluster().nodesInfo(new NodesInfoRequest(nodeId).all()).actionGet();
+            return r.getNodesMap().get(nodeId).getNode().getName();
+        } catch (Exception e) {
+            LOG.error("Could not read name of ES node.", e);
+            return "UNKNOWN";
+        }
+        
+    }
+    
+    public String nodeIdToHostName(String nodeId) {
+        if (nodeId == null || nodeId.isEmpty()) {
+            return null;
+        }
+        
+        try {
+            NodesInfoResponse r = client.admin().cluster().nodesInfo(new NodesInfoRequest(nodeId).all()).actionGet();
+            return r.getNodesMap().get(nodeId).getHostname();
+        } catch (Exception e) {
+            LOG.error("Could not read name of ES node.", e);
+            return "UNKNOWN";
+        }
+        
     }
     
     public Map<String, IndexStats> getIndices() {
@@ -182,13 +216,16 @@ public class EmbeddedElasticSearchClient {
         return !response.hasFailures();
     }
 
-    public boolean deleteMessagesByTimeRange(int to) {
-        DeleteByQueryRequestBuilder b = client.prepareDeleteByQuery(new String[] {allIndicesAlias()});
-        b.setTypes(new String[] {TYPE});
+    public void deleteMessagesByTimeRange(int to) {
+        DeleteByQueryRequestBuilder b = client.prepareDeleteByQuery();
         final QueryBuilder qb = rangeQuery("created_at").from(0).to(to);
+        
+        b.setTypes(new String[] {TYPE});
+        b.setIndices(server.getDeflector().getAllIndexNames());
         b.setQuery(qb);
+        
         ActionFuture<DeleteByQueryResponse> future = client.deleteByQuery(b.request());
-        return future.actionGet().index(allIndicesAlias()).failedShards() == 0;
+        future.actionGet();
     }
 
     // yyyy-MM-dd HH-mm-ss
