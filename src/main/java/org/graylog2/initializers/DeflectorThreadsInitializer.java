@@ -20,7 +20,7 @@
 package org.graylog2.initializers;
 
 import org.graylog2.GraylogServer;
-import org.graylog2.periodical.DeflectorManagerThread;
+import org.graylog2.periodical.DeflectorPointerThread;
 
 /**
  * @author Lennart Koopmann <lennart@socketfeed.com>
@@ -34,9 +34,9 @@ public class DeflectorThreadsInitializer extends SimpleFixedRateScheduleInitiali
     @Override
     public void initialize() {
         configureScheduler(
-                new DeflectorManagerThread(this.graylogServer),
-                DeflectorManagerThread.INITIAL_DELAY,
-                DeflectorManagerThread.PERIOD
+                new DeflectorPointerThread(this.graylogServer),
+                DeflectorPointerThread.INITIAL_DELAY,
+                DeflectorPointerThread.PERIOD
         );
     }
     
