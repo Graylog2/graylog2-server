@@ -195,9 +195,11 @@ public class Deflector {
     }
     
     private boolean ourIndex(String indexName) {
-    
-        return !indexName.equals(EmbeddedElasticSearchClient.RECENT_INDEX_NAME) &&
-                indexName.startsWith(server.getConfiguration().getElasticSearchIndexPrefix() + "_");
+        if (indexName.trim().equals(EmbeddedElasticSearchClient.RECENT_INDEX_NAME)) {
+            return false;
+        }
+        
+        return indexName.startsWith(server.getConfiguration().getElasticSearchIndexPrefix() + "_");
     }
     
     private void pointTo(String newIndex, String oldIndex) {
