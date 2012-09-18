@@ -25,7 +25,6 @@ import java.util.concurrent.TimeUnit;
 import org.apache.log4j.Logger;
 import org.graylog2.GraylogServer;
 import org.graylog2.indexer.retention.MessageRetention;
-import org.graylog2.settings.Setting;
 
 /**
  * Removes messages from indexer that are older than specified retention time.
@@ -41,12 +40,10 @@ public class MessageRetentionThread implements Runnable {
     private final GraylogServer server;
 
     private final MessageRetention messageRetention;
-    private final Setting settings;
 
     public MessageRetentionThread(GraylogServer server) {
         this.server = server;
         this.messageRetention = new MessageRetention(server);
-        this.settings = new Setting(server);
     }
 
     @Override
@@ -57,7 +54,7 @@ public class MessageRetentionThread implements Runnable {
              * to be sure to always have the *current* setting from database - even when
              * used with scheduler.
              */
-            this.retentionTimeDays = settings.getRetentionTimeInDays();
+            this.retentionTimeDays = server.getConfiguration().getMessageTTLDays();
 
             LOG.info("Initialized message retention thread - cleaning all messages older than <" + this.retentionTimeDays + " days>.");
 
@@ -72,7 +69,7 @@ public class MessageRetentionThread implements Runnable {
 
     private void scheduleNextRun() {
         // Schedule next run in [current frequency setting from database] minutes.
-        int when = settings.getRetentionFrequencyInMinutes();
+        int when = server.getConfiguration().getMessageTTLFreq();
         server.getScheduler().schedule(new MessageRetentionThread(server), when, TimeUnit.MINUTES);
         LOG.info("Scheduled next run of MessageRetentionThread in <" + when + " minutes>.");
     }
