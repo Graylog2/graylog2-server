@@ -630,6 +630,10 @@
   font-weight: bold;
 }
 
+#health-nodes {
+  margin-top: 8px;
+}
+
 /* Stream categories */
 #streamcategories-list {
   list-style-type: square;

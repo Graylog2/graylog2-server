@@ -50,6 +50,16 @@
 <strong>Number of messages per index:</strong>
 <span class="highlighted"><%= @index_information.max_messages_per_index %></span>
 
+<ul id="health-nodes">
+<% @nodes.each_with_index do |node, i| %>
+  <li>
+    <strong>Node <%= i+1 %>: <span class="highlighted"> <%= node[:name] %></span></strong>
+    on <span class="highlighted"><%= node[:hostname] %></span>
+    (<%= node[:id] %>)
+  </li>
+<% end %>
+</ul>
+
 <% @indices.each do |index, info| %>
 
   <div class="health-index">
