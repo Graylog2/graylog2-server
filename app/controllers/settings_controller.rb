@@ -37,9 +37,7 @@ class SettingsController < ApplicationController
     def select_controller
       setting_type = params[:setting_type].to_i
       
-      if Setting.retentiontime_types.include?(setting_type)
-        controller = "retentiontime"
-      elsif setting_type == Setting::TYPE_ADDITIONAL_COLUMNS
+      if setting_type == Setting::TYPE_ADDITIONAL_COLUMNS
         controller = "additionalcolumns"
       else
         controller = "settings"

@@ -130,8 +130,6 @@ Graylog2WebInterface::Application.routes.draw do
     end
   end
 
-  resources :retentiontime
-  
   resources :additionalcolumns
 
   resources :settings do
