@@ -82,7 +82,7 @@ public class DeflectorManagerThread implements Runnable { // public class Klimpe
     }
     
     private void updateIndexInformation() {
-        DeflectorInformation i = new DeflectorInformation();
+        DeflectorInformation i = new DeflectorInformation(this.graylogServer);
         
         // Where is the deflector pointing to?
         String deflectorName;
