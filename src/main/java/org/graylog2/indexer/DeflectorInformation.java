@@ -97,9 +97,9 @@ public class DeflectorInformation {
                     shard.put("is_unassigned", ss.getShardRouting().unassigned());
                     shard.put("is_relocating", ss.getShardRouting().relocating());
                     shard.put("relocating_to", graylogServer.getIndexer().nodeIdToName(ss.getShardRouting().relocatingNodeId()));
+                    
+                    shards.add(shard);
                 }
-                
-                shards.add(shard);
             }
             info.put("shards", shards);
             
