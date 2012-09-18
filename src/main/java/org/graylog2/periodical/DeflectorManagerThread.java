@@ -47,13 +47,6 @@ public class DeflectorManagerThread implements Runnable { // public class Klimpe
         } catch (Exception e) {
             LOG.error(e);
         }
-        
-        // Write current index information to MongoDB.
-        try {
-            updateIndexInformation();
-        } catch (Exception e) {
-            LOG.error(e);
-        }
     }
     
     private void point() {
@@ -79,32 +72,6 @@ public class DeflectorManagerThread implements Runnable { // public class Klimpe
                     + "than the limit. (" + graylogServer.getConfiguration().getElasticSearchMaxDocsPerIndex() + ") "
                     + "Not doing anything.");
         }
-    }
-    
-    private void updateIndexInformation() {
-        DeflectorInformation i = new DeflectorInformation(this.graylogServer);
-        
-        // Where is the deflector pointing to?
-        String deflectorName;
-        try {
-            deflectorName = graylogServer.getDeflector().getCurrentTargetName();
-        } catch(Exception e) {
-            deflectorName = "NO TARGET";
-        }
-        i.setDeflectorTarget(deflectorName);
-        
-        // Configured limit of messages per index.
-        i.setConfiguredMaximumMessagesPerIndex(
-                graylogServer.getConfiguration().getElasticSearchMaxDocsPerIndex()
-        );
-        
-        // List of indexes and number of messages in them.
-        i.addIndices(graylogServer.getDeflector().getAllDeflectorIndices());
-        
-        // Last updated from which node?
-        i.setCallingNode(graylogServer.getServerId());
-        
-        graylogServer.getMongoBridge().writeDeflectorInformation(i.getAsDatabaseObject());
     }
     
 }
