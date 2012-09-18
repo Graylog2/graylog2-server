@@ -20,6 +20,7 @@
 package org.graylog2.indexer;
 
 import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -150,7 +151,6 @@ public class Deflector {
     public String[] getAllIndexNames() {
         List<String> indices = Lists.newArrayList();
         
-        int i = 0;
         for(Map.Entry<String, IndexStats> e : server.getIndexer().getIndices().entrySet()) {
             String name = e.getKey();
             
@@ -160,6 +160,19 @@ public class Deflector {
         }
         
         return indices.toArray(new String[0]);
+    }
+    
+    public Map<String, IndexStats> getAllDeflectorIndices() {
+        Map<String, IndexStats> result = Maps.newHashMap();
+        for(Map.Entry<String, IndexStats> e : server.getIndexer().getIndices().entrySet()) {
+            String name = e.getKey();
+            
+            if (ourIndex(name)) {
+                result.put(name, e.getValue());
+            }
+        }
+        
+        return result;
     }
     
     public String getCurrentTargetName() throws NoTargetIndexException {
@@ -182,7 +195,9 @@ public class Deflector {
     }
     
     private boolean ourIndex(String indexName) {
-        return indexName.startsWith(server.getConfiguration().getElasticSearchIndexPrefix() + "_");
+    
+        return !indexName.equals(EmbeddedElasticSearchClient.RECENT_INDEX_NAME) &&
+                indexName.startsWith(server.getConfiguration().getElasticSearchIndexPrefix() + "_");
     }
     
     private void pointTo(String newIndex, String oldIndex) {

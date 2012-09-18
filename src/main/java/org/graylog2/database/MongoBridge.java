@@ -125,6 +125,16 @@ public class MongoBridge {
         connection.getDatabase().getCollection("server_activities").insert(obj);
     }
     
+    public void writeDeflectorInformation(Map<String, Object> info) {
+        DBCollection coll = connection.getDatabase().getCollection("deflector_informations");
+
+        // Delete all entries, we only have one at a time.
+        coll.remove(new BasicDBObject());
+        
+        BasicDBObject obj = new BasicDBObject(info);
+        coll.insert(obj);
+    }
+    
     /**
      * Get a setting from the settings collection.
      *

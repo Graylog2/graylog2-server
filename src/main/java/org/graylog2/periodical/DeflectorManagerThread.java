@@ -21,25 +21,42 @@ package org.graylog2.periodical;
 
 import org.apache.log4j.Logger;
 import org.graylog2.GraylogServer;
+import org.graylog2.indexer.DeflectorInformation;
 
 /**
  * @author Lennart Koopmann <lennart@socketfeed.com>
  */
-public class DeflectorPointerThread implements Runnable { // public class Klimperkiste
+public class DeflectorManagerThread implements Runnable { // public class Klimperkiste
     
-    private static final Logger LOG = Logger.getLogger(DeflectorPointerThread.class);
+    private static final Logger LOG = Logger.getLogger(DeflectorManagerThread.class);
     
     public static final int INITIAL_DELAY = 0;
     public static final int PERIOD = 60;
     
     private final GraylogServer graylogServer;
     
-    public DeflectorPointerThread(GraylogServer graylogServer) {
+    public DeflectorManagerThread(GraylogServer graylogServer) {
         this.graylogServer = graylogServer;
     }
 
     @Override
     public void run() {
+        // Point deflector to a new index if required.
+        try {
+            point();
+        } catch (Exception e) {
+            LOG.error(e);
+        }
+        
+        // Write current index information to MongoDB.
+        try {
+            updateIndexInformation();
+        } catch (Exception e) {
+            LOG.error(e);
+        }
+    }
+    
+    private void point() {
         // Check if message limit of current target is hit. Point to new target if so.
         String currentTarget;
         long messageCountInTarget = 0;
@@ -62,6 +79,32 @@ public class DeflectorPointerThread implements Runnable { // public class Klimpe
                     + "than the limit. (" + graylogServer.getConfiguration().getElasticSearchMaxDocsPerIndex() + ") "
                     + "Not doing anything.");
         }
+    }
+    
+    private void updateIndexInformation() {
+        DeflectorInformation i = new DeflectorInformation();
+        
+        // Where is the deflector pointing to?
+        String deflectorName;
+        try {
+            deflectorName = graylogServer.getDeflector().getCurrentTargetName();
+        } catch(Exception e) {
+            deflectorName = "NO TARGET";
+        }
+        i.setDeflectorTarget(deflectorName);
+        
+        // Configured limit of messages per index.
+        i.setConfiguredMaximumMessagesPerIndex(
+                graylogServer.getConfiguration().getElasticSearchMaxDocsPerIndex()
+        );
+        
+        // List of indexes and number of messages in them.
+        i.addIndices(graylogServer.getDeflector().getAllDeflectorIndices());
+        
+        // Last updated from which node?
+        i.setCallingNode(graylogServer.getServerId());
+        
+        graylogServer.getMongoBridge().writeDeflectorInformation(i.getAsDatabaseObject());
     }
     
 }
