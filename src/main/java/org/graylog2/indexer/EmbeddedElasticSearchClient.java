@@ -32,6 +32,7 @@ import org.elasticsearch.action.bulk.BulkRequestBuilder;
 import org.elasticsearch.action.bulk.BulkResponse;
 import org.elasticsearch.action.deletebyquery.DeleteByQueryRequestBuilder;
 import org.elasticsearch.action.deletebyquery.DeleteByQueryResponse;
+import org.elasticsearch.action.index.IndexRequest;
 import org.elasticsearch.action.index.IndexRequest.OpType;
 import org.elasticsearch.action.index.IndexRequestBuilder;
 import org.elasticsearch.client.Client;
@@ -189,6 +190,14 @@ public class EmbeddedElasticSearchClient {
         }
         
         return index.getTotal().docs().count();
+    }
+    
+    public boolean index(final LogMessage msg) {
+        String source = JSONValue.toJSONString(msg.toElasticSearchObject());
+        final String id = UUID.randomBase64UUID();
+        client.index(buildIndexRequest(Deflector.DEFLECTOR_NAME, source, id, 0).request()).actionGet();
+        client.index(buildIndexRequest(RECENT_INDEX_NAME, source, id, server.getConfiguration().getRecentIndexTtlMinutes()).request()).actionGet();
+        return true;
     }
 
     public boolean bulkIndex(final List<LogMessage> messages) {
