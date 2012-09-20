@@ -81,8 +81,7 @@ public class DeflectorInformation {
 
             List<Map<String, Object>> shards = Lists.newArrayList();
             for(Map.Entry<Integer, IndexShardStats> s : e.getValue().indexShards().entrySet()) {
-                
-                
+
                 Iterator<ShardStats> iter = s.getValue().iterator();
                 while (iter.hasNext()) {
                     ShardStats ss = iter.next();
