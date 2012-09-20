@@ -39,8 +39,6 @@ import org.graylog2.outputs.MessageOutput;
 import org.graylog2.streams.StreamCache;
 
 import com.google.common.collect.Lists;
-import com.yammer.metrics.HealthChecks;
-import com.yammer.metrics.core.HealthCheck;
 import org.graylog2.activities.Activity;
 import org.graylog2.activities.ActivityWriter;
 import org.graylog2.communicator.Communicator;
@@ -164,10 +162,6 @@ public class GraylogServer implements Runnable {
 
     public <T extends CommunicatorMethod> void registerCommunicatorMethod(Class<T> klazz) {
         this.communicatorMethods.add(klazz);
-    }
-    
-    public void registerHealthCheck(HealthCheck check) {
-        HealthChecks.register(check);
     }
 
     @Override

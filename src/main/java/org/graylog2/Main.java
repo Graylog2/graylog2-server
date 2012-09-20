@@ -37,7 +37,6 @@ import org.graylog2.filters.CounterUpdateFilter;
 import org.graylog2.filters.RewriteFilter;
 import org.graylog2.filters.StreamMatcherFilter;
 import org.graylog2.filters.TokenizerFilter;
-import org.graylog2.healthchecks.MessageFlowHealthCheck;
 import org.graylog2.initializers.*;
 import org.graylog2.inputs.gelf.GELFTCPInput;
 import org.graylog2.inputs.gelf.GELFUDPInput;
@@ -133,9 +132,6 @@ public final class Main {
         server.registerInitializer(new MessageRetentionInitializer(server));
         if (configuration.isEnableGraphiteOutput())       { server.registerInitializer(new GraphiteInitializer(server)); }
         if (configuration.isEnableLibratoMetricsOutput()) { server.registerInitializer(new LibratoMetricsInitializer(server)); }
-        if (configuration.isEnableHealthCheckHttpApi()) {
-            server.registerInitializer(new HealthCheckHTTPServerInitializer(configuration.getHealthCheckHttpApiPort()));
-        }
         server.registerInitializer(new DeflectorThreadsInitializer(server));
 
         // Register inputs.
@@ -156,9 +152,6 @@ public final class Main {
 
         // Register outputs.
         server.registerOutput(ElasticSearchOutput.class);
-
-        // Register health checks.
-        server.registerHealthCheck(new MessageFlowHealthCheck(server));
 
         // Blocks until we shut down.
         server.run();

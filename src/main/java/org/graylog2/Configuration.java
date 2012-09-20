@@ -198,12 +198,6 @@ public class Configuration {
 
     @Parameter(value = "libratometrics_prefix", required = false)
     private String libratometricsPrefix = "gl2";
-
-    @Parameter(value = "enable_healthcheck_http_api", required = false)
-    private boolean enableHealthCheckHttpApi = false;
-    
-    @Parameter(value = "healthcheck_http_api_port", validator = InetPortValidator.class, required = false)
-    private int healthcheckHttpApiPort = 8010;
     
     @Parameter(value = "enable_cm_twilio", required = false)
     private boolean enableCommunicationMethodTwilio = false;
@@ -456,14 +450,6 @@ public class Configuration {
 
     public String getLibratoMetricsPrefix() {
         return libratometricsPrefix;
-    }
-    
-    public boolean isEnableHealthCheckHttpApi() {
-        return enableHealthCheckHttpApi;
-    }
-
-    public int getHealthCheckHttpApiPort() {
-        return healthcheckHttpApiPort;
     }
     
     public boolean isEnableCommunicationMethodTwilio() {
