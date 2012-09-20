@@ -81,12 +81,14 @@ public class DeflectorInformation {
 
             List<Map<String, Object>> shards = Lists.newArrayList();
             for(Map.Entry<Integer, IndexShardStats> s : e.getValue().indexShards().entrySet()) {
-                Map<String, Object> shard = Maps.newHashMap();
+                
                 
                 Iterator<ShardStats> iter = s.getValue().iterator();
                 while (iter.hasNext()) {
                     ShardStats ss = iter.next();
                     
+                    Map<String, Object> shard = Maps.newHashMap();
+
                     shard.put("node_hostname", graylogServer.getIndexer().nodeIdToHostName(ss.getShardRouting().currentNodeId()));
                     shard.put("node_name", graylogServer.getIndexer().nodeIdToName(ss.getShardRouting().currentNodeId()));
                     shard.put("id", ss.getShardId());

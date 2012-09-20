@@ -19,9 +19,14 @@
  */
 package org.graylog2.periodical;
 
+import java.util.Map;
 import org.apache.log4j.Logger;
+import org.elasticsearch.action.admin.indices.stats.IndexStats;
 import org.graylog2.GraylogServer;
+import org.graylog2.activities.Activity;
 import org.graylog2.indexer.DeflectorInformation;
+import org.graylog2.indexer.EmbeddedElasticSearchClient;
+import org.graylog2.indexer.NoTargetIndexException;
 
 /**
  * @author Lennart Koopmann <lennart@socketfeed.com>
@@ -44,6 +49,13 @@ public class DeflectorManagerThread implements Runnable { // public class Klimpe
         // Point deflector to a new index if required.
         try {
             point();
+        } catch (Exception e) {
+            LOG.error(e);
+        }
+        
+        // Delete outdated, empty indices.
+        try {
+            deleteEmptyIndices();
         } catch (Exception e) {
             LOG.error(e);
         }
@@ -71,6 +83,27 @@ public class DeflectorManagerThread implements Runnable { // public class Klimpe
             LOG.debug("Number of messages in <" + currentTarget + "> (" + messageCountInTarget + ") is lower "
                     + "than the limit. (" + graylogServer.getConfiguration().getElasticSearchMaxDocsPerIndex() + ") "
                     + "Not doing anything.");
+        }
+    }
+    
+    private void deleteEmptyIndices() {
+        for(Map.Entry<String, IndexStats> e : graylogServer.getDeflector().getAllDeflectorIndices().entrySet()) {
+            if (e.getValue().getTotal().getDocs().count() == 0) {
+                String index = e.getKey();
+                
+                // Never delete the index the deflector is currently pointing to or even the recent index, even if it is empty.
+                try {
+                    if (index.equals(graylogServer.getDeflector().getCurrentTargetName()) || index.equals(EmbeddedElasticSearchClient.RECENT_INDEX_NAME)) {
+                        continue;
+                    }
+                } catch (NoTargetIndexException zomg) { /** I don't care **/ }
+                
+                String msg = "Deleting empty index <" + index + ">";
+                graylogServer.getActivityWriter().write(new Activity(msg, DeflectorManagerThread.class));
+                LOG.info(msg);
+                
+                graylogServer.getIndexer().deleteIndex(index);
+            }
         }
     }
     
