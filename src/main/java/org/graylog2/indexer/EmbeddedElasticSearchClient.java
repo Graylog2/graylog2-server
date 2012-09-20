@@ -14,6 +14,7 @@ import java.util.Map;
 import org.apache.commons.io.FileUtils;
 import org.apache.log4j.Logger;
 import org.elasticsearch.action.ActionFuture;
+import org.elasticsearch.action.WriteConsistencyLevel;
 import org.elasticsearch.action.admin.cluster.health.ClusterHealthRequest;
 import org.elasticsearch.action.admin.cluster.node.info.NodesInfoRequest;
 import org.elasticsearch.action.admin.cluster.node.info.NodesInfoResponse;
@@ -249,6 +250,7 @@ public class EmbeddedElasticSearchClient {
         b.setContentType(XContentType.JSON);
         b.setOpType(OpType.INDEX);
         b.setType(TYPE);
+        b.setConsistencyLevel(WriteConsistencyLevel.ONE);
         
         // Set a TTL?
         if (ttlMinutes > 0) {
