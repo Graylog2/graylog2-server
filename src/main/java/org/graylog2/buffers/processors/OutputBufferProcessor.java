@@ -41,6 +41,8 @@ public class OutputBufferProcessor implements EventHandler<LogMessageEvent> {
 
     private GraylogServer server;
 
+    List<LogMessage> buffer = Lists.newArrayList();
+
     public OutputBufferProcessor(GraylogServer server) {
         this.server = server;
     }
@@ -52,16 +54,23 @@ public class OutputBufferProcessor implements EventHandler<LogMessageEvent> {
         LogMessage msg = event.getMessage();
         LOG.debug("Processing message <" + msg.getId() + "> from OutputBuffer.");
 
-        for (Class<? extends MessageOutput> outputType : server.getOutputs()) {
-            try {
-                // Always create a new instance of this filter.
-                MessageOutput output = outputType.newInstance();
+        buffer.add(msg);
 
-                LOG.debug("Writing message to [" + outputType.getSimpleName() + "].");
+        if (endOfBatch || buffer.size() >= server.getConfiguration().getOutputBatchSize()) {
+            for (Class<? extends MessageOutput> outputType : server.getOutputs()) {
+                try {
+                    // Always create a new instance of this filter.
+                    MessageOutput output = outputType.newInstance();
 
-                output.write(event, server);
-            } catch (Exception e) {
-                LOG.error("Could not write message batch to output [" + outputType.getSimpleName() +"].", e);
+                    LOG.debug("Writing message batch to [" + outputType.getSimpleName() + "]. Size <" + buffer.size() + ">");
+
+                    Metrics.newHistogram(OutputBufferProcessor.class, "BatchSize").update(buffer.size());
+                    output.write(buffer, server);
+                } catch (Exception e) {
+                    LOG.error("Could not write message batch to output [" + outputType.getSimpleName() +"].", e);
+                } finally {
+                    buffer.clear();
+                }
             }
         }
 
