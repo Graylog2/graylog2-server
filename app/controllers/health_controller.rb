@@ -10,6 +10,7 @@ class HealthController < ApplicationController
  	  @server_activities = ServerActivity.all.order_by([[sort, order]]).page(params[:page])
 
  	  @index_information = DeflectorInformation.first
+    @recent_index = @index_information.recent_index
     @indices = @index_information.indices.sort_by { |k,v| k.split("_").last.to_i }.reverse
     @nodes = DeflectorInformation.get_nodes
   end
