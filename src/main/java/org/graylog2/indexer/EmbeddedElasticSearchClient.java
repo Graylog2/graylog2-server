@@ -18,6 +18,7 @@ import org.elasticsearch.action.WriteConsistencyLevel;
 import org.elasticsearch.action.admin.cluster.health.ClusterHealthRequest;
 import org.elasticsearch.action.admin.cluster.node.info.NodesInfoRequest;
 import org.elasticsearch.action.admin.cluster.node.info.NodesInfoResponse;
+import org.elasticsearch.action.admin.cluster.state.ClusterStateRequest;
 import org.elasticsearch.action.admin.indices.alias.IndicesAliasesRequest;
 import org.elasticsearch.action.admin.indices.alias.IndicesAliasesResponse;
 import org.elasticsearch.action.admin.indices.create.CreateIndexRequest;
@@ -30,6 +31,7 @@ import org.elasticsearch.action.admin.indices.mapping.put.PutMappingRequest;
 import org.elasticsearch.action.admin.indices.stats.IndexStats;
 import org.elasticsearch.action.admin.indices.stats.IndicesStats;
 import org.elasticsearch.action.admin.indices.stats.IndicesStatsRequest;
+import org.elasticsearch.action.admin.indices.status.IndicesStatusRequest;
 import org.elasticsearch.action.bulk.BulkRequestBuilder;
 import org.elasticsearch.action.bulk.BulkResponse;
 import org.elasticsearch.action.deletebyquery.DeleteByQueryRequestBuilder;
@@ -37,7 +39,9 @@ import org.elasticsearch.action.deletebyquery.DeleteByQueryResponse;
 import org.elasticsearch.action.index.IndexRequest.OpType;
 import org.elasticsearch.action.index.IndexRequestBuilder;
 import org.elasticsearch.client.Client;
+import org.elasticsearch.cluster.metadata.IndexMetaData;
 import org.elasticsearch.common.UUID;
+import org.elasticsearch.common.collect.ImmutableMap;
 import org.elasticsearch.common.settings.loader.YamlSettingsLoader;
 import org.elasticsearch.common.xcontent.XContentType;
 import org.elasticsearch.index.query.QueryBuilder;
@@ -135,6 +139,18 @@ public class EmbeddedElasticSearchClient {
         return isr.actionGet().indices();
     }
 
+    public IndexStats getRecentIndex() {
+        return getIndices().get(RECENT_INDEX_NAME);
+    }
+    
+    public ImmutableMap<String, IndexMetaData> getIndicesMetadata() {
+        return client.admin().cluster().state(new ClusterStateRequest().filteredIndices(RECENT_INDEX_NAME)).actionGet().getState().getMetaData().indices();
+    }
+    
+    public String getRecentIndexStorageType() {
+        return getIndicesMetadata().get(RECENT_INDEX_NAME).getSettings().get("index.store.type");
+    }
+    
     public boolean indexExists(String index) {
         ActionFuture<IndicesExistsResponse> existsFuture = client.admin().indices().exists(new IndicesExistsRequest(index));
         return existsFuture.actionGet().exists();

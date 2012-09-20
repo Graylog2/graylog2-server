@@ -60,6 +60,10 @@ public class DeflectorInformationWriterThread implements Runnable {
         // List of indexes and number of messages in them.
         i.addIndices(graylogServer.getDeflector().getAllDeflectorIndices());
         
+        // Recent index information.
+        i.setRecentIndex(graylogServer.getIndexer().getRecentIndex());
+        i.setRecentIndexStorageType(graylogServer.getIndexer().getRecentIndexStorageType());
+        
         // Last updated from which node?
         i.setCallingNode(graylogServer.getServerId());
         

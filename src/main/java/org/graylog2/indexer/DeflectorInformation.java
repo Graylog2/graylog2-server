@@ -38,6 +38,8 @@ public class DeflectorInformation {
     private GraylogServer graylogServer;
     
     private Map<String, IndexStats> indices = Maps.newHashMap();
+    private IndexStats recentIndex;
+    private String recentIndexStorageType;
     private String deflectorTarget;
     private int maxMessagesPerIndex;
     private String serverId;
@@ -54,9 +56,17 @@ public class DeflectorInformation {
         this.indices.putAll(indices);
     }
     
+    public void setRecentIndex(IndexStats recentIndex) {
+        this.recentIndex = recentIndex;
+    }
+    
+    public void setRecentIndexStorageType(String type) {
+        this.recentIndexStorageType = type;
+    }
+    
     public void setDeflectorTarget(String target) {
         this.deflectorTarget = target;
-    } 
+    }
     
     public void setConfiguredMaximumMessagesPerIndex(int max) {
         this.maxMessagesPerIndex = max;
@@ -71,41 +81,14 @@ public class DeflectorInformation {
 
         Map<String, Map<String, Object>> indexInformation = Maps.newHashMap();
         for (Map.Entry<String, IndexStats> e : indices.entrySet()) {
-            Map<String, Object> info = Maps.newHashMap();
-            info.put("docs", e.getValue().getTotal().getDocs().count());
-            info.put("size", e.getValue().getTotal().store().getSize().getKb());
-            info.put("time_index", e.getValue().getTotal().getIndexing().total().indexTime().getSeconds());
-            info.put("time_query", e.getValue().getTotal().getSearch().total().queryTime().getSeconds());
-            info.put("time_fetch", e.getValue().getTotal().getSearch().total().fetchTime().getSeconds());
-            info.put("time_get", e.getValue().getTotal().getGet().getTime().getSeconds());
-
-            List<Map<String, Object>> shards = Lists.newArrayList();
-            for(Map.Entry<Integer, IndexShardStats> s : e.getValue().indexShards().entrySet()) {
-
-                Iterator<ShardStats> iter = s.getValue().iterator();
-                while (iter.hasNext()) {
-                    ShardStats ss = iter.next();
-                    
-                    Map<String, Object> shard = Maps.newHashMap();
-
-                    shard.put("node_hostname", graylogServer.getIndexer().nodeIdToHostName(ss.getShardRouting().currentNodeId()));
-                    shard.put("node_name", graylogServer.getIndexer().nodeIdToName(ss.getShardRouting().currentNodeId()));
-                    shard.put("id", ss.getShardId());
-                    shard.put("node_id", ss.getShardRouting().currentNodeId());
-                    shard.put("primary", ss.getShardRouting().primary());
-                    shard.put("is_initializing", ss.getShardRouting().initializing());
-                    shard.put("is_started", ss.getShardRouting().started());
-                    shard.put("is_unassigned", ss.getShardRouting().unassigned());
-                    shard.put("is_relocating", ss.getShardRouting().relocating());
-                    shard.put("relocating_to", graylogServer.getIndexer().nodeIdToName(ss.getShardRouting().relocatingNodeId()));
-                    
-                    shards.add(shard);
-                }
-            }
-            info.put("shards", shards);
-            
-            indexInformation.put(e.getKey(), info);
+            indexInformation.put(e.getKey(), getIndexInformation(e.getValue()));
         }
+
+        Map<String, Object> recentIndexInfo = Maps.newHashMap();
+        recentIndexInfo.put("name", recentIndex.index());
+        recentIndexInfo.put("info", getIndexInformation(recentIndex));
+        recentIndexInfo.put("storage_type", recentIndexStorageType);
+        result.put("recent_index", recentIndexInfo);
         
         result.put("server_id", serverId);
         result.put("deflector_target", deflectorTarget);
@@ -114,6 +97,46 @@ public class DeflectorInformation {
         result.put("timestamp", Tools.getUTCTimestamp());
         
         return result;
+    }
+    
+    private Map<String, Object> getIndexInformation(IndexStats stats) {
+        Map<String, Object> info = Maps.newHashMap();
+        info.put("docs", stats.getTotal().getDocs().count());
+        info.put("size", stats.getTotal().store().getSize().getKb());
+        info.put("time_index", stats.getTotal().getIndexing().total().indexTime().getSeconds());
+        info.put("time_query", stats.getTotal().getSearch().total().queryTime().getSeconds());
+        info.put("time_fetch", stats.getTotal().getSearch().total().fetchTime().getSeconds());
+        info.put("time_get", stats.getTotal().getGet().getTime().getSeconds());
+        info.put("shards", getShardInformation(stats));
+        
+        return info;
+    }
+    
+    private List<Map<String, Object>> getShardInformation(IndexStats stats) {
+        List<Map<String, Object>> shards = Lists.newArrayList();
+        for(Map.Entry<Integer, IndexShardStats> s : stats.indexShards().entrySet()) {
+            Iterator<ShardStats> iter = s.getValue().iterator();
+            while (iter.hasNext()) {
+                ShardStats ss = iter.next();
+
+                Map<String, Object> shard = Maps.newHashMap();
+
+                shard.put("node_hostname", graylogServer.getIndexer().nodeIdToHostName(ss.getShardRouting().currentNodeId()));
+                shard.put("node_name", graylogServer.getIndexer().nodeIdToName(ss.getShardRouting().currentNodeId()));
+                shard.put("id", ss.getShardId());
+                shard.put("node_id", ss.getShardRouting().currentNodeId());
+                shard.put("primary", ss.getShardRouting().primary());
+                shard.put("is_initializing", ss.getShardRouting().initializing());
+                shard.put("is_started", ss.getShardRouting().started());
+                shard.put("is_unassigned", ss.getShardRouting().unassigned());
+                shard.put("is_relocating", ss.getShardRouting().relocating());
+                shard.put("relocating_to", graylogServer.getIndexer().nodeIdToName(ss.getShardRouting().relocatingNodeId()));
+
+                shards.add(shard);
+            }
+        }
+        
+        return shards;
     }
     
 }
