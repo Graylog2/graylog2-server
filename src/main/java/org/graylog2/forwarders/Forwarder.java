@@ -21,8 +21,8 @@
 package org.graylog2.forwarders;
 
 import org.apache.log4j.Logger;
-import org.graylog2.logmessage.LogMessage;
-import org.graylog2.streams.Stream;
+import org.graylog2.logmessage.LogMessageImpl;
+import org.graylog2.streams.StreamImpl;
 
 /**
  * Forwards messages to other endpoints. (i.e. other GELF or syslog servers)
@@ -39,7 +39,7 @@ public class Forwarder {
      * @param message The GELF message to forward.
      * @return Number of endpoints the message was successfully forwarded to.
      */
-    public static int forward(LogMessage message) {
+    public static int forward(LogMessageImpl message) {
      /*   int succeeded = 0;
         for (Stream stream : message.getStreams()) {
             try {

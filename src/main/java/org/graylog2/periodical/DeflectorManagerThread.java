@@ -22,9 +22,8 @@ package org.graylog2.periodical;
 import java.util.Map;
 import org.apache.log4j.Logger;
 import org.elasticsearch.action.admin.indices.stats.IndexStats;
-import org.graylog2.GraylogServer;
+import org.graylog2.Core;
 import org.graylog2.activities.Activity;
-import org.graylog2.indexer.DeflectorInformation;
 import org.graylog2.indexer.EmbeddedElasticSearchClient;
 import org.graylog2.indexer.NoTargetIndexException;
 
@@ -38,9 +37,9 @@ public class DeflectorManagerThread implements Runnable { // public class Klimpe
     public static final int INITIAL_DELAY = 0;
     public static final int PERIOD = 60;
     
-    private final GraylogServer graylogServer;
+    private final Core graylogServer;
     
-    public DeflectorManagerThread(GraylogServer graylogServer) {
+    public DeflectorManagerThread(Core graylogServer) {
         this.graylogServer = graylogServer;
     }
 

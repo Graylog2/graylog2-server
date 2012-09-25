@@ -23,7 +23,8 @@ package org.graylog2.inputs.gelf;
 import org.graylog2.Tools;
 import org.graylog2.GraylogServerStub;
 import org.graylog2.TestHelper;
-import org.graylog2.logmessage.LogMessage;
+import org.graylog2.logmessage.LogMessageImpl;
+import org.graylog2.plugin.logmessage.LogMessage;
 import org.junit.Test;
 import static org.junit.Assert.*;
 
@@ -89,7 +90,7 @@ public class GELFProcessorTest {
         LogMessage lm = serverStub.lastInsertedToProcessBuffer;
 
         assertEquals(1, serverStub.callsToProcessBufferInserter);
-        assertEquals(LogMessage.STANDARD_LEVEL, lm.getLevel());
+        assertEquals(LogMessageImpl.STANDARD_LEVEL, lm.getLevel());
     }
 
     @Test
@@ -103,7 +104,7 @@ public class GELFProcessorTest {
         LogMessage lm = serverStub.lastInsertedToProcessBuffer;
 
         assertEquals(1, serverStub.callsToProcessBufferInserter);
-        assertEquals(LogMessage.STANDARD_FACILITY, lm.getFacility());
+        assertEquals(LogMessageImpl.STANDARD_FACILITY, lm.getFacility());
     }
 
     @Test

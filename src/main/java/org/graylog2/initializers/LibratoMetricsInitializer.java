@@ -20,7 +20,7 @@
 
 package org.graylog2.initializers;
 
-import org.graylog2.GraylogServer;
+import org.graylog2.Core;
 import org.graylog2.periodical.LibratoMetricsWriterThread;
 
 /**
@@ -28,7 +28,7 @@ import org.graylog2.periodical.LibratoMetricsWriterThread;
  */
 public class LibratoMetricsInitializer extends SimpleFixedRateScheduleInitializer implements Initializer {
 
-    public LibratoMetricsInitializer(GraylogServer graylogServer) {
+    public LibratoMetricsInitializer(Core graylogServer) {
         this.graylogServer = graylogServer;
     }
 

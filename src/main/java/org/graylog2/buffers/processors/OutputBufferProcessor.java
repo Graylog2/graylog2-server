@@ -23,14 +23,13 @@ package org.graylog2.buffers.processors;
 import com.google.common.collect.Lists;
 import com.lmax.disruptor.EventHandler;
 import com.yammer.metrics.Metrics;
-import com.yammer.metrics.core.TimerContext;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 import org.apache.log4j.Logger;
-import org.graylog2.GraylogServer;
+import org.graylog2.Core;
 import org.graylog2.buffers.LogMessageEvent;
-import org.graylog2.logmessage.LogMessage;
 import org.graylog2.outputs.MessageOutput;
+import org.graylog2.plugin.logmessage.LogMessage;
 
 /**
  * @author Lennart Koopmann <lennart@socketfeed.com>
@@ -39,11 +38,11 @@ public class OutputBufferProcessor implements EventHandler<LogMessageEvent> {
 
     private static final Logger LOG = Logger.getLogger(OutputBufferProcessor.class);
 
-    private GraylogServer server;
+    private Core server;
 
     List<LogMessage> buffer = Lists.newArrayList();
 
-    public OutputBufferProcessor(GraylogServer server) {
+    public OutputBufferProcessor(Core server) {
         this.server = server;
     }
 

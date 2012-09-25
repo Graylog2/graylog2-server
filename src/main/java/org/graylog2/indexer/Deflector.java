@@ -27,7 +27,7 @@ import java.util.List;
 import java.util.Map;
 import org.apache.log4j.Logger;
 import org.elasticsearch.action.admin.indices.stats.IndexStats;
-import org.graylog2.GraylogServer;
+import org.graylog2.Core;
 import org.graylog2.activities.Activity;
 
 /**
@@ -46,9 +46,9 @@ public class Deflector {
     
     public static final String DEFLECTOR_NAME = "graylog2_deflector";
     
-    GraylogServer server;
+    Core server;
     
-    public Deflector(GraylogServer server) {
+    public Deflector(Core server) {
         this.server = server;
     }
     

@@ -21,7 +21,7 @@
 package org.graylog2;
 
 import org.graylog2.buffers.ProcessBuffer;
-import org.graylog2.logmessage.LogMessage;
+import org.graylog2.plugin.logmessage.LogMessage;
 
 /**
  * @author Lennart Koopmann <lennart@socketfeed.com>

@@ -27,7 +27,7 @@ import com.twilio.sdk.resource.instance.Account;
 import java.util.List;
 import java.util.Map;
 import org.apache.log4j.Logger;
-import org.graylog2.GraylogServer;
+import org.graylog2.Core;
 
 /**
  * @author Lennart Koopmann <lennart@socketfeed.com>
@@ -39,10 +39,10 @@ public class TwilioCommunicator implements CommunicatorMethod {
     public static final String PREFIX = "[gl2]";
     public static final int MAX_MESSAGE_LENGTH = 160-PREFIX.length()-1; // -1 for whitespace after prefix.
     
-    GraylogServer server;
+    Core server;
     
     @Override
-    public boolean send(GraylogServer server, String text, List<String> recipients) {
+    public boolean send(Core server, String text, List<String> recipients) {
         this.server = server;
         
         TwilioRestClient client = new TwilioRestClient(

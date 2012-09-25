@@ -21,8 +21,9 @@
 package org.graylog2.periodical;
 
 import org.apache.log4j.Logger;
-import org.graylog2.GraylogServer;
-import org.graylog2.MessageCounter;
+import org.graylog2.Core;
+import org.graylog2.MessageCounterImpl;
+import org.graylog2.plugin.MessageCounter;
 
 /**
  * Periodically writes server values to MongoDB.
@@ -36,9 +37,9 @@ public class ServerValueWriterThread implements Runnable {
     public static final int PERIOD = 5;
     public static final int INITIAL_DELAY = 0;
 
-    private final GraylogServer graylogServer;
+    private final Core graylogServer;
 
-    public ServerValueWriterThread(GraylogServer graylogServer) {
+    public ServerValueWriterThread(Core graylogServer) {
         this.graylogServer = graylogServer;
     }
 
@@ -52,7 +53,7 @@ public class ServerValueWriterThread implements Runnable {
             graylogServer.getServerValues().ping();
 
             // Current throughput.
-            MessageCounter c = this.graylogServer.getMessageCounterManager().get(GraylogServer.MASTER_COUNTER_NAME);
+            MessageCounter c = this.graylogServer.getMessageCounterManager().get(Core.MASTER_COUNTER_NAME);
             graylogServer.getServerValues().writeThroughput(c.getThroughput(), c.getHighestThroughput());
             c.resetThroughput(); // Reset five second throughput count.
 

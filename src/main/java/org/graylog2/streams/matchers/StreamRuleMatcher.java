@@ -20,8 +20,9 @@
 
 package org.graylog2.streams.matchers;
 
-import org.graylog2.logmessage.LogMessage;
-import org.graylog2.streams.StreamRule;
+import org.graylog2.plugin.logmessage.LogMessage;
+import org.graylog2.plugin.streams.StreamRule;
+
 
 /**
  * @author Lennart Koopmann <lennart@socketfeed.com>

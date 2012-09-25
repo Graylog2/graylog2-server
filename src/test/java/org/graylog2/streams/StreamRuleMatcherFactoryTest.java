@@ -33,19 +33,19 @@ public class StreamRuleMatcherFactoryTest {
 
     @Test
     public void testBuild() throws Exception {
-        StreamRuleMatcher messageMatcher = StreamRuleMatcherFactory.build(StreamRule.TYPE_MESSAGE);
+        StreamRuleMatcher messageMatcher = StreamRuleMatcherFactory.build(StreamRuleImpl.TYPE_MESSAGE);
         assertTrue(messageMatcher instanceof MessageMatcher);
 
-        StreamRuleMatcher hostMatcher = StreamRuleMatcherFactory.build(StreamRule.TYPE_HOST);
+        StreamRuleMatcher hostMatcher = StreamRuleMatcherFactory.build(StreamRuleImpl.TYPE_HOST);
         assertTrue(hostMatcher instanceof HostMatcher);
 
-        StreamRuleMatcher severityMatcher = StreamRuleMatcherFactory.build(StreamRule.TYPE_SEVERITY);
+        StreamRuleMatcher severityMatcher = StreamRuleMatcherFactory.build(StreamRuleImpl.TYPE_SEVERITY);
         assertTrue(severityMatcher instanceof SeverityMatcher);
 
-        StreamRuleMatcher facilityMatcher = StreamRuleMatcherFactory.build(StreamRule.TYPE_FACILITY);
+        StreamRuleMatcher facilityMatcher = StreamRuleMatcherFactory.build(StreamRuleImpl.TYPE_FACILITY);
         assertTrue(facilityMatcher instanceof FacilityMatcher);
 
-        StreamRuleMatcher additionalFieldMatcher = StreamRuleMatcherFactory.build(StreamRule.TYPE_ADDITIONAL);
+        StreamRuleMatcher additionalFieldMatcher = StreamRuleMatcherFactory.build(StreamRuleImpl.TYPE_ADDITIONAL);
         assertTrue(additionalFieldMatcher instanceof AdditionalFieldMatcher);
     }
 

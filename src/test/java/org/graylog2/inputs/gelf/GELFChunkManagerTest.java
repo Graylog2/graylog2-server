@@ -20,16 +20,15 @@
 
 package org.graylog2.inputs.gelf;
 
-import org.graylog2.GraylogServer;
 import org.apache.commons.lang3.ArrayUtils;
-import org.graylog2.Configuration;
+import org.graylog2.Core;
 import org.graylog2.TestHelper;
 import org.junit.Test;
 import static org.junit.Assert.*;
 
 public class GELFChunkManagerTest {
 
-    private GraylogServer server = null;
+    private Core server = null;
 
     @Test
     public void testIsCompleteDetectsAsNotComplete() throws Exception {

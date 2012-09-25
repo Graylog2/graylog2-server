@@ -21,9 +21,11 @@
 package org.graylog2.streams;
 
 import java.util.List;
+import org.graylog2.Core;
 
-import org.graylog2.GraylogServer;
 import org.graylog2.SimpleObjectCache;
+import org.graylog2.plugin.GraylogServer;
+import org.graylog2.plugin.streams.Stream;
 
 /**
  * Singleton caching the already fetched streams.
@@ -33,21 +35,21 @@ import org.graylog2.SimpleObjectCache;
 public class StreamCache extends SimpleObjectCache<List<Stream>> {
 
     private static StreamCache instance;
-    private GraylogServer graylogServer;
+    private Core graylogServer;
 
     private StreamCache() { }
 
-    public static synchronized StreamCache initialize(GraylogServer server) {
+    public static synchronized StreamCache initialize(Core server) {
         StreamCache streamCache = getInstance();
         streamCache.setGraylogServer(server);
         return streamCache;
     }
 
-    private void setGraylogServer(GraylogServer server) {
+    private void setGraylogServer(Core server) {
         this.graylogServer = server;
     }
 
-    public GraylogServer getGraylogServer() {
+    public Core getGraylogServer() {
         return graylogServer;
     }
 

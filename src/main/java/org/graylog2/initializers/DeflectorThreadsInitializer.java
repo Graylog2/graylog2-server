@@ -19,7 +19,7 @@
  */
 package org.graylog2.initializers;
 
-import org.graylog2.GraylogServer;
+import org.graylog2.Core;
 import org.graylog2.periodical.DeflectorInformationWriterThread;
 import org.graylog2.periodical.DeflectorManagerThread;
 
@@ -28,7 +28,7 @@ import org.graylog2.periodical.DeflectorManagerThread;
  */
 public class DeflectorThreadsInitializer extends SimpleFixedRateScheduleInitializer implements Initializer {
     
-    public DeflectorThreadsInitializer(GraylogServer graylogServer) {
+    public DeflectorThreadsInitializer(Core graylogServer) {
         this.graylogServer = graylogServer;
     }
 

@@ -27,7 +27,7 @@ import java.util.Map;
 import org.elasticsearch.action.admin.indices.stats.IndexShardStats;
 import org.elasticsearch.action.admin.indices.stats.IndexStats;
 import org.elasticsearch.action.admin.indices.stats.ShardStats;
-import org.graylog2.GraylogServer;
+import org.graylog2.Core;
 import org.graylog2.Tools;
 
 /**
@@ -35,7 +35,7 @@ import org.graylog2.Tools;
  */
 public class DeflectorInformation {
     
-    private GraylogServer graylogServer;
+    private Core graylogServer;
     
     private Map<String, IndexStats> indices = Maps.newHashMap();
     private IndexStats recentIndex;
@@ -44,7 +44,7 @@ public class DeflectorInformation {
     private int maxMessagesPerIndex;
     private String serverId;
     
-    public DeflectorInformation(GraylogServer server) {
+    public DeflectorInformation(Core server) {
         this.graylogServer = server;
     }
     

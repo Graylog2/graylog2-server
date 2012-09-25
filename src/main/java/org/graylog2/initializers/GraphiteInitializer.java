@@ -22,7 +22,7 @@ package org.graylog2.initializers;
 
 import com.yammer.metrics.reporting.GraphiteReporter;
 import java.util.concurrent.TimeUnit;
-import org.graylog2.GraylogServer;
+import org.graylog2.Core;
 import org.graylog2.periodical.GraphiteWriterThread;
 
 /**
@@ -30,7 +30,7 @@ import org.graylog2.periodical.GraphiteWriterThread;
  */
 public class GraphiteInitializer extends SimpleFixedRateScheduleInitializer implements Initializer {
 
-    public GraphiteInitializer(GraylogServer graylogServer) {
+    public GraphiteInitializer(Core graylogServer) {
         this.graylogServer = graylogServer;
     }
 

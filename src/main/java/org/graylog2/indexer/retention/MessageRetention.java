@@ -22,7 +22,7 @@ package org.graylog2.indexer.retention;
 
 import com.google.common.base.Stopwatch;
 import org.apache.log4j.Logger;
-import org.graylog2.GraylogServer;
+import org.graylog2.Core;
 import org.graylog2.Tools;
 import org.graylog2.activities.Activity;
 
@@ -32,9 +32,9 @@ import org.graylog2.activities.Activity;
 public class MessageRetention {
 
     private static final Logger LOG = Logger.getLogger(MessageRetention.class);
-    private final GraylogServer graylogServer;
+    private final Core graylogServer;
 
-    public MessageRetention(final GraylogServer server) {
+    public MessageRetention(final Core server) {
         this.graylogServer = server;
     }
 

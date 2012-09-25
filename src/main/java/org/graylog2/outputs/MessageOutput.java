@@ -21,14 +21,14 @@
 package org.graylog2.outputs;
 
 import java.util.List;
-import org.graylog2.GraylogServer;
-import org.graylog2.logmessage.LogMessage;
+import org.graylog2.Core;
+import org.graylog2.plugin.logmessage.LogMessage;
 
 /**
  * @author Lennart Koopmann <lennart@socketfeed.com>
  */
 public interface MessageOutput {
 
-    void write(List<LogMessage> msg, GraylogServer server) throws Exception;
+    void write(List<LogMessage> msg, Core server) throws Exception;
 
 }

@@ -23,7 +23,7 @@ package org.graylog2.periodical;
 import java.util.concurrent.TimeUnit;
 
 import org.apache.log4j.Logger;
-import org.graylog2.GraylogServer;
+import org.graylog2.Core;
 import org.graylog2.indexer.retention.MessageRetention;
 
 /**
@@ -37,11 +37,11 @@ public class MessageRetentionThread implements Runnable {
 
     private int retentionTimeDays;
 
-    private final GraylogServer server;
+    private final Core server;
 
     private final MessageRetention messageRetention;
 
-    public MessageRetentionThread(GraylogServer server) {
+    public MessageRetentionThread(Core server) {
         this.server = server;
         this.messageRetention = new MessageRetention(server);
     }

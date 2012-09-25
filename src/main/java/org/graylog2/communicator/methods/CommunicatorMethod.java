@@ -20,14 +20,14 @@
 package org.graylog2.communicator.methods;
 
 import java.util.List;
-import org.graylog2.GraylogServer;
+import org.graylog2.Core;
 
 /**
  * @author Lennart Koopmann <lennart@socketfeed.com>
  */
 public interface CommunicatorMethod {
     
-    public boolean send(GraylogServer server, String text, List<String> recipients);
+    public boolean send(Core server, String text, List<String> recipients);
     public int getMaxTextLength();
     
 }

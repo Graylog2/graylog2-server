@@ -20,10 +20,10 @@
 
 package org.graylog2.streams.matchers;
 
-import org.graylog2.logmessage.LogMessage;
+import org.graylog2.logmessage.LogMessageImpl;
 import org.bson.types.ObjectId;
 import com.mongodb.BasicDBObject;
-import org.graylog2.streams.StreamRule;
+import org.graylog2.streams.StreamRuleImpl;
 import org.junit.Test;
 import static org.junit.Assert.*;
 
@@ -37,12 +37,12 @@ public class SeverityOrHigherMatcherTest {
     public void testSuccessfulMatch() {
         BasicDBObject mongoRule = new BasicDBObject();
         mongoRule.put("_id", new ObjectId());
-        mongoRule.put("rule_type", StreamRule.TYPE_SEVERITY_OR_HIGHER);
+        mongoRule.put("rule_type", StreamRuleImpl.TYPE_SEVERITY_OR_HIGHER);
         mongoRule.put("value", String.valueOf(6));
 
-        StreamRule rule = new StreamRule(mongoRule);
+        StreamRuleImpl rule = new StreamRuleImpl(mongoRule);
 
-        LogMessage msg = new LogMessage();
+        LogMessageImpl msg = new LogMessageImpl();
         msg.setLevel(2);
 
         SeverityOrHigherMatcher matcher = new SeverityOrHigherMatcher();
@@ -54,12 +54,12 @@ public class SeverityOrHigherMatcherTest {
     public void testSuccessfulMatchWithEqualRuleAndValue() {
         BasicDBObject mongoRule = new BasicDBObject();
         mongoRule.put("_id", new ObjectId());
-        mongoRule.put("rule_type", StreamRule.TYPE_SEVERITY_OR_HIGHER);
+        mongoRule.put("rule_type", StreamRuleImpl.TYPE_SEVERITY_OR_HIGHER);
         mongoRule.put("value", String.valueOf(3));
 
-        StreamRule rule = new StreamRule(mongoRule);
+        StreamRuleImpl rule = new StreamRuleImpl(mongoRule);
 
-        LogMessage msg = new LogMessage();
+        LogMessageImpl msg = new LogMessageImpl();
         msg.setLevel(3);
 
         SeverityOrHigherMatcher matcher = new SeverityOrHigherMatcher();
@@ -71,12 +71,12 @@ public class SeverityOrHigherMatcherTest {
     public void testMissedMatch() {
         BasicDBObject mongoRule = new BasicDBObject();
         mongoRule.put("_id", new ObjectId());
-        mongoRule.put("rule_type", StreamRule.TYPE_SEVERITY_OR_HIGHER);
+        mongoRule.put("rule_type", StreamRuleImpl.TYPE_SEVERITY_OR_HIGHER);
         mongoRule.put("value", String.valueOf(3));
 
-        StreamRule rule = new StreamRule(mongoRule);
+        StreamRuleImpl rule = new StreamRuleImpl(mongoRule);
 
-        LogMessage msg = new LogMessage();
+        LogMessageImpl msg = new LogMessageImpl();
         msg.setLevel(5);
 
         SeverityOrHigherMatcher matcher = new SeverityOrHigherMatcher();

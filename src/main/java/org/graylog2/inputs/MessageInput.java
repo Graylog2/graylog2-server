@@ -20,14 +20,14 @@
 package org.graylog2.inputs;
 
 import org.graylog2.Configuration;
-import org.graylog2.GraylogServer;
+import org.graylog2.Core;
 
 /**
  * @author Lennart Koopmann <lennart@socketfeed.com>
  */
 public interface MessageInput {
     
-    void initialize(Configuration configuration, GraylogServer graylogServer);
+    void initialize(Configuration configuration, Core graylogServer);
    
     String getName();
     

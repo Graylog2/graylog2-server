@@ -20,10 +20,10 @@
 
 package org.graylog2.streams.matchers;
 
-import org.graylog2.logmessage.LogMessage;
+import org.graylog2.logmessage.LogMessageImpl;
 import org.bson.types.ObjectId;
 import com.mongodb.BasicDBObject;
-import org.graylog2.streams.StreamRule;
+import org.graylog2.streams.StreamRuleImpl;
 import org.junit.Test;
 import static org.junit.Assert.*;
 
@@ -39,12 +39,12 @@ public class SeverityMatcherTest {
 
         BasicDBObject mongoRule = new BasicDBObject();
         mongoRule.put("_id", new ObjectId());
-        mongoRule.put("rule_type", StreamRule.TYPE_SEVERITY);
+        mongoRule.put("rule_type", StreamRuleImpl.TYPE_SEVERITY);
         mongoRule.put("value", String.valueOf(severity));
 
-        StreamRule rule = new StreamRule(mongoRule);
+        StreamRuleImpl rule = new StreamRuleImpl(mongoRule);
 
-        LogMessage msg = new LogMessage();
+        LogMessageImpl msg = new LogMessageImpl();
         msg.setLevel(severity);
 
         SeverityMatcher matcher = new SeverityMatcher();
@@ -58,12 +58,12 @@ public class SeverityMatcherTest {
 
         BasicDBObject mongoRule = new BasicDBObject();
         mongoRule.put("_id", new ObjectId());
-        mongoRule.put("rule_type", StreamRule.TYPE_SEVERITY);
+        mongoRule.put("rule_type", StreamRuleImpl.TYPE_SEVERITY);
         mongoRule.put("value", String.valueOf(severity));
 
-        StreamRule rule = new StreamRule(mongoRule);
+        StreamRuleImpl rule = new StreamRuleImpl(mongoRule);
 
-        LogMessage msg = new LogMessage();
+        LogMessageImpl msg = new LogMessageImpl();
         msg.setLevel(severity+1);
 
         SeverityMatcher matcher = new SeverityMatcher();

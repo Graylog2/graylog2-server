@@ -20,7 +20,7 @@
 
 package org.graylog2.inputs.gelf;
 
-import org.graylog2.GraylogServer;
+import org.graylog2.Core;
 import org.jboss.netty.channel.ChannelPipeline;
 import org.jboss.netty.channel.ChannelPipelineFactory;
 import org.jboss.netty.channel.Channels;
@@ -30,9 +30,9 @@ import org.jboss.netty.channel.Channels;
  */
 public class GELFUDPPipelineFactory implements ChannelPipelineFactory {
 
-    GraylogServer server;
+    Core server;
 
-    public GELFUDPPipelineFactory(GraylogServer server) {
+    public GELFUDPPipelineFactory(Core server) {
         this.server = server;
     }
 

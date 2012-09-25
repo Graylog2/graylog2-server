@@ -19,7 +19,7 @@ import static org.junit.Assert.*;
  */
 public class MessageCounterTest {
 
-    private MessageCounter counter = new MessageCounter();
+    private MessageCounterImpl counter = new MessageCounterImpl();
 
     @Test
     public void testGetTotalCount() {

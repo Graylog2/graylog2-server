@@ -21,7 +21,7 @@
 package org.graylog2.buffers;
 
 import com.lmax.disruptor.EventFactory;
-import org.graylog2.logmessage.LogMessage;
+import org.graylog2.plugin.logmessage.LogMessage;
 
 /**
  * @author Lennart Koopmann <lennart@socketfeed.com>
@@ -29,7 +29,7 @@ import org.graylog2.logmessage.LogMessage;
 public class LogMessageEvent {
 
     private LogMessage msg;
-
+    
     public LogMessage getMessage()
     {
         return msg;
