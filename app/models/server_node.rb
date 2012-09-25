@@ -7,7 +7,7 @@ class ServerNode
   end
 
   def is_master?
-    ServerValue.get("is_master", @server_id, 0).value == true
+    ServerValue.get("is_master", @server_id, 0)
   end
 
   def current_throughput
@@ -19,23 +19,23 @@ class ServerNode
   end
 
   def startup_time
-    ServerValue.get("startup_time", @server_id, 0).value
+    ServerValue.get("startup_time", @server_id, 0)
   end
 
   def available_processors
-    ServerValue.get("available_processors", @server_id).value
+    ServerValue.get("available_processors", @server_id)
   end
 
   def jre
-    ServerValue.get("jre", @server_id).value
+    ServerValue.get("jre", @server_id)
   end
   
   def pid
-    ServerValue.get("pid", @server_id).value
+    ServerValue.get("pid", @server_id)
   end
   
   def graylog2_version
-    ServerValue.get("graylog2_version", @server_id).value
+    ServerValue.get("graylog2_version", @server_id)
   end
 
   def message_retention_last_performed
@@ -46,11 +46,7 @@ class ServerNode
 
   private
   def get_throughput(which)
-    val = ServerValue.get("total_throughput", @server_id)
-    case which
-      when :current then return val.__send__(:current)
-      when :highest then return val.__send__(:highest)
-    end
+    ServerValue.get("total_throughput", @server_id, -1, which)
   rescue
     -1
   end

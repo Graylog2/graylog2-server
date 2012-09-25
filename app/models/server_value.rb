@@ -5,9 +5,9 @@ class ServerValue
   field :type, :type => String
   field :value, :type => Object
   
-  def self.get(key, server_id, if_not_found = "unknown")
+  def self.get(key, server_id, if_not_found = "unknown", field = :value)
     val = self.first(:conditions => { "server_id" => server_id, "type" => key })
-    val.blank? ? if_not_found : val
+    val.nil? ? if_not_found : val.__send__(field)
   end
 
   def self.delete_outdated
