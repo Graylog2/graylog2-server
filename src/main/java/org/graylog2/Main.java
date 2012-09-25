@@ -159,8 +159,9 @@ public final class Main {
         server.registerOutput(ElasticSearchOutput.class);
 
         // Load plugins.
-        PluginLoader pl = new PluginLoader("plugins");
+        PluginLoader pl = new PluginLoader("plugin");
         for (Class<? extends MessageFilter> filter : pl.loadFilterPlugins()) {
+            LOG.info("Registering plugin filter [" + filter.getSimpleName() + "].");
             server.registerFilter(filter);
         }
         

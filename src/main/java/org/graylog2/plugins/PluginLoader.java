@@ -20,9 +20,12 @@
 package org.graylog2.plugins;
 
 import com.beust.jcommander.internal.Lists;
+import java.io.File;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLClassLoader;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import org.apache.log4j.Logger;
 import org.graylog2.Core;
@@ -36,33 +39,60 @@ public class PluginLoader {
     
     private static final Logger LOG = Logger.getLogger(PluginLoader.class);
     
-    private String directory;
+    public static final String FILTER_DIR = "filters";
     
-    public PluginLoader(String directory) {
-        this.directory = directory;
+    private String baseDirectory;
+    
+    public PluginLoader(String baseDirectory) {
+        this.baseDirectory = baseDirectory;
     }
     
     public List<Class<? extends MessageFilter>> loadFilterPlugins() {
         List<Class<? extends MessageFilter>> filters = Lists.newArrayList();
         
-        try {
-            // Load plugins.
-            ClassLoader loader = URLClassLoader.newInstance(
-                new URL[] { (new java.io.File("plugin/graylog2-example-plugin-filter-otter-1.0.jar")).toURI().toURL() },
-                getClass().getClassLoader()
-            );
-            
-            Class<?> clazz = Class.forName("com.example.graylog2examplepluginfilterotter.OtterFilter", true, loader);
-            filters.add(clazz.asSubclass(MessageFilter.class));
-        } catch (MalformedURLException ex) {
-            LOG.error(ex);
-   // CONTINUE
-        } catch (ClassNotFoundException ex) {
-            LOG.error(ex);
-   // CONTINUE
+        // Load all plugin jars.
+        for (File jarPath : getAllJars(FILTER_DIR)) {
+            try {
+                ClassLoader loader = URLClassLoader.newInstance(
+                    new URL[] { jarPath.toURI().toURL() },
+                    getClass().getClassLoader()
+                );
+
+                Class<?> clazz = Class.forName(getClassNameFromJarName(jarPath.getName()), true, loader);
+                filters.add(clazz.asSubclass(MessageFilter.class));
+            } catch (MalformedURLException ex) {
+                LOG.error("Could not load plugin <" + jarPath.getAbsolutePath() + ">", ex);
+                continue;
+            } catch (ClassNotFoundException ex) {
+                LOG.error("Could not load plugin <" + jarPath.getAbsolutePath() + ">", ex);
+                continue;
+            } catch (InvalidJarNameException ex) {
+                LOG.error("Could not load plugin <" + jarPath.getAbsolutePath() + ">", ex);
+                continue;
+            }
         }
         
         return filters;
+    }
+    
+    private List<File> getAllJars(String type) {
+        File dir = new File(baseDirectory + "/" + type);
+        
+        if (!dir.isDirectory()) {
+            LOG.error("Plugin path <" + dir.getAbsolutePath() + "> does not exist or is not a directory.");
+            return new ArrayList<File>();
+        }
+ 
+        return Arrays.asList(dir.listFiles(new Graylog2PluginFileFilter()));
+    }
+    
+    private String getClassNameFromJarName(String jar) throws InvalidJarNameException {
+        try {
+            return jar.split("_gl2plugin.jar")[0];
+        } catch(Exception e) {
+            LOG.error("Could not extract class name from jar <" + jar + ">.");
+            throw new InvalidJarNameException("Invalid jar path: " + jar);
+        }
     }
     
 }
