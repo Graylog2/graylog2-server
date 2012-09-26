@@ -243,8 +243,8 @@ class MessageGateway
   end
 
   # Returns how the text is broken down to terms.
-  def self.analyze(text, field = "message")
-    result = Tire.index(INDEX_NAME).analyze(text, :field => "message.#{field}")
+  def self.analyze(text, index, field = "message")
+    result = Tire.index(index).analyze(text, :field => "message.#{field}")
     return Array.new if result == false
 
     result["tokens"].map { |t| t["token"] }

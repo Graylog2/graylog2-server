@@ -1,4 +1,4 @@
-class MessagesController < ApplicationController
+ class MessagesController < ApplicationController
   before_filter :do_scoping
 
   ignore_session_on_json :index, :show
@@ -94,7 +94,7 @@ class MessagesController < ApplicationController
     @load_messages = true
 
     @message = MessageGateway.retrieve_by_id(params[:id])
-    @terms = MessageGateway.analyze(@message.message)
+    @terms = MessageGateway.analyze(@message.message, @message.source_index)
 
     unless @message.accessable_for_user?(current_user)
       block_access_for_non_admins
