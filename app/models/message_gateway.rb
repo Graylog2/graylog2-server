@@ -70,6 +70,7 @@ class MessageGateway
   end
 
   def self.retrieve_by_id(id)
+    use_all_indices!
     wrap search("_id:#{id}").first
   end
 
@@ -277,6 +278,10 @@ class MessageGateway
   end
 
   private
+
+  def self.use_all_indices!
+    index_name(INDEX_NAME)
+  end
 
   def self.use_recent_index!
     index_name(RECENT_INDEX_NAME)
