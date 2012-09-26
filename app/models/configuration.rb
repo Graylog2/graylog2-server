@@ -41,26 +41,6 @@ class Configuration
     general_config :hide_message_stats, false
   end
 
-  def self.hoptoad_config(key, default = nil)
-    nested_general_config :hoptoad, key, default
-  end
-
-  def self.hoptoad_enabled?
-    hoptoad_config :enabled, false
-  end
-
-  def self.hoptoad_ssl?
-    hoptoad_config :ssl
-  end
-
-  def self.hoptoad_key
-    hoptoad_config :api_key
-  end
-
-  def self.hoptoad_host
-    hoptoad_config :host
-  end
-
   def self.subscr_config(key, default)
     nested_general_config :subscriptions, key, default
   end

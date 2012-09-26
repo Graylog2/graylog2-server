@@ -12,7 +12,6 @@
   <%= stylesheet_link_tag "sections" %>
   <%= stylesheet_link_tag "messages" %>
   <%= stylesheet_link_tag "shell" %>
-  <%= hoptoad_javascript_notifier if ::Configuration.hoptoad_enabled? %>
   <%= javascript_include_tag "application" %>
   <%= javascript_include_tag("jit") if @load_jit %>
   <% if @load_flot %>
