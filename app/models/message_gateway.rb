@@ -250,12 +250,12 @@ class MessageGateway
     result["tokens"].map { |t| t["token"] }
   end
 
-  def self.message_mapping
-    Tire.index(INDEX_NAME).mapping["message"] rescue {}
+  def self.message_mapping(index)
+    Tire.index(index).mapping["message"] rescue {}
   end
 
-  def self.mapping_valid?
-    mapping = message_mapping
+  def self.mapping_valid?(index)
+    mapping = message_mapping(index)
 
     store_generic = mapping["dynamic_templates"][0]["store_generic"]
     return false if store_generic["mapping"]["index"] != "not_analyzed"
