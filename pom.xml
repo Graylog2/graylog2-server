@@ -112,11 +112,6 @@
             <version>3.1</version>
         </dependency>
         <dependency>
-            <groupId>com.googlecode.disruptor</groupId>
-            <artifactId>disruptor</artifactId>
-            <version>2.9</version>
-        </dependency>
-        <dependency>
             <groupId>org.jmock</groupId>
             <artifactId>jmock</artifactId>
             <version>2.5.1</version>
@@ -137,6 +132,11 @@
             <artifactId>twilio-java-sdk</artifactId>
             <version>3.3.9</version>
             <classifier>jar-with-dependencies</classifier>
+        </dependency>
+        <dependency>
+            <groupId>com.googlecode.disruptor</groupId>
+            <artifactId>disruptor</artifactId>
+            <version>2.10.3</version>
         </dependency>
     </dependencies>
 
