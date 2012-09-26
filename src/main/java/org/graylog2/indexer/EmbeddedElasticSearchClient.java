@@ -214,24 +214,35 @@ public class EmbeddedElasticSearchClient {
             return true;
         }
 
-        final BulkRequestBuilder b = client.prepareBulk();
+        final BulkRequestBuilder mainIndex = client.prepareBulk();
+        final BulkRequestBuilder recentIndex = client.prepareBulk();
         for (LogMessage msg : messages) {
             String source = JSONValue.toJSONString(msg.toElasticSearchObject());
             
             // We manually set the same ID to allow linking between indices later.
             final String id = UUID.randomBase64UUID();
             
-            b.add(buildIndexRequest(Deflector.DEFLECTOR_NAME, source, id, 0)); // Main index.
-            b.add(buildIndexRequest(RECENT_INDEX_NAME, source, id, server.getConfiguration().getRecentIndexTtlMinutes())); // Recent index.
+            mainIndex.add(buildIndexRequest(Deflector.DEFLECTOR_NAME, source, id, 0)); // Main index.
+            recentIndex.add(buildIndexRequest(RECENT_INDEX_NAME, source, id, server.getConfiguration().getRecentIndexTtlMinutes())); // Recent index.
         }
 
-        final ActionFuture<BulkResponse> bulkFuture = client.bulk(b.request());
-        final BulkResponse response = bulkFuture.actionGet();
-        LOG.debug(String.format("Bulk indexed %d messages, took %d ms, failures: %b",
-                response.items().length,
-                response.getTookInMillis(),
-                response.hasFailures()));
-        return !response.hasFailures();
+        final ActionFuture<BulkResponse> mainBulkFuture = client.bulk(mainIndex.request());
+        final ActionFuture<BulkResponse> recentBulkFuture = client.bulk(recentIndex.request());
+        
+        final BulkResponse mainResponse = mainBulkFuture.actionGet();
+        final BulkResponse recentResponse = recentBulkFuture.actionGet();
+        
+        LOG.debug(String.format("Deflector index: Bulk indexed %d messages, took %d ms, failures: %b",
+                mainResponse.items().length,
+                mainResponse.getTookInMillis(),
+                mainResponse.hasFailures()));
+        
+        LOG.debug(String.format("Recent index: Bulk indexed %d messages, took %d ms, failures: %b",
+                recentResponse.items().length,
+                recentResponse.getTookInMillis(),
+                recentResponse.hasFailures()));
+        
+        return !mainResponse.hasFailures() && !recentResponse.hasFailures();
     }
 
     public void deleteMessagesByTimeRange(int to) {
