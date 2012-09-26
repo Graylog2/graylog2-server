@@ -1,8 +1,8 @@
 source :rubygems
 
-gem 'rack', '~> 1.3.5'
+gem 'rack', '~> 1.4.1'
 gem 'rake', '~> 0.9.2'
-gem 'rails', '~> 3.1.3'
+gem 'rails', '~> 3.2.8'
 gem 'json', '~> 1.5.1'
 gem 'chronic', '~> 0.6.7'
 gem 'pony', '~> 1.1'  # unusual version number
@@ -28,7 +28,7 @@ end
 
 group :development do
   # gem 'ruby-prof', '~> 0.10.5'  # works nice with NewRelic RPM Developer Mode
-  gem 'passenger', '~> 3.0.9'
+  gem 'passenger', '~> 3.0.17'
 end
 
 group :test do
@@ -42,7 +42,7 @@ end
 
 # Needed for the new asset pipeline
 group :assets do
-  gem 'sass-rails',   "~> 3.1.5"
-  gem 'coffee-rails', "~> 3.1.1"
+  gem 'sass-rails',   "~> 3.2.5"
+  gem 'coffee-rails', "~> 3.2.2"
   gem 'uglifier',     ">= 1.0.3"
 end
