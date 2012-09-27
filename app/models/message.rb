@@ -131,4 +131,7 @@ class Message
     self.id.to_s
   end
 
+  def as_json(options={})
+    self.plain.as_json
+  end
 end

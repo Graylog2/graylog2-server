@@ -67,8 +67,13 @@
   # Not possible to do this via before_filter because of scope decision by params hash
   def block_access_for_non_admins
     if current_user.role != "admin"
-      flash[:error] = "You have no access rights for this section."
-      redirect_to :controller => "streams", :action => "index"
+      respond_to do |format|
+        format.html {
+          flash[:error] = "You have no access rights for this section."
+          redirect_to :controller => "streams", :action => "index"
+        }
+        format.json { render :json => {:error=>"permission denied"}, :status => 403 }
+      end
     end
   end
 
