@@ -9,10 +9,13 @@
 
 <%= render :partial => "user_form", :locals => {:form_action => "update", :user => @user}%>
 
+<h3>API Key</h3>
 <div id="users-apikey">
-  <br />
-  <% if not @user.api_key.blank? then %>
-    Api Key: <%=@user.api_key%>
+  <% if @user.api_key.blank? %>
+    No API key found
+  <% else %>
+    <code><%= @user.api_key %></code>
   <% end %>
-  <%= awesome_link "Generate Api Key", key_user_path(@user), :method => :post, :confirm => "Really reset key?" %>
-<div/>  
+  <br /><br />
+  <%= awesome_link "Generate new API Key", key_user_path(@user), :method => :post, :confirm => "Really reset key?" %>
+</div>  
