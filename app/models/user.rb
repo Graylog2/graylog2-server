@@ -92,6 +92,10 @@ class User
     return key
   end
 
+  def admin?
+    role == "admin"
+  end
+
   def reader?
     role == "reader"
   end

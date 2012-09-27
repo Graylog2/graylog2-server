@@ -108,7 +108,5 @@
 <h3>Created: <%= gl_date(@stream.created_at) %></h3>
 <h3>Last change: <%= gl_date(@stream.updated_at) %></h3>
 
-<% if current_user.role == "admin" %>
-  <br /><br />
-  <%= awesome_link "Open stream dashboard", stream_dashboard_index_path(@stream), :style => "display: inline;", :target => "_blank" %>
-<% end %>
+<br /><br />
+<%= awesome_link "Open stream dashboard", stream_dashboard_index_path(@stream), :style => "display: inline;", :target => "_blank" %>

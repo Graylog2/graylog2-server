@@ -66,6 +66,7 @@ authorization do
   end
 
   role :reader do
+    has_permission_on :dashboard, :to => [:index]
     has_permission_on :streams, :to => [:index, :show, :analytics, :showrange] do
       if_attribute :users => contains { user }
     end
