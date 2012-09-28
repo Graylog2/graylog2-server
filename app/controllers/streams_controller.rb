@@ -258,6 +258,9 @@ class StreamsController < ApplicationController
       flash[:error] = "Could not delete stream"
     end
 
+    # also delete stream alarms. (zomg this should be done in stream model)
+    AlertedStream.delete_all(:stream_id => @stream.id)
+
     redirect_to streams_path
   end
 
