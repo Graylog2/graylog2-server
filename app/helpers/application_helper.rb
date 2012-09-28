@@ -1,8 +1,12 @@
 module ApplicationHelper
 
   # Returns formatted time
-  def time_to_formatted_s(t)
+  def time_to_formatted_s(timestamp)
+    t = Time.at(timestamp)
     (t.strftime('%Y-%m-%d %H:%M:%S') + "<span class='time-light'>.#{t.usec.to_s[0,3]}</span>").html_safe
+  rescue
+    # for example range errors for too long timestamps
+    "INVALID"
   end
 
   def menu_item title, where

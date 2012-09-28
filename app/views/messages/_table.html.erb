@@ -26,7 +26,7 @@ additional_columns ||= []
     <% @messages.each do |message|  %>
       <tr id="<%= message.id %>"
           class="<%= i.modulo(2) == 1 ? "tr-light" : "tr-dark" %> message-row udate-<%= message.uniform_date_string %> <%= "highlighted" if message.id.to_s == params[:message_id] %>">
-        <td><%= time_to_formatted_s(Time.at(message.created_at)) %></td>
+        <td><%= time_to_formatted_s(message.created_at) %></td>
         <td style="white-space: nowrap;"><%= message.host.blank? ? nil : h(message.host) %></td>
         <td><%= syslog_level_to_human(message.level) %></td>
         <td><%= message.facility %></td>

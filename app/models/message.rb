@@ -125,6 +125,9 @@ class Message
   def uniform_date_string
     d = Time.at(self.created_at)
     "#{d.year}-#{d.month}-#{d.day}"
+  rescue
+    # for example range errors for too long timestamps
+    return "INVALID"
   end
 
   def to_param
