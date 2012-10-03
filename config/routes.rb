@@ -142,6 +142,12 @@ Graylog2WebInterface::Application.routes.draw do
     end
   end
 
+  resources :systemsettings do
+    collection do
+      post :allow_usage_stats
+    end
+  end
+
   match '/visuals/fetch/:id' => 'visuals#fetch',:as => "visuals"
 
   root :to => 'messages#index'

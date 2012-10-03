@@ -52,6 +52,8 @@ authorization do
 
     has_permission_on :settings, :to => [:index, :store, :removecolumn]
 
+    has_permission_on :systemsettings, :to => [:index, :allow_usage_stats]
+
     has_permission_on :users, :to => [:new, :index, :show, :create, :edit, :delete, :update]
 
     has_permission_on :sessions, :to => [:destroy]

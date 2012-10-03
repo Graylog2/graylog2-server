@@ -818,3 +818,12 @@
 .realtime-status-connected {
   color: #0f0;
 }
+
+/* First login modal */
+#first-login-modal {
+  width: 700px;
+}
+
+#first-login-usage-information {
+  margin-top: 15px;
+}
