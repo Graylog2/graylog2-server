@@ -20,14 +20,14 @@
 
 package org.graylog2.streams.matchers;
 
-import org.graylog2.logmessage.LogMessage;
+import org.graylog2.logmessage.LogMessageImpl;
 import java.util.Map;
 import org.bson.types.ObjectId;
 
 import com.google.common.collect.Maps;
 import com.mongodb.BasicDBObject;
 import java.util.HashMap;
-import org.graylog2.streams.StreamRule;
+import org.graylog2.streams.StreamRuleImpl;
 import org.junit.Test;
 import static org.junit.Assert.*;
 
@@ -44,12 +44,12 @@ public class MessageMatcherTest {
 
         BasicDBObject mongoRule = new BasicDBObject();
         mongoRule.put("_id", new ObjectId());
-        mongoRule.put("rule_type", StreamRule.TYPE_MESSAGE);
+        mongoRule.put("rule_type", StreamRuleImpl.TYPE_MESSAGE);
         mongoRule.put("value",  regex);
 
-        StreamRule rule = new StreamRule(mongoRule);
+        StreamRuleImpl rule = new StreamRuleImpl(mongoRule);
 
-        LogMessage msg = new LogMessage();
+        LogMessageImpl msg = new LogMessageImpl();
         msg.setShortMessage(message);
 
         MessageMatcher matcher = new MessageMatcher();
@@ -64,12 +64,12 @@ public class MessageMatcherTest {
 
         BasicDBObject mongoRule = new BasicDBObject();
         mongoRule.put("_id", new ObjectId());
-        mongoRule.put("rule_type", StreamRule.TYPE_MESSAGE);
+        mongoRule.put("rule_type", StreamRuleImpl.TYPE_MESSAGE);
         mongoRule.put("value",  regex);
 
-        StreamRule rule = new StreamRule(mongoRule);
+        StreamRuleImpl rule = new StreamRuleImpl(mongoRule);
 
-        LogMessage msg = new LogMessage();
+        LogMessageImpl msg = new LogMessageImpl();
         msg.setShortMessage(message);
 
         MessageMatcher matcher = new MessageMatcher();
@@ -94,12 +94,12 @@ public class MessageMatcherTest {
         for (Map.Entry<String, String> e : cases.entrySet()) {
             BasicDBObject mongoRule = new BasicDBObject();
             mongoRule.put("_id", new ObjectId());
-            mongoRule.put("rule_type", StreamRule.TYPE_MESSAGE);
+            mongoRule.put("rule_type", StreamRuleImpl.TYPE_MESSAGE);
             mongoRule.put("value",  e.getValue());
 
-            StreamRule rule = new StreamRule(mongoRule);
+            StreamRuleImpl rule = new StreamRuleImpl(mongoRule);
 
-            LogMessage msg = new LogMessage();
+            LogMessageImpl msg = new LogMessageImpl();
             msg.setShortMessage(e.getKey());
 
             MessageMatcher matcher = new MessageMatcher();

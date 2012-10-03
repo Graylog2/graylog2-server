@@ -20,7 +20,7 @@
 package org.graylog2.periodical;
 
 import org.apache.log4j.Logger;
-import org.graylog2.GraylogServer;
+import org.graylog2.Core;
 import org.graylog2.indexer.DeflectorInformation;
 
 /**
@@ -33,9 +33,9 @@ public class DeflectorInformationWriterThread implements Runnable {
     public static final int INITIAL_DELAY = 0;
     public static final int PERIOD = 5;
     
-    private final GraylogServer graylogServer;
+    private final Core graylogServer;
     
-    public DeflectorInformationWriterThread(GraylogServer graylogServer) {
+    public DeflectorInformationWriterThread(Core graylogServer) {
         this.graylogServer = graylogServer;
     }
     

@@ -20,7 +20,7 @@
 
 package org.graylog2.forwarders;
 
-import org.graylog2.logmessage.LogMessage;
+import org.graylog2.logmessage.LogMessageImpl;
 import org.graylog2.forwarders.forwarders.MessageForwarderConfigurationException;
 
 /**
@@ -37,7 +37,7 @@ public interface MessageForwarderIF {
      * @param message The message to forward
      * @return true in case of success, otherwise false
      */
-    boolean forward(LogMessage message) throws MessageForwarderConfigurationException;
+    boolean forward(LogMessageImpl message) throws MessageForwarderConfigurationException;
 
     /**
      * Indicates if the last forward has succeeded.

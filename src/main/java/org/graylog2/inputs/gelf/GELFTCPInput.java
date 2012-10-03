@@ -25,7 +25,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import org.apache.log4j.Logger;
 import org.graylog2.Configuration;
-import org.graylog2.GraylogServer;
+import org.graylog2.Core;
 import org.graylog2.inputs.MessageInput;
 import org.jboss.netty.bootstrap.ServerBootstrap;
 import org.jboss.netty.channel.ChannelException;
@@ -40,11 +40,11 @@ public class GELFTCPInput implements MessageInput {
 
     private static final String NAME = "GELF TCP";
 
-    private GraylogServer graylogServer;
+    private Core graylogServer;
     private InetSocketAddress socketAddress;
 
     @Override
-    public void initialize(Configuration configuration, GraylogServer graylogServer) {
+    public void initialize(Configuration configuration, Core graylogServer) {
         this.graylogServer = graylogServer;
         this.socketAddress = new InetSocketAddress(configuration.getGelfListenAddress(), configuration.getGelfListenPort());
 

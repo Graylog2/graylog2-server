@@ -20,10 +20,10 @@
 
 package org.graylog2.streams.matchers;
 
-import org.graylog2.logmessage.LogMessage;
+import org.graylog2.logmessage.LogMessageImpl;
 import org.bson.types.ObjectId;
 import com.mongodb.BasicDBObject;
-import org.graylog2.streams.StreamRule;
+import org.graylog2.streams.StreamRuleImpl;
 import org.junit.Test;
 import static org.junit.Assert.*;
 
@@ -41,12 +41,12 @@ public class FileNameAndLineMatcherTest {
 
         BasicDBObject mongoRule = new BasicDBObject();
         mongoRule.put("_id", new ObjectId());
-        mongoRule.put("rule_type", StreamRule.TYPE_FILENAME_LINE);
+        mongoRule.put("rule_type", StreamRuleImpl.TYPE_FILENAME_LINE);
         mongoRule.put("value",  regex);
 
-        StreamRule rule = new StreamRule(mongoRule);
+        StreamRuleImpl rule = new StreamRuleImpl(mongoRule);
         FileNameAndLineMatcher matcher = new FileNameAndLineMatcher();
-        LogMessage msg = new LogMessage();
+        LogMessageImpl msg = new LogMessageImpl();
         
         msg.setFile(filename);
         msg.setLine(17);
@@ -61,12 +61,12 @@ public class FileNameAndLineMatcherTest {
 
         BasicDBObject mongoRule = new BasicDBObject();
         mongoRule.put("_id", new ObjectId());
-        mongoRule.put("rule_type", StreamRule.TYPE_FILENAME_LINE);
+        mongoRule.put("rule_type", StreamRuleImpl.TYPE_FILENAME_LINE);
         mongoRule.put("value",  regex);
 
-        StreamRule rule = new StreamRule(mongoRule);
+        StreamRuleImpl rule = new StreamRuleImpl(mongoRule);
         FileNameAndLineMatcher matcher = new FileNameAndLineMatcher();
-        LogMessage msg = new LogMessage();
+        LogMessageImpl msg = new LogMessageImpl();
 
         msg.setFile(filename);
         msg.setLine(9001);
@@ -81,12 +81,12 @@ public class FileNameAndLineMatcherTest {
 
         BasicDBObject mongoRule = new BasicDBObject();
         mongoRule.put("_id", new ObjectId());
-        mongoRule.put("rule_type", StreamRule.TYPE_FILENAME_LINE);
+        mongoRule.put("rule_type", StreamRuleImpl.TYPE_FILENAME_LINE);
         mongoRule.put("value",  regex);
 
-        StreamRule rule = new StreamRule(mongoRule);
+        StreamRuleImpl rule = new StreamRuleImpl(mongoRule);
         FileNameAndLineMatcher matcher = new FileNameAndLineMatcher();
-        LogMessage msg = new LogMessage();
+        LogMessageImpl msg = new LogMessageImpl();
 
         msg.setFile(filename);
         assertTrue(matcher.match(msg, rule));
@@ -100,12 +100,12 @@ public class FileNameAndLineMatcherTest {
 
         BasicDBObject mongoRule = new BasicDBObject();
         mongoRule.put("_id", new ObjectId());
-        mongoRule.put("rule_type", StreamRule.TYPE_FILENAME_LINE);
+        mongoRule.put("rule_type", StreamRuleImpl.TYPE_FILENAME_LINE);
         mongoRule.put("value",  regex);
 
-        StreamRule rule = new StreamRule(mongoRule);
+        StreamRuleImpl rule = new StreamRuleImpl(mongoRule);
         FileNameAndLineMatcher matcher = new FileNameAndLineMatcher();
-        LogMessage msg = new LogMessage();
+        LogMessageImpl msg = new LogMessageImpl();
 
         msg.setFile(filename);
         msg.setLine(line);

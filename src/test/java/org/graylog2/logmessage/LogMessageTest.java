@@ -30,14 +30,14 @@ public class LogMessageTest {
 
     @Test
     public void testIdGetsSet() {
-        LogMessage lm = new LogMessage();
+        LogMessageImpl lm = new LogMessageImpl();
         assertNotNull(lm.getId());
         assertFalse(lm.getId().isEmpty());
     }
 
     @Test
     public void testIsCompleteSucceeds() {
-        LogMessage lm = new LogMessage();
+        LogMessageImpl lm = new LogMessageImpl();
         lm.setShortMessage("foo");
         lm.setHost("bar");
         assertTrue(lm.isComplete());
@@ -45,55 +45,55 @@ public class LogMessageTest {
 
     @Test
     public void testIsCompleteFails() {
-        LogMessage lm = new LogMessage();
+        LogMessageImpl lm = new LogMessageImpl();
         lm.setShortMessage("foo");
         lm.setHost(null);
         assertFalse(lm.isComplete());
 
-        lm = new LogMessage();
+        lm = new LogMessageImpl();
         lm.setShortMessage("foo");
         lm.setHost("");
         assertFalse(lm.isComplete());
 
-        lm = new LogMessage();
+        lm = new LogMessageImpl();
         lm.setShortMessage(null);
         lm.setHost("bar");
         assertFalse(lm.isComplete());
 
-        lm = new LogMessage();
+        lm = new LogMessageImpl();
         lm.setShortMessage("");
         lm.setHost("bar");
         assertFalse(lm.isComplete());
 
-        lm = new LogMessage();
+        lm = new LogMessageImpl();
         lm.setShortMessage("");
         lm.setHost("");
         assertFalse(lm.isComplete());
 
-        lm = new LogMessage();
+        lm = new LogMessageImpl();
         lm.setShortMessage(null);
         lm.setHost(null);
         assertFalse(lm.isComplete());
 
-        lm = new LogMessage();
+        lm = new LogMessageImpl();
         lm.setHost("bar");
         assertFalse(lm.isComplete());
 
-        lm = new LogMessage();
+        lm = new LogMessageImpl();
         lm.setShortMessage("foo");
         assertFalse(lm.isComplete());
     }
 
     @Test
     public void testAddAdditionalData() {
-        LogMessage lm = new LogMessage();
+        LogMessageImpl lm = new LogMessageImpl();
         lm.addAdditionalData("_ohai", "thar");
         assertEquals("thar", lm.getAdditionalData().get("_ohai"));
     }
 
     @Test
     public void testAddAdditionalDataWithMap() {
-        LogMessage lm = new LogMessage();
+        LogMessageImpl lm = new LogMessageImpl();
         lm.addAdditionalData("_ohai", "hai");
 
         Map<String, String> map = new HashMap<String, String>();
@@ -110,7 +110,7 @@ public class LogMessageTest {
 
     @Test
     public void testAddAdditionalDataAddsUnderscoreIfNotGiven() {
-        LogMessage lm = new LogMessage();
+        LogMessageImpl lm = new LogMessageImpl();
         lm.addAdditionalData("ohai", "lol");
         lm.addAdditionalData("_wat", 9001);
         assertEquals(2, lm.getAdditionalData().size());
@@ -120,7 +120,7 @@ public class LogMessageTest {
     
     @Test
     public void testAddAdditionalDataTrimsWhiteSpacesTabsAndStuffFromKeyAndValue() {
-        LogMessage lm = new LogMessage();
+        LogMessageImpl lm = new LogMessageImpl();
         lm.addAdditionalData(" one", "value_one");
         lm.addAdditionalData(" two  ", "value_two");
         lm.addAdditionalData("three ", "value_three");
@@ -136,7 +136,7 @@ public class LogMessageTest {
     
     @Test
     public void testAddAdditionalDataTrimsWhiteSpacesTabsAndStuffFromKeyAndValueWhenInsertedAsMap() {
-        LogMessage lm = new LogMessage();
+        LogMessageImpl lm = new LogMessageImpl();
         Map<String, String> av = Maps.newHashMap();
         
         av.put(" one", "value_one");
@@ -154,7 +154,7 @@ public class LogMessageTest {
 
     @Test
     public void testRemoveAdditionalData() {
-        LogMessage lm = new LogMessage();
+        LogMessageImpl lm = new LogMessageImpl();
         lm.addAdditionalData("_something", "foo");
         lm.addAdditionalData("_something_else", "bar");
 
@@ -166,7 +166,7 @@ public class LogMessageTest {
 
     @Test
     public void testRemoveAdditionalDataWithNonExistentKey() {
-        LogMessage lm = new LogMessage();
+        LogMessageImpl lm = new LogMessageImpl();
         lm.addAdditionalData("_something", "foo");
         lm.addAdditionalData("_something_else", "bar");
 
@@ -177,7 +177,7 @@ public class LogMessageTest {
 
     @Test
     public void testToString() {
-        LogMessage lm = new LogMessage();
+        LogMessageImpl lm = new LogMessageImpl();
         lm.toString();
         lm.setHost("foo");
         lm.toString();

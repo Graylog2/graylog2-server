@@ -17,29 +17,19 @@
  * along with Graylog2.  If not, see <http://www.gnu.org/licenses/>.
  *
  */
-
-package org.graylog2;
-
-import com.google.common.collect.Maps;
-import java.util.Map;
+package org.graylog2.plugins;
 
 /**
  * @author Lennart Koopmann <lennart@socketfeed.com>
  */
-public class MessageCounterManager {
-
-    private Map<String, MessageCounter> counters = Maps.newConcurrentMap();
-
-    public void register(String name) {
-        counters.put(name, new MessageCounter());
+public class InvalidJarNameException extends Exception {
+    
+    public InvalidJarNameException() {
+        super();
     }
-
-    public MessageCounter get(String name) {
-        return counters.get(name);
+    
+    public InvalidJarNameException(String msg) {
+        super(msg);
     }
-
-    public Map<String, MessageCounter> getAllCounters() {
-        return counters;
-    }
-
+    
 }

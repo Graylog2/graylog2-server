@@ -21,7 +21,7 @@
 package org.graylog2.initializers;
 
 import org.graylog2.Configuration;
-import org.graylog2.GraylogServer;
+import org.graylog2.Core;
 import org.graylog2.HostSystem;
 import org.graylog2.ServerValue;
 import org.graylog2.Tools;
@@ -34,7 +34,7 @@ public class ServerValueWriterInitializer extends SimpleFixedRateScheduleInitial
 
     private Configuration configuration;
 
-    public ServerValueWriterInitializer(GraylogServer graylogServer, Configuration configuration) {
+    public ServerValueWriterInitializer(Core graylogServer, Configuration configuration) {
         this.graylogServer = graylogServer;
         this.configuration = configuration;
     }
@@ -46,7 +46,7 @@ public class ServerValueWriterInitializer extends SimpleFixedRateScheduleInitial
         serverValue.setStartupTime(Tools.getUTCTimestamp());
         serverValue.setPID(Integer.parseInt(Tools.getPID()));
         serverValue.setJREInfo(Tools.getSystemInformation());
-        serverValue.setGraylog2Version(GraylogServer.GRAYLOG2_VERSION);
+        serverValue.setGraylog2Version(Core.GRAYLOG2_VERSION);
         serverValue.setAvailableProcessors(HostSystem.getAvailableProcessors());
         serverValue.setLocalHostname(Tools.getLocalHostname());
         serverValue.setIsMaster(graylogServer.isMaster());

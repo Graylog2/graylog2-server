@@ -134,6 +134,11 @@
             <classifier>jar-with-dependencies</classifier>
         </dependency>
         <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>graylog2-plugin</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
             <groupId>com.googlecode.disruptor</groupId>
             <artifactId>disruptor</artifactId>
             <version>2.10.3</version>

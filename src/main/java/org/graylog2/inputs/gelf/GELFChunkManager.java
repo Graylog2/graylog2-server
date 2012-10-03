@@ -24,7 +24,7 @@ import java.io.ByteArrayOutputStream;
 import java.util.Map;
 
 import org.apache.log4j.Logger;
-import org.graylog2.GraylogServer;
+import org.graylog2.Core;
 
 import com.google.common.collect.Maps;
 import com.yammer.metrics.Metrics;
@@ -39,12 +39,12 @@ public class GELFChunkManager extends Thread {
 
     private Map<String, Map<Integer, GELFMessageChunk>> chunks = Maps.newConcurrentMap();
     private GELFProcessor processor;
-    private GraylogServer server;
+    private Core server;
 
     // The number of seconds a chunk is valid. Every message with chunks older than this will be dropped.
     public static final int SECONDS_VALID = 5;
 
-    public GELFChunkManager(GraylogServer server) {
+    public GELFChunkManager(Core server) {
         this.processor = new GELFProcessor(server);
         this.server = server;
     }

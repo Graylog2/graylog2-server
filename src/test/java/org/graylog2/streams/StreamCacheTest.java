@@ -21,6 +21,7 @@
 package org.graylog2.streams;
 
 import java.util.ArrayList;
+import org.graylog2.plugin.streams.Stream;
 import org.junit.Test;
 import static org.junit.Assert.*;
 

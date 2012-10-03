@@ -22,13 +22,14 @@ package org.graylog2.streams;
 
 import com.mongodb.DBObject;
 import org.bson.types.ObjectId;
+import org.graylog2.plugin.streams.StreamRule;
 
 /**
  * Representing the rules of a single stream.
  *
  * @author Lennart Koopmann <lennart@socketfeed.com>
  */
-public class StreamRule {
+public class StreamRuleImpl implements StreamRule {
 
     public static final int TYPE_MESSAGE = 1;
     public static final int TYPE_HOST = 2;
@@ -46,7 +47,7 @@ public class StreamRule {
     private int ruleType = 0;
     private String value = null;
 
-    public StreamRule(DBObject rule) {
+    public StreamRuleImpl(DBObject rule) {
         this.objectId = (ObjectId) rule.get("_id");
         this.ruleType = (Integer) rule.get("rule_type");
         this.value = (String) rule.get("value");
@@ -55,6 +56,7 @@ public class StreamRule {
     /**
      * @return the objectId
      */
+    @Override
     public ObjectId getObjectId() {
         return objectId;
     }
@@ -62,6 +64,7 @@ public class StreamRule {
     /**
      * @return the ruleType
      */
+    @Override
     public int getRuleType() {
         return ruleType;
     }
@@ -69,6 +72,7 @@ public class StreamRule {
     /**
      * @return the value
      */
+    @Override
     public String getValue() {
         return value;
     }

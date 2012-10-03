@@ -21,7 +21,7 @@
 package org.graylog2.filters;
 
 import org.graylog2.GraylogServerStub;
-import org.graylog2.logmessage.LogMessage;
+import org.graylog2.logmessage.LogMessageImpl;
 import org.junit.Test;
 import static org.junit.Assert.*;
 
@@ -32,7 +32,7 @@ public class TokenizerFilterTest {
 
     @Test
     public void testFilter() {
-        LogMessage msg = new LogMessage();
+        LogMessageImpl msg = new LogMessageImpl();
         msg.setShortMessage("Ohai I am a message k1=v1 k2=v2 Awesome!");
         TokenizerFilter f = new TokenizerFilter();
         f.filter(msg, new GraylogServerStub());
@@ -44,7 +44,7 @@ public class TokenizerFilterTest {
 
     @Test
     public void testFilterWithKVAtBeginning() {
-        LogMessage msg = new LogMessage();
+        LogMessageImpl msg = new LogMessageImpl();
         msg.setShortMessage("k1=v1 k2=v2 Awesome!");
         TokenizerFilter f = new TokenizerFilter();
         f.filter(msg, new GraylogServerStub());
@@ -56,7 +56,7 @@ public class TokenizerFilterTest {
 
     @Test
     public void testFilterWithKVAtEnd() {
-        LogMessage msg = new LogMessage();
+        LogMessageImpl msg = new LogMessageImpl();
         msg.setShortMessage("lolwat Awesome! k1=v1");
         TokenizerFilter f = new TokenizerFilter();
         f.filter(msg, new GraylogServerStub());
@@ -67,7 +67,7 @@ public class TokenizerFilterTest {
 
     @Test
     public void testFilterWithStringInBetween() {
-        LogMessage msg = new LogMessage();
+        LogMessageImpl msg = new LogMessageImpl();
         msg.setShortMessage("foo k2=v2 lolwat Awesome! k1=v1");
         TokenizerFilter f = new TokenizerFilter();
         f.filter(msg, new GraylogServerStub());
@@ -79,7 +79,7 @@ public class TokenizerFilterTest {
 
     @Test
     public void testFilterWithKVOnly() {
-        LogMessage msg = new LogMessage();
+        LogMessageImpl msg = new LogMessageImpl();
         msg.setShortMessage("k1=v1");
         TokenizerFilter f = new TokenizerFilter();
         f.filter(msg, new GraylogServerStub());
@@ -90,7 +90,7 @@ public class TokenizerFilterTest {
 
     @Test
     public void testFilterWithInvalidKVPairs() {
-        LogMessage msg = new LogMessage();
+        LogMessageImpl msg = new LogMessageImpl();
         msg.setShortMessage("Ohai I am a message and this is a URL: index.php?foo=bar&baz=bar");
         TokenizerFilter f = new TokenizerFilter();
         f.filter(msg, new GraylogServerStub());
@@ -100,7 +100,7 @@ public class TokenizerFilterTest {
 
     @Test
     public void testFilterWithoutKVPairs() {
-        LogMessage msg = new LogMessage();
+        LogMessageImpl msg = new LogMessageImpl();
         msg.setShortMessage("trolololololol");
         TokenizerFilter f = new TokenizerFilter();
         f.filter(msg, new GraylogServerStub());
@@ -110,7 +110,7 @@ public class TokenizerFilterTest {
 
     @Test
     public void testFilterWithOneInvalidKVPair() {
-        LogMessage msg = new LogMessage();
+        LogMessageImpl msg = new LogMessageImpl();
         msg.setShortMessage("Ohai I am a message and this is a URL: index.php?foo=bar");
         TokenizerFilter f = new TokenizerFilter();
         f.filter(msg, new GraylogServerStub());
@@ -120,7 +120,7 @@ public class TokenizerFilterTest {
 
     @Test
     public void testFilterWillNotOverwriteExistingAdditionalFields() {
-        LogMessage msg = new LogMessage();
+        LogMessageImpl msg = new LogMessageImpl();
         msg.addAdditionalData("_k1", "YOU BETTER NOT OVERWRITE");
         msg.setShortMessage("Ohai I am a message k1=v1 k2=v2 Awesome!");
         TokenizerFilter f = new TokenizerFilter();

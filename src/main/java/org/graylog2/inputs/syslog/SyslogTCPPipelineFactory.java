@@ -20,7 +20,7 @@
 
 package org.graylog2.inputs.syslog;
 
-import org.graylog2.GraylogServer;
+import org.graylog2.Core;
 import org.jboss.netty.buffer.ChannelBuffer;
 import org.jboss.netty.channel.ChannelPipeline;
 import org.jboss.netty.channel.ChannelPipelineFactory;
@@ -33,9 +33,9 @@ import org.jboss.netty.handler.codec.frame.Delimiters;
  */
 public class SyslogTCPPipelineFactory implements ChannelPipelineFactory {
     
-    GraylogServer server;
+    Core server;
 
-    public SyslogTCPPipelineFactory(GraylogServer server) {
+    public SyslogTCPPipelineFactory(Core server) {
         this.server = server;
     }
 

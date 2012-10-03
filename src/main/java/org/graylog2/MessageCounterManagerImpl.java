@@ -18,21 +18,33 @@
  *
  */
 
-package org.graylog2.filters;
+package org.graylog2;
 
-import org.graylog2.GraylogServer;
-import org.graylog2.logmessage.LogMessage;
+import com.google.common.collect.Maps;
+import java.util.Map;
+import org.graylog2.plugin.MessageCounter;
+import org.graylog2.plugin.MessageCounterManager;
 
 /**
  * @author Lennart Koopmann <lennart@socketfeed.com>
  */
-public interface MessageFilter {
+public class MessageCounterManagerImpl implements MessageCounterManager {
 
-    /**
-     * Process a LogMessage
-     *
-     * @return true if this message should not further be handled (for example for blacklisting purposes)
-     */
-    boolean filter(LogMessage msg, GraylogServer server);
-    
+    private Map<String, MessageCounter> counters = Maps.newConcurrentMap();
+
+    @Override
+    public void register(String name) {
+        counters.put(name, new MessageCounterImpl());
+    }
+
+    @Override
+    public MessageCounter get(String name) {
+        return counters.get(name);
+    }
+
+    @Override
+    public Map<String, MessageCounter> getAllCounters() {
+        return counters;
+    }
+
 }

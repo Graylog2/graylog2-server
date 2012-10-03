@@ -25,9 +25,11 @@ import org.graylog2.streams.matchers.StreamRuleMatcher;
 
 import java.util.ArrayList;
 import java.util.List;
-import org.graylog2.logmessage.LogMessage;
 
 import com.google.common.collect.Lists;
+import org.graylog2.plugin.logmessage.LogMessage;
+import org.graylog2.plugin.streams.Stream;
+import org.graylog2.plugin.streams.StreamRule;
 
 /**
  * Routes a GELF Message to it's streams.
@@ -40,7 +42,7 @@ public class StreamRouter {
 
     public List<Stream> route(LogMessage msg) {
         List<Stream> matches = Lists.newArrayList();
-        List<Stream> streams = Stream.fetchAllEnabled();
+        List<Stream> streams = StreamImpl.fetchAllEnabled();
 
         for (Stream stream : streams) {
             boolean missed = false;

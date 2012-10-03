@@ -23,6 +23,7 @@ package org.graylog2.database;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
+import org.graylog2.plugin.database.HostCounterCache;
 
 /**
  * Acts as cache for count updates in the hosts collection. Written to MongoDB
@@ -30,7 +31,7 @@ import java.util.concurrent.ConcurrentMap;
  *
  * @author Lennart Koopmann <lennart@socketfeed.com>
  */
-public class HostCounterCache {
+public class HostCounterCacheImpl implements HostCounterCache {
 
     private ConcurrentMap<String, Integer> cache = new ConcurrentHashMap<String, Integer>();
 
@@ -39,6 +40,7 @@ public class HostCounterCache {
      *
      * @param hostname The host of which the counter to increment.
      */
+    @Override
     public void increment(String hostname) {
         int old = 0;
 
@@ -54,6 +56,7 @@ public class HostCounterCache {
      *
      * @param hostname The host of which the counter to reset.
      */
+    @Override
     public void reset(String hostname) {
         if (this.cache.containsKey(hostname)) {
             this.cache.remove(hostname);
@@ -65,6 +68,7 @@ public class HostCounterCache {
      *
      * @param hostname The host of which the count to get.
      */
+    @Override
     public int getCount(String hostname) {
         return this.cache.get(hostname) == null ? 0 : this.cache.get(hostname);
     }
@@ -72,6 +76,7 @@ public class HostCounterCache {
     /**
      * Get all hostnames that are currently in the cache.
      */
+    @Override
     public Set<String> getAllHosts() {
         return this.cache.keySet();
     }

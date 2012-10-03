@@ -26,8 +26,10 @@ import java.util.concurrent.TimeUnit;
 import java.util.regex.Pattern;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
-import org.graylog2.GraylogServer;
-import org.graylog2.logmessage.LogMessage;
+import org.graylog2.logmessage.LogMessageImpl;
+import org.graylog2.plugin.GraylogServer;
+import org.graylog2.plugin.filters.MessageFilter;
+import org.graylog2.plugin.logmessage.LogMessage;
 
 /**
  * @author Lennart Koopmann <lennart@socketfeed.com>
@@ -52,7 +54,7 @@ public class TokenizerFilter implements MessageFilter {
      */
 
     @Override
-    public boolean filter(LogMessage msg, GraylogServer server) {
+    public void filter(LogMessage msg, GraylogServer server) {
         TimerContext tcx = Metrics.newTimer(TokenizerFilter.class, "ProcessTime", TimeUnit.MICROSECONDS, TimeUnit.SECONDS).time();
 
         int extracted = 0;
@@ -78,8 +80,10 @@ public class TokenizerFilter implements MessageFilter {
         LOG.debug("Extracted <" + extracted + "> additional fields from message <" + msg.getId() + "> k=v pairs.");
 
         tcx.stop();
+    }
 
-        // We never want to filter out this message.
+    @Override
+    public boolean discard() {
         return false;
     }
 

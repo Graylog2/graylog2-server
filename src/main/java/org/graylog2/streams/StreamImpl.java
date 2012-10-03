@@ -20,7 +20,7 @@
 
 package org.graylog2.streams;
 
-import java.util.ArrayList;
+import org.graylog2.plugin.streams.Stream;
 import java.util.List;
 
 import org.apache.log4j.Logger;
@@ -33,6 +33,7 @@ import com.mongodb.BasicDBObject;
 import com.mongodb.DBCollection;
 import com.mongodb.DBCursor;
 import com.mongodb.DBObject;
+import org.graylog2.plugin.streams.StreamRule;
 
 /**
  * Representing a single stream from the streams collection. Also provides method
@@ -40,9 +41,9 @@ import com.mongodb.DBObject;
  *
  * @author Lennart Koopmann <lennart@socketfeed.com>
  */
-public class Stream {
+public class StreamImpl implements Stream {
 
-    private static final Logger LOG = Logger.getLogger(Stream.class);
+    private static final Logger LOG = Logger.getLogger(StreamImpl.class);
 
     private ObjectId id = null;
     private String title = null;
@@ -52,7 +53,7 @@ public class Stream {
 
     private DBObject mongoObject = null;
 
-    public Stream (DBObject stream) {
+    public StreamImpl (DBObject stream) {
         this.id = (ObjectId) stream.get("_id");
         this.title = (String) stream.get("title");
         this.mongoObject = stream;
@@ -73,7 +74,7 @@ public class Stream {
 
         while (cur.hasNext()) {
             try {
-                streams.add(new Stream(cur.next()));
+                streams.add(new StreamImpl(cur.next()));
             } catch (Exception e) {
                 LOG.warn("Can't fetch stream. Skipping. " + e.getMessage(), e);
             }
@@ -84,6 +85,7 @@ public class Stream {
         return streams;
     }
 
+    @Override
     public List<StreamRule> getStreamRules() {
         if (this.streamRules != null) {
             return this.streamRules;
@@ -95,7 +97,7 @@ public class Stream {
         if (rawRules != null && rawRules.size() > 0) {
             for (Object ruleObj : rawRules) {
                 try {
-                    StreamRule rule = new StreamRule((DBObject) ruleObj);
+                    StreamRule rule = new StreamRuleImpl((DBObject) ruleObj);
                     rules.add(rule);
                 } catch (Exception e) {
                     LOG.warn("Skipping stream rule in Stream.getStreamRules(): " + e.getMessage(), e);
@@ -133,6 +135,7 @@ public class Stream {
     /**
      * @return the id
      */
+    @Override
     public ObjectId getId() {
         return id;
     }
@@ -140,6 +143,7 @@ public class Stream {
     /**
      * @return the title
      */
+    @Override
     public String getTitle() {
         return title;
     }

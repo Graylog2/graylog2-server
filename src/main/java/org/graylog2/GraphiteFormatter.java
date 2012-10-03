@@ -23,6 +23,7 @@ package org.graylog2;
 import com.google.common.collect.Lists;
 import java.util.List;
 import java.util.Map.Entry;
+import org.graylog2.plugin.MessageCounter;
 
 /**
  * @author Lennart Koopmann <lennart@socketfeed.com>

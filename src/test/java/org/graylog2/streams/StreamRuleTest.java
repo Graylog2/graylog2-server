@@ -30,7 +30,7 @@ public class StreamRuleTest {
     public BasicDBObject buildMongoStreamRule() {
         BasicDBObject mongo = new BasicDBObject();
         mongo.put("_id", new ObjectId());
-        mongo.put("rule_type", StreamRule.TYPE_MESSAGE);
+        mongo.put("rule_type", StreamRuleImpl.TYPE_MESSAGE);
         mongo.put("value", "bar");
 
         return mongo;
@@ -42,19 +42,19 @@ public class StreamRuleTest {
         ObjectId objId = new ObjectId();
         mongo.put("_id", objId);
 
-        StreamRule rule = new StreamRule(mongo);
+        StreamRuleImpl rule = new StreamRuleImpl(mongo);
         assertEquals(objId, rule.getObjectId());
     }
 
     @Test
     public void testGetRuleType() {
-        StreamRule rule = new StreamRule(this.buildMongoStreamRule());
-        assertEquals(StreamRule.TYPE_MESSAGE, rule.getRuleType());
+        StreamRuleImpl rule = new StreamRuleImpl(this.buildMongoStreamRule());
+        assertEquals(StreamRuleImpl.TYPE_MESSAGE, rule.getRuleType());
     }
 
     @Test
     public void testGetValue() {
-        StreamRule rule = new StreamRule(this.buildMongoStreamRule());
+        StreamRuleImpl rule = new StreamRuleImpl(this.buildMongoStreamRule());
         assertEquals("bar", rule.getValue());
     }
 

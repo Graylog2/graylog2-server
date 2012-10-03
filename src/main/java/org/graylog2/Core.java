@@ -29,7 +29,6 @@ import org.graylog2.buffers.OutputBuffer;
 import org.graylog2.buffers.ProcessBuffer;
 import org.graylog2.database.MongoBridge;
 import org.graylog2.database.MongoConnection;
-import org.graylog2.filters.MessageFilter;
 import org.graylog2.forwarders.forwarders.LogglyForwarder;
 import org.graylog2.indexer.EmbeddedElasticSearchClient;
 import org.graylog2.initializers.Initializer;
@@ -43,17 +42,20 @@ import org.graylog2.activities.Activity;
 import org.graylog2.activities.ActivityWriter;
 import org.graylog2.communicator.Communicator;
 import org.graylog2.communicator.methods.CommunicatorMethod;
-import org.graylog2.database.HostCounterCache;
+import org.graylog2.database.HostCounterCacheImpl;
 import org.graylog2.indexer.Deflector;
+import org.graylog2.plugin.GraylogServer;
+import org.graylog2.plugin.buffers.Buffer;
+import org.graylog2.plugin.filters.MessageFilter;
 
-public class GraylogServer implements Runnable {
+public class Core implements GraylogServer {
 
     private static final Logger LOG = Logger.getLogger(GraylogServer.class);
 
     private MongoConnection mongoConnection;
     private MongoBridge mongoBridge;
     private Configuration configuration;
-    private RulesEngine rulesEngine;
+    private RulesEngineImpl rulesEngine;
     private ServerValue serverValues;
     private GELFChunkManager gelfChunkManager;
 
@@ -68,9 +70,9 @@ public class GraylogServer implements Runnable {
 
     private EmbeddedElasticSearchClient indexer;
 
-    private HostCounterCache hostCounterCache;
+    private HostCounterCacheImpl hostCounterCache;
 
-    private MessageCounterManager messageCounterManager;
+    private MessageCounterManagerImpl messageCounterManager;
 
     private List<Initializer> initializers = Lists.newArrayList();
     private List<MessageInput> inputs = Lists.newArrayList();
@@ -113,10 +115,10 @@ public class GraylogServer implements Runnable {
         
         activityWriter = new ActivityWriter(mongoBridge, communicator);
         
-        messageCounterManager = new MessageCounterManager();
+        messageCounterManager = new MessageCounterManagerImpl();
         messageCounterManager.register(MASTER_COUNTER_NAME);
 
-        hostCounterCache = new HostCounterCache();
+        hostCounterCache = new HostCounterCacheImpl();
 
         processBuffer = new ProcessBuffer(this);
         processBuffer.initialize();
@@ -233,11 +235,11 @@ public class GraylogServer implements Runnable {
         return configuration;
     }
 
-    public void setRulesEngine(RulesEngine engine) {
+    public void setRulesEngine(RulesEngineImpl engine) {
         rulesEngine = engine;
     }
 
-    public RulesEngine getRulesEngine() {
+    public RulesEngineImpl getRulesEngine() {
         return rulesEngine;
     }
 
@@ -253,11 +255,13 @@ public class GraylogServer implements Runnable {
         return this.gelfChunkManager;
     }
 
-    public ProcessBuffer getProcessBuffer() {
+    @Override
+    public Buffer getProcessBuffer() {
         return this.processBuffer;
     }
 
-    public OutputBuffer getOutputBuffer() {
+    @Override
+    public Buffer getOutputBuffer() {
         return this.outputBuffer;
     }
 
@@ -273,11 +277,11 @@ public class GraylogServer implements Runnable {
         return this.communicatorMethods;
     }
     
-    public MessageCounterManager getMessageCounterManager() {
+    public MessageCounterManagerImpl getMessageCounterManager() {
         return this.messageCounterManager;
     }
 
-    public HostCounterCache getHostCounterCache() {
+    public HostCounterCacheImpl getHostCounterCache() {
         return this.hostCounterCache;
     }
     
@@ -289,18 +293,12 @@ public class GraylogServer implements Runnable {
         return this.activityWriter;
     }
     
-    public int getLastReceivedMessageTimestamp() {
-        return this.lastReceivedMessageTimestamp;
-    }
-    
-    public void setLastReceivedMessageTimestamp(int t) {
-        this.lastReceivedMessageTimestamp = t;
-    }
-    
+    @Override
     public boolean isMaster() {
         return this.configuration.isMaster();
     }
     
+    @Override
     public String getServerId() {
         return this.serverId;
     }

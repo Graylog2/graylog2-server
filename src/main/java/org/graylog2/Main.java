@@ -28,6 +28,9 @@ import com.github.joschi.jadconfig.repositories.PropertiesRepository;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.Writer;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.net.URLClassLoader;
 import org.apache.commons.io.IOUtils;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
@@ -43,6 +46,8 @@ import org.graylog2.inputs.gelf.GELFUDPInput;
 import org.graylog2.inputs.syslog.SyslogTCPInput;
 import org.graylog2.inputs.syslog.SyslogUDPInput;
 import org.graylog2.outputs.ElasticSearchOutput;
+import org.graylog2.plugin.filters.MessageFilter;
+import org.graylog2.plugins.PluginLoader;
 
 /**
  * Main class of Graylog2.
@@ -70,7 +75,7 @@ public final class Main {
         }
 
         if (commandLineArguments.isShowVersion()) {
-            System.out.println("Graylog2 Server " + GraylogServer.GRAYLOG2_VERSION);
+            System.out.println("Graylog2 Server " + Core.GRAYLOG2_VERSION);
             System.out.println("JRE: " + Tools.getSystemInformation());
             System.exit(0);
         }
@@ -82,7 +87,7 @@ public final class Main {
             Logger.getLogger(Main.class.getPackage().getName()).setLevel(Level.ALL);
         }
 
-        LOG.info("Graylog2 " + GraylogServer.GRAYLOG2_VERSION + " starting up. (JRE: " + Tools.getSystemInformation() + ")");
+        LOG.info("Graylog2 " + Core.GRAYLOG2_VERSION + " starting up. (JRE: " + Tools.getSystemInformation() + ")");
 
         String configFile = commandLineArguments.getConfigFile();
         LOG.info("Using config file: " + configFile);
@@ -103,7 +108,7 @@ public final class Main {
 
         // If we only want to check our configuration, we just initialize the rules engine to check if the rules compile
         if (commandLineArguments.isConfigTest()) {
-            GraylogServer server = new GraylogServer();
+            Core server = new Core();
             DroolsInitializer drools = new DroolsInitializer(server, configuration);
             drools.initialize();
             // rules have been checked, exit gracefully
@@ -116,9 +121,9 @@ public final class Main {
         }
 
         // Le server object. This is where all the magic happens.
-        GraylogServer server = new GraylogServer();
+        Core server = new Core();
         server.initialize(configuration);
-
+        
         // Register communicator methods.
         if (configuration.isEnableCommunicationMethodTwilio()) {
             server.registerCommunicatorMethod(TwilioCommunicator.class);
@@ -152,10 +157,17 @@ public final class Main {
         // Register outputs.
         server.registerOutput(ElasticSearchOutput.class);
 
+        // Load plugins.
+        PluginLoader pl = new PluginLoader("plugin");
+        for (Class<? extends MessageFilter> filter : pl.loadFilterPlugins()) {
+            LOG.info("Registering plugin filter [" + filter.getSimpleName() + "].");
+            server.registerFilter(filter);
+        }
+        
         // Blocks until we shut down.
         server.run();
 
-        LOG.info("Graylog2 " + GraylogServer.GRAYLOG2_VERSION + " exiting.");
+        LOG.info("Graylog2 " + Core.GRAYLOG2_VERSION + " exiting.");
     }
 
     private static void savePidFile(String pidFile) {

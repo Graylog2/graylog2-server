@@ -17,36 +17,19 @@
  * along with Graylog2.  If not, see <http://www.gnu.org/licenses/>.
  *
  */
+package org.graylog2.plugins;
 
-package org.graylog2.buffers;
-
-import com.lmax.disruptor.EventFactory;
-import org.graylog2.plugin.logmessage.LogMessage;
+import java.io.File;
+import java.io.FilenameFilter;
 
 /**
  * @author Lennart Koopmann <lennart@socketfeed.com>
  */
-public class LogMessageEvent {
+public class Graylog2PluginFileFilter implements FilenameFilter {
 
-    private LogMessage msg;
+    @Override
+    public boolean accept(File file, String string) {
+        return string.endsWith("_gl2plugin.jar");
+    }
     
-    public LogMessage getMessage()
-    {
-        return msg;
-    }
-
-    public void setMessage(final LogMessage msg)
-    {
-        this.msg = msg;
-    }
-
-    public final static EventFactory<LogMessageEvent> EVENT_FACTORY = new EventFactory<LogMessageEvent>()
-    {
-        @Override
-        public LogMessageEvent newInstance()
-        {
-            return new LogMessageEvent();
-        }
-    };
-
 }

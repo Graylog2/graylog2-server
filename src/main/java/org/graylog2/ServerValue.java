@@ -27,9 +27,9 @@ package org.graylog2;
  */
 public class ServerValue {
 
-    private final GraylogServer graylogServer;
+    private final Core graylogServer;
 
-    public ServerValue(GraylogServer graylogServer) {
+    public ServerValue(Core graylogServer) {
         this.graylogServer = graylogServer;
     }
 

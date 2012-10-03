@@ -24,10 +24,11 @@ import java.io.DataOutputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import org.apache.log4j.Logger;
-import org.graylog2.GraylogServer;
+import org.graylog2.Core;
 import org.graylog2.LibratoMetricsFormatter;
-import org.graylog2.MessageCounter;
+import org.graylog2.MessageCounterImpl;
 import org.graylog2.Tools;
+import org.graylog2.plugin.MessageCounter;
 
 /**
  * @author Lennart Koopmann <lennart@socketfeed.com>
@@ -40,11 +41,11 @@ public class LibratoMetricsWriterThread implements Runnable {
 
     public static final int INITIAL_DELAY = 0;
 
-    private final GraylogServer graylogServer;
+    private final Core graylogServer;
 
     private static final String API_TARGET = "https://metrics-api.librato.com/v1/metrics";
 
-    public LibratoMetricsWriterThread(GraylogServer graylogServer) {
+    public LibratoMetricsWriterThread(Core graylogServer) {
         this.graylogServer = graylogServer;
     }
 

@@ -22,7 +22,7 @@ package org.graylog2.communicator;
 import com.beust.jcommander.internal.Lists;
 import java.util.List;
 import org.apache.log4j.Logger;
-import org.graylog2.GraylogServer;
+import org.graylog2.Core;
 import org.graylog2.communicator.methods.CommunicatorMethod;
 
 /**
@@ -32,9 +32,9 @@ public class Communicator {
 
     private static final Logger LOG = Logger.getLogger(Communicator.class);
     
-    private GraylogServer server;
+    private Core server;
     
-    public Communicator(GraylogServer server) {
+    public Communicator(Core server) {
         this.server = server;
     }
     

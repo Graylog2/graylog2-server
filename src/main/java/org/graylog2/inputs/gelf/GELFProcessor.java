@@ -26,9 +26,9 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
 import org.apache.log4j.Logger;
-import org.graylog2.GraylogServer;
+import org.graylog2.Core;
 import org.graylog2.Tools;
-import org.graylog2.logmessage.LogMessage;
+import org.graylog2.logmessage.LogMessageImpl;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.JSONValue;
@@ -39,9 +39,9 @@ import org.json.simple.JSONValue;
 public class GELFProcessor {
 
     private static final Logger LOG = Logger.getLogger(GELFProcessor.class);
-    private GraylogServer server;
+    private Core server;
 
-    public GELFProcessor(GraylogServer server) {
+    public GELFProcessor(Core server) {
         this.server = server;
     }
 
@@ -49,7 +49,7 @@ public class GELFProcessor {
         Metrics.newMeter(GELFProcessor.class, "IncomingMessages", "messages", TimeUnit.SECONDS).mark();
         
         // Convert to LogMessage
-        LogMessage lm = parse(message.getJSON());
+        LogMessageImpl lm = parse(message.getJSON());
 
         if (!lm.isComplete()) {
             Metrics.newMeter(GELFProcessor.class, "IncompleteMessages", "messages", TimeUnit.SECONDS).mark();
@@ -62,11 +62,11 @@ public class GELFProcessor {
         server.getProcessBuffer().insert(lm);
     }
 
-    private LogMessage parse(String message) {
+    private LogMessageImpl parse(String message) {
         TimerContext tcx = Metrics.newTimer(GELFProcessor.class, "GELFParsedTime", TimeUnit.MICROSECONDS, TimeUnit.SECONDS).time();
 
         JSONObject json;
-        LogMessage lm = new LogMessage();
+        LogMessageImpl lm = new LogMessageImpl();
         
         try {
             json = getJSON(message);
@@ -91,13 +91,13 @@ public class GELFProcessor {
         if (level > -1) {
             lm.setLevel(level);
         } else {
-            lm.setLevel(LogMessage.STANDARD_LEVEL);
+            lm.setLevel(LogMessageImpl.STANDARD_LEVEL);
         }
 
         // Facility is set by server if not specified by client.
         String facility = this.jsonToString(json.get("facility"));
         if (facility == null) {
-            lm.setFacility(LogMessage.STANDARD_FACILITY);
+            lm.setFacility(LogMessageImpl.STANDARD_FACILITY);
         } else {
             lm.setFacility(facility);
         }
