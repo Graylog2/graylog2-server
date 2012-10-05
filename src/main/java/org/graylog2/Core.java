@@ -40,6 +40,7 @@ import org.graylog2.streams.StreamCache;
 import com.google.common.collect.Lists;
 import org.graylog2.activities.Activity;
 import org.graylog2.activities.ActivityWriter;
+import org.graylog2.cluster.Cluster;
 import org.graylog2.communicator.Communicator;
 import org.graylog2.communicator.methods.CommunicatorMethod;
 import org.graylog2.database.HostCounterCacheImpl;
@@ -47,10 +48,18 @@ import org.graylog2.indexer.Deflector;
 import org.graylog2.plugin.GraylogServer;
 import org.graylog2.plugin.buffers.Buffer;
 import org.graylog2.plugin.filters.MessageFilter;
+import org.graylog2.plugins.PluginLoader;
 
+/**
+ * Server core, handling and holding basically everything.
+ * 
+ * (Du kannst das Geraet nicht bremsen, schon garnicht mit bloßen Haenden.)
+ * 
+ * @author Lennart Koopmann <lennart@socketfeed.com>
+ */
 public class Core implements GraylogServer {
 
-    private static final Logger LOG = Logger.getLogger(GraylogServer.class);
+    private static final Logger LOG = Logger.getLogger(Core.class);
 
     private MongoConnection mongoConnection;
     private MongoBridge mongoBridge;
@@ -74,11 +83,15 @@ public class Core implements GraylogServer {
 
     private MessageCounterManagerImpl messageCounterManager;
 
+    private Cluster cluster;
+    
     private List<Initializer> initializers = Lists.newArrayList();
     private List<MessageInput> inputs = Lists.newArrayList();
     private List<Class<? extends MessageFilter>> filters = Lists.newArrayList();
     private List<Class<? extends MessageOutput>> outputs = Lists.newArrayList();
     private List<Class<? extends CommunicatorMethod>> communicatorMethods = Lists.newArrayList();
+    
+    private int loadedFilterPlugins = 0;
     
     private ProcessBuffer processBuffer;
     private OutputBuffer outputBuffer;
@@ -90,6 +103,8 @@ public class Core implements GraylogServer {
     private Communicator communicator;
     
     private String serverId;
+    
+    private boolean localMode = false;
 
     public void initialize(Configuration configuration) {
         serverId = Tools.generateServerId();
@@ -110,6 +125,8 @@ public class Core implements GraylogServer {
         mongoBridge = new MongoBridge();
         mongoBridge.setConnection(mongoConnection); // TODO use dependency injection
         mongoConnection.connect();
+        
+        cluster = new Cluster(this);
         
         communicator = new Communicator(this);
         
@@ -198,6 +215,8 @@ public class Core implements GraylogServer {
 
         scheduler = Executors.newScheduledThreadPool(SCHEDULED_THREADS_POOL_SIZE);
 
+        loadPlugins();
+        
         // Call all registered initializers.
         for (Initializer initializer : this.initializers) {
             initializer.initialize();
@@ -217,6 +236,15 @@ public class Core implements GraylogServer {
             try { Thread.sleep(1000); } catch (InterruptedException e) { /* lol, i don't care */ }
         }
 
+    }
+    
+    private void loadPlugins() {
+        PluginLoader pl = new PluginLoader("plugin");
+        for (Class<? extends MessageFilter> filter : pl.loadFilterPlugins()) {
+            LOG.info("Registering plugin filter [" + filter.getSimpleName() + "].");
+            registerFilter(filter);
+            this.loadedFilterPlugins += 1;
+        }
     }
 
     public MongoConnection getMongoConnection() {
@@ -289,6 +317,10 @@ public class Core implements GraylogServer {
         return this.deflector;
     }
     
+    public Cluster cluster() {
+        return this.cluster;
+    }
+    
     public ActivityWriter getActivityWriter() {
         return this.activityWriter;
     }
@@ -301,6 +333,18 @@ public class Core implements GraylogServer {
     @Override
     public String getServerId() {
         return this.serverId;
+    }
+    
+    public int getLoadedFilterPlugins() {
+        return this.loadedFilterPlugins;
+    }
+    
+    public void setLocalMode(boolean mode) {
+        this.localMode = mode;
+    }
+   
+    public boolean isLocalMode() {
+        return localMode;
     }
 
 }

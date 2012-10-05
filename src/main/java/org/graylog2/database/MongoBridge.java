@@ -1,5 +1,5 @@
 /**
- * Copyright 2010, 2011 Lennart Koopmann <lennart@socketfeed.com>
+ * Copyright 2010, 2011, 2012 Lennart Koopmann <lennart@socketfeed.com>
  *
  * This file is part of Graylog2.
  *
@@ -38,8 +38,7 @@ import org.graylog2.activities.Activity;
  */
 public class MongoBridge {
 
-    private static final Logger LOG = Logger.getLogger(MongoBridge.class);
-
+    private static final Logger LOG = Logger.getLogger(MongoBridge.class);    
     private MongoConnection connection;
 
     public MongoBridge() {

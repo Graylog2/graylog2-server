@@ -22,12 +22,11 @@ package org.graylog2.blacklists;
 
 import com.google.common.collect.Lists;
 import com.mongodb.*;
-import org.apache.log4j.Logger;
 import org.bson.types.ObjectId;
-import org.graylog2.database.MongoConnection;
 
 import java.util.ArrayList;
 import java.util.List;
+import org.apache.log4j.Logger;
 
 /**
  * Representing a blacklist stored in MongoDB.

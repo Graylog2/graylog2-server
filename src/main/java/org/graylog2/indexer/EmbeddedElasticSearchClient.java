@@ -30,6 +30,7 @@ import org.elasticsearch.action.admin.indices.stats.IndicesStats;
 import org.elasticsearch.action.admin.indices.stats.IndicesStatsRequest;
 import org.elasticsearch.action.bulk.BulkRequestBuilder;
 import org.elasticsearch.action.bulk.BulkResponse;
+import org.elasticsearch.action.count.CountRequest;
 import org.elasticsearch.action.deletebyquery.DeleteByQueryRequestBuilder;
 import org.elasticsearch.action.deletebyquery.DeleteByQueryResponse;
 import org.elasticsearch.action.index.IndexRequest.OpType;
@@ -96,8 +97,17 @@ public class EmbeddedElasticSearchClient {
     }
     
     public String allIndicesAlias() {
-
         return server.getConfiguration().getElasticSearchIndexPrefix() + "_*";
+    }
+    
+    public long getTotalIndexSize() {
+        return client.admin().indices().stats(
+                new IndicesStatsRequest().indices(allIndicesAlias()))
+                .actionGet()
+                .total()
+                .store()
+                .getSize()
+                .getMb();
     }
     
     public String nodeIdToName(String nodeId) {
@@ -128,6 +138,14 @@ public class EmbeddedElasticSearchClient {
             return "UNKNOWN";
         }
         
+    }
+    
+    public int getNumberOfNodesInCluster() {
+        return client.admin().cluster().nodesInfo(new NodesInfoRequest().all()).actionGet().nodes().length;
+    }
+    
+    public long getTotalNumberOfMessagesInIndices() {
+        return client.count(new CountRequest(allIndicesAlias())).actionGet().count();
     }
     
     public Map<String, IndexStats> getIndices() {

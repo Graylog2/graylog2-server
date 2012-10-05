@@ -28,9 +28,6 @@ import com.github.joschi.jadconfig.repositories.PropertiesRepository;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.Writer;
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.net.URLClassLoader;
 import org.apache.commons.io.IOUtils;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
@@ -46,8 +43,6 @@ import org.graylog2.inputs.gelf.GELFUDPInput;
 import org.graylog2.inputs.syslog.SyslogTCPInput;
 import org.graylog2.inputs.syslog.SyslogUDPInput;
 import org.graylog2.outputs.ElasticSearchOutput;
-import org.graylog2.plugin.filters.MessageFilter;
-import org.graylog2.plugins.PluginLoader;
 
 /**
  * Main class of Graylog2.
@@ -124,6 +119,12 @@ public final class Main {
         Core server = new Core();
         server.initialize(configuration);
         
+        if (commandLineArguments.isLocal()) {
+            // In local mode, systemstats are sent to localhost for example.
+            LOG.info("Running in local mode");
+            server.setLocalMode(true);
+        }
+        
         // Register communicator methods.
         if (configuration.isEnableCommunicationMethodTwilio()) {
             server.registerCommunicatorMethod(TwilioCommunicator.class);
@@ -137,7 +138,8 @@ public final class Main {
         if (configuration.isEnableGraphiteOutput())       { server.registerInitializer(new GraphiteInitializer(server)); }
         if (configuration.isEnableLibratoMetricsOutput()) { server.registerInitializer(new LibratoMetricsInitializer(server)); }
         server.registerInitializer(new DeflectorThreadsInitializer(server));
-
+        server.registerInitializer(new AnonymousInformationCollectorInitializer(server));
+        
         // Register inputs.
         if (configuration.isUseGELF()) {
             server.registerInput(new GELFUDPInput());
@@ -156,13 +158,6 @@ public final class Main {
 
         // Register outputs.
         server.registerOutput(ElasticSearchOutput.class);
-
-        // Load plugins.
-        PluginLoader pl = new PluginLoader("plugin");
-        for (Class<? extends MessageFilter> filter : pl.loadFilterPlugins()) {
-            LOG.info("Registering plugin filter [" + filter.getSimpleName() + "].");
-            server.registerFilter(filter);
-        }
         
         // Blocks until we shut down.
         server.run();
