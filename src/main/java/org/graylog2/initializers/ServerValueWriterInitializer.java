@@ -48,7 +48,7 @@ public class ServerValueWriterInitializer extends SimpleFixedRateScheduleInitial
         serverValue.setJREInfo(Tools.getSystemInformation());
         serverValue.setGraylog2Version(Core.GRAYLOG2_VERSION);
         serverValue.setAvailableProcessors(HostSystem.getAvailableProcessors());
-        serverValue.setLocalHostname(Tools.getLocalHostname());
+        serverValue.setLocalHostname(Tools.getLocalCanonicalHostname());
         serverValue.setIsMaster(graylogServer.isMaster());
 
         configureScheduler(

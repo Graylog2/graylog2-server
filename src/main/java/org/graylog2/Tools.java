@@ -205,6 +205,17 @@ public final class Tools {
 
         return addr.getHostName();
     }
+    
+    public static String getLocalCanonicalHostname() {
+        InetAddress addr = null;
+        try {
+            addr = InetAddress.getLocalHost();
+        } catch (UnknownHostException ex) {
+            return "Unknown";
+        }
+
+        return addr.getCanonicalHostName();
+    }
 
     public static int getTimestampDaysAgo(int ts, int days) {
         return (ts - (days*86400));
