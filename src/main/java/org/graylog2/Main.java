@@ -31,6 +31,7 @@ import java.io.Writer;
 import org.apache.commons.io.IOUtils;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
+import org.graylog2.activities.Activity;
 import org.graylog2.communicator.methods.TwilioCommunicator;
 import org.graylog2.filters.BlacklistFilter;
 import org.graylog2.filters.CounterUpdateFilter;
@@ -118,6 +119,17 @@ public final class Main {
         // Le server object. This is where all the magic happens.
         Core server = new Core();
         server.initialize(configuration);
+        
+        // Could it be that there is another master instance already?
+        if (server.cluster().masterCountExcept(server.getServerId()) != 0) {
+            // All devils here.
+            String what = "Detected other master node in the cluster! Starting as non-master! "
+                    + "This is a mis-configuration you should fix.";
+            LOG.warn(what);
+            server.getActivityWriter().write(new Activity(what, Main.class));
+            
+            configuration.setIsMaster(false);
+        }
         
         if (commandLineArguments.isLocal()) {
             // In local mode, systemstats are sent to localhost for example.
