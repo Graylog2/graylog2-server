@@ -19,7 +19,7 @@
  */
 package org.graylog2.systeminformation;
 
-import com.beust.jcommander.internal.Maps;
+import com.google.common.collect.Maps;
 import java.util.Map;
 import org.apache.log4j.Logger;
 import org.graylog2.Core;
