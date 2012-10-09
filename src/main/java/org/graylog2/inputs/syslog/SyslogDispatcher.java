@@ -33,6 +33,7 @@ import org.jboss.netty.channel.ChannelHandlerContext;
 import org.jboss.netty.channel.ExceptionEvent;
 import org.jboss.netty.channel.MessageEvent;
 import org.jboss.netty.channel.SimpleChannelHandler;
+import org.graylog2.ThreadPool;
 
 /**
  * @author Lennart Koopmann <lennart@socketfeed.com>
@@ -40,7 +41,7 @@ import org.jboss.netty.channel.SimpleChannelHandler;
 public class SyslogDispatcher extends SimpleChannelHandler {
 
     private static final Logger LOG = Logger.getLogger(SyslogDispatcher.class);
-    protected final ExecutorService executor = Executors.newCachedThreadPool();
+    protected final ExecutorService executor = new ThreadPool(SyslogDispatcher.class.getName(), 128, 15000*10);
     protected static final Meter receivedMessagesMeter = Metrics.newMeter(SyslogDispatcher.class, "ReceivedMessages", "messages", TimeUnit.SECONDS);
 
     private SyslogProcessor processor;
@@ -65,7 +66,7 @@ public class SyslogDispatcher extends SimpleChannelHandler {
 
                     processor.messageReceived(new String(readable), remoteAddress.getAddress());
                 } catch (Exception ex) {
-                    LOG.warn("Could not handle syslog message.", ex.getCause());
+                    LOG.warn("Could not handle syslog message: " + ex.getCause());
                 }
             }
         });
