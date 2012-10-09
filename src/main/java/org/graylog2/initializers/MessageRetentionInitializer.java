@@ -21,7 +21,7 @@
 package org.graylog2.initializers;
 
 import java.util.concurrent.TimeUnit;
-import org.graylog2.GraylogServer;
+import org.graylog2.Core;
 import org.graylog2.periodical.MessageRetentionThread;
 
 /**
@@ -29,13 +29,13 @@ import org.graylog2.periodical.MessageRetentionThread;
  */
 public class MessageRetentionInitializer implements Initializer {
 
-    GraylogServer graylogServer;
+    Core graylogServer;
 
     /*
      * Beware! This is not a fixed rate scheduled thread. Called only once.
      * Look into MessageRetentionThread#scheduleNextRun().
      */
-    public MessageRetentionInitializer(GraylogServer graylogServer) {
+    public MessageRetentionInitializer(Core graylogServer) {
         this.graylogServer = graylogServer;
     }
 

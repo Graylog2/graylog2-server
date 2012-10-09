@@ -26,21 +26,25 @@ import com.yammer.metrics.core.TimerContext;
 import java.util.concurrent.TimeUnit;
 import java.util.regex.Pattern;
 import org.apache.log4j.Logger;
-import org.graylog2.GraylogServer;
 import org.graylog2.blacklists.Blacklist;
 import org.graylog2.blacklists.BlacklistRule;
-import org.graylog2.logmessage.LogMessage;
+import org.graylog2.logmessage.LogMessageImpl;
+import org.graylog2.plugin.GraylogServer;
+import org.graylog2.plugin.filters.MessageFilter;
+import org.graylog2.plugin.logmessage.LogMessage;
 
 /**
  * @author Lennart Koopmann <lennart@socketfeed.com>
  */
 public class BlacklistFilter implements MessageFilter {
-
+    
     private static final Logger LOG = Logger.getLogger(BlacklistFilter.class);
     protected static final Timer processTimer = Metrics.newTimer(BlacklistFilter.class, "ProcessTime", TimeUnit.MICROSECONDS, TimeUnit.SECONDS);
 
+    private boolean discard;
+    
     @Override
-    public boolean filter(LogMessage msg, GraylogServer server) {
+    public void filter(LogMessage msg, GraylogServer server) {
         TimerContext tcx = processTimer.time();
         for (Blacklist blacklist : Blacklist.fetchAll()) {
             for (BlacklistRule rule : blacklist.getRules()) {
@@ -48,13 +52,21 @@ public class BlacklistFilter implements MessageFilter {
                     LOG.debug("Message <" + this.toString() + "> is blacklisted. First match on " + rule.getTerm());
 
                     // Done - This message is blacklisted.
-                    return true;
+                    discard = true;
+                    return;
                 }
             }
         }
 
         tcx.stop();
-        return false;
+        discard = false;
     }
+
+    @Override
+    public boolean discard() {
+        return discard;
+    }
+    
+    
 
 }

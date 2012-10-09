@@ -20,7 +20,7 @@
 
 package org.graylog2.initializers;
 
-import org.graylog2.GraylogServer;
+import org.graylog2.Core;
 import org.graylog2.periodical.HostCounterCacheWriterThread;
 
 /**
@@ -28,7 +28,7 @@ import org.graylog2.periodical.HostCounterCacheWriterThread;
  */
 public class HostCounterCacheWriterInitializer extends SimpleFixedRateScheduleInitializer implements Initializer {
 
-    public HostCounterCacheWriterInitializer(GraylogServer server) {
+    public HostCounterCacheWriterInitializer(Core server) {
         this.graylogServer = server;
     }
 

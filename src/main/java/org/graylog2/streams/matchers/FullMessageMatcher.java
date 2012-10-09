@@ -21,8 +21,8 @@
 package org.graylog2.streams.matchers;
 
 import java.util.regex.Pattern;
-import org.graylog2.logmessage.LogMessage;
-import org.graylog2.streams.StreamRule;
+import org.graylog2.plugin.logmessage.LogMessage;
+import org.graylog2.plugin.streams.StreamRule;
 
 /**
  * @author Dennis Oelkers <dennis@lauschmusik.de>

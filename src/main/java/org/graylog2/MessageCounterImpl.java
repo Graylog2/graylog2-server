@@ -23,6 +23,7 @@ package org.graylog2;
 import org.bson.types.ObjectId;
 import java.util.Map;
 import com.google.common.collect.Maps;
+import org.graylog2.plugin.MessageCounter;
 
 /**
  * Singleton holding the number of received messages for streams,
@@ -30,7 +31,7 @@ import com.google.common.collect.Maps;
  *
  * @author Lennart Koopmann <lennart@socketfeed.com>
  */
-public final class MessageCounter {
+public final class MessageCounterImpl implements MessageCounter {
 
     private int total;
     private final Map<String, Integer> streams = Maps.newConcurrentMap();

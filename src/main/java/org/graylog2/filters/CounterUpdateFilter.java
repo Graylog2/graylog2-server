@@ -24,12 +24,11 @@ import com.yammer.metrics.Metrics;
 import com.yammer.metrics.core.Timer;
 import com.yammer.metrics.core.TimerContext;
 import java.util.concurrent.TimeUnit;
-import org.graylog2.GraylogServer;
-import org.graylog2.MessageCounter;
-import org.graylog2.Tools;
-import org.graylog2.logmessage.LogMessage;
-import org.graylog2.streams.Stream;
-
+import org.graylog2.plugin.GraylogServer;
+import org.graylog2.plugin.MessageCounter;
+import org.graylog2.plugin.filters.MessageFilter;
+import org.graylog2.plugin.logmessage.LogMessage;
+import org.graylog2.plugin.streams.Stream;
 /**
  * @author Lennart Koopmann <lennart@socketfeed.com>
  */
@@ -38,11 +37,9 @@ public class CounterUpdateFilter implements MessageFilter {
     protected static final Timer processTimer = Metrics.newTimer(CounterUpdateFilter.class, "ProcessTime", TimeUnit.MICROSECONDS, TimeUnit.SECONDS);
 
     @Override
-    public boolean filter(LogMessage msg, GraylogServer server) {
+    public void filter(LogMessage msg, GraylogServer server) {
         TimerContext tcx = processTimer.time();
 
-        server.setLastReceivedMessageTimestamp(Tools.getUTCTimestamp());
-        
         // Increment all registered message counters.
         for (MessageCounter counter : server.getMessageCounterManager().getAllCounters().values()) {
             // Five second throughput for health page.
@@ -65,8 +62,10 @@ public class CounterUpdateFilter implements MessageFilter {
 
         
         tcx.stop();
-        
-        // Do not discard message.
+    }
+
+    @Override
+    public boolean discard() {
         return false;
     }
 }

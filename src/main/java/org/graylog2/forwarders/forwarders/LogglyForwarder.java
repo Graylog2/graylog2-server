@@ -26,7 +26,7 @@ import org.graylog2.forwarders.MessageForwarderIF;
 import java.io.DataOutputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
-import org.graylog2.logmessage.LogMessage;
+import org.graylog2.logmessage.LogMessageImpl;
 
 /**
  * Forwards messages to Logg.ly. (via HTTP/S API)
@@ -61,7 +61,7 @@ public class LogglyForwarder implements MessageForwarderIF {
      * @param message The message to forward
      * @return true in case of success, otherwise false
      */
-    public boolean forward(LogMessage message) {
+    public boolean forward(LogMessageImpl message) {
 /*
         this.succeeded = this.send(message.toOneLiner());
         return this.succeeded();*/

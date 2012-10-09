@@ -24,6 +24,7 @@ import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.atomic.AtomicInteger;
+import org.graylog2.plugin.database.HostCounterCache;
 
 /**
  * Acts as cache for count updates in the hosts collection. Written to MongoDB
@@ -31,7 +32,7 @@ import java.util.concurrent.atomic.AtomicInteger;
  *
  * @author Lennart Koopmann <lennart@socketfeed.com>
  */
-public class HostCounterCache {
+public class HostCounterCacheImpl implements HostCounterCache {
 
     private ConcurrentMap<String, AtomicInteger> cache = new ConcurrentHashMap<String, AtomicInteger>();
 
@@ -40,6 +41,7 @@ public class HostCounterCache {
      *
      * @param hostname The host of which the counter to increment.
      */
+    @Override
     public void increment(String hostname) {
         AtomicInteger count = this.cache.putIfAbsent(hostname, new AtomicInteger(0));
         if (count != null) {
@@ -65,6 +67,7 @@ public class HostCounterCache {
     /**
      * Get all hostnames that are currently in the cache.
      */
+    @Override
     public Set<String> getAllHosts() {
         return this.cache.keySet();
     }

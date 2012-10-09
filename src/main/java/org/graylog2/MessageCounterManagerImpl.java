@@ -22,22 +22,27 @@ package org.graylog2;
 
 import com.google.common.collect.Maps;
 import java.util.Map;
+import org.graylog2.plugin.MessageCounter;
+import org.graylog2.plugin.MessageCounterManager;
 
 /**
  * @author Lennart Koopmann <lennart@socketfeed.com>
  */
-public class MessageCounterManager {
+public class MessageCounterManagerImpl implements MessageCounterManager {
 
     private Map<String, MessageCounter> counters = Maps.newConcurrentMap();
 
+    @Override
     public void register(String name) {
-        counters.put(name, new MessageCounter());
+        counters.put(name, new MessageCounterImpl());
     }
 
+    @Override
     public MessageCounter get(String name) {
         return counters.get(name);
     }
 
+    @Override
     public Map<String, MessageCounter> getAllCounters() {
         return counters;
     }

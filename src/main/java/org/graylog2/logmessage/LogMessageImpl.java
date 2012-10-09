@@ -28,15 +28,16 @@ import org.apache.log4j.Logger;
 
 import org.graylog2.Tools;
 import org.graylog2.indexer.EmbeddedElasticSearchClient;
-import org.graylog2.streams.Stream;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
+import org.graylog2.plugin.logmessage.LogMessage;
+import org.graylog2.plugin.streams.Stream;
 
 /**
  * @author Lennart Koopmann <lennart@socketfeed.com>
  */
-public class LogMessage {
+public class LogMessageImpl implements LogMessage {
 
     private static final Logger LOG = Logger.getLogger(LogMessage.class);
     public static final int STANDARD_LEVEL = 1;
@@ -69,14 +70,16 @@ public class LogMessage {
 
     private double createdAt = 0;
 
-    public LogMessage() {
+    public LogMessageImpl() {
         this.id = UUID.nameUUIDFromBytes(HOSTNAME).toString();
     }
 
+    @Override
     public boolean isComplete() {
         return (shortMessage != null && !shortMessage.isEmpty() && host != null && !host.isEmpty());
     }
 
+    @Override
     public String getId() {
         return this.id;
     }
@@ -138,10 +141,12 @@ public class LogMessage {
         return ret;
     }
 
+    @Override
     public double getCreatedAt() {
         return createdAt;
     }
 
+    @Override
     public void setCreatedAt(double createdAt) {
         this.createdAt = createdAt;
     }
@@ -149,85 +154,105 @@ public class LogMessage {
     public String getFacility() {
         return facility;
     }
-
+ 
+    @Override
     public void setFacility(String facility) {
         this.facility = facility;
     }
 
+    @Override
     public String getFile() {
         return file;
     }
 
+    @Override
     public void setFile(String file) {
         this.file = file;
     }
 
+    @Override
     public String getFullMessage() {
         return fullMessage;
     }
 
+    @Override
     public void setFullMessage(String fullMessage) {
         this.fullMessage = fullMessage;
     }
 
+    @Override
     public String getHost() {
         return host;
     }
 
+    @Override
     public void setHost(String host) {
         this.host = host;
     }
 
+    @Override
     public int getLevel() {
         return level;
     }
 
+    @Override
     public void setLevel(int level) {
         this.level = level;
     }
 
+    @Override
     public int getLine() {
         return line;
     }
 
+    @Override
     public void setLine(int line) {
         this.line = line;
     }
 
+    @Override
     public String getShortMessage() {
         return shortMessage;
     }
 
+    @Override
     public void setShortMessage(String shortMessage) {
         this.shortMessage = shortMessage;
     }
 
+    @Override
     public void addAdditionalData(String key, Object value) {       
         this.additionalData.put(prepareAdditionalDataKey(key), value);
     }
     
+    @Override
     public void addAdditionalData(String key, String value) {
         this.additionalData.put(prepareAdditionalDataKey(key), value.trim());
     }
 
+    @Override
     public void addAdditionalData(Map<String, String> fields) {
         for (Map.Entry<String, String> field : fields.entrySet()) {
             addAdditionalData(field.getKey(), field.getValue());
         }
     }
 
+    @Override
     public void removeAdditionalData(String key) {
         this.additionalData.remove(key);
     }
 
+    @Override
     public Map<String, Object> getAdditionalData() {
         return this.additionalData;
     }
 
+    @Override
     public void setStreams(List<Stream> streams) {
         this.streams = streams;
     }
 
+    @Override
     public List<Stream> getStreams() {
         return this.streams;
     }

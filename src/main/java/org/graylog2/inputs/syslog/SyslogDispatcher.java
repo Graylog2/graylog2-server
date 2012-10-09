@@ -27,7 +27,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import org.apache.log4j.Logger;
-import org.graylog2.GraylogServer;
+import org.graylog2.Core;
 import org.jboss.netty.buffer.ChannelBuffer;
 import org.jboss.netty.channel.ChannelHandlerContext;
 import org.jboss.netty.channel.ExceptionEvent;
@@ -46,7 +46,7 @@ public class SyslogDispatcher extends SimpleChannelHandler {
 
     private SyslogProcessor processor;
 
-    public SyslogDispatcher(GraylogServer server) {
+    public SyslogDispatcher(Core server) {
         this.processor = new SyslogProcessor(server);
     }
 

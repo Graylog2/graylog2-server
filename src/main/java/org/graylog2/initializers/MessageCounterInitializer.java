@@ -20,7 +20,7 @@
 
 package org.graylog2.initializers;
 
-import org.graylog2.GraylogServer;
+import org.graylog2.Core;
 import org.graylog2.periodical.MessageCountWriterThread;
 
 /**
@@ -28,7 +28,7 @@ import org.graylog2.periodical.MessageCountWriterThread;
  */
 public class MessageCounterInitializer extends SimpleFixedRateScheduleInitializer implements Initializer {
 
-    public MessageCounterInitializer(GraylogServer graylogServer) {
+    public MessageCounterInitializer(Core graylogServer) {
         this.graylogServer = graylogServer;
     }
 

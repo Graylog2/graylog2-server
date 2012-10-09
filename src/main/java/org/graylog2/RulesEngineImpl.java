@@ -20,22 +20,23 @@
 
 package org.graylog2;
 
-import org.graylog2.logmessage.LogMessage;
 import org.apache.log4j.Logger;
 import org.drools.KnowledgeBase;
 import org.drools.KnowledgeBaseFactory;
 import org.drools.builder.*;
 import org.drools.io.ResourceFactory;
 import org.drools.runtime.StatefulKnowledgeSession;
+import org.graylog2.plugin.RulesEngine;
+import org.graylog2.plugin.logmessage.LogMessage;
 
-public final class RulesEngine {
+public final class RulesEngineImpl implements RulesEngine {
 
-    private static final Logger LOG = Logger.getLogger(RulesEngine.class);
+    private static final Logger LOG = Logger.getLogger(RulesEngineImpl.class);
 	
 	private KnowledgeBuilder kbuilder = null;
 	private KnowledgeBase kbase = null;
 	
-	public RulesEngine() {
+	public RulesEngineImpl() {
 		this.kbuilder = KnowledgeBuilderFactory.newKnowledgeBuilder();
 		this.kbase = KnowledgeBaseFactory.newKnowledgeBase();
 	}

@@ -29,6 +29,7 @@ import com.github.joschi.jadconfig.Parameter;
 import com.github.joschi.jadconfig.ValidationException;
 import com.github.joschi.jadconfig.ValidatorMethod;
 import com.github.joschi.jadconfig.converters.StringListConverter;
+import com.github.joschi.jadconfig.validators.FileReadableValidator;
 import com.github.joschi.jadconfig.validators.InetPortValidator;
 import com.github.joschi.jadconfig.validators.PositiveIntegerValidator;
 import com.google.common.collect.Lists;
@@ -88,12 +89,21 @@ public class Configuration {
     @Parameter(value = "output_batch_size", required = true, validator = PositiveIntegerValidator.class)
     private int outputBatchSize = 5000;
 
-    @Parameter(value = "elasticsearch_config_file", required = true, validator = FilePresentValidator.class)
+    @Parameter(value = "elasticsearch_config_file", required = true, validator = FileReadableValidator.class)
     private String elasticSearchConfigFile = "/etc/graylog2-elasticsearch.yml";
 
-    @Parameter(value = "elasticsearch_index_name", required = true)
-    private String elasticsearchIndexName = "graylog2";
+    @Parameter(value = "elasticsearch_index_prefix", required = true)
+    private String elasticsearchIndexPrefix = "graylog2";
+    
+    @Parameter(value = "elasticsearch_max_docs_per_index", validator = PositiveIntegerValidator.class, required = true)
+    private int elasticsearchMaxDocsPerIndex = 80000000;
 
+    @Parameter(value = "message_ttl_days", required = true, validator = PositiveIntegerValidator.class)
+    private int messageTTLDays = 30;
+    
+    @Parameter(value = "message_ttl_freq", required = true, validator = PositiveIntegerValidator.class)
+    private int messageTTLFreq = 30;
+    
     @Parameter(value = "mongodb_user")
     private String mongoUser;
 
@@ -168,6 +178,9 @@ public class Configuration {
 
     @Parameter(value = "graphite_carbon_tcp_port", validator = InetPortValidator.class, required = false)
     private int graphiteCarbonTcpPort = 2003;
+    
+    @Parameter(value = "graphite_prefix", required = false)
+    private String graphitePrefix = "graylog2-server";
 
     @Parameter(value = "enable_libratometrics_output", required = false)
     private boolean enableLibratoMetricsOutput = false;
@@ -189,15 +202,25 @@ public class Configuration {
 
     @Parameter(value = "libratometrics_prefix", required = false)
     private String libratometricsPrefix = "gl2";
-
-    @Parameter(value = "enable_healthcheck_http_api", required = false)
-    private boolean enableHealthCheckHttpApi = false;
     
-    @Parameter(value = "healthcheck_http_api_port", validator = InetPortValidator.class, required = false)
-    private int healthcheckHttpApiPort = 8010;
+    @Parameter(value = "enable_cm_twilio", required = false)
+    private boolean enableCommunicationMethodTwilio = false;
+    
+    @Parameter(value = "twilio_sid", required = false)
+    private String twilioSid = "";
+    
+    @Parameter(value = "twilio_auth_token", required = false)
+    private String twilioAuthToken = "";
+    
+    @Parameter(value = "twilio_sender", required = false)
+    private String twilioSender = "";
     
     public boolean isMaster() {
         return isMaster;
+    }
+    
+    public void setIsMaster(boolean is) {
+        isMaster = is;
     }
     
     public int getSyslogListenPort() {
@@ -264,10 +287,21 @@ public class Configuration {
         return elasticSearchConfigFile;
     }
 
-    public String getElasticSearchIndexName() {
-        return this.elasticsearchIndexName;
+    public String getElasticSearchIndexPrefix() {
+        return this.elasticsearchIndexPrefix;
     }
-
+    
+    public int getElasticSearchMaxDocsPerIndex() {
+        return this.elasticsearchMaxDocsPerIndex;
+    }
+   
+    public int getMessageTTLDays() {
+        return this.messageTTLDays;
+    }
+    
+    public int getMessageTTLFreq() {
+        return this.messageTTLFreq;
+    }
     public boolean isMongoUseAuth() {
         return mongoUseAuth;
     }
@@ -394,6 +428,10 @@ public class Configuration {
     public int getGraphiteCarbonTcpPort() {
         return graphiteCarbonTcpPort;
     }
+    
+    public String getGraphitePrefix() {
+        return graphitePrefix;
+    }
 
     public boolean isEnableLibratoMetricsOutput() {
         return enableLibratoMetricsOutput;
@@ -426,12 +464,20 @@ public class Configuration {
         return libratometricsPrefix;
     }
     
-    public boolean isEnableHealthCheckHttpApi() {
-        return enableHealthCheckHttpApi;
+    public boolean isEnableCommunicationMethodTwilio() {
+        return enableCommunicationMethodTwilio;
     }
-
-    public int getHealthCheckHttpApiPort() {
-        return healthcheckHttpApiPort;
+    
+    public String getTwilioSid() {
+        return twilioSid;
+    }
+    
+    public String getTwilioAuthToken() {
+        return twilioAuthToken;
+    }
+    
+    public String getTwilioSender() {
+        return twilioSender;
     }
     
     @ValidatorMethod

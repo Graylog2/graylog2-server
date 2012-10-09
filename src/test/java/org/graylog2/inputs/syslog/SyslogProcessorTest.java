@@ -21,10 +21,10 @@
 package org.graylog2.inputs.syslog;
 
 import org.graylog2.Tools;
-import org.graylog2.logmessage.LogMessage;
 import java.net.InetAddress;
 import org.graylog2.Configuration;
 import org.graylog2.GraylogServerStub;
+import org.graylog2.plugin.logmessage.LogMessage;
 import org.junit.Test;
 import static org.junit.Assert.*;
 

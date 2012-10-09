@@ -1,5 +1,5 @@
 /**
- * Copyright 2010, 2011 Lennart Koopmann <lennart@socketfeed.com>
+ * Copyright 2010, 2011, 2012 Lennart Koopmann <lennart@socketfeed.com>
  *
  * This file is part of Graylog2.
  *
@@ -28,6 +28,7 @@ import com.mongodb.DB;
 import com.mongodb.DBCollection;
 import com.mongodb.DBObject;
 import java.util.Map;
+import org.graylog2.activities.Activity;
 
 
 /**
@@ -37,8 +38,7 @@ import java.util.Map;
  */
 public class MongoBridge {
 
-    private static final Logger LOG = Logger.getLogger(MongoBridge.class);
-
+    private static final Logger LOG = Logger.getLogger(MongoBridge.class);    
     private MongoConnection connection;
 
     public MongoBridge() {
@@ -115,6 +115,25 @@ public class MongoBridge {
         getConnection().getMessageCountsColl().insert(obj);
     }
 
+    public void writeActivity(Activity activity) {
+        BasicDBObject obj = new BasicDBObject();
+        obj.put("timestamp", Tools.getUTCTimestamp());
+        obj.put("content", activity.getContent());
+        obj.put("caller", activity.getCaller().getCanonicalName());
+        
+        connection.getDatabase().getCollection("server_activities").insert(obj);
+    }
+    
+    public void writeDeflectorInformation(Map<String, Object> info) {
+        DBCollection coll = connection.getDatabase().getCollection("deflector_informations");
+
+        // Delete all entries, we only have one at a time.
+        coll.remove(new BasicDBObject());
+        
+        BasicDBObject obj = new BasicDBObject(info);
+        coll.insert(obj);
+    }
+    
     /**
      * Get a setting from the settings collection.
      *

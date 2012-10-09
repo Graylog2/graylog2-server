@@ -17,22 +17,27 @@
  * along with Graylog2.  If not, see <http://www.gnu.org/licenses/>.
  *
  */
-
-package org.graylog2.filters;
-
-import org.graylog2.GraylogServer;
-import org.graylog2.logmessage.LogMessage;
+package org.graylog2.activities;
 
 /**
  * @author Lennart Koopmann <lennart@socketfeed.com>
  */
-public interface MessageFilter {
-
-    /**
-     * Process a LogMessage
-     *
-     * @return true if this message should not further be handled (for example for blacklisting purposes)
-     */
-    boolean filter(LogMessage msg, GraylogServer server);
+public class Activity {
     
+    String content;
+    Class caller;
+    
+    public Activity(String content, Class caller) {
+        this.content = content;
+        this.caller = caller;
+    }
+    
+    public String getContent() {
+        return content;
+    }
+    
+    public Class getCaller() {
+        return caller;
+    }
+
 }

@@ -21,7 +21,7 @@
 package org.graylog2.initializers;
 
 import java.util.concurrent.TimeUnit;
-import org.graylog2.GraylogServer;
+import org.graylog2.Core;
 
 /**
  * @author Lennart Koopmann <lennart@socketfeed.com>
@@ -30,7 +30,7 @@ public class SimpleFixedRateScheduleInitializer {
 
     protected SimpleFixedRateScheduleInitializer() { /* Nope. No instances desired. Only to be inherited by Initializers if wanted. */ }
 
-    protected GraylogServer graylogServer = null;
+    protected Core graylogServer = null;
 
     public void configureScheduler(Runnable what, int initialDelay, int period) {
         this.graylogServer.getScheduler()

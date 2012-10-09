@@ -21,7 +21,7 @@
 package org.graylog2.forwarders.forwarders;
 
 import org.apache.log4j.Logger;
-import org.graylog2.logmessage.LogMessage;
+import org.graylog2.logmessage.LogMessageImpl;
 import org.graylog2.forwarders.MessageForwarderIF;
 
 /**
@@ -40,7 +40,7 @@ public class UDPSyslogForwarder extends UDPForwarder implements MessageForwarder
         this.setPort(port);
     }
 
-    public boolean forward(LogMessage message) throws MessageForwarderConfigurationException {
+    public boolean forward(LogMessageImpl message) throws MessageForwarderConfigurationException {
         /*if (this.host.isEmpty() || this.port <= 0) {
             throw new MessageForwarderConfigurationException("Host is empty or port is invalid.");
         }

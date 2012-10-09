@@ -31,13 +31,14 @@ import java.io.Writer;
 import org.apache.commons.io.IOUtils;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
+import org.graylog2.activities.Activity;
+import org.graylog2.communicator.methods.TwilioCommunicator;
 import org.graylog2.filters.BlacklistFilter;
 import org.graylog2.filters.CounterUpdateFilter;
 //import org.graylog2.filters.RewriteFilter;
 import org.graylog2.filters.PatternFilter;
 import org.graylog2.filters.StreamMatcherFilter;
 import org.graylog2.filters.TokenizerFilter;
-import org.graylog2.healthchecks.MessageFlowHealthCheck;
 import org.graylog2.initializers.*;
 import org.graylog2.inputs.gelf.GELFTCPInput;
 import org.graylog2.inputs.gelf.GELFUDPInput;
@@ -71,7 +72,7 @@ public final class Main {
         }
 
         if (commandLineArguments.isShowVersion()) {
-            System.out.println("Graylog2 Server " + GraylogServer.GRAYLOG2_VERSION);
+            System.out.println("Graylog2 Server " + Core.GRAYLOG2_VERSION);
             System.out.println("JRE: " + Tools.getSystemInformation());
             System.exit(0);
         }
@@ -83,7 +84,7 @@ public final class Main {
             Logger.getLogger(Main.class.getPackage().getName()).setLevel(Level.ALL);
         }
 
-        LOG.info("Graylog2 " + GraylogServer.GRAYLOG2_VERSION + " starting up. (JRE: " + Tools.getSystemInformation() + ")");
+        LOG.info("Graylog2 " + Core.GRAYLOG2_VERSION + " starting up. (JRE: " + Tools.getSystemInformation() + ")");
 
         String configFile = commandLineArguments.getConfigFile();
         LOG.info("Using config file: " + configFile);
@@ -104,7 +105,7 @@ public final class Main {
 
         // If we only want to check our configuration, we just initialize the rules engine to check if the rules compile
         if (commandLineArguments.isConfigTest()) {
-            GraylogServer server = new GraylogServer();
+            Core server = new Core();
             DroolsInitializer drools = new DroolsInitializer(server, configuration);
             drools.initialize();
             // rules have been checked, exit gracefully
@@ -112,28 +113,49 @@ public final class Main {
         }
 
         // Do not use a PID file if the user requested not to
-        if (!commandLineArguments.isNoPidFile())
+        if (!commandLineArguments.isNoPidFile()) {
             savePidFile(commandLineArguments.getPidFile());
+        }
 
         // Le server object. This is where all the magic happens.
-        GraylogServer server = new GraylogServer();
+        Core server = new Core();
         server.initialize(configuration);
 
-	PatternFilter patternFilter = new PatternFilter(configuration);
-
+        PatternFilter patternFilter = new PatternFilter(configuration);
+        
+        // Could it be that there is another master instance already?
+        if (server.cluster().masterCountExcept(server.getServerId()) != 0) {
+            // All devils here.
+            String what = "Detected other master node in the cluster! Starting as non-master! "
+                    + "This is a mis-configuration you should fix.";
+            LOG.warn(what);
+            server.getActivityWriter().write(new Activity(what, Main.class));
+            
+            configuration.setIsMaster(false);
+        }
+        
+        if (commandLineArguments.isLocal()) {
+            // In local mode, systemstats are sent to localhost for example.
+            LOG.info("Running in local mode");
+            server.setLocalMode(true);
+        }
+        
+        // Register communicator methods.
+        if (configuration.isEnableCommunicationMethodTwilio()) {
+            server.registerCommunicatorMethod(TwilioCommunicator.class);
+        }
+        
         // Register initializers.
         server.registerInitializer(patternFilter);
         server.registerInitializer(new ServerValueWriterInitializer(server, configuration));
         server.registerInitializer(new DroolsInitializer(server, configuration));
         server.registerInitializer(new HostCounterCacheWriterInitializer(server));
         server.registerInitializer(new MessageCounterInitializer(server));
-        server.registerInitializer(new MessageRetentionInitializer(server));
         if (configuration.isEnableGraphiteOutput())       { server.registerInitializer(new GraphiteInitializer(server)); }
         if (configuration.isEnableLibratoMetricsOutput()) { server.registerInitializer(new LibratoMetricsInitializer(server)); }
-        if (configuration.isEnableHealthCheckHttpApi()) {
-            server.registerInitializer(new HealthCheckHTTPServerInitializer(configuration.getHealthCheckHttpApiPort()));
-        }
-
+        server.registerInitializer(new DeflectorThreadsInitializer(server));
+        server.registerInitializer(new AnonymousInformationCollectorInitializer(server));
+        
         // Register inputs.
         if (configuration.isUseGELF()) {
             server.registerInput(new GELFUDPInput());
@@ -154,13 +176,10 @@ public final class Main {
         // Register outputs.
         server.registerOutput(new ElasticSearchOutput());
 
-        // Register health checks.
-        server.registerHealthCheck(new MessageFlowHealthCheck(server));
-
         // Blocks until we shut down.
         server.run();
 
-        LOG.info("Graylog2 " + GraylogServer.GRAYLOG2_VERSION + " exiting.");
+        LOG.info("Graylog2 " + Core.GRAYLOG2_VERSION + " exiting.");
     }
 
     private static void savePidFile(String pidFile) {

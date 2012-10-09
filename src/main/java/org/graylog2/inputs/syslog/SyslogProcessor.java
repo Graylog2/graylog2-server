@@ -30,9 +30,9 @@ import java.util.Date;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 import org.apache.log4j.Logger;
-import org.graylog2.GraylogServer;
+import org.graylog2.Core;
 import org.graylog2.Tools;
-import org.graylog2.logmessage.LogMessage;
+import org.graylog2.logmessage.LogMessageImpl;
 import org.productivity.java.syslog4j.server.impl.event.SyslogServerEvent;
 
 /**
@@ -41,12 +41,12 @@ import org.productivity.java.syslog4j.server.impl.event.SyslogServerEvent;
 public class SyslogProcessor {
 
     private static final Logger LOG = Logger.getLogger(SyslogProcessor.class);
-    private GraylogServer server;
     protected static final Meter incomingMessagesMeter = Metrics.newMeter(SyslogProcessor.class, "IncomingMessages", "messages", TimeUnit.SECONDS);
     protected static final Meter processedMessagesMeter = Metrics.newMeter(SyslogProcessor.class, "ProcessedMessages", "messages", TimeUnit.SECONDS);
     protected static final Timer parsedTimer = Metrics.newTimer(SyslogProcessor.class, "SyslogParsedTime", TimeUnit.MICROSECONDS, TimeUnit.SECONDS);
+    private Core server;
 
-    public SyslogProcessor(GraylogServer server) {
+    public SyslogProcessor(Core server) {
         this.server = server;
     }
 
@@ -54,7 +54,7 @@ public class SyslogProcessor {
         incomingMessagesMeter.mark();
 
         // Convert to LogMessage
-        LogMessage lm;
+        LogMessageImpl lm;
         try {
             lm = parse(msg, remoteAddress);
         } catch (Exception e) {
@@ -80,10 +80,10 @@ public class SyslogProcessor {
         server.getProcessBuffer().insert(lm);
     }
 
-    private LogMessage parse(String msg, InetAddress remoteAddress) throws UnknownHostException {
+    private LogMessageImpl parse(String msg, InetAddress remoteAddress) throws UnknownHostException {
         TimerContext tcx = parsedTimer.time();
 
-        LogMessage lm = new LogMessage();
+        LogMessageImpl lm = new LogMessageImpl();
 
         SyslogServerEvent e = new SyslogServerEvent(msg, remoteAddress);
 

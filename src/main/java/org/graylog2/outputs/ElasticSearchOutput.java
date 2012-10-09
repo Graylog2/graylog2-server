@@ -26,8 +26,8 @@ import com.yammer.metrics.core.Meter;
 import com.yammer.metrics.core.Timer;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
-import org.graylog2.GraylogServer;
-import org.graylog2.logmessage.LogMessage;
+import org.graylog2.Core;
+import org.graylog2.plugin.logmessage.LogMessage;
 
 /**
  * @author Lennart Koopmann <lennart@socketfeed.com>
@@ -38,7 +38,7 @@ public class ElasticSearchOutput implements MessageOutput {
     protected static final Timer processTimer = Metrics.newTimer(ElasticSearchOutput.class, "ProcessTimeMilliseconds", TimeUnit.MILLISECONDS, TimeUnit.SECONDS);
 
     @Override
-    public void write(List<LogMessage> messages, GraylogServer server) throws Exception {
+    public void write(List<LogMessage> messages, Core server) throws Exception {
         messagesMeter.mark();
 
         TimerContext tcx = processTimer.time();

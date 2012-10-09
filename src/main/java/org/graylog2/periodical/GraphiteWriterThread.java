@@ -30,8 +30,8 @@ import java.net.UnknownHostException;
 import java.util.List;
 import org.apache.log4j.Logger;
 import org.graylog2.GraphiteFormatter;
-import org.graylog2.GraylogServer;
-import org.graylog2.MessageCounter;
+import org.graylog2.Core;
+import org.graylog2.plugin.MessageCounter;
 
 /**
  * @author Lennart Koopmann <lennart@socketfeed.com>
@@ -45,13 +45,13 @@ public class GraphiteWriterThread implements Runnable {
     public static final int INITIAL_DELAY = 0;
     public static final int PERIOD = 1;
 
-    private final GraylogServer graylogServer;
+    private final Core graylogServer;
 
     String carbonHost;
     int carbonPort;
     SocketAddress carbonServer;
 
-    public GraphiteWriterThread(GraylogServer graylogServer) {
+    public GraphiteWriterThread(Core graylogServer) {
         this.graylogServer = graylogServer;
 
         carbonHost = graylogServer.getConfiguration().getGraphiteCarbonHost();
@@ -68,7 +68,12 @@ public class GraphiteWriterThread implements Runnable {
 
         MessageCounter counter = this.graylogServer.getMessageCounterManager().get(COUNTER_NAME);
         try {
-            GraphiteFormatter f = new GraphiteFormatter(counter, graylogServer.getServerId());
+            GraphiteFormatter f = new GraphiteFormatter(
+                    counter,
+                    graylogServer.getServerId(),
+                    graylogServer.getConfiguration().getGraphitePrefix()
+            );
+            
             send(f.getAllMetrics());
 
             LOG.debug("Sent message counts to Graphite at <" + carbonHost + ":" + carbonPort + ">.");

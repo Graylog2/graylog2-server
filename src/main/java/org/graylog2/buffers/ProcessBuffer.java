@@ -30,22 +30,25 @@ import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.ThreadPoolExecutor;
-import org.graylog2.GraylogServer;
-import org.graylog2.buffers.processors.ProcessBufferProcessor;
-import org.graylog2.logmessage.LogMessage;
 import org.graylog2.ThreadPool;
+import org.graylog2.Core;
+import org.graylog2.buffers.processors.ProcessBufferProcessor;
+import org.graylog2.plugin.GraylogServer;
+import org.graylog2.plugin.buffers.Buffer;
+import org.graylog2.plugin.logmessage.LogMessage;
 
 /**
  * @author Lennart Koopmann <lennart@socketfeed.com>
  */
-public class ProcessBuffer {
+public class ProcessBuffer implements Buffer {
 
     protected ExecutorService executor = new ThreadPool(ProcessBuffer.class.getName(), 8, 15000*10);
 
     GraylogServer server;
     ProcessBufferProcessor processor;
+    Core server;
 
-    public ProcessBuffer(GraylogServer server) {
+    public ProcessBuffer(Core server) {
         this.server = server;
         this.processor = new ProcessBufferProcessor(this.server);
     }
@@ -53,6 +56,7 @@ public class ProcessBuffer {
     public void initialize() {
     }
     
+    @Override
     public void insert(LogMessage message) {
         final LogMessageEvent event = new LogMessageEvent();
         event.setMessage(message);

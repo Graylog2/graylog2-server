@@ -29,7 +29,6 @@ import org.graylog2.buffers.OutputBuffer;
 import org.graylog2.buffers.ProcessBuffer;
 import org.graylog2.database.MongoBridge;
 import org.graylog2.database.MongoConnection;
-import org.graylog2.filters.MessageFilter;
 import org.graylog2.forwarders.forwarders.LogglyForwarder;
 import org.graylog2.indexer.EmbeddedElasticSearchClient;
 import org.graylog2.initializers.Initializer;
@@ -39,18 +38,33 @@ import org.graylog2.outputs.MessageOutput;
 import org.graylog2.streams.StreamCache;
 
 import com.google.common.collect.Lists;
-import com.yammer.metrics.HealthChecks;
-import com.yammer.metrics.core.HealthCheck;
-import org.graylog2.database.HostCounterCache;
+import org.graylog2.activities.Activity;
+import org.graylog2.activities.ActivityWriter;
+import org.graylog2.cluster.Cluster;
+import org.graylog2.communicator.Communicator;
+import org.graylog2.communicator.methods.CommunicatorMethod;
+import org.graylog2.database.HostCounterCacheImpl;
+import org.graylog2.indexer.Deflector;
+import org.graylog2.plugin.GraylogServer;
+import org.graylog2.plugin.buffers.Buffer;
+import org.graylog2.plugin.filters.MessageFilter;
+import org.graylog2.plugins.PluginLoader;
 
-public class GraylogServer implements Runnable {
+/**
+ * Server core, handling and holding basically everything.
+ * 
+ * (Du kannst das Geraet nicht bremsen, schon garnicht mit bloßen Haenden.)
+ * 
+ * @author Lennart Koopmann <lennart@socketfeed.com>
+ */
+public class Core implements GraylogServer {
 
-    private static final Logger LOG = Logger.getLogger(GraylogServer.class);
+    private static final Logger LOG = Logger.getLogger(Core.class);
 
     private MongoConnection mongoConnection;
     private MongoBridge mongoBridge;
     private Configuration configuration;
-    private RulesEngine rulesEngine;
+    private RulesEngineImpl rulesEngine;
     private ServerValue serverValues;
     private GELFChunkManager gelfChunkManager;
 
@@ -65,19 +79,32 @@ public class GraylogServer implements Runnable {
 
     private EmbeddedElasticSearchClient indexer;
 
-    private HostCounterCache hostCounterCache;
+    private HostCounterCacheImpl hostCounterCache;
 
-    private MessageCounterManager messageCounterManager;
+    private MessageCounterManagerImpl messageCounterManager;
 
+    private Cluster cluster;
+    
     private List<Initializer> initializers = Lists.newArrayList();
     private List<MessageInput> inputs = Lists.newArrayList();
-    private List<MessageFilter> filters = Lists.newArrayList();
-    private List<MessageOutput> outputs = Lists.newArrayList();
-
+    private List<Class<? extends MessageFilter>> filters = Lists.newArrayList();
+    private List<Class<? extends MessageOutput>> outputs = Lists.newArrayList();
+    private List<Class<? extends CommunicatorMethod>> communicatorMethods = Lists.newArrayList();
+    
+    private int loadedFilterPlugins = 0;
+    
     private ProcessBuffer processBuffer;
     private OutputBuffer outputBuffer;
     
+    private Deflector deflector;
+    
+    private ActivityWriter activityWriter;
+    
+    private Communicator communicator;
+    
     private String serverId;
+    
+    private boolean localMode = false;
 
     public void initialize(Configuration configuration) {
         serverId = Tools.generateServerId();
@@ -95,10 +122,20 @@ public class GraylogServer implements Runnable {
         mongoConnection.setThreadsAllowedToBlockMultiplier(configuration.getMongoThreadsAllowedToBlockMultiplier());
         mongoConnection.setReplicaSet(configuration.getMongoReplicaSet());
 
-        messageCounterManager = new MessageCounterManager();
+        mongoBridge = new MongoBridge();
+        mongoBridge.setConnection(mongoConnection); // TODO use dependency injection
+        mongoConnection.connect();
+        
+        cluster = new Cluster(this);
+        
+        communicator = new Communicator(this);
+        
+        activityWriter = new ActivityWriter(mongoBridge, communicator);
+        
+        messageCounterManager = new MessageCounterManagerImpl();
         messageCounterManager.register(MASTER_COUNTER_NAME);
 
-        hostCounterCache = new HostCounterCache();
+        hostCounterCache = new HostCounterCacheImpl();
 
         processBuffer = new ProcessBuffer(this);
         processBuffer.initialize();
@@ -106,15 +143,19 @@ public class GraylogServer implements Runnable {
         outputBuffer = new OutputBuffer(this);
         outputBuffer.initialize();
 
-        mongoBridge = new MongoBridge();
-        mongoBridge.setConnection(mongoConnection); // TODO use dependency injection
-
         gelfChunkManager = new GELFChunkManager(this);
 
         indexer = new EmbeddedElasticSearchClient(this);
         serverValues = new ServerValue(this);
+                
+        Runtime.getRuntime().addShutdownHook(new Thread() {
+            @Override
+            public void run() {
+                activityWriter.write(new Activity("Shutting down.", GraylogServer.class));
+            }
+        });
     }
-
+    
     public void registerInitializer(Initializer initializer) {
         if (initializer.masterOnly() && !this.isMaster()) {
             LOG.info("Not registering initializer " + initializer.getClass().getSimpleName()
@@ -138,32 +179,24 @@ public class GraylogServer implements Runnable {
         this.outputs.add(output);
     }
 
-    public void registerHealthCheck(HealthCheck check) {
-        HealthChecks.register(check);
+    public <T extends CommunicatorMethod> void registerCommunicatorMethod(Class<T> klazz) {
+        this.communicatorMethods.add(klazz);
     }
 
     @Override
     public void run() {
 
         // initiate the mongodb connection, this might fail but it will retry to establish the connection
-        mongoConnection.connect();
         gelfChunkManager.start();
         BlacklistCache.initialize(this);
         StreamCache.initialize(this);
-
-        if (indexer.indexExists(indexer.getMainIndexName())) {
-            LOG.info("Main index exists. Not creating it.");
-        } else {
-            LOG.info("Main index does not exist! Trying to create it ...");
-            if (indexer.createIndex()) {
-                LOG.info("Successfully created main index.");
-            } else {
-                LOG.fatal("Could not create main index. Terminating.");
-                System.exit(1);
-            }
-        }
         
-        // XXX TODO lol code duplication. make this smart.
+        // Set up deflector.
+        LOG.info("Setting up deflector.");
+        deflector = new Deflector(this);
+        deflector.setUp();
+        
+        // Set up recent index.
         if (indexer.indexExists(EmbeddedElasticSearchClient.RECENT_INDEX_NAME)) {
             LOG.info("Recent index exists. Not creating it.");
         } else {
@@ -182,6 +215,8 @@ public class GraylogServer implements Runnable {
 
         scheduler = Executors.newScheduledThreadPool(SCHEDULED_THREADS_POOL_SIZE);
 
+        loadPlugins();
+        
         // Call all registered initializers.
         for (Initializer initializer : this.initializers) {
             initializer.initialize();
@@ -194,12 +229,22 @@ public class GraylogServer implements Runnable {
             LOG.debug("Initialized input: " + input.getName());
         }
 
+        activityWriter.write(new Activity("Started up.", GraylogServer.class));
         LOG.info("Graylog2 up and running.");
 
         while (true) {
             try { Thread.sleep(1000); } catch (InterruptedException e) { /* lol, i don't care */ }
         }
 
+    }
+    
+    private void loadPlugins() {
+        PluginLoader pl = new PluginLoader("plugin");
+        for (Class<? extends MessageFilter> filter : pl.loadFilterPlugins()) {
+            LOG.info("Registering plugin filter [" + filter.getSimpleName() + "].");
+            registerFilter(filter);
+            this.loadedFilterPlugins += 1;
+        }
     }
 
     public MongoConnection getMongoConnection() {
@@ -218,11 +263,11 @@ public class GraylogServer implements Runnable {
         return configuration;
     }
 
-    public void setRulesEngine(RulesEngine engine) {
+    public void setRulesEngine(RulesEngineImpl engine) {
         rulesEngine = engine;
     }
 
-    public RulesEngine getRulesEngine() {
+    public RulesEngineImpl getRulesEngine() {
         return rulesEngine;
     }
 
@@ -238,11 +283,13 @@ public class GraylogServer implements Runnable {
         return this.gelfChunkManager;
     }
 
-    public ProcessBuffer getProcessBuffer() {
+    @Override
+    public Buffer getProcessBuffer() {
         return this.processBuffer;
     }
 
-    public OutputBuffer getOutputBuffer() {
+    @Override
+    public Buffer getOutputBuffer() {
         return this.outputBuffer;
     }
 
@@ -254,28 +301,50 @@ public class GraylogServer implements Runnable {
         return this.outputs;
     }
 
-    public MessageCounterManager getMessageCounterManager() {
+    public List<Class<? extends CommunicatorMethod>> getCommunicatorMethods() {
+        return this.communicatorMethods;
+    }
+    
+    public MessageCounterManagerImpl getMessageCounterManager() {
         return this.messageCounterManager;
     }
 
-    public HostCounterCache getHostCounterCache() {
+    public HostCounterCacheImpl getHostCounterCache() {
         return this.hostCounterCache;
     }
     
-    public int getLastReceivedMessageTimestamp() {
-        return this.lastReceivedMessageTimestamp;
+    public Deflector getDeflector() {
+        return this.deflector;
     }
     
-    public void setLastReceivedMessageTimestamp(int t) {
-        this.lastReceivedMessageTimestamp = t;
+    public Cluster cluster() {
+        return this.cluster;
     }
     
+    public ActivityWriter getActivityWriter() {
+        return this.activityWriter;
+    }
+    
+    @Override
     public boolean isMaster() {
         return this.configuration.isMaster();
     }
     
+    @Override
     public String getServerId() {
         return this.serverId;
+    }
+    
+    public int getLoadedFilterPlugins() {
+        return this.loadedFilterPlugins;
+    }
+    
+    public void setLocalMode(boolean mode) {
+        this.localMode = mode;
+    }
+   
+    public boolean isLocalMode() {
+        return localMode;
     }
 
 }

@@ -35,7 +35,7 @@ public class LibratoMetricsFormatterTest {
 
     @Test
     public void testAsJson() {
-        MessageCounter counter = new MessageCounter();
+        MessageCounterImpl counter = new MessageCounterImpl();
 
         // Total: 2
         counter.incrementTotal();
@@ -74,7 +74,7 @@ public class LibratoMetricsFormatterTest {
 
     @Test
     public void testAsJsonWithEmptyCounter() {
-        MessageCounter counter = new MessageCounter();
+        MessageCounterImpl counter = new MessageCounterImpl();
         LibratoMetricsFormatter f = new LibratoMetricsFormatter(counter, "gl2", new ArrayList<String>(), "");
 
         Map<String, Map<String,Object>> gauges = parseGauges(f.asJson());
@@ -85,7 +85,7 @@ public class LibratoMetricsFormatterTest {
 
     @Test
     public void testAsJsonWithConfiguredStreamFilter() {
-        MessageCounter counter = new MessageCounter();
+        MessageCounterImpl counter = new MessageCounterImpl();
 
         // Total: 2
         counter.incrementTotal();
@@ -132,7 +132,7 @@ public class LibratoMetricsFormatterTest {
 
     @Test
     public void testAsJsonWithConfiguredHostFilter() {
-        MessageCounter counter = new MessageCounter();
+        MessageCounterImpl counter = new MessageCounterImpl();
 
         // Total: 2
         counter.incrementTotal();
@@ -175,7 +175,7 @@ public class LibratoMetricsFormatterTest {
 
     @Test
     public void testAsJsonAccountsPrefix() {
-        MessageCounter counter = new MessageCounter();
+        MessageCounterImpl counter = new MessageCounterImpl();
         LibratoMetricsFormatter f = new LibratoMetricsFormatter(counter, "LOLSOMEPREFIX", new ArrayList<String>(), "");
 
         Map<String, Map<String,Object>> gauges = parseGauges(f.asJson());

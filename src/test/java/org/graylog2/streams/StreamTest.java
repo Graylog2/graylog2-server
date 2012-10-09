@@ -40,12 +40,12 @@ public class StreamTest {
     public void testGetStreamRules() {
         BasicDBObject mongoRule1 = new BasicDBObject();
         mongoRule1.put("_id", new ObjectId());
-        mongoRule1.put("rule_type", StreamRule.TYPE_HOST);
+        mongoRule1.put("rule_type", StreamRuleImpl.TYPE_HOST);
         mongoRule1.put("value", "example.org");
 
         BasicDBObject mongoRule2 = new BasicDBObject();
         mongoRule2.put("_id", new ObjectId());
-        mongoRule2.put("rule_type", StreamRule.TYPE_SEVERITY);
+        mongoRule2.put("rule_type", StreamRuleImpl.TYPE_SEVERITY);
         mongoRule2.put("value", "2");
 
         BasicDBList rules = new BasicDBList();
@@ -55,14 +55,14 @@ public class StreamTest {
         BasicDBObject mongo = this.buildMongoStream();
         mongo.put("streamrules", rules);
 
-        Stream stream = new Stream(mongo);
+        StreamImpl stream = new StreamImpl(mongo);
 
         assertEquals(2, stream.getStreamRules().size());
 
-        assertEquals(StreamRule.TYPE_HOST, stream.getStreamRules().get(0).getRuleType());
+        assertEquals(StreamRuleImpl.TYPE_HOST, stream.getStreamRules().get(0).getRuleType());
         assertEquals("example.org", stream.getStreamRules().get(0).getValue());
 
-        assertEquals(StreamRule.TYPE_SEVERITY, stream.getStreamRules().get(1).getRuleType());
+        assertEquals(StreamRuleImpl.TYPE_SEVERITY, stream.getStreamRules().get(1).getRuleType());
         assertEquals("2", stream.getStreamRules().get(1).getValue());
     }
 
@@ -71,7 +71,7 @@ public class StreamTest {
         BasicDBObject mongo = this.buildMongoStream();
         mongo.put("streamrules", null);
 
-        Stream stream = new Stream(mongo);
+        StreamImpl stream = new StreamImpl(mongo);
 
         assertEquals(0, stream.getStreamRules().size());
 
@@ -81,14 +81,14 @@ public class StreamTest {
     @Test
     public void testGetId() {
         BasicDBObject mongo = this.buildMongoStream();
-        Stream stream = new Stream(mongo);
+        StreamImpl stream = new StreamImpl(mongo);
 
         assertEquals(mongo.get("_id"), stream.getId());
     }
 
     @Test
     public void testGetTitle() {
-        Stream stream = new Stream(this.buildMongoStream());
+        StreamImpl stream = new StreamImpl(this.buildMongoStream());
 
         assertEquals("foo", stream.getTitle());
     }

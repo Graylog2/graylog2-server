@@ -23,7 +23,7 @@ package org.graylog2.inputs.gelf;
 import com.yammer.metrics.Metrics;
 import java.util.concurrent.TimeUnit;
 import org.apache.log4j.Logger;
-import org.graylog2.GraylogServer;
+import org.graylog2.Core;
 import org.jboss.netty.buffer.ChannelBuffer;
 import org.jboss.netty.channel.ChannelHandlerContext;
 import org.jboss.netty.channel.ExceptionEvent;
@@ -38,9 +38,9 @@ public class GELFDispatcher extends SimpleChannelHandler {
     private static final Logger LOG = Logger.getLogger(GELFDispatcher.class);
 
     private GELFProcessor processor;
-    private GraylogServer server;
+    private Core server;
 
-    public GELFDispatcher(GraylogServer server) {
+    public GELFDispatcher(Core server) {
         this.server = server;
         this.processor = new GELFProcessor(server);
     }

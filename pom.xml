@@ -11,6 +11,7 @@
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <metrics.version>2.1.2</metrics.version>
     </properties>
 
     <repositories>
@@ -88,7 +89,7 @@
         <dependency>
             <groupId>com.github.joschi</groupId>
             <artifactId>jadconfig</artifactId>
-            <version>0.3</version>
+            <version>0.4</version>
         </dependency>
         <dependency>
             <groupId>org.slf4j</groupId>
@@ -98,7 +99,7 @@
         <dependency>
         	<groupId>org.elasticsearch</groupId>
         	<artifactId>elasticsearch</artifactId>
-        	<version>0.19.0</version>
+        	<version>0.19.9</version>
         </dependency>
         <dependency>
             <groupId>io.netty</groupId>
@@ -111,11 +112,6 @@
             <version>3.1</version>
         </dependency>
         <dependency>
-            <groupId>com.googlecode.disruptor</groupId>
-            <artifactId>disruptor</artifactId>
-            <version>2.9</version>
-        </dependency>
-        <dependency>
             <groupId>org.jmock</groupId>
             <artifactId>jmock</artifactId>
             <version>2.5.1</version>
@@ -124,12 +120,28 @@
         <dependency>
             <groupId>com.yammer.metrics</groupId>
             <artifactId>metrics-core</artifactId>
-            <version>2.1.2</version>
+            <version>${metrics.version}</version>
         </dependency>
         <dependency>
             <groupId>com.yammer.metrics</groupId>
             <artifactId>metrics-graphite</artifactId>
-            <version>2.1.2</version>
+            <version>${metrics.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.twilio.sdk</groupId>
+            <artifactId>twilio-java-sdk</artifactId>
+            <version>3.3.9</version>
+            <classifier>jar-with-dependencies</classifier>
+        </dependency>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>graylog2-plugin</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.googlecode.disruptor</groupId>
+            <artifactId>disruptor</artifactId>
+            <version>2.10.3</version>
         </dependency>
     </dependencies>
 

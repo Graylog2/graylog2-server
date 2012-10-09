@@ -27,10 +27,11 @@ import com.yammer.metrics.core.Timer;
 import com.yammer.metrics.core.TimerContext;
 import java.util.concurrent.TimeUnit;
 import org.apache.log4j.Logger;
-import org.graylog2.GraylogServer;
+import org.graylog2.Core;
 import org.graylog2.buffers.LogMessageEvent;
-import org.graylog2.filters.MessageFilter;
-import org.graylog2.logmessage.LogMessage;
+import org.graylog2.logmessage.LogMessageImpl;
+import org.graylog2.plugin.filters.MessageFilter;
+import org.graylog2.plugin.logmessage.LogMessage;
 
 /**
  * @author Lennart Koopmann <lennart@socketfeed.com>
@@ -44,9 +45,9 @@ public class ProcessBufferProcessor implements EventHandler<LogMessageEvent> {
     protected static final Meter filteredOutMessagesMeter = Metrics.newMeter(ProcessBufferProcessor.class, "FilteredOutMessages", "messages", TimeUnit.SECONDS);
     protected static final Timer processTimer = Metrics.newTimer(ProcessBufferProcessor.class, "ProcessTime", TimeUnit.MICROSECONDS, TimeUnit.SECONDS);
 
-    private GraylogServer server;
+    private Core server;
 
-    public ProcessBufferProcessor(GraylogServer server) {
+    public ProcessBufferProcessor(Core server) {
         this.server = server;
     }
 
@@ -66,7 +67,8 @@ public class ProcessBufferProcessor implements EventHandler<LogMessageEvent> {
                     LOG.trace("Applying filter [" + filter.getClass().getSimpleName() +"] on message <" + msg.getId() + ">.");
                 }
 
-                if (filter.filter(msg, server)) {
+                filter.filter(msg, server);
+                if (filter.discard()) {
                     if (LOG.isTraceEnabled()) {
                         LOG.trace("Filter [" + filter.getClass().getSimpleName() + "] marked message <" + msg.getId() + "> to be discarded. Dropping message.");
                     }
