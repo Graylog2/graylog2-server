@@ -60,10 +60,6 @@ public class ServerValue {
     public void writeThroughput(int current, int highest) {
         graylogServer.getMongoBridge().writeThroughput(graylogServer.getServerId(), current, highest);
     }
-
-    public void writeMessageRetentionLastPerformed(int when) {
-        set("message_retention_last_performed", when);
-    }
     
     public void setIsMaster(boolean isIt) {
         set("is_master", isIt);

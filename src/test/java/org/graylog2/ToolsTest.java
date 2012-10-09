@@ -24,15 +24,16 @@
 
 package org.graylog2;
 
+import com.google.common.collect.Lists;
+import com.google.common.collect.Sets;
 import org.junit.Test;
 
 import java.io.ByteArrayOutputStream;
 import java.io.EOFException;
 import java.io.IOException;
-import java.net.InetSocketAddress;
-import java.net.SocketAddress;
-import java.net.UnknownHostException;
 import java.util.Calendar;
+import java.util.List;
+import java.util.Set;
 import java.util.zip.Deflater;
 import java.util.zip.GZIPOutputStream;
 
@@ -153,5 +154,26 @@ public class ToolsTest {
         
         assertTrue(id.startsWith(Tools.getLocalHostname() + "-"));
         assertTrue(id.length() > (Tools.getLocalHostname() + "-").length());
+    }
+    
+    @Test
+    public void testAsSortedList() {
+        Set sortMe = Sets.newHashSet();
+        sortMe.add("graylog2_production_1");
+        sortMe.add("graylog2_production_7");
+        sortMe.add("graylog2_production_0");
+        sortMe.add("graylog2_production_2");
+        sortMe.add("graylog2_production_3");
+        sortMe.add("graylog2_production_5");
+        
+        List expected = Lists.newArrayList();
+        expected.add("graylog2_production_0");
+        expected.add("graylog2_production_1");
+        expected.add("graylog2_production_2");
+        expected.add("graylog2_production_3");
+        expected.add("graylog2_production_5");
+        expected.add("graylog2_production_7");
+        
+        assertEquals(expected, Tools.asSortedList(sortMe));
     }
 }

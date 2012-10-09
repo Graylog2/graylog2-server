@@ -85,6 +85,9 @@ public class Configuration {
 
     @Parameter(value = "no_retention")
     private boolean noRetention;
+    
+    @Parameter(value = "elasticsearch_max_number_of_indices", required = true, validator = PositiveIntegerValidator.class)
+    private int maxNumberOfIndices = 20;
 
     @Parameter(value = "output_batch_size", required = true, validator = PositiveIntegerValidator.class)
     private int outputBatchSize = 5000;
@@ -97,12 +100,6 @@ public class Configuration {
     
     @Parameter(value = "elasticsearch_max_docs_per_index", validator = PositiveIntegerValidator.class, required = true)
     private int elasticsearchMaxDocsPerIndex = 80000000;
-
-    @Parameter(value = "message_ttl_days", required = true, validator = PositiveIntegerValidator.class)
-    private int messageTTLDays = 30;
-    
-    @Parameter(value = "message_ttl_freq", required = true, validator = PositiveIntegerValidator.class)
-    private int messageTTLFreq = 30;
     
     @Parameter(value = "mongodb_user")
     private String mongoUser;
@@ -271,9 +268,13 @@ public class Configuration {
         }
         return recentIndexStoreType;
     }
-    
+
     public boolean performRetention() {
         return !noRetention;
+    }
+    
+    public int getMaxNumberOfIndices() {
+        return maxNumberOfIndices;
     }
 
     public int getOutputBatchSize() {
@@ -292,13 +293,6 @@ public class Configuration {
         return this.elasticsearchMaxDocsPerIndex;
     }
    
-    public int getMessageTTLDays() {
-        return this.messageTTLDays;
-    }
-    
-    public int getMessageTTLFreq() {
-        return this.messageTTLFreq;
-    }
     public boolean isMongoUseAuth() {
         return mongoUseAuth;
     }
