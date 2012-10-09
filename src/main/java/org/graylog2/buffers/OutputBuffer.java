@@ -29,13 +29,14 @@ import java.util.concurrent.ThreadPoolExecutor;
 import org.graylog2.GraylogServer;
 import org.graylog2.buffers.processors.OutputBufferProcessor;
 import org.graylog2.logmessage.LogMessage;
+import org.graylog2.ThreadPool;
 
 /**
  * @author Lennart Koopmann <lennart@socketfeed.com>
  */
 public class OutputBuffer {
 
-    protected ExecutorService executor = Executors.newCachedThreadPool();
+    protected ExecutorService executor = new ThreadPool(OutputBuffer.class.getName(), 16, 15000*10);
 
     GraylogServer server;
     OutputBufferProcessor processor;

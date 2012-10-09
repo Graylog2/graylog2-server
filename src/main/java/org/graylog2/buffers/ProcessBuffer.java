@@ -33,13 +33,14 @@ import java.util.concurrent.ThreadPoolExecutor;
 import org.graylog2.GraylogServer;
 import org.graylog2.buffers.processors.ProcessBufferProcessor;
 import org.graylog2.logmessage.LogMessage;
+import org.graylog2.ThreadPool;
 
 /**
  * @author Lennart Koopmann <lennart@socketfeed.com>
  */
 public class ProcessBuffer {
 
-    protected ExecutorService executor = Executors.newCachedThreadPool();
+    protected ExecutorService executor = new ThreadPool(ProcessBuffer.class.getName(), 8, 15000*10);
 
     GraylogServer server;
     ProcessBufferProcessor processor;
