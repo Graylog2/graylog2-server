@@ -1,0 +1,31 @@
+<div id="first-login-modal" style="display: none;">
+	<h2>Hey, this is the first login to your Graylog2 instance.</h2>
+	<strong>If you have any problems or questions, please consult the
+	<%= link_to "support pages", "http://www.graylog2.org/support" %>.</strong>
+
+	<div id="first-login-usage-information">
+		It would be really great if you would allow us to <span class="highlighted">collect anonymous
+		usage statistics</span>. It will not include any ID, and not transfer any sensible
+		information. We will only collect information like the total number of messages
+		you are managing, the number of streams you have configured or how many
+		ElasticSearch clusters are in your cluster. Your graylog2-server master instance will
+		send this information periodically. You can see which information is transferred
+		directly in the source code on GitHub:
+		<%= link_to "AnonymousInformationCollector.java", "https://github.com/Graylog2/graylog2-server/blob/develop/src/main/java/org/graylog2/systeminformation/AnonymousInformationCollector.java", :target => "_blank" %> <em>(Use the git tags to see the code of the version you are using [<%= GRAYLOG2_VERSION %>])</em>
+	</div>
+
+	<br />
+	<%= form_tag (allow_usage_stats_systemsettings_path) do %>
+		<%= check_box_tag :allow, :allow %>
+		<%= label_tag :allow, "Allow sending anonymous usage statistics" %>
+		<br />
+		(This would really help us and you can change your mind in the settings at any time.)
+		<%= hidden_field_tag :back_to_overview %>
+
+		<br /><br />
+		<%= awesome_submit_link "Let's start logging" %>
+	<% end %>
+</div>
+<script type="text/javascript">
+	$("#first-login-modal").modal({ close:false });
+</script>
