@@ -48,10 +48,10 @@ public class Configuration {
 
     @Parameter(value = "is_master", required = true)
     private boolean isMaster = true;
-    
+
     @Parameter(value = "syslog_listen_port", required = true, validator = InetPortValidator.class)
     private int syslogListenPort = 514;
-    
+
     @Parameter(value = "syslog_listen_address")
     private String syslogListenAddress = "0.0.0.0";
 
@@ -60,13 +60,13 @@ public class Configuration {
 
     @Parameter(value = "syslog_enable_tcp", required = true)
     private boolean syslogEnableTcp = false;
-    
+
     @Parameter(value = "syslog_use_nul_delimiter", required = false)
     private boolean syslogUseNulDelimiter = false;
-    
+
     @Parameter(value = "syslog_store_full_message", required = false)
     private boolean syslogStoreFullMessage = true;
-    
+
     @Parameter(value = "force_syslog_rdns", required = true)
     private boolean forceSyslogRdns = false;
 
@@ -75,10 +75,10 @@ public class Configuration {
 
     @Parameter(value = "allow_override_syslog_date", required = true)
     private boolean allowOverrideSyslogDate = true;
-    
+
     @Parameter(value = "recent_index_ttl_minutes", required = true, validator = PositiveIntegerValidator.class)
     private int recentIndexTtlMinutes = 60;
-    
+
     @Parameter(value = "recent_index_store_type")
     private String recentIndexStoreType = EmbeddedElasticSearchClient.STANDARD_RECENT_INDEX_STORE_TYPE;
 
@@ -93,16 +93,16 @@ public class Configuration {
 
     @Parameter(value = "elasticsearch_index_prefix", required = true)
     private String elasticsearchIndexPrefix = "graylog2";
-    
+
     @Parameter(value = "elasticsearch_max_docs_per_index", validator = PositiveIntegerValidator.class, required = true)
     private int elasticsearchMaxDocsPerIndex = 80000000;
 
     @Parameter(value = "message_ttl_days", required = true, validator = PositiveIntegerValidator.class)
     private int messageTTLDays = 30;
-    
+
     @Parameter(value = "message_ttl_freq", required = true, validator = PositiveIntegerValidator.class)
     private int messageTTLFreq = 30;
-    
+
     @Parameter(value = "mongodb_user")
     private String mongoUser;
 
@@ -157,6 +157,27 @@ public class Configuration {
     @Parameter("amqp_virtualhost")
     private String amqpVirtualhost = "/";
 
+    @Parameter("scribe_enabled")
+    private boolean scribeEnabled = false;
+
+    @Parameter(value = "scribe_port", validator = InetPortValidator.class)
+    private int scribePort = 5672;
+
+    @Parameter("scribe_host")
+    private String scribeHost = "localhost";
+
+    @Parameter(value = "scribe_rpc_timeout", validator = PositiveIntegerValidator.class)
+    private int scribeRpcTimeout = 15000;
+
+    @Parameter(value = "scribe_thrift_length", validator = PositiveIntegerValidator.class)
+    private int scribeThriftLength = 150000;
+
+    @Parameter(value = "scribe_min_threads", validator = PositiveIntegerValidator.class)
+    private int scribeMinThreads = 5;
+
+    @Parameter(value = "scribe_max_threads", validator = PositiveIntegerValidator.class)
+    private int scribeMaxThreads = 10;
+
     @Parameter(value = "forwarder_loggly_timeout", validator = PositiveIntegerValidator.class)
     private int forwarderLogglyTimeout = 3;
 
@@ -174,7 +195,7 @@ public class Configuration {
 
     @Parameter(value = "graphite_carbon_tcp_port", validator = InetPortValidator.class, required = false)
     private int graphiteCarbonTcpPort = 2003;
-    
+
     @Parameter(value = "graphite_prefix", required = false)
     private String graphitePrefix = "graylog2-server";
 
@@ -198,23 +219,23 @@ public class Configuration {
 
     @Parameter(value = "libratometrics_prefix", required = false)
     private String libratometricsPrefix = "gl2";
-    
+
     @Parameter(value = "enable_cm_twilio", required = false)
     private boolean enableCommunicationMethodTwilio = false;
-    
+
     @Parameter(value = "twilio_sid", required = false)
     private String twilioSid = "";
-    
+
     @Parameter(value = "twilio_auth_token", required = false)
     private String twilioAuthToken = "";
-    
+
     @Parameter(value = "twilio_sender", required = false)
     private String twilioSender = "";
-    
+
     public boolean isMaster() {
         return isMaster;
     }
-    
+
     public int getSyslogListenPort() {
         return syslogListenPort;
     }
@@ -226,19 +247,19 @@ public class Configuration {
     public boolean isSyslogUdpEnabled() {
         return syslogEnableUdp;
     }
-    
+
     public boolean isSyslogTcpEnabled() {
         return syslogEnableTcp;
     }
-    
+
     public boolean isSyslogUseNulDelimiterEnabled() {
         return syslogUseNulDelimiter;
     }
-    
+
     public boolean isSyslogStoreFullMessageEnabled() {
         return syslogStoreFullMessage;
     }
-    
+
     public void setISyslogStoreFullMessageEnabled(boolean b) {
         syslogStoreFullMessage = b;
     }
@@ -254,11 +275,11 @@ public class Configuration {
     public boolean getAllowOverrideSyslogDate() {
         return allowOverrideSyslogDate;
     }
-    
+
     public int getRecentIndexTtlMinutes() {
         return recentIndexTtlMinutes;
     }
-    
+
     public String getRecentIndexStoreType() {
         if (!EmbeddedElasticSearchClient.ALLOWED_RECENT_INDEX_STORE_TYPES.contains(recentIndexStoreType)) {
             LOG.error("Invalid recent index store type configured. Falling back to <" + EmbeddedElasticSearchClient.STANDARD_RECENT_INDEX_STORE_TYPE + ">");
@@ -266,7 +287,7 @@ public class Configuration {
         }
         return recentIndexStoreType;
     }
-    
+
     public boolean performRetention() {
         return !noRetention;
     }
@@ -282,15 +303,15 @@ public class Configuration {
     public String getElasticSearchIndexPrefix() {
         return this.elasticsearchIndexPrefix;
     }
-    
+
     public int getElasticSearchMaxDocsPerIndex() {
         return this.elasticsearchMaxDocsPerIndex;
     }
-   
+
     public int getMessageTTLDays() {
         return this.messageTTLDays;
     }
-    
+
     public int getMessageTTLFreq() {
         return this.messageTTLFreq;
     }
@@ -416,7 +437,7 @@ public class Configuration {
     public int getGraphiteCarbonTcpPort() {
         return graphiteCarbonTcpPort;
     }
-    
+
     public String getGraphitePrefix() {
         return graphitePrefix;
     }
@@ -451,23 +472,51 @@ public class Configuration {
     public String getLibratoMetricsPrefix() {
         return libratometricsPrefix;
     }
-    
+
     public boolean isEnableCommunicationMethodTwilio() {
         return enableCommunicationMethodTwilio;
     }
-    
+
     public String getTwilioSid() {
         return twilioSid;
     }
-    
+
     public String getTwilioAuthToken() {
         return twilioAuthToken;
     }
-    
+
     public String getTwilioSender() {
         return twilioSender;
     }
-    
+
+    public boolean isScribeEnabled() {
+        return scribeEnabled;
+    }
+
+    public String getScribeHost() {
+        return scribeHost;
+    }
+
+    public int getScribePort() {
+        return scribePort;
+    }
+
+    public int getScribeRPCTimeout() {
+        return scribeRpcTimeout;
+    }
+
+    public int getScribeThriftLength() {
+        return scribeThriftLength;
+    }
+
+    public int getScribeMinThreads() {
+        return scribeMinThreads;
+    }
+
+    public int getScribeMaxThreads() {
+        return scribeMaxThreads;
+    }
+
     @ValidatorMethod
     public void validate() throws ValidationException {
 

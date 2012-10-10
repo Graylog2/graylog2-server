@@ -40,6 +40,7 @@ import org.graylog2.filters.TokenizerFilter;
 import org.graylog2.initializers.*;
 import org.graylog2.inputs.gelf.GELFTCPInput;
 import org.graylog2.inputs.gelf.GELFUDPInput;
+import org.graylog2.inputs.scribe.ScribeServer;
 import org.graylog2.inputs.syslog.SyslogTCPInput;
 import org.graylog2.inputs.syslog.SyslogUDPInput;
 import org.graylog2.outputs.ElasticSearchOutput;
@@ -153,6 +154,10 @@ public final class Main {
         // Register outputs.
         server.registerOutput(ElasticSearchOutput.class);
 
+        // Initialize Scribe if enabled
+        if (configuration.isScribeEnabled()) {
+            initializeScribe(configuration, server);
+        }
         // Blocks until we shut down.
         server.run();
 
@@ -179,6 +184,21 @@ public final class Main {
             // make sure to remove our pid when we exit
             new File(pidFile).deleteOnExit();
         }
+    }
+
+    private static void initializeScribe(Configuration configuration, GraylogServer server) {
+        // Start up the scribe server
+        ScribeServer scribeServer = new ScribeServer(
+                server,
+                configuration.getScribeHost(),
+                configuration.getScribePort(),
+                configuration.getScribeRPCTimeout(),
+                configuration.getScribeThriftLength(),
+                configuration.getScribeMinThreads(),
+                configuration.getScribeMaxThreads()
+        );
+        scribeServer.run();
+        LOG.info("Scribe server started.");
     }
 
 }
