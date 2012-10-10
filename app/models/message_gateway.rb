@@ -26,27 +26,29 @@ class MessageGateway
   include Mongoid::Document
 
   # used if not set in config
-  DEFAULT_INDEX_NAME = "graylog2"
+  DEFAULT_INDEX_PREFIX = "graylog2"
   DEFAULT_RECENT_INDEX_NAME = "graylog2_recent"
 
   # XXX ELASTIC: sucks.
   if Rails.env == "test"
-    INDEX_NAME = "graylog2_test"
+    ALL_INDICES_ALIAS = "graylog2_test"
     RECENT_INDEX_NAME = "graylog2_recent_test"
   else
-    config_index = Configuration.indexer_index_prefix + "_*"
-    config_index.blank? ? INDEX_NAME = DEFAULT_INDEX_NAME : INDEX_NAME = config_index
-
+    indices_prefix = Configuration.indexer_index_prefix.blank? ? DEFAULT_INDEX_PREFIX : Configuration.indexer_index_prefix
     config_recent_index = Configuration.indexer_recent_index_name
     config_recent_index.blank? ? RECENT_INDEX_NAME = DEFAULT_RECENT_INDEX_NAME : RECENT_INDEX_NAME = config_recent_index
+
+    # Wildcard Multi Index Syntax
+    # http://www.elasticsearch.org/blog/2012/07/02/0.19.8-released.html
+    ALL_INDICES_ALIAS = "#{indices_prefix}_*,-#{RECENT_INDEX_NAME}"
   end
 
   TYPE_NAME = "message"
 
-  index_name(INDEX_NAME)
+  index_name(ALL_INDICES_ALIAS)
   document_type(TYPE_NAME)
 
-  @index = Tire.index(INDEX_NAME)
+  @index = Tire.index(ALL_INDICES_ALIAS)
   @default_query_options = { :sort => "created_at desc" }
 
   def self.all_paginated(page = 1, opts = {})
@@ -76,7 +78,7 @@ class MessageGateway
 
   def self.dynamic_search(what, with_default_query_options = false)
     what = what.merge({:sort => { :created_at => :desc }}) if with_default_query_options
-    wrap Tire.search(INDEX_NAME, what)
+    wrap Tire.search(ALL_INDICES_ALIAS, what)
   end
 
   def self.dynamic_distribution(target, query)
@@ -92,7 +94,7 @@ class MessageGateway
       }
     }
 
-    r = Tire.search(INDEX_NAME, query)
+    r = Tire.search(ALL_INDICES_ALIAS, query)
 
     # [{"term"=>"baz.example.org", "count"=>4}, {"term"=>"bar.example.com", "count"=>3}]
     r.facets["distribution_result"]["terms"].each do |r|
@@ -200,7 +202,7 @@ class MessageGateway
   end
 
   def self.oldest_message
-    index_name(INDEX_NAME)  # just to make sure
+    index_name(ALL_INDICES_ALIAS)  # just to make sure
     r = search({ :sort => "created_at asc", :size => 1 }) do
       query { all }
     end.first
@@ -236,8 +238,8 @@ class MessageGateway
   end
 
   def self.delete_message(id)
-    result = Tire.index(INDEX_NAME).remove(TYPE_NAME, id)
-    Tire.index(INDEX_NAME).refresh
+    result = Tire.index(ALL_INDICES_ALIAS).remove(TYPE_NAME, id)
+    Tire.index(ALL_INDICES_ALIAS).refresh
     return false if result.nil? or result["ok"] != true
 
     return true
@@ -281,7 +283,7 @@ class MessageGateway
   private
 
   def self.use_all_indices!
-    index_name(INDEX_NAME)
+    index_name(ALL_INDICES_ALIAS)
   end
 
   def self.use_recent_index!
