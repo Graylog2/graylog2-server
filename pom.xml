@@ -4,11 +4,26 @@
 
   <groupId>org.graylog2</groupId>
   <artifactId>graylog2-plugin</artifactId>
-  <version>0.9.7-dev</version>
+  <version>0.9.7-SNAPHSHOT</version>
   <packaging>jar</packaging>
 
   <name>graylog2-plugin</name>
-  <url>http://maven.apache.org</url>
+  <url>http://www.graylog2.org/</url>
+
+  <scm>
+    <developerConnection>scm:git:git://github.com/Graylog2/graylog2-plugin-interfaces</developerConnection>
+  </scm>
+
+  <build>
+    <plugins>
+
+      <plugin>
+        <artifactId>maven-release-plugin</artifactId>
+        <version>2.3.2</version>
+      </plugin>
+
+    </plugins>
+  </build>
 
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
