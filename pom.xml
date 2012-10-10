@@ -10,7 +10,7 @@
   <url>http://www.graylog2.org/</url>
 
   <scm>
-    <developerConnection>scm:git:git://github.com/Graylog2/graylog2-plugin-interfaces</developerConnection>
+    <developerConnection>scm:git:git@github.com:Graylog2/graylog2-plugin-interfaces.git</developerConnection>
     <tag>graylog2-plugin-0.9.7</tag>
   </scm>
 
