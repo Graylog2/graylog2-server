@@ -10,12 +10,12 @@ class Cluster
 
   def self.throughput
     return 0 if no_active_nodes?
-    active_nodes.map { |n| n.current_throughput }.sum
+    (active_nodes.map { |n| n.current_throughput }.sum/5).to_i
   end
 
   def self.highest_throughput
     return 0 if no_active_nodes?
-    active_nodes.map { |n| n.highest_throughput }.sum
+    (active_nodes.map { |n| n.highest_throughput }.sum/5).to_i
   end
 
   def self.no_active_nodes?
