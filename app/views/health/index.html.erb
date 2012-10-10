@@ -44,31 +44,36 @@
 
 <br />
 <h2>Indices &amp; Shards</h2>
-<strong>Current deflector target:</strong>
-<span class="highlighted"><%= @index_information.deflector_target %></span>
-<br />
+<% if DeflectorInformation.up_to_date? %>
+  <strong>Current deflector target:</strong>
+  <span class="highlighted"><%= @index_information.deflector_target %></span>
+  <br />
 
-<strong>Number of messages per index:</strong>
-<span class="highlighted"><%= @index_information.max_messages_per_index %></span>
-<br />
+  <strong>Number of messages per index:</strong>
+  <span class="highlighted"><%= @index_information.max_messages_per_index %></span>
+  <br />
 
-<strong>Recent index storage type:</strong>
-<span class="highlighted"><%= @recent_index["storage_type"] %></span>
+  <strong>Recent index storage type:</strong>
+  <span class="highlighted"><%= @recent_index["storage_type"] %></span>
 
-<ul id="health-nodes">
-<% @nodes.each_with_index do |node, i| %>
-  <li>
-    <strong>Node <%= i+1 %>: <span class="highlighted"> <%= node[:name] %></span></strong>
-    on <span class="highlighted"><%= node[:hostname] %></span>
-    (<%= node[:id] %>)
-  </li>
-<% end %>
-</ul>
+  <ul id="health-nodes">
+  <% @nodes.each_with_index do |node, i| %>
+    <li>
+      <strong>Node <%= i+1 %>: <span class="highlighted"> <%= node[:name] %></span></strong>
+      on <span class="highlighted"><%= node[:hostname] %></span>
+      (<%= node[:id] %>)
+    </li>
+  <% end %>
+  </ul>
 
-<%= render :partial => "index", :locals => { :index_name => @recent_index["name"], :info => @recent_index["info"] } %>
+  <%= render :partial => "index", :locals => { :index_name => @recent_index["name"], :info => @recent_index["info"] } %>
 
-<% @indices.each do |name, info| %>
-  <%= render :partial => "index", :locals => { :index_name => name, :info => info } %>
+  <% @indices.each do |name, info| %>
+    <%= render :partial => "index", :locals => { :index_name => name, :info => info } %>
+  <% end %>
+<% else %>
+  <strong>Information is not up to date! Seems like you have no Graylog2 node running.</strong>
+  <br />
 <% end %>
 <i>Informaton last updated at <%= gl_date(Time.at(@index_information.timestamp)) %> by <%= @index_information.server_id %></i>
 
