@@ -8,9 +8,32 @@
 
   <name>graylog2-plugin</name>
   <url>http://www.graylog2.org/</url>
+  <description>Graylog2 interfaces for plugin development</description>
+
+  <licenses>
+    <license>
+      <name>MIT license</name>
+      <url>http://www.opensource.org/licenses/mit-license.php</url>
+    </license>
+  </licenses>
+
+  <developers>
+    <developer>
+      <id>lennartkoopmann</id>
+      <name>Lennart Koopmann</name>
+      <email>lennart@socketfeed.com</email>
+    </developer>
+  </developers>
+
+  <parent>
+    <groupId>org.sonatype.oss</groupId>
+    <artifactId>oss-parent</artifactId>
+    <version>7</version>
+  </parent>
 
   <scm>
     <developerConnection>scm:git:git@github.com:Graylog2/graylog2-plugin-interfaces.git</developerConnection>
+    <url>git@github.com:Graylog2/graylog2-plugin-interfaces.git</url>
     <tag>graylog2-plugin-0.9.7</tag>
   </scm>
 
