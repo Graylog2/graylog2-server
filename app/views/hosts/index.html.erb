@@ -25,7 +25,7 @@ Monitoring <span class="highlighted"><%= @host_count %></span> hosts.
   <div id="el-e">
     <div class="el-e-left">
       <span class="el-e-sparkline">
-        <%= sparkline_values(MessageCount.counts_of_last_minutes(minutes, :hostname => host.host, :fill => true).map { |c| c[:count] }) %>
+        <%= sparkline_values(MessageCount.counts_of_last_minutes(minutes, :hostname => host.host, :fill => true).map { |timestamp, count| count }) %>
       </span>
     </div>
 

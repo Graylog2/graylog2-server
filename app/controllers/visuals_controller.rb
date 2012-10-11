@@ -25,8 +25,8 @@ class VisualsController < ApplicationController
   private
 
   def calculate_totalgraph(hours = STANDARD_TIMESPAN_HOURS)
-    MessageCount.counts_of_last_minutes(hours.to_i*60).collect do |c|
-      [ (c[:timestamp].to_i+Time.now.utc_offset)*1000, c[:count] ]
+    MessageCount.counts_of_last_minutes(hours.to_i*60).collect do |timestamp, count|
+      [ (timestamp.to_i+Time.now.utc_offset)*1000, count ]
     end
   end
 
@@ -35,14 +35,14 @@ class VisualsController < ApplicationController
 
     return Array.new if stream.streamrules.blank?
 
-    MessageCount.counts_of_last_minutes(hours.to_i*60, :stream_id => stream.id).collect do |c|
-      [ (c[:timestamp].to_i+Time.now.utc_offset)*1000, c[:count] ]
+    MessageCount.counts_of_last_minutes(hours.to_i*60, :stream_id => stream.id).collect do |timestamp, count|
+      [ (timestamp.to_i+Time.now.utc_offset)*1000, count ]
     end
   end
 
   def calculate_hostgraph(hostname, hours = STANDARD_TIMESPAN_HOURS)
-    MessageCount.counts_of_last_minutes(hours.to_i*60, :hostname => hostname).collect do |c|
-      [ (c[:timestamp].to_i+Time.now.utc_offset)*1000, c[:count] ]
+    MessageCount.counts_of_last_minutes(hours.to_i*60, :hostname => hostname).collect do |timestamp, count|
+      [ (timestamp.to_i+Time.now.utc_offset)*1000, count ]
     end
   end
 

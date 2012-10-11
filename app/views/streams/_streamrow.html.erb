@@ -4,7 +4,7 @@
 <div id="el-e">
   <div class="el-e-left">
     <span class="el-e-sparkline">
-      <%= sparkline_values(MessageCount.counts_of_last_minutes(minutes, :stream_id => stream.id, :fill => true).map { |c| c[:count] }) %>
+      <%= sparkline_values(MessageCount.counts_of_last_minutes(minutes, :stream_id => stream.id, :fill => true).map { |timestamp, count| count }) %>
     </span>
   </div>
 

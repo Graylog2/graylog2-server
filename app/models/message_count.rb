@@ -11,36 +11,42 @@ class MessageCount
 
     # XXX ELASTIC - this sucks. use map reduce here.
     total = 0
-    counts_of_last_minutes(x, opts).each do |c|
-      total += c[:count]
+    counts_of_last_minutes(x, opts).each do |timestamp, count|
+      total += count
     end
 
     return total
   end
 
   def self.counts_of_last_minutes(x, opts = {})
-    res = Array.new
+    res = {}
 
-    all(:conditions => { :timestamp => { "$gte" => x.minutes.ago.to_i }}).each do |c|
-      case(count_type(opts))
-        when :stream then
-          sc = c.streams[opts[:stream_id].to_s]
-          sc.blank? ? count = 0 : count = sc
-          res << { :timestamp => c.timestamp, :count => count }#
-        when :host then
-          hc = c.hosts[Base64.encode64(opts[:hostname]).chop]
-          hc.blank? ? count = 0 : count = hc
-          res << { :timestamp => c.timestamp, :count => count }#
-        when :total then
-          res << { :timestamp => c.timestamp, :count => c.total }
+    conditions = { :timestamp => { "$gte" => x.minutes.ago.to_i }}
+
+    all(:conditions => conditions).distinct(:server_id).each do |node|
+      all(:conditions => conditions.merge(:server_id => node)).each do |c|
+        tsc = 0
+        case(count_type(opts))
+          when :stream then
+            sc = c.streams[opts[:stream_id].to_s]
+            sc.blank? ? count = 0 : count = sc
+            tsc = count
+          when :host then
+            hc = c.hosts[Base64.encode64(opts[:hostname]).chop]
+            hc.blank? ? count = 0 : count = hc
+            tsc = count
+          when :total then
+            tsc = c.total
+        end
+
+        if res[c.timestamp].blank?
+          # First node counts for this timestamp.
+          res[c.timestamp] = tsc
+        else
+          # Another node already has stored counts. Add on top.
+          res[c.timestamp] = res[c.timestamp]+tsc
+        end
       end
-    end
-
-    if opts[:fill] and opts[:fill] == true
-      # Fill with zeroes if there were not enough results.
-      remaining = x-res.count
-      ts = Time.now.to_i-1
-      remaining.times { res.insert(0, { :timestamp => ts, :count => 0 }) } if remaining > 0
     end
 
     return res
