@@ -58,5 +58,6 @@ module Graylog2WebInterface
     config.assets.enabled = true
     config.assets.version = '1.0'
     config.assets.prefix = '/assets'
+    config.assets.compile = true
   end
 end
