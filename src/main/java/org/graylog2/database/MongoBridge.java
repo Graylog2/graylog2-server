@@ -28,6 +28,7 @@ import com.mongodb.DB;
 import com.mongodb.DBCollection;
 import com.mongodb.DBObject;
 import java.util.Map;
+import org.graylog2.Core;
 import org.graylog2.activities.Activity;
 
 
@@ -40,8 +41,11 @@ public class MongoBridge {
 
     private static final Logger LOG = Logger.getLogger(MongoBridge.class);    
     private MongoConnection connection;
+    
+    Core server;
 
-    public MongoBridge() {
+    public MongoBridge(Core server) {
+        this.server = server;
     }
 
     public MongoConnection getConnection() {
@@ -111,6 +115,7 @@ public class MongoBridge {
         obj.put("total", total);
         obj.put("streams", streams);
         obj.put("hosts", hosts);
+        obj.put("server_id", server.getServerId());
 
         getConnection().getMessageCountsColl().insert(obj);
     }
