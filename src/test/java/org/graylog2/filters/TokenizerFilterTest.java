@@ -20,7 +20,9 @@
 
 package org.graylog2.filters;
 
+import org.apache.log4j.Logger;
 import org.graylog2.GraylogServerStub;
+import org.graylog2.TestAppender;
 import org.graylog2.logmessage.LogMessageImpl;
 import org.junit.Test;
 import static org.junit.Assert.*;
@@ -134,12 +136,17 @@ public class TokenizerFilterTest {
     @Test
     public void testFilterWithWhitespaceAroundKVNoException() {
         LogMessageImpl msg = new LogMessageImpl();
-        msg.setShortMessage("k1 = v1");
+        msg.setShortMessage("k1 = ");
         TokenizerFilter f = new TokenizerFilter();
+
+        Logger logger = Logger.getLogger(TokenizerFilter.class);
+        TestAppender testAppender = new TestAppender();
+        logger.addAppender(testAppender);
+
         f.filter(msg, new GraylogServerStub());
 
-        assertEquals(1, msg.getAdditionalData().size());
-        assertEquals("v1", msg.getAdditionalData().get("_k1"));
+        assertEquals("Should not log anything", 0, testAppender.getEvents().size());
+        assertEquals(0, msg.getAdditionalData().size());
     }
 
     @Test
@@ -149,7 +156,7 @@ public class TokenizerFilterTest {
         TokenizerFilter f = new TokenizerFilter();
         f.filter(msg, new GraylogServerStub());
 
-        assertEquals(4, msg.getAdditionalData().size());
+        assertEquals("There should be 4 kv pairs", 4, msg.getAdditionalData().size());
         assertEquals("v1", msg.getAdditionalData().get("_k1"));
         assertEquals("v2", msg.getAdditionalData().get("_k2"));
         assertEquals("v3", msg.getAdditionalData().get("_k3"));
