@@ -131,4 +131,29 @@ public class TokenizerFilterTest {
         assertEquals("v2", msg.getAdditionalData().get("_k2"));
     }
 
+    @Test
+    public void testFilterWithWhitespaceAroundKVNoException() {
+        LogMessageImpl msg = new LogMessageImpl();
+        msg.setShortMessage("k1 = v1");
+        TokenizerFilter f = new TokenizerFilter();
+        f.filter(msg, new GraylogServerStub());
+
+        assertEquals(1, msg.getAdditionalData().size());
+        assertEquals("v1", msg.getAdditionalData().get("_k1"));
+    }
+
+    @Test
+    public void testFilterWithWhitespaceAroundKV() {
+        LogMessageImpl msg = new LogMessageImpl();
+        msg.setShortMessage("otters in k1 = v1 k2= v2 k3 =v3 k4=v4 more otters");
+        TokenizerFilter f = new TokenizerFilter();
+        f.filter(msg, new GraylogServerStub());
+
+        assertEquals(4, msg.getAdditionalData().size());
+        assertEquals("v1", msg.getAdditionalData().get("_k1"));
+        assertEquals("v2", msg.getAdditionalData().get("_k2"));
+        assertEquals("v3", msg.getAdditionalData().get("_k3"));
+        assertEquals("v4", msg.getAdditionalData().get("_k4"));
+    }
+
 }
