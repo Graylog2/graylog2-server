@@ -20,17 +20,16 @@
 
 package org.graylog2.logmessage;
 
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
-
-import org.graylog2.Tools;
-import org.graylog2.indexer.EmbeddedElasticSearchClient;
-
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
+import org.elasticsearch.common.UUID;
+import org.graylog2.Tools;
+import org.graylog2.indexer.EmbeddedElasticSearchClient;
 import org.graylog2.plugin.logmessage.LogMessage;
 import org.graylog2.plugin.streams.Stream;
+
+import java.util.List;
+import java.util.Map;
 
 /**
  * @author Lennart Koopmann <lennart@socketfeed.com>
@@ -57,7 +56,9 @@ public class LogMessageImpl implements LogMessage {
     private double createdAt = 0;
 
     public LogMessageImpl() {
-        this.id = UUID.randomUUID().toString();
+        // the elasticsearch version is the same as the "standard" one, except the encoding is different.
+        // to avoid recomputing it when submitting the message to elasticsearch we always use its method.
+        this.id = UUID.randomBase64UUID();
     }
 
     @Override

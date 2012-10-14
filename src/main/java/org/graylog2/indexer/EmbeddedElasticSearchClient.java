@@ -1,16 +1,6 @@
 package org.graylog2.indexer;
 
 import com.beust.jcommander.internal.Maps;
-import static org.elasticsearch.index.query.QueryBuilders.rangeQuery;
-import static org.elasticsearch.node.NodeBuilder.nodeBuilder;
-
-import java.io.File;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.List;
-import java.util.Map;
-
 import org.apache.commons.io.FileUtils;
 import org.apache.log4j.Logger;
 import org.elasticsearch.action.ActionFuture;
@@ -37,7 +27,6 @@ import org.elasticsearch.action.index.IndexRequest.OpType;
 import org.elasticsearch.action.index.IndexRequestBuilder;
 import org.elasticsearch.client.Client;
 import org.elasticsearch.cluster.metadata.IndexMetaData;
-import org.elasticsearch.common.UUID;
 import org.elasticsearch.common.collect.ImmutableMap;
 import org.elasticsearch.common.settings.loader.YamlSettingsLoader;
 import org.elasticsearch.common.xcontent.XContentType;
@@ -46,9 +35,18 @@ import org.elasticsearch.node.Node;
 import org.elasticsearch.node.NodeBuilder;
 import org.graylog2.Core;
 import org.graylog2.activities.Activity;
-import org.graylog2.logmessage.LogMessageImpl;
 import org.graylog2.plugin.logmessage.LogMessage;
 import org.json.simple.JSONValue;
+
+import java.io.File;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.List;
+import java.util.Map;
+
+import static org.elasticsearch.index.query.QueryBuilders.rangeQuery;
+import static org.elasticsearch.node.NodeBuilder.nodeBuilder;
 
 // TODO this class blocks for most of its operations, but is called from the main thread for some of them
 // TODO figure out how to gracefully deal with failure to connect (or losing connection) to the elastic search cluster!
@@ -234,12 +232,10 @@ public class EmbeddedElasticSearchClient {
         final BulkRequestBuilder recentIndex = client.prepareBulk();
         for (LogMessage msg : messages) {
             String source = JSONValue.toJSONString(msg.toElasticSearchObject());
-            
-            // We manually set the same ID to allow linking between indices later.
-            final String id = UUID.randomBase64UUID();
-            
-            mainIndex.add(buildIndexRequest(Deflector.DEFLECTOR_NAME, source, id, 0)); // Main index.
-            recentIndex.add(buildIndexRequest(RECENT_INDEX_NAME, source, id, server.getConfiguration().getRecentIndexTtlMinutes())); // Recent index.
+
+            // we manually set the document ID to the same value to be able to match up documents later.
+            mainIndex.add(buildIndexRequest(Deflector.DEFLECTOR_NAME, source, msg.getId(), 0)); // Main index.
+            recentIndex.add(buildIndexRequest(RECENT_INDEX_NAME, source, msg.getId(), server.getConfiguration().getRecentIndexTtlMinutes())); // Recent index.
         }
 
         final ActionFuture<BulkResponse> mainBulkFuture = client.bulk(mainIndex.request());
