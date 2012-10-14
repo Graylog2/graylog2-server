@@ -21,6 +21,7 @@
 package org.graylog2.filters;
 
 import com.yammer.metrics.Metrics;
+import com.yammer.metrics.core.Timer;
 import com.yammer.metrics.core.TimerContext;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
@@ -38,7 +39,10 @@ public class TokenizerFilter implements MessageFilter {
 
     private static final Logger LOG = Logger.getLogger(TokenizerFilter.class);
 
-    private Pattern p = Pattern.compile("[a-zA-Z0-9_-]*");
+    private final Pattern p = Pattern.compile("[a-zA-Z0-9_-]*");
+    private final Pattern kvPattern = Pattern.compile("\\s?=\\s?");
+    private final Pattern spacePattern = Pattern.compile(" ");
+    private final Timer processTime = Metrics.newTimer(TokenizerFilter.class, "ProcessTime", TimeUnit.MICROSECONDS, TimeUnit.SECONDS);
 
     /*
      * Extract out only true k=v pairs, not everything separated by a = character.
@@ -55,13 +59,13 @@ public class TokenizerFilter implements MessageFilter {
 
     @Override
     public void filter(LogMessage msg, GraylogServer server) {
-        TimerContext tcx = Metrics.newTimer(TokenizerFilter.class, "ProcessTime", TimeUnit.MICROSECONDS, TimeUnit.SECONDS).time();
+        TimerContext tcx = processTime.time();
 
         int extracted = 0;
         if (msg.getShortMessage().contains("=")) {
             try {
-                String nmsg = msg.getShortMessage().replaceAll("\\s?=\\s?", "=");
-                String[] parts = nmsg.split(" ");
+                final String nmsg = kvPattern.matcher(msg.getShortMessage()).replaceAll("=");
+                final String[] parts = spacePattern.split(nmsg);
                 if (parts != null) {
                     for (String part : parts) {
                         if (part.contains("=") && StringUtils.countMatches(part, "=") == 1) {

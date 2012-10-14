@@ -23,13 +23,16 @@ package org.graylog2.buffers.processors;
 import com.google.common.collect.Lists;
 import com.lmax.disruptor.EventHandler;
 import com.yammer.metrics.Metrics;
-import java.util.List;
-import java.util.concurrent.TimeUnit;
+import com.yammer.metrics.core.Histogram;
+import com.yammer.metrics.core.Meter;
 import org.apache.log4j.Logger;
 import org.graylog2.Core;
 import org.graylog2.buffers.LogMessageEvent;
 import org.graylog2.outputs.MessageOutput;
 import org.graylog2.plugin.logmessage.LogMessage;
+
+import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 /**
  * @author Lennart Koopmann <lennart@socketfeed.com>
@@ -40,7 +43,9 @@ public class OutputBufferProcessor implements EventHandler<LogMessageEvent> {
 
     private Core server;
 
-    List<LogMessage> buffer = Lists.newArrayList();
+    private List<LogMessage> buffer = Lists.newArrayList();
+    private final Meter incomingMessages = Metrics.newMeter(OutputBufferProcessor.class, "IncomingMessages", "messages", TimeUnit.SECONDS);
+    private final Histogram batchSize = Metrics.newHistogram(OutputBufferProcessor.class, "BatchSize");
 
     public OutputBufferProcessor(Core server) {
         this.server = server;
@@ -48,10 +53,11 @@ public class OutputBufferProcessor implements EventHandler<LogMessageEvent> {
 
     @Override
     public void onEvent(LogMessageEvent event, long sequence, boolean endOfBatch) throws Exception {
-        Metrics.newMeter(OutputBufferProcessor.class, "IncomingMessages", "messages", TimeUnit.SECONDS).mark();
+        incomingMessages.mark();
 
         LogMessage msg = event.getMessage();
-        LOG.debug("Processing message <" + msg.getId() + "> from OutputBuffer.");
+        if (LOG.isDebugEnabled())
+            LOG.debug("Processing message <" + msg.getId() + "> from OutputBuffer.");
 
         buffer.add(msg);
 
@@ -61,9 +67,10 @@ public class OutputBufferProcessor implements EventHandler<LogMessageEvent> {
                     // Always create a new instance of this filter.
                     MessageOutput output = outputType.newInstance();
 
-                    LOG.debug("Writing message batch to [" + outputType.getSimpleName() + "]. Size <" + buffer.size() + ">");
+                    if (LOG.isDebugEnabled())
+                        LOG.debug("Writing message batch to [" + outputType.getSimpleName() + "]. Size <" + buffer.size() + ">");
 
-                    Metrics.newHistogram(OutputBufferProcessor.class, "BatchSize").update(buffer.size());
+                    batchSize.update(buffer.size());
                     output.write(buffer, server);
                 } catch (Exception e) {
                     LOG.error("Could not write message batch to output [" + outputType.getSimpleName() +"].", e);
@@ -73,7 +80,8 @@ public class OutputBufferProcessor implements EventHandler<LogMessageEvent> {
             }
         }
 
-        LOG.debug("Wrote message <" + msg.getId() + "> to all outputs. Finished handling.");
+        if (LOG.isDebugEnabled())
+            LOG.debug("Wrote message <" + msg.getId() + "> to all outputs. Finished handling.");
     }
 
 }
