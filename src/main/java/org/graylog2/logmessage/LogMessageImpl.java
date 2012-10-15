@@ -71,7 +71,7 @@ public class LogMessageImpl implements LogMessage {
     private double createdAt = 0;
 
     public LogMessageImpl() {
-        this.id = UUID.nameUUIDFromBytes(HOSTNAME).toString();
+        this.id = UUID.randomUUID().toString();
     }
 
     @Override
