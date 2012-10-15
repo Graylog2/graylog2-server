@@ -87,9 +87,9 @@ public class Core implements GraylogServer {
     
     private List<Initializer> initializers = Lists.newArrayList();
     private List<MessageInput> inputs = Lists.newArrayList();
-    private List<Class<? extends MessageFilter>> filters = Lists.newArrayList();
-    private List<Class<? extends MessageOutput>> outputs = Lists.newArrayList();
-    private List<Class<? extends CommunicatorMethod>> communicatorMethods = Lists.newArrayList();
+    private List<MessageFilter> filters = Lists.newArrayList();
+    private List<MessageOutput> outputs = Lists.newArrayList();
+    private List<CommunicatorMethod> communicatorMethods = Lists.newArrayList();
     
     private int loadedFilterPlugins = 0;
     
@@ -179,8 +179,8 @@ public class Core implements GraylogServer {
         this.outputs.add(output);
     }
 
-    public <T extends CommunicatorMethod> void registerCommunicatorMethod(Class<T> klazz) {
-        this.communicatorMethods.add(klazz);
+    public void registerCommunicatorMethod(CommunicatorMethod method) {
+        this.communicatorMethods.add(method);
     }
 
     @Override
@@ -241,9 +241,13 @@ public class Core implements GraylogServer {
     private void loadPlugins() {
         PluginLoader pl = new PluginLoader("plugin");
         for (Class<? extends MessageFilter> filter : pl.loadFilterPlugins()) {
-            LOG.info("Registering plugin filter [" + filter.getSimpleName() + "].");
-            registerFilter(filter);
-            this.loadedFilterPlugins += 1;
+            try {
+                LOG.info("Registering plugin filter [" + filter.getSimpleName() + "].");
+                registerFilter(filter.newInstance());
+                this.loadedFilterPlugins += 1;
+            } catch (Exception exc) {
+                LOG.error("Failed to load plugin filter [" + filter.getSimpleName() + "].");
+            }
         }
     }
 
@@ -301,7 +305,7 @@ public class Core implements GraylogServer {
         return this.outputs;
     }
 
-    public List<Class<? extends CommunicatorMethod>> getCommunicatorMethods() {
+    public List<CommunicatorMethod> getCommunicatorMethods() {
         return this.communicatorMethods;
     }
     

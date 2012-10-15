@@ -142,7 +142,7 @@ public final class Main {
         
         // Register communicator methods.
         if (configuration.isEnableCommunicationMethodTwilio()) {
-            server.registerCommunicatorMethod(TwilioCommunicator.class);
+            server.registerCommunicatorMethod(new TwilioCommunicator());
         }
         
         // Register initializers.
