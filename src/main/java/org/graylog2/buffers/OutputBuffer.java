@@ -56,9 +56,14 @@ public class OutputBuffer implements Buffer {
                 new SleepingWaitStrategy()
         );
 
-        OutputBufferProcessor processor = new OutputBufferProcessor(this.server);
-
-        disruptor.handleEventsWith(processor);
+        OutputBufferProcessor[] processors = new OutputBufferProcessor[server.getConfiguration().getOutputBufferProcessors()];
+        
+        for (int i = 0; i < server.getConfiguration().getOutputBufferProcessors(); i++) {
+            processors[i] = new OutputBufferProcessor(this.server, i, server.getConfiguration().getOutputBufferProcessors());
+        }
+        
+        disruptor.handleEventsWith(processors);
+        
         ringBuffer = disruptor.start();
     }
 

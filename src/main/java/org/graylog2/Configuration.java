@@ -91,6 +91,9 @@ public class Configuration {
 
     @Parameter(value = "output_batch_size", required = true, validator = PositiveIntegerValidator.class)
     private int outputBatchSize = 5000;
+    
+    @Parameter(value = "outputbuffer_processors", required = true, validator = PositiveIntegerValidator.class)
+    private int outputBufferProcessors = 5;
 
     @Parameter(value = "elasticsearch_config_file", required = true, validator = FileReadableValidator.class)
     private String elasticSearchConfigFile = "/etc/graylog2-elasticsearch.yml";
@@ -279,6 +282,10 @@ public class Configuration {
 
     public int getOutputBatchSize() {
         return outputBatchSize;
+    }
+    
+    public int getOutputBufferProcessors() {
+        return outputBufferProcessors;
     }
 
     public String getElasticSearchConfigFile() {
