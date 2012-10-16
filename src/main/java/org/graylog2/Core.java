@@ -137,10 +137,10 @@ public class Core implements GraylogServer {
 
         hostCounterCache = new HostCounterCacheImpl();
 
-        processBuffer = new ProcessBuffer(this);
+        processBuffer = new ProcessBuffer(this, configuration.getProcessThreadCount(), configuration.getProcessQueueLimit());
         processBuffer.initialize();
 
-        outputBuffer = new OutputBuffer(this);
+        outputBuffer = new OutputBuffer(this, configuration.getOutputThreadCount(), configuration.getOutputQueueLimit());
         outputBuffer.initialize();
 
         gelfChunkManager = new GELFChunkManager(this);

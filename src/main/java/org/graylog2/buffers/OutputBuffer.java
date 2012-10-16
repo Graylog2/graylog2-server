@@ -38,13 +38,13 @@ import org.graylog2.plugin.logmessage.LogMessage;
  */
 public class OutputBuffer implements Buffer {
 
-    protected ExecutorService executor = new ThreadPool(OutputBuffer.class.getName(), 16, 15000*10);
-
+    ExecutorService executor;
     OutputBufferProcessor[] processors;
     Core server;
 
-    public OutputBuffer(Core server) {
+    public OutputBuffer(Core server, int threadCount, int queueLimit) {
         this.server = server;
+        this.executor = new ThreadPool(OutputBuffer.class.getName(), threadCount, queueLimit);
     }
 
     public void initialize() {

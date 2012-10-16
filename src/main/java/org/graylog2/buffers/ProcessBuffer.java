@@ -42,14 +42,14 @@ import org.graylog2.plugin.logmessage.LogMessage;
  */
 public class ProcessBuffer implements Buffer {
 
-    protected ExecutorService executor = new ThreadPool(ProcessBuffer.class.getName(), 8, 15000*10);
-
+    ExecutorService executor;
     ProcessBufferProcessor processor;
     Core server;
 
-    public ProcessBuffer(Core server) {
+    public ProcessBuffer(Core server, int threadCount, int queueLimit) {
         this.server = server;
         this.processor = new ProcessBufferProcessor(this.server);
+        this.executor = new ThreadPool(this.getClass().getName(), threadCount, queueLimit);
     }
 
     public void initialize() {

@@ -217,6 +217,18 @@ public class Configuration {
 
     @Parameter(value = "plugin_dir", required = false)
     private String pluginDir = "plugin";
+
+    @Parameter(value = "process_thread_count", required = false)
+    private int processThreadCount = 4;
+
+    @Parameter(value = "process_queue_limit", required = false)
+    private int processQueueLimit = 150000;
+
+    @Parameter(value = "output_thread_count", required = false)
+    private int outputThreadCount = 8;
+
+    @Parameter(value = "output_queue_limit", required = false)
+    private int outputQueueLimit = 150000;
     
     public boolean isMaster() {
         return isMaster;
@@ -486,6 +498,22 @@ public class Configuration {
 
     public String getPluginDir() {
         return pluginDir;
+    }
+
+    public int getProcessThreadCount() {
+        return processThreadCount;
+    }
+
+    public int getProcessQueueLimit() {
+        return processQueueLimit;
+    }
+
+    public int getOutputThreadCount() {
+        return outputThreadCount;
+    }
+
+    public int getOutputQueueLimit() {
+        return outputQueueLimit;
     }
     
     @ValidatorMethod
