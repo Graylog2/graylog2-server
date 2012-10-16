@@ -21,10 +21,9 @@
 package org.graylog2.inputs.gelf;
 
 import com.yammer.metrics.Metrics;
+import com.yammer.metrics.core.Meter;
+import com.yammer.metrics.core.Timer;
 import com.yammer.metrics.core.TimerContext;
-import java.util.Map;
-import java.util.Set;
-import java.util.concurrent.TimeUnit;
 import org.apache.log4j.Logger;
 import org.graylog2.Core;
 import org.graylog2.Tools;
@@ -33,6 +32,10 @@ import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.JSONValue;
 
+import java.util.Map;
+import java.util.Set;
+import java.util.concurrent.TimeUnit;
+
 /**
  * @author Lennart Koopmann <lennart@socketfeed.com>
  */
@@ -40,30 +43,34 @@ public class GELFProcessor {
 
     private static final Logger LOG = Logger.getLogger(GELFProcessor.class);
     private Core server;
+    private final Meter incomingMessages = Metrics.newMeter(GELFProcessor.class, "IncomingMessages", "messages", TimeUnit.SECONDS);
+    private final Meter incompleteMessages = Metrics.newMeter(GELFProcessor.class, "IncompleteMessages", "messages", TimeUnit.SECONDS);
+    private final Meter processedMessages = Metrics.newMeter(GELFProcessor.class, "ProcessedMessages", "messages", TimeUnit.SECONDS);
+    private final Timer gelfParsedTime = Metrics.newTimer(GELFProcessor.class, "GELFParsedTime", TimeUnit.MICROSECONDS, TimeUnit.SECONDS);
 
     public GELFProcessor(Core server) {
         this.server = server;
     }
 
     public void messageReceived(GELFMessage message) {
-        Metrics.newMeter(GELFProcessor.class, "IncomingMessages", "messages", TimeUnit.SECONDS).mark();
+        incomingMessages.mark();
         
         // Convert to LogMessage
         LogMessageImpl lm = parse(message.getJSON());
 
         if (!lm.isComplete()) {
-            Metrics.newMeter(GELFProcessor.class, "IncompleteMessages", "messages", TimeUnit.SECONDS).mark();
+            incompleteMessages.mark();
             LOG.debug("Skipping incomplete message.");
         }
 
         // Add to process buffer.
         LOG.debug("Adding received GELF message <" + lm.getId() +"> to process buffer: " + lm);
-        Metrics.newMeter(GELFProcessor.class, "ProcessedMessages", "messages", TimeUnit.SECONDS).mark();
+        processedMessages.mark();
         server.getProcessBuffer().insert(lm);
     }
 
     private LogMessageImpl parse(String message) {
-        TimerContext tcx = Metrics.newTimer(GELFProcessor.class, "GELFParsedTime", TimeUnit.MICROSECONDS, TimeUnit.SECONDS).time();
+        TimerContext tcx = gelfParsedTime.time();
 
         JSONObject json;
         LogMessageImpl lm = new LogMessageImpl();

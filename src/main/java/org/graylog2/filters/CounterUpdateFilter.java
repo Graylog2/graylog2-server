@@ -23,22 +23,23 @@ package org.graylog2.filters;
 import com.yammer.metrics.Metrics;
 import com.yammer.metrics.core.Timer;
 import com.yammer.metrics.core.TimerContext;
-import java.util.concurrent.TimeUnit;
 import org.graylog2.plugin.GraylogServer;
 import org.graylog2.plugin.MessageCounter;
 import org.graylog2.plugin.filters.MessageFilter;
 import org.graylog2.plugin.logmessage.LogMessage;
 import org.graylog2.plugin.streams.Stream;
+
+import java.util.concurrent.TimeUnit;
 /**
  * @author Lennart Koopmann <lennart@socketfeed.com>
  */
 public class CounterUpdateFilter implements MessageFilter {
 
-    protected static final Timer processTimer = Metrics.newTimer(CounterUpdateFilter.class, "ProcessTime", TimeUnit.MICROSECONDS, TimeUnit.SECONDS);
+    private final Timer processTime = Metrics.newTimer(CounterUpdateFilter.class, "ProcessTime", TimeUnit.MICROSECONDS, TimeUnit.SECONDS);
 
     @Override
     public void filter(LogMessage msg, GraylogServer server) {
-        TimerContext tcx = processTimer.time();
+        TimerContext tcx = processTime.time();
 
         // Increment all registered message counters.
         for (MessageCounter counter : server.getMessageCounterManager().getAllCounters().values()) {

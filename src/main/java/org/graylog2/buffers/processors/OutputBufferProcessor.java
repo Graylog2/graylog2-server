@@ -23,16 +23,16 @@ package org.graylog2.buffers.processors;
 import com.google.common.collect.Lists;
 import com.lmax.disruptor.EventHandler;
 import com.yammer.metrics.Metrics;
-import com.yammer.metrics.core.TimerContext;
-import com.yammer.metrics.core.Meter;
 import com.yammer.metrics.core.Histogram;
-import java.util.List;
-import java.util.concurrent.TimeUnit;
+import com.yammer.metrics.core.Meter;
 import org.apache.log4j.Logger;
 import org.graylog2.Core;
 import org.graylog2.buffers.LogMessageEvent;
 import org.graylog2.outputs.MessageOutput;
 import org.graylog2.plugin.logmessage.LogMessage;
+
+import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 /**
  * @author Lennart Koopmann <lennart@socketfeed.com>
@@ -40,8 +40,6 @@ import org.graylog2.plugin.logmessage.LogMessage;
 public class OutputBufferProcessor implements EventHandler<LogMessageEvent> {
 
     private static final Logger LOG = Logger.getLogger(OutputBufferProcessor.class);
-    protected static final Meter incomingMessagesMeter = Metrics.newMeter(OutputBufferProcessor.class, "IncomingMessages", "messages", TimeUnit.SECONDS);
-    protected static final Histogram batchSizeHistogram = Metrics.newHistogram(OutputBufferProcessor.class, "BatchSize");
 
     private Core server;
 
@@ -50,17 +48,31 @@ public class OutputBufferProcessor implements EventHandler<LogMessageEvent> {
             return Lists.newArrayList();
         }
     };
+    private final Meter incomingMessages = Metrics.newMeter(OutputBufferProcessor.class, "IncomingMessages", "messages", TimeUnit.SECONDS);
+    private final Histogram batchSize = Metrics.newHistogram(OutputBufferProcessor.class, "BatchSize");
 
-    public OutputBufferProcessor(Core server) {
+    private final long ordinal;
+    private final long numberOfConsumers;
+    
+    public OutputBufferProcessor(Core server, final long ordinal, final long numberOfConsumers) {
+        this.ordinal = ordinal;
+        this.numberOfConsumers = numberOfConsumers;
         this.server = server;
     }
 
     @Override
     public void onEvent(LogMessageEvent event, long sequence, boolean endOfBatch) throws Exception {
-        incomingMessagesMeter.mark();
+        // Because Trisha said so. (http://code.google.com/p/disruptor/wiki/FrequentlyAskedQuestions)
+        if ((sequence % numberOfConsumers) != ordinal) {
+            return;
+        }
+        
+        incomingMessages.mark();
 
         LogMessage msg = event.getMessage();
-        LOG.debug("Processing message <" + msg.getId() + "> from OutputBuffer.");
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Processing message <" + msg.getId() + "> from OutputBuffer.");
+        }
 
         List<LogMessage> buffer = tlsBuffer.get();
         buffer.add(msg);
@@ -68,9 +80,11 @@ public class OutputBufferProcessor implements EventHandler<LogMessageEvent> {
         if (endOfBatch || buffer.size() >= server.getConfiguration().getOutputBatchSize()) {
             for (MessageOutput output : server.getOutputs()) {
                 try {
-                    LOG.debug("Writing message batch to [" + output.getClass().getSimpleName() + "]. Size <" + buffer.size() + ">");
+                    if (LOG.isDebugEnabled()) {
+                        LOG.debug("Writing message batch to [" + output.getClass().getSimpleName() + "]. Size <" + buffer.size() + ">");
+                    }
 
-                    batchSizeHistogram.update(buffer.size());
+                    batchSize.update(buffer.size());
                     output.write(buffer, server);
                 } catch (Exception e) {
                     LOG.error("Could not write message batch to output [" + output.getClass().getSimpleName() +"].", e);
@@ -80,7 +94,9 @@ public class OutputBufferProcessor implements EventHandler<LogMessageEvent> {
             }
         }
 
-        LOG.debug("Wrote message <" + msg.getId() + "> to all outputs. Finished handling.");
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Wrote message <" + msg.getId() + "> to all outputs. Finished handling.");
+        }
     }
 
 }

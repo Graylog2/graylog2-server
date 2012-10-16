@@ -37,7 +37,7 @@ public class ActivityWriter {
     
     public void write(Activity activity) {
         mongoBridge.writeActivity(activity);
-        communicator.send(activity.getContent());
+        communicator.send(activity.getMessage());
     }
     
 }

@@ -20,19 +20,21 @@
 
 package org.graylog2.filters;
 
-import java.util.List;
 import com.google.common.collect.Lists;
 import com.yammer.metrics.Metrics;
 import com.yammer.metrics.core.Timer;
 import com.yammer.metrics.core.TimerContext;
-import java.util.concurrent.TimeUnit;
 import org.apache.log4j.Logger;
-import org.graylog2.GraylogServer;
-import org.graylog2.logmessage.LogMessage;
+import org.graylog2.initializers.Initializer;
+import org.graylog2.plugin.GraylogServer;
+import org.graylog2.plugin.filters.MessageFilter;
+import org.graylog2.plugin.logmessage.LogMessage;
+import org.graylog2.Configuration;
+
+import java.util.List;
+import java.util.concurrent.TimeUnit;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import org.graylog2.initializers.Initializer;
-import org.graylog2.Configuration;
 import java.io.BufferedReader;
 import java.io.FileReader;
 
@@ -95,7 +97,7 @@ public class PatternFilter implements MessageFilter, Initializer {
     }
 
     @Override
-    public boolean filter(LogMessage msg, GraylogServer server) {
+    public void filter(LogMessage msg, GraylogServer server) {
         final TimerContext tcx = processTimer.time();
         
         try {
@@ -105,9 +107,6 @@ public class PatternFilter implements MessageFilter, Initializer {
         } finally {
             tcx.stop();
         }
-
-        // Do not discard message.
-        return false;
     }
 
     private void parseMessage(LogMessage m, MessagePattern pattern) {
@@ -126,5 +125,10 @@ public class PatternFilter implements MessageFilter, Initializer {
         } finally {
             tcx.stop();
         }
+    }
+
+    @Override
+    public boolean discard() {
+        return false;
     }
 }

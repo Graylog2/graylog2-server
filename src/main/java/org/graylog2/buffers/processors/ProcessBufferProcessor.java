@@ -25,13 +25,13 @@ import com.yammer.metrics.Metrics;
 import com.yammer.metrics.core.Meter;
 import com.yammer.metrics.core.Timer;
 import com.yammer.metrics.core.TimerContext;
-import java.util.concurrent.TimeUnit;
 import org.apache.log4j.Logger;
 import org.graylog2.Core;
 import org.graylog2.buffers.LogMessageEvent;
-import org.graylog2.logmessage.LogMessageImpl;
 import org.graylog2.plugin.filters.MessageFilter;
 import org.graylog2.plugin.logmessage.LogMessage;
+
+import java.util.concurrent.TimeUnit;
 
 /**
  * @author Lennart Koopmann <lennart@socketfeed.com>
@@ -39,13 +39,13 @@ import org.graylog2.plugin.logmessage.LogMessage;
 public class ProcessBufferProcessor implements EventHandler<LogMessageEvent> {
 
     private static final Logger LOG = Logger.getLogger(ProcessBufferProcessor.class);
-    protected static final Meter incomingMessagesMeter = Metrics.newMeter(ProcessBufferProcessor.class, "IncomingMessages", "messages", TimeUnit.SECONDS);
-    protected static final Meter incomingMessagesMinutelyMeter = Metrics.newMeter(ProcessBufferProcessor.class, "IncomingMessagesMinutely", "messages", TimeUnit.MINUTES);
-    protected static final Meter outgoingMessagesMeter = Metrics.newMeter(ProcessBufferProcessor.class, "OutgoingMessages", "messages", TimeUnit.SECONDS);
-    protected static final Meter filteredOutMessagesMeter = Metrics.newMeter(ProcessBufferProcessor.class, "FilteredOutMessages", "messages", TimeUnit.SECONDS);
-    protected static final Timer processTimer = Metrics.newTimer(ProcessBufferProcessor.class, "ProcessTime", TimeUnit.MICROSECONDS, TimeUnit.SECONDS);
 
     private Core server;
+    private final Meter incomingMessages = Metrics.newMeter(ProcessBufferProcessor.class, "IncomingMessages", "messages", TimeUnit.SECONDS);
+    private final Meter incomingMessagesPerMinute = Metrics.newMeter(ProcessBufferProcessor.class, "IncomingMessagesMinutely", "messages", TimeUnit.MINUTES);
+    private final Timer processTime = Metrics.newTimer(ProcessBufferProcessor.class, "ProcessTime", TimeUnit.MICROSECONDS, TimeUnit.SECONDS);
+    private final Meter filteredOutMessages = Metrics.newMeter(ProcessBufferProcessor.class, "FilteredOutMessages", "messages", TimeUnit.SECONDS);
+    private final Meter outgoingMessages = Metrics.newMeter(ProcessBufferProcessor.class, "OutgoingMessages", "messages", TimeUnit.SECONDS);
 
     public ProcessBufferProcessor(Core server) {
         this.server = server;
@@ -53,26 +53,25 @@ public class ProcessBufferProcessor implements EventHandler<LogMessageEvent> {
 
     @Override
     public void onEvent(LogMessageEvent event, long sequence, boolean endOfBatch) throws Exception {
-        incomingMessagesMeter.mark();
-        incomingMessagesMinutelyMeter.mark();
-        TimerContext tcx = processTimer.time();
+        incomingMessages.mark();
+        incomingMessagesPerMinute.mark();
+        TimerContext tcx = processTime.time();
 
         LogMessage msg = event.getMessage();
 
-        LOG.debug("Starting to process message <" + msg.getId() + ">.");
+        if (LOG.isDebugEnabled())
+            LOG.debug("Starting to process message <" + msg.getId() + ">.");
 
         for (MessageFilter filter : server.getFilters()) {
             try {
-                if (LOG.isTraceEnabled()) {
-                    LOG.trace("Applying filter [" + filter.getClass().getSimpleName() +"] on message <" + msg.getId() + ">.");
-                }
+                if (LOG.isDebugEnabled())
+                    LOG.debug("Applying filter [" + filter.getClass().getSimpleName() +"] on message <" + msg.getId() + ">.");
 
                 filter.filter(msg, server);
                 if (filter.discard()) {
-                    if (LOG.isTraceEnabled()) {
-                        LOG.trace("Filter [" + filter.getClass().getSimpleName() + "] marked message <" + msg.getId() + "> to be discarded. Dropping message.");
-                    }
-                    filteredOutMessagesMeter.mark();
+                    if (LOG.isDebugEnabled())
+                        LOG.debug("Filter [" + filter.getClass().getSimpleName() + "] marked message <" + msg.getId() + "> to be discarded. Dropping message.");
+                    filteredOutMessages.mark();
                     return;
                 }
             } catch (Exception e) {
@@ -81,7 +80,7 @@ public class ProcessBufferProcessor implements EventHandler<LogMessageEvent> {
         }
 
         LOG.debug("Finished processing message. Writing to output buffer.");
-        outgoingMessagesMeter.mark();
+        outgoingMessages.mark();
         server.getOutputBuffer().insert(msg);
         tcx.stop();
     }

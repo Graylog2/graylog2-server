@@ -20,14 +20,14 @@
 
 package org.graylog2.inputs.gelf;
 
-import java.io.ByteArrayOutputStream;
-import java.util.Map;
-
+import com.google.common.collect.Maps;
+import com.yammer.metrics.Metrics;
+import com.yammer.metrics.core.Meter;
 import org.apache.log4j.Logger;
 import org.graylog2.Core;
 
-import com.google.common.collect.Maps;
-import com.yammer.metrics.Metrics;
+import java.io.ByteArrayOutputStream;
+import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -43,6 +43,7 @@ public class GELFChunkManager extends Thread {
 
     // The number of seconds a chunk is valid. Every message with chunks older than this will be dropped.
     public static final int SECONDS_VALID = 5;
+    private final Meter outdatedMessagesDropped = Metrics.newMeter(GELFChunkManager.class, "OutdatedMessagesDropped", "messages", TimeUnit.SECONDS);
 
     public GELFChunkManager(Core server) {
         this.processor = new GELFProcessor(server);
@@ -63,7 +64,7 @@ public class GELFChunkManager extends Thread {
 
                     // Outdated?
                     if (isOutdated(messageId)) {
-                        Metrics.newMeter(GELFChunkManager.class, "OutdatedMessagesDropped", "messages", TimeUnit.SECONDS).mark();
+                        outdatedMessagesDropped.mark();
                         
                         LOG.debug("Not all chunks of <" + messageId + "> arrived in time. Dropping. [" + SECONDS_VALID + "s]");
                         dropMessage(messageId);

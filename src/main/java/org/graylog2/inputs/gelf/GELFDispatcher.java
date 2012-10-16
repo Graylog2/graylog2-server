@@ -21,7 +21,7 @@
 package org.graylog2.inputs.gelf;
 
 import com.yammer.metrics.Metrics;
-import java.util.concurrent.TimeUnit;
+import com.yammer.metrics.core.Meter;
 import org.apache.log4j.Logger;
 import org.graylog2.Core;
 import org.jboss.netty.buffer.ChannelBuffer;
@@ -29,6 +29,8 @@ import org.jboss.netty.channel.ChannelHandlerContext;
 import org.jboss.netty.channel.ExceptionEvent;
 import org.jboss.netty.channel.MessageEvent;
 import org.jboss.netty.channel.SimpleChannelHandler;
+
+import java.util.concurrent.TimeUnit;
 
 /**
  * @author Lennart Koopmann <lennart@socketfeed.com>
@@ -39,6 +41,9 @@ public class GELFDispatcher extends SimpleChannelHandler {
 
     private GELFProcessor processor;
     private Core server;
+    private final Meter receivedMessages = Metrics.newMeter(GELFDispatcher.class, "ReceivedMessages", "messages", TimeUnit.SECONDS);
+    private final Meter dispatchedMessageChunk = Metrics.newMeter(GELFDispatcher.class, "DispatchedMessagesChunks", "messages", TimeUnit.SECONDS);
+    private final Meter dispatchedUnchunkedMessage = Metrics.newMeter(GELFDispatcher.class, "DispatchedNonChunkedMessages", "messages", TimeUnit.SECONDS);
 
     public GELFDispatcher(Core server) {
         this.server = server;
@@ -47,7 +52,7 @@ public class GELFDispatcher extends SimpleChannelHandler {
 
     @Override
     public void messageReceived(ChannelHandlerContext ctx, MessageEvent e) throws Exception {
-        Metrics.newMeter(GELFDispatcher.class, "ReceivedMessages", "messages", TimeUnit.SECONDS).mark();
+        receivedMessages.mark();
         
         ChannelBuffer buffer = (ChannelBuffer) e.getMessage();
 
@@ -58,14 +63,14 @@ public class GELFDispatcher extends SimpleChannelHandler {
 
         switch(msg.getGELFType()) {
         case CHUNKED:
-            Metrics.newMeter(GELFDispatcher.class, "DispatchedMessagesChunks", "messages", TimeUnit.SECONDS).mark();
+            dispatchedMessageChunk.mark();
             server.getGELFChunkManager().insert(msg);
             break;
         case ZLIB:
         case GZIP:
         case UNCOMPRESSED:
         case UNSUPPORTED:
-            Metrics.newMeter(GELFDispatcher.class, "DispatchedNonChunkedMessages", "messages", TimeUnit.SECONDS).mark();
+            dispatchedUnchunkedMessage.mark();
             processor.messageReceived(msg);
             break;
         }

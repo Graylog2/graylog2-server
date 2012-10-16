@@ -155,6 +155,9 @@ public final class Main {
         if (configuration.isEnableLibratoMetricsOutput()) { server.registerInitializer(new LibratoMetricsInitializer(server)); }
         server.registerInitializer(new DeflectorThreadsInitializer(server));
         server.registerInitializer(new AnonymousInformationCollectorInitializer(server));
+        if (configuration.performRetention() && commandLineArguments.performRetention()) {
+            server.registerInitializer(new IndexRetentionInitializer(server));
+        }
         
         // Register inputs.
         if (configuration.isUseGELF()) {

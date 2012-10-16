@@ -44,7 +44,6 @@ public class ProcessBuffer implements Buffer {
 
     protected ExecutorService executor = new ThreadPool(ProcessBuffer.class.getName(), 8, 15000*10);
 
-    GraylogServer server;
     ProcessBufferProcessor processor;
     Core server;
 

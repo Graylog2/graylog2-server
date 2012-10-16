@@ -1,16 +1,6 @@
 package org.graylog2.indexer;
 
 import com.beust.jcommander.internal.Maps;
-import static org.elasticsearch.index.query.QueryBuilders.rangeQuery;
-import static org.elasticsearch.node.NodeBuilder.nodeBuilder;
-
-import java.io.File;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.List;
-import java.util.Map;
-
 import org.apache.commons.io.FileUtils;
 import org.apache.log4j.Logger;
 import org.elasticsearch.action.ActionFuture;
@@ -37,7 +27,6 @@ import org.elasticsearch.action.index.IndexRequest.OpType;
 import org.elasticsearch.action.index.IndexRequestBuilder;
 import org.elasticsearch.client.Client;
 import org.elasticsearch.cluster.metadata.IndexMetaData;
-import org.elasticsearch.common.UUID;
 import org.elasticsearch.common.collect.ImmutableMap;
 import org.elasticsearch.common.settings.loader.YamlSettingsLoader;
 import org.elasticsearch.common.xcontent.XContentType;
@@ -45,9 +34,19 @@ import org.elasticsearch.index.query.QueryBuilder;
 import org.elasticsearch.node.Node;
 import org.elasticsearch.node.NodeBuilder;
 import org.graylog2.Core;
-import org.graylog2.logmessage.LogMessageImpl;
+import org.graylog2.activities.Activity;
 import org.graylog2.plugin.logmessage.LogMessage;
 import org.json.simple.JSONValue;
+
+import java.io.File;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.List;
+import java.util.Map;
+
+import static org.elasticsearch.index.query.QueryBuilders.rangeQuery;
+import static org.elasticsearch.node.NodeBuilder.nodeBuilder;
 
 // TODO this class blocks for most of its operations, but is called from the main thread for some of them
 // TODO figure out how to gracefully deal with failure to connect (or losing connection) to the elastic search cluster!
@@ -233,12 +232,10 @@ public class EmbeddedElasticSearchClient {
         final BulkRequestBuilder recentIndex = client.prepareBulk();
         for (LogMessage msg : messages) {
             String source = JSONValue.toJSONString(msg.toElasticSearchObject());
-            
-            // We manually set the same ID to allow linking between indices later.
-            final String id = UUID.randomBase64UUID();
-            
-            mainIndex.add(buildIndexRequest(Deflector.DEFLECTOR_NAME, source, id, 0)); // Main index.
-            recentIndex.add(buildIndexRequest(RECENT_INDEX_NAME, source, id, server.getConfiguration().getRecentIndexTtlMinutes())); // Recent index.
+
+            // we manually set the document ID to the same value to be able to match up documents later.
+            mainIndex.add(buildIndexRequest(Deflector.DEFLECTOR_NAME, source, msg.getId(), 0)); // Main index.
+            recentIndex.add(buildIndexRequest(RECENT_INDEX_NAME, source, msg.getId(), server.getConfiguration().getRecentIndexTtlMinutes())); // Recent index.
         }
 
         final ActionFuture<BulkResponse> mainBulkFuture = client.bulk(mainIndex.request());
@@ -282,6 +279,39 @@ public class EmbeddedElasticSearchClient {
     
     public void deleteIndex(String indexName) {
         client.admin().indices().delete(new DeleteIndexRequest(indexName)).actionGet();
+    }
+    
+    public void runIndexRetention() throws NoTargetIndexException {
+        Map<String, IndexStats> indices = server.getDeflector().getAllDeflectorIndices();
+        int indexCount = indices.size();
+        int maxIndices = server.getConfiguration().getMaxNumberOfIndices();
+        
+        // Do we have more indices than the configured maximum?
+        if (indexCount <= maxIndices) {
+            LOG.debug("Number of indices (" + indexCount + ") lower than limit (" + maxIndices + "). Not performing any retention actions.");
+            return;
+        }
+        
+        // We have more indices than the configured maximum! Remove as many as needed.
+        int remove = indexCount-maxIndices;
+        String msg = "Number of indices (" + indexCount + ") higher than limit (" + maxIndices + "). Deleting " + remove + " indices.";
+        LOG.info(msg);
+        server.getActivityWriter().write(new Activity(msg, EmbeddedElasticSearchClient.class));
+        
+        for (String indexName : IndexHelper.getOldestIndices(indices.keySet(), remove)) {
+            // Never delete the current deflector target.
+            if (server.getDeflector().getCurrentTargetName().equals(indexName)) {
+                LOG.info("Not deleting current deflector target <" + indexName + ">.");
+                continue;
+            }
+            
+            msg = "Retention cleaning: Deleting index <" + indexName + ">";
+            LOG.info(msg);
+            server.getActivityWriter().write(new Activity(msg, EmbeddedElasticSearchClient.class));
+            
+            // Sorry if this should ever go mad. Delete the index!
+            deleteIndex(indexName);
+        }
     }
     
     private IndexRequestBuilder buildIndexRequest(String index, String source, String id, int ttlMinutes) {

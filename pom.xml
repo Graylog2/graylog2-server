@@ -6,7 +6,7 @@
 
     <groupId>org.graylog2</groupId>
     <artifactId>graylog2-server</artifactId>
-    <version>0.9.7-dev</version>
+    <version>0.9.7-preview.1</version>
     <packaging>jar</packaging>
 
     <properties>
@@ -134,9 +134,9 @@
             <classifier>jar-with-dependencies</classifier>
         </dependency>
         <dependency>
-            <groupId>${project.groupId}</groupId>
+            <groupId>org.graylog2</groupId>
             <artifactId>graylog2-plugin</artifactId>
-            <version>${project.version}</version>
+            <version>0.9.7.1</version>
         </dependency>
         <dependency>
             <groupId>com.googlecode.disruptor</groupId>

@@ -22,10 +22,6 @@ package org.graylog2.inputs.syslog;
 
 import com.yammer.metrics.Metrics;
 import com.yammer.metrics.core.Meter;
-import java.net.InetSocketAddress;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 import org.apache.log4j.Logger;
 import org.graylog2.Core;
 import org.jboss.netty.buffer.ChannelBuffer;
@@ -35,6 +31,10 @@ import org.jboss.netty.channel.MessageEvent;
 import org.jboss.netty.channel.SimpleChannelHandler;
 import org.graylog2.ThreadPool;
 
+import java.net.InetSocketAddress;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.ExecutorService;
+
 /**
  * @author Lennart Koopmann <lennart@socketfeed.com>
  */
@@ -42,9 +42,9 @@ public class SyslogDispatcher extends SimpleChannelHandler {
 
     private static final Logger LOG = Logger.getLogger(SyslogDispatcher.class);
     protected final ExecutorService executor = new ThreadPool(SyslogDispatcher.class.getName(), 128, 15000*10);
-    protected static final Meter receivedMessagesMeter = Metrics.newMeter(SyslogDispatcher.class, "ReceivedMessages", "messages", TimeUnit.SECONDS);
 
     private SyslogProcessor processor;
+    private final Meter receivedMessages = Metrics.newMeter(SyslogDispatcher.class, "ReceivedMessages", "messages", TimeUnit.SECONDS);
 
     public SyslogDispatcher(Core server) {
         this.processor = new SyslogProcessor(server);
@@ -55,7 +55,7 @@ public class SyslogDispatcher extends SimpleChannelHandler {
         executor.execute(new Runnable() {
             public void run() {
                 try {
-                    receivedMessagesMeter.mark();
+                    receivedMessages.mark();
 
                     InetSocketAddress remoteAddress = (InetSocketAddress) e.getRemoteAddress();
 

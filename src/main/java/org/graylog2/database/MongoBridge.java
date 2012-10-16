@@ -28,7 +28,9 @@ import com.mongodb.DB;
 import com.mongodb.DBCollection;
 import com.mongodb.DBObject;
 import java.util.Map;
+import org.graylog2.Core;
 import org.graylog2.activities.Activity;
+import org.joda.time.DateTime;
 
 
 /**
@@ -40,8 +42,11 @@ public class MongoBridge {
 
     private static final Logger LOG = Logger.getLogger(MongoBridge.class);    
     private MongoConnection connection;
+    
+    Core server;
 
-    public MongoBridge() {
+    public MongoBridge(Core server) {
+        this.server = server;
     }
 
     public MongoConnection getConnection() {
@@ -106,11 +111,17 @@ public class MongoBridge {
     }
 
     public synchronized void writeMessageCounts(int total, Map<String, Integer> streams, Map<String, Integer> hosts) {
+        // We store the first second of the current minute, to allow syncing (summing) message counts
+        // from different graylog-server nodes later
+        DateTime dt = new DateTime();
+        int startOfMinute = Tools.getUTCTimestamp()-dt.getSecondOfMinute();;
+        
         BasicDBObject obj = new BasicDBObject();
-        obj.put("timestamp", Tools.getUTCTimestamp());
+        obj.put("timestamp", startOfMinute);
         obj.put("total", total);
         obj.put("streams", streams);
         obj.put("hosts", hosts);
+        obj.put("server_id", server.getServerId());
 
         getConnection().getMessageCountsColl().insert(obj);
     }
@@ -118,7 +129,7 @@ public class MongoBridge {
     public void writeActivity(Activity activity) {
         BasicDBObject obj = new BasicDBObject();
         obj.put("timestamp", Tools.getUTCTimestamp());
-        obj.put("content", activity.getContent());
+        obj.put("content", activity.getMessage());
         obj.put("caller", activity.getCaller().getCanonicalName());
         
         connection.getDatabase().getCollection("server_activities").insert(obj);

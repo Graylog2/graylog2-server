@@ -17,35 +17,32 @@
  * along with Graylog2.  If not, see <http://www.gnu.org/licenses/>.
  *
  */
-package org.graylog2.activities;
+package org.graylog2.indexer;
+
+import com.google.common.collect.Sets;
+import java.util.List;
+import java.util.Set;
+import org.graylog2.Tools;
 
 /**
  * @author Lennart Koopmann <lennart@socketfeed.com>
  */
-public class Activity {
+public class IndexHelper {
     
-    String message;
-    Class caller;
-    
-    public Activity(Class caller) {
-        this.caller = caller;
+    public static Set<String> getOldestIndices(Set<String> indexNames, int count) {
+        Set<String> r = Sets.newHashSet();
+        
+        if (count < 0 || indexNames.size() <= count) {
+            return r;
+        }
+        
+        List<String> sorted = Tools.asSortedList(indexNames);
+        
+        // Add last x entries to return set.
+        r.addAll(sorted.subList(0, count));
+        
+        return r;
     }
+   
     
-    public Activity(String content, Class caller) {
-        this.message = content;
-        this.caller = caller;
-    }
-    
-    public void setMessage(String message) {
-        this.message = message;
-    }
-    
-    public String getMessage() {
-        return message;
-    }
-    
-    public Class getCaller() {
-        return caller;
-    }
-
 }

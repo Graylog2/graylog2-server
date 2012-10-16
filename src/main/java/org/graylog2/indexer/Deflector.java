@@ -107,18 +107,20 @@ public class Deflector {
         
         // Point to deflector to new index.
         LOG.info("Pointing deflector to new target index....");
+
+        Activity activity = new Activity(Deflector.class);
         if (oldTargetNumber == -1) {
             // Only poiting, not cycling.
             pointTo(newTarget);
+            activity.setMessage("Cycled deflector from <none> to <" + newTarget + ">");
         } else {
             // Re-poiting from existing old index to the new one.
             pointTo(newTarget, oldTarget);
+            activity.setMessage("Cycled deflector from <" + oldTarget + "> to <" + newTarget + ">");
         }
         LOG.info("Done!");
-        server.getActivityWriter().write(new Activity(
-                    "Cycled deflector from <" + oldTarget + "> to <" + newTarget + ">",
-                    Deflector.class
-                ));
+
+        server.getActivityWriter().write(activity);
     }
     
     public int getCurrentTargetNumber() throws NoTargetIndexException {

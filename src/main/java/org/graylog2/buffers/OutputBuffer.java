@@ -40,29 +40,35 @@ public class OutputBuffer implements Buffer {
 
     protected ExecutorService executor = new ThreadPool(OutputBuffer.class.getName(), 16, 15000*10);
 
-    OutputBufferProcessor processor;
+    OutputBufferProcessor[] processors;
     Core server;
 
     public OutputBuffer(Core server) {
         this.server = server;
-        this.processor = new OutputBufferProcessor(this.server);
     }
 
     public void initialize() {
+        processors = new OutputBufferProcessor[server.getConfiguration().getOutputBufferProcessors()];
+        
+        for (int i = 0; i < server.getConfiguration().getOutputBufferProcessors(); i++) {
+            processors[i] = new OutputBufferProcessor(this.server, i, server.getConfiguration().getOutputBufferProcessors());
+        }
     }
 
     @Override
     public void insert(LogMessage message) {
         final LogMessageEvent event = new LogMessageEvent();
         event.setMessage(message);
-        executor.execute(new Runnable() {
-            public void run() {
-                try {
-                    processor.onEvent(event, 0, false);
-                } catch (Exception e) {
+        for (final OutputBufferProcessor processor: processors) {
+            executor.execute(new Runnable() {
+                public void run() {
+                    try {
+                        processor.onEvent(event, 0, false);
+                    } catch (Exception e) {
+                    }
                 }
-            }
-        });
+            });
+        }
     }
 
 }

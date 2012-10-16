@@ -20,33 +20,30 @@
 
 package org.graylog2.initializers;
 
-import java.util.concurrent.TimeUnit;
 import org.graylog2.Core;
-import org.graylog2.periodical.MessageRetentionThread;
+import org.graylog2.periodical.IndexRetentionThread;
 
 /**
  * @author Lennart Koopmann <lennart@socketfeed.com>
  */
-public class MessageRetentionInitializer implements Initializer {
+public class IndexRetentionInitializer  extends SimpleFixedRateScheduleInitializer implements Initializer {
 
-    Core graylogServer;
-
-    /*
-     * Beware! This is not a fixed rate scheduled thread. Called only once.
-     * Look into MessageRetentionThread#scheduleNextRun().
-     */
-    public MessageRetentionInitializer(Core graylogServer) {
+    public IndexRetentionInitializer(Core graylogServer) {
         this.graylogServer = graylogServer;
     }
-
+    
     @Override
     public void initialize() {
-        this.graylogServer.getScheduler().schedule(new MessageRetentionThread(graylogServer),0,TimeUnit.SECONDS);
+        configureScheduler(
+                new IndexRetentionThread(this.graylogServer),
+                IndexRetentionThread.INITIAL_DELAY,
+                IndexRetentionThread.PERIOD
+        );
     }
     
     @Override
     public boolean masterOnly() {
         return true;
     }
-    
+
 }
