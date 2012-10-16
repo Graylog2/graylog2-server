@@ -211,6 +211,9 @@ public class Configuration {
     
     @Parameter(value = "twilio_sender", required = false)
     private String twilioSender = "";
+
+    @Parameter(value = "plugin_dir", required = false)
+    private String pluginDir = "plugin";
     
     public boolean isMaster() {
         return isMaster;
@@ -472,6 +475,10 @@ public class Configuration {
     
     public String getTwilioSender() {
         return twilioSender;
+    }
+
+    public String getPluginDir() {
+        return pluginDir;
     }
     
     @ValidatorMethod
