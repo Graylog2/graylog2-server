@@ -34,6 +34,7 @@ import org.graylog2.ThreadPool;
 import java.net.InetSocketAddress;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.ExecutorService;
+import java.util.concurrent.RejectedExecutionException;
 
 /**
  * @author Lennart Koopmann <lennart@socketfeed.com>
@@ -65,8 +66,10 @@ public class SyslogDispatcher extends SimpleChannelHandler {
                     buffer.toByteBuffer().get(readable, buffer.readerIndex(), buffer.readableBytes());
 
                     processor.messageReceived(new String(readable), remoteAddress.getAddress());
+                } catch (RejectedExecutionException ex) {
+                    LOG.debug("Syslog processor overload");
                 } catch (Exception ex) {
-                    LOG.warn("Could not handle syslog message: " + ex.getCause());
+                    LOG.error("Could not handle syslog message", ex);
                 }
             }
         });
