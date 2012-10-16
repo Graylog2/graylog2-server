@@ -70,7 +70,6 @@ public class GraphiteWriterThread implements Runnable {
         try {
             GraphiteFormatter f = new GraphiteFormatter(
                     counter,
-                    graylogServer.getServerId(),
                     graylogServer.getConfiguration().getGraphitePrefix()
             );
             

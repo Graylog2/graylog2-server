@@ -31,12 +31,10 @@ import org.graylog2.plugin.MessageCounter;
 public class GraphiteFormatter {
 
     private MessageCounter counter;
-    String serverId;
     String prefix;
     
-    public GraphiteFormatter(MessageCounter counter, String serverId, String prefix) {
+    public GraphiteFormatter(MessageCounter counter, String prefix) {
         this.counter = counter;
-        this.serverId = serverId;
         this.prefix = prefix;
     }
 
@@ -65,7 +63,7 @@ public class GraphiteFormatter {
     }
     
     private String prefix() {
-        return prefix + "." + serverId + "." + "messagecounts" + ".";
+        return prefix + "." + "messagecounts" + ".";
     }
 
 }
