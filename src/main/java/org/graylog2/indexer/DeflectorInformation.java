@@ -19,6 +19,7 @@
  */
 package org.graylog2.indexer;
 
+import org.apache.log4j.Logger;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import java.util.Iterator;
@@ -35,6 +36,8 @@ import org.graylog2.Tools;
  */
 public class DeflectorInformation {
     
+    private static final Logger LOG = Logger.getLogger(DeflectorInformation.class);
+
     private Core graylogServer;
     
     private Map<String, IndexStats> indices = Maps.newHashMap();
@@ -81,7 +84,12 @@ public class DeflectorInformation {
 
         Map<String, Map<String, Object>> indexInformation = Maps.newHashMap();
         for (Map.Entry<String, IndexStats> e : indices.entrySet()) {
-            indexInformation.put(e.getKey(), getIndexInformation(e.getValue()));
+            try {
+                indexInformation.put(e.getKey(), getIndexInformation(e.getValue()));
+            } catch (NullPointerException ex) {
+                LOG.error("Failed to get index information for index "+e.getKey(), ex);
+                throw ex;
+            }
         }
 
         Map<String, Object> recentIndexInfo = Maps.newHashMap();
@@ -104,8 +112,7 @@ public class DeflectorInformation {
         info.put("docs", stats.getTotal().getDocs().count());
         info.put("size", stats.getTotal().store().getSize().getKb());
         info.put("time_index", stats.getTotal().getIndexing().total().indexTime().getSeconds());
-        info.put("time_query", stats.getTotal().getSearch().total().queryTime().getSeconds());
-        info.put("time_fetch", stats.getTotal().getSearch().total().fetchTime().getSeconds());
+        info.put("time_delete", stats.getTotal().getIndexing().total().deleteTime().getSeconds());
         info.put("time_get", stats.getTotal().getGet().getTime().getSeconds());
         info.put("shards", getShardInformation(stats));
         
