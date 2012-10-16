@@ -41,33 +41,37 @@ public class DeflectorInformationWriterThread implements Runnable {
     
     @Override
     public void run() {
-        DeflectorInformation i = new DeflectorInformation(this.graylogServer);
-        
-        // Where is the deflector pointing to?
-        String deflectorName;
         try {
-            deflectorName = graylogServer.getDeflector().getCurrentTargetName();
-        } catch(Exception e) {
-            deflectorName = "NO TARGET";
+            DeflectorInformation i = new DeflectorInformation(this.graylogServer);
+            
+            // Where is the deflector pointing to?
+            String deflectorName;
+            try {
+                deflectorName = graylogServer.getDeflector().getCurrentTargetName();
+            } catch(Exception e) {
+                deflectorName = "NO TARGET";
+            }
+            i.setDeflectorTarget(deflectorName);
+            
+            // Configured limit of messages per index.
+            i.setConfiguredMaximumMessagesPerIndex(
+                    graylogServer.getConfiguration().getElasticSearchMaxDocsPerIndex()
+            );
+            
+            // List of indexes and number of messages in them.
+            i.addIndices(graylogServer.getDeflector().getAllDeflectorIndices());
+            
+            // Recent index information.
+            i.setRecentIndex(graylogServer.getIndexer().getRecentIndex());
+            i.setRecentIndexStorageType(graylogServer.getIndexer().getRecentIndexStorageType());
+            
+            // Last updated from which node?
+            i.setCallingNode(graylogServer.getServerId());
+            
+            graylogServer.getMongoBridge().writeDeflectorInformation(i.getAsDatabaseObject());
+        } catch (Exception ex) {
+            LOG.error("Exception", ex);
         }
-        i.setDeflectorTarget(deflectorName);
-        
-        // Configured limit of messages per index.
-        i.setConfiguredMaximumMessagesPerIndex(
-                graylogServer.getConfiguration().getElasticSearchMaxDocsPerIndex()
-        );
-        
-        // List of indexes and number of messages in them.
-        i.addIndices(graylogServer.getDeflector().getAllDeflectorIndices());
-        
-        // Recent index information.
-        i.setRecentIndex(graylogServer.getIndexer().getRecentIndex());
-        i.setRecentIndexStorageType(graylogServer.getIndexer().getRecentIndexStorageType());
-        
-        // Last updated from which node?
-        i.setCallingNode(graylogServer.getServerId());
-        
-        graylogServer.getMongoBridge().writeDeflectorInformation(i.getAsDatabaseObject());
     }
     
 }
