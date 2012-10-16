@@ -19,21 +19,19 @@ case "$1" in
 	chown -Rh root:root /etc/graylog2.d /etc/graylog2.conf
 	chmod 755 /etc/graylog2.d
 	chmod 644 /etc/graylog2.d/*
+	chmod 755 /etc/graylog2.d/rules
+	chmod 644 /etc/graylog2.d/rules/*
 
-    pass=grayloguser
-    cat | mongo <<EOF
-use admin
-db.addUser('admin', '$pass')
-db.auth('admin', '$pass')
-use graylog2
-db.addUser('grayloguser', '$pass')
-db.auth('grayloguser', '$pass')
-EOF
+    mongo localhost/graylog2 --eval "db.addUser('grayloguser', 'grayloguser')" || true
+
+    if [ -f "/etc/init/graylog2-server.conf" ]; then
+        if status graylog2-server; then
+            restart graylog2-server || true
+        else
+            start graylog2-server || true
+        fi
+    fi
     ;;
 esac
 
-
-if [ -f "/etc/init/graylog2-server.conf" ]; then
-    start graylog2-server || true
-fi
 
