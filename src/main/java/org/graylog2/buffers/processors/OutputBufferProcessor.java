@@ -43,7 +43,11 @@ public class OutputBufferProcessor implements EventHandler<LogMessageEvent> {
 
     private Core server;
 
-    private List<LogMessage> buffer = Lists.newArrayList();
+    private final ThreadLocal<List<LogMessage>> tlsBuffer = new ThreadLocal() {
+        @Override protected List<LogMessage> initialValue() {
+            return Lists.newArrayList();
+        }
+    };
     private final Meter incomingMessages = Metrics.newMeter(OutputBufferProcessor.class, "IncomingMessages", "messages", TimeUnit.SECONDS);
     private final Histogram batchSize = Metrics.newHistogram(OutputBufferProcessor.class, "BatchSize");
 
@@ -70,22 +74,20 @@ public class OutputBufferProcessor implements EventHandler<LogMessageEvent> {
             LOG.debug("Processing message <" + msg.getId() + "> from OutputBuffer.");
         }
 
+        List<LogMessage> buffer = tlsBuffer.get();
         buffer.add(msg);
 
         if (endOfBatch || buffer.size() >= server.getConfiguration().getOutputBatchSize()) {
-            for (Class<? extends MessageOutput> outputType : server.getOutputs()) {
+            for (MessageOutput output : server.getOutputs()) {
                 try {
-                    // Always create a new instance of this filter.
-                    MessageOutput output = outputType.newInstance();
-
                     if (LOG.isDebugEnabled()) {
-                        LOG.debug("Writing message batch to [" + outputType.getSimpleName() + "]. Size <" + buffer.size() + ">");
+                        LOG.debug("Writing message batch to [" + output.getClass().getSimpleName() + "]. Size <" + buffer.size() + ">");
                     }
 
                     batchSize.update(buffer.size());
                     output.write(buffer, server);
                 } catch (Exception e) {
-                    LOG.error("Could not write message batch to output [" + outputType.getSimpleName() +"].", e);
+                    LOG.error("Could not write message batch to output [" + output.getClass().getSimpleName() +"].", e);
                 } finally {
                     buffer.clear();
                 }

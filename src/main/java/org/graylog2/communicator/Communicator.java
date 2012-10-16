@@ -39,14 +39,13 @@ public class Communicator {
     }
     
     public void send(String text) {
-        for (Class<? extends CommunicatorMethod> cmc : server.getCommunicatorMethods()) {
+        for (CommunicatorMethod cm : server.getCommunicatorMethods()) {
             try {
-                CommunicatorMethod cm = cmc.newInstance();
                 if (text.length() > cm.getMaxTextLength()) {
                     text = text.substring(0, cm.getMaxTextLength());
                 }
                 
-                cm.send(server, text, getAllRecipientsForMethod(cmc));
+                cm.send(server, text, getAllRecipientsForMethod(cm.getClass()));
             } catch (Exception e) {
                 LOG.error("Could not send message from communicator. ", e);
             }

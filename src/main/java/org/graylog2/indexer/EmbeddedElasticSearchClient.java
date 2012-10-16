@@ -118,7 +118,7 @@ public class EmbeddedElasticSearchClient {
             NodesInfoResponse r = client.admin().cluster().nodesInfo(new NodesInfoRequest(nodeId).all()).actionGet();
             return r.getNodesMap().get(nodeId).getNode().getName();
         } catch (Exception e) {
-            LOG.error("Could not read name of ES node.", e);
+            LOG.error("Could not read name of ES node "+nodeId, e);
             return "UNKNOWN";
         }
         
@@ -133,7 +133,7 @@ public class EmbeddedElasticSearchClient {
             NodesInfoResponse r = client.admin().cluster().nodesInfo(new NodesInfoRequest(nodeId).all()).actionGet();
             return r.getNodesMap().get(nodeId).getHostname();
         } catch (Exception e) {
-            LOG.error("Could not read name of ES node.", e);
+            LOG.error("Could not read name of ES node "+nodeId, e);
             return "UNKNOWN";
         }
         

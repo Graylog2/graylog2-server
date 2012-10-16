@@ -1,0 +1,37 @@
+#!/bin/sh
+set -e
+
+case "$1" in
+    configure)
+	[ -f /etc/default/graylog2-server ] && . /etc/default/graylog2-server
+	[ -z "$USER" ] && USER="graylog2"
+	[ -z "$GROUP" ] && GROUP="graylog2"
+	if ! getent group "$GROUP" > /dev/null 2>&1 ; then
+	    addgroup --system "$GROUP" --quiet
+	fi
+	if ! id $USER > /dev/null 2>&1 ; then
+	    adduser --system --home /usr/share/graylog2-server --no-create-home \
+		--ingroup "$GROUP" --disabled-password --shell /bin/false \
+		"$USER"
+	fi
+
+	# configuration files should not be modifiable by elasticsearch user, as this can be a security issue
+	chown -Rh root:root /etc/graylog2.d /etc/graylog2.conf
+	chmod 755 /etc/graylog2.d
+	chmod 644 /etc/graylog2.d/*
+	chmod 755 /etc/graylog2.d/rules
+	chmod 644 /etc/graylog2.d/rules/*
+
+    mongo localhost/graylog2 --eval "db.addUser('grayloguser', 'grayloguser')" || true
+
+    if [ -f "/etc/init/graylog2-server.conf" ]; then
+        if status graylog2-server; then
+            restart graylog2-server || true
+        else
+            start graylog2-server || true
+        fi
+    fi
+    ;;
+esac
+
+

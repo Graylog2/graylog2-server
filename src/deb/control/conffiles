@@ -1,0 +1,6 @@
+/etc/default/graylog2-server
+/etc/graylog2.conf
+/etc/graylog2.d/log4j.conf
+/etc/graylog2.d/rules/graylog2.patterns
+/etc/graylog2.d/rules/graylog2.drl
+/etc/graylog2-elasticsearch.yml

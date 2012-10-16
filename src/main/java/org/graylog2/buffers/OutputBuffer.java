@@ -20,12 +20,13 @@
 
 package org.graylog2.buffers;
 
-import com.lmax.disruptor.MultiThreadedClaimStrategy;
-import com.lmax.disruptor.RingBuffer;
-import com.lmax.disruptor.SleepingWaitStrategy;
-import com.lmax.disruptor.dsl.Disruptor;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.ThreadFactory;
+import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.ThreadPoolExecutor;
+import org.graylog2.ThreadPool;
 import org.graylog2.Core;
 import org.graylog2.buffers.processors.OutputBufferProcessor;
 import org.graylog2.plugin.GraylogServer;
@@ -37,42 +38,37 @@ import org.graylog2.plugin.logmessage.LogMessage;
  */
 public class OutputBuffer implements Buffer {
 
-    protected static final int RING_SIZE = 524288;
-    protected RingBuffer<LogMessageEvent> ringBuffer;
-
-    protected ExecutorService executor = Executors.newCachedThreadPool();
-
+    ExecutorService executor;
+    OutputBufferProcessor[] processors;
     Core server;
 
-    public OutputBuffer(Core server) {
+    public OutputBuffer(Core server, int threadCount, int queueLimit) {
         this.server = server;
+        this.executor = new ThreadPool(OutputBuffer.class.getName(), threadCount, queueLimit);
     }
 
     public void initialize() {
-        Disruptor disruptor = new Disruptor<LogMessageEvent>(
-                LogMessageEvent.EVENT_FACTORY,
-                executor,
-                new MultiThreadedClaimStrategy(RING_SIZE),
-                new SleepingWaitStrategy()
-        );
-
-        OutputBufferProcessor[] processors = new OutputBufferProcessor[server.getConfiguration().getOutputBufferProcessors()];
+        processors = new OutputBufferProcessor[server.getConfiguration().getOutputBufferProcessors()];
         
         for (int i = 0; i < server.getConfiguration().getOutputBufferProcessors(); i++) {
             processors[i] = new OutputBufferProcessor(this.server, i, server.getConfiguration().getOutputBufferProcessors());
         }
-        
-        disruptor.handleEventsWith(processors);
-        
-        ringBuffer = disruptor.start();
     }
 
     @Override
     public void insert(LogMessage message) {
-        long sequence = ringBuffer.next();
-        LogMessageEvent event = ringBuffer.get(sequence);
+        final LogMessageEvent event = new LogMessageEvent();
         event.setMessage(message);
-        ringBuffer.publish(sequence);
+        for (final OutputBufferProcessor processor: processors) {
+            executor.execute(new Runnable() {
+                public void run() {
+                    try {
+                        processor.onEvent(event, 0, false);
+                    } catch (Exception e) {
+                    }
+                }
+            });
+        }
     }
 
 }
