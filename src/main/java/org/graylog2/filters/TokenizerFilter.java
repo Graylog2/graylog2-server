@@ -70,7 +70,7 @@ public class TokenizerFilter implements MessageFilter {
                     for (String part : parts) {
                         if (part.contains("=") && StringUtils.countMatches(part, "=") == 1) {
                             String[] kv = part.split("=");
-                            if (kv.length == 2 && p.matcher(kv[0]).matches() && !msg.getAdditionalData().containsKey("_" + kv[0])) {
+                            if (kv.length == 2 && p.matcher(kv[0]).matches() && !msg.getAdditionalData().containsKey("_" + kv[0]) && !kv[0].equals("id")) {
                                 msg.addAdditionalData(kv[0].trim(), kv[1].trim());
                                 extracted++;
                             }
