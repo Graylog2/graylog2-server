@@ -264,11 +264,6 @@ class MessageGateway
     return false if store_generic["mapping"]["index"] != "not_analyzed"
     return false if store_generic["match"] != "*"
 
-    properties = mapping["properties"]
-    expected = { "analyzer" => "whitespace", "type" => "string" }
-    return false if properties["full_message"] != expected
-    return false if properties["message"] != expected
-
     true
   rescue
     false
