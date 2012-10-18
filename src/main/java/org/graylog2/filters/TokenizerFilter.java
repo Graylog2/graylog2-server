@@ -31,6 +31,7 @@ import org.graylog2.plugin.logmessage.LogMessage;
 
 import java.util.concurrent.TimeUnit;
 import java.util.regex.Pattern;
+import java.util.regex.Matcher;
 
 /**
  * @author Lennart Koopmann <lennart@socketfeed.com>
@@ -42,6 +43,7 @@ public class TokenizerFilter implements MessageFilter {
     private final Pattern p = Pattern.compile("[a-zA-Z0-9_-]*");
     private final Pattern kvPattern = Pattern.compile("\\s?=\\s?");
     private final Pattern spacePattern = Pattern.compile(" ");
+    private final Pattern quotedValuePattern = Pattern.compile("([a-zA-Z0-9_-]+=\"[^\"]+\")");
     private final Timer processTime = Metrics.newTimer(TokenizerFilter.class, "ProcessTime", TimeUnit.MICROSECONDS, TimeUnit.SECONDS);
 
     /*
@@ -65,18 +67,30 @@ public class TokenizerFilter implements MessageFilter {
         if (msg.getShortMessage().contains("=")) {
             try {
                 final String nmsg = kvPattern.matcher(msg.getShortMessage()).replaceAll("=");
-                final String[] parts = spacePattern.split(nmsg);
-                if (parts != null) {
-                    for (String part : parts) {
-                        if (part.contains("=") && StringUtils.countMatches(part, "=") == 1) {
-                            String[] kv = part.split("=");
-                            if (kv.length == 2 && p.matcher(kv[0]).matches() && !msg.getAdditionalData().containsKey("_" + kv[0]) && !kv[0].equals("id")) {
-                                msg.addAdditionalData(kv[0].trim(), kv[1].trim());
-                                extracted++;
+                if (nmsg.contains("=\"")) {
+                    Matcher m = quotedValuePattern.matcher(nmsg);
+                    while (m.find()) {
+                        String[] kv = m.group(1).split("=");
+                        if (kv.length == 2 && p.matcher(kv[0]).matches() && !kv[0].equals("id")) {
+                            msg.addAdditionalData(kv[0].trim(), StringUtils.strip(kv[1], "\"").trim());
+                            extracted++;
+                        }
+                    }
+                } else {
+                    final String[] parts = spacePattern.split(nmsg);
+                    if (parts != null) {
+                        for (String part : parts) {
+                            if (part.contains("=") && StringUtils.countMatches(part, "=") == 1) {
+                                String[] kv = part.split("=");
+                                if (kv.length == 2 && p.matcher(kv[0]).matches() && !msg.getAdditionalData().containsKey("_" + kv[0]) && !kv[0].equals("id")) {
+                                    msg.addAdditionalData(kv[0].trim(), kv[1].trim());
+                                    extracted++;
+                                }
                             }
                         }
                     }
                 }
+
             } catch(Exception e) {
                 LOG.warn("Error while trying to tokenize message <" + msg.getId() + ">", e);
             }
