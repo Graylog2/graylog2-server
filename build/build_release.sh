@@ -29,7 +29,7 @@ echo $BUILD_DATE > $BUILD_DIR/build_date
 echo "Copying files ..."
 
 # Copy files.
-cp ../app ../config ../lib ../public ../Rakefile ../README ../Gemfile ../Gemfile.lock ../config.ru ../script ../vendor $BUILD_DIR -r
+cp -R ../app ../config ../lib ../public ../Rakefile ../README ../Gemfile ../Gemfile.lock ../config.ru ../script ../vendor $BUILD_DIR
 
 # Remove not needed files
 rm $BUILD_DIR/public/images/dashboard_logo.png
