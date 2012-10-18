@@ -163,4 +163,14 @@ public class TokenizerFilterTest {
         assertEquals("v4", msg.getAdditionalData().get("_k4"));
     }
 
+   @Test
+    public void testFilterWithIDAdditionalField() {
+        LogMessageImpl msg = new LogMessageImpl();
+        msg.setShortMessage("otters id=123 more otters");
+        TokenizerFilter f = new TokenizerFilter();
+        f.filter(msg, new GraylogServerStub());
+
+        assertEquals(false, msg.getAdditionalData().containsKey("_id"));
+    }
+
 }
