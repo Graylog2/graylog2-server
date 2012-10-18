@@ -176,7 +176,7 @@ public class EmbeddedElasticSearchClient {
         if (!acknowledged) {
             return false;
         }
-        final PutMappingRequest mappingRequest = Mapping.getPutMappingRequest(client, indexName);
+        final PutMappingRequest mappingRequest = Mapping.getPutMappingRequest(client, indexName, server.getConfiguration().getElasticSearchAnalyzer());
         final boolean mappingCreated = client.admin().indices().putMapping(mappingRequest).actionGet().acknowledged();
         return acknowledged && mappingCreated;
     }
@@ -194,7 +194,7 @@ public class EmbeddedElasticSearchClient {
         if (!acknowledged) {
             return false;
         }
-        final PutMappingRequest mappingRequest = Mapping.getPutMappingRequest(client, RECENT_INDEX_NAME);
+        final PutMappingRequest mappingRequest = Mapping.getPutMappingRequest(client, RECENT_INDEX_NAME, server.getConfiguration().getElasticSearchAnalyzer());
         final boolean mappingCreated = client.admin().indices().putMapping(mappingRequest).actionGet().acknowledged();
         return acknowledged && mappingCreated;
     }

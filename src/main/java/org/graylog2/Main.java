@@ -121,7 +121,7 @@ public final class Main {
         server.initialize(configuration);
         
         // Could it be that there is another master instance already?
-        if (server.cluster().masterCountExcept(server.getServerId()) != 0) {
+        if (configuration.isMaster() && server.cluster().masterCountExcept(server.getServerId()) != 0) {
             // All devils here.
             String what = "Detected other master node in the cluster! Starting as non-master! "
                     + "This is a mis-configuration you should fix.";

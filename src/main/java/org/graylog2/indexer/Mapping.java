@@ -38,12 +38,12 @@ import org.elasticsearch.client.Client;
 @SuppressWarnings({"unchecked"})
 public class Mapping {
 
-    public static PutMappingRequest getPutMappingRequest(final Client client, final String index) {
+    public static PutMappingRequest getPutMappingRequest(final Client client, final String index, final String analyzer) {
         final PutMappingRequestBuilder builder = client.admin().indices().preparePutMapping(new String[] {index});
         builder.setType(EmbeddedElasticSearchClient.TYPE);
 
         final Map<String, Object> mapping = new HashMap<String, Object>();
-        mapping.put("properties", partFieldProperties());
+        mapping.put("properties", partFieldProperties(analyzer));
         mapping.put("dynamic_templates", partDefaultAllInDynamicTemplate());
         mapping.put("_source", enabledAndCompressed()); // Compress source field..
         mapping.put("_ttl", enabled()); // Enable purging by TTL.
@@ -79,11 +79,11 @@ public class Mapping {
     /*
      * Enable analyzing for some fields again. Like for message and full_message.
      */
-    private static Map partFieldProperties() {
+    private static Map partFieldProperties(String analyzer) {
         final Map properties = new HashMap();
 
-        properties.put("message", analyzedString());
-        properties.put("full_message", analyzedString());
+        properties.put("message", analyzedString(analyzer));
+        properties.put("full_message", analyzedString(analyzer));
 
         // Required for the WI to not fail on empty indexes.
         properties.put("created_at", typeNumberDouble());
@@ -94,11 +94,11 @@ public class Mapping {
         return properties;
     }
 
-    private static Map analyzedString() {
+    private static Map analyzedString(String analyzer) {
         final Map type = new HashMap();
         type.put("index", "analyzed");
         type.put("type", "string");
-        type.put("analyzer", "whitespace");
+        type.put("analyzer", analyzer);
 
         return type;
     }

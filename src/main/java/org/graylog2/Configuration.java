@@ -104,6 +104,9 @@ public class Configuration {
     @Parameter(value = "elasticsearch_max_docs_per_index", validator = PositiveIntegerValidator.class, required = true)
     private int elasticsearchMaxDocsPerIndex = 80000000;
     
+    @Parameter(value = "elasticsearch_analyzer", required = true)
+    private String elasticsearchAnalyzer = "standard";
+    
     @Parameter(value = "mongodb_user")
     private String mongoUser;
 
@@ -301,6 +304,10 @@ public class Configuration {
     
     public int getElasticSearchMaxDocsPerIndex() {
         return this.elasticsearchMaxDocsPerIndex;
+    }
+    
+    public String getElasticSearchAnalyzer() {
+        return elasticsearchAnalyzer;
     }
    
     public boolean isMongoUseAuth() {
