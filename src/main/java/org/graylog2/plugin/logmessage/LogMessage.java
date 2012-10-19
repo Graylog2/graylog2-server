@@ -71,8 +71,6 @@ public interface LogMessage {
     public void setShortMessage(String shortMessage);
 
     public void addAdditionalData(String key, Object value);
-    
-    public void addAdditionalData(String key, String value);
 
     public void addAdditionalData(Map<String, String> fields);
 
