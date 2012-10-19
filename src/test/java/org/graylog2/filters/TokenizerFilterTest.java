@@ -183,5 +183,18 @@ public class TokenizerFilterTest {
 
         assertEquals(false, msg.getAdditionalData().containsKey("_id"));
     }
+   
+   @Test
+   public void testFilterWithConflictingAdditionalFields() {
+        LogMessageImpl msg = new LogMessageImpl();
+        msg.setShortMessage("otters id=123 ttl=123 more otters");
+        TokenizerFilter f = new TokenizerFilter();
+        f.filter(msg, new GraylogServerStub());
+
+        // TTL and ID are protected and should not get accepted.
+        
+        assertEquals(false, msg.getAdditionalData().containsKey("_id"));
+        assertEquals(false, msg.getAdditionalData().containsKey("_ttl"));
+   }
 
 }
