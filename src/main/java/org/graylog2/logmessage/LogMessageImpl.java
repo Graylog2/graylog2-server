@@ -20,6 +20,7 @@
 
 package org.graylog2.logmessage;
 
+import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import java.util.ArrayList;
@@ -59,16 +60,15 @@ public class LogMessageImpl implements LogMessage {
 
     private double createdAt = 0;
     
-    public static final List<String> PROTECTED_KEYS = new ArrayList<String>() {{ 
-        add("_id");
-        add("_ttl");
-        add("_source");
-        add("_all");
-        add("_index");
-        add("_type");
-        add("_score");
-    }};
-
+    private static final ImmutableSet<String> PROTECTED_KEYS = ImmutableSet.of(
+        "_id",
+        "_ttl",
+        "_source",
+        "_all",
+        "_index",
+        "_type",
+        "_score"
+    );
 
     public LogMessageImpl() {
         // the elasticsearch version is the same as the "standard" one, except the encoding is different.
