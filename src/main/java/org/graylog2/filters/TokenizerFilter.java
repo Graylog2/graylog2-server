@@ -71,7 +71,7 @@ public class TokenizerFilter implements MessageFilter {
                     Matcher m = quotedValuePattern.matcher(nmsg);
                     while (m.find()) {
                         String[] kv = m.group(1).split("=");
-                        if (kv.length == 2 && p.matcher(kv[0]).matches() && !kv[0].equals("id")) {
+                        if (kv.length == 2 && p.matcher(kv[0]).matches() && !msg.getAdditionalData().containsKey("_" + kv[0])  && !kv[0].equals("id") && !kv[0].equals("ttl")) {
                             msg.addAdditionalData(kv[0].trim(), StringUtils.strip(kv[1], "\"").trim());
                             extracted++;
                         }
@@ -82,7 +82,7 @@ public class TokenizerFilter implements MessageFilter {
                         for (String part : parts) {
                             if (part.contains("=") && StringUtils.countMatches(part, "=") == 1) {
                                 String[] kv = part.split("=");
-                                if (kv.length == 2 && p.matcher(kv[0]).matches() && !msg.getAdditionalData().containsKey("_" + kv[0]) && !kv[0].equals("id")) {
+                                if (kv.length == 2 && p.matcher(kv[0]).matches() && !msg.getAdditionalData().containsKey("_" + kv[0]) && !kv[0].equals("id") && !kv[0].equals("ttl")) {
                                     msg.addAdditionalData(kv[0].trim(), kv[1].trim());
                                     extracted++;
                                 }

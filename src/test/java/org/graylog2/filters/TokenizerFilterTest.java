@@ -175,13 +175,14 @@ public class TokenizerFilterTest {
     }
 
    @Test
-    public void testFilterWithIDAdditionalField() {
+    public void testFilterWithConflictingAdditionalFields() {
         LogMessageImpl msg = new LogMessageImpl();
-        msg.setShortMessage("otters id=123 more otters");
+        msg.setShortMessage("otters id=123 ttl=123 more otters");
         TokenizerFilter f = new TokenizerFilter();
         f.filter(msg, new GraylogServerStub());
 
         assertEquals(false, msg.getAdditionalData().containsKey("_id"));
+        assertEquals(false, msg.getAdditionalData().containsKey("_ttl"));
     }
    
    @Test
