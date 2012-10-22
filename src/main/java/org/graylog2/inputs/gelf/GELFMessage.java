@@ -67,8 +67,22 @@ public class GELFMessage {
         };
 
         static Type determineType(final byte first, final byte second) {
-            if (first == ZLIB.first && second == ZLIB.second) {
-                return ZLIB;
+            if (first == ZLIB.first) {
+                // zlib's second byte is for flags and a checksum -
+                // make sure it is positive.
+                int secondInt = second;
+                if (second < 0) {
+                    secondInt += 256;
+                }
+                // the second byte is not constant for zlib, it
+                // differs based on compression level used and whether
+                // a dictionary is used.  What the RFC guarantees is
+                // that "CMF and FLG, when viewed as a 16-bit unsigned
+                // integer stored in MSB order (CMF*256 + FLG), is a
+                // multiple of 31"
+                if ((256 * first + secondInt) % 31 == 0) {
+                    return ZLIB;
+                }
             } else if (first == GZIP.first) { // GZIP and UNCOMPRESSED share first magic byte
                 if (second == GZIP.second) {
                     return GZIP;
