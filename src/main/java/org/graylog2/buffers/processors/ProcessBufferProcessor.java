@@ -64,23 +64,21 @@ public class ProcessBufferProcessor implements EventHandler<LogMessageEvent> {
         }
 
         for (MessageFilter filter : server.getFilters()) {
-            String name = filter.getClass().getSimpleName();
-            
             try {
                 
                 if (LOG.isDebugEnabled()) {
-                    LOG.debug("Applying filter [" + name +"] on message <" + msg.getId() + ">.");
+                    LOG.debug("Applying filter [" + filter.getName() +"] on message <" + msg.getId() + ">.");
                 }
 
                 if (filter.filter(msg, server)) {
                     if (LOG.isDebugEnabled()) {
-                        LOG.debug("Filter [" + name + "] marked message <" + msg.getId() + "> to be discarded. Dropping message.");
+                        LOG.debug("Filter [" + filter.getName() + "] marked message <" + msg.getId() + "> to be discarded. Dropping message.");
                     }
                     filteredOutMessages.mark();
                     return;
                 }
             } catch (Exception e) {
-                LOG.error("Could not apply filter [" + name +"] on message <" + msg.getId() +">: ", e);
+                LOG.error("Could not apply filter [" + filter.getName() +"] on message <" + msg.getId() +">: ", e);
             }
         }
 

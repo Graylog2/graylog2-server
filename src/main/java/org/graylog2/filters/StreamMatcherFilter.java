@@ -59,4 +59,9 @@ public class StreamMatcherFilter implements MessageFilter {
         return false;
     }
 
+    @Override
+    public String getName() {
+        return "StreamMatcher";
+    }
+    
 }

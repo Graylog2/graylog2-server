@@ -101,4 +101,8 @@ public class TokenizerFilter implements MessageFilter {
         tcx.stop();
         return false;
     }
-}
+    
+    @Override
+    public String getName() {
+        return "Tokenizer";
+    }}

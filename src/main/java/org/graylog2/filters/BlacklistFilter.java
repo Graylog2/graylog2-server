@@ -41,7 +41,7 @@ public class BlacklistFilter implements MessageFilter {
     private static final Logger LOG = Logger.getLogger(BlacklistFilter.class);
 
     private final Timer processTime = Metrics.newTimer(BlacklistFilter.class, "ProcessTime", TimeUnit.MICROSECONDS, TimeUnit.SECONDS);
-
+    
     @Override
     public boolean filter(LogMessage msg, GraylogServer server) {
         TimerContext tcx = processTime.time();
@@ -58,6 +58,11 @@ public class BlacklistFilter implements MessageFilter {
 
         tcx.stop();
         return false;
+    }
+    
+    @Override
+    public String getName() {
+        return "Blacklister";
     }
 
 }
