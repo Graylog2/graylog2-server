@@ -37,7 +37,6 @@ import org.graylog2.plugin.logmessage.LogMessage;
  */
 public class OutputBuffer implements Buffer {
 
-    protected static final int RING_SIZE = 524288;
     protected RingBuffer<LogMessageEvent> ringBuffer;
 
     protected ExecutorService executor = Executors.newCachedThreadPool();
@@ -52,7 +51,7 @@ public class OutputBuffer implements Buffer {
         Disruptor disruptor = new Disruptor<LogMessageEvent>(
                 LogMessageEvent.EVENT_FACTORY,
                 executor,
-                new MultiThreadedClaimStrategy(RING_SIZE),
+                new MultiThreadedClaimStrategy(server.getConfiguration().getRingSize()),
                 new SleepingWaitStrategy()
         );
 

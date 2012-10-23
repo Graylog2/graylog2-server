@@ -94,7 +94,10 @@ public class Configuration {
     
     @Parameter(value = "outputbuffer_processors", required = true, validator = PositiveIntegerValidator.class)
     private int outputBufferProcessors = 5;
-
+    
+    @Parameter(value = "ring_size", required = true, validator = PositiveIntegerValidator.class)
+    private int ringSize = 1024;
+    
     @Parameter(value = "elasticsearch_config_file", required = true, validator = FileReadableValidator.class)
     private String elasticSearchConfigFile = "/etc/graylog2-elasticsearch.yml";
 
@@ -294,6 +297,10 @@ public class Configuration {
         return outputBufferProcessors;
     }
 
+    public int getRingSize() {
+        return ringSize;
+    }
+    
     public String getElasticSearchConfigFile() {
         return elasticSearchConfigFile;
     }
