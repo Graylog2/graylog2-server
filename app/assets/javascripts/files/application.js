@@ -190,6 +190,21 @@ $(document).ready(function() {
       });
     });
 
+    // Universal search field.
+    var unisearch = $("#universal-search-field");
+    var stdval = unisearch.attr("data-stdval");
+    unisearch.val(stdval);
+    unisearch.focus(function () {
+      if (unisearch.val() == stdval) {
+        unisearch.val("");
+      }
+    });
+    unisearch.blur(function () {
+      if (unisearch.val() == "") {
+        unisearch.val(stdval);
+      }
+    });
+
     // Stream alerts: Inputs only numeric.
     $('#streams-alerts-limit').numeric();
     $('#streams-alerts-timespan').numeric();

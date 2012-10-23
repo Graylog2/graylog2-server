@@ -9,7 +9,8 @@ authorization do
       :showrange,
       :deletebyquickfilter,
       :deletebystream,
-      :realtime
+      :realtime,
+      :universalsearch
     ]
 
     has_permission_on :streams, :to => [

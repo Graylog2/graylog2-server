@@ -22,6 +22,7 @@ Graylog2WebInterface::Application.routes.draw do
       post :deletebystream
       post :deletebyquickfilter
       get :realtime
+      get :universalsearch
     end
     member do
       post :show

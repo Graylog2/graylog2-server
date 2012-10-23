@@ -62,6 +62,26 @@
 
   <br style="clear: both;" />
 
+  <% if @has_universalsearch and current_user.admin? %>
+  <div id="universal-search">
+    <form action="<%= universalsearch_messages_path %>" method="GET">
+      <% if @stream %>
+        <input type="hidden" name="stream_id" value="<%= @stream.id %>" />
+      <% end %>
+
+      <input type="text" id="universal-search-field"
+            name="query"
+            data-stdval='Type your search query here and press enter. ("not found" AND http) OR _http_response_code:[400 TO *]' />
+    </form>
+  </div>
+
+  <style>
+    .content-tabs-tab {
+      margin-top: 15px;
+    }
+  </style>
+  <% end %>
+
   <div id="content-top">
     <div id="content-tabs">
   <% (messages_tabs | stream_tabs | settings_tabs).each do |tab| %>

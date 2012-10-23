@@ -81,6 +81,20 @@ class MessageGateway
     wrap Tire.search(ALL_INDICES_ALIAS, what)
   end
 
+  def self.universal_search(page = 1, query, opts)
+    use_all_indices!
+
+    if opts[:stream]
+      query = "(" + query + ") AND streams:#{opts[:stream].id}"
+    end
+
+    if opts[:host]
+      query = "(" + query + ") AND host:#{opts[:host]}"
+    end
+
+    wrap search(query, pagination_options(page).merge(@default_query_options))
+  end
+
   def self.dynamic_distribution(target, query)
     result = Array.new
 

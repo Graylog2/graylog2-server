@@ -1,5 +1,5 @@
  class MessagesController < ApplicationController
-  before_filter :do_scoping
+  before_filter :do_scoping, :only => :index
 
   ignore_session_on_json :index, :show
 
@@ -80,6 +80,7 @@
   public
   def index
     @has_sidebar = true
+    @has_universalsearch = true
     @load_flot = true
     @use_backtotop = true
     @load_messages = true
@@ -137,12 +138,19 @@
     @total_count = @messages.total_result_count
   end
 
-  def realtime
-    render :text => "enable realtime in general.yml", :status => :forbidden and return if !::Configuration.realtime_enabled?
-    @content_class = "console"
-    @has_realtime = true
-    @websocket_target = ::Configuration.realtime_websocket_url + "/overall" rescue nil
-    @auth_token = ::Configuration.realtime_websocket_token
+  def universalsearch
+    if !params[:stream_id].blank?
+      @stream = Stream.find(params[:stream_id])
+    end
+
+    block_access_for_non_admins if @stream and !@stream.accessable_for_user?(current_user)
+
+    @has_sidebar = true
+    @has_universalsearch = true
+    @load_flot = true
+    @use_backtotop = true
+    
+    @messages = MessageGateway.universal_search(params[:page], params[:query], :stream => @stream)
   end
 
 end

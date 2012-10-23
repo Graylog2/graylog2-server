@@ -1,0 +1,14 @@
+<% content_for :sidebar do %>
+  <%= render :partial => "sidebar_index" %>
+<% end %>
+
+<h1>
+	Search result for <span class="highlighted"><%= params[:query] %></span>
+	<% if @stream %>
+		in stream <span class="highlighted"><%= @stream.title %></span>.
+	<% end %>
+</h1>
+
+<%= render :partial => "messages/table", :locals => { :messages => @messages,
+                                                    :total_messages => @messages.total_result_count, 
+                                                    :additional_columns => Setting.get_additional_columns(current_user) } %>
