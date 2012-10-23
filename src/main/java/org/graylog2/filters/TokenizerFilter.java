@@ -60,7 +60,7 @@ public class TokenizerFilter implements MessageFilter {
      */
 
     @Override
-    public void filter(LogMessage msg, GraylogServer server) {
+    public boolean filter(LogMessage msg, GraylogServer server) {
         TimerContext tcx = processTime.time();
 
         int extracted = 0;
@@ -99,11 +99,6 @@ public class TokenizerFilter implements MessageFilter {
         LOG.debug("Extracted <" + extracted + "> additional fields from message <" + msg.getId() + "> k=v pairs.");
 
         tcx.stop();
-    }
-
-    @Override
-    public boolean discard() {
         return false;
     }
-
 }

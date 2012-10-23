@@ -44,20 +44,18 @@ public class StreamMatcherFilter implements MessageFilter {
     private final Timer processTime = Metrics.newTimer(StreamMatcherFilter.class, "ProcessTime", TimeUnit.MICROSECONDS, TimeUnit.SECONDS);
 
     @Override
-    public void filter(LogMessage msg, GraylogServer server) {
+    public boolean filter(LogMessage msg, GraylogServer server) {
         TimerContext tcx = processTime.time();
 
         List<Stream> streams = ROUTER.route(msg);
         msg.setStreams(streams);
 
-        if (LOG.isDebugEnabled())
+        if (LOG.isDebugEnabled()) {
             LOG.debug("Routed message <" + msg.getId() + "> to " + streams.size() + " streams.");
+        }
 
         tcx.stop();
-    }
-
-    @Override
-    public boolean discard() {
+        
         return false;
     }
 

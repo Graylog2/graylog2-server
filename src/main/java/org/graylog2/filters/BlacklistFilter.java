@@ -40,11 +40,10 @@ public class BlacklistFilter implements MessageFilter {
     
     private static final Logger LOG = Logger.getLogger(BlacklistFilter.class);
 
-    private boolean discard;
     private final Timer processTime = Metrics.newTimer(BlacklistFilter.class, "ProcessTime", TimeUnit.MICROSECONDS, TimeUnit.SECONDS);
 
     @Override
-    public void filter(LogMessage msg, GraylogServer server) {
+    public boolean filter(LogMessage msg, GraylogServer server) {
         TimerContext tcx = processTime.time();
         for (Blacklist blacklist : Blacklist.fetchAll()) {
             for (BlacklistRule rule : blacklist.getRules()) {
@@ -52,21 +51,13 @@ public class BlacklistFilter implements MessageFilter {
                     LOG.debug("Message <" + this.toString() + "> is blacklisted. First match on " + rule.getTerm());
 
                     // Done - This message is blacklisted.
-                    discard = true;
-                    return;
+                    return true;
                 }
             }
         }
 
         tcx.stop();
-        discard = false;
+        return false;
     }
-
-    @Override
-    public boolean discard() {
-        return discard;
-    }
-    
-    
 
 }

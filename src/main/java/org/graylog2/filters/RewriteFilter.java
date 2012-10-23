@@ -39,7 +39,7 @@ public class RewriteFilter implements MessageFilter {
     private final Timer processTime = Metrics.newTimer(RewriteFilter.class, "ProcessTime", TimeUnit.MICROSECONDS, TimeUnit.SECONDS);
 
     @Override
-    public void filter(LogMessage msg, GraylogServer server) {
+    public boolean filter(LogMessage msg, GraylogServer server) {
         TimerContext tcx = processTime.time();
 
         if (server.getRulesEngine() != null) {
@@ -47,10 +47,6 @@ public class RewriteFilter implements MessageFilter {
         }
 
         tcx.stop();
-    }
-
-    @Override
-    public boolean discard() {
         return false;
     }
 

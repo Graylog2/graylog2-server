@@ -47,8 +47,8 @@ public class PluginLoader {
         this.baseDirectory = baseDirectory;
     }
     
-    public List<Class<? extends MessageFilter>> loadFilterPlugins() {
-        List<Class<? extends MessageFilter>> filters = Lists.newArrayList();
+    public List<MessageFilter> loadFilterPlugins() {
+        List<MessageFilter> filters = Lists.newArrayList();
         
         // Load all plugin jars.
         for (File jarPath : getAllJars(FILTER_DIR)) {
@@ -59,14 +59,8 @@ public class PluginLoader {
                 );
 
                 Class<?> clazz = Class.forName(getClassNameFromJarName(jarPath.getName()), true, loader);
-                filters.add(clazz.asSubclass(MessageFilter.class));
-            } catch (MalformedURLException ex) {
-                LOG.error("Could not load plugin <" + jarPath.getAbsolutePath() + ">", ex);
-                continue;
-            } catch (ClassNotFoundException ex) {
-                LOG.error("Could not load plugin <" + jarPath.getAbsolutePath() + ">", ex);
-                continue;
-            } catch (InvalidJarNameException ex) {
+                filters.add(clazz.asSubclass(MessageFilter.class).newInstance());
+            } catch (Exception ex) {
                 LOG.error("Could not load plugin <" + jarPath.getAbsolutePath() + ">", ex);
                 continue;
             }

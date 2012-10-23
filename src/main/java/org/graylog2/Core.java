@@ -87,7 +87,7 @@ public class Core implements GraylogServer {
     
     private List<Initializer> initializers = Lists.newArrayList();
     private List<MessageInput> inputs = Lists.newArrayList();
-    private List<Class<? extends MessageFilter>> filters = Lists.newArrayList();
+    private List<MessageFilter> filters = Lists.newArrayList();
     private List<Class<? extends MessageOutput>> outputs = Lists.newArrayList();
     private List<Class<? extends CommunicatorMethod>> communicatorMethods = Lists.newArrayList();
     
@@ -171,8 +171,8 @@ public class Core implements GraylogServer {
         this.inputs.add(input);
     }
 
-    public <T extends MessageFilter> void registerFilter(Class<T> klazz) {
-        this.filters.add(klazz);
+    public void registerFilter(MessageFilter filter) {
+        this.filters.add(filter);
     }
 
     public <T extends MessageOutput> void registerOutput(Class<T> klazz) {
@@ -240,8 +240,8 @@ public class Core implements GraylogServer {
     
     private void loadPlugins() {
         PluginLoader pl = new PluginLoader(configuration.getPluginDir());
-        for (Class<? extends MessageFilter> filter : pl.loadFilterPlugins()) {
-            LOG.info("Registering plugin filter [" + filter.getSimpleName() + "].");
+        for (MessageFilter filter : pl.loadFilterPlugins()) {
+            LOG.info("Registering plugin filter [" + filter.getClass().getSimpleName() + "].");
             registerFilter(filter);
             this.loadedFilterPlugins += 1;
         }
@@ -293,7 +293,7 @@ public class Core implements GraylogServer {
         return this.outputBuffer;
     }
 
-    public List<Class<? extends MessageFilter>> getFilters() {
+    public List<MessageFilter> getFilters() {
         return this.filters;
     }
 

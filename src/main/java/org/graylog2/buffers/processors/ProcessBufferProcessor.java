@@ -59,27 +59,28 @@ public class ProcessBufferProcessor implements EventHandler<LogMessageEvent> {
 
         LogMessage msg = event.getMessage();
 
-        if (LOG.isDebugEnabled())
+        if (LOG.isDebugEnabled()) {
             LOG.debug("Starting to process message <" + msg.getId() + ">.");
+        }
 
-        for (Class<? extends MessageFilter> filterType : server.getFilters()) {
+        for (MessageFilter filter : server.getFilters()) {
+            String name = filter.getClass().getSimpleName();
+            
             try {
-                // Always create a new instance of this filter.
-                MessageFilter filter = filterType.newInstance();
-
-                String name = filterType.getSimpleName();
-                if (LOG.isDebugEnabled())
+                
+                if (LOG.isDebugEnabled()) {
                     LOG.debug("Applying filter [" + name +"] on message <" + msg.getId() + ">.");
+                }
 
-                filter.filter(msg, server);
-                if (filter.discard()) {
-                    if (LOG.isDebugEnabled())
+                if (filter.filter(msg, server)) {
+                    if (LOG.isDebugEnabled()) {
                         LOG.debug("Filter [" + name + "] marked message <" + msg.getId() + "> to be discarded. Dropping message.");
+                    }
                     filteredOutMessages.mark();
                     return;
                 }
             } catch (Exception e) {
-                LOG.error("Could not apply filter [" + filterType.getSimpleName() +"] on message <" + msg.getId() +">: ", e);
+                LOG.error("Could not apply filter [" + name +"] on message <" + msg.getId() +">: ", e);
             }
         }
 
