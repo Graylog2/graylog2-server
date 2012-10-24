@@ -11,7 +11,7 @@ node.data: false
 # you might need to bind to a certain IP address, do that here
 #network.host: 172.24.0.14
 # use a different port if you run multiple elasticsearch nodes on one machine
-transport.tcp.port: 9301
+transport.tcp.port: 9350
 
 # we don't need to run the embedded HTTP server here
 http.enabled: false
