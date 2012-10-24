@@ -26,6 +26,8 @@ import com.lmax.disruptor.SleepingWaitStrategy;
 import com.lmax.disruptor.dsl.Disruptor;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
+import org.apache.commons.lang3.concurrent.BasicThreadFactory;
 import org.graylog2.Core;
 import org.graylog2.buffers.processors.ProcessBufferProcessor;
 import org.graylog2.plugin.GraylogServer;
@@ -39,7 +41,11 @@ public class ProcessBuffer implements Buffer {
 
     protected static RingBuffer<LogMessageEvent> ringBuffer;
 
-    protected ExecutorService executor = Executors.newCachedThreadPool();
+    protected ExecutorService executor = Executors.newCachedThreadPool(
+            new BasicThreadFactory.Builder()
+                .namingPattern("processbufferprocessor-%d")
+                .build()
+    );
 
     Core server;
 
@@ -55,9 +61,14 @@ public class ProcessBuffer implements Buffer {
                 new SleepingWaitStrategy()
         );
 
-        ProcessBufferProcessor processor = new ProcessBufferProcessor(this.server);
-
-        disruptor.handleEventsWith(processor);
+        ProcessBufferProcessor[] processors = new ProcessBufferProcessor[server.getConfiguration().getProcessBufferProcessors()];
+        
+        for (int i = 0; i < server.getConfiguration().getProcessBufferProcessors(); i++) {
+            processors[i] = new ProcessBufferProcessor(this.server, i, server.getConfiguration().getProcessBufferProcessors());
+        }
+        
+        disruptor.handleEventsWith(processors);
+        
         ringBuffer = disruptor.start();
     }
     

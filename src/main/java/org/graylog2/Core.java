@@ -38,6 +38,7 @@ import org.graylog2.outputs.MessageOutput;
 import org.graylog2.streams.StreamCache;
 
 import com.google.common.collect.Lists;
+import org.apache.commons.lang3.concurrent.BasicThreadFactory;
 import org.graylog2.activities.Activity;
 import org.graylog2.activities.ActivityWriter;
 import org.graylog2.cluster.Cluster;
@@ -213,7 +214,11 @@ public class Core implements GraylogServer {
         // TODO: This is a code smell and needs to be fixed.
         LogglyForwarder.setTimeout(configuration.getForwarderLogglyTimeout());
 
-        scheduler = Executors.newScheduledThreadPool(SCHEDULED_THREADS_POOL_SIZE);
+        scheduler = Executors.newScheduledThreadPool(SCHEDULED_THREADS_POOL_SIZE,
+                new BasicThreadFactory.Builder()
+                    .namingPattern("scheduled-%d")
+                    .build()
+        );
 
         loadPlugins();
         

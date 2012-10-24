@@ -92,6 +92,9 @@ public class Configuration {
     @Parameter(value = "output_batch_size", required = true, validator = PositiveIntegerValidator.class)
     private int outputBatchSize = 5000;
     
+    @Parameter(value = "processbuffer_processors", required = true, validator = PositiveIntegerValidator.class)
+    private int processBufferProcessors = 5;
+    
     @Parameter(value = "outputbuffer_processors", required = true, validator = PositiveIntegerValidator.class)
     private int outputBufferProcessors = 5;
     
@@ -291,6 +294,10 @@ public class Configuration {
 
     public int getOutputBatchSize() {
         return outputBatchSize;
+    }
+    
+    public int getProcessBufferProcessors() {
+        return processBufferProcessors;
     }
     
     public int getOutputBufferProcessors() {

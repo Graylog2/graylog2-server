@@ -47,12 +47,22 @@ public class ProcessBufferProcessor implements EventHandler<LogMessageEvent> {
     private final Meter filteredOutMessages = Metrics.newMeter(ProcessBufferProcessor.class, "FilteredOutMessages", "messages", TimeUnit.SECONDS);
     private final Meter outgoingMessages = Metrics.newMeter(ProcessBufferProcessor.class, "OutgoingMessages", "messages", TimeUnit.SECONDS);
 
-    public ProcessBufferProcessor(Core server) {
+    private final long ordinal;
+    private final long numberOfConsumers;
+    
+    public ProcessBufferProcessor(Core server, final long ordinal, final long numberOfConsumers) {
+        this.ordinal = ordinal;
+        this.numberOfConsumers = numberOfConsumers;
         this.server = server;
     }
 
     @Override
     public void onEvent(LogMessageEvent event, long sequence, boolean endOfBatch) throws Exception {
+        // Because Trisha said so. (http://code.google.com/p/disruptor/wiki/FrequentlyAskedQuestions)
+        if ((sequence % numberOfConsumers) != ordinal) {
+            return;
+        }
+        
         incomingMessages.mark();
         incomingMessagesPerMinute.mark();
         TimerContext tcx = processTime.time();
