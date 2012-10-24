@@ -8,6 +8,9 @@
 	<% if @host %>for host <span class="highlighted"><%= @host.host %></span><% end %>
 </h1>
 
+<%= render :partial => "result_graph" %>
+<br />
+
 <%= render :partial => "messages/table", :locals => { :messages => @messages,
                                                     :total_messages => @messages.total_result_count, 
                                                     :additional_columns => Setting.get_additional_columns(current_user) } %>

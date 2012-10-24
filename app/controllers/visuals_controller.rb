@@ -12,8 +12,20 @@ class VisualsController < ApplicationController
           r["data"] = calculate_streamgraph(params[:stream_id], params[:hours])
         when "hostgraph" then
           r["data"] = calculate_hostgraph(params[:hostname], params[:hours])
-        when "quickfiltergraph" then
-          r["data"] = calculate_quickfiltergraph(params[:filters], params[:interval], params[:hostname], params[:stream_id])
+        when "resultgraph" then
+          if params[:filters]
+            r["data"] = calculate_quickfiltergraph(
+              params[:filters],
+              params[:interval],
+              params[:hostname],
+              params[:stream_id]
+            )
+          elsif params[:query]
+            stream = Stream.find(params[:stream_id]) if !params[:stream_id].blank?
+            host = Host.find(:first, :conditions => {:host=> params[:hostname]}) if !params[:hostname].blank?
+
+            r["data"] = calculate_querygraph(params[:query], params[:interval], host, stream)
+          end
       end
     end
 
@@ -50,6 +62,14 @@ class VisualsController < ApplicationController
     raise "Invalid interval" unless valid_interval?(interval)
 
     MessageGateway.all_by_quickfilter(filters, 1, :date_histogram => true, :date_histogram_interval => interval, :hostname => hostname, :stream_id => stream_id).collect do |c|
+      [ c["time"].to_i, c["count"] ]
+    end
+  end
+
+  def calculate_querygraph(query, interval, host, stream)
+    raise "Invalid interval" unless valid_interval?(interval)
+
+    MessageGateway.universal_search(1, query, :date_histogram => true, :date_histogram_interval => interval, :host => host, :stream => stream).collect do |c|
       [ c["time"].to_i, c["count"] ]
     end
   end

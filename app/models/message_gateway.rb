@@ -84,6 +84,8 @@ class MessageGateway
   def self.universal_search(page = 1, query, opts)
     use_all_indices!
 
+    histogram_only = !opts[:date_histogram].blank? and opts[:date_histogram] == true
+
     if opts[:stream]
       query = "(" + query + ") AND streams:#{opts[:stream].id}"
     end
@@ -92,7 +94,22 @@ class MessageGateway
       query = "(" + query + ") AND host:#{opts[:host].host}"
     end
 
-    wrap search(query, pagination_options(page).merge(@default_query_options))
+    #wrap search(query, pagination_options(page).merge(@default_query_options))
+
+    r = search(pagination_options(page).merge(@default_query_options)) do
+      query { string(query) }
+
+      # Request date histogram facet?
+      if histogram_only
+        facet 'date_histogram' do
+          date("histogram_time", :interval => (opts[:date_histogram_interval]))
+        end
+      end
+    end
+
+    return r.facets["date_histogram"]["entries"] if histogram_only rescue return []
+
+    wrap(r)
   end
 
   def self.dynamic_distribution(target, query)

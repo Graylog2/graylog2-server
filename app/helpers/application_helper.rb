@@ -85,9 +85,15 @@ module ApplicationHelper
     raise "You can only pass stream_id OR hostname" if !options[:stream_id].blank? and !options[:hostname].blank?
     
     uid = ""
-    if !options[:quickfilter_graph].blank? and options[:quickfilter_graph] == true
-      url = visuals_path("quickfiltergraph", :filters => options[:filters], :interval => options[:interval], :hostname => options[:hostname], :stream_id => options[:stream_id])
-      uid = "quickfiltergraph"
+    if !options[:result_graph].blank? and options[:result_graph] == true
+      url = visuals_path("resultgraph",
+        :filters => options[:filters],
+        :query => options[:query],
+        :interval => options[:interval],
+        :hostname => options[:hostname],
+        :stream_id => options[:stream_id]
+      )
+      uid = "resultgraph"
       lines_bars = "bars: { show: true, fill: true }"
       grid_color = "#333"
     else
