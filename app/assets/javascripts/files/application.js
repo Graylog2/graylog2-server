@@ -193,7 +193,9 @@ $(document).ready(function() {
     // Universal search field.
     var unisearch = $("#universal-search-field");
     var stdval = unisearch.attr("data-stdval");
-    unisearch.val(stdval);
+    if (unisearch.val() == "") {
+      unisearch.val(stdval);
+    }
     unisearch.focus(function () {
       if (unisearch.val() == stdval) {
         unisearch.val("");
