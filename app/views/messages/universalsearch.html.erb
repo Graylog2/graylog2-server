@@ -4,9 +4,8 @@
 
 <h1>
 	Search result for <span class="highlighted"><%= params[:query] %></span>
-	<% if @stream %>
-		in stream <span class="highlighted"><%= @stream.title %></span>.
-	<% end %>
+	<% if @stream %>in stream <span class="highlighted"><%= @stream.title %></span><% end %>
+	<% if @host %>for host <span class="highlighted"><%= @host.host %></span><% end %>
 </h1>
 
 <%= render :partial => "messages/table", :locals => { :messages => @messages,
