@@ -94,8 +94,6 @@ class MessageGateway
       query = "(" + query + ") AND host:#{opts[:host].host}"
     end
 
-    #wrap search(query, pagination_options(page).merge(@default_query_options))
-
     r = search(pagination_options(page).merge(@default_query_options)) do
       query { string(query) }
 

@@ -150,7 +150,13 @@
     @load_flot = true
     @use_backtotop = true
     
-    @messages = MessageGateway.universal_search(params[:page], params[:query], :stream => @stream, :host => @host)
+    begin
+      @messages = MessageGateway.universal_search(params[:page], params[:query], :stream => @stream, :host => @host)
+    rescue Tire::Search::SearchRequestFailed
+      @messages = MessageResult.new
+      @messages.total_result_count = 0
+      flash[:error] = "Search request failed. Did you forget to escape Lucene syntax?"
+    end
   end
 
 end
