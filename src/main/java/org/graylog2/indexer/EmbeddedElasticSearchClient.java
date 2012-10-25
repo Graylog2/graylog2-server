@@ -1,6 +1,7 @@
 package org.graylog2.indexer;
 
 import com.beust.jcommander.internal.Maps;
+import com.google.common.collect.Sets;
 import org.apache.commons.io.FileUtils;
 import org.apache.log4j.Logger;
 import org.elasticsearch.action.ActionFuture;
@@ -44,6 +45,9 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
+import org.elasticsearch.common.settings.ImmutableSettings;
+import org.elasticsearch.common.settings.Settings;
 
 import static org.elasticsearch.index.query.QueryBuilders.rangeQuery;
 import static org.elasticsearch.node.NodeBuilder.nodeBuilder;
@@ -171,7 +175,14 @@ public class EmbeddedElasticSearchClient {
     }
 
     public boolean createIndex(String indexName) {
-        final ActionFuture<CreateIndexResponse> createFuture = client.admin().indices().create(new CreateIndexRequest(indexName));
+        Map<String, Integer> settings = Maps.newHashMap();
+        settings.put("number_of_shards", server.getConfiguration().getElasticSearchShards());
+        settings.put("number_of_replicas", server.getConfiguration().getElasticSearchReplicas());
+
+        CreateIndexRequest cir = new CreateIndexRequest(indexName);
+        cir.settings(settings);
+        
+        final ActionFuture<CreateIndexResponse> createFuture = client.admin().indices().create(cir);
         final boolean acknowledged = createFuture.actionGet().acknowledged();
         if (!acknowledged) {
             return false;
@@ -183,7 +194,9 @@ public class EmbeddedElasticSearchClient {
     
     public boolean createRecentIndex() {
         Map<String, Object> settings = Maps.newHashMap();
-        settings.put("index.store.type", server.getConfiguration().getRecentIndexStoreType());
+        settings.put("store.type", server.getConfiguration().getRecentIndexStoreType());
+        settings.put("number_of_shards", server.getConfiguration().getElasticSearchShards());
+        settings.put("number_of_replicas", server.getConfiguration().getElasticSearchReplicas());
         
         CreateIndexRequestBuilder crb = new CreateIndexRequestBuilder(client.admin().indices());
         crb.setIndex(RECENT_INDEX_NAME);

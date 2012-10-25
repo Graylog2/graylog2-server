@@ -110,6 +110,12 @@ public class Configuration {
     @Parameter(value = "elasticsearch_max_docs_per_index", validator = PositiveIntegerValidator.class, required = true)
     private int elasticsearchMaxDocsPerIndex = 80000000;
     
+    @Parameter(value = "elasticsearch_shards", validator = PositiveIntegerValidator.class, required = true)
+    private int elasticsearchShards = 4;
+    
+    @Parameter(value = "elasticsearch_replicas", validator = PositiveIntegerValidator.class, required = true)
+    private int elasticsearchReplicas = 0;
+    
     @Parameter(value = "elasticsearch_analyzer", required = true)
     private String elasticsearchAnalyzer = "standard";
     
@@ -318,6 +324,14 @@ public class Configuration {
     
     public int getElasticSearchMaxDocsPerIndex() {
         return this.elasticsearchMaxDocsPerIndex;
+    }
+    
+    public int getElasticSearchShards() {
+        return this.elasticsearchShards;
+    }
+    
+    public int getElasticSearchReplicas() {
+        return this.elasticsearchReplicas;
     }
     
     public String getElasticSearchAnalyzer() {
