@@ -124,7 +124,7 @@ public class Core implements GraylogServer {
         
         cluster = new Cluster(this);
         
-        activityWriter = new ActivityWriter(mongoBridge);
+        activityWriter = new ActivityWriter(this);
         
         messageCounterManager = new MessageCounterManagerImpl();
         messageCounterManager.register(MASTER_COUNTER_NAME);
