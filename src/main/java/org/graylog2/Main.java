@@ -131,7 +131,7 @@ public final class Main {
             configuration.setIsMaster(false);
         }
         
-        if (commandLineArguments.isLocal()) {
+        if (commandLineArguments.isLocal() || commandLineArguments.isDebug()) {
             // In local mode, systemstats are sent to localhost for example.
             LOG.info("Running in local mode");
             server.setLocalMode(true);
