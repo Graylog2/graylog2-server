@@ -84,6 +84,7 @@
   <thead>
   <tr>
     <th style="width: 250px;">Date<%= sorting_link(:date, params[:sort], params[:order]) %></th>
+    <th>Node<%= sorting_link(:node_id, params[:sort], params[:order]) %></th>
     <th>Caller<%= sorting_link(:caller, params[:sort], params[:order]) %></th>
     <th>Message</th>
   </tr>
@@ -91,9 +92,10 @@
 <% @server_activities.each do |activity| %>
   <tr>
     <td>
-		<%= gl_date(Time.at(activity.timestamp)) %>
-		(<%= distance_of_time_in_words_to_now(Time.at(activity.timestamp)) %> ago)
-	</td>
+  		<%= gl_date(Time.at(activity.timestamp)) %>
+  		(<%= distance_of_time_in_words_to_now(Time.at(activity.timestamp)) %> ago)
+    </td>
+    <td><%= activity.node_id %></td>
     <td><%= activity.caller %></td>
     <td><%= activity.content %></td>
   </tr>
