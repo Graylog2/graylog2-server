@@ -101,12 +101,12 @@ public class DeflectorInformation {
     
     private Map<String, Object> getIndexInformation(IndexStats stats) {
         Map<String, Object> info = Maps.newHashMap();
-        info.put("docs", stats.getTotal().getDocs().count());
-        info.put("size", stats.getTotal().store().getSize().getKb());
-        info.put("time_index", stats.getTotal().getIndexing().total().indexTime().getSeconds());
-        info.put("time_query", stats.getTotal().getSearch().total().queryTime().getSeconds());
-        info.put("time_fetch", stats.getTotal().getSearch().total().fetchTime().getSeconds());
-        info.put("time_get", stats.getTotal().getGet().getTime().getSeconds());
+        info.put("docs", stats.getPrimaries().getDocs().getCount());
+        info.put("size", stats.getPrimaries().store().getSize().getKb());
+        info.put("time_index", stats.getPrimaries().getIndexing().total().indexTime().getSeconds());
+        info.put("time_query", stats.getPrimaries().getSearch().total().queryTime().getSeconds());
+        info.put("time_fetch", stats.getPrimaries().getSearch().total().fetchTime().getSeconds());
+        info.put("time_get", stats.getPrimaries().getGet().getTime().getSeconds());
         info.put("shards", getShardInformation(stats));
         
         return info;
