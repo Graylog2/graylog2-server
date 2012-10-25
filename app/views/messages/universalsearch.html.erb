@@ -8,6 +8,10 @@
 	<% if @host %>for host <span class="highlighted"><%= @host.host %></span><% end %>
 </h1>
 
+<% unless @messages.total_result_count.blank? %>
+  Search hit <span class="highlighted"><%= number_with_delimiter(@messages.total_result_count, :delimiter => '.')  %></span> messages.
+<% end %>
+
 <%= render :partial => "result_graph" %>
 <br />
 
