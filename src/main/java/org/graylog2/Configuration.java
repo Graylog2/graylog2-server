@@ -214,18 +214,6 @@ public class Configuration {
 
     @Parameter(value = "libratometrics_prefix", required = false)
     private String libratometricsPrefix = "gl2";
-    
-    @Parameter(value = "enable_cm_twilio", required = false)
-    private boolean enableCommunicationMethodTwilio = false;
-    
-    @Parameter(value = "twilio_sid", required = false)
-    private String twilioSid = "";
-    
-    @Parameter(value = "twilio_auth_token", required = false)
-    private String twilioAuthToken = "";
-    
-    @Parameter(value = "twilio_sender", required = false)
-    private String twilioSender = "";
 
     @Parameter(value = "plugin_dir", required = false)
     private String pluginDir = "plugin";
@@ -494,22 +482,6 @@ public class Configuration {
 
     public String getLibratoMetricsPrefix() {
         return libratometricsPrefix;
-    }
-    
-    public boolean isEnableCommunicationMethodTwilio() {
-        return enableCommunicationMethodTwilio;
-    }
-    
-    public String getTwilioSid() {
-        return twilioSid;
-    }
-    
-    public String getTwilioAuthToken() {
-        return twilioAuthToken;
-    }
-    
-    public String getTwilioSender() {
-        return twilioSender;
     }
 
     public String getPluginDir() {

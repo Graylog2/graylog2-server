@@ -19,7 +19,6 @@
  */
 package org.graylog2.activities;
 
-import org.graylog2.communicator.Communicator;
 import org.graylog2.database.MongoBridge;
 
 /**
@@ -28,16 +27,13 @@ import org.graylog2.database.MongoBridge;
 public class ActivityWriter {
     
     MongoBridge mongoBridge;
-    Communicator communicator;
     
-    public ActivityWriter(MongoBridge mongoBridge, Communicator communicator) {
+    public ActivityWriter(MongoBridge mongoBridge) {
         this.mongoBridge = mongoBridge;
-        this.communicator = communicator;
     }
     
     public void write(Activity activity) {
         mongoBridge.writeActivity(activity);
-        communicator.send(activity.getMessage());
     }
     
 }

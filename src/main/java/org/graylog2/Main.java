@@ -32,7 +32,6 @@ import org.apache.commons.io.IOUtils;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.graylog2.activities.Activity;
-import org.graylog2.communicator.methods.TwilioCommunicator;
 import org.graylog2.filters.BlacklistFilter;
 import org.graylog2.filters.CounterUpdateFilter;
 import org.graylog2.filters.RewriteFilter;
@@ -136,12 +135,7 @@ public final class Main {
             LOG.info("Running in local mode");
             server.setLocalMode(true);
         }
-        
-        // Register communicator methods.
-        if (configuration.isEnableCommunicationMethodTwilio()) {
-            server.registerCommunicatorMethod(TwilioCommunicator.class);
-        }
-        
+
         // Register initializers.
         server.registerInitializer(new ServerValueWriterInitializer(server, configuration));
         server.registerInitializer(new DroolsInitializer(server, configuration));
