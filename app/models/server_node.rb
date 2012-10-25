@@ -10,6 +10,10 @@ class ServerNode
     ServerValue.get("is_master", @server_id, 0)
   end
 
+  def local_hostname
+    ServerValue.get("local_hostname", @server_id)
+  end
+
   def current_throughput
     get_throughput(:current)
   end

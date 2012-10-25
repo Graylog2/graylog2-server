@@ -29,6 +29,7 @@
         <span class="health-master">(Master)</span>
       <% end %>
     </h3>
+    <h4><span class="highlighted">Hostname:</span> <%= node.local_hostname %></h4>
     <h4><span class="highlighted">Throughput:</span> <%= node.current_throughput %> / 5 sec (<%= node.highest_throughput %> highest)</h4>
     <h4><span class="highlighted">Started:</span> <%= gl_date(Time.at(node.startup_time)) rescue "?" %></h4>
     <h4><span class="highlighted">Available processors:</span> <%= node.available_processors %></h4>
