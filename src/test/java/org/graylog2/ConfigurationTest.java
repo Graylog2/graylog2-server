@@ -133,26 +133,6 @@ public class ConfigurationTest {
         Assert.assertEquals(5, configuration.getMongoThreadsAllowedToBlockMultiplier());
     }
 
-    @Test
-    public void testGetLogglyTimeout() throws RepositoryException, ValidationException {
-
-        validProperties.put("forwarder_loggly_timeout", "5");
-        Configuration configuration = new Configuration();
-        new JadConfig(new InMemoryRepository(validProperties), configuration).process();
-
-        Assert.assertEquals(5000, configuration.getForwarderLogglyTimeout());
-    }
-
-    @Test
-    public void testGetLogglyTimeoutDefault() throws RepositoryException, ValidationException {
-
-        validProperties.remove("forwarder_loggly_timeout");
-        Configuration configuration = new Configuration();
-        new JadConfig(new InMemoryRepository(validProperties), configuration).process();
-
-        Assert.assertEquals(3000, configuration.getForwarderLogglyTimeout());
-    }
-
     /*@Test
     public void testGetAMQPSubscribedQueuesEmpty() throws RepositoryException, ValidationException {
         validProperties.put("amqp_subscribed_queues", "");

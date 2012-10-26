@@ -29,7 +29,6 @@ import org.graylog2.buffers.OutputBuffer;
 import org.graylog2.buffers.ProcessBuffer;
 import org.graylog2.database.MongoBridge;
 import org.graylog2.database.MongoConnection;
-import org.graylog2.forwarders.forwarders.LogglyForwarder;
 import org.graylog2.indexer.EmbeddedElasticSearchClient;
 import org.graylog2.initializers.Initializer;
 import org.graylog2.inputs.MessageInput;
@@ -198,10 +197,6 @@ public class Core implements GraylogServer {
                 System.exit(1);
             }
         }
-
-        // Statically set timeout for LogglyForwarder.
-        // TODO: This is a code smell and needs to be fixed.
-        LogglyForwarder.setTimeout(configuration.getForwarderLogglyTimeout());
 
         scheduler = Executors.newScheduledThreadPool(SCHEDULED_THREADS_POOL_SIZE,
                 new BasicThreadFactory.Builder()

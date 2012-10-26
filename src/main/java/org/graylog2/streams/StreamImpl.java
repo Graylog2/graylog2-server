@@ -25,7 +25,6 @@ import java.util.List;
 
 import org.apache.log4j.Logger;
 import org.bson.types.ObjectId;
-import org.graylog2.forwarders.ForwardEndpoint;
 
 import com.google.common.collect.Lists;
 import com.mongodb.BasicDBList;
@@ -49,7 +48,6 @@ public class StreamImpl implements Stream {
     private String title = null;
 
     private List<StreamRule> streamRules = null;
-    private List<ForwardEndpoint> forwardedTo = null;
 
     private DBObject mongoObject = null;
 
@@ -107,29 +105,6 @@ public class StreamImpl implements Stream {
 
         this.streamRules = rules;
         return rules;
-    }
-
-    public List<ForwardEndpoint> getForwardedTo() {
-        if (this.forwardedTo != null) {
-            return this.forwardedTo;
-        }
-
-        List<ForwardEndpoint> fwds = Lists.newArrayList();
-
-        BasicDBList rawFwds = (BasicDBList) this.mongoObject.get("forwarders");
-        if (rawFwds != null && rawFwds.size() > 0) {
-            for (Object fwdObj : rawFwds) {
-                try {
-                    ForwardEndpoint fwd = new ForwardEndpoint((DBObject) fwdObj);
-                    fwds.add(fwd);
-                } catch (Exception e) {
-                    LOG.warn("Skipping forward endpoint in Stream.getForwardedTo(): " + e.getMessage(), e);
-                }
-            }
-        }
-
-        this.forwardedTo = fwds;
-        return fwds;
     }
 
     /**

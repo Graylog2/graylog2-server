@@ -173,9 +173,6 @@ public class Configuration {
     @Parameter("amqp_virtualhost")
     private String amqpVirtualhost = "/";
 
-    @Parameter(value = "forwarder_loggly_timeout", validator = PositiveIntegerValidator.class)
-    private int forwarderLogglyTimeout = 3;
-
     @Parameter("rules_file")
     private String droolsRulesFile;
 
@@ -392,10 +389,6 @@ public class Configuration {
 
     public String getAmqpVirtualhost() {
         return amqpVirtualhost;
-    }
-
-    public int getForwarderLogglyTimeout() {
-        return forwarderLogglyTimeout * 1000;
     }
 
     public String getDroolsRulesFile() {
