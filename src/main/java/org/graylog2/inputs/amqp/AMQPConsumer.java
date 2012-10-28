@@ -30,7 +30,9 @@ import com.yammer.metrics.core.Meter;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
+import org.apache.commons.lang3.concurrent.BasicThreadFactory;
 import org.apache.log4j.Logger;
 import org.graylog2.Core;
 import org.graylog2.gelf.GELFMessage;
@@ -156,7 +158,11 @@ public class AMQPConsumer implements Runnable {
         factory.setHost(server.getConfiguration().getAmqpHost());
         factory.setPort(server.getConfiguration().getAmqpPort());
 
-        connection = factory.newConnection();
+        connection = factory.newConnection(Executors.newCachedThreadPool(
+            new BasicThreadFactory.Builder()
+                .namingPattern("amqp-consumer-" + queueConfig.getQueueUUID() + "-%d")
+                .build()
+        ));
         
         return connection.createChannel();
     }

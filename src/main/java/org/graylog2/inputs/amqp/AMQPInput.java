@@ -33,7 +33,7 @@ public class AMQPInput implements MessageInput {
 
     public static ExecutorService executor = Executors.newCachedThreadPool(
             new BasicThreadFactory.Builder()
-                .namingPattern("amqp-consumer-%d")
+                .namingPattern("amqp-input-%d")
                 .build()
     );
     
