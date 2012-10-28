@@ -71,8 +71,6 @@ public class AMQPConsumer implements Runnable {
                 this.syslogProcessor = new SyslogProcessor(server);
                 break;
         }
-        
-        Runtime.getRuntime().addShutdownHook(new AMQPCleaner(this));
     }
     
     @Override
