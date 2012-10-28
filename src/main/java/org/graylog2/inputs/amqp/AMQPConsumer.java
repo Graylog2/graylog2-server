@@ -45,8 +45,6 @@ import org.graylog2.inputs.syslog.SyslogProcessor;
 public class AMQPConsumer implements Runnable {
 
     private static final Logger LOG = Logger.getLogger(AMQPConsumer.class);
-    
-    public static final int INITIAL_IO_RETRY_DELAY_SECONDS = 5;
 
     private Core server;
     private GELFProcessor gelfProcessor;
@@ -101,14 +99,7 @@ public class AMQPConsumer implements Runnable {
 
             LOG.info("Connected to broker <" + queueConfig + ">");
         } catch(IOException e) {
-           LOG.error("IO error on broker <" + queueConfig + "> - Retrying in " + INITIAL_IO_RETRY_DELAY_SECONDS + " seconds", e);
-
-           try {
-               Thread.sleep(INITIAL_IO_RETRY_DELAY_SECONDS*1000);
-           } catch(InterruptedException ie) {}
-
-           // Retry.
-           this.listen();
+           LOG.error("IO error on broker <" + queueConfig + ">", e);
         }
     }
 
