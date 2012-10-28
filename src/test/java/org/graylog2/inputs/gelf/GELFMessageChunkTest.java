@@ -20,6 +20,7 @@
 
 package org.graylog2.inputs.gelf;
 
+import org.graylog2.gelf.GELFMessageChunk;
 import org.graylog2.TestHelper;
 import org.graylog2.Tools;
 import org.junit.Test;

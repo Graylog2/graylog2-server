@@ -18,7 +18,7 @@
  *
  */
 
-package org.graylog2.inputs.gelf;
+package org.graylog2.gelf;
 
 import java.io.IOException;
 import org.graylog2.Tools;

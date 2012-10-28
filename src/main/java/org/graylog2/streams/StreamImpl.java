@@ -32,6 +32,7 @@ import com.mongodb.BasicDBObject;
 import com.mongodb.DBCollection;
 import com.mongodb.DBCursor;
 import com.mongodb.DBObject;
+import org.graylog2.Core;
 import org.graylog2.plugin.streams.StreamRule;
 
 /**
@@ -57,7 +58,7 @@ public class StreamImpl implements Stream {
         this.mongoObject = stream;
     }
 
-    public static List<Stream> fetchAllEnabled() {
+    public static List<Stream> fetchAllEnabled(Core server) {
         StreamCache streamCache = StreamCache.getInstance();
         if (streamCache.valid()) {
             return streamCache.get();
@@ -65,7 +66,7 @@ public class StreamImpl implements Stream {
 
         List<Stream> streams = Lists.newArrayList();
 
-        DBCollection coll = streamCache.getGraylogServer().getMongoConnection().getDatabase().getCollection("streams");
+        DBCollection coll = server.getMongoConnection().getDatabase().getCollection("streams");
         DBObject query = new BasicDBObject();
         query.put("disabled", new BasicDBObject("$ne", true));
         DBCursor cur = coll.find(query);

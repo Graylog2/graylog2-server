@@ -20,6 +20,8 @@
 
 package org.graylog2.inputs.gelf;
 
+import org.graylog2.gelf.GELFProcessor;
+import org.graylog2.gelf.GELFMessage;
 import com.yammer.metrics.Metrics;
 import com.yammer.metrics.core.Meter;
 import org.apache.log4j.Logger;

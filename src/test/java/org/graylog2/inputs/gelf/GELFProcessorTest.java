@@ -20,6 +20,8 @@
 
 package org.graylog2.inputs.gelf;
 
+import org.graylog2.gelf.GELFProcessor;
+import org.graylog2.gelf.GELFMessage;
 import org.graylog2.Tools;
 import org.graylog2.GraylogServerStub;
 import org.graylog2.TestHelper;

@@ -32,6 +32,7 @@ import org.graylog2.streams.StreamRouter;
 
 import java.util.List;
 import java.util.concurrent.TimeUnit;
+import org.graylog2.Core;
 
 /**
  * @author Lennart Koopmann <lennart@socketfeed.com>
@@ -47,7 +48,7 @@ public class StreamMatcherFilter implements MessageFilter {
     public boolean filter(LogMessage msg, GraylogServer server) {
         TimerContext tcx = processTime.time();
 
-        List<Stream> streams = ROUTER.route(msg);
+        List<Stream> streams = ROUTER.route((Core) server, msg);
         msg.setStreams(streams);
 
         if (LOG.isDebugEnabled()) {

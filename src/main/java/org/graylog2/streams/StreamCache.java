@@ -35,22 +35,12 @@ import org.graylog2.plugin.streams.Stream;
 public class StreamCache extends SimpleObjectCache<List<Stream>> {
 
     private static StreamCache instance;
-    private Core graylogServer;
 
     private StreamCache() { }
 
     public static synchronized StreamCache initialize(Core server) {
         StreamCache streamCache = getInstance();
-        streamCache.setGraylogServer(server);
         return streamCache;
-    }
-
-    private void setGraylogServer(Core server) {
-        this.graylogServer = server;
-    }
-
-    public Core getGraylogServer() {
-        return graylogServer;
     }
 
     public static synchronized StreamCache getInstance() {

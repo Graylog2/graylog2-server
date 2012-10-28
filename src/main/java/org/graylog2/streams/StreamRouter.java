@@ -23,10 +23,10 @@ package org.graylog2.streams;
 import org.apache.log4j.Logger;
 import org.graylog2.streams.matchers.StreamRuleMatcher;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import com.google.common.collect.Lists;
+import org.graylog2.Core;
 import org.graylog2.plugin.logmessage.LogMessage;
 import org.graylog2.plugin.streams.Stream;
 import org.graylog2.plugin.streams.StreamRule;
@@ -40,9 +40,9 @@ public class StreamRouter {
 
     private static final Logger LOG = Logger.getLogger(StreamRouter.class);
 
-    public List<Stream> route(LogMessage msg) {
+    public List<Stream> route(Core server, LogMessage msg) {
         List<Stream> matches = Lists.newArrayList();
-        List<Stream> streams = StreamImpl.fetchAllEnabled();
+        List<Stream> streams = StreamImpl.fetchAllEnabled(server);
 
         for (Stream stream : streams) {
             boolean missed = false;

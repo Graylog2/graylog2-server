@@ -18,7 +18,7 @@
  *
  */
 
-package org.graylog2.inputs.gelf;
+package org.graylog2.gelf;
 
 import com.google.common.collect.Maps;
 import com.yammer.metrics.Metrics;

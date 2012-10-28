@@ -18,7 +18,7 @@
  *
  */
 
-package org.graylog2.inputs.gelf;
+package org.graylog2.gelf;
 
 /**
  * @author Lennart Koopmann <lennart@socketfeed.com>

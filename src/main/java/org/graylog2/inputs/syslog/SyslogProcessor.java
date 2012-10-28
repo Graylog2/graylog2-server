@@ -54,7 +54,7 @@ public class SyslogProcessor {
         this.server = server;
     }
 
-    public void messageReceived(String msg, InetAddress remoteAddress) throws Exception {
+    public void messageReceived(String msg, InetAddress remoteAddress) {
         incomingMessages.mark();
 
         // Convert to LogMessage
@@ -86,6 +86,10 @@ public class SyslogProcessor {
 
     private LogMessageImpl parse(String msg, InetAddress remoteAddress) throws UnknownHostException {
         TimerContext tcx = syslogParsedTime.time();
+        
+        if (remoteAddress == null) {
+            remoteAddress = InetAddress.getLocalHost();
+        }
 
         LogMessageImpl lm = new LogMessageImpl();
 
@@ -117,7 +121,7 @@ public class SyslogProcessor {
     }
 
     private String parseHost(SyslogServerEvent msg, InetAddress remoteAddress) {
-        if (server.getConfiguration().getForceSyslogRdns()) {
+        if (remoteAddress != null &&server.getConfiguration().getForceSyslogRdns()) {
             try {
                 return Tools.rdnsLookup(remoteAddress);
             } catch (UnknownHostException e) {

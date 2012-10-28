@@ -20,6 +20,8 @@
 
 package org.graylog2.inputs.gelf;
 
+import org.graylog2.gelf.GELFChunkManager;
+import org.graylog2.gelf.GELFMessageChunk;
 import org.apache.commons.lang3.ArrayUtils;
 import org.graylog2.Core;
 import org.graylog2.TestHelper;

@@ -32,7 +32,7 @@ import org.graylog2.database.MongoConnection;
 import org.graylog2.indexer.EmbeddedElasticSearchClient;
 import org.graylog2.initializers.Initializer;
 import org.graylog2.inputs.MessageInput;
-import org.graylog2.inputs.gelf.GELFChunkManager;
+import org.graylog2.gelf.GELFChunkManager;
 import org.graylog2.outputs.MessageOutput;
 import org.graylog2.streams.StreamCache;
 

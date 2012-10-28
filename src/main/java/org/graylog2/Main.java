@@ -38,6 +38,7 @@ import org.graylog2.filters.RewriteFilter;
 import org.graylog2.filters.StreamMatcherFilter;
 import org.graylog2.filters.TokenizerFilter;
 import org.graylog2.initializers.*;
+import org.graylog2.inputs.amqp.AMQPInput;
 import org.graylog2.inputs.gelf.GELFTCPInput;
 import org.graylog2.inputs.gelf.GELFUDPInput;
 import org.graylog2.inputs.syslog.SyslogTCPInput;
@@ -158,6 +159,8 @@ public final class Main {
         if (configuration.isSyslogUdpEnabled()) { server.registerInput(new SyslogUDPInput()); }
         if (configuration.isSyslogTcpEnabled()) { server.registerInput(new SyslogTCPInput()); }
 
+        if (configuration.isAmqpEnabled()) { server.registerInput(new AMQPInput()); }
+        
         // Register message filters.
         server.registerFilter(new RewriteFilter());
         server.registerFilter(new BlacklistFilter());

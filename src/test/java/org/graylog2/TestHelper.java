@@ -27,7 +27,7 @@ import java.io.UnsupportedEncodingException;
 import java.math.BigInteger;
 import java.util.zip.Deflater;
 import java.util.zip.GZIPOutputStream;
-import org.graylog2.inputs.gelf.GELFMessageChunk;
+import org.graylog2.gelf.GELFMessageChunk;
 
 public class TestHelper {
 

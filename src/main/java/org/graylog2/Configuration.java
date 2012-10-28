@@ -161,9 +161,6 @@ public class Configuration {
     @Parameter(value = "amqp_port", validator = InetPortValidator.class)
     private int amqpPort = 5672;
 
-    @Parameter(value = "amqp_subscribed_queues", converter = StringListConverter.class)
-    private List<String> amqpSubscribedQueues;
-
     @Parameter("amqp_username")
     private String amqpUsername = "guest";
 
