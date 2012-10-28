@@ -128,16 +128,20 @@ public class AMQPConsumer implements Runnable {
             new DefaultConsumer(channel) {
                 @Override
                 public void handleDelivery(String consumerTag, Envelope envelope, AMQP.BasicProperties properties, byte[] body) throws IOException {
-                    handledMessages.mark();
-                    
-                    switch (queueConfig.getInputType()) {
-                        case GELF:
-                            GELFMessage gelf = new GELFMessage(body);
-                            gelfProcessor.messageReceived(gelf);
-                            break;
-                        case SYSLOG:
-                            syslogProcessor.messageReceived(new String(body), null);
-                            break;
+                    try {
+                        handledMessages.mark();
+
+                        switch (queueConfig.getInputType()) {
+                            case GELF:
+                                GELFMessage gelf = new GELFMessage(body);
+                                gelfProcessor.messageReceived(gelf);
+                                break;
+                            case SYSLOG:
+                                syslogProcessor.messageReceived(new String(body), null);
+                                break;
+                        }
+                    } catch(Exception e) {
+                        LOG.error("Could not handle message from AMQP.", e);
                     }
                 }
              }
