@@ -137,7 +137,7 @@ public class AMQPConsumer implements Runnable {
                                 gelfProcessor.messageReceived(gelf);
                                 break;
                             case SYSLOG:
-                                syslogProcessor.messageReceived(new String(body), null);
+                                syslogProcessor.messageReceived(new String(body), connection.getAddress());
                                 break;
                         }
                     } catch(Exception e) {
@@ -157,7 +157,7 @@ public class AMQPConsumer implements Runnable {
         factory.setPort(server.getConfiguration().getAmqpPort());
 
         connection = factory.newConnection();
-
+        
         return connection.createChannel();
     }
     
