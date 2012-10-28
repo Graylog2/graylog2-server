@@ -40,6 +40,7 @@ public class AMQPQueueConfiguration {
     
     private String exchange;
     private String routingKey;
+    private int ttl;
     private InputType inputType;
     private String gl2NodeId;
     
@@ -60,6 +61,7 @@ public class AMQPQueueConfiguration {
                 configs.add(new AMQPQueueConfiguration(
                             (String) config.get("exchange"),
                             (String) config.get("routing_key"),
+                            (Integer) config.get("ttl"),
                             inputTypeFromString((String) config.get("input_type")),
                             server.getServerId()
                         ));
@@ -71,9 +73,10 @@ public class AMQPQueueConfiguration {
         return configs;
     }
     
-    public AMQPQueueConfiguration(String exchange, String routingKey, InputType inputType, String gl2NodeId) {
+    public AMQPQueueConfiguration(String exchange, String routingKey, int ttl, InputType inputType, String gl2NodeId) {
         this.exchange = exchange;
         this.routingKey = routingKey;
+        this.ttl = ttl;
         this.inputType = inputType;
         this.gl2NodeId = gl2NodeId;
         
@@ -86,6 +89,10 @@ public class AMQPQueueConfiguration {
     
     public String getRoutingKey() {
         return routingKey;
+    }
+    
+    public int getTtl() {
+        return ttl;
     }
     
     public InputType getInputType() {
@@ -111,7 +118,7 @@ public class AMQPQueueConfiguration {
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder();
-        sb.append("<").append(exchange).append(":")
+        sb.append(exchange).append(":")
                 .append(routingKey).append(":")
                 .append(inputType);
 

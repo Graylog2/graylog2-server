@@ -88,7 +88,7 @@ public class AMQPConsumer implements Runnable {
             boolean isDurable = false;
             boolean isExclusive = false;
             boolean isAutoDelete = true;
-            arguments.put("x-message-ttl", 900000); // 15 minutes.
+            arguments.put("x-message-ttl", queueConfig.getTtl()); // 15 minutes.
 
             // Automatically re-connect.
             this.connection.addShutdownListener(new AMQPReconnector(server, queueConfig));
