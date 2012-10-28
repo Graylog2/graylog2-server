@@ -19,9 +19,11 @@
  */
 package org.graylog2.inputs.amqp;
 
+import java.util.Map;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import org.apache.commons.lang3.concurrent.BasicThreadFactory;
+import org.elasticsearch.common.collect.Maps;
 import org.graylog2.Configuration;
 import org.graylog2.Core;
 import org.graylog2.inputs.MessageInput;
@@ -31,20 +33,36 @@ import org.graylog2.inputs.MessageInput;
  */
 public class AMQPInput implements MessageInput {
 
-    public static ExecutorService executor = Executors.newCachedThreadPool(
+    private static ExecutorService executor = Executors.newCachedThreadPool(
             new BasicThreadFactory.Builder()
                 .namingPattern("amqp-input-%d")
                 .build()
     );
     
+    private static Map<String, AMQPConsumer> consumers;
+    
     private static final String NAME = "AMQP syslog/GELF";
+    
+    public AMQPInput() {
+        consumers = Maps.newConcurrentMap();
+    }
 
     @Override
     public void initialize(Configuration configuration, Core graylogServer) {
         for (AMQPQueueConfiguration config : AMQPQueueConfiguration.fetchAll(graylogServer)) {
-            executor.submit(new AMQPConsumer(graylogServer, config));
+            AMQPConsumer consumer = new AMQPConsumer(graylogServer, config);
+            executor.submit(consumer);
+            consumers.put(config.getId(), consumer);
         }
-     }
+    }
+    
+    public static ExecutorService getThreadPool() {
+        return executor;
+    }
+    
+    public static Map<String, AMQPConsumer> getConsumers() {
+        return consumers;
+    }
 
     @Override
     public String getName() {

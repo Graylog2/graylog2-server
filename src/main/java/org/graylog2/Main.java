@@ -149,6 +149,9 @@ public final class Main {
         if (configuration.performRetention() && commandLineArguments.performRetention()) {
             server.registerInitializer(new IndexRetentionInitializer(server));
         }
+        if (configuration.isAmqpEnabled()) {
+            server.registerInitializer(new AMQPSyncInitializer(server));
+        }
         
         // Register inputs.
         if (configuration.isUseGELF()) {

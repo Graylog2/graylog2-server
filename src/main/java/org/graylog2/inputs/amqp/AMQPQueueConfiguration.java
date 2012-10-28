@@ -77,6 +77,16 @@ public class AMQPQueueConfiguration {
         return configs;
     }
     
+    public static Set<String> fetchAllIds(Core server) {
+        Set<String> configIDs = Sets.newHashSet();
+        
+        for (AMQPQueueConfiguration config : fetchAll(server)) {
+            configIDs.add(config.getId());
+        }
+                
+        return configIDs;
+    }
+    
     public AMQPQueueConfiguration(ObjectId id, String exchange, String routingKey, int ttl, InputType inputType, String gl2NodeId) {
         this.id = id;
         this.exchange = exchange;

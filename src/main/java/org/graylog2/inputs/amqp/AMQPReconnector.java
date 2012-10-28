@@ -45,16 +45,23 @@ public class AMQPReconnector implements ShutdownListener {
 
     @Override
     public void shutdownCompleted(ShutdownSignalException cause) {
-        Metrics.newMeter(AMQPReconnector.class, "ReconnectionAttempts", "reconnections", TimeUnit.SECONDS).mark();
+        // Only try to re-connect if this queue is still in the configuration.
+        if (AMQPQueueConfiguration.fetchAllIds(server).contains(queueConfig.getId())) {
+            Metrics.newMeter(AMQPReconnector.class, "ReconnectionAttempts", "reconnections", TimeUnit.SECONDS).mark();
 
-        LOG.error("Looks like we lost connection to the AMQP broker. "
-                + "Trying to reconnect to " + this.queueConfig + " in " + DELAY_SECONDS + " seconds");
+            LOG.error("Looks like we lost connection to the AMQP broker. "
+                    + "Trying to reconnect to " + this.queueConfig + " in " + DELAY_SECONDS + " seconds");
 
-        try {
-           Thread.sleep(DELAY_SECONDS*1000);
-        } catch(InterruptedException ie) {}
+            try {
+               Thread.sleep(DELAY_SECONDS*1000);
+            } catch(InterruptedException ie) {}
 
-        AMQPInput.executor.submit(new AMQPConsumer(server, queueConfig));
+            AMQPConsumer consumer = new AMQPConsumer(server, queueConfig);
+            AMQPInput.getThreadPool().submit(consumer);
+            AMQPInput.getConsumers().put(queueConfig.getId(), consumer);
+        } else {
+            LOG.info("Not trying to reconnect to queue " + queueConfig + ", which is not in the configuration anymore.");
+        }
     }
     
 }
