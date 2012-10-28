@@ -149,6 +149,8 @@ Graylog2WebInterface::Application.routes.draw do
     end
   end
 
+  resources :amqp_settings
+
   match '/visuals/fetch/:id' => 'visuals#fetch',:as => "visuals"
 
   root :to => 'messages#index'

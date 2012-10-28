@@ -66,6 +66,8 @@ authorization do
     has_permission_on :retentiontime, :to => [:index]
     
     has_permission_on :additionalcolumns, :to => [:index]
+
+    has_permission_on :amqp_settings, :to => [:index, :create]
   end
 
   role :reader do
