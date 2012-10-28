@@ -160,7 +160,7 @@ public class AMQPConsumer implements Runnable {
 
         connection = factory.newConnection(Executors.newCachedThreadPool(
             new BasicThreadFactory.Builder()
-                .namingPattern("amqp-consumer-" + queueConfig.getQueueUUID() + "-%d")
+                .namingPattern("amqp-consumer-" + queueConfig.getId() + "-%d")
                 .build()
         ));
         
