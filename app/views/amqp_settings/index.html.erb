@@ -31,6 +31,7 @@ SEE THE HEALTH PAGE FOR LE CURRENT QUEUE SETTINGS ET LE ACTIVITY MESSAGES. zomg 
 			<th>Routing key</th>
 			<th>TTL</th>
 			<th>Type</th>
+			<th>Queue name</th>
 			<th>Created</th>
 		</tr>
 	</thead>
@@ -42,6 +43,7 @@ SEE THE HEALTH PAGE FOR LE CURRENT QUEUE SETTINGS ET LE ACTIVITY MESSAGES. zomg 
 				<td><%= config.routing_key %></td>
 				<td><%= config.ttl %></td>
 				<td><%= config.input_type %></td>
+				<td><%= config.queue_name %></td>
 				<td><%= gl_date(config.created_at) %></td>
 			</tr>
 		<% end %>

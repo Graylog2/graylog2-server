@@ -12,4 +12,9 @@ class AmqpConfiguration
   validates_presence_of :exchange, :routing_key, :input_type, :ttl
   validates_numericality_of :ttl
 
+
+  def queue_name
+  	return "gl2-#{input_type.downcase}-#{exchange}-#{id}"
+  end
+
 end
