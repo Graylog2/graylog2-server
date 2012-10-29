@@ -35,6 +35,7 @@ import java.util.concurrent.TimeUnit;
 import org.apache.commons.lang3.concurrent.BasicThreadFactory;
 import org.apache.log4j.Logger;
 import org.graylog2.Core;
+import org.graylog2.activities.Activity;
 import org.graylog2.gelf.GELFMessage;
 import org.graylog2.gelf.GELFProcessor;
 import org.graylog2.inputs.syslog.SyslogProcessor;
@@ -73,7 +74,9 @@ public class AMQPConsumer implements Runnable {
     
     @Override
     public void run() {
-        LOG.info("Setting up AMQP connection to <" + queueConfig + ">");
+        String msg = "Setting up AMQP connection to <" + queueConfig + ">";
+        LOG.info(msg);
+        server.getActivityWriter().write(new Activity(msg, AMQPConsumer.class));
         listen();
     }
 
@@ -97,19 +100,21 @@ public class AMQPConsumer implements Runnable {
 
             consume();
 
-            LOG.info("Connected to broker <" + queueConfig + ">");
+            String msg = "Connected to broker <" + queueConfig + ">";
+            LOG.info(msg);
+            server.getActivityWriter().write(new Activity(msg, AMQPConsumer.class));
         } catch(IOException e) {
            LOG.error("IO error on broker <" + queueConfig + ">", e);
+           disconnect();
         }
     }
 
     public void disconnect() {
         try {
-            channel.queueDelete(queueConfig.getQueueName());
+            AMQPInput.getConsumers().remove(queueConfig.getId());
+            
             channel.close();
             connection.close();
-
-            AMQPInput.getConsumers().remove(queueConfig.getId());
         } catch(IOException e) {
             LOG.error("Could not disconnect from AMQP broker!", e);
         }
