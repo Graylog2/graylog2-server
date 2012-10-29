@@ -221,6 +221,10 @@ module ApplicationHelper
     link_to(image_tag("icons/tooltip.png"), "https://github.com/Graylog2/graylog2-web-interface/wiki/" + to, :class => "tooltip", :target => "_blank", :title => "Help page in the wiki")
   end
 
+  def support_link(text, to)
+    link_to(text, "http://support.torch.sh/kb/" + to, :target => "_blank", :title => "link to Graylog2 Knowledge Base")
+  end
+
   def array_for_flot_with_timeseries(values)
     ret = "["
     values.each do |value|
