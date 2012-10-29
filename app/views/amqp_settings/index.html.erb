@@ -17,6 +17,7 @@ Go to the <%= link_to("server activity messages", health_index_path) %> to see A
 	&nbsp;
 	<%= f.label :ttl, "TTL:" %>
 	<%= f.text_field :ttl, :value => "900000", :size => 8 %>
+	
 	&nbsp;
 	<%= f.label :input_type, "Type:" %>
 	<%= f.select :input_type, [ ["GELF", :gelf ], :syslog ] %>
@@ -34,7 +35,7 @@ Go to the <%= link_to("server activity messages", health_index_path) %> to see A
 			<th>TTL</th>
 			<th>Type</th>
 			<th>Queue name</th>
-			<th>Created</th>
+			<th colspan="2">Created</th>
 		</tr>
 	</thead>
 
@@ -47,6 +48,7 @@ Go to the <%= link_to("server activity messages", health_index_path) %> to see A
 				<td><%= config.input_type %></td>
 				<td><%= config.queue_name %></td>
 				<td><%= gl_date(config.created_at) %></td>
+				<td><%= link_to("Delete", amqp_setting_path(config), :method => :delete, :confirm => "Really delete?") %></td>
 			</tr>
 		<% end %>
 	</tbody>

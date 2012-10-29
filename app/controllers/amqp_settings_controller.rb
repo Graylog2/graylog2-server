@@ -18,5 +18,17 @@ class AmqpSettingsController < ApplicationController
 
   	redirect_to :action => :index
   end
+
+  def destroy
+    config = AmqpConfiguration.find(params[:id])
+
+    if config.destroy
+      flash[:notice] = "AMQP configuration has been delete. System will stop consuming it soon."
+    else
+      flash[:error] = "Could not delete AMQP configuration."
+    end
+
+    redirect_to :action => :index
+  end
   
 end
