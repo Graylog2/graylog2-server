@@ -53,9 +53,7 @@ public class AMQPQueueConfiguration {
         Set<AMQPQueueConfiguration> configs = Sets.newHashSet();
 
         DBCollection coll = server.getMongoConnection().getDatabase().getCollection("amqp_configurations");
-        DBObject query = new BasicDBObject();
-        query.put("disabled", new BasicDBObject("$ne", true));
-        DBCursor cur = coll.find(query);
+        DBCursor cur = coll.find(new BasicDBObject());
 
         while (cur.hasNext()) {
             try {
