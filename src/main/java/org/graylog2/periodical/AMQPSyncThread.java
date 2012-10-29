@@ -68,7 +68,7 @@ public class AMQPSyncThread implements Runnable {
             
             for (Map.Entry<String, AMQPConsumer> consumer : AMQPInput.getConsumers().entrySet()) {
                 if (!AMQPQueueConfiguration.fetchAllIds(graylogServer).contains(consumer.getKey())) {
-                    LOG.info("Consumer <" + consumer + "> is not in the configuratio anymore. Stopping it.");
+                    LOG.info("Consumer <" + consumer.getKey() + "> is not in the configuration anymore. Stopping it.");
                     consumer.getValue().disconnect();
                 }
             } 

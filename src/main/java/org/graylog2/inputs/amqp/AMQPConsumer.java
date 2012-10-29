@@ -108,6 +108,8 @@ public class AMQPConsumer implements Runnable {
             channel.queueDelete(queueConfig.getQueueName());
             channel.close();
             connection.close();
+
+            AMQPInput.getConsumers().remove(queueConfig.getId());
         } catch(IOException e) {
             LOG.error("Could not disconnect from AMQP broker!", e);
         }
