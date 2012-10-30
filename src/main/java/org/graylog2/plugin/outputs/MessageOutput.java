@@ -19,23 +19,19 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
 */
-package org.graylog2.plugin;
 
-import org.graylog2.plugin.buffers.Buffer;
-import org.graylog2.plugin.database.HostCounterCache;
+package org.graylog2.plugin.outputs;
+
+import java.util.List;
+import org.graylog2.plugin.GraylogServer;
+import org.graylog2.plugin.logmessage.LogMessage;
 
 /**
- *
+ * 
  * @author Lennart Koopmann <lennart@socketfeed.com>
  */
-public interface GraylogServer extends Runnable {
+public interface MessageOutput {
 
-    public Buffer getProcessBuffer();
+    void write(List<LogMessage> msg, GraylogServer server) throws Exception;
 
-    public Buffer getOutputBuffer();
-    
-    public boolean isMaster();
-    
-    public String getServerId();
-    
 }
