@@ -33,7 +33,7 @@ import org.graylog2.indexer.EmbeddedElasticSearchClient;
 import org.graylog2.initializers.Initializer;
 import org.graylog2.inputs.MessageInput;
 import org.graylog2.gelf.GELFChunkManager;
-import org.graylog2.outputs.MessageOutput;
+import org.graylog2.plugin.outputs.MessageOutput;
 import org.graylog2.streams.StreamCache;
 
 import com.google.common.collect.Lists;
@@ -86,7 +86,7 @@ public class Core implements GraylogServer {
     private List<Initializer> initializers = Lists.newArrayList();
     private List<MessageInput> inputs = Lists.newArrayList();
     private List<MessageFilter> filters = Lists.newArrayList();
-    private List<Class<? extends MessageOutput>> outputs = Lists.newArrayList();
+    private List<MessageOutput> outputs = Lists.newArrayList();
     
     private int loadedFilterPlugins = 0;
     
@@ -168,8 +168,8 @@ public class Core implements GraylogServer {
         this.filters.add(filter);
     }
 
-    public <T extends MessageOutput> void registerOutput(Class<T> klazz) {
-        this.outputs.add(klazz);
+    public void registerOutput(MessageOutput output) {
+        this.outputs.add(output);
     }
 
     @Override
@@ -204,7 +204,9 @@ public class Core implements GraylogServer {
                     .build()
         );
 
-        loadPlugins();
+        // Load and register plugins.
+        loadPlugins(MessageFilter.class, "filters");
+        loadPlugins(MessageOutput.class, "outputs");
         
         // Call all registered initializers.
         for (Initializer initializer : this.initializers) {
@@ -227,12 +229,18 @@ public class Core implements GraylogServer {
 
     }
     
-    private void loadPlugins() {
-        PluginLoader pl = new PluginLoader(configuration.getPluginDir());
-        for (MessageFilter filter : pl.loadFilterPlugins()) {
-            LOG.info("Registering plugin filter [" + filter.getClass().getSimpleName() + "].");
-            registerFilter(filter);
-            this.loadedFilterPlugins += 1;
+    private <A> void loadPlugins(Class<A> type, String subDirectory) {
+        PluginLoader<A> pl = new PluginLoader(configuration.getPluginDir(), subDirectory, type);
+        for (A plugin : pl.getPlugins()) {
+            LOG.info("Registering <" + type.getSimpleName() + "> plugin [" + plugin.getClass().getCanonicalName() + "].");
+            
+            if (plugin instanceof MessageFilter) {
+                registerFilter((MessageFilter) plugin);
+            } else if (plugin instanceof MessageOutput) {
+                registerOutput((MessageOutput) plugin);
+            } else {
+                LOG.error("Could not load plugin [" + plugin.getClass().getCanonicalName() + "] - Not supported type.");
+            }
         }
     }
 
@@ -282,20 +290,22 @@ public class Core implements GraylogServer {
         return this.outputBuffer;
     }
 
+    public List<MessageInput> getInputs() {
+        return this.inputs;
+    }
+    
     public List<MessageFilter> getFilters() {
         return this.filters;
     }
 
-    public List<Class<? extends MessageOutput>> getOutputs() {
+    public List<MessageOutput> getOutputs() {
         return this.outputs;
     }
-    
-    @Override
+
     public MessageCounterManagerImpl getMessageCounterManager() {
         return this.messageCounterManager;
     }
 
-    @Override
     public HostCounterCacheImpl getHostCounterCache() {
         return this.hostCounterCache;
     }
@@ -320,10 +330,6 @@ public class Core implements GraylogServer {
     @Override
     public String getServerId() {
         return this.serverId;
-    }
-    
-    public int getLoadedFilterPlugins() {
-        return this.loadedFilterPlugins;
     }
     
     public void setLocalMode(boolean mode) {

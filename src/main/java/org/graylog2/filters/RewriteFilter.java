@@ -29,6 +29,7 @@ import org.graylog2.plugin.filters.MessageFilter;
 import org.graylog2.plugin.logmessage.LogMessage;
 
 import java.util.concurrent.TimeUnit;
+import org.graylog2.Core;
 
 /**
  * @author Lennart Koopmann <lennart@socketfeed.com>
@@ -40,10 +41,11 @@ public class RewriteFilter implements MessageFilter {
 
     @Override
     public boolean filter(LogMessage msg, GraylogServer server) {
+        Core serverImpl = (Core) server;
         TimerContext tcx = processTime.time();
 
-        if (server.getRulesEngine() != null) {
-            server.getRulesEngine().evaluate(msg);
+        if (serverImpl.getRulesEngine() != null) {
+            serverImpl.getRulesEngine().evaluate(msg);
         }
 
         tcx.stop();

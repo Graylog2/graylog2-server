@@ -172,7 +172,7 @@ public final class Main {
         server.registerFilter(new CounterUpdateFilter());
 
         // Register outputs.
-        server.registerOutput(ElasticSearchOutput.class);
+        server.registerOutput(new ElasticSearchOutput());
         
         // Blocks until we shut down.
         server.run();

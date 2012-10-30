@@ -28,30 +28,29 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import org.apache.log4j.Logger;
-import org.graylog2.Core;
-import org.graylog2.Main;
-import org.graylog2.plugin.filters.MessageFilter;
 
 /**
  * @author Lennart Koopmann <lennart@socketfeed.com>
  */
-public class PluginLoader {
+public class PluginLoader<A> {
     
     private static final Logger LOG = Logger.getLogger(PluginLoader.class);
+
+    private final String baseDirectory;
+    private final String subDirectory;
+    private final Class<A> type;
     
-    public static final String FILTER_DIR = "filters";
-    
-    private String baseDirectory;
-    
-    public PluginLoader(String baseDirectory) {
+    public PluginLoader(String baseDirectory, String subDirectory, Class<A> clazz) {
         this.baseDirectory = baseDirectory;
+        this.subDirectory = subDirectory;
+        this.type = clazz;
     }
     
-    public List<MessageFilter> loadFilterPlugins() {
-        List<MessageFilter> filters = Lists.newArrayList();
+    public List<A> getPlugins() {
+        List<A> filters = Lists.newArrayList();
         
         // Load all plugin jars.
-        for (File jarPath : getAllJars(FILTER_DIR)) {
+        for (File jarPath : getAllJars(subDirectory)) {
             try {
                 ClassLoader loader = URLClassLoader.newInstance(
                     new URL[] { jarPath.toURI().toURL() },
@@ -59,7 +58,7 @@ public class PluginLoader {
                 );
 
                 Class<?> clazz = Class.forName(getClassNameFromJarName(jarPath.getName()), true, loader);
-                filters.add(clazz.asSubclass(MessageFilter.class).newInstance());
+                filters.add(clazz.asSubclass(type).newInstance());
             } catch (Exception ex) {
                 LOG.error("Could not load plugin <" + jarPath.getAbsolutePath() + ">", ex);
                 continue;

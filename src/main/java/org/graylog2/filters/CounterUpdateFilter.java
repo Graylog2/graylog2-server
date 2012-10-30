@@ -30,6 +30,7 @@ import org.graylog2.plugin.logmessage.LogMessage;
 import org.graylog2.plugin.streams.Stream;
 
 import java.util.concurrent.TimeUnit;
+import org.graylog2.Core;
 /**
  * @author Lennart Koopmann <lennart@socketfeed.com>
  */
@@ -39,10 +40,11 @@ public class CounterUpdateFilter implements MessageFilter {
 
     @Override
     public boolean filter(LogMessage msg, GraylogServer server) {
+        Core serverImpl = (Core) server;
         TimerContext tcx = processTime.time();
 
         // Increment all registered message counters.
-        for (MessageCounter counter : server.getMessageCounterManager().getAllCounters().values()) {
+        for (MessageCounter counter : serverImpl.getMessageCounterManager().getAllCounters().values()) {
             // Five second throughput for health page.
             counter.incrementThroughput();
 
@@ -59,7 +61,7 @@ public class CounterUpdateFilter implements MessageFilter {
         }
         
         // Update hostcounters. Used to build hosts connection.
-        server.getHostCounterCache().increment(msg.getHost());
+        serverImpl.getHostCounterCache().increment(msg.getHost());
 
         
         tcx.stop();

@@ -28,7 +28,7 @@ import com.yammer.metrics.core.Meter;
 import org.apache.log4j.Logger;
 import org.graylog2.Core;
 import org.graylog2.buffers.LogMessageEvent;
-import org.graylog2.outputs.MessageOutput;
+import org.graylog2.plugin.outputs.MessageOutput;
 import org.graylog2.plugin.logmessage.LogMessage;
 
 import java.util.List;
@@ -73,23 +73,20 @@ public class OutputBufferProcessor implements EventHandler<LogMessageEvent> {
         buffer.add(msg);
 
         if (endOfBatch || buffer.size() >= server.getConfiguration().getOutputBatchSize()) {
-            for (Class<? extends MessageOutput> outputType : server.getOutputs()) {
+            for (MessageOutput output : server.getOutputs()) {
                 try {
-                    // Always create a new instance of this filter.
-                    MessageOutput output = outputType.newInstance();
-
                     if (LOG.isDebugEnabled()) {
-                        LOG.debug("Writing message batch to [" + outputType.getSimpleName() + "]. Size <" + buffer.size() + ">");
+                        LOG.debug("Writing message batch to [" + output.getName() + "]. Size <" + buffer.size() + ">");
                     }
 
                     batchSize.update(buffer.size());
                     output.write(buffer, server);
                 } catch (Exception e) {
-                    LOG.error("Could not write message batch to output [" + outputType.getSimpleName() +"].", e);
-                } finally {
-                    buffer.clear();
+                    LOG.error("Could not write message batch to output [" + output.getName() +"].", e);
                 }
             }
+            
+            buffer.clear();
         }
 
         if (LOG.isDebugEnabled()) {

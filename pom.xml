@@ -131,7 +131,7 @@
         <dependency>
             <groupId>org.graylog2</groupId>
             <artifactId>graylog2-plugin</artifactId>
-            <version>0.9.7.4</version>
+            <version>0.9.7.6</version>
         </dependency>
         <dependency>
             <groupId>com.googlecode.disruptor</groupId>

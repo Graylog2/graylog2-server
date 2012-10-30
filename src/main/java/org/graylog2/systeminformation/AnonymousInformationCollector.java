@@ -62,7 +62,9 @@ public class AnonymousInformationCollector {
     private Map<String, Integer> numberOfLoadedPlugins() {
         try {
             Map<String, Integer> plugins = Maps.newHashMap();
-            plugins.put("filters", server.getLoadedFilterPlugins());
+            plugins.put("inputs", server.getInputs().size());
+            plugins.put("filters", server.getFilters().size());
+            plugins.put("outputs", server.getOutputs().size());
 
             return plugins;
         } catch (Exception e) {
