@@ -1,3 +1,4 @@
+# Settings for the elasticsearch indexer.
 production:
   url: http://localhost:9200/
   index_prefix: graylog2
