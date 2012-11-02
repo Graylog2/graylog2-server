@@ -291,7 +291,7 @@ $(document).ready(function() {
     //$.mapKey("s", function() { $("#modal-stream-chooser").modal(standardMapKeyOptions); });
     //$.mapKey("h", function() { $("#modal-host-chooser").modal(standardMapKeyOptions); });
   
-    var mqcount, count;
+    var count;
 
     setInterval(function(){
       // Update current throughput every 5 seconds
