@@ -63,6 +63,8 @@ public class ProcessBufferProcessor implements EventHandler<LogMessageEvent> {
             return;
         }
         
+        server.processBufferWatermark().decrementAndGet();
+        
         incomingMessages.mark();
         incomingMessagesPerMinute.mark();
         TimerContext tcx = processTime.time();

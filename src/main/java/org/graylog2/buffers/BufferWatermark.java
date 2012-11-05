@@ -17,32 +17,32 @@
  * along with Graylog2.  If not, see <http://www.gnu.org/licenses/>.
  *
  */
-package org.graylog2.initializers;
+package org.graylog2.buffers;
 
-import org.graylog2.Core;
-import org.graylog2.periodical.AMQPSyncThread;
+import java.util.concurrent.atomic.AtomicInteger;
+import org.apache.log4j.Logger;
 
 /**
  * @author Lennart Koopmann <lennart@socketfeed.com>
  */
-public class AMQPSyncInitializer extends SimpleFixedRateScheduleInitializer implements Initializer {
+public class BufferWatermark {
     
-    public AMQPSyncInitializer(Core graylogServer) {
-        this.graylogServer = graylogServer;
-    }
-
-    @Override
-    public void initialize() {
-        configureScheduler(
-                new AMQPSyncThread(this.graylogServer),
-                AMQPSyncThread.INITIAL_DELAY,
-                AMQPSyncThread.PERIOD
-        );
+    private static final Logger LOG = Logger.getLogger(BufferWatermark.class);
+    
+    private final int bufferSize;
+    private final AtomicInteger watermark;
+    
+    public BufferWatermark(int bufferSize, AtomicInteger watermark) {
+        this.bufferSize = bufferSize;
+        this.watermark = watermark;
     }
     
-    @Override
-    public boolean masterOnly() {
-        return true;
+    public int getUtilization() {
+        return watermark.get();
+    }
+    
+    public float getUtilizationPercentage() {
+        return getUtilization()/bufferSize*100;
     }
     
 }

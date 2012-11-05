@@ -37,6 +37,7 @@ import org.graylog2.plugin.outputs.MessageOutput;
 import org.graylog2.streams.StreamCache;
 
 import com.google.common.collect.Lists;
+import java.util.concurrent.atomic.AtomicInteger;
 import org.apache.commons.lang3.concurrent.BasicThreadFactory;
 import org.graylog2.activities.Activity;
 import org.graylog2.activities.ActivityWriter;
@@ -88,10 +89,10 @@ public class Core implements GraylogServer {
     private List<MessageFilter> filters = Lists.newArrayList();
     private List<MessageOutput> outputs = Lists.newArrayList();
     
-    private int loadedFilterPlugins = 0;
-    
     private ProcessBuffer processBuffer;
     private OutputBuffer outputBuffer;
+    private AtomicInteger outputBufferWatermark = new AtomicInteger();
+    private AtomicInteger processBufferWatermark = new AtomicInteger();
     
     private Deflector deflector;
     
@@ -100,6 +101,7 @@ public class Core implements GraylogServer {
     private String serverId;
     
     private boolean localMode = false;
+    private boolean statsMode = false;
 
     public void initialize(Configuration configuration) {
         serverId = Tools.generateServerId();
@@ -289,6 +291,14 @@ public class Core implements GraylogServer {
     public Buffer getOutputBuffer() {
         return this.outputBuffer;
     }
+    
+    public AtomicInteger outputBufferWatermark() {
+        return outputBufferWatermark;
+    }
+    
+    public AtomicInteger processBufferWatermark() {
+        return processBufferWatermark;
+    }
 
     public List<MessageInput> getInputs() {
         return this.inputs;
@@ -340,4 +350,12 @@ public class Core implements GraylogServer {
         return localMode;
     }
 
+    public void setStatsMode(boolean mode) {
+        this.statsMode = mode;
+    }
+   
+    public boolean isStatsMode() {
+        return statsMode;
+    }
+    
 }

@@ -78,6 +78,8 @@ public class ProcessBuffer implements Buffer {
         LogMessageEvent event = ringBuffer.get(sequence);
         event.setMessage(message);
         ringBuffer.publish(sequence);
+        
+        server.processBufferWatermark().incrementAndGet();
     }
 
 }

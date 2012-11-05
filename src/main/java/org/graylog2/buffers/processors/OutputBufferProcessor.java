@@ -45,6 +45,7 @@ public class OutputBufferProcessor implements EventHandler<LogMessageEvent> {
 
     private List<LogMessage> buffer = Lists.newArrayList();
     private final Meter incomingMessages = Metrics.newMeter(OutputBufferProcessor.class, "IncomingMessages", "messages", TimeUnit.SECONDS);
+    
     private final Histogram batchSize = Metrics.newHistogram(OutputBufferProcessor.class, "BatchSize");
 
     private final long ordinal;
@@ -63,6 +64,7 @@ public class OutputBufferProcessor implements EventHandler<LogMessageEvent> {
             return;
         }
         
+        server.outputBufferWatermark().decrementAndGet();
         incomingMessages.mark();
 
         LogMessage msg = event.getMessage();

@@ -24,12 +24,14 @@ import com.lmax.disruptor.MultiThreadedClaimStrategy;
 import com.lmax.disruptor.RingBuffer;
 import com.lmax.disruptor.SleepingWaitStrategy;
 import com.lmax.disruptor.dsl.Disruptor;
+import com.yammer.metrics.Metrics;
+import com.yammer.metrics.core.Meter;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 import org.apache.commons.lang3.concurrent.BasicThreadFactory;
 import org.graylog2.Core;
 import org.graylog2.buffers.processors.OutputBufferProcessor;
-import org.graylog2.plugin.GraylogServer;
 import org.graylog2.plugin.buffers.Buffer;
 import org.graylog2.plugin.logmessage.LogMessage;
 
@@ -45,7 +47,10 @@ public class OutputBuffer implements Buffer {
                 .namingPattern("outputbufferprocessor-%d")
                 .build()
     );
+    
     Core server;
+    
+    private final Meter incomingMessages = Metrics.newMeter(OutputBuffer.class, "InsertedMessages", "messages", TimeUnit.SECONDS);
 
     public OutputBuffer(Core server) {
         this.server = server;
@@ -76,6 +81,9 @@ public class OutputBuffer implements Buffer {
         LogMessageEvent event = ringBuffer.get(sequence);
         event.setMessage(message);
         ringBuffer.publish(sequence);
+        
+        server.outputBufferWatermark().incrementAndGet();
+        incomingMessages.mark();
     }
 
 }

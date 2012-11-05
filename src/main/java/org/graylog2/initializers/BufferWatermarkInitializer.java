@@ -20,23 +20,23 @@
 package org.graylog2.initializers;
 
 import org.graylog2.Core;
-import org.graylog2.periodical.AMQPSyncThread;
+import org.graylog2.periodical.BufferWatermarkThread;
 
 /**
  * @author Lennart Koopmann <lennart@socketfeed.com>
  */
-public class AMQPSyncInitializer extends SimpleFixedRateScheduleInitializer implements Initializer {
+public class BufferWatermarkInitializer extends SimpleFixedRateScheduleInitializer implements Initializer {
     
-    public AMQPSyncInitializer(Core graylogServer) {
+    public BufferWatermarkInitializer(Core graylogServer) {
         this.graylogServer = graylogServer;
     }
 
     @Override
     public void initialize() {
         configureScheduler(
-                new AMQPSyncThread(this.graylogServer),
-                AMQPSyncThread.INITIAL_DELAY,
-                AMQPSyncThread.PERIOD
+                new BufferWatermarkThread(this.graylogServer),
+                BufferWatermarkThread.INITIAL_DELAY,
+                BufferWatermarkThread.PERIOD
         );
     }
     
@@ -44,5 +44,4 @@ public class AMQPSyncInitializer extends SimpleFixedRateScheduleInitializer impl
     public boolean masterOnly() {
         return true;
     }
-    
 }

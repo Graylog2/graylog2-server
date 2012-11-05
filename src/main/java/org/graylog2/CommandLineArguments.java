@@ -31,6 +31,9 @@ public class CommandLineArguments {
     
     @Parameter(names = {"-l", "--local"}, description = "Run graylog2 in local mode. Only interesting for Graylog2 developers.")
     private boolean local = false;
+    
+    @Parameter(names = {"-s", "--statistics"}, description = "Print utilization statistics to STDOUT")
+    private boolean stats = false;
 
     @Parameter(names = {"-r", "--no-retention"}, description = "Do not automatically remove messages from index that are older than the retention time")
     private boolean noRetention = false;
@@ -79,6 +82,10 @@ public class CommandLineArguments {
     
     public boolean isLocal() {
         return local;
+    }
+    
+    public boolean isStats() {
+        return stats;
     }
 
     public void setDebug(boolean debug) {

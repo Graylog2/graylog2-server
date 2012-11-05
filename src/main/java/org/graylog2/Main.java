@@ -131,10 +131,17 @@ public final class Main {
             configuration.setIsMaster(false);
         }
         
+        // Enable local mode?
         if (commandLineArguments.isLocal() || commandLineArguments.isDebug()) {
             // In local mode, systemstats are sent to localhost for example.
             LOG.info("Running in local mode");
             server.setLocalMode(true);
+        }
+        
+        // Are we in stats mode?
+        if (commandLineArguments.isStats()) {
+            LOG.info("Printing system utilization information.");
+            server.setStatsMode(true);
         }
 
         // Register initializers.
@@ -152,6 +159,7 @@ public final class Main {
         if (configuration.isAmqpEnabled()) {
             server.registerInitializer(new AMQPSyncInitializer(server));
         }
+        server.registerInitializer(new BufferWatermarkInitializer(server));
         
         // Register inputs.
         if (configuration.isUseGELF()) {
