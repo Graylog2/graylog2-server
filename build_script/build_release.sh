@@ -41,6 +41,14 @@ cp ../misc/elasticsearch.yml $BUILD_DIR/elasticsearch.yml.example
 # Copy control script
 cp -R copy/bin $BUILD_DIR
 
+# Create empty plugin directories.
+mkdir -p $BUILD_DIR/plugin
+mkdir -p $BUILD_DIR/plugin/filters
+mkdir -p $BUILD_DIR/plugin/outputs
+mkdir -p $BUILD_DIR/plugin/inputs
+mkdir -p $BUILD_DIR/plugin/initializers
+mkdir -p $BUILD_DIR/plugin/transports
+
 cd builds/
 
 # tar it
