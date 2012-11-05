@@ -42,6 +42,6 @@ public class BufferWatermarkInitializer extends SimpleFixedRateScheduleInitializ
     
     @Override
     public boolean masterOnly() {
-        return true;
+        return false;
     }
 }
