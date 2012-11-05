@@ -42,7 +42,7 @@ public class BufferWatermark {
     }
     
     public float getUtilizationPercentage() {
-        return getUtilization()/bufferSize*100;
+        return (float) getUtilization()/bufferSize*100;
     }
     
 }
