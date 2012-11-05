@@ -31,6 +31,12 @@
     </h3>
     <h4><span class="highlighted">Hostname:</span> <%= node.local_hostname %></h4>
     <h4><span class="highlighted">Throughput:</span> <%= node.current_throughput %> / 5 sec (<%= node.highest_throughput %> highest)</h4>
+    <h4>
+      <span class="highlighted">Buffer utilization:</span>
+      <%= node.buffer_watermark_percentage("processbuffer") %>% ProcessBuffer [<%= node.buffer_watermark("processbuffer") %>]
+      /
+      <%= node.buffer_watermark_percentage("outputbuffer") %>% OutputBuffer [<%= node.buffer_watermark("outputbuffer") %>]
+    </h4>
     <h4><span class="highlighted">Started:</span> <%= gl_date(Time.at(node.startup_time)) rescue "?" %></h4>
     <h4><span class="highlighted">Available processors:</span> <%= node.available_processors %></h4>
     <h4><span class="highlighted">JRE:</span> <%= node.jre %></h4>

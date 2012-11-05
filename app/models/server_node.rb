@@ -22,6 +22,14 @@ class ServerNode
     get_throughput(:highest)
   end
 
+  def buffer_watermark(buffer)
+    get_buffer_watermark(buffer, :number)
+  end
+
+  def buffer_watermark_percentage(buffer)
+    get_buffer_watermark(buffer, :percentage)
+  end
+
   def startup_time
     ServerValue.get("startup_time", @server_id, 0)
   end
@@ -51,6 +59,19 @@ class ServerNode
   private
   def get_throughput(which)
     ServerValue.get("total_throughput", @server_id, -1, which)
+  rescue
+    -1
+  end
+
+  def get_buffer_watermark(buffer, type)
+    case type
+      when :number
+        key = buffer
+      when :percentage
+        key = buffer + "_percent"
+    end
+
+    ServerValue.get("buffer_watermarks", @server_id, -1, key)
   rescue
     -1
   end
