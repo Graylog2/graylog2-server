@@ -34,8 +34,9 @@ cp -R ../target/graylog2-server-jar-with-dependencies.jar ../README.markdown ../
 # Rename jar
 mv $BUILD_DIR/graylog2-server-jar-with-dependencies.jar $BUILD_DIR/graylog2-server.jar
 
-# Copy example config file
+# Copy example config files
 cp ../misc/graylog2.conf $BUILD_DIR/graylog2.conf.example
+cp ../misc/elasticsearch.yml $BUILD_DIR/elasticsearch.yml.example
 
 # Copy control script
 cp -R copy/bin $BUILD_DIR
