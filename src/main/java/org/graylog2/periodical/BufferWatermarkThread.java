@@ -19,6 +19,8 @@
  */
 package org.graylog2.periodical;
 
+import com.yammer.metrics.Metrics;
+import com.yammer.metrics.core.Gauge;
 import java.util.concurrent.atomic.AtomicInteger;
 import org.apache.log4j.Logger;
 import org.graylog2.Core;
@@ -48,9 +50,8 @@ public class BufferWatermarkThread implements Runnable {
         
         int ringSize = graylogServer.getConfiguration().getRingSize();
         
-        BufferWatermark oWm = new BufferWatermark(ringSize, graylogServer.outputBufferWatermark());
-        
-        BufferWatermark pWm = new BufferWatermark(ringSize, graylogServer.processBufferWatermark());
+        final BufferWatermark oWm = new BufferWatermark(ringSize, graylogServer.outputBufferWatermark());
+        final BufferWatermark pWm = new BufferWatermark(ringSize, graylogServer.processBufferWatermark());
         
         if (graylogServer.isStatsMode()) {
             DateTime now = new DateTime();
@@ -59,6 +60,8 @@ public class BufferWatermarkThread implements Runnable {
             System.out.println("[util] [" + now + "] ProcessBuffer is at "
                     + pWm.getUtilizationPercentage() + "%. [" + pWm.getUtilization() + "/" + ringSize +"]");
         }
+        
+        sendMetrics(oWm, pWm);
     }
     
     private void checkValidity(AtomicInteger watermark) {
@@ -68,6 +71,36 @@ public class BufferWatermarkThread implements Runnable {
             LOG.warn("Reset a watermark to 0 because it was <" + x + ">");
             watermark.set(0);
         }
+    }
+    
+    private void sendMetrics(final BufferWatermark outputBuffer, final BufferWatermark processBuffer) {
+        Metrics.newGauge(BufferWatermarkThread.class, "OutputBufferWatermark", new Gauge<Integer>() {
+            @Override
+            public Integer value() {
+                return outputBuffer.getUtilization();
+            }
+        });
+        
+        Metrics.newGauge(BufferWatermarkThread.class, "OutputBufferWatermarkPercentage", new Gauge<Float>() {
+            @Override
+            public Float value() {
+                return outputBuffer.getUtilizationPercentage();
+            }
+        });
+        
+        Metrics.newGauge(BufferWatermarkThread.class, "ProcessBufferWatermark", new Gauge<Integer>() {
+            @Override
+            public Integer value() {
+                return processBuffer.getUtilization();
+            }
+        });
+        
+        Metrics.newGauge(BufferWatermarkThread.class, "ProcessBufferWatermarkPercentage", new Gauge<Float>() {
+            @Override
+            public Float value() {
+                return processBuffer.getUtilizationPercentage();
+            }
+        });
     }
     
 }
