@@ -30,6 +30,7 @@ import com.mongodb.DBObject;
 import java.util.Map;
 import org.graylog2.Core;
 import org.graylog2.activities.Activity;
+import org.graylog2.buffers.BufferWatermark;
 import org.joda.time.DateTime;
 
 
@@ -93,6 +94,25 @@ public class MongoBridge {
         DBCollection coll = getConnection().getDatabase().getCollection("server_values");
         coll.update(query, update, true, false);
     }
+    
+    public void writeBufferWatermarks(String serverId, BufferWatermark outputBuffer, BufferWatermark processBuffer) {
+        BasicDBObject query = new BasicDBObject();
+        query.put("server_id", serverId);
+        query.put("type", "buffer_watermarks");
+
+        BasicDBObject update = new BasicDBObject();
+        update.put("server_id", serverId);
+        update.put("type", "buffer_watermarks");
+        
+        update.put("outputbuffer", outputBuffer.getUtilization());
+        update.put("outputbuffer_percent", outputBuffer.getUtilizationPercentage());
+
+        update.put("processbuffer", processBuffer.getUtilization());
+        update.put("processbuffer_percent", processBuffer.getUtilizationPercentage());
+        
+        DBCollection coll = getConnection().getDatabase().getCollection("server_values");
+        coll.update(query, update, true, false);
+    }
 
     public void setSimpleServerValue(String serverId, String key, Object value) {
         BasicDBObject query = new BasicDBObject();
@@ -110,7 +130,7 @@ public class MongoBridge {
         coll.update(query, update, true, false);
     }
 
-    public synchronized void writeMessageCounts(int total, Map<String, Integer> streams, Map<String, Integer> hosts) {
+    public void writeMessageCounts(int total, Map<String, Integer> streams, Map<String, Integer> hosts) {
         // We store the first second of the current minute, to allow syncing (summing) message counts
         // from different graylog-server nodes later
         DateTime dt = new DateTime();

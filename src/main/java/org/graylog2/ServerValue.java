@@ -20,6 +20,8 @@
 
 package org.graylog2;
 
+import org.graylog2.buffers.BufferWatermark;
+
 /**
  * Filling the server_values collection
  *
@@ -59,6 +61,10 @@ public class ServerValue {
 
     public void writeThroughput(int current, int highest) {
         graylogServer.getMongoBridge().writeThroughput(graylogServer.getServerId(), current, highest);
+    }
+    
+    public void writeBufferWatermarks(BufferWatermark outputBuffer, BufferWatermark processBuffer) {
+        graylogServer.getMongoBridge().writeBufferWatermarks(graylogServer.getServerId(), outputBuffer, processBuffer);
     }
     
     public void setIsMaster(boolean isIt) {
