@@ -27,7 +27,7 @@ class ServerNode
   end
 
   def buffer_watermark_percentage(buffer)
-    get_buffer_watermark(buffer, :percentage)
+    get_buffer_watermark(buffer, :percentage).round(2)
   end
 
   def startup_time
