@@ -57,7 +57,9 @@ public class AMQPConsumer implements Runnable {
     Connection connection;
     Channel channel;
     
-    Meter handledMessages = Metrics.newMeter(AMQPConsumer.class, "HandledAMQPMessages", "messages", TimeUnit.SECONDS);
+    private final Meter handledMessages = Metrics.newMeter(AMQPConsumer.class, "HandledAMQPMessages", "messages", TimeUnit.SECONDS);
+    private final Meter handledSyslogMessages = Metrics.newMeter(AMQPConsumer.class, "HandledAMQPSyslogMessages", "messages", TimeUnit.SECONDS);
+    private final Meter handledGELFMessages = Metrics.newMeter(AMQPConsumer.class, "HandledAMQPGELFMessages", "messages", TimeUnit.SECONDS);
 
     public AMQPConsumer(Core server, AMQPQueueConfiguration queueConfig) {
         this.server = server;
@@ -149,20 +151,20 @@ public class AMQPConsumer implements Runnable {
              @Override
              public void handleDelivery(String consumerTag, Envelope envelope, AMQP.BasicProperties properties, byte[] body) throws IOException {
                  try {
-                     handledMessages.mark();
-
                      switch (queueConfig.getInputType()) {
                          case GELF:
                              GELFMessage gelf = new GELFMessage(body);
                              gelfProcessor.messageReceived(gelf);
+                             handledGELFMessages.mark();
                              break;
                          case SYSLOG:
                              syslogProcessor.messageReceived(new String(body), connection.getAddress());
+                             handledSyslogMessages.mark();
                              break;
                      }
                      
                      channel.basicAck(envelope.getDeliveryTag(), false);
-                     
+                     handledMessages.mark();
                  } catch(Exception e) {
                      LOG.error("Could not handle message from AMQP.", e);
                  }
