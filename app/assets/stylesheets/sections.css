@@ -229,7 +229,11 @@
 }
 
 #streams-alerts-timespan {
-  width: 25px;
+  width: 30px;
+}
+
+#streams-alerts-period {
+  width: 30px;
 }
 
 #streams-description {

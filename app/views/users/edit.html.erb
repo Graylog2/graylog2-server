@@ -3,7 +3,6 @@
   <%= awesome_link "Delete user", user_path(@user), :method => :delete, :confirm => "Really delete ths user?" %>
 </div>
 
-
 <h1>Edit user <span class="highlighted"><%= @user.login %></span></h1>
 <% @user.password = @user.password_confirmation = nil %>
 

@@ -33,7 +33,13 @@ of the alarm. You can also define that all users are alarmed, no matter what the
   <%= label_tag :timespan, "Minutes:" %>
   <%= text_field_tag :timespan, @stream.alarm_timespan, :id => "streams-alerts-timespan" %> &nbsp;
 
+  <%= label_tag :alarm_period, "Grace period (minutes):" %>
+  <%= text_field_tag :period, @stream.alarm_period, :id => "streams-alerts-period" %> &nbsp;
+
   <%= awesome_submit_link "Save" %>
+
+  <br />
+  The grace period defines for how many minutes the system will wait until sending the next alert. The check runs once a minute.
 <% end %>
 <br />
 

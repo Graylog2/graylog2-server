@@ -26,9 +26,8 @@ class Stream
   field :created_at, :type => DateTime
   field :updated_at, :type => DateTime
   field :alarm_force, :type => Boolean
-  field :last_subscription_check, :type => Integer
-  field :last_alarm_check, :type => Integer
   field :alarm_active, :type => Boolean
+  field :alarm_period, :type => Integer
   field :disabled, :type => Boolean
   field :additional_columns, :type => Array, :default => []
   field :shortname, :type => String

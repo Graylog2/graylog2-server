@@ -36,6 +36,7 @@ class User
   field :remember_token_expires_at
   field :last_version_check, :type => Integer
   field :api_key, :type => String
+  field :transports, :type => Hash
 
   index :login,          :background => true, :unique => true
   index :remember_token, :background => true, :unique => true
@@ -90,6 +91,12 @@ class User
     key = Digest::SHA1.hexdigest(self.login + rand(1000000).to_s + ":" + Time.now.to_s)  
     write_attribute :api_key, key
     return key
+  end
+
+  def get_transport_value(typeclass)
+    transports.select { |x| x["typeclass"] == typeclass }.first["value"]
+  rescue
+    nil
   end
 
   def admin?

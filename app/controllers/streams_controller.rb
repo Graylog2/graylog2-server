@@ -129,9 +129,10 @@ class StreamsController < ApplicationController
   def setalarmvalues
     @stream = Stream.find_by_id(params[:id])
 
-    unless params[:limit].blank? or params[:timespan].blank?
+    unless params[:limit].blank? or params[:timespan].blank? or params[:period].blank?
       @stream.alarm_limit = params[:limit]
       @stream.alarm_timespan = params[:timespan]
+      @stream.alarm_period = params[:period]
 
       if @stream.save
         flash[:notice] = "Alarm settings updated."

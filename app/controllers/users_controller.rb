@@ -44,6 +44,8 @@ class UsersController < ApplicationController
     params[:user].delete :password_confirmation if params[:user][:password_confirmation].blank?
 
     @user = User.find(params[:id])
+    
+    @user.transports = transport_hash(params)
 
     if @user.update_attributes(params[:user]) then
       flash[:notice] = 'User has been updated'
@@ -122,6 +124,20 @@ class UsersController < ApplicationController
 
   def choose_layout
     action_name == "first" || action_name == "createfirst" ? "login" : "application"
+  end
+
+  def transport_hash(p)
+    r = []
+    
+    if p.blank? or p[:transports].blank?
+      return r
+    end
+
+    p[:transports].each do |k,v|
+      r << { :typeclass => k, :value => v }
+    end
+
+    return r
   end
 
 end

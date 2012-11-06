@@ -78,33 +78,6 @@
 </ul>
 
 <br />
-<% unless @stream.subscribers.nil? %>
-<h3>
-  Last run of subscription check:
-  <span class="highlighted">
-    <% if @stream.last_subscription_check.blank? %>
-      Never
-    <% else %>
-      <%= time_ago_in_words(Time.at(@stream.last_subscription_check)) %> ago
-    <% end %>
-  </span>
-</h3>
-<% end %>
-
-<% if @stream.alarm_active %>
-<h3>
-  Last run of alarm check:
-  <span class="highlighted">
-    <% if @stream.last_alarm_check.blank? %>
-      Never
-    <% else %>
-      <%= time_ago_in_words(Time.at(@stream.last_alarm_check)) %> ago
-    <% end %>
-  </span>
-</h3>
-<% end %>
-
-<br />
 <h3>Created: <%= gl_date(@stream.created_at) %></h3>
 <h3>Last change: <%= gl_date(@stream.updated_at) %></h3>
 
