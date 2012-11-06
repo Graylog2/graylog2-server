@@ -1,5 +1,5 @@
 /**
- * Copyright 2011 Lennart Koopmann <lennart@socketfeed.com>
+ * Copyright 2012 Lennart Koopmann <lennart@socketfeed.com>
  *
  * This file is part of Graylog2.
  *
@@ -18,33 +18,30 @@
  *
  */
 
-package org.graylog2.streams;
+package org.graylog2.users;
 
 import java.util.Set;
 import org.graylog2.Core;
 
 import org.graylog2.SimpleObjectCache;
-import org.graylog2.plugin.streams.Stream;
 
 /**
- * Singleton caching the already fetched streams.
- *
  * @author Lennart Koopmann <lennart@socketfeed.com>
  */
-public class StreamCache extends SimpleObjectCache<Set<Stream>> {
+public class UserCache extends SimpleObjectCache<Set<User>> {
 
-    private static StreamCache instance;
+    private static UserCache instance;
 
-    private StreamCache() { }
+    private UserCache() { }
 
-    public static synchronized StreamCache initialize(Core server) {
-        StreamCache streamCache = getInstance();
+    public static synchronized UserCache initialize(Core server) {
+        UserCache streamCache = getInstance();
         return streamCache;
     }
 
-    public static synchronized StreamCache getInstance() {
+    public static synchronized UserCache getInstance() {
         if (instance == null) {
-            instance = new StreamCache();
+            instance = new UserCache();
         }
 
         return instance;

@@ -28,6 +28,7 @@ import com.mongodb.DB;
 import com.mongodb.DBCollection;
 import com.mongodb.DBObject;
 import java.util.Map;
+import java.util.Set;
 import org.graylog2.Core;
 import org.graylog2.activities.Activity;
 import org.graylog2.buffers.BufferWatermark;
@@ -164,6 +165,17 @@ public class MongoBridge {
         
         BasicDBObject obj = new BasicDBObject(info);
         coll.insert(obj);
+    }
+    
+    public void writeTransports(Set<Map<String, String>> transports) {
+        DBCollection coll = connection.getDatabase().getCollection("transports");
+
+        // Delete all entries, we only have one at a time.
+        coll.remove(new BasicDBObject());
+        
+        for (Map<String, String> transport : transports) {
+            coll.insert(new BasicDBObject(transport));
+        }
     }
     
     /**

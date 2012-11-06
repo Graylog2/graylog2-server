@@ -1,5 +1,5 @@
 /**
- * Copyright 2011 Lennart Koopmann <lennart@socketfeed.com>
+ * Copyright 2012 Lennart Koopmann <lennart@socketfeed.com>
  *
  * This file is part of Graylog2.
  *
@@ -17,36 +17,32 @@
  * along with Graylog2.  If not, see <http://www.gnu.org/licenses/>.
  *
  */
+package org.graylog2.initializers;
 
-package org.graylog2.streams;
-
-import java.util.Set;
 import org.graylog2.Core;
-
-import org.graylog2.SimpleObjectCache;
-import org.graylog2.plugin.streams.Stream;
+import org.graylog2.periodical.AlarmScannerThread;
 
 /**
- * Singleton caching the already fetched streams.
- *
  * @author Lennart Koopmann <lennart@socketfeed.com>
  */
-public class StreamCache extends SimpleObjectCache<Set<Stream>> {
-
-    private static StreamCache instance;
-
-    private StreamCache() { }
-
-    public static synchronized StreamCache initialize(Core server) {
-        StreamCache streamCache = getInstance();
-        return streamCache;
+public class AlarmScannerInitializer extends SimpleFixedRateScheduleInitializer implements Initializer {
+    
+    public AlarmScannerInitializer(Core graylogServer) {
+        this.graylogServer = graylogServer;
     }
 
-    public static synchronized StreamCache getInstance() {
-        if (instance == null) {
-            instance = new StreamCache();
-        }
-
-        return instance;
+    @Override
+    public void initialize() {
+        configureScheduler(
+                new AlarmScannerThread(this.graylogServer),
+                AlarmScannerThread.INITIAL_DELAY,
+                AlarmScannerThread.PERIOD
+        );
     }
+    
+    @Override
+    public boolean masterOnly() {
+        return true;
+    }
+    
 }

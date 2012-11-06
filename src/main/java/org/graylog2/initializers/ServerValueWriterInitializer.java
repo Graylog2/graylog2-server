@@ -25,6 +25,7 @@ import org.graylog2.Core;
 import org.graylog2.HostSystem;
 import org.graylog2.ServerValue;
 import org.graylog2.Tools;
+import org.graylog2.alarms.transports.TransportRegistry;
 import org.graylog2.periodical.ServerValueWriterThread;
 
 /**
@@ -51,6 +52,10 @@ public class ServerValueWriterInitializer extends SimpleFixedRateScheduleInitial
         serverValue.setLocalHostname(Tools.getLocalCanonicalHostname());
         serverValue.setIsMaster(graylogServer.isMaster());
 
+        if (graylogServer.isMaster()) {
+            TransportRegistry.setActiveTransports(graylogServer, graylogServer.getTransports());
+        }
+        
         configureScheduler(
                 new ServerValueWriterThread(graylogServer),
                 ServerValueWriterThread.INITIAL_DELAY,

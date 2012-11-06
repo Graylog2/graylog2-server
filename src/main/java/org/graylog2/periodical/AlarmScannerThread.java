@@ -1,0 +1,104 @@
+/**
+ * Copyright 2012 Lennart Koopmann <lennart@socketfeed.com>
+ *
+ * This file is part of Graylog2.
+ *
+ * Graylog2 is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * Graylog2 is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with Graylog2.  If not, see <http://www.gnu.org/licenses/>.
+ *
+ */
+package org.graylog2.periodical;
+
+import java.util.HashSet;
+import java.util.Map;
+import org.apache.log4j.Logger;
+import org.elasticsearch.common.collect.Maps;
+import org.graylog2.Core;
+import org.graylog2.Tools;
+import org.graylog2.alarms.MessageCountAlarm;
+import org.graylog2.alarms.StreamAlarmChecker;
+import org.graylog2.plugin.alarms.transports.Transport;
+import org.graylog2.plugin.streams.Stream;
+import org.graylog2.streams.StreamImpl;
+
+/**
+ * @author Lennart Koopmann <lennart@socketfeed.com>
+ */
+public class AlarmScannerThread implements Runnable {
+
+    private static final Logger LOG = Logger.getLogger(AlarmScannerThread.class);
+    
+    public static final int INITIAL_DELAY = 10;
+    public static final int PERIOD = 60;
+    
+    private final Core graylogServer;
+    
+    public AlarmScannerThread(Core graylogServer) {
+        this.graylogServer = graylogServer;
+    }
+    
+    @Override
+    public void run() {
+        Map<String, Object> onlyAlerted = Maps.newHashMap();
+        onlyAlerted.put("alarm_active", true);
+        for (Stream streamIF : StreamImpl.fetchAllEnabled(graylogServer, onlyAlerted)) {
+            StreamImpl stream = (StreamImpl) streamIF;
+            StreamAlarmChecker checker = new StreamAlarmChecker(graylogServer, stream); 
+
+            // Skip if limit and timespan have been configured for this stream.
+            if (!checker.fullyConfigured()) {
+                LOG.debug("Skipping alarm scan for stream <" + stream.getId() + "> - Timespan or limit not set.");
+                continue;
+            }
+
+            // Is the stream over limit?
+            if (checker.overLimit()) {
+                // Are we still in grace period?
+                if (stream.inAlarmGracePeriod()) {
+                    LOG.debug("Stream <" + stream.getId() + "> is over alarm limit but in grace period. Skipping.");
+                    continue;
+                }
+                
+                int messageCount = checker.getMessageCount();
+                
+                LOG.debug("Stream <" + stream.getId() + "> is over alarm limit. Sending alerts.");
+                
+                // Update last alarm timestamp.
+                stream.setLastAlarm(Tools.getUTCTimestamp(), graylogServer);
+                
+                MessageCountAlarm alarm = new MessageCountAlarm(stream.getAlarmReceivers(graylogServer));
+                alarm.setTopic("Stream message count alert: [" + stream.getTitle() + "]");
+                alarm.setDescription("Stream [" + stream.getTitle() + "] received " + messageCount
+                        + " messages in the last " + stream.getAlarmTimespan() + " minutes."
+                        + " Limit: " + stream.getAlarmMessageLimit());
+                
+                for (Transport transport : graylogServer.getTransports()) {
+                    // Check if this transport has users that configured it at all.
+                    if (alarm.getReceivers(transport).isEmpty()) {
+                        LOG.debug("Skipping transport [" + transport.getName() + "] because "
+                                + "it has no configured users.");
+                        continue;
+                    }
+                    
+                    LOG.debug("Sending alarm for user <" + stream.getId() + "> via Transport [" + transport.getName() + "].");
+                    transport.transportAlarm(alarm);
+                }
+                
+            } else {
+                LOG.debug("Stream <" + stream.getId() + "> is not over alarm limit.");
+            }
+
+        }
+    }
+    
+}

@@ -38,6 +38,8 @@ import org.graylog2.streams.StreamCache;
 
 import com.google.common.collect.Lists;
 import java.util.concurrent.atomic.AtomicInteger;
+import com.google.common.collect.Maps;
+import java.util.Map;
 import org.apache.commons.lang3.concurrent.BasicThreadFactory;
 import org.graylog2.activities.Activity;
 import org.graylog2.activities.ActivityWriter;
@@ -45,6 +47,8 @@ import org.graylog2.cluster.Cluster;
 import org.graylog2.database.HostCounterCacheImpl;
 import org.graylog2.indexer.Deflector;
 import org.graylog2.plugin.GraylogServer;
+import org.graylog2.plugin.alarms.transports.Transport;
+import org.graylog2.plugin.alarms.transports.TransportConfigurationException;
 import org.graylog2.plugin.buffers.Buffer;
 import org.graylog2.plugin.filters.MessageFilter;
 import org.graylog2.plugins.PluginLoader;
@@ -88,6 +92,7 @@ public class Core implements GraylogServer {
     private List<MessageInput> inputs = Lists.newArrayList();
     private List<MessageFilter> filters = Lists.newArrayList();
     private List<MessageOutput> outputs = Lists.newArrayList();
+    private List<Transport> transports = Lists.newArrayList();
     
     private ProcessBuffer processBuffer;
     private OutputBuffer outputBuffer;
@@ -173,6 +178,10 @@ public class Core implements GraylogServer {
     public void registerOutput(MessageOutput output) {
         this.outputs.add(output);
     }
+    
+    public void registerTransport(Transport transport) {
+        this.transports.add(transport);
+    }
 
     @Override
     public void run() {
@@ -210,13 +219,34 @@ public class Core implements GraylogServer {
         loadPlugins(MessageFilter.class, "filters");
         loadPlugins(MessageOutput.class, "outputs");
         
-        // Call all registered initializers.
+        // Initialize all registered transports.
+        for (Transport transport : this.transports) {
+            Map<String, String> config = Maps.newHashMap();
+            try {
+                // The built in transport methods get a more convenient configuration from graylog2.conf.
+                if (transport.getClass().getCanonicalName().equals("org.graylog2.alarms.transports.EmailTransport")) {
+                    config = configuration.getEmailTransportConfiguration();
+                }
+                
+                if (transport.getClass().getCanonicalName().equals("org.graylog2.alarms.transports.JabberTransport")) {
+                    //config = configuration.getEmailTransportConfiguration();
+                }
+                
+                transport.initialize(config);
+                LOG.debug("Initialized transport: " + transport.getName());
+            } catch (TransportConfigurationException e) {
+                LOG.error("Could not initialize transport <" + transport.getName() + ">"
+                        + " because of missing or invalid configuration.", e);
+            }
+        }
+        
+        // Initialize all registered initializers.
         for (Initializer initializer : this.initializers) {
             initializer.initialize();
-            LOG.debug("Initialized: " + initializer.getClass().getSimpleName());
+            LOG.debug("Initialized initializer: " + initializer.getClass().getSimpleName());
         }
 
-        // Call all registered inputs.
+        // Initialize all registered inputs.
         for (MessageInput input : this.inputs) {
             input.initialize(this.configuration, this);
             LOG.debug("Initialized input: " + input.getName());
@@ -300,6 +330,14 @@ public class Core implements GraylogServer {
         return processBufferWatermark;
     }
 
+    public List<Initializer> getInitializers() {
+        return this.initializers;
+    }
+    
+    public List<Transport> getTransports() {
+        return this.transports;
+    }
+    
     public List<MessageInput> getInputs() {
         return this.inputs;
     }

@@ -129,11 +129,6 @@
             <classifier>jar-with-dependencies</classifier>
         </dependency>
         <dependency>
-            <groupId>org.graylog2</groupId>
-            <artifactId>graylog2-plugin</artifactId>
-            <version>0.9.7.6</version>
-        </dependency>
-        <dependency>
             <groupId>com.googlecode.disruptor</groupId>
             <artifactId>disruptor</artifactId>
             <version>2.10.3</version>
@@ -142,6 +137,16 @@
             <groupId>com.rabbitmq</groupId>
             <artifactId>amqp-client</artifactId>
             <version>2.8.7</version>
+        </dependency>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>graylog2-plugin</artifactId>
+            <version>0.9.7.7-SNAPSHOT</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-email</artifactId>
+            <version>1.2</version>
         </dependency>
     </dependencies>
 

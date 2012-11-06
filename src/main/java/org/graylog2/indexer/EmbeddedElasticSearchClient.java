@@ -46,11 +46,14 @@ import java.util.Calendar;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import org.elasticsearch.action.count.CountRequestBuilder;
+import org.elasticsearch.action.count.CountResponse;
 import org.elasticsearch.common.settings.ImmutableSettings;
 import org.elasticsearch.common.settings.Settings;
 
 import static org.elasticsearch.index.query.QueryBuilders.rangeQuery;
 import static org.elasticsearch.node.NodeBuilder.nodeBuilder;
+import org.graylog2.plugin.streams.Stream;
 
 // TODO this class blocks for most of its operations, but is called from the main thread for some of them
 // TODO figure out how to gracefully deal with failure to connect (or losing connection) to the elastic search cluster!
@@ -58,6 +61,7 @@ public class EmbeddedElasticSearchClient {
     private static final Logger LOG = Logger.getLogger(EmbeddedElasticSearchClient.class);
 
     private Client client;
+    private final MessageGateway messageGateway;
     public static final String TYPE = "message";
     public static final String RECENT_INDEX_NAME = "graylog2_recent";
     
@@ -76,6 +80,7 @@ public class EmbeddedElasticSearchClient {
 
     public EmbeddedElasticSearchClient(Core graylogServer) {
         server = graylogServer;
+        messageGateway = new MessageGateway(graylogServer);
 
         final NodeBuilder builder = nodeBuilder().client(true);
         String esSettings;
@@ -99,8 +104,21 @@ public class EmbeddedElasticSearchClient {
 
     }
     
+    public Client getClient() {
+        return client;
+    }
+
+    public MessageGateway getMessageGateway() {
+        return messageGateway;
+    }
+    
     public String allIndicesAlias() {
         return server.getConfiguration().getElasticSearchIndexPrefix() + "_*";
+    }
+    
+    public String allIndicesExceptRecentIndexAlias() {
+        // e.g. graylog2_*,-graylog2_recent
+        return allIndicesAlias() + ",-" + RECENT_INDEX_NAME;
     }
     
     public long getTotalIndexSize() {
@@ -275,7 +293,7 @@ public class EmbeddedElasticSearchClient {
         final QueryBuilder qb = rangeQuery("created_at").from(0).to(to);
         
         b.setTypes(new String[] {TYPE});
-        b.setIndices(server.getDeflector().getAllIndexNames());
+        b.setIndices(server.getDeflector().getAllDeflectorIndexNames());
         b.setQuery(qb);
         
         ActionFuture<DeleteByQueryResponse> future = client.deleteByQuery(b.request());
@@ -349,4 +367,5 @@ public class EmbeddedElasticSearchClient {
         
         return b;
     }
+
 }

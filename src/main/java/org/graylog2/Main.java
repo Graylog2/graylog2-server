@@ -25,13 +25,17 @@ import com.github.joschi.jadconfig.JadConfig;
 import com.github.joschi.jadconfig.RepositoryException;
 import com.github.joschi.jadconfig.ValidationException;
 import com.github.joschi.jadconfig.repositories.PropertiesRepository;
+import com.google.common.collect.Maps;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.Writer;
+import java.util.Map;
 import org.apache.commons.io.IOUtils;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.graylog2.activities.Activity;
+import org.graylog2.alarms.transports.EmailTransport;
+import org.graylog2.alarms.transports.JabberTransport;
 import org.graylog2.filters.BlacklistFilter;
 import org.graylog2.filters.CounterUpdateFilter;
 import org.graylog2.filters.RewriteFilter;
@@ -137,18 +141,23 @@ public final class Main {
             LOG.info("Running in local mode");
             server.setLocalMode(true);
         }
-        
+
         // Are we in stats mode?
         if (commandLineArguments.isStats()) {
             LOG.info("Printing system utilization information.");
             server.setStatsMode(true);
         }
+        
+        // Register transports.
+        if (configuration.isTransportEmailEnabled()) { server.registerTransport(new EmailTransport()); }
+        server.registerTransport(new JabberTransport());
 
         // Register initializers.
         server.registerInitializer(new ServerValueWriterInitializer(server, configuration));
         server.registerInitializer(new DroolsInitializer(server, configuration));
         server.registerInitializer(new HostCounterCacheWriterInitializer(server));
         server.registerInitializer(new MessageCounterInitializer(server));
+        server.registerInitializer(new AlarmScannerInitializer(server));
         if (configuration.isEnableGraphiteOutput())       { server.registerInitializer(new GraphiteInitializer(server)); }
         if (configuration.isEnableLibratoMetricsOutput()) { server.registerInitializer(new LibratoMetricsInitializer(server)); }
         server.registerInitializer(new DeflectorThreadsInitializer(server));

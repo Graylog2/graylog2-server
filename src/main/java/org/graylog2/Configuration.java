@@ -33,8 +33,10 @@ import com.github.joschi.jadconfig.validators.FileReadableValidator;
 import com.github.joschi.jadconfig.validators.InetPortValidator;
 import com.github.joschi.jadconfig.validators.PositiveIntegerValidator;
 import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
 import com.mongodb.ServerAddress;
 import java.net.UnknownHostException;
+import java.util.Map;
 import org.graylog2.indexer.EmbeddedElasticSearchClient;
 
 /**
@@ -212,6 +214,37 @@ public class Configuration {
     @Parameter(value = "plugin_dir", required = false)
     private String pluginDir = "plugin";
     
+    // Transport: email   from-email, froma_name
+    @Parameter(value = "transport_email_enabled", required = false)
+    private boolean emailTransportEnabled = true;
+    
+    @Parameter(value = "transport_email_hostname", required = false)
+    private String emailTransportHostname;
+    
+    @Parameter(value = "transport_email_port", validator = InetPortValidator.class, required = false)
+    private int emailTransportPort;
+    
+    @Parameter(value = "transport_email_use_auth", required = false)
+    private boolean emailTransportUseAuth = false;
+    
+    @Parameter(value = "transport_email_use_tls", required = false)
+    private boolean emailTransportUseTls = false;
+    
+    @Parameter(value = "transport_email_auth_username", required = false)
+    private String emailTransportUsername;
+    
+    @Parameter(value = "transport_email_auth_password", required = false)
+    private String emailTransportPassword;
+    
+    @Parameter(value = "transport_email_subject_prefix", required = false)
+    private String emailTransportSubjectPrefix;
+    
+    @Parameter(value = "transport_email_from_email", required = false)
+    private String emailTransportFromEmail;
+    
+    @Parameter(value = "transport_email_from_name", required = false)
+    private String emailTransportFromName;
+        
     public boolean isMaster() {
         return isMaster;
     }
@@ -476,6 +509,26 @@ public class Configuration {
 
     public String getPluginDir() {
         return pluginDir;
+    }
+    
+    public boolean isTransportEmailEnabled() {
+        return emailTransportEnabled;
+    }
+    
+    public Map<String, String> getEmailTransportConfiguration() {
+        Map<String, String> c = Maps.newHashMap();
+        
+        c.put("hostname", emailTransportHostname);
+        c.put("port", String.valueOf(emailTransportPort));
+        c.put("use_auth", String.valueOf(emailTransportUseAuth));
+        c.put("username", emailTransportUsername);
+        c.put("password", emailTransportPassword);
+        c.put("use_tls", String.valueOf(emailTransportUseTls));
+        c.put("subject_prefix", emailTransportSubjectPrefix);
+        c.put("from_email", emailTransportFromEmail);
+        c.put("from_name", emailTransportFromName);
+        
+        return c;
     }
     
     @ValidatorMethod

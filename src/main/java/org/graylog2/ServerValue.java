@@ -20,7 +20,13 @@
 
 package org.graylog2;
 
+import com.google.common.collect.Maps;
+import com.google.common.collect.Sets;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import org.graylog2.buffers.BufferWatermark;
+import org.graylog2.plugin.alarms.transports.Transport;
 
 /**
  * Filling the server_values collection

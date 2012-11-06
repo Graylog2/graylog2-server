@@ -44,7 +44,7 @@ public class AnonymousInformationCollector {
         Map<String, Object> info = Maps.newHashMap();
         
         info.put("version", Core.GRAYLOG2_VERSION);
-        info.put("number_of_loaded_plugins", numberOfLoadedPlugins());
+        info.put("number_of_loaded_modules", numberOfLoadedModules());
         info.put("number_of_elasticsearch_nodes", server.getIndexer().getNumberOfNodesInCluster());
         info.put("number_of_graylog2_server_nodes", server.cluster().getActiveNodeCount());
         info.put("number_of_total_messages", server.getIndexer().getTotalNumberOfMessagesInIndices());
@@ -59,12 +59,14 @@ public class AnonymousInformationCollector {
         return info;
     }
 
-    private Map<String, Integer> numberOfLoadedPlugins() {
+    private Map<String, Integer> numberOfLoadedModules() {
         try {
             Map<String, Integer> plugins = Maps.newHashMap();
+            plugins.put("initializers", server.getInitializers().size());
             plugins.put("inputs", server.getInputs().size());
             plugins.put("filters", server.getFilters().size());
             plugins.put("outputs", server.getOutputs().size());
+            plugins.put("transports", server.getTransports().size());
 
             return plugins;
         } catch (Exception e) {

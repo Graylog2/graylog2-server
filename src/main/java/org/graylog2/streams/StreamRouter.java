@@ -26,6 +26,7 @@ import org.graylog2.streams.matchers.StreamRuleMatcher;
 import java.util.List;
 
 import com.google.common.collect.Lists;
+import java.util.Set;
 import org.graylog2.Core;
 import org.graylog2.plugin.logmessage.LogMessage;
 import org.graylog2.plugin.streams.Stream;
@@ -42,7 +43,7 @@ public class StreamRouter {
 
     public List<Stream> route(Core server, LogMessage msg) {
         List<Stream> matches = Lists.newArrayList();
-        List<Stream> streams = StreamImpl.fetchAllEnabled(server);
+        Set<Stream> streams = StreamImpl.fetchAllEnabled(server);
 
         for (Stream stream : streams) {
             boolean missed = false;

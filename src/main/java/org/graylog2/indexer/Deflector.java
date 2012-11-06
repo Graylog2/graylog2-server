@@ -150,7 +150,7 @@ public class Deflector {
         return Collections.max(indexNumbers);
     }
     
-    public String[] getAllIndexNames() {
+    public String[] getAllDeflectorIndexNames() {
         List<String> indices = Lists.newArrayList();
         
         for(Map.Entry<String, IndexStats> e : server.getIndexer().getIndices().entrySet()) {
