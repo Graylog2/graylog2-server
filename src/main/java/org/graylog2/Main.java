@@ -150,7 +150,7 @@ public final class Main {
         
         // Register transports.
         if (configuration.isTransportEmailEnabled()) { server.registerTransport(new EmailTransport()); }
-        server.registerTransport(new JabberTransport());
+        if (configuration.isTransportJabberEnabled()) {  server.registerTransport(new JabberTransport()); }
 
         // Register initializers.
         server.registerInitializer(new ServerValueWriterInitializer(server, configuration));

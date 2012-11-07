@@ -214,9 +214,9 @@ public class Configuration {
     @Parameter(value = "plugin_dir", required = false)
     private String pluginDir = "plugin";
     
-    // Transport: email   from-email, froma_name
+    // Transport: Email
     @Parameter(value = "transport_email_enabled", required = false)
-    private boolean emailTransportEnabled = true;
+    private boolean emailTransportEnabled = false;
     
     @Parameter(value = "transport_email_hostname", required = false)
     private String emailTransportHostname;
@@ -244,7 +244,32 @@ public class Configuration {
     
     @Parameter(value = "transport_email_from_name", required = false)
     private String emailTransportFromName;
-        
+    
+    // Transport: Jabber
+    @Parameter(value = "transport_jabber_enabled", required = false)
+    private boolean jabberTransportEnabled = false;
+    
+    @Parameter(value = "transport_jabber_hostname", required = false)
+    private String jabberTransportHostname;
+    
+    @Parameter(value = "transport_jabber_port", validator = InetPortValidator.class, required = false)
+    private int jabberTransportPort = 5222;
+    
+    @Parameter(value = "transport_jabber_use_sasl_auth", required = false)
+    private boolean jabberTransportUseSASLAuth = true;
+    
+    @Parameter(value = "transport_jabber_allow_selfsigned_certs", required = false)
+    private boolean jabberTransportAllowSelfsignedCerts = false;
+    
+    @Parameter(value = "transport_jabber_auth_username", required = false)
+    private String jabberTransportUsername;
+    
+    @Parameter(value = "transport_jabber_auth_password", required = false)
+    private String jabberTransportPassword;
+    
+    @Parameter(value = "transport_jabber_message_prefix", required = false)
+    private String jabberTransportMessagePrefix;
+    
     public boolean isMaster() {
         return isMaster;
     }
@@ -527,6 +552,24 @@ public class Configuration {
         c.put("subject_prefix", emailTransportSubjectPrefix);
         c.put("from_email", emailTransportFromEmail);
         c.put("from_name", emailTransportFromName);
+        
+        return c;
+    }
+    
+    public boolean isTransportJabberEnabled() {
+        return jabberTransportEnabled;
+    }
+    
+    public Map<String, String> getJabberTransportConfiguration() {
+        Map<String, String> c = Maps.newHashMap();
+        
+        c.put("hostname", jabberTransportHostname);
+        c.put("port", String.valueOf(jabberTransportPort));
+        c.put("sasl_auth", String.valueOf(jabberTransportUseSASLAuth));
+        c.put("allow_selfsigned_certs", String.valueOf(jabberTransportAllowSelfsignedCerts));
+        c.put("username", jabberTransportUsername);
+        c.put("password", jabberTransportPassword);
+        c.put("message_prefix", jabberTransportMessagePrefix);
         
         return c;
     }

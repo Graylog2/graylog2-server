@@ -221,15 +221,17 @@ public class Core implements GraylogServer {
         
         // Initialize all registered transports.
         for (Transport transport : this.transports) {
-            Map<String, String> config = Maps.newHashMap();
             try {
+                Map<String, String> config = Maps.newHashMap();
+                
                 // The built in transport methods get a more convenient configuration from graylog2.conf.
                 if (transport.getClass().getCanonicalName().equals("org.graylog2.alarms.transports.EmailTransport")) {
                     config = configuration.getEmailTransportConfiguration();
-                }
-                
-                if (transport.getClass().getCanonicalName().equals("org.graylog2.alarms.transports.JabberTransport")) {
-                    //config = configuration.getEmailTransportConfiguration();
+                }else if (transport.getClass().getCanonicalName().equals("org.graylog2.alarms.transports.JabberTransport")) {
+                    config = configuration.getJabberTransportConfiguration();
+                } else {
+                    // Load custom plugin config.
+                    // TBD lol
                 }
                 
                 transport.initialize(config);

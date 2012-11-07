@@ -19,7 +19,11 @@
  */
 package org.graylog2.alarms.transports;
 
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import org.apache.commons.mail.EmailException;
 import org.graylog2.plugin.alarms.Alarm;
 import org.graylog2.plugin.alarms.transports.Transport;
@@ -41,6 +45,15 @@ public class EmailTransport implements Transport {
     private final String className;
     
     private Map<String, String> configuration;
+    public static final Set<String> REQUIRED_FIELDS = new HashSet<String>() {{ 
+        add("subject_prefix");
+        add("hostname");
+        add("port");
+        add("use_tls");
+        add("use_auth");
+        add("from_email");
+        add("from_name");
+    }};
     
     public EmailTransport() {
         this.className = this.getClass().getCanonicalName();
@@ -94,21 +107,15 @@ public class EmailTransport implements Transport {
         email.send();
     }
 
+    
     private void checkConfiguration() throws TransportConfigurationException {
-        if (!configSet("subject_prefix")) { throw new TransportConfigurationException("Missing configuration option: subject_prefix"); }
-        if (!configSet("hostname")) { throw new TransportConfigurationException("Missing configuration option: hostname"); }
-        if (!configSet("port")) { throw new TransportConfigurationException("Missing configuration option: port"); }
-        if (!configSet("use_tls")) { throw new TransportConfigurationException("Missing configuration option: use_tls"); }
-        if (!configSet("from_email")) { throw new TransportConfigurationException("Missing configuration option: from_email"); }
-        if (!configSet("from_name")) { throw new TransportConfigurationException("Missing configuration option: from_name"); }
+        for (String field : REQUIRED_FIELDS) {
+            if (!configSet(field)) { throw new TransportConfigurationException("Missing configuration option: " + field); }
+        }
         
-        if (configSet("use_auth")) {
-            if (configuration.get("use_auth").equals("true")) {
-                if (!configSet("username")) { throw new TransportConfigurationException("Missing configuration option: username"); }
-                if (!configSet("password")) { throw new TransportConfigurationException("Missing configuration option: password"); }
-            }
-        } else {
-            throw new TransportConfigurationException("Missing configuration option: hostname");
+        if (configuration.get("use_auth").equals("true")) {
+            if (!configSet("username")) { throw new TransportConfigurationException("Missing configuration option: username"); }
+            if (!configSet("password")) { throw new TransportConfigurationException("Missing configuration option: password"); }
         }
     }
     

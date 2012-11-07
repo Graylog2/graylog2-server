@@ -52,7 +52,13 @@ public class AlarmReceiverImpl implements AlarmReceiver {
 
     @Override
     public String getAddress(Transport transport) {
-        return addresses.get(transport.getClass().getCanonicalName());
+        String a = addresses.get(transport.getClass().getCanonicalName());
+        
+        if (a != null) {
+            return a.trim();
+        }
+        
+        return null;
     }
     
 }
