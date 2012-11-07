@@ -20,6 +20,7 @@
 package org.graylog2.alarms.transports;
 
 import java.util.Map;
+import org.apache.commons.mail.EmailException;
 import org.graylog2.plugin.alarms.Alarm;
 import org.graylog2.plugin.alarms.transports.Transport;
 import org.graylog2.plugin.alarms.transports.TransportConfigurationException;
@@ -55,37 +56,42 @@ public class EmailTransport implements Transport {
     @Override
     public void transportAlarm(Alarm alarm) {
         try {
-            SimpleEmail email = new SimpleEmail();
-
-            email.setHostName(configuration.get("hostname"));
-            email.setSmtpPort(Integer.parseInt(configuration.get("port")));
-            
-            if (configuration.get("use_auth").equals("true")) {
-                email.setAuthentication(configuration.get("username"), configuration.get("password"));
-                if (configuration.get("use_tls").equals("true")) {
-                    email.setTLS(true);
-                }
-            }
-            
-            email.setFrom(configuration.get("from_email"), configuration.get("from_name"));
-            
             for (AlarmReceiver receiver : alarm.getReceivers(this)) {
-                email.addTo(receiver.getAddress(this));
+                send(alarm, receiver);
             }
-            
-            String subjectPrefix = configuration.get("subject_prefix");
-            String subject = alarm.getTopic();
-            
-            if (subjectPrefix != null && !subjectPrefix.isEmpty()) {
-                subject = subjectPrefix + " " + subject;
-            }
-            
-            email.setSubject(subject);
-            email.setMsg(alarm.getDescription());
-            email.send();
         } catch(Exception e) {
             LOG.warn("Could not send alarm email.", e);
         }
+    }
+    
+    private void send(Alarm alarm, AlarmReceiver receiver) throws EmailException {
+        SimpleEmail email = new SimpleEmail();
+
+        email.setHostName(configuration.get("hostname"));
+        email.setSmtpPort(Integer.parseInt(configuration.get("port")));
+
+        if (configuration.get("use_auth").equals("true")) {
+            email.setAuthentication(configuration.get("username"), configuration.get("password"));
+            if (configuration.get("use_tls").equals("true")) {
+                email.setTLS(true);
+            }
+        }
+
+        email.setFrom(configuration.get("from_email"), configuration.get("from_name"));
+
+        
+        email.addTo(receiver.getAddress(this));
+
+        String subjectPrefix = configuration.get("subject_prefix");
+        String subject = alarm.getTopic();
+
+        if (subjectPrefix != null && !subjectPrefix.isEmpty()) {
+            subject = subjectPrefix + " " + subject;
+        }
+
+        email.setSubject(subject);
+        email.setMsg(alarm.getDescription());
+        email.send();
     }
 
     private void checkConfiguration() throws TransportConfigurationException {
