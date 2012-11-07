@@ -72,13 +72,10 @@ Graylog2WebInterface::Application.routes.draw do
       post :togglealarmactive
       post :togglefavorited
       post :togglealarmforce
-      post :togglesubscription
       post :toggledisabled
       post :rename
       post :clone
       get :settings
-      post :subscribe
-      post :unsubscribe
       post :categorize
       post :addcolumn
       delete :removecolumn
@@ -88,12 +85,6 @@ Graylog2WebInterface::Application.routes.draw do
   end
 
   resources :alertedstreams do
-    member do
-      post :toggle
-    end
-  end
-
-  resources :subscribedstreams do
     member do
       post :toggle
     end

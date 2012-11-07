@@ -28,8 +28,6 @@ authorization do
       :forward,
       :analytics,
       :settings,
-      :subscribe,
-      :togglesubscription,
       :rename,
       :categorize,
       :clone,
