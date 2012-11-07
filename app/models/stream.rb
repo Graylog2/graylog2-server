@@ -7,7 +7,6 @@ class Stream
 
   has_and_belongs_to_many :users, :inverse_of => :streams
   has_and_belongs_to_many :favorited_streams, :class_name => "User", :inverse_of => :favorite_streams
-  has_and_belongs_to_many :subscribers,       :class_name => "User", :inverse_of => :subscribed_streams
 
   referenced_in :streamcategory
 
@@ -59,10 +58,6 @@ class Stream
     AlertedStream.alerted?(self.id, user.id)
   end
 
-  def subscribed?(user)
-    !subscribers.nil? and subscribers.include?(user)
-  end
-
   def favorited?(user_id)
     !favorited_streams.nil? and favorited_streams.include? user_id
   end
@@ -71,7 +66,6 @@ class Stream
     title.blank? ? id.to_s : "#{id}-#{title.parameterize}"
   end
 
-  # giving back IDs because all_with_subscribers does too
   def self.all_with_enabled_alerts
     all.where({:alarm_active => true}).collect &:id
   end

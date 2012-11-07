@@ -10,9 +10,6 @@
 <br />
 
 <%=raw ajaxtrigger(:alarm, "Receive alarms of this stream", toggle_alertedstream_path(@stream), @stream.alerted?(current_user) ) %> <%= tooltip("Notifications") %>
-<br />
-
-<%=raw ajaxtrigger(:subscribe, "Subscribe to stream", togglesubscription_stream_path(@stream), @stream.subscribed?(current_user) ) %> <%= tooltip("Notifications") %>
 <br /><br />
 
 <h2>Alarms</h2>

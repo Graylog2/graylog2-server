@@ -26,35 +26,6 @@ Your current time: <%= gl_date(Time.zone.now) %>
 <% end %>
 </ul>
 
-<h3>Jobs & Tasks <%= tooltip("Notifications") %></h3>
-<ul id="jobsandtasks">
-  <li>
-    Stream subscriptions:
-    <% job = Job["streamsubscription_check"] %>
-    <% if job and job.active? %>
-      <span class="status-okay-text">running</span>
-    <% else %>
-      <span class="status-alarm-text">not running</span>
-    <% end %>
-  </li>
-
-  <li>
-    Stream alerts:
-    <% if AlertedStream.job_active? %>
-      <span class="status-okay-text">running</span>
-    <% else %>
-      <span class="status-alarm-text">not running</span>
-    <% end %>
-  </li>
-</ul>
-
-<% if !MessageGateway.mapping_valid?(DeflectorInformation.first.deflector_target) %>
-  <div id="invalid-mapping-warning">
-    Your ElasticSearch mapping is invalid! Make sure it has been created by the graylog2-server.
-    <%= tooltip("Fixing-invalid-ElasticSearch-mappings") %>
-  </div>
-<% end %>
-
 <% if current_user.role == "admin" %>
 <br />
 

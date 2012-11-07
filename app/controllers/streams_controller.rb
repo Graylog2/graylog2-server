@@ -265,33 +265,6 @@ class StreamsController < ApplicationController
     redirect_to streams_path
   end
 
-  def subscribe
-    current_user.subscribed_streams << @stream
-    render :json => {:status => :success}
-  end
-
-  def unsubscribe
-    # SHITSTORM BEGIN
-    user_ids = @stream.subscriber_ids
-    user_ids = Array.new if !user_ids.is_a?(Array)
-    user_ids.delete(current_user.id)
-    @stream.subscriber_ids = user_ids
-    @stream.save
-
-    stream_ids = current_user.subscribed_stream_ids
-    stream_ids = Array.new if !stream_ids.is_a?(Array)
-    stream_ids.delete(@stream.id)
-    current_user.subscribed_stream_ids = stream_ids
-    current_user.save
-    # SHITSTORM END
-
-    render :json => {:status => :success}
-  end
-
-  def togglesubscription
-    @stream.subscribed?(current_user) ? unsubscribe : subscribe
-  end
-
   def shortname
     if params[:shortname].blank?
       flash[:error] = "No short name given"

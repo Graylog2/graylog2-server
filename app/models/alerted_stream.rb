@@ -29,11 +29,4 @@ class AlertedStream
     return emails
   end
 
-  def self.job_active?
-    last_run = Job.last_run(JOB_TITLE)
-    return false if last_run.blank?
-
-    last_run > 15.minutes.ago.to_i
-  end
-
 end
