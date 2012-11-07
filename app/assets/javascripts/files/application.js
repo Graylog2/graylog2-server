@@ -286,6 +286,13 @@ $(document).ready(function() {
       return false;
     })
 
+    // Health: Show all indices.
+    $("#health-show-all-indices").bind('click', function() {
+      $(this).hide();
+      $("#health-indices-more").slideDown();
+      return false;
+    });
+
     // Key bindings.
     //standardMapKeyOptions = { overlayClose:true }
     //$.mapKey("s", function() { $("#modal-stream-chooser").modal(standardMapKeyOptions); });

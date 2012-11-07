@@ -75,9 +75,20 @@
 
   <%= render :partial => "index", :locals => { :index_name => @recent_index["name"], :info => @recent_index["info"] } %>
 
-  <% @indices.each do |name, info| %>
+  <% @indices.to(3).each do |name, info| %>
     <%= render :partial => "index", :locals => { :index_name => name, :info => info } %>
   <% end %>
+
+  <% if @indices.size > 4 %>
+    <a href="#" id="health-show-all-indices">Show all indices</a>
+    
+    <div id="health-indices-more">
+      <% @indices.from(4).each do |name, info| %>
+        <%= render :partial => "index", :locals => { :index_name => name, :info => info } %>
+      <% end %>
+    </div>
+  <% end %>
+
 <% else %>
   <strong>Information is not up to date! Seems like you have no Graylog2 node running.</strong>
   <br />

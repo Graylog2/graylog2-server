@@ -588,6 +588,15 @@
   text-transform: uppercase;
 }
 
+#health-show-all-indices {
+  display: block;
+  margin-bottom: 10px;
+}
+
+#health-indices-more {
+  display: none;
+}
+
 .health-index {
   margin-top: 10px;
   margin-bottom: 10px;
