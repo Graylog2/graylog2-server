@@ -31,6 +31,7 @@ class Stream
   field :additional_columns, :type => Array, :default => []
   field :shortname, :type => String
   field :related_streams_matcher, :type => String
+  field :alarm_callbacks, :type => Array, :default => []
 
   def self.find_by_id(_id)
     _id = $1 if /^([0-9a-f]+)-/ =~ _id
@@ -129,6 +130,28 @@ class Stream
 
     stream_count = self.message_count_since(self.alarm_timespan.minutes.ago.to_f)
     return stream_count > self.alarm_limit ? :alarm : :no_alarm
+  end
+
+  def alarm_callback_active?(typeclass)
+    if !alarm_callbacks.blank? and alarm_callbacks.is_a?(Array)
+      return true if alarm_callbacks.include?(typeclass)
+    end
+
+    return false
+  end
+
+  def set_alarm_callback_active(typeclass, what)
+    actives = alarm_callbacks
+    if what == true
+      # Add to list.
+      actives << typeclass
+    else
+      # Remove from list.
+      actives.delete(typeclass)
+    end
+
+    # Update
+    alarm_callbacks = actives
   end
 
   private

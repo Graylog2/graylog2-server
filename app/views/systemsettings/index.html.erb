@@ -26,3 +26,36 @@ at any time.
 	<%= label_tag :allow, "Allow sending anonymous usage statistics" %>
 	<%= awesome_submit_link "Save" %>
 <% end %>
+
+<br />
+<h2>Alarm callback plugins</h2>
+<div class="short-description">
+All currently installed alarm callback plugins are listed here. You can enable/disable them and define if triggering them should be force for all streams. If you decide not to force triggering for all streams, you have to enable it on the settings page of each stream individually.
+</div>
+
+<% if @alarm_callbacks.blank? %>
+	<strong>No alarm callbacks installed</strong>
+<% else %>
+	<table>
+		<thead>
+			<tr>
+				<th>Name</th>
+				<th>Class</th>
+				<th>Force for all streams</th>
+			</tr>
+		</thead>
+		<tbody>
+			<% @alarm_callbacks.each_with_index do |callback,i| %>
+				<tr>
+					<td><%= callback.name %></td>
+					<td><%= callback.typeclass %></td>
+					<td>
+						<%=raw ajaxtrigger("toggle_callback_forced_#{i}", "",
+							toggle_alarmcallback_force_systemsettings_path(:typeclass => callback.typeclass),
+							SystemSetting.alarm_callback_forced?(callback.typeclass)) %>
+					</td>
+				</tr>
+			<% end %>
+		</tbody>
+	</table>
+<% end %>

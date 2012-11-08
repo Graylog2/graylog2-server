@@ -4,41 +4,13 @@
 <br /><br />
 
 <h2>General</h2>
-<div class="short-description">All these settings are only applied for your user.</div>
+<div class="short-description">These settings are only applied for your user.</div>
 
 <%=raw ajaxtrigger(:favorite, "Favorite", togglefavorited_stream_path(@stream), @stream.favorited?(current_user)) %>
 <br />
 
 <%=raw ajaxtrigger(:alarm, "Receive alarms of this stream", toggle_alertedstream_path(@stream), @stream.alerted?(current_user) ) %> <%= tooltip("Notifications") %>
 <br /><br />
-
-<h2>Alarms</h2>
-<div class="short-description">An alarm is triggered when the number of messages in the defined timespan
-is higher than the maximum. All users who enabled receiving of alerts will be notified
-of the alarm. You can also define that all users are alarmed, no matter what they defined. <%= tooltip("Notifications") %></div>
-
-<%=raw ajaxtrigger(:active, "Active", togglealarmactive_stream_path(@stream), @stream.alarm_active) %>
-<br />
-
-<%=raw ajaxtrigger(:allusers, "Force for all users", togglealarmforce_stream_path(@stream), @stream.alarm_force) %>
-<br /><br />
-
-<%= form_tag setalarmvalues_stream_path(@stream) do %>
-  <%= label_tag :limit, "Maximum number of messages:" %>
-  <%= text_field_tag :limit, @stream.alarm_limit, :id => "streams-alerts-limit" %> &nbsp;
-
-  <%= label_tag :timespan, "Minutes:" %>
-  <%= text_field_tag :timespan, @stream.alarm_timespan, :id => "streams-alerts-timespan" %> &nbsp;
-
-  <%= label_tag :alarm_period, "Grace period (minutes):" %>
-  <%= text_field_tag :period, @stream.alarm_period, :id => "streams-alerts-period" %> &nbsp;
-
-  <%= awesome_submit_link "Save" %>
-
-  <br />
-  The grace period defines for how many minutes the system will wait until sending the next alert. The check runs once a minute.
-<% end %>
-<br />
 
 <h2>Category</h2>
 <%= form_tag categorize_stream_path(:stream_id => @stream) do %>

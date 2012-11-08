@@ -58,6 +58,7 @@ Graylog2WebInterface::Application.routes.draw do
 
     member do
       get :analytics
+      get :alarms
       post :favorite
       post :unfavorite
       post :alertable
@@ -73,6 +74,7 @@ Graylog2WebInterface::Application.routes.draw do
       post :togglefavorited
       post :togglealarmforce
       post :toggledisabled
+      post :togglecallbackactive
       post :rename
       post :clone
       get :settings
@@ -137,6 +139,7 @@ Graylog2WebInterface::Application.routes.draw do
   resources :systemsettings do
     collection do
       post :allow_usage_stats
+      post :toggle_alarmcallback_force
     end
   end
 

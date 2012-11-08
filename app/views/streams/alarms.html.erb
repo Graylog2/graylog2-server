@@ -1,0 +1,65 @@
+<h1>Alarm settings of stream <span class="highlighted"><%= @stream.title_possibly_disabled %></span></h1>
+
+<div class="short-description">An alarm is triggered when the number of messages in the defined timespan
+is higher than the maximum. All users who enabled receiving of alerts will be notified
+of the alarm. You can also define that all users are alarmed, no matter what they defined. <%= tooltip("Notifications") %></div>
+
+<%=raw ajaxtrigger(:active, "Active", togglealarmactive_stream_path(@stream), @stream.alarm_active) %>
+<br />
+
+<%=raw ajaxtrigger(:allusers, "Force for all users", togglealarmforce_stream_path(@stream), @stream.alarm_force) %>
+<br /><br />
+
+<%= form_tag setalarmvalues_stream_path(@stream) do %>
+  <%= label_tag :limit, "Maximum number of messages:" %>
+  <%= text_field_tag :limit, @stream.alarm_limit, :id => "streams-alerts-limit" %> &nbsp;
+
+  <%= label_tag :timespan, "Minutes:" %>
+  <%= text_field_tag :timespan, @stream.alarm_timespan, :id => "streams-alerts-timespan" %> &nbsp;
+
+  <%= label_tag :alarm_period, "Grace period (minutes):" %>
+  <%= text_field_tag :period, @stream.alarm_period, :id => "streams-alerts-period" %> &nbsp;
+
+  <%= awesome_submit_link "Save" %>
+
+  <br />
+  The grace period defines for how many minutes the system will wait until sending the next alert. The check runs once a minute.
+<% end %>
+
+<br />
+<h2>Alarm callbacks</h2>
+<div class="short-description">
+All currently installed alarm callback plugins are listed here. You can enable them for this stream if they are not enforced in the
+<%= link_to("system settings", systemsettings_path) %>.
+</div>
+
+<% if @alarm_callbacks.blank? %>
+	<strong>No alarm callbacks installed</strong>
+<% else %>
+	<table>
+		<thead>
+			<tr>
+				<th>Name</th>
+				<th>Class</th>
+				<th>Active</th>
+			</tr>
+		</thead>
+		<tbody>
+			<% @alarm_callbacks.each_with_index do |callback,i| %>
+				<tr>
+					<td><%= callback.name %></td>
+					<td><%= callback.typeclass %></td>
+					<td>
+						<% if SystemSetting.alarm_callback_forced?(callback.typeclass) %>
+							<%= check_box_tag "active_dummy_#{i}", nil, true, :disabled => true %>
+						<% else %>
+							<%=raw ajaxtrigger("toggle_callback_active_#{i}", "",
+								togglecallbackactive_stream_path(@stream, :typeclass => callback.typeclass),
+								@stream.alarm_callback_active?(callback.typeclass)) %>
+						<% end %>
+					</td>
+				</tr>
+			<% end %>
+		</tbody>
+	</table>
+<% end %>

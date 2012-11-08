@@ -10,9 +10,9 @@ module SettingsHelper
       ["Additional columns", additionalcolumns_path],
       ["Message comments", messagecomments_path],
       ["Filtered terms", filteredterms_path],
+      ["System", systemsettings_path],
     ]
 
-    tabs << ["System", systemsettings_path] if current_user.admin?
     tabs << ["Version check", versioncheck_index_path] if Configuration.allow_version_check
 
     tabs

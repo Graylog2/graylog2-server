@@ -65,6 +65,10 @@ class StreamsController < ApplicationController
   def settings
   end
 
+  def alarms
+    @alarm_callbacks = AlarmCallback.all
+  end
+
   def setdescription
     @stream.description = params[:description]
 
@@ -124,6 +128,18 @@ class StreamsController < ApplicationController
 
     # Intended to be called via AJAX only.
     render :text => ""
+  end
+
+  def togglecallbackactive
+    @stream = Stream.find_by_id(params[:id])
+    if params[:typeclass].blank?
+      render :status => 400, :text => "Missing parameter: typeclass"
+      return
+    end
+
+    @stream.set_alarm_callback_active(params[:typeclass], !@stream.alarm_callback_active?(params[:typeclass]))
+    @stream.save
+    render :status => 200, :text => ""
   end
 
   def setalarmvalues

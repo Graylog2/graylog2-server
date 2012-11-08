@@ -1,0 +1,25 @@
+<h1>Alarm settings</h1>
+
+<div class="setting">
+  <h4><label>Message count interval</label></h4>
+  <%= form_tag store_settings_path do -%>
+    <%= hidden_field_tag 'setting_type', Setting::TYPE_MESSAGE_COUNT_INTERVAL %>
+    <%= text_field_tag 'value', Setting.get_message_count_interval(current_user) %>
+    <%= awesome_submit_link 'Store' %>
+    <br />
+    Graylog2 can display the number of handled log messages in the last X minutes. Define X here. (Default: <%= Setting::TYPE_MESSAGE_COUNT_INTERVAL_STANDARD %>)
+  <% end -%>
+</div>
+
+<div class="setting">
+  <h4><label>Maximum messages</label></h4>
+  <%= form_tag store_settings_path do -%>
+    <%= hidden_field_tag 'setting_type', Setting::TYPE_MESSAGE_MAX_COUNT %>
+    <%= text_field_tag 'value', Setting.get_message_max_count(current_user) %>
+    <%= awesome_submit_link 'Store' %>
+    <br />
+    The number of maximum messages per [message count interval] minutes. Everything above this value is an alarm. For example visible in the dashboard. Get alarms
+    via the Nagios hook <%= tooltip("Nagios-hook") %> or general notifications <%= tooltip("Notifications") %>.
+    (Default: <%= Setting::TYPE_MESSAGE_MAX_COUNT_STANDARD %>)
+  <% end -%>
+</div>
