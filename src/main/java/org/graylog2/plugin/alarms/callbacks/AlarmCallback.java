@@ -19,32 +19,21 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
 */
+package org.graylog2.plugin.alarms.callbacks;
 
-package org.graylog2.plugin.streams;
-
-import java.util.List;
-import java.util.Set;
-import org.bson.types.ObjectId;
-import org.graylog2.plugin.GraylogServer;
-import org.graylog2.plugin.alarms.AlarmReceiver;
+import java.util.Map;
+import org.graylog2.plugin.alarms.Alarm;
 
 /**
  *
  * @author Lennart Koopmann <lennart@socketfeed.com>
  */
-public interface Stream {
-
-    public List<StreamRule> getStreamRules();
+public interface AlarmCallback {
     
-    public ObjectId getId();
+    public void initialize(Map<String, String> config) throws AlarmCallbackConfigurationException;
+    public void call(Alarm alarm) throws AlarmCallbackException;
 
-    public String getTitle();
+    public Map<String, String> getRequestedConfiguration();
+    public String getName();
     
-    public int getAlarmTimespan();
-    public int getAlarmMessageLimit();
-    public int getAlarmPeriod();
-    public Set<AlarmReceiver> getAlarmReceivers(GraylogServer server);
-
-    @Override
-    public String toString();
 }
