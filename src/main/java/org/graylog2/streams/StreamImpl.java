@@ -41,6 +41,7 @@ import org.graylog2.Tools;
 import org.graylog2.alarms.AlarmReceiverImpl;
 import org.graylog2.plugin.GraylogServer;
 import org.graylog2.plugin.alarms.AlarmReceiver;
+import org.graylog2.plugin.alarms.callbacks.AlarmCallback;
 import org.graylog2.plugin.streams.StreamRule;
 import org.graylog2.users.User;
 
@@ -63,6 +64,7 @@ public class StreamImpl implements Stream {
     private final int lastAlarm;
 
     private List<StreamRule> streamRules;
+    private Set<String> alarmCallbacks;
 
     private final DBObject mongoObject;
 
@@ -99,6 +101,8 @@ public class StreamImpl implements Stream {
         } else {
             this.lastAlarm = 0;
         }
+        
+        
         
         this.mongoObject = stream;
     }
@@ -162,6 +166,28 @@ public class StreamImpl implements Stream {
 
         this.streamRules = rules;
         return rules;
+    }
+    
+    public Set<String> getAlarmCallbacks() {
+        if (this.alarmCallbacks != null) {
+            return this.alarmCallbacks;
+        }
+        
+        Set<String> callbacks = Sets.newTreeSet();
+        
+        List objs = (BasicDBList) this.mongoObject.get("alarm_callbacks");
+        if (objs != null) {
+            for (Object obj : objs) {
+                DBObject callback = (BasicDBObject) obj;
+                String typeclass = (String) callback.get("typeclass");
+                if (typeclass != null && !typeclass.isEmpty()) {
+                    callbacks.add(typeclass);
+                }
+            }
+        }
+        
+        this.alarmCallbacks = callbacks;
+        return callbacks;
     }
 
     @Override
@@ -252,7 +278,7 @@ public class StreamImpl implements Stream {
         
         return userIds;
     }
-    
+
     private Set<AlarmReceiver> usersToAlarmReceivers(Set<User> users) {
         Set <AlarmReceiver> receivers = Sets.newHashSet();
         

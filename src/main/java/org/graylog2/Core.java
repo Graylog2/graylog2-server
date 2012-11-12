@@ -47,10 +47,13 @@ import org.graylog2.cluster.Cluster;
 import org.graylog2.database.HostCounterCacheImpl;
 import org.graylog2.indexer.Deflector;
 import org.graylog2.plugin.GraylogServer;
+import org.graylog2.plugin.alarms.callbacks.AlarmCallback;
+import org.graylog2.plugin.alarms.callbacks.AlarmCallbackConfigurationException;
 import org.graylog2.plugin.alarms.transports.Transport;
 import org.graylog2.plugin.alarms.transports.TransportConfigurationException;
 import org.graylog2.plugin.buffers.Buffer;
 import org.graylog2.plugin.filters.MessageFilter;
+import org.graylog2.plugins.PluginConfiguration;
 import org.graylog2.plugins.PluginLoader;
 
 /**
@@ -93,6 +96,7 @@ public class Core implements GraylogServer {
     private List<MessageFilter> filters = Lists.newArrayList();
     private List<MessageOutput> outputs = Lists.newArrayList();
     private List<Transport> transports = Lists.newArrayList();
+    private List<AlarmCallback> alarmCallbacks = Lists.newArrayList();
     
     private ProcessBuffer processBuffer;
     private OutputBuffer outputBuffer;
@@ -182,6 +186,10 @@ public class Core implements GraylogServer {
     public void registerTransport(Transport transport) {
         this.transports.add(transport);
     }
+    
+    public void registerAlarmCallback(AlarmCallback alarmCallback) {
+        this.alarmCallbacks.add(alarmCallback);
+    }
 
     @Override
     public void run() {
@@ -218,6 +226,7 @@ public class Core implements GraylogServer {
         // Load and register plugins.
         loadPlugins(MessageFilter.class, "filters");
         loadPlugins(MessageOutput.class, "outputs");
+        loadPlugins(AlarmCallback.class, "alarm_callbacks");
         
         // Initialize all registered transports.
         for (Transport transport : this.transports) {
@@ -227,17 +236,28 @@ public class Core implements GraylogServer {
                 // The built in transport methods get a more convenient configuration from graylog2.conf.
                 if (transport.getClass().getCanonicalName().equals("org.graylog2.alarms.transports.EmailTransport")) {
                     config = configuration.getEmailTransportConfiguration();
-                }else if (transport.getClass().getCanonicalName().equals("org.graylog2.alarms.transports.JabberTransport")) {
+                } else if (transport.getClass().getCanonicalName().equals("org.graylog2.alarms.transports.JabberTransport")) {
                     config = configuration.getJabberTransportConfiguration();
                 } else {
                     // Load custom plugin config.
-                    // TBD lol
+                    // config = PluginConfiguration.load(transport.getClass().getCanonicalName(), "transports")
                 }
                 
                 transport.initialize(config);
                 LOG.debug("Initialized transport: " + transport.getName());
             } catch (TransportConfigurationException e) {
                 LOG.error("Could not initialize transport <" + transport.getName() + ">"
+                        + " because of missing or invalid configuration.", e);
+            }
+        }
+        
+        // Initialize all registered alarm callbacks.
+        for (AlarmCallback callback : this.alarmCallbacks) {
+            try {
+                callback.initialize(PluginConfiguration.load(this, callback.getClass().getCanonicalName()));
+                LOG.debug("Initialized alarm callback: " + callback.getName());
+            } catch(AlarmCallbackConfigurationException e) {
+                LOG.error("Could not initialize alarm callback <" + callback.getName() + ">"
                         + " because of missing or invalid configuration.", e);
             }
         }
@@ -272,6 +292,8 @@ public class Core implements GraylogServer {
                 registerFilter((MessageFilter) plugin);
             } else if (plugin instanceof MessageOutput) {
                 registerOutput((MessageOutput) plugin);
+            } else if (plugin instanceof AlarmCallback) {
+                registerAlarmCallback((AlarmCallback) plugin);
             } else {
                 LOG.error("Could not load plugin [" + plugin.getClass().getCanonicalName() + "] - Not supported type.");
             }
@@ -352,6 +374,10 @@ public class Core implements GraylogServer {
         return this.outputs;
     }
 
+    public List<AlarmCallback> getAlarmCallbacks() {
+        return this.alarmCallbacks;
+    }
+    
     public MessageCounterManagerImpl getMessageCounterManager() {
         return this.messageCounterManager;
     }

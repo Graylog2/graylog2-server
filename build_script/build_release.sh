@@ -48,6 +48,7 @@ mkdir -p $BUILD_DIR/plugin/outputs
 mkdir -p $BUILD_DIR/plugin/inputs
 mkdir -p $BUILD_DIR/plugin/initializers
 mkdir -p $BUILD_DIR/plugin/transports
+mkdir -p $BUILD_DIR/plugin/alarm_callbacks
 
 cd builds/
 

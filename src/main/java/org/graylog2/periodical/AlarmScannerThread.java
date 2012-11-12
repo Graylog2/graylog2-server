@@ -19,14 +19,17 @@
  */
 package org.graylog2.periodical;
 
-import java.util.HashSet;
 import java.util.Map;
 import org.apache.log4j.Logger;
 import org.elasticsearch.common.collect.Maps;
 import org.graylog2.Core;
+import org.graylog2.SystemSettingAccessor;
 import org.graylog2.Tools;
 import org.graylog2.alarms.MessageCountAlarm;
 import org.graylog2.alarms.StreamAlarmChecker;
+import org.graylog2.plugin.alarms.Alarm;
+import org.graylog2.plugin.alarms.callbacks.AlarmCallback;
+import org.graylog2.plugin.alarms.callbacks.AlarmCallbackException;
 import org.graylog2.plugin.alarms.transports.Transport;
 import org.graylog2.plugin.streams.Stream;
 import org.graylog2.streams.StreamImpl;
@@ -82,22 +85,50 @@ public class AlarmScannerThread implements Runnable {
                         + " messages in the last " + stream.getAlarmTimespan() + " minutes."
                         + " Limit: " + stream.getAlarmMessageLimit());
                 
-                for (Transport transport : graylogServer.getTransports()) {
-                    // Check if this transport has users that configured it at all.
-                    if (alarm.getReceivers(transport).isEmpty()) {
-                        LOG.debug("Skipping transport [" + transport.getName() + "] because "
-                                + "it has no configured users.");
-                        continue;
-                    }
-                    
-                    LOG.debug("Sending alarm for user <" + stream.getId() + "> via Transport [" + transport.getName() + "].");
-                    transport.transportAlarm(alarm);
-                }
+                // Send using all transports.
+                sendMessages(alarm, stream);
+                
+                // Call all callbacks. Brace, brace, brace!
+                callCallbacks(alarm, stream);
                 
             } else {
                 LOG.debug("Stream <" + stream.getId() + "> is not over alarm limit.");
             }
 
+        }
+    }
+    
+    private void sendMessages(Alarm alarm, Stream stream) {
+        for (Transport transport : graylogServer.getTransports()) {
+            // Check if this transport has users that configured it at all.
+            if (alarm.getReceivers(transport).isEmpty()) {
+                LOG.debug("Skipping transport [" + transport.getName() + "] because "
+                        + "it has no configured users.");
+                continue;
+            }
+
+            LOG.debug("Sending alarm for user <" + stream.getId() + "> via Transport [" + transport.getName() + "].");
+            transport.transportAlarm(alarm);
+        }
+    }
+    
+    private void callCallbacks(Alarm alarm, StreamImpl stream) {
+        SystemSettingAccessor ssa = new SystemSettingAccessor(graylogServer);
+
+        for (AlarmCallback callback : graylogServer.getAlarmCallbacks()) {
+            String typeclass = callback.getClass().getCanonicalName();
+System.out.println("forced: " + ssa.getForcedAlarmCallbacks());
+System.out.println("stream: " + stream.getAlarmCallbacks());
+
+            // Only call if callback is forced for all streams or enabled for this particular stream.
+            if (ssa.getForcedAlarmCallbacks().contains(typeclass) || stream.getAlarmCallbacks().contains(typeclass)) {
+                LOG.debug("Calling alarm callback [" + typeclass + "].");
+                try {
+                    callback.call(alarm);
+                } catch (AlarmCallbackException e) {
+                    LOG.error("Execution of alarm callback [" + typeclass + "] failed.", e);
+                }
+            }
         }
     }
     

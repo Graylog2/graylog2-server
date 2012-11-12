@@ -17,7 +17,7 @@
  * along with Graylog2.  If not, see <http://www.gnu.org/licenses/>.
  *
  */
-package org.graylog2.alarms.transports;
+package org.graylog2.plugins;
 
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
@@ -25,25 +25,41 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import org.graylog2.Core;
+import org.graylog2.plugin.alarms.callbacks.AlarmCallback;
 import org.graylog2.plugin.alarms.transports.Transport;
 
 /**
  * @author Lennart Koopmann <lennart@socketfeed.com>
  */
-public class TransportRegistry {
+public class PluginRegistry {
     
     public static void setActiveTransports(Core server, List<Transport> transports) {
-        Set<Map<String, String>> r = Sets.newHashSet();
+        Set<Map<String, Object>> r = Sets.newHashSet();
         
         for(Transport transport : transports) {
-            Map<String, String> entry = Maps.newHashMap();
+            Map<String, Object> entry = Maps.newHashMap();
             entry.put("typeclass", transport.getClass().getCanonicalName());
             entry.put("name", transport.getName());
             
             r.add(entry);
         }
         
-        server.getMongoBridge().writeTransports(r);
+        server.getMongoBridge().writePluginInformation(r, "transports");
+    }
+    
+    public static void setActiveAlarmCallbacks(Core server, List<AlarmCallback> callbacks) {
+        Set<Map<String, Object>> r = Sets.newHashSet();
+        
+        for(AlarmCallback callback : callbacks) {
+            Map<String, Object> entry = Maps.newHashMap();
+            entry.put("typeclass", callback.getClass().getCanonicalName());
+            entry.put("name", callback.getName());
+            entry.put("requested_config", callback.getRequestedConfiguration());
+            
+            r.add(entry);
+        }
+        
+        server.getMongoBridge().writePluginInformation(r, "alarm_callbacks");
     }
     
 }

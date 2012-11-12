@@ -167,14 +167,14 @@ public class MongoBridge {
         coll.insert(obj);
     }
     
-    public void writeTransports(Set<Map<String, String>> transports) {
-        DBCollection coll = connection.getDatabase().getCollection("transports");
+    public void writePluginInformation(Set<Map<String, Object>> plugins, String collection) {
+        DBCollection coll = connection.getDatabase().getCollection(collection);
 
         // Delete all entries, we only have one at a time.
         coll.remove(new BasicDBObject());
         
-        for (Map<String, String> transport : transports) {
-            coll.insert(new BasicDBObject(transport));
+        for (Map<String, Object> plugin : plugins) {
+            coll.insert(new BasicDBObject(plugin));
         }
     }
     
