@@ -68,6 +68,8 @@ authorization do
     has_permission_on :additionalcolumns, :to => [:index]
 
     has_permission_on :amqp_settings, :to => [:index, :create, :destroy]
+
+    has_permission_on :plugin_configuration, :to => [:configure, :store]
   end
 
   role :reader do

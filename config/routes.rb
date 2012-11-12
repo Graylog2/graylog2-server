@@ -147,5 +147,9 @@ Graylog2WebInterface::Application.routes.draw do
 
   match '/visuals/fetch/:id' => 'visuals#fetch',:as => "visuals"
 
+  # The contraints makes the typeclass parameter accept dots. Everything except slash is allowed.
+  match '/plugin_configuration/configure/:plugin_type/:typeclass' => "plugin_configuration#configure", :constraints => { :typeclass => /[^\/]+/ }, :via => :get
+  match '/plugin_configuration/configure/:plugin_type/:typeclass' => "plugin_configuration#store", :constraints => { :typeclass => /[^\/]+/ }, :via => :post
+
   root :to => 'messages#index'
 end

@@ -840,3 +840,12 @@
 #first-login-usage-information {
   margin-top: 15px;
 }
+
+/* Plugin configuration */
+.plugin-configuration dd {
+  margin-bottom: 5px;
+}
+
+.plugin-configuration label, input {
+  font-family: Georgia,"Times New Roman",Times,serif;
+}

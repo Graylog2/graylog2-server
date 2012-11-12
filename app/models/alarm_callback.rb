@@ -3,5 +3,6 @@ class AlarmCallback
 
   field :name, :type => String
   field :typeclass, :type => String
+  field :requested_config, :type => Hash
 
 end
