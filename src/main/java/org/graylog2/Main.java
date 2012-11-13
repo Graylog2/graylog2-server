@@ -165,6 +165,7 @@ public final class Main {
             server.registerInitializer(new AMQPSyncInitializer(server));
         }
         server.registerInitializer(new BufferWatermarkInitializer(server));
+        if (commandLineArguments.isStats()) { server.registerInitializer(new StatisticsPrinterInitializer(server)); }
         
         // Register inputs.
         if (configuration.isUseGELF()) {
