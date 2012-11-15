@@ -1,9 +1,0 @@
-production:
-  via: smtp # via: sendmail
-  host: smtp.example.org
-  enable_starttls_auto: true
-  port: 25
-  auth: plain # plain, login, cram_md5 - Comment out or remove to use no auth
-  user: somebody
-  password: yourpass
-  domain: example.org # the HELO domain provided by the client to the server 

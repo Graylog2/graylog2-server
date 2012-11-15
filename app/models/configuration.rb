@@ -1,6 +1,5 @@
 class Configuration
   @general_config = YAML::load File.read(Rails.root.to_s + "/config/general.yml")
-  @email_config = YAML::load File.read(Rails.root.to_s + "/config/email.yml")
   @indexer_config = YAML::load File.read(Rails.root.to_s + "/config/indexer.yml")
 
   def self.config_value(root, nesting, key, default = nil)
@@ -90,36 +89,11 @@ class Configuration
     return token
   end
 
-  def self.email_config(key = nil, default = nil)
-    if key
-      config_value @email_config, Rails.env, key, default
-    else
-      @email_config[Rails.env]
-    end
-  end
-
   def self.indexer_config(key = nil, default = nil)
     if key
       config_value @indexer_config, Rails.env, key, default
     else
       @indexer_config[Rails.env]
-    end
-  end
-
-  def self.email_transport_type
-    default = :sendmail
-    email_config('via', default).to_sym.tap do |value|
-      value = default unless [:sendmail, :smtp].include?(value) # Only sendmail or SMTP allowed.
-    end
-  end
-
-  def self.email_smtp_settings
-    Hash.new.tap do |ret|
-      if email_transport_type == :smtp
-        email_config.each_pair do |key, value|
-          ret[key.to_sym] = value unless value.blank?
-        end
-      end
     end
   end
 
