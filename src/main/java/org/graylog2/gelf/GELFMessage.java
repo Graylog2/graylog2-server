@@ -20,8 +20,9 @@
 
 package org.graylog2.gelf;
 
-import java.io.IOException;
 import org.graylog2.Tools;
+
+import java.io.IOException;
 
 /**
  * @author Lennart Koopmann <lennart@socketfeed.com>
@@ -29,6 +30,7 @@ import org.graylog2.Tools;
 public class GELFMessage {
 
     private final byte[] payload;
+    private final boolean raw;
 
     public static final String ADDITIONAL_FIELD_PREFIX = "_";
 
@@ -54,23 +56,30 @@ public class GELFMessage {
         /**
          * An uncompressed message
          */
-        UNCOMPRESSED( (byte) 0x1f, (byte) 0x3c );
+        UNCOMPRESSED( (byte) 0x1f, (byte) 0x3c ),
+
+        /**
+         * A raw, uncompressed message, which does not start with magic bytes.
+         * Unfortunately it's tricky to find values that are not valid bytes...
+         */
+        RAW( (byte) 0xff, (byte) 0xff );
 
         private static final int HEADER_SIZE = 2;
 
-        private final byte first;
-        private final byte second;
+        private final byte[] bytes;
 
         Type(final byte first, final byte second) {
-            this.first = first;
-            this.second = second;
-        };
+            bytes = new byte[]{first, second};
+        }
 
         static Type determineType(final byte first, final byte second) {
-            if (first == ZLIB.first) {
+
+            // RAW is not handle here, because it cannot be detected by header bytes.
+
+            if (first == ZLIB.first()) {
                 // zlib's second byte is for flags and a checksum -
                 // make sure it is positive.
-                int secondInt = second;
+                int secondInt = ZLIB.second();
                 if (second < 0) {
                     secondInt += 256;
                 }
@@ -83,28 +92,54 @@ public class GELFMessage {
                 if ((256 * first + secondInt) % 31 == 0) {
                     return ZLIB;
                 }
-            } else if (first == GZIP.first) { // GZIP and UNCOMPRESSED share first magic byte
-                if (second == GZIP.second) {
+            } else if (first == GZIP.first()) { // GZIP and UNCOMPRESSED share first magic byte
+                if (second == GZIP.second()) {
                     return GZIP;
-                } else if (second == UNCOMPRESSED.second) {
+                } else if (second == UNCOMPRESSED.second()) {
                     return UNCOMPRESSED;
                 }
-            } else if (first == CHUNKED.first && second == CHUNKED.second) {
+            } else if (first == CHUNKED.first() && second == CHUNKED.second()) {
                 return CHUNKED;
             }
             return UNSUPPORTED;
+        }
+
+        public byte first() {
+            return bytes[0];
+        }
+
+        public byte second() {
+            return bytes[1];
+        }
+
+        public byte[] getBytes() {
+            return bytes;
         }
     }
 
     /**
      *
-     * @param payload Compressed or uncompressed (See HEADER_* constants)
+     * @param payload Compressed or uncompressed
+     * @see GELFMessage.Type
      */
     public GELFMessage(final byte[] payload) {
+        this(payload, false);
+    }
+
+    /**
+     *
+     * @param payload Compressed or uncompressed message content
+     * @param raw if <code>false</code> the payload MUST NOT start with any header bytes, it is interpreted as raw UTF-8 GELF
+     */
+    public GELFMessage(final byte[] payload, boolean raw) {
         this.payload = payload;
+        this.raw = raw;
     }
 
     public Type getGELFType() {
+        if (raw) {
+            return Type.RAW;
+        }
         if (payload.length < Type.HEADER_SIZE) {
             throw new IllegalStateException("GELF message is too short. Not even the type header would fit.");
         }
@@ -113,6 +148,9 @@ public class GELFMessage {
 
     public String getJSON(){
         try {
+            if (raw) {
+                return new String(payload, "UTF-8");
+            }
             switch(getGELFType()) {
                 case ZLIB:
                     return Tools.decompressZlib(payload);

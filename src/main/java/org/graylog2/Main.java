@@ -25,29 +25,25 @@ import com.github.joschi.jadconfig.JadConfig;
 import com.github.joschi.jadconfig.RepositoryException;
 import com.github.joschi.jadconfig.ValidationException;
 import com.github.joschi.jadconfig.repositories.PropertiesRepository;
-import com.google.common.collect.Maps;
-import java.io.File;
-import java.io.FileWriter;
-import java.io.Writer;
-import java.util.Map;
 import org.apache.commons.io.IOUtils;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.graylog2.activities.Activity;
 import org.graylog2.alarms.transports.EmailTransport;
 import org.graylog2.alarms.transports.JabberTransport;
-import org.graylog2.filters.BlacklistFilter;
-import org.graylog2.filters.CounterUpdateFilter;
-import org.graylog2.filters.RewriteFilter;
-import org.graylog2.filters.StreamMatcherFilter;
-import org.graylog2.filters.TokenizerFilter;
+import org.graylog2.filters.*;
 import org.graylog2.initializers.*;
 import org.graylog2.inputs.amqp.AMQPInput;
 import org.graylog2.inputs.gelf.GELFTCPInput;
 import org.graylog2.inputs.gelf.GELFUDPInput;
+import org.graylog2.inputs.http.GELFHttpInput;
 import org.graylog2.inputs.syslog.SyslogTCPInput;
 import org.graylog2.inputs.syslog.SyslogUDPInput;
 import org.graylog2.outputs.ElasticSearchOutput;
+
+import java.io.File;
+import java.io.FileWriter;
+import java.io.Writer;
 
 /**
  * Main class of Graylog2.
@@ -180,7 +176,9 @@ public final class Main {
         if (configuration.isSyslogTcpEnabled()) { server.registerInput(new SyslogTCPInput()); }
 
         if (configuration.isAmqpEnabled()) { server.registerInput(new AMQPInput()); }
-        
+
+        if (configuration.isHttpEnabled()) { server.registerInput(new GELFHttpInput()); }
+
         // Register message filters.
         server.registerFilter(new RewriteFilter());
         server.registerFilter(new BlacklistFilter());
