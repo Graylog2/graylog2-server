@@ -39,12 +39,11 @@ import java.util.regex.Matcher;
 public class TokenizerFilter implements MessageFilter {
 
     private static final Logger LOG = Logger.getLogger(TokenizerFilter.class);
-
-    private final Pattern p = Pattern.compile("[a-zA-Z0-9_-]*");
-    private final Pattern kvPattern = Pattern.compile("\\s?=\\s?");
-    private final Pattern spacePattern = Pattern.compile(" ");
-    private final Pattern quotedValuePattern = Pattern.compile("([a-zA-Z0-9_-]+=\"[^\"]+\")");
-    private final Timer processTime = Metrics.newTimer(TokenizerFilter.class, "ProcessTime", TimeUnit.MICROSECONDS, TimeUnit.SECONDS);
+    private static final Pattern p = Pattern.compile("[a-zA-Z0-9_-]*");
+    private static final Pattern kvPattern = Pattern.compile("\\s?=\\s?");
+    private static final Pattern spacePattern = Pattern.compile(" ");
+    private static final Pattern quotedValuePattern = Pattern.compile("([a-zA-Z0-9_-]+=\"[^\"]+\")");
+    private static final Timer processTime = Metrics.newTimer(TokenizerFilter.class, "ProcessTime", TimeUnit.MICROSECONDS, TimeUnit.SECONDS);
 
     /*
      * Extract out only true k=v pairs, not everything separated by a = character.
