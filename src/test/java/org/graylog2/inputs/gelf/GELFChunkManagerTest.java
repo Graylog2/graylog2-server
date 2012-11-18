@@ -22,7 +22,7 @@ package org.graylog2.inputs.gelf;
 
 import org.graylog2.gelf.GELFChunkManager;
 import org.graylog2.gelf.GELFMessageChunk;
-import org.apache.commons.lang3.ArrayUtils;
+import com.google.common.primitives.Bytes;
 import org.graylog2.Core;
 import org.graylog2.TestHelper;
 import org.junit.Test;
@@ -132,8 +132,8 @@ public class GELFChunkManagerTest {
         byte[] b2 = TestHelper.gzipCompress("tosee");
         byte[] b3 = TestHelper.gzipCompress("here");
         
-        byte[] b12 = ArrayUtils.addAll(b1, b2);
-        byte[] expected = ArrayUtils.addAll(b12, b3);
+        byte[] b12 = Bytes.concat(b1, b2);
+        byte[] expected = Bytes.concat(b12, b3);
         
         String msgId = "foobar00";
         mgr.insert(new GELFMessageChunk(TestHelper.buildGELFMessageChunk(msgId, 0, 3, b1)));
