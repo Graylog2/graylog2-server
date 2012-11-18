@@ -26,7 +26,7 @@ import com.lmax.disruptor.SleepingWaitStrategy;
 import com.lmax.disruptor.dsl.Disruptor;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import org.apache.commons.lang3.concurrent.BasicThreadFactory;
+import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import org.apache.log4j.Logger;
 import org.graylog2.Core;
 import org.graylog2.buffers.processors.ProcessBufferProcessor;
@@ -43,8 +43,8 @@ public class ProcessBuffer implements Buffer {
     protected static RingBuffer<LogMessageEvent> ringBuffer;
 
     protected ExecutorService executor = Executors.newCachedThreadPool(
-            new BasicThreadFactory.Builder()
-                .namingPattern("processbufferprocessor-%d")
+            new ThreadFactoryBuilder()
+                .setNameFormat("processbufferprocessor-%d")
                 .build()
     );
 

@@ -40,7 +40,7 @@ import com.google.common.collect.Lists;
 import java.util.concurrent.atomic.AtomicInteger;
 import com.google.common.collect.Maps;
 import java.util.Map;
-import org.apache.commons.lang3.concurrent.BasicThreadFactory;
+import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import org.graylog2.activities.Activity;
 import org.graylog2.activities.ActivityWriter;
 import org.graylog2.cluster.Cluster;
@@ -218,9 +218,7 @@ public class Core implements GraylogServer {
         }
 
         scheduler = Executors.newScheduledThreadPool(SCHEDULED_THREADS_POOL_SIZE,
-                new BasicThreadFactory.Builder()
-                    .namingPattern("scheduled-%d")
-                    .build()
+                new ThreadFactoryBuilder().setNameFormat("scheduled-%d").build()
         );
 
         // Load and register plugins.

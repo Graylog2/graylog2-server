@@ -19,7 +19,7 @@
  */
 package org.graylog2.inputs.http;
 
-import org.apache.commons.lang3.concurrent.BasicThreadFactory;
+import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import org.apache.log4j.Logger;
 import org.graylog2.Configuration;
 import org.graylog2.Core;
@@ -41,13 +41,13 @@ public class GELFHttpInput implements MessageInput {
         final InetSocketAddress socketAddress = new InetSocketAddress(configuration.getHttpListenAddress(), configuration.getHttpListenPort());
 
         final ExecutorService bossExecutor = Executors.newCachedThreadPool(
-            new BasicThreadFactory.Builder()
-                .namingPattern("input-gelfhttp-boss-%d")
+            new ThreadFactoryBuilder()
+                .setNameFormat("input-gelfhttp-boss-%d")
                 .build());
 
         final ExecutorService workerExecutor = Executors.newCachedThreadPool(
-            new BasicThreadFactory.Builder()
-                .namingPattern("input-gelfhttp-worker-%d")
+            new ThreadFactoryBuilder()
+                .setNameFormat("input-gelfhttp-worker-%d")
                 .build());
 
         final ServerBootstrap httpBootstrap = new ServerBootstrap(
