@@ -25,7 +25,7 @@ package org.graylog2.inputs.gelf;
 import java.net.InetSocketAddress;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import org.apache.commons.lang3.concurrent.BasicThreadFactory;
+import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import org.apache.log4j.Logger;
 import org.elasticsearch.common.netty.channel.ChannelException;
 import org.graylog2.Configuration;
@@ -58,8 +58,8 @@ public class GELFUDPInput implements MessageInput {
     private void spinUp() {
         
         final ExecutorService workerThreadPool = Executors.newCachedThreadPool(
-                new BasicThreadFactory.Builder()
-                .namingPattern("input-gelfudp-worker-%d")
+                new ThreadFactoryBuilder()
+                .setNameFormat("input-gelfudp-worker-%d")
                 .build());
         
         final ConnectionlessBootstrap bootstrap = new ConnectionlessBootstrap(new NioDatagramChannelFactory(workerThreadPool));

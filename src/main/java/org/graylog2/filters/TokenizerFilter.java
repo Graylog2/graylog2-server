@@ -20,10 +20,10 @@
 
 package org.graylog2.filters;
 
+import com.google.common.base.CharMatcher;
 import com.yammer.metrics.Metrics;
 import com.yammer.metrics.core.Timer;
 import com.yammer.metrics.core.TimerContext;
-import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 import org.graylog2.plugin.GraylogServer;
 import org.graylog2.plugin.filters.MessageFilter;
@@ -39,12 +39,13 @@ import java.util.regex.Matcher;
 public class TokenizerFilter implements MessageFilter {
 
     private static final Logger LOG = Logger.getLogger(TokenizerFilter.class);
-
-    private final Pattern p = Pattern.compile("[a-zA-Z0-9_-]*");
-    private final Pattern kvPattern = Pattern.compile("\\s?=\\s?");
-    private final Pattern spacePattern = Pattern.compile(" ");
-    private final Pattern quotedValuePattern = Pattern.compile("([a-zA-Z0-9_-]+=\"[^\"]+\")");
-    private final Timer processTime = Metrics.newTimer(TokenizerFilter.class, "ProcessTime", TimeUnit.MICROSECONDS, TimeUnit.SECONDS);
+    private static final Pattern p = Pattern.compile("[a-zA-Z0-9_-]*");
+    private static final Pattern kvPattern = Pattern.compile("\\s?=\\s?");
+    private static final Pattern spacePattern = Pattern.compile(" ");
+    private static final Pattern quotedValuePattern = Pattern.compile("([a-zA-Z0-9_-]+=\"[^\"]+\")");
+    private static final CharMatcher QUOTE_MATCHER = CharMatcher.is('"').precomputed();
+    private static final CharMatcher EQUAL_SIGN_MATCHER = CharMatcher.is('=').precomputed();
+    private static final Timer processTime = Metrics.newTimer(TokenizerFilter.class, "ProcessTime", TimeUnit.MICROSECONDS, TimeUnit.SECONDS);
 
     /*
      * Extract out only true k=v pairs, not everything separated by a = character.
@@ -72,7 +73,7 @@ public class TokenizerFilter implements MessageFilter {
                     while (m.find()) {
                         String[] kv = m.group(1).split("=");
                         if (kv.length == 2 && p.matcher(kv[0]).matches() && !kv[0].equals("id")) {
-                            msg.addAdditionalData(kv[0].trim(), StringUtils.strip(kv[1], "\"").trim());
+                            msg.addAdditionalData(kv[0].trim(), QUOTE_MATCHER.removeFrom(kv[1]).trim());
                             extracted++;
                         }
                     }
@@ -80,7 +81,7 @@ public class TokenizerFilter implements MessageFilter {
                     final String[] parts = spacePattern.split(nmsg);
                     if (parts != null) {
                         for (String part : parts) {
-                            if (part.contains("=") && StringUtils.countMatches(part, "=") == 1) {
+                            if (part.contains("=") && EQUAL_SIGN_MATCHER.countIn(part) == 1) {
                                 String[] kv = part.split("=");
                                 if (kv.length == 2 && p.matcher(kv[0]).matches() && !msg.getAdditionalData().containsKey("_" + kv[0]) && !kv[0].equals("id")) {
                                     msg.addAdditionalData(kv[0].trim(), kv[1].trim());
