@@ -29,7 +29,7 @@ import com.yammer.metrics.core.Meter;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
-import org.apache.commons.lang3.concurrent.BasicThreadFactory;
+import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import org.apache.log4j.Logger;
 import org.graylog2.Core;
 import org.graylog2.buffers.processors.OutputBufferProcessor;
@@ -46,8 +46,8 @@ public class OutputBuffer implements Buffer {
     protected static RingBuffer<LogMessageEvent> ringBuffer;
 
     protected ExecutorService executor = Executors.newCachedThreadPool(
-            new BasicThreadFactory.Builder()
-                .namingPattern("outputbufferprocessor-%d")
+            new ThreadFactoryBuilder()
+                .setNameFormat("outputbufferprocessor-%d")
                 .build()
     );
     

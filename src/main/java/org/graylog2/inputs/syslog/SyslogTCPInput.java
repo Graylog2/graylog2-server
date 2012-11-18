@@ -23,7 +23,7 @@ package org.graylog2.inputs.syslog;
 import java.net.InetSocketAddress;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import org.apache.commons.lang3.concurrent.BasicThreadFactory;
+import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import org.apache.log4j.Logger;
 import org.graylog2.Configuration;
 import org.graylog2.Core;
@@ -57,13 +57,13 @@ public class SyslogTCPInput implements MessageInput {
     
     private void spinUp() {
         final ExecutorService bossThreadPool = Executors.newCachedThreadPool(
-                new BasicThreadFactory.Builder()
-                .namingPattern("input-syslogtcp-boss-%d")
+                new ThreadFactoryBuilder()
+                .setNameFormat("input-syslogtcp-boss-%d")
                 .build());
         
         final ExecutorService workerThreadPool = Executors.newCachedThreadPool(
-                new BasicThreadFactory.Builder()
-                .namingPattern("input-syslogtcp-worker-%d")
+                new ThreadFactoryBuilder()
+                .setNameFormat("input-syslogtcp-worker-%d")
                 .build());
 
         ServerBootstrap tcpBootstrap = new ServerBootstrap(

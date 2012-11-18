@@ -33,7 +33,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
-import org.apache.commons.lang3.concurrent.BasicThreadFactory;
+import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import org.apache.log4j.Logger;
 import org.graylog2.Core;
 import org.graylog2.activities.Activity;
@@ -138,8 +138,8 @@ public class AMQPConsumer implements Runnable {
         factory.setPort(server.getConfiguration().getAmqpPort());
 
         connection = factory.newConnection(Executors.newCachedThreadPool(
-            new BasicThreadFactory.Builder()
-                .namingPattern("amqp-consumer-" + queueConfig.getId() + "-%d")
+            new ThreadFactoryBuilder()
+                .setNameFormat("amqp-consumer-" + queueConfig.getId() + "-%d")
                 .build()
         ));
         
