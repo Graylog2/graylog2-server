@@ -27,6 +27,7 @@ import java.util.Set;
 import org.graylog2.Core;
 import org.graylog2.plugin.alarms.callbacks.AlarmCallback;
 import org.graylog2.plugin.alarms.transports.Transport;
+import org.graylog2.plugin.outputs.MessageOutput;
 
 /**
  * @author Lennart Koopmann <lennart@socketfeed.com>
@@ -60,6 +61,22 @@ public class PluginRegistry {
         }
         
         server.getMongoBridge().writePluginInformation(r, "alarm_callbacks");
+    }
+    
+    public static void setActiveMessageOutputs(Core server, List<MessageOutput> outputs) {
+        Set<Map<String, Object>> r = Sets.newHashSet();
+        
+        for(MessageOutput output : outputs) {
+            Map<String, Object> entry = Maps.newHashMap();
+            entry.put("typeclass", output.getClass().getCanonicalName());
+            entry.put("name", output.getName());
+            entry.put("requested_config", output.getRequestedConfiguration());
+            entry.put("requested_stream_config", output.getRequestedStreamConfiguration());
+            
+            r.add(entry);
+        }
+        
+        server.getMongoBridge().writePluginInformation(r, "message_outputs");
     }
     
 }

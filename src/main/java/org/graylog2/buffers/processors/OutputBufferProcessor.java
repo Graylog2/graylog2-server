@@ -32,7 +32,16 @@ import org.graylog2.plugin.outputs.MessageOutput;
 import org.graylog2.plugin.logmessage.LogMessage;
 
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.TimeUnit;
+import org.bson.types.ObjectId;
+import org.elasticsearch.common.collect.Maps;
+import org.graylog2.outputs.ElasticSearchOutput;
+import org.graylog2.outputs.OutputRouter;
+import org.graylog2.outputs.OutputStreamConfigurationImpl;
+import org.graylog2.plugin.outputs.OutputStreamConfiguration;
+import org.graylog2.plugin.streams.Stream;
+import org.graylog2.streams.StreamImpl;
 
 /**
  * @author Lennart Koopmann <lennart@socketfeed.com>
@@ -41,6 +50,8 @@ public class OutputBufferProcessor implements EventHandler<LogMessageEvent> {
 
     private static final Logger LOG = Logger.getLogger(OutputBufferProcessor.class);
 
+    private static final OutputRouter ROUTER = new OutputRouter();
+    
     private Core server;
 
     private List<LogMessage> buffer = Lists.newArrayList();
@@ -76,15 +87,18 @@ public class OutputBufferProcessor implements EventHandler<LogMessageEvent> {
 
         if (endOfBatch || buffer.size() >= server.getConfiguration().getOutputBatchSize()) {
             for (MessageOutput output : server.getOutputs()) {
-                try {
-                    if (LOG.isDebugEnabled()) {
-                        LOG.debug("Writing message batch to [" + output.getName() + "]. Size <" + buffer.size() + ">");
-                    }
+                // Always write to ElasticSearch, but only write to other outputs if enabled for one of its streams.
+                if (output instanceof ElasticSearchOutput || ROUTER.checkRouting(output, msg)) {
+                    try {
+                        if (LOG.isDebugEnabled()) {
+                            LOG.debug("Writing message batch to [" + output.getName() + "]. Size <" + buffer.size() + ">");
+                        }
 
-                    batchSize.update(buffer.size());
-                    output.write(buffer, server);
-                } catch (Exception e) {
-                    LOG.error("Could not write message batch to output [" + output.getName() +"].", e);
+                        batchSize.update(buffer.size());
+                        output.write(buffer, buildStreamConfigs(buffer, output.getClass().getCanonicalName()), server);
+                    } catch (Exception e) {
+                        LOG.error("Could not write message batch to output [" + output.getName() +"].", e);
+                    }
                 }
             }
             
@@ -96,4 +110,22 @@ public class OutputBufferProcessor implements EventHandler<LogMessageEvent> {
         }
     }
 
+    private OutputStreamConfiguration buildStreamConfigs(List<LogMessage> messages, String className) {
+        OutputStreamConfiguration configs = new OutputStreamConfigurationImpl();
+        Map<ObjectId, Stream> distinctStreams = Maps.newHashMap();
+        
+        for (LogMessage message : messages) {
+            for (Stream stream : message.getStreams()) {
+                distinctStreams.put(stream.getId(), stream);
+            }
+        }
+        
+        for (Map.Entry<ObjectId, Stream> e : distinctStreams.entrySet()) {
+            StreamImpl stream = (StreamImpl) e.getValue();
+            configs.add(e.getKey(), stream.getOutputConfigurations(className));
+        }
+        
+        return configs;
+    }
+    
 }

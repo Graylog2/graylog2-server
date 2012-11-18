@@ -53,6 +53,7 @@ import org.graylog2.plugin.alarms.transports.Transport;
 import org.graylog2.plugin.alarms.transports.TransportConfigurationException;
 import org.graylog2.plugin.buffers.Buffer;
 import org.graylog2.plugin.filters.MessageFilter;
+import org.graylog2.plugin.outputs.MessageOutputConfigurationException;
 import org.graylog2.plugins.PluginConfiguration;
 import org.graylog2.plugins.PluginLoader;
 
@@ -270,6 +271,17 @@ public class Core implements GraylogServer {
         for (MessageInput input : this.inputs) {
             input.initialize(this.configuration, this);
             LOG.debug("Initialized input: " + input.getName());
+        }
+        
+        // Initialize all registered outputs.
+        for (MessageOutput output : this.outputs) {
+            try {
+                output.initialize(PluginConfiguration.load(this, output.getClass().getCanonicalName()));
+                LOG.debug("Initialized output: " + output.getName());
+            } catch(MessageOutputConfigurationException e) {
+                LOG.error("Could not initialize output <" + output.getName() + ">"
+                        + " because of missing or invalid configuration.", e);
+            }
         }
 
         activityWriter.write(new Activity("Started up.", GraylogServer.class));
