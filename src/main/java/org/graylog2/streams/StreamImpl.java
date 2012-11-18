@@ -20,15 +20,14 @@
 
 package org.graylog2.streams;
 
+import com.google.common.collect.Lists;
+import com.google.common.collect.Sets;
 import org.graylog2.plugin.streams.Stream;
 import java.util.List;
 
 import org.apache.log4j.Logger;
 import org.bson.types.ObjectId;
 
-import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
-import com.google.common.collect.Sets;
 import com.mongodb.BasicDBList;
 import com.mongodb.BasicDBObject;
 import com.mongodb.DBCollection;
@@ -37,11 +36,13 @@ import com.mongodb.DBObject;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
+import org.elasticsearch.common.collect.Maps;
 import org.graylog2.Core;
 import org.graylog2.Tools;
 import org.graylog2.alarms.AlarmReceiverImpl;
 import org.graylog2.plugin.GraylogServer;
 import org.graylog2.plugin.alarms.AlarmReceiver;
+import org.graylog2.plugin.alarms.callbacks.AlarmCallback;
 import org.graylog2.plugin.streams.StreamRule;
 import org.graylog2.users.User;
 
@@ -301,7 +302,7 @@ public class StreamImpl implements Stream {
         
         return receivers;
     }
-
+    
     private Map<String, Set<Map<String, String>>> buildOutputsFromMongoDoc(DBObject stream) {
         Map<String, Set<Map<String, String>>> o = Maps.newHashMap();
         
@@ -335,5 +336,5 @@ public class StreamImpl implements Stream {
         
         return o;
     }
-    
+
 }
