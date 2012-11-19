@@ -48,6 +48,7 @@ import java.util.Map;
 import java.util.Set;
 import org.elasticsearch.action.count.CountRequestBuilder;
 import org.elasticsearch.action.count.CountResponse;
+import org.elasticsearch.action.support.replication.ReplicationType;
 import org.elasticsearch.common.settings.ImmutableSettings;
 import org.elasticsearch.common.settings.Settings;
 
@@ -269,6 +270,12 @@ public class EmbeddedElasticSearchClient {
             recentIndex.add(buildIndexRequest(RECENT_INDEX_NAME, source, msg.getId(), server.getConfiguration().getRecentIndexTtlMinutes())); // Recent index.
         }
 
+        mainIndex.setConsistencyLevel(WriteConsistencyLevel.ONE);
+        recentIndex.setConsistencyLevel(WriteConsistencyLevel.ONE);
+        
+        mainIndex.setReplicationType(ReplicationType.ASYNC);
+        recentIndex.setReplicationType(ReplicationType.ASYNC);
+        
         final ActionFuture<BulkResponse> mainBulkFuture = client.bulk(mainIndex.request());
         final ActionFuture<BulkResponse> recentBulkFuture = client.bulk(recentIndex.request());
         
@@ -359,7 +366,7 @@ public class EmbeddedElasticSearchClient {
         b.setOpType(OpType.INDEX);
         b.setType(TYPE);
         b.setConsistencyLevel(WriteConsistencyLevel.ONE);
-        
+
         // Set a TTL?
         if (ttlMinutes > 0) {
             b.setTTL(ttlMinutes*60*1000); // TTL is specified in milliseconds.
