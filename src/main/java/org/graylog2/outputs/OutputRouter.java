@@ -21,19 +21,23 @@
 package org.graylog2.outputs;
 
 import org.graylog2.plugin.logmessage.LogMessage;
-import org.graylog2.plugin.outputs.MessageOutput;
+import org.graylog2.plugin.streams.Stream;
+import org.graylog2.streams.StreamImpl;
 
 /**
  * @author Lennart Koopmann <lennart@socketfeed.com>
  */
 public class OutputRouter {
     
-/*    msg.getStreams()
-      - stream.hasOutputEnabled()
-       - first hit: return true*/
-    
-    public static boolean checkRouting(MessageOutput output, LogMessage msg) {
-        return true;
+    public static boolean checkRouting(String outputTypeClass, LogMessage msg) {
+        for (Stream stream : msg.getStreams()) {
+            if (((StreamImpl) stream).hasConfiguredOutputs(outputTypeClass)) {
+                return true;
+            }
+        }
+        
+        // No stream had that output configured.
+        return false;
     }
     
 }

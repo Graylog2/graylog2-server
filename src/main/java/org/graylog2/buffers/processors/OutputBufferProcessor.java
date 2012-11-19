@@ -21,6 +21,7 @@
 package org.graylog2.buffers.processors;
 
 import com.google.common.collect.Lists;
+import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import com.lmax.disruptor.EventHandler;
 import com.yammer.metrics.Metrics;
 import com.yammer.metrics.core.Histogram;
@@ -33,6 +34,8 @@ import org.graylog2.plugin.logmessage.LogMessage;
 
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 import org.bson.types.ObjectId;
 import org.elasticsearch.common.collect.Maps;
@@ -87,15 +90,16 @@ public class OutputBufferProcessor implements EventHandler<LogMessageEvent> {
 
         if (endOfBatch || buffer.size() >= server.getConfiguration().getOutputBatchSize()) {
             for (MessageOutput output : server.getOutputs()) {
+                String typeClass = output.getClass().getCanonicalName();
                 // Always write to ElasticSearch, but only write to other outputs if enabled for one of its streams.
-                if (output instanceof ElasticSearchOutput || ROUTER.checkRouting(output, msg)) {
+                if (output instanceof ElasticSearchOutput || ROUTER.checkRouting(typeClass, msg)) {
                     try {
                         if (LOG.isDebugEnabled()) {
                             LOG.debug("Writing message batch to [" + output.getName() + "]. Size <" + buffer.size() + ">");
                         }
 
                         batchSize.update(buffer.size());
-                        output.write(buffer, buildStreamConfigs(buffer, output.getClass().getCanonicalName()), server);
+                        output.write(buffer, buildStreamConfigs(buffer, typeClass), server);
                     } catch (Exception e) {
                         LOG.error("Could not write message batch to output [" + output.getName() +"].", e);
                     }
