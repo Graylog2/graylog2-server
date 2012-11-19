@@ -20,6 +20,7 @@
 package org.graylog2.periodical;
 
 import java.util.Map;
+import java.util.Set;
 import org.apache.log4j.Logger;
 import org.elasticsearch.common.collect.Maps;
 import org.graylog2.Core;
@@ -54,7 +55,15 @@ public class AlarmScannerThread implements Runnable {
     public void run() {
         Map<String, Object> onlyAlerted = Maps.newHashMap();
         onlyAlerted.put("alarm_active", true);
-        for (Stream streamIF : StreamImpl.fetchAllEnabled(graylogServer, onlyAlerted)) {
+        
+        Set<Stream> streams = StreamImpl.fetchAllEnabled(graylogServer, onlyAlerted);
+        
+        if (streams.isEmpty()) {
+            LOG.debug("No alertable streams found. Not doing anything more.");
+            return;
+        }
+        
+        for (Stream streamIF : streams) {
             StreamImpl stream = (StreamImpl) streamIF;
             StreamAlarmChecker checker = new StreamAlarmChecker(graylogServer, stream); 
 

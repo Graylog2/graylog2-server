@@ -219,11 +219,17 @@ public class StreamImpl implements Stream {
     }
     
     public Set<Map<String, String>> getOutputConfigurations(String className) {
+        
         return outputs.get(className);
     }
     
     public boolean hasConfiguredOutputs(String typeClass) {
-        return !getOutputConfigurations(typeClass).isEmpty();
+        Set<Map<String, String>> oc = getOutputConfigurations(typeClass);
+        if (oc == null) {
+            return false;
+        }
+        
+        return !oc.isEmpty();
     }
     
     @Override

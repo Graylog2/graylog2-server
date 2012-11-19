@@ -75,7 +75,7 @@ public class Core implements GraylogServer {
     private ServerValue serverValues;
     private GELFChunkManager gelfChunkManager;
 
-    private static final int SCHEDULED_THREADS_POOL_SIZE = 15;
+    private static final int SCHEDULED_THREADS_POOL_SIZE = 30;
     private ScheduledExecutorService scheduler;
 
     public static final String GRAYLOG2_VERSION = "0.10.0-preview.2";
