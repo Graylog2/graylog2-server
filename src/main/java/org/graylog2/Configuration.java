@@ -30,7 +30,8 @@ import com.github.joschi.jadconfig.validators.PositiveIntegerValidator;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.mongodb.ServerAddress;
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.graylog2.indexer.EmbeddedElasticSearchClient;
 
 import java.net.UnknownHostException;
@@ -46,7 +47,7 @@ import java.util.Map;
  */
 public class Configuration {
 
-    private static final Logger LOG = Logger.getLogger(Configuration.class);
+    private static final Logger LOG = LoggerFactory.getLogger(Configuration.class);
 
     @Parameter(value = "is_master", required = true)
     private boolean isMaster = true;
@@ -332,7 +333,7 @@ public class Configuration {
     
     public String getRecentIndexStoreType() {
         if (!EmbeddedElasticSearchClient.ALLOWED_RECENT_INDEX_STORE_TYPES.contains(recentIndexStoreType)) {
-            LOG.error("Invalid recent index store type configured. Falling back to <" + EmbeddedElasticSearchClient.STANDARD_RECENT_INDEX_STORE_TYPE + ">");
+            LOG.error("Invalid recent index store type configured. Falling back to <{}>", EmbeddedElasticSearchClient.STANDARD_RECENT_INDEX_STORE_TYPE);
             return EmbeddedElasticSearchClient.STANDARD_RECENT_INDEX_STORE_TYPE;
         }
         return recentIndexStoreType;

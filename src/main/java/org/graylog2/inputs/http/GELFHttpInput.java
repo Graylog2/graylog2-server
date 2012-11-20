@@ -20,7 +20,8 @@
 package org.graylog2.inputs.http;
 
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.graylog2.Configuration;
 import org.graylog2.Core;
 import org.graylog2.inputs.MessageInput;
@@ -34,7 +35,7 @@ import java.util.concurrent.Executors;
 
 public class GELFHttpInput implements MessageInput {
 
-    private static final Logger LOG = Logger.getLogger(GELFHttpInput.class);
+    private static final Logger LOG = LoggerFactory.getLogger(GELFHttpInput.class);
 
     @Override
     public void initialize(final Configuration configuration, final Core graylogServer) {
@@ -57,9 +58,9 @@ public class GELFHttpInput implements MessageInput {
 
         try {
             httpBootstrap.bind(socketAddress);
-            LOG.info("Started HTTP GELF server on " + socketAddress);
+            LOG.info("Started HTTP GELF server on {}", socketAddress);
         } catch (final ChannelException e) {
-            LOG.fatal("Could not bind HTTP GELF server to address " + socketAddress, e);
+            LOG.error("Could not bind HTTP GELF server to address " + socketAddress, e);
         }
         Runtime.getRuntime().addShutdownHook(new Thread() {
             @Override

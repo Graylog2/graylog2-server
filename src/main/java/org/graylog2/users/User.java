@@ -26,18 +26,20 @@ import com.mongodb.BasicDBObject;
 import com.mongodb.DBCollection;
 import com.mongodb.DBCursor;
 import com.mongodb.DBObject;
-import java.util.Map;
-import java.util.Set;
-import org.apache.log4j.Logger;
 import org.bson.types.ObjectId;
 import org.graylog2.Core;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.util.Map;
+import java.util.Set;
 
 /**
  * @author Lennart Koopmann <lennart@socketfeed.com>
  */
 public class User {
    
-    private static final Logger LOG = Logger.getLogger(User.class);
+    private static final Logger LOG = LoggerFactory.getLogger(User.class);
     
     private final ObjectId id;
     private final String login;

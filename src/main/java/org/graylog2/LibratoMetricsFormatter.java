@@ -22,19 +22,21 @@ package org.graylog2;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
+import org.graylog2.plugin.MessageCounter;
+import org.json.simple.JSONValue;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
-import org.apache.log4j.Logger;
-import org.graylog2.plugin.MessageCounter;
-import org.json.simple.JSONValue;
 
 /**
  * @author Lennart Koopmann <lennart@socketfeed.com>
  */
 public class LibratoMetricsFormatter {
 
-    private static final Logger LOG = Logger.getLogger(LibratoMetricsFormatter.class);
+    private static final Logger LOG = LoggerFactory.getLogger(LibratoMetricsFormatter.class);
 
     private static final String SOURCE = "graylog2";
 
@@ -82,7 +84,7 @@ public class LibratoMetricsFormatter {
         // Streams.
         for(Entry<String, Integer> stream : counter.getStreamCounts().entrySet()) {
             if (streamFilter.contains(stream.getKey())) {
-                LOG.debug("Not sending stream <" + stream.getKey() + "> to Librato Metrics because it is listed in libratometrics_stream_filter");
+                LOG.debug("Not sending stream <{}> to Librato Metrics because it is listed in libratometrics_stream_filter", stream.getKey());
                 continue;
             }
 
@@ -96,7 +98,7 @@ public class LibratoMetricsFormatter {
         // Hosts.
         for(Entry<String, Integer> host : counter.getHostCounts().entrySet()) {
             if (Tools.decodeBase64(host.getKey()).matches(hostFilter)) {
-                LOG.debug("Not sending host <" + host.getKey() + "> to Librato Metrics because it was matched by libratometrics_host_filter");
+                LOG.debug("Not sending host <{}> to Librato Metrics because it was matched by libratometrics_host_filter", host.getKey());
                 continue;
             }
 

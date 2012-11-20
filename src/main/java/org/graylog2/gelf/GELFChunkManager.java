@@ -23,7 +23,8 @@ package org.graylog2.gelf;
 import com.google.common.collect.Maps;
 import com.yammer.metrics.Metrics;
 import com.yammer.metrics.core.Meter;
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.graylog2.Core;
 
 import java.io.ByteArrayOutputStream;
@@ -35,7 +36,7 @@ import java.util.concurrent.TimeUnit;
  */
 public class GELFChunkManager extends Thread {
 
-    private static final Logger LOG = Logger.getLogger(GELFChunkManager.class);
+    private static final Logger LOG = LoggerFactory.getLogger(GELFChunkManager.class);
 
     private Map<String, Map<Integer, GELFMessageChunk>> chunks = Maps.newConcurrentMap();
     private GELFProcessor processor;
@@ -55,7 +56,7 @@ public class GELFChunkManager extends Thread {
         while (true) {
             try {
                 if (!chunks.isEmpty()) {
-                    LOG.debug("Dumping GELF chunk map [" + chunks.size() + "]:\n" + humanReadableChunkMap());
+                    LOG.debug("Dumping GELF chunk map [{}]:\n{}", chunks.size(), humanReadableChunkMap());
                 }
                 
                 // Check for complete or outdated messages.
@@ -66,7 +67,7 @@ public class GELFChunkManager extends Thread {
                     if (isOutdated(messageId)) {
                         outdatedMessagesDropped.mark();
                         
-                        LOG.debug("Not all chunks of <" + messageId + "> arrived in time. Dropping. [" + SECONDS_VALID + "s]");
+                        LOG.debug("Not all chunks of <{}> arrived in time. Dropping. [{}s]", messageId, SECONDS_VALID);
                         dropMessage(messageId);
                         continue;
                     }
@@ -74,11 +75,11 @@ public class GELFChunkManager extends Thread {
                     // Not oudated. Maybe complete?
                     if (isComplete(messageId)) {
                         // We got a complete message! Re-assemble and insert to GELFProcessor.
-                        LOG.debug("Message <" + messageId + "> seems to be complete. Handling now.");
+                        LOG.debug("Message <{}> seems to be complete. Handling now.", messageId);
                         processor.messageReceived(new GELFMessage(chunksToByteArray(messageId)));
 
                         // Message has been handled. Drop it.
-                        LOG.debug("Message <" + messageId + "> is now being processed. Dropping from chunk map.");
+                        LOG.debug("Message <{}> is now being processed. Dropping from chunk map.", messageId);
                         dropMessage(messageId);
                     }
                 }
@@ -92,12 +93,12 @@ public class GELFChunkManager extends Thread {
 
     public boolean isComplete(String messageId) {
         if (!chunks.containsKey(messageId)) {
-            LOG.debug("Message <" + messageId + "> not in chunk map. Not checking if complete.");
+            LOG.debug("Message <{}> not in chunk map. Not checking if complete.", messageId);
             return false;
         }
 
         if (!chunks.get(messageId).containsKey(0)) {
-            LOG.debug("Message <" + messageId + "> does not even contain first chunk. Not complete!");
+            LOG.debug("Message <{}> does not even contain first chunk. Not complete!", messageId);
             return false;
         }
 
@@ -112,7 +113,7 @@ public class GELFChunkManager extends Thread {
 
     public boolean isOutdated(String messageId) {
         if (!chunks.containsKey(messageId)) {
-            LOG.debug("Message <" + messageId + "> not in chunk map. Not checking if outdated.");
+            LOG.debug("Message <{}> not in chunk map. Not checking if outdated.", messageId);
             return false;
         }
 
@@ -132,7 +133,7 @@ public class GELFChunkManager extends Thread {
         if (chunks.containsKey(messageId)) {
             chunks.remove(messageId);
         } else {
-            LOG.debug("Message <" + messageId + "> not in chunk map. Not dropping.");
+            LOG.debug("Message <{}> not in chunk map. Not dropping.", messageId);
         }
     }
 
@@ -158,7 +159,7 @@ public class GELFChunkManager extends Thread {
     }
 
     public void insert(GELFMessageChunk chunk) {
-        LOG.debug("Handling GELF chunk: " + chunk);
+        LOG.debug("Handling GELF chunk: {}", chunk);
         
         if (chunks.containsKey(chunk.getId())) {
             // Add chunk to partial message.

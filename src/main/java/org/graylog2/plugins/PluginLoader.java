@@ -20,21 +20,22 @@
 package org.graylog2.plugins;
 
 import com.beust.jcommander.internal.Lists;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.io.File;
-import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLClassLoader;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import org.apache.log4j.Logger;
 
 /**
  * @author Lennart Koopmann <lennart@socketfeed.com>
  */
 public class PluginLoader<A> {
     
-    private static final Logger LOG = Logger.getLogger(PluginLoader.class);
+    private static final Logger LOG = LoggerFactory.getLogger(PluginLoader.class);
 
     private final String baseDirectory;
     private final String subDirectory;
@@ -72,7 +73,7 @@ public class PluginLoader<A> {
         File dir = new File(baseDirectory + "/" + type);
         
         if (!dir.isDirectory()) {
-            LOG.error("Plugin path <" + dir.getAbsolutePath() + "> does not exist or is not a directory.");
+            LOG.error("Plugin path <{}> does not exist or is not a directory.", dir.getAbsolutePath());
             return new ArrayList<File>();
         }
  
@@ -83,7 +84,7 @@ public class PluginLoader<A> {
         try {
             return jar.split("_gl2plugin.jar")[0];
         } catch(Exception e) {
-            LOG.error("Could not extract class name from jar <" + jar + ">.");
+            LOG.error("Could not extract class name from jar <{}>.", jar);
             throw new InvalidJarNameException("Invalid jar path: " + jar);
         }
     }

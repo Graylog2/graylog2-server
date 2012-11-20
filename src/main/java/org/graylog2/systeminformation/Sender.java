@@ -28,7 +28,8 @@ import org.apache.http.client.entity.UrlEncodedFormEntity;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.message.BasicNameValuePair;
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.elasticsearch.common.collect.Lists;
 import org.graylog2.Core;
 import org.json.simple.JSONValue;
@@ -38,7 +39,7 @@ import org.json.simple.JSONValue;
  */
 public class Sender {
     
-    private static final Logger LOG = Logger.getLogger(Sender.class);
+    private static final Logger LOG = LoggerFactory.getLogger(Sender.class);
     
     public final static String TARGET = "http://systemstats.graylog2.org/";
     public final static String LOCAL_TARGET = "http://localhost:9393/";

@@ -20,6 +20,12 @@
 
 package org.graylog2.periodical;
 
+import org.graylog2.Core;
+import org.graylog2.GraphiteFormatter;
+import org.graylog2.plugin.MessageCounter;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.net.InetSocketAddress;
@@ -28,17 +34,13 @@ import java.net.SocketAddress;
 import java.net.SocketException;
 import java.net.UnknownHostException;
 import java.util.List;
-import org.apache.log4j.Logger;
-import org.graylog2.GraphiteFormatter;
-import org.graylog2.Core;
-import org.graylog2.plugin.MessageCounter;
 
 /**
  * @author Lennart Koopmann <lennart@socketfeed.com>
  */
 public class GraphiteWriterThread implements Runnable {
 
-    private static final Logger LOG = Logger.getLogger(GraphiteWriterThread.class);
+    private static final Logger LOG = LoggerFactory.getLogger(GraphiteWriterThread.class);
 
     public static final String COUNTER_NAME = "graphitecounter";
 
@@ -75,7 +77,7 @@ public class GraphiteWriterThread implements Runnable {
             
             send(f.getAllMetrics());
 
-            LOG.debug("Sent message counts to Graphite at <" + carbonHost + ":" + carbonPort + ">.");
+            LOG.debug("Sent message counts to Graphite at <{}:{}>.", carbonHost, carbonPort);
         } catch (Exception e) {
             LOG.warn("Error in GraphiteWriterThread: " + e.getMessage(), e);
         } finally {

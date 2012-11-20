@@ -20,7 +20,8 @@
 
 package org.graylog2.initializers;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.graylog2.Configuration;
 import org.graylog2.Core;
 import org.graylog2.RulesEngineImpl;
@@ -30,7 +31,7 @@ import org.graylog2.RulesEngineImpl;
  */
 public class DroolsInitializer implements Initializer {
 
-    private static final Logger LOG = Logger.getLogger(DroolsInitializer.class);
+    private static final Logger LOG = LoggerFactory.getLogger(DroolsInitializer.class);
 
     private final Configuration configuration;
     private final Core graylogServer;
@@ -48,12 +49,12 @@ public class DroolsInitializer implements Initializer {
                 RulesEngineImpl drools = new RulesEngineImpl();
                 drools.addRules(rulesFilePath);
                 graylogServer.setRulesEngine(drools);
-                LOG.info("Using rules: " + rulesFilePath);
+                LOG.info("Using rules: {}", rulesFilePath);
             } else {
                 LOG.info("Not using rules");
             }
         } catch (Exception e) {
-            LOG.fatal("Could not load rules engine: " + e.getMessage(), e);
+            LOG.error("Could not load rules engine: " + e.getMessage(), e);
             System.exit(1);
         }
     }

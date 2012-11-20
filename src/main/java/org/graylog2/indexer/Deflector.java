@@ -21,14 +21,16 @@ package org.graylog2.indexer;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
+import org.elasticsearch.action.admin.indices.stats.IndexStats;
+import org.graylog2.Core;
+import org.graylog2.activities.Activity;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
-import org.apache.log4j.Logger;
-import org.elasticsearch.action.admin.indices.stats.IndexStats;
-import org.graylog2.Core;
-import org.graylog2.activities.Activity;
 
 /**
  *
@@ -42,7 +44,7 @@ import org.graylog2.activities.Activity;
  */
 public class Deflector {
     
-    private static final Logger LOG = Logger.getLogger(Deflector.class);
+    private static final Logger LOG = LoggerFactory.getLogger(Deflector.class);
     
     public static final String DEFLECTOR_NAME = "graylog2_deflector";
     
@@ -59,14 +61,14 @@ public class Deflector {
     public void setUp() {
         // Check if there already is an deflector index pointing somewhere.
         if (isUp()) {
-            LOG.info("Found deflector alias <" + DEFLECTOR_NAME + ">. Using it.");
+            LOG.info("Found deflector alias <{}>. Using it.", DEFLECTOR_NAME);
         } else {
             LOG.info("Did not find an deflector alias. Setting one up now.");
             
             // Do we have a target index to point to?
             try {
                 String currentTarget = getCurrentTargetName();
-                LOG.info("Pointing to already existing index target <" + currentTarget + ">");
+                LOG.info("Pointing to already existing index target <{}>", currentTarget);
                 
                 pointTo(currentTarget);
             } catch(NoTargetIndexException ex) {
@@ -95,13 +97,13 @@ public class Deflector {
         String oldTarget = buildIndexName(server.getConfiguration().getElasticSearchIndexPrefix(), oldTargetNumber);
         
         if (oldTargetNumber == -1) {
-            LOG.info("Cycling from <none> to <" + newTarget + ">");
+            LOG.info("Cycling from <none> to <{}>", newTarget);
         } else {
-            LOG.info("Cycling from <" + oldTarget + "> to <" + newTarget + ">");
+            LOG.info("Cycling from <{}> to <{}>", oldTarget, newTarget);
         }
         
         // Create new index.
-        LOG.info("Creating index target <" + newTarget + ">...");
+        LOG.info("Creating index target <{}>...", newTarget);
         server.getIndexer().createIndex(newTarget);
         LOG.info("Done!");
         
@@ -191,7 +193,7 @@ public class Deflector {
         try {
             return Integer.parseInt(parts[parts.length-1]);
         } catch(Exception e) {
-            LOG.debug("Could not extract index number from index <" + indexName + ">.");
+            LOG.debug("Could not extract index number from index <{}>.", indexName);
             throw new NumberFormatException();
         }
     }

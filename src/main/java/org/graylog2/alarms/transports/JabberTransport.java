@@ -19,10 +19,6 @@
  */
 package org.graylog2.alarms.transports;
 
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
-import org.apache.log4j.Logger;
 import org.graylog2.plugin.alarms.Alarm;
 import org.graylog2.plugin.alarms.AlarmReceiver;
 import org.graylog2.plugin.alarms.transports.Transport;
@@ -35,13 +31,19 @@ import org.jivesoftware.smack.MessageListener;
 import org.jivesoftware.smack.XMPPConnection;
 import org.jivesoftware.smack.XMPPException;
 import org.jivesoftware.smack.packet.Message;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * @author Lennart Koopmann <lennart@socketfeed.com>
  */
 public class JabberTransport implements Transport {
 
-    private static final Logger LOG = Logger.getLogger(JabberTransport.class);
+    private static final Logger LOG = LoggerFactory.getLogger(JabberTransport.class);
     
     public static final String NAME = "Jabber/XMPP";
     
@@ -83,7 +85,7 @@ public class JabberTransport implements Transport {
         
         for (AlarmReceiver receiver : alarm.getReceivers(this)) {
             try {
-                LOG.debug("Sending XMPP message to alarm receiver <" + receiver.getUserId() +">.");
+                LOG.debug("Sending XMPP message to alarm receiver <{}>.", receiver.getUserId());
                 sendMessage(alarm, receiver);
             } catch (XMPPException e) {
                 LOG.error("Could not send XMPP message to alarm receiver <" + receiver.getUserId() +">.", e);
@@ -92,7 +94,7 @@ public class JabberTransport implements Transport {
     }
     
     private void sendMessage(Alarm alarm, AlarmReceiver receiver) throws XMPPException {
-        LOG.debug("XMPP Receiver <" + receiver.getUserId() +">: [" + receiver.getAddress(this) + "]");
+        LOG.debug("XMPP Receiver <{}>: [{}]", receiver.getUserId(), receiver.getAddress(this));
         ChatManager chatmanager = connection.getChatManager();
         Chat chat = chatmanager.createChat(receiver.getAddress(this), new MessageListener() {
             @Override

@@ -23,7 +23,8 @@ package org.graylog2.filters;
 import com.yammer.metrics.Metrics;
 import com.yammer.metrics.core.Timer;
 import com.yammer.metrics.core.TimerContext;
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.graylog2.blacklists.Blacklist;
 import org.graylog2.blacklists.BlacklistRule;
 import org.graylog2.plugin.GraylogServer;
@@ -38,7 +39,7 @@ import java.util.regex.Pattern;
  */
 public class BlacklistFilter implements MessageFilter {
     
-    private static final Logger LOG = Logger.getLogger(BlacklistFilter.class);
+    private static final Logger LOG = LoggerFactory.getLogger(BlacklistFilter.class);
 
     private final Timer processTime = Metrics.newTimer(BlacklistFilter.class, "ProcessTime", TimeUnit.MICROSECONDS, TimeUnit.SECONDS);
     
@@ -48,7 +49,7 @@ public class BlacklistFilter implements MessageFilter {
         for (Blacklist blacklist : Blacklist.fetchAll()) {
             for (BlacklistRule rule : blacklist.getRules()) {
                 if (Pattern.compile(rule.getTerm(), Pattern.DOTALL).matcher(msg.getShortMessage()).matches()) {
-                    LOG.debug("Message <" + this.toString() + "> is blacklisted. First match on " + rule.getTerm());
+                    LOG.debug("Message <{}> is blacklisted. First match on {}", this, rule.getTerm());
 
                     // Done - This message is blacklisted.
                     return true;

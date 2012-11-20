@@ -20,19 +20,21 @@
 package org.graylog2.systeminformation;
 
 import com.google.common.collect.Maps;
-import java.util.Map;
-import org.apache.log4j.Logger;
 import org.graylog2.Core;
 import org.graylog2.blacklists.Blacklist;
 import org.graylog2.plugin.streams.Stream;
 import org.graylog2.streams.StreamImpl;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.util.Map;
 
 /**
  *  @author Lennart Koopmann <lennart@socketfeed.com>
  */
 public class AnonymousInformationCollector {
     
-    private static final Logger LOG = Logger.getLogger(AnonymousInformationCollector.class);
+    private static final Logger LOG = LoggerFactory.getLogger(AnonymousInformationCollector.class);
     
     Core server;
     
@@ -70,7 +72,7 @@ public class AnonymousInformationCollector {
 
             return plugins;
         } catch (Exception e) {
-            LOG.warn(e);
+            LOG.warn("Couldn't fetch data for loaded modules", e);
             return Maps.newHashMap();
         }
     }
@@ -88,7 +90,7 @@ public class AnonymousInformationCollector {
         try {
             return server.getIndexer().getRecentIndex().total().store().size().getMb();
         } catch (Exception e) {
-            LOG.warn(e);
+            LOG.warn("Couldn't retrieve recent index size", e);
             return -1;
         }
     }

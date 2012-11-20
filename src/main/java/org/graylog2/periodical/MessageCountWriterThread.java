@@ -20,7 +20,8 @@
 
 package org.graylog2.periodical;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.graylog2.Core;
 import org.graylog2.MessageCounterImpl;
 import org.graylog2.plugin.MessageCounter;
@@ -33,7 +34,7 @@ import org.graylog2.plugin.MessageCounter;
  */
 public class MessageCountWriterThread implements Runnable {
 
-    private static final Logger LOG = Logger.getLogger(MessageCountWriterThread.class);
+    private static final Logger LOG = LoggerFactory.getLogger(MessageCountWriterThread.class);
 
     public static final int INITIAL_DELAY = 60;
     public static final int PERIOD = 60;
