@@ -23,7 +23,8 @@ package org.graylog2.filters;
 import com.yammer.metrics.Metrics;
 import com.yammer.metrics.core.Timer;
 import com.yammer.metrics.core.TimerContext;
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.graylog2.plugin.GraylogServer;
 import org.graylog2.plugin.filters.MessageFilter;
 import org.graylog2.plugin.logmessage.LogMessage;
@@ -36,7 +37,7 @@ import org.graylog2.Core;
  */
 public class RewriteFilter implements MessageFilter {
 
-    private static final Logger LOG = Logger.getLogger(RewriteFilter.class);
+    private static final Logger LOG = LoggerFactory.getLogger(RewriteFilter.class);
     private final Timer processTime = Metrics.newTimer(RewriteFilter.class, "ProcessTime", TimeUnit.MICROSECONDS, TimeUnit.SECONDS);
 
     @Override

@@ -24,7 +24,8 @@ import com.yammer.metrics.Metrics;
 import com.yammer.metrics.core.Meter;
 import com.yammer.metrics.core.Timer;
 import com.yammer.metrics.core.TimerContext;
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.graylog2.Core;
 import org.graylog2.Tools;
 import org.graylog2.logmessage.LogMessageImpl;
@@ -41,7 +42,7 @@ import java.util.concurrent.TimeUnit;
  */
 public class SyslogProcessor {
 
-    private static final Logger LOG = Logger.getLogger(SyslogProcessor.class);
+    private static final Logger LOG = LoggerFactory.getLogger(SyslogProcessor.class);
     private Core server;
 
     private final Meter incomingMessages = Metrics.newMeter(SyslogProcessor.class, "IncomingMessages", "messages", TimeUnit.SECONDS);
@@ -79,7 +80,7 @@ public class SyslogProcessor {
         }
 
         // Add to process buffer.
-        LOG.debug("Adding received syslog message <" + lm.getId() +"> to process buffer: " + lm);
+        LOG.debug("Adding received syslog message <{}> to process buffer: {}", lm.getId(), lm);
         processedMessages.mark();
         server.getProcessBuffer().insert(lm);
     }
@@ -113,8 +114,7 @@ public class SyslogProcessor {
         Map<String, String> structuredData = StructuredSyslog.extractFields(msg.getRaw());
 
         if (structuredData.size() > 0) {
-            LOG.debug("Parsed <" + structuredData.size() + "> structured data pairs."
-                        + " Adding as additional_fields. Not using tokenizer.");
+            LOG.debug("Parsed <{}> structured data pairs. Adding as additional_fields. Not using tokenizer.", structuredData.size());
         }
 
         return structuredData;

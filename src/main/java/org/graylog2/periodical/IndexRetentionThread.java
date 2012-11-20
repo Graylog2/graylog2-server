@@ -20,7 +20,9 @@
 
 package org.graylog2.periodical;
 
-import org.apache.log4j.Logger;
+import org.graylog2.indexer.NoTargetIndexException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.graylog2.Core;
 
 /**
@@ -28,7 +30,7 @@ import org.graylog2.Core;
  */
 public class IndexRetentionThread implements Runnable {
 
-    private static final Logger LOG = Logger.getLogger(IndexRetentionThread.class);
+    private static final Logger LOG = LoggerFactory.getLogger(IndexRetentionThread.class);
 
     private final Core server;
     
@@ -43,8 +45,8 @@ public class IndexRetentionThread implements Runnable {
     public void run() {
         try {
             server.getIndexer().runIndexRetention();
-        } catch (Exception e) {
-            LOG.error(e);
+        } catch (NoTargetIndexException e) {
+            LOG.error("Couldn't run index retention", e);
         }
     }
 

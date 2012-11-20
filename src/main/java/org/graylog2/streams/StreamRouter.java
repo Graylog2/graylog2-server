@@ -20,7 +20,8 @@
 
 package org.graylog2.streams;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.graylog2.streams.matchers.StreamRuleMatcher;
 
 import java.util.List;
@@ -39,7 +40,7 @@ import org.graylog2.plugin.streams.StreamRule;
  */
 public class StreamRouter {
 
-    private static final Logger LOG = Logger.getLogger(StreamRouter.class);
+    private static final Logger LOG = LoggerFactory.getLogger(StreamRouter.class);
 
     public List<Stream> route(Core server, LogMessage msg) {
         List<Stream> matches = Lists.newArrayList();

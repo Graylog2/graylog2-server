@@ -19,7 +19,8 @@
  */
 package org.graylog2.periodical;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.graylog2.Core;
 import org.graylog2.indexer.DeflectorInformation;
 
@@ -28,7 +29,7 @@ import org.graylog2.indexer.DeflectorInformation;
  */
 public class DeflectorInformationWriterThread implements Runnable {
 
-    private static final Logger LOG = Logger.getLogger(DeflectorInformationWriterThread.class);
+    private static final Logger LOG = LoggerFactory.getLogger(DeflectorInformationWriterThread.class);
     
     public static final int INITIAL_DELAY = 0;
     public static final int PERIOD = 5;

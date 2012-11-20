@@ -19,9 +19,6 @@
  */
 package org.graylog2.periodical;
 
-import java.util.Map;
-import java.util.Set;
-import org.apache.log4j.Logger;
 import org.elasticsearch.common.collect.Maps;
 import org.graylog2.Core;
 import org.graylog2.SystemSettingAccessor;
@@ -34,13 +31,18 @@ import org.graylog2.plugin.alarms.callbacks.AlarmCallbackException;
 import org.graylog2.plugin.alarms.transports.Transport;
 import org.graylog2.plugin.streams.Stream;
 import org.graylog2.streams.StreamImpl;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.util.Map;
+import java.util.Set;
 
 /**
  * @author Lennart Koopmann <lennart@socketfeed.com>
  */
 public class AlarmScannerThread implements Runnable {
 
-    private static final Logger LOG = Logger.getLogger(AlarmScannerThread.class);
+    private static final Logger LOG = LoggerFactory.getLogger(AlarmScannerThread.class);
     
     public static final int INITIAL_DELAY = 10;
     public static final int PERIOD = 60;
@@ -69,7 +71,7 @@ public class AlarmScannerThread implements Runnable {
 
             // Skip if limit and timespan have been configured for this stream.
             if (!checker.fullyConfigured()) {
-                LOG.debug("Skipping alarm scan for stream <" + stream.getId() + "> - Timespan or limit not set.");
+                LOG.debug("Skipping alarm scan for stream <{}> - Timespan or limit not set.", stream.getId());
                 continue;
             }
 
@@ -77,13 +79,13 @@ public class AlarmScannerThread implements Runnable {
             if (checker.overLimit()) {
                 // Are we still in grace period?
                 if (stream.inAlarmGracePeriod()) {
-                    LOG.debug("Stream <" + stream.getId() + "> is over alarm limit but in grace period. Skipping.");
+                    LOG.debug("Stream <{}> is over alarm limit but in grace period. Skipping.", stream.getId());
                     continue;
                 }
                 
                 int messageCount = checker.getMessageCount();
                 
-                LOG.debug("Stream <" + stream.getId() + "> is over alarm limit. Sending alerts.");
+                LOG.debug("Stream <{}> is over alarm limit. Sending alerts.", stream.getId());
                 
                 // Update last alarm timestamp.
                 stream.setLastAlarm(Tools.getUTCTimestamp(), graylogServer);
@@ -101,7 +103,7 @@ public class AlarmScannerThread implements Runnable {
                 callCallbacks(alarm, stream);
                 
             } else {
-                LOG.debug("Stream <" + stream.getId() + "> is not over alarm limit.");
+                LOG.debug("Stream <{}> is not over alarm limit.", stream.getId());
             }
 
         }
@@ -111,12 +113,11 @@ public class AlarmScannerThread implements Runnable {
         for (Transport transport : graylogServer.getTransports()) {
             // Check if this transport has users that configured it at all.
             if (alarm.getReceivers(transport).isEmpty()) {
-                LOG.debug("Skipping transport [" + transport.getName() + "] because "
-                        + "it has no configured users.");
+                LOG.debug("Skipping transport [{}] because it has no configured users.", transport.getName());
                 continue;
             }
 
-            LOG.debug("Sending alarm for user <" + stream.getId() + "> via Transport [" + transport.getName() + "].");
+            LOG.debug("Sending alarm for user <{}> via Transport [{}].", stream.getId(), transport.getName());
             transport.transportAlarm(alarm);
         }
     }
@@ -131,7 +132,7 @@ System.out.println("stream: " + stream.getAlarmCallbacks());
 
             // Only call if callback is forced for all streams or enabled for this particular stream.
             if (ssa.getForcedAlarmCallbacks().contains(typeclass) || stream.getAlarmCallbacks().contains(typeclass)) {
-                LOG.debug("Calling alarm callback [" + typeclass + "].");
+                LOG.debug("Calling alarm callback [{}].", typeclass);
                 try {
                     callback.call(alarm);
                 } catch (AlarmCallbackException e) {

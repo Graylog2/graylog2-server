@@ -26,7 +26,8 @@ import com.mongodb.DBCursor;
 import com.mongodb.DBObject;
 import java.util.Set;
 import java.util.UUID;
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.bson.types.ObjectId;
 import org.graylog2.Core;
 
@@ -35,7 +36,7 @@ import org.graylog2.Core;
  */
 public class AMQPQueueConfiguration {
     
-    private static final Logger LOG = Logger.getLogger(AMQPQueueConfiguration.class);
+    private static final Logger LOG = LoggerFactory.getLogger(AMQPQueueConfiguration.class);
     
     public enum InputType { GELF, SYSLOG, UNKNOWN }
     

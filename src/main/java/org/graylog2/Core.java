@@ -23,7 +23,8 @@ package org.graylog2;
 import java.util.List;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.graylog2.blacklists.BlacklistCache;
 import org.graylog2.buffers.OutputBuffer;
 import org.graylog2.buffers.ProcessBuffer;
@@ -66,7 +67,7 @@ import org.graylog2.plugins.PluginLoader;
  */
 public class Core implements GraylogServer {
 
-    private static final Logger LOG = Logger.getLogger(Core.class);
+    private static final Logger LOG = LoggerFactory.getLogger(Core.class);
 
     private MongoConnection mongoConnection;
     private MongoBridge mongoBridge;
@@ -163,8 +164,7 @@ public class Core implements GraylogServer {
     
     public void registerInitializer(Initializer initializer) {
         if (initializer.masterOnly() && !this.isMaster()) {
-            LOG.info("Not registering initializer " + initializer.getClass().getSimpleName()
-                    + " because it is marked as master only.");
+            LOG.info("Not registering initializer {} because it is marked as master only.", initializer.getClass().getSimpleName());
             return;
         }
         
@@ -213,7 +213,7 @@ public class Core implements GraylogServer {
             if (indexer.createRecentIndex()) {
                 LOG.info("Successfully created recent index.");
             } else {
-                LOG.fatal("Could not create recent index. Terminating.");
+                LOG.error("Could not create recent index. Terminating.");
                 System.exit(1);
             }
         }
@@ -243,7 +243,7 @@ public class Core implements GraylogServer {
                 }
                 
                 transport.initialize(config);
-                LOG.debug("Initialized transport: " + transport.getName());
+                LOG.debug("Initialized transport: {}", transport.getName());
             } catch (TransportConfigurationException e) {
                 LOG.error("Could not initialize transport <" + transport.getName() + ">"
                         + " because of missing or invalid configuration.", e);
@@ -254,7 +254,7 @@ public class Core implements GraylogServer {
         for (AlarmCallback callback : this.alarmCallbacks) {
             try {
                 callback.initialize(PluginConfiguration.load(this, callback.getClass().getCanonicalName()));
-                LOG.debug("Initialized alarm callback: " + callback.getName());
+                LOG.debug("Initialized alarm callback: {}", callback.getName());
             } catch(AlarmCallbackConfigurationException e) {
                 LOG.error("Could not initialize alarm callback <" + callback.getName() + ">"
                         + " because of missing or invalid configuration.", e);
@@ -264,20 +264,20 @@ public class Core implements GraylogServer {
         // Initialize all registered initializers.
         for (Initializer initializer : this.initializers) {
             initializer.initialize();
-            LOG.debug("Initialized initializer: " + initializer.getClass().getSimpleName());
+            LOG.debug("Initialized initializer: {}", initializer.getClass().getSimpleName());
         }
 
         // Initialize all registered inputs.
         for (MessageInput input : this.inputs) {
             input.initialize(this.configuration, this);
-            LOG.debug("Initialized input: " + input.getName());
+            LOG.debug("Initialized input: {}", input.getName());
         }
         
         // Initialize all registered outputs.
         for (MessageOutput output : this.outputs) {
             try {
                 output.initialize(PluginConfiguration.load(this, output.getClass().getCanonicalName()));
-                LOG.debug("Initialized output: " + output.getName());
+                LOG.debug("Initialized output: {}", output.getName());
             } catch(MessageOutputConfigurationException e) {
                 LOG.error("Could not initialize output <" + output.getName() + ">"
                         + " because of missing or invalid configuration.", e);
@@ -296,7 +296,7 @@ public class Core implements GraylogServer {
     private <A> void loadPlugins(Class<A> type, String subDirectory) {
         PluginLoader<A> pl = new PluginLoader(configuration.getPluginDir(), subDirectory, type);
         for (A plugin : pl.getPlugins()) {
-            LOG.info("Registering <" + type.getSimpleName() + "> plugin [" + plugin.getClass().getCanonicalName() + "].");
+            LOG.info("Registering <{}> plugin [{}].", type.getSimpleName(), plugin.getClass().getCanonicalName());
             
             if (plugin instanceof MessageFilter) {
                 registerFilter((MessageFilter) plugin);
@@ -305,7 +305,7 @@ public class Core implements GraylogServer {
             } else if (plugin instanceof AlarmCallback) {
                 registerAlarmCallback((AlarmCallback) plugin);
             } else {
-                LOG.error("Could not load plugin [" + plugin.getClass().getCanonicalName() + "] - Not supported type.");
+                LOG.error("Could not load plugin [{}] - Not supported type.", plugin.getClass().getCanonicalName());
             }
         }
     }

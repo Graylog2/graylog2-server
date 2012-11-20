@@ -21,12 +21,17 @@
 package org.graylog2.blacklists;
 
 import com.google.common.collect.Lists;
-import com.mongodb.*;
+import com.mongodb.BasicDBList;
+import com.mongodb.BasicDBObject;
+import com.mongodb.DBCollection;
+import com.mongodb.DBCursor;
+import com.mongodb.DBObject;
 import org.bson.types.ObjectId;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.List;
-import org.apache.log4j.Logger;
 
 /**
  * Representing a blacklist stored in MongoDB.
@@ -35,7 +40,7 @@ import org.apache.log4j.Logger;
  */
 public class Blacklist {
 
-    private static final Logger LOG = Logger.getLogger(Blacklist.class);
+    private static final Logger LOG = LoggerFactory.getLogger(Blacklist.class);
 
     private ObjectId id = null;
     private String title = null;

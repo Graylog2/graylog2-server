@@ -26,7 +26,8 @@ import com.lmax.disruptor.EventHandler;
 import com.yammer.metrics.Metrics;
 import com.yammer.metrics.core.Histogram;
 import com.yammer.metrics.core.Meter;
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.graylog2.Core;
 import org.graylog2.buffers.LogMessageEvent;
 import org.graylog2.plugin.outputs.MessageOutput;
@@ -51,7 +52,7 @@ import org.graylog2.streams.StreamImpl;
  */
 public class OutputBufferProcessor implements EventHandler<LogMessageEvent> {
 
-    private static final Logger LOG = Logger.getLogger(OutputBufferProcessor.class);
+    private static final Logger LOG = LoggerFactory.getLogger(OutputBufferProcessor.class);
 
     private static final OutputRouter ROUTER = new OutputRouter();
     
@@ -82,9 +83,7 @@ public class OutputBufferProcessor implements EventHandler<LogMessageEvent> {
         incomingMessages.mark();
 
         LogMessage msg = event.getMessage();
-        if (LOG.isDebugEnabled()) {
-            LOG.debug("Processing message <" + msg.getId() + "> from OutputBuffer.");
-        }
+        LOG.debug("Processing message <{}> from OutputBuffer.", msg.getId());
 
         buffer.add(msg);
 
@@ -94,9 +93,7 @@ public class OutputBufferProcessor implements EventHandler<LogMessageEvent> {
                 // Always write to ElasticSearch, but only write to other outputs if enabled for one of its streams.
                 if (output instanceof ElasticSearchOutput || ROUTER.checkRouting(typeClass, msg)) {
                     try {
-                        if (LOG.isDebugEnabled()) {
-                            LOG.debug("Writing message batch to [" + output.getName() + "]. Size <" + buffer.size() + ">");
-                        }
+                        LOG.debug("Writing message batch to [{}]. Size <{}>", output.getName(), buffer.size());
 
                         batchSize.update(buffer.size());
                         output.write(buffer, buildStreamConfigs(buffer, typeClass), server);
@@ -109,9 +106,7 @@ public class OutputBufferProcessor implements EventHandler<LogMessageEvent> {
             buffer.clear();
         }
 
-        if (LOG.isDebugEnabled()) {
-            LOG.debug("Wrote message <" + msg.getId() + "> to all outputs. Finished handling.");
-        }
+        LOG.debug("Wrote message <{}> to all outputs. Finished handling.", msg.getId());
     }
 
     private OutputStreamConfiguration buildStreamConfigs(List<LogMessage> messages, String className) {

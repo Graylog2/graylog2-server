@@ -24,7 +24,8 @@ import com.google.common.base.CharMatcher;
 import com.yammer.metrics.Metrics;
 import com.yammer.metrics.core.Timer;
 import com.yammer.metrics.core.TimerContext;
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.graylog2.plugin.GraylogServer;
 import org.graylog2.plugin.filters.MessageFilter;
 import org.graylog2.plugin.logmessage.LogMessage;
@@ -38,7 +39,7 @@ import java.util.regex.Matcher;
  */
 public class TokenizerFilter implements MessageFilter {
 
-    private static final Logger LOG = Logger.getLogger(TokenizerFilter.class);
+    private static final Logger LOG = LoggerFactory.getLogger(TokenizerFilter.class);
     private static final Pattern p = Pattern.compile("[a-zA-Z0-9_-]*");
     private static final Pattern kvPattern = Pattern.compile("\\s?=\\s?");
     private static final Pattern spacePattern = Pattern.compile(" ");
@@ -97,7 +98,7 @@ public class TokenizerFilter implements MessageFilter {
             }
         }
 
-        LOG.debug("Extracted <" + extracted + "> additional fields from message <" + msg.getId() + "> k=v pairs.");
+        LOG.debug("Extracted <{}> additional fields from message <{}> k=v pairs.", extracted, msg.getId());
 
         tcx.stop();
         return false;
