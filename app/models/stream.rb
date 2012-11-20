@@ -3,7 +3,6 @@ class Stream
   include Mongoid::Timestamps
 
   embeds_many :streamrules
-  embeds_many :forwarders
 
   has_and_belongs_to_many :users, :inverse_of => :streams
   has_and_belongs_to_many :favorited_streams, :class_name => "User", :inverse_of => :favorite_streams
@@ -32,6 +31,7 @@ class Stream
   field :shortname, :type => String
   field :related_streams_matcher, :type => String
   field :alarm_callbacks, :type => Array, :default => []
+  field :outputs, :type => Array, :default => []
 
   def self.find_by_id(_id)
     _id = $1 if /^([0-9a-f]+)-/ =~ _id

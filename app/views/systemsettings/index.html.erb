@@ -34,7 +34,8 @@ All currently installed alarm callback plugins are listed here. You can enable/d
 </div>
 
 <% if @alarm_callbacks.blank? %>
-	<strong>No alarm callbacks installed</strong>
+	<strong>No alarm callback plugins installed</strong>
+	<br />
 <% else %>
 	<table>
 		<thead>
@@ -46,7 +47,7 @@ All currently installed alarm callback plugins are listed here. You can enable/d
 			</tr>
 		</thead>
 		<tbody>
-			<% @alarm_callbacks.each_with_index do |callback,i| %>
+			<% @alarm_callbacks.each_with_index do |callback, i| %>
 				<tr>
 					<td><%= callback.name %></td>
 					<td><%= callback.typeclass %></td>
@@ -55,7 +56,37 @@ All currently installed alarm callback plugins are listed here. You can enable/d
 							toggle_alarmcallback_force_systemsettings_path(:typeclass => callback.typeclass),
 							SystemSetting.alarm_callback_forced?(callback.typeclass)) %>
 					</td>
-					<td><%= link_to "Configure", "/plugin_configuration/configure/alarm_transport/#{callback.typeclass}" %></td>
+					<td><%= link_to "Configure", "/plugin_configuration/configure/alarm_callback/#{callback.typeclass}" %></td>
+				</tr>
+			<% end %>
+		</tbody>
+	</table>
+<% end %>
+
+<br />
+<h2>Message output plugins</h2>
+<div class="short-description">
+All currently installed message output plugins are listed here. You can configure them here and enable them for every stream individually.
+</div>
+
+<% if @message_outputs.blank? %>
+	<strong>No message output plugins installed</strong>
+	<br />
+<% else %>
+	<table>
+		<thead>
+			<tr>
+				<th>Name</th>
+				<th>Class</th>
+				<th>&nbsp;</th>
+			</tr>
+		</thead>
+		<tbody>
+			<% @message_outputs.each do |output| %>
+				<tr>
+					<td><%= output.name %></td>
+					<td><%= output.typeclass %></td>
+					<td><%= link_to "Configure", "/plugin_configuration/configure/message_output/#{output.typeclass}" %></td>
 				</tr>
 			<% end %>
 		</tbody>

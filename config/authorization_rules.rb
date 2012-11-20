@@ -27,7 +27,7 @@ authorization do
       :togglecallbackactive,
       :rules,
       :alarms,
-      :forward,
+      :outputs,
       :analytics,
       :settings,
       :rename,
@@ -37,12 +37,12 @@ authorization do
       :addcolumn,
       :removecolumn,
       :shortname,
-      :related
+      :related,
+      :add_output,
+      :delete_output
     ]
     has_permission_on :streamrules, :to => [:create, :destroy]
     has_permission_on :streamcategories, :to => [:create, :destroy]
-
-    has_permission_on :forwarders, :to => [:create, :destroy]
 
     has_permission_on :analytics, :to => [:index, :shell]
 

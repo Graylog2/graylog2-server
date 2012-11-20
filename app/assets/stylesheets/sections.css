@@ -371,6 +371,27 @@
   margin-bottom: 1px;
 }
 
+.stream-output-fields {
+  display: none;
+}
+
+.stream-output {
+  padding: 10px;
+  padding-top: 15px;
+  margin-bottom: 15px;
+  background-color: #333;
+  color: #fff;
+}
+
+.stream-output h3 {
+  font-size: 18px;
+  margin-top: 0px;
+  font-family: Georgia,"Times New Roman",Times,serif;
+}
+
+.stream-output-edit {
+  display: none;
+}
 
 /* Hosts */
 #hosts-quickjump {

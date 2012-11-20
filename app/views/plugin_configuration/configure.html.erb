@@ -1,15 +1,19 @@
 <h1>Configure plugin <span class="highlighted"><%= params[:typeclass] %></span></h1>
 
-<%= form_tag "/plugin_configuration/configure/#{params[:plugin_type]}/#{params[:typeclass]}" do %>
+<% if @requested_fields.blank? %>
+	<strong>Plugin did not request any configuration.</strong>
+<% else %>
+	<%= form_tag "/plugin_configuration/configure/#{params[:plugin_type]}/#{params[:typeclass]}" do %>
 
-	<dl class="plugin-configuration">
-		<% @requested_fields.each do |field, title| %>
-			<dt><%= label_tag "config[#{field}]", title %></dt>
-			<dd><%= text_field_tag "config[#{field}]", @config.configuration[field], :size => 50 %></dd>
-		<% end %>
-	</dl>
+		<dl class="plugin-configuration">
+			<% @requested_fields.each do |field, title| %>
+				<dt><%= label_tag "config[#{field}]", title %></dt>
+				<dd><%= text_field_tag "config[#{field}]", @config.configuration[field], :size => 50 %></dd>
+			<% end %>
+		</dl>
 
-	<br />
-	<%= awesome_submit_link "Save configuration" %>
+		<br />
+		<%= awesome_submit_link "Save configuration" %>
 
+	<% end %>
 <% end %>

@@ -19,28 +19,15 @@ module StreamsHelper
   def stream_tabs
     tabs = []
     if @stream
-      tabs.push ["Show", stream_path(@stream)] if permitted_to?(:show, @stream)
-      tabs.push ["Rules", rules_stream_path(@stream)] if permitted_to?(:rules, @stream)
-      tabs.push ["Forwarders", forward_stream_path(@stream)] if permitted_to?(:forward, @stream)
-      tabs.push ["Analytics", analytics_stream_path(@stream)] if permitted_to?(:analytics, @stream)
-      tabs.push ["Alarms", alarms_stream_path(@stream)] if permitted_to?(:alarms, @stream)
-      tabs.push ["Settings", settings_stream_path(@stream)] if permitted_to?(:settings, @stream)
+      tabs << ["Show", stream_path(@stream)] if permitted_to?(:show, @stream)
+      tabs << ["Rules", rules_stream_path(@stream)] if permitted_to?(:rules, @stream)
+      tabs << ["Analytics", analytics_stream_path(@stream)] if permitted_to?(:analytics, @stream)
+      tabs << ["Alarms", alarms_stream_path(@stream)] if permitted_to?(:alarms, @stream)
+      tabs << ["Outputs", outputs_stream_path(@stream)] if permitted_to?(:outputs, @stream)
+      tabs << ["Settings", settings_stream_path(@stream)] if permitted_to?(:settings, @stream)
     end
 
     tabs
   end
 
-  def forwarder_details(forwarder)
-    return String.new if forwarder.endpoint_type.blank?
-
-    case forwarder.endpoint_type.to_sym
-      when :syslog then
-        return "#{forwarder.host}:#{forwarder.port}"
-      when :gelf then
-        return "#{forwarder.host}:#{forwarder.port}"
-      when :loggly then
-        return forwarder.host
-      else return String.new
-    end
-  end
 end

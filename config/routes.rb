@@ -52,13 +52,13 @@ Graylog2WebInterface::Application.routes.draw do
   resources :streams do
     resources :messages
     resources :streamrules
-    resources :forwarders
 
     resources :dashboard
 
     member do
       get :analytics
       get :alarms
+      get :outputs
       post :favorite
       post :unfavorite
       post :alertable
@@ -67,8 +67,6 @@ Graylog2WebInterface::Application.routes.draw do
       get :showrange
       post :rules
       get :rules
-      post :forward
-      get :forward
       post :setalarmvalues
       post :togglealarmactive
       post :togglefavorited
@@ -83,6 +81,8 @@ Graylog2WebInterface::Application.routes.draw do
       delete :removecolumn
       post :shortname
       post :related
+      post :add_output
+      delete :delete_output
     end
   end
 

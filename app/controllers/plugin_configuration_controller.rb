@@ -3,7 +3,7 @@ class PluginConfigurationController < ApplicationController
   filter_access_to :all
 
   def configure
-    @config = PluginConfiguration.where(:typeclass => params[:typeclass]).first || PluginConfiguration.new
+    @config = PluginConfiguration.where(:typeclass => params[:typeclass]).first || PluginConfiguration.new(:configuration => {})
     @requested_fields = get_requested_fields(params[:plugin_type], params[:typeclass]) || Hash.new
   end
 
@@ -25,8 +25,10 @@ class PluginConfigurationController < ApplicationController
   private
   def get_requested_fields(plugin_type, typeclass)
   	case plugin_type
-  		when "alarm_transport"
+  		when "alarm_callback"
   			return AlarmCallback.where(:typeclass => typeclass).first.requested_config
+      when "message_output"
+        return MessageOutput.where(:typeclass => typeclass).first.requested_config
   	end
   rescue
   	{}

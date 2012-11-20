@@ -293,6 +293,17 @@ $(document).ready(function() {
       return false;
     });
 
+    // Stream output chooser.
+    $('#stream-outputs-chooser').bind('change', function() {
+      $(".stream-output-fields").hide();
+      $("#stream-output-fields-" + $(this).val().replace(/\./g, "_")).show();
+    });
+
+    // Stream output show edit form.
+    $('.stream-output-edit-link').bind('click', function() {
+      $("#stream-output-edit-" + $(this).attr("data-output-id")).show();
+    });
+
     // Key bindings.
     //standardMapKeyOptions = { overlayClose:true }
     //$.mapKey("s", function() { $("#modal-stream-chooser").modal(standardMapKeyOptions); });

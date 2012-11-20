@@ -5,6 +5,7 @@ class SystemsettingsController < ApplicationController
     @has_settings_tabs = true
     @allow_usage_stats = SystemSetting.allow_usage_stats?
     @alarm_callbacks = AlarmCallback.all
+    @message_outputs = MessageOutput.all_non_standard
   end
 
   def allow_usage_stats
