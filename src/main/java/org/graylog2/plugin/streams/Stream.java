@@ -23,6 +23,7 @@
 package org.graylog2.plugin.streams;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import org.bson.types.ObjectId;
 import org.graylog2.plugin.GraylogServer;

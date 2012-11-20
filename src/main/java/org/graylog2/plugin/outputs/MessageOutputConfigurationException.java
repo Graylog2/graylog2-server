@@ -19,23 +19,20 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
 */
-
 package org.graylog2.plugin.outputs;
 
-import java.util.List;
-import java.util.Map;
-import org.graylog2.plugin.GraylogServer;
-import org.graylog2.plugin.logmessage.LogMessage;
-
 /**
+ *
  * @author Lennart Koopmann <lennart@socketfeed.com>
  */
-public interface MessageOutput {
-
-    public void initialize(Map<String, String> config) throws MessageOutputConfigurationException;
-    public void write(List<LogMessage> messages, OutputStreamConfiguration streamConfiguration, GraylogServer server) throws Exception;
-    public Map<String, String> getRequestedConfiguration();
-    public Map<String, String> getRequestedStreamConfiguration();
-    public String getName();
+public class MessageOutputConfigurationException extends Exception {
+    
+    public MessageOutputConfigurationException() {
+        super();
+    }
+    
+    public MessageOutputConfigurationException(String msg) {
+        super(msg);
+    }
     
 }
