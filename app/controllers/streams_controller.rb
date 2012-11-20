@@ -320,6 +320,12 @@ class StreamsController < ApplicationController
   def add_output
     key = params[:typeclass].gsub(".", "_")
     entry = params[:config][key]
+
+    if entry["description"].blank?
+      flash[:error] = "Description is missing!"
+      redirect_to outputs_stream_path(@stream) and return
+    end
+
     entry[:id] = BSON::ObjectId.new
     entry[:typeclass] = params[:typeclass]
     @stream.outputs << entry
@@ -340,6 +346,29 @@ class StreamsController < ApplicationController
       flash[:notice] = "Output has been deleted."
     else
       flash[:error] = "Could not delete output!"
+    end
+
+    redirect_to outputs_stream_path(@stream)
+  end
+
+  def edit_output
+    if params["config"]["description"].blank?
+      flash[:error] = "Description is missing!"
+      redirect_to outputs_stream_path(@stream) and return
+    end
+
+    output = @stream.outputs.select { |o| o["id"] == BSON::ObjectId.from_string(params["output_id"]) }
+    output = params["config"]
+    output["id"] = BSON::ObjectId.from_string(params["output_id"])
+    output["typeclass"] = params["typeclass"]
+
+    @stream.outputs.delete_if { |o| o["id"] == BSON::ObjectId.from_string(params["output_id"]) }
+    @stream.outputs << output
+
+    if @stream.save
+      flash[:notice] = "Output has been updated."
+    else
+      flash[:error] = "Could not update output!"
     end
 
     redirect_to outputs_stream_path(@stream)

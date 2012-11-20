@@ -389,7 +389,13 @@
   font-family: Georgia,"Times New Roman",Times,serif;
 }
 
+.stream-output label {
+  font-weight: normal;
+  font-size: 11px;
+}
+
 .stream-output-edit {
+  margin-top: 8px;
   display: none;
 }
 

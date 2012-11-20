@@ -7,7 +7,7 @@ ElasticSearch output is always enabled.</div>
 	<br /><br />
 <% else %>
 
-	<% @stream.outputs.each do |output| %>
+	<% @stream.outputs.sort_by{ |o| o["description"]}.each do |output| %>
 		<div class="stream-output">
 			<h3><%= output["description"] %></h3>
 			<strong>Type:</strong> <%= output["typeclass"] %>
@@ -17,7 +17,23 @@ ElasticSearch output is always enabled.</div>
 			<%= link_to "Edit", "#", :class => "stream-output-edit-link", "data-output-id" => output["id"] %>
 
 			<div class="stream-output-edit" id="stream-output-edit-<%= output['id'] %>">
-				<%= form_tag(add_output_stream_path(@stream)) do %>
+				<%= form_tag(edit_output_stream_path(@stream), :method => :put) do %>
+					<%= hidden_field_tag :output_id, output["id"] %>
+					<%= hidden_field_tag :typeclass, output["typeclass"] %>
+
+					<%= label_tag "config[description]", "Description" %><br />
+					<%= text_field_tag "config[description]", output["description"], :size => 40 %>
+					<br />
+
+					<% output.delete_if { |k,v| Stream::RESERVED_OUTPUT_FIELDS.include?(k) }.each_pair do |k,v|  %>
+						<%= label_tag "config[#{k}]", k %>
+						<br />
+						<%= text_field_tag "config[#{k}]", v, :size => 40 %>
+						<br />
+					<% end %>
+
+					<br />
+					<%= awesome_submit_link "Save changes" %>
 				<% end %>
 			</div>
 		</div>
@@ -41,10 +57,10 @@ ElasticSearch output is always enabled.</div>
 				<% end %>
 			>
 				<dt><%= label_tag "config[#{output.typeclass}][description]", "Description" %></dt>
-				<dd><%= text_field_tag "config[#{output.typeclass}][description]" %></dd>
+				<dd><%= text_field_tag "config[#{output.typeclass}][description]", nil, :size => 40 %></dd>
 				<% output.requested_stream_config.each do |c, title| %>
 					<dt><%= label_tag "config[#{output.typeclass}][#{c}]", title %></dt>
-					<dd><%= text_field_tag "config[#{output.typeclass}][#{c}]" %></dd>
+					<dd><%= text_field_tag "config[#{output.typeclass}][#{c}]", nil, :size => 40 %></dd>
 				<% end %>
 			</dl>
 		<% end %>

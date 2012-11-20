@@ -301,7 +301,8 @@ $(document).ready(function() {
 
     // Stream output show edit form.
     $('.stream-output-edit-link').bind('click', function() {
-      $("#stream-output-edit-" + $(this).attr("data-output-id")).show();
+      $("#stream-output-edit-" + $(this).attr("data-output-id")).toggle();
+      return false;
     });
 
     // Key bindings.

@@ -39,7 +39,8 @@ authorization do
       :shortname,
       :related,
       :add_output,
-      :delete_output
+      :delete_output,
+      :edit_output
     ]
     has_permission_on :streamrules, :to => [:create, :destroy]
     has_permission_on :streamcategories, :to => [:create, :destroy]

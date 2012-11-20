@@ -83,6 +83,7 @@ Graylog2WebInterface::Application.routes.draw do
       post :related
       post :add_output
       delete :delete_output
+      put :edit_output
     end
   end
 
