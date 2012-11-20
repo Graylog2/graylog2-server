@@ -22,29 +22,28 @@ package org.graylog2.streams;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
-import org.graylog2.plugin.streams.Stream;
-import java.util.List;
-
-import org.apache.log4j.Logger;
-import org.bson.types.ObjectId;
-
 import com.mongodb.BasicDBList;
 import com.mongodb.BasicDBObject;
 import com.mongodb.DBCollection;
 import com.mongodb.DBCursor;
 import com.mongodb.DBObject;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
+import org.bson.types.ObjectId;
 import org.elasticsearch.common.collect.Maps;
 import org.graylog2.Core;
 import org.graylog2.Tools;
 import org.graylog2.alarms.AlarmReceiverImpl;
 import org.graylog2.plugin.GraylogServer;
 import org.graylog2.plugin.alarms.AlarmReceiver;
-import org.graylog2.plugin.alarms.callbacks.AlarmCallback;
+import org.graylog2.plugin.streams.Stream;
 import org.graylog2.plugin.streams.StreamRule;
 import org.graylog2.users.User;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * Representing a single stream from the streams collection. Also provides method
@@ -54,7 +53,7 @@ import org.graylog2.users.User;
  */
 public class StreamImpl implements Stream {
 
-    private static final Logger LOG = Logger.getLogger(StreamImpl.class);
+    private static final Logger LOG = LoggerFactory.getLogger(StreamImpl.class);
 
     private final ObjectId id;
     private final String title;
@@ -271,8 +270,8 @@ public class StreamImpl implements Stream {
     public boolean inAlarmGracePeriod() {
         int now = Tools.getUTCTimestamp();
         int graceLine = lastAlarm+(alarmPeriod*60);
-        LOG.debug("Last alarm of stream <" + getId() + "> was at [" + lastAlarm + "]. "
-                + "Grace period ends at [" + graceLine + "]. It now is [" + now + "].");
+        LOG.debug("Last alarm of stream <{}> was at [{}]. Grace period ends at [{}]. It now is [{}].",
+                new Object[] { getId(), lastAlarm, graceLine, now });
         return now <= graceLine;
     }
     

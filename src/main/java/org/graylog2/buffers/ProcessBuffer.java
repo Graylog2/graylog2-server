@@ -20,25 +20,27 @@
 
 package org.graylog2.buffers;
 
+import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import com.lmax.disruptor.MultiThreadedClaimStrategy;
 import com.lmax.disruptor.RingBuffer;
 import com.lmax.disruptor.SleepingWaitStrategy;
 import com.lmax.disruptor.dsl.Disruptor;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import com.google.common.util.concurrent.ThreadFactoryBuilder;
-import org.apache.log4j.Logger;
 import org.graylog2.Core;
 import org.graylog2.buffers.processors.ProcessBufferProcessor;
 import org.graylog2.plugin.buffers.Buffer;
 import org.graylog2.plugin.logmessage.LogMessage;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 /**
  * @author Lennart Koopmann <lennart@socketfeed.com>
  */
 public class ProcessBuffer implements Buffer {
 
-    private static final Logger LOG = Logger.getLogger(ProcessBuffer.class);
+    private static final Logger LOG = LoggerFactory.getLogger(ProcessBuffer.class);
     
     protected static RingBuffer<LogMessageEvent> ringBuffer;
 
@@ -83,7 +85,7 @@ public class ProcessBuffer implements Buffer {
 
             server.processBufferWatermark().incrementAndGet();
         } else {
-            LOG.fatal("ProcessBuffer is out of capacity. Raise the ring_size configuration parameter. DROPPING MESSAGE!");
+            LOG.error("ProcessBuffer is out of capacity. Raise the ring_size configuration parameter. DROPPING MESSAGE!");
         }
     }
 

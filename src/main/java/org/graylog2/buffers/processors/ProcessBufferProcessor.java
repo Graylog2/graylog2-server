@@ -25,7 +25,8 @@ import com.yammer.metrics.Metrics;
 import com.yammer.metrics.core.Meter;
 import com.yammer.metrics.core.Timer;
 import com.yammer.metrics.core.TimerContext;
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.graylog2.Core;
 import org.graylog2.buffers.LogMessageEvent;
 import org.graylog2.plugin.filters.MessageFilter;
@@ -38,7 +39,7 @@ import java.util.concurrent.TimeUnit;
  */
 public class ProcessBufferProcessor implements EventHandler<LogMessageEvent> {
 
-    private static final Logger LOG = Logger.getLogger(ProcessBufferProcessor.class);
+    private static final Logger LOG = LoggerFactory.getLogger(ProcessBufferProcessor.class);
 
     private Core server;
     private final Meter incomingMessages = Metrics.newMeter(ProcessBufferProcessor.class, "IncomingMessages", "messages", TimeUnit.SECONDS);
@@ -71,21 +72,14 @@ public class ProcessBufferProcessor implements EventHandler<LogMessageEvent> {
 
         LogMessage msg = event.getMessage();
 
-        if (LOG.isDebugEnabled()) {
-            LOG.debug("Starting to process message <" + msg.getId() + ">.");
-        }
+        LOG.debug("Starting to process message <{}>.", msg.getId());
 
         for (MessageFilter filter : server.getFilters()) {
             try {
-                
-                if (LOG.isDebugEnabled()) {
-                    LOG.debug("Applying filter [" + filter.getName() +"] on message <" + msg.getId() + ">.");
-                }
+                LOG.debug("Applying filter [{}] on message <{}>.", filter.getName(), msg.getId());
 
                 if (filter.filter(msg, server)) {
-                    if (LOG.isDebugEnabled()) {
-                        LOG.debug("Filter [" + filter.getName() + "] marked message <" + msg.getId() + "> to be discarded. Dropping message.");
-                    }
+                    LOG.debug("Filter [{}] marked message <{}> to be discarded. Dropping message.", filter.getName(), msg.getId());
                     filteredOutMessages.mark();
                     return;
                 }

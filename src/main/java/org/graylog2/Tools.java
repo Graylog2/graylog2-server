@@ -20,7 +20,8 @@
 
 package org.graylog2;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -46,7 +47,7 @@ import org.joda.time.DateTime;
  */
 public final class Tools {
 
-    private static final Logger LOG = Logger.getLogger(Tools.class);
+    private static final Logger LOG = LoggerFactory.getLogger(Tools.class);
 
     private Tools() { }
 

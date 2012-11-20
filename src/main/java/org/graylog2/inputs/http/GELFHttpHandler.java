@@ -21,7 +21,8 @@ package org.graylog2.inputs.http;
 
 import com.yammer.metrics.Metrics;
 import com.yammer.metrics.core.Meter;
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.graylog2.Core;
 import org.graylog2.gelf.GELFMessage;
 import org.graylog2.gelf.GELFProcessor;
@@ -35,7 +36,7 @@ import static org.jboss.netty.handler.codec.http.HttpHeaders.isKeepAlive;
 
 public class GELFHttpHandler extends SimpleChannelHandler {
 
-    private static final Logger LOG = Logger.getLogger(GELFHttpHandler.class);
+    private static final Logger LOG = LoggerFactory.getLogger(GELFHttpHandler.class);
 
     private final Core server;
     private final Meter receivedMessages = Metrics.newMeter(GELFHttpHandler.class, "ReceivedMessages", "messages", TimeUnit.SECONDS);

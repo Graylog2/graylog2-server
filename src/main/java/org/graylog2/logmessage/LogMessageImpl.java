@@ -23,23 +23,23 @@ package org.graylog2.logmessage;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
-import java.util.ArrayList;
 import org.elasticsearch.common.UUID;
 import org.graylog2.Tools;
 import org.graylog2.indexer.EmbeddedElasticSearchClient;
 import org.graylog2.plugin.logmessage.LogMessage;
 import org.graylog2.plugin.streams.Stream;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.List;
 import java.util.Map;
-import org.apache.log4j.Logger;
 
 /**
  * @author Lennart Koopmann <lennart@socketfeed.com>
  */
 public class LogMessageImpl implements LogMessage {
 
-    private static final Logger LOG = Logger.getLogger(LogMessageImpl.class);
+    private static final Logger LOG = LoggerFactory.getLogger(LogMessageImpl.class);
     
     public static final int STANDARD_LEVEL = 1;
     public static final String STANDARD_FACILITY = "unknown";
@@ -228,7 +228,7 @@ public class LogMessageImpl implements LogMessage {
         
         // Don't accept protected keys.
         if (PROTECTED_KEYS.contains(pKey)) {
-            LOG.debug("Not accepting protected key <" + pKey + ">");
+            LOG.debug("Not accepting protected key <{}>", pKey);
             return;
         }
         

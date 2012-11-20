@@ -22,7 +22,8 @@ package org.graylog2.inputs.syslog;
 
 import com.yammer.metrics.Metrics;
 import com.yammer.metrics.core.Meter;
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.graylog2.Core;
 import org.jboss.netty.buffer.ChannelBuffer;
 import org.jboss.netty.channel.ChannelHandlerContext;
@@ -38,7 +39,7 @@ import java.util.concurrent.TimeUnit;
  */
 public class SyslogDispatcher extends SimpleChannelHandler {
 
-    private static final Logger LOG = Logger.getLogger(SyslogDispatcher.class);
+    private static final Logger LOG = LoggerFactory.getLogger(SyslogDispatcher.class);
 
     private SyslogProcessor processor;
     private final Meter receivedMessages = Metrics.newMeter(SyslogDispatcher.class, "ReceivedMessages", "messages", TimeUnit.SECONDS);

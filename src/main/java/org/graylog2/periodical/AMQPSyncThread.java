@@ -22,7 +22,8 @@ package org.graylog2.periodical;
 import com.google.common.collect.Sets;
 import java.util.Map;
 import java.util.Set;
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.graylog2.Core;
 import org.graylog2.activities.Activity;
 import org.graylog2.inputs.amqp.AMQPConsumer;
@@ -37,7 +38,7 @@ import org.graylog2.inputs.amqp.AMQPQueueConfiguration;
  */
 public class AMQPSyncThread implements Runnable {
     
-    private static final Logger LOG = Logger.getLogger(AMQPSyncThread.class);
+    private static final Logger LOG = LoggerFactory.getLogger(AMQPSyncThread.class);
     
     public static final int INITIAL_DELAY = 5;
     public static final int PERIOD = 5;
