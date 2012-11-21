@@ -55,6 +55,10 @@ $(document).ready(function() {
                 notify("Remember to possibly escape characters in the regular expression." +
                        "A typical mistake is forgetting to escape the dot in filenames.");
                 break;
+            case '12':
+                field = $('.stream-value-facility-regex');
+                notify("Remember to possibly escape characters in the regular expression.");
+                break;
         }
         field.removeAttr("disabled");
         field.show();

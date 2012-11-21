@@ -20,10 +20,11 @@ class Streamrule
   TYPE_HOST_REGEX = 9
   TYPE_FULL_MESSAGE = 10
   TYPE_FILENAME_LINE = 11
+  TYPE_FACILITY_REGEX = 12
 
   # All rules with these types will be checked for valid regex syntax.
   def regex_rules
-    [ TYPE_MESSAGE, TYPE_FULL_MESSAGE, TYPE_HOST_REGEX, TYPE_FILENAME_LINE ]
+    [ TYPE_MESSAGE, TYPE_FULL_MESSAGE, TYPE_HOST_REGEX, TYPE_FILENAME_LINE, TYPE_FACILITY_REGEX ]
   end
 
   def self.rule_names
@@ -35,8 +36,9 @@ class Streamrule
       self::TYPE_SEVERITY => "Severity",
       self::TYPE_SEVERITY_OR_HIGHER => "Severity (or higher)",
       self::TYPE_FACILITY => "Facility",
+      self::TYPE_FACILITY_REGEX => "Facility (regex)",
       self::TYPE_FILENAME_LINE => "Filename and line (regex)",
-      self::TYPE_ADDITIONAL => "Additional field"
+      self::TYPE_ADDITIONAL => "Additional field",
     }
   end
 

@@ -44,7 +44,8 @@ module StreamsHelper
     r[Streamrule::TYPE_SEVERITY_OR_HIGHER] = select_tag("streamrule[value]", options_for_select(get_ordered_severities_for_select, value), :disabled => disabled, :style => style, :class => "#{class_prefix}-field #{class_prefix}-severity-or-higher")
     r[Streamrule::TYPE_HOST] = select_tag("streamrule[value]", options_for_select(Host.all.collect {|host| [ h(host.host) ]}.sort, value), :disabled => disabled, :style => style, :class => "#{class_prefix}-field #{class_prefix}-host" ) 
     r[Streamrule::TYPE_ADDITIONAL] = text_field_tag("streamrule[value]", value, :class => "#{class_prefix}-field #{class_prefix}-additional-field", :disabled => disabled, :style => style)
-  
+    r[Streamrule::TYPE_FACILITY_REGEX] = text_field_tag("streamrule[value]", value, :class => "#{class_prefix}-field #{class_prefix}-facility-regex", :disabled => disabled, :style => style)
+
     return r
   end
 

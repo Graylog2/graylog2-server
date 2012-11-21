@@ -2,7 +2,7 @@
 <div class="description">
   Streams can be used to store specific views on your messages. Define filter rules for each stream and quickly select
   them later. Example: Create a stream "All database messages of host www15" that only shows messages from host "www15" which
-  include the string "MySQL".
+  include the string "MySQL". The rules are AND connected.
 </div>
 
 <% if @stream.streamrules.blank? %>
