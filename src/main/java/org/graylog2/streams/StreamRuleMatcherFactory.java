@@ -59,6 +59,9 @@ public class StreamRuleMatcherFactory {
             case StreamRuleImpl.TYPE_FILENAME_LINE:
                 matcher = new FileNameAndLineMatcher();
                 break;
+            case StreamRuleImpl.TYPE_FACILITY_REGEX:
+                matcher = new FacilityRegexMatcher();
+                break;
             default:
                 throw new InvalidStreamRuleTypeException();
         }

@@ -42,6 +42,7 @@ public class StreamRuleImpl implements StreamRule {
     public static final int TYPE_HOST_REGEX = 9;
     public static final int TYPE_FULL_MESSAGE = 10;
     public static final int TYPE_FILENAME_LINE = 11;
+    public static final int TYPE_FACILITY_REGEX = 12;
 
     private ObjectId objectId = null;
     private int ruleType = 0;
