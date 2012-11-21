@@ -1,10 +1,13 @@
 <h1>Alarm settings of stream <span class="highlighted"><%= @stream.title_possibly_disabled %></span></h1>
 
 <div class="short-description">An alarm is triggered when the number of messages in the defined timespan
-is higher than the maximum. All users who enabled receiving of alerts will be notified
+is higher than the maximum. All users who enabled receiving of alarms will be notified
 of the alarm. You can also define that all users are alarmed, no matter what they defined. <%= tooltip("Notifications") %></div>
 
 <%=raw ajaxtrigger(:active, "Active", togglealarmactive_stream_path(@stream), @stream.alarm_active) %>
+<br />
+
+<%=raw ajaxtrigger(:alarm, "I want to receive alarms of this stream", toggle_alertedstream_path(@stream), @stream.alerted?(current_user) ) %> <%= tooltip("Notifications") %>
 <br />
 
 <%=raw ajaxtrigger(:allusers, "Force for all users", togglealarmforce_stream_path(@stream), @stream.alarm_force) %>
