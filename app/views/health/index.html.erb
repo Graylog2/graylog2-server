@@ -51,7 +51,7 @@
 
 <br />
 <h2>Indices &amp; Shards</h2>
-<% if DeflectorInformation.up_to_date? %>
+<% if !@index_information.blank? and DeflectorInformation.up_to_date? %>
   <strong>Current deflector target:</strong>
   <span class="highlighted"><%= @index_information.deflector_target %></span>
   <br />
