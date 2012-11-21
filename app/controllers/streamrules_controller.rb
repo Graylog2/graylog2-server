@@ -16,6 +16,17 @@ class StreamrulesController < ApplicationController
     redirect_to rules_stream_path(@stream)
   end
 
+  def update
+    rule = @stream.streamrules.find(:first, :conditions => {:_id => BSON::ObjectId(params[:id])})
+    rule.value = params[:streamrule][:value]
+    if rule.save
+      flash[:notice] = "Rule has been updated."
+    else
+      flash[:error] = "Could not update rule."
+    end
+    redirect_to rules_stream_path(@stream)
+  end
+
   def destroy
     rule = @stream.streamrules.find(:first, :conditions => {:_id => BSON::ObjectId(params[:id])})
     if rule.destroy

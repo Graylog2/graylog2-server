@@ -8,7 +8,7 @@ ElasticSearch output is always enabled.</div>
 <% else %>
 
 	<% @stream.outputs.sort_by{ |o| o["description"]}.each do |output| %>
-		<div class="stream-output">
+		<div class="lines-line">
 			<h3><%= output["description"] %></h3>
 			<strong>Type:</strong> <%= output["typeclass"] %>
 			<br />

@@ -1,4 +1,5 @@
 module StreamsHelper
+
   def streamrule_type_to_human(type)
     name = Streamrule.rule_names[type]
     name.blank? ? "Invalid rule" : name
@@ -13,7 +14,7 @@ module StreamsHelper
         value = "#{syslog_level_to_human(rule.value)} (#{rule.value.to_i})"
     end
 
-    return "<span class=\"black\">#{type}</span>: <i>#{value}</i>"
+    return "#{type}: <i>#{value}</i>"
   end
 
   def stream_tabs
@@ -28,6 +29,32 @@ module StreamsHelper
     end
 
     tabs
+  end
+
+  def streamrule_input_fields(value = nil, style = "display: none;", disabled = true, class_prefix = "stream-value")
+    r = {}
+
+    r[Streamrule::TYPE_MESSAGE] = text_field_tag("streamrule[value]", value, :class => "#{class_prefix}-field #{class_prefix}-message")
+    r[Streamrule::TYPE_FACILITY] = text_field_tag("streamrule[value]", value, :class => "#{class_prefix}-field #{class_prefix}-facility", :style => style, :disabled => disabled)
+    r[Streamrule::TYPE_HOST_REGEX] = text_field_tag("streamrule[value]", value, :class => "#{class_prefix}-field #{class_prefix}-host-regex", :style => style, :disabled => disabled)
+    r[Streamrule::TYPE_FILENAME_LINE] = text_field_tag("streamrule[value]", value, :class => "#{class_prefix}-field #{class_prefix}-filename", :style => style, :disabled => disabled)
+    r[Streamrule::TYPE_FULL_MESSAGE] = text_field_tag("streamrule[value]", value, :class => "#{class_prefix}-field #{class_prefix}-fullmessage", :style => style, :disabled => disabled)
+
+    r[Streamrule::TYPE_SEVERITY] = select_tag("streamrule[value]", options_for_select(get_ordered_severities_for_select, value), :disabled => disabled, :style => style, :class => "#{class_prefix}-field #{class_prefix}-severity") 
+    r[Streamrule::TYPE_SEVERITY_OR_HIGHER] = select_tag("streamrule[value]", options_for_select(get_ordered_severities_for_select, value), :disabled => disabled, :style => style, :class => "#{class_prefix}-field #{class_prefix}-severity-or-higher")
+    r[Streamrule::TYPE_HOST] = select_tag("streamrule[value]", options_for_select(Host.all.collect {|host| [ h(host.host) ]}.sort, value), :disabled => disabled, :style => style, :class => "#{class_prefix}-field #{class_prefix}-host" ) 
+    r[Streamrule::TYPE_ADDITIONAL] = text_field_tag("streamrule[value]", value, :class => "#{class_prefix}-field #{class_prefix}-additional-field", :disabled => disabled, :style => style)
+  
+    return r
+  end
+
+  def streamrule_input_fields_for_add_form
+    r = ""
+    streamrule_input_fields.each do |k,v|
+      r += v
+    end
+
+    return r.html_safe
   end
 
 end

@@ -305,6 +305,12 @@ $(document).ready(function() {
       return false;
     });
 
+    // Stream rule show edit form.
+    $('.stream-rule-edit-link').bind('click', function() {
+      $("#stream-rule-edit-" + $(this).attr("data-rule-id")).toggle();
+      return false;
+    });
+
     // Key bindings.
     //standardMapKeyOptions = { overlayClose:true }
     //$.mapKey("s", function() { $("#modal-stream-chooser").modal(standardMapKeyOptions); });

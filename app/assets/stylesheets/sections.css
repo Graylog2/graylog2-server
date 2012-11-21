@@ -375,26 +375,12 @@
   display: none;
 }
 
-.stream-output {
-  padding: 10px;
-  padding-top: 15px;
-  margin-bottom: 15px;
-  background-color: #333;
-  color: #fff;
-}
-
-.stream-output h3 {
-  font-size: 18px;
-  margin-top: 0px;
-  font-family: Georgia,"Times New Roman",Times,serif;
-}
-
-.stream-output label {
-  font-weight: normal;
-  font-size: 11px;
-}
-
 .stream-output-edit {
+  margin-top: 8px;
+  display: none;
+}
+
+.stream-rule-edit {
   margin-top: 8px;
   display: none;
 }
@@ -875,4 +861,24 @@
 
 .plugin-configuration label, input {
   font-family: Georgia,"Times New Roman",Times,serif;
+}
+
+/* Lines */
+.lines-line {
+  padding: 10px;
+  padding-top: 15px;
+  margin-bottom: 15px;
+  background-color: #333;
+  color: #fff;
+}
+
+.lines-line h3 {
+  font-size: 18px;
+  margin-top: 0px;
+  font-family: Georgia,"Times New Roman",Times,serif;
+}
+
+.lines-line label {
+  font-weight: normal;
+  font-size: 11px;
 }

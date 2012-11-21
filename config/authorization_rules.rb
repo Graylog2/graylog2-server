@@ -42,7 +42,7 @@ authorization do
       :delete_output,
       :edit_output
     ]
-    has_permission_on :streamrules, :to => [:create, :destroy]
+    has_permission_on :streamrules, :to => [:create, :destroy, :update]
     has_permission_on :streamcategories, :to => [:create, :destroy]
 
     has_permission_on :analytics, :to => [:index, :shell]

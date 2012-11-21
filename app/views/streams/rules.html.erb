@@ -1,41 +1,41 @@
 <h1>Rules of stream <span class="highlighted"><%= @stream.title_possibly_disabled %></span></h1>
 <div class="description">
-  Streams can be used to store specific views on the syslog messages. Define filter rules for each stream and quickly select
+  Streams can be used to store specific views on your messages. Define filter rules for each stream and quickly select
   them later. Example: Create a stream "All database messages of host www15" that only shows messages from host "www15" which
   include the string "MySQL".
 </div>
+
+<% if @stream.streamrules.blank? %>
+  <strong>No rules configured for this stream.</strong>
+  <br /><br />
+<% else %>
+  <% @stream.streamrules.each do |rule| %>
+    <div class="lines-line">
+      <h3><%= raw(streamrule_to_human(rule)) %></h3>
+      <%= link_to "Delete", stream_streamrule_path(@stream, rule), :method => :delete, :confirm => "Really delete stream rule?" %>
+      |
+      <%= link_to "Edit", "", :class => "stream-rule-edit-link", "data-rule-id" => rule.id %>
+
+      <div class="stream-rule-edit" id="stream-rule-edit-<%= rule.id %>">
+        <%= form_tag(stream_streamrule_path(@stream, rule), :method => :put) do %>
+          <%= hidden_field_tag "rule_id", rule.id %>
+          <%= label_tag :value %><br />
+          <%= streamrule_input_fields(rule.value, "", false, "stream-value-edit")[rule.rule_type] %>
+
+          <br /><br />
+          <%= awesome_submit_link "Update rule" %>
+        <% end %>
+      </div>
+
+    </div>
+  <% end %>
+<% end %>
 
 <h2>Add rule:</h2>
 <%= form_for @new_rule, :url => stream_streamrules_path(@stream) do |f| %>
   <%= f.hidden_field :stream_id, :value => @stream.id %>
   <%= f.select :rule_type, options_for_select(Streamrule.get_types_for_select_options(:streams).sort, :selected => Streamrule::TYPE_MESSAGE) %>
-  <%= f.text_field :value, :class => "stream-value-field stream-value-message" %>
-  <%= f.text_field :value, { :class => "stream-value-field stream-value-facility", :style => "display: none;", :disabled => true } %>
-  <%= f.text_field :value, { :class => "stream-value-field stream-value-host-regex", :style => "display: none;", :disabled => true } %>
-  <%= f.text_field :value, { :class => "stream-value-field stream-value-filename", :style => "display: none;", :disabled => true } %>
-  <%= f.text_field :value, { :class => "stream-value-field stream-value-fullmessage", :style => "display: none;", :disabled => true } %>
-
-  <%= f.select :value, options_for_select(get_ordered_severities_for_select), {}, { :disabled => true, :style => "display: none;", :class => "stream-value-field stream-value-severity" } %>
-  <%= f.select :value, options_for_select(get_ordered_severities_for_select), {}, { :disabled => true, :style => "display: none;", :class => "stream-value-field stream-value-severity-or-higher" } %>
-
-  <%= f.select :value, Host.all.collect {|host| [ h(host.host) ]}.sort, {}, { :disabled => true, :style => "display: none;", :class => "stream-value-field stream-value-host" } %>
-  <%= f.text_field :value, :class => "stream-value-field stream-value-additional-field", :disabled => true, :style => "display: none;" %>
+  <%= streamrule_input_fields_for_add_form %>
   <span id="stream-value-additional-field-help" class="stream-value-help" style="display: none;"><%= tooltip("Additional-field-filters-in-streams") %></span>
   <%= awesome_submit_link "Add" %>
 <% end %>
-
-<br />
-<h2>Filter rules:</h2>
-<div class="short-description">Click on a rule to remove it</div>
-<ul>
-  <% if @stream.streamrules.blank? %>
-    <li>No rules defined.</li>
-  <% else %>
-    <% @stream.streamrules.each do |rule| %>
-      <li style="margin-bottom: 2px;">
-        <h4 style="display: inline;"><%= raw(streamrule_to_human(rule)) %></h4>
-        <%= link_to("Delete", stream_streamrule_path(@stream, rule), :method => :delete) %>
-      </li>
-    <% end %>
-  <% end %>
-<ul>
