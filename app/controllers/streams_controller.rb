@@ -159,7 +159,7 @@ class StreamsController < ApplicationController
         flash[:error] = "Could not update alarm settings: Missing parameters."
     end
 
-    redirect_to settings_stream_path(@stream)
+    redirect_to alarms_stream_path(@stream)
   end
 
   def create
