@@ -41,7 +41,6 @@ public class GELFHttpHandler extends SimpleChannelHandler {
     private final Core server;
     private final Meter receivedMessages = Metrics.newMeter(GELFHttpHandler.class, "ReceivedMessages", "messages", TimeUnit.SECONDS);
     private final Meter gelfMessages = Metrics.newMeter(GELFHttpHandler.class, "ReceivedGelfMessages", "messages", TimeUnit.SECONDS);
-    private final Meter rawMessages = Metrics.newMeter(GELFHttpHandler.class, "ReceivedRawMessages", "messages", TimeUnit.SECONDS);
     private final GELFProcessor gelfProcessor;
 
     public GELFHttpHandler(Core server) {
@@ -62,19 +61,12 @@ public class GELFHttpHandler extends SimpleChannelHandler {
             writeResponse(e.getChannel(), keepAlive, httpRequestVersion, HttpResponseStatus.METHOD_NOT_ALLOWED);
         }
 
-        // there are two variants to get data in via HTTP:
-        // 1. just send a common GELF message, including the header bytes (see GELFMessage.Type)
-        // 2. only sending the uncompressed "raw" message, i.e. only the actual JSON
-        //    currently GELFMessage does not support "RAW", so we jump through some hoops to avoid System.arrayCopy
         final ChannelBuffer buffer = request.getContent();
         final byte[] message = new byte[buffer.readableBytes()];
         buffer.toByteBuffer().get(message, buffer.readerIndex(), buffer.readableBytes());
 
         final GELFMessage msg;
-        if ("/gelf/raw".equals(request.getUri())) {
-            rawMessages.mark();
-            msg = new GELFMessage(message, true);
-        } else if ("/gelf".equals(request.getUri())) {
+        if ("/gelf".equals(request.getUri())) {
             gelfMessages.mark();
             msg = new GELFMessage(message);
         } else {
