@@ -318,4 +318,15 @@ module ApplicationHelper
            " (Show " + link_to(not_shown, "?showall=" + link) + " messages)").html_safe
 
   end
+
+  def humanize_seconds(secs)
+    return "0s" if secs.nil? or secs == 0
+
+    [[60, :s], [60, :m], [24, :h], [1000, :d]].map do |count, name|
+      if secs > 0
+        secs, n = secs.divmod(count)
+        "#{n.to_i}#{name}"
+      end
+    end.compact.reverse.join(' ')
+  end
 end

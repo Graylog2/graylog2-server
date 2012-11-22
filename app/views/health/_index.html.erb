@@ -1,7 +1,10 @@
 <div class="health-index">
   <h3><%= index_name %></h3>
   <%= info["docs"] %> documents, <%= number_to_human_size(info["size"]*1024) %> |
-  <%= info["time_index"] %>s index, <%= info["time_query"] %>s query, <%= info["time_fetch"] %>s fetch, <%= info["time_get"] %>s get
+  <%= humanize_seconds(info["time_index"]) %> index,
+  <%= humanize_seconds(info["time_query"]) %> query,
+  <%= humanize_seconds(info["time_fetch"]) %> fetch,
+  <%= humanize_seconds(info["time_get"]) %> get
 
   <br />
   <div class="health-shards">
