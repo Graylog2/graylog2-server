@@ -57,7 +57,7 @@ public class GELFHttpHandler extends SimpleChannelHandler {
         final HttpVersion httpRequestVersion = request.getProtocolVersion();
 
         // to allow for future changes, let's be at least a little strict in what we accept here.
-        if (request.getMethod() != HttpMethod.PUT) {
+        if (request.getMethod() != HttpMethod.POST) {
             writeResponse(e.getChannel(), keepAlive, httpRequestVersion, HttpResponseStatus.METHOD_NOT_ALLOWED);
         }
 
