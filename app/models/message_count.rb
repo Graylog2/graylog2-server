@@ -21,7 +21,13 @@ class MessageCount
   def self.counts_of_last_minutes(x, opts = {})
     res = {}
 
-    conditions = { :timestamp => { "$gte" => x.minutes.ago.to_i, "$lt" => 1.minute.ago.to_i+1 }}
+    if x == 1
+      to = Time.now.to_i
+    else
+      to = 1.minute.ago.to_i
+    end
+
+    conditions = { :timestamp => { "$gte" => x.minutes.ago.to_i, "$lt" => to+1 }}
 
     all(:conditions => conditions).distinct(:server_id).each do |node|
       all(:conditions => conditions.merge(:server_id => node)).each do |c|
