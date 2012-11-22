@@ -11,9 +11,6 @@ class Setting
   TYPE_MESSAGE_COUNT_INTERVAL = 2
   TYPE_MESSAGE_COUNT_INTERVAL_STANDARD = 10
 
-  TYPE_MESSAGE_MAX_COUNT = 3
-  TYPE_MESSAGE_MAX_COUNT_STANDARD = 100
-
   TYPE_ADDITIONAL_COLUMNS = 7
   TYPE_ADDITIONAL_COLUMNS_STANDARD = []
 
@@ -26,12 +23,6 @@ class Setting
   def self.get_message_count_interval current_user
     setting = Setting.where(:user_id => current_user.id, :setting_type => TYPE_MESSAGE_COUNT_INTERVAL).first
     return TYPE_MESSAGE_COUNT_INTERVAL_STANDARD if setting.blank?
-    return setting.value
-  end
-
-  def self.get_message_max_count current_user
-    setting = Setting.where(:user_id => current_user.id, :setting_type => TYPE_MESSAGE_MAX_COUNT).first
-    return TYPE_MESSAGE_MAX_COUNT_STANDARD if setting.blank?
     return setting.value
   end
 
