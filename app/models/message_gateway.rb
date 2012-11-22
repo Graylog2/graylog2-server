@@ -52,7 +52,7 @@ class MessageGateway
   @default_query_options = { :sort => "created_at desc" }
 
   def self.all_paginated(page = 1, opts = {})
-    use_recent_index! if (opts[:all].blank? or opts[:all] == false)
+    (opts[:all].blank? or opts[:all] == false) ? use_recent_index! : use_all_indices!
 
     r = search(pagination_options(page).merge(@default_query_options)) do
       query { all }
@@ -62,12 +62,14 @@ class MessageGateway
   end
 
   def self.all_of_stream_paginated(stream_id, page = 1, opts = {})
-    use_recent_index! if (opts[:all].blank? or opts[:all] == false)
+    (opts[:all].blank? or opts[:all] == false) ? use_recent_index! : use_all_indices!
+
     wrap search("streams:#{stream_id}", pagination_options(page).merge(@default_query_options))
   end
 
   def self.all_of_host_paginated(hostname, page = 1, opts = {})
-    use_recent_index! if (opts[:all].blank? or opts[:all] == false)
+    (opts[:all].blank? or opts[:all] == false) ? use_recent_index! : use_all_indices!
+
     wrap search("host:#{hostname}", pagination_options(page).merge(@default_query_options))
   end
 
@@ -77,6 +79,8 @@ class MessageGateway
   end
 
   def self.dynamic_search(what, with_default_query_options = false)
+    use_all_indices!
+
     what = what.merge({:sort => { :created_at => :desc }}) if with_default_query_options
     wrap Tire.search(ALL_INDICES_ALIAS, what)
   end
@@ -111,6 +115,8 @@ class MessageGateway
   end
 
   def self.dynamic_distribution(target, query)
+    use_all_indices!
+
     result = Array.new
 
     query[:facets] = {
@@ -135,6 +141,8 @@ class MessageGateway
   end
 
   def self.all_by_quickfilter(filters, page = 1, opts = {})
+    use_all_indices!
+
     histogram_only = !opts[:date_histogram].blank? and opts[:date_histogram] == true
 
     if histogram_only
@@ -217,21 +225,30 @@ class MessageGateway
   end
 
   def self.total_count
+    use_all_indices!
+
     # search with size 0 instead of count because of this issue: https://github.com/karmi/tire/issues/100
-    search("*", :size => 0).total
+    search(:size => 0) do
+      query { all }
+    end.total
   end
 
   def self.stream_count(stream_id)
+    use_all_indices!
+
     # search with size 0 instead of count because of this issue: https://github.com/karmi/tire/issues/100
     search("streams:#{stream_id}", :size => 0).total
   end
 
   def self.host_count(hostname)
+    use_all_indices!
+
     search("host:#{hostname}", :size => 0).total
   end
 
   def self.oldest_message
-    index_name(ALL_INDICES_ALIAS)  # just to make sure
+    use_all_indices!
+
     r = search({ :sort => "created_at asc", :size => 1 }) do
       query { all }
     end.first
