@@ -64,13 +64,23 @@ class MessageGateway
   def self.all_of_stream_paginated(stream_id, page = 1, opts = {})
     (opts[:all].blank? or opts[:all] == false) ? use_recent_index! : use_all_indices!
 
-    wrap search("streams:#{stream_id}", pagination_options(page).merge(@default_query_options))
+    r = search(pagination_options(page).merge(@default_query_options)) do
+      query { all }
+      filter :term, :streams => stream_id
+    end
+
+    wrap(r)
   end
 
   def self.all_of_host_paginated(hostname, page = 1, opts = {})
     (opts[:all].blank? or opts[:all] == false) ? use_recent_index! : use_all_indices!
 
-    wrap search("host:#{hostname}", pagination_options(page).merge(@default_query_options))
+    r = search(pagination_options(page).merge(@default_query_options)) do
+      query { all }
+      filter :term, :host => hostname
+    end
+
+    wrap(r)
   end
 
   def self.retrieve_by_id(id)
@@ -90,16 +100,11 @@ class MessageGateway
 
     histogram_only = !opts[:date_histogram].blank? and opts[:date_histogram] == true
 
-    if opts[:stream]
-      query = "(" + query + ") AND streams:#{opts[:stream].id}"
-    end
-
-    if opts[:host]
-      query = "(" + query + ") AND host:#{opts[:host].host}"
-    end
-
     r = search(pagination_options(page).merge(@default_query_options)) do
       query { string(query) }
+
+      filter :term, :streams => opts[:stream].id if opts[:stream]
+      filter :term, :host => opts[:host].host if opts[:host]
 
       # Request date histogram facet?
       if histogram_only
@@ -153,61 +158,61 @@ class MessageGateway
 
     r = search(options) do
       query do
-        boolean do
-          # Short message
-          must { string("message:#{filters[:message]}") } unless filters[:message].blank?
+        # If no message or full_message are set, we are doing a pure filter query.
+        if filters[:message].blank? and filters[:full_message].blank?
+          all
+        else
+          boolean do
+            # Short message
+            must { string("message:#{filters[:message]}") } unless filters[:message].blank?
 
-          # Full message
-          must { string("full_message:#{filters[:full_message]}") } unless filters[:full_message].blank?
-
-          # Facility
-          must { term(:facility, filters[:facility]) } unless filters[:facility].blank?
-
-          # Severity
-          if !filters[:severity].blank? and filters[:severity_above].blank?
-            must { term(:level, filters[:severity]) }
+            # Full message
+            must { string("full_message:#{filters[:full_message]}") } unless filters[:full_message].blank?
           end
-
-          # Host
-          must { term(:host, filters[:host]) } unless filters[:host].blank?
-
-          # Additional fields.
-          Quickfilter.extract_additional_fields_from_request(filters).each do |key, value|
-            must { term("_#{key}".to_sym, value) }
-          end
-
-          # Possibly narrow down to stream?
-          unless opts[:stream_id].blank?
-            must { term(:streams, opts[:stream_id]) }
-          end
-
-          # Severity (or higher)
-          if !filters[:severity].blank? and !filters[:severity_above].blank?
-            must { range(:level, :to => filters[:severity].to_i) }
-          end
-
-          # Timeframe.
-          if !filters[:date].blank?
-            range = Quickfilter.get_conditions_timeframe(filters[:date])
-            must { range(:created_at, :gt => range[:greater], :lt => range[:lower]) }
-          end
-
-          unless opts[:hostname].blank?
-            must { term(:host, opts[:hostname]) }
-          end
-
-          # XXX Duplicated?
-          # Possibly narrow down to stream?
-          unless opts[:stream_id].blank?
-            must { term(:streams, opts[:stream_id]) }
-          end
-
-          # File name
-          must { term(:file, filters[:file]) } unless filters[:file].blank?
-
-          # Line number
-          must { term(:line, filters[:line]) } unless filters[:line].blank?
         end
+      end
+
+      # Stream
+      unless opts[:stream_id].blank?
+        filter :term, :streams => opts[:stream_id]
+      end
+
+      # Host (one is the actual input field, one is the message context)
+      unless opts[:hostname].blank?
+        filter :term, :host => opts[:hostname]
+      end
+      unless opts[:host].blank?
+        filter :term, :host => opts[:host]
+      end
+
+      # Timeframe.
+      if !filters[:date].blank?
+        range = Quickfilter.get_conditions_timeframe(filters[:date])
+        filter :range, :created_at => { :gt => range[:greater], :lt => range[:lower] }
+      end
+
+      # Facility
+      filter :term, :facility => filters[:facility] unless filters[:facility].blank?
+
+      # Severity
+      if !filters[:severity].blank? and filters[:severity_above].blank?
+        filter :term, :level => filters[:severity]
+      end
+
+      # Severity (or higher)
+      if !filters[:severity].blank? and !filters[:severity_above].blank?
+        filter :range, :level => { :to => filters[:severity].to_i }
+      end
+
+      # File name
+      filter :term, :file => filters[:file] unless filters[:file].blank?
+
+      # Line number
+      filter :term, :line => filters[:line] unless filters[:line].blank?
+
+      # Additional fields.
+      Quickfilter.extract_additional_fields_from_request(filters).each do |key, value|
+        filter :term, "_#{key}".to_sym => value
       end
 
       # Request date histogram facet?
@@ -237,13 +242,20 @@ class MessageGateway
     use_all_indices!
 
     # search with size 0 instead of count because of this issue: https://github.com/karmi/tire/issues/100
-    search("streams:#{stream_id}", :size => 0).total
+    search(:size => 0) do
+      query { all }
+      filter :term, :streams => stream_id
+    end.total
   end
 
   def self.host_count(hostname)
     use_all_indices!
 
-    search("host:#{hostname}", :size => 0).total
+    # search with size 0 instead of count because of this issue: https://github.com/karmi/tire/issues/100
+    search(:size => 0) do
+      query { all }
+      filter :term, :host => hostname
+    end.total
   end
 
   def self.oldest_message
@@ -263,18 +275,14 @@ class MessageGateway
     options = pagination_options(page).merge(@default_query_options)
 
     r = search(options) do
-      query do
-        all
+      query { all }
 
-        # Possibly narrow down to stream?
-        unless opts[:stream_id].blank?
-          term(:streams, opts[:stream_id])
-        end
+      unless opts[:stream_id].blank?
+        filter :term, :streams => opts[:stream_id]
+      end
 
-        # Possibly narrow down to host?
-        unless opts[:hostname].blank?
-          term(:host, opts[:hostname])
-        end
+      unless opts[:hostname].blank?
+        filter :term, :host => opts[:hostname]
       end
 
       filter 'range', { :created_at => { :gte => from, :lte => to } }
