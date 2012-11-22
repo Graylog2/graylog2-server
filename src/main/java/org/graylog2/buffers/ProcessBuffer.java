@@ -25,6 +25,8 @@ import com.lmax.disruptor.MultiThreadedClaimStrategy;
 import com.lmax.disruptor.RingBuffer;
 import com.lmax.disruptor.SleepingWaitStrategy;
 import com.lmax.disruptor.dsl.Disruptor;
+import com.yammer.metrics.Metrics;
+import com.yammer.metrics.core.Meter;
 import org.graylog2.Core;
 import org.graylog2.buffers.processors.ProcessBufferProcessor;
 import org.graylog2.plugin.buffers.Buffer;
@@ -34,6 +36,7 @@ import org.slf4j.LoggerFactory;
 
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 
 /**
  * @author Lennart Koopmann <lennart@socketfeed.com>
@@ -51,6 +54,9 @@ public class ProcessBuffer implements Buffer {
     );
 
     Core server;
+    
+    private final Meter incomingMessages = Metrics.newMeter(ProcessBuffer.class, "InsertedMessages", "messages", TimeUnit.SECONDS);
+    private final Meter rejectedMessages = Metrics.newMeter(ProcessBuffer.class, "RejectedMessages", "messages", TimeUnit.SECONDS);
 
     public ProcessBuffer(Core server) {
         this.server = server;
@@ -84,8 +90,10 @@ public class ProcessBuffer implements Buffer {
             ringBuffer.publish(sequence);
 
             server.processBufferWatermark().incrementAndGet();
+            incomingMessages.mark();
         } else {
             LOG.error("ProcessBuffer is out of capacity. Raise the ring_size configuration parameter. DROPPING MESSAGE!");
+            rejectedMessages.mark();
         }
     }
 

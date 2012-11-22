@@ -56,6 +56,7 @@ public class OutputBuffer implements Buffer {
     Core server;
     
     private final Meter incomingMessages = Metrics.newMeter(OutputBuffer.class, "InsertedMessages", "messages", TimeUnit.SECONDS);
+    private final Meter rejectedMessages = Metrics.newMeter(OutputBuffer.class, "RejectedMessages", "messages", TimeUnit.SECONDS);
 
     public OutputBuffer(Core server) {
         this.server = server;
@@ -92,6 +93,7 @@ public class OutputBuffer implements Buffer {
             incomingMessages.mark();
         } else {
             LOG.error("OutputBuffer is out of capacity. Raise the ring_size configuration parameter. DROPPING MESSAGE!");
+            rejectedMessages.mark();
         }
     }
 
