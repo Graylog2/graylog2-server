@@ -100,6 +100,12 @@ public class Configuration {
     @Parameter(value = "outputbuffer_processors", required = true, validator = PositiveIntegerValidator.class)
     private int outputBufferProcessors = 5;
     
+    @Parameter(value = "outputbuffer_processor_threads_max_pool_size", required = true, validator = PositiveIntegerValidator.class)
+    private int outputBufferProcessorThreadsMaxPoolSize = 30;
+    
+    @Parameter(value = "outputbuffer_processor_threads_core_pool_size", required = true, validator = PositiveIntegerValidator.class)
+    private int outputBufferProcessorThreadsCorePoolSize = 3;
+    
     @Parameter(value = "ring_size", required = true, validator = PositiveIntegerValidator.class)
     private int ringSize = 1024;
     
@@ -357,6 +363,14 @@ public class Configuration {
     
     public int getOutputBufferProcessors() {
         return outputBufferProcessors;
+    }
+    
+    public int getOutputBufferProcessorThreadsCorePoolSize() {
+        return outputBufferProcessorThreadsCorePoolSize;
+    }
+    
+    public int getOutputBufferProcessorThreadsMaxPoolSize() {
+        return outputBufferProcessorThreadsMaxPoolSize;
     }
 
     public int getRingSize() {

@@ -36,7 +36,8 @@ import org.graylog2.plugin.logmessage.LogMessage;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
+import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 import org.bson.types.ObjectId;
 import org.elasticsearch.common.collect.Maps;
@@ -54,7 +55,7 @@ public class OutputBufferProcessor implements EventHandler<LogMessageEvent> {
 
     private static final Logger LOG = LoggerFactory.getLogger(OutputBufferProcessor.class);
 
-    private static final OutputRouter ROUTER = new OutputRouter();
+    private final ExecutorService executor;
     
     private Core server;
 
@@ -70,6 +71,15 @@ public class OutputBufferProcessor implements EventHandler<LogMessageEvent> {
         this.ordinal = ordinal;
         this.numberOfConsumers = numberOfConsumers;
         this.server = server;
+        
+        executor = new ThreadPoolExecutor(
+            server.getConfiguration().getOutputBufferProcessorThreadsCorePoolSize(),
+            server.getConfiguration().getOutputBufferProcessorThreadsMaxPoolSize(),
+            5, TimeUnit.SECONDS,
+            new LinkedBlockingQueue<Runnable>(),
+            new ThreadFactoryBuilder()
+            .setNameFormat("outputbuffer-processor-" + ordinal + "-executor-%d")
+            .build());
     }
 
     @Override
@@ -88,15 +98,26 @@ public class OutputBufferProcessor implements EventHandler<LogMessageEvent> {
         buffer.add(msg);
 
         if (endOfBatch || buffer.size() >= server.getConfiguration().getOutputBatchSize()) {
-            for (MessageOutput output : server.getOutputs()) {
-                String typeClass = output.getClass().getCanonicalName();
+            for (final MessageOutput output : server.getOutputs()) {
+                final String typeClass = output.getClass().getCanonicalName();
                 // Always write to ElasticSearch, but only write to other outputs if enabled for one of its streams.
-                if (output instanceof ElasticSearchOutput || ROUTER.checkRouting(typeClass, msg)) {
+                if (output instanceof ElasticSearchOutput || OutputRouter.checkRouting(typeClass, msg)) {
                     try {
                         LOG.debug("Writing message batch to [{}]. Size <{}>", output.getName(), buffer.size());
 
                         batchSize.update(buffer.size());
-                        output.write(buffer, buildStreamConfigs(buffer, typeClass), server);
+                        
+                        executor.submit(new Runnable() {
+                            @Override
+                            public void run() {
+                                try {
+                                    output.write(buffer, buildStreamConfigs(buffer, typeClass), server);
+                                } catch (Exception e) {
+                                    throw new RuntimeException(e);
+                                }
+                            }
+                        });
+                        
                     } catch (Exception e) {
                         LOG.error("Could not write message batch to output [" + output.getName() +"].", e);
                     }
