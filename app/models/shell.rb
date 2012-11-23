@@ -325,13 +325,13 @@ class Shell
   def perform_count
     q = criteria
     @query_hash = q
-    @result = MessageGateway.dynamic_search(q, true).total_result_count
+    @result = MessageGateway.dynamic_search(q).total_result_count
   end
 
   def perform_find
     q = criteria.merge(:size => MAX_LIMIT)
     @query_hash = q
-    @result = MessageGateway.dynamic_search(q, true)
+    @result = MessageGateway.dynamic_search(q)
   end
 
   def perform_distribution

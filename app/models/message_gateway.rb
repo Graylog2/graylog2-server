@@ -49,13 +49,13 @@ class MessageGateway
   document_type(TYPE_NAME)
 
   @index = Tire.index(ALL_INDICES_ALIAS)
-  @default_query_options = { :sort => "created_at desc" }
 
   def self.all_paginated(page = 1, opts = {})
     (opts[:all].blank? or opts[:all] == false) ? use_recent_index! : use_all_indices!
 
-    r = search(pagination_options(page).merge(@default_query_options)) do
+    r = search(pagination_options(page)) do
       query { all }
+      sort { by :created_at, 'desc' }
     end
 
     wrap(r)
@@ -64,9 +64,10 @@ class MessageGateway
   def self.all_of_stream_paginated(stream_id, page = 1, opts = {})
     (opts[:all].blank? or opts[:all] == false) ? use_recent_index! : use_all_indices!
 
-    r = search(pagination_options(page).merge(@default_query_options)) do
+    r = search(pagination_options(page)) do
       query { all }
       filter :term, :streams => stream_id
+      sort { by :created_at, 'desc' }
     end
 
     wrap(r)
@@ -75,9 +76,10 @@ class MessageGateway
   def self.all_of_host_paginated(hostname, page = 1, opts = {})
     (opts[:all].blank? or opts[:all] == false) ? use_recent_index! : use_all_indices!
 
-    r = search(pagination_options(page).merge(@default_query_options)) do
+    r = search(pagination_options(page)) do
       query { all }
       filter :term, :host => hostname
+      sort { by :created_at, 'desc' }
     end
 
     wrap(r)
@@ -88,11 +90,14 @@ class MessageGateway
     wrap search("_id:#{id}").first
   end
 
-  def self.dynamic_search(what, with_default_query_options = false)
+  def self.dynamic_search(what)
     use_all_indices!
 
-    what = what.merge({:sort => { :created_at => :desc }}) if with_default_query_options
-    wrap Tire.search(ALL_INDICES_ALIAS, what)
+    r = Tire.search(ALL_INDICES_ALIAS, what) do
+      sort { by :created_at, 'desc' }
+    end
+
+    wrap(r.results)
   end
 
   def self.universal_search(page = 1, query, opts)
@@ -100,7 +105,7 @@ class MessageGateway
 
     histogram_only = !opts[:date_histogram].blank? and opts[:date_histogram] == true
 
-    r = search(pagination_options(page).merge(@default_query_options)) do
+    r = search(pagination_options(page)) do
       query { string(query) }
 
       filter :term, :streams => opts[:stream].id if opts[:stream]
@@ -112,6 +117,8 @@ class MessageGateway
           date("histogram_time", :interval => (opts[:date_histogram_interval]))
         end
       end
+
+      sort { by :created_at, 'desc' }
     end
 
     return r.facets["date_histogram"]["entries"] if histogram_only rescue return []
@@ -153,7 +160,7 @@ class MessageGateway
     if histogram_only
       options = nil
     else
-      options = pagination_options(page).merge(@default_query_options)
+      options = pagination_options(page)
     end
 
     r = search(options) do
@@ -174,7 +181,7 @@ class MessageGateway
 
       # Stream
       unless opts[:stream_id].blank?
-        filter :term, :streams => opts[:stream_id]
+        filter :term, :streams => opts[:stream_id].to_s
       end
 
       # Host (one is the actual input field, one is the message context)
@@ -219,8 +226,53 @@ class MessageGateway
       if histogram_only
         facet 'date_histogram' do
           date("histogram_time", :interval => (opts[:date_histogram_interval]))
+
+          # Stream
+          unless opts[:stream_id].blank?
+            facet_filter :term, :streams => opts[:stream_id].to_s
+          end
+
+          # Host (one is the actual input field, one is the message context)
+          unless opts[:hostname].blank?
+            facet_filter :term, :host => opts[:hostname]
+          end
+          unless opts[:host].blank?
+            facet_filter :term, :host => opts[:host]
+          end
+
+          # Timeframe.
+          if !filters[:date].blank?
+            range = Quickfilter.get_conditions_timeframe(filters[:date])
+            facet_filter :range, :created_at => { :gt => range[:greater], :lt => range[:lower] }
+          end
+
+          # Facility
+          facet_filter :term, :facility => filters[:facility] unless filters[:facility].blank?
+
+          # Severity
+          if !filters[:severity].blank? and filters[:severity_above].blank?
+            facet_filter :term, :level => filters[:severity]
+          end
+
+          # Severity (or higher)
+          if !filters[:severity].blank? and !filters[:severity_above].blank?
+            facet_filter :range, :level => { :to => filters[:severity].to_i }
+          end
+
+          # File name
+          facet_filter :term, :file => filters[:file] unless filters[:file].blank?
+
+          # Line number
+          facet_filter :term, :line => filters[:line] unless filters[:line].blank?
+
+          # Additional fields.
+          Quickfilter.extract_additional_fields_from_request(filters).each do |key, value|
+            facet_filter :term, "_#{key}".to_sym => value
+          end
         end
       end
+
+      sort { by :created_at, 'desc' }
 
     end
 
@@ -233,7 +285,7 @@ class MessageGateway
     use_all_indices!
 
     # search with size 0 instead of count because of this issue: https://github.com/karmi/tire/issues/100
-    search(:size => 0) do
+    search(:size => 0, :search_type => 'count') do
       query { all }
     end.total
   end
@@ -242,7 +294,7 @@ class MessageGateway
     use_all_indices!
 
     # search with size 0 instead of count because of this issue: https://github.com/karmi/tire/issues/100
-    search(:size => 0) do
+    search(:size => 0, :search_type => 'count') do
       query { all }
       filter :term, :streams => stream_id
     end.total
@@ -252,7 +304,7 @@ class MessageGateway
     use_all_indices!
 
     # search with size 0 instead of count because of this issue: https://github.com/karmi/tire/issues/100
-    search(:size => 0) do
+    search(:size => 0, :search_type => 'count') do
       query { all }
       filter :term, :host => hostname
     end.total
@@ -261,8 +313,9 @@ class MessageGateway
   def self.oldest_message
     use_all_indices!
 
-    r = search({ :sort => "created_at asc", :size => 1 }) do
+    r = search(:size => 1) do
       query { all }
+      sort { by :created_at, 'asc' }
     end.first
 
     wrap(r)
@@ -272,7 +325,7 @@ class MessageGateway
     raise "You can only pass stream_id OR hostname" if !opts[:stream_id].blank? and !opts[:hostname].blank?
   
     use_all_indices!
-    options = pagination_options(page).merge(@default_query_options)
+    options = pagination_options(page)
 
     r = search(options) do
       query { all }
@@ -286,6 +339,8 @@ class MessageGateway
       end
 
       filter 'range', { :created_at => { :gte => from, :lte => to } }
+
+      sort { by :created_at, 'desc' }
     end
 
     wrap(r)
