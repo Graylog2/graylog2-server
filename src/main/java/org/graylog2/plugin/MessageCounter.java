@@ -30,11 +30,11 @@ import org.bson.types.ObjectId;
  */
 public interface MessageCounter {
 
-    public int getTotalCount();
+    public Counter getTotalCount();
 
-    public Map<String, Integer> getStreamCounts();
+    public Map<String, Counter> getStreamCounts();
 
-    public Map<String, Integer> getHostCounts();
+    public Map<String, Counter> getHostCounts();
 
     public void resetAllCounts();
 
