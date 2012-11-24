@@ -35,6 +35,8 @@ import org.graylog2.Core;
 import org.graylog2.plugin.GraylogServer;
 import org.graylog2.plugin.outputs.MessageOutputConfigurationException;
 import org.graylog2.plugin.outputs.OutputStreamConfiguration;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * @author Lennart Koopmann <lennart@socketfeed.com>
@@ -46,8 +48,12 @@ public class ElasticSearchOutput implements MessageOutput {
 
     private static final String NAME = "ElasticSearch Output";
     
+    private static final Logger LOG = LoggerFactory.getLogger(ElasticSearchOutput.class);
+
     @Override
     public void write(List<LogMessage> messages, OutputStreamConfiguration streamConfig, GraylogServer server) throws Exception {
+        LOG.debug("Writing <{}> messages.", messages.size());
+        
         Core serverImpl = (Core) server;
         
         writes.mark();

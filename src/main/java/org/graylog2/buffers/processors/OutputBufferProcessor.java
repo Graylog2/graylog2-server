@@ -103,6 +103,9 @@ public class OutputBufferProcessor implements EventHandler<LogMessageEvent> {
                 // Always write to ElasticSearch, but only write to other outputs if enabled for one of its streams.
                 if (output instanceof ElasticSearchOutput || OutputRouter.checkRouting(typeClass, msg)) {
                     try {
+                        // We must copy the buffer for this output, because it may be cleared before all messages are handled.
+                        final List<LogMessage> myBuffer = Lists.newArrayList(buffer);
+                        
                         LOG.debug("Writing message batch to [{}]. Size <{}>", output.getName(), buffer.size());
 
                         batchSize.update(buffer.size());
@@ -111,7 +114,7 @@ public class OutputBufferProcessor implements EventHandler<LogMessageEvent> {
                             @Override
                             public void run() {
                                 try {
-                                    output.write(buffer, buildStreamConfigs(buffer, typeClass), server);
+                                    output.write(myBuffer, buildStreamConfigs(buffer, typeClass), server);
                                 } catch (Exception e) {
                                     throw new RuntimeException(e);
                                 }
