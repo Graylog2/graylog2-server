@@ -24,7 +24,7 @@ class VisualsController < ApplicationController
             stream = Stream.find(params[:stream_id]) if !params[:stream_id].blank?
             host = Host.find(:first, :conditions => {:host=> params[:hostname]}) if !params[:hostname].blank?
 
-            r["data"] = calculate_querygraph(params[:query], params[:interval], host, stream)
+            r["data"] = calculate_querygraph(params[:query], params[:interval], host, stream, params[:since])
           end
       end
     end
@@ -66,10 +66,10 @@ class VisualsController < ApplicationController
     end
   end
 
-  def calculate_querygraph(query, interval, host, stream)
+  def calculate_querygraph(query, interval, host, stream, since)
     raise "Invalid interval" unless valid_interval?(interval)
 
-    MessageGateway.universal_search(1, query, :date_histogram => true, :date_histogram_interval => interval, :host => host, :stream => stream).collect do |c|
+    MessageGateway.universal_search(1, query, :date_histogram => true, :date_histogram_interval => interval, :host => host, :stream => stream, :since => since).collect do |c|
       [ c["time"].to_i, c["count"] ]
     end
   end

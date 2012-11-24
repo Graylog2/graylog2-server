@@ -3,13 +3,34 @@
     <% if @stream %><input type="hidden" name="stream_id" value="<%= @stream.id %>" /><% end %>
     <% if @host %><input type="hidden" name="host" value="<%= @host.host %>" /><% end %>
 
-    <input type="text" id="universal-search-field"
-          name="query"
-          data-stdval='Type your search query here and press enter. ("not found" AND http) OR _http_response_code:[400 TO *]'
-          <% if !params[:query].blank? %>
-            value="<%= params[:query] %>"
-          <% end %>
-           />
+    <table>
+      <tr id="universal-search-container">
+        <td id="universal-search-timespan-container">
+          <select name="timespan" id="universal-search-timespan">
+            <% universal_search_timespans.each do |name, secs| %>
+              <option
+                value="<%= secs %>"
+                <% if !params[:timespan].blank? and params[:timespan].to_i == secs %>
+                  selected="selected"
+                <% end %>
+              >
+                <%= name %>
+              </option>
+            <% end %>
+          </select>
+        </td>
+
+        <td>
+          <input type="text" id="universal-search-field"
+                name="query"
+                data-stdval='Type your search query here and press enter. ("not found" AND http) OR _http_response_code:[400 TO *]'
+                <% if !params[:query].blank? %>
+                  value="<%= params[:query] %>"
+                <% end %>
+          />
+        </td>
+      </tr>
+    </table>
   </form>
 </div>
 

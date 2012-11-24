@@ -91,7 +91,8 @@ module ApplicationHelper
         :query => options[:query],
         :interval => options[:interval],
         :hostname => options[:hostname],
-        :stream_id => options[:stream_id]
+        :stream_id => options[:stream_id],
+        :since => options[:since]
       )
       uid = "resultgraph"
       lines_bars = "bars: { show: true, fill: true }"
@@ -328,5 +329,22 @@ module ApplicationHelper
         "#{n.to_i}#{name}"
       end
     end.compact.reverse.join(' ')
+  end
+
+  def universal_search_timespans
+    {
+      "5 min" => 5.minutes.to_i,
+      "15 min" => 15.minutes.to_i,
+      "30 min" => 30.minutes.to_i,
+      "1 hour" => 1.hour.to_i,
+      "2 hours" => 2.hours.to_i,
+      "8 hours" => 8.hours.to_i,
+      "1 day" => 1.day.to_i,
+      "2 days" => 2.days.to_i,
+      "5 days" => 5.days.to_i,
+      "7 days" => 7.days.to_i,
+      "1 month" => 1.month.to_i,
+      "All time" => 0
+    }
   end
 end

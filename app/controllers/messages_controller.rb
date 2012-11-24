@@ -151,7 +151,32 @@
     @use_backtotop = true
     
     begin
-      @messages = MessageGateway.universal_search(params[:page], params[:query], :stream => @stream, :host => @host)
+      if params[:timespan].nil? or params[:timespan].to_i == 0
+        @since = 0
+      else
+        @since = Time.now.to_i-params[:timespan].to_i
+
+        if params[:timespan].to_i <= 8.hours
+          @default_interval = "minute"
+        end
+
+        if params[:timespan].to_i > 8.hours
+          @default_interval = "hour"
+        end
+
+        if params[:timespan].to_i >= 1.month
+          @default_interval = "day"
+        end
+
+      end
+
+      @messages = MessageGateway.universal_search(
+        params[:page],
+        params[:query],
+        :stream => @stream,
+        :host => @host,
+        :since => @since
+      )
     rescue Tire::Search::SearchRequestFailed
       @messages = MessageResult.new
       @messages.total_result_count = 0

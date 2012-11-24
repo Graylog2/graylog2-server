@@ -1,30 +1,31 @@
 <div id="result-graph">
   <%= image_tag "loading.gif", :class => "ajaxloader" %>
 </div>
+  
 <%=raw flot_graph_loader(
     :inject => "#result-graph",
     :filters => params[:filters],
     :query => params[:query],
     :result_graph => true,
-    :interval => (params[:interval] || "hour"),
+    :interval => (params[:interval] || (@default_interval.blank? ? "hour" : @default_interval)),
     :stream_id => @stream.blank? ? nil : @stream.id,
-    :hostname => @host.blank? ? nil : @host.host
+    :hostname => @host.blank? ? nil : @host.host,
+    :since => @since
   )
 %>
+
 <ul id="result-graph-interval-selector">
   <li class="result-graph-interval-selector-first">Interval:</li>
   <% ["year", "month", "week", "day", "hour", "minute"].each do |i| %>
     <li>
       <a href="#" onClick="window.location.href = document.URL + '&interval=<%= i %>'; return false;">
         <% name = i.capitalize + "s" %>
-        <% if params[:interval] == i or (params[:interval].blank? and i == "hour") %>
-          <strong><%= name %></strong>
-        <% else %>
-          <%= name %>
-        <% end %>
+        <%= name %>
       </a>
     </li>
   <% end %>
 </ul>
+
+<%= @default_interval %>
 
 <br style="clear: both;" />
