@@ -84,21 +84,27 @@ public class MongoBridge {
         }
     }
 
-    public void writeThroughput(String serverId, int current, int highest) {
-        BasicDBObject query = new BasicDBObject();
-        query.put("server_id", serverId);
-        query.put("type", "total_throughput");
+    public void writeThroughput(String serverId, int current) {
+        BasicDBObject totalQuery = new BasicDBObject();
+        totalQuery.put("server_id", serverId);
+        totalQuery.put("type", "total_throughput");
 
-        BasicDBObject update = new BasicDBObject();
-        update.put("server_id", serverId);
-        update.put("type", "total_throughput");
-        update.put("current", current);
-        update.put("highest", highest);
+        BasicDBObject totalUpdate = new BasicDBObject();
+        totalUpdate.put("$set", new BasicDBObject("current", current));
+
+        BasicDBObject highestQuery = new BasicDBObject();
+        highestQuery.put("server_id", serverId);
+        highestQuery.put("type", "total_throughput");
+        highestQuery.put("highest", new BasicDBObject("$lt", current));
+
+        BasicDBObject highestUpdate = new BasicDBObject();
+        highestUpdate.put("$set", new BasicDBObject("highest", current));
 
         DBCollection coll = getConnection().getDatabase().getCollection("server_values");
-        coll.update(query, update, true, false);
+        coll.update(totalQuery, totalUpdate, true, false);
+        coll.update(highestQuery, highestUpdate, true, false);
     }
-    
+
     public void writeBufferWatermarks(String serverId, BufferWatermark outputBuffer, BufferWatermark processBuffer) {
         BasicDBObject query = new BasicDBObject();
         query.put("server_id", serverId);

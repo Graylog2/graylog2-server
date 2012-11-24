@@ -38,9 +38,6 @@ public final class MessageCounterImpl implements MessageCounter {
     private final Map<String, Integer> streams = Maps.newConcurrentMap();
     private final Map<String, Integer> hosts = Maps.newConcurrentMap();
 
-    private int throughput = 0;
-    private int highestThroughput = 0;
-
     public int getTotalCount() {
         return this.total;
     }
@@ -51,14 +48,6 @@ public final class MessageCounterImpl implements MessageCounter {
 
     public Map<String, Integer> getHostCounts() {
         return this.hosts;
-    }
-
-    public int getThroughput() {
-        return this.throughput;
-    }
-
-    public int getHighestThroughput() {
-        return this.highestThroughput;
     }
 
     public void resetAllCounts() {
@@ -79,22 +68,11 @@ public final class MessageCounterImpl implements MessageCounter {
         this.total = 0;
     }
 
-    public void resetThroughput() {
-        this.throughput = 0;
-    }
-
     /**
      * Increment total count by 1.
      */
     public void incrementTotal() {
         this.countUpTotal(1);
-    }
-
-    /**
-     * Increment five second throughput by 1.
-     */
-    public void incrementThroughput() {
-        this.countUpThroughput(1);
     }
 
     /**
@@ -104,20 +82,6 @@ public final class MessageCounterImpl implements MessageCounter {
      */
     public void countUpTotal(final int x) {
         this.total += x;
-    }
-
-    /**
-     * Counts up the five second througput counter which is handled and reset by
-     * the ServerValueWriterThread.
-     *
-     * @param x The value to add on top of five second throuput.
-     */
-    public void countUpThroughput(final int x) {
-        this.throughput += x;
-
-        if (this.throughput > this.highestThroughput) {
-            this.highestThroughput = this.throughput;
-        }
     }
 
     /**
