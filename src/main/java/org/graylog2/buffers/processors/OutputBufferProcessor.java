@@ -114,7 +114,7 @@ public class OutputBufferProcessor implements EventHandler<LogMessageEvent> {
                             @Override
                             public void run() {
                                 try {
-                                    output.write(myBuffer, buildStreamConfigs(buffer, typeClass), server);
+                                    output.write(myBuffer, buildStreamConfigs(myBuffer, typeClass), server);
                                 } catch (Exception e) {
                                     throw new RuntimeException(e);
                                 }
