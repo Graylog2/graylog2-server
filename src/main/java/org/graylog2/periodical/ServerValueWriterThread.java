@@ -54,7 +54,7 @@ public class ServerValueWriterThread implements Runnable {
 
             // Current throughput.
             MessageCounter c = this.graylogServer.getMessageCounterManager().get(Core.THROUGHPUT_COUNTER_NAME);
-            graylogServer.getServerValues().writeThroughput(c.getTotalCount());
+            graylogServer.getServerValues().writeThroughput(c.getTotalCount().get());
             c.resetTotal(); // Reset five second throughput count.
 
             /*
