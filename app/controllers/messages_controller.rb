@@ -114,18 +114,6 @@
     end
   end
 
-  def destroy
-    render :status => :forbidden, :text => "forbidden" and return if !::Configuration.allow_deleting
-
-    if MessageGateway.delete_message(params[:id])
-      flash[:notice] = "Message has been deleted."
-    else
-      flash[:error] = "Could not delete message."
-    end
-
-    redirect_to :action => "index"
-  end
-
   def showrange
     @has_sidebar = true
     @load_flot = true

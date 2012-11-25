@@ -65,12 +65,6 @@
   <br /><br />
   Stored in index <span class="highlighted"><%= @message.source_index %></span>
 
-  <% if !current_user.reader? and ::Configuration.allow_deleting %>
-    <br />
-    <%= awesome_link "Delete message", message_path(@message), :method => :delete, :confirm => "Really delete message?" %>
-    <br />
-  <% end %>
-
   <% unless @comments.blank? %>
     <h3>Comments</h3>
     <ul id="messagecomments">

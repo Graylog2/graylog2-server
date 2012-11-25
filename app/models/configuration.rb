@@ -24,10 +24,6 @@ class Configuration
     general_config :allow_version_check, false
   end
 
-  def self.allow_deleting
-    general_config :allow_deleting, false
-  end
-
   def self.custom_cookie_name
     general_config :custom_cookie_name
   end
