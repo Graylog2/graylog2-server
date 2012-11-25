@@ -6,7 +6,6 @@ ElasticSearch output is always enabled.</div>
 	<strong>No outputs configured for this stream.</strong>
 	<br /><br />
 <% else %>
-
 	<% @stream.outputs.sort_by{ |o| o["description"]}.each do |output| %>
 		<div class="lines-line">
 			<h3><%= output["description"] %></h3>
@@ -38,7 +37,6 @@ ElasticSearch output is always enabled.</div>
 			</div>
 		</div>
 	<% end %>
-
 <% end %>
 
 <h2>Add output</h2>

@@ -5,6 +5,22 @@ The full documentation is available on the <%= support_link("support pages", "gr
 Go to the <%= link_to("server activity messages", health_index_path) %> to see AMQP activity.
 <br /><br />
 
+<% if @amqp_configurations.blank? %>
+	<strong>No AMQP configurations found.</strong>
+	<br /><br />
+<% else %>
+	<% @amqp_configurations.each do |config| %>
+		<div class="lines-line">
+			<h3><%= config.exchange %>:<%= config.routing_key %></h3>
+			<strong>Type:</strong> <%= config.input_type %>,
+			<strong>TTL:</strong> <%= config.ttl %><br />
+			<strong>Queue name:</strong> <%= config.queue_name %>
+			<br />
+			<%= link_to("Delete", amqp_setting_path(config), :method => :delete, :confirm => "Really delete?") %>
+		</div>
+	<% end %>
+<% end %>
+
 <h2>Add new AMQP configuration</h2>
 <%= form_for(@amqp_configuration, :url => amqp_settings_path) do |f| %>
 	<%= f.label :exchange, "Exchange:" %>
@@ -25,32 +41,3 @@ Go to the <%= link_to("server activity messages", health_index_path) %> to see A
 	&nbsp;
 	<%= awesome_submit_link "Add" %>
 <% end %>
-
-<br />
-<table class="messages">
-	<thead>
-		<tr>
-			<th>Exchange</th>
-			<th>Routing key</th>
-			<th>TTL</th>
-			<th>Type</th>
-			<th>Queue name</th>
-			<th colspan="2">Created</th>
-		</tr>
-	</thead>
-
-	<tbody>
-		<% @amqp_configurations.each do |config| %>
-			<tr>
-				<td><%= config.exchange %></td>
-				<td><%= config.routing_key %></td>
-				<td><%= config.ttl %></td>
-				<td><%= config.input_type %></td>
-				<td><%= config.queue_name %></td>
-				<td><%= gl_date(config.created_at) %></td>
-				<td><%= link_to("Delete", amqp_setting_path(config), :method => :delete, :confirm => "Really delete?") %></td>
-			</tr>
-		<% end %>
-	</tbody>
-
-</table>
