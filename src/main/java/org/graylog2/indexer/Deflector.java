@@ -31,6 +31,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import org.graylog2.Tools;
 
 /**
  *
@@ -105,9 +106,10 @@ public class Deflector {
         // Create new index.
         LOG.info("Creating index target <{}>...", newTarget);
         server.getIndexer().createIndex(newTarget);
+        server.getMongoBridge().writeIndexDateRange(newTarget, Tools.getUTCTimestamp());
         LOG.info("Done!");
         
-        // Point to deflector to new index.
+        // Point deflector to new index.
         LOG.info("Pointing deflector to new target index....");
 
         Activity activity = new Activity(Deflector.class);

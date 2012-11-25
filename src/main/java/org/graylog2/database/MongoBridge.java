@@ -179,6 +179,14 @@ public class MongoBridge {
         }
     }
     
+    public void writeIndexDateRange(String indexName, int startDate) {
+        BasicDBObject obj = new BasicDBObject();
+        obj.put("index", indexName);
+        obj.put("start", startDate);
+        
+        connection.getDatabase().getCollection("index_ranges").insert(obj);
+    }
+    
     /**
      * Get a setting from the settings collection.
      *
