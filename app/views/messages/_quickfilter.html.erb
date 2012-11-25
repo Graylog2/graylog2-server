@@ -8,7 +8,7 @@
     <dd><%= text_field_tag "filters[full_message]", params[:filters].blank? ? nil : params[:filters][:full_message] %> <%=raw tooltip("Message-search-syntax") %></dd>
 
     <dt><%= label_tag "filters[date]", "Timeframe:" %></dt>
-    <dd><%= text_field_tag "filters[date]", params[:filters].blank? ? nil : params[:filters][:date] %> <%=raw tooltip("Timeframe-Filters") %></dd>
+    <dd><%= text_field_tag "filters[date]", params[:filters].blank? ? "from 30 minutes ago" : params[:filters][:date] %> <%=raw tooltip("Timeframe-Filters") %></dd>
 
     <dt><%= label_tag "filters[facility]", "Facility:" %></dt>
     <dd><%= text_field_tag "filters[facility]", params[:filters].blank? ? nil : params[:filters][:facility] %></dd>
