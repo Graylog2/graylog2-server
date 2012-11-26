@@ -18,3 +18,9 @@
 <% if current_user.admin? and SystemSetting.show_first_login_modal? %>
 	<%= render :partial => "firstlogin" %>
 <% end %>
+
+<% if !params[:filters].blank? %>
+	<span class="messages-used-indices">
+	I searched in the following indices: <%= @messages.used_indices.to_sentence %>
+	</span>
+<% end %>

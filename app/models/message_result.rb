@@ -1,5 +1,5 @@
 class MessageResult < Array
 
-  attr_accessor :total_result_count
+  attr_accessor :total_result_count, :used_indices
 
 end

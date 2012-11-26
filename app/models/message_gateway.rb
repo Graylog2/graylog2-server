@@ -34,13 +34,13 @@ class MessageGateway
     ALL_INDICES_ALIAS = "graylog2_test"
     RECENT_INDEX_NAME = "graylog2_recent_test"
   else
-    indices_prefix = Configuration.indexer_index_prefix.blank? ? DEFAULT_INDEX_PREFIX : Configuration.indexer_index_prefix
+    @indices_prefix = Configuration.indexer_index_prefix.blank? ? DEFAULT_INDEX_PREFIX : Configuration.indexer_index_prefix
     config_recent_index = Configuration.indexer_recent_index_name
     config_recent_index.blank? ? RECENT_INDEX_NAME = DEFAULT_RECENT_INDEX_NAME : RECENT_INDEX_NAME = config_recent_index
 
     # Wildcard Multi Index Syntax
     # http://www.elasticsearch.org/blog/2012/07/02/0.19.8-released.html
-    ALL_INDICES_ALIAS = "#{indices_prefix}_*,-#{RECENT_INDEX_NAME}"
+    ALL_INDICES_ALIAS = "#{@indices_prefix}_*,-#{RECENT_INDEX_NAME}"
   end
 
   TYPE_NAME = "message"
@@ -101,7 +101,7 @@ class MessageGateway
   end
 
   def self.universal_search(page = 1, query, opts)
-    use_all_indices!
+    used_indices = use_timerange_specific_indices!((opts[:since].blank? or opts[:since] == 0) ? nil : opts[:since])
 
     histogram_only = !opts[:date_histogram].blank? and opts[:date_histogram] == true
 
@@ -130,7 +130,7 @@ class MessageGateway
 
     return r.facets["date_histogram"]["entries"] if histogram_only rescue return []
 
-    wrap(r)
+    wrap(r, used_indices)
   end
 
   def self.dynamic_distribution(target, query)
@@ -160,7 +160,8 @@ class MessageGateway
   end
 
   def self.all_by_quickfilter(filters, page = 1, opts = {})
-    use_all_indices!
+    range = Quickfilter.get_conditions_timeframe(filters[:date])
+    used_indices = use_timerange_specific_indices!(range[:greater])
 
     histogram_only = !opts[:date_histogram].blank? and opts[:date_histogram] == true
 
@@ -201,7 +202,7 @@ class MessageGateway
 
       # Timeframe.
       if !filters[:date].blank?
-        range = Quickfilter.get_conditions_timeframe(filters[:date])
+        
         filter :range, :created_at => { :gt => range[:greater], :lt => range[:lower] }
       end
 
@@ -249,7 +250,6 @@ class MessageGateway
 
           # Timeframe.
           if !filters[:date].blank?
-            range = Quickfilter.get_conditions_timeframe(filters[:date])
             facet_filter :range, :created_at => { :gt => range[:greater], :lt => range[:lower] }
           end
 
@@ -285,7 +285,7 @@ class MessageGateway
 
     return r.facets["date_histogram"]["entries"] if histogram_only rescue return []
 
-    return wrap(r)
+    return wrap(r, used_indices)
   end
 
   def self.total_count
@@ -397,24 +397,53 @@ class MessageGateway
     index_name(ALL_INDICES_ALIAS)
   end
 
+  def self.use_timerange_specific_indices!(start)
+    if start.blank?
+      indices = ["ALL"]
+      use_all_indices!
+    else
+      indices = get_timeranged_indices(start)
+
+      if indices.size > 0
+        index_name("#{indices.map{|i| "#{i}*" }.join(",")},-#{RECENT_INDEX_NAME}")
+      else
+        # No indices for that timerange. We need to have an index target, so search on RECENT.
+        index_name("#{RECENT_INDEX_NAME}")
+      end
+    end
+
+    return indices
+  end
+
   def self.use_recent_index!
     index_name(RECENT_INDEX_NAME)
   end
 
-  def self.wrap(x)
+  def self.get_timeranged_indices(start)
+    indices = []
+
+    IndexRange.all.where(:start => { "$gte" => start }).each do |r|
+      indices << r.index
+    end
+
+    return indices
+  end
+
+  def self.wrap(x, used_indices = ["UNKNOWN"])
     return nil if x.nil?
     case(x)
       when Tire::Results::Item then Message.parse_from_elastic(x)
-      when Tire::Results::Collection then wrap_collection(x)
+      when Tire::Results::Collection then wrap_collection(x, used_indices)
       else
         Rails.logger.error "Unsupported result type while trying to wrap ElasticSearch response: #{x.class}"
         raise UnsupportedResultType
     end
   end
 
-  def self.wrap_collection(c)
+  def self.wrap_collection(c, used_indices = ["UNKOWN"])
     r = MessageResult.new(c.results.map { |i| wrap(i) })
     r.total_result_count = c.total
+    r.used_indices = used_indices
     return r
   end
 

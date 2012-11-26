@@ -57,11 +57,11 @@
         @quickfilter_result_count = @messages.total_result_count
       end
     end
-  rescue Tire::Search::SearchRequestFailed
-      flash[:error] = "Syntax error in search query or empty index."
-      @messages = MessageResult.new
-      @total_count = 0
-      @quickfilter_result_count = @messages.total_result_count
+  #rescue Tire::Search::SearchRequestFailed
+  ##    flash[:error] = "Syntax error in search query or empty index."
+  #    @messages = MessageResult.new
+  #    @total_count = 0
+  #    @quickfilter_result_count = @messages.total_result_count
   end
 
   # Not possible to do this via before_filter because of scope decision by params hash
