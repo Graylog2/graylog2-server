@@ -20,17 +20,18 @@
 
 package org.graylog2.periodical;
 
-import org.graylog2.Core;
-import org.graylog2.LibratoMetricsFormatter;
-import org.graylog2.plugin.Tools;
-import org.graylog2.plugin.MessageCounter;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import java.io.DataOutputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.util.Map;
+
+import org.graylog2.Core;
+import org.graylog2.LibratoMetricsFormatter;
+import org.graylog2.plugin.MessageCounter;
+import org.graylog2.plugin.Tools;
 import org.graylog2.streams.StreamImpl;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * @author Lennart Koopmann <lennart@socketfeed.com>
@@ -58,10 +59,10 @@ public class LibratoMetricsWriterThread implements Runnable {
             this.graylogServer.getMessageCounterManager().register(COUNTER_NAME);
         }
 
-        MessageCounter counter = this.graylogServer.getMessageCounterManager().get(COUNTER_NAME);
+        Map<Integer, MessageCounter> counters = this.graylogServer.getMessageCounterManager().get(COUNTER_NAME);
         try {
             LibratoMetricsFormatter f = new LibratoMetricsFormatter(
-                    counter,
+                    counters,
                     graylogServer.getConfiguration().getLibratoMetricsPrefix(),
                     graylogServer.getConfiguration().getLibratoMetricsStreamFilter(),
                     graylogServer.getConfiguration().getLibratoMetricsHostsFilter(),
@@ -73,8 +74,6 @@ public class LibratoMetricsWriterThread implements Runnable {
             LOG.debug("Sent message counts to Librato Metrics.");
         } catch (Exception e) {
             LOG.warn("Error in LibratoMetricsWriterThread: " + e.getMessage(), e);
-        } finally {
-            counter.resetAllCounts();
         }
     }
 

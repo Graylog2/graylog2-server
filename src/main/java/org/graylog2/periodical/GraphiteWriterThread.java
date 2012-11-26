@@ -34,6 +34,7 @@ import java.net.SocketAddress;
 import java.net.SocketException;
 import java.net.UnknownHostException;
 import java.util.List;
+import java.util.Map;
 
 /**
  * @author Lennart Koopmann <lennart@socketfeed.com>
@@ -68,21 +69,25 @@ public class GraphiteWriterThread implements Runnable {
             this.graylogServer.getMessageCounterManager().register(COUNTER_NAME);
         }
 
-        MessageCounter counter = this.graylogServer.getMessageCounterManager().get(COUNTER_NAME);
-        try {
-            GraphiteFormatter f = new GraphiteFormatter(
-                    counter,
-                    graylogServer.getConfiguration().getGraphitePrefix()
-            );
-            
-            send(f.getAllMetrics());
+    	Map<Integer, MessageCounter> counters = this.graylogServer.getMessageCounterManager().get(COUNTER_NAME);
 
-            LOG.debug("Sent message counts to Graphite at <{}:{}>.", carbonHost, carbonPort);
-        } catch (Exception e) {
-            LOG.warn("Error in GraphiteWriterThread: " + e.getMessage(), e);
-        } finally {
-            counter.resetAllCounts();
-        }
+    	for(Integer currentCounterKey : counters.keySet()) {
+    		MessageCounter currentCounterValue = counters.remove(currentCounterKey);
+
+    		try {
+    			GraphiteFormatter f = new GraphiteFormatter(
+    					currentCounterKey,
+    					currentCounterValue,
+    					graylogServer.getConfiguration().getGraphitePrefix()
+    					);
+
+    			send(f.getAllMetrics());
+
+    			LOG.debug("Sent message counts to Graphite at <{}:{}>.", carbonHost, carbonPort);
+    		} catch (Exception e) {
+    			LOG.warn("Error in GraphiteWriterThread: " + e.getMessage(), e);
+    		}
+    	}
     }
 
     private boolean send(List<String> metrics) {

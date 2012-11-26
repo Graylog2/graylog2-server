@@ -20,17 +20,22 @@
 
 package org.graylog2;
 
-import java.util.List;
+import static org.junit.Assert.assertEquals;
+
 import java.util.ArrayList;
-import com.google.common.collect.Maps;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
-import org.json.simple.JSONValue;
+
 import org.bson.types.ObjectId;
+import org.graylog2.plugin.MessageCounter;
+import org.graylog2.plugin.Tools;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
+import org.json.simple.JSONValue;
 import org.junit.Test;
-import static org.junit.Assert.*;
+
+import com.google.common.collect.Maps;
 
 public class LibratoMetricsFormatterTest {
 
@@ -63,7 +68,9 @@ public class LibratoMetricsFormatterTest {
         fakeStreamNames.put(id2.toString(), "lolano$therSTREAM");
         counter.incrementStream(id2);
 
-        LibratoMetricsFormatter f = new LibratoMetricsFormatter(counter, "gl2-", new ArrayList<String>(), "", fakeStreamNames);
+        Map<Integer, MessageCounter> counters = Maps.newConcurrentMap();
+        counters.put(Tools.getUTCTimestamp(), counter);
+        LibratoMetricsFormatter f = new LibratoMetricsFormatter(counters, "gl2-", new ArrayList<String>(), "", fakeStreamNames);
 
         Map<String, Map<String,Object>> gauges = parseGauges(f.asJson());
 
@@ -80,7 +87,9 @@ public class LibratoMetricsFormatterTest {
     @Test
     public void testAsJsonWithEmptyCounter() {
         MessageCounterImpl counter = new MessageCounterImpl();
-        LibratoMetricsFormatter f = new LibratoMetricsFormatter(counter, "gl2-", new ArrayList<String>(), "", new HashMap<String, String>());
+        Map<Integer, MessageCounter> counters = Maps.newConcurrentMap();
+        counters.put(Tools.getUTCTimestamp(), counter);
+        LibratoMetricsFormatter f = new LibratoMetricsFormatter(counters, "gl2-", new ArrayList<String>(), "", new HashMap<String, String>());
 
         Map<String, Map<String,Object>> gauges = parseGauges(f.asJson());
 
@@ -125,7 +134,9 @@ public class LibratoMetricsFormatterTest {
         streamFilter.add(id3.toString());
         streamFilter.add(new ObjectId().toString());
 
-        LibratoMetricsFormatter f = new LibratoMetricsFormatter(counter, "gl2-", streamFilter, "", fakeStreamNames);
+        Map<Integer, MessageCounter> counters = Maps.newConcurrentMap();
+        counters.put(Tools.getUTCTimestamp(), counter);
+        LibratoMetricsFormatter f = new LibratoMetricsFormatter(counters, "gl2-", streamFilter, "", fakeStreamNames);
 
         Map<String, Map<String,Object>> gauges = parseGauges(f.asJson());
 
@@ -172,7 +183,9 @@ public class LibratoMetricsFormatterTest {
 
         String hostFilter = "^bar.*\\.example.org$";
 
-        LibratoMetricsFormatter f = new LibratoMetricsFormatter(counter, "gl2-", new ArrayList<String>(), hostFilter, fakeStreamNames);
+        Map<Integer, MessageCounter> counters = Maps.newConcurrentMap();
+        counters.put(Tools.getUTCTimestamp(), counter);
+        LibratoMetricsFormatter f = new LibratoMetricsFormatter(counters, "gl2-", new ArrayList<String>(), hostFilter, fakeStreamNames);
 
         Map<String, Map<String,Object>> gauges = parseGauges(f.asJson());
 
