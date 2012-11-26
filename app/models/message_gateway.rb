@@ -409,6 +409,7 @@ class MessageGateway
       else
         # No indices for that timerange. We need to have an index target, so search on RECENT.
         index_name("#{RECENT_INDEX_NAME}")
+        indices = [RECENT_INDEX_NAME]
       end
     end
 
@@ -426,7 +427,12 @@ class MessageGateway
       indices << r.index
     end
 
-    return indices
+    # Always search in the latest index.
+    if !DeflectorInformation.first.nil?
+      indices << DeflectorInformation.first.deflector_target
+    end
+
+    return indices.uniq
   end
 
   def self.wrap(x, used_indices = ["UNKNOWN"])
