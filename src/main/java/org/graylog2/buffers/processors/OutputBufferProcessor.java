@@ -35,6 +35,7 @@ import org.graylog2.plugin.logmessage.LogMessage;
 
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ThreadPoolExecutor;
@@ -98,6 +99,7 @@ public class OutputBufferProcessor implements EventHandler<LogMessageEvent> {
         buffer.add(msg);
 
         if (endOfBatch || buffer.size() >= server.getConfiguration().getOutputBatchSize()) {
+            final CountDownLatch doneSignal = new CountDownLatch(server.getOutputs().size());
             for (final MessageOutput output : server.getOutputs()) {
                 final String typeClass = output.getClass().getCanonicalName();
                 // Always write to ElasticSearch, but only write to other outputs if enabled for one of its streams.
@@ -117,14 +119,25 @@ public class OutputBufferProcessor implements EventHandler<LogMessageEvent> {
                                     output.write(myBuffer, buildStreamConfigs(myBuffer, typeClass), server);
                                 } catch (Exception e) {
                                     throw new RuntimeException(e);
+                                } finally {
+                                    doneSignal.countDown();
                                 }
                             }
                         });
                         
                     } catch (Exception e) {
                         LOG.error("Could not write message batch to output [" + output.getName() +"].", e);
+                        doneSignal.countDown();
                     }
+                } else {
+                    // Output was not written to, Router did not hit.
+                    doneSignal.countDown();
                 }
+            }
+            
+            // Wait until all writer threads have finished or timeout is reached.
+            if (!doneSignal.await(10, TimeUnit.SECONDS)) {
+                LOG.warn("Timeout reached. Not waiting any longer for writer threads to complete.");
             }
             
             buffer.clear();
