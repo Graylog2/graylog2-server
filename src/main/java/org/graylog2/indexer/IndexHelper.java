@@ -22,12 +22,17 @@ package org.graylog2.indexer;
 import com.google.common.collect.Sets;
 import java.util.List;
 import java.util.Set;
+import org.elasticsearch.common.collect.Lists;
 import org.graylog2.Tools;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * @author Lennart Koopmann <lennart@socketfeed.com>
  */
 public class IndexHelper {
+    
+    private static final Logger LOG = LoggerFactory.getLogger(IndexHelper.class);
     
     public static Set<String> getOldestIndices(Set<String> indexNames, int count) {
         Set<String> r = Sets.newHashSet();
@@ -36,13 +41,37 @@ public class IndexHelper {
             return r;
         }
         
-        List<String> sorted = Tools.asSortedList(indexNames);
+        Set<Integer> numbers = Sets.newHashSet();
         
+        for (String indexName : indexNames) {
+            numbers.add(Deflector.extractIndexNumber(indexName));
+        }
+ 
+        List<String> sorted = prependPrefixes(getPrefix(indexNames), Tools.asSortedList(numbers));
+
         // Add last x entries to return set.
         r.addAll(sorted.subList(0, count));
         
         return r;
     }
-   
+
+    private static String getPrefix(Set<String> names) {
+        if (names.isEmpty()) {
+            return "";
+        }
+        
+        String name = (String) names.toArray()[0];
+        return name.substring(0, name.lastIndexOf("_"));
+    }
+    
+    private static List<String> prependPrefixes(String prefix, List<Integer> numbers) {
+        List<String> r = Lists.newArrayList();
+        
+        for (int number : numbers) {
+            r.add(prefix + "_" + number);
+        }
+        
+        return r;
+    }
     
 }

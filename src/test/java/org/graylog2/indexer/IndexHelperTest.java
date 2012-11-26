@@ -40,16 +40,27 @@ public class IndexHelperTest {
         indices.add("graylog2_production_6");
         indices.add("graylog2_production_3");
         indices.add("graylog2_production_5");
+        indices.add("graylog2_production_8");
+        indices.add("graylog2_production_9");
+        indices.add("graylog2_production_10");
+        indices.add("graylog2_production_110");
+        indices.add("graylog2_production_125");
+        indices.add("graylog2_production_20");
+        indices.add("graylog2_production_21");
 
         Set<String> expected1 = Sets.newHashSet();
         expected1.add("graylog2_production_0");
         expected1.add("graylog2_production_1");
         expected1.add("graylog2_production_2");
+        expected1.add("graylog2_production_3");
+        expected1.add("graylog2_production_4");
+        expected1.add("graylog2_production_5");
+        expected1.add("graylog2_production_6");
         
         Set<String> expected2 = Sets.newHashSet();
         expected2.add("graylog2_production_0");
 
-        assertEquals(expected1, IndexHelper.getOldestIndices(indices, 3));
+        assertEquals(expected1, IndexHelper.getOldestIndices(indices, 7));
         assertEquals(expected2, IndexHelper.getOldestIndices(indices, 1));
     }
     

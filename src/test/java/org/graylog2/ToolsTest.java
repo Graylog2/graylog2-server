@@ -158,21 +158,23 @@ public class ToolsTest {
     
     @Test
     public void testAsSortedList() {
-        Set sortMe = Sets.newHashSet();
-        sortMe.add("graylog2_production_1");
-        sortMe.add("graylog2_production_7");
-        sortMe.add("graylog2_production_0");
-        sortMe.add("graylog2_production_2");
-        sortMe.add("graylog2_production_3");
-        sortMe.add("graylog2_production_5");
+        List sortMe = Lists.newArrayList();
+        sortMe.add(0);
+        sortMe.add(2);
+        sortMe.add(6);
+        sortMe.add(1);
+        sortMe.add(10);
+        sortMe.add(25);
+        sortMe.add(11);
         
         List expected = Lists.newArrayList();
-        expected.add("graylog2_production_0");
-        expected.add("graylog2_production_1");
-        expected.add("graylog2_production_2");
-        expected.add("graylog2_production_3");
-        expected.add("graylog2_production_5");
-        expected.add("graylog2_production_7");
+        expected.add(0);
+        expected.add(1);
+        expected.add(2);
+        expected.add(6);
+        expected.add(10);
+        expected.add(11);
+        expected.add(25);
         
         assertEquals(expected, Tools.asSortedList(sortMe));
     }

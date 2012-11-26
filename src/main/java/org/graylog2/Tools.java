@@ -28,8 +28,6 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.lang.management.ManagementFactory;
 import java.net.InetAddress;
-import java.net.InetSocketAddress;
-import java.net.SocketAddress;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -245,9 +243,9 @@ public final class Tools {
     }
     
     public static <T extends Comparable<? super T>> List<T> asSortedList(Collection<T> c) {
-      List<T> list = new ArrayList<T>(c);
-      java.util.Collections.sort(list);
-      return list;
+        List<T> list = new ArrayList<T>(c);
+        java.util.Collections.sort(list);
+        return list;
     }
  
 }

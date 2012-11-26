@@ -16,27 +16,21 @@ public class DeflectorTest {
 
     @Test
     public void testExtractIndexNumber() {
-        Deflector d = new Deflector(new GraylogServerStub());
-
-        assertEquals(0, d.extractIndexNumber("graylog2_0"));
-        assertEquals(4, d.extractIndexNumber("graylog2_4"));
-        assertEquals(52, d.extractIndexNumber("graylog2_52"));
+        assertEquals(0, Deflector.extractIndexNumber("graylog2_0"));
+        assertEquals(4, Deflector.extractIndexNumber("graylog2_4"));
+        assertEquals(52, Deflector.extractIndexNumber("graylog2_52"));
     }
     
     @Test
     public void testExtractIndexNumberWithCustomIndexPrefix() {
-        Deflector d = new Deflector(new GraylogServerStub());
-
-        assertEquals(0, d.extractIndexNumber("foo_0_bar_0"));
-        assertEquals(4, d.extractIndexNumber("foo_0_bar_4"));
-        assertEquals(52, d.extractIndexNumber("foo_0_bar_52"));
+        assertEquals(0, Deflector.extractIndexNumber("foo_0_bar_0"));
+        assertEquals(4, Deflector.extractIndexNumber("foo_0_bar_4"));
+        assertEquals(52, Deflector.extractIndexNumber("foo_0_bar_52"));
     }
     
     @Test(expected=NumberFormatException.class)
     public void testExtractIndexNumberWithMalformedFormatThrowsException() {
-        Deflector d = new Deflector(new GraylogServerStub());
-
-        assertEquals(0, d.extractIndexNumber("graylog2_hunderttausend"));
+        assertEquals(0, Deflector.extractIndexNumber("graylog2_hunderttausend"));
     }
     
     @Test
