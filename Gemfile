@@ -17,6 +17,7 @@ gem 'rails_autolink', '~> 1.0.4'
 gem 'kaminari', '~> 0.12.4'
 gem 'jquery-rails', '~> 2.1'
 gem 'therubyracer', '~> 0.10.2'
+gem 'net-ldap', '~> 0.3.1'
 
 group :development, :test do
   # might be useful to generate fake data in development

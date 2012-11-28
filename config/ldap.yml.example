@@ -1,0 +1,7 @@
+ldap:
+  enabled: false
+  host: ldap.mycompany.com
+  base: ou=People,dc=mycompany,dc=com
+  port: 389
+  username_attribute: email
+  displayname_attribute: displayname

@@ -20,7 +20,7 @@ class User
   # HACK HACK HACK -- how to do attr_accessible from here?
   # prevents a user from submitting a crafted form that bypasses activation
   # anything else you want your user to change should be added here.
-  attr_accessible :login, :email, :name, :password, :password_confirmation, :role, :stream_ids, :api_key
+  attr_accessible :login, :email, :name, :password, :password_confirmation, :role, :stream_ids, :from_ldap, :api_key
 
   field :login, :type => String
   field :email, :type => String
@@ -34,6 +34,7 @@ class User
   field :last_version_check, :type => Integer
   field :api_key, :type => String
   field :transports, :type => Hash
+  field :from_ldap, :type => Boolean, :default => false
 
   index :login,          :background => true, :unique => true
   index :remember_token, :background => true, :unique => true
@@ -51,9 +52,11 @@ class User
   # This will also let us return a human error message.
   #
   def self.authenticate(login, password)
-    return nil if login.blank? || password.blank?
-    u = find_by_login(login.downcase) # need to get the salt
-    u && u.authenticated?(password) ? u : nil
+    authenticator = Authenticator.new(login, password)
+
+    if authenticator.authenticated?
+      find_or_create_by_credentials(authenticator.credentials)
+    end
   end
 
   def self.find_by_id(_id)
@@ -70,6 +73,15 @@ class User
   
   def self.find_by_key(key)
     find(:first, :conditions => {:api_key => key})
+  end
+
+  def self.find_or_create_by_credentials(credentials)
+    user   = find_by_login(credentials.login)
+    params = credentials.to_hash.reverse_merge({ :password              => 'Not needed for auth strategy.',
+                                                 :password_confirmation => 'Not needed for auth strategy.',
+                                                 :role                  => User::STANDARD_ROLE })
+
+    user || create(params)
   end
 
   def login=(value)
