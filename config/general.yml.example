@@ -1,17 +1,6 @@
 general:
   external_hostname: "your-graylog2.example.org" # Used for example to generate permalinks. Don't add 'http://' or trailing slashes.
   date_format: "%d.%m.%Y - %H:%M:%S" # http://ruby-doc.org/core/classes/Time.html#M000298 (strftime syntax)
-  allow_deleting: false # Allowing deleting of messages negatively impacts performance
   allow_version_check: true # Enables manual (/versioncheck/index) and automatic (every 30min from overview page) version checking against graylog2.org via HTTP. 
   # custom_cookie_name: graylog2_staging1 # Set an own cookie name - Useful for multiple deployments on same host like example.org/staging1/graylog2, example.org/staging2/graylog2
   # hide_message_stats: false # Hide the message statistics at the top of the messages page. Improves performance when having huge amounts of stored logs.
-
-# Settings for stream subscription emails. 
-subscriptions:
-  from: graylog2subscriptions@example.org
-  subject: "[graylog2] Subscription"
-
-# Settings for stream alarm emails.
-streamalarms:
-  from: graylog2alarms@example.org
-  subject: "[graylog2] Stream alarm!"
