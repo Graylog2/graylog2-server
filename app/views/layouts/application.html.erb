@@ -22,8 +22,6 @@
   <% end %>
 
   <%= javascript_include_tag "backtotop" if @use_backtotop %>
-
-  <%= javascript_include_tag "realtime" if @has_realtime %>
 </head>
 <body>
   <%= javascript_tag("var relative_url_root = '#{controller.config.relative_url_root}';") %>

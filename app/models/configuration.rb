@@ -33,59 +33,6 @@ class Configuration
     general_config :date_format, "%d.%m.%Y - %H:%M:%S"
   end
 
-  def self.hide_message_stats?
-    general_config :hide_message_stats, false
-  end
-
-  def self.subscr_config(key, default)
-    nested_general_config :subscriptions, key, default
-  end
-
-  def self.subscription_from_address
-    subscr_config :from, 'graylog2@example.org'
-  end
-
-  def self.subscription_subject
-    subscr_config :subject, "[graylog2] Subscription"
-  end
-
-  def self.streamalarm_config(key, default)
-    nested_general_config :streamalarms, key, default
-  end
-
-  def self.streamalarm_from_address
-    streamalarm_config :from, "graylog2@example.org"
-  end
-
-  def self.streamalarm_subject
-    streamalarm_config :subject, "[graylog2] Stream alarm!"
-  end
-
-  def self.realtime_config(key, default)
-    nested_general_config :realtime, key, default
-  end
-
-  def self.realtime_enabled?
-    realtime_config :enabled, false
-  end
-
-  def self.realtime_websocket_url
-    url = realtime_config :websocket_url, nil
-    return nil if url.nil?
-    url.chop! if url[-1] == "/"
-
-    return url
-  end
-
-  def self.realtime_websocket_token
-    token = realtime_config :token, nil
-    return nil if token.nil?
-
-    raise "configured websocket token (general.yml) must be alphanumeric" unless token =~ /^\w+$/i
-
-    return token
-  end
-
   def self.indexer_config(key = nil, default = nil)
     if key
       config_value @indexer_config, Rails.env, key, default

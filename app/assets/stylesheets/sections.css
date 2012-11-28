@@ -810,41 +810,6 @@
   display: none;
 }
 
-/* Realtime view */
-#realtime-messages li {
-  font-family: monospace;
-  font-size: 13px;
-}
-
-.realtime-messages-message-date {
-  color: #fd0c99;
-}
-
-#realtime-debug-log-open {
-  float: right;
-  padding-right: 5px;
-}
-
-#realtime-debug-log {
-  display: none;
-  margin-bottom: 15px;
-  border: 1px dotted #f00;
-  padding: 3px;
-  font-weight: bold;
-}
-
-.realtime-debug-log-date {
-  font-weight: normal;
-}
-
-.realtime-status-disconnected {
-  color: #f00;
-}
-
-.realtime-status-connected {
-  color: #0f0;
-}
-
 /* First login modal */
 #first-login-modal {
   width: 700px;

@@ -6,23 +6,7 @@
 
 Currently containing <span class="highlighted"><%= number_with_delimiter(@total_count, :delimiter => '.') %></span> messages.
 
-<% unless ::Configuration.hide_message_stats? %>
-  <% oldest_msg = MessageGateway.oldest_message %>
-  <% if @total_count > 0 and !oldest_msg.nil? %>
-    Oldest message is from <span class="highlighted"><%= gl_date(Time.at(oldest_msg.created_at)) %></span>.
-  <% end %>
-
-  <% message_count_interval = Setting.get_message_count_interval(current_user) %>
-  Stored <span class="highlighted">
-    <%= number_with_delimiter(MessageCount.total_count_of_last_minutes(Setting.get_message_count_interval(current_user)), :delimiter => '.') %>
-  </span>
-  messages in the last <%= message_count_interval %> minutes.
-<% end %>
-
-<br />
-
 <% if params[:filters].blank? %>
-<br />
 <%= recent_index_switcher(params[:showall]) %>
 <br />
 <% end %>
