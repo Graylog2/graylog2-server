@@ -30,6 +30,7 @@ application.js: application.js
 backtotop.js: backtotop.js
 files/application.js: files/application.js
 files/backtotop.js: files/backtotop.js
+files/excanvas.min.js: files/excanvas.min.js
 files/jit.js: files/jit.js
 files/jquery-1.8.1.js: files/jquery-1.8.1.js
 files/jquery.autocomplete.min.js: files/jquery.autocomplete.min.js
