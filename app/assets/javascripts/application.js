@@ -14,7 +14,6 @@
 //= require files/rails
 //= require files/application
 //= require files/jquery.autocomplete.min
-//= require files/excanvas.min
 //= require files/jquery.graylog2shell
 //= require files/jquery.gritter.min
 //= require files/jquery.mapkey.min
