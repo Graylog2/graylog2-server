@@ -219,7 +219,7 @@ module ApplicationHelper
   end
 
   def tooltip(to)
-    link_to(image_tag("icons/tooltip.png"), "https://github.com/Graylog2/graylog2-web-interface/wiki/" + to, :class => "tooltip", :target => "_blank", :title => "Help page in the wiki")
+    link_to(image_tag("icons/tooltip.png"), "http://support.torch.sh/help/kb/graylog2-web-interface/" + to, :class => "tooltip", :target => "_blank", :title => "Help in the support pages")
   end
 
   def support_link(text, to)

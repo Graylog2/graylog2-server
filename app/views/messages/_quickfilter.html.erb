@@ -2,13 +2,13 @@
   <%= form_tag((@stream ? stream_messages_path(@stream) : messages_path), :method => "GET") do -%>
   <dl id="messages-quickfilter-fields">
     <dt><%= label_tag "filters[:message]", "Message:" %></dt>
-    <dd><%= text_field_tag "filters[message]", params[:filters].blank? ? nil : params[:filters][:message] %> <%=raw tooltip("Message-search-syntax") %></dd>
+    <dd><%= text_field_tag "filters[message]", params[:filters].blank? ? nil : params[:filters][:message] %> <%=raw tooltip("message-search-syntax") %></dd>
 
     <dt><%= label_tag "filters[:full_message]", "Full Message:" %></dt>
-    <dd><%= text_field_tag "filters[full_message]", params[:filters].blank? ? nil : params[:filters][:full_message] %> <%=raw tooltip("Message-search-syntax") %></dd>
+    <dd><%= text_field_tag "filters[full_message]", params[:filters].blank? ? nil : params[:filters][:full_message] %> <%=raw tooltip("message-search-syntax") %></dd>
 
     <dt><%= label_tag "filters[date]", "Timeframe:" %></dt>
-    <dd><%= text_field_tag "filters[date]", params[:filters].blank? ? "from 30 minutes ago" : params[:filters][:date] %> <%=raw tooltip("Timeframe-Filters") %></dd>
+    <dd><%= text_field_tag "filters[date]", params[:filters].blank? ? "from 30 minutes ago" : params[:filters][:date] %> <%=raw tooltip("timeframe-filters") %></dd>
 
     <dt><%= label_tag "filters[facility]", "Facility:" %></dt>
     <dd><%= text_field_tag "filters[facility]", params[:filters].blank? ? nil : params[:filters][:facility] %></dd>

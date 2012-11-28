@@ -36,6 +36,6 @@
   <%= f.hidden_field :stream_id, :value => @stream.id %>
   <%= f.select :rule_type, options_for_select(Streamrule.get_types_for_select_options(:streams).sort, :selected => Streamrule::TYPE_MESSAGE) %>
   <%= streamrule_input_fields_for_add_form %>
-  <span id="stream-value-additional-field-help" class="stream-value-help" style="display: none;"><%= tooltip("Additional-field-filters-in-streams") %></span>
+  <span id="stream-value-additional-field-help" class="stream-value-help" style="display: none;"><%= tooltip("the-additional-field-stream-rule") %></span>
   <%= awesome_submit_link "Add" %>
 <% end %>
