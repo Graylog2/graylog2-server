@@ -15,6 +15,7 @@
   <%= javascript_include_tag "application" %>
   <%= javascript_include_tag("jit") if @load_jit %>
   <% if @load_flot %>
+    <%= javascript_include_tag("excanvas.min") %>
     <%= javascript_include_tag("flot") %>
   <% end %>
   <% if @load_messages %>
