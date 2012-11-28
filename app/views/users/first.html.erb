@@ -7,9 +7,6 @@
   <dt><%= label_tag 'login', "Username" %></dt>
   <dd><%= f.text_field :login %><%= @user.errors[:login].join(" and ")%></dd>
 
-  <dt><%= label_tag 'email' %></dt>
-  <dd><%= f.text_field :email %><%= @user.errors[:email].join(" and ")%></dd>
-
   <dt><%= label_tag 'name' %></dt>
   <dd><%= f.text_field :name %><%= @user.errors[:name].join(" and ")%></dd>
 
