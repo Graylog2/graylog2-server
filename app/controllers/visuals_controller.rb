@@ -7,13 +7,22 @@ class VisualsController < ApplicationController
     time = Benchmark.realtime do
       case params[:id]
         when "totalgraph" then
-          r["data"] = calculate_totalgraph(params[:hours])
+          if current_user.admin?
+            r["data"] = calculate_totalgraph(params[:hours])
+          end
         when "streamgraph" then
-          r["data"] = calculate_streamgraph(params[:stream_id], params[:hours])
+          stream = Stream.find(params[:stream_id])
+          if !stream.accessable_for_user?(current_user)
+            render :text => "you are not allowed to access this stream", :status => :not_authorized
+            return
+          end
+          r["data"] = calculate_streamgraph(stream, params[:hours])
         when "hostgraph" then
-          r["data"] = calculate_hostgraph(params[:hostname], params[:hours])
+          if current_user.admin?
+            r["data"] = calculate_hostgraph(params[:hostname], params[:hours])
+          end
         when "resultgraph" then
-          if params[:filters]
+          if current_user.admin? and params[:filters]
             r["data"] = calculate_quickfiltergraph(
               params[:filters],
               params[:interval],
@@ -23,6 +32,11 @@ class VisualsController < ApplicationController
           elsif params[:query]
             stream = Stream.find(params[:stream_id]) if !params[:stream_id].blank?
             host = Host.find(:first, :conditions => {:host=> params[:hostname]}) if !params[:hostname].blank?
+
+            if stream and !stream.accessable_for_user?(current_user)
+              render :text => "you are not allowed to access this stream", :status => :not_authorized
+              return
+            end
 
             r["data"] = calculate_querygraph(params[:query], params[:interval], host, stream, params[:since])
           end
@@ -42,9 +56,7 @@ class VisualsController < ApplicationController
     end
   end
 
-  def calculate_streamgraph(stream_id, hours = STANDARD_TIMESPAN_HOURS)
-    stream = Stream.find(stream_id)
-
+  def calculate_streamgraph(stream, hours = STANDARD_TIMESPAN_HOURS)
     return Array.new if stream.streamrules.blank?
 
     MessageCount.counts_of_last_minutes(hours.to_i*60, :stream_id => stream.id).collect do |timestamp, count|
