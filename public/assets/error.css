@@ -1,0 +1,29 @@
+body {
+  background-color: #000;
+  font-family: Helvetica,Arial,'Liberation Sans',FreeSans,sans-serif;
+  color: #fff;
+}
+
+h1 {
+  color: #fd0c99;
+  font-size: 22px;
+}
+
+ul {
+  list-style-type: square;
+  padding-left: 30px;
+}
+
+a {
+  color: #fd0c99;
+  text-decoration: none;
+}
+
+.dialog {
+  width: 500px;
+  margin: 50px auto;
+  background-color: #333333;
+  background-image: url(/assets/errorlogo.png);
+  background-repeat: no-repeat;
+  padding: 90px 25px 10px;
+}

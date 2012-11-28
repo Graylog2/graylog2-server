@@ -1,0 +1,49 @@
+#shell-container {
+  clear: both;
+  margin: 0 15px 10px 15px;
+  background-color: #000;
+  padding: 5px;
+  color: white;
+  font-family: monospace;
+  font-size: 14px;
+}
+
+#shell-container input {
+  background-color: #000;
+  color: white;
+}
+
+#shell-container ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.shell-prompt {
+  font-weight: bold;
+  float: left;
+}
+
+.shell-command {
+  padding: 0;
+  border: 0;
+  margin-left: 8px;
+  font-family: monospace;
+  font-size: 14px;
+}
+
+.shell-loading {
+  height: 16px;
+  width: 16px;
+  background: url(/assets/loading-shell.gif) no-repeat;
+  float: left;
+  padding-right: 5px;
+}
+
+.shell-result-string {
+  color: #fd0c99;
+}
+
+.shell-history-line {
+  line-height: 20px;
+}

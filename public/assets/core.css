@@ -1,0 +1,634 @@
+body {
+  background-color: #d4d4d4;
+  color: #000;
+  font-size: 11px;
+  font-family: 'Lucida Grande',Verdana,sans-serif;
+  line-height: 16px;
+}
+
+h1 {
+    font-size: 34px;
+    margin-bottom: 10px;
+    line-height: 32px;
+    display: block;
+    font-weight: normal;
+    font-family: Georgia,"Times New Roman",Times,serif;
+}
+
+h2 {
+    font-size: 24px;
+    margin-top: 5px;
+    margin-bottom: 10px;
+    display: block;
+    font-weight: normal;
+    font-family: Georgia,"Times New Roman",Times,serif;
+}
+
+h3 {
+    font-size: 18px;
+    margin-top: 11px;
+    margin-bottom: 5px;
+    display: block;
+    font-weight: normal;
+    font-family: Georgia,"Times New Roman",Times,serif;
+}
+
+h4 {
+    font-size: 14px;
+    margin-top: 7px;
+    margin-bottom: 3px;
+    display: block;
+    font-weight: normal;
+    font-family: Georgia,"Times New Roman",Times,serif;
+}
+
+a {
+    color: #fd0c99;
+    text-decoration: none;
+}
+
+table {
+    font-size: 11px;
+    width: 100%;
+}
+
+th {
+    text-align: left;
+    padding-right: 15px;
+    padding-bottom: 2px;
+    border-bottom: 1px dashed #222222;
+    font-size: 12px;
+}
+
+tbody tr:hover {
+    background-color: #ffdddd;
+}
+
+input, select {
+    font-size: 12px;
+    padding: 1px;
+}
+
+label {
+    font-size: 13px;
+    font-weight: bold;
+}
+
+.awesome {
+  margin-left: 3px;
+  font-size: 11px;
+  background: #a9014b url(/assets/awesome-link-overlay.png) repeat-x;
+  display: inline-block;
+  padding: 5px 10px 4px;
+  color: #fff;
+  text-decoration: none;
+  font-weight: bold;
+  line-height: 1;
+  -moz-border-radius: 5px;
+  -webkit-border-radius: 5px;
+  position: relative;
+  top: -3px;
+  cursor: pointer;
+  -moz-box-shadow: 0 1px 3px rgba(0,0,0,0.5);
+  -webkit-box-shadow: 0 1px 3px rgba(0,0,0,0.5);
+  text-shadow: 0 -1px 1px rgba(0,0,0,0.25);
+  border-bottom: 1px solid rgba(0,0,0,0.25);
+}
+
+.code {
+    font-family: monospace;
+    font-size: 10px;
+}
+
+.highlighted {
+    color: #fd0c99;
+}
+
+.light {
+  color: #333;
+  font-family: Georgia,"Times New Roman",Times,serif;
+}
+
+.bigger {
+  font-size: 15px;
+}
+
+.description {
+  position: relative;
+  top: -5px;
+  margin-bottom: 10px;
+  width: 70%;
+  color: #333;
+  font-family: Georgia,"Times New Roman",Times,serif;
+  font-size: 15px;
+  line-height: 19px;
+}
+
+.short-description {
+  position: relative;
+  top: -5px;
+  margin-bottom: 5px;
+  width: 70%;
+  font-family: Georgia,"Times New Roman",Times,serif;
+  font-size: 15px;
+  line-height: 19px;
+}
+
+.black {
+    color: #000 !important;
+}
+
+.loading {
+    height: 200px;
+    width: 100%;
+    background-image: url(/assets/loading.gif);
+    background-repeat: no-repeat;
+    background-position: center center;
+}
+
+.center {
+    width: 100%;
+    text-align: center;
+}
+
+.top-right {
+  width: 25%;
+  text-align: right;
+  float: right;
+}
+
+.tickLabel {
+  color: #000 !important;
+}
+
+.status-okay-text {
+  color: green;
+}
+
+.status-alarm-text {
+  color: #fff;
+  background-color: #f00;
+}
+
+.message-row {
+  cursor: pointer;
+}
+
+.notification {
+  height: 28px;
+  padding-left: 15px;
+  padding-top: 8px;
+  color: #fff;
+  font-size: 16px;
+  text-shadow: 0 -1px 1px #111;
+  font-weight: bold;
+  background-repeat: repeat-x;
+  position: fixed;
+  bottom: 0px;
+  width: 100%;
+}
+
+.notification-title {
+  margin-right: 25px;
+  font-size: 20px;
+  z-index: 9000;
+}
+
+#notification-notice {
+  background-image: url(/assets/notificationbar-green.png);
+}
+
+#notification-error {
+  background-image: url(/assets/notificationbar-red.png);
+}
+
+#top {
+    height: 90px;
+    width: 100%;
+    background-color: #333;
+}
+
+#toplogo {
+    float: left;
+    margin-left: 13px;
+}
+
+#userbar {
+    float: right;
+    background-color: #fd0c99;
+    background-image: url(/assets/userbar.png);
+    background-repeat: no-repeat;
+    padding: 3px;
+    padding-right: 5px;
+    padding-left: 18px;
+    position: relative;
+    top: 5px;
+    color: #fff;
+}
+
+#userbar a {
+    color: #000;
+}
+
+#topmenu {
+    float: left;
+    color: #fff;
+    position: relative;
+    top: 35px;
+    font-size: 16px;
+    height: 40px;
+    width: 675px;
+}
+
+#topmenu a {
+    color: #fff;
+}
+
+#topmenu li {
+    float: left;
+    margin-left: 20px;
+    padding: 7px;
+    color: #000;
+    text-transform: lowercase;
+}
+
+#topmenu a:hover {
+    color: #fd0c99;
+}
+
+.topmenu-active {
+   background-color: #fd0c99;
+}
+
+.topmenu-active a:hover {
+    color: #fff !important;
+}
+
+#new-message-count {
+    padding: 0px 4px 2px;
+    color: #fff;
+    font-size: 9px;
+    position: absolute;
+    left: 159px;
+}
+
+#content-top {
+  margin-left: 15px;
+  margin-right: 15px;
+}
+
+.content-tabs-tab {
+  float: left;
+  background-color: #fff;
+  font-size: 13px;
+  margin-left: 10px;
+  padding-left: 10px;
+  padding-right: 10px;
+  padding-bottom: 2px;
+  padding-top: 2px;
+}
+
+.content-tabs-tab-active {
+  font-weight: bold;
+}
+
+.ajaxloader {
+  display: block;
+  margin: 0px auto;
+  position: relative;
+  top: 25px;
+}
+
+.user-link-img {
+  width: 10px;
+  height: 10px;
+  margin-right: 2px;
+}
+
+#content {
+  clear: both;
+  margin: 0px 15px;
+  margin-bottom: 0px;
+  background-color: #fff;
+  padding-bottom: 7px;
+}
+
+#content-inner {
+  padding: 15px;
+  overflow: hidden;
+}
+
+#main-left {
+  float: left;
+  width: 65%;
+}
+
+#main-right {
+  width: 35%;
+  margin-left: 65%;
+  float: right;
+  position: fixed;
+}
+
+#sidebar {
+  margin-right: 15px;
+  overflow: auto;
+}
+
+#sidebar-inner {
+  background-color: #fff;
+  padding: 15px;
+}
+
+#sidebar-hide-link {
+  float: right;
+  position: relative;
+  top: 5px;
+  right: 10px;
+}
+
+#sidebar-hide-link:hover {
+  font-weight: bold;
+}
+
+#sidebar-inner h2 {
+  line-height: 23px;
+  margin-bottom: 6px;
+  margin-top: 0px;
+}
+
+.content-bottom {
+  height: 7px;
+  background-image: url(/assets/contentedge.png);
+  background-repeat: repeat-x;
+  background-color: #D4D4D4;
+  overflow: hidden;
+  position: relative;
+  top: 7px;
+}
+
+.content-bottom-sidebar {
+  top: 0px;
+}
+
+.content-bottom-left {
+  width: 40%;
+  float: left;
+}
+
+.content-bottom-right {
+  width: 40%;
+  float: right;
+  text-align: right;
+}
+
+#messages-bottom {
+  margin-top: 10px;
+}
+
+#errorExplanation {
+  margin-top: 10px;
+  margin-bottom: 10px;
+}
+
+#errorExplanation ul {
+  margin-left: 15px;
+  list-style-type: square;
+}
+
+.previous-page {
+  float: left;
+}
+
+.next-page {
+  float: right;
+}
+
+.tr-light {
+    background-color: #fff;
+}
+
+.tr-dark {
+    background-color: #fff;
+}
+
+/* AUTOCOMPLETE */
+.ac_results {
+    padding: 0px;
+    background-color: white;
+    overflow: hidden;
+    z-index: 99999;
+    width: 371px !important;
+}
+
+.ac_results ul {
+    width: 100%;
+    list-style-position: outside;
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.ac_results li {
+    margin: 0px;
+    padding: 2px 5px;
+    cursor: default;
+    display: block;
+    font: menu;
+    font-size: 12px;
+    line-height: 16px;
+    overflow: hidden;
+}
+
+.ac_loading {
+    background: white url('indicator.gif') right center no-repeat;
+}
+
+.ac_odd {
+    border-bottom: 1px solid #ccc;
+}
+
+.ac_even {
+    border-bottom: 1px solid #ccc;
+}
+
+.ac_over {
+    background-color: #fd0c99;
+    color: white;
+}
+
+#new-messages-bar a {
+    color: #fff;
+    font-weight: bold;
+}
+
+#graph-rangeselector {
+  float: right;
+}
+
+/* General Loading Notification :) */
+#gln {
+  position: fixed;
+  top: 5px;
+  left: 50%;
+  padding: 2px 5px 2px 25px;
+  color: #000;
+  background-color: #000;
+  text-transform: uppercase;
+  z-index: 9001;
+  color: #fff;
+  background-image: url(/assets/top-load.gif);
+  background-repeat: no-repeat;
+  background-position: left center;
+}
+
+#simplemodal-container a.modalCloseImg {
+  background:url(/assets/x.png) no-repeat;
+  width:25px;
+  height:29px;
+  display:inline;
+  z-index:3200;
+  position:absolute;
+  top:-15px;
+  right:-18px;
+  cursor:pointer;
+}
+#simplemodal-overlay {background-color:#000;}
+#simplemodal-container {background-color:#333; border:8px solid #444; padding:12px; color: #fff;}
+
+#back-to-top {
+  width: 100px;
+  border: 1px solid #ccc;
+  background: #f7f7f7;
+  text-align: center;
+  padding: 5px;
+  position: fixed;
+  top: 65px;
+  left: 65%;
+  cursor: pointer;
+  display: none;
+  color: #333;
+  font-size: 11px;
+}
+
+#server-not-running {
+  background-image: url(/assets/notificationbar-red.png);
+}
+
+.time-light {
+  color: #9a9a9a;
+}
+
+.highlighted .time-light {
+  color: #fd9dd5;
+}
+
+/* entity list */
+
+#el-e {
+  margin-top: 10px;
+  margin-bottom: 10px;
+  margin-left: 15px;
+  padding-top: 6px;
+  padding-bottom: 6px;
+  border-bottom: 1px solid #ccc;
+  height: 16px;
+  clear: both;
+}
+
+.el-e-left {
+  width: 85px;
+  float: left;
+}
+
+.el-e-middle {
+  float: left;
+  padding-right: 15px;
+}
+
+.el-e-right {
+  float: left;
+}
+
+.el-e-title {
+  font-size: 27px;
+  font-family: Georgia,"Times New Roman",Times,serif;
+  display: block;
+}
+
+.el-e-title-disabled a {
+  color: #aaa;
+}
+
+.el-e-description {
+  color: #aaa;
+  display: block;
+  position: relative;
+  top: 5px;
+}
+
+.pagination {
+  width: 100%;
+  text-align: right;
+  margin-top: 25px;
+}
+
+.pagination .page {
+  font-weight: bold;
+}
+
+#current-throughputs {
+  position: absolute;
+  right: 0px;
+  top: 50px;
+  padding: 3px;
+  padding-left: 7px;
+  background-color: #000;
+  font-weight: bold;
+  color: #fff;
+  cursor: pointer;
+}
+
+.content-console {
+  background-color: #000 !important;
+  color: #fff;
+}
+
+.content-console h1 {
+  font-family: monospace;
+  font-size: 20px;
+}
+
+.content-console #content-inner {
+  padding: 5px;
+  padding-left: 10px;
+}
+
+#invalid-mapping-warning {
+  margin-top: 10px;
+  margin-bottom: 10px;
+  font-weight: bold;
+  color: #f00;
+}
+
+#universal-search {
+  background-color: #fff;
+  margin: 0px 15px;
+  padding: 5px 10px;
+}
+
+#universal-search-field {
+  border: 0px;
+  font-size: 14px;
+  font-family: monospace;
+  color: #bbb;
+  width: 100%;
+}
+
+#universal-search-timespan-container {
+  width: 90px;
+}
+
+#universal-search-container {
+  background-color: #fff !important;
+}

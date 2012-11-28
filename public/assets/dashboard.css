@@ -1,0 +1,66 @@
+body {
+    font-family: Helvetica,Arial,sans-serif;
+    overflow: hidden;
+}
+
+table {
+    font-size: 11px;
+    width: 100%;
+}
+
+th {
+    text-align: left;
+    padding-right: 15px;
+    padding-bottom: 2px;
+    border-bottom: 1px dashed #222222;
+    font-size: 12px;
+}
+
+#top {
+    margin: 15px auto;
+    width: 90%;
+    height: 50px;
+}
+
+#top-timestamp {
+    float: right;
+    font-size: 17px;
+    margin-top: 40px;
+    color: #444;
+}
+
+#statuscontainer {
+    width: 100%;
+    color: #fff;
+}
+
+#status {
+    margin: 0px auto;
+    padding: 30px;
+    width: 90%;
+}
+
+#status h1 {
+    text-shadow: -1px -1px 0 #060;
+    font-size: 50px;
+    margin-left: 15px;
+    display: inline;
+}
+
+.status-problems {
+    background-color: #ff2500;
+}
+
+.status-okay {
+    background-color: #58b300;
+}
+
+#content {
+    width: 90%;
+    margin: 15px auto;
+}
+
+.messages td {
+    padding-top: 5px !important;
+    padding-bottom: 5px !important;
+}

@@ -1,0 +1,43 @@
+.messages {
+    font-family: 'Lucida Grande',Verdana,sans-serif !important;
+    font-size: 10px;
+}
+
+.messages-inline {
+    margin: 0px auto;
+    width: 98%;
+}
+
+.messages tr {
+    border-bottom: 1px solid #ccc;
+}
+
+.messages td {
+    padding: 2px;
+}
+
+.messages .highlighted {
+  color: #ff0000;
+}
+
+.messages-c-tools {
+  text-align: right;
+}
+
+.messages-from-today-link {
+  cursor: pointer;
+}
+
+.messages-today {
+  background-color: #ffdf93;
+}
+
+#result-graph {
+  width: 100%;
+  height: 200px;
+  margin-top: 20px;
+}
+
+.messages-used-indices {
+  color: #ccc;
+}

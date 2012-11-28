@@ -28,9 +28,7 @@ Graylog2WebInterface::Application.configure do
   # Use a different cache store in production
   # config.cache_store = :mem_cache_store
 
-  # Disable Rails's static asset server
-  # In production, Apache or nginx will already do this
-  config.serve_static_assets = true
+  
 
   # Enable serving of images, stylesheets, and javascripts from an asset server
   # config.action_controller.asset_host = "http://assets.example.com"
@@ -48,20 +46,15 @@ Graylog2WebInterface::Application.configure do
   # Send deprecation notices to registered listeners
   config.active_support.deprecation = :notify
 
-  # Compress JavaScripts and CSS
+  config.serve_static_assets = true
   config.assets.compress = true
-
-  # Don't fallback to assets pipeline if a precompiled asset is missed
   config.assets.compile = true
-
-  # Generate digests for assets URLs
-  config.assets.digest = true
+  config.assets.digest = false
+  config.assets.precompile += %w( * )
 
   # Defaults to Rails.root.join("public/assets")
   # config.assets.manifest = YOUR_PATH
 
-  # Precompile additional assets (application.js, application.css, and all non-JS/CSS are already added)
-  config.assets.precompile += %w( * )
 
   # Force all access to the app over SSL, use Strict-Transport-Security, and use secure cookies.
   # config.force_ssl = true

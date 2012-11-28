@@ -1,0 +1,99 @@
+body {
+  background-color: #d4d4d4;
+  font-family: Helvetica,Arial,'Liberation Sans',FreeSans,sans-serif;
+  color: #fff;
+  font-size: 13px;
+}
+
+h1 {
+  font-size: 25px;
+  margin-bottom: 7px;
+  display: block;
+  font-weight: normal;
+  font-family: Georgia,"Times New Roman",Times,serif;
+}
+
+a {
+  color: #fd0c99;
+  text-decoration: none;
+}
+
+#loginbox {
+  background-color: #363636;
+  margin: 0px auto;
+  padding: 15px;
+  width: 400px;
+  height: 108px;
+
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  margin-left: -215px;
+  margin-top: -69px;
+}
+
+#firstuser-box {
+  background-color: #363636;
+  margin: 0px auto;
+  padding: 15px;
+  width: 400px;
+  margin-top: 100px;
+}
+
+.login-credentials {
+  width: 380px;
+  font-size: 14px;
+  font-weight: bold;
+  padding: 8px 5px 9px 11px;
+}
+
+.initial {
+  text-align: right;
+  text-transform: uppercase;
+  color: #ccc;
+}
+
+#remember-me {
+  text-transform: uppercase;
+  font-size: 11px;
+  position: relative;
+  top: -2px;
+  left: -3px;
+}
+
+#submit {
+  margin-top: 3px;
+  float: right;
+  font-size: 12px;
+  background-color: #a9014b;
+  display: inline-block;
+  padding: 5px 10px 6px;
+  color: #fff;
+  text-decoration: none;
+  font-weight: bold;
+  line-height: 1;
+  -moz-border-radius: 5px;
+  -webkit-border-radius: 5px;
+  position: relative;
+  cursor: pointer;
+  -moz-box-shadow: 0 1px 3px rgba(0,0,0,0.5);
+  -webkit-box-shadow: 0 1px 3px rgba(0,0,0,0.5);
+  text-shadow: 0 -1px 1px rgba(0,0,0,0.25);
+  border-bottom: 1px solid rgba(0,0,0,0.25);
+}
+
+.submit-disabled {
+  color: #ccc !important;
+  cursor: wait !important;
+}
+
+#users-form dt {
+  font-weight: bold;
+  margin-top: 5px;
+}
+
+.description {
+  font-family: Georgia,"Times New Roman",Times,serif;
+  font-size: 15px;
+  line-height: 16px;
+}
