@@ -186,7 +186,6 @@ public class Core implements GraylogServer {
             return;
         }
         
-            
         this.initializers.add(initializer);
     }
 
@@ -245,6 +244,7 @@ public class Core implements GraylogServer {
         loadPlugins(MessageOutput.class, "outputs");
         loadPlugins(AlarmCallback.class, "alarm_callbacks");
         loadPlugins(Initializer.class, "initializers");
+        loadPlugins(MessageInput.class, "inputs");
         
         // Initialize all registered transports.
         for (Transport transport : this.transports) {
@@ -340,6 +340,8 @@ public class Core implements GraylogServer {
                 registerAlarmCallback((AlarmCallback) plugin);
             } else if (plugin instanceof Initializer) {
                 registerInitializer((Initializer) plugin);
+            } else if (plugin instanceof MessageInput) {
+                registerInput((MessageInput) plugin);
             } else {
                 LOG.error("Could not load plugin [{}] - Not supported type.", plugin.getClass().getCanonicalName());
             }

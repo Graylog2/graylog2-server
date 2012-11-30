@@ -57,6 +57,7 @@ public class ServerValueWriterInitializer extends SimpleFixedRateScheduleInitial
             PluginRegistry.setActiveTransports(graylogServer, graylogServer.getTransports());
             PluginRegistry.setActiveAlarmCallbacks(graylogServer, graylogServer.getAlarmCallbacks());
             PluginRegistry.setActiveMessageOutputs(graylogServer, graylogServer.getOutputs());
+            PluginRegistry.setActiveMessageInputs(graylogServer, graylogServer.getInputs());
         }
         
         configureScheduler(
