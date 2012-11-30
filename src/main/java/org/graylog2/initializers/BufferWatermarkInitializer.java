@@ -19,6 +19,7 @@
  */
 package org.graylog2.initializers;
 
+import org.graylog2.plugin.initializers.Initializer;
 import org.graylog2.Core;
 import org.graylog2.periodical.BufferWatermarkThread;
 

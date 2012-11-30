@@ -146,7 +146,7 @@
         <dependency>
             <groupId>${project.groupId}</groupId>
             <artifactId>graylog2-plugin</artifactId>
-            <version>0.9.7.8-SNAPSHOT</version>
+            <version>0.9.7.9-SNAPSHOT</version>
         </dependency>
     </dependencies>
 

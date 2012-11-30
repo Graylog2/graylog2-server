@@ -20,6 +20,7 @@
 
 package org.graylog2.initializers;
 
+import org.graylog2.plugin.initializers.Initializer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.graylog2.Configuration;

@@ -20,6 +20,7 @@
 
 package org.graylog2.initializers;
 
+import org.graylog2.plugin.initializers.Initializer;
 import com.yammer.metrics.reporting.GraphiteReporter;
 import java.util.concurrent.TimeUnit;
 import org.graylog2.Core;

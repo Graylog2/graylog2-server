@@ -31,7 +31,7 @@ import org.graylog2.buffers.ProcessBuffer;
 import org.graylog2.database.MongoBridge;
 import org.graylog2.database.MongoConnection;
 import org.graylog2.indexer.EmbeddedElasticSearchClient;
-import org.graylog2.initializers.Initializer;
+import org.graylog2.plugin.initializers.Initializer;
 import org.graylog2.inputs.MessageInput;
 import org.graylog2.gelf.GELFChunkManager;
 import org.graylog2.plugin.outputs.MessageOutput;
@@ -226,6 +226,7 @@ public class Core implements GraylogServer {
         loadPlugins(MessageFilter.class, "filters");
         loadPlugins(MessageOutput.class, "outputs");
         loadPlugins(AlarmCallback.class, "alarm_callbacks");
+        loadPlugins(Initializer.class, "initializers");
         
         // Initialize all registered transports.
         for (Transport transport : this.transports) {
@@ -304,6 +305,8 @@ public class Core implements GraylogServer {
                 registerOutput((MessageOutput) plugin);
             } else if (plugin instanceof AlarmCallback) {
                 registerAlarmCallback((AlarmCallback) plugin);
+            } else if (plugin instanceof Initializer) {
+                registerInitializer((Initializer) plugin);
             } else {
                 LOG.error("Could not load plugin [{}] - Not supported type.", plugin.getClass().getCanonicalName());
             }

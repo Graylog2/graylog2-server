@@ -21,6 +21,7 @@ package org.graylog2.initializers;
 
 import org.graylog2.Core;
 import org.graylog2.periodical.AMQPSyncThread;
+import org.graylog2.plugin.initializers.Initializer;
 
 /**
  * @author Lennart Koopmann <lennart@socketfeed.com>
