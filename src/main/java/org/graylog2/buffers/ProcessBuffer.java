@@ -23,7 +23,6 @@ package org.graylog2.buffers;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import com.lmax.disruptor.MultiThreadedClaimStrategy;
 import com.lmax.disruptor.RingBuffer;
-import com.lmax.disruptor.SleepingWaitStrategy;
 import com.lmax.disruptor.dsl.Disruptor;
 import com.yammer.metrics.Metrics;
 import com.yammer.metrics.core.Meter;
