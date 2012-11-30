@@ -118,7 +118,7 @@ public class Configuration {
     private int outputBufferProcessorThreadsCorePoolSize = 3;
     
     @Parameter(value = "processor_wait_strategy", required = true)
-    private String processorWaitStrategy = "yielding";
+    private String processorWaitStrategy = "sleeping";
     
     @Parameter(value = "ring_size", required = true, validator = PositiveIntegerValidator.class)
     private int ringSize = 1024;
@@ -405,8 +405,8 @@ public class Configuration {
         }
         
         LOG.warn("Invalid setting for [processor_wait_strategy]:"
-                + " Falling back to default: YieldingWaitStrategy.");
-        return new YieldingWaitStrategy();
+                + " Falling back to default: SleepingWaitStrategy.");
+        return new SleepingWaitStrategy();
     }
 
     public int getRingSize() {
