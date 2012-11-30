@@ -43,6 +43,12 @@ import java.net.UnknownHostException;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
+import org.graylog2.inputs.amqp.AMQPInput;
+import org.graylog2.inputs.gelf.GELFTCPInput;
+import org.graylog2.inputs.gelf.GELFUDPInput;
+import org.graylog2.inputs.http.GELFHttpInput;
+import org.graylog2.inputs.syslog.SyslogTCPInput;
+import org.graylog2.inputs.syslog.SyslogUDPInput;
 
 /**
  * Helper class to hold configuration of Graylog2
@@ -627,6 +633,28 @@ public class Configuration {
         return c;
     }
     
+    public Map<String, String> getInputConfig(Class input) {
+        if (input.equals(GELFTCPInput.class) || input.equals(GELFUDPInput.class)) {
+            return getGELFInputConfig();
+        }
+        
+        if (input.equals(SyslogTCPInput.class) || input.equals(SyslogUDPInput.class)) {
+            return getSyslogInputConfig();
+        }
+        
+        if (input.equals(GELFHttpInput.class)) {
+            return getGELFHttpInputConfig();
+        }
+        
+        if (input.equals(AMQPInput.class)) {
+            // AMQP has no special config needs for now.
+            return Maps.newHashMap();
+        }
+            
+        LOG.error("No standard configuration for input <{}> found.", input.getCanonicalName());
+        return Maps.newHashMap();
+    }
+    
     @ValidatorMethod
     public void validate() throws ValidationException {
 
@@ -646,5 +674,32 @@ public class Configuration {
 
     public int getHttpListenPort() {
         return httpListenPort;
+    }
+    
+    private Map<String, String> getGELFInputConfig() {
+        Map<String, String> c = Maps.newHashMap();
+        
+        c.put("listen_address", getGelfListenAddress());
+        c.put("listen_port", String.valueOf(getGelfListenPort()));
+        
+        return c;
+    }
+    
+    private Map<String, String> getSyslogInputConfig() {
+        Map<String, String> c = Maps.newHashMap();
+        
+        c.put("listen_address", getSyslogListenAddress());
+        c.put("listen_port", String.valueOf(getSyslogListenPort()));
+        
+        return c;
+    }
+    
+    private Map<String, String> getGELFHttpInputConfig() {
+        Map<String, String> c = Maps.newHashMap();
+        
+        c.put("listen_address", getHttpListenAddress());
+        c.put("listen_port", String.valueOf(getHttpListenPort()));
+        
+        return c;
     }
 }

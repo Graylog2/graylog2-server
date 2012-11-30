@@ -20,10 +20,10 @@
 
 package org.graylog2.inputs.syslog;
 
+import com.google.common.collect.Maps;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
-import org.graylog2.Configuration;
 import org.graylog2.Core;
-import org.graylog2.inputs.MessageInput;
+import org.graylog2.plugin.inputs.MessageInput;
 import org.jboss.netty.bootstrap.ConnectionlessBootstrap;
 import org.jboss.netty.channel.ChannelException;
 import org.jboss.netty.channel.FixedReceiveBufferSizePredictorFactory;
@@ -32,8 +32,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.net.InetSocketAddress;
+import java.util.Map;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import org.graylog2.plugin.GraylogServer;
 
 /**
  * @author Lennart Koopmann <lennart@socketfeed.com>
@@ -48,11 +50,11 @@ public class SyslogUDPInput implements MessageInput {
     private InetSocketAddress socketAddress;
 
     @Override
-    public void initialize(Configuration configuration, Core graylogServer) {
-        this.graylogServer = graylogServer;
+    public void initialize(Map<String, String> configuration, GraylogServer graylogServer) {
+        this.graylogServer = (Core) graylogServer;
         this.socketAddress = new InetSocketAddress(
-                configuration.getSyslogListenAddress(),
-                configuration.getSyslogListenPort()
+                configuration.get("listen_address"),
+                Integer.parseInt(configuration.get("listen_port"))
         );
 
         spinUp();
@@ -83,4 +85,10 @@ public class SyslogUDPInput implements MessageInput {
         return NAME;
     }
 
+    @Override
+    public Map<String, String> getRequestedConfiguration() {
+        // Built in input. This is just for plugin compat. No special configuration required.
+        return Maps.newHashMap();
+    }
+    
 }

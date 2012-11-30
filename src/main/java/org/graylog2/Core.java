@@ -32,7 +32,7 @@ import org.graylog2.database.MongoBridge;
 import org.graylog2.database.MongoConnection;
 import org.graylog2.indexer.EmbeddedElasticSearchClient;
 import org.graylog2.plugin.initializers.Initializer;
-import org.graylog2.inputs.MessageInput;
+import org.graylog2.plugin.inputs.MessageInput;
 import org.graylog2.gelf.GELFChunkManager;
 import org.graylog2.plugin.outputs.MessageOutput;
 import org.graylog2.streams.StreamCache;
@@ -42,11 +42,19 @@ import java.util.concurrent.atomic.AtomicInteger;
 import com.google.common.collect.Maps;
 import java.util.Map;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
+import java.util.HashSet;
+import java.util.Set;
 import org.graylog2.activities.Activity;
 import org.graylog2.activities.ActivityWriter;
 import org.graylog2.cluster.Cluster;
 import org.graylog2.database.HostCounterCacheImpl;
 import org.graylog2.indexer.Deflector;
+import org.graylog2.inputs.amqp.AMQPInput;
+import org.graylog2.inputs.gelf.GELFTCPInput;
+import org.graylog2.inputs.gelf.GELFUDPInput;
+import org.graylog2.inputs.http.GELFHttpInput;
+import org.graylog2.inputs.syslog.SyslogTCPInput;
+import org.graylog2.inputs.syslog.SyslogUDPInput;
 import org.graylog2.plugin.GraylogServer;
 import org.graylog2.plugin.alarms.callbacks.AlarmCallback;
 import org.graylog2.plugin.alarms.callbacks.AlarmCallbackConfigurationException;
@@ -54,6 +62,7 @@ import org.graylog2.plugin.alarms.transports.Transport;
 import org.graylog2.plugin.alarms.transports.TransportConfigurationException;
 import org.graylog2.plugin.buffers.Buffer;
 import org.graylog2.plugin.filters.MessageFilter;
+import org.graylog2.plugin.inputs.MessageInputConfigurationException;
 import org.graylog2.plugin.outputs.MessageOutputConfigurationException;
 import org.graylog2.plugins.PluginConfiguration;
 import org.graylog2.plugins.PluginLoader;
@@ -113,6 +122,15 @@ public class Core implements GraylogServer {
     
     private boolean localMode = false;
     private boolean statsMode = false;
+    
+    public static final Set<Class> STANDARD_INPUTS = new HashSet<Class>() {{ 
+        add(GELFTCPInput.class);
+        add(GELFUDPInput.class);
+        add(GELFHttpInput.class);
+        add(AMQPInput.class);
+        add(SyslogTCPInput.class);
+        add(SyslogUDPInput.class);
+    }};
 
     public void initialize(Configuration configuration) {
         serverId = Tools.generateServerId();
@@ -270,7 +288,22 @@ public class Core implements GraylogServer {
 
         // Initialize all registered inputs.
         for (MessageInput input : this.inputs) {
-            input.initialize(this.configuration, this);
+            try {
+                if (STANDARD_INPUTS.contains(input.getClass())) {
+                    // This is a built-in input. Initialize with config from graylog2.conf.
+                    input.initialize(configuration.getInputConfig(input.getClass()), this);
+                } else {
+                    // This is a plugin. Initialize with custom config from Mongo.
+                    input.initialize(PluginConfiguration.load(
+                            this,
+                            input.getClass().getCanonicalName()),
+                            this
+                    );
+                }
+            } catch (MessageInputConfigurationException e) {
+                LOG.error("Could not initialize input <{}>.", input.getClass().getCanonicalName(), e);
+            }
+            
             LOG.debug("Initialized input: {}", input.getName());
         }
         
