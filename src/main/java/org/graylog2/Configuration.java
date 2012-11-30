@@ -29,6 +29,11 @@ import com.github.joschi.jadconfig.validators.InetPortValidator;
 import com.github.joschi.jadconfig.validators.PositiveIntegerValidator;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
+import com.lmax.disruptor.BlockingWaitStrategy;
+import com.lmax.disruptor.BusySpinWaitStrategy;
+import com.lmax.disruptor.SleepingWaitStrategy;
+import com.lmax.disruptor.WaitStrategy;
+import com.lmax.disruptor.YieldingWaitStrategy;
 import com.mongodb.ServerAddress;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -106,9 +111,12 @@ public class Configuration {
     @Parameter(value = "outputbuffer_processor_threads_core_pool_size", required = true, validator = PositiveIntegerValidator.class)
     private int outputBufferProcessorThreadsCorePoolSize = 3;
     
+    @Parameter(value = "processor_wait_strategy", required = true)
+    private String processorWaitStrategy = "yielding";
+    
     @Parameter(value = "ring_size", required = true, validator = PositiveIntegerValidator.class)
     private int ringSize = 1024;
-    
+
     @Parameter(value = "elasticsearch_config_file", required = true, validator = FileReadableValidator.class)
     private String elasticSearchConfigFile = "/etc/graylog2-elasticsearch.yml";
 
@@ -371,6 +379,28 @@ public class Configuration {
     
     public int getOutputBufferProcessorThreadsMaxPoolSize() {
         return outputBufferProcessorThreadsMaxPoolSize;
+    }
+    
+    public WaitStrategy getProcessorWaitStrategy() {
+        if (processorWaitStrategy.equals("sleeping")) {
+            return new SleepingWaitStrategy();
+        }
+        
+        if (processorWaitStrategy.equals("yielding")) {
+            return new YieldingWaitStrategy();
+        }
+        
+        if (processorWaitStrategy.equals("blocking")) {
+            return new BlockingWaitStrategy();
+        }
+        
+        if (processorWaitStrategy.equals("busy_spinning")) {
+            return new BusySpinWaitStrategy();
+        }
+        
+        LOG.warn("Invalid setting for [processor_wait_strategy]:"
+                + " Falling back to default: YieldingWaitStrategy.");
+        return new YieldingWaitStrategy();
     }
 
     public int getRingSize() {

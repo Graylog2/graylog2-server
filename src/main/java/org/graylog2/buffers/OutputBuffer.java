@@ -67,8 +67,12 @@ public class OutputBuffer implements Buffer {
                 LogMessageEvent.EVENT_FACTORY,
                 executor,
                 new MultiThreadedClaimStrategy(server.getConfiguration().getRingSize()),
-                new SleepingWaitStrategy()
+                server.getConfiguration().getProcessorWaitStrategy()
         );
+        
+        LOG.info("Initialized OutputBuffer with ring size <{}> "
+                + "and wait strategy <{}>.", server.getConfiguration().getRingSize(),
+                server.getConfiguration().getProcessorWaitStrategy().getClass().getSimpleName());
 
         OutputBufferProcessor[] processors = new OutputBufferProcessor[server.getConfiguration().getOutputBufferProcessors()];
         

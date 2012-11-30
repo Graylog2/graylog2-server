@@ -67,8 +67,12 @@ public class ProcessBuffer implements Buffer {
                 LogMessageEvent.EVENT_FACTORY,
                 executor,
                 new MultiThreadedClaimStrategy(server.getConfiguration().getRingSize()),
-                new SleepingWaitStrategy()
+                server.getConfiguration().getProcessorWaitStrategy()
         );
+        
+        LOG.info("Initialized ProcessBuffer with ring size <{}> "
+                + "and wait strategy <{}>.", server.getConfiguration().getRingSize(),
+                server.getConfiguration().getProcessorWaitStrategy().getClass().getSimpleName());
 
         ProcessBufferProcessor[] processors = new ProcessBufferProcessor[server.getConfiguration().getProcessBufferProcessors()];
         
