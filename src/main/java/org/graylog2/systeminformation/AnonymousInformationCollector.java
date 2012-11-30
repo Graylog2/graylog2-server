@@ -69,6 +69,7 @@ public class AnonymousInformationCollector {
             plugins.put("filters", server.getFilters().size());
             plugins.put("outputs", server.getOutputs().size());
             plugins.put("transports", server.getTransports().size());
+            plugins.put("alarm_callbacks", server.getAlarmCallbacks().size());
 
             return plugins;
         } catch (Exception e) {
