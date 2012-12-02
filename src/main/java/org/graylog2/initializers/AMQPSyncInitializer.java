@@ -19,31 +19,44 @@
  */
 package org.graylog2.initializers;
 
+import java.util.Map;
 import org.graylog2.Core;
 import org.graylog2.periodical.AMQPSyncThread;
+import org.graylog2.plugin.GraylogServer;
 import org.graylog2.plugin.initializers.Initializer;
+import org.graylog2.plugin.initializers.InitializerConfigurationException;
 
 /**
  * @author Lennart Koopmann <lennart@socketfeed.com>
  */
 public class AMQPSyncInitializer extends SimpleFixedRateScheduleInitializer implements Initializer {
-    
-    public AMQPSyncInitializer(Core graylogServer) {
-        this.graylogServer = graylogServer;
-    }
 
+    private static final String NAME = "AMQP synchronizer";
+    
     @Override
-    public void initialize() {
+    public void initialize(GraylogServer server, Map<String, String> config) throws InitializerConfigurationException {
         configureScheduler(
-                new AMQPSyncThread(this.graylogServer),
+                (Core) server,
+                new AMQPSyncThread((Core) server),
                 AMQPSyncThread.INITIAL_DELAY,
                 AMQPSyncThread.PERIOD
         );
+    }
+
+    @Override
+    public Map<String, String> getRequestedConfiguration() {
+        // Built in initializer. This is just for plugin compat. No special configuration required.
+        return com.google.common.collect.Maps.newHashMap();
     }
     
     @Override
     public boolean masterOnly() {
         return true;
+    }
+    
+    @Override
+    public String getName() {
+        return NAME;
     }
     
 }

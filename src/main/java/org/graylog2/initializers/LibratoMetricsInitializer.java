@@ -20,31 +20,46 @@
 
 package org.graylog2.initializers;
 
+import java.util.Map;
 import org.graylog2.plugin.initializers.Initializer;
 import org.graylog2.Core;
 import org.graylog2.periodical.LibratoMetricsWriterThread;
+import org.graylog2.plugin.GraylogServer;
+import org.graylog2.plugin.initializers.InitializerConfigurationException;
 
 /**
  * @author Lennart Koopmann <lennart@socketfeed.com>
  */
 public class LibratoMetricsInitializer extends SimpleFixedRateScheduleInitializer implements Initializer {
 
-    public LibratoMetricsInitializer(Core graylogServer) {
-        this.graylogServer = graylogServer;
+    private static final String NAME = "Librato";
+    
+    @Override
+    public void initialize(GraylogServer server, Map<String, String> config) throws InitializerConfigurationException {
+        Core srv = (Core) server;
+        
+        configureScheduler(
+                (Core) server,
+                new LibratoMetricsWriterThread(srv),
+                LibratoMetricsWriterThread.INITIAL_DELAY,
+                srv.getConfiguration().getLibratoMetricsInterval()
+        );
     }
 
     @Override
-    public void initialize() {
-        configureScheduler(
-                new LibratoMetricsWriterThread(this.graylogServer),
-                LibratoMetricsWriterThread.INITIAL_DELAY,
-                graylogServer.getConfiguration().getLibratoMetricsInterval()
-        );
+    public Map<String, String> getRequestedConfiguration() {
+        // Built in initializer. This is just for plugin compat. No special configuration required.
+        return com.google.common.collect.Maps.newHashMap();
     }
     
     @Override
     public boolean masterOnly() {
         return false;
+    }
+    
+    @Override
+    public String getName() {
+        return NAME;
     }
 
 }

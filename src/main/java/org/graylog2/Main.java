@@ -45,6 +45,7 @@ import org.graylog2.outputs.ElasticSearchOutput;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.Writer;
+import org.graylog2.plugin.initializers.InitializerConfigurationException;
 
 /**
  * Main class of Graylog2.
@@ -106,8 +107,12 @@ public final class Main {
         // If we only want to check our configuration, we just initialize the rules engine to check if the rules compile
         if (commandLineArguments.isConfigTest()) {
             Core server = new Core();
-            DroolsInitializer drools = new DroolsInitializer(server, configuration);
-            drools.initialize();
+            DroolsInitializer drools = new DroolsInitializer();
+            try {
+                drools.initialize(server, null);
+            } catch (InitializerConfigurationException e) {
+                LOG.error("Drools initialization failed.", e);
+            }
             // rules have been checked, exit gracefully
             System.exit(0);
         }
@@ -150,23 +155,23 @@ public final class Main {
         if (configuration.isTransportJabberEnabled()) {  server.registerTransport(new JabberTransport()); }
 
         // Register initializers.
-        server.registerInitializer(new ServerValueWriterInitializer(server, configuration));
-        server.registerInitializer(new DroolsInitializer(server, configuration));
-        server.registerInitializer(new HostCounterCacheWriterInitializer(server));
-        server.registerInitializer(new MessageCounterInitializer(server));
-        server.registerInitializer(new AlarmScannerInitializer(server));
-        if (configuration.isEnableGraphiteOutput())       { server.registerInitializer(new GraphiteInitializer(server)); }
-        if (configuration.isEnableLibratoMetricsOutput()) { server.registerInitializer(new LibratoMetricsInitializer(server)); }
-        server.registerInitializer(new DeflectorThreadsInitializer(server));
-        server.registerInitializer(new AnonymousInformationCollectorInitializer(server));
+        server.registerInitializer(new ServerValueWriterInitializer());
+        server.registerInitializer(new DroolsInitializer());
+        server.registerInitializer(new HostCounterCacheWriterInitializer());
+        server.registerInitializer(new MessageCounterInitializer());
+        server.registerInitializer(new AlarmScannerInitializer());
+        if (configuration.isEnableGraphiteOutput())       { server.registerInitializer(new GraphiteInitializer()); }
+        if (configuration.isEnableLibratoMetricsOutput()) { server.registerInitializer(new LibratoMetricsInitializer()); }
+        server.registerInitializer(new DeflectorThreadsInitializer());
+        server.registerInitializer(new AnonymousInformationCollectorInitializer());
         if (configuration.performRetention() && commandLineArguments.performRetention()) {
-            server.registerInitializer(new IndexRetentionInitializer(server));
+            server.registerInitializer(new IndexRetentionInitializer());
         }
         if (configuration.isAmqpEnabled()) {
-            server.registerInitializer(new AMQPSyncInitializer(server));
+            server.registerInitializer(new AMQPSyncInitializer());
         }
-        server.registerInitializer(new BufferWatermarkInitializer(server));
-        if (commandLineArguments.isStats()) { server.registerInitializer(new StatisticsPrinterInitializer(server)); }
+        server.registerInitializer(new BufferWatermarkInitializer());
+        if (commandLineArguments.isStats()) { server.registerInitializer(new StatisticsPrinterInitializer()); }
         
         // Register inputs.
         if (configuration.isUseGELF()) {

@@ -19,23 +19,31 @@
  */
 package org.graylog2.initializers;
 
+import java.util.Map;
 import org.graylog2.plugin.initializers.Initializer;
 import org.graylog2.Core;
 import org.graylog2.periodical.AlarmScannerThread;
+import org.graylog2.plugin.GraylogServer;
+import org.graylog2.plugin.initializers.InitializerConfigurationException;
 
 /**
  * @author Lennart Koopmann <lennart@socketfeed.com>
  */
 public class AlarmScannerInitializer extends SimpleFixedRateScheduleInitializer implements Initializer {
     
-    public AlarmScannerInitializer(Core graylogServer) {
-        this.graylogServer = graylogServer;
-    }
-
+    private static final String NAME = "Alarm scanner";
+    
     @Override
-    public void initialize() {
+    public Map<String, String> getRequestedConfiguration() {
+        // Built in initializer. This is just for plugin compat. No special configuration required.
+        return com.google.common.collect.Maps.newHashMap();
+    }
+    
+    @Override
+    public void initialize(GraylogServer server, Map<String, String> config) throws InitializerConfigurationException {
         configureScheduler(
-                new AlarmScannerThread(this.graylogServer),
+                (Core) server,
+                new AlarmScannerThread((Core) server),
                 AlarmScannerThread.INITIAL_DELAY,
                 AlarmScannerThread.PERIOD
         );
@@ -44,6 +52,11 @@ public class AlarmScannerInitializer extends SimpleFixedRateScheduleInitializer 
     @Override
     public boolean masterOnly() {
         return true;
+    }
+    
+    @Override
+    public String getName() {
+        return NAME;
     }
     
 }

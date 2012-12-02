@@ -20,36 +20,33 @@
 
 package org.graylog2.initializers;
 
+import java.util.Map;
 import org.graylog2.plugin.initializers.Initializer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.graylog2.Configuration;
 import org.graylog2.Core;
 import org.graylog2.RulesEngineImpl;
+import org.graylog2.plugin.GraylogServer;
+import org.graylog2.plugin.initializers.InitializerConfigurationException;
 
 /**
  * @author Lennart Koopmann <lennart@socketfeed.com>
  */
 public class DroolsInitializer implements Initializer {
 
+    private static final String NAME = "Drools";
+    
     private static final Logger LOG = LoggerFactory.getLogger(DroolsInitializer.class);
 
-    private final Configuration configuration;
-    private final Core graylogServer;
-
-    public DroolsInitializer(Core server, Configuration configuration) {
-        this.graylogServer = server;
-        this.configuration = configuration;
-    }
-
     @Override
-    public void initialize() {
+    public void initialize(GraylogServer server, Map<String, String> config) throws InitializerConfigurationException {
+        Core srv = (Core) server;
         try {
-            String rulesFilePath = configuration.getDroolsRulesFile();
+            String rulesFilePath = srv.getConfiguration().getDroolsRulesFile();
             if (rulesFilePath != null && !rulesFilePath.isEmpty()) {
                 RulesEngineImpl drools = new RulesEngineImpl();
                 drools.addRules(rulesFilePath);
-                graylogServer.setRulesEngine(drools);
+                srv.setRulesEngine(drools);
                 LOG.info("Using rules: {}", rulesFilePath);
             } else {
                 LOG.info("Not using rules");
@@ -61,8 +58,19 @@ public class DroolsInitializer implements Initializer {
     }
     
     @Override
+    public Map<String, String> getRequestedConfiguration() {
+        // Built in initializer. This is just for plugin compat. No special configuration required.
+        return com.google.common.collect.Maps.newHashMap();
+    }
+    
+    @Override
     public boolean masterOnly() {
         return false;
+    }
+    
+    @Override
+    public String getName() {
+        return NAME;
     }
 
 }

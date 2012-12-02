@@ -27,6 +27,7 @@ import java.util.Set;
 import org.graylog2.Core;
 import org.graylog2.plugin.alarms.callbacks.AlarmCallback;
 import org.graylog2.plugin.alarms.transports.Transport;
+import org.graylog2.plugin.initializers.Initializer;
 import org.graylog2.plugin.inputs.MessageInput;
 import org.graylog2.plugin.outputs.MessageOutput;
 
@@ -93,6 +94,21 @@ public class PluginRegistry {
         }
         
         server.getMongoBridge().writePluginInformation(r, "message_inputs");
+    }
+    
+    public static void setActiveInitializers(Core server, List<Initializer> initializers) {
+        Set<Map<String, Object>> r = Sets.newHashSet();
+        
+        for(Initializer initializer : initializers) {
+            Map<String, Object> entry = Maps.newHashMap();
+            entry.put("typeclass", initializer.getClass().getCanonicalName());
+            entry.put("name", initializer.getName());
+            entry.put("requested_config", initializer.getRequestedConfiguration());
+            
+            r.add(entry);
+        }
+        
+        server.getMongoBridge().writePluginInformation(r, "initializers");
     }
     
 }

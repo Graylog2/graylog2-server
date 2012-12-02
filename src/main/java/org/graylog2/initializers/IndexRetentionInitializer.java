@@ -20,31 +20,44 @@
 
 package org.graylog2.initializers;
 
+import java.util.Map;
 import org.graylog2.plugin.initializers.Initializer;
 import org.graylog2.Core;
 import org.graylog2.periodical.IndexRetentionThread;
+import org.graylog2.plugin.GraylogServer;
+import org.graylog2.plugin.initializers.InitializerConfigurationException;
 
 /**
  * @author Lennart Koopmann <lennart@socketfeed.com>
  */
 public class IndexRetentionInitializer  extends SimpleFixedRateScheduleInitializer implements Initializer {
 
-    public IndexRetentionInitializer(Core graylogServer) {
-        this.graylogServer = graylogServer;
-    }
+    private static final String NAME = "Index retention";
     
     @Override
-    public void initialize() {
+    public void initialize(GraylogServer server, Map<String, String> config) throws InitializerConfigurationException {
         configureScheduler(
-                new IndexRetentionThread(this.graylogServer),
+                (Core) server,
+                new IndexRetentionThread((Core) server),
                 IndexRetentionThread.INITIAL_DELAY,
                 IndexRetentionThread.PERIOD
         );
+    }
+
+    @Override
+    public Map<String, String> getRequestedConfiguration() {
+        // Built in initializer. This is just for plugin compat. No special configuration required.
+        return com.google.common.collect.Maps.newHashMap();
     }
     
     @Override
     public boolean masterOnly() {
         return true;
+    }
+    
+    @Override
+    public String getName() {
+        return NAME;
     }
 
 }

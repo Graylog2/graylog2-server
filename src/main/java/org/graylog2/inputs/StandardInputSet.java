@@ -17,27 +17,31 @@
  * along with Graylog2.  If not, see <http://www.gnu.org/licenses/>.
  *
  */
+package org.graylog2.inputs;
 
-package org.graylog2.initializers;
-
-import java.util.concurrent.TimeUnit;
-import org.graylog2.Core;
+import java.util.HashSet;
+import java.util.Set;
+import org.graylog2.inputs.amqp.AMQPInput;
+import org.graylog2.inputs.gelf.GELFTCPInput;
+import org.graylog2.inputs.gelf.GELFUDPInput;
+import org.graylog2.inputs.http.GELFHttpInput;
+import org.graylog2.inputs.syslog.SyslogTCPInput;
+import org.graylog2.inputs.syslog.SyslogUDPInput;
 
 /**
  * @author Lennart Koopmann <lennart@socketfeed.com>
  */
-public class SimpleFixedRateScheduleInitializer {
-
-    protected SimpleFixedRateScheduleInitializer() { /* Nope. No instances desired. Only to be inherited by Initializers if wanted. */ }
-
-    public void configureScheduler(Core server, Runnable what, int initialDelay, int period) {
-        server.getScheduler()
-                .scheduleAtFixedRate(
-                    what,
-                    initialDelay,
-                    period,
-                    TimeUnit.SECONDS
-                );
+public class StandardInputSet {
+    
+    public static Set<Class> get() {
+        return new HashSet<Class>() {{ 
+            add(GELFTCPInput.class);
+            add(GELFUDPInput.class);
+            add(GELFHttpInput.class);
+            add(AMQPInput.class);
+            add(SyslogTCPInput.class);
+            add(SyslogUDPInput.class);
+        }};
     }
     
 }

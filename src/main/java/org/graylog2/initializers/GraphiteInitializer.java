@@ -22,40 +22,55 @@ package org.graylog2.initializers;
 
 import org.graylog2.plugin.initializers.Initializer;
 import com.yammer.metrics.reporting.GraphiteReporter;
+import java.util.Map;
 import java.util.concurrent.TimeUnit;
 import org.graylog2.Core;
 import org.graylog2.periodical.GraphiteWriterThread;
+import org.graylog2.plugin.GraylogServer;
+import org.graylog2.plugin.initializers.InitializerConfigurationException;
 
 /**
  * @author Lennart Koopmann <lennart@socketfeed.com>
  */
 public class GraphiteInitializer extends SimpleFixedRateScheduleInitializer implements Initializer {
 
-    public GraphiteInitializer(Core graylogServer) {
-        this.graylogServer = graylogServer;
-    }
-
+    private static final String NAME = "Graphite";
+    
     @Override
-    public void initialize() {
+    public void initialize(GraylogServer server, Map<String, String> config) throws InitializerConfigurationException {
+        Core srv = (Core) server;
+        
         // Enable graphite metrics reporter.
         GraphiteReporter.enable(
                 5,
                 TimeUnit.SECONDS,
-                this.graylogServer.getConfiguration().getGraphiteCarbonHost(),
-                this.graylogServer.getConfiguration().getGraphiteCarbonTcpPort(),
-                this.graylogServer.getConfiguration().getGraphitePrefix()
+                srv.getConfiguration().getGraphiteCarbonHost(),
+                srv.getConfiguration().getGraphiteCarbonTcpPort(),
+                srv.getConfiguration().getGraphitePrefix()
         );
 
         configureScheduler(
-                new GraphiteWriterThread(this.graylogServer),
+                srv,
+                new GraphiteWriterThread(srv),
                 GraphiteWriterThread.INITIAL_DELAY,
                 GraphiteWriterThread.PERIOD
         );
+    }
+
+    @Override
+    public Map<String, String> getRequestedConfiguration() {
+        // Built in initializer. This is just for plugin compat. No special configuration required.
+        return com.google.common.collect.Maps.newHashMap();
     }
     
     @Override
     public boolean masterOnly() {
         return false;
+    }
+    
+    @Override
+    public String getName() {
+        return NAME;
     }
 
 }

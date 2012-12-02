@@ -20,31 +20,44 @@
 
 package org.graylog2.initializers;
 
+import java.util.Map;
 import org.graylog2.plugin.initializers.Initializer;
 import org.graylog2.Core;
 import org.graylog2.periodical.HostCounterCacheWriterThread;
+import org.graylog2.plugin.GraylogServer;
+import org.graylog2.plugin.initializers.InitializerConfigurationException;
 
 /**
  * @author Lennart Koopmann <lennart@socketfeed.com>
  */
 public class HostCounterCacheWriterInitializer extends SimpleFixedRateScheduleInitializer implements Initializer {
 
-    public HostCounterCacheWriterInitializer(Core server) {
-        this.graylogServer = server;
-    }
-
+    private static final String NAME = "Host counter cache";
+    
     @Override
-    public void initialize() {
-         configureScheduler(
-                new HostCounterCacheWriterThread(this.graylogServer),
+    public void initialize(GraylogServer server, Map<String, String> config) throws InitializerConfigurationException {
+        configureScheduler(
+                (Core) server,
+                new HostCounterCacheWriterThread((Core) server),
                 HostCounterCacheWriterThread.INITIAL_DELAY,
                 HostCounterCacheWriterThread.PERIOD
         );
     }
 
     @Override
+    public Map<String, String> getRequestedConfiguration() {
+        // Built in initializer. This is just for plugin compat. No special configuration required.
+        return com.google.common.collect.Maps.newHashMap();
+    }
+
+    @Override
     public boolean masterOnly() {
         return false;
+    }
+    
+    @Override
+    public String getName() {
+        return NAME;
     }
 
 }

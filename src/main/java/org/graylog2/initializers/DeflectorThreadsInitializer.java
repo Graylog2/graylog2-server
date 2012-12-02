@@ -19,37 +19,52 @@
  */
 package org.graylog2.initializers;
 
+import java.util.Map;
 import org.graylog2.plugin.initializers.Initializer;
 import org.graylog2.Core;
 import org.graylog2.periodical.DeflectorInformationWriterThread;
 import org.graylog2.periodical.DeflectorManagerThread;
+import org.graylog2.plugin.GraylogServer;
+import org.graylog2.plugin.initializers.InitializerConfigurationException;
 
 /**
  * @author Lennart Koopmann <lennart@socketfeed.com>
  */
 public class DeflectorThreadsInitializer extends SimpleFixedRateScheduleInitializer implements Initializer {
-    
-    public DeflectorThreadsInitializer(Core graylogServer) {
-        this.graylogServer = graylogServer;
-    }
 
+    private static final String NAME = "Deflector";
+    
     @Override
-    public void initialize() {
+    public void initialize(GraylogServer server, Map<String, String> config) throws InitializerConfigurationException {
         configureScheduler(
-                new DeflectorManagerThread(this.graylogServer),
+                (Core) server,
+                new DeflectorManagerThread((Core) server),
                 DeflectorManagerThread.INITIAL_DELAY,
                 DeflectorManagerThread.PERIOD
         );
         
         configureScheduler(
-                new DeflectorInformationWriterThread(this.graylogServer),
+                (Core) server,
+                new DeflectorInformationWriterThread((Core) server),
                 DeflectorInformationWriterThread.INITIAL_DELAY,
                 DeflectorInformationWriterThread.PERIOD
         );
+    }
+
+    @Override
+    public Map<String, String> getRequestedConfiguration() {
+        // Built in initializer. This is just for plugin compat. No special configuration required.
+        return com.google.common.collect.Maps.newHashMap();
     }
     
     @Override
     public boolean masterOnly() {
         return true;
     }
+    
+    @Override
+    public String getName() {
+        return NAME;
+    }
+    
 }

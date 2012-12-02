@@ -17,27 +17,32 @@
  * along with Graylog2.  If not, see <http://www.gnu.org/licenses/>.
  *
  */
-
 package org.graylog2.initializers;
 
-import java.util.concurrent.TimeUnit;
-import org.graylog2.Core;
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  * @author Lennart Koopmann <lennart@socketfeed.com>
  */
-public class SimpleFixedRateScheduleInitializer {
+public class StandardInitializerSet {
 
-    protected SimpleFixedRateScheduleInitializer() { /* Nope. No instances desired. Only to be inherited by Initializers if wanted. */ }
-
-    public void configureScheduler(Core server, Runnable what, int initialDelay, int period) {
-        server.getScheduler()
-                .scheduleAtFixedRate(
-                    what,
-                    initialDelay,
-                    period,
-                    TimeUnit.SECONDS
-                );
+    public static Set<Class> get() {
+        return new HashSet<Class>() {{ 
+            add(AMQPSyncInitializer.class);
+            add(AlarmScannerInitializer.class);
+            add(AnonymousInformationCollectorInitializer.class);
+            add(BufferWatermarkInitializer.class);
+            add(DeflectorThreadsInitializer.class);
+            add(DroolsInitializer.class);
+            add(GraphiteInitializer.class);
+            add(HostCounterCacheWriterInitializer.class);
+            add(IndexRetentionInitializer.class);
+            add(LibratoMetricsInitializer.class);
+            add(MessageCounterInitializer.class);
+            add(ServerValueWriterInitializer.class);
+            add(StatisticsPrinterInitializer.class);
+        }};
     }
     
 }

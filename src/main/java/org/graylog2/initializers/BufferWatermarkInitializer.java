@@ -19,30 +19,43 @@
  */
 package org.graylog2.initializers;
 
+import java.util.Map;
 import org.graylog2.plugin.initializers.Initializer;
 import org.graylog2.Core;
 import org.graylog2.periodical.BufferWatermarkThread;
+import org.graylog2.plugin.GraylogServer;
+import org.graylog2.plugin.initializers.InitializerConfigurationException;
 
 /**
  * @author Lennart Koopmann <lennart@socketfeed.com>
  */
 public class BufferWatermarkInitializer extends SimpleFixedRateScheduleInitializer implements Initializer {
-    
-    public BufferWatermarkInitializer(Core graylogServer) {
-        this.graylogServer = graylogServer;
-    }
 
+    private static final String NAME = "Buffer watermarks";
+    
     @Override
-    public void initialize() {
+    public void initialize(GraylogServer server, Map<String, String> config) throws InitializerConfigurationException {
         configureScheduler(
-                new BufferWatermarkThread(this.graylogServer),
+                (Core) server,
+                new BufferWatermarkThread((Core) server),
                 BufferWatermarkThread.INITIAL_DELAY,
                 BufferWatermarkThread.PERIOD
         );
+    }
+
+    @Override
+    public Map<String, String> getRequestedConfiguration() {
+        // Built in initializer. This is just for plugin compat. No special configuration required.
+        return com.google.common.collect.Maps.newHashMap();
     }
     
     @Override
     public boolean masterOnly() {
         return false;
+    }
+    
+    @Override
+    public String getName() {
+        return NAME;
     }
 }
