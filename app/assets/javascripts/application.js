@@ -12,7 +12,7 @@
 //
 //= require files/jquery-1.8.1
 //= require files/rails
-//= require files/application
+//= require files/master
 //= require files/jquery.autocomplete.min
 //= require files/jquery.graylog2shell
 //= require files/jquery.gritter.min
