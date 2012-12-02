@@ -29,6 +29,10 @@ class PluginConfigurationController < ApplicationController
   			return AlarmCallback.where(:typeclass => typeclass).first.requested_config
       when "message_output"
         return MessageOutput.where(:typeclass => typeclass).first.requested_config
+      when "message_input"
+        return MessageInput.where(:typeclass => typeclass).first.requested_config
+      when "initializer"
+        return Initializer.where(:typeclass => typeclass).first.requested_config
   	end
   rescue
   	{}

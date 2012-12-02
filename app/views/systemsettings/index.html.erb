@@ -35,35 +35,23 @@ All currently installed alarm callback plugins are listed here. You can enable/d
 
 <% if @alarm_callbacks.blank? %>
 	<strong>No alarm callback plugins installed</strong>
-	<br />
+	<br /><br />
 <% else %>
-	<table>
-		<thead>
-			<tr>
-				<th>Name</th>
-				<th>Class</th>
-				<th>Force for all streams</th>
-				<th>&nbsp;</th>
-			</tr>
-		</thead>
-		<tbody>
-			<% @alarm_callbacks.each_with_index do |callback, i| %>
-				<tr>
-					<td><%= callback.name %></td>
-					<td><%= callback.typeclass %></td>
-					<td>
-						<%=raw ajaxtrigger("toggle_callback_forced_#{i}", "",
-							toggle_alarmcallback_force_systemsettings_path(:typeclass => callback.typeclass),
-							SystemSetting.alarm_callback_forced?(callback.typeclass)) %>
-					</td>
-					<td><%= link_to "Configure", "/plugin_configuration/configure/alarm_callback/#{callback.typeclass}" %></td>
-				</tr>
-			<% end %>
-		</tbody>
-	</table>
+	<% @alarm_callbacks.each_with_index do |callback, i| %>
+		<div class="lines-line">
+			<h3><%= callback.name %></h3>
+			<strong>Type:</strong> <%= callback.typeclass %><br />
+			<strong>Forced for all streams:</strong>
+			<%=raw ajaxtrigger("toggle_callback_forced_#{i}", "",
+				toggle_alarmcallback_force_systemsettings_path(:typeclass => callback.typeclass),
+				SystemSetting.alarm_callback_forced?(callback.typeclass)) %>
+			<br />
+			<%= link_to "Configure", "/plugin_configuration/configure/alarm_callback/#{callback.typeclass}" %>
+		</div>
+	<% end %>
 <% end %>
 
-<br />
+
 <h2>Message output plugins</h2>
 <div class="short-description">
 All currently installed message output plugins are listed here. You can configure them here and enable them for every stream individually.
@@ -71,24 +59,42 @@ All currently installed message output plugins are listed here. You can configur
 
 <% if @message_outputs.blank? %>
 	<strong>No message output plugins installed</strong>
-	<br />
+	<br /><br />
 <% else %>
-	<table>
-		<thead>
-			<tr>
-				<th>Name</th>
-				<th>Class</th>
-				<th>&nbsp;</th>
-			</tr>
-		</thead>
-		<tbody>
-			<% @message_outputs.each do |output| %>
-				<tr>
-					<td><%= output.name %></td>
-					<td><%= output.typeclass %></td>
-					<td><%= link_to "Configure", "/plugin_configuration/configure/message_output/#{output.typeclass}" %></td>
-				</tr>
-			<% end %>
-		</tbody>
-	</table>
+	<% @message_outputs.each do |output| %>
+		<div class="lines-line">
+			<h3><%= output.name %></h3>
+			<strong>Type:</strong> <%= output.typeclass %><br />
+			<%= link_to "Configure", "/plugin_configuration/configure/message_output/#{output.typeclass}" %>
+		</div>
+	<% end %>
+<% end %>
+
+<h2>Message input plugins</h2>
+<% if @message_inputs.blank? %>
+	<strong>No message input plugins installed</strong>
+	<br /><br />
+<% else %>
+	<% @message_inputs.each do |input| %>
+		<div class="lines-line">
+			<h3><%= input.name %></h3>
+			<strong>Type:</strong> <%= input.typeclass %><br />
+			<%= link_to "Configure", "/plugin_configuration/configure/message_input/#{input.typeclass}" %>
+		</div>
+	<% end %>
+<% end %>
+
+
+<h2>Initializer plugins</h2>
+<% if @initializers.blank? %>
+	<strong>No message initializers installed</strong>
+	<br /><br />
+<% else %>
+	<% @initializers.each do |init| %>
+		<div class="lines-line">
+			<h3><%= init.name %></h3>
+			<strong>Type:</strong> <%= init.typeclass %><br />
+			<%= link_to "Configure", "/plugin_configuration/configure/initializers/#{init.typeclass}" %>
+		</div>
+	<% end %>
 <% end %>

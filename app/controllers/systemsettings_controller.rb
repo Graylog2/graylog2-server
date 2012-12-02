@@ -6,6 +6,8 @@ class SystemsettingsController < ApplicationController
     @allow_usage_stats = SystemSetting.allow_usage_stats?
     @alarm_callbacks = AlarmCallback.all
     @message_outputs = MessageOutput.all_non_standard
+    @message_inputs = MessageInput.all_non_standard
+    @initializers = Initializer.all_non_standard
   end
 
   def allow_usage_stats
