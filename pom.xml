@@ -3,7 +3,7 @@
 
   <groupId>org.graylog2</groupId>
   <artifactId>graylog2-plugin</artifactId>
-  <version>0.9.7.14-SNAPSHOT</version>
+  <version>0.10.0-SNAPSHOT</version>
   <packaging>jar</packaging>
 
   <name>graylog2-plugin</name>
