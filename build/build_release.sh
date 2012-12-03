@@ -40,10 +40,10 @@ echo "Configuring release ..."
 cd $BUILD_DIR
 
 # Change config files.
-mv config/email.yml.example config/email.yml
 mv config/general.yml.example config/general.yml
 mv config/mongoid.yml.example config/mongoid.yml
 mv config/indexer.yml.example config/indexer.yml
+mv config/ldap.yml.example config/ldap.yml
 
 RAILS_ENV=production
 export RAILS_ENV
@@ -56,7 +56,7 @@ mv temp_env config/environment.rb
 # tar it
 cd ..
 echo "Building Tarball ..."
-tar cfz $BUILD_NAME.tar.gz $BUILD_NAME
+gnutar cfz $BUILD_NAME.tar.gz $BUILD_NAME
 rm -rf ./$BUILD_NAME
 
 echo "DONE! Created Graylog2 release $BUILD_NAME on $BUILD_DATE"
