@@ -2,7 +2,7 @@ class Message
 
   LIMIT = 100
   ADDITIONAL_FIELD_SEPARATOR = '_'
-  RESERVED_ADDITIONAL_FIELDS = %w(_type _index _version _score )
+  RESERVED_ADDITIONAL_FIELDS = %w( _type _index _version _score _explanation )
 
   @fields = [ :id, :message, :full_message, :created_at, :facility, :level, :host, :file, :line, :deleted, :streams ]
   @fields.each { |f| attr_accessor(f) }
