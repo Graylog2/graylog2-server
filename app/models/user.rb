@@ -37,8 +37,8 @@ class User
   field :from_ldap, :type => Boolean, :default => false
 
   index :login,          :background => true, :unique => true
-  index :remember_token, :background => true, :unique => true
-  index :api_key,          :background => true, :unique => true
+  index :remember_token, :background => true, :unique => true, :sparse => true
+  index :api_key,          :background => true, :unique => true, :sparse => true
 
   has_and_belongs_to_many :streams, :inverse_of => :users
   has_and_belongs_to_many :favorite_streams,   :class_name => "Stream", :inverse_of => :favorited_streams
