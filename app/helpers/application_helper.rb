@@ -96,7 +96,6 @@ module ApplicationHelper
       )
       uid = "resultgraph"
       lines_bars = "bars: { show: true, fill: true }"
-      grid_color = "#333"
     else
       if options[:stream_id].blank? and options[:hostname].blank?
         url = visuals_path("totalgraph", :hours => options[:hours])
@@ -105,7 +104,6 @@ module ApplicationHelper
         url = visuals_path("hostgraph", :hostname => options[:hostname], :hours => options[:hours]) if (!options[:hostname].blank?)
       end
       lines_bars = "lines: { show: true, fill: true }"
-      grid_color = "#fff"
       range_selector = true
     end
 
@@ -123,7 +121,7 @@ module ApplicationHelper
             xaxis: { mode: 'time' },
             grid: {
               show: true,
-              color: '#{grid_color}',
+              color: '#333',
               borderWidth: 0
             },
             #{"selection: { mode: 'x' }" if range_selector}
