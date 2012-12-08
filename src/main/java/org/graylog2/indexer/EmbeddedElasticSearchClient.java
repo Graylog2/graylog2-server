@@ -69,8 +69,6 @@ public class EmbeddedElasticSearchClient {
         add("memory");
     }};
 
-    final static Calendar cal = Calendar.getInstance();
-
     private Core server;
 
     public EmbeddedElasticSearchClient(Core graylogServer) {
@@ -295,14 +293,6 @@ public class EmbeddedElasticSearchClient {
         
         ActionFuture<DeleteByQueryResponse> future = client.deleteByQuery(b.request());
         future.actionGet();
-    }
-
-    // yyyy-MM-dd HH-mm-ss
-    // http://docs.oracle.com/javase/1.5.0/docs/api/java/util/Formatter.html#syntax
-    public static String buildTimeFormat(double timestamp) {
-        cal.setTimeInMillis(System.currentTimeMillis());
-
-        return String.format("%1$tY-%1$tm-%1$td %1$tH-%1$tM-%1$tS", cal); // ramtamtam
     }
     
     public void deleteIndex(String indexName) {

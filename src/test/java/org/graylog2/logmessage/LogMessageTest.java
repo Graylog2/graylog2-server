@@ -20,6 +20,7 @@
 
 package org.graylog2.logmessage;
 
+import org.graylog2.plugin.logmessage.LogMessage;
 import com.beust.jcommander.internal.Maps;
 import java.util.Map;
 import java.util.HashMap;
@@ -30,14 +31,14 @@ public class LogMessageTest {
 
     @Test
     public void testIdGetsSet() {
-        LogMessageImpl lm = new LogMessageImpl();
+        LogMessage lm = new LogMessage();
         assertNotNull(lm.getId());
         assertFalse(lm.getId().isEmpty());
     }
 
     @Test
     public void testIsCompleteSucceeds() {
-        LogMessageImpl lm = new LogMessageImpl();
+        LogMessage lm = new LogMessage();
         lm.setShortMessage("foo");
         lm.setHost("bar");
         assertTrue(lm.isComplete());
@@ -45,55 +46,55 @@ public class LogMessageTest {
 
     @Test
     public void testIsCompleteFails() {
-        LogMessageImpl lm = new LogMessageImpl();
+        LogMessage lm = new LogMessage();
         lm.setShortMessage("foo");
         lm.setHost(null);
         assertFalse(lm.isComplete());
 
-        lm = new LogMessageImpl();
+        lm = new LogMessage();
         lm.setShortMessage("foo");
         lm.setHost("");
         assertFalse(lm.isComplete());
 
-        lm = new LogMessageImpl();
+        lm = new LogMessage();
         lm.setShortMessage(null);
         lm.setHost("bar");
         assertFalse(lm.isComplete());
 
-        lm = new LogMessageImpl();
+        lm = new LogMessage();
         lm.setShortMessage("");
         lm.setHost("bar");
         assertFalse(lm.isComplete());
 
-        lm = new LogMessageImpl();
+        lm = new LogMessage();
         lm.setShortMessage("");
         lm.setHost("");
         assertFalse(lm.isComplete());
 
-        lm = new LogMessageImpl();
+        lm = new LogMessage();
         lm.setShortMessage(null);
         lm.setHost(null);
         assertFalse(lm.isComplete());
 
-        lm = new LogMessageImpl();
+        lm = new LogMessage();
         lm.setHost("bar");
         assertFalse(lm.isComplete());
 
-        lm = new LogMessageImpl();
+        lm = new LogMessage();
         lm.setShortMessage("foo");
         assertFalse(lm.isComplete());
     }
 
     @Test
     public void testAddAdditionalData() {
-        LogMessageImpl lm = new LogMessageImpl();
+        LogMessage lm = new LogMessage();
         lm.addAdditionalData("_ohai", "thar");
         assertEquals("thar", lm.getAdditionalData().get("_ohai"));
     }
 
     @Test
     public void testAddAdditionalDataWithMap() {
-        LogMessageImpl lm = new LogMessageImpl();
+        LogMessage lm = new LogMessage();
         lm.addAdditionalData("_ohai", "hai");
 
         Map<String, String> map = new HashMap<String, String>();
@@ -110,7 +111,7 @@ public class LogMessageTest {
 
     @Test
     public void testAddAdditionalDataAddsUnderscoreIfNotGiven() {
-        LogMessageImpl lm = new LogMessageImpl();
+        LogMessage lm = new LogMessage();
         lm.addAdditionalData("ohai", "lol");
         lm.addAdditionalData("_wat", 9001);
         assertEquals(2, lm.getAdditionalData().size());
@@ -120,7 +121,7 @@ public class LogMessageTest {
     
     @Test
     public void testAddAdditionalDataTrimsWhiteSpacesTabsAndStuffFromKeyAndValue() {
-        LogMessageImpl lm = new LogMessageImpl();
+        LogMessage lm = new LogMessage();
         lm.addAdditionalData(" one", "value_one");
         lm.addAdditionalData(" two  ", "value_two");
         lm.addAdditionalData("three ", "value_three");
@@ -136,7 +137,7 @@ public class LogMessageTest {
     
     @Test
     public void testAddAdditionalDataTrimsWhiteSpacesTabsAndStuffFromKeyAndValueWhenInsertedAsMap() {
-        LogMessageImpl lm = new LogMessageImpl();
+        LogMessage lm = new LogMessage();
         Map<String, String> av = Maps.newHashMap();
         
         av.put(" one", "value_one");
@@ -154,7 +155,7 @@ public class LogMessageTest {
 
     @Test
     public void testRemoveAdditionalData() {
-        LogMessageImpl lm = new LogMessageImpl();
+        LogMessage lm = new LogMessage();
         lm.addAdditionalData("_something", "foo");
         lm.addAdditionalData("_something_else", "bar");
 
@@ -166,7 +167,7 @@ public class LogMessageTest {
 
     @Test
     public void testRemoveAdditionalDataWithNonExistentKey() {
-        LogMessageImpl lm = new LogMessageImpl();
+        LogMessage lm = new LogMessage();
         lm.addAdditionalData("_something", "foo");
         lm.addAdditionalData("_something_else", "bar");
 
@@ -177,7 +178,7 @@ public class LogMessageTest {
 
     @Test
     public void testToString() {
-        LogMessageImpl lm = new LogMessageImpl();
+        LogMessage lm = new LogMessage();
         lm.toString();
         lm.setHost("foo");
         lm.toString();

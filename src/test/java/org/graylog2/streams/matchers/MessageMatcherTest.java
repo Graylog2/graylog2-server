@@ -20,7 +20,7 @@
 
 package org.graylog2.streams.matchers;
 
-import org.graylog2.logmessage.LogMessageImpl;
+import org.graylog2.plugin.logmessage.LogMessage;
 import java.util.Map;
 import org.bson.types.ObjectId;
 
@@ -49,7 +49,7 @@ public class MessageMatcherTest {
 
         StreamRuleImpl rule = new StreamRuleImpl(mongoRule);
 
-        LogMessageImpl msg = new LogMessageImpl();
+        LogMessage msg = new LogMessage();
         msg.setShortMessage(message);
 
         MessageMatcher matcher = new MessageMatcher();
@@ -69,7 +69,7 @@ public class MessageMatcherTest {
 
         StreamRuleImpl rule = new StreamRuleImpl(mongoRule);
 
-        LogMessageImpl msg = new LogMessageImpl();
+        LogMessage msg = new LogMessage();
         msg.setShortMessage(message);
 
         MessageMatcher matcher = new MessageMatcher();
@@ -99,7 +99,7 @@ public class MessageMatcherTest {
 
             StreamRuleImpl rule = new StreamRuleImpl(mongoRule);
 
-            LogMessageImpl msg = new LogMessageImpl();
+            LogMessage msg = new LogMessage();
             msg.setShortMessage(e.getKey());
 
             MessageMatcher matcher = new MessageMatcher();

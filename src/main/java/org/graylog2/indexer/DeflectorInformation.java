@@ -28,7 +28,7 @@ import org.elasticsearch.action.admin.indices.stats.IndexShardStats;
 import org.elasticsearch.action.admin.indices.stats.IndexStats;
 import org.elasticsearch.action.admin.indices.stats.ShardStats;
 import org.graylog2.Core;
-import org.graylog2.Tools;
+import org.graylog2.plugin.Tools;
 
 /**
  * @author Lennart Koopmann <lennart@socketfeed.com>

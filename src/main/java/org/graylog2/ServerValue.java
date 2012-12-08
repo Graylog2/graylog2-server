@@ -20,6 +20,7 @@
 
 package org.graylog2;
 
+import org.graylog2.plugin.Tools;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import java.util.List;

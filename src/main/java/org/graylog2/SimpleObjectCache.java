@@ -19,6 +19,8 @@
  */
 package org.graylog2;
 
+import org.graylog2.plugin.Tools;
+
 /**
  * Singleton caching objects. Derive from this like StreamCache and
  * BlacklistCache.

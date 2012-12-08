@@ -20,6 +20,7 @@
 
 package org.graylog2;
 
+import org.graylog2.plugin.Tools;
 import java.util.List;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;

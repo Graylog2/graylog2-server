@@ -26,7 +26,7 @@ import com.mongodb.DBCollection;
 import com.mongodb.DBObject;
 import java.util.List;
 import org.graylog2.Core;
-import org.graylog2.Tools;
+import org.graylog2.plugin.Tools;
 import org.graylog2.activities.Activity;
 import org.graylog2.buffers.BufferWatermark;
 import org.joda.time.DateTime;

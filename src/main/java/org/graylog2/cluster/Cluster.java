@@ -27,7 +27,7 @@ import com.mongodb.DBObject;
 import java.util.List;
 import java.util.Set;
 import org.graylog2.Core;
-import org.graylog2.Tools;
+import org.graylog2.plugin.Tools;
 
 /**
  * @author Lennart Koopmann <lennart@socketfeed.com>

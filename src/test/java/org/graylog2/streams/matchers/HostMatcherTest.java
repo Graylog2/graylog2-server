@@ -20,7 +20,7 @@
 
 package org.graylog2.streams.matchers;
 
-import org.graylog2.logmessage.LogMessageImpl;
+import org.graylog2.plugin.logmessage.LogMessage;
 import com.mongodb.BasicDBObject;
 import org.bson.types.ObjectId;
 import org.graylog2.streams.StreamRuleImpl;
@@ -44,7 +44,7 @@ public class HostMatcherTest {
 
         StreamRuleImpl rule = new StreamRuleImpl(mongoRule);
 
-        LogMessageImpl msg = new LogMessageImpl();
+        LogMessage msg = new LogMessage();
         msg.setHost(host);
 
         HostMatcher matcher = new HostMatcher();
@@ -63,7 +63,7 @@ public class HostMatcherTest {
 
         StreamRuleImpl rule = new StreamRuleImpl(mongoRule);
 
-        LogMessageImpl msg = new LogMessageImpl();
+        LogMessage msg = new LogMessage();
         msg.setHost(host + "foo");
 
         HostMatcher matcher = new HostMatcher();

@@ -22,7 +22,7 @@ package org.graylog2.periodical;
 import org.elasticsearch.common.collect.Maps;
 import org.graylog2.Core;
 import org.graylog2.SystemSettingAccessor;
-import org.graylog2.Tools;
+import org.graylog2.plugin.Tools;
 import org.graylog2.alarms.MessageCountAlarm;
 import org.graylog2.alarms.StreamAlarmChecker;
 import org.graylog2.plugin.alarms.Alarm;

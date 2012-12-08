@@ -20,7 +20,7 @@
 
 package org.graylog2.inputs.syslog;
 
-import org.graylog2.Tools;
+import org.graylog2.plugin.Tools;
 import java.net.InetAddress;
 import org.graylog2.Configuration;
 import org.graylog2.GraylogServerStub;

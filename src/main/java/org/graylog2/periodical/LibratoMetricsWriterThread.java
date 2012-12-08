@@ -22,7 +22,7 @@ package org.graylog2.periodical;
 
 import org.graylog2.Core;
 import org.graylog2.LibratoMetricsFormatter;
-import org.graylog2.Tools;
+import org.graylog2.plugin.Tools;
 import org.graylog2.plugin.MessageCounter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

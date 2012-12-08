@@ -20,6 +20,7 @@
 
 package org.graylog2;
 
+import org.graylog2.plugin.Tools;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import org.graylog2.plugin.MessageCounter;

@@ -20,7 +20,7 @@
 
 package org.graylog2.gelf;
 
-import org.graylog2.Tools;
+import org.graylog2.plugin.Tools;
 
 import java.io.IOException;
 import java.nio.charset.Charset;

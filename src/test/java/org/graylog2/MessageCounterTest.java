@@ -5,6 +5,7 @@
 
 package org.graylog2;
 
+import org.graylog2.plugin.Tools;
 import java.util.HashMap;
 import java.util.Map;
 import org.bson.types.ObjectId;

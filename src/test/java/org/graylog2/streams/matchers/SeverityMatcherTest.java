@@ -20,7 +20,7 @@
 
 package org.graylog2.streams.matchers;
 
-import org.graylog2.logmessage.LogMessageImpl;
+import org.graylog2.plugin.logmessage.LogMessage;
 import org.bson.types.ObjectId;
 import com.mongodb.BasicDBObject;
 import org.graylog2.streams.StreamRuleImpl;
@@ -44,7 +44,7 @@ public class SeverityMatcherTest {
 
         StreamRuleImpl rule = new StreamRuleImpl(mongoRule);
 
-        LogMessageImpl msg = new LogMessageImpl();
+        LogMessage msg = new LogMessage();
         msg.setLevel(severity);
 
         SeverityMatcher matcher = new SeverityMatcher();
@@ -63,7 +63,7 @@ public class SeverityMatcherTest {
 
         StreamRuleImpl rule = new StreamRuleImpl(mongoRule);
 
-        LogMessageImpl msg = new LogMessageImpl();
+        LogMessage msg = new LogMessage();
         msg.setLevel(severity+1);
 
         SeverityMatcher matcher = new SeverityMatcher();

@@ -23,7 +23,7 @@ import com.google.common.collect.Sets;
 import java.util.List;
 import java.util.Set;
 import org.elasticsearch.common.collect.Lists;
-import org.graylog2.Tools;
+import org.graylog2.plugin.Tools;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

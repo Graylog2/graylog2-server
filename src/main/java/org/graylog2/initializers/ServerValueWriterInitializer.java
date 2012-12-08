@@ -25,7 +25,7 @@ import org.graylog2.plugin.initializers.Initializer;
 import org.graylog2.Core;
 import org.graylog2.HostSystem;
 import org.graylog2.ServerValue;
-import org.graylog2.Tools;
+import org.graylog2.plugin.Tools;
 import org.graylog2.plugins.PluginRegistry;
 import org.graylog2.periodical.ServerValueWriterThread;
 import org.graylog2.plugin.GraylogServer;

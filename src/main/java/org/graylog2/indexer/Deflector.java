@@ -31,7 +31,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
-import org.graylog2.Tools;
+import org.graylog2.plugin.Tools;
 
 /**
  *

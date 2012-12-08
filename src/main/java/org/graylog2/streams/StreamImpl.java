@@ -30,7 +30,7 @@ import com.mongodb.DBObject;
 import org.bson.types.ObjectId;
 import org.elasticsearch.common.collect.Maps;
 import org.graylog2.Core;
-import org.graylog2.Tools;
+import org.graylog2.plugin.Tools;
 import org.graylog2.alarms.AlarmReceiverImpl;
 import org.graylog2.plugin.GraylogServer;
 import org.graylog2.plugin.alarms.AlarmReceiver;

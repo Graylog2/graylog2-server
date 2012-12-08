@@ -27,8 +27,8 @@ import com.yammer.metrics.core.TimerContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.graylog2.Core;
-import org.graylog2.Tools;
-import org.graylog2.logmessage.LogMessageImpl;
+import org.graylog2.plugin.Tools;
+import org.graylog2.plugin.logmessage.LogMessage;
 import org.productivity.java.syslog4j.server.impl.event.SyslogServerEvent;
 
 import java.net.InetAddress;
@@ -59,7 +59,7 @@ public class SyslogProcessor {
         incomingMessages.mark();
 
         // Convert to LogMessage
-        LogMessageImpl lm;
+        LogMessage lm;
         try {
             lm = parse(msg, remoteAddress);
         } catch (Exception e) {
@@ -85,14 +85,14 @@ public class SyslogProcessor {
         server.getProcessBuffer().insert(lm);
     }
 
-    private LogMessageImpl parse(String msg, InetAddress remoteAddress) throws UnknownHostException {
+    private LogMessage parse(String msg, InetAddress remoteAddress) throws UnknownHostException {
         TimerContext tcx = syslogParsedTime.time();
         
         if (remoteAddress == null) {
             remoteAddress = InetAddress.getLocalHost();
         }
 
-        LogMessageImpl lm = new LogMessageImpl();
+        LogMessage lm = new LogMessage();
 
         SyslogServerEvent e = new SyslogServerEvent(msg, remoteAddress);
 

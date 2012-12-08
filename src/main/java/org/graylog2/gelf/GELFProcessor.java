@@ -27,8 +27,8 @@ import com.yammer.metrics.core.TimerContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.graylog2.Core;
-import org.graylog2.Tools;
-import org.graylog2.logmessage.LogMessageImpl;
+import org.graylog2.plugin.Tools;
+import org.graylog2.plugin.logmessage.LogMessage;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.JSONValue;
@@ -57,7 +57,7 @@ public class GELFProcessor {
         incomingMessages.mark();
         
         // Convert to LogMessage
-        LogMessageImpl lm = parse(message.getJSON());
+        LogMessage lm = parse(message.getJSON());
 
         if (!lm.isComplete()) {
             incompleteMessages.mark();
@@ -70,11 +70,11 @@ public class GELFProcessor {
         server.getProcessBuffer().insert(lm);
     }
 
-    private LogMessageImpl parse(String message) {
+    private LogMessage parse(String message) {
         TimerContext tcx = gelfParsedTime.time();
 
         JSONObject json;
-        LogMessageImpl lm = new LogMessageImpl();
+        LogMessage lm = new LogMessage();
         
         try {
             json = getJSON(message);
@@ -99,13 +99,13 @@ public class GELFProcessor {
         if (level > -1) {
             lm.setLevel(level);
         } else {
-            lm.setLevel(LogMessageImpl.STANDARD_LEVEL);
+            lm.setLevel(LogMessage.STANDARD_LEVEL);
         }
 
         // Facility is set by server if not specified by client.
         String facility = this.jsonToString(json.get("facility"));
         if (facility == null) {
-            lm.setFacility(LogMessageImpl.STANDARD_FACILITY);
+            lm.setFacility(LogMessage.STANDARD_FACILITY);
         } else {
             lm.setFacility(facility);
         }
