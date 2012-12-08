@@ -87,8 +87,6 @@ files/login.js: files/login.js
 files/login/index.js: files/login.js
 files/master.js: files/master.js
 files/master/index.js: files/master.js
-files/messages.js: files/messages.js
-files/messages/index.js: files/messages.js
 files/rails.js: files/rails.js
 files/rails/index.js: files/rails.js
 flot.js: flot.js
@@ -97,8 +95,6 @@ jit.js: jit.js
 jit/index.js: jit.js
 login.js: login.js
 login/index.js: login.js
-messages.js: messages.js
-messages/index.js: messages.js
 core.css: core.css
 core/index.css: core.css
 dashboard.css: dashboard.css

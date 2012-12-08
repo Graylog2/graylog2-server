@@ -117,8 +117,10 @@ class MessageGateway
       if histogram_only
         facet 'date_histogram' do
           date("histogram_time", :interval => (opts[:date_histogram_interval]))
+          if opts[:stream]
+            facet_filter :term, :streams => opts[:stream].id.to_s
+          end
 
-          facet_filter :term, :streams => opts[:stream].id if opts[:stream]
           facet_filter :term, :host => opts[:host].host if opts[:host]
 
           facet_filter :range, :created_at => { :gte => opts[:since] } if !opts[:since].blank?

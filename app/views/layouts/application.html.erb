@@ -19,9 +19,6 @@
   <% if @load_flot %>
     <%= javascript_include_tag("flot") %>
   <% end %>
-  <% if @load_messages %>
-    <%= javascript_include_tag("messages.js") %>
-  <% end %>
 
   <%= javascript_include_tag "backtotop" if @use_backtotop %>
 </head>

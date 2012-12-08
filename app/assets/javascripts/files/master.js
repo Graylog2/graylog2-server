@@ -315,6 +315,33 @@ $(document).ready(function() {
       return false;
     });
 
+    var messagesHelper = function(elem) {
+
+      if ($(elem).attr("class") == "messages-link") { 
+        if ($(elem).attr("data-modal")) {
+          $("#messages-show-terms-modal").modal({ overlayClose: true });
+        }
+
+        if (!$(elem).attr("data-confirm")) {
+          return true;
+        } else {
+          if (confirm($(elem).attr("data-confirm"))) {
+            return true;
+          } else {
+            return false;
+          }
+        }
+      }
+    };
+
+    $("#sidebar-inner").delegate("a", "click", function(e) {
+      messagesHelper(this);
+    });
+
+    $("#content-inner").delegate("a", "click", function(e) {
+      messagesHelper(this);
+    });
+
     // Key bindings.
     //standardMapKeyOptions = { overlayClose:true }
     //$.mapKey("s", function() { $("#modal-stream-chooser").modal(standardMapKeyOptions); });

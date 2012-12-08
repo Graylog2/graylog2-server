@@ -80,7 +80,7 @@ class VisualsController < ApplicationController
 
   def calculate_querygraph(query, interval, host, stream, since)
     raise "Invalid interval" unless valid_interval?(interval)
-
+Rails.logger.info "LOL STREAM 1: " + stream.inspect
     MessageGateway.universal_search(1, query, :date_histogram => true, :date_histogram_interval => interval, :host => host, :stream => stream, :since => since).collect do |c|
       [ c["time"].to_i, c["count"] ]
     end
