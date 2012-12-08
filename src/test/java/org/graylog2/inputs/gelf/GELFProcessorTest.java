@@ -42,6 +42,8 @@ public class GELFProcessorTest {
 
     public final static String GELF_JSON_INCOMPLETE_WITH_NON_STANDARD_FIELD = "{\"short_message\":\"foo\",\"host\":\"bar\",\"lol_not_allowed\":\":7\",\"_something\":\"foo\"}";
 
+    public final static String GELF_JSON_WITH_MAP = "{\"short_message\":\"foo\",\"host\":\"bar\",\"_lol\":{\"foo\":\"zomg\"}}";
+    
     @Test
     public void testMessageReceived() throws Exception {
         GraylogServerStub serverStub = new GraylogServerStub();
@@ -138,6 +140,21 @@ public class GELFProcessorTest {
         assertEquals(1, serverStub.callsToProcessBufferInserter);
         assertNull(lm.getAdditionalData().get("lol_not_allowed"));
         assertEquals("foo", lm.getAdditionalData().get("_something"));
+        assertEquals(1, lm.getAdditionalData().size());
+    }
+    
+    @Test
+    public void testMessageReceivedConvertsMapsToString() throws Exception {
+        GraylogServerStub serverStub = new GraylogServerStub();
+        GELFProcessor processor = new GELFProcessor(serverStub);
+
+        processor.messageReceived(new GELFMessage(TestHelper.zlibCompress(GELF_JSON_WITH_MAP)));
+        // All GELF types are tested in GELFMessageTest.
+
+        LogMessage lm = serverStub.lastInsertedToProcessBuffer;
+
+        assertEquals(1, serverStub.callsToProcessBufferInserter);
+        assertEquals("{\"foo\":\"zomg\"}", lm.getAdditionalData().get("_lol"));
         assertEquals(1, lm.getAdditionalData().size());
     }
 }

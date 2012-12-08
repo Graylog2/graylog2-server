@@ -24,6 +24,7 @@ import com.yammer.metrics.Metrics;
 import com.yammer.metrics.core.Meter;
 import com.yammer.metrics.core.Timer;
 import com.yammer.metrics.core.TimerContext;
+import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.graylog2.Core;
@@ -123,10 +124,17 @@ public class GELFProcessor {
         for(Map.Entry<String, Object> entry : entrySet) {
 
             String key = entry.getKey();
+            Object value = entry.getValue();
 
             // Skip standard fields.
             if (!key.startsWith(GELFMessage.ADDITIONAL_FIELD_PREFIX)) {
                 continue;
+            }
+            
+            // Convert lists and maps to Strings.
+            
+            if (value instanceof List || value instanceof Map || value instanceof Set) {
+                value = value.toString();
             }
 
             // Don't allow to override _id. (just to make sure...)
@@ -136,7 +144,7 @@ public class GELFProcessor {
             }
 
             // Add to message.
-            lm.addAdditionalData(key, entry.getValue());
+            lm.addAdditionalData(key, value);
         }
 
         // Stop metrics timer.
