@@ -144,9 +144,9 @@
             <version>3.2.1</version>
         </dependency>
         <dependency>
-            <groupId>${project.groupId}</groupId>
+            <groupId>org.graylog2</groupId>
             <artifactId>graylog2-plugin</artifactId>
-            <version>0.10.1-SNAPSHOT</version>
+            <version>0.10.1</version>
         </dependency>
     </dependencies>
 
