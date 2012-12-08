@@ -148,6 +148,11 @@
             <artifactId>graylog2-plugin</artifactId>
             <version>0.10.1</version>
         </dependency>
+        <dependency>
+            <groupId>org.igniterealtime.smack</groupId>
+            <artifactId>smackx</artifactId>
+            <version>3.2.1</version>
+        </dependency>
     </dependencies>
 
     <build>
