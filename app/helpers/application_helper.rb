@@ -140,7 +140,7 @@ module ApplicationHelper
       });"
     end
 
-    r += "$.post('#{url}', function(json) {
+    r += "$.get('#{url}', function(json) {
             plot#{uid}(json.data);
           }, 'json');
     </script>"

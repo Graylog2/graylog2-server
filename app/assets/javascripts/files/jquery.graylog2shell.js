@@ -181,7 +181,7 @@
       var self = this;
 
       $.ajax({
-        type: "POST",
+        type: "GET",
         url: "analytics/shell",
         dataType: "json",
         data: { cmd : input },

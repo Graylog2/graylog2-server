@@ -2,7 +2,7 @@
 <h1>Hosts</h1>
 
 <div id="hosts-quickjump">
-  <%= form_tag '/hosts/quickjump/' do %>
+  <%= form_tag '/hosts/quickjump/', :method => :get do %>
     <%= label_tag "hosts-quickjump-input", "Quick jump to host:" %>
     <%= text_field_tag :host, nil, :id => "hosts-quickjump-input" %>
     <%= awesome_submit_link "Go!" %>

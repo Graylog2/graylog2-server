@@ -126,7 +126,7 @@ $(document).ready(function() {
       $("#analytics-new-messages-update-loading").show();
 
       // Update graph.
-      $.post($(this).attr("data-updateurl") + "&hours=" + range_num, function(response) {
+      $.get($(this).attr("data-updateurl") + "&hours=" + range_num, function(response) {
 
         // Plot is defined inline. (I suck at JavaScript)
         plot(response.data);
@@ -351,7 +351,7 @@ $(document).ready(function() {
 
     setInterval(function(){
       // Update current throughput every 5 seconds
-      $.post("/health/currentthroughput", function(json) {
+      $.get("/health/currentthroughput", function(json) {
         count = $(".health-throughput-current");
         count.html(parseInt(json.count));
         count.fadeOut(200, function() {
@@ -376,7 +376,7 @@ function bindMessageSidebarClicks() {
       target += "&stream_id=" + stream_id;
     }
 
-    $.post(target, function(data) {
+    $.get(target, function(data) {
       $("#sidebar-inner").html(data);
 
       // Show sidebar if hidden.

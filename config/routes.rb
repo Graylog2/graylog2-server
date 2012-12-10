@@ -17,15 +17,9 @@ Graylog2WebInterface::Application.routes.draw do
 
   resources :messages do
     collection do
-      post :showrange
       get :showrange
-      post :deletebystream
-      post :deletebyquickfilter
       get :realtime
       get :universalsearch
-    end
-    member do
-      post :show
     end
   end
 
@@ -37,12 +31,11 @@ Graylog2WebInterface::Application.routes.draw do
     resources :messages
 
     member do
-      post :showrange
       get :showrange
     end
 
     collection do
-      post :quickjump
+      get :quickjump
     end
   end
 
@@ -101,7 +94,7 @@ Graylog2WebInterface::Application.routes.draw do
 
   resource :analytics do
     get :index
-    post :shell
+    get :shell
   end
 
   resources :versioncheck do
@@ -114,14 +107,14 @@ Graylog2WebInterface::Application.routes.draw do
 
   resources :visuals, :constraints => {:id => /[a-z]+/} do
     member do
-      post :fetch
+      get :fetch
     end
   end
 
   resources :health do
     collection do
-      post :currentthroughput
-      post :currentmqsize
+      get :currentthroughput
+      get :currentmqsize
     end
   end
 
