@@ -3,7 +3,7 @@ class ApplicationController < ActionController::Base
 
   protect_from_forgery
   helper Authorization::AuthorizationHelper
-  before_filter :login_required, :clear_terms_cache
+  before_filter :login_required, :clear_terms_cache, :block_demo_access
 
   rescue_from "Mongo::ConnectionFailure" do
       render_custom_error_page("mongo_connectionfailure") and return
@@ -88,4 +88,12 @@ class ApplicationController < ActionController::Base
     render :file => "#{Rails.root.to_s}/public/#{tpl}.html", :status => 500, :layout => false
     return
   end
+
+  def block_demo_access
+    if ::Configuration.is_demo_system? and !request.get?
+      flash[:error] = "Sorry, this demo is not allowing any changes."
+      redirect_to :controller => :messages, :action => :index
+    end
+  end
+
 end

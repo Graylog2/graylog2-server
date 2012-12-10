@@ -25,6 +25,10 @@ class Configuration
     general_config :allow_version_check, false
   end
 
+  def self.is_demo_system?
+    general_config :is_demo_system, false
+  end
+
   def self.custom_cookie_name
     general_config :custom_cookie_name
   end
