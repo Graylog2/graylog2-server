@@ -90,7 +90,8 @@ class ApplicationController < ActionController::Base
   end
 
   def block_demo_access
-    if ::Configuration.is_demo_system? and !request.get?
+    # current_user check because login POST must still work.
+    if ::Configuration.is_demo_system? and current_user and !request.get?
       flash[:error] = "Sorry, this demo is not allowing any changes."
       redirect_to :controller => :messages, :action => :index
     end

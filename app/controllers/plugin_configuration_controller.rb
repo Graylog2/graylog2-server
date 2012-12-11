@@ -1,5 +1,7 @@
 class PluginConfigurationController < ApplicationController
 
+  before_filter :block_demo_access
+
   filter_access_to :all
 
   def configure
@@ -36,6 +38,13 @@ class PluginConfigurationController < ApplicationController
   	end
   rescue
   	{}
+  end
+
+  def block_demo_access
+    if ::Configuration.is_demo_system?
+      flash[:notice] = "Sorry, plugin configurations are blocked in demo mode."
+      redirect_to :controller => :systemsettings
+    end
   end
 
 end
