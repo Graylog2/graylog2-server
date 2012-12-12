@@ -27,19 +27,21 @@ class LdapAuthentication
           encryption: get_encryption)
       
     if ::Configuration.ldap_user_dn_pattern
-      session.search(
+      result = session.search(
           base:          get_user_dn_from_pattern,
           attributes:    get_attributes,
           return_result: true
-      ).try(:first)
+      )
+      result ? result.try(:first) : nil
     elsif ::Configuration.ldap_search_base_dn && ::Configuration.ldap_search_filter
-      session.bind_as(
+      result = session.bind_as(
           base:          ::Configuration.ldap_search_base_dn,
           filter:        get_search_filter_bind_as,
           password:      @password,
           attributes:    get_attributes,
           return_result: true
-      ).try(:first)
+      )
+      result ? result.try(:first) : nil
     else
       raise ArgumentError, 'LDAP authentication requires either a user_dn_pattern, or a search_base_dn and a search_filter'
     end
