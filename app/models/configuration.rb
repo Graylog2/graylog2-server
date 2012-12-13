@@ -73,16 +73,36 @@ class Configuration
     ldap_config :port, 389
   end
 
-  def self.ldap_base
-    ldap_config :base
+  def self.ldap_tls_enabled?
+    ldap_config :tls_enabled, false
   end
 
   def self.ldap_displayname_attribute
-    ldap_config :displayname_attribute, :displayname
+    ldap_config :displayname_attribute, 'cn'
   end
 
-  def self.ldap_username_attribute
-    ldap_config :username_attribute, 'uid'
+  def self.ldap_mail_attribute
+    ldap_config :mail_attribute, 'mail'
+  end
+
+  def self.ldap_user_dn_pattern
+    ldap_config :user_dn_pattern
+  end
+  
+  def self.ldap_search_base_dn
+    ldap_config :search_base_dn
+  end
+
+  def self.ldap_search_filter
+    ldap_config :search_filter
+  end
+
+  def self.ldap_search_bind_dn
+    ldap_config :search_bind_dn
+  end
+
+  def self.ldap_search_bind_password
+    ldap_config :search_bind_password
   end
 
 end

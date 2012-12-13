@@ -1,7 +1,50 @@
 ldap:
+  # Is LDAP authentication enabled?
   enabled: false
+
+  # Server hostname
   host: ldap.mycompany.com
-  base: ou=People,dc=mycompany,dc=com
+
+  # Server port
   port: 389
-  username_attribute: email
-  displayname_attribute: displayname
+
+  # Is the LDAP server port using simple TLS (encrypted-only connection, not using STARTTLS on a shared port)
+  tls_enabled: false
+
+  # Attribute containing user's name for display, defaults to 'cn'
+  displayname_attribute: cn
+
+  # Attribute containing user's email address, defaults to 'mail'
+  mail_attribute: mail
+
+  ###
+  # LDAP authentication modes
+  # Two supported modes: apply a pattern to determine the user's DN, or perform a subtree search for the user (with optional search user authentication)
+  ###
+
+  ###
+  # Pattern lookup
+  ###
+
+  # If set, applies a pattern the supplied username to convert it to a DN before attempting to bind with the user's password
+  # user_dn_pattern: uid=%s,ou=people,dc=ldap,dc=example,dc=com
+
+  ###
+  # Subtree search
+  ###
+
+  # If set, searches for the user within the specified DN (subtree search); search_filter must also be set
+  # search_base_dn: ou=people,dc=ldap,dc=example,dc=com
+
+  # If set, searches for the user with the specified LDAP filter; search_base_dn must also be set
+  # search_filter: (uid=%s)
+
+  ###
+  # Authenticated subtree search
+  ###
+
+  # DN to bind with before performing a LDAP subtree search; search_bind_password must also be set
+  # search_bind_dn: uid=search,ou=auth,dc=ldap,dc=example,dc=com
+
+  # Password to bind with before performing a LDAP subtree search; search_bind_dn must also be set
+  # search_bind_password: s3kr3t_p455w0rd
