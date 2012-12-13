@@ -1,7 +1,7 @@
 class Configuration
-  @general_config = YAML::load File.read(Rails.root.to_s + "/config/general.yml")
-  @indexer_config = YAML::load File.read(Rails.root.to_s + "/config/indexer.yml")
-  @ldap_config = YAML::load File.read(Rails.root.to_s + "/config/ldap.yml")
+  @general_config = YAML::load File.read((ENV['GRAYLOG2_BASE'] || Rails.root.to_s) + "/config/general.yml")
+  @indexer_config = YAML::load File.read((ENV['GRAYLOG2_BASE'] || Rails.root.to_s) + "/config/indexer.yml")
+  @ldap_config = YAML::load File.read((ENV['GRAYLOG2_BASE'] || Rails.root.to_s) + "/config/ldap.yml")
 
   def self.config_value(root, nesting, key, default = nil)
     [root, root[nesting.to_s], root[nesting.to_s][key.to_s]].any?(&:blank?) ? default : root[nesting.to_s][key.to_s]
