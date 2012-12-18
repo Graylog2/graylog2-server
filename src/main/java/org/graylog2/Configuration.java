@@ -151,7 +151,7 @@ public class Configuration {
     private String mongoDatabase = "graylog2";
 
     @Parameter(value = "mongodb_host", required = true)
-    private String mongoHost = "localhost";
+    private String mongoHost = "127.0.0.1";
 
     @Parameter(value = "mongodb_port", required = true, validator = InetPortValidator.class)
     private int mongoPort = 27017;
