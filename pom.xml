@@ -139,11 +139,6 @@
             <version>3.2.1</version>
         </dependency>
         <dependency>
-            <groupId>org.graylog2</groupId>
-            <artifactId>graylog2-plugin</artifactId>
-            <version>0.10.1</version>
-        </dependency>
-        <dependency>
             <groupId>org.igniterealtime.smack</groupId>
             <artifactId>smackx</artifactId>
             <version>3.2.1</version>
@@ -152,6 +147,11 @@
             <groupId>io.netty</groupId>
             <artifactId>netty</artifactId>
             <version>3.5.11.Final</version>
+        </dependency>
+        <dependency>
+            <groupId>org.graylog2</groupId>
+            <artifactId>graylog2-plugin</artifactId>
+            <version>0.10.3</version>
         </dependency>
     </dependencies>
 

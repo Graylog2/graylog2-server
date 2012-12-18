@@ -33,6 +33,7 @@ import org.graylog2.plugin.filters.MessageFilter;
 import org.graylog2.plugin.logmessage.LogMessage;
 
 import java.util.concurrent.TimeUnit;
+import org.graylog2.plugin.buffers.BufferOutOfCapacityException;
 
 /**
  * @author Lennart Koopmann <lennart@socketfeed.com>
@@ -89,8 +90,19 @@ public class ProcessBufferProcessor implements EventHandler<LogMessageEvent> {
         }
 
         LOG.debug("Finished processing message. Writing to output buffer.");
+        
+        while (true) {
+            try {
+               server.getOutputBuffer().insert(msg);
+               break;
+            } catch (BufferOutOfCapacityException e) {
+                LOG.debug("OutputBuffer out of capacity. Trying again in 250ms.");
+                Thread.sleep(250);
+                continue;
+            }
+        }
+        
         outgoingMessages.mark();
-        server.getOutputBuffer().insert(msg);
         tcx.stop();
     }
 

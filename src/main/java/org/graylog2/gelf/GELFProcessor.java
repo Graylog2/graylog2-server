@@ -37,6 +37,7 @@ import org.json.simple.JSONValue;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
+import org.graylog2.plugin.buffers.BufferOutOfCapacityException;
 
 /**
  * @author Lennart Koopmann <lennart@socketfeed.com>
@@ -54,7 +55,7 @@ public class GELFProcessor {
         this.server = server;
     }
 
-    public void messageReceived(GELFMessage message) {
+    public void messageReceived(GELFMessage message) throws BufferOutOfCapacityException {
         incomingMessages.mark();
         
         // Convert to LogMessage

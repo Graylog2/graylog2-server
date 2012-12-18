@@ -36,6 +36,7 @@ import org.slf4j.LoggerFactory;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
+import org.graylog2.plugin.buffers.BufferOutOfCapacityException;
 
 /**
  * @author Lennart Koopmann <lennart@socketfeed.com>
@@ -85,19 +86,25 @@ public class OutputBuffer implements Buffer {
     }
 
     @Override
-    public void insert(LogMessage message) {
-        if (ringBuffer.remainingCapacity() > 0) {
-            long sequence = ringBuffer.next();
-            LogMessageEvent event = ringBuffer.get(sequence);
-            event.setMessage(message);
-            ringBuffer.publish(sequence);
-
-            server.outputBufferWatermark().incrementAndGet();
-            incomingMessages.mark();
-        } else {
-            LOG.error("OutputBuffer is out of capacity. Raise the ring_size configuration parameter. DROPPING MESSAGE!");
+    public void insert(LogMessage message) throws BufferOutOfCapacityException {
+        if (!hasCapacity()) {
+            LOG.warn("Rejecting message, because I am full. Raise my size or add more processors.");
             rejectedMessages.mark();
+            throw new BufferOutOfCapacityException();
         }
+        
+        long sequence = ringBuffer.next();
+        LogMessageEvent event = ringBuffer.get(sequence);
+        event.setMessage(message);
+        ringBuffer.publish(sequence);
+
+        server.outputBufferWatermark().incrementAndGet();
+        incomingMessages.mark();
+    }
+
+    @Override
+    public boolean hasCapacity() {
+        return ringBuffer.remainingCapacity() > 0;
     }
 
 }

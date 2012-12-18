@@ -41,6 +41,7 @@ import org.graylog2.activities.Activity;
 import org.graylog2.gelf.GELFMessage;
 import org.graylog2.gelf.GELFProcessor;
 import org.graylog2.inputs.syslog.SyslogProcessor;
+import org.graylog2.plugin.buffers.BufferOutOfCapacityException;
 
 /**
  * @author Lennart Koopmann <lennart@socketfeed.com>
@@ -158,11 +159,33 @@ public class AMQPConsumer implements Runnable {
                      switch (queueConfig.getInputType()) {
                          case GELF:
                              GELFMessage gelf = new GELFMessage(body);
-                             gelfProcessor.messageReceived(gelf);
+                             
+                             while (true) {
+                                try {
+                                   gelfProcessor.messageReceived(gelf);
+                                   break;
+                                } catch (BufferOutOfCapacityException e) {
+                                    LOG.debug("Buffer out of capacity. Trying again in 250ms.");
+                                    Thread.sleep(250);
+                                    continue;
+                                }
+                             }
+                             
                              handledGELFMessages.mark();
                              break;
                          case SYSLOG:
-                             syslogProcessor.messageReceived(new String(body), connection.getAddress());
+                             
+                             while (true) {
+                                try {
+                                   syslogProcessor.messageReceived(new String(body), connection.getAddress());
+                                   break;
+                                } catch (BufferOutOfCapacityException e) {
+                                    LOG.debug("Buffer out of capacity. Trying again in 250ms.");
+                                    Thread.sleep(250);
+                                    continue;
+                                }
+                             }
+
                              handledSyslogMessages.mark();
                              break;
                      }

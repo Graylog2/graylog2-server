@@ -36,6 +36,7 @@ import java.net.UnknownHostException;
 import java.util.Date;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
+import org.graylog2.plugin.buffers.BufferOutOfCapacityException;
 
 /**
  * @author Lennart Koopmann <lennart@socketfeed.com>
@@ -55,7 +56,7 @@ public class SyslogProcessor {
         this.server = server;
     }
 
-    public void messageReceived(String msg, InetAddress remoteAddress) {
+    public void messageReceived(String msg, InetAddress remoteAddress) throws BufferOutOfCapacityException {
         incomingMessages.mark();
 
         // Convert to LogMessage
