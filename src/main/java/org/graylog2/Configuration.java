@@ -81,6 +81,9 @@ public class Configuration {
     @Parameter(value = "syslog_store_full_message", required = false)
     private boolean syslogStoreFullMessage = true;
     
+    @Parameter(value = "udp_recvbuffer_sizes", required = true, validator = PositiveIntegerValidator.class)
+    private int udpRecvBufferSizes = 1048576;
+    
     @Parameter(value = "force_syslog_rdns", required = true)
     private boolean forceSyslogRdns = false;
 
@@ -385,6 +388,10 @@ public class Configuration {
     
     public int getOutputBufferProcessorThreadsMaxPoolSize() {
         return outputBufferProcessorThreadsMaxPoolSize;
+    }
+    
+    public int getUdpRecvBufferSizes() {
+        return udpRecvBufferSizes;
     }
     
     public WaitStrategy getProcessorWaitStrategy() {

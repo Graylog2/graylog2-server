@@ -68,8 +68,9 @@ public class SyslogUDPInput implements MessageInput {
         
         final ConnectionlessBootstrap bootstrap = new ConnectionlessBootstrap(new NioDatagramChannelFactory(workerThreadPool));
 
-        bootstrap.setOption("receiveBufferSize", 1048576);
-        bootstrap.setOption("receiveBufferSizePredictorFactory", new FixedReceiveBufferSizePredictorFactory(8192));
+        bootstrap.setOption("receiveBufferSizePredictorFactory", new FixedReceiveBufferSizePredictorFactory(
+                graylogServer.getConfiguration().getUdpRecvBufferSizes())
+        );
         bootstrap.setPipelineFactory(new SyslogPipelineFactory(graylogServer));
 
         try {
