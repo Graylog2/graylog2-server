@@ -20,7 +20,9 @@
 
 package org.graylog2.initializers;
 
+import com.librato.metrics.LibratoReporter;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 import org.graylog2.plugin.initializers.Initializer;
 import org.graylog2.Core;
 import org.graylog2.periodical.LibratoMetricsWriterThread;
@@ -37,6 +39,19 @@ public class LibratoMetricsInitializer extends SimpleFixedRateScheduleInitialize
     @Override
     public void initialize(GraylogServer server, Map<String, String> config) throws InitializerConfigurationException {
         Core srv = (Core) server;
+        
+        if (srv.getConfiguration().isEnableLibratoSystemMetrics()) {
+            // Enable librato metrics reporter.
+            LibratoReporter.enable(
+                    LibratoReporter.builder(
+                        srv.getConfiguration().getLibratoMetricsAPIUser(),
+                        srv.getConfiguration().getLibratoMetricsAPIToken(),
+                        srv.getServerId()
+                    ),
+                    srv.getConfiguration().getLibratoMetricsInterval(),
+                    TimeUnit.SECONDS
+            );
+        }
         
         configureScheduler(
                 (Core) server,

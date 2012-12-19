@@ -215,6 +215,9 @@ public class Configuration {
 
     @Parameter(value = "enable_libratometrics_output", required = false)
     private boolean enableLibratoMetricsOutput = false;
+    
+    @Parameter(value = "enable_libratometrics_system_metrics", required = false)
+    private boolean enableLibratoSystemMetrics = false;
 
     @Parameter(value = "libratometrics_api_user", required = false)
     private String libratometricsApiUser;
@@ -571,6 +574,10 @@ public class Configuration {
         return enableLibratoMetricsOutput;
     }
 
+    public boolean isEnableLibratoSystemMetrics() {
+        return enableLibratoSystemMetrics;
+    }
+    
     public String getLibratoMetricsAPIUser() {
         return libratometricsApiUser;
     }
