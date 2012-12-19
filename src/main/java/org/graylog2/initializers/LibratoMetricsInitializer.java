@@ -46,7 +46,7 @@ public class LibratoMetricsInitializer extends SimpleFixedRateScheduleInitialize
                     LibratoReporter.builder(
                         srv.getConfiguration().getLibratoMetricsAPIUser(),
                         srv.getConfiguration().getLibratoMetricsAPIToken(),
-                        srv.getServerId()
+                        srv.getServerId() + "-" + srv.getConfiguration().getLibratoMetricsPrefix()
                     ),
                     srv.getConfiguration().getLibratoMetricsInterval(),
                     TimeUnit.SECONDS
