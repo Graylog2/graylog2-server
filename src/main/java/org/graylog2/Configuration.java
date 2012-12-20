@@ -235,7 +235,7 @@ public class Configuration {
     private int libratometricsInterval = 10;
 
     @Parameter(value = "libratometrics_prefix", required = false)
-    private String libratometricsPrefix = "gl2";
+    private String libratometricsPrefix = "gl2-";
 
     @Parameter(value = "plugin_dir", required = false)
     private String pluginDir = "plugin";

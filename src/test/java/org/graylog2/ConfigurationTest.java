@@ -237,7 +237,7 @@ public class ConfigurationTest {
         Configuration configuration = new Configuration();
         new JadConfig(new InMemoryRepository(validProperties), configuration).process();
 
-        Assert.assertEquals("gl2", configuration.getLibratoMetricsPrefix());
+        Assert.assertEquals("gl2-", configuration.getLibratoMetricsPrefix());
     }
     
     @Test

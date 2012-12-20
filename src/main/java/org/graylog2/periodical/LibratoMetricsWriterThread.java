@@ -61,7 +61,7 @@ public class LibratoMetricsWriterThread implements Runnable {
         try {
             LibratoMetricsFormatter f = new LibratoMetricsFormatter(
                     counter,
-                    graylogServer.getServerId() + "-" + graylogServer.getConfiguration().getLibratoMetricsPrefix(),
+                    graylogServer.getConfiguration().getLibratoMetricsPrefix(),
                     graylogServer.getConfiguration().getLibratoMetricsStreamFilter(),
                     graylogServer.getConfiguration().getLibratoMetricsHostsFilter()
             );

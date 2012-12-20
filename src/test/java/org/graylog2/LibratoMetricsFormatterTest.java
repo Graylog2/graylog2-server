@@ -58,13 +58,13 @@ public class LibratoMetricsFormatterTest {
         ObjectId id2 = new ObjectId();
         counter.incrementStream(id2);
 
-        LibratoMetricsFormatter f = new LibratoMetricsFormatter(counter, "gl2", new ArrayList<String>(), "");
+        LibratoMetricsFormatter f = new LibratoMetricsFormatter(counter, "gl2-", new ArrayList<String>(), "");
 
         Map<String, Map<String,Object>> gauges = parseGauges(f.asJson());
 
         assertEquals(5, gauges.size());
         
-        assertEquals("graylog2", gauges.get("gl2-total").get("source"));
+        assertEquals("gl2-graylog2-server", gauges.get("gl2-total").get("source"));
         assertEquals((long) 2, gauges.get("gl2-total").get("value"));
         assertEquals((long) 3, gauges.get("gl2-host-fooexampleorg").get("value"));
         assertEquals((long) 1, gauges.get("gl2-host-barexampleorg").get("value"));
@@ -75,7 +75,7 @@ public class LibratoMetricsFormatterTest {
     @Test
     public void testAsJsonWithEmptyCounter() {
         MessageCounterImpl counter = new MessageCounterImpl();
-        LibratoMetricsFormatter f = new LibratoMetricsFormatter(counter, "gl2", new ArrayList<String>(), "");
+        LibratoMetricsFormatter f = new LibratoMetricsFormatter(counter, "gl2-", new ArrayList<String>(), "");
 
         Map<String, Map<String,Object>> gauges = parseGauges(f.asJson());
 
@@ -117,13 +117,13 @@ public class LibratoMetricsFormatterTest {
         streamFilter.add(id3.toString());
         streamFilter.add(new ObjectId().toString());
 
-        LibratoMetricsFormatter f = new LibratoMetricsFormatter(counter, "gl2", streamFilter, "");
+        LibratoMetricsFormatter f = new LibratoMetricsFormatter(counter, "gl2-", streamFilter, "");
 
         Map<String, Map<String,Object>> gauges = parseGauges(f.asJson());
 
         assertEquals(4, gauges.size());
 
-        assertEquals("graylog2", gauges.get("gl2-total").get("source"));
+        assertEquals("gl2-graylog2-server", gauges.get("gl2-total").get("source"));
         assertEquals((long) 2, gauges.get("gl2-total").get("value"));
         assertEquals((long) 3, gauges.get("gl2-host-fooexampleorg").get("value"));
         assertEquals((long) 1, gauges.get("gl2-host-barexampleorg").get("value"));
@@ -160,28 +160,17 @@ public class LibratoMetricsFormatterTest {
 
         String hostFilter = "^bar.*\\.example.org$";
 
-        LibratoMetricsFormatter f = new LibratoMetricsFormatter(counter, "gl2", new ArrayList<String>(), hostFilter);
+        LibratoMetricsFormatter f = new LibratoMetricsFormatter(counter, "gl2-", new ArrayList<String>(), hostFilter);
 
         Map<String, Map<String,Object>> gauges = parseGauges(f.asJson());
 
         assertEquals(4, gauges.size());
 
-        assertEquals("graylog2", gauges.get("gl2-total").get("source"));
+        assertEquals("gl2-graylog2-server", gauges.get("gl2-total").get("source"));
         assertEquals((long) 2, gauges.get("gl2-total").get("value"));
         assertEquals((long) 3, gauges.get("gl2-host-fooexampleorg").get("value"));
         assertEquals((long) 2, gauges.get("gl2-stream-" + id1.toString()).get("value"));
         assertEquals((long) 1, gauges.get("gl2-stream-" + id2.toString()).get("value"));
-    }
-
-    @Test
-    public void testAsJsonAccountsPrefix() {
-        MessageCounterImpl counter = new MessageCounterImpl();
-        LibratoMetricsFormatter f = new LibratoMetricsFormatter(counter, "LOLSOMEPREFIX", new ArrayList<String>(), "");
-
-        Map<String, Map<String,Object>> gauges = parseGauges(f.asJson());
-
-        assertEquals(1, gauges.size());
-        assertEquals((long) 0, gauges.get("LOLSOMEPREFIX-total").get("value"));
     }
 
     private Map<String, Map<String,Object>> parseGauges(String json) {

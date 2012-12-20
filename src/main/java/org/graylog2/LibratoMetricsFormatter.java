@@ -38,19 +38,17 @@ import java.util.Map.Entry;
 public class LibratoMetricsFormatter {
 
     private static final Logger LOG = LoggerFactory.getLogger(LibratoMetricsFormatter.class);
-
-    private static final String SOURCE = "graylog2";
-
+    
     private MessageCounter counter;
     List<String> streamFilter;
     String hostFilter;
-    String prefix;
+    String source;
 
     public LibratoMetricsFormatter (MessageCounter counter, String prefix, List<String> streamFilter, String hostFilter) {
         this.counter = counter;
         this.streamFilter = streamFilter;
         this.hostFilter = hostFilter;
-        this.prefix = prefix;
+        this.source = prefix + "graylog2-server";
     }
     
     /*
@@ -78,8 +76,8 @@ public class LibratoMetricsFormatter {
         // Overall
         Map<String, Object> overall = Maps.newHashMap();
         overall.put("value", counter.getTotalCount());
-        overall.put("source", SOURCE);
-        overall.put("name", name("total"));
+        overall.put("source", source);
+        overall.put("name", "gl2-total");
         gauges.add(overall);
 
         // Streams.
@@ -91,8 +89,8 @@ public class LibratoMetricsFormatter {
 
             Map<String, Object> s = Maps.newHashMap();
             s.put("value", stream.getValue());
-            s.put("source", SOURCE);
-            s.put("name", name("stream-" + stream.getKey()));
+            s.put("source", source);
+            s.put("name", "gl2-stream-" + stream.getKey());
             gauges.add(s);
         }
 
@@ -105,18 +103,14 @@ public class LibratoMetricsFormatter {
 
             Map<String, Object> h = Maps.newHashMap();
             h.put("value", host.getValue());
-            h.put("source", SOURCE);
-            h.put("name", name("host-" + Tools.decodeBase64(host.getKey()).replaceAll("[^a-zA-Z0-9]", "")));
+            h.put("source", source);
+            h.put("name", "gl2-host-" + Tools.decodeBase64(host.getKey()).replaceAll("[^a-zA-Z0-9]", ""));
             gauges.add(h);
         }
 
         m.put("gauges", gauges);
 
         return JSONValue.toJSONString(m);
-    }
-
-    private String name(String name) {
-        return prefix + "-" + name;
     }
 
 }
