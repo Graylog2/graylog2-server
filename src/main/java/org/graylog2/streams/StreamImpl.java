@@ -149,6 +149,16 @@ public class StreamImpl implements Stream {
 
         return streams;
     }
+    
+    public static Map<String, String> nameMap(Core server) {
+        Map<String, String> streams = Maps.newHashMap();
+        
+        for(Stream stream : fetchAllEnabled(server)) {
+            streams.put(stream.getId().toString(), stream.getTitle());
+        }
+        
+        return streams;
+    }
 
     @Override
     public List<StreamRule> getStreamRules() {

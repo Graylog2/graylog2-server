@@ -30,6 +30,7 @@ import org.slf4j.LoggerFactory;
 import java.io.DataOutputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import org.graylog2.streams.StreamImpl;
 
 /**
  * @author Lennart Koopmann <lennart@socketfeed.com>
@@ -63,7 +64,8 @@ public class LibratoMetricsWriterThread implements Runnable {
                     counter,
                     graylogServer.getConfiguration().getLibratoMetricsPrefix(),
                     graylogServer.getConfiguration().getLibratoMetricsStreamFilter(),
-                    graylogServer.getConfiguration().getLibratoMetricsHostsFilter()
+                    graylogServer.getConfiguration().getLibratoMetricsHostsFilter(),
+                    StreamImpl.nameMap(graylogServer)
             );
 
             send(f.asJson());

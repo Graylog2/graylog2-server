@@ -31,6 +31,9 @@ import org.slf4j.LoggerFactory;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Set;
+import org.graylog2.plugin.streams.Stream;
+import org.graylog2.streams.StreamImpl;
 
 /**
  * @author Lennart Koopmann <lennart@socketfeed.com>
@@ -40,15 +43,17 @@ public class LibratoMetricsFormatter {
     private static final Logger LOG = LoggerFactory.getLogger(LibratoMetricsFormatter.class);
     
     private MessageCounter counter;
-    List<String> streamFilter;
-    String hostFilter;
-    String source;
+    private List<String> streamFilter;
+    private String hostFilter;
+    private String source;
+    private Map<String, String> streamNames;
 
-    public LibratoMetricsFormatter (MessageCounter counter, String prefix, List<String> streamFilter, String hostFilter) {
+    public LibratoMetricsFormatter (MessageCounter counter, String prefix, List<String> streamFilter, String hostFilter, Map<String, String> streamNames) {
         this.counter = counter;
         this.streamFilter = streamFilter;
         this.hostFilter = hostFilter;
         this.source = prefix + "graylog2-server";
+        this.streamNames = streamNames;
     }
     
     /*
@@ -79,7 +84,7 @@ public class LibratoMetricsFormatter {
         overall.put("source", source);
         overall.put("name", "gl2-total");
         gauges.add(overall);
-
+        
         // Streams.
         for(Entry<String, Integer> stream : counter.getStreamCounts().entrySet()) {
             if (streamFilter.contains(stream.getKey())) {
@@ -90,7 +95,7 @@ public class LibratoMetricsFormatter {
             Map<String, Object> s = Maps.newHashMap();
             s.put("value", stream.getValue());
             s.put("source", source);
-            s.put("name", "gl2-stream-" + stream.getKey());
+            s.put("name", "gl2-stream-" + buildStreamMetricName(stream.getKey()));
             gauges.add(s);
         }
 
@@ -113,4 +118,12 @@ public class LibratoMetricsFormatter {
         return JSONValue.toJSONString(m);
     }
 
+    private String buildStreamMetricName(String streamId) {
+        if (!streamNames.containsKey(streamId) || streamNames.get(streamId) == null || streamNames.get(streamId).isEmpty()) {
+            return "noname-" + streamId;
+        }
+        
+        return streamNames.get(streamId).toLowerCase().replaceAll("[^a-zA-Z0-9]", "");
+    }
+    
 }
