@@ -22,6 +22,8 @@ package org.graylog2.indexer;
 import org.elasticsearch.action.ActionFuture;
 import org.elasticsearch.action.count.CountRequestBuilder;
 import org.elasticsearch.action.count.CountResponse;
+import static org.elasticsearch.index.query.QueryBuilders.filteredQuery;
+import static org.elasticsearch.index.query.FilterBuilders.rangeFilter;
 import org.elasticsearch.index.query.QueryBuilder;
 import org.graylog2.Core;
 import org.graylog2.plugin.streams.Stream;
@@ -41,7 +43,9 @@ public class MessageGateway {
     
     public int streamMessageCount(Stream stream, int sinceTimestamp) {
         CountRequestBuilder b = server.getIndexer().getClient().prepareCount();
-        final QueryBuilder qb = matchQuery("streams", stream.getId().toString());
+        final QueryBuilder qb = filteredQuery(
+                matchQuery("streams", stream.getId().toString()),
+                rangeFilter("created_at").gte(sinceTimestamp));
         
         b.setIndices(server.getDeflector().getAllDeflectorIndexNames());
         b.setQuery(qb);
