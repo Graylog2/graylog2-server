@@ -17,16 +17,15 @@ while [ -h "$GRAYLOG2CTL" ]; do
 done
 
 GRAYLOG2CTL_DIR=`dirname "$GRAYLOG2CTL"`
-GRAYLOG2_SERVER_JAR=${GRAYLOG2CTL_DIR}/../graylog2-server.jar
-GRAYLOG2_CONFIG_SH=${GRAYLOG2CTL_DIR}/graylog2_config.sh
+GRAYLOG2_SERVER_JAR=graylog2-server.jar
 GRAYLOG2_CONF=/etc/graylog2.conf
 GRAYLOG2_PID=/tmp/graylog2.pid
-
-[ -f $GRAYLOG2_CONFIG_SH ] && . $GRAYLOG2_CONFIG_SH
+LOG_FILE=log/graylog2-server.log
 
 start() {
     echo "Starting graylog2-server ..."
-    $NOHUP java -jar ${GRAYLOG2_SERVER_JAR} -f ${GRAYLOG2_CONF} -p ${GRAYLOG2_PID} &
+    cd "$GRAYLOG2CTL_DIR/.."
+    $NOHUP java -jar ${GRAYLOG2_SERVER_JAR} -f ${GRAYLOG2_CONF} -p ${GRAYLOG2_PID} >> ${LOG_FILE} &
 }
 
 stop() {
