@@ -127,8 +127,6 @@ public class AlarmScannerThread implements Runnable {
 
         for (AlarmCallback callback : graylogServer.getAlarmCallbacks()) {
             String typeclass = callback.getClass().getCanonicalName();
-System.out.println("forced: " + ssa.getForcedAlarmCallbacks());
-System.out.println("stream: " + stream.getAlarmCallbacks());
 
             // Only call if callback is forced for all streams or enabled for this particular stream.
             if (ssa.getForcedAlarmCallbacks().contains(typeclass) || stream.getAlarmCallbacks().contains(typeclass)) {
