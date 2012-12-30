@@ -47,6 +47,7 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.Writer;
 import org.graylog2.plugin.initializers.InitializerConfigurationException;
+import org.graylog2.plugins.PluginInstaller;
 
 /**
  * Main class of Graylog2.
@@ -78,16 +79,7 @@ public final class Main {
             System.out.println("JRE: " + Tools.getSystemInformation());
             System.exit(0);
         }
-
-        // Are we in debug mode?
-        if (commandLineArguments.isDebug()) {
-            LOG.info("Running in Debug mode");
-            org.apache.log4j.Logger.getRootLogger().setLevel(Level.ALL);
-            org.apache.log4j.Logger.getLogger(Main.class.getPackage().getName()).setLevel(Level.ALL);
-        }
-
-        LOG.info("Graylog2 {} starting up. (JRE: {})", Core.GRAYLOG2_VERSION, Tools.getSystemInformation());
-
+        
         String configFile = commandLineArguments.getConfigFile();
         LOG.info("Using config file: {}", configFile);
 
@@ -104,6 +96,28 @@ public final class Main {
             LOG.error("Invalid configuration", e);
             System.exit(1);
         }
+        
+        if (commandLineArguments.isInstallPlugin()) {
+            System.out.println("Plugin installation requested.");
+            PluginInstaller installer = new PluginInstaller(
+                    commandLineArguments.getPluginShortname(),
+                    commandLineArguments.getPluginVersion(),
+                    configuration,
+                    commandLineArguments.isForcePlugin()
+            );
+            
+            installer.install();
+            System.exit(0);
+        }
+
+        // Are we in debug mode?
+        if (commandLineArguments.isDebug()) {
+            LOG.info("Running in Debug mode");
+            org.apache.log4j.Logger.getRootLogger().setLevel(Level.ALL);
+            org.apache.log4j.Logger.getLogger(Main.class.getPackage().getName()).setLevel(Level.ALL);
+        }
+
+        LOG.info("Graylog2 {} starting up. (JRE: {})", Core.GRAYLOG2_VERSION, Tools.getSystemInformation());
 
         // If we only want to check our configuration, we just initialize the rules engine to check if the rules compile
         if (commandLineArguments.isConfigTest()) {

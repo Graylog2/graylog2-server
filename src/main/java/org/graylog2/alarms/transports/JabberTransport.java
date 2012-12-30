@@ -37,6 +37,7 @@ import org.slf4j.LoggerFactory;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
+import org.elasticsearch.common.collect.Maps;
 
 /**
  * @author Lennart Koopmann <lennart@socketfeed.com>
@@ -138,6 +139,12 @@ public class JabberTransport implements Transport {
     @Override
     public String getName() {
         return NAME;
+    }
+    
+    @Override
+    public Map<String, String> getRequestedConfiguration() {
+        // This transport is built in and has it's own config way. Just for plugin compat.
+        return Maps.newHashMap();
     }
     
 }

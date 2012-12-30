@@ -43,7 +43,7 @@ public class PluginRegistry {
             r.add(buildStandardInformation(
                     transport.getClass().getCanonicalName(),
                     transport.getName(),
-                    null
+                    transport.getRequestedConfiguration()
             ));
         }
         
@@ -110,7 +110,7 @@ public class PluginRegistry {
         server.getMongoBridge().writePluginInformation(r, "initializers");
     }
     
-    private static Map<String, Object> buildStandardInformation(String typeclass, String name, Map<String, String> requestedConfig) {
+    public static Map<String, Object> buildStandardInformation(String typeclass, String name, Map<String, String> requestedConfig) {
         Map<String, Object> o = Maps.newHashMap();
         
         o.put("typeclass", typeclass);

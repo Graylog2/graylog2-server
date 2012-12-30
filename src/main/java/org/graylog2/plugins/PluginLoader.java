@@ -48,7 +48,7 @@ public class PluginLoader<A> {
     }
     
     public List<A> getPlugins() {
-        List<A> filters = Lists.newArrayList();
+        List<A> plugins = Lists.newArrayList();
         
         // Load all plugin jars.
         for (File jarPath : getAllJars(subDirectory)) {
@@ -59,14 +59,14 @@ public class PluginLoader<A> {
                 );
 
                 Class<?> clazz = Class.forName(getClassNameFromJarName(jarPath.getName()), true, loader);
-                filters.add(clazz.asSubclass(type).newInstance());
+                plugins.add(clazz.asSubclass(type).newInstance());
             } catch (Exception ex) {
                 LOG.error("Could not load plugin <" + jarPath.getAbsolutePath() + ">", ex);
                 continue;
             }
         }
         
-        return filters;
+        return plugins;
     }
     
     private List<File> getAllJars(String type) {
@@ -80,7 +80,7 @@ public class PluginLoader<A> {
         return Arrays.asList(dir.listFiles(new Graylog2PluginFileFilter()));
     }
     
-    private String getClassNameFromJarName(String jar) throws InvalidJarNameException {
+    public static String getClassNameFromJarName(String jar) throws InvalidJarNameException {
         try {
             return jar.split("_gl2plugin.jar")[0];
         } catch(Exception e) {

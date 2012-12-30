@@ -38,6 +38,15 @@ public class CommandLineArguments {
     @Parameter(names = {"-r", "--no-retention"}, description = "Do not automatically remove messages from index that are older than the retention time")
     private boolean noRetention = false;
 
+    @Parameter(names = {"-x", "--install-plugin"}, description = "Install plugin with provided short name from graylog2.org")
+    private String pluginShortname;
+    
+    @Parameter(names = {"-v", "--plugin-version"}, description = "Install plugin with this version")
+    private String pluginVersion = Core.GRAYLOG2_VERSION;
+
+    @Parameter(names = {"-m", "--force-plugin"}, description = "Force plugin installation even if this version of graylog2-server is not officially supported.")
+    private boolean forcePlugin = false;
+    
     @Parameter(names = "--version", description = "Show version of graylog2 and exit")
     private boolean showVersion = false;
 
@@ -111,4 +120,21 @@ public class CommandLineArguments {
     public void setShowHelp(boolean showHelp) {
         this.showHelp = showHelp;
     }
+    
+    public boolean isInstallPlugin() {
+        return pluginShortname != null && !pluginShortname.isEmpty();
+    }
+    
+    public String getPluginShortname() {
+        return pluginShortname;
+    }
+    
+    public String getPluginVersion() {
+        return pluginVersion;
+    }
+    
+    public boolean isForcePlugin() {
+        return forcePlugin;
+    }
+    
 }

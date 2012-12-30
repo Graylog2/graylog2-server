@@ -20,6 +20,7 @@
 
 package org.graylog2.database;
 
+import com.mongodb.BasicDBList;
 import com.mongodb.BasicDBObject;
 import com.mongodb.DB;
 import com.mongodb.DBCollection;
@@ -176,8 +177,18 @@ public class MongoBridge {
         coll.remove(new BasicDBObject());
         
         for (Map<String, Object> plugin : plugins) {
-            coll.insert(new BasicDBObject(plugin));
+            writeSinglePluginInformation(plugin, collection);
         }
+    }
+    
+    public void writeSinglePluginInformation(Map<String, Object> plugin, String collection) {
+        DBCollection coll = connection.getDatabase().getCollection(collection);
+
+        DBObject query = new BasicDBObject();
+        query.put("typeclass", plugin.get("typeclass"));
+        
+        // Upsert, because there might be a plugin already and we don't purge for single.
+        coll.update(query, new BasicDBObject(plugin), true, false);
     }
     
     public void writeIndexDateRange(String indexName, int startDate) {

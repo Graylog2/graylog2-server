@@ -92,7 +92,7 @@ public class Core implements GraylogServer {
     private static final int SCHEDULED_THREADS_POOL_SIZE = 30;
     private ScheduledExecutorService scheduler;
 
-    public static final String GRAYLOG2_VERSION = "0.10.0-rc.1";
+    public static final String GRAYLOG2_VERSION = "0.10.0-rc.2";
 
     public static final String MASTER_COUNTER_NAME = "master";
     
@@ -207,7 +207,6 @@ public class Core implements GraylogServer {
     @Override
     public void run() {
 
-        // initiate the mongodb connection, this might fail but it will retry to establish the connection
         gelfChunkManager.start();
         BlacklistCache.initialize(this);
         StreamCache.initialize(this);
@@ -238,13 +237,14 @@ public class Core implements GraylogServer {
         loadPlugins(MessageFilter.class, "filters");
         loadPlugins(MessageOutput.class, "outputs");
         loadPlugins(AlarmCallback.class, "alarm_callbacks");
+        loadPlugins(Transport.class, "transports");
         loadPlugins(Initializer.class, "initializers");
         loadPlugins(MessageInput.class, "inputs");
         
         // Initialize all registered transports.
         for (Transport transport : this.transports) {
             try {
-                Map<String, String> config = Maps.newHashMap();
+                Map<String, String> config;
                 
                 // The built in transport methods get a more convenient configuration from graylog2.conf.
                 if (transport.getClass().getCanonicalName().equals("org.graylog2.alarms.transports.EmailTransport")) {
@@ -253,7 +253,7 @@ public class Core implements GraylogServer {
                     config = configuration.getJabberTransportConfiguration();
                 } else {
                     // Load custom plugin config.
-                    // config = PluginConfiguration.load(transport.getClass().getCanonicalName(), "transports")
+                    config = PluginConfiguration.load(this, transport.getClass().getCanonicalName());
                 }
                 
                 transport.initialize(config);
