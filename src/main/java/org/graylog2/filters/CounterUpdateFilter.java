@@ -45,9 +45,6 @@ public class CounterUpdateFilter implements MessageFilter {
 
         // Increment all registered message counters.
         for (MessageCounter counter : serverImpl.getMessageCounterManager().getAllCounters().values()) {
-            // Five second throughput for health page.
-            counter.incrementThroughput();
-
             // Total count.
             counter.incrementTotal();
 

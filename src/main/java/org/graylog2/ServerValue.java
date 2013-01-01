@@ -20,14 +20,8 @@
 
 package org.graylog2;
 
-import org.graylog2.plugin.Tools;
-import com.google.common.collect.Maps;
-import com.google.common.collect.Sets;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
 import org.graylog2.buffers.BufferWatermark;
-import org.graylog2.plugin.alarms.transports.Transport;
+import org.graylog2.plugin.Tools;
 
 /**
  * Filling the server_values collection
@@ -66,8 +60,8 @@ public class ServerValue {
         set("local_hostname", hostname);
     }
 
-    public void writeThroughput(int current, int highest) {
-        graylogServer.getMongoBridge().writeThroughput(graylogServer.getServerId(), current, highest);
+    public void writeThroughput(int current) {
+        graylogServer.getMongoBridge().writeThroughput(graylogServer.getServerId(), current);
     }
     
     public void writeBufferWatermarks(BufferWatermark outputBuffer, BufferWatermark processBuffer) {

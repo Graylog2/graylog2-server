@@ -20,22 +20,23 @@
 
 package org.graylog2.database;
 
-import com.mongodb.BasicDBList;
-import com.mongodb.BasicDBObject;
-import com.mongodb.DB;
-import com.mongodb.DBCollection;
-import com.mongodb.DBObject;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
 import org.graylog2.Core;
-import org.graylog2.plugin.Tools;
 import org.graylog2.activities.Activity;
 import org.graylog2.buffers.BufferWatermark;
+import org.graylog2.plugin.Counter;
+import org.graylog2.plugin.Tools;
 import org.joda.time.DateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.Map;
-import java.util.Set;
+import com.mongodb.BasicDBObject;
+import com.mongodb.DB;
+import com.mongodb.DBCollection;
+import com.mongodb.DBObject;
 
 
 /**
@@ -84,21 +85,27 @@ public class MongoBridge {
         }
     }
 
-    public void writeThroughput(String serverId, int current, int highest) {
-        BasicDBObject query = new BasicDBObject();
-        query.put("server_id", serverId);
-        query.put("type", "total_throughput");
+    public void writeThroughput(String serverId, int current) {
+        BasicDBObject totalQuery = new BasicDBObject();
+        totalQuery.put("server_id", serverId);
+        totalQuery.put("type", "total_throughput");
 
-        BasicDBObject update = new BasicDBObject();
-        update.put("server_id", serverId);
-        update.put("type", "total_throughput");
-        update.put("current", current);
-        update.put("highest", highest);
+        BasicDBObject totalUpdate = new BasicDBObject();
+        totalUpdate.put("$set", new BasicDBObject("current", current));
+
+        BasicDBObject highestQuery = new BasicDBObject();
+        highestQuery.put("server_id", serverId);
+        highestQuery.put("type", "total_throughput");
+        highestQuery.put("highest", new BasicDBObject("$lt", current));
+
+        BasicDBObject highestUpdate = new BasicDBObject();
+        highestUpdate.put("$set", new BasicDBObject("highest", current));
 
         DBCollection coll = getConnection().getDatabase().getCollection("server_values");
-        coll.update(query, update, true, false);
+        coll.update(totalQuery, totalUpdate, true, false);
+        coll.update(highestQuery, highestUpdate, true, false);
     }
-    
+
     public void writeBufferWatermarks(String serverId, BufferWatermark outputBuffer, BufferWatermark processBuffer) {
         BasicDBObject query = new BasicDBObject();
         query.put("server_id", serverId);
@@ -134,7 +141,7 @@ public class MongoBridge {
         coll.update(query, update, true, false);
     }
 
-    public void writeMessageCounts(int total, Map<String, Integer> streams, Map<String, Integer> hosts) {
+    public void writeMessageCounts(Counter total, Map<String, Counter> streams, Map<String, Counter> hosts) {
         // We store the first second of the current minute, to allow syncing (summing) message counts
         // from different graylog-server nodes later
         DateTime dt = new DateTime();
@@ -142,7 +149,7 @@ public class MongoBridge {
         
         BasicDBObject obj = new BasicDBObject();
         obj.put("timestamp", startOfMinute);
-        obj.put("total", total);
+        obj.put("total", total.get());
         obj.put("streams", streams);
         obj.put("hosts", hosts);
         obj.put("server_id", server.getServerId());
