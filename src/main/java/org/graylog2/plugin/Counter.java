@@ -21,39 +21,23 @@
 */
 package org.graylog2.plugin;
 
-import java.util.Map;
-import org.bson.types.ObjectId;
+public interface Counter {
+    public int get();
 
-/**
- *
- * @author Lennart Koopmann <lennart@socketfeed.com>
- */
-public interface MessageCounter {
+    public void increment();
 
-    public Counter getTotalCount();
+    public void reset();
 
-    public Map<String, Counter> getStreamCounts();
+    public void set(final int value);
 
-    public Map<String, Counter> getHostCounts();
+    public void set(final double value);
 
-    public void resetAllCounts();
+    public void set(final Counter value);
 
-    public void resetHostCounts();
+    public void add(final int value);
 
-    public void resetStreamCounts();
+    public void add(final double value);
 
-    public void resetTotal();
-
-    public void incrementTotal();
-
-    public void countUpTotal(final int x);
-
-    public void incrementStream(final ObjectId streamId);
-
-    public void countUpStream(final ObjectId streamId, final int x);
-
-    public void incrementHost(final String hostname);
-
-    public void countUpHost(String hostname, final int x);
+    public void add(final Counter value);
 
 }
