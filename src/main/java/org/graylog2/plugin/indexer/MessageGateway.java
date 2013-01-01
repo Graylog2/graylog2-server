@@ -23,14 +23,13 @@
  */
 package org.graylog2.plugin.indexer;
 
-import org.graylog2.plugin.streams.Stream;
-
 /**
  *
  * @author lennart.koopmann
  */
 public interface MessageGateway {
     
+    public int totalMessageCount(int sinceTimestamp);
     public int streamMessageCount(String streamId, int sinceTimestamp);
     
 }

@@ -44,6 +44,4 @@ public interface GraylogServer extends Runnable {
     
     public Map<String, Stream> getEnabledStreams();
     
-    public MessageCounterManager getMessageCounterManager();
-    
 }
