@@ -22,13 +22,14 @@ package org.graylog2.indexer;
 import org.elasticsearch.action.ActionFuture;
 import org.elasticsearch.action.count.CountRequestBuilder;
 import org.elasticsearch.action.count.CountResponse;
-import static org.elasticsearch.index.query.QueryBuilders.filteredQuery;
-import static org.elasticsearch.index.query.FilterBuilders.rangeFilter;
+import org.graylog2.plugin.indexer.MessageGateway;
 import org.elasticsearch.index.query.QueryBuilder;
 import org.graylog2.Core;
 
+import static org.elasticsearch.index.query.QueryBuilders.filteredQuery;
+import static org.elasticsearch.index.query.FilterBuilders.rangeFilter;
 import static org.elasticsearch.index.query.QueryBuilders.matchQuery;
-import org.graylog2.plugin.indexer.MessageGateway;
+import static org.elasticsearch.index.query.QueryBuilders.matchAllQuery;
 
 /**
  * @author Lennart Koopmann <lennart@socketfeed.com>
@@ -43,10 +44,26 @@ public class MessageGatewayImpl implements MessageGateway {
     
     @Override
     public int streamMessageCount(String streamId, int sinceTimestamp) {
-        CountRequestBuilder b = server.getIndexer().getClient().prepareCount();
         final QueryBuilder qb = filteredQuery(
                 matchQuery("streams", streamId),
-                rangeFilter("created_at").gte(sinceTimestamp));
+                rangeFilter("created_at").gte(sinceTimestamp)
+        );
+        
+        return countOnAllIndices(qb);
+    }
+
+    @Override
+    public int totalMessageCount(int sinceTimestamp) {
+        final QueryBuilder qb = filteredQuery(
+                matchAllQuery(),
+                rangeFilter("created_at").gte(sinceTimestamp)
+        );
+
+        return countOnAllIndices(qb);
+    }
+    
+    private int countOnAllIndices(QueryBuilder qb) {
+       CountRequestBuilder b = server.getIndexer().getClient().prepareCount();
         
         b.setIndices(server.getDeflector().getAllDeflectorIndexNames());
         b.setQuery(qb);

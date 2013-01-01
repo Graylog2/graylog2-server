@@ -161,7 +161,7 @@
         <dependency>
             <groupId>org.graylog2</groupId>
             <artifactId>graylog2-plugin</artifactId>
-            <version>0.10.5</version>
+            <version>0.10.6</version>
         </dependency>
     </dependencies>
 

@@ -43,8 +43,6 @@ import java.util.concurrent.atomic.AtomicInteger;
 import com.google.common.collect.Maps;
 import java.util.Map;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
-import java.util.Set;
-import org.elasticsearch.common.collect.Sets;
 import org.graylog2.activities.Activity;
 import org.graylog2.activities.ActivityWriter;
 import org.graylog2.cluster.Cluster;
