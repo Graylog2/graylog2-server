@@ -43,8 +43,8 @@ import java.util.concurrent.atomic.AtomicInteger;
 import com.google.common.collect.Maps;
 import java.util.Map;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
-import java.util.HashSet;
 import java.util.Set;
+import org.elasticsearch.common.collect.Sets;
 import org.graylog2.activities.Activity;
 import org.graylog2.activities.ActivityWriter;
 import org.graylog2.cluster.Cluster;
@@ -52,12 +52,6 @@ import org.graylog2.database.HostCounterCacheImpl;
 import org.graylog2.indexer.Deflector;
 import org.graylog2.initializers.*;
 import org.graylog2.inputs.StandardInputSet;
-import org.graylog2.inputs.amqp.AMQPInput;
-import org.graylog2.inputs.gelf.GELFTCPInput;
-import org.graylog2.inputs.gelf.GELFUDPInput;
-import org.graylog2.inputs.http.GELFHttpInput;
-import org.graylog2.inputs.syslog.SyslogTCPInput;
-import org.graylog2.inputs.syslog.SyslogUDPInput;
 import org.graylog2.plugin.GraylogServer;
 import org.graylog2.plugin.alarms.callbacks.AlarmCallback;
 import org.graylog2.plugin.alarms.callbacks.AlarmCallbackConfigurationException;
@@ -65,11 +59,14 @@ import org.graylog2.plugin.alarms.transports.Transport;
 import org.graylog2.plugin.alarms.transports.TransportConfigurationException;
 import org.graylog2.plugin.buffers.Buffer;
 import org.graylog2.plugin.filters.MessageFilter;
+import org.graylog2.plugin.indexer.MessageGateway;
 import org.graylog2.plugin.initializers.InitializerConfigurationException;
 import org.graylog2.plugin.inputs.MessageInputConfigurationException;
 import org.graylog2.plugin.outputs.MessageOutputConfigurationException;
+import org.graylog2.plugin.streams.Stream;
 import org.graylog2.plugins.PluginConfiguration;
 import org.graylog2.plugins.PluginLoader;
+import org.graylog2.streams.StreamImpl;
 
 /**
  * Server core, handling and holding basically everything.
@@ -466,6 +463,11 @@ public class Core implements GraylogServer {
         return this.serverId;
     }
     
+    @Override
+    public MessageGateway getMessageGateway() {
+        return this.indexer.getMessageGateway();
+    }
+    
     public void setLocalMode(boolean mode) {
         this.localMode = mode;
     }
@@ -480,6 +482,20 @@ public class Core implements GraylogServer {
    
     public boolean isStatsMode() {
         return statsMode;
+    }
+    
+    /*
+     * For plugins that need a list of all active streams. Could be moved somewhere
+     * more appropiate.
+     */
+    @Override
+    public Map<String, Stream> getEnabledStreams() {
+        Map<String, Stream> streams = Maps.newHashMap();
+        for (Stream stream : StreamImpl.fetchAllEnabled(this)) {
+            streams.put(stream.getId().toString(), stream);
+        }
+        
+        return streams;
     }
     
 }

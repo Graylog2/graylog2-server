@@ -26,25 +26,26 @@ import static org.elasticsearch.index.query.QueryBuilders.filteredQuery;
 import static org.elasticsearch.index.query.FilterBuilders.rangeFilter;
 import org.elasticsearch.index.query.QueryBuilder;
 import org.graylog2.Core;
-import org.graylog2.plugin.streams.Stream;
 
 import static org.elasticsearch.index.query.QueryBuilders.matchQuery;
+import org.graylog2.plugin.indexer.MessageGateway;
 
 /**
  * @author Lennart Koopmann <lennart@socketfeed.com>
  */
-public class MessageGateway {
+public class MessageGatewayImpl implements MessageGateway {
  
     private final Core server;
     
-    public MessageGateway(Core server) {
+    public MessageGatewayImpl(Core server) {
         this.server = server;
     }
     
-    public int streamMessageCount(Stream stream, int sinceTimestamp) {
+    @Override
+    public int streamMessageCount(String streamId, int sinceTimestamp) {
         CountRequestBuilder b = server.getIndexer().getClient().prepareCount();
         final QueryBuilder qb = filteredQuery(
-                matchQuery("streams", stream.getId().toString()),
+                matchQuery("streams", streamId),
                 rangeFilter("created_at").gte(sinceTimestamp));
         
         b.setIndices(server.getDeflector().getAllDeflectorIndexNames());

@@ -49,6 +49,7 @@ import java.util.Map;
 
 import static org.elasticsearch.index.query.QueryBuilders.rangeQuery;
 import static org.elasticsearch.node.NodeBuilder.nodeBuilder;
+import org.graylog2.plugin.indexer.MessageGateway;
 
 // TODO this class blocks for most of its operations, but is called from the main thread for some of them
 // TODO figure out how to gracefully deal with failure to connect (or losing connection) to the elastic search cluster!
@@ -73,7 +74,7 @@ public class EmbeddedElasticSearchClient {
 
     public EmbeddedElasticSearchClient(Core graylogServer) {
         server = graylogServer;
-        messageGateway = new MessageGateway(graylogServer);
+        messageGateway = new MessageGatewayImpl(graylogServer);
 
         final NodeBuilder builder = nodeBuilder().client(true);
         String esSettings;

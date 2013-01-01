@@ -56,7 +56,7 @@ public class StreamAlarmChecker {
     
     public boolean overLimit() {
         int since = Tools.getUTCTimestamp()-(stream.getAlarmTimespan()*60);
-        messageCount = server.getIndexer().getMessageGateway().streamMessageCount(stream, since);
+        messageCount = server.getIndexer().getMessageGateway().streamMessageCount(stream.getId().toString(), since);
         LOG.debug("Stream <{}> had {} messages in last {} minutes. [Limit: {}]",
                 new Object[] { stream.getId(), messageCount, stream.getAlarmTimespan(), stream.getAlarmMessageLimit() });
         return messageCount > stream.getAlarmMessageLimit();
