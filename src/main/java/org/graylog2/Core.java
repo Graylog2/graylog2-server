@@ -434,6 +434,7 @@ public class Core implements GraylogServer {
         return this.alarmCallbacks;
     }
     
+    @Override
     public MessageCounterManagerImpl getMessageCounterManager() {
         return this.messageCounterManager;
     }
