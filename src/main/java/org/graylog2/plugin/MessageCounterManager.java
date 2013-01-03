@@ -31,8 +31,8 @@ public interface MessageCounterManager {
     
     public void register(String name);
 
-    public MessageCounter get(String name);
+    public Map<Integer, MessageCounter> get(String name);
     
-    public Map<String, MessageCounter> getAllCounters();
+    public Map<String, Map<Integer, MessageCounter>> getAllCounters();
     
 }
