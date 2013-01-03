@@ -64,7 +64,7 @@ public class AlarmScannerThread implements Runnable {
             LOG.debug("No alertable streams found. Not doing anything more.");
             return;
         }
-        
+                
         for (Stream streamIF : streams) {
             StreamImpl stream = (StreamImpl) streamIF;
             StreamAlarmChecker checker = new StreamAlarmChecker(graylogServer, stream); 
@@ -74,7 +74,7 @@ public class AlarmScannerThread implements Runnable {
                 LOG.debug("Skipping alarm scan for stream <{}> - Timespan or limit not set.", stream.getId());
                 continue;
             }
-
+            
             // Is the stream over limit?
             if (checker.overLimit()) {
                 // Are we still in grace period?
@@ -95,12 +95,13 @@ public class AlarmScannerThread implements Runnable {
                 alarm.setDescription("Stream [" + stream.getTitle() + "] received " + messageCount
                         + " messages in the last " + stream.getAlarmTimespan() + " minutes."
                         + " Limit: " + stream.getAlarmMessageLimit());
-                
+
                 // Send using all transports.
                 sendMessages(alarm, stream);
-                
+
                 // Call all callbacks. Brace, brace, brace!
                 callCallbacks(alarm, stream);
+
                 
             } else {
                 LOG.debug("Stream <{}> is not over alarm limit.", stream.getId());
@@ -124,10 +125,10 @@ public class AlarmScannerThread implements Runnable {
     
     private void callCallbacks(Alarm alarm, StreamImpl stream) {
         SystemSettingAccessor ssa = new SystemSettingAccessor(graylogServer);
-
+        
         for (AlarmCallback callback : graylogServer.getAlarmCallbacks()) {
             String typeclass = callback.getClass().getCanonicalName();
-
+            
             // Only call if callback is forced for all streams or enabled for this particular stream.
             if (ssa.getForcedAlarmCallbacks().contains(typeclass) || stream.getAlarmCallbacks().contains(typeclass)) {
                 LOG.debug("Calling alarm callback [{}].", typeclass);
@@ -136,6 +137,8 @@ public class AlarmScannerThread implements Runnable {
                 } catch (AlarmCallbackException e) {
                     LOG.error("Execution of alarm callback [" + typeclass + "] failed.", e);
                 }
+            } else {
+                LOG.debug("Skipping alarm callback [{}] because it has no configured streams.", callback.getName());
             }
         }
     }

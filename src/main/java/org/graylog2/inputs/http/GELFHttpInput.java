@@ -62,7 +62,7 @@ public class GELFHttpInput implements MessageInput {
 
         try {
             httpBootstrap.bind(socketAddress);
-            LOG.info("Started HTTP GELF server on {}", socketAddress);
+            LOG.debug("Started HTTP GELF server on {}", socketAddress);
         } catch (final ChannelException e) {
             LOG.error("Could not bind HTTP GELF server to address " + socketAddress, e);
         }

@@ -20,9 +20,7 @@
 package org.graylog2;
 
 import com.google.common.collect.Sets;
-import com.mongodb.BasicDBObject;
-import com.mongodb.DBObject;
-import java.util.List;
+import com.mongodb.BasicDBList;
 import java.util.Set;
 
 /**
@@ -46,13 +44,11 @@ public class SystemSettingAccessor {
     
     public Set<String> getForcedAlarmCallbacks() {
         Set<String> callbacks = Sets.newHashSet();
-        
         SystemSetting s = new SystemSetting(server);
-        List<Object> objs = s.getList(KEY_FORCED_ALARM_CALLBACKS);
+        BasicDBList objs = s.getList(KEY_FORCED_ALARM_CALLBACKS);
         
         for (Object obj : objs) {
-            DBObject callback = (BasicDBObject) obj;
-            String typeclass = (String) callback.get("typeclass");
+            String typeclass = (String) obj;
             if (typeclass != null && !typeclass.isEmpty()) {
                 callbacks.add(typeclass);
             }

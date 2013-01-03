@@ -230,7 +230,7 @@ public class PluginInstaller {
             pluginName = plugin.getName();
             return plugin.getRequestedConfiguration();
         }
-        
+
         if (pluginObj instanceof MessageFilter) {
             MessageFilter plugin = (MessageFilter) pluginObj;
             pluginName = plugin.getName();

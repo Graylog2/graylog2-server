@@ -56,13 +56,14 @@ public class SystemSetting {
         return false;
     }
     
-    public List<Object> getList(String key) {
+    public BasicDBList getList(String key) {
         DBCollection coll = getCollection();
-        
         DBObject query = new BasicDBObject();
         query.put("key", key);
-        
-        return (BasicDBList) coll.findOne(query);
+
+        DBObject result = coll.findOne(query);
+
+        return (BasicDBList) result.get("value");
     }
 
     private DBCollection getCollection() {
