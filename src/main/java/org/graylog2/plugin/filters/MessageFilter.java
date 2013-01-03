@@ -42,5 +42,5 @@ public interface MessageFilter {
      * @return The name of this filter. Should not include whitespaces or special characters.
      */
     public String getName();
-    
+
 }

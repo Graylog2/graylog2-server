@@ -215,6 +215,10 @@ public class LogMessage {
             addAdditionalData(field.getKey(), field.getValue());
         }
     }
+    
+    public void setAdditionalData(String key, Object value) {
+        this.additionalData.put(key, value);
+    }
 
     public void removeAdditionalData(String key) {
         this.additionalData.remove(key);
