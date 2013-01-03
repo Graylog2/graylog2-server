@@ -30,20 +30,21 @@ import org.graylog2.plugin.MessageCounterManager;
  */
 public class MessageCounterManagerImpl implements MessageCounterManager {
 
-    private Map<String, MessageCounter> counters = Maps.newConcurrentMap();
+    private Map<String, Map<Integer, MessageCounter>> counters = Maps.newConcurrentMap();
 
     @Override
     public void register(String name) {
-        counters.put(name, new MessageCounterImpl());
+        Map<Integer, MessageCounter> newMap =  Maps.newConcurrentMap();
+        counters.put(name, newMap);
     }
 
     @Override
-    public MessageCounter get(String name) {
+    public Map<Integer, MessageCounter> get(String name) {
         return counters.get(name);
     }
 
     @Override
-    public Map<String, MessageCounter> getAllCounters() {
+    public Map<String, Map<Integer, MessageCounter>> getAllCounters() {
         return counters;
     }
 
