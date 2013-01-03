@@ -20,11 +20,12 @@
 
 package org.graylog2.periodical;
 
+import java.util.Map;
+
+import org.graylog2.Core;
+import org.graylog2.plugin.MessageCounter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.graylog2.Core;
-import org.graylog2.MessageCounterImpl;
-import org.graylog2.plugin.MessageCounter;
 
 
 /**
@@ -47,15 +48,21 @@ public class MessageCountWriterThread implements Runnable {
 
     @Override
     public void run() {
+        Map<Integer, MessageCounter> counters = this.graylogServer.getMessageCounterManager().get(Core.MASTER_COUNTER_NAME);
 
-        MessageCounter counter = this.graylogServer.getMessageCounterManager().get(Core.MASTER_COUNTER_NAME);
         try {
-            graylogServer.getMongoBridge().writeMessageCounts(counter.getTotalCount(), counter.getStreamCounts(), counter.getHostCounts());
+            for(Integer currentCounterKey : counters.keySet()) {
+                MessageCounter currentCounterValue = counters.remove(currentCounterKey);
+
+                // We store the first second of the current minute, to allow syncing (summing) message counts
+                // from different graylog-server nodes later
+                int counterTimestamp = currentCounterKey.intValue();
+                int startOfPeriod = counterTimestamp - counterTimestamp % PERIOD;
+
+                graylogServer.getMongoBridge().writeMessageCounts(startOfPeriod, currentCounterValue);
+            }
         } catch (Exception e) {
             LOG.warn("Error in MessageCountWriterThread: " + e.getMessage(), e);
-        } finally {
-            counter.resetAllCounts();
         }
     }
-
 }

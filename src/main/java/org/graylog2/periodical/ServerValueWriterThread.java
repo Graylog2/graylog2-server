@@ -20,7 +20,11 @@
 
 package org.graylog2.periodical;
 
+import java.util.Map;
+
 import org.graylog2.Core;
+import org.graylog2.CounterFactory;
+import org.graylog2.plugin.Counter;
 import org.graylog2.plugin.MessageCounter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -53,9 +57,14 @@ public class ServerValueWriterThread implements Runnable {
             graylogServer.getServerValues().ping();
 
             // Current throughput.
-            MessageCounter c = this.graylogServer.getMessageCounterManager().get(Core.THROUGHPUT_COUNTER_NAME);
-            graylogServer.getServerValues().writeThroughput(c.getTotalCount().get());
-            c.resetTotal(); // Reset five second throughput count.
+            Map<Integer, MessageCounter> counters = this.graylogServer.getMessageCounterManager().get(Core.THROUGHPUT_COUNTER_NAME);
+
+            Counter throughput = CounterFactory.newCounter();
+            for(Integer currentCounterKey : counters.keySet()) {
+                throughput.add(counters.remove(currentCounterKey).getTotalCount());
+            }
+
+            graylogServer.getServerValues().writeThroughput(throughput.get());
 
             /*
              * Message queue size is written in BulkIndexerThread. More about the
