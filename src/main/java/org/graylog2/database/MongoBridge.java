@@ -20,6 +20,7 @@
 
 package org.graylog2.database;
 
+import com.google.common.collect.Maps;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -142,37 +143,28 @@ public class MongoBridge {
         coll.update(query, update, true, false);
     }
 
-    public void writeMessageCounts(Counter total, Map<String, Counter> streams, Map<String, Counter> hosts) {
-        // We store the first second of the current minute, to allow syncing (summing) message counts
-        // from different graylog-server nodes later
+    public void writeMessageCounts(int timestamp, MessageCounter counter) {
+        Map<String, Integer> streams = Maps.newHashMap();
+        for (Map.Entry<String, Counter> s : counter.getStreamCounts().entrySet()) {
+            streams.put(s.getKey(), s.getValue().get());
+        }
+
+        Map<String, Integer> hosts = Maps.newHashMap();
+        for (Map.Entry<String, Counter> h : counter.getHostCounts().entrySet()) {
+            hosts.put(h.getKey(), h.getValue().get());
+        }
+        
         DateTime dt = new DateTime();
         int startOfMinute = Tools.getUTCTimestamp()-dt.getSecondOfMinute();;
-
+        
         BasicDBObject obj = new BasicDBObject();
         obj.put("timestamp", startOfMinute);
-        obj.put("total", total.get());
+        obj.put("total", counter.getTotalCount().get());
         obj.put("streams", streams);
         obj.put("hosts", hosts);
         obj.put("server_id", server.getServerId());
 
         getConnection().getMessageCountsColl().insert(obj);
-    }
-
-    public void writeMessageCounts(int timestamp, MessageCounter counter) {
-        BasicDBObject queryObject = new BasicDBObject();
-        queryObject.put("timestamp", timestamp);
-        queryObject.put("server_id", server.getServerId());
-
-        //TODO check streams and hosts
-        BasicDBObject incObject = new BasicDBObject();
-        incObject.put("total", counter.getTotalCount());
-        incObject.put("streams", counter.getStreamCounts());
-        incObject.put("hosts", counter.getHostCounts());
-
-        BasicDBObject updateObject = new BasicDBObject();
-        updateObject.put("$inc", incObject);
-
-        getConnection().getMessageCountsColl().update(queryObject, updateObject, true, false);
     }
 
     public void writeActivity(Activity activity, String nodeId) {
