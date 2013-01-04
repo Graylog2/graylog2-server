@@ -350,6 +350,8 @@ public class Core implements GraylogServer {
                 registerInitializer((Initializer) plugin);
             } else if (plugin instanceof MessageInput) {
                 registerInput((MessageInput) plugin);
+            } else if (plugin instanceof Transport) {
+                registerTransport((Transport) plugin);
             } else {
                 LOG.error("Could not load plugin [{}] - Not supported type.", plugin.getClass().getCanonicalName());
             }

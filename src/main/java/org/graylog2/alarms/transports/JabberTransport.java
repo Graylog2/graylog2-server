@@ -47,6 +47,7 @@ public class JabberTransport implements Transport {
     private static final Logger LOG = LoggerFactory.getLogger(JabberTransport.class);
     
     public static final String NAME = "Jabber/XMPP";
+    public static final String USER_FIELD_NAME = "Jabber/XMPP address";
     
     private Connection connection;
     
@@ -139,6 +140,11 @@ public class JabberTransport implements Transport {
     @Override
     public String getName() {
         return NAME;
+    }
+    
+    @Override
+    public String getUserFieldName() {
+        return USER_FIELD_NAME;
     }
     
     @Override

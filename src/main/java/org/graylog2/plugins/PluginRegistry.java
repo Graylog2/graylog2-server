@@ -40,11 +40,15 @@ public class PluginRegistry {
         Set<Map<String, Object>> r = Sets.newHashSet();
         
         for(Transport transport : transports) {
-            r.add(buildStandardInformation(
+            Map<String, Object> entry = buildStandardInformation(
                     transport.getClass().getCanonicalName(),
                     transport.getName(),
                     transport.getRequestedConfiguration()
-            ));
+            );
+            
+            entry.put("user_field_name", transport.getUserFieldName());
+            
+            r.add(entry);
         }
         
         server.getMongoBridge().writePluginInformation(r, "transports");
