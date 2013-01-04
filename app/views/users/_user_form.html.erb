@@ -8,7 +8,7 @@
   </dd>
 
   <% Transport.all.each do |transport| %>
-    <dt><%= label_tag "transports[#{transport.typeclass}]", transport.name %></dt>
+    <dt><%= label_tag "transports[#{transport.typeclass}]", transport.user_field_name %> (<%= transport.name %>)</dt>
     <dd>
       <%= text_field_tag "transports[#{transport.typeclass}]", @user.get_transport_value(transport.typeclass) , :size => 30 %>
     </dd>

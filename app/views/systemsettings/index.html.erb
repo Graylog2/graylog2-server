@@ -84,6 +84,19 @@ All currently installed message output plugins are listed here. You can configur
 	<% end %>
 <% end %>
 
+<h2>Alarm transport plugins</h2>
+<% if @transports.blank? %>
+	<strong>No transport plugins installed</strong>
+	<br /><br />
+<% else %>
+	<% @transports.each do |transport| %>
+		<div class="lines-line">
+			<h3><%= transport.name %></h3>
+			<strong>Type:</strong> <%= transport.typeclass %><br />
+			<%= link_to "Configure", "/plugin_configuration/configure/transport/#{transport.typeclass}" %>
+		</div>
+	<% end %>
+<% end %>
 
 <h2>Initializer plugins</h2>
 <% if @initializers.blank? %>
@@ -94,7 +107,7 @@ All currently installed message output plugins are listed here. You can configur
 		<div class="lines-line">
 			<h3><%= init.name %></h3>
 			<strong>Type:</strong> <%= init.typeclass %><br />
-			<%= link_to "Configure", "/plugin_configuration/configure/initializers/#{init.typeclass}" %>
+			<%= link_to "Configure", "/plugin_configuration/configure/initializer/#{init.typeclass}" %>
 		</div>
 	<% end %>
 <% end %>

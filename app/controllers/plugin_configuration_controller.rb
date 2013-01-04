@@ -35,6 +35,8 @@ class PluginConfigurationController < ApplicationController
         return MessageInput.where(:typeclass => typeclass).first.requested_config
       when "initializer"
         return Initializer.where(:typeclass => typeclass).first.requested_config
+      when "transport"
+        return Transport.where(:typeclass => typeclass).first.requested_config
   	end
   rescue
   	{}
