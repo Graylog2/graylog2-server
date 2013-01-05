@@ -131,7 +131,7 @@ public final class MessageCounterImpl implements MessageCounter {
         hostname = Tools.encodeBase64(hostname);
         Counter counter = this.hosts.get(hostname);
         if (counter == null) {
-            counter = CounterFactory.newCounter();
+        	counter = CounterFactory.newCounter();
         }
 
         counter.add(x);
