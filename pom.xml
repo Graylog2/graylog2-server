@@ -3,7 +3,7 @@
 
   <groupId>org.graylog2</groupId>
   <artifactId>graylog2-plugin</artifactId>
-  <version>0.10.9-SNAPSHOT</version>
+  <version>0.10.9</version>
   <packaging>jar</packaging>
 
   <name>graylog2-plugin</name>
@@ -34,7 +34,7 @@
   <scm>
     <developerConnection>scm:git:git@github.com:Graylog2/graylog2-plugin-interfaces.git</developerConnection>
     <url>git@github.com:Graylog2/graylog2-plugin-interfaces.git</url>
-    <tag>graylog2-plugin-0.9.7</tag>
+    <tag>graylog2-plugin-0.10.9</tag>
   </scm>
 
   <build>
