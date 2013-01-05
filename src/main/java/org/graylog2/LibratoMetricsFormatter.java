@@ -20,19 +20,20 @@
 
 package org.graylog2;
 
-import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
-
-import org.graylog2.plugin.Counter;
-import org.graylog2.plugin.MessageCounter;
 import org.graylog2.plugin.Tools;
+import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
+import org.graylog2.plugin.MessageCounter;
 import org.json.simple.JSONValue;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
+import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.Set;
+import org.graylog2.plugin.streams.Stream;
+import org.graylog2.streams.StreamImpl;
 
 /**
  * @author Lennart Koopmann <lennart@socketfeed.com>
@@ -85,28 +86,28 @@ public class LibratoMetricsFormatter {
         gauges.add(overall);
         
         // Streams.
-        for(Entry<String, Counter> stream : counter.getStreamCounts().entrySet()) {
+        for(Entry<String, Integer> stream : counter.getStreamCounts().entrySet()) {
             if (streamFilter.contains(stream.getKey())) {
                 LOG.debug("Not sending stream <{}> to Librato Metrics because it is listed in libratometrics_stream_filter", stream.getKey());
                 continue;
             }
 
             Map<String, Object> s = Maps.newHashMap();
-            s.put("value", stream.getValue().get());
+            s.put("value", stream.getValue());
             s.put("source", source);
             s.put("name", "gl2-stream-" + buildStreamMetricName(stream.getKey()));
             gauges.add(s);
         }
 
         // Hosts.
-        for(Entry<String, Counter> host : counter.getHostCounts().entrySet()) {
+        for(Entry<String, Integer> host : counter.getHostCounts().entrySet()) {
             if (Tools.decodeBase64(host.getKey()).matches(hostFilter)) {
                 LOG.debug("Not sending host <{}> to Librato Metrics because it was matched by libratometrics_host_filter", host.getKey());
                 continue;
             }
 
             Map<String, Object> h = Maps.newHashMap();
-            h.put("value", host.getValue().get());
+            h.put("value", host.getValue());
             h.put("source", source);
             h.put("name", "gl2-host-" + Tools.decodeBase64(host.getKey()).replaceAll("[^a-zA-Z0-9]", ""));
             gauges.add(h);

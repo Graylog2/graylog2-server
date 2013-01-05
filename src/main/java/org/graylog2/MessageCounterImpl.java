@@ -20,14 +20,11 @@
 
 package org.graylog2;
 
-import java.util.Map;
-
-import org.bson.types.ObjectId;
-import org.graylog2.plugin.Counter;
-import org.graylog2.plugin.MessageCounter;
 import org.graylog2.plugin.Tools;
-
+import org.bson.types.ObjectId;
+import java.util.Map;
 import com.google.common.collect.Maps;
+import org.graylog2.plugin.MessageCounter;
 
 /**
  * Singleton holding the number of received messages for streams,
@@ -37,19 +34,19 @@ import com.google.common.collect.Maps;
  */
 public final class MessageCounterImpl implements MessageCounter {
 
-    private Counter total = CounterFactory.newCounter();
-    private final Map<String, Counter> streams = Maps.newConcurrentMap();
-    private final Map<String, Counter> hosts = Maps.newConcurrentMap();
+    private int total;
+    private final Map<String, Integer> streams = Maps.newConcurrentMap();
+    private final Map<String, Integer> hosts = Maps.newConcurrentMap();
 
-    public Counter getTotalCount() {
+    public int getTotalCount() {
         return this.total;
     }
 
-    public Map<String, Counter> getStreamCounts() {
+    public Map<String, Integer> getStreamCounts() {
         return this.streams;
     }
 
-    public Map<String, Counter> getHostCounts() {
+    public Map<String, Integer> getHostCounts() {
         return this.hosts;
     }
 
@@ -68,7 +65,7 @@ public final class MessageCounterImpl implements MessageCounter {
     }
 
     public void resetTotal() {
-        this.total.reset();
+        this.total = 0;
     }
 
     /**
@@ -84,7 +81,7 @@ public final class MessageCounterImpl implements MessageCounter {
      * @param x The value to add on top of current total count.
      */
     public void countUpTotal(final int x) {
-        this.total.add(x);
+        this.total += x;
     }
 
     /**
@@ -103,13 +100,14 @@ public final class MessageCounterImpl implements MessageCounter {
      * @param x The value to add on top of the current stream count.
      */
     public synchronized void countUpStream(final ObjectId streamId, final int x) {
-    	Counter counter = this.streams.get(streamId.toString());
-    	if (counter == null) {
-    		counter = CounterFactory.newCounter();
-    	}
-
-    	counter.add(x);
-    	this.streams.put(streamId.toString(), counter);
+        if (this.streams.containsKey(streamId.toString())) {
+            // There already is an entry. Increment.
+            final int oldCount = this.streams.get(streamId.toString());
+            this.streams.put(streamId.toString(), oldCount+x); // Overwrites old entry.
+        } else {
+            // First entry for this stream.
+            this.streams.put(streamId.toString(), x);
+        }
     }
 
     /**
@@ -129,13 +127,14 @@ public final class MessageCounterImpl implements MessageCounter {
      */
     public synchronized void countUpHost(String hostname, final int x) {
         hostname = Tools.encodeBase64(hostname);
-        Counter counter = this.hosts.get(hostname);
-        if (counter == null) {
-        	counter = CounterFactory.newCounter();
+        if (this.hosts.containsKey(hostname)) {
+            // There already is an entry. Increment.
+            final int oldCount = this.hosts.get(hostname);
+            this.hosts.put(hostname, oldCount+x); // Overwrites old entry.
+        } else {
+            // First entry for this stream.
+            this.hosts.put(hostname, x);
         }
-
-        counter.add(x);
-        this.hosts.put(hostname, counter);
     }
 
 }
