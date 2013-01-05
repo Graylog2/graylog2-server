@@ -28,7 +28,6 @@ import org.graylog2.Core;
 import org.graylog2.activities.Activity;
 import org.graylog2.buffers.BufferWatermark;
 import org.graylog2.plugin.Counter;
-import org.graylog2.plugin.MessageCounter;
 import org.graylog2.plugin.Tools;
 import org.joda.time.DateTime;
 import org.slf4j.Logger;
@@ -156,23 +155,6 @@ public class MongoBridge {
         obj.put("server_id", server.getServerId());
 
         getConnection().getMessageCountsColl().insert(obj);
-    }
-
-    public void writeMessageCounts(int timestamp, MessageCounter counter) {
-    	BasicDBObject queryObject = new BasicDBObject();
-    	queryObject.put("timestamp", timestamp);
-    	queryObject.put("server_id", server.getServerId());
-
-    	//TODO check streams and hosts
-    	BasicDBObject incObject = new BasicDBObject();
-    	incObject.put("total", counter.getTotalCount());
-    	incObject.put("streams", counter.getStreamCounts());
-    	incObject.put("hosts", counter.getHostCounts());
-
-    	BasicDBObject updateObject = new BasicDBObject();
-    	updateObject.put("$inc", incObject);
-
-    	getConnection().getMessageCountsColl().update(queryObject, updateObject, true, false);
     }
 
     public void writeActivity(Activity activity, String nodeId) {

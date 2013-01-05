@@ -29,10 +29,8 @@ import org.graylog2.plugin.filters.MessageFilter;
 import org.graylog2.plugin.logmessage.LogMessage;
 import org.graylog2.plugin.streams.Stream;
 
-import java.util.Map;
 import java.util.concurrent.TimeUnit;
 import org.graylog2.Core;
-import org.graylog2.MessageCounterImpl;
 /**
  * @author Lennart Koopmann <lennart@socketfeed.com>
  */
@@ -46,17 +44,7 @@ public class CounterUpdateFilter implements MessageFilter {
         TimerContext tcx = processTime.time();
 
         // Increment all registered message counters.
-        for (Map<Integer, MessageCounter> counters : serverImpl.getMessageCounterManager().getAllCounters().values()) {
-
-        	//Get the message TS with precision to the second (base unit of all periodical threads)
-            Integer counterTimestamp = Integer.valueOf(Double.valueOf(Math.floor(msg.getCreatedAt() / 1000)).intValue());
-
-            MessageCounter counter = counters.get(counterTimestamp);
-            if (counter == null) {
-            	counter = new MessageCounterImpl();
-            	counters.put(counterTimestamp, counter);
-            }
-
+        for (MessageCounter counter : serverImpl.getMessageCounterManager().getAllCounters().values()) {
             // Total count.
             counter.incrementTotal();
 
@@ -68,14 +56,15 @@ public class CounterUpdateFilter implements MessageFilter {
             // Host count.
             counter.incrementHost(msg.getHost());
         }
-
+        
         // Update hostcounters. Used to build hosts connection.
         serverImpl.getHostCounterCache().increment(msg.getHost());
 
+        
         tcx.stop();
         return false;
     }
-
+    
     @Override
     public String getName() {
         return "CounterUpdater";

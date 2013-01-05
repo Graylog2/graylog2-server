@@ -41,71 +41,20 @@ public class LibratoMetricsFormatter {
 
     private static final Logger LOG = LoggerFactory.getLogger(LibratoMetricsFormatter.class);
     
+    private MessageCounter counter;
     private List<String> streamFilter;
     private String hostFilter;
     private String source;
     private Map<String, String> streamNames;
 
-    private int totalCount = 0;
-    private Map<String, Counter> streams = null;
-    private Map<String, Counter> hosts = null;
-
-    public LibratoMetricsFormatter (Map<Integer, MessageCounter> counters, String prefix, List<String> streamFilter, String hostFilter, Map<String, String> streamNames) {
+    public LibratoMetricsFormatter (MessageCounter counter, String prefix, List<String> streamFilter, String hostFilter, Map<String, String> streamNames) {
+        this.counter = counter;
         this.streamFilter = streamFilter;
         this.hostFilter = hostFilter;
         this.source = prefix + "graylog2-server";
         this.streamNames = streamNames;
-
-        this.parseCounters(counters);
     }
-
-    private void parseCounters(Map<Integer, MessageCounter> counters) {
-        this.totalCount = 0;
-        this.streams = Maps.newHashMap();
-        this.hosts = Maps.newHashMap();
-
-        if (counters != null) {
-            for (Integer currentCounterKey : counters.keySet()) {
-                this.parseCounter(currentCounterKey, counters.remove(currentCounterKey));
-            }
-        }
-    }
-
-    private void parseCounter(Integer timestamp, MessageCounter counter) {
-        if (counter != null) {
-            Counter currentCounter = null;
-
-            //Total message count
-            this.totalCount += counter.getTotalCount().get();
-
-            // Streams.
-            Map<String, Counter> counterStreams = counter.getStreamCounts();
-            for(Entry<String, Counter> stream : counterStreams.entrySet()) {
-                if (!this.streamFilter.contains(stream.getKey())) {
-                    currentCounter = stream.getValue();
-                    currentCounter.add(this.streams.get(stream.getKey()));
-
-                    this.streams.put(stream.getKey(), currentCounter);
-                } else {
-                    LOG.debug("Not sending stream <{}> to Librato Metrics because it is listed in libratometrics_stream_filter", stream.getKey());
-                }
-            }
-
-            // Hosts.            
-            Map<String, Counter> counterHosts = counter.getHostCounts();
-            for(Entry<String, Counter> host : counterHosts.entrySet()) {
-                if (!Tools.decodeBase64(host.getKey()).matches(hostFilter)) {
-                    currentCounter = host.getValue();
-                    currentCounter.add(this.hosts.get(host.getKey()));
-
-                    this.hosts.put(host.getKey(), currentCounter);
-                } else {
-                    LOG.debug("Not sending host <{}> to Librato Metrics because it was matched by libratometrics_host_filter", host.getKey());
-                }
-            }
-        }
-    }
-
+    
     /*
      * Example:
      * 
@@ -130,13 +79,18 @@ public class LibratoMetricsFormatter {
 
         // Overall
         Map<String, Object> overall = Maps.newHashMap();
-        overall.put("value", this.totalCount);
+        overall.put("value", counter.getTotalCount());
         overall.put("source", source);
         overall.put("name", "gl2-total");
         gauges.add(overall);
         
         // Streams.
-        for(Entry<String, Counter> stream : this.streams.entrySet()) {
+        for(Entry<String, Counter> stream : counter.getStreamCounts().entrySet()) {
+            if (streamFilter.contains(stream.getKey())) {
+                LOG.debug("Not sending stream <{}> to Librato Metrics because it is listed in libratometrics_stream_filter", stream.getKey());
+                continue;
+            }
+
             Map<String, Object> s = Maps.newHashMap();
             s.put("value", stream.getValue().get());
             s.put("source", source);
@@ -145,7 +99,12 @@ public class LibratoMetricsFormatter {
         }
 
         // Hosts.
-        for(Entry<String, Counter> host : this.hosts.entrySet()) {
+        for(Entry<String, Counter> host : counter.getHostCounts().entrySet()) {
+            if (Tools.decodeBase64(host.getKey()).matches(hostFilter)) {
+                LOG.debug("Not sending host <{}> to Librato Metrics because it was matched by libratometrics_host_filter", host.getKey());
+                continue;
+            }
+
             Map<String, Object> h = Maps.newHashMap();
             h.put("value", host.getValue().get());
             h.put("source", source);
