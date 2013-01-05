@@ -16,6 +16,7 @@ class Initializer
     org.graylog2.initializers.AnonymousInformationCollectorInitializer
     org.graylog2.initializers.HostCounterCacheWriterInitializer
     org.graylog2.initializers.MessageCounterInitializer
+    org.graylog2.initializers.LibratoMetricsInitializer
   )
 
   def self.all_non_standard
