@@ -91,7 +91,7 @@ public class LibratoMetricsFormatter {
                 }
             }
 
-            // Hosts.
+            // Hosts.            
             Map<String, Counter> counterHosts = counter.getHostCounts();
             for(Entry<String, Counter> host : counterHosts.entrySet()) {
                 if (!Tools.decodeBase64(host.getKey()).matches(hostFilter)) {
@@ -108,7 +108,7 @@ public class LibratoMetricsFormatter {
 
     /*
      * Example:
-     *
+     * 
      * {
      *   "gauges": [
      *     {

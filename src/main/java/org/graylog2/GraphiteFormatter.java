@@ -34,12 +34,12 @@ import com.google.common.collect.Lists;
  */
 public class GraphiteFormatter {
 
-    private Integer timestamp = null;
+	private Integer timestamp = null;
     private MessageCounter counter;
     private String prefix;
 
     public GraphiteFormatter(MessageCounter counter, String prefix) {
-        this(null, counter, prefix);
+    	this(null, counter, prefix);
     }
 
     public GraphiteFormatter(Integer timestamp, MessageCounter counter, String prefix) {
@@ -51,7 +51,8 @@ public class GraphiteFormatter {
     public List<String> getAllMetrics() {
         List<String> r = Lists.newArrayList();
 
-        int now = ((this.timestamp != null) ? this.timestamp.intValue() : Tools.getUTCTimestamp());
+		int now = ((this.timestamp != null) ? this.timestamp.intValue() : Tools
+				.getUTCTimestamp());
 
         // Overall count.
         String overall = prefix() + "total " + counter.getTotalCount() + " " + now;
@@ -71,7 +72,7 @@ public class GraphiteFormatter {
 
         return r;
     }
-
+    
     private String prefix() {
         return prefix + "." + "messagecounts" + ".";
     }

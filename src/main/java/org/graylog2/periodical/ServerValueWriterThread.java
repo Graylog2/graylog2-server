@@ -61,7 +61,7 @@ public class ServerValueWriterThread implements Runnable {
 
             Counter throughput = CounterFactory.newCounter();
             for(Integer currentCounterKey : counters.keySet()) {
-                throughput.add(counters.remove(currentCounterKey).getTotalCount());
+            	throughput.add(counters.remove(currentCounterKey).getTotalCount());
             }
 
             graylogServer.getServerValues().writeThroughput(throughput.get());

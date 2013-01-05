@@ -34,7 +34,7 @@ public class MessageCounterManagerImpl implements MessageCounterManager {
 
     @Override
     public void register(String name) {
-        Map<Integer, MessageCounter> newMap =  Maps.newConcurrentMap();
+    	Map<Integer, MessageCounter> newMap =  Maps.newConcurrentMap();
         counters.put(name, newMap);
     }
 

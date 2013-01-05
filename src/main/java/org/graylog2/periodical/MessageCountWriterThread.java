@@ -52,14 +52,14 @@ public class MessageCountWriterThread implements Runnable {
 
         try {
             for(Integer currentCounterKey : counters.keySet()) {
-                MessageCounter currentCounterValue = counters.remove(currentCounterKey);
+            	MessageCounter currentCounterValue = counters.remove(currentCounterKey);
 
                 // We store the first second of the current minute, to allow syncing (summing) message counts
                 // from different graylog-server nodes later
-                int counterTimestamp = currentCounterKey.intValue();
-                int startOfPeriod = counterTimestamp - counterTimestamp % PERIOD;
+            	int counterTimestamp = currentCounterKey.intValue();
+            	int startOfPeriod = counterTimestamp - counterTimestamp % PERIOD;
 
-                graylogServer.getMongoBridge().writeMessageCounts(startOfPeriod, currentCounterValue);
+            	graylogServer.getMongoBridge().writeMessageCounts(startOfPeriod, currentCounterValue);
             }
         } catch (Exception e) {
             LOG.warn("Error in MessageCountWriterThread: " + e.getMessage(), e);

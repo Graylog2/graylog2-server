@@ -69,25 +69,25 @@ public class GraphiteWriterThread implements Runnable {
             this.graylogServer.getMessageCounterManager().register(COUNTER_NAME);
         }
 
-        Map<Integer, MessageCounter> counters = this.graylogServer.getMessageCounterManager().get(COUNTER_NAME);
+    	Map<Integer, MessageCounter> counters = this.graylogServer.getMessageCounterManager().get(COUNTER_NAME);
 
-        for(Integer currentCounterKey : counters.keySet()) {
-            MessageCounter currentCounterValue = counters.remove(currentCounterKey);
+    	for(Integer currentCounterKey : counters.keySet()) {
+    		MessageCounter currentCounterValue = counters.remove(currentCounterKey);
 
-            try {
-                GraphiteFormatter f = new GraphiteFormatter(
-                        currentCounterKey,
-                        currentCounterValue,
-                        graylogServer.getConfiguration().getGraphitePrefix()
-                        );
+    		try {
+    			GraphiteFormatter f = new GraphiteFormatter(
+    					currentCounterKey,
+    					currentCounterValue,
+    					graylogServer.getConfiguration().getGraphitePrefix()
+    					);
 
-                send(f.getAllMetrics());
+    			send(f.getAllMetrics());
 
-                LOG.debug("Sent message counts to Graphite at <{}:{}>.", carbonHost, carbonPort);
-            } catch (Exception e) {
-                LOG.warn("Error in GraphiteWriterThread: " + e.getMessage(), e);
-            }
-        }
+    			LOG.debug("Sent message counts to Graphite at <{}:{}>.", carbonHost, carbonPort);
+    		} catch (Exception e) {
+    			LOG.warn("Error in GraphiteWriterThread: " + e.getMessage(), e);
+    		}
+    	}
     }
 
     private boolean send(List<String> metrics) {
@@ -100,7 +100,7 @@ public class GraphiteWriterThread implements Runnable {
             for (String metric : metrics) {
                 out.write(metric + "\n");
             }
-
+            
             out.close();
             sock.close();
         } catch (SocketException e) {

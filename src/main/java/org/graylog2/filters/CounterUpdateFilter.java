@@ -48,13 +48,13 @@ public class CounterUpdateFilter implements MessageFilter {
         // Increment all registered message counters.
         for (Map<Integer, MessageCounter> counters : serverImpl.getMessageCounterManager().getAllCounters().values()) {
 
-            //Get the message TS with precision to the second (base unit of all periodical threads)
+        	//Get the message TS with precision to the second (base unit of all periodical threads)
             Integer counterTimestamp = Integer.valueOf(Double.valueOf(Math.floor(msg.getCreatedAt() / 1000)).intValue());
 
             MessageCounter counter = counters.get(counterTimestamp);
             if (counter == null) {
-                counter = new MessageCounterImpl();
-                counters.put(counterTimestamp, counter);
+            	counter = new MessageCounterImpl();
+            	counters.put(counterTimestamp, counter);
             }
 
             // Total count.

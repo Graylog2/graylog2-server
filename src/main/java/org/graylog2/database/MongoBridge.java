@@ -49,7 +49,7 @@ public class MongoBridge {
 
     private static final Logger LOG = LoggerFactory.getLogger(MongoBridge.class);
     private MongoConnection connection;
-
+    
     Core server;
 
     public MongoBridge(Core server) {
@@ -115,13 +115,13 @@ public class MongoBridge {
         BasicDBObject update = new BasicDBObject();
         update.put("server_id", serverId);
         update.put("type", "buffer_watermarks");
-
+        
         update.put("outputbuffer", outputBuffer.getUtilization());
         update.put("outputbuffer_percent", outputBuffer.getUtilizationPercentage());
 
         update.put("processbuffer", processBuffer.getUtilization());
         update.put("processbuffer_percent", processBuffer.getUtilizationPercentage());
-
+        
         DBCollection coll = getConnection().getDatabase().getCollection("server_values");
         coll.update(query, update, true, false);
     }
@@ -147,7 +147,7 @@ public class MongoBridge {
         // from different graylog-server nodes later
         DateTime dt = new DateTime();
         int startOfMinute = Tools.getUTCTimestamp()-dt.getSecondOfMinute();;
-
+        
         BasicDBObject obj = new BasicDBObject();
         obj.put("timestamp", startOfMinute);
         obj.put("total", total.get());
@@ -159,20 +159,20 @@ public class MongoBridge {
     }
 
     public void writeMessageCounts(int timestamp, MessageCounter counter) {
-        BasicDBObject queryObject = new BasicDBObject();
-        queryObject.put("timestamp", timestamp);
-        queryObject.put("server_id", server.getServerId());
+    	BasicDBObject queryObject = new BasicDBObject();
+    	queryObject.put("timestamp", timestamp);
+    	queryObject.put("server_id", server.getServerId());
 
-        //TODO check streams and hosts
-        BasicDBObject incObject = new BasicDBObject();
-        incObject.put("total", counter.getTotalCount());
-        incObject.put("streams", counter.getStreamCounts());
-        incObject.put("hosts", counter.getHostCounts());
+    	//TODO check streams and hosts
+    	BasicDBObject incObject = new BasicDBObject();
+    	incObject.put("total", counter.getTotalCount());
+    	incObject.put("streams", counter.getStreamCounts());
+    	incObject.put("hosts", counter.getHostCounts());
 
-        BasicDBObject updateObject = new BasicDBObject();
-        updateObject.put("$inc", incObject);
+    	BasicDBObject updateObject = new BasicDBObject();
+    	updateObject.put("$inc", incObject);
 
-        getConnection().getMessageCountsColl().update(queryObject, updateObject, true, false);
+    	getConnection().getMessageCountsColl().update(queryObject, updateObject, true, false);
     }
 
     public void writeActivity(Activity activity, String nodeId) {
@@ -181,60 +181,60 @@ public class MongoBridge {
         obj.put("content", activity.getMessage());
         obj.put("caller", activity.getCaller().getCanonicalName());
         obj.put("node_id", nodeId);
-
+        
         connection.getDatabase().getCollection("server_activities").insert(obj);
     }
-
+    
     public void writeDeflectorInformation(Map<String, Object> info) {
         DBCollection coll = connection.getDatabase().getCollection("deflector_informations");
 
         // Delete all entries, we only have one at a time.
         coll.remove(new BasicDBObject());
-
+        
         BasicDBObject obj = new BasicDBObject(info);
         coll.insert(obj);
     }
-
+    
     public void writePluginInformation(Set<Map<String, Object>> plugins, String collection) {
         DBCollection coll = connection.getDatabase().getCollection(collection);
 
         // Delete all entries, we only have one at a time.
         coll.remove(new BasicDBObject());
-
+        
         for (Map<String, Object> plugin : plugins) {
             writeSinglePluginInformation(plugin, collection);
         }
     }
-
+    
     public void writeSinglePluginInformation(Map<String, Object> plugin, String collection) {
         DBCollection coll = connection.getDatabase().getCollection(collection);
 
         DBObject query = new BasicDBObject();
         query.put("typeclass", plugin.get("typeclass"));
-
+        
         // Upsert, because there might be a plugin already and we don't purge for single.
         coll.update(query, new BasicDBObject(plugin), true, false);
     }
-
+    
     public void writeIndexDateRange(String indexName, int startDate) {
         BasicDBObject obj = new BasicDBObject();
         obj.put("index", indexName);
         obj.put("start", startDate);
-
+        
         connection.getDatabase().getCollection("index_ranges").insert(obj);
     }
-
+    
     public List<DBObject> getIndexDateRanges() {
         return connection.getDatabase().getCollection("index_ranges").find().toArray();
     }
-
+    
     public void removeIndexDateRange(String indexName) {
         BasicDBObject obj = new BasicDBObject();
         obj.put("index", indexName);
-
+        
         connection.getDatabase().getCollection("index_ranges").remove(obj);
     }
-
+    
     /**
      * Get a setting from the settings collection.
      *
