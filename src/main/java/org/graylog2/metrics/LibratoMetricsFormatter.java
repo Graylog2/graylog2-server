@@ -1,5 +1,5 @@
 /**
- * Copyright 2012 Lennart Koopmann <lennart@socketfeed.com>
+ * Copyright 2012, 2013 Lennart Koopmann <lennart@socketfeed.com>
  *
  * This file is part of Graylog2.
  *
@@ -18,7 +18,7 @@
  *
  */
 
-package org.graylog2;
+package org.graylog2.metrics;
 
 import org.graylog2.plugin.Tools;
 import com.google.common.collect.Lists;
@@ -31,14 +31,11 @@ import org.slf4j.LoggerFactory;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.Set;
-import org.graylog2.plugin.streams.Stream;
-import org.graylog2.streams.StreamImpl;
 
 /**
  * @author Lennart Koopmann <lennart@socketfeed.com>
  */
-public class LibratoMetricsFormatter {
+public class LibratoMetricsFormatter extends MetricsFormatter {
 
     private static final Logger LOG = LoggerFactory.getLogger(LibratoMetricsFormatter.class);
     
@@ -95,7 +92,7 @@ public class LibratoMetricsFormatter {
             Map<String, Object> s = Maps.newHashMap();
             s.put("value", stream.getValue());
             s.put("source", source);
-            s.put("name", "gl2-stream-" + buildStreamMetricName(stream.getKey()));
+            s.put("name", "gl2-stream-" + buildStreamMetricName(stream.getKey(), streamNames));
             gauges.add(s);
         }
 
@@ -116,14 +113,6 @@ public class LibratoMetricsFormatter {
         m.put("gauges", gauges);
 
         return JSONValue.toJSONString(m);
-    }
-
-    private String buildStreamMetricName(String streamId) {
-        if (!streamNames.containsKey(streamId) || streamNames.get(streamId) == null || streamNames.get(streamId).isEmpty()) {
-            return "noname-" + streamId;
-        }
-        
-        return streamNames.get(streamId).toLowerCase().replaceAll("[^a-zA-Z0-9]", "");
     }
     
 }

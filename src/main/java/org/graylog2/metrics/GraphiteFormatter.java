@@ -1,5 +1,5 @@
 /**
- * Copyright 2012 Lennart Koopmann <lennart@socketfeed.com>
+ * Copyright 2012, 2013 Lennart Koopmann <lennart@socketfeed.com>
  *
  * This file is part of Graylog2.
  *
@@ -18,25 +18,28 @@
  *
  */
 
-package org.graylog2;
+package org.graylog2.metrics;
 
 import org.graylog2.plugin.Tools;
 import com.google.common.collect.Lists;
 import java.util.List;
+import java.util.Map;
 import java.util.Map.Entry;
 import org.graylog2.plugin.MessageCounter;
 
 /**
  * @author Lennart Koopmann <lennart@socketfeed.com>
  */
-public class GraphiteFormatter {
+public class GraphiteFormatter extends MetricsFormatter {
 
-    private MessageCounter counter;
-    String prefix;
+    private final MessageCounter counter;
+    private final String prefix;
+    private final Map<String, String> streamNames;
     
-    public GraphiteFormatter(MessageCounter counter, String prefix) {
+    public GraphiteFormatter(MessageCounter counter, String prefix, Map<String, String> streamNames) {
         this.counter = counter;
         this.prefix = prefix;
+        this.streamNames = streamNames;
     }
 
     public List<String> getAllMetrics() {
@@ -50,7 +53,7 @@ public class GraphiteFormatter {
 
         // Streams.
         for(Entry<String, Integer> stream : counter.getStreamCounts().entrySet()) {
-            String sval = prefix() + "streams." + stream.getKey() + " " + stream.getValue() + " " + now;
+            String sval = prefix() + "streams." + buildStreamMetricName(stream.getKey(), streamNames) + " " + stream.getValue() + " " + now;
             r.add(sval);
         }
 

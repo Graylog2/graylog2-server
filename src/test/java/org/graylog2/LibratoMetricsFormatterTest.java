@@ -20,6 +20,7 @@
 
 package org.graylog2;
 
+import org.graylog2.metrics.LibratoMetricsFormatter;
 import java.util.List;
 import java.util.ArrayList;
 import com.google.common.collect.Maps;
