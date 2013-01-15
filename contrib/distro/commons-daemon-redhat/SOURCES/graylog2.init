@@ -1,0 +1,150 @@
+#!/bin/bash
+#
+# graylog2-server - This script starts and stops the graylog2-server daemon
+#
+# chkconfig:   - 85 15
+# description: graylog2 is a syslog implementation that stores logs in Elasticsearch
+ 
+### BEGIN INIT INFO
+# Provides:             graylog2-server
+# Required-Start:       $network
+# Required-Stop:        $network
+# Default-Stop:         0 1 2 6
+# Short-Description:    Start/stop the graylog2-server daemon
+# Description:          A syslog implementation that stores logs in Elasticsearch
+### END INIT INFO
+
+# Source function library.
+. /etc/rc.d/init.d/functions
+
+# Check networking
+. /etc/sysconfig/network
+[[ $NETWORKING == no ]] && exit 0
+ 
+NAME=graylog2-server
+PID_FILE=${PIDFILE:-/var/run/${NAME}/${NAME}.pid}
+LOCK_FILE=${LOCKFILE:-/var/lock/subsys/${NAME}}
+
+GRAYLOG2_HOME=/opt/graylog2-server
+GRAYLOG2_USER=graylog2
+GRAYLOG2_CONFIG=/etc/${NAME}/graylog2.conf
+GRAYLOG2_OUT=/var/log/${NAME}/${NAME}.log
+LOG4J_CONFIG=file:/etc/${NAME}/log4j.xml
+
+GRAYLOG2_OPTS="-Xms256m -Xmx256m"
+GRAYLOG2_OPTS="$GRAYLOG2_OPTS -Dcom.sun.management.jmxremote.ssl=false"
+GRAYLOG2_OPTS="$GRAYLOG2_OPTS -Dcom.sun.management.jmxremote.authenticate=false"
+GRAYLOG2_OPTS="$GRAYLOG2_OPTS -Dcom.sun.management.jmxremote.port=12203"
+
+CLASSPATH="$GRAYLOG2_HOME/$NAME.jar"
+
+JSVC_EXEC=`which jsvc`
+JAVA_HOME=${JAVA_HOME:-/usr/java/default}
+
+case `echo "testing\c"`,`echo -n testing` in
+	*c*,-n*) echo_n=   echo_c=     ;;
+	*c*,*)   echo_n=-n echo_c=     ;;
+	*)       echo_n=   echo_c='\c' ;;
+esac
+
+start() {
+	echo -n $"Starting ${NAME}: "
+	# check if graylog2 is already booted
+	__pids_var_run "${JAVA_HOME}/bin/java" "$PID_FILE"
+	RC=$?
+	if [ -z "$PID_FILE" -a -z "$pid" ]; then
+		pid="$(__pids_pidof "$1")"
+	fi
+	if [ -n "$pid" ]; then
+		echo_success
+		echo
+		return 0
+	fi
+	rm -f $PID_FILE
+
+	$JSVC_EXEC \
+		-user $GRAYLOG2_USER \
+		-home $JAVA_HOME \
+		-server \
+		$GRAYLOG2_OPTS \
+		-wait 30 \
+		-pidfile $PID_FILE \
+		-outfile $GRAYLOG2_OUT \
+		-errfile '&1' \
+		-cp $CLASSPATH \
+		-Dlog4j.configuration=$LOG4J_CONFIG \
+		org.graylog2.ServerDaemon --configfile ${GRAYLOG2_CONFIG}
+	exitValue=$?
+
+	if [ $exitValue -eq 0 ]; then
+		echo_success
+	else
+		echo_failure
+	fi
+	echo
+}
+
+stop() {
+	echo -n $"Shutting down ${NAME}: "
+
+	$JSVC_EXEC \
+		-stop -pidfile $PID_FILE \
+		-user $GRAYLOG2_USER \
+		-home $JAVA_HOME \
+		org.graylog2.ServerDaemon --configfile ${GRAYLOG2_CONFIG}
+	if [ $? -eq 0 ]; then
+		echo_success
+	else    
+		echo_failure
+	fi      
+	echo    
+}               
+        
+status() {
+	__pids_var_run "${JAVA_HOME}/bin/java" "$PID_FILE"
+	RC=$?
+	if [ -z "$PID_FILE" -a -z "$pid" ]; then
+		pid="$(__pids_pidof "$1")"
+	fi
+	if [ -n "$pid" ]; then
+		echo $"${NAME} (pid $pid) is running..."
+		return 0
+	fi      
+                
+	case "$RC" in   
+		0)      
+		echo $"${NAME} (pid $pid) is running..."
+		return 0
+		;;
+		1)
+		echo $"${NAME} dead but pid file exists"
+		return 1
+		;;
+	esac    
+	echo $"${NAME} is stopped"
+	return 2
+}
+
+case "$1" in
+    start)
+        start
+        ;;
+    stop)
+        stop
+        ;;
+    status)
+        status
+        RETVAL=$?
+        ;;
+    restart|force-reload)
+        stop
+        start
+        ;;
+    *)
+        N=/etc/init.d/${NAME}
+        echo "Usage: $N {start|stop|restart|force-reload}" >&2
+        RETVAL=2
+        ;;
+esac
+
+exit 0
