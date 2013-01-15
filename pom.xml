@@ -163,6 +163,11 @@
             <artifactId>graylog2-plugin</artifactId>
             <version>0.10.9</version>
         </dependency>
+        <dependency>
+            <groupId>commons-daemon</groupId>
+            <artifactId>commons-daemon</artifactId>
+            <version>1.0.10</version>
+        </dependency>
     </dependencies>
 
     <build>
