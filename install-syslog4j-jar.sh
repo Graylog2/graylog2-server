@@ -1,2 +1,2 @@
-echo "Installing provided syslog4j jar to local mvn repository for great justice!"
-mvn install:install-file -DgroupId=org.syslog4j -DartifactId=syslog4j -Dversion=0.9.46 -Dpackaging=jar -Dfile=lib/syslog4j-0.9.46-bin.jar
+echo "Installing our provided syslog4j fork .jar to local mvn repository for great justice!"
+mvn install:install-file -DgroupId=org.productivity.java -DartifactId=syslog4j-graylog2 -Dversion=0.9.47-graylog2 -Dpackaging=jar -Dfile=lib/syslog4j-graylog2-0.9.47-graylog2.jar

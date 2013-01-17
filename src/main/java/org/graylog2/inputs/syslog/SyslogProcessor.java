@@ -36,7 +36,11 @@ import java.net.UnknownHostException;
 import java.util.Date;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import org.graylog2.plugin.buffers.BufferOutOfCapacityException;
+import org.productivity.java.syslog4j.server.SyslogServerEventIF;
+import org.productivity.java.syslog4j.server.impl.event.structured.StructuredSyslogServerEvent;
 
 /**
  * @author Lennart Koopmann <lennart@socketfeed.com>
@@ -46,6 +50,8 @@ public class SyslogProcessor {
     private static final Logger LOG = LoggerFactory.getLogger(SyslogProcessor.class);
     private Core server;
 
+    private static final Pattern STRUCTURED_SYSLOG_PATTERN = Pattern.compile("<\\d+>\\d.*", Pattern.DOTALL);
+    
     private final Meter incomingMessages = Metrics.newMeter(SyslogProcessor.class, "IncomingMessages", "messages", TimeUnit.SECONDS);
     private final Meter parsingFailures = Metrics.newMeter(SyslogProcessor.class, "MessageParsingFailures", "failures", TimeUnit.SECONDS);
     private final Meter incompleteMessages = Metrics.newMeter(SyslogProcessor.class, "IncompleteMessages", "messages", TimeUnit.SECONDS);
@@ -95,7 +101,33 @@ public class SyslogProcessor {
 
         LogMessage lm = new LogMessage();
 
-        SyslogServerEvent e = new SyslogServerEvent(msg, remoteAddress);
+        /* 
+         * ZOMG funny 80s neckbeard protocols. We are now deciding if to parse
+         * structured (RFC5424) or unstructured (classic BSD, RFC3164) syslog
+         * by checking if there is a VERSION after the PRI. Sorry.
+         * 
+         *                            ._.                                  _
+         *    R-O-F-L-R-O-F-L-R-O-F-L-IOI-R-O-F-L-R-O-F-L-R-O-F-L         / l
+         *                ___________/LOL\____                           /: ]
+         *            .__/°         °\___/°   \                         / ::\
+         *           /^^ \            °  °     \_______.__________.____/: OO:\
+         *      .__./     j      ________             _________________ ::OO::|
+         *    ./ ^^ j____/°     [\______/]      .____/                 \__:__/
+         *  ._|____/°    °       <{(OMG{<       /                         ::
+         * /  °    °              (OMFG{       /
+         * |°  loooooooooooooooooooooooooooooooool
+         *         °L|                   L|
+         *          ()                   ()
+         * 
+         */
+        
+        SyslogServerEventIF e;
+        if (isStructuredSyslog(msg)) {
+            e = new StructuredSyslogServerEvent(msg, remoteAddress);
+        } else {
+            e = new SyslogServerEvent(msg, remoteAddress);
+
+        }
 
         lm.setShortMessage(e.getMessage());
         lm.setHost(parseHost(e, remoteAddress));
@@ -110,19 +142,32 @@ public class SyslogProcessor {
         return lm;
     }
 
-    private Map<String, String> parseAdditionalData(SyslogServerEvent msg) {
+    private Map<String, String> parseAdditionalData(SyslogServerEventIF msg) {
         // Parse possibly included structured syslog data into additional_fields.
         Map<String, String> structuredData = StructuredSyslog.extractFields(msg.getRaw());
 
         if (structuredData.size() > 0) {
             LOG.debug("Parsed <{}> structured data pairs. Adding as additional_fields. Not using tokenizer.", structuredData.size());
         }
+        
+        // Structured syslog has more data we can parse.
+        if (msg instanceof StructuredSyslogServerEvent) {
+            StructuredSyslogServerEvent sMsg = (StructuredSyslogServerEvent) msg;
+            
+            if (sMsg.getApplicationName() != null && !sMsg.getApplicationName().isEmpty()) {
+                structuredData.put("application_name", sMsg.getApplicationName());
+            }
+            
+            if (sMsg.getProcessId() != null && !sMsg.getProcessId().isEmpty()) {
+                structuredData.put("process_id", sMsg.getProcessId());
+            }
+        }
 
         return structuredData;
     }
 
-    private String parseHost(SyslogServerEvent msg, InetAddress remoteAddress) {
-        if (remoteAddress != null &&server.getConfiguration().getForceSyslogRdns()) {
+    private String parseHost(SyslogServerEventIF msg, InetAddress remoteAddress) {
+        if (remoteAddress != null && server.getConfiguration().getForceSyslogRdns()) {
             try {
                 return Tools.rdnsLookup(remoteAddress);
             } catch (UnknownHostException e) {
@@ -133,7 +178,7 @@ public class SyslogProcessor {
         return msg.getHost();
     }
 
-    private double parseDate(SyslogServerEvent msg) throws IllegalStateException {
+    private double parseDate(SyslogServerEventIF msg) throws IllegalStateException {
         // Check if date could be parsed.
         if (msg.getDate() == null) {
             if (server.getConfiguration().getAllowOverrideSyslogDate()) {
@@ -150,4 +195,15 @@ public class SyslogProcessor {
         return Tools.getUTCTimestampWithMilliseconds(msg.getDate().getTime());
     }
 
+    /**
+     * Try to find out if the message is a structured syslog message or not.
+     * See ROFLCopter comment in parse() for a explanation of this. Sorry.
+     * 
+     * @param message
+     * @return 
+     */
+    public static boolean isStructuredSyslog(String message) {
+        return STRUCTURED_SYSLOG_PATTERN.matcher(message).matches();
+    }
+    
 }

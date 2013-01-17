@@ -29,11 +29,6 @@
             <version>13.0.1</version>
         </dependency>
         <dependency>
-            <groupId>org.syslog4j</groupId>
-            <artifactId>syslog4j</artifactId>
-            <version>0.9.46</version>
-        </dependency>
-        <dependency>
             <groupId>com.googlecode.json-simple</groupId>
             <artifactId>json-simple</artifactId>
             <version>1.1</version>
@@ -162,6 +157,11 @@
             <groupId>org.graylog2</groupId>
             <artifactId>graylog2-plugin</artifactId>
             <version>0.10.9</version>
+        </dependency>
+        <dependency>
+            <groupId>org.productivity.java</groupId>
+            <artifactId>syslog4j-graylog2</artifactId>
+            <version>0.9.47-graylog2</version>
         </dependency>
     </dependencies>
 
