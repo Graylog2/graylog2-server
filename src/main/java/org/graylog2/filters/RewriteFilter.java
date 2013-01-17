@@ -1,5 +1,5 @@
 /**
- * Copyright 2012 Lennart Koopmann <lennart@socketfeed.com>
+ * Copyright 2012, 2013 Lennart Koopmann <lennart@socketfeed.com>
  *
  * This file is part of Graylog2.
  *
@@ -50,7 +50,9 @@ public class RewriteFilter implements MessageFilter {
         }
 
         tcx.stop();
-        return false;
+        
+        // false if not expecitly set to true in the rules.
+        return msg.getFilterOut();
     }
     
     @Override
