@@ -54,6 +54,9 @@ public class LogMessage {
 
     private double createdAt = 0;
     
+    // Used for drools to filter out messages.
+    private boolean filterOut = false;
+    
     private static final ImmutableSet<String> PROTECTED_KEYS = ImmutableSet.of(
         "_id",
         "_ttl",
@@ -234,6 +237,10 @@ public class LogMessage {
 
     public List<Stream> getStreams() {
         return this.streams;
+    }
+    
+    public void setFilterOut(boolean set) {
+        this.filterOut = set;
     }
     
     private String prepareAdditionalDataKey(final String _key) {
