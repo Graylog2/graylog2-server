@@ -366,6 +366,10 @@ public class Core implements GraylogServer {
     public ScheduledExecutorService getScheduler() {
         return scheduler;
     }
+    
+    public void setConfiguration(Configuration configuration) {
+        this.configuration = configuration;
+    }
 
     public Configuration getConfiguration() {
         return configuration;

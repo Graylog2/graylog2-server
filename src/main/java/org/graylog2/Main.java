@@ -122,6 +122,7 @@ public final class Main {
         // If we only want to check our configuration, we just initialize the rules engine to check if the rules compile
         if (commandLineArguments.isConfigTest()) {
             Core server = new Core();
+            server.setConfiguration(configuration);
             DroolsInitializer drools = new DroolsInitializer();
             try {
                 drools.initialize(server, null);
