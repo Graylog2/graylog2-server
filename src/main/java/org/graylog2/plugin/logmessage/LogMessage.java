@@ -243,6 +243,10 @@ public class LogMessage {
         this.filterOut = set;
     }
     
+    public boolean getFilterOut() {
+        return this.filterOut;
+    }
+    
     private String prepareAdditionalDataKey(final String _key) {
         String key = _key.trim();
         
