@@ -198,13 +198,13 @@ class MessageGateway
       unless opts[:hostname].blank?
         filter :term, :host => opts[:hostname]
       end
-      unless opts[:host].blank?
-        filter :term, :host => opts[:host]
+
+      unless filters[:host].blank?
+        filter :term, :host => filters[:host]
       end
 
       # Timeframe.
       if !filters[:date].blank?
-        
         filter :range, :created_at => { :gt => range[:greater], :lt => range[:lower] }
       end
 
@@ -246,8 +246,8 @@ class MessageGateway
           unless opts[:hostname].blank?
             facet_filter :term, :host => opts[:hostname]
           end
-          unless opts[:host].blank?
-            facet_filter :term, :host => opts[:host]
+          unless filters[:host].blank?
+            facet_filter :term, :host => filters[:host]
           end
 
           # Timeframe.
