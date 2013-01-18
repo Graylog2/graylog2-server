@@ -85,7 +85,7 @@ class User
   end
 
   def login=(value)
-    write_attribute :login, (value ? value.downcase : nil)
+    write_attribute :login, value
   end
 
   def display_name
@@ -93,7 +93,7 @@ class User
   end
 
   def email=(value)
-    write_attribute :email, (value ? value.downcase : nil)
+    write_attribute :email, value
   end
   
   def generate_api_key

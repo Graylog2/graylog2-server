@@ -12,6 +12,6 @@ class BasicAuthentication
 
   private
   def user
-    @user ||= User.find_by_login(@login.downcase)
+    @user ||= User.find_by_login(@login)
   end
 end
