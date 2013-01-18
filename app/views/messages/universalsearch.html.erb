@@ -20,5 +20,9 @@
                                                     :additional_columns => Setting.get_additional_columns(current_user) } %>
 
 <span class="messages-used-indices">
-I searched in the following indices: <%= @messages.used_indices.to_sentence %>
+<% if !@messages.used_indices.blank? %>
+	I searched in the following indices: <%= @messages.used_indices.to_sentence %>
+<% else %>
+	I searched in no indices at all.
+<% end %>
 </span>

@@ -106,7 +106,13 @@ class MessageGateway
     histogram_only = !opts[:date_histogram].blank? and opts[:date_histogram] == true
 
     r = search(pagination_options(page)) do
-      query { string(query) }
+      query do
+        if !query.blank?
+          string(query)
+        else
+          all
+        end
+      end
 
       filter :term, :streams => opts[:stream].id if opts[:stream]
       filter :term, :host => opts[:host].host if opts[:host]
