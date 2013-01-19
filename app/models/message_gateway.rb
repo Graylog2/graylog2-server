@@ -20,6 +20,8 @@ module Tire::HTTP::Client
   end
 end
 
+# Tire.configure { logger 'elasticsearch.log' }
+
 # XXX ELASTIC: try curb as HTTP adapter for tire. reported to be faster: https://gist.github.com/1204159
 class MessageGateway
   include Tire::Model::Search
@@ -123,13 +125,13 @@ class MessageGateway
       if histogram_only
         facet 'date_histogram' do
           date("histogram_time", :interval => (opts[:date_histogram_interval]))
-          if opts[:stream]
-            facet_filter :term, :streams => opts[:stream].id.to_s
-          end
 
-          facet_filter :term, :host => opts[:host].host if opts[:host]
+          facet_filters = []
+          facet_filters << { :term => { :streams => opts[:stream].id.to_s } } if opts[:stream]
+          facet_filters << { :range => { :created_at => { :gte => opts[:since] } } } if !opts[:since].blank?
+          facet_filters << { :term => { :host => opts[:host].host } } if opts[:host]
 
-          facet_filter :range, :created_at => { :gte => opts[:since] } if !opts[:since].blank?
+          facet_filter :and, facet_filters
         end
       end
 
