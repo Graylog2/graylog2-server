@@ -365,7 +365,7 @@ class MessageGateway
   end
 
   def self.all_fields
-    all_additional_fields + [ "host", "level", "facility" ]
+    all_additional_fields + [ "host", "level", "facility", "file", "line" ]
   rescue
     []
   end
