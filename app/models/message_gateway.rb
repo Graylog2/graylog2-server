@@ -364,6 +364,12 @@ class MessageGateway
     []
   end
 
+  def self.all_fields
+    all_additional_fields + [ "host", "level", "facility" ]
+  rescue
+    []
+  end
+
   private
 
   def self.use_all_indices!
