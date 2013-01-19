@@ -2,3 +2,8 @@
 production:
   url: http://localhost:9200/
   index_prefix: graylog2
+
+  # Be careful with the index_prefix if you want to use several Graylog2 instances in the same
+  # ElasticSearch cluster (cluster.name) because the web interface will perform some searches
+  # against the [index_prefix]_* wildcard. Make sure that you have entirely different index
+  # prefixes to avoid overlapping namespaces.
