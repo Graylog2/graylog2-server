@@ -20,7 +20,7 @@ module Tire::HTTP::Client
   end
 end
 
-# Tire.configure { logger 'elasticsearch.log' }
+# Tire.configure { logger 'log/elasticsearch.log' }
 
 # XXX ELASTIC: try curb as HTTP adapter for tire. reported to be faster: https://gist.github.com/1204159
 class MessageGateway
@@ -245,46 +245,40 @@ class MessageGateway
         facet 'date_histogram' do
           date("histogram_time", :interval => (opts[:date_histogram_interval]))
 
-          # Stream
-          unless opts[:stream_id].blank?
-            facet_filter :term, :streams => opts[:stream_id].to_s
-          end
+          facet_filters = []
+
+          # Stream.
+          facet_filters << { :term => { :streams => opts[:stream_id].to_s } } unless opts[:stream_id].blank?
 
           # Host (one is the actual input field, one is the message context)
-          unless opts[:hostname].blank?
-            facet_filter :term, :host => opts[:hostname]
-          end
-          unless filters[:host].blank?
-            facet_filter :term, :host => filters[:host]
-          end
+          facet_filters << { :term => { :host => filters[:host] } } unless filters[:host].blank?
+          facet_filters << { :term => { :host => opts[:hostname] } } unless opts[:hostname].blank?
 
-          # Timeframe.
-          if !filters[:date].blank?
-            facet_filter :range, :created_at => { :gt => range[:greater], :lt => range[:lower] }
-          end
+          # Timeframe
+          facet_filters << { :range => { :created_at => { :gt => range[:greater], :lt => range[:lower] } } } unless filters[:date].blank?
 
           # Facility
-          facet_filter :term, :facility => filters[:facility] unless filters[:facility].blank?
+          facet_filters << { :term => { :facility => filters[:facility] } } unless filters[:facility].blank?
 
           # Severity
-          if !filters[:severity].blank? and filters[:severity_above].blank?
-            facet_filter :term, :level => filters[:severity]
-          end
+          facet_filters << { :term => { :level => filters[:severity] } } if !filters[:severity].blank? and filters[:severity_above].blank?
 
           # Severity (or higher)
-          if !filters[:severity].blank? and !filters[:severity_above].blank?
-            facet_filter :range, :level => { :to => filters[:severity].to_i }
-          end
+          facet_filters << { :range => { :level => { :to => filters[:severity].to_i } } } if !filters[:severity].blank? and !filters[:severity_above].blank?
 
           # File name
-          facet_filter :term, :file => filters[:file] unless filters[:file].blank?
+          facet_filters << { :term => { :file => filters[:file] } } unless filters[:file].blank?
 
           # Line number
-          facet_filter :term, :line => filters[:line] unless filters[:line].blank?
+          facet_filters << { :term => { :line => filters[:line] } } unless filters[:line].blank?
 
           # Additional fields.
           Quickfilter.extract_additional_fields_from_request(filters).each do |key, value|
-            facet_filter :term, "_#{key}".to_sym => value
+            facet_filters << { :term => { "_#{key}".to_sym => value } }
+          end
+
+          if facet_filters.count > 0
+            facet_filter :and, facet_filters
           end
         end
       end
