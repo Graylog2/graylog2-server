@@ -48,7 +48,6 @@
     <ul id="topmenu">
       <% current_user.role == "admin" and permitted_to? :index, :messages do %><%=raw menu_item("Messages", messages_path) %><% end %>
       <% permitted_to? :index, :streams do %><%=raw menu_item("Streams", streams_path) %><% end %>
-      <% permitted_to? :index, :analytics do %><%=raw menu_item("Analytics", analytics_path) %><% end %>
       <% permitted_to? :index, :hosts do %><%=raw menu_item("Hosts", hosts_path) %><% end %>
       <% permitted_to? :index, :blacklists do %><%=raw menu_item("Blacklists", blacklists_path) %><% end %>
       <% permitted_to? :index, :settings do %><%=raw menu_item("Settings", settings_path) %><% end %>

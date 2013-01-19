@@ -92,20 +92,11 @@ class MessageGateway
     wrap search("_id:#{id}").first
   end
 
-  def self.dynamic_search(what)
-    use_all_indices!
-
-    r = Tire.search(ALL_INDICES_ALIAS, what) do
-      sort { by :created_at, 'desc' }
-    end
-
-    wrap(r.results)
-  end
-
   def self.universal_search(page = 1, query, opts)
     used_indices = use_timerange_specific_indices!((opts[:since].blank? or opts[:since] == 0) ? nil : opts[:since])
 
     histogram_only = !opts[:date_histogram].blank? and opts[:date_histogram] == true
+    distribution_only = !opts[:distribution].blank?
 
     r = search(pagination_options(page)) do
       query do
@@ -121,17 +112,25 @@ class MessageGateway
 
       filter :range, :created_at => { :gte => opts[:since] } if !opts[:since].blank?
 
+      if histogram_only or distribution_only
+        facet_filters = []
+        facet_filters << { :term => { :streams => opts[:stream].id.to_s } } if opts[:stream]
+        facet_filters << { :range => { :created_at => { :gte => opts[:since] } } } if !opts[:since].blank?
+        facet_filters << { :term => { :host => opts[:host].host } } if opts[:host]
+      end
+
       # Request date histogram facet?
       if histogram_only
         facet 'date_histogram' do
           date("histogram_time", :interval => (opts[:date_histogram_interval]))
+          facet_filter :and, facet_filters if facet_filters.count > 0
+        end
+      end
 
-          facet_filters = []
-          facet_filters << { :term => { :streams => opts[:stream].id.to_s } } if opts[:stream]
-          facet_filters << { :range => { :created_at => { :gte => opts[:since] } } } if !opts[:since].blank?
-          facet_filters << { :term => { :host => opts[:host].host } } if opts[:host]
-
-          facet_filter :and, facet_filters
+      if distribution_only
+        facet 'distribution' do
+          terms(opts[:distribution], :all_terms => true, :size => 99999)
+          facet_filter :and, facet_filters if facet_filters.count > 0
         end
       end
 
@@ -140,33 +139,22 @@ class MessageGateway
 
     return r.facets["date_histogram"]["entries"] if histogram_only rescue return []
 
-    wrap(r, used_indices)
-  end
+    if distribution_only
+      f = []
+      # [{"term"=>"baz.example.org", "count"=>4}, {"term"=>"bar.example.com", "count"=>3}]
+      r.facets["distribution"]["terms"].each do |r|
+        next if r["count"] == 0 # ES returns the count for *every* field. Skip those that had no matches.
+        f << { :term => r["term"], :count => r["count"] }
+      end
 
-  def self.dynamic_distribution(target, query)
-    use_all_indices!
+      result = MessageResult.new(f)
+      result.total_result_count = r.total
+      result.used_indices = used_indices
 
-    result = Array.new
-
-    query[:facets] = {
-      "distribution_result" => {
-        "terms" => {
-          "field" => target,
-          "all_terms" => true,
-          "size" => 99999
-        }
-      }
-    }
-
-    r = Tire.search(ALL_INDICES_ALIAS, query)
-
-    # [{"term"=>"baz.example.org", "count"=>4}, {"term"=>"bar.example.com", "count"=>3}]
-    r.facets["distribution_result"]["terms"].each do |r|
-      next if r["count"] == 0 # ES returns the count for *every* field. Skip those that had no matches.
-      result << { :distinct => r["term"], :count => r["count"] }
+      return result
     end
 
-    return result
+    wrap(r, used_indices)
   end
 
   def self.all_by_quickfilter(filters, page = 1, opts = {})
@@ -321,17 +309,6 @@ class MessageGateway
     end.total
   end
 
-  def self.oldest_message
-    use_all_indices!
-
-    r = search(:size => 1) do
-      query { all }
-      sort { by :created_at, 'asc' }
-    end.first
-
-    wrap(r)
-  end
-
   def self.all_in_range(page, from, to, opts = {})
     raise "You can only pass stream_id OR hostname" if !opts[:stream_id].blank? and !opts[:hostname].blank?
   
@@ -355,14 +332,6 @@ class MessageGateway
     end
 
     wrap(r)
-  end
-
-  def self.delete_message(id)
-    result = Tire.index(ALL_INDICES_ALIAS).remove(TYPE_NAME, id)
-    Tire.index(ALL_INDICES_ALIAS).refresh
-    return false if result.nil? or result["ok"] != true
-
-    return true
   end
 
   # Returns how the text is broken down to terms.

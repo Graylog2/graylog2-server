@@ -92,11 +92,6 @@ Graylog2WebInterface::Application.routes.draw do
     end
   end
 
-  resource :analytics do
-    get :index
-    get :shell
-  end
-
   resources :versioncheck do
     collection do
       get :perform

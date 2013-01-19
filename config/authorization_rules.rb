@@ -45,8 +45,6 @@ authorization do
     has_permission_on :streamrules, :to => [:create, :destroy, :update]
     has_permission_on :streamcategories, :to => [:create, :destroy]
 
-    has_permission_on :analytics, :to => [:index, :shell]
-
     has_permission_on :hosts, :to => [:index, :show, :destroy, :quickjump, :showrange]
 
     has_permission_on :blacklists, :to => [:index, :show, :create, :destroy]

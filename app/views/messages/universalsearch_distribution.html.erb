@@ -3,7 +3,8 @@
 <% end %>
 
 <h1>
-	Search result for <span class="highlighted"><%= params[:query].blank? ? "[all]" : params[:query] %></span>
+	Distribution of <span class="highlighted"><%= params[:distribution_field] %></span>
+	for search <span class="highlighted"><%= params[:query].blank? ? "[all]" : params[:query] %></span>
 	<% if @stream %>in stream <span class="highlighted"><%= @stream.title %></span><% end %>
 	<% if @host %>for host <span class="highlighted"><%= @host.host %></span><% end %>
 </h1>
@@ -15,19 +16,11 @@
 <%= render :partial => "result_graph" %>
 <br />
 
-<%= form_tag "/messages/universalsearch", :method => :get do %>
-	<%= hidden_field_tag "timespan", params[:timespan] %>
-	<%= hidden_field_tag "query", params[:query] %>
+<%= awesome_link "Back to search results", "/messages/universalsearch?timespan=#{params[:timespan]}&query=#{params[:query]}" %>
+<br /><br />
 
-	<%= text_field_tag :distribution_field, "host" %>
-
-	<%= awesome_submit_link "Show distribution of field" %>
-<% end %>
+<%= render :partial => "result_distribution", :locals => { :distribution_result => @messages } %>
 <br />
-
-<%= render :partial => "messages/table", :locals => { :messages => @messages,
-                                                    :total_messages => @messages.total_result_count, 
-                                                    :additional_columns => Setting.get_additional_columns(current_user) } %>
 
 <span class="messages-used-indices">
 <% if !@messages.used_indices.blank? %>
