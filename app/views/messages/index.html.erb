@@ -10,9 +10,13 @@
   <%= render :partial => "quickfilter"%>
 
   <br />
-  <%= render :partial => "messages/table", :locals => { :messages => @messages,
-                                                        :total_messages => (@quickfilter_result_count.blank? ? @total_count : @quickfilter_result_count), 
-                                                        :additional_columns => @stream ? @stream.additional_columns : Setting.get_additional_columns(current_user) } %>
+  <% if params[:distribution_field].blank? %>
+    <%= render :partial => "messages/table", :locals => { :messages => @messages,
+                                                          :total_messages => (@quickfilter_result_count.blank? ? @total_count : @quickfilter_result_count), 
+                                                          :additional_columns => @stream ? @stream.additional_columns : Setting.get_additional_columns(current_user) } %>
+  <% else %>
+    <%= render :partial => "messages/result_distribution", :locals => { :distribution_result => @messages } %>
+  <% end %>
 </div>
 
 <% if current_user.admin? and SystemSetting.show_first_login_modal? %>

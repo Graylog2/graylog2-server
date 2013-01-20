@@ -19,7 +19,11 @@
 	<%= hidden_field_tag "timespan", params[:timespan] %>
 	<%= hidden_field_tag "query", params[:query] %>
 
-	<%= text_field_tag :distribution_field, "host", :id => "distribution_field" %>
+	<% if @stream %>
+		<%= hidden_field_tag "stream_id", @stream.id %>
+	<% end %>
+
+	<%= text_field_tag :distribution_field, (params[:distribution_field].blank? ? "host" : params[:distribution_field]), :id => "distribution_field" %>
 
 	<%= awesome_submit_link "Show distribution of field" %>
 <% end %>
@@ -28,7 +32,6 @@
 	var distribution_fields = "<%= MessageGateway.all_fields.join ',' %> ".split(",");
 	$("#distribution_field").autocomplete(distribution_fields);
 </script>
-
 <br />
 
 <%= render :partial => "messages/table", :locals => { :messages => @messages,

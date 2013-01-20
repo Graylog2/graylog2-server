@@ -16,6 +16,25 @@
 <%= render :partial => "result_graph" %>
 <br />
 
+<%= form_tag "/messages/universalsearch", :method => :get do %>
+	<%= hidden_field_tag "timespan", params[:timespan] %>
+	<%= hidden_field_tag "query", params[:query] %>
+
+	<% if @stream %>
+		<%= hidden_field_tag "stream_id", @stream.id %>
+	<% end %>
+	
+	<%= text_field_tag :distribution_field, (params[:distribution_field].blank? ? "host" : params[:distribution_field]), :id => "distribution_field" %>
+
+	<%= awesome_submit_link "Show distribution of field" %>
+<% end %>
+
+<script type="text/javascript">
+	var distribution_fields = "<%= MessageGateway.all_fields.join ',' %> ".split(",");
+	$("#distribution_field").autocomplete(distribution_fields);
+</script>
+<br  />
+
 <%= awesome_link "Back to search results", "/messages/universalsearch?timespan=#{params[:timespan]}&query=#{params[:query]}" %>
 <br /><br />
 

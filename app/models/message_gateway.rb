@@ -162,6 +162,7 @@ class MessageGateway
     used_indices = use_timerange_specific_indices!(range[:greater])
 
     histogram_only = !opts[:date_histogram].blank? and opts[:date_histogram] == true
+    distribution_only = !opts[:distribution].blank?
 
     if histogram_only
       options = nil
@@ -228,46 +229,54 @@ class MessageGateway
         filter :term, "_#{key}".to_sym => value
       end
 
+      if histogram_only or distribution_only
+        facet_filters = []
+        # Stream.
+        facet_filters << { :term => { :streams => opts[:stream_id].to_s } } unless opts[:stream_id].blank?
+
+        # Host (one is the actual input field, one is the message context)
+        facet_filters << { :term => { :host => filters[:host] } } unless filters[:host].blank?
+        facet_filters << { :term => { :host => opts[:hostname] } } unless opts[:hostname].blank?
+
+        # Timeframe
+        facet_filters << { :range => { :created_at => { :gt => range[:greater], :lt => range[:lower] } } } unless filters[:date].blank?
+
+        # Facility
+        facet_filters << { :term => { :facility => filters[:facility] } } unless filters[:facility].blank?
+
+        # Severity
+        facet_filters << { :term => { :level => filters[:severity] } } if !filters[:severity].blank? and filters[:severity_above].blank?
+
+        # Severity (or higher)
+        facet_filters << { :range => { :level => { :to => filters[:severity].to_i } } } if !filters[:severity].blank? and !filters[:severity_above].blank?
+
+        # File name
+        facet_filters << { :term => { :file => filters[:file] } } unless filters[:file].blank?
+
+        # Line number
+        facet_filters << { :term => { :line => filters[:line] } } unless filters[:line].blank?
+
+        # Additional fields.
+        Quickfilter.extract_additional_fields_from_request(filters).each do |key, value|
+          facet_filters << { :term => { "_#{key}".to_sym => value } }
+        end
+      end
+
       # Request date histogram facet?
       if histogram_only
         facet 'date_histogram' do
           date("histogram_time", :interval => (opts[:date_histogram_interval]))
 
-          facet_filters = []
-
-          # Stream.
-          facet_filters << { :term => { :streams => opts[:stream_id].to_s } } unless opts[:stream_id].blank?
-
-          # Host (one is the actual input field, one is the message context)
-          facet_filters << { :term => { :host => filters[:host] } } unless filters[:host].blank?
-          facet_filters << { :term => { :host => opts[:hostname] } } unless opts[:hostname].blank?
-
-          # Timeframe
-          facet_filters << { :range => { :created_at => { :gt => range[:greater], :lt => range[:lower] } } } unless filters[:date].blank?
-
-          # Facility
-          facet_filters << { :term => { :facility => filters[:facility] } } unless filters[:facility].blank?
-
-          # Severity
-          facet_filters << { :term => { :level => filters[:severity] } } if !filters[:severity].blank? and filters[:severity_above].blank?
-
-          # Severity (or higher)
-          facet_filters << { :range => { :level => { :to => filters[:severity].to_i } } } if !filters[:severity].blank? and !filters[:severity_above].blank?
-
-          # File name
-          facet_filters << { :term => { :file => filters[:file] } } unless filters[:file].blank?
-
-          # Line number
-          facet_filters << { :term => { :line => filters[:line] } } unless filters[:line].blank?
-
-          # Additional fields.
-          Quickfilter.extract_additional_fields_from_request(filters).each do |key, value|
-            facet_filters << { :term => { "_#{key}".to_sym => value } }
-          end
-
           if facet_filters.count > 0
             facet_filter :and, facet_filters
           end
+        end
+      end
+
+      if distribution_only
+        facet 'distribution' do
+          terms(opts[:distribution], :all_terms => true, :size => 99999)
+          facet_filter :and, facet_filters if facet_filters.count > 0
         end
       end
 
@@ -276,6 +285,21 @@ class MessageGateway
     end
 
     return r.facets["date_histogram"]["entries"] if histogram_only rescue return []
+
+    if distribution_only
+      f = []
+      # [{"term"=>"baz.example.org", "count"=>4}, {"term"=>"bar.example.com", "count"=>3}]
+      r.facets["distribution"]["terms"].each do |r|
+        next if r["count"] == 0 # ES returns the count for *every* field. Skip those that had no matches.
+        f << { :term => r["term"], :count => r["count"] }
+      end
+
+      result = MessageResult.new(f)
+      result.total_result_count = r.total
+      result.used_indices = used_indices
+
+      return result
+    end
 
     return wrap(r, used_indices)
   end

@@ -53,7 +53,7 @@
         @messages = MessageGateway.all_paginated(params[:page], :all => showall)
       else
         @additional_filters = Quickfilter.extract_additional_fields_from_request(params[:filters])
-        @messages = MessageGateway.all_by_quickfilter(params[:filters], params[:page])
+        @messages = MessageGateway.all_by_quickfilter(params[:filters], params[:page], :distribution => params[:distribution_field])
         @quickfilter_result_count = @messages.total_result_count
       end
     end
