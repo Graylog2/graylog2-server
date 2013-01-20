@@ -19,7 +19,7 @@
     <dt><%= label_tag "filters[line]", "Line number:" %></dt>
     <dd><%= text_field_tag "filters[line]", params[:filters].blank? ? nil : params[:filters][:line] %></dd>
 
-    <dt><%= label_tag "filters[severity]", "Severity:" %></dt>
+    <dt><%= label_tag "filters[severity]", "Level:" %></dt>
     <dd>
       <%= select_tag "filters[severity]", raw("<option></option>" + options_for_select(get_ordered_severities_for_select, :selected => get_quickfilter_selected(params[:filters], :severity))) %>
       <%= check_box_tag "filters[severity_above]", true, get_quickfilter_selected(params[:filters], :severity_above), :style => "width: 15px;" || false %>

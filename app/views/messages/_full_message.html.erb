@@ -27,7 +27,7 @@
   </h4>
 
   <h4>Date: <span class="highlighted"><%= Time.at(@message.created_at) %></span></h4>
-  <h4>Severity: <span class="highlighted"><%= syslog_level_to_human(@message.level) %></span></h4>
+  <h4>Level: <span class="highlighted"><%= syslog_level_to_human(@message.level) %></span></h4>
   <h4>Facility: <span class="highlighted"><%= @message.facility %></span></h4>
   <% if @message.file_and_line.present? %>
     <h4>File: <span class="highlighted"><%= @message.file_and_line %></span></h4>
