@@ -21,7 +21,7 @@
         @messages = MessageGateway.all_of_host_paginated(@host.host, params[:page], :all => showall)
       else
         @additional_filters = Quickfilter.extract_additional_fields_from_request(params[:filters])
-        @messages = MessageGateway.all_by_quickfilter(params[:filters], params[:page], :hostname => @host.host)
+        @messages = MessageGateway.all_by_quickfilter(params[:filters], params[:page], :hostname => @host.host, :distribution => params[:distribution_field])
         @quickfilter_result_count = @messages.total_result_count
       end
     elsif params[:stream_id]
@@ -38,7 +38,7 @@
         @messages = MessageGateway.all_of_stream_paginated(@stream.id, params[:page], :all => showall)
       else
         @additional_filters = Quickfilter.extract_additional_fields_from_request(params[:filters])
-        @messages = MessageGateway.all_by_quickfilter(params[:filters], params[:page], :stream_id => @stream.id)
+        @messages = MessageGateway.all_by_quickfilter(params[:filters], params[:page], :stream_id => @stream.id, :distribution => params[:distribution_field])
         @quickfilter_result_count = @messages.total_result_count
       end
     else
