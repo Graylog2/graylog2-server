@@ -163,6 +163,11 @@
             <artifactId>syslog4j-graylog2</artifactId>
             <version>0.9.47-graylog2</version>
         </dependency>
+        <dependency>
+            <groupId>com.github.stephenc.high-scale-lib</groupId>
+            <artifactId>high-scale-lib</artifactId>
+            <version>1.1.4</version>
+        </dependency>
     </dependencies>
 
     <build>
