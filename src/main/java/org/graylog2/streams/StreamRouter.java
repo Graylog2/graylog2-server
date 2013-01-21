@@ -24,6 +24,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.graylog2.streams.matchers.StreamRuleMatcher;
 
+import java.util.Collections;
 import java.util.List;
 
 import com.google.common.collect.Lists;
@@ -43,8 +44,9 @@ public class StreamRouter {
     private static final Logger LOG = LoggerFactory.getLogger(StreamRouter.class);
 
     public List<Stream> route(Core server, LogMessage msg) {
-        List<Stream> matches = Lists.newArrayList();
-        Set<Stream> streams = StreamImpl.fetchAllEnabled(server);
+        Set<Stream> streams = server.getEnabledStreamsSet();
+
+        List<Stream> matches = null;
 
         for (Stream stream : streams) {
             boolean missed = false;
@@ -67,11 +69,14 @@ public class StreamRouter {
 
             // All rules were matched.
             if (!missed) {
+                if (matches == null) {
+                    matches = Lists.newArrayList();
+                }
                 matches.add(stream);
             }
         }
 
-        return matches;
+        return matches == null ? Collections.<Stream>emptyList() :  matches;
     }
 
     public boolean matchStreamRule(LogMessage msg, StreamRuleMatcher matcher, StreamRule rule) {

@@ -20,6 +20,7 @@
 
 package org.graylog2.buffers.processors;
 
+import com.google.common.collect.Lists;
 import com.lmax.disruptor.EventHandler;
 import com.yammer.metrics.Metrics;
 import com.yammer.metrics.core.Meter;
@@ -29,9 +30,12 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.graylog2.Core;
 import org.graylog2.buffers.LogMessageEvent;
+import org.graylog2.buffers.OutputBuffer;
 import org.graylog2.plugin.filters.MessageFilter;
 import org.graylog2.plugin.logmessage.LogMessage;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.TimeUnit;
 import org.graylog2.plugin.buffers.BufferOutOfCapacityException;
 
@@ -51,11 +55,16 @@ public class ProcessBufferProcessor implements EventHandler<LogMessageEvent> {
 
     private final long ordinal;
     private final long numberOfConsumers;
+    private List<LogMessage> buffer;
+
+    private final int bufferSize;
     
     public ProcessBufferProcessor(Core server, final long ordinal, final long numberOfConsumers) {
         this.ordinal = ordinal;
         this.numberOfConsumers = numberOfConsumers;
         this.server = server;
+        this.bufferSize = server.getConfiguration().getOutputBatchSize();
+        this.buffer = new ArrayList<LogMessage>(bufferSize);
     }
 
     @Override
@@ -71,7 +80,7 @@ public class ProcessBufferProcessor implements EventHandler<LogMessageEvent> {
         incomingMessagesPerMinute.mark();
         TimerContext tcx = processTime.time();
 
-        LogMessage msg = event.getMessage();
+        LogMessage msg = event.getAndResetMessage();
 
         LOG.debug("Starting to process message <{}>.", msg.getId());
 
@@ -91,9 +100,13 @@ public class ProcessBufferProcessor implements EventHandler<LogMessageEvent> {
 
         LOG.debug("Finished processing message. Writing to output buffer.");
         
-        while (true) {
+        this.buffer.add(msg);
+
+        // TODO add time limit as well
+        while (this.buffer.size()>=this.bufferSize) {
             try {
-               server.getOutputBuffer().insert(msg);
+               ((OutputBuffer) server.getOutputBuffer()).insert(this.buffer);
+               this.buffer = new ArrayList<LogMessage>(this.bufferSize);
                break;
             } catch (BufferOutOfCapacityException e) {
                 LOG.debug("OutputBuffer out of capacity. Trying again in 250ms.");

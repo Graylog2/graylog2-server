@@ -22,6 +22,7 @@ package org.graylog2;
 
 import org.graylog2.plugin.Tools;
 import java.util.List;
+import java.util.Set;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import org.slf4j.Logger;
@@ -40,6 +41,9 @@ import org.graylog2.streams.StreamCache;
 
 import com.google.common.collect.Lists;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.atomic.AtomicLong;
+import java.util.concurrent.atomic.AtomicReference;
+
 import com.google.common.collect.Maps;
 import java.util.Map;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
@@ -121,7 +125,11 @@ public class Core implements GraylogServer {
     
     private boolean localMode = false;
     private boolean statsMode = false;
-
+    
+    private AtomicReference<Set<Stream>> enabledStreamsCache = new AtomicReference<Set<Stream>>();
+    private AtomicReference<Map<String,Stream>> enabledStreamsMap = new AtomicReference<Map<String,Stream>>();
+    private AtomicLong enabledStreamsUpdated = new AtomicLong();
+    
     public void initialize(Configuration configuration) {
         serverId = Tools.generateServerId();
         
@@ -495,12 +503,51 @@ public class Core implements GraylogServer {
      */
     @Override
     public Map<String, Stream> getEnabledStreams() {
+        Map<String, Stream> map = enabledStreamsMap.get();
+        if (map==null)
+        {
+            return buildEnabledStreamsMap(getEnabledStreamsSet());
+        }
+        
+        return map;
+    }
+
+    private Map<String, Stream> buildEnabledStreamsMap(Set<Stream> enabled)
+    {
         Map<String, Stream> streams = Maps.newHashMap();
-        for (Stream stream : StreamImpl.fetchAllEnabled(this)) {
+        for (Stream stream : enabled) {
             streams.put(stream.getId().toString(), stream);
         }
         
         return streams;
     }
-    
+
+    /**
+       cache the list of streams is not being changed for every log message (as well as its disabled state)
+     */
+    public Set<Stream> getEnabledStreamsSet()
+    {
+        Set<Stream> set = enabledStreamsCache.get();
+        
+        
+        long now = System.currentTimeMillis();
+        long l = enabledStreamsUpdated.get();
+        if ( now-l < 5000 ) {
+            return set !=null ? set : StreamImpl.fetchAllEnabled(this);
+        }
+        
+        // need to refresh
+        if ( enabledStreamsUpdated.compareAndSet(l, now) ) {
+            set=StreamImpl.fetchAllEnabled(this);
+            enabledStreamsCache.set(set);
+            enabledStreamsMap.set( buildEnabledStreamsMap(set) );
+        }
+        
+        if (set == null )
+        {
+            set = StreamImpl.fetchAllEnabled(this);
+        }
+
+        return set;
+    }
 }
