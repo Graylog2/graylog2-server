@@ -20,32 +20,40 @@
 
 package org.graylog2.buffers;
 
-import com.lmax.disruptor.EventFactory;
+import java.util.List;
+
 import org.graylog2.plugin.logmessage.LogMessage;
+
+import com.lmax.disruptor.EventFactory;
 
 /**
  * @author Lennart Koopmann <lennart@socketfeed.com>
  */
-public class LogMessageEvent {
+public class LogMessagesEvent {
 
-    private LogMessage msg;
+    private List<LogMessage> msg;
     
-    public LogMessage getAndResetMessage()
+    public List<LogMessage> getAndResetMessages()
     {
-        return msg;
+        List<LogMessage> msg2 = msg;
+        // cleaning messages as soon as we can to avoid these messages promotion to old gen
+        // (because disruptor keeps references to this instance in its ring buffer for a long time)
+        this.msg = null;
+        
+        return msg2;
     }
 
-    public void setMessage(final LogMessage msg)
+    public void setMessages(final List<LogMessage> msg)
     {
         this.msg = msg;
     }
 
-    public final static EventFactory<LogMessageEvent> EVENT_FACTORY = new EventFactory<LogMessageEvent>()
+    public final static EventFactory<LogMessagesEvent> EVENT_FACTORY = new EventFactory<LogMessagesEvent>()
     {
         @Override
-        public LogMessageEvent newInstance()
+        public LogMessagesEvent newInstance()
         {
-            return new LogMessageEvent();
+            return new LogMessagesEvent();
         }
     };
 

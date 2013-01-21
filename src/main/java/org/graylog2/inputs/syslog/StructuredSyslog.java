@@ -21,6 +21,7 @@
 package org.graylog2.inputs.syslog;
 
 import java.net.InetAddress;
+import java.net.UnknownHostException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
@@ -35,6 +36,15 @@ import org.productivity.java.syslog4j.server.impl.event.structured.StructuredSys
  */
 public class StructuredSyslog {
 
+    private static final InetAddress LOCAL_HOST;
+    static { 
+        try {
+            LOCAL_HOST = InetAddress.getLocalHost();
+        } catch (UnknownHostException e) {
+            throw new RuntimeException("Cannot deternine localhost");
+        }
+    }
+    
     private static final Logger LOG = LoggerFactory.getLogger(StructuredSyslog.class);
 
     public static Map<String, String> extractFields(byte[] rawSyslogMessage) {
@@ -43,7 +53,7 @@ public class StructuredSyslog {
             StructuredSyslogServerEvent s = new StructuredSyslogServerEvent(
                     rawSyslogMessage,
                     rawSyslogMessage.length,
-                    InetAddress.getLocalHost()
+                    LOCAL_HOST
              );
 
             Map raw = s.getStructuredMessage().getStructuredData();

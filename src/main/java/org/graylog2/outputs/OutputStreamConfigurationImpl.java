@@ -42,4 +42,8 @@ public class OutputStreamConfigurationImpl implements OutputStreamConfiguration 
         return config.get(streamId);
     }
     
+    public boolean exist( ObjectId streamId )
+    {
+        return config.containsKey(streamId);
+    }
 }

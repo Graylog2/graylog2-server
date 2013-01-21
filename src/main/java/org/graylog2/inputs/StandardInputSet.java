@@ -23,9 +23,11 @@ import java.util.HashSet;
 import java.util.Set;
 import org.graylog2.inputs.amqp.AMQPInput;
 import org.graylog2.inputs.gelf.GELFTCPInput;
+import org.graylog2.inputs.gelf.GELFUDPBlockingInput;
 import org.graylog2.inputs.gelf.GELFUDPInput;
 import org.graylog2.inputs.http.GELFHttpInput;
 import org.graylog2.inputs.syslog.SyslogTCPInput;
+import org.graylog2.inputs.syslog.SyslogUDPBlockingInput;
 import org.graylog2.inputs.syslog.SyslogUDPInput;
 
 /**
@@ -37,10 +39,12 @@ public class StandardInputSet {
         return new HashSet<Class>() {{ 
             add(GELFTCPInput.class);
             add(GELFUDPInput.class);
+            add(GELFUDPBlockingInput.class);
             add(GELFHttpInput.class);
             add(AMQPInput.class);
             add(SyslogTCPInput.class);
             add(SyslogUDPInput.class);
+            add(SyslogUDPBlockingInput.class);
         }};
     }
     

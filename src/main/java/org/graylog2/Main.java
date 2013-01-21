@@ -37,9 +37,11 @@ import org.graylog2.filters.*;
 import org.graylog2.initializers.*;
 import org.graylog2.inputs.amqp.AMQPInput;
 import org.graylog2.inputs.gelf.GELFTCPInput;
+import org.graylog2.inputs.gelf.GELFUDPBlockingInput;
 import org.graylog2.inputs.gelf.GELFUDPInput;
 import org.graylog2.inputs.http.GELFHttpInput;
 import org.graylog2.inputs.syslog.SyslogTCPInput;
+import org.graylog2.inputs.syslog.SyslogUDPBlockingInput;
 import org.graylog2.inputs.syslog.SyslogUDPInput;
 import org.graylog2.outputs.ElasticSearchOutput;
 
@@ -191,11 +193,11 @@ public final class Main {
         
         // Register inputs.
         if (configuration.isUseGELF()) {
-            server.registerInput(new GELFUDPInput());
+            server.registerInput(new GELFUDPBlockingInput());
             server.registerInput(new GELFTCPInput());
         }
         
-        if (configuration.isSyslogUdpEnabled()) { server.registerInput(new SyslogUDPInput()); }
+        if (configuration.isSyslogUdpEnabled()) { server.registerInput(new SyslogUDPBlockingInput()); }
         if (configuration.isSyslogTcpEnabled()) { server.registerInput(new SyslogTCPInput()); }
 
         if (configuration.isAmqpEnabled()) { server.registerInput(new AMQPInput()); }

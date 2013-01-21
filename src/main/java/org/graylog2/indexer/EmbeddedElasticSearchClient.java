@@ -260,30 +260,31 @@ public class EmbeddedElasticSearchClient {
 
             // we manually set the document ID to the same value to be able to match up documents later.
             mainIndex.add(buildIndexRequest(Deflector.DEFLECTOR_NAME, source, msg.getId(), 0)); // Main index.
-            recentIndex.add(buildIndexRequest(RECENT_INDEX_NAME, source, msg.getId(), server.getConfiguration().getRecentIndexTtlMinutes())); // Recent index.
+//            recentIndex.add(buildIndexRequest(RECENT_INDEX_NAME, source, msg.getId(), server.getConfiguration().getRecentIndexTtlMinutes())); // Recent index.
         }
 
         mainIndex.setConsistencyLevel(WriteConsistencyLevel.ONE);
-        recentIndex.setConsistencyLevel(WriteConsistencyLevel.ONE);
+//        recentIndex.setConsistencyLevel(WriteConsistencyLevel.ONE);
         
         mainIndex.setReplicationType(ReplicationType.ASYNC);
-        recentIndex.setReplicationType(ReplicationType.ASYNC);
+//        recentIndex.setReplicationType(ReplicationType.ASYNC);
         
         final ActionFuture<BulkResponse> mainBulkFuture = client.bulk(mainIndex.request());
-        final ActionFuture<BulkResponse> recentBulkFuture = client.bulk(recentIndex.request());
+//        final ActionFuture<BulkResponse> recentBulkFuture = client.bulk(recentIndex.request());
         
         final BulkResponse mainResponse = mainBulkFuture.actionGet();
-        final BulkResponse recentResponse = recentBulkFuture.actionGet();
+//        final BulkResponse recentResponse = recentBulkFuture.actionGet();
         
         LOG.debug("Deflector index: Bulk indexed {} messages, took {} ms, failures: {}",
                 new Object[] { mainResponse.items().length, mainResponse.getTookInMillis(), mainResponse.hasFailures() });
         
-        LOG.debug("Recent index: Bulk indexed {} messages, took {} ms, failures: {}",
-                new Object[] { recentResponse.items().length, recentResponse.getTookInMillis(), recentResponse.hasFailures() });
+//        LOG.debug("Recent index: Bulk indexed {} messages, took {} ms, failures: {}",
+//                new Object[] { recentResponse.items().length, recentResponse.getTookInMillis(), recentResponse.hasFailures() });
         
-        return !mainResponse.hasFailures() && !recentResponse.hasFailures();
+//        return !mainResponse.hasFailures() && !recentResponse.hasFailures();
+        return !mainResponse.hasFailures();
     }
-
+/*
     public void deleteMessagesByTimeRange(int to) {
         DeleteByQueryRequestBuilder b = client.prepareDeleteByQuery();
         final QueryBuilder qb = rangeQuery("created_at").from(0).to(to);
@@ -295,7 +296,7 @@ public class EmbeddedElasticSearchClient {
         ActionFuture<DeleteByQueryResponse> future = client.deleteByQuery(b.request());
         future.actionGet();
     }
-    
+*/    
     public void deleteIndex(String indexName) {
         client.admin().indices().delete(new DeleteIndexRequest(indexName)).actionGet();
     }
