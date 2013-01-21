@@ -35,8 +35,8 @@ public class HostCounterCacheWriterThread implements Runnable {
 
     private static final Logger LOG = LoggerFactory.getLogger(HostCounterCacheWriterThread.class);
 
-    public static final int PERIOD = 5;
-    public static final int INITIAL_DELAY = 5;
+    public static final int PERIOD = 60;
+    public static final int INITIAL_DELAY = 60;
 
     private final Core graylogServer;
 

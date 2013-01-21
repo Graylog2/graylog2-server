@@ -23,6 +23,10 @@ package org.graylog2.database;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
+
+import org.cliffc.high_scale_lib.Counter;
+import org.cliffc.high_scale_lib.NonBlockingHashMap;
+import org.graylog2.plugin.Tools;
 import org.graylog2.plugin.database.HostCounterCache;
 
 /**
@@ -33,7 +37,7 @@ import org.graylog2.plugin.database.HostCounterCache;
  */
 public class HostCounterCacheImpl implements HostCounterCache {
 
-    private ConcurrentMap<String, Integer> cache = new ConcurrentHashMap<String, Integer>();
+    private NonBlockingHashMap<String, Counter> hosts = new NonBlockingHashMap<String, Counter>();
 
     /**
      * Increment counter cache by 1 for a host.
@@ -42,13 +46,15 @@ public class HostCounterCacheImpl implements HostCounterCache {
      */
     @Override
     public void increment(String hostname) {
-        int old = 0;
-
-        if (this.cache.containsKey(hostname)) {
-            old = this.cache.get(hostname);
+        Counter c = this.hosts.get( hostname );
+        if (c != null) {
+            c.increment();
+        } else {
+            c = new Counter();
+            Counter c1 = this.hosts.putIfAbsent(hostname, c);
+            if (c1 !=null ) c = c1;
+            c.increment();
         }
-
-        this.cache.put(hostname, old+1);
     }
 
     /**
@@ -58,9 +64,8 @@ public class HostCounterCacheImpl implements HostCounterCache {
      */
     @Override
     public void reset(String hostname) {
-        if (this.cache.containsKey(hostname)) {
-            this.cache.remove(hostname);
-        }
+        Counter c = this.hosts.get(hostname);
+        c.set(0);
     }
 
     /**
@@ -70,7 +75,8 @@ public class HostCounterCacheImpl implements HostCounterCache {
      */
     @Override
     public int getCount(String hostname) {
-        return this.cache.get(hostname) == null ? 0 : this.cache.get(hostname);
+        Counter c = this.hosts.get(hostname);
+        return c == null ? 0 : (int)c.get();
     }
 
     /**
@@ -78,7 +84,7 @@ public class HostCounterCacheImpl implements HostCounterCache {
      */
     @Override
     public Set<String> getAllHosts() {
-        return this.cache.keySet();
+        return this.hosts.keySet();
     }
 
 }
