@@ -20,6 +20,10 @@
 
 package org.graylog2.gelf;
 
+import java.nio.ByteBuffer;
+import java.nio.ByteOrder;
+import java.util.Arrays;
+
 /**
  * @author Lennart Koopmann <lennart@socketfeed.com>
  */
@@ -68,11 +72,22 @@ public final class GELFMessageChunk {
 
     final byte[] payload;
 
+    private final int offset;
+
+    private final int length;
+
     public GELFMessageChunk(final byte[] payload) {
-        if (payload.length < HEADER_TOTAL_LENGTH) {
+        this(payload,0,payload.length);
+    }
+
+    public GELFMessageChunk(final byte[] payload, int offset, int length) {
+        this.offset = offset;
+        this.length = length;
+        this.payload = payload;
+
+        if (length < HEADER_TOTAL_LENGTH) {
             throw new IllegalArgumentException("This GELF message chunk is too short. Cannot even contain the required header.");
         }
-        this.payload = payload;
 
         read();
     }
@@ -111,12 +126,7 @@ public final class GELFMessageChunk {
 
     private String extractId() {
         if (this.id == null) {
-            String tmp = "";
-            for (int i = 0; i < HEADER_PART_HASH_LENGTH; i++) {
-                // Make a hex value out of it.
-                tmp = tmp.concat(Integer.toString((payload[i+HEADER_PART_HASH_START] & 0xff) + 0x100, 16).substring(1));
-            }
-            this.id = tmp;
+            this.id = Long.toHexString(ByteBuffer.wrap(payload, offset+HEADER_PART_HASH_START, HEADER_PART_HASH_LENGTH).order(ByteOrder.BIG_ENDIAN).getLong() );
         }
 
         return this.id;
@@ -151,23 +161,18 @@ public final class GELFMessageChunk {
     }
 
     private int sliceInteger(final int start, final int length) {
+        if (length==1)
+            return payload[offset + start]; // which are 100% cases =)
+        
         String tmp = "";
         for (int i = 0; i < length; i++) {
-            tmp = tmp.concat(Integer.toString(payload[i+start]));
+            tmp = tmp.concat(Integer.toString(payload[offset+ i+start]));
         }
         return Integer.parseInt(tmp);
     }
 
     private byte[] slice(final int cutOffAt) {
-        final byte[] tmp = new byte[payload.length-cutOffAt];
-
-        int j = 0;
-        for (int i = cutOffAt; i < payload.length; i++) {
-            tmp[j] = payload[i];
-            j++;
-        }
-
-        return tmp;
+        return Arrays.copyOfRange(payload, offset+cutOffAt, offset+length);
     }
 
     @Override
@@ -183,7 +188,7 @@ public final class GELFMessageChunk {
         sb.append("\tArrival: ");
         sb.append(this.arrival);
         sb.append("\tData size: ");
-        sb.append(this.payload.length);
+        sb.append(this.length);
 
         return sb.toString();
     }

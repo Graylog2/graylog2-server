@@ -32,6 +32,10 @@ public class GELFMessage {
 
     private final byte[] payload;
 
+    private int length;
+
+    private int offset;
+
     public static final String ADDITIONAL_FIELD_PREFIX = "_";
 
     private static final Charset UTF8_CHARSET = Charset.forName("UTF-8");
@@ -121,24 +125,32 @@ public class GELFMessage {
      */
     public GELFMessage(final byte[] payload) {
         this.payload = payload;
+        this.offset = 0;
+        this.length = payload.length;
+    }
+
+    public GELFMessage(final byte[] payload, int offset, int length) {
+        this.payload = payload;
+        this.offset = offset;
+        this.length = length;
     }
 
     public Type getGELFType() {
-        if (payload.length < Type.HEADER_SIZE) {
+        if (length < Type.HEADER_SIZE) {
             throw new IllegalStateException("GELF message is too short. Not even the type header would fit.");
         }
-        return Type.determineType(payload[0], payload[1]);
+        return Type.determineType(payload[offset], payload[offset+1]);
     }
 
     public String getJSON(){
         try {
             switch(getGELFType()) {
                 case ZLIB:
-                    return Tools.decompressZlib(payload);
+                    return Tools.decompressZlib(payload,offset,length);
                 case GZIP:
-                    return Tools.decompressGzip(payload);
+                    return Tools.decompressGzip(payload,offset,length);
                 case UNCOMPRESSED:
-                    return new String(payload, UTF8_CHARSET);
+                    return new String(payload, offset,length, UTF8_CHARSET);
                 case CHUNKED:
                 case UNSUPPORTED:
                     throw new IllegalStateException("Unknown GELF type. Not supported.");
@@ -154,5 +166,21 @@ public class GELFMessage {
 
     public byte[] getPayload() {
         return payload;
+    }
+    
+    /**
+     * @return the offset
+     */
+    public int getOffset()
+    {
+        return offset;
+    }
+    
+    /**
+     * @return the length
+     */
+    public int getLength()
+    {
+        return length;
     }
 }

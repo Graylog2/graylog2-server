@@ -106,7 +106,7 @@ public class ToolsTest {
         deflater.deflate(buffer);
         deflater.end();
 
-        assertEquals(testString, Tools.decompressZlib(buffer));
+        assertEquals(testString, Tools.decompressZlib(buffer,0,buffer.length));
     }
 
     @Test
@@ -121,13 +121,13 @@ public class ToolsTest {
 
         byte[] buffer = out.toByteArray();
 
-        assertEquals(testString, Tools.decompressGzip(buffer));
+        assertEquals(testString, Tools.decompressGzip(buffer,0,buffer.length));
     }
 
     @Test(expected = EOFException.class)
     public void testDecompressGzipEmptyInput() throws IOException {
 
-        Tools.decompressGzip(new byte[0]);
+        Tools.decompressGzip(new byte[0],0,0);
     }
 
     /**

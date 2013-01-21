@@ -45,9 +45,11 @@ import java.util.List;
 import java.util.Map;
 import org.graylog2.inputs.amqp.AMQPInput;
 import org.graylog2.inputs.gelf.GELFTCPInput;
+import org.graylog2.inputs.gelf.GELFUDPBlockingInput;
 import org.graylog2.inputs.gelf.GELFUDPInput;
 import org.graylog2.inputs.http.GELFHttpInput;
 import org.graylog2.inputs.syslog.SyslogTCPInput;
+import org.graylog2.inputs.syslog.SyslogUDPBlockingInput;
 import org.graylog2.inputs.syslog.SyslogUDPInput;
 
 /**
@@ -648,11 +650,11 @@ public class Configuration {
     }
     
     public Map<String, String> getInputConfig(Class input) {
-        if (input.equals(GELFTCPInput.class) || input.equals(GELFUDPInput.class)) {
+        if (input.equals(GELFTCPInput.class) || input.equals(GELFUDPInput.class) || input.equals(GELFUDPBlockingInput.class)) {
             return getGELFInputConfig();
         }
         
-        if (input.equals(SyslogTCPInput.class) || input.equals(SyslogUDPInput.class)) {
+        if (input.equals(SyslogTCPInput.class) || input.equals(SyslogUDPInput.class)|| input.equals(SyslogUDPBlockingInput.class)) {
             return getSyslogInputConfig();
         }
         
