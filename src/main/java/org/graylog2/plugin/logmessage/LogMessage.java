@@ -23,6 +23,7 @@ package org.graylog2.plugin.logmessage;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
+import java.util.Collections;
 import org.graylog2.plugin.streams.Stream;
 
 import java.util.List;
@@ -68,9 +69,7 @@ public class LogMessage {
     );
 
     public LogMessage() {
-        // the elasticsearch version is the same as the "standard" one, except the encoding is different.
-        // to avoid recomputing it when submitting the message to elasticsearch we always use its method.
-        this.id = UUID.randomUUID().toString();
+        this.id = new com.eaio.uuid.UUID().toString();
     }
 
     public boolean isComplete() {
@@ -106,13 +105,16 @@ public class LogMessage {
             obj.put("histogram_time", Tools.buildElasticSearchTimeFormat(this.getCreatedAt()));
         }
 
-
         // Manually converting stream ID to string - caused strange problems without it.
-        List<String> streamIds = Lists.newArrayList();
-        for (Stream stream : this.getStreams()) {
-            streamIds.add(stream.getId().toString());
+        if (getStreams().size()>0) {
+            List<String> streamIds = Lists.newArrayList();
+            for (Stream stream : this.getStreams()) {
+                streamIds.add(stream.getId().toString());
+            }
+            obj.put("streams", streamIds);
+        } else {
+            obj.put("streams", Collections.EMPTY_LIST);
         }
-        obj.put("streams", streamIds);
 
         return obj;
     }

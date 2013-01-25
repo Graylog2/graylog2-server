@@ -85,5 +85,10 @@
       <artifactId>joda-time</artifactId>
       <version>2.1</version>
     </dependency>
+    <dependency>
+      <groupId>com.eaio.uuid</groupId>
+      <artifactId>uuid</artifactId>
+      <version>3.2</version>
+    </dependency>
   </dependencies>
 </project>

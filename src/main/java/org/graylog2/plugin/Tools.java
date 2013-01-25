@@ -171,8 +171,7 @@ public final class Tools {
      * @return The current UTC UNIX timestamp.
      */
     public static int getUTCTimestamp() {
-       DateTime dateTime = new DateTime();
-       return (int) (dateTime.getMillis()/1000);
+       return (int) (System.currentTimeMillis()/1000);
     }
 
     /**
@@ -181,8 +180,7 @@ public final class Tools {
      * @return The current UTC UNIX timestamp with milliseconds.
      */
     public static double getUTCTimestampWithMilliseconds() {
-        DateTime dateTime = new DateTime();
-        return getUTCTimestampWithMilliseconds(dateTime.getMillis());
+        return getUTCTimestampWithMilliseconds(System.currentTimeMillis());
     }
 
     /**
@@ -192,8 +190,7 @@ public final class Tools {
      * @return The current UTC UNIX timestamp with milliseconds.
      */
     public static double getUTCTimestampWithMilliseconds(long timestamp) {
-
-        return Double.parseDouble(String.format("%d.%d", timestamp/1000, timestamp%1000));
+        return timestamp / 1000.0;
     }
 
     public static String getLocalHostname() {
