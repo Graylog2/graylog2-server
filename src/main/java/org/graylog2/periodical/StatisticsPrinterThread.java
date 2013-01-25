@@ -19,8 +19,13 @@
  */
 package org.graylog2.periodical;
 
+import com.sun.media.jai.opimage.MeanRIF;
+import com.yammer.metrics.Metrics;
+import java.util.concurrent.TimeUnit;
 import org.graylog2.Core;
 import org.graylog2.buffers.BufferWatermark;
+import org.graylog2.buffers.OutputBuffer;
+import org.graylog2.buffers.ProcessBuffer;
 import org.joda.time.DateTime;
 
 /**
@@ -33,14 +38,18 @@ public class StatisticsPrinterThread implements Runnable {
     
     private final Core server;
     
+    public static final String COUNTER_NAME = "statisticsprinter";
+    
     public StatisticsPrinterThread(Core server) {
         this.server = server;
+        server.getMessageCounterManager().register(COUNTER_NAME);
     }
     
     @Override
     public void run() {
         bufferWatermarks();
         memory();
+        messageCounts();
     }
     
     private void print(String subtype, String what) {
@@ -65,6 +74,11 @@ public class StatisticsPrinterThread implements Runnable {
         print("heap", "Free memory (MB): " + runtime.freeMemory() / mb);
         print("heap", "Total memory (MB): " + runtime.totalMemory() / mb);
         print("heap", "Max memory (MB): " + runtime.maxMemory() / mb);
+    }
+    
+    private void messageCounts() {
+        print("messagecounts", "Accepted messages: " + server.getMessageCounterManager().get(COUNTER_NAME).getTotalCount());
+        server.getMessageCounterManager().get(COUNTER_NAME).resetAllCounts();
     }
     
 }
