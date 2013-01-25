@@ -130,6 +130,8 @@ class MessageGateway
       if distribution_only
         facet 'distribution' do
           distribution_target = opts[:distribution]
+          distribution_target = "created_at" if distribution_target == "date"
+
           if !Message::STD_FIELDS.map { |f| f.to_s }.include?(distribution_target) && !distribution_target.starts_with?(Message::ADDITIONAL_FIELD_SEPARATOR)
             distribution_target = "#{Message::ADDITIONAL_FIELD_SEPARATOR}#{distribution_target}"
           end
@@ -281,10 +283,11 @@ class MessageGateway
       if distribution_only
         facet 'distribution' do
           distribution_target = opts[:distribution]
+          distribution_target = "created_at" if distribution_target == "date"
+
           if !Message::STD_FIELDS.map { |f| f.to_s }.include?(distribution_target) && !distribution_target.starts_with?(Message::ADDITIONAL_FIELD_SEPARATOR)
             distribution_target = "#{Message::ADDITIONAL_FIELD_SEPARATOR}#{distribution_target}"
           end
-
           terms(distribution_target, :all_terms => true, :size => 99999)
           facet_filter :and, facet_filters if facet_filters.count > 0
         end

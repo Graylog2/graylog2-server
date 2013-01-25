@@ -1,3 +1,11 @@
+<% if params[:distribution_field] == "level" %>
+  <% distribution_result = map_distribution_result(:level, distribution_result) %>
+<% end %>
+
+<% if ["created_at", "date"].include?(params[:distribution_field])  %>
+  <% distribution_result = map_distribution_result(:date, distribution_result) %>
+<% end %>
+
 <% if distribution_result.blank? %>
 <h2>No results</h2>
 <% else %>

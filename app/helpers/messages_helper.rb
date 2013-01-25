@@ -35,4 +35,24 @@ module MessagesHelper
     res
   end
 
+  def map_distribution_result(type, result)
+    mapped = []
+
+    if type == :level
+      result.each do |r|
+        mapped << { :count => r[:count], :term => syslog_level_to_human(r[:term])}
+      end
+      return mapped
+    end
+
+    if type == :date
+      result.each do |r|
+        mapped << { :count => r[:count], :term => Time.at(r[:term])}
+      end
+      return mapped
+    end
+
+    return result
+  end
+
 end

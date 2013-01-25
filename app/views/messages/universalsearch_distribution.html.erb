@@ -30,7 +30,7 @@
 <% end %>
 
 <script type="text/javascript">
-	var distribution_fields = "<%= MessageGateway.all_fields.join ',' %> ".split(",");
+	var distribution_fields = "<%= MessageGateway.all_fields.join ',' %>,date".split(",");
 	$("#distribution_field").autocomplete(distribution_fields);
 </script>
 <br  />
