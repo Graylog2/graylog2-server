@@ -41,10 +41,6 @@ public class SyslogPipelineFactory implements ChannelPipelineFactory {
     @Override
     public ChannelPipeline getPipeline() throws Exception {
         ChannelPipeline p = Channels.pipeline();
-        p.addFirst(
-                "execution-handler",
-                new ExecutionHandler(new OrderedMemoryAwareThreadPoolExecutor(16, 0, 0))
-        );
         p.addLast("handler", new SyslogDispatcher(server));
         
         return p;
