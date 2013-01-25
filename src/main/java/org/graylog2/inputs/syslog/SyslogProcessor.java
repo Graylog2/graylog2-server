@@ -36,8 +36,8 @@ import java.net.UnknownHostException;
 import java.util.Date;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
-import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import org.elasticsearch.common.collect.Maps;
 import org.graylog2.plugin.buffers.BufferOutOfCapacityException;
 import org.productivity.java.syslog4j.server.SyslogServerEventIF;
 import org.productivity.java.syslog4j.server.impl.event.structured.StructuredSyslogServerEvent;
@@ -143,16 +143,13 @@ public class SyslogProcessor {
     }
 
     private Map<String, String> parseAdditionalData(SyslogServerEventIF msg) {
-        // Parse possibly included structured syslog data into additional_fields.
-        Map<String, String> structuredData = StructuredSyslog.extractFields(msg.getRaw());
-
-        if (structuredData.size() > 0) {
-            LOG.debug("Parsed <{}> structured data pairs. Adding as additional_fields. Not using tokenizer.", structuredData.size());
-        }
+        Map<String, String> structuredData = Maps.newHashMap();
         
         // Structured syslog has more data we can parse.
         if (msg instanceof StructuredSyslogServerEvent) {
             StructuredSyslogServerEvent sMsg = (StructuredSyslogServerEvent) msg;
+            
+            structuredData = StructuredSyslog.extractFields(sMsg);
             
             if (sMsg.getApplicationName() != null && !sMsg.getApplicationName().isEmpty()) {
                 structuredData.put("application_name", sMsg.getApplicationName());

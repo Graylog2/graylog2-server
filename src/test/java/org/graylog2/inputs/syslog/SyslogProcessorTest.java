@@ -33,7 +33,7 @@ public class SyslogProcessorTest {
     // http://tools.ietf.org/rfc/rfc5424.txt
     public static String ValidStructuredMessage = "<165>1 2012-12-25T22:14:15.003Z mymachine.example.com evntslog - ID47 [exampleSDID@32473 iut=\"3\" eventSource=\"Application\" eventID=\"1011\"] BOMAn application event log entry";
     public static String ValidStructuedMessageWithDifferentDateFormat = "<165>1 2003-08-24T05:14:15.000003-07:00 192.0.2.1 myproc 8710 - - %% It's time to make the do-nuts";
-    public static String ValidNonStructuredMessage = "<86>Dec 24 17:05:01 foo-bar CRON[10049]: pam_unix(cron:session): session closed for user root";
+    public static String ValidNonStructuredMessage = "<86>Dec 24 17:05:01 foo-bar CRON[10049]: pam_unix(cron:session): session closed for user root";    
     public static String MessageLookingLikeStructured = "<133>NOMA101FW01A: NetScreen device_id=NOMA101FW01A [Root]system-notification-00257(traffic): start_time=\"2011-12-23 17:33:43\" duration=0 reason=Creation";
 
     @Test
@@ -69,12 +69,15 @@ public class SyslogProcessorTest {
         LogMessage lm = serverStub.lastInsertedToProcessBuffer;
 
         assertEquals(1, serverStub.callsToProcessBufferInserter);
-        
+
         assertEquals("local4", lm.getFacility());
         assertEquals("mymachine.example.com", lm.getHost());
         assertEquals(5, lm.getLevel());
         assertEquals(ValidStructuredMessage, lm.getFullMessage());
         assertEquals("evntslog", lm.getAdditionalData().get("_application_name"));
+        assertEquals("1011", lm.getAdditionalData().get("_eventID"));
+        assertEquals("Application", lm.getAdditionalData().get("_eventSource"));
+        assertEquals("3", lm.getAdditionalData().get("_iut"));
         assertEquals(4, lm.getAdditionalData().size());
     }
     
