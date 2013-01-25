@@ -4,8 +4,8 @@ class Message
   ADDITIONAL_FIELD_SEPARATOR = '_'
   RESERVED_ADDITIONAL_FIELDS = %w( _type _index _version _score _explanation )
 
-  @fields = [ :id, :message, :full_message, :created_at, :facility, :level, :host, :file, :line, :deleted, :streams ]
-  @fields.each { |f| attr_accessor(f) }
+  STD_FIELDS = [ :id, :message, :full_message, :created_at, :facility, :level, :host, :file, :line, :deleted, :streams ]
+  STD_FIELDS.each { |f| attr_accessor(f) }
 
   attr_accessor :source_index, :plain, :total_result_count
 
@@ -16,7 +16,7 @@ class Message
     m.total_result_count = x.total rescue nil
     m.source_index = x[:_index]
 
-    @fields.each do |f|
+    STD_FIELDS.each do |f|
       # XXX ELASTIC: zomg workaround
       # - __send__ creates a Rake::FileTask instead of a string. not sure why yet
       if f != :file
@@ -35,7 +35,7 @@ class Message
 
     m.plain = x
     m.total_result_count = x.total rescue nil
-    @fields.each do |f|
+    STD_FIELDS.each do |f|
       m.__send__(:"#{f}=", x[f]) rescue nil
     end
 

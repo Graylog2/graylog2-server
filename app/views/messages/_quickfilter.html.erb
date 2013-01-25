@@ -75,7 +75,21 @@
   <%= form_tag "/messages", :method => :get do %>
 
     <% params[:filters].each do |k,v| %>
-      <%= hidden_field_tag "filters[#{k}]", v %>
+      <% next if v.blank? or k == "additional" %>
+      <% if v.kind_of?(Hash) %>
+        <% v.each do |ak, av| %>
+          <%= hidden_field_tag "filters[#{k}][#{ak}][]", av %>
+        <% end %>
+      <% else %>
+        <%= hidden_field_tag "filters[#{k}]", v %>
+      <% end %>
+    <% end %>
+
+    <% unless @additional_filters.blank? %>
+      <% @additional_filters.each do |k,v| %>
+        <dt><%= hidden_field_tag "filters[additional][keys][]", (k.to_s.at(0) == '_' ? k.to_s[1..k.to_s.length] : k.to_s) %></dt>
+        <dd><%= hidden_field_tag "filters[additional][values][]", v %></dd>
+      <% end %>
     <% end %>
 
     <% if !@stream.blank? %>
