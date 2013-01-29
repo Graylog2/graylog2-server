@@ -89,7 +89,7 @@
         <dependency>
         	<groupId>org.elasticsearch</groupId>
         	<artifactId>elasticsearch</artifactId>
-        	<version>0.20.2</version>
+        	<version>0.20.4</version>
         </dependency>
         <dependency>
             <groupId>org.jmock</groupId>
