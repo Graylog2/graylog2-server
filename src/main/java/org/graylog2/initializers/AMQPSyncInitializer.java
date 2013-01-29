@@ -51,7 +51,7 @@ public class AMQPSyncInitializer extends SimpleFixedRateScheduleInitializer impl
     
     @Override
     public boolean masterOnly() {
-        return true;
+        return false;
     }
     
     @Override
