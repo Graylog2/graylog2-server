@@ -89,7 +89,7 @@ public class OutputBufferProcessor implements EventHandler<LogMessageEvent> {
         if ((sequence % numberOfConsumers) != ordinal) {
             return;
         }
-        
+
         server.outputBufferWatermark().decrementAndGet();
         incomingMessages.mark();
 
@@ -99,38 +99,38 @@ public class OutputBufferProcessor implements EventHandler<LogMessageEvent> {
         buffer.add(msg);
 
         if (endOfBatch || buffer.size() >= server.getConfiguration().getOutputBatchSize()) {
+
             final CountDownLatch doneSignal = new CountDownLatch(server.getOutputs().size());
             for (final MessageOutput output : server.getOutputs()) {
                 final String typeClass = output.getClass().getCanonicalName();
-                // Always write to ElasticSearch, but only write to other outputs if enabled for one of its streams.
-                if (output instanceof ElasticSearchOutput || OutputRouter.checkRouting(typeClass, msg)) {
-                    try {
-                        // We must copy the buffer for this output, because it may be cleared before all messages are handled.
-                        final List<LogMessage> myBuffer = Lists.newArrayList(buffer);
-                        
-                        LOG.debug("Writing message batch to [{}]. Size <{}>", output.getName(), buffer.size());
 
-                        batchSize.update(buffer.size());
-                        
-                        executor.submit(new Runnable() {
-                            @Override
-                            public void run() {
-                                try {
-                                    output.write(myBuffer, buildStreamConfigs(myBuffer, typeClass), server);
-                                } catch (Exception e) {
-                                    throw new RuntimeException(e);
-                                } finally {
-                                    doneSignal.countDown();
-                                }
+                try {
+                    // We must copy the buffer for this output, because it may be cleared before all messages are handled.
+                    final List<LogMessage> myBuffer = Lists.newArrayList(buffer);
+
+                    LOG.debug("Writing message batch to [{}]. Size <{}>", output.getName(), buffer.size());
+
+                    batchSize.update(buffer.size());
+
+                    executor.submit(new Runnable() {
+                        @Override
+                        public void run() {
+                            try {
+                                output.write(
+                                        OutputRouter.getMessagesForOutput(myBuffer, typeClass),
+                                        buildStreamConfigs(myBuffer, typeClass),
+                                        server
+                                );
+                            } catch (Exception e) {
+                                LOG.error("Error in output [" + output.getName() +"].", e);
+                            } finally {
+                                doneSignal.countDown();
                             }
-                        });
-                        
-                    } catch (Exception e) {
-                        LOG.error("Could not write message batch to output [" + output.getName() +"].", e);
-                        doneSignal.countDown();
-                    }
-                } else {
-                    // Output was not written to, Router did not hit.
+                        }
+                    });
+
+                } catch (Exception e) {
+                    LOG.error("Could not write message batch to output [" + output.getName() +"].", e);
                     doneSignal.countDown();
                 }
             }
