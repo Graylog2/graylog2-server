@@ -77,7 +77,11 @@ public class AMQPSyncThread implements Runnable {
                     LOG.info(msg);
                     graylogServer.getActivityWriter().write(new Activity(msg, AMQPSyncThread.class));
 
-                    consumer.getValue().disconnect();
+                    if (graylogServer.isMaster()) {
+                        consumer.getValue().deleteQueueAndDisconnect();
+                    } else {
+                        consumer.getValue().disconnect();
+                    }
                 }
             } 
         }

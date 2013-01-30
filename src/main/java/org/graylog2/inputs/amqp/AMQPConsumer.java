@@ -93,7 +93,7 @@ public class AMQPConsumer implements Runnable {
             Map<String, Object> arguments = new HashMap<String, Object>();
             boolean isDurable = false;
             boolean isExclusive = false;
-            boolean isAutoDelete = true;
+            boolean isAutoDelete = false;
             arguments.put("x-message-ttl", queueConfig.getTtl()); // 15 minutes.
 
             // Automatically re-connect.
@@ -115,6 +115,22 @@ public class AMQPConsumer implements Runnable {
            
            disconnect();
         }
+    }
+    
+    public void deleteQueueAndDisconnect() {
+        String msg = "Attempting to delete and disconnect from queue [" + queueConfig.getQueueName() + "]";
+        LOG.debug(msg);
+        server.getActivityWriter().write(new Activity(msg, AMQPConsumer.class));
+        
+        try {
+            channel.queueDelete(queueConfig.getQueueName());
+        } catch(IOException e) {
+            String msg2 = "Could not delete queue [" + queueConfig.getQueueName() + "]";
+            LOG.error(msg2);
+            server.getActivityWriter().write(new Activity(msg2, AMQPConsumer.class));
+        }
+        
+        disconnect();
     }
 
     public void disconnect() {
