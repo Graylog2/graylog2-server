@@ -93,7 +93,7 @@ public final class GELFMessageChunk {
     }
 
     public GELFMessageChunk(final GELFMessage msg) {
-        this(msg.getPayload());
+        this(msg.getPayload(), msg.getOffset(), msg.getLength());
     }
 
     public int getArrival() {

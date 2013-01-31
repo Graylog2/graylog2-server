@@ -20,16 +20,20 @@
 
 package org.graylog2.gelf;
 
-import com.google.common.collect.Maps;
-import com.yammer.metrics.Metrics;
-import com.yammer.metrics.core.Meter;
+import java.io.ByteArrayOutputStream;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
+import java.util.concurrent.TimeUnit;
+
+import org.graylog2.Core;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.graylog2.Core;
 
-import java.io.ByteArrayOutputStream;
-import java.util.Map;
-import java.util.concurrent.TimeUnit;
+import com.yammer.metrics.Metrics;
+import com.yammer.metrics.core.Meter;
 
 /**
  * @author Lennart Koopmann <lennart@socketfeed.com>
@@ -38,9 +42,8 @@ public class GELFChunkManager extends Thread {
 
     private static final Logger LOG = LoggerFactory.getLogger(GELFChunkManager.class);
 
-    private Map<String, Map<Integer, GELFMessageChunk>> chunks = Maps.newConcurrentMap();
+    private ConcurrentMap<String, Map<Integer, GELFMessageChunk>> chunks = new ConcurrentHashMap<String, Map<Integer,GELFMessageChunk>>(256,0.75f,Runtime.getRuntime().availableProcessors()*4);
     private GELFProcessor processor;
-    private Core server;
 
     // The number of seconds a chunk is valid. Every message with chunks older than this will be dropped.
     public static final int SECONDS_VALID = 5;
@@ -48,7 +51,6 @@ public class GELFChunkManager extends Thread {
 
     public GELFChunkManager(Core server) {
         this.processor = new GELFProcessor(server);
-        this.server = server;
     }
 
     @Override
@@ -161,14 +163,22 @@ public class GELFChunkManager extends Thread {
     public void insert(GELFMessageChunk chunk) {
         LOG.debug("Handling GELF chunk: {}", chunk);
         
-        if (chunks.containsKey(chunk.getId())) {
+        Map<Integer, GELFMessageChunk> messageChunks = chunks.get(chunk.getId());
+        if (messageChunks!=null) {
             // Add chunk to partial message.
-            chunks.get(chunk.getId()).put(chunk.getSequenceNumber(), chunk);
+            messageChunks.put(chunk.getSequenceNumber(), chunk);
         } else {
             // First chunk of message.
-            Map<Integer, GELFMessageChunk> c = Maps.newHashMap();
+            // There is a little concurrency expected on individual message sequence maps, still it can happen
+            // because individual chunks can be processed in parallel by udp processing input threads
+            // so sync map is ok here.
+            Map<Integer, GELFMessageChunk> c =Collections.synchronizedMap( new HashMap<Integer, GELFMessageChunk>() );
             c.put(chunk.getSequenceNumber(), chunk);
-            chunks.put(chunk.getId(), c);
+            c=chunks.putIfAbsent(chunk.getId(), c);
+            if (c!=null) {
+                // unexpected concurrency happened on map init. need to reinsert chunk top just added map 
+                c.put(chunk.getSequenceNumber(), chunk);
+            }
         }
 
     }
