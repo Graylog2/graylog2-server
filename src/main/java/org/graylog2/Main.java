@@ -46,6 +46,7 @@ import org.graylog2.outputs.ElasticSearchOutput;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.Writer;
+import org.graylog2.cluster.Cluster;
 import org.graylog2.plugin.initializers.InitializerConfigurationException;
 import org.graylog2.plugins.PluginInstaller;
 
@@ -144,13 +145,23 @@ public final class Main {
         
         // Could it be that there is another master instance already?
         if (configuration.isMaster() && server.cluster().masterCountExcept(server.getServerId()) != 0) {
-            // All devils here.
-            String what = "Detected other master node in the cluster! Starting as non-master! "
-                    + "This is a mis-configuration you should fix.";
-            LOG.warn(what);
-            server.getActivityWriter().write(new Activity(what, Main.class));
+            LOG.warn("Detected another master in the cluster. Retrying in {} seconds to make sure it is not "
+                    + "an old stale instance.", Cluster.PING_TIMEOUT);
+            try {
+                Thread.sleep(Cluster.PING_TIMEOUT*1000);
+            } catch (InterruptedException e) { /* nope */ }
             
-            configuration.setIsMaster(false);
+            if (server.cluster().masterCountExcept(server.getServerId()) != 0) {
+                // All devils here.
+                String what = "Detected other master node in the cluster! Starting as non-master! "
+                        + "This is a mis-configuration you should fix.";
+                LOG.warn(what);
+                server.getActivityWriter().write(new Activity(what, Main.class));
+
+                configuration.setIsMaster(false);
+            } else {
+                LOG.warn("Stale master has gone. Starting as master.");
+            }
         }
         
         // Enable local mode?
