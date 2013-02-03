@@ -1,5 +1,5 @@
 /**
- * Copyright 2012 Lennart Koopmann <lennart@socketfeed.com>
+ * Copyright 2012, 2013 Lennart Koopmann <lennart@socketfeed.com>
  *
  * This file is part of Graylog2.
  *
@@ -31,7 +31,7 @@ public class FacilityRegexMatcher implements StreamRuleMatcher {
 
     @Override
     public boolean match(LogMessage msg, StreamRule rule) {
-        return Pattern.compile(rule.getValue(), Pattern.DOTALL).matcher(msg.getFacility()).matches();
+        return Pattern.compile(rule.getValue(), Pattern.DOTALL).matcher(msg.getFacility()).find();
     }
 
 }

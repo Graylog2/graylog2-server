@@ -1,5 +1,5 @@
 /**
- * Copyright 2011 Lennart Koopmann <lennart@socketfeed.com>
+ * Copyright 2011, 2012, 2013 Lennart Koopmann <lennart@socketfeed.com>
  *
  * This file is part of Graylog2.
  *
@@ -31,7 +31,7 @@ public class HostRegexMatcher implements StreamRuleMatcher {
 
     @Override
     public boolean match(LogMessage msg, StreamRule rule) {
-        return Pattern.compile(rule.getValue(), Pattern.DOTALL).matcher(msg.getHost()).matches();
+        return Pattern.compile(rule.getValue(), Pattern.DOTALL).matcher(msg.getHost()).find();
     }
 
 }
