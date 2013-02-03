@@ -1,5 +1,7 @@
 <% content_for :sidebar do %>
-  <%= render :partial => "sidebar_index" %>
+  <% if @stream %><%= render :partial => "streams/sidebar_index" %>
+  <% elsif @host %><%= render :partial => "hosts/sidebar_index" %>
+  <% else %><%= render :partial => "sidebar_index" %><% end %>
 <% end %>
 
 <h1>
