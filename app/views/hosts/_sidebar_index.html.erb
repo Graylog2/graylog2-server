@@ -2,7 +2,7 @@
 
 <div id="sidebar-graph" style="height: 100px;"></div>
 <div id="graph-rangeselector" class="graph-rangeselector-sidebar" style="display: none;">
-  <%= form_tag showrange_host_path(@host) do %>
+  <%= form_tag(showrange_host_path(@host), :method => :get) do %>
     <%= hidden_field_tag :from, nil, :id => "graph-rangeselector-from" %>
     <%= hidden_field_tag :to, nil, :id => "graph-rangeselector-to" %>
     <%= awesome_submit_link "Show messages in range" %>
