@@ -161,7 +161,7 @@
         <dependency>
             <groupId>org.productivity.java</groupId>
             <artifactId>syslog4j-graylog2</artifactId>
-            <version>0.9.47-graylog2</version>
+            <version>0.9.48-graylog2</version>
         </dependency>
         <dependency>
             <groupId>com.github.stephenc.high-scale-lib</groupId>

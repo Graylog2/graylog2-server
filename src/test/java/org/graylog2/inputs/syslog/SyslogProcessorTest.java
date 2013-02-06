@@ -30,12 +30,14 @@ import static org.junit.Assert.*;
 
 public class SyslogProcessorTest {
 
-    // http://tools.ietf.org/rfc/rfc5424.txt
     public static String ValidStructuredMessage = "<165>1 2012-12-25T22:14:15.003Z mymachine.example.com evntslog - ID47 [exampleSDID@32473 iut=\"3\" eventSource=\"Application\" eventID=\"1011\"] BOMAn application event log entry";
     public static String ValidStructuedMessageWithDifferentDateFormat = "<165>1 2003-08-24T05:14:15.000003-07:00 192.0.2.1 myproc 8710 - - %% It's time to make the do-nuts";
     public static String ValidNonStructuredMessage = "<86>Dec 24 17:05:01 foo-bar CRON[10049]: pam_unix(cron:session): session closed for user root";    
     public static String MessageLookingLikeStructured = "<133>NOMA101FW01A: NetScreen device_id=NOMA101FW01A [Root]system-notification-00257(traffic): start_time=\"2011-12-23 17:33:43\" duration=0 reason=Creation";
 
+    // http://jira.graylog2.org/browse/SERVER-287
+    public static String ValidNonStructuredMessageWithShortDate = "<38>Feb 5 10:18:12 foo-bar sshd[593115]: Accepted publickey for root from 94.XXX.XXX.XXX port 5992 ssh2";
+    
     @Test
     public void testMessageReceivedWithNonStructuredMessage() throws Exception {
         GraylogServerStub serverStub = new GraylogServerStub();
@@ -54,6 +56,26 @@ public class SyslogProcessorTest {
         assertEquals("foo-bar", lm.getHost());
         assertEquals(6, lm.getLevel());
         assertEquals(ValidNonStructuredMessage, lm.getFullMessage());
+        assertEquals(0, lm.getAdditionalData().size());
+    }
+    
+    @Test
+    public void testMessageReceivedWithNonStructuredMessageAndShortDate() throws Exception {
+        GraylogServerStub serverStub = new GraylogServerStub();
+        Configuration configStub = new Configuration();
+        serverStub.setConfigurationStub(configStub);
+        SyslogProcessor processor = new SyslogProcessor(serverStub);
+
+        processor.messageReceived(ValidNonStructuredMessageWithShortDate, InetAddress.getLocalHost());
+
+        LogMessage lm = serverStub.lastInsertedToProcessBuffer;
+
+        assertEquals(1, serverStub.callsToProcessBufferInserter);
+
+        assertEquals("security/authorization", lm.getFacility());
+        assertEquals("foo-bar", lm.getHost());
+        assertEquals(6, lm.getLevel());
+        assertEquals(ValidNonStructuredMessageWithShortDate, lm.getFullMessage());
         assertEquals(0, lm.getAdditionalData().size());
     }
 
