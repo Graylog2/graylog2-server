@@ -349,7 +349,7 @@ class MessageGateway
   def self.all_in_range(page, from, to, opts = {})
     raise "You can only pass stream_id OR hostname" if !opts[:stream_id].blank? and !opts[:hostname].blank?
   
-    use_all_indices!
+    used_indices = use_timerange_specific_indices!(from)
     options = pagination_options(page)
 
     r = search(options) do
@@ -368,7 +368,7 @@ class MessageGateway
       sort { by :created_at, 'desc' }
     end
 
-    wrap(r)
+    wrap(r, used_indices)
   end
 
   # Returns how the text is broken down to terms.

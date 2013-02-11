@@ -13,3 +13,11 @@ A total of <span class="highlighted"><%= @total_count %></span> messages in this
   :total_messages => @total_count,
   :append_params => [{ :key => "from", :value => @from.to_i}, {:key => "to", :value => @to.to_i} ]
 } %>
+
+<span class="messages-used-indices">
+<% if !@messages.used_indices.blank? %>
+	I searched in the following indices: <%= @messages.used_indices.to_sentence %>
+<% else %>
+	I searched in no indices at all.
+<% end %>
+</span>
