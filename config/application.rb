@@ -17,8 +17,8 @@ require "sprockets/railtie"
 # you've limited to :test, :development, or :production.
 Bundler.require(:default, Rails.env) if defined?(Bundler)
 
-GRAYLOG2_VERSION = "0.10.0-rc.3"
-GRAYLOG2_VERSION_TIMESTAMP = 1324660530
+GRAYLOG2_VERSION = "0.10.0"
+GRAYLOG2_VERSION_TIMESTAMP = 1360859502
 
 module Graylog2WebInterface
   class Application < Rails::Application
