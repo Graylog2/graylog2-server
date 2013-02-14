@@ -20,14 +20,18 @@
 
 package org.graylog2.streams.matchers;
 
+import org.graylog2.plugin.logmessage.LogMessage;
 import org.bson.types.ObjectId;
 import com.mongodb.BasicDBObject;
-import org.graylog2.messagehandlers.gelf.GELFMessage;
-import org.graylog2.streams.StreamRule;
+import org.graylog2.streams.StreamRuleImpl;
 import org.junit.Test;
 import static org.junit.Assert.*;
 
 public class HostRegexMatcherTest {
+    @Test
+    public void testTheTruthToWork() {
+        assertTrue(true);
+    }
 
     @Test
     public void testSuccessfulMatch() {
@@ -37,12 +41,12 @@ public class HostRegexMatcherTest {
 
         BasicDBObject mongoRule = new BasicDBObject();
         mongoRule.put("_id", new ObjectId());
-        mongoRule.put("rule_type", StreamRule.TYPE_HOST_REGEX);
+        mongoRule.put("rule_type", StreamRuleImpl.TYPE_HOST_REGEX);
         mongoRule.put("value",  regex);
 
-        StreamRule rule = new StreamRule(mongoRule);
+        StreamRuleImpl rule = new StreamRuleImpl(mongoRule);
         HostRegexMatcher matcher = new HostRegexMatcher();
-        GELFMessage msg = new GELFMessage();
+        LogMessage msg = new LogMessage();
         
         msg.setHost(host1);
         assertTrue(matcher.match(msg, rule));
@@ -57,12 +61,12 @@ public class HostRegexMatcherTest {
 
         BasicDBObject mongoRule = new BasicDBObject();
         mongoRule.put("_id", new ObjectId());
-        mongoRule.put("rule_type", StreamRule.TYPE_HOST_REGEX);
+        mongoRule.put("rule_type", StreamRuleImpl.TYPE_HOST_REGEX);
         mongoRule.put("value",  regex);
 
-        StreamRule rule = new StreamRule(mongoRule);
+        StreamRuleImpl rule = new StreamRuleImpl(mongoRule);
 
-        GELFMessage msg = new GELFMessage();
+        LogMessage msg = new LogMessage();
         msg.setHost(host);
 
         HostRegexMatcher matcher = new HostRegexMatcher();

@@ -24,22 +24,23 @@
 
 package org.graylog2;
 
+import org.graylog2.plugin.Tools;
+import com.google.common.collect.Lists;
+import com.google.common.collect.Sets;
 import org.junit.Test;
 
 import java.io.ByteArrayOutputStream;
 import java.io.EOFException;
 import java.io.IOException;
-import java.net.InetSocketAddress;
-import java.net.SocketAddress;
-import java.net.UnknownHostException;
 import java.util.Calendar;
+import java.util.List;
+import java.util.Set;
 import java.util.zip.Deflater;
 import java.util.zip.GZIPOutputStream;
 
 import static org.junit.Assert.*;
 
 /**
- *
  * @author lennart
  */
 public class ToolsTest {
@@ -147,11 +148,35 @@ public class ToolsTest {
     public void testDecodeBase64() {
         assertEquals("lolwat.encoded", Tools.decodeBase64("bG9sd2F0LmVuY29kZWQ="));
     }
-
+    
     @Test
-    public void testRdnsLookup() throws UnknownHostException {
-        // google.com - let's see for how long this works.
-        InetSocketAddress addr = new InetSocketAddress("173.194.69.99", 80);
-        assertEquals("bk-in-f99.1e100.net", Tools.rdnsLookup(addr));
+    public void testGenerateServerId() {
+        String id = Tools.generateServerId();
+        
+        assertTrue(id.startsWith(Tools.getLocalHostname() + "-"));
+        assertTrue(id.length() > (Tools.getLocalHostname() + "-").length());
+    }
+    
+    @Test
+    public void testAsSortedList() {
+        List sortMe = Lists.newArrayList();
+        sortMe.add(0);
+        sortMe.add(2);
+        sortMe.add(6);
+        sortMe.add(1);
+        sortMe.add(10);
+        sortMe.add(25);
+        sortMe.add(11);
+        
+        List expected = Lists.newArrayList();
+        expected.add(0);
+        expected.add(1);
+        expected.add(2);
+        expected.add(6);
+        expected.add(10);
+        expected.add(11);
+        expected.add(25);
+        
+        assertEquals(expected, Tools.asSortedList(sortMe));
     }
 }

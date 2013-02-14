@@ -20,19 +20,16 @@
 
 package org.graylog2.streams.matchers;
 
-import org.graylog2.messagehandlers.gelf.GELFMessage;
-import org.graylog2.streams.StreamRule;
+import org.graylog2.plugin.logmessage.LogMessage;
+import org.graylog2.plugin.streams.StreamRule;
 
 /**
- * SeverityMatcher.java: May 23, 2011 3:26:41 PM
- *
- * [description]
- *
  * @author Lennart Koopmann <lennart@socketfeed.com>
  */
-public class SeverityOrHigherMatcher implements StreamRuleMatcherIF {
+public class SeverityOrHigherMatcher implements StreamRuleMatcher {
 
-    public boolean match(GELFMessage msg, StreamRule rule) {
+    @Override
+    public boolean match(LogMessage msg, StreamRule rule) {
         // <= because 0 (EMERG) is lower than DEBUG (7)
         return msg.getLevel() <= Integer.parseInt(rule.getValue());
     }

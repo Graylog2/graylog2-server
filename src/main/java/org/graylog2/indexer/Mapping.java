@@ -1,5 +1,5 @@
 /**
- * Copyright 2011 Lennart Koopmann <lennart@socketfeed.com>
+ * Copyright 2011, 2012 Lennart Koopmann <lennart@socketfeed.com>
  *
  * This file is part of Graylog2.
  *
@@ -25,38 +25,44 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
+import org.elasticsearch.action.admin.indices.mapping.put.PutMappingRequest;
+import org.elasticsearch.action.admin.indices.mapping.put.PutMappingRequestBuilder;
+import org.elasticsearch.client.Client;
+
 /**
- * Mapping.java: Sep 05, 2011 3:34:57 PM
- *
  * Representing the message type mapping in ElasticSearch. This is giving ES more
  * information about what the fields look like and how it should analyze them.
  *
  * @author Lennart Koopmann <lennart@socketfeed.com>
  */
+@SuppressWarnings({"unchecked"})
 public class Mapping {
 
-    public static Map get() {
-        Map mapping = new HashMap();
-        mapping.put("properties", partFieldProperties());
+    public static PutMappingRequest getPutMappingRequest(final Client client, final String index, final String analyzer) {
+        final PutMappingRequestBuilder builder = client.admin().indices().preparePutMapping(new String[] {index});
+        builder.setType(EmbeddedElasticSearchClient.TYPE);
+
+        final Map<String, Object> mapping = new HashMap<String, Object>();
+        mapping.put("properties", partFieldProperties(analyzer));
         mapping.put("dynamic_templates", partDefaultAllInDynamicTemplate());
+        mapping.put("_source", enabledAndCompressed()); // Compress source field..
+        mapping.put("_ttl", enabled()); // Enable purging by TTL.
 
-        Map completeMapping = new HashMap();
-        completeMapping.put(Indexer.TYPE, mapping);
+        final Map completeMapping = new HashMap();
+        completeMapping.put(EmbeddedElasticSearchClient.TYPE, mapping);
 
-        Map spec = new HashMap();
-        spec.put("mappings", completeMapping);
-
-        return spec;
+        builder.setSource(completeMapping);
+        return builder.request();
     }
 
     /*
      * Disable analyzing for every field by default.
      */
-    public static List partDefaultAllInDynamicTemplate() {
-        List dynamicTemplates = new LinkedList();
-        Map template = new HashMap();
-        Map defaultAll = new HashMap();
-        Map notAnalyzed = new HashMap();
+    private static List partDefaultAllInDynamicTemplate() {
+        final List dynamicTemplates = new LinkedList();
+        final Map template = new HashMap();
+        final Map defaultAll = new HashMap();
+        final Map notAnalyzed = new HashMap();
         notAnalyzed.put("index", "not_analyzed");
 
         // Match all.
@@ -73,32 +79,59 @@ public class Mapping {
     /*
      * Enable analyzing for some fields again. Like for message and full_message.
      */
-    public static Map partFieldProperties() {
-        Map properties = new HashMap();
+    private static Map partFieldProperties(String analyzer) {
+        final Map properties = new HashMap();
 
-        properties.put("message", analyzedString());
-        properties.put("full_message", analyzedString());
+        properties.put("message", analyzedString(analyzer));
+        properties.put("full_message", analyzedString(analyzer));
 
         // Required for the WI to not fail on empty indexes.
         properties.put("created_at", typeNumberDouble());
 
+        // This is used building histograms. An own field to avoid mapping problems with oder versions.
+        properties.put("histogram_time", typeTimeNoMillis()); // yyyy-MM-dd HH-mm-ss
+
         return properties;
     }
 
-    public static Map analyzedString() {
-        Map type = new HashMap();
+    private static Map analyzedString(String analyzer) {
+        final Map type = new HashMap();
         type.put("index", "analyzed");
         type.put("type", "string");
-        type.put("analyzer", "whitespace");
-        
+        type.put("analyzer", analyzer);
+
         return type;
     }
 
-    public static Map typeNumberDouble() {
-        Map type = new HashMap();
+    private static Map typeNumberDouble() {
+        final Map type = new HashMap();
         type.put("type", "double");
 
         return type;
+    }
+
+    private static Map typeTimeNoMillis() {
+        final Map type = new HashMap();
+        type.put("type", "date");
+        type.put("format", "yyyy-MM-dd HH-mm-ss");
+
+        return type;
+    }
+
+    private static Map enabled() {
+        final Map e = new HashMap();
+        e.put("enabled", true);
+
+        return e;
+    }
+
+    
+    private static Map enabledAndCompressed() {
+        final Map e = new HashMap();
+        e.put("enabled", true);
+        e.put("compress", true);
+
+        return e;
     }
 
 }

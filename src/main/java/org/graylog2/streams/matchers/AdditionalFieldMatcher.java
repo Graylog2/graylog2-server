@@ -1,5 +1,5 @@
 /**
- * Copyright 2011 Lennart Koopmann <lennart@socketfeed.com>
+ * Copyright 2011, 2012, 2013 Lennart Koopmann <lennart@socketfeed.com>
  *
  * This file is part of Graylog2.
  *
@@ -20,19 +20,17 @@
 
 package org.graylog2.streams.matchers;
 
-import org.graylog2.messagehandlers.gelf.GELFMessage;
-import org.graylog2.streams.StreamRule;
+import java.util.regex.Pattern;
+import org.graylog2.plugin.logmessage.LogMessage;
+import org.graylog2.plugin.streams.StreamRule;
 
 /**
- * AdditionalFieldMatcher.java: Mar 27, 2011 5:50:53 PM
- *
- * [description]
- *
  * @author Lennart Koopmann <lennart@socketfeed.com>
  */
-public class AdditionalFieldMatcher implements StreamRuleMatcherIF {
+public class AdditionalFieldMatcher implements StreamRuleMatcher {
 
-    public boolean match(GELFMessage msg, StreamRule rule) {
+    @Override
+    public boolean match(LogMessage msg, StreamRule rule) {
         String[] parts = rule.getValue().split("=");
         String key = "_" + parts[0];
         String value = parts[1];
@@ -50,6 +48,6 @@ public class AdditionalFieldMatcher implements StreamRuleMatcherIF {
             }
         }
 
-        return null != str && str.matches(value);
+        return (str != null && Pattern.compile(value, Pattern.DOTALL).matcher(str).find());
     }
 }

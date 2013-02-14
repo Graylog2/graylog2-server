@@ -20,25 +20,29 @@
 
 package org.graylog2.streams.matchers;
 
+import org.graylog2.plugin.logmessage.LogMessage;
 import org.bson.types.ObjectId;
 import com.mongodb.BasicDBObject;
-import org.graylog2.messagehandlers.gelf.GELFMessage;
-import org.graylog2.streams.StreamRule;
+import org.graylog2.streams.StreamRuleImpl;
 import org.junit.Test;
 import static org.junit.Assert.*;
 
 public class SeverityOrHigherMatcherTest {
+    @Test
+    public void testTheTruthToWork() {
+        assertTrue(true);
+    }
 
     @Test
     public void testSuccessfulMatch() {
         BasicDBObject mongoRule = new BasicDBObject();
         mongoRule.put("_id", new ObjectId());
-        mongoRule.put("rule_type", StreamRule.TYPE_SEVERITY_OR_HIGHER);
+        mongoRule.put("rule_type", StreamRuleImpl.TYPE_SEVERITY_OR_HIGHER);
         mongoRule.put("value", String.valueOf(6));
 
-        StreamRule rule = new StreamRule(mongoRule);
+        StreamRuleImpl rule = new StreamRuleImpl(mongoRule);
 
-        GELFMessage msg = new GELFMessage();
+        LogMessage msg = new LogMessage();
         msg.setLevel(2);
 
         SeverityOrHigherMatcher matcher = new SeverityOrHigherMatcher();
@@ -50,12 +54,12 @@ public class SeverityOrHigherMatcherTest {
     public void testSuccessfulMatchWithEqualRuleAndValue() {
         BasicDBObject mongoRule = new BasicDBObject();
         mongoRule.put("_id", new ObjectId());
-        mongoRule.put("rule_type", StreamRule.TYPE_SEVERITY_OR_HIGHER);
+        mongoRule.put("rule_type", StreamRuleImpl.TYPE_SEVERITY_OR_HIGHER);
         mongoRule.put("value", String.valueOf(3));
 
-        StreamRule rule = new StreamRule(mongoRule);
+        StreamRuleImpl rule = new StreamRuleImpl(mongoRule);
 
-        GELFMessage msg = new GELFMessage();
+        LogMessage msg = new LogMessage();
         msg.setLevel(3);
 
         SeverityOrHigherMatcher matcher = new SeverityOrHigherMatcher();
@@ -67,12 +71,12 @@ public class SeverityOrHigherMatcherTest {
     public void testMissedMatch() {
         BasicDBObject mongoRule = new BasicDBObject();
         mongoRule.put("_id", new ObjectId());
-        mongoRule.put("rule_type", StreamRule.TYPE_SEVERITY_OR_HIGHER);
+        mongoRule.put("rule_type", StreamRuleImpl.TYPE_SEVERITY_OR_HIGHER);
         mongoRule.put("value", String.valueOf(3));
 
-        StreamRule rule = new StreamRule(mongoRule);
+        StreamRuleImpl rule = new StreamRuleImpl(mongoRule);
 
-        GELFMessage msg = new GELFMessage();
+        LogMessage msg = new LogMessage();
         msg.setLevel(5);
 
         SeverityOrHigherMatcher matcher = new SeverityOrHigherMatcher();

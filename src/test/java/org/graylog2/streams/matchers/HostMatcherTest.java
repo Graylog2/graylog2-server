@@ -20,14 +20,18 @@
 
 package org.graylog2.streams.matchers;
 
+import org.graylog2.plugin.logmessage.LogMessage;
 import com.mongodb.BasicDBObject;
 import org.bson.types.ObjectId;
-import org.graylog2.messagehandlers.gelf.GELFMessage;
-import org.graylog2.streams.StreamRule;
+import org.graylog2.streams.StreamRuleImpl;
 import org.junit.Test;
 import static org.junit.Assert.*;
 
 public class HostMatcherTest {
+    @Test
+    public void testTheTruthToWork() {
+        assertTrue(true);
+    }
 
     @Test
     public void testSuccessfulMatch() {
@@ -35,12 +39,12 @@ public class HostMatcherTest {
 
         BasicDBObject mongoRule = new BasicDBObject();
         mongoRule.put("_id", new ObjectId());
-        mongoRule.put("rule_type", StreamRule.TYPE_HOST);
+        mongoRule.put("rule_type", StreamRuleImpl.TYPE_HOST);
         mongoRule.put("value", host);
 
-        StreamRule rule = new StreamRule(mongoRule);
+        StreamRuleImpl rule = new StreamRuleImpl(mongoRule);
 
-        GELFMessage msg = new GELFMessage();
+        LogMessage msg = new LogMessage();
         msg.setHost(host);
 
         HostMatcher matcher = new HostMatcher();
@@ -54,18 +58,17 @@ public class HostMatcherTest {
 
         BasicDBObject mongoRule = new BasicDBObject();
         mongoRule.put("_id", new ObjectId());
-        mongoRule.put("rule_type", StreamRule.TYPE_HOST);
+        mongoRule.put("rule_type", StreamRuleImpl.TYPE_HOST);
         mongoRule.put("value", host);
 
-        StreamRule rule = new StreamRule(mongoRule);
+        StreamRuleImpl rule = new StreamRuleImpl(mongoRule);
 
-        GELFMessage msg = new GELFMessage();
+        LogMessage msg = new LogMessage();
         msg.setHost(host + "foo");
 
         HostMatcher matcher = new HostMatcher();
 
         assertFalse(matcher.match(msg, rule));
     }
-
 
 }

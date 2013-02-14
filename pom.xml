@@ -6,18 +6,27 @@
 
     <groupId>org.graylog2</groupId>
     <artifactId>graylog2-server</artifactId>
-    <version>0.9.6p1-RC2</version>
+    <version>0.10.0</version>
     <packaging>jar</packaging>
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <metrics.version>2.1.2</metrics.version>
     </properties>
+
+    <repositories>
+       <repository>
+            <id>OSS Sonatype</id>
+            <name>Sonatype Opensource Release Repo</name>
+            <url>https://oss.sonatype.org/content/repositories/releases/</url>
+        </repository>
+    </repositories>
 
     <dependencies>
         <dependency>
-            <groupId>org.syslog4j</groupId>
-            <artifactId>syslog4j</artifactId>
-            <version>0.9.46</version>
+            <groupId>com.google.guava</groupId>
+            <artifactId>guava</artifactId>
+            <version>13.0.1</version>
         </dependency>
         <dependency>
             <groupId>com.googlecode.json-simple</groupId>
@@ -41,11 +50,6 @@
             <artifactId>commons-codec</artifactId>
             <version>1.4</version>
             <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>com.rabbitmq</groupId>
-            <artifactId>amqp-client</artifactId>
-            <version>2.6.1</version>
         </dependency>
         <dependency>
             <groupId>org.drools</groupId>
@@ -75,12 +79,94 @@
         <dependency>
             <groupId>com.github.joschi</groupId>
             <artifactId>jadconfig</artifactId>
-            <version>0.3</version>
+            <version>0.4</version>
         </dependency>
         <dependency>
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-log4j12</artifactId>
-            <version>1.6.1</version>
+            <version>1.7.2</version>
+        </dependency>
+        <dependency>
+        	<groupId>org.elasticsearch</groupId>
+        	<artifactId>elasticsearch</artifactId>
+        	<version>0.20.4</version>
+        </dependency>
+        <dependency>
+            <groupId>org.jmock</groupId>
+            <artifactId>jmock</artifactId>
+            <version>2.5.1</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.yammer.metrics</groupId>
+            <artifactId>metrics-core</artifactId>
+            <version>${metrics.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.yammer.metrics</groupId>
+            <artifactId>metrics-graphite</artifactId>
+            <version>${metrics.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.twilio.sdk</groupId>
+            <artifactId>twilio-java-sdk</artifactId>
+            <version>3.3.9</version>
+            <classifier>jar-with-dependencies</classifier>
+        </dependency>
+        <dependency>
+            <groupId>com.googlecode.disruptor</groupId>
+            <artifactId>disruptor</artifactId>
+            <version>2.10.3</version>
+        </dependency>
+        <dependency>
+            <groupId>com.rabbitmq</groupId>
+            <artifactId>amqp-client</artifactId>
+            <version>2.8.7</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-email</artifactId>
+            <version>1.2</version>
+        </dependency>
+        <dependency>
+            <groupId>org.igniterealtime.smack</groupId>
+            <artifactId>smack</artifactId>
+            <version>3.2.1</version>
+        </dependency>
+        <dependency>
+            <groupId>org.igniterealtime.smack</groupId>
+            <artifactId>smackx</artifactId>
+            <version>3.2.1</version>
+        </dependency>
+        <dependency>
+            <groupId>io.netty</groupId>
+            <artifactId>netty</artifactId>
+            <version>3.5.11.Final</version>
+        </dependency>
+        <dependency>
+            <groupId>com.librato.metrics</groupId>
+            <artifactId>metrics-librato</artifactId>
+            <version>2.1.2.4</version>
+        </dependency>
+        <dependency>
+            <groupId>com.google.code.gson</groupId>
+            <artifactId>gson</artifactId>
+            <version>2.2.2</version>
+        </dependency>
+        <dependency>
+            <groupId>org.graylog2</groupId>
+            <artifactId>graylog2-plugin</artifactId>
+            <version>0.10.12</version>
+        </dependency>
+        <dependency>
+            <groupId>org.productivity.java</groupId>
+            <artifactId>syslog4j-graylog2</artifactId>
+            <version>0.9.48-graylog2</version>
+        </dependency>
+        <dependency>
+            <groupId>com.github.stephenc.high-scale-lib</groupId>
+            <artifactId>high-scale-lib</artifactId>
+            <version>1.1.4</version>
         </dependency>
     </dependencies>
 
@@ -114,6 +200,7 @@
                 <artifactId>maven-jar-plugin</artifactId>
                 <version>2.3.1</version>
                 <configuration>
+                    <finalName>graylog2-server</finalName>
                     <archive>
                         <manifest>
                             <mainClass>org.graylog2.Main</mainClass>
@@ -126,6 +213,7 @@
                 <artifactId>maven-assembly-plugin</artifactId>
                 <version>2.2.1</version>
                 <configuration>
+                    <finalName>graylog2-server</finalName>
                     <archive>
                         <manifest>
                             <mainClass>org.graylog2.Main</mainClass>

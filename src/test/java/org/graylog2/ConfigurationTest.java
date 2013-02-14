@@ -1,15 +1,22 @@
 package org.graylog2;
 
+import java.io.File;
+import java.io.IOException;
+import java.util.Map;
+
+import junit.framework.Assert;
+
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
+
 import com.github.joschi.jadconfig.JadConfig;
 import com.github.joschi.jadconfig.RepositoryException;
 import com.github.joschi.jadconfig.ValidationException;
 import com.github.joschi.jadconfig.repositories.InMemoryRepository;
-import junit.framework.Assert;
-import org.junit.Before;
-import org.junit.Test;
-
-import java.util.HashMap;
-import java.util.Map;
+import com.google.common.collect.Maps;
+import org.bson.types.ObjectId;
+import org.graylog2.indexer.EmbeddedElasticSearchClient;
 
 /**
  * Unit tests for {@link Configuration} class
@@ -19,15 +26,21 @@ import java.util.Map;
 public class ConfigurationTest {
 
     Map<String, String> validProperties;
+    private File tempFile;
 
     @Before
     public void setUp() {
 
-        validProperties = new HashMap<String, String>();
+        validProperties = Maps.newHashMap();
 
+        try {
+            tempFile = File.createTempFile("graylog", null);
+        } catch (IOException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
         // Required properties
-        validProperties.put("elasticsearch_url", "http://localhost:9200/");
-        validProperties.put("elasticsearch_index_name", "graylog2");
+        validProperties.put("elasticsearch_config_file", tempFile.getAbsolutePath());
         validProperties.put("force_syslog_rdns", "false");
         validProperties.put("syslog_listen_port", "514");
         validProperties.put("syslog_protocol", "udp");
@@ -37,7 +50,6 @@ public class ConfigurationTest {
         validProperties.put("mongodb_database", "test");
         validProperties.put("mongodb_host", "localhost");
         validProperties.put("mongodb_port", "27017");
-        validProperties.put("messages_collection_size", "1000");
         validProperties.put("use_gelf", "true");
         validProperties.put("gelf_listen_port", "12201");
 
@@ -48,21 +60,17 @@ public class ConfigurationTest {
         validProperties.put("forwarder_loggly_timeout", "3");
     }
 
+    @After
+    public void tearDown() {
+        tempFile.delete();
+    }
+
     @Test(expected = ValidationException.class)
     public void testValidateMongoDbAuth() throws RepositoryException, ValidationException {
 
         validProperties.put("mongodb_useauth", "true");
         validProperties.remove("mongodb_user");
         validProperties.remove("mongodb_password");
-
-        Configuration configuration = new Configuration();
-        new JadConfig(new InMemoryRepository(validProperties), configuration).process();
-    }
-
-    @Test(expected = ValidationException.class)
-    public void testValidateSyslogProtocol() throws RepositoryException, ValidationException {
-
-        validProperties.put("syslog_protocol", "noValidProtocol");
 
         Configuration configuration = new Configuration();
         new JadConfig(new InMemoryRepository(validProperties), configuration).process();
@@ -77,31 +85,12 @@ public class ConfigurationTest {
     }
 
     @Test
-    public void testGetElasticSearchUrl() throws RepositoryException, ValidationException {
+    public void testGetElasticSearchIndexPrefix() throws RepositoryException, ValidationException {
 
         Configuration configuration = new Configuration();
         new JadConfig(new InMemoryRepository(validProperties), configuration).process();
 
-        Assert.assertEquals("http://localhost:9200/", configuration.getElasticSearchUrl());
-    }
-
-    @Test
-    public void testGetElasticSearchUrlAddsTrailingSlashIfOmittedInConfigFile() throws RepositoryException, ValidationException {
-
-        validProperties.put("elasticsearch_url", "https://example.org:80");
-        Configuration configuration = new Configuration();
-        new JadConfig(new InMemoryRepository(validProperties), configuration).process();
-
-        Assert.assertEquals("https://example.org:80/", configuration.getElasticSearchUrl());
-    }
-
-    @Test
-    public void testGetElasticSearchIndexName() throws RepositoryException, ValidationException {
-
-        Configuration configuration = new Configuration();
-        new JadConfig(new InMemoryRepository(validProperties), configuration).process();
-
-        Assert.assertEquals("graylog2", configuration.getElasticSearchIndexName());
+        Assert.assertEquals("graylog2", configuration.getElasticSearchIndexPrefix());
     }
 
     @Test
@@ -144,27 +133,7 @@ public class ConfigurationTest {
         Assert.assertEquals(5, configuration.getMongoThreadsAllowedToBlockMultiplier());
     }
 
-    @Test
-    public void testGetLogglyTimeout() throws RepositoryException, ValidationException {
-
-        validProperties.put("forwarder_loggly_timeout", "5");
-        Configuration configuration = new Configuration();
-        new JadConfig(new InMemoryRepository(validProperties), configuration).process();
-
-        Assert.assertEquals(5000, configuration.getForwarderLogglyTimeout());
-    }
-
-    @Test
-    public void testGetLogglyTimeoutDefault() throws RepositoryException, ValidationException {
-
-        validProperties.remove("forwarder_loggly_timeout");
-        Configuration configuration = new Configuration();
-        new JadConfig(new InMemoryRepository(validProperties), configuration).process();
-
-        Assert.assertEquals(3000, configuration.getForwarderLogglyTimeout());
-    }
-
-    @Test
+    /*@Test
     public void testGetAMQPSubscribedQueuesEmpty() throws RepositoryException, ValidationException {
         validProperties.put("amqp_subscribed_queues", "");
         Configuration configuration = new Configuration();
@@ -198,7 +167,7 @@ public class ConfigurationTest {
         new JadConfig(new InMemoryRepository(validProperties), configuration).process();
 
         Assert.assertEquals(2, configuration.getAmqpSubscribedQueues().size());
-    }
+    }*/
 
     @Test
     public void testGetMongoDBReplicaSetServersEmpty() throws RepositoryException, ValidationException {
@@ -220,7 +189,7 @@ public class ConfigurationTest {
 
     @Test
     public void testGetMongoDBReplicaSetServersUnknownHost() throws RepositoryException, ValidationException {
-        validProperties.put("mongodb_replica_set", "this-host-hopefully-does-not-exist:27017");
+        validProperties.put("mongodb_replica_set", "this-host-hopefully-does-not-exist.:27017");
         Configuration configuration = new Configuration();
         new JadConfig(new InMemoryRepository(validProperties), configuration).process();
 
@@ -229,11 +198,72 @@ public class ConfigurationTest {
 
     @Test
     public void testGetMongoDBReplicaSetServers() throws RepositoryException, ValidationException {
-        validProperties.put("mongodb_replica_set", "localhost:27017,localhost:27018");
+        validProperties.put("mongodb_replica_set", "127.0.0.1:27017,127.0.0.1:27018");
 
         Configuration configuration = new Configuration();
         new JadConfig(new InMemoryRepository(validProperties), configuration).process();
 
         Assert.assertEquals(2, configuration.getMongoReplicaSet().size());
+    }
+
+    @Test
+    public void testGetLibratoMetricsStreamFilter() throws RepositoryException, ValidationException {
+        ObjectId id1 = new ObjectId();
+        ObjectId id2 = new ObjectId();
+        ObjectId id3 = new ObjectId();
+        validProperties.put("libratometrics_stream_filter", id1.toString() + "," + id2.toString() + "," + id3.toString());
+
+        Configuration configuration = new Configuration();
+        new JadConfig(new InMemoryRepository(validProperties), configuration).process();
+
+        Assert.assertEquals(3, configuration.getLibratoMetricsStreamFilter().size());
+        Assert.assertTrue(configuration.getLibratoMetricsStreamFilter().contains(id1.toString()));
+        Assert.assertTrue(configuration.getLibratoMetricsStreamFilter().contains(id2.toString()));
+        Assert.assertTrue(configuration.getLibratoMetricsStreamFilter().contains(id3.toString()));
+    }
+
+    @Test
+    public void testGetLibratoMetricsPrefix() throws RepositoryException, ValidationException {
+        validProperties.put("libratometrics_prefix", "lolwut");
+        Configuration configuration = new Configuration();
+        new JadConfig(new InMemoryRepository(validProperties), configuration).process();
+
+        Assert.assertEquals("lolwut", configuration.getLibratoMetricsPrefix());
+    }
+
+    @Test
+    public void testGetLibratoMetricsPrefixHasStandardValue() throws RepositoryException, ValidationException {
+        // Nothing set.
+        Configuration configuration = new Configuration();
+        new JadConfig(new InMemoryRepository(validProperties), configuration).process();
+
+        Assert.assertEquals("gl2-", configuration.getLibratoMetricsPrefix());
+    }
+    
+    @Test
+    public void testGetRecentIndexStoreType() throws RepositoryException, ValidationException {
+        validProperties.put("recent_index_store_type", "mmapfs");
+        Configuration configuration = new Configuration();
+        new JadConfig(new InMemoryRepository(validProperties), configuration).process();
+
+        Assert.assertEquals("mmapfs", configuration.getRecentIndexStoreType());
+    }
+    
+    @Test
+    public void testGetRecentIndexStoreTypeHasStandardValue() throws RepositoryException, ValidationException {
+        // Nothing set.
+        Configuration configuration = new Configuration();
+        new JadConfig(new InMemoryRepository(validProperties), configuration).process();
+
+        Assert.assertEquals(EmbeddedElasticSearchClient.STANDARD_RECENT_INDEX_STORE_TYPE, configuration.getRecentIndexStoreType());
+    }
+    
+    @Test
+    public void testGetRecentIndexStoreTypeFallsBackToStandardInCaseOfInvalidType() throws RepositoryException, ValidationException {
+        validProperties.put("recent_index_store_type", "LOLSOMETHINGINVALID");
+        Configuration configuration = new Configuration();
+        new JadConfig(new InMemoryRepository(validProperties), configuration).process();
+
+        Assert.assertEquals(EmbeddedElasticSearchClient.STANDARD_RECENT_INDEX_STORE_TYPE, configuration.getRecentIndexStoreType());
     }
 }

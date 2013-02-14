@@ -29,22 +29,34 @@ echo $BUILD_DATE > $BUILD_DIR/build_date
 echo "Copying files ..."
 
 # Copy files.
-cp ../target/*-with-dependencies.jar ../README ../COPYING $BUILD_DIR -r
+cp -R ../target/graylog2-server-jar-with-dependencies.jar ../README.markdown ../COPYING $BUILD_DIR
 
 # Rename jar
-mv $BUILD_DIR/*-with-dependencies.jar $BUILD_DIR/graylog2-server.jar
+mv $BUILD_DIR/graylog2-server-jar-with-dependencies.jar $BUILD_DIR/graylog2-server.jar
 
-# Copy example config file
+# Copy example config files
 cp ../misc/graylog2.conf $BUILD_DIR/graylog2.conf.example
+cp ../misc/elasticsearch.yml $BUILD_DIR/elasticsearch.yml.example
 
 # Copy control script
-cp copy/bin $BUILD_DIR -r
+cp -R copy/bin $BUILD_DIR
+
+# Create empty plugin directories.
+mkdir -p $BUILD_DIR/plugin
+mkdir -p $BUILD_DIR/plugin/filters
+mkdir -p $BUILD_DIR/plugin/outputs
+mkdir -p $BUILD_DIR/plugin/inputs
+mkdir -p $BUILD_DIR/plugin/initializers
+mkdir -p $BUILD_DIR/plugin/transports
+mkdir -p $BUILD_DIR/plugin/alarm_callbacks
+
+mkdir -p $BUILD_DIR/log
 
 cd builds/
 
 # tar it
 echo "Building Tarball ..."
-tar cfz $BUILD_NAME.tar.gz $BUILD_NAME
+gnutar cfz $BUILD_NAME.tar.gz $BUILD_NAME
 rm -rf ./$BUILD_NAME
 
 echo "DONE! Created Graylog2 release $BUILD_NAME on $BUILD_DATE"

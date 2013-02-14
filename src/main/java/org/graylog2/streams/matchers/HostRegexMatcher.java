@@ -1,5 +1,5 @@
 /**
- * Copyright 2011 Lennart Koopmann <lennart@socketfeed.com>
+ * Copyright 2011, 2012, 2013 Lennart Koopmann <lennart@socketfeed.com>
  *
  * This file is part of Graylog2.
  *
@@ -21,20 +21,17 @@
 package org.graylog2.streams.matchers;
 
 import java.util.regex.Pattern;
-import org.graylog2.messagehandlers.gelf.GELFMessage;
-import org.graylog2.streams.StreamRule;
+import org.graylog2.plugin.logmessage.LogMessage;
+import org.graylog2.plugin.streams.StreamRule;
 
 /**
- * HostRegeMatcher.java: Jun 21, 2011 9:56:31 PM
- *
- * [description]
- *
  * @author Lennart Koopmann <lennart@socketfeed.com>
  */
-public class HostRegexMatcher implements StreamRuleMatcherIF {
+public class HostRegexMatcher implements StreamRuleMatcher {
 
-    public boolean match(GELFMessage msg, StreamRule rule) {
-        return Pattern.compile(rule.getValue(), Pattern.DOTALL).matcher(msg.getHost()).matches();
+    @Override
+    public boolean match(LogMessage msg, StreamRule rule) {
+        return Pattern.compile(rule.getValue(), Pattern.DOTALL).matcher(msg.getHost()).find();
     }
 
 }

@@ -20,15 +20,33 @@ public class CommandLineArguments {
     @Parameter(names = {"-p", "--pidfile"}, description = "File containing the PID of graylog2")
     private String pidFile = TMPDIR + FILE_SEPARATOR + "graylog2.pid";
 
+    @Parameter(names = {"-np", "--no-pid-file"}, description = "Do not write a PID file (overrides -p/--pidfile)")
+    private boolean noPidFile = false;
+
     @Parameter(names = {"-t", "--configtest"}, description = "Validate graylog2 configuration and exit")
     private boolean configTest = false;
 
     @Parameter(names = {"-d", "--debug"}, description = "Run graylog2 in debug mode")
     private boolean debug = false;
+    
+    @Parameter(names = {"-l", "--local"}, description = "Run graylog2 in local mode. Only interesting for Graylog2 developers.")
+    private boolean local = false;
+    
+    @Parameter(names = {"-s", "--statistics"}, description = "Print utilization statistics to STDOUT")
+    private boolean stats = false;
 
     @Parameter(names = {"-r", "--no-retention"}, description = "Do not automatically remove messages from index that are older than the retention time")
     private boolean noRetention = false;
 
+    @Parameter(names = {"-x", "--install-plugin"}, description = "Install plugin with provided short name from graylog2.org")
+    private String pluginShortname;
+    
+    @Parameter(names = {"-v", "--plugin-version"}, description = "Install plugin with this version")
+    private String pluginVersion = Core.GRAYLOG2_VERSION;
+
+    @Parameter(names = {"-m", "--force-plugin"}, description = "Force plugin installation even if this version of graylog2-server is not officially supported.")
+    private boolean forcePlugin = false;
+    
     @Parameter(names = "--version", description = "Show version of graylog2 and exit")
     private boolean showVersion = false;
 
@@ -51,6 +69,14 @@ public class CommandLineArguments {
         this.pidFile = pidFile;
     }
 
+    public boolean isNoPidFile() {
+        return noPidFile;
+    }
+
+    public void setNoPidFile(final boolean noPidFile) {
+        this.noPidFile = noPidFile;
+    }
+
     public boolean isConfigTest() {
         return configTest;
     }
@@ -61,6 +87,14 @@ public class CommandLineArguments {
 
     public boolean isDebug() {
         return debug;
+    }
+    
+    public boolean isLocal() {
+        return local;
+    }
+    
+    public boolean isStats() {
+        return stats;
     }
 
     public void setDebug(boolean debug) {
@@ -86,4 +120,21 @@ public class CommandLineArguments {
     public void setShowHelp(boolean showHelp) {
         this.showHelp = showHelp;
     }
+    
+    public boolean isInstallPlugin() {
+        return pluginShortname != null && !pluginShortname.isEmpty();
+    }
+    
+    public String getPluginShortname() {
+        return pluginShortname;
+    }
+    
+    public String getPluginVersion() {
+        return pluginVersion;
+    }
+    
+    public boolean isForcePlugin() {
+        return forcePlugin;
+    }
+    
 }

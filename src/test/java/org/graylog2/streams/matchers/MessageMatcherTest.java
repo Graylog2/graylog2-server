@@ -20,16 +20,22 @@
 
 package org.graylog2.streams.matchers;
 
+import org.graylog2.plugin.logmessage.LogMessage;
 import java.util.Map;
 import org.bson.types.ObjectId;
+
+import com.google.common.collect.Maps;
 import com.mongodb.BasicDBObject;
 import java.util.HashMap;
-import org.graylog2.messagehandlers.gelf.GELFMessage;
-import org.graylog2.streams.StreamRule;
+import org.graylog2.streams.StreamRuleImpl;
 import org.junit.Test;
 import static org.junit.Assert.*;
 
 public class MessageMatcherTest {
+    @Test
+    public void testTheTruthToWork() {
+        assertTrue(true);
+    }
 
     @Test
     public void testSuccessfulMatch() {
@@ -38,12 +44,12 @@ public class MessageMatcherTest {
 
         BasicDBObject mongoRule = new BasicDBObject();
         mongoRule.put("_id", new ObjectId());
-        mongoRule.put("rule_type", StreamRule.TYPE_MESSAGE);
+        mongoRule.put("rule_type", StreamRuleImpl.TYPE_MESSAGE);
         mongoRule.put("value",  regex);
 
-        StreamRule rule = new StreamRule(mongoRule);
+        StreamRuleImpl rule = new StreamRuleImpl(mongoRule);
 
-        GELFMessage msg = new GELFMessage();
+        LogMessage msg = new LogMessage();
         msg.setShortMessage(message);
 
         MessageMatcher matcher = new MessageMatcher();
@@ -58,12 +64,12 @@ public class MessageMatcherTest {
 
         BasicDBObject mongoRule = new BasicDBObject();
         mongoRule.put("_id", new ObjectId());
-        mongoRule.put("rule_type", StreamRule.TYPE_MESSAGE);
+        mongoRule.put("rule_type", StreamRuleImpl.TYPE_MESSAGE);
         mongoRule.put("value",  regex);
 
-        StreamRule rule = new StreamRule(mongoRule);
+        StreamRuleImpl rule = new StreamRuleImpl(mongoRule);
 
-        GELFMessage msg = new GELFMessage();
+        LogMessage msg = new LogMessage();
         msg.setShortMessage(message);
 
         MessageMatcher matcher = new MessageMatcher();
@@ -76,7 +82,7 @@ public class MessageMatcherTest {
      */
     @Test
     public void testSpecificMatches() {
-        Map<String, String> cases = new HashMap<String, String>();
+        Map<String, String> cases = Maps.newHashMap();
 
         cases.put("su: (to myuser) root on none", "(su|sudo).+"); // http://jira.graylog2.org/browse/SERVER-11
         cases.put("MyHostname su: (to myuser) root on none\n", ".+su.+"); // http://jira.graylog2.org/browse/SERVER-11
@@ -88,12 +94,12 @@ public class MessageMatcherTest {
         for (Map.Entry<String, String> e : cases.entrySet()) {
             BasicDBObject mongoRule = new BasicDBObject();
             mongoRule.put("_id", new ObjectId());
-            mongoRule.put("rule_type", StreamRule.TYPE_MESSAGE);
+            mongoRule.put("rule_type", StreamRuleImpl.TYPE_MESSAGE);
             mongoRule.put("value",  e.getValue());
 
-            StreamRule rule = new StreamRule(mongoRule);
+            StreamRuleImpl rule = new StreamRuleImpl(mongoRule);
 
-            GELFMessage msg = new GELFMessage();
+            LogMessage msg = new LogMessage();
             msg.setShortMessage(e.getKey());
 
             MessageMatcher matcher = new MessageMatcher();
@@ -101,6 +107,5 @@ public class MessageMatcherTest {
             assertTrue(matcher.match(msg, rule));
         }
     }
-
 
 }

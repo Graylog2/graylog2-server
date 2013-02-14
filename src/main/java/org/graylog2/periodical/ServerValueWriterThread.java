@@ -20,27 +20,29 @@
 
 package org.graylog2.periodical;
 
-import org.apache.log4j.Logger;
-import org.graylog2.HostSystem;
-import org.graylog2.ServerValue;
-import org.graylog2.Tools;
-import org.graylog2.database.MongoBridge;
-import org.graylog2.messagehandlers.common.MessageCounter;
-import org.graylog2.messagequeue.MessageQueue;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.graylog2.Core;
+import org.graylog2.MessageCounterImpl;
+import org.graylog2.plugin.MessageCounter;
 
 /**
- * ServerValueWriterThread.java
- * <p/>
  * Periodically writes server values to MongoDB.
  *
  * @author Lennart Koopmann <lennart@socketfeed.com>
  */
 public class ServerValueWriterThread implements Runnable {
 
-    private static final Logger LOG = Logger.getLogger(ServerValueWriterThread.class);
+    private static final Logger LOG = LoggerFactory.getLogger(ServerValueWriterThread.class);
 
     public static final int PERIOD = 5;
     public static final int INITIAL_DELAY = 0;
+
+    private final Core graylogServer;
+
+    public ServerValueWriterThread(Core graylogServer) {
+        this.graylogServer = graylogServer;
+    }
 
     /**
      * Start the thread. Runs forever.
@@ -49,12 +51,12 @@ public class ServerValueWriterThread implements Runnable {
     public void run() {
         try {
             // ohai, we are alive. \o/
-            ServerValue.ping();
+            graylogServer.getServerValues().ping();
 
             // Current throughput.
-            MessageCounter c = MessageCounter.getInstance();
-            ServerValue.writeThroughput(c.getFiveSecondThroughput(), c.getHighestFiveSecondThroughput());
-            c.resetFiveSecondThroughput(); // Reset five second throughput count.
+            MessageCounter c = this.graylogServer.getMessageCounterManager().get(Core.MASTER_COUNTER_NAME);
+            graylogServer.getServerValues().writeThroughput(c.getThroughput(), c.getHighestThroughput());
+            c.resetThroughput(); // Reset five second throughput count.
 
             /*
              * Message queue size is written in BulkIndexerThread. More about the
