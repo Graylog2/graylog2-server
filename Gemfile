@@ -2,8 +2,8 @@ source :rubygems
 
 gem 'rack', '~> 1.4.1'
 gem 'rake', '~> 0.9.2'
-gem 'rails', '~> 3.2.11'
-gem 'json', '~> 1.5.1'
+gem 'rails', '~> 3.2.12'
+gem 'json', '~> 1.5.5'
 gem 'chronic', '~> 0.6.7'
 gem 'pony', '~> 1.1'  # unusual version number
 gem 'graylog2-declarative_authorization', '~> 0.5.2', :require => 'declarative_authorization'
