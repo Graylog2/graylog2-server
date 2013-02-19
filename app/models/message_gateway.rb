@@ -107,7 +107,7 @@ class MessageGateway
         end
       end
 
-      filter :term, :streams => opts[:stream].id if opts[:stream]
+      filter :term, :streams => opts[:stream].id.to_s if opts[:stream]
       filter :term, :host => opts[:host].host if opts[:host]
 
       filter :range, :created_at => { :gte => opts[:since] } if !opts[:since].blank?

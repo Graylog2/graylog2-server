@@ -32,13 +32,13 @@
       # Check streams for reader.
       block_access_for_non_admins if !@stream.accessable_for_user?(current_user)
         
-      @total_count = MessageGateway.stream_count(@stream.id)
+      @total_count = MessageGateway.stream_count(@stream.id.to_s)
       
       if params[:filters].blank?
-        @messages = MessageGateway.all_of_stream_paginated(@stream.id, params[:page], :all => showall)
+        @messages = MessageGateway.all_of_stream_paginated(@stream.id.to_s, params[:page], :all => showall)
       else
         @additional_filters = Quickfilter.extract_additional_fields_from_request(params[:filters])
-        @messages = MessageGateway.all_by_quickfilter(params[:filters], params[:page], :stream_id => @stream.id, :distribution => params[:distribution_field])
+        @messages = MessageGateway.all_by_quickfilter(params[:filters], params[:page], :stream_id => @stream.id.to_s, :distribution => params[:distribution_field])
         @quickfilter_result_count = @messages.total_result_count
       end
     else

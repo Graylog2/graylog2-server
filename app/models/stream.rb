@@ -35,10 +35,6 @@ class Stream
 
   RESERVED_OUTPUT_FIELDS = %w( id typeclass description )
 
-  def id
-    _id.to_s
-  end
-
   def self.find_by_id(_id)
     _id = $1 if /^([0-9a-f]+)-/ =~ _id
     first(:conditions => { :_id => BSON::ObjectId(_id)})

@@ -10,6 +10,7 @@ class MessageInput
     org.graylog2.inputs.syslog.SyslogUDPInput
     org.graylog2.inputs.gelf.GELFUDPInput
     org.graylog2.inputs.gelf.GELFTCPInput
+    org.graylog2.inputs.gelf.GELFHttpInput
     org.graylog2.inputs.amqp.AMQPInput
   )
 

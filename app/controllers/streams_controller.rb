@@ -46,7 +46,7 @@ class StreamsController < ApplicationController
       flash[:error] = "Missing or invalid range parameters."
     end
 
-    @messages = MessageGateway.all_in_range(params[:page], @from.to_i, @to.to_i, :stream_id => @stream.id)
+    @messages = MessageGateway.all_in_range(params[:page], @from.to_i, @to.to_i, :stream_id => @stream.id.to_s)
     @total_count = @messages.total_result_count
   end
 
@@ -268,15 +268,15 @@ class StreamsController < ApplicationController
   end
 
   def destroy
-    @stream = Stream.find_by_id params[:id]
-    if @stream.destroy
+    stream = Stream.find_by_id params[:id]
+    if stream.destroy
       flash[:notice] = "Stream has been deleted"
     else
       flash[:error] = "Could not delete stream"
     end
 
     # also delete stream alarms. (zomg this should be done in stream model)
-    AlertedStream.delete_all(:stream_id => @stream.id)
+    AlertedStream.delete_all(:stream_id => stream.id)
 
     redirect_to streams_path
   end
