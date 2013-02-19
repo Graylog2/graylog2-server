@@ -1,8 +1,17 @@
 <h1>Alarm settings of stream <span class="highlighted"><%= @stream.title_possibly_disabled %></span></h1>
 
-<div class="short-description">An alarm is triggered when the number of messages in the defined timespan
+<div class="short-description">
+
+An alarm is triggered when the number of messages in the defined timespan
 is higher than the maximum. All users who enabled receiving of alarms will be notified
-of the alarm. You can also define that all users are alarmed, no matter what they defined.</div>
+of the alarm. You can also define that all users are alarmed, no matter what they defined.
+
+<br />
+<strong>Important:</strong> Alarms will be sent via built in (Email, XMPP) or plugin transports. If you
+want to use the built in transports, they must be enabled and configured in your graylog2.conf. Addresses
+of users are configured in the user settings.
+
+</div>
 
 <%=raw ajaxtrigger(:active, "Active", togglealarmactive_stream_path(@stream), @stream.alarm_active) %>
 <br />
