@@ -22,7 +22,14 @@ package org.graylog2;
 
 import org.graylog2.plugin.Tools;
 import org.bson.types.ObjectId;
+import org.cliffc.high_scale_lib.Counter;
+import org.cliffc.high_scale_lib.NonBlockingHashMap;
+
+import java.util.HashMap;
 import java.util.Map;
+import java.util.Map.Entry;
+import java.util.concurrent.atomic.AtomicInteger;
+
 import com.google.common.collect.Maps;
 import org.graylog2.plugin.MessageCounter;
 
@@ -34,31 +41,44 @@ import org.graylog2.plugin.MessageCounter;
  */
 public final class MessageCounterImpl implements MessageCounter {
 
-    private int total;
-    private final Map<String, Integer> streams = Maps.newConcurrentMap();
-    private final Map<String, Integer> hosts = Maps.newConcurrentMap();
+    private Counter total = new Counter();
+    private NonBlockingHashMap<String, Counter> streams =new NonBlockingHashMap<String, Counter>();
+    private NonBlockingHashMap<String, Counter> hosts = new NonBlockingHashMap<String, Counter>();
 
-    private int throughput = 0;
-    private int highestThroughput = 0;
+    private AtomicInteger throughput = new AtomicInteger();
+    private long highestThroughput = 0;
 
     public int getTotalCount() {
-        return this.total;
+        return (int) this.total.get();
     }
 
     public Map<String, Integer> getStreamCounts() {
-        return this.streams;
+        
+        HashMap<String, Integer> r = new HashMap<String, Integer>(this.streams.size());
+        
+        for (Entry<String, Counter> entry : this.streams.entrySet()) {
+            r.put(entry.getKey(),(int) entry.getValue().get());
+        }
+        
+        return r;
     }
 
     public Map<String, Integer> getHostCounts() {
-        return this.hosts;
+        HashMap<String, Integer> r = new HashMap<String, Integer>(this.hosts.size());
+        
+        for (Entry<String, Counter> entry : this.hosts.entrySet()) {
+            r.put(entry.getKey(),(int) entry.getValue().get());
+        }
+        
+        return r;
     }
 
     public int getThroughput() {
-        return this.throughput;
+        return (int) this.throughput.get();
     }
 
     public int getHighestThroughput() {
-        return this.highestThroughput;
+        return (int) this.highestThroughput;
     }
 
     public void resetAllCounts() {
@@ -68,33 +88,33 @@ public final class MessageCounterImpl implements MessageCounter {
     }
 
     public void resetHostCounts() {
-        this.hosts.clear();
+        this.hosts = new NonBlockingHashMap<String, Counter>(this.hosts.size());
     }
 
     public void resetStreamCounts() {
-        this.streams.clear();
+        this.streams = new NonBlockingHashMap<String, Counter>(this.streams.size());
     }
 
     public void resetTotal() {
-        this.total = 0;
+        this.total.set(0);
     }
 
     public void resetThroughput() {
-        this.throughput = 0;
+        this.throughput.set( 0 );
     }
 
     /**
      * Increment total count by 1.
      */
     public void incrementTotal() {
-        this.countUpTotal(1);
+        this.total.increment();
     }
 
     /**
      * Increment five second throughput by 1.
      */
     public void incrementThroughput() {
-        this.countUpThroughput(1);
+        countUpThroughput(1);
     }
 
     /**
@@ -103,7 +123,7 @@ public final class MessageCounterImpl implements MessageCounter {
      * @param x The value to add on top of current total count.
      */
     public void countUpTotal(final int x) {
-        this.total += x;
+        this.total.add( x );
     }
 
     /**
@@ -113,10 +133,10 @@ public final class MessageCounterImpl implements MessageCounter {
      * @param x The value to add on top of five second throuput.
      */
     public void countUpThroughput(final int x) {
-        this.throughput += x;
+        int t = this.throughput.addAndGet(x);
 
-        if (this.throughput > this.highestThroughput) {
-            this.highestThroughput = this.throughput;
+        if (t > this.highestThroughput) {
+            this.highestThroughput = t;
         }
     }
 
@@ -135,14 +155,17 @@ public final class MessageCounterImpl implements MessageCounter {
      * @param streamId The ID of the stream which count to increment.
      * @param x The value to add on top of the current stream count.
      */
-    public synchronized void countUpStream(final ObjectId streamId, final int x) {
-        if (this.streams.containsKey(streamId.toString())) {
-            // There already is an entry. Increment.
-            final int oldCount = this.streams.get(streamId.toString());
-            this.streams.put(streamId.toString(), oldCount+x); // Overwrites old entry.
+    public void countUpStream(final ObjectId streamId, final int x) {
+        Counter c = this.streams.get(streamId);
+        if (c != null) {
+            c.add(x);
         } else {
-            // First entry for this stream.
-            this.streams.put(streamId.toString(), x);
+            c = new Counter();
+            Counter c1 = this.streams.putIfAbsent(streamId.toString(), c );
+            
+            if ( c1 != null ) c= c1;
+            
+            c.add(x);
         }
     }
 
@@ -161,15 +184,16 @@ public final class MessageCounterImpl implements MessageCounter {
      * @param hostname The name of the host which count to increment.
      * @param x The value to add on top of the current host count.
      */
-    public synchronized void countUpHost(String hostname, final int x) {
+    public  void countUpHost(String hostname, final int x) {
         hostname = Tools.encodeBase64(hostname);
-        if (this.hosts.containsKey(hostname)) {
-            // There already is an entry. Increment.
-            final int oldCount = this.hosts.get(hostname);
-            this.hosts.put(hostname, oldCount+x); // Overwrites old entry.
+        Counter c = this.hosts.get( hostname );
+        if (c != null) {
+            c.add(x);
         } else {
-            // First entry for this stream.
-            this.hosts.put(hostname, x);
+            c = new Counter();
+            Counter c1 = this.hosts.putIfAbsent(hostname, c);
+            if (c1 !=null ) c = c1;
+            c.add(x);
         }
     }
 

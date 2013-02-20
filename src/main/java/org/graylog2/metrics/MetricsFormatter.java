@@ -1,5 +1,5 @@
 /**
- * Copyright 2011, 2012, 2013 Lennart Koopmann <lennart@socketfeed.com>
+ * Copyright 2013 Lennart Koopmann <lennart@socketfeed.com>
  *
  * This file is part of Graylog2.
  *
@@ -17,21 +17,23 @@
  * along with Graylog2.  If not, see <http://www.gnu.org/licenses/>.
  *
  */
+package org.graylog2.metrics;
 
-package org.graylog2.streams.matchers;
-
-import java.util.regex.Pattern;
-import org.graylog2.plugin.logmessage.LogMessage;
-import org.graylog2.plugin.streams.StreamRule;
+import java.util.Map;
 
 /**
  * @author Lennart Koopmann <lennart@socketfeed.com>
  */
-public class HostRegexMatcher implements StreamRuleMatcher {
-
-    @Override
-    public boolean match(LogMessage msg, StreamRule rule) {
-        return Pattern.compile(rule.getValue(), Pattern.DOTALL).matcher(msg.getHost()).find();
+public class MetricsFormatter {
+    
+    protected MetricsFormatter() { /* nananana */ }
+    
+    protected String buildStreamMetricName(String streamId, Map<String, String> streamNames) {
+        if (!streamNames.containsKey(streamId) || streamNames.get(streamId) == null || streamNames.get(streamId).isEmpty()) {
+            return "noname-" + streamId;
+        }
+        
+        return streamNames.get(streamId).toLowerCase().replaceAll("[^a-zA-Z0-9]", "");
     }
-
+    
 }

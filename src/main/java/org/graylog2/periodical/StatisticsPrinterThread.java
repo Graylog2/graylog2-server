@@ -32,7 +32,7 @@ public class StatisticsPrinterThread implements Runnable {
     public static final int PERIOD = 5;
     
     private final Core server;
-    
+        
     public StatisticsPrinterThread(Core server) {
         this.server = server;
     }
@@ -41,6 +41,7 @@ public class StatisticsPrinterThread implements Runnable {
     public void run() {
         bufferWatermarks();
         memory();
+        messageCounts();
     }
     
     private void print(String subtype, String what) {
@@ -65,6 +66,11 @@ public class StatisticsPrinterThread implements Runnable {
         print("heap", "Free memory (MB): " + runtime.freeMemory() / mb);
         print("heap", "Total memory (MB): " + runtime.totalMemory() / mb);
         print("heap", "Max memory (MB): " + runtime.maxMemory() / mb);
+    }
+    
+    private void messageCounts() {
+        print("written", "Messages written to all outputs: " + server.getBenchmarkCounter().get());
+        server.getBenchmarkCounter().set(0);
     }
     
 }

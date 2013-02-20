@@ -6,7 +6,7 @@
 
     <groupId>org.graylog2</groupId>
     <artifactId>graylog2-server</artifactId>
-    <version>0.10.0-rc.2</version>
+    <version>0.10.0</version>
     <packaging>jar</packaging>
 
     <properties>
@@ -27,11 +27,6 @@
             <groupId>com.google.guava</groupId>
             <artifactId>guava</artifactId>
             <version>13.0.1</version>
-        </dependency>
-        <dependency>
-            <groupId>org.syslog4j</groupId>
-            <artifactId>syslog4j</artifactId>
-            <version>0.9.46</version>
         </dependency>
         <dependency>
             <groupId>com.googlecode.json-simple</groupId>
@@ -94,7 +89,7 @@
         <dependency>
         	<groupId>org.elasticsearch</groupId>
         	<artifactId>elasticsearch</artifactId>
-        	<version>0.20.1</version>
+        	<version>0.20.4</version>
         </dependency>
         <dependency>
             <groupId>org.jmock</groupId>
@@ -161,7 +156,17 @@
         <dependency>
             <groupId>org.graylog2</groupId>
             <artifactId>graylog2-plugin</artifactId>
-            <version>0.10.9</version>
+            <version>0.10.12</version>
+        </dependency>
+        <dependency>
+            <groupId>org.productivity.java</groupId>
+            <artifactId>syslog4j-graylog2</artifactId>
+            <version>0.9.48-graylog2</version>
+        </dependency>
+        <dependency>
+            <groupId>com.github.stephenc.high-scale-lib</groupId>
+            <artifactId>high-scale-lib</artifactId>
+            <version>1.1.4</version>
         </dependency>
         <dependency>
             <groupId>commons-daemon</groupId>

@@ -34,7 +34,7 @@ import org.graylog2.plugin.Tools;
  */
 public class Cluster {
  
-    private static final int PING_TIMEOUT = 7;
+    public static final int PING_TIMEOUT = 7;
     
     Core localServer;
     

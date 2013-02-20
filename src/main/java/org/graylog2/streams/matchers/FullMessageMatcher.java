@@ -1,5 +1,5 @@
 /**
- * Copyright 2011 Lennart Koopmann <lennart@socketfeed.com>
+ * Copyright 2011, 2012, 2013 Lennart Koopmann <lennart@socketfeed.com>
  *
  * This file is part of Graylog2.
  *
@@ -34,7 +34,7 @@ public class FullMessageMatcher implements StreamRuleMatcher {
 	Pattern messagePattern = Pattern.compile(rule.getValue(), Pattern.DOTALL);
 	String fullMessage = msg.getFullMessage();
 		
-        return (fullMessage != null && messagePattern.matcher(msg.getFullMessage()).matches());
+        return (fullMessage != null && messagePattern.matcher(msg.getFullMessage()).find());
     }
 
 }

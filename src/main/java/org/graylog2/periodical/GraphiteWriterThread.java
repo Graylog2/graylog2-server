@@ -21,7 +21,7 @@
 package org.graylog2.periodical;
 
 import org.graylog2.Core;
-import org.graylog2.GraphiteFormatter;
+import org.graylog2.metrics.GraphiteFormatter;
 import org.graylog2.plugin.MessageCounter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -34,6 +34,7 @@ import java.net.SocketAddress;
 import java.net.SocketException;
 import java.net.UnknownHostException;
 import java.util.List;
+import org.graylog2.streams.StreamImpl;
 
 /**
  * @author Lennart Koopmann <lennart@socketfeed.com>
@@ -72,7 +73,8 @@ public class GraphiteWriterThread implements Runnable {
         try {
             GraphiteFormatter f = new GraphiteFormatter(
                     counter,
-                    graylogServer.getConfiguration().getGraphitePrefix()
+                    graylogServer.getConfiguration().getGraphitePrefix(),
+                    StreamImpl.nameMap(graylogServer)
             );
             
             send(f.getAllMetrics());
