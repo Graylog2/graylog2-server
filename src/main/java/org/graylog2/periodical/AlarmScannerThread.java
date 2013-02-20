@@ -90,7 +90,8 @@ public class AlarmScannerThread implements Runnable {
                 // Update last alarm timestamp.
                 stream.setLastAlarm(Tools.getUTCTimestamp(), graylogServer);
                 
-                MessageCountAlarm alarm = new MessageCountAlarm(stream.getAlarmReceivers(graylogServer));
+                MessageCountAlarm alarm = new MessageCountAlarm(stream, stream.getAlarmReceivers(graylogServer));
+                alarm.setMessageCount(messageCount);
                 alarm.setTopic("Stream message count alert: [" + stream.getTitle() + "]");
                 alarm.setDescription("Stream [" + stream.getTitle() + "] received " + messageCount
                         + " messages in the last " + stream.getAlarmTimespan() + " minutes."

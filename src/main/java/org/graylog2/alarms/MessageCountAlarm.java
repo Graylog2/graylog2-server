@@ -24,21 +24,29 @@ import java.util.Set;
 import org.graylog2.plugin.alarms.Alarm;
 import org.graylog2.plugin.alarms.AlarmReceiver;
 import org.graylog2.plugin.alarms.transports.Transport;
+import org.graylog2.plugin.streams.Stream;
 
 /**
  * @author Lennart Koopmann <lennart@socketfeed.com>
  */
 public class MessageCountAlarm implements Alarm {
 
+    private int messageCount;
     private String topic;
     private String description;
     
+    private final Stream stream;
     private final Set<AlarmReceiver> receivers;
     
-    public MessageCountAlarm(Set<AlarmReceiver> receivers) {
+    public MessageCountAlarm(Stream stream, Set<AlarmReceiver> receivers) {
+        this.stream = stream;
         this.receivers = receivers;
     }
-    
+
+    public void setMessageCount(int messageCount) {
+        this.messageCount = messageCount;
+    }
+
     public void setTopic(String topic) {
         this.topic = topic;
     }
@@ -56,6 +64,17 @@ public class MessageCountAlarm implements Alarm {
     public String getDescription() {
         return description;
     }
+    
+    @Override
+    public Stream getStream() {
+        return stream;
+    }
+    
+    @Override
+    public int getMessageCount() {
+        return messageCount;
+    }
+    
 
     @Override
     public Set<AlarmReceiver> getReceivers(Transport transport) {
