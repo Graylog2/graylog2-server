@@ -2,8 +2,8 @@ NAME=graylog2-server
 PREFIX=/usr
 DESTDIR=
 
-SERVER_W_DEP=target/graylog2-server-0.9.6-jar-with-dependencies.jar
-SERVER=target/graylog2-server-0.9.6.jar
+SERVER_W_DEP=target/graylog2-server-0.9.6p1-RC2-jar-with-dependencies.jar
+SERVER=target/graylog2-server-0.9.6p1-RC2.jar
 SYSLOG4J=lib/syslog4j-0.9.46-bin.jar
 INITD=contrib/distro/generic/graylog2-server.init.d
 CONF=misc/graylog2.conf
