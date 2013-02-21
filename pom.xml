@@ -168,6 +168,11 @@
             <artifactId>high-scale-lib</artifactId>
             <version>1.1.4</version>
         </dependency>
+        <dependency>
+            <groupId>commons-daemon</groupId>
+            <artifactId>commons-daemon</artifactId>
+            <version>1.0.10</version>
+        </dependency>
     </dependencies>
 
     <build>
