@@ -20,6 +20,9 @@
 
 package org.graylog2.inputs.gelf;
 
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+
 import org.graylog2.gelf.GELFMessage;
 import org.graylog2.gelf.GELFMessageChunk;
 import org.graylog2.TestHelper;
@@ -95,7 +98,7 @@ public class GELFMessageTest {
 
     @Test
     public void testGelfMessageChunkCreation() throws Exception {
-        String id = "foobar01";
+        long id = 1;
         int seqNum = 1;
         int seqCnt = 5;
         byte[] data = TestHelper.gzipCompress(GELF_JSON);
@@ -103,10 +106,19 @@ public class GELFMessageTest {
         GELFMessage msg = new GELFMessage(TestHelper.buildGELFMessageChunk(id, seqNum, seqCnt, data));
         GELFMessageChunk chunk = new GELFMessageChunk(msg);
         
-        assertEquals(TestHelper.toHex(id), chunk.getId());
+        assertEquals(id, chunk.getId());
         assertEquals(seqNum, chunk.getSequenceNumber());
         assertEquals(seqCnt, chunk.getSequenceCount());
-        assertArrayEquals(data, chunk.getData());
+        assertArrayEquals(data, getData(chunk));
+    }
+    
+    private byte[] getData(GELFMessageChunk buildChunk) throws IOException
+    {
+        byte[] data = new byte[ buildChunk.getBodyLength() ];
+        
+        buildChunk.writeBody(data,0);
+        
+        return data;
     }
 
 }

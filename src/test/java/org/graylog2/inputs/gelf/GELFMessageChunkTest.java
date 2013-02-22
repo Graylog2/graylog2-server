@@ -20,11 +20,17 @@
 
 package org.graylog2.inputs.gelf;
 
-import org.graylog2.gelf.GELFMessageChunk;
+import static org.junit.Assert.assertArrayEquals;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+
+import java.io.IOException;
+
 import org.graylog2.TestHelper;
+import org.graylog2.gelf.GELFMessageChunk;
 import org.graylog2.plugin.Tools;
 import org.junit.Test;
-import static org.junit.Assert.*;
 
 
 public class GELFMessageChunkTest {
@@ -33,7 +39,7 @@ public class GELFMessageChunkTest {
 
     
     private GELFMessageChunk buildChunk() throws Exception {
-        String id = "lolwat67";
+        long id = 67;
         int seqNum = 3;
         int seqCnt = 4;
         byte[] data = TestHelper.gzipCompress(GELF_JSON);
@@ -50,12 +56,22 @@ public class GELFMessageChunkTest {
 
     @Test
     public void testGetId() throws Exception {      
-        assertEquals(TestHelper.toHex("lolwat67"), buildChunk().getId());
+        assertEquals(67l, buildChunk().getId());
     }
 
     @Test
     public void testGetData() throws Exception  {
-        assertArrayEquals(TestHelper.gzipCompress(GELF_JSON), buildChunk().getData());
+        assertArrayEquals(TestHelper.gzipCompress(GELF_JSON), getData(buildChunk()));
+    }
+    
+
+    private byte[] getData(GELFMessageChunk buildChunk) throws IOException
+    {
+        byte[] data = new byte[ buildChunk.getBodyLength() ];
+        
+        buildChunk.writeBody(data,0);
+        
+        return data;
     }
 
     @Test

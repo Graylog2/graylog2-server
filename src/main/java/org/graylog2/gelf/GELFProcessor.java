@@ -55,7 +55,7 @@ public class GELFProcessor {
         this.server = server;
     }
 
-    public void messageReceived(GELFMessage message) throws BufferOutOfCapacityException {
+    public void messageReceived(GELFMessage message) throws BufferOutOfCapacityException, MessageParseException {
         incomingMessages.mark();
         
         // Convert to LogMessage
@@ -86,7 +86,7 @@ public class GELFProcessor {
         }
 
         if (json == null) {
-            throw new IllegalStateException("JSON is null/could not be parsed (invalid JSON)");
+            throw new IllegalStateException("JSON is null/could not be parsed (invalid JSON):"+message);
         }
 
         // Add standard fields.

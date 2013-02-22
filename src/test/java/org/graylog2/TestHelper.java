@@ -25,6 +25,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.math.BigInteger;
+import java.nio.ByteBuffer;
 import java.util.zip.Deflater;
 import java.util.zip.GZIPOutputStream;
 import org.graylog2.gelf.GELFMessageChunk;
@@ -58,28 +59,15 @@ public class TestHelper {
         return compressedMessage.toByteArray();
     }
 
-    public static byte[] buildGELFMessageChunk(String id, int seqNum, int seqCnt, byte[] data) throws Exception {
-        if (id.getBytes().length != 8) {
-            throw new Exception("IN TEST HELPER!!! YOU WROTE WRONG YOUR TESTS! - id must consist of 8 byte. length is: " + id.getBytes().length);
-        }
+    public static byte[] buildGELFMessageChunk(long id, int seqNum, int seqCnt, byte[] data) throws Exception {
 
-        byte[] chunkData = new byte[GELFMessageChunk.HEADER_TOTAL_LENGTH+data.length]; // Magic bytes/header + data
-        chunkData[0] = (byte) 0x1e;
-        chunkData[1] = (byte) 0x0f;
+        ByteBuffer chunk=ByteBuffer.allocate(GELFMessageChunk.HEADER_TOTAL_LENGTH+data.length);
+        // write header
+        chunk.put((byte) 0x1e).put((byte) 0x0f).putLong(id).put((byte) seqNum).put((byte) seqCnt);
+        // write body
+        chunk.put(data);
 
-        // 2,3,4,5,6,7,8,9 id
-        System.arraycopy(id.getBytes(), 0, chunkData, 2, id.getBytes().length);
-
-        // 10 seq num
-        chunkData[10] = (byte) seqNum;
-
-        // 11 seq cnt
-        chunkData[11] = (byte) seqCnt;
-
-        // 12... data
-        System.arraycopy(data, 0, chunkData, 12, data.length);
-
-        return chunkData;
+        return chunk.array();
     }
 
     public static String toHex(String arg) throws UnsupportedEncodingException {

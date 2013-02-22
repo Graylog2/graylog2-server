@@ -135,14 +135,14 @@ public class GELFMessage {
         this.length = length;
     }
 
-    public Type getGELFType() {
+    public Type getGELFType() throws MessageParseException {
         if (length < Type.HEADER_SIZE) {
-            throw new IllegalStateException("GELF message is too short. Not even the type header would fit.");
+            throw new MessageParseException("GELF message is too short. Not even the type header would fit.");
         }
         return Type.determineType(payload[offset], payload[offset+1]);
     }
 
-    public String getJSON(){
+    public String getJSON() throws MessageParseException{
         try {
             switch(getGELFType()) {
                 case ZLIB:
@@ -159,7 +159,7 @@ public class GELFMessage {
         catch (final IOException e) {
             // Note that the UnsupportedEncodingException thrown by 'new String' can never happen because UTF-8
             // is a mandatory JRE encoding which is always present. So we only need to mention the decompress exceptions here.
-            throw new IllegalStateException("Failed to decompress the GELF message payload", e);
+            throw new MessageParseException("Failed to decompress the GELF message payload", e);
         }
         return null;
     }

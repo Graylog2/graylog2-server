@@ -25,6 +25,7 @@ import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetSocketAddress;
 import java.net.SocketException;
+import java.util.Arrays;
 import java.util.Map;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -34,6 +35,7 @@ import org.graylog2.Core;
 import org.graylog2.gelf.GELFChunkManager;
 import org.graylog2.gelf.GELFMessage;
 import org.graylog2.gelf.GELFProcessor;
+import org.graylog2.gelf.MessageParseException;
 import org.graylog2.plugin.GraylogServer;
 import org.graylog2.plugin.buffers.BufferOutOfCapacityException;
 import org.graylog2.plugin.inputs.MessageInput;
@@ -87,7 +89,7 @@ public class GELFUDPBlockingInput implements MessageInput {
         
         try {
             final DatagramSocket dgs = new DatagramSocket(socketAddress);
-            int threadCount = Runtime.getRuntime().availableProcessors() * 2;
+            int threadCount = Runtime.getRuntime().availableProcessors() * 4;
             
             while (threadCount-- > 0) {
                 workerThreadPool.submit(new Runnable()
@@ -97,34 +99,41 @@ public class GELFUDPBlockingInput implements MessageInput {
                     @Override
                     public void run()
                     {
-                        while (true) {
-                            try {
-                                dgs.receive(packet);
-                                receivedMessages.mark();
+                        try {
+                            while (true) {
+                                try {
+                                    dgs.receive(packet);
+                                    receivedMessages.mark();
 
-                                InetSocketAddress remoteAddress = (InetSocketAddress) packet.getSocketAddress();
+                                    InetSocketAddress remoteAddress = (InetSocketAddress) packet.getSocketAddress();
 
-                                GELFMessage msg = new GELFMessage(packet.getData(), packet.getOffset(), packet.getLength());
+                                    try {
+                                        GELFMessage msg = new GELFMessage(packet.getData(), packet.getOffset(), packet.getLength());
 
-                                switch(msg.getGELFType()) {
-                                case CHUNKED:
-                                    dispatchedMessageChunk.mark();
-                                    chunkManager.insert(msg);
-                                    break;
-                                case ZLIB:
-                                case GZIP:
-                                case UNCOMPRESSED:
-                                case UNSUPPORTED:
-                                    dispatchedUnchunkedMessage.mark();
-                                    processor.messageReceived(msg);
-                                    break;
+                                        switch(msg.getGELFType()) {
+                                        case CHUNKED:
+                                            dispatchedMessageChunk.mark();
+                                            chunkManager.insert(msg);
+                                            break;
+                                        case ZLIB:
+                                        case GZIP:
+                                        case UNCOMPRESSED:
+                                        case UNSUPPORTED:
+                                            dispatchedUnchunkedMessage.mark();
+                                            processor.messageReceived(msg);
+                                            break;
+                                        }
+                                    } catch (MessageParseException e) {
+                                        LOG.error("Cannot parse packet received from "+packet.getAddress()+", starting from "+Arrays.toString(Arrays.copyOfRange(packet.getData(), packet.getOffset(),packet.getOffset()+11)),e);
+                                    }
+                                } catch (IOException e) {
+                                    LOG.error("Could not recv GELF UDP data to address " + socketAddress, e);
+                                } catch (BufferOutOfCapacityException e) {
+                                    LOG.error("Process Buffer is out of capacity Syslog UDP data to address " + socketAddress, e);
                                 }
-                                
-                            } catch (IOException e) {
-                                LOG.error("Could not recv Syslog UDP data to address " + socketAddress, e);
-                            } catch (BufferOutOfCapacityException e) {
-                                LOG.error("Process Buffer is out of capacity Syslog UDP data to address " + socketAddress, e);
                             }
+                        } catch (Throwable e) {
+                            LOG.error("GELF UDP is dying because of unexpected exception",e);
                         }
                     }
                 });
