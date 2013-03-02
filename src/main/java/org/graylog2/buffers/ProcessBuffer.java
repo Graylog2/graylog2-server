@@ -53,13 +53,17 @@ public class ProcessBuffer implements Buffer {
                 .build()
     );
 
-    Core server;
+    private Core server;
+    
+    private final Cache overflowCache;
     
     private final Meter incomingMessages = Metrics.newMeter(ProcessBuffer.class, "InsertedMessages", "messages", TimeUnit.SECONDS);
     private final Meter rejectedMessages = Metrics.newMeter(ProcessBuffer.class, "RejectedMessages", "messages", TimeUnit.SECONDS);
+    private final Meter cachedMessages = Metrics.newMeter(ProcessBuffer.class, "CachedMessages", "messages", TimeUnit.SECONDS);
 
-    public ProcessBuffer(Core server) {
+    public ProcessBuffer(Core server, Cache overflowCache) {
         this.server = server;
+        this.overflowCache = overflowCache;
     }
 
     public void initialize() {
@@ -86,13 +90,29 @@ public class ProcessBuffer implements Buffer {
     }
     
     @Override
-    public void insert(LogMessage message) throws BufferOutOfCapacityException {
+    public void insertCached(LogMessage message) {
         if (!hasCapacity()) {
-            LOG.warn("Rejecting message, because I am full. Raise my size or add more processors.");
+            LOG.debug("Out of capacity. Writing to cache.");
+            cachedMessages.mark();
+            overflowCache.add(message);
+            return;
+        }
+        
+        insert(message);
+    }
+    
+    @Override
+    public void insertFailFast(LogMessage message) throws BufferOutOfCapacityException {
+        if (!hasCapacity()) {
+            LOG.debug("Rejecting message, because I am full and caching was disabled by input. Raise my size or add more processors.");
             rejectedMessages.mark();
             throw new BufferOutOfCapacityException();
         }
         
+        insert(message);
+    }
+    
+    private void insert(LogMessage message) {
         long sequence = ringBuffer.next();
         LogMessageEvent event = ringBuffer.get(sequence);
         event.setMessage(message);

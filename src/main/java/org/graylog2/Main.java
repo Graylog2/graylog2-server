@@ -199,6 +199,7 @@ public final class Main {
         }
         server.registerInitializer(new BufferWatermarkInitializer());
         if (commandLineArguments.isStats()) { server.registerInitializer(new StatisticsPrinterInitializer()); }
+        server.registerInitializer(new MasterCacheWorkersInitializer());
         
         // Register inputs.
         if (configuration.isUseGELF()) {

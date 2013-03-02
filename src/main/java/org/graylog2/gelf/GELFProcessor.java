@@ -69,7 +69,7 @@ public class GELFProcessor {
         // Add to process buffer.
         LOG.debug("Adding received GELF message <{}> to process buffer: {}", lm.getId(), lm);
         processedMessages.mark();
-        server.getProcessBuffer().insert(lm);
+        server.getProcessBuffer().insertCached(lm);
     }
 
     private LogMessage parse(String message) {

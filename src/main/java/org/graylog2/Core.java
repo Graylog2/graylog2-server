@@ -1,5 +1,5 @@
 /**
- * Copyright 2012 Lennart Koopmann <lennart@socketfeed.com>
+ * Copyright 2012, 2013 Lennart Koopmann <lennart@socketfeed.com>
  *
  * This file is part of Graylog2.
  *
@@ -46,6 +46,8 @@ import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import org.cliffc.high_scale_lib.Counter;
 import org.graylog2.activities.Activity;
 import org.graylog2.activities.ActivityWriter;
+import org.graylog2.buffers.BasicCache;
+import org.graylog2.buffers.Cache;
 import org.graylog2.cluster.Cluster;
 import org.graylog2.database.HostCounterCacheImpl;
 import org.graylog2.indexer.Deflector;
@@ -61,6 +63,7 @@ import org.graylog2.plugin.filters.MessageFilter;
 import org.graylog2.plugin.indexer.MessageGateway;
 import org.graylog2.plugin.initializers.InitializerConfigurationException;
 import org.graylog2.plugin.inputs.MessageInputConfigurationException;
+import org.graylog2.plugin.logmessage.LogMessage;
 import org.graylog2.plugin.outputs.MessageOutputConfigurationException;
 import org.graylog2.plugin.streams.Stream;
 import org.graylog2.plugins.PluginConfiguration;
@@ -91,8 +94,6 @@ public class Core implements GraylogServer {
     public static final String GRAYLOG2_VERSION = "0.10.0";
 
     public static final String MASTER_COUNTER_NAME = "master";
-    
-    private int lastReceivedMessageTimestamp = 0;
 
     private EmbeddedElasticSearchClient indexer;
 
@@ -115,6 +116,9 @@ public class Core implements GraylogServer {
     private OutputBuffer outputBuffer;
     private AtomicInteger outputBufferWatermark = new AtomicInteger();
     private AtomicInteger processBufferWatermark = new AtomicInteger();
+    
+    private Cache inputCache;
+    private Cache outputCache;
     
     private Deflector deflector;
     
@@ -153,11 +157,14 @@ public class Core implements GraylogServer {
         messageCounterManager.register(MASTER_COUNTER_NAME);
 
         hostCounterCache = new HostCounterCacheImpl();
-
-        processBuffer = new ProcessBuffer(this);
+        
+        inputCache = new BasicCache();
+        outputCache = new BasicCache();
+    
+        processBuffer = new ProcessBuffer(this, inputCache);
         processBuffer.initialize();
 
-        outputBuffer = new OutputBuffer(this);
+        outputBuffer = new OutputBuffer(this, outputCache);
         outputBuffer.initialize();
 
         gelfChunkManager = new GELFChunkManager(this);
@@ -508,6 +515,14 @@ public class Core implements GraylogServer {
     
     public Counter getBenchmarkCounter() {
         return benchmarkCounter;
+    }
+
+    public Cache getInputCache() {
+        return inputCache;
+    }
+    
+    public Cache getOutputCache() {
+        return outputCache;
     }
     
 }

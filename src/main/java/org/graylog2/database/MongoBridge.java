@@ -117,6 +117,22 @@ public class MongoBridge {
         DBCollection coll = getConnection().getDatabase().getCollection("server_values");
         coll.update(query, update, true, false);
     }
+    
+    public void writeMasterCacheSizes(String serverId, int inputCacheSize, int outputCacheSize) {
+        BasicDBObject query = new BasicDBObject();
+        query.put("server_id", serverId);
+        query.put("type", "mastercache_sizes");
+
+        BasicDBObject update = new BasicDBObject();
+        update.put("server_id", serverId);
+        update.put("type", "mastercache_sizes");
+        
+        update.put("inputcache", inputCacheSize);
+        update.put("outputcache", outputCacheSize);
+        
+        DBCollection coll = getConnection().getDatabase().getCollection("server_values");
+        coll.update(query, update, true, false);
+    }
 
     public void setSimpleServerValue(String serverId, String key, Object value) {
         BasicDBObject query = new BasicDBObject();

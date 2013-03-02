@@ -1,5 +1,5 @@
 /**
- * Copyright 2012 Lennart Koopmann <lennart@socketfeed.com>
+ * Copyright 2012, 2013 Lennart Koopmann <lennart@socketfeed.com>
  *
  * This file is part of Graylog2.
  *
@@ -56,7 +56,13 @@ public class BufferWatermarkThread implements Runnable {
 
         graylogServer.getServerValues().writeBufferWatermarks(oWm, pWm);
         
-        sendMetrics(oWm, pWm);
+        graylogServer.getServerValues().writeMasterCacheSizes(
+                graylogServer.getInputCache().size(),
+                graylogServer.getOutputCache().size()
+        );
+        
+        bufferMetrics(oWm, pWm);
+        masterCacheMetrics(graylogServer.getInputCache().size(), graylogServer.getOutputCache().size());
     }
     
     private void checkValidity(AtomicInteger watermark) {
@@ -68,7 +74,7 @@ public class BufferWatermarkThread implements Runnable {
         }
     }
     
-    private void sendMetrics(final BufferWatermark outputBuffer, final BufferWatermark processBuffer) {
+    private void bufferMetrics(final BufferWatermark outputBuffer, final BufferWatermark processBuffer) {
         Metrics.newGauge(BufferWatermarkThread.class, "OutputBufferWatermark", new Gauge<Integer>() {
             @Override
             public Integer value() {
@@ -94,6 +100,22 @@ public class BufferWatermarkThread implements Runnable {
             @Override
             public Float value() {
                 return processBuffer.getUtilizationPercentage();
+            }
+        });
+    }
+    
+    private void masterCacheMetrics(final int inputCacheSize, final int outputCacheSize) {
+        Metrics.newGauge(BufferWatermarkThread.class, "InputCacheSize", new Gauge<Integer>() {
+            @Override
+            public Integer value() {
+                return inputCacheSize;
+            }
+        });
+        
+        Metrics.newGauge(BufferWatermarkThread.class, "OutputCacheSize", new Gauge<Integer>() {
+            @Override
+            public Integer value() {
+                return outputCacheSize;
             }
         });
     }

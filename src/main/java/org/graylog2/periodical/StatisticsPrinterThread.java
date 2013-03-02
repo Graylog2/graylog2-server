@@ -39,6 +39,7 @@ public class StatisticsPrinterThread implements Runnable {
     
     @Override
     public void run() {
+        caches();
         bufferWatermarks();
         memory();
         messageCounts();
@@ -48,6 +49,11 @@ public class StatisticsPrinterThread implements Runnable {
         DateTime now = new DateTime();
         
         System.out.println("[util][" + subtype + "][" + now + "] " + what);
+    }
+    
+    private void caches() {
+        print("caches", "InputCache size: " + server.getInputCache().size());
+        print("caches", "OutputCache size: " + server.getOutputCache().size());
     }
     
     private void bufferWatermarks() {

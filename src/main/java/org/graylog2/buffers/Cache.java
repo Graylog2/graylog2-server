@@ -1,5 +1,5 @@
 /**
- * Copyright 2012 Lennart Koopmann <lennart@socketfeed.com>
+ * Copyright 2012, 2013 Lennart Koopmann <lennart@socketfeed.com>
  *
  * This file is part of Graylog2.
  *
@@ -17,29 +17,18 @@
  * along with Graylog2.  If not, see <http://www.gnu.org/licenses/>.
  *
  */
+package org.graylog2.buffers;
 
-package org.graylog2;
-
-import org.graylog2.buffers.BasicCache;
-import org.graylog2.buffers.ProcessBuffer;
 import org.graylog2.plugin.logmessage.LogMessage;
 
 /**
+ * 
  * @author Lennart Koopmann <lennart@socketfeed.com>
  */
-public class ProcessBufferStub extends ProcessBuffer {
-
-    GraylogServerStub serverStub;
-
-    public ProcessBufferStub(GraylogServerStub server) {
-        super(null, new BasicCache());
-        serverStub = server;
-    }
-
-    @Override
-    public void insertCached(LogMessage msg) {
-        serverStub.callsToProcessBufferInserter++;
-        serverStub.lastInsertedToProcessBuffer = msg;
-    }
-
+public interface Cache {
+    
+    public void add(LogMessage m);
+    public LogMessage pop();
+    public int size();
+    
 }

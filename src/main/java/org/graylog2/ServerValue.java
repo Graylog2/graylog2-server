@@ -74,6 +74,10 @@ public class ServerValue {
         graylogServer.getMongoBridge().writeBufferWatermarks(graylogServer.getServerId(), outputBuffer, processBuffer);
     }
     
+    public void writeMasterCacheSizes(int inputCacheSize, int outputCacheSize) {
+        graylogServer.getMongoBridge().writeMasterCacheSizes(graylogServer.getServerId(), inputCacheSize, outputCacheSize);
+    }
+    
     public void setIsMaster(boolean isIt) {
         set("is_master", isIt);
     }
