@@ -24,7 +24,9 @@
 <% end %>
 
 <% if !params[:filters].blank? %>
-	<span class="messages-used-indices">
-	I searched in the following indices: <%= @messages.used_indices.to_sentence %>
-	</span>
+<% if !@messages.used_indices.blank? %>
+  I searched in the following indices: <%= @messages.used_indices.to_sentence %>
+<% else %>
+  I searched in no indices at all.
+<% end %>
 <% end %>
