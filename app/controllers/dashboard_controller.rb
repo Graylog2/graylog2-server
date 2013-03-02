@@ -30,7 +30,7 @@ class DashboardController < ApplicationController
       @max_messages = STANDARD_MAX_MESSAGES
       @timespan = STANDARD_TIMESPAN
     end
-    @messages = MessageGateway.all_of_stream_paginated(@stream.id)
+    @messages = MessageGateway.all_of_stream_paginated(@stream.id.to_s)
   end
 
 end
