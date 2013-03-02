@@ -245,7 +245,7 @@ public class Configuration {
     private boolean emailTransportEnabled = false;
     
     @Parameter(value = "transport_email_protocol", required = false)
-    private String emailTransportProtocol;
+    private String emailTransportProtocol = "smtp";
 
     @Parameter(value = "transport_email_hostname", required = false)
     private String emailTransportHostname;
@@ -275,7 +275,7 @@ public class Configuration {
     private String emailTransportFromName;
     
     @Parameter(value = "transport_email_web_interface_url", required = false)
-    private String emailTransportWebInterfaceUrl;
+    private String emailTransportWebInterfaceUrl = "http://your-graylog2.example.org/";
     
     // Transport: Jabber
     @Parameter(value = "transport_jabber_enabled", required = false)

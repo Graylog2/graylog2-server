@@ -156,7 +156,7 @@
         <dependency>
             <groupId>org.graylog2</groupId>
             <artifactId>graylog2-plugin</artifactId>
-            <version>0.10.13</version>
+            <version>0.10.14</version>
         </dependency>
         <dependency>
             <groupId>org.productivity.java</groupId>
