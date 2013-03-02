@@ -20,52 +20,53 @@
 
 package org.graylog2;
 
-import org.graylog2.plugin.Tools;
-import java.util.List;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.graylog2.blacklists.BlacklistCache;
-import org.graylog2.buffers.OutputBuffer;
-import org.graylog2.buffers.ProcessBuffer;
-import org.graylog2.database.MongoBridge;
-import org.graylog2.database.MongoConnection;
-import org.graylog2.indexer.EmbeddedElasticSearchClient;
-import org.graylog2.plugin.initializers.Initializer;
-import org.graylog2.plugin.inputs.MessageInput;
-import org.graylog2.gelf.GELFChunkManager;
-import org.graylog2.plugin.outputs.MessageOutput;
-import org.graylog2.streams.StreamCache;
-
 import com.google.common.collect.Lists;
-import java.util.concurrent.atomic.AtomicInteger;
 import com.google.common.collect.Maps;
-import java.util.Map;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import org.cliffc.high_scale_lib.Counter;
 import org.graylog2.activities.Activity;
 import org.graylog2.activities.ActivityWriter;
+import org.graylog2.blacklists.BlacklistCache;
+import org.graylog2.buffers.OutputBuffer;
+import org.graylog2.buffers.ProcessBuffer;
 import org.graylog2.cluster.Cluster;
 import org.graylog2.database.HostCounterCacheImpl;
+import org.graylog2.database.MongoBridge;
+import org.graylog2.database.MongoConnection;
+import org.graylog2.gelf.GELFChunkManager;
 import org.graylog2.indexer.Deflector;
-import org.graylog2.initializers.*;
+import org.graylog2.indexer.EmbeddedElasticSearchClient;
+import org.graylog2.initializers.StandardInitializerSet;
 import org.graylog2.inputs.StandardInputSet;
 import org.graylog2.plugin.GraylogServer;
+import org.graylog2.plugin.Tools;
 import org.graylog2.plugin.alarms.callbacks.AlarmCallback;
 import org.graylog2.plugin.alarms.callbacks.AlarmCallbackConfigurationException;
 import org.graylog2.plugin.alarms.transports.Transport;
 import org.graylog2.plugin.alarms.transports.TransportConfigurationException;
+import org.graylog2.plugin.buffers.BatchBuffer;
 import org.graylog2.plugin.buffers.Buffer;
 import org.graylog2.plugin.filters.MessageFilter;
 import org.graylog2.plugin.indexer.MessageGateway;
+import org.graylog2.plugin.initializers.Initializer;
 import org.graylog2.plugin.initializers.InitializerConfigurationException;
+import org.graylog2.plugin.inputs.MessageInput;
 import org.graylog2.plugin.inputs.MessageInputConfigurationException;
+import org.graylog2.plugin.outputs.MessageOutput;
 import org.graylog2.plugin.outputs.MessageOutputConfigurationException;
 import org.graylog2.plugin.streams.Stream;
 import org.graylog2.plugins.PluginConfiguration;
 import org.graylog2.plugins.PluginLoader;
+import org.graylog2.streams.StreamCache;
 import org.graylog2.streams.StreamImpl;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.util.List;
+import java.util.Map;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * Server core, handling and holding basically everything.
@@ -399,7 +400,7 @@ public class Core implements GraylogServer {
     }
 
     @Override
-    public Buffer getProcessBuffer() {
+    public BatchBuffer getProcessBuffer() {
         return this.processBuffer;
     }
 
