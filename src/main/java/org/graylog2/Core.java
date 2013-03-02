@@ -39,6 +39,8 @@ import org.graylog2.plugin.outputs.MessageOutput;
 import org.graylog2.streams.StreamCache;
 
 import com.google.common.collect.Lists;
+
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 import com.google.common.collect.Maps;
 import java.util.Map;
@@ -115,6 +117,8 @@ public class Core implements GraylogServer {
     private OutputBuffer outputBuffer;
     private AtomicInteger outputBufferWatermark = new AtomicInteger();
     private AtomicInteger processBufferWatermark = new AtomicInteger();
+    private AtomicBoolean componentsInitialized = new AtomicBoolean(false);
+    private AtomicBoolean processing = new AtomicBoolean(false);
     
     private Deflector deflector;
     
@@ -201,10 +205,28 @@ public class Core implements GraylogServer {
     public void registerAlarmCallback(AlarmCallback alarmCallback) {
         this.alarmCallbacks.add(alarmCallback);
     }
+    
+    public boolean isProcessing() {
+        return processing.get();
+    }
+    
+    public void setProcessing(boolean processing) {
+        this.processing.set(processing);
+    }
 
     @Override
     public void run() {
+        if (!componentsInitialized.get()) {
+            initializeComponents();
+        }
+             
+        while (isProcessing()) {
+            try { Thread.sleep(1000); } catch (InterruptedException e) { /* lol, i don't care */ }
+        }
 
+    }
+
+    void initializeComponents() {
         gelfChunkManager.start();
         BlacklistCache.initialize(this);
         StreamCache.initialize(this);
@@ -326,13 +348,9 @@ public class Core implements GraylogServer {
             }
         }
 
+        componentsInitialized.set(true);
         activityWriter.write(new Activity("Started up.", GraylogServer.class));
         LOG.info("Graylog2 up and running.");
-
-        while (true) {
-            try { Thread.sleep(1000); } catch (InterruptedException e) { /* lol, i don't care */ }
-        }
-
     }
     
     private <A> void loadPlugins(Class<A> type, String subDirectory) {
