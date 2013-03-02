@@ -19,6 +19,9 @@
  */
 package org.graylog2.periodical;
 
+import com.yammer.metrics.Metrics;
+import com.yammer.metrics.core.Meter;
+import java.util.concurrent.TimeUnit;
 import org.graylog2.Core;
 import org.graylog2.buffers.Cache;
 import org.graylog2.plugin.buffers.Buffer;
@@ -40,6 +43,9 @@ public class MasterCacheWorkerThread implements Runnable {
     private final String cacheName;
     private final Buffer targetBuffer;
 
+    private final Meter writtenMessages = Metrics.newMeter(MasterCacheWorkerThread.class, "SuccessfulWrites", "messages", TimeUnit.SECONDS);
+    private final Meter outOfCapacity = Metrics.newMeter(MasterCacheWorkerThread.class, "FailedWritesOutOfCapacity", "messages", TimeUnit.SECONDS);
+    
     public MasterCacheWorkerThread(Core graylogServer, Cache cache, Buffer targetBuffer) {
         this.cache = cache;
         this.cacheName = cache.getClass().getCanonicalName();
@@ -64,7 +70,9 @@ public class MasterCacheWorkerThread implements Runnable {
                             try {
                                 LOG.debug("Reading message from {}.", cacheName);
                                 targetBuffer.insertFailFast(cache.pop());
+                                writtenMessages.mark();
                             } catch (BufferOutOfCapacityException ex) {
+                                outOfCapacity.mark();
                                 LOG.debug("Target buffer out of capacity in {}. Breaking.", cacheName);
                                 break;
                             }
