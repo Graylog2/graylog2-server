@@ -124,9 +124,9 @@
             <version>2.8.7</version>
         </dependency>
         <dependency>
-            <groupId>org.apache.commons</groupId>
-            <artifactId>commons-email</artifactId>
-            <version>1.2</version>
+            <groupId>javax.mail</groupId>
+            <artifactId>mail</artifactId>
+            <version>1.4.5</version>
         </dependency>
         <dependency>
             <groupId>org.igniterealtime.smack</groupId>

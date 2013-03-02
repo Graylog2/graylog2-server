@@ -244,6 +244,9 @@ public class Configuration {
     @Parameter(value = "transport_email_enabled", required = false)
     private boolean emailTransportEnabled = false;
     
+    @Parameter(value = "transport_email_protocol", required = false)
+    private String emailTransportProtocol;
+
     @Parameter(value = "transport_email_hostname", required = false)
     private String emailTransportHostname;
     
@@ -270,6 +273,9 @@ public class Configuration {
     
     @Parameter(value = "transport_email_from_name", required = false)
     private String emailTransportFromName;
+    
+    @Parameter(value = "transport_email_web_interface_url", required = false)
+    private String emailTransportWebInterfaceUrl;
     
     // Transport: Jabber
     @Parameter(value = "transport_jabber_enabled", required = false)
@@ -616,6 +622,7 @@ public class Configuration {
     public Map<String, String> getEmailTransportConfiguration() {
         Map<String, String> c = Maps.newHashMap();
         
+        c.put("protocol", emailTransportProtocol);
         c.put("hostname", emailTransportHostname);
         c.put("port", String.valueOf(emailTransportPort));
         c.put("use_auth", String.valueOf(emailTransportUseAuth));
@@ -625,6 +632,7 @@ public class Configuration {
         c.put("subject_prefix", emailTransportSubjectPrefix);
         c.put("from_email", emailTransportFromEmail);
         c.put("from_name", emailTransportFromName);
+        c.put("web_interface_url", emailTransportWebInterfaceUrl);
         
         return c;
     }
