@@ -30,6 +30,10 @@ class ServerNode
     get_buffer_watermark(buffer, :percentage).round(2)
   end
 
+  def mastercache_size(cache)
+    ServerValue.get("mastercache_sizes", @server_id, -1, cache)
+  end
+
   def startup_time
     ServerValue.get("startup_time", @server_id, 0)
   end
