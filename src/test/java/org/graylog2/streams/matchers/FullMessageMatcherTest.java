@@ -21,58 +21,35 @@
 package org.graylog2.streams.matchers;
 
 import org.graylog2.plugin.logmessage.LogMessage;
-import java.util.Map;
-import org.bson.types.ObjectId;
-import com.mongodb.BasicDBObject;
-import java.util.HashMap;
+import org.graylog2.plugin.streams.StreamRule;
+
 import org.graylog2.streams.StreamRuleImpl;
+import org.graylog2.streams.StreamRuleTest;
 import org.junit.Test;
 import static org.junit.Assert.*;
 
 public class FullMessageMatcherTest {
     @Test
-    public void testTheTruthToWork() {
-        assertTrue(true);
-    }
-
-    @Test
     public void testSuccessfulMatch() {
-        String message = "ohai thar|foo";
-        String regex = "ohai\\sthar.+";
+        StreamRule rule = StreamRuleTest.toRule(StreamRuleImpl.TYPE_FULL_MESSAGE, "ohai\\sthar.+");
 
-        BasicDBObject mongoRule = new BasicDBObject();
-        mongoRule.put("_id", new ObjectId());
-        mongoRule.put("rule_type", StreamRuleImpl.TYPE_FULL_MESSAGE);
-        mongoRule.put("value",  regex);
-
-        StreamRuleImpl rule = new StreamRuleImpl(mongoRule);
+        FullMessageMatcher matcher = new FullMessageMatcher(rule);
 
         LogMessage msg = new LogMessage();
-        msg.setFullMessage(message);
-
-        FullMessageMatcher matcher = new FullMessageMatcher();
+        msg.setFullMessage("ohai thar|foo");
 
         assertTrue(matcher.match(msg, rule));
     }
 
     @Test
     public void testMissedMatch() {
-        String message = "ohai thar|foo";
-        String regex = "bar";
-
-        BasicDBObject mongoRule = new BasicDBObject();
-        mongoRule.put("_id", new ObjectId());
-        mongoRule.put("rule_type", StreamRuleImpl.TYPE_FULL_MESSAGE);
-        mongoRule.put("value",  regex);
-
-        StreamRuleImpl rule = new StreamRuleImpl(mongoRule);
+        StreamRule rule = StreamRuleTest.toRule(StreamRuleImpl.TYPE_FULL_MESSAGE, "bar");
+        
+        FullMessageMatcher matcher = new FullMessageMatcher(rule);
 
         LogMessage msg = new LogMessage();
-        msg.setFullMessage(message);
-
-        FullMessageMatcher matcher = new FullMessageMatcher();
+        msg.setFullMessage("ohai thar|foo");
 
         assertFalse(matcher.match(msg, rule));
     }
-
 }

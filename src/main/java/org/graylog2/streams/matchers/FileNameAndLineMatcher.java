@@ -29,6 +29,11 @@ import org.graylog2.plugin.streams.StreamRule;
  */
 public class FileNameAndLineMatcher implements StreamRuleMatcher {
 
+    private final Pattern pattern;
+    public FileNameAndLineMatcher(StreamRule rule) {
+        pattern = Pattern.compile(rule.getValue(), Pattern.DOTALL);
+    }
+
     @Override
     public boolean match(LogMessage msg, StreamRule rule) {
         String file = msg.getFile();
@@ -36,7 +41,6 @@ public class FileNameAndLineMatcher implements StreamRuleMatcher {
             file += ":" + msg.getLine();
         }
 
-        return Pattern.compile(rule.getValue(), Pattern.DOTALL).matcher(file).matches();
+        return pattern.matcher(file).matches();
     }
-
 }

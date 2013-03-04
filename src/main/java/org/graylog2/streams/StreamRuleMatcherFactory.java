@@ -20,6 +20,7 @@
 
 package org.graylog2.streams;
 
+import org.graylog2.plugin.streams.StreamRule;
 import org.graylog2.streams.matchers.*;
 
 /**
@@ -27,46 +28,47 @@ import org.graylog2.streams.matchers.*;
  */
 public class StreamRuleMatcherFactory {
 
-    public static StreamRuleMatcher build(int ruleType) throws InvalidStreamRuleTypeException {
-        StreamRuleMatcher matcher = null;
-
-        // IMPORTANT: Also add every new rule type to the unit test.
-        switch (ruleType) {
-            case StreamRuleImpl.TYPE_MESSAGE:
-                matcher = new MessageMatcher();
-                break;
-            case StreamRuleImpl.TYPE_FULL_MESSAGE:
-                matcher = new FullMessageMatcher();
-                break;
-            case StreamRuleImpl.TYPE_HOST:
-                matcher = new HostMatcher();
-                break;
-            case StreamRuleImpl.TYPE_SEVERITY:
-                matcher = new SeverityMatcher();
-                break;
-            case StreamRuleImpl.TYPE_FACILITY:
-                matcher = new FacilityMatcher();
-                break;
-            case StreamRuleImpl.TYPE_ADDITIONAL:
-                matcher = new AdditionalFieldMatcher();
-                break;
-            case StreamRuleImpl.TYPE_SEVERITY_OR_HIGHER:
-                matcher = new SeverityOrHigherMatcher();
-                break;
-            case StreamRuleImpl.TYPE_HOST_REGEX:
-                matcher = new HostRegexMatcher();
-                break;
-            case StreamRuleImpl.TYPE_FILENAME_LINE:
-                matcher = new FileNameAndLineMatcher();
-                break;
-            case StreamRuleImpl.TYPE_FACILITY_REGEX:
-                matcher = new FacilityRegexMatcher();
-                break;
-            default:
-                throw new InvalidStreamRuleTypeException();
-        }
-
-        return matcher;
-    }
+    public static StreamRuleMatcher build(StreamRule rule)  throws InvalidStreamRuleTypeException
+	{
+		StreamRuleMatcher matcher = null;
+		
+		// IMPORTANT: Also add every new rule type to the unit test.
+		switch (rule.getRuleType()) {
+		    case StreamRuleImpl.TYPE_MESSAGE:
+		        matcher = new MessageMatcher(rule);
+		        break;
+		    case StreamRuleImpl.TYPE_FULL_MESSAGE:
+		        matcher = new FullMessageMatcher(rule);
+		        break;
+		    case StreamRuleImpl.TYPE_HOST:
+		        matcher = new HostMatcher(rule);
+		        break;
+		    case StreamRuleImpl.TYPE_SEVERITY:
+		        matcher = new SeverityMatcher(rule);
+		        break;
+		    case StreamRuleImpl.TYPE_FACILITY:
+		        matcher = new FacilityMatcher(rule);
+		        break;
+		    case StreamRuleImpl.TYPE_ADDITIONAL:
+		        matcher = new AdditionalFieldMatcher(rule);
+		        break;
+		    case StreamRuleImpl.TYPE_SEVERITY_OR_HIGHER:
+		        matcher = new SeverityOrHigherMatcher(rule);
+		        break;
+		    case StreamRuleImpl.TYPE_HOST_REGEX:
+		        matcher = new HostRegexMatcher(rule);
+		        break;
+		    case StreamRuleImpl.TYPE_FILENAME_LINE:
+		        matcher = new FileNameAndLineMatcher(rule);
+		        break;
+		    case StreamRuleImpl.TYPE_FACILITY_REGEX:
+		        matcher = new FacilityRegexMatcher(rule);
+		        break;
+		    default:
+		        throw new InvalidStreamRuleTypeException();
+		}
+		
+		return matcher;
+	}
 
 }

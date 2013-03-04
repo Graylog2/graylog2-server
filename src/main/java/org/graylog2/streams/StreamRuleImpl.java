@@ -23,6 +23,7 @@ package org.graylog2.streams;
 import com.mongodb.DBObject;
 import org.bson.types.ObjectId;
 import org.graylog2.plugin.streams.StreamRule;
+import org.graylog2.streams.matchers.StreamRuleMatcher;
 
 /**
  * Representing the rules of a single stream.
@@ -44,9 +45,10 @@ public class StreamRuleImpl implements StreamRule {
     public static final int TYPE_FILENAME_LINE = 11;
     public static final int TYPE_FACILITY_REGEX = 12;
 
-    private ObjectId objectId = null;
-    private int ruleType = 0;
-    private String value = null;
+    private final ObjectId objectId;
+    private final int ruleType;
+    private final String value;
+	private transient StreamRuleMatcher matcher;
 
     public StreamRuleImpl(DBObject rule) {
         this.objectId = (ObjectId) rule.get("_id");
@@ -78,6 +80,11 @@ public class StreamRuleImpl implements StreamRule {
         return value;
     }
 
-
+    public StreamRuleMatcher getMatcher() throws InvalidStreamRuleTypeException {
+    	if(null == matcher) {
+    		matcher = StreamRuleMatcherFactory.build(this);
+    	}
+    	return matcher;
+    }
 
 }

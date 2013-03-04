@@ -21,101 +21,70 @@
 package org.graylog2.streams.matchers;
 
 import org.graylog2.plugin.logmessage.LogMessage;
-import org.bson.types.ObjectId;
-import com.mongodb.BasicDBObject;
+import org.graylog2.plugin.streams.StreamRule;
 import org.graylog2.streams.StreamRuleImpl;
+import org.graylog2.streams.StreamRuleTest;
 import org.junit.Test;
 import static org.junit.Assert.*;
 
 public class AdditionalFieldMatcherTest {
     @Test
-    public void testTheTruthToWork() {
-        assertTrue(true);
-    }
-
-    @Test
     public void testSuccessfulMatch() {
-        BasicDBObject mongoRule = new BasicDBObject();
-        mongoRule.put("_id", new ObjectId());
-        mongoRule.put("rule_type", StreamRuleImpl.TYPE_ADDITIONAL);
-        mongoRule.put("value", "foo=bar");
+        StreamRule rule = StreamRuleTest.toRule(StreamRuleImpl.TYPE_ADDITIONAL, "foo=bar");
 
-        StreamRuleImpl rule = new StreamRuleImpl(mongoRule);
+        AdditionalFieldMatcher matcher = new AdditionalFieldMatcher(rule);
 
         LogMessage msg = new LogMessage();
         msg.addAdditionalData("_foo", "bar");
-
-        AdditionalFieldMatcher matcher = new AdditionalFieldMatcher();
 
         assertTrue(matcher.match(msg, rule));
     }
 
     @Test
     public void testMissedMatch() {
-        BasicDBObject mongoRule = new BasicDBObject();
-        mongoRule.put("_id", new ObjectId());
-        mongoRule.put("rule_type", StreamRuleImpl.TYPE_ADDITIONAL);
-        mongoRule.put("value", "foo=bar");
+        StreamRule rule = StreamRuleTest.toRule(StreamRuleImpl.TYPE_ADDITIONAL, "foo=bar");
 
-        StreamRuleImpl rule = new StreamRuleImpl(mongoRule);
-
+        AdditionalFieldMatcher matcher = new AdditionalFieldMatcher(rule);
+        
         LogMessage msg = new LogMessage();
         msg.addAdditionalData("_foo", "bazbaz");
-
-        AdditionalFieldMatcher matcher = new AdditionalFieldMatcher();
 
         assertFalse(matcher.match(msg, rule));
     }
 
     @Test
     public void testSuccessfulRegexMatch() {
-        BasicDBObject mongoRule = new BasicDBObject();
-        mongoRule.put("_id", new ObjectId());
-        mongoRule.put("rule_type", StreamRuleImpl.TYPE_ADDITIONAL);
-        mongoRule.put("value", "foo=baz|bar");
+        StreamRule rule = StreamRuleTest.toRule(StreamRuleImpl.TYPE_ADDITIONAL, "foo=baz|bar");
 
-        StreamRuleImpl rule = new StreamRuleImpl(mongoRule);
-
+        AdditionalFieldMatcher matcher = new AdditionalFieldMatcher(rule);
+        
         LogMessage msg = new LogMessage();
         msg.addAdditionalData("_foo", "bar");
-
-        AdditionalFieldMatcher matcher = new AdditionalFieldMatcher();
 
         assertTrue(matcher.match(msg, rule));
     }
 
     @Test
     public void testMissedRegexMatch() {
-        BasicDBObject mongoRule = new BasicDBObject();
-        mongoRule.put("_id", new ObjectId());
-        mongoRule.put("rule_type", StreamRuleImpl.TYPE_ADDITIONAL);
-        mongoRule.put("value", "foo=baz|bar");
+        StreamRule rule = StreamRuleTest.toRule(StreamRuleImpl.TYPE_ADDITIONAL, "foo=baz|bar");
 
-        StreamRuleImpl rule = new StreamRuleImpl(mongoRule);
+        AdditionalFieldMatcher matcher = new AdditionalFieldMatcher(rule);
 
         LogMessage msg = new LogMessage();
         msg.addAdditionalData("_foo", "wat");
-
-        AdditionalFieldMatcher matcher = new AdditionalFieldMatcher();
-
+        
         assertFalse(matcher.match(msg, rule));
     }
 
     @Test
     public void testSuccessfulComplexButUnrealisticRegexMatch() {
-        BasicDBObject mongoRule = new BasicDBObject();
-        mongoRule.put("_id", new ObjectId());
-        mongoRule.put("rule_type", StreamRuleImpl.TYPE_ADDITIONAL);
-        mongoRule.put("value", "foo=^foo|bar\\d.+wat");
+        StreamRule rule = StreamRuleTest.toRule(StreamRuleImpl.TYPE_ADDITIONAL, "foo=^foo|bar\\d.+wat");
 
-        StreamRuleImpl rule = new StreamRuleImpl(mongoRule);
+        AdditionalFieldMatcher matcher = new AdditionalFieldMatcher(rule);
 
         LogMessage msg = new LogMessage();
         msg.addAdditionalData("_foo", "bar1foowat");
-
-        AdditionalFieldMatcher matcher = new AdditionalFieldMatcher();
-
+        
         assertTrue(matcher.match(msg, rule));
     }
-
 }

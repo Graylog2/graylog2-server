@@ -29,9 +29,14 @@ import org.graylog2.plugin.streams.StreamRule;
  */
 public class MessageMatcher implements StreamRuleMatcher {
 
-    @Override
-    public boolean match(LogMessage msg, StreamRule rule) {
-        return Pattern.compile(rule.getValue(), Pattern.DOTALL).matcher(msg.getShortMessage()).find();
+    private final Pattern pattern;
+    public MessageMatcher(StreamRule rule) {
+        pattern = Pattern.compile(rule.getValue(), Pattern.DOTALL);
     }
 
+    @Override
+    public boolean match(LogMessage msg, StreamRule rule) {
+        String shortMessage = msg.getShortMessage();
+        return shortMessage != null && pattern.matcher(shortMessage).find();
+    }
 }

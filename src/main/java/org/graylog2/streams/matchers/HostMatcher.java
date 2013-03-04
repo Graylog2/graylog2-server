@@ -28,9 +28,14 @@ import org.graylog2.plugin.streams.StreamRule;
  */
 public class HostMatcher implements StreamRuleMatcher {
 
+    private final String host;
+    public HostMatcher(StreamRule rule) {
+        host = rule.getValue();
+    }
+
     @Override
     public boolean match(LogMessage msg, StreamRule rule) {
-        return msg.getHost().equals(rule.getValue());
+        return msg.getHost().equals(host);
     }
 
 }

@@ -29,25 +29,18 @@ import org.graylog2.plugin.streams.StreamRule;
  */
 public class AdditionalFieldMatcher implements StreamRuleMatcher {
 
+    private final String field;
+    private final Pattern pattern;
+    public AdditionalFieldMatcher(StreamRule rule) {
+        String[] parts = rule.getValue().split("=", 2);
+        field = "_" + parts[0];
+        pattern = Pattern.compile(parts[1]);
+    }
+
     @Override
     public boolean match(LogMessage msg, StreamRule rule) {
-        String[] parts = rule.getValue().split("=");
-        String key = "_" + parts[0];
-        String value = parts[1];
-        String str = null;
-
-        if (msg.getAdditionalData().containsKey(key) && msg.getAdditionalData().get(key) != null) {
-            Object afValue = msg.getAdditionalData().get(key);
-
-            if (afValue instanceof String) {
-                str = (String) afValue;
-            }
-
-            if (afValue instanceof Long) {
-                str = String.valueOf(afValue);
-            }
-        }
-
-        return (str != null && Pattern.compile(value, Pattern.DOTALL).matcher(str).find());
+        Object object = msg.getAdditionalData().get(field);
+        String value = (null == object) ? null : object.toString();
+        return (value != null && pattern.matcher(value).find());
     }
 }

@@ -21,54 +21,34 @@
 package org.graylog2.streams.matchers;
 
 import org.graylog2.plugin.logmessage.LogMessage;
-import com.mongodb.BasicDBObject;
-import org.bson.types.ObjectId;
+import org.graylog2.plugin.streams.StreamRule;
+
 import org.graylog2.streams.StreamRuleImpl;
+import org.graylog2.streams.StreamRuleTest;
 import org.junit.Test;
 import static org.junit.Assert.*;
 
 public class HostMatcherTest {
     @Test
-    public void testTheTruthToWork() {
-        assertTrue(true);
-    }
-
-    @Test
     public void testSuccessfulMatch() {
-        String host = "example.org";
-
-        BasicDBObject mongoRule = new BasicDBObject();
-        mongoRule.put("_id", new ObjectId());
-        mongoRule.put("rule_type", StreamRuleImpl.TYPE_HOST);
-        mongoRule.put("value", host);
-
-        StreamRuleImpl rule = new StreamRuleImpl(mongoRule);
+        StreamRule rule = StreamRuleTest.toRule(StreamRuleImpl.TYPE_HOST, "example.org");
+        
+        HostMatcher matcher = new HostMatcher(rule);
 
         LogMessage msg = new LogMessage();
-        msg.setHost(host);
-
-        HostMatcher matcher = new HostMatcher();
+        msg.setHost("example.org");
 
         assertTrue(matcher.match(msg, rule));
     }
 
     @Test
     public void testMissedMatch() {
-        String host = "example.org";
-
-        BasicDBObject mongoRule = new BasicDBObject();
-        mongoRule.put("_id", new ObjectId());
-        mongoRule.put("rule_type", StreamRuleImpl.TYPE_HOST);
-        mongoRule.put("value", host);
-
-        StreamRuleImpl rule = new StreamRuleImpl(mongoRule);
+        StreamRule rule = StreamRuleTest.toRule(StreamRuleImpl.TYPE_HOST, "example.org");
+        HostMatcher matcher = new HostMatcher(rule);
 
         LogMessage msg = new LogMessage();
-        msg.setHost(host + "foo");
-
-        HostMatcher matcher = new HostMatcher();
+        msg.setHost("foo.example.org");
 
         assertFalse(matcher.match(msg, rule));
     }
-
 }

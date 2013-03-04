@@ -20,45 +20,58 @@
 
 package org.graylog2.streams;
 
+import org.bson.types.ObjectId;
+import org.graylog2.plugin.streams.StreamRule;
 import org.graylog2.streams.matchers.AdditionalFieldMatcher;
+import org.graylog2.streams.matchers.FacilityRegexMatcher;
+import org.graylog2.streams.matchers.FileNameAndLineMatcher;
+import org.graylog2.streams.matchers.FullMessageMatcher;
+import org.graylog2.streams.matchers.HostRegexMatcher;
 import org.graylog2.streams.matchers.SeverityMatcher;
 import org.graylog2.streams.matchers.HostMatcher;
 import org.graylog2.streams.matchers.FacilityMatcher;
 import org.graylog2.streams.matchers.MessageMatcher;
+import org.graylog2.streams.matchers.SeverityOrHigherMatcher;
 import org.graylog2.streams.matchers.StreamRuleMatcher;
 import org.junit.Test;
+
+import com.mongodb.BasicDBObject;
+
 import static org.junit.Assert.*;
 
 public class StreamRuleMatcherFactoryTest {
 
     @Test
-    public void testBuild() throws Exception {
-        StreamRuleMatcher messageMatcher = StreamRuleMatcherFactory.build(StreamRuleImpl.TYPE_MESSAGE);
-        assertTrue(messageMatcher instanceof MessageMatcher);
-
-        StreamRuleMatcher hostMatcher = StreamRuleMatcherFactory.build(StreamRuleImpl.TYPE_HOST);
-        assertTrue(hostMatcher instanceof HostMatcher);
-
-        StreamRuleMatcher severityMatcher = StreamRuleMatcherFactory.build(StreamRuleImpl.TYPE_SEVERITY);
-        assertTrue(severityMatcher instanceof SeverityMatcher);
-
-        StreamRuleMatcher facilityMatcher = StreamRuleMatcherFactory.build(StreamRuleImpl.TYPE_FACILITY);
-        assertTrue(facilityMatcher instanceof FacilityMatcher);
-
-        StreamRuleMatcher additionalFieldMatcher = StreamRuleMatcherFactory.build(StreamRuleImpl.TYPE_ADDITIONAL);
-        assertTrue(additionalFieldMatcher instanceof AdditionalFieldMatcher);
+    public void testBuild() throws InvalidStreamRuleTypeException {
+    	checkMatcherClassForType(StreamRuleImpl.TYPE_MESSAGE, "bar", MessageMatcher.class);
+    	checkMatcherClassForType(StreamRuleImpl.TYPE_FULL_MESSAGE, "bar", FullMessageMatcher.class);
+		checkMatcherClassForType(StreamRuleImpl.TYPE_HOST, "bar", HostMatcher.class);
+		checkMatcherClassForType(StreamRuleImpl.TYPE_SEVERITY, "3", SeverityMatcher.class);
+		checkMatcherClassForType(StreamRuleImpl.TYPE_FACILITY, "bar", FacilityMatcher.class);
+		checkMatcherClassForType(StreamRuleImpl.TYPE_ADDITIONAL, "field=value", AdditionalFieldMatcher.class);
+		checkMatcherClassForType(StreamRuleImpl.TYPE_SEVERITY_OR_HIGHER, "3", SeverityOrHigherMatcher.class);
+		checkMatcherClassForType(StreamRuleImpl.TYPE_HOST_REGEX, "bar", HostRegexMatcher.class);
+		checkMatcherClassForType(StreamRuleImpl.TYPE_FILENAME_LINE, "bar:3", FileNameAndLineMatcher.class);
+		checkMatcherClassForType(StreamRuleImpl.TYPE_FACILITY_REGEX, "bar", FacilityRegexMatcher.class);
     }
 
-    @Test
-    public void testBuildWithInvalidStreamRuleType() {
-        boolean exceptionThrown = false;
-        try {
-            StreamRuleMatcher messageMatcher = StreamRuleMatcherFactory.build(9001);
-        } catch (InvalidStreamRuleTypeException e) {
-            exceptionThrown = true;
-        }
-
-        assertTrue(exceptionThrown);
+    @Test(expected=InvalidStreamRuleTypeException.class)
+    public void testBuildWithInvalidStreamRuleType() throws InvalidStreamRuleTypeException {
+        StreamRuleMatcherFactory.build(toRule(9001, "bar4"));
+    }
+    
+    private static void checkMatcherClassForType(int type, String value, Class<? extends StreamRuleMatcher> clazz) throws InvalidStreamRuleTypeException {
+        StreamRuleMatcher matcher = StreamRuleMatcherFactory.build(toRule(type, value));
+        assertTrue("Expected " + clazz.getName() + ", but got " + matcher.getClass().getName(), clazz.isInstance(matcher));
+    }
+    
+    private static StreamRule toRule(int type, String value) {
+        BasicDBObject mongo = new BasicDBObject();
+        mongo.put("_id", new ObjectId());
+        mongo.put("rule_type", type);
+        mongo.put("value", value);
+        
+    	return new StreamRuleImpl(mongo);
     }
 
 }

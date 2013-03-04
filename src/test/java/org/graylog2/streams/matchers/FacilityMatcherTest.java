@@ -21,54 +21,34 @@
 package org.graylog2.streams.matchers;
 
 import org.graylog2.plugin.logmessage.LogMessage;
-import org.graylog2.plugin.Tools;
-import org.bson.types.ObjectId;
-import com.mongodb.BasicDBObject;
+import org.graylog2.plugin.streams.StreamRule;
 import org.graylog2.streams.StreamRuleImpl;
+import org.graylog2.streams.StreamRuleTest;
 import org.junit.Test;
 import static org.junit.Assert.*;
 
 public class FacilityMatcherTest {
-
-    @Test
-    public void testTheTruthToWork() {
-        assertTrue(true);
-    }
-
     @Test
     public void testSuccessfulMatch() {
-        String facility = "foobar";
+        StreamRule rule = StreamRuleTest.toRule(StreamRuleImpl.TYPE_FACILITY, "foobar");
 
-        BasicDBObject mongoRule = new BasicDBObject();
-        mongoRule.put("_id", new ObjectId());
-        mongoRule.put("rule_type", StreamRuleImpl.TYPE_FACILITY);
-        mongoRule.put("value", facility);
-
-        StreamRuleImpl rule = new StreamRuleImpl(mongoRule);
+        FacilityMatcher matcher = new FacilityMatcher(rule);
 
         LogMessage msg = new LogMessage();
-        msg.setFacility(facility);
-
-        FacilityMatcher matcher = new FacilityMatcher();
-
+        msg.setFacility("foobar");
+        
         assertTrue(matcher.match(msg, rule));
     }
 
     @Test
     public void testMissedMatch() {
-        BasicDBObject mongoRule = new BasicDBObject();
-        mongoRule.put("_id", new ObjectId());
-        mongoRule.put("rule_type", StreamRuleImpl.TYPE_FACILITY);
-        mongoRule.put("value", "foobar");
+        StreamRule rule = StreamRuleTest.toRule(StreamRuleImpl.TYPE_FACILITY, "foobar");
 
-        StreamRuleImpl rule = new StreamRuleImpl(mongoRule);
+        FacilityMatcher matcher = new FacilityMatcher(rule);
 
         LogMessage msg = new LogMessage();
         msg.setFacility("barfoo");
 
-        FacilityMatcher matcher = new FacilityMatcher();
-
         assertFalse(matcher.match(msg, rule));
     }
-
 }

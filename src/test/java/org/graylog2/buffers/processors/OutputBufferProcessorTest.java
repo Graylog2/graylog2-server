@@ -4,10 +4,7 @@
  */
 package org.graylog2.buffers.processors;
 
-import com.mongodb.BasicDBObject;
 import java.util.List;
-import org.bson.BSON;
-import org.bson.types.ObjectId;
 import org.elasticsearch.common.collect.Lists;
 import org.graylog2.GraylogServerStub;
 import org.graylog2.TestHelper;
@@ -16,7 +13,6 @@ import org.graylog2.buffers.processors.fakeoutputs.FakeOutput;
 import org.graylog2.plugin.logmessage.LogMessage;
 import org.graylog2.plugin.streams.Stream;
 import org.graylog2.streams.FakeStream;
-import org.graylog2.streams.StreamImpl;
 import org.junit.Test;
 import static org.junit.Assert.*;
 

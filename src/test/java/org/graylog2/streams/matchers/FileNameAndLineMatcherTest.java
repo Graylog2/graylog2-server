@@ -21,54 +21,35 @@
 package org.graylog2.streams.matchers;
 
 import org.graylog2.plugin.logmessage.LogMessage;
-import org.bson.types.ObjectId;
-import com.mongodb.BasicDBObject;
+import org.graylog2.plugin.streams.StreamRule;
 import org.graylog2.streams.StreamRuleImpl;
+import org.graylog2.streams.StreamRuleTest;
 import org.junit.Test;
 import static org.junit.Assert.*;
 
 public class FileNameAndLineMatcherTest {
-    @Test
-    public void testTheTruthToWork() {
-        assertTrue(true);
-    }
 
     @Test
     public void testSuccessfulMath() {
-        String filename = "main.rb";
-        int line = 17;
-        String regex = "^main\\.rb:1\\d";
+        StreamRule rule = StreamRuleTest.toRule(StreamRuleImpl.TYPE_FILENAME_LINE, "^main\\.rb:1\\d");
 
-        BasicDBObject mongoRule = new BasicDBObject();
-        mongoRule.put("_id", new ObjectId());
-        mongoRule.put("rule_type", StreamRuleImpl.TYPE_FILENAME_LINE);
-        mongoRule.put("value",  regex);
-
-        StreamRuleImpl rule = new StreamRuleImpl(mongoRule);
-        FileNameAndLineMatcher matcher = new FileNameAndLineMatcher();
-        LogMessage msg = new LogMessage();
+        FileNameAndLineMatcher matcher = new FileNameAndLineMatcher(rule);
         
-        msg.setFile(filename);
+        LogMessage msg = new LogMessage();
+        msg.setFile("main.rb");
         msg.setLine(17);
+        
         assertTrue(matcher.match(msg, rule));
     }
 
     @Test
     public void testSuccessfulMatchWithoutRegex() {
-        String filename = "lol.php";
-        int line = 9001;
-        String regex = "lol\\.php:9001";
+        StreamRule rule = StreamRuleTest.toRule(StreamRuleImpl.TYPE_FILENAME_LINE, "lol\\.php:9001");
 
-        BasicDBObject mongoRule = new BasicDBObject();
-        mongoRule.put("_id", new ObjectId());
-        mongoRule.put("rule_type", StreamRuleImpl.TYPE_FILENAME_LINE);
-        mongoRule.put("value",  regex);
-
-        StreamRuleImpl rule = new StreamRuleImpl(mongoRule);
-        FileNameAndLineMatcher matcher = new FileNameAndLineMatcher();
+        FileNameAndLineMatcher matcher = new FileNameAndLineMatcher(rule);
+        
         LogMessage msg = new LogMessage();
-
-        msg.setFile(filename);
+        msg.setFile("lol.php");
         msg.setLine(9001);
 
         assertTrue(matcher.match(msg, rule));
@@ -76,40 +57,26 @@ public class FileNameAndLineMatcherTest {
 
     @Test
     public void testSuccessfulMatchWithoutLineNumber() {
-        String filename = "lol.php";
-        String regex = "^lol\\.php";
+        StreamRule rule = StreamRuleTest.toRule(StreamRuleImpl.TYPE_FILENAME_LINE, "^lol\\.php");
 
-        BasicDBObject mongoRule = new BasicDBObject();
-        mongoRule.put("_id", new ObjectId());
-        mongoRule.put("rule_type", StreamRuleImpl.TYPE_FILENAME_LINE);
-        mongoRule.put("value",  regex);
+        FileNameAndLineMatcher matcher = new FileNameAndLineMatcher(rule);
 
-        StreamRuleImpl rule = new StreamRuleImpl(mongoRule);
-        FileNameAndLineMatcher matcher = new FileNameAndLineMatcher();
         LogMessage msg = new LogMessage();
-
-        msg.setFile(filename);
+        msg.setFile("lol.php");
+        
         assertTrue(matcher.match(msg, rule));
     }
 
     @Test
     public void testMissedMatch() {
-        String filename = "main.rb";
-        int line = 27;
-        String regex = "^main\\.rb:1\\d";
+        StreamRule rule = StreamRuleTest.toRule(StreamRuleImpl.TYPE_FILENAME_LINE, "^main\\.rb:1\\d");
 
-        BasicDBObject mongoRule = new BasicDBObject();
-        mongoRule.put("_id", new ObjectId());
-        mongoRule.put("rule_type", StreamRuleImpl.TYPE_FILENAME_LINE);
-        mongoRule.put("value",  regex);
+        FileNameAndLineMatcher matcher = new FileNameAndLineMatcher(rule);
 
-        StreamRuleImpl rule = new StreamRuleImpl(mongoRule);
-        FileNameAndLineMatcher matcher = new FileNameAndLineMatcher();
         LogMessage msg = new LogMessage();
-
-        msg.setFile(filename);
-        msg.setLine(line);
+        msg.setFile("main.rb");
+        msg.setLine(27);
+        
         assertFalse(matcher.match(msg, rule));
     }
-
 }

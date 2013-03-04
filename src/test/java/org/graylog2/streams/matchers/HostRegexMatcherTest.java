@@ -21,57 +21,35 @@
 package org.graylog2.streams.matchers;
 
 import org.graylog2.plugin.logmessage.LogMessage;
-import org.bson.types.ObjectId;
-import com.mongodb.BasicDBObject;
+import org.graylog2.plugin.streams.StreamRule;
 import org.graylog2.streams.StreamRuleImpl;
+import org.graylog2.streams.StreamRuleTest;
 import org.junit.Test;
 import static org.junit.Assert.*;
 
 public class HostRegexMatcherTest {
     @Test
-    public void testTheTruthToWork() {
-        assertTrue(true);
-    }
-
-    @Test
     public void testSuccessfulMatch() {
-        String host1 = "foo.example.org";
-        String host2 = "bar.example.com";
-        String regex = "^(foo|bar)\\.example\\.(org|com)";
-
-        BasicDBObject mongoRule = new BasicDBObject();
-        mongoRule.put("_id", new ObjectId());
-        mongoRule.put("rule_type", StreamRuleImpl.TYPE_HOST_REGEX);
-        mongoRule.put("value",  regex);
-
-        StreamRuleImpl rule = new StreamRuleImpl(mongoRule);
-        HostRegexMatcher matcher = new HostRegexMatcher();
-        LogMessage msg = new LogMessage();
+        StreamRule rule = StreamRuleTest.toRule(StreamRuleImpl.TYPE_HOST_REGEX, "^(foo|bar)\\.example\\.(org|com)");
+        HostRegexMatcher matcher = new HostRegexMatcher(rule);
         
-        msg.setHost(host1);
+        LogMessage msg = new LogMessage();
+        msg.setHost("foo.example.org");
         assertTrue(matcher.match(msg, rule));
-        msg.setHost(host2);
+
+        msg.setHost("bar.example.com");
         assertTrue(matcher.match(msg, rule));
     }
 
     @Test
     public void testMissedMatch() {
-        String host = "example.org";
-        String regex = "^example\\.(com|de)";
-
-        BasicDBObject mongoRule = new BasicDBObject();
-        mongoRule.put("_id", new ObjectId());
-        mongoRule.put("rule_type", StreamRuleImpl.TYPE_HOST_REGEX);
-        mongoRule.put("value",  regex);
-
-        StreamRuleImpl rule = new StreamRuleImpl(mongoRule);
+        StreamRule rule = StreamRuleTest.toRule(StreamRuleImpl.TYPE_HOST_REGEX, "^example\\.(com|de)");
+        
+        HostRegexMatcher matcher = new HostRegexMatcher(rule);
 
         LogMessage msg = new LogMessage();
-        msg.setHost(host);
-
-        HostRegexMatcher matcher = new HostRegexMatcher();
+        msg.setHost("example.org");
 
         assertFalse(matcher.match(msg, rule));
     }
-
 }

@@ -21,6 +21,7 @@
 package org.graylog2.streams;
 
 import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import com.mongodb.BasicDBList;
 import com.mongodb.BasicDBObject;
@@ -28,7 +29,6 @@ import com.mongodb.DBCollection;
 import com.mongodb.DBCursor;
 import com.mongodb.DBObject;
 import org.bson.types.ObjectId;
-import org.elasticsearch.common.collect.Maps;
 import org.graylog2.Core;
 import org.graylog2.plugin.Tools;
 import org.graylog2.alarms.AlarmReceiverImpl;
@@ -40,11 +40,9 @@ import org.graylog2.users.User;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import org.graylog2.plugin.outputs.MessageOutput;
 
 /**
  * Representing a single stream from the streams collection. Also provides method
@@ -60,82 +58,46 @@ public class StreamImpl implements Stream {
     private final String title;
     private final int alarmTimespan;
     private final int alarmMessageLimit;
+    private final boolean alarmActive;
     private final boolean alarmForce;
     private final int alarmPeriod;
     private final int lastAlarm;
-    
-    protected final Map<String, Set<Map<String, String>>> outputs;
-
-    private List<StreamRule> streamRules;
-    private Set<String> alarmCallbacks;
-
     private final DBObject mongoObject;
+    
+    private transient List<StreamRule> streamRules;
+    private transient Set<String> alarmCallbacks;
+    protected transient Map<String, Set<Map<String, String>>> outputs;
 
     public StreamImpl (DBObject stream) {
         this.id = (ObjectId) stream.get("_id");
         this.title = (String) stream.get("title");
-        
-        if (stream.get("alarm_timespan") != null) {
-            this.alarmTimespan = (Integer) stream.get("alarm_timespan");
-        } else {
-            this.alarmTimespan = -1;
-        }
-        
-        if (stream.get("alarm_limit") != null) {
-            this.alarmMessageLimit = (Integer) stream.get("alarm_limit");
-        } else {
-            this.alarmMessageLimit = -1;
-        }
-        
-        if (stream.get("alarm_force") != null) {
-            this.alarmForce = (Boolean) stream.get("alarm_force");
-        } else {
-            this.alarmForce = false;
-        }
-        
-        if (stream.get("alarm_period") != null) {
-            this.alarmPeriod = (Integer) stream.get("alarm_period");
-        } else {
-            this.alarmPeriod = 0;
-        }
-        
-        if (stream.get("last_alarm") != null) {
-            this.lastAlarm = (Integer) stream.get("last_alarm");
-        } else {
-            this.lastAlarm = 0;
-        }
-        
-        if (stream.get("outputs") != null) {
-            this.outputs = buildOutputsFromMongoDoc(stream);
-        } else {
-            this.outputs = Maps.newHashMap();
-        }
-        
+        this.alarmTimespan = getDefaultedValue(stream, "alarm_timespan", -1);
+        this.alarmMessageLimit = getDefaultedValue(stream, "alarm_limit", -1);
+        this.alarmActive = getDefaultedValue(stream, "alarm_active", false);
+        this.alarmForce = getDefaultedValue(stream, "alarm_force", false);
+        this.alarmPeriod = getDefaultedValue(stream, "alarm_period", 0);
+        this.lastAlarm = getDefaultedValue(stream, "last_alarm", 0);
         this.mongoObject = stream;
     }
     
-    public static Set<Stream> fetchAllEnabled(Core server) {
-        Map<String, Object> emptyMap = Maps.newHashMap();
-        return fetchAllEnabled(server, emptyMap);
+    @SuppressWarnings("unchecked")
+	private static <T> T getDefaultedValue(DBObject object, String field, T defaultValue) {
+    	Object value = object.get(field);
+    	return (null == value) ? defaultValue : (T) value;
     }
-
-    public static Set<Stream> fetchAllEnabled(Core server, Map<String, Object> additionalQueryOpts) {
+    
+    public static Set<StreamImpl> fetchAllEnabled(Core server) {
         StreamCache streamCache = StreamCache.getInstance();
         if (streamCache.valid()) {
             return streamCache.get();
         }
 
-        Set<Stream> streams = Sets.newHashSet();
+        Set<StreamImpl> streams = Sets.newHashSet();
 
         DBCollection coll = server.getMongoConnection().getDatabase().getCollection("streams");
         DBObject query = new BasicDBObject();
         query.put("disabled", new BasicDBObject("$ne", true));
         
-        // query.putAll() is not working
-        for (Map.Entry<String, Object> o : additionalQueryOpts.entrySet()) {
-             query.put(o.getKey(), o.getValue());
-        }
-            
         DBCursor cur = coll.find(query);
 
         while (cur.hasNext()) {
@@ -191,7 +153,7 @@ public class StreamImpl implements Stream {
         }
         
         Set<String> callbacks = Sets.newTreeSet();
-        List objs = (BasicDBList) this.mongoObject.get("alarm_callbacks");
+        List<Object> objs = (BasicDBList) this.mongoObject.get("alarm_callbacks");
         
         if (objs != null) {
             for (Object obj : objs) {
@@ -228,17 +190,16 @@ public class StreamImpl implements Stream {
     }
     
     public Set<Map<String, String>> getOutputConfigurations(String className) {
-        
+        if (this.outputs == null) {
+        	this.outputs = buildOutputsFromMongoList((BasicDBList) this.mongoObject.get("outputs"));
+        }
+
         return outputs.get(className);
     }
     
     public boolean hasConfiguredOutputs(String typeClass) {
         Set<Map<String, String>> oc = getOutputConfigurations(typeClass);
-        if (oc == null) {
-            return false;
-        }
-        
-        return !oc.isEmpty();
+        return oc != null && !oc.isEmpty();
     }
     
     @Override
@@ -265,6 +226,11 @@ public class StreamImpl implements Stream {
     public int getAlarmPeriod() {
         return alarmPeriod;
     }
+    
+    public boolean isAlarmActive()
+	{
+		return alarmActive;
+	}
     
     public void setLastAlarm(int timestamp, Core server) {
         DBCollection coll = server.getMongoConnection().getDatabase().getCollection("streams");
@@ -322,31 +288,32 @@ public class StreamImpl implements Stream {
         return receivers;
     }
     
-    private Map<String, Set<Map<String, String>>> buildOutputsFromMongoDoc(DBObject stream) {
-        Map<String, Set<Map<String, String>>> o = Maps.newHashMap();
-        
-        List objs = (BasicDBList) stream.get("outputs");
-        
-        if (objs == null || objs.isEmpty()) {
-            return o;
+    private Map<String, Set<Map<String, String>>> buildOutputsFromMongoList(List<Object> objs)
+	{
+		if (objs == null || objs.isEmpty()) {
+            return Maps.newHashMapWithExpectedSize(0);
         }
+        
+        Map<String, Set<Map<String, String>>> o = Maps.newHashMap();
         
         for (Object obj : objs) {
             try {
                 DBObject output = (BasicDBObject) obj;
-                String typeclass = (String) output.get("typeclass");
-
-                if (!o.containsKey(typeclass)) {
-                    o.put(typeclass, new HashSet<Map<String, String>>());
-                }
                 
                 // ZOMG we need an ODM in the next version.
                 Map<String, String> outputConfig = Maps.newHashMap();
-                for (Object key : output.toMap().keySet()) {
-                    outputConfig.put(key.toString(), output.get(key.toString()).toString());
+                for (String key : output.keySet()) {
+                    String value = output.get(key).toString();
+					outputConfig.put(key, value);
                 }
                 
-                o.get(typeclass).add(outputConfig);
+                String typeclass = (String) output.get("typeclass");
+                Set<Map<String, String>> maps = o.get(typeclass);
+                if (null == maps) {
+					o.put(typeclass, maps = Sets.newHashSet());
+                }
+                
+                maps.add(outputConfig);
             } catch(Exception e) {
                 LOG.warn("Could not read stream output.", e);
                 continue;
@@ -354,6 +321,6 @@ public class StreamImpl implements Stream {
         }
         
         return o;
-    }
+	}
 
 }

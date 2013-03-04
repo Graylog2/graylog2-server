@@ -29,12 +29,14 @@ import org.graylog2.plugin.streams.StreamRule;
  */
 public class FullMessageMatcher implements StreamRuleMatcher {
 
-    @Override
-    public boolean match(LogMessage msg, StreamRule rule) {
-	Pattern messagePattern = Pattern.compile(rule.getValue(), Pattern.DOTALL);
-	String fullMessage = msg.getFullMessage();
-		
-        return (fullMessage != null && messagePattern.matcher(msg.getFullMessage()).find());
+    private final Pattern pattern;
+    public FullMessageMatcher(StreamRule rule) {
+        pattern = Pattern.compile(rule.getValue(), Pattern.DOTALL);
     }
 
+    @Override
+    public boolean match(LogMessage msg, StreamRule rule) {
+        String fullMessage = msg.getFullMessage();
+        return fullMessage != null && pattern.matcher(fullMessage).find();
+    }
 }

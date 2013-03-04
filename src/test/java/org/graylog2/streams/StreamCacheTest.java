@@ -21,7 +21,6 @@
 package org.graylog2.streams;
 
 import java.util.HashSet;
-import org.graylog2.plugin.streams.Stream;
 import org.junit.Test;
 import static org.junit.Assert.*;
 
@@ -38,7 +37,7 @@ public class StreamCacheTest {
 
     @Test
     public void testSetAndGet() {
-        StreamCache.getInstance().set(new HashSet<Stream>());
+        StreamCache.getInstance().set(new HashSet<StreamImpl>());
         StreamCache.getInstance().get();
         assertTrue(StreamCache.getInstance().valid());
     }

@@ -44,9 +44,9 @@ public class StreamRouter {
 
     public List<Stream> route(Core server, LogMessage msg) {
         List<Stream> matches = Lists.newArrayList();
-        Set<Stream> streams = StreamImpl.fetchAllEnabled(server);
+        Set<StreamImpl> streams = StreamImpl.fetchAllEnabled(server);
 
-        for (Stream stream : streams) {
+        for (StreamImpl stream : streams) {
             boolean missed = false;
 
             if (stream.getStreamRules().isEmpty()) {
@@ -55,7 +55,13 @@ public class StreamRouter {
 
             for (StreamRule rule : stream.getStreamRules()) {
                 try {
-                    StreamRuleMatcher matcher = StreamRuleMatcherFactory.build(rule.getRuleType());
+                	StreamRuleMatcher matcher;
+                	if(rule instanceof StreamRuleImpl) {
+                		matcher = ((StreamRuleImpl) rule).getMatcher();
+                	} else {
+                		matcher = StreamRuleMatcherFactory.build(rule);
+                	}
+
                     if (!matchStreamRule(msg, matcher, rule)) {
                         missed = true;
                         break;

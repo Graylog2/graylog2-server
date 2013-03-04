@@ -24,14 +24,13 @@ import java.util.Set;
 import org.graylog2.Core;
 
 import org.graylog2.SimpleObjectCache;
-import org.graylog2.plugin.streams.Stream;
 
 /**
  * Singleton caching the already fetched streams.
  *
  * @author Lennart Koopmann <lennart@socketfeed.com>
  */
-public class StreamCache extends SimpleObjectCache<Set<Stream>> {
+public class StreamCache extends SimpleObjectCache<Set<StreamImpl>> {
 
     private static StreamCache instance;
 
