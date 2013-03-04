@@ -1,8 +1,0 @@
-<h1>Create new user</h1>
-<% @user.password = @user.password_confirmation = nil %>
-
-<div class="description">
-  Use this form to create a new user that can log in to the web interface.
-</div>
-
-<%= render :partial => "user_form", :locals => { :form_action => "create", :user => @user}%>

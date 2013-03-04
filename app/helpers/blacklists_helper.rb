@@ -1,2 +1,0 @@
-module BlacklistsHelper
-end
