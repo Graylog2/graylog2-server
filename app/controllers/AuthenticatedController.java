@@ -1,6 +1,6 @@
 package controllers;
 
-import models.RedirectAuthenticator;
+import lib.RedirectAuthenticator;
 import models.User;
 import play.mvc.Controller;
 import play.mvc.Security.Authenticated;
