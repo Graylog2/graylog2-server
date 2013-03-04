@@ -1,36 +1,10 @@
-log/*
-tmp/*
-
-nbproject/*
-
-# Idea project files
-/.idea
-/*.ipr
-/*.iml
-/*.iws
-/.generators
-/.rakeTasks
-
-config/mongoid.yml
-config/general.yml
-config/email.yml
-config/indexer.yml
-config/ldap.yml
-
-Capfile
-config/deploy.rb
-
-build/builds/*
-build/logs/*
-
-public/images/dashboard_logo.png
-public/images/graphs/*
-
-.bundle/
-vendor/bundle/
-
-coverage/
-test/reports/
+logs
+project/project
+project/target
+target
+tmp
+dist
+.cache
 
 .DS_Store
 
