@@ -6,6 +6,7 @@ import play.mvc.Security.Authenticator;
 
 public class RedirectAuthenticator extends Authenticator {
 
+	@Override
 	public Result onUnauthorized(Context ctx) {
 		return redirect(controllers.routes.Sessions.index());
 	}
