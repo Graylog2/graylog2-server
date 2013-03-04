@@ -3,10 +3,16 @@ project/project
 project/target
 target
 tmp
+.history
 dist
-.cache
+/.idea
+/*.iml
+/out
+/.idea_modules
+/.classpath
+/.project
+/RUNNING_PID
+/.settings
 
+.target
 .DS_Store
-
-*.swp
-*.swo
