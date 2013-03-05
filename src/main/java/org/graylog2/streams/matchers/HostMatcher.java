@@ -34,7 +34,7 @@ public class HostMatcher implements StreamRuleMatcher {
     }
 
     @Override
-    public boolean match(LogMessage msg, StreamRule rule) {
+    public boolean match(LogMessage msg) {
         return msg.getHost().equals(host);
     }
 

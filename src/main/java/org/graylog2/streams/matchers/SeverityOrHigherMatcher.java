@@ -34,7 +34,7 @@ public class SeverityOrHigherMatcher implements StreamRuleMatcher {
     }
 
     @Override
-    public boolean match(LogMessage msg, StreamRule rule) {
+    public boolean match(LogMessage msg) {
         // <= because 0 (EMERG) is lower than DEBUG (7)
         return msg.getLevel() <= level;
     }

@@ -20,7 +20,8 @@
 
 package org.graylog2.streams.matchers;
 
-import java.util.regex.Pattern;
+import org.graylog2.pattern.Pattern;
+import org.graylog2.pattern.PatternFactory;
 import org.graylog2.plugin.logmessage.LogMessage;
 import org.graylog2.plugin.streams.StreamRule;
 
@@ -34,13 +35,13 @@ public class AdditionalFieldMatcher implements StreamRuleMatcher {
     public AdditionalFieldMatcher(StreamRule rule) {
         String[] parts = rule.getValue().split("=", 2);
         field = "_" + parts[0];
-        pattern = Pattern.compile(parts[1]);
+        pattern = PatternFactory.matchPartially(parts[1]);
     }
 
     @Override
-    public boolean match(LogMessage msg, StreamRule rule) {
+    public boolean match(LogMessage msg) {
         Object object = msg.getAdditionalData().get(field);
         String value = (null == object) ? null : object.toString();
-        return (value != null && pattern.matcher(value).find());
+        return pattern.matches(value);
     }
 }

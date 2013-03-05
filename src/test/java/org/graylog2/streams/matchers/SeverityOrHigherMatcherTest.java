@@ -37,7 +37,7 @@ public class SeverityOrHigherMatcherTest {
         LogMessage msg = new LogMessage();
         msg.setLevel(2);
 
-        assertTrue(matcher.match(msg, rule));
+        assertTrue(matcher.match(msg));
     }
 
     @Test
@@ -49,7 +49,7 @@ public class SeverityOrHigherMatcherTest {
         LogMessage msg = new LogMessage();
         msg.setLevel(3);
 
-        assertTrue(matcher.match(msg, rule));
+        assertTrue(matcher.match(msg));
     }
 
     @Test
@@ -61,6 +61,6 @@ public class SeverityOrHigherMatcherTest {
         LogMessage msg = new LogMessage();
         msg.setLevel(5);
 
-        assertFalse(matcher.match(msg, rule));
+        assertFalse(matcher.match(msg));
     }
 }

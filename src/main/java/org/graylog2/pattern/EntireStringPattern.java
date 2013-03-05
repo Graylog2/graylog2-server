@@ -18,24 +18,18 @@
  *
  */
 
-package org.graylog2.streams.matchers;
+package org.graylog2.pattern;
 
-import org.graylog2.plugin.logmessage.LogMessage;
-import org.graylog2.plugin.streams.StreamRule;
+class EntireStringPattern implements Pattern {
+    
+    private final String pattern;
 
-
-/**
- * @author Lennart Koopmann <lennart@socketfeed.com>
- */
-public class SeverityMatcher implements StreamRuleMatcher {
-
-    private int level;
-    public SeverityMatcher(StreamRule rule) {
-        level = Integer.parseInt(rule.getValue());
+    public EntireStringPattern(String pattern) {
+        this.pattern = pattern;
     }
 
     @Override
-    public boolean match(LogMessage msg) {
-        return msg.getLevel() == level;
+    public boolean matches(String string) {
+        return null != string && string.equals(pattern);
     }
 }

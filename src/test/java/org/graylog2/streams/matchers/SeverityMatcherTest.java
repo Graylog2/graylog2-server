@@ -37,7 +37,7 @@ public class SeverityMatcherTest {
         LogMessage msg = new LogMessage();
         msg.setLevel(1);
 
-        assertTrue(matcher.match(msg, rule));
+        assertTrue(matcher.match(msg));
     }
 
     @Test
@@ -49,6 +49,6 @@ public class SeverityMatcherTest {
         LogMessage msg = new LogMessage();
         msg.setLevel(4);
 
-        assertFalse(matcher.match(msg, rule));
+        assertFalse(matcher.match(msg));
     }
 }

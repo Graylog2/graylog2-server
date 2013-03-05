@@ -38,7 +38,7 @@ public class HostMatcherTest {
         LogMessage msg = new LogMessage();
         msg.setHost("example.org");
 
-        assertTrue(matcher.match(msg, rule));
+        assertTrue(matcher.match(msg));
     }
 
     @Test
@@ -49,6 +49,6 @@ public class HostMatcherTest {
         LogMessage msg = new LogMessage();
         msg.setHost("foo.example.org");
 
-        assertFalse(matcher.match(msg, rule));
+        assertFalse(matcher.match(msg));
     }
 }

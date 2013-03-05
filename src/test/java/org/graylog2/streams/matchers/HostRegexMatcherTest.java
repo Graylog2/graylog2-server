@@ -35,10 +35,10 @@ public class HostRegexMatcherTest {
         
         LogMessage msg = new LogMessage();
         msg.setHost("foo.example.org");
-        assertTrue(matcher.match(msg, rule));
+        assertTrue(matcher.match(msg));
 
         msg.setHost("bar.example.com");
-        assertTrue(matcher.match(msg, rule));
+        assertTrue(matcher.match(msg));
     }
 
     @Test
@@ -50,6 +50,6 @@ public class HostRegexMatcherTest {
         LogMessage msg = new LogMessage();
         msg.setHost("example.org");
 
-        assertFalse(matcher.match(msg, rule));
+        assertFalse(matcher.match(msg));
     }
 }

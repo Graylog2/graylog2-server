@@ -38,7 +38,7 @@ public class FullMessageMatcherTest {
         LogMessage msg = new LogMessage();
         msg.setFullMessage("ohai thar|foo");
 
-        assertTrue(matcher.match(msg, rule));
+        assertTrue(matcher.match(msg));
     }
 
     @Test
@@ -50,6 +50,6 @@ public class FullMessageMatcherTest {
         LogMessage msg = new LogMessage();
         msg.setFullMessage("ohai thar|foo");
 
-        assertFalse(matcher.match(msg, rule));
+        assertFalse(matcher.match(msg));
     }
 }

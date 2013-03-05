@@ -34,7 +34,7 @@ public class FacilityMatcher implements StreamRuleMatcher {
     }
 
     @Override
-    public boolean match(LogMessage msg, StreamRule rule) {
+    public boolean match(LogMessage msg) {
         return msg.getFacility().equals(facility);
     }
 }

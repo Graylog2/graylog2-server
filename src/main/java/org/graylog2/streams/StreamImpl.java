@@ -64,7 +64,7 @@ public class StreamImpl implements Stream {
     private final int lastAlarm;
     private final DBObject mongoObject;
     
-    private transient List<StreamRule> streamRules;
+    protected transient List<StreamRule> streamRules;
     private transient Set<String> alarmCallbacks;
     protected transient Map<String, Set<Map<String, String>>> outputs;
 
@@ -81,9 +81,9 @@ public class StreamImpl implements Stream {
     }
     
     @SuppressWarnings("unchecked")
-	private static <T> T getDefaultedValue(DBObject object, String field, T defaultValue) {
-    	Object value = object.get(field);
-    	return (null == value) ? defaultValue : (T) value;
+    private static <T> T getDefaultedValue(DBObject object, String field, T defaultValue) {
+        Object value = object.get(field);
+        return (null == value) ? defaultValue : (T) value;
     }
     
     public static Set<StreamImpl> fetchAllEnabled(Core server) {
@@ -191,7 +191,7 @@ public class StreamImpl implements Stream {
     
     public Set<Map<String, String>> getOutputConfigurations(String className) {
         if (this.outputs == null) {
-        	this.outputs = buildOutputsFromMongoList((BasicDBList) this.mongoObject.get("outputs"));
+            this.outputs = buildOutputsFromMongoList((BasicDBList) this.mongoObject.get("outputs"));
         }
 
         return outputs.get(className);
@@ -228,9 +228,9 @@ public class StreamImpl implements Stream {
     }
     
     public boolean isAlarmActive()
-	{
-		return alarmActive;
-	}
+    {
+        return alarmActive;
+    }
     
     public void setLastAlarm(int timestamp, Core server) {
         DBCollection coll = server.getMongoConnection().getDatabase().getCollection("streams");
@@ -289,8 +289,8 @@ public class StreamImpl implements Stream {
     }
     
     private Map<String, Set<Map<String, String>>> buildOutputsFromMongoList(List<Object> objs)
-	{
-		if (objs == null || objs.isEmpty()) {
+    {
+        if (objs == null || objs.isEmpty()) {
             return Maps.newHashMapWithExpectedSize(0);
         }
         
@@ -304,13 +304,13 @@ public class StreamImpl implements Stream {
                 Map<String, String> outputConfig = Maps.newHashMap();
                 for (String key : output.keySet()) {
                     String value = output.get(key).toString();
-					outputConfig.put(key, value);
+                    outputConfig.put(key, value);
                 }
                 
                 String typeclass = (String) output.get("typeclass");
                 Set<Map<String, String>> maps = o.get(typeclass);
                 if (null == maps) {
-					o.put(typeclass, maps = Sets.newHashSet());
+                    o.put(typeclass, maps = Sets.newHashSet());
                 }
                 
                 maps.add(outputConfig);
@@ -321,6 +321,6 @@ public class StreamImpl implements Stream {
         }
         
         return o;
-	}
+    }
 
 }

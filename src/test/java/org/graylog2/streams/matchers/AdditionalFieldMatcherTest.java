@@ -37,7 +37,7 @@ public class AdditionalFieldMatcherTest {
         LogMessage msg = new LogMessage();
         msg.addAdditionalData("_foo", "bar");
 
-        assertTrue(matcher.match(msg, rule));
+        assertTrue(matcher.match(msg));
     }
 
     @Test
@@ -49,7 +49,7 @@ public class AdditionalFieldMatcherTest {
         LogMessage msg = new LogMessage();
         msg.addAdditionalData("_foo", "bazbaz");
 
-        assertFalse(matcher.match(msg, rule));
+        assertFalse(matcher.match(msg));
     }
 
     @Test
@@ -61,7 +61,7 @@ public class AdditionalFieldMatcherTest {
         LogMessage msg = new LogMessage();
         msg.addAdditionalData("_foo", "bar");
 
-        assertTrue(matcher.match(msg, rule));
+        assertTrue(matcher.match(msg));
     }
 
     @Test
@@ -73,7 +73,7 @@ public class AdditionalFieldMatcherTest {
         LogMessage msg = new LogMessage();
         msg.addAdditionalData("_foo", "wat");
         
-        assertFalse(matcher.match(msg, rule));
+        assertFalse(matcher.match(msg));
     }
 
     @Test
@@ -85,6 +85,6 @@ public class AdditionalFieldMatcherTest {
         LogMessage msg = new LogMessage();
         msg.addAdditionalData("_foo", "bar1foowat");
         
-        assertTrue(matcher.match(msg, rule));
+        assertTrue(matcher.match(msg));
     }
 }

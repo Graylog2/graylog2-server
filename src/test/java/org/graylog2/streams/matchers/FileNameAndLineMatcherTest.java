@@ -39,7 +39,7 @@ public class FileNameAndLineMatcherTest {
         msg.setFile("main.rb");
         msg.setLine(17);
         
-        assertTrue(matcher.match(msg, rule));
+        assertTrue(matcher.match(msg));
     }
 
     @Test
@@ -52,7 +52,7 @@ public class FileNameAndLineMatcherTest {
         msg.setFile("lol.php");
         msg.setLine(9001);
 
-        assertTrue(matcher.match(msg, rule));
+        assertTrue(matcher.match(msg));
     }
 
     @Test
@@ -64,7 +64,7 @@ public class FileNameAndLineMatcherTest {
         LogMessage msg = new LogMessage();
         msg.setFile("lol.php");
         
-        assertTrue(matcher.match(msg, rule));
+        assertTrue(matcher.match(msg));
     }
 
     @Test
@@ -77,6 +77,6 @@ public class FileNameAndLineMatcherTest {
         msg.setFile("main.rb");
         msg.setLine(27);
         
-        assertFalse(matcher.match(msg, rule));
+        assertFalse(matcher.match(msg));
     }
 }

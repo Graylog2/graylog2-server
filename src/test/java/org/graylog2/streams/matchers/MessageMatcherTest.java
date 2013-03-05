@@ -41,7 +41,7 @@ public class MessageMatcherTest {
         LogMessage msg = new LogMessage();
         msg.setShortMessage("ohai thar|foo");
 
-        assertTrue(matcher.match(msg, rule));
+        assertTrue(matcher.match(msg));
     }
 
     @Test
@@ -53,7 +53,7 @@ public class MessageMatcherTest {
         LogMessage msg = new LogMessage();
         msg.setShortMessage("ohai thar|foo");
 
-        assertFalse(matcher.match(msg, rule));
+        assertFalse(matcher.match(msg));
     }
 
     /*
@@ -78,7 +78,7 @@ public class MessageMatcherTest {
             LogMessage msg = new LogMessage();
             msg.setShortMessage(e.getKey());
 
-            assertTrue(matcher.match(msg, rule));
+            assertTrue(matcher.match(msg));
         }
     }
 }

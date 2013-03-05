@@ -22,7 +22,6 @@ package org.graylog2.streams;
 
 import com.mongodb.BasicDBObject;
 import org.bson.types.ObjectId;
-import org.graylog2.plugin.streams.StreamRule;
 import org.junit.Test;
 import static org.junit.Assert.*;
 
@@ -59,13 +58,13 @@ public class StreamRuleTest {
         assertEquals("bar", rule.getValue());
     }
 
-	public static StreamRule toRule(int type, String value) {
-	    BasicDBObject mongo = new BasicDBObject();
-	    mongo.put("_id", new ObjectId());
-	    mongo.put("rule_type", type);
-	    mongo.put("value", value);
-	    
-		return new StreamRuleImpl(mongo);
-	}
+    public static StreamRuleImpl toRule(int type, String value) {
+        BasicDBObject mongo = new BasicDBObject();
+        mongo.put("_id", new ObjectId());
+        mongo.put("rule_type", type);
+        mongo.put("value", value);
+        
+        return new StreamRuleImpl(mongo);
+    }
 
 }

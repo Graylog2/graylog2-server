@@ -37,7 +37,7 @@ public class FacilityMatcherTest {
         LogMessage msg = new LogMessage();
         msg.setFacility("foobar");
         
-        assertTrue(matcher.match(msg, rule));
+        assertTrue(matcher.match(msg));
     }
 
     @Test
@@ -49,6 +49,6 @@ public class FacilityMatcherTest {
         LogMessage msg = new LogMessage();
         msg.setFacility("barfoo");
 
-        assertFalse(matcher.match(msg, rule));
+        assertFalse(matcher.match(msg));
     }
 }
