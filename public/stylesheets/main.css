@@ -1,3 +1,48 @@
 body {
 	background-color: #fff;
+	font-family: 'Open Sans', sans-serif;
+	margin-top: 50px;
+	font-size: 12px;
+}
+
+#top {
+	height: 40px;
+	background-image: url(/assets/images/topbg.png);
+	background-repeat: repeat-x;
+	color: #fff !important;
+}
+
+#toplogo {
+	margin-top: 7px;
+	float: left;
+}
+
+#topmenu {
+	list-style-type: none;
+	margin: 0;
+	padding-top: 9px;
+	margin-left: 200px;
+}
+
+#topmenu li {
+	float: left;
+	margin-right: 15px;
+	margin-left: 15px;
+	font-size: 13px;
+}
+
+#topmenu a {
+	color: #fff;
+	padding-bottom: 1px;
+}
+
+#topmenu a:hover {
+	text-decoration: none;
+	color: #4DBCE9;
+	border-bottom: 1px dotted #4DBCE9;
+}
+
+.searchform input {
+	font-family: monospace;
+	width: 100%;
 }
