@@ -29,7 +29,7 @@ import com.yammer.metrics.core.Meter;
 import org.graylog2.Core;
 import org.graylog2.buffers.processors.ProcessBufferProcessor;
 import org.graylog2.plugin.buffers.Buffer;
-import org.graylog2.plugin.logmessage.LogMessage;
+import org.graylog2.plugin.Message;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -45,7 +45,7 @@ public class ProcessBuffer implements Buffer {
 
     private static final Logger LOG = LoggerFactory.getLogger(ProcessBuffer.class);
     
-    protected static RingBuffer<LogMessageEvent> ringBuffer;
+    protected static RingBuffer<MessageEvent> ringBuffer;
 
     protected ExecutorService executor = Executors.newCachedThreadPool(
             new ThreadFactoryBuilder()
@@ -67,8 +67,8 @@ public class ProcessBuffer implements Buffer {
     }
 
     public void initialize() {
-        Disruptor disruptor = new Disruptor<LogMessageEvent>(
-                LogMessageEvent.EVENT_FACTORY,
+        Disruptor<MessageEvent> disruptor = new Disruptor<MessageEvent>(
+                MessageEvent.EVENT_FACTORY,
                 executor,
                 new MultiThreadedClaimStrategy(server.getConfiguration().getRingSize()),
                 server.getConfiguration().getProcessorWaitStrategy()
@@ -90,7 +90,7 @@ public class ProcessBuffer implements Buffer {
     }
     
     @Override
-    public void insertCached(LogMessage message) {
+    public void insertCached(Message message) {
         if (!hasCapacity()) {
             LOG.debug("Out of capacity. Writing to cache.");
             cachedMessages.mark();
@@ -102,7 +102,7 @@ public class ProcessBuffer implements Buffer {
     }
     
     @Override
-    public void insertFailFast(LogMessage message) throws BufferOutOfCapacityException {
+    public void insertFailFast(Message message) throws BufferOutOfCapacityException {
         if (!hasCapacity()) {
             LOG.debug("Rejecting message, because I am full and caching was disabled by input. Raise my size or add more processors.");
             rejectedMessages.mark();
@@ -112,9 +112,9 @@ public class ProcessBuffer implements Buffer {
         insert(message);
     }
     
-    private void insert(LogMessage message) {
+    private void insert(Message message) {
         long sequence = ringBuffer.next();
-        LogMessageEvent event = ringBuffer.get(sequence);
+        MessageEvent event = ringBuffer.get(sequence);
         event.setMessage(message);
         ringBuffer.publish(sequence);
 

@@ -29,9 +29,9 @@ import com.yammer.metrics.core.Meter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.graylog2.Core;
-import org.graylog2.buffers.LogMessageEvent;
+import org.graylog2.buffers.MessageEvent;
 import org.graylog2.plugin.outputs.MessageOutput;
-import org.graylog2.plugin.logmessage.LogMessage;
+import org.graylog2.plugin.Message;
 
 import java.util.List;
 import java.util.Map;
@@ -52,7 +52,7 @@ import org.graylog2.streams.StreamImpl;
 /**
  * @author Lennart Koopmann <lennart@socketfeed.com>
  */
-public class OutputBufferProcessor implements EventHandler<LogMessageEvent> {
+public class OutputBufferProcessor implements EventHandler<MessageEvent> {
 
     private static final Logger LOG = LoggerFactory.getLogger(OutputBufferProcessor.class);
 
@@ -60,7 +60,7 @@ public class OutputBufferProcessor implements EventHandler<LogMessageEvent> {
     
     private Core server;
 
-    private List<LogMessage> buffer = Lists.newArrayList();
+    private List<Message> buffer = Lists.newArrayList();
     private final Meter incomingMessages = Metrics.newMeter(OutputBufferProcessor.class, "IncomingMessages", "messages", TimeUnit.SECONDS);
     
     private final Histogram batchSize = Metrics.newHistogram(OutputBufferProcessor.class, "BatchSize");
@@ -84,7 +84,7 @@ public class OutputBufferProcessor implements EventHandler<LogMessageEvent> {
     }
 
     @Override
-    public void onEvent(LogMessageEvent event, long sequence, boolean endOfBatch) throws Exception {
+    public void onEvent(MessageEvent event, long sequence, boolean endOfBatch) throws Exception {
         // Because Trisha said so. (http://code.google.com/p/disruptor/wiki/FrequentlyAskedQuestions)
         if ((sequence % numberOfConsumers) != ordinal) {
             return;
@@ -93,7 +93,7 @@ public class OutputBufferProcessor implements EventHandler<LogMessageEvent> {
         server.outputBufferWatermark().decrementAndGet();
         incomingMessages.mark();
 
-        LogMessage msg = event.getMessage();
+        Message msg = event.getMessage();
         LOG.debug("Processing message <{}> from OutputBuffer.", msg.getId());
 
         buffer.add(msg);
@@ -106,7 +106,7 @@ public class OutputBufferProcessor implements EventHandler<LogMessageEvent> {
 
                 try {
                     // We must copy the buffer for this output, because it may be cleared before all messages are handled.
-                    final List<LogMessage> myBuffer = Lists.newArrayList(buffer);
+                    final List<Message> myBuffer = Lists.newArrayList(buffer);
 
                     LOG.debug("Writing message batch to [{}]. Size <{}>", output.getName(), buffer.size());
 
@@ -150,11 +150,11 @@ public class OutputBufferProcessor implements EventHandler<LogMessageEvent> {
         LOG.debug("Wrote message <{}> to all outputs. Finished handling.", msg.getId());
     }
 
-    private OutputStreamConfiguration buildStreamConfigs(List<LogMessage> messages, String className) {
+    private OutputStreamConfiguration buildStreamConfigs(List<Message> messages, String className) {
         OutputStreamConfiguration configs = new OutputStreamConfigurationImpl();
         Map<ObjectId, Stream> distinctStreams = Maps.newHashMap();
         
-        for (LogMessage message : messages) {
+        for (Message message : messages) {
             for (Stream stream : message.getStreams()) {
                 distinctStreams.put(stream.getId(), stream);
             }

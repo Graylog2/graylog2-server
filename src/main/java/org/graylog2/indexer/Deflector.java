@@ -201,10 +201,6 @@ public class Deflector {
     }
     
     private boolean ourIndex(String indexName) {
-        if (indexName.trim().equals(EmbeddedElasticSearchClient.RECENT_INDEX_NAME)) {
-            return false;
-        }
-        
         return indexName.startsWith(server.getConfiguration().getElasticSearchIndexPrefix() + "_");
     }
     

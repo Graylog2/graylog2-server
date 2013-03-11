@@ -19,7 +19,6 @@
  */
 package org.graylog2.periodical;
 
-import com.google.common.collect.Sets;
 import java.util.Map;
 import java.util.Set;
 import org.slf4j.Logger;

@@ -42,6 +42,7 @@ public class StandardInitializerSet {
             add(MessageCounterInitializer.class);
             add(ServerValueWriterInitializer.class);
             add(StatisticsPrinterInitializer.class);
+            add(MasterCacheWorkersInitializer.class);
         }};
     }
     

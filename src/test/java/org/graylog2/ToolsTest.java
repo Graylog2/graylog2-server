@@ -26,7 +26,6 @@ package org.graylog2;
 
 import org.graylog2.plugin.Tools;
 import com.google.common.collect.Lists;
-import com.google.common.collect.Sets;
 import org.junit.Test;
 
 import java.io.ByteArrayOutputStream;
@@ -34,7 +33,6 @@ import java.io.EOFException;
 import java.io.IOException;
 import java.util.Calendar;
 import java.util.List;
-import java.util.Set;
 import java.util.zip.Deflater;
 import java.util.zip.GZIPOutputStream;
 

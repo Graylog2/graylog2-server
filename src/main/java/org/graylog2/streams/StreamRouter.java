@@ -29,7 +29,7 @@ import java.util.List;
 import com.google.common.collect.Lists;
 import java.util.Set;
 import org.graylog2.Core;
-import org.graylog2.plugin.logmessage.LogMessage;
+import org.graylog2.plugin.Message;
 import org.graylog2.plugin.streams.Stream;
 import org.graylog2.plugin.streams.StreamRule;
 
@@ -42,7 +42,7 @@ public class StreamRouter {
 
     private static final Logger LOG = LoggerFactory.getLogger(StreamRouter.class);
 
-    public List<Stream> route(Core server, LogMessage msg) {
+    public List<Stream> route(Core server, Message msg) {
         List<Stream> matches = Lists.newArrayList();
         Set<Stream> streams = StreamImpl.fetchAllEnabled(server);
 
@@ -74,7 +74,7 @@ public class StreamRouter {
         return matches;
     }
 
-    public boolean matchStreamRule(LogMessage msg, StreamRuleMatcher matcher, StreamRule rule) {
+    public boolean matchStreamRule(Message msg, StreamRuleMatcher matcher, StreamRule rule) {
         try {
             return matcher.match(msg, rule);
         } catch (Exception e) {

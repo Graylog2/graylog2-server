@@ -96,12 +96,12 @@ public class DeflectorManagerThread implements Runnable { // public class Klimpe
             if (e.getValue().getTotal().getDocs().count() == 0) {
                 String index = e.getKey();
                 
-                // Never delete the index the deflector is currently pointing to or even the recent index, even if it is empty.
+                // Never delete the index the deflector is currently pointing to, even if it is empty.
                 try {
-                    if (index.equals(graylogServer.getDeflector().getCurrentTargetName()) || index.equals(EmbeddedElasticSearchClient.RECENT_INDEX_NAME)) {
+                    if (index.equals(graylogServer.getDeflector().getCurrentTargetName())) {
                         continue;
                     }
-                } catch (NoTargetIndexException zomg) { /** I don't care **/ }
+                } catch (NoTargetIndexException zomg) { /* I don't care */ }
                 
                 String msg = "Deleting empty index <" + index + ">";
                 graylogServer.getActivityWriter().write(new Activity(msg, DeflectorManagerThread.class));

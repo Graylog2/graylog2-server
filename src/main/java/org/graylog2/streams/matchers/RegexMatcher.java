@@ -21,33 +21,17 @@
 package org.graylog2.streams.matchers;
 
 import java.util.regex.Pattern;
-import org.graylog2.plugin.logmessage.LogMessage;
+import org.graylog2.plugin.Message;
 import org.graylog2.plugin.streams.StreamRule;
 
 /**
  * @author Lennart Koopmann <lennart@socketfeed.com>
  */
-public class AdditionalFieldMatcher implements StreamRuleMatcher {
+public class RegexMatcher implements StreamRuleMatcher {
 
     @Override
-    public boolean match(LogMessage msg, StreamRule rule) {
-        String[] parts = rule.getValue().split("=");
-        String key = "_" + parts[0];
-        String value = parts[1];
-        String str = null;
-
-        if (msg.getAdditionalData().containsKey(key) && msg.getAdditionalData().get(key) != null) {
-            Object afValue = msg.getAdditionalData().get(key);
-
-            if (afValue instanceof String) {
-                str = (String) afValue;
-            }
-
-            if (afValue instanceof Long) {
-                str = String.valueOf(afValue);
-            }
-        }
-
-        return (str != null && Pattern.compile(value, Pattern.DOTALL).matcher(str).find());
+    public boolean match(Message msg, StreamRule rule) {
+        return Pattern.compile(rule.getValue(), Pattern.DOTALL).matcher(msg.getField(rule.getField()).toString()).find();
     }
+
 }

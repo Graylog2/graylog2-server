@@ -55,7 +55,6 @@ public class AnonymousInformationCollector {
         info.put("number_of_stream_rules", numberOfStreamRules());
         info.put("number_of_blacklist_rules", Blacklist.fetchAll().size());
         info.put("total_index_size", server.getIndexer().getTotalIndexSize());
-        info.put("recent_index_size", recentIndexSize());
         info.put("recent_index_ttl", server.getConfiguration().getRecentIndexTtlMinutes());
         
         return info;
@@ -87,13 +86,4 @@ public class AnonymousInformationCollector {
         return rules;
     }
 
-    private long recentIndexSize() {
-        try {
-            return server.getIndexer().getRecentIndex().total().store().size().getMb();
-        } catch (Exception e) {
-            LOG.warn("Couldn't retrieve recent index size", e);
-            return -1;
-        }
-    }
-    
 }

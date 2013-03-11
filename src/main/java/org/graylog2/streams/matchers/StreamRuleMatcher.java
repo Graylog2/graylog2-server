@@ -20,7 +20,7 @@
 
 package org.graylog2.streams.matchers;
 
-import org.graylog2.plugin.logmessage.LogMessage;
+import org.graylog2.plugin.Message;
 import org.graylog2.plugin.streams.StreamRule;
 
 
@@ -29,6 +29,6 @@ import org.graylog2.plugin.streams.StreamRule;
  */
 public interface StreamRuleMatcher {
 
-    boolean match(LogMessage msg, StreamRule rule);
+    boolean match(Message msg, StreamRule rule);
 
 }

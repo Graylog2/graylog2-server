@@ -35,7 +35,8 @@ import org.elasticsearch.node.Node;
 import org.elasticsearch.node.NodeBuilder;
 import org.graylog2.Core;
 import org.graylog2.activities.Activity;
-import org.graylog2.plugin.logmessage.LogMessage;
+import org.graylog2.indexer.searches.Searches;
+import org.graylog2.plugin.Message;
 import org.json.simple.JSONValue;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -43,7 +44,6 @@ import org.slf4j.LoggerFactory;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.List;
 import java.util.Map;
 
@@ -59,11 +59,14 @@ public class EmbeddedElasticSearchClient {
     private Client client;
     private final MessageGateway messageGateway;
     public static final String TYPE = "message";
-    public static final String RECENT_INDEX_NAME = "graylog2_recent";
+    
+    private final Searches searches;
     
     // http://www.elasticsearch.org/guide/reference/index-modules/store.html
     public static final String STANDARD_RECENT_INDEX_STORE_TYPE = "niofs";
-    public static final List<String> ALLOWED_RECENT_INDEX_STORE_TYPES = new ArrayList<String>() {{ 
+    
+    @SuppressWarnings("serial")
+	public static final List<String> ALLOWED_RECENT_INDEX_STORE_TYPES = new ArrayList<String>() {{ 
         add("niofs");
         add("simplefs");
         add("mmapfs");
@@ -74,7 +77,6 @@ public class EmbeddedElasticSearchClient {
 
     public EmbeddedElasticSearchClient(Core graylogServer) {
         server = graylogServer;
-        messageGateway = new MessageGatewayImpl(graylogServer);
 
         final NodeBuilder builder = nodeBuilder().client(true);
         String esSettings;
@@ -95,7 +97,9 @@ public class EmbeddedElasticSearchClient {
                 node.close();
             }
         });
-
+        
+        messageGateway = new MessageGatewayImpl(graylogServer);
+        searches = new Searches(client, graylogServer);
     }
     
     public Client getClient() {
@@ -108,11 +112,6 @@ public class EmbeddedElasticSearchClient {
     
     public String allIndicesAlias() {
         return server.getConfiguration().getElasticSearchIndexPrefix() + "_*";
-    }
-    
-    public String allIndicesExceptRecentIndexAlias() {
-        // e.g. graylog2_*,-graylog2_recent
-        return allIndicesAlias() + ",-" + RECENT_INDEX_NAME;
     }
     
     public long getTotalIndexSize() {
@@ -168,17 +167,9 @@ public class EmbeddedElasticSearchClient {
         
         return isr.actionGet().indices();
     }
-
-    public IndexStats getRecentIndex() {
-        return getIndices().get(RECENT_INDEX_NAME);
-    }
     
     public ImmutableMap<String, IndexMetaData> getIndicesMetadata() {
-        return client.admin().cluster().state(new ClusterStateRequest().filteredIndices(RECENT_INDEX_NAME)).actionGet().getState().getMetaData().indices();
-    }
-    
-    public String getRecentIndexStorageType() {
-        return getIndicesMetadata().get(RECENT_INDEX_NAME).getSettings().get("index.store.type");
+        return client.admin().cluster().state(new ClusterStateRequest()).actionGet().getState().getMetaData().indices();
     }
     
     public boolean indexExists(String index) {
@@ -200,26 +191,6 @@ public class EmbeddedElasticSearchClient {
             return false;
         }
         final PutMappingRequest mappingRequest = Mapping.getPutMappingRequest(client, indexName, server.getConfiguration().getElasticSearchAnalyzer());
-        final boolean mappingCreated = client.admin().indices().putMapping(mappingRequest).actionGet().acknowledged();
-        return acknowledged && mappingCreated;
-    }
-    
-    public boolean createRecentIndex() {
-        Map<String, Object> settings = Maps.newHashMap();
-        settings.put("store.type", server.getConfiguration().getRecentIndexStoreType());
-        settings.put("number_of_shards", server.getConfiguration().getElasticSearchShards());
-        settings.put("number_of_replicas", server.getConfiguration().getElasticSearchReplicas());
-        
-        CreateIndexRequestBuilder crb = new CreateIndexRequestBuilder(client.admin().indices());
-        crb.setIndex(RECENT_INDEX_NAME);
-        crb.setSettings(settings);
-        
-        final ActionFuture<CreateIndexResponse> createFuture = client.admin().indices().create(crb.request());
-        final boolean acknowledged = createFuture.actionGet().acknowledged();
-        if (!acknowledged) {
-            return false;
-        }
-        final PutMappingRequest mappingRequest = Mapping.getPutMappingRequest(client, RECENT_INDEX_NAME, server.getConfiguration().getElasticSearchAnalyzer());
         final boolean mappingCreated = client.admin().indices().putMapping(mappingRequest).actionGet().acknowledged();
         return acknowledged && mappingCreated;
     }
@@ -248,40 +219,28 @@ public class EmbeddedElasticSearchClient {
         return index.getPrimaries().docs().count();
     }
 
-    public boolean bulkIndex(final List<LogMessage> messages) {
+    public boolean bulkIndex(final List<Message> messages) {
         if (messages.isEmpty()) {
             return true;
         }
 
-        final BulkRequestBuilder mainIndex = client.prepareBulk();
-        final BulkRequestBuilder recentIndex = client.prepareBulk();
-        for (LogMessage msg : messages) {
+        final BulkRequestBuilder request = client.prepareBulk();
+        for (Message msg : messages) {
             String source = JSONValue.toJSONString(msg.toElasticSearchObject());
 
             // we manually set the document ID to the same value to be able to match up documents later.
-            mainIndex.add(buildIndexRequest(Deflector.DEFLECTOR_NAME, source, msg.getId(), 0)); // Main index.
-            recentIndex.add(buildIndexRequest(RECENT_INDEX_NAME, source, msg.getId(), server.getConfiguration().getRecentIndexTtlMinutes())); // Recent index.
+            request.add(buildIndexRequest(Deflector.DEFLECTOR_NAME, source, msg.getId(), 0)); // Main index.
         }
 
-        mainIndex.setConsistencyLevel(WriteConsistencyLevel.ONE);
-        recentIndex.setConsistencyLevel(WriteConsistencyLevel.ONE);
+        request.setConsistencyLevel(WriteConsistencyLevel.ONE);
+        request.setReplicationType(ReplicationType.ASYNC);
         
-        mainIndex.setReplicationType(ReplicationType.ASYNC);
-        recentIndex.setReplicationType(ReplicationType.ASYNC);
-        
-        final ActionFuture<BulkResponse> mainBulkFuture = client.bulk(mainIndex.request());
-        final ActionFuture<BulkResponse> recentBulkFuture = client.bulk(recentIndex.request());
-        
-        final BulkResponse mainResponse = mainBulkFuture.actionGet();
-        final BulkResponse recentResponse = recentBulkFuture.actionGet();
+        final BulkResponse response = client.bulk(request.request()).actionGet();
         
         LOG.debug("Deflector index: Bulk indexed {} messages, took {} ms, failures: {}",
-                new Object[] { mainResponse.items().length, mainResponse.getTookInMillis(), mainResponse.hasFailures() });
-        
-        LOG.debug("Recent index: Bulk indexed {} messages, took {} ms, failures: {}",
-                new Object[] { recentResponse.items().length, recentResponse.getTookInMillis(), recentResponse.hasFailures() });
-        
-        return !mainResponse.hasFailures() && !recentResponse.hasFailures();
+                new Object[] { response.items().length, response.getTookInMillis(), response.hasFailures() });
+
+        return !response.hasFailures();
     }
 
     public void deleteMessagesByTimeRange(int to) {
@@ -333,6 +292,10 @@ public class EmbeddedElasticSearchClient {
             deleteIndex(indexName);
             server.getMongoBridge().removeIndexDateRange(indexName);
         }
+    }
+    
+    public Searches searches() {
+    	return searches;
     }
     
     private IndexRequestBuilder buildIndexRequest(String index, String source, String id, int ttlMinutes) {

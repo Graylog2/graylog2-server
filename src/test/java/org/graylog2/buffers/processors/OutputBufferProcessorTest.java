@@ -4,19 +4,15 @@
  */
 package org.graylog2.buffers.processors;
 
-import com.mongodb.BasicDBObject;
 import java.util.List;
-import org.bson.BSON;
-import org.bson.types.ObjectId;
 import org.elasticsearch.common.collect.Lists;
 import org.graylog2.GraylogServerStub;
 import org.graylog2.TestHelper;
-import org.graylog2.buffers.LogMessageEvent;
+import org.graylog2.buffers.MessageEvent;
 import org.graylog2.buffers.processors.fakeoutputs.FakeOutput;
-import org.graylog2.plugin.logmessage.LogMessage;
+import org.graylog2.plugin.Message;
 import org.graylog2.plugin.streams.Stream;
 import org.graylog2.streams.FakeStream;
-import org.graylog2.streams.StreamImpl;
 import org.junit.Test;
 import static org.junit.Assert.*;
 
@@ -54,22 +50,22 @@ public class OutputBufferProcessorTest {
         List<Stream> streamList3 = Lists.newArrayList();
         streamList3.add(stream2);
         
-        LogMessage msg1 = TestHelper.simpleLogMessage();
+        Message msg1 = TestHelper.simpleLogMessage();
         msg1.setStreams(streamList1);
         
-        LogMessage msg2 = TestHelper.simpleLogMessage();
+        Message msg2 = TestHelper.simpleLogMessage();
         msg2.setStreams(streamList2);
         
-        LogMessage msg3 = TestHelper.simpleLogMessage();
+        Message msg3 = TestHelper.simpleLogMessage();
         msg3.setStreams(streamList3);
         
-        LogMessageEvent e1 = new LogMessageEvent();
+        MessageEvent e1 = new MessageEvent();
         e1.setMessage(msg1);
         
-        LogMessageEvent e2 = new LogMessageEvent();
+        MessageEvent e2 = new MessageEvent();
         e2.setMessage(msg2);
         
-        LogMessageEvent e3 = new LogMessageEvent();
+        MessageEvent e3 = new MessageEvent();
         e3.setMessage(msg3);
         
         proc.onEvent(e1, 1, false);

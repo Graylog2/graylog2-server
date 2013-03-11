@@ -20,7 +20,11 @@
 
 package org.graylog2;
 
+import org.glassfish.grizzly.http.server.HttpServer;
 import org.graylog2.plugin.Tools;
+
+import java.io.IOException;
+import java.net.URI;
 import java.util.List;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
@@ -42,7 +46,14 @@ import com.google.common.collect.Lists;
 import java.util.concurrent.atomic.AtomicInteger;
 import com.google.common.collect.Maps;
 import java.util.Map;
+
+import javax.ws.rs.core.UriBuilder;
+
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
+import com.sun.jersey.api.container.grizzly2.GrizzlyServerFactory;
+import com.sun.jersey.api.core.PackagesResourceConfig;
+import com.sun.jersey.api.core.ResourceConfig;
+
 import org.cliffc.high_scale_lib.Counter;
 import org.graylog2.activities.Activity;
 import org.graylog2.activities.ActivityWriter;
@@ -63,7 +74,6 @@ import org.graylog2.plugin.filters.MessageFilter;
 import org.graylog2.plugin.indexer.MessageGateway;
 import org.graylog2.plugin.initializers.InitializerConfigurationException;
 import org.graylog2.plugin.inputs.MessageInputConfigurationException;
-import org.graylog2.plugin.logmessage.LogMessage;
 import org.graylog2.plugin.outputs.MessageOutputConfigurationException;
 import org.graylog2.plugin.streams.Stream;
 import org.graylog2.plugins.PluginConfiguration;
@@ -91,7 +101,8 @@ public class Core implements GraylogServer {
     private static final int SCHEDULED_THREADS_POOL_SIZE = 30;
     private ScheduledExecutorService scheduler;
 
-    public static final String GRAYLOG2_VERSION = "0.11.0";
+    public static final String GRAYLOG2_VERSION = "0.20.0-dev";
+    public static final String GRAYLOG2_CODENAME = "Amigo Humanos (Flipper)";
 
     public static final String MASTER_COUNTER_NAME = "master";
 
@@ -128,8 +139,11 @@ public class Core implements GraylogServer {
     
     private boolean localMode = false;
     private boolean statsMode = false;
+    
+    private int startedAt;
 
     public void initialize(Configuration configuration) {
+    	startedAt = Tools.getUTCTimestamp();
         serverId = Tools.generateServerId();
         
         this.configuration = configuration; // TODO use dependency injection
@@ -220,19 +234,6 @@ public class Core implements GraylogServer {
         LOG.info("Setting up deflector.");
         deflector = new Deflector(this);
         deflector.setUp();
-        
-        // Set up recent index.
-        if (indexer.indexExists(EmbeddedElasticSearchClient.RECENT_INDEX_NAME)) {
-            LOG.info("Recent index exists. Not creating it.");
-        } else {
-            LOG.info("Recent index does not exist! Trying to create it ...");
-            if (indexer.createRecentIndex()) {
-                LOG.info("Successfully created recent index.");
-            } else {
-                LOG.error("Could not create recent index. Terminating.");
-                System.exit(1);
-            }
-        }
 
         scheduler = Executors.newScheduledThreadPool(SCHEDULED_THREADS_POOL_SIZE,
                 new ThreadFactoryBuilder().setNameFormat("scheduled-%d").build()
@@ -342,6 +343,12 @@ public class Core implements GraylogServer {
 
     }
     
+    public void startRestApi() throws IOException {
+        URI restUri = UriBuilder.fromUri(configuration.getRestListenUri()).port(configuration.getRestListenPort()).build();
+        startRestServer(restUri);
+        LOG.info("Started REST API at <{}>", restUri);
+    }
+    
     private <A> void loadPlugins(Class<A> type, String subDirectory) {
         PluginLoader<A> pl = new PluginLoader(configuration.getPluginDir(), subDirectory, type);
         for (A plugin : pl.getPlugins()) {
@@ -363,6 +370,12 @@ public class Core implements GraylogServer {
                 LOG.error("Could not load plugin [{}] - Not supported type.", plugin.getClass().getCanonicalName());
             }
         }
+    }
+
+    private HttpServer startRestServer(URI restUri) throws IOException {
+        ResourceConfig rc = new PackagesResourceConfig("org.graylog2.rest.resources");
+        rc.getProperties().put("core", this);
+        return GrizzlyServerFactory.createHttpServer(restUri, rc);
     }
 
     public MongoConnection getMongoConnection() {
@@ -523,6 +536,10 @@ public class Core implements GraylogServer {
     
     public Cache getOutputCache() {
         return outputCache;
+    }
+    
+    public int getStartedAt() {
+    	return startedAt;
     }
     
 }

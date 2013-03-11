@@ -25,7 +25,7 @@ import com.yammer.metrics.Metrics;
 import com.yammer.metrics.core.Meter;
 import com.yammer.metrics.core.Timer;
 import com.yammer.metrics.core.TimerContext;
-import org.graylog2.plugin.logmessage.LogMessage;
+import org.graylog2.plugin.Message;
 
 import java.util.List;
 import java.util.Map;
@@ -51,7 +51,7 @@ public class ElasticSearchOutput implements MessageOutput {
     private static final Logger LOG = LoggerFactory.getLogger(ElasticSearchOutput.class);
 
     @Override
-    public void write(List<LogMessage> messages, OutputStreamConfiguration streamConfig, GraylogServer server) throws Exception {
+    public void write(List<Message> messages, OutputStreamConfiguration streamConfig, GraylogServer server) throws Exception {
         LOG.debug("Writing <{}> messages.", messages.size());
         
         Core serverImpl = (Core) server;

@@ -28,7 +28,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.graylog2.plugin.GraylogServer;
 import org.graylog2.plugin.filters.MessageFilter;
-import org.graylog2.plugin.logmessage.LogMessage;
+import org.graylog2.plugin.Message;
 
 import java.util.concurrent.TimeUnit;
 import java.util.regex.Pattern;
@@ -62,19 +62,19 @@ public class TokenizerFilter implements MessageFilter {
      */
 
     @Override
-    public boolean filter(LogMessage msg, GraylogServer server) {
+    public boolean filter(Message msg, GraylogServer server) {
         TimerContext tcx = processTime.time();
 
         int extracted = 0;
-        if (msg.getShortMessage().contains("=")) {
+        if (msg.getMessage().contains("=")) {
             try {
-                final String nmsg = kvPattern.matcher(msg.getShortMessage()).replaceAll("=");
+                final String nmsg = kvPattern.matcher(msg.getMessage()).replaceAll("=");
                 if (nmsg.contains("=\"")) {
                     Matcher m = quotedValuePattern.matcher(nmsg);
                     while (m.find()) {
                         String[] kv = m.group(1).split("=");
-                        if (kv.length == 2 && p.matcher(kv[0]).matches() && !kv[0].equals("id")) {
-                            msg.addAdditionalData(kv[0].trim(), QUOTE_MATCHER.removeFrom(kv[1]).trim());
+                        if (kv.length == 2 && p.matcher(kv[0]).matches()) {
+                            msg.addField(kv[0].trim(), QUOTE_MATCHER.removeFrom(kv[1]).trim());
                             extracted++;
                         }
                     }
@@ -84,8 +84,8 @@ public class TokenizerFilter implements MessageFilter {
                         for (String part : parts) {
                             if (part.contains("=") && EQUAL_SIGN_MATCHER.countIn(part) == 1) {
                                 String[] kv = part.split("=");
-                                if (kv.length == 2 && p.matcher(kv[0]).matches() && !msg.getAdditionalData().containsKey("_" + kv[0]) && !kv[0].equals("id")) {
-                                    msg.addAdditionalData(kv[0].trim(), kv[1].trim());
+                                if (kv.length == 2 && p.matcher(kv[0]).matches() && !msg.getFields().containsKey(kv[0])) {
+                                    msg.addField(kv[0].trim(), kv[1].trim());
                                     extracted++;
                                 }
                             }

@@ -81,6 +81,12 @@ public class Configuration {
     @Parameter(value = "syslog_store_full_message", required = false)
     private boolean syslogStoreFullMessage = true;
     
+    @Parameter(value = "rest_listen_uri", required = true)
+    private String restListenUri = "http://0.0.0.0/";
+    
+    @Parameter(value = "rest_listen_port", required = true, validator = InetPortValidator.class)
+    private int restListenPort = 12900;
+    
     @Parameter(value = "udp_recvbuffer_sizes", required = true, validator = PositiveIntegerValidator.class)
     private int udpRecvBufferSizes = 1048576;
     
@@ -698,6 +704,14 @@ public class Configuration {
         return httpListenPort;
     }
     
+    public String getRestListenUri() {
+    	return restListenUri;
+    }
+    
+    public int getRestListenPort() {
+    	return restListenPort;
+    }
+    
     private Map<String, String> getGELFInputConfig() {
         Map<String, String> c = Maps.newHashMap();
         
@@ -724,4 +738,5 @@ public class Configuration {
         
         return c;
     }
+    
 }

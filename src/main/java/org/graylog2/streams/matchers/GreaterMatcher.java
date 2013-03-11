@@ -1,5 +1,5 @@
 /**
- * Copyright 2012 Lennart Koopmann <lennart@socketfeed.com>
+ * Copyright 2013 Lennart Koopmann <lennart@socketfeed.com>
  *
  * This file is part of Graylog2.
  *
@@ -18,35 +18,29 @@
  *
  */
 
-package org.graylog2.buffers;
+package org.graylog2.streams.matchers;
 
-import com.lmax.disruptor.EventFactory;
-import org.graylog2.plugin.logmessage.LogMessage;
+import org.graylog2.plugin.Message;
+import org.graylog2.plugin.streams.StreamRule;
 
 /**
  * @author Lennart Koopmann <lennart@socketfeed.com>
  */
-public class LogMessageEvent {
+public class GreaterMatcher implements StreamRuleMatcher {
 
-    private LogMessage msg;
-    
-    public LogMessage getMessage()
-    {
-        return msg;
-    }
-
-    public void setMessage(final LogMessage msg)
-    {
-        this.msg = msg;
-    }
-
-    public final static EventFactory<LogMessageEvent> EVENT_FACTORY = new EventFactory<LogMessageEvent>()
-    {
-        @Override
-        public LogMessageEvent newInstance()
-        {
-            return new LogMessageEvent();
-        }
-    };
+	@Override
+	public boolean match(Message msg, StreamRule rule) {
+		int num;
+		int compare;
+		
+		try {
+			num = Integer.parseInt(msg.getField(rule.getField()).toString());
+			compare = Integer.parseInt(rule.getValue());
+		} catch (Exception e) {
+			return false;
+		}
+	
+		return num > compare;
+	}
 
 }

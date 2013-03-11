@@ -1,5 +1,5 @@
 /**
- * Copyright 2011 Lennart Koopmann <lennart@socketfeed.com>
+ * Copyright 2011, 2012, 2013 Lennart Koopmann <lennart@socketfeed.com>
  *
  * This file is part of Graylog2.
  *
@@ -20,55 +20,64 @@
 
 package org.graylog2.streams.matchers;
 
-import org.graylog2.plugin.logmessage.LogMessage;
-import com.mongodb.BasicDBObject;
+import org.graylog2.plugin.Message;
 import org.bson.types.ObjectId;
+import com.mongodb.BasicDBObject;
 import org.graylog2.streams.StreamRuleImpl;
 import org.junit.Test;
 import static org.junit.Assert.*;
 
-public class HostMatcherTest {
-    @Test
-    public void testTheTruthToWork() {
-        assertTrue(true);
-    }
+public class RegexMatcherTest {
 
     @Test
     public void testSuccessfulMatch() {
-        String host = "example.org";
-
         BasicDBObject mongoRule = new BasicDBObject();
         mongoRule.put("_id", new ObjectId());
-        mongoRule.put("rule_type", StreamRuleImpl.TYPE_HOST);
-        mongoRule.put("value", host);
+        mongoRule.put("rule_type", StreamRuleImpl.TYPE_REGEX);
+        mongoRule.put("field", "something");
+        mongoRule.put("value", "^foo");
 
         StreamRuleImpl rule = new StreamRuleImpl(mongoRule);
 
-        LogMessage msg = new LogMessage();
-        msg.setHost(host);
+        Message msg = new Message("foo", "bar", 0);
+        msg.addField("something", "foobar");
 
-        HostMatcher matcher = new HostMatcher();
-
+        RegexMatcher matcher = new RegexMatcher();
         assertTrue(matcher.match(msg, rule));
     }
 
     @Test
     public void testMissedMatch() {
-        String host = "example.org";
-
         BasicDBObject mongoRule = new BasicDBObject();
         mongoRule.put("_id", new ObjectId());
-        mongoRule.put("rule_type", StreamRuleImpl.TYPE_HOST);
-        mongoRule.put("value", host);
+        mongoRule.put("rule_type", StreamRuleImpl.TYPE_REGEX);
+        mongoRule.put("field", "something");
+        mongoRule.put("value", "^foo");
 
         StreamRuleImpl rule = new StreamRuleImpl(mongoRule);
 
-        LogMessage msg = new LogMessage();
-        msg.setHost(host + "foo");
+        Message msg = new Message("foo", "bar", 0);
+        msg.addField("something", "zomg");
 
-        HostMatcher matcher = new HostMatcher();
-
+        RegexMatcher matcher = new RegexMatcher();
         assertFalse(matcher.match(msg, rule));
+    }
+
+    @Test
+    public void testSuccessfulComplexRegexMatch() {
+        BasicDBObject mongoRule = new BasicDBObject();
+        mongoRule.put("_id", new ObjectId());
+        mongoRule.put("rule_type", StreamRuleImpl.TYPE_REGEX);
+        mongoRule.put("field", "some_field");
+        mongoRule.put("value", "foo=^foo|bar\\d.+wat");
+
+        StreamRuleImpl rule = new StreamRuleImpl(mongoRule);
+
+        Message msg = new Message("foo", "bar", 0);
+        msg.addField("some_field", "bar1foowat");
+
+        RegexMatcher matcher = new RegexMatcher();
+        assertTrue(matcher.match(msg, rule));
     }
 
 }

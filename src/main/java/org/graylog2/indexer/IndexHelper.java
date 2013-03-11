@@ -24,16 +24,12 @@ import java.util.List;
 import java.util.Set;
 import org.elasticsearch.common.collect.Lists;
 import org.graylog2.plugin.Tools;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * @author Lennart Koopmann <lennart@socketfeed.com>
  */
 public class IndexHelper {
-    
-    private static final Logger LOG = LoggerFactory.getLogger(IndexHelper.class);
-    
+
     public static Set<String> getOldestIndices(Set<String> indexNames, int count) {
         Set<String> r = Sets.newHashSet();
         

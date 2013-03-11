@@ -23,7 +23,7 @@ package org.graylog2.filters;
 import org.apache.log4j.Logger;
 import org.graylog2.GraylogServerStub;
 import org.graylog2.TestAppender;
-import org.graylog2.plugin.logmessage.LogMessage;
+import org.graylog2.plugin.Message;
 import org.junit.Test;
 import static org.junit.Assert.*;
 
@@ -34,109 +34,99 @@ public class TokenizerFilterTest {
 
     @Test
     public void testFilter() {
-        LogMessage msg = new LogMessage();
-        msg.setShortMessage("Ohai I am a message k1=v1 k2=v2 Awesome!");
+        Message msg = new Message("Ohai I am a message k1=v1 k2=v2 Awesome!", "foo", 0);
         TokenizerFilter f = new TokenizerFilter();
         f.filter(msg, new GraylogServerStub());
 
-        assertEquals(2, msg.getAdditionalData().size());
-        assertEquals("v1", msg.getAdditionalData().get("_k1"));
-        assertEquals("v2", msg.getAdditionalData().get("_k2"));
+        assertEquals(6, msg.getFields().size());
+        assertEquals("v1", msg.getField("k1"));
+        assertEquals("v2", msg.getField("k2"));
     }
 
     @Test
     public void testFilterWithKVAtBeginning() {
-        LogMessage msg = new LogMessage();
-        msg.setShortMessage("k1=v1 k2=v2 Awesome!");
+        Message msg = new Message("k1=v1 k2=v2 Awesome!", "foo", 0);
         TokenizerFilter f = new TokenizerFilter();
         f.filter(msg, new GraylogServerStub());
 
-        assertEquals(2, msg.getAdditionalData().size());
-        assertEquals("v1", msg.getAdditionalData().get("_k1"));
-        assertEquals("v2", msg.getAdditionalData().get("_k2"));
+        assertEquals(6, msg.getFields().size());
+        assertEquals("v1", msg.getField("k1"));
+        assertEquals("v2", msg.getField("k2"));
     }
 
     @Test
     public void testFilterWithKVAtEnd() {
-        LogMessage msg = new LogMessage();
-        msg.setShortMessage("lolwat Awesome! k1=v1");
+        Message msg = new Message("lolwat Awesome! k1=v1", "foo", 0);
         TokenizerFilter f = new TokenizerFilter();
         f.filter(msg, new GraylogServerStub());
 
-        assertEquals(1, msg.getAdditionalData().size());
-        assertEquals("v1", msg.getAdditionalData().get("_k1"));
+        assertEquals(5, msg.getFields().size());
+        assertEquals("v1", msg.getField("k1"));
     }
 
     @Test
     public void testFilterWithStringInBetween() {
-        LogMessage msg = new LogMessage();
-        msg.setShortMessage("foo k2=v2 lolwat Awesome! k1=v1");
+        Message msg = new Message("foo k2=v2 lolwat Awesome! k1=v1", "foo", 0);
         TokenizerFilter f = new TokenizerFilter();
         f.filter(msg, new GraylogServerStub());
 
-        assertEquals(2, msg.getAdditionalData().size());
-        assertEquals("v1", msg.getAdditionalData().get("_k1"));
-        assertEquals("v2", msg.getAdditionalData().get("_k2"));
+        assertEquals(6, msg.getFields().size());
+        assertEquals("v1", msg.getField("k1"));
+        assertEquals("v2", msg.getField("k2"));
     }
 
     @Test
     public void testFilterWithKVOnly() {
-        LogMessage msg = new LogMessage();
-        msg.setShortMessage("k1=v1");
+        Message msg = new Message("k1=v1", "foo", 0);
         TokenizerFilter f = new TokenizerFilter();
         f.filter(msg, new GraylogServerStub());
 
-        assertEquals(1, msg.getAdditionalData().size());
-        assertEquals("v1", msg.getAdditionalData().get("_k1"));
+        assertEquals(5, msg.getFields().size());
+        assertEquals("v1", msg.getField("k1"));
     }
 
     @Test
     public void testFilterWithInvalidKVPairs() {
-        LogMessage msg = new LogMessage();
-        msg.setShortMessage("Ohai I am a message and this is a URL: index.php?foo=bar&baz=bar");
+        Message msg = new Message("Ohai I am a message and this is a URL: index.php?foo=bar&baz=bar", "foo", 0);
         TokenizerFilter f = new TokenizerFilter();
         f.filter(msg, new GraylogServerStub());
 
-        assertEquals(0, msg.getAdditionalData().size());
+        assertEquals(4, msg.getFields().size());
     }
 
     @Test
     public void testFilterWithoutKVPairs() {
-        LogMessage msg = new LogMessage();
-        msg.setShortMessage("trolololololol");
+        Message msg = new Message("trolololololol", "foo", 0);
         TokenizerFilter f = new TokenizerFilter();
         f.filter(msg, new GraylogServerStub());
 
-        assertEquals(0, msg.getAdditionalData().size());
+        assertEquals(4, msg.getFields().size());
     }
 
     @Test
     public void testFilterWithOneInvalidKVPair() {
-        LogMessage msg = new LogMessage();
-        msg.setShortMessage("Ohai I am a message and this is a URL: index.php?foo=bar");
+        Message msg = new Message("Ohai I am a message and this is a URL: index.php?foo=bar", "foo", 0);
         TokenizerFilter f = new TokenizerFilter();
         f.filter(msg, new GraylogServerStub());
 
-        assertEquals(0, msg.getAdditionalData().size());
+        assertEquals(4, msg.getFields().size());
     }
 
     @Test
     public void testFilterWillNotOverwriteExistingAdditionalFields() {
-        LogMessage msg = new LogMessage();
-        msg.addAdditionalData("_k1", "YOU BETTER NOT OVERWRITE");
-        msg.setShortMessage("Ohai I am a message k1=v1 k2=v2 Awesome!");
+        Message msg = new Message("Ohai I am a message k1=v1 k2=v2 Awesome!", "foo", 0);
+        msg.addField("k1", "YOU BETTER NOT OVERWRITE");
         TokenizerFilter f = new TokenizerFilter();
         f.filter(msg, new GraylogServerStub());
 
-        assertEquals(2, msg.getAdditionalData().size());
-        assertEquals("YOU BETTER NOT OVERWRITE", msg.getAdditionalData().get("_k1"));
-        assertEquals("v2", msg.getAdditionalData().get("_k2"));
+        assertEquals(6, msg.getFields().size());
+        assertEquals("YOU BETTER NOT OVERWRITE", msg.getField("k1"));
+        assertEquals("v2", msg.getField("k2"));
     }
 
     @Test
     public void testFilterWithWhitespaceAroundKVNoException() {
-        LogMessage msg = new LogMessage();
-        msg.setShortMessage("k1 = ");
+        Message msg = new Message("k1 = ", "foo", 0);
         TokenizerFilter f = new TokenizerFilter();
 
         Logger logger = Logger.getLogger(TokenizerFilter.class);
@@ -146,55 +136,53 @@ public class TokenizerFilterTest {
         f.filter(msg, new GraylogServerStub());
 
         assertEquals("Should not log anything", 0, testAppender.getEvents().size());
-        assertEquals(0, msg.getAdditionalData().size());
+        assertEquals(4, msg.getFields().size());
     }
 
     @Test
     public void testFilterWithWhitespaceAroundKV() {
-        LogMessage msg = new LogMessage();
-        msg.setShortMessage("otters in k1 = v1 k2= v2 k3 =v3 k4=v4 more otters");
+        Message msg = new Message("otters in k1 = v1 k2= v2 k3 =v3 k4=v4 more otters", "foo", 0);
         TokenizerFilter f = new TokenizerFilter();
         f.filter(msg, new GraylogServerStub());
 
-        assertEquals("There should be 4 kv pairs", 4, msg.getAdditionalData().size());
-        assertEquals("v1", msg.getAdditionalData().get("_k1"));
-        assertEquals("v2", msg.getAdditionalData().get("_k2"));
-        assertEquals("v3", msg.getAdditionalData().get("_k3"));
-        assertEquals("v4", msg.getAdditionalData().get("_k4"));
+        assertEquals(8, msg.getFields().size());
+        assertEquals("v1", msg.getField("k1"));
+        assertEquals("v2", msg.getField("k2"));
+        assertEquals("v3", msg.getField("k3"));
+        assertEquals("v4", msg.getField("k4"));
     }
 
     @Test
     public void testFilterWithQuotedValue() {
-        LogMessage msg = new LogMessage();
-        msg.setShortMessage("otters in k1=\"v1\" more otters");
+        Message msg = new Message("otters in k1=\"v1\" more otters", "foo", 0);
         TokenizerFilter f = new TokenizerFilter();
         f.filter(msg, new GraylogServerStub());
 
-        assertEquals("There should be 1 kv pairs", 1, msg.getAdditionalData().size());
-        assertEquals("v1", msg.getAdditionalData().get("_k1"));
+        assertEquals(5, msg.getFields().size());
+        assertEquals("v1", msg.getField("k1"));
     }
 
    @Test
     public void testFilterWithIDAdditionalField() {
-        LogMessage msg = new LogMessage();
-        msg.setShortMessage("otters id=123 more otters");
+        Message msg = new Message("otters _id=123 more otters", "foo", 0);
         TokenizerFilter f = new TokenizerFilter();
         f.filter(msg, new GraylogServerStub());
 
-        assertEquals(false, msg.getAdditionalData().containsKey("_id"));
+        assertTrue(msg.getField("_id") != "123");
     }
    
    @Test
    public void testFilterWithConflictingAdditionalFields() {
-        LogMessage msg = new LogMessage();
-        msg.setShortMessage("otters id=123 ttl=123 more otters");
+        Message msg = new Message("otters id=lolwut _id=123 _ttl=123 more otters", "foo", 0);
         TokenizerFilter f = new TokenizerFilter();
         f.filter(msg, new GraylogServerStub());
 
-        // TTL and ID are protected and should not get accepted.
+        // id is fine (_id is not)
+        assertEquals("lolwut", msg.getField("id"));
         
-        assertEquals(false, msg.getAdditionalData().containsKey("_id"));
-        assertEquals(false, msg.getAdditionalData().containsKey("_ttl"));
+        // TTL and ID are protected and should not get accepted.
+        assertTrue(msg.getField("_id") != "123");
+        assertEquals(false, msg.getFields().containsKey("_ttl"));
    }
 
 }

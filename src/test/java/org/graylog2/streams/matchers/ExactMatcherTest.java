@@ -1,5 +1,5 @@
 /**
- * Copyright 2011 Lennart Koopmann <lennart@socketfeed.com>
+ * Copyright 2011, 2012, 2013 Lennart Koopmann <lennart@socketfeed.com>
  *
  * This file is part of Graylog2.
  *
@@ -20,54 +20,46 @@
 
 package org.graylog2.streams.matchers;
 
-import org.graylog2.plugin.logmessage.LogMessage;
+import org.graylog2.plugin.Message;
 import org.bson.types.ObjectId;
 import com.mongodb.BasicDBObject;
 import org.graylog2.streams.StreamRuleImpl;
 import org.junit.Test;
 import static org.junit.Assert.*;
 
-public class SeverityMatcherTest {
-    @Test
-    public void testTheTruthToWork() {
-        assertTrue(true);
-    }
+public class ExactMatcherTest {
 
     @Test
     public void testSuccessfulMatch() {
-        int severity = 1;
-
         BasicDBObject mongoRule = new BasicDBObject();
         mongoRule.put("_id", new ObjectId());
-        mongoRule.put("rule_type", StreamRuleImpl.TYPE_SEVERITY);
-        mongoRule.put("value", String.valueOf(severity));
+        mongoRule.put("rule_type", StreamRuleImpl.TYPE_EXACT);
+        mongoRule.put("field", "something");
+        mongoRule.put("value", "foo");
 
         StreamRuleImpl rule = new StreamRuleImpl(mongoRule);
 
-        LogMessage msg = new LogMessage();
-        msg.setLevel(severity);
+        Message msg = new Message("foo", "bar", 0);
+        msg.addField("something", "foo");
 
-        SeverityMatcher matcher = new SeverityMatcher();
-
+        ExactMatcher matcher = new ExactMatcher();
         assertTrue(matcher.match(msg, rule));
     }
 
     @Test
     public void testMissedMatch() {
-        int severity = 3;
-
         BasicDBObject mongoRule = new BasicDBObject();
         mongoRule.put("_id", new ObjectId());
-        mongoRule.put("rule_type", StreamRuleImpl.TYPE_SEVERITY);
-        mongoRule.put("value", String.valueOf(severity));
+        mongoRule.put("rule_type", StreamRuleImpl.TYPE_EXACT);
+        mongoRule.put("field", "something");
+        mongoRule.put("value", "foo");
 
         StreamRuleImpl rule = new StreamRuleImpl(mongoRule);
 
-        LogMessage msg = new LogMessage();
-        msg.setLevel(severity+1);
+        Message msg = new Message("foo", "bar", 0);
+        msg.addField("something", "nonono");
 
-        SeverityMatcher matcher = new SeverityMatcher();
-
+        ExactMatcher matcher = new ExactMatcher();
         assertFalse(matcher.match(msg, rule));
     }
 

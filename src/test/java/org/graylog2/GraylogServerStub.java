@@ -21,7 +21,7 @@
 package org.graylog2;
 
 import org.graylog2.buffers.ProcessBuffer;
-import org.graylog2.plugin.logmessage.LogMessage;
+import org.graylog2.plugin.Message;
 
 /**
  * @author Lennart Koopmann <lennart@socketfeed.com>
@@ -29,7 +29,7 @@ import org.graylog2.plugin.logmessage.LogMessage;
 public class GraylogServerStub extends Core {
 
     public int callsToProcessBufferInserter = 0;
-    public LogMessage lastInsertedToProcessBuffer = null;
+    public Message lastInsertedToProcessBuffer = null;
     private Configuration configurationStub;
 
     @Override

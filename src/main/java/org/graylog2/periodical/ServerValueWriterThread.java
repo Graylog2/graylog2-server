@@ -23,7 +23,6 @@ package org.graylog2.periodical;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.graylog2.Core;
-import org.graylog2.MessageCounterImpl;
 import org.graylog2.plugin.MessageCounter;
 
 /**

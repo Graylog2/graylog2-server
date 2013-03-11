@@ -19,7 +19,7 @@
  */
 package org.graylog2.buffers;
 
-import org.graylog2.plugin.logmessage.LogMessage;
+import org.graylog2.plugin.Message;
 
 /**
  * 
@@ -27,8 +27,8 @@ import org.graylog2.plugin.logmessage.LogMessage;
  */
 public interface Cache {
     
-    public void add(LogMessage m);
-    public LogMessage pop();
+    public void add(Message m);
+    public Message pop();
     public int size();
     
 }

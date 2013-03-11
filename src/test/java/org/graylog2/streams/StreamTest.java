@@ -1,5 +1,5 @@
 /**
- * Copyright 2011 Lennart Koopmann <lennart@socketfeed.com>
+ * Copyright 2011, 2012, 2013 Lennart Koopmann <lennart@socketfeed.com>
  *
  * This file is part of Graylog2.
  *
@@ -40,13 +40,15 @@ public class StreamTest {
     public void testGetStreamRules() {
         BasicDBObject mongoRule1 = new BasicDBObject();
         mongoRule1.put("_id", new ObjectId());
-        mongoRule1.put("rule_type", StreamRuleImpl.TYPE_HOST);
+        mongoRule1.put("rule_type", StreamRuleImpl.TYPE_EXACT);
         mongoRule1.put("value", "example.org");
+        mongoRule1.put("field", "source");
 
         BasicDBObject mongoRule2 = new BasicDBObject();
         mongoRule2.put("_id", new ObjectId());
-        mongoRule2.put("rule_type", StreamRuleImpl.TYPE_SEVERITY);
+        mongoRule2.put("rule_type", StreamRuleImpl.TYPE_GREATER);
         mongoRule2.put("value", "2");
+        mongoRule2.put("field", "something");
 
         BasicDBList rules = new BasicDBList();
         rules.add(mongoRule1);
@@ -59,10 +61,12 @@ public class StreamTest {
 
         assertEquals(2, stream.getStreamRules().size());
 
-        assertEquals(StreamRuleImpl.TYPE_HOST, stream.getStreamRules().get(0).getRuleType());
+        assertEquals(StreamRuleImpl.TYPE_EXACT, stream.getStreamRules().get(0).getRuleType());
+        assertEquals("source", stream.getStreamRules().get(0).getField());
         assertEquals("example.org", stream.getStreamRules().get(0).getValue());
 
-        assertEquals(StreamRuleImpl.TYPE_SEVERITY, stream.getStreamRules().get(1).getRuleType());
+        assertEquals(StreamRuleImpl.TYPE_GREATER, stream.getStreamRules().get(1).getRuleType());
+        assertEquals("something", stream.getStreamRules().get(1).getField());
         assertEquals("2", stream.getStreamRules().get(1).getValue());
     }
 

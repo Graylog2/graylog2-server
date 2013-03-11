@@ -28,7 +28,7 @@ import org.drools.builder.*;
 import org.drools.io.ResourceFactory;
 import org.drools.runtime.StatefulKnowledgeSession;
 import org.graylog2.plugin.RulesEngine;
-import org.graylog2.plugin.logmessage.LogMessage;
+import org.graylog2.plugin.Message;
 
 public final class RulesEngineImpl implements RulesEngine {
 
@@ -54,7 +54,7 @@ public final class RulesEngineImpl implements RulesEngine {
 		this.kbase.addKnowledgePackages(kbuilder.getKnowledgePackages());
 	}
 	
-	public void evaluate(LogMessage message) {
+	public void evaluate(Message message) {
 		// Create new session, insert fact and evaluate
 		StatefulKnowledgeSession ksession = this.kbase.newStatefulKnowledgeSession();
 		ksession.insert(message);

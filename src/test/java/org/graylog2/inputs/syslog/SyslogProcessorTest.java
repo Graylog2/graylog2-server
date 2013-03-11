@@ -20,11 +20,10 @@
 
 package org.graylog2.inputs.syslog;
 
-import org.graylog2.plugin.Tools;
 import java.net.InetAddress;
 import org.graylog2.Configuration;
 import org.graylog2.GraylogServerStub;
-import org.graylog2.plugin.logmessage.LogMessage;
+import org.graylog2.plugin.Message;
 import org.junit.Test;
 import static org.junit.Assert.*;
 
@@ -48,15 +47,15 @@ public class SyslogProcessorTest {
         processor.messageReceived(ValidNonStructuredMessage, InetAddress.getLocalHost());
         processor.messageReceived(ValidNonStructuredMessage, InetAddress.getLocalHost());
 
-        LogMessage lm = serverStub.lastInsertedToProcessBuffer;
+        Message lm = serverStub.lastInsertedToProcessBuffer;
 
         assertEquals(2, serverStub.callsToProcessBufferInserter);
 
-        assertEquals("security/authorization", lm.getFacility());
-        assertEquals("foo-bar", lm.getHost());
-        assertEquals(6, lm.getLevel());
-        assertEquals(ValidNonStructuredMessage, lm.getFullMessage());
-        assertEquals(0, lm.getAdditionalData().size());
+        assertEquals("security/authorization", lm.getField("facility"));
+        assertEquals("foo-bar", lm.getField("source"));
+        assertEquals(6, lm.getField("level"));
+        assertEquals(ValidNonStructuredMessage, lm.getField("full_message"));
+        assertEquals(7, lm.getFields().size());
     }
     
     @Test
@@ -68,15 +67,15 @@ public class SyslogProcessorTest {
 
         processor.messageReceived(ValidNonStructuredMessageWithShortDate, InetAddress.getLocalHost());
 
-        LogMessage lm = serverStub.lastInsertedToProcessBuffer;
+        Message lm = serverStub.lastInsertedToProcessBuffer;
 
         assertEquals(1, serverStub.callsToProcessBufferInserter);
 
-        assertEquals("security/authorization", lm.getFacility());
-        assertEquals("foo-bar", lm.getHost());
-        assertEquals(6, lm.getLevel());
-        assertEquals(ValidNonStructuredMessageWithShortDate, lm.getFullMessage());
-        assertEquals(0, lm.getAdditionalData().size());
+        assertEquals("security/authorization", lm.getField("facility"));
+        assertEquals("foo-bar", lm.getField("source"));
+        assertEquals(6, lm.getField("level"));
+        assertEquals(ValidNonStructuredMessageWithShortDate, lm.getField("full_message"));
+        assertEquals(7, lm.getFields().size());
     }
 
     @Test
@@ -88,19 +87,19 @@ public class SyslogProcessorTest {
 
         processor.messageReceived(ValidStructuredMessage, InetAddress.getLocalHost());
 
-        LogMessage lm = serverStub.lastInsertedToProcessBuffer;
+        Message lm = serverStub.lastInsertedToProcessBuffer;
 
         assertEquals(1, serverStub.callsToProcessBufferInserter);
 
-        assertEquals("local4", lm.getFacility());
-        assertEquals("mymachine.example.com", lm.getHost());
-        assertEquals(5, lm.getLevel());
-        assertEquals(ValidStructuredMessage, lm.getFullMessage());
-        assertEquals("evntslog", lm.getAdditionalData().get("_application_name"));
-        assertEquals("1011", lm.getAdditionalData().get("_eventID"));
-        assertEquals("Application", lm.getAdditionalData().get("_eventSource"));
-        assertEquals("3", lm.getAdditionalData().get("_iut"));
-        assertEquals(4, lm.getAdditionalData().size());
+        assertEquals("local4", lm.getField("facility"));
+        assertEquals("mymachine.example.com", lm.getField("source"));
+        assertEquals(5, lm.getField("level"));
+        assertEquals(ValidStructuredMessage, lm.getField("full_message"));
+        assertEquals("evntslog", lm.getField("application_name"));
+        assertEquals("1011", lm.getField("eventID"));
+        assertEquals("Application", lm.getField("eventSource"));
+        assertEquals("3", lm.getField("iut"));
+        assertEquals(11, lm.getFields().size());
     }
     
     @Test
@@ -113,17 +112,17 @@ public class SyslogProcessorTest {
         processor.messageReceived(ValidStructuedMessageWithDifferentDateFormat, InetAddress.getLocalHost());
         processor.messageReceived(ValidStructuedMessageWithDifferentDateFormat, InetAddress.getLocalHost());
 
-        LogMessage lm = serverStub.lastInsertedToProcessBuffer;
+        Message lm = serverStub.lastInsertedToProcessBuffer;
 
         assertEquals(2, serverStub.callsToProcessBufferInserter);
 
-        assertEquals("local4", lm.getFacility());
-        assertEquals("192.0.2.1", lm.getHost());
-        assertEquals(5, lm.getLevel());
-        assertEquals(ValidStructuedMessageWithDifferentDateFormat, lm.getFullMessage());
-        assertEquals("myproc", lm.getAdditionalData().get("_application_name"));
-        assertEquals("8710", lm.getAdditionalData().get("_process_id"));
-        assertEquals(2, lm.getAdditionalData().size());
+        assertEquals("local4", lm.getField("facility"));
+        assertEquals("192.0.2.1", lm.getField("source"));
+        assertEquals(5, lm.getField("level"));
+        assertEquals(ValidStructuedMessageWithDifferentDateFormat, lm.getField("full_message"));
+        assertEquals("myproc", lm.getField("application_name"));
+        assertEquals("8710", lm.getField("process_id"));
+        assertEquals(9, lm.getFields().size());
     }
 
     @Test
@@ -151,9 +150,9 @@ public class SyslogProcessorTest {
         
         processor.messageReceived(ValidNonStructuredMessage, InetAddress.getLocalHost());
 
-        LogMessage lm = serverStub.lastInsertedToProcessBuffer;
+        Message lm = serverStub.lastInsertedToProcessBuffer;
 
-        assertNull(lm.getFullMessage());
+        assertNull(lm.getField("full_message"));
     }
 
 }

@@ -1,5 +1,5 @@
 /**
- * Copyright 2011, 2012, 2013 Lennart Koopmann <lennart@socketfeed.com>
+ * Copyright 2012 Lennart Koopmann <lennart@socketfeed.com>
  *
  * This file is part of Graylog2.
  *
@@ -18,20 +18,35 @@
  *
  */
 
-package org.graylog2.streams.matchers;
+package org.graylog2.buffers;
 
-import java.util.regex.Pattern;
-import org.graylog2.plugin.logmessage.LogMessage;
-import org.graylog2.plugin.streams.StreamRule;
+import com.lmax.disruptor.EventFactory;
+import org.graylog2.plugin.Message;
 
 /**
  * @author Lennart Koopmann <lennart@socketfeed.com>
  */
-public class HostRegexMatcher implements StreamRuleMatcher {
+public class MessageEvent {
 
-    @Override
-    public boolean match(LogMessage msg, StreamRule rule) {
-        return Pattern.compile(rule.getValue(), Pattern.DOTALL).matcher(msg.getHost()).find();
+    private Message msg;
+    
+    public Message getMessage()
+    {
+        return msg;
     }
+
+    public void setMessage(final Message msg)
+    {
+        this.msg = msg;
+    }
+
+    public final static EventFactory<MessageEvent> EVENT_FACTORY = new EventFactory<MessageEvent>()
+    {
+        @Override
+        public MessageEvent newInstance()
+        {
+            return new MessageEvent();
+        }
+    };
 
 }
