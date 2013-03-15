@@ -3,9 +3,11 @@ package lib;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.io.UnsupportedEncodingException;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.net.URLEncoder;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -20,7 +22,7 @@ public class Api {
 			
 			if (conn.getResponseCode() != 200) {
 				conn.disconnect();
-				throw new APIException("REST call [" + url + "] returned " + conn.getResponseCode());
+				throw new APIException(conn.getResponseCode(), "REST call [" + url + "] returned " + conn.getResponseCode());
 			}
 			
 			BufferedReader br = new BufferedReader(new InputStreamReader((conn.getInputStream())));
@@ -36,6 +38,14 @@ public class Api {
 			return (T) gson.fromJson(sb.toString(), t.getClass());
 		} catch (MalformedURLException e) {
 			throw new RuntimeException("Malformed URL.", e);
+		}
+	}
+	
+	public static String urlEncode(String x) {
+		try {
+			return URLEncoder.encode(x, "UTF-8");
+		} catch (UnsupportedEncodingException e) {
+			throw new RuntimeException("Unsupported Encoding");
 		}
 	}
 

@@ -1,8 +1,34 @@
 body {
-	background-color: #fff;
+	background-color: #e3e3e3;
 	font-family: 'Open Sans', sans-serif;
 	margin-top: 50px;
 	font-size: 12px;
+}
+
+ul {
+	list-style-type: none;
+	margin: 0;
+}
+
+h1, h2, h3, h4, h5 {
+	font-weight: normal;
+	padding: 0;
+	margin: 0;
+}
+
+h1 {
+	font-size: 26px;
+	line-height: 28px;
+}
+
+h2 {
+	font-size: 18px;
+	line-height: 26px;
+}
+
+h3 {
+	font-size: 15px;
+	line-height: 26px;
 }
 
 #top {
@@ -42,7 +68,77 @@ body {
 	border-bottom: 1px dotted #4DBCE9;
 }
 
+#logout {
+	margin-top: -8px;
+}
+
+#main-content, #sidebar, #universalsearch {
+	padding: 15px;
+	background-color: #fff;
+}
+
+#sidebar {
+	padding-top: 5px;
+	margin-left: 10px;
+}
+
+#universalsearch {
+	padding: 5px;
+	margin-bottom: 10px;
+	height: 40px;
+}
+
+#universalsearch-container {
+	width: 100%;
+}
+
+#universalsearch-timerange {
+	width: 100px;
+	padding-right: 8px;
+}
+
 .searchform input {
 	font-family: monospace;
+	font-size: 13px;
 	width: 100%;
+	border: 0px;
+	background-color: #fff;
+	box-shadow: none;
+	-moz-box-shadow: none;
+	-webkit-box-shadow: none;
+	-webkit-transition: none;
+	-moz-transition: none;
+	transition: none;
+	outline:none;
+}
+
+.searchform select {
+	width: 100px;	
+	height: 24px;
+	font-size: 12px;
+	margin: 0px;
+	position: relative;
+	top: -5px;
+}
+
+.searchform {
+	margin: 0;
+	padding: 0;
+}
+
+.messages {
+	font-size: 11px;
+	margin-top: 15px;
+}
+
+.messages th {
+	font-size: 13px;
+}
+
+#result-graph {
+	margin-top: 15px;
+}
+
+#sidebar-graph {
+	margin-top: 15px;
 }

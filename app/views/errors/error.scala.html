@@ -1,0 +1,63 @@
+@(message: String, exception: Exception, request: Http.Request)
+
+@failure("Error") {
+
+<h1>
+	<i class="icon-medkit icon-large" style="color: #d00;"></i>
+	Oh no, something went wrong!
+</h1>
+
+<p class="failure-exception">
+	(You caused a @exception.getClass().getCanonicalName(). @exception.getMessage())
+</p>
+
+<p class="failure-message">
+	<h3><strong>Reason:</strong> @message</h3>
+</p>
+
+<h2>What should I do now?</h2>
+<p>
+	Please consult the <a href="http://support.torch.sh/" target="_blank">support pages</a> if you don't
+	know how to fix this problem. Contact the <a href="http://www.graylog2.org/support" target="_blank">
+	mailing list</a> or <a href="https://github.com/Graylog2/" target="_blank">file an issue</a> if in
+	doubt about anything or you have questions left.
+</p>
+
+<div class="well well-small crash-info">
+	<h2>Stacktrace</h2>
+	<ul>
+	@for(l <- exception.getStackTrace()) {
+		<li>
+			@l.getClassName()#@l.getMethodName()
+			(<em>@l.getFileName():@l.getLineNumber()</em>)
+		</li>
+	}
+	</ul>
+</div>
+
+<div class="well well-small crash-info">
+	<h2>Request information</h2>
+	
+	<dl>
+		<dt>Method</dt>
+		<dd>@request.method()</dd>
+		
+		<dt>Query</dt>
+		<dd>
+			<ul>
+				@for((key, value) <- request.queryString()) {
+					<li>@key=@value</li>
+				}
+			</ul>
+		</dd>
+		
+		@for((key, value) <- request.headers()) {
+			@if(key != "Cookie") {
+				<dt>@key</dt>
+				<dd>@value</dd>
+			}
+		}
+	</dl>
+</div>
+
+}
