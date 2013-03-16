@@ -13,6 +13,8 @@ dist
 /.project
 /RUNNING_PID
 /.settings
+.ecltarget
+
 
 .target
 .DS_Store

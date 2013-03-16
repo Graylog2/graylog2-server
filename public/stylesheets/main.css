@@ -69,17 +69,23 @@ h3 {
 }
 
 #logout {
-	margin-top: -8px;
+	margin-top: -11px;
 }
 
-#main-content, #sidebar, #universalsearch {
+#search {
+	padding-top: 1px;
+	padding-bottom: 1px;
+	padding-left: 4px;
+	font-size: 12px;
+}
+
+#main-content, #sidebar-inner, #universalsearch {
 	padding: 15px;
 	background-color: #fff;
 }
 
-#sidebar {
-	padding-top: 5px;
-	margin-left: 10px;
+#sidebar-inner {
+	margin-left: -25px;
 }
 
 #universalsearch {
@@ -110,6 +116,7 @@ h3 {
 	-moz-transition: none;
 	transition: none;
 	outline:none;
+	padding-right: 0;
 }
 
 .searchform select {
@@ -141,4 +148,9 @@ h3 {
 
 #sidebar-graph {
 	margin-top: 15px;
+}
+
+#sidebar-inner.affix {
+	width: 31%;
+	top: 50px;
 }

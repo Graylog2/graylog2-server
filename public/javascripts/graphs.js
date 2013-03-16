@@ -10,6 +10,10 @@ $(document).ready(function() {
 		stroke: true,
 		dataURL: '/a/messagecounts/total?timerange=' + 2*60*60, // last two hours
 		onData: function(d) { return transformData(d) },
+		onError: function(d) {
+			error = "<span class='alert alert-error'><i class='icon-warning-sign'></i> Could not load graph</span>";
+			$("#sidebar-graph").html(error);
+		},
 		onComplete: function(transport) {
 			graph = transport.graph;
 			
