@@ -22,7 +22,7 @@ package org.graylog2.periodical;
 import org.elasticsearch.action.admin.indices.stats.IndexStats;
 import org.graylog2.Core;
 import org.graylog2.activities.Activity;
-import org.graylog2.indexer.EmbeddedElasticSearchClient;
+import org.graylog2.indexer.Indexer;
 import org.graylog2.indexer.NoTargetIndexException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

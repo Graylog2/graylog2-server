@@ -18,16 +18,17 @@
  *
  */
 
-package org.graylog2.indexer.searches;
+package org.graylog2.indexer.results;
 
 import java.util.Map;
 
+import org.elasticsearch.action.get.GetResponse;
 import org.elasticsearch.search.SearchHit;
 
 /**
  * @author Lennart Koopmann <lennart@socketfeed.com>
  */
-public class SearchResultMessage {
+public class ResultMessage {
 
 	/* 
 	 * I suppress all the warnings because Eclipse doesn't know shit
@@ -36,17 +37,23 @@ public class SearchResultMessage {
 	@SuppressWarnings("unused") private Map<String, Object> message;
 	@SuppressWarnings("unused") private String index;
 	@SuppressWarnings("unused") private String nodeId;
-	@SuppressWarnings("unused") private int shardId;
 
-	protected SearchResultMessage() { /* use factory method */}
+	protected ResultMessage() { /* use factory method */}
 	
-	public static SearchResultMessage parseFromSource(SearchHit hit) {
-		SearchResultMessage m = new SearchResultMessage();
+	public static ResultMessage parseFromSource(SearchHit hit) {
+		ResultMessage m = new ResultMessage();
 		m.setMessage(hit.getSource());
 		m.setIndex(hit.getIndex());
 		m.setNodeId(hit.getShard().getNodeId());
-		m.setShardId(hit.getShard().getShardId());
 		
+		return m;
+	}
+	
+	public static ResultMessage parseFromSource(GetResponse r) {
+		ResultMessage m = new ResultMessage();
+		m.setMessage(r.getSource());
+		m.setIndex(r.getIndex());
+
 		return m;
 	}
 	
@@ -60,10 +67,6 @@ public class SearchResultMessage {
 	
 	public void setNodeId(String nodeId) {
 		this.nodeId = nodeId;
-	}
-	
-	public void setShardId(int shardId) {
-		this.shardId = shardId;
 	}
 
 }

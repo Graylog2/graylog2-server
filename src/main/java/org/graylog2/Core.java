@@ -35,7 +35,7 @@ import org.graylog2.buffers.OutputBuffer;
 import org.graylog2.buffers.ProcessBuffer;
 import org.graylog2.database.MongoBridge;
 import org.graylog2.database.MongoConnection;
-import org.graylog2.indexer.EmbeddedElasticSearchClient;
+import org.graylog2.indexer.Indexer;
 import org.graylog2.plugin.initializers.Initializer;
 import org.graylog2.plugin.inputs.MessageInput;
 import org.graylog2.gelf.GELFChunkManager;
@@ -106,7 +106,7 @@ public class Core implements GraylogServer {
 
     public static final String MASTER_COUNTER_NAME = "master";
 
-    private EmbeddedElasticSearchClient indexer;
+    private Indexer indexer;
 
     private HostCounterCacheImpl hostCounterCache;
 
@@ -183,7 +183,7 @@ public class Core implements GraylogServer {
 
         gelfChunkManager = new GELFChunkManager(this);
 
-        indexer = new EmbeddedElasticSearchClient(this);
+        indexer = new Indexer(this);
         serverValues = new ServerValue(this);
                 
         Runtime.getRuntime().addShutdownHook(new Thread() {
@@ -406,7 +406,7 @@ public class Core implements GraylogServer {
         return rulesEngine;
     }
 
-    public EmbeddedElasticSearchClient getIndexer() {
+    public Indexer getIndexer() {
         return indexer;
     }
 

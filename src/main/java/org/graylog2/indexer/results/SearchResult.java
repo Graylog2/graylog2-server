@@ -18,7 +18,7 @@
  *
  */
 
-package org.graylog2.indexer.searches;
+package org.graylog2.indexer.results;
 
 import java.util.Iterator;
 import java.util.List;
@@ -59,12 +59,12 @@ public class SearchResult {
 		return totalResults;
 	}
 	
-	public List<SearchResultMessage> getResults() {
-		List<SearchResultMessage> r = Lists.newArrayList();
+	public List<ResultMessage> getResults() {
+		List<ResultMessage> r = Lists.newArrayList();
 		
 		Iterator<SearchHit> i = hits.iterator();
 		while(i.hasNext()) {
-			r.add(SearchResultMessage.parseFromSource(i.next()));
+			r.add(ResultMessage.parseFromSource(i.next()));
 		}
 		
 		return r;

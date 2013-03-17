@@ -18,58 +18,52 @@
  *
  */
 
-package org.graylog2.indexer.searches;
+package org.graylog2.indexer.counts;
 
 import org.elasticsearch.action.search.SearchRequestBuilder;
 import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.client.Client;
+import org.elasticsearch.index.query.FilterBuilder;
+import org.elasticsearch.index.query.FilterBuilders;
 import org.elasticsearch.search.facet.FacetBuilders;
 import org.elasticsearch.search.facet.datehistogram.DateHistogramFacet;
 import org.elasticsearch.search.facet.datehistogram.DateHistogramFacetBuilder;
-import org.elasticsearch.search.sort.SortOrder;
 import org.graylog2.Core;
 import org.graylog2.indexer.Indexer;
 import org.graylog2.indexer.results.DateHistogramResult;
-import org.graylog2.indexer.results.SearchResult;
+import org.graylog2.plugin.Tools;
 
-import static org.elasticsearch.index.query.QueryBuilders.queryString;
+import static org.elasticsearch.index.query.QueryBuilders.matchAllQuery;
 
 /**
  * @author Lennart Koopmann <lennart@socketfeed.com>
  */
-public class Searches {
+public class Counts {
 
 	private final Core server;
 	private final Client c;
 	
-	public Searches(Client client, Core server) {
+	public Counts(Client client, Core server) {
 		this.server = server;
 		this.c = client;
 	}
 	
-	public SearchResult universalSearch(String query) {
-		SearchRequestBuilder srb = c.prepareSearch();
-		srb.setIndices(server.getDeflector().getAllDeflectorIndexNames()); // XXX 020: have a method that builds time ranged index requests
-		srb.setQuery(queryString(query));
-		srb.setSize(150);
-		srb.addSort("timestamp", SortOrder.DESC);
+	public DateHistogramResult totalCount(Indexer.DateHistogramInterval interval, int timerange) {
+		String from = Tools.buildElasticSearchTimeFormat(Tools.getUTCTimestamp()-timerange);
+		FilterBuilder timestampFilter = FilterBuilders.rangeFilter("timestamp").from(from);
 		
-		SearchResponse r = c.search(srb.request()).actionGet();
-		return new SearchResult(r.hits(), query, r.took());
-	}
-	
-	public DateHistogramResult universalSearchHistogram(String query, Indexer.DateHistogramInterval interval) {
 		DateHistogramFacetBuilder fb = FacetBuilders.dateHistogramFacet("histogram")
 				.field("timestamp")
+				.facetFilter(timestampFilter)
 				.interval(interval.toString().toLowerCase());
 		
 		SearchRequestBuilder srb = c.prepareSearch();
 		srb.setIndices(server.getDeflector().getAllDeflectorIndexNames()); // XXX 020: have a method that builds time ranged index requests
-		srb.setQuery(queryString(query));
+		srb.setQuery(matchAllQuery());
 		srb.addFacet(fb);
 		
 		SearchResponse r = c.search(srb.request()).actionGet();
-		return new DateHistogramResult((DateHistogramFacet) r.facets().facet("histogram"), query, interval, r.took());
+		return new DateHistogramResult((DateHistogramFacet) r.facets().facet("histogram"), "match_all", interval, r.took());
 	}
 	
 }

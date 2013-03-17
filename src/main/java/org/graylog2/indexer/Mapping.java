@@ -29,6 +29,8 @@ import org.elasticsearch.action.admin.indices.mapping.put.PutMappingRequest;
 import org.elasticsearch.action.admin.indices.mapping.put.PutMappingRequestBuilder;
 import org.elasticsearch.client.Client;
 
+import com.beust.jcommander.internal.Maps;
+
 /**
  * Representing the message type mapping in ElasticSearch. This is giving ES more
  * information about what the fields look like and how it should analyze them.
@@ -40,7 +42,7 @@ public class Mapping {
 
     public static PutMappingRequest getPutMappingRequest(final Client client, final String index, final String analyzer) {
         final PutMappingRequestBuilder builder = client.admin().indices().preparePutMapping(new String[] {index});
-        builder.setType(EmbeddedElasticSearchClient.TYPE);
+        builder.setType(Indexer.TYPE);
 
         final Map<String, Object> mapping = new HashMap<String, Object>();
         mapping.put("properties", partFieldProperties(analyzer));
@@ -49,7 +51,7 @@ public class Mapping {
         mapping.put("_ttl", enabled()); // Enable purging by TTL.
 
         final Map completeMapping = new HashMap();
-        completeMapping.put(EmbeddedElasticSearchClient.TYPE, mapping);
+        completeMapping.put(Indexer.TYPE, mapping);
 
         builder.setSource(completeMapping);
         return builder.request();
@@ -85,17 +87,15 @@ public class Mapping {
         properties.put("message", analyzedString(analyzer));
         properties.put("full_message", analyzedString(analyzer));
 
-        // Required for the WI to not fail on empty indexes.
-        properties.put("created_at", typeNumberDouble());
-
-        // This is used building histograms. An own field to avoid mapping problems with oder versions.
-        properties.put("histogram_time", typeTimeNoMillis()); // yyyy-MM-dd HH-mm-ss
+        // http://joda-time.sourceforge.net/api-release/org/joda/time/format/DateTimeFormat.html
+        // http://www.elasticsearch.org/guide/reference/mapping/date-format.html
+        properties.put("timestamp", typeTimeWithMillis());
 
         return properties;
     }
 
-    private static Map analyzedString(String analyzer) {
-        final Map type = new HashMap();
+    private static Map<String, String> analyzedString(String analyzer) {
+        final Map<String, String> type = Maps.newHashMap();
         type.put("index", "analyzed");
         type.put("type", "string");
         type.put("analyzer", analyzer);
@@ -103,31 +103,24 @@ public class Mapping {
         return type;
     }
 
-    private static Map typeNumberDouble() {
-        final Map type = new HashMap();
-        type.put("type", "double");
-
-        return type;
-    }
-
-    private static Map typeTimeNoMillis() {
-        final Map type = new HashMap();
+    private static Map<String, String> typeTimeWithMillis() {
+        final Map<String, String> type = Maps.newHashMap();
         type.put("type", "date");
-        type.put("format", "yyyy-MM-dd HH-mm-ss");
+        type.put("format", "yyyy-MM-dd HH-mm-ss.SSS");
 
         return type;
     }
 
-    private static Map enabled() {
-        final Map e = new HashMap();
+    private static Map<String, Boolean> enabled() {
+        final Map<String, Boolean> e = Maps.newHashMap();
         e.put("enabled", true);
 
         return e;
     }
 
     
-    private static Map enabledAndCompressed() {
-        final Map e = new HashMap();
+    private static Map<String, Boolean> enabledAndCompressed() {
+        final Map<String, Boolean> e = Maps.newHashMap();
         e.put("enabled", true);
         e.put("compress", true);
 

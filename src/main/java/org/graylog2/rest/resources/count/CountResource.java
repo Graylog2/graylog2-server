@@ -1,3 +1,9 @@
+package org.graylog2.rest.resources.count;
+
+import java.util.Map;
+
+import javax.ws.rs.GET;
+import javax.ws.rs.Path;
 /**
  * Copyright 2013 Lennart Koopmann <lennart@socketfeed.com>
  *
@@ -18,12 +24,6 @@
  *
  */
 
-package org.graylog2.rest.resources.search;
-
-import java.util.Map;
-
-import javax.ws.rs.GET;
-import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.WebApplicationException;
@@ -33,7 +33,6 @@ import javax.ws.rs.core.MediaType;
 import org.graylog2.Core;
 import org.graylog2.indexer.Indexer;
 import org.graylog2.indexer.results.DateHistogramResult;
-import org.graylog2.indexer.results.SearchResult;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -45,48 +44,21 @@ import com.sun.jersey.api.core.ResourceConfig;
 /**
  * @author Lennart Koopmann <lennart@torch.sh>
  */
-@Path("/search")
-public class SearchResource {
-    private static final Logger LOG = LoggerFactory.getLogger(SearchResource.class);
+@Path("/count")
+public class CountResource {
+	
+    private static final Logger LOG = LoggerFactory.getLogger(CountResource.class);
 	
     @Context ResourceConfig rc;
-
-    @GET @Path("/universal")
+	
+    @GET @Path("/total")
     @Produces(MediaType.APPLICATION_JSON)
-    public String search(@QueryParam("query") String query, @QueryParam("pretty") boolean prettyPrint) {
+    public String histogram(@QueryParam("interval") String interval, @QueryParam("timerange") int timerange, @QueryParam("pretty") boolean prettyPrint) {
         Core core = (Core) rc.getProperty("core");
-
-        if (query == null || query.isEmpty()) {
-        	LOG.error("Missing parameters. Returning HTTP 400.");
-        	throw new WebApplicationException(400);
-        }
-        
-        SearchResult sr = core.getIndexer().searches().universalSearch(query);
-        
-        Gson gson = new Gson();
-        
-        if (prettyPrint) {
-            gson = new GsonBuilder().setPrettyPrinting().create();
-        }
-        
-        Map<String, Object> result = Maps.newHashMap();
-        result.put("query", sr.getOriginalQuery());
-        result.put("messages", sr.getResults());
-        result.put("time", sr.took().millis());
-        result.put("total_results", sr.getTotalResults());
-        
-        return gson.toJson(result);
-    }
-    
-    @GET @Path("/universal/histogram")
-    @Produces(MediaType.APPLICATION_JSON)
-    public String histogram(@QueryParam("query") String query, @QueryParam("interval") String interval, @QueryParam("pretty") boolean prettyPrint) {
-        Core core = (Core) rc.getProperty("core");
-        
         interval = interval.toUpperCase();
 
-        if (query == null || query.isEmpty() || interval == null || interval.isEmpty()) {
-        	LOG.error("Missing parameters. Returning HTTP 400.");
+        if (timerange <= 0) {
+        	LOG.error("Invalid timerange. Returning HTTP 400.");
         	throw new WebApplicationException(400);
         }
         
@@ -97,7 +69,7 @@ public class SearchResource {
         	throw new WebApplicationException(400);
         }
         
-        DateHistogramResult dhr = core.getIndexer().searches().universalSearchHistogram(query, Indexer.DateHistogramInterval.valueOf(interval));
+        DateHistogramResult dhr = core.getIndexer().counts().totalCount(Indexer.DateHistogramInterval.valueOf(interval), timerange);
 
         Gson gson = new Gson();
         

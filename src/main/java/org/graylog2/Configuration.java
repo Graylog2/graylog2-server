@@ -37,7 +37,7 @@ import com.lmax.disruptor.YieldingWaitStrategy;
 import com.mongodb.ServerAddress;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.graylog2.indexer.EmbeddedElasticSearchClient;
+import org.graylog2.indexer.Indexer;
 
 import java.net.UnknownHostException;
 import java.util.Arrays;
@@ -98,12 +98,6 @@ public class Configuration {
 
     @Parameter(value = "allow_override_syslog_date", required = true)
     private boolean allowOverrideSyslogDate = true;
-    
-    @Parameter(value = "recent_index_ttl_minutes", required = true, validator = PositiveIntegerValidator.class)
-    private int recentIndexTtlMinutes = 60;
-    
-    @Parameter(value = "recent_index_store_type")
-    private String recentIndexStoreType = EmbeddedElasticSearchClient.STANDARD_RECENT_INDEX_STORE_TYPE;
 
     @Parameter(value = "no_retention")
     private boolean noRetention;
@@ -363,18 +357,6 @@ public class Configuration {
 
     public boolean getAllowOverrideSyslogDate() {
         return allowOverrideSyslogDate;
-    }
-    
-    public int getRecentIndexTtlMinutes() {
-        return recentIndexTtlMinutes;
-    }
-    
-    public String getRecentIndexStoreType() {
-        if (!EmbeddedElasticSearchClient.ALLOWED_RECENT_INDEX_STORE_TYPES.contains(recentIndexStoreType)) {
-            LOG.error("Invalid recent index store type configured. Falling back to <{}>", EmbeddedElasticSearchClient.STANDARD_RECENT_INDEX_STORE_TYPE);
-            return EmbeddedElasticSearchClient.STANDARD_RECENT_INDEX_STORE_TYPE;
-        }
-        return recentIndexStoreType;
     }
 
     public boolean performRetention() {

@@ -8,7 +8,6 @@ import org.elasticsearch.action.admin.cluster.node.info.NodesInfoRequest;
 import org.elasticsearch.action.admin.cluster.node.info.NodesInfoResponse;
 import org.elasticsearch.action.admin.cluster.state.ClusterStateRequest;
 import org.elasticsearch.action.admin.indices.create.CreateIndexRequest;
-import org.elasticsearch.action.admin.indices.create.CreateIndexRequestBuilder;
 import org.elasticsearch.action.admin.indices.create.CreateIndexResponse;
 import org.elasticsearch.action.admin.indices.delete.DeleteIndexRequest;
 import org.elasticsearch.action.admin.indices.exists.indices.IndicesExistsRequest;
@@ -35,6 +34,8 @@ import org.elasticsearch.node.Node;
 import org.elasticsearch.node.NodeBuilder;
 import org.graylog2.Core;
 import org.graylog2.activities.Activity;
+import org.graylog2.indexer.counts.Counts;
+import org.graylog2.indexer.messages.Messages;
 import org.graylog2.indexer.searches.Searches;
 import org.graylog2.plugin.Message;
 import org.json.simple.JSONValue;
@@ -53,18 +54,21 @@ import org.graylog2.plugin.indexer.MessageGateway;
 
 // TODO this class blocks for most of its operations, but is called from the main thread for some of them
 // TODO figure out how to gracefully deal with failure to connect (or losing connection) to the elastic search cluster!
-public class EmbeddedElasticSearchClient {
-    private static final Logger LOG = LoggerFactory.getLogger(EmbeddedElasticSearchClient.class);
+public class Indexer {
+    private static final Logger LOG = LoggerFactory.getLogger(Indexer.class);
 
     private Client client;
     private final MessageGateway messageGateway;
     public static final String TYPE = "message";
     
     private final Searches searches;
+    private final Counts counts;
+    private final Messages messages;
     
-    // http://www.elasticsearch.org/guide/reference/index-modules/store.html
-    public static final String STANDARD_RECENT_INDEX_STORE_TYPE = "niofs";
-    
+	public static enum DateHistogramInterval {
+		YEAR, QUARTER, MONTH, WEEK, DAY, HOUR, MINUTE
+	}
+
     @SuppressWarnings("serial")
 	public static final List<String> ALLOWED_RECENT_INDEX_STORE_TYPES = new ArrayList<String>() {{ 
         add("niofs");
@@ -75,7 +79,7 @@ public class EmbeddedElasticSearchClient {
 
     private Core server;
 
-    public EmbeddedElasticSearchClient(Core graylogServer) {
+    public Indexer(Core graylogServer) {
         server = graylogServer;
 
         final NodeBuilder builder = nodeBuilder().client(true);
@@ -100,6 +104,8 @@ public class EmbeddedElasticSearchClient {
         
         messageGateway = new MessageGatewayImpl(graylogServer);
         searches = new Searches(client, graylogServer);
+        counts = new Counts(client, graylogServer);
+        messages = new Messages(client, graylogServer);
     }
     
     public Client getClient() {
@@ -275,7 +281,7 @@ public class EmbeddedElasticSearchClient {
         int remove = indexCount-maxIndices;
         String msg = "Number of indices (" + indexCount + ") higher than limit (" + maxIndices + "). Deleting " + remove + " indices.";
         LOG.info(msg);
-        server.getActivityWriter().write(new Activity(msg, EmbeddedElasticSearchClient.class));
+        server.getActivityWriter().write(new Activity(msg, Indexer.class));
         
         for (String indexName : IndexHelper.getOldestIndices(indices.keySet(), remove)) {
             // Never delete the current deflector target.
@@ -286,7 +292,7 @@ public class EmbeddedElasticSearchClient {
             
             msg = "Retention cleaning: Deleting index <" + indexName + ">";
             LOG.info(msg);
-            server.getActivityWriter().write(new Activity(msg, EmbeddedElasticSearchClient.class));
+            server.getActivityWriter().write(new Activity(msg, Indexer.class));
             
             // Sorry if this should ever go mad. Delete the index!
             deleteIndex(indexName);
@@ -296,6 +302,14 @@ public class EmbeddedElasticSearchClient {
     
     public Searches searches() {
     	return searches;
+    }
+    
+    public Counts counts() {
+    	return counts;
+    }
+    
+    public Messages messages() {
+    	return messages;
     }
     
     private IndexRequestBuilder buildIndexRequest(String index, String source, String id, int ttlMinutes) {

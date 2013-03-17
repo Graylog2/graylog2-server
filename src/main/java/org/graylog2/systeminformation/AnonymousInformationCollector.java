@@ -55,7 +55,6 @@ public class AnonymousInformationCollector {
         info.put("number_of_stream_rules", numberOfStreamRules());
         info.put("number_of_blacklist_rules", Blacklist.fetchAll().size());
         info.put("total_index_size", server.getIndexer().getTotalIndexSize());
-        info.put("recent_index_ttl", server.getConfiguration().getRecentIndexTtlMinutes());
         
         return info;
     }
