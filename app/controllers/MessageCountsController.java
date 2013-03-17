@@ -13,7 +13,7 @@ import models.DateHistogramResult;
 import models.MessageCount;
 import play.mvc.*;
 
-public class MessageCounts extends AuthenticatedController {
+public class MessageCountsController extends AuthenticatedController {
 
 	public static Result total(String timerange) {
     	int range;

@@ -19,7 +19,7 @@ public class MessageCount {
 	
 	public DateHistogramResult total() throws IOException, APIException {
 		String i = Api.urlEncode(interval);
-		URL url = new URL("http://localhost:12900/count/total?interval=" + i + "&timerange=" + timerange);
+		URL url = Api.buildTarget("count/total?interval=" + i + "&timerange=" + timerange);
 		
 		DateHistogramResponse response = Api.get(url, new DateHistogramResponse());
 		return new DateHistogramResult("match_all", response.time, response.interval, response.results);

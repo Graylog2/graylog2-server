@@ -3,18 +3,21 @@
 # ~~~~
 
 # Authentication
-GET		/login						controllers.Sessions.index()
-POST	/session					controllers.Sessions.create()
-GET		/logout						controllers.Sessions.destroy()
+GET		/login						controllers.SessionsController.index()
+POST	/session					controllers.SessionsController.create()
+GET		/logout						controllers.SessionsController.destroy()
 
 # Home page
-GET     /                           controllers.Dashboard.index()
+GET     /                           controllers.DashboardController.index()
 
 # Search
-GET		/search						controllers.Search.index(q ?= "", timerange ?= "", interval ?= "")
+GET		/search						controllers.SearchController.index(q ?= "", timerange ?= "", interval ?= "")
+
+# Messages
+GET		/messages/:index/:id/partial		controllers.MessagesController.asPartial(index: String, id: String)
 
 # API: Message counts
-GET		/a/messagecounts/total		controllers.MessageCounts.total(timerange ?= "")
+GET		/a/messagecounts/total		controllers.MessageCountsController.total(timerange ?= "")
 
 # Map static resources from the /public folder to the /assets URL path
 GET     /assets/*file               controllers.Assets.at(path="/public", file)

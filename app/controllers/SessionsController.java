@@ -7,7 +7,7 @@ import play.mvc.*;
 import play.data.*;
 import static play.data.Form.*;
 
-public class Sessions extends Controller {
+public class SessionsController extends Controller {
 
 	final static Form<LoginRequest> userForm = form(LoginRequest.class);
 	

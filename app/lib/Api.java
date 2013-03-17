@@ -41,6 +41,10 @@ public class Api {
 		}
 	}
 	
+	public static URL buildTarget(String part) throws MalformedURLException {
+		return new URL(Configuration.getServerRestUri() + part);
+	}
+	
 	public static String urlEncode(String x) {
 		try {
 			return URLEncoder.encode(x, "UTF-8");

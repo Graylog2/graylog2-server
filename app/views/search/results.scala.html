@@ -3,7 +3,7 @@
 @main("Search results", query, currentUser) {
 
 <h1>
-	<i class="icon-search icon-large"></i>
+	<i class="icon-search"></i>
 	Search results
 </h1>
 
@@ -62,7 +62,7 @@
 	</thead>
 	<tbody>
 		@for(r <- searchResult.getMessages()) {
-		<tr>
+		<tr data-message-id="@r.message.id" data-source-index="@r.index">
 			<td style="width: 135px;">@r.message.timestamp</td>
 			<td style="white-space: nowrap;">@r.message.source</td>
 			<td>@r.message.message</td>

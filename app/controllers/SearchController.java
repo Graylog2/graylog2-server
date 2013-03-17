@@ -9,7 +9,7 @@ import models.SearchResult;
 import models.UniversalSearch;
 import play.mvc.*;
 
-public class Search extends AuthenticatedController {
+public class SearchController extends AuthenticatedController {
 
     public static Result index(String q, String timerange, String interval) {
     	int range;

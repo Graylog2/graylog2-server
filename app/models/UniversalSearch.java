@@ -1,9 +1,7 @@
 package models;
 
 import java.io.IOException;
-import java.io.UnsupportedEncodingException;
 import java.net.URL;
-import java.net.URLEncoder;
 
 import lib.APIException;
 import lib.Api;
@@ -19,7 +17,7 @@ public class UniversalSearch {
 	}
 	
 	public SearchResult search() throws IOException, APIException {
-		URL url = new URL("http://localhost:12900/search/universal?query=" + query);
+		URL url = Api.buildTarget("search/universal?query=" + query);
 		
 		SearchResultResponse response = Api.get(url, new SearchResultResponse());
 		SearchResult result = new SearchResult(response.query, response.total_results, response.time, response.messages);
@@ -28,7 +26,7 @@ public class UniversalSearch {
 	
 	public DateHistogramResult dateHistogram(String interval) throws IOException, APIException {
 		String i = Api.urlEncode(interval);
-		URL url = new URL("http://localhost:12900/search/universal/histogram?interval=" + i + "&query=" + query);
+		URL url = Api.buildTarget("search/universal/histogram?interval=" + i + "&query=" + query);
 		
 		DateHistogramResponse response = Api.get(url, new DateHistogramResponse());
 		return new DateHistogramResult(response.query, response.time, response.interval, response.results);

@@ -154,3 +154,12 @@ h3 {
 	width: 31%;
 	top: 50px;
 }
+
+.messages tbody > tr {
+	cursor: pointer;
+}
+
+.sidebar-alert {
+	display: block;
+	margin-bottom: 0;
+}
