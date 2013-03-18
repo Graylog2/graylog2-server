@@ -7,6 +7,8 @@ import lib.APIException;
 import lib.Api;
 import models.api.responses.DateHistogramResponse;
 import models.api.responses.SearchResultResponse;
+import models.api.results.DateHistogramResult;
+import models.api.results.SearchResult;
 
 public class UniversalSearch {
 

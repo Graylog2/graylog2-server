@@ -1,5 +1,13 @@
-@(message: models.api.responses.MessageResponse, index: String)
+@(message: api.results.MessageResult)
 
-<h3>Message @message.id</h3>
+<h2>Message @message.getId()</h2>
+Timestamp: @message.getTimestamp()
 
-<strong>Index: <em>@index</em></strong>
+<dl>
+@for((key, value) <- message.getFields()) {
+	<dt style="float: left; padding-right: 5px;">@key:</dt>
+	<dd style="word-wrap: break-word;">@value</dd>
+}
+</dl>
+
+<strong>Index: <em>@message.getIndex()</em></strong>

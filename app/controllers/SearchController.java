@@ -4,9 +4,9 @@ import java.io.IOException;
 
 import lib.APIException;
 import lib.SearchTools;
-import models.DateHistogramResult;
-import models.SearchResult;
 import models.UniversalSearch;
+import models.api.results.DateHistogramResult;
+import models.api.results.SearchResult;
 import play.mvc.*;
 
 public class SearchController extends AuthenticatedController {

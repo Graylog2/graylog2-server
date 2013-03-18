@@ -6,6 +6,7 @@ import java.net.URL;
 import lib.APIException;
 import lib.Api;
 import models.api.responses.DateHistogramResponse;
+import models.api.results.DateHistogramResult;
 
 public class MessageCount {
 

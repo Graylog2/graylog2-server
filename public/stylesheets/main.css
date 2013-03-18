@@ -136,6 +136,13 @@ h3 {
 .messages {
 	font-size: 11px;
 	margin-top: 15px;
+	table-layout: fixed;
+	border-collapse: collapse;
+	width: 100%;
+}
+
+.messages-message {
+	word-wrap:break-word;
 }
 
 .messages th {

@@ -9,8 +9,8 @@ import com.google.common.collect.Maps;
 import com.google.gson.Gson;
 
 import lib.APIException;
-import models.DateHistogramResult;
 import models.MessageCount;
+import models.api.results.DateHistogramResult;
 import play.mvc.*;
 
 public class MessageCountsController extends AuthenticatedController {

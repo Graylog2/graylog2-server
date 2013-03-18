@@ -1,4 +1,4 @@
-@(currentUser: User, searchResult: SearchResult, histogram: DateHistogramResult, query: String)
+@(currentUser: User, searchResult: api.results.SearchResult, histogram: api.results.DateHistogramResult, query: String)
 
 @main("Search results", query, currentUser) {
 
@@ -55,17 +55,17 @@
 <table class="table table-condensed table-hover table-striped messages">
 	<thead>
 		<tr>
-			<th>Timestamp</th>
-			<th>Source</th>
+			<th style="width: 135px;">Timestamp</th>
+			<th style="width: 150px;">Source</th>
 			<th>Message</th>
 		</tr>
 	</thead>
 	<tbody>
 		@for(r <- searchResult.getMessages()) {
-		<tr data-message-id="@r.message.id" data-source-index="@r.index">
-			<td style="width: 135px;">@r.message.timestamp</td>
-			<td style="white-space: nowrap;">@r.message.source</td>
-			<td>@r.message.message</td>
+		<tr data-message-id='@r.message.get("_id")' data-source-index="@r.index">
+			<td>@r.message.get("timestamp")</td>
+			<td>@r.message.get("source")</td>
+			<td class="messages-message">@r.message.get("message")</td>
 		</tr>
 		}
 	</tbody>
