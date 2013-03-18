@@ -27,7 +27,12 @@ package org.graylog2.plugin.initializers;
  */
 public class InitializerConfigurationException extends Exception {
     
-    public InitializerConfigurationException() {
+    /**
+	 * Re-generate if you modify the class structure.
+	 */
+	private static final long serialVersionUID = 2515731988548808134L;
+
+	public InitializerConfigurationException() {
         super();
     }
     
