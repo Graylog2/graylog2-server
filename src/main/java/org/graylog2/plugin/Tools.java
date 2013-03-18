@@ -34,7 +34,6 @@ import java.util.UUID;
 import java.util.zip.GZIPInputStream;
 import java.util.zip.InflaterInputStream;
 import org.drools.util.codec.Base64;
-import org.joda.time.DateTime;
 
 /**
  * Utilty class for various tool/helper functions.
@@ -244,7 +243,7 @@ public final class Tools {
     	Calendar cal = Calendar.getInstance();
     	cal.setTimeInMillis((long) (1000 * timestamp));
 
-        return String.format("%1$tY-%1$tm-%1$td %1$tH-%1$tM-%1$tS", cal); // ramtamtam
+        return String.format("%1$tY-%1$tm-%1$td %1$tH-%1$tM-%1$tS.%1$tL", cal); // ramtamtam
     }
  
 }

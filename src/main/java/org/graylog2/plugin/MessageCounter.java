@@ -34,7 +34,7 @@ public interface MessageCounter {
 
     public Map<String, Integer> getStreamCounts();
 
-    public Map<String, Integer> getHostCounts();
+    public Map<String, Integer> getSourceCounts();
 
     public int getThroughput();
 
@@ -42,7 +42,7 @@ public interface MessageCounter {
 
     public void resetAllCounts();
 
-    public void resetHostCounts();
+    public void resetSourceCounts();
 
     public void resetStreamCounts();
 
@@ -62,8 +62,8 @@ public interface MessageCounter {
 
     public void countUpStream(final ObjectId streamId, final int x);
 
-    public void incrementHost(final String hostname);
+    public void incrementSource(final String source);
 
-    public void countUpHost(String hostname, final int x);
+    public void countUpSource(String source, final int x);
 
 }

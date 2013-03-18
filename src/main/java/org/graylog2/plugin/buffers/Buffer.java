@@ -21,7 +21,7 @@
 */
 package org.graylog2.plugin.buffers;
 
-import org.graylog2.plugin.logmessage.LogMessage;
+import org.graylog2.plugin.Message;
 
 /**
  *
@@ -29,8 +29,8 @@ import org.graylog2.plugin.logmessage.LogMessage;
  */
 public interface Buffer {
     
-    public void insertFailFast(LogMessage message) throws BufferOutOfCapacityException;
-    public void insertCached(LogMessage message);
+    public void insertFailFast(Message message) throws BufferOutOfCapacityException;
+    public void insertCached(Message message);
     
     public boolean hasCapacity();
     

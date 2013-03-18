@@ -23,7 +23,7 @@
 package org.graylog2.plugin.filters;
 
 import org.graylog2.plugin.GraylogServer;
-import org.graylog2.plugin.logmessage.LogMessage;
+import org.graylog2.plugin.Message;
 
 /**
  * 
@@ -32,11 +32,11 @@ import org.graylog2.plugin.logmessage.LogMessage;
 public interface MessageFilter {
 
     /**
-     * Process a LogMessage
+     * Process a Message
      *
      * @return true if this message should not further be handled (for example for blacklisting purposes)
      */
-    public boolean filter(LogMessage msg, GraylogServer server);
+    public boolean filter(Message msg, GraylogServer server);
 
     /**
      * @return The name of this filter. Should not include whitespaces or special characters.

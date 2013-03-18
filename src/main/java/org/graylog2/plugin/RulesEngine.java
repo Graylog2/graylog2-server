@@ -21,7 +21,6 @@
 */
 package org.graylog2.plugin;
 
-import org.graylog2.plugin.logmessage.LogMessage;
 
 /**
  *
@@ -31,6 +30,6 @@ public interface RulesEngine {
     
     public void addRules(String rulesFile);
 	
-    public void evaluate(LogMessage message);
+    public void evaluate(Message message);
     
 }

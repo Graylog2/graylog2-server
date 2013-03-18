@@ -25,7 +25,7 @@ package org.graylog2.plugin.outputs;
 import java.util.List;
 import java.util.Map;
 import org.graylog2.plugin.GraylogServer;
-import org.graylog2.plugin.logmessage.LogMessage;
+import org.graylog2.plugin.Message;
 
 /**
  * @author Lennart Koopmann <lennart@socketfeed.com>
@@ -33,7 +33,7 @@ import org.graylog2.plugin.logmessage.LogMessage;
 public interface MessageOutput {
 
     public void initialize(Map<String, String> config) throws MessageOutputConfigurationException;
-    public void write(List<LogMessage> messages, OutputStreamConfiguration streamConfiguration, GraylogServer server) throws Exception;
+    public void write(List<Message> messages, OutputStreamConfiguration streamConfiguration, GraylogServer server) throws Exception;
     public Map<String, String> getRequestedConfiguration();
     public Map<String, String> getRequestedStreamConfiguration();
     public String getName();

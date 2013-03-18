@@ -33,6 +33,7 @@ public interface StreamRule {
 
     public int getRuleType();
 
+    public String getField();
     public String getValue();
     
 }
