@@ -27,7 +27,12 @@ package org.graylog2.plugin.buffers;
  */
 public class BufferOutOfCapacityException extends Exception {
     
-    public BufferOutOfCapacityException() {
+    /**
+	 * Re-generate if you modify the class structure.
+	 */
+	private static final long serialVersionUID = -2497994875518554556L;
+
+	public BufferOutOfCapacityException() {
         super();
     }
     

@@ -27,7 +27,12 @@ package org.graylog2.plugin.alarms.callbacks;
  */
 public class AlarmCallbackConfigurationException extends Exception {
     
-    public AlarmCallbackConfigurationException() {
+    /**
+	 * Re-generate if you modify the class structure.
+	 */
+	private static final long serialVersionUID = 1762085797851052304L;
+
+	public AlarmCallbackConfigurationException() {
         super();
     }
     

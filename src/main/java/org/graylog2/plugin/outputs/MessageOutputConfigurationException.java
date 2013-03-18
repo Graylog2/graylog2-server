@@ -27,7 +27,12 @@ package org.graylog2.plugin.outputs;
  */
 public class MessageOutputConfigurationException extends Exception {
     
-    public MessageOutputConfigurationException() {
+    /**
+	 * Re-generate if you modify the class structure.
+	 */
+	private static final long serialVersionUID = -4252325712098060658L;
+
+	public MessageOutputConfigurationException() {
         super();
     }
     

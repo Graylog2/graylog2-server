@@ -27,7 +27,12 @@ package org.graylog2.plugin.inputs;
  */
 public class MessageInputConfigurationException extends Exception {
     
-    public MessageInputConfigurationException() {
+    /**
+	 * Re-generate if you modify the class structure.
+	 */
+	private static final long serialVersionUID = 8745066310811183675L;
+
+	public MessageInputConfigurationException() {
         super();
     }
     
