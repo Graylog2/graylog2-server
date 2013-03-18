@@ -27,6 +27,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.productivity.java.syslog4j.server.impl.event.structured.StructuredSyslogServerEvent;
 
+import com.google.common.collect.Maps;
+
 /**
  * Parses structured syslog data.
  *
@@ -36,12 +38,13 @@ public class StructuredSyslog {
 
     private static final Logger LOG = LoggerFactory.getLogger(StructuredSyslog.class);
 
-    public static Map<String, String> extractFields(StructuredSyslogServerEvent msg) {
-        Map<String, String> fields = new HashMap<String, String>();
+    @SuppressWarnings({ "rawtypes", "unchecked" })
+	public static Map<String, String> extractFields(StructuredSyslogServerEvent msg) {
+        Map<String, String> fields = Maps.newHashMap();
         try {
-            Map raw = msg.getStructuredMessage().getStructuredData();
+			Map raw = msg.getStructuredMessage().getStructuredData();
             if (raw != null) {
-                Set ks = raw.keySet();
+				Set ks = raw.keySet();
                 if (ks.size() > 0) {
                     Object[] fl = raw.keySet().toArray();
 
@@ -53,7 +56,7 @@ public class StructuredSyslog {
             }
         } catch (Exception e) {
             LOG.debug("Could not extract structured syslog", e);
-            return new HashMap();
+            return Maps.newHashMap();
         }
         
         return fields;

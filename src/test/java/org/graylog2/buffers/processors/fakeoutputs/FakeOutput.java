@@ -6,6 +6,7 @@ package org.graylog2.buffers.processors.fakeoutputs;
 
 import java.util.List;
 import java.util.Map;
+
 import org.elasticsearch.common.collect.Maps;
 import org.graylog2.plugin.GraylogServer;
 import org.graylog2.plugin.Message;
@@ -29,10 +30,7 @@ public class FakeOutput implements MessageOutput {
     @Override
     public void write(List<Message> messages, OutputStreamConfiguration streamConfiguration, GraylogServer server) throws Exception {
         this.callCount++;
-        
-        for (Message msg : messages) {
-            this.writeCount++;
-        }
+        this.writeCount += messages.size();
     }
 
     @Override

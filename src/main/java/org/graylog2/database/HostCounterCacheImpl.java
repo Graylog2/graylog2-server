@@ -21,12 +21,9 @@
 package org.graylog2.database;
 
 import java.util.Set;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ConcurrentMap;
 
 import org.cliffc.high_scale_lib.Counter;
 import org.cliffc.high_scale_lib.NonBlockingHashMap;
-import org.graylog2.plugin.Tools;
 import org.graylog2.plugin.database.HostCounterCache;
 
 /**

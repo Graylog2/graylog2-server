@@ -19,16 +19,16 @@
  */
 package org.graylog2.plugins;
 
-import com.mongodb.BasicDBList;
-import com.mongodb.BasicDBObject;
-import com.mongodb.DBCollection;
-import com.mongodb.DBCursor;
-import com.mongodb.DBObject;
 import java.util.Map;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+
 import org.elasticsearch.common.collect.Maps;
 import org.graylog2.Core;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import com.mongodb.BasicDBObject;
+import com.mongodb.DBCollection;
+import com.mongodb.DBObject;
 
 /**
  * @author Lennart Koopmann <lennart@socketfeed.com>
@@ -53,7 +53,8 @@ public class PluginConfiguration {
             }
 
             DBObject rawConfig = (BasicDBObject) res.get("configuration");
-            Map<String, String> configs = rawConfig.toMap();
+            @SuppressWarnings("unchecked")
+			Map<String, String> configs = rawConfig.toMap();
             
             return configs;
         } catch (Exception e) {

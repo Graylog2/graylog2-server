@@ -205,7 +205,7 @@ public class PluginInstaller {
         }
     }
     
-    public Map<String, String> getRequestedConfiguration(String jarPath, Class type) throws Exception {
+    public Map<String, String> getRequestedConfiguration(String jarPath, Class<?> type) throws Exception {
         File file = new File(jarPath);
 
         ClassLoader loader = URLClassLoader.newInstance(

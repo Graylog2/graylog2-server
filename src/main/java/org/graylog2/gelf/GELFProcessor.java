@@ -20,24 +20,25 @@
 
 package org.graylog2.gelf;
 
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.concurrent.TimeUnit;
+
+import org.graylog2.Core;
+import org.graylog2.plugin.Message;
+import org.graylog2.plugin.Tools;
+import org.graylog2.plugin.buffers.BufferOutOfCapacityException;
+import org.json.simple.JSONArray;
+import org.json.simple.JSONObject;
+import org.json.simple.JSONValue;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.yammer.metrics.Metrics;
 import com.yammer.metrics.core.Meter;
 import com.yammer.metrics.core.Timer;
 import com.yammer.metrics.core.TimerContext;
-import java.util.List;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.graylog2.Core;
-import org.graylog2.plugin.Tools;
-import org.graylog2.plugin.Message;
-import org.json.simple.JSONArray;
-import org.json.simple.JSONObject;
-import org.json.simple.JSONValue;
-
-import java.util.Map;
-import java.util.Set;
-import java.util.concurrent.TimeUnit;
-import org.graylog2.plugin.buffers.BufferOutOfCapacityException;
 
 /**
  * @author Lennart Koopmann <lennart@socketfeed.com>
@@ -124,7 +125,8 @@ public class GELFProcessor {
         }
 
         // Add additional data if there is some.
-        Set<Map.Entry<String, Object>> entrySet = json.entrySet();
+        @SuppressWarnings("unchecked")
+		Set<Map.Entry<String, Object>> entrySet = json.entrySet();
         for(Map.Entry<String, Object> entry : entrySet) {
 
             String key = entry.getKey();

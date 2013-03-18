@@ -58,7 +58,7 @@ public class PluginApiResponse {
         return "unknown";
     }
     
-    public Class getClassOfPlugin() {
+    public Class<?> getClassOfPlugin() {
         switch (plugin_type) {
             case 0:
                 return Initializer.class;

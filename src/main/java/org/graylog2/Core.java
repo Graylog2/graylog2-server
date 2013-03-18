@@ -350,7 +350,7 @@ public class Core implements GraylogServer {
     }
     
     private <A> void loadPlugins(Class<A> type, String subDirectory) {
-        PluginLoader<A> pl = new PluginLoader(configuration.getPluginDir(), subDirectory, type);
+        PluginLoader<A> pl = new PluginLoader<A>(configuration.getPluginDir(), subDirectory, type);
         for (A plugin : pl.getPlugins()) {
             LOG.info("Registering <{}> plugin [{}].", type.getSimpleName(), plugin.getClass().getCanonicalName());
             

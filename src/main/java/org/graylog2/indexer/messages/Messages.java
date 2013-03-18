@@ -32,6 +32,7 @@ import org.graylog2.indexer.results.ResultMessage;
  */
 public class Messages {
 	
+	@SuppressWarnings("unused")
 	private final Core server;
 	private final Client c;
 	

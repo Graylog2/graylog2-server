@@ -24,6 +24,11 @@ package org.graylog2.indexer;
  */
 public class IndexNotFoundException extends Exception {
     
-    public IndexNotFoundException() {}
+    /**
+     * Re-generate if you modify the class structure.
+     */
+	private static final long serialVersionUID = 1332856399663575545L;
+
+	public IndexNotFoundException() {}
     
 }

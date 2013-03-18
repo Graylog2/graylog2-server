@@ -25,6 +25,11 @@ package org.graylog2.indexer.messages;
  */
 public class DocumentNotFoundException extends Exception {
 
+	/**
+	 * Re-generate if you modify the class structure.
+	 */
+	private static final long serialVersionUID = -4347296409541352478L;
+
 	public DocumentNotFoundException() {
 		super();
 	}

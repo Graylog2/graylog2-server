@@ -29,7 +29,8 @@ import org.elasticsearch.action.admin.indices.mapping.put.PutMappingRequest;
 import org.elasticsearch.action.admin.indices.mapping.put.PutMappingRequestBuilder;
 import org.elasticsearch.client.Client;
 
-import com.beust.jcommander.internal.Maps;
+import com.google.common.collect.Maps;
+
 
 /**
  * Representing the message type mapping in ElasticSearch. This is giving ES more
@@ -50,7 +51,8 @@ public class Mapping {
         mapping.put("_source", enabledAndCompressed()); // Compress source field..
         mapping.put("_ttl", enabled()); // Enable purging by TTL.
 
-        final Map completeMapping = new HashMap();
+        // TODO: use multimap?
+        final Map<String, Map<String, Object>> completeMapping = Maps.newHashMap();
         completeMapping.put(Indexer.TYPE, mapping);
 
         builder.setSource(completeMapping);
@@ -60,7 +62,9 @@ public class Mapping {
     /*
      * Disable analyzing for every field by default.
      */
-    private static List partDefaultAllInDynamicTemplate() {
+    // TODO warnings
+    @SuppressWarnings("rawtypes")
+	private static List partDefaultAllInDynamicTemplate() {
         final List dynamicTemplates = new LinkedList();
         final Map template = new HashMap();
         final Map defaultAll = new HashMap();
@@ -81,8 +85,10 @@ public class Mapping {
     /*
      * Enable analyzing for some fields again. Like for message and full_message.
      */
-    private static Map partFieldProperties(String analyzer) {
-        final Map properties = new HashMap();
+    // TODO warnings
+    @SuppressWarnings("rawtypes")
+	private static Map partFieldProperties(String analyzer) {
+        final Map<String, Map<?, ?>> properties = Maps.newHashMap();
 
         properties.put("message", analyzedString(analyzer));
         properties.put("full_message", analyzedString(analyzer));

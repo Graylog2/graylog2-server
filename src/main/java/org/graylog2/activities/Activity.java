@@ -25,13 +25,13 @@ package org.graylog2.activities;
 public class Activity {
     
     String message;
-    Class caller;
+    Class<?> caller;
     
-    public Activity(Class caller) {
+    public Activity(Class<?> caller) {
         this.caller = caller;
     }
     
-    public Activity(String content, Class caller) {
+    public Activity(String content, Class<?> caller) {
         this.message = content;
         this.caller = caller;
     }
@@ -44,7 +44,7 @@ public class Activity {
         return message;
     }
     
-    public Class getCaller() {
+    public Class<?> getCaller() {
         return caller;
     }
 

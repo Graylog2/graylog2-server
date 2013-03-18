@@ -20,6 +20,21 @@
 
 package org.graylog2;
 
+import java.net.UnknownHostException;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Map;
+
+import org.graylog2.inputs.amqp.AMQPInput;
+import org.graylog2.inputs.gelf.GELFTCPInput;
+import org.graylog2.inputs.gelf.GELFUDPInput;
+import org.graylog2.inputs.http.GELFHttpInput;
+import org.graylog2.inputs.syslog.SyslogTCPInput;
+import org.graylog2.inputs.syslog.SyslogUDPInput;
+import org.graylog2.plugin.inputs.MessageInput;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.github.joschi.jadconfig.Parameter;
 import com.github.joschi.jadconfig.ValidationException;
 import com.github.joschi.jadconfig.ValidatorMethod;
@@ -35,20 +50,6 @@ import com.lmax.disruptor.SleepingWaitStrategy;
 import com.lmax.disruptor.WaitStrategy;
 import com.lmax.disruptor.YieldingWaitStrategy;
 import com.mongodb.ServerAddress;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.graylog2.indexer.Indexer;
-
-import java.net.UnknownHostException;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
-import org.graylog2.inputs.amqp.AMQPInput;
-import org.graylog2.inputs.gelf.GELFTCPInput;
-import org.graylog2.inputs.gelf.GELFUDPInput;
-import org.graylog2.inputs.http.GELFHttpInput;
-import org.graylog2.inputs.syslog.SyslogTCPInput;
-import org.graylog2.inputs.syslog.SyslogUDPInput;
 
 /**
  * Helper class to hold configuration of Graylog2
@@ -643,7 +644,7 @@ public class Configuration {
         return c;
     }
     
-    public Map<String, String> getInputConfig(Class input) {
+    public Map<String, String> getInputConfig(Class<? extends MessageInput> input) {
         if (input.equals(GELFTCPInput.class) || input.equals(GELFUDPInput.class)) {
             return getGELFInputConfig();
         }

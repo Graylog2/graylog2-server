@@ -20,15 +20,11 @@
 package org.graylog2.buffers;
 
 import java.util.concurrent.atomic.AtomicInteger;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * @author Lennart Koopmann <lennart@socketfeed.com>
  */
 public class BufferWatermark {
-    
-    private static final Logger LOG = LoggerFactory.getLogger(BufferWatermark.class);
     
     private final int bufferSize;
     private final AtomicInteger watermark;

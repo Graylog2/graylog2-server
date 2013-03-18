@@ -6,6 +6,7 @@ import java.util.Map;
 
 import junit.framework.Assert;
 
+import org.bson.types.ObjectId;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -15,8 +16,6 @@ import com.github.joschi.jadconfig.RepositoryException;
 import com.github.joschi.jadconfig.ValidationException;
 import com.github.joschi.jadconfig.repositories.InMemoryRepository;
 import com.google.common.collect.Maps;
-import org.bson.types.ObjectId;
-import org.graylog2.indexer.Indexer;
 
 /**
  * Unit tests for {@link Configuration} class
