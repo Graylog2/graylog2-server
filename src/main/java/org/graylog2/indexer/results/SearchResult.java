@@ -22,12 +22,15 @@ package org.graylog2.indexer.results;
 
 import java.util.Iterator;
 import java.util.List;
+import java.util.Set;
 
 import org.elasticsearch.common.unit.TimeValue;
 import org.elasticsearch.search.SearchHit;
 import org.elasticsearch.search.SearchHits;
+import org.graylog2.plugin.Message;
 
 import com.beust.jcommander.internal.Lists;
+import com.beust.jcommander.internal.Sets;
 
 /**
  * @author Lennart Koopmann <lennart@socketfeed.com>
@@ -35,13 +38,15 @@ import com.beust.jcommander.internal.Lists;
 public class SearchResult {
 	
 	private final String originalQuery;
-	private final SearchHits hits;
 	private final TimeValue took;
 	private final int totalResults;
+	private final List<ResultMessage> results;
+	private final Set<String> fields;
 
 	public SearchResult(SearchHits searchHits, String originalQuery, TimeValue took) {
 		this.originalQuery = originalQuery;
-		this.hits = searchHits;
+		this.results = buildResults(searchHits);
+		this.fields = extractFields(searchHits);
 		this.took = took;
 		
 		this.totalResults = (int) searchHits.getTotalHits();
@@ -60,6 +65,14 @@ public class SearchResult {
 	}
 	
 	public List<ResultMessage> getResults() {
+		return results;
+	}
+	
+	public Set<String> getFields() {
+		return fields;
+	}
+	
+	private List<ResultMessage> buildResults(SearchHits hits) {
 		List<ResultMessage> r = Lists.newArrayList();
 		
 		Iterator<SearchHit> i = hits.iterator();
@@ -70,4 +83,24 @@ public class SearchResult {
 		return r;
 	}
 	
+	private Set<String> extractFields(SearchHits hits) {
+		Set<String> fields = Sets.newHashSet();
+		
+		Iterator<SearchHit> i = hits.iterator();
+		while(i.hasNext()) {
+			for (String field : i.next().sourceAsMap().keySet()) {
+				if (!Message.RESERVED_FIELDS.contains(field)) {
+					fields.add(field);
+				}
+			}
+		}
+		
+		// Because some fields actually make sense in this result and some don't.
+		fields.add("message");
+		fields.add("source");
+		fields.remove("streams");
+		fields.remove("full_message");
+		
+		return fields;
+	}
 }

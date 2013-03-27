@@ -72,6 +72,7 @@ public class SearchResource {
         Map<String, Object> result = Maps.newHashMap();
         result.put("query", sr.getOriginalQuery());
         result.put("messages", sr.getResults());
+        result.put("fields", sr.getFields());
         result.put("time", sr.took().millis());
         result.put("total_results", sr.getTotalResults());
         

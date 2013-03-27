@@ -20,12 +20,19 @@
 
 package org.graylog2.indexer.messages;
 
+import java.util.List;
+
+import org.elasticsearch.action.admin.indices.analyze.AnalyzeRequestBuilder;
+import org.elasticsearch.action.admin.indices.analyze.AnalyzeResponse;
+import org.elasticsearch.action.admin.indices.analyze.AnalyzeResponse.AnalyzeToken;
 import org.elasticsearch.action.get.GetRequestBuilder;
 import org.elasticsearch.action.get.GetResponse;
 import org.elasticsearch.client.Client;
 import org.elasticsearch.indices.IndexMissingException;
 import org.graylog2.Core;
 import org.graylog2.indexer.results.ResultMessage;
+
+import com.beust.jcommander.internal.Lists;
 
 /**
  * @author Lennart Koopmann <lennart@socketfeed.com>
@@ -52,6 +59,18 @@ public class Messages {
 		}
 		
 		return ResultMessage.parseFromSource(r);
+	}
+	
+	public List<String> analyze(String string, String index) throws IndexMissingException {
+		List<String> tokens = Lists.newArrayList();
+		AnalyzeRequestBuilder arb = new AnalyzeRequestBuilder(c.admin().indices(), index, string);
+		AnalyzeResponse r = c.admin().indices().analyze(arb.request()).actionGet();
+		
+		for (AnalyzeToken token : r.getTokens()) {
+			tokens.add(token.getTerm());
+		}
+		
+		return tokens;
 	}
 	
 }
