@@ -23,14 +23,18 @@ package org.graylog2.indexer.searches;
 import org.elasticsearch.action.search.SearchRequestBuilder;
 import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.client.Client;
+import org.elasticsearch.index.query.FilterBuilder;
+import org.elasticsearch.index.query.FilterBuilders;
 import org.elasticsearch.search.facet.FacetBuilders;
 import org.elasticsearch.search.facet.datehistogram.DateHistogramFacet;
 import org.elasticsearch.search.facet.datehistogram.DateHistogramFacetBuilder;
 import org.elasticsearch.search.sort.SortOrder;
 import org.graylog2.Core;
+import org.graylog2.indexer.IndexHelper;
 import org.graylog2.indexer.Indexer;
 import org.graylog2.indexer.results.DateHistogramResult;
 import org.graylog2.indexer.results.SearchResult;
+import org.graylog2.plugin.Tools;
 
 import static org.elasticsearch.index.query.QueryBuilders.queryString;
 
@@ -47,20 +51,22 @@ public class Searches {
 		this.c = client;
 	}
 	
-	public SearchResult universalSearch(String query) {
+	public SearchResult universalSearch(String query, int timerange) {
 		SearchRequestBuilder srb = c.prepareSearch();
 		srb.setIndices(server.getDeflector().getAllDeflectorIndexNames()); // XXX 020: have a method that builds time ranged index requests
 		srb.setQuery(queryString(query));
 		srb.setSize(150);
+		srb.setFilter(IndexHelper.getTimestampRangeFilter(timerange));
 		srb.addSort("timestamp", SortOrder.DESC);
 		
 		SearchResponse r = c.search(srb.request()).actionGet();
 		return new SearchResult(r.hits(), query, r.took());
 	}
 	
-	public DateHistogramResult universalSearchHistogram(String query, Indexer.DateHistogramInterval interval) {
+	public DateHistogramResult universalSearchHistogram(String query, Indexer.DateHistogramInterval interval, int timerange) {
 		DateHistogramFacetBuilder fb = FacetBuilders.dateHistogramFacet("histogram")
 				.field("timestamp")
+				.facetFilter(IndexHelper.getTimestampRangeFilter(timerange))
 				.interval(interval.toString().toLowerCase());
 		
 		SearchRequestBuilder srb = c.prepareSearch();

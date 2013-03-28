@@ -23,6 +23,8 @@ import com.google.common.collect.Sets;
 import java.util.List;
 import java.util.Set;
 import org.elasticsearch.common.collect.Lists;
+import org.elasticsearch.index.query.FilterBuilder;
+import org.elasticsearch.index.query.FilterBuilders;
 import org.graylog2.plugin.Tools;
 
 /**
@@ -51,6 +53,15 @@ public class IndexHelper {
         return r;
     }
 
+    public static FilterBuilder getTimestampRangeFilter(int timerange) {
+    	if (timerange <= 0) {
+    		return null;
+    	}
+    	
+		String from = Tools.buildElasticSearchTimeFormat(Tools.getUTCTimestamp()-timerange);
+		return FilterBuilders.rangeFilter("timestamp").from(from);
+    }
+    
     private static String getPrefix(Set<String> names) {
         if (names.isEmpty()) {
             return "";

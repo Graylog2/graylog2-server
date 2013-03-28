@@ -53,7 +53,7 @@ public class SearchResource {
 
     @GET @Path("/universal")
     @Produces(MediaType.APPLICATION_JSON)
-    public String search(@QueryParam("query") String query, @QueryParam("pretty") boolean prettyPrint) {
+    public String search(@QueryParam("query") String query, @QueryParam("timerange") int timerange, @QueryParam("pretty") boolean prettyPrint) {
         Core core = (Core) rc.getProperty("core");
 
         if (query == null || query.isEmpty()) {
@@ -61,7 +61,7 @@ public class SearchResource {
         	throw new WebApplicationException(400);
         }
         
-        SearchResult sr = core.getIndexer().searches().universalSearch(query);
+        SearchResult sr = core.getIndexer().searches().universalSearch(query, timerange);
         
         Gson gson = new Gson();
         
@@ -81,7 +81,7 @@ public class SearchResource {
     
     @GET @Path("/universal/histogram")
     @Produces(MediaType.APPLICATION_JSON)
-    public String histogram(@QueryParam("query") String query, @QueryParam("interval") String interval, @QueryParam("pretty") boolean prettyPrint) {
+    public String histogram(@QueryParam("query") String query, @QueryParam("interval") String interval, @QueryParam("timerange") int timerange, @QueryParam("pretty") boolean prettyPrint) {
         Core core = (Core) rc.getProperty("core");
         
         interval = interval.toUpperCase();
@@ -98,7 +98,7 @@ public class SearchResource {
         	throw new WebApplicationException(400);
         }
         
-        DateHistogramResult dhr = core.getIndexer().searches().universalSearchHistogram(query, Indexer.DateHistogramInterval.valueOf(interval));
+        DateHistogramResult dhr = core.getIndexer().searches().universalSearchHistogram(query, Indexer.DateHistogramInterval.valueOf(interval), timerange);
 
         Gson gson = new Gson();
         

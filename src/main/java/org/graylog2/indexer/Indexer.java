@@ -68,15 +68,7 @@ public class Indexer {
 	public static enum DateHistogramInterval {
 		YEAR, QUARTER, MONTH, WEEK, DAY, HOUR, MINUTE
 	}
-
-    @SuppressWarnings("serial")
-	public static final List<String> ALLOWED_RECENT_INDEX_STORE_TYPES = new ArrayList<String>() {{ 
-        add("niofs");
-        add("simplefs");
-        add("mmapfs");
-        add("memory");
-    }};
-
+	
     private Core server;
 
     public Indexer(Core graylogServer) {
