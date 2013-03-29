@@ -1,7 +1,13 @@
 @(message: api.results.MessageResult)
 
+<div class="pull-right sidebar-back">
+	<i class="icon-remove"></i>
+</div>
+
 <h2>Message @message.getId()</h2>
 Timestamp: @message.getTimestamp()
+
+<i class="icon-question-sign"></i> <a href="#terms-msg-@message.getId()" role="button" data-toggle="modal" data-backdrop="false">Terms</a>
 
 <dl>
 @for((key, value) <- message.getFields()) {
@@ -11,3 +17,5 @@ Timestamp: @message.getTimestamp()
 </dl>
 
 <strong>Index: <em>@message.getIndex()</em></strong>
+
+@partials.message_terms(message.getId())

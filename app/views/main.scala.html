@@ -1,4 +1,6 @@
-@(title: String, searchQuery: String = "", currentUser: User)(content: Html)
+@(title: String, sidebarContent: Html, searchQuery: String = "", currentUser: User)(content: Html)
+@import views.helpers.TimerangeSelector
+
 
 <!DOCTYPE html>
 <html lang="en">
@@ -18,21 +20,9 @@
 						<table id="universalsearch-container">
 						<tr>
 							<td id="universalsearch-timerange">
-							<select name="timerange">
-								<option value="@{5*60}">5 min</option>
-								<option value="@{15*60}">15 min</option>
-								<option value="@{30*60}">30 min</option>
-								<option value="@{60*60}">1 hour</option>
-								<option value="@{2*60*60}">2 hours</option>
-								<option value="@{8*60*60}">8 hours</option>
-								<option value="@{24*60*60}">1 day</option>
-								<option value="@{2*24*60*60}">2 days</option>
-								<option value="@{5*24*60*60}">5 days</option>
-								<option value="@{7*24*60*60}">7 days</option>
-								<option value="@{14*24*60*60}">14 days</option>
-								<option value="@{30*24*60*60}">30 days</option>
-								<option value="all">All time</option>
-							</select>
+								<select name="timerange">
+									@Html(TimerangeSelector.getOptions(request))
+								</select>
 							</td>
 							
 							<td>
@@ -49,19 +39,15 @@
 	    	<div class="row-fluid">
 		   		<div class="span8" id="main-content">
 		       		@content
-		       		
-		       		<br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br />
-		       		<br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br />
-		       		<br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br />
-		       		WAT
 		       	</div>
 	       	
 		   		<div class="span4" id="sidebar">
 		   			<div id="sidebar-inner" data-spy="affix" data-offset-top="50">
-					<h3>Welcome, @currentUser.getFullName()</h3>
-					Your current time: @{new Date()}
-					
-					<div id="sidebar-graph"></div>
+		   				<div id="sidebar-original">
+							@sidebarContent
+						</div>
+						
+						<div id="sidebar-replacement"></div>
 					</div>
 		       	</div>
 			</div>

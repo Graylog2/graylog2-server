@@ -1,5 +1,12 @@
 @(currentUser: User)
 
-@main("Dashboard", "", currentUser) {
-dashboard here
+@main("Dashboard", sidebars.standard(currentUser), "", currentUser) {
+
+<div id="donut-test">
+<h2>Distribution of level</h2>
+last 5 minutes<br />
+</div>
+
+@partials.charts.donut(200, 200, "#donut-test")
+
 }

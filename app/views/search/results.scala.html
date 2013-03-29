@@ -1,15 +1,7 @@
 @(currentUser: User, searchResult: api.results.SearchResult, histogram: api.results.DateHistogramResult, query: String)
+@import views.helpers.DateHistogramResolutionSelector
 
-@main("Search results", query, currentUser) {
-
-<h1>
-	<i class="icon-search"></i>
-	Search results
-</h1>
-
-<p>
-	Found @searchResult.getTotalResultCount() messages in @searchResult.getTookMs()ms.
-</p>
+@main("Search results", sidebars.searchresults(searchResult), query, currentUser) {
 
 <style>
 .rickshaw_graph .detail .x_label { display: none }
@@ -38,7 +30,8 @@
 	});
 	
 	new Rickshaw.Graph.Axis.Time({
-		graph: resultGraph
+		graph: resultGraph,
+		ticksTreatment: "glow"
 	});
 	
 	new Rickshaw.Graph.HoverDetail( {
@@ -49,23 +42,39 @@
 			return content;
 		}
 	});
+	
 	resultGraph.render();
 </script>
+
+<i class="icon-time"></i>
+<strong>Resolution:</strong> @Html(DateHistogramResolutionSelector.getOptions(histogram.getInterval()))
 
 <table class="table table-condensed table-hover table-striped messages">
 	<thead>
 		<tr>
 			<th style="width: 135px;">Timestamp</th>
-			<th style="width: 150px;">Source</th>
-			<th>Message</th>
+			<th style="width: 150px;" id="result-th-36cd38f49b9afa08222c0dc9ebfe35eb">Source</th>
+			<th id="result-th-78e731027d8fd50ed642340b7c9a63b3">Message</th>
+			
+			@for(f <- searchResult.getFields()) {
+				@if(!f.isStandardSelected()) {
+					<th style="display: none;" id="result-th-@f.getHash()">@f.getName()</th>
+				}
+			}
 		</tr>
 	</thead>
 	<tbody>
 		@for(r <- searchResult.getMessages()) {
 		<tr data-message-id='@r.message.get("_id")' data-source-index="@r.index">
 			<td>@r.message.get("timestamp")</td>
-			<td>@r.message.get("source")</td>
-			<td class="messages-message">@r.message.get("message")</td>
+			<td class="result-td-36cd38f49b9afa08222c0dc9ebfe35eb">@r.message.get("source")</td>
+			<td class="messages-message result-td-78e731027d8fd50ed642340b7c9a63b3">@r.message.get("message")</td>
+			
+			@for(f <- searchResult.getFields()) {
+				@if(!f.isStandardSelected()) {
+					<td style="display: none;" class="result-td-@f.getHash()">@r.message.get(f.getName())</td>
+				}
+			}
 		</tr>
 		}
 	</tbody>
