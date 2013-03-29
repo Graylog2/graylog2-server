@@ -10,12 +10,12 @@ import java.net.URL;
 import java.net.URLEncoder;
 
 import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
 
 public class Api {
 
 	public static final String ERROR_MSG_IO = "Could not connect to graylog2-server. Please make sure that it is running and you configured the correct REST URI.";
-	
+
+	@SuppressWarnings("unchecked")
 	public static <T> T get(URL url, T t) throws IOException, APIException {
 		try {
 			HttpURLConnection conn = (HttpURLConnection) url.openConnection();
@@ -37,7 +37,7 @@ public class Api {
 
 			conn.disconnect();
 			Gson gson = new Gson();
-			return (T) gson.fromJson(sb.toString(), t.getClass());
+			return (T) gson.fromJson(sb.toString(), (Class<T>) t.getClass());
 		} catch (MalformedURLException e) {
 			throw new RuntimeException("Malformed URL.", e);
 		}
