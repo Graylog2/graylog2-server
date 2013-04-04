@@ -26,9 +26,10 @@ import java.util.List;
 import com.mongodb.BasicDBObject;
 import com.mongodb.DB;
 import com.mongodb.DBCollection;
-import com.mongodb.Mongo;
+import com.mongodb.MongoClient;
+import com.mongodb.MongoClientOptions;
+import com.mongodb.MongoClientOptions.Builder;
 import com.mongodb.MongoException;
-import com.mongodb.MongoOptions;
 import com.mongodb.ServerAddress;
 
 /**
@@ -37,7 +38,7 @@ import com.mongodb.ServerAddress;
  * @author Lennart Koopmann <lennart@socketfeed.com>
  */
 public final class MongoConnection {
-    private Mongo m;
+    private MongoClient m;
     private DB db;
 
     private DBCollection messageCountsCollection;
@@ -66,20 +67,20 @@ public final class MongoConnection {
     /**
      * Connect the instance.
      */
-    public synchronized Mongo connect() {
+    public synchronized MongoClient connect() {
         if (m == null) {
-            MongoOptions options = new MongoOptions();
-            options.connectionsPerHost = maxConnections;
-            options.threadsAllowedToBlockForConnectionMultiplier = threadsAllowedToBlockMultiplier;
+            Builder options = new MongoClientOptions.Builder();
+            options.connectionsPerHost(maxConnections);
+            options.threadsAllowedToBlockForConnectionMultiplier(threadsAllowedToBlockMultiplier);
 
             try {
 
                 // Connect to replica servers if given. Else the standard way to one server.
                 if (replicaServers != null && replicaServers.size() > 0) {
-                    m = new Mongo(replicaServers, options);
+                    m = new MongoClient(replicaServers, options.build());
                 } else {
                     ServerAddress address = new ServerAddress(host, port);
-                    m = new Mongo(address, options);
+                    m = new MongoClient(address, options.build());
                 }
                 db = m.getDB(database);
 
@@ -108,7 +109,7 @@ public final class MongoConnection {
 
 
     /**
-     * Get the message_counts collection. Lazily checks if correct indizes are set.
+     * Get the message_counts collection. Lazily checks if correct indices are set.
      *
      * @return The messages collection
      */

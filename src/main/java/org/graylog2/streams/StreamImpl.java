@@ -20,340 +20,166 @@
 
 package org.graylog2.streams;
 
-import java.util.HashSet;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
 import org.bson.types.ObjectId;
-import org.elasticsearch.common.collect.Maps;
 import org.graylog2.Core;
-import org.graylog2.alarms.AlarmReceiverImpl;
+import org.graylog2.database.NotFoundException;
+import org.graylog2.database.Persistable;
+import org.graylog2.database.Persisted;
 import org.graylog2.plugin.GraylogServer;
-import org.graylog2.plugin.Tools;
 import org.graylog2.plugin.alarms.AlarmReceiver;
 import org.graylog2.plugin.streams.Stream;
 import org.graylog2.plugin.streams.StreamRule;
-import org.graylog2.users.User;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
-import com.google.common.collect.Lists;
+import com.beust.jcommander.internal.Lists;
+import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
-import com.mongodb.BasicDBList;
 import com.mongodb.BasicDBObject;
-import com.mongodb.DBCollection;
-import com.mongodb.DBCursor;
 import com.mongodb.DBObject;
 
 /**
  * Representing a single stream from the streams collection. Also provides method
  * to get all streams of this collection.
  *
- * @author Lennart Koopmann <lennart@socketfeed.com>
+ * @author Lennart Koopmann <lennart@torch.sh>
  */
-public class StreamImpl implements Stream {
+public class StreamImpl extends Persisted implements Stream, Persistable {
 
-    private static final Logger LOG = LoggerFactory.getLogger(StreamImpl.class);
-
-    private final ObjectId id;
-    private final String title;
-    private final int alarmTimespan;
-    private final int alarmMessageLimit;
-    private final boolean alarmForce;
-    private final int alarmPeriod;
-    private final int lastAlarm;
+    private static final String COLLECTION = "streams";
     
-    protected final Map<String, Set<Map<String, String>>> outputs;
-
-    private List<StreamRule> streamRules;
-    private Set<String> alarmCallbacks;
-
-    private final DBObject mongoObject;
-
-    public StreamImpl (DBObject stream) {
-        this.id = (ObjectId) stream.get("_id");
-        this.title = (String) stream.get("title");
-        
-        if (stream.get("alarm_timespan") != null) {
-            this.alarmTimespan = (Integer) stream.get("alarm_timespan");
-        } else {
-            this.alarmTimespan = -1;
-        }
-        
-        if (stream.get("alarm_limit") != null) {
-            this.alarmMessageLimit = (Integer) stream.get("alarm_limit");
-        } else {
-            this.alarmMessageLimit = -1;
-        }
-        
-        if (stream.get("alarm_force") != null) {
-            this.alarmForce = (Boolean) stream.get("alarm_force");
-        } else {
-            this.alarmForce = false;
-        }
-        
-        if (stream.get("alarm_period") != null) {
-            this.alarmPeriod = (Integer) stream.get("alarm_period");
-        } else {
-            this.alarmPeriod = 0;
-        }
-        
-        if (stream.get("last_alarm") != null) {
-            this.lastAlarm = (Integer) stream.get("last_alarm");
-        } else {
-            this.lastAlarm = 0;
-        }
-        
-        if (stream.get("outputs") != null) {
-            this.outputs = buildOutputsFromMongoDoc(stream);
-        } else {
-            this.outputs = Maps.newHashMap();
-        }
-        
-        this.mongoObject = stream;
-    }
-    
-    public static Set<Stream> fetchAllEnabled(Core server) {
-        Map<String, Object> emptyMap = Maps.newHashMap();
-        return fetchAllEnabled(server, emptyMap);
+    public StreamImpl(Map<String, Object> fields, Core core) {
+    	super(COLLECTION, core, fields);
     }
 
-    public static Set<Stream> fetchAllEnabled(Core server, Map<String, Object> additionalQueryOpts) {
-        StreamCache streamCache = StreamCache.getInstance();
-        if (streamCache.valid()) {
-            return streamCache.get();
-        }
+    protected StreamImpl(ObjectId id, Map<String, Object> fields, Core core) {
+    	super(COLLECTION, core, id, fields);
+    }
+    
+    @SuppressWarnings("unchecked")
+	public static StreamImpl load(ObjectId id, Core core) throws NotFoundException {
+    	BasicDBObject o = (BasicDBObject) get(id, core, COLLECTION);
 
-        Set<Stream> streams = Sets.newHashSet();
-
-        DBCollection coll = server.getMongoConnection().getDatabase().getCollection("streams");
-        DBObject query = new BasicDBObject();
+    	if (o == null) {
+    		throw new NotFoundException();
+    	}
+    	
+    	return new StreamImpl((ObjectId) o.get("_id"), o.toMap(), core);
+    }
+    
+    public static List<Stream> loadAllEnabled(Core core) {
+        return loadAllEnabled(core, new HashMap<String, Object>());
+    }
+    
+    @SuppressWarnings("unchecked")
+	public static List<Stream> loadAllEnabled(Core core, Map<String, Object> additionalQueryOpts) {
+    	List<Stream> streams = Lists.newArrayList();
+    	
+    	DBObject query = new BasicDBObject();
         query.put("disabled", new BasicDBObject("$ne", true));
-        
-        // query.putAll() is not working
+    	
+        // putAll() is not working with BasicDBObject.
         for (Map.Entry<String, Object> o : additionalQueryOpts.entrySet()) {
-             query.put(o.getKey(), o.getValue());
+        	query.put(o.getKey(), o.getValue());
         }
-            
-        DBCursor cur = coll.find(query);
-
-        while (cur.hasNext()) {
-            try {
-                streams.add(new StreamImpl(cur.next()));
-            } catch (Exception e) {
-                LOG.warn("Can't fetch stream. Skipping. " + e.getMessage(), e);
-            }
+        
+        List<DBObject> results = query(query, core, COLLECTION);
+        for (DBObject o : results) {
+        	streams.add(new StreamImpl((ObjectId) o.get("_id"), o.toMap(), core));
         }
 
-        streamCache.set(streams);
-
-        return streams;
+    	return streams;
     }
     
-    public static Map<String, String> nameMap(Core server) {
-        Map<String, String> streams = Maps.newHashMap();
-        
-        for(Stream stream : fetchAllEnabled(server)) {
-            streams.put(stream.getId().toString(), stream.getTitle());
-        }
-        
-        return streams;
-    }
-
-    @Override
-    public List<StreamRule> getStreamRules() {
-        if (this.streamRules != null) {
-            return this.streamRules;
-        }
-
-        List<StreamRule> rules = Lists.newArrayList();
-
-        BasicDBList rawRules = (BasicDBList) this.mongoObject.get("streamrules");
-        if (rawRules != null && rawRules.size() > 0) {
-            for (Object ruleObj : rawRules) {
-                try {
-                    StreamRule rule = new StreamRuleImpl((DBObject) ruleObj);
-                    rules.add(rule);
-                } catch (Exception e) {
-                    LOG.warn("Skipping stream rule in Stream.getStreamRules(): " + e.getMessage(), e);
-                }
-            }
-        }
-
-        this.streamRules = rules;
-        return rules;
-    }
     
-    public Set<String> getAlarmCallbacks() {
-        if (this.alarmCallbacks != null) {
-            return this.alarmCallbacks;
-        }
-        
-        Set<String> callbacks = Sets.newTreeSet();
-        BasicDBList objs = (BasicDBList) this.mongoObject.get("alarm_callbacks");
-        
-        if (objs != null) {
-            for (Object obj : objs) {
-                String typeclass = (String) obj;
-                if (typeclass != null && !typeclass.isEmpty()) {
-                    callbacks.add(typeclass);
-                }
-            }
-        }
-        
-        this.alarmCallbacks = callbacks;
-        return callbacks;
-    }
-
-    @Override
-    public Set<AlarmReceiver> getAlarmReceivers(GraylogServer server) {
-        Core core = (Core) server;
-
-        Set<User> users;
-        
-        if (alarmForce) {
-            // Alarm notification is forced for all users. Fetch them all.
-            users = User.fetchAll(core);
-        } else {
-            // Fetch only users that have subscribed to alarms of this stream.
-            Map<String, Object> conditions = Maps.newHashMap();
-            Map<String, Set<ObjectId>> userCondition = Maps.newHashMap();
-            userCondition.put("$in", getAlarmedUserIds(core));
-            conditions.put("_id", userCondition);
-            users = User.fetchAll(core, conditions);
-        }
-        
-        return usersToAlarmReceivers(users);
-    }
+    
+    
+    
+    
     
     public Set<Map<String, String>> getOutputConfigurations(String className) {
-        
-        return outputs.get(className);
+    	return null;
     }
     
     public boolean hasConfiguredOutputs(String typeClass) {
-        Set<Map<String, String>> oc = getOutputConfigurations(typeClass);
-        if (oc == null) {
-            return false;
-        }
-        
-        return !oc.isEmpty();
-    }
-    
-    @Override
-    public ObjectId getId() {
-        return id;
-    }
-
-    @Override
-    public String getTitle() {
-        return title;
-    }
-    
-    @Override
-    public int getAlarmTimespan() {
-        return alarmTimespan;
-    }
-
-    @Override
-    public int getAlarmMessageLimit() {
-        return alarmMessageLimit;
-    }
-
-    @Override
-    public int getAlarmPeriod() {
-        return alarmPeriod;
-    }
-    
-    public void setLastAlarm(int timestamp, Core server) {
-        DBCollection coll = server.getMongoConnection().getDatabase().getCollection("streams");
-        DBObject query = new BasicDBObject();
-        query.put("_id", this.id);
-        
-        DBObject stream = coll.findOne(query);
-        stream.put("last_alarm", timestamp);
-
-        coll.update(query, stream);
+    	return false;
     }
     
     public boolean inAlarmGracePeriod() {
-        int now = Tools.getUTCTimestamp();
-        int graceLine = lastAlarm+(alarmPeriod*60)-1;
-        LOG.debug("Last alarm of stream <{}> was at [{}]. Grace period ends at [{}]. It now is [{}].",
-                new Object[] { getId(), lastAlarm, graceLine, now });
-        return now <= graceLine;
+    	return true;
     }
     
+    public void setLastAlarm(int timestamp, Core server) {
+    }
+    
+    public Set<String> getAlarmCallbacks() {
+    	return Sets.newHashSet();
+    }
+
+    public static Map<String, String> nameMap(Core server) {
+    	return Maps.newHashMap();
+    }
+    
+	@Override
+	public List<StreamRule> getStreamRules() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public int getAlarmTimespan() {
+		// TODO Auto-generated method stub
+		return 0;
+	}
+
+	@Override
+	public int getAlarmMessageLimit() {
+		// TODO Auto-generated method stub
+		return 0;
+	}
+
+	@Override
+	public int getAlarmPeriod() {
+		// TODO Auto-generated method stub
+		return 0;
+	}
+
+	@Override
+	public Set<AlarmReceiver> getAlarmReceivers(GraylogServer server) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+	
     @Override
     public String toString() {
         this.getStreamRules();
-        return this.id.toString() + ":" + this.title;
-    }
-    
-    private Set<ObjectId> getAlarmedUserIds(Core server) {
-        Set<ObjectId> userIds = Sets.newHashSet();
-        
-        // ZOMG this alerted_streams stuff suck so hard, but we keep it for backwards-compat.
-        DBCollection coll = server.getMongoConnection().getDatabase().getCollection("alerted_streams");
-        DBObject query = new BasicDBObject();
-        query.put("stream_id", this.id);
-        
-        DBCursor cur = coll.find(query);
-
-        while (cur.hasNext()) {
-            DBObject x = cur.next(); // I don't even know how I should call this lol
-            userIds.add((ObjectId) x.get("user_id"));
-        }
-        
-        return userIds;
+        return this.id.toString() + ":" + this.getTitle();
     }
 
-    private Set<AlarmReceiver> usersToAlarmReceivers(Set<User> users) {
-        Set <AlarmReceiver> receivers = Sets.newHashSet();
-        
-        for(User user : users) {
-            AlarmReceiverImpl receiver = new AlarmReceiverImpl(user.getId().toString());
-            receiver.addAddresses(user.getTransports());
+	@Override
+	public ObjectId getId() {
+		return this.id;
+	}
 
-            receivers.add(receiver);
-        }
-        
-        return receivers;
-    }
-    
-    private Map<String, Set<Map<String, String>>> buildOutputsFromMongoDoc(DBObject stream) {
-        Map<String, Set<Map<String, String>>> o = Maps.newHashMap();
-        
-        BasicDBList objs = (BasicDBList) stream.get("outputs");
-        
-        if (objs == null || objs.isEmpty()) {
-            return o;
-        }
-        
-        for (Object obj : objs) {
-            try {
-                DBObject output = (BasicDBObject) obj;
-                String typeclass = (String) output.get("typeclass");
-
-                if (!o.containsKey(typeclass)) {
-                    o.put(typeclass, new HashSet<Map<String, String>>());
-                }
-                
-                // ZOMG we need an ODM in the next version.
-                Map<String, String> outputConfig = Maps.newHashMap();
-                for (Object key : output.toMap().keySet()) {
-                    outputConfig.put(key.toString(), output.get(key.toString()).toString());
-                }
-                
-                o.get(typeclass).add(outputConfig);
-            } catch(Exception e) {
-                LOG.warn("Could not read stream output.", e);
-                continue;
-            }
-        }
-        
-        return o;
-    }
+	@Override
+	public String getTitle() {
+		return (String) fields.get("title");
+	}
+	
+	public Map<String, Object> asMap() {
+		// We work on the result a bit to allow correct JSON serializing.
+		Map<String, Object> result = Maps.newHashMap(fields);
+		result.remove("_id");
+		result.put("id", ((ObjectId) fields.get("_id")).toStringMongod());
+		
+		if (!result.containsKey("rules")) {
+			result.put("rules", Maps.newHashMap());
+		}
+		
+		return result;
+	}
 
 }

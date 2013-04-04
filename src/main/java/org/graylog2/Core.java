@@ -519,7 +519,7 @@ public class Core implements GraylogServer {
     @Override
     public Map<String, Stream> getEnabledStreams() {
         Map<String, Stream> streams = Maps.newHashMap();
-        for (Stream stream : StreamImpl.fetchAllEnabled(this)) {
+        for (Stream stream : StreamImpl.loadAllEnabled(this)) {
             streams.put(stream.getId().toString(), stream);
         }
         

@@ -34,8 +34,8 @@ import org.graylog2.streams.StreamImpl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 /**
  * @author Lennart Koopmann <lennart@socketfeed.com>
@@ -58,7 +58,7 @@ public class AlarmScannerThread implements Runnable {
         Map<String, Object> onlyAlerted = Maps.newHashMap();
         onlyAlerted.put("alarm_active", true);
         
-        Set<Stream> streams = StreamImpl.fetchAllEnabled(graylogServer, onlyAlerted);
+        List<Stream> streams = StreamImpl.loadAllEnabled(graylogServer, onlyAlerted);
         
         if (streams.isEmpty()) {
             LOG.debug("No alertable streams found. Not doing anything more.");

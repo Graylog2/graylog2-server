@@ -36,19 +36,18 @@ import org.elasticsearch.indices.IndexMissingException;
 import org.graylog2.Core;
 import org.graylog2.indexer.messages.DocumentNotFoundException;
 import org.graylog2.indexer.results.ResultMessage;
+import org.graylog2.rest.RestResource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.google.common.collect.Maps;
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
 import com.sun.jersey.api.core.ResourceConfig;
 
 /**
  * @author Lennart Koopmann <lennart@torch.sh>
  */
 @Path("/messages/{index}")
-public class MessageResource {
+public class MessageResource extends RestResource {
     private static final Logger LOG = LoggerFactory.getLogger(MessageResource.class);
 	
     @Context ResourceConfig rc;
@@ -74,13 +73,7 @@ public class MessageResource {
         	throw new WebApplicationException(404);
 		}
         
-        Gson gson = new Gson();
-        
-        if (prettyPrint) {
-            gson = new GsonBuilder().setPrettyPrinting().create();
-        }
-        
-        return gson.toJson(m);
+        return json(m, prettyPrint);
     }
     
     @GET @Path("/analyze")
@@ -103,13 +96,7 @@ public class MessageResource {
         
         Map<String, Object> result = Maps.newHashMap();
         result.put("tokens", tokens);
-        
-        Gson gson = new Gson();
-        
-        if (prettyPrint) {
-            gson = new GsonBuilder().setPrettyPrinting().create();
-        }
 
-        return gson.toJson(result);
+        return json(result, prettyPrint);
     }
 }

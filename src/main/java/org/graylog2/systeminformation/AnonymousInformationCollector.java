@@ -51,7 +51,7 @@ public class AnonymousInformationCollector {
         info.put("number_of_graylog2_server_nodes", server.cluster().getActiveNodeCount());
         info.put("number_of_total_messages", server.getIndexer().getTotalNumberOfMessagesInIndices());
         info.put("number_of_indices", server.getDeflector().getAllDeflectorIndices().size());
-        info.put("number_of_streams", StreamImpl.fetchAllEnabled(server).size());
+        info.put("number_of_streams", StreamImpl.loadAllEnabled(server).size());
         info.put("number_of_stream_rules", numberOfStreamRules());
         info.put("number_of_blacklist_rules", Blacklist.fetchAll().size());
         info.put("total_index_size", server.getIndexer().getTotalIndexSize());
@@ -78,7 +78,7 @@ public class AnonymousInformationCollector {
     
     private int numberOfStreamRules() {
         int rules = 0;
-        for (Stream stream : StreamImpl.fetchAllEnabled(server)) {
+        for (Stream stream : StreamImpl.loadAllEnabled(server)) {
             rules =+ stream.getStreamRules().size();
         }
             

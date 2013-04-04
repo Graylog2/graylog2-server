@@ -30,17 +30,16 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 
 import org.graylog2.Core;
+import org.graylog2.rest.RestResource;
 
 import com.google.common.collect.Maps;
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
 import com.sun.jersey.api.core.ResourceConfig;
 
 /**
  * @author Lennart Koopmann <lennart@torch.sh>
  */
 @Path("/system")
-public class SystemResource {
+public class SystemResource extends RestResource {
     @Context ResourceConfig rc;
 
     @GET @Path("/")
@@ -48,12 +47,6 @@ public class SystemResource {
     public String system(@QueryParam("pretty") boolean prettyPrint) {
         Core core = (Core) rc.getProperty("core");
 
-        Gson gson = new Gson();
-        
-        if (prettyPrint) {
-            gson = new GsonBuilder().setPrettyPrinting().create();
-        }
-        
         Map<String, Object> result = Maps.newHashMap();
         result.put("facility", "graylog2-server");
         result.put("codename", Core.GRAYLOG2_CODENAME);
@@ -61,6 +54,6 @@ public class SystemResource {
        	result.put("version", Core.GRAYLOG2_VERSION);
        	result.put("started_at", core.getStartedAt());
         
-        return gson.toJson(result);
+        return json(result, prettyPrint);
     }
 }
