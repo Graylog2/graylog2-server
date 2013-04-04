@@ -223,6 +223,8 @@ public class AMQPConsumer implements Runnable {
                      channel.basicAck(envelope.getDeliveryTag(), false);
                      handledMessages.mark();
                  } catch(Exception e) {
+                	 // If something breaks here it is extremely likely that it won't work next time. Ack the message.
+                	 channel.basicAck(envelope.getDeliveryTag(), false);
                      LOG.error("Could not handle message from AMQP.", e);
                  }
              }
