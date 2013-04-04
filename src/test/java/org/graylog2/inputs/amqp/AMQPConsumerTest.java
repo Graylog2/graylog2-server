@@ -46,13 +46,19 @@ public class AMQPConsumerTest {
 	}
 	
 	@Test
-	public void testConsumerDoesNotAcknowledgeOnException() throws IOException {
+	public void testConsumerDoesAcknowledgeOnException() throws IOException {
+		final long deliveryTag = 3l;
+		
 		byte[] body = null; // invalid payload so that an Exception is thrown
 		Mockery context = new Mockery();
 		final Channel channel = context.mock(Channel.class);
-
+		
+		context.checking(new Expectations() {{
+		    oneOf (channel).basicAck(deliveryTag, false);
+		}});
+		
 		Consumer consumer = _amqpConsumer.createConsumer(channel);
-		consumer.handleDelivery("consumerTag", new Envelope(35l, true, "myexchange", "myroutingkey"), null, body);
+		consumer.handleDelivery("consumerTag", new Envelope(deliveryTag, true, "myexchange", "myroutingkey"), null, body);
 		context.assertIsSatisfied();
 	}
 	
