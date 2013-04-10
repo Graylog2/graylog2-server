@@ -33,8 +33,9 @@ import org.graylog2.inputs.syslog.SyslogUDPInput;
  */
 public class StandardInputSet {
     
-    public static Set<Class> get() {
-        return new HashSet<Class>() {{ 
+    @SuppressWarnings("serial")
+	public static Set<Class<?>> get() {
+        return new HashSet<Class<?>>() {{ 
             add(GELFTCPInput.class);
             add(GELFUDPInput.class);
             add(GELFHttpInput.class);

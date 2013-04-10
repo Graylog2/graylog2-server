@@ -20,11 +20,10 @@
 
 package org.graylog2.blacklists;
 
-import org.graylog2.SimpleObjectCache;
-
 import java.util.List;
+
 import org.graylog2.Core;
-import org.graylog2.plugin.GraylogServer;
+import org.graylog2.SimpleObjectCache;
 
 /**
  * Singleton caching the already fetched blacklist.

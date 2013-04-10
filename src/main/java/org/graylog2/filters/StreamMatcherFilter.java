@@ -26,7 +26,7 @@ import com.yammer.metrics.core.TimerContext;
 import org.graylog2.Core;
 import org.graylog2.plugin.GraylogServer;
 import org.graylog2.plugin.filters.MessageFilter;
-import org.graylog2.plugin.logmessage.LogMessage;
+import org.graylog2.plugin.Message;
 import org.graylog2.plugin.streams.Stream;
 import org.graylog2.streams.StreamRouter;
 import org.slf4j.Logger;
@@ -46,7 +46,7 @@ public class StreamMatcherFilter implements MessageFilter {
     private final Timer processTime = Metrics.newTimer(StreamMatcherFilter.class, "ProcessTime", TimeUnit.MICROSECONDS, TimeUnit.SECONDS);
 
     @Override
-    public boolean filter(LogMessage msg, GraylogServer server) {
+    public boolean filter(Message msg, GraylogServer server) {
         TimerContext tcx = processTime.time();
 
         List<Stream> streams = ROUTER.route((Core) server, msg);

@@ -23,7 +23,6 @@ import com.mongodb.BasicDBList;
 import com.mongodb.BasicDBObject;
 import com.mongodb.DBCollection;
 import com.mongodb.DBObject;
-import java.util.List;
 
 /**
  *  @author Lennart Koopmann <lennart@socketfeed.com>

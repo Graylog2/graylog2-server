@@ -19,26 +19,40 @@
  */
 package org.graylog2.inputs.http;
 
-import com.yammer.metrics.Metrics;
-import com.yammer.metrics.core.Meter;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import static org.jboss.netty.handler.codec.http.HttpHeaders.isKeepAlive;
+
+import java.util.concurrent.TimeUnit;
+
 import org.graylog2.Core;
 import org.graylog2.gelf.GELFMessage;
 import org.graylog2.gelf.GELFProcessor;
 import org.jboss.netty.buffer.ChannelBuffer;
-import org.jboss.netty.channel.*;
-import org.jboss.netty.handler.codec.http.*;
+import org.jboss.netty.channel.Channel;
+import org.jboss.netty.channel.ChannelFuture;
+import org.jboss.netty.channel.ChannelFutureListener;
+import org.jboss.netty.channel.ChannelHandlerContext;
+import org.jboss.netty.channel.ExceptionEvent;
+import org.jboss.netty.channel.MessageEvent;
+import org.jboss.netty.channel.SimpleChannelHandler;
+import org.jboss.netty.handler.codec.http.DefaultHttpResponse;
+import org.jboss.netty.handler.codec.http.HttpHeaders;
+import org.jboss.netty.handler.codec.http.HttpMethod;
+import org.jboss.netty.handler.codec.http.HttpRequest;
+import org.jboss.netty.handler.codec.http.HttpResponse;
+import org.jboss.netty.handler.codec.http.HttpResponseStatus;
+import org.jboss.netty.handler.codec.http.HttpVersion;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-import java.util.concurrent.TimeUnit;
-
-import static org.jboss.netty.handler.codec.http.HttpHeaders.isKeepAlive;
+import com.yammer.metrics.Metrics;
+import com.yammer.metrics.core.Meter;
 
 public class GELFHttpHandler extends SimpleChannelHandler {
 
     private static final Logger LOG = LoggerFactory.getLogger(GELFHttpHandler.class);
 
-    private final Core server;
+    @SuppressWarnings("unused")
+	private final Core server;
     private final Meter receivedMessages = Metrics.newMeter(GELFHttpHandler.class, "ReceivedMessages", "messages", TimeUnit.SECONDS);
     private final Meter gelfMessages = Metrics.newMeter(GELFHttpHandler.class, "ReceivedGelfMessages", "messages", TimeUnit.SECONDS);
     private final GELFProcessor gelfProcessor;

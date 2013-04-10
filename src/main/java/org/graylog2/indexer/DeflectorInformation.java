@@ -38,8 +38,6 @@ public class DeflectorInformation {
     private Core graylogServer;
     
     private Map<String, IndexStats> indices = Maps.newHashMap();
-    private IndexStats recentIndex;
-    private String recentIndexStorageType;
     private String deflectorTarget;
     private int maxMessagesPerIndex;
     private String serverId;
@@ -55,15 +53,7 @@ public class DeflectorInformation {
     public void addIndices(Map<String, IndexStats> indices) {
         this.indices.putAll(indices);
     }
-    
-    public void setRecentIndex(IndexStats recentIndex) {
-        this.recentIndex = recentIndex;
-    }
-    
-    public void setRecentIndexStorageType(String type) {
-        this.recentIndexStorageType = type;
-    }
-    
+
     public void setDeflectorTarget(String target) {
         this.deflectorTarget = target;
     }
@@ -83,12 +73,6 @@ public class DeflectorInformation {
         for (Map.Entry<String, IndexStats> e : indices.entrySet()) {
             indexInformation.put(e.getKey(), getIndexInformation(e.getValue()));
         }
-
-        Map<String, Object> recentIndexInfo = Maps.newHashMap();
-        recentIndexInfo.put("name", recentIndex.index());
-        recentIndexInfo.put("info", getIndexInformation(recentIndex));
-        recentIndexInfo.put("storage_type", recentIndexStorageType);
-        result.put("recent_index", recentIndexInfo);
         
         result.put("server_id", serverId);
         result.put("deflector_target", deflectorTarget);

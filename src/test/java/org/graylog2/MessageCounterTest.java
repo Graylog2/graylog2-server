@@ -61,18 +61,18 @@ public class MessageCounterTest {
         expected.put(Tools.encodeBase64(host3), 3);
 
         counter.countUpStream(new ObjectId(), 5); // Add a stream count for complexity.
-        counter.countUpHost(host1, 4);
-        counter.countUpHost(host1, 1);
-        counter.incrementHost(host2);
-        counter.countUpHost(host3, 3);
+        counter.countUpSource(host1, 4);
+        counter.countUpSource(host1, 1);
+        counter.incrementSource(host2);
+        counter.countUpSource(host3, 3);
 
-        assertEquals(expected, counter.getHostCounts());
+        assertEquals(expected, counter.getSourceCounts());
     }
 
     @Test
     public void testResetAllCounts() {
         counter.countUpTotal(100);
-        counter.countUpHost("foo.example.org", 9001);
+        counter.countUpSource("foo.example.org", 9001);
         counter.countUpStream(new ObjectId(), 5);
 
         assertEquals(100, counter.getTotalCount()); // Just to make sure.
@@ -80,15 +80,15 @@ public class MessageCounterTest {
         counter.resetAllCounts();
 
         assertEquals(0, counter.getTotalCount());
-        assertEquals(0, counter.getHostCounts().size());
+        assertEquals(0, counter.getSourceCounts().size());
         assertEquals(0, counter.getStreamCounts().size());
     }
 
     @Test
     public void testResetHostCounts() {
-        counter.countUpHost("lolwat", 200);
-        counter.resetHostCounts();
-        assertEquals(new HashMap<String, Integer>(), counter.getHostCounts());
+        counter.countUpSource("lolwat", 200);
+        counter.resetSourceCounts();
+        assertEquals(new HashMap<String, Integer>(), counter.getSourceCounts());
     }
 
     @Test
@@ -142,20 +142,20 @@ public class MessageCounterTest {
     @Test
     public void testIncrementHost() {
         String hostname = "foobar";
-        counter.countUpHost(hostname, 10);
-        counter.incrementHost(hostname);
+        counter.countUpSource(hostname, 10);
+        counter.incrementSource(hostname);
 
-        int res = counter.getHostCounts().get(Tools.encodeBase64(hostname));
+        int res = counter.getSourceCounts().get(Tools.encodeBase64(hostname));
         assertEquals(11, res);
     }
 
     @Test
     public void testCountUpHost() {
         String hostname = "foo.example.org";
-        counter.countUpHost(hostname, 25);
-        counter.countUpHost(hostname, 40);
+        counter.countUpSource(hostname, 25);
+        counter.countUpSource(hostname, 40);
 
-        int res = counter.getHostCounts().get(Tools.encodeBase64(hostname));
+        int res = counter.getSourceCounts().get(Tools.encodeBase64(hostname));
         assertEquals(65, res);
     }
 

@@ -28,16 +28,16 @@ import com.yammer.metrics.core.TimerContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.graylog2.Core;
-import org.graylog2.buffers.LogMessageEvent;
+import org.graylog2.buffers.MessageEvent;
 import org.graylog2.plugin.filters.MessageFilter;
-import org.graylog2.plugin.logmessage.LogMessage;
+import org.graylog2.plugin.Message;
 
 import java.util.concurrent.TimeUnit;
 
 /**
  * @author Lennart Koopmann <lennart@socketfeed.com>
  */
-public class ProcessBufferProcessor implements EventHandler<LogMessageEvent> {
+public class ProcessBufferProcessor implements EventHandler<MessageEvent> {
 
     private static final Logger LOG = LoggerFactory.getLogger(ProcessBufferProcessor.class);
 
@@ -58,7 +58,7 @@ public class ProcessBufferProcessor implements EventHandler<LogMessageEvent> {
     }
 
     @Override
-    public void onEvent(LogMessageEvent event, long sequence, boolean endOfBatch) throws Exception {
+    public void onEvent(MessageEvent event, long sequence, boolean endOfBatch) throws Exception {
         // Because Trisha said so. (http://code.google.com/p/disruptor/wiki/FrequentlyAskedQuestions)
         if ((sequence % numberOfConsumers) != ordinal) {
             return;
@@ -70,7 +70,7 @@ public class ProcessBufferProcessor implements EventHandler<LogMessageEvent> {
         incomingMessagesPerMinute.mark();
         TimerContext tcx = processTime.time();
 
-        LogMessage msg = event.getMessage();
+        Message msg = event.getMessage();
 
         LOG.debug("Starting to process message <{}>.", msg.getId());
 

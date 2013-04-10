@@ -31,27 +31,21 @@ import org.graylog2.plugin.streams.StreamRule;
  */
 public class StreamRuleImpl implements StreamRule {
 
-    public static final int TYPE_MESSAGE = 1;
-    public static final int TYPE_HOST = 2;
-    public static final int TYPE_SEVERITY = 3;
-    public static final int TYPE_FACILITY = 4;
-    // Type 5 is reserved for frontend usage (timeframe filter)
-    public static final int TYPE_ADDITIONAL = 6;
-    // Type 7 used to be for the removed hostgroup feature.
-    public static final int TYPE_SEVERITY_OR_HIGHER = 8;
-    public static final int TYPE_HOST_REGEX = 9;
-    public static final int TYPE_FULL_MESSAGE = 10;
-    public static final int TYPE_FILENAME_LINE = 11;
-    public static final int TYPE_FACILITY_REGEX = 12;
+    public static final int TYPE_EXACT = 1;
+    public static final int TYPE_REGEX = 2;
+    public static final int TYPE_GREATER = 3;
+    public static final int TYPE_SMALLER = 4;
 
     private ObjectId objectId = null;
     private int ruleType = 0;
     private String value = null;
+    private String field = null;
 
     public StreamRuleImpl(DBObject rule) {
         this.objectId = (ObjectId) rule.get("_id");
         this.ruleType = (Integer) rule.get("rule_type");
         this.value = (String) rule.get("value");
+        this.field = (String) rule.get("field");
     }
 
     /**
@@ -78,6 +72,9 @@ public class StreamRuleImpl implements StreamRule {
         return value;
     }
 
-
+	@Override
+	public String getField() {
+		return field;
+	}
 
 }

@@ -4,10 +4,36 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
+    <parent>
+        <groupId>org.sonatype.oss</groupId>
+        <artifactId>oss-parent</artifactId>
+        <version>7</version>
+    </parent>
+
     <groupId>org.graylog2</groupId>
     <artifactId>graylog2-server</artifactId>
-    <version>0.11.0</version>
+    <version>0.12.0-SNAPSHOT</version>
     <packaging>jar</packaging>
+
+    <developers>
+      <developer>
+        <id>lennartkoopmann</id>
+        <name>Lennart Koopmann</name>
+        <email>lennart@socketfeed.com</email>
+      </developer>
+    </developers>
+
+    <licenses>
+        <license>
+            <name>MIT license</name>
+            <url>http://www.opensource.org/licenses/mit-license.php</url>
+        </license>
+    </licenses>
+
+    <scm>
+        <developerConnection>scm:git:git@github.com:Graylog2/graylog2-server.git</developerConnection>
+        <url>git@github.com:Graylog2/graylog2-server.git</url>
+    </scm>
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -154,11 +180,6 @@
             <version>2.2.2</version>
         </dependency>
         <dependency>
-            <groupId>org.graylog2</groupId>
-            <artifactId>graylog2-plugin</artifactId>
-            <version>0.10.14</version>
-        </dependency>
-        <dependency>
             <groupId>org.productivity.java</groupId>
             <artifactId>syslog4j-graylog2</artifactId>
             <version>0.9.48-graylog2</version>
@@ -167,6 +188,21 @@
             <groupId>com.github.stephenc.high-scale-lib</groupId>
             <artifactId>high-scale-lib</artifactId>
             <version>1.1.4</version>
+        </dependency>
+	    <dependency>
+	      <groupId>com.sun.jersey</groupId>
+	      <artifactId>jersey-grizzly2</artifactId>
+	      <version>1.17</version>
+	    </dependency>
+	    <dependency>
+	      <groupId>com.sun.jersey</groupId>
+	      <artifactId>jersey-server</artifactId>
+	      <version>1.17</version>
+	    </dependency>
+        <dependency>
+            <groupId>com.eaio.uuid</groupId>
+            <artifactId>uuid</artifactId>
+            <version>3.2</version>
         </dependency>
     </dependencies>
 
@@ -211,7 +247,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-assembly-plugin</artifactId>
-                <version>2.2.1</version>
+                <version>2.4</version>
                 <configuration>
                     <finalName>graylog2-server</finalName>
                     <archive>
@@ -223,6 +259,34 @@
                         <descriptorRef>jar-with-dependencies</descriptorRef>
                     </descriptorRefs>
                 </configuration>
+            </plugin>
+	      <plugin>
+	         <groupId>org.apache.maven.plugins</groupId>
+	         <artifactId>maven-shade-plugin</artifactId>
+	         <version>1.5</version>
+	         <configuration>
+	         <transformers>
+	         <transformer implementation="org.apache.maven.plugins.shade.resource.ServicesResourceTransformer"/>
+	         <transformer implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
+	           <manifestEntries>
+	            <Main-Class>org.graylog2.Main</Main-Class>
+	            <Build-Number>1</Build-Number>
+	           </manifestEntries>
+	          </transformer>
+	        </transformers>
+	       </configuration>
+	      <executions>
+	       <execution>
+	        <phase>package</phase>
+	         <goals>
+	          <goal>shade</goal>
+	         </goals>
+	       </execution>
+	      </executions>
+	      </plugin>
+            <plugin>
+                <artifactId>maven-release-plugin</artifactId>
+                <version>2.3.2</version>
             </plugin>
         </plugins>
         <testResources>

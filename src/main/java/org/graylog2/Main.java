@@ -224,6 +224,13 @@ public final class Main {
         // Register outputs.
         server.registerOutput(new ElasticSearchOutput());
         
+        try {
+        	server.startRestApi();
+        } catch(Exception e) {
+        	LOG.error("Could not start REST API. Terminating.", e);
+        	System.exit(1);
+        }
+        
         // Blocks until we shut down.
         server.run();
 

@@ -19,6 +19,14 @@
  */
 package org.graylog2.users;
 
+import java.util.Map;
+import java.util.Set;
+
+import org.bson.types.ObjectId;
+import org.graylog2.Core;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.beust.jcommander.internal.Maps;
 import com.google.common.collect.Sets;
 import com.mongodb.BasicDBList;
@@ -26,13 +34,6 @@ import com.mongodb.BasicDBObject;
 import com.mongodb.DBCollection;
 import com.mongodb.DBCursor;
 import com.mongodb.DBObject;
-import org.bson.types.ObjectId;
-import org.graylog2.Core;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import java.util.Map;
-import java.util.Set;
 
 /**
  * @author Lennart Koopmann <lennart@socketfeed.com>
@@ -46,7 +47,8 @@ public class User {
     private final String name;
     private final Map<String, String> transports;
     
-    private final DBObject mongoObject;
+    @SuppressWarnings("unused")
+	private final DBObject mongoObject;
     
     public User (DBObject user) {
         this.id = (ObjectId) user.get("_id");

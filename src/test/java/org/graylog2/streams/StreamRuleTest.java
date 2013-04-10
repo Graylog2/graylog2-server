@@ -1,5 +1,5 @@
 /**
- * Copyright 2011 Lennart Koopmann <lennart@socketfeed.com>
+ * Copyright 2011, 2012, 2013 Lennart Koopmann <lennart@socketfeed.com>
  *
  * This file is part of Graylog2.
  *
@@ -30,7 +30,7 @@ public class StreamRuleTest {
     public BasicDBObject buildMongoStreamRule() {
         BasicDBObject mongo = new BasicDBObject();
         mongo.put("_id", new ObjectId());
-        mongo.put("rule_type", StreamRuleImpl.TYPE_MESSAGE);
+        mongo.put("rule_type", StreamRuleImpl.TYPE_REGEX);
         mongo.put("value", "bar");
 
         return mongo;
@@ -49,7 +49,7 @@ public class StreamRuleTest {
     @Test
     public void testGetRuleType() {
         StreamRuleImpl rule = new StreamRuleImpl(this.buildMongoStreamRule());
-        assertEquals(StreamRuleImpl.TYPE_MESSAGE, rule.getRuleType());
+        assertEquals(StreamRuleImpl.TYPE_REGEX, rule.getRuleType());
     }
 
     @Test

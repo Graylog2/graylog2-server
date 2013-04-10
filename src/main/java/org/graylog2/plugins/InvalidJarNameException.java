@@ -24,7 +24,12 @@ package org.graylog2.plugins;
  */
 public class InvalidJarNameException extends Exception {
     
-    public InvalidJarNameException() {
+    /**
+	 * Re-generate if you modify the class structure.
+	 */
+	private static final long serialVersionUID = -7295134658260134545L;
+
+	public InvalidJarNameException() {
         super();
     }
     

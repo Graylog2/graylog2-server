@@ -1,5 +1,5 @@
 /**
- * Copyright 2012 Lennart Koopmann <lennart@socketfeed.com>
+ * Copyright 2012, 2013 Lennart Koopmann <lennart@socketfeed.com>
  *
  * This file is part of Graylog2.
  *
@@ -25,8 +25,7 @@ import org.graylog2.gelf.GELFMessage;
 import org.graylog2.plugin.Tools;
 import org.graylog2.GraylogServerStub;
 import org.graylog2.TestHelper;
-import org.graylog2.plugin.logmessage.LogMessage;
-import org.graylog2.plugin.logmessage.LogMessage;
+import org.graylog2.plugin.Message;
 import org.junit.Test;
 import static org.junit.Assert.*;
 
@@ -35,13 +34,8 @@ public class GELFProcessorTest {
     public final static double usedTimestamp = Tools.getUTCTimestampWithMilliseconds();
     public final static String GELF_JSON_COMPLETE = "{\"short_message\":\"foo\",\"full_message\":\"foo\nzomg\",\"facility\":"
             + "\"test\",\"level\":3,\"line\":23,\"file\":\"lol.js\",\"host\":\"bar\",\"timestamp\": " + usedTimestamp + ",\"_lol_utf8\":\"ü\",\"_foo\":\"bar\"}";
-
     public final static String GELF_JSON_INCOMPLETE = "{\"short_message\":\"foo\",\"host\":\"bar\"}";
-
     public final static String GELF_JSON_INCOMPLETE_WITH_ID = "{\"short_message\":\"foo\",\"host\":\"bar\",\"_id\":\":7\",\"_something\":\"foo\"}";
-
-    public final static String GELF_JSON_INCOMPLETE_WITH_NON_STANDARD_FIELD = "{\"short_message\":\"foo\",\"host\":\"bar\",\"lol_not_allowed\":\":7\",\"_something\":\"foo\"}";
-
     public final static String GELF_JSON_WITH_MAP = "{\"short_message\":\"foo\",\"host\":\"bar\",\"_lol\":{\"foo\":\"zomg\"}}";
     
     @Test
@@ -53,20 +47,20 @@ public class GELFProcessorTest {
         processor.messageReceived(new GELFMessage(TestHelper.gzipCompress(GELF_JSON_COMPLETE)));
         // All GELF types are tested in GELFMessageTest.
 
-        LogMessage lm = serverStub.lastInsertedToProcessBuffer;
-        
+        Message lm = serverStub.lastInsertedToProcessBuffer;
+
         assertEquals(2, serverStub.callsToProcessBufferInserter);
-        assertEquals("foo", lm.getShortMessage());
-        assertEquals("foo\nzomg", lm.getFullMessage());
-        assertEquals("test", lm.getFacility());
-        assertEquals(3, lm.getLevel());
-        assertEquals("bar", lm.getHost());
-        assertEquals("lol.js", lm.getFile());
-        assertEquals(23, lm.getLine());
-        assertEquals(usedTimestamp, lm.getCreatedAt(), 1e-8);
-        assertEquals("ü", lm.getAdditionalData().get("_lol_utf8"));
-        assertEquals("bar", lm.getAdditionalData().get("_foo"));
-        assertEquals(2, lm.getAdditionalData().size());
+        assertEquals("foo", lm.getField("message"));
+        assertEquals("foo\nzomg", lm.getField("full_message"));
+        assertEquals("test", lm.getField("facility"));
+        assertEquals(3L, lm.getField("level"));
+        assertEquals("bar", lm.getField("source"));
+        assertEquals("lol.js", lm.getField("file"));
+        assertEquals(23L, lm.getField("line"));
+        assertEquals(usedTimestamp, (Double) lm.getField("timestamp"), 1e-8);
+        assertEquals("ü", lm.getField("_lol_utf8"));
+        assertEquals("bar", lm.getField("_foo"));
+        assertEquals(13, lm.getFields().size());
     }
 
     @Test
@@ -77,38 +71,10 @@ public class GELFProcessorTest {
         processor.messageReceived(new GELFMessage(TestHelper.zlibCompress(GELF_JSON_INCOMPLETE)));
         // All GELF types are tested in GELFMessageTest.
 
-        LogMessage lm = serverStub.lastInsertedToProcessBuffer;
+        Message lm = serverStub.lastInsertedToProcessBuffer;
 
         assertEquals(1, serverStub.callsToProcessBufferInserter);
-        assertEquals(Tools.getUTCTimestampWithMilliseconds(), lm.getCreatedAt(), 2);
-    }
-
-    @Test
-    public void testMessageReceivedSetsLevelToDefaultIfNotSet() throws Exception {
-        GraylogServerStub serverStub = new GraylogServerStub();
-        GELFProcessor processor = new GELFProcessor(serverStub);
-
-        processor.messageReceived(new GELFMessage(TestHelper.zlibCompress(GELF_JSON_INCOMPLETE)));
-        // All GELF types are tested in GELFMessageTest.
-
-        LogMessage lm = serverStub.lastInsertedToProcessBuffer;
-
-        assertEquals(1, serverStub.callsToProcessBufferInserter);
-        assertEquals(LogMessage.STANDARD_LEVEL, lm.getLevel());
-    }
-
-    @Test
-    public void testMessageReceivedSetsFacilityToDefaultIfNotSet() throws Exception {
-        GraylogServerStub serverStub = new GraylogServerStub();
-        GELFProcessor processor = new GELFProcessor(serverStub);
-
-        processor.messageReceived(new GELFMessage(TestHelper.zlibCompress(GELF_JSON_INCOMPLETE)));
-        // All GELF types are tested in GELFMessageTest.
-
-        LogMessage lm = serverStub.lastInsertedToProcessBuffer;
-
-        assertEquals(1, serverStub.callsToProcessBufferInserter);
-        assertEquals(LogMessage.STANDARD_FACILITY, lm.getFacility());
+        assertEquals(Tools.getUTCTimestampWithMilliseconds(), (Double) lm.getField("timestamp"), 2);
     }
 
     @Test
@@ -119,28 +85,12 @@ public class GELFProcessorTest {
         processor.messageReceived(new GELFMessage(TestHelper.zlibCompress(GELF_JSON_INCOMPLETE_WITH_ID)));
         // All GELF types are tested in GELFMessageTest.
 
-        LogMessage lm = serverStub.lastInsertedToProcessBuffer;
+        Message lm = serverStub.lastInsertedToProcessBuffer;
 
         assertEquals(1, serverStub.callsToProcessBufferInserter);
-        assertNull(lm.getAdditionalData().get("_id"));
-        assertEquals("foo", lm.getAdditionalData().get("_something"));
-        assertEquals(1, lm.getAdditionalData().size());
-    }
-
-    @Test
-    public void testMessageReceivedSkipsNonStandardFields() throws Exception {
-        GraylogServerStub serverStub = new GraylogServerStub();
-        GELFProcessor processor = new GELFProcessor(serverStub);
-
-        processor.messageReceived(new GELFMessage(TestHelper.zlibCompress(GELF_JSON_INCOMPLETE_WITH_NON_STANDARD_FIELD)));
-        // All GELF types are tested in GELFMessageTest.
-
-        LogMessage lm = serverStub.lastInsertedToProcessBuffer;
-
-        assertEquals(1, serverStub.callsToProcessBufferInserter);
-        assertNull(lm.getAdditionalData().get("lol_not_allowed"));
-        assertEquals("foo", lm.getAdditionalData().get("_something"));
-        assertEquals(1, lm.getAdditionalData().size());
+        assertNull(lm.getField("id"));
+        assertEquals("foo", lm.getField("_something"));
+        assertEquals(8, lm.getFields().size());
     }
     
     @Test
@@ -151,10 +101,10 @@ public class GELFProcessorTest {
         processor.messageReceived(new GELFMessage(TestHelper.zlibCompress(GELF_JSON_WITH_MAP)));
         // All GELF types are tested in GELFMessageTest.
 
-        LogMessage lm = serverStub.lastInsertedToProcessBuffer;
+        Message lm = serverStub.lastInsertedToProcessBuffer;
 
         assertEquals(1, serverStub.callsToProcessBufferInserter);
-        assertEquals("{\"foo\":\"zomg\"}", lm.getAdditionalData().get("_lol"));
-        assertEquals(1, lm.getAdditionalData().size());
+        assertEquals("{\"foo\":\"zomg\"}", lm.getField("_lol"));
+        assertEquals(8, lm.getFields().size());
     }
 }

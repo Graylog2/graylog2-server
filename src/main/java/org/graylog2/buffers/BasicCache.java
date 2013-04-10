@@ -22,7 +22,7 @@ package org.graylog2.buffers;
 import com.google.common.collect.Queues;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import org.cliffc.high_scale_lib.Counter;
-import org.graylog2.plugin.logmessage.LogMessage;
+import org.graylog2.plugin.Message;
 
 /**
  * 
@@ -30,7 +30,7 @@ import org.graylog2.plugin.logmessage.LogMessage;
  */
 public class BasicCache implements Cache {
     
-    private final ConcurrentLinkedQueue<LogMessage> q;
+    private final ConcurrentLinkedQueue<Message> q;
     private final Counter counter;
     
     public BasicCache() {
@@ -39,14 +39,14 @@ public class BasicCache implements Cache {
     }
     
     @Override
-    public void add(LogMessage m) {
+    public void add(Message m) {
         q.add(m);
         counter.increment();
     }
     
     @Override
-    public LogMessage pop() {
-        LogMessage m = q.poll();
+    public Message pop() {
+        Message m = q.poll();
         
         // Only decrement counter if we really popped something.
         if (m != null) {

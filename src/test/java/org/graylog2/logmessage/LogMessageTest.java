@@ -20,7 +20,7 @@
 
 package org.graylog2.logmessage;
 
-import org.graylog2.plugin.logmessage.LogMessage;
+import org.graylog2.plugin.Message;
 import com.beust.jcommander.internal.Maps;
 import java.util.Map;
 import java.util.HashMap;
@@ -31,113 +31,81 @@ public class LogMessageTest {
 
     @Test
     public void testIdGetsSet() {
-        LogMessage lm = new LogMessage();
+        Message lm = new Message("foo", "bar", 0);
         assertNotNull(lm.getId());
         assertFalse(lm.getId().isEmpty());
     }
 
     @Test
     public void testIsCompleteSucceeds() {
-        LogMessage lm = new LogMessage();
-        lm.setShortMessage("foo");
-        lm.setHost("bar");
+        Message lm = new Message("foo", "bar", 0);
         assertTrue(lm.isComplete());
     }
 
     @Test
     public void testIsCompleteFails() {
-        LogMessage lm = new LogMessage();
-        lm.setShortMessage("foo");
-        lm.setHost(null);
+        Message lm = new Message("foo", null, 0);
         assertFalse(lm.isComplete());
 
-        lm = new LogMessage();
-        lm.setShortMessage("foo");
-        lm.setHost("");
+        lm = new Message("foo", "", 0);
         assertFalse(lm.isComplete());
 
-        lm = new LogMessage();
-        lm.setShortMessage(null);
-        lm.setHost("bar");
+        lm = new Message(null, "bar", 0);
         assertFalse(lm.isComplete());
 
-        lm = new LogMessage();
-        lm.setShortMessage("");
-        lm.setHost("bar");
+        lm = new Message("", "bar", 0);
         assertFalse(lm.isComplete());
 
-        lm = new LogMessage();
-        lm.setShortMessage("");
-        lm.setHost("");
+        lm = new Message("", "", 0);
         assertFalse(lm.isComplete());
 
-        lm = new LogMessage();
-        lm.setShortMessage(null);
-        lm.setHost(null);
-        assertFalse(lm.isComplete());
-
-        lm = new LogMessage();
-        lm.setHost("bar");
-        assertFalse(lm.isComplete());
-
-        lm = new LogMessage();
-        lm.setShortMessage("foo");
+        lm = new Message(null, null, 0);
         assertFalse(lm.isComplete());
     }
 
     @Test
-    public void testAddAdditionalData() {
-        LogMessage lm = new LogMessage();
-        lm.addAdditionalData("_ohai", "thar");
-        assertEquals("thar", lm.getAdditionalData().get("_ohai"));
+    public void testAddField() {
+        Message lm = new Message("foo", "bar", 0);
+        lm.addField("ohai", "thar");
+        assertEquals("thar", lm.getField("ohai"));
     }
 
     @Test
-    public void testAddAdditionalDataWithMap() {
-        LogMessage lm = new LogMessage();
-        lm.addAdditionalData("_ohai", "hai");
+    public void testAddFieldsWithMap() {
+        Message lm = new Message("foo", "bar", 0);
+        lm.addField("ohai", "hai");
 
         Map<String, String> map = new HashMap<String, String>();
+        map.put("lol", "wut");
+        map.put("aha", "pipes");
 
-        map.put("_lol", "wut");
-        map.put("_aha", "pipes");
-
-        lm.addAdditionalData(map);
-        assertEquals(3, lm.getAdditionalData().size());
-        assertEquals("wut", lm.getAdditionalData().get("_lol"));
-        assertEquals("pipes", lm.getAdditionalData().get("_aha"));
-        assertEquals("hai", lm.getAdditionalData().get("_ohai"));
+        lm.addFields(map);
+        assertEquals(7, lm.getFields().size());
+        assertEquals("wut", lm.getField("lol"));
+        assertEquals("pipes", lm.getField("aha"));
+        assertEquals("hai", lm.getField("ohai"));
     }
 
-    @Test
-    public void testAddAdditionalDataAddsUnderscoreIfNotGiven() {
-        LogMessage lm = new LogMessage();
-        lm.addAdditionalData("ohai", "lol");
-        lm.addAdditionalData("_wat", 9001);
-        assertEquals(2, lm.getAdditionalData().size());
-        assertEquals("lol", lm.getAdditionalData().get("_ohai"));
-        assertEquals(9001, lm.getAdditionalData().get("_wat"));
-    }
     
     @Test
-    public void testAddAdditionalDataTrimsWhiteSpacesTabsAndStuffFromKeyAndValue() {
-        LogMessage lm = new LogMessage();
-        lm.addAdditionalData(" one", "value_one");
-        lm.addAdditionalData(" two  ", "value_two");
-        lm.addAdditionalData("three ", "value_three");
-        lm.addAdditionalData("  four   ", "value_four_lol_tab");
-        lm.addAdditionalData("five", 5); // zomg integer
+    public void testAddFieldTrimsWhiteSpacesTabsAndStuffFromKeyAndValue() {
+        Message lm = new Message("foo", "bar", 0);
+        lm.addField(" one", "value_one");
+        lm.addField(" two  ", "value_two");
+        lm.addField("three ", "value_three");
+        lm.addField("  four   ", "value_four_lol_tab");
+        lm.addField("five", 5); // zomg integer
         
-        assertEquals("value_one", lm.getAdditionalData().get("_one"));
-        assertEquals("value_two", lm.getAdditionalData().get("_two"));
-        assertEquals("value_three", lm.getAdditionalData().get("_three"));
-        assertEquals("value_four_lol_tab", lm.getAdditionalData().get("_four"));
-        assertEquals(5, lm.getAdditionalData().get("_five"));
+        assertEquals("value_one", lm.getField("one"));
+        assertEquals("value_two", lm.getField("two"));
+        assertEquals("value_three", lm.getField("three"));
+        assertEquals("value_four_lol_tab", lm.getField("four"));
+        assertEquals(5, lm.getField("five"));
     }
     
     @Test
-    public void testAddAdditionalDataTrimsWhiteSpacesTabsAndStuffFromKeyAndValueWhenInsertedAsMap() {
-        LogMessage lm = new LogMessage();
+    public void testAddFieldsTrimsWhiteSpacesTabsAndStuffFromKeyAndValueWhenInsertedAsMap() {
+        Message lm = new Message("foo", "bar", 0);
         Map<String, String> av = Maps.newHashMap();
         
         av.put(" one", "value_one");
@@ -145,44 +113,55 @@ public class LogMessageTest {
         av.put("three ", "value_three");
         av.put("  four   ", "value_four_lol_tab");
         
-        lm.addAdditionalData(av);
+        lm.addFields(av);
         
-        assertEquals("value_one", lm.getAdditionalData().get("_one"));
-        assertEquals("value_two", lm.getAdditionalData().get("_two"));
-        assertEquals("value_three", lm.getAdditionalData().get("_three"));
-        assertEquals("value_four_lol_tab", lm.getAdditionalData().get("_four"));
+        assertEquals("value_one", lm.getField("one"));
+        assertEquals("value_two", lm.getField("two"));
+        assertEquals("value_three", lm.getField("three"));
+        assertEquals("value_four_lol_tab", lm.getField("four"));
     }
 
     @Test
-    public void testRemoveAdditionalData() {
-        LogMessage lm = new LogMessage();
-        lm.addAdditionalData("_something", "foo");
-        lm.addAdditionalData("_something_else", "bar");
+    public void testRemoveField() {
+        Message lm = new Message("foo", "bar", 0);
+        lm.addField("something", "foo");
+        lm.addField("something_else", "bar");
 
-        lm.removeAdditionalData("_something_else");
+        lm.removeField("something_else");
 
-        assertEquals(1, lm.getAdditionalData().size());
-        assertEquals("foo", lm.getAdditionalData().get("_something"));
+        assertEquals(5, lm.getFields().size());
+        assertEquals("foo", lm.getField("something"));
     }
 
     @Test
-    public void testRemoveAdditionalDataWithNonExistentKey() {
-        LogMessage lm = new LogMessage();
-        lm.addAdditionalData("_something", "foo");
-        lm.addAdditionalData("_something_else", "bar");
+    public void testRemoveFieldWithNonExistentKey() {
+        Message lm = new Message("foo", "bar", 0);
+        lm.addField("something", "foo");
+        lm.addField("something_else", "bar");
 
-        lm.removeAdditionalData("_LOLIDONTEXIST");
+        lm.removeField("LOLIDONTEXIST");
 
-        assertEquals(2, lm.getAdditionalData().size());
+        assertEquals(6, lm.getFields().size());
+    }
+    
+    @Test
+    public void testRemoveFieldDoesNotDeleteReservedFields() {
+        Message lm = new Message("foo", "bar", 9001);
+        lm.removeField("source");
+        lm.removeField("timestamp");
+        lm.removeField("_id");
+
+        assertTrue(lm.isComplete());
+        assertEquals("foo", lm.getField("message"));
+        assertEquals("bar", lm.getField("source"));
+        assertEquals(9001.0, lm.getField("timestamp"));
+        assertEquals(4, lm.getFields().size());
     }
 
     @Test
     public void testToString() {
-        LogMessage lm = new LogMessage();
+        Message lm = new Message("foo", "bar", 0);
         lm.toString();
-        lm.setHost("foo");
-        lm.toString();
-
         // Fine if it does not crash.
     }
 

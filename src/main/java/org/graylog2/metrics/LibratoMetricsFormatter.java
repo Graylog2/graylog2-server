@@ -97,7 +97,7 @@ public class LibratoMetricsFormatter extends MetricsFormatter {
         }
 
         // Hosts.
-        for(Entry<String, Integer> host : counter.getHostCounts().entrySet()) {
+        for(Entry<String, Integer> host : counter.getSourceCounts().entrySet()) {
             if (Tools.decodeBase64(host.getKey()).matches(hostFilter)) {
                 LOG.debug("Not sending host <{}> to Librato Metrics because it was matched by libratometrics_host_filter", host.getKey());
                 continue;

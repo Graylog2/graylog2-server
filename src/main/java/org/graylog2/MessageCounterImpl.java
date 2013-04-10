@@ -1,5 +1,5 @@
 /**
- * Copyright 2011 Lennart Koopmann <lennart@socketfeed.com>
+ * Copyright 2011, 2012, 2013 Lennart Koopmann <lennart@socketfeed.com>
  *
  * This file is part of Graylog2.
  *
@@ -30,12 +30,11 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import com.google.common.collect.Maps;
 import org.graylog2.plugin.MessageCounter;
 
 /**
  * Singleton holding the number of received messages for streams,
- * hosts and a total.
+ * sources and a total.
  *
  * @author Lennart Koopmann <lennart@socketfeed.com>
  */
@@ -43,7 +42,7 @@ public final class MessageCounterImpl implements MessageCounter {
 
     private Counter total = new Counter();
     private NonBlockingHashMap<String, Counter> streams =new NonBlockingHashMap<String, Counter>();
-    private NonBlockingHashMap<String, Counter> hosts = new NonBlockingHashMap<String, Counter>();
+    private NonBlockingHashMap<String, Counter> sources = new NonBlockingHashMap<String, Counter>();
 
     private AtomicInteger throughput = new AtomicInteger();
     private long highestThroughput = 0;
@@ -63,10 +62,10 @@ public final class MessageCounterImpl implements MessageCounter {
         return r;
     }
 
-    public Map<String, Integer> getHostCounts() {
-        HashMap<String, Integer> r = new HashMap<String, Integer>(this.hosts.size());
+    public Map<String, Integer> getSourceCounts() {
+        HashMap<String, Integer> r = new HashMap<String, Integer>(this.sources.size());
         
-        for (Entry<String, Counter> entry : this.hosts.entrySet()) {
+        for (Entry<String, Counter> entry : this.sources.entrySet()) {
             r.put(entry.getKey(),(int) entry.getValue().get());
         }
         
@@ -84,11 +83,11 @@ public final class MessageCounterImpl implements MessageCounter {
     public void resetAllCounts() {
         this.resetTotal();
         this.resetStreamCounts();
-        this.resetHostCounts();
+        this.resetSourceCounts();
     }
 
-    public void resetHostCounts() {
-        this.hosts = new NonBlockingHashMap<String, Counter>(this.hosts.size());
+    public void resetSourceCounts() {
+        this.sources = new NonBlockingHashMap<String, Counter>(this.sources.size());
     }
 
     public void resetStreamCounts() {
@@ -170,28 +169,28 @@ public final class MessageCounterImpl implements MessageCounter {
     }
 
     /**
-     * Increment host count by 1.
+     * Increment source count by 1.
      *
-     * @param hostname The name of the host which count to increment.
+     * @param source The name of the source which count to increment.
      */
-    public void incrementHost(final String hostname) {
-        this.countUpHost(hostname, 1);
+    public void incrementSource(final String source) {
+        this.countUpSource(source, 1);
     }
 
     /**
-     * Count up the count of a host.
+     * Count up the count of a sourcet.
      *
-     * @param hostname The name of the host which count to increment.
-     * @param x The value to add on top of the current host count.
+     * @param source The name of the source which count to increment.
+     * @param x The value to add on top of the current source count.
      */
-    public  void countUpHost(String hostname, final int x) {
-        hostname = Tools.encodeBase64(hostname);
-        Counter c = this.hosts.get( hostname );
+    public  void countUpSource(String source, final int x) {
+        source = Tools.encodeBase64(source);
+        Counter c = this.sources.get(source);
         if (c != null) {
             c.add(x);
         } else {
             c = new Counter();
-            Counter c1 = this.hosts.putIfAbsent(hostname, c);
+            Counter c1 = this.sources.putIfAbsent(source, c);
             if (c1 !=null ) c = c1;
             c.add(x);
         }

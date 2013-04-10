@@ -19,6 +19,11 @@
  */
 package org.graylog2.alarms.transports;
 
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
+
+import org.elasticsearch.common.collect.Maps;
 import org.graylog2.plugin.alarms.Alarm;
 import org.graylog2.plugin.alarms.AlarmReceiver;
 import org.graylog2.plugin.alarms.transports.Transport;
@@ -34,11 +39,6 @@ import org.jivesoftware.smack.packet.Message;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
-import org.elasticsearch.common.collect.Maps;
-
 /**
  * @author Lennart Koopmann <lennart@socketfeed.com>
  */
@@ -52,7 +52,9 @@ public class JabberTransport implements Transport {
     private Connection connection;
     
     private Map<String, String> configuration;
-    public static final Set<String> REQUIRED_FIELDS = new HashSet<String>() {{ 
+    
+    @SuppressWarnings("serial")
+	public static final Set<String> REQUIRED_FIELDS = new HashSet<String>() {{ 
         add("hostname");
         add("port");
         add("sasl_auth");

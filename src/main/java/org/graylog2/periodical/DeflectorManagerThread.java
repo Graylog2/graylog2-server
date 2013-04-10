@@ -19,15 +19,14 @@
  */
 package org.graylog2.periodical;
 
+import java.util.Map;
+
 import org.elasticsearch.action.admin.indices.stats.IndexStats;
 import org.graylog2.Core;
 import org.graylog2.activities.Activity;
-import org.graylog2.indexer.EmbeddedElasticSearchClient;
 import org.graylog2.indexer.NoTargetIndexException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.util.Map;
 
 /**
  * @author Lennart Koopmann <lennart@socketfeed.com>
@@ -96,12 +95,12 @@ public class DeflectorManagerThread implements Runnable { // public class Klimpe
             if (e.getValue().getTotal().getDocs().count() == 0) {
                 String index = e.getKey();
                 
-                // Never delete the index the deflector is currently pointing to or even the recent index, even if it is empty.
+                // Never delete the index the deflector is currently pointing to, even if it is empty.
                 try {
-                    if (index.equals(graylogServer.getDeflector().getCurrentTargetName()) || index.equals(EmbeddedElasticSearchClient.RECENT_INDEX_NAME)) {
+                    if (index.equals(graylogServer.getDeflector().getCurrentTargetName())) {
                         continue;
                     }
-                } catch (NoTargetIndexException zomg) { /** I don't care **/ }
+                } catch (NoTargetIndexException zomg) { /* I don't care */ }
                 
                 String msg = "Deleting empty index <" + index + ">";
                 graylogServer.getActivityWriter().write(new Activity(msg, DeflectorManagerThread.class));

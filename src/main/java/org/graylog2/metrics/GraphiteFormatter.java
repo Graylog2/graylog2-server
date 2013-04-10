@@ -58,7 +58,7 @@ public class GraphiteFormatter extends MetricsFormatter {
         }
 
         // Hosts.
-        for(Entry<String, Integer> host : counter.getHostCounts().entrySet()) {
+        for(Entry<String, Integer> host : counter.getSourceCounts().entrySet()) {
             String hval = prefix() + "hosts." + Tools.decodeBase64(host.getKey()).replaceAll("[^a-zA-Z0-9\\.]", "") + " " + host.getValue() + " " + Tools.getUTCTimestamp();
             r.add(hval);
         }

@@ -44,12 +44,12 @@ public class LibratoMetricsFormatterTest {
         counter.incrementTotal();
 
         // Host foo.example.org: 3
-        counter.incrementHost("foo.example.org");
-        counter.incrementHost("foo.example.org");
-        counter.incrementHost("foo.example.org");
+        counter.incrementSource("foo.example.org");
+        counter.incrementSource("foo.example.org");
+        counter.incrementSource("foo.example.org");
 
         // Host bar.example.org: 1
-        counter.incrementHost("bar.example.org");
+        counter.incrementSource("bar.example.org");
 
         Map<String, String> fakeStreamNames = Maps.newHashMap();
         
@@ -98,12 +98,12 @@ public class LibratoMetricsFormatterTest {
         counter.incrementTotal();
 
         // Host foo.example.org: 3
-        counter.incrementHost("foo.example.org");
-        counter.incrementHost("foo.example.org");
-        counter.incrementHost("foo.example.org");
+        counter.incrementSource("foo.example.org");
+        counter.incrementSource("foo.example.org");
+        counter.incrementSource("foo.example.org");
 
         // Host bar.example.org: 1
-        counter.incrementHost("bar.example.org");
+        counter.incrementSource("bar.example.org");
 
         Map<String, String> fakeStreamNames = Maps.newHashMap();
         
@@ -148,15 +148,15 @@ public class LibratoMetricsFormatterTest {
         counter.incrementTotal();
 
         // Host foo.example.org: 3
-        counter.incrementHost("foo.example.org");
-        counter.incrementHost("foo.example.org");
-        counter.incrementHost("foo.example.org");
+        counter.incrementSource("foo.example.org");
+        counter.incrementSource("foo.example.org");
+        counter.incrementSource("foo.example.org");
 
         // Host bar.example.org: 1
-        counter.incrementHost("bar.example.org");
+        counter.incrementSource("bar.example.org");
 
         // Host bar.lolwut.example.org: 1
-        counter.incrementHost("bar.lolwut.example.org");
+        counter.incrementSource("bar.lolwut.example.org");
 
         Map<String, String> fakeStreamNames = Maps.newHashMap();
         

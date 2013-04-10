@@ -26,11 +26,12 @@ import com.yammer.metrics.core.TimerContext;
 import org.graylog2.plugin.GraylogServer;
 import org.graylog2.plugin.MessageCounter;
 import org.graylog2.plugin.filters.MessageFilter;
-import org.graylog2.plugin.logmessage.LogMessage;
+import org.graylog2.plugin.Message;
 import org.graylog2.plugin.streams.Stream;
 
 import java.util.concurrent.TimeUnit;
 import org.graylog2.Core;
+
 /**
  * @author Lennart Koopmann <lennart@socketfeed.com>
  */
@@ -39,7 +40,7 @@ public class CounterUpdateFilter implements MessageFilter {
     private final Timer processTime = Metrics.newTimer(CounterUpdateFilter.class, "ProcessTime", TimeUnit.MICROSECONDS, TimeUnit.SECONDS);
 
     @Override
-    public boolean filter(LogMessage msg, GraylogServer server) {
+    public boolean filter(Message msg, GraylogServer server) {
         Core serverImpl = (Core) server;
         TimerContext tcx = processTime.time();
 
@@ -57,13 +58,9 @@ public class CounterUpdateFilter implements MessageFilter {
             }
 
             // Host count.
-            counter.incrementHost(msg.getHost());
+            counter.incrementSource(msg.getSource());
         }
-        
-        // Update hostcounters. Used to build hosts connection.
-        serverImpl.getHostCounterCache().increment(msg.getHost());
 
-        
         tcx.stop();
         return false;
     }

@@ -29,7 +29,7 @@ import org.graylog2.blacklists.Blacklist;
 import org.graylog2.blacklists.BlacklistRule;
 import org.graylog2.plugin.GraylogServer;
 import org.graylog2.plugin.filters.MessageFilter;
-import org.graylog2.plugin.logmessage.LogMessage;
+import org.graylog2.plugin.Message;
 
 import java.util.concurrent.TimeUnit;
 import java.util.regex.Pattern;
@@ -44,11 +44,11 @@ public class BlacklistFilter implements MessageFilter {
     private final Timer processTime = Metrics.newTimer(BlacklistFilter.class, "ProcessTime", TimeUnit.MICROSECONDS, TimeUnit.SECONDS);
     
     @Override
-    public boolean filter(LogMessage msg, GraylogServer server) {
+    public boolean filter(Message msg, GraylogServer server) {
         TimerContext tcx = processTime.time();
         for (Blacklist blacklist : Blacklist.fetchAll()) {
             for (BlacklistRule rule : blacklist.getRules()) {
-                if (Pattern.compile(rule.getTerm(), Pattern.DOTALL).matcher(msg.getShortMessage()).matches()) {
+                if (Pattern.compile(rule.getTerm(), Pattern.DOTALL).matcher(msg.getMessage()).matches()) {
                     LOG.debug("Message <{}> is blacklisted. First match on {}", this, rule.getTerm());
 
                     // Done - This message is blacklisted.

@@ -22,12 +22,13 @@ package org.graylog2.inputs.amqp;
 import java.util.Map;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import com.google.common.util.concurrent.ThreadFactoryBuilder;
+
 import org.elasticsearch.common.collect.Maps;
-import org.graylog2.Configuration;
 import org.graylog2.Core;
 import org.graylog2.plugin.GraylogServer;
 import org.graylog2.plugin.inputs.MessageInput;
+
+import com.google.common.util.concurrent.ThreadFactoryBuilder;
 
 /**
  * @author Lennart Koopmann <lennart@socketfeed.com>

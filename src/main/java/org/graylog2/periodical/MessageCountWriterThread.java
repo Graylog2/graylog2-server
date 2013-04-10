@@ -23,7 +23,6 @@ package org.graylog2.periodical;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.graylog2.Core;
-import org.graylog2.MessageCounterImpl;
 import org.graylog2.plugin.MessageCounter;
 
 
@@ -50,7 +49,7 @@ public class MessageCountWriterThread implements Runnable {
 
         MessageCounter counter = this.graylogServer.getMessageCounterManager().get(Core.MASTER_COUNTER_NAME);
         try {
-            graylogServer.getMongoBridge().writeMessageCounts(counter.getTotalCount(), counter.getStreamCounts(), counter.getHostCounts());
+            graylogServer.getMongoBridge().writeMessageCounts(counter.getTotalCount(), counter.getStreamCounts(), counter.getSourceCounts());
         } catch (Exception e) {
             LOG.warn("Error in MessageCountWriterThread: " + e.getMessage(), e);
         } finally {

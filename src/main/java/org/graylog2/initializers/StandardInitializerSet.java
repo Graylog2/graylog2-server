@@ -27,8 +27,9 @@ import java.util.Set;
  */
 public class StandardInitializerSet {
 
-    public static Set<Class> get() {
-        return new HashSet<Class>() {{ 
+    @SuppressWarnings("serial")
+	public static Set<Class<?>> get() {
+        return new HashSet<Class<?>>() {{ 
             add(AMQPSyncInitializer.class);
             add(AlarmScannerInitializer.class);
             add(AnonymousInformationCollectorInitializer.class);
@@ -42,6 +43,7 @@ public class StandardInitializerSet {
             add(MessageCounterInitializer.class);
             add(ServerValueWriterInitializer.class);
             add(StatisticsPrinterInitializer.class);
+            add(MasterCacheWorkersInitializer.class);
         }};
     }
     

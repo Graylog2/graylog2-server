@@ -1,5 +1,5 @@
 /**
- * Copyright 2012 Lennart Koopmann <lennart@socketfeed.com>
+ * Copyright 2012, 2013 Lennart Koopmann <lennart@socketfeed.com>
  *
  * This file is part of Graylog2.
  *
@@ -20,24 +20,25 @@
 
 package org.graylog2.gelf;
 
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.concurrent.TimeUnit;
+
+import org.graylog2.Core;
+import org.graylog2.plugin.Message;
+import org.graylog2.plugin.Tools;
+import org.graylog2.plugin.buffers.BufferOutOfCapacityException;
+import org.json.simple.JSONArray;
+import org.json.simple.JSONObject;
+import org.json.simple.JSONValue;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.yammer.metrics.Metrics;
 import com.yammer.metrics.core.Meter;
 import com.yammer.metrics.core.Timer;
 import com.yammer.metrics.core.TimerContext;
-import java.util.List;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.graylog2.Core;
-import org.graylog2.plugin.Tools;
-import org.graylog2.plugin.logmessage.LogMessage;
-import org.json.simple.JSONArray;
-import org.json.simple.JSONObject;
-import org.json.simple.JSONValue;
-
-import java.util.Map;
-import java.util.Set;
-import java.util.concurrent.TimeUnit;
-import org.graylog2.plugin.buffers.BufferOutOfCapacityException;
 
 /**
  * @author Lennart Koopmann <lennart@socketfeed.com>
@@ -59,7 +60,7 @@ public class GELFProcessor {
         incomingMessages.mark();
         
         // Convert to LogMessage
-        LogMessage lm = parse(message.getJSON());
+        Message lm = parse(message.getJSON());
 
         if (!lm.isComplete()) {
             incompleteMessages.mark();
@@ -72,12 +73,11 @@ public class GELFProcessor {
         server.getProcessBuffer().insertCached(lm);
     }
 
-    private LogMessage parse(String message) {
+    private Message parse(String message) {
         TimerContext tcx = gelfParsedTime.time();
 
         JSONObject json;
-        LogMessage lm = new LogMessage();
-        
+
         try {
             json = getJSON(message);
         } catch (Exception e) {
@@ -88,64 +88,62 @@ public class GELFProcessor {
         if (json == null) {
             throw new IllegalStateException("JSON is null/could not be parsed (invalid JSON)");
         }
+        
+        // Timestamp.
+        double timestamp = this.jsonToDouble(json.get("timestamp"));
+        if (timestamp <= 0) {
+            timestamp = Tools.getUTCTimestampWithMilliseconds();
+        }
+        
+        Message lm = new Message(
+        		this.jsonToString(json.get("short_message")),
+        		this.jsonToString(json.get("host")),
+        		timestamp);
+        
+        lm.addField("full_message", this.jsonToString(json.get("full_message")));
+        
+        String file = this.jsonToString(json.get("file"));
+        if (file != null && !file.isEmpty()) {
+        	lm.addField("file", file);
+        }
 
-        // Add standard fields.
-        lm.setHost(this.jsonToString(json.get("host")));
-        lm.setShortMessage(this.jsonToString(json.get("short_message")));
-        lm.setFullMessage(this.jsonToString(json.get("full_message")));
-        lm.setFile(this.jsonToString(json.get("file")));
-        lm.setLine(this.jsonToInt(json.get("line")));
-
+        int line = this.jsonToInt(json.get("line"));
+        if (line > -1) {
+        	lm.addField("line", line);
+        }
+        
         // Level is set by server if not specified by client.
         int level = this.jsonToInt(json.get("level"));
         if (level > -1) {
-            lm.setLevel(level);
-        } else {
-            lm.setLevel(LogMessage.STANDARD_LEVEL);
+            lm.addField("level", level);
         }
 
         // Facility is set by server if not specified by client.
         String facility = this.jsonToString(json.get("facility"));
-        if (facility == null) {
-            lm.setFacility(LogMessage.STANDARD_FACILITY);
-        } else {
-            lm.setFacility(facility);
-        }
-
-        // Set createdAt to provided timestamp - Set to current time if not set.
-        double timestamp = this.jsonToDouble(json.get("timestamp"));
-        if (timestamp <= 0) {
-            lm.setCreatedAt(Tools.getUTCTimestampWithMilliseconds());
-        } else {
-            lm.setCreatedAt(timestamp);
+        if (facility != null && !facility.isEmpty()) {
+            lm.addField("facility", facility);
         }
 
         // Add additional data if there is some.
-        Set<Map.Entry<String, Object>> entrySet = json.entrySet();
+        @SuppressWarnings("unchecked")
+		Set<Map.Entry<String, Object>> entrySet = json.entrySet();
         for(Map.Entry<String, Object> entry : entrySet) {
 
             String key = entry.getKey();
             Object value = entry.getValue();
 
             // Skip standard fields.
-            if (!key.startsWith(GELFMessage.ADDITIONAL_FIELD_PREFIX)) {
+            if (Message.RESERVED_FIELDS.contains(key)) {
                 continue;
             }
             
-            // Convert lists and maps to Strings.
-            
-            if (value instanceof List || value instanceof Map || value instanceof Set) {
+            // Convert JSON containers to Strings.
+            if (value instanceof Map || value instanceof Set || value instanceof List) {
                 value = value.toString();
             }
 
-            // Don't allow to override _id. (just to make sure...)
-            if (key.equals("_id")) {
-                LOG.warn("Client tried to override _id field! Skipped field, but still storing message.");
-                continue;
-            }
-
             // Add to message.
-            lm.addAdditionalData(key, value);
+            lm.addField(key, value);
         }
 
         // Stop metrics timer.
@@ -158,11 +156,11 @@ public class GELFProcessor {
         if (value != null) {
             Object obj = JSONValue.parse(value);
             if (obj != null) {
-                if (obj.getClass().toString().equals("class org.json.simple.JSONArray")) {
+                if (obj instanceof org.json.simple.JSONArray) {
                     // Return the k/v of ths JSON array if this is an array.
                     JSONArray array = (JSONArray)obj;
                     return (JSONObject) array.get(0);
-                } else if(obj.getClass().toString().equals("class org.json.simple.JSONObject")) {
+                } else if(obj instanceof org.json.simple.JSONObject) {
                     // This is not an array. Convert it to an JSONObject directly without choosing first k/v.
                     return (JSONObject)obj;
                 }

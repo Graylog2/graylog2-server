@@ -1,5 +1,5 @@
 /**
- * Copyright 2011 Lennart Koopmann <lennart@socketfeed.com>
+ * Copyright 2011, 2012, 2013 Lennart Koopmann <lennart@socketfeed.com>
  *
  * This file is part of Graylog2.
  *
@@ -19,13 +19,7 @@
  */
 
 package org.graylog2.streams;
-
-import org.graylog2.streams.matchers.AdditionalFieldMatcher;
-import org.graylog2.streams.matchers.SeverityMatcher;
-import org.graylog2.streams.matchers.HostMatcher;
-import org.graylog2.streams.matchers.FacilityMatcher;
-import org.graylog2.streams.matchers.MessageMatcher;
-import org.graylog2.streams.matchers.StreamRuleMatcher;
+import org.graylog2.streams.matchers.*;
 import org.junit.Test;
 import static org.junit.Assert.*;
 
@@ -33,27 +27,17 @@ public class StreamRuleMatcherFactoryTest {
 
     @Test
     public void testBuild() throws Exception {
-        StreamRuleMatcher messageMatcher = StreamRuleMatcherFactory.build(StreamRuleImpl.TYPE_MESSAGE);
-        assertTrue(messageMatcher instanceof MessageMatcher);
-
-        StreamRuleMatcher hostMatcher = StreamRuleMatcherFactory.build(StreamRuleImpl.TYPE_HOST);
-        assertTrue(hostMatcher instanceof HostMatcher);
-
-        StreamRuleMatcher severityMatcher = StreamRuleMatcherFactory.build(StreamRuleImpl.TYPE_SEVERITY);
-        assertTrue(severityMatcher instanceof SeverityMatcher);
-
-        StreamRuleMatcher facilityMatcher = StreamRuleMatcherFactory.build(StreamRuleImpl.TYPE_FACILITY);
-        assertTrue(facilityMatcher instanceof FacilityMatcher);
-
-        StreamRuleMatcher additionalFieldMatcher = StreamRuleMatcherFactory.build(StreamRuleImpl.TYPE_ADDITIONAL);
-        assertTrue(additionalFieldMatcher instanceof AdditionalFieldMatcher);
+        assertTrue(StreamRuleMatcherFactory.build(StreamRuleImpl.TYPE_EXACT) instanceof ExactMatcher);
+        assertTrue(StreamRuleMatcherFactory.build(StreamRuleImpl.TYPE_GREATER) instanceof GreaterMatcher);
+        assertTrue(StreamRuleMatcherFactory.build(StreamRuleImpl.TYPE_REGEX) instanceof RegexMatcher);
+        assertTrue(StreamRuleMatcherFactory.build(StreamRuleImpl.TYPE_SMALLER) instanceof SmallerMatcher);
     }
 
     @Test
     public void testBuildWithInvalidStreamRuleType() {
         boolean exceptionThrown = false;
         try {
-            StreamRuleMatcher messageMatcher = StreamRuleMatcherFactory.build(9001);
+            StreamRuleMatcherFactory.build(9001);
         } catch (InvalidStreamRuleTypeException e) {
             exceptionThrown = true;
         }

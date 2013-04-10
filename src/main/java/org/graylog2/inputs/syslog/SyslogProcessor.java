@@ -28,7 +28,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.graylog2.Core;
 import org.graylog2.plugin.Tools;
-import org.graylog2.plugin.logmessage.LogMessage;
+import org.graylog2.plugin.Message;
 import org.productivity.java.syslog4j.server.impl.event.SyslogServerEvent;
 
 import java.net.InetAddress;
@@ -66,7 +66,7 @@ public class SyslogProcessor {
         incomingMessages.mark();
 
         // Convert to LogMessage
-        LogMessage lm;
+        Message lm;
         try {
             lm = parse(msg, remoteAddress);
         } catch (Exception e) {
@@ -83,7 +83,7 @@ public class SyslogProcessor {
         
         // Possibly remove full message.
         if (!this.server.getConfiguration().isSyslogStoreFullMessageEnabled()) {
-            lm.setFullMessage(null);
+            lm.removeField("full_message");
         }
 
         // Add to process buffer.
@@ -92,14 +92,12 @@ public class SyslogProcessor {
         server.getProcessBuffer().insertCached(lm);
     }
 
-    private LogMessage parse(String msg, InetAddress remoteAddress) throws UnknownHostException {
+    private Message parse(String msg, InetAddress remoteAddress) throws UnknownHostException {
         TimerContext tcx = syslogParsedTime.time();
         
         if (remoteAddress == null) {
             remoteAddress = InetAddress.getLocalHost();
         }
-
-        LogMessage lm = new LogMessage();
 
         /* 
          * ZOMG funny 80s neckbeard protocols. We are now deciding if to parse
@@ -129,17 +127,15 @@ public class SyslogProcessor {
 
         }
 
-        lm.setShortMessage(e.getMessage());
-        lm.setHost(parseHost(e, remoteAddress));
-        lm.setFacility(Tools.syslogFacilityToReadable(e.getFacility()));
-        lm.setLevel(e.getLevel());
-        lm.setFullMessage(new String(e.getRaw()));
-        lm.setCreatedAt(parseDate(e));
-        lm.addAdditionalData(parseAdditionalData(e));
-
+        Message m = new Message(e.getMessage(), parseHost(e, remoteAddress), parseDate(e));
+        m.addField("facility", Tools.syslogFacilityToReadable(e.getFacility()));
+        m.addField("level", e.getLevel());
+        m.addField("full_message", new String(e.getRaw()));
+        m.addFields(parseAdditionalData(e));
+        
         tcx.stop();
 
-        return lm;
+        return m;
     }
 
     private Map<String, String> parseAdditionalData(SyslogServerEventIF msg) {

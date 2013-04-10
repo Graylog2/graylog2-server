@@ -26,7 +26,6 @@ package org.graylog2;
 
 import org.graylog2.plugin.Tools;
 import com.google.common.collect.Lists;
-import com.google.common.collect.Sets;
 import org.junit.Test;
 
 import java.io.ByteArrayOutputStream;
@@ -34,7 +33,6 @@ import java.io.EOFException;
 import java.io.IOException;
 import java.util.Calendar;
 import java.util.List;
-import java.util.Set;
 import java.util.zip.Deflater;
 import java.util.zip.GZIPOutputStream;
 
@@ -159,7 +157,7 @@ public class ToolsTest {
     
     @Test
     public void testAsSortedList() {
-        List sortMe = Lists.newArrayList();
+        List<Integer> sortMe = Lists.newArrayList();
         sortMe.add(0);
         sortMe.add(2);
         sortMe.add(6);
@@ -168,7 +166,7 @@ public class ToolsTest {
         sortMe.add(25);
         sortMe.add(11);
         
-        List expected = Lists.newArrayList();
+        List<Integer> expected = Lists.newArrayList();
         expected.add(0);
         expected.add(1);
         expected.add(2);

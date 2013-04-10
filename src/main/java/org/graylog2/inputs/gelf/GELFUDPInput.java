@@ -22,11 +22,14 @@ package org.graylog2.inputs.gelf;
 
 
 
-import com.google.common.collect.Maps;
-import com.google.common.util.concurrent.ThreadFactoryBuilder;
+import java.net.InetSocketAddress;
+import java.util.Map;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+
 import org.elasticsearch.common.netty.channel.ChannelException;
-import org.graylog2.Configuration;
 import org.graylog2.Core;
+import org.graylog2.plugin.GraylogServer;
 import org.graylog2.plugin.inputs.MessageInput;
 import org.jboss.netty.bootstrap.ConnectionlessBootstrap;
 import org.jboss.netty.channel.FixedReceiveBufferSizePredictorFactory;
@@ -34,11 +37,8 @@ import org.jboss.netty.channel.socket.nio.NioDatagramChannelFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.net.InetSocketAddress;
-import java.util.Map;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import org.graylog2.plugin.GraylogServer;
+import com.google.common.collect.Maps;
+import com.google.common.util.concurrent.ThreadFactoryBuilder;
 
 /**
  * @author Lennart Koopmann <lennart@socketfeed.com>
