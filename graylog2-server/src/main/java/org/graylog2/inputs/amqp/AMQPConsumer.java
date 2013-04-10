@@ -1,5 +1,5 @@
 /**
- * Copyright 2012 Lennart Koopmann <lennart@socketfeed.com>
+ * Copyright 2012, 2013 Lennart Koopmann <lennart@socketfeed.com>
  *
  * This file is part of Graylog2.
  *
@@ -228,6 +228,8 @@ public class AMQPConsumer implements Runnable {
                      channel.basicAck(envelope.getDeliveryTag(), false);
                      handledMessages.mark();
                  } catch(Exception e) {
+                	 // If something breaks here it is extremely likely that it won't work next time. Not-Ack the message and do not requeue.
+                	 channel.basicNack(envelope.getDeliveryTag(), false, false); // YOLO
                      LOG.error("Could not handle message from AMQP.", e);
                  }
              }
