@@ -21,54 +21,34 @@
 package org.graylog2.streams.matchers;
 
 import org.graylog2.plugin.logmessage.LogMessage;
-import org.bson.types.ObjectId;
-import com.mongodb.BasicDBObject;
+import org.graylog2.plugin.streams.StreamRule;
 import org.graylog2.streams.StreamRuleImpl;
+import org.graylog2.streams.StreamRuleTest;
 import org.junit.Test;
 import static org.junit.Assert.*;
 
 public class SeverityMatcherTest {
     @Test
-    public void testTheTruthToWork() {
-        assertTrue(true);
-    }
-
-    @Test
     public void testSuccessfulMatch() {
-        int severity = 1;
+        StreamRule rule = StreamRuleTest.toRule(StreamRuleImpl.TYPE_SEVERITY, "1");
 
-        BasicDBObject mongoRule = new BasicDBObject();
-        mongoRule.put("_id", new ObjectId());
-        mongoRule.put("rule_type", StreamRuleImpl.TYPE_SEVERITY);
-        mongoRule.put("value", String.valueOf(severity));
-
-        StreamRuleImpl rule = new StreamRuleImpl(mongoRule);
+        SeverityMatcher matcher = new SeverityMatcher(rule);
 
         LogMessage msg = new LogMessage();
-        msg.setLevel(severity);
+        msg.setLevel(1);
 
-        SeverityMatcher matcher = new SeverityMatcher();
-
-        assertTrue(matcher.match(msg, rule));
+        assertTrue(matcher.match(msg));
     }
 
     @Test
     public void testMissedMatch() {
-        int severity = 3;
+        StreamRule rule = StreamRuleTest.toRule(StreamRuleImpl.TYPE_SEVERITY, "3");
 
-        BasicDBObject mongoRule = new BasicDBObject();
-        mongoRule.put("_id", new ObjectId());
-        mongoRule.put("rule_type", StreamRuleImpl.TYPE_SEVERITY);
-        mongoRule.put("value", String.valueOf(severity));
-
-        StreamRuleImpl rule = new StreamRuleImpl(mongoRule);
-
+        SeverityMatcher matcher = new SeverityMatcher(rule);
+        
         LogMessage msg = new LogMessage();
-        msg.setLevel(severity+1);
+        msg.setLevel(4);
 
-        SeverityMatcher matcher = new SeverityMatcher();
-
-        assertFalse(matcher.match(msg, rule));
+        assertFalse(matcher.match(msg));
     }
-
 }

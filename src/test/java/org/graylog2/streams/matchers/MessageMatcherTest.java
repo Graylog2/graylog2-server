@@ -21,60 +21,39 @@
 package org.graylog2.streams.matchers;
 
 import org.graylog2.plugin.logmessage.LogMessage;
+import org.graylog2.plugin.streams.StreamRule;
+
 import java.util.Map;
-import org.bson.types.ObjectId;
 
 import com.google.common.collect.Maps;
-import com.mongodb.BasicDBObject;
-import java.util.HashMap;
 import org.graylog2.streams.StreamRuleImpl;
+import org.graylog2.streams.StreamRuleTest;
 import org.junit.Test;
 import static org.junit.Assert.*;
 
 public class MessageMatcherTest {
     @Test
-    public void testTheTruthToWork() {
-        assertTrue(true);
-    }
-
-    @Test
     public void testSuccessfulMatch() {
-        String message = "ohai thar|foo";
-        String regex = "ohai\\sthar.+";
-
-        BasicDBObject mongoRule = new BasicDBObject();
-        mongoRule.put("_id", new ObjectId());
-        mongoRule.put("rule_type", StreamRuleImpl.TYPE_MESSAGE);
-        mongoRule.put("value",  regex);
-
-        StreamRuleImpl rule = new StreamRuleImpl(mongoRule);
+        StreamRule rule = StreamRuleTest.toRule(StreamRuleImpl.TYPE_MESSAGE, "ohai\\sthar.+");
+        
+        MessageMatcher matcher = new MessageMatcher(rule);
 
         LogMessage msg = new LogMessage();
-        msg.setShortMessage(message);
+        msg.setShortMessage("ohai thar|foo");
 
-        MessageMatcher matcher = new MessageMatcher();
-
-        assertTrue(matcher.match(msg, rule));
+        assertTrue(matcher.match(msg));
     }
 
     @Test
     public void testMissedMatch() {
-        String message = "ohai thar|foo";
-        String regex = "bar";
+        StreamRule rule = StreamRuleTest.toRule(StreamRuleImpl.TYPE_MESSAGE, "bar");
 
-        BasicDBObject mongoRule = new BasicDBObject();
-        mongoRule.put("_id", new ObjectId());
-        mongoRule.put("rule_type", StreamRuleImpl.TYPE_MESSAGE);
-        mongoRule.put("value",  regex);
-
-        StreamRuleImpl rule = new StreamRuleImpl(mongoRule);
-
+        MessageMatcher matcher = new MessageMatcher(rule);
+        
         LogMessage msg = new LogMessage();
-        msg.setShortMessage(message);
+        msg.setShortMessage("ohai thar|foo");
 
-        MessageMatcher matcher = new MessageMatcher();
-
-        assertFalse(matcher.match(msg, rule));
+        assertFalse(matcher.match(msg));
     }
 
     /*
@@ -92,20 +71,14 @@ public class MessageMatcherTest {
                 + "ted, AWS Error Message: Address blacklisted.", ".+(?i).Received error response.+Address blacklisted.+");
 
         for (Map.Entry<String, String> e : cases.entrySet()) {
-            BasicDBObject mongoRule = new BasicDBObject();
-            mongoRule.put("_id", new ObjectId());
-            mongoRule.put("rule_type", StreamRuleImpl.TYPE_MESSAGE);
-            mongoRule.put("value",  e.getValue());
+            StreamRule rule = StreamRuleTest.toRule(StreamRuleImpl.TYPE_MESSAGE, e.getValue());
 
-            StreamRuleImpl rule = new StreamRuleImpl(mongoRule);
+            MessageMatcher matcher = new MessageMatcher(rule);
 
             LogMessage msg = new LogMessage();
             msg.setShortMessage(e.getKey());
 
-            MessageMatcher matcher = new MessageMatcher();
-
-            assertTrue(matcher.match(msg, rule));
+            assertTrue(matcher.match(msg));
         }
     }
-
 }

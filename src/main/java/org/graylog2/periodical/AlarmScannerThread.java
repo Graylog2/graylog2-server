@@ -19,7 +19,6 @@
  */
 package org.graylog2.periodical;
 
-import org.elasticsearch.common.collect.Maps;
 import org.graylog2.Core;
 import org.graylog2.SystemSettingAccessor;
 import org.graylog2.plugin.Tools;
@@ -34,7 +33,6 @@ import org.graylog2.streams.StreamImpl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.Map;
 import java.util.Set;
 
 /**
@@ -55,59 +53,56 @@ public class AlarmScannerThread implements Runnable {
     
     @Override
     public void run() {
-        Map<String, Object> onlyAlerted = Maps.newHashMap();
-        onlyAlerted.put("alarm_active", true);
-        
-        Set<Stream> streams = StreamImpl.fetchAllEnabled(graylogServer, onlyAlerted);
+        Set<StreamImpl> streams = StreamImpl.fetchAllEnabled(graylogServer);
         
         if (streams.isEmpty()) {
             LOG.debug("No alertable streams found. Not doing anything more.");
             return;
         }
                 
-        for (Stream streamIF : streams) {
-            StreamImpl stream = (StreamImpl) streamIF;
-            StreamAlarmChecker checker = new StreamAlarmChecker(graylogServer, stream); 
-
-            // Skip if limit and timespan have been configured for this stream.
-            if (!checker.fullyConfigured()) {
-                LOG.debug("Skipping alarm scan for stream <{}> - Timespan or limit not set.", stream.getId());
-                continue;
-            }
-            
-            // Is the stream over limit?
-            if (checker.overLimit()) {
-                // Are we still in grace period?
-                if (stream.inAlarmGracePeriod()) {
-                    LOG.debug("Stream <{}> is over alarm limit but in grace period. Skipping.", stream.getId());
-                    continue;
-                }
-                
-                int messageCount = checker.getMessageCount();
-                
-                LOG.debug("Stream <{}> is over alarm limit. Sending alerts.", stream.getId());
-                
-                // Update last alarm timestamp.
-                stream.setLastAlarm(Tools.getUTCTimestamp(), graylogServer);
-                
-                MessageCountAlarm alarm = new MessageCountAlarm(stream, stream.getAlarmReceivers(graylogServer));
-                alarm.setMessageCount(messageCount);
-                alarm.setTopic("Stream message count alert: [" + stream.getTitle() + "]");
-                alarm.setDescription("Stream [" + stream.getTitle() + "] received " + messageCount
-                        + " messages in the last " + stream.getAlarmTimespan() + " minutes."
-                        + " Limit: " + stream.getAlarmMessageLimit());
-
-                // Send using all transports.
-                sendMessages(alarm, stream);
-
-                // Call all callbacks. Brace, brace, brace!
-                callCallbacks(alarm, stream);
-
-                
-            } else {
-                LOG.debug("Stream <{}> is not over alarm limit.", stream.getId());
-            }
-
+        for (StreamImpl stream : streams) {
+        	if(stream.isAlarmActive()) {
+	            StreamAlarmChecker checker = new StreamAlarmChecker(graylogServer, stream); 
+	
+	            // Skip if limit and timespan have been configured for this stream.
+	            if (!checker.fullyConfigured()) {
+	                LOG.debug("Skipping alarm scan for stream <{}> - Timespan or limit not set.", stream.getId());
+	                continue;
+	            }
+	            
+	            // Is the stream over limit?
+	            if (checker.overLimit()) {
+	                // Are we still in grace period?
+	                if (stream.inAlarmGracePeriod()) {
+	                    LOG.debug("Stream <{}> is over alarm limit but in grace period. Skipping.", stream.getId());
+	                    continue;
+	                }
+	                
+	                int messageCount = checker.getMessageCount();
+	                
+	                LOG.debug("Stream <{}> is over alarm limit. Sending alerts.", stream.getId());
+	                
+	                // Update last alarm timestamp.
+	                stream.setLastAlarm(Tools.getUTCTimestamp(), graylogServer);
+	                
+	                MessageCountAlarm alarm = new MessageCountAlarm(stream, stream.getAlarmReceivers(graylogServer));
+	                alarm.setMessageCount(messageCount);
+	                alarm.setTopic("Stream message count alert: [" + stream.getTitle() + "]");
+	                alarm.setDescription("Stream [" + stream.getTitle() + "] received " + messageCount
+	                        + " messages in the last " + stream.getAlarmTimespan() + " minutes."
+	                        + " Limit: " + stream.getAlarmMessageLimit());
+	
+	                // Send using all transports.
+	                sendMessages(alarm, stream);
+	
+	                // Call all callbacks. Brace, brace, brace!
+	                callCallbacks(alarm, stream);
+	
+	                
+	            } else {
+	                LOG.debug("Stream <{}> is not over alarm limit.", stream.getId());
+	            }
+        	}
         }
     }
     

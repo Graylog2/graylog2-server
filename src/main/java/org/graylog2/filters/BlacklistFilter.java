@@ -32,7 +32,6 @@ import org.graylog2.plugin.filters.MessageFilter;
 import org.graylog2.plugin.logmessage.LogMessage;
 
 import java.util.concurrent.TimeUnit;
-import java.util.regex.Pattern;
 
 /**
  * @author Lennart Koopmann <lennart@socketfeed.com>
@@ -48,7 +47,7 @@ public class BlacklistFilter implements MessageFilter {
         TimerContext tcx = processTime.time();
         for (Blacklist blacklist : Blacklist.fetchAll()) {
             for (BlacklistRule rule : blacklist.getRules()) {
-                if (Pattern.compile(rule.getTerm(), Pattern.DOTALL).matcher(msg.getShortMessage()).matches()) {
+                if (rule.getPattern().matches(msg.getShortMessage())) {
                     LOG.debug("Message <{}> is blacklisted. First match on {}", this, rule.getTerm());
 
                     // Done - This message is blacklisted.

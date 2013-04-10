@@ -20,22 +20,25 @@
 
 package org.graylog2.gelf;
 
+import com.fasterxml.jackson.core.JsonFactory;
+import com.fasterxml.jackson.core.JsonGenerationException;
+import com.fasterxml.jackson.core.JsonGenerator;
+import com.fasterxml.jackson.core.JsonParseException;
+import com.fasterxml.jackson.core.JsonParser;
+import com.fasterxml.jackson.core.JsonToken;
 import com.yammer.metrics.Metrics;
 import com.yammer.metrics.core.Meter;
 import com.yammer.metrics.core.Timer;
 import com.yammer.metrics.core.TimerContext;
-import java.util.List;
+
+import java.io.IOException;
+import java.io.StringWriter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.graylog2.Core;
 import org.graylog2.plugin.Tools;
 import org.graylog2.plugin.logmessage.LogMessage;
-import org.json.simple.JSONArray;
-import org.json.simple.JSONObject;
-import org.json.simple.JSONValue;
 
-import java.util.Map;
-import java.util.Set;
 import java.util.concurrent.TimeUnit;
 import org.graylog2.plugin.buffers.BufferOutOfCapacityException;
 
@@ -45,6 +48,7 @@ import org.graylog2.plugin.buffers.BufferOutOfCapacityException;
 public class GELFProcessor {
 
     private static final Logger LOG = LoggerFactory.getLogger(GELFProcessor.class);
+    private static final JsonFactory JSON_FACTORY = new JsonFactory();
     private Core server;
     private final Meter incomingMessages = Metrics.newMeter(GELFProcessor.class, "IncomingMessages", "messages", TimeUnit.SECONDS);
     private final Meter incompleteMessages = Metrics.newMeter(GELFProcessor.class, "IncompleteMessages", "messages", TimeUnit.SECONDS);
@@ -58,9 +62,11 @@ public class GELFProcessor {
     public void messageReceived(GELFMessage message) throws BufferOutOfCapacityException {
         incomingMessages.mark();
         
+        LogMessage lm;
+        
         // Convert to LogMessage
-        LogMessage lm = parse(message.getJSON());
-
+        lm = parse(message.getJSON());
+        
         if (!lm.isComplete()) {
             incompleteMessages.mark();
             LOG.debug("Skipping incomplete message.");
@@ -71,141 +77,135 @@ public class GELFProcessor {
         processedMessages.mark();
         server.getProcessBuffer().insertCached(lm);
     }
-
+    
     private LogMessage parse(String message) {
-        TimerContext tcx = gelfParsedTime.time();
+    	TimerContext tcx = gelfParsedTime.time();
+    	
+    	try {
+	    	LogMessage lm = new LogMessage();
+	    	JsonParser parser = JSON_FACTORY.createJsonParser(message);
+	    	
+	    	JsonToken token = parser.nextToken();
+			if (JsonToken.START_ARRAY == token) {
+				// Skip to first array element
+				token = parser.nextToken();
+			}
 
-        JSONObject json;
-        LogMessage lm = new LogMessage();
-        
-        try {
-            json = getJSON(message);
-        } catch (Exception e) {
-            LOG.error("Could not parse JSON!", e);
-            json = null;
-        }
+			if(JsonToken.START_OBJECT != token) {
+				throw new IllegalStateException("Expected either a JSON object, or an array containing at least one JSON object");
+			}
+	    	
+	    	while (JsonToken.END_OBJECT != (token = parser.nextToken())) {
+	    		String key = parser.getCurrentName();
+	    		token = parser.nextToken();
+	    		
+	    		if("host".equals(key)) {
+	    			lm.setHost(parser.getValueAsString());
+	    		} else if("short_message".equals(key)) {
+	    			lm.setShortMessage(parser.getValueAsString());
+	    		} else if("full_message".equals(key)) {
+	    			lm.setFullMessage(parser.getValueAsString());
+	    		} else if("file".equals(key)) {
+	    			lm.setFile(parser.getValueAsString());
+	    		} else if("line".equals(key)) {
+	    			lm.setLine(parser.getIntValue());
+	    		} else if("level".equals(key)) {
+	    			lm.setLevel(parser.getIntValue());
+	    		} else if("facility".equals(key)) {
+	    			lm.setFacility(parser.getValueAsString());
+	    		} else if("timestamp".equals(key)) {
+	    			lm.setCreatedAt(parser.getDoubleValue());
+	    		} else if(key.startsWith(GELFMessage.ADDITIONAL_FIELD_PREFIX)) {
+	    			if(key.equals("_id")) {
+	                    LOG.warn("Client tried to override _id field! Skipped field, but still storing message.");
+	                    continue;
+	    			}
+	    			CharSequence value;
+	    			switch(token) {
+	    				case START_ARRAY: {
+	    					StringWriter writer = new StringWriter();
+	    					JsonGenerator generator = JSON_FACTORY.createGenerator(writer);
+	    					generator.writeStartArray();
+							tokenStreamToJSONString(parser, generator, JsonToken.END_ARRAY);
+							generator.writeEndArray();
+	    					generator.close();
+	    					value = writer.toString();
+	    					break;
+	    				}
+	    				case START_OBJECT: {
+	    					StringWriter writer = new StringWriter();
+	    					JsonGenerator generator = JSON_FACTORY.createGenerator(writer);
+	    					generator.writeStartObject();
+							tokenStreamToJSONString(parser, generator, JsonToken.END_OBJECT);
+							generator.writeEndObject();
+	    					generator.close();
+	    					value = writer.toString();
+	    					break;
+	    				}
+	    				default:
+	    					value = parser.getValueAsString();
+	    					break;
+	    			}
+	    			lm.setAdditionalData(key,  value.toString());
+	    		}
+	    	}
+	    	
+	    	if(lm.getCreatedAt() <= 0) {
+	    		lm.setCreatedAt(Tools.getUTCTimestampWithMilliseconds());
+	    	}
+	    	if(lm.getFacility() == null) {
+				lm.setFacility(LogMessage.STANDARD_FACILITY);
+	    	}
+	    	if(lm.getLevel() <= 0) {
+				lm.setLevel(LogMessage.STANDARD_LEVEL);
+	    	}
 
-        if (json == null) {
-            throw new IllegalStateException("JSON is null/could not be parsed (invalid JSON)");
-        }
-
-        // Add standard fields.
-        lm.setHost(this.jsonToString(json.get("host")));
-        lm.setShortMessage(this.jsonToString(json.get("short_message")));
-        lm.setFullMessage(this.jsonToString(json.get("full_message")));
-        lm.setFile(this.jsonToString(json.get("file")));
-        lm.setLine(this.jsonToInt(json.get("line")));
-
-        // Level is set by server if not specified by client.
-        int level = this.jsonToInt(json.get("level"));
-        if (level > -1) {
-            lm.setLevel(level);
-        } else {
-            lm.setLevel(LogMessage.STANDARD_LEVEL);
-        }
-
-        // Facility is set by server if not specified by client.
-        String facility = this.jsonToString(json.get("facility"));
-        if (facility == null) {
-            lm.setFacility(LogMessage.STANDARD_FACILITY);
-        } else {
-            lm.setFacility(facility);
-        }
-
-        // Set createdAt to provided timestamp - Set to current time if not set.
-        double timestamp = this.jsonToDouble(json.get("timestamp"));
-        if (timestamp <= 0) {
-            lm.setCreatedAt(Tools.getUTCTimestampWithMilliseconds());
-        } else {
-            lm.setCreatedAt(timestamp);
-        }
-
-        // Add additional data if there is some.
-        Set<Map.Entry<String, Object>> entrySet = json.entrySet();
-        for(Map.Entry<String, Object> entry : entrySet) {
-
-            String key = entry.getKey();
-            Object value = entry.getValue();
-
-            // Skip standard fields.
-            if (!key.startsWith(GELFMessage.ADDITIONAL_FIELD_PREFIX)) {
-                continue;
-            }
-            
-            // Convert lists and maps to Strings.
-            
-            if (value instanceof List || value instanceof Map || value instanceof Set) {
-                value = value.toString();
-            }
-
-            // Don't allow to override _id. (just to make sure...)
-            if (key.equals("_id")) {
-                LOG.warn("Client tried to override _id field! Skipped field, but still storing message.");
-                continue;
-            }
-
-            // Add to message.
-            lm.addAdditionalData(key, value);
-        }
-
-        // Stop metrics timer.
-        tcx.stop();
-        
-        return lm;
+	    	return lm;
+    	} catch(IOException e) {
+    		throw new IllegalStateException("JSON is null/could not be parsed (invalid JSON)", e);
+    	} finally {
+    		tcx.stop();
+    	}
     }
 
-    private JSONObject getJSON(String value) {
-        if (value != null) {
-            Object obj = JSONValue.parse(value);
-            if (obj != null) {
-                if (obj.getClass().toString().equals("class org.json.simple.JSONArray")) {
-                    // Return the k/v of ths JSON array if this is an array.
-                    JSONArray array = (JSONArray)obj;
-                    return (JSONObject) array.get(0);
-                } else if(obj.getClass().toString().equals("class org.json.simple.JSONObject")) {
-                    // This is not an array. Convert it to an JSONObject directly without choosing first k/v.
-                    return (JSONObject)obj;
-                }
-            }
-        }
-
-        return null;
-    }
-
-    private String jsonToString(Object json) {
-        try {
-            if (json != null) {
-                return json.toString();
-            }
-        } catch(Exception e) {}
-
-        return null;
-    }
-
-    private int jsonToInt(Object json) {
-        try {
-            if (json != null) {
-                String str = this.jsonToString(json);
-                if (str != null) {
-                    return Integer.parseInt(str);
-                }
-            }
-        } catch(Exception e) {}
-
-        return -1;
-    }
-
-    private double jsonToDouble(Object json) {
-        try {
-            if (json != null) {
-                String str = this.jsonToString(json);
-                if (str != null) {
-                    return Double.parseDouble(str);
-                }
-            }
-        } catch(Exception e) {}
-
-        return -1;
-    }
-
+	private void tokenStreamToJSONString(JsonParser parser, JsonGenerator generator, JsonToken stopToken) throws IOException,
+			JsonParseException, JsonGenerationException
+	{
+		JsonToken token;
+		while (stopToken != (token = parser.nextToken())) {
+    		switch(token) {
+    			case VALUE_NULL:
+    				generator.writeNull();
+    				break;
+    			case VALUE_TRUE:
+    			case VALUE_FALSE:
+    				generator.writeBoolean(parser.getBooleanValue());
+    				break;
+    			case VALUE_NUMBER_FLOAT:
+    				generator.writeNumber(parser.getValueAsDouble());
+    				break;
+    			case VALUE_NUMBER_INT:
+    				generator.writeNumber(parser.getValueAsLong());
+    				break;
+    			case VALUE_STRING:
+    				generator.writeString(parser.getValueAsString());
+    				break;
+    			case START_ARRAY:
+    				generator.writeStartArray();
+					tokenStreamToJSONString(parser, generator, JsonToken.END_ARRAY);
+					generator.writeEndArray();
+    				break;
+    			case START_OBJECT:
+    				generator.writeStartObject();
+					tokenStreamToJSONString(parser, generator, JsonToken.END_OBJECT);
+					generator.writeEndObject();
+    				break;
+    			case FIELD_NAME:
+    				generator.writeFieldName(parser.getCurrentName());
+    				break;
+    			default:
+    				throw new IllegalStateException("Unexpected token in JSON/GELF: " + token);
+    		}
+    	}
+	}
 }

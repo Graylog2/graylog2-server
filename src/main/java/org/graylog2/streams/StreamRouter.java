@@ -43,10 +43,14 @@ public class StreamRouter {
     private static final Logger LOG = LoggerFactory.getLogger(StreamRouter.class);
 
     public List<Stream> route(Core server, LogMessage msg) {
-        List<Stream> matches = Lists.newArrayList();
-        Set<Stream> streams = StreamImpl.fetchAllEnabled(server);
+        Set<StreamImpl> streams = StreamImpl.fetchAllEnabled(server);
+        return route(streams, msg);
+    }
 
-        for (Stream stream : streams) {
+    protected List<Stream> route(Set<StreamImpl> streams, LogMessage msg) {
+        List<Stream> matches = Lists.newArrayList();
+
+        for (StreamImpl stream : streams) {
             boolean missed = false;
 
             if (stream.getStreamRules().isEmpty()) {
@@ -55,7 +59,13 @@ public class StreamRouter {
 
             for (StreamRule rule : stream.getStreamRules()) {
                 try {
-                    StreamRuleMatcher matcher = StreamRuleMatcherFactory.build(rule.getRuleType());
+                    StreamRuleMatcher matcher;
+                    if(rule instanceof StreamRuleImpl) {
+                        matcher = ((StreamRuleImpl) rule).getMatcher();
+                    } else {
+                        matcher = StreamRuleMatcherFactory.build(rule);
+                    }
+
                     if (!matchStreamRule(msg, matcher, rule)) {
                         missed = true;
                         break;
@@ -76,7 +86,7 @@ public class StreamRouter {
 
     public boolean matchStreamRule(LogMessage msg, StreamRuleMatcher matcher, StreamRule rule) {
         try {
-            return matcher.match(msg, rule);
+            return matcher.match(msg);
         } catch (Exception e) {
             LOG.warn("Could not match stream rule <" + rule.getRuleType() + "/" + rule.getValue() + ">: " + e.getMessage(), e);
             return false;

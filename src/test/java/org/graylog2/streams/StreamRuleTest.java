@@ -58,4 +58,13 @@ public class StreamRuleTest {
         assertEquals("bar", rule.getValue());
     }
 
+    public static StreamRuleImpl toRule(int type, String value) {
+        BasicDBObject mongo = new BasicDBObject();
+        mongo.put("_id", new ObjectId());
+        mongo.put("rule_type", type);
+        mongo.put("value", value);
+        
+        return new StreamRuleImpl(mongo);
+    }
+
 }

@@ -20,7 +20,8 @@
 
 package org.graylog2.streams.matchers;
 
-import java.util.regex.Pattern;
+import org.graylog2.pattern.Pattern;
+import org.graylog2.pattern.PatternFactory;
 import org.graylog2.plugin.logmessage.LogMessage;
 import org.graylog2.plugin.streams.StreamRule;
 
@@ -29,12 +30,14 @@ import org.graylog2.plugin.streams.StreamRule;
  */
 public class FullMessageMatcher implements StreamRuleMatcher {
 
-    @Override
-    public boolean match(LogMessage msg, StreamRule rule) {
-	Pattern messagePattern = Pattern.compile(rule.getValue(), Pattern.DOTALL);
-	String fullMessage = msg.getFullMessage();
-		
-        return (fullMessage != null && messagePattern.matcher(msg.getFullMessage()).find());
+    private final Pattern pattern;
+    public FullMessageMatcher(StreamRule rule) {
+        pattern = PatternFactory.matchPartially(rule.getValue());
     }
 
+    @Override
+    public boolean match(LogMessage msg) {
+        String fullMessage = msg.getFullMessage();
+        return pattern.matches(fullMessage);
+    }
 }

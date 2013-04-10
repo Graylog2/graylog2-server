@@ -22,6 +22,8 @@ package org.graylog2.blacklists;
 
 import com.mongodb.DBObject;
 import org.bson.types.ObjectId;
+import org.graylog2.pattern.Pattern;
+import org.graylog2.pattern.PatternFactory;
 
 /**
  * Representing rule of a blacklist.
@@ -30,8 +32,9 @@ import org.bson.types.ObjectId;
  */
 public class BlacklistRule {
 
-    private ObjectId id = null;
-    private String term = null;
+    private final ObjectId id;
+    private final String term;
+    private Pattern pattern;
 
     public BlacklistRule(DBObject blacklistRule) {
         this.id = (ObjectId) blacklistRule.get("_id");
@@ -44,6 +47,13 @@ public class BlacklistRule {
 
     public ObjectId getId() {
         return this.id;
+    }
+    
+    public Pattern getPattern() {
+        if(pattern == null) {
+            pattern = PatternFactory.matchEntirely(this.term);
+        }
+        return pattern;
     }
 
 }
