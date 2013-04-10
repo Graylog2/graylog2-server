@@ -202,6 +202,11 @@ public class AMQPConsumer implements Runnable {
                                 channel.basicReject(envelope.getDeliveryTag(), true);
                                 reQueuedMessages.mark();
                                 return;
+                            } catch (java.lang.IllegalStateException e) {
+                                LOG.warn("GELF Message not parsable, rejecting");
+                                channel.basicReject(envelope.getDeliveryTag(), false);
+                                reQueuedMessages.mark();
+                                return;
                             }
                              
                             handledGELFMessages.mark();
@@ -212,6 +217,11 @@ public class AMQPConsumer implements Runnable {
                              } catch (BufferOutOfCapacityException e) {
                                 LOG.warn("ProcessBufferProcessor is out of capacity. Requeuing message!");
                                 channel.basicReject(envelope.getDeliveryTag(), true);
+                                reQueuedMessages.mark();
+                                return;
+                             } catch (java.lang.IllegalStateException e) {
+                                LOG.warn("SYSLOG Message not parsable, rejecting");
+                                channel.basicReject(envelope.getDeliveryTag(), false);
                                 reQueuedMessages.mark();
                                 return;
                              }
