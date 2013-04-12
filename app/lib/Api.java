@@ -14,6 +14,8 @@ import com.google.gson.GsonBuilder;
 
 public class Api {
 
+	public static final String ERROR_MSG_IO = "Could not connect to graylog2-server. Please make sure that it is running and you configured the correct REST URI.";
+	
 	public static <T> T get(URL url, T t) throws IOException, APIException {
 		try {
 			HttpURLConnection conn = (HttpURLConnection) url.openConnection();
@@ -46,6 +48,10 @@ public class Api {
 	}
 	
 	public static String urlEncode(String x) {
+		if (x == null || x.isEmpty()) {
+			return "";
+		}
+		
 		try {
 			return URLEncoder.encode(x, "UTF-8");
 		} catch (UnsupportedEncodingException e) {

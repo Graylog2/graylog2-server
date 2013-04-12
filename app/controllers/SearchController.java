@@ -3,10 +3,12 @@ package controllers;
 import java.io.IOException;
 
 import lib.APIException;
+import lib.Api;
 import lib.SearchTools;
 import models.UniversalSearch;
 import models.api.results.DateHistogramResult;
 import models.api.results.SearchResult;
+import play.Logger;
 import play.mvc.*;
 
 public class SearchController extends AuthenticatedController {
@@ -16,23 +18,26 @@ public class SearchController extends AuthenticatedController {
     	try {
     		range = Integer.parseInt(timerange);
     	} catch (NumberFormatException e) {
-    		range = 60*60;
+    		Logger.warn("Could not parse timerange. Setting to 0.");
+    		range = 0;
     	}
     	
-    	if (interval == null || interval.isEmpty()) {
-    		interval = SearchTools.determineHistogramInterval(range);
+    	if (q == null || q.isEmpty()) {
+    		q = "*";
+    	}
+    	
+    	if (interval == null || interval.isEmpty() || !SearchTools.isAllowedDateHistogramInterval(interval)) {
+    		interval = SearchTools.determineDefaultDateHistogramInterval(range);
     	}
     	
 		try {
-			UniversalSearch search = new UniversalSearch(q);
+			UniversalSearch search = new UniversalSearch(q, range);
 			SearchResult searchResult = search.search();
 			DateHistogramResult histogramResult = search.dateHistogram(interval);
 
 			return ok(views.html.search.results.render(currentUser(), searchResult, histogramResult, q));
 		} catch (IOException e) {
-			String message = "Could not connect to graylog2-server. Please make sure that it is running and you " +
-					"configured the correct REST URI.";
-			return status(504, views.html.errors.error.render(message, e, request()));
+			return status(504, views.html.errors.error.render(Api.ERROR_MSG_IO, e, request()));
 		} catch (APIException e) {
 			String message = "There was a problem with your search. We expected HTTP 200, but got a HTTP " + e.getHttpCode() + ".";
 			return status(504, views.html.errors.error.render(message, e, request()));

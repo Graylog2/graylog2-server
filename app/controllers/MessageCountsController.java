@@ -29,7 +29,7 @@ public class MessageCountsController extends AuthenticatedController {
 			
 			List<Map<String, Object>> lines = Lists.newArrayList();
 			Map<String, Object> r = Maps.newTreeMap();
-			r.put("color", "#4DBCE9");
+			r.put("color", "#26ADE4");
 			r.put("name", "Messages");
 			r.put("data", histogramResult.getFormattedResults());
 			

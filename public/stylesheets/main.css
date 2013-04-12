@@ -3,6 +3,7 @@ body {
 	font-family: 'Open Sans', sans-serif;
 	margin-top: 50px;
 	font-size: 12px;
+	overflow-x: hidden;
 }
 
 ul {
@@ -82,6 +83,12 @@ h3 {
 #main-content, #sidebar-inner, #universalsearch {
 	padding: 15px;
 	background-color: #fff;
+    border: 1px solid #D1D1D1;
+}
+
+#sidebar {
+	height: 100%;
+	padding-bottom: 100px;
 }
 
 #sidebar-inner {
@@ -169,4 +176,42 @@ h3 {
 .sidebar-alert {
 	display: block;
 	margin-bottom: 0;
+}
+
+#sidebar-inner .rickshaw_graph .detail .item.active {
+	margin-left: -200px;
+	text-align: right;
+}
+
+.search-result-fields li {
+	margin-top: 1px;
+}
+
+.search-result-fields label {
+	font-size: 12px;
+	display: inline;
+	position: relative;
+	top: 3px;	
+}
+
+.sidebar-back {
+	cursor: pointer;
+}
+
+.message-highlighted {
+	color: #26ADE4;
+}
+
+.terms-msg-modal .modal-header {
+	font-size: 11px;
+}
+
+.terms-msg-modal .modal-body li {
+	float: left;
+	margin-right: 8px;
+	font-family: monospace;
+}
+
+.terms-msg-modal .modal-body .as-list li {
+	float: none !important;
 }

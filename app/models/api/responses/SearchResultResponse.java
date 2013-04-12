@@ -8,5 +8,6 @@ public class SearchResultResponse {
 	public String query;
 	public int total_results;
 	public List<MessageSummaryResponse> messages;
+	public List<String> fields;
 	
 }

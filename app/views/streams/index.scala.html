@@ -1,0 +1,8 @@
+@(currentUser: User, streams: api.results.StreamsResult)
+
+@main("Streams", null, "", currentUser) {
+
+@streams.getTotal()
+@streams.getStreams()
+
+}

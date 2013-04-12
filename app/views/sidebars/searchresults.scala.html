@@ -1,0 +1,30 @@
+@(searchResult: api.results.SearchResult)
+
+<h2>
+	<i class="icon-search"></i>
+	Search results
+</h2>
+
+<p>
+	Found @searchResult.getTotalResultCount() messages in @searchResult.getTookMs()ms.
+</p>
+
+<h3>Select fields</h3>
+<ul class="search-result-fields">
+	@for(f <- searchResult.getFields()) {
+		<li>
+			<input type="checkbox"
+				id="field-selector-@f.getHash"
+				class="field-selector"
+				data-field-hash="@f.getHash"
+				@if(f.isStandardSelected()) { checked="checked" }
+			/>
+
+			<label for="field-selector-@f.getHash">@f.getName()</label>
+		</li>
+	}
+</ul>
+
+<br />
+<h3>Analyze field</h3>
+... tba ...
