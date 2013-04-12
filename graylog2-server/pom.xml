@@ -3,24 +3,32 @@
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
+    <prerequisites>
+        <maven>3.0.0</maven>
+    </prerequisites>
 
-    <groupId>org.graylog2</groupId>
     <artifactId>graylog2-server</artifactId>
-    <version>0.11.0</version>
     <packaging>jar</packaging>
+    <name>graylog2-server</name>
+
+    <licenses>
+        <license>
+            <name>GNU General Public License (GPL) version 3.0</name>
+            <url>https://www.gnu.org/licenses/gpl-3.0.html</url>
+            <distribution>repo</distribution>
+        </license>
+    </licenses>
+
+    <parent>
+        <groupId>org.graylog2</groupId>
+        <artifactId>graylog2-parent</artifactId>
+        <version>0.20.0-SNAPSHOT</version>
+    </parent>
 
     <properties>
-        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <metrics.version>2.1.2</metrics.version>
+        <mainClass>org.graylog2.Main</mainClass>
     </properties>
-
-    <repositories>
-       <repository>
-            <id>OSS Sonatype</id>
-            <name>Sonatype Opensource Release Repo</name>
-            <url>https://oss.sonatype.org/content/repositories/releases/</url>
-        </repository>
-    </repositories>
 
     <dependencies>
         <dependency>
@@ -87,9 +95,9 @@
             <version>1.7.2</version>
         </dependency>
         <dependency>
-        	<groupId>org.elasticsearch</groupId>
-        	<artifactId>elasticsearch</artifactId>
-        	<version>0.20.4</version>
+            <groupId>org.elasticsearch</groupId>
+            <artifactId>elasticsearch</artifactId>
+            <version>0.20.4</version>
         </dependency>
         <dependency>
             <groupId>org.jmock</groupId>
@@ -156,7 +164,7 @@
         <dependency>
             <groupId>org.graylog2</groupId>
             <artifactId>graylog2-plugin</artifactId>
-            <version>0.20.7-SNAPSHOT</version>
+            <version>${project.parent.version}</version>
         </dependency>
         <dependency>
             <groupId>org.productivity.java</groupId>
@@ -168,96 +176,79 @@
             <artifactId>high-scale-lib</artifactId>
             <version>1.1.4</version>
         </dependency>
-	    <dependency>
-	      <groupId>com.sun.jersey</groupId>
-	      <artifactId>jersey-grizzly2</artifactId>
-	      <version>1.17</version>
-	    </dependency>
-	    <dependency>
-	      <groupId>com.sun.jersey</groupId>
-	      <artifactId>jersey-server</artifactId>
-	      <version>1.17</version>
-	    </dependency>
+        <dependency>
+            <groupId>com.sun.jersey</groupId>
+            <artifactId>jersey-grizzly2</artifactId>
+            <version>1.17</version>
+        </dependency>
+        <dependency>
+            <groupId>com.sun.jersey</groupId>
+            <artifactId>jersey-server</artifactId>
+            <version>1.17</version>
+        </dependency>
     </dependencies>
 
     <build>
         <plugins>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-compiler-plugin</artifactId>
-                <version>2.3.2</version>
-                <configuration>
-                    <source>1.6</source>
-                    <target>1.6</target>
-                </configuration>
-            </plugin>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-surefire-plugin</artifactId>
-                <version>2.6</version>
-                <configuration>
-                    <excludes>
-                        <exclude>**/*IntegrationTest.java</exclude>
-                    </excludes>
-                    <includes>
-                        <include>**/*Spec.class</include>
-                        <include>**/*Test.class</include>
-                    </includes>
-                </configuration>
-            </plugin>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-jar-plugin</artifactId>
-                <version>2.3.1</version>
-                <configuration>
-                    <finalName>graylog2-server</finalName>
-                    <archive>
-                        <manifest>
-                            <mainClass>org.graylog2.Main</mainClass>
-                        </manifest>
-                    </archive>
-                </configuration>
-            </plugin>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-assembly-plugin</artifactId>
                 <version>2.4</version>
                 <configuration>
                     <finalName>graylog2-server</finalName>
                     <archive>
                         <manifest>
-                            <mainClass>org.graylog2.Main</mainClass>
+                            <mainClass>${mainClass}</mainClass>
                         </manifest>
                     </archive>
-                    <descriptorRefs>
-                        <descriptorRef>jar-with-dependencies</descriptorRef>
-                    </descriptorRefs>
                 </configuration>
             </plugin>
-	      <plugin>
-	         <groupId>org.apache.maven.plugins</groupId>
-	         <artifactId>maven-shade-plugin</artifactId>
-	         <version>1.5</version>
-	         <configuration>
-	         <transformers>
-	         <transformer implementation="org.apache.maven.plugins.shade.resource.ServicesResourceTransformer"/>
-	         <transformer implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
-	           <manifestEntries>
-	            <Main-Class>org.graylog2.Main</Main-Class>
-	            <Build-Number>1</Build-Number>
-	           </manifestEntries>
-	          </transformer>
-	        </transformers>
-	       </configuration>
-	      <executions>
-	       <execution>
-	        <phase>package</phase>
-	         <goals>
-	          <goal>shade</goal>
-	         </goals>
-	       </execution>
-	      </executions>
-	      </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-shade-plugin</artifactId>
+                <version>2.0</version>
+                <configuration>
+                    <transformers>
+                        <transformer
+                                implementation="org.apache.maven.plugins.shade.resource.ServicesResourceTransformer"/>
+                        <transformer
+                                implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
+                            <mainClass>${mainClass}</mainClass>
+                        </transformer>
+                    </transformers>
+                </configuration>
+                <executions>
+                    <execution>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>shade</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-site-plugin</artifactId>
+                <version>3.2</version>
+                <configuration>
+                    <reportPlugins>
+                        <plugin>
+                            <groupId>org.apache.maven.plugins</groupId>
+                            <artifactId>maven-project-info-reports-plugin</artifactId>
+                            <version>2.6</version>
+                            <configuration>
+                                <dependencyLocationsEnabled>false</dependencyLocationsEnabled>
+                                <dependencyDetailsEnabled>false</dependencyDetailsEnabled>
+                            </configuration>
+                        </plugin>
+                        <plugin>
+                            <groupId>org.codehaus.mojo</groupId>
+                            <artifactId>findbugs-maven-plugin</artifactId>
+                            <version>2.5.2</version>
+                        </plugin>
+                    </reportPlugins>
+                </configuration>
+            </plugin>
         </plugins>
         <testResources>
             <testResource>
@@ -268,8 +259,4 @@
             </testResource>
         </testResources>
     </build>
-    <name>graylog2-server</name>
-    <description>http://www.graylog2.org/</description>
 </project>
-
-
