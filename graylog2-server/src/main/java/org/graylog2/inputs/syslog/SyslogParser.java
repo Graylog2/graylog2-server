@@ -170,11 +170,11 @@ public class SyslogParser {
                     if ('l' == la(3)) { month = 7; }
                     if ('n' == la(3)) { month = 6; }
                 }
-                if ('M' == la(1)) {
-                    if ('a' == la(2)) {
-                        if ('r' == la(3)) { month = 3; }
-                        if ('y' == la(3)) { month = 5; }
-                    }
+            }
+            if ('M' == la(1)) {
+                if ('a' == la(2)) {
+                    if ('r' == la(3)) { month = 3; }
+                    if ('y' == la(3)) { month = 5; }
                 }
             }
             if ('N' == la(1)) { month = 11; }
@@ -296,9 +296,12 @@ public class SyslogParser {
         SyslogMessage parsedMessage2 = new SyslogParser(msg).parse();
         msg = "<38>Feb 5 10:18:12 foo-bar sshd[593115]: Accepted publickey for root from 94.XXX.XXX.XXX port 5992 ssh2";
         SyslogMessage parsedMessage3 = new SyslogParser(msg).parse();
+        msg = "<46>Mar 20 15:22:38 host_srv01 rsyslogd: [origin software=\"rsyslogd\" swVersion=\"4.6.4\" x-pid=\"8767\" x-info=\"http://www.rsyslog.com\";] (re)start";
+        SyslogMessage parsedMessage4 = new SyslogParser(msg).parse();
 
         System.err.println(parsedMessage.getDateTime().withZone(DateTimeZone.UTC).toString());
         System.err.println(parsedMessage2.getDateTime().withZone(DateTimeZone.UTC).toString());
         System.err.println(parsedMessage3.getDateTime().withZone(DateTimeZone.UTC).toString());
+        System.err.println(parsedMessage4.getDateTime().withZone(DateTimeZone.UTC).toString());
     }
 }
