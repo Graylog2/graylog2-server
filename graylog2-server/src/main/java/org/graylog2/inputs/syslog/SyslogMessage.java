@@ -20,6 +20,7 @@
 package org.graylog2.inputs.syslog;
 
 import org.joda.time.DateTime;
+import org.joda.time.DateTimeZone;
 
 /**
  *
@@ -49,6 +50,16 @@ public class SyslogMessage {
 
     public DateTime getDateTime() {
         return dateTime;
+    }
+
+    @Override
+    public String toString() {
+        return "SyslogMessage{" +
+            "facility=" + facility +
+            ", severity=" + severity +
+            ", dateTime=" + dateTime.withZone(DateTimeZone.UTC) +
+            ", hostname='" + hostname + '\'' +
+            '}';
     }
 
     public static Builder builder() {

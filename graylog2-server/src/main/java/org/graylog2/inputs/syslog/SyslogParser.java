@@ -86,17 +86,31 @@ public class SyslogParser {
         
         // input position is now after the facility/severity value or we encountered an error (yet unhandled in this code)
         // RFC 5424 mandates the version number at this point. Only one version has ever been assigned.
+        boolean isStructured = false;
         if ('1' == la(1) && ' ' == la(2)) {
             // this is structured syslog a la RFC 5424
             consume(); // the version
-            consume(); // the space
-            timestamp(true);
-            hostnameOrIP();
-        } else {
-            // this is unstructured syslog a la RFC 3164 (or something like it)
-            timestamp(false);
-            hostnameOrIP();
+            consumeFieldSeparator();
+            isStructured = true;
         }
+        timestamp(isStructured);
+        consumeFieldSeparator();
+        hostnameOrIP();
+        consumeFieldSeparator();
+
+        if (isStructured) {
+            appName();
+            consumeFieldSeparator();
+            procId();
+            consumeFieldSeparator();
+            msgId();
+            consumeFieldSeparator();
+            structuredData();
+            // for structured syslog messages the msg part is optional and thus it doesn't have to have the field separator here
+            consumeFieldSeparator(true);
+        }
+        // for structured syslog messages the msg part is optional
+        message(isStructured);
     }
 
     /**
@@ -109,8 +123,10 @@ public class SyslogParser {
         boolean parseRfc3339Successful = false;
         if (guessRfc3339Timestamp) {
             if ('-' == la(1)) {
-                // NILVALUE, means we don't have a supplied timestamp TODO new Date() instead?
+                // NILVALUE, means we don't have a supplied timestamp
                 consume();
+                // the caller is responsible for filling in the current date, if we couldn't parse it.
+                parseRfc3339Successful = true; // skip trying to parse a different date format, there is no date.
             } else {
                 // we just check for common signature of dates, meaning the fixed positions of the separators:
                 // YYYY-MM-DDTHH:MM:SS.
@@ -144,12 +160,6 @@ public class SyslogParser {
                     DateTime dateTime = new DateTime(dateString);
                     parseRfc3339Successful = true;
                     builder.timestamp(dateTime);
-                    if (' ' == la(1)) {
-                        // field should have a space separator trailing
-                        consume();
-                    } else {
-                        // TODO complain
-                    }
                 }
             }
         }
@@ -186,11 +196,7 @@ public class SyslogParser {
                 // TODO complain
             }
 
-            if (' ' == la(1)) {
-                consume();
-            } else {
-                // TODO complain
-            }
+            consumeFieldSeparator();
 
             int day = 0;
             // one (http://jira.graylog2.org/browse/SERVER-287) or two digits day
@@ -209,11 +215,7 @@ public class SyslogParser {
             }
 
             // now consume the trailing space (wasn't consumed above!)
-            if (' ' == la(1)) {
-                consume();
-            } else {
-                // TODO complain
-            }
+            consumeFieldSeparator();
 
             // the time part, should always look like HH:MM:SS
             int hours = 0;
@@ -242,7 +244,7 @@ public class SyslogParser {
         if ('-' == la(1) && ' ' == la(2)) {
             // NILVALUE. no host is given.
             builder.hostname(null);
-            consume(2);
+            consume();
         } else {
             // hostname or IP, right now we don't care which format is used.
             while (' ' != la(1)) {
@@ -250,8 +252,37 @@ public class SyslogParser {
             }
             builder.hostname(getText(hostnameStart));
         }
+    }
 
+    private void message(boolean optional) {
+    }
 
+    private void appName() {
+
+    }
+
+    private void procId() {
+
+    }
+
+    private void msgId() {
+
+    }
+
+    private void structuredData() {
+
+    }
+
+    private void consumeFieldSeparator(boolean optional) {
+        if (' ' == la(1)) {
+            consume();
+        } else if (!optional) {
+            // TODO complain
+        }
+    }
+
+    private void consumeFieldSeparator() {
+        consumeFieldSeparator(false);
     }
 
     private static boolean isDigit(char c) {
@@ -299,9 +330,9 @@ public class SyslogParser {
         msg = "<46>Mar 20 15:22:38 host_srv01 rsyslogd: [origin software=\"rsyslogd\" swVersion=\"4.6.4\" x-pid=\"8767\" x-info=\"http://www.rsyslog.com\";] (re)start";
         SyslogMessage parsedMessage4 = new SyslogParser(msg).parse();
 
-        System.err.println(parsedMessage.getDateTime().withZone(DateTimeZone.UTC).toString());
-        System.err.println(parsedMessage2.getDateTime().withZone(DateTimeZone.UTC).toString());
-        System.err.println(parsedMessage3.getDateTime().withZone(DateTimeZone.UTC).toString());
-        System.err.println(parsedMessage4.getDateTime().withZone(DateTimeZone.UTC).toString());
+        System.err.println(parsedMessage.toString());
+        System.err.println(parsedMessage2.toString());
+        System.err.println(parsedMessage3.toString());
+        System.err.println(parsedMessage4.toString());
     }
 }
