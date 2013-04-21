@@ -19,8 +19,7 @@
  */
 package org.graylog2.systeminformation;
 
-import java.util.List;
-import java.util.Map;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.http.HttpResponse;
 import org.apache.http.NameValuePair;
 import org.apache.http.client.HttpClient;
@@ -28,11 +27,13 @@ import org.apache.http.client.entity.UrlEncodedFormEntity;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.message.BasicNameValuePair;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.elasticsearch.common.collect.Lists;
 import org.graylog2.Core;
-import org.json.simple.JSONValue;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.util.List;
+import java.util.Map;
 
 /**
  *  @author Lennart Koopmann <lennart@socketfeed.com>
@@ -45,13 +46,14 @@ public class Sender {
     public final static String LOCAL_TARGET = "http://localhost:9393/";
     
     public static void send(Map<String, Object> info, Core server) {
+        ObjectMapper objectMapper = new ObjectMapper();
         HttpClient httpClient = new DefaultHttpClient();
 
         try {
             HttpPost request = new HttpPost(getTarget(server));
 
             List<NameValuePair> nameValuePairs = Lists.newArrayList();
-            nameValuePairs.add(new BasicNameValuePair("systeminfo", JSONValue.toJSONString(info)));
+            nameValuePairs.add(new BasicNameValuePair("systeminfo", objectMapper.writeValueAsString(info)));
             request.setEntity(new UrlEncodedFormEntity(nameValuePairs));
             
             HttpResponse response = httpClient.execute(request);
