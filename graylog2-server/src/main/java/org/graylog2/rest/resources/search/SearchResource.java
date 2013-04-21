@@ -20,7 +20,16 @@
 
 package org.graylog2.rest.resources.search;
 
-import java.util.Map;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.common.collect.Maps;
+import com.sun.jersey.api.core.ResourceConfig;
+import org.graylog2.Core;
+import org.graylog2.indexer.Indexer;
+import org.graylog2.indexer.results.DateHistogramResult;
+import org.graylog2.indexer.results.SearchResult;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
@@ -29,18 +38,8 @@ import javax.ws.rs.QueryParam;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
-
-import org.graylog2.Core;
-import org.graylog2.indexer.Indexer;
-import org.graylog2.indexer.results.DateHistogramResult;
-import org.graylog2.indexer.results.SearchResult;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import com.google.common.collect.Maps;
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
-import com.sun.jersey.api.core.ResourceConfig;
+import javax.ws.rs.core.Response;
+import java.util.Map;
 
 /**
  * @author Lennart Koopmann <lennart@torch.sh>
@@ -48,7 +47,9 @@ import com.sun.jersey.api.core.ResourceConfig;
 @Path("/search")
 public class SearchResource {
     private static final Logger LOG = LoggerFactory.getLogger(SearchResource.class);
-	
+
+    private final ObjectMapper objectMapper = new ObjectMapper();
+
     @Context ResourceConfig rc;
 
     @GET @Path("/universal")
@@ -63,19 +64,22 @@ public class SearchResource {
         
         SearchResult sr = core.getIndexer().searches().universalSearch(query);
         
-        Gson gson = new Gson();
-        
-        if (prettyPrint) {
-            gson = new GsonBuilder().setPrettyPrinting().create();
-        }
-        
         Map<String, Object> result = Maps.newHashMap();
         result.put("query", sr.getOriginalQuery());
         result.put("messages", sr.getResults());
         result.put("time", sr.took().millis());
         result.put("total_results", sr.getTotalResults());
-        
-        return gson.toJson(result);
+
+        try {
+            if (prettyPrint) {
+                return objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(result);
+            } else {
+                return objectMapper.writeValueAsString(result);
+            }
+        } catch (JsonProcessingException e) {
+            LOG.error("Error while generating JSON", e);
+            throw new WebApplicationException(e, Response.Status.INTERNAL_SERVER_ERROR);
+        }
     }
     
     @GET @Path("/universal/histogram")
@@ -99,18 +103,21 @@ public class SearchResource {
         
         DateHistogramResult dhr = core.getIndexer().searches().universalSearchHistogram(query, Indexer.DateHistogramInterval.valueOf(interval));
 
-        Gson gson = new Gson();
-        
-        if (prettyPrint) {
-            gson = new GsonBuilder().setPrettyPrinting().create();
-        }
-        
         Map<String, Object> result = Maps.newHashMap();
         result.put("query", dhr.getOriginalQuery());
         result.put("interval", dhr.getInterval().toString().toLowerCase());
         result.put("results", dhr.getResults());
         result.put("time", dhr.took().millis());
-        
-        return gson.toJson(result);
+
+        try {
+            if (prettyPrint) {
+                return objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(result);
+            } else {
+                return objectMapper.writeValueAsString(result);
+            }
+        } catch (JsonProcessingException e) {
+            LOG.error("Error while generating JSON", e);
+            throw new WebApplicationException(e, Response.Status.INTERNAL_SERVER_ERROR);
+        }
     }
 }

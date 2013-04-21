@@ -20,23 +20,26 @@
 
 package org.graylog2;
 
-import org.graylog2.metrics.LibratoMetricsFormatter;
-import java.util.List;
-import java.util.ArrayList;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.Maps;
-import java.util.HashMap;
-import java.util.Map;
-import org.json.simple.JSONValue;
 import org.bson.types.ObjectId;
-import org.json.simple.JSONArray;
-import org.json.simple.JSONObject;
+import org.graylog2.metrics.LibratoMetricsFormatter;
 import org.junit.Test;
-import static org.junit.Assert.*;
+
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import static org.junit.Assert.assertEquals;
 
 public class LibratoMetricsFormatterTest {
+    private ObjectMapper objectMapper = new ObjectMapper();
 
     @Test
-    public void testAsJson() {
+    public void testAsJson() throws IOException {
         MessageCounterImpl counter = new MessageCounterImpl();
 
         // Total: 2
@@ -79,7 +82,7 @@ public class LibratoMetricsFormatterTest {
     }
 
     @Test
-    public void testAsJsonWithEmptyCounter() {
+    public void testAsJsonWithEmptyCounter() throws IOException {
         MessageCounterImpl counter = new MessageCounterImpl();
         LibratoMetricsFormatter f = new LibratoMetricsFormatter(counter, "gl2-", new ArrayList<String>(), "", new HashMap<String, String>());
 
@@ -90,7 +93,7 @@ public class LibratoMetricsFormatterTest {
     }
 
     @Test
-    public void testAsJsonWithConfiguredStreamFilter() {
+    public void testAsJsonWithConfiguredStreamFilter() throws IOException {
         MessageCounterImpl counter = new MessageCounterImpl();
 
         // Total: 2
@@ -140,7 +143,7 @@ public class LibratoMetricsFormatterTest {
     }
 
     @Test
-    public void testAsJsonWithConfiguredHostFilter() {
+    public void testAsJsonWithConfiguredHostFilter() throws IOException {
         MessageCounterImpl counter = new MessageCounterImpl();
 
         // Total: 2
@@ -180,28 +183,26 @@ public class LibratoMetricsFormatterTest {
         assertEquals(4, gauges.size());
 
         assertEquals("gl2-graylog2-server", gauges.get("gl2-total").get("source"));
-        assertEquals((long) 2, gauges.get("gl2-total").get("value"));
-        assertEquals((long) 3, gauges.get("gl2-host-fooexampleorg").get("value"));
-        assertEquals((long) 2, gauges.get("gl2-stream-somestream").get("value"));
-        assertEquals((long) 1, gauges.get("gl2-stream-somestream2").get("value"));
+        assertEquals(2L, gauges.get("gl2-total").get("value"));
+        assertEquals(3L, gauges.get("gl2-host-fooexampleorg").get("value"));
+        assertEquals(2L, gauges.get("gl2-stream-somestream").get("value"));
+        assertEquals(1L, gauges.get("gl2-stream-somestream2").get("value"));
     }
 
-    private Map<String, Map<String,Object>> parseGauges(String json) {
+    private Map<String, Map<String,Object>> parseGauges(String json) throws IOException {
         Map<String, Map<String,Object>> result = Maps.newHashMap();
 
-        JSONObject r = (JSONObject) JSONValue.parse(json);
-        JSONArray gauges = (JSONArray) r.get("gauges");
+        JsonNode userData = objectMapper.readTree(json);
+        JsonNode gauges = userData.get("gauges");
 
-        for (Object o : gauges) {
-            JSONObject jsonObject = (JSONObject) o;
+        for (JsonNode node : gauges) {
             Map<String, Object> gauge = Maps.newHashMap();
-            gauge.put("source", jsonObject.get("source"));
-            gauge.put("name", jsonObject.get("name"));
-            gauge.put("value", jsonObject.get("value"));
-            result.put((String) jsonObject.get("name"), gauge);
+            gauge.put("source", node.get("source").asText());
+            gauge.put("name", node.get("name").asText());
+            gauge.put("value", node.get("value").asLong());
+            result.put(node.get("name").asText(), gauge);
         }
 
         return result;
     }
-
 }

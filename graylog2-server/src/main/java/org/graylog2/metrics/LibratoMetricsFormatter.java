@@ -20,11 +20,12 @@
 
 package org.graylog2.metrics;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.graylog2.plugin.Tools;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import org.graylog2.plugin.MessageCounter;
-import org.json.simple.JSONValue;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -38,7 +39,9 @@ import java.util.Map.Entry;
 public class LibratoMetricsFormatter extends MetricsFormatter {
 
     private static final Logger LOG = LoggerFactory.getLogger(LibratoMetricsFormatter.class);
-    
+
+    private final ObjectMapper objectMapper = new ObjectMapper();
+
     private MessageCounter counter;
     private List<String> streamFilter;
     private String hostFilter;
@@ -112,7 +115,14 @@ public class LibratoMetricsFormatter extends MetricsFormatter {
 
         m.put("gauges", gauges);
 
-        return JSONValue.toJSONString(m);
+        String result = null;
+        try {
+            result = objectMapper.writeValueAsString(m);
+        } catch (JsonProcessingException e) {
+            LOG.error("Error while generating JSON data", e);
+        }
+
+        return result;
     }
     
 }
