@@ -55,13 +55,6 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
 
-    <repositories>
-        <repository>
-            <id>OSS Sonatype</id>
-            <name>Sonatype Opensource Release Repo</name>
-            <url>https://oss.sonatype.org/content/repositories/releases/</url>
-        </repository>
-    </repositories>
 
     <build>
         <plugins>
