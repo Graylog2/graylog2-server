@@ -20,25 +20,23 @@
 
 package org.graylog2.gelf;
 
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.concurrent.TimeUnit;
-
-import org.graylog2.Core;
-import org.graylog2.plugin.Message;
-import org.graylog2.plugin.Tools;
-import org.graylog2.plugin.buffers.BufferOutOfCapacityException;
-import org.json.simple.JSONArray;
-import org.json.simple.JSONObject;
-import org.json.simple.JSONValue;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
+import com.fasterxml.jackson.core.JsonParser;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.yammer.metrics.Metrics;
 import com.yammer.metrics.core.Meter;
 import com.yammer.metrics.core.Timer;
 import com.yammer.metrics.core.TimerContext;
+import org.graylog2.Core;
+import org.graylog2.plugin.Message;
+import org.graylog2.plugin.Tools;
+import org.graylog2.plugin.buffers.BufferOutOfCapacityException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.util.Iterator;
+import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
 /**
  * @author Lennart Koopmann <lennart@socketfeed.com>
@@ -52,8 +50,13 @@ public class GELFProcessor {
     private final Meter processedMessages = Metrics.newMeter(GELFProcessor.class, "ProcessedMessages", "messages", TimeUnit.SECONDS);
     private final Timer gelfParsedTime = Metrics.newTimer(GELFProcessor.class, "GELFParsedTime", TimeUnit.MICROSECONDS, TimeUnit.SECONDS);
 
+    private final ObjectMapper objectMapper;
+
     public GELFProcessor(Core server) {
         this.server = server;
+
+        objectMapper = new ObjectMapper();
+        objectMapper.configure(JsonParser.Feature.ALLOW_UNQUOTED_CONTROL_CHARS, true);
     }
 
     public void messageReceived(GELFMessage message) throws BufferOutOfCapacityException {
@@ -76,10 +79,10 @@ public class GELFProcessor {
     private Message parse(String message) {
         TimerContext tcx = gelfParsedTime.time();
 
-        JSONObject json;
+        JsonNode json;
 
         try {
-            json = getJSON(message);
+            json = objectMapper.readTree(message);
         } catch (Exception e) {
             LOG.error("Could not parse JSON!", e);
             json = null;
@@ -90,60 +93,61 @@ public class GELFProcessor {
         }
         
         // Timestamp.
-        double timestamp = this.jsonToDouble(json.get("timestamp"));
+        double timestamp = doubleValue(json, "timestamp");
         if (timestamp <= 0) {
             timestamp = Tools.getUTCTimestampWithMilliseconds();
         }
         
         Message lm = new Message(
-        		this.jsonToString(json.get("short_message")),
-        		this.jsonToString(json.get("host")),
+        		this.stringValue(json, "short_message"),
+        		this.stringValue(json, "host"),
         		timestamp);
         
-        lm.addField("full_message", this.jsonToString(json.get("full_message")));
+        lm.addField("full_message", this.stringValue(json, "full_message"));
         
-        String file = this.jsonToString(json.get("file"));
+        String file = this.stringValue(json, "file");
+
         if (file != null && !file.isEmpty()) {
         	lm.addField("file", file);
         }
 
-        int line = this.jsonToInt(json.get("line"));
+        long line = this.longValue(json, "line");
         if (line > -1) {
         	lm.addField("line", line);
         }
         
         // Level is set by server if not specified by client.
-        int level = this.jsonToInt(json.get("level"));
+        long level = this.longValue(json, "level");
         if (level > -1) {
             lm.addField("level", level);
         }
 
         // Facility is set by server if not specified by client.
-        String facility = this.jsonToString(json.get("facility"));
+        String facility = this.stringValue(json, ("facility"));
         if (facility != null && !facility.isEmpty()) {
             lm.addField("facility", facility);
         }
 
         // Add additional data if there is some.
-        @SuppressWarnings("unchecked")
-		Set<Map.Entry<String, Object>> entrySet = json.entrySet();
-        for(Map.Entry<String, Object> entry : entrySet) {
+        Iterator<Map.Entry<String, JsonNode>> fields = json.fields();
+
+        while(fields.hasNext()) {
+            Map.Entry<String, JsonNode> entry = fields.next();
 
             String key = entry.getKey();
-            Object value = entry.getValue();
+            JsonNode value = entry.getValue();
 
             // Skip standard fields.
-            if (Message.RESERVED_FIELDS.contains(key)) {
+            if (null != lm.getField(key) || Message.RESERVED_FIELDS.contains(key)) {
                 continue;
             }
-            
-            // Convert JSON containers to Strings.
-            if (value instanceof Map || value instanceof Set || value instanceof List) {
-                value = value.toString();
-            }
 
-            // Add to message.
-            lm.addField(key, value);
+            // Convert JSON containers to Strings.
+            if (value.isContainerNode()) {
+                lm.addField(key, value.toString());
+            } else {
+                lm.addField(key, value.asText());
+            }
         }
 
         // Stop metrics timer.
@@ -152,58 +156,39 @@ public class GELFProcessor {
         return lm;
     }
 
-    private JSONObject getJSON(String value) {
-        if (value != null) {
-            Object obj = JSONValue.parse(value);
-            if (obj != null) {
-                if (obj instanceof org.json.simple.JSONArray) {
-                    // Return the k/v of ths JSON array if this is an array.
-                    JSONArray array = (JSONArray)obj;
-                    return (JSONObject) array.get(0);
-                } else if(obj instanceof org.json.simple.JSONObject) {
-                    // This is not an array. Convert it to an JSONObject directly without choosing first k/v.
-                    return (JSONObject)obj;
-                }
+    private String stringValue(JsonNode json, String fieldName) {
+        if (json != null) {
+            JsonNode value = json.get(fieldName);
+
+            if (value != null) {
+                return value.asText();
             }
         }
 
         return null;
     }
 
-    private String jsonToString(Object json) {
-        try {
-            if (json != null) {
-                return json.toString();
-            }
-        } catch(Exception e) {}
+    private long longValue(JsonNode json, String fieldName) {
+        if (json != null) {
+            JsonNode value = json.get(fieldName);
 
-        return null;
+            if (value != null) {
+                return value.asLong(-1L);
+            }
+        }
+
+        return -1L;
     }
 
-    private int jsonToInt(Object json) {
-        try {
-            if (json != null) {
-                String str = this.jsonToString(json);
-                if (str != null) {
-                    return Integer.parseInt(str);
-                }
+    private double doubleValue(JsonNode json, String fieldName) {
+        if (json != null) {
+            JsonNode value = json.get(fieldName);
+
+            if (value != null) {
+                return value.asDouble(-1.0);
             }
-        } catch(Exception e) {}
+        }
 
-        return -1;
+        return -1.0;
     }
-
-    private double jsonToDouble(Object json) {
-        try {
-            if (json != null) {
-                String str = this.jsonToString(json);
-                if (str != null) {
-                    return Double.parseDouble(str);
-                }
-            }
-        } catch(Exception e) {}
-
-        return -1;
-    }
-
 }

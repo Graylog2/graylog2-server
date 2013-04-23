@@ -20,6 +20,16 @@
 
 package org.graylog2.rest.resources.messages;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.sun.jersey.api.core.ResourceConfig;
+import org.elasticsearch.indices.IndexMissingException;
+import org.graylog2.Core;
+import org.graylog2.indexer.messages.DocumentNotFoundException;
+import org.graylog2.indexer.results.ResultMessage;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
@@ -28,17 +38,7 @@ import javax.ws.rs.QueryParam;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
-
-import org.elasticsearch.indices.IndexMissingException;
-import org.graylog2.Core;
-import org.graylog2.indexer.messages.DocumentNotFoundException;
-import org.graylog2.indexer.results.ResultMessage;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
-import com.sun.jersey.api.core.ResourceConfig;
+import javax.ws.rs.core.Response;
 
 /**
  * @author Lennart Koopmann <lennart@torch.sh>
@@ -46,6 +46,8 @@ import com.sun.jersey.api.core.ResourceConfig;
 @Path("/messages/{index}")
 public class MessageResource {
     private static final Logger LOG = LoggerFactory.getLogger(MessageResource.class);
+
+    private final ObjectMapper objectMapper = new ObjectMapper();
 	
     @Context ResourceConfig rc;
 
@@ -69,13 +71,16 @@ public class MessageResource {
         	LOG.error("Message does not exist. Returning HTTP 404.");
         	throw new WebApplicationException(404);
 		}
-        
-        Gson gson = new Gson();
-        
-        if (prettyPrint) {
-            gson = new GsonBuilder().setPrettyPrinting().create();
+
+        try {
+            if (prettyPrint) {
+                return objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(m);
+            } else {
+                return objectMapper.writeValueAsString(m);
+            }
+        } catch (JsonProcessingException e) {
+            LOG.error("Error while generating JSON", e);
+            throw new WebApplicationException(e, Response.Status.INTERNAL_SERVER_ERROR);
         }
-        
-        return gson.toJson(m);
     }
 }

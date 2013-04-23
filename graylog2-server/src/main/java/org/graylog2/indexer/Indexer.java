@@ -1,6 +1,8 @@
 package org.graylog2.indexer;
 
 import com.beust.jcommander.internal.Maps;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.commons.io.FileUtils;
 import org.elasticsearch.action.ActionFuture;
 import org.elasticsearch.action.WriteConsistencyLevel;
@@ -38,7 +40,7 @@ import org.graylog2.indexer.counts.Counts;
 import org.graylog2.indexer.messages.Messages;
 import org.graylog2.indexer.searches.Searches;
 import org.graylog2.plugin.Message;
-import org.json.simple.JSONValue;
+import org.graylog2.plugin.indexer.MessageGateway;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -50,7 +52,6 @@ import java.util.Map;
 
 import static org.elasticsearch.index.query.QueryBuilders.rangeQuery;
 import static org.elasticsearch.node.NodeBuilder.nodeBuilder;
-import org.graylog2.plugin.indexer.MessageGateway;
 
 // TODO this class blocks for most of its operations, but is called from the main thread for some of them
 // TODO figure out how to gracefully deal with failure to connect (or losing connection) to the elastic search cluster!
@@ -59,6 +60,7 @@ public class Indexer {
 
     private Client client;
     private final MessageGateway messageGateway;
+    private final ObjectMapper objectMapper = new ObjectMapper();
     public static final String TYPE = "message";
     
     private final Searches searches;
@@ -232,10 +234,14 @@ public class Indexer {
 
         final BulkRequestBuilder request = client.prepareBulk();
         for (Message msg : messages) {
-            String source = JSONValue.toJSONString(msg.toElasticSearchObject());
+            try {
+                String source = objectMapper.writeValueAsString(msg.toElasticSearchObject());
 
-            // we manually set the document ID to the same value to be able to match up documents later.
-            request.add(buildIndexRequest(Deflector.DEFLECTOR_NAME, source, msg.getId(), 0)); // Main index.
+                // we manually set the document ID to the same value to be able to match up documents later.
+                request.add(buildIndexRequest(Deflector.DEFLECTOR_NAME, source, msg.getId(), 0)); // Main index.
+            } catch (JsonProcessingException e) {
+                LOG.warn("Error while converting message to ElasticSearch JSON", e);
+            }
         }
 
         request.setConsistencyLevel(WriteConsistencyLevel.ONE);
