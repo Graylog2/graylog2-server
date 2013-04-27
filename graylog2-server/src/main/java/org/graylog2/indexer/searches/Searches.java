@@ -55,7 +55,7 @@ public class Searches {
 		srb.addSort("timestamp", SortOrder.DESC);
 		
 		SearchResponse r = c.search(srb.request()).actionGet();
-		return new SearchResult(r.hits(), query, r.took());
+		return new SearchResult(r.getHits(), query, r.getTook());
 	}
 	
 	public DateHistogramResult universalSearchHistogram(String query, Indexer.DateHistogramInterval interval) {
@@ -69,7 +69,7 @@ public class Searches {
 		srb.addFacet(fb);
 		
 		SearchResponse r = c.search(srb.request()).actionGet();
-		return new DateHistogramResult((DateHistogramFacet) r.facets().facet("histogram"), query, interval, r.took());
+		return new DateHistogramResult((DateHistogramFacet) r.getFacets().facet("histogram"), query, interval, r.getTook());
 	}
 	
 }

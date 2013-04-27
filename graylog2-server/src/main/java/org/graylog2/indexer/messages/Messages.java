@@ -47,7 +47,7 @@ public class Messages {
 
 		GetResponse r = c.get(grb.request()).actionGet();
 		
-		if (!r.exists()) {
+		if (!r.isExists()) {
 			throw new DocumentNotFoundException();
 		}
 		

@@ -92,7 +92,7 @@ public class DeflectorManagerThread implements Runnable { // public class Klimpe
     
     private void deleteEmptyIndices() {
         for(Map.Entry<String, IndexStats> e : graylogServer.getDeflector().getAllDeflectorIndices().entrySet()) {
-            if (e.getValue().getTotal().getDocs().count() == 0) {
+            if (e.getValue().getTotal().getDocs().getCount() == 0) {
                 String index = e.getKey();
                 
                 // Never delete the index the deflector is currently pointing to, even if it is empty.

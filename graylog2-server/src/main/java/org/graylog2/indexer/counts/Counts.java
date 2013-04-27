@@ -63,7 +63,7 @@ public class Counts {
 		srb.addFacet(fb);
 		
 		SearchResponse r = c.search(srb.request()).actionGet();
-		return new DateHistogramResult((DateHistogramFacet) r.facets().facet("histogram"), "match_all", interval, r.took());
+		return new DateHistogramResult((DateHistogramFacet) r.getFacets().facet("histogram"), "match_all", interval, r.getTook());
 	}
 	
 }

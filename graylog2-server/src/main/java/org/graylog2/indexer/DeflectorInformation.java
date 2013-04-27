@@ -47,7 +47,7 @@ public class DeflectorInformation {
     }
     
     public void addIndex(IndexStats index) {
-        indices.put(index.index(), index);
+        indices.put(index.getIndex(), index);
     }
     
     public void addIndices(Map<String, IndexStats> indices) {
@@ -86,10 +86,10 @@ public class DeflectorInformation {
     private Map<String, Object> getIndexInformation(IndexStats stats) {
         Map<String, Object> info = Maps.newHashMap();
         info.put("docs", stats.getPrimaries().getDocs().getCount());
-        info.put("size", stats.getPrimaries().store().getSize().getKb());
-        info.put("time_index", stats.getPrimaries().getIndexing().total().indexTime().getSeconds());
-        info.put("time_query", stats.getPrimaries().getSearch().total().queryTime().getSeconds());
-        info.put("time_fetch", stats.getPrimaries().getSearch().total().fetchTime().getSeconds());
+        info.put("size", stats.getPrimaries().getStore().getSize().getKb());
+        info.put("time_index", stats.getPrimaries().getIndexing().getTotal().getIndexTime().getSeconds());
+        info.put("time_query", stats.getPrimaries().getSearch().getTotal().getQueryTime().getSeconds());
+        info.put("time_fetch", stats.getPrimaries().getSearch().getTotal().getFetchTime().getSeconds());
         info.put("time_get", stats.getPrimaries().getGet().getTime().getSeconds());
         info.put("shards", getShardInformation(stats));
         
@@ -98,7 +98,7 @@ public class DeflectorInformation {
     
     private List<Map<String, Object>> getShardInformation(IndexStats stats) {
         List<Map<String, Object>> shards = Lists.newArrayList();
-        for(Map.Entry<Integer, IndexShardStats> s : stats.indexShards().entrySet()) {
+        for(Map.Entry<Integer, IndexShardStats> s : stats.getIndexShards().entrySet()) {
             Iterator<ShardStats> iter = s.getValue().iterator();
             while (iter.hasNext()) {
                 ShardStats ss = iter.next();
