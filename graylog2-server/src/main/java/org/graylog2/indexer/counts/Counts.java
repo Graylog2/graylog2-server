@@ -20,6 +20,7 @@
 
 package org.graylog2.indexer.counts;
 
+import org.elasticsearch.action.count.CountRequest;
 import org.elasticsearch.action.search.SearchRequestBuilder;
 import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.client.Client;
@@ -47,8 +48,12 @@ public class Counts {
 		this.server = server;
 		this.c = client;
 	}
+
+    public long total() {
+        return c.count(new CountRequest(server.getDeflector().getAllDeflectorIndexNames())).actionGet().getCount();
+    }
 	
-	public DateHistogramResult totalCount(Indexer.DateHistogramInterval interval, int timerange) {
+	public DateHistogramResult histogram(Indexer.DateHistogramInterval interval, int timerange) {
 		String from = Tools.buildElasticSearchTimeFormat(Tools.getUTCTimestamp()-timerange);
 		FilterBuilder timestampFilter = FilterBuilders.rangeFilter("timestamp").from(from);
 		

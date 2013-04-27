@@ -34,9 +34,9 @@ public class ResultMessage {
 	 * I suppress all the warnings because Eclipse doesn't know shit
 	 * about JSON POJO serialization.
 	 */
-	@SuppressWarnings("unused") private Map<String, Object> message;
-	@SuppressWarnings("unused") private String index;
-	@SuppressWarnings("unused") private String nodeId;
+	@SuppressWarnings("unused") public Map<String, Object> message;
+	@SuppressWarnings("unused") public String index;
+	@SuppressWarnings("unused") public String nodeId;
 
 	protected ResultMessage() { /* use factory method */}
 	

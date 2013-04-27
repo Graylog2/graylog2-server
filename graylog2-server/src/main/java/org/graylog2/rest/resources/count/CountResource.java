@@ -50,18 +50,43 @@ public class CountResource {
     private final ObjectMapper objectMapper = new ObjectMapper();
 	
     @Context ResourceConfig rc;
-	
+
     @GET @Path("/total")
+    @Produces(MediaType.APPLICATION_JSON)
+    public String histogram(@QueryParam("pretty") boolean prettyPrint) {
+        Core core = (Core) rc.getProperty("core");
+
+        Map<String, Long> result = Maps.newHashMap();
+        result.put("events", core.getIndexer().counts().total());
+
+        try {
+            if (prettyPrint) {
+                return objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(result);
+            } else {
+                return objectMapper.writeValueAsString(result);
+            }
+        } catch (JsonProcessingException e) {
+            LOG.error("Error while generating JSON", e);
+            throw new WebApplicationException(e, Response.Status.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    @GET @Path("/histogram")
     @Produces(MediaType.APPLICATION_JSON)
     public String histogram(@QueryParam("interval") String interval, @QueryParam("timerange") int timerange, @QueryParam("pretty") boolean prettyPrint) {
         Core core = (Core) rc.getProperty("core");
-        interval = interval.toUpperCase();
+
+        if (interval == null || interval.isEmpty()) {
+            LOG.error("Missing parameters. Returning HTTP 400.");
+            throw new WebApplicationException(400);
+        }
 
         if (timerange <= 0) {
         	LOG.error("Invalid timerange. Returning HTTP 400.");
         	throw new WebApplicationException(400);
         }
-        
+
+        interval = interval.toUpperCase();
         try {
         	Indexer.DateHistogramInterval.valueOf(interval);
         } catch (IllegalArgumentException e) {
@@ -69,7 +94,7 @@ public class CountResource {
         	throw new WebApplicationException(400);
         }
         
-        DateHistogramResult dhr = core.getIndexer().counts().totalCount(Indexer.DateHistogramInterval.valueOf(interval), timerange);
+        DateHistogramResult dhr = core.getIndexer().counts().histogram(Indexer.DateHistogramInterval.valueOf(interval), timerange);
 
         // TODO: Replace with Jackson JAX-RS provider and proper data binding
         Map<String, Object> result = Maps.newHashMap();
