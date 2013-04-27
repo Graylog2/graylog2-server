@@ -1,6 +1,6 @@
 $(document).ready(function() {
 
-	// Sidebar graph. (total message counts)
+	// Sidebar graph. (histogram message counts)
 	if (document.querySelector("#sidebar-graph") != null) {
 		var sidebarGraph = new Rickshaw.Graph.Ajax({
 			element: document.querySelector("#sidebar-graph"),
@@ -9,7 +9,7 @@ $(document).ready(function() {
 			renderer: 'bar',
 			interpolation: 'linear',
 			stroke: true,
-			dataURL: '/a/messagecounts/total?timerange=' + 2*60*60, // last two hours
+			dataURL: '/a/messagecounts/histogram?timerange=' + 2*60*60, // last two hours
 			onData: function(d) { return transformData(d) },
 			onError: function(d) {
 				error = "<span class='alert alert-error'><i class='icon-warning-sign'></i> Could not load graph</span>";

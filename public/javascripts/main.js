@@ -84,6 +84,24 @@ $(document).ready(function() {
 		}
 	});
 
+    // Updating total event counts;
+
+    (function updateTotalEvents() {
+        $.ajax({
+            url: '/a/messagecounts/total',
+            success: function(data) {
+                $(".total-events").html(data.events);
+            },
+            error: function() {
+                $(".total-events").html("?");
+            },
+            complete: function() {
+                setTimeout(updateTotalEvents, 2500);
+            }
+        });
+    })();
+
+
 	function displayFailureInSidebar(message) {
 		x = "<span class='alert alert-error sidebar-alert'><i class='icon-warning-sign'></i> " + message + "</span>"
 		$("#sidebar-inner").html(x);

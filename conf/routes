@@ -19,8 +19,9 @@ GET		/messages/:index/:id/partial	controllers.MessagesController.asPartial(index
 # Streams
 GET		/streams						controllers.StreamsController.index()
 
-# API: Message counts
-GET		/a/messagecounts/total			controllers.MessageCountsController.total(timerange ?= "")
+# API: Message counts and histograms
+GET		/a/messagecounts/histogram		controllers.MessageCountsController.histogram(timerange ?= "")
+GET		/a/messagecounts/total  		controllers.MessageCountsController.total()
 
 # API: Message analyzing
 GET		/a/analyze/:index/:id/:field	controllers.MessagesController.analyze(index: String, id: String, field: String)

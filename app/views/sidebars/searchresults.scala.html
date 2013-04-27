@@ -9,6 +9,7 @@
 	Found @searchResult.getTotalResultCount() messages in @searchResult.getTookMs()ms.
 </p>
 
+@if(searchResult.getTotalResultCount() > 0) {
 <h3>Select fields</h3>
 <ul class="search-result-fields">
 	@for(f <- searchResult.getFields()) {
@@ -28,3 +29,4 @@
 <br />
 <h3>Analyze field</h3>
 ... tba ...
+}

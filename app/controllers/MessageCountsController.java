@@ -9,13 +9,31 @@ import com.google.common.collect.Maps;
 import com.google.gson.Gson;
 
 import lib.APIException;
-import models.MessageCount;
+import models.MessageCountHistogram;
 import models.api.results.DateHistogramResult;
+import models.MessageCount;
+import models.api.results.MessageCountResult;
 import play.mvc.*;
 
 public class MessageCountsController extends AuthenticatedController {
 
-	public static Result total(String timerange) {
+    public static Result total() {
+        try {
+            MessageCount count = new MessageCount();
+            MessageCountResult countResult = count.total();
+
+            Map<String, Integer> result = Maps.newHashMap();
+            result.put("events", countResult.getEventsCount());
+
+            return ok(new Gson().toJson(result)).as("application/json");
+        } catch (IOException e) {
+            return internalServerError("io exception");
+        } catch (APIException e) {
+            return internalServerError("api exception " + e);
+        }
+    }
+
+	public static Result histogram(String timerange) {
     	int range;
     	try {
     		range = Integer.parseInt(timerange);
@@ -24,8 +42,8 @@ public class MessageCountsController extends AuthenticatedController {
     	}
 		
 		try {
-			MessageCount count = new MessageCount("minute", range);
-			DateHistogramResult histogramResult = count.total();
+			MessageCountHistogram count = new MessageCountHistogram("minute", range);
+			DateHistogramResult histogramResult = count.histogram();
 			
 			List<Map<String, Object>> lines = Lists.newArrayList();
 			Map<String, Object> r = Maps.newTreeMap();
@@ -37,9 +55,9 @@ public class MessageCountsController extends AuthenticatedController {
 			
 			return ok(new Gson().toJson(lines)).as("application/json");
 		} catch (IOException e) {
-			return ok("io exception");
+			return internalServerError("io exception");
 		} catch (APIException e) {
-			return ok("api exception" + e);
+			return internalServerError("api exception " + e);
 		}
 	}
 	

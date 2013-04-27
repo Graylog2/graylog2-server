@@ -215,3 +215,7 @@ h3 {
 .terms-msg-modal .modal-body .as-list li {
 	float: none !important;
 }
+
+.support-sources ul {
+    margin-top: 5px;
+}

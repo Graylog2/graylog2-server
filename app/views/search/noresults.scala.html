@@ -1,0 +1,16 @@
+@(currentUser: User, query: String)
+
+@main("Search results", sidebars.standard(currentUser), query, currentUser) {
+    <h1>
+        <i class="icon-search icon-large"></i>
+        Nothing found
+    </h1>
+
+    <p>
+        Your search returned no results. Take a look at the
+        <a href="http://support.torch.sh/help/kb/graylog2-web-interface/message-search-syntax" target="_blank">documentation</a>
+        if you need help with the search syntax.
+    </p>
+
+    @partials.support_sources()
+}

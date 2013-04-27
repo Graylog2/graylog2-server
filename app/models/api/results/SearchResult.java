@@ -45,10 +45,12 @@ public class SearchResult {
 	
 	private List<Field> buildFields(List<String> sFields) {
 		List<Field> fields = Lists.newArrayList();
-		
-		for (String field : sFields) {
-			fields.add(new Field(field));
-		}
+
+        if (sFields != null) {
+            for (String field : sFields) {
+                fields.add(new Field(field));
+            }
+        }
 		
 		return fields;
 	}

@@ -12,6 +12,11 @@ public class SessionsController extends Controller {
 	final static Form<LoginRequest> userForm = form(LoginRequest.class);
 	
 	public static Result index() {
+        // Redirect if already logged in.
+        if (session("username") != null && !session("username").isEmpty()) {
+           return redirect("/");
+        }
+
 		return ok(views.html.sessions.login.render(userForm));
 	}
 	

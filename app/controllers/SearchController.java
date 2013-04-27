@@ -35,7 +35,11 @@ public class SearchController extends AuthenticatedController {
 			SearchResult searchResult = search.search();
 			DateHistogramResult histogramResult = search.dateHistogram(interval);
 
-			return ok(views.html.search.results.render(currentUser(), searchResult, histogramResult, q));
+            if (searchResult.getTotalResultCount() > 0) {
+			    return ok(views.html.search.results.render(currentUser(), searchResult, histogramResult, q));
+            } else {
+                return ok(views.html.search.noresults.render(currentUser(), q));
+            }
 		} catch (IOException e) {
 			return status(504, views.html.errors.error.render(Api.ERROR_MSG_IO, e, request()));
 		} catch (APIException e) {
