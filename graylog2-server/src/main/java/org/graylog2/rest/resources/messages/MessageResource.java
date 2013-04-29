@@ -29,6 +29,7 @@ import org.elasticsearch.indices.IndexMissingException;
 import org.graylog2.Core;
 import org.graylog2.indexer.messages.DocumentNotFoundException;
 import org.graylog2.indexer.results.ResultMessage;
+import org.graylog2.rest.RestResource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -41,16 +42,8 @@ import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 
-import org.elasticsearch.indices.IndexMissingException;
-import org.graylog2.Core;
-import org.graylog2.indexer.messages.DocumentNotFoundException;
-import org.graylog2.indexer.results.ResultMessage;
-import org.graylog2.rest.RestResource;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import com.google.common.collect.Maps;
-import com.sun.jersey.api.core.ResourceConfig;
 import javax.ws.rs.core.Response;
 
 /**
@@ -85,7 +78,16 @@ public class MessageResource extends RestResource {
         	throw new WebApplicationException(404);
 		}
 
-        return json(m, prettyPrint);
+        try {
+            if (prettyPrint) {
+                return objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(m);
+            } else {
+                return objectMapper.writeValueAsString(m);
+            }
+        } catch (JsonProcessingException e) {
+            LOG.error("Error while generating JSON", e);
+            throw new WebApplicationException(e, Response.Status.INTERNAL_SERVER_ERROR);
+        }
     }
     
     @GET @Path("/analyze")
@@ -109,13 +111,11 @@ public class MessageResource extends RestResource {
         Map<String, Object> result = Maps.newHashMap();
         result.put("tokens", tokens);
 
-        return json(result, prettyPrint);
-
         try {
             if (prettyPrint) {
-                return objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(m);
+                return objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(result);
             } else {
-                return objectMapper.writeValueAsString(m);
+                return objectMapper.writeValueAsString(result);
             }
         } catch (JsonProcessingException e) {
             LOG.error("Error while generating JSON", e);

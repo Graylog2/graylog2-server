@@ -26,9 +26,6 @@ import org.bson.types.ObjectId;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
-
 /**
  * @author Lennart Koopmann <lennart@torch.sh>
  */
@@ -46,19 +43,4 @@ public class RestResource {
         	throw new WebApplicationException(400);
 		}
 	}
-	
-	protected String json(Object x) {
-		return json(x, false);
-	}
-	
-	protected String json(Object x, boolean prettyPrint) {
-		Gson gson = new Gson();
-		
-        if (prettyPrint) {
-            gson = new GsonBuilder().setPrettyPrinting().create();
-        }
-        
-        return gson.toJson(x);
-	}
-	
 }
