@@ -27,7 +27,7 @@
 
     <properties>
         <metrics.version>2.2.0</metrics.version>
-        <jackson.version>2.1.4</jackson.version>
+        <jackson.version>2.2.0</jackson.version>
         <mainClass>org.graylog2.Main</mainClass>
     </properties>
 
