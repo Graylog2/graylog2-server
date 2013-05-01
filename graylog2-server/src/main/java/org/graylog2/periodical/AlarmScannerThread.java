@@ -19,7 +19,7 @@
  */
 package org.graylog2.periodical;
 
-import org.elasticsearch.common.collect.Maps;
+import com.google.common.collect.Maps;
 import org.graylog2.Core;
 import org.graylog2.SystemSettingAccessor;
 import org.graylog2.plugin.Tools;

@@ -29,7 +29,7 @@ import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
 import org.bson.types.ObjectId;
-import org.elasticsearch.common.collect.Maps;
+import com.google.common.collect.Maps;
 import org.graylog2.Core;
 import org.graylog2.buffers.MessageEvent;
 import org.graylog2.outputs.OutputRouter;

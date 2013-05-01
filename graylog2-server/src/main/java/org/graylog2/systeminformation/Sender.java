@@ -27,7 +27,7 @@ import org.apache.http.client.entity.UrlEncodedFormEntity;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.message.BasicNameValuePair;
-import org.elasticsearch.common.collect.Lists;
+import com.google.common.collect.Lists;
 import org.graylog2.Core;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
