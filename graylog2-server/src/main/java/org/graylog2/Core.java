@@ -28,6 +28,9 @@ import java.net.URI;
 import java.util.List;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
+
+import org.joda.time.DateTime;
+import org.joda.time.DateTimeZone;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.graylog2.blacklists.BlacklistCache;
@@ -140,10 +143,10 @@ public class Core implements GraylogServer {
     private boolean localMode = false;
     private boolean statsMode = false;
     
-    private int startedAt;
+    private DateTime startedAt;
 
     public void initialize(Configuration configuration) {
-    	startedAt = Tools.getUTCTimestamp();
+    	startedAt = new DateTime(DateTimeZone.UTC);
         serverId = Tools.generateServerId();
         
         this.configuration = configuration; // TODO use dependency injection
@@ -538,7 +541,7 @@ public class Core implements GraylogServer {
         return outputCache;
     }
     
-    public int getStartedAt() {
+    public DateTime getStartedAt() {
     	return startedAt;
     }
     

@@ -25,6 +25,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.Maps;
 import com.sun.jersey.api.core.ResourceConfig;
 import org.graylog2.Core;
+import org.joda.time.format.DateTimeFormatter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -65,7 +66,7 @@ public class SystemResource extends RestResource {
         result.put("codename", Core.GRAYLOG2_CODENAME);
         result.put("server_id", core.getServerId());
        	result.put("version", Core.GRAYLOG2_VERSION);
-        result.put("started_at", core.getStartedAt());
+        result.put("started_at", core.getStartedAt().toString());
 
         return json(result, prettyPrint);
     }

@@ -20,6 +20,8 @@
 package org.graylog2.database.validators;
 
 import static org.junit.Assert.*;
+
+import org.joda.time.DateTimeZone;
 import org.junit.Test;
 
 /**
@@ -34,6 +36,12 @@ public class DateValidatorTest {
         assertFalse(v.validate(null));
         assertFalse(v.validate(9001));
         assertFalse(v.validate(""));
-        assertTrue(v.validate(new java.util.Date()));
+        assertFalse(v.validate(new java.util.Date()));
+
+        // Only joda datetime.
+        assertTrue(v.validate(new org.joda.time.DateTime(DateTimeZone.UTC)));
+
+        // Only accepts UTC.
+        assertFalse(v.validate(new org.joda.time.DateTime(DateTimeZone.forID("+09:00"))));
     }
 }

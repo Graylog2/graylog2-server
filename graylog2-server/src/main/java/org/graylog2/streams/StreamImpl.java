@@ -57,11 +57,11 @@ public class StreamImpl extends Persisted implements Stream, Persistable {
 
     private static final String COLLECTION = "streams";
 
-    public StreamImpl(Map<String, Object> fields, Core core) throws ValidationException {
+    public StreamImpl(Map<String, Object> fields, Core core) {
     	super(COLLECTION, core, fields, validations());
     }
 
-    protected StreamImpl(ObjectId id, Map<String, Object> fields, Core core) throws ValidationException {
+    protected StreamImpl(ObjectId id, Map<String, Object> fields, Core core) {
     	super(COLLECTION, core, id, fields, validations());
     }
     
@@ -73,12 +73,7 @@ public class StreamImpl extends Persisted implements Stream, Persistable {
     		throw new NotFoundException();
     	}
 
-        try {
-    	    return new StreamImpl((ObjectId) o.get("_id"), o.toMap(), core);
-        } catch (ValidationException e) {
-            throw new RuntimeException("An object loaded from DB (" + id.toStringMongod() + ") is not passing " +
-                    "validations. This should never happen.", e);
-        }
+    	return new StreamImpl((ObjectId) o.get("_id"), o.toMap(), core);
     }
     
     public static List<Stream> loadAllEnabled(Core core) {
@@ -99,14 +94,7 @@ public class StreamImpl extends Persisted implements Stream, Persistable {
         
         List<DBObject> results = query(query, core, COLLECTION);
         for (DBObject o : results) {
-            ObjectId id = (ObjectId) o.get("_id");
-
-            try {
-        	    streams.add(new StreamImpl(id, o.toMap(), core));
-            } catch (ValidationException e) {
-                LOG.error("An object loaded from DB (" + id.toStringMongod() + ") is not passing " +
-                        "validations. This should never happen.", e);
-            }
+            streams.add(new StreamImpl((ObjectId) o.get("_id"), o.toMap(), core));
         }
 
     	return streams;

@@ -21,7 +21,6 @@
 package org.graylog2.rest.resources.streams;
 
 import java.io.IOException;
-import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
@@ -45,10 +44,13 @@ import org.bson.types.ObjectId;
 import org.graylog2.Core;
 import org.graylog2.database.NotFoundException;
 import org.graylog2.database.ValidationException;
+import org.graylog2.plugin.Tools;
 import org.graylog2.plugin.streams.Stream;
 import org.graylog2.rest.RestResource;
 import org.graylog2.rest.resources.streams.requests.CreateRequest;
 import org.graylog2.streams.StreamImpl;
+import org.joda.time.DateTime;
+import org.joda.time.DateTimeZone;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -88,17 +90,16 @@ public class StreamResource extends RestResource {
         Map<String, Object> streamData = Maps.newHashMap();
         streamData.put("title", cr.title);
         streamData.put("creator_user_id", cr.creator_user_id);
-        streamData.put("created_at", new Date());
+        streamData.put("created_at", new DateTime(DateTimeZone.UTC));
 
-        StreamImpl stream;
+        StreamImpl stream = new StreamImpl(streamData, core);
+        ObjectId id;
         try {
-            stream = new StreamImpl(streamData, core);
+            id = stream.save();
         } catch (ValidationException e) {
             LOG.error("Validation error.", e);
             throw new WebApplicationException(e, Status.BAD_REQUEST);
         }
-
-        ObjectId id = stream.save();
 
         Map<String, Object> result = Maps.newHashMap();
         result.put("stream_id", id.toStringMongod());
