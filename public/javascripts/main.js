@@ -50,6 +50,7 @@ $(document).ready(function() {
 				list_link.bind("click", function() {
 					list.addClass("as-list");
 					$(this).hide();
+                    return false;
 				});
 			});
 		})
