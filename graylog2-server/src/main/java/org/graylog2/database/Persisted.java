@@ -32,32 +32,45 @@ import com.mongodb.DBCollection;
 import com.mongodb.DBCursor;
 import com.mongodb.DBObject;
 import com.mongodb.WriteResult;
+import org.graylog2.database.validators.Validator;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * @author Lennart Koopmann <lennart@torch.sh>
  */
 public class Persisted {
-	
-	protected final Map<String, Object> fields;
+
+    private static final Logger LOG = LoggerFactory.getLogger(Persisted.class);
+
+    protected final Map<String, Object> fields;
     protected final ObjectId id;
     
     protected final Core core;
     protected final String collectionName;
     
-	protected Persisted(String collectionName, Core core, Map<String, Object> fields) {
-		this.id = new ObjectId();
+	protected Persisted(String collectionName, Core core, Map<String, Object> fields, Map<String, Validator> validations) throws ValidationException {
+        this.id = new ObjectId();
 		this.fields = fields;
 		
 		this.collectionName = collectionName;
 		this.core = core;
+
+        if(!validate(validations, fields)) {
+            throw new ValidationException();
+        }
 	}
 
-	protected Persisted(String collectionName, Core core, ObjectId id, Map<String, Object> fields) {
+	protected Persisted(String collectionName, Core core, ObjectId id, Map<String, Object> fields,  Map<String, Validator> validations) throws ValidationException {
 		this.id = id;
 		this.fields = fields;
 		
 		this.collectionName = collectionName;
 		this.core = core;
+
+        if(!validate(validations, fields)) {
+            throw new ValidationException();
+        }
 	}
 	
 	protected static DBObject get(ObjectId id, Core core, String collectionName) {
@@ -105,5 +118,27 @@ public class Persisted {
 	protected static DBCollection collection(Core core, String collectionName) {
 		return core.getMongoConnection().getDatabase().getCollection(collectionName);
 	}
+
+    private boolean validate(Map<String, Validator> validations, Map<String, Object> fields) {
+        if (validations == null || validations.isEmpty()) {
+            return true;
+        }
+
+        for(Map.Entry<String, Validator> validation : validations.entrySet()) {
+            Validator v = validation.getValue();
+            String field = validation.getKey();
+
+            try {
+                if (!v.validate(fields.get(field))) {
+                    return false;
+                }
+            } catch(Exception e) {
+                LOG.error("Error while trying to validate <{}>. Marking as invalid.", field, e);
+                return false;
+            }
+        }
+
+        return true;
+    }
 
 }

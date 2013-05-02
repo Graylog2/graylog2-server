@@ -1,12 +1,10 @@
 package org.graylog2.rest.resources.streams.requests;
 
-import com.google.gson.annotations.SerializedName;
+import com.fasterxml.jackson.core.io.SerializedString;
 
 public class CreateRequest {
 
 	public String title;
-	
-	@SerializedName("creator_user_id")
-	public String creatorUserId;
+    public String creator_user_id;
 	
 }

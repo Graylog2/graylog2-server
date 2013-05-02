@@ -27,9 +27,10 @@ import java.util.Set;
 
 import org.bson.types.ObjectId;
 import org.graylog2.Core;
-import org.graylog2.database.NotFoundException;
-import org.graylog2.database.Persistable;
-import org.graylog2.database.Persisted;
+import org.graylog2.database.*;
+import org.graylog2.database.validators.DateValidator;
+import org.graylog2.database.validators.FilledStringValidator;
+import org.graylog2.database.validators.Validator;
 import org.graylog2.plugin.GraylogServer;
 import org.graylog2.plugin.alarms.AlarmReceiver;
 import org.graylog2.plugin.streams.Stream;
@@ -40,6 +41,8 @@ import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import com.mongodb.BasicDBObject;
 import com.mongodb.DBObject;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Representing a single stream from the streams collection. Also provides method
@@ -49,14 +52,17 @@ import com.mongodb.DBObject;
  */
 public class StreamImpl extends Persisted implements Stream, Persistable {
 
+    private static final Logger LOG = LoggerFactory.getLogger(StreamImpl.class);
+
+
     private static final String COLLECTION = "streams";
-    
-    public StreamImpl(Map<String, Object> fields, Core core) {
-    	super(COLLECTION, core, fields);
+
+    public StreamImpl(Map<String, Object> fields, Core core) throws ValidationException {
+    	super(COLLECTION, core, fields, validations());
     }
 
-    protected StreamImpl(ObjectId id, Map<String, Object> fields, Core core) {
-    	super(COLLECTION, core, id, fields);
+    protected StreamImpl(ObjectId id, Map<String, Object> fields, Core core) throws ValidationException {
+    	super(COLLECTION, core, id, fields, validations());
     }
     
     @SuppressWarnings("unchecked")
@@ -66,8 +72,13 @@ public class StreamImpl extends Persisted implements Stream, Persistable {
     	if (o == null) {
     		throw new NotFoundException();
     	}
-    	
-    	return new StreamImpl((ObjectId) o.get("_id"), o.toMap(), core);
+
+        try {
+    	    return new StreamImpl((ObjectId) o.get("_id"), o.toMap(), core);
+        } catch (ValidationException e) {
+            throw new RuntimeException("An object loaded from DB (" + id.toStringMongod() + ") is not passing " +
+                    "validations. This should never happen.", e);
+        }
     }
     
     public static List<Stream> loadAllEnabled(Core core) {
@@ -88,18 +99,19 @@ public class StreamImpl extends Persisted implements Stream, Persistable {
         
         List<DBObject> results = query(query, core, COLLECTION);
         for (DBObject o : results) {
-        	streams.add(new StreamImpl((ObjectId) o.get("_id"), o.toMap(), core));
+            ObjectId id = (ObjectId) o.get("_id");
+
+            try {
+        	    streams.add(new StreamImpl(id, o.toMap(), core));
+            } catch (ValidationException e) {
+                LOG.error("An object loaded from DB (" + id.toStringMongod() + ") is not passing " +
+                        "validations. This should never happen.", e);
+            }
         }
 
     	return streams;
     }
-    
-    
-    
-    
-    
-    
-    
+
     public Set<Map<String, String>> getOutputConfigurations(String className) {
     	return null;
     }
@@ -164,7 +176,7 @@ public class StreamImpl extends Persisted implements Stream, Persistable {
 		return this.id;
 	}
 
-	@Override
+    @Override
 	public String getTitle() {
 		return (String) fields.get("title");
 	}
@@ -181,5 +193,13 @@ public class StreamImpl extends Persisted implements Stream, Persistable {
 		
 		return result;
 	}
+
+    private static Map<String, Validator> validations() {
+        return new HashMap<String, Validator>() {{
+            put("title", new FilledStringValidator());
+            put("creator_user_id", new FilledStringValidator());
+            put("created_at", new DateValidator());
+        }};
+    }
 
 }
