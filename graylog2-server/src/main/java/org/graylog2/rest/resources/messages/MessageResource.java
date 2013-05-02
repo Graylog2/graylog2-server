@@ -78,16 +78,7 @@ public class MessageResource extends RestResource {
         	throw new WebApplicationException(404);
 		}
 
-        try {
-            if (prettyPrint) {
-                return objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(m);
-            } else {
-                return objectMapper.writeValueAsString(m);
-            }
-        } catch (JsonProcessingException e) {
-            LOG.error("Error while generating JSON", e);
-            throw new WebApplicationException(e, Response.Status.INTERNAL_SERVER_ERROR);
-        }
+        return json(m, prettyPrint);
     }
     
     @GET @Path("/analyze")
@@ -111,15 +102,6 @@ public class MessageResource extends RestResource {
         Map<String, Object> result = Maps.newHashMap();
         result.put("tokens", tokens);
 
-        try {
-            if (prettyPrint) {
-                return objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(result);
-            } else {
-                return objectMapper.writeValueAsString(result);
-            }
-        } catch (JsonProcessingException e) {
-            LOG.error("Error while generating JSON", e);
-            throw new WebApplicationException(e, Response.Status.INTERNAL_SERVER_ERROR);
-        }
+        return json(result, prettyPrint);
     }
 }

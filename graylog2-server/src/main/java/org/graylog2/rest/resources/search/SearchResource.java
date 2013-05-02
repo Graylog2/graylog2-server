@@ -82,16 +82,7 @@ public class SearchResource extends RestResource {
         result.put("time", sr.took().millis());
         result.put("total_results", sr.getTotalResults());
 
-        try {
-            if (prettyPrint) {
-                return objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(result);
-            } else {
-                return objectMapper.writeValueAsString(result);
-            }
-        } catch (JsonProcessingException e) {
-            LOG.error("Error while generating JSON", e);
-            throw new WebApplicationException(e, Response.Status.INTERNAL_SERVER_ERROR);
-        }
+        return json(result, prettyPrint);
     }
     
     @GET @Path("/universal/histogram")
@@ -121,15 +112,6 @@ public class SearchResource extends RestResource {
         result.put("results", dhr.getResults());
         result.put("time", dhr.took().millis());
 
-        try {
-            if (prettyPrint) {
-                return objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(result);
-            } else {
-                return objectMapper.writeValueAsString(result);
-            }
-        } catch (JsonProcessingException e) {
-            LOG.error("Error while generating JSON", e);
-            throw new WebApplicationException(e, Response.Status.INTERNAL_SERVER_ERROR);
-        }
+        return json(result, prettyPrint);
     }
 }

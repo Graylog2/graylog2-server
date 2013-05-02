@@ -62,16 +62,7 @@ public class CountResource extends RestResource {
         Map<String, Long> result = Maps.newHashMap();
         result.put("events", core.getIndexer().counts().total());
 
-        try {
-            if (prettyPrint) {
-                return objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(result);
-            } else {
-                return objectMapper.writeValueAsString(result);
-            }
-        } catch (JsonProcessingException e) {
-            LOG.error("Error while generating JSON", e);
-            throw new WebApplicationException(e, Response.Status.INTERNAL_SERVER_ERROR);
-        }
+        return json(result, prettyPrint);
     }
 
     @GET @Path("/histogram")
@@ -106,15 +97,6 @@ public class CountResource extends RestResource {
         result.put("results", dhr.getResults());
         result.put("time", dhr.took().millis());
 
-        try {
-            if (prettyPrint) {
-                return objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(result);
-            } else {
-                return objectMapper.writeValueAsString(result);
-            }
-        } catch (JsonProcessingException e) {
-            LOG.error("Error while generating JSON", e);
-            throw new WebApplicationException(e, Response.Status.INTERNAL_SERVER_ERROR);
-        }
+        return json(result, prettyPrint);
     }
 }

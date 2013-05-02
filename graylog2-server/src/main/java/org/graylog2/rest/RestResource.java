@@ -21,7 +21,10 @@
 package org.graylog2.rest;
 
 import javax.ws.rs.WebApplicationException;
+import javax.ws.rs.core.Response;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.bson.types.ObjectId;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -33,6 +36,8 @@ public class RestResource {
 	
 	private static final Logger LOG = LoggerFactory.getLogger(RestResource.class);
 
+    protected final ObjectMapper objectMapper = new ObjectMapper();
+
 	protected RestResource() { /* */ }
 	
 	protected ObjectId loadObjectId(String id) {
@@ -43,4 +48,17 @@ public class RestResource {
         	throw new WebApplicationException(400);
 		}
 	}
+
+    protected String json(Object x, boolean prettyPrint) {
+        try {
+            if (prettyPrint) {
+                return objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(x);
+            } else {
+                return objectMapper.writeValueAsString(x);
+            }
+        } catch (JsonProcessingException e) {
+            LOG.error("Error while generating JSON", e);
+            throw new WebApplicationException(e, Response.Status.INTERNAL_SERVER_ERROR);
+        }
+    }
 }

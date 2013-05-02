@@ -67,15 +67,6 @@ public class SystemResource extends RestResource {
        	result.put("version", Core.GRAYLOG2_VERSION);
         result.put("started_at", core.getStartedAt());
 
-        try {
-            if (prettyPrint) {
-                return objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(result);
-            } else {
-                return objectMapper.writeValueAsString(result);
-            }
-        } catch (JsonProcessingException e) {
-            LOG.error("Error while generating JSON", e);
-            throw new WebApplicationException(e, Response.Status.INTERNAL_SERVER_ERROR);
-        }
+        return json(result, prettyPrint);
     }
 }
