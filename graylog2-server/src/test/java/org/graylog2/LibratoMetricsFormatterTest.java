@@ -75,9 +75,9 @@ public class LibratoMetricsFormatterTest {
 
         assertEquals("gl2-graylog2-server", gauges.get("gl2-total").get("source"));
         assertEquals((long) 2, gauges.get("gl2-total").get("value"));
-        assertEquals((long) 3, gauges.get("gl2-host-fooexampleorg").get("value"));
-        assertEquals((long) 1, gauges.get("gl2-host-barexampleorg").get("value"));
-        assertEquals((long) 2, gauges.get("gl2-stream-lolstream1").get("value"));
+        assertEquals((long) 3, gauges.get("gl2-host-foo-example-org").get("value"));
+        assertEquals((long) 1, gauges.get("gl2-host-bar-example-org").get("value"));
+        assertEquals((long) 2, gauges.get("gl2-stream-lol-stream1").get("value"));
         assertEquals((long) 1, gauges.get("gl2-stream-lolanotherstream").get("value"));
     }
 
@@ -137,8 +137,8 @@ public class LibratoMetricsFormatterTest {
 
         assertEquals("gl2-graylog2-server", gauges.get("gl2-total").get("source"));
         assertEquals((long) 2, gauges.get("gl2-total").get("value"));
-        assertEquals((long) 3, gauges.get("gl2-host-fooexampleorg").get("value"));
-        assertEquals((long) 1, gauges.get("gl2-host-barexampleorg").get("value"));
+        assertEquals((long) 3, gauges.get("gl2-host-foo-example-org").get("value"));
+        assertEquals((long) 1, gauges.get("gl2-host-bar-example-org").get("value"));
         assertEquals((long) 1, gauges.get("gl2-stream-noname-" + id2.toString()).get("value"));
     }
 

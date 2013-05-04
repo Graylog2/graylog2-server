@@ -25,15 +25,24 @@ import java.util.Map;
  * @author Lennart Koopmann <lennart@socketfeed.com>
  */
 public class MetricsFormatter {
-    
-    protected MetricsFormatter() { /* nananana */ }
-    
-    protected String buildStreamMetricName(String streamId, Map<String, String> streamNames) {
+
+    public String buildStreamMetricName(String streamId, Map<String, String> streamNames) {
         if (!streamNames.containsKey(streamId) || streamNames.get(streamId) == null || streamNames.get(streamId).isEmpty()) {
             return "noname-" + streamId;
         }
         
-        return streamNames.get(streamId).toLowerCase().replaceAll("[^a-zA-Z0-9]", "");
+        return streamNames.get(streamId).toLowerCase().replaceAll("[^a-zA-Z0-9\\-]", "");
+    }
+
+    public String buildHostMetricName(String hostname) {
+        if (hostname == null || hostname.isEmpty()) {
+            return "noname";
+        }
+
+        // First replace all dots with dashes.
+        hostname = hostname.replaceAll("\\.", "-");
+
+        return hostname.replaceAll("[^a-zA-Z0-9\\-]", "");
     }
     
 }

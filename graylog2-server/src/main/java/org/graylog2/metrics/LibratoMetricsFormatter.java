@@ -109,7 +109,7 @@ public class LibratoMetricsFormatter extends MetricsFormatter {
             Map<String, Object> h = Maps.newHashMap();
             h.put("value", host.getValue());
             h.put("source", source);
-            h.put("name", "gl2-host-" + Tools.decodeBase64(host.getKey()).replaceAll("[^a-zA-Z0-9]", ""));
+            h.put("name", "gl2-host-" + buildHostMetricName(Tools.decodeBase64(host.getKey())));
             gauges.add(h);
         }
 
