@@ -38,7 +38,7 @@ import javax.mail.Session;
 import javax.mail.internet.AddressException;
 import javax.mail.internet.InternetAddress;
 
-import org.elasticsearch.common.collect.Maps;
+import com.google.common.collect.Maps;
 
 /**
  * @author Lennart Koopmann <lennart@socketfeed.com>

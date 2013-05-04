@@ -1,10 +1,12 @@
 package org.graylog2.rest.resources.streams.requests;
 
-import com.fasterxml.jackson.core.io.SerializedString;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
 public class CreateRequest {
 
 	public String title;
-    public String creator_user_id;
-	
+
+	@JsonProperty("creator_user_id")
+	public String creatorUserId;
+
 }

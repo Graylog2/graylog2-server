@@ -21,7 +21,7 @@ package org.graylog2.plugins;
 
 import java.util.Map;
 
-import org.elasticsearch.common.collect.Maps;
+import com.google.common.collect.Maps;
 import org.graylog2.Core;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

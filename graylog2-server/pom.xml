@@ -27,8 +27,9 @@
 
     <properties>
         <metrics.version>2.2.0</metrics.version>
-        <jackson.version>2.1.4</jackson.version>
+        <jackson.version>2.2.0</jackson.version>
         <mainClass>org.graylog2.Main</mainClass>
+        <jersey.version>1.17.1</jersey.version>
     </properties>
 
     <dependencies>
@@ -45,7 +46,7 @@
         <dependency>
             <groupId>commons-codec</groupId>
             <artifactId>commons-codec</artifactId>
-            <version>1.7</version>
+            <version>1.8</version>
             <scope>test</scope>
         </dependency>
         <dependency>
@@ -108,7 +109,7 @@
         <dependency>
             <groupId>javax.mail</groupId>
             <artifactId>mail</artifactId>
-            <version>1.4.5</version>
+            <version>1.4.7</version>
         </dependency>
         <dependency>
             <groupId>org.igniterealtime.smack</groupId>
@@ -123,7 +124,7 @@
         <dependency>
             <groupId>io.netty</groupId>
             <artifactId>netty</artifactId>
-            <version>3.6.3.Final</version>
+            <version>3.6.5.Final</version>
         </dependency>
         <dependency>
             <groupId>com.librato.metrics</groupId>
@@ -148,12 +149,12 @@
         <dependency>
             <groupId>com.sun.jersey</groupId>
             <artifactId>jersey-grizzly2</artifactId>
-            <version>1.17.1</version>
+            <version>${jersey.version}</version>
         </dependency>
         <dependency>
             <groupId>com.sun.jersey</groupId>
             <artifactId>jersey-server</artifactId>
-            <version>1.17.1</version>
+            <version>${jersey.version}</version>
         </dependency>
     </dependencies>
 

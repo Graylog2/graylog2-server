@@ -23,7 +23,7 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
-import org.elasticsearch.common.collect.Maps;
+import com.google.common.collect.Maps;
 import org.graylog2.plugin.alarms.Alarm;
 import org.graylog2.plugin.alarms.AlarmReceiver;
 import org.graylog2.plugin.alarms.transports.Transport;

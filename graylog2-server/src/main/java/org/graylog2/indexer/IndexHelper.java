@@ -22,7 +22,7 @@ package org.graylog2.indexer;
 import com.google.common.collect.Sets;
 import java.util.List;
 import java.util.Set;
-import org.elasticsearch.common.collect.Lists;
+import com.google.common.collect.Lists;
 import org.elasticsearch.index.query.FilterBuilder;
 import org.elasticsearch.index.query.FilterBuilders;
 import org.graylog2.plugin.Tools;

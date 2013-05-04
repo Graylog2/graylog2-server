@@ -20,12 +20,12 @@
 
 package org.graylog2.indexer.results;
 
-import java.util.Map;
-
-import org.elasticsearch.common.collect.Maps;
+import com.google.common.collect.Maps;
 import org.elasticsearch.common.unit.TimeValue;
 import org.elasticsearch.search.facet.datehistogram.DateHistogramFacet;
 import org.graylog2.indexer.Indexer;
+
+import java.util.Map;
 
 /**
  * @author Lennart Koopmann <lennart@socketfeed.com>

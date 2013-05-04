@@ -20,43 +20,32 @@
 
 package org.graylog2.rest.resources.streams;
 
-import java.io.IOException;
-import java.util.List;
-import java.util.Map;
-
-import javax.ws.rs.DELETE;
-import javax.ws.rs.GET;
-import javax.ws.rs.POST;
-import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
-import javax.ws.rs.Produces;
-import javax.ws.rs.Consumes;
-import javax.ws.rs.QueryParam;
-import javax.ws.rs.WebApplicationException;
-import javax.ws.rs.core.Context;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response;
-import javax.ws.rs.core.Response.Status;
-
+import com.beust.jcommander.internal.Lists;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.common.collect.Maps;
+import com.sun.jersey.api.core.ResourceConfig;
 import org.bson.types.ObjectId;
 import org.graylog2.Core;
 import org.graylog2.database.NotFoundException;
-import org.graylog2.database.ValidationException;
-import org.graylog2.plugin.Tools;
 import org.graylog2.plugin.streams.Stream;
 import org.graylog2.rest.RestResource;
 import org.graylog2.rest.resources.streams.requests.CreateRequest;
 import org.graylog2.streams.StreamImpl;
-import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.beust.jcommander.internal.Lists;
-import com.google.common.collect.Maps;
-import com.sun.jersey.api.core.ResourceConfig;
+import org.graylog2.database.ValidationException;
+import org.joda.time.DateTime;
+
+import javax.ws.rs.*;
+import javax.ws.rs.core.Context;
+import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
+import java.io.IOException;
+import java.util.List;
+import java.util.Map;
 
 /**
  * @author Lennart Koopmann <lennart@torch.sh>
@@ -65,10 +54,13 @@ import com.sun.jersey.api.core.ResourceConfig;
 public class StreamResource extends RestResource {
 	private static final Logger LOG = LoggerFactory.getLogger(StreamResource.class);
 
-    @Context ResourceConfig rc;
+    private final ObjectMapper objectMapper = new ObjectMapper();
+
+    @Context
+    ResourceConfig rc;
 
     @POST @Path("/")
-    @Consumes(MediaType.APPLICATION_JSON) 
+    @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
     public Response create(String body, @QueryParam("pretty") boolean prettyPrint) {
         Core core = (Core) rc.getProperty("core");
@@ -83,13 +75,13 @@ public class StreamResource extends RestResource {
             cr = objectMapper.readValue(body, CreateRequest.class);
         } catch(IOException e) {
             LOG.error("Error while parsing JSON", e);
-            throw new WebApplicationException(e, Status.BAD_REQUEST);
+            throw new WebApplicationException(e, Response.Status.BAD_REQUEST);
         }
 
         // Create stream.
         Map<String, Object> streamData = Maps.newHashMap();
         streamData.put("title", cr.title);
-        streamData.put("creator_user_id", cr.creator_user_id);
+        streamData.put("creator_user_id", cr.creatorUserId);
         streamData.put("created_at", new DateTime(DateTimeZone.UTC));
 
         StreamImpl stream = new StreamImpl(streamData, core);
@@ -98,13 +90,13 @@ public class StreamResource extends RestResource {
             id = stream.save();
         } catch (ValidationException e) {
             LOG.error("Validation error.", e);
-            throw new WebApplicationException(e, Status.BAD_REQUEST);
+            throw new WebApplicationException(e, Response.Status.BAD_REQUEST);
         }
 
         Map<String, Object> result = Maps.newHashMap();
         result.put("stream_id", id.toStringMongod());
 
-        return Response.status(Status.CREATED).entity(json(result, prettyPrint)).build();
+        return Response.status(Response.Status.CREATED).entity(json(result, prettyPrint)).build();
     }
     
     @GET @Path("/")
@@ -121,7 +113,16 @@ public class StreamResource extends RestResource {
         result.put("total", streams.size());
         result.put("streams", streams);
 
-        return json(result, prettyPrint);
+        try {
+            if (prettyPrint) {
+                return objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(result);
+            } else {
+                return objectMapper.writeValueAsString(result);
+            }
+        } catch (JsonProcessingException e) {
+            LOG.error("Error while generating JSON", e);
+            throw new WebApplicationException(e, Response.Status.INTERNAL_SERVER_ERROR);
+        }
     }
     
     @GET @Path("/{streamId}")
@@ -160,6 +161,6 @@ public class StreamResource extends RestResource {
         	throw new WebApplicationException(404);
         }
         
-        return Response.status(Status.fromStatusCode(204)).build();
+        return Response.status(Response.Status.fromStatusCode(204)).build();
     }
 }
