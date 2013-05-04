@@ -54,7 +54,7 @@ public class AMQPConsumerTest {
 		final Channel channel = context.mock(Channel.class);
 		
 		context.checking(new Expectations() {{
-		    oneOf (channel).basicAck(deliveryTag, false);
+		    oneOf (channel).basicNack(deliveryTag, false, false);
 		}});
 		
 		Consumer consumer = _amqpConsumer.createConsumer(channel);
