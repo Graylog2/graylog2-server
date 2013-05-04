@@ -51,6 +51,10 @@ public class AMQPConsumerTest {
 		Mockery context = new Mockery();
 		final Channel channel = context.mock(Channel.class);
 
+		context.checking(new Expectations() {{
+		    oneOf (channel).basicNack(deliveryTag, false, false);
+		}});
+		
 		Consumer consumer = _amqpConsumer.createConsumer(channel);
 		consumer.handleDelivery("consumerTag", new Envelope(35l, true, "myexchange", "myroutingkey"), null, body);
 		context.assertIsSatisfied();
