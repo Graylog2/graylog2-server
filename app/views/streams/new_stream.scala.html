@@ -25,8 +25,8 @@
             <span class="area-title">Rules</span>
             You can change rules at any time later.
 
-            <ul class="stream-rules">
-                <li>No rules defined</li>
+            <ul id="stream-rules">
+                <li id="stream-rules-placeholder">No rules defined</li>
             </ul>
 
             <button class="btn btn-small" type="button" data-toggle="modal" data-target="#new-stream-rule">
@@ -51,25 +51,25 @@
         <div class="modal-body">
             <div class="span8">
                 <label>Field</label>
-                <input type="text" class="sr-input" data-reflect="#sr-result-field" placeholder="user_id">
+                <input type="text" id="sr-field" class="sr-input typeahead-fields" data-reflect="#sr-result-field" placeholder="user_id">
 
                 <label>Type</label>
-                <select name="category" class="sr-input" data-reflect="#sr-result-category" required="true">
+                <select name="category" id="sr-type" class="sr-input" data-reflect="#sr-result-category" required="true">
                     @for((id, rule) <- StreamRule.RULES) {
-                        <option id="@id" data-reflect-string="@rule.getSentenceRepresentation()">@rule.getName()</option>
+                        <option value="@id" data-reflect-string="@rule.getSentenceRepresentation()">@rule.getName()</option>
                     }
                 </select>
 
                 <label>Value</label>
-                <input type="text" class="sr-input" data-reflect="#sr-result-value" placeholder="19983">
+                <input type="text" id="sr-value" class="sr-input" data-reflect="#sr-result-value" placeholder="19983">
 
                 <label class="checkbox">
                     <input type="checkbox" id="sr-inverted"> Inverted
                 </label>
 
                 <p>
+                    <strong>Result:</strong>
                     <span id="sr-result">
-                        <strong>Result:</strong>
                         Field <em id="sr-result-field">user_id</em> must
                         <em id="sr-result-category">@StreamRule.RULES.get(1).getSentenceRepresentation</em>
                         <em id="sr-result-value">19983</em>
@@ -93,7 +93,7 @@
         </div>
         <div class="modal-footer">
             <button class="btn" data-dismiss="modal" aria-hidden="true">Close</button>
-            <button class="btn btn-primary">Add</button>
+            <button class="btn btn-primary" id="add-stream-rule">Add</button>
         </div>
     </div>
 }

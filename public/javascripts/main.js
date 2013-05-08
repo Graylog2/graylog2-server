@@ -110,31 +110,68 @@ $(document).ready(function() {
             s = $("option:selected", this);
             if (s != undefined && s.attr("data-reflect-string") != undefined && s.attr("data-reflect-string") != "") {
                 value = s.attr("data-reflect-string");
+
+                // Inverted?
+                if ($("#sr-inverted").is(':checked')) {
+                    value = "not " + value;
+                }
             }
         } else {
             value = $(this).attr("placeholder");
         }
 
-        // Inverted?
-        if ($("#sr-inverted").is(':checked')) {
-            value = "not " + value;
-        }
-
         $($(this).attr("data-reflect")).html(value);
     });
 
+    // Stream rules inverter.
     $("#sr-inverted").on("click", function() {
+console.log($(this).is(":checked"))
         old_val = $("#new-stream-rule #sr-result-category").html();
 
         if ($(this).is(":checked")) {
             // Add the not.
             new_val = "not " + old_val;
         } else {
+ console.log(old_val);
             // Remove the not.
-            new_val = old_val.substr("3");
+            if (old_val.substr(0,3) == "not") {
+                new_val = old_val.substr(3);
+            } else {
+                new_val = old_val;
+            }
         }
         $("#new-stream-rule #sr-result-category").html(new_val);
     })
+
+    // Add stream rule to stream rule list when saved.
+    $("#add-stream-rule").on("click", function() {
+        $("#stream-rules-placeholder").hide();
+
+        rule = {
+            field: $("#sr-field").val(),
+            type: parseInt($("#sr-type").val()),
+            value: $("#sr-value").val(),
+            inverted: $("#sr-inverted-box").is(":checked")
+        }
+
+        // Add hidden field that is transmitted in form.
+        field = "<input type='hidden' name='rules[]' value='" + JSON.stringify(rule) + "' />"
+        $("#new-stream").prepend(field);
+
+        // Add visible entry.
+        remover = "<a href='#'><i class='icon-remove'></i></a>";
+        $("#stream-rules").append("<li>" + $("#sr-result").html().replace(/<(?:.|\n)*?>/gm, '') + " " + remover + "</li>");
+
+        $("#new-stream-rule").modal("hide");
+    });
+
+    // Typeahead for message fields.
+    $.ajax({
+        url: '/a/system/fields',
+        success: function(data) {
+            $(".typeahead-fields").typeahead({ source: data.fields, items: 6 });
+        }
+    });
 
 	function displayFailureInSidebar(message) {
 		x = "<span class='alert alert-error sidebar-alert'><i class='icon-warning-sign'></i> " + message + "</span>"

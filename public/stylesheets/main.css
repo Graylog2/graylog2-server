@@ -229,7 +229,7 @@ form .area-title {
     line-height: 20px;
 }
 
-form .stream-rules {
+form #stream-rules {
     margin-top: 5px;
     margin-bottom: 5px;
     margin-left: 20px;

@@ -27,5 +27,8 @@ GET		/a/messagecounts/total  		controllers.MessageCountsController.total()
 # API: Message analyzing
 GET		/a/analyze/:index/:id/:field	controllers.MessagesController.analyze(index: String, id: String, field: String)
 
+# API: System/CORE
+GET		/a/system/fields                controllers.SystemController.fields()
+
 # Map static resources from the /public folder to the /assets URL path
 GET     /assets/*file               	controllers.Assets.at(path="/public", file)
