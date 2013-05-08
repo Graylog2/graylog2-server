@@ -2,7 +2,14 @@
 
 @main("Streams", null, "", currentUser) {
 
-@streams.getTotal()
-@streams.getStreams()
+    <a href="/streams/new" class="btn btn-primary btn-small pull-right">Create stream</a>
+
+    <h1>Streams</h1>
+    @streams.getTotal total
+
+    <br /><br />
+    @for(stream <- streams.getStreams) {
+       @stream<br />
+    }
 
 }
