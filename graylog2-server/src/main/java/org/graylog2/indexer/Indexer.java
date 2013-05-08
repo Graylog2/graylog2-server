@@ -1,6 +1,7 @@
 package org.graylog2.indexer;
 
 import com.beust.jcommander.internal.Maps;
+import com.beust.jcommander.internal.Sets;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.ImmutableMap;
@@ -28,6 +29,7 @@ import org.elasticsearch.action.index.IndexRequest.OpType;
 import org.elasticsearch.action.index.IndexRequestBuilder;
 import org.elasticsearch.action.support.replication.ReplicationType;
 import org.elasticsearch.client.Client;
+import org.elasticsearch.cluster.ClusterState;
 import org.elasticsearch.cluster.metadata.IndexMetaData;
 import org.elasticsearch.common.settings.loader.YamlSettingsLoader;
 import org.elasticsearch.common.xcontent.XContentType;
@@ -48,6 +50,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import static org.elasticsearch.index.query.QueryBuilders.rangeQuery;
 import static org.elasticsearch.node.NodeBuilder.nodeBuilder;
@@ -260,6 +263,25 @@ public class Indexer {
     
     public void deleteIndex(String indexName) {
         client.admin().indices().delete(new DeleteIndexRequest(indexName)).actionGet();
+    }
+
+    public Set<String> getAllMessageFields() {
+        Set<String> fields = Sets.newHashSet();
+
+        ClusterStateRequest csr = new ClusterStateRequest().filterBlocks(true).filterNodes(true);
+        ClusterState cs = client.admin().cluster().state(csr).actionGet().getState();
+        for (Map.Entry<String, IndexMetaData> d : cs.getMetaData().indices().entrySet()) {
+            try {
+                Map<String, Object> mapping = (Map<String, Object>) d.getValue().mapping(TYPE).getSourceAsMap().get("properties");
+
+                fields.addAll(mapping.keySet());
+            } catch(Exception e) {
+                LOG.error("Error while trying to get fields of <{}>", d.getKey(), e);
+                continue;
+            }
+        }
+
+        return fields;
     }
     
     public void runIndexRetention() throws NoTargetIndexException {

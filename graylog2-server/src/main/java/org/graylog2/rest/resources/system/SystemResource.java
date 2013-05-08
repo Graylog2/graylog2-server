@@ -20,10 +20,12 @@
 
 package org.graylog2.rest.resources.system;
 
+import com.beust.jcommander.internal.Lists;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.Maps;
 import com.sun.jersey.api.core.ResourceConfig;
+import org.elasticsearch.indices.IndexMissingException;
 import org.graylog2.Core;
 import org.joda.time.format.DateTimeFormatter;
 import org.slf4j.Logger;
@@ -43,7 +45,9 @@ import org.graylog2.rest.RestResource;
 import com.google.common.collect.Maps;
 import com.sun.jersey.api.core.ResourceConfig;
 import javax.ws.rs.core.Response;
+import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * @author Lennart Koopmann <lennart@torch.sh>
@@ -67,6 +71,17 @@ public class SystemResource extends RestResource {
         result.put("server_id", core.getServerId());
        	result.put("version", Core.GRAYLOG2_VERSION);
         result.put("started_at", core.getStartedAt().toString());
+
+        return json(result, prettyPrint);
+    }
+
+    @GET @Path("/fields")
+    @Produces(MediaType.APPLICATION_JSON)
+    public String analyze(@QueryParam("pretty") boolean prettyPrint) {
+        Core core = (Core) rc.getProperty("core");
+
+        Map<String, Object> result = Maps.newHashMap();
+        result.put("fields", core.getIndexer().getAllMessageFields());
 
         return json(result, prettyPrint);
     }

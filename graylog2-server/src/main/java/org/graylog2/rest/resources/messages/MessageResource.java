@@ -104,4 +104,5 @@ public class MessageResource extends RestResource {
 
         return json(result, prettyPrint);
     }
+
 }
