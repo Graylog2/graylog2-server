@@ -1,0 +1,99 @@
+@(currentUser: User)
+
+@main("Create new stream", null, "", currentUser) {
+    <h1>
+        <i class="icon-pushpin"></i>
+        Create stream
+    </h1>
+
+    <p>
+        Streams allow you to tag your data when it arrives. Create a stream called <em>SSH logins</em> and add rules that
+        match every message notifying about a SSH login. You will get quick access to all login messages, charts and
+        analysis of logins and can even define actions to trigger when a login was performed.
+    </p>
+
+    <form id="new-stream">
+        <fieldset>
+            <label>Title</label>
+            <input name="title" required="true" type="text" class="input-xlarge" placeholder="A descriptive name of the new stream">
+
+            <label>Category</label>
+            <select name="category" required="true">
+                <option id="0">None</option>
+            </select>
+
+            <span class="area-title">Rules</span>
+            You can change rules at any time later.
+
+            <ul class="stream-rules">
+                <li>No rules defined</li>
+            </ul>
+
+            <button class="btn btn-small" type="button" data-toggle="modal" data-target="#new-stream-rule">
+                Add rule
+            </button>
+            <br /><br />
+
+            <p>
+                <button type="submit" class="btn btn-primary">Create stream</button>
+            </p>
+        </fieldset>
+    </form>
+
+    <div id="new-stream-rule" class="modal hide fade">
+        <div class="modal-header">
+            <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+            <h2>
+                <i class="icon-signin"></i>
+                Add stream rule
+            </h2>
+        </div>
+        <div class="modal-body">
+            <div class="span8">
+                <label>Field</label>
+                <input type="text" class="sr-input" data-reflect="#sr-result-field" placeholder="user_id">
+
+                <label>Type</label>
+                <select name="category" class="sr-input" data-reflect="#sr-result-category" required="true">
+                    @for((id, rule) <- StreamRule.RULES) {
+                        <option id="@id" data-reflect-string="@rule.getSentenceRepresentation()">@rule.getName()</option>
+                    }
+                </select>
+
+                <label>Value</label>
+                <input type="text" class="sr-input" data-reflect="#sr-result-value" placeholder="19983">
+
+                <label class="checkbox">
+                    <input type="checkbox" id="sr-inverted"> Inverted
+                </label>
+
+                <p>
+                    <span id="sr-result">
+                        <strong>Result:</strong>
+                        Field <em id="sr-result-field">user_id</em> must
+                        <em id="sr-result-category">@StreamRule.RULES.get(1).getSentenceRepresentation</em>
+                        <em id="sr-result-value">19983</em>
+                    </span>
+                </p>
+            </div>
+
+            <div class="span4">
+                <div class="well well-small matcher-github">
+                    It does not matter what type the compared message fields are of. The server will try
+                    to convert to String / Integer based on the matcher type as good as it can.
+
+                    <br /><br />
+                    <i class="icon-github"></i>
+                    <a href="https://github.com/Graylog2/graylog2-server/tree/graylog2-server/src/main/java/org/graylog2/streams/matchers"
+                    target="_blank">
+                        Take a look at the matcher code on GitHub
+                    </a>
+                </div>
+            </div>
+        </div>
+        <div class="modal-footer">
+            <button class="btn" data-dismiss="modal" aria-hidden="true">Close</button>
+            <button class="btn btn-primary">Add</button>
+        </div>
+    </div>
+}

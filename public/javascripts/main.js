@@ -86,7 +86,6 @@ $(document).ready(function() {
 	});
 
     // Updating total event counts;
-
     (function updateTotalEvents() {
         $.ajax({
             url: '/a/messagecounts/total',
@@ -102,6 +101,40 @@ $(document).ready(function() {
         });
     })();
 
+    // Stream rules.
+    $("#new-stream-rule .sr-input").on("keyup change", function() {
+        value = $(this).val();
+
+        if (value != undefined && value != "") {
+            // Selectbox options can have a custom replace string.
+            s = $("option:selected", this);
+            if (s != undefined && s.attr("data-reflect-string") != undefined && s.attr("data-reflect-string") != "") {
+                value = s.attr("data-reflect-string");
+            }
+        } else {
+            value = $(this).attr("placeholder");
+        }
+
+        // Inverted?
+        if ($("#sr-inverted").is(':checked')) {
+            value = "not " + value;
+        }
+
+        $($(this).attr("data-reflect")).html(value);
+    });
+
+    $("#sr-inverted").on("click", function() {
+        old_val = $("#new-stream-rule #sr-result-category").html();
+
+        if ($(this).is(":checked")) {
+            // Add the not.
+            new_val = "not " + old_val;
+        } else {
+            // Remove the not.
+            new_val = old_val.substr("3");
+        }
+        $("#new-stream-rule #sr-result-category").html(new_val);
+    })
 
 	function displayFailureInSidebar(message) {
 		x = "<span class='alert alert-error sidebar-alert'><i class='icon-warning-sign'></i> " + message + "</span>"

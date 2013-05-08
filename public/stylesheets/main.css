@@ -20,6 +20,7 @@ h1, h2, h3, h4, h5 {
 h1 {
 	font-size: 26px;
 	line-height: 28px;
+    margin-bottom: 3px;
 }
 
 h2 {
@@ -218,4 +219,23 @@ h3 {
 
 .support-sources ul {
     margin-top: 5px;
+}
+
+form .area-title {
+    display: block;
+    margin-bottom: 5px;
+    font-size: 14px;
+    line-weight: normal;
+    line-height: 20px;
+}
+
+form .stream-rules {
+    margin-top: 5px;
+    margin-bottom: 5px;
+    margin-left: 20px;
+    list-style-type: square !important;
+}
+
+#new-stream-rule .well a {
+    font-size: 11px;
 }

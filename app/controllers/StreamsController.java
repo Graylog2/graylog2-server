@@ -23,5 +23,9 @@ public class StreamsController extends AuthenticatedController {
 			return status(504, views.html.errors.error.render(message, e, request()));
 		}
 	}
+
+    public static Result newStream() {
+        return ok(views.html.streams.new_stream.render(currentUser()));
+    }
 	
 }

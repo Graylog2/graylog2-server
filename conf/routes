@@ -18,6 +18,7 @@ GET		/messages/:index/:id/partial	controllers.MessagesController.asPartial(index
 
 # Streams
 GET		/streams						controllers.StreamsController.index()
+GET     /streams/new                    controllers.StreamsController.newStream()
 
 # API: Message counts and histograms
 GET		/a/messagecounts/histogram		controllers.MessageCountsController.histogram(timerange ?= "")
