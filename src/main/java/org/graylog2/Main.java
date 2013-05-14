@@ -218,8 +218,8 @@ public final class Main {
         server.registerFilter(new BlacklistFilter());
         if (configuration.isEnableTokenizerFilter()) { server.registerFilter(new TokenizerFilter()); }
         server.registerFilter(new StreamMatcherFilter());
-        server.registerFilter(new CounterUpdateFilter());
         server.registerFilter(new RewriteFilter());
+        server.registerFilter(new CounterUpdateFilter());
 
         // Register outputs.
         server.registerOutput(new ElasticSearchOutput());
