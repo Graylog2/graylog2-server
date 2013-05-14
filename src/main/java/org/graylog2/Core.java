@@ -222,7 +222,7 @@ public class Core implements GraylogServer {
         deflector.setUp();
         
         // Set up recent index.
-        if (indexer.indexExists(EmbeddedElasticSearchClient.RECENT_INDEX_NAME)) {
+        if (indexer.indexExists(configuration.getRecentIndexName())) {
             LOG.info("Recent index exists. Not creating it.");
         } else {
             LOG.info("Recent index does not exist! Trying to create it ...");

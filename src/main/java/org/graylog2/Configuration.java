@@ -92,7 +92,10 @@ public class Configuration {
 
     @Parameter(value = "allow_override_syslog_date", required = true)
     private boolean allowOverrideSyslogDate = true;
-    
+
+    @Parameter(value = "recent_index_name", required = true)
+    private String recentIndexName = "graylog2_recent";
+
     @Parameter(value = "recent_index_ttl_minutes", required = true, validator = PositiveIntegerValidator.class)
     private int recentIndexTtlMinutes = 60;
     
@@ -357,6 +360,10 @@ public class Configuration {
 
     public boolean getAllowOverrideSyslogDate() {
         return allowOverrideSyslogDate;
+    }
+
+    public String getRecentIndexName() {
+        return recentIndexName;
     }
     
     public int getRecentIndexTtlMinutes() {

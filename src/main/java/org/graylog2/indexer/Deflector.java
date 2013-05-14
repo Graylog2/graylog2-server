@@ -201,7 +201,7 @@ public class Deflector {
     }
     
     private boolean ourIndex(String indexName) {
-        if (indexName.trim().equals(EmbeddedElasticSearchClient.RECENT_INDEX_NAME)) {
+        if (indexName.trim().equals(server.getConfiguration().getRecentIndexName())) {
             return false;
         }
         

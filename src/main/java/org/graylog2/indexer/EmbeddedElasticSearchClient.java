@@ -59,8 +59,7 @@ public class EmbeddedElasticSearchClient {
     private Client client;
     private final MessageGateway messageGateway;
     public static final String TYPE = "message";
-    public static final String RECENT_INDEX_NAME = "graylog2_recent";
-    
+
     // http://www.elasticsearch.org/guide/reference/index-modules/store.html
     public static final String STANDARD_RECENT_INDEX_STORE_TYPE = "niofs";
     public static final List<String> ALLOWED_RECENT_INDEX_STORE_TYPES = new ArrayList<String>() {{ 
@@ -112,7 +111,7 @@ public class EmbeddedElasticSearchClient {
     
     public String allIndicesExceptRecentIndexAlias() {
         // e.g. graylog2_*,-graylog2_recent
-        return allIndicesAlias() + ",-" + RECENT_INDEX_NAME;
+        return allIndicesAlias() + ",-" + server.getConfiguration().getRecentIndexName();
     }
     
     public long getTotalIndexSize() {
@@ -170,15 +169,15 @@ public class EmbeddedElasticSearchClient {
     }
 
     public IndexStats getRecentIndex() {
-        return getIndices().get(RECENT_INDEX_NAME);
+        return getIndices().get(server.getConfiguration().getRecentIndexName());
     }
     
     public ImmutableMap<String, IndexMetaData> getIndicesMetadata() {
-        return client.admin().cluster().state(new ClusterStateRequest().filteredIndices(RECENT_INDEX_NAME)).actionGet().getState().getMetaData().indices();
+        return client.admin().cluster().state(new ClusterStateRequest().filteredIndices(server.getConfiguration().getRecentIndexName())).actionGet().getState().getMetaData().indices();
     }
     
     public String getRecentIndexStorageType() {
-        return getIndicesMetadata().get(RECENT_INDEX_NAME).getSettings().get("index.store.type");
+        return getIndicesMetadata().get(server.getConfiguration().getRecentIndexName()).getSettings().get("index.store.type");
     }
     
     public boolean indexExists(String index) {
@@ -211,7 +210,7 @@ public class EmbeddedElasticSearchClient {
         settings.put("number_of_replicas", server.getConfiguration().getElasticSearchReplicas());
         
         CreateIndexRequestBuilder crb = new CreateIndexRequestBuilder(client.admin().indices());
-        crb.setIndex(RECENT_INDEX_NAME);
+        crb.setIndex(server.getConfiguration().getRecentIndexName());
         crb.setSettings(settings);
         
         final ActionFuture<CreateIndexResponse> createFuture = client.admin().indices().create(crb.request());
@@ -219,7 +218,7 @@ public class EmbeddedElasticSearchClient {
         if (!acknowledged) {
             return false;
         }
-        final PutMappingRequest mappingRequest = Mapping.getPutMappingRequest(client, RECENT_INDEX_NAME, server.getConfiguration().getElasticSearchAnalyzer());
+        final PutMappingRequest mappingRequest = Mapping.getPutMappingRequest(client, server.getConfiguration().getRecentIndexName(), server.getConfiguration().getElasticSearchAnalyzer());
         final boolean mappingCreated = client.admin().indices().putMapping(mappingRequest).actionGet().acknowledged();
         return acknowledged && mappingCreated;
     }
@@ -260,7 +259,7 @@ public class EmbeddedElasticSearchClient {
 
             // we manually set the document ID to the same value to be able to match up documents later.
             mainIndex.add(buildIndexRequest(Deflector.DEFLECTOR_NAME, source, msg.getId(), 0)); // Main index.
-            recentIndex.add(buildIndexRequest(RECENT_INDEX_NAME, source, msg.getId(), server.getConfiguration().getRecentIndexTtlMinutes())); // Recent index.
+            recentIndex.add(buildIndexRequest(server.getConfiguration().getRecentIndexName(), source, msg.getId(), server.getConfiguration().getRecentIndexTtlMinutes())); // Recent index.
         }
 
         mainIndex.setConsistencyLevel(WriteConsistencyLevel.ONE);
