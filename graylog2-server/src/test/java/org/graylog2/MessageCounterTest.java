@@ -70,6 +70,36 @@ public class MessageCounterTest {
     }
 
     @Test
+    public void testGetHostCountsDoesNotAddDeletedHostsAgain() {
+        String host1 = "example.org";
+        String host2 = "foo.example.org";
+        String host3 = "example.com";
+
+        Map<String, Integer> expected = Maps.newHashMap();
+        expected.put(Tools.encodeBase64(host1), 4);
+        expected.put(Tools.encodeBase64(host2), 1);
+        expected.put(Tools.encodeBase64(host3), 3);
+
+        counter.countUpHost(host1, 4);
+        counter.countUpHost(host2, 1);
+        counter.countUpHost(host3, 3);
+
+        assertEquals(expected, counter.getHostCounts());
+
+        counter.resetAllCounts();
+
+        Map<String, Integer> nextExpected = Maps.newHashMap();
+        nextExpected.put(Tools.encodeBase64(host1), 5);
+        nextExpected.put(Tools.encodeBase64(host3), 2);
+
+        counter.countUpHost(host1, 5);
+        counter.countUpHost(host3, 2);
+
+        // Not including the 0 host anymore.
+        assertEquals(nextExpected, counter.getHostCounts());
+    }
+
+    @Test
     public void testResetAllCounts() {
         counter.countUpTotal(100);
         counter.countUpSource("foo.example.org", 9001);
