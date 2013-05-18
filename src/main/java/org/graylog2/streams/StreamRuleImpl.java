@@ -47,11 +47,16 @@ public class StreamRuleImpl implements StreamRule {
     private ObjectId objectId = null;
     private int ruleType = 0;
     private String value = null;
+    private boolean inverted = false;
 
     public StreamRuleImpl(DBObject rule) {
         this.objectId = (ObjectId) rule.get("_id");
         this.ruleType = (Integer) rule.get("rule_type");
         this.value = (String) rule.get("value");
+
+        if (rule.get("inverted") != null) {
+            this.inverted = (Boolean) rule.get("inverted");
+        }
     }
 
     /**
@@ -76,6 +81,10 @@ public class StreamRuleImpl implements StreamRule {
     @Override
     public String getValue() {
         return value;
+    }
+
+    public boolean isInverted() {
+        return inverted;
     }
 
 
