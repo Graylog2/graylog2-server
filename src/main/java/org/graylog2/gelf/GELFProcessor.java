@@ -57,7 +57,7 @@ public class GELFProcessor {
 
     public void messageReceived(GELFMessage message, boolean caching) throws BufferOutOfCapacityException {
         incomingMessages.mark();
-        
+
         // Convert to LogMessage
         LogMessage lm = parse(message.getJSON());
 

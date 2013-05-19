@@ -37,6 +37,12 @@ public class ProcessBufferStub extends ProcessBuffer {
     }
 
     @Override
+    public void insertFailFast(LogMessage msg) {
+        serverStub.callsToProcessBufferInserter++;
+        serverStub.lastInsertedToProcessBuffer = msg;
+    }
+
+    @Override
     public void insertCached(LogMessage msg) {
         serverStub.callsToProcessBufferInserter++;
         serverStub.lastInsertedToProcessBuffer = msg;

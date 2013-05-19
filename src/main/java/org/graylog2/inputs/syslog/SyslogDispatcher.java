@@ -59,7 +59,7 @@ public class SyslogDispatcher extends SimpleChannelHandler {
         byte[] readable = new byte[buffer.readableBytes()];
         buffer.toByteBuffer().get(readable, buffer.readerIndex(), buffer.readableBytes());
 
-        this.processor.messageReceived(new String(readable), remoteAddress.getAddress());
+        this.processor.messageReceived(new String(readable), remoteAddress.getAddress(), true);
     }
 
     @Override

@@ -45,8 +45,8 @@ public class SyslogProcessorTest {
         serverStub.setConfigurationStub(configStub);
         SyslogProcessor processor = new SyslogProcessor(serverStub);
 
-        processor.messageReceived(ValidNonStructuredMessage, InetAddress.getLocalHost());
-        processor.messageReceived(ValidNonStructuredMessage, InetAddress.getLocalHost());
+        processor.messageReceived(ValidNonStructuredMessage, InetAddress.getLocalHost(), true);
+        processor.messageReceived(ValidNonStructuredMessage, InetAddress.getLocalHost(), true);
 
         LogMessage lm = serverStub.lastInsertedToProcessBuffer;
 
@@ -66,7 +66,7 @@ public class SyslogProcessorTest {
         serverStub.setConfigurationStub(configStub);
         SyslogProcessor processor = new SyslogProcessor(serverStub);
 
-        processor.messageReceived(ValidNonStructuredMessageWithShortDate, InetAddress.getLocalHost());
+        processor.messageReceived(ValidNonStructuredMessageWithShortDate, InetAddress.getLocalHost(), true);
 
         LogMessage lm = serverStub.lastInsertedToProcessBuffer;
 
@@ -86,7 +86,7 @@ public class SyslogProcessorTest {
         serverStub.setConfigurationStub(configStub);
         SyslogProcessor processor = new SyslogProcessor(serverStub);
 
-        processor.messageReceived(ValidStructuredMessage, InetAddress.getLocalHost());
+        processor.messageReceived(ValidStructuredMessage, InetAddress.getLocalHost(), true);
 
         LogMessage lm = serverStub.lastInsertedToProcessBuffer;
 
@@ -110,8 +110,8 @@ public class SyslogProcessorTest {
         serverStub.setConfigurationStub(configStub);
         SyslogProcessor processor = new SyslogProcessor(serverStub);
 
-        processor.messageReceived(ValidStructuedMessageWithDifferentDateFormat, InetAddress.getLocalHost());
-        processor.messageReceived(ValidStructuedMessageWithDifferentDateFormat, InetAddress.getLocalHost());
+        processor.messageReceived(ValidStructuedMessageWithDifferentDateFormat, InetAddress.getLocalHost(), true);
+        processor.messageReceived(ValidStructuedMessageWithDifferentDateFormat, InetAddress.getLocalHost(), true);
 
         LogMessage lm = serverStub.lastInsertedToProcessBuffer;
 
@@ -133,7 +133,7 @@ public class SyslogProcessorTest {
         serverStub.setConfigurationStub(configStub);
         SyslogProcessor processor = new SyslogProcessor(serverStub);
 
-        processor.messageReceived("LOLWAT", InetAddress.getLocalHost());
+        processor.messageReceived("LOLWAT", InetAddress.getLocalHost(), true);
 
         // Message is not inserted to process buffer.
         assertEquals(0, serverStub.callsToProcessBufferInserter);
@@ -149,7 +149,7 @@ public class SyslogProcessorTest {
         serverStub.setConfigurationStub(configStub);
         SyslogProcessor processor = new SyslogProcessor(serverStub);
         
-        processor.messageReceived(ValidNonStructuredMessage, InetAddress.getLocalHost());
+        processor.messageReceived(ValidNonStructuredMessage, InetAddress.getLocalHost(), true);
 
         LogMessage lm = serverStub.lastInsertedToProcessBuffer;
 

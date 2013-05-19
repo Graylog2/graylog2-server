@@ -124,6 +124,10 @@ public class GELFMessage {
     }
 
     public Type getGELFType() {
+        if (payload == null) {
+            throw new IllegalStateException("Payload is NULL");
+        }
+
         if (payload.length < Type.HEADER_SIZE) {
             throw new IllegalStateException("GELF message is too short. Not even the type header would fit.");
         }

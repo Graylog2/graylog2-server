@@ -19,18 +19,17 @@ import com.rabbitmq.client.Envelope;
 
 public class AMQPConsumerTest {
 	public final static String GELF_JSON = "{\"message\":\"foo\",\"host\":\"bar\",\"_lol_utf8\":\"\u00FC\"}";
-	
-	private AMQPConsumer _amqpConsumer;
-	
-	@Before
-	public void setup() {
+
+	public AMQPConsumer buildConsumer() {
 		AMQPQueueConfiguration amqpqueue_configuration = new AMQPQueueConfiguration(new ObjectId(),
 				"exchange", "routing.key", 1, InputType.GELF, "gl2NodeId");
-		_amqpConsumer = new AMQPConsumer(new GraylogServerStub(), amqpqueue_configuration);
+		return new AMQPConsumer(new GraylogServerStub(), amqpqueue_configuration);
 	}
 	
 	@Test
 	public void testAutoAckFalse() throws IOException, IllegalAccessException, NoSuchFieldException {
+        AMQPConsumer consumer = buildConsumer();
+
 		Mockery context = new Mockery();
 		final Channel channel = context.mock(Channel.class);
 		context.checking(new Expectations() {{
@@ -39,14 +38,16 @@ public class AMQPConsumerTest {
 		
 		Field field = AMQPConsumer.class.getDeclaredField("channel");
 		field.setAccessible(true);
-		field.set(_amqpConsumer, channel);
-				
-		_amqpConsumer.consume();
+		field.set(consumer, channel);
+
+        consumer.consume();
 		context.assertIsSatisfied();
 	}
 	
 	@Test
 	public void testConsumerDoesAcknowledgeOnException() throws IOException {
+        AMQPConsumer amqp = buildConsumer();
+
 		final long deliveryTag = 3l;
 		
 		byte[] body = null; // invalid payload so that an Exception is thrown
@@ -56,14 +57,16 @@ public class AMQPConsumerTest {
 		context.checking(new Expectations() {{
 		    oneOf (channel).basicNack(deliveryTag, false, false);
 		}});
-		
-		Consumer consumer = _amqpConsumer.createConsumer(channel);
-		consumer.handleDelivery("consumerTag", new Envelope(deliveryTag, true, "myexchange", "myroutingkey"), null, body);
+
+        Consumer consumer = amqp.createConsumer(channel);
+        consumer.handleDelivery("consumerTag", new Envelope(deliveryTag, true, "myexchange", "myroutingkey"), null, body);
 		context.assertIsSatisfied();
 	}
 	
 	@Test
 	public void testConsumerDoesAcknowledgeOnSuccess() throws IOException {
+        AMQPConsumer amqp = buildConsumer();
+
 		final long deliveryTag = 3l;
 		
 		Mockery context = new Mockery();
@@ -71,7 +74,8 @@ public class AMQPConsumerTest {
 		context.checking(new Expectations() {{
 		    oneOf (channel).basicAck(deliveryTag, false);
 		}});
-		Consumer consumer = _amqpConsumer.createConsumer(channel);
+
+        Consumer consumer = amqp.createConsumer(channel);
 		consumer.handleDelivery("consumerTag", new Envelope(deliveryTag, true, "myexchange", "myroutingkey"), null, TestHelper.zlibCompress(GELF_JSON));
 		context.assertIsSatisfied();
 	}
