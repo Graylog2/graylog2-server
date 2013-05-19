@@ -114,9 +114,9 @@
             <classifier>jar-with-dependencies</classifier>
         </dependency>
         <dependency>
-            <groupId>com.googlecode.disruptor</groupId>
+            <groupId>com.lmax</groupId>
             <artifactId>disruptor</artifactId>
-            <version>2.10.3</version>
+            <version>3.0.1</version>
         </dependency>
         <dependency>
             <groupId>com.rabbitmq</groupId>
@@ -141,7 +141,7 @@
         <dependency>
             <groupId>io.netty</groupId>
             <artifactId>netty</artifactId>
-            <version>3.5.11.Final</version>
+            <version>3.6.6.Final</version>
         </dependency>
         <dependency>
             <groupId>com.librato.metrics</groupId>
