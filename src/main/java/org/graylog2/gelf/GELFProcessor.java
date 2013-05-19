@@ -55,7 +55,7 @@ public class GELFProcessor {
         this.server = server;
     }
 
-    public void messageReceived(GELFMessage message) throws BufferOutOfCapacityException {
+    public void messageReceived(GELFMessage message, boolean caching) throws BufferOutOfCapacityException {
         incomingMessages.mark();
         
         // Convert to LogMessage
@@ -69,7 +69,12 @@ public class GELFProcessor {
         // Add to process buffer.
         LOG.debug("Adding received GELF message <{}> to process buffer: {}", lm.getId(), lm);
         processedMessages.mark();
-        server.getProcessBuffer().insertCached(lm);
+
+        if (caching) {
+            server.getProcessBuffer().insertCached(lm);
+        } else {
+            server.getProcessBuffer().insertFailFast(lm);
+        }
     }
 
     private LogMessage parse(String message) {

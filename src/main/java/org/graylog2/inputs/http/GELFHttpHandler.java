@@ -74,7 +74,7 @@ public class GELFHttpHandler extends SimpleChannelHandler {
             return;
         }
 
-        gelfProcessor.messageReceived(msg);
+        gelfProcessor.messageReceived(msg, true);
         writeResponse(e.getChannel(), keepAlive, httpRequestVersion, HttpResponseStatus.ACCEPTED);
     }
 

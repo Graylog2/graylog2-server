@@ -196,7 +196,7 @@ public class AMQPConsumer implements Runnable {
                         case GELF:
                             GELFMessage gelf = new GELFMessage(body);
                             try {
-                               gelfProcessor.messageReceived(gelf);
+                               gelfProcessor.messageReceived(gelf, false);
                             } catch (BufferOutOfCapacityException e) {
                                 LOG.warn("ProcessBufferProcessor is out of capacity. Requeuing message!");
                                 channel.basicReject(envelope.getDeliveryTag(), true);
@@ -208,7 +208,7 @@ public class AMQPConsumer implements Runnable {
                             break;
                          case SYSLOG:
                             try {
-                                syslogProcessor.messageReceived(new String(body), connection.getAddress());
+                                syslogProcessor.messageReceived(new String(body), connection.getAddress(), false);
                              } catch (BufferOutOfCapacityException e) {
                                 LOG.warn("ProcessBufferProcessor is out of capacity. Requeuing message!");
                                 channel.basicReject(envelope.getDeliveryTag(), true);

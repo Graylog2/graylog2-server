@@ -74,7 +74,7 @@ public class GELFDispatcher extends SimpleChannelHandler {
         case UNCOMPRESSED:
         case UNSUPPORTED:
             dispatchedUnchunkedMessage.mark();
-            processor.messageReceived(msg);
+            processor.messageReceived(msg, true);
             break;
         }
     }
