@@ -62,7 +62,7 @@ public class SyslogProcessor {
         this.server = server;
     }
 
-    public void messageReceived(String msg, InetAddress remoteAddress) throws BufferOutOfCapacityException {
+    public void messageReceived(String msg, InetAddress remoteAddress, boolean caching) throws BufferOutOfCapacityException {
         incomingMessages.mark();
 
         // Convert to LogMessage
@@ -89,7 +89,12 @@ public class SyslogProcessor {
         // Add to process buffer.
         LOG.debug("Adding received syslog message <{}> to process buffer: {}", lm.getId(), lm);
         processedMessages.mark();
-        server.getProcessBuffer().insertCached(lm);
+
+        if (caching) {
+            server.getProcessBuffer().insertCached(lm);
+        } else {
+            server.getProcessBuffer().insertFailFast(lm);
+        }
     }
 
     private LogMessage parse(String msg, InetAddress remoteAddress) throws UnknownHostException {

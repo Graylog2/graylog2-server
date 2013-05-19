@@ -76,7 +76,7 @@ public class GELFChunkManager extends Thread {
                     if (isComplete(messageId)) {
                         // We got a complete message! Re-assemble and insert to GELFProcessor.
                         LOG.debug("Message <{}> seems to be complete. Handling now.", messageId);
-                        processor.messageReceived(new GELFMessage(chunksToByteArray(messageId)));
+                        processor.messageReceived(new GELFMessage(chunksToByteArray(messageId)), true);
 
                         // Message has been handled. Drop it.
                         LOG.debug("Message <{}> is now being processed. Dropping from chunk map.", messageId);
