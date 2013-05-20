@@ -47,6 +47,8 @@ public class AMQPConsumerTest {
 	
 	@Test
 	public void testConsumerDoesNotAcknowledgeOnException() throws IOException {
+        final long deliveryTag = 35l;
+
 		byte[] body = null; // invalid payload so that an Exception is thrown
 		Mockery context = new Mockery();
 		final Channel channel = context.mock(Channel.class);

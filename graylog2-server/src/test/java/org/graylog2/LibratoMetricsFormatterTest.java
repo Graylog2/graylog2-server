@@ -184,7 +184,7 @@ public class LibratoMetricsFormatterTest {
 
         assertEquals("gl2-graylog2-server", gauges.get("gl2-total").get("source"));
         assertEquals(2L, gauges.get("gl2-total").get("value"));
-        assertEquals(3L, gauges.get("gl2-host-fooexampleorg").get("value"));
+        assertEquals(3L, gauges.get("gl2-host-foo-example-org").get("value"));
         assertEquals(2L, gauges.get("gl2-stream-somestream").get("value"));
         assertEquals(1L, gauges.get("gl2-stream-somestream2").get("value"));
     }

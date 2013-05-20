@@ -80,11 +80,11 @@ public class MessageCounterTest {
         expected.put(Tools.encodeBase64(host2), 1);
         expected.put(Tools.encodeBase64(host3), 3);
 
-        counter.countUpHost(host1, 4);
-        counter.countUpHost(host2, 1);
-        counter.countUpHost(host3, 3);
+        counter.countUpSource(host1, 4);
+        counter.countUpSource(host2, 1);
+        counter.countUpSource(host3, 3);
 
-        assertEquals(expected, counter.getHostCounts());
+        assertEquals(expected, counter.getSourceCounts());
 
         counter.resetAllCounts();
 
@@ -92,11 +92,11 @@ public class MessageCounterTest {
         nextExpected.put(Tools.encodeBase64(host1), 5);
         nextExpected.put(Tools.encodeBase64(host3), 2);
 
-        counter.countUpHost(host1, 5);
-        counter.countUpHost(host3, 2);
+        counter.countUpSource(host1, 5);
+        counter.countUpSource(host3, 2);
 
         // Not including the 0 host anymore.
-        assertEquals(nextExpected, counter.getHostCounts());
+        assertEquals(nextExpected, counter.getSourceCounts());
     }
 
     @Test
