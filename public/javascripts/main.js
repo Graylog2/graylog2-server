@@ -125,14 +125,12 @@ $(document).ready(function() {
 
     // Stream rules inverter.
     $("#sr-inverted").on("click", function() {
-console.log($(this).is(":checked"))
         old_val = $("#new-stream-rule #sr-result-category").html();
 
         if ($(this).is(":checked")) {
             // Add the not.
             new_val = "not " + old_val;
         } else {
- console.log(old_val);
             // Remove the not.
             if (old_val.substr(0,3) == "not") {
                 new_val = old_val.substr(3);
@@ -145,6 +143,10 @@ console.log($(this).is(":checked"))
 
     // Add stream rule to stream rule list when saved.
     $("#add-stream-rule").on("click", function() {
+        if (!validate("#sr")) {
+            return false;
+        }
+
         $("#stream-rules-placeholder").hide();
 
         rule = {

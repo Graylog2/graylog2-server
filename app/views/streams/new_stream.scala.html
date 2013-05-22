@@ -49,19 +49,34 @@
             </h2>
         </div>
         <div class="modal-body">
-            <div class="span8">
+            <div class="span8" id="sr">
                 <label>Field</label>
-                <input type="text" id="sr-field" class="sr-input typeahead-fields" data-reflect="#sr-result-field" placeholder="user_id">
+                <input type="text"
+                    id="sr-field"
+                    class="sr-input typeahead-fields validatable"
+                    data-reflect="#sr-result-field"
+                    data-validate="defined"
+                    placeholder="user_id">
 
                 <label>Type</label>
-                <select name="category" id="sr-type" class="sr-input" data-reflect="#sr-result-category" required="true">
-                    @for((id, rule) <- StreamRule.RULES) {
-                        <option value="@id" data-reflect-string="@rule.getSentenceRepresentation()">@rule.getName()</option>
-                    }
+                <select name="category"
+                    id="sr-type"
+                    class="sr-input validatable"
+                    data-reflect="#sr-result-category"
+                    data-validate="defined"
+                    required="true">
+                        @for((id, rule) <- StreamRule.RULES) {
+                            <option value="@id" data-reflect-string="@rule.getSentenceRepresentation()">@rule.getName()</option>
+                        }
                 </select>
 
                 <label>Value</label>
-                <input type="text" id="sr-value" class="sr-input" data-reflect="#sr-result-value" placeholder="19983">
+                <input type="text"
+                    id="sr-value"
+                    class="sr-input validatable"
+                    data-validate="defined"
+                    data-reflect="#sr-result-value"
+                    placeholder="19983">
 
                 <label class="checkbox">
                     <input type="checkbox" id="sr-inverted"> Inverted
@@ -93,7 +108,10 @@
         </div>
         <div class="modal-footer">
             <button class="btn" data-dismiss="modal" aria-hidden="true">Close</button>
-            <button class="btn btn-primary" id="add-stream-rule">Add</button>
+            <button class="btn btn-primary validate" id="add-stream-rule">
+                Add
+            </button>
         </div>
     </div>
+
 }
