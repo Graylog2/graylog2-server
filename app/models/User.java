@@ -16,14 +16,6 @@ public class User {
 		return user;
 	}
 	
-	public static boolean authenticate(String username, String password) {
-		if (username.equals("lennart") && password.equals("123123123")) {
-			return true; 
-		} else {
-			return false;
-		}
-	}
-	
 	public String getName() {
 		return name;
 	}

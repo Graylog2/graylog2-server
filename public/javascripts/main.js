@@ -155,14 +155,16 @@ $(document).ready(function() {
             value: $("#sr-value").val(),
             inverted: $("#sr-inverted-box").is(":checked")
         }
-
-        // Add hidden field that is transmitted in form.
+        // Add hidden field that is transmitted in form add visible entry.
         field = "<input type='hidden' name='rules[]' value='" + JSON.stringify(rule) + "' />"
-        $("#new-stream").prepend(field);
+        remover = "<a href='#' class='sr-remove'><i class='icon-remove'></i></a>";
+        $("#stream-rules").append("<li>" + field + $("#sr-result").html().replace(/<(?:.|\n)*?>/gm, '') + " " + remover + "</li>");
 
-        // Add visible entry.
-        remover = "<a href='#'><i class='icon-remove'></i></a>";
-        $("#stream-rules").append("<li>" + $("#sr-result").html().replace(/<(?:.|\n)*?>/gm, '') + " " + remover + "</li>");
+        // Remove stream rule binding.
+        $(".sr-remove").on("click", function() {
+            $(this).parent().remove();
+            return false;
+        });
 
         $("#new-stream-rule").modal("hide");
     });

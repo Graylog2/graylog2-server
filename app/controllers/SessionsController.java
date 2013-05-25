@@ -1,5 +1,6 @@
 package controllers;
 
+import lib.Authenticator;
 import models.LoginRequest;
 import models.User;
 
@@ -29,7 +30,8 @@ public class SessionsController extends Controller {
 		}
 		
 		LoginRequest r = loginRequest.get();
-		if (User.authenticate(r.username, r.password)) {
+        Authenticator auth = new Authenticator();
+		if (auth.authenticate(r.username, r.password)) {
 			session("username", "LOL_SOME_USER_ID");
 			return redirect("/");
 		} else {
