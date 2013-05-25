@@ -19,114 +19,73 @@
  */
 package org.graylog2.users;
 
+import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import com.mongodb.BasicDBObject;
+import com.mongodb.DBObject;
 import org.bson.types.ObjectId;
 import org.graylog2.Core;
+import org.graylog2.database.NotFoundException;
+import org.graylog2.database.Persistable;
+import org.graylog2.database.Persisted;
+import org.graylog2.database.validators.FilledStringValidator;
+import org.graylog2.database.validators.Validator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.beust.jcommander.internal.Maps;
-import com.google.common.collect.Sets;
-import com.mongodb.BasicDBList;
-import com.mongodb.BasicDBObject;
-import com.mongodb.DBCollection;
-import com.mongodb.DBCursor;
-import com.mongodb.DBObject;
 
 /**
  * @author Lennart Koopmann <lennart@socketfeed.com>
  */
-public class User {
+public class User extends Persisted implements Persistable {
    
     private static final Logger LOG = LoggerFactory.getLogger(User.class);
-    
-    private final ObjectId id;
-    private final String login;
-    private final String name;
-    private final Map<String, String> transports;
-    
-    @SuppressWarnings("unused")
-	private final DBObject mongoObject;
-    
-    public User (DBObject user) {
-        this.id = (ObjectId) user.get("_id");
-        this.login = (String) user.get("login");
-        this.name = (String) user.get("name");
-        this.transports = Maps.newHashMap();
-        
-        
-        if (user.get("transports") != null) {
-            BasicDBList transportList = (BasicDBList) user.get("transports");
-            
-            if (transportList != null && transportList.size() > 0) {
-                for (Object transportObj : transportList) {
-                    DBObject tp = (BasicDBObject) transportObj;
-                    transports.put((String) tp.get("typeclass"), (String) tp.get("value"));
-                }
-            }
-        }
-        
-        this.mongoObject = user;
-    }
-    
-    public static Set<User> fetchAll(Core server) {
-        Map<String, Object> emptyMap = Maps.newHashMap();
-        return fetchAll(server, emptyMap);
-    }
-    
-    public static Set<User> fetchAll(Core server, Map<String, Object> additionalQueryOpts) {
-        UserCache cache = UserCache.getInstance();
-        
-        // Only use the cache if we really fetch *all* users.
-        if (additionalQueryOpts == null || additionalQueryOpts.isEmpty()) {
-            if (cache.valid()) {
-                return cache.get();
-            }
-        }
 
-        Set<User> users = Sets.newHashSet();
+    private static final String COLLECTION = "users";
 
-        DBCollection coll = server.getMongoConnection().getDatabase().getCollection("users");
+    public User(Map<String, Object> fields, Core core) {
+        super(COLLECTION, core, fields, validations());
+    }
+
+    protected User(ObjectId id, Map<String, Object> fields, Core core) {
+        super(COLLECTION, core, id, fields, validations());
+    }
+
+    public static boolean exists(String username, String passwordHash, Core core) {
         DBObject query = new BasicDBObject();
-        
-        // query.putAll() is not working
-        for (Map.Entry<String, Object> o : additionalQueryOpts.entrySet()) {
-             query.put(o.getKey(), o.getValue());
-        }
-            
-        DBCursor cur = coll.find(query);
+        query.put("username", username);
+        query.put("password", passwordHash);
 
-        while (cur.hasNext()) {
-            try {
-                users.add(new User(cur.next()));
-            } catch (Exception e) {
-                LOG.warn("Can't fetch user. Skipping. " + e.getMessage(), e);
-            }
+        List<DBObject> result = query(query, core, COLLECTION);
+
+        if (result == null)     { return false; }
+        if (result.size() == 0) { return false; }
+
+        if (result.size() > 1) {
+            throw new RuntimeException("There was more than one matching user. This should never happen.");
         }
 
-        if (additionalQueryOpts == null || additionalQueryOpts.isEmpty()) {
-            cache.set(users);
+        String dbUsername = (String) result.get(0).get("username");
+        String dbPasswordHash = (String) result.get(0).get("password");
+
+        if (dbUsername != null && dbPasswordHash != null) {
+            return dbUsername.equals(username) && dbPasswordHash.equals(passwordHash);
         }
 
-        return users;
+        return false;
     }
 
+    @Override
     public ObjectId getId() {
-        return id;
+        return this.id;
     }
 
-    public String getLogin() {
-        return login;
+    private static Map<String, Validator> validations() {
+        return new HashMap<String, Validator>() {{
+            put("FOO BETTER SET THIS lol", new FilledStringValidator());
+        }};
     }
-
-    public String getName() {
-        return name;
-    }
-
-    public Map<String, String> getTransports() {
-        return transports;
-    }
-    
 }

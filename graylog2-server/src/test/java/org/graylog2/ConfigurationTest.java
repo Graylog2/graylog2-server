@@ -39,6 +39,7 @@ public class ConfigurationTest {
             e.printStackTrace();
         }
         // Required properties
+        validProperties.put("password_secret", "ipNUnWxmBLCxTEzXcyamrdy0Q3G7HxdKsAvyg30R9SCof0JydiZFiA3dLSkRsbLF");
         validProperties.put("elasticsearch_config_file", tempFile.getAbsolutePath());
         validProperties.put("force_syslog_rdns", "false");
         validProperties.put("syslog_listen_port", "514");

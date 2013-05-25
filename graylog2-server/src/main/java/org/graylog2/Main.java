@@ -97,6 +97,11 @@ public final class Main {
             LOG.error("Invalid configuration", e);
             System.exit(1);
         }
+
+        if (configuration.getPasswordSecret().isEmpty()) {
+            LOG.error("No password secret set. Please define password_secret in your graylog2.conf.");
+            System.exit(1);
+        }
         
         if (commandLineArguments.isInstallPlugin()) {
             System.out.println("Plugin installation requested.");

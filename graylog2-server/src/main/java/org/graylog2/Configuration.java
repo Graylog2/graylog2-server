@@ -63,6 +63,9 @@ public class Configuration {
 
     @Parameter(value = "is_master", required = true)
     private boolean isMaster = true;
+
+    @Parameter(value = "password_secret", required = true)
+    private String passwordSecret;
     
     @Parameter(value = "syslog_listen_port", required = true, validator = InetPortValidator.class)
     private int syslogListenPort = 514;
@@ -318,6 +321,10 @@ public class Configuration {
     
     public void setIsMaster(boolean is) {
         isMaster = is;
+    }
+
+    public String getPasswordSecret() {
+        return passwordSecret.trim();
     }
     
     public int getSyslogListenPort() {
