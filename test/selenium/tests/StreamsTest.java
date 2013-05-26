@@ -54,7 +54,7 @@ public class StreamsTest extends LoggedIn {
         serverStub.initialize();
 
         String sauceUser = System.getenv("SAUCE_USERNAME");
-        String saucePassword = System.getenv("SAUCE_USERNAME");
+        String saucePassword = System.getenv("SAUCE_ACCESS_KEY");
 
         if (sauceUser != null && saucePassword != null && !sauceUser.isEmpty() && !saucePassword.isEmpty()) {
             URL saucelabs = new URL("http://" + sauceUser + ":" + saucePassword + "@localhost:4445/wd/hub");
