@@ -14,5 +14,9 @@ env:
 before_script:
   - wget http://downloads.typesafe.com/play/${PLAY_VERSION}/play-${PLAY_VERSION}.zip
   - unzip -q play-${PLAY_VERSION}.zip
-  - ./sauce_connect_setup.sh
 script: play-${PLAY_VERSION}/play test
+
+# http://about.travis-ci.org/docs/user/addons/
+addons:
+  # Credentials are in secure ENV variables above.
+  sauce_connect: true

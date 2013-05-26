@@ -81,14 +81,6 @@ public class StreamsTest extends LoggedIn {
         running(testServer(9999), new Runnable() {
             public void run() {
                 Result r = login(testBrowser(driver, 9999), serverStub, "lennart", "123123123");
-
-                // DEBUG
-                try {
-                    Thread.sleep(300000);
-                } catch (InterruptedException e) {
-                    e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
-                }
-
                 assertTrue("Login failed", r.isSuccess());
             }
         });

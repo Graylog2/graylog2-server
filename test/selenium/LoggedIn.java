@@ -58,7 +58,7 @@ public class LoggedIn {
         browser.fill("#password").with(password);
         browser.submit("#username");
 
-        boolean success = browser.url().equals("Graylog2 - Dashboard");
+        boolean success = browser.title().equals("Graylog2 - Dashboard");
 
         return new Result(success, user, password);
     }
