@@ -59,9 +59,9 @@ public class StreamsTest extends LoggedIn {
             URL saucelabs = new URL("http://" + sauceUser + ":" + saucePassword + "@localhost:4445/wd/hub");
 
             // https://saucelabs.com/docs/platforms
-            DesiredCapabilities capabilities = DesiredCapabilities.chrome();
-            capabilities.setCapability("platform", "OS X 10.8");
-            capabilities.setCapability("version", "26");
+            DesiredCapabilities capabilities = DesiredCapabilities.firefox();
+            capabilities.setCapability("platform", "Windows 8");
+            capabilities.setCapability("version", "21");
 
             driver = new RemoteWebDriver(saucelabs, capabilities);
         } else {
@@ -84,7 +84,7 @@ public class StreamsTest extends LoggedIn {
 
                 // DEBUG
                 try {
-                    Thread.sleep(120000);
+                    Thread.sleep(300000);
                 } catch (InterruptedException e) {
                     e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
                 }
