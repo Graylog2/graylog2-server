@@ -1,10 +1,8 @@
-rvm:
-  - 1.8.7
-  - ree
-  - 1.9.3
-  - jruby
-
-before_script: "bundle exec rake test:travis:copy_configs test:travis:run_elasticsearch"
-
-notifications:
-  irc: "irc.freenode.org#graylog2"
+language: java # "scala" would work the same
+language: scala # to trigger the build on JVM worker ('language: java' works the same)
+env:
+  - PLAY_VERSION=2.1.1
+before_script:
+  - wget http://download.playframework.org/releases/play-${PLAY_VERSION}.zip
+  - unzip -q play-${PLAY_VERSION}.zip
+script: play-${PLAY_VERSION}/play test
