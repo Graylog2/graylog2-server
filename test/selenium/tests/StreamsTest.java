@@ -78,9 +78,9 @@ public class StreamsTest extends LoggedIn {
 
     @Test
     public void addingStreamRulesWorks() {
-        running(testServer(3333), new Runnable() {
+        running(testServer(80), new Runnable() {
             public void run() {
-                Result r = login(testBrowser(driver, 80), serverStub, "lennart", "123123123");
+                Result r = login(testBrowser(driver, 3333), serverStub, "lennart", "123123123");
                 assertTrue("Login failed", r.isSuccess());
 
                 try {
