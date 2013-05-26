@@ -9,9 +9,11 @@ mkdir -p $DIR
 cd $DIR && curl $ZIP_URL > $DL
 unzip $DL && rm $DL
 
-java -jar Sauce-Connect.jar --readyfile $READYFILE --tunnel-identifier $TRAVIS_JOB_NUMBER $SAUCE_USERNAME $SAUCE_ACCESS_KEY &
+java -jar Sauce-Connect.jar $SAUCE_USERNAME $SAUCE_ACCESS_KEY --readyfile $READYFILE --tunnel-identifier $TRAVIS_JOB_NUMBER &
 
-# wait a bit for connect to start
-while [ ! -f $READYFILE ]; do
-  sleep 1
-done
+# wait a bit for connect to start if starting succeedd
+if [[ $rc == 0 ]] ; then
+    while [ ! -f $READYFILE ]; do
+      sleep 1
+    done
+fi
