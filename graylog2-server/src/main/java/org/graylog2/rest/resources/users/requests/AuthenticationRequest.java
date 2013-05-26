@@ -17,12 +17,12 @@
  * along with Graylog2.  If not, see <http://www.gnu.org/licenses/>.
  *
  */
-package org.graylog2.rest.resources.sessions.requests;
+package org.graylog2.rest.resources.users.requests;
 
 /**
  * @author Lennart Koopmann <lennart@torch.sh>
  */
-public class CreateRequest {
+public class AuthenticationRequest {
 
     public String username;
     public String password;

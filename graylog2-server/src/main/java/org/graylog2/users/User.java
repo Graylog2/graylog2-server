@@ -78,6 +78,18 @@ public class User extends Persisted implements Persistable {
         return false;
     }
 
+    public static String saltPass(String password, String salt) {
+        if (password == null || password.isEmpty()) {
+            throw new RuntimeException("No password given.");
+        }
+
+        if (salt == null || salt.isEmpty()) {
+            throw new RuntimeException("No salt given.");
+        }
+
+        return password + salt;
+    }
+
     @Override
     public ObjectId getId() {
         return this.id;
@@ -85,7 +97,9 @@ public class User extends Persisted implements Persistable {
 
     private static Map<String, Validator> validations() {
         return new HashMap<String, Validator>() {{
-            put("FOO BETTER SET THIS lol", new FilledStringValidator());
+            put("username", new FilledStringValidator());
+            put("password", new FilledStringValidator());
+            put("full_name", new FilledStringValidator());
         }};
     }
 }
