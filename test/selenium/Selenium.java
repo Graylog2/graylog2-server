@@ -17,44 +17,63 @@
  * along with Graylog2.  If not, see <http://www.gnu.org/licenses/>.
  *
  */
-package selenium.tests;
+package selenium;
 
 import org.junit.After;
+import org.junit.AfterClass;
 import org.junit.Before;
-import org.junit.Test;
+import org.junit.BeforeClass;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.chrome.ChromeDriver;
+import org.openqa.selenium.firefox.FirefoxDriver;
 import org.openqa.selenium.remote.DesiredCapabilities;
 import org.openqa.selenium.remote.RemoteWebDriver;
-import selenium.LoggedIn;
+import play.test.TestBrowser;
 import selenium.serverstub.ServerStub;
 
 import java.net.MalformedURLException;
 import java.net.URL;
 
-import static org.junit.Assert.assertTrue;
-import static play.test.Helpers.*;
+import static play.mvc.Http.HeaderNames.SERVER;
+import static play.test.Helpers.testBrowser;
 
 /**
  * @author Lennart Koopmann <lennart@torch.sh>
  */
-public class StreamsTest extends LoggedIn {
+public class Selenium {
 
-    private static final int SERVER_STUB_PORT = 9005;
-    private static final int WEB_PORT = 3333;
-    private ServerStub serverStub;
+    public static int SERVER_STUB_PORT = 9005;
+    public static final int WEB_PORT = 9999;
 
-    private WebDriver driver;
+    protected static ServerStub serverStub;
 
-    @Before
-    public void setUp() throws MalformedURLException {
+    protected WebDriver driver;
+    protected TestBrowser browser;
+
+    protected Selenium() { }
+
+    @BeforeClass
+    public static void setUpServerStub() {
+        // The port allocation sucks. It is done this way because Grizzly refused to free the port when kill()'d.
+        // This will also cause problems when trying to run tests in parallel. TODO: fix.
+        SERVER_STUB_PORT = SERVER_STUB_PORT+1;
         System.out.println("Launching graylog2-server stub on :" + SERVER_STUB_PORT);
         serverStub = new ServerStub(SERVER_STUB_PORT);
         serverStub.initialize();
+    }
 
+    @AfterClass
+    public static void tearDownServerStub() throws Exception {
+        System.out.println("Shutting down graylog2-server stub");
+        serverStub.kill();
+    }
+
+    @Before
+    public void setUp() throws MalformedURLException {
         String sauceUser = System.getenv("SAUCE_USERNAME");
         String saucePassword = System.getenv("SAUCE_ACCESS_KEY");
 
+        // Decide whether to use sauceLabs or local browser to execute Selenium tests.
         if (sauceUser != null && saucePassword != null && !sauceUser.isEmpty() && !saucePassword.isEmpty()) {
             URL saucelabs = new URL("http://" + sauceUser + ":" + saucePassword + "@localhost:4445/wd/hub");
 
@@ -66,25 +85,15 @@ public class StreamsTest extends LoggedIn {
 
             driver = new RemoteWebDriver(saucelabs, capabilities);
         } else {
-            driver = new ChromeDriver();
+            driver = new FirefoxDriver();
         }
+
+        browser = testBrowser(driver, WEB_PORT);
     }
 
     @After
     public void tearDown() {
-        System.out.println("Shutting down graylog2-server stub");
-        serverStub.kill();
         driver.quit();
-    }
-
-    @Test
-    public void addingStreamRulesWorks() {
-        running(testServer(9999), new Runnable() {
-            public void run() {
-                Result r = login(testBrowser(driver, 9999), serverStub, "lennart", "123123123");
-                assertTrue("Login failed", r.isSuccess());
-            }
-        });
     }
 
 }

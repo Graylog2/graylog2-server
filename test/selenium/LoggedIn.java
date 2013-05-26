@@ -19,15 +19,24 @@
  */
 package selenium;
 
+import org.junit.Before;
 import play.test.TestBrowser;
 import selenium.serverstub.ServerStub;
+
+import static org.junit.Assert.assertTrue;
+import static play.test.Helpers.testBrowser;
 
 /**
  * @author Lennart Koopmann <lennart@torch.sh>
  */
-public class LoggedIn {
+public class LoggedIn extends Selenium {
 
     protected LoggedIn() { }
+
+    protected void doLogin() {
+        Result r = login(browser, serverStub, "lennart", "123123123");
+        assertTrue("Login failed", r.isSuccess());
+    }
 
     /**
      * Logs you in with a new user it creates before.
