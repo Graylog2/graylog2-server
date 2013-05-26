@@ -58,6 +58,7 @@ public class LoggedIn {
         browser.fill("#password").with(password);
         browser.submit("#username");
 
+        // XXX THIS SHOULD BE A POSITIVE TEST. will succeed if connection refused for example
         boolean success = !browser.url().endsWith("/login");
 
         return new Result(success, user, password);

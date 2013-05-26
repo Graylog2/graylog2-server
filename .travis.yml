@@ -1,7 +1,13 @@
+# Selenium remote test setup docs: https://saucelabs.com/opensource/travis
+
 language: java # "scala" would work the same
 env:
   - PLAY_VERSION=2.1.1
+  global:
+    - secure: "YKnxrCkKxDCD7RQ29mM5EpSNjTzw8o5gv1zyHjI7eqgDDhd4WBirk++y2MzM\nXBU7/z3KFBW1WqbeD5AV+iYquBiqN/4JJcI9abo1s45XIRL9yEKhhvm/A1pJ\nacv1ka7NqktNHviIaqR+EIVLeMIFvIWaz0KIFBN3drtF0Hffkr8="
+    - secure: "xvcLRtK3dSnbvK/Iqx02c+qk17JLH9rteUUNb4t9SWbvBSAodxkQzZDtSYCb\nNT7R7lu1ZtFQCypw8CeR2aNpmpNLUzL9bpjsma63rjJkHVI+lT/rCfsOElg1\nsFPGfRJvlAiqswcfXWGWgX2wdFoJ7o1b9STv1Ge+ns6uKZFGoJA="
 before_script:
   - wget http://downloads.typesafe.com/play/${PLAY_VERSION}/play-${PLAY_VERSION}.zip
   - unzip -q play-${PLAY_VERSION}.zip
+  - ./sauce_connect_setup.sh
 script: play-${PLAY_VERSION}/play test

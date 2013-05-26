@@ -54,7 +54,7 @@ public class SessionResource extends RestResource {
         if (core.users.containsKey(lr.username) && core.users.get(lr.username).equals(lr.password)) {
             Map<String, Object> result = Maps.newHashMap();
             result.put("username", lr.username);
-            result.put("name", "Stub User");
+            result.put("full_name", "Stub User");
 
             return Response.ok(json(result, prettyPrint)).build();
         } else {

@@ -17,14 +17,22 @@
  * along with Graylog2.  If not, see <http://www.gnu.org/licenses/>.
  *
  */
-package selenium;
+package selenium.tests;
 
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.chrome.ChromeDriver;
+import org.openqa.selenium.remote.DesiredCapabilities;
+import org.openqa.selenium.remote.RemoteWebDriver;
 import play.libs.F;
 import play.test.TestBrowser;
+import selenium.LoggedIn;
 import selenium.serverstub.ServerStub;
+
+import java.net.MalformedURLException;
+import java.net.URL;
 
 import static org.junit.Assert.assertTrue;
 import static play.test.Helpers.*;
@@ -37,25 +45,43 @@ public class StreamsTest extends LoggedIn {
     private static final int STUB_PORT = 9005;
     private ServerStub serverStub;
 
+    private WebDriver driver;
+
     @Before
-    public void setUp() {
+    public void setUp() throws MalformedURLException {
         System.out.println("Launching graylog2-server stub on :" + STUB_PORT);
         serverStub = new ServerStub(STUB_PORT);
         serverStub.initialize();
+
+        String sauceUser = System.getenv("SAUCE_USERNAME");
+        String saucePassword = System.getenv("SAUCE_USERNAME");
+
+        if (sauceUser != null && saucePassword != null && !sauceUser.isEmpty() && !saucePassword.isEmpty()) {
+            URL saucelabs = new URL("http://" + sauceUser + ":" + saucePassword + "@localhost:4445/wd/hub");
+
+            // https://saucelabs.com/docs/platforms
+            DesiredCapabilities capabilities = DesiredCapabilities.chrome();
+            capabilities.setCapability("platform", "OS X 10.8");
+            capabilities.setCapability("version", "26");
+
+            driver = new RemoteWebDriver(saucelabs, capabilities);
+        } else {
+            driver = new ChromeDriver();
+        }
     }
 
     @After
     public void tearDown() {
         System.out.println("Shutting down graylog2-server stub");
         serverStub.kill();
+        driver.quit();
     }
 
     @Test
     public void addingStreamRulesWorks() {
-        running(testServer(19001), FIREFOX, new F.Callback<TestBrowser>() {
-            public void invoke(TestBrowser browser) {
-                Result r = login(browser, serverStub, "lennart", "123123123");
-                //Result r = login(browser, serverStub);
+        running(testServer(3333), new Runnable() {
+            public void run() {
+                Result r = login(testBrowser(driver), serverStub, "lennart", "123123123");
                 assertTrue("Login failed", r.isSuccess());
 
                 try {
