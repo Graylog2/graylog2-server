@@ -41,6 +41,7 @@ import static play.test.Helpers.*;
 public class StreamsTest extends LoggedIn {
 
     private static final int SERVER_STUB_PORT = 9005;
+    private static final int WEB_PORT = 3333;
     private ServerStub serverStub;
 
     private WebDriver driver;
@@ -77,9 +78,9 @@ public class StreamsTest extends LoggedIn {
 
     @Test
     public void addingStreamRulesWorks() {
-        running(testServer(3333), new Runnable() {
+        running(testServer(56517), new Runnable() {
             public void run() {
-                Result r = login(testBrowser(driver, 3333), serverStub, "lennart", "123123123");
+                Result r = login(testBrowser(driver), serverStub, "lennart", "123123123");
                 assertTrue("Login failed", r.isSuccess());
 
                 try {
