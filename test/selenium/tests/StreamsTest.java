@@ -62,6 +62,7 @@ public class StreamsTest extends LoggedIn {
             DesiredCapabilities capabilities = DesiredCapabilities.firefox();
             capabilities.setCapability("platform", "Windows 8");
             capabilities.setCapability("version", "21");
+            capabilities.setCapability("tunnel-identifier", System.getenv("TRAVIS_JOB_NUMBER"));
 
             driver = new RemoteWebDriver(saucelabs, capabilities);
         } else {
