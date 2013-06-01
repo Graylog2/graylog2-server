@@ -9,9 +9,11 @@
 			<param name="ConversionPattern" value="%d %-5p: %c - %m%n" />
 		</layout>
 	</appender>
-	<appender name="graylog2" class="org.apache.log4j.DailyRollingFileAppender" />
-		<param name="file" value="/var/log/graylog2-server.log" />
-		<param name="DatePattern" value="'.'yyyy-MM-dd" />
+	<appender name="graylog2" class="org.apache.log4j.RollingFileAppender" />
+		<rollingPolicy class="org.apache.log4j.rolling.TimeBasedRollingPolicy">
+			<param name="ActiveFileName" value="/var/log/graylog2-server.log"/>
+			<param name="FileNamePattern" value="/var/log/graylog2-server.%d{yyyy-MM-dd}.log.gz"/>
+		</rollingPolicy>
 		<layout class="org.apache.log4j.PatternLayout">
 			<param name="ConversionPattern" value="%d %-5p: %c - %m%n" />
 		</layout>
