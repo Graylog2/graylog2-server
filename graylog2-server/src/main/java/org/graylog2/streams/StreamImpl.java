@@ -126,6 +126,10 @@ public class StreamImpl extends Persisted implements Stream, Persistable {
 	@Override
 	public List<StreamRule> getStreamRules() {
 		// TODO Auto-generated method stub
+
+        // TODO: PUT REGEX MATCHERS AT THE END
+        // TODO: CONVERT TO INTS AS GOOD AS POSSIBLE IN CACHE
+
 		return null;
 	}
 

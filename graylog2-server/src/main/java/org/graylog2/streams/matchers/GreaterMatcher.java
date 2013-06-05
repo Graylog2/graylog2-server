@@ -26,21 +26,21 @@ import org.graylog2.plugin.streams.StreamRule;
 /**
  * @author Lennart Koopmann <lennart@socketfeed.com>
  */
-public class GreaterMatcher implements StreamRuleMatcher {
+public class GreaterMatcher extends MatcherBase implements StreamRuleMatcher {
 
 	@Override
 	public boolean match(Message msg, StreamRule rule) {
-		int num;
-		int compare;
-		
-		try {
-			num = Integer.parseInt(msg.getField(rule.getField()).toString());
-			compare = Integer.parseInt(rule.getValue());
-		} catch (Exception e) {
-			return false;
-		}
-	
-		return num > compare;
+        Integer msgVal = getInt(msg.getField(rule.getField()));
+        if (msgVal == null) {
+            return false;
+        }
+
+        Integer ruleVal = getInt(rule.getValue());
+        if (ruleVal == null) {
+            return false;
+        }
+
+        return msgVal > ruleVal;
 	}
 
 }
