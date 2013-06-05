@@ -87,12 +87,6 @@
             <version>4.11</version>
             <scope>test</scope>
         </dependency>
-        <dependency>
-            <groupId>com.google.caliper</groupId>
-            <artifactId>caliper</artifactId>
-            <version>1.0-beta-1</version>
-            <scope>test</scope>
-        </dependency>
     </dependencies>
 
     <build>
