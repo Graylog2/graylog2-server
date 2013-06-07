@@ -23,10 +23,12 @@ package org.graylog2.streams.matchers;
 import org.graylog2.plugin.Message;
 import org.graylog2.plugin.streams.StreamRule;
 
+import static org.graylog2.streams.matchers.MatcherBase.getInt;
+
 /**
  * @author Lennart Koopmann <lennart@socketfeed.com>
  */
-public class GreaterMatcher extends MatcherBase implements StreamRuleMatcher {
+public class GreaterMatcher implements StreamRuleMatcher {
 
 	@Override
 	public boolean match(Message msg, StreamRule rule) {

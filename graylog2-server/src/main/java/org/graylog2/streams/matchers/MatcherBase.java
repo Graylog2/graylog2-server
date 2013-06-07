@@ -39,7 +39,7 @@ public class MatcherBase {
      * @param x The object to convert to an int
      * @return Converted object, 0 if empty or something went wrong.
      */
-    public Integer getInt(Object x) {
+    public static Integer getInt(Object x) {
         if (x == null) {
             return null;
         }
