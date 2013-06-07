@@ -63,12 +63,7 @@ public class MatcherBase {
          * user sent them in as non-numerical type.
          */
         LOG.debug("Warning: Trying to convert a <{}> to int. This should be avoided.", x.getClass().getCanonicalName());
-        Integer result = Ints.tryParse(x.toString());
-        if (result == null) {
-            return null;
-        } else {
-            return result;
-        }
+        return Ints.tryParse(x.toString());
     }
 
 }
