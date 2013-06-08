@@ -25,6 +25,8 @@ import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.client.Client;
 import org.elasticsearch.index.query.FilterBuilder;
 import org.elasticsearch.index.query.FilterBuilders;
+import org.elasticsearch.index.query.QueryBuilder;
+import org.elasticsearch.search.SearchHit;
 import org.elasticsearch.search.facet.FacetBuilders;
 import org.elasticsearch.search.facet.datehistogram.DateHistogramFacet;
 import org.elasticsearch.search.facet.datehistogram.DateHistogramFacetBuilder;
@@ -36,6 +38,7 @@ import org.graylog2.indexer.results.DateHistogramResult;
 import org.graylog2.indexer.results.SearchResult;
 import org.graylog2.plugin.Tools;
 
+import static org.elasticsearch.index.query.QueryBuilders.matchAllQuery;
 import static org.elasticsearch.index.query.QueryBuilders.queryString;
 
 /**
@@ -77,5 +80,29 @@ public class Searches {
 		SearchResponse r = c.search(srb.request()).actionGet();
 		return new DateHistogramResult((DateHistogramFacet) r.getFacets().facet("histogram"), query, interval, r.getTook());
 	}
+
+    public SearchHit firstOfIndex(String index) {
+        return oneOfIndex(index, matchAllQuery(), SortOrder.DESC);
+    }
+
+    public SearchHit lastOfIndex(String index) {
+        return oneOfIndex(index, matchAllQuery(), SortOrder.ASC);
+    }
+
+    private SearchHit oneOfIndex(String index, QueryBuilder q, SortOrder sort) {
+        SearchRequestBuilder srb = c.prepareSearch();
+        srb.setIndices(index);
+        srb.setQuery(q);
+        srb.setSize(1);
+        srb.addSort("timestamp", sort);
+
+        SearchResponse r = c.search(srb.request()).actionGet();
+        if (r.getHits() != null && r.getHits().totalHits() > 0) {
+            return r.getHits().getAt(0);
+        } else {
+            return null;
+        }
+    }
+
 	
 }

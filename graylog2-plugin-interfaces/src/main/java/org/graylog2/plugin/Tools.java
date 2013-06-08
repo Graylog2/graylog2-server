@@ -34,8 +34,11 @@ import java.util.UUID;
 import java.util.zip.GZIPInputStream;
 import java.util.zip.InflaterInputStream;
 import org.drools.util.codec.Base64;
+import org.elasticsearch.search.SearchHit;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
+import org.joda.time.format.DateTimeFormat;
+import org.joda.time.format.DateTimeFormatter;
 
 /**
  * Utilty class for various tool/helper functions.
@@ -246,6 +249,18 @@ public final class Tools {
     	cal.setTimeInMillis((long) (1000 * timestamp));
 
         return String.format("%1$tY-%1$tm-%1$td %1$tH-%1$tM-%1$tS.%1$tL", cal); // ramtamtam
+    }
+
+    public static int getTimestampOfMessage(SearchHit msg) {
+        Object field = msg.getSource().get("timestamp");
+        if (field == null) {
+            throw new RuntimeException("Document has no field timestamp.");
+        }
+
+        DateTimeFormatter formatter = DateTimeFormat.forPattern("yyyy-MM-dd HH-mm-ss.SSS");
+        DateTime dt = formatter.parseDateTime(field.toString());
+
+        return (int) (dt.getMillis()/1000);
     }
  
 }

@@ -27,6 +27,7 @@ import java.util.Set;
 import org.graylog2.Core;
 import org.graylog2.activities.Activity;
 import org.graylog2.buffers.BufferWatermark;
+import org.graylog2.indexer.IndexRange;
 import org.graylog2.plugin.Tools;
 import org.joda.time.DateTime;
 import org.slf4j.Logger;
@@ -205,25 +206,6 @@ public class MongoBridge {
         
         // Upsert, because there might be a plugin already and we don't purge for single.
         coll.update(query, new BasicDBObject(plugin), true, false);
-    }
-    
-    public void writeIndexDateRange(String indexName, int startDate) {
-        BasicDBObject obj = new BasicDBObject();
-        obj.put("index", indexName);
-        obj.put("start", startDate);
-        
-        connection.getDatabase().getCollection("index_ranges").insert(obj);
-    }
-    
-    public List<DBObject> getIndexDateRanges() {
-        return connection.getDatabase().getCollection("index_ranges").find().toArray();
-    }
-    
-    public void removeIndexDateRange(String indexName) {
-        BasicDBObject obj = new BasicDBObject();
-        obj.put("index", indexName);
-        
-        connection.getDatabase().getCollection("index_ranges").remove(obj);
     }
     
     /**

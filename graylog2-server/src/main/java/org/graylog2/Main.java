@@ -117,11 +117,14 @@ public final class Main {
         }
 
         // Are we in debug mode?
+        Level logLevel = Level.INFO;
         if (commandLineArguments.isDebug()) {
             LOG.info("Running in Debug mode");
-            org.apache.log4j.Logger.getRootLogger().setLevel(Level.ALL);
-            org.apache.log4j.Logger.getLogger(Main.class.getPackage().getName()).setLevel(Level.ALL);
+            logLevel = Level.DEBUG;
         }
+
+        org.apache.log4j.Logger.getRootLogger().setLevel(logLevel);
+        org.apache.log4j.Logger.getLogger(Main.class.getPackage().getName()).setLevel(logLevel);
 
         LOG.info("Graylog2 {} starting up. (JRE: {})", Core.GRAYLOG2_VERSION, Tools.getSystemInformation());
 

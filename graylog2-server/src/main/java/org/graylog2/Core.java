@@ -21,6 +21,7 @@
 package org.graylog2;
 
 import org.glassfish.grizzly.http.server.HttpServer;
+import org.graylog2.indexer.IndexRangeManager;
 import org.graylog2.plugin.Tools;
 
 import java.io.IOException;

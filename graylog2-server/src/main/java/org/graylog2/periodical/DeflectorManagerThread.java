@@ -52,13 +52,6 @@ public class DeflectorManagerThread implements Runnable { // public class Klimpe
         } catch (Exception e) {
             LOG.error("Couldn't point deflector to a new index", e);
         }
-        
-        // Delete outdated, empty indices.
-        try {
-            deleteEmptyIndices();
-        } catch (Exception e) {
-            LOG.error("Couldn't delete outdated or empty indices", e);
-        }
     }
     
     private void point() {
@@ -87,28 +80,6 @@ public class DeflectorManagerThread implements Runnable { // public class Klimpe
                             currentTarget,messageCountInTarget,
                             graylogServer.getConfiguration().getElasticSearchMaxDocsPerIndex()
                     });
-        }
-    }
-    
-    private void deleteEmptyIndices() {
-        for(Map.Entry<String, IndexStats> e : graylogServer.getDeflector().getAllDeflectorIndices().entrySet()) {
-            if (e.getValue().getTotal().getDocs().getCount() == 0) {
-                String index = e.getKey();
-                
-                // Never delete the index the deflector is currently pointing to, even if it is empty.
-                try {
-                    if (index.equals(graylogServer.getDeflector().getCurrentTargetName())) {
-                        continue;
-                    }
-                } catch (NoTargetIndexException zomg) { /* I don't care */ }
-                
-                String msg = "Deleting empty index <" + index + ">";
-                graylogServer.getActivityWriter().write(new Activity(msg, DeflectorManagerThread.class));
-                LOG.info(msg);
-                
-                graylogServer.getIndexer().deleteIndex(index);
-                graylogServer.getMongoBridge().removeIndexDateRange(index);
-            }
         }
     }
     

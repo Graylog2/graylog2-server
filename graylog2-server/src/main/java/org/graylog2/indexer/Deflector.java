@@ -106,7 +106,8 @@ public class Deflector {
         // Create new index.
         LOG.info("Creating index target <{}>...", newTarget);
         server.getIndexer().createIndex(newTarget);
-        server.getMongoBridge().writeIndexDateRange(newTarget, Tools.getUTCTimestamp());
+        updateIndexRanges(newTarget);
+
         LOG.info("Done!");
         
         // Point deflector to new index.
@@ -114,11 +115,11 @@ public class Deflector {
 
         Activity activity = new Activity(Deflector.class);
         if (oldTargetNumber == -1) {
-            // Only poiting, not cycling.
+            // Only pointing, not cycling.
             pointTo(newTarget);
             activity.setMessage("Cycled deflector from <none> to <" + newTarget + ">");
         } else {
-            // Re-poiting from existing old index to the new one.
+            // Re-pointing from existing old index to the new one.
             pointTo(newTarget, oldTarget);
             activity.setMessage("Cycled deflector from <" + oldTarget + "> to <" + newTarget + ">");
         }
@@ -210,6 +211,15 @@ public class Deflector {
     
     private void pointTo(String newIndex) {
         server.getIndexer().cycleAlias(DEFLECTOR_NAME, newIndex);
+    }
+
+    private void updateIndexRanges(String index) {
+        Map<String, Object> params = Maps.newHashMap();
+        params.put("index", index);
+        params.put("start", Tools.getUTCTimestamp());
+
+        IndexRange range = new IndexRange(server, params);
+        range.saveWithoutValidation();
     }
     
 }
