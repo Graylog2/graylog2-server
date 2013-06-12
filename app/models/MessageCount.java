@@ -7,7 +7,6 @@ import models.api.results.MessageCountResult;
 import play.cache.Cache;
 
 import java.io.IOException;
-import java.net.URL;
 
 public class MessageCount {
 
@@ -20,7 +19,7 @@ public class MessageCount {
             return cached;
         }
 
-        MessageCountResponse response = Api.get(Api.buildTarget("count/total"), new MessageCountResponse());
+        MessageCountResponse response = Api.get(Api.buildTarget("count/total"), MessageCountResponse.class);
         MessageCountResult result = new MessageCountResult(response.events);
         Cache.set(TOTAL_CNT_CACHE_KEY, result, TOTAL_CNT_CACHE_TTL);
         return result;

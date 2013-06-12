@@ -14,6 +14,7 @@ object ApplicationBuild extends Build {
     javaEbean,
 
     "com.google.code.gson" % "gson" % "2.2",
+    "com.ning" % "async-http-client" % "1.7.17",
 
     "org.mockito" % "mockito-all" % "1.9.5" % "test",
     "org.seleniumhq.selenium" % "selenium-java" % "2.33.0" % "test",

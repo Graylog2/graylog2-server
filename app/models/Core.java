@@ -19,7 +19,7 @@ public class Core {
             return cached;
         }
 
-        MessageFieldResponse response = Api.get(Api.buildTarget("system/fields"), new MessageFieldResponse());
+        MessageFieldResponse response = Api.get(Api.buildTarget("system/fields"), MessageFieldResponse.class);
         Set<String> result = response.fields;
         Cache.set(MESSAGE_FIELDS_CACHE_KEY, result, MESSAGE_FIELDS_CACHE_TTL);
         return result;

@@ -16,7 +16,7 @@ public class Message {
 	public static MessageResult get(String index, String id) throws IOException, APIException {
 		URL url = Api.buildTarget("messages/" + index + "/" + id);
 		
-		GetMessageResponse r = Api.get(url, new GetMessageResponse());
+		GetMessageResponse r = Api.get(url, GetMessageResponse.class);
 		return new MessageResult(r.message, r.index);
 	}
 	
@@ -27,7 +27,7 @@ public class Message {
 		
 		URL url = Api.buildTarget("messages/" + index + "/analyze?string=" + Api.urlEncode(what));
 		
-		MessageAnalyzeResponse r = Api.get(url, new MessageAnalyzeResponse());
+		MessageAnalyzeResponse r = Api.get(url, MessageAnalyzeResponse.class);
 		return new MessageAnalyzeResult(r.tokens);
 	}
 	

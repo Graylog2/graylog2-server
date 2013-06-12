@@ -19,7 +19,7 @@ public class Stream {
 
 	public static StreamsResult allEnabled() throws IOException, APIException {
 		URL url = Api.buildTarget("streams");
-		GetStreamsResponse r = Api.get(url, new GetStreamsResponse());
+		GetStreamsResponse r = Api.get(url, GetStreamsResponse.class);
 		
 		return new StreamsResult(r.total, r.streams);
 	}
