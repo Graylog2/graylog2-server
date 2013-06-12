@@ -20,14 +20,12 @@
 
 package org.graylog2.database;
 
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
 import org.graylog2.Core;
 import org.graylog2.activities.Activity;
 import org.graylog2.buffers.BufferWatermark;
-import org.graylog2.indexer.IndexRange;
 import org.graylog2.plugin.Tools;
 import org.joda.time.DateTime;
 import org.slf4j.Logger;

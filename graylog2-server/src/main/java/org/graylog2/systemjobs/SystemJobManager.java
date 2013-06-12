@@ -19,9 +19,15 @@
  */
 package org.graylog2.systemjobs;
 
+import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import org.graylog2.Core;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.TimeUnit;
 
 /**
  * @author Lennart Koopmann <lennart@torch.sh>
@@ -32,12 +38,21 @@ public class SystemJobManager {
 
     private final Core server;
 
+    private static final int THREAD_POOL_SIZE = 15;
+
+    private ExecutorService executor = Executors.newFixedThreadPool(
+            THREAD_POOL_SIZE,
+            new ThreadFactoryBuilder().setNameFormat("systemjob-executor-%d").build()
+    );
+
     public SystemJobManager(Core server) {
         this.server = server;
     }
 
     public void submit(SystemJob job) {
-        LOG.info("Received SystemJob <{}>", job.getClass().getCanonicalName());
+        job.setJobReference(new SystemJobReference());
+        executor.submit((Runnable) job);
+        LOG.info("Submitted SystemJob <{}>", job.getClass().getCanonicalName());
     }
 
 }

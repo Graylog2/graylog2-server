@@ -27,10 +27,6 @@ public class SystemJobReference {
     private boolean isComplete = false;
     private int percentDone = 0;
 
-    public SystemJobReference(SystemJob job) {
-
-    }
-
     public void setPercentDone(int percent) throws IllegalArgumentException {
         if (percent < 0 || percent > 100) {
             throw new IllegalArgumentException("Percent cannot be lower than 0 or higher than 100");

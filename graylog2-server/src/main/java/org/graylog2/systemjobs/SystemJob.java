@@ -19,11 +19,19 @@
  */
 package org.graylog2.systemjobs;
 
+import org.graylog2.Core;
+
 /**
  * @author Lennart Koopmann <lennart@torch.sh>
  */
 public interface SystemJob {
 
-    public void execute(SystemJobReference sjr);
+    public void prepare(Core server);
+    public void setJobReference(SystemJobReference sjr);
+
+    public boolean providesProgress();
+    public boolean isStoppable();
+
+    public String getDescription();
 
 }

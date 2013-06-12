@@ -17,61 +17,46 @@
  * along with Graylog2.  If not, see <http://www.gnu.org/licenses/>.
  *
  */
-package org.graylog2.rest.resources.system.jobs;
+package org.graylog2.rest.resources.system.indices.ranges;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.google.common.collect.Maps;
 import com.sun.jersey.api.core.ResourceConfig;
 import org.graylog2.Core;
+import org.graylog2.indexer.ranges.RebuildIndexRangesJob;
 import org.graylog2.rest.RestResource;
+import org.graylog2.systemjobs.SystemJob;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.ws.rs.GET;
-import javax.ws.rs.Path;
-import javax.ws.rs.Produces;
-import javax.ws.rs.QueryParam;
+import javax.ws.rs.*;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
-import java.util.Map;
+import javax.ws.rs.core.Response;
 
 /**
  * @author Lennart Koopmann <lennart@torch.sh>
  */
-@Path("/system/jobs")
-public class SystemJobResource extends RestResource {
+@Path("/system/indices/ranges")
+public class IndexRangesResource extends RestResource {
 
-    private static final Logger LOG = LoggerFactory.getLogger(SystemJobResource.class);
+    private static final Logger LOG = LoggerFactory.getLogger(IndexRangesResource.class);
 
     private final ObjectMapper objectMapper = new ObjectMapper();
 
     @Context
     ResourceConfig rc;
 
-    @GET
-    @Path("/")
+    @POST
+    @Path("/rebuild")
     @Produces(MediaType.APPLICATION_JSON)
-    public String listJobs(@QueryParam("pretty") boolean prettyPrint) {
+    public Response rebuild() {
         Core core = (Core) rc.getProperty("core");
 
-        Map<String, Object> result = Maps.newHashMap();
-        result.put("jobs", Maps.newHashMap());
+        SystemJob rebuildJob = new RebuildIndexRangesJob();
+        rebuildJob.prepare(core);
+        core.getSystemJobManager().submit(rebuildJob);
 
-        /*
-
-        returns only active and recently finished
-
-        jobs: [
-          { id (uid), started_at, is_stoppable, percent_complete, title, description, started_by (user_id/system) },
-          ...
-        ]
-
-         */
-
-        return json(result, prettyPrint);
+        return Response.status(Response.Status.ACCEPTED).build();
     }
-
-    // GET single job
-    // DELETE try to stop/cancel job
 
 }

@@ -17,7 +17,7 @@
  * along with Graylog2.  If not, see <http://www.gnu.org/licenses/>.
  *
  */
-package org.graylog2.indexer;
+package org.graylog2.indexer.ranges;
 
 import com.beust.jcommander.internal.Lists;
 import com.google.common.base.Stopwatch;
@@ -25,6 +25,7 @@ import com.google.common.collect.Maps;
 import org.elasticsearch.search.SearchHit;
 import org.graylog2.Core;
 import org.graylog2.activities.Activity;
+import org.graylog2.indexer.EmptyIndexException;
 import org.graylog2.plugin.Tools;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

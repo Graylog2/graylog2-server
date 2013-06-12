@@ -17,7 +17,7 @@
  * along with Graylog2.  If not, see <http://www.gnu.org/licenses/>.
  *
  */
-package org.graylog2.indexer;
+package org.graylog2.indexer.ranges;
 
 import com.mongodb.BasicDBObject;
 import com.mongodb.DBObject;
@@ -25,7 +25,6 @@ import org.bson.types.ObjectId;
 import org.graylog2.Core;
 import org.graylog2.database.Persistable;
 import org.graylog2.database.Persisted;
-import org.graylog2.database.validators.Validator;
 
 import java.util.Map;
 
@@ -36,7 +35,7 @@ public class IndexRange extends Persisted implements Persistable {
 
     public static final String COLLECTION = "index_ranges";
 
-    protected IndexRange(Core core, Map<String, Object> fields) {
+    public IndexRange(Core core, Map<String, Object> fields) {
         super(COLLECTION, core, fields);
     }
 
