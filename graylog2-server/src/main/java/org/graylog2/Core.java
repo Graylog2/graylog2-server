@@ -30,6 +30,7 @@ import java.util.List;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 
+import org.graylog2.systemjobs.SystemJobManager;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 import org.slf4j.Logger;
@@ -138,6 +139,8 @@ public class Core implements GraylogServer {
     
     private ActivityWriter activityWriter;
 
+    private SystemJobManager systemJobManager;
+
     private String serverId;
     
     private boolean localMode = false;
@@ -169,7 +172,9 @@ public class Core implements GraylogServer {
         cluster = new Cluster(this);
         
         activityWriter = new ActivityWriter(this);
-        
+
+        systemJobManager = new SystemJobManager(this);
+
         messageCounterManager = new MessageCounterManagerImpl();
         messageCounterManager.register(MASTER_COUNTER_NAME);
 
@@ -481,6 +486,10 @@ public class Core implements GraylogServer {
     
     public ActivityWriter getActivityWriter() {
         return this.activityWriter;
+    }
+
+    public SystemJobManager getSystemJobManager() {
+        return this.systemJobManager;
     }
     
     @Override
