@@ -1,0 +1,14 @@
+@(currentUser: User, jobs: api.results.SystemJobsResult)
+
+@main("System", views.html.system.sidebar(), "", currentUser) {
+
+    <h1>System</h1>
+
+    <h2>Active system jobs</h2>
+    @for(job <- jobs.getJobs) {
+        @job.getId() on @job.getNodeId() is @job.getPercentComplete()% complete (@job.getDescription())<br />
+    }
+
+    curl -XPOST http://localhost:12900/system/indices/ranges/rebuild -v
+
+}

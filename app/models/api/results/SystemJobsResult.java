@@ -17,32 +17,35 @@
  * along with Graylog2.  If not, see <http://www.gnu.org/licenses/>.
  *
  */
-package controllers;
+package models.api.results;
 
-import lib.APIException;
-import lib.Api;
+import com.google.common.collect.Lists;
+import models.Stream;
 import models.SystemJob;
-import models.api.results.SystemJobsResult;
-import play.mvc.*;
+import models.api.responses.StreamSummaryResponse;
+import models.api.responses.SystemJobSummaryResponse;
 
-import java.io.IOException;
+import java.util.List;
 
 /**
  * @author Lennart Koopmann <lennart@torch.sh>
  */
-public class SystemController extends AuthenticatedController {
+public class SystemJobsResult {
 
-    public static Result index() {
-        try {
-            SystemJobsResult systemJobs = SystemJob.all();
+    private final List<SystemJobSummaryResponse> jobs;
 
-            return ok(views.html.system.index.render(currentUser(), systemJobs));
-        } catch (IOException e) {
-            return status(504, views.html.errors.error.render(Api.ERROR_MSG_IO, e, request()));
-        } catch (APIException e) {
-            String message = "Could not fetch system information. We expected HTTP 200, but got a HTTP " + e.getHttpCode() + ".";
-            return status(504, views.html.errors.error.render(message, e, request()));
+    public SystemJobsResult(List<SystemJobSummaryResponse> jobs) {
+        this.jobs = jobs;
+    }
+
+    public List<SystemJob> getJobs() {
+        List<SystemJob> jobs = Lists.newArrayList();
+
+        for (SystemJobSummaryResponse sjsr : this.jobs) {
+            jobs.add(new SystemJob(sjsr));
         }
+
+        return jobs;
     }
 
 }

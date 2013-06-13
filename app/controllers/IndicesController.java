@@ -19,30 +19,11 @@
  */
 package controllers;
 
-import lib.APIException;
-import lib.Api;
-import models.SystemJob;
-import models.api.results.SystemJobsResult;
-import play.mvc.*;
-
-import java.io.IOException;
-
 /**
  * @author Lennart Koopmann <lennart@torch.sh>
  */
-public class SystemController extends AuthenticatedController {
+public class IndicesController extends AuthenticatedController {
 
-    public static Result index() {
-        try {
-            SystemJobsResult systemJobs = SystemJob.all();
 
-            return ok(views.html.system.index.render(currentUser(), systemJobs));
-        } catch (IOException e) {
-            return status(504, views.html.errors.error.render(Api.ERROR_MSG_IO, e, request()));
-        } catch (APIException e) {
-            String message = "Could not fetch system information. We expected HTTP 200, but got a HTTP " + e.getHttpCode() + ".";
-            return status(504, views.html.errors.error.render(message, e, request()));
-        }
-    }
 
 }

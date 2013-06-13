@@ -20,6 +20,10 @@ GET		/messages/:index/:id/partial	controllers.MessagesController.asPartial(index
 GET		/streams						controllers.StreamsController.index()
 GET     /streams/new                    controllers.StreamsController.newStream()
 
+# System
+GET     /system                         controllers.SystemController.index()
+#GET     /system/indices                 controllers.IndicesController.index()
+
 # API: Message counts and histograms
 GET		/a/messagecounts/histogram		controllers.MessageCountsController.histogram(timerange ?= "")
 GET		/a/messagecounts/total  		controllers.MessageCountsController.total()
@@ -28,7 +32,7 @@ GET		/a/messagecounts/total  		controllers.MessageCountsController.total()
 GET		/a/analyze/:index/:id/:field	controllers.MessagesController.analyze(index: String, id: String, field: String)
 
 # API: System/CORE
-GET		/a/system/fields                controllers.SystemController.fields()
+GET		/a/system/fields                controllers.SystemApiController.fields()
 
 # Map static resources from the /public folder to the /assets URL path
 GET     /assets/*file               	controllers.Assets.at(path="/public", file)
