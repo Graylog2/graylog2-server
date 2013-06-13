@@ -40,7 +40,7 @@ import org.graylog2.Core;
 import org.graylog2.activities.Activity;
 import org.graylog2.indexer.counts.Counts;
 import org.graylog2.indexer.messages.Messages;
-import org.graylog2.indexer.ranges.IndexRangeManager;
+import org.graylog2.indexer.ranges.IndexRange;
 import org.graylog2.indexer.searches.Searches;
 import org.graylog2.plugin.Message;
 import org.graylog2.plugin.indexer.MessageGateway;
@@ -316,7 +316,7 @@ public class Indexer {
             
             // Sorry if this should ever go mad. Delete the index!
             deleteIndex(indexName);
-            new IndexRangeManager(server).removeRange(indexName);
+            IndexRange.destroy(server, indexName);
         }
     }
     

@@ -19,14 +19,18 @@
  */
 package org.graylog2.systemjobs;
 
+import com.eaio.uuid.UUID;
+import com.google.common.base.Stopwatch;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import org.graylog2.Core;
+import org.graylog2.activities.Activity;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -45,14 +49,36 @@ public class SystemJobManager {
             new ThreadFactoryBuilder().setNameFormat("systemjob-executor-%d").build()
     );
 
+    private final Map<String, SystemJob> jobs;
+
     public SystemJobManager(Core server) {
         this.server = server;
+
+        jobs = new ConcurrentHashMap<String, SystemJob>();
     }
 
-    public void submit(SystemJob job) {
-        job.setJobReference(new SystemJobReference());
-        executor.submit((Runnable) job);
-        LOG.info("Submitted SystemJob <{}>", job.getClass().getCanonicalName());
+    public String submit(final SystemJob job) {
+        final String jobClass = job.getClass().getCanonicalName();
+
+        job.setId(new UUID().toString());
+        jobs.put(job.getId(), job);
+        executor.submit(new Runnable() {
+            @Override
+            public void run() {
+                Stopwatch x = new Stopwatch().start();
+                job.execute();  // ... blocks until it finishes.
+                x.stop();
+
+                jobs.remove(job.getId());
+
+                String msg = "SystemJob <" + job.getId() + "> [" + jobClass + "] finished in " + x.elapsed(TimeUnit.MILLISECONDS) + "ms.";
+                LOG.info(msg);
+                server.getActivityWriter().write(new Activity(msg, SystemJobManager.class));
+            }
+        });
+
+        LOG.info("Submitted SystemJob <{}> [{}]", job.getId(), jobClass);
+        return job.getId();
     }
 
 }

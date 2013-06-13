@@ -23,8 +23,11 @@ import com.mongodb.BasicDBObject;
 import com.mongodb.DBObject;
 import org.bson.types.ObjectId;
 import org.graylog2.Core;
+import org.graylog2.activities.Activity;
 import org.graylog2.database.Persistable;
 import org.graylog2.database.Persisted;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.Map;
 
@@ -32,6 +35,8 @@ import java.util.Map;
  * @author Lennart Koopmann <lennart@torch.sh>
  */
 public class IndexRange extends Persisted implements Persistable {
+
+    private static final Logger LOG = LoggerFactory.getLogger(IndexRange.class);
 
     public static final String COLLECTION = "index_ranges";
 
@@ -47,6 +52,15 @@ public class IndexRange extends Persisted implements Persistable {
         DBObject dbo = findOne(new BasicDBObject("index", index), core, COLLECTION);
 
         return new IndexRange((ObjectId) dbo.get("_id"), core, dbo.toMap());
+    }
+
+    public static void destroy(Core server, String index) {
+        IndexRange range = IndexRange.get(index, server);
+        range.destroy();
+
+        String x = "Removed range meta-information of [" + index + "]";
+        LOG.info(x);
+        server.getActivityWriter().write(new Activity(x, IndexRange.class));
     }
 
     @Override

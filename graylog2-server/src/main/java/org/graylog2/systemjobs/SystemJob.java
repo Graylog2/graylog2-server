@@ -24,14 +24,33 @@ import org.graylog2.Core;
 /**
  * @author Lennart Koopmann <lennart@torch.sh>
  */
-public interface SystemJob {
+public abstract class SystemJob {
 
-    public void prepare(Core server);
-    public void setJobReference(SystemJobReference sjr);
+    public abstract void execute();
+    public abstract void requestCancel();
+    public abstract int getProgress();
 
-    public boolean providesProgress();
-    public boolean isStoppable();
+    public abstract boolean providesProgress();
+    public abstract boolean isCancelable();
+    public abstract String getDescription();
 
-    public String getDescription();
+    protected Core server;
+    protected String id;
+
+    public void prepare(Core server) {
+        this.server = server;
+    }
+
+    public String getId() {
+        if (id == null) {
+            throw new IllegalStateException("Cannot return ID if the job has not been started yet.");
+        }
+
+        return id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
+    }
 
 }

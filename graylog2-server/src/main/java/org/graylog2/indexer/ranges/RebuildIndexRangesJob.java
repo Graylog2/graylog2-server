@@ -19,40 +19,46 @@
  */
 package org.graylog2.indexer.ranges;
 
+import com.beust.jcommander.internal.Lists;
+import com.google.common.base.Stopwatch;
+import com.google.common.collect.Maps;
+import org.elasticsearch.search.SearchHit;
 import org.graylog2.Core;
+import org.graylog2.activities.Activity;
+import org.graylog2.indexer.EmptyIndexException;
+import org.graylog2.plugin.Tools;
 import org.graylog2.systemjobs.SystemJob;
-import org.graylog2.systemjobs.SystemJobReference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.util.List;
+import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
 /**
  * @author Lennart Koopmann <lennart@torch.sh>
  */
-public class RebuildIndexRangesJob implements SystemJob, Runnable {
+public class RebuildIndexRangesJob extends SystemJob {
 
-    private Core server;
-    private SystemJobReference jobReference;
+    private static final Logger LOG = LoggerFactory.getLogger(RebuildIndexRangesJob.class);
 
-    @Override
-    public void prepare(Core server) {
-        this.server = server;
-    }
-
-    // TODO: We can actually provide progress here. We can even stop it.
+    private boolean cancelRequested = false;
+    private int indicesToCalculate = 0;
+    private int indicesCalculated = 0;
 
     @Override
-    public void setJobReference(SystemJobReference sjr) {
-        this.jobReference = sjr;
+    public void requestCancel() {
+        this.cancelRequested = true;
     }
 
     @Override
-    public boolean providesProgress() {
-        return false;
-    }
+    public int getProgress() {
+        if (indicesToCalculate <= 0) {
+            return 0;
+        }
 
-    @Override
-    public boolean isStoppable() {
-        return false;
+        // lolwtfbbqcasting
+        return (int) Math.floor(((float) indicesCalculated / (float) indicesToCalculate)*100);
     }
 
     @Override
@@ -61,12 +67,85 @@ public class RebuildIndexRangesJob implements SystemJob, Runnable {
     }
 
     @Override
-    public void run() {
-        if (server == null || jobReference == null) {
-            throw new RuntimeException("Job is not prepared.");
+    public void execute() {
+        List<Map<String, Object>> ranges = Lists.newArrayList();
+        info("Re-calculating index ranges.");
+
+        String[] indices = server.getDeflector().getAllDeflectorIndexNames();
+        if (indices == null || indices.length == 0) {
+            info("No indices, nothing to calculate.");
+            return;
+        }
+        indicesToCalculate = indices.length;
+
+        Stopwatch sw = new Stopwatch().start();
+        for(String index : indices) {
+            if (cancelRequested) {
+                info("Stop requested. Not calculating next index range, not updating ranges.");
+                sw.stop();
+                return;
+            }
+
+            try {
+                ranges.add(calculateRange(index));
+            } catch (EmptyIndexException e) {
+                LOG.info("Index [{}] is empty. Not calculating ranges.", index);
+                continue;
+            } catch (Exception e1) {
+                LOG.info("Could not calculate range of index [{}]. Skipping.", index, e1);
+                continue;
+            } finally {
+                indicesCalculated++;
+            }
         }
 
-        IndexRangeManager irm = new IndexRangeManager(server);
-        irm.rebuildIndexRanges();
+        // Now that all is calculated we can replace the whole collection at once.
+        updateCollection(ranges);
+
+        info("Done calculating index ranges for " + indices.length + " indices. Took " + sw.stop().elapsed(TimeUnit.MILLISECONDS) + "ms.");
+    }
+
+    private Map<String, Object> calculateRange(String index) throws EmptyIndexException {
+        Map<String, Object> range = Maps.newHashMap();
+
+        Stopwatch x = new Stopwatch().start();
+        SearchHit doc = server.getIndexer().searches().firstOfIndex(index);
+        if (doc == null || doc.isSourceEmpty()) {
+            x.stop();
+            throw new EmptyIndexException();
+        }
+
+        int rangeStart = Tools.getTimestampOfMessage(doc);
+        int took = (int) x.stop().elapsed(TimeUnit.MILLISECONDS);
+
+        range.put("index", index);
+        range.put("start", rangeStart);
+        range.put("calculated_at", Tools.getUTCTimestamp());
+        range.put("took_ms",  took);
+
+        LOG.info("Calculated range of [{}] in [{}ms].", index, took);
+        return range;
+    }
+
+    private void updateCollection(List<Map<String, Object>> ranges) {
+        IndexRange.destroyAll(server, IndexRange.COLLECTION);
+        for (Map<String, Object> range : ranges) {
+            new IndexRange(server, range).saveWithoutValidation();
+        }
+    }
+
+    private void info(String what) {
+        LOG.info(what);
+        server.getActivityWriter().write(new Activity(what, RebuildIndexRangesJob.class));
+    }
+
+    @Override
+    public boolean providesProgress() {
+        return true;
+    }
+
+    @Override
+    public boolean isCancelable() {
+        return true;
     }
 }
