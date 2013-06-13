@@ -65,6 +65,8 @@ public class SystemJobManager {
         executor.submit(new Runnable() {
             @Override
             public void run() {
+                job.markStarted();
+
                 Stopwatch x = new Stopwatch().start();
                 job.execute();  // ... blocks until it finishes.
                 x.stop();
@@ -79,6 +81,10 @@ public class SystemJobManager {
 
         LOG.info("Submitted SystemJob <{}> [{}]", job.getId(), jobClass);
         return job.getId();
+    }
+
+    public Map<String, SystemJob> getRunningJobs() {
+        return jobs;
     }
 
 }

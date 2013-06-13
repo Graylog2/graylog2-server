@@ -20,6 +20,7 @@
 package org.graylog2.systemjobs;
 
 import org.graylog2.Core;
+import org.joda.time.DateTime;
 
 /**
  * @author Lennart Koopmann <lennart@torch.sh>
@@ -36,6 +37,7 @@ public abstract class SystemJob {
 
     protected Core server;
     protected String id;
+    protected DateTime startedAt;
 
     public void prepare(Core server) {
         this.server = server;
@@ -51,6 +53,14 @@ public abstract class SystemJob {
 
     public void setId(String id) {
         this.id = id;
+    }
+
+    public void markStarted() {
+        startedAt = DateTime.now();
+    }
+
+    public DateTime getStartedAt() {
+        return startedAt;
     }
 
 }
