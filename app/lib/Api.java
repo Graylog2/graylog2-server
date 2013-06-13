@@ -19,9 +19,23 @@ public class Api {
 
 	public static final String ERROR_MSG_IO = "Could not connect to graylog2-server. Please make sure that it is running and you configured the correct REST URI.";
 
+	private static AsyncHttpClient client;
+	static {
+		AsyncHttpClientConfig.Builder builder = new AsyncHttpClientConfig.Builder();
+		builder.setAllowPoolingConnection(false);
+		client = new AsyncHttpClient(builder.build());
+
+		Runtime.getRuntime().addShutdownHook(new Thread(new Runnable() {
+			@Override
+			public void run() {
+				client.close();
+			}
+		}));
+	}
+
 	public static <T> T get(URL url, Class<T> responseClass) throws APIException, IOException {
 		try {
-			AsyncHttpClient.BoundRequestBuilder requestBuilder = getClient().prepareGet(url.toString());
+			AsyncHttpClient.BoundRequestBuilder requestBuilder = client.prepareGet(url.toString());
 			requestBuilder.addHeader("Accept", "application/json");
 			final Response response = requestBuilder.execute().get();
 
@@ -61,10 +75,4 @@ public class Api {
 		}
 	}
 
-	// TODO make cached
-	private static AsyncHttpClient getClient() {
-		AsyncHttpClientConfig.Builder builder = new AsyncHttpClientConfig.Builder();
-		builder.setAllowPoolingConnection(true);
-		return new AsyncHttpClient(builder.build());
-	}
 }
