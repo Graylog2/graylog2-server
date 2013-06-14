@@ -2,13 +2,34 @@
 
 @main("System", views.html.system.sidebar(), "", currentUser) {
 
-    <h1>System</h1>
+    <div class="row-fluid">
+        <h2><i class="icon icon-cogs"></i> Active system jobs</h2>
+        A system job is a long-running task a graylog2-server node executes. Some jobs
+        provide progress information or can be stopped.
 
-    <h2>Active system jobs</h2>
-    @for(job <- jobs.getJobs) {
-        @job.getId() on @job.getNodeId() is @job.getPercentComplete()% complete (@job.getDescription())<br />
-    }
+        @for(job <- jobs.getJobs) {
+            <div class="systemjob systemjob-progress systemjob-active" id="job-@job.getId()" data-job-id="@job.getId()">
+                <i class="icon icon-cog"></i>
+                Started @job.getDescription()
+                on <a href="#">implement.me.local</a>
+                at @job.getStartedAt()
 
-    curl -XPOST http://localhost:12900/system/indices/ranges/rebuild -v
+                <a href="#" title="Open details"><i class="icon icon-external-link"></i></a>
+
+                <span class="label label-success finished">Finished!</span>
+
+                <div class="progress progress-striped active">
+                    <div class="bar" style="width: @job.getPercentComplete()%;"></div>
+                </div>
+            </div>
+        }
+
+        @if(jobs.getJobs().isEmpty) {
+            <div class="alert alert-info systemjobs-none">
+                <j class="icon icon-info-sign"></j>
+                No active system jobs.
+            </div>
+        }
+    </div>
 
 }

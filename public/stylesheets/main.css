@@ -239,3 +239,25 @@ form #stream-rules {
 #new-stream-rule .well a {
     font-size: 11px;
 }
+
+.systemjob {
+    margin-top: 10px;
+    border-bottom: 1px solid #ccc;
+}
+
+.systemjob .progress {
+    margin-bottom: 5px;
+}
+
+.systemjob .finished {
+    display: none;
+    position: relative;
+    top: -1px;
+    left: 2px;
+    font-family: "Arial", sans-serif;
+    font-size: 11px;
+}
+
+.systemjobs-none {
+    margin-top: 5px;
+}

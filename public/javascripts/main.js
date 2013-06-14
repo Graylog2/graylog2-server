@@ -177,6 +177,49 @@ $(document).ready(function() {
         }
     });
 
+    // Update progress for systemjobs that provide it.
+    if ($(".systemjob-progress").size() > 0) {
+        (function updateSystemJobProgress() {
+            $.ajax({
+                url: '/a/system/jobs',
+                success: function(data) {
+                    // Check if there is an element that is not in the response anymore.
+                    // That would mean it's job has finished or was stopped.
+                    $(".systemjob-progress").each(function() {
+                        var id = $(this).attr("data-job-id");
+
+                        var included = false;
+                        data.jobs.forEach(function(job) {
+                            if (id === job.id) {
+                                included = true;
+                            }
+                        });
+
+                        if (!included) {
+                            $(this).removeClass("systemjob-progress");
+                            $(".progress .bar", $(this)).css("width", "100%");
+                            $(".progress", $(this)).removeClass("active");
+                            $(".progress", $(this)).addClass("progress-success");
+                            $(".finished", $(this)).show();
+                        }
+                    });
+
+                    data.jobs.forEach(function(job) {
+                       var el = $("#job-" + job.id);
+
+                        // Only update those jobs that provide progress.
+                        if (el.hasClass("systemjob-progress")) {
+                            $(".progress .bar", el).css("width", job.percent_complete + "%");
+                        }
+                    });
+                },
+                complete: function() {
+                    setTimeout(updateSystemJobProgress, 1000);
+                }
+            });
+        })();
+    }
+
 	function displayFailureInSidebar(message) {
 		x = "<span class='alert alert-error sidebar-alert'><i class='icon-warning-sign'></i> " + message + "</span>"
 		$("#sidebar-inner").html(x);

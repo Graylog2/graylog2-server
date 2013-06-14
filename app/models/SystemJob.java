@@ -26,28 +26,39 @@ import models.api.responses.GetSystemJobsResponse;
 import models.api.responses.SystemJobSummaryResponse;
 import models.api.results.StreamsResult;
 import models.api.results.SystemJobsResult;
+import org.joda.time.DateTime;
+import org.joda.time.format.ISODateTimeFormat;
 
 import java.io.IOException;
 import java.net.URL;
+import java.util.UUID;
 
 /**
  * @author Lennart Koopmann <lennart@torch.sh>
  */
 public class SystemJob {
 
-    private final String id;
+    private final UUID id;
     private final String description;
     private final String nodeId;
+    private final DateTime startedAt;
+    private final User startedBy;
     private final int percentComplete;
+    private final boolean isCancelable;
+    private final boolean providesProgress;
 
     public SystemJob(SystemJobSummaryResponse s) {
-        this.id = s.id;
+        this.id = UUID.fromString(s.id);
         this.description = s.description;
         this.nodeId = s.nodeId;
+        this.startedAt = DateTime.parse(s.startedAt);
+        this.startedBy = null; // TODO try to load user
         this.percentComplete = s.percentComplete;
+        this.isCancelable = s.isCancelable;
+        this.providesProgress = s.providesProgress;
     }
 
-    public String getId() {
+    public UUID getId() {
         return id;
     }
 
@@ -61,6 +72,10 @@ public class SystemJob {
 
     public int getPercentComplete() {
         return percentComplete;
+    }
+
+    public DateTime getStartedAt() {
+        return startedAt;
     }
 
     public static SystemJobsResult all() throws IOException, APIException {

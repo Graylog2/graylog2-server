@@ -41,8 +41,8 @@ public class SystemJobSummaryResponse {
     @SerializedName("percent_complete")
     public int percentComplete;
 
-    @SerializedName("is_stoppable")
-    public boolean isStoppable;
+    @SerializedName("is_cancelable")
+    public boolean isCancelable;
 
     @SerializedName("provides_progress")
     public boolean providesProgress;
