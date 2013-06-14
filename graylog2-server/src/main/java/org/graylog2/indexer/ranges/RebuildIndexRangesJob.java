@@ -63,7 +63,7 @@ public class RebuildIndexRangesJob extends SystemJob {
 
     @Override
     public String getDescription() {
-        return "Rebuilds index range information";
+        return "rebuilding index range information";
     }
 
     @Override

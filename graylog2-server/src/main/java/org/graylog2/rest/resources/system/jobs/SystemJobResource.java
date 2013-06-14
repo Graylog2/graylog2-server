@@ -27,10 +27,6 @@ import org.graylog2.Core;
 import org.graylog2.plugin.Tools;
 import org.graylog2.rest.RestResource;
 import org.graylog2.systemjobs.SystemJob;
-import org.joda.time.DateTime;
-import org.joda.time.DateTimeZone;
-import org.joda.time.format.DateTimeFormatter;
-import org.joda.time.format.ISODateTimeFormat;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -75,7 +71,7 @@ public class SystemJobResource extends RestResource {
             job.put("started_by", "SYSTEM/FIXME");
             job.put("percent_complete", jobInfo.getProgress());
             job.put("provides_progress", jobInfo.providesProgress());
-            job.put("is_stoppable", jobInfo.isCancelable());
+            job.put("is_cancelable", jobInfo.isCancelable());
             job.put("node_id", core.getServerId());
 
             jobs.add(job);
