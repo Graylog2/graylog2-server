@@ -23,27 +23,27 @@ package org.graylog2.activities;
  * @author Lennart Koopmann <lennart@socketfeed.com>
  */
 public class Activity {
-    
+
     String message;
     Class<?> caller;
-    
+
     public Activity(Class<?> caller) {
         this.caller = caller;
     }
-    
+
     public Activity(String content, Class<?> caller) {
         this.message = content;
         this.caller = caller;
     }
-    
+
     public void setMessage(String message) {
         this.message = message;
     }
-    
+
     public String getMessage() {
         return message;
     }
-    
+
     public Class<?> getCaller() {
         return caller;
     }

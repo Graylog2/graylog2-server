@@ -19,13 +19,22 @@
  */
 package org.graylog2.activities;
 
+import com.beust.jcommander.internal.Maps;
 import org.graylog2.Core;
+import org.graylog2.database.ValidationException;
+import org.graylog2.plugin.Tools;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.util.Map;
 
 /**
  * @author Lennart Koopmann <lennart@socketfeed.com>
  */
 public class ActivityWriter {
-    
+
+    private static final Logger LOG = LoggerFactory.getLogger(ActivityWriter.class);
+
     Core server;
     
     public ActivityWriter(Core server) {
@@ -33,7 +42,19 @@ public class ActivityWriter {
     }
     
     public void write(Activity activity) {
-        server.getMongoBridge().writeActivity(activity, server.getServerId());
+        try {
+            Map<String, Object> entry = Maps.newHashMap();
+            entry.put("timestamp", Tools.getCurrentISO8601String());
+            entry.put("content", activity.getMessage());
+            entry.put("caller", activity.getCaller().getCanonicalName());
+            entry.put("node_id", server.getServerId());
+
+            SystemMessage sm = new SystemMessage(entry, server);
+            sm.save();
+        } catch (ValidationException e) {
+            // no validations, not gonna happen lol
+
+        }
     }
     
 }

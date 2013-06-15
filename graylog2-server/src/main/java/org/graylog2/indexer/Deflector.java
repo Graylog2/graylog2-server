@@ -57,7 +57,7 @@ public class Deflector {
     }
     
     public boolean isUp() {
-        return this.server.getIndexer().indexExists(DEFLECTOR_NAME);
+        return this.server.getIndexer().aliasExists(DEFLECTOR_NAME);
     }
     
     public void setUp() {

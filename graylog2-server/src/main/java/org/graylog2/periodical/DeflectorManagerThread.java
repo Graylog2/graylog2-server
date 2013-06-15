@@ -48,6 +48,7 @@ public class DeflectorManagerThread implements Runnable { // public class Klimpe
     public void run() {
         // Point deflector to a new index if required.
         try {
+            checkAndRepair();
             point();
         } catch (Exception e) {
             LOG.error("Couldn't point deflector to a new index", e);
@@ -81,6 +82,23 @@ public class DeflectorManagerThread implements Runnable { // public class Klimpe
                             graylogServer.getConfiguration().getElasticSearchMaxDocsPerIndex()
                     });
         }
+    }
+
+    private void checkAndRepair() {
+        if (!graylogServer.getDeflector().isUp()) {
+            warn("Detected that there is no deflector alias. Trying to set up one now.");
+
+            // NEVER EVER WRITE TO AN INDEX CALLED "graylog2_deflector".
+
+            graylogServer.getDeflector().setUp();
+        }
+
+
+    }
+
+    private void warn(String x) {
+        LOG.warn(x);
+        graylogServer.getActivityWriter().write(new Activity(x, DeflectorManagerThread.class));
     }
     
 }

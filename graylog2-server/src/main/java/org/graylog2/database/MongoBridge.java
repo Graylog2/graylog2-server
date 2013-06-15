@@ -164,16 +164,6 @@ public class MongoBridge {
 
         getConnection().getMessageCountsColl().insert(obj);
     }
-
-    public void writeActivity(Activity activity, String nodeId) {
-        BasicDBObject obj = new BasicDBObject();
-        obj.put("timestamp", Tools.getUTCTimestamp());
-        obj.put("content", activity.getMessage());
-        obj.put("caller", activity.getCaller().getCanonicalName());
-        obj.put("node_id", nodeId);
-        
-        connection.getDatabase().getCollection("server_activities").insert(obj);
-    }
     
     public void writeDeflectorInformation(Map<String, Object> info) {
         DBCollection coll = connection.getDatabase().getCollection("deflector_informations");

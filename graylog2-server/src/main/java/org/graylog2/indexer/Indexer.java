@@ -11,6 +11,7 @@ import org.elasticsearch.action.WriteConsistencyLevel;
 import org.elasticsearch.action.admin.cluster.node.info.NodesInfoRequest;
 import org.elasticsearch.action.admin.cluster.node.info.NodesInfoResponse;
 import org.elasticsearch.action.admin.cluster.state.ClusterStateRequest;
+import org.elasticsearch.action.admin.indices.alias.get.IndicesGetAliasesRequest;
 import org.elasticsearch.action.admin.indices.create.CreateIndexRequest;
 import org.elasticsearch.action.admin.indices.create.CreateIndexResponse;
 import org.elasticsearch.action.admin.indices.delete.DeleteIndexRequest;
@@ -182,6 +183,10 @@ public class Indexer {
     public boolean indexExists(String index) {
         ActionFuture<IndicesExistsResponse> existsFuture = client.admin().indices().exists(new IndicesExistsRequest(index));
         return existsFuture.actionGet().isExists();
+    }
+
+    public boolean aliasExists(String alias) {
+        return client.admin().indices().existsAliases(new IndicesGetAliasesRequest(alias)).actionGet().exists();
     }
 
     public boolean createIndex(String indexName) {
