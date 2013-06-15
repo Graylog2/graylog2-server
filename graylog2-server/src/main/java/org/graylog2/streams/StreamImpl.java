@@ -54,15 +54,14 @@ public class StreamImpl extends Persisted implements Stream {
 
     private static final Logger LOG = LoggerFactory.getLogger(StreamImpl.class);
 
-
     private static final String COLLECTION = "streams";
 
     public StreamImpl(Map<String, Object> fields, Core core) {
-    	super(COLLECTION, core, fields);
+    	super(core, fields);
     }
 
     protected StreamImpl(ObjectId id, Map<String, Object> fields, Core core) {
-    	super(COLLECTION, core, id, fields);
+    	super(core, id, fields);
     }
     
     @SuppressWarnings("unchecked")
@@ -163,7 +162,12 @@ public class StreamImpl extends Persisted implements Stream {
         return this.id.toString() + ":" + this.getTitle();
     }
 
-	@Override
+    @Override
+    public String getCollectionName() {
+        return COLLECTION;
+    }
+
+    @Override
 	public ObjectId getId() {
 		return this.id;
 	}

@@ -35,11 +35,16 @@ public class SystemMessage extends Persisted {
     private static final String COLLECTION = "system_messages";
 
     public SystemMessage(Map<String, Object> fields, Core core) {
-        super(COLLECTION, core, fields);
+        super(core, fields);
     }
 
     protected SystemMessage(ObjectId id, Map<String, Object> fields, Core core) {
-        super(COLLECTION, core, id, fields);
+        super(core, id, fields);
+    }
+
+    @Override
+    public String getCollectionName() {
+        return COLLECTION;
     }
 
     @Override

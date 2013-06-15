@@ -46,21 +46,18 @@ public abstract class Persisted {
     protected final ObjectId id;
     
     protected final Core core;
-    protected final String collectionName;
 
-    protected Persisted(String collectionName, Core core, Map<String, Object> fields) {
+    protected Persisted(Core core, Map<String, Object> fields) {
         this.id = new ObjectId();
         this.fields = fields;
 
-        this.collectionName = collectionName;
         this.core = core;
     }
 
-    protected Persisted(String collectionName, Core core, ObjectId id, Map<String, Object> fields) {
+    protected Persisted(Core core, ObjectId id, Map<String, Object> fields) {
         this.id = id;
         this.fields = fields;
 
-        this.collectionName = collectionName;
         this.core = core;
     }
 
@@ -123,9 +120,9 @@ public abstract class Persisted {
     }
 	
 	protected DBCollection collection() {
-		return collection(this.core, this.collectionName);
+		return collection(this.core, getCollectionName());
 	}
-	
+
 	protected static DBCollection collection(Core core, String collectionName) {
 		return core.getMongoConnection().getDatabase().getCollection(collectionName);
 	}
@@ -153,6 +150,7 @@ public abstract class Persisted {
         return true;
     }
 
+    public abstract String getCollectionName();
     public abstract ObjectId getId();
     protected abstract Map<String, Validator> getValidations();
 }

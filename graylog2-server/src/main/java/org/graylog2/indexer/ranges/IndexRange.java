@@ -42,11 +42,16 @@ public class IndexRange extends Persisted {
     public static final String COLLECTION = "index_ranges";
 
     public IndexRange(Core core, Map<String, Object> fields) {
-        super(COLLECTION, core, fields);
+        super(core, fields);
+    }
+
+    @Override
+    public String getCollectionName() {
+        return COLLECTION;
     }
 
     protected IndexRange(ObjectId id, Core core, Map<String, Object> fields) {
-        super(COLLECTION, core, id, fields);
+        super(core, id, fields);
     }
 
     public static IndexRange get(String index, Core core) {

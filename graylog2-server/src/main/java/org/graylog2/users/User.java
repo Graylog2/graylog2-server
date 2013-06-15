@@ -45,11 +45,11 @@ public class User extends Persisted {
     private static final String COLLECTION = "users";
 
     public User(Map<String, Object> fields, Core core) {
-        super(COLLECTION, core, fields);
+        super(core, fields);
     }
 
     protected User(ObjectId id, Map<String, Object> fields, Core core) {
-        super(COLLECTION, core, id, fields);
+        super(core, id, fields);
     }
 
     public static boolean exists(String username, String passwordHash, Core core) {
@@ -86,6 +86,11 @@ public class User extends Persisted {
         }
 
         return password + salt;
+    }
+
+    @Override
+    public String getCollectionName() {
+        return COLLECTION;
     }
 
     @Override
