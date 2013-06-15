@@ -38,6 +38,7 @@ import org.elasticsearch.node.Node;
 import org.elasticsearch.node.NodeBuilder;
 import org.graylog2.Core;
 import org.graylog2.activities.Activity;
+import org.graylog2.indexer.cluster.Cluster;
 import org.graylog2.indexer.counts.Counts;
 import org.graylog2.indexer.messages.Messages;
 import org.graylog2.indexer.ranges.IndexRange;
@@ -69,12 +70,13 @@ public class Indexer {
     private final Searches searches;
     private final Counts counts;
     private final Messages messages;
-    
-	public static enum DateHistogramInterval {
-		YEAR, QUARTER, MONTH, WEEK, DAY, HOUR, MINUTE
-	}
+    private final Cluster cluster;
 	
     private Core server;
+
+    public static enum DateHistogramInterval {
+        YEAR, QUARTER, MONTH, WEEK, DAY, HOUR, MINUTE
+    }
 
     public Indexer(Core graylogServer) {
         server = graylogServer;
@@ -103,6 +105,7 @@ public class Indexer {
         searches = new Searches(client, graylogServer);
         counts = new Counts(client, graylogServer);
         messages = new Messages(client, graylogServer);
+        cluster = new Cluster(client, graylogServer);
     }
     
     public Client getClient() {
@@ -330,6 +333,10 @@ public class Indexer {
     
     public Messages messages() {
     	return messages;
+    }
+
+    public Cluster cluster() {
+        return cluster;
     }
     
     private IndexRequestBuilder buildIndexRequest(String index, String source, String id, int ttlMinutes) {
