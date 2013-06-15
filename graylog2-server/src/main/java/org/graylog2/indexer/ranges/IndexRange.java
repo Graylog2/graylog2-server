@@ -19,13 +19,14 @@
  */
 package org.graylog2.indexer.ranges;
 
+import com.beust.jcommander.internal.Maps;
 import com.mongodb.BasicDBObject;
 import com.mongodb.DBObject;
 import org.bson.types.ObjectId;
 import org.graylog2.Core;
 import org.graylog2.activities.Activity;
-import org.graylog2.database.Persistable;
 import org.graylog2.database.Persisted;
+import org.graylog2.database.validators.Validator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -34,7 +35,7 @@ import java.util.Map;
 /**
  * @author Lennart Koopmann <lennart@torch.sh>
  */
-public class IndexRange extends Persisted implements Persistable {
+public class IndexRange extends Persisted {
 
     private static final Logger LOG = LoggerFactory.getLogger(IndexRange.class);
 
@@ -66,6 +67,12 @@ public class IndexRange extends Persisted implements Persistable {
     @Override
     public ObjectId getId() {
         return this.id;
+    }
+
+    @Override
+    protected Map<String, Validator> getValidations() {
+        // We don't have any, this is used internally only.
+        return Maps.newHashMap();
     }
 
 }

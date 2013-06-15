@@ -22,7 +22,6 @@ package org.graylog2.activities;
 import com.beust.jcommander.internal.Maps;
 import org.bson.types.ObjectId;
 import org.graylog2.Core;
-import org.graylog2.database.Persistable;
 import org.graylog2.database.Persisted;
 import org.graylog2.database.validators.Validator;
 
@@ -31,16 +30,16 @@ import java.util.Map;
 /**
  * @author Lennart Koopmann <lennart@torch.sh>
  */
-public class SystemMessage extends Persisted implements Persistable {
+public class SystemMessage extends Persisted {
 
     private static final String COLLECTION = "system_messages";
 
     public SystemMessage(Map<String, Object> fields, Core core) {
-        super(COLLECTION, core, fields, validations());
+        super(COLLECTION, core, fields);
     }
 
     protected SystemMessage(ObjectId id, Map<String, Object> fields, Core core) {
-        super(COLLECTION, core, id, fields, validations());
+        super(COLLECTION, core, id, fields);
     }
 
     @Override
@@ -48,7 +47,8 @@ public class SystemMessage extends Persisted implements Persistable {
         return this.id;
     }
 
-    private static Map<String, Validator> validations() {
+    @Override
+    protected Map<String, Validator> getValidations() {
         // We don't have any, this is used internally only.
         return Maps.newHashMap();
     }

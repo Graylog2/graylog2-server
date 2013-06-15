@@ -31,7 +31,6 @@ import com.mongodb.BasicDBObject;
 import com.mongodb.DBCollection;
 import com.mongodb.DBCursor;
 import com.mongodb.DBObject;
-import com.mongodb.WriteResult;
 import org.graylog2.database.validators.Validator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -39,7 +38,7 @@ import org.slf4j.LoggerFactory;
 /**
  * @author Lennart Koopmann <lennart@torch.sh>
  */
-public class Persisted {
+public abstract class Persisted {
 
     private static final Logger LOG = LoggerFactory.getLogger(Persisted.class);
 
@@ -48,7 +47,6 @@ public class Persisted {
     
     protected final Core core;
     protected final String collectionName;
-    protected final Map<String, Validator> validations;
 
     protected Persisted(String collectionName, Core core, Map<String, Object> fields) {
         this.id = new ObjectId();
@@ -56,17 +54,7 @@ public class Persisted {
 
         this.collectionName = collectionName;
         this.core = core;
-        this.validations = null;
     }
-
-	protected Persisted(String collectionName, Core core, Map<String, Object> fields, Map<String, Validator> validations) {
-        this.id = new ObjectId();
-		this.fields = fields;
-		
-		this.collectionName = collectionName;
-		this.core = core;
-        this.validations = validations;
-	}
 
     protected Persisted(String collectionName, Core core, ObjectId id, Map<String, Object> fields) {
         this.id = id;
@@ -74,18 +62,8 @@ public class Persisted {
 
         this.collectionName = collectionName;
         this.core = core;
-        this.validations = null;
     }
 
-	protected Persisted(String collectionName, Core core, ObjectId id, Map<String, Object> fields,  Map<String, Validator> validations) {
-		this.id = id;
-		this.fields = fields;
-		
-		this.collectionName = collectionName;
-		this.core = core;
-        this.validations = validations;
-	}
-	
 	protected static DBObject get(ObjectId id, Core core, String collectionName) {
 		return collection(core, collectionName).findOne(new BasicDBObject("_id", id));
 	}
@@ -118,7 +96,7 @@ public class Persisted {
     }
 	
 	public ObjectId save() throws ValidationException {
-        if(!validate(validations, fields)) {
+        if(!validate(getValidations(), fields)) {
             throw new ValidationException();
         }
 
@@ -175,4 +153,6 @@ public class Persisted {
         return true;
     }
 
+    public abstract ObjectId getId();
+    protected abstract Map<String, Validator> getValidations();
 }

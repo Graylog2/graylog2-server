@@ -50,7 +50,7 @@ import org.slf4j.LoggerFactory;
  *
  * @author Lennart Koopmann <lennart@torch.sh>
  */
-public class StreamImpl extends Persisted implements Stream, Persistable {
+public class StreamImpl extends Persisted implements Stream {
 
     private static final Logger LOG = LoggerFactory.getLogger(StreamImpl.class);
 
@@ -58,11 +58,11 @@ public class StreamImpl extends Persisted implements Stream, Persistable {
     private static final String COLLECTION = "streams";
 
     public StreamImpl(Map<String, Object> fields, Core core) {
-    	super(COLLECTION, core, fields, validations());
+    	super(COLLECTION, core, fields);
     }
 
     protected StreamImpl(ObjectId id, Map<String, Object> fields, Core core) {
-    	super(COLLECTION, core, id, fields, validations());
+    	super(COLLECTION, core, id, fields);
     }
     
     @SuppressWarnings("unchecked")
@@ -186,7 +186,7 @@ public class StreamImpl extends Persisted implements Stream, Persistable {
 		return result;
 	}
 
-    private static Map<String, Validator> validations() {
+    protected Map<String, Validator> getValidations() {
         return new HashMap<String, Validator>() {{
             put("title", new FilledStringValidator());
             put("creator_user_id", new FilledStringValidator());
