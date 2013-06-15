@@ -31,6 +31,7 @@ import org.elasticsearch.action.support.replication.ReplicationType;
 import org.elasticsearch.client.Client;
 import org.elasticsearch.cluster.ClusterState;
 import org.elasticsearch.cluster.metadata.IndexMetaData;
+import org.elasticsearch.cluster.metadata.MappingMetaData;
 import org.elasticsearch.common.settings.loader.YamlSettingsLoader;
 import org.elasticsearch.common.xcontent.XContentType;
 import org.elasticsearch.index.query.QueryBuilder;
@@ -276,7 +277,13 @@ public class Indexer {
         ClusterState cs = client.admin().cluster().state(csr).actionGet().getState();
         for (Map.Entry<String, IndexMetaData> d : cs.getMetaData().indices().entrySet()) {
             try {
-                Map<String, Object> mapping = (Map<String, Object>) d.getValue().mapping(TYPE).getSourceAsMap().get("properties");
+                MappingMetaData mmd = d.getValue().mapping(TYPE);
+                if (mmd == null) {
+                    // There is no mapping if there are no messages in the index.
+                    continue;
+                }
+
+                Map<String, Object> mapping = (Map<String, Object>) mmd.getSourceAsMap().get("properties");
 
                 fields.addAll(mapping.keySet());
             } catch(Exception e) {
@@ -334,7 +341,7 @@ public class Indexer {
     public Messages messages() {
     	return messages;
     }
-
+    
     public Cluster cluster() {
         return cluster;
     }
