@@ -34,7 +34,7 @@ public class SystemApiController extends AuthenticatedController {
     public static Result jobs() {
         try {
             List<Object> jobs = Lists.newArrayList();
-            for(SystemJob j : SystemJob.all().getJobs()) {
+            for(SystemJob j : SystemJob.all()) {
                 Map<String, Object> job = Maps.newHashMap();
 
                 job.put("id", j.getId());

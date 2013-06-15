@@ -19,18 +19,16 @@
  */
 package models;
 
+import com.google.common.collect.Lists;
 import lib.APIException;
 import lib.Api;
-import models.api.responses.GetStreamsResponse;
 import models.api.responses.GetSystemJobsResponse;
 import models.api.responses.SystemJobSummaryResponse;
-import models.api.results.StreamsResult;
-import models.api.results.SystemJobsResult;
 import org.joda.time.DateTime;
-import org.joda.time.format.ISODateTimeFormat;
 
 import java.io.IOException;
 import java.net.URL;
+import java.util.List;
 import java.util.UUID;
 
 /**
@@ -78,11 +76,16 @@ public class SystemJob {
         return startedAt;
     }
 
-    public static SystemJobsResult all() throws IOException, APIException {
+    public static List<SystemJob> all() throws IOException, APIException {
         URL url = Api.buildTarget("system/jobs");
         GetSystemJobsResponse r = Api.get(url, GetSystemJobsResponse.class);
 
-        return new SystemJobsResult(r.jobs);
+        List<SystemJob> jobs = Lists.newArrayList();
+        for (SystemJobSummaryResponse job : r.jobs) {
+            jobs.add(new SystemJob(job));
+        }
+
+        return jobs;
     }
 
 }

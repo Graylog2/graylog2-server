@@ -21,11 +21,12 @@ package controllers;
 
 import lib.APIException;
 import lib.Api;
+import models.ESClusterHealth;
 import models.SystemJob;
-import models.api.results.SystemJobsResult;
 import play.mvc.*;
 
 import java.io.IOException;
+import java.util.List;
 
 /**
  * @author Lennart Koopmann <lennart@torch.sh>
@@ -34,9 +35,10 @@ public class SystemController extends AuthenticatedController {
 
     public static Result index() {
         try {
-            SystemJobsResult systemJobs = SystemJob.all();
+            List<SystemJob> systemJobs = SystemJob.all();
+            ESClusterHealth clusterHealth = ESClusterHealth.get();
 
-            return ok(views.html.system.index.render(currentUser(), systemJobs));
+            return ok(views.html.system.index.render(currentUser(), systemJobs, clusterHealth));
         } catch (IOException e) {
             return status(504, views.html.errors.error.render(Api.ERROR_MSG_IO, e, request()));
         } catch (APIException e) {

@@ -1,4 +1,4 @@
-@(currentUser: User, jobs: api.results.SystemJobsResult)
+@(currentUser: User, jobs: List[SystemJob], clusterHealth: ESClusterHealth)
 
 @main("System", views.html.system.sidebar(), "", currentUser) {
 
@@ -7,7 +7,7 @@
         A system job is a long-running task a graylog2-server node executes. Some jobs
         provide progress information or can be stopped.
 
-        @for(job <- jobs.getJobs) {
+        @for(job <- jobs) {
             <div class="systemjob systemjob-progress systemjob-active" id="job-@job.getId()" data-job-id="@job.getId()">
                 <i class="icon icon-cog"></i>
                 Started @job.getDescription()
@@ -24,12 +24,28 @@
             </div>
         }
 
-        @if(jobs.getJobs().isEmpty) {
+        @if(jobs.isEmpty) {
             <div class="alert alert-info systemjobs-none">
                 <j class="icon icon-info-sign"></j>
                 No active system jobs.
             </div>
         }
     </div>
+
+    <div class="row-fluid">
+        <h2><i class="icon icon-tasks"></i> ElasticSearch cluster</h2>
+
+        Status: @clusterHealth.getStatus
+
+        <br />
+        Shards:
+        @clusterHealth.getRelocatingShards relocating,
+        @clusterHealth.getUnassignedShards unassigned,
+        @clusterHealth.getActiveShards active,
+        @clusterHealth.getInitializingShards init
+
+    </div>
+
+    ... auto-updating server activities.
 
 }

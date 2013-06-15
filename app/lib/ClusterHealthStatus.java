@@ -17,35 +17,13 @@
  * along with Graylog2.  If not, see <http://www.gnu.org/licenses/>.
  *
  */
-package models.api.results;
-
-import com.google.common.collect.Lists;
-import models.Stream;
-import models.SystemJob;
-import models.api.responses.StreamSummaryResponse;
-import models.api.responses.SystemJobSummaryResponse;
-
-import java.util.List;
+package lib;
 
 /**
  * @author Lennart Koopmann <lennart@torch.sh>
  */
-public class SystemJobsResult {
+public enum ClusterHealthStatus {
 
-    private final List<SystemJobSummaryResponse> jobs;
-
-    public SystemJobsResult(List<SystemJobSummaryResponse> jobs) {
-        this.jobs = jobs;
-    }
-
-    public List<SystemJob> getJobs() {
-        List<SystemJob> jobs = Lists.newArrayList();
-
-        for (SystemJobSummaryResponse sjsr : this.jobs) {
-            jobs.add(new SystemJob(sjsr));
-        }
-
-        return jobs;
-    }
+    GREEN, YELLOW, RED
 
 }
