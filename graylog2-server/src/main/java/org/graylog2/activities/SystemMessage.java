@@ -28,7 +28,6 @@ import org.graylog2.database.Persisted;
 import org.graylog2.database.validators.DateValidator;
 import org.graylog2.database.validators.FilledStringValidator;
 import org.graylog2.database.validators.Validator;
-import org.graylog2.plugin.Tools;
 import org.joda.time.DateTime;
 
 import java.util.HashMap;
@@ -41,6 +40,7 @@ import java.util.Map;
 public class SystemMessage extends Persisted {
 
     private static final String COLLECTION = "system_messages";
+    private static final int PER_PAGE = 30;
 
     private final String caller;
     private final String content;
@@ -61,7 +61,7 @@ public class SystemMessage extends Persisted {
 
         this.caller = (String) fields.get("caller");
         this.content = (String) fields.get("content");
-        this.timestamp = DateTime.parse((String) fields.get("timestamp"));
+        this.timestamp = new DateTime(fields.get("timestamp"));
         this.nodeId = (String) fields.get("node_id");
     }
 
@@ -70,10 +70,13 @@ public class SystemMessage extends Persisted {
         return COLLECTION;
     }
 
-    public static List<SystemMessage> all(Core core) {
+    public static List<SystemMessage> all(Core core, int page) {
         List<SystemMessage> messages = Lists.newArrayList();
 
-        List<DBObject> results = query(new BasicDBObject(), core, COLLECTION);
+        DBObject sort = new BasicDBObject();
+        sort.put("timestamp", -1);
+
+        List<DBObject> results = query(new BasicDBObject(), sort, PER_PAGE, PER_PAGE*page, core, COLLECTION);
         for (DBObject o : results) {
             messages.add(new SystemMessage((ObjectId) o.get("_id"), o.toMap(), core));
         }
@@ -111,4 +114,5 @@ public class SystemMessage extends Persisted {
             put("timestamp", new DateValidator());
         }};
     }
+
 }

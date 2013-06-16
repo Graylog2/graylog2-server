@@ -55,12 +55,12 @@ public class MessagesResource extends RestResource {
     @GET
     @Path("/")
     @Produces(MediaType.APPLICATION_JSON)
-    public String all(@QueryParam("pretty") boolean prettyPrint) {
+    public String all(@QueryParam("page") int page, @QueryParam("pretty") boolean prettyPrint) {
         Core core = (Core) rc.getProperty("core");
 
         List<Map<String, Object>> messages = Lists.newArrayList();
 
-        for (SystemMessage sm : SystemMessage.all(core)) {
+        for (SystemMessage sm : SystemMessage.all(core, page)) {
             Map<String, Object> message = Maps.newHashMap();
             message.put("caller", sm.getCaller());
             message.put("content", sm.getContent());

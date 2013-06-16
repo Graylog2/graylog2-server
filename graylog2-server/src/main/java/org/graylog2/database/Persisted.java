@@ -20,6 +20,7 @@
 
 package org.graylog2.database;
 
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
@@ -65,10 +66,26 @@ public abstract class Persisted {
 	protected static DBObject get(ObjectId id, Core core, String collectionName) {
 		return collection(core, collectionName).findOne(new BasicDBObject("_id", id));
 	}
-	
-	protected static List<DBObject> query(DBObject query, Core core, String collectionName) {
+
+    protected static List<DBObject> query(DBObject query, Core core, String collectionName) {
+        return cursorToList(collection(core, collectionName).find(query));
+    }
+
+    protected static List<DBObject> query(DBObject query, DBObject sort, Core core, String collectionName) {
+        return cursorToList(collection(core, collectionName).find(query).sort(sort));
+    }
+
+    protected static List<DBObject> query(DBObject query, DBObject sort, int limit, int offset, Core core, String collectionName) {
+        return cursorToList(
+                collection(core, collectionName)
+                        .find(query)
+                        .sort(sort)
+                        .limit(limit)
+                        .skip(offset));
+    }
+
+    private static List<DBObject> cursorToList(DBCursor cursor) {
         List<DBObject> results = Lists.newArrayList();
-        DBCursor cursor = collection(core, collectionName).find(query);
 
         try {
             while(cursor.hasNext()) {
@@ -104,9 +121,9 @@ public abstract class Persisted {
         // Do field transformations
         for (Map.Entry<String, Object> x : doc.entrySet()) {
 
-            // JodaTime DateTime is not accepted by MongoDB. Use the String representation. :(
+            // JodaTime DateTime is not accepted by MongoDB. Convert to java.util.Date...
             if (x.getValue() instanceof org.joda.time.DateTime) {
-                doc.put(x.getKey(), x.getValue().toString());
+                doc.put(x.getKey(), ((DateTime) x.getValue()).toDate());
             }
         }
 
