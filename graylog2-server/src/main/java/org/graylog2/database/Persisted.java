@@ -32,6 +32,7 @@ import com.mongodb.DBCollection;
 import com.mongodb.DBCursor;
 import com.mongodb.DBObject;
 import org.graylog2.database.validators.Validator;
+import org.joda.time.DateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -99,6 +100,15 @@ public abstract class Persisted {
 
 		BasicDBObject doc = new BasicDBObject(fields);
 		doc.put("_id", id); // ID was created in constructor or taken from original doc already.
+
+        // Do field transformations
+        for (Map.Entry<String, Object> x : doc.entrySet()) {
+
+            // JodaTime DateTime is not accepted by MongoDB. Use the String representation. :(
+            if (x.getValue() instanceof org.joda.time.DateTime) {
+                doc.put(x.getKey(), x.getValue().toString());
+            }
+        }
 
 		/*
 		 * We are running an upsert. This means that the existing

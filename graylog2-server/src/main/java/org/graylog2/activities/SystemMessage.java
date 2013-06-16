@@ -19,12 +19,20 @@
  */
 package org.graylog2.activities;
 
-import com.beust.jcommander.internal.Maps;
+import com.google.common.collect.Lists;
+import com.mongodb.BasicDBObject;
+import com.mongodb.DBObject;
 import org.bson.types.ObjectId;
 import org.graylog2.Core;
 import org.graylog2.database.Persisted;
+import org.graylog2.database.validators.DateValidator;
+import org.graylog2.database.validators.FilledStringValidator;
 import org.graylog2.database.validators.Validator;
+import org.graylog2.plugin.Tools;
+import org.joda.time.DateTime;
 
+import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -34,17 +42,59 @@ public class SystemMessage extends Persisted {
 
     private static final String COLLECTION = "system_messages";
 
+    private final String caller;
+    private final String content;
+    private final DateTime timestamp;
+    private final String nodeId;
+
     public SystemMessage(Map<String, Object> fields, Core core) {
         super(core, fields);
+
+        this.caller = (String) fields.get("caller");
+        this.content = (String) fields.get("content");
+        this.timestamp = (DateTime) fields.get("timestamp");
+        this.nodeId = (String) fields.get("node_id");
     }
 
     protected SystemMessage(ObjectId id, Map<String, Object> fields, Core core) {
         super(core, id, fields);
+
+        this.caller = (String) fields.get("caller");
+        this.content = (String) fields.get("content");
+        this.timestamp = DateTime.parse((String) fields.get("timestamp"));
+        this.nodeId = (String) fields.get("node_id");
     }
 
     @Override
     public String getCollectionName() {
         return COLLECTION;
+    }
+
+    public static List<SystemMessage> all(Core core) {
+        List<SystemMessage> messages = Lists.newArrayList();
+
+        List<DBObject> results = query(new BasicDBObject(), core, COLLECTION);
+        for (DBObject o : results) {
+            messages.add(new SystemMessage((ObjectId) o.get("_id"), o.toMap(), core));
+        }
+
+        return messages;
+    }
+
+    public String getCaller() {
+        return caller;
+    }
+
+    public String getContent() {
+        return content;
+    }
+
+    public DateTime getTimestamp() {
+        return timestamp;
+    }
+
+    public String getNodeId() {
+        return nodeId;
     }
 
     @Override
@@ -54,7 +104,11 @@ public class SystemMessage extends Persisted {
 
     @Override
     protected Map<String, Validator> getValidations() {
-        // We don't have any, this is used internally only.
-        return Maps.newHashMap();
+        return new HashMap<String, Validator>() {{
+            put("caller", new FilledStringValidator());
+            put("content", new FilledStringValidator());
+            put("node_id", new FilledStringValidator());
+            put("timestamp", new DateValidator());
+        }};
     }
 }

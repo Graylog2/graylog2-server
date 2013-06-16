@@ -36,7 +36,7 @@ public class ActivityWriter {
     private static final Logger LOG = LoggerFactory.getLogger(ActivityWriter.class);
 
     Core server;
-    
+
     public ActivityWriter(Core server) {
         this.server = server;
     }
@@ -44,7 +44,7 @@ public class ActivityWriter {
     public void write(Activity activity) {
         try {
             Map<String, Object> entry = Maps.newHashMap();
-            entry.put("timestamp", Tools.getCurrentISO8601String());
+            entry.put("timestamp", Tools.iso8601());
             entry.put("content", activity.getMessage());
             entry.put("caller", activity.getCaller().getCanonicalName());
             entry.put("node_id", server.getServerId());
@@ -52,8 +52,7 @@ public class ActivityWriter {
             SystemMessage sm = new SystemMessage(entry, server);
             sm.save();
         } catch (ValidationException e) {
-            // no validations, not gonna happen lol
-
+            LOG.error("Could not write activity.", e);
         }
     }
     

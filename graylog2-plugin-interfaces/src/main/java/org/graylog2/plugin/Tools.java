@@ -264,6 +264,10 @@ public final class Tools {
         return (int) (dt.getMillis()/1000);
     }
 
+    public static DateTime iso8601() {
+        return new DateTime(DateTimeZone.UTC);
+    }
+
     public static String getISO8601String(DateTime time) {
         return ISODateTimeFormat.dateTime().print(time);
     }

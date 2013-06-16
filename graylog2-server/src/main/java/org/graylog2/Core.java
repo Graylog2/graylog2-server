@@ -340,7 +340,7 @@ public class Core implements GraylogServer {
             }
         }
 
-        activityWriter.write(new Activity("Started up.", GraylogServer.class));
+        activityWriter.write(new Activity("Started up.", Core.class));
         LOG.info("Graylog2 up and running.");
 
         while (true) {
