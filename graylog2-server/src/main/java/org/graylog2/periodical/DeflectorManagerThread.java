@@ -24,7 +24,9 @@ import java.util.Map;
 import org.elasticsearch.action.admin.indices.stats.IndexStats;
 import org.graylog2.Core;
 import org.graylog2.activities.Activity;
+import org.graylog2.indexer.Deflector;
 import org.graylog2.indexer.NoTargetIndexException;
+import org.graylog2.userwarnings.UserWarning;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -36,7 +38,7 @@ public class DeflectorManagerThread implements Runnable { // public class Klimpe
     private static final Logger LOG = LoggerFactory.getLogger(DeflectorManagerThread.class);
     
     public static final int INITIAL_DELAY = 0;
-    public static final int PERIOD = 60;
+    public static final int PERIOD = 10;
     
     private final Core graylogServer;
     
@@ -88,9 +90,17 @@ public class DeflectorManagerThread implements Runnable { // public class Klimpe
         if (!graylogServer.getDeflector().isUp()) {
             warn("Detected that there is no deflector alias. Trying to set up one now.");
 
-            // NEVER EVER WRITE TO AN INDEX CALLED "graylog2_deflector".
+            if (graylogServer.getIndexer().indexExists(Deflector.DEFLECTOR_NAME)) {
+                // is there an *index* called graylog2_deflector? if so: raise a user warning, he has to decide what to do:
+                //   options:
+                //     * delete index (stop message processing, delete, setUp(), start processing)
+                //     * rename index (stop message processing and write to master caches, create new index, scan & write to new index, delete old, setUp(), start processing)
 
-            graylogServer.getDeflector().setUp();
+                UserWarning.issue(graylogServer, UserWarning.Type.DEFLECTOR_EXISTS_AS_INDEX, UserWarning.Severity.URGENT);
+                warn("There is an index called [" + Deflector.DEFLECTOR_NAME + "]. Cannot fix this automatically. Warning to user issue.");
+            } else {
+                graylogServer.getDeflector().setUp();
+            }
         }
 
 
