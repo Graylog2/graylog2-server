@@ -84,7 +84,9 @@ public class DeflectorManagerThread implements Runnable { // public class Klimpe
 
     private void checkAndRepair() {
         if (!graylogServer.getDeflector().isUp()) {
-            warn("Detected that there is no deflector alias. Trying to set up one now.");
+            String msg = "Detected that there is no deflector alias. Trying to set up one now.";
+            LOG.warn(msg);
+            graylogServer.getActivityWriter().write(new Activity(msg, DeflectorManagerThread.class));
 
             if (graylogServer.getIndexer().indexExists(Deflector.DEFLECTOR_NAME)) {
                 // is there an *index* called graylog2_deflector? if so: raise a user warning, he has to decide what to do:
@@ -94,7 +96,7 @@ public class DeflectorManagerThread implements Runnable { // public class Klimpe
 
                 if (Notification.isFirst(graylogServer, Notification.Type.DEFLECTOR_EXISTS_AS_INDEX)) {
                     Notification.publish(graylogServer, Notification.Type.DEFLECTOR_EXISTS_AS_INDEX, Notification.Severity.URGENT);
-                    warn("There is an index called [" + Deflector.DEFLECTOR_NAME + "]. Cannot fix this automatically and published a notification.");
+                    LOG.warn("There is an index called [" + Deflector.DEFLECTOR_NAME + "]. Cannot fix this automatically and published a notification.");
                 }
             } else {
                 graylogServer.getDeflector().setUp();
@@ -102,11 +104,6 @@ public class DeflectorManagerThread implements Runnable { // public class Klimpe
         }
 
 
-    }
-
-    private void warn(String x) {
-        LOG.warn(x);
-        graylogServer.getActivityWriter().write(new Activity(x, DeflectorManagerThread.class));
     }
     
 }

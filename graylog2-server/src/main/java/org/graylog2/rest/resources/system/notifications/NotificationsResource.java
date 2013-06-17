@@ -68,6 +68,7 @@ public class NotificationsResource extends RestResource {
         }
 
         Map<String, Object> result = Maps.newHashMap();
+        result.put("total", notifications.size());
         result.put("notifications", notifications);
 
         return json(result, prettyPrint);
