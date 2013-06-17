@@ -19,7 +19,7 @@
  */
 package org.graylog2.userwarnings;
 
-import com.beust.jcommander.internal.Maps;
+import com.google.common.collect.Maps;
 import com.mongodb.BasicDBObject;
 import org.bson.types.ObjectId;
 import org.graylog2.Core;
