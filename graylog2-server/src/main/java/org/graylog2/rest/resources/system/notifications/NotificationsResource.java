@@ -17,13 +17,14 @@
  * along with Graylog2.  If not, see <http://www.gnu.org/licenses/>.
  *
  */
-package org.graylog2.rest.resources.system.jobs;
+package org.graylog2.rest.resources.system.notifications;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.sun.jersey.api.core.ResourceConfig;
 import org.graylog2.Core;
+import org.graylog2.notifications.Notification;
 import org.graylog2.plugin.Tools;
 import org.graylog2.rest.RestResource;
 import org.graylog2.systemjobs.SystemJob;
@@ -42,10 +43,10 @@ import java.util.Map;
 /**
  * @author Lennart Koopmann <lennart@torch.sh>
  */
-@Path("/system/jobs")
-public class SystemJobResource extends RestResource {
+@Path("/system/notifications")
+public class NotificationsResource extends RestResource {
 
-    private static final Logger LOG = LoggerFactory.getLogger(SystemJobResource.class);
+    private static final Logger LOG = LoggerFactory.getLogger(NotificationsResource.class);
 
     @Context
     ResourceConfig rc;
@@ -53,35 +54,23 @@ public class SystemJobResource extends RestResource {
     @GET
     @Path("/")
     @Produces(MediaType.APPLICATION_JSON)
-    public String listJobs(@QueryParam("pretty") boolean prettyPrint) {
+    public String listNotifications(@QueryParam("pretty") boolean prettyPrint) {
         Core core = (Core) rc.getProperty("core");
 
-        List<Map<String, Object>> jobs = Lists.newArrayList();
+        List<Map<String, Object>> notifications = Lists.newArrayList();
 
-        for (Map.Entry<String, SystemJob> x : core.getSystemJobManager().getRunningJobs().entrySet()) {
-            String jobId = x.getKey();
-            SystemJob jobInfo = x.getValue();
+        for (Notification n : Notification.all(core)) {
+            Map<String, Object> notification = Maps.newHashMap();
+            notification.put("timestamp", Tools.getISO8601String(n.getTimestamp()));
+            notification.put("type", n.getType().toString().toLowerCase());
 
-            Map<String, Object> job = Maps.newHashMap();
-            job.put("id", jobId);
-            job.put("description", jobInfo.getDescription());
-            job.put("started_at", Tools.getISO8601String(jobInfo.getStartedAt()));
-            job.put("started_by", "SYSTEM/FIXME");
-            job.put("percent_complete", jobInfo.getProgress());
-            job.put("provides_progress", jobInfo.providesProgress());
-            job.put("is_cancelable", jobInfo.isCancelable());
-            job.put("node_id", core.getServerId());
-
-            jobs.add(job);
+            notifications.add(notification);
         }
 
         Map<String, Object> result = Maps.newHashMap();
-        result.put("jobs", jobs);
+        result.put("notifications", notifications);
 
         return json(result, prettyPrint);
     }
-
-    // GET single job
-    // DELETE try to stop/cancel job
 
 }

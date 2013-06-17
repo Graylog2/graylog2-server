@@ -19,14 +19,10 @@
  */
 package org.graylog2.periodical;
 
-import java.util.Map;
-
-import org.elasticsearch.action.admin.indices.stats.IndexStats;
 import org.graylog2.Core;
 import org.graylog2.activities.Activity;
 import org.graylog2.indexer.Deflector;
-import org.graylog2.indexer.NoTargetIndexException;
-import org.graylog2.userwarnings.UserWarning;
+import org.graylog2.notifications.Notification;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -96,8 +92,10 @@ public class DeflectorManagerThread implements Runnable { // public class Klimpe
                 //     * delete index (stop message processing, delete, setUp(), start processing)
                 //     * rename index (stop message processing and write to master caches, create new index, scan & write to new index, delete old, setUp(), start processing)
 
-                UserWarning.issue(graylogServer, UserWarning.Type.DEFLECTOR_EXISTS_AS_INDEX, UserWarning.Severity.URGENT);
-                warn("There is an index called [" + Deflector.DEFLECTOR_NAME + "]. Cannot fix this automatically. Warning to user issue.");
+                if (Notification.isFirst(graylogServer, Notification.Type.DEFLECTOR_EXISTS_AS_INDEX)) {
+                    Notification.publish(graylogServer, Notification.Type.DEFLECTOR_EXISTS_AS_INDEX, Notification.Severity.URGENT);
+                    warn("There is an index called [" + Deflector.DEFLECTOR_NAME + "]. Cannot fix this automatically and published a notification.");
+                }
             } else {
                 graylogServer.getDeflector().setUp();
             }

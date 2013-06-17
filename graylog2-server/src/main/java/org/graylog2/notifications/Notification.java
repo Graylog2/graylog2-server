@@ -17,29 +17,33 @@
  * along with Graylog2.  If not, see <http://www.gnu.org/licenses/>.
  *
  */
-package org.graylog2.userwarnings;
+package org.graylog2.notifications;
 
+import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.mongodb.BasicDBObject;
+import com.mongodb.DBObject;
 import org.bson.types.ObjectId;
 import org.graylog2.Core;
 import org.graylog2.database.Persisted;
 import org.graylog2.database.ValidationException;
 import org.graylog2.database.validators.Validator;
 import org.graylog2.plugin.Tools;
+import org.joda.time.DateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.List;
 import java.util.Map;
 
 /**
  * @author Lennart Koopmann <lennart@torch.sh>
  */
-public class UserWarning extends Persisted {
+public class Notification extends Persisted {
 
-    private static final Logger LOG = LoggerFactory.getLogger(UserWarning.class);
+    private static final Logger LOG = LoggerFactory.getLogger(Notification.class);
 
-    public static final String COLLECTION = "user_warnings";
+    public static final String COLLECTION = "notifications";
 
     public enum Type {
         DEFLECTOR_EXISTS_AS_INDEX
@@ -49,13 +53,26 @@ public class UserWarning extends Persisted {
         NORMAL, URGENT
     }
 
-    protected UserWarning(Core core, Map<String, Object> fields) {
-        super(core, fields);
+    private final Type type;
+    private final DateTime timestamp;
+
+    protected Notification(ObjectId id, Core core, Map<String, Object> fields) {
+        super(core, id, fields);
+
+        this.type = Type.valueOf(((String) fields.get("type")).toUpperCase());
+        this.timestamp = new DateTime(fields.get("timestamp"));
     }
 
-    public static void issue(Core core, Type type, Severity severity) {
+    protected Notification(Core core, Map<String, Object> fields) {
+        super(core, fields);
+
+        this.type = Type.valueOf(((String) fields.get("type")).toUpperCase());
+        this.timestamp = new DateTime(fields.get("timestamp"));
+    }
+
+    public static void publish(Core core, Type type, Severity severity) {
         // Write only if there is no such warning yet.
-        if (!first(core, type)) {
+        if (!isFirst(core, type)) {
             return;
         }
 
@@ -64,7 +81,7 @@ public class UserWarning extends Persisted {
         fields.put("severity", severity.toString().toLowerCase());
         fields.put("timestamp", Tools.iso8601());
 
-        UserWarning w = new UserWarning(core, fields);
+        Notification w = new Notification(core, fields);
 
         try {
             w.save();
@@ -74,13 +91,31 @@ public class UserWarning extends Persisted {
         }
     }
 
-    public static boolean first(Core core, Type type) {
-        return (UserWarning.findOne(new BasicDBObject("type", type.toString().toLowerCase()), core, COLLECTION) != null);
+    public static boolean isFirst(Core core, Type type) {
+        return (Notification.findOne(new BasicDBObject("type", type.toString().toLowerCase()), core, COLLECTION) == null);
+    }
+
+    public static List<Notification> all(Core core) {
+        List<Notification> notifications = Lists.newArrayList();
+
+        for(DBObject obj : query(new BasicDBObject(), new BasicDBObject("timestamp", -1), core, COLLECTION)) {
+            notifications.add(new Notification((ObjectId) obj.get("_id"), core, obj.toMap()));
+        }
+
+        return notifications;
     }
 
     @Override
     public ObjectId getId() {
         return this.id;
+    }
+
+    public DateTime getTimestamp() {
+        return timestamp;
+    }
+
+    public Type getType() {
+        return type;
     }
 
     @Override
