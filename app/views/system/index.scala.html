@@ -1,4 +1,4 @@
-@(currentUser: User, jobs: List[SystemJob], clusterHealth: ESClusterHealth)
+@(currentUser: User, jobs: List[SystemJob], clusterHealth: ESClusterHealth, systemMessages: List[SystemMessage])
 
 @main("System", views.html.system.sidebar(), "", currentUser) {
 
@@ -43,9 +43,20 @@
         @clusterHealth.getUnassignedShards unassigned,
         @clusterHealth.getActiveShards active,
         @clusterHealth.getInitializingShards init
-
     </div>
 
-    ... auto-updating server activities.
+    <div class="row-fluid">
+        <h2><i class="icon icon-comments-alt"></i> Messages and notifications</h2>
 
+        <table class="system-messages">
+        @for(message <- systemMessages) {
+            <tr>
+                <td>formatDate(@message.getTimestamp)</td>
+                <td>shortClass(@message.getCaller)</td>
+                <td>nodeLink(@message.getNodeId)</td>
+                <td>@message.getContent</td>
+            </tr>
+        }
+        </table>
+    </div>
 }

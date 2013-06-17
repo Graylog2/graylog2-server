@@ -23,6 +23,7 @@ import lib.APIException;
 import lib.Api;
 import models.ESClusterHealth;
 import models.SystemJob;
+import models.SystemMessage;
 import play.mvc.*;
 
 import java.io.IOException;
@@ -36,9 +37,10 @@ public class SystemController extends AuthenticatedController {
     public static Result index() {
         try {
             List<SystemJob> systemJobs = SystemJob.all();
+            List<SystemMessage> systemMessages = SystemMessage.all();
             ESClusterHealth clusterHealth = ESClusterHealth.get();
 
-            return ok(views.html.system.index.render(currentUser(), systemJobs, clusterHealth));
+            return ok(views.html.system.index.render(currentUser(), systemJobs, clusterHealth, systemMessages));
         } catch (IOException e) {
             return status(504, views.html.errors.error.render(Api.ERROR_MSG_IO, e, request()));
         } catch (APIException e) {

@@ -259,5 +259,21 @@ form #stream-rules {
 }
 
 .systemjobs-none {
-    margin-top: 5px;
+    margin-top: 10px;
+}
+
+.row-fluid {
+    margin-bottom: 15px;
+}
+
+.no-bm {
+    margin-bottom: 0px;
+}
+
+.alert {
+    margin-bottom: 0px;
+}
+
+.system-messages {
+    font-size: 11px;
 }
