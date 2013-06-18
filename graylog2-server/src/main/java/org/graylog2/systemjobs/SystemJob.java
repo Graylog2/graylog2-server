@@ -20,7 +20,11 @@
 package org.graylog2.systemjobs;
 
 import org.graylog2.Core;
+import org.graylog2.plugin.Tools;
 import org.joda.time.DateTime;
+
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * @author Lennart Koopmann <lennart@torch.sh>
@@ -61,6 +65,18 @@ public abstract class SystemJob {
 
     public DateTime getStartedAt() {
         return startedAt;
+    }
+
+    public Map<String, Object> toMap() {
+        return new HashMap<String, Object>() {{
+            put("id", id);
+            put("description", getDescription());
+            put("started_at", Tools.getISO8601String(getStartedAt()));
+            put("percent_complete", getProgress());
+            put("provides_progress", providesProgress());
+            put("is_cancelable", isCancelable());
+            put("node_id", server.getServerId());
+        }};
     }
 
 }

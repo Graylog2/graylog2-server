@@ -18,7 +18,7 @@
  *
  */
 
-package org.graylog2.rest;
+package org.graylog2.rest.resources;
 
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Response;

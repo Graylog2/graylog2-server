@@ -26,7 +26,7 @@ import com.sun.jersey.api.core.ResourceConfig;
 import org.graylog2.Core;
 import org.graylog2.activities.SystemMessage;
 import org.graylog2.plugin.Tools;
-import org.graylog2.rest.RestResource;
+import org.graylog2.rest.resources.RestResource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
