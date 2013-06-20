@@ -2,10 +2,10 @@ package controllers;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
-import com.google.common.collect.Sets;
 import com.google.gson.Gson;
 import lib.APIException;
 import models.Core;
+import models.Notification;
 import models.SystemJob;
 import play.mvc.Result;
 
@@ -33,7 +33,7 @@ public class SystemApiController extends AuthenticatedController {
 
     public static Result jobs() {
         try {
-            List<Object> jobs = Lists.newArrayList();
+            List<Map<String, Object>> jobs = Lists.newArrayList();
             for(SystemJob j : SystemJob.all()) {
                 Map<String, Object> job = Maps.newHashMap();
 
@@ -45,6 +45,19 @@ public class SystemApiController extends AuthenticatedController {
 
             Map<String, Object> result = Maps.newHashMap();
             result.put("jobs", jobs);
+
+            return ok(new Gson().toJson(result)).as("application/json");
+        } catch (IOException e) {
+            return internalServerError("io exception");
+        } catch (APIException e) {
+            return internalServerError("api exception " + e);
+        }
+    }
+
+    public static Result notifications() {
+        try {
+            Map<String, Object> result = Maps.newHashMap();
+            result.put("count", Notification.all().size());
 
             return ok(new Gson().toJson(result)).as("application/json");
         } catch (IOException e) {

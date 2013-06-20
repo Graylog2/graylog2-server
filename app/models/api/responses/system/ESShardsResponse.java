@@ -17,15 +17,16 @@
  * along with Graylog2.  If not, see <http://www.gnu.org/licenses/>.
  *
  */
-package models.api.responses;
-
-import java.util.List;
+package models.api.responses.system;
 
 /**
  * @author Lennart Koopmann <lennart@torch.sh>
  */
-public class GetSystemJobsResponse {
+public class ESShardsResponse {
 
-    public List<SystemJobSummaryResponse> jobs;
+    public int active;
+    public int initializing;
+    public int relocating;
+    public int unassigned;
 
 }

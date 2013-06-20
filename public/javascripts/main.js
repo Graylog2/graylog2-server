@@ -101,6 +101,25 @@ $(document).ready(function() {
         });
     })();
 
+    // Updating notification count badge.
+    (function updateNotificationCount() {
+        $.ajax({
+            url: '/a/system/notifications',
+            success: function(data) {
+                var count = data.count;
+                if (count > 0) {
+                    $("#notification-badge").html(count);
+                } else {
+                    // Badges are collapsing when empty so we make a 0 collapse.
+                    $("#notification-badge").html("");
+                }
+            },
+            complete: function() {
+                setTimeout(updateNotificationCount, 10000);
+            }
+        });
+    })();
+
     // Stream rules.
     $("#new-stream-rule .sr-input").on("keyup change", function() {
         value = $(this).val();

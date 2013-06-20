@@ -17,15 +17,16 @@
  * along with Graylog2.  If not, see <http://www.gnu.org/licenses/>.
  *
  */
-package models.api.responses;
+package models.api.responses.system;
 
 import java.util.List;
 
 /**
  * @author Lennart Koopmann <lennart@torch.sh>
  */
-public class GetSystemMessagesResponse {
+public class GetNotificationsResponse {
 
-    public List<SystemMessageSummaryResponse> messages;
+    public int total;
+    public List<NotificationSummaryResponse> notifications;
 
 }

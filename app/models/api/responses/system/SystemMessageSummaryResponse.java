@@ -17,33 +17,20 @@
  * along with Graylog2.  If not, see <http://www.gnu.org/licenses/>.
  *
  */
-package models.api.responses;
+package models.api.responses.system;
 
 import com.google.gson.annotations.SerializedName;
 
 /**
  * @author Lennart Koopmann <lennart@torch.sh>
  */
-public class SystemJobSummaryResponse {
+public class SystemMessageSummaryResponse {
 
-    public String id;
-    public String description;
+    public String timestamp;
+    public String content;
+    public String caller;
 
     @SerializedName("node_id")
     public String nodeId;
 
-    @SerializedName("started_at")
-    public String startedAt;
-
-    @SerializedName("started_by")
-    public String startedBy;
-
-    @SerializedName("percent_complete")
-    public int percentComplete;
-
-    @SerializedName("is_cancelable")
-    public boolean isCancelable;
-
-    @SerializedName("provides_progress")
-    public boolean providesProgress;
 }

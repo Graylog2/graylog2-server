@@ -22,7 +22,7 @@ package models;
 import lib.APIException;
 import lib.Api;
 import lib.ClusterHealthStatus;
-import models.api.responses.ESClusterHealthResponse;
+import models.api.responses.system.ESClusterHealthResponse;
 
 import java.io.IOException;
 import java.net.URL;

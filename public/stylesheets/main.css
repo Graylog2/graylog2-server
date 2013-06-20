@@ -262,6 +262,10 @@ form #stream-rules {
     margin-top: 10px;
 }
 
+.notifications-none {
+    margin-top: 10px;
+}
+
 .row-fluid {
     margin-bottom: 15px;
 }
@@ -276,4 +280,36 @@ form #stream-rules {
 
 .system-messages {
     font-size: 11px;
+}
+
+.notification {
+    margin-top: 10px !important;
+}
+
+.notification i {
+    color: #000;
+}
+
+.notification-timestamp {
+    font-size: 10px;
+}
+
+.notification-solutions {
+    margin-top: 10px;
+}
+
+.notification-solutions label {
+    font-size: 13px;
+}
+
+.notification-solutions h4 {
+    font-size: 13px;
+    font-weight: bold;
+    margin-bottom: 1px;
+}
+
+.notification-solutions .btn {
+    margin-top: 3px;
+    font-size: 12px;
+    padding: 3px 11px;
 }

@@ -22,8 +22,8 @@ package models;
 import com.google.common.collect.Lists;
 import lib.APIException;
 import lib.Api;
-import models.api.responses.GetSystemMessagesResponse;
-import models.api.responses.SystemMessageSummaryResponse;
+import models.api.responses.system.GetSystemMessagesResponse;
+import models.api.responses.system.SystemMessageSummaryResponse;
 import org.joda.time.DateTime;
 
 import java.io.IOException;

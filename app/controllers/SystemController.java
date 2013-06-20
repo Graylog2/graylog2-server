@@ -19,9 +19,11 @@
  */
 package controllers;
 
+import com.google.common.collect.Lists;
 import lib.APIException;
 import lib.Api;
 import models.ESClusterHealth;
+import models.Notification;
 import models.SystemJob;
 import models.SystemMessage;
 import play.mvc.*;
@@ -36,11 +38,12 @@ public class SystemController extends AuthenticatedController {
 
     public static Result index() {
         try {
+            List<Notification> notifications = Notification.all();
             List<SystemJob> systemJobs = SystemJob.all();
             List<SystemMessage> systemMessages = SystemMessage.all();
             ESClusterHealth clusterHealth = ESClusterHealth.get();
 
-            return ok(views.html.system.index.render(currentUser(), systemJobs, clusterHealth, systemMessages));
+            return ok(views.html.system.index.render(currentUser(), systemJobs, clusterHealth, systemMessages, notifications));
         } catch (IOException e) {
             return status(504, views.html.errors.error.render(Api.ERROR_MSG_IO, e, request()));
         } catch (APIException e) {

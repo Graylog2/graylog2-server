@@ -31,11 +31,10 @@ GET		/a/messagecounts/total  		controllers.MessageCountsController.total()
 # API: Message analyzing
 GET		/a/analyze/:index/:id/:field	controllers.MessagesController.analyze(index: String, id: String, field: String)
 
-# API: System/CORE
+# API: System
 GET		/a/system/fields                controllers.SystemApiController.fields()
-
-# API: System jobs
 GET     /a/system/jobs                  controllers.SystemApiController.jobs()
+GET     /a/system/notifications         controllers.SystemApiController.notifications()
 
 # Map static resources from the /public folder to the /assets URL path
 GET     /assets/*file               	controllers.Assets.at(path="/public", file)

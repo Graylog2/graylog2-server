@@ -17,20 +17,19 @@
  * along with Graylog2.  If not, see <http://www.gnu.org/licenses/>.
  *
  */
-package models.api.responses;
+package lib.notifications;
 
-import com.google.gson.annotations.SerializedName;
+import models.SystemJob;
+
+import java.util.Map;
 
 /**
  * @author Lennart Koopmann <lennart@torch.sh>
  */
-public class SystemMessageSummaryResponse {
+public interface NotificationType {
 
-    public String timestamp;
-    public String content;
-    public String caller;
-
-    @SerializedName("node_id")
-    public String nodeId;
+    public Map<SystemJob.Type, String> options();
+    public String getTitle();
+    public String getDescription();
 
 }

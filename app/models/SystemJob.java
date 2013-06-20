@@ -22,8 +22,8 @@ package models;
 import com.google.common.collect.Lists;
 import lib.APIException;
 import lib.Api;
-import models.api.responses.GetSystemJobsResponse;
-import models.api.responses.SystemJobSummaryResponse;
+import models.api.responses.system.GetSystemJobsResponse;
+import models.api.responses.system.SystemJobSummaryResponse;
 import org.joda.time.DateTime;
 
 import java.io.IOException;
@@ -35,6 +35,12 @@ import java.util.UUID;
  * @author Lennart Koopmann <lennart@torch.sh>
  */
 public class SystemJob {
+
+    // Some known SystemJob types that can be triggered manually from the web interface.
+    public enum Type {
+        FIX_DEFLECTOR_DELETE_INDEX,
+        FIX_DEFLECTOR_MOVE_INDEX
+    }
 
     private final UUID id;
     private final String description;
