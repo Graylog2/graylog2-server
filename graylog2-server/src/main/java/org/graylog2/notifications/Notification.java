@@ -54,12 +54,14 @@ public class Notification extends Persisted {
     }
 
     private final Type type;
+    private final Severity severity;
     private final DateTime timestamp;
 
     protected Notification(ObjectId id, Core core, Map<String, Object> fields) {
         super(core, id, fields);
 
         this.type = Type.valueOf(((String) fields.get("type")).toUpperCase());
+        this.severity = Severity.valueOf(((String) fields.get("severity")).toUpperCase());
         this.timestamp = new DateTime(fields.get("timestamp"));
     }
 
@@ -67,6 +69,7 @@ public class Notification extends Persisted {
         super(core, fields);
 
         this.type = Type.valueOf(((String) fields.get("type")).toUpperCase());
+        this.severity = Severity.valueOf(((String) fields.get("severity")).toUpperCase());
         this.timestamp = new DateTime(fields.get("timestamp"));
     }
 
@@ -116,6 +119,10 @@ public class Notification extends Persisted {
 
     public Type getType() {
         return type;
+    }
+
+    public Severity getSeverity() {
+        return severity;
     }
 
     @Override
