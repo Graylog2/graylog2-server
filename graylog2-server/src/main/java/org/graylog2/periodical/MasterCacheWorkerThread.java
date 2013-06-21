@@ -42,15 +42,17 @@ public class MasterCacheWorkerThread implements Runnable {
     private final Cache cache;
     private final String cacheName;
     private final Buffer targetBuffer;
+    private final Core core;
 
     private final Meter writtenMessages = Metrics.newMeter(MasterCacheWorkerThread.class, "SuccessfulWrites", "messages", TimeUnit.SECONDS);
     private final Meter outOfCapacity = Metrics.newMeter(MasterCacheWorkerThread.class, "FailedWritesOutOfCapacity", "messages", TimeUnit.SECONDS);
     
-    public MasterCacheWorkerThread(Core graylogServer, Cache cache, Buffer targetBuffer) {
+    public MasterCacheWorkerThread(Core core, Cache cache, Buffer targetBuffer) {
         this.cache = cache;
         this.cacheName = cache.getClass().getCanonicalName();
         
         this.targetBuffer = targetBuffer;
+        this.core = core;
     }
 
     @Override
@@ -66,7 +68,7 @@ public class MasterCacheWorkerThread implements Runnable {
                             break;
                         }
                         
-                        if (targetBuffer.hasCapacity()) {
+                        if (targetBuffer.hasCapacity() && core.isProcessing()) {
                             try {
                                 LOG.debug("Reading message from {}.", cacheName);
                                 targetBuffer.insertFailFast(cache.pop());

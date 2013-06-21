@@ -30,6 +30,7 @@ import org.graylog2.Core;
 import org.graylog2.buffers.processors.ProcessBufferProcessor;
 import org.graylog2.plugin.buffers.Buffer;
 import org.graylog2.plugin.Message;
+import org.graylog2.plugin.buffers.ProcessingDisabledException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -55,15 +56,15 @@ public class ProcessBuffer implements Buffer {
 
     private Core server;
     
-    private final Cache overflowCache;
+    private final Cache masterCache;
     
     private final Meter incomingMessages = Metrics.newMeter(ProcessBuffer.class, "InsertedMessages", "messages", TimeUnit.SECONDS);
     private final Meter rejectedMessages = Metrics.newMeter(ProcessBuffer.class, "RejectedMessages", "messages", TimeUnit.SECONDS);
     private final Meter cachedMessages = Metrics.newMeter(ProcessBuffer.class, "CachedMessages", "messages", TimeUnit.SECONDS);
 
-    public ProcessBuffer(Core server, Cache overflowCache) {
+    public ProcessBuffer(Core server, Cache masterCache) {
         this.server = server;
-        this.overflowCache = overflowCache;
+        this.masterCache = masterCache;
     }
 
     public void initialize() {
@@ -91,10 +92,17 @@ public class ProcessBuffer implements Buffer {
     
     @Override
     public void insertCached(Message message) {
+        if (!server.isProcessing()) {
+            LOG.debug("Message processing is paused. Writing to cache.");
+            cachedMessages.mark();
+            masterCache.add(message);
+            return;
+        }
+
         if (!hasCapacity()) {
             LOG.debug("Out of capacity. Writing to cache.");
             cachedMessages.mark();
-            overflowCache.add(message);
+            masterCache.add(message);
             return;
         }
         
@@ -102,7 +110,12 @@ public class ProcessBuffer implements Buffer {
     }
     
     @Override
-    public void insertFailFast(Message message) throws BufferOutOfCapacityException {
+    public void insertFailFast(Message message) throws BufferOutOfCapacityException, ProcessingDisabledException {
+        if (!server.isProcessing()) {
+            LOG.debug("Rejecting message, because message processing is paused.");
+            throw new ProcessingDisabledException();
+        }
+
         if (!hasCapacity()) {
             LOG.debug("Rejecting message, because I am full and caching was disabled by input. Raise my size or add more processors.");
             rejectedMessages.mark();

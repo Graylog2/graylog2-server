@@ -46,6 +46,8 @@ import org.graylog2.gelf.GELFChunkManager;
 import org.graylog2.plugin.outputs.MessageOutput;
 
 import com.google.common.collect.Lists;
+
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 import com.google.common.collect.Maps;
 import java.util.Map;
@@ -144,6 +146,8 @@ public class Core implements GraylogServer {
     
     private boolean localMode = false;
     private boolean statsMode = false;
+
+    private AtomicBoolean isProcessing = new AtomicBoolean(true);
     
     private DateTime startedAt;
 
@@ -550,6 +554,19 @@ public class Core implements GraylogServer {
     
     public DateTime getStartedAt() {
     	return startedAt;
+    }
+
+    public void pauseMessageProcessing() {
+        // TODO: properly pause and restart AMQP inputs.
+        isProcessing.set(false);
+    }
+
+    public void resumeMessageProcessing() {
+        isProcessing.set(true);
+    }
+
+    public boolean isProcessing() {
+        return isProcessing.get();
     }
     
 }
