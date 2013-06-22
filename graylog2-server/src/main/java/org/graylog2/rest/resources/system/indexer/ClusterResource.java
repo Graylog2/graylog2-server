@@ -23,9 +23,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.Maps;
 import com.sun.jersey.api.core.ResourceConfig;
 import org.graylog2.Core;
-import org.graylog2.indexer.ranges.RebuildIndexRangesJob;
-import org.graylog2.rest.RestResource;
-import org.graylog2.systemjobs.SystemJob;
+import org.graylog2.rest.resources.RestResource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

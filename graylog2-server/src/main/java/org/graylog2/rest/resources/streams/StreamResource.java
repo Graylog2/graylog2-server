@@ -29,7 +29,7 @@ import org.bson.types.ObjectId;
 import org.graylog2.Core;
 import org.graylog2.database.NotFoundException;
 import org.graylog2.plugin.streams.Stream;
-import org.graylog2.rest.RestResource;
+import org.graylog2.rest.resources.RestResource;
 import org.graylog2.rest.resources.streams.requests.CreateRequest;
 import org.graylog2.streams.StreamImpl;
 import org.joda.time.DateTimeZone;

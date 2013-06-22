@@ -85,11 +85,7 @@ public class DeflectorManagerThread implements Runnable { // public class Klimpe
     private void checkAndRepair() {
         if (!graylogServer.getDeflector().isUp()) {
             if (graylogServer.getIndexer().indexExists(Deflector.DEFLECTOR_NAME)) {
-                // is there an *index* called graylog2_deflector? if so: raise a user warning, he has to decide what to do:
-                //   options:
-                //     * delete index (stop message processing, delete, setUp(), start processing)
-                //     * rename index (stop message processing and write to master caches, create new index, scan & write to new index, delete old, setUp(), start processing)
-
+                // Publish a notification if there is an *index* called graylog2_deflector
                 if (Notification.isFirst(graylogServer, Notification.Type.DEFLECTOR_EXISTS_AS_INDEX)) {
                     Notification.publish(graylogServer, Notification.Type.DEFLECTOR_EXISTS_AS_INDEX, Notification.Severity.URGENT);
                     LOG.warn("There is an index called [" + Deflector.DEFLECTOR_NAME + "]. Cannot fix this automatically and published a notification.");

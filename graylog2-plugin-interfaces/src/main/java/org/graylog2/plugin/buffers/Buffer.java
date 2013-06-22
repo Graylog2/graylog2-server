@@ -29,7 +29,7 @@ import org.graylog2.plugin.Message;
  */
 public interface Buffer {
     
-    public void insertFailFast(Message message) throws BufferOutOfCapacityException;
+    public void insertFailFast(Message message) throws BufferOutOfCapacityException, ProcessingDisabledException;
     public void insertCached(Message message);
     
     public boolean hasCapacity();

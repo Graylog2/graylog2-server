@@ -20,47 +20,34 @@
 
 package org.graylog2.rest.resources.system;
 
-import com.beust.jcommander.internal.Lists;
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.Maps;
 import com.sun.jersey.api.core.ResourceConfig;
-import org.elasticsearch.indices.IndexMissingException;
 import org.graylog2.Core;
-import org.joda.time.format.DateTimeFormatter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.ws.rs.GET;
-import javax.ws.rs.Path;
-import javax.ws.rs.Produces;
-import javax.ws.rs.QueryParam;
-import javax.ws.rs.WebApplicationException;
+import javax.ws.rs.*;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
-
-import org.graylog2.Core;
-import org.graylog2.rest.RestResource;
-
-import com.google.common.collect.Maps;
-import com.sun.jersey.api.core.ResourceConfig;
 import javax.ws.rs.core.Response;
-import java.util.List;
+
+import org.graylog2.rest.resources.RestResource;
+
 import java.util.Map;
-import java.util.Set;
 
 /**
  * @author Lennart Koopmann <lennart@torch.sh>
  */
 @Path("/system")
 public class SystemResource extends RestResource {
-    private static final Logger LOG = LoggerFactory.getLogger(SystemResource.class);
 
-    private final ObjectMapper objectMapper = new ObjectMapper();
+    private static final Logger LOG = LoggerFactory.getLogger(SystemResource.class);
 
     @Context ResourceConfig rc;
 
-    @GET @Path("/")
+    @GET
+    @Path("/")
     @Produces(MediaType.APPLICATION_JSON)
     public String system(@QueryParam("pretty") boolean prettyPrint) {
         Core core = (Core) rc.getProperty("core");
@@ -75,7 +62,8 @@ public class SystemResource extends RestResource {
         return json(result, prettyPrint);
     }
 
-    @GET @Path("/fields")
+    @GET
+    @Path("/fields")
     @Produces(MediaType.APPLICATION_JSON)
     public String analyze(@QueryParam("pretty") boolean prettyPrint) {
         Core core = (Core) rc.getProperty("core");
@@ -85,4 +73,25 @@ public class SystemResource extends RestResource {
 
         return json(result, prettyPrint);
     }
+
+    @PUT
+    @Path("/processing/pause")
+    public Response pauseProcessing() {
+        Core core = (Core) rc.getProperty("core");
+        core.pauseMessageProcessing();
+
+        LOG.info("Paused message processing - triggered by REST call.");
+        return Response.ok().build();
+    }
+
+    @PUT
+    @Path("/processing/resume")
+    public Response resumeProcessing() {
+        Core core = (Core) rc.getProperty("core");
+        core.resumeMessageProcessing();
+
+        LOG.info("Resumed message processing - triggered by REST call.");
+        return Response.ok().build();
+    }
+
 }

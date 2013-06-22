@@ -22,14 +22,14 @@ package org.graylog2.rest.resources.messages;
 
 import java.util.List;
 import java.util.Map;
-import com.fasterxml.jackson.core.JsonProcessingException;
+
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sun.jersey.api.core.ResourceConfig;
 import org.elasticsearch.indices.IndexMissingException;
 import org.graylog2.Core;
 import org.graylog2.indexer.messages.DocumentNotFoundException;
 import org.graylog2.indexer.results.ResultMessage;
-import org.graylog2.rest.RestResource;
+import org.graylog2.rest.resources.RestResource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -44,7 +44,6 @@ import javax.ws.rs.core.MediaType;
 
 
 import com.google.common.collect.Maps;
-import javax.ws.rs.core.Response;
 
 /**
  * @author Lennart Koopmann <lennart@torch.sh>

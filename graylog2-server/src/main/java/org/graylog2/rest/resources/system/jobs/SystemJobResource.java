@@ -19,21 +19,17 @@
  */
 package org.graylog2.rest.resources.system.jobs;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.sun.jersey.api.core.ResourceConfig;
 import org.graylog2.Core;
 import org.graylog2.plugin.Tools;
-import org.graylog2.rest.RestResource;
+import org.graylog2.rest.resources.RestResource;
 import org.graylog2.systemjobs.SystemJob;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.ws.rs.GET;
-import javax.ws.rs.Path;
-import javax.ws.rs.Produces;
-import javax.ws.rs.QueryParam;
+import javax.ws.rs.*;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import java.util.List;
@@ -53,26 +49,13 @@ public class SystemJobResource extends RestResource {
     @GET
     @Path("/")
     @Produces(MediaType.APPLICATION_JSON)
-    public String listJobs(@QueryParam("pretty") boolean prettyPrint) {
+    public String list(@QueryParam("pretty") boolean prettyPrint) {
         Core core = (Core) rc.getProperty("core");
 
         List<Map<String, Object>> jobs = Lists.newArrayList();
 
         for (Map.Entry<String, SystemJob> x : core.getSystemJobManager().getRunningJobs().entrySet()) {
-            String jobId = x.getKey();
-            SystemJob jobInfo = x.getValue();
-
-            Map<String, Object> job = Maps.newHashMap();
-            job.put("id", jobId);
-            job.put("description", jobInfo.getDescription());
-            job.put("started_at", Tools.getISO8601String(jobInfo.getStartedAt()));
-            job.put("started_by", "SYSTEM/FIXME");
-            job.put("percent_complete", jobInfo.getProgress());
-            job.put("provides_progress", jobInfo.providesProgress());
-            job.put("is_cancelable", jobInfo.isCancelable());
-            job.put("node_id", core.getServerId());
-
-            jobs.add(job);
+            jobs.add(x.getValue().toMap());
         }
 
         Map<String, Object> result = Maps.newHashMap();
@@ -81,7 +64,27 @@ public class SystemJobResource extends RestResource {
         return json(result, prettyPrint);
     }
 
-    // GET single job
+    @GET
+    @Path("/{jobId}")
+    @Produces(MediaType.APPLICATION_JSON)
+    public String get(@PathParam("jobId") String jobId, @QueryParam("pretty") boolean prettyPrint) {
+        Core core = (Core) rc.getProperty("core");
+
+        if (jobId == null || jobId.isEmpty()) {
+            LOG.error("Missing jobId. Returning HTTP 400.");
+            throw new WebApplicationException(400);
+        }
+
+        SystemJob job = core.getSystemJobManager().getRunningJobs().get(jobId);
+
+        if (job == null) {
+            LOG.error("No system job with ID <{}> found.", jobId);
+            throw new WebApplicationException(404);
+        }
+
+        return json(job.toMap(), prettyPrint);
+    }
+
     // DELETE try to stop/cancel job
 
 }
