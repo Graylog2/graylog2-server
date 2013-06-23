@@ -1,0 +1,1 @@
+## graylog2-server REST documentation
