@@ -90,18 +90,29 @@
         @clusterHealth.getInitializingShards init
     </div>
 
+    <!-- TODO fix the styling here -->
+    <!-- TODO needs pagination -->
+
     <div class="row-fluid">
         <h2><i class="icon icon-comments-alt"></i> Messages and notifications</h2>
 
-        <table class="system-messages">
-        @for(message <- systemMessages) {
-            <tr>
-                <td>formatDate(@message.getTimestamp)</td>
-                <td>shortClass(@message.getCaller)</td>
-                <td>nodeLink(@message.getNodeId)</td>
-                <td>@message.getContent</td>
-            </tr>
-        }
+        <table class="system-messages table table-striped table-hover table-condensed">
+            <thead>
+                <th style="width: 170px;">Timestamp</th>
+                <th>Node</th>
+                <th>Message</th>
+            </thead>
+
+            <tbody>
+                @for(message <- systemMessages) {
+                    <tr>
+                        <td>@message.getTimestamp</td>
+                        <td>@message.getNodeId</td>
+                        <td>@message.getContent</td>
+                    </tr>
+                }
+            </tbody>
+
         </table>
     </div>
 }

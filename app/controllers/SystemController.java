@@ -20,12 +20,10 @@
 package controllers;
 
 import com.google.common.collect.Lists;
+import controllers.AuthenticatedController;
 import lib.APIException;
 import lib.Api;
-import models.ESClusterHealth;
-import models.Notification;
-import models.SystemJob;
-import models.SystemMessage;
+import models.*;
 import play.mvc.*;
 
 import java.io.IOException;
@@ -51,5 +49,19 @@ public class SystemController extends AuthenticatedController {
             return status(504, views.html.errors.error.render(message, e, request()));
         }
     }
+
+    public static Result messageProcessing() {
+        try {
+            ServerJVMStats serverJvmStats = ServerJVMStats.get();
+
+            return ok(views.html.system.message_processing.render(currentUser(), serverJvmStats));
+        } catch (IOException e) {
+            return status(504, views.html.errors.error.render(Api.ERROR_MSG_IO, e, request()));
+        } catch (APIException e) {
+            String message = "Could not fetch system information. We expected HTTP 200, but got a HTTP " + e.getHttpCode() + ".";
+            return status(504, views.html.errors.error.render(message, e, request()));
+        }
+    }
+
 
 }

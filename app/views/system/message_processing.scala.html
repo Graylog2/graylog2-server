@@ -1,0 +1,51 @@
+@(currentUser: User, jvm: ServerJVMStats)
+
+@main("Message processing", views.html.system.sidebar(), "", currentUser) {
+
+<div class="row-fluid">
+    <h1><i class="icon icon-sitemap"></i> Message processing</h1>
+    This page provides a realtime overview of the inner workings of Graylog2 and how it handles and processes
+    the incoming messages.
+</div>
+
+<div class="row-fluid">
+    <div class="alert alert-success">
+        Actively processing <strong>X</strong> messages per second.
+    </div>
+</div>
+
+<div class="row-fluid">
+    <a href="" class="btn btn-danger btn-small">Pause message processing</a>
+</div>
+
+<div class="well well-small">
+    You can pause message processing at any time. The process buffers will not accept any new messages until you
+    resume it. It is important to keep in mind that incoming messages (except those from inputs that support rejecting
+    messages, like AMQP) are buffered in memory. This means that they will be lost if you stop or restart the server
+    until they are processed or you run out of memory. Messages already accepted will be processed completely.
+</div>
+
+@jvm.info
+<br />
+@jvm.pid
+<br />
+max mem: @jvm.maxMemory.getMegabytes() MB<br />
+total mem: @jvm.totalMemory.getMegabytes() MB<br />
+used mem: @jvm.usedMemory.getMegabytes() MB
+
+    <div class="progress">
+        <div class="bar bar-warning" style="width: @jvm.usedMemoryPercentage()%;">
+            @jvm.usedMemory.getMegabytes MB used
+        </div>
+
+        <div class="bar" style="width: @(jvm.totalMemoryPercentage()-jvm.usedMemoryPercentage)%">
+            @jvm.totalMemory.getMegabytes() MB total
+        </div>
+
+        &nbsp; @jvm.maxMemory.getMegabytes() MB max
+    </div>
+
+    free mem: @jvm.freeMemory.getMegabytes() MB<br />
+
+
+}
