@@ -20,6 +20,8 @@
 
 package org.graylog2;
 
+import org.graylog2.cluster.Node;
+import org.graylog2.cluster.NodeNotFoundException;
 import org.graylog2.plugin.Tools;
 import com.beust.jcommander.JCommander;
 import com.github.joschi.jadconfig.JadConfig;
@@ -46,7 +48,6 @@ import org.graylog2.outputs.ElasticSearchOutput;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.Writer;
-import org.graylog2.cluster.Cluster;
 import org.graylog2.plugin.initializers.InitializerConfigurationException;
 import org.graylog2.plugins.PluginInstaller;
 
@@ -152,14 +153,22 @@ public final class Main {
         server.initialize(configuration);
         
         // Could it be that there is another master instance already?
-        if (configuration.isMaster() && server.cluster().masterCountExcept(server.getServerId()) != 0) {
+        Node.register(server, configuration.isMaster(), configuration.getRestListenUri());
+
+        Node thisNode = null;
+        try {
+            thisNode = Node.thisNode(server);
+        } catch (NodeNotFoundException e) {
+            throw new RuntimeException("Did not find own node. This should never happen.", e);
+        }
+        if (configuration.isMaster() && !thisNode.isOnlyMaster()) {
             LOG.warn("Detected another master in the cluster. Retrying in {} seconds to make sure it is not "
-                    + "an old stale instance.", Cluster.PING_TIMEOUT);
+                    + "an old stale instance.", Node.PING_TIMEOUT);
             try {
-                Thread.sleep(Cluster.PING_TIMEOUT*1000);
+                Thread.sleep(Node.PING_TIMEOUT*1000);
             } catch (InterruptedException e) { /* nope */ }
             
-            if (server.cluster().masterCountExcept(server.getServerId()) != 0) {
+            if (!thisNode.isOnlyMaster()) {
                 // All devils here.
                 String what = "Detected other master node in the cluster! Starting as non-master! "
                         + "This is a mis-configuration you should fix.";
@@ -193,6 +202,7 @@ public final class Main {
         server.registerInitializer(new DroolsInitializer());
         server.registerInitializer(new HostCounterCacheWriterInitializer());
         server.registerInitializer(new ThroughputCounterInitializer());
+        server.registerInitializer(new NodePingInitializer());
         server.registerInitializer(new AlarmScannerInitializer());
         if (configuration.isEnableGraphiteOutput())       { server.registerInitializer(new GraphiteInitializer()); }
         if (configuration.isEnableLibratoMetricsOutput()) { server.registerInitializer(new LibratoMetricsInitializer()); }
@@ -232,7 +242,7 @@ public final class Main {
         try {
         	server.startRestApi();
         } catch(Exception e) {
-        	LOG.error("Could not start REST API. Terminating.", e);
+        	LOG.error("Could not start REST API on <{}>. Terminating.", configuration.getRestListenUri(), e);
         	System.exit(1);
         }
         

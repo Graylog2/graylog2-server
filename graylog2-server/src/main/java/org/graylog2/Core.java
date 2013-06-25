@@ -64,7 +64,6 @@ import org.graylog2.activities.Activity;
 import org.graylog2.activities.ActivityWriter;
 import org.graylog2.buffers.BasicCache;
 import org.graylog2.buffers.Cache;
-import org.graylog2.cluster.Cluster;
 import org.graylog2.database.HostCounterCacheImpl;
 import org.graylog2.indexer.Deflector;
 import org.graylog2.initializers.*;
@@ -112,8 +111,6 @@ public class Core implements GraylogServer {
 
     private HostCounterCacheImpl hostCounterCache;
 
-    private Cluster cluster;
-    
     private Counter benchmarkCounter = new Counter();
     private Counter throughputCounter = new Counter();
     private long throughput = 0;
@@ -168,9 +165,7 @@ public class Core implements GraylogServer {
         mongoBridge = new MongoBridge(this);
         mongoBridge.setConnection(mongoConnection); // TODO use dependency injection
         mongoConnection.connect();
-        
-        cluster = new Cluster(this);
-        
+
         activityWriter = new ActivityWriter(this);
 
         systemJobManager = new SystemJobManager(this);
@@ -347,9 +342,8 @@ public class Core implements GraylogServer {
     }
     
     public void startRestApi() throws IOException {
-        URI restUri = UriBuilder.fromUri(configuration.getRestListenUri()).port(configuration.getRestListenPort()).build();
-        startRestServer(restUri);
-        LOG.info("Started REST API at <{}>", restUri);
+        startRestServer(configuration.getRestListenUri());
+        LOG.info("Started REST API at <{}>", configuration.getRestListenUri());
     }
     
     private <A> void loadPlugins(Class<A> type, String subDirectory) {
@@ -466,11 +460,7 @@ public class Core implements GraylogServer {
     public Deflector getDeflector() {
         return this.deflector;
     }
-    
-    public Cluster cluster() {
-        return this.cluster;
-    }
-    
+
     public ActivityWriter getActivityWriter() {
         return this.activityWriter;
     }

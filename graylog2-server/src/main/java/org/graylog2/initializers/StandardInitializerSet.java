@@ -42,6 +42,7 @@ public class StandardInitializerSet {
             add(ThroughputCounterInitializer.class);
             add(StatisticsPrinterInitializer.class);
             add(MasterCacheWorkersInitializer.class);
+            add(NodePingInitializer.class);
         }};
     }
     

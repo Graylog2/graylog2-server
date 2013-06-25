@@ -20,6 +20,8 @@
 
 package org.graylog2;
 
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.net.UnknownHostException;
 import java.util.Arrays;
 import java.util.List;
@@ -50,6 +52,8 @@ import com.lmax.disruptor.SleepingWaitStrategy;
 import com.lmax.disruptor.WaitStrategy;
 import com.lmax.disruptor.YieldingWaitStrategy;
 import com.mongodb.ServerAddress;
+
+import javax.ws.rs.core.UriBuilder;
 
 /**
  * Helper class to hold configuration of Graylog2
@@ -86,10 +90,7 @@ public class Configuration {
     private boolean syslogStoreFullMessage = true;
     
     @Parameter(value = "rest_listen_uri", required = true)
-    private String restListenUri = "http://0.0.0.0/";
-    
-    @Parameter(value = "rest_listen_port", required = true, validator = InetPortValidator.class)
-    private int restListenPort = 12900;
+    private String restListenUri = "http://127.0.0.1:12900/";
     
     @Parameter(value = "udp_recvbuffer_sizes", required = true, validator = PositiveIntegerValidator.class)
     private int udpRecvBufferSizes = 1048576;
@@ -693,13 +694,20 @@ public class Configuration {
     public int getHttpListenPort() {
         return httpListenPort;
     }
-    
-    public String getRestListenUri() {
-    	return restListenUri;
-    }
-    
-    public int getRestListenPort() {
-    	return restListenPort;
+
+    public URI getRestListenUri() {
+        try {
+            URI uri = new URI(restListenUri);
+
+            // The port is set to -1 if not defined. Default to 80 here.
+            if (uri.getPort() == -1) {
+                return UriBuilder.fromUri(uri).port(80).build();
+            }
+
+            return uri;
+        } catch (URISyntaxException e) {
+            throw new RuntimeException("Could not parse REST listen URI.", e);
+        }
     }
     
     private Map<String, String> getGELFInputConfig() {

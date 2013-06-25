@@ -67,6 +67,10 @@ public abstract class Persisted {
 		return collection(core, collectionName).findOne(new BasicDBObject("_id", id));
 	}
 
+    protected List<DBObject> query(DBObject query, String collectionName) {
+        return cursorToList(collection(core, collectionName).find(query));
+    }
+
     protected static List<DBObject> query(DBObject query, Core core, String collectionName) {
         return cursorToList(collection(core, collectionName).find(query));
     }
@@ -86,6 +90,10 @@ public abstract class Persisted {
 
     private static List<DBObject> cursorToList(DBCursor cursor) {
         List<DBObject> results = Lists.newArrayList();
+
+        if (cursor == null) {
+            return results;
+        }
 
         try {
             while(cursor.hasNext()) {
@@ -108,6 +116,10 @@ public abstract class Persisted {
 
     public static void destroyAll(Core core, String collectionName) {
         collection(core, collectionName).remove(new BasicDBObject());
+    }
+
+    public static void destroy(DBObject query, Core core, String collectionName) {
+        collection(core, collectionName).remove(query);
     }
 	
 	public ObjectId save() throws ValidationException {
@@ -177,7 +189,10 @@ public abstract class Persisted {
         return true;
     }
 
+    public ObjectId getId() {
+        return this.id;
+    }
+
     public abstract String getCollectionName();
-    public abstract ObjectId getId();
     protected abstract Map<String, Validator> getValidations();
 }
