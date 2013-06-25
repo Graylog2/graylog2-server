@@ -27,6 +27,9 @@ import models.api.responses.ByteListing;
  */
 public class ServerJVMStatsResponse {
 
+    @SerializedName("node_id")
+    public String nodeId;
+
     public String info;
     public String pid;
 

@@ -1,4 +1,4 @@
-@(currentUser: User, jvm: ServerJVMStats, throughput: Integer)
+@(currentUser: User, jvms: Set[ServerJVMStats], throughput: Integer)
 
 @main("Message processing", views.html.system.sidebar(), "", currentUser) {
 
@@ -14,10 +14,6 @@
         </div>
     </div>
 
-    <div class="row-fluid">
-        <a href="" class="btn btn-danger btn-small">Pause message processing</a>
-    </div>
-
     <div class="well well-small">
         You can pause message processing at any time. The process buffers will not accept any new messages until you
         resume it. It is important to keep in mind that incoming messages (except those from inputs that support rejecting
@@ -25,18 +21,34 @@
         until they are processed or you run out of memory. Messages already accepted will be processed completely.
     </div>
 
-    <div class="progress">
-        <div class="bar bar-warning" style="width: @jvm.usedMemoryPercentage()%;">
-            @jvm.usedMemory.getMegabytes MB used
-        </div>
-
-        <div class="bar" style="width: @(jvm.totalMemoryPercentage()-jvm.usedMemoryPercentage)%">
-            @jvm.totalMemory.getMegabytes() MB total
-        </div>
-
-        &nbsp; @jvm.maxMemory.getMegabytes() MB max
+    <div class="row-fluid">
+        <a href="" class="btn btn-danger btn-small">Pause all message processing</a>
     </div>
-    The JVM (<em>@jvm.info</em>) is using @jvm.usedMemory.getMegabytes() of @jvm.totalMemory.getMegabytes() MB heap space
-    and will not attempt to use more than @jvm.maxMemory.getMegabytes() MB.
+
+
+    @for(jvm <- jvms) {
+        <h3>@jvm.getNodeId</h3> (last seen ...)
+        <div class="progress">
+            <div class="bar bar-warning" style="width: @jvm.usedMemoryPercentage()%;">
+                @jvm.getUsedMemory.getMegabytes MB used
+            </div>
+
+            <div class="bar" style="width: @(jvm.totalMemoryPercentage()-jvm.usedMemoryPercentage)%">
+                @jvm.getTotalMemory.getMegabytes() MB total
+            </div>
+
+            &nbsp; @jvm.getMaxMemory.getMegabytes() MB max
+        </div>
+
+        The JVM (<em>@jvm.getInfo</em>) is using @jvm.getUsedMemory.getMegabytes() of @jvm.getTotalMemory.getMegabytes() MB heap space
+        and will not attempt to use more than @jvm.getMaxMemory.getMegabytes() MB.
+
+        <br />    processing x messages per second
+
+        <div class="row-fluid">
+            <a href="" class="btn btn-danger btn-small">Pause message processing</a>
+        </div>
+
+    }
 
 }

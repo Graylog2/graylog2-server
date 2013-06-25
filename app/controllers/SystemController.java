@@ -29,6 +29,7 @@ import play.mvc.*;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.Set;
 
 /**
  * @author Lennart Koopmann <lennart@torch.sh>
@@ -53,7 +54,7 @@ public class SystemController extends AuthenticatedController {
 
     public static Result messageProcessing() {
         try {
-            ServerJVMStats serverJvmStats = ServerJVMStats.get();
+            Set<ServerJVMStats> serverJvmStats = ServerJVMStats.get();
             int throughput = Throughput.get();
 
             return ok(views.html.system.message_processing.render(currentUser(), serverJvmStats, throughput));

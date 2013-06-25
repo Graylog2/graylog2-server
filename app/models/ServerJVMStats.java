@@ -19,6 +19,7 @@
  */
 package models;
 
+import com.google.common.collect.Sets;
 import lib.APIException;
 import lib.Api;
 import models.api.responses.ByteListing;
@@ -26,20 +27,23 @@ import models.api.responses.system.ServerJVMStatsResponse;
 
 import java.io.IOException;
 import java.net.URL;
+import java.util.Set;
 
 /**
  * @author Lennart Koopmann <lennart@torch.sh>
  */
 public class ServerJVMStats {
 
-    public final String info;
-    public final String pid;
-    public final ByteListing maxMemory;
-    public final ByteListing usedMemory;
-    public final ByteListing totalMemory;
-    public final ByteListing freeMemory;
+    private final String nodeId;
+    private final String info;
+    private final String pid;
+    private final ByteListing maxMemory;
+    private final ByteListing usedMemory;
+    private final ByteListing totalMemory;
+    private final ByteListing freeMemory;
 
     public ServerJVMStats(ServerJVMStatsResponse r) {
+        this.nodeId = r.nodeId;
         this.info = r.info;
         this.pid = r.pid;
 
@@ -47,6 +51,34 @@ public class ServerJVMStats {
         this.usedMemory = r.usedMemory;
         this.totalMemory = r.totalMemory;
         this.freeMemory = r.freeMemory;
+    }
+
+    public String getNodeId() {
+        return nodeId;
+    }
+
+    public String getInfo() {
+        return info;
+    }
+
+    public String getPid() {
+        return pid;
+    }
+
+    public ByteListing getMaxMemory() {
+        return maxMemory;
+    }
+
+    public ByteListing getUsedMemory() {
+        return usedMemory;
+    }
+
+    public ByteListing getTotalMemory() {
+        return totalMemory;
+    }
+
+    public ByteListing getFreeMemory() {
+        return freeMemory;
     }
 
     public int usedMemoryPercentage() {
@@ -57,12 +89,15 @@ public class ServerJVMStats {
         return Math.round((float) totalMemory.getMegabytes() / maxMemory.getMegabytes() * 100);
     }
 
-    // TODO make multi-node compatible
-    public static ServerJVMStats get() throws IOException, APIException {
-        URL url = Api.buildTarget("system/jvm");
-        ServerJVMStatsResponse r = Api.get(url, ServerJVMStatsResponse.class);
+    public static Set<ServerJVMStats> get() throws IOException, APIException {
+        Set<ServerJVMStats> result = Sets.newHashSet();
+        Set<ServerJVMStatsResponse> rs = Api.getFromAllNodes("system/jvm", ServerJVMStatsResponse.class);
 
-        return new ServerJVMStats(r);
+        for (ServerJVMStatsResponse r : rs) {
+            result.add(new ServerJVMStats(r));
+        }
+
+        return result;
     }
 
 }
