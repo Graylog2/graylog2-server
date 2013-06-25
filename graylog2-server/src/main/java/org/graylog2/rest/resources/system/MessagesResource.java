@@ -17,46 +17,63 @@
  * along with Graylog2.  If not, see <http://www.gnu.org/licenses/>.
  *
  */
-package org.graylog2.rest.resources.system.indices.ranges;
+package org.graylog2.rest.resources.system;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
 import com.sun.jersey.api.core.ResourceConfig;
 import org.graylog2.Core;
-import org.graylog2.indexer.ranges.RebuildIndexRangesJob;
+import org.graylog2.activities.SystemMessage;
+import org.graylog2.plugin.Tools;
 import org.graylog2.rest.resources.RestResource;
-import org.graylog2.systemjobs.SystemJob;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.ws.rs.*;
+import javax.ws.rs.GET;
+import javax.ws.rs.Path;
+import javax.ws.rs.Produces;
+import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response;
+import java.util.List;
+import java.util.Map;
 
 /**
  * @author Lennart Koopmann <lennart@torch.sh>
  */
-@Path("/system/indices/ranges")
-public class IndexRangesResource extends RestResource {
+@Path("/system/messages")
+public class MessagesResource extends RestResource {
 
-    private static final Logger LOG = LoggerFactory.getLogger(IndexRangesResource.class);
+    private static final Logger LOG = LoggerFactory.getLogger(MessagesResource.class);
 
     private final ObjectMapper objectMapper = new ObjectMapper();
 
     @Context
     ResourceConfig rc;
 
-    @POST
-    @Path("/rebuild")
+    @GET
+    @Path("/")
     @Produces(MediaType.APPLICATION_JSON)
-    public Response rebuild() {
+    public String all(@QueryParam("page") int page, @QueryParam("pretty") boolean prettyPrint) {
         Core core = (Core) rc.getProperty("core");
 
-        SystemJob rebuildJob = new RebuildIndexRangesJob();
-        rebuildJob.prepare(core);
-        core.getSystemJobManager().submit(rebuildJob);
+        List<Map<String, Object>> messages = Lists.newArrayList();
 
-        return Response.status(Response.Status.ACCEPTED).build();
+        for (SystemMessage sm : SystemMessage.all(core, page)) {
+            Map<String, Object> message = Maps.newHashMap();
+            message.put("caller", sm.getCaller());
+            message.put("content", sm.getContent());
+            message.put("timestamp", Tools.getISO8601String(sm.getTimestamp()));
+            message.put("node_id", sm.getNodeId());
+
+            messages.add(message);
+        }
+
+        Map<String, Object> result = Maps.newHashMap();
+        result.put("messages", messages);
+
+        return json(result, prettyPrint);
     }
 
 }

@@ -190,10 +190,9 @@ public final class Main {
         if (configuration.isTransportJabberEnabled()) {  server.registerTransport(new JabberTransport()); }
 
         // Register initializers.
-        server.registerInitializer(new ServerValueWriterInitializer());
         server.registerInitializer(new DroolsInitializer());
         server.registerInitializer(new HostCounterCacheWriterInitializer());
-        server.registerInitializer(new MessageCounterInitializer());
+        server.registerInitializer(new ThroughputCounterInitializer());
         server.registerInitializer(new AlarmScannerInitializer());
         if (configuration.isEnableGraphiteOutput())       { server.registerInitializer(new GraphiteInitializer()); }
         if (configuration.isEnableLibratoMetricsOutput()) { server.registerInitializer(new LibratoMetricsInitializer()); }
@@ -205,7 +204,6 @@ public final class Main {
         if (configuration.isAmqpEnabled()) {
             server.registerInitializer(new AMQPSyncInitializer());
         }
-        server.registerInitializer(new BufferWatermarkInitializer());
         if (commandLineArguments.isStats()) { server.registerInitializer(new StatisticsPrinterInitializer()); }
         server.registerInitializer(new MasterCacheWorkersInitializer());
         
@@ -227,7 +225,6 @@ public final class Main {
         if (configuration.isEnableTokenizerFilter()) { server.registerFilter(new TokenizerFilter()); }
         server.registerFilter(new StreamMatcherFilter());
         server.registerFilter(new RewriteFilter());
-        server.registerFilter(new CounterUpdateFilter());
 
         // Register outputs.
         server.registerOutput(new ElasticSearchOutput());

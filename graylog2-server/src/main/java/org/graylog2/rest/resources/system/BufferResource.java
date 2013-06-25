@@ -17,7 +17,7 @@
  * along with Graylog2.  If not, see <http://www.gnu.org/licenses/>.
  *
  */
-package org.graylog2.rest.resources.system.buffers;
+package org.graylog2.rest.resources.system;
 
 import com.google.common.collect.Maps;
 import com.sun.jersey.api.core.ResourceConfig;

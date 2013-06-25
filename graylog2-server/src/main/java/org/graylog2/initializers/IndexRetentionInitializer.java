@@ -30,7 +30,7 @@ import org.graylog2.plugin.initializers.InitializerConfigurationException;
 /**
  * @author Lennart Koopmann <lennart@socketfeed.com>
  */
-public class IndexRetentionInitializer  extends SimpleFixedRateScheduleInitializer implements Initializer {
+public class IndexRetentionInitializer extends SimpleFixedRateScheduleInitializer implements Initializer {
 
     private static final String NAME = "Index retention";
     

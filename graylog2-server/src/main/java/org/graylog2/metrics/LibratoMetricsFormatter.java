@@ -25,7 +25,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.graylog2.plugin.Tools;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
-import org.graylog2.plugin.MessageCounter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -42,14 +41,14 @@ public class LibratoMetricsFormatter extends MetricsFormatter {
 
     private final ObjectMapper objectMapper = new ObjectMapper();
 
-    private MessageCounter counter;
+    //private MessageCounter counter;
     private List<String> streamFilter;
     private String hostFilter;
     private String source;
     private Map<String, String> streamNames;
 
-    public LibratoMetricsFormatter (MessageCounter counter, String prefix, List<String> streamFilter, String hostFilter, Map<String, String> streamNames) {
-        this.counter = counter;
+    public LibratoMetricsFormatter (String prefix, List<String> streamFilter, String hostFilter, Map<String, String> streamNames) {
+        //this.counter = counter;
         this.streamFilter = streamFilter;
         this.hostFilter = hostFilter;
         this.source = prefix + "graylog2-server";
@@ -76,7 +75,10 @@ public class LibratoMetricsFormatter extends MetricsFormatter {
      */
     public String asJson() {
         Map<String, Object> m = Maps.newHashMap();
-        List<Map<String, Object>> gauges = Lists.newArrayList();
+
+        // TODO
+
+        /*List<Map<String, Object>> gauges = Lists.newArrayList();
 
         // Overall
         Map<String, Object> overall = Maps.newHashMap();
@@ -122,7 +124,9 @@ public class LibratoMetricsFormatter extends MetricsFormatter {
             LOG.error("Error while generating JSON data", e);
         }
 
-        return result;
+        return result;*/
+
+        return "";
     }
     
 }

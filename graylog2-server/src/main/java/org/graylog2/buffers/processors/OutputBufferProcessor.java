@@ -62,7 +62,7 @@ public class OutputBufferProcessor implements EventHandler<MessageEvent> {
 
     private List<Message> buffer = Lists.newArrayList();
     private final Meter incomingMessages = Metrics.newMeter(OutputBufferProcessor.class, "IncomingMessages", "messages", TimeUnit.SECONDS);
-    
+
     private final Histogram batchSize = Metrics.newHistogram(OutputBufferProcessor.class, "BatchSize");
 
     private final long ordinal;
@@ -139,10 +139,14 @@ public class OutputBufferProcessor implements EventHandler<MessageEvent> {
             if (!doneSignal.await(10, TimeUnit.SECONDS)) {
                 LOG.warn("Timeout reached. Not waiting any longer for writer threads to complete.");
             }
-            
+
+            int messagesWritten = buffer.size();
+
             if (server.isStatsMode()) {
-                server.getBenchmarkCounter().add(buffer.size());
+                server.getBenchmarkCounter().add(messagesWritten);
             }
+
+            server.getThroughputCounter().add(messagesWritten);
             
             buffer.clear();
         }

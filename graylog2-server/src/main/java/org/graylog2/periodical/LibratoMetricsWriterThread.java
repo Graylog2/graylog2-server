@@ -23,7 +23,6 @@ package org.graylog2.periodical;
 import org.graylog2.Core;
 import org.graylog2.metrics.LibratoMetricsFormatter;
 import org.graylog2.plugin.Tools;
-import org.graylog2.plugin.MessageCounter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -53,6 +52,10 @@ public class LibratoMetricsWriterThread implements Runnable {
 
     @Override
     public void run() {
+
+        // TODO
+
+        /*
         // Register message counter if it has not been done yet.
         if (this.graylogServer.getMessageCounterManager().get(COUNTER_NAME) == null) {
             this.graylogServer.getMessageCounterManager().register(COUNTER_NAME);
@@ -75,7 +78,7 @@ public class LibratoMetricsWriterThread implements Runnable {
             LOG.warn("Error in LibratoMetricsWriterThread: " + e.getMessage(), e);
         } finally {
             counter.resetAllCounts();
-        }
+        }*/
     }
 
     private void send(String what) {

@@ -1,5 +1,5 @@
 /**
- * Copyright 2012 Lennart Koopmann <lennart@socketfeed.com>
+ * Copyright 2013 Lennart Koopmann <lennart@torch.sh>
  *
  * This file is part of Graylog2.
  *
@@ -19,43 +19,46 @@
  */
 package org.graylog2.initializers;
 
-import java.util.Map;
-import org.graylog2.plugin.initializers.Initializer;
+import com.google.common.collect.Maps;
 import org.graylog2.Core;
-import org.graylog2.periodical.BufferWatermarkThread;
+import org.graylog2.periodical.ThroughputCounterManagerThread;
 import org.graylog2.plugin.GraylogServer;
+import org.graylog2.plugin.initializers.Initializer;
 import org.graylog2.plugin.initializers.InitializerConfigurationException;
 
-/**
- * @author Lennart Koopmann <lennart@socketfeed.com>
- */
-public class BufferWatermarkInitializer extends SimpleFixedRateScheduleInitializer implements Initializer {
+import java.util.Map;
 
-    private static final String NAME = "Buffer watermarks";
-    
+/**
+ * @author Lennart Koopmann <lennart@torch.sh>
+ */
+public class ThroughputCounterInitializer extends SimpleFixedRateScheduleInitializer implements Initializer {
+
+    private static final String NAME = "Throughput counter";
+
     @Override
     public void initialize(GraylogServer server, Map<String, String> config) throws InitializerConfigurationException {
         configureScheduler(
                 (Core) server,
-                new BufferWatermarkThread((Core) server),
-                BufferWatermarkThread.INITIAL_DELAY,
-                BufferWatermarkThread.PERIOD
+                new ThroughputCounterManagerThread((Core) server),
+                ThroughputCounterManagerThread.INITIAL_DELAY,
+                ThroughputCounterManagerThread.PERIOD
         );
     }
 
     @Override
     public Map<String, String> getRequestedConfiguration() {
         // Built in initializer. This is just for plugin compat. No special configuration required.
-        return com.google.common.collect.Maps.newHashMap();
+        return Maps.newHashMap();
     }
-    
+
     @Override
     public boolean masterOnly() {
         return false;
     }
-    
+
     @Override
     public String getName() {
         return NAME;
     }
+
 }

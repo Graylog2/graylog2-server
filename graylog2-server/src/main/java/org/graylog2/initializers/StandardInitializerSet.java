@@ -33,15 +33,13 @@ public class StandardInitializerSet {
             add(AMQPSyncInitializer.class);
             add(AlarmScannerInitializer.class);
             add(AnonymousInformationCollectorInitializer.class);
-            add(BufferWatermarkInitializer.class);
             add(DeflectorThreadsInitializer.class);
             add(DroolsInitializer.class);
             add(GraphiteInitializer.class);
             add(HostCounterCacheWriterInitializer.class);
             add(IndexRetentionInitializer.class);
             add(LibratoMetricsInitializer.class);
-            add(MessageCounterInitializer.class);
-            add(ServerValueWriterInitializer.class);
+            add(ThroughputCounterInitializer.class);
             add(StatisticsPrinterInitializer.class);
             add(MasterCacheWorkersInitializer.class);
         }};

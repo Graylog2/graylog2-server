@@ -100,7 +100,6 @@ public class Core implements GraylogServer {
     private MongoBridge mongoBridge;
     private Configuration configuration;
     private RulesEngineImpl rulesEngine;
-    private ServerValue serverValues;
     private GELFChunkManager gelfChunkManager;
 
     private static final int SCHEDULED_THREADS_POOL_SIZE = 30;
@@ -109,17 +108,15 @@ public class Core implements GraylogServer {
     public static final String GRAYLOG2_VERSION = "0.20.0-dev";
     public static final String GRAYLOG2_CODENAME = "Amigo Humanos (Flipper)";
 
-    public static final String MASTER_COUNTER_NAME = "master";
-
     private Indexer indexer;
 
     private HostCounterCacheImpl hostCounterCache;
 
-    private MessageCounterManagerImpl messageCounterManager;
-
     private Cluster cluster;
     
     private Counter benchmarkCounter = new Counter();
+    private Counter throughputCounter = new Counter();
+    private long throughput = 0;
     
     private List<Initializer> initializers = Lists.newArrayList();
     private List<MessageInput> inputs = Lists.newArrayList();
@@ -178,9 +175,6 @@ public class Core implements GraylogServer {
 
         systemJobManager = new SystemJobManager(this);
 
-        messageCounterManager = new MessageCounterManagerImpl();
-        messageCounterManager.register(MASTER_COUNTER_NAME);
-
         hostCounterCache = new HostCounterCacheImpl();
         
         inputCache = new BasicCache();
@@ -195,8 +189,7 @@ public class Core implements GraylogServer {
         gelfChunkManager = new GELFChunkManager(this);
 
         indexer = new Indexer(this);
-        serverValues = new ServerValue(this);
-                
+
         Runtime.getRuntime().addShutdownHook(new Thread() {
             @Override
             public void run() {
@@ -420,10 +413,6 @@ public class Core implements GraylogServer {
         return indexer;
     }
 
-    public ServerValue getServerValues() {
-        return serverValues;
-    }
-
     public GELFChunkManager getGELFChunkManager() {
         return this.gelfChunkManager;
     }
@@ -468,11 +457,6 @@ public class Core implements GraylogServer {
 
     public List<AlarmCallback> getAlarmCallbacks() {
         return this.alarmCallbacks;
-    }
-    
-    @Override
-    public MessageCounterManagerImpl getMessageCounterManager() {
-        return this.messageCounterManager;
     }
 
     public HostCounterCacheImpl getHostCounterCache() {
@@ -542,6 +526,18 @@ public class Core implements GraylogServer {
     
     public Counter getBenchmarkCounter() {
         return benchmarkCounter;
+    }
+
+    public Counter getThroughputCounter() {
+        return throughputCounter;
+    }
+
+    public void setCurrentThroughput(long x) {
+        this.throughput = x;
+    }
+
+    public long getCurrentThroughput() {
+        return this.throughput;
     }
 
     public Cache getInputCache() {
