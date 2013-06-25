@@ -35,6 +35,7 @@ GET		/a/analyze/:index/:id/:field	controllers.MessagesController.analyze(index: 
 GET		/a/system/fields                controllers.SystemApiController.fields()
 GET     /a/system/jobs                  controllers.SystemApiController.jobs()
 GET     /a/system/notifications         controllers.SystemApiController.notifications()
+GET     /a/system/throughput            controllers.SystemApiController.totalThroughput()
 
 # Map static resources from the /public folder to the /assets URL path
 GET     /assets/*file               	controllers.Assets.at(path="/public", file)

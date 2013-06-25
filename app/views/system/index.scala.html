@@ -1,4 +1,7 @@
-@(currentUser: User, jobs: List[SystemJob], clusterHealth: ESClusterHealth, systemMessages: List[SystemMessage], notifications: List[Notification])
+@(currentUser: User,
+        jobs: List[SystemJob], clusterHealth: ESClusterHealth,
+        systemMessages: List[SystemMessage],
+        notifications: List[Notification])
 
 @main("System", views.html.system.sidebar(), "", currentUser) {
 

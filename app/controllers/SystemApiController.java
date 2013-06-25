@@ -7,6 +7,7 @@ import lib.APIException;
 import models.Core;
 import models.Notification;
 import models.SystemJob;
+import models.Throughput;
 import play.mvc.Result;
 
 import java.io.IOException;
@@ -58,6 +59,19 @@ public class SystemApiController extends AuthenticatedController {
         try {
             Map<String, Object> result = Maps.newHashMap();
             result.put("count", Notification.all().size());
+
+            return ok(new Gson().toJson(result)).as("application/json");
+        } catch (IOException e) {
+            return internalServerError("io exception");
+        } catch (APIException e) {
+            return internalServerError("api exception " + e);
+        }
+    }
+
+    public static Result totalThroughput() {
+        try {
+            Map<String, Object> result = Maps.newHashMap();
+            result.put("throughput", Throughput.get());
 
             return ok(new Gson().toJson(result)).as("application/json");
         } catch (IOException e) {

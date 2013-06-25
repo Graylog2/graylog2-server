@@ -24,6 +24,7 @@ import controllers.AuthenticatedController;
 import lib.APIException;
 import lib.Api;
 import models.*;
+import models.api.responses.system.ServerThroughputResponse;
 import play.mvc.*;
 
 import java.io.IOException;
@@ -53,8 +54,9 @@ public class SystemController extends AuthenticatedController {
     public static Result messageProcessing() {
         try {
             ServerJVMStats serverJvmStats = ServerJVMStats.get();
+            int throughput = Throughput.get();
 
-            return ok(views.html.system.message_processing.render(currentUser(), serverJvmStats));
+            return ok(views.html.system.message_processing.render(currentUser(), serverJvmStats, throughput));
         } catch (IOException e) {
             return status(504, views.html.errors.error.render(Api.ERROR_MSG_IO, e, request()));
         } catch (APIException e) {

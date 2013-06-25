@@ -101,6 +101,22 @@ $(document).ready(function() {
         });
     })();
 
+    // Updating total throughput.
+    (function updateTotalThroughput() {
+        $.ajax({
+            url: '/a/system/throughput',
+            success: function(data) {
+                $(".total-throughput").html(data.throughput);
+            },
+            error: function() {
+                $(".total-throughput").html("?");
+            },
+            complete: function() {
+                setTimeout(updateTotalThroughput, 1000);
+            }
+        });
+    })();
+
     // Updating notification count badge.
     (function updateNotificationCount() {
         $.ajax({
