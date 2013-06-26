@@ -131,6 +131,7 @@ public class SystemResource extends RestResource {
         result.put("total_memory", bytesToValueMap(runtime.totalMemory()));
         result.put("used_memory", bytesToValueMap(runtime.totalMemory() - runtime.freeMemory()));
 
+        result.put("node_id", core.getServerId());
         result.put("pid", Tools.getPID());
         result.put("info", Tools.getSystemInformation());
 
