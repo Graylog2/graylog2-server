@@ -566,7 +566,7 @@ public class Core implements GraylogServer {
         return processingPauseLocked.get();
     }
 
-    public void manuallyUnlockProcessingPauseLock() {
+    public void unlockProcessingPause() {
         processingPauseLocked.set(false);
     }
 

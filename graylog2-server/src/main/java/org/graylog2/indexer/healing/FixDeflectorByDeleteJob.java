@@ -21,6 +21,8 @@
 package org.graylog2.indexer.healing;
 
 import org.graylog2.Core;
+import org.graylog2.ProcessingPauseLockedException;
+import org.graylog2.indexer.Deflector;
 import org.graylog2.systemjobs.SystemJob;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -43,24 +45,50 @@ public class FixDeflectorByDeleteJob extends SystemJob {
 
     @Override
     public void execute() {
-        /*
-        // Pause message processing.
-        core.pauseMessageProcessing();
+        LOG.info("Attempting to fix deflector with delete strategy.");
 
-        // Clear all buffers and caches. They would be written to the deflector index anyway and this is the delete strategy.
+        // Pause message processing and lock the pause.
+        core.pauseMessageProcessing(true);
+
+        // Clear all caches. They would be written to the deflector index anyway and this is the delete strategy.
+        core.getInputCache().clear();
+        core.getOutputCache().clear();
+
+        // Wait until the buffers are empty. Messages that where already started to be processed must be fully processed.
+        while(true) {
+            if(core.getProcessBuffer().isEmpty() && core.getOutputBuffer().isEmpty()) {
+                break;
+            }
+
+            try {
+                LOG.info("Not all buffers are empty. Waiting another second.");
+                Thread.sleep(1000);
+            } catch (InterruptedException e) { /* */ }
+        }
+
+        LOG.info("All buffers and caches are empty. Continuing.");
 
         progress = 25;
 
         // Delete deflector index.
+        LOG.info("Deleting <{}> index.", Deflector.DEFLECTOR_NAME);
+        core.getIndexer().deleteIndex(Deflector.DEFLECTOR_NAME);
         progress = 50;
 
         // Set up deflector.
         progress = 75;
 
         // Start message processing again.
-        core.restartMessageProcessing();
+        try {
+            core.unlockProcessingPause();
+            core.resumeMessageProcessing();
+        } catch (ProcessingPauseLockedException e) {
+            // lol checked exceptions
+            throw new RuntimeException("Could not unlock processing pause.", e);
+        }
+
         progress = 100;
-        */
+        LOG.info("Finished.");
     }
 
     @Override

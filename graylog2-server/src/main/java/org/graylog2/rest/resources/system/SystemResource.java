@@ -20,7 +20,6 @@
 
 package org.graylog2.rest.resources.system;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.Maps;
 import com.sun.jersey.api.core.ResourceConfig;
 import org.graylog2.Core;
@@ -108,11 +107,11 @@ public class SystemResource extends RestResource {
 
         /*
          * This is meant to be only used in exceptional cases, when something that locked the processing pause
-         * has crashed and never unlocked so we need to unlock manually.
+         * has crashed and never unlocked so we need to unlock manually. #donttellanybody
          */
 
         Core core = (Core) rc.getProperty("core");
-        core.manuallyUnlockProcessingPauseLock();
+        core.unlockProcessingPause();
 
         LOG.info("Manually unlocked message processing pause - triggered by REST call.");
         return Response.ok().build();

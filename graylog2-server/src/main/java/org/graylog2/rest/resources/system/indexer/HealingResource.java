@@ -1,5 +1,5 @@
 /**
- * Copyright 2012, 2013 Lennart Koopmann <lennart@socketfeed.com>
+ * Copyright 2013 Lennart Koopmann <lennart@torch.sh>
  *
  * This file is part of Graylog2.
  *
@@ -17,19 +17,10 @@
  * along with Graylog2.  If not, see <http://www.gnu.org/licenses/>.
  *
  */
-package org.graylog2.buffers;
-
-import org.graylog2.plugin.Message;
+package org.graylog2.rest.resources.system.indexer;
 
 /**
- * 
- * @author Lennart Koopmann <lennart@socketfeed.com>
+ * @author Lennart Koopmann <lennart@torch.sh>
  */
-public interface Cache {
-    
-    public void add(Message m);
-    public Message pop();
-    public int size();
-    public void clear();
-    
+public class HealingResource {
 }

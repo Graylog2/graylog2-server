@@ -100,7 +100,12 @@ public class OutputBuffer implements Buffer {
         
         insert(message);
     }
-    
+
+    @Override
+    public boolean isEmpty() {
+        return ringBuffer.getBufferSize() == 0;
+    }
+
     @Override
     public void insertFailFast(Message message) throws BufferOutOfCapacityException {
         if (!hasCapacity()) {

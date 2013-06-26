@@ -62,4 +62,9 @@ public class BasicCache implements Cache {
         return counter.intValue();
     }
 
+    @Override
+    public void clear() {
+        q.clear();
+    }
+
 }
