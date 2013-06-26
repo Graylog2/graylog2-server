@@ -24,6 +24,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.Maps;
 import com.sun.jersey.api.core.ResourceConfig;
 import org.graylog2.Core;
+import org.graylog2.ProcessingPauseLockedException;
 import org.graylog2.plugin.Tools;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -79,7 +80,7 @@ public class SystemResource extends RestResource {
     @Path("/processing/pause")
     public Response pauseProcessing() {
         Core core = (Core) rc.getProperty("core");
-        core.pauseMessageProcessing();
+        core.pauseMessageProcessing(false);
 
         LOG.info("Paused message processing - triggered by REST call.");
         return Response.ok().build();
@@ -89,9 +90,31 @@ public class SystemResource extends RestResource {
     @Path("/processing/resume")
     public Response resumeProcessing() {
         Core core = (Core) rc.getProperty("core");
-        core.resumeMessageProcessing();
+
+        try {
+            core.resumeMessageProcessing();
+        } catch (ProcessingPauseLockedException e) {
+            LOG.error("Message processing pause is locked. Returning HTTP 403.");
+            throw new WebApplicationException(403);
+        }
 
         LOG.info("Resumed message processing - triggered by REST call.");
+        return Response.ok().build();
+    }
+
+    @PUT
+    @Path("/processing/pause/unlock")
+    public Response unlockProcessingPause() {
+
+        /*
+         * This is meant to be only used in exceptional cases, when something that locked the processing pause
+         * has crashed and never unlocked so we need to unlock manually.
+         */
+
+        Core core = (Core) rc.getProperty("core");
+        core.manuallyUnlockProcessingPauseLock();
+
+        LOG.info("Manually unlocked message processing pause - triggered by REST call.");
         return Response.ok().build();
     }
 

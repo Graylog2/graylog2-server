@@ -142,6 +142,7 @@ public class Core implements GraylogServer {
     private boolean statsMode = false;
 
     private AtomicBoolean isProcessing = new AtomicBoolean(true);
+    private AtomicBoolean processingPauseLocked = new AtomicBoolean(false);
     
     private DateTime startedAt;
 
@@ -542,13 +543,31 @@ public class Core implements GraylogServer {
     	return startedAt;
     }
 
-    public void pauseMessageProcessing() {
+    public void pauseMessageProcessing(boolean locked) {
         // TODO: properly pause and restart AMQP inputs.
         isProcessing.set(false);
+
+        // Never override pause lock if already locked.
+        if (!processingPauseLocked.get()) {
+            processingPauseLocked.set(locked);
+        }
     }
 
-    public void resumeMessageProcessing() {
+    public void resumeMessageProcessing() throws ProcessingPauseLockedException {
+        if (processingPauseLocked()) {
+            throw new ProcessingPauseLockedException("Processing pause is locked. Wait until the locking task has finished " +
+                    "or manually unlock if you know what you are doing.");
+        }
+
         isProcessing.set(true);
+    }
+
+    public boolean processingPauseLocked() {
+        return processingPauseLocked.get();
+    }
+
+    public void manuallyUnlockProcessingPauseLock() {
+        processingPauseLocked.set(false);
     }
 
     public boolean isProcessing() {
