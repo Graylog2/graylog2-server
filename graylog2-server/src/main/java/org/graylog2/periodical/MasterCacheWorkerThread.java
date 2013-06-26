@@ -59,7 +59,7 @@ public class MasterCacheWorkerThread implements Runnable {
     public void run() {
         while(true) {
             try {
-                if (cache.size() > 0) {
+                if (cache.size() > 0 && core.isProcessing()) {
                     LOG.debug("{} contains {} messages. Trying to process them.", cacheName, cache.size());
                     
                     while (true) {
