@@ -54,7 +54,7 @@ public class SystemController extends AuthenticatedController {
 
     public static Result messageProcessing() {
         try {
-            Set<ServerJVMStats> serverJvmStats = ServerJVMStats.get();
+            List<ServerJVMStats> serverJvmStats = ServerJVMStats.get();
             int throughput = Throughput.get();
 
             return ok(views.html.system.message_processing.render(currentUser(), serverJvmStats, throughput));

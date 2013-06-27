@@ -19,6 +19,7 @@
  */
 package models;
 
+import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 import lib.APIException;
 import lib.Api;
@@ -27,6 +28,7 @@ import models.api.responses.system.ServerJVMStatsResponse;
 
 import java.io.IOException;
 import java.net.URL;
+import java.util.List;
 import java.util.Set;
 
 /**
@@ -37,6 +39,7 @@ public class ServerJVMStats {
     private final String nodeId;
     private final String info;
     private final String pid;
+    private final boolean isProcessing;
     private final ByteListing maxMemory;
     private final ByteListing usedMemory;
     private final ByteListing totalMemory;
@@ -51,6 +54,7 @@ public class ServerJVMStats {
         this.usedMemory = r.usedMemory;
         this.totalMemory = r.totalMemory;
         this.freeMemory = r.freeMemory;
+        this.isProcessing = r.isProcessing;
     }
 
     public String getNodeId() {
@@ -81,6 +85,10 @@ public class ServerJVMStats {
         return freeMemory;
     }
 
+    public boolean isProcessing() {
+        return isProcessing;
+    }
+
     public int usedMemoryPercentage() {
         return Math.round((float) usedMemory.getMegabytes() / maxMemory.getMegabytes() * 100);
     }
@@ -89,9 +97,9 @@ public class ServerJVMStats {
         return Math.round((float) totalMemory.getMegabytes() / maxMemory.getMegabytes() * 100);
     }
 
-    public static Set<ServerJVMStats> get() throws IOException, APIException {
-        Set<ServerJVMStats> result = Sets.newHashSet();
-        Set<ServerJVMStatsResponse> rs = Api.getFromAllNodes("system/jvm", ServerJVMStatsResponse.class);
+    public static List<ServerJVMStats> get() throws IOException, APIException {
+        List<ServerJVMStats> result = Lists.newArrayList();
+        List<ServerJVMStatsResponse> rs = Api.getFromAllNodes("system/jvm", ServerJVMStatsResponse.class);
 
         for (ServerJVMStatsResponse r : rs) {
             result.add(new ServerJVMStats(r));

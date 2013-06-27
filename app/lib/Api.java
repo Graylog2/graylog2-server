@@ -1,7 +1,6 @@
 package lib;
 
 import com.google.common.collect.Lists;
-import com.google.common.collect.Sets;
 import com.google.gson.Gson;
 import com.ning.http.client.AsyncHttpClient;
 import com.ning.http.client.AsyncHttpClientConfig;
@@ -66,8 +65,8 @@ public class Api {
 		return (T) null;
 	}
 
-    public static <T> Set<T> getFromAllNodes(String resource, Class<T> responseClass) throws APIException, IOException {
-        Set<T> result = Sets.newHashSet();
+    public static <T> List<T> getFromAllNodes(String resource, Class<T> responseClass) throws APIException, IOException {
+        List<T> result = Lists.newArrayList();
 
         for (String node : nodes) {
             URL url = buildTarget(node, resource);

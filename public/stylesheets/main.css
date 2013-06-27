@@ -313,3 +313,27 @@ form #stream-rules {
     font-size: 12px;
     padding: 3px 11px;
 }
+
+.message-processing-host {
+    border-bottom: 1px solid #ccc;
+    padding-bottom: 8px;
+    margin-top: 8px;
+    margin-bottom: 0px;
+}
+
+.message-processing-host .progress {
+    margin-bottom: 5px;
+}
+
+.message-processing-host .label {
+    position: relative;
+    top: -2px;
+    left: 2px;
+    font-family: "Arial", sans-serif;
+    font-size: 11px;
+}
+
+.message-processing-host .node-throughput-info {
+    position: relative;
+    top: 3px;
+}

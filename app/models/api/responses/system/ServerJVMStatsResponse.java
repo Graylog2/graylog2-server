@@ -33,6 +33,9 @@ public class ServerJVMStatsResponse {
     public String info;
     public String pid;
 
+    @SerializedName("is_processing")
+    public boolean isProcessing;
+
     @SerializedName("max_memory")
     public ByteListing maxMemory;
 
