@@ -30,6 +30,7 @@ import org.graylog2.Core;
 import org.graylog2.buffers.processors.OutputBufferProcessor;
 import org.graylog2.plugin.buffers.Buffer;
 import org.graylog2.plugin.Message;
+import org.graylog2.plugin.buffers.MessageEvent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -41,11 +42,9 @@ import org.graylog2.plugin.buffers.BufferOutOfCapacityException;
 /**
  * @author Lennart Koopmann <lennart@socketfeed.com>
  */
-public class OutputBuffer implements Buffer {
+public class OutputBuffer extends Buffer {
 
     private static final Logger LOG = LoggerFactory.getLogger(OutputBuffer.class);
-    
-    protected static RingBuffer<MessageEvent> ringBuffer;
 
     protected ExecutorService executor = Executors.newCachedThreadPool(
             new ThreadFactoryBuilder()
@@ -102,11 +101,6 @@ public class OutputBuffer implements Buffer {
     }
 
     @Override
-    public boolean isEmpty() {
-        return ringBuffer.getBufferSize() == 0;
-    }
-
-    @Override
     public void insertFailFast(Message message) throws BufferOutOfCapacityException {
         if (!hasCapacity()) {
             LOG.debug("Rejecting message, because I am full and caching was disabled by input. Raise my size or add more processors.");
@@ -125,11 +119,6 @@ public class OutputBuffer implements Buffer {
 
         server.outputBufferWatermark().incrementAndGet();
         incomingMessages.mark();
-    }
-
-    @Override
-    public boolean hasCapacity() {
-        return ringBuffer.remainingCapacity() > 0;
     }
 
 }

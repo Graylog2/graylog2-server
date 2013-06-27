@@ -17,10 +17,19 @@
  * along with Graylog2.  If not, see <http://www.gnu.org/licenses/>.
  *
  */
-package org.graylog2.rest.resources.system.indexer;
+package org.graylog2.systemjobs;
 
 /**
  * @author Lennart Koopmann <lennart@torch.sh>
  */
-public class HealingResource {
+public class NoSuchJobException extends Exception {
+
+    public NoSuchJobException() {
+        super();
+    }
+
+    public NoSuchJobException(String msg) {
+        super(msg);
+    }
+
 }

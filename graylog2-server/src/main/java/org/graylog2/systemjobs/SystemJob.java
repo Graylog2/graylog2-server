@@ -31,6 +31,12 @@ import java.util.Map;
  */
 public abstract class SystemJob {
 
+    // Known types that can be resolved in the SystemJobFactory.
+    public enum Type {
+        FIX_DEFLECTOR_DELETE_INDEX,
+        FIX_DEFLECTOR_MOVE_INDEX
+    }
+
     public abstract void execute();
     public abstract void requestCancel();
     public abstract int getProgress();

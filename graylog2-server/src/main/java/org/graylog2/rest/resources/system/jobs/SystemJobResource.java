@@ -17,20 +17,25 @@
  * along with Graylog2.  If not, see <http://www.gnu.org/licenses/>.
  *
  */
-package org.graylog2.rest.resources.system;
+package org.graylog2.rest.resources.system.jobs;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.sun.jersey.api.core.ResourceConfig;
 import org.graylog2.Core;
 import org.graylog2.rest.resources.RestResource;
+import org.graylog2.rest.resources.system.jobs.requests.TriggerRequest;
+import org.graylog2.systemjobs.NoSuchJobException;
 import org.graylog2.systemjobs.SystemJob;
+import org.graylog2.systemjobs.SystemJobFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.ws.rs.*;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
+import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 
@@ -84,6 +89,38 @@ public class SystemJobResource extends RestResource {
         return json(job.toMap(), prettyPrint);
     }
 
-    // DELETE try to stop/cancel job
+    @POST @Path("/")
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response trigger(String body, @QueryParam("pretty") boolean prettyPrint) {
+        Core core = (Core) rc.getProperty("core");
+
+        if (body == null || body.isEmpty()) {
+            LOG.error("Missing parameters. Returning HTTP 400.");
+            throw new WebApplicationException(400);
+        }
+
+        TriggerRequest tr;
+        try {
+            tr = objectMapper.readValue(body, TriggerRequest.class);
+        } catch(IOException e) {
+            LOG.error("Error while parsing JSON", e);
+            throw new WebApplicationException(e, Response.Status.BAD_REQUEST);
+        }
+
+        SystemJob job;
+        try {
+            job = SystemJobFactory.build(tr.jobName, core);
+        } catch(NoSuchJobException e) {
+            LOG.error("Such a system job type does not exist. Returning HTTP 400.");
+            throw new WebApplicationException(400);
+        }
+
+        core.getSystemJobManager().submit(job);
+
+        return Response.status(Response.Status.ACCEPTED).build();
+    }
+
+    // TODO: DELETE: attempt to stop/cancel job
 
 }

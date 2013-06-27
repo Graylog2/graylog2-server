@@ -58,7 +58,7 @@ public class Deflector {
     }
     
     public boolean isUp() {
-        return this.server.getIndexer().aliasExists(DEFLECTOR_NAME);
+        return this.server.getIndexer().indices().aliasExists(DEFLECTOR_NAME);
     }
     
     public void setUp() {
@@ -111,7 +111,7 @@ public class Deflector {
         
         // Create new index.
         LOG.info("Creating index target <{}>...", newTarget);
-        server.getIndexer().createIndex(newTarget);
+        server.getIndexer().indices().create(newTarget);
         updateIndexRanges(newTarget);
 
         LOG.info("Done!");
@@ -135,7 +135,7 @@ public class Deflector {
     }
     
     public int getCurrentTargetNumber() throws NoTargetIndexException {
-        Map<String, IndexStats> indexes = this.server.getIndexer().getIndices();
+        Map<String, IndexStats> indexes = this.server.getIndexer().indices().getAll();
         if (indexes.isEmpty()) {
             throw new NoTargetIndexException();
         }
@@ -164,7 +164,7 @@ public class Deflector {
     public String[] getAllDeflectorIndexNames() {
         List<String> indices = Lists.newArrayList();
         
-        for(Map.Entry<String, IndexStats> e : server.getIndexer().getIndices().entrySet()) {
+        for(Map.Entry<String, IndexStats> e : server.getIndexer().indices().getAll().entrySet()) {
             String name = e.getKey();
             
             if (ourIndex(name)) {
@@ -177,7 +177,7 @@ public class Deflector {
     
     public Map<String, IndexStats> getAllDeflectorIndices() {
         Map<String, IndexStats> result = Maps.newHashMap();
-        for(Map.Entry<String, IndexStats> e : server.getIndexer().getIndices().entrySet()) {
+        for(Map.Entry<String, IndexStats> e : server.getIndexer().indices().getAll().entrySet()) {
             String name = e.getKey();
             
             if (ourIndex(name)) {

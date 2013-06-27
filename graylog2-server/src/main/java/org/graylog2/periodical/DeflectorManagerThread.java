@@ -60,7 +60,7 @@ public class DeflectorManagerThread implements Runnable { // public class Klimpe
         
         try {
             currentTarget = this.graylogServer.getDeflector().getCurrentTargetName();
-            messageCountInTarget = this.graylogServer.getIndexer().numberOfMessages(currentTarget);
+            messageCountInTarget = this.graylogServer.getIndexer().indices().numberOfMessages(currentTarget);
         } catch(Exception e) {
             LOG.error("Tried to check for number of messages in current deflector target but did not find index. Aborting.", e);
             return;
@@ -84,7 +84,7 @@ public class DeflectorManagerThread implements Runnable { // public class Klimpe
 
     private void checkAndRepair() {
         if (!graylogServer.getDeflector().isUp()) {
-            if (graylogServer.getIndexer().indexExists(Deflector.DEFLECTOR_NAME)) {
+            if (graylogServer.getIndexer().indices().exists(Deflector.DEFLECTOR_NAME)) {
                 // Publish a notification if there is an *index* called graylog2_deflector
                 if (Notification.isFirst(graylogServer, Notification.Type.DEFLECTOR_EXISTS_AS_INDEX)) {
                     Notification.publish(graylogServer, Notification.Type.DEFLECTOR_EXISTS_AS_INDEX, Notification.Severity.URGENT);

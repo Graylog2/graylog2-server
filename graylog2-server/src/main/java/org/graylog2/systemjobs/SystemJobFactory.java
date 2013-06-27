@@ -1,5 +1,5 @@
 /**
- * Copyright 2013 Lennart Koopmann <lennart@socketfeed.com>
+ * Copyright 2013 Lennart Koopmann <lennart@torch.sh>
  *
  * This file is part of Graylog2.
  *
@@ -17,18 +17,26 @@
  * along with Graylog2.  If not, see <http://www.gnu.org/licenses/>.
  *
  */
-package org.graylog2.rest.resources.streams.requests;
+package org.graylog2.systemjobs;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
+import org.graylog2.Core;
+import org.graylog2.indexer.healing.FixDeflectorByDeleteJob;
+import org.graylog2.indexer.healing.FixDeflectorByMoveJob;
 
 /**
  * @author Lennart Koopmann <lennart@torch.sh>
  */
-public class CreateRequest {
+public class SystemJobFactory {
 
-	public String title;
+    public static SystemJob build(String jobName, Core core) throws NoSuchJobException {
+        switch(SystemJob.Type.valueOf(jobName.toUpperCase())) {
+            case FIX_DEFLECTOR_DELETE_INDEX:
+                return new FixDeflectorByDeleteJob(core);
+            case FIX_DEFLECTOR_MOVE_INDEX:
+                return new FixDeflectorByMoveJob(core);
+        }
 
-	@JsonProperty("creator_user_id")
-	public String creatorUserId;
+        throw new NoSuchJobException();
+    }
 
 }

@@ -42,6 +42,7 @@ import org.graylog2.Core;
 import org.graylog2.activities.Activity;
 import org.graylog2.indexer.cluster.Cluster;
 import org.graylog2.indexer.counts.Counts;
+import org.graylog2.indexer.indices.Indices;
 import org.graylog2.indexer.messages.Messages;
 import org.graylog2.indexer.ranges.IndexRange;
 import org.graylog2.indexer.searches.Searches;
@@ -73,6 +74,7 @@ public class Indexer {
     private final Counts counts;
     private final Messages messages;
     private final Cluster cluster;
+    private final Indices indices;
 	
     private Core server;
 
@@ -108,6 +110,7 @@ public class Indexer {
         counts = new Counts(client, graylogServer);
         messages = new Messages(client, graylogServer);
         cluster = new Cluster(client, graylogServer);
+        indices = new Indices(client, graylogServer);
     }
     
     public Client getClient() {
@@ -117,21 +120,7 @@ public class Indexer {
     public MessageGateway getMessageGateway() {
         return messageGateway;
     }
-    
-    public String allIndicesAlias() {
-        return server.getConfiguration().getElasticSearchIndexPrefix() + "_*";
-    }
-    
-    public long getTotalIndexSize() {
-        return client.admin().indices().stats(
-                new IndicesStatsRequest().indices(allIndicesAlias()))
-                .actionGet()
-                .getTotal()
-                .getStore()
-                .getSize()
-                .getMb();
-    }
-    
+
     public String nodeIdToName(String nodeId) {
         if (nodeId == null || nodeId.isEmpty()) {
             return null;
@@ -161,52 +150,7 @@ public class Indexer {
         }
         
     }
-    
-    public int getNumberOfNodesInCluster() {
-        return client.admin().cluster().nodesInfo(new NodesInfoRequest().all()).actionGet().getNodes().length;
-    }
-    
-    public long getTotalNumberOfMessagesInIndices() {
-        return client.count(new CountRequest(allIndicesAlias())).actionGet().getCount();
-    }
-    
-    public Map<String, IndexStats> getIndices() {
-        ActionFuture<IndicesStatsResponse> isr = client.admin().indices().stats(new IndicesStatsRequest().all());
-        
-        return isr.actionGet().getIndices();
-    }
-    
-    public ImmutableMap<String, IndexMetaData> getIndicesMetadata() {
-        return ImmutableMap.copyOf(client.admin().cluster().state(new ClusterStateRequest()).actionGet().getState().getMetaData().indices());
-    }
-    
-    public boolean indexExists(String index) {
-        ActionFuture<IndicesExistsResponse> existsFuture = client.admin().indices().exists(new IndicesExistsRequest(index));
-        return existsFuture.actionGet().isExists();
-    }
 
-    public boolean aliasExists(String alias) {
-        return client.admin().indices().existsAliases(new IndicesGetAliasesRequest(alias)).actionGet().exists();
-    }
-
-    public boolean createIndex(String indexName) {
-        Map<String, Integer> settings = Maps.newHashMap();
-        settings.put("number_of_shards", server.getConfiguration().getElasticSearchShards());
-        settings.put("number_of_replicas", server.getConfiguration().getElasticSearchReplicas());
-
-        CreateIndexRequest cir = new CreateIndexRequest(indexName);
-        cir.settings(settings);
-        
-        final ActionFuture<CreateIndexResponse> createFuture = client.admin().indices().create(cir);
-        final boolean acknowledged = createFuture.actionGet().isAcknowledged();
-        if (!acknowledged) {
-            return false;
-        }
-        final PutMappingRequest mappingRequest = Mapping.getPutMappingRequest(client, indexName, server.getConfiguration().getElasticSearchAnalyzer());
-        final boolean mappingCreated = client.admin().indices().putMapping(mappingRequest).actionGet().isAcknowledged();
-        return acknowledged && mappingCreated;
-    }
-    
     public boolean cycleAlias(String aliasName, String targetIndex) {
         return client.admin().indices().prepareAliases()
                 .addAlias(targetIndex, aliasName)
@@ -218,17 +162,6 @@ public class Indexer {
                 .removeAlias(oldIndex, aliasName)
                 .addAlias(targetIndex, aliasName)
                 .execute().actionGet().isAcknowledged();
-    }
-    
-    public long numberOfMessages(String indexName) throws IndexNotFoundException {
-        Map<String, IndexStats> indices = getIndices();
-        IndexStats index = indices.get(indexName);
-        
-        if (index == null) {
-            throw new IndexNotFoundException();
-        }
-        
-        return index.getPrimaries().getDocs().getCount();
     }
 
     public boolean bulkIndex(final List<Message> messages) {
@@ -257,22 +190,6 @@ public class Indexer {
                 new Object[] { response.getItems().length, response.getTookInMillis(), response.hasFailures() });
 
         return !response.hasFailures();
-    }
-
-    public void deleteMessagesByTimeRange(int to) {
-        DeleteByQueryRequestBuilder b = client.prepareDeleteByQuery();
-        final QueryBuilder qb = rangeQuery("created_at").from(0).to(to);
-        
-        b.setTypes(new String[] {TYPE});
-        b.setIndices(server.getDeflector().getAllDeflectorIndexNames());
-        b.setQuery(qb);
-        
-        ActionFuture<DeleteByQueryResponse> future = client.deleteByQuery(b.request());
-        future.actionGet();
-    }
-    
-    public void deleteIndex(String indexName) {
-        client.admin().indices().delete(new DeleteIndexRequest(indexName)).actionGet();
     }
 
     public Set<String> getAllMessageFields() {
@@ -330,7 +247,7 @@ public class Indexer {
             server.getActivityWriter().write(new Activity(msg, Indexer.class));
             
             // Sorry if this should ever go mad. Delete the index!
-            deleteIndex(indexName);
+            indices().delete(indexName);
             IndexRange.destroy(server, indexName);
         }
     }
@@ -349,6 +266,10 @@ public class Indexer {
     
     public Cluster cluster() {
         return cluster;
+    }
+
+    public Indices indices() {
+        return indices;
     }
     
     private IndexRequestBuilder buildIndexRequest(String index, String source, String id, int ttlMinutes) {
