@@ -17,9 +17,12 @@
  * along with Graylog2.  If not, see <http://www.gnu.org/licenses/>.
  *
  */
-
 package org.graylog2.indexer.healing;
 
+import org.graylog2.Core;
+import org.graylog2.ProcessingPauseLockedException;
+import org.graylog2.buffers.Buffers;
+import org.graylog2.indexer.Deflector;
 import org.graylog2.systemjobs.SystemJob;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -31,12 +34,56 @@ public class FixDeflectorByMoveJob extends SystemJob {
 
     private static final Logger LOG = LoggerFactory.getLogger(FixDeflectorByMoveJob.class);
 
+    private final Core core;
+
     private boolean cancelRequested = false;
+    private int progress = 0;
+
+    public FixDeflectorByMoveJob(Core core) {
+        this.core = core;
+    }
 
     @Override
     public void execute() {
+        if (core.getDeflector().isUp() || !core.getIndexer().indices().exists(Deflector.DEFLECTOR_NAME)) {
+            LOG.error("There is no index <{}>. No need to run this job. Aborting.", Deflector.DEFLECTOR_NAME);
+            return;
+        }
 
-        // wait until all buffered and cached messages are written
+        LOG.info("Attempting to fix deflector with delete strategy.");
+
+        // Pause message processing and lock the pause.
+        core.pauseMessageProcessing(true);
+        progress = 10;
+
+        Buffers.waitForEmptyBuffers(core);
+        progress = 25;
+
+        // Copy messages to new index.
+        core.getIndexer().indices().move(Deflector.DEFLECTOR_NAME, "LOL_TEST_9001");
+
+        progress = 85;
+
+        // Delete deflector index.
+        LOG.info("Deleting <{}> index.", Deflector.DEFLECTOR_NAME);
+        core.getIndexer().indices().delete(Deflector.DEFLECTOR_NAME);
+        progress = 90;
+
+        // Set up deflector.
+        core.getDeflector().setUp();
+        progress = 95;
+
+        // Start message processing again.
+        try {
+            core.unlockProcessingPause();
+            core.resumeMessageProcessing();
+        } catch (ProcessingPauseLockedException e) {
+            // lol checked exceptions
+            throw new RuntimeException("Could not unlock processing pause.", e);
+        }
+
+        progress = 100;
+        LOG.info("Finished.");
     }
 
     @Override
@@ -46,12 +93,12 @@ public class FixDeflectorByMoveJob extends SystemJob {
 
     @Override
     public int getProgress() {
-        return 0;
+        return progress;
     }
 
     @Override
     public boolean providesProgress() {
-        return false;
+        return true;
     }
 
     @Override

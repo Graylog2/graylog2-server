@@ -1,5 +1,5 @@
 /**
- * Copyright 2012 Lennart Koopmann <lennart@socketfeed.com>
+ * Copyright 2013 Lennart Koopmann <lennart@socketfeed.com>
  *
  * This file is part of Graylog2.
  *
@@ -17,36 +17,19 @@
  * along with Graylog2.  If not, see <http://www.gnu.org/licenses/>.
  *
  */
+package org.graylog2.rest.resources.system.jobs.requests;
 
-package org.graylog2.buffers;
-
-import com.lmax.disruptor.EventFactory;
-import org.graylog2.plugin.Message;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
 /**
- * @author Lennart Koopmann <lennart@socketfeed.com>
+ * @author Lennart Koopmann <lennart@torch.sh>
  */
-public class MessageEvent {
+public class TriggerRequest {
 
-    private Message msg;
-    
-    public Message getMessage()
-    {
-        return msg;
-    }
+    @JsonProperty("job_name")
+    public String jobName;
 
-    public void setMessage(final Message msg)
-    {
-        this.msg = msg;
-    }
-
-    public final static EventFactory<MessageEvent> EVENT_FACTORY = new EventFactory<MessageEvent>()
-    {
-        @Override
-        public MessageEvent newInstance()
-        {
-            return new MessageEvent();
-        }
-    };
+    @JsonProperty("creator_user_id")
+    public String creatorUserId;
 
 }

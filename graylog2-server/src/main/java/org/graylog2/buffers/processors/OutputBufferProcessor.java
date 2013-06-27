@@ -31,7 +31,7 @@ import java.util.concurrent.TimeUnit;
 import org.bson.types.ObjectId;
 import com.google.common.collect.Maps;
 import org.graylog2.Core;
-import org.graylog2.buffers.MessageEvent;
+import org.graylog2.plugin.buffers.MessageEvent;
 import org.graylog2.outputs.OutputRouter;
 import org.graylog2.outputs.OutputStreamConfigurationImpl;
 import org.graylog2.plugin.Message;

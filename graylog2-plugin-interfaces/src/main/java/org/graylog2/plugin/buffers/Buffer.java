@@ -21,18 +21,30 @@
 */
 package org.graylog2.plugin.buffers;
 
+import com.lmax.disruptor.RingBuffer;
 import org.graylog2.plugin.Message;
 
 /**
  *
  * @author Lennart Koopmann <lennart@socketfeed.com>
  */
-public interface Buffer {
-    
-    public void insertFailFast(Message message) throws BufferOutOfCapacityException, ProcessingDisabledException;
-    public void insertCached(Message message);
+public abstract class Buffer {
 
-    public boolean isEmpty();
-    public boolean hasCapacity();
+    protected static RingBuffer<MessageEvent> ringBuffer;
+
+    public abstract void insertFailFast(Message message) throws BufferOutOfCapacityException, ProcessingDisabledException;
+    public abstract void insertCached(Message message);
+
+    public boolean isEmpty() {
+        return getUsage() == 0;
+    }
+
+    public boolean hasCapacity() {
+        return ringBuffer.remainingCapacity() > 0;
+    }
+
+    public long getUsage() {
+        return Long.valueOf(ringBuffer.getBufferSize())-ringBuffer.remainingCapacity();
+    }
     
 }

@@ -17,7 +17,6 @@
  * along with Graylog2.  If not, see <http://www.gnu.org/licenses/>.
  *
  */
-
 package org.graylog2.rest.resources.streams;
 
 import com.beust.jcommander.internal.Lists;

@@ -4,19 +4,8 @@
  */
 package org.graylog2.buffers.processors;
 
-import com.google.common.collect.Lists;
-import org.graylog2.GraylogServerStub;
-import org.graylog2.TestHelper;
-import org.graylog2.buffers.MessageEvent;
-import org.graylog2.buffers.processors.fakeoutputs.FakeOutput;
-import org.graylog2.buffers.processors.fakestreams.FakeStream;
-import org.graylog2.plugin.Message;
-import org.graylog2.plugin.streams.Stream;
-
 import org.junit.Ignore;
 import org.junit.Test;
-
-import java.util.List;
 
 import static org.junit.Assert.assertEquals;
 

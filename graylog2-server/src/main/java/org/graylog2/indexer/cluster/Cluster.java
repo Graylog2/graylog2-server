@@ -22,6 +22,7 @@ package org.graylog2.indexer.cluster;
 import org.elasticsearch.action.admin.cluster.health.ClusterHealthRequest;
 import org.elasticsearch.action.admin.cluster.health.ClusterHealthResponse;
 import org.elasticsearch.action.admin.cluster.health.ClusterHealthStatus;
+import org.elasticsearch.action.admin.cluster.node.info.NodesInfoRequest;
 import org.elasticsearch.client.Client;
 import org.graylog2.Core;
 
@@ -65,6 +66,10 @@ public class Cluster {
     private ClusterHealthResponse health() {
         String[] indices = server.getDeflector().getAllDeflectorIndexNames();
         return c.admin().cluster().health(new ClusterHealthRequest(indices)).actionGet();
+    }
+
+    public int getNumberOfNodes() {
+        return c.admin().cluster().nodesInfo(new NodesInfoRequest().all()).actionGet().getNodes().length;
     }
 
 }

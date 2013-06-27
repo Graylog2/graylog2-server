@@ -22,6 +22,7 @@ package org.graylog2.indexer.healing;
 
 import org.graylog2.Core;
 import org.graylog2.ProcessingPauseLockedException;
+import org.graylog2.buffers.Buffers;
 import org.graylog2.indexer.Deflector;
 import org.graylog2.systemjobs.SystemJob;
 import org.slf4j.Logger;
@@ -36,7 +37,6 @@ public class FixDeflectorByDeleteJob extends SystemJob {
 
     private final Core core;
 
-    private boolean cancelRequested = false;
     private int progress = 0;
 
     public FixDeflectorByDeleteJob(Core core) {
@@ -45,38 +45,28 @@ public class FixDeflectorByDeleteJob extends SystemJob {
 
     @Override
     public void execute() {
+        if (core.getDeflector().isUp() || !core.getIndexer().indices().exists(Deflector.DEFLECTOR_NAME)) {
+            LOG.error("There is no index <{}>. No need to run this job. Aborting.", Deflector.DEFLECTOR_NAME);
+            return;
+        }
+
         LOG.info("Attempting to fix deflector with delete strategy.");
 
         // Pause message processing and lock the pause.
         core.pauseMessageProcessing(true);
+        progress = 10;
 
-        // Clear all caches. They would be written to the deflector index anyway and this is the delete strategy.
-        core.getInputCache().clear();
-        core.getOutputCache().clear();
-
-        // Wait until the buffers are empty. Messages that where already started to be processed must be fully processed.
-        while(true) {
-            if(core.getProcessBuffer().isEmpty() && core.getOutputBuffer().isEmpty()) {
-                break;
-            }
-
-            try {
-                LOG.info("Not all buffers are empty. Waiting another second.");
-                Thread.sleep(1000);
-            } catch (InterruptedException e) { /* */ }
-        }
-
-        LOG.info("All buffers and caches are empty. Continuing.");
-
+        Buffers.waitForEmptyBuffers(core);
         progress = 25;
 
         // Delete deflector index.
         LOG.info("Deleting <{}> index.", Deflector.DEFLECTOR_NAME);
-        core.getIndexer().deleteIndex(Deflector.DEFLECTOR_NAME);
-        progress = 50;
+        core.getIndexer().indices().delete(Deflector.DEFLECTOR_NAME);
+        progress = 70;
 
         // Set up deflector.
-        progress = 75;
+        core.getDeflector().setUp();
+        progress = 80;
 
         // Start message processing again.
         try {
@@ -93,7 +83,7 @@ public class FixDeflectorByDeleteJob extends SystemJob {
 
     @Override
     public void requestCancel() {
-        this.cancelRequested = true;
+        // Cannot be canceled.
     }
 
     @Override
@@ -108,7 +98,7 @@ public class FixDeflectorByDeleteJob extends SystemJob {
 
     @Override
     public boolean isCancelable() {
-        return true;
+        return false;
     }
 
     @Override

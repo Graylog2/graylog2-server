@@ -28,7 +28,7 @@ import com.yammer.metrics.core.TimerContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.graylog2.Core;
-import org.graylog2.buffers.MessageEvent;
+import org.graylog2.plugin.buffers.MessageEvent;
 import org.graylog2.plugin.filters.MessageFilter;
 import org.graylog2.plugin.Message;
 

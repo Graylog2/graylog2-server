@@ -22,7 +22,6 @@ package org.graylog2.buffers;
 
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import com.lmax.disruptor.MultiThreadedClaimStrategy;
-import com.lmax.disruptor.RingBuffer;
 import com.lmax.disruptor.dsl.Disruptor;
 import com.yammer.metrics.Metrics;
 import com.yammer.metrics.core.Meter;
@@ -30,6 +29,7 @@ import org.graylog2.Core;
 import org.graylog2.buffers.processors.ProcessBufferProcessor;
 import org.graylog2.plugin.buffers.Buffer;
 import org.graylog2.plugin.Message;
+import org.graylog2.plugin.buffers.MessageEvent;
 import org.graylog2.plugin.buffers.ProcessingDisabledException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -42,11 +42,9 @@ import org.graylog2.plugin.buffers.BufferOutOfCapacityException;
 /**
  * @author Lennart Koopmann <lennart@socketfeed.com>
  */
-public class ProcessBuffer implements Buffer {
+public class ProcessBuffer extends Buffer {
 
     private static final Logger LOG = LoggerFactory.getLogger(ProcessBuffer.class);
-    
-    protected static RingBuffer<MessageEvent> ringBuffer;
 
     protected ExecutorService executor = Executors.newCachedThreadPool(
             new ThreadFactoryBuilder()
@@ -110,11 +108,6 @@ public class ProcessBuffer implements Buffer {
     }
 
     @Override
-    public boolean isEmpty() {
-        return ringBuffer.getBufferSize() == 0;
-    }
-
-    @Override
     public void insertFailFast(Message message) throws BufferOutOfCapacityException, ProcessingDisabledException {
         if (!server.isProcessing()) {
             LOG.debug("Rejecting message, because message processing is paused.");
@@ -138,11 +131,6 @@ public class ProcessBuffer implements Buffer {
 
         server.processBufferWatermark().incrementAndGet();
         incomingMessages.mark();
-    }
-
-    @Override
-    public boolean hasCapacity() {
-        return ringBuffer.remainingCapacity() > 0;
     }
 
 }
