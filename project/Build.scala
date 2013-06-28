@@ -16,6 +16,8 @@ object ApplicationBuild extends Build {
     "com.google.code.gson" % "gson" % "2.2",
     "com.ning" % "async-http-client" % "1.7.17",
 
+    "org.apache.shiro" % "shiro-core" % "1.2.2",
+
     "org.mockito" % "mockito-all" % "1.9.5" % "test",
     "org.seleniumhq.selenium" % "selenium-java" % "2.33.0" % "test",
     "javax.ws.rs" % "jsr311-api" % "0.11" % "test",

@@ -17,7 +17,7 @@
  * along with Graylog2.  If not, see <http://www.gnu.org/licenses/>.
  *
  */
-package lib;
+package lib.security;
 
 /**
  * @author Lennart Koopmann <lennart@torch.sh>
@@ -25,6 +25,7 @@ package lib;
 public class Authenticator {
 
     public boolean authenticate(String username, String password) {
+
         if (username.equals("lennart") && password.equals("123123123")) {
             return true;
         } else {
