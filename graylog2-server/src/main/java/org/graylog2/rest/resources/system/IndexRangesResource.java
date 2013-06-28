@@ -52,8 +52,7 @@ public class IndexRangesResource extends RestResource {
     public Response rebuild() {
         Core core = (Core) rc.getProperty("core");
 
-        SystemJob rebuildJob = new RebuildIndexRangesJob();
-        rebuildJob.prepare(core);
+        SystemJob rebuildJob = new RebuildIndexRangesJob(core);
         core.getSystemJobManager().submit(rebuildJob);
 
         return Response.status(Response.Status.ACCEPTED).build();

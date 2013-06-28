@@ -35,8 +35,6 @@ public class FixDeflectorByDeleteJob extends SystemJob {
 
     private static final Logger LOG = LoggerFactory.getLogger(FixDeflectorByDeleteJob.class);
 
-    private final Core core;
-
     private int progress = 0;
 
     public FixDeflectorByDeleteJob(Core core) {

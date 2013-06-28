@@ -192,7 +192,7 @@ public class Deflector {
         return buildIndexName(this.server.getConfiguration().getElasticSearchIndexPrefix(), getCurrentTargetNumber());
     }
     
-    public String buildIndexName(String prefix, int number) {
+    public static String buildIndexName(String prefix, int number) {
         return prefix + "_" + number;
     }
     
@@ -208,7 +208,7 @@ public class Deflector {
     }
     
     private boolean ourIndex(String indexName) {
-        return indexName.startsWith(server.getConfiguration().getElasticSearchIndexPrefix() + "_");
+        return indexName != DEFLECTOR_NAME && indexName.startsWith(server.getConfiguration().getElasticSearchIndexPrefix() + "_");
     }
     
     private void pointTo(String newIndex, String oldIndex) {

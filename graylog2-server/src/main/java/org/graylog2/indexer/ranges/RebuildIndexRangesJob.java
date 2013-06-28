@@ -46,6 +46,10 @@ public class RebuildIndexRangesJob extends SystemJob {
     private int indicesToCalculate = 0;
     private int indicesCalculated = 0;
 
+    public RebuildIndexRangesJob(Core core) {
+        this.core = core;
+    }
+
     @Override
     public void requestCancel() {
         this.cancelRequested = true;
@@ -71,7 +75,7 @@ public class RebuildIndexRangesJob extends SystemJob {
         List<Map<String, Object>> ranges = Lists.newArrayList();
         info("Re-calculating index ranges.");
 
-        String[] indices = server.getDeflector().getAllDeflectorIndexNames();
+        String[] indices = core.getDeflector().getAllDeflectorIndexNames();
         if (indices == null || indices.length == 0) {
             info("No indices, nothing to calculate.");
             return;
@@ -109,7 +113,7 @@ public class RebuildIndexRangesJob extends SystemJob {
         Map<String, Object> range = Maps.newHashMap();
 
         Stopwatch x = new Stopwatch().start();
-        SearchHit doc = server.getIndexer().searches().firstOfIndex(index);
+        SearchHit doc = core.getIndexer().searches().firstOfIndex(index);
         if (doc == null || doc.isSourceEmpty()) {
             x.stop();
             throw new EmptyIndexException();
@@ -128,15 +132,15 @@ public class RebuildIndexRangesJob extends SystemJob {
     }
 
     private void updateCollection(List<Map<String, Object>> ranges) {
-        IndexRange.destroyAll(server, IndexRange.COLLECTION);
+        IndexRange.destroyAll(core, IndexRange.COLLECTION);
         for (Map<String, Object> range : ranges) {
-            new IndexRange(server, range).saveWithoutValidation();
+            new IndexRange(core, range).saveWithoutValidation();
         }
     }
 
     private void info(String what) {
         LOG.info(what);
-        server.getActivityWriter().write(new Activity(what, RebuildIndexRangesJob.class));
+        core.getActivityWriter().write(new Activity(what, RebuildIndexRangesJob.class));
     }
 
     @Override

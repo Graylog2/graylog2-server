@@ -23,6 +23,7 @@ package org.graylog2.indexer.indices;
 import com.beust.jcommander.internal.Maps;
 import com.google.common.collect.ImmutableMap;
 import org.elasticsearch.action.ActionFuture;
+import org.elasticsearch.action.WriteConsistencyLevel;
 import org.elasticsearch.action.admin.cluster.state.ClusterStateRequest;
 import org.elasticsearch.action.admin.indices.alias.get.IndicesGetAliasesRequest;
 import org.elasticsearch.action.admin.indices.create.CreateIndexRequest;
@@ -34,19 +35,36 @@ import org.elasticsearch.action.admin.indices.mapping.put.PutMappingRequest;
 import org.elasticsearch.action.admin.indices.stats.IndexStats;
 import org.elasticsearch.action.admin.indices.stats.IndicesStatsRequest;
 import org.elasticsearch.action.admin.indices.stats.IndicesStatsResponse;
+import org.elasticsearch.action.bulk.BulkRequestBuilder;
+import org.elasticsearch.action.bulk.BulkResponse;
 import org.elasticsearch.action.count.CountRequest;
+import org.elasticsearch.action.index.IndexRequest;
+import org.elasticsearch.action.index.IndexRequestBuilder;
+import org.elasticsearch.action.search.SearchResponse;
+import org.elasticsearch.action.search.SearchType;
+import org.elasticsearch.action.support.replication.ReplicationType;
 import org.elasticsearch.client.Client;
 import org.elasticsearch.cluster.metadata.IndexMetaData;
+import org.elasticsearch.common.unit.TimeValue;
+import org.elasticsearch.index.query.QueryBuilder;
+import org.elasticsearch.search.SearchHit;
 import org.graylog2.Core;
 import org.graylog2.indexer.IndexNotFoundException;
+import org.graylog2.indexer.Indexer;
 import org.graylog2.indexer.Mapping;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.Map;
+
+import static org.elasticsearch.index.query.QueryBuilders.matchAllQuery;
 
 /**
  * @author Lennart Koopmann <lennart@torch.sh>
  */
 public class Indices {
+
+    private static final Logger LOG = LoggerFactory.getLogger(Indices.class);
 
     private final Core server;
     private final Client c;
@@ -57,7 +75,45 @@ public class Indices {
     }
 
     public void move(String source, String target) {
-       // TODO
+        QueryBuilder qb = matchAllQuery();
+
+        SearchResponse scrollResp = c.prepareSearch(source)
+                .setSearchType(SearchType.SCAN)
+                .setScroll(new TimeValue(10000))
+                .setQuery(qb)
+                .setSize(100).execute().actionGet();
+
+        while (true) {
+            scrollResp = c.prepareSearchScroll(scrollResp.getScrollId()).setScroll(new TimeValue(60000)).execute().actionGet();
+
+            // No more hits.
+            if (scrollResp.getHits().hits().length == 0) {
+                break;
+            }
+
+            final BulkRequestBuilder request = c.prepareBulk();
+            for (SearchHit hit : scrollResp.getHits()) {
+                Map<String, Object> doc = hit.getSource();
+                String id = (String) doc.remove("_id");
+
+                request.add(manualIndexRequest(target, doc, id).request());
+            }
+
+            request.setConsistencyLevel(WriteConsistencyLevel.ONE);
+            request.setReplicationType(ReplicationType.ASYNC);
+
+            if (request.numberOfActions() > 0) {
+                BulkResponse response = c.bulk(request.request()).actionGet();
+
+                LOG.info("Moving index <{}> to <{}>: Bulk indexed {} messages, took {} ms, failures: {}",
+                        new Object[] { source, target, response.getItems().length, response.getTookInMillis(), response.hasFailures() });
+
+                if (response.hasFailures()) {
+                    throw new RuntimeException("Failed to move a message. Check your indexer log.");
+                }
+            }
+        }
+
     }
 
     public void delete(String indexName) {
@@ -128,6 +184,18 @@ public class Indices {
 
     public ImmutableMap<String, IndexMetaData> getMetadata() {
         return ImmutableMap.copyOf(c.admin().cluster().state(new ClusterStateRequest()).actionGet().getState().getMetaData().indices());
+    }
+
+    private IndexRequestBuilder manualIndexRequest(String index, Map<String, Object> doc, String id) {
+        final IndexRequestBuilder b = new IndexRequestBuilder(c);
+        b.setIndex(index);
+        b.setId(id);
+        b.setSource(doc);
+        b.setOpType(IndexRequest.OpType.INDEX);
+        b.setType(Indexer.TYPE);
+        b.setConsistencyLevel(WriteConsistencyLevel.ONE);
+
+        return b;
     }
 
 }

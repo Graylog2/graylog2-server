@@ -44,7 +44,7 @@ public class Buffers {
             } catch (InterruptedException e) { /* */ }
         }
 
-        LOG.info("All buffers and caches are empty. Continuing.");
+        LOG.info("All buffers are empty. Continuing.");
     }
 
 }

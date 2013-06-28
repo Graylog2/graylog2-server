@@ -175,7 +175,7 @@ public class Indexer {
                 String source = objectMapper.writeValueAsString(msg.toElasticSearchObject());
 
                 // we manually set the document ID to the same value to be able to match up documents later.
-                request.add(buildIndexRequest(Deflector.DEFLECTOR_NAME, source, msg.getId(), 0)); // Main index.
+                request.add(buildIndexRequest(Deflector.DEFLECTOR_NAME, source, msg.getId())); // Main index.
             } catch (JsonProcessingException e) {
                 LOG.warn("Error while converting message to ElasticSearch JSON", e);
             }
@@ -272,7 +272,7 @@ public class Indexer {
         return indices;
     }
     
-    private IndexRequestBuilder buildIndexRequest(String index, String source, String id, int ttlMinutes) {
+    private IndexRequestBuilder buildIndexRequest(String index, String source, String id) {
         final IndexRequestBuilder b = new IndexRequestBuilder(client);
         
         /*
@@ -287,11 +287,6 @@ public class Indexer {
         b.setType(TYPE);
         b.setConsistencyLevel(WriteConsistencyLevel.ONE);
 
-        // Set a TTL?
-        if (ttlMinutes > 0) {
-            b.setTTL(ttlMinutes*60*1000); // TTL is specified in milliseconds.
-        }
-        
         return b;
     }
 

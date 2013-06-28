@@ -45,13 +45,9 @@ public abstract class SystemJob {
     public abstract boolean isCancelable();
     public abstract String getDescription();
 
-    protected Core server;
+    protected Core core;
     protected String id;
     protected DateTime startedAt;
-
-    public void prepare(Core server) {
-        this.server = server;
-    }
 
     public String getId() {
         if (id == null) {
@@ -81,7 +77,7 @@ public abstract class SystemJob {
             put("percent_complete", getProgress());
             put("provides_progress", providesProgress());
             put("is_cancelable", isCancelable());
-            put("node_id", server.getServerId());
+            put("node_id", core.getServerId());
         }};
     }
 

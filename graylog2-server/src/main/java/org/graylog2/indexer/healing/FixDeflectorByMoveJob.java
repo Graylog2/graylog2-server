@@ -23,6 +23,7 @@ import org.graylog2.Core;
 import org.graylog2.ProcessingPauseLockedException;
 import org.graylog2.buffers.Buffers;
 import org.graylog2.indexer.Deflector;
+import org.graylog2.indexer.NoTargetIndexException;
 import org.graylog2.systemjobs.SystemJob;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -33,8 +34,6 @@ import org.slf4j.LoggerFactory;
 public class FixDeflectorByMoveJob extends SystemJob {
 
     private static final Logger LOG = LoggerFactory.getLogger(FixDeflectorByMoveJob.class);
-
-    private final Core core;
 
     private boolean cancelRequested = false;
     private int progress = 0;
@@ -50,36 +49,52 @@ public class FixDeflectorByMoveJob extends SystemJob {
             return;
         }
 
-        LOG.info("Attempting to fix deflector with delete strategy.");
+        LOG.info("Attempting to fix deflector with move strategy.");
 
-        // Pause message processing and lock the pause.
-        core.pauseMessageProcessing(true);
-        progress = 10;
-
-        Buffers.waitForEmptyBuffers(core);
-        progress = 25;
-
-        // Copy messages to new index.
-        core.getIndexer().indices().move(Deflector.DEFLECTOR_NAME, "LOL_TEST_9001");
-
-        progress = 85;
-
-        // Delete deflector index.
-        LOG.info("Deleting <{}> index.", Deflector.DEFLECTOR_NAME);
-        core.getIndexer().indices().delete(Deflector.DEFLECTOR_NAME);
-        progress = 90;
-
-        // Set up deflector.
-        core.getDeflector().setUp();
-        progress = 95;
-
-        // Start message processing again.
         try {
-            core.unlockProcessingPause();
-            core.resumeMessageProcessing();
-        } catch (ProcessingPauseLockedException e) {
-            // lol checked exceptions
-            throw new RuntimeException("Could not unlock processing pause.", e);
+            // Pause message processing and lock the pause.
+            core.pauseMessageProcessing(true);
+            progress = 5;
+
+            Buffers.waitForEmptyBuffers(core);
+            progress = 10;
+
+            // Copy messages to new index.
+            String newTarget = null;
+            try {
+                newTarget = Deflector.buildIndexName(core.getConfiguration().getElasticSearchIndexPrefix(), core.getDeflector().getCurrentTargetNumber());
+
+                LOG.info("Starting to move <{}> to <{}>.", Deflector.DEFLECTOR_NAME, newTarget);
+                core.getIndexer().indices().move(Deflector.DEFLECTOR_NAME, newTarget);
+            } catch(Exception e) {
+                LOG.error("Moving index failed. Rolling back.", e);
+                if (newTarget != null) {
+                    core.getIndexer().indices().delete(newTarget);
+                }
+                throw new RuntimeException(e);
+            }
+
+            LOG.info("Done moving deflector index.");
+
+            progress = 85;
+
+            // Delete deflector index.
+            LOG.info("Deleting <{}> index.", Deflector.DEFLECTOR_NAME);
+            core.getIndexer().indices().delete(Deflector.DEFLECTOR_NAME);
+            progress = 90;
+
+            // Set up deflector.
+            core.getDeflector().setUp();
+            progress = 95;
+        } finally {
+            // Start message processing again.
+            try {
+                core.unlockProcessingPause();
+                core.resumeMessageProcessing();
+            } catch (ProcessingPauseLockedException e) {
+                // lol checked exceptions
+                throw new RuntimeException("Could not unlock processing pause.", e);
+            }
         }
 
         progress = 100;
