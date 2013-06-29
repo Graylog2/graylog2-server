@@ -17,26 +17,20 @@
  * along with Graylog2.  If not, see <http://www.gnu.org/licenses/>.
  *
  */
-package models;
+package models.api.responses;
 
-import lib.APIException;
-import lib.Api;
-import models.api.responses.system.ServerJVMStatsResponse;
-import models.api.responses.system.ServerThroughputResponse;
+import com.google.gson.annotations.SerializedName;
 
-import java.io.IOException;
-import java.net.URL;
+import java.util.Map;
 
 /**
  * @author Lennart Koopmann <lennart@torch.sh>
  */
-public class Throughput {
+public class BuffersResponse {
 
-    // TODO make multi-node compatible
-    public static int get() throws IOException, APIException {
-        ServerThroughputResponse r = Api.get("system/throughput", ServerThroughputResponse.class);
+    public Map<String, BufferSummaryResponse> buffers;
 
-        return r.throughput;
-    }
+    @SerializedName("master_caches")
+    public Map<String, MasterCacheSummaryResponse> masterCaches;
 
 }

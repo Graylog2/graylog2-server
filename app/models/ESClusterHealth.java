@@ -47,8 +47,7 @@ public class ESClusterHealth {
     }
 
     public static ESClusterHealth get() throws IOException, APIException {
-        URL url = Api.buildTarget("system/indexer/cluster/health");
-        ESClusterHealthResponse r = Api.get(url, ESClusterHealthResponse.class);
+        ESClusterHealthResponse r = Api.get("system/indexer/cluster/health", ESClusterHealthResponse.class);
 
         return new ESClusterHealth(r);
     }

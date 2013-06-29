@@ -83,8 +83,7 @@ public class SystemJob {
     }
 
     public static List<SystemJob> all() throws IOException, APIException {
-        URL url = Api.buildTarget("system/jobs");
-        GetSystemJobsResponse r = Api.get(url, GetSystemJobsResponse.class);
+        GetSystemJobsResponse r = Api.get("system/jobs", GetSystemJobsResponse.class);
 
         List<SystemJob> jobs = Lists.newArrayList();
         for (SystemJobSummaryResponse job : r.jobs) {

@@ -4,10 +4,8 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.gson.Gson;
 import lib.APIException;
-import models.Core;
-import models.Notification;
-import models.SystemJob;
-import models.Throughput;
+import models.*;
+import play.mvc.Http;
 import play.mvc.Result;
 
 import java.io.IOException;
@@ -74,6 +72,30 @@ public class SystemApiController extends AuthenticatedController {
             result.put("throughput", Throughput.get());
 
             return ok(new Gson().toJson(result)).as("application/json");
+        } catch (IOException e) {
+            return internalServerError("io exception");
+        } catch (APIException e) {
+            return internalServerError("api exception " + e);
+        }
+    }
+
+    public static Result pauseMessageProcessing() {
+        try {
+            Http.RequestBody body = request().body();
+            MessageProcessing.pause(body.asFormUrlEncoded().get("node_id")[0]);
+            return ok();
+        } catch (IOException e) {
+            return internalServerError("io exception");
+        } catch (APIException e) {
+            return internalServerError("api exception " + e);
+        }
+    }
+
+    public static Result resumeMessageProcessing() {
+        try {
+            Http.RequestBody body = request().body();
+            MessageProcessing.resume(body.asFormUrlEncoded().get("node_id")[0]);
+            return ok();
         } catch (IOException e) {
             return internalServerError("io exception");
         } catch (APIException e) {

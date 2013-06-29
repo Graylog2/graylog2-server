@@ -255,6 +255,23 @@ $(document).ready(function() {
         })();
     }
 
+    // Pausing/Resuming of message processing.
+    $(".change-message-processing").on("click", function() {
+        var action = $(this).attr("data-action");
+        $.ajax({
+            url: "/a/system/processing/" + action,
+            type: "PUT",
+            data: { node_id: $(this).attr("data-node-id") },
+            success: function(data) {
+                document.location.href = "/system/message_processing";
+            },
+            error: function() {
+                showError("Could not " + action + " message processing.");
+            }
+        });
+        return false;
+    });
+
 	function displayFailureInSidebar(message) {
 		x = "<span class='alert alert-error sidebar-alert'><i class='icon-warning-sign'></i> " + message + "</span>"
 		$("#sidebar-inner").html(x);
@@ -284,5 +301,17 @@ $(document).ready(function() {
 
 	    return kvp.join('&'); 
 	}
+
+    function showError(message) {
+        toastr.error(message, "Error", {
+            "debug": false,
+            "positionClass": "toast-bottom-full-width",
+            "onclick": null,
+            "fadeIn": 300,
+            "fadeOut": 1000,
+            "timeOut": 7000,
+            "extendedTimeOut": 1000
+        });
+    }
 	
 });

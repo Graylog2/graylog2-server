@@ -17,26 +17,18 @@
  * along with Graylog2.  If not, see <http://www.gnu.org/licenses/>.
  *
  */
-package models;
+package models.api.responses;
 
-import lib.APIException;
-import lib.Api;
-import models.api.responses.system.ServerJVMStatsResponse;
-import models.api.responses.system.ServerThroughputResponse;
-
-import java.io.IOException;
-import java.net.URL;
+import com.google.gson.annotations.SerializedName;
 
 /**
  * @author Lennart Koopmann <lennart@torch.sh>
  */
-public class Throughput {
+public class BufferSummaryResponse {
 
-    // TODO make multi-node compatible
-    public static int get() throws IOException, APIException {
-        ServerThroughputResponse r = Api.get("system/throughput", ServerThroughputResponse.class);
+    public long utilization;
 
-        return r.throughput;
-    }
+    @SerializedName("utilization_percent")
+    public float utilizationPercent;
 
 }

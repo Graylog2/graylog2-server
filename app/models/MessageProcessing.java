@@ -21,22 +21,24 @@ package models;
 
 import lib.APIException;
 import lib.Api;
-import models.api.responses.system.ServerJVMStatsResponse;
-import models.api.responses.system.ServerThroughputResponse;
+import models.api.responses.EmptyResponse;
+import play.Logger;
 
 import java.io.IOException;
-import java.net.URL;
 
 /**
  * @author Lennart Koopmann <lennart@torch.sh>
  */
-public class Throughput {
+public class MessageProcessing {
 
-    // TODO make multi-node compatible
-    public static int get() throws IOException, APIException {
-        ServerThroughputResponse r = Api.get("system/throughput", ServerThroughputResponse.class);
+    public static void pause(String nodeId) throws IOException, APIException {
+        Node node = Node.fromId(nodeId);
+        Api.put(node, "system/processing/pause", EmptyResponse.class);
+    }
 
-        return r.throughput;
+    public static void resume(String nodeId) throws IOException, APIException {
+        Node node = Node.fromId(nodeId);
+        Api.put(node, "system/processing/resume", EmptyResponse.class);
     }
 
 }

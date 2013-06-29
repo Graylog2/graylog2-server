@@ -48,8 +48,7 @@ public class SystemMessage {
     }
 
     public static List<SystemMessage> all() throws IOException, APIException {
-        URL url = Api.buildTarget("system/messages");
-        GetSystemMessagesResponse r = Api.get(url, GetSystemMessagesResponse.class);
+        GetSystemMessagesResponse r = Api.get("system/messages", GetSystemMessagesResponse.class);
 
         List<SystemMessage> messages = Lists.newArrayList();
         for (SystemMessageSummaryResponse message : r.messages) {

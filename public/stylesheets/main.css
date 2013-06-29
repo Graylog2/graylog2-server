@@ -333,7 +333,14 @@ form #stream-rules {
     font-size: 11px;
 }
 
-.message-processing-host .node-throughput-info {
+.message-processing-host .node-throughput-info .sentence {
     position: relative;
-    top: 3px;
+    margin-right: 5px;
+    position: relative;
+    top: 1px;
+}
+
+.change-message-processing {
+    position: relative;
+    top: -1px;
 }

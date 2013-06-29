@@ -21,9 +21,9 @@ public class UniversalSearch {
 	}
 	
 	public SearchResult search() throws IOException, APIException {
-		URL url = Api.buildTarget("search/universal?query=" + query + "&timerange=" + timerange);
+		String resource = "search/universal?query=" + query + "&timerange=" + timerange;
 		
-		SearchResultResponse response = Api.get(url, SearchResultResponse.class);
+		SearchResultResponse response = Api.get(resource, SearchResultResponse.class);
 		SearchResult result = new SearchResult(
 				response.query,
 				response.total_results,
@@ -37,9 +37,9 @@ public class UniversalSearch {
 	
 	public DateHistogramResult dateHistogram(String interval) throws IOException, APIException {
 		String i = Api.urlEncode(interval);
-		URL url = Api.buildTarget("search/universal/histogram?interval=" + i + "&query=" + query + "&timerange=" + timerange);
+        String resource = "search/universal/histogram?interval=" + i + "&query=" + query + "&timerange=" + timerange;
 		
-		DateHistogramResponse response = Api.get(url, DateHistogramResponse.class);
+		DateHistogramResponse response = Api.get(resource, DateHistogramResponse.class);
 		return new DateHistogramResult(response.query, response.time, response.interval, response.results);
 	}
 	

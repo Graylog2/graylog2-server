@@ -1,9 +1,6 @@
-@(currentUser: User, jvms: List[ServerJVMStats], throughput: Integer)
+@(currentUser: User, jvms: List[ServerJVMStats], buffers: Map[String, BufferInfo], totalThroughput: Integer)
 
 @main("Message processing", views.html.system.sidebar(), "", currentUser) {
-
-    <a href="" class="btn btn-danger btn-small pull-right">Pause message processing</a>
-
 
     <div class="row-fluid">
         <h1><i class="icon icon-sitemap"></i> Message processing</h1>
@@ -12,7 +9,7 @@
 
     <div class="row-fluid">
         <div class="alert alert-success">
-            Processing <strong class="total-throughput">@throughput</strong> messages per second.
+            Processing <strong class="total-throughput">@totalThroughput</strong> messages per second.
         </div>
     </div>
 
@@ -27,9 +24,29 @@
     @for(jvm <- jvms) {
         <div class="row-fluid message-processing-host">
             <span class="pull-right node-throughput-info">
-                Processing
-                <strong class="node-throughput" data-node-id="@jvm.getNodeId">0</strong>
-                messages per second.
+                @if(jvm.isProcessing) {
+                    <span class="sentence">
+                        Processing
+                        <strong class="node-throughput" data-node-id="@jvm.getNodeId">0</strong>
+                        messages per second.
+                    </span>
+
+                    <a href="#" class="btn btn-danger btn-mini change-message-processing"
+                            data-action="pause"
+                            data-node-id="@jvm.getNodeId">
+                        Pause
+                    </a>
+                } else {
+                    <span class="sentence">
+                        Processing is <strong>paused</strong>.
+                    </span>
+
+                    <a href="#" class="btn btn-success btn-mini change-message-processing"
+                            data-action="resume"
+                            data-node-id="@jvm.getNodeId">
+                        Resume
+                    </a>
+                }
             </span>
 
             <h3>
@@ -47,17 +64,18 @@
                 <div class="bar" style="width: @(jvm.totalMemoryPercentage()-jvm.usedMemoryPercentage)%"></div>
             </div>
 
-            The JVM (<em>@jvm.getInfo</em>) is using
-            <strong>@jvm.getUsedMemory.getMegabytes() of @jvm.getTotalMemory.getMegabytes() MB</strong> heap space
-            and will not attempt to use more than <strong>@jvm.getMaxMemory.getMegabytes() MB</strong>.
+            <strong>@buffers.get(jvm.getNodeId).getInputMasterCache.size messages</strong> in input buffer.
+
+            The JVM is using <strong>@jvm.getUsedMemory.getMegabytes() of @jvm.getTotalMemory.getMegabytes() MB</strong>
+            heap space and will not attempt to use more than <strong>@jvm.getMaxMemory.getMegabytes() MB</strong>.
+
         </div>
     }
 
 }
 
     <!-- TODO:
-    stop processing,
+    show when not processing (incl "locked")
     show cache sizes when paused,
-    warnings when pausing a node failed (could be locked),
     update processing sec/node
     -->
