@@ -77,6 +77,17 @@ public class Node extends Persisted {
         return new Node(core, (ObjectId) o.get("_id"), o.toMap());
     }
 
+    public static Node byNodeId(Core core, String nodeId) {
+        DBObject query = new BasicDBObject("node_id", nodeId);
+        DBObject o = findOne(query, core, COLLECTION);
+
+        if (o == null) {
+            return null;
+        }
+
+        return new Node(core, (ObjectId) o.get("_id"), o.toMap());
+    }
+
     public static Map<String, Node> allActive(Core core) {
         Map<String, Node> nodes = Maps.newHashMap();
 
