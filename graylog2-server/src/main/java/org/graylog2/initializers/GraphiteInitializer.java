@@ -20,12 +20,15 @@
 
 package org.graylog2.initializers;
 
+import com.codahale.metrics.MetricFilter;
+import com.codahale.metrics.graphite.Graphite;
+import com.codahale.metrics.graphite.GraphiteReporter;
 import org.graylog2.plugin.initializers.Initializer;
-import com.yammer.metrics.reporting.GraphiteReporter;
+
+import java.net.InetSocketAddress;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 import org.graylog2.Core;
-import org.graylog2.periodical.GraphiteWriterThread;
 import org.graylog2.plugin.GraylogServer;
 import org.graylog2.plugin.initializers.InitializerConfigurationException;
 
@@ -41,20 +44,21 @@ public class GraphiteInitializer extends SimpleFixedRateScheduleInitializer impl
         Core srv = (Core) server;
         
         // Enable graphite metrics reporter.
-        GraphiteReporter.enable(
-                5,
-                TimeUnit.SECONDS,
-                srv.getConfiguration().getGraphiteCarbonHost(),
-                srv.getConfiguration().getGraphiteCarbonTcpPort(),
-                srv.getConfiguration().getGraphitePrefix()
+        final Graphite graphite = new Graphite(
+                new InetSocketAddress(
+                        srv.getConfiguration().getGraphiteCarbonHost(),
+                        srv.getConfiguration().getGraphiteCarbonTcpPort()
+                )
         );
 
-        configureScheduler(
-                srv,
-                new GraphiteWriterThread(srv),
-                GraphiteWriterThread.INITIAL_DELAY,
-                GraphiteWriterThread.PERIOD
-        );
+        final GraphiteReporter reporter = GraphiteReporter.forRegistry(((Core) server).metrics())
+                .prefixedWith(srv.getConfiguration().getGraphitePrefix())
+                .convertRatesTo(TimeUnit.SECONDS)
+                .convertDurationsTo(TimeUnit.MILLISECONDS)
+                .filter(MetricFilter.ALL)
+                .build(graphite);
+
+        reporter.start(20, TimeUnit.SECONDS);
     }
 
     @Override

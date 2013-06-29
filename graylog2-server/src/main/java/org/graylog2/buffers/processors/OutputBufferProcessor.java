@@ -28,6 +28,8 @@ import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
+import com.codahale.metrics.Histogram;
+import com.codahale.metrics.Meter;
 import org.bson.types.ObjectId;
 import com.google.common.collect.Maps;
 import org.graylog2.Core;
@@ -45,9 +47,8 @@ import org.slf4j.LoggerFactory;
 import com.google.common.collect.Lists;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import com.lmax.disruptor.EventHandler;
-import com.yammer.metrics.Metrics;
-import com.yammer.metrics.core.Histogram;
-import com.yammer.metrics.core.Meter;
+
+import static com.codahale.metrics.MetricRegistry.name;
 
 /**
  * @author Lennart Koopmann <lennart@socketfeed.com>
@@ -61,9 +62,9 @@ public class OutputBufferProcessor implements EventHandler<MessageEvent> {
     private Core server;
 
     private List<Message> buffer = Lists.newArrayList();
-    private final Meter incomingMessages = Metrics.newMeter(OutputBufferProcessor.class, "IncomingMessages", "messages", TimeUnit.SECONDS);
 
-    private final Histogram batchSize = Metrics.newHistogram(OutputBufferProcessor.class, "BatchSize");
+    private final Meter incomingMessages;
+    private final Histogram batchSize;
 
     private final long ordinal;
     private final long numberOfConsumers;
@@ -81,6 +82,9 @@ public class OutputBufferProcessor implements EventHandler<MessageEvent> {
             new ThreadFactoryBuilder()
             .setNameFormat("outputbuffer-processor-" + ordinal + "-executor-%d")
             .build());
+
+        incomingMessages = server.metrics().meter(name(OutputBufferProcessor.class, "incomingMessages"));
+        batchSize = server.metrics().histogram(name(OutputBufferProcessor.class, "batchSize"));
     }
 
     @Override

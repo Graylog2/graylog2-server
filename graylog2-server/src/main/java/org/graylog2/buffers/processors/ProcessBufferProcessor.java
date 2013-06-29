@@ -20,11 +20,9 @@
 
 package org.graylog2.buffers.processors;
 
+import com.codahale.metrics.Meter;
+import com.codahale.metrics.Timer;
 import com.lmax.disruptor.EventHandler;
-import com.yammer.metrics.Metrics;
-import com.yammer.metrics.core.Meter;
-import com.yammer.metrics.core.Timer;
-import com.yammer.metrics.core.TimerContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.graylog2.Core;
@@ -34,6 +32,8 @@ import org.graylog2.plugin.Message;
 
 import java.util.concurrent.TimeUnit;
 
+import static com.codahale.metrics.MetricRegistry.name;
+
 /**
  * @author Lennart Koopmann <lennart@socketfeed.com>
  */
@@ -42,11 +42,10 @@ public class ProcessBufferProcessor implements EventHandler<MessageEvent> {
     private static final Logger LOG = LoggerFactory.getLogger(ProcessBufferProcessor.class);
 
     private Core server;
-    private final Meter incomingMessages = Metrics.newMeter(ProcessBufferProcessor.class, "IncomingMessages", "messages", TimeUnit.SECONDS);
-    private final Meter incomingMessagesPerMinute = Metrics.newMeter(ProcessBufferProcessor.class, "IncomingMessagesMinutely", "messages", TimeUnit.MINUTES);
-    private final Timer processTime = Metrics.newTimer(ProcessBufferProcessor.class, "ProcessTime", TimeUnit.MICROSECONDS, TimeUnit.SECONDS);
-    private final Meter filteredOutMessages = Metrics.newMeter(ProcessBufferProcessor.class, "FilteredOutMessages", "messages", TimeUnit.SECONDS);
-    private final Meter outgoingMessages = Metrics.newMeter(ProcessBufferProcessor.class, "OutgoingMessages", "messages", TimeUnit.SECONDS);
+    private final Meter incomingMessages;
+    private final Timer processTime;
+    private final Meter filteredOutMessages;
+    private final Meter outgoingMessages;
 
     private final long ordinal;
     private final long numberOfConsumers;
@@ -55,6 +54,11 @@ public class ProcessBufferProcessor implements EventHandler<MessageEvent> {
         this.ordinal = ordinal;
         this.numberOfConsumers = numberOfConsumers;
         this.server = server;
+
+        incomingMessages = server.metrics().meter(name(ProcessBufferProcessor.class, "incomingMessages"));
+        outgoingMessages = server.metrics().meter(name(ProcessBufferProcessor.class, "outgoingMessages"));
+        filteredOutMessages = server.metrics().meter(name(ProcessBufferProcessor.class, "filteredOutMessages"));
+        processTime = server.metrics().timer(name(ProcessBufferProcessor.class, "processTime"));
     }
 
     @Override
@@ -67,14 +71,16 @@ public class ProcessBufferProcessor implements EventHandler<MessageEvent> {
         server.processBufferWatermark().decrementAndGet();
         
         incomingMessages.mark();
-        incomingMessagesPerMinute.mark();
-        TimerContext tcx = processTime.time();
+        final Timer.Context tcx = processTime.time();
 
         Message msg = event.getMessage();
 
         LOG.debug("Starting to process message <{}>.", msg.getId());
 
         for (MessageFilter filter : server.getFilters()) {
+            Timer timer = server.metrics().timer(name(filter.getClass(), "executionTime"));
+            final Timer.Context timerContext = timer.time();
+
             try {
                 LOG.debug("Applying filter [{}] on message <{}>.", filter.getName(), msg.getId());
 
@@ -85,6 +91,8 @@ public class ProcessBufferProcessor implements EventHandler<MessageEvent> {
                 }
             } catch (Exception e) {
                 LOG.error("Could not apply filter [" + filter.getName() +"] on message <" + msg.getId() +">: ", e);
+            } finally {
+                timerContext.stop();
             }
         }
 

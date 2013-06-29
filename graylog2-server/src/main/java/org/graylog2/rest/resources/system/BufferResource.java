@@ -19,6 +19,7 @@
  */
 package org.graylog2.rest.resources.system;
 
+import com.codahale.metrics.annotation.Timed;
 import com.google.common.collect.Maps;
 import com.sun.jersey.api.core.ResourceConfig;
 import org.graylog2.Core;
@@ -42,7 +43,7 @@ public class BufferResource extends RestResource {
     @Context
     ResourceConfig rc;
 
-    @GET
+    @GET @Timed
     @Path("/")
     @Produces(MediaType.APPLICATION_JSON)
     public String utilization(@QueryParam("pretty") boolean prettyPrint) {

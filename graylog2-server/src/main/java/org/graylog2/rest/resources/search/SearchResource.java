@@ -23,6 +23,7 @@ package org.graylog2.rest.resources.search;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.Maps;
 import com.sun.jersey.api.core.ResourceConfig;
+import com.codahale.metrics.annotation.Timed;
 import org.graylog2.Core;
 import org.graylog2.indexer.Indexer;
 import org.graylog2.indexer.results.DateHistogramResult;
@@ -49,7 +50,7 @@ public class SearchResource extends RestResource {
 
     @Context ResourceConfig rc;
 
-    @GET @Path("/universal")
+    @GET @Path("/universal") @Timed
     @Produces(MediaType.APPLICATION_JSON)
     public String search(@QueryParam("query") String query, @QueryParam("timerange") int timerange, @QueryParam("pretty") boolean prettyPrint) {
         Core core = (Core) rc.getProperty("core");
@@ -71,7 +72,7 @@ public class SearchResource extends RestResource {
         return json(result, prettyPrint);
     }
     
-    @GET @Path("/universal/histogram")
+    @GET @Path("/universal/histogram") @Timed
     @Produces(MediaType.APPLICATION_JSON)
     public String histogram(@QueryParam("query") String query, @QueryParam("interval") String interval, @QueryParam("timerange") int timerange, @QueryParam("pretty") boolean prettyPrint) {
         Core core = (Core) rc.getProperty("core");

@@ -19,6 +19,7 @@
  */
 package org.graylog2.rest.resources.system;
 
+import com.codahale.metrics.annotation.Timed;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
@@ -52,7 +53,7 @@ public class MessagesResource extends RestResource {
     @Context
     ResourceConfig rc;
 
-    @GET
+    @GET @Timed
     @Path("/")
     @Produces(MediaType.APPLICATION_JSON)
     public String all(@QueryParam("page") int page, @QueryParam("pretty") boolean prettyPrint) {

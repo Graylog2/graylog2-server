@@ -20,6 +20,9 @@
 
 package org.graylog2;
 
+import com.codahale.metrics.JmxReporter;
+import com.codahale.metrics.MetricRegistry;
+import com.codahale.metrics.log4j.InstrumentedAppender;
 import org.graylog2.cluster.Node;
 import org.graylog2.cluster.NodeNotFoundException;
 import org.graylog2.plugin.Tools;
@@ -124,8 +127,18 @@ public final class Main {
             logLevel = Level.DEBUG;
         }
 
+        // This is holding all our metrics.
+        final MetricRegistry metrics = new MetricRegistry();
+
+        // Report metrics via JMX.
+        final JmxReporter reporter = JmxReporter.forRegistry(metrics).build();
+        reporter.start();
+
+        InstrumentedAppender logMetrics = new InstrumentedAppender(metrics);
+        logMetrics.activateOptions();
         org.apache.log4j.Logger.getRootLogger().setLevel(logLevel);
         org.apache.log4j.Logger.getLogger(Main.class.getPackage().getName()).setLevel(logLevel);
+        org.apache.log4j.Logger.getRootLogger().addAppender(logMetrics);
 
         LOG.info("Graylog2 {} starting up. (JRE: {})", Core.GRAYLOG2_VERSION, Tools.getSystemInformation());
 
@@ -150,7 +163,7 @@ public final class Main {
 
         // Le server object. This is where all the magic happens.
         Core server = new Core();
-        server.initialize(configuration);
+        server.initialize(configuration, metrics);
         
         // Could it be that there is another master instance already?
         Node.register(server, configuration.isMaster(), configuration.getRestListenUri());
@@ -193,7 +206,7 @@ public final class Main {
             LOG.info("Printing system utilization information.");
             server.setStatsMode(true);
         }
-        
+
         // Register transports.
         if (configuration.isTransportEmailEnabled()) { server.registerTransport(new EmailTransport()); }
         if (configuration.isTransportJabberEnabled()) {  server.registerTransport(new JabberTransport()); }
@@ -237,7 +250,7 @@ public final class Main {
         server.registerFilter(new RewriteFilter());
 
         // Register outputs.
-        server.registerOutput(new ElasticSearchOutput());
+        server.registerOutput(new ElasticSearchOutput(server));
         
         try {
         	server.startRestApi();

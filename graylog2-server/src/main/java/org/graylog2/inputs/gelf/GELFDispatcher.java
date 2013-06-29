@@ -20,10 +20,9 @@
 
 package org.graylog2.inputs.gelf;
 
+import com.codahale.metrics.Meter;
 import org.graylog2.gelf.GELFProcessor;
 import org.graylog2.gelf.GELFMessage;
-import com.yammer.metrics.Metrics;
-import com.yammer.metrics.core.Meter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.graylog2.Core;
@@ -33,7 +32,8 @@ import org.jboss.netty.channel.ExceptionEvent;
 import org.jboss.netty.channel.MessageEvent;
 import org.jboss.netty.channel.SimpleChannelHandler;
 
-import java.util.concurrent.TimeUnit;
+import static com.codahale.metrics.MetricRegistry.name;
+
 
 /**
  * @author Lennart Koopmann <lennart@socketfeed.com>
@@ -44,13 +44,18 @@ public class GELFDispatcher extends SimpleChannelHandler {
 
     private GELFProcessor processor;
     private Core server;
-    private final Meter receivedMessages = Metrics.newMeter(GELFDispatcher.class, "ReceivedMessages", "messages", TimeUnit.SECONDS);
-    private final Meter dispatchedMessageChunk = Metrics.newMeter(GELFDispatcher.class, "DispatchedMessagesChunks", "messages", TimeUnit.SECONDS);
-    private final Meter dispatchedUnchunkedMessage = Metrics.newMeter(GELFDispatcher.class, "DispatchedNonChunkedMessages", "messages", TimeUnit.SECONDS);
+
+    private final Meter receivedMessages;
+    private final Meter dispatchedChunkedMessages;
+    private final Meter dispatchedUnchunkedMessages;
 
     public GELFDispatcher(Core server) {
         this.server = server;
         this.processor = new GELFProcessor(server);
+
+        this.receivedMessages = server.metrics().meter(name(GELFDispatcher.class, "receivedMessages"));
+        this.dispatchedChunkedMessages = server.metrics().meter(name(GELFDispatcher.class, "dispatchedChunkedMessages"));
+        this.dispatchedUnchunkedMessages = server.metrics().meter(name(GELFDispatcher.class, "dispatchedUnchunkedMessages"));
     }
 
     @Override
@@ -66,14 +71,14 @@ public class GELFDispatcher extends SimpleChannelHandler {
 
         switch(msg.getGELFType()) {
         case CHUNKED:
-            dispatchedMessageChunk.mark();
+            dispatchedChunkedMessages.mark();
             server.getGELFChunkManager().insert(msg);
             break;
         case ZLIB:
         case GZIP:
         case UNCOMPRESSED:
         case UNSUPPORTED:
-            dispatchedUnchunkedMessage.mark();
+            dispatchedUnchunkedMessages.mark();
             processor.messageReceived(msg);
             break;
         }

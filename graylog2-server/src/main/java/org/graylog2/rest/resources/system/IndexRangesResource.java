@@ -19,6 +19,7 @@
  */
 package org.graylog2.rest.resources.system;
 
+import com.codahale.metrics.annotation.Timed;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sun.jersey.api.core.ResourceConfig;
 import org.graylog2.Core;
@@ -46,7 +47,7 @@ public class IndexRangesResource extends RestResource {
     @Context
     ResourceConfig rc;
 
-    @POST
+    @POST @Timed
     @Path("/rebuild")
     @Produces(MediaType.APPLICATION_JSON)
     public Response rebuild() {

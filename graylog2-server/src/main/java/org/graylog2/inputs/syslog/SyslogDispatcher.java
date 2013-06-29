@@ -20,8 +20,7 @@
 
 package org.graylog2.inputs.syslog;
 
-import com.yammer.metrics.Metrics;
-import com.yammer.metrics.core.Meter;
+import com.codahale.metrics.Meter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.graylog2.Core;
@@ -32,7 +31,8 @@ import org.jboss.netty.channel.MessageEvent;
 import org.jboss.netty.channel.SimpleChannelHandler;
 
 import java.net.InetSocketAddress;
-import java.util.concurrent.TimeUnit;
+
+import static com.codahale.metrics.MetricRegistry.name;
 
 /**
  * @author Lennart Koopmann <lennart@socketfeed.com>
@@ -42,10 +42,12 @@ public class SyslogDispatcher extends SimpleChannelHandler {
     private static final Logger LOG = LoggerFactory.getLogger(SyslogDispatcher.class);
 
     private SyslogProcessor processor;
-    private final Meter receivedMessages = Metrics.newMeter(SyslogDispatcher.class, "ReceivedMessages", "messages", TimeUnit.SECONDS);
+    private final Meter receivedMessages;
 
     public SyslogDispatcher(Core server) {
         this.processor = new SyslogProcessor(server);
+
+        this.receivedMessages = server.metrics().meter(name(SyslogDispatcher.class, "receivedMessages"));
     }
 
     @Override

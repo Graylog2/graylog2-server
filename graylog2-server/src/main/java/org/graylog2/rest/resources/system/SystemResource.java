@@ -20,6 +20,7 @@
 
 package org.graylog2.rest.resources.system;
 
+import com.codahale.metrics.annotation.Timed;
 import com.google.common.collect.Maps;
 import com.sun.jersey.api.core.ResourceConfig;
 import org.graylog2.Core;
@@ -47,7 +48,7 @@ public class SystemResource extends RestResource {
 
     @Context ResourceConfig rc;
 
-    @GET
+    @GET @Timed
     @Path("/")
     @Produces(MediaType.APPLICATION_JSON)
     public String system(@QueryParam("pretty") boolean prettyPrint) {
@@ -63,7 +64,7 @@ public class SystemResource extends RestResource {
         return json(result, prettyPrint);
     }
 
-    @GET
+    @GET @Timed
     @Path("/fields")
     @Produces(MediaType.APPLICATION_JSON)
     public String analyze(@QueryParam("pretty") boolean prettyPrint) {
@@ -75,7 +76,7 @@ public class SystemResource extends RestResource {
         return json(result, prettyPrint);
     }
 
-    @PUT
+    @PUT @Timed
     @Path("/processing/pause")
     public Response pauseProcessing() {
         Core core = (Core) rc.getProperty("core");
@@ -85,7 +86,7 @@ public class SystemResource extends RestResource {
         return Response.ok().build();
     }
 
-    @PUT
+    @PUT @Timed
     @Path("/processing/resume")
     public Response resumeProcessing() {
         Core core = (Core) rc.getProperty("core");
@@ -101,7 +102,7 @@ public class SystemResource extends RestResource {
         return Response.ok().build();
     }
 
-    @PUT
+    @PUT @Timed
     @Path("/processing/pause/unlock")
     public Response unlockProcessingPause() {
 
@@ -118,7 +119,7 @@ public class SystemResource extends RestResource {
     }
 
     @GET
-    @Path("/jvm")
+    @Path("/jvm") @Timed
     @Produces(MediaType.APPLICATION_JSON)
     public String jvm(@QueryParam("pretty") boolean prettyPrint) {
         Core core = (Core) rc.getProperty("core");

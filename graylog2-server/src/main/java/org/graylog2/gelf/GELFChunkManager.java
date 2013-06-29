@@ -22,15 +22,15 @@ package org.graylog2.gelf;
 
 import java.io.ByteArrayOutputStream;
 import java.util.Map;
-import java.util.concurrent.TimeUnit;
 
+import com.codahale.metrics.Meter;
 import org.graylog2.Core;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.google.common.collect.Maps;
-import com.yammer.metrics.Metrics;
-import com.yammer.metrics.core.Meter;
+
+import static com.codahale.metrics.MetricRegistry.name;
 
 /**
  * @author Lennart Koopmann <lennart@socketfeed.com>
@@ -47,11 +47,13 @@ public class GELFChunkManager extends Thread {
 
     // The number of seconds a chunk is valid. Every message with chunks older than this will be dropped.
     public static final int SECONDS_VALID = 5;
-    private final Meter outdatedMessagesDropped = Metrics.newMeter(GELFChunkManager.class, "OutdatedMessagesDropped", "messages", TimeUnit.SECONDS);
+    private final Meter outdatedMessagesDropped;
 
     public GELFChunkManager(Core server) {
         this.processor = new GELFProcessor(server);
         this.server = server;
+
+        this.outdatedMessagesDropped = server.metrics().meter(name(GELFChunkManager.class, "outdatedMessagesDropped"));
     }
 
     @Override

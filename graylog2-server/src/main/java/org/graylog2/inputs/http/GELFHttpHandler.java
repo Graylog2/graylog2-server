@@ -19,10 +19,10 @@
  */
 package org.graylog2.inputs.http;
 
+import static com.codahale.metrics.MetricRegistry.name;
 import static org.jboss.netty.handler.codec.http.HttpHeaders.isKeepAlive;
 
-import java.util.concurrent.TimeUnit;
-
+import com.codahale.metrics.Meter;
 import org.graylog2.Core;
 import org.graylog2.gelf.GELFMessage;
 import org.graylog2.gelf.GELFProcessor;
@@ -44,22 +44,24 @@ import org.jboss.netty.handler.codec.http.HttpVersion;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.yammer.metrics.Metrics;
-import com.yammer.metrics.core.Meter;
-
 public class GELFHttpHandler extends SimpleChannelHandler {
 
     private static final Logger LOG = LoggerFactory.getLogger(GELFHttpHandler.class);
 
     @SuppressWarnings("unused")
 	private final Core server;
-    private final Meter receivedMessages = Metrics.newMeter(GELFHttpHandler.class, "ReceivedMessages", "messages", TimeUnit.SECONDS);
-    private final Meter gelfMessages = Metrics.newMeter(GELFHttpHandler.class, "ReceivedGelfMessages", "messages", TimeUnit.SECONDS);
+
+    private final Meter receivedMessages;
+    private final Meter gelfMessages;
+
     private final GELFProcessor gelfProcessor;
 
     public GELFHttpHandler(Core server) {
         this.server = server;
         gelfProcessor = new GELFProcessor(server);
+
+        this.receivedMessages = server.metrics().meter(name(GELFHttpHandler.class, "receivedMessages"));
+        this.gelfMessages = server.metrics().meter(name(GELFHttpHandler.class, "gelfMessages"));
     }
 
     @Override

@@ -19,6 +19,7 @@
  */
 package org.graylog2.inputs.amqp;
 
+import com.codahale.metrics.Meter;
 import com.rabbitmq.client.AMQP;
 import com.rabbitmq.client.AlreadyClosedException;
 import com.rabbitmq.client.Channel;
@@ -27,14 +28,11 @@ import com.rabbitmq.client.ConnectionFactory;
 import com.rabbitmq.client.Consumer;
 import com.rabbitmq.client.DefaultConsumer;
 import com.rabbitmq.client.Envelope;
-import com.yammer.metrics.Metrics;
-import com.yammer.metrics.core.Meter;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import java.util.concurrent.TimeUnit;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -44,6 +42,8 @@ import org.graylog2.gelf.GELFMessage;
 import org.graylog2.gelf.GELFProcessor;
 import org.graylog2.inputs.syslog.SyslogProcessor;
 import org.graylog2.plugin.buffers.BufferOutOfCapacityException;
+
+import static com.codahale.metrics.MetricRegistry.name;
 
 /**
  * @author Lennart Koopmann <lennart@socketfeed.com>
@@ -62,15 +62,15 @@ public class AMQPConsumer implements Runnable {
     Channel channel;
     ExecutorService executor;
     
-    private final Meter handledMessages = Metrics.newMeter(AMQPConsumer.class, "HandledAMQPMessages", "messages", TimeUnit.SECONDS);
-    private final Meter handledSyslogMessages = Metrics.newMeter(AMQPConsumer.class, "HandledAMQPSyslogMessages", "messages", TimeUnit.SECONDS);
-    private final Meter handledGELFMessages = Metrics.newMeter(AMQPConsumer.class, "HandledAMQPGELFMessages", "messages", TimeUnit.SECONDS);
-    private final Meter reQueuedMessages = Metrics.newMeter(AMQPConsumer.class, "ReQueuedAMQPMessages", "messages", TimeUnit.SECONDS);
+    private final Meter handledMessages;
+    private final Meter handledSyslogMessages;
+    private final Meter handledGELFMessages;
+    private final Meter reQueuedMessages;
     
     public AMQPConsumer(Core server, AMQPQueueConfiguration queueConfig) {
         this.server = server;
         this.queueConfig = queueConfig;
-        
+
         switch (queueConfig.getInputType()) {
             case GELF:
                 this.gelfProcessor = new GELFProcessor(server);
@@ -82,6 +82,11 @@ public class AMQPConsumer implements Runnable {
             	LOG.error("Unknown input type {} for queue {}", queueConfig.getInputType(), queueConfig.getQueueName());
             	break;
         }
+
+        this.handledMessages = server.metrics().meter(name(AMQPConsumer.class, "handledMessages"));
+        this.handledSyslogMessages = server.metrics().meter(name(AMQPConsumer.class, "handledSyslogMessages"));
+        this.handledGELFMessages = server.metrics().meter(name(AMQPConsumer.class, "handledGELFMessages"));
+        this.reQueuedMessages = server.metrics().meter(name(AMQPConsumer.class, "reQueuedMessages"));
     }
     
     @Override

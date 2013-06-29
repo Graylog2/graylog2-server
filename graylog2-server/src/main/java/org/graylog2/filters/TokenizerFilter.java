@@ -21,16 +21,12 @@
 package org.graylog2.filters;
 
 import com.google.common.base.CharMatcher;
-import com.yammer.metrics.Metrics;
-import com.yammer.metrics.core.Timer;
-import com.yammer.metrics.core.TimerContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.graylog2.plugin.GraylogServer;
 import org.graylog2.plugin.filters.MessageFilter;
 import org.graylog2.plugin.Message;
 
-import java.util.concurrent.TimeUnit;
 import java.util.regex.Pattern;
 import java.util.regex.Matcher;
 
@@ -46,7 +42,6 @@ public class TokenizerFilter implements MessageFilter {
     private static final Pattern quotedValuePattern = Pattern.compile("([a-zA-Z0-9_-]+=\"[^\"]+\")");
     private static final CharMatcher QUOTE_MATCHER = CharMatcher.is('"').precomputed();
     private static final CharMatcher EQUAL_SIGN_MATCHER = CharMatcher.is('=').precomputed();
-    private static final Timer processTime = Metrics.newTimer(TokenizerFilter.class, "ProcessTime", TimeUnit.MICROSECONDS, TimeUnit.SECONDS);
 
     /*
      * Extract out only true k=v pairs, not everything separated by a = character.
@@ -63,8 +58,6 @@ public class TokenizerFilter implements MessageFilter {
 
     @Override
     public boolean filter(Message msg, GraylogServer server) {
-        TimerContext tcx = processTime.time();
-
         int extracted = 0;
         if (msg.getMessage().contains("=")) {
             try {
@@ -100,7 +93,6 @@ public class TokenizerFilter implements MessageFilter {
 
         LOG.debug("Extracted <{}> additional fields from message <{}> k=v pairs.", extracted, msg.getId());
 
-        tcx.stop();
         return false;
     }
     

@@ -20,16 +20,13 @@
 
 package org.graylog2.outputs;
 
+import com.codahale.metrics.Meter;
+import com.codahale.metrics.Timer;
 import org.graylog2.plugin.outputs.MessageOutput;
-import com.yammer.metrics.Metrics;
-import com.yammer.metrics.core.Meter;
-import com.yammer.metrics.core.Timer;
-import com.yammer.metrics.core.TimerContext;
 import org.graylog2.plugin.Message;
 
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.TimeUnit;
 import com.google.common.collect.Maps;
 import org.graylog2.Core;
 import org.graylog2.plugin.GraylogServer;
@@ -38,17 +35,25 @@ import org.graylog2.plugin.outputs.OutputStreamConfiguration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import static com.codahale.metrics.MetricRegistry.name;
+
 /**
  * @author Lennart Koopmann <lennart@socketfeed.com>
  */
 public class ElasticSearchOutput implements MessageOutput {
 
-    private final Meter writes = Metrics.newMeter(ElasticSearchOutput.class, "Writes", "messages", TimeUnit.SECONDS);
-    private final Timer processTime = Metrics.newTimer(ElasticSearchOutput.class, "ProcessTimeMilliseconds", TimeUnit.MILLISECONDS, TimeUnit.SECONDS);
+    private final Meter writes;
+    private final Timer processTime;
 
     private static final String NAME = "ElasticSearch Output";
     
     private static final Logger LOG = LoggerFactory.getLogger(ElasticSearchOutput.class);
+
+    public ElasticSearchOutput(Core core) {
+        // Only constructing metrics here. write() get's another Core reference. (because this technically is a plugin)
+        this.writes = core.metrics().meter(name(ElasticSearchOutput.class, "writes"));
+        this.processTime = core.metrics().timer(name(ElasticSearchOutput.class, "processTime"));
+    }
 
     @Override
     public void write(List<Message> messages, OutputStreamConfiguration streamConfig, GraylogServer server) throws Exception {
@@ -58,7 +63,7 @@ public class ElasticSearchOutput implements MessageOutput {
         
         writes.mark();
 
-        TimerContext tcx = processTime.time();
+        Timer.Context tcx = processTime.time();
         serverImpl.getIndexer().bulkIndex(messages);
         tcx.stop();
     }

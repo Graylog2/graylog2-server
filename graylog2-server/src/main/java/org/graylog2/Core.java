@@ -20,6 +20,8 @@
 
 package org.graylog2;
 
+import com.codahale.metrics.MetricRegistry;
+import com.codahale.metrics.jersey.InstrumentedResourceMethodDispatchAdapter;
 import org.glassfish.grizzly.http.server.HttpServer;
 import org.graylog2.plugin.Tools;
 
@@ -51,8 +53,6 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 import com.google.common.collect.Maps;
 import java.util.Map;
-
-import javax.ws.rs.core.UriBuilder;
 
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import com.sun.jersey.api.container.grizzly2.GrizzlyServerFactory;
@@ -145,10 +145,13 @@ public class Core implements GraylogServer {
     private AtomicBoolean processingPauseLocked = new AtomicBoolean(false);
     
     private DateTime startedAt;
+    private MetricRegistry metricRegistry;
 
-    public void initialize(Configuration configuration) {
+    public void initialize(Configuration configuration, MetricRegistry metrics) {
     	startedAt = new DateTime(DateTimeZone.UTC);
         serverId = Tools.generateServerId();
+
+        this.metricRegistry = metrics;
         
         this.configuration = configuration; // TODO use dependency injection
 
@@ -372,6 +375,7 @@ public class Core implements GraylogServer {
 
     private HttpServer startRestServer(URI restUri) throws IOException {
         ResourceConfig rc = new PackagesResourceConfig("org.graylog2.rest.resources");
+        rc.getSingletons().add(new InstrumentedResourceMethodDispatchAdapter(metricRegistry));
         rc.getProperties().put("core", this);
         return GrizzlyServerFactory.createHttpServer(restUri, rc);
     }
@@ -573,5 +577,8 @@ public class Core implements GraylogServer {
     public boolean isProcessing() {
         return isProcessing.get();
     }
-    
+
+    public MetricRegistry metrics() {
+        return metricRegistry;
+    }
 }

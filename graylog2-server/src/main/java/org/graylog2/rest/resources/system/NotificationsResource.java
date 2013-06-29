@@ -19,6 +19,7 @@
  */
 package org.graylog2.rest.resources.system;
 
+import com.codahale.metrics.annotation.Timed;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.sun.jersey.api.core.ResourceConfig;
@@ -49,7 +50,7 @@ public class NotificationsResource extends RestResource {
     @Context
     ResourceConfig rc;
 
-    @GET
+    @GET @Timed
     @Path("/")
     @Produces(MediaType.APPLICATION_JSON)
     public String listNotifications(@QueryParam("pretty") boolean prettyPrint) {

@@ -25,6 +25,7 @@ import java.util.Map;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sun.jersey.api.core.ResourceConfig;
+import com.codahale.metrics.annotation.Timed;
 import org.elasticsearch.indices.IndexMissingException;
 import org.graylog2.Core;
 import org.graylog2.indexer.messages.DocumentNotFoundException;
@@ -56,7 +57,7 @@ public class MessageResource extends RestResource {
 	
     @Context ResourceConfig rc;
 
-    @GET @Path("/{messageId}")
+    @GET @Path("/{messageId}") @Timed
     @Produces(MediaType.APPLICATION_JSON)
     public String search(@PathParam("index") String index, @PathParam("messageId") String messageId, @QueryParam("pretty") boolean prettyPrint) {
         Core core = (Core) rc.getProperty("core");
@@ -80,7 +81,7 @@ public class MessageResource extends RestResource {
         return json(m, prettyPrint);
     }
     
-    @GET @Path("/analyze")
+    @GET @Path("/analyze") @Timed
     @Produces(MediaType.APPLICATION_JSON)
     public String analyze(@PathParam("index") String index, @QueryParam("string") String string, @QueryParam("pretty") boolean prettyPrint) {
         Core core = (Core) rc.getProperty("core");

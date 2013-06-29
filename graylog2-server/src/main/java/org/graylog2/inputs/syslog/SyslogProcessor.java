@@ -20,10 +20,8 @@
 
 package org.graylog2.inputs.syslog;
 
-import com.yammer.metrics.Metrics;
-import com.yammer.metrics.core.Meter;
-import com.yammer.metrics.core.Timer;
-import com.yammer.metrics.core.TimerContext;
+import com.codahale.metrics.Meter;
+import com.codahale.metrics.Timer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.graylog2.Core;
@@ -35,12 +33,13 @@ import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.Date;
 import java.util.Map;
-import java.util.concurrent.TimeUnit;
 import java.util.regex.Pattern;
 import com.google.common.collect.Maps;
 import org.graylog2.plugin.buffers.BufferOutOfCapacityException;
 import org.productivity.java.syslog4j.server.SyslogServerEventIF;
 import org.productivity.java.syslog4j.server.impl.event.structured.StructuredSyslogServerEvent;
+
+import static com.codahale.metrics.MetricRegistry.name;
 
 /**
  * @author Lennart Koopmann <lennart@socketfeed.com>
@@ -52,14 +51,20 @@ public class SyslogProcessor {
 
     private static final Pattern STRUCTURED_SYSLOG_PATTERN = Pattern.compile("<\\d+>\\d.*", Pattern.DOTALL);
     
-    private final Meter incomingMessages = Metrics.newMeter(SyslogProcessor.class, "IncomingMessages", "messages", TimeUnit.SECONDS);
-    private final Meter parsingFailures = Metrics.newMeter(SyslogProcessor.class, "MessageParsingFailures", "failures", TimeUnit.SECONDS);
-    private final Meter incompleteMessages = Metrics.newMeter(SyslogProcessor.class, "IncompleteMessages", "messages", TimeUnit.SECONDS);
-    private final Meter processedMessages = Metrics.newMeter(SyslogProcessor.class, "ProcessedMessages", "messages", TimeUnit.SECONDS);
-    private final Timer syslogParsedTime = Metrics.newTimer(SyslogProcessor.class, "SyslogParsedTime", TimeUnit.MICROSECONDS, TimeUnit.SECONDS);
+    private final Meter incomingMessages;
+    private final Meter parsingFailures;
+    private final Meter incompleteMessages;
+    private final Meter processedMessages;
+    private final Timer syslogParsedTime;
 
     public SyslogProcessor(Core server) {
         this.server = server;
+
+        this.incomingMessages = server.metrics().meter(name(SyslogProcessor.class, "incomingMessages"));
+        this.parsingFailures = server.metrics().meter(name(SyslogProcessor.class, "parsingFailures"));
+        this.processedMessages = server.metrics().meter(name(SyslogProcessor.class, "processedMessages"));
+        this.incompleteMessages = server.metrics().meter(name(SyslogProcessor.class, "incompleteMessages"));
+        this.syslogParsedTime = server.metrics().timer(name(SyslogProcessor.class, "syslogParsedTime"));
     }
 
     public void messageReceived(String msg, InetAddress remoteAddress) throws BufferOutOfCapacityException {
@@ -93,7 +98,7 @@ public class SyslogProcessor {
     }
 
     private Message parse(String msg, InetAddress remoteAddress) throws UnknownHostException {
-        TimerContext tcx = syslogParsedTime.time();
+        Timer.Context tcx = syslogParsedTime.time();
         
         if (remoteAddress == null) {
             remoteAddress = InetAddress.getLocalHost();

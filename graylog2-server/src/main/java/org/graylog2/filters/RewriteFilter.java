@@ -20,14 +20,10 @@
 
 package org.graylog2.filters;
 
-import com.yammer.metrics.Metrics;
-import com.yammer.metrics.core.Timer;
-import com.yammer.metrics.core.TimerContext;
 import org.graylog2.plugin.GraylogServer;
 import org.graylog2.plugin.filters.MessageFilter;
 import org.graylog2.plugin.Message;
 
-import java.util.concurrent.TimeUnit;
 import org.graylog2.Core;
 
 /**
@@ -35,19 +31,14 @@ import org.graylog2.Core;
  */
 public class RewriteFilter implements MessageFilter {
 
-    private final Timer processTime = Metrics.newTimer(RewriteFilter.class, "ProcessTime", TimeUnit.MICROSECONDS, TimeUnit.SECONDS);
-
     @Override
     public boolean filter(Message msg, GraylogServer server) {
         Core serverImpl = (Core) server;
-        TimerContext tcx = processTime.time();
 
         if (serverImpl.getRulesEngine() != null) {
             serverImpl.getRulesEngine().evaluate(msg);
         }
 
-        tcx.stop();
-        
         // false if not expecitly set to true in the rules.
         return msg.getFilterOut();
     }

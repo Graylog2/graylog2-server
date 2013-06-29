@@ -19,6 +19,7 @@
  */
 package org.graylog2.rest.resources.system;
 
+import com.codahale.metrics.annotation.Timed;
 import com.google.common.collect.Maps;
 import com.sun.jersey.api.core.ResourceConfig;
 import org.graylog2.Core;
@@ -46,7 +47,7 @@ public class ThroughputResource extends RestResource {
     ResourceConfig rc;
 
     @GET
-    @Path("/")
+    @Path("/") @Timed
     @Produces(MediaType.APPLICATION_JSON)
     public String total(@QueryParam("pretty") boolean prettyPrint) {
         Core core = (Core) rc.getProperty("core");

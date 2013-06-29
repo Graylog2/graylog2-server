@@ -24,6 +24,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.Maps;
 import com.sun.jersey.api.core.ResourceConfig;
+import com.codahale.metrics.annotation.Timed;
 import org.bson.types.ObjectId;
 import org.graylog2.Core;
 import org.graylog2.database.NotFoundException;
@@ -58,7 +59,7 @@ public class StreamResource extends RestResource {
     @Context
     ResourceConfig rc;
 
-    @POST @Path("/")
+    @POST @Path("/") @Timed
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
     public Response create(String body, @QueryParam("pretty") boolean prettyPrint) {
@@ -98,7 +99,7 @@ public class StreamResource extends RestResource {
         return Response.status(Response.Status.CREATED).entity(json(result, prettyPrint)).build();
     }
     
-    @GET @Path("/")
+    @GET @Path("/") @Timed
     @Produces(MediaType.APPLICATION_JSON)
     public String get(@QueryParam("pretty") boolean prettyPrint) {
         Core core = (Core) rc.getProperty("core");
@@ -124,7 +125,7 @@ public class StreamResource extends RestResource {
         }
     }
     
-    @GET @Path("/{streamId}")
+    @GET @Path("/{streamId}") @Timed
     @Produces(MediaType.APPLICATION_JSON)
     public String get(@PathParam("streamId") String streamId, @QueryParam("pretty") boolean prettyPrint) {
         Core core = (Core) rc.getProperty("core");
@@ -144,7 +145,7 @@ public class StreamResource extends RestResource {
         return json(stream.asMap(), prettyPrint);
     }
 
-    @DELETE @Path("/{streamId}")
+    @DELETE @Path("/{streamId}") @Timed
     public Response delete(@PathParam("streamId") String streamId) {
         Core core = (Core) rc.getProperty("core");
 

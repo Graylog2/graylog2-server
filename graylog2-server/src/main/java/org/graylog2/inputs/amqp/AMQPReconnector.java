@@ -19,15 +19,15 @@
  */
 package org.graylog2.inputs.amqp;
 
+import com.codahale.metrics.Meter;
 import com.rabbitmq.client.ShutdownListener;
 import com.rabbitmq.client.ShutdownSignalException;
-import com.yammer.metrics.Metrics;
-import com.yammer.metrics.core.Meter;
-import java.util.concurrent.TimeUnit;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.graylog2.Core;
 import org.graylog2.activities.Activity;
+
+import static com.codahale.metrics.MetricRegistry.name;
 
 /**
  * @author Lennart Koopmann <lennart@socketfeed.com>
@@ -41,11 +41,13 @@ public class AMQPReconnector implements ShutdownListener {
     private Core server;
     private AMQPQueueConfiguration queueConfig;
     
-    private final Meter reconnectionAttempts = Metrics.newMeter(AMQPReconnector.class, "ReconnectionAttempts", "attempts", TimeUnit.SECONDS);
+    private final Meter reconnectionAttempts;
     
     public AMQPReconnector(Core server, AMQPQueueConfiguration config) {
         this.server = server;
         this.queueConfig = config;
+
+        this.reconnectionAttempts = server.metrics().meter(name(AMQPReconnector.class, "reconnectionAttempts"));
     }
 
     @Override

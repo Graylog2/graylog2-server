@@ -22,6 +22,7 @@ package org.graylog2.rest.resources.count;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.Maps;
 import com.sun.jersey.api.core.ResourceConfig;
+import com.codahale.metrics.annotation.Timed;
 import org.graylog2.Core;
 import org.graylog2.indexer.Indexer;
 import org.graylog2.indexer.results.DateHistogramResult;
@@ -50,9 +51,9 @@ public class CountResource extends RestResource {
 	
     @Context ResourceConfig rc;
 
-    @GET @Path("/total")
+    @GET @Path("/total") @Timed
     @Produces(MediaType.APPLICATION_JSON)
-    public String histogram(@QueryParam("pretty") boolean prettyPrint) {
+    public String total(@QueryParam("pretty") boolean prettyPrint) {
         Core core = (Core) rc.getProperty("core");
 
         Map<String, Long> result = Maps.newHashMap();
@@ -61,7 +62,7 @@ public class CountResource extends RestResource {
         return json(result, prettyPrint);
     }
 
-    @GET @Path("/histogram")
+    @GET @Path("/histogram") @Timed
     @Produces(MediaType.APPLICATION_JSON)
     public String histogram(@QueryParam("interval") String interval, @QueryParam("timerange") int timerange, @QueryParam("pretty") boolean prettyPrint) {
         Core core = (Core) rc.getProperty("core");

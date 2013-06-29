@@ -19,6 +19,7 @@
  */
 package org.graylog2.rest.resources.system.jobs;
 
+import com.codahale.metrics.annotation.Timed;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.sun.jersey.api.core.ResourceConfig;
@@ -50,7 +51,7 @@ public class SystemJobResource extends RestResource {
     @Context
     ResourceConfig rc;
 
-    @GET
+    @GET @Timed
     @Path("/")
     @Produces(MediaType.APPLICATION_JSON)
     public String list(@QueryParam("pretty") boolean prettyPrint) {
@@ -68,7 +69,7 @@ public class SystemJobResource extends RestResource {
         return json(result, prettyPrint);
     }
 
-    @GET
+    @GET @Timed
     @Path("/{jobId}")
     @Produces(MediaType.APPLICATION_JSON)
     public String get(@PathParam("jobId") String jobId, @QueryParam("pretty") boolean prettyPrint) {
@@ -89,7 +90,8 @@ public class SystemJobResource extends RestResource {
         return json(job.toMap(), prettyPrint);
     }
 
-    @POST @Path("/")
+    @POST @Timed
+    @Path("/")
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
     public Response trigger(String body, @QueryParam("pretty") boolean prettyPrint) {

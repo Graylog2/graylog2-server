@@ -19,6 +19,7 @@
  */
 package org.graylog2.rest.resources.system.indexer;
 
+import com.codahale.metrics.annotation.Timed;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.Maps;
 import com.sun.jersey.api.core.ResourceConfig;
@@ -47,7 +48,8 @@ public class ClusterResource extends RestResource {
 
     @Context
     ResourceConfig rc;
-    @GET
+
+    @GET @Timed
     @Path("/name")
     @Produces(MediaType.APPLICATION_JSON)
     public String name(@QueryParam("pretty") boolean prettyPrint) {
@@ -59,7 +61,7 @@ public class ClusterResource extends RestResource {
         return json(result, prettyPrint);
     }
 
-    @GET
+    @GET @Timed
     @Path("/health")
     @Produces(MediaType.APPLICATION_JSON)
     public String health(@QueryParam("pretty") boolean prettyPrint) {

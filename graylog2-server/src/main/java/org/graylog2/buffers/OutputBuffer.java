@@ -20,12 +20,11 @@
 
 package org.graylog2.buffers;
 
+import com.codahale.metrics.Meter;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import com.lmax.disruptor.MultiThreadedClaimStrategy;
 import com.lmax.disruptor.RingBuffer;
 import com.lmax.disruptor.dsl.Disruptor;
-import com.yammer.metrics.Metrics;
-import com.yammer.metrics.core.Meter;
 import org.graylog2.Core;
 import org.graylog2.buffers.processors.OutputBufferProcessor;
 import org.graylog2.plugin.buffers.Buffer;
@@ -38,6 +37,8 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 import org.graylog2.plugin.buffers.BufferOutOfCapacityException;
+
+import static com.codahale.metrics.MetricRegistry.name;
 
 /**
  * @author Lennart Koopmann <lennart@socketfeed.com>
@@ -56,13 +57,17 @@ public class OutputBuffer extends Buffer {
     
     private final Cache overflowCache;
 
-    private final Meter incomingMessages = Metrics.newMeter(OutputBuffer.class, "InsertedMessages", "messages", TimeUnit.SECONDS);
-    private final Meter rejectedMessages = Metrics.newMeter(OutputBuffer.class, "RejectedMessages", "messages", TimeUnit.SECONDS);
-    private final Meter cachedMessages = Metrics.newMeter(OutputBuffer.class, "CachedMessages", "messages", TimeUnit.SECONDS);
+    private final Meter incomingMessages;
+    private final Meter rejectedMessages;
+    private final Meter cachedMessages;
 
     public OutputBuffer(Core server, Cache overflowCache) {
         this.server = server;
         this.overflowCache = overflowCache;
+
+        incomingMessages = server.metrics().meter(name(OutputBuffer.class, "incomingMessages"));
+        rejectedMessages = server.metrics().meter(name(OutputBuffer.class, "rejectedMessages"));
+        cachedMessages = server.metrics().meter(name(OutputBuffer.class, "cachedMessages"));
     }
 
     public void initialize() {

@@ -20,13 +20,11 @@
 
 package org.graylog2.gelf;
 
+import com.codahale.metrics.Meter;
+import com.codahale.metrics.Timer;
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.yammer.metrics.Metrics;
-import com.yammer.metrics.core.Meter;
-import com.yammer.metrics.core.Timer;
-import com.yammer.metrics.core.TimerContext;
 import org.graylog2.Core;
 import org.graylog2.plugin.Message;
 import org.graylog2.plugin.Tools;
@@ -36,7 +34,8 @@ import org.slf4j.LoggerFactory;
 
 import java.util.Iterator;
 import java.util.Map;
-import java.util.concurrent.TimeUnit;
+
+import static com.codahale.metrics.MetricRegistry.name;
 
 /**
  * @author Lennart Koopmann <lennart@socketfeed.com>
@@ -45,10 +44,11 @@ public class GELFProcessor {
 
     private static final Logger LOG = LoggerFactory.getLogger(GELFProcessor.class);
     private Core server;
-    private final Meter incomingMessages = Metrics.newMeter(GELFProcessor.class, "IncomingMessages", "messages", TimeUnit.SECONDS);
-    private final Meter incompleteMessages = Metrics.newMeter(GELFProcessor.class, "IncompleteMessages", "messages", TimeUnit.SECONDS);
-    private final Meter processedMessages = Metrics.newMeter(GELFProcessor.class, "ProcessedMessages", "messages", TimeUnit.SECONDS);
-    private final Timer gelfParsedTime = Metrics.newTimer(GELFProcessor.class, "GELFParsedTime", TimeUnit.MICROSECONDS, TimeUnit.SECONDS);
+
+    private final Meter incomingMessages;
+    private final Meter incompleteMessages;
+    private final Meter processedMessages;
+    private final Timer gelfParsedTime;
 
     private final ObjectMapper objectMapper;
 
@@ -57,6 +57,11 @@ public class GELFProcessor {
 
         objectMapper = new ObjectMapper();
         objectMapper.configure(JsonParser.Feature.ALLOW_UNQUOTED_CONTROL_CHARS, true);
+
+        this.incomingMessages = server.metrics().meter(name(GELFProcessor.class, "incomingMessages"));
+        this.incompleteMessages = server.metrics().meter(name(GELFProcessor.class, "incompleteMessages"));
+        this.processedMessages = server.metrics().meter(name(GELFProcessor.class, "processedMessages"));
+        this.gelfParsedTime = server.metrics().timer(name(GELFProcessor.class, "gelfParsedTime"));
     }
 
     public void messageReceived(GELFMessage message) throws BufferOutOfCapacityException {
@@ -77,7 +82,7 @@ public class GELFProcessor {
     }
 
     private Message parse(String message) {
-        TimerContext tcx = gelfParsedTime.time();
+        Timer.Context tcx = gelfParsedTime.time();
 
         JsonNode json;
 
