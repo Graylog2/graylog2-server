@@ -58,8 +58,6 @@ public class SystemController extends AuthenticatedController {
     public static Result messageProcessing() {
         try {
             List<ServerJVMStats> serverJvmStats = ServerJVMStats.get();
-            int throughput = Throughput.get();
-
             Map<String, BufferInfo> bufferInfo = Maps.newHashMap();
 
             // Ask every node for buffer info.
@@ -67,7 +65,7 @@ public class SystemController extends AuthenticatedController {
                 bufferInfo.put(node.getNodeId(), BufferInfo.ofNode(node));
             }
 
-            return ok(views.html.system.message_processing.render(currentUser(), serverJvmStats, bufferInfo, throughput));
+            return ok(views.html.system.message_processing.render(currentUser(), serverJvmStats, bufferInfo));
         } catch (IOException e) {
             return status(504, views.html.errors.error.render(Api.ERROR_MSG_IO, e, request()));
         } catch (APIException e) {

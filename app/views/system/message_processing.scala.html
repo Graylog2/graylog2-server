@@ -1,4 +1,4 @@
-@(currentUser: User, jvms: List[ServerJVMStats], buffers: Map[String, BufferInfo], totalThroughput: Integer)
+@(currentUser: User, jvms: List[ServerJVMStats], buffers: Map[String, BufferInfo])
 
 @main("Message processing", views.html.system.sidebar(), "", currentUser) {
 
@@ -9,7 +9,7 @@
 
     <div class="row-fluid">
         <div class="alert alert-success">
-            Processing <strong class="total-throughput">@totalThroughput</strong> messages per second.
+            Processing <strong class="total-throughput"></strong> messages per second.
         </div>
     </div>
 
@@ -27,7 +27,7 @@
                 @if(jvm.isProcessing) {
                     <span class="sentence">
                         Processing
-                        <strong class="node-throughput" data-node-id="@jvm.getNodeId">0</strong>
+                        <strong class="node-throughput" data-node-id="@jvm.getNodeId">9</strong>
                         messages per second.
                     </span>
 
@@ -73,9 +73,3 @@
     }
 
 }
-
-    <!-- TODO:
-    show when not processing (incl "locked")
-    show cache sizes when paused,
-    update processing sec/node
-    -->

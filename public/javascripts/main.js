@@ -87,34 +87,62 @@ $(document).ready(function() {
 
     // Updating total event counts;
     (function updateTotalEvents() {
-        $.ajax({
-            url: '/a/messagecounts/total',
-            success: function(data) {
-                $(".total-events").html(data.events);
-            },
-            error: function() {
-                $(".total-events").html("?");
-            },
-            complete: function() {
-                setTimeout(updateTotalEvents, 2500);
-            }
-        });
+        if ($(".total-events").length > 0) {
+            $.ajax({
+                url: '/a/messagecounts/total',
+                success: function(data) {
+                    $(".total-events").html(data.events);
+                },
+                error: function() {
+                    $(".total-events").html("?");
+                },
+                complete: function() {
+                    setTimeout(updateTotalEvents, 2500);
+                }
+            });
+        }
     })();
 
     // Updating total throughput.
     (function updateTotalThroughput() {
-        $.ajax({
-            url: '/a/system/throughput',
-            success: function(data) {
-                $(".total-throughput").html(data.throughput);
-            },
-            error: function() {
-                $(".total-throughput").html("?");
-            },
-            complete: function() {
-                setTimeout(updateTotalThroughput, 1000);
-            }
-        });
+        if ($(".total-throughput").length > 0) {
+            $.ajax({
+                url: '/a/system/throughput',
+                success: function(data) {
+                    $(".total-throughput").html(data.throughput);
+                },
+                error: function() {
+                    $(".total-throughput").html("?");
+                },
+                complete: function() {
+                    setTimeout(updateTotalThroughput, 1000);
+                }
+            });
+        }
+    })();
+
+    // Updating individual node throughput.
+    (function updateNodeThroughput() {
+        if ($(".node-throughput").length > 0) {
+            $(".node-throughput").each(function(i) {
+                var thisNodeT = $(this);
+                $.ajax({
+                    url: '/a/system/throughput/node/' + $(this).attr("data-node-id"),
+                    success: function(data) {
+                        thisNodeT.html(data.throughput);
+                    },
+                    error: function() {
+                        thisNodeT.html("?");
+                    },
+                    complete: function() {
+                        // Trigger next call of the whole function when we updated the last element.
+                        if (i == $(".node-throughput").length-1) {
+                            setTimeout(updateNodeThroughput, 1000);
+                        }
+                    }
+                });
+            });
+        };
     })();
 
     // Updating notification count badge.
