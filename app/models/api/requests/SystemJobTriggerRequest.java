@@ -17,34 +17,32 @@
  * along with Graylog2.  If not, see <http://www.gnu.org/licenses/>.
  *
  */
-package models.api.responses.system;
+package models.api.requests;
 
+import com.google.gson.Gson;
 import com.google.gson.annotations.SerializedName;
+import models.SystemJob;
+import models.User;
 
 /**
  * @author Lennart Koopmann <lennart@torch.sh>
  */
-public class SystemJobSummaryResponse {
+public class SystemJobTriggerRequest implements ApiRequest {
 
-    public String id;
-    public String description;
-    public String name;
+    @SerializedName("job_name")
+    public String jobName;
 
-    @SerializedName("node_id")
-    public String nodeId;
+    @SerializedName("creator_user_id")
+    public String creatorUserId;
 
-    @SerializedName("started_at")
-    public String startedAt;
+    public SystemJobTriggerRequest(SystemJob.Type type, User user) {
+        this.jobName = type.toString().toLowerCase();
+        this.creatorUserId = user.getId();
+    }
 
-    @SerializedName("started_by")
-    public String startedBy;
+    @Override
+    public String toJson() {
+        return new Gson().toJson(this);
+    }
 
-    @SerializedName("percent_complete")
-    public int percentComplete;
-
-    @SerializedName("is_cancelable")
-    public boolean isCancelable;
-
-    @SerializedName("provides_progress")
-    public boolean providesProgress;
 }

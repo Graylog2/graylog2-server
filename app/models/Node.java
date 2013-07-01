@@ -29,11 +29,14 @@ import org.joda.time.DateTime;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.Random;
 
 /**
  * @author Lennart Koopmann <lennart@torch.sh>
  */
 public class Node {
+
+    private static Random randomGenerator = new Random();
 
     private final String transportAddress;
     private final DateTime lastSeen;
@@ -63,6 +66,11 @@ public class Node {
         }
 
         return nodes;
+    }
+
+    public static Node random() throws IOException, APIException {
+        List<Node> nodes = all();
+        return all().get(randomGenerator.nextInt(nodes.size()));
     }
 
     public String getTransportAddress() {

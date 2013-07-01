@@ -19,8 +19,20 @@
  */
 package controllers;
 
+import lib.APIException;
+import lib.Api;
+import models.SystemJob;
+import play.Logger;
+import play.mvc.Http;
 import play.mvc.Result;
+
+import java.io.IOException;
+
+import static controllers.AuthenticatedController.currentUser;
+import static play.mvc.Controller.request;
+import static play.mvc.Results.forbidden;
 import static play.mvc.Results.redirect;
+import static play.mvc.Results.status;
 
 /**
  * @author Lennart Koopmann <lennart@torch.sh>
@@ -28,21 +40,23 @@ import static play.mvc.Results.redirect;
 public class SystemJobsController {
 
     public static Result trigger() {
-        return redirect(routes.SystemController.index());
+        Http.RequestBody body = request().body();
 
-        /*try {
-            List<Notification> notifications = Notification.all();
-            List<SystemJob> systemJobs = SystemJob.all();
-            List<SystemMessage> systemMessages = SystemMessage.all();
-            ESClusterHealth clusterHealth = ESClusterHealth.get();
+        if (body.asFormUrlEncoded().get("job") == null) {
+            Logger.warn("No job name provided.");
+            return forbidden();
+        }
 
-            return ok(views.html.system.index.render(currentUser(), systemJobs, clusterHealth, systemMessages, notifications));
+        try {
+            SystemJob.trigger(SystemJob.Type.valueOf(body.asFormUrlEncoded().get("job")[0]), currentUser());
+            return redirect(routes.SystemController.index());
         } catch (IOException e) {
             return status(504, views.html.errors.error.render(Api.ERROR_MSG_IO, e, request()));
         } catch (APIException e) {
-            String message = "Could not fetch system information. We expected HTTP 200, but got a HTTP " + e.getHttpCode() + ".";
+            String message = "Could not trigger system job. We expected HTTP 202, but got a HTTP " + e.getHttpCode() + ".";
             return status(504, views.html.errors.error.render(message, e, request()));
-        }*/
+        }
+
     }
 
 }

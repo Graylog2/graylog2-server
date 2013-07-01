@@ -62,7 +62,7 @@
         @for(job <- jobs) {
             <div class="systemjob systemjob-progress systemjob-active" id="job-@job.getId()" data-job-id="@job.getId()">
                 <i class="icon icon-cog"></i>
-                Started @job.getDescription()
+                Started @job.getName
                 on <a href="#">implement.me.local</a>
                 at @job.getStartedAt()
 

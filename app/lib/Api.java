@@ -5,7 +5,9 @@ import com.google.gson.Gson;
 import com.ning.http.client.AsyncHttpClient;
 import com.ning.http.client.AsyncHttpClientConfig;
 import com.ning.http.client.Response;
+import com.ning.http.client.StringPart;
 import models.Node;
+import models.api.requests.ApiRequest;
 
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
@@ -79,7 +81,29 @@ public class Api {
         return (T) null;
     }
 
+    public static <T> T post(URL url, String body, int expectedResponseCode, Class<T> responseClass) throws APIException, IOException {
+        try {
+            AsyncHttpClient.BoundRequestBuilder requestBuilder = client.preparePost(url.toString());
+            requestBuilder.addHeader("Accept", "application/json");
+            requestBuilder.setBody(body);
+            final Response response = requestBuilder.execute().get();
 
+            if (response.getStatusCode() != expectedResponseCode) {
+                throw new APIException(response.getStatusCode(), "REST call [" + url + "] returned " + response.getStatusText());
+            }
+
+            Gson gson = new Gson();
+            return gson.fromJson(response.getResponseBody("UTF-8"), responseClass);
+        } catch (InterruptedException e) {
+            // TODO
+        } catch (ExecutionException e) {
+            throw new APIException(-1, "REST call [" + url + "] failed: " + e.getMessage());
+        } catch (MalformedURLException e) {
+            throw new RuntimeException("Malformed URL.", e);
+        }
+
+        return (T) null;
+    }
 
 
 
@@ -119,7 +143,7 @@ public class Api {
     ////////
 
     public static <T> T get(String part, Class<T> responseClass) throws IOException, APIException {
-        return get(buildTarget(Configuration.getServerRestUris().get(0), part), responseClass);
+        return get(buildTarget(Node.random(), part), responseClass);
     }
 
 	public static <T> T get(Node node, String part, Class<T> responseClass) throws IOException, APIException {
@@ -130,6 +154,13 @@ public class Api {
         return get(buildTarget(host, part), responseClass);
     }
 
+    public static <T> T post(Node node, String part, ApiRequest body, Class<T> responseClass) throws IOException, APIException {
+        return post(buildTarget(node, part), body.toJson(), 201, responseClass);
+    }
+
+    public static <T> T post(Node node, String part, ApiRequest body, int expectedResponseCode, Class<T> responseClass) throws IOException, APIException {
+        return post(buildTarget(node, part), body.toJson(), expectedResponseCode, responseClass);
+    }
 
     public static <T> T put(Node node, String part, Class<T> responseClass) throws IOException, APIException {
         return put(buildTarget(node, part), responseClass);

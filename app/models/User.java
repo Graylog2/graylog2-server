@@ -15,6 +15,11 @@ public class User {
 		
 		return user;
 	}
+
+    public String getId() {
+        // TODO implement me
+        return "foo-bar-userid";
+    }
 	
 	public String getName() {
 		return name;
