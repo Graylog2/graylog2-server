@@ -20,6 +20,7 @@
 
 package org.graylog2.inputs.gelf;
 
+import org.graylog2.GraylogServerStub;
 import org.graylog2.gelf.GELFChunkManager;
 import org.graylog2.gelf.GELFMessageChunk;
 import com.google.common.primitives.Bytes;
@@ -30,7 +31,7 @@ import static org.junit.Assert.*;
 
 public class GELFChunkManagerTest {
 
-    private Core server = null;
+    private Core server = new GraylogServerStub();
 
     @Test
     public void testIsCompleteDetectsAsNotComplete() throws Exception {

@@ -32,7 +32,7 @@ public class ProcessBufferStub extends ProcessBuffer {
     GraylogServerStub serverStub;
 
     public ProcessBufferStub(GraylogServerStub server) {
-        super(null, new BasicCache());
+        super(server, new BasicCache());
         serverStub = server;
     }
 
