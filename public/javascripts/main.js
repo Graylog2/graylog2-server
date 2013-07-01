@@ -300,6 +300,11 @@ $(document).ready(function() {
         return false;
     });
 
+    // Submit button confirmation.
+    $('button[data-confirm]').on("click", function() {
+        return confirm($(this).attr("data-confirm"));
+    });
+
 	function displayFailureInSidebar(message) {
 		x = "<span class='alert alert-error sidebar-alert'><i class='icon-warning-sign'></i> " + message + "</span>"
 		$("#sidebar-inner").html(x);

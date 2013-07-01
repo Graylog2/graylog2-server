@@ -302,6 +302,10 @@ form #stream-rules {
     font-size: 13px;
 }
 
+.notification form {
+    margin-bottom: 0px;
+}
+
 .notification-solutions h4 {
     font-size: 13px;
     font-weight: bold;

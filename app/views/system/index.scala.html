@@ -26,17 +26,21 @@
                         Your options:
                     </h4>
 
-                    @for((jobType, description) <- notification.get().options()) {
-                        <label class="radio">
-                            <input type="radio" value="@jobType" name="@notification.getType().toString().toLowerCase()_solution">
-                            @description
-                        </label>
-                    }
+                    @if(!notification.get().options().isEmpty) {
+                        <form action="/systemjobs/trigger" method="POST">
+                            @for((jobType, description) <- notification.get().options()) {
+                                <label class="radio">
+                                    <input type="radio" value="@jobType" name="job" required="required">
+                                    @description
+                                </label>
+                            }
 
-                    <a href="#" class="btn">
-                        <i class="icon icon-ok"></i>
-                        Trigger repair job
-                    </a>
+                            <button type="submit" class="btn" data-confirm="Execute select option?">
+                                <i class="icon icon-ok"></i>
+                                Trigger repair job
+                            </button>
+                        </form>
+                    }
                 </div>
             </div>
         }
