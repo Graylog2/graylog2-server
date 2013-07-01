@@ -291,7 +291,7 @@ $(document).ready(function() {
             type: "PUT",
             data: { node_id: $(this).attr("data-node-id") },
             success: function(data) {
-                document.location.href = "/system/message_processing";
+                document.location.href = "/system/nodes";
             },
             error: function() {
                 showError("Could not " + action + " message processing.");

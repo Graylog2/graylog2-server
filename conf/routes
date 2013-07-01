@@ -22,7 +22,7 @@ GET        /streams/new                       controllers.StreamsController.newS
 
 # System
 GET        /system                            controllers.SystemController.index()
-GET        /system/message_processing         controllers.SystemController.messageProcessing()
+GET        /system/nodes                     controllers.SystemController.nodes()
 
 # API: Message counts and histograms
 GET        /a/messagecounts/histogram         controllers.MessageCountsController.histogram(timerange ?= "")
