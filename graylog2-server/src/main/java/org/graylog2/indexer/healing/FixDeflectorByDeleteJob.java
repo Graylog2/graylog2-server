@@ -22,8 +22,10 @@ package org.graylog2.indexer.healing;
 
 import org.graylog2.Core;
 import org.graylog2.ProcessingPauseLockedException;
+import org.graylog2.activities.Activity;
 import org.graylog2.buffers.Buffers;
 import org.graylog2.indexer.Deflector;
+import org.graylog2.notifications.Notification;
 import org.graylog2.systemjobs.SystemJob;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -76,6 +78,11 @@ public class FixDeflectorByDeleteJob extends SystemJob {
             // lol checked exceptions
             throw new RuntimeException("Could not unlock processing pause.", e);
         }
+
+        progress = 90;
+        core.getActivityWriter().write(new Activity("Notification condition [" + Notification.Type.DEFLECTOR_EXISTS_AS_INDEX + "] " +
+                "has been fixed.", this.getClass()));
+        Notification.fixed(core, Notification.Type.DEFLECTOR_EXISTS_AS_INDEX);
 
         progress = 100;
         LOG.info("Finished.");
