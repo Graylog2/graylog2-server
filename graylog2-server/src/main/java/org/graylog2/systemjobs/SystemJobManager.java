@@ -57,7 +57,14 @@ public class SystemJobManager {
         jobs = new ConcurrentHashMap<String, SystemJob>();
     }
 
-    public String submit(final SystemJob job) {
+    public String submit(final SystemJob job) throws SystemJobConcurrencyException {
+        int concurrent = concurrentJobs(job.getClass());
+
+        if (concurrent >= job.maxConcurrency()) {
+            throw new SystemJobConcurrencyException("The maximum of parallel [" + job.getClass().getCanonicalName().toString() + "] is locked " +
+                    "to <" + job.maxConcurrency() + "> but <" + concurrent + "> are running.");
+        }
+
         final String jobClass = job.getClass().getCanonicalName();
 
         job.setId(new UUID().toString());
@@ -85,6 +92,18 @@ public class SystemJobManager {
 
     public Map<String, SystemJob> getRunningJobs() {
         return jobs;
+    }
+
+    public int concurrentJobs(Class jobClass) {
+        int concurrent = 0;
+
+        for (SystemJob job : jobs.values()) {
+            if (job.getClass().equals(jobClass)) {
+                concurrent += 1;
+            }
+        }
+
+        return concurrent;
     }
 
 }

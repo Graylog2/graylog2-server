@@ -40,6 +40,7 @@ public abstract class SystemJob {
     public abstract void execute();
     public abstract void requestCancel();
     public abstract int getProgress();
+    public abstract int maxConcurrency();
 
     public abstract boolean providesProgress();
     public abstract boolean isCancelable();

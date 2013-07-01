@@ -28,6 +28,7 @@ import org.graylog2.rest.resources.RestResource;
 import org.graylog2.rest.resources.system.jobs.requests.TriggerRequest;
 import org.graylog2.systemjobs.NoSuchJobException;
 import org.graylog2.systemjobs.SystemJob;
+import org.graylog2.systemjobs.SystemJobConcurrencyException;
 import org.graylog2.systemjobs.SystemJobFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -118,7 +119,12 @@ public class SystemJobResource extends RestResource {
             throw new WebApplicationException(400);
         }
 
-        core.getSystemJobManager().submit(job);
+        try {
+            core.getSystemJobManager().submit(job);
+        } catch (SystemJobConcurrencyException e) {
+            LOG.error("Concurrency level of this job reached: " + e.getMessage());
+            throw new WebApplicationException(400);
+        }
 
         return Response.status(Response.Status.ACCEPTED).build();
     }
