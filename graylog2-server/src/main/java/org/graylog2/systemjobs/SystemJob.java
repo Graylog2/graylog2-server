@@ -45,6 +45,7 @@ public abstract class SystemJob {
     public abstract boolean providesProgress();
     public abstract boolean isCancelable();
     public abstract String getDescription();
+    public abstract String getClassName();
 
     protected Core core;
     protected String id;
@@ -73,6 +74,7 @@ public abstract class SystemJob {
     public Map<String, Object> toMap() {
         return new HashMap<String, Object>() {{
             put("id", id);
+            put("name", getClassName()); // getting the concrete class, not this abstract one
             put("description", getDescription());
             put("started_at", Tools.getISO8601String(getStartedAt()));
             put("percent_complete", getProgress());

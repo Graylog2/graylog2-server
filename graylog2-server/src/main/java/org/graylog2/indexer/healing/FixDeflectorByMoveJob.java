@@ -134,5 +134,9 @@ public class FixDeflectorByMoveJob extends SystemJob {
                 "by hand after a notification. This operation can take some time depending on the number of messages " +
                 "that were already written into the deflector index.";
     }
+    @Override
+    public String getClassName() {
+        return this.getClass().getCanonicalName();
+    }
 
 }

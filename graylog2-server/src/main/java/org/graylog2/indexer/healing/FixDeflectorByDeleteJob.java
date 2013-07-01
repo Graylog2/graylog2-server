@@ -112,4 +112,9 @@ public class FixDeflectorByDeleteJob extends SystemJob {
                 "after a notification.";
     }
 
+    @Override
+    public String getClassName() {
+        return this.getClass().getCanonicalName();
+    }
+
 }

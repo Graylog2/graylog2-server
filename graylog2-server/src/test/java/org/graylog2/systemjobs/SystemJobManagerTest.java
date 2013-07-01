@@ -144,6 +144,11 @@ public class SystemJobManagerTest {
         public String getDescription() {
             return "Test Job. You better not use this anywhere else, bro.";
         }
+
+        @Override
+        public String getClassName() {
+            return getClass().getCanonicalName();
+        }
     }
 
     class AnotherLongRunningJob extends SystemJob {
@@ -191,6 +196,11 @@ public class SystemJobManagerTest {
         @Override
         public String getDescription() {
             return "Another Test Job. You better not use this anywhere else, bro.";
+        }
+
+        @Override
+        public String getClassName() {
+            return getClass().getCanonicalName();
         }
     }
 }

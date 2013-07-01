@@ -59,7 +59,7 @@ public class IndexRangesResource extends RestResource {
             core.getSystemJobManager().submit(rebuildJob);
         } catch (SystemJobConcurrencyException e) {
             LOG.error("Concurrency level of this job reached: " + e.getMessage());
-            throw new WebApplicationException(400);
+            throw new WebApplicationException(403);
         }
 
         return Response.status(Response.Status.ACCEPTED).build();

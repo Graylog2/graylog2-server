@@ -81,7 +81,7 @@ public class Indices {
                 .setSearchType(SearchType.SCAN)
                 .setScroll(new TimeValue(10000))
                 .setQuery(qb)
-                .setSize(100).execute().actionGet();
+                .setSize(350).execute().actionGet();
 
         while (true) {
             scrollResp = c.prepareSearchScroll(scrollResp.getScrollId()).setScroll(new TimeValue(60000)).execute().actionGet();

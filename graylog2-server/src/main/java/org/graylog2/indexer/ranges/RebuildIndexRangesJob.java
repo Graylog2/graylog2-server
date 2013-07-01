@@ -69,7 +69,7 @@ public class RebuildIndexRangesJob extends SystemJob {
 
     @Override
     public String getDescription() {
-        return "rebuilding index range information";
+        return "Rebuilds index range information.";
     }
 
     @Override
@@ -158,5 +158,10 @@ public class RebuildIndexRangesJob extends SystemJob {
     @Override
     public int maxConcurrency() {
         return MAX_CONCURRENCY;
+    }
+
+    @Override
+    public String getClassName() {
+        return this.getClass().getCanonicalName();
     }
 }
