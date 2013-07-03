@@ -171,14 +171,7 @@ public class Indexer {
 
         final BulkRequestBuilder request = client.prepareBulk();
         for (Message msg : messages) {
-            try {
-                String source = objectMapper.writeValueAsString(msg.toElasticSearchObject());
-
-                // we manually set the document ID to the same value to be able to match up documents later.
-                request.add(buildIndexRequest(Deflector.DEFLECTOR_NAME, source, msg.getId())); // Main index.
-            } catch (JsonProcessingException e) {
-                LOG.warn("Error while converting message to ElasticSearch JSON", e);
-            }
+            request.add(buildIndexRequest(Deflector.DEFLECTOR_NAME, msg.toElasticSearchObject(), msg.getId())); // Main index.
         }
 
         request.setConsistencyLevel(WriteConsistencyLevel.ONE);
@@ -272,7 +265,7 @@ public class Indexer {
         return indices;
     }
     
-    private IndexRequestBuilder buildIndexRequest(String index, String source, String id) {
+    private IndexRequestBuilder buildIndexRequest(String index, Map<String, Object> source, String id) {
         final IndexRequestBuilder b = new IndexRequestBuilder(client);
         
         /*
