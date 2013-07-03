@@ -16,6 +16,8 @@ misc/elasticsearch.yml.2
 misc/elasticsearch.yml.dev
 misc/convert_rsyslog_db_to_mongo.rb
 
+.DS_Store
+
 plugin/*/*.jar
 *_gl2plugin.jar
 
