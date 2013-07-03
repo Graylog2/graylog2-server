@@ -15,8 +15,8 @@ import org.elasticsearch.action.admin.indices.exists.indices.IndicesExistsReques
 import org.elasticsearch.action.admin.indices.exists.indices.IndicesExistsResponse;
 import org.elasticsearch.action.admin.indices.mapping.put.PutMappingRequest;
 import org.elasticsearch.action.admin.indices.stats.IndexStats;
-import org.elasticsearch.action.admin.indices.stats.IndicesStats;
 import org.elasticsearch.action.admin.indices.stats.IndicesStatsRequest;
+import org.elasticsearch.action.admin.indices.stats.IndicesStatsResponse;
 import org.elasticsearch.action.bulk.BulkRequestBuilder;
 import org.elasticsearch.action.bulk.BulkResponse;
 import org.elasticsearch.action.count.CountRequest;
@@ -115,11 +115,10 @@ public class EmbeddedElasticSearchClient {
     }
     
     public long getTotalIndexSize() {
-        return client.admin().indices().stats(
-                new IndicesStatsRequest().indices(allIndicesAlias()))
+        return client.admin().indices().stats(new IndicesStatsRequest().indices(allIndicesAlias()))
                 .actionGet()
-                .total()
-                .store()
+                .getTotal()
+                .getStore()
                 .getSize()
                 .getMb();
     }
@@ -155,17 +154,17 @@ public class EmbeddedElasticSearchClient {
     }
     
     public int getNumberOfNodesInCluster() {
-        return client.admin().cluster().nodesInfo(new NodesInfoRequest().all()).actionGet().nodes().length;
+        return client.admin().cluster().nodesInfo(new NodesInfoRequest().all()).actionGet().getNodes().length;
     }
     
     public long getTotalNumberOfMessagesInIndices() {
-        return client.count(new CountRequest(allIndicesAlias())).actionGet().count();
+        return client.count(new CountRequest(allIndicesAlias())).actionGet().getCount();
     }
     
     public Map<String, IndexStats> getIndices() {
-        ActionFuture<IndicesStats> isr = client.admin().indices().stats(new IndicesStatsRequest().all());
+        ActionFuture<IndicesStatsResponse> isr = client.admin().indices().stats(new IndicesStatsRequest().all());
         
-        return isr.actionGet().indices();
+        return isr.actionGet().getIndices();
     }
 
     public IndexStats getRecentIndex() {
@@ -182,7 +181,7 @@ public class EmbeddedElasticSearchClient {
     
     public boolean indexExists(String index) {
         ActionFuture<IndicesExistsResponse> existsFuture = client.admin().indices().exists(new IndicesExistsRequest(index));
-        return existsFuture.actionGet().exists();
+        return existsFuture.actionGet().isExists();
     }
 
     public boolean createIndex(String indexName) {
@@ -194,12 +193,12 @@ public class EmbeddedElasticSearchClient {
         cir.settings(settings);
         
         final ActionFuture<CreateIndexResponse> createFuture = client.admin().indices().create(cir);
-        final boolean acknowledged = createFuture.actionGet().acknowledged();
+        final boolean acknowledged = createFuture.actionGet().isAcknowledged();
         if (!acknowledged) {
             return false;
         }
         final PutMappingRequest mappingRequest = Mapping.getPutMappingRequest(client, indexName, server.getConfiguration().getElasticSearchAnalyzer());
-        final boolean mappingCreated = client.admin().indices().putMapping(mappingRequest).actionGet().acknowledged();
+        final boolean mappingCreated = client.admin().indices().putMapping(mappingRequest).actionGet().isAcknowledged();
         return acknowledged && mappingCreated;
     }
     
@@ -214,26 +213,26 @@ public class EmbeddedElasticSearchClient {
         crb.setSettings(settings);
         
         final ActionFuture<CreateIndexResponse> createFuture = client.admin().indices().create(crb.request());
-        final boolean acknowledged = createFuture.actionGet().acknowledged();
+        final boolean acknowledged = createFuture.actionGet().isAcknowledged();
         if (!acknowledged) {
             return false;
         }
         final PutMappingRequest mappingRequest = Mapping.getPutMappingRequest(client, server.getConfiguration().getRecentIndexName(), server.getConfiguration().getElasticSearchAnalyzer());
-        final boolean mappingCreated = client.admin().indices().putMapping(mappingRequest).actionGet().acknowledged();
+        final boolean mappingCreated = client.admin().indices().putMapping(mappingRequest).actionGet().isAcknowledged();
         return acknowledged && mappingCreated;
     }
     
     public boolean cycleAlias(String aliasName, String targetIndex) {
         return client.admin().indices().prepareAliases()
                 .addAlias(targetIndex, aliasName)
-                .execute().actionGet().acknowledged();
+                .execute().actionGet().isAcknowledged();
     }
     
     public boolean cycleAlias(String aliasName, String targetIndex, String oldIndex) {
         return client.admin().indices().prepareAliases()
                 .removeAlias(oldIndex, aliasName)
                 .addAlias(targetIndex, aliasName)
-                .execute().actionGet().acknowledged();
+                .execute().actionGet().isAcknowledged();
     }
     
     public long numberOfMessages(String indexName) throws IndexNotFoundException {
@@ -244,7 +243,7 @@ public class EmbeddedElasticSearchClient {
             throw new IndexNotFoundException();
         }
         
-        return index.getPrimaries().docs().count();
+        return index.getPrimaries().getDocs().getCount();
     }
 
     public boolean bulkIndex(final List<LogMessage> messages) {
@@ -275,10 +274,10 @@ public class EmbeddedElasticSearchClient {
         final BulkResponse recentResponse = recentBulkFuture.actionGet();
         
         LOG.debug("Deflector index: Bulk indexed {} messages, took {} ms, failures: {}",
-                new Object[] { mainResponse.items().length, mainResponse.getTookInMillis(), mainResponse.hasFailures() });
+                new Object[] { mainResponse.getItems().length, mainResponse.getTookInMillis(), mainResponse.hasFailures() });
         
         LOG.debug("Recent index: Bulk indexed {} messages, took {} ms, failures: {}",
-                new Object[] { recentResponse.items().length, recentResponse.getTookInMillis(), recentResponse.hasFailures() });
+                new Object[] { recentResponse.getItems().length, recentResponse.getTookInMillis(), recentResponse.hasFailures() });
         
         return !mainResponse.hasFailures() && !recentResponse.hasFailures();
     }

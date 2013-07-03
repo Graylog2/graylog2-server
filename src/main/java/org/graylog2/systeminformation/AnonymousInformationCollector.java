@@ -89,7 +89,7 @@ public class AnonymousInformationCollector {
 
     private long recentIndexSize() {
         try {
-            return server.getIndexer().getRecentIndex().total().store().size().getMb();
+            return server.getIndexer().getRecentIndex().getTotal().getStore().size().getMb();
         } catch (Exception e) {
             LOG.warn("Couldn't retrieve recent index size", e);
             return -1;
