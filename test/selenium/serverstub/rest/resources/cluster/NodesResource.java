@@ -17,54 +17,50 @@
  * along with Graylog2.  If not, see <http://www.gnu.org/licenses/>.
  *
  */
-package selenium.serverstub.rest.resources.authentication;
+package selenium.serverstub.rest.resources.cluster;
 
+import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import org.codehaus.jackson.map.ObjectMapper;
+import org.joda.time.DateTime;
+import org.joda.time.format.ISODateTimeFormat;
 import selenium.serverstub.ServerStub;
 import selenium.serverstub.rest.resources.RestResource;
 
-import javax.ws.rs.*;
+import javax.ws.rs.GET;
+import javax.ws.rs.Path;
 import javax.ws.rs.core.Context;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response;
-import java.io.IOException;
+import java.util.List;
 import java.util.Map;
 
 /**
  * @author Lennart Koopmann <lennart@torch.sh>
  */
-@Path("/session")
-public class SessionResource extends RestResource {
+@Path("/cluster/nodes")
+public class NodesResource extends RestResource {
+
     private final ObjectMapper objectMapper = new ObjectMapper();
 
     @Context
     com.sun.jersey.api.core.ResourceConfig rc;
 
-    @POST
+    @GET
     @Path("/")
-    public Response create(String body, @QueryParam("pretty") boolean prettyPrint) {
+    public String notifications() {
         ServerStub core = (ServerStub) rc.getProperty("core");
 
-        LoginRequest lr;
-        try {
-            lr = objectMapper.readValue(body, LoginRequest.class);
-        } catch(IOException e) { throw new RuntimeException(e); }
+        List<Map<String, Object>> nodes = Lists.newArrayList();
 
-        if (core.users.containsKey(lr.username) && core.users.get(lr.username).equals(lr.password)) {
-            Map<String, Object> result = Maps.newHashMap();
-            result.put("username", lr.username);
-            result.put("full_name", "Stub User");
+        Map<String, Object> nodeMap = Maps.newHashMap();
+        nodeMap.put("node_id", core.nodeId);
+        nodeMap.put("transport_address", core.transportAddress);
+        nodeMap.put("last_seen", ISODateTimeFormat.dateTime().print(new DateTime()));
+        nodes.add(nodeMap);
 
-            return Response.ok(json(result)).build();
-        } else {
-            return Response.status(Response.Status.UNAUTHORIZED).build();
-        }
+        Map<String, Object> result = Maps.newHashMap();
+        result.put("total", nodes.size());
+        result.put("nodes", nodes);
 
-    }
-
-    private class LoginRequest {
-        public String username;
-        public String password;
+        return json(result);
     }
 }

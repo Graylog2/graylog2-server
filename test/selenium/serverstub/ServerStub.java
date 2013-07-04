@@ -21,13 +21,19 @@ package selenium.serverstub;
 
 import java.io.IOException;
 import java.net.URI;
+import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 
+import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.sun.jersey.api.container.grizzly2.GrizzlyServerFactory;
 import com.sun.jersey.api.core.PackagesResourceConfig;
 import com.sun.jersey.api.core.ResourceConfig;
 import org.glassfish.grizzly.http.server.HttpServer;
+import org.joda.time.DateTime;
+import org.joda.time.format.ISODateTimeFormat;
+
 import javax.ws.rs.core.UriBuilder;
 
 /**
@@ -36,6 +42,12 @@ import javax.ws.rs.core.UriBuilder;
 public class ServerStub {
 
     public Map<String, String> users = Maps.newHashMap();
+    public List<Map<String, String>> systemMessages = Lists.newArrayList();
+    public List<Map<String, String>> systemNotifications = Lists.newArrayList();
+    public List<Map<String, Object>> systemJobs = Lists.newArrayList();
+
+    public String nodeId;
+    public String transportAddress;
 
     private final int restPort;
 
@@ -43,6 +55,9 @@ public class ServerStub {
 
     public ServerStub(int restPort) {
         this.restPort = restPort;
+        this.nodeId = UUID.randomUUID().toString();
+        this.transportAddress = "http://127.0.0.1:" + restPort + "/";
+
     }
 
     public void initialize() {
@@ -67,6 +82,25 @@ public class ServerStub {
         System.out.println("Started stub REST API at " + restUri);
 
         return GrizzlyServerFactory.createHttpServer(restUri, rc);
+    }
+
+    public void addNotification(DateTime timestamp, String severity, String type) {
+        Map<String, String> notification = Maps.newHashMap();
+        notification.put("timestamp", ISODateTimeFormat.dateTime().print(timestamp));
+        notification.put("severity", severity);
+        notification.put("type", type);
+
+        systemNotifications.add(notification);
+    }
+
+    public void addSystemMessage(String callerClass, String content, DateTime timestamp, String nodeId) {
+        Map<String, String> message = Maps.newHashMap();
+        message.put("caller", callerClass);
+        message.put("content", content);
+        message.put("timestamp", ISODateTimeFormat.dateTime().print(timestamp));
+        message.put("node_id", nodeId);
+
+        systemMessages.add(message);
     }
 
 }

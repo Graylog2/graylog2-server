@@ -35,13 +35,9 @@ public class RestResource {
 
     protected RestResource() { /* */ }
 
-    protected String json(Object x, boolean prettyPrint) {
+    protected String json(Object x) {
         try {
-            if (prettyPrint) {
-                return objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(x);
-            } else {
-                return objectMapper.writeValueAsString(x);
-            }
+            return objectMapper.writeValueAsString(x);
         } catch (JsonProcessingException e) {
             System.out.println(e);
             throw new WebApplicationException(e, Response.Status.INTERNAL_SERVER_ERROR);
