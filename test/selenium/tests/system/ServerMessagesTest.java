@@ -19,6 +19,7 @@
  */
 package selenium.tests.system;
 
+import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import lib.Configuration;
 import org.joda.time.DateTime;
@@ -42,8 +43,7 @@ public class ServerMessagesTest extends LoggedIn {
     public void showsServerMessages() {
         running(testServer(WEB_PORT), new Runnable() {
             public void run() {
-                Configuration.setServerRestUris("http://127.0.0.1:" + SERVER_STUB_PORT);
-
+                serverStub.systemMessages = Lists.newArrayList();
                 serverStub.addSystemMessage(
                         "solveigPlease",
                         "test message 1",
@@ -69,6 +69,21 @@ public class ServerMessagesTest extends LoggedIn {
 
                 assertEquals("foo-9001", browser.find(".system-messages tbody tr", 1).find("td", 1).html());
                 assertEquals("test message 2", browser.find(".system-messages tbody tr", 1).find("td", 2).html());
+            }
+        });
+    }
+
+    @Test
+    public void showsEmptyServerMessagesTable() {
+        running(testServer(WEB_PORT), new Runnable() {
+            public void run() {
+                serverStub.systemMessages = Lists.newArrayList();
+
+                doLogin();
+                browser.goTo("/system");
+
+                assertEquals(1, browser.find(".system-messages").size());
+                assertEquals(0, browser.find(".system-messages tbody tr").size());
             }
         });
     }
