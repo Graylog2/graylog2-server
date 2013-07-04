@@ -22,8 +22,8 @@ package org.graylog2.buffers;
 
 import com.codahale.metrics.Meter;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
-import com.lmax.disruptor.MultiThreadedClaimStrategy;
 import com.lmax.disruptor.dsl.Disruptor;
+import com.lmax.disruptor.dsl.ProducerType;
 import org.graylog2.Core;
 import org.graylog2.buffers.processors.ProcessBufferProcessor;
 import org.graylog2.plugin.buffers.Buffer;
@@ -35,7 +35,6 @@ import org.slf4j.LoggerFactory;
 
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import java.util.concurrent.TimeUnit;
 import org.graylog2.plugin.buffers.BufferOutOfCapacityException;
 
 import static com.codahale.metrics.MetricRegistry.name;
@@ -71,10 +70,11 @@ public class ProcessBuffer extends Buffer {
     }
 
     public void initialize() {
-        Disruptor<MessageEvent> disruptor = new Disruptor<MessageEvent>(
+        Disruptor disruptor = new Disruptor<MessageEvent>(
                 MessageEvent.EVENT_FACTORY,
+                server.getConfiguration().getRingSize(),
                 executor,
-                new MultiThreadedClaimStrategy(server.getConfiguration().getRingSize()),
+                ProducerType.MULTI,
                 server.getConfiguration().getProcessorWaitStrategy()
         );
         
