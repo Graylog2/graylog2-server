@@ -19,6 +19,7 @@
  */
 package org.graylog2.rest.resources.system;
 
+import com.codahale.metrics.Counter;
 import com.codahale.metrics.Metric;
 import com.codahale.metrics.annotation.Timed;
 import com.google.common.collect.Maps;
@@ -52,7 +53,21 @@ public class MetricsResource extends RestResource {
         Core core = (Core) rc.getProperty("core");
 
         Map<String, Object> result = Maps.newHashMap();
+        Map<String, Counter>
         result.put("metrics", core.metrics().getMetrics());
+
+        return json(result, prettyPrint);
+    }
+
+    @GET
+    @Timed
+    @Path("/names")
+    @Produces(MediaType.APPLICATION_JSON)
+    public String metricNames(@QueryParam("pretty") boolean prettyPrint) {
+        Core core = (Core) rc.getProperty("core");
+
+        Map<String, Object> result = Maps.newHashMap();
+        result.put("names", core.metrics().getNames());
 
         return json(result, prettyPrint);
     }
