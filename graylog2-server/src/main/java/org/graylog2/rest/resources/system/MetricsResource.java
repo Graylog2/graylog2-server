@@ -53,7 +53,7 @@ public class MetricsResource extends RestResource {
         Core core = (Core) rc.getProperty("core");
 
         Map<String, Object> result = Maps.newHashMap();
-        Map<String, Counter>
+
         result.put("metrics", core.metrics().getMetrics());
 
         return json(result, prettyPrint);
