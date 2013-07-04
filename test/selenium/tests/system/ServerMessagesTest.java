@@ -64,7 +64,7 @@ public class ServerMessagesTest extends LoggedIn {
                 assertEquals(1, browser.find(".system-messages").size());
                 assertEquals(2, browser.find(".system-messages tbody tr").size());
 
-                assertEquals("foo-bar-123", browser.find(".system-messages tbody tr", 0).find("td", 1).html());
+                assertEquals("FAIL TEST", browser.find(".system-messages tbody tr", 0).find("td", 1).html());
                 assertEquals("test message 1", browser.find(".system-messages tbody tr", 0).find("td", 2).html());
 
                 assertEquals("foo-9001", browser.find(".system-messages tbody tr", 1).find("td", 1).html());
