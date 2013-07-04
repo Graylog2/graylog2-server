@@ -12,6 +12,8 @@ coverage
 build.xml
 nbactions.xml
 
+.DS_Store
+
 graylog2-server/dependency-reduced-pom.xml
 
 misc/elasticsearch.yml.2
