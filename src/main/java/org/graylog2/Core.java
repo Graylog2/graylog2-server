@@ -176,6 +176,8 @@ public class Core implements GraylogServer {
             @Override
             public void run() {
                 activityWriter.write(new Activity("Shutting down.", GraylogServer.class));
+                processBuffer.shutdown();
+                outputBuffer.shutdown();
             }
         });
     }
