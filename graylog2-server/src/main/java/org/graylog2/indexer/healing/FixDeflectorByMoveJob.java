@@ -21,11 +21,11 @@ package org.graylog2.indexer.healing;
 
 import org.graylog2.Core;
 import org.graylog2.ProcessingPauseLockedException;
-import org.graylog2.activities.Activity;
+import org.graylog2.system.activities.Activity;
 import org.graylog2.buffers.Buffers;
 import org.graylog2.indexer.Deflector;
 import org.graylog2.notifications.Notification;
-import org.graylog2.systemjobs.SystemJob;
+import org.graylog2.system.jobs.SystemJob;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

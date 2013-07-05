@@ -17,7 +17,7 @@
  * along with Graylog2.  If not, see <http://www.gnu.org/licenses/>.
  *
  */
-package org.graylog2.systemjobs;
+package org.graylog2.system.jobs;
 
 import org.graylog2.Core;
 import org.graylog2.indexer.healing.FixDeflectorByDeleteJob;

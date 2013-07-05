@@ -22,7 +22,7 @@ import org.elasticsearch.common.xcontent.XContentType;
 import org.elasticsearch.node.Node;
 import org.elasticsearch.node.NodeBuilder;
 import org.graylog2.Core;
-import org.graylog2.activities.Activity;
+import org.graylog2.system.activities.Activity;
 import org.graylog2.indexer.cluster.Cluster;
 import org.graylog2.indexer.counts.Counts;
 import org.graylog2.indexer.indices.Indices;

@@ -24,7 +24,7 @@ import com.mongodb.BasicDBObject;
 import com.mongodb.DBObject;
 import org.bson.types.ObjectId;
 import org.graylog2.Core;
-import org.graylog2.activities.Activity;
+import org.graylog2.system.activities.Activity;
 import org.graylog2.database.Persisted;
 import org.graylog2.database.validators.Validator;
 import org.slf4j.Logger;

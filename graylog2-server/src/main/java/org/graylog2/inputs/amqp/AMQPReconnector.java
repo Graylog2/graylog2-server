@@ -25,7 +25,7 @@ import com.rabbitmq.client.ShutdownSignalException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.graylog2.Core;
-import org.graylog2.activities.Activity;
+import org.graylog2.system.activities.Activity;
 
 import static com.codahale.metrics.MetricRegistry.name;
 

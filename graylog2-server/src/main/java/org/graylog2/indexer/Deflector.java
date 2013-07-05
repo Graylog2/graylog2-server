@@ -24,7 +24,7 @@ import com.google.common.collect.Maps;
 import org.elasticsearch.action.admin.indices.stats.IndexStats;
 import org.elasticsearch.indices.InvalidAliasNameException;
 import org.graylog2.Core;
-import org.graylog2.activities.Activity;
+import org.graylog2.system.activities.Activity;
 import org.graylog2.indexer.ranges.IndexRange;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

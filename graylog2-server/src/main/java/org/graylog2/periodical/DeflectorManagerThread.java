@@ -20,7 +20,7 @@
 package org.graylog2.periodical;
 
 import org.graylog2.Core;
-import org.graylog2.activities.Activity;
+import org.graylog2.system.activities.Activity;
 import org.graylog2.indexer.Deflector;
 import org.graylog2.indexer.NoTargetIndexException;
 import org.graylog2.notifications.Notification;
