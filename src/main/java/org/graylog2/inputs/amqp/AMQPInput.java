@@ -55,6 +55,15 @@ public class AMQPInput implements MessageInput {
             executor.submit(consumer);
             consumers.put(config.getId(), consumer);
         }
+
+        Runtime.getRuntime().addShutdownHook(new Thread() {
+            @Override
+            public void run() {
+                for (AMQPConsumer consumer : consumers.values()) {
+                    consumer.disconnect();
+                }
+            }
+        });
     }
     
     public static ExecutorService getThreadPool() {
