@@ -56,6 +56,7 @@ import org.graylog2.plugin.indexer.MessageGateway;
 public class EmbeddedElasticSearchClient {
     private static final Logger LOG = LoggerFactory.getLogger(EmbeddedElasticSearchClient.class);
 
+    private Node node;
     private Client client;
     private final MessageGateway messageGateway;
     public static final String TYPE = "message";
@@ -84,17 +85,14 @@ public class EmbeddedElasticSearchClient {
         } catch (IOException e) {
             throw new RuntimeException("Cannot read elasticsearch configuration.", e);
         }
+
         builder.settings().put(settings);
-        final Node node = builder.node();
+        node = builder.node();
         client = node.client();
+    }
 
-        Runtime.getRuntime().addShutdownHook(new Thread() {
-            @Override
-            public void run() {
-                node.close();
-            }
-        });
-
+    public void close() {
+        node.close();
     }
     
     public Client getClient() {
