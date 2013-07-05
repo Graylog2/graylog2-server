@@ -19,7 +19,6 @@
  */
 package org.graylog2.periodical;
 
-import com.mongodb.DBObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.graylog2.Core;
@@ -48,7 +47,7 @@ public class DeflectorInformationWriterThread implements Runnable {
         // Where is the deflector pointing to?
         String deflectorName;
         try {
-            deflectorName = graylogServer.getDeflector().getCurrentTargetName();
+            deflectorName = graylogServer.getDeflector().getNewestTargetName();
         } catch(Exception e) {
             deflectorName = "NO TARGET";
         }

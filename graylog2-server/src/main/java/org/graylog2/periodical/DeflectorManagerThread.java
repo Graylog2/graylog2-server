@@ -22,6 +22,7 @@ package org.graylog2.periodical;
 import org.graylog2.Core;
 import org.graylog2.activities.Activity;
 import org.graylog2.indexer.Deflector;
+import org.graylog2.indexer.NoTargetIndexException;
 import org.graylog2.notifications.Notification;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -59,7 +60,7 @@ public class DeflectorManagerThread implements Runnable { // public class Klimpe
         long messageCountInTarget = 0;
         
         try {
-            currentTarget = this.graylogServer.getDeflector().getCurrentTargetName();
+            currentTarget = this.graylogServer.getDeflector().getNewestTargetName();
             messageCountInTarget = this.graylogServer.getIndexer().indices().numberOfMessages(currentTarget);
         } catch(Exception e) {
             LOG.error("Tried to check for number of messages in current deflector target but did not find index. Aborting.", e);
@@ -93,8 +94,22 @@ public class DeflectorManagerThread implements Runnable { // public class Klimpe
             } else {
                 graylogServer.getDeflector().setUp();
             }
-        }
+        } else {
+            try {
+                String currentTarget = graylogServer.getDeflector().getCurrentActualTargetIndex();
+                String shouldBeTarget = graylogServer.getDeflector().getNewestTargetName();
 
+                if (!currentTarget.equals(shouldBeTarget)) {
+                    String msg = "Deflector is pointing to [" + currentTarget + "], not the newest one: [" + shouldBeTarget + "]. Re-pointing.";
+                    LOG.warn(msg);
+                    graylogServer.getActivityWriter().write(new Activity(msg, DeflectorManagerThread.class));
+
+                    graylogServer.getDeflector().pointTo(shouldBeTarget, currentTarget);
+                }
+            } catch (NoTargetIndexException e) {
+                LOG.warn("Deflector is not up. Not trying to point to another index.");
+            }
+        }
 
     }
     

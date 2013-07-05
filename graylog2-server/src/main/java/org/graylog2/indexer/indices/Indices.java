@@ -25,6 +25,7 @@ import com.google.common.collect.ImmutableMap;
 import org.elasticsearch.action.ActionFuture;
 import org.elasticsearch.action.WriteConsistencyLevel;
 import org.elasticsearch.action.admin.cluster.state.ClusterStateRequest;
+import org.elasticsearch.action.admin.indices.alias.IndicesAliasesRequest;
 import org.elasticsearch.action.admin.indices.alias.get.IndicesGetAliasesRequest;
 import org.elasticsearch.action.admin.indices.create.CreateIndexRequest;
 import org.elasticsearch.action.admin.indices.create.CreateIndexResponse;
@@ -162,6 +163,11 @@ public class Indices {
 
     public boolean aliasExists(String alias) {
         return c.admin().indices().existsAliases(new IndicesGetAliasesRequest(alias)).actionGet().exists();
+    }
+
+    public String aliasTarget(String alias) {
+        // The ES return value of this has an awkward format: The first key of the hash is the target index. Thanks.
+        return c.admin().indices().getAliases(new IndicesGetAliasesRequest(alias)).actionGet().getAliases().keySet().iterator().next();
     }
 
     public boolean create(String indexName) {
