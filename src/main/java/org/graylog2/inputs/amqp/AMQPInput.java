@@ -59,6 +59,10 @@ public class AMQPInput implements MessageInput {
         Runtime.getRuntime().addShutdownHook(new Thread() {
             @Override
             public void run() {
+                // first shutdown executor that no new consumers are accepted
+                executor.shutdown();
+
+                // shutdown consumers
                 for (AMQPConsumer consumer : consumers.values()) {
                     consumer.disconnect();
                 }
