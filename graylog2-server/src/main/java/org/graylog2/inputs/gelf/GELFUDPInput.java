@@ -26,6 +26,9 @@ import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import org.graylog2.Core;
 import org.graylog2.plugin.GraylogServer;
 import org.graylog2.plugin.inputs.MessageInput;
+import org.graylog2.plugin.inputs.MessageInputConfiguration;
+import org.graylog2.plugin.inputs.MessageInputConfigurationException;
+import org.graylog2.plugin.inputs.MessageInputConfigurationRequest;
 import org.jboss.netty.bootstrap.ConnectionlessBootstrap;
 import org.jboss.netty.channel.ChannelException;
 import org.jboss.netty.channel.FixedReceiveBufferSizePredictorFactory;
@@ -46,11 +49,11 @@ public class GELFUDPInput implements MessageInput {
     private static final Logger LOG = LoggerFactory.getLogger(GELFUDPInput.class);
 
     private static final String NAME = "GELF UDP";
-    
+
     private Core graylogServer;
     private InetSocketAddress socketAddress;
-    
-    @Override
+
+    /*@Override
     public void initialize(Map<String, String> configuration, GraylogServer graylogServer) {
         this.graylogServer = (Core) graylogServer;
         this.socketAddress = new InetSocketAddress(
@@ -60,14 +63,14 @@ public class GELFUDPInput implements MessageInput {
 
         spinUp();
     }
-    
+
     private void spinUp() {
-        
+
         final ExecutorService workerThreadPool = Executors.newCachedThreadPool(
                 new ThreadFactoryBuilder()
                 .setNameFormat("input-gelfudp-worker-%d")
                 .build());
-        
+
         final ConnectionlessBootstrap bootstrap = new ConnectionlessBootstrap(new NioDatagramChannelFactory(workerThreadPool));
 
         bootstrap.setOption("receiveBufferSizePredictorFactory", new FixedReceiveBufferSizePredictorFactory(
@@ -81,7 +84,15 @@ public class GELFUDPInput implements MessageInput {
         } catch (ChannelException e) {
             LOG.error("Could not bind UDP GELF server to address " + socketAddress, e);
         }
-    }
+    }*/
+
+
+
+
+
+
+
+
 
     @Override
     public String getName() {
@@ -89,9 +100,28 @@ public class GELFUDPInput implements MessageInput {
     }
 
     @Override
-    public Map<String, String> getRequestedConfiguration() {
-        // Built in input. This is just for plugin compat. No special configuration required.
-        return Maps.newHashMap();
+    public void configure(MessageInputConfiguration config, GraylogServer graylogServer) throws MessageInputConfigurationException {
+        //To change body of implemented methods use File | Settings | File Templates.
     }
-    
+
+    @Override
+    public void start() {
+        //To change body of implemented methods use File | Settings | File Templates.
+    }
+
+    @Override
+    public void stop() {
+        //To change body of implemented methods use File | Settings | File Templates.
+    }
+
+    @Override
+    public MessageInputConfigurationRequest getRequestedConfiguration() {
+        return new MessageInputConfigurationRequest();
+    }
+
+    @Override
+    public boolean isExclusive() {
+        return false;  //To change body of implemented methods use File | Settings | File Templates.
+    }
+
 }

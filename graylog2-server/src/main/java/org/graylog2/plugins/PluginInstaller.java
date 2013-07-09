@@ -59,7 +59,6 @@ public class PluginInstaller {
     private final String shortname;
     private final String version;
     private final boolean force;
-    private final Configuration configuration;
     
     /*
      * those are set in getRequestedConfiguration which is a bit unfortunate,
@@ -69,18 +68,13 @@ public class PluginInstaller {
     private String pluginClassName;
     private String pluginName;
     
-    private MongoBridge mongoBridge;
-    
-    public PluginInstaller(String shortname, String version, Configuration configuration, boolean force) {
+    public PluginInstaller(String shortname, String version, boolean force) {
         this.shortname = shortname;
         this.version = version;
-        this.configuration = configuration;
         this.force = force;
     }
     
     public void install() {
-        connectMongo();
-        
         System.out.println("Attempting to install plugin <" + shortname + "> version <" + version + ">.");
         
         if (force) {
@@ -103,18 +97,8 @@ public class PluginInstaller {
             downloadAndCopyJar(pluginInformation.jar, pluginInformation.getPluginTypeName());
             String jarPath = jarPath(pluginInformation.jar, pluginInformation.getPluginTypeName());
             System.out.println("Copied JAR to " + jarPath);
-            
-            Map<String, String> config = getRequestedConfiguration(jarPath, pluginInformation.getClassOfPlugin());
-            
-            System.out.println("Requested configuration: " + config);
-            
-            mongoBridge.writeSinglePluginInformation(
-                    PluginRegistry.buildStandardInformation(pluginClassName, pluginName, config),
-                    pluginInformation.getRegistryName()
-            );
-            
-            System.out.println("All done. You can now configure this plugin in the web interface. "
-                    + "Please restart graylog2-server when you are done so the plugin is loaded.");
+
+            System.out.println("All done. Please restart graylog2-server to load the plugin.");
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -208,80 +192,8 @@ public class PluginInstaller {
         }
     }
     
-    public Map<String, String> getRequestedConfiguration(String jarPath, Class<?> type) throws Exception {
-        File file = new File(jarPath);
-
-        ClassLoader loader = URLClassLoader.newInstance(
-            new URL[] { file.toURI().toURL() },
-            getClass().getClassLoader()
-        );
-
-        Class<?> p = Class.forName(PluginLoader.getClassNameFromJarName(file.getName()), true, loader);
-        pluginClassName = p.getCanonicalName();
-        Object pluginObj = p.asSubclass(type).newInstance();
-
-        // no shame, time for a second iteration!
-        
-        if (pluginObj instanceof Initializer) {
-            Initializer plugin = (Initializer) pluginObj;
-            pluginName = plugin.getName();
-            return plugin.getRequestedConfiguration();
-        }
-        
-        if (pluginObj instanceof MessageInput) {
-            MessageInput plugin = (MessageInput) pluginObj;
-            pluginName = plugin.getName();
-            return plugin.getRequestedConfiguration();
-        }
-
-        if (pluginObj instanceof MessageFilter) {
-            MessageFilter plugin = (MessageFilter) pluginObj;
-            pluginName = plugin.getName();
-            
-            // zomg filters have no config
-            return Maps.newHashMap();
-        }
-        
-        if (pluginObj instanceof MessageOutput) {
-            MessageOutput plugin = (MessageOutput) pluginObj;
-            pluginName = plugin.getName();
-            return plugin.getRequestedConfiguration();
-        }
-        
-        if (pluginObj instanceof Transport) {
-            Transport plugin = (Transport) pluginObj;
-            pluginName = plugin.getName();
-            return plugin.getRequestedConfiguration();
-        }
-        
-        if (pluginObj instanceof AlarmCallback) {
-            AlarmCallback plugin = (AlarmCallback) pluginObj;
-            pluginName = plugin.getName();
-            return plugin.getRequestedConfiguration();
-        }
-        
-        throw new RuntimeException("Could not get requested configuration of plugin.");
-    }
-    
     private String buildUrl() {
         return API_TARGET + "/" + shortname + "/" + version;
-    }
-    
-    private void connectMongo() {
-        MongoConnection mongoConnection = new MongoConnection();    // TODO use dependency injection
-        mongoConnection.setUser(configuration.getMongoUser());
-        mongoConnection.setPassword(configuration.getMongoPassword());
-        mongoConnection.setHost(configuration.getMongoHost());
-        mongoConnection.setPort(configuration.getMongoPort());
-        mongoConnection.setDatabase(configuration.getMongoDatabase());
-        mongoConnection.setUseAuth(configuration.isMongoUseAuth());
-        mongoConnection.setMaxConnections(configuration.getMongoMaxConnections());
-        mongoConnection.setThreadsAllowedToBlockMultiplier(configuration.getMongoThreadsAllowedToBlockMultiplier());
-        mongoConnection.setReplicaSet(configuration.getMongoReplicaSet());
-
-        mongoBridge = new MongoBridge(null);
-        mongoBridge.setConnection(mongoConnection);
-        mongoConnection.connect();
     }
     
 }

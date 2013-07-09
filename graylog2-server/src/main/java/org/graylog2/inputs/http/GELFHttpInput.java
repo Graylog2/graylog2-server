@@ -20,6 +20,9 @@
 package org.graylog2.inputs.http;
 
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
+import org.graylog2.plugin.inputs.MessageInputConfiguration;
+import org.graylog2.plugin.inputs.MessageInputConfigurationException;
+import org.graylog2.plugin.inputs.MessageInputConfigurationRequest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.graylog2.Core;
@@ -39,6 +42,36 @@ public class GELFHttpInput implements MessageInput {
     private static final Logger LOG = LoggerFactory.getLogger(GELFHttpInput.class);
 
     @Override
+    public void configure(MessageInputConfiguration config, GraylogServer graylogServer) throws MessageInputConfigurationException {
+        //To change body of implemented methods use File | Settings | File Templates.
+    }
+
+    @Override
+    public void start() {
+        //To change body of implemented methods use File | Settings | File Templates.
+    }
+
+    @Override
+    public void stop() {
+        //To change body of implemented methods use File | Settings | File Templates.
+    }
+
+    @Override
+    public MessageInputConfigurationRequest getRequestedConfiguration() {
+        return null;  //To change body of implemented methods use File | Settings | File Templates.
+    }
+
+    @Override
+    public boolean isExclusive() {
+        return false;  //To change body of implemented methods use File | Settings | File Templates.
+    }
+
+    @Override
+    public String getName() {
+        return null;  //To change body of implemented methods use File | Settings | File Templates.
+    }
+
+    /*@Override
     public void initialize(final Map<String, String> configuration, GraylogServer graylogServer) {
         final InetSocketAddress socketAddress = new InetSocketAddress(
                 configuration.get("listen_address"),
@@ -83,5 +116,5 @@ public class GELFHttpInput implements MessageInput {
     public Map<String, String> getRequestedConfiguration() {
         // Built in input. This is just for plugin compat. No special configuration required.
         return com.google.common.collect.Maps.newHashMap();
-    }
+    }*/
 }

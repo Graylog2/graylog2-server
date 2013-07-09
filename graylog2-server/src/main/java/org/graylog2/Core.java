@@ -23,6 +23,8 @@ package org.graylog2;
 import com.codahale.metrics.MetricRegistry;
 import com.codahale.metrics.jersey.InstrumentedResourceMethodDispatchAdapter;
 import org.glassfish.grizzly.http.server.HttpServer;
+import org.graylog2.inputs.Inputs;
+import org.graylog2.outputs.Outputs;
 import org.graylog2.plugin.Tools;
 
 import java.io.IOException;
@@ -67,20 +69,13 @@ import org.graylog2.buffers.Cache;
 import org.graylog2.database.HostCounterCacheImpl;
 import org.graylog2.indexer.Deflector;
 import org.graylog2.initializers.*;
-import org.graylog2.inputs.StandardInputSet;
 import org.graylog2.plugin.GraylogServer;
 import org.graylog2.plugin.alarms.callbacks.AlarmCallback;
-import org.graylog2.plugin.alarms.callbacks.AlarmCallbackConfigurationException;
 import org.graylog2.plugin.alarms.transports.Transport;
-import org.graylog2.plugin.alarms.transports.TransportConfigurationException;
 import org.graylog2.plugin.buffers.Buffer;
 import org.graylog2.plugin.filters.MessageFilter;
 import org.graylog2.plugin.indexer.MessageGateway;
-import org.graylog2.plugin.initializers.InitializerConfigurationException;
-import org.graylog2.plugin.inputs.MessageInputConfigurationException;
-import org.graylog2.plugin.outputs.MessageOutputConfigurationException;
 import org.graylog2.plugin.streams.Stream;
-import org.graylog2.plugins.PluginConfiguration;
 import org.graylog2.plugins.PluginLoader;
 import org.graylog2.streams.StreamImpl;
 
@@ -114,13 +109,14 @@ public class Core implements GraylogServer {
     private Counter benchmarkCounter = new Counter();
     private Counter throughputCounter = new Counter();
     private long throughput = 0;
-    
-    private List<Initializer> initializers = Lists.newArrayList();
-    private List<MessageInput> inputs = Lists.newArrayList();
+
     private List<MessageFilter> filters = Lists.newArrayList();
-    private List<MessageOutput> outputs = Lists.newArrayList();
     private List<Transport> transports = Lists.newArrayList();
     private List<AlarmCallback> alarmCallbacks = Lists.newArrayList();
+
+    private Initializers initializers;
+    private Inputs inputs;
+    private Outputs outputs;
     
     private ProcessBuffer processBuffer;
     private OutputBuffer outputBuffer;
@@ -170,6 +166,10 @@ public class Core implements GraylogServer {
         mongoBridge.setConnection(mongoConnection); // TODO use dependency injection
         mongoConnection.connect();
 
+        initializers = new Initializers(this);
+        inputs = new Inputs(this);
+        outputs = new Outputs(this);
+
         activityWriter = new ActivityWriter(this);
 
         systemJobManager = new SystemJobManager(this);
@@ -196,28 +196,11 @@ public class Core implements GraylogServer {
             }
         });
     }
-    
-    public void registerInitializer(Initializer initializer) {
-        if (initializer.masterOnly() && !this.isMaster()) {
-            LOG.info("Not registering initializer {} because it is marked as master only.", initializer.getClass().getSimpleName());
-            return;
-        }
-        
-        this.initializers.add(initializer);
-    }
-
-    public void registerInput(MessageInput input) {
-        this.inputs.add(input);
-    }
 
     public void registerFilter(MessageFilter filter) {
         this.filters.add(filter);
     }
 
-    public void registerOutput(MessageOutput output) {
-        this.outputs.add(output);
-    }
-    
     public void registerTransport(Transport transport) {
         this.transports.add(transport);
     }
@@ -242,36 +225,29 @@ public class Core implements GraylogServer {
         );
 
         // Load and register plugins.
-        loadPlugins(MessageFilter.class, "filters");
-        loadPlugins(MessageOutput.class, "outputs");
-        loadPlugins(AlarmCallback.class, "alarm_callbacks");
-        loadPlugins(Transport.class, "transports");
-        loadPlugins(Initializer.class, "initializers");
-        loadPlugins(MessageInput.class, "inputs");
-        
+        registerPlugins(MessageFilter.class, "filters");
+        registerPlugins(MessageOutput.class, "outputs");
+        registerPlugins(AlarmCallback.class, "alarm_callbacks");
+        registerPlugins(Transport.class, "transports");
+        registerPlugins(Initializer.class, "initializers");
+        registerPlugins(MessageInput.class, "inputs");
+
+        // Ramp it all up. (both plugins and built-in types)
+        initializers().initialize();
+        outputs().initialize();
+
+        /*
         // Initialize all registered transports.
         for (Transport transport : this.transports) {
             try {
-                Map<String, String> config;
-                
-                // The built in transport methods get a more convenient configuration from graylog2.conf.
-                if (transport.getClass().getCanonicalName().equals("org.graylog2.alarms.transports.EmailTransport")) {
-                    config = configuration.getEmailTransportConfiguration();
-                } else if (transport.getClass().getCanonicalName().equals("org.graylog2.alarms.transports.JabberTransport")) {
-                    config = configuration.getJabberTransportConfiguration();
-                } else {
-                    // Load custom plugin config.
-                    config = PluginConfiguration.load(this, transport.getClass().getCanonicalName());
-                }
-                
-                transport.initialize(config);
+                transport.initialize(PluginConfiguration.load(this, transport.getClass().getCanonicalName()));
                 LOG.debug("Initialized transport: {}", transport.getName());
             } catch (TransportConfigurationException e) {
                 LOG.error("Could not initialize transport <" + transport.getName() + ">"
                         + " because of missing or invalid configuration.", e);
             }
         }
-        
+
         // Initialize all registered alarm callbacks.
         for (AlarmCallback callback : this.alarmCallbacks) {
             try {
@@ -282,49 +258,18 @@ public class Core implements GraylogServer {
                         + " because of missing or invalid configuration.", e);
             }
         }
-        
-        // Initialize all registered initializers.
-        for (Initializer initializer : this.initializers) {
-            try {
-                if (StandardInitializerSet.get().contains(initializer.getClass())) {
-                    // This is a built-in initializer. We don't need special configs for them.
-                    initializer.initialize(this, null);
-                } else {
-                    // This is a plugin. Initialize with custom config from Mongo.
-                    initializer.initialize(this, PluginConfiguration.load(
-                            this,
-                            initializer.getClass().getCanonicalName())
-                    );
-                }
-                
-                LOG.debug("Initialized initializer: {}", initializer.getClass().getSimpleName());
-            } catch (InitializerConfigurationException e) {
-                
-            }
-            
-        }
 
         // Initialize all registered inputs.
         for (MessageInput input : this.inputs) {
             try {
-                if (StandardInputSet.get().contains(input.getClass())) {
-                    // This is a built-in input. Initialize with config from graylog2.conf.
-                    input.initialize(configuration.getInputConfig(input.getClass()), this);
-                } else {
-                    // This is a plugin. Initialize with custom config from Mongo.
-                    input.initialize(PluginConfiguration.load(
-                            this,
-                            input.getClass().getCanonicalName()),
-                            this
-                    );
-                }
-                
+                // This is a plugin. Initialize with custom config from Mongo.
+                input.initialize(PluginConfiguration.load(this, input.getClass().getCanonicalName()), this);
                 LOG.debug("Initialized input: {}", input.getName());
             } catch (MessageInputConfigurationException e) {
                 LOG.error("Could not initialize input <{}>.", input.getClass().getCanonicalName(), e);
             }
         }
-        
+
         // Initialize all registered outputs.
         for (MessageOutput output : this.outputs) {
             try {
@@ -334,7 +279,7 @@ public class Core implements GraylogServer {
                 LOG.error("Could not initialize output <" + output.getName() + ">"
                         + " because of missing or invalid configuration.", e);
             }
-        }
+        }*/
 
         activityWriter.write(new Activity("Started up.", Core.class));
         LOG.info("Graylog2 up and running.");
@@ -344,33 +289,31 @@ public class Core implements GraylogServer {
         }
 
     }
-    
-    public void startRestApi() throws IOException {
-        startRestServer(configuration.getRestListenUri());
-        LOG.info("Started REST API at <{}>", configuration.getRestListenUri());
-    }
-    
-    private <A> void loadPlugins(Class<A> type, String subDirectory) {
+
+    public <A> void registerPlugins(Class<A> type, String subDirectory) {
         PluginLoader<A> pl = new PluginLoader<A>(configuration.getPluginDir(), subDirectory, type);
         for (A plugin : pl.getPlugins()) {
-            LOG.info("Registering <{}> plugin [{}].", type.getSimpleName(), plugin.getClass().getCanonicalName());
-            
+            LOG.info("Loaded <{}> plugin [{}].", type.getSimpleName(), plugin.getClass().getCanonicalName());
+
             if (plugin instanceof MessageFilter) {
                 registerFilter((MessageFilter) plugin);
             } else if (plugin instanceof MessageOutput) {
-                registerOutput((MessageOutput) plugin);
+                outputs.register((MessageOutput) plugin);
             } else if (plugin instanceof AlarmCallback) {
                 registerAlarmCallback((AlarmCallback) plugin);
             } else if (plugin instanceof Initializer) {
-                registerInitializer((Initializer) plugin);
-            } else if (plugin instanceof MessageInput) {
-                registerInput((MessageInput) plugin);
+                initializers.register((Initializer) plugin);
             } else if (plugin instanceof Transport) {
                 registerTransport((Transport) plugin);
             } else {
                 LOG.error("Could not load plugin [{}] - Not supported type.", plugin.getClass().getCanonicalName());
             }
         }
+    }
+    
+    public void startRestApi() throws IOException {
+        startRestServer(configuration.getRestListenUri());
+        LOG.info("Started REST API at <{}>", configuration.getRestListenUri());
     }
 
     private HttpServer startRestServer(URI restUri) throws IOException {
@@ -433,25 +376,13 @@ public class Core implements GraylogServer {
     public AtomicInteger processBufferWatermark() {
         return processBufferWatermark;
     }
-
-    public List<Initializer> getInitializers() {
-        return this.initializers;
-    }
     
     public List<Transport> getTransports() {
         return this.transports;
     }
     
-    public List<MessageInput> getInputs() {
-        return this.inputs;
-    }
-    
     public List<MessageFilter> getFilters() {
         return this.filters;
-    }
-
-    public List<MessageOutput> getOutputs() {
-        return this.outputs;
     }
 
     public List<AlarmCallback> getAlarmCallbacks() {
@@ -580,5 +511,17 @@ public class Core implements GraylogServer {
 
     public MetricRegistry metrics() {
         return metricRegistry;
+    }
+
+    public Initializers initializers() {
+        return initializers;
+    }
+
+    public Inputs inputs() {
+        return inputs;
+    }
+
+    public Outputs outputs() {
+        return outputs;
     }
 }

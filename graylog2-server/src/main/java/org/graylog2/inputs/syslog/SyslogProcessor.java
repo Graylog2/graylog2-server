@@ -85,11 +85,6 @@ public class SyslogProcessor {
             LOG.debug("Skipping incomplete message.");
             return;
         }
-        
-        // Possibly remove full message.
-        if (!this.server.getConfiguration().isSyslogStoreFullMessageEnabled()) {
-            lm.removeField("full_message");
-        }
 
         // Add to process buffer.
         LOG.debug("Adding received syslog message <{}> to process buffer: {}", lm.getId(), lm);
@@ -165,13 +160,14 @@ public class SyslogProcessor {
     }
 
     private String parseHost(SyslogServerEventIF msg, InetAddress remoteAddress) {
-        if (remoteAddress != null && server.getConfiguration().getForceSyslogRdns()) {
+        // TODO re-implement with new input structure
+        /*if (remoteAddress != null && server.getConfiguration().getForceSyslogRdns()) {
             try {
                 return Tools.rdnsLookup(remoteAddress);
             } catch (UnknownHostException e) {
                 LOG.warn("Reverse DNS lookup failed. Falling back to parsed hostname.", e);
             }
-        }
+        }*/
 
         return msg.getHost();
     }
@@ -179,15 +175,16 @@ public class SyslogProcessor {
     private double parseDate(SyslogServerEventIF msg) throws IllegalStateException {
         // Check if date could be parsed.
         if (msg.getDate() == null) {
-            if (server.getConfiguration().getAllowOverrideSyslogDate()) {
+            // TODO re-implement with new input structure
+            /*if (server.getConfiguration().getAllowOverrideSyslogDate()) {
                 // empty Date constructor allocates a Date object and initializes it so that it represents the time at which it was allocated.
                 msg.setDate(new Date());
                 LOG.info("Date could not be parsed. Was set to NOW because allow_override_syslog_date is true.");
-            } else {
+            } else {*/
                 LOG.info("Syslog message is missing date or date could not be parsed. (Possibly set allow_override_syslog_date to true) "
                         + "Not further handling. Message was: " + new String(msg.getRaw()));
                 throw new IllegalStateException();
-            }
+            //}
         }
 
         return Tools.getUTCTimestampWithMilliseconds(msg.getDate().getTime());

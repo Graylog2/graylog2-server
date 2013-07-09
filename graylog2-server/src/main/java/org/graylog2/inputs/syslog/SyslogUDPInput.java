@@ -24,6 +24,9 @@ import com.google.common.collect.Maps;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import org.graylog2.Core;
 import org.graylog2.plugin.inputs.MessageInput;
+import org.graylog2.plugin.inputs.MessageInputConfiguration;
+import org.graylog2.plugin.inputs.MessageInputConfigurationException;
+import org.graylog2.plugin.inputs.MessageInputConfigurationRequest;
 import org.jboss.netty.bootstrap.ConnectionlessBootstrap;
 import org.jboss.netty.channel.ChannelException;
 import org.jboss.netty.channel.FixedReceiveBufferSizePredictorFactory;
@@ -46,7 +49,37 @@ public class SyslogUDPInput implements MessageInput {
 
     private static final String NAME = "Syslog UDP";
 
-    private Core graylogServer;
+    @Override
+    public void configure(MessageInputConfiguration config, GraylogServer graylogServer) throws MessageInputConfigurationException {
+        //To change body of implemented methods use File | Settings | File Templates.
+    }
+
+    @Override
+    public void start() {
+        //To change body of implemented methods use File | Settings | File Templates.
+    }
+
+    @Override
+    public void stop() {
+        //To change body of implemented methods use File | Settings | File Templates.
+    }
+
+    @Override
+    public MessageInputConfigurationRequest getRequestedConfiguration() {
+        return null;  //To change body of implemented methods use File | Settings | File Templates.
+    }
+
+    @Override
+    public boolean isExclusive() {
+        return false;  //To change body of implemented methods use File | Settings | File Templates.
+    }
+
+    @Override
+    public String getName() {
+        return null;  //To change body of implemented methods use File | Settings | File Templates.
+    }
+
+    /*private Core graylogServer;
     private InetSocketAddress socketAddress;
 
     @Override
@@ -90,6 +123,6 @@ public class SyslogUDPInput implements MessageInput {
     public Map<String, String> getRequestedConfiguration() {
         // Built in input. This is just for plugin compat. No special configuration required.
         return Maps.newHashMap();
-    }
+    }*/
     
 }

@@ -104,8 +104,8 @@ public class OutputBufferProcessor implements EventHandler<MessageEvent> {
 
         if (endOfBatch || buffer.size() >= server.getConfiguration().getOutputBatchSize()) {
 
-            final CountDownLatch doneSignal = new CountDownLatch(server.getOutputs().size());
-            for (final MessageOutput output : server.getOutputs()) {
+            final CountDownLatch doneSignal = new CountDownLatch(server.outputs().count());
+            for (final MessageOutput output : server.outputs().get()) {
                 final String typeClass = output.getClass().getCanonicalName();
 
                 try {

@@ -148,8 +148,6 @@ public class SyslogProcessorTest {
     public void testFullMessageIsNotStoredIfConfigured() throws Exception {
         GraylogServerStub serverStub = new GraylogServerStub();
         Configuration configStub = new Configuration();
-        configStub.setForceSyslogRdns(true);
-        configStub.setISyslogStoreFullMessageEnabled(false);
         serverStub.setConfigurationStub(configStub);
         SyslogProcessor processor = new SyslogProcessor(serverStub);
         

@@ -19,7 +19,7 @@
  */
 package org.graylog2.metrics;
 
-import com.beust.jcommander.internal.Maps;
+import com.google.common.collect.Maps;
 import org.junit.Test;
 import static org.junit.Assert.*;
 
