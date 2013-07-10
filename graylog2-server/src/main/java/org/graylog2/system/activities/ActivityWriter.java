@@ -17,7 +17,7 @@
  * along with Graylog2.  If not, see <http://www.gnu.org/licenses/>.
  *
  */
-package org.graylog2.activities;
+package org.graylog2.system.activities;
 
 import com.beust.jcommander.internal.Maps;
 import org.graylog2.Core;

@@ -24,7 +24,7 @@ import java.util.Set;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.graylog2.Core;
-import org.graylog2.activities.Activity;
+import org.graylog2.system.activities.Activity;
 import org.graylog2.inputs.amqp.AMQPConsumer;
 import org.graylog2.inputs.amqp.AMQPInput;
 import org.graylog2.inputs.amqp.AMQPQueueConfiguration;

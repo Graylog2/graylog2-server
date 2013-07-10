@@ -21,12 +21,11 @@ package org.graylog2.indexer.healing;
 
 import org.graylog2.Core;
 import org.graylog2.ProcessingPauseLockedException;
-import org.graylog2.activities.Activity;
+import org.graylog2.system.activities.Activity;
 import org.graylog2.buffers.Buffers;
 import org.graylog2.indexer.Deflector;
-import org.graylog2.indexer.NoTargetIndexException;
 import org.graylog2.notifications.Notification;
-import org.graylog2.systemjobs.SystemJob;
+import org.graylog2.system.jobs.SystemJob;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -66,7 +65,7 @@ public class FixDeflectorByMoveJob extends SystemJob {
             // Copy messages to new index.
             String newTarget = null;
             try {
-                newTarget = Deflector.buildIndexName(core.getConfiguration().getElasticSearchIndexPrefix(), core.getDeflector().getCurrentTargetNumber());
+                newTarget = Deflector.buildIndexName(core.getConfiguration().getElasticSearchIndexPrefix(), core.getDeflector().getNewestTargetNumber());
 
                 LOG.info("Starting to move <{}> to <{}>.", Deflector.DEFLECTOR_NAME, newTarget);
                 core.getIndexer().indices().move(Deflector.DEFLECTOR_NAME, newTarget);

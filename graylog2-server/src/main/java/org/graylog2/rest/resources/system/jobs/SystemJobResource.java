@@ -26,10 +26,10 @@ import com.sun.jersey.api.core.ResourceConfig;
 import org.graylog2.Core;
 import org.graylog2.rest.resources.RestResource;
 import org.graylog2.rest.resources.system.jobs.requests.TriggerRequest;
-import org.graylog2.systemjobs.NoSuchJobException;
-import org.graylog2.systemjobs.SystemJob;
-import org.graylog2.systemjobs.SystemJobConcurrencyException;
-import org.graylog2.systemjobs.SystemJobFactory;
+import org.graylog2.system.jobs.NoSuchJobException;
+import org.graylog2.system.jobs.SystemJob;
+import org.graylog2.system.jobs.SystemJobConcurrencyException;
+import org.graylog2.system.jobs.SystemJobFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

@@ -24,7 +24,7 @@ import com.google.common.collect.Maps;
 import org.elasticsearch.action.admin.indices.stats.IndexStats;
 import org.elasticsearch.indices.InvalidAliasNameException;
 import org.graylog2.Core;
-import org.graylog2.activities.Activity;
+import org.graylog2.system.activities.Activity;
 import org.graylog2.indexer.ranges.IndexRange;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -45,7 +45,7 @@ import org.graylog2.plugin.Tools;
  * 
  * @author Lennart Koopmann <lennart@socketfeed.com>
  */
-public class Deflector {
+public class Deflector { // extends Ablenkblech
     
     private static final Logger LOG = LoggerFactory.getLogger(Deflector.class);
     
@@ -71,7 +71,7 @@ public class Deflector {
             try {
             // Do we have a target index to point to?
             try {
-                String currentTarget = getCurrentTargetName();
+                String currentTarget = getNewestTargetName();
                 LOG.info("Pointing to already existing index target <{}>", currentTarget);
                 
                 pointTo(currentTarget);
@@ -93,7 +93,7 @@ public class Deflector {
         int oldTargetNumber;
         
         try {
-            oldTargetNumber = getCurrentTargetNumber();
+            oldTargetNumber = getNewestTargetNumber();
         } catch (NoTargetIndexException ex) {
             oldTargetNumber = -1;
         }
@@ -134,7 +134,7 @@ public class Deflector {
         server.getActivityWriter().write(activity);
     }
     
-    public int getCurrentTargetNumber() throws NoTargetIndexException {
+    public int getNewestTargetNumber() throws NoTargetIndexException {
         Map<String, IndexStats> indexes = this.server.getIndexer().indices().getAll();
         if (indexes.isEmpty()) {
             throw new NoTargetIndexException();
@@ -188,8 +188,8 @@ public class Deflector {
         return result;
     }
     
-    public String getCurrentTargetName() throws NoTargetIndexException {
-        return buildIndexName(this.server.getConfiguration().getElasticSearchIndexPrefix(), getCurrentTargetNumber());
+    public String getNewestTargetName() throws NoTargetIndexException {
+        return buildIndexName(this.server.getConfiguration().getElasticSearchIndexPrefix(), getNewestTargetNumber());
     }
     
     public static String buildIndexName(String prefix, int number) {
@@ -211,11 +211,11 @@ public class Deflector {
         return indexName != DEFLECTOR_NAME && indexName.startsWith(server.getConfiguration().getElasticSearchIndexPrefix() + "_");
     }
     
-    private void pointTo(String newIndex, String oldIndex) {
+    public void pointTo(String newIndex, String oldIndex) {
         server.getIndexer().cycleAlias(DEFLECTOR_NAME, newIndex, oldIndex);
     }
     
-    private void pointTo(String newIndex) {
+    public void pointTo(String newIndex) {
         server.getIndexer().cycleAlias(DEFLECTOR_NAME, newIndex);
     }
 
@@ -227,5 +227,8 @@ public class Deflector {
         IndexRange range = new IndexRange(server, params);
         range.saveWithoutValidation();
     }
-    
+
+    public String getCurrentActualTargetIndex() {
+        return server.getIndexer().indices().aliasTarget(Deflector.DEFLECTOR_NAME);
+    }
 }

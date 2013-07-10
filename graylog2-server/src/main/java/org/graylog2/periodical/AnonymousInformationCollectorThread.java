@@ -23,8 +23,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.graylog2.Core;
 import org.graylog2.SystemSettingAccessor;
-import org.graylog2.systeminformation.AnonymousInformationCollector;
-import org.graylog2.systeminformation.Sender;
+import org.graylog2.system.information.AnonymousInformationCollector;
+import org.graylog2.system.information.Sender;
 
 /**
  * @author Lennart Koopmann <lennart@socketfeed.com>

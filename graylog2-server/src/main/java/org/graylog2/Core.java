@@ -31,7 +31,7 @@ import java.util.List;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 
-import org.graylog2.systemjobs.SystemJobManager;
+import org.graylog2.system.jobs.SystemJobManager;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 import org.slf4j.Logger;
@@ -60,8 +60,8 @@ import com.sun.jersey.api.core.PackagesResourceConfig;
 import com.sun.jersey.api.core.ResourceConfig;
 
 import org.cliffc.high_scale_lib.Counter;
-import org.graylog2.activities.Activity;
-import org.graylog2.activities.ActivityWriter;
+import org.graylog2.system.activities.Activity;
+import org.graylog2.system.activities.ActivityWriter;
 import org.graylog2.buffers.BasicCache;
 import org.graylog2.buffers.Cache;
 import org.graylog2.database.HostCounterCacheImpl;

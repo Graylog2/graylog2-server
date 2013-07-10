@@ -35,7 +35,7 @@ import org.apache.commons.io.IOUtils;
 import org.apache.log4j.Level;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.graylog2.activities.Activity;
+import org.graylog2.system.activities.Activity;
 import org.graylog2.alarms.transports.EmailTransport;
 import org.graylog2.alarms.transports.JabberTransport;
 import org.graylog2.filters.*;

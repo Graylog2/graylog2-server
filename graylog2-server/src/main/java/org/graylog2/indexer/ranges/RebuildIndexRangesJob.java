@@ -24,10 +24,10 @@ import com.google.common.base.Stopwatch;
 import com.google.common.collect.Maps;
 import org.elasticsearch.search.SearchHit;
 import org.graylog2.Core;
-import org.graylog2.activities.Activity;
+import org.graylog2.system.activities.Activity;
 import org.graylog2.indexer.EmptyIndexException;
 import org.graylog2.plugin.Tools;
-import org.graylog2.systemjobs.SystemJob;
+import org.graylog2.system.jobs.SystemJob;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

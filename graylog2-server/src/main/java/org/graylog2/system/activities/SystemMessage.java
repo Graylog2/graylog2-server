@@ -17,7 +17,7 @@
  * along with Graylog2.  If not, see <http://www.gnu.org/licenses/>.
  *
  */
-package org.graylog2.activities;
+package org.graylog2.system.activities;
 
 import com.google.common.collect.Lists;
 import com.mongodb.BasicDBObject;
