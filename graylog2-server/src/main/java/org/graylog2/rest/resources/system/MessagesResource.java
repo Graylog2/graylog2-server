@@ -61,7 +61,7 @@ public class MessagesResource extends RestResource {
 
         List<Map<String, Object>> messages = Lists.newArrayList();
 
-        for (SystemMessage sm : SystemMessage.all(core, page)) {
+        for (SystemMessage sm : SystemMessage.all(core, page(page))) {
             Map<String, Object> message = Maps.newHashMap();
             message.put("caller", sm.getCaller());
             message.put("content", sm.getContent());

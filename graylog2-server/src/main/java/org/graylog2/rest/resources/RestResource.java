@@ -42,7 +42,15 @@ public class RestResource {
     protected final ObjectMapper objectMapper = new ObjectMapper();
 
 	protected RestResource() { /* */ }
-	
+
+    protected int page(int page) {
+        if (page <= 0) {
+            return 0;
+        }
+
+        return page-1;
+    }
+
 	protected ObjectId loadObjectId(String id) {
 		try {
 			return new ObjectId(id);
