@@ -70,6 +70,16 @@ public class SyslogUDPInput implements MessageInput {
     }
 
     @Override
+    public void setId(String id) {
+        //To change body of implemented methods use File | Settings | File Templates.
+    }
+
+    @Override
+    public String getId() {
+        return null;  //To change body of implemented methods use File | Settings | File Templates.
+    }
+
+    @Override
     public boolean isExclusive() {
         return false;  //To change body of implemented methods use File | Settings | File Templates.
     }

@@ -27,7 +27,6 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
-import org.graylog2.inputs.amqp.AMQPInput;
 import org.graylog2.inputs.gelf.GELFTCPInput;
 import org.graylog2.inputs.gelf.GELFUDPInput;
 import org.graylog2.inputs.http.GELFHttpInput;

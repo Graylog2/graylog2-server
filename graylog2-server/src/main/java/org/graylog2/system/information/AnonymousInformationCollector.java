@@ -64,7 +64,6 @@ public class AnonymousInformationCollector {
         try {
             Map<String, Integer> plugins = Maps.newHashMap();
             plugins.put("initializers", server.initializers().count());
-            plugins.put("inputs", server.getInputs().size());
             plugins.put("filters", server.getFilters().size());
             plugins.put("outputs", server.outputs().count());
             plugins.put("transports", server.getTransports().size());

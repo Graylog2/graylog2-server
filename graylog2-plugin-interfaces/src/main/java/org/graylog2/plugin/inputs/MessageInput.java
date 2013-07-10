@@ -21,7 +21,6 @@
 */
 package org.graylog2.plugin.inputs;
 
-import java.util.Map;
 import org.graylog2.plugin.GraylogServer;
 
 /**

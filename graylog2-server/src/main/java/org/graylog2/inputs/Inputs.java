@@ -52,7 +52,7 @@ public class Inputs {
         runningInputs = Maps.newHashMap();
     }
 
-    public void start(final MessageInput input) {
+    public String start(final MessageInput input) {
         String id = UUID.randomUUID().toString();
 
         input.setId(id);
@@ -65,6 +65,8 @@ public class Inputs {
                 input.start();
             }
         });
+
+        return id;
     }
 
     public Map<String, MessageInput> getRunningInputs() {
@@ -73,5 +75,9 @@ public class Inputs {
 
     public int running() {
         return runningInputs.size();
+    }
+
+    public static MessageInput factory(String type) {
+
     }
 }
