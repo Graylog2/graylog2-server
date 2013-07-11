@@ -65,11 +65,6 @@ public class StreamResource extends RestResource {
     public Response create(String body, @QueryParam("pretty") boolean prettyPrint) {
         Core core = (Core) rc.getProperty("core");
 
-        if (body == null || body.isEmpty()) {
-        	LOG.error("Missing parameters. Returning HTTP 400.");
-        	throw new WebApplicationException(400);
-        }
-
         CreateRequest cr;
         try {
             cr = objectMapper.readValue(body, CreateRequest.class);

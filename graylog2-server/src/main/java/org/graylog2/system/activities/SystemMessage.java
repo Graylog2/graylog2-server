@@ -39,7 +39,7 @@ import java.util.Map;
  */
 public class SystemMessage extends Persisted {
 
-    private static final String COLLECTION = "system_messages";
+    public static final String COLLECTION = "system_messages";
     private static final int PER_PAGE = 30;
 
     private final String caller;

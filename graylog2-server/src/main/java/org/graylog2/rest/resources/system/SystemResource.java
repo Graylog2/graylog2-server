@@ -53,7 +53,6 @@ public class SystemResource extends RestResource {
     @Context ResourceConfig rc;
 
     @GET @Timed
-    @Path("/")
     @Produces(MediaType.APPLICATION_JSON)
     public String system(@QueryParam("pretty") boolean prettyPrint) {
         Core core = (Core) rc.getProperty("core");

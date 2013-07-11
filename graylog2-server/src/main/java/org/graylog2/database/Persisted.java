@@ -110,6 +110,10 @@ public abstract class Persisted {
         return collection(core, collectionName).findOne(query);
     }
 
+    public static long totalCount(Core core, String collectionName) {
+        return collection(core, collectionName).count();
+    }
+
 	public void destroy() {
 		collection().remove(new BasicDBObject("_id", id));
 	}

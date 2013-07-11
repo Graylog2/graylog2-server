@@ -77,14 +77,6 @@ public class ConfigurationTest {
     }
 
     @Test
-    public void testForceSyslogRdns() throws RepositoryException, ValidationException {
-        Configuration configuration = new Configuration();
-        new JadConfig(new InMemoryRepository(validProperties), configuration).process();
-
-        Assert.assertEquals(false, configuration.getForceSyslogRdns());
-    }
-
-    @Test
     public void testGetElasticSearchIndexPrefix() throws RepositoryException, ValidationException {
 
         Configuration configuration = new Configuration();

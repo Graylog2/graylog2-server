@@ -27,7 +27,6 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
-import org.graylog2.inputs.amqp.AMQPInput;
 import org.graylog2.inputs.gelf.GELFTCPInput;
 import org.graylog2.inputs.gelf.GELFUDPInput;
 import org.graylog2.inputs.http.GELFHttpInput;
@@ -70,24 +69,6 @@ public class Configuration {
 
     @Parameter(value = "password_secret", required = true)
     private String passwordSecret;
-    
-    @Parameter(value = "syslog_listen_port", required = true, validator = InetPortValidator.class)
-    private int syslogListenPort = 514;
-    
-    @Parameter(value = "syslog_listen_address")
-    private String syslogListenAddress = "0.0.0.0";
-
-    @Parameter(value = "syslog_enable_udp", required = true)
-    private boolean syslogEnableUdp = true;
-
-    @Parameter(value = "syslog_enable_tcp", required = true)
-    private boolean syslogEnableTcp = false;
-    
-    @Parameter(value = "syslog_use_nul_delimiter", required = false)
-    private boolean syslogUseNulDelimiter = false;
-    
-    @Parameter(value = "syslog_store_full_message", required = false)
-    private boolean syslogStoreFullMessage = true;
     
     @Parameter(value = "rest_listen_uri", required = true)
     private String restListenUri = "http://127.0.0.1:12900/";
@@ -173,33 +154,6 @@ public class Configuration {
     @Parameter(value = "mongodb_replica_set", converter = StringListConverter.class)
     private List<String> mongoReplicaSet;
 
-    @Parameter(value = "use_gelf", required = true)
-    private boolean useGELF = false;
-
-    @Parameter(value = "gelf_listen_address")
-    private String gelfListenAddress = "0.0.0.0";
-
-    @Parameter(value = "gelf_listen_port", required = true, validator = InetPortValidator.class)
-    private int gelfListenPort = 12201;
-
-    @Parameter("amqp_enabled")
-    private boolean amqpEnabled = false;
-
-    @Parameter("amqp_host")
-    private String amqpHost = "localhost";
-
-    @Parameter(value = "amqp_port", validator = InetPortValidator.class)
-    private int amqpPort = 5672;
-
-    @Parameter("amqp_username")
-    private String amqpUsername = "guest";
-
-    @Parameter("amqp_password")
-    private String amqpPassword = "guest";
-
-    @Parameter("amqp_virtualhost")
-    private String amqpVirtualhost = "/";
-
     @Parameter("rules_file")
     private String droolsRulesFile;
 
@@ -244,77 +198,6 @@ public class Configuration {
 
     @Parameter(value = "plugin_dir", required = false)
     private String pluginDir = "plugin";
-    
-    // Transport: Email
-    @Parameter(value = "transport_email_enabled", required = false)
-    private boolean emailTransportEnabled = false;
-    
-    @Parameter(value = "transport_email_protocol", required = false)
-    private String emailTransportProtocol = "smtp";
-
-    @Parameter(value = "transport_email_hostname", required = false)
-    private String emailTransportHostname;
-    
-    @Parameter(value = "transport_email_port", validator = InetPortValidator.class, required = false)
-    private int emailTransportPort;
-    
-    @Parameter(value = "transport_email_use_auth", required = false)
-    private boolean emailTransportUseAuth = false;
-    
-    @Parameter(value = "transport_email_use_tls", required = false)
-    private boolean emailTransportUseTls = false;
-    
-    @Parameter(value = "transport_email_auth_username", required = false)
-    private String emailTransportUsername;
-    
-    @Parameter(value = "transport_email_auth_password", required = false)
-    private String emailTransportPassword;
-    
-    @Parameter(value = "transport_email_subject_prefix", required = false)
-    private String emailTransportSubjectPrefix;
-    
-    @Parameter(value = "transport_email_from_email", required = false)
-    private String emailTransportFromEmail;
-    
-    @Parameter(value = "transport_email_from_name", required = false)
-    private String emailTransportFromName;
-    
-    @Parameter(value = "transport_email_web_interface_url", required = false)
-    private String emailTransportWebInterfaceUrl = "http://your-graylog2.example.org/";
-    
-    // Transport: Jabber
-    @Parameter(value = "transport_jabber_enabled", required = false)
-    private boolean jabberTransportEnabled = false;
-    
-    @Parameter(value = "transport_jabber_hostname", required = false)
-    private String jabberTransportHostname;
-    
-    @Parameter(value = "transport_jabber_port", validator = InetPortValidator.class, required = false)
-    private int jabberTransportPort = 5222;
-    
-    @Parameter(value = "transport_jabber_use_sasl_auth", required = false)
-    private boolean jabberTransportUseSASLAuth = true;
-    
-    @Parameter(value = "transport_jabber_allow_selfsigned_certs", required = false)
-    private boolean jabberTransportAllowSelfsignedCerts = false;
-    
-    @Parameter(value = "transport_jabber_auth_username", required = false)
-    private String jabberTransportUsername;
-    
-    @Parameter(value = "transport_jabber_auth_password", required = false)
-    private String jabberTransportPassword;
-    
-    @Parameter(value = "transport_jabber_message_prefix", required = false)
-    private String jabberTransportMessagePrefix;
-
-    @Parameter("http_enabled")
-    private boolean httpEnabled = false;
-
-    @Parameter("http_listen_address")
-    private String httpListenAddress = "0.0.0.0";
-
-    @Parameter(value = "http_listen_port", validator = InetPortValidator.class, required = false)
-    private int httpListenPort = 12202;
 
     public boolean isMaster() {
         return isMaster;
@@ -326,46 +209,6 @@ public class Configuration {
 
     public String getPasswordSecret() {
         return passwordSecret.trim();
-    }
-    
-    public int getSyslogListenPort() {
-        return syslogListenPort;
-    }
-
-    public String getSyslogListenAddress() {
-        return syslogListenAddress;
-    }
-
-    public boolean isSyslogUdpEnabled() {
-        return syslogEnableUdp;
-    }
-    
-    public boolean isSyslogTcpEnabled() {
-        return syslogEnableTcp;
-    }
-    
-    public boolean isSyslogUseNulDelimiterEnabled() {
-        return syslogUseNulDelimiter;
-    }
-    
-    public boolean isSyslogStoreFullMessageEnabled() {
-        return syslogStoreFullMessage;
-    }
-    
-    public void setISyslogStoreFullMessageEnabled(boolean b) {
-        syslogStoreFullMessage = b;
-    }
-
-    public boolean getForceSyslogRdns() {
-        return forceSyslogRdns;
-    }
-
-    public void setForceSyslogRdns(boolean b) {
-        forceSyslogRdns = b;
-    }
-
-    public boolean getAllowOverrideSyslogDate() {
-        return allowOverrideSyslogDate;
     }
 
     public boolean performRetention() {
@@ -482,42 +325,6 @@ public class Configuration {
         return mongoThreadsAllowedToBlockMultiplier;
     }
 
-    public boolean isUseGELF() {
-        return useGELF;
-    }
-
-    public String getGelfListenAddress() {
-        return gelfListenAddress;
-    }
-
-    public int getGelfListenPort() {
-        return gelfListenPort;
-    }
-
-    public boolean isAmqpEnabled() {
-        return amqpEnabled;
-    }
-
-    public String getAmqpHost() {
-        return amqpHost;
-    }
-
-    public int getAmqpPort() {
-        return amqpPort;
-    }
-
-    public String getAmqpUsername() {
-        return amqpUsername;
-    }
-
-    public String getAmqpPassword() {
-        return amqpPassword;
-    }
-
-    public String getAmqpVirtualhost() {
-        return amqpVirtualhost;
-    }
-
     public String getDroolsRulesFile() {
         return droolsRulesFile;
     }
@@ -611,69 +418,7 @@ public class Configuration {
     public String getPluginDir() {
         return pluginDir;
     }
-    
-    public boolean isTransportEmailEnabled() {
-        return emailTransportEnabled;
-    }
-    
-    public Map<String, String> getEmailTransportConfiguration() {
-        Map<String, String> c = Maps.newHashMap();
-        
-        c.put("protocol", emailTransportProtocol);
-        c.put("hostname", emailTransportHostname);
-        c.put("port", String.valueOf(emailTransportPort));
-        c.put("use_auth", String.valueOf(emailTransportUseAuth));
-        c.put("username", emailTransportUsername);
-        c.put("password", emailTransportPassword);
-        c.put("use_tls", String.valueOf(emailTransportUseTls));
-        c.put("subject_prefix", emailTransportSubjectPrefix);
-        c.put("from_email", emailTransportFromEmail);
-        c.put("from_name", emailTransportFromName);
-        c.put("web_interface_url", emailTransportWebInterfaceUrl);
-        
-        return c;
-    }
-    
-    public boolean isTransportJabberEnabled() {
-        return jabberTransportEnabled;
-    }
-    
-    public Map<String, String> getJabberTransportConfiguration() {
-        Map<String, String> c = Maps.newHashMap();
-        
-        c.put("hostname", jabberTransportHostname);
-        c.put("port", String.valueOf(jabberTransportPort));
-        c.put("sasl_auth", String.valueOf(jabberTransportUseSASLAuth));
-        c.put("allow_selfsigned_certs", String.valueOf(jabberTransportAllowSelfsignedCerts));
-        c.put("username", jabberTransportUsername);
-        c.put("password", jabberTransportPassword);
-        c.put("message_prefix", jabberTransportMessagePrefix);
-        
-        return c;
-    }
-    
-    public Map<String, String> getInputConfig(Class<? extends MessageInput> input) {
-        if (input.equals(GELFTCPInput.class) || input.equals(GELFUDPInput.class)) {
-            return getGELFInputConfig();
-        }
-        
-        if (input.equals(SyslogTCPInput.class) || input.equals(SyslogUDPInput.class)) {
-            return getSyslogInputConfig();
-        }
-        
-        if (input.equals(GELFHttpInput.class)) {
-            return getGELFHttpInputConfig();
-        }
-        
-        if (input.equals(AMQPInput.class)) {
-            // AMQP has no special config needs for now.
-            return Maps.newHashMap();
-        }
-            
-        LOG.error("No standard configuration for input <{}> found.", input.getCanonicalName());
-        return Maps.newHashMap();
-    }
-    
+
     @ValidatorMethod
     public void validate() throws ValidationException {
 
@@ -681,18 +426,6 @@ public class Configuration {
 
             throw new ValidationException("mongodb_user and mongodb_password have to be set if mongodb_useauth is true");
         }
-    }
-
-    public boolean isHttpEnabled() {
-        return httpEnabled;
-    }
-
-    public String getHttpListenAddress() {
-        return httpListenAddress;
-    }
-
-    public int getHttpListenPort() {
-        return httpListenPort;
     }
 
     public URI getRestListenUri() {
@@ -709,32 +442,5 @@ public class Configuration {
             throw new RuntimeException("Could not parse REST listen URI.", e);
         }
     }
-    
-    private Map<String, String> getGELFInputConfig() {
-        Map<String, String> c = Maps.newHashMap();
-        
-        c.put("listen_address", getGelfListenAddress());
-        c.put("listen_port", String.valueOf(getGelfListenPort()));
-        
-        return c;
-    }
-    
-    private Map<String, String> getSyslogInputConfig() {
-        Map<String, String> c = Maps.newHashMap();
-        
-        c.put("listen_address", getSyslogListenAddress());
-        c.put("listen_port", String.valueOf(getSyslogListenPort()));
-        
-        return c;
-    }
-    
-    private Map<String, String> getGELFHttpInputConfig() {
-        Map<String, String> c = Maps.newHashMap();
-        
-        c.put("listen_address", getHttpListenAddress());
-        c.put("listen_port", String.valueOf(getHttpListenPort()));
-        
-        return c;
-    }
-    
+
 }

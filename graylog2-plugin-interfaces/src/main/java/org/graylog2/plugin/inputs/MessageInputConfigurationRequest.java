@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2012 Lennart Koopmann <lennart@socketfeed.com>
+ * Copyright (c) 2013 Lennart Koopmann <lennart@socketfeed.com>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of
  * this software and associated documentation files (the "Software"), to deal in
@@ -9,8 +9,8 @@
  * so, subject to the following conditions:
  *
  * The above copyright notice and this permission notice shall be included in all
- * copies or substantial portions of the Software. 
- * 
+ * copies or substantial portions of the Software.
+ *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -18,25 +18,11 @@
  * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
-*/
+ */
 package org.graylog2.plugin.inputs;
 
-import org.graylog2.plugin.GraylogServer;
-
 /**
- * @author Lennart Koopmann <lennart@socketfeed.com>
+ * @author Lennart Koopmann <lennart@torch.sh>
  */
-public interface MessageInput {
-    
-    public void configure(MessageInputConfiguration config, GraylogServer graylogServer) throws MessageInputConfigurationException;
-
-    public void launch() throws MisfireException;
-    public void stop();
-
-    public MessageInputConfigurationRequest getRequestedConfiguration();
-    public void setId(String id);
-    public String getId();
-    public boolean isExclusive();
-    public String getName();
-    
+public class MessageInputConfigurationRequest {
 }

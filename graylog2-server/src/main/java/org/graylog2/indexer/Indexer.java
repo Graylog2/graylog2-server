@@ -2,8 +2,11 @@ package org.graylog2.indexer;
 
 import com.beust.jcommander.internal.Sets;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.common.collect.Maps;
 import org.apache.commons.io.FileUtils;
+import org.elasticsearch.ElasticSearchTimeoutException;
 import org.elasticsearch.action.WriteConsistencyLevel;
+import org.elasticsearch.action.admin.cluster.health.ClusterHealthRequest;
 import org.elasticsearch.action.admin.cluster.node.info.NodesInfoRequest;
 import org.elasticsearch.action.admin.cluster.node.info.NodesInfoResponse;
 import org.elasticsearch.action.admin.cluster.state.ClusterStateRequest;
@@ -22,6 +25,7 @@ import org.elasticsearch.common.xcontent.XContentType;
 import org.elasticsearch.node.Node;
 import org.elasticsearch.node.NodeBuilder;
 import org.graylog2.Core;
+import org.graylog2.UI;
 import org.graylog2.system.activities.Activity;
 import org.graylog2.indexer.cluster.Cluster;
 import org.graylog2.indexer.counts.Counts;
@@ -39,6 +43,7 @@ import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.TimeUnit;
 
 import static org.elasticsearch.node.NodeBuilder.nodeBuilder;
 
@@ -69,16 +74,30 @@ public class Indexer {
 
         final NodeBuilder builder = nodeBuilder().client(true);
         String esSettings;
-        Map<String, String> settings = null;
+        Map<String, String> settings = Maps.newHashMap();
+
+        // TODO: fill this with usueful stuff to make elasticsearch.yml optional.
+        // Standard Configuration.
+        settings.put("discovery.initial_state_timeout", "3s");
+
+        // Overwrite from a custom ElasticSearch config file.
         try {
             esSettings = FileUtils.readFileToString(new File(graylogServer.getConfiguration().getElasticSearchConfigFile()));
-            settings = new YamlSettingsLoader().load(esSettings);
+            settings.putAll(new YamlSettingsLoader().load(esSettings));
         } catch (IOException e) {
             throw new RuntimeException("Cannot read elasticsearch configuration.", e);
         }
+
         builder.settings().put(settings);
         final Node node = builder.node();
         client = node.client();
+
+        try {
+            client.admin().cluster().health(new ClusterHealthRequest().waitForYellowStatus()).actionGet(5, TimeUnit.SECONDS);
+        } catch(ElasticSearchTimeoutException e) {
+            UI.exitHardWithWall("No ElasticSearch master was found.", new String[]{ "graylog2-server/connecting-to-an-elasticsearch-cluster" });
+        }
+
 
         Runtime.getRuntime().addShutdownHook(new Thread() {
             @Override

@@ -22,7 +22,7 @@ package org.graylog2.inputs.gelf;
 
 import com.google.common.collect.Maps;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
-import org.graylog2.plugin.inputs.MessageInput;
+import org.graylog2.plugin.inputs.*;
 import org.jboss.netty.bootstrap.ServerBootstrap;
 import org.jboss.netty.channel.ChannelException;
 import org.jboss.netty.channel.socket.nio.NioServerSocketChannelFactory;
@@ -30,6 +30,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.net.InetSocketAddress;
+import java.net.SocketAddress;
 import java.util.Map;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -45,44 +46,8 @@ public class GELFTCPInput implements MessageInput {
 
     private static final String NAME = "GELF TCP";
 
-    private Core graylogServer;
-    private InetSocketAddress socketAddress;
-
-    @Override
-    public void initialize(Map<String, String> configuration, GraylogServer graylogServer) {
-        this.graylogServer = (Core) graylogServer;
-        this.socketAddress = new InetSocketAddress(
-                configuration.get("listen_address"),
-                Integer.parseInt(configuration.get("listen_port"))
-        );
-
-        spinUp();
-    }
-
-    private void spinUp() {
-        final ExecutorService bossThreadPool = Executors.newCachedThreadPool(
-                new ThreadFactoryBuilder()
-                .setNameFormat("input-gelftcp-boss-%d")
-                .build());
-        
-        final ExecutorService workerThreadPool = Executors.newCachedThreadPool(
-                new ThreadFactoryBuilder()
-                .setNameFormat("input-gelftcp-worker-%d")
-                .build());
-
-        ServerBootstrap tcpBootstrap = new ServerBootstrap(
-            new NioServerSocketChannelFactory(bossThreadPool, workerThreadPool)
-        );
-
-        tcpBootstrap.setPipelineFactory(new GELFTCPPipelineFactory(this.graylogServer));
-
-        try {
-            tcpBootstrap.bind(socketAddress);
-            LOG.info("Started TCP GELF server on {}", socketAddress);
-        } catch (ChannelException e) {
-            LOG.error("Could not bind TCP GELF server to address " + socketAddress, e);
-        }
-    }
+    private MessageInputConfiguration config;
+    private GraylogServer server;
 
     @Override
     public String getName() {
@@ -90,9 +55,64 @@ public class GELFTCPInput implements MessageInput {
     }
 
     @Override
-    public Map<String, String> getRequestedConfiguration() {
-        // Built in input. This is just for plugin compat. No special configuration required.
-        return Maps.newHashMap();
+    public void configure(MessageInputConfiguration config, GraylogServer graylogServer) throws MessageInputConfigurationException {
+        this.config = config;
+        this.server = graylogServer;
+    }
+
+    @Override
+    public void launch() throws MisfireException {
+        /*final ExecutorService bossThreadPool = Executors.newCachedThreadPool(
+                new ThreadFactoryBuilder()
+                        .setNameFormat("input-gelftcp-boss-%d")
+                        .build());
+
+        final ExecutorService workerThreadPool = Executors.newCachedThreadPool(
+                new ThreadFactoryBuilder()
+                        .setNameFormat("input-gelftcp-worker-%d")
+                        .build());
+
+        ServerBootstrap tcpBootstrap = new ServerBootstrap(
+                new NioServerSocketChannelFactory(bossThreadPool, workerThreadPool)
+        );
+
+        tcpBootstrap.shutdown();
+
+        tcpBootstrap.setPipelineFactory(new GELFTCPPipelineFactory((Core) server));
+
+        SocketAddress socketAddress = config.get("listen_address").asSocketAddress();
+
+        try {
+            tcpBootstrap.bind(socketAddress);
+            LOG.info("Started TCP GELF server on {}", socketAddress);
+        } catch (ChannelException e) {
+            LOG.error("Could not bind TCP GELF server to address " + socketAddress, e);
+        }*/
+    }
+
+    @Override
+    public void stop() {
+
+    }
+
+    @Override
+    public MessageInputConfigurationRequest getRequestedConfiguration() {
+        return new MessageInputConfigurationRequest();
+    }
+
+    @Override
+    public void setId(String id) {
+        //To change body of implemented methods use File | Settings | File Templates.
+    }
+
+    @Override
+    public String getId() {
+        return null;  //To change body of implemented methods use File | Settings | File Templates.
+    }
+
+    @Override
+    public boolean isExclusive() {
+        return false;
     }
 
 }

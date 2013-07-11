@@ -63,10 +63,9 @@ public class AnonymousInformationCollector {
     private Map<String, Integer> numberOfLoadedModules() {
         try {
             Map<String, Integer> plugins = Maps.newHashMap();
-            plugins.put("initializers", server.getInitializers().size());
-            plugins.put("inputs", server.getInputs().size());
+            plugins.put("initializers", server.initializers().count());
             plugins.put("filters", server.getFilters().size());
-            plugins.put("outputs", server.getOutputs().size());
+            plugins.put("outputs", server.outputs().count());
             plugins.put("transports", server.getTransports().size());
             plugins.put("alarm_callbacks", server.getAlarmCallbacks().size());
 
