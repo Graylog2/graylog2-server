@@ -23,6 +23,7 @@ package org.graylog2;
 import com.codahale.metrics.JmxReporter;
 import com.codahale.metrics.MetricRegistry;
 import com.codahale.metrics.log4j.InstrumentedAppender;
+import org.elasticsearch.discovery.MasterNotDiscoveredException;
 import org.graylog2.cluster.Node;
 import org.graylog2.cluster.NodeNotFoundException;
 import org.graylog2.plugin.Tools;
@@ -162,7 +163,7 @@ public final class Main {
         // Le server object. This is where all the magic happens.
         Core server = new Core();
         server.initialize(configuration, metrics);
-        
+
         // Could it be that there is another master instance already?
         Node.register(server, configuration.isMaster(), configuration.getRestListenUri());
 

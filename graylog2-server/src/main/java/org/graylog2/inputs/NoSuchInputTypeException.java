@@ -17,16 +17,18 @@
  * along with Graylog2.  If not, see <http://www.gnu.org/licenses/>.
  *
  */
-package org.graylog2.rest.resources.system.inputs.requests;
-
-import com.fasterxml.jackson.annotation.JsonProperty;
+package org.graylog2.inputs;
 
 /**
  * @author Lennart Koopmann <lennart@torch.sh>
  */
-public class InputLaunchRequest {
+public class NoSuchInputTypeException extends Throwable {
 
-    public String title;
-    public String type;
+    public NoSuchInputTypeException() {
+    }
+
+    public NoSuchInputTypeException(String s) {
+        super(s);
+    }
 
 }

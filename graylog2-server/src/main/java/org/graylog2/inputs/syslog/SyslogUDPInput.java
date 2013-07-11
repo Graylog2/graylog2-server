@@ -23,10 +23,7 @@ package org.graylog2.inputs.syslog;
 import com.google.common.collect.Maps;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import org.graylog2.Core;
-import org.graylog2.plugin.inputs.MessageInput;
-import org.graylog2.plugin.inputs.MessageInputConfiguration;
-import org.graylog2.plugin.inputs.MessageInputConfigurationException;
-import org.graylog2.plugin.inputs.MessageInputConfigurationRequest;
+import org.graylog2.plugin.inputs.*;
 import org.jboss.netty.bootstrap.ConnectionlessBootstrap;
 import org.jboss.netty.channel.ChannelException;
 import org.jboss.netty.channel.FixedReceiveBufferSizePredictorFactory;
@@ -55,7 +52,7 @@ public class SyslogUDPInput implements MessageInput {
     }
 
     @Override
-    public void start() {
+    public void launch() throws MisfireException {
         //To change body of implemented methods use File | Settings | File Templates.
     }
 

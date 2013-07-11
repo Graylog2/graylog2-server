@@ -22,6 +22,7 @@ package org.graylog2;
 
 import com.codahale.metrics.MetricRegistry;
 import com.codahale.metrics.jersey.InstrumentedResourceMethodDispatchAdapter;
+import org.elasticsearch.discovery.MasterNotDiscoveredException;
 import org.glassfish.grizzly.http.server.HttpServer;
 import org.graylog2.inputs.Inputs;
 import org.graylog2.outputs.Outputs;

@@ -25,10 +25,7 @@ import com.google.common.collect.Maps;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import org.graylog2.Core;
 import org.graylog2.plugin.GraylogServer;
-import org.graylog2.plugin.inputs.MessageInput;
-import org.graylog2.plugin.inputs.MessageInputConfiguration;
-import org.graylog2.plugin.inputs.MessageInputConfigurationException;
-import org.graylog2.plugin.inputs.MessageInputConfigurationRequest;
+import org.graylog2.plugin.inputs.*;
 import org.jboss.netty.bootstrap.ConnectionlessBootstrap;
 import org.jboss.netty.channel.ChannelException;
 import org.jboss.netty.channel.FixedReceiveBufferSizePredictorFactory;
@@ -50,49 +47,9 @@ public class GELFUDPInput implements MessageInput {
 
     private static final String NAME = "GELF UDP";
 
-    private Core graylogServer;
+    private Core core;
+    private String inputId;
     private InetSocketAddress socketAddress;
-
-    /*@Override
-    public void initialize(Map<String, String> configuration, GraylogServer graylogServer) {
-        this.graylogServer = (Core) graylogServer;
-        this.socketAddress = new InetSocketAddress(
-                    configuration.get("listen_address"),
-                    Integer.parseInt(configuration.get("listen_port"))
-        );
-
-        spinUp();
-    }
-
-    private void spinUp() {
-
-        final ExecutorService workerThreadPool = Executors.newCachedThreadPool(
-                new ThreadFactoryBuilder()
-                .setNameFormat("input-gelfudp-worker-%d")
-                .build());
-
-        final ConnectionlessBootstrap bootstrap = new ConnectionlessBootstrap(new NioDatagramChannelFactory(workerThreadPool));
-
-        bootstrap.setOption("receiveBufferSizePredictorFactory", new FixedReceiveBufferSizePredictorFactory(
-                graylogServer.getConfiguration().getUdpRecvBufferSizes())
-        );
-        bootstrap.setPipelineFactory(new GELFUDPPipelineFactory(graylogServer));
-
-        try {
-            bootstrap.bind(socketAddress);
-            LOG.info("Started UDP GELF server on {}", socketAddress);
-        } catch (ChannelException e) {
-            LOG.error("Could not bind UDP GELF server to address " + socketAddress, e);
-        }
-    }*/
-
-
-
-
-
-
-
-
 
     @Override
     public String getName() {
@@ -101,17 +58,39 @@ public class GELFUDPInput implements MessageInput {
 
     @Override
     public void configure(MessageInputConfiguration config, GraylogServer graylogServer) throws MessageInputConfigurationException {
-        //To change body of implemented methods use File | Settings | File Templates.
+        this.core = (Core) graylogServer;
+
+        // TODO load from actual config.
+        this.socketAddress = new InetSocketAddress("127.0.0.1",12201);
     }
 
     @Override
-    public void start() {
-        //To change body of implemented methods use File | Settings | File Templates.
+    public void launch() throws MisfireException {
+        final ExecutorService workerThreadPool = Executors.newCachedThreadPool(
+                new ThreadFactoryBuilder()
+                        .setNameFormat("input-" + inputId + "-gelfudp-worker-%d")
+                        .build());
+
+        final ConnectionlessBootstrap bootstrap = new ConnectionlessBootstrap(new NioDatagramChannelFactory(workerThreadPool));
+
+        bootstrap.setOption("receiveBufferSizePredictorFactory", new FixedReceiveBufferSizePredictorFactory(
+                core.getConfiguration().getUdpRecvBufferSizes())
+        );
+        bootstrap.setPipelineFactory(new GELFUDPPipelineFactory(core));
+
+        try {
+            bootstrap.bind(socketAddress);
+            LOG.info("Started UDP GELF server on {}", socketAddress);
+        } catch (Exception e) {
+            String msg = "Could not bind UDP GELF server to address " + socketAddress;
+            LOG.error(msg, e);
+            throw new MisfireException(msg);
+        }
     }
 
     @Override
     public void stop() {
-        //To change body of implemented methods use File | Settings | File Templates.
+        // TODO implement me.
     }
 
     @Override
@@ -121,17 +100,17 @@ public class GELFUDPInput implements MessageInput {
 
     @Override
     public void setId(String id) {
-        //To change body of implemented methods use File | Settings | File Templates.
+        this.inputId = id;
     }
 
     @Override
     public String getId() {
-        return null;  //To change body of implemented methods use File | Settings | File Templates.
+        return inputId;
     }
 
     @Override
     public boolean isExclusive() {
-        return false;  //To change body of implemented methods use File | Settings | File Templates.
+        return false;
     }
 
 }
