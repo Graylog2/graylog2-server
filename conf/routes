@@ -21,7 +21,7 @@ GET        /streams                                 controllers.StreamsControlle
 GET        /streams/new                             controllers.StreamsController.newStream()
 
 # System
-GET        /system                                  controllers.SystemController.index()
+GET        /system                                  controllers.SystemController.index(page:Integer ?= 1)
 GET        /system/nodes                            controllers.SystemController.nodes()
 
 # Systemjobs

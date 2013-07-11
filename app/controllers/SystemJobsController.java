@@ -49,7 +49,7 @@ public class SystemJobsController {
 
         try {
             SystemJob.trigger(SystemJob.Type.valueOf(body.asFormUrlEncoded().get("job")[0]), currentUser());
-            return redirect(routes.SystemController.index());
+            return redirect(routes.SystemController.index(1));
         } catch (IOException e) {
             return status(504, views.html.errors.error.render(Api.ERROR_MSG_IO, e, request()));
         } catch (APIException e) {

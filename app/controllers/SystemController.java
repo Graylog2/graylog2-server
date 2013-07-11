@@ -39,14 +39,23 @@ import java.util.Set;
  */
 public class SystemController extends AuthenticatedController {
 
-    public static Result index() {
+    public static Result index(Integer page) {
         try {
             List<Notification> notifications = Notification.all();
             List<SystemJob> systemJobs = SystemJob.all();
-            List<SystemMessage> systemMessages = SystemMessage.all();
+            int totalSystemMessages = SystemMessage.total();
+            List<SystemMessage> systemMessages = SystemMessage.all(Integer.valueOf(page-1));
             ESClusterHealth clusterHealth = ESClusterHealth.get();
 
-            return ok(views.html.system.index.render(currentUser(), systemJobs, clusterHealth, systemMessages, notifications));
+            return ok(views.html.system.index.render(
+                    currentUser(),
+                    systemJobs,
+                    clusterHealth,
+                    systemMessages,
+                    totalSystemMessages,
+                    page,
+                    notifications
+            ));
         } catch (IOException e) {
             return status(504, views.html.errors.error.render(Api.ERROR_MSG_IO, e, request()));
         } catch (APIException e) {

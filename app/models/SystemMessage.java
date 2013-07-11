@@ -35,6 +35,9 @@ import java.util.List;
  */
 public class SystemMessage {
 
+    // This must match the messages returned per page by server or things will go horribly wrong.
+    public static final int PER_PAGE = 30;
+
     private DateTime timestamp;
     private String caller;
     private String content;
@@ -47,8 +50,8 @@ public class SystemMessage {
         this.nodeId = sms.nodeId;
     }
 
-    public static List<SystemMessage> all() throws IOException, APIException {
-        GetSystemMessagesResponse r = Api.get("system/messages", GetSystemMessagesResponse.class);
+    public static List<SystemMessage> all(int page) throws IOException, APIException {
+        GetSystemMessagesResponse r = Api.get("system/messages?page=" + page, GetSystemMessagesResponse.class);
 
         List<SystemMessage> messages = Lists.newArrayList();
         for (SystemMessageSummaryResponse message : r.messages) {
@@ -56,6 +59,10 @@ public class SystemMessage {
         }
 
         return messages;
+    }
+
+    public static int total() throws IOException, APIException {
+        return Api.get("system/messages", GetSystemMessagesResponse.class).total;
     }
 
     public DateTime getTimestamp() {

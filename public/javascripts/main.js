@@ -305,6 +305,11 @@ $(document).ready(function() {
         return confirm($(this).attr("data-confirm"));
     });
 
+    // Paginator disabled links should not trigger anything.
+    $(".pagination .disabled a").on("click", function() {
+       return false;
+    });
+
 	function displayFailureInSidebar(message) {
 		x = "<span class='alert alert-error sidebar-alert'><i class='icon-warning-sign'></i> " + message + "</span>"
 		$("#sidebar-inner").html(x);

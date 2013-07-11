@@ -1,6 +1,9 @@
 @(currentUser: User,
-        jobs: List[SystemJob], clusterHealth: ESClusterHealth,
+        jobs: List[SystemJob],
+        clusterHealth: ESClusterHealth,
         systemMessages: List[SystemMessage],
+        totalSystemMessages: Integer,
+        page: Integer,
         notifications: List[Notification])
 
 @main("System", views.html.system.sidebar(), "", currentUser) {
@@ -97,9 +100,6 @@
         @clusterHealth.getInitializingShards init
     </div>
 
-    <!-- TODO fix the styling here -->
-    <!-- TODO needs pagination -->
-
     <div class="row-fluid">
         <h2><i class="icon icon-comments-alt"></i> Messages and notifications</h2>
 
@@ -121,5 +121,7 @@
             </tbody>
 
         </table>
+
+        @partials.paginator(page, SystemMessage.PER_PAGE, totalSystemMessages, routes.SystemController.index(_))
     </div>
 }
