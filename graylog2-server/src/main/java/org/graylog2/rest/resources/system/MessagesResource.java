@@ -73,6 +73,7 @@ public class MessagesResource extends RestResource {
 
         Map<String, Object> result = Maps.newHashMap();
         result.put("messages", messages);
+        result.put("total", SystemMessage.totalCount(core, SystemMessage.COLLECTION));
 
         return json(result, prettyPrint);
     }
