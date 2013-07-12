@@ -348,3 +348,8 @@ form #stream-rules {
     position: relative;
     top: -1px;
 }
+
+.es-cluster-status {
+    margin-top: 10px;
+    margin-bottom: 5px;
+}

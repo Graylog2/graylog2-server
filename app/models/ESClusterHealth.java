@@ -56,6 +56,18 @@ public class ESClusterHealth {
         return status;
     }
 
+    public boolean isGreen() {
+        return this.status == ClusterHealthStatus.GREEN;
+    }
+
+    public boolean isYellow() {
+        return this.status == ClusterHealthStatus.YELLOW;
+    }
+
+    public boolean isRed() {
+        return this.status == ClusterHealthStatus.RED;
+    }
+
     public int getRelocatingShards() {
         return relocatingShards;
     }
