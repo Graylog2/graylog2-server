@@ -82,6 +82,10 @@ public class Node {
         return all().get(randomGenerator.nextInt(nodes.size()));
     }
 
+    public String getThreadDump() throws IOException, APIException {
+        return Api.get(this, "/system/threaddump", String.class);
+    }
+
     public String getTransportAddress() {
         return transportAddress;
     }

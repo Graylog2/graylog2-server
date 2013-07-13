@@ -23,6 +23,7 @@ GET        /streams/new                             controllers.StreamsControlle
 # System
 GET        /system                                  controllers.SystemController.index(page:Integer ?= 1)
 GET        /system/nodes                            controllers.SystemController.nodes()
+GET        /system/threaddump/:node_id             controllers.SystemController.threadDump(node_id: String)
 
 # Systemjobs
 POST        /systemjobs/trigger                     controllers.SystemJobsController.trigger()

@@ -30,23 +30,35 @@
                         <strong class="node-throughput" data-node-id="@jvm.getNodeId">9</strong>
                         messages per second.
                     </span>
-
-                    <a href="#" class="btn btn-danger btn-mini change-message-processing"
-                            data-action="pause"
-                            data-node-id="@jvm.getNodeId">
-                        Pause
-                    </a>
                 } else {
                     <span class="sentence">
                         Processing is <strong>paused</strong>.
                     </span>
-
-                    <a href="#" class="btn btn-success btn-mini change-message-processing"
-                            data-action="resume"
-                            data-node-id="@jvm.getNodeId">
-                        Resume
-                    </a>
                 }
+
+                <div class="btn-group">
+                    <a class="btn btn-mini dropdown-toggle" data-toggle="dropdown" href="#">
+                        Action
+                        <span class="caret"></span>
+                    </a>
+                    <ul class="dropdown-menu">
+                        <li>
+                        @if(jvm.isProcessing) {
+                            <a class="change-message-processing"
+                            data-action="pause"
+                            data-node-id="@jvm.getNodeId"
+                            href="#">Pause message processing</a>
+                        } else {
+                            <a class="change-message-processing"
+                            data-action="resume"
+                            data-node-id="@jvm.getNodeId"
+                            href="#">Resume message processing</a>
+                        }
+                        </li>
+
+                        <li><a href="/system/threaddump/@jvm.getNodeId">Get thread dump</a></li>
+                    </ul>
+                </div>
             </span>
 
             <h3>

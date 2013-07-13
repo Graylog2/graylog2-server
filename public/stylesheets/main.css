@@ -353,3 +353,19 @@ form #stream-rules {
     margin-top: 10px;
     margin-bottom: 5px;
 }
+
+.dropdown-menu li {
+    font-size: 12px;
+}
+
+.breadcrumb {
+    background-color: #fff;
+    padding: 0px;
+    margin: 0px;
+    margin-bottom: 10px;
+    color: #ccc;
+}
+
+.breadcrumb a {
+    color: #008693;
+}

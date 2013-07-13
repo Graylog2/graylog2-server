@@ -38,12 +38,22 @@ public class Api {
 	public static <T> T get(URL url, Class<T> responseClass) throws APIException, IOException {
 		try {
 			AsyncHttpClient.BoundRequestBuilder requestBuilder = client.prepareGet(url.toString());
-			requestBuilder.addHeader("Accept", "application/json");
+
+            // TODO: better make this better bro
+            if (!responseClass.equals(String.class)) {
+			    requestBuilder.addHeader("Accept", "application/json");
+            }
+
 			final Response response = requestBuilder.execute().get();
 
 			if (response.getStatusCode() != 200) {
 				throw new APIException(response.getStatusCode(), "REST call [" + url + "] returned " + response.getStatusText());
 			}
+
+            // TODO: better make this better bro
+            if (responseClass.equals(String.class)) {
+                return (T) response.getResponseBody("UTF-8");
+            }
 
 			Gson gson = new Gson();
 			return gson.fromJson(response.getResponseBody("UTF-8"), responseClass);
