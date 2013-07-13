@@ -50,9 +50,8 @@ public class SystemJob {
     private final UUID id;
     private final String name;
     private final String description;
-    private final String nodeId;
+    private final Node node;
     private final DateTime startedAt;
-    private final User startedBy;
     private final int percentComplete;
     private final boolean isCancelable;
     private final boolean providesProgress;
@@ -61,9 +60,8 @@ public class SystemJob {
         this.id = UUID.fromString(s.id);
         this.name = s.name;
         this.description = s.description;
-        this.nodeId = s.nodeId;
+        this.node = Node.fromId(s.nodeId);
         this.startedAt = DateTime.parse(s.startedAt);
-        this.startedBy = null; // TODO try to load user
         this.percentComplete = s.percentComplete;
         this.isCancelable = s.isCancelable;
         this.providesProgress = s.providesProgress;
@@ -85,8 +83,8 @@ public class SystemJob {
         return description;
     }
 
-    public String getNodeId() {
-        return nodeId;
+    public Node getNode() {
+        return node;
     }
 
     public int getPercentComplete() {

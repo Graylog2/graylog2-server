@@ -29,6 +29,8 @@ public class NodeSummaryResponse {
     @SerializedName("node_id")
     public String nodeId;
 
+    public String hostname;
+
     @SerializedName("last_seen")
     public String lastSeen;
 

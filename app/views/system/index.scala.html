@@ -66,10 +66,8 @@
             <div class="systemjob systemjob-progress systemjob-active" id="job-@job.getId()" data-job-id="@job.getId()">
                 <i class="icon icon-cog"></i>
                 Started @job.getName
-                on <a href="#">implement.me.local</a>
+                on @partials.links.to_node(job.getNode)
                 at @job.getStartedAt()
-
-                <a href="#" title="Open details"><i class="icon icon-external-link"></i></a>
 
                 <span class="label label-success finished">Finished!</span>
 
@@ -124,9 +122,11 @@
 
         <table class="system-messages table table-striped table-hover table-condensed">
             <thead>
-                <th style="width: 170px;">Timestamp</th>
-                <th>Node</th>
-                <th>Message</th>
+                <tr>
+                    <th style="width: 170px;">Timestamp</th>
+                    <th>Node</th>
+                    <th>Message</th>
+                </tr>
             </thead>
 
             <tbody>

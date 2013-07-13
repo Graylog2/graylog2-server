@@ -36,23 +36,32 @@ import java.util.Random;
  */
 public class Node {
 
-    private static Random randomGenerator = new Random();
+    private static final Random randomGenerator = new Random();
 
     private final String transportAddress;
     private final DateTime lastSeen;
     private final String nodeId;
+    private final String hostname;
 
     public Node(NodeSummaryResponse r) {
         transportAddress = r.transportAddress;
         lastSeen = new DateTime(r.lastSeen);
         nodeId = r.nodeId;
+        hostname = r.hostname;
     }
 
-    public static Node fromId(String id) throws IOException, APIException {
-        NodeSummaryResponse response = Api.get(
-                Configuration.getServerRestUris().get(0),
-                "/cluster/nodes/" + id,
-                NodeSummaryResponse.class);
+    public static Node fromId(String id) {
+        NodeSummaryResponse response = null;
+        try {
+            response = Api.get(
+                    Configuration.getServerRestUris().get(0),
+                    "/cluster/nodes/" + id,
+                    NodeSummaryResponse.class);
+        } catch (IOException e) {
+            return null;
+        } catch (APIException e) {
+            return null;
+        }
 
         return new Node(response);
     }
@@ -83,5 +92,9 @@ public class Node {
 
     public String getNodeId() {
         return nodeId;
+    }
+
+    public String getHostname() {
+        return hostname;
     }
 }
