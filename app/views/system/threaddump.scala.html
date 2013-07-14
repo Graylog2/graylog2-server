@@ -1,8 +1,8 @@
-@(currentUser: User, breadcrumbs: lib.Breadcrumbs, node: Node, dump: String)
+@(currentUser: User, breadcrumbs: lib.BreadcrumbList, node: Node, dump: String)
 
 @main("Nodes", views.html.system.sidebar(), "", currentUser) {
 
-    @Html(breadcrumbs.draw())
+    @views.html.partials.breadcrumbs(breadcrumbs)
 
     <div class="row-fluid">
         <h1><i class="icon icon-film"></i> Thread dump of @node.getNodeId</h1>

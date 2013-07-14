@@ -22,9 +22,9 @@ package controllers;
 import com.google.common.collect.Maps;
 import lib.APIException;
 import lib.Api;
+import lib.BreadcrumbList;
 import models.*;
 import play.mvc.*;
-import lib.Breadcrumbs;
 
 import java.io.IOException;
 import java.util.List;
@@ -80,7 +80,7 @@ public class SystemController extends AuthenticatedController {
     }
 
     public static Result threadDump(String nodeId) {
-        Breadcrumbs bc = new Breadcrumbs();
+        BreadcrumbList bc = new BreadcrumbList();
         bc.addCrumb("System", routes.SystemController.index(0));
         bc.addCrumb("Nodes", routes.SystemController.nodes());
         bc.addCrumb("Thread dump", routes.SystemController.threadDump(nodeId));

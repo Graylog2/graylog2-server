@@ -19,21 +19,21 @@
  */
 package lib;
 
+import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import play.api.mvc.Call;
 
+import java.util.List;
 import java.util.Map;
 
 /**
  * @author Lennart Koopmann <lennart@torch.sh>
  */
-public class Breadcrumbs {
-
-    // TODO this sucks and needs a proper template engine. (like play has lol)
+public class BreadcrumbList {
 
     private final Map<String, Call> crumbs;
 
-    public Breadcrumbs() {
+    public BreadcrumbList() {
         crumbs = Maps.newLinkedHashMap();
     }
 
@@ -41,37 +41,41 @@ public class Breadcrumbs {
         crumbs.put(title, call);
     }
 
-    public String draw() {
-        StringBuilder sb = new StringBuilder();
-
-        sb.append("<ul class=\"breadcrumb\">");
-
-        sb.append("<li><i class='icon icon-anchor'></i>&nbsp;&nbsp;</li>");
+    public List<Crumb> get() {
+        List<Crumb> list = Lists.newArrayList();
 
         int i = 0;
-        for(Map.Entry<String, Call> crumb : crumbs.entrySet()) {
-            sb.append("<li>");
-
-            if (i != crumbs.size()-1) {
-                sb.append("<a href=\"").append(crumb.getValue().url()).append("\">");
-                sb.append(crumb.getKey());
-                sb.append("</a>");
-            } else {
-                sb.append(crumb.getKey());
-            }
-
-            if (i != crumbs.size()-1) {
-                sb.append("<span class=\"divider\">/</span>");
-            }
-
-            sb.append("</li>");
-
+        for (Map.Entry<String, Call> e : crumbs.entrySet()) {
+            list.add(new Crumb(e.getValue().url(), e.getKey(), (i == crumbs.size()-1)));
             i++;
         }
 
-        sb.append("</ul>");
+        return list;
+    }
 
-        return sb.toString();
+    public class Crumb {
+
+        private final String title;
+        private final String url;
+        private final boolean isLast;
+
+        public Crumb(String url, String title, boolean isLast) {
+            this.url = url;
+            this.title = title;
+            this.isLast = isLast;
+        }
+
+        public String getTitle() {
+            return title;
+        }
+
+        public String getUrl() {
+            return url;
+        }
+
+        public  boolean isLast() {
+            return isLast;
+        }
     }
 
 }
