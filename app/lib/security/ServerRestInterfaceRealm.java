@@ -39,9 +39,9 @@ public class ServerRestInterfaceRealm extends AuthorizingRealm {
 				throw new UnauthorizedException();
 			}
 		} catch (IOException e) {
-			throw new AuthenticationException("Unabled to communicate with graylog2-server backend", e);
+			throw new AuthenticationException("Unable to communicate with graylog2-server backend", e);
 		} catch (APIException e) {
-			throw new AuthenticationException("Unabled to communicate with graylog2-server backend", e);
+			throw new AuthenticationException("Unable to communicate with graylog2-server backend", e);
 		}
 		return new SimpleAuthenticationInfo(response.username, token.getCredentials(), "rest-interface");
 	}

@@ -9,11 +9,9 @@ public class User {
 		this.name = name;
 		this.email = email;
 	}
-	
+
 	public static User load(String userId) {
-		User user = new User("lennart", "lennart@torch.sh");
-		
-		return user;
+		return new User("lennart", "lennart@torch.sh");
 	}
 	
 	public String getName() {
