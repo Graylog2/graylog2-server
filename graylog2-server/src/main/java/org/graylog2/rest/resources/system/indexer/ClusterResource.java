@@ -22,8 +22,6 @@ package org.graylog2.rest.resources.system.indexer;
 import com.codahale.metrics.annotation.Timed;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.Maps;
-import com.sun.jersey.api.core.ResourceConfig;
-import org.graylog2.Core;
 import org.graylog2.rest.resources.RestResource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -32,7 +30,6 @@ import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
-import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import java.util.Map;
 
@@ -46,15 +43,10 @@ public class ClusterResource extends RestResource {
 
     private final ObjectMapper objectMapper = new ObjectMapper();
 
-    @Context
-    ResourceConfig rc;
-
     @GET @Timed
     @Path("/name")
     @Produces(MediaType.APPLICATION_JSON)
     public String name(@QueryParam("pretty") boolean prettyPrint) {
-        Core core = (Core) rc.getProperty("core");
-
         Map<String, Object> result = Maps.newHashMap();
         result.put("name", core.getIndexer().cluster().getName());
 
@@ -65,8 +57,6 @@ public class ClusterResource extends RestResource {
     @Path("/health")
     @Produces(MediaType.APPLICATION_JSON)
     public String health(@QueryParam("pretty") boolean prettyPrint) {
-        Core core = (Core) rc.getProperty("core");
-
         Map<String, Integer> shards = Maps.newHashMap();
         shards.put("active", core.getIndexer().cluster().getActiveShards());
         shards.put("initializing", core.getIndexer().cluster().getInitializingShards());

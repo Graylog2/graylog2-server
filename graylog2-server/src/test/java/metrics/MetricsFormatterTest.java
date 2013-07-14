@@ -17,14 +17,16 @@
  * along with Graylog2.  If not, see <http://www.gnu.org/licenses/>.
  *
  */
-package org.graylog2.metrics;
+package metrics;
 
 import com.google.common.collect.Maps;
+import org.graylog2.metrics.MetricsFormatter;
 import org.junit.Test;
-import static org.junit.Assert.*;
 
 import java.util.HashMap;
 import java.util.Map;
+
+import static org.junit.Assert.assertEquals;
 
 /**
  * @author Lennart Koopmann <lennart@torch.sh>

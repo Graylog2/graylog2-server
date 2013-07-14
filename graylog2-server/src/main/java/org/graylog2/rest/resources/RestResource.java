@@ -20,26 +20,30 @@
 
 package org.graylog2.rest.resources;
 
-import javax.ws.rs.WebApplicationException;
-import javax.ws.rs.core.Response;
-
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.Maps;
 import org.bson.types.ObjectId;
+import org.graylog2.Core;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.inject.Inject;
+import javax.ws.rs.WebApplicationException;
+import javax.ws.rs.core.Response;
 import java.util.Map;
 
 /**
  * @author Lennart Koopmann <lennart@torch.sh>
  */
-public class RestResource {
+public abstract class RestResource {
 	
 	private static final Logger LOG = LoggerFactory.getLogger(RestResource.class);
 
     protected final ObjectMapper objectMapper = new ObjectMapper();
+
+    @Inject
+    protected Core core;
 
 	protected RestResource() { /* */ }
 

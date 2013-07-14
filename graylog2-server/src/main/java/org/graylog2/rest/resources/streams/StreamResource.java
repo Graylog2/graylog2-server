@@ -20,24 +20,23 @@
 package org.graylog2.rest.resources.streams;
 
 import com.beust.jcommander.internal.Lists;
+import com.codahale.metrics.annotation.Timed;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.Maps;
-import com.sun.jersey.api.core.ResourceConfig;
-import com.codahale.metrics.annotation.Timed;
 import org.bson.types.ObjectId;
+import org.glassfish.jersey.server.ResourceConfig;
 import org.graylog2.Core;
 import org.graylog2.database.NotFoundException;
+import org.graylog2.database.ValidationException;
 import org.graylog2.plugin.streams.Stream;
 import org.graylog2.rest.resources.RestResource;
 import org.graylog2.rest.resources.streams.requests.CreateRequest;
 import org.graylog2.streams.StreamImpl;
+import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import org.graylog2.database.ValidationException;
-import org.joda.time.DateTime;
 
 import javax.ws.rs.*;
 import javax.ws.rs.core.Context;

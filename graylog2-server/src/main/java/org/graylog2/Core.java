@@ -21,64 +21,68 @@
 package org.graylog2;
 
 import com.codahale.metrics.MetricRegistry;
-import com.codahale.metrics.jersey.InstrumentedResourceMethodDispatchAdapter;
-import org.elasticsearch.discovery.MasterNotDiscoveredException;
-import org.glassfish.grizzly.http.server.HttpServer;
-import org.graylog2.inputs.Inputs;
-import org.graylog2.outputs.Outputs;
-import org.graylog2.plugin.Tools;
-
-import java.io.IOException;
-import java.net.URI;
-import java.util.List;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
-
-import org.graylog2.system.jobs.SystemJobManager;
-import org.joda.time.DateTime;
-import org.joda.time.DateTimeZone;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.graylog2.blacklists.BlacklistCache;
-import org.graylog2.buffers.OutputBuffer;
-import org.graylog2.buffers.ProcessBuffer;
-import org.graylog2.database.MongoBridge;
-import org.graylog2.database.MongoConnection;
-import org.graylog2.indexer.Indexer;
-import org.graylog2.plugin.initializers.Initializer;
-import org.graylog2.plugin.inputs.MessageInput;
-import org.graylog2.gelf.GELFChunkManager;
-import org.graylog2.plugin.outputs.MessageOutput;
-
 import com.google.common.collect.Lists;
-
-import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.concurrent.atomic.AtomicInteger;
 import com.google.common.collect.Maps;
-import java.util.Map;
-
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
-import com.sun.jersey.api.container.grizzly2.GrizzlyServerFactory;
-import com.sun.jersey.api.core.PackagesResourceConfig;
-import com.sun.jersey.api.core.ResourceConfig;
-
 import org.cliffc.high_scale_lib.Counter;
-import org.graylog2.system.activities.Activity;
-import org.graylog2.system.activities.ActivityWriter;
+import org.glassfish.hk2.utilities.binding.AbstractBinder;
+import org.glassfish.jersey.server.ContainerFactory;
+import org.glassfish.jersey.server.ResourceConfig;
+import org.glassfish.jersey.server.internal.scanning.PackageNamesScanner;
+import org.graylog2.blacklists.BlacklistCache;
 import org.graylog2.buffers.BasicCache;
 import org.graylog2.buffers.Cache;
+import org.graylog2.buffers.OutputBuffer;
+import org.graylog2.buffers.ProcessBuffer;
 import org.graylog2.database.HostCounterCacheImpl;
+import org.graylog2.database.MongoBridge;
+import org.graylog2.database.MongoConnection;
+import org.graylog2.gelf.GELFChunkManager;
 import org.graylog2.indexer.Deflector;
-import org.graylog2.initializers.*;
+import org.graylog2.indexer.Indexer;
+import org.graylog2.initializers.Initializers;
+import org.graylog2.inputs.Inputs;
+import org.graylog2.jersey.container.netty.NettyContainer;
+import org.graylog2.metrics.jetty2.AnyExceptionClassMapper;
+import org.graylog2.metrics.jetty2.MetricsDynamicBinding;
+import org.graylog2.outputs.Outputs;
 import org.graylog2.plugin.GraylogServer;
+import org.graylog2.plugin.Tools;
 import org.graylog2.plugin.alarms.callbacks.AlarmCallback;
 import org.graylog2.plugin.alarms.transports.Transport;
 import org.graylog2.plugin.buffers.Buffer;
 import org.graylog2.plugin.filters.MessageFilter;
 import org.graylog2.plugin.indexer.MessageGateway;
+import org.graylog2.plugin.initializers.Initializer;
+import org.graylog2.plugin.inputs.MessageInput;
+import org.graylog2.plugin.outputs.MessageOutput;
 import org.graylog2.plugin.streams.Stream;
 import org.graylog2.plugins.PluginLoader;
 import org.graylog2.streams.StreamImpl;
+import org.graylog2.system.activities.Activity;
+import org.graylog2.system.activities.ActivityWriter;
+import org.graylog2.system.jobs.SystemJobManager;
+import org.jboss.netty.bootstrap.ServerBootstrap;
+import org.jboss.netty.channel.ChannelPipeline;
+import org.jboss.netty.channel.ChannelPipelineFactory;
+import org.jboss.netty.channel.Channels;
+import org.jboss.netty.channel.socket.nio.NioServerSocketChannelFactory;
+import org.jboss.netty.handler.codec.http.HttpRequestDecoder;
+import org.jboss.netty.handler.codec.http.HttpResponseEncoder;
+import org.joda.time.DateTime;
+import org.joda.time.DateTimeZone;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.io.IOException;
+import java.net.InetSocketAddress;
+import java.util.List;
+import java.util.Map;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * Server core, handling and holding basically everything.
@@ -291,7 +295,61 @@ public class Core implements GraylogServer {
 
     }
 
-    public <A> void registerPlugins(Class<A> type, String subDirectory) {
+    private class Graylog2Binder extends AbstractBinder {
+
+        @Override
+        protected void configure() {
+            bind(metricRegistry).to(MetricRegistry.class);
+            bind(Core.this).to(Core.class);
+        }
+    }
+
+
+    public void startRestApi() throws IOException {
+        final ExecutorService bossExecutor = Executors.newCachedThreadPool(
+                new ThreadFactoryBuilder()
+                        .setNameFormat("restapi-boss-%d")
+                        .build());
+
+        final ExecutorService workerExecutor = Executors.newCachedThreadPool(
+                new ThreadFactoryBuilder()
+                        .setNameFormat("restapi-worker-%d")
+                        .build());
+
+        final ServerBootstrap bootstrap = new ServerBootstrap(new NioServerSocketChannelFactory(
+                bossExecutor,
+                workerExecutor
+        ));
+        ResourceConfig rc = new ResourceConfig();
+        rc.property(NettyContainer.PROPERTY_BASE_URI, configuration.getRestListenUri());
+        rc.registerClasses(MetricsDynamicBinding.class, AnyExceptionClassMapper.class);
+        rc.register(new Graylog2Binder());
+        rc.registerFinder(new PackageNamesScanner(new String[] {"org.graylog2.rest.resources"}, true));
+        final NettyContainer jerseyHandler = ContainerFactory.createContainer(NettyContainer.class, rc);
+
+        bootstrap.setPipelineFactory(new ChannelPipelineFactory() {
+            @Override
+            public ChannelPipeline getPipeline() throws Exception {
+                ChannelPipeline pipeline = Channels.pipeline();
+                pipeline.addLast("decoder", new HttpRequestDecoder());
+                pipeline.addLast("encoder", new HttpResponseEncoder());
+                pipeline.addLast("jerseyHandler", jerseyHandler);
+                return pipeline;
+            }
+        }) ;
+
+        bootstrap.bind(new InetSocketAddress(configuration.getRestListenUri().getPort()));
+        Runtime.getRuntime().addShutdownHook(new Thread() {
+            @Override
+            public void run() {
+                bootstrap.releaseExternalResources();
+            }
+        });
+        LOG.info("Started REST API at <{}>", configuration.getRestListenUri());
+    }
+
+
+    private <A> void registerPlugins(Class<A> type, String subDirectory) {
         PluginLoader<A> pl = new PluginLoader<A>(configuration.getPluginDir(), subDirectory, type);
         for (A plugin : pl.getPlugins()) {
             LOG.info("Loaded <{}> plugin [{}].", type.getSimpleName(), plugin.getClass().getCanonicalName());
@@ -310,18 +368,6 @@ public class Core implements GraylogServer {
                 LOG.error("Could not load plugin [{}] - Not supported type.", plugin.getClass().getCanonicalName());
             }
         }
-    }
-    
-    public void startRestApi() throws IOException {
-        startRestServer(configuration.getRestListenUri());
-        LOG.info("Started REST API at <{}>", configuration.getRestListenUri());
-    }
-
-    private HttpServer startRestServer(URI restUri) throws IOException {
-        ResourceConfig rc = new PackagesResourceConfig("org.graylog2.rest.resources");
-        rc.getSingletons().add(new InstrumentedResourceMethodDispatchAdapter(metricRegistry));
-        rc.getProperties().put("core", this);
-        return GrizzlyServerFactory.createHttpServer(restUri, rc);
     }
 
     public MongoConnection getMongoConnection() {

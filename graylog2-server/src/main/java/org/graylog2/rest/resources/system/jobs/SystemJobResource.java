@@ -22,8 +22,6 @@ package org.graylog2.rest.resources.system.jobs;
 import com.codahale.metrics.annotation.Timed;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
-import com.sun.jersey.api.core.ResourceConfig;
-import org.graylog2.Core;
 import org.graylog2.rest.resources.RestResource;
 import org.graylog2.rest.resources.system.jobs.requests.TriggerRequest;
 import org.graylog2.system.jobs.NoSuchJobException;
@@ -34,7 +32,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.ws.rs.*;
-import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.io.IOException;
@@ -49,14 +46,9 @@ public class SystemJobResource extends RestResource {
 
     private static final Logger LOG = LoggerFactory.getLogger(SystemJobResource.class);
 
-    @Context
-    ResourceConfig rc;
-
     @GET @Timed
     @Produces(MediaType.APPLICATION_JSON)
     public String list(@QueryParam("pretty") boolean prettyPrint) {
-        Core core = (Core) rc.getProperty("core");
-
         List<Map<String, Object>> jobs = Lists.newArrayList();
 
         for (Map.Entry<String, SystemJob> x : core.getSystemJobManager().getRunningJobs().entrySet()) {
@@ -73,8 +65,6 @@ public class SystemJobResource extends RestResource {
     @Path("/{jobId}")
     @Produces(MediaType.APPLICATION_JSON)
     public String get(@PathParam("jobId") String jobId, @QueryParam("pretty") boolean prettyPrint) {
-        Core core = (Core) rc.getProperty("core");
-
         if (jobId == null || jobId.isEmpty()) {
             LOG.error("Missing jobId. Returning HTTP 400.");
             throw new WebApplicationException(400);
@@ -94,8 +84,6 @@ public class SystemJobResource extends RestResource {
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
     public Response trigger(String body, @QueryParam("pretty") boolean prettyPrint) {
-        Core core = (Core) rc.getProperty("core");
-
         if (body == null || body.isEmpty()) {
             LOG.error("Missing parameters. Returning HTTP 400.");
             throw new WebApplicationException(400);

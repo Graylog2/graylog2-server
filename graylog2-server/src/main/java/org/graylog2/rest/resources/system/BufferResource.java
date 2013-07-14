@@ -21,7 +21,6 @@ package org.graylog2.rest.resources.system;
 
 import com.codahale.metrics.annotation.Timed;
 import com.google.common.collect.Maps;
-import com.sun.jersey.api.core.ResourceConfig;
 import org.graylog2.Core;
 import org.graylog2.buffers.BufferWatermark;
 import org.graylog2.rest.resources.RestResource;
@@ -30,7 +29,6 @@ import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
-import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import java.util.Map;
 
@@ -40,14 +38,9 @@ import java.util.Map;
 @Path("/system/buffers")
 public class BufferResource extends RestResource {
 
-    @Context
-    ResourceConfig rc;
-
     @GET @Timed
     @Produces(MediaType.APPLICATION_JSON)
     public String utilization(@QueryParam("pretty") boolean prettyPrint) {
-        Core core = (Core) rc.getProperty("core");
-
         Map<String, Object> result = Maps.newHashMap();
         result.put("buffers", buffers(core));
         result.put("master_caches", masterCaches(core));

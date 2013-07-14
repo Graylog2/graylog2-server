@@ -22,7 +22,7 @@ package org.graylog2.rest.resources.cluster;
 import com.codahale.metrics.annotation.Timed;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
-import com.sun.jersey.api.core.ResourceConfig;
+import org.glassfish.jersey.server.ResourceConfig;
 import org.graylog2.Core;
 import org.graylog2.cluster.Node;
 import org.graylog2.plugin.Tools;

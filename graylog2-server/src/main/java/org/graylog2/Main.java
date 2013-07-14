@@ -20,39 +20,35 @@
 
 package org.graylog2;
 
+import com.beust.jcommander.JCommander;
 import com.codahale.metrics.JmxReporter;
 import com.codahale.metrics.MetricRegistry;
 import com.codahale.metrics.log4j.InstrumentedAppender;
-import org.elasticsearch.discovery.MasterNotDiscoveredException;
-import org.graylog2.cluster.Node;
-import org.graylog2.cluster.NodeNotFoundException;
-import org.graylog2.plugin.Tools;
-import com.beust.jcommander.JCommander;
 import com.github.joschi.jadconfig.JadConfig;
 import com.github.joschi.jadconfig.RepositoryException;
 import com.github.joschi.jadconfig.ValidationException;
 import com.github.joschi.jadconfig.repositories.PropertiesRepository;
 import org.apache.commons.io.IOUtils;
 import org.apache.log4j.Level;
+import org.graylog2.cluster.Node;
+import org.graylog2.cluster.NodeNotFoundException;
+import org.graylog2.filters.BlacklistFilter;
+import org.graylog2.filters.RewriteFilter;
+import org.graylog2.filters.StreamMatcherFilter;
+import org.graylog2.filters.TokenizerFilter;
+import org.graylog2.initializers.*;
+import org.graylog2.outputs.ElasticSearchOutput;
+import org.graylog2.plugin.Tools;
+import org.graylog2.plugin.initializers.InitializerConfigurationException;
+import org.graylog2.plugins.PluginInstaller;
+import org.graylog2.system.activities.Activity;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.graylog2.system.activities.Activity;
-import org.graylog2.alarms.transports.EmailTransport;
-import org.graylog2.alarms.transports.JabberTransport;
-import org.graylog2.filters.*;
-import org.graylog2.initializers.*;
-import org.graylog2.inputs.gelf.GELFTCPInput;
-import org.graylog2.inputs.gelf.GELFUDPInput;
-import org.graylog2.inputs.http.GELFHttpInput;
-import org.graylog2.inputs.syslog.SyslogTCPInput;
-import org.graylog2.inputs.syslog.SyslogUDPInput;
-import org.graylog2.outputs.ElasticSearchOutput;
+import org.slf4j.bridge.SLF4JBridgeHandler;
 
 import java.io.File;
 import java.io.FileWriter;
 import java.io.Writer;
-import org.graylog2.plugin.initializers.InitializerConfigurationException;
-import org.graylog2.plugins.PluginInstaller;
 
 /**
  * Main class of Graylog2.
@@ -138,6 +134,9 @@ public final class Main {
         org.apache.log4j.Logger.getRootLogger().setLevel(logLevel);
         org.apache.log4j.Logger.getLogger(Main.class.getPackage().getName()).setLevel(logLevel);
         org.apache.log4j.Logger.getRootLogger().addAppender(logMetrics);
+
+        SLF4JBridgeHandler.removeHandlersForRootLogger();
+        SLF4JBridgeHandler.install();
 
         LOG.info("Graylog2 {} starting up. (JRE: {})", Core.GRAYLOG2_VERSION, Tools.getSystemInformation());
 

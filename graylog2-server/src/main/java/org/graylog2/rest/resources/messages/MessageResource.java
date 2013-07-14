@@ -20,13 +20,11 @@
 
 package org.graylog2.rest.resources.messages;
 
-import java.util.List;
-import java.util.Map;
-
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.sun.jersey.api.core.ResourceConfig;
 import com.codahale.metrics.annotation.Timed;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.common.collect.Maps;
 import org.elasticsearch.indices.IndexMissingException;
+import org.glassfish.jersey.server.ResourceConfig;
 import org.graylog2.Core;
 import org.graylog2.indexer.messages.DocumentNotFoundException;
 import org.graylog2.indexer.results.ResultMessage;
@@ -34,17 +32,11 @@ import org.graylog2.rest.resources.RestResource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.ws.rs.GET;
-import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
-import javax.ws.rs.Produces;
-import javax.ws.rs.QueryParam;
-import javax.ws.rs.WebApplicationException;
+import javax.ws.rs.*;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
-
-
-import com.google.common.collect.Maps;
+import java.util.List;
+import java.util.Map;
 
 /**
  * @author Lennart Koopmann <lennart@torch.sh>
@@ -55,7 +47,8 @@ public class MessageResource extends RestResource {
 
     private final ObjectMapper objectMapper = new ObjectMapper();
 	
-    @Context ResourceConfig rc;
+    @Context
+    ResourceConfig rc;
 
     @GET @Path("/{messageId}") @Timed
     @Produces(MediaType.APPLICATION_JSON)

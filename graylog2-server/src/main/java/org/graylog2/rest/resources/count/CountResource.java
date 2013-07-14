@@ -19,10 +19,10 @@
  */
 package org.graylog2.rest.resources.count;
 
+import com.codahale.metrics.annotation.Timed;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.Maps;
-import com.sun.jersey.api.core.ResourceConfig;
-import com.codahale.metrics.annotation.Timed;
+import org.glassfish.jersey.server.ResourceConfig;
 import org.graylog2.Core;
 import org.graylog2.indexer.Indexer;
 import org.graylog2.indexer.results.DateHistogramResult;
@@ -30,11 +30,7 @@ import org.graylog2.rest.resources.RestResource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.ws.rs.GET;
-import javax.ws.rs.Path;
-import javax.ws.rs.Produces;
-import javax.ws.rs.QueryParam;
-import javax.ws.rs.WebApplicationException;
+import javax.ws.rs.*;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import java.util.Map;
@@ -49,7 +45,8 @@ public class CountResource extends RestResource {
 
     private final ObjectMapper objectMapper = new ObjectMapper();
 	
-    @Context ResourceConfig rc;
+    @Context
+    ResourceConfig rc;
 
     @GET @Path("/total") @Timed
     @Produces(MediaType.APPLICATION_JSON)
