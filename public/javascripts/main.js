@@ -286,6 +286,13 @@ $(document).ready(function() {
     // Pausing/Resuming of message processing.
     $(".change-message-processing").on("click", function() {
         var action = $(this).attr("data-action");
+
+        if  (action == "pause") {
+            if (!confirm("Really pause message processing?")) {
+                return;
+            }
+        }
+
         $.ajax({
             url: "/a/system/processing/" + action,
             type: "PUT",

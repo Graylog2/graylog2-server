@@ -44,6 +44,9 @@
                         <span class="caret"></span>
                     </a>
                     <ul class="dropdown-menu">
+                        <li><a href="/system/threaddump/@jvm.getNodeId">Get thread dump</a></li>
+
+                        <li class="divider"></li>
                         <li>
                         @if(jvm.isProcessing) {
                             <a class="change-message-processing"
@@ -57,8 +60,6 @@
                             href="#">Resume message processing</a>
                         }
                         </li>
-
-                        <li><a href="/system/threaddump/@jvm.getNodeId">Get thread dump</a></li>
                     </ul>
                 </div>
             </span>
