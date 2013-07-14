@@ -19,18 +19,14 @@
  */
 package org.graylog2.rest.resources.system;
 
-import com.codahale.metrics.Counter;
 import com.codahale.metrics.Metric;
 import com.codahale.metrics.annotation.Timed;
 import com.google.common.collect.Maps;
-import com.sun.jersey.api.core.ResourceConfig;
-import org.graylog2.Core;
 import org.graylog2.rest.resources.RestResource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.ws.rs.*;
-import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import java.util.Map;
 
@@ -42,15 +38,10 @@ public class MetricsResource extends RestResource {
 
     private static final Logger LOG = LoggerFactory.getLogger(MetricsResource.class);
 
-    @Context
-    ResourceConfig rc;
-
     @GET
     @Timed
     @Produces(MediaType.APPLICATION_JSON)
     public String metrics(@QueryParam("pretty") boolean prettyPrint) {
-        Core core = (Core) rc.getProperty("core");
-
         Map<String, Object> result = Maps.newHashMap();
 
         result.put("metrics", core.metrics().getMetrics());
@@ -63,8 +54,6 @@ public class MetricsResource extends RestResource {
     @Path("/names")
     @Produces(MediaType.APPLICATION_JSON)
     public String metricNames(@QueryParam("pretty") boolean prettyPrint) {
-        Core core = (Core) rc.getProperty("core");
-
         Map<String, Object> result = Maps.newHashMap();
         result.put("names", core.metrics().getNames());
 
@@ -76,8 +65,6 @@ public class MetricsResource extends RestResource {
     @Path("/{metricName}")
     @Produces(MediaType.APPLICATION_JSON)
     public String singleMetric(@PathParam("metricName") String metricName, @QueryParam("pretty") boolean prettyPrint) {
-        Core core = (Core) rc.getProperty("core");
-
         Metric metric = core.metrics().getMetrics().get(metricName);
 
         if (metric == null) {
