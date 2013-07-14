@@ -7,7 +7,6 @@ $(document).ready(function() {
 			width: $("#sidebar").width()-5,
 			height: 100,
 			renderer: 'bar',
-			interpolation: 'linear',
 			stroke: true,
 			dataURL: '/a/messagecounts/histogram?timerange=' + 2*60*60, // last two hours
 			onData: function(d) { return transformData(d) },
@@ -27,16 +26,7 @@ $(document).ready(function() {
 				    graph: graph,
 				    tickFormat: Rickshaw.Fixtures.Number.formatKMBT
 				});
-				
-				new Rickshaw.Graph.HoverDetail( {
-				    graph: graph,
-				    formatter: function(series, x, y) {
-						var date = new Date(x * 1000).toUTCString();
-						var content = "<strong>"  + parseInt(y) + " " + series.name + "</strong>" + '<br />' + date;
-						return content;
-					}
-				});
-				
+
 				graph.update();
 			}
 		});

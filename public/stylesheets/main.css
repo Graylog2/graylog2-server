@@ -143,7 +143,7 @@ h3 {
 
 .messages {
 	font-size: 11px;
-	margin-top: 15px;
+	margin-top: 10px;
 	table-layout: fixed;
 	border-collapse: collapse;
 	width: 100%;
@@ -372,4 +372,27 @@ form #stream-rules {
 
 .node-row .hostname {
     font-size: 12px;
+}
+
+.rickshaw_graph .x_tick {
+    position: relative;
+    top: 30px;
+}
+
+#sidebar .rickshaw_graph .x_tick {
+    position: relative;
+    top: 22px;
+}
+
+.graph-resolution-selector {
+    margin-top: 30px;
+}
+
+#sidebar-graph {
+    border-bottom: 2px solid #ccc;
+}
+
+.search-result-fields i {
+    position: relative;
+    top: 3px;
 }

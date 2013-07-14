@@ -3,8 +3,11 @@
 
 @main("Search results", sidebars.searchresults(searchResult), query, currentUser) {
 
+<a href="" class="btn btn-small pull-right">Refresh</a>
+
+<h1><i class="icon-search"></i> Search results</h1>
+
 <style>
-.rickshaw_graph .detail .x_label { display: none }
 .y_ticks { color: #000; }
 </style>
 
@@ -15,7 +18,7 @@
 	var resultGraph = new Rickshaw.Graph( {
 	        element: document.querySelector("#result-graph"),
 	        width: $("#main-content").width()-12,
-	        height: 100,
+	        height: 175,
 	        renderer: "bar",
 	        series: [ {
 	        		name: "Messages",
@@ -33,21 +36,22 @@
 		graph: resultGraph,
 		ticksTreatment: "glow"
 	});
-	
+
 	new Rickshaw.Graph.HoverDetail( {
 		graph: resultGraph,
 		formatter: function(series, x, y) {
-			var date = new Date(x * 1000).toUTCString();
-			var content = "<strong>"  + parseInt(y) + " " + series.name + "</strong>" + '<br />' + date;
+			var content = parseInt(y) + " " + series.name;
 			return content;
 		}
 	});
-	
+
 	resultGraph.render();
 </script>
 
-<i class="icon-time"></i>
-<strong>Resolution:</strong> @Html(DateHistogramResolutionSelector.getOptions(histogram.getInterval()))
+<div class="graph-resolution-selector">
+    <i class="icon-time"></i>
+    <strong>Resolution:</strong> @Html(DateHistogramResolutionSelector.getOptions(histogram.getInterval()))
+</div>
 
 <table class="table table-condensed table-hover table-striped messages">
 	<thead>
