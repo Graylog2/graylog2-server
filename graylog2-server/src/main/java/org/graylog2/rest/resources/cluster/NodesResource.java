@@ -66,13 +66,7 @@ public class NodesResource extends RestResource {
             throw new WebApplicationException(404);
         }
 
-        Map<String, Object> result = Maps.newHashMap();
-        result.put("node_id", node.getNodeId());
-        result.put("hostname", Tools.getLocalCanonicalHostname());
-        result.put("transport_address", node.getTransportAddress());
-        result.put("last_seen", Tools.getISO8601String(node.getLastSeen()));
-
-        return json(result, prettyPrint);
+        return json(nodeSummary(node), prettyPrint);
     }
 
     @GET
@@ -85,12 +79,7 @@ public class NodesResource extends RestResource {
         List<Map<String, Object>> nodes = Lists.newArrayList();
 
         for (Node node : Node.allActive(core).values()) {
-            Map<String, Object> nodeMap = Maps.newHashMap();
-            nodeMap.put("node_id", node.getNodeId());
-            nodeMap.put("transport_address", node.getTransportAddress());
-            nodeMap.put("last_seen", Tools.getISO8601String(node.getLastSeen()));
-
-            nodes.add(nodeMap);
+            nodes.add(nodeSummary(node));
         }
 
         Map<String, Object> result = Maps.newHashMap();
@@ -98,5 +87,16 @@ public class NodesResource extends RestResource {
         result.put("nodes", nodes);
 
         return json(result, prettyPrint);
+    }
+
+    private Map<String, Object> nodeSummary(Node node) {
+        Map<String, Object> m  = Maps.newHashMap();
+
+        m.put("node_id", node.getNodeId());
+        m.put("hostname", Tools.getLocalCanonicalHostname());
+        m.put("transport_address", node.getTransportAddress());
+        m.put("last_seen", Tools.getISO8601String(node.getLastSeen()));
+
+        return m;
     }
 }
