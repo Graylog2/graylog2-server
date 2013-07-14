@@ -1,6 +1,8 @@
-@(currentUser: User, jvms: List[ServerJVMStats], buffers: Map[String, BufferInfo])
+@(currentUser: User, breadcrumbs: lib.BreadcrumbList, jvms: List[ServerJVMStats], buffers: Map[String, BufferInfo])
 
 @main("Nodes", views.html.system.sidebar(), "", currentUser) {
+
+    @views.html.partials.breadcrumbs(breadcrumbs)
 
     <div class="row-fluid">
         <h1><i class="icon icon-sitemap"></i> Nodes</h1>

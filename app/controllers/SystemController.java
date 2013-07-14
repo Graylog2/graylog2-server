@@ -61,6 +61,10 @@ public class SystemController extends AuthenticatedController {
     }
 
     public static Result nodes() {
+        BreadcrumbList bc = new BreadcrumbList();
+        bc.addCrumb("System", routes.SystemController.index(0));
+        bc.addCrumb("Nodes", routes.SystemController.nodes());
+
         try {
             List<ServerJVMStats> serverJvmStats = ServerJVMStats.get();
             Map<String, BufferInfo> bufferInfo = Maps.newHashMap();
@@ -70,7 +74,7 @@ public class SystemController extends AuthenticatedController {
                 bufferInfo.put(node.getNodeId(), BufferInfo.ofNode(node));
             }
 
-            return ok(views.html.system.nodes.render(currentUser(), serverJvmStats, bufferInfo));
+            return ok(views.html.system.nodes.render(currentUser(), bc, serverJvmStats, bufferInfo));
         } catch (IOException e) {
             return status(504, views.html.errors.error.render(Api.ERROR_MSG_IO, e, request()));
         } catch (APIException e) {
