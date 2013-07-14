@@ -1,0 +1,27 @@
+@(currentUser: User, breadcrumbs: lib.BreadcrumbList, nodes: List[Node])
+
+@main("Nodes", views.html.system.sidebar(), "", currentUser) {
+
+    @views.html.partials.breadcrumbs(breadcrumbs)
+
+    <div class="row-fluid">
+        <h1><i class="icon icon-cloud-download"></i> Inputs</h1>
+        Every node in your Graylog2 cluster accepts data via inputs. You can manage all these inputs here.
+    </div>
+
+    <div class="row-fluid">
+        <h2><i class="icon icon-cloud"></i> Graylog2 nodes</h2>
+        @for(node <- nodes) {
+
+            <div class="node-row">
+                <a href="/system/inputs/@node.getNodeId" class="btn btn-mini pull-right">Manage inputs</a>
+
+                <h3>
+                    <i class="icon icon-code-fork"></i> @node.getNodeId
+                    <span class="hostname">(@node.getHostname)</span>
+                </h3>
+            </div>
+        }
+    </div>
+
+}

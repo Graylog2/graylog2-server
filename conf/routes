@@ -3,46 +3,48 @@
 # ~~~~
 
 # Authentication
-GET        /login                                   controllers.SessionsController.index()
-POST       /session                                 controllers.SessionsController.create()
-GET        /logout                                  controllers.SessionsController.destroy()
+GET         /login                                    controllers.SessionsController.index()
+POST        /session                                  controllers.SessionsController.create()
+GET         /logout                                   controllers.SessionsController.destroy()
 
 # Home page
-GET        /                                        controllers.DashboardController.index()
+GET         /                                         controllers.DashboardController.index()
 
 # Search
-GET        /search                                  controllers.SearchController.index(q ?= "", timerange ?= "", interval ?= "")
+GET         /search                                   controllers.SearchController.index(q ?= "", timerange ?= "", interval ?= "")
 
 # Messages
-GET        /messages/:index/:id/partial             controllers.MessagesController.asPartial(index: String, id: String)
+GET         /messages/:index/:id/partial              controllers.MessagesController.asPartial(index: String, id: String)
 
 # Streams
-GET        /streams                                 controllers.StreamsController.index()
-GET        /streams/new                             controllers.StreamsController.newStream()
+GET         /streams                                  controllers.StreamsController.index()
+GET         /streams/new                              controllers.StreamsController.newStream()
 
 # System
-GET        /system                                  controllers.SystemController.index(page:Integer ?= 1)
-GET        /system/nodes                            controllers.SystemController.nodes()
-GET        /system/threaddump/:node_id             controllers.SystemController.threadDump(node_id: String)
+GET         /system                                   controllers.SystemController.index(page:Integer ?= 1)
+GET         /system/nodes                             controllers.SystemController.nodes()
+GET         /system/threaddump/:node_id               controllers.SystemController.threadDump(node_id: String)
+GET         /system/inputs                            controllers.InputsController.index()
+GET         /system/inputs/:node_id                   controllers.InputsController.manage(node_id: String)
 
 # Systemjobs
-POST        /systemjobs/trigger                     controllers.SystemJobsController.trigger()
+POST        /systemjobs/trigger                       controllers.SystemJobsController.trigger()
 
 # API: Message counts and histograms
-GET        /a/messagecounts/histogram               controllers.MessageCountsController.histogram(timerange ?= "")
-GET        /a/messagecounts/total                   controllers.MessageCountsController.total()
+GET         /a/messagecounts/histogram                controllers.MessageCountsController.histogram(timerange ?= "")
+GET         /a/messagecounts/total                    controllers.MessageCountsController.total()
 
 # API: Message analyzing
-GET        /a/analyze/:index/:id/:field             controllers.MessagesController.analyze(index: String, id: String, field: String)
+GET         /a/analyze/:index/:id/:field              controllers.MessagesController.analyze(index: String, id: String, field: String)
 
 # API: System
-GET        /a/system/fields                         controllers.SystemApiController.fields()
-GET        /a/system/jobs                           controllers.SystemApiController.jobs()
-GET        /a/system/notifications                  controllers.SystemApiController.notifications()
-GET        /a/system/throughput                     controllers.SystemApiController.totalThroughput()
-GET        /a/system/throughput/node/:node_id       controllers.SystemApiController.nodeThroughput(node_id: String)
-PUT        /a/system/processing/pause               controllers.SystemApiController.pauseMessageProcessing()
-PUT        /a/system/processing/resume              controllers.SystemApiController.resumeMessageProcessing()
+GET         /a/system/fields                          controllers.SystemApiController.fields()
+GET         /a/system/jobs                            controllers.SystemApiController.jobs()
+GET         /a/system/notifications                   controllers.SystemApiController.notifications()
+GET         /a/system/throughput                      controllers.SystemApiController.totalThroughput()
+GET         /a/system/throughput/node/:node_id        controllers.SystemApiController.nodeThroughput(node_id: String)
+PUT         /a/system/processing/pause                controllers.SystemApiController.pauseMessageProcessing()
+PUT         /a/system/processing/resume               controllers.SystemApiController.resumeMessageProcessing()
 
 # Map static resources from the /public folder to the /assets URL path
-GET        /assets/*file                            controllers.Assets.at(path="/public", file)
+GET         /assets/*file                             controllers.Assets.at(path="/public", file)

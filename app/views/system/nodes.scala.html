@@ -24,7 +24,7 @@
 
     <h2><i class="icon icon-cloud"></i> Graylog2 nodes</h2>
     @for(jvm <- jvms) {
-        <div class="row-fluid message-processing-host">
+        <div class="row-fluid message-processing-host node-row">
             <span class="pull-right node-throughput-info">
                 @if(jvm.isProcessing) {
                     <span class="sentence">
@@ -45,6 +45,7 @@
                     </a>
                     <ul class="dropdown-menu">
                         <li><a href="/system/threaddump/@jvm.getNodeId">Get thread dump</a></li>
+                        <li><a href="/system/inputs/@jvm.getNodeId">Manage inputs</a></li>
 
                         <li class="divider"></li>
                         <li>

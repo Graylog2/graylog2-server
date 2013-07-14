@@ -318,7 +318,7 @@ form #stream-rules {
     padding: 3px 11px;
 }
 
-.message-processing-host {
+.node-row {
     border-bottom: 1px solid #ccc;
     padding-bottom: 8px;
     margin-top: 8px;
@@ -368,4 +368,8 @@ form #stream-rules {
 
 .breadcrumb a {
     color: #0085A7;
+}
+
+.node-row .hostname {
+    font-size: 12px;
 }

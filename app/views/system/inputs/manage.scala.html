@@ -1,0 +1,12 @@
+@(currentUser: User, breadcrumbs: lib.BreadcrumbList, node: Node)
+
+@main("Inputs of node", views.html.system.sidebar(), "", currentUser) {
+
+    @views.html.partials.breadcrumbs(breadcrumbs)
+
+    <div class="row-fluid">
+        <h1><i class="icon icon-cloud-download"></i> Inputs of @node.getNodeId</h1>
+        Graylog2 nodes accept data via inputs. Launch or shutdown as many inputs as you want here.
+    </div>
+
+}
