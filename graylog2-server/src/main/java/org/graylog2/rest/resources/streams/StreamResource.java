@@ -59,7 +59,8 @@ public class StreamResource extends RestResource {
     @Context
     ResourceConfig rc;
 
-    @POST @Path("/") @Timed
+    @POST
+    @Timed
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
     public Response create(String body, @QueryParam("pretty") boolean prettyPrint) {
@@ -94,7 +95,8 @@ public class StreamResource extends RestResource {
         return Response.status(Response.Status.CREATED).entity(json(result, prettyPrint)).build();
     }
     
-    @GET @Path("/") @Timed
+    @GET
+    @Timed
     @Produces(MediaType.APPLICATION_JSON)
     public String get(@QueryParam("pretty") boolean prettyPrint) {
         Core core = (Core) rc.getProperty("core");

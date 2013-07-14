@@ -54,7 +54,6 @@ public class MessagesResource extends RestResource {
     ResourceConfig rc;
 
     @GET @Timed
-    @Path("/")
     @Produces(MediaType.APPLICATION_JSON)
     public String all(@QueryParam("page") int page, @QueryParam("pretty") boolean prettyPrint) {
         Core core = (Core) rc.getProperty("core");

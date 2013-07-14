@@ -51,7 +51,6 @@ public class NotificationsResource extends RestResource {
     ResourceConfig rc;
 
     @GET @Timed
-    @Path("/")
     @Produces(MediaType.APPLICATION_JSON)
     public String listNotifications(@QueryParam("pretty") boolean prettyPrint) {
         Core core = (Core) rc.getProperty("core");

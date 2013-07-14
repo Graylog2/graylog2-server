@@ -86,7 +86,6 @@ public class UsersResource extends RestResource {
     }
 
     @POST
-    @Path("/")
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
     public Response create(String body, @QueryParam("pretty") boolean prettyPrint) {

@@ -44,7 +44,6 @@ public class BufferResource extends RestResource {
     ResourceConfig rc;
 
     @GET @Timed
-    @Path("/")
     @Produces(MediaType.APPLICATION_JSON)
     public String utilization(@QueryParam("pretty") boolean prettyPrint) {
         Core core = (Core) rc.getProperty("core");

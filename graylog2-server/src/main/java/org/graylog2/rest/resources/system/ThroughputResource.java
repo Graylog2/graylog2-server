@@ -47,7 +47,7 @@ public class ThroughputResource extends RestResource {
     ResourceConfig rc;
 
     @GET
-    @Path("/") @Timed
+    @Timed
     @Produces(MediaType.APPLICATION_JSON)
     public String total(@QueryParam("pretty") boolean prettyPrint) {
         Core core = (Core) rc.getProperty("core");

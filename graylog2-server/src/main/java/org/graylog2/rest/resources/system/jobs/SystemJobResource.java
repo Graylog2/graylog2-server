@@ -53,7 +53,6 @@ public class SystemJobResource extends RestResource {
     ResourceConfig rc;
 
     @GET @Timed
-    @Path("/")
     @Produces(MediaType.APPLICATION_JSON)
     public String list(@QueryParam("pretty") boolean prettyPrint) {
         Core core = (Core) rc.getProperty("core");
@@ -92,7 +91,6 @@ public class SystemJobResource extends RestResource {
     }
 
     @POST @Timed
-    @Path("/")
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
     public Response trigger(String body, @QueryParam("pretty") boolean prettyPrint) {
