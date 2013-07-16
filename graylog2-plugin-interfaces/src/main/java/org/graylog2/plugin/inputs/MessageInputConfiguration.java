@@ -21,8 +21,80 @@
  */
 package org.graylog2.plugin.inputs;
 
+import com.google.common.collect.Maps;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.util.Map;
+
 /**
  * @author Lennart Koopmann <lennart@torch.sh>
  */
 public class MessageInputConfiguration {
+
+    private static final Logger LOG = LoggerFactory.getLogger(MessageInputConfiguration.class);
+
+    private final Map<String, Object> source;
+
+    private final Map<String, String> strings;
+    private final Map<String, Integer> ints;
+    private final Map<String, Boolean> bools;
+
+    public MessageInputConfiguration(Map<String, Object> m) {
+        this.source = m;
+
+        strings = Maps.newHashMap();
+        ints = Maps.newHashMap();
+        bools = Maps.newHashMap();
+
+        if (m != null) {
+            for(Map.Entry<String, Object> e : m.entrySet()) {
+                try {
+                    if (e.getValue() instanceof String) {
+                        strings.put(e.getKey(), (String) e.getValue());
+                    }
+
+                    if (e.getValue() instanceof Integer) {
+                        ints.put(e.getKey(), (Integer) e.getValue());
+                    }
+
+                    if (e.getValue() instanceof Boolean) {
+                        bools.put(e.getKey(), (Boolean) e.getValue());
+                    }
+                } catch(Exception ex) {
+                    LOG.warn("Could not read input configuration key <{}>. Skipping.", e.getKey(), ex);
+                    continue;
+                }
+            }
+        }
+    }
+
+    public String getString(String key) {
+        return strings.get(key);
+    }
+
+    public long getInt(String key) {
+        return ints.get(key);
+    }
+
+    public boolean getBoolean(String key) {
+        return bools.get(key);
+    }
+
+    public Map<String, Object> getSource() {
+        return source;
+    }
+
+    public boolean stringIsSet(String key) {
+        return strings.get(key) != null && !strings.get(key).isEmpty();
+    }
+
+    public boolean intIsSet(String key) {
+        return ints.get(key) != null;
+    }
+
+    public boolean boolIsSet(String key) {
+        return bools.get(key) != null;
+    }
+
 }

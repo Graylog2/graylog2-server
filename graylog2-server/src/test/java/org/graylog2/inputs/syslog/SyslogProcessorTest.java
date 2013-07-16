@@ -20,13 +20,16 @@
 
 package org.graylog2.inputs.syslog;
 
+import com.google.common.collect.Maps;
 import org.graylog2.Configuration;
 import org.graylog2.GraylogServerStub;
 import org.graylog2.plugin.Message;
+import org.graylog2.plugin.inputs.MessageInputConfiguration;
 import org.junit.Ignore;
 import org.junit.Test;
 
 import java.net.InetAddress;
+import java.util.HashMap;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
@@ -47,7 +50,10 @@ public class SyslogProcessorTest {
         GraylogServerStub serverStub = new GraylogServerStub();
         Configuration configStub = new Configuration();
         serverStub.setConfigurationStub(configStub);
-        SyslogProcessor processor = new SyslogProcessor(serverStub);
+
+        // TODO have a proper configuration here
+
+        SyslogProcessor processor = new SyslogProcessor(serverStub, new MessageInputConfiguration(new HashMap<String, Object>()));
 
         processor.messageReceived(ValidNonStructuredMessage, InetAddress.getLocalHost());
         processor.messageReceived(ValidNonStructuredMessage, InetAddress.getLocalHost());
@@ -68,7 +74,7 @@ public class SyslogProcessorTest {
         GraylogServerStub serverStub = new GraylogServerStub();
         Configuration configStub = new Configuration();
         serverStub.setConfigurationStub(configStub);
-        SyslogProcessor processor = new SyslogProcessor(serverStub);
+        SyslogProcessor processor = new SyslogProcessor(serverStub, new MessageInputConfiguration(new HashMap<String, Object>()));
 
         processor.messageReceived(ValidNonStructuredMessageWithShortDate, InetAddress.getLocalHost());
 
@@ -88,7 +94,7 @@ public class SyslogProcessorTest {
         GraylogServerStub serverStub = new GraylogServerStub();
         Configuration configStub = new Configuration();
         serverStub.setConfigurationStub(configStub);
-        SyslogProcessor processor = new SyslogProcessor(serverStub);
+        SyslogProcessor processor = new SyslogProcessor(serverStub, new MessageInputConfiguration(new HashMap<String, Object>()));
 
         processor.messageReceived(ValidStructuredMessage, InetAddress.getLocalHost());
 
@@ -112,7 +118,7 @@ public class SyslogProcessorTest {
         GraylogServerStub serverStub = new GraylogServerStub();
         Configuration configStub = new Configuration();
         serverStub.setConfigurationStub(configStub);
-        SyslogProcessor processor = new SyslogProcessor(serverStub);
+        SyslogProcessor processor = new SyslogProcessor(serverStub, new MessageInputConfiguration(new HashMap<String, Object>()));
 
         processor.messageReceived(ValidStructuedMessageWithDifferentDateFormat, InetAddress.getLocalHost());
         processor.messageReceived(ValidStructuedMessageWithDifferentDateFormat, InetAddress.getLocalHost());
@@ -135,7 +141,7 @@ public class SyslogProcessorTest {
         GraylogServerStub serverStub = new GraylogServerStub();
         Configuration configStub = new Configuration();
         serverStub.setConfigurationStub(configStub);
-        SyslogProcessor processor = new SyslogProcessor(serverStub);
+        SyslogProcessor processor = new SyslogProcessor(serverStub, new MessageInputConfiguration(new HashMap<String, Object>()));
 
         processor.messageReceived("LOLWAT", InetAddress.getLocalHost());
 
@@ -149,7 +155,7 @@ public class SyslogProcessorTest {
         GraylogServerStub serverStub = new GraylogServerStub();
         Configuration configStub = new Configuration();
         serverStub.setConfigurationStub(configStub);
-        SyslogProcessor processor = new SyslogProcessor(serverStub);
+        SyslogProcessor processor = new SyslogProcessor(serverStub, new MessageInputConfiguration(new HashMap<String, Object>()));
         
         processor.messageReceived(ValidNonStructuredMessage, InetAddress.getLocalHost());
 

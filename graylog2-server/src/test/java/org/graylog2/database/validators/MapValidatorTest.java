@@ -17,23 +17,37 @@
  * along with Graylog2.  If not, see <http://www.gnu.org/licenses/>.
  *
  */
-package org.graylog2.rest.resources.system.inputs.requests;
+package org.graylog2.database.validators;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
+import org.junit.Test;
 
+import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.Map;
+import java.util.TreeMap;
+
+import static org.junit.Assert.*;
 
 /**
  * @author Lennart Koopmann <lennart@torch.sh>
  */
-public class InputLaunchRequest {
+public class MapValidatorTest {
 
-    public String title;
-    public String type;
+    @Test
+    public void testValidate() throws Exception {
+        Validator v = new MapValidator();
 
-    @JsonProperty("creator_user_id")
-    public String creatorUserId;
+        assertFalse(v.validate(null));
+        assertFalse(v.validate(new LinkedList<Integer>()));
+        assertFalse(v.validate(9001));
+        assertFalse(v.validate("foo"));
 
-    public Map<String, Object> configuration;
+        Map<String, String> actuallyFilledMap = new TreeMap<String, String>();
+        actuallyFilledMap.put("foo", "bar");
+        actuallyFilledMap.put("lol", "wut");
+
+        assertTrue(v.validate(actuallyFilledMap));
+        assertTrue(v.validate(new HashMap<String, String>()));
+    }
 
 }
