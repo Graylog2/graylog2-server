@@ -48,19 +48,18 @@ public class ConfigurationRequest {
         return ImmutableList.copyOf(fields);
     }
 
-    public List<Map<String, Object>> asList() {
-        List<Map<String, Object>> configs = Lists.newArrayList();
+    public Map<String, Map<String, Object>> asList() {
+        Map<String, Map<String, Object>> configs = Maps.newHashMap();
 
         for (ConfigurationField f : fields) {
             Map<String, Object> config = Maps.newHashMap();
             config.put("type", f.getFieldType());
-            config.put("name", f.getName());
             config.put("description", f.getDescription());
             config.put("default_value", f.getDefaultValue());
             config.put("is_optional", f.isOptional().equals(ConfigurationField.Optional.OPTIONAL));
             config.put("attributes", f.getAttributes());
 
-            configs.add(config);
+            configs.put(f.getName(), config);
         }
 
         return configs;
