@@ -1,36 +1,16 @@
-HOST: http://www.google.com/
-
---- graylog2-server ---
-
+--- Graylog2 REST API ---
 ---
-Welcome to the our sample API documentation. All comments can be written in (support [Markdown](http://daringfireball.net/projects/markdown/syntax) syntax)
+Welcome to the REST API documentation of Graylog2 **v0.20.0-dev**. This API is still in draft mode until the first stable release, planned for the end of this summer.
 ---
 
+
 --
-Shopping Cart Resources
-The following is a section of resources related to the shopping cart
+Cluster
+Resources related to your graylog2-server cluster.
 --
 
-List products added into your shopping-cart. (comment block again in Markdown)
-GET /shopping-cart
+Get a list of all active nodes.
+GET /cluster/nodes
 < 200
 < Content-Type: application/json
-{ "items": [
-{ "url": "/shopping-cart/1", "product":"2ZY48XPZ", "quantity": 1, "name": "New socks", "price": 1.25 }
-] }
-
-Save new products in your shopping cart
-POST /shopping-cart
-> Content-Type: application/json
-{ "product":"1AB23ORM", "quantity": 2 }
-< 201
-< Content-Type: application/json
-{ "status": "created", "url": "/shopping-cart/2" }
-
--- Payment Resources --
-
-This resource allows you to submit payment information to process your *shopping cart* items
-POST /payment
-{ "cc": "12345678900", "cvc": "123", "expiry": "0112" }
-< 200
-{ "receipt": "/payment/receipt/1" }
+{"total":2,"nodes":[{"hostname":"localhost","last_seen":"2013-07-17T22:41:21.000+02:00","transport_address":"http://127.0.0.1:12900/","node_id":"localhost-c65f4556-798c-4507-a258-422a4dda330e"},{"hostname":"localhost","last_seen":"2013-07-17T22:41:21.000+02:00","transport_address":"http://127.0.0.1:12910/","node_id":"localhost-b1772993-3445-4c74-9268-9dbb773b4b02"}]}
