@@ -30,3 +30,14 @@ GET /cluster/nodes
         }
     ]
 }
+
+Get information of a single graylog2-server node.
+GET /cluster/nodes/{node_id}
+< 200
+< Content-Type: application/json
+{
+    "hostname":"localhost",
+    "last_seen":"2013-07-17T23:03:56.000+02:00",
+    "transport_address":"http://127.0.0.1:12900/",
+    "node_id":"localhost-c65f4556-798c-4507-a258-422a4dda330e"
+}
