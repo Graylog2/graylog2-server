@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2013 Lennart Koopmann <lennart@socketfeed.com>
+ * Copyright (c) 2012 Lennart Koopmann <lennart@socketfeed.com>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of
  * this software and associated documentation files (the "Software"), to deal in
@@ -9,8 +9,8 @@
  * so, subject to the following conditions:
  *
  * The above copyright notice and this permission notice shall be included in all
- * copies or substantial portions of the Software.
- *
+ * copies or substantial portions of the Software. 
+ * 
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -18,11 +18,26 @@
  * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
- */
-package org.graylog2.plugin.inputs;
+*/
+package org.graylog2.plugin.configuration;
 
 /**
- * @author Lennart Koopmann <lennart@torch.sh>
+ *
+ * @author Lennart Koopmann <lennart@socketfeed.com>
  */
-public class MessageInputConfigurationRequest {
+public class ConfigurationException extends Exception {
+    
+    /**
+	 * Re-generate if you modify the class structure.
+	 */
+	private static final long serialVersionUID = 8745066310811183675L;
+
+	public ConfigurationException() {
+        super();
+    }
+    
+    public ConfigurationException(String msg) {
+        super(msg);
+    }
+    
 }

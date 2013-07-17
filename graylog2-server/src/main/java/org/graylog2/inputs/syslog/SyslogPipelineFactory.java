@@ -21,7 +21,7 @@
 package org.graylog2.inputs.syslog;
 
 import org.graylog2.Core;
-import org.graylog2.plugin.inputs.MessageInputConfiguration;
+import org.graylog2.plugin.configuration.Configuration;
 import org.jboss.netty.channel.ChannelPipeline;
 import org.jboss.netty.channel.ChannelPipelineFactory;
 import org.jboss.netty.channel.Channels;
@@ -32,9 +32,9 @@ import org.jboss.netty.channel.Channels;
 public class SyslogPipelineFactory implements ChannelPipelineFactory {
 
     private final Core server;
-    private final MessageInputConfiguration config;
+    private final Configuration config;
 
-    public SyslogPipelineFactory(Core server, MessageInputConfiguration config) {
+    public SyslogPipelineFactory(Core server, Configuration config) {
         this.server = server;
         this.config = config;
     }

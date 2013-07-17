@@ -22,7 +22,7 @@ package org.graylog2.inputs.syslog;
 
 import com.codahale.metrics.Meter;
 import com.codahale.metrics.Timer;
-import org.graylog2.plugin.inputs.MessageInputConfiguration;
+import org.graylog2.plugin.configuration.Configuration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.graylog2.Core;
@@ -49,7 +49,7 @@ public class SyslogProcessor {
 
     private static final Logger LOG = LoggerFactory.getLogger(SyslogProcessor.class);
     private final Core server;
-    private final MessageInputConfiguration config;
+    private final Configuration config;
 
     private static final Pattern STRUCTURED_SYSLOG_PATTERN = Pattern.compile("<\\d+>\\d.*", Pattern.DOTALL);
     
@@ -59,7 +59,7 @@ public class SyslogProcessor {
     private final Meter processedMessages;
     private final Timer syslogParsedTime;
 
-    public SyslogProcessor(Core server, MessageInputConfiguration config) {
+    public SyslogProcessor(Core server, Configuration config) {
         this.server = server;
         this.config = config;
 

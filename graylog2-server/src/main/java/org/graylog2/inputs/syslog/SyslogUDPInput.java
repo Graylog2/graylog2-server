@@ -23,6 +23,8 @@ package org.graylog2.inputs.syslog;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import org.graylog2.Core;
 import org.graylog2.plugin.inputs.*;
+import org.graylog2.plugin.configuration.Configuration;
+import org.graylog2.plugin.configuration.ConfigurationException;
 import org.jboss.netty.bootstrap.ConnectionlessBootstrap;
 import org.jboss.netty.channel.ChannelException;
 import org.jboss.netty.channel.FixedReceiveBufferSizePredictorFactory;
@@ -46,17 +48,17 @@ public class SyslogUDPInput extends SyslogInputBase implements MessageInput {
 
     private Core core;
     private String inputId;
-    private MessageInputConfiguration config;
+    private Configuration config;
     private InetSocketAddress socketAddress;
     private ConnectionlessBootstrap bootstrap;
 
     @Override
-    public void configure(MessageInputConfiguration config, GraylogServer graylogServer) throws MessageInputConfigurationException {
+    public void configure(Configuration config, GraylogServer graylogServer) throws ConfigurationException {
         this.core = (Core) graylogServer;
         this.config = config;
 
         if (!checkConfig(config)) {
-            throw new MessageInputConfigurationException();
+            throw new ConfigurationException();
         }
 
         this.socketAddress = new InetSocketAddress(
@@ -92,11 +94,6 @@ public class SyslogUDPInput extends SyslogInputBase implements MessageInput {
         if (bootstrap != null) {
             bootstrap.shutdown();
         }
-    }
-
-    @Override
-    public MessageInputConfigurationRequest getRequestedConfiguration() {
-        return new MessageInputConfigurationRequest();
     }
 
     @Override

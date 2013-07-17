@@ -19,7 +19,7 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package org.graylog2.plugin.inputs;
+package org.graylog2.plugin.configuration;
 
 import com.google.common.collect.Maps;
 import org.slf4j.Logger;
@@ -30,9 +30,9 @@ import java.util.Map;
 /**
  * @author Lennart Koopmann <lennart@torch.sh>
  */
-public class MessageInputConfiguration {
+public class Configuration {
 
-    private static final Logger LOG = LoggerFactory.getLogger(MessageInputConfiguration.class);
+    private static final Logger LOG = LoggerFactory.getLogger(Configuration.class);
 
     private final Map<String, Object> source;
 
@@ -40,7 +40,7 @@ public class MessageInputConfiguration {
     private final Map<String, Integer> ints;
     private final Map<String, Boolean> bools;
 
-    public MessageInputConfiguration(Map<String, Object> m) {
+    public Configuration(Map<String, Object> m) {
         this.source = m;
 
         strings = Maps.newHashMap();

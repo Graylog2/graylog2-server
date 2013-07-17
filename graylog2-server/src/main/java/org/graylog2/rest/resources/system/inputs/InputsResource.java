@@ -19,6 +19,7 @@
  */
 package org.graylog2.rest.resources.system.inputs;
 
+import com.beust.jcommander.internal.Lists;
 import com.codahale.metrics.annotation.Timed;
 import com.google.common.collect.Maps;
 import org.bson.types.ObjectId;
@@ -27,8 +28,9 @@ import org.graylog2.inputs.Input;
 import org.graylog2.inputs.Inputs;
 import org.graylog2.inputs.NoSuchInputTypeException;
 import org.graylog2.plugin.inputs.MessageInput;
-import org.graylog2.plugin.inputs.MessageInputConfiguration;
-import org.graylog2.plugin.inputs.MessageInputConfigurationException;
+import org.graylog2.plugin.configuration.Configuration;
+import org.graylog2.plugin.configuration.ConfigurationException;
+import org.graylog2.plugin.configuration.fields.ConfigurationField;
 import org.graylog2.rest.resources.RestResource;
 import org.graylog2.rest.resources.system.inputs.requests.InputLaunchRequest;
 import org.joda.time.DateTime;
@@ -40,6 +42,7 @@ import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.io.IOException;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -64,7 +67,7 @@ public class InputsResource extends RestResource {
         }
 
         // Build a proper configuration from POST data.
-        MessageInputConfiguration inputConfig = new MessageInputConfiguration(lr.configuration);
+        Configuration inputConfig = new Configuration(lr.configuration);
 
         // Build input.
         MessageInput input = null;
@@ -74,12 +77,12 @@ public class InputsResource extends RestResource {
         } catch (NoSuchInputTypeException e) {
             LOG.error("There is no such input type registered.", e);
             throw new WebApplicationException(e, Response.Status.NOT_FOUND);
-        } catch (MessageInputConfigurationException e) {
+        } catch (ConfigurationException e) {
             LOG.error("Missing or invalid input configuration.", e);
             throw new WebApplicationException(e, Response.Status.BAD_REQUEST);
         }
 
-        // Build MongoDB data and check if it would pass validation. We don't need to go on if it doesn't.
+        // Build MongoDB data
         Map<String, Object> inputData = Maps.newHashMap();
         inputData.put("title", lr.title);
         inputData.put("type", lr.type);
@@ -87,6 +90,7 @@ public class InputsResource extends RestResource {
         inputData.put("configuration", lr.configuration);
         inputData.put("created_at", new DateTime(DateTimeZone.UTC));
 
+        // ... and check if it would pass validation. We don't need to go on if it doesn't.
         Input mongoInput = new Input(core, inputData);
         if (!mongoInput.validate(inputData)) {
             LOG.error("Validation error.");
@@ -117,5 +121,29 @@ public class InputsResource extends RestResource {
 
         return Response.status(Response.Status.ACCEPTED).entity(json(result)).build();
     }
+
+    @GET
+    @Timed
+    @Path("/types/{inputType}")
+    @Produces(MediaType.APPLICATION_JSON)
+    public String info(@PathParam("inputType") String inputType) {
+
+        MessageInput input;
+        try {
+            input = Inputs.factory(inputType);
+        } catch (NoSuchInputTypeException e) {
+            LOG.error("There is no such input type registered.", e);
+            throw new WebApplicationException(e, Response.Status.NOT_FOUND);
+        }
+
+        Map<String, Object> result = Maps.newHashMap();
+        result.put("type", input.getClass().getCanonicalName());
+        result.put("name", input.getName());
+        result.put("is_exclusive", input.isExclusive());
+        result.put("requested_configuration", input.getRequestedConfiguration().asList());
+
+        return json(result);
+    }
+
 
 }

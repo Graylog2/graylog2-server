@@ -22,18 +22,21 @@
 package org.graylog2.plugin.inputs;
 
 import org.graylog2.plugin.GraylogServer;
+import org.graylog2.plugin.configuration.Configuration;
+import org.graylog2.plugin.configuration.ConfigurationException;
+import org.graylog2.plugin.configuration.ConfigurationRequest;
 
 /**
  * @author Lennart Koopmann <lennart@socketfeed.com>
  */
 public interface MessageInput {
     
-    public void configure(MessageInputConfiguration config, GraylogServer graylogServer) throws MessageInputConfigurationException;
+    public void configure(Configuration config, GraylogServer graylogServer) throws ConfigurationException;
 
     public void launch() throws MisfireException;
     public void stop();
 
-    public MessageInputConfigurationRequest getRequestedConfiguration();
+    public ConfigurationRequest getRequestedConfiguration();
     public void setId(String id);
     public String getId();
     public boolean isExclusive();

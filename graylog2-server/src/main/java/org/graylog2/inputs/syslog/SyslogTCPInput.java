@@ -20,20 +20,13 @@
 
 package org.graylog2.inputs.syslog;
 
-import com.google.common.collect.Maps;
-import com.google.common.util.concurrent.ThreadFactoryBuilder;
-import org.graylog2.Core;
 import org.graylog2.plugin.inputs.*;
-import org.jboss.netty.bootstrap.ServerBootstrap;
-import org.jboss.netty.channel.ChannelException;
-import org.jboss.netty.channel.socket.nio.NioServerSocketChannelFactory;
+import org.graylog2.plugin.configuration.Configuration;
+import org.graylog2.plugin.configuration.ConfigurationException;
+import org.graylog2.plugin.configuration.ConfigurationRequest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.net.InetSocketAddress;
-import java.util.Map;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 import org.graylog2.plugin.GraylogServer;
 
 /**
@@ -46,7 +39,7 @@ public class SyslogTCPInput implements MessageInput {
     private static final String NAME = "Syslog TCP";
 
     @Override
-    public void configure(MessageInputConfiguration config, GraylogServer graylogServer) throws MessageInputConfigurationException {
+    public void configure(Configuration config, GraylogServer graylogServer) throws ConfigurationException {
         //To change body of implemented methods use File | Settings | File Templates.
     }
 
@@ -61,7 +54,7 @@ public class SyslogTCPInput implements MessageInput {
     }
 
     @Override
-    public MessageInputConfigurationRequest getRequestedConfiguration() {
+    public ConfigurationRequest getRequestedConfiguration() {
         return null;  //To change body of implemented methods use File | Settings | File Templates.
     }
 
