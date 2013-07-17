@@ -9,8 +9,24 @@ Cluster
 Resources related to your graylog2-server cluster.
 --
 
-Get a list of all active nodes.
+Get a list of all active graylog2-server nodes.
 GET /cluster/nodes
 < 200
 < Content-Type: application/json
-{"total":2,"nodes":[{"hostname":"localhost","last_seen":"2013-07-17T22:41:21.000+02:00","transport_address":"http://127.0.0.1:12900/","node_id":"localhost-c65f4556-798c-4507-a258-422a4dda330e"},{"hostname":"localhost","last_seen":"2013-07-17T22:41:21.000+02:00","transport_address":"http://127.0.0.1:12910/","node_id":"localhost-b1772993-3445-4c74-9268-9dbb773b4b02"}]}
+{
+    "total":2,
+    "nodes": [
+        {
+            "hostname":"localhost",
+            "last_seen":"2013-07-17T22:41:21.000+02:00",
+            "transport_address":"http://127.0.0.1:12900/",
+            "node_id":"localhost-c65f4556-798c-4507-a258-422a4dda330e"
+        },
+        {
+            "hostname":"localhost",
+            "last_seen":"2013-07-17T22:41:21.000+02:00",
+            "transport_address":"http://127.0.0.1:12910/",
+            "node_id":"localhost-b1772993-3445-4c74-9268-9dbb773b4b02"
+        }
+    ]
+}
