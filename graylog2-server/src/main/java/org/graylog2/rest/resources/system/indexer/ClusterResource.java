@@ -20,7 +20,6 @@
 package org.graylog2.rest.resources.system.indexer;
 
 import com.codahale.metrics.annotation.Timed;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.Maps;
 import org.graylog2.rest.resources.RestResource;
 import org.slf4j.Logger;
@@ -40,8 +39,6 @@ import java.util.Map;
 public class ClusterResource extends RestResource {
 
     private static final Logger LOG = LoggerFactory.getLogger(ClusterResource.class);
-
-    private final ObjectMapper objectMapper = new ObjectMapper();
 
     @GET @Timed
     @Path("/name")

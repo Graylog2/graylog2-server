@@ -22,8 +22,6 @@ package org.graylog2.rest.resources.cluster;
 import com.codahale.metrics.annotation.Timed;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
-import org.glassfish.jersey.server.ResourceConfig;
-import org.graylog2.Core;
 import org.graylog2.cluster.Node;
 import org.graylog2.plugin.Tools;
 import org.graylog2.rest.resources.RestResource;
@@ -31,7 +29,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.ws.rs.*;
-import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import java.util.List;
 import java.util.Map;
@@ -44,16 +41,11 @@ public class NodesResource extends RestResource {
 
     private static final Logger LOG = LoggerFactory.getLogger(NodesResource.class);
 
-    @Context
-    ResourceConfig rc;
-
     @GET
     @Timed
     @Path("/{nodeId}")
     @Produces(MediaType.APPLICATION_JSON)
     public String node(@PathParam("nodeId") String nodeId, @QueryParam("pretty") boolean prettyPrint) {
-        Core core = (Core) rc.getProperty("core");
-
         if (nodeId == null || nodeId.isEmpty()) {
             LOG.error("Missing nodeId. Returning HTTP 400.");
             throw new WebApplicationException(400);
@@ -73,8 +65,6 @@ public class NodesResource extends RestResource {
     @Timed
     @Produces(MediaType.APPLICATION_JSON)
     public String list(@QueryParam("pretty") boolean prettyPrint) {
-        Core core = (Core) rc.getProperty("core");
-
         List<Map<String, Object>> nodes = Lists.newArrayList();
 
         for (Node node : Node.allActive(core).values()) {

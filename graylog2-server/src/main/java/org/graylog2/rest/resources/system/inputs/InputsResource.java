@@ -20,7 +20,6 @@
 package org.graylog2.rest.resources.system.inputs;
 
 import com.codahale.metrics.annotation.Timed;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.Maps;
 import org.bson.types.ObjectId;
 import org.graylog2.inputs.Inputs;
@@ -46,8 +45,6 @@ import java.util.Map;
 public class InputsResource extends RestResource {
 
     private static final Logger LOG = LoggerFactory.getLogger(InputsResource.class);
-
-    private final ObjectMapper objectMapper = new ObjectMapper();
 
     @POST
     @Timed

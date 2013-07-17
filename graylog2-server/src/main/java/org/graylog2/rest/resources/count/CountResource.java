@@ -20,10 +20,7 @@
 package org.graylog2.rest.resources.count;
 
 import com.codahale.metrics.annotation.Timed;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.Maps;
-import org.glassfish.jersey.server.ResourceConfig;
-import org.graylog2.Core;
 import org.graylog2.indexer.Indexer;
 import org.graylog2.indexer.results.DateHistogramResult;
 import org.graylog2.rest.resources.RestResource;
@@ -31,7 +28,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.ws.rs.*;
-import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import java.util.Map;
 
@@ -43,16 +39,9 @@ public class CountResource extends RestResource {
 	
     private static final Logger LOG = LoggerFactory.getLogger(CountResource.class);
 
-    private final ObjectMapper objectMapper = new ObjectMapper();
-	
-    @Context
-    ResourceConfig rc;
-
     @GET @Path("/total") @Timed
     @Produces(MediaType.APPLICATION_JSON)
     public String total(@QueryParam("pretty") boolean prettyPrint) {
-        Core core = (Core) rc.getProperty("core");
-
         Map<String, Long> result = Maps.newHashMap();
         result.put("events", core.getIndexer().counts().total());
 
@@ -62,8 +51,6 @@ public class CountResource extends RestResource {
     @GET @Path("/histogram") @Timed
     @Produces(MediaType.APPLICATION_JSON)
     public String histogram(@QueryParam("interval") String interval, @QueryParam("timerange") int timerange, @QueryParam("pretty") boolean prettyPrint) {
-        Core core = (Core) rc.getProperty("core");
-
         if (interval == null || interval.isEmpty()) {
             LOG.error("Missing parameters. Returning HTTP 400.");
             throw new WebApplicationException(400);

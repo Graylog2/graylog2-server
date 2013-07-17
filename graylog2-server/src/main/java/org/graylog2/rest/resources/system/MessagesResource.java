@@ -20,12 +20,11 @@
 package org.graylog2.rest.resources.system;
 
 import com.codahale.metrics.annotation.Timed;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
-import org.graylog2.system.activities.SystemMessage;
 import org.graylog2.plugin.Tools;
 import org.graylog2.rest.resources.RestResource;
+import org.graylog2.system.activities.SystemMessage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -44,8 +43,6 @@ import java.util.Map;
 public class MessagesResource extends RestResource {
 
     private static final Logger LOG = LoggerFactory.getLogger(MessagesResource.class);
-
-    private final ObjectMapper objectMapper = new ObjectMapper();
 
     @GET @Timed
     @Produces(MediaType.APPLICATION_JSON)

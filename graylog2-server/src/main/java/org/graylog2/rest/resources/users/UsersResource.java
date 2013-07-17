@@ -19,7 +19,6 @@
  */
 package org.graylog2.rest.resources.users;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.Maps;
 import org.bson.types.ObjectId;
 import org.graylog2.database.ValidationException;
@@ -43,8 +42,6 @@ import java.util.Map;
 public class UsersResource extends RestResource {
 
     private static final Logger LOG = LoggerFactory.getLogger(RestResource.class);
-
-    private final ObjectMapper objectMapper = new ObjectMapper();
 
     @POST // This is a post request because sending (hashed) user credentials as GET params sucks.
     @Path("/authenticate")

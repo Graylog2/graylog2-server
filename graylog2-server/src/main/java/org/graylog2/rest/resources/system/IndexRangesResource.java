@@ -20,7 +20,6 @@
 package org.graylog2.rest.resources.system;
 
 import com.codahale.metrics.annotation.Timed;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.graylog2.indexer.ranges.RebuildIndexRangesJob;
 import org.graylog2.rest.resources.RestResource;
 import org.graylog2.system.jobs.SystemJob;
@@ -42,8 +41,6 @@ import javax.ws.rs.core.Response;
 public class IndexRangesResource extends RestResource {
 
     private static final Logger LOG = LoggerFactory.getLogger(IndexRangesResource.class);
-
-    private final ObjectMapper objectMapper = new ObjectMapper();
 
     @POST @Timed
     @Path("/rebuild")
