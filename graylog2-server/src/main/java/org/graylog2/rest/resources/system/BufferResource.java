@@ -28,7 +28,6 @@ import org.graylog2.rest.resources.RestResource;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
-import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
 import java.util.Map;
 
@@ -40,12 +39,12 @@ public class BufferResource extends RestResource {
 
     @GET @Timed
     @Produces(MediaType.APPLICATION_JSON)
-    public String utilization(@QueryParam("pretty") boolean prettyPrint) {
+    public String utilization() {
         Map<String, Object> result = Maps.newHashMap();
         result.put("buffers", buffers(core));
         result.put("master_caches", masterCaches(core));
 
-        return json(result, prettyPrint);
+        return json(result);
     }
 
     private Map<String, Object> masterCaches(Core core) {

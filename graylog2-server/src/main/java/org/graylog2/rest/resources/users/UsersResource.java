@@ -47,7 +47,7 @@ public class UsersResource extends RestResource {
     @Path("/authenticate")
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
-    public Response authenticate(String body, @QueryParam("pretty") boolean prettyPrint) {
+    public Response authenticate(String body) {
         if (body == null || body.isEmpty()) {
             LOG.error("Missing parameters. Returning HTTP 400.");
             throw new WebApplicationException(400);
@@ -77,7 +77,7 @@ public class UsersResource extends RestResource {
     @POST
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
-    public Response create(String body, @QueryParam("pretty") boolean prettyPrint) {
+    public Response create(String body) {
         if (body == null || body.isEmpty()) {
             LOG.error("Missing parameters. Returning HTTP 400.");
             throw new WebApplicationException(400);
@@ -109,7 +109,7 @@ public class UsersResource extends RestResource {
         Map<String, Object> result = Maps.newHashMap();
         result.put("user_id", id.toStringMongod());
 
-        return Response.status(Response.Status.CREATED).entity(json(result, prettyPrint)).build();
+        return Response.status(Response.Status.CREATED).entity(json(result)).build();
     }
 
 }

@@ -58,7 +58,7 @@ public class NodesResource extends RestResource {
             throw new WebApplicationException(404);
         }
 
-        return json(nodeSummary(node), prettyPrint);
+        return json(nodeSummary(node));
     }
 
     @GET
@@ -75,7 +75,7 @@ public class NodesResource extends RestResource {
         result.put("total", nodes.size());
         result.put("nodes", nodes);
 
-        return json(result, prettyPrint);
+        return json(result);
     }
 
     private Map<String, Object> nodeSummary(Node node) {

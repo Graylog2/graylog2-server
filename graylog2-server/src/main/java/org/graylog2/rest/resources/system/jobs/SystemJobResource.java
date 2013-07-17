@@ -48,7 +48,7 @@ public class SystemJobResource extends RestResource {
 
     @GET @Timed
     @Produces(MediaType.APPLICATION_JSON)
-    public String list(@QueryParam("pretty") boolean prettyPrint) {
+    public String list() {
         List<Map<String, Object>> jobs = Lists.newArrayList();
 
         for (Map.Entry<String, SystemJob> x : core.getSystemJobManager().getRunningJobs().entrySet()) {
@@ -58,13 +58,13 @@ public class SystemJobResource extends RestResource {
         Map<String, Object> result = Maps.newHashMap();
         result.put("jobs", jobs);
 
-        return json(result, prettyPrint);
+        return json(result);
     }
 
     @GET @Timed
     @Path("/{jobId}")
     @Produces(MediaType.APPLICATION_JSON)
-    public String get(@PathParam("jobId") String jobId, @QueryParam("pretty") boolean prettyPrint) {
+    public String get(@PathParam("jobId") String jobId) {
         if (jobId == null || jobId.isEmpty()) {
             LOG.error("Missing jobId. Returning HTTP 400.");
             throw new WebApplicationException(400);
@@ -77,13 +77,13 @@ public class SystemJobResource extends RestResource {
             throw new WebApplicationException(404);
         }
 
-        return json(job.toMap(), prettyPrint);
+        return json(job.toMap());
     }
 
     @POST @Timed
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
-    public Response trigger(String body, @QueryParam("pretty") boolean prettyPrint) {
+    public Response trigger(String body) {
         if (body == null || body.isEmpty()) {
             LOG.error("Missing parameters. Returning HTTP 400.");
             throw new WebApplicationException(400);

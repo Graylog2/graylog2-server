@@ -31,7 +31,6 @@ import org.slf4j.LoggerFactory;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
-import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
 import java.util.List;
 import java.util.Map;
@@ -46,7 +45,7 @@ public class NotificationsResource extends RestResource {
 
     @GET @Timed
     @Produces(MediaType.APPLICATION_JSON)
-    public String listNotifications(@QueryParam("pretty") boolean prettyPrint) {
+    public String listNotifications() {
         List<Map<String, Object>> notifications = Lists.newArrayList();
 
         for (Notification n : Notification.all(core)) {
@@ -62,7 +61,7 @@ public class NotificationsResource extends RestResource {
         result.put("total", notifications.size());
         result.put("notifications", notifications);
 
-        return json(result, prettyPrint);
+        return json(result);
     }
 
 }

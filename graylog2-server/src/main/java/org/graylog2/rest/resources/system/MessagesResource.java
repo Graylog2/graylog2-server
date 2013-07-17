@@ -46,7 +46,7 @@ public class MessagesResource extends RestResource {
 
     @GET @Timed
     @Produces(MediaType.APPLICATION_JSON)
-    public String all(@QueryParam("page") int page, @QueryParam("pretty") boolean prettyPrint) {
+    public String all(@QueryParam("page") int page) {
         List<Map<String, Object>> messages = Lists.newArrayList();
 
         for (SystemMessage sm : SystemMessage.all(core, page(page))) {
@@ -63,7 +63,7 @@ public class MessagesResource extends RestResource {
         result.put("messages", messages);
         result.put("total", SystemMessage.totalCount(core, SystemMessage.COLLECTION));
 
-        return json(result, prettyPrint);
+        return json(result);
     }
 
 }

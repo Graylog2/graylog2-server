@@ -41,30 +41,30 @@ public class MetricsResource extends RestResource {
     @GET
     @Timed
     @Produces(MediaType.APPLICATION_JSON)
-    public String metrics(@QueryParam("pretty") boolean prettyPrint) {
+    public String metrics() {
         Map<String, Object> result = Maps.newHashMap();
 
         result.put("metrics", core.metrics().getMetrics());
 
-        return json(result, prettyPrint);
+        return json(result);
     }
 
     @GET
     @Timed
     @Path("/names")
     @Produces(MediaType.APPLICATION_JSON)
-    public String metricNames(@QueryParam("pretty") boolean prettyPrint) {
+    public String metricNames() {
         Map<String, Object> result = Maps.newHashMap();
         result.put("names", core.metrics().getNames());
 
-        return json(result, prettyPrint);
+        return json(result);
     }
 
     @GET
     @Timed
     @Path("/{metricName}")
     @Produces(MediaType.APPLICATION_JSON)
-    public String singleMetric(@PathParam("metricName") String metricName, @QueryParam("pretty") boolean prettyPrint) {
+    public String singleMetric(@PathParam("metricName") String metricName) {
         Metric metric = core.metrics().getMetrics().get(metricName);
 
         if (metric == null) {
@@ -72,7 +72,7 @@ public class MetricsResource extends RestResource {
             throw new WebApplicationException(404);
         }
 
-        return json(metric, prettyPrint);
+        return json(metric);
     }
 
 }

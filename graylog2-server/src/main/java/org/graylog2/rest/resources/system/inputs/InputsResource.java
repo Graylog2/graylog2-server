@@ -54,7 +54,7 @@ public class InputsResource extends RestResource {
     @Timed
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
-    public Response create(String body, @QueryParam("pretty") boolean prettyPrint) {
+    public Response create(String body) {
         InputLaunchRequest lr;
         try {
             lr = objectMapper.readValue(body, InputLaunchRequest.class);
@@ -115,7 +115,7 @@ public class InputsResource extends RestResource {
         result.put("input_id", inputId);
         result.put("persist_id", id.toStringMongod());
 
-        return Response.status(Response.Status.ACCEPTED).entity(json(result, prettyPrint)).build();
+        return Response.status(Response.Status.ACCEPTED).entity(json(result)).build();
     }
 
 }

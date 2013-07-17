@@ -57,7 +57,7 @@ public class SearchResource extends RestResource {
         result.put("time", sr.took().millis());
         result.put("total_results", sr.getTotalResults());
 
-        return json(result, prettyPrint);
+        return json(result);
     }
     
     @GET @Path("/universal/histogram") @Timed
@@ -85,7 +85,7 @@ public class SearchResource extends RestResource {
         result.put("results", dhr.getResults());
         result.put("time", dhr.took().millis());
 
-        return json(result, prettyPrint);
+        return json(result);
     }
 
 }

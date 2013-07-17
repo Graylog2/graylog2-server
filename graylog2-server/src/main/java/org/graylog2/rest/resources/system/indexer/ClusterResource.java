@@ -28,7 +28,6 @@ import org.slf4j.LoggerFactory;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
-import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
 import java.util.Map;
 
@@ -43,17 +42,17 @@ public class ClusterResource extends RestResource {
     @GET @Timed
     @Path("/name")
     @Produces(MediaType.APPLICATION_JSON)
-    public String name(@QueryParam("pretty") boolean prettyPrint) {
+    public String name() {
         Map<String, Object> result = Maps.newHashMap();
         result.put("name", core.getIndexer().cluster().getName());
 
-        return json(result, prettyPrint);
+        return json(result);
     }
 
     @GET @Timed
     @Path("/health")
     @Produces(MediaType.APPLICATION_JSON)
-    public String health(@QueryParam("pretty") boolean prettyPrint) {
+    public String health() {
         Map<String, Integer> shards = Maps.newHashMap();
         shards.put("active", core.getIndexer().cluster().getActiveShards());
         shards.put("initializing", core.getIndexer().cluster().getInitializingShards());
@@ -64,7 +63,7 @@ public class ClusterResource extends RestResource {
         health.put("status", core.getIndexer().cluster().getHealth().toString().toLowerCase());
         health.put("shards", shards);
 
-        return json(health, prettyPrint);
+        return json(health);
     }
 
 }

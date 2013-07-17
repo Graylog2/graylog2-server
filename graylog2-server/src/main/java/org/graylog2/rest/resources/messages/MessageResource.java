@@ -60,7 +60,7 @@ public class MessageResource extends RestResource {
         	throw new WebApplicationException(404);
 		}
 
-        return json(m, prettyPrint);
+        return json(m);
     }
     
     @GET @Path("/analyze") @Timed
@@ -82,7 +82,7 @@ public class MessageResource extends RestResource {
         Map<String, Object> result = Maps.newHashMap();
         result.put("tokens", tokens);
 
-        return json(result, prettyPrint);
+        return json(result);
     }
 
 }

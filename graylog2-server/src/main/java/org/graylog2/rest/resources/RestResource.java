@@ -29,6 +29,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
+import javax.ws.rs.QueryParam;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Response;
 import java.util.Map;
@@ -44,6 +45,9 @@ public abstract class RestResource {
 
     @Inject
     protected Core core;
+
+    @QueryParam("pretty")
+    boolean prettyPrint;
 
 	protected RestResource() { /* */ }
 
@@ -64,9 +68,9 @@ public abstract class RestResource {
 		}
 	}
 
-    protected String json(Object x, boolean prettyPrint) {
+    protected String json(Object x) {
         try {
-            if (prettyPrint) {
+            if (this.prettyPrint) {
                 return objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(x);
             } else {
                 return objectMapper.writeValueAsString(x);

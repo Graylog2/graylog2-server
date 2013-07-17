@@ -31,7 +31,6 @@ import org.slf4j.LoggerFactory;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
-import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
 import java.util.List;
 import java.util.Map;
@@ -47,7 +46,7 @@ public class ClusterResource extends RestResource {
     @GET @Timed
     @Path("/nodes")
     @Produces(MediaType.APPLICATION_JSON)
-    public String nodes(@QueryParam("pretty") boolean prettyPrint) {
+    public String nodes() {
         List<Map<String, Object>> nodeList = Lists.newArrayList();
         Map<String, Node> nodes = Node.allActive(core);
 
@@ -67,7 +66,7 @@ public class ClusterResource extends RestResource {
         result.put("total", nodes.size());
         result.put("nodes", nodeList);
 
-        return json(result, prettyPrint);
+        return json(result);
     }
 
 

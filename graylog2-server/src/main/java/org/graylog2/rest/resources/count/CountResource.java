@@ -45,7 +45,7 @@ public class CountResource extends RestResource {
         Map<String, Long> result = Maps.newHashMap();
         result.put("events", core.getIndexer().counts().total());
 
-        return json(result, prettyPrint);
+        return json(result);
     }
 
     @GET @Path("/histogram") @Timed
@@ -78,6 +78,6 @@ public class CountResource extends RestResource {
         result.put("results", dhr.getResults());
         result.put("time", dhr.took().millis());
 
-        return json(result, prettyPrint);
+        return json(result);
     }
 }

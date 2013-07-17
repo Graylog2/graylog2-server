@@ -48,7 +48,7 @@ public class SystemResource extends RestResource {
 
     @GET @Timed
     @Produces(MediaType.APPLICATION_JSON)
-    public String system(@QueryParam("pretty") boolean prettyPrint) {
+    public String system() {
         Map<String, Object> result = Maps.newHashMap();
         result.put("facility", "graylog2-server");
         result.put("codename", Core.GRAYLOG2_CODENAME);
@@ -56,17 +56,17 @@ public class SystemResource extends RestResource {
        	result.put("version", Core.GRAYLOG2_VERSION);
         result.put("started_at", core.getStartedAt().toString());
 
-        return json(result, prettyPrint);
+        return json(result);
     }
 
     @GET @Timed
     @Path("/fields")
     @Produces(MediaType.APPLICATION_JSON)
-    public String analyze(@QueryParam("pretty") boolean prettyPrint) {
+    public String analyze() {
         Map<String, Object> result = Maps.newHashMap();
         result.put("fields", core.getIndexer().getAllMessageFields());
 
-        return json(result, prettyPrint);
+        return json(result);
     }
 
     @PUT @Timed
@@ -109,7 +109,7 @@ public class SystemResource extends RestResource {
     @GET
     @Path("/jvm") @Timed
     @Produces(MediaType.APPLICATION_JSON)
-    public String jvm(@QueryParam("pretty") boolean prettyPrint) {
+    public String jvm() {
         Runtime runtime = Runtime.getRuntime();
 
         Map<String, Object> result = Maps.newHashMap();
@@ -123,13 +123,13 @@ public class SystemResource extends RestResource {
         result.put("info", Tools.getSystemInformation());
         result.put("is_processing", core.isProcessing());
 
-        return json(result, prettyPrint);
+        return json(result);
     }
 
     @GET
     @Path("/threaddump") @Timed
     @Produces(MediaType.TEXT_PLAIN)
-    public String threaddump(@QueryParam("pretty") boolean prettyPrint) {
+    public String threaddump() {
         // The ThreadDump is built by  internal codahale.metrics servlet library we are abusing.
         ThreadDump threadDump = new ThreadDump(ManagementFactory.getThreadMXBean());
         ByteArrayOutputStream output = new ByteArrayOutputStream();

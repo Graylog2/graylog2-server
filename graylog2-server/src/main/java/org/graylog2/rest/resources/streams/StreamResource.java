@@ -80,7 +80,7 @@ public class StreamResource extends RestResource {
         Map<String, Object> result = Maps.newHashMap();
         result.put("stream_id", id.toStringMongod());
 
-        return Response.status(Response.Status.CREATED).entity(json(result, prettyPrint)).build();
+        return Response.status(Response.Status.CREATED).entity(json(result)).build();
     }
     
     @GET
@@ -123,7 +123,7 @@ public class StreamResource extends RestResource {
         	throw new WebApplicationException(404);
         }
 
-        return json(stream.asMap(), prettyPrint);
+        return json(stream.asMap());
     }
 
     @DELETE @Path("/{streamId}") @Timed
