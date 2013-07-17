@@ -1,8 +1,41 @@
 --- Graylog2 REST API ---
 ---
 Welcome to the REST API documentation of Graylog2 **v0.20.0-dev**. This API is still in draft mode until the first stable release, planned for the end of this summer.
+
+You can append a `pretty=true` GET parameter to every call to get a pretty-printed and formatted JSON result.
 ---
 
+
+--
+Message counts
+Resources related to message counts.
+--
+
+Get the total number of messages in your Graylog2 setup.
+GET /count/total
+< 200
+< Content-Type: application/json
+{
+    "events":55318286
+}
+
+Get a histogram of message counts for a specified timerange in a specified interval.
+
+  * **interval**: One of year, quarter, month, week, day, hour or minute (controls bucket sizes)
+  * **timerange**: From how many seconds in the past to start. Example: 300 means last 5 minutes.
+GET /count/histogram{?interval,timerange}
+< 200
+< Content-Type: application/json
+{
+    "time":35,
+    "results": {
+        "1373846400":113,
+        "1373850000":192,
+        "1373853600":281
+    },
+    "interval":"hour",
+    "query":"match_all"
+}
 
 --
 Cluster
