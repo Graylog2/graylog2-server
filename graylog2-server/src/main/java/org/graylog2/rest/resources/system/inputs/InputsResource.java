@@ -22,6 +22,8 @@ package org.graylog2.rest.resources.system.inputs;
 import com.codahale.metrics.annotation.Timed;
 import com.google.common.collect.Maps;
 import org.bson.types.ObjectId;
+import org.graylog2.database.ValidationException;
+import org.graylog2.inputs.Input;
 import org.graylog2.inputs.Inputs;
 import org.graylog2.inputs.NoSuchInputTypeException;
 import org.graylog2.plugin.inputs.MessageInput;
@@ -29,6 +31,8 @@ import org.graylog2.plugin.inputs.MessageInputConfiguration;
 import org.graylog2.plugin.inputs.MessageInputConfigurationException;
 import org.graylog2.rest.resources.RestResource;
 import org.graylog2.rest.resources.system.inputs.requests.InputLaunchRequest;
+import org.joda.time.DateTime;
+import org.joda.time.DateTimeZone;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -60,7 +64,7 @@ public class InputsResource extends RestResource {
         }
 
         // Build a proper configuration from POST data.
-        MessageInputConfiguration inputConfig = new MessageInputConfiguration();
+        MessageInputConfiguration inputConfig = new MessageInputConfiguration(lr.configuration);
 
         // Build input.
         MessageInput input = null;
@@ -75,6 +79,20 @@ public class InputsResource extends RestResource {
             throw new WebApplicationException(e, Response.Status.BAD_REQUEST);
         }
 
+        // Build MongoDB data and check if it would pass validation. We don't need to go on if it doesn't.
+        Map<String, Object> inputData = Maps.newHashMap();
+        inputData.put("title", lr.title);
+        inputData.put("type", lr.type);
+        inputData.put("creator_user_id", lr.creatorUserId);
+        inputData.put("configuration", lr.configuration);
+        inputData.put("created_at", new DateTime(DateTimeZone.UTC));
+
+        Input mongoInput = new Input(core, inputData);
+        if (!mongoInput.validate(inputData)) {
+            LOG.error("Validation error.");
+            throw new WebApplicationException(Response.Status.BAD_REQUEST);
+        }
+
         // Launch input.
         String inputId;
         try {
@@ -86,17 +104,16 @@ public class InputsResource extends RestResource {
 
         // Persist input.
         ObjectId id;
-        /*StreamImpl stream = new StreamImpl(streamData, core);
         try {
-            id = stream.save();
+            id = mongoInput.save();
         } catch (ValidationException e) {
             LOG.error("Validation error.", e);
             throw new WebApplicationException(e, Response.Status.BAD_REQUEST);
-        }*/
+        }
 
         Map<String, Object> result = Maps.newHashMap();
         result.put("input_id", inputId);
-        //result.put("persist_id", id.toStringMongod());
+        result.put("persist_id", id.toStringMongod());
 
         return Response.status(Response.Status.ACCEPTED).entity(json(result, prettyPrint)).build();
     }

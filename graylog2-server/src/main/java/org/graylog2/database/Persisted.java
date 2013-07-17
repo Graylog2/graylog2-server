@@ -127,7 +127,7 @@ public abstract class Persisted {
     }
 	
 	public ObjectId save() throws ValidationException {
-        if(!validate(getValidations(), fields)) {
+        if(!validate(fields)) {
             throw new ValidationException();
         }
 
@@ -170,12 +170,12 @@ public abstract class Persisted {
 		return core.getMongoConnection().getDatabase().getCollection(collectionName);
 	}
 
-    private boolean validate(Map<String, Validator> validations, Map<String, Object> fields) {
-        if (validations == null || validations.isEmpty()) {
+    public boolean validate(Map<String, Object> fields) {
+        if (getValidations() == null || getValidations().isEmpty()) {
             return true;
         }
 
-        for(Map.Entry<String, Validator> validation : validations.entrySet()) {
+        for(Map.Entry<String, Validator> validation : getValidations().entrySet()) {
             Validator v = validation.getValue();
             String field = validation.getKey();
 

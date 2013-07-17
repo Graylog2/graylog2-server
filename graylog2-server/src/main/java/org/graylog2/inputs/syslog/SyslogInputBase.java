@@ -1,5 +1,5 @@
 /**
- * Copyright 2013 Lennart Koopmann <lennart@torch.sh>
+ * Copyright 2013 Lennart Koopmann <lennart@socketfeed.com>
  *
  * This file is part of Graylog2.
  *
@@ -17,23 +17,25 @@
  * along with Graylog2.  If not, see <http://www.gnu.org/licenses/>.
  *
  */
-package org.graylog2.rest.resources.system.inputs.requests;
+package org.graylog2.inputs.syslog;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
-
-import java.util.Map;
+import org.graylog2.plugin.inputs.MessageInputConfiguration;
 
 /**
  * @author Lennart Koopmann <lennart@torch.sh>
  */
-public class InputLaunchRequest {
+public class SyslogInputBase {
 
-    public String title;
-    public String type;
+    public static final String CK_BIND_ADDRESS = "bind_address";
+    public static final String CK_PORT = "port";
+    public static final String CK_FORCE_RDNS = "force_rdns";
+    public static final String CK_ALLOW_OVERRIDE_DATE = "allow_override_date";
 
-    @JsonProperty("creator_user_id")
-    public String creatorUserId;
-
-    public Map<String, Object> configuration;
+    protected boolean checkConfig(MessageInputConfiguration config) {
+        return config.stringIsSet(CK_BIND_ADDRESS)
+                && config.intIsSet(CK_PORT)
+                && config.boolIsSet(CK_FORCE_RDNS)
+                && config.boolIsSet(CK_ALLOW_OVERRIDE_DATE);
+    }
 
 }

@@ -22,6 +22,7 @@ package org.graylog2.inputs.syslog;
 
 import com.codahale.metrics.Meter;
 import com.codahale.metrics.Timer;
+import org.graylog2.plugin.inputs.MessageInputConfiguration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.graylog2.Core;
@@ -47,7 +48,8 @@ import static com.codahale.metrics.MetricRegistry.name;
 public class SyslogProcessor {
 
     private static final Logger LOG = LoggerFactory.getLogger(SyslogProcessor.class);
-    private Core server;
+    private final Core server;
+    private final MessageInputConfiguration config;
 
     private static final Pattern STRUCTURED_SYSLOG_PATTERN = Pattern.compile("<\\d+>\\d.*", Pattern.DOTALL);
     
@@ -57,8 +59,9 @@ public class SyslogProcessor {
     private final Meter processedMessages;
     private final Timer syslogParsedTime;
 
-    public SyslogProcessor(Core server) {
+    public SyslogProcessor(Core server, MessageInputConfiguration config) {
         this.server = server;
+        this.config = config;
 
         this.incomingMessages = server.metrics().meter(name(SyslogProcessor.class, "incomingMessages"));
         this.parsingFailures = server.metrics().meter(name(SyslogProcessor.class, "parsingFailures"));
@@ -160,14 +163,13 @@ public class SyslogProcessor {
     }
 
     private String parseHost(SyslogServerEventIF msg, InetAddress remoteAddress) {
-        // TODO re-implement with new input structure
-        /*if (remoteAddress != null && server.getConfiguration().getForceSyslogRdns()) {
+        if (remoteAddress != null && config.getBoolean(SyslogInputBase.CK_FORCE_RDNS)) {
             try {
                 return Tools.rdnsLookup(remoteAddress);
             } catch (UnknownHostException e) {
                 LOG.warn("Reverse DNS lookup failed. Falling back to parsed hostname.", e);
             }
-        }*/
+        }
 
         return msg.getHost();
     }
@@ -175,16 +177,15 @@ public class SyslogProcessor {
     private double parseDate(SyslogServerEventIF msg) throws IllegalStateException {
         // Check if date could be parsed.
         if (msg.getDate() == null) {
-            // TODO re-implement with new input structure
-            /*if (server.getConfiguration().getAllowOverrideSyslogDate()) {
+            if (config.getBoolean(SyslogInputBase.CK_ALLOW_OVERRIDE_DATE)) {
                 // empty Date constructor allocates a Date object and initializes it so that it represents the time at which it was allocated.
                 msg.setDate(new Date());
-                LOG.info("Date could not be parsed. Was set to NOW because allow_override_syslog_date is true.");
-            } else {*/
-                LOG.info("Syslog message is missing date or date could not be parsed. (Possibly set allow_override_syslog_date to true) "
-                        + "Not further handling. Message was: " + new String(msg.getRaw()));
+                LOG.info("Date could not be parsed. Was set to NOW because {} is true.", SyslogInputBase.CK_ALLOW_OVERRIDE_DATE);
+            } else {
+                LOG.info("Syslog message is missing date or date could not be parsed. (Possibly set {} to true) "
+                        + "Not further handling. Message was: {}", SyslogInputBase.CK_ALLOW_OVERRIDE_DATE, new String(msg.getRaw()));
                 throw new IllegalStateException();
-            //}
+            }
         }
 
         return Tools.getUTCTimestampWithMilliseconds(msg.getDate().getTime());

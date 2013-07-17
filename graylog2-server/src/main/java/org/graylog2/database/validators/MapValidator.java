@@ -17,23 +17,19 @@
  * along with Graylog2.  If not, see <http://www.gnu.org/licenses/>.
  *
  */
-package org.graylog2.rest.resources.system.inputs.requests;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
+package org.graylog2.database.validators;
 
 import java.util.Map;
 
 /**
  * @author Lennart Koopmann <lennart@torch.sh>
  */
-public class InputLaunchRequest {
+public class MapValidator implements Validator {
 
-    public String title;
-    public String type;
-
-    @JsonProperty("creator_user_id")
-    public String creatorUserId;
-
-    public Map<String, Object> configuration;
+    @Override
+    public boolean validate(Object value) {
+        return value instanceof Map;
+    }
 
 }
