@@ -44,8 +44,7 @@ public class ResultMessage {
 		ResultMessage m = new ResultMessage();
 		m.setMessage(hit.getSource());
 		m.setIndex(hit.getIndex());
-		m.setNodeId(hit.getShard().getNodeId());
-		
+
 		return m;
 	}
 	
