@@ -24,6 +24,7 @@ import lib.APIException;
 import lib.Api;
 import lib.BreadcrumbList;
 import models.BufferInfo;
+import models.Input;
 import models.Node;
 import models.ServerJVMStats;
 import play.mvc.Result;
@@ -65,7 +66,14 @@ public class InputsController extends AuthenticatedController {
         bc.addCrumb("Inputs", routes.InputsController.index());
         bc.addCrumb(node.getNodeId(), routes.InputsController.manage(node.getNodeId()));
 
-        return ok(views.html.system.inputs.manage.render(currentUser(), bc, node));
+        try {
+            return ok(views.html.system.inputs.manage.render(currentUser(), bc, node, Input.getTypes(node)));
+        } catch (IOException e) {
+            return status(504, views.html.errors.error.render(Api.ERROR_MSG_IO, e, request()));
+        } catch (APIException e) {
+            String message = "Could not fetch system information. We expected HTTP 200, but got a HTTP " + e.getHttpCode() + ".";
+            return status(504, views.html.errors.error.render(message, e, request()));
+        }
     }
 
 }

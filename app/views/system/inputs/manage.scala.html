@@ -1,4 +1,4 @@
-@(currentUser: User, breadcrumbs: lib.BreadcrumbList, node: Node)
+@(currentUser: User, breadcrumbs: lib.BreadcrumbList, node: Node, inputTypes: Map[String, String])
 
 @main("Inputs of node", views.html.system.sidebar(), "", currentUser) {
 
@@ -10,26 +10,14 @@
     </div>
 
     <div class="row-fluid">
-        <!-- list of all input types installed on this node and their requested configuration -->
 
-        <a href="#" class="btn btn-success">Launch</a>
+        <select id="input-type">
+            @for((t,name) <- inputTypes) {
+                <option value="@t">@name</option>
+            }
+        </select>
 
-        <!-- POST -->
+        <button class="btn btn-success">Launch new input</button>
     </div>
 
-    <!-- list of all currently running inputs -->
-
 }
-
-
-    <!--
-
-
-      start with a non-persisted version.
-
-      needs:
-
-        * REST to get all running inputs with configuration
-
-
-    -->
