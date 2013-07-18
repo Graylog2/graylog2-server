@@ -7,6 +7,38 @@ You can append a `pretty=true` GET parameter to every call to get a pretty-print
 
 
 --
+Messages
+Resources mostly related to single messages identified by an ID.
+--
+
+Get a single message in detail. Note the index specified as URL parameter. (for example: graylog2_38)
+The index a message is stored in is included in every search result.
+GET /messages/{index}/{message_id}
+< 200
+< Content-Type: application/json
+{
+  "message" : {
+    "message" : "sundaysister kernel[0]: AirPort: Link Up on en0\n",
+    "timestamp" : "2013-07-15 02-36-34.000",
+    "level" : 7,
+    "source" : "sundaysister",
+    "facility" : "kernel",
+    "_id" : "9a3eb412-ece6-11e2-a7d5-4c8d79f2b596",
+    "full_message" : "<7>Jul 15 02:36:34 sundaysister kernel[0]: AirPort: Link Up on en0\n",
+    "streams" : [ ]
+  },
+  "index" : "graylog2_38"
+}
+
+Analyze a string included in a message. Gives back the tokens this string was broken into.
+GET /messages/{index}/analyze{?string}
+< 200
+< Content-Type: application/json
+{
+  "tokens" : [ "sundaysister", "kernel", "0", "airport", "link", "up", "en0", "n" ]
+}
+
+--
 Message counts
 Resources related to message counts.
 --
