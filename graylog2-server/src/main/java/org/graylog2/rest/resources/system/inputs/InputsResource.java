@@ -22,6 +22,7 @@ package org.graylog2.rest.resources.system.inputs;
 import com.beust.jcommander.internal.Lists;
 import com.codahale.metrics.annotation.Timed;
 import com.google.common.collect.Maps;
+import com.google.common.collect.Sets;
 import org.bson.types.ObjectId;
 import org.graylog2.database.ValidationException;
 import org.graylog2.inputs.Input;
@@ -44,6 +45,7 @@ import javax.ws.rs.core.Response;
 import java.io.IOException;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * @author Lennart Koopmann <lennart@torch.sh>
@@ -120,6 +122,17 @@ public class InputsResource extends RestResource {
         result.put("persist_id", id.toStringMongod());
 
         return Response.status(Response.Status.ACCEPTED).entity(json(result)).build();
+    }
+
+    @GET
+    @Timed
+    @Path("/types")
+    @Produces(MediaType.APPLICATION_JSON)
+    public String types() {
+        Map<String, Object> result = Maps.newHashMap();
+        result.put("types", core.inputs().getAvailableInputs());
+
+        return json(result);
     }
 
     @GET

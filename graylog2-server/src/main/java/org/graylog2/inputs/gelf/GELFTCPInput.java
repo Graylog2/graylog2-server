@@ -36,7 +36,7 @@ public class GELFTCPInput implements MessageInput {
 
     private static final Logger LOG = LoggerFactory.getLogger(GELFTCPInput.class);
 
-    private static final String NAME = "GELF TCP";
+    public static final String NAME = "GELF TCP";
 
     private Configuration config;
     private GraylogServer server;

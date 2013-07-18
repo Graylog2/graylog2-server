@@ -44,7 +44,7 @@ public class SyslogUDPInput extends SyslogInputBase implements MessageInput {
 
     private static final Logger LOG = LoggerFactory.getLogger(SyslogUDPInput.class);
 
-    private static final String NAME = "Syslog UDP";
+    public static final String NAME = "Syslog UDP";
 
     private Core core;
     private String inputId;

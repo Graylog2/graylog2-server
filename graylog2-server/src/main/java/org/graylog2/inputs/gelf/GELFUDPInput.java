@@ -45,7 +45,7 @@ public class GELFUDPInput implements MessageInput {
 
     private static final Logger LOG = LoggerFactory.getLogger(GELFUDPInput.class);
 
-    private static final String NAME = "GELF UDP";
+    public static final String NAME = "GELF UDP";
 
     private Core core;
     private String inputId;

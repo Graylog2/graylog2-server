@@ -36,7 +36,7 @@ public class SyslogTCPInput implements MessageInput {
     
     private static final Logger LOG = LoggerFactory.getLogger(SyslogTCPInput.class);
 
-    private static final String NAME = "Syslog TCP";
+    public static final String NAME = "Syslog TCP";
 
     @Override
     public void configure(Configuration config, GraylogServer graylogServer) throws ConfigurationException {

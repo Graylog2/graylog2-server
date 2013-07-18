@@ -32,6 +32,8 @@ public class GELFHttpInput implements MessageInput {
 
     private static final Logger LOG = LoggerFactory.getLogger(GELFHttpInput.class);
 
+    public static final String NAME = "GELF HTTP";
+
     @Override
     public void configure(Configuration config, GraylogServer graylogServer) throws ConfigurationException {
         //To change body of implemented methods use File | Settings | File Templates.
@@ -110,7 +112,7 @@ public class GELFHttpInput implements MessageInput {
 
     @Override
     public String getName() {
-        return "GELF HTTP";
+        return NAME;
     }
 
     @Override

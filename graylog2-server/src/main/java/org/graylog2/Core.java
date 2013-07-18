@@ -356,6 +356,8 @@ public class Core implements GraylogServer {
 
             if (plugin instanceof MessageFilter) {
                 registerFilter((MessageFilter) plugin);
+            } else if (plugin instanceof MessageInput) {
+                inputs.register(plugin.getClass(), ((MessageInput) plugin).getName());
             } else if (plugin instanceof MessageOutput) {
                 outputs.register((MessageOutput) plugin);
             } else if (plugin instanceof AlarmCallback) {

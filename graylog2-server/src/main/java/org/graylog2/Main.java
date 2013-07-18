@@ -37,6 +37,11 @@ import org.graylog2.filters.RewriteFilter;
 import org.graylog2.filters.StreamMatcherFilter;
 import org.graylog2.filters.TokenizerFilter;
 import org.graylog2.initializers.*;
+import org.graylog2.inputs.gelf.GELFTCPInput;
+import org.graylog2.inputs.gelf.GELFUDPInput;
+import org.graylog2.inputs.http.GELFHttpInput;
+import org.graylog2.inputs.syslog.SyslogTCPInput;
+import org.graylog2.inputs.syslog.SyslogUDPInput;
 import org.graylog2.outputs.ElasticSearchOutput;
 import org.graylog2.plugin.Tools;
 import org.graylog2.plugin.initializers.InitializerConfigurationException;
@@ -204,6 +209,13 @@ public final class Main {
             LOG.info("Printing system utilization information.");
             server.setStatsMode(true);
         }
+
+        // Register standard inputs.
+        server.inputs().register(SyslogUDPInput.class, SyslogUDPInput.NAME);
+        server.inputs().register(SyslogTCPInput.class, SyslogTCPInput.NAME);
+        server.inputs().register(GELFUDPInput.class, GELFUDPInput.NAME);
+        server.inputs().register(GELFTCPInput.class, GELFTCPInput.NAME);
+        server.inputs().register(GELFHttpInput.class, GELFHttpInput.NAME);
 
         // Register initializers.
         server.initializers().register(new DroolsInitializer());
