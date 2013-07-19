@@ -20,6 +20,7 @@
 
 package org.graylog2.inputs.syslog;
 
+import com.google.common.collect.Maps;
 import org.graylog2.GraylogServerStub;
 import org.graylog2.plugin.Message;
 import org.graylog2.plugin.configuration.Configuration;
@@ -28,6 +29,7 @@ import org.junit.Test;
 
 import java.net.InetAddress;
 import java.util.HashMap;
+import java.util.Map;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
@@ -72,7 +74,10 @@ public class SyslogProcessorTest {
         GraylogServerStub serverStub = new GraylogServerStub();
         org.graylog2.Configuration configStub = new org.graylog2.Configuration();
         serverStub.setConfigurationStub(configStub);
-        SyslogProcessor processor = new SyslogProcessor(serverStub, new Configuration(new HashMap<String, Object>()));
+
+        Map<String, Object> inputConfig = Maps.newHashMap();
+        inputConfig.put(SyslogInputBase.CK_STORE_FULL_MESSAGE, true);
+        SyslogProcessor processor = new SyslogProcessor(serverStub, new Configuration(inputConfig));
 
         processor.messageReceived(ValidNonStructuredMessageWithShortDate, InetAddress.getLocalHost());
 
@@ -92,7 +97,10 @@ public class SyslogProcessorTest {
         GraylogServerStub serverStub = new GraylogServerStub();
         org.graylog2.Configuration configStub = new org.graylog2.Configuration();
         serverStub.setConfigurationStub(configStub);
-        SyslogProcessor processor = new SyslogProcessor(serverStub, new Configuration(new HashMap<String, Object>()));
+
+        Map<String, Object> inputConfig = Maps.newHashMap();
+        inputConfig.put(SyslogInputBase.CK_STORE_FULL_MESSAGE, true);
+        SyslogProcessor processor = new SyslogProcessor(serverStub, new Configuration(inputConfig));
 
         processor.messageReceived(ValidStructuredMessage, InetAddress.getLocalHost());
 
@@ -116,7 +124,10 @@ public class SyslogProcessorTest {
         GraylogServerStub serverStub = new GraylogServerStub();
         org.graylog2.Configuration configStub = new org.graylog2.Configuration();
         serverStub.setConfigurationStub(configStub);
-        SyslogProcessor processor = new SyslogProcessor(serverStub, new Configuration(new HashMap<String, Object>()));
+
+        Map<String, Object> inputConfig = Maps.newHashMap();
+        inputConfig.put(SyslogInputBase.CK_STORE_FULL_MESSAGE, true);
+        SyslogProcessor processor = new SyslogProcessor(serverStub, new Configuration(inputConfig));
 
         processor.messageReceived(ValidStructuedMessageWithDifferentDateFormat, InetAddress.getLocalHost());
         processor.messageReceived(ValidStructuedMessageWithDifferentDateFormat, InetAddress.getLocalHost());
@@ -153,7 +164,10 @@ public class SyslogProcessorTest {
         GraylogServerStub serverStub = new GraylogServerStub();
         org.graylog2.Configuration configStub = new org.graylog2.Configuration();
         serverStub.setConfigurationStub(configStub);
-        SyslogProcessor processor = new SyslogProcessor(serverStub, new Configuration(new HashMap<String, Object>()));
+
+        Map<String, Object> inputConfig = Maps.newHashMap();
+        inputConfig.put(SyslogInputBase.CK_STORE_FULL_MESSAGE, false);
+        SyslogProcessor processor = new SyslogProcessor(serverStub, new Configuration(inputConfig));
         
         processor.messageReceived(ValidNonStructuredMessage, InetAddress.getLocalHost());
 

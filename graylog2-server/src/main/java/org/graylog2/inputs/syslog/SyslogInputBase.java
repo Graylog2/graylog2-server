@@ -34,6 +34,7 @@ public class SyslogInputBase {
     public static final String CK_PORT = "port";
     public static final String CK_FORCE_RDNS = "force_rdns";
     public static final String CK_ALLOW_OVERRIDE_DATE = "allow_override_date";
+    public static final String CK_STORE_FULL_MESSAGE = "store_full_message";
 
     protected boolean checkConfig(Configuration config) {
         return config.stringIsSet(CK_BIND_ADDRESS)
@@ -75,7 +76,15 @@ public class SyslogInputBase {
                 new BooleanField(
                         CK_ALLOW_OVERRIDE_DATE,
                         true,
-                        "Allow to override with current date if date could not be parsed."
+                        "Allow to override with current date if date could not be parsed?"
+                )
+        );
+
+        r.addField(
+                new BooleanField(
+                        CK_STORE_FULL_MESSAGE,
+                        false,
+                        "Store the full original syslog message as full_message?"
                 )
         );
 

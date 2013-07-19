@@ -133,7 +133,12 @@ public class SyslogProcessor {
         Message m = new Message(e.getMessage(), parseHost(e, remoteAddress), parseDate(e));
         m.addField("facility", Tools.syslogFacilityToReadable(e.getFacility()));
         m.addField("level", e.getLevel());
-        m.addField("full_message", new String(e.getRaw()));
+
+        // Store full message if configured.
+        if (config.getBoolean(SyslogInputBase.CK_STORE_FULL_MESSAGE)) {
+            m.addField("full_message", new String(e.getRaw()));
+        }
+
         m.addFields(parseAdditionalData(e));
         
         tcx.stop();
