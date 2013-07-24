@@ -58,6 +58,8 @@ import org.graylog2.plugin.inputs.MessageInput;
 import org.graylog2.plugin.outputs.MessageOutput;
 import org.graylog2.plugin.streams.Stream;
 import org.graylog2.plugins.PluginLoader;
+import org.graylog2.security.ShiroSecurityBinding;
+import org.graylog2.security.ShiroSecurityContextFactory;
 import org.graylog2.streams.StreamImpl;
 import org.graylog2.system.activities.Activity;
 import org.graylog2.system.activities.ActivityWriter;
@@ -322,10 +324,11 @@ public class Core implements GraylogServer {
         ));
         ResourceConfig rc = new ResourceConfig();
         rc.property(NettyContainer.PROPERTY_BASE_URI, configuration.getRestListenUri());
-        rc.registerClasses(MetricsDynamicBinding.class, AnyExceptionClassMapper.class);
+        rc.registerClasses(MetricsDynamicBinding.class, AnyExceptionClassMapper.class, ShiroSecurityBinding.class);
         rc.register(new Graylog2Binder());
         rc.registerFinder(new PackageNamesScanner(new String[] {"org.graylog2.rest.resources"}, true));
         final NettyContainer jerseyHandler = ContainerFactory.createContainer(NettyContainer.class, rc);
+        jerseyHandler.setSecurityContextFactory(new ShiroSecurityContextFactory(this));
 
         bootstrap.setPipelineFactory(new ChannelPipelineFactory() {
             @Override

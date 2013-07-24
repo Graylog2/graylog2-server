@@ -19,11 +19,6 @@
  */
 package org.graylog2.users;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
 import com.mongodb.BasicDBObject;
 import com.mongodb.DBObject;
 import org.bson.types.ObjectId;
@@ -34,15 +29,22 @@ import org.graylog2.database.validators.Validator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 
 /**
  * @author Lennart Koopmann <lennart@socketfeed.com>
  */
 public class User extends Persisted {
-   
+
     private static final Logger LOG = LoggerFactory.getLogger(User.class);
 
     private static final String COLLECTION = "users";
+    public static final String USERNAME = "username";
+    public static final String PASSWORD = "password";
+    public static final String FULL_NAME = "full_name";
 
     public User(Map<String, Object> fields, Core core) {
         super(core, fields);
@@ -54,8 +56,8 @@ public class User extends Persisted {
 
     public static boolean exists(String username, String passwordHash, Core core) {
         DBObject query = new BasicDBObject();
-        query.put("username", username);
-        query.put("password", passwordHash);
+        query.put(USERNAME, username);
+        query.put(PASSWORD, passwordHash);
 
         List<DBObject> result = query(query, core, COLLECTION);
 
@@ -66,8 +68,8 @@ public class User extends Persisted {
             throw new RuntimeException("There was more than one matching user. This should never happen.");
         }
 
-        String dbUsername = (String) result.get(0).get("username");
-        String dbPasswordHash = (String) result.get(0).get("password");
+        String dbUsername = (String) result.get(0).get(USERNAME);
+        String dbPasswordHash = (String) result.get(0).get(PASSWORD);
 
         if (dbUsername != null && dbPasswordHash != null) {
             return dbUsername.equals(username) && dbPasswordHash.equals(passwordHash);
@@ -100,9 +102,9 @@ public class User extends Persisted {
 
     protected Map<String, Validator> getValidations() {
         return new HashMap<String, Validator>() {{
-            put("username", new FilledStringValidator());
-            put("password", new FilledStringValidator());
-            put("full_name", new FilledStringValidator());
+            put(USERNAME, new FilledStringValidator());
+            put(PASSWORD, new FilledStringValidator());
+            put(FULL_NAME, new FilledStringValidator());
         }};
     }
 }

@@ -14,7 +14,9 @@
 	<logger name="org.graylog2">
 		<level value="warn" />
 	</logger>
-	
+	<logger name="org.apache.shiro">
+        <level value="info" />
+	</logger>
 	<!-- Root Logger -->
 	<root>
 		<priority value="warn" />
