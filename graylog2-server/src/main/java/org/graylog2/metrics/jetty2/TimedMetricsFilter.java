@@ -31,6 +31,7 @@ public class TimedMetricsFilter extends AbstractMetricsFilter {
     @Override
     public void filter(ContainerRequestContext requestContext, ContainerResponseContext responseContext) throws IOException {
         final Timer.Context context = (Timer.Context) requestContext.getProperty("metricsTimerContext");
+        if (context == null) return;
         final long elapsedNanos = context.stop();
         responseContext.getHeaders().add("X-Runtime-Microseconds", TimeUnit.NANOSECONDS.toMicros(elapsedNanos));
     }
