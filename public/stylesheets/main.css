@@ -396,3 +396,7 @@ form #stream-rules {
     position: relative;
     top: 3px;
 }
+
+.modal form {
+    margin-bottom: 0;
+}

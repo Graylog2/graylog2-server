@@ -1,0 +1,8 @@
+@(field: lib.plugin.configuration.RequestedConfigurationField)
+
+<label>@field.getTitle</label>
+<input name="@field.getTitle"
+required="@field.isOptional"
+type="number"
+class="input-xlarge">
+<span class="help-block">@field.getDescription</span>

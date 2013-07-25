@@ -19,8 +19,10 @@
  */
 package models;
 
+import com.google.common.collect.Maps;
 import lib.APIException;
 import lib.Api;
+import models.api.responses.InputTypeResponse;
 import models.api.responses.InputTypesResponse;
 
 import java.io.IOException;
@@ -33,6 +35,21 @@ public class Input {
 
     public static Map<String, String> getTypes(Node node) throws IOException, APIException {
         return Api.get(node, "system/inputs/types", InputTypesResponse.class).types;
+    }
+
+    public static InputTypeResponse getTypeInformation(Node node, String type) throws IOException, APIException {
+        return Api.get(node, "system/inputs/types/" + type, InputTypeResponse.class);
+    }
+
+    public static Map<String, InputTypeResponse> getAllTypeInformation(Node node) throws IOException, APIException {
+        Map<String, InputTypeResponse> types = Maps.newHashMap();
+
+        for (String type : getTypes(node).keySet()) {
+            InputTypeResponse itr = getTypeInformation(node, type);
+            types.put(itr.type, itr);
+        }
+
+        return types;
     }
 
 }

@@ -307,6 +307,12 @@ $(document).ready(function() {
         return false;
     });
 
+    // Open input configuration modal.
+    $("#configure-input").on("click", function() {
+        var inputType = $("#input-type").val();
+        $('[data-inputtype="' + inputType + '"]').modal();
+    });
+
     // Submit button confirmation.
     $('button[data-confirm]').on("click", function() {
         return confirm($(this).attr("data-confirm"));

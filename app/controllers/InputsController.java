@@ -67,7 +67,12 @@ public class InputsController extends AuthenticatedController {
         bc.addCrumb(node.getNodeId(), routes.InputsController.manage(node.getNodeId()));
 
         try {
-            return ok(views.html.system.inputs.manage.render(currentUser(), bc, node, Input.getTypes(node)));
+            return ok(views.html.system.inputs.manage.render(
+                    currentUser(),
+                    bc,
+                    node,
+                    Input.getAllTypeInformation(node)
+            ));
         } catch (IOException e) {
             return status(504, views.html.errors.error.render(Api.ERROR_MSG_IO, e, request()));
         } catch (APIException e) {

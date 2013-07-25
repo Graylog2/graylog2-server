@@ -1,4 +1,5 @@
-@(currentUser: User, breadcrumbs: lib.BreadcrumbList, node: Node, inputTypes: Map[String, String])
+@(currentUser: User, breadcrumbs: lib.BreadcrumbList, node: Node, inputTypes: Map[String, models.api.responses.InputTypeResponse])
+@import lib.plugin.configuration.TextField
 
 @main("Inputs of node", views.html.system.sidebar(), "", currentUser) {
 
@@ -12,12 +13,56 @@
     <div class="row-fluid">
 
         <select id="input-type">
-            @for((t,name) <- inputTypes) {
-                <option value="@t">@name</option>
+            @for((inputType,info) <- inputTypes) {
+                <option value="@inputType">@info.name</option>
             }
         </select>
 
-        <button class="btn btn-success">Launch new input</button>
+        <button id="configure-input" class="btn btn-success">Launch new input</button>
     </div>
+
+    @***************************************************************
+    * Pre-build all the modals showing the requested configuration *
+    ***************************************************************@
+
+    @for((inputType,info) <- inputTypes) {
+        <div class="input-configuration modal hide fade" data-inputtype="@inputType">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+                <h2>
+                    <i class="icon-signin"></i>
+                    Launch new input: <em>@info.name</em>
+                </h2>
+            </div>
+
+            <form>
+                <fieldset>
+                    <div class="modal-body">
+                        @for(field <- info.getRequestedConfiguration) {
+
+                            @if(field.getType().equals("text")) {
+                                @views.html.system.inputs.fields.text_field(field)
+                            }
+
+                            @if(field.getType().equals("number")) {
+                                @views.html.system.inputs.fields.number_field(field)
+                            }
+
+                            @if(field.getType().equals("boolean")) {
+                                @views.html.system.inputs.fields.boolean_field(field)
+                            }
+                        }
+                    </div>
+                    <div class="modal-footer">
+                        <button class="btn" data-dismiss="modal" aria-hidden="true">Close</button>
+                        <button type="submit" class="btn btn-primary">
+                            <i class="icon icon-rocket"></i>
+                            Launch
+                        </button>
+                    </div>
+                </fieldset>
+            </form>
+        </div>
+    }
 
 }
