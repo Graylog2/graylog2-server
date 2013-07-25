@@ -45,12 +45,12 @@ public class SyslogTCPPipelineFactory implements ChannelPipelineFactory {
     @Override
     public ChannelPipeline getPipeline() throws Exception {
         ChannelBuffer[] delimiter;
-        // TODO re-implement with new input structure
-        //if (this.server.getConfiguration().isSyslogUseNulDelimiterEnabled()) {
-        //    delimiter = Delimiters.nulDelimiter();
-        //} else {
+
+        if (config.getBoolean(SyslogTCPInput.CK_USE_NULL_DELIMITER)) {
+            delimiter = Delimiters.nulDelimiter();
+        } else {
             delimiter = Delimiters.lineDelimiter();
-        //}
+        }
                 
         ChannelPipeline p = Channels.pipeline();
         p.addLast("framer", new DelimiterBasedFrameDecoder(2 * 1024 * 1024, delimiter));

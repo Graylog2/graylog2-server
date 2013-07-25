@@ -54,6 +54,7 @@ public class ConfigurationRequest {
         for (ConfigurationField f : fields) {
             Map<String, Object> config = Maps.newHashMap();
             config.put("type", f.getFieldType());
+            config.put("human_name", f.getHumanName());
             config.put("description", f.getDescription());
             config.put("default_value", f.getDefaultValue());
             config.put("is_optional", f.isOptional().equals(ConfigurationField.Optional.OPTIONAL));

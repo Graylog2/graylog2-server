@@ -41,22 +41,24 @@ public class NumberField implements ConfigurationField {
     }
 
     private final String name;
+    private final String humanName;
     private final int defaultValue;
     private final String description;
     private final Optional optional;
 
     private final List<String> attributes;
 
-    public NumberField(String name, int defaultValue, String description, Optional isOptional) {
-        this(name, defaultValue, description, isOptional, null);
+    public NumberField(String name, String humanName, int defaultValue, String description, Optional isOptional) {
+        this(name, humanName, defaultValue, description, isOptional, null);
     }
 
-    public NumberField(String name, int defaultValue, String description, Attribute... attributes) {
-        this(name, defaultValue, description, Optional.NOT_OPTIONAL, attributes);
+    public NumberField(String name, String humanName, int defaultValue, String description, Attribute... attributes) {
+        this(name, humanName, defaultValue, description, Optional.NOT_OPTIONAL, attributes);
     }
 
-    public NumberField(String name, int defaultValue, String description, Optional isOptional, Attribute... attrs) {
+    public NumberField(String name, String humanName, int defaultValue, String description, Optional isOptional, Attribute... attrs) {
         this.name = name;
+        this.humanName = humanName;
         this.defaultValue = defaultValue;
         this.description = description;
         this.optional = isOptional;
@@ -77,6 +79,11 @@ public class NumberField implements ConfigurationField {
     @Override
     public String getName() {
         return name;
+    }
+
+    @Override
+    public String getHumanName() {
+        return humanName;
     }
 
     @Override

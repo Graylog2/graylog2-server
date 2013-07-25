@@ -37,6 +37,7 @@ public interface ConfigurationField {
     public String getFieldType();
 
     public String getName();
+    public String getHumanName();
     public String getDescription();
     public Object getDefaultValue();
     public Optional isOptional();

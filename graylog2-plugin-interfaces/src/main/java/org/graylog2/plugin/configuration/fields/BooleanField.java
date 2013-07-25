@@ -35,19 +35,15 @@ public class BooleanField implements ConfigurationField {
     public static final String FIELD_TYPE = "boolean";
 
     private final String name;
+    private final String humanName;
     private final boolean defaultValue;
     private final String description;
-    private final Optional optional;
 
-    public BooleanField(String name, boolean defaultValue, String description) {
-        this(name, defaultValue, description, Optional.NOT_OPTIONAL);
-    }
-
-    public BooleanField(String name, boolean defaultValue, String description, Optional isOptional) {
+    public BooleanField(String name, String humanName, boolean defaultValue, String description) {
         this.name = name;
+        this.humanName = humanName;
         this.defaultValue = defaultValue;
         this.description = description;
-        this.optional = isOptional;
     }
 
     @Override
@@ -58,6 +54,11 @@ public class BooleanField implements ConfigurationField {
     @Override
     public String getName() {
         return this.name;
+    }
+
+    @Override
+    public String getHumanName() {
+        return humanName;
     }
 
     @Override
@@ -72,7 +73,8 @@ public class BooleanField implements ConfigurationField {
 
     @Override
     public Optional isOptional() {
-        return optional;
+        // Always optional. If it's not checked it's false.
+        return Optional.OPTIONAL;
     }
 
     @Override

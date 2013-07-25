@@ -21,6 +21,7 @@
 package org.graylog2.inputs.syslog;
 
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
+import org.graylog2.plugin.configuration.fields.BooleanField;
 import org.graylog2.plugin.inputs.*;
 import org.graylog2.plugin.configuration.Configuration;
 import org.graylog2.plugin.configuration.ConfigurationException;
@@ -47,6 +48,8 @@ public class SyslogTCPInput extends SyslogInputBase implements MessageInput {
     private static final Logger LOG = LoggerFactory.getLogger(SyslogTCPInput.class);
 
     public static final String NAME = "Syslog TCP";
+
+    public static final String CK_USE_NULL_DELIMITER = "use_null_delimiter";
 
     private String inputId;
     private ConnectionlessBootstrap bootstrap;
@@ -82,6 +85,22 @@ public class SyslogTCPInput extends SyslogInputBase implements MessageInput {
         if (bootstrap != null) {
             bootstrap.shutdown();
         }
+    }
+
+    @Override
+    public ConfigurationRequest getRequestedConfiguration() {
+        ConfigurationRequest x = super.getRequestedConfiguration();
+
+        x.addField(
+                new BooleanField(
+                        CK_USE_NULL_DELIMITER,
+                        "Null frame delimiter?",
+                        false,
+                        "Use null byte as frame delimiter? Default is newline."
+                )
+        );
+
+        return x;
     }
 
     @Override

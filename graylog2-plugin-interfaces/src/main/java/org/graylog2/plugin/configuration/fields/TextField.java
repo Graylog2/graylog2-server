@@ -40,22 +40,24 @@ public class TextField implements ConfigurationField {
     }
 
     private final String name;
+    private final String humanName;
     private final String defaultValue;
     private final String description;
     private final Optional optional;
 
     private final List<String> attributes;
 
-    public TextField(String name, String defaultValue, String description, Optional isOptional) {
-        this(name, defaultValue, description, isOptional, null);
+    public TextField(String name, String humanName, String defaultValue, String description, Optional isOptional) {
+        this(name, humanName, defaultValue, description, isOptional, null);
     }
 
-    public TextField(String name, String defaultValue, String description, Attribute... attributes) {
-        this(name, defaultValue, description, Optional.NOT_OPTIONAL, attributes);
+    public TextField(String name, String humanName, String defaultValue, String description, Attribute... attributes) {
+        this(name, humanName, defaultValue, description, Optional.NOT_OPTIONAL, attributes);
     }
 
-    public TextField(String name, String defaultValue, String description, Optional isOptional, Attribute... attrs) {
+    public TextField(String name, String humanName, String defaultValue, String description, Optional isOptional, Attribute... attrs) {
         this.name = name;
+        this.humanName = humanName;
         this.defaultValue = defaultValue;
         this.description = description;
         this.optional = isOptional;
@@ -76,6 +78,11 @@ public class TextField implements ConfigurationField {
     @Override
     public String getName() {
         return name;
+    }
+
+    @Override
+    public String getHumanName() {
+        return humanName;
     }
 
     @Override
