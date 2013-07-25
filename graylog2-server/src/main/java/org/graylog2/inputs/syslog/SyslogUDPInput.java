@@ -46,26 +46,8 @@ public class SyslogUDPInput extends SyslogInputBase implements MessageInput {
 
     public static final String NAME = "Syslog UDP";
 
-    private Core core;
     private String inputId;
-    private Configuration config;
-    private InetSocketAddress socketAddress;
     private ConnectionlessBootstrap bootstrap;
-
-    @Override
-    public void configure(Configuration config, GraylogServer graylogServer) throws ConfigurationException {
-        this.core = (Core) graylogServer;
-        this.config = config;
-
-        if (!checkConfig(config)) {
-            throw new ConfigurationException();
-        }
-
-        this.socketAddress = new InetSocketAddress(
-                config.getString(CK_BIND_ADDRESS),
-                (int) config.getInt(CK_PORT)
-        );
-    }
 
     @Override
     public void launch() throws MisfireException {
@@ -83,7 +65,7 @@ public class SyslogUDPInput extends SyslogInputBase implements MessageInput {
 
         try {
             bootstrap.bind(socketAddress);
-            LOG.info("Started UDP Syslog server on {}", socketAddress);
+            LOG.info("Started UDP syslog server on {}", socketAddress);
         } catch (ChannelException e) {
             LOG.error("Could not bind Syslog UDP server to address " + socketAddress, e);
         }

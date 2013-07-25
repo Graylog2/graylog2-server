@@ -99,6 +99,12 @@ public class InputsResource extends RestResource {
             throw new WebApplicationException(Response.Status.BAD_REQUEST);
         }
 
+        // Don't run if exclusive and another instance is already running.
+        if (input.isExclusive() && core.inputs().hasTypeRunning(input.getClass())) {
+            LOG.error("Type is exclusive and already has input running.");
+            throw new WebApplicationException(Response.Status.BAD_REQUEST);
+        }
+
         // Launch input.
         String inputId;
         try {

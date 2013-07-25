@@ -19,11 +19,16 @@
  */
 package org.graylog2.inputs.syslog;
 
+import org.graylog2.Core;
+import org.graylog2.plugin.GraylogServer;
 import org.graylog2.plugin.configuration.Configuration;
+import org.graylog2.plugin.configuration.ConfigurationException;
 import org.graylog2.plugin.configuration.ConfigurationRequest;
 import org.graylog2.plugin.configuration.fields.BooleanField;
 import org.graylog2.plugin.configuration.fields.NumberField;
 import org.graylog2.plugin.configuration.fields.TextField;
+
+import java.net.InetSocketAddress;
 
 /**
  * @author Lennart Koopmann <lennart@torch.sh>
@@ -35,6 +40,24 @@ public class SyslogInputBase {
     public static final String CK_FORCE_RDNS = "force_rdns";
     public static final String CK_ALLOW_OVERRIDE_DATE = "allow_override_date";
     public static final String CK_STORE_FULL_MESSAGE = "store_full_message";
+
+    protected Core core;
+    protected Configuration config;
+    protected InetSocketAddress socketAddress;
+
+    public void configure(Configuration config, GraylogServer graylogServer) throws ConfigurationException {
+        this.core = (Core) graylogServer;
+        this.config = config;
+
+        if (!checkConfig(config)) {
+            throw new ConfigurationException();
+        }
+
+        this.socketAddress = new InetSocketAddress(
+                config.getString(CK_BIND_ADDRESS),
+                (int) config.getInt(CK_PORT)
+        );
+    }
 
     protected boolean checkConfig(Configuration config) {
         return config.stringIsSet(CK_BIND_ADDRESS)

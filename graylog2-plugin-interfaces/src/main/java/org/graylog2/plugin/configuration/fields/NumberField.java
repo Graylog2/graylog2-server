@@ -32,7 +32,7 @@ import java.util.Map;
  */
 public class NumberField implements ConfigurationField {
 
-    public static final String FIELD_TYPE = "text";
+    public static final String FIELD_TYPE = "number";
 
     public enum Attribute {
         ONLY_POSITIVE,

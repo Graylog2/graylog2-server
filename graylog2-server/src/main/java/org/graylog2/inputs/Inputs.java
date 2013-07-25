@@ -86,6 +86,16 @@ public class Inputs {
         return runningInputs;
     }
 
+    public boolean hasTypeRunning(Class klazz) {
+        for (MessageInput input : runningInputs.values()) {
+            if (input.getClass().equals(klazz)) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
     public Map<String, String> getAvailableInputs() {
         return availableInputs;
     }
