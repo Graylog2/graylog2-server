@@ -1,8 +1,11 @@
 @(field: lib.plugin.configuration.RequestedConfigurationField)
 
-<label>@field.getTitle</label>
+<label>@field.getHumanName</label>
+<span class="help-block">@field.getDescription</span>
 <input name="@field.getTitle"
     required="@field.isOptional"
     type="text"
+    @if(!field.getDefaultValue().toString().isEmpty()) {
+        placeholder="@field.getDefaultValue()"
+    }
     class="input-xlarge">
-<span class="help-block">@field.getDescription</span>

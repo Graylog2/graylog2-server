@@ -38,6 +38,9 @@ public class InputTypeResponse {
     public String name;
     public String type;
 
+    @SerializedName("human_name")
+    public String humanName;
+
     @SerializedName("is_exclusive")
     public String isExclusive;
 
@@ -46,6 +49,7 @@ public class InputTypeResponse {
 
     public List<RequestedConfigurationField> getRequestedConfiguration() {
         List<RequestedConfigurationField> fields = Lists.newArrayList();
+        List<RequestedConfigurationField> tmpBools = Lists.newArrayList();
 
         for (Map.Entry<String, Map<String, Object>> c : requestedConfiguration.entrySet()) {
             try {
@@ -58,7 +62,7 @@ public class InputTypeResponse {
                         fields.add(new NumberField(c));
                         continue;
                     case "boolean":
-                        fields.add(new BooleanField(c));
+                        tmpBools.add(new BooleanField(c));
                         continue;
                     default:
                         Logger.info("Unknown field type [" + fieldType + "].");
@@ -68,6 +72,9 @@ public class InputTypeResponse {
                 continue;
             }
         }
+
+        // We want the boolean fields at the end for display/layout reasons.
+        fields.addAll(tmpBools);
 
         return fields;
     }

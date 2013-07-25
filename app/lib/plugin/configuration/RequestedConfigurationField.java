@@ -21,7 +21,6 @@ package lib.plugin.configuration;
 
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 /**
  * @author Lennart Koopmann <lennart@torch.sh>
@@ -29,6 +28,7 @@ import java.util.Set;
 public abstract class RequestedConfigurationField {
 
     private final String title;
+    private final String humanName;
     private final Object defaultValue;
     private final String description;
     private final boolean isOptional;
@@ -45,6 +45,7 @@ public abstract class RequestedConfigurationField {
 
         this.superType = (String) info.get("type");
 
+        this.humanName = (String) info.get("human_name");
         this.defaultValue = info.get("default_value");
         this.description = (String) info.get("description");
         this.isOptional = (Boolean) info.get("is_optional");
@@ -53,6 +54,10 @@ public abstract class RequestedConfigurationField {
 
     public String getTitle() {
         return title;
+    }
+
+    public String getHumanName() {
+        return humanName;
     }
 
     public Object getDefaultValue() {

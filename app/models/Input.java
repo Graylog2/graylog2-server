@@ -19,6 +19,7 @@
  */
 package models;
 
+import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import lib.APIException;
 import lib.Api;
@@ -26,6 +27,7 @@ import models.api.responses.InputTypeResponse;
 import models.api.responses.InputTypesResponse;
 
 import java.io.IOException;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -44,6 +46,7 @@ public class Input {
     public static Map<String, InputTypeResponse> getAllTypeInformation(Node node) throws IOException, APIException {
         Map<String, InputTypeResponse> types = Maps.newHashMap();
 
+        List<InputTypeResponse> bools = Lists.newArrayList();
         for (String type : getTypes(node).keySet()) {
             InputTypeResponse itr = getTypeInformation(node, type);
             types.put(itr.type, itr);
