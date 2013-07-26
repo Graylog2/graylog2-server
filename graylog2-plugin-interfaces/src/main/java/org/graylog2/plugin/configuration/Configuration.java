@@ -97,8 +97,4 @@ public class Configuration {
         return ints.get(key) != null;
     }
 
-    public boolean boolIsSet(String key) {
-        return bools.get(key) != null;
-    }
-
 }

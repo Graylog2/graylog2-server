@@ -50,7 +50,7 @@ public class SyslogInputBase {
         this.config = config;
 
         if (!checkConfig(config)) {
-            throw new ConfigurationException();
+            throw new ConfigurationException(config.getSource().toString());
         }
 
         this.socketAddress = new InetSocketAddress(
@@ -61,9 +61,7 @@ public class SyslogInputBase {
 
     protected boolean checkConfig(Configuration config) {
         return config.stringIsSet(CK_BIND_ADDRESS)
-                && config.intIsSet(CK_PORT)
-                && config.boolIsSet(CK_FORCE_RDNS)
-                && config.boolIsSet(CK_ALLOW_OVERRIDE_DATE);
+                && config.intIsSet(CK_PORT);
     }
 
     public ConfigurationRequest getRequestedConfiguration() {
