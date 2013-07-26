@@ -67,6 +67,8 @@ public class InputsResource extends RestResource {
             inputMap.put("input_id", input.getId());
             inputMap.put("persist_id", input.getPersistId());
             inputMap.put("name", input.getName());
+            inputMap.put("title", input.getTitle());
+            inputMap.put("creator_user_id", input.getCreatorUserId());
             inputMap.put("attributes", input.getAttributes());
 
             inputs.add(inputMap);
@@ -100,6 +102,8 @@ public class InputsResource extends RestResource {
         try {
             input = Inputs.factory(lr.type);
             input.configure(inputConfig, core);
+            input.setTitle(lr.title);
+            input.setCreatorUserId(lr.creatorUserId);
         } catch (NoSuchInputTypeException e) {
             LOG.error("There is no such input type registered.", e);
             throw new WebApplicationException(e, Response.Status.NOT_FOUND);
