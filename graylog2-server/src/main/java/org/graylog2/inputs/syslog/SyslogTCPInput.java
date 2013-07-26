@@ -20,6 +20,7 @@
 
 package org.graylog2.inputs.syslog;
 
+import com.google.common.collect.Maps;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import org.graylog2.plugin.configuration.fields.BooleanField;
 import org.graylog2.plugin.inputs.*;
@@ -37,22 +38,20 @@ import org.slf4j.LoggerFactory;
 
 import org.graylog2.plugin.GraylogServer;
 
+import java.util.Map;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 /**
  * @author Lennart Koopmann <lennart@socketfeed.com>
  */
-public class SyslogTCPInput extends SyslogInputBase implements MessageInput {
+public class SyslogTCPInput extends SyslogInputBase {
     
     private static final Logger LOG = LoggerFactory.getLogger(SyslogTCPInput.class);
 
     public static final String NAME = "Syslog TCP";
 
     public static final String CK_USE_NULL_DELIMITER = "use_null_delimiter";
-
-    private String inputId;
-    private ConnectionlessBootstrap bootstrap;
 
     @Override
     public void launch() throws MisfireException {
@@ -104,16 +103,6 @@ public class SyslogTCPInput extends SyslogInputBase implements MessageInput {
     }
 
     @Override
-    public void setId(String id) {
-        this.inputId = id;
-    }
-
-    @Override
-    public String getId() {
-        return inputId;
-    }
-
-    @Override
     public boolean isExclusive() {
         return false;
     }
@@ -121,6 +110,11 @@ public class SyslogTCPInput extends SyslogInputBase implements MessageInput {
     @Override
     public String getName() {
         return NAME;
+    }
+
+    @Override
+    public Map<String, String> getAttributes() {
+        return Maps.newHashMap();
     }
 
 }

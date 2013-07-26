@@ -28,7 +28,9 @@ import org.slf4j.LoggerFactory;
 
 import org.graylog2.plugin.GraylogServer;
 
-public class GELFHttpInput implements MessageInput {
+import java.util.Map;
+
+public class GELFHttpInput extends MessageInput {
 
     private static final Logger LOG = LoggerFactory.getLogger(GELFHttpInput.class);
 
@@ -55,22 +57,17 @@ public class GELFHttpInput implements MessageInput {
     }
 
     @Override
-    public void setId(String id) {
-        //To change body of implemented methods use File | Settings | File Templates.
-    }
-
-    @Override
-    public String getId() {
-        return null;  //To change body of implemented methods use File | Settings | File Templates.
-    }
-
-    @Override
     public boolean isExclusive() {
         return false;  //To change body of implemented methods use File | Settings | File Templates.
     }
 
     @Override
     public String getName() {
+        return null;  //To change body of implemented methods use File | Settings | File Templates.
+    }
+
+    @Override
+    public Map<String, String> getAttributes() {
         return null;  //To change body of implemented methods use File | Settings | File Templates.
     }
 
@@ -108,16 +105,6 @@ public class GELFHttpInput implements MessageInput {
                 httpBootstrap.releaseExternalResources();
             }
         });
-    }
-
-    @Override
-    public String getName() {
-        return NAME;
-    }
-
-    @Override
-    public Map<String, String> getRequestedConfiguration() {
-        // Built in input. This is just for plugin compat. No special configuration required.
-        return com.google.common.collect.Maps.newHashMap();
     }*/
+
 }

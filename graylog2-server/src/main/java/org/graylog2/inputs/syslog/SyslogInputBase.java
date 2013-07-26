@@ -27,19 +27,25 @@ import org.graylog2.plugin.configuration.ConfigurationRequest;
 import org.graylog2.plugin.configuration.fields.BooleanField;
 import org.graylog2.plugin.configuration.fields.NumberField;
 import org.graylog2.plugin.configuration.fields.TextField;
+import org.graylog2.plugin.inputs.MessageInput;
+import org.graylog2.plugin.inputs.MisfireException;
+import org.jboss.netty.bootstrap.ConnectionlessBootstrap;
 
 import java.net.InetSocketAddress;
+import java.util.Map;
 
 /**
  * @author Lennart Koopmann <lennart@torch.sh>
  */
-public class SyslogInputBase {
+public class SyslogInputBase extends MessageInput {
 
     public static final String CK_BIND_ADDRESS = "bind_address";
     public static final String CK_PORT = "port";
     public static final String CK_FORCE_RDNS = "force_rdns";
     public static final String CK_ALLOW_OVERRIDE_DATE = "allow_override_date";
     public static final String CK_STORE_FULL_MESSAGE = "store_full_message";
+
+    protected ConnectionlessBootstrap bootstrap;
 
     protected Core core;
     protected Configuration config;
@@ -115,6 +121,31 @@ public class SyslogInputBase {
         );
 
         return r;
+    }
+
+    @Override
+    public boolean isExclusive() {
+        throw new RuntimeException("Must be overridden in syslog input classes.");
+    }
+
+    @Override
+    public String getName() {
+        throw new RuntimeException("Must be overridden in syslog input classes.");
+    }
+
+    @Override
+    public Map<String, String> getAttributes() {
+        throw new RuntimeException("Must be overridden in syslog input classes.");
+    }
+
+    @Override
+    public void launch() throws MisfireException {
+        throw new RuntimeException("Must be overridden in syslog input classes.");
+    }
+
+    @Override
+    public void stop() {
+        throw new RuntimeException("Must be overridden in syslog input classes.");
     }
 
 }

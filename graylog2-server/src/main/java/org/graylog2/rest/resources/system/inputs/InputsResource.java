@@ -55,6 +55,30 @@ public class InputsResource extends RestResource {
 
     private static final Logger LOG = LoggerFactory.getLogger(InputsResource.class);
 
+    @GET
+    @Timed
+    @Produces(MediaType.APPLICATION_JSON)
+    public String list() {
+        List<Map<String, Object>> inputs = Lists.newArrayList();
+
+        for (MessageInput input : core.inputs().getRunningInputs().values()) {
+            Map<String, Object> inputMap = Maps.newHashMap();
+
+            inputMap.put("input_id", input.getId());
+            inputMap.put("persist_id", input.getPersistId());
+            inputMap.put("name", input.getName());
+            inputMap.put("attributes", input.getAttributes());
+
+            inputs.add(inputMap);
+        }
+
+        Map<String, Object> result = Maps.newHashMap();
+        result.put("inputs", inputs);
+        result.put("total", core.inputs().runningCount());
+
+        return json(result);
+    }
+
     @POST
     @Timed
     @Consumes(MediaType.APPLICATION_JSON)
@@ -118,6 +142,7 @@ public class InputsResource extends RestResource {
         ObjectId id;
         try {
             id = mongoInput.save();
+            input.setPersistId(id.toStringMongod());
         } catch (ValidationException e) {
             LOG.error("Validation error.", e);
             throw new WebApplicationException(e, Response.Status.BAD_REQUEST);
