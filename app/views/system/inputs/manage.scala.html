@@ -35,9 +35,15 @@
                 </h2>
             </div>
 
-            <form>
+            <form action="/system/inputs/@node.getNodeId" method="POST">
+                <input type="hidden" name="type" value="@inputType" />
+
                 <fieldset>
                     <div class="modal-body">
+                        <label>Title</label>
+                        <span class="help-block">Select a name of your new input that describes it.</span>
+                        <input name="title" required="true" type="text" class="input-xlarge">
+
                         @for(field <- info.getRequestedConfiguration) {
 
                             @if(field.getType().equals("text")) {

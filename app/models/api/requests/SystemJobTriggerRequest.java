@@ -27,7 +27,7 @@ import models.User;
 /**
  * @author Lennart Koopmann <lennart@torch.sh>
  */
-public class SystemJobTriggerRequest implements ApiRequest {
+public class SystemJobTriggerRequest extends ApiRequest {
 
     @SerializedName("job_name")
     public String jobName;
@@ -38,11 +38,6 @@ public class SystemJobTriggerRequest implements ApiRequest {
     public SystemJobTriggerRequest(SystemJob.Type type, User user) {
         this.jobName = type.toString().toLowerCase();
         this.creatorUserId = user.getId();
-    }
-
-    @Override
-    public String toJson() {
-        return new Gson().toJson(this);
     }
 
 }

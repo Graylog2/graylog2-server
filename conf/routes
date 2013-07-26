@@ -26,6 +26,7 @@ GET         /system/nodes                             controllers.SystemControll
 GET         /system/threaddump/:node_id               controllers.SystemController.threadDump(node_id: String)
 GET         /system/inputs                            controllers.InputsController.index()
 GET         /system/inputs/:node_id                   controllers.InputsController.manage(node_id: String)
+POST        /system/inputs/:node_id                   controllers.InputsController.launch(node_id: String)
 
 # Systemjobs
 POST        /systemjobs/trigger                       controllers.SystemJobsController.trigger()

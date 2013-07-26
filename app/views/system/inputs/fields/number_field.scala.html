@@ -2,7 +2,7 @@
 
 <label>@field.getHumanName</label>
 <span class="help-block">@field.getDescription</span>
-<input name="@field.getTitle"
+<input name="configuration_@field.getTitle"
     required="@field.isOptional"
     type="number"
     @if(!field.getDefaultValue().toString().isEmpty()) {

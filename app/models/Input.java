@@ -23,6 +23,8 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import lib.APIException;
 import lib.Api;
+import models.api.requests.InputLaunchRequest;
+import models.api.responses.EmptyResponse;
 import models.api.responses.InputTypeResponse;
 import models.api.responses.InputTypesResponse;
 
@@ -53,6 +55,16 @@ public class Input {
         }
 
         return types;
+    }
+
+    public static void launch(Node node, String title, String type, Map<String, Object> configuration, String userId) throws IOException, APIException {
+        InputLaunchRequest request = new InputLaunchRequest();
+        request.title = title;
+        request.type = type;
+        request.configuration = configuration;
+        request.creatorUserId = userId;
+
+        Api.post(node, "system/inputs", request, 202, EmptyResponse.class);
     }
 
 }
