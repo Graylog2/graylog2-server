@@ -124,17 +124,17 @@ public class SyslogInputBase extends MessageInput {
     }
 
     @Override
+    public Map<String, Object> getAttributes() {
+        return config.getSource();
+    }
+
+    @Override
     public boolean isExclusive() {
         throw new RuntimeException("Must be overridden in syslog input classes.");
     }
 
     @Override
     public String getName() {
-        throw new RuntimeException("Must be overridden in syslog input classes.");
-    }
-
-    @Override
-    public Map<String, String> getAttributes() {
         throw new RuntimeException("Must be overridden in syslog input classes.");
     }
 

@@ -67,7 +67,7 @@ public class GELFHttpInput extends MessageInput {
     }
 
     @Override
-    public Map<String, String> getAttributes() {
+    public Map<String, Object> getAttributes() {
         return null;  //To change body of implemented methods use File | Settings | File Templates.
     }
 

@@ -45,7 +45,7 @@ public abstract class MessageInput {
 
     public abstract boolean isExclusive();
     public abstract String getName();
-    public abstract Map<String, String> getAttributes();
+    public abstract Map<String, Object> getAttributes();
 
     public void setId(String id) {
         this.inputId = id;

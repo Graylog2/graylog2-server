@@ -112,9 +112,4 @@ public class SyslogTCPInput extends SyslogInputBase {
         return NAME;
     }
 
-    @Override
-    public Map<String, String> getAttributes() {
-        return Maps.newHashMap();
-    }
-
 }
