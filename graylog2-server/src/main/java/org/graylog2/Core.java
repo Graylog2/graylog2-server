@@ -340,6 +340,8 @@ public class Core implements GraylogServer {
                 return pipeline;
             }
         }) ;
+        bootstrap.setOption("child.tcpNoDelay", true);
+        bootstrap.setOption("child.keepAlive", true);
 
         bootstrap.bind(new InetSocketAddress(configuration.getRestListenUri().getPort()));
         Runtime.getRuntime().addShutdownHook(new Thread() {
