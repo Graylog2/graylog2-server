@@ -17,15 +17,32 @@
  * along with Graylog2.  If not, see <http://www.gnu.org/licenses/>.
  *
  */
-package models.api.responses;
+package models.api.responses.system;
+
+import com.google.gson.annotations.SerializedName;
 
 import java.util.Map;
 
 /**
  * @author Lennart Koopmann <lennart@torch.sh>
  */
-public class InputTypesResponse {
+public class InputSummaryResponse {
 
-    public Map<String, String> types;
+    @SerializedName("input_id")
+    public String inputId;
+
+    @SerializedName("persist_id")
+    public String persistId;
+
+    public String name;
+    public String title;
+
+    @SerializedName("creator_user_id")
+    public String creatorUserId;
+
+    @SerializedName("started_at")
+    public String startedAt;
+
+    public Map<String, Object> attributes;
 
 }

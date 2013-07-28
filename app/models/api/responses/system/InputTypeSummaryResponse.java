@@ -17,7 +17,7 @@
  * along with Graylog2.  If not, see <http://www.gnu.org/licenses/>.
  *
  */
-package models.api.responses;
+package models.api.responses.system;
 
 import com.google.common.collect.Lists;
 import com.google.gson.annotations.SerializedName;
@@ -33,7 +33,7 @@ import java.util.Map;
 /**
  * @author Lennart Koopmann <lennart@torch.sh>
  */
-public class InputTypeResponse {
+public class InputTypeSummaryResponse {
 
     public String name;
     public String type;

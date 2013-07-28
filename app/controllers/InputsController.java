@@ -23,18 +23,12 @@ import com.google.common.collect.Maps;
 import lib.APIException;
 import lib.Api;
 import lib.BreadcrumbList;
-import lib.plugin.configuration.BooleanField;
-import models.BufferInfo;
 import models.Input;
 import models.Node;
-import models.ServerJVMStats;
-import models.api.responses.InputTypeResponse;
-import play.Logger;
-import play.mvc.Http;
+import models.api.responses.system.InputTypeSummaryResponse;
 import play.mvc.Result;
 
 import java.io.IOException;
-import java.util.List;
 import java.util.Map;
 
 /**
@@ -93,7 +87,7 @@ public class InputsController extends AuthenticatedController {
         String inputTitle = form.get("title")[0];
 
         try {
-            InputTypeResponse inputInfo = Input.getTypeInformation(Node.fromId(nodeId), inputType);
+            InputTypeSummaryResponse inputInfo = Input.getTypeInformation(Node.fromId(nodeId), inputType);
 
             for (Map.Entry<String, String[]> f : form.entrySet()) {
                 if (!f.getKey().startsWith("configuration_")) {
