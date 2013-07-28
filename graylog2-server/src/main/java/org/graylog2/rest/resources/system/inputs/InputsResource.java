@@ -28,6 +28,7 @@ import org.graylog2.database.ValidationException;
 import org.graylog2.inputs.Input;
 import org.graylog2.inputs.Inputs;
 import org.graylog2.inputs.NoSuchInputTypeException;
+import org.graylog2.plugin.Tools;
 import org.graylog2.plugin.inputs.MessageInput;
 import org.graylog2.plugin.configuration.Configuration;
 import org.graylog2.plugin.configuration.ConfigurationException;
@@ -69,6 +70,7 @@ public class InputsResource extends RestResource {
             inputMap.put("name", input.getName());
             inputMap.put("title", input.getTitle());
             inputMap.put("creator_user_id", input.getCreatorUserId());
+            inputMap.put("started_at", Tools.getISO8601String(input.getCreatedAt()));
             inputMap.put("attributes", input.getAttributes());
 
             inputs.add(inputMap);
@@ -98,12 +100,14 @@ public class InputsResource extends RestResource {
         Configuration inputConfig = new Configuration(lr.configuration);
 
         // Build input.
+        DateTime createdAt = new DateTime(DateTimeZone.UTC);
         MessageInput input = null;
         try {
             input = Inputs.factory(lr.type);
             input.configure(inputConfig, core);
             input.setTitle(lr.title);
             input.setCreatorUserId(lr.creatorUserId);
+            input.setCreatedAt(createdAt);
         } catch (NoSuchInputTypeException e) {
             LOG.error("There is no such input type registered.", e);
             throw new WebApplicationException(e, Response.Status.NOT_FOUND);
@@ -118,7 +122,7 @@ public class InputsResource extends RestResource {
         inputData.put("type", lr.type);
         inputData.put("creator_user_id", lr.creatorUserId);
         inputData.put("configuration", lr.configuration);
-        inputData.put("created_at", new DateTime(DateTimeZone.UTC));
+        inputData.put("created_at", createdAt);
 
         // ... and check if it would pass validation. We don't need to go on if it doesn't.
         Input mongoInput = new Input(core, inputData);
