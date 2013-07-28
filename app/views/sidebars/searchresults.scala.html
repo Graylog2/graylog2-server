@@ -14,19 +14,19 @@
 <ul class="search-result-fields">
 	@for(f <- searchResult.getFields()) {
 		<li>
+            <i class="icon icon-cog"></i>
+            &nbsp;
+
 			<input type="checkbox"
 				id="field-selector-@f.getHash"
 				class="field-selector"
 				data-field-hash="@f.getHash"
-				@if(f.isStandardSelected()) { checked="checked" }
+				@if(f.isStandardSelected) { checked="checked" }
 			/>
 
 			<label for="field-selector-@f.getHash">@f.getName()</label>
-		</li>
+        </li>
 	}
 </ul>
 
-<br />
-<h3>Analyze field</h3>
-... tba ...
 }

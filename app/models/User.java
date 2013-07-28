@@ -13,6 +13,11 @@ public class User {
 	public static User load(String userId) {
 		return new User("lennart", "lennart@torch.sh");
 	}
+
+    public String getId() {
+        // TODO implement me
+        return "foo-bar-userid";
+    }
 	
 	public String getName() {
 		return name;

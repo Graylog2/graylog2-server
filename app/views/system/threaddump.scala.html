@@ -1,0 +1,16 @@
+@(currentUser: User, breadcrumbs: lib.BreadcrumbList, node: Node, dump: String)
+
+@main("Nodes", views.html.system.sidebar(), "", currentUser) {
+
+    @views.html.partials.breadcrumbs(breadcrumbs)
+
+    <div class="row-fluid">
+        <h1><i class="icon icon-film"></i> Thread dump of @node.getNodeId</h1>
+        Taken at @views.helpers.DateHelper.current().
+    </div>
+
+    <div class="well well-small" style="overflow: scroll;">
+        @Html(views.helpers.StringHelper.simpleFormat(dump))
+    </div>
+
+}

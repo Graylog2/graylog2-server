@@ -20,11 +20,16 @@
 package models;
 
 import com.google.common.collect.Lists;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import lib.APIException;
 import lib.Api;
+import models.api.requests.SystemJobTriggerRequest;
+import models.api.responses.EmptyResponse;
 import models.api.responses.system.GetSystemJobsResponse;
 import models.api.responses.system.SystemJobSummaryResponse;
 import org.joda.time.DateTime;
+import play.Logger;
 
 import java.io.IOException;
 import java.net.URL;
@@ -43,35 +48,43 @@ public class SystemJob {
     }
 
     private final UUID id;
+    private final String name;
     private final String description;
-    private final String nodeId;
+    private final Node node;
     private final DateTime startedAt;
-    private final User startedBy;
     private final int percentComplete;
     private final boolean isCancelable;
     private final boolean providesProgress;
 
     public SystemJob(SystemJobSummaryResponse s) {
         this.id = UUID.fromString(s.id);
+        this.name = s.name;
         this.description = s.description;
-        this.nodeId = s.nodeId;
+        this.node = Node.fromId(s.nodeId);
         this.startedAt = DateTime.parse(s.startedAt);
-        this.startedBy = null; // TODO try to load user
         this.percentComplete = s.percentComplete;
         this.isCancelable = s.isCancelable;
         this.providesProgress = s.providesProgress;
+    }
+
+    public static void trigger(Type type, User user) throws IOException, APIException {
+        Api.post(Node.random(), "system/jobs", new SystemJobTriggerRequest(type, user), 202, EmptyResponse.class);
     }
 
     public UUID getId() {
         return id;
     }
 
+    public String getName() {
+        return name;
+    }
+
     public String getDescription() {
         return description;
     }
 
-    public String getNodeId() {
-        return nodeId;
+    public Node getNode() {
+        return node;
     }
 
     public int getPercentComplete() {
@@ -83,12 +96,14 @@ public class SystemJob {
     }
 
     public static List<SystemJob> all() throws IOException, APIException {
-        URL url = Api.buildTarget("system/jobs");
-        GetSystemJobsResponse r = Api.get(url, GetSystemJobsResponse.class);
-
         List<SystemJob> jobs = Lists.newArrayList();
-        for (SystemJobSummaryResponse job : r.jobs) {
-            jobs.add(new SystemJob(job));
+
+        for(Node node : Node.all()) {
+            GetSystemJobsResponse r = Api.get(node, "system/jobs", GetSystemJobsResponse.class);
+
+            for (SystemJobSummaryResponse job : r.jobs) {
+                jobs.add(new SystemJob(job));
+            }
         }
 
         return jobs;

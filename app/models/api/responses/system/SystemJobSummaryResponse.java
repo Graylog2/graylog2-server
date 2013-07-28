@@ -28,6 +28,7 @@ public class SystemJobSummaryResponse {
 
     public String id;
     public String description;
+    public String name;
 
     @SerializedName("node_id")
     public String nodeId;

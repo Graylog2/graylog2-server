@@ -48,7 +48,7 @@ public class DeflectorExistsAsIndexNotification implements NotificationType {
             put(SystemJob.Type.FIX_DEFLECTOR_DELETE_INDEX, "Delete the deflector index and re-create the alias. " +
                     "The messages in the deflector index will be lost. Fastest solution.");
             put(SystemJob.Type.FIX_DEFLECTOR_MOVE_INDEX, "Stop message processing, move the deflector index to a regular " +
-                    "one and re-create the index. This can take some time and buffer utilization should be monitored");
+                    "one and re-create the index. This can take some time and buffer utilization should be monitored.");
         }};
     }
 

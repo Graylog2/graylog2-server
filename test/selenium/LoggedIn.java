@@ -19,6 +19,7 @@
  */
 package selenium;
 
+import lib.Configuration;
 import org.junit.Before;
 import play.test.TestBrowser;
 import selenium.serverstub.ServerStub;
@@ -61,6 +62,8 @@ public class LoggedIn extends Selenium {
      * @return True if the login was successful.
      */
     protected Result login(TestBrowser browser, ServerStub serverStub, String user, String password) {
+        Configuration.setServerRestUris("http://127.0.0.1:" + SERVER_STUB_PORT);
+
         browser.goTo("/login");
 
         browser.fill("#username").with(user);

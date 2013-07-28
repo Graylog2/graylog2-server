@@ -1,6 +1,9 @@
 @(currentUser: User,
-        jobs: List[SystemJob], clusterHealth: ESClusterHealth,
+        jobs: List[SystemJob],
+        clusterHealth: ESClusterHealth,
         systemMessages: List[SystemMessage],
+        totalSystemMessages: Integer,
+        page: Integer,
         notifications: List[Notification])
 
 @main("System", views.html.system.sidebar(), "", currentUser) {
@@ -26,17 +29,21 @@
                         Your options:
                     </h4>
 
-                    @for((jobType, description) <- notification.get().options()) {
-                        <label class="radio">
-                            <input type="radio" value="@jobType" name="@notification.getType().toString().toLowerCase()_solution">
-                            @description
-                        </label>
-                    }
+                    @if(!notification.get().options().isEmpty) {
+                        <form action="/systemjobs/trigger" method="POST">
+                            @for((jobType, description) <- notification.get().options()) {
+                                <label class="radio">
+                                    <input type="radio" value="@jobType" name="job" required="required">
+                                    @description
+                                </label>
+                            }
 
-                    <a href="#" class="btn">
-                        <i class="icon icon-ok"></i>
-                        Trigger repair job
-                    </a>
+                            <button type="submit" class="btn" data-confirm="Execute select option?">
+                                <i class="icon icon-ok"></i>
+                                Trigger repair job
+                            </button>
+                        </form>
+                    }
                 </div>
             </div>
         }
@@ -58,11 +65,9 @@
         @for(job <- jobs) {
             <div class="systemjob systemjob-progress systemjob-active" id="job-@job.getId()" data-job-id="@job.getId()">
                 <i class="icon icon-cog"></i>
-                Started @job.getDescription()
-                on <a href="#">implement.me.local</a>
+                Started @job.getName
+                on @partials.links.to_node(job.getNode)
                 at @job.getStartedAt()
-
-                <a href="#" title="Open details"><i class="icon icon-external-link"></i></a>
 
                 <span class="label label-success finished">Finished!</span>
 
@@ -81,29 +86,47 @@
     </div>
 
     <div class="row-fluid">
+        @partials.support.head_bubble("the-elasticsearch-cluster-status-explained")
+
         <h2><i class="icon icon-tasks"></i> ElasticSearch cluster</h2>
 
-        Status: @clusterHealth.getStatus
+        @if(clusterHealth.isGreen) {
+            <div class="es-cluster-status alert alert-success">
+                <i class="icon icon-ok-sign"></i> Cluster is green.
+        }
 
-        <br />
-        Shards:
-        @clusterHealth.getRelocatingShards relocating,
-        @clusterHealth.getUnassignedShards unassigned,
-        @clusterHealth.getActiveShards active,
-        @clusterHealth.getInitializingShards init
+
+        @if(clusterHealth.isYellow) {
+            <div class="es-cluster-status alert alert-warning">
+                <i class="icon icon-warning-sign"></i> <strong>Cluster is yellow.</strong>
+        }
+
+        @if(clusterHealth.isRed) {
+            <div class="es-cluster-status alert alert-error">
+                <i class="icon icon-ambulance"></i> <strong>Cluster is red.</strong>
+        }
+
+            <div class="pull-right">
+                Shards:
+                @clusterHealth.getActiveShards active,
+                @clusterHealth.getInitializingShards initializing,
+                @clusterHealth.getRelocatingShards relocating,
+                @clusterHealth.getUnassignedShards unassigned
+            </div>
+        </div>
+
     </div>
-
-    <!-- TODO fix the styling here -->
-    <!-- TODO needs pagination -->
 
     <div class="row-fluid">
         <h2><i class="icon icon-comments-alt"></i> Messages and notifications</h2>
 
         <table class="system-messages table table-striped table-hover table-condensed">
             <thead>
-                <th style="width: 170px;">Timestamp</th>
-                <th>Node</th>
-                <th>Message</th>
+                <tr>
+                    <th style="width: 170px;">Timestamp</th>
+                    <th>Node</th>
+                    <th>Message</th>
+                </tr>
             </thead>
 
             <tbody>
@@ -117,5 +140,7 @@
             </tbody>
 
         </table>
+
+        @partials.paginator(page, SystemMessage.PER_PAGE, totalSystemMessages, routes.SystemController.index(_))
     </div>
 }

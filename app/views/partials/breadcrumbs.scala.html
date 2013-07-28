@@ -1,0 +1,19 @@
+@(crumbs: lib.BreadcrumbList)
+
+<ul class="breadcrumb">
+    <li>
+        <i class="icon icon-anchor"></i>&nbsp;&nbsp;
+    </li>
+
+    @for(crumb <- crumbs.get()) {
+        <li>
+            @if(!crumb.isLast) {
+                <a href="@crumb.getUrl">@crumb.getTitle</a>
+                <span class="divider">/</span>
+            } else {
+                @crumb.getTitle
+            }
+        </li>
+    }
+
+</ul>

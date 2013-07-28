@@ -29,5 +29,6 @@ import java.util.List;
 public class GetSystemMessagesResponse {
 
     public List<SystemMessageSummaryResponse> messages;
+    public int total;
 
 }

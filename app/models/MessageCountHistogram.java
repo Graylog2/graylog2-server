@@ -20,9 +20,9 @@ public class MessageCountHistogram {
 	
 	public DateHistogramResult histogram() throws IOException, APIException {
 		String i = Api.urlEncode(interval);
-		URL url = Api.buildTarget("count/histogram?interval=" + i + "&timerange=" + timerange);
+		String resource = "count/histogram?interval=" + i + "&timerange=" + timerange;
 		
-		DateHistogramResponse response = Api.get(url, DateHistogramResponse.class);
+		DateHistogramResponse response = Api.get(resource, DateHistogramResponse.class);
 		return new DateHistogramResult("match_all", response.time, response.interval, response.results);
 	}
 	

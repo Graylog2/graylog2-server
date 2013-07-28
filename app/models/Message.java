@@ -14,9 +14,9 @@ import models.api.results.MessageResult;
 public class Message {
 
 	public static MessageResult get(String index, String id) throws IOException, APIException {
-		URL url = Api.buildTarget("messages/" + index + "/" + id);
+		String resource = "messages/" + index + "/" + id;
 		
-		GetMessageResponse r = Api.get(url, GetMessageResponse.class);
+		GetMessageResponse r = Api.get(resource, GetMessageResponse.class);
 		return new MessageResult(r.message, r.index);
 	}
 	
@@ -25,9 +25,9 @@ public class Message {
 			return new MessageAnalyzeResult(new ArrayList<String>());
 		}
 		
-		URL url = Api.buildTarget("messages/" + index + "/analyze?string=" + Api.urlEncode(what));
+		String resource = "messages/" + index + "/analyze?string=" + Api.urlEncode(what);
 		
-		MessageAnalyzeResponse r = Api.get(url, MessageAnalyzeResponse.class);
+		MessageAnalyzeResponse r = Api.get(resource, MessageAnalyzeResponse.class);
 		return new MessageAnalyzeResult(r.tokens);
 	}
 	

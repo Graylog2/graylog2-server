@@ -47,14 +47,25 @@ public class ESClusterHealth {
     }
 
     public static ESClusterHealth get() throws IOException, APIException {
-        URL url = Api.buildTarget("system/indexer/cluster/health");
-        ESClusterHealthResponse r = Api.get(url, ESClusterHealthResponse.class);
+        ESClusterHealthResponse r = Api.get("system/indexer/cluster/health", ESClusterHealthResponse.class);
 
         return new ESClusterHealth(r);
     }
 
     public ClusterHealthStatus getStatus() {
         return status;
+    }
+
+    public boolean isGreen() {
+        return this.status == ClusterHealthStatus.GREEN;
+    }
+
+    public boolean isYellow() {
+        return this.status == ClusterHealthStatus.YELLOW;
+    }
+
+    public boolean isRed() {
+        return this.status == ClusterHealthStatus.RED;
     }
 
     public int getRelocatingShards() {

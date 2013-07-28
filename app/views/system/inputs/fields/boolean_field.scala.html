@@ -1,0 +1,13 @@
+@(field: lib.plugin.configuration.RequestedConfigurationField)
+
+<label class="checkbox">
+    <input type="checkbox"
+        @if(field.getDefaultValue == true) {
+            checked="checked"
+        }
+        value="true"
+        name="configuration_@field.getTitle">
+
+    @field.getHumanName
+</label>
+<span class="help-block">@field.getDescription</span>

@@ -143,7 +143,7 @@ h3 {
 
 .messages {
 	font-size: 11px;
-	margin-top: 15px;
+	margin-top: 10px;
 	table-layout: fixed;
 	border-collapse: collapse;
 	width: 100%;
@@ -302,6 +302,10 @@ form #stream-rules {
     font-size: 13px;
 }
 
+.notification form {
+    margin-bottom: 0px;
+}
+
 .notification-solutions h4 {
     font-size: 13px;
     font-weight: bold;
@@ -314,7 +318,7 @@ form #stream-rules {
     padding: 3px 11px;
 }
 
-.message-processing-host {
+.node-row {
     border-bottom: 1px solid #ccc;
     padding-bottom: 8px;
     margin-top: 8px;
@@ -333,7 +337,66 @@ form #stream-rules {
     font-size: 11px;
 }
 
-.message-processing-host .node-throughput-info {
+.message-processing-host .node-throughput-info .sentence {
+    position: relative;
+    margin-right: 5px;
+    position: relative;
+    top: 1px;
+}
+
+.change-message-processing {
+    position: relative;
+    top: -1px;
+}
+
+.es-cluster-status {
+    margin-top: 10px;
+    margin-bottom: 5px;
+}
+
+.dropdown-menu li {
+    font-size: 12px;
+}
+
+.breadcrumb {
+    background-color: #fff;
+    padding: 0px;
+    margin: 0px;
+    margin-bottom: 10px;
+    color: #ccc;
+}
+
+.breadcrumb a {
+    color: #0085A7;
+}
+
+.node-row .hostname {
+    font-size: 12px;
+}
+
+.rickshaw_graph .x_tick {
+    position: relative;
+    top: 30px;
+}
+
+#sidebar .rickshaw_graph .x_tick {
+    position: relative;
+    top: 22px;
+}
+
+.graph-resolution-selector {
+    margin-top: 30px;
+}
+
+#sidebar-graph {
+    border-bottom: 2px solid #ccc;
+}
+
+.search-result-fields i {
     position: relative;
     top: 3px;
+}
+
+.modal form {
+    margin-bottom: 0;
 }

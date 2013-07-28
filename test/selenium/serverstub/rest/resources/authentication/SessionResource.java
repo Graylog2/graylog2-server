@@ -56,7 +56,7 @@ public class SessionResource extends RestResource {
             result.put("username", lr.username);
             result.put("full_name", "Stub User");
 
-            return Response.ok(json(result, prettyPrint)).build();
+            return Response.ok(json(result)).build();
         } else {
             return Response.status(Response.Status.UNAUTHORIZED).build();
         }

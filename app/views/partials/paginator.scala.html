@@ -1,0 +1,56 @@
+@(page:Int, perPage:Int, collectionLength:Integer, route:Int => Call, show:Int = 5)
+
+@lowestPage() = @{
+    ((page.toDouble / show).floor * show).toInt
+}
+
+@highestPage() = @{
+    if ((lowestPage() + show) * perPage >= collectionLength)
+        collectionLength / perPage + 1
+    else
+        lowestPage() + show
+}
+
+    <div class="pagination pagination-centered">
+        <ul>
+            @if(page == 1){
+                <li class="disabled"><a href="#">Previous</a></li>
+            } else {
+                <li><a href="@route(page-1)">Previous</a></li>
+
+            }
+
+            @if(page < show) {
+                <li class="disabled"><a href="#">&laquo;</a></li>
+            } else {
+                @if(lowestPage()-show <= 0) {
+                    <li><a href="@route(1)">&laquo;</a></li>
+                } else {
+                    <li><a href="@route(lowestPage()-show)">&laquo;</a></li>
+                }
+            }
+
+            @for(i <- lowestPage().max(1) until page) {
+                <li><a href="@route(i)">@i</a></li>
+            }
+
+            <li class="active"><a href="#">@page</a></li>
+
+            @for(i <- page+1 to highestPage()) {
+                <li><a href="@route(i)">@i</a></li>
+            }
+
+            @if(highestPage() * perPage <= collectionLength && highestPage() > page && page * perPage != collectionLength) {
+                <li><a href="@route(highestPage())">&raquo;</a></li>
+            } else {
+                <li class="disabled"><a href="#">&raquo;</a></li>
+            }
+
+            @if(page < highestPage()) {
+                <li><a href="@route(page+1)">Next</a></li>
+            } else {
+                <li class="disabled"><a href="#">Next</a></li>
+
+            }
+        </ul>
+    </div>

@@ -71,8 +71,7 @@ public class Notification {
     }
 
     public static List<Notification> all() throws IOException, APIException {
-        URL url = Api.buildTarget("system/notifications");
-        GetNotificationsResponse r = Api.get(url, GetNotificationsResponse.class);
+        GetNotificationsResponse r = Api.get("system/notifications", GetNotificationsResponse.class);
 
         List<Notification> notifications = Lists.newArrayList();
         for (NotificationSummaryResponse notification : r.notifications) {

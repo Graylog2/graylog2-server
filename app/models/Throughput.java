@@ -32,12 +32,18 @@ import java.net.URL;
  */
 public class Throughput {
 
-    // TODO make multi-node compatible
-    public static int get() throws IOException, APIException {
-        URL url = Api.buildTarget("system/throughput");
-        ServerThroughputResponse r = Api.get(url, ServerThroughputResponse.class);
+    public static int getTotal() throws IOException, APIException {
+        int total = 0;
 
-        return r.throughput;
+        for(Node node: Node.all()) {
+            total += get(node);
+        }
+
+        return total;
+    }
+
+    public static int get(Node node) throws IOException, APIException {
+        return Api.get(node, "system/throughput", ServerThroughputResponse.class).throughput;
     }
 
 }

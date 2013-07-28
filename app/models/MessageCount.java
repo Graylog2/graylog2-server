@@ -19,7 +19,7 @@ public class MessageCount {
             return cached;
         }
 
-        MessageCountResponse response = Api.get(Api.buildTarget("count/total"), MessageCountResponse.class);
+        MessageCountResponse response = Api.get("count/total", MessageCountResponse.class);
         MessageCountResult result = new MessageCountResult(response.events);
         Cache.set(TOTAL_CNT_CACHE_KEY, result, TOTAL_CNT_CACHE_TTL);
         return result;
