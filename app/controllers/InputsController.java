@@ -52,6 +52,8 @@ public class InputsController extends AuthenticatedController {
     }
 
     public static Result manage(String nodeId) {
+        // TODO: account field attributes using JS (greater than, listen_address, ...)
+
         Node node = Node.fromId(nodeId);
 
         if (node == null) {
@@ -128,7 +130,20 @@ public class InputsController extends AuthenticatedController {
         } catch (IOException e) {
             return status(504, views.html.errors.error.render(Api.ERROR_MSG_IO, e, request()));
         } catch (APIException e) {
-            String message = "Could not fetch system information. We expected HTTP 202, but got a HTTP " + e.getHttpCode() + ".";
+            String message = "Could not launch input. We expected HTTP 202, but got a HTTP " + e.getHttpCode() + ".";
+            return status(504, views.html.errors.error.render(message, e, request()));
+        }
+    }
+
+    public static Result terminate(String nodeId, String inputId) {
+        try {
+            Input.terminate(Node.fromId(nodeId), inputId);
+
+            return redirect(routes.InputsController.manage(nodeId));
+        } catch (IOException e) {
+            return status(504, views.html.errors.error.render(Api.ERROR_MSG_IO, e, request()));
+        } catch (APIException e) {
+            String message = "Could not send terminate request. We expected HTTP 202, but got a HTTP " + e.getHttpCode() + ".";
             return status(504, views.html.errors.error.render(message, e, request()));
         }
     }

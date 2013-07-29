@@ -399,4 +399,47 @@ form #stream-rules {
 
 .modal form {
     margin-bottom: 0;
+}s
+
+.input-list h2 {
+    margin-bottom: 5px;
+}
+
+.input-row {
+    margin-bottom: 8px;
+    margin-top: 0px;
+}
+
+.input-row .well {
+    margin-bottom: 0px;
+    margin-top: 3px;
+    font-family: monospace;
+    font-size: 11px;
+}
+
+.input-row-info {
+    position: relative;
+    top: 2px;
+}
+
+.input-row-info form {
+    display: inline;
+}
+
+.input-row-info span {
+    position: relative;
+    top: 3px;
+}
+
+.input-list .alert {
+    margin-top: 10px;
+}
+
+#configure-input {
+    position: relative;
+    top: -5px;
+}
+
+.input-new {
+    margin-bottom: 8px;
 }

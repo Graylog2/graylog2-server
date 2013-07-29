@@ -47,7 +47,7 @@ public class Api {
 			final Response response = requestBuilder.execute().get();
 
 			if (response.getStatusCode() != 200) {
-				throw new APIException(response.getStatusCode(), "REST call [" + url + "] returned " + response.getStatusText());
+				throw new APIException(response.getStatusCode(), "REST call GET [" + url + "] returned " + response.getStatusText());
 			}
 
             // TODO: better make this better bro
@@ -60,7 +60,7 @@ public class Api {
 		} catch (InterruptedException e) {
 			// TODO
 		} catch (ExecutionException e) {
-			throw new APIException(-1, "REST call [" + url + "] failed: " + e.getMessage());
+			throw new APIException(-1, "REST call GET [" + url + "] failed: " + e.getMessage());
 		} catch (MalformedURLException e) {
 			throw new RuntimeException("Malformed URL.", e);
 		}
@@ -75,7 +75,7 @@ public class Api {
             final Response response = requestBuilder.execute().get();
 
             if (response.getStatusCode() != 200) {
-                throw new APIException(response.getStatusCode(), "REST call [" + url + "] returned " + response.getStatusText());
+                throw new APIException(response.getStatusCode(), "REST call PUT [" + url + "] returned " + response.getStatusText());
             }
 
             Gson gson = new Gson();
@@ -83,7 +83,7 @@ public class Api {
         } catch (InterruptedException e) {
             // TODO
         } catch (ExecutionException e) {
-            throw new APIException(-1, "REST call [" + url + "] failed: " + e.getMessage());
+            throw new APIException(-1, "REST call PUT [" + url + "] failed: " + e.getMessage());
         } catch (MalformedURLException e) {
             throw new RuntimeException("Malformed URL.", e);
         }
@@ -99,7 +99,7 @@ public class Api {
             final Response response = requestBuilder.execute().get();
 
             if (response.getStatusCode() != expectedResponseCode) {
-                throw new APIException(response.getStatusCode(), "REST call [" + url + "] returned " + response.getStatusText());
+                throw new APIException(response.getStatusCode(), "REST call POST [" + url + "] returned " + response.getStatusText());
             }
 
             Gson gson = new Gson();
@@ -107,7 +107,7 @@ public class Api {
         } catch (InterruptedException e) {
             // TODO
         } catch (ExecutionException e) {
-            throw new APIException(-1, "REST call [" + url + "] failed: " + e.getMessage());
+            throw new APIException(-1, "REST call POST [" + url + "] failed: " + e.getMessage());
         } catch (MalformedURLException e) {
             throw new RuntimeException("Malformed URL.", e);
         }
@@ -115,7 +115,28 @@ public class Api {
         return (T) null;
     }
 
+    public static <T> T delete(URL url, int expectedResponseCode, Class<T> responseClass) throws APIException, IOException {
+        try {
+            AsyncHttpClient.BoundRequestBuilder requestBuilder = client.prepareDelete(url.toString());
+            requestBuilder.addHeader("Accept", "application/json");
+            final Response response = requestBuilder.execute().get();
 
+            if (response.getStatusCode() != expectedResponseCode) {
+                throw new APIException(response.getStatusCode(), "REST call DELETE [" + url + "] returned " + response.getStatusText());
+            }
+
+            Gson gson = new Gson();
+            return gson.fromJson(response.getResponseBody("UTF-8"), responseClass);
+        } catch (InterruptedException e) {
+            // TODO
+        } catch (ExecutionException e) {
+            throw new APIException(-1, "REST call DELETE [" + url + "] failed: " + e.getMessage());
+        } catch (MalformedURLException e) {
+            throw new RuntimeException("Malformed URL.", e);
+        }
+
+        return (T) null;
+    }
 
 
 
@@ -180,6 +201,13 @@ public class Api {
         return put(buildTarget(host, part), responseClass);
     }
 
+    public static <T> T delete(Node node, String part, Class<T> responseClass) throws IOException, APIException {
+        return delete(buildTarget(node, part), 204, responseClass);
+    }
+
+    public static <T> T delete(Node node, String part, int expectedResponseCode, Class<T> responseClass) throws IOException, APIException {
+        return delete(buildTarget(node, part), expectedResponseCode, responseClass);
+    }
 
     ////////
 

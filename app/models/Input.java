@@ -29,6 +29,7 @@ import models.api.responses.system.InputSummaryResponse;
 import models.api.responses.system.InputTypeSummaryResponse;
 import models.api.responses.system.InputTypesResponse;
 import org.joda.time.DateTime;
+import play.Logger;
 
 import java.io.IOException;
 import java.util.List;
@@ -67,6 +68,13 @@ public class Input {
         this.startedAt = DateTime.parse(startedAt);
         this.creatorUser = creatorUser;
         this.attributes = attributes;
+
+        // We might get a double parsed from JSON here. Make sure to round it to Integer. (would be .0 anyways)
+        for (Map.Entry<String, Object> e : attributes.entrySet()) {
+            if (e.getValue() instanceof Double) {
+                attributes.put(e.getKey(), Math.round((Double) e.getValue()));
+            }
+        }
     }
 
     public static Map<String, String> getTypes(Node node) throws IOException, APIException {
@@ -97,6 +105,10 @@ public class Input {
         request.creatorUserId = userId;
 
         Api.post(node, "system/inputs", request, 202, EmptyResponse.class);
+    }
+
+    public static void terminate(Node node, String inputId) throws IOException, APIException {
+        Api.delete(node, "/system/inputs/" + inputId, 202, EmptyResponse.class);
     }
 
     public String getId() {

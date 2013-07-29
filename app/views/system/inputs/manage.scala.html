@@ -1,5 +1,4 @@
 @(currentUser: User, breadcrumbs: lib.BreadcrumbList, node: Node, inputTypes: Map[String, models.api.responses.system.InputTypeSummaryResponse])
-@import lib.plugin.configuration.TextField
 
 @main("Inputs of node", views.html.system.sidebar(), "", currentUser) {
 
@@ -7,10 +6,10 @@
 
     <div class="row-fluid">
         <h1><i class="icon icon-cloud-download"></i> Inputs of @node.getNodeId</h1>
-        Graylog2 nodes accept data via inputs. Launch or shutdown as many inputs as you want here.
+        Graylog2 nodes accept data via inputs. Launch or terminate as many inputs as you want here.
     </div>
 
-    <div class="row-fluid">
+    <div class="row-fluid input-new">
 
         <select id="input-type">
             @for((inputType,info) <- inputTypes) {
@@ -21,19 +20,36 @@
         <button id="configure-input" class="btn btn-success">Launch new input</button>
     </div>
 
-    <div class="row-fluid">
-        <h2><i class="icon icon-cloud-download"></i> Running inputs</h2>
+    <div class="row-fluid input-list">
+        <h2><i class="icon icon-cogs"></i> Running inputs</h2>
 
-        @for(input <- node.getInputs) {
-            <span class="pull-right">Started by @input.getCreatorUser at @input.getStartedAt</span>
-            <h3>@input.getTitle (@input.getName)</h3>
-            <div class="well well-small">
-                <ul>
-                @for((k,v) <- input.getAttributes) {
-                    <li>@k: @v</li>
-                }
-                </ul>
-            </div>
+        @if(node.numberOfInputs > 0) {
+            @for(input <- node.getInputs) {
+                <div class="row-fluid input-row node-row">
+                    <span class="pull-right input-row-info">
+                        <span>Started by @views.html.partials.links.to_user(input.getCreatorUser) at @input.getStartedAt</span>
+                        &nbsp;
+
+                        <form action="@routes.InputsController.terminate(node.getNodeId, input.getId)" method="POST">
+                            <button class="btn btn-danger btn-mini"
+                                type="submit"
+                                data-confirm="Really terminate input?">
+                                    Terminate
+                            </button>
+                        </form>
+                    </span>
+                    <h3><i class="icon icon-ellipsis-vertical"></i> @input.getTitle (@input.getName)</h3>
+                    <div class="well well-small">
+                        <ul>
+                        @for((k,v) <- input.getAttributes) {
+                            <li>@k: @v</li>
+                        }
+                        </ul>
+                    </div>
+                </div>
+            }
+        } else {
+            <div class="alert alert-danger">This node has no running inputs.</div>
         }
 
     </div>
