@@ -29,6 +29,7 @@ import org.graylog2.plugin.configuration.ConfigurationException;
 import org.graylog2.plugin.configuration.ConfigurationRequest;
 import org.jboss.netty.bootstrap.ConnectionlessBootstrap;
 import org.jboss.netty.bootstrap.ServerBootstrap;
+import org.jboss.netty.channel.Channel;
 import org.jboss.netty.channel.ChannelException;
 import org.jboss.netty.channel.FixedReceiveBufferSizePredictorFactory;
 import org.jboss.netty.channel.socket.nio.NioDatagramChannelFactory;
@@ -72,17 +73,10 @@ public class SyslogTCPInput extends SyslogInputBase {
         tcpBootstrap.setPipelineFactory(new SyslogTCPPipelineFactory(core, config));
 
         try {
-            tcpBootstrap.bind(socketAddress);
+            channel = tcpBootstrap.bind(socketAddress);
             LOG.info("Started TCP syslog server on {}", socketAddress);
         } catch (ChannelException e) {
             LOG.error("Could not bind TCP syslog server to address " + socketAddress, e);
-        }
-    }
-
-    @Override
-    public void stop() {
-        if (bootstrap != null) {
-            bootstrap.shutdown();
         }
     }
 

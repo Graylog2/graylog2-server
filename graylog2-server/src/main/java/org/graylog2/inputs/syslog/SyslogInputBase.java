@@ -30,6 +30,7 @@ import org.graylog2.plugin.configuration.fields.TextField;
 import org.graylog2.plugin.inputs.MessageInput;
 import org.graylog2.plugin.inputs.MisfireException;
 import org.jboss.netty.bootstrap.ConnectionlessBootstrap;
+import org.jboss.netty.channel.Channel;
 
 import java.net.InetSocketAddress;
 import java.util.Map;
@@ -46,10 +47,21 @@ public class SyslogInputBase extends MessageInput {
     public static final String CK_STORE_FULL_MESSAGE = "store_full_message";
 
     protected ConnectionlessBootstrap bootstrap;
+    protected Channel channel;
 
     protected Core core;
     protected Configuration config;
     protected InetSocketAddress socketAddress;
+
+    @Override
+    public void stop() {
+        if (channel != null && channel.isOpen()) {
+            channel.close();
+        }
+        if (bootstrap != null) {
+            bootstrap.shutdown();
+        }
+    }
 
     public void configure(Configuration config, GraylogServer graylogServer) throws ConfigurationException {
         this.core = (Core) graylogServer;
@@ -140,11 +152,6 @@ public class SyslogInputBase extends MessageInput {
 
     @Override
     public void launch() throws MisfireException {
-        throw new RuntimeException("Must be overridden in syslog input classes.");
-    }
-
-    @Override
-    public void stop() {
         throw new RuntimeException("Must be overridden in syslog input classes.");
     }
 

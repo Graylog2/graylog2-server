@@ -23,6 +23,7 @@ import com.beust.jcommander.internal.Lists;
 import com.codahale.metrics.annotation.Timed;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
+import com.mongodb.BasicDBObject;
 import org.bson.types.ObjectId;
 import org.graylog2.database.ValidationException;
 import org.graylog2.inputs.Input;
@@ -35,6 +36,7 @@ import org.graylog2.plugin.configuration.ConfigurationException;
 import org.graylog2.plugin.configuration.fields.ConfigurationField;
 import org.graylog2.rest.resources.RestResource;
 import org.graylog2.rest.resources.system.inputs.requests.InputLaunchRequest;
+import org.graylog2.system.activities.Activity;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 import org.slf4j.Logger;
@@ -172,6 +174,36 @@ public class InputsResource extends RestResource {
         result.put("types", core.inputs().getAvailableInputs());
 
         return json(result);
+    }
+
+    @DELETE
+    @Timed
+    @Path("/{inputId}")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response terminate(@PathParam("inputId") String inputId) {
+        MessageInput input = core.inputs().getRunningInputs().get(inputId);
+
+        String msg = "Attempting to terminate input [" + input.getName()+ "]. Reason: REST request.";
+        LOG.info(msg);
+        core.getActivityWriter().write(new Activity(msg, InputsResource.class));
+
+        if (input == null) {
+            LOG.info("Cannot terminate input. Input not found.");
+            throw new WebApplicationException(404);
+        }
+
+        // Delete in Mongo.
+        Input.destroy(new BasicDBObject("_id", input.getPersistId()), core, Input.COLLECTION);
+
+        // Shutdown actual input.
+        input.stop();
+        core.inputs().getRunningInputs().remove(input.getId());
+
+        String msg2 = "Terminated input [" + input.getName()+ "]. Reason: REST request.";
+        LOG.info(msg2);
+        core.getActivityWriter().write(new Activity(msg2, InputsResource.class));
+
+        return Response.status(Response.Status.ACCEPTED).build();
     }
 
     @GET
