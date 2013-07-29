@@ -193,7 +193,7 @@ public class InputsResource extends RestResource {
         }
 
         // Delete in Mongo.
-        Input.destroy(new BasicDBObject("_id", input.getPersistId()), core, Input.COLLECTION);
+        Input.destroy(new BasicDBObject("_id", new ObjectId(input.getPersistId())), core, Input.COLLECTION);
 
         // Shutdown actual input.
         input.stop();
