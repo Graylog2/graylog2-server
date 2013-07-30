@@ -21,12 +21,15 @@
 */
 package org.graylog2.plugin.inputs;
 
+import com.google.common.collect.Maps;
 import org.graylog2.plugin.GraylogServer;
 import org.graylog2.plugin.configuration.Configuration;
 import org.graylog2.plugin.configuration.ConfigurationException;
 import org.graylog2.plugin.configuration.ConfigurationRequest;
+import org.graylog2.plugin.configuration.fields.TextField;
 import org.joda.time.DateTime;
 
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -91,4 +94,19 @@ public abstract class MessageInput {
         return createdAt;
     }
 
+    public Object getAttributesWithMaskedPasswords() {
+        Map<String, Object> result = Maps.newHashMap();
+        for(Map.Entry<String, Object> attribute : getAttributes().entrySet()) {
+            Object value = attribute.getValue();
+
+            List<String> attributes = (List<String>) getRequestedConfiguration().asList().get(attribute.getKey()).get("attributes");
+            if(attributes.contains(TextField.Attribute.IS_PASSWORD.toString().toLowerCase())) {
+                value = "********";
+            }
+
+            result.put(attribute.getKey(), value);
+        }
+
+        return result;
+    }
 }
