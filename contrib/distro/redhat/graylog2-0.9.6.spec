@@ -31,6 +31,7 @@ rm -rf $RPM_BUILD_ROOT
 %{__install} -p -d -m 0755 %{buildroot}%{_sysconfdir}/%{name}/rules
 %{__install} -p -d -m 0755 %{buildroot}%{_datadir}/%{name}
 %{__install} -p -d -m 0755 %{buildroot}%{_localstatedir}/log/%{name}
+mkdir -p %{buildroot}%{_datadir}/%{name}/plugin/{filters,outputs,alarm_callbacks,transports,initializers};
 
 # Files
 %{__install} -p -D -m 0755 %{SOURCE3} %{buildroot}%{_initrddir}/%{name}
@@ -66,10 +67,17 @@ fi
 %{_initrddir}/%{name}
 %dir %{_datadir}/%{name}
 %{_datadir}/%{name}/%{name}-server.jar
+%dir %{_datadir}/%{name}/plugin/*
+
 %dir %{_localstatedir}/log/%{name}
 
 
 %changelog
+* Mon Jul 29 2012 Timothy Forbes <leprasmurf@gmail.com> - 0.12.0
+- Update to 0.12.0
+- Add graylog2-elasticsearch.yml as a configuration
+- Added empty plugin directories to make server stop complaining
+
 * Mon Feb 6 2012 Daniel Aharon <daharon@sazze.com> - 0.9.6
 - Update to 0.9.6
 - Fix permissions for files/dirs.
