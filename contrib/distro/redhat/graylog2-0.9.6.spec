@@ -11,7 +11,7 @@ Source2:    graylog2.conf
 Source3:    graylog2.init
 BuildRoot:	%(mktemp -ud %{_tmppath}/%{name}-server-%{version}-%{release}-XXXXXX)
 
-Requires:	java-1.6.0-openjdk
+Requires:	jre >= 1.6.0
 
 %description
 Graylog2 is an open source syslog implementation that stores your logs in ElasticSearch. It consists of a server written in Java that accepts your syslog messages via TCP or UDP and stores it in the database. The second part is a Ruby on Rails web interface that allows you to view the log messages.
