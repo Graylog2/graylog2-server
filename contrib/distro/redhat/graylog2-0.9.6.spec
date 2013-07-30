@@ -31,7 +31,7 @@ rm -rf $RPM_BUILD_ROOT
 %{__install} -p -d -m 0755 %{buildroot}%{_sysconfdir}/%{name}/rules
 %{__install} -p -d -m 0755 %{buildroot}%{_datadir}/%{name}
 %{__install} -p -d -m 0755 %{buildroot}%{_localstatedir}/log/%{name}
-mkdir -p %{buildroot}%{_datadir}/%{name}/plugin/{filters,outputs,alarm_callbacks,transports,initializers};
+mkdir -p %{buildroot}%{_datadir}/%{name}/plugin/{inputs,filters,outputs,alarm_callbacks,transports,initializers};
 
 # Files
 %{__install} -p -D -m 0755 %{SOURCE3} %{buildroot}%{_initrddir}/%{name}
