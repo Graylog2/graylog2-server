@@ -76,6 +76,26 @@ public abstract class RequestedConfigurationField {
         return attributes;
     }
 
-    public abstract String getType();
+    public boolean hasAttribute(String attribute) {
+        return attributes.contains(attribute.toLowerCase());
+    }
 
+    public String getAttributesAsJSValidationSpec() {
+        StringBuilder sb = new StringBuilder();
+
+        int i = 0;
+        for (String attribute : attributes) {
+            if (i > 0) {
+                sb.append(" ");
+            }
+
+            sb.append(attributeToJSValidation(attribute));
+            i++;
+        }
+
+        return sb.toString();
+    }
+
+    public abstract String getType();
+    public abstract String attributeToJSValidation(String attribute);
 }

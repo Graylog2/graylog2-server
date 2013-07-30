@@ -36,23 +36,9 @@ import java.util.Map;
  */
 public class InputsController extends AuthenticatedController {
 
-    public static Result index() {
-        BreadcrumbList bc = new BreadcrumbList();
-        bc.addCrumb("System", routes.SystemController.index(0));
-        bc.addCrumb("Inputs", routes.InputsController.index());
-
-        try {
-            return ok(views.html.system.inputs.index.render(currentUser(), bc, Node.all()));
-        } catch (IOException e) {
-            return status(504, views.html.errors.error.render(Api.ERROR_MSG_IO, e, request()));
-        } catch (APIException e) {
-            String message = "Could not fetch nodes. We expected HTTP 200, but got a HTTP " + e.getHttpCode() + ".";
-            return status(504, views.html.errors.error.render(message, e, request()));
-        }
-    }
-
     public static Result manage(String nodeId) {
         // TODO: account field attributes using JS (greater than, listen_address, ...)
+        // TODO: persist inputs
 
         Node node = Node.fromId(nodeId);
 
@@ -63,8 +49,9 @@ public class InputsController extends AuthenticatedController {
 
         BreadcrumbList bc = new BreadcrumbList();
         bc.addCrumb("System", routes.SystemController.index(0));
-        bc.addCrumb("Inputs", routes.InputsController.index());
-        bc.addCrumb(node.getNodeId(), routes.InputsController.manage(node.getNodeId()));
+        bc.addCrumb("Nodes", routes.SystemController.nodes());
+        bc.addCrumb(node.getNodeId(), routes.SystemController.node(node.getNodeId()));
+        bc.addCrumb("Inputs", routes.InputsController.manage(node.getNodeId()));
 
         try {
             return ok(views.html.system.inputs.manage.render(

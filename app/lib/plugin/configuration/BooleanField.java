@@ -37,4 +37,9 @@ public class BooleanField extends RequestedConfigurationField {
         return TYPE;
     }
 
+    @Override
+    public String attributeToJSValidation(String attribute) {
+        throw new RuntimeException("This type does not have any validatable attributes.");
+    }
+
 }

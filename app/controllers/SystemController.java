@@ -83,6 +83,11 @@ public class SystemController extends AuthenticatedController {
         }
     }
 
+    public static Result node(String nodeId) {
+        // TODO
+        return ok("implement me");
+    }
+
     public static Result threadDump(String nodeId) {
         BreadcrumbList bc = new BreadcrumbList();
         bc.addCrumb("System", routes.SystemController.index(0));
