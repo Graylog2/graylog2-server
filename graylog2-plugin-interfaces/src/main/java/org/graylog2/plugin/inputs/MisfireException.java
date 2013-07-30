@@ -26,11 +26,16 @@ package org.graylog2.plugin.inputs;
  */
 public class MisfireException extends Throwable {
 
-    public MisfireException() {
-    }
-
     public MisfireException(String msg) {
         super(msg);
+    }
+
+    public MisfireException(Throwable e) {
+        super(e);
+    }
+
+    public MisfireException(String msg, Throwable e) {
+        super(msg, e);
     }
 
 }

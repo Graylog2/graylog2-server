@@ -67,7 +67,9 @@ public class SyslogUDPInput extends SyslogInputBase {
             channel = bootstrap.bind(socketAddress);
             LOG.info("Started UDP syslog server on {}", socketAddress);
         } catch (ChannelException e) {
-            LOG.error("Could not bind Syslog UDP server to address " + socketAddress, e);
+            String msg = "Could not bind UDP syslog server to address " + socketAddress;
+            LOG.error(msg, e);
+            throw new MisfireException(msg, e);
         }
     }
 

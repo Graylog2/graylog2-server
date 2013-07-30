@@ -139,14 +139,8 @@ public class InputsResource extends RestResource {
             throw new WebApplicationException(Response.Status.BAD_REQUEST);
         }
 
-        // Launch input.
-        String inputId;
-        try {
-            inputId = core.inputs().launch(input);
-        } catch (Exception e) {
-            LOG.error("Could not launch new input.", e);
-            throw new WebApplicationException(e, Response.Status.INTERNAL_SERVER_ERROR);
-        }
+        // Launch input. (this will run async and clean up itself in case of an error.)
+        String inputId = core.inputs().launch(input);
 
         // Persist input.
         ObjectId id;
@@ -192,12 +186,11 @@ public class InputsResource extends RestResource {
             throw new WebApplicationException(404);
         }
 
-        // Delete in Mongo.
-        Input.destroy(new BasicDBObject("_id", new ObjectId(input.getPersistId())), core, Input.COLLECTION);
-
         // Shutdown actual input.
         input.stop();
-        core.inputs().getRunningInputs().remove(input.getId());
+
+        // Remove from list and mongo.
+        core.inputs().cleanInput(input);
 
         String msg2 = "Terminated input [" + input.getName()+ "]. Reason: REST request.";
         LOG.info(msg2);

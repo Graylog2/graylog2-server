@@ -23,6 +23,8 @@ package org.graylog2.inputs;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
+import com.mongodb.BasicDBObject;
+import org.bson.types.ObjectId;
 import org.graylog2.Core;
 import org.graylog2.plugin.inputs.MessageInput;
 import org.graylog2.plugin.inputs.MisfireException;
@@ -75,6 +77,9 @@ public class Inputs {
                             "was accepted but misfired. Reason: " + e.getMessage();
                     core.getActivityWriter().write(new Activity(msg, Inputs.class));
                     LOG.error(msg, e);
+
+                    // Clean up.
+                    cleanInput(input);
                 }
             }
         });
@@ -117,6 +122,14 @@ public class Inputs {
 
     public void register(Class clazz, String name) {
         availableInputs.put(clazz.getCanonicalName(), name);
+    }
+
+    public void cleanInput(MessageInput input) {
+        // Remove from running list.
+        getRunningInputs().remove(input.getId());
+
+        // Remove in Mongo.
+        Input.destroy(new BasicDBObject("_id", new ObjectId(input.getPersistId())), core, Input.COLLECTION);
     }
 
 }
