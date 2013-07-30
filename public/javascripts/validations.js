@@ -2,7 +2,6 @@ function validate(formcontainer) {
     errors = false;
     $(formcontainer + " .validatable").each(function() {
         var validatorTypes = $(this).attr("data-validate").split(" ");
-        console.log(validatorTypes);
         for (var i = 0; i < validatorTypes.length; i++) {
             dispatchRuleValidation($(this), validatorTypes[i]);
         }
