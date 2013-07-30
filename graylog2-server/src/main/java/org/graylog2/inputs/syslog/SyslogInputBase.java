@@ -90,8 +90,7 @@ public class SyslogInputBase extends MessageInput {
                         CK_BIND_ADDRESS,
                         "Bind address",
                         "0.0.0.0",
-                        "Address to listen on. For example 0.0.0.0 or 127.0.0.1.",
-                        TextField.Attribute.IS_SOCKET_ADDRESS
+                        "Address to listen on. For example 0.0.0.0 or 127.0.0.1."
                 )
         );
 

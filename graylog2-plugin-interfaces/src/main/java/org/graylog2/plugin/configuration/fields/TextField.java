@@ -35,8 +35,7 @@ public class TextField implements ConfigurationField {
     public static final String FIELD_TYPE = "text";
 
     public enum Attribute {
-        IS_PASSWORD,
-        IS_SOCKET_ADDRESS
+        IS_PASSWORD
     }
 
     private final String name;

@@ -72,13 +72,8 @@ public class TextFieldTest {
         TextField f = new TextField("test", "Name", "default", "description");
         assertEquals(0, f.getAttributes().size());
 
-        TextField f1 = new TextField("test", "Name", "default", "description", TextField.Attribute.IS_SOCKET_ADDRESS);
+        TextField f1 = new TextField("test", "Name", "default", "description", TextField.Attribute.IS_PASSWORD);
         assertEquals(1, f1.getAttributes().size());
-        assertTrue(f1.getAttributes().contains("is_socket_address"));
-
-        TextField f2 = new TextField("test", "Name", "default", "description", TextField.Attribute.IS_SOCKET_ADDRESS, TextField.Attribute.IS_PASSWORD);
-        assertEquals(2, f2.getAttributes().size());
-        assertTrue(f2.getAttributes().contains("is_socket_address"));
-        assertTrue(f2.getAttributes().contains("is_password"));
+        assertTrue(f1.getAttributes().contains("is_password"));
     }
 }
