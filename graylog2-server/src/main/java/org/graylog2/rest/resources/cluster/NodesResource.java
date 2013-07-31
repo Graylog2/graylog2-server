@@ -82,6 +82,7 @@ public class NodesResource extends RestResource {
         Map<String, Object> m  = Maps.newHashMap();
 
         m.put("node_id", node.getNodeId());
+        m.put("is_master", node.isMaster());
         m.put("hostname", Tools.getLocalCanonicalHostname());
         m.put("transport_address", node.getTransportAddress());
         m.put("last_seen", Tools.getISO8601String(node.getLastSeen()));
