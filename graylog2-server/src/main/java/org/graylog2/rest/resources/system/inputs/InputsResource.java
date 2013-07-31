@@ -67,6 +67,7 @@ public class InputsResource extends RestResource {
         for (MessageInput input : core.inputs().getRunningInputs().values()) {
             Map<String, Object> inputMap = Maps.newHashMap();
 
+            inputMap.put("type", input.getClass().getCanonicalName());
             inputMap.put("input_id", input.getId());
             inputMap.put("persist_id", input.getPersistId());
             inputMap.put("name", input.getName());
