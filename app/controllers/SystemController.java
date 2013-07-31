@@ -67,6 +67,7 @@ public class SystemController extends AuthenticatedController {
 
         try {
             List<ServerJVMStats> serverJvmStats = ServerJVMStats.get();
+            Map<String, Node> nodes = Node.map();
             Map<String, BufferInfo> bufferInfo = Maps.newHashMap();
 
             // Ask every node for buffer info.
@@ -74,7 +75,7 @@ public class SystemController extends AuthenticatedController {
                 bufferInfo.put(node.getNodeId(), BufferInfo.ofNode(node));
             }
 
-            return ok(views.html.system.nodes.render(currentUser(), bc, serverJvmStats, bufferInfo));
+            return ok(views.html.system.nodes.render(currentUser(), bc, serverJvmStats, nodes, bufferInfo));
         } catch (IOException e) {
             return status(504, views.html.errors.error.render(Api.ERROR_MSG_IO, e, request()));
         } catch (APIException e) {

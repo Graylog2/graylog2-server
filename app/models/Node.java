@@ -20,6 +20,7 @@
 package models;
 
 import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
 import lib.APIException;
 import lib.Api;
 import lib.Configuration;
@@ -31,6 +32,7 @@ import play.Logger;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.Map;
 import java.util.Random;
 
 /**
@@ -44,12 +46,14 @@ public class Node {
     private final DateTime lastSeen;
     private final String nodeId;
     private final String hostname;
+    private final boolean isMaster;
 
     public Node(NodeSummaryResponse r) {
         transportAddress = r.transportAddress;
         lastSeen = new DateTime(r.lastSeen);
         nodeId = r.nodeId;
         hostname = r.hostname;
+        isMaster = r.isMaster;
     }
 
     public static Node fromId(String id) {
@@ -77,6 +81,15 @@ public class Node {
         }
 
         return nodes;
+    }
+
+    public static Map<String, Node> map() throws IOException, APIException {
+        Map<String, Node> map = Maps.newHashMap();
+        for (Node node : all()) {
+            map.put(node.getNodeId(), node);
+        }
+
+        return map;
     }
 
     public static Node random() throws IOException, APIException {
@@ -116,6 +129,10 @@ public class Node {
 
     public String getHostname() {
         return hostname;
+    }
+
+    public boolean isMaster() {
+        return isMaster;
     }
 
     /**

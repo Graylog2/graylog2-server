@@ -37,4 +37,7 @@ public class NodeSummaryResponse {
     @SerializedName("transport_address")
     public String transportAddress;
 
+    @SerializedName("is_master")
+    public boolean isMaster;
+
 }
