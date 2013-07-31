@@ -443,3 +443,11 @@ form #stream-rules {
 .input-new {
     margin-bottom: 8px;
 }
+
+.error-bar {
+    margin-bottom: 0px;
+}
+
+.main-error {
+    margin-bottom: 10px;
+}

@@ -35,7 +35,16 @@
 					</form>
 				</div>
 	    	</div>
-	    	
+
+            <div class="row-fluid error-bar">
+            @if(flash.get("error") != null && !flash.get("error").isEmpty()) {
+                <div class="alert alert-error main-error">
+                    <strong>Error!</strong>
+                    <a class="close" data-dismiss="alert" href="#">×</a>@flash.get("error")
+                </div>
+            }
+            </div>
+
 	    	<div class="row-fluid">
 		   		<div class="span8" id="main-content">
 		       		@content

@@ -23,6 +23,7 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import lib.APIException;
 import lib.Api;
+import lib.ExclusiveInputException;
 import models.api.requests.InputLaunchRequest;
 import models.api.responses.EmptyResponse;
 import models.api.responses.system.InputSummaryResponse;
@@ -40,6 +41,7 @@ import java.util.Map;
  */
 public class Input {
 
+    private final String type;
     private final String id;
     private final String persistId;
     private final String name;
@@ -50,6 +52,7 @@ public class Input {
 
     public Input(InputSummaryResponse is) {
         this(
+                is.type,
                 is.inputId,
                 is.persistId,
                 is.name,
@@ -60,7 +63,8 @@ public class Input {
         );
     }
 
-    public Input(String id, String persistId, String name, String title, String startedAt, User creatorUser, Map<String, Object> attributes) {
+    public Input(String type, String id, String persistId, String name, String title, String startedAt, User creatorUser, Map<String, Object> attributes) {
+        this.type = type;
         this.id = id;
         this.persistId = persistId;
         this.name = name;
@@ -97,7 +101,15 @@ public class Input {
         return types;
     }
 
-    public static void launch(Node node, String title, String type, Map<String, Object> configuration, String userId) throws IOException, APIException {
+    public static void launch(Node node, String title, String type, Map<String, Object> configuration, String userId, boolean isExclusive) throws IOException, APIException, ExclusiveInputException {
+        if (isExclusive) {
+            for (Input input : node.getInputs()) {
+                if(input.getType().equals(type)) {
+                    throw new ExclusiveInputException();
+                }
+            }
+        }
+
         InputLaunchRequest request = new InputLaunchRequest();
         request.title = title;
         request.type = type;
@@ -117,6 +129,10 @@ public class Input {
 
     public String getPersistId() {
         return persistId;
+    }
+
+    public String getType() {
+        return type;
     }
 
     public String getName() {

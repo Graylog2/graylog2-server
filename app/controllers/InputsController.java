@@ -23,9 +23,11 @@ import com.google.common.collect.Maps;
 import lib.APIException;
 import lib.Api;
 import lib.BreadcrumbList;
+import lib.ExclusiveInputException;
 import models.Input;
 import models.Node;
 import models.api.responses.system.InputTypeSummaryResponse;
+import play.Logger;
 import play.mvc.Result;
 
 import java.io.IOException;
@@ -110,8 +112,12 @@ public class InputsController extends AuthenticatedController {
                 configuration.put(key, value);
             }
 
-
-            Input.launch(Node.fromId(nodeId), inputTitle, inputType, configuration, currentUser().getId());
+            try {
+                Input.launch(Node.fromId(nodeId), inputTitle, inputType, configuration, currentUser().getId(), inputInfo.isExclusive);
+            } catch (ExclusiveInputException e) {
+                flash("error", "This input is exclusive and already running.");
+                return redirect(routes.InputsController.manage(nodeId));
+            }
 
             return redirect(routes.InputsController.manage(nodeId));
         } catch (IOException e) {
