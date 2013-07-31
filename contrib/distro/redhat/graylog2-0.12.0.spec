@@ -11,7 +11,7 @@ Source2:    graylog2.conf
 Source3:    graylog2.init
 BuildRoot:	%(mktemp -ud %{_tmppath}/%{name}-server-%{version}-%{release}-XXXXXX)
 
-Requires:	java-1.6.0-openjdk
+Requires:	jre >= 1.6.0
 
 %description
 Graylog2 is an open source syslog implementation that stores your logs in ElasticSearch. It consists of a server written in Java that accepts your syslog messages via TCP or UDP and stores it in the database. The second part is a Ruby on Rails web interface that allows you to view the log messages.
@@ -31,6 +31,7 @@ rm -rf $RPM_BUILD_ROOT
 %{__install} -p -d -m 0755 %{buildroot}%{_sysconfdir}/%{name}/rules
 %{__install} -p -d -m 0755 %{buildroot}%{_datadir}/%{name}
 %{__install} -p -d -m 0755 %{buildroot}%{_localstatedir}/log/%{name}
+mkdir -p %{buildroot}%{_datadir}/%{name}/plugin/{inputs,filters,outputs,alarm_callbacks,transports,initializers};
 
 # Files
 %{__install} -p -D -m 0755 %{SOURCE3} %{buildroot}%{_initrddir}/%{name}
@@ -66,10 +67,17 @@ fi
 %{_initrddir}/%{name}
 %dir %{_datadir}/%{name}
 %{_datadir}/%{name}/%{name}-server.jar
+%dir %{_datadir}/%{name}/plugin/*
+
 %dir %{_localstatedir}/log/%{name}
 
 
 %changelog
+* Mon Jul 29 2012 Timothy Forbes <leprasmurf@gmail.com> - 0.12.0
+- Update to 0.12.0
+- Add graylog2-elasticsearch.yml as a configuration
+- Added empty plugin directories to make server stop complaining
+
 * Mon Feb 6 2012 Daniel Aharon <daharon@sazze.com> - 0.9.6
 - Update to 0.9.6
 - Fix permissions for files/dirs.
