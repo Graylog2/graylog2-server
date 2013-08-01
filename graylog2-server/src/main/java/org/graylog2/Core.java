@@ -47,7 +47,6 @@ import org.graylog2.metrics.jetty2.AnyExceptionClassMapper;
 import org.graylog2.metrics.jetty2.MetricsDynamicBinding;
 import org.graylog2.outputs.Outputs;
 import org.graylog2.plugin.GraylogServer;
-import org.graylog2.plugin.Tools;
 import org.graylog2.plugin.alarms.callbacks.AlarmCallback;
 import org.graylog2.plugin.alarms.transports.Transport;
 import org.graylog2.plugin.buffers.Buffer;
@@ -61,6 +60,7 @@ import org.graylog2.plugins.PluginLoader;
 import org.graylog2.security.ShiroSecurityBinding;
 import org.graylog2.security.ShiroSecurityContextFactory;
 import org.graylog2.streams.StreamImpl;
+import org.graylog2.system.NodeId;
 import org.graylog2.system.activities.Activity;
 import org.graylog2.system.activities.ActivityWriter;
 import org.graylog2.system.jobs.SystemJobManager;
@@ -139,7 +139,7 @@ public class Core implements GraylogServer {
 
     private SystemJobManager systemJobManager;
 
-    private String serverId;
+    private String nodeId;
     
     private boolean localMode = false;
     private boolean statsMode = false;
@@ -152,7 +152,9 @@ public class Core implements GraylogServer {
 
     public void initialize(Configuration configuration, MetricRegistry metrics) {
     	startedAt = new DateTime(DateTimeZone.UTC);
-        serverId = Tools.generateServerId();
+
+        NodeId id = new NodeId(configuration.getNodeIdFile());
+        this.nodeId = id.readOrGenerate();
 
         this.metricRegistry = metrics;
         
@@ -242,6 +244,9 @@ public class Core implements GraylogServer {
         // Ramp it all up. (both plugins and built-in types)
         initializers().initialize();
         outputs().initialize();
+
+        // Load persisted inputs.
+        inputs().launchPersisted();
 
         /*
         // Initialize all registered transports.
@@ -465,8 +470,8 @@ public class Core implements GraylogServer {
     }
     
     @Override
-    public String getServerId() {
-        return this.serverId;
+    public String getNodeId() {
+        return this.nodeId;
     }
     
     @Override

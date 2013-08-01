@@ -38,7 +38,7 @@ public interface GraylogServer extends Runnable {
     
     public boolean isMaster();
     
-    public String getServerId();
+    public String getNodeId();
     
     public MessageGateway getMessageGateway();
     

@@ -52,7 +52,7 @@ public class SystemResource extends RestResource {
         Map<String, Object> result = Maps.newHashMap();
         result.put("facility", "graylog2-server");
         result.put("codename", Core.GRAYLOG2_CODENAME);
-        result.put("server_id", core.getServerId());
+        result.put("server_id", core.getNodeId());
        	result.put("version", Core.GRAYLOG2_VERSION);
         result.put("started_at", core.getStartedAt().toString());
 
@@ -118,7 +118,7 @@ public class SystemResource extends RestResource {
         result.put("total_memory", bytesToValueMap(runtime.totalMemory()));
         result.put("used_memory", bytesToValueMap(runtime.totalMemory() - runtime.freeMemory()));
 
-        result.put("node_id", core.getServerId());
+        result.put("node_id", core.getNodeId());
         result.put("pid", Tools.getPID());
         result.put("info", Tools.getSystemInformation());
         result.put("is_processing", core.isProcessing());

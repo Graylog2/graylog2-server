@@ -234,9 +234,7 @@ public final class Tools {
     }
     
     public static String generateServerId() {
-        UUID id = UUID.randomUUID();
-        
-        return getLocalHostname() + "-" + id.toString();
+        return UUID.randomUUID().toString();
     }
     
     public static <T extends Comparable<? super T>> List<T> asSortedList(Collection<T> c) {

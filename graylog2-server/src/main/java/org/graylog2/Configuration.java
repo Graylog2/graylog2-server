@@ -199,6 +199,9 @@ public class Configuration {
     @Parameter(value = "plugin_dir", required = false)
     private String pluginDir = "plugin";
 
+    @Parameter(value = "node_id_file", required = false)
+    private String nodeIdFile = "graylog2-server-node-id";
+
     public boolean isMaster() {
         return isMaster;
     }
@@ -417,6 +420,10 @@ public class Configuration {
 
     public String getPluginDir() {
         return pluginDir;
+    }
+
+    public String getNodeIdFile() {
+        return nodeIdFile;
     }
 
     @ValidatorMethod

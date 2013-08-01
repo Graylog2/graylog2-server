@@ -80,7 +80,7 @@ public abstract class SystemJob {
             put("percent_complete", getProgress());
             put("provides_progress", providesProgress());
             put("is_cancelable", isCancelable());
-            put("node_id", core.getServerId());
+            put("node_id", core.getNodeId());
         }};
     }
 

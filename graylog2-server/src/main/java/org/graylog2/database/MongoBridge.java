@@ -159,7 +159,7 @@ public class MongoBridge {
         obj.put("total", total);
         obj.put("streams", streams);
         obj.put("hosts", hosts);
-        obj.put("server_id", server.getServerId());
+        obj.put("server_id", server.getNodeId());
 
         getConnection().getMessageCountsColl().insert(obj);
     }

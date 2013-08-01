@@ -56,7 +56,7 @@ public class Node extends Persisted {
     public static void register(Core core, boolean isMaster, URI restListenUri) {
         Map<String, Object> fields = Maps.newHashMap();
         fields.put("last_seen", Tools.getUTCTimestamp());
-        fields.put("node_id", core.getServerId());
+        fields.put("node_id", core.getNodeId());
         fields.put("is_master", isMaster);
         fields.put("transport_address", restListenUri.toString());
 
@@ -68,7 +68,7 @@ public class Node extends Persisted {
     }
 
     public static Node thisNode(Core core) throws NodeNotFoundException {
-        DBObject o = findOne(new BasicDBObject("node_id", core.getServerId()), core, COLLECTION);
+        DBObject o = findOne(new BasicDBObject("node_id", core.getNodeId()), core, COLLECTION);
 
         if (o == null || !o.containsField("node_id")) {
             throw new NodeNotFoundException("Did not find our own node. This should never happen.");
@@ -114,7 +114,7 @@ public class Node extends Persisted {
     public boolean isOnlyMaster() {
         BasicDBObject query = new BasicDBObject();
         query.put("last_seen", new BasicDBObject("$gte", Tools.getUTCTimestamp()-PING_TIMEOUT));
-        query.put("node_id", new BasicDBObject("$ne", core.getServerId()));
+        query.put("node_id", new BasicDBObject("$ne", core.getNodeId()));
         query.put("is_master", true);
 
         return query(query, COLLECTION).size() == 0;

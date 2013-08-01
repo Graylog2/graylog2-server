@@ -26,12 +26,16 @@ import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import com.mongodb.BasicDBObject;
 import org.bson.types.ObjectId;
 import org.graylog2.Core;
+import org.graylog2.plugin.configuration.Configuration;
+import org.graylog2.plugin.configuration.ConfigurationException;
 import org.graylog2.plugin.inputs.MessageInput;
 import org.graylog2.plugin.inputs.MisfireException;
 import org.graylog2.system.activities.Activity;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.ws.rs.WebApplicationException;
+import javax.ws.rs.core.Response;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -130,6 +134,27 @@ public class Inputs {
 
         // Remove in Mongo.
         Input.destroy(new BasicDBObject("_id", new ObjectId(input.getPersistId())), core, Input.COLLECTION);
+    }
+
+    public void launchPersisted() {
+        for (Input io : Input.allOfThisNode(core)) {
+            MessageInput input = null;
+            try {
+                input = Inputs.factory(io.getType());
+                input.configure(new Configuration(io.getConfiguration()), core);
+                input.setTitle(io.getTitle());
+                input.setCreatorUserId(io.getCreatorUserId());
+                input.setCreatedAt(io.getCreatedAt());
+            } catch (NoSuchInputTypeException e) {
+                LOG.warn("Cannot launch persisted input. No such type [{}].", io.getType());
+                throw new WebApplicationException(e, Response.Status.NOT_FOUND);
+            } catch (ConfigurationException e) {
+                LOG.error("Missing or invalid input configuration.", e);
+                throw new WebApplicationException(e, Response.Status.BAD_REQUEST);
+            }
+
+            launch(input);
+        }
     }
 
 }

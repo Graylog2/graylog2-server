@@ -62,7 +62,7 @@ public class DeflectorInformationWriterThread implements Runnable {
         i.addIndices(graylogServer.getDeflector().getAllDeflectorIndices());
 
         // Last updated from which node?
-        i.setCallingNode(graylogServer.getServerId());
+        i.setCallingNode(graylogServer.getNodeId());
         
         graylogServer.getMongoBridge().writeDeflectorInformation(i.getAsDatabaseObject());
     }

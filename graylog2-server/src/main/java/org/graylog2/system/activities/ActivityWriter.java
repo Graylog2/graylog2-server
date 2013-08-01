@@ -47,7 +47,7 @@ public class ActivityWriter {
             entry.put("timestamp", Tools.iso8601());
             entry.put("content", activity.getMessage());
             entry.put("caller", activity.getCaller().getCanonicalName());
-            entry.put("node_id", server.getServerId());
+            entry.put("node_id", server.getNodeId());
 
             SystemMessage sm = new SystemMessage(entry, server);
             sm.save();

@@ -126,6 +126,7 @@ public class InputsResource extends RestResource {
         inputData.put("creator_user_id", lr.creatorUserId);
         inputData.put("configuration", lr.configuration);
         inputData.put("created_at", createdAt);
+        inputData.put("node_id", core.getNodeId());
 
         // ... and check if it would pass validation. We don't need to go on if it doesn't.
         Input mongoInput = new Input(core, inputData);
