@@ -144,6 +144,7 @@ public class Inputs {
                 input.configure(new Configuration(io.getConfiguration()), core);
                 input.setTitle(io.getTitle());
                 input.setCreatorUserId(io.getCreatorUserId());
+                input.setPersistId(io.getId().toStringMongod());
                 input.setCreatedAt(io.getCreatedAt());
             } catch (NoSuchInputTypeException e) {
                 LOG.warn("Cannot launch persisted input. No such type [{}].", io.getType());
