@@ -426,7 +426,7 @@ form #stream-rules {
     display: inline;
 }
 
-.input-row-info span {
+.input-row-info .text {
     position: relative;
     top: 3px;
 }
