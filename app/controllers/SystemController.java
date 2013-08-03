@@ -90,13 +90,15 @@ public class SystemController extends AuthenticatedController {
     }
 
     public static Result threadDump(String nodeId) {
-        BreadcrumbList bc = new BreadcrumbList();
-        bc.addCrumb("System", routes.SystemController.index(0));
-        bc.addCrumb("Nodes", routes.SystemController.nodes());
-        bc.addCrumb("Thread dump", routes.SystemController.threadDump(nodeId));
-
         try {
             Node node = Node.fromId(nodeId);
+
+            BreadcrumbList bc = new BreadcrumbList();
+            bc.addCrumb("System", routes.SystemController.index(0));
+            bc.addCrumb("Nodes", routes.SystemController.nodes());
+            bc.addCrumb(node.getShortNodeId(), routes.SystemController.node(node.getNodeId()));
+            bc.addCrumb("Thread dump", routes.SystemController.threadDump(nodeId));
+
             return ok(views.html.system.threaddump.render(currentUser(), bc, node, node.getThreadDump()));
         } catch (IOException e) {
             return status(504, views.html.errors.error.render(Api.ERROR_MSG_IO, e, request()));

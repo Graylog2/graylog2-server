@@ -451,3 +451,11 @@ form #stream-rules {
 .main-error {
     margin-bottom: 10px;
 }
+
+.node-row .node-link {
+    color: #000;
+}
+
+.system-messages a {
+    color: #000;
+}

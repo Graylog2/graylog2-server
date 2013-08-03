@@ -45,6 +45,7 @@ public class Node {
     private final String transportAddress;
     private final DateTime lastSeen;
     private final String nodeId;
+    private final String shortNodeId;
     private final String hostname;
     private final boolean isMaster;
 
@@ -52,6 +53,7 @@ public class Node {
         transportAddress = r.transportAddress;
         lastSeen = new DateTime(r.lastSeen);
         nodeId = r.nodeId;
+        shortNodeId = r.shortNodeId;
         hostname = r.hostname;
         isMaster = r.isMaster;
     }
@@ -125,6 +127,10 @@ public class Node {
 
     public String getNodeId() {
         return nodeId;
+    }
+
+    public String getShortNodeId() {
+        return shortNodeId;
     }
 
     public String getHostname() {

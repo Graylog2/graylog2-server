@@ -52,7 +52,7 @@ public class InputsController extends AuthenticatedController {
         BreadcrumbList bc = new BreadcrumbList();
         bc.addCrumb("System", routes.SystemController.index(0));
         bc.addCrumb("Nodes", routes.SystemController.nodes());
-        bc.addCrumb(node.getNodeId(), routes.SystemController.node(node.getNodeId()));
+        bc.addCrumb(node.getShortNodeId(), routes.SystemController.node(node.getNodeId()));
         bc.addCrumb("Inputs", routes.InputsController.manage(node.getNodeId()));
 
         try {

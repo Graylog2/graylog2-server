@@ -29,7 +29,7 @@
                 @if(jvm.isProcessing) {
                     <span class="sentence">
                         Processing
-                        <strong class="node-throughput" data-node-id="@jvm.getNodeId">9</strong>
+                        <strong class="node-throughput" data-node-id="@jvm.getNodeId">0</strong>
                         messages per second.
                     </span>
                 } else {
@@ -72,7 +72,11 @@
                     <i class="icon icon-star" title="Master Node"></i>
                 }
 
-                @jvm.getNodeId
+                <a href="@routes.SystemController.node(jvm.getNodeId)" class="node-link">
+                    @nodes.get(jvm.getNodeId).getShortNodeId()
+                    /
+                    @nodes.get(jvm.getNodeId).getHostname()
+                </a>
 
                 @if(jvm.isProcessing) {
                     <span class="label label-success">Processing</span>
