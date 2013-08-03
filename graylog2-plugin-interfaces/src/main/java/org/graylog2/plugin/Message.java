@@ -53,7 +53,9 @@ public class Message {
         // Our reserved fields.
         "message",
         "source",
-        "timestamp"
+        "timestamp",
+        "gl2_source_node",
+        "gl2_source_input"
     );
 
     public Message(String message, String source, double timestamp) {

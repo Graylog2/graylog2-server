@@ -54,11 +54,15 @@ public class Searches {
 		this.c = client;
 	}
 	
-	public SearchResult universalSearch(String query, int timerange) {
+	public SearchResult universalSearch(String query, int timerange, int limit) {
+        if (limit == 0) {
+            limit = 150;
+        }
+
 		SearchRequestBuilder srb = c.prepareSearch();
 		srb.setIndices(server.getDeflector().getAllDeflectorIndexNames()); // XXX 020: have a method that builds time ranged index requests
 		srb.setQuery(queryString(query));
-		srb.setSize(150);
+		srb.setSize(limit);
 		srb.setFilter(IndexHelper.getTimestampRangeFilter(timerange));
 		srb.addSort("timestamp", SortOrder.DESC);
 		

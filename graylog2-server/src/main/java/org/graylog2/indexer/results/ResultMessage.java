@@ -36,7 +36,6 @@ public class ResultMessage {
 	 */
 	@SuppressWarnings("unused") public Map<String, Object> message;
 	@SuppressWarnings("unused") public String index;
-	@SuppressWarnings("unused") public String nodeId;
 
 	protected ResultMessage() { /* use factory method */}
 	
@@ -62,10 +61,6 @@ public class ResultMessage {
 	
 	public void setIndex(String index) {
 		this.index = index;
-	}
-	
-	public void setNodeId(String nodeId) {
-		this.nodeId = nodeId;
 	}
 
 }
