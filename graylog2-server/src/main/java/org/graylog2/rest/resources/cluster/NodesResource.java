@@ -87,6 +87,9 @@ public class NodesResource extends RestResource {
         m.put("transport_address", node.getTransportAddress());
         m.put("last_seen", Tools.getISO8601String(node.getLastSeen()));
 
+        // Only meant to be used for representation. Not a real ID.
+        m.put("short_node_id", node.getShortNodeId());
+
         return m;
     }
 }

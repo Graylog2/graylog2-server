@@ -44,6 +44,7 @@ public class Node extends Persisted {
 
     public static final int PING_TIMEOUT = 7; // <3
     private static final String COLLECTION = "nodes";
+    private Object shortNodeId;
 
     protected Node(Core core, Map<String, Object> fields) {
         super(core, fields);
@@ -154,4 +155,9 @@ public class Node extends Persisted {
     protected Map<String, Validator> getValidations() {
         return Maps.newHashMap();
     }
+
+    public String getShortNodeId() {
+        return getNodeId().split("-")[0];
+    }
+
 }
