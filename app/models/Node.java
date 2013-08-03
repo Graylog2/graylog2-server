@@ -113,6 +113,10 @@ public class Node {
         return inputs;
     }
 
+    public Input getInput(String inputId) throws IOException, APIException {
+        return new Input(Api.get(this, "/system/inputs/" + inputId, InputSummaryResponse.class));
+    }
+
     public int numberOfInputs() {
         return inputs().total;
     }

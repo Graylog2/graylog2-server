@@ -6,9 +6,12 @@ import com.google.gson.Gson;
 
 import lib.APIException;
 import lib.Api;
+import models.Input;
 import models.Message;
+import models.Node;
 import models.api.results.MessageAnalyzeResult;
 import models.api.results.MessageResult;
+import play.Logger;
 import play.mvc.*;
 
 public class MessagesController extends AuthenticatedController {
@@ -16,7 +19,25 @@ public class MessagesController extends AuthenticatedController {
 	public static Result asPartial(String index, String id) {
 		try {
 			MessageResult message = Message.get(index, id);
-			return ok(views.html.messages.show_as_partial.render(message));
+
+            Input sourceInput = null;
+            Node sourceNode = null;
+
+            try {
+                sourceNode = Node.fromId(message.getSourceNodeId());
+            } catch(Exception e) {
+                Logger.warn("Could not derive source node from message <" + id + ">.", e);
+            }
+
+            if (sourceNode != null) {
+                try {
+                    sourceInput = sourceNode.getInput(message.getSourceInputId());
+                } catch(Exception e) {
+                    Logger.warn("Could not derive source input from message <" + id + ">.", e);
+                }
+            }
+
+			return ok(views.html.messages.show_as_partial.render(message, sourceInput, sourceNode));
 		} catch (IOException e) {
 			return status(504, views.html.errors.error.render(Api.ERROR_MSG_IO, e, request()));
 		} catch (APIException e) {

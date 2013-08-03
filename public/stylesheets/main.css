@@ -459,3 +459,7 @@ form #stream-rules {
 .system-messages a {
     color: #000;
 }
+
+.xtrc-random-message {
+    margin-top: 3px;
+}

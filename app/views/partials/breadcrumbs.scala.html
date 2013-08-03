@@ -7,11 +7,14 @@
 
     @for(crumb <- crumbs.get()) {
         <li>
-            @if(!crumb.isLast) {
+            @if(!crumb.isLast && crumb.getUrl != null) {
                 <a href="@crumb.getUrl">@crumb.getTitle</a>
-                <span class="divider">/</span>
             } else {
                 @crumb.getTitle
+            }
+
+            @if(!crumb.isLast) {
+                <span class="divider">/</span>
             }
         </li>
     }
