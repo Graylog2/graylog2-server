@@ -64,9 +64,7 @@ public class Inputs {
         availableInputs = Maps.newHashMap();
     }
 
-    public String launch(final MessageInput input) {
-        String id = UUID.randomUUID().toString();
-
+    public String launch(final MessageInput input, String id) {
         input.setId(id);
         runningInputs.put(id, input);
 
@@ -89,6 +87,10 @@ public class Inputs {
         });
 
         return id;
+    }
+
+    public String launch(final MessageInput input) {
+        return launch(input, UUID.randomUUID().toString());
     }
 
     public Map<String, MessageInput> getRunningInputs() {
@@ -154,7 +156,7 @@ public class Inputs {
                 throw new WebApplicationException(e, Response.Status.BAD_REQUEST);
             }
 
-            launch(input);
+            launch(input, io.getInputId());
         }
     }
 

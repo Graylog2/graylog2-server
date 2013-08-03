@@ -72,6 +72,7 @@ public class Input extends Persisted {
     @Override
     protected Map<String, Validator> getValidations() {
         return new HashMap<String, Validator>() {{
+            put("input_id", new FilledStringValidator());
             put("title", new FilledStringValidator());
             put("type", new FilledStringValidator());
             put("configuration", new MapValidator());
@@ -98,6 +99,10 @@ public class Input extends Persisted {
 
     public String getCreatorUserId() {
         return (String) fields.get("creator_user_id");
+    }
+
+    public String getInputId() {
+        return (String) fields.get("input_id");
     }
 
 }
