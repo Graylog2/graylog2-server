@@ -20,6 +20,7 @@
 package controllers;
 
 import com.google.common.collect.Maps;
+import com.google.gson.Gson;
 import lib.APIException;
 import lib.Api;
 import lib.BreadcrumbList;
@@ -133,6 +134,28 @@ public class InputsController extends AuthenticatedController {
             Input.terminate(Node.fromId(nodeId), inputId);
 
             return redirect(routes.InputsController.manage(nodeId));
+        } catch (IOException e) {
+            return status(504, views.html.errors.error.render(Api.ERROR_MSG_IO, e, request()));
+        } catch (APIException e) {
+            String message = "Could not send terminate request. We expected HTTP 202, but got a HTTP " + e.getHttpCode() + ".";
+            return status(504, views.html.errors.error.render(message, e, request()));
+        }
+    }
+
+    public static Result recentMessage(String nodeId, String inputId) {
+        try {
+// XXX REMOVE ME DEBUG
+try {
+    Thread.sleep(1000);
+} catch (InterruptedException e) {
+    e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+}
+
+            Node node = Node.fromId(nodeId);
+            Map<String, Object> result = Maps.newHashMap();
+            result.put("message", node.getInput(inputId).getRecentlyReceivedMessage(nodeId).getFields());
+
+            return ok(new Gson().toJson(result)).as("application/json");
         } catch (IOException e) {
             return status(504, views.html.errors.error.render(Api.ERROR_MSG_IO, e, request()));
         } catch (APIException e) {

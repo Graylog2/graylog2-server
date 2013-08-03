@@ -328,6 +328,29 @@ $(document).ready(function() {
        return false;
     });
 
+    // Extractors: Load random message.
+    $(".xtrc-load-recent").on("click", function() {
+        var container = $(this).parent().parent();
+        var step1 = $(".step1", container);
+        var spinner = "<h2><i class='icon-refresh icon-spin'></i> &nbsp;Loading message</h2>";
+        step1.html(spinner);
+        $.ajax({
+            url: '/a/system/inputs/' + $(this).attr("data-node-id") + '/' + $(this).attr("data-input-id") + '/recent_message',
+            success: function(data) {
+                step1.remove(); // Remove spinner.
+                var fields = $(".xtrc-random-message-fields", container);
+                fields.show();
+                var m = data.message;
+                for(var f in m) {
+                    fields.append("<dt>" + f + "</dt><dd>" + m[f] + "</dd>");
+                }
+            },
+            error: function() {
+                showError("Could not load recent message. Try selecting a message manually.");
+            }
+        });
+    });
+
 	function displayFailureInSidebar(message) {
 		x = "<span class='alert alert-error sidebar-alert'><i class='icon-warning-sign'></i> " + message + "</span>"
 		$("#sidebar-inner").html(x);

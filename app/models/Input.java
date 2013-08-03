@@ -26,15 +26,18 @@ import lib.Api;
 import lib.ExclusiveInputException;
 import models.api.requests.InputLaunchRequest;
 import models.api.responses.EmptyResponse;
+import models.api.responses.MessageSummaryResponse;
 import models.api.responses.system.InputSummaryResponse;
 import models.api.responses.system.InputTypeSummaryResponse;
 import models.api.responses.system.InputTypesResponse;
+import models.api.results.MessageResult;
 import org.joda.time.DateTime;
 import play.Logger;
 
 import java.io.IOException;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
 /**
  * @author Lennart Koopmann <lennart@torch.sh>
@@ -121,6 +124,22 @@ public class Input {
 
     public static void terminate(Node node, String inputId) throws IOException, APIException {
         Api.delete(node, "/system/inputs/" + inputId, 202, EmptyResponse.class);
+    }
+
+    public MessageResult getRecentlyReceivedMessage(String nodeId) throws IOException, APIException {
+        String query = "gl2_source_node:" + nodeId + " AND gl2_source_input:" + id;
+
+        UniversalSearch search = new UniversalSearch(query, 60*60*24);
+        List<MessageSummaryResponse> messages = search.search().getMessages();
+
+        MessageSummaryResponse result;
+        if (messages.size() > 0) {
+            result = messages.get(0);
+        } else {
+            return null;
+        }
+
+        return new MessageResult(result.message, result.index);
     }
 
     public String getId() {

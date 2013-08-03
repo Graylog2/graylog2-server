@@ -41,13 +41,16 @@ GET         /a/messagecounts/total                             controllers.Messa
 GET         /a/analyze/:index/:id/:field                       controllers.MessagesController.analyze(index: String, id: String, field: String)
 
 # API: System
-GET         /a/system/fields                                   controllers.SystemApiController.fields()
-GET         /a/system/jobs                                     controllers.SystemApiController.jobs()
-GET         /a/system/notifications                            controllers.SystemApiController.notifications()
-GET         /a/system/throughput                               controllers.SystemApiController.totalThroughput()
-GET         /a/system/throughput/node/:node_id                 controllers.SystemApiController.nodeThroughput(node_id: String)
-PUT         /a/system/processing/pause                         controllers.SystemApiController.pauseMessageProcessing()
-PUT         /a/system/processing/resume                        controllers.SystemApiController.resumeMessageProcessing()
+GET         /a/system/fields                                        controllers.SystemApiController.fields()
+GET         /a/system/jobs                                          controllers.SystemApiController.jobs()
+GET         /a/system/notifications                                 controllers.SystemApiController.notifications()
+GET         /a/system/throughput                                    controllers.SystemApiController.totalThroughput()
+GET         /a/system/throughput/node/:node_id                      controllers.SystemApiController.nodeThroughput(node_id: String)
+PUT         /a/system/processing/pause                              controllers.SystemApiController.pauseMessageProcessing()
+PUT         /a/system/processing/resume                             controllers.SystemApiController.resumeMessageProcessing()
+
+# API: Inputs
+GET         /a/system/inputs/:node_id/:input_id/recent_message      controllers.InputsController.recentMessage(node_id: String, input_id: String)
 
 # Map static resources from the /public folder to the /assets URL path
 GET         /assets/*file                                      controllers.Assets.at(path="/public", file)

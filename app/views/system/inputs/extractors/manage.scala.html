@@ -23,9 +23,15 @@
         </h2>
 
         <div class="row-fluid xtrc-random-message">
-            Start by loading a random message received by this input so we have an example to work on.
-            <br />
-            <button class="btn btn-info btn-small">Load random message received by this input</button>
+            <div class="step1">
+                Start by loading a message recently received by this input so we have an example to work on.
+                <br />
+                <button class="btn btn-info btn-small xtrc-load-recent" data-node-id="@node.getNodeId" data-input-id="@input.getId">
+                    Load a message recently received by this input
+                </button>
+            </div>
+
+            <dl class="xtrc-random-message-fields" style="display: none;"></dl>
         </div>
     </div>
 
