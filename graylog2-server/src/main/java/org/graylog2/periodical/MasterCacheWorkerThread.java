@@ -22,6 +22,8 @@ package org.graylog2.periodical;
 import com.codahale.metrics.Meter;
 import org.graylog2.Core;
 import org.graylog2.buffers.Cache;
+import org.graylog2.buffers.ProcessBuffer;
+import org.graylog2.plugin.Message;
 import org.graylog2.plugin.buffers.Buffer;
 import org.graylog2.plugin.buffers.BufferOutOfCapacityException;
 import org.slf4j.Logger;
@@ -74,7 +76,8 @@ public class MasterCacheWorkerThread implements Runnable {
                         if (targetBuffer.hasCapacity() && core.isProcessing()) {
                             try {
                                 LOG.debug("Reading message from {}.", cacheName);
-                                targetBuffer.insertFailFast(cache.pop());
+                                Message msg = cache.pop();
+                                targetBuffer.insertFailFast(msg, (String) msg.getField(ProcessBuffer.SOURCE_INPUT_ATTR_NAME));
                                 writtenMessages.mark();
                             } catch (BufferOutOfCapacityException ex) {
                                 outOfCapacity.mark();

@@ -30,9 +30,11 @@ import org.jboss.netty.handler.codec.http.HttpResponseEncoder;
 public class GELFHttpPipelineFactory implements ChannelPipelineFactory {
 
     private final Core graylogServer;
+    private final String sourceInputId;
 
-    public GELFHttpPipelineFactory(Core graylogServer) {
+    public GELFHttpPipelineFactory(Core graylogServer, String sourceInputId) {
         this.graylogServer = graylogServer;
+        this.sourceInputId = sourceInputId;
     }
 
     @Override
@@ -45,7 +47,7 @@ public class GELFHttpPipelineFactory implements ChannelPipelineFactory {
         // only add support for incoming compressed messages, we don't return much (if any) data to the client.
         pipeline.addLast("decompressor", new HttpContentDecompressor());
 
-        pipeline.addLast("handler", new GELFHttpHandler(graylogServer));
+        pipeline.addLast("handler", new GELFHttpHandler(graylogServer, sourceInputId));
 
         return pipeline;
     }

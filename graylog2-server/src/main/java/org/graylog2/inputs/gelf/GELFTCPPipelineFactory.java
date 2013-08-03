@@ -32,17 +32,19 @@ import org.jboss.netty.handler.codec.frame.Delimiters;
  */
 public class GELFTCPPipelineFactory implements ChannelPipelineFactory {
 
-    Core server;
+    private final Core server;
+    private final String sourceInputId;
 
-    public GELFTCPPipelineFactory(Core server) {
+    public GELFTCPPipelineFactory(Core server, String sourceInputId) {
         this.server = server;
+        this.sourceInputId = sourceInputId;
     }
 
     @Override
     public ChannelPipeline getPipeline() throws Exception {
         ChannelPipeline p = Channels.pipeline();
         p.addLast("framer", new DelimiterBasedFrameDecoder(2 * 1024 * 1024, Delimiters.nulDelimiter()));
-        p.addLast("handler", new GELFDispatcher(server));
+        p.addLast("handler", new GELFDispatcher(server, sourceInputId));
         return p;
     }
 

@@ -66,19 +66,20 @@ public final class GELFMessageChunk {
     private int sequenceCount = -1;
     private int arrival = -1;
 
-    final byte[] payload;
+    private final byte[] payload;
+    private final String sourceInputId;
 
-    public GELFMessageChunk(final byte[] payload) {
+    public GELFMessageChunk(final byte[] payload, String sourceInputId) {
         if (payload.length < HEADER_TOTAL_LENGTH) {
             throw new IllegalArgumentException("This GELF message chunk is too short. Cannot even contain the required header.");
         }
         this.payload = payload;
-
+        this.sourceInputId = sourceInputId;
         read();
     }
 
-    public GELFMessageChunk(final GELFMessage msg) {
-        this(msg.getPayload());
+    public GELFMessageChunk(final GELFMessage msg, String sourceInputId) {
+        this(msg.getPayload(), sourceInputId);
     }
 
     public int getArrival() {
@@ -99,6 +100,10 @@ public final class GELFMessageChunk {
 
     public int getSequenceNumber() {
         return this.sequenceNumber;
+    }
+
+    public String getSourceInputId() {
+        return sourceInputId;
     }
 
     private void read() {

@@ -44,14 +44,16 @@ public class GELFDispatcher extends SimpleChannelHandler {
 
     private GELFProcessor processor;
     private Core server;
+    private final String sourceInputId;
 
     private final Meter receivedMessages;
     private final Meter dispatchedChunkedMessages;
     private final Meter dispatchedUnchunkedMessages;
 
-    public GELFDispatcher(Core server) {
+    public GELFDispatcher(Core server, String sourceInputId) {
         this.server = server;
         this.processor = new GELFProcessor(server);
+        this.sourceInputId = sourceInputId;
 
         this.receivedMessages = server.metrics().meter(name(GELFDispatcher.class, "receivedMessages"));
         this.dispatchedChunkedMessages = server.metrics().meter(name(GELFDispatcher.class, "dispatchedChunkedMessages"));
@@ -72,14 +74,14 @@ public class GELFDispatcher extends SimpleChannelHandler {
         switch(msg.getGELFType()) {
         case CHUNKED:
             dispatchedChunkedMessages.mark();
-            server.getGELFChunkManager().insert(msg);
+            server.getGELFChunkManager().insert(msg, sourceInputId);
             break;
         case ZLIB:
         case GZIP:
         case UNCOMPRESSED:
         case UNSUPPORTED:
             dispatchedUnchunkedMessages.mark();
-            processor.messageReceived(msg);
+            processor.messageReceived(msg, sourceInputId);
             break;
         }
     }

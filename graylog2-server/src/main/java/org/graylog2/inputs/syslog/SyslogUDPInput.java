@@ -61,7 +61,7 @@ public class SyslogUDPInput extends SyslogInputBase {
         bootstrap.setOption("receiveBufferSizePredictorFactory", new FixedReceiveBufferSizePredictorFactory(
                 core.getConfiguration().getUdpRecvBufferSizes())
         );
-        bootstrap.setPipelineFactory(new SyslogPipelineFactory(core, config));
+        bootstrap.setPipelineFactory(new SyslogPipelineFactory(core, config, inputId));
 
         try {
             channel = bootstrap.bind(socketAddress);

@@ -46,6 +46,10 @@ public class ProcessBuffer extends Buffer {
 
     private static final Logger LOG = LoggerFactory.getLogger(ProcessBuffer.class);
 
+    public static final String SOURCE_INPUT_ATTR_NAME = "gl2_source_input";
+    public static final String SOURCE_NODE_ATTR_NAME = "gl2_source_node";
+
+
     protected ExecutorService executor = Executors.newCachedThreadPool(
             new ThreadFactoryBuilder()
                 .setNameFormat("processbufferprocessor-%d")
@@ -94,7 +98,10 @@ public class ProcessBuffer extends Buffer {
     }
     
     @Override
-    public void insertCached(Message message) {
+    public void insertCached(Message message, String sourceInputId) {
+        message.addField(SOURCE_INPUT_ATTR_NAME, sourceInputId);
+        message.addField(SOURCE_NODE_ATTR_NAME, server.getNodeId());
+
         if (!server.isProcessing()) {
             LOG.debug("Message processing is paused. Writing to cache.");
             cachedMessages.mark();
@@ -108,12 +115,15 @@ public class ProcessBuffer extends Buffer {
             masterCache.add(message);
             return;
         }
-        
+
         insert(message);
     }
 
     @Override
-    public void insertFailFast(Message message) throws BufferOutOfCapacityException, ProcessingDisabledException {
+    public void insertFailFast(Message message, String sourceInputId) throws BufferOutOfCapacityException, ProcessingDisabledException {
+        message.addField(SOURCE_INPUT_ATTR_NAME, sourceInputId);
+        message.addField(SOURCE_NODE_ATTR_NAME, server.getNodeId());
+
         if (!server.isProcessing()) {
             LOG.debug("Rejecting message, because message processing is paused.");
             throw new ProcessingDisabledException();
@@ -124,7 +134,7 @@ public class ProcessBuffer extends Buffer {
             rejectedMessages.mark();
             throw new BufferOutOfCapacityException();
         }
-        
+
         insert(message);
     }
     

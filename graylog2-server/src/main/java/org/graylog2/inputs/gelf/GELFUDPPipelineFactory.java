@@ -30,15 +30,17 @@ import org.jboss.netty.channel.Channels;
  */
 public class GELFUDPPipelineFactory implements ChannelPipelineFactory {
 
-    Core server;
+    private final Core server;
+    private final String sourceInputId;
 
-    public GELFUDPPipelineFactory(Core server) {
+    public GELFUDPPipelineFactory(Core server, String sourceInputId) {
         this.server = server;
+        this.sourceInputId = sourceInputId;
     }
 
     @Override
     public ChannelPipeline getPipeline() throws Exception {
-        return Channels.pipeline(new GELFDispatcher(server));
+        return Channels.pipeline(new GELFDispatcher(server, sourceInputId));
     }
     
 }

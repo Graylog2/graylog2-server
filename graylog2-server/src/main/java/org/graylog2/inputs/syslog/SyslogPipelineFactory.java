@@ -33,16 +33,18 @@ public class SyslogPipelineFactory implements ChannelPipelineFactory {
 
     private final Core server;
     private final Configuration config;
+    private final String inputId;
 
-    public SyslogPipelineFactory(Core server, Configuration config) {
+    public SyslogPipelineFactory(Core server, Configuration config, String inputId) {
         this.server = server;
         this.config = config;
+        this.inputId = inputId;
     }
 
     @Override
     public ChannelPipeline getPipeline() throws Exception {
         ChannelPipeline p = Channels.pipeline();
-        p.addLast("handler", new SyslogDispatcher(server, config));
+        p.addLast("handler", new SyslogDispatcher(server, config, inputId));
         
         return p;
     }

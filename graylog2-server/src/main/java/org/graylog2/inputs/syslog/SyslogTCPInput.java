@@ -70,7 +70,7 @@ public class SyslogTCPInput extends SyslogInputBase {
                 new NioServerSocketChannelFactory(bossThreadPool, workerThreadPool)
         );
 
-        tcpBootstrap.setPipelineFactory(new SyslogTCPPipelineFactory(core, config));
+        tcpBootstrap.setPipelineFactory(new SyslogTCPPipelineFactory(core, config, inputId));
 
         try {
             channel = tcpBootstrap.bind(socketAddress);

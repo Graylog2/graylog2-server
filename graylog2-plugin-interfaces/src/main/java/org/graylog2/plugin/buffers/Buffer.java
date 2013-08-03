@@ -32,8 +32,8 @@ public abstract class Buffer {
 
     protected static RingBuffer<MessageEvent> ringBuffer;
 
-    public abstract void insertFailFast(Message message) throws BufferOutOfCapacityException, ProcessingDisabledException;
-    public abstract void insertCached(Message message);
+    public abstract void insertFailFast(Message message, String sourceInputId) throws BufferOutOfCapacityException, ProcessingDisabledException;
+    public abstract void insertCached(Message message, String sourceInputId);
 
     public boolean isEmpty() {
         return getUsage() == 0;

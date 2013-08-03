@@ -93,7 +93,7 @@ public class OutputBuffer extends Buffer {
     }
 
     @Override
-    public void insertCached(Message message) {
+    public void insertCached(Message message, String sourceInputId) {
         if (!hasCapacity()) {
             LOG.debug("Out of capacity. Writing to cache.");
             cachedMessages.mark();
@@ -105,7 +105,7 @@ public class OutputBuffer extends Buffer {
     }
 
     @Override
-    public void insertFailFast(Message message) throws BufferOutOfCapacityException {
+    public void insertFailFast(Message message, String sourceInputIds) throws BufferOutOfCapacityException {
         if (!hasCapacity()) {
             LOG.debug("Rejecting message, because I am full and caching was disabled by input. Raise my size or add more processors.");
             rejectedMessages.mark();

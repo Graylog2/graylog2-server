@@ -97,7 +97,7 @@ public class ProcessBufferProcessor implements EventHandler<MessageEvent> {
         }
 
         LOG.debug("Finished processing message. Writing to output buffer.");
-        server.getOutputBuffer().insertCached(msg);
+        server.getOutputBuffer().insertCached(msg, null);
         
         outgoingMessages.mark();
         tcx.stop();
