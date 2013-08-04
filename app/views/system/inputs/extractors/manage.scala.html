@@ -23,15 +23,30 @@
         </h2>
 
         <div class="row-fluid xtrc-random-message">
-            <div class="step1">
-                Start by loading a message recently received by this input so we have an example to work on.
+            <div class="subcontainer">
+                Start by loading a message so we have an example to work on.
                 <br />
-                <button class="btn btn-info btn-small xtrc-load-recent" data-node-id="@node.getNodeId" data-input-id="@input.getId">
+                <button class="btn btn-small xtrc-load-recent" data-node-id="@node.getNodeId" data-input-id="@input.getId">
                     Load a message recently received by this input
+                </button>
+
+                <button class="btn btn-small xtrc-load-manual" data-node-id="@node.getNodeId" data-input-id="@input.getId">
+                    Manually load a message
                 </button>
             </div>
 
-            <dl class="xtrc-random-message-fields" style="display: none;"></dl>
+            <div class="manual-selector" style="display: none;">
+                You can load any message manually using the form below. The <em>message ID</em> and <em>index</em>
+                can be found in the detail view of any message. Make sure that the selected message has the exact
+                same format as those received by this input or you extractor might now match.
+                <form class="form-inline manual-selector-form">
+                    <input type="text" name="message_id" class="input-xlarge" placeholder="Message ID" required="true">
+                    <input type="text" name="index" class="input-medium" placeholder="Index" required="true">
+                    <button type="submit" class="btn manual-selector-load">Load message</button>
+                </form>
+            </div>
+
+            <dl class="xtrc-message-fields" style="display: none;"></dl>
         </div>
     </div>
 

@@ -28,6 +28,7 @@ import lib.ExclusiveInputException;
 import models.Input;
 import models.Node;
 import models.api.responses.system.InputTypeSummaryResponse;
+import models.api.results.MessageResult;
 import play.Logger;
 import play.mvc.Result;
 
@@ -64,10 +65,10 @@ public class InputsController extends AuthenticatedController {
                     Input.getAllTypeInformation(node)
             ));
         } catch (IOException e) {
-            return status(504, views.html.errors.error.render(Api.ERROR_MSG_IO, e, request()));
+            return status(500, views.html.errors.error.render(Api.ERROR_MSG_IO, e, request()));
         } catch (APIException e) {
             String message = "Could not fetch system information. We expected HTTP 200, but got a HTTP " + e.getHttpCode() + ".";
-            return status(504, views.html.errors.error.render(message, e, request()));
+            return status(500, views.html.errors.error.render(message, e, request()));
         }
     }
 
@@ -122,10 +123,10 @@ public class InputsController extends AuthenticatedController {
 
             return redirect(routes.InputsController.manage(nodeId));
         } catch (IOException e) {
-            return status(504, views.html.errors.error.render(Api.ERROR_MSG_IO, e, request()));
+            return status(500, views.html.errors.error.render(Api.ERROR_MSG_IO, e, request()));
         } catch (APIException e) {
             String message = "Could not launch input. We expected HTTP 202, but got a HTTP " + e.getHttpCode() + ".";
-            return status(504, views.html.errors.error.render(message, e, request()));
+            return status(500, views.html.errors.error.render(message, e, request()));
         }
     }
 
@@ -135,16 +136,16 @@ public class InputsController extends AuthenticatedController {
 
             return redirect(routes.InputsController.manage(nodeId));
         } catch (IOException e) {
-            return status(504, views.html.errors.error.render(Api.ERROR_MSG_IO, e, request()));
+            return status(500, views.html.errors.error.render(Api.ERROR_MSG_IO, e, request()));
         } catch (APIException e) {
             String message = "Could not send terminate request. We expected HTTP 202, but got a HTTP " + e.getHttpCode() + ".";
-            return status(504, views.html.errors.error.render(message, e, request()));
+            return status(500, views.html.errors.error.render(message, e, request()));
         }
     }
 
     public static Result recentMessage(String nodeId, String inputId) {
         try {
-// XXX REMOVE ME DEBUG
+// TODO XXX REMOVE ME DEBUG
 try {
     Thread.sleep(1000);
 } catch (InterruptedException e) {
@@ -152,15 +153,20 @@ try {
 }
 
             Node node = Node.fromId(nodeId);
+            MessageResult recentlyReceivedMessage = node.getInput(inputId).getRecentlyReceivedMessage(nodeId);
+
+            if (recentlyReceivedMessage == null) {
+                return notFound();
+            }
+
             Map<String, Object> result = Maps.newHashMap();
-            result.put("message", node.getInput(inputId).getRecentlyReceivedMessage(nodeId).getFields());
+            result.put("message", recentlyReceivedMessage.getFields());
 
             return ok(new Gson().toJson(result)).as("application/json");
         } catch (IOException e) {
-            return status(504, views.html.errors.error.render(Api.ERROR_MSG_IO, e, request()));
+            return status(500);
         } catch (APIException e) {
-            String message = "Could not send terminate request. We expected HTTP 202, but got a HTTP " + e.getHttpCode() + ".";
-            return status(504, views.html.errors.error.render(message, e, request()));
+            return status(e.getHttpCode());
         }
     }
 

@@ -14,7 +14,7 @@ GET         /                                                  controllers.Dashb
 GET         /search                                            controllers.SearchController.index(q ?= "", timerange ?= "", interval ?= "")
 
 # Messages
-GET         /messages/:index/:id/partial                       controllers.MessagesController.asPartial(index: String, id: String)
+GET         /messages/:index/:id/partial                       controllers.MessagesController.singleAsPartial(index: String, id: String)
 
 # Streams
 GET         /streams                                           controllers.StreamsController.index()
@@ -51,6 +51,9 @@ PUT         /a/system/processing/resume                             controllers.
 
 # API: Inputs
 GET         /a/system/inputs/:node_id/:input_id/recent_message      controllers.InputsController.recentMessage(node_id: String, input_id: String)
+
+# API: Messages
+GET         /a/messages/:index/:id                               controllers.MessagesController.single(index: String, id: String)
 
 # Map static resources from the /public folder to the /assets URL path
 GET         /assets/*file                                      controllers.Assets.at(path="/public", file)
