@@ -58,6 +58,16 @@ public class Message {
         "gl2_source_input"
     );
 
+    public static final ImmutableSet<String> RESERVED_SETTABLE_FIELDS = ImmutableSet.of(
+            "gl2_source_node",
+            "gl2_source_input"
+    );
+
+
+    private static final ImmutableSet<String> REQUIRED_FIELDS = ImmutableSet.of(
+            "message", "source", "_id"
+    );
+
     public Message(String message, String source, double timestamp) {
     	// Adding the fields directly because they would not be accepted as a reserved fields.
         fields.put("_id", new com.eaio.uuid.UUID().toString());
@@ -67,11 +77,7 @@ public class Message {
     }
 
     public boolean isComplete() {
-    	final ImmutableSet<String> required = ImmutableSet.of(
-    			"message", "source", "_id"
-        );
-    	
-    	for (String key : required) {
+    	for (String key : REQUIRED_FIELDS) {
     		if (getField(key) == null || ((String) getField(key)).isEmpty()) {
     			return false;
     		}
@@ -138,8 +144,8 @@ public class Message {
     }
     
     public void addField(String key, Object value) {
-        // Don't accept protected keys.
-        if (RESERVED_FIELDS.contains(key)) {
+        // Don't accept protected keys. (some are allowed though lol)
+        if (RESERVED_FIELDS.contains(key) && !RESERVED_SETTABLE_FIELDS.contains(key)) {
             return;
         }
         
