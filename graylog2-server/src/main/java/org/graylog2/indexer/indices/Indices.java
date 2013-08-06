@@ -162,7 +162,7 @@ public class Indices {
     }
 
     public boolean aliasExists(String alias) {
-        return c.admin().indices().existsAliases(new IndicesGetAliasesRequest(alias)).actionGet().exists();
+        return c.admin().indices().aliasesExist(new IndicesGetAliasesRequest(alias)).actionGet().exists();
     }
 
     public String aliasTarget(String alias) {
