@@ -25,6 +25,8 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import org.graylog2.plugin.configuration.fields.ConfigurationField;
+import org.graylog2.plugin.configuration.fields.NumberField;
+import org.graylog2.plugin.configuration.fields.TextField;
 
 import java.util.List;
 import java.util.Map;
@@ -64,6 +66,29 @@ public class ConfigurationRequest {
         }
 
         return configs;
+    }
+
+    public static class Templates {
+
+        public static ConfigurationField bindAddress(String name) {
+            return new TextField(
+                    name,
+                    "Bind address",
+                    "0.0.0.0",
+                    "Address to listen on. For example 0.0.0.0 or 127.0.0.1."
+            );
+        }
+
+        public static ConfigurationField portNumber(String name) {
+            return new NumberField(
+                    name,
+                    "Port",
+                    514,
+                    "Port to listen on.",
+                    NumberField.Attribute.IS_PORT_NUMBER
+            );
+        }
+
     }
 
 }

@@ -74,9 +74,9 @@ public class SyslogTCPInput extends SyslogInputBase {
 
         try {
             channel = tcpBootstrap.bind(socketAddress);
-            LOG.info("Started TCP syslog server on {}", socketAddress);
+            LOG.info("Started syslog TCP input on {}", socketAddress);
         } catch (ChannelException e) {
-            String msg = "Could not bind TCP syslog server to address " + socketAddress;
+            String msg = "Could not bind syslog TCP input to address " + socketAddress;
             LOG.error(msg, e);
             throw new MisfireException(msg, e);
         }
@@ -96,11 +96,6 @@ public class SyslogTCPInput extends SyslogInputBase {
         );
 
         return x;
-    }
-
-    @Override
-    public boolean isExclusive() {
-        return false;
     }
 
     @Override

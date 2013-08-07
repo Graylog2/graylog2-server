@@ -40,6 +40,7 @@ import org.graylog2.initializers.*;
 import org.graylog2.inputs.gelf.GELFTCPInput;
 import org.graylog2.inputs.gelf.GELFUDPInput;
 import org.graylog2.inputs.http.GELFHttpInput;
+import org.graylog2.inputs.raw.RawUDPInput;
 import org.graylog2.inputs.syslog.SyslogTCPInput;
 import org.graylog2.inputs.syslog.SyslogUDPInput;
 import org.graylog2.outputs.ElasticSearchOutput;
@@ -213,6 +214,7 @@ public final class Main {
         // Register standard inputs.
         server.inputs().register(SyslogUDPInput.class, SyslogUDPInput.NAME);
         server.inputs().register(SyslogTCPInput.class, SyslogTCPInput.NAME);
+        server.inputs().register(RawUDPInput.class, RawUDPInput.NAME);
         //server.inputs().register(GELFUDPInput.class, GELFUDPInput.NAME);
         //server.inputs().register(GELFTCPInput.class, GELFTCPInput.NAME);
         //server.inputs().register(GELFHttpInput.class, GELFHttpInput.NAME);

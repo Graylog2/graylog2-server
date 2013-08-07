@@ -1,5 +1,5 @@
 /**
- * Copyright 2012 Lennart Koopmann <lennart@socketfeed.com>
+ * Copyright 2013 Lennart Koopmann <lennart@torch.sh>
  *
  * This file is part of Graylog2.
  *
@@ -17,15 +17,10 @@
  * along with Graylog2.  If not, see <http://www.gnu.org/licenses/>.
  *
  */
+package org.graylog2.inputs.raw;
 
-package org.graylog2.inputs.syslog;
-
-import com.google.common.collect.Maps;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
-import org.graylog2.Core;
-import org.graylog2.plugin.inputs.*;
-import org.graylog2.plugin.configuration.Configuration;
-import org.graylog2.plugin.configuration.ConfigurationException;
+import org.graylog2.plugin.inputs.MisfireException;
 import org.jboss.netty.bootstrap.ConnectionlessBootstrap;
 import org.jboss.netty.channel.ChannelException;
 import org.jboss.netty.channel.FixedReceiveBufferSizePredictorFactory;
@@ -33,27 +28,23 @@ import org.jboss.netty.channel.socket.nio.NioDatagramChannelFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.net.InetSocketAddress;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import org.graylog2.plugin.GraylogServer;
 
 /**
- * @author Lennart Koopmann <lennart@socketfeed.com>
+ * @author Lennart Koopmann <lennart@torch.sh>
  */
-public class SyslogUDPInput extends SyslogInputBase {
+public class RawUDPInput extends RawInputBase {
 
-    private static final Logger LOG = LoggerFactory.getLogger(SyslogUDPInput.class);
+    private static final Logger LOG = LoggerFactory.getLogger(RawUDPInput.class);
 
-    public static final String NAME = "Syslog UDP";
+    public static final String NAME = "Raw/Plaintext UDP";
 
     @Override
     public void launch() throws MisfireException {
         final ExecutorService workerThreadPool = Executors.newCachedThreadPool(
                 new ThreadFactoryBuilder()
-                        .setNameFormat("input-" + inputId + "-syslogudp-worker-%d")
+                        .setNameFormat("input-" + inputId + "-rawudp-worker-%d")
                         .build());
 
         bootstrap = new ConnectionlessBootstrap(new NioDatagramChannelFactory(workerThreadPool));
@@ -61,13 +52,13 @@ public class SyslogUDPInput extends SyslogInputBase {
         bootstrap.setOption("receiveBufferSizePredictorFactory", new FixedReceiveBufferSizePredictorFactory(
                 core.getConfiguration().getUdpRecvBufferSizes())
         );
-        bootstrap.setPipelineFactory(new SyslogPipelineFactory(core, config, inputId));
+        bootstrap.setPipelineFactory(new RawPipelineFactory(core, config, inputId));
 
         try {
             channel = bootstrap.bind(socketAddress);
-            LOG.info("Started syslog UDP input server on {}", socketAddress);
+            LOG.info("Started UDP raw/plaintext input on {}", socketAddress);
         } catch (ChannelException e) {
-            String msg = "Could not bind UDP syslog input to address " + socketAddress;
+            String msg = "Could not bind UDP raw/plaintext input to address " + socketAddress;
             LOG.error(msg, e);
             throw new MisfireException(msg, e);
         }
@@ -77,6 +68,5 @@ public class SyslogUDPInput extends SyslogInputBase {
     public String getName() {
         return NAME;
     }
-
 
 }
