@@ -313,6 +313,11 @@ $(document).ready(function() {
         $('[data-inputtype="' + inputType + '"]').modal();
     });
 
+    // Check input configuration according to provided plugin attribues.
+    $(".launch-input").on("click", function() {
+        return validate('[data-inputtype="' + $(this).attr("data-type") + '"] form');
+    });
+
     // Submit button confirmation.
     $('button[data-confirm]').on("click", function() {
         return confirm($(this).attr("data-confirm"));

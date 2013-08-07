@@ -43,4 +43,18 @@ public class NumberField extends RequestedConfigurationField {
         return TYPE;
     }
 
+    @Override
+    public String attributeToJSValidation(String attribute) {
+        switch (Attribute.valueOf(attribute.toUpperCase())) {
+            case ONLY_NEGATIVE:
+                return "negative_number";
+            case ONLY_POSITIVE:
+                return "positive_number";
+            case IS_PORT_NUMBER:
+                return "port_number";
+            default:
+                throw new RuntimeException("No JS validation for type [" + attribute + "].");
+        }
+    }
+
 }

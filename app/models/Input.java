@@ -25,8 +25,11 @@ import lib.APIException;
 import lib.Api;
 import models.api.requests.InputLaunchRequest;
 import models.api.responses.EmptyResponse;
-import models.api.responses.InputTypeResponse;
-import models.api.responses.InputTypesResponse;
+import models.api.responses.system.InputSummaryResponse;
+import models.api.responses.system.InputTypeSummaryResponse;
+import models.api.responses.system.InputTypesResponse;
+import org.joda.time.DateTime;
+import play.Logger;
 
 import java.io.IOException;
 import java.util.List;
@@ -37,20 +40,57 @@ import java.util.Map;
  */
 public class Input {
 
+    private final String id;
+    private final String persistId;
+    private final String name;
+    private final String title;
+    private final User creatorUser;
+    private final DateTime startedAt;
+    private final Map<String, Object> attributes;
+
+    public Input(InputSummaryResponse is) {
+        this(
+                is.inputId,
+                is.persistId,
+                is.name,
+                is.title,
+                is.startedAt,
+                User.load(is.creatorUserId),
+                is.attributes
+        );
+    }
+
+    public Input(String id, String persistId, String name, String title, String startedAt, User creatorUser, Map<String, Object> attributes) {
+        this.id = id;
+        this.persistId = persistId;
+        this.name = name;
+        this.title = title;
+        this.startedAt = DateTime.parse(startedAt);
+        this.creatorUser = creatorUser;
+        this.attributes = attributes;
+
+        // We might get a double parsed from JSON here. Make sure to round it to Integer. (would be .0 anyways)
+        for (Map.Entry<String, Object> e : attributes.entrySet()) {
+            if (e.getValue() instanceof Double) {
+                attributes.put(e.getKey(), Math.round((Double) e.getValue()));
+            }
+        }
+    }
+
     public static Map<String, String> getTypes(Node node) throws IOException, APIException {
         return Api.get(node, "system/inputs/types", InputTypesResponse.class).types;
     }
 
-    public static InputTypeResponse getTypeInformation(Node node, String type) throws IOException, APIException {
-        return Api.get(node, "system/inputs/types/" + type, InputTypeResponse.class);
+    public static InputTypeSummaryResponse getTypeInformation(Node node, String type) throws IOException, APIException {
+        return Api.get(node, "system/inputs/types/" + type, InputTypeSummaryResponse.class);
     }
 
-    public static Map<String, InputTypeResponse> getAllTypeInformation(Node node) throws IOException, APIException {
-        Map<String, InputTypeResponse> types = Maps.newHashMap();
+    public static Map<String, InputTypeSummaryResponse> getAllTypeInformation(Node node) throws IOException, APIException {
+        Map<String, InputTypeSummaryResponse> types = Maps.newHashMap();
 
-        List<InputTypeResponse> bools = Lists.newArrayList();
+        List<InputTypeSummaryResponse> bools = Lists.newArrayList();
         for (String type : getTypes(node).keySet()) {
-            InputTypeResponse itr = getTypeInformation(node, type);
+            InputTypeSummaryResponse itr = getTypeInformation(node, type);
             types.put(itr.type, itr);
         }
 
@@ -65,6 +105,38 @@ public class Input {
         request.creatorUserId = userId;
 
         Api.post(node, "system/inputs", request, 202, EmptyResponse.class);
+    }
+
+    public static void terminate(Node node, String inputId) throws IOException, APIException {
+        Api.delete(node, "/system/inputs/" + inputId, 202, EmptyResponse.class);
+    }
+
+    public String getId() {
+        return id;
+    }
+
+    public String getPersistId() {
+        return persistId;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public String getTitle() {
+        return title;
+    }
+
+    public User getCreatorUser() {
+        return creatorUser;
+    }
+
+    public DateTime getStartedAt() {
+        return startedAt;
+    }
+
+    public Map<String, Object> getAttributes() {
+        return attributes;
     }
 
 }

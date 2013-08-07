@@ -23,9 +23,11 @@ import com.google.common.collect.Lists;
 import lib.APIException;
 import lib.Api;
 import lib.Configuration;
-import models.api.responses.NodeResponse;
-import models.api.responses.NodeSummaryResponse;
+import models.api.responses.*;
+import models.api.responses.system.InputSummaryResponse;
+import models.api.responses.system.InputsResponse;
 import org.joda.time.DateTime;
+import play.Logger;
 
 import java.io.IOException;
 import java.util.List;
@@ -86,6 +88,20 @@ public class Node {
         return Api.get(this, "/system/threaddump", String.class);
     }
 
+    public List<Input> getInputs() {
+        List<Input> inputs = Lists.newArrayList();
+
+        for (InputSummaryResponse input : inputs().inputs) {
+            inputs.add(new Input(input));
+        }
+
+        return inputs;
+    }
+
+    public int numberOfInputs() {
+        return inputs().total;
+    }
+
     public String getTransportAddress() {
         return transportAddress;
     }
@@ -100,5 +116,19 @@ public class Node {
 
     public String getHostname() {
         return hostname;
+    }
+
+    /**
+     * This swallows all exceptions to allow easy lazy-loading in views without exception handling.
+     *
+     * @return List of running inputs o this node.
+     */
+    private InputsResponse inputs()  {
+        try {
+            return Api.get(this, "/system/inputs", InputsResponse.class);
+        } catch (Exception e) {
+            Logger.error("Could not get inputs.", e);
+            throw new RuntimeException("Could not get inputs.", e);
+        }
     }
 }

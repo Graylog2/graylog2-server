@@ -1,4 +1,5 @@
 @(field: lib.plugin.configuration.RequestedConfigurationField)
+@import lib.plugin.configuration.NumberField
 
 <label>@field.getHumanName</label>
 <span class="help-block">@field.getDescription</span>
@@ -8,4 +9,9 @@
     @if(!field.getDefaultValue().toString().isEmpty()) {
         placeholder="@Math.round(Float.parseFloat(field.getDefaultValue().toString))"
     }
-    class="input-xlarge">
+
+    @if(!field.getAttributes.isEmpty) {
+        data-validate="@field.getAttributesAsJSValidationSpec"
+    }
+
+    class="input-xlarge validatable">

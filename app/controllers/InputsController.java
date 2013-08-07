@@ -23,18 +23,12 @@ import com.google.common.collect.Maps;
 import lib.APIException;
 import lib.Api;
 import lib.BreadcrumbList;
-import lib.plugin.configuration.BooleanField;
-import models.BufferInfo;
 import models.Input;
 import models.Node;
-import models.ServerJVMStats;
-import models.api.responses.InputTypeResponse;
-import play.Logger;
-import play.mvc.Http;
+import models.api.responses.system.InputTypeSummaryResponse;
 import play.mvc.Result;
 
 import java.io.IOException;
-import java.util.List;
 import java.util.Map;
 
 /**
@@ -42,22 +36,10 @@ import java.util.Map;
  */
 public class InputsController extends AuthenticatedController {
 
-    public static Result index() {
-        BreadcrumbList bc = new BreadcrumbList();
-        bc.addCrumb("System", routes.SystemController.index(0));
-        bc.addCrumb("Inputs", routes.InputsController.index());
-
-        try {
-            return ok(views.html.system.inputs.index.render(currentUser(), bc, Node.all()));
-        } catch (IOException e) {
-            return status(504, views.html.errors.error.render(Api.ERROR_MSG_IO, e, request()));
-        } catch (APIException e) {
-            String message = "Could not fetch nodes. We expected HTTP 200, but got a HTTP " + e.getHttpCode() + ".";
-            return status(504, views.html.errors.error.render(message, e, request()));
-        }
-    }
-
     public static Result manage(String nodeId) {
+        // TODO: account field attributes using JS (greater than, listen_address, ...)
+        // TODO: persist inputs
+
         Node node = Node.fromId(nodeId);
 
         if (node == null) {
@@ -67,8 +49,9 @@ public class InputsController extends AuthenticatedController {
 
         BreadcrumbList bc = new BreadcrumbList();
         bc.addCrumb("System", routes.SystemController.index(0));
-        bc.addCrumb("Inputs", routes.InputsController.index());
-        bc.addCrumb(node.getNodeId(), routes.InputsController.manage(node.getNodeId()));
+        bc.addCrumb("Nodes", routes.SystemController.nodes());
+        bc.addCrumb(node.getNodeId(), routes.SystemController.node(node.getNodeId()));
+        bc.addCrumb("Inputs", routes.InputsController.manage(node.getNodeId()));
 
         try {
             return ok(views.html.system.inputs.manage.render(
@@ -93,7 +76,7 @@ public class InputsController extends AuthenticatedController {
         String inputTitle = form.get("title")[0];
 
         try {
-            InputTypeResponse inputInfo = Input.getTypeInformation(Node.fromId(nodeId), inputType);
+            InputTypeSummaryResponse inputInfo = Input.getTypeInformation(Node.fromId(nodeId), inputType);
 
             for (Map.Entry<String, String[]> f : form.entrySet()) {
                 if (!f.getKey().startsWith("configuration_")) {
@@ -134,7 +117,20 @@ public class InputsController extends AuthenticatedController {
         } catch (IOException e) {
             return status(504, views.html.errors.error.render(Api.ERROR_MSG_IO, e, request()));
         } catch (APIException e) {
-            String message = "Could not fetch system information. We expected HTTP 202, but got a HTTP " + e.getHttpCode() + ".";
+            String message = "Could not launch input. We expected HTTP 202, but got a HTTP " + e.getHttpCode() + ".";
+            return status(504, views.html.errors.error.render(message, e, request()));
+        }
+    }
+
+    public static Result terminate(String nodeId, String inputId) {
+        try {
+            Input.terminate(Node.fromId(nodeId), inputId);
+
+            return redirect(routes.InputsController.manage(nodeId));
+        } catch (IOException e) {
+            return status(504, views.html.errors.error.render(Api.ERROR_MSG_IO, e, request()));
+        } catch (APIException e) {
+            String message = "Could not send terminate request. We expected HTTP 202, but got a HTTP " + e.getHttpCode() + ".";
             return status(504, views.html.errors.error.render(message, e, request()));
         }
     }

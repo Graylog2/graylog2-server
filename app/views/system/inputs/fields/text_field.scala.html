@@ -4,8 +4,15 @@
 <span class="help-block">@field.getDescription</span>
 <input name="configuration_@field.getTitle"
     required="@field.isOptional"
-    type="text"
+
+    @if(field.hasAttribute("is_password")) {
+        type="password"
+    } else {
+        type="text"
+    }
+
     @if(!field.getDefaultValue().toString().isEmpty()) {
         placeholder="@field.getDefaultValue()"
     }
+
     class="input-xlarge">

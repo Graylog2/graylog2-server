@@ -17,29 +17,16 @@
  * along with Graylog2.  If not, see <http://www.gnu.org/licenses/>.
  *
  */
-package lib.plugin.configuration;
+package models.api.responses.system;
 
-import java.util.Map;
+import java.util.List;
 
 /**
  * @author Lennart Koopmann <lennart@torch.sh>
  */
-public class BooleanField extends RequestedConfigurationField {
+public class InputsResponse {
 
-    private final static String TYPE = "boolean";
-
-    public BooleanField(Map.Entry<String, Map<String, Object>> c) {
-        super(TYPE, c);
-    }
-
-    @Override
-    public String getType() {
-        return TYPE;
-    }
-
-    @Override
-    public String attributeToJSValidation(String attribute) {
-        throw new RuntimeException("This type does not have any validatable attributes.");
-    }
+    public int total;
+    public List<InputSummaryResponse> inputs;
 
 }
