@@ -460,6 +460,37 @@ form #stream-rules {
     color: #000;
 }
 
-.xtrc-random-message {
-    margin-top: 3px;
+.xtrc-select-message {
+    margin-top: 5px;
+    margin-bottom: 0;
+}
+
+.xtrc-message-fields {
+    margin: 0;
+}
+
+.xtrc-message-fields dt {
+    float: left;
+    padding-right: 5px;
+}
+
+.xtrc-message-fields dd {
+    margin-left: 10px;
+}
+
+.xtrc-message .well {
+    margin-bottom: 5px;
+}
+
+.xtrc-message dt:hover {
+    color: #0085A7;
+    cursor: pointer;
+}
+
+.xtrc-wizard-field {
+    font-style: italic;
+}
+
+.xtrc-new-example {
+    margin-top: 10px;
 }

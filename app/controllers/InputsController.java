@@ -145,13 +145,6 @@ public class InputsController extends AuthenticatedController {
 
     public static Result recentMessage(String nodeId, String inputId) {
         try {
-// TODO XXX REMOVE ME DEBUG
-try {
-    Thread.sleep(1000);
-} catch (InterruptedException e) {
-    e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
-}
-
             Node node = Node.fromId(nodeId);
             MessageResult recentlyReceivedMessage = node.getInput(inputId).getRecentlyReceivedMessage(nodeId);
 
@@ -160,7 +153,8 @@ try {
             }
 
             Map<String, Object> result = Maps.newHashMap();
-            result.put("message", recentlyReceivedMessage.getFields());
+            result.put("id", recentlyReceivedMessage.getId());
+            result.put("fields", recentlyReceivedMessage.getFields());
 
             return ok(new Gson().toJson(result)).as("application/json");
         } catch (IOException e) {

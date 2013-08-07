@@ -10,7 +10,7 @@ $(document).ready(function() {
         $.ajax({
             url: '/a/system/inputs/' + $(this).attr("data-node-id") + '/' + $(this).attr("data-input-id") + '/recent_message',
             success: function(data) {
-                showMessage($(".xtrc-message-fields", container), data.message);
+                showMessage($(".xtrc-message-fields", container), data.fields, data.id);
             },
             error: function() {
                 showError("There was no message received by this input in the last 24 hours. Try selecting a message manually.");
@@ -41,13 +41,13 @@ $(document).ready(function() {
             showSpinner(subcontainer);
             manualSelector.hide();
 
-            var messageId = $("input[name=message_id]", $(this)).val();
-            var index = $("input[name=index]", $(this)).val();
+            var index = $("input[name=message_id]", $(this)).val();
+            var messageId = $("input[name=index]", $(this)).val();
 
             $.ajax({
                 url: '/a/messages/' + index + '/' + messageId,
                 success: function(data) {
-                    showMessage($(".xtrc-message-fields", container), data.message);
+                    showMessage($(".xtrc-message-fields", container), data.fields, data.id);
                 },
                 error: function() {
                     showError("Could not load message. Make sure that ID and index are correct.");
@@ -57,8 +57,6 @@ $(document).ready(function() {
                     hideSpinner(subcontainer);
                 }
             });
-
-
         })
     }
 
@@ -72,11 +70,38 @@ $(document).ready(function() {
         subcontainer.hide();
     }
 
-    function showMessage(dl, msg) {
-        dl.show();
+    function showMessage(dl, msg, msgId) {
+        var msgContainer = dl.parent().parent();
+        msgContainer.show();
+
+        $("h2 span", msgContainer).html(msgId);
+
         for(var f in msg) {
-            dl.append("<dt>" + f + "</dt><dd>" + msg[f] + "</dd>");
+            var field = f;
+            var value = msg[f];
+            dl.append("<dt data-field='" + field + "' data-value='" + value + "'>" + field + "</dt><dd>" + value + "</dd>");
         }
+
+        // Bind links to next step.
+        $("dt", msgContainer).bind("click", function() {
+            var field = $(this).attr("data-field");
+            var value = $(this).attr("data-value");
+
+            showExtractorWizard(field, value);
+            $(".xtrc-select-message").remove();
+
+            var wizard = $(".xtrc-wizard");
+            $(".xtrc-wizard-field", wizard).html(field)
+            $(".xtrc-wizard-example", wizard).html(value);
+
+            $("input[name=field]", wizard).val(field)
+            $("input[name=example]", wizard).val(value);
+            wizard.show();
+        });
+    }
+
+    function showExtractorWizard(field, value) {
+        console.log(field + ": " + value);
     }
 
 });

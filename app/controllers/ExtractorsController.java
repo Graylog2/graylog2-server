@@ -22,6 +22,7 @@ package controllers;
 import lib.APIException;
 import lib.Api;
 import lib.BreadcrumbList;
+import models.Extractor;
 import models.Input;
 import models.Node;
 import play.mvc.Result;
@@ -38,20 +39,51 @@ public class ExtractorsController extends AuthenticatedController {
             Node node = Node.fromId(nodeId);
             Input input = node.getInput(inputId);
 
-            BreadcrumbList bc = new BreadcrumbList();
-            bc.addCrumb("System", routes.SystemController.index(0));
-            bc.addCrumb("Nodes", routes.SystemController.nodes());
-            bc.addCrumb(node.getShortNodeId(), routes.SystemController.node(node.getNodeId()));
-            bc.addCrumb("Input: " + input.getTitle(), null);
-            bc.addCrumb("Extractors", routes.ExtractorsController.manage(nodeId, inputId));
-
-            return ok(views.html.system.inputs.extractors.manage.render(currentUser(), bc, node, input));
+            return ok(views.html.system.inputs.extractors.manage.render(
+                    currentUser(),
+                    standardBreadcrumbs(node, input),
+                    node,
+                    input)
+            );
         } catch (IOException e) {
-            return status(504, views.html.errors.error.render(Api.ERROR_MSG_IO, e, request()));
+            return status(500, views.html.errors.error.render(Api.ERROR_MSG_IO, e, request()));
         } catch (APIException e) {
             String message = "Could not fetch system information. We expected HTTP 200, but got a HTTP " + e.getHttpCode() + ".";
-            return status(504, views.html.errors.error.render(message, e, request()));
+            return status(500, views.html.errors.error.render(message, e, request()));
         }
+    }
+
+    public static Result create(String nodeId, String inputId, String extractorType, String field, String example) {
+        try {
+            Node node = Node.fromId(nodeId);
+            Input input = node.getInput(inputId);
+
+            return ok(views.html.system.inputs.extractors.create.render(
+                    currentUser(),
+                    standardBreadcrumbs(node, input),
+                    node,
+                    input,
+                    Extractor.Type.valueOf(extractorType.toUpperCase()),
+                    field,
+                    example)
+            );
+        } catch (IOException e) {
+            return status(500, views.html.errors.error.render(Api.ERROR_MSG_IO, e, request()));
+        } catch (APIException e) {
+            String message = "Could not fetch system information. We expected HTTP 200, but got a HTTP " + e.getHttpCode() + ".";
+            return status(500, views.html.errors.error.render(message, e, request()));
+        }
+    }
+
+    private static BreadcrumbList standardBreadcrumbs(Node node, Input input) {
+        BreadcrumbList bc = new BreadcrumbList();
+        bc.addCrumb("System", routes.SystemController.index(0));
+        bc.addCrumb("Nodes", routes.SystemController.nodes());
+        bc.addCrumb(node.getShortNodeId(), routes.SystemController.node(node.getNodeId()));
+        bc.addCrumb("Input: " + input.getTitle(), null);
+        bc.addCrumb("Extractors", routes.ExtractorsController.manage(node.getNodeId(), input.getId()));
+
+        return bc;
     }
 
 }

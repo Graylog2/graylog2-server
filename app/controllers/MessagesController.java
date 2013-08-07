@@ -29,7 +29,8 @@ try {
             MessageResult message = Message.get(index, id);
 
             Map<String, Object> result = Maps.newHashMap();
-            result.put("message", message.getFields());
+            result.put("id", message.getId());
+            result.put("fields", message.getFields());
 
             return ok(new Gson().toJson(result)).as("application/json");
         } catch (IOException e) {
