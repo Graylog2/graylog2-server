@@ -15,10 +15,15 @@
             Field: <em>@field</em>
         </h2>
 
+        <span id="xtrc-original-example" style="display: none;">@example</span>
+
         <div class="well well-small xtrc-new-example">
-            <strong>Example:</strong> @example
+            <strong>Example:</strong>
+            <span id="xtrc-example">@example</span>
         </div>
     </div>
+
+    <form action="@routes.ExtractorsController.create(node.getNodeId, input.getId)" method="POST">
 
     <div class="row-fluid">
         @if(extractorType.equals(Extractor.Type.REGEX)) {
@@ -37,4 +42,6 @@
     <div class="row-fluid">
         ... converters ...
     </div>
+
+    </form>
 }

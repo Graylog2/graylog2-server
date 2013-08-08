@@ -70,7 +70,7 @@
                 <span class="xtrc-wizard-example"></span>
             </div>
 
-            <form action="@routes.ExtractorsController.create(node.getNodeId, input.getId)" method="GET">
+            <form action="@routes.ExtractorsController.newExtractor(node.getNodeId, input.getId)" method="GET">
                 <select name="extractor_type">
                     @for(et <- Extractor.Type.values()) {
                         <option value="@et.toString.toLowerCase">@Extractor.typeToHuman(et)</option>

@@ -31,7 +31,8 @@ POST        /system/inputs/:node_id/:input_id/terminate        controllers.Input
 
 # Extractors
 GET         /system/inputs/:node_id/:input_id/extractors       controllers.ExtractorsController.manage(node_id: String, input_id: String)
-GET         /system/inputs/:node_id/:input_id/extractors/new   controllers.ExtractorsController.create(node_id: String, input_id: String, extractor_type ?= "", field ?= "", example ?= "")
+GET         /system/inputs/:node_id/:input_id/extractors/new   controllers.ExtractorsController.newExtractor(node_id: String, input_id: String, extractor_type ?= "", field ?= "", example ?= "")
+POST        /system/inputs/:node_id/:input_id/extractors       controllers.ExtractorsController.create(node_id: String, input_id: String)
 
 # Systemjobs
 POST        /systemjobs/trigger                                controllers.SystemJobsController.trigger()
@@ -57,6 +58,9 @@ GET         /a/system/inputs/:node_id/:input_id/recent_message      controllers.
 
 # API: Messages
 GET         /a/messages/:index/:id                               controllers.MessagesController.single(index: String, id: String)
+
+# API: Tools
+GET         /a/tools/regex_test                                  controllers.ToolsApiController.regexTest(regex ?= "", string ?= "")
 
 # Map static resources from the /public folder to the /assets URL path
 GET         /assets/*file                                      controllers.Assets.at(path="/public", file)

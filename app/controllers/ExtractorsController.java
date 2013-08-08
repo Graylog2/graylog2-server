@@ -53,12 +53,12 @@ public class ExtractorsController extends AuthenticatedController {
         }
     }
 
-    public static Result create(String nodeId, String inputId, String extractorType, String field, String example) {
+    public static Result newExtractor(String nodeId, String inputId, String extractorType, String field, String example) {
         try {
             Node node = Node.fromId(nodeId);
             Input input = node.getInput(inputId);
 
-            return ok(views.html.system.inputs.extractors.create.render(
+            return ok(views.html.system.inputs.extractors.new_extractor.render(
                     currentUser(),
                     standardBreadcrumbs(node, input),
                     node,
@@ -73,6 +73,10 @@ public class ExtractorsController extends AuthenticatedController {
             String message = "Could not fetch system information. We expected HTTP 200, but got a HTTP " + e.getHttpCode() + ".";
             return status(500, views.html.errors.error.render(message, e, request()));
         }
+    }
+
+    public static Result create(String nodeId, String inputId) {
+        return created();
     }
 
     private static BreadcrumbList standardBreadcrumbs(Node node, Input input) {

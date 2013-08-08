@@ -494,3 +494,7 @@ form #stream-rules {
 .xtrc-new-example {
     margin-top: 10px;
 }
+
+.xtrc-hl {
+    background-color: #ff0;
+}
