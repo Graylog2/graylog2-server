@@ -4,44 +4,67 @@
 
     @views.html.partials.breadcrumbs(breadcrumbs)
 
-    <div class="row-fluid">
-        <h1>
-            <i class="icon icon-beaker"></i>
-            New  extractor for input <em>@input.getTitle</em>
-        </h1>
-
-        <h2>
-            Type: <em>@Extractor.typeToHuman(extractorType)</em>,
-            Field: <em>@field</em>
-        </h2>
-
-        <span id="xtrc-original-example" style="display: none;">@example</span>
-
-        <div class="well well-small xtrc-new-example">
-            <strong>Example:</strong>
-            <span id="xtrc-example">@example</span>
-        </div>
-    </div>
-
     <form action="@routes.ExtractorsController.create(node.getNodeId, input.getId)" method="POST">
+        <div class="row-fluid">
+            <h1>
+                <i class="icon icon-beaker"></i>
+                New  extractor for input <em>@input.getTitle</em>
+            </h1>
 
-    <div class="row-fluid">
-        @if(extractorType.equals(Extractor.Type.REGEX)) {
-            @views.html.system.inputs.extractors.configurations.regex()
-        }
+            <h2>
+                Type: <em>@Extractor.typeToHuman(extractorType)</em>,
+                Field: <em>@field</em>
+            </h2>
 
-        @if(extractorType.equals(Extractor.Type.SUBSTRING)) {
-            implement me (type: substring)
-        }
+            <span id="xtrc-original-example" style="display: none;">@example</span>
 
-        @if(extractorType.equals(Extractor.Type.START_END_CHAR)) {
-            implement me (type: start end char)
-        }
-    </div>
+            <div class="well well-small xtrc-new-example">
+                <span id="xtrc-example">@example</span>
+            </div>
 
-    <div class="row-fluid">
-        ... converters ...
-    </div>
 
+            @if(extractorType.equals(Extractor.Type.REGEX)) {
+                @views.html.system.inputs.extractors.configurations.regex()
+            }
+
+            @if(extractorType.equals(Extractor.Type.SUBSTRING)) {
+                implement me (type: substring)
+            }
+
+            @if(extractorType.equals(Extractor.Type.START_END_CHAR)) {
+                implement me (type: start end char)
+            }
+
+            <label for="target_field">Store as field:</label>
+            <input name="target_field" id="target_field" type="text" class="input-xlarge" required />
+            <span class="help-block">Choose a message field name. The extracted value will be stored in it.</span>
+
+            <label class="radio inline">
+                <input type="radio" name="cut_or_copy" value="copy" checked>
+                Copy
+            </label>
+            <label class="radio inline">
+                <input type="radio" name="cut_or_copy" value="cut">
+                Cut
+            </label>
+            <span class="help-block">Do you want to copy or cut from source?</span>
+
+
+            <div id="add-converter-fields">
+                <label for="add-converter">Add converter:</label>
+                <select id="add-converter">
+                    <option value="number">Numeric</option>
+                    <option value="date">Date</option>
+                    <option value="hash">Hash</option>
+                </select>
+                <button class="btn btn-info">Add</button>
+            </div>
+
+            @views.html.system.inputs.extractors.converters.numeric()
+            @views.html.system.inputs.extractors.converters.date()
+            @views.html.system.inputs.extractors.converters.hash()
+
+            <button type="submit" class="btn btn-success" id="create-extractor">Create extractor</button>
+        </div>
     </form>
 }

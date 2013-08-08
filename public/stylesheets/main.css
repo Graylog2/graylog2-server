@@ -492,9 +492,31 @@ form #stream-rules {
 }
 
 .xtrc-new-example {
-    margin-top: 10px;
+    margin-top: 15px;
+    margin-bottom: 12px;
+    font-family: monospace;
+    font-size: 14px;
 }
 
 .xtrc-hl {
-    background-color: #ff0;
+    background-color: #f8b9b7;
+    padding-top: 3px;
+    padding-bottom: 3px;
+}
+
+.xtrc-converter {
+    display: none;
+}
+
+#add-converter-fields button {
+    position: relative;
+    top: -5px;
+}
+
+#create-extractor {
+    margin-top: 5px;
+}
+
+.xtrc-converter-subfield {
+    margin-left: 20px;
 }

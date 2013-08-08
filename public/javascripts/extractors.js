@@ -147,6 +147,14 @@ $(document).ready(function() {
         example.html(exampleContent);
     }
 
+    // Add converter button.
+    $("#add-converter-fields button").on("click", function() {
+        var type = $("#add-converter").val();
+
+        $(".xtrc-converter-" + type).show();
+        return false;
+    });
+
     function showExtractorWizard(field, value) {
         console.log(field + ": " + value);
     }
