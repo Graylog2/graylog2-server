@@ -46,7 +46,17 @@ public class BreadcrumbList {
 
         int i = 0;
         for (Map.Entry<String, Call> e : crumbs.entrySet()) {
-            list.add(new Crumb(e.getValue().url(), e.getKey(), (i == crumbs.size()-1)));
+            boolean isLast = (i == crumbs.size()-1);
+
+            // We can have crumbs without URLs that will not get a link.
+            Crumb crumb;
+            if (e.getValue() == null) {
+                crumb = new Crumb(e.getKey(), isLast);
+            } else {
+                crumb = new Crumb(e.getValue().url(), e.getKey(), isLast);
+            }
+
+            list.add(crumb);
             i++;
         }
 
@@ -61,6 +71,12 @@ public class BreadcrumbList {
 
         public Crumb(String url, String title, boolean isLast) {
             this.url = url;
+            this.title = title;
+            this.isLast = isLast;
+        }
+
+        public Crumb(String title, boolean isLast) {
+            this.url = null;
             this.title = title;
             this.isLast = isLast;
         }

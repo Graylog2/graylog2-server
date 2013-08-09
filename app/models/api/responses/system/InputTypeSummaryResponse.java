@@ -42,7 +42,7 @@ public class InputTypeSummaryResponse {
     public String humanName;
 
     @SerializedName("is_exclusive")
-    public String isExclusive;
+    public boolean isExclusive;
 
     @SerializedName("requested_configuration")
     public Map<String, Map<String, Object>> requestedConfiguration;

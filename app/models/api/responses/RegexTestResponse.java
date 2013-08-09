@@ -19,28 +19,20 @@
  */
 package models.api.responses;
 
-import com.google.gson.annotations.SerializedName;
-
 /**
  * @author Lennart Koopmann <lennart@torch.sh>
  */
-public class NodeSummaryResponse {
+public class RegexTestResponse {
 
-    @SerializedName("node_id")
-    public String nodeId;
+    public String regex;
+    public boolean finds;
+    public String string;
+    public Match match;
 
-    @SerializedName("short_node_id")
-    public String shortNodeId;
-
-    public String hostname;
-
-    @SerializedName("last_seen")
-    public String lastSeen;
-
-    @SerializedName("transport_address")
-    public String transportAddress;
-
-    @SerializedName("is_master")
-    public boolean isMaster;
+    public class Match {
+        public int start;
+        public int end;
+        public String match;
+    }
 
 }

@@ -1,0 +1,15 @@
+<div class="xtrc-converter xtrc-converter-date">
+    <label class="checkbox">
+        <input type="checkbox" value="true" name="converter_date_enable">
+        Convert to date type
+    </label>
+
+    <div class="xtrc-converter-subfield">
+        <label for="converter_date_format">
+            Format string:
+            @views.html.partials.support.bubble("graylog2-web-interface/date-parser-formats")
+        </label>
+        <input name="converter_date_format" id="converter_date_format"
+            type="text" placeholder="yyyy-MM-dd'T'HH:mm:ss.SSSZ" class="input-xlarge" />
+    </div>
+</div>

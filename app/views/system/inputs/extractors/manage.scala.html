@@ -1,0 +1,88 @@
+@(currentUser: User, breadcrumbs: lib.BreadcrumbList, node: Node, input: Input)
+
+@main("Extractors", views.html.system.sidebar(), "", currentUser) {
+
+    @views.html.partials.breadcrumbs(breadcrumbs)
+
+    <div class="row-fluid">
+        <h1>
+            <i class="icon icon-beaker"></i>
+            Extractors of <em>@input.getTitle</em>
+        </h1>
+
+        Extractors are applied on every message that is received by this input. Use them to extract and transform
+        any text data into fields that allow you easy filtering and analysis later on.
+        Example: Extract the HTTP response code from a log message, transform it to a numeric field and attach it
+        as <em>http_response_code</em> to the message.
+    </div>
+
+    <div class="row-fluid">
+        <div class="row-fluid xtrc-select-message">
+            <h2>
+                <i class="icon icon-signin"></i>
+                Add extractor
+            </h2>
+
+            <div class="subcontainer">
+                Start by loading a message so we have an example to work on.
+                <br />
+                <button class="btn btn-small xtrc-load-recent" data-node-id="@node.getNodeId" data-input-id="@input.getId">
+                    Load a message recently received by this input
+                </button>
+
+                <button class="btn btn-small xtrc-load-manual" data-node-id="@node.getNodeId" data-input-id="@input.getId">
+                    Manually load a message
+                </button>
+            </div>
+
+            <div class="manual-selector" style="display: none;">
+                You can load any message manually using the form below. The <em>message ID</em> and <em>index</em>
+                can be found in the detail view of any message. Make sure that the selected message has the exact
+                same format as those received by this input or you extractor might now match.
+                <form class="form-inline manual-selector-form">
+                    <input type="text" name="message_id" class="input-xlarge" placeholder="Message ID" required="true">
+                    <input type="text" name="index" class="input-medium" placeholder="Index" required="true">
+                    <button type="submit" class="btn manual-selector-load">Load message</button>
+                </form>
+            </div>
+
+            <div class="xtrc-message" style="display: none;">
+                <div class="well well-small">
+                    <h2>Message <span></span></h2>
+                    <dl class="xtrc-message-fields">
+                    </dl>
+                </div>
+
+                <strong>Next step:</strong>
+                Select a field you want to apply the extractor on by clicking on it.
+            </div>
+        </div>
+
+        <div class="row-fluid xtrc-wizard" style="display: none;">
+            <h2>
+                <i class="icon icon-signin"></i>
+                Add extractor on field
+                <span class="xtrc-wizard-field"></span>
+            </h2>
+
+            <div class="well well-small">
+                <strong>Example:</strong>
+                <span class="xtrc-wizard-example"></span>
+            </div>
+
+            <form action="@routes.ExtractorsController.newExtractor(node.getNodeId, input.getId)" method="GET">
+                <select name="extractor_type">
+                    @for(et <- Extractor.Type.values()) {
+                        <option value="@et.toString.toLowerCase">@Extractor.typeToHuman(et)</option>
+                    }
+                </select>
+
+                <input type="hidden" name="field" value="" />
+                <input type="hidden" name="example" value="" />
+                <button type="submit" class="btn">Next step</button>
+            </form>
+
+        </div>
+    </div>
+
+}

@@ -17,30 +17,30 @@
  * along with Graylog2.  If not, see <http://www.gnu.org/licenses/>.
  *
  */
-package models.api.responses;
+package models;
 
-import com.google.gson.annotations.SerializedName;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * @author Lennart Koopmann <lennart@torch.sh>
  */
-public class NodeSummaryResponse {
+public class Extractor {
 
-    @SerializedName("node_id")
-    public String nodeId;
+    public enum Type {
+        SUBSTRING,
+        REGEX,
+        START_END_CHAR
+    }
 
-    @SerializedName("short_node_id")
-    public String shortNodeId;
+    private static final Map<Type, String> TYPE_MAPPING = new HashMap<Type, String>() {{
+        put(Type.SUBSTRING, "Substring");
+        put(Type.REGEX, "Regular expression");
+        put(Type.START_END_CHAR, "Start/End character");
+    }};
 
-    public String hostname;
-
-    @SerializedName("last_seen")
-    public String lastSeen;
-
-    @SerializedName("transport_address")
-    public String transportAddress;
-
-    @SerializedName("is_master")
-    public boolean isMaster;
+    public static String typeToHuman(Type type) {
+        return TYPE_MAPPING.get(type);
+    }
 
 }

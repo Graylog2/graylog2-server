@@ -33,4 +33,21 @@ public class Tools {
         return rand.nextInt(max - min + 1) + min;
     }
 
+    public static Object removeTrailingNewline(Object x) {
+        if (x == null) {
+            return x;
+        }
+
+        if (x instanceof String) {
+            String s = (String) x;
+            if (s.endsWith("\n") || s.endsWith("\r")) {
+                return s.substring(0, s.length()-1);
+            } else {
+                return x;
+            }
+        } else {
+            return x;
+        }
+    }
+
 }

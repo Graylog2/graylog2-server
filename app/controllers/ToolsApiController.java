@@ -17,30 +17,35 @@
  * along with Graylog2.  If not, see <http://www.gnu.org/licenses/>.
  *
  */
-package models.api.responses;
+package controllers;
 
-import com.google.gson.annotations.SerializedName;
+import lib.APIException;
+import com.google.gson.Gson;
+import models.Core;
+import models.RegexTest;
+import play.mvc.Result;
+
+import java.io.IOException;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * @author Lennart Koopmann <lennart@torch.sh>
  */
-public class NodeSummaryResponse {
+public class ToolsApiController extends AuthenticatedController {
 
-    @SerializedName("node_id")
-    public String nodeId;
+    public static Result regexTest(String regex, String string) {
+        try {
+;           if (regex.isEmpty() || string.isEmpty()) {
+                return badRequest();
+            }
 
-    @SerializedName("short_node_id")
-    public String shortNodeId;
-
-    public String hostname;
-
-    @SerializedName("last_seen")
-    public String lastSeen;
-
-    @SerializedName("transport_address")
-    public String transportAddress;
-
-    @SerializedName("is_master")
-    public boolean isMaster;
+            return ok(new Gson().toJson(RegexTest.test(regex, string))).as("application/json");
+        } catch (IOException e) {
+            return internalServerError("io exception");
+        } catch (APIException e) {
+            return internalServerError("api exception " + e);
+        }
+    }
 
 }

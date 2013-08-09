@@ -5,7 +5,11 @@
     @views.html.partials.breadcrumbs(breadcrumbs)
 
     <div class="row-fluid">
-        <h1><i class="icon icon-film"></i> Thread dump of @node.getNodeId</h1>
+        <h1>
+            <i class="icon icon-film"></i>
+            Thread dump of @node.getShortNodeId
+            / @node.getHostname
+        </h1>
         Taken at @views.helpers.DateHelper.current().
     </div>
 

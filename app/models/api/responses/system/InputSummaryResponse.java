@@ -28,6 +28,8 @@ import java.util.Map;
  */
 public class InputSummaryResponse {
 
+    public String type;
+
     @SerializedName("input_id")
     public String inputId;
 

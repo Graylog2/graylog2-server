@@ -426,7 +426,7 @@ form #stream-rules {
     display: inline;
 }
 
-.input-row-info span {
+.input-row-info .text {
     position: relative;
     top: 3px;
 }
@@ -442,4 +442,81 @@ form #stream-rules {
 
 .input-new {
     margin-bottom: 8px;
+}
+
+.error-bar {
+    margin-bottom: 0px;
+}
+
+.main-error {
+    margin-bottom: 10px;
+}
+
+.node-row .node-link {
+    color: #000;
+}
+
+.system-messages a {
+    color: #000;
+}
+
+.xtrc-select-message {
+    margin-top: 5px;
+    margin-bottom: 0;
+}
+
+.xtrc-message-fields {
+    margin: 0;
+}
+
+.xtrc-message-fields dt {
+    float: left;
+    padding-right: 5px;
+}
+
+.xtrc-message-fields dd {
+    margin-left: 10px;
+}
+
+.xtrc-message .well {
+    margin-bottom: 5px;
+}
+
+.xtrc-message dt:hover {
+    color: #0085A7;
+    cursor: pointer;
+}
+
+.xtrc-wizard-field {
+    font-style: italic;
+}
+
+.xtrc-new-example {
+    margin-top: 15px;
+    margin-bottom: 12px;
+    font-family: monospace;
+    font-size: 14px;
+}
+
+.xtrc-hl {
+    background-color: #f8b9b7;
+    padding-top: 3px;
+    padding-bottom: 3px;
+}
+
+.xtrc-converter {
+    display: none;
+}
+
+#add-converter-fields button {
+    position: relative;
+    top: -5px;
+}
+
+#create-extractor {
+    margin-top: 5px;
+}
+
+.xtrc-converter-subfield {
+    margin-left: 20px;
 }

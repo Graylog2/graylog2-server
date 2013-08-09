@@ -133,7 +133,11 @@
                 @for(message <- systemMessages) {
                     <tr>
                         <td>@message.getTimestamp</td>
-                        <td>@message.getNodeId</td>
+                        <td>
+                            <a href="@routes.SystemController.node(message.getNodeId)">
+                                @message.getNodeId
+                            </a>
+                        </td>
                         <td>@message.getContent</td>
                     </tr>
                 }

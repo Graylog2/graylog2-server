@@ -3,7 +3,10 @@
 <label>@field.getHumanName</label>
 <span class="help-block">@field.getDescription</span>
 <input name="configuration_@field.getTitle"
-    required="@field.isOptional"
+
+    @if(!field.isOptional) {
+        required
+    }
 
     @if(field.hasAttribute("is_password")) {
         type="password"
@@ -11,7 +14,7 @@
         type="text"
     }
 
-    @if(!field.getDefaultValue().toString().isEmpty()) {
+    @if(field.getDefaultValue() != null && !field.getDefaultValue().toString().isEmpty()) {
         placeholder="@field.getDefaultValue()"
     }
 

@@ -20,12 +20,16 @@
 package controllers;
 
 import com.google.common.collect.Maps;
+import com.google.gson.Gson;
 import lib.APIException;
 import lib.Api;
 import lib.BreadcrumbList;
+import lib.ExclusiveInputException;
 import models.Input;
 import models.Node;
 import models.api.responses.system.InputTypeSummaryResponse;
+import models.api.results.MessageResult;
+import play.Logger;
 import play.mvc.Result;
 
 import java.io.IOException;
@@ -50,7 +54,7 @@ public class InputsController extends AuthenticatedController {
         BreadcrumbList bc = new BreadcrumbList();
         bc.addCrumb("System", routes.SystemController.index(0));
         bc.addCrumb("Nodes", routes.SystemController.nodes());
-        bc.addCrumb(node.getNodeId(), routes.SystemController.node(node.getNodeId()));
+        bc.addCrumb(node.getShortNodeId(), routes.SystemController.node(node.getNodeId()));
         bc.addCrumb("Inputs", routes.InputsController.manage(node.getNodeId()));
 
         try {
@@ -61,10 +65,10 @@ public class InputsController extends AuthenticatedController {
                     Input.getAllTypeInformation(node)
             ));
         } catch (IOException e) {
-            return status(504, views.html.errors.error.render(Api.ERROR_MSG_IO, e, request()));
+            return status(500, views.html.errors.error.render(Api.ERROR_MSG_IO, e, request()));
         } catch (APIException e) {
             String message = "Could not fetch system information. We expected HTTP 200, but got a HTTP " + e.getHttpCode() + ".";
-            return status(504, views.html.errors.error.render(message, e, request()));
+            return status(500, views.html.errors.error.render(message, e, request()));
         }
     }
 
@@ -110,15 +114,19 @@ public class InputsController extends AuthenticatedController {
                 configuration.put(key, value);
             }
 
-
-            Input.launch(Node.fromId(nodeId), inputTitle, inputType, configuration, currentUser().getId());
+            try {
+                Input.launch(Node.fromId(nodeId), inputTitle, inputType, configuration, currentUser().getId(), inputInfo.isExclusive);
+            } catch (ExclusiveInputException e) {
+                flash("error", "This input is exclusive and already running.");
+                return redirect(routes.InputsController.manage(nodeId));
+            }
 
             return redirect(routes.InputsController.manage(nodeId));
         } catch (IOException e) {
-            return status(504, views.html.errors.error.render(Api.ERROR_MSG_IO, e, request()));
+            return status(500, views.html.errors.error.render(Api.ERROR_MSG_IO, e, request()));
         } catch (APIException e) {
             String message = "Could not launch input. We expected HTTP 202, but got a HTTP " + e.getHttpCode() + ".";
-            return status(504, views.html.errors.error.render(message, e, request()));
+            return status(500, views.html.errors.error.render(message, e, request()));
         }
     }
 
@@ -128,10 +136,31 @@ public class InputsController extends AuthenticatedController {
 
             return redirect(routes.InputsController.manage(nodeId));
         } catch (IOException e) {
-            return status(504, views.html.errors.error.render(Api.ERROR_MSG_IO, e, request()));
+            return status(500, views.html.errors.error.render(Api.ERROR_MSG_IO, e, request()));
         } catch (APIException e) {
             String message = "Could not send terminate request. We expected HTTP 202, but got a HTTP " + e.getHttpCode() + ".";
-            return status(504, views.html.errors.error.render(message, e, request()));
+            return status(500, views.html.errors.error.render(message, e, request()));
+        }
+    }
+
+    public static Result recentMessage(String nodeId, String inputId) {
+        try {
+            Node node = Node.fromId(nodeId);
+            MessageResult recentlyReceivedMessage = node.getInput(inputId).getRecentlyReceivedMessage(nodeId);
+
+            if (recentlyReceivedMessage == null) {
+                return notFound();
+            }
+
+            Map<String, Object> result = Maps.newHashMap();
+            result.put("id", recentlyReceivedMessage.getId());
+            result.put("fields", recentlyReceivedMessage.getFields());
+
+            return ok(new Gson().toJson(result)).as("application/json");
+        } catch (IOException e) {
+            return status(500);
+        } catch (APIException e) {
+            return status(e.getHttpCode());
         }
     }
 

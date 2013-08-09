@@ -1,4 +1,4 @@
-@(currentUser: User, breadcrumbs: lib.BreadcrumbList, jvms: List[ServerJVMStats], buffers: Map[String, BufferInfo])
+@(currentUser: User, breadcrumbs: lib.BreadcrumbList, jvms: List[ServerJVMStats], nodes: Map[String, Node], buffers: Map[String, BufferInfo])
 
 @main("Nodes", views.html.system.sidebar(), "", currentUser) {
 
@@ -29,7 +29,7 @@
                 @if(jvm.isProcessing) {
                     <span class="sentence">
                         Processing
-                        <strong class="node-throughput" data-node-id="@jvm.getNodeId">9</strong>
+                        <strong class="node-throughput" data-node-id="@jvm.getNodeId">0</strong>
                         messages per second.
                     </span>
                 } else {
@@ -66,7 +66,17 @@
             </span>
 
             <h3>
-                <i class="icon icon-code-fork"></i> @jvm.getNodeId
+                <i class="icon icon-code-fork"></i>
+
+                @if(nodes.get(jvm.getNodeId).isMaster()) {
+                    <i class="icon icon-star" title="Master Node"></i>
+                }
+
+                <a href="@routes.SystemController.node(jvm.getNodeId)" class="node-link">
+                    @nodes.get(jvm.getNodeId).getShortNodeId()
+                    /
+                    @nodes.get(jvm.getNodeId).getHostname()
+                </a>
 
                 @if(jvm.isProcessing) {
                     <span class="label label-success">Processing</span>

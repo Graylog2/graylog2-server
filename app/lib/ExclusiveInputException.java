@@ -17,30 +17,10 @@
  * along with Graylog2.  If not, see <http://www.gnu.org/licenses/>.
  *
  */
-package models.api.responses;
-
-import com.google.gson.annotations.SerializedName;
+package lib;
 
 /**
  * @author Lennart Koopmann <lennart@torch.sh>
  */
-public class NodeSummaryResponse {
-
-    @SerializedName("node_id")
-    public String nodeId;
-
-    @SerializedName("short_node_id")
-    public String shortNodeId;
-
-    public String hostname;
-
-    @SerializedName("last_seen")
-    public String lastSeen;
-
-    @SerializedName("transport_address")
-    public String transportAddress;
-
-    @SerializedName("is_master")
-    public boolean isMaster;
-
+public class ExclusiveInputException extends Throwable {
 }
