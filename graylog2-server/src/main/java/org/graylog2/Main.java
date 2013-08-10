@@ -32,10 +32,7 @@ import org.apache.commons.io.IOUtils;
 import org.apache.log4j.Level;
 import org.graylog2.cluster.Node;
 import org.graylog2.cluster.NodeNotFoundException;
-import org.graylog2.filters.BlacklistFilter;
-import org.graylog2.filters.RewriteFilter;
-import org.graylog2.filters.StreamMatcherFilter;
-import org.graylog2.filters.TokenizerFilter;
+import org.graylog2.filters.*;
 import org.graylog2.initializers.*;
 import org.graylog2.inputs.gelf.GELFTCPInput;
 import org.graylog2.inputs.gelf.GELFUDPInput;
@@ -235,7 +232,8 @@ public final class Main {
         if (commandLineArguments.isStats()) { server.initializers().register(new StatisticsPrinterInitializer()); }
         server.initializers().register(new MasterCacheWorkersInitializer());
 
-        // Register message filters.
+        // Register message filters. (Order is important here)
+        server.registerFilter(new ExtractorFilter());
         server.registerFilter(new BlacklistFilter());
         if (configuration.isEnableTokenizerFilter()) { server.registerFilter(new TokenizerFilter()); }
         server.registerFilter(new StreamMatcherFilter());

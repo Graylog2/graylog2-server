@@ -101,7 +101,7 @@ public class GELFMessageTest {
         byte[] data = TestHelper.gzipCompress(GELF_JSON);
 
         GELFMessage msg = new GELFMessage(TestHelper.buildGELFMessageChunk(id, seqNum, seqCnt, data));
-        GELFMessageChunk chunk = new GELFMessageChunk(msg, "test");
+        GELFMessageChunk chunk = new GELFMessageChunk(msg, null);
         
         assertEquals(TestHelper.toHex(id), chunk.getId());
         assertEquals(seqNum, chunk.getSequenceNumber());

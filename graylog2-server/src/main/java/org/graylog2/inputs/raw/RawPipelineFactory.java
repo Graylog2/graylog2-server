@@ -21,6 +21,7 @@ package org.graylog2.inputs.raw;
 
 import org.graylog2.Core;
 import org.graylog2.plugin.configuration.Configuration;
+import org.graylog2.plugin.inputs.MessageInput;
 import org.jboss.netty.channel.ChannelPipeline;
 import org.jboss.netty.channel.ChannelPipelineFactory;
 import org.jboss.netty.channel.Channels;
@@ -32,18 +33,18 @@ public class RawPipelineFactory implements ChannelPipelineFactory {
 
     private final Core server;
     private final Configuration config;
-    private final String inputId;
+    private final MessageInput sourceInput;
 
-    public RawPipelineFactory(Core server, Configuration config, String inputId) {
+    public RawPipelineFactory(Core server, Configuration config, MessageInput sourceInput) {
         this.server = server;
         this.config = config;
-        this.inputId = inputId;
+        this.sourceInput = sourceInput;
     }
 
     @Override
     public ChannelPipeline getPipeline() throws Exception {
         ChannelPipeline p = Channels.pipeline();
-        p.addLast("handler", new RawDispatcher(server, config, inputId));
+        p.addLast("handler", new RawDispatcher(server, config, sourceInput));
 
         return p;
     }

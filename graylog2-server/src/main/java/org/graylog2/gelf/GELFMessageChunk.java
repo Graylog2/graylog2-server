@@ -20,6 +20,8 @@
 
 package org.graylog2.gelf;
 
+import org.graylog2.plugin.inputs.MessageInput;
+
 /**
  * @author Lennart Koopmann <lennart@socketfeed.com>
  */
@@ -67,19 +69,19 @@ public final class GELFMessageChunk {
     private int arrival = -1;
 
     private final byte[] payload;
-    private final String sourceInputId;
+    private final MessageInput sourceInput;
 
-    public GELFMessageChunk(final byte[] payload, String sourceInputId) {
+    public GELFMessageChunk(final byte[] payload, MessageInput sourceInput) {
         if (payload.length < HEADER_TOTAL_LENGTH) {
             throw new IllegalArgumentException("This GELF message chunk is too short. Cannot even contain the required header.");
         }
         this.payload = payload;
-        this.sourceInputId = sourceInputId;
+        this.sourceInput = sourceInput;
         read();
     }
 
-    public GELFMessageChunk(final GELFMessage msg, String sourceInputId) {
-        this(msg.getPayload(), sourceInputId);
+    public GELFMessageChunk(final GELFMessage msg, MessageInput sourceInput) {
+        this(msg.getPayload(), sourceInput);
     }
 
     public int getArrival() {
@@ -102,8 +104,8 @@ public final class GELFMessageChunk {
         return this.sequenceNumber;
     }
 
-    public String getSourceInputId() {
-        return sourceInputId;
+    public MessageInput getSourceInput() {
+        return sourceInput;
     }
 
     private void read() {

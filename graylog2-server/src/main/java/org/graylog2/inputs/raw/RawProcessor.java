@@ -26,6 +26,7 @@ import org.graylog2.plugin.Message;
 import org.graylog2.plugin.Tools;
 import org.graylog2.plugin.buffers.BufferOutOfCapacityException;
 import org.graylog2.plugin.configuration.Configuration;
+import org.graylog2.plugin.inputs.MessageInput;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -60,7 +61,7 @@ public class RawProcessor {
         this.parseTime = server.metrics().timer(name(RawProcessor.class, "parseTime"));
     }
 
-    public void messageReceived(String msg, InetAddress remoteAddress, String sourceInputId) throws BufferOutOfCapacityException {
+    public void messageReceived(String msg, InetAddress remoteAddress, MessageInput sourceInput) throws BufferOutOfCapacityException {
         incomingMessages.mark();
 
         // Convert to LogMessage
@@ -82,7 +83,7 @@ public class RawProcessor {
         // Add to process buffer.
         LOG.debug("Adding received raw message <{}> to process buffer: {}", lm.getId(), lm);
         processedMessages.mark();
-        server.getProcessBuffer().insertCached(lm, sourceInputId);
+        server.getProcessBuffer().insertCached(lm, sourceInput);
     }
 
     private String parseSource(String msg, InetAddress remoteAddress) {

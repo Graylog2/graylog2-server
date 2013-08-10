@@ -38,7 +38,7 @@ public class GELFMessageChunkTest {
         int seqCnt = 4;
         byte[] data = TestHelper.gzipCompress(GELF_JSON);
 
-        return new GELFMessageChunk(TestHelper.buildGELFMessageChunk(id, seqNum, seqCnt, data), "test");
+        return new GELFMessageChunk(TestHelper.buildGELFMessageChunk(id, seqNum, seqCnt, data), null);
     }
     
     @Test

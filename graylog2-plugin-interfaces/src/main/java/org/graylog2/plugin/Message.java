@@ -24,6 +24,8 @@ import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import java.util.Collections;
+
+import org.graylog2.plugin.inputs.MessageInput;
 import org.graylog2.plugin.streams.Stream;
 
 import java.util.List;
@@ -36,10 +38,12 @@ public class Message {
 	
     private Map<String, Object> fields = Maps.newHashMap();
     private List<Stream> streams = Lists.newArrayList();
-    
+
+    private MessageInput sourceInput;
+
     // Used for drools to filter out messages.
     private boolean filterOut = false;
-    
+
     public static final ImmutableSet<String> RESERVED_FIELDS = ImmutableSet.of(
         // ElasticSearch fields.
         "_id",
@@ -62,7 +66,6 @@ public class Message {
             "gl2_source_node",
             "gl2_source_input"
     );
-
 
     private static final ImmutableSet<String> REQUIRED_FIELDS = ImmutableSet.of(
             "message", "source", "_id"
@@ -186,6 +189,14 @@ public class Message {
     
     public boolean getFilterOut() {
         return this.filterOut;
+    }
+
+    public MessageInput getSourceInput() {
+        return sourceInput;
+    }
+
+    public void setSourceInput(MessageInput input) {
+        this.sourceInput = input;
     }
 
 }

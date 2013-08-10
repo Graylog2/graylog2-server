@@ -67,7 +67,7 @@ public class ProcessBufferProcessor implements EventHandler<MessageEvent> {
         if ((sequence % numberOfConsumers) != ordinal) {
             return;
         }
-        
+
         server.processBufferWatermark().decrementAndGet();
         
         incomingMessages.mark();

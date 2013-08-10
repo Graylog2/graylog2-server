@@ -21,6 +21,7 @@
 package org.graylog2.inputs.gelf;
 
 import org.graylog2.Core;
+import org.graylog2.plugin.inputs.MessageInput;
 import org.jboss.netty.channel.ChannelPipeline;
 import org.jboss.netty.channel.ChannelPipelineFactory;
 import org.jboss.netty.channel.Channels;
@@ -33,18 +34,18 @@ import org.jboss.netty.handler.codec.frame.Delimiters;
 public class GELFTCPPipelineFactory implements ChannelPipelineFactory {
 
     private final Core server;
-    private final String sourceInputId;
+    private final MessageInput sourceInput;
 
-    public GELFTCPPipelineFactory(Core server, String sourceInputId) {
+    public GELFTCPPipelineFactory(Core server, MessageInput sourceInput) {
         this.server = server;
-        this.sourceInputId = sourceInputId;
+        this.sourceInput = sourceInput;
     }
 
     @Override
     public ChannelPipeline getPipeline() throws Exception {
         ChannelPipeline p = Channels.pipeline();
         p.addLast("framer", new DelimiterBasedFrameDecoder(2 * 1024 * 1024, Delimiters.nulDelimiter()));
-        p.addLast("handler", new GELFDispatcher(server, sourceInputId));
+        p.addLast("handler", new GELFDispatcher(server, sourceInput));
         return p;
     }
 

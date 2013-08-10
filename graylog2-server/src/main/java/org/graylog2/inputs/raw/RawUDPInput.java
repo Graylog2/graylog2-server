@@ -52,7 +52,7 @@ public class RawUDPInput extends RawInputBase {
         bootstrap.setOption("receiveBufferSizePredictorFactory", new FixedReceiveBufferSizePredictorFactory(
                 core.getConfiguration().getUdpRecvBufferSizes())
         );
-        bootstrap.setPipelineFactory(new RawPipelineFactory(core, config, inputId));
+        bootstrap.setPipelineFactory(new RawPipelineFactory(core, config, this));
 
         try {
             channel = bootstrap.bind(socketAddress);

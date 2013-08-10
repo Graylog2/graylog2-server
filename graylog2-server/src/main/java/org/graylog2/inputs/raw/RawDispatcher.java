@@ -23,6 +23,7 @@ import com.codahale.metrics.Meter;
 import org.graylog2.Core;
 import org.graylog2.inputs.syslog.SyslogProcessor;
 import org.graylog2.plugin.configuration.Configuration;
+import org.graylog2.plugin.inputs.MessageInput;
 import org.jboss.netty.buffer.ChannelBuffer;
 import org.jboss.netty.channel.ChannelHandlerContext;
 import org.jboss.netty.channel.ExceptionEvent;
@@ -44,11 +45,11 @@ public class RawDispatcher extends SimpleChannelHandler {
 
     private final RawProcessor processor;
     private final Meter receivedMessages;
-    private final String inputId;
+    private final MessageInput sourceInput;
 
-    public RawDispatcher(Core server, Configuration config, String inputId) {
+    public RawDispatcher(Core server, Configuration config, MessageInput sourceInput) {
         this.processor = new RawProcessor(server, config);
-        this.inputId = inputId;
+        this.sourceInput = sourceInput;
 
         this.receivedMessages = server.metrics().meter(name(RawDispatcher.class, "receivedMessages"));
     }
@@ -64,7 +65,7 @@ public class RawDispatcher extends SimpleChannelHandler {
         byte[] readable = new byte[buffer.readableBytes()];
         buffer.toByteBuffer().get(readable, buffer.readerIndex(), buffer.readableBytes());
 
-        this.processor.messageReceived(new String(readable), remoteAddress.getAddress(), inputId);
+        this.processor.messageReceived(new String(readable), remoteAddress.getAddress(), sourceInput);
     }
 
     @Override

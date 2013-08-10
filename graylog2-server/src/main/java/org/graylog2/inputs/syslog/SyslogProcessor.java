@@ -23,6 +23,7 @@ package org.graylog2.inputs.syslog;
 import com.codahale.metrics.Meter;
 import com.codahale.metrics.Timer;
 import org.graylog2.plugin.configuration.Configuration;
+import org.graylog2.plugin.inputs.MessageInput;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.graylog2.Core;
@@ -70,7 +71,7 @@ public class SyslogProcessor {
         this.syslogParsedTime = server.metrics().timer(name(SyslogProcessor.class, "syslogParsedTime"));
     }
 
-    public void messageReceived(String msg, InetAddress remoteAddress, String sourceInputId) throws BufferOutOfCapacityException {
+    public void messageReceived(String msg, InetAddress remoteAddress, MessageInput sourceInput) throws BufferOutOfCapacityException {
         incomingMessages.mark();
 
         // Convert to LogMessage
@@ -92,7 +93,7 @@ public class SyslogProcessor {
         // Add to process buffer.
         LOG.debug("Adding received syslog message <{}> to process buffer: {}", lm.getId(), lm);
         processedMessages.mark();
-        server.getProcessBuffer().insertCached(lm, sourceInputId);
+        server.getProcessBuffer().insertCached(lm, sourceInput);
     }
 
     private Message parse(String msg, InetAddress remoteAddress) throws UnknownHostException {

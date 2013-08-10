@@ -43,8 +43,8 @@ public class GELFProcessorTest {
         GraylogServerStub serverStub = new GraylogServerStub();
         GELFProcessor processor = new GELFProcessor(serverStub);
 
-        processor.messageReceived(new GELFMessage(TestHelper.zlibCompress(GELF_JSON_COMPLETE)), "test");
-        processor.messageReceived(new GELFMessage(TestHelper.gzipCompress(GELF_JSON_COMPLETE)), "test");
+        processor.messageReceived(new GELFMessage(TestHelper.zlibCompress(GELF_JSON_COMPLETE)), null);
+        processor.messageReceived(new GELFMessage(TestHelper.gzipCompress(GELF_JSON_COMPLETE)), null);
         // All GELF types are tested in GELFMessageTest.
 
         Message lm = serverStub.lastInsertedToProcessBuffer;
@@ -68,7 +68,7 @@ public class GELFProcessorTest {
         GraylogServerStub serverStub = new GraylogServerStub();
         GELFProcessor processor = new GELFProcessor(serverStub);
 
-        processor.messageReceived(new GELFMessage(TestHelper.zlibCompress(GELF_JSON_INCOMPLETE)), "test");
+        processor.messageReceived(new GELFMessage(TestHelper.zlibCompress(GELF_JSON_INCOMPLETE)), null);
         // All GELF types are tested in GELFMessageTest.
 
         Message lm = serverStub.lastInsertedToProcessBuffer;
@@ -82,7 +82,7 @@ public class GELFProcessorTest {
         GraylogServerStub serverStub = new GraylogServerStub();
         GELFProcessor processor = new GELFProcessor(serverStub);
 
-        processor.messageReceived(new GELFMessage(TestHelper.zlibCompress(GELF_JSON_INCOMPLETE_WITH_ID)), "test");
+        processor.messageReceived(new GELFMessage(TestHelper.zlibCompress(GELF_JSON_INCOMPLETE_WITH_ID)), null);
         // All GELF types are tested in GELFMessageTest.
 
         Message lm = serverStub.lastInsertedToProcessBuffer;
@@ -98,7 +98,7 @@ public class GELFProcessorTest {
         GraylogServerStub serverStub = new GraylogServerStub();
         GELFProcessor processor = new GELFProcessor(serverStub);
 
-        processor.messageReceived(new GELFMessage(TestHelper.zlibCompress(GELF_JSON_WITH_MAP)), "test");
+        processor.messageReceived(new GELFMessage(TestHelper.zlibCompress(GELF_JSON_WITH_MAP)), null);
         // All GELF types are tested in GELFMessageTest.
 
         Message lm = serverStub.lastInsertedToProcessBuffer;

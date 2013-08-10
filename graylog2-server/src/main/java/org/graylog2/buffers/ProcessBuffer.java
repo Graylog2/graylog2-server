@@ -30,6 +30,7 @@ import org.graylog2.plugin.buffers.Buffer;
 import org.graylog2.plugin.Message;
 import org.graylog2.plugin.buffers.MessageEvent;
 import org.graylog2.plugin.buffers.ProcessingDisabledException;
+import org.graylog2.plugin.inputs.MessageInput;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -48,7 +49,6 @@ public class ProcessBuffer extends Buffer {
 
     public static final String SOURCE_INPUT_ATTR_NAME = "gl2_source_input";
     public static final String SOURCE_NODE_ATTR_NAME = "gl2_source_node";
-
 
     protected ExecutorService executor = Executors.newCachedThreadPool(
             new ThreadFactoryBuilder()
@@ -98,8 +98,10 @@ public class ProcessBuffer extends Buffer {
     }
     
     @Override
-    public void insertCached(Message message, String sourceInputId) {
-        message.addField(SOURCE_INPUT_ATTR_NAME, sourceInputId);
+    public void insertCached(Message message, MessageInput sourceInput) {
+        message.setSourceInput(sourceInput);
+
+        message.addField(SOURCE_INPUT_ATTR_NAME, sourceInput.getId());
         message.addField(SOURCE_NODE_ATTR_NAME, server.getNodeId());
 
         if (!server.isProcessing()) {
@@ -120,8 +122,10 @@ public class ProcessBuffer extends Buffer {
     }
 
     @Override
-    public void insertFailFast(Message message, String sourceInputId) throws BufferOutOfCapacityException, ProcessingDisabledException {
-        message.addField(SOURCE_INPUT_ATTR_NAME, sourceInputId);
+    public void insertFailFast(Message message, MessageInput sourceInput) throws BufferOutOfCapacityException, ProcessingDisabledException {
+        message.setSourceInput(sourceInput);
+
+        message.addField(SOURCE_INPUT_ATTR_NAME, sourceInput.getId());
         message.addField(SOURCE_NODE_ATTR_NAME, server.getNodeId());
 
         if (!server.isProcessing()) {

@@ -38,8 +38,8 @@ public class GELFChunkManagerTest {
         GELFChunkManager mgr = new GELFChunkManager(server);
  
         String msgId = "lolwat67";
-        mgr.insert(new GELFMessageChunk(TestHelper.buildGELFMessageChunk(msgId, 0, 3, new byte[1]), "test"));
-        mgr.insert(new GELFMessageChunk(TestHelper.buildGELFMessageChunk(msgId, 1, 3, new byte[1]), "test"));
+        mgr.insert(new GELFMessageChunk(TestHelper.buildGELFMessageChunk(msgId, 0, 3, new byte[1]), null));
+        mgr.insert(new GELFMessageChunk(TestHelper.buildGELFMessageChunk(msgId, 1, 3, new byte[1]), null));
         
         assertFalse(mgr.isComplete(TestHelper.toHex(msgId)));
     }
@@ -49,9 +49,9 @@ public class GELFChunkManagerTest {
         GELFChunkManager mgr = new GELFChunkManager(server);
  
         String msgId = "foobar00";
-        mgr.insert(new GELFMessageChunk(TestHelper.buildGELFMessageChunk(msgId, 0, 3, new byte[1]), "test"));
-        mgr.insert(new GELFMessageChunk(TestHelper.buildGELFMessageChunk(msgId, 2, 3, new byte[1]), "test"));
-        mgr.insert(new GELFMessageChunk(TestHelper.buildGELFMessageChunk(msgId, 1, 3, new byte[1]), "test"));
+        mgr.insert(new GELFMessageChunk(TestHelper.buildGELFMessageChunk(msgId, 0, 3, new byte[1]), null));
+        mgr.insert(new GELFMessageChunk(TestHelper.buildGELFMessageChunk(msgId, 2, 3, new byte[1]), null));
+        mgr.insert(new GELFMessageChunk(TestHelper.buildGELFMessageChunk(msgId, 1, 3, new byte[1]), null));
         
         assertTrue(mgr.isComplete(TestHelper.toHex(msgId)));
     }
@@ -67,8 +67,8 @@ public class GELFChunkManagerTest {
         GELFChunkManager mgr = new GELFChunkManager(server);
  
         String msgId = "lolwat67";
-        mgr.insert(new GELFMessageChunk(TestHelper.buildGELFMessageChunk(msgId, 0, 3, new byte[1]), "test"));
-        mgr.insert(new GELFMessageChunk(TestHelper.buildGELFMessageChunk(msgId, 1, 3, new byte[1]), "test"));
+        mgr.insert(new GELFMessageChunk(TestHelper.buildGELFMessageChunk(msgId, 0, 3, new byte[1]), null));
+        mgr.insert(new GELFMessageChunk(TestHelper.buildGELFMessageChunk(msgId, 1, 3, new byte[1]), null));
         
         try { Thread.sleep((GELFChunkManager.SECONDS_VALID+1)*1000); } catch (InterruptedException e) { /* trololol */ }
         
@@ -80,8 +80,8 @@ public class GELFChunkManagerTest {
         GELFChunkManager mgr = new GELFChunkManager(server);
  
         String msgId = "lolwat67";
-        mgr.insert(new GELFMessageChunk(TestHelper.buildGELFMessageChunk(msgId, 0, 3, new byte[1]), "test"));
-        mgr.insert(new GELFMessageChunk(TestHelper.buildGELFMessageChunk(msgId, 1, 3, new byte[1]), "test"));
+        mgr.insert(new GELFMessageChunk(TestHelper.buildGELFMessageChunk(msgId, 0, 3, new byte[1]), null));
+        mgr.insert(new GELFMessageChunk(TestHelper.buildGELFMessageChunk(msgId, 1, 3, new byte[1]), null));
         
         try { Thread.sleep((GELFChunkManager.SECONDS_VALID-2)*1000); } catch (InterruptedException e) { /* trololol */ }
         
@@ -99,10 +99,10 @@ public class GELFChunkManagerTest {
         GELFChunkManager mgr = new GELFChunkManager(server);
  
         String msgId = "foobaz11";
-        mgr.insert(new GELFMessageChunk(TestHelper.buildGELFMessageChunk(msgId, 0, 2, new byte[1]), "test"));
+        mgr.insert(new GELFMessageChunk(TestHelper.buildGELFMessageChunk(msgId, 0, 2, new byte[1]),null));
         
-        mgr.insert(new GELFMessageChunk(TestHelper.buildGELFMessageChunk("lollol99", 1, 3, new byte[1]), "test"));
-        mgr.insert(new GELFMessageChunk(TestHelper.buildGELFMessageChunk("lollol99", 0, 3, new byte[1]), "test"));
+        mgr.insert(new GELFMessageChunk(TestHelper.buildGELFMessageChunk("lollol99", 1, 3, new byte[1]), null));
+        mgr.insert(new GELFMessageChunk(TestHelper.buildGELFMessageChunk("lollol99", 0, 3, new byte[1]), null));
         
         mgr.dropMessage(TestHelper.toHex(msgId));
         assertFalse(mgr.hasMessage(TestHelper.toHex(msgId)));
@@ -112,8 +112,8 @@ public class GELFChunkManagerTest {
     public void testDropMessageWithNotExistingMessage() throws Exception {
         GELFChunkManager mgr = new GELFChunkManager(server);
  
-        mgr.insert(new GELFMessageChunk(TestHelper.buildGELFMessageChunk("lollol99", 1, 3, new byte[1]), "test"));
-        mgr.insert(new GELFMessageChunk(TestHelper.buildGELFMessageChunk("lollol99", 0, 3, new byte[1]), "test"));
+        mgr.insert(new GELFMessageChunk(TestHelper.buildGELFMessageChunk("lollol99", 1, 3, new byte[1]), null));
+        mgr.insert(new GELFMessageChunk(TestHelper.buildGELFMessageChunk("lollol99", 0, 3, new byte[1]), null));
         
         mgr.dropMessage(TestHelper.toHex("something"));
         assertFalse(mgr.hasMessage(TestHelper.toHex("something")));
@@ -137,12 +137,12 @@ public class GELFChunkManagerTest {
         byte[] expected = Bytes.concat(b12, b3);
         
         String msgId = "foobar00";
-        mgr.insert(new GELFMessageChunk(TestHelper.buildGELFMessageChunk(msgId, 0, 3, b1), "test"));
-        mgr.insert(new GELFMessageChunk(TestHelper.buildGELFMessageChunk(msgId, 1, 3, b2), "test"));
-        mgr.insert(new GELFMessageChunk(TestHelper.buildGELFMessageChunk(msgId, 2, 3, b3), "test"));
+        mgr.insert(new GELFMessageChunk(TestHelper.buildGELFMessageChunk(msgId, 0, 3, b1), null));
+        mgr.insert(new GELFMessageChunk(TestHelper.buildGELFMessageChunk(msgId, 1, 3, b2), null));
+        mgr.insert(new GELFMessageChunk(TestHelper.buildGELFMessageChunk(msgId, 2, 3, b3), null));
         
         // And another message, to confuse stuff.
-        mgr.insert(new GELFMessageChunk(TestHelper.buildGELFMessageChunk("hahahaha", 2, 3, b1), "test"));
+        mgr.insert(new GELFMessageChunk(TestHelper.buildGELFMessageChunk("hahahaha", 2, 3, b1), null));
         
         assertArrayEquals(expected, mgr.chunksToByteArray(TestHelper.toHex(msgId)));
     }
@@ -155,7 +155,7 @@ public class GELFChunkManagerTest {
         
         assertFalse(mgr.hasMessage(TestHelper.toHex(msgId)));
         
-        mgr.insert(new GELFMessageChunk(TestHelper.buildGELFMessageChunk(msgId, 0, 3, new byte[1]), "test"));
+        mgr.insert(new GELFMessageChunk(TestHelper.buildGELFMessageChunk(msgId, 0, 3, new byte[1]), null));
 
         assertTrue(mgr.hasMessage(TestHelper.toHex(msgId)));
     }
@@ -163,7 +163,7 @@ public class GELFChunkManagerTest {
     @Test
     public void testHumanReadableChunkMap() throws Exception {
         GELFChunkManager mgr = new GELFChunkManager(server);
-        mgr.insert(new GELFMessageChunk(TestHelper.buildGELFMessageChunk("ohaithar", 0, 3, new byte[1]), "test"));
+        mgr.insert(new GELFMessageChunk(TestHelper.buildGELFMessageChunk("ohaithar", 0, 3, new byte[1]), null));
         mgr.humanReadableChunkMap();
     }
     
