@@ -19,15 +19,19 @@
  */
 package controllers;
 
+import com.google.common.collect.Maps;
+import com.google.gson.Gson;
 import lib.APIException;
 import lib.Api;
 import lib.BreadcrumbList;
 import models.Extractor;
 import models.Input;
 import models.Node;
+import play.Logger;
 import play.mvc.Result;
 
 import java.io.IOException;
+import java.util.Map;
 
 /**
  * @author Lennart Koopmann <lennart@torch.sh>
@@ -76,7 +80,37 @@ public class ExtractorsController extends AuthenticatedController {
     }
 
     public static Result create(String nodeId, String inputId) {
-        return created();
+        Map<String, String[]> form = request().body().asFormUrlEncoded();
+        Extractor.Type extractorType = Extractor.Type.valueOf(form.get("extractor_type")[0].toUpperCase());
+        Node node = Node.fromId(nodeId);
+
+        Extractor extractor;
+        try {
+            try {
+                extractor = new Extractor(
+                        Extractor.CursorStrategy.valueOf(form.get("cut_or_copy")[0].toUpperCase()),
+                        form.get("source_field")[0],
+                        form.get("target_field")[0],
+                        extractorType,
+                        currentUser(),
+                        node.getInput(inputId)
+                );
+            } catch (NullPointerException e) {
+                Logger.error("Cannot build extractor configuration.", e);
+                return badRequest();
+            }
+
+            extractor.loadConfigFromForm(extractorType, form);
+            extractor.loadConvertersFromForm(form);
+            extractor.create(node);
+        } catch (IOException e) {
+            return status(500, views.html.errors.error.render(Api.ERROR_MSG_IO, e, request()));
+        } catch (APIException e) {
+            String message = "Could not create extractor! We expected HTTP 200, but got a HTTP " + e.getHttpCode() + ".";
+            return status(500, views.html.errors.error.render(message, e, request()));
+        }
+
+        return ok(new Gson().toJson(form));
     }
 
     private static BreadcrumbList standardBreadcrumbs(Node node, Input input) {

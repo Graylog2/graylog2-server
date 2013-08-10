@@ -17,22 +17,10 @@
  * along with Graylog2.  If not, see <http://www.gnu.org/licenses/>.
  *
  */
-package models.api.responses;
+package models;
 
 /**
  * @author Lennart Koopmann <lennart@torch.sh>
  */
-public class RegexTestResponse {
-
-    public String regex;
-    public boolean matched;
-    public String string;
-    public Match match;
-
-    public class Match {
-        public int start;
-        public int end;
-        public String match;
-    }
-
+public class Converter {
 }

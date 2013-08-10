@@ -24,7 +24,7 @@ import com.google.gson.Gson;
 /**
  * @author Lennart Koopmann <lennart@torch.sh>
  */
-public abstract class ApiRequest {
+public class ApiRequest {
 
     public String toJson() {
         return new Gson().toJson(this);

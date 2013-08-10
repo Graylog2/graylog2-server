@@ -37,7 +37,10 @@
 
             <label for="target_field">Store as field:</label>
             <input name="target_field" id="target_field" type="text" class="input-xlarge" required />
-            <span class="help-block">Choose a message field name. The extracted value will be stored in it.</span>
+            <span class="help-block">
+                Choose a field name. The extracted value will be stored in it. Call it <em>http_response_code</em>
+                for example if you are extracting a HTTP response code.
+            </span>
 
             <label class="radio inline">
                 <input type="radio" name="cut_or_copy" value="copy" checked>
@@ -64,6 +67,8 @@
             @views.html.system.inputs.extractors.converters.date()
             @views.html.system.inputs.extractors.converters.hash()
 
+
+            <input type="hidden" name="source_field" value="@field" />
             <button type="submit" class="btn btn-success" id="create-extractor">Create extractor</button>
         </div>
     </form>
