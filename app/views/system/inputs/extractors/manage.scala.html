@@ -24,14 +24,16 @@
 
         <div class="subcontainer">
             Start by loading a message so we have an example to work on.
-            <br />
-            <button class="btn btn-small xtrc-load-recent" data-node-id="@node.getNodeId" data-input-id="@input.getId">
-                Load a message recently received by this input
-            </button>
 
-            <button class="btn btn-small xtrc-load-manual" data-node-id="@node.getNodeId" data-input-id="@input.getId">
-                Manually load a message
-            </button>
+            <div class="buttons">
+                <button class="btn btn-small xtrc-load-recent" data-node-id="@node.getNodeId" data-input-id="@input.getId">
+                    Load a message recently received by this input
+                </button>
+
+                <button class="btn btn-small xtrc-load-manual" data-node-id="@node.getNodeId" data-input-id="@input.getId">
+                    Manually load a message
+                </button>
+            </div>
         </div>
 
         <div class="manual-selector" style="display: none;">
@@ -46,14 +48,17 @@
         </div>
 
         <div class="xtrc-message" style="display: none;">
+            We found this message.
+            <strong>Next step:</strong>
+            Select a field you want to apply the extractor on by clicking on its name.
+
             <div class="well well-small">
                 <h2>Message <span></span></h2>
                 <dl class="xtrc-message-fields">
                 </dl>
             </div>
 
-            <strong>Next step:</strong>
-            Select a field you want to apply the extractor on by clicking on it.
+
         </div>
     </div>
 
@@ -70,7 +75,8 @@
         </div>
 
         <form action="@routes.ExtractorsController.newExtractor(node.getNodeId, input.getId)" method="GET">
-            <select name="extractor_type">
+            <label for="extractor_type">How do you want to extract data from this field?</label>
+            <select name="extractor_type" id="extractor_type">
                 @for(et <- Extractor.Type.values()) {
                     <option value="@et.toString.toLowerCase">@Extractor.typeToHuman(et)</option>
                 }
@@ -78,7 +84,7 @@
 
             <input type="hidden" name="field" value="" />
             <input type="hidden" name="example" value="" />
-            <button type="submit" class="btn">Next step</button>
+            <button type="submit" class="btn btn-success">Next step</button>
         </form>
     </div>
 

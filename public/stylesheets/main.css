@@ -489,7 +489,8 @@ form #stream-rules {
 }
 
 .xtrc-message .well {
-    margin-bottom: 5px;
+    margin-top: 5px;
+    margin-bottom: 0px;
 }
 
 .xtrc-message dt:hover {
@@ -537,4 +538,30 @@ form #stream-rules {
 
 .xtrc-list-container .alert {
     margin-top: 5px;
+}
+
+.xtrc-select-message .subcontainer .buttons {
+    margin-top: 5px;
+}
+
+.manual-selector-form {
+    margin-top: 5px;
+}
+
+.xtrc-wizard .well {
+    margin-top: 8px;
+    margin-bottom: 8px;
+}
+
+.xtrc-wizard {
+    margin-bottom: 0px;
+}
+
+.xtrc-wizard form {
+    margin-bottom: 0px;
+}
+
+.xtrc-wizard .btn {
+    position: relative;
+    top: -5px;
 }
