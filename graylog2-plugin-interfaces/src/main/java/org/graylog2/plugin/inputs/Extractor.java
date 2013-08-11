@@ -41,25 +41,29 @@ public abstract class Extractor {
     }
 
     protected final String id;
+    protected final String title;
     protected final Type superType;
     protected final CursorStrategy cursorStrategy;
     protected final String targetField;
     protected final String sourceField;
+    protected final String creatorUserId;
     protected final Map<String, Object> extractorConfig;
 
     public abstract void run(Message msg);
 
-    public Extractor(String id, Type type, CursorStrategy cursorStrategy, String sourceField, String targetField, Map<String, Object> extractorConfig) throws ReservedFieldException {
+    public Extractor(String id, String title, Type type, CursorStrategy cursorStrategy, String sourceField, String targetField, Map<String, Object> extractorConfig, String creatorUserId) throws ReservedFieldException {
         if (Message.RESERVED_FIELDS.contains(targetField)) {
             throw new ReservedFieldException("You cannot apply an extractor on reserved field [" + targetField + "].");
         }
 
         this.id = id;
+        this.title = title;
         this.superType = type;
         this.cursorStrategy = cursorStrategy;
         this.targetField = targetField;
         this.sourceField = sourceField;
         this.extractorConfig = extractorConfig;
+        this.creatorUserId = creatorUserId;
     }
 
     public class ReservedFieldException extends Exception {
@@ -70,6 +74,10 @@ public abstract class Extractor {
 
     public String getId() {
         return id;
+    }
+
+    public String getTitle() {
+        return title;
     }
 
     public Type getType() {
@@ -90,5 +98,9 @@ public abstract class Extractor {
 
     public Map<String, Object> getExtractorConfig() {
         return extractorConfig;
+    }
+
+    public String getCreatorUserId() {
+        return creatorUserId;
     }
 }

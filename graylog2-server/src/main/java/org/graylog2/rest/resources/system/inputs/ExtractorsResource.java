@@ -84,11 +84,13 @@ public class ExtractorsResource extends RestResource {
         try {
             extractor = ExtractorFactory.factory(
                     id,
+                    cer.title,
                     Extractor.CursorStrategy.valueOf(cer.cutOrCopy.toUpperCase()),
                     Extractor.Type.valueOf(cer.extractorType.toUpperCase()),
                     cer.sourceField,
                     cer.targetField,
-                    cer.extractorConfig
+                    cer.extractorConfig,
+                    cer.creatorUserId
             );
         } catch (ExtractorFactory.NoSuchExtractorException e) {
             LOG.error("No such extractor type.", e);
@@ -144,15 +146,53 @@ public class ExtractorsResource extends RestResource {
         return json(result);
     }
 
+    @DELETE
+    @Timed
+    @Path("/{extractorId}")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response terminate(@PathParam("inputId") String inputId, @PathParam("extractorId") String extractorId) {
+        if (extractorId == null || extractorId.isEmpty()) {
+            LOG.error("Missing extractorId. Returning HTTP 400.");
+            throw new WebApplicationException(400);
+        }
+
+        if (inputId == null || inputId.isEmpty()) {
+            LOG.error("Missing inputId. Returning HTTP 400.");
+            throw new WebApplicationException(400);
+        }
+
+        MessageInput input = core.inputs().getRunningInputs().get(inputId);
+
+        if (input == null) {
+            LOG.error("Input <{}> not found.", inputId);
+            throw new WebApplicationException(404);
+        }
+
+        if (input.getExtractors().get(extractorId) == null) {
+            LOG.error("Extractor <{}> not found.", extractorId);
+            throw new WebApplicationException(404);
+        }
+
+        input.getExtractors().remove(extractorId);
+
+        String msg = "Deleted extractor <" + extractorId + ">. Reason: REST request.";
+        LOG.info(msg);
+        core.getActivityWriter().write(new Activity(msg, InputsResource.class));
+
+        return Response.status(Response.Status.NO_CONTENT).build();
+    }
+
     private Map<String, Object> toMap(Extractor extractor) {
         Map<String, Object> map = Maps.newHashMap();
 
         map.put("id", extractor.getId());
+        map.put("title", extractor.getTitle());
         map.put("type", extractor.getType().toString().toLowerCase());
         map.put("cursor_strategy", extractor.getCursorStrategy().toString().toLowerCase());
         map.put("source_field", extractor.getSourceField());
         map.put("target_field", extractor.getTargetField());
         map.put("extractor_config", extractor.getExtractorConfig());
+        map.put("creator_user_id", extractor.getCreatorUserId());
 
         return map;
     }

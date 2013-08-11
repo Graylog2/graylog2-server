@@ -29,11 +29,11 @@ import java.util.Map;
  */
 public class ExtractorFactory {
 
-    public static Extractor factory(String id, Extractor.CursorStrategy cursorStrategy, Extractor.Type type, String sourceField, String targetField, Map<String, Object> extractorConfig)
+    public static Extractor factory(String id, String title, Extractor.CursorStrategy cursorStrategy, Extractor.Type type, String sourceField, String targetField, Map<String, Object> extractorConfig, String creatorUserId)
             throws NoSuchExtractorException, Extractor.ReservedFieldException, ConfigurationException {
         switch (type) {
             case REGEX:
-                return new RegexExtractor(id, cursorStrategy, sourceField, targetField, extractorConfig);
+                return new RegexExtractor(id, title, cursorStrategy, sourceField, targetField, extractorConfig, creatorUserId);
             default:
                 throw new NoSuchExtractorException();
         }

@@ -28,6 +28,8 @@ import java.util.Map;
  */
 public class CreateExtractorRequest {
 
+    public String title;
+
     @JsonProperty("cut_or_copy")
     public String cutOrCopy;
 

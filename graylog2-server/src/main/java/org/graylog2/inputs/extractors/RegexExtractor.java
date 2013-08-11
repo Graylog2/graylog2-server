@@ -34,8 +34,8 @@ public class RegexExtractor extends Extractor {
 
     private final Pattern pattern;
 
-    public RegexExtractor(String id, CursorStrategy cursorStrategy, String sourceField, String targetField, Map<String, Object> extractorConfig) throws ReservedFieldException, ConfigurationException {
-        super(id, Type.REGEX, cursorStrategy, sourceField, targetField, extractorConfig);
+    public RegexExtractor(String id, String title, CursorStrategy cursorStrategy, String sourceField, String targetField, Map<String, Object> extractorConfig, String creatorUserId) throws ReservedFieldException, ConfigurationException {
+        super(id, title, Type.REGEX, cursorStrategy, sourceField, targetField, extractorConfig, creatorUserId);
 
         if (extractorConfig == null || extractorConfig.get("regex_value") == null || ((String) extractorConfig.get("regex_value")).isEmpty()) {
             throw new ConfigurationException("Missing regex configuration field: regex_value");
