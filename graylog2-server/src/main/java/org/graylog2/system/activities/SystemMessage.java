@@ -20,6 +20,7 @@
 package org.graylog2.system.activities;
 
 import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
 import com.mongodb.BasicDBObject;
 import com.mongodb.DBObject;
 import org.bson.types.ObjectId;
@@ -113,6 +114,11 @@ public class SystemMessage extends Persisted {
             put("node_id", new FilledStringValidator());
             put("timestamp", new DateValidator());
         }};
+    }
+
+    @Override
+    protected Map<String, Validator> getEmbeddedValidations(String key) {
+        return Maps.newHashMap();
     }
 
 }

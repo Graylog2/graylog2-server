@@ -160,4 +160,9 @@ public class Node extends Persisted {
         return getNodeId().split("-")[0];
     }
 
+    @Override
+    protected Map<String, Validator> getEmbeddedValidations(String key) {
+        return Maps.newHashMap();
+    }
+
 }

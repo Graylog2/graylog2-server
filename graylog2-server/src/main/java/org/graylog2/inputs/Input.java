@@ -20,21 +20,28 @@
 package org.graylog2.inputs;
 
 import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
+import com.mongodb.BasicDBList;
 import com.mongodb.BasicDBObject;
 import com.mongodb.DBObject;
 import org.bson.types.ObjectId;
+import org.graylog2.ConfigurationException;
 import org.graylog2.Core;
 import org.graylog2.database.Persisted;
+import org.graylog2.database.ValidationException;
 import org.graylog2.database.validators.DateValidator;
 import org.graylog2.database.validators.FilledStringValidator;
 import org.graylog2.database.validators.MapValidator;
 import org.graylog2.database.validators.Validator;
+import org.graylog2.inputs.extractors.ExtractorFactory;
+import org.graylog2.plugin.inputs.Extractor;
 import org.graylog2.users.User;
 import org.joda.time.DateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -46,6 +53,8 @@ public class Input extends Persisted {
     private static final Logger LOG = LoggerFactory.getLogger(Input.class);
 
     public static final String COLLECTION = "inputs";
+
+    public static final String EMBEDDED_EXTRACTORS = "extractors";
 
     public Input(Core core, Map<String, Object> fields) {
         super(core, fields);
@@ -62,6 +71,11 @@ public class Input extends Persisted {
         }
 
         return inputs;
+    }
+
+    public static Input find(Core core, String id) {
+        DBObject o = findOne(new BasicDBObject("_id", new ObjectId(id)), core, COLLECTION);
+        return new Input(core, (ObjectId) o.get("_id"), o.toMap());
     }
 
     @Override
@@ -81,6 +95,28 @@ public class Input extends Persisted {
         }};
     }
 
+    @Override
+    protected Map<String, Validator> getEmbeddedValidations(String key) {
+        if (key.equals(EMBEDDED_EXTRACTORS)) {
+            return new HashMap<String, Validator>() {{
+                put("id", new FilledStringValidator());
+                put("title", new FilledStringValidator());
+                put("type", new FilledStringValidator());
+                put("cursor_strategy", new FilledStringValidator());
+                put("target_field", new FilledStringValidator());
+                put("source_field", new FilledStringValidator());
+                put("creator_user_id", new FilledStringValidator());
+                put("extractor_config", new MapValidator());
+            }};
+        }
+
+        return Maps.newHashMap();
+    }
+
+    public void addExtractor(Extractor extractor) throws ValidationException {
+        embed("extractors", extractor);
+    }
+
     public String getTitle() {
         return (String) fields.get("title");
     }
@@ -91,6 +127,39 @@ public class Input extends Persisted {
 
     public Map<String, Object> getConfiguration() {
         return (Map<String, Object>) fields.get("configuration");
+    }
+
+    public List<Extractor> getExtractors() {
+        List<Extractor> extractors = Lists.newArrayList();
+
+        if (fields.get(EMBEDDED_EXTRACTORS) == null) {
+            return extractors;
+        }
+
+        BasicDBList mEx = (BasicDBList) fields.get(EMBEDDED_EXTRACTORS);
+        Iterator<Object> iterator = mEx.iterator();
+        while(iterator.hasNext()) {
+            DBObject ex = (BasicDBObject) iterator.next();
+            try {
+                Extractor extractor = ExtractorFactory.factory(
+                        (String) ex.get("id"),
+                        (String) ex.get("title"),
+                        Extractor.CursorStrategy.valueOf(((String) ex.get("cursor_strategy")).toUpperCase()),
+                        Extractor.Type.valueOf(((String) ex.get("type")).toUpperCase()),
+                        (String) ex.get("source_field"),
+                        (String) ex.get("target_field"),
+                        (Map<String, Object>) ex.get("extractor_config"),
+                        (String) ex.get("creator_user_id")
+                );
+
+                extractors.add(extractor);
+            } catch (Exception e) {
+                LOG.error("Cannot build extractor from persisted data.", e);
+                continue;
+            }
+        }
+
+        return extractors;
     }
 
     public String getType() {

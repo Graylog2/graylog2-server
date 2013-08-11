@@ -24,6 +24,8 @@ import com.codahale.metrics.annotation.Timed;
 import com.google.common.collect.Maps;
 import org.elasticsearch.common.UUID;
 import org.graylog2.ConfigurationException;
+import org.graylog2.database.ValidationException;
+import org.graylog2.inputs.Input;
 import org.graylog2.inputs.extractors.ExtractorFactory;
 import org.graylog2.plugin.inputs.MessageInput;
 import org.graylog2.rest.resources.RestResource;
@@ -105,7 +107,13 @@ public class ExtractorsResource extends RestResource {
 
         input.addExtractor(id, extractor);
 
-        // TODO: Persist extractor. (add to mongo input)
+        Input mongoInput = Input.find(core, input.getPersistId());
+        try {
+            mongoInput.addExtractor(extractor);
+        } catch (ValidationException e) {
+            LOG.error("Extractor persist validation failed.", e);
+            throw new WebApplicationException(e, Response.Status.BAD_REQUEST);
+        }
 
         String msg = "Added extractor <" + id + "> of type [" + cer.extractorType + "] to input <" + inputId + ">.";
         LOG.info(msg);

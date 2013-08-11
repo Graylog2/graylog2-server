@@ -198,4 +198,9 @@ public class StreamImpl extends Persisted implements Stream {
         }};
     }
 
+    @Override
+    protected Map<String, Validator> getEmbeddedValidations(String key) {
+        return Maps.newHashMap();
+    }
+
 }

@@ -19,6 +19,7 @@
  */
 package org.graylog2.users;
 
+import com.google.common.collect.Maps;
 import com.mongodb.BasicDBObject;
 import com.mongodb.DBObject;
 import org.bson.types.ObjectId;
@@ -106,5 +107,10 @@ public class User extends Persisted {
             put(PASSWORD, new FilledStringValidator());
             put(FULL_NAME, new FilledStringValidator());
         }};
+    }
+
+    @Override
+    protected Map<String, Validator> getEmbeddedValidations(String key) {
+        return Maps.newHashMap();
     }
 }

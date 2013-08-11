@@ -28,6 +28,7 @@ import org.bson.types.ObjectId;
 import org.graylog2.Core;
 import org.graylog2.plugin.configuration.Configuration;
 import org.graylog2.plugin.configuration.ConfigurationException;
+import org.graylog2.plugin.inputs.Extractor;
 import org.graylog2.plugin.inputs.MessageInput;
 import org.graylog2.plugin.inputs.MisfireException;
 import org.graylog2.system.activities.Activity;
@@ -148,6 +149,10 @@ public class Inputs {
                 input.setCreatorUserId(io.getCreatorUserId());
                 input.setPersistId(io.getId().toStringMongod());
                 input.setCreatedAt(io.getCreatedAt());
+
+                for (Extractor extractor : io.getExtractors()) {
+                    input.addExtractor(extractor.getId(), extractor);
+                }
             } catch (NoSuchInputTypeException e) {
                 LOG.warn("Cannot launch persisted input. No such type [{}].", io.getType());
                 throw new WebApplicationException(e, Response.Status.NOT_FOUND);
