@@ -8,7 +8,7 @@
         <div class="row-fluid">
             <h1>
                 <i class="icon icon-beaker"></i>
-                New  extractor for input <em>@input.getTitle</em>
+                New extractor for input <em>@input.getTitle</em>
             </h1>
 
             <h2>
@@ -21,7 +21,6 @@
             <div class="well well-small xtrc-new-example">
                 <span id="xtrc-example">@example</span>
             </div>
-
 
             @if(extractorType.equals(Extractor.Type.REGEX)) {
                 @views.html.system.inputs.extractors.configurations.regex()
@@ -72,8 +71,15 @@
             @views.html.system.inputs.extractors.converters.date()
             @views.html.system.inputs.extractors.converters.hash()
 
+            <div class="alert alert-info">
+                Please note that you cannot use the cutting feature on standard fields
+                like <em>message</em> and <em>source</em>.
+            </div>
+
             <input type="hidden" name="source_field" value="@field" />
             <button type="submit" class="btn btn-success" id="create-extractor">Create extractor</button>
+
         </div>
+
     </form>
 }
