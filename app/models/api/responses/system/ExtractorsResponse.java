@@ -17,35 +17,16 @@
  * along with Graylog2.  If not, see <http://www.gnu.org/licenses/>.
  *
  */
-package models.api.requests;
+package models.api.responses.system;
 
-import com.google.gson.annotations.SerializedName;
-
-import java.util.Map;
+import java.util.List;
 
 /**
  * @author Lennart Koopmann <lennart@torch.sh>
  */
-public class CreateExtractorRequest extends ApiRequest {
+public class ExtractorsResponse {
 
-    public String title;
-
-    @SerializedName("cut_or_copy")
-    public String cutOrCopy;
-
-    @SerializedName("target_field")
-    public String targetField;
-
-    @SerializedName("source_field")
-    public String sourceField;
-
-    @SerializedName("extractor_type")
-    public String extractorType;
-
-    @SerializedName("creator_user_id")
-    public String creatorUserId;
-
-    @SerializedName("extractor_config")
-    public Map<String, Object> extractorConfig;
+    public int total;
+    public List<ExtractorSummaryResponse> extractors;
 
 }

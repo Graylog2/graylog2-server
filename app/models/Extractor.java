@@ -19,17 +19,20 @@
  */
 package models;
 
+import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import lib.APIException;
 import lib.Api;
 import models.api.requests.CreateExtractorRequest;
-import models.api.requests.InputLaunchRequest;
 import models.api.responses.EmptyResponse;
-import play.Logger;
+import models.api.responses.system.ExtractorSummaryResponse;
+import models.api.responses.system.ExtractorsResponse;
+import org.joda.time.DateTime;
 
 import java.io.IOException;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -49,6 +52,8 @@ public class Extractor {
         COPY
     }
 
+    private final String id;
+    private final String title;
     private final CursorStrategy cursorStrategy;
     private final Type extractorType;
     private final String sourceField;
@@ -57,24 +62,41 @@ public class Extractor {
     private final Map<String, Object> extractorConfig;
     private final Set<Converter> converters;
 
-    private final Input input;
+    public Extractor(ExtractorSummaryResponse esr) {
+        this(
+                esr.id,
+                esr.title,
+                CursorStrategy.valueOf(esr.cursorStrategy.toUpperCase()),
+                esr.sourceField,
+                esr.targetField,
+                Type.valueOf(esr.type.toUpperCase()),
+                esr.extractorConfig,
+                User.load(esr.creatorUserId)
+        );
+    }
 
-    public Extractor(CursorStrategy cursorStrategy, String sourceField, String targetField, Type type, User creatorUser, Input input) {
+    public Extractor(CursorStrategy cursorStrategy, String title, String sourceField, String targetField, Type type, User creatorUser) {
+        this(null, title, cursorStrategy, sourceField, targetField, type, new HashMap<String, Object>(), creatorUser);
+    }
+
+    public Extractor(String id, String title, CursorStrategy cursorStrategy, String sourceField, String targetField, Type type, Map<String, Object> extractorConfig, User creatorUser) {
+        this.id = id;
+        this.title = title;
         this.cursorStrategy = cursorStrategy;
         this.sourceField = sourceField;
         this.targetField = targetField;
         this.extractorType = type;
 
-        this.extractorConfig = Maps.newHashMap();
+        this.extractorConfig = extractorConfig;
         this.converters = Sets.newHashSet();
 
         this.creatorUser = creatorUser;
-        this.input = input;
     }
 
-    public void create(Node node) throws IOException, APIException {
+    public void create(Node node, Input input) throws IOException, APIException {
         CreateExtractorRequest request = new CreateExtractorRequest();
 
+        request.title = title;
         request.cutOrCopy = cursorStrategy.toString().toLowerCase();
         request.extractorType = extractorType.toString().toLowerCase();
         request.sourceField = sourceField;
@@ -83,6 +105,20 @@ public class Extractor {
         request.extractorConfig = extractorConfig;
 
         Api.post(node, "system/inputs/" + input.getId() + "/extractors", request, 201, EmptyResponse.class);
+    }
+
+    public static List<Extractor> all(Node node, Input input) throws IOException, APIException {
+        List<Extractor> extractors = Lists.newArrayList();
+
+        for(ExtractorSummaryResponse ex : Api.get(node, "system/inputs/" + input.getId() + "/extractors", ExtractorsResponse.class).extractors) {
+            extractors.add(new Extractor(ex));
+        }
+
+        return extractors;
+    }
+
+    public static void delete(Node node, Input input, String extractorId) throws IOException, APIException {
+        Api.delete(node, "system/inputs/" + input.getId() + "/extractors/" + extractorId, 204, EmptyResponse.class);
     }
 
     private static final Map<Type, String> TYPE_MAPPING = new HashMap<Type, String>() {{
@@ -120,4 +156,35 @@ public class Extractor {
         extractorConfig.put("regex_value", form.get("regex_value")[0]);
     }
 
+    public User getCreatorUser() {
+        return creatorUser;
+    }
+
+    public Type getType() {
+        return extractorType;
+    }
+
+    public String getId() {
+        return id;
+    }
+
+    public Map<String, Object> getExtractorConfig() {
+        return extractorConfig;
+    }
+
+    public String getTitle() {
+        return title;
+    }
+
+    public String getTargetField() {
+        return targetField;
+    }
+
+    public String getSourceField() {
+        return sourceField;
+    }
+
+    public CursorStrategy getCursorStrategy() {
+        return cursorStrategy;
+    }
 }
