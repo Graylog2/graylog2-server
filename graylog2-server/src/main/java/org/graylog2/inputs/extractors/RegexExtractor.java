@@ -66,8 +66,14 @@ public class RegexExtractor extends Extractor {
             StringBuilder sb = new StringBuilder(original);
             sb.delete(matcher.start(1), matcher.end(1));
 
+            String finalResult = sb.toString();
+
+            if(finalResult.isEmpty()) {
+                finalResult = "fullyCutByExtractor";
+            }
+
             msg.removeField(sourceField);
-            msg.addField(sourceField, sb.toString());
+            msg.addField(sourceField, finalResult);
         }
     }
 

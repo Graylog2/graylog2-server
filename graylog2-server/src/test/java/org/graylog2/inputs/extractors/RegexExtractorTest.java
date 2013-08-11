@@ -123,6 +123,19 @@ public class RegexExtractorTest {
         x.run(msg);
     }
 
+    @Test
+    public void testBasicExtractionWithCutStrategyDoesNotLeaveEmptyFields() throws Exception {
+        Message msg = new Message("The short message", "TestUnit", Tools.getUTCTimestampWithMilliseconds());
+
+        msg.addField("somefield", "<10> 07 Aug 2013 somesubsystem: this is my message for username9001 id:9001");
+
+        RegexExtractor x = new RegexExtractor("foo", "foo", Extractor.CursorStrategy.CUT, "somefield", "our_result", config("(.*)"), "foo");
+        x.run(msg);
+
+        assertNotNull(msg.getField("our_result"));
+        assertEquals("fullyCutByExtractor", msg.getField("somefield"));
+    }
+
     @Test(expected = Extractor.ReservedFieldException.class)
     public void testDoesNotRunAgainstReservedFields() throws Exception {
         new RegexExtractor("foo", "foo", Extractor.CursorStrategy.CUT, "somefield", "source", config("id:(\\d+)"), "foo");
