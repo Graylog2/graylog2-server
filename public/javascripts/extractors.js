@@ -155,6 +155,18 @@ $(document).ready(function() {
         return false;
     });
 
+    // Only allow alphanum and underscores as target_field values. Messages in graylog2-server will just ignore others.
+    $("#target_field").on("keyup", function(event){
+        var str = $(this).val();
+        if(str != "") {
+            var regex = /^[A-Za-z0-9_]+$/;
+            if (!regex.test(str)) {
+                $(this).val(str.slice(0,-1));
+                return false;
+            }
+        }
+    });
+
     function showExtractorWizard(field, value) {
         console.log(field + ": " + value);
     }
