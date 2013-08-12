@@ -17,22 +17,16 @@
  * along with Graylog2.  If not, see <http://www.gnu.org/licenses/>.
  *
  */
-package models.api.responses;
+package models.api.responses.system;
+
+import java.util.List;
 
 /**
  * @author Lennart Koopmann <lennart@torch.sh>
  */
-public class RegexTestResponse {
+public class ExtractorsResponse {
 
-    public String regex;
-    public boolean matched;
-    public String string;
-    public Match match;
-
-    public class Match {
-        public int start;
-        public int end;
-        public String match;
-    }
+    public int total;
+    public List<ExtractorSummaryResponse> extractors;
 
 }

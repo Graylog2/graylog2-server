@@ -19,12 +19,6 @@ import play.mvc.*;
 public class MessagesController extends AuthenticatedController {
 
     public static Result single(String index, String id) {
-// TODO XXX REMOVE ME DEBUG
-try {
-    Thread.sleep(1000);
-} catch (InterruptedException e) {
-    e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
-}
         try {
             MessageResult message = Message.get(index, id);
 

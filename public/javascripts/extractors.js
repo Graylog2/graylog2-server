@@ -2,7 +2,7 @@ $(document).ready(function() {
 
     // Load random message.
     $(".xtrc-load-recent").on("click", function() {
-        var container = $(this).parent().parent();
+        var container = $(this).parent().parent().parent();
         var subcontainer = $(".subcontainer", container);
 
         showSpinner(subcontainer);
@@ -23,7 +23,7 @@ $(document).ready(function() {
     });
 
     $(".xtrc-load-manual").on("click", function() {
-        var container = $(this).parent().parent();
+        var container = $(this).parent().parent().parent();
         var subcontainer = $(".subcontainer", container);
 
         subcontainer.hide();

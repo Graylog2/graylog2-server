@@ -8,7 +8,7 @@
         <div class="row-fluid">
             <h1>
                 <i class="icon icon-beaker"></i>
-                New  extractor for input <em>@input.getTitle</em>
+                New extractor for input <em>@input.getTitle</em>
             </h1>
 
             <h2>
@@ -21,7 +21,6 @@
             <div class="well well-small xtrc-new-example">
                 <span id="xtrc-example">@example</span>
             </div>
-
 
             @if(extractorType.equals(Extractor.Type.REGEX)) {
                 @views.html.system.inputs.extractors.configurations.regex()
@@ -37,7 +36,10 @@
 
             <label for="target_field">Store as field:</label>
             <input name="target_field" id="target_field" type="text" class="input-xlarge" required />
-            <span class="help-block">Choose a message field name. The extracted value will be stored in it.</span>
+            <span class="help-block">
+                Choose a field name. The extracted value will be stored in it. Call it <em>http_response_code</em>
+                for example if you are extracting a HTTP response code.
+            </span>
 
             <label class="radio inline">
                 <input type="radio" name="cut_or_copy" value="copy" checked>
@@ -49,6 +51,11 @@
             </label>
             <span class="help-block">Do you want to copy or cut from source?</span>
 
+            <label for="title">Extractor title:</label>
+            <input name="title" id="title" type="text" class="input-xlarge" required />
+            <span class="help-block">
+                A descriptive name of this extractor.
+            </span>
 
             <div id="add-converter-fields">
                 <label for="add-converter">Add converter:</label>
@@ -64,7 +71,15 @@
             @views.html.system.inputs.extractors.converters.date()
             @views.html.system.inputs.extractors.converters.hash()
 
+            <div class="alert alert-info">
+                Please note that you cannot use the cutting feature on standard fields
+                like <em>message</em> and <em>source</em>.
+            </div>
+
+            <input type="hidden" name="source_field" value="@field" />
             <button type="submit" class="btn btn-success" id="create-extractor">Create extractor</button>
+
         </div>
+
     </form>
 }

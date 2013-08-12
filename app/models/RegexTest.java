@@ -49,9 +49,9 @@ public class RegexTest {
         Map<String, Object> result = Maps.newHashMap();
         result.put("string", r.string);
         result.put("regex", r.regex);
-        result.put("finds", r.finds);
+        result.put("finds", r.matched);
 
-        if (r.finds) {
+        if (r.matched) {
             result.put("match", match);
         }
 

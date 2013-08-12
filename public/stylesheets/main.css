@@ -33,6 +33,11 @@ h3 {
 	line-height: 26px;
 }
 
+h4 {
+    font-size: 13px;
+    line-height: 20px;
+}
+
 #top {
 	height: 40px;
 	background-image: url(/assets/images/topbg.png);
@@ -405,30 +410,35 @@ form #stream-rules {
     margin-bottom: 5px;
 }
 
-.input-row {
+.node-row {
     margin-bottom: 8px;
     margin-top: 0px;
 }
 
-.input-row .well {
+.node-row .well {
     margin-bottom: 0px;
     margin-top: 3px;
     font-family: monospace;
     font-size: 11px;
 }
 
-.input-row-info {
+.node-row-info {
     position: relative;
     top: 2px;
 }
 
-.input-row-info form {
+.node-row-info form {
     display: inline;
 }
 
-.input-row-info .text {
+.node-row-info .text {
     position: relative;
     top: 3px;
+}
+
+.node-row-info-negative-correction {
+    position: relative;
+    top: -3px;
 }
 
 .input-list .alert {
@@ -479,7 +489,8 @@ form #stream-rules {
 }
 
 .xtrc-message .well {
-    margin-bottom: 5px;
+    margin-top: 5px;
+    margin-bottom: 0px;
 }
 
 .xtrc-message dt:hover {
@@ -514,9 +525,43 @@ form #stream-rules {
 }
 
 #create-extractor {
-    margin-top: 5px;
+    margin-top: 10px;
 }
 
 .xtrc-converter-subfield {
     margin-left: 20px;
+}
+
+.xtrc-list-container {
+    margin-top: 15px;
+}
+
+.xtrc-list-container .alert {
+    margin-top: 5px;
+}
+
+.xtrc-select-message .subcontainer .buttons {
+    margin-top: 5px;
+}
+
+.manual-selector-form {
+    margin-top: 5px;
+}
+
+.xtrc-wizard .well {
+    margin-top: 8px;
+    margin-bottom: 8px;
+}
+
+.xtrc-wizard {
+    margin-bottom: 0px;
+}
+
+.xtrc-wizard form {
+    margin-bottom: 0px;
+}
+
+.xtrc-wizard .btn {
+    position: relative;
+    top: -5px;
 }
