@@ -87,7 +87,6 @@ $(document).ready(function() {
             var field = $(this).attr("data-field");
             var value = $(this).attr("data-value");
 
-            showExtractorWizard(field, value);
             $(".xtrc-select-message").remove();
 
             var wizard = $(".xtrc-wizard");
@@ -166,14 +165,11 @@ $(document).ready(function() {
         var spanEnd = "</span>";
 
         var start = result.match.start;
-        var end = result.match.end+spanStart.length-1;
+        var end = result.match.end+spanStart.length;
 
         var exampleContent = $("<div/>").html(example.html()).text(); // ZOMG JS. this is how you unescape HTML entities.
 
-        exampleContent = exampleContent.splice(start,0,spanStart);
-        exampleContent = exampleContent.splice(end,0,spanEnd);
-
-        example.html(exampleContent);
+        example.html(exampleContent.splice(start,0,spanStart).splice(end,0,spanEnd));
     }
 
     // Add converter button.
@@ -195,9 +191,5 @@ $(document).ready(function() {
             }
         }
     });
-
-    function showExtractorWizard(field, value) {
-        console.log(field + ": " + value);
-    }
 
 });
