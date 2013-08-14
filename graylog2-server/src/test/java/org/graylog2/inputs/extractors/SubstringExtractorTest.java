@@ -35,7 +35,7 @@ import static org.junit.Assert.assertNotNull;
 /**
  * @author Lennart Koopmann <lennart@torch.sh>
  */
-public class RegexExtractorTest {
+public class SubstringExtractorTest {
 
     @Test
     public void testBasicExtraction() throws Exception {
@@ -43,12 +43,12 @@ public class RegexExtractorTest {
 
         msg.addField("somefield", "<10> 07 Aug 2013 somesubsystem: this is my message for username9001 id:9001");
 
-        RegexExtractor x = new RegexExtractor("foo", "foo", Extractor.CursorStrategy.COPY, "somefield", "our_result", config("id:(\\d+)"), "foo");
+        SubstringExtractor x = new SubstringExtractor("foo", "foo", Extractor.CursorStrategy.COPY, "somefield", "our_result", config(17, 30), "foo");
         x.run(msg);
 
         assertNotNull(msg.getField("our_result"));
         assertEquals("<10> 07 Aug 2013 somesubsystem: this is my message for username9001 id:9001", msg.getField("somefield"));
-        assertEquals("9001", msg.getField("our_result"));
+        assertEquals("somesubsystem", msg.getField("our_result"));
     }
 
     @Test
@@ -57,23 +57,23 @@ public class RegexExtractorTest {
 
         msg.addField("somefield", "<10> 07 Aug 2013 somesubsystem: this is my message for username9001 id:9001");
 
-        RegexExtractor x = new RegexExtractor("foo", "foo", Extractor.CursorStrategy.CUT, "somefield", "our_result", config("id:(\\d+)"), "foo");
+        SubstringExtractor x = new SubstringExtractor("foo", "foo", Extractor.CursorStrategy.CUT, "somefield", "our_result", config(17, 30), "foo");
         x.run(msg);
 
         assertNotNull(msg.getField("our_result"));
-        assertEquals("<10> 07 Aug 2013 somesubsystem: this is my message for username9001 id:", msg.getField("somefield"));
-        assertEquals("9001", msg.getField("our_result"));
+        assertEquals("<10> 07 Aug 2013 : this is my message for username9001 id:9001", msg.getField("somefield"));
+        assertEquals("somesubsystem", msg.getField("our_result"));
     }
 
     @Test
     public void testBasicExtractionWithCutStrategyDoesNotCutStandardFields() throws Exception {
         Message msg = new Message("The short message", "TestUnit", Tools.getUTCTimestampWithMilliseconds());
 
-        RegexExtractor x = new RegexExtractor("foo", "foo", Extractor.CursorStrategy.CUT, "source", "our_result", config("Test(.*)"), "foo");
+        SubstringExtractor x = new SubstringExtractor("foo", "foo", Extractor.CursorStrategy.CUT, "source", "our_result", config(4,8), "foo");
         x.run(msg);
 
         assertNotNull(msg.getField("our_result"));
-        assertEquals("TestUnit", msg.getField("sourcre"));
+        assertEquals("TestUnit", msg.getField("source")); // Not cut!
         assertEquals("Unit", msg.getField("our_result"));
     }
 
@@ -83,7 +83,7 @@ public class RegexExtractorTest {
 
         msg.addField("somefield", "<10> 07 Aug 2013 somesubsystem: this is my message for username9001 id:9001");
 
-        RegexExtractor x = new RegexExtractor("foo", "foo", Extractor.CursorStrategy.COPY, "somefield", "our_result", config("nothing:(\\d+)"), "foo");
+        SubstringExtractor x = new SubstringExtractor("foo", "foo", Extractor.CursorStrategy.COPY, "somefield", "our_result", config(100, 200), "foo");
         x.run(msg);
 
         assertNull(msg.getField("our_result"));
@@ -96,7 +96,7 @@ public class RegexExtractorTest {
 
         msg.addField("somefield", "<10> 07 Aug 2013 somesubsystem: this is my message for username9001 id:9001");
 
-        RegexExtractor x = new RegexExtractor("foo", "foo", Extractor.CursorStrategy.CUT, "somefield", "our_result", config("nothing:(\\d+)"), "foo");
+        SubstringExtractor x = new SubstringExtractor("foo", "foo", Extractor.CursorStrategy.CUT, "somefield", "our_result", config(100, 200), "foo");
         x.run(msg);
 
         assertNull(msg.getField("our_result"));
@@ -104,24 +104,10 @@ public class RegexExtractorTest {
     }
 
     @Test
-    public void testExtractsFirstMatcherGroupWhenProvidedWithSeveral() throws Exception {
-        Message msg = new Message("The short message", "TestUnit", Tools.getUTCTimestampWithMilliseconds());
-
-        msg.addField("somefield", "<10> 07 Aug 2013 somesubsystem: this is my message for username9001 id:9001 lolwut");
-
-        RegexExtractor x = new RegexExtractor("foo", "foo", Extractor.CursorStrategy.COPY, "somefield", "our_result", config("id:(\\d+).*(lolwut)"), "foo");
-        x.run(msg);
-
-        assertNotNull(msg.getField("our_result"));
-        assertEquals("<10> 07 Aug 2013 somesubsystem: this is my message for username9001 id:9001 lolwut", msg.getField("somefield"));
-        assertEquals("9001", msg.getField("our_result"));
-    }
-
-    @Test
     public void testDoesNotFailOnNonExistentSourceField() throws Exception {
         Message msg = new Message("The short message", "TestUnit", Tools.getUTCTimestampWithMilliseconds());
 
-        RegexExtractor x = new RegexExtractor("foo", "foo", Extractor.CursorStrategy.CUT, "LOLIDONTEXIST", "our_result", config("id:(\\d+)"), "foo");
+        SubstringExtractor x = new SubstringExtractor("foo", "foo", Extractor.CursorStrategy.CUT, "LOLIDONTEXIST", "our_result", config(0,1), "foo");
         x.run(msg);
     }
 
@@ -131,7 +117,7 @@ public class RegexExtractorTest {
 
         msg.addField("somefield", 9001);
 
-        RegexExtractor x = new RegexExtractor("foo", "foo", Extractor.CursorStrategy.CUT, "somefield", "our_result", config("id:(\\d+)"), "foo");
+        SubstringExtractor x = new SubstringExtractor("foo", "foo", Extractor.CursorStrategy.CUT, "somefield", "our_result", config(0,1), "foo");
         x.run(msg);
     }
 
@@ -141,36 +127,49 @@ public class RegexExtractorTest {
 
         msg.addField("somefield", "<10> 07 Aug 2013 somesubsystem: this is my message for username9001 id:9001");
 
-        RegexExtractor x = new RegexExtractor("foo", "foo", Extractor.CursorStrategy.CUT, "somefield", "our_result", config("(.*)"), "foo");
+        SubstringExtractor x = new SubstringExtractor("foo", "foo", Extractor.CursorStrategy.CUT, "somefield", "our_result", config(0,75), "foo");
         x.run(msg);
 
         assertNotNull(msg.getField("our_result"));
         assertEquals("fullyCutByExtractor", msg.getField("somefield"));
     }
 
+
     @Test(expected = Extractor.ReservedFieldException.class)
     public void testDoesNotRunAgainstReservedFields() throws Exception {
-        new RegexExtractor("foo", "foo", Extractor.CursorStrategy.CUT, "somefield", "source", config("id:(\\d+)"), "foo");
+        new SubstringExtractor("foo", "foo", Extractor.CursorStrategy.CUT, "somefield", "source", config(0,1), "foo");
     }
 
     @Test(expected = ConfigurationException.class)
     public void testDoesNotInitializeOnNullConfigMap() throws Exception {
-        new RegexExtractor("foo", "foo", Extractor.CursorStrategy.CUT, "somefield", "somefield", null, "foo");
+        new SubstringExtractor("foo", "foo", Extractor.CursorStrategy.CUT, "somefield", "somefield", null, "foo");
     }
 
     @Test(expected = ConfigurationException.class)
-    public void testDoesNotInitializeOnNullRegexValue() throws Exception {
-        new RegexExtractor("foo", "foo", Extractor.CursorStrategy.CUT, "somefield", "somefield", config(null), "foo");
+    public void testDoesNotInitializeOnNullStartValue() throws Exception {
+        new SubstringExtractor("foo", "foo", Extractor.CursorStrategy.CUT, "somefield", "somefield", config(null, 2), "foo");
     }
 
     @Test(expected = ConfigurationException.class)
-    public void testDoesNotInitializeOnEmptyRegexValue() throws Exception {
-        new RegexExtractor("foo", "foo", Extractor.CursorStrategy.CUT, "somefield", "somefield", config(""), "foo");
+    public void testDoesNotInitializeOnNullEndValue() throws Exception {
+        new SubstringExtractor("foo", "foo", Extractor.CursorStrategy.CUT, "somefield", "somefield", config(1, null), "foo");
     }
 
-    public static Map<String, Object> config(final String regex) {
+    @Test(expected = ConfigurationException.class)
+    public void testDoesNotInitializeOnStringStartValue() throws Exception {
+        new SubstringExtractor("foo", "foo", Extractor.CursorStrategy.CUT, "somefield", "somefield", config("1", 2), "foo");
+    }
+
+    @Test(expected = ConfigurationException.class)
+    public void testDoesNotInitializeOnStringEndValue() throws Exception {
+        new SubstringExtractor("foo", "foo", Extractor.CursorStrategy.CUT, "somefield", "somefield", config(1, "2"), "foo");
+    }
+
+    public static Map<String, Object> config(final Object start, final Object end) {
         return new HashMap<String, Object>() {{
-            put("regex_value", regex);
+            put("begin_index", start);
+            put("end_index", end);
         }};
     }
+
 }
