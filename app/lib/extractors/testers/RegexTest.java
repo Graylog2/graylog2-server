@@ -17,7 +17,7 @@
  * along with Graylog2.  If not, see <http://www.gnu.org/licenses/>.
  *
  */
-package models;
+package lib.extractors.testers;
 
 import com.google.common.collect.Maps;
 

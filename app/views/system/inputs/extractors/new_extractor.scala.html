@@ -27,7 +27,7 @@
             }
 
             @if(extractorType.equals(Extractor.Type.SUBSTRING)) {
-                implement me (type: substring)
+                @views.html.system.inputs.extractors.configurations.substring()
             }
 
             @if(extractorType.equals(Extractor.Type.START_END_CHAR)) {

@@ -127,7 +127,37 @@ $(document).ready(function() {
         });
     });
 
-    function highlightMatchResult(matchResult) {
+    // Try substring against example.
+    $(".xtrc-try-substring").on("click", function() {
+        var button = $(this);
+
+        var warningText = "We were not able to run the substring extraction. Please check index boundaries.";
+
+        button.html("<i class='icon-refresh icon-spin'></i> Trying...");
+        $.ajax({
+            url: '/a/tools/substring_test',
+            data: {
+                "string":$("#xtrc-example").text(),
+                "start":$("#begin_index").val(),
+                "end":$("#end_index").val()
+            },
+            success: function(result) {
+                if(result.successful) {
+                    highlightMatchResult(result);
+                } else {
+                    showWarning(warningText);
+                }
+            },
+            error: function() {
+                showError(warningText);
+            },
+            complete: function() {
+                button.html("Try!");
+            }
+        });
+    });
+
+    function highlightMatchResult(result) {
         var example = $("#xtrc-example");
         // Set to original content first, so we can do this multiple times.
         example.html($("#xtrc-original-example").html());
@@ -135,11 +165,10 @@ $(document).ready(function() {
         var spanStart = "<span class='xtrc-hl'>";
         var spanEnd = "</span>";
 
-        var start = matchResult.match.start;
-        var end = matchResult.match.end+spanStart.length-1;
+        var start = result.match.start;
+        var end = result.match.end+spanStart.length-1;
 
         var exampleContent = $("<div/>").html(example.html()).text(); // ZOMG JS. this is how you unescape HTML entities.
-        console.log(exampleContent);
 
         exampleContent = exampleContent.splice(start,0,spanStart);
         exampleContent = exampleContent.splice(end,0,spanEnd);
