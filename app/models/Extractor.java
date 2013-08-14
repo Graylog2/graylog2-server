@@ -29,6 +29,7 @@ import models.api.responses.EmptyResponse;
 import models.api.responses.system.ExtractorSummaryResponse;
 import models.api.responses.system.ExtractorsResponse;
 import org.joda.time.DateTime;
+import play.Logger;
 
 import java.io.IOException;
 import java.util.HashMap;
@@ -137,6 +138,7 @@ public class Extractor {
                 loadRegexConfig(form);
                 break;
             case SUBSTRING:
+                loadSubstringConfig(form);
                 break;
             case START_END_CHAR:
                 break;
@@ -149,11 +151,24 @@ public class Extractor {
     }
 
     private void loadRegexConfig(Map<String,String[]> form) {
-        if (form.get("regex_value") == null || form.get("regex_value")[0] == null || form.get("regex_value")[0].isEmpty()) {
+        if (!formFieldSet(form, "regex_value")) {
             throw new RuntimeException("Missing extractor config: regex_value");
         }
 
         extractorConfig.put("regex_value", form.get("regex_value")[0]);
+    }
+
+    private void loadSubstringConfig(Map<String,String[]> form) {
+        if (!formFieldSet(form, "begin_index") || !formFieldSet(form, "end_index")) {
+            throw new RuntimeException("Missing extractor config: begin_index or end_index.");
+        }
+
+        extractorConfig.put("begin_index", Integer.parseInt(form.get("begin_index")[0]));
+        extractorConfig.put("end_index", Integer.parseInt(form.get("end_index")[0]));
+    }
+
+    private boolean formFieldSet(Map<String,String[]> form, String key) {
+        return form.get(key) != null && form.get(key)[0] != null && !form.get(key)[0].isEmpty();
     }
 
     public User getCreatorUser() {
