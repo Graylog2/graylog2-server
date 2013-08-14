@@ -275,5 +275,25 @@ public final class Tools {
     public static String getCurrentISO8601String() {
         return getISO8601String(new DateTime(DateTimeZone.UTC));
     }
+
+    /**
+     *
+     * @param target String to cut.
+     * @param start  Character position to start cutting at. Inclusive.
+     * @param end Character position to stop cutting at. Exclusive!
+     * @return Extracted/cut part of the string or null when invalid positions where provided.
+     */
+    public static String safeSubstring(String target, int start, int end) {
+        if (target == null) {
+            return null;
+        }
+
+        int slen = target.length();
+        if (start < 0 || end <= 0 || end <= start || slen < start || slen < end) {
+            return null;
+        }
+
+        return target.substring(start, end);
+    }
  
 }
