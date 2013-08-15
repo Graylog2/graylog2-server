@@ -61,7 +61,7 @@ public class Extractor {
     private final String targetField;
     private final User creatorUser;
     private final Map<String, Object> extractorConfig;
-    private final Set<Converter> converters;
+    private final List<Converter> converters;
 
     public Extractor(ExtractorSummaryResponse esr) {
         this(
@@ -89,13 +89,18 @@ public class Extractor {
         this.extractorType = type;
 
         this.extractorConfig = extractorConfig;
-        this.converters = Sets.newHashSet();
+        this.converters = Lists.newArrayList();
 
         this.creatorUser = creatorUser;
     }
 
     public void create(Node node, Input input) throws IOException, APIException {
         CreateExtractorRequest request = new CreateExtractorRequest();
+
+        Map<String, Map<String, Object>> converterList = Maps.newHashMap();
+        for (Converter converter : converters) {
+            converterList.put(converter.getType(), converter.getConfig());
+        }
 
         request.title = title;
         request.cutOrCopy = cursorStrategy.toString().toLowerCase();
@@ -104,6 +109,7 @@ public class Extractor {
         request.targetField = targetField;
         request.creatorUserId = creatorUser.getId();
         request.extractorConfig = extractorConfig;
+        request.converters = converterList;
 
         Api.post(node, "system/inputs/" + input.getId() + "/extractors", request, 201, EmptyResponse.class);
     }
@@ -148,6 +154,25 @@ public class Extractor {
     }
 
     public void loadConvertersFromForm(Map<String,String[]> form) {
+        for(String name : extractSelectedConverters(form)) {
+            converters.add(new Converter(Converter.Type.valueOf(name.toUpperCase())));
+        }
+    }
+
+    private List<String> extractSelectedConverters(Map<String, String[]> form) {
+        List<String> result = Lists.newArrayList();
+
+        for (Map.Entry<String,String[]> f : form.entrySet()) {
+            try {
+                if (f.getKey().startsWith("converter_") && f.getValue()[0].equals("enabled")) {
+                    result.add(f.getKey().substring("converter_".length()));
+                }
+            } catch(Exception e) {
+                continue;
+            }
+        }
+
+        return result;
     }
 
     private void loadRegexConfig(Map<String,String[]> form) {

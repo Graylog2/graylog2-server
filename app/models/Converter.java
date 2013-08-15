@@ -19,8 +19,33 @@
  */
 package models;
 
+import com.google.common.collect.Maps;
+
+import java.util.Map;
+
 /**
  * @author Lennart Koopmann <lennart@torch.sh>
  */
 public class Converter {
+
+    public enum Type {
+        NUMERIC,
+        DATE,
+        HASH
+    }
+
+    private final Type type;
+
+    public Converter(Type type) {
+        this.type = type;
+    }
+
+    public String getType() {
+        return this.type.toString().toLowerCase();
+    }
+
+    public Map<String, Object> getConfig() {
+        return Maps.newHashMap();
+    }
+
 }
