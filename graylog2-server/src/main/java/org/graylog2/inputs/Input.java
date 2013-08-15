@@ -33,6 +33,7 @@ import org.graylog2.database.validators.DateValidator;
 import org.graylog2.database.validators.FilledStringValidator;
 import org.graylog2.database.validators.MapValidator;
 import org.graylog2.database.validators.Validator;
+import org.graylog2.inputs.converters.ConverterFactory;
 import org.graylog2.inputs.extractors.ExtractorFactory;
 import org.graylog2.plugin.inputs.Converter;
 import org.graylog2.plugin.inputs.Extractor;
@@ -152,7 +153,7 @@ public class Input extends Persisted {
                         (String) ex.get("target_field"),
                         (Map<String, Object>) ex.get("extractor_config"),
                         (String) ex.get("creator_user_id"),
-                        new ArrayList<Converter>()
+                        getConvertersOfExtractor(ex)
                 );
 
                 extractors.add(extractor);
@@ -175,6 +176,31 @@ public class Input extends Persisted {
 
     public String getInputId() {
         return (String) fields.get("input_id");
+    }
+
+    private List<Converter> getConvertersOfExtractor(DBObject extractor) {
+        List<Converter> cl = Lists.newArrayList();
+
+        BasicDBList m = (BasicDBList) extractor.get("converters");
+        Iterator<Object> iterator = m.iterator();
+        while(iterator.hasNext()) {
+            DBObject c = (BasicDBObject) iterator.next();
+
+            try {
+                cl.add(ConverterFactory.factory(
+                        Converter.Type.valueOf(((String) c.get("type")).toUpperCase()),
+                        (Map<String, Object>) c.get("config")
+                ));
+            } catch (ConverterFactory.NoSuchConverterException e1) {
+                LOG.error("Cannot build converter from persisted data. No such converter.", e1);
+                continue;
+            } catch (Exception e) {
+                LOG.error("Cannot build converter from persisted data.", e);
+                continue;
+            }
+        }
+
+        return cl;
     }
 
 }
