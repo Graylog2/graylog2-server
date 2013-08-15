@@ -21,6 +21,7 @@
  */
 package org.graylog2.plugin.inputs;
 
+import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import org.graylog2.plugin.Message;
 import org.graylog2.plugin.database.EmbeddedPersistable;
@@ -134,7 +135,23 @@ public abstract class Extractor implements EmbeddedPersistable {
             put("source_field", sourceField);
             put("creator_user_id", creatorUserId);
             put("extractor_config", extractorConfig);
+            put("converters", converterConfigMap());
         }};
+    }
+
+    public List<Map<String, Object>> converterConfigMap() {
+        List<Map<String, Object>> converterConfig = Lists.newArrayList();
+
+        for (Converter converter : converters) {
+            Map<String, Object> config = Maps.newHashMap();
+
+            config.put("type", converter.getType().toString().toLowerCase());
+            config.put("config", converter.getConfig());
+
+            converterConfig.add(config);
+        }
+
+        return converterConfig;
     }
 
 }
