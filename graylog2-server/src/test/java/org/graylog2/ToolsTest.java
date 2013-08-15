@@ -177,4 +177,20 @@ public class ToolsTest {
         
         assertEquals(expected, Tools.asSortedList(sortMe));
     }
+
+    @Test
+    public void testSafeSubstring() {
+        assertNull(Tools.safeSubstring(null, 10, 20));
+        assertNull(Tools.safeSubstring("", 10, 20));
+        assertNull(Tools.safeSubstring("foo", -1, 2));
+        assertNull(Tools.safeSubstring("foo", 1, 0));
+        assertNull(Tools.safeSubstring("foo", 5, 2));
+        assertNull(Tools.safeSubstring("foo", 1, 1));
+        assertNull(Tools.safeSubstring("foo", 2, 1));
+
+        assertEquals("justatest", Tools.safeSubstring("justatest", 0, 9));
+        assertEquals("tat", Tools.safeSubstring("justatest", 3, 6));
+        assertEquals("just", Tools.safeSubstring("justatest", 0, 4));
+        assertEquals("atest", Tools.safeSubstring("justatest", 4, 9));
+    }
 }

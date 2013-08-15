@@ -30,6 +30,7 @@ import org.graylog2.plugin.streams.Stream;
 
 import java.util.List;
 import java.util.Map;
+import java.util.regex.Pattern;
 
 /**
  * @author Lennart Koopmann <lennart@socketfeed.com>
@@ -40,6 +41,8 @@ public class Message {
     private List<Stream> streams = Lists.newArrayList();
 
     private MessageInput sourceInput;
+
+    private static final Pattern ALPHANUMERIC_ASCII_AND_UNDERSCORE = Pattern.compile("^\\w*$");
 
     // Used for drools to filter out messages.
     private boolean filterOut = false;
@@ -151,7 +154,12 @@ public class Message {
         if (RESERVED_FIELDS.contains(key) && !RESERVED_SETTABLE_FIELDS.contains(key)) {
             return;
         }
-        
+
+        // Only allow alphanumeric characters (and underscores)
+        if(!ALPHANUMERIC_ASCII_AND_UNDERSCORE.matcher(key).matches()) {
+            return;
+        }
+
         this.fields.put(key.trim(), value);
     }      
 
