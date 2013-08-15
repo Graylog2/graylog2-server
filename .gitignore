@@ -3,6 +3,7 @@
 .project
 .settings
 target
+out
 build/*
 dist/*
 build-before-profiler.xml

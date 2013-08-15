@@ -24,10 +24,11 @@ import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.authc.UsernamePasswordToken;
 import org.apache.shiro.mgt.DefaultSecurityManager;
 import org.apache.shiro.realm.Realm;
-import org.apache.shiro.realm.SimpleAccountRealm;
 import org.apache.shiro.subject.Subject;
+import org.graylog2.Configuration;
 import org.graylog2.Core;
 import org.graylog2.jersey.container.netty.SecurityContextFactory;
+import org.graylog2.security.realm.GraylogSimpleAccountRealm;
 import org.graylog2.security.realm.MongoDbRealm;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -42,9 +43,13 @@ public class ShiroSecurityContextFactory implements SecurityContextFactory {
     private org.apache.shiro.mgt.SecurityManager sm;
 
     public ShiroSecurityContextFactory(Core core) {
-        final SimpleAccountRealm inMemoryRealm = new SimpleAccountRealm();
+        final GraylogSimpleAccountRealm inMemoryRealm = new GraylogSimpleAccountRealm();
         inMemoryRealm.setCachingEnabled(false);
-        inMemoryRealm.addAccount("kay", "pass", "admin");
+        final Configuration config = core.getConfiguration();
+        inMemoryRealm.addRootAccount(
+                config.getRootUsername(),
+                config.getRootPasswordSha1()
+        );
 
         final MongoDbRealm mongoDbRealm = new MongoDbRealm(core);
         mongoDbRealm.setCachingEnabled(false);

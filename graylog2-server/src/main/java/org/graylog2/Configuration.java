@@ -20,22 +20,6 @@
 
 package org.graylog2;
 
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.net.UnknownHostException;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
-
-import org.graylog2.inputs.gelf.GELFTCPInput;
-import org.graylog2.inputs.gelf.GELFUDPInput;
-import org.graylog2.inputs.http.GELFHttpInput;
-import org.graylog2.inputs.syslog.SyslogTCPInput;
-import org.graylog2.inputs.syslog.SyslogUDPInput;
-import org.graylog2.plugin.inputs.MessageInput;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import com.github.joschi.jadconfig.Parameter;
 import com.github.joschi.jadconfig.ValidationException;
 import com.github.joschi.jadconfig.ValidatorMethod;
@@ -44,15 +28,17 @@ import com.github.joschi.jadconfig.validators.FileReadableValidator;
 import com.github.joschi.jadconfig.validators.InetPortValidator;
 import com.github.joschi.jadconfig.validators.PositiveIntegerValidator;
 import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
-import com.lmax.disruptor.BlockingWaitStrategy;
-import com.lmax.disruptor.BusySpinWaitStrategy;
-import com.lmax.disruptor.SleepingWaitStrategy;
-import com.lmax.disruptor.WaitStrategy;
-import com.lmax.disruptor.YieldingWaitStrategy;
+import com.lmax.disruptor.*;
 import com.mongodb.ServerAddress;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.ws.rs.core.UriBuilder;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.net.UnknownHostException;
+import java.util.Arrays;
+import java.util.List;
 
 /**
  * Helper class to hold configuration of Graylog2
@@ -201,6 +187,12 @@ public class Configuration {
 
     @Parameter(value = "node_id_file", required = false)
     private String nodeIdFile = "graylog2-server-node-id";
+
+    @Parameter(value = "root_username", required = false)
+    private String rootUsername = "admin";
+
+    @Parameter(value = "root_password_sha1", required = true)
+    private String rootPasswordSha1;
 
     public boolean isMaster() {
         return isMaster;
@@ -450,4 +442,11 @@ public class Configuration {
         }
     }
 
+    public String getRootUsername() {
+        return rootUsername;
+    }
+
+    public String getRootPasswordSha1() {
+        return rootPasswordSha1;
+    }
 }

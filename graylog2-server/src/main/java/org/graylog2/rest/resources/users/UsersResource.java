@@ -20,19 +20,24 @@
 package org.graylog2.rest.resources.users;
 
 import com.google.common.collect.Maps;
+import org.apache.shiro.authz.annotation.RequiresAuthentication;
+import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.bson.types.ObjectId;
 import org.graylog2.database.ValidationException;
 import org.graylog2.rest.resources.RestResource;
-import org.graylog2.rest.resources.users.requests.AuthenticationRequest;
 import org.graylog2.rest.resources.users.requests.CreateRequest;
 import org.graylog2.users.User;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.ws.rs.*;
+import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+import javax.ws.rs.core.SecurityContext;
 import java.io.IOException;
+import java.security.Principal;
+import java.util.HashMap;
 import java.util.Map;
 
 /**
@@ -43,38 +48,29 @@ public class UsersResource extends RestResource {
 
     private static final Logger LOG = LoggerFactory.getLogger(RestResource.class);
 
-    @POST // This is a post request because sending (hashed) user credentials as GET params sucks.
-    @Path("/authenticate")
+    @GET
+    @RequiresAuthentication
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
-    public Response authenticate(String body) {
-        if (body == null || body.isEmpty()) {
-            LOG.error("Missing parameters. Returning HTTP 400.");
-            throw new WebApplicationException(400);
-        }
+    public Response authenticate(@Context SecurityContext securityContext) {
+        final Principal principal = securityContext.getUserPrincipal();
+        final User user = User.load(principal.getName(), core);
 
-        AuthenticationRequest ar;
-        try {
-            ar = objectMapper.readValue(body, AuthenticationRequest.class);
-        } catch(IOException e) {
-            LOG.error("Error while parsing JSON", e);
-            throw new WebApplicationException(e, Response.Status.BAD_REQUEST);
-        }
-
-        if (ar.username == null || ar.username.isEmpty() || ar.password == null || ar.password.isEmpty()) {
-            LOG.error("Incomplete JSON.");
-            throw new WebApplicationException(400);
-        }
-
-        // Check.
-        if (User.exists(ar.username, User.saltPass(ar.password, core.getConfiguration().getPasswordSecret()), core)) {
-            return Response.ok().build();
-        } else {
+        if (user == null) {
             return Response.status(Response.Status.UNAUTHORIZED).build();
         }
+
+        final HashMap<String,String> map = Maps.newHashMap();
+        map.put("username", user.getName());
+        map.put("isAuthorized", "true");
+        map.put("full_name", user.getFullName());
+        return Response.ok().entity(json(map)).build();
+
     }
 
     @POST
+    @RequiresAuthentication
+    @RequiresPermissions("users:create")
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
     public Response create(String body) {
@@ -94,12 +90,13 @@ public class UsersResource extends RestResource {
         // Create user.
         Map<String, Object> userData = Maps.newHashMap();
         userData.put("username", cr.username);
-        userData.put("password", User.saltPass(cr.password, core.getConfiguration().getPasswordSecret()));
+        userData.put("password", cr.password); // core.getConfiguration().getPasswordSecret()));
         userData.put("full_name", cr.fullName);
 
         User user = new User(userData, core);
         ObjectId id;
         try {
+            // TODO JPA this is wrong, the primary key is the username
             id = user.save();
         } catch (ValidationException e) {
             LOG.error("Validation error.", e);

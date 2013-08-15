@@ -51,7 +51,7 @@ public class MongoDbRealm extends AuthorizingRealm {
             throw new IllegalArgumentException("Only implemented for UsernamePasswordToken currently.");
         }
         UsernamePasswordToken token = (UsernamePasswordToken) authToken;
-        log.info("Retrieving authc info for user {}", token.getUsername());
+        log.info("Retrieving authc info for user {}:{}", token.getUsername(), token.getCredentials());
 
         final SimpleAccount simpleAccount;
         if (User.exists(token.getUsername(), new String(token.getPassword()), core)) {
