@@ -19,29 +19,39 @@
  */
 package org.graylog2.inputs.converters;
 
+import com.google.common.primitives.Ints;
 import org.graylog2.ConfigurationException;
 import org.graylog2.plugin.inputs.Converter;
+import org.joda.time.DateTime;
+import org.joda.time.format.DateTimeFormat;
+import org.joda.time.format.DateTimeFormatter;
 
 import java.util.Map;
 
 /**
  * @author Lennart Koopmann <lennart@torch.sh>
  */
-public class ConverterFactory {
+public class DateConverter extends Converter {
 
-    public static Converter factory(Converter.Type type, Map<String, Object> config) throws NoSuchConverterException, ConfigurationException {
-        switch (type) {
-            case NUMERIC:
-                return new NumericConverter(config);
-            case DATE:
-                return new DateConverter(config);
-            case HASH:
-                return new HashConverter(config);
-            default:
-                throw new NoSuchConverterException();
+    private final String dateFormat;
+
+    public DateConverter(Map<String, Object> config) throws ConfigurationException {
+        super(Type.DATE, config);
+
+        if (config.get("date_format") == null || ((String) config.get("date_format")).isEmpty()) {
+            throw new ConfigurationException("Missing config [date_format].");
         }
+
+        dateFormat = (String) config.get("date_format");
     }
 
-    public static class NoSuchConverterException extends Throwable {
+    @Override
+    public Object convert(String value) {
+        if (value == null || value.isEmpty()) {
+            return value;
+        }
+
+        return DateTime.parse(value, DateTimeFormat.forPattern(dateFormat));
     }
+
 }
