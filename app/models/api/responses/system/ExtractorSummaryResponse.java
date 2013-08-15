@@ -21,6 +21,7 @@ package models.api.responses.system;
 
 import com.google.gson.annotations.SerializedName;
 
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -46,5 +47,7 @@ public class ExtractorSummaryResponse {
 
     @SerializedName("creator_user_id")
     public String creatorUserId;
+
+    public List<Map<String, Object>> converters;
 
 }

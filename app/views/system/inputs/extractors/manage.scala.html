@@ -115,12 +115,25 @@
                     </div>
 
                     <div class="well well-small">
-                        <h4>Configuration:</h4>
-                        <ul>
-                            @for((k,v) <- extractor.getExtractorConfig) {
-                                <li>@k: @v</li>
-                            }
-                        </ul>
+                        <div class="xtrc-config">
+                            <h4>Configuration:</h4>
+                            <ul>
+                                @for((k,v) <- extractor.getExtractorConfig) {
+                                    <li>@k: @v</li>
+                                }
+                            </ul>
+                        </div>
+
+                        @if(!extractor.getConverters().isEmpty) {
+                            <div class="xtrc-converters">
+                                <h4>Converters</h4>
+                                <ul>
+                                    @for(converter <- extractor.getConverters) {
+                                        <li>@converter.getType</li>
+                                    }
+                                </ul>
+                            </div>
+                        }
                     </div>
                 </div>
             }

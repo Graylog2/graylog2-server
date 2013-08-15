@@ -21,21 +21,15 @@ package models;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
-import com.google.common.collect.Sets;
 import lib.APIException;
 import lib.Api;
 import models.api.requests.CreateExtractorRequest;
 import models.api.responses.EmptyResponse;
 import models.api.responses.system.ExtractorSummaryResponse;
 import models.api.responses.system.ExtractorsResponse;
-import org.joda.time.DateTime;
-import play.Logger;
 
 import java.io.IOException;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 /**
  * @author Lennart Koopmann <lennart@torch.sh>
@@ -72,15 +66,16 @@ public class Extractor {
                 esr.targetField,
                 Type.valueOf(esr.type.toUpperCase()),
                 esr.extractorConfig,
-                User.load(esr.creatorUserId)
+                User.load(esr.creatorUserId),
+                buildConverterList(esr.converters)
         );
     }
 
     public Extractor(CursorStrategy cursorStrategy, String title, String sourceField, String targetField, Type type, User creatorUser) {
-        this(null, title, cursorStrategy, sourceField, targetField, type, new HashMap<String, Object>(), creatorUser);
+        this(null, title, cursorStrategy, sourceField, targetField, type, new HashMap<String, Object>(), creatorUser, new ArrayList<Converter>());
     }
 
-    public Extractor(String id, String title, CursorStrategy cursorStrategy, String sourceField, String targetField, Type type, Map<String, Object> extractorConfig, User creatorUser) {
+    public Extractor(String id, String title, CursorStrategy cursorStrategy, String sourceField, String targetField, Type type, Map<String, Object> extractorConfig, User creatorUser, List<Converter> converters) {
         this.id = id;
         this.title = title;
         this.cursorStrategy = cursorStrategy;
@@ -89,7 +84,7 @@ public class Extractor {
         this.extractorType = type;
 
         this.extractorConfig = extractorConfig;
-        this.converters = Lists.newArrayList();
+        this.converters = converters;
 
         this.creatorUser = creatorUser;
     }
@@ -155,7 +150,8 @@ public class Extractor {
 
     public void loadConvertersFromForm(Map<String,String[]> form) {
         for(String name : extractSelectedConverters(form)) {
-            converters.add(new Converter(Converter.Type.valueOf(name.toUpperCase())));
+            // TODO load actual config here.
+            converters.add(new Converter(Converter.Type.valueOf(name.toUpperCase()), new HashMap<String, Object>()));
         }
     }
 
@@ -196,6 +192,19 @@ public class Extractor {
         return form.get(key) != null && form.get(key)[0] != null && !form.get(key)[0].isEmpty();
     }
 
+    private static List<Converter> buildConverterList(List<Map<String, Object>> converters) {
+        List<Converter> cl = Lists.newArrayList();
+
+        for(Map<String, Object> converterSummary : converters) {
+            cl.add(new Converter(
+                    Converter.Type.valueOf(converterSummary.get("type").toString().toUpperCase()),
+                    (Map<String, Object>) converterSummary.get("config")
+            ));
+        }
+
+        return cl;
+    }
+
     public User getCreatorUser() {
         return creatorUser;
     }
@@ -226,5 +235,9 @@ public class Extractor {
 
     public CursorStrategy getCursorStrategy() {
         return cursorStrategy;
+    }
+
+    public List<Converter> getConverters() {
+        return converters;
     }
 }

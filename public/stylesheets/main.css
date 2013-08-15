@@ -565,3 +565,15 @@ form #stream-rules {
     position: relative;
     top: -5px;
 }
+
+.node-row .xtrc-converters {
+    margin-top: 10px;
+}
+
+.node-row .xtrc-config li {
+    margin-left: 10px;
+}
+
+.node-row .xtrc-converters li {
+    margin-left: 10px;
+}

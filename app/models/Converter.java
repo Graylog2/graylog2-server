@@ -35,9 +35,11 @@ public class Converter {
     }
 
     private final Type type;
+    private final Map<String, Object> config;
 
-    public Converter(Type type) {
+    public Converter(Type type, Map<String, Object> config) {
         this.type = type;
+        this.config = config;
     }
 
     public String getType() {
@@ -45,7 +47,7 @@ public class Converter {
     }
 
     public Map<String, Object> getConfig() {
-        return Maps.newHashMap();
+        return config;
     }
 
 }
