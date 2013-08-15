@@ -4,10 +4,12 @@ import com.google.common.collect.Lists;
 import com.google.gson.Gson;
 import com.ning.http.client.AsyncHttpClient;
 import com.ning.http.client.AsyncHttpClientConfig;
+import com.ning.http.client.Realm;
 import com.ning.http.client.Response;
-import com.ning.http.client.StringPart;
 import models.Node;
 import models.api.requests.ApiRequest;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
@@ -18,6 +20,7 @@ import java.util.List;
 import java.util.concurrent.ExecutionException;
 
 public class Api {
+	private static final Logger log = LoggerFactory.getLogger(Api.class);
 
 	public static final String ERROR_MSG_IO = "Could not connect to graylog2-server. Please make sure that it is running and you configured the correct REST URI.";
 
@@ -35,7 +38,7 @@ public class Api {
 		}));
 	}
 
-	public static <T> T get(URL url, Class<T> responseClass) throws APIException, IOException {
+	public static <T> T get(URL url, Class<T> responseClass, String username, String password) throws APIException, IOException {
 		try {
 			AsyncHttpClient.BoundRequestBuilder requestBuilder = client.prepareGet(url.toString());
 
@@ -43,6 +46,16 @@ public class Api {
             if (!responseClass.equals(String.class)) {
 			    requestBuilder.addHeader("Accept", "application/json");
             }
+
+			// TODO: better make this _much_ better bro
+			if (username != null && password != null) {
+				requestBuilder.setRealm(new Realm.RealmBuilder()
+						.setPrincipal(username)
+						.setPassword(password)
+						.setUsePreemptiveAuth(true)
+						.setScheme(Realm.AuthScheme.BASIC)
+						.build());
+			}
 
 			final Response response = requestBuilder.execute().get();
 
@@ -174,16 +187,20 @@ public class Api {
     ////////
 
     public static <T> T get(String part, Class<T> responseClass) throws IOException, APIException {
-        return get(buildTarget(Node.random(), part), responseClass);
+        return get(buildTarget(Node.random(), part), responseClass, null, null);
     }
 
 	public static <T> T get(Node node, String part, Class<T> responseClass) throws IOException, APIException {
-        return get(buildTarget(node, part), responseClass);
+        return get(buildTarget(node, part), responseClass, null, null);
     }
 
     public static <T> T get(String host, String part, Class<T> responseClass) throws IOException, APIException {
-        return get(buildTarget(host, part), responseClass);
+        return get(buildTarget(host, part), responseClass, null, null);
     }
+
+	public static <T> T post(String part, ApiRequest body, Class<T> responseClass) throws IOException, APIException {
+		return post(buildTarget(Node.random(), part), body.toJson(), 200, responseClass);
+	}
 
     public static <T> T post(Node node, String part, ApiRequest body, Class<T> responseClass) throws IOException, APIException {
         return post(buildTarget(node, part), body.toJson(), 201, responseClass);
@@ -244,4 +261,9 @@ public class Api {
         return resource;
     }
 
+	// TODO this really sucks. passing username/password manually is not the right way
+	public static <T> T get(String part, Class<T> responseClass, String username, String password) throws IOException, APIException {
+		log.info("GET to {} with {}:{}", buildTarget(Node.random(), part), username, password);
+		return get(buildTarget(Node.random(), part), responseClass, username, password);
+	}
 }
