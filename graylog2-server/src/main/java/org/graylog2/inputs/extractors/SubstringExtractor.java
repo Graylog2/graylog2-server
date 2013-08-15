@@ -22,8 +22,10 @@ package org.graylog2.inputs.extractors;
 import org.graylog2.ConfigurationException;
 import org.graylog2.plugin.Message;
 import org.graylog2.plugin.Tools;
+import org.graylog2.plugin.inputs.Converter;
 import org.graylog2.plugin.inputs.Extractor;
 
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -34,8 +36,8 @@ public class SubstringExtractor extends Extractor {
     private int beginIndex = -1;
     private int endIndex = -1;
 
-    public SubstringExtractor(String id, String title, CursorStrategy cursorStrategy, String sourceField, String targetField, Map<String, Object> extractorConfig, String creatorUserId) throws ReservedFieldException, ConfigurationException {
-        super(id, title, Type.SUBSTRING, cursorStrategy, sourceField, targetField, extractorConfig, creatorUserId);
+    public SubstringExtractor(String id, String title, CursorStrategy cursorStrategy, String sourceField, String targetField, Map<String, Object> extractorConfig, String creatorUserId, List<Converter> converters) throws ReservedFieldException, ConfigurationException {
+        super(id, title, Type.SUBSTRING, cursorStrategy, sourceField, targetField, extractorConfig, creatorUserId, converters);
 
         if (extractorConfig == null || extractorConfig.get("begin_index") == null || extractorConfig.get("end_index") == null) {
             throw new ConfigurationException("Missing regex configuration field: regex_value");

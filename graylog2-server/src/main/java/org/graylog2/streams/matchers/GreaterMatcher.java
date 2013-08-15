@@ -23,7 +23,7 @@ package org.graylog2.streams.matchers;
 import org.graylog2.plugin.Message;
 import org.graylog2.plugin.streams.StreamRule;
 
-import static org.graylog2.streams.matchers.MatcherBase.getInt;
+import static org.graylog2.plugin.Tools.getInt;
 
 /**
  * @author Lennart Koopmann <lennart@socketfeed.com>

@@ -17,37 +17,30 @@
  * along with Graylog2.  If not, see <http://www.gnu.org/licenses/>.
  *
  */
-package org.graylog2.rest.resources.system.inputs.requests;
+package org.graylog2.inputs.converters;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
+import org.apache.commons.codec.digest.DigestUtils;
+import org.graylog2.plugin.inputs.Converter;
 
 import java.util.Map;
 
 /**
  * @author Lennart Koopmann <lennart@torch.sh>
  */
-public class CreateExtractorRequest {
+public class HashConverter extends Converter {
 
-    public String title;
+    public HashConverter(Map<String, Object> config) {
+        super(Type.HASH, config);
+    }
 
-    @JsonProperty("cut_or_copy")
-    public String cutOrCopy;
+    @Override
+    public Object convert(String value) {
+        if (value == null || value.isEmpty()) {
+            return value;
+        }
 
-    @JsonProperty("source_field")
-    public String sourceField;
-
-    @JsonProperty("target_field")
-    public String targetField;
-
-    @JsonProperty("extractor_type")
-    public String extractorType;
-
-    @JsonProperty("creator_user_id")
-    public String creatorUserId;
-
-    @JsonProperty("extractor_config")
-    public Map<String, Object> extractorConfig;
-
-    public Map<String, Map<String, Object>> converters;
+        // MessageDigest is not threadsafe. #neverForget
+        return DigestUtils.md5Hex(value);
+    }
 
 }

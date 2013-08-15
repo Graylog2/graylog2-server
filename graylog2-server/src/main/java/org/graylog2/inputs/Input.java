@@ -34,16 +34,14 @@ import org.graylog2.database.validators.FilledStringValidator;
 import org.graylog2.database.validators.MapValidator;
 import org.graylog2.database.validators.Validator;
 import org.graylog2.inputs.extractors.ExtractorFactory;
+import org.graylog2.plugin.inputs.Converter;
 import org.graylog2.plugin.inputs.Extractor;
 import org.graylog2.users.User;
 import org.joda.time.DateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * @author Lennart Koopmann <lennart@torch.sh>
@@ -149,7 +147,8 @@ public class Input extends Persisted {
                         (String) ex.get("source_field"),
                         (String) ex.get("target_field"),
                         (Map<String, Object>) ex.get("extractor_config"),
-                        (String) ex.get("creator_user_id")
+                        (String) ex.get("creator_user_id"),
+                        new ArrayList<Converter>()
                 );
 
                 extractors.add(extractor);

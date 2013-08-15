@@ -32,6 +32,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.EOFException;
 import java.io.IOException;
 import java.util.Calendar;
+import java.util.HashMap;
 import java.util.List;
 import java.util.zip.Deflater;
 import java.util.zip.GZIPOutputStream;
@@ -192,5 +193,23 @@ public class ToolsTest {
         assertEquals("tat", Tools.safeSubstring("justatest", 3, 6));
         assertEquals("just", Tools.safeSubstring("justatest", 0, 4));
         assertEquals("atest", Tools.safeSubstring("justatest", 4, 9));
+    }
+
+    @Test
+    public void testGetInt() throws Exception {
+        assertEquals(null, Tools.getInt(null));
+
+        assertEquals((Integer) 0, Tools.getInt(0));
+        assertEquals((Integer) 1, Tools.getInt(1));
+        assertEquals((Integer) 9001, Tools.getInt(9001));
+
+        assertEquals((Integer) 1253453, Tools.getInt((long) 1253453));
+        assertEquals(null, Tools.getInt((double) 5));
+        assertEquals(null, Tools.getInt(18.2));
+
+        assertEquals((Integer) 88, Tools.getInt("88"));
+        assertEquals(null, Tools.getInt("lol NOT A NUMBER"));
+
+        assertEquals(null, Tools.getInt(new HashMap<String, String>()));
     }
 }

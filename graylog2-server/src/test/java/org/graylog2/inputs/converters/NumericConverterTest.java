@@ -17,37 +17,30 @@
  * along with Graylog2.  If not, see <http://www.gnu.org/licenses/>.
  *
  */
-package org.graylog2.rest.resources.system.inputs.requests;
+package org.graylog2.inputs.converters;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
+import org.graylog2.plugin.inputs.Converter;
+import org.junit.Test;
 
-import java.util.Map;
+import java.util.HashMap;
+
+import static junit.framework.Assert.assertEquals;
+import static junit.framework.Assert.assertNull;
 
 /**
  * @author Lennart Koopmann <lennart@torch.sh>
  */
-public class CreateExtractorRequest {
+public class NumericConverterTest {
 
-    public String title;
+    @Test
+    public void testConvert() throws Exception {
+        Converter hc = new NumericConverter(new HashMap<String, Object>());
 
-    @JsonProperty("cut_or_copy")
-    public String cutOrCopy;
-
-    @JsonProperty("source_field")
-    public String sourceField;
-
-    @JsonProperty("target_field")
-    public String targetField;
-
-    @JsonProperty("extractor_type")
-    public String extractorType;
-
-    @JsonProperty("creator_user_id")
-    public String creatorUserId;
-
-    @JsonProperty("extractor_config")
-    public Map<String, Object> extractorConfig;
-
-    public Map<String, Map<String, Object>> converters;
+        assertNull(hc.convert(null));
+        assertEquals("", hc.convert(""));
+        assertEquals("lol no number", hc.convert("lol no number"));
+        assertEquals(9001, hc.convert("9001"));
+        assertEquals(Integer.class, hc.convert("4").getClass());
+    }
 
 }

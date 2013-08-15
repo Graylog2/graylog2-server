@@ -17,37 +17,28 @@
  * along with Graylog2.  If not, see <http://www.gnu.org/licenses/>.
  *
  */
-package org.graylog2.streams.matchers;
+package org.graylog2.inputs.converters;
 
+import org.graylog2.plugin.inputs.Converter;
 import org.junit.Test;
 
 import java.util.HashMap;
 
-import static org.junit.Assert.assertEquals;
+import static junit.framework.Assert.assertEquals;
+import static junit.framework.Assert.assertNull;
 
 /**
  * @author Lennart Koopmann <lennart@torch.sh>
  */
-public class MatcherBaseTest {
+public class HashConverterTest {
 
     @Test
-    public void testGetInt() throws Exception {
-        MatcherBase mb  = new MatcherBase();
+    public void testConvert() throws Exception {
+        Converter hc = new HashConverter(new HashMap<String, Object>());
 
-        assertEquals(null, mb.getInt(null));
-
-        assertEquals((Integer) 0, mb.getInt(0));
-        assertEquals((Integer) 1, mb.getInt(1));
-        assertEquals((Integer) 9001, mb.getInt(9001));
-
-        assertEquals((Integer) 1253453, mb.getInt((long) 1253453));
-        assertEquals(null, mb.getInt((double) 5));
-        assertEquals(null, mb.getInt(18.2));
-
-        assertEquals((Integer) 88, mb.getInt("88"));
-        assertEquals(null, mb.getInt("lol NOT A NUMBER"));
-
-        assertEquals(null, mb.getInt(new HashMap<String, String>()));
+        assertNull(hc.convert(null));
+        assertEquals("", hc.convert(""));
+        assertEquals("c029b5a72ae255853d7151a9e28c6260", hc.convert("graylog2"));
     }
 
 }

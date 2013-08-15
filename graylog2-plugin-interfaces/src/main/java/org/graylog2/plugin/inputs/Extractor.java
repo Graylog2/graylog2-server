@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2012 Lennart Koopmann <lennart@socketfeed.com>
+ * Copyright (c) 2013 Lennart Koopmann <lennart@socketfeed.com>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of
  * this software and associated documentation files (the "Software"), to deal in
@@ -26,6 +26,7 @@ import org.graylog2.plugin.Message;
 import org.graylog2.plugin.database.EmbeddedPersistable;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -52,10 +53,11 @@ public abstract class Extractor implements EmbeddedPersistable {
     protected final String sourceField;
     protected final String creatorUserId;
     protected final Map<String, Object> extractorConfig;
+    protected final List<Converter> converters;
 
     public abstract void run(Message msg);
 
-    public Extractor(String id, String title, Type type, CursorStrategy cursorStrategy, String sourceField, String targetField, Map<String, Object> extractorConfig, String creatorUserId) throws ReservedFieldException {
+    public Extractor(String id, String title, Type type, CursorStrategy cursorStrategy, String sourceField, String targetField, Map<String, Object> extractorConfig, String creatorUserId, List<Converter> converters) throws ReservedFieldException {
         if (Message.RESERVED_FIELDS.contains(targetField)) {
             throw new ReservedFieldException("You cannot apply an extractor on reserved field [" + targetField + "].");
         }
@@ -68,6 +70,20 @@ public abstract class Extractor implements EmbeddedPersistable {
         this.sourceField = sourceField;
         this.extractorConfig = extractorConfig;
         this.creatorUserId = creatorUserId;
+        this.converters = converters;
+    }
+
+    public void runConverters(Message msg) {
+        for (Converter converter : converters) {
+            if (!(msg.getFields().get(targetField) instanceof String)) {
+                continue;
+            }
+
+            String value = (String) msg.getFields().get(targetField);
+
+            msg.removeField(targetField);
+            msg.addField(targetField, converter.convert(value));
+        }
     }
 
     public class ReservedFieldException extends Exception {

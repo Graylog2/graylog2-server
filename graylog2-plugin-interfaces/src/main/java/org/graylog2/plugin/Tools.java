@@ -33,6 +33,8 @@ import java.util.List;
 import java.util.UUID;
 import java.util.zip.GZIPInputStream;
 import java.util.zip.InflaterInputStream;
+
+import com.google.common.primitives.Ints;
 import org.drools.util.codec.Base64;
 import org.elasticsearch.search.SearchHit;
 import org.joda.time.DateTime;
@@ -294,6 +296,41 @@ public final class Tools {
         }
 
         return target.substring(start, end);
+    }
+
+    /**
+     * Convert something to an int in a fast way having a good guess
+     * that it is an int. This is perfect for MongoDB data that *should*
+     * have been stored as integers already so there is a high probability
+     * of easy converting.
+     *
+     * @param x The object to convert to an int
+     * @return Converted object, 0 if empty or something went wrong.
+     */
+    public static Integer getInt(Object x) {
+        if (x == null) {
+            return null;
+        }
+
+        if (x instanceof Integer) {
+            return (Integer) x;
+        }
+
+        if (x instanceof String) {
+            String s = x.toString();
+            if (s == null || s.isEmpty()) {
+                return null;
+            }
+        }
+
+        /*
+         * This is the last and probably expensive fallback. This should be avoided by
+         * only passing in Integers, Longs or stuff that can be parsed from it's String
+         * representation. You might have to build cached objects that did a safe conversion
+         * once for example. There is no way around for the actual values we compare if the
+         * user sent them in as non-numerical type.
+         */
+        return Ints.tryParse(x.toString());
     }
  
 }

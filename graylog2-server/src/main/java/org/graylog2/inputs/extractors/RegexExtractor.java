@@ -21,8 +21,10 @@ package org.graylog2.inputs.extractors;
 
 import org.graylog2.ConfigurationException;
 import org.graylog2.plugin.Message;
+import org.graylog2.plugin.inputs.Converter;
 import org.graylog2.plugin.inputs.Extractor;
 
+import java.util.List;
 import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -34,8 +36,8 @@ public class RegexExtractor extends Extractor {
 
     private final Pattern pattern;
 
-    public RegexExtractor(String id, String title, CursorStrategy cursorStrategy, String sourceField, String targetField, Map<String, Object> extractorConfig, String creatorUserId) throws ReservedFieldException, ConfigurationException {
-        super(id, title, Type.REGEX, cursorStrategy, sourceField, targetField, extractorConfig, creatorUserId);
+    public RegexExtractor(String id, String title, CursorStrategy cursorStrategy, String sourceField, String targetField, Map<String, Object> extractorConfig, String creatorUserId, List<Converter> converters) throws ReservedFieldException, ConfigurationException {
+        super(id, title, Type.REGEX, cursorStrategy, sourceField, targetField, extractorConfig, creatorUserId, converters);
 
         if (extractorConfig == null || extractorConfig.get("regex_value") == null || ((String) extractorConfig.get("regex_value")).isEmpty()) {
             throw new ConfigurationException("Missing regex configuration field: regex_value");
