@@ -21,35 +21,37 @@ package org.graylog2.inputs.converters;
 
 import org.graylog2.ConfigurationException;
 import org.graylog2.plugin.inputs.Converter;
-import org.joda.time.DateTime;
-import org.joda.time.format.DateTimeFormat;
+import org.junit.Test;
 
+import java.util.HashMap;
 import java.util.Map;
+
+import static junit.framework.Assert.assertEquals;
 
 /**
  * @author Lennart Koopmann <lennart@torch.sh>
  */
-public class DateConverter extends Converter {
+public class DateConverterTest {
 
-    private final String dateFormat;
-
-    public DateConverter(Map<String, Object> config) throws ConfigurationException {
-        super(Type.DATE, config);
-
-        if (config.get("date_format") == null || ((String) config.get("date_format")).isEmpty()) {
-            throw new ConfigurationException("Missing config [date_format].");
-        }
-
-        dateFormat = (String) config.get("date_format");
+    @Test
+    public void testBasicConvert() throws Exception {
+        assertEquals("2013-08-15T23:15:16.000+02:00", new DateConverter(config("YYYY MMM dd HH:mm:ss")).convert("2013 Aug 15 23:15:16").toString());
     }
 
-    @Override
-    public Object convert(String value) {
-        if (value == null || value.isEmpty()) {
-            return value;
-        }
+    @Test(expected = ConfigurationException.class)
+    public void testWithEmptyConfig() throws Exception {
+        assertEquals(null, new DateConverter(config("")).convert("foo"));
+    }
 
-        return DateTime.parse(value, DateTimeFormat.forPattern(dateFormat));
+    @Test(expected = ConfigurationException.class)
+    public void testWithNullConfig() throws Exception {
+        assertEquals(null, new DateConverter(config(null)).convert("foo"));
+    }
+
+    private Map<String, Object> config(final String dateFormat) {
+        return new HashMap<String, Object>() {{
+            put("date_format", dateFormat);
+        }};
     }
 
 }
