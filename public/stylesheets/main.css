@@ -577,3 +577,7 @@ form #stream-rules {
 .node-row .xtrc-converters li {
     margin-left: 10px;
 }
+
+.node-row .xtrc-converter-config li {
+    margin-left: 20px;
+}

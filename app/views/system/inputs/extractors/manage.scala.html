@@ -130,6 +130,14 @@
                                 <ul>
                                     @for(converter <- extractor.getConverters) {
                                         <li>@converter.getType</li>
+
+                                        @if(!converter.getConfig.isEmpty) {
+                                            <ul class="xtrc-converter-config">
+                                                @for((k,v) <- converter.getConfig) {
+                                                    <li>@k: @v</li>
+                                                }
+                                            </ul>
+                                        }
                                     }
                                 </ul>
                             </div>

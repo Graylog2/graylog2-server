@@ -27,6 +27,7 @@ import models.api.requests.CreateExtractorRequest;
 import models.api.responses.EmptyResponse;
 import models.api.responses.system.ExtractorSummaryResponse;
 import models.api.responses.system.ExtractorsResponse;
+import play.Logger;
 
 import java.io.IOException;
 import java.util.*;
@@ -150,9 +151,25 @@ public class Extractor {
 
     public void loadConvertersFromForm(Map<String,String[]> form) {
         for(String name : extractSelectedConverters(form)) {
-            // TODO load actual config here.
-            converters.add(new Converter(Converter.Type.valueOf(name.toUpperCase()), new HashMap<String, Object>()));
+            Converter.Type converterType = Converter.Type.valueOf(name.toUpperCase());
+            Map<String, Object> converterConfig = extractConverterConfig(converterType, form);
+
+            converters.add(new Converter(converterType, converterConfig));
         }
+    }
+
+    private Map<String, Object> extractConverterConfig(Converter.Type converterType, Map<String,String[]> form) {
+        Map<String, Object> config = Maps.newHashMap();
+        switch (converterType) {
+            case DATE:
+                if (formFieldSet(form, "converter_date_format")) {
+                    config.put("date_format", form.get("converter_date_format")[0]);
+                } else {
+                    config.put("date_format", "yyyy-MM-dd HH:mm:ss.SSS");
+                }
+        }
+
+        return config;
     }
 
     private List<String> extractSelectedConverters(Map<String, String[]> form) {
