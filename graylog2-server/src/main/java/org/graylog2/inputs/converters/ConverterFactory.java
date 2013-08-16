@@ -20,6 +20,8 @@
 package org.graylog2.inputs.converters;
 
 import org.graylog2.ConfigurationException;
+import org.graylog2.inputs.extractors.SyslogPriFacilityConverter;
+import org.graylog2.inputs.extractors.SyslogPriLevelConverter;
 import org.graylog2.plugin.inputs.Converter;
 
 import java.util.Map;
@@ -37,6 +39,10 @@ public class ConverterFactory {
                 return new DateConverter(config);
             case HASH:
                 return new HashConverter(config);
+            case SYSLOG_PRI_LEVEL:
+                return new SyslogPriLevelConverter(config);
+            case SYSLOG_PRI_FACILITY:
+                return new SyslogPriFacilityConverter(config);
             default:
                 throw new NoSuchConverterException();
         }
