@@ -2,7 +2,7 @@
 language: java
 env:
   global:
-  - PLAY_VERSION=2.1.1
+  - PLAY_VERSION=2.1.3
   - secure: |-
       x85VA9iP+/ZkBaWiupbGeJBDM4MBTp98yBVnWIe+vbWMj07zmvrIfM6rsdgT
       hZ1uBgEzGfpZ/vnU8CQN6KYXmyG2Vy4j2RlOhHf7aChNh38VzCq+97gXmLCR
