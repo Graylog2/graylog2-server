@@ -97,11 +97,18 @@
         @if(extractors.size() > 0) {
             @for(extractor <- extractors) {
                 <div class="row-fluid node-row">
-                    <h3><i class="icon icon-ellipsis-vertical"></i> @extractor.getTitle (@Extractor.typeToHuman(extractor.getType))</h3>
+                    <h3>
+                        <i class="icon icon-ellipsis-vertical"></i>
+                        <strong>@extractor.getTitle</strong> (@Extractor.typeToHuman(extractor.getType))
+                    </h3>
 
                     <span class="pull-right node-row-info node-row-info-negative-correction">
                         <span class="text">Added by @views.html.partials.links.to_user(extractor.getCreatorUser)</span>
                             &nbsp;
+
+                        <button class="btn btn-mini extractor-show-details" data-extractor-id="@extractor.getId">
+                                Details
+                        </button>
 
                         <form action="@routes.ExtractorsController.delete(node.getNodeId, input.getId, extractor.getId)" method="POST">
                             <button class="btn btn-danger btn-mini" type="submit" data-confirm="Really remove extractor?">
@@ -114,7 +121,7 @@
                         @views.html.system.inputs.extractors.partials.extractor_summary(extractor)
                     </div>
 
-                    <div class="well well-small">
+                    <div class="well well-small extractor-details-@extractor.getId" style="display: none;">
                         <div class="xtrc-config">
                             <h4>Configuration:</h4>
                             <ul>

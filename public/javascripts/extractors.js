@@ -192,4 +192,10 @@ $(document).ready(function() {
         }
     });
 
+    // Show extractor details.
+    $(".extractor-show-details").on("click", function() {
+        var extractorId = $(this).attr("data-extractor-id");
+        $(".extractor-details-" + extractorId).toggle();
+    });
+
 });

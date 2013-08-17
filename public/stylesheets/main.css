@@ -536,6 +536,10 @@ form #stream-rules {
     margin-top: 15px;
 }
 
+.xtrc-list-container h2 {
+    margin-bottom: 5px;
+}
+
 .xtrc-list-container .alert {
     margin-top: 5px;
 }
