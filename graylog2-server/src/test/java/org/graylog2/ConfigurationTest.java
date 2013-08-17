@@ -1,21 +1,19 @@
 package org.graylog2;
 
-import java.io.File;
-import java.io.IOException;
-import java.util.Map;
-
-import junit.framework.Assert;
-
-import org.bson.types.ObjectId;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
-
 import com.github.joschi.jadconfig.JadConfig;
 import com.github.joschi.jadconfig.RepositoryException;
 import com.github.joschi.jadconfig.ValidationException;
 import com.github.joschi.jadconfig.repositories.InMemoryRepository;
 import com.google.common.collect.Maps;
+import org.junit.Assert;
+import org.bson.types.ObjectId;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
+
+import java.io.File;
+import java.io.IOException;
+import java.util.Map;
 
 /**
  * Unit tests for {@link Configuration} class
@@ -52,6 +50,7 @@ public class ConfigurationTest {
         validProperties.put("mongodb_port", "27017");
         validProperties.put("use_gelf", "true");
         validProperties.put("gelf_listen_port", "12201");
+        validProperties.put("root_password_sha1", "d033e22ae348aeb5660fc2140aec35850c4da997"); // sha1 of admin
 
         // Additional numerical properties
         validProperties.put("mongodb_max_connections", "100");
