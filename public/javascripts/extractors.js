@@ -41,8 +41,8 @@ $(document).ready(function() {
             showSpinner(subcontainer);
             manualSelector.hide();
 
-            var index = $("input[name=message_id]", $(this)).val();
-            var messageId = $("input[name=index]", $(this)).val();
+            var index = $("input[name=index]", $(this)).val();
+            var messageId = $("input[name=message_id]", $(this)).val();
 
             $.ajax({
                 url: '/a/messages/' + index + '/' + messageId,
