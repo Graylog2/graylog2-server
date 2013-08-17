@@ -1,0 +1,68 @@
+@(metrics: ExtractorMetrics)
+
+<div class="xtrc-metrics">
+    <h3>
+        <i class="icon icon-time"></i>
+        Metrics
+        <span class="unit">(timings in microseconds, rates in events/second since boot)</span>
+    </h3>
+
+    @if(metrics.getMeter != null) {
+        <div class="meter">
+            @metrics.getMeter.getTotal total invocations since boot,
+
+            averages:
+            @metrics.getMeter.getOneMinuteFormatted,
+            @metrics.getMeter.getFiveMinuteFormatted,
+            @metrics.getMeter.getFifteenMinuteFormatted
+        </div>
+    }
+
+    <div class="span4">
+        <h3 class="u-light" style="display: inline;">Total extractor time</h3><br />
+        @if(metrics.getTotalTiming == null) {
+            NO TOTAL TIMING INFORMATION
+        } else {
+            <dl>
+                <dt>98th percentile:</dt>
+                <dd>@metrics.getTotalTiming.get98thPercentile()&#956;s</dd>
+
+                <dt>Standard deviation:</dt>
+                <dd>@metrics.getTotalTiming.getStandardDeviation&#956;s</dd>
+
+                <dt>Mean:</dt>
+                <dd>@metrics.getTotalTiming.getMean&#956;s</dd>
+
+                <dt>Minimum:</dt>
+                <dd>@metrics.getTotalTiming.getMinimum&#956;s</dd>
+
+                <dt>Maximum:</dt>
+                <dd>@metrics.getTotalTiming.getMaximum&#956;s</dd>
+            </dl>
+        }
+    </div>
+
+    <div class="span4">
+        <h3 class="u-light" style="display: inline;">Converter time</h3><br />
+        @if(metrics.getConverterTiming == null) {
+            NO CONVERTER TIMING INFORMATION
+        } else {
+            <dl>
+                <dt>98th percentile:</dt>
+                <dd>@metrics.getConverterTiming.get98thPercentile()&#956;s</dd>
+
+                <dt>Standard deviation:</dt>
+                <dd>@metrics.getConverterTiming.getStandardDeviation&#956;s</dd>
+
+                <dt>Mean:</dt>
+                <dd>@metrics.getConverterTiming.getMean&#956;s</dd>
+
+                <dt>Minimum:</dt>
+                <dd>@metrics.getConverterTiming.getMinimum&#956;s</dd>
+
+                <dt>Maximum:</dt>
+                <dd>@metrics.getConverterTiming.getMaximum&#956;s</dd>
+            </dl>
+        }
+    </div>
+</div>

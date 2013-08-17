@@ -585,3 +585,33 @@ form #stream-rules {
 .node-row .xtrc-converter-config li {
     margin-left: 20px;
 }
+
+.u-light {
+    border-bottom: 1px dotted #bbb;
+}
+
+.xtrc-metrics {
+    margin-top: 7px;
+    margin-left: 5px;
+}
+
+.xtrc-metrics .span4 {
+    margin-left: 0px;
+}
+
+.xtrc-metrics h3 .unit {
+    font-size: 11px;
+}
+
+.xtrc-metrics dl {
+    margin-top: 3px;
+    margin-bottom: 0px;
+}
+
+.xtrc-metrics dt {
+    float: left;
+}
+
+.xtrc-metrics dd {
+    margin-left: 130px;
+}

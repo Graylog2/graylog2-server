@@ -121,34 +121,38 @@
                         @views.html.system.inputs.extractors.partials.extractor_summary(extractor)
                     </div>
 
-                    <div class="well well-small extractor-details-@extractor.getId" style="display: none;">
-                        <div class="xtrc-config">
-                            <h4>Configuration:</h4>
-                            <ul>
-                                @for((k,v) <- extractor.getExtractorConfig) {
-                                    <li>@k: @v</li>
-                                }
-                            </ul>
-                        </div>
-
-                        @if(!extractor.getConverters().isEmpty) {
-                            <div class="xtrc-converters">
-                                <h4>Converters</h4>
+                    <div class="extractor-details-@extractor.getId" style="display: none;">
+                        <div class="well well-small">
+                            <div class="xtrc-config">
+                                <h4>Configuration:</h4>
                                 <ul>
-                                    @for(converter <- extractor.getConverters) {
-                                        <li>@converter.getType</li>
-
-                                        @if(!converter.getConfig.isEmpty) {
-                                            <ul class="xtrc-converter-config">
-                                                @for((k,v) <- converter.getConfig) {
-                                                    <li>@k: @v</li>
-                                                }
-                                            </ul>
-                                        }
+                                    @for((k,v) <- extractor.getExtractorConfig) {
+                                        <li>@k: @v</li>
                                     }
                                 </ul>
                             </div>
-                        }
+
+                            @if(!extractor.getConverters().isEmpty) {
+                                <div class="xtrc-converters">
+                                    <h4>Converters</h4>
+                                    <ul>
+                                        @for(converter <- extractor.getConverters) {
+                                            <li>@converter.getType</li>
+
+                                            @if(!converter.getConfig.isEmpty) {
+                                                <ul class="xtrc-converter-config">
+                                                    @for((k,v) <- converter.getConfig) {
+                                                        <li>@k: @v</li>
+                                                    }
+                                                </ul>
+                                            }
+                                        }
+                                    </ul>
+                                </div>
+                            }
+                        </div>
+                        @views.html.system.inputs.extractors.partials.extractor_metrics(extractor.getMetrics)
+
                     </div>
                 </div>
             }

@@ -57,6 +57,7 @@ public class Extractor {
     private final User creatorUser;
     private final Map<String, Object> extractorConfig;
     private final List<Converter> converters;
+    private final ExtractorMetrics metrics;
 
     public Extractor(ExtractorSummaryResponse esr) {
         this(
@@ -68,15 +69,16 @@ public class Extractor {
                 Type.valueOf(esr.type.toUpperCase()),
                 esr.extractorConfig,
                 User.load(esr.creatorUserId),
-                buildConverterList(esr.converters)
+                buildConverterList(esr.converters),
+                new ExtractorMetrics(esr.metrics.get("total"), esr.metrics.get("converters"))
         );
     }
 
     public Extractor(CursorStrategy cursorStrategy, String title, String sourceField, String targetField, Type type, User creatorUser) {
-        this(null, title, cursorStrategy, sourceField, targetField, type, new HashMap<String, Object>(), creatorUser, new ArrayList<Converter>());
+        this(null, title, cursorStrategy, sourceField, targetField, type, new HashMap<String, Object>(), creatorUser, new ArrayList<Converter>(), null);
     }
 
-    public Extractor(String id, String title, CursorStrategy cursorStrategy, String sourceField, String targetField, Type type, Map<String, Object> extractorConfig, User creatorUser, List<Converter> converters) {
+    public Extractor(String id, String title, CursorStrategy cursorStrategy, String sourceField, String targetField, Type type, Map<String, Object> extractorConfig, User creatorUser, List<Converter> converters, ExtractorMetrics metrics) {
         this.id = id;
         this.title = title;
         this.cursorStrategy = cursorStrategy;
@@ -88,6 +90,7 @@ public class Extractor {
         this.converters = converters;
 
         this.creatorUser = creatorUser;
+        this.metrics = metrics;
     }
 
     public void create(Node node, Input input) throws IOException, APIException {
@@ -257,4 +260,9 @@ public class Extractor {
     public List<Converter> getConverters() {
         return converters;
     }
+
+    public ExtractorMetrics getMetrics() {
+        return metrics;
+    }
+
 }

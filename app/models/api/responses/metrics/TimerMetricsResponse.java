@@ -17,40 +17,29 @@
  * along with Graylog2.  If not, see <http://www.gnu.org/licenses/>.
  *
  */
-package models.api.responses.system;
+package models.api.responses.metrics;
 
 import com.google.gson.annotations.SerializedName;
-import models.api.responses.metrics.TimerRateMetricsResponse;
-
-import java.util.List;
-import java.util.Map;
 
 /**
  * @author Lennart Koopmann <lennart@torch.sh>
  */
-public class ExtractorSummaryResponse {
+public class TimerMetricsResponse {
 
-    public String id;
-    public String title;
-    public String type;
+    public long min;
+    public long max;
+    public long mean;
 
-    @SerializedName("target_field")
-    public String targetField;
+    @SerializedName("std_dev")
+    public long stdDev;
 
-    @SerializedName("source_field")
-    public String sourceField;
+    @SerializedName("95th_percentile")
+    public long percentile95th;
 
-    @SerializedName("cursor_strategy")
-    public String cursorStrategy;
+    @SerializedName("98th_percentile")
+    public long percentile98th;
 
-    @SerializedName("extractor_config")
-    public Map<String, Object> extractorConfig;
-
-    @SerializedName("creator_user_id")
-    public String creatorUserId;
-
-    public List<Map<String, Object>> converters;
-
-    public Map<String, TimerRateMetricsResponse> metrics;
+    @SerializedName("99th_percentile")
+    public long percentile99th;
 
 }
