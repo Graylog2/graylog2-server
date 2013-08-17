@@ -1,0 +1,17 @@
+@(timing: lib.metrics.Timing)
+<dl>
+    <dt>98th percentile:</dt>
+    <dd>@timing.get98thPercentile()&#956;s</dd>
+
+    <dt>Standard deviation:</dt>
+    <dd>@timing.getStandardDeviation&#956;s</dd>
+
+    <dt>Mean:</dt>
+    <dd>@timing.getMean&#956;s</dd>
+
+    <dt>Minimum:</dt>
+    <dd>@timing.getMinimum&#956;s</dd>
+
+    <dt>Maximum:</dt>
+    <dd>@timing.getMaximum&#956;s</dd>
+</dl>

@@ -19,6 +19,8 @@
  */
 package models;
 
+import lib.metrics.Meter;
+import lib.metrics.Timing;
 import models.api.responses.metrics.RateMetricsResponse;
 import models.api.responses.metrics.TimerMetricsResponse;
 import models.api.responses.metrics.TimerRateMetricsResponse;
@@ -30,12 +32,6 @@ import java.text.DecimalFormat;
  */
 public class ExtractorMetrics {
 
-    public enum TimingUnit {
-        MICROSECONDS
-    }
-
-    DecimalFormat df = new DecimalFormat("#.##");
-
     private Meter meter;
 
     private Timing totalTiming;
@@ -43,11 +39,11 @@ public class ExtractorMetrics {
 
     public ExtractorMetrics(TimerRateMetricsResponse total, TimerRateMetricsResponse converters) {
         if (total.durationUnit != null) {
-            this.totalTiming = new Timing(total.time, TimingUnit.valueOf(total.durationUnit.toUpperCase()));
+            this.totalTiming = new Timing(total.time, Timing.Unit.valueOf(total.durationUnit.toUpperCase()));
         }
 
         if (converters.durationUnit != null) {
-            this.converterTiming = new Timing(converters.time, TimingUnit.valueOf(converters.durationUnit.toUpperCase()));
+            this.converterTiming = new Timing(converters.time, Timing.Unit.valueOf(converters.durationUnit.toUpperCase()));
         }
 
         if (total.rate == null) {
@@ -67,113 +63,6 @@ public class ExtractorMetrics {
 
     public Meter getMeter() {
         return meter;
-    }
-
-    public class Timing {
-
-        private final long standardDeviation;
-        private final long minimum;
-        private final long maximum;
-        private final long mean;
-        private final long percentile95th;
-        private final long percentile98th;
-        private final long percentile99th;
-
-        public Timing(TimerMetricsResponse t, TimingUnit durationUnit) {
-            if (!durationUnit.equals(TimingUnit.MICROSECONDS)) {
-                throw new RuntimeException("Extractor timings must be in microseconds.");
-            }
-
-            this.standardDeviation = t.stdDev;
-            this.minimum = t.min;
-            this.maximum = t.max;
-            this.mean = t.mean;
-            this.percentile95th = t.percentile95th;
-            this.percentile98th = t.percentile98th;
-            this.percentile99th = t.percentile99th;
-        }
-
-        public long getStandardDeviation() {
-            return standardDeviation;
-        }
-
-        public long getMinimum() {
-            return minimum;
-        }
-
-        public long getMaximum() {
-            return maximum;
-        }
-
-        public long getMean() {
-            return mean;
-        }
-
-        public long get95thPercentile() {
-            return percentile95th;
-        }
-
-        public long get98thPercentile() {
-            return percentile98th;
-        }
-
-        public long get99thPercentile() {
-            return percentile99th;
-        }
-    }
-
-    public class Meter {
-
-        public final long total;
-        public final double mean;
-        public final double oneMinute;
-        public final double fiveMinute;
-        public final double fifteenMinute;
-
-        public Meter(RateMetricsResponse rate) {
-            this.total = rate.total;
-            this.mean = rate.mean;
-            this.oneMinute = rate.oneMinute;
-            this.fiveMinute = rate.fiveMinute;
-            this.fifteenMinute = rate.fifteenMinute;
-        }
-
-        public long getTotal() {
-            return total;
-        }
-
-        public double getMean() {
-            return mean;
-        }
-
-        public double getOneMinute() {
-            return oneMinute;
-        }
-
-        public double getFiveMinute() {
-            return fiveMinute;
-        }
-
-        public double getFifteenMinute() {
-            return fifteenMinute;
-        }
-
-        public String getMeanFormatted() {
-            return df.format(mean);
-        }
-
-        public String getOneMinuteFormatted() {
-            return df.format(oneMinute);
-        }
-
-        public String getFiveMinuteFormatted() {
-            return df.format(fiveMinute);
-        }
-
-        public String getFifteenMinuteFormatted() {
-            return df.format(fifteenMinute);
-        }
-
     }
 
 }

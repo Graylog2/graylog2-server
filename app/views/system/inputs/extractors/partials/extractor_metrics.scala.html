@@ -23,22 +23,7 @@
         @if(metrics.getTotalTiming == null) {
             No message passed through here yet.
         } else {
-            <dl>
-                <dt>98th percentile:</dt>
-                <dd>@metrics.getTotalTiming.get98thPercentile()&#956;s</dd>
-
-                <dt>Standard deviation:</dt>
-                <dd>@metrics.getTotalTiming.getStandardDeviation&#956;s</dd>
-
-                <dt>Mean:</dt>
-                <dd>@metrics.getTotalTiming.getMean&#956;s</dd>
-
-                <dt>Minimum:</dt>
-                <dd>@metrics.getTotalTiming.getMinimum&#956;s</dd>
-
-                <dt>Maximum:</dt>
-                <dd>@metrics.getTotalTiming.getMaximum&#956;s</dd>
-            </dl>
+            @views.html.partials.metrics.timing(metrics.getTotalTiming)
         }
     </div>
 
@@ -47,22 +32,7 @@
         @if(metrics.getConverterTiming == null) {
             No message passed through here yet.
         } else {
-            <dl>
-                <dt>98th percentile:</dt>
-                <dd>@metrics.getConverterTiming.get98thPercentile()&#956;s</dd>
-
-                <dt>Standard deviation:</dt>
-                <dd>@metrics.getConverterTiming.getStandardDeviation&#956;s</dd>
-
-                <dt>Mean:</dt>
-                <dd>@metrics.getConverterTiming.getMean&#956;s</dd>
-
-                <dt>Minimum:</dt>
-                <dd>@metrics.getConverterTiming.getMinimum&#956;s</dd>
-
-                <dt>Maximum:</dt>
-                <dd>@metrics.getConverterTiming.getMaximum&#956;s</dd>
-            </dl>
+            @views.html.partials.metrics.timing(metrics.getConverterTiming)
         }
     </div>
 </div>
