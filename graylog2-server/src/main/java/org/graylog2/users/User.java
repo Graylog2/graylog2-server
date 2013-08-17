@@ -25,6 +25,7 @@ import com.mongodb.DBObject;
 import org.bson.types.ObjectId;
 import org.graylog2.Core;
 import org.graylog2.database.Persisted;
+import org.graylog2.database.ValidationException;
 import org.graylog2.database.validators.FilledStringValidator;
 import org.graylog2.database.validators.Validator;
 import org.slf4j.Logger;
@@ -56,6 +57,11 @@ public class User extends Persisted {
     }
 
     public static User load(String username, Core core) {
+        // special case for the locally defined user, we don't store that in MongoDB.
+        if (core.getConfiguration().getRootUsername().equals(username)) {
+            return new LocalAdminUser(core);
+        }
+
         DBObject query = new BasicDBObject();
         query.put(USERNAME, username);
 
@@ -111,6 +117,10 @@ public class User extends Persisted {
         return password + salt;
     }
 
+    public boolean isReadOnly() {
+        return false;
+    }
+
     @Override
     public String getCollectionName() {
         return COLLECTION;
@@ -142,4 +152,28 @@ public class User extends Persisted {
         return fields.get(USERNAME).toString();
     }
 
+    private static class LocalAdminUser extends User {
+        LocalAdminUser(Core core) {
+            super(null, Maps.<String, Object>newHashMap(), core);
+        }
+
+        @Override
+        public String getFullName() {
+            return "Administrator";
+        }
+
+        @Override
+        public String getName() {
+            return core.getConfiguration().getRootUsername();
+        }
+
+        public boolean isReadOnly() {
+            return true;
+        }
+
+        @Override
+        public ObjectId save() throws ValidationException {
+            throw new IllegalStateException("Cannot modify local root user, this is a bug.");
+        }
+    }
 }
