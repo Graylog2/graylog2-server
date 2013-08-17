@@ -63,6 +63,8 @@
                     <option value="number">Numeric</option>
                     <option value="date">Date</option>
                     <option value="hash">Hash</option>
+                    <option value="syslog-pri-level">Syslog level from PRI</option>
+                    <option value="syslog-pri-facility">Syslog facility from PRI</option>
                 </select>
                 <button class="btn btn-info">Add</button>
             </div>
@@ -70,6 +72,9 @@
             @views.html.system.inputs.extractors.converters.numeric()
             @views.html.system.inputs.extractors.converters.date()
             @views.html.system.inputs.extractors.converters.hash()
+            @views.html.system.inputs.extractors.converters.syslog_pri_level()
+            @views.html.system.inputs.extractors.converters.syslog_pri_facility()
+
 
             <div class="alert alert-info">
                 Please note that you cannot use the cutting feature on standard fields

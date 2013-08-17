@@ -31,7 +31,9 @@ public class Converter {
     public enum Type {
         NUMERIC,
         DATE,
-        HASH
+        HASH,
+        SYSLOG_PRI_LEVEL,
+        SYSLOG_PRI_FACILITY
     }
 
     private final Type type;
