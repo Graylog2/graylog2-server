@@ -43,7 +43,7 @@ public class SessionsController extends Controller {
 			session("authSession", subject.getSession().toString());
 			return redirect("/");
 		} catch (AuthenticationException e) {
-			log.warn("Unable to authenticate user. Redirecting back to '/'", e);
+			log.warn("Unable to authenticate user {}. Redirecting back to '/'", r.username, e);
 			flash("error", "Sorry, those credentials are invalid.");
 			return redirect("/login");
 		}
