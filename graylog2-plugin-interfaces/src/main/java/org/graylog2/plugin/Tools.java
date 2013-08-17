@@ -246,12 +246,28 @@ public final class Tools {
         java.util.Collections.sort(list);
         return list;
     }
-    
-    public static String buildElasticSearchTimeFormat(double timestamp) {
-    	Calendar cal = Calendar.getInstance();
-    	cal.setTimeInMillis((long) (1000 * timestamp));
+
+    public static String buildElasticSearchTimeFormat(Object timestamp) {
+        if (timestamp instanceof Double || timestamp instanceof Integer) {
+            return buildElasticSearchTimeFormatFromDouble((Double) timestamp);
+        }
+
+        if (timestamp instanceof DateTime) {
+            return buildElasticSearchTimeFormatFromDateTime((DateTime) timestamp);
+        }
+
+        return buildElasticSearchTimeFormatFromDouble((getUTCTimestampWithMilliseconds()));
+    }
+
+    public static String buildElasticSearchTimeFormatFromDouble(double timestamp) {
+        Calendar cal = Calendar.getInstance();
+        cal.setTimeInMillis((long) (1000 * timestamp));
 
         return String.format("%1$tY-%1$tm-%1$td %1$tH-%1$tM-%1$tS.%1$tL", cal); // ramtamtam
+    }
+
+    public static String buildElasticSearchTimeFormatFromDateTime(DateTime d) {
+        return d.toString(DateTimeFormat.forPattern("yyyy-MM-dd HH-mm-ss.SSS"));
     }
 
     public static int getTimestampOfMessage(SearchHit msg) {

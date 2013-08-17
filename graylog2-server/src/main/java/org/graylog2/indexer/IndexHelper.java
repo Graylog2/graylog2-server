@@ -58,7 +58,7 @@ public class IndexHelper {
     		return null;
     	}
     	
-		String from = Tools.buildElasticSearchTimeFormat(Tools.getUTCTimestamp()-timerange);
+		String from = Tools.buildElasticSearchTimeFormatFromDouble(Tools.getUTCTimestamp()-timerange);
 		return FilterBuilders.rangeFilter("timestamp").from(from);
     }
     

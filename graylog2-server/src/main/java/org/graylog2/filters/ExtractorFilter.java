@@ -24,6 +24,8 @@ import org.graylog2.plugin.GraylogServer;
 import org.graylog2.plugin.Message;
 import org.graylog2.plugin.filters.MessageFilter;
 import org.graylog2.plugin.inputs.Extractor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.Set;
 
@@ -31,6 +33,8 @@ import java.util.Set;
  * @author Lennart Koopmann <lennart@torch.sh>
  */
 public class ExtractorFilter implements MessageFilter {
+
+    private static final Logger LOG = LoggerFactory.getLogger(ExtractorFilter.class);
 
     private static final String NAME = "Extractor";
 
@@ -41,7 +45,13 @@ public class ExtractorFilter implements MessageFilter {
         }
 
         for (Extractor extractor : msg.getSourceInput().getExtractors().values()) {
-            extractor.run(msg);
+            try {
+                extractor.run(msg);
+            } catch (Exception e) {
+                LOG.error("Could not apply extractor.", e);
+                continue;
+            }
+
             extractor.runConverters(msg);
         }
 

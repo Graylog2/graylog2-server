@@ -66,6 +66,9 @@ public class Message {
     );
 
     public static final ImmutableSet<String> RESERVED_SETTABLE_FIELDS = ImmutableSet.of(
+            "message",
+            "source",
+            "timestamp",
             "gl2_source_node",
             "gl2_source_input"
     );
@@ -107,7 +110,7 @@ public class Message {
         obj.putAll(getFields());
         
         // Timestamp
-        obj.put("timestamp", Tools.buildElasticSearchTimeFormat((Double) getField("timestamp")));
+        obj.put("timestamp", Tools.buildElasticSearchTimeFormat(getField("timestamp")));
 
         // Manually converting stream ID to string - caused strange problems without it.
         if (getStreams().size() > 0) {

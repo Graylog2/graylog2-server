@@ -55,7 +55,7 @@ public class MessageResource extends RestResource {
 		} catch (IndexMissingException e) {
         	LOG.error("Index does not exist. Returning HTTP 404.");
         	throw new WebApplicationException(404);
-		} catch (DocumentNotFoundException e) {
+		} catch (DocumentNotFoundException e1) {
         	LOG.error("Message does not exist. Returning HTTP 404.");
         	throw new WebApplicationException(404);
 		}
