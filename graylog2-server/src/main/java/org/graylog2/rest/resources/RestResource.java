@@ -20,6 +20,7 @@
 
 package org.graylog2.rest.resources;
 
+import com.codahale.metrics.Timer;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.Maps;
@@ -33,6 +34,7 @@ import javax.ws.rs.QueryParam;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Response;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
 /**
  * @author Lennart Koopmann <lennart@torch.sh>
@@ -92,6 +94,39 @@ public abstract class RestResource {
         r.put("megabytes", bytes/mb);
 
         return r;
+    }
+
+    protected Map<String, Object> buildMetricsMap(Timer t) {
+        Map<String, Object> metrics = Maps.newHashMap();
+
+        if (t == null) {
+            return metrics;
+        }
+
+        TimeUnit timeUnit = TimeUnit.MICROSECONDS;
+
+        Map<String, Object> time = Maps.newHashMap();
+        time.put("max", TimeUnit.MICROSECONDS.convert(t.getSnapshot().getMax(), TimeUnit.NANOSECONDS));
+        time.put("min", TimeUnit.MICROSECONDS.convert(t.getSnapshot().getMin(), TimeUnit.NANOSECONDS));
+        time.put("mean", TimeUnit.MICROSECONDS.convert((long) t.getSnapshot().getMean(), TimeUnit.NANOSECONDS));
+        time.put("95th_percentile", TimeUnit.MICROSECONDS.convert((long) t.getSnapshot().get95thPercentile(), TimeUnit.NANOSECONDS));
+        time.put("98th_percentile", TimeUnit.MICROSECONDS.convert((long) t.getSnapshot().get98thPercentile(), TimeUnit.NANOSECONDS));
+        time.put("99th_percentile", TimeUnit.MICROSECONDS.convert((long) t.getSnapshot().get99thPercentile(), TimeUnit.NANOSECONDS));
+        time.put("std_dev", TimeUnit.MICROSECONDS.convert((long) t.getSnapshot().getStdDev(), TimeUnit.NANOSECONDS));
+
+        Map<String, Object> rate = Maps.newHashMap();
+        rate.put("one_minute", t.getOneMinuteRate());
+        rate.put("five_minute", t.getFiveMinuteRate());
+        rate.put("fifteen_minute", t.getFifteenMinuteRate());
+        rate.put("total", t.getCount());
+        rate.put("mean", t.getMeanRate());
+
+        metrics.put("rate_unit", "events/second");
+        metrics.put("duration_unit", timeUnit.toString().toLowerCase());
+        metrics.put("time", time);
+        metrics.put("rate", rate);
+
+        return metrics;
     }
 
 }

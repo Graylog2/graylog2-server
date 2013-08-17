@@ -29,6 +29,8 @@ import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import static com.codahale.metrics.MetricRegistry.name;
+
 /**
  * @author Lennart Koopmann <lennart@torch.sh>
  */
