@@ -22,6 +22,8 @@
 package org.graylog2.plugin;
 
 import java.util.Map;
+
+import com.codahale.metrics.MetricRegistry;
 import org.graylog2.plugin.buffers.Buffer;
 import org.graylog2.plugin.indexer.MessageGateway;
 import org.graylog2.plugin.streams.Stream;
@@ -43,5 +45,7 @@ public interface GraylogServer extends Runnable {
     public MessageGateway getMessageGateway();
     
     public Map<String, Stream> getEnabledStreams();
+
+    public MetricRegistry metrics();
 
 }
