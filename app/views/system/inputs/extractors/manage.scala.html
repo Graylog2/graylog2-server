@@ -100,6 +100,12 @@
                     <h3>
                         <i class="icon icon-ellipsis-vertical"></i>
                         <strong>@extractor.getTitle</strong> (@Extractor.typeToHuman(extractor.getType))
+
+                        @if(extractor.getTotalExceptions > 0) {
+                            <span class="badge badge-important xtrc-exception-bubble" data-extractor-id="@extractor.getId">
+                                @extractor.getTotalExceptions
+                            </span>
+                        }
                     </h3>
 
                     <span class="pull-right node-row-info node-row-info-negative-correction">
@@ -122,6 +128,20 @@
                     </div>
 
                     <div class="extractor-details-@extractor.getId" style="display: none;">
+
+                        @if(extractor.getTotalExceptions > 0) {
+                            <div class="alert alert-danger">
+                                This extractor has thrown <em>@extractor.getExceptions</em> exception@if(extractor.getExceptions != 1) {s}
+                                during extracting and <em>@extractor.getConverterExceptions</em>
+                                exception@if(extractor.getConverterExceptions != 1) {s}
+
+                                while converting.
+
+                                Please check the server logs for error messages because exceptions can have a severe
+                                performance impact and should be avoided.
+                            </div>
+                        }
+
                         <div class="well well-small">
                             <div class="xtrc-config">
                                 <h4>Configuration:</h4>
@@ -151,6 +171,7 @@
                                 </div>
                             }
                         </div>
+
                         @views.html.system.inputs.extractors.partials.extractor_metrics(extractor.getMetrics)
 
                     </div>

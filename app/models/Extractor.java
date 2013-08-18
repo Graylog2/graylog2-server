@@ -58,6 +58,8 @@ public class Extractor {
     private final Map<String, Object> extractorConfig;
     private final List<Converter> converters;
     private final ExtractorMetrics metrics;
+    private final long exceptions;
+    private final long converterExceptions;
 
     public Extractor(ExtractorSummaryResponse esr) {
         this(
@@ -70,15 +72,28 @@ public class Extractor {
                 esr.extractorConfig,
                 User.load(esr.creatorUserId),
                 buildConverterList(esr.converters),
-                new ExtractorMetrics(esr.metrics.get("total"), esr.metrics.get("converters"))
+                new ExtractorMetrics(esr.metrics.get("total"), esr.metrics.get("converters")),
+                esr.exceptions,
+                esr.converterExceptions
         );
     }
 
     public Extractor(CursorStrategy cursorStrategy, String title, String sourceField, String targetField, Type type, User creatorUser) {
-        this(null, title, cursorStrategy, sourceField, targetField, type, new HashMap<String, Object>(), creatorUser, new ArrayList<Converter>(), null);
+        this(null, title, cursorStrategy, sourceField, targetField, type, new HashMap<String, Object>(), creatorUser, new ArrayList<Converter>(), null, 0, 0);
     }
 
-    public Extractor(String id, String title, CursorStrategy cursorStrategy, String sourceField, String targetField, Type type, Map<String, Object> extractorConfig, User creatorUser, List<Converter> converters, ExtractorMetrics metrics) {
+    public Extractor(String id,
+                     String title,
+                     CursorStrategy cursorStrategy,
+                     String sourceField,
+                     String targetField,
+                     Type type,
+                     Map<String, Object> extractorConfig,
+                     User creatorUser,
+                     List<Converter> converters,
+                     ExtractorMetrics metrics,
+                     long exceptions,
+                     long converterExceptions) {
         this.id = id;
         this.title = title;
         this.cursorStrategy = cursorStrategy;
@@ -88,6 +103,9 @@ public class Extractor {
 
         this.extractorConfig = extractorConfig;
         this.converters = converters;
+
+        this.exceptions = exceptions;
+        this.converterExceptions = converterExceptions;
 
         this.creatorUser = creatorUser;
         this.metrics = metrics;
@@ -265,4 +283,15 @@ public class Extractor {
         return metrics;
     }
 
+    public long getExceptions() {
+        return exceptions;
+    }
+
+    public long getConverterExceptions() {
+        return converterExceptions;
+    }
+
+    public long getTotalExceptions() {
+        return exceptions + converterExceptions;
+    }
 }

@@ -51,6 +51,11 @@ public class ExtractorSummaryResponse {
 
     public List<Map<String, Object>> converters;
 
+    public long exceptions;
+
+    @SerializedName("converter_exceptions")
+    public long converterExceptions;
+
     public Map<String, TimerRateMetricsResponse> metrics;
 
 }

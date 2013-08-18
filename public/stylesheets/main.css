@@ -615,3 +615,10 @@ form #stream-rules {
 .xtrc-metrics dd {
     margin-left: 130px;
 }
+
+.xtrc-exception-bubble {
+    position: relative;
+    top: -7px;
+    margin-left: 2px;
+    cursor: pointer;
+}
