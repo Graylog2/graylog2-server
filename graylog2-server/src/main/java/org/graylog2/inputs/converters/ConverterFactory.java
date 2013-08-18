@@ -20,8 +20,6 @@
 package org.graylog2.inputs.converters;
 
 import org.graylog2.ConfigurationException;
-import org.graylog2.inputs.extractors.SyslogPriFacilityConverter;
-import org.graylog2.inputs.extractors.SyslogPriLevelConverter;
 import org.graylog2.plugin.inputs.Converter;
 
 import java.util.Map;

@@ -69,18 +69,6 @@ public class SubstringExtractorTest {
     }
 
     @Test
-    public void testBasicExtractionWithCutStrategyDoesNotCutStandardFields() throws Exception {
-        Message msg = new Message("The short message", "TestUnit", Tools.getUTCTimestampWithMilliseconds());
-
-        SubstringExtractor x = new SubstringExtractor("foo", "foo", Extractor.CursorStrategy.CUT, "source", "our_result", config(4,8), "foo", noConverters());
-        x.run(msg);
-
-        assertNotNull(msg.getField("our_result"));
-        assertEquals("TestUnit", msg.getField("source")); // Not cut!
-        assertEquals("Unit", msg.getField("our_result"));
-    }
-
-    @Test
     public void testBasicExtractionDoesNotFailOnNonMatch() throws Exception {
         Message msg = new Message("The short message", "TestUnit", Tools.getUTCTimestampWithMilliseconds());
 
@@ -135,12 +123,6 @@ public class SubstringExtractorTest {
 
         assertNotNull(msg.getField("our_result"));
         assertEquals("fullyCutByExtractor", msg.getField("somefield"));
-    }
-
-
-    @Test(expected = Extractor.ReservedFieldException.class)
-    public void testDoesNotRunAgainstReservedFields() throws Exception {
-        new SubstringExtractor("foo", "foo", Extractor.CursorStrategy.CUT, "somefield", "source", config(0,1), "foo", noConverters());
     }
 
     @Test(expected = ConfigurationException.class)

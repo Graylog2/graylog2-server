@@ -17,37 +17,32 @@
  * along with Graylog2.  If not, see <http://www.gnu.org/licenses/>.
  *
  */
-package org.graylog2.inputs.extractors;
+package org.graylog2.inputs.converters;
 
-import com.google.common.primitives.Ints;
-import org.graylog2.inputs.converters.SyslogPriUtilities;
-import org.graylog2.plugin.Tools;
+import org.graylog2.inputs.converters.SyslogPriFacilityConverter;
 import org.graylog2.plugin.inputs.Converter;
+import org.junit.Test;
 
-import java.util.Map;
+import java.util.HashMap;
+
+import static junit.framework.Assert.assertEquals;
+import static junit.framework.Assert.assertNull;
 
 /**
  * @author Lennart Koopmann <lennart@torch.sh>
  */
-public class SyslogPriFacilityConverter extends Converter {
+public class SyslogPriFacilityConverterTest {
 
-    public SyslogPriFacilityConverter(Map<String, Object> config) {
-        super(Type.SYSLOG_PRI_FACILITY, config);
-    }
+    @Test
+    public void testConvert() throws Exception {
+        Converter hc = new SyslogPriFacilityConverter(new HashMap<String, Object>());
+        assertNull(hc.convert(null));
+        assertEquals("", hc.convert(""));
+        assertEquals("lol no number", hc.convert("lol no number"));
 
-    @Override
-    public Object convert(String value) {
-        if (value == null || value.isEmpty()) {
-            return value;
-        }
-
-        Integer priority = Ints.tryParse(value);
-
-        if (priority == null) {
-            return value;
-        }
-
-        return Tools.syslogFacilityToReadable(SyslogPriUtilities.facilityFromPriority(priority));
+        assertEquals("user-level", hc.convert("14")); // user-level
+        assertEquals("kernel", hc.convert("5")); // kernel
+        assertEquals("security/authorization", hc.convert("87")); // security/authorization
     }
 
 }

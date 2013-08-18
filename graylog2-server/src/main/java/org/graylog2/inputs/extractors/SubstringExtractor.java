@@ -40,7 +40,7 @@ public class SubstringExtractor extends Extractor {
         super(id, title, Type.SUBSTRING, cursorStrategy, sourceField, targetField, extractorConfig, creatorUserId, converters);
 
         if (extractorConfig == null || extractorConfig.get("begin_index") == null || extractorConfig.get("end_index") == null) {
-            throw new ConfigurationException("Missing regex configuration field: regex_value");
+            throw new ConfigurationException("Missing configuration fields. Required: begin_index, end_index");
         }
 
         try {

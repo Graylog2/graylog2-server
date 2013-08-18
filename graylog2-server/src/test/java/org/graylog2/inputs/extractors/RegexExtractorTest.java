@@ -69,18 +69,6 @@ public class RegexExtractorTest {
     }
 
     @Test
-    public void testBasicExtractionWithCutStrategyDoesNotCutStandardFields() throws Exception {
-        Message msg = new Message("The short message", "TestUnit", Tools.getUTCTimestampWithMilliseconds());
-
-        RegexExtractor x = new RegexExtractor("foo", "foo", Extractor.CursorStrategy.CUT, "source", "our_result", config("Test(.*)"), "foo", noConverters());
-        x.run(msg);
-
-        assertNotNull(msg.getField("our_result"));
-        assertEquals("TestUnit", msg.getField("sourcre"));
-        assertEquals("Unit", msg.getField("our_result"));
-    }
-
-    @Test
     public void testBasicExtractionDoesNotFailOnNonMatch() throws Exception {
         Message msg = new Message("The short message", "TestUnit", Tools.getUTCTimestampWithMilliseconds());
 
@@ -149,11 +137,6 @@ public class RegexExtractorTest {
 
         assertNotNull(msg.getField("our_result"));
         assertEquals("fullyCutByExtractor", msg.getField("somefield"));
-    }
-
-    @Test(expected = Extractor.ReservedFieldException.class)
-    public void testDoesNotRunAgainstReservedFields() throws Exception {
-        new RegexExtractor("foo", "foo", Extractor.CursorStrategy.CUT, "somefield", "source", config("id:(\\d+)"), "foo", noConverters());
     }
 
     @Test(expected = ConfigurationException.class)

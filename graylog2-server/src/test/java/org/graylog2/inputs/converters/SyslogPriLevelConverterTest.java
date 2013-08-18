@@ -17,7 +17,7 @@
  * along with Graylog2.  If not, see <http://www.gnu.org/licenses/>.
  *
  */
-package org.graylog2.inputs.extractors;
+package org.graylog2.inputs.converters;
 
 import org.graylog2.plugin.inputs.Converter;
 import org.junit.Test;
