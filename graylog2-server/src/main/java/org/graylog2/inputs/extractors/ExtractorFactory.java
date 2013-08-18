@@ -39,6 +39,8 @@ public class ExtractorFactory {
                 return new RegexExtractor(id, title, cursorStrategy, sourceField, targetField, extractorConfig, creatorUserId, converters);
             case SUBSTRING:
                 return new SubstringExtractor(id, title, cursorStrategy, sourceField, targetField, extractorConfig, creatorUserId, converters);
+            case SPLIT_AND_INDEX:
+                return new SplitAndIndexExtractor(id, title, cursorStrategy, sourceField, targetField, extractorConfig, creatorUserId, converters);
             default:
                 throw new NoSuchExtractorException();
         }

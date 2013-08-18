@@ -52,7 +52,7 @@ import static com.codahale.metrics.MetricRegistry.name;
 @Path("/system/inputs/{inputId}/extractors")
 public class ExtractorsResource extends RestResource {
 
-    private static final Logger LOG = LoggerFactory.getLogger(InputsResource.class);
+    private static final Logger LOG = LoggerFactory.getLogger(ExtractorsResource.class);
 
     @POST
     @Timed
