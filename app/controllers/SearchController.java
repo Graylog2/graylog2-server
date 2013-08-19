@@ -5,6 +5,7 @@ import java.io.IOException;
 import lib.APIException;
 import lib.Api;
 import lib.SearchTools;
+import models.FieldMapper;
 import models.UniversalSearch;
 import models.api.results.DateHistogramResult;
 import models.api.results.SearchResult;
@@ -32,7 +33,7 @@ public class SearchController extends AuthenticatedController {
     	
 		try {
 			UniversalSearch search = new UniversalSearch(q, range);
-			SearchResult searchResult = search.search();
+			SearchResult searchResult = FieldMapper.run(search.search());
 			DateHistogramResult histogramResult = search.dateHistogram(interval);
 
             if (searchResult.getTotalResultCount() > 0) {

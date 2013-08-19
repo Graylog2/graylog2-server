@@ -50,4 +50,27 @@ public class Tools {
         }
     }
 
+    public static String syslogLevelToHuman(int level) {
+        switch (level) {
+            case 0:
+                return "Emergency";
+            case 1:
+                return "Alert";
+            case 2:
+                return"Critical";
+            case 3:
+                return "Error";
+            case 4:
+                return "Warning";
+            case 5:
+                return "Notice";
+            case 6:
+                return "Info";
+            case 7:
+                return "Debug";
+        }
+
+        return "Invalid";
+    }
+
 }

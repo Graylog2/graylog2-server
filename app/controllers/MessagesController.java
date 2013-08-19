@@ -8,6 +8,7 @@ import com.google.gson.Gson;
 
 import lib.APIException;
 import lib.Api;
+import models.FieldMapper;
 import models.Input;
 import models.Message;
 import models.Node;
@@ -36,7 +37,7 @@ public class MessagesController extends AuthenticatedController {
 
 	public static Result singleAsPartial(String index, String id) {
 		try {
-            MessageResult message = Message.get(index, id);
+            MessageResult message = FieldMapper.run(Message.get(index, id));
             Node sourceNode = getSourceNode(message);
 
             return ok(views.html.messages.show_as_partial.render(message, getSourceInput(sourceNode, message), sourceNode));
