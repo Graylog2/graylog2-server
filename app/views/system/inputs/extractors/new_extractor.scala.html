@@ -30,9 +30,10 @@
                 @views.html.system.inputs.extractors.configurations.substring()
             }
 
-            @if(extractorType.equals(Extractor.Type.START_END_CHAR)) {
-                implement me (type: start end char)
+            @if(extractorType.equals(Extractor.Type.SPLIT_AND_INDEX)) {
+                @views.html.system.inputs.extractors.configurations.split_and_index()
             }
+
 
             <label for="target_field">Store as field:</label>
             <input name="target_field" id="target_field" type="text" class="input-xlarge" required />

@@ -22,6 +22,7 @@ package controllers;
 import lib.APIException;
 import com.google.gson.Gson;
 import lib.extractors.testers.RegexTest;
+import lib.extractors.testers.SplitAndIndexTest;
 import lib.extractors.testers.SubstringTest;
 import play.mvc.Result;
 
@@ -53,6 +54,20 @@ public class ToolsApiController extends AuthenticatedController {
             }
 
             return ok(new Gson().toJson(SubstringTest.test(start, end, string))).as("application/json");
+        } catch (IOException e) {
+            return internalServerError("io exception");
+        } catch (APIException e) {
+            return internalServerError("api exception " + e);
+        }
+    }
+
+    public static Result splitAndIndexTest(String splitBy, int index, String string) {
+        try {
+            if (splitBy.isEmpty()|| index < 0 || string.isEmpty()) {
+                return badRequest();
+            }
+
+            return ok(new Gson().toJson(SplitAndIndexTest.test(splitBy, index, string))).as("application/json");
         } catch (IOException e) {
             return internalServerError("io exception");
         } catch (APIException e) {

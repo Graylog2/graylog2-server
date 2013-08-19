@@ -147,7 +147,14 @@
                                 <h4>Configuration:</h4>
                                 <ul>
                                     @for((k,v) <- extractor.getExtractorConfig) {
-                                        <li>@k: @v</li>
+                                        <li>
+                                            @k:
+                                            @if(v.equals(" ")){
+                                               [whitespace]
+                                            } else {
+                                                @v
+                                            }
+                                        </li>
                                     }
                                 </ul>
                             </div>
@@ -162,7 +169,14 @@
                                             @if(!converter.getConfig.isEmpty) {
                                                 <ul class="xtrc-converter-config">
                                                     @for((k,v) <- converter.getConfig) {
-                                                        <li>@k: @v</li>
+                                                        <li>
+                                                            @k:
+                                                            @if(v.equals(" ")){
+                                                                [whitespace]
+                                                             } else {
+                                                                @v
+                                                             }
+                                                        </li>
                                                     }
                                                 </ul>
                                             }

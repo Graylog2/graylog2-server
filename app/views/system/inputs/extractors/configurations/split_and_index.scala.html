@@ -1,0 +1,24 @@
+<input type="hidden" name="extractor_type" value="split_and_index" />
+
+<label for="split_by">Split by:</label>
+<input name="split_by" id="split_by" type="text" class="input-small" required />
+
+<span class="help-block">
+    What character to split on. <strong>Example:</strong> A whitespace character will
+    split <em>foo bar baz</em> to <em>[foo,bar,baz]</em>.
+</span>
+
+<label for="index">Target index:</label>
+<input name="index" id="index" type="number" class="input-small" required />
+
+<span class="help-block">
+    What part of the split string to you want to use?
+    <strong>Example:</strong>
+    <em>2</em> selects <em>baz</em> from <em>[foo,bar,baz]</em>.
+</span>
+
+<button class="btn btn-info xtrc-try-splitandindex" type="button">
+    Try!
+</button>
+
+<br /><br />

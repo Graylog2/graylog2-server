@@ -40,7 +40,7 @@ public class Extractor {
     public enum Type {
         SUBSTRING,
         REGEX,
-        START_END_CHAR
+        SPLIT_AND_INDEX
     }
 
     public enum CursorStrategy {
@@ -148,7 +148,7 @@ public class Extractor {
     private static final Map<Type, String> TYPE_MAPPING = new HashMap<Type, String>() {{
         put(Type.SUBSTRING, "Substring");
         put(Type.REGEX, "Regular expression");
-        put(Type.START_END_CHAR, "Start/End character");
+        put(Type.SPLIT_AND_INDEX, "Split & Index");
     }};
 
     public static String typeToHuman(Type type) {
@@ -163,7 +163,8 @@ public class Extractor {
             case SUBSTRING:
                 loadSubstringConfig(form);
                 break;
-            case START_END_CHAR:
+            case SPLIT_AND_INDEX:
+                loadSplitAndIndexConfig(form);
                 break;
             default:
                 throw new RuntimeException("Unknown extractor type <" + extractorType.toString() + ">");
@@ -224,6 +225,15 @@ public class Extractor {
 
         extractorConfig.put("begin_index", Integer.parseInt(form.get("begin_index")[0]));
         extractorConfig.put("end_index", Integer.parseInt(form.get("end_index")[0]));
+    }
+
+    private void loadSplitAndIndexConfig(Map<String,String[]> form) {
+        if (!formFieldSet(form, "split_by") || !formFieldSet(form, "index")) {
+            throw new RuntimeException("Missing extractor config: split_by or index.");
+        }
+
+        extractorConfig.put("split_by", form.get("split_by")[0]);
+        extractorConfig.put("index", Integer.parseInt(form.get("index")[0]));
     }
 
     private boolean formFieldSet(Map<String,String[]> form, String key) {

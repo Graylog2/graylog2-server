@@ -156,6 +156,36 @@ $(document).ready(function() {
         });
     });
 
+    // Try split&index against example.
+    $(".xtrc-try-splitandindex").on("click", function() {
+        var button = $(this);
+
+        var warningText = "We were not able to run the split&index extraction. Please check your parameters.";
+
+        button.html("<i class='icon-refresh icon-spin'></i> Trying...");
+        $.ajax({
+            url: '/a/tools/split_and_index_test',
+            data: {
+                "string":$("#xtrc-example").text(),
+                "split_by":$("#split_by").val(),
+                "index":$("#index").val()
+            },
+            success: function(result) {
+                if(result.successful) {
+                    highlightMatchResult(result);
+                } else {
+                    showWarning(warningText);
+                }
+            },
+            error: function() {
+                showError(warningText);
+            },
+            complete: function() {
+                button.html("Try!");
+            }
+        });
+    });
+
     function highlightMatchResult(result) {
         var example = $("#xtrc-example");
         // Set to original content first, so we can do this multiple times.
