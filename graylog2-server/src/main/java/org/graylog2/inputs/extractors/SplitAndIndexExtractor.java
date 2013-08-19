@@ -112,6 +112,10 @@ public class SplitAndIndexExtractor extends Extractor {
 
             if (found == index) {
                 int begin = i;
+                if (begin != 0) {
+                    begin+=1;
+                }
+
                 int end = s.indexOf(target, i+1);
 
                 // End will be -1 if this is the last last token in the string and there is no other occurence.

@@ -78,7 +78,7 @@ public class SplitAndIndexExtractorTest {
         x.run(msg);
 
         assertNotNull(msg.getField("our_result"));
-        assertEquals("<10> 07 Aug somesubsystem: this is my message for username9001 id:9001", msg.getField("somefield"));
+        assertEquals("<10> 07 Aug  somesubsystem: this is my message for username9001 id:9001", msg.getField("somefield"));
         assertEquals("2013", msg.getField("our_result"));
     }
 
@@ -92,7 +92,7 @@ public class SplitAndIndexExtractorTest {
         x.run(msg);
 
         assertNotNull(msg.getField("our_result"));
-        assertEquals("<10> 07 Aug 2013 somesubsystem: this is my message for username9001", msg.getField("somefield"));
+        assertEquals("<10> 07 Aug 2013 somesubsystem: this is my message for username9001 ", msg.getField("somefield"));
         assertEquals("id:9001", msg.getField("our_result"));
     }
 
@@ -214,7 +214,7 @@ public class SplitAndIndexExtractorTest {
     public void testCutIndices() throws Exception {
         int[] result = SplitAndIndexExtractor.getCutIndices("<10> 07 Aug 2013 somesubsystem: this is my message for username9001 id:9001", " ", 3);
 
-        assertEquals(11, result[0]);
+        assertEquals(12, result[0]);
         assertEquals(16, result[1]);
     }
 
@@ -223,8 +223,17 @@ public class SplitAndIndexExtractorTest {
         String s = "<10> 07 Aug 2013 somesubsystem";
         int[] result = SplitAndIndexExtractor.getCutIndices(s, " ", 4);
 
-        assertEquals(16, result[0]);
+        assertEquals(17, result[0]);
         assertEquals(s.length(), result[1]);
+    }
+
+    @Test
+    public void testCutIndicesWithFirstToken() throws Exception {
+        String s = "<10> 07 Aug 2013 somesubsystem";
+        int[] result = SplitAndIndexExtractor.getCutIndices(s, " ", 0);
+
+        assertEquals(0, result[0]);
+        assertEquals(4, result[1]);
     }
 
     @Test
