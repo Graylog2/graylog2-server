@@ -23,31 +23,39 @@ import org.graylog2.ConfigurationException;
 import org.graylog2.plugin.inputs.Converter;
 
 import java.util.Map;
+import java.util.regex.Pattern;
 
 /**
  * @author Lennart Koopmann <lennart@torch.sh>
  */
-public class ConverterFactory {
+public class SplitAndCountConverter extends Converter {
 
-    public static Converter factory(Converter.Type type, Map<String, Object> config) throws NoSuchConverterException, ConfigurationException {
-        switch (type) {
-            case NUMERIC:
-                return new NumericConverter(config);
-            case DATE:
-                return new DateConverter(config);
-            case HASH:
-                return new HashConverter(config);
-            case SPLIT_AND_COUNT:
-                return new SplitAndCountConverter(config);
-            case SYSLOG_PRI_LEVEL:
-                return new SyslogPriLevelConverter(config);
-            case SYSLOG_PRI_FACILITY:
-                return new SyslogPriFacilityConverter(config);
-            default:
-                throw new NoSuchConverterException();
+    private final String splitBy;
+    private final String splitByEscaped;
+
+    public SplitAndCountConverter(Map<String, Object> config) throws ConfigurationException {
+        super(Type.SPLIT_AND_COUNT, config);
+
+        if (config.get("split_by") == null || ((String) config.get("split_by")).isEmpty()) {
+            throw new ConfigurationException("Missing config [split_by].");
         }
+
+        splitBy = (String) config.get("split_by");
+        splitByEscaped = Pattern.quote((String) config.get("split_by"));
     }
 
-    public static class NoSuchConverterException extends Throwable {
+    @Override
+    public Object convert(String value) {
+        if (value == null || value.isEmpty()) {
+            return 0;
+        }
+
+        if (!value.contains(splitBy)) {
+            // split().length would be 1, but we want 0.
+            return 0;
+        }
+
+        return value.split(splitByEscaped).length;
     }
+
 }
