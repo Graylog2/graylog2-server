@@ -186,9 +186,13 @@ public class Extractor {
             case DATE:
                 if (formFieldSet(form, "converter_date_format")) {
                     config.put("date_format", form.get("converter_date_format")[0]);
-                } else {
-                    config.put("date_format", "yyyy-MM-dd HH:mm:ss.SSS");
                 }
+                break;
+            case SPLIT_AND_COUNT:
+                if (formFieldSet(form, "converter_split_and_count_by")) {
+                    config.put("split_by", form.get("converter_split_and_count_by")[0]);
+                }
+                break;
         }
 
         return config;

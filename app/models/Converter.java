@@ -32,6 +32,7 @@ public class Converter {
         NUMERIC,
         DATE,
         HASH,
+        SPLIT_AND_COUNT,
         SYSLOG_PRI_LEVEL,
         SYSLOG_PRI_FACILITY
     }

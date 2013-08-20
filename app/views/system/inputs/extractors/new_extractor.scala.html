@@ -64,6 +64,7 @@
                     <option value="number">Numeric</option>
                     <option value="date">Date</option>
                     <option value="hash">Hash</option>
+                    <option value="split-and-count">Split & Count</option>
                     <option value="syslog-pri-level">Syslog level from PRI</option>
                     <option value="syslog-pri-facility">Syslog facility from PRI</option>
                 </select>
@@ -75,7 +76,7 @@
             @views.html.system.inputs.extractors.converters.hash()
             @views.html.system.inputs.extractors.converters.syslog_pri_level()
             @views.html.system.inputs.extractors.converters.syslog_pri_facility()
-
+            @views.html.system.inputs.extractors.converters.split_and_count()
 
             <div class="alert alert-info">
                 Please note that you cannot use the cutting feature on standard fields
