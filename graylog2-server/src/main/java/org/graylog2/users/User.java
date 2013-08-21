@@ -19,6 +19,7 @@
  */
 package org.graylog2.users;
 
+import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.mongodb.BasicDBObject;
 import com.mongodb.DBObject;
@@ -27,6 +28,7 @@ import org.graylog2.Core;
 import org.graylog2.database.Persisted;
 import org.graylog2.database.ValidationException;
 import org.graylog2.database.validators.FilledStringValidator;
+import org.graylog2.database.validators.ListValidator;
 import org.graylog2.database.validators.Validator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -47,6 +49,7 @@ public class User extends Persisted {
     public static final String USERNAME = "username";
     public static final String PASSWORD = "password";
     public static final String FULL_NAME = "full_name";
+    private static final String PERMISSIONS = "permissions";
 
     public User(Map<String, Object> fields, Core core) {
         super(core, fields);
@@ -77,6 +80,18 @@ public class User extends Persisted {
 
         final Object userId = userObject.get("_id");
         return new User((ObjectId) userId, userObject.toMap(), core);
+    }
+
+    public static List<User> loadAll(Core core) {
+        List<User> users = Lists.newArrayList();
+
+        DBObject query = new BasicDBObject();
+        List<DBObject> result = query(query, core, COLLECTION);
+
+        for (DBObject dbObject : result) {
+            users.add(new User((ObjectId) dbObject.get("_id"), dbObject.toMap(), core));
+        }
+        return users;
     }
 
     public static boolean exists(String username, String passwordHash, Core core) {
@@ -136,6 +151,7 @@ public class User extends Persisted {
             put(USERNAME, new FilledStringValidator());
             put(PASSWORD, new FilledStringValidator());
             put(FULL_NAME, new FilledStringValidator());
+            put(PERMISSIONS, new ListValidator());
         }};
     }
 
@@ -150,6 +166,11 @@ public class User extends Persisted {
 
     public String getName() {
         return fields.get(USERNAME).toString();
+    }
+
+    public List<String> getPermissions() {
+        final Object o = fields.get(PERMISSIONS);
+        return (List<String>) o;
     }
 
     private static class LocalAdminUser extends User {

@@ -1,5 +1,5 @@
 /**
- * Copyright 2013 Lennart Koopmann <lennart@torch.sh>
+ * Copyright 2013 Kay Roepke <kay@torch.sh>
  *
  * This file is part of Graylog2.
  *
@@ -17,22 +17,21 @@
  * along with Graylog2.  If not, see <http://www.gnu.org/licenses/>.
  *
  */
-package org.graylog2.rest.resources.users.requests;
+package org.graylog2.security;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
+import org.apache.shiro.authz.aop.PermissionAnnotationHandler;
+import org.apache.shiro.subject.Subject;
 
-import java.util.List;
+public class ContextAwarePermissionAnnotationHandler extends PermissionAnnotationHandler {
 
-/**
- * @author Lennart Koopmann <lennart@torch.sh>
- */
-public class CreateRequest {
+    private final ShiroSecurityContext context;
 
-    public String username;
-    public String password;
+    public ContextAwarePermissionAnnotationHandler(ShiroSecurityContext context) {
+        this.context = context;
+    }
 
-    @JsonProperty("full_name")
-    public String fullName;
-
-    public List<String> permissions;
+    @Override
+    protected Subject getSubject() {
+        return context.getSubject();
+    }
 }
