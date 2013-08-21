@@ -7,7 +7,6 @@ import models.api.responses.system.AuthenticationResponse;
 import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.authc.*;
 import org.apache.shiro.authz.AuthorizationInfo;
-import org.apache.shiro.authz.UnauthorizedException;
 import org.apache.shiro.crypto.hash.SimpleHash;
 import org.apache.shiro.realm.AuthorizingRealm;
 import org.apache.shiro.subject.PrincipalCollection;
@@ -40,11 +39,9 @@ public class ServerRestInterfaceRealm extends AuthorizingRealm {
 		try {
 			// TODO implement POST and actually send stuff. Should the password be hashed here already?
 			final SimpleHash sha1 = new SimpleHash("SHA1", token.getPassword());    // , Play.application().configuration().getString("secret")
-			response = Api.get("/users", AuthenticationResponse.class, token.getUsername(), sha1.toString());
+			// TODO string concat in url sucks, use messageformat or something that actually encodes, too
+			response = Api.get("/users/"+token.getUsername(), AuthenticationResponse.class, token.getUsername(), sha1.toString());
 			log.debug("Trying to log in {} via REST", token.getUsername());
-			if (!response.isAuthorized) {
-				throw new UnauthorizedException();
-			}
 			final User user = new User(response.id, response.username, "", response.fullName);
 			// TODO AAAAAAAAARG
 			Cache.set(user.getName(), user);
