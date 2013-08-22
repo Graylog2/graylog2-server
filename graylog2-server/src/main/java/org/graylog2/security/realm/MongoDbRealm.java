@@ -19,8 +19,10 @@
  */
 package org.graylog2.security.realm;
 
+import com.google.common.collect.Sets;
 import org.apache.shiro.authc.*;
 import org.apache.shiro.authz.AuthorizationInfo;
+import org.apache.shiro.authz.SimpleAuthorizationInfo;
 import org.apache.shiro.realm.AuthorizingRealm;
 import org.apache.shiro.subject.PrincipalCollection;
 import org.apache.shiro.util.ByteSource;
@@ -28,6 +30,8 @@ import org.graylog2.Core;
 import org.graylog2.users.User;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.util.List;
 
 /**
  * @author Kay Roepke <kay@torch.sh>
@@ -42,7 +46,14 @@ public class MongoDbRealm extends AuthorizingRealm {
 
     @Override
     protected AuthorizationInfo doGetAuthorizationInfo(PrincipalCollection principals) {
-        return null;
+        log.trace("Retrieving authz information for {}", principals);
+        final User user = User.load(principals.getPrimaryPrincipal().toString(), core);
+        final SimpleAuthorizationInfo info = new SimpleAuthorizationInfo();
+        final List<String> permissions = user.getPermissions();
+        if (permissions != null) {
+            info.setStringPermissions(Sets.newHashSet(permissions));
+        }
+        return info;
     }
 
     @Override
@@ -51,7 +62,7 @@ public class MongoDbRealm extends AuthorizingRealm {
             throw new IllegalArgumentException("Only implemented for UsernamePasswordToken currently.");
         }
         UsernamePasswordToken token = (UsernamePasswordToken) authToken;
-        log.info("Retrieving authc info for user {}:{}", token.getUsername(), token.getCredentials());
+        log.info("Retrieving authc info for user {}", token.getUsername());
 
         final SimpleAccount simpleAccount;
         if (User.exists(token.getUsername(), new String(token.getPassword()), core)) {

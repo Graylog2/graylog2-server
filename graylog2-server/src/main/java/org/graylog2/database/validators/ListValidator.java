@@ -1,5 +1,5 @@
 /**
- * Copyright 2013 Lennart Koopmann <lennart@torch.sh>
+ * Copyright 2013 Kay Roepke <kay@torch.sh>
  *
  * This file is part of Graylog2.
  *
@@ -17,22 +17,13 @@
  * along with Graylog2.  If not, see <http://www.gnu.org/licenses/>.
  *
  */
-package org.graylog2.rest.resources.users.requests;
-
-import com.fasterxml.jackson.annotation.JsonProperty;
+package org.graylog2.database.validators;
 
 import java.util.List;
 
-/**
- * @author Lennart Koopmann <lennart@torch.sh>
- */
-public class CreateRequest {
-
-    public String username;
-    public String password;
-
-    @JsonProperty("full_name")
-    public String fullName;
-
-    public List<String> permissions;
+public class ListValidator implements Validator {
+    @Override
+    public boolean validate(Object value) {
+        return value instanceof List;
+    }
 }

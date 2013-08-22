@@ -19,6 +19,7 @@
  */
 package org.graylog2.rest.resources.users;
 
+import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
@@ -26,6 +27,7 @@ import org.bson.types.ObjectId;
 import org.graylog2.database.ValidationException;
 import org.graylog2.rest.resources.RestResource;
 import org.graylog2.rest.resources.users.requests.CreateRequest;
+import org.graylog2.security.RestPermissions;
 import org.graylog2.users.User;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -38,41 +40,51 @@ import javax.ws.rs.core.SecurityContext;
 import java.io.IOException;
 import java.security.Principal;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
  * @author Lennart Koopmann <lennart@torch.sh>
  */
+@RequiresAuthentication
 @Path("/users")
+@Consumes(MediaType.APPLICATION_JSON)
+@Produces(MediaType.APPLICATION_JSON)
 public class UsersResource extends RestResource {
 
     private static final Logger LOG = LoggerFactory.getLogger(RestResource.class);
 
     @GET
-    @RequiresAuthentication
-    @Consumes(MediaType.APPLICATION_JSON)
-    @Produces(MediaType.APPLICATION_JSON)
-    public Response authenticate(@Context SecurityContext securityContext) {
+    @Path("{username}")
+    public Response authenticate(@Context SecurityContext securityContext, @PathParam("username") String username) {
         final Principal principal = securityContext.getUserPrincipal();
         final User user = User.load(principal.getName(), core);
 
         if (user == null) {
             return Response.status(Response.Status.UNAUTHORIZED).build();
         }
+        if (! user.getName().equals(username)) {
+            return Response.status(Response.Status.BAD_REQUEST).build();
+        }
 
-        final HashMap<String,String> map = Maps.newHashMap();
-        map.put("username", user.getName());
-        map.put("isAuthorized", "true");
-        map.put("full_name", user.getFullName());
-        return Response.ok().entity(json(map)).build();
+        return Response.ok().entity(json(toMap(user))).build();
 
     }
 
+    @GET
+    @RequiresPermissions(RestPermissions.USERS_LIST)
+    public Response listUsers() {
+        final List<User> users = User.loadAll(core);
+        final List<Map<String, Object>> resultUsers = Lists.newArrayList();
+        for (User user : users) {
+            resultUsers.add(toMap(user));
+        }
+
+        return Response.ok(json(resultUsers)).build();
+    }
+
     @POST
-    @RequiresAuthentication
-    @RequiresPermissions("users:create")
-    @Consumes(MediaType.APPLICATION_JSON)
-    @Produces(MediaType.APPLICATION_JSON)
+    @RequiresPermissions(RestPermissions.USERS_CREATE)
     public Response create(String body) {
         if (body == null || body.isEmpty()) {
             LOG.error("Missing parameters. Returning HTTP 400.");
@@ -92,6 +104,7 @@ public class UsersResource extends RestResource {
         userData.put("username", cr.username);
         userData.put("password", cr.password); // core.getConfiguration().getPasswordSecret()));
         userData.put("full_name", cr.fullName);
+        userData.put("permissions", cr.permissions);
 
         User user = new User(userData, core);
         ObjectId id;
@@ -107,6 +120,15 @@ public class UsersResource extends RestResource {
         result.put("user_id", id.toStringMongod());
 
         return Response.status(Response.Status.CREATED).entity(json(result)).build();
+    }
+
+    private HashMap<String, Object> toMap(User user) {
+        final HashMap<String,Object> map = Maps.newHashMap();
+        map.put("username", user.getName());
+        map.put("full_name", user.getFullName());
+        map.put("permissions", user.getPermissions());
+        map.put("read_only", user.isReadOnly());
+        return map;
     }
 
 }
