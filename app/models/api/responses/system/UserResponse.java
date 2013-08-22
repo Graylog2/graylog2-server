@@ -2,7 +2,9 @@ package models.api.responses.system;
 
 import com.google.gson.annotations.SerializedName;
 
-public class AuthenticationResponse {
+import java.util.List;
+
+public class UserResponse {
 
 	public String username;
 
@@ -10,4 +12,6 @@ public class AuthenticationResponse {
 	public String fullName;
 
 	public String id;
+
+	public List<String> permissions;
 }
