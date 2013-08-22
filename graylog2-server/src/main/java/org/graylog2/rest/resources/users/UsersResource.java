@@ -27,6 +27,7 @@ import org.bson.types.ObjectId;
 import org.graylog2.database.ValidationException;
 import org.graylog2.rest.resources.RestResource;
 import org.graylog2.rest.resources.users.requests.CreateRequest;
+import org.graylog2.rest.resources.users.requests.PermissionEditRequest;
 import org.graylog2.security.RestPermissions;
 import org.graylog2.users.User;
 import org.slf4j.Logger;
@@ -63,12 +64,9 @@ public class UsersResource extends RestResource {
         if (user == null) {
             return Response.status(Response.Status.UNAUTHORIZED).build();
         }
-        if (! user.getName().equals(username)) {
-            return Response.status(Response.Status.BAD_REQUEST).build();
-        }
-
-        return Response.ok().entity(json(toMap(user))).build();
-
+        // if the requested username does not match the authenticated user, then we don't return permission information
+        final boolean isSameUser = user.getName().equals(username);
+        return Response.ok().entity(json(toMap(user, isSameUser))).build();
     }
 
     @GET
@@ -79,8 +77,9 @@ public class UsersResource extends RestResource {
         for (User user : users) {
             resultUsers.add(toMap(user));
         }
-
-        return Response.ok(json(resultUsers)).build();
+        final HashMap<Object, Object> map = Maps.newHashMap();
+        map.put("users", resultUsers);
+        return Response.ok(json(map)).build();
     }
 
     @POST
@@ -124,19 +123,17 @@ public class UsersResource extends RestResource {
 
     @PUT
     @Path("{username}/permissions")
-    @RequiresPermissions(RestPermissions.PERMISSIONS_EDIT)
+    @RequiresPermissions(RestPermissions.USERPERMISSIONS_EDIT)
     public Response editPermissions(@PathParam("username") String username, String body) {
-        List<String> permissions = null;
+        PermissionEditRequest permissionRequest;
         try {
-            permissions = objectMapper.readValue(body, List.class);
+            permissionRequest = objectMapper.readValue(body, PermissionEditRequest.class);
         } catch (IOException e) {
-            // TODO
+            throw new BadRequestException(e);
         }
-        if (permissions == null) {
-            return Response.status(Response.Status.BAD_REQUEST).build();
-        }
+
         final User user = User.load(username, core);
-        user.setPermissions(permissions);
+        user.setPermissions(permissionRequest.permissions);
         try {
             user.save();
         } catch (ValidationException e) {
@@ -147,7 +144,7 @@ public class UsersResource extends RestResource {
 
     @DELETE
     @Path("{username}/permissions")
-    @RequiresPermissions(RestPermissions.PERMISSIONS_EDIT)
+    @RequiresPermissions(RestPermissions.USERPERMISSIONS_EDIT)
     public Response deletePermissions(@PathParam("username") String username) {
         final User user = User.load(username, core);
         user.setPermissions(Lists.<String>newArrayList());
@@ -160,12 +157,19 @@ public class UsersResource extends RestResource {
     }
 
     private HashMap<String, Object> toMap(User user) {
+        return toMap(user, true);
+    }
+
+    private HashMap<String, Object> toMap(User user, boolean includePermissions) {
         final HashMap<String,Object> map = Maps.newHashMap();
         map.put("username", user.getName());
         map.put("full_name", user.getFullName());
-        map.put("permissions", user.getPermissions());
+        if (includePermissions) {
+            map.put("permissions", user.getPermissions());
+        }
         map.put("read_only", user.isReadOnly());
         return map;
     }
+
 
 }

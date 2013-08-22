@@ -17,10 +17,11 @@
  * along with Graylog2.  If not, see <http://www.gnu.org/licenses/>.
  *
  */
-package org.graylog2.security;
+package org.graylog2.rest.resources.users.requests;
 
-public class RestPermissions {
-    public static final String USERS_CREATE =  "users:create";
-    public static final String USERS_LIST = "users:list";
-    public static final String USERPERMISSIONS_EDIT = "userpermissions:edit";
+import java.util.List;
+
+public class PermissionEditRequest {
+
+    public List<String> permissions;
 }
