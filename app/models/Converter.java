@@ -33,6 +33,7 @@ public class Converter {
         DATE,
         HASH,
         SPLIT_AND_COUNT,
+        IP_ANONYMIZER,
         SYSLOG_PRI_LEVEL,
         SYSLOG_PRI_FACILITY
     }
