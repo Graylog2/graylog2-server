@@ -52,8 +52,16 @@
             </span>
 
             <div id="condition-value-input" style="display: none;">
-                <label for="condition_value">Regex condition:</label>
-                <input name="condition_value" id="condition_value" type="text" class="input-xlarge" />
+                <div class="input-append">
+                    <label for="condition_value"></label>
+                    <input name="condition_value" id="condition_value" type="text" class="input-xlarge" />
+
+                    <button class="btn btn-info try-xtrc-condition" type="button" style="display: none;">
+                        Try!
+                    </button>
+                </div>
+
+                <div id="try-xtrc-condition-result" style="display: none;">Matches! Extractor would run against this example.</div>
             </div>
 
             <label for="target_field">Store as field:</label>

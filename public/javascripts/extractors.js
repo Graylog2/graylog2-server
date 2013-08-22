@@ -236,6 +236,8 @@ $(document).ready(function() {
     // String condition type.
     $("#string-condition-type").on("click", function() {
         var div = $("#condition-value-input");
+        $(".try-xtrc-condition").hide();
+        $("#try-xtrc-condition-result").hide();
         div.show();
         $("input", div).attr("placeholder", "");
         $("label", div).html("Field must include this string:");
@@ -247,6 +249,41 @@ $(document).ready(function() {
         div.show();
         $("input", div).attr("placeholder", "^\d{3,}");
         $("label", div).html("Field must match this regular expression:");
+        $(".try-xtrc-condition").show();
+    });
+
+    // Try regex conditions.
+    $(".try-xtrc-condition").on("click", function() {
+        var button = $(this);
+
+        button.html("<i class='icon-refresh icon-spin'></i> Trying...");
+        $.ajax({
+            url: '/a/tools/regex_test',
+            data: {
+                "string":$("#xtrc-example").text(),
+                "regex":$("#condition_value").val()
+            },
+            success: function(matchResult) {
+                var resultMsg = $("#try-xtrc-condition-result");
+                resultMsg.removeClass("success-match");
+                resultMsg.removeClass("fail-match");
+                if(matchResult.finds) {
+                    resultMsg.html("Matches! Extractor would run against this example.");
+                    resultMsg.addClass("success-match");
+                } else {
+                    resultMsg.html("Does not match! Extractor would not run.");
+                    resultMsg.addClass("fail-match");
+                }
+
+                resultMsg.show();
+            },
+            error: function() {
+                showError("Could not try regular expression. Make sure that it is valid.");
+            },
+            complete: function() {
+                button.html("Try!");
+            }
+        });
     });
 
 });
