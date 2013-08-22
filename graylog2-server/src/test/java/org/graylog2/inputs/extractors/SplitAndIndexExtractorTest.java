@@ -21,6 +21,7 @@ package org.graylog2.inputs.extractors;
 
 import com.google.common.collect.Lists;
 import org.graylog2.ConfigurationException;
+import org.graylog2.GraylogServerStub;
 import org.graylog2.plugin.Message;
 import org.graylog2.plugin.Tools;
 import org.graylog2.plugin.inputs.Converter;
@@ -46,8 +47,8 @@ public class SplitAndIndexExtractorTest {
 
         msg.addField("somefield", "<10> 07 Aug 2013 somesubsystem: this is my message for username9001 id:9001");
 
-        SplitAndIndexExtractor x = new SplitAndIndexExtractor("foo", "foo", Extractor.CursorStrategy.COPY, "somefield", "our_result", config(" ", 3), "foo", noConverters());
-        x.run(msg);
+        SplitAndIndexExtractor x = new SplitAndIndexExtractor("foo", "foo", Extractor.CursorStrategy.COPY, "somefield", "our_result", config(" ", 3), "foo", noConverters(), Extractor.ConditionType.NONE, null);
+        x.runExtractor(new GraylogServerStub(), msg);
 
         assertNotNull(msg.getField("our_result"));
         assertEquals("<10> 07 Aug 2013 somesubsystem: this is my message for username9001 id:9001", msg.getField("somefield"));
@@ -60,8 +61,8 @@ public class SplitAndIndexExtractorTest {
 
         msg.addField("somefield", "foo.bar.baz");
 
-        SplitAndIndexExtractor x = new SplitAndIndexExtractor("foo", "foo", Extractor.CursorStrategy.COPY, "somefield", "our_result", config(".", 1), "foo", noConverters());
-        x.run(msg);
+        SplitAndIndexExtractor x = new SplitAndIndexExtractor("foo", "foo", Extractor.CursorStrategy.COPY, "somefield", "our_result", config(".", 1), "foo", noConverters(), Extractor.ConditionType.NONE, null);
+        x.runExtractor(new GraylogServerStub(), msg);
 
         assertNotNull(msg.getField("our_result"));
         assertEquals("foo.bar.baz", msg.getField("somefield"));
@@ -74,8 +75,8 @@ public class SplitAndIndexExtractorTest {
 
         msg.addField("somefield", "<10> 07 Aug 2013 somesubsystem: this is my message for username9001 id:9001");
 
-        SplitAndIndexExtractor x = new SplitAndIndexExtractor("foo", "foo", Extractor.CursorStrategy.CUT, "somefield", "our_result", config(" ", 3), "foo", noConverters());
-        x.run(msg);
+        SplitAndIndexExtractor x = new SplitAndIndexExtractor("foo", "foo", Extractor.CursorStrategy.CUT, "somefield", "our_result", config(" ", 3), "foo", noConverters(), Extractor.ConditionType.NONE, null);
+        x.runExtractor(new GraylogServerStub(), msg);
 
         assertNotNull(msg.getField("our_result"));
         assertEquals("<10> 07 Aug  somesubsystem: this is my message for username9001 id:9001", msg.getField("somefield"));
@@ -88,8 +89,8 @@ public class SplitAndIndexExtractorTest {
 
         msg.addField("somefield", "<10> 07 Aug 2013 somesubsystem: this is my message for username9001 id:9001");
 
-        SplitAndIndexExtractor x = new SplitAndIndexExtractor("foo", "foo", Extractor.CursorStrategy.CUT, "somefield", "our_result", config(" ", 11), "foo", noConverters());
-        x.run(msg);
+        SplitAndIndexExtractor x = new SplitAndIndexExtractor("foo", "foo", Extractor.CursorStrategy.CUT, "somefield", "our_result", config(" ", 11), "foo", noConverters(), Extractor.ConditionType.NONE, null);
+        x.runExtractor(new GraylogServerStub(), msg);
 
         assertNotNull(msg.getField("our_result"));
         assertEquals("<10> 07 Aug 2013 somesubsystem: this is my message for username9001 ", msg.getField("somefield"));
@@ -102,8 +103,8 @@ public class SplitAndIndexExtractorTest {
 
         msg.addField("somefield", "<10> 07 Aug 2013 somesubsystem: this is my message for username9001 id:9001");
 
-        SplitAndIndexExtractor x = new SplitAndIndexExtractor("foo", "foo", Extractor.CursorStrategy.COPY, "somefield", "our_result", config(" ", 9001), "foo", noConverters());
-        x.run(msg);
+        SplitAndIndexExtractor x = new SplitAndIndexExtractor("foo", "foo", Extractor.CursorStrategy.COPY, "somefield", "our_result", config(" ", 9001), "foo", noConverters(), Extractor.ConditionType.NONE, null);
+        x.runExtractor(new GraylogServerStub(), msg);
 
         assertNull(msg.getField("our_result"));
         assertEquals("<10> 07 Aug 2013 somesubsystem: this is my message for username9001 id:9001", msg.getField("somefield"));
@@ -115,8 +116,8 @@ public class SplitAndIndexExtractorTest {
 
         msg.addField("somefield", "<10> 07 Aug 2013 somesubsystem: this is my message for username9001 id:9001");
 
-        SplitAndIndexExtractor x = new SplitAndIndexExtractor("foo", "foo", Extractor.CursorStrategy.COPY, "somefield", "our_result", config("_", 9001), "foo", noConverters());
-        x.run(msg);
+        SplitAndIndexExtractor x = new SplitAndIndexExtractor("foo", "foo", Extractor.CursorStrategy.COPY, "somefield", "our_result", config("_", 9001), "foo", noConverters(), Extractor.ConditionType.NONE, null);
+        x.runExtractor(new GraylogServerStub(), msg);
 
         assertNull(msg.getField("our_result"));
         assertEquals("<10> 07 Aug 2013 somesubsystem: this is my message for username9001 id:9001", msg.getField("somefield"));
@@ -128,8 +129,8 @@ public class SplitAndIndexExtractorTest {
 
         msg.addField("somefield", "<10> 07 Aug 2013 somesubsystem: this is my message for username9001 id:9001");
 
-        SplitAndIndexExtractor x = new SplitAndIndexExtractor("foo", "foo", Extractor.CursorStrategy.CUT, "somefield", "our_result", config(" ", 9001), "foo", noConverters());
-        x.run(msg);
+        SplitAndIndexExtractor x = new SplitAndIndexExtractor("foo", "foo", Extractor.CursorStrategy.CUT, "somefield", "our_result", config(" ", 9001), "foo", noConverters(), Extractor.ConditionType.NONE, null);
+        x.runExtractor(new GraylogServerStub(), msg);
 
         assertNull(msg.getField("our_result"));
         assertEquals("<10> 07 Aug 2013 somesubsystem: this is my message for username9001 id:9001", msg.getField("somefield"));
@@ -141,8 +142,8 @@ public class SplitAndIndexExtractorTest {
 
         msg.addField("somefield", "<10> 07 Aug 2013 somesubsystem: this is my message for username9001 id:9001");
 
-        SplitAndIndexExtractor x = new SplitAndIndexExtractor("foo", "foo", Extractor.CursorStrategy.CUT, "somefield", "our_result", config("_", 9001), "foo", noConverters());
-        x.run(msg);
+        SplitAndIndexExtractor x = new SplitAndIndexExtractor("foo", "foo", Extractor.CursorStrategy.CUT, "somefield", "our_result", config("_", 9001), "foo", noConverters(), Extractor.ConditionType.NONE, null);
+        x.runExtractor(new GraylogServerStub(), msg);
 
         assertNull(msg.getField("our_result"));
         assertEquals("<10> 07 Aug 2013 somesubsystem: this is my message for username9001 id:9001", msg.getField("somefield"));
@@ -154,8 +155,8 @@ public class SplitAndIndexExtractorTest {
 
         msg.addField("somefield", "<10>__07__Aug__2013__somesubsystem:__this__is__my__message__for__username9001__id:9001");
 
-        SplitAndIndexExtractor x = new SplitAndIndexExtractor("foo", "foo", Extractor.CursorStrategy.COPY, "somefield", "our_result", config("__", 3), "foo", noConverters());
-        x.run(msg);
+        SplitAndIndexExtractor x = new SplitAndIndexExtractor("foo", "foo", Extractor.CursorStrategy.COPY, "somefield", "our_result", config("__", 3), "foo", noConverters(), Extractor.ConditionType.NONE, null);
+        x.runExtractor(new GraylogServerStub(), msg);
 
         assertNotNull(msg.getField("our_result"));
         assertEquals("<10>__07__Aug__2013__somesubsystem:__this__is__my__message__for__username9001__id:9001", msg.getField("somefield"));
@@ -166,8 +167,8 @@ public class SplitAndIndexExtractorTest {
     public void testDoesNotFailOnNonExistentSourceField() throws Exception {
         Message msg = new Message("The short message", "TestUnit", Tools.getUTCTimestampWithMilliseconds());
 
-        SplitAndIndexExtractor x = new SplitAndIndexExtractor("foo", "foo", Extractor.CursorStrategy.CUT, "LOLIDONTEXIST", "our_result", config(" ", 3), "foo", noConverters());
-        x.run(msg);
+        SplitAndIndexExtractor x = new SplitAndIndexExtractor("foo", "foo", Extractor.CursorStrategy.CUT, "LOLIDONTEXIST", "our_result", config(" ", 3), "foo", noConverters(), Extractor.ConditionType.NONE, null);
+        x.runExtractor(new GraylogServerStub(), msg);
     }
 
     @Test
@@ -176,38 +177,38 @@ public class SplitAndIndexExtractorTest {
 
         msg.addField("somefield", 9001);
 
-        SplitAndIndexExtractor x = new SplitAndIndexExtractor("foo", "foo", Extractor.CursorStrategy.CUT, "somefield", "our_result", config(" ", 3), "foo", noConverters());
-        x.run(msg);
+        SplitAndIndexExtractor x = new SplitAndIndexExtractor("foo", "foo", Extractor.CursorStrategy.CUT, "somefield", "our_result", config(" ", 3), "foo", noConverters(), Extractor.ConditionType.NONE, null);
+        x.runExtractor(new GraylogServerStub(), msg);
     }
 
     @Test(expected = ConfigurationException.class)
     public void testDoesNotInitializeOnNullConfigMap() throws Exception {
-        new SplitAndIndexExtractor("foo", "foo", Extractor.CursorStrategy.CUT, "somefield", "somefield", null, "foo", noConverters());
+        new SplitAndIndexExtractor("foo", "foo", Extractor.CursorStrategy.CUT, "somefield", "somefield", null, "foo", noConverters(), Extractor.ConditionType.NONE, null);
     }
 
     @Test(expected = ConfigurationException.class)
     public void testDoesNotInitializeOnNullSplitChar() throws Exception {
-        new SplitAndIndexExtractor("foo", "foo", Extractor.CursorStrategy.CUT, "somefield", "somefield", config(null, 1), "foo", noConverters());
+        new SplitAndIndexExtractor("foo", "foo", Extractor.CursorStrategy.CUT, "somefield", "somefield", config(null, 1), "foo", noConverters(), Extractor.ConditionType.NONE, null);
     }
 
     @Test(expected = ConfigurationException.class)
          public void testDoesNotInitializeOnNullTargetIndex() throws Exception {
-        new SplitAndIndexExtractor("foo", "foo", Extractor.CursorStrategy.CUT, "somefield", "somefield", config("x", null), "foo", noConverters());
+        new SplitAndIndexExtractor("foo", "foo", Extractor.CursorStrategy.CUT, "somefield", "somefield", config("x", null), "foo", noConverters(), Extractor.ConditionType.NONE, null);
     }
 
     @Test(expected = ConfigurationException.class)
     public void testDoesNotInitializeOnNullNullNullNullSupernull() throws Exception {
-        new SplitAndIndexExtractor("foo", "foo", Extractor.CursorStrategy.CUT, "somefield", "somefield", config(null, null), "foo", noConverters());
+        new SplitAndIndexExtractor("foo", "foo", Extractor.CursorStrategy.CUT, "somefield", "somefield", config(null, null), "foo", noConverters(), Extractor.ConditionType.NONE, null);
     }
 
     @Test(expected = ConfigurationException.class)
     public void testDoesNotInitializeOnWrongSplitCharType() throws Exception {
-        new SplitAndIndexExtractor("foo", "foo", Extractor.CursorStrategy.CUT, "somefield", "somefield", config(1, 1), "foo", noConverters());
+        new SplitAndIndexExtractor("foo", "foo", Extractor.CursorStrategy.CUT, "somefield", "somefield", config(1, 1), "foo", noConverters(), Extractor.ConditionType.NONE, null);
     }
 
     @Test(expected = ConfigurationException.class)
     public void testDoesNotInitializeOnWrongTargetIndex() throws Exception {
-        new SplitAndIndexExtractor("foo", "foo", Extractor.CursorStrategy.CUT, "somefield", "somefield", config("x", "foo"), "foo", noConverters());
+        new SplitAndIndexExtractor("foo", "foo", Extractor.CursorStrategy.CUT, "somefield", "somefield", config("x", "foo"), "foo", noConverters(), Extractor.ConditionType.NONE, null);
     }
 
     @Test
@@ -242,6 +243,32 @@ public class SplitAndIndexExtractorTest {
 
         assertEquals(0, result[0]);
         assertEquals(0, result[1]);
+    }
+
+    @Test
+    public void testDoesNotRunWhenRegexConditionFails() throws Exception {
+        Message msg = new Message("The short message", "TestUnit", Tools.getUTCTimestampWithMilliseconds());
+
+        msg.addField("somefield", "<10> 07 Aug 2013 somesubsystem: this is my message for username9001 id:9001");
+
+        SplitAndIndexExtractor x = new SplitAndIndexExtractor("foo", "foo", Extractor.CursorStrategy.COPY, "somefield", "our_result", config(" ", 3), "foo", noConverters(), Extractor.ConditionType.REGEX, "^XXX");
+        x.runExtractor(new GraylogServerStub(), msg);
+
+        assertNull(msg.getField("our_result"));
+        assertEquals("<10> 07 Aug 2013 somesubsystem: this is my message for username9001 id:9001", msg.getField("somefield"));
+    }
+
+    @Test
+    public void testDoesNotRunWhenStringConditionFails() throws Exception {
+        Message msg = new Message("The short message", "TestUnit", Tools.getUTCTimestampWithMilliseconds());
+
+        msg.addField("somefield", "<10> 07 Aug 2013 somesubsystem: this is my message for username9001 id:9001");
+
+        SplitAndIndexExtractor x = new SplitAndIndexExtractor("foo", "foo", Extractor.CursorStrategy.COPY, "somefield", "our_result", config(" ", 3), "foo", noConverters(), Extractor.ConditionType.STRING, "FOOBAR");
+        x.runExtractor(new GraylogServerStub(), msg);
+
+        assertNull(msg.getField("our_result"));
+        assertEquals("<10> 07 Aug 2013 somesubsystem: this is my message for username9001 id:9001", msg.getField("somefield"));
     }
 
     public static Map<String, Object> config(final Object splitChar, final Object targetIndex) {

@@ -21,8 +21,10 @@
  */
 package org.graylog2.plugin.inputs;
 
+import com.codahale.metrics.Timer;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
+import org.graylog2.plugin.GraylogServer;
 import org.graylog2.plugin.Message;
 import org.graylog2.plugin.database.EmbeddedPersistable;
 import org.slf4j.Logger;
@@ -32,6 +34,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicLong;
+import java.util.regex.Pattern;
 
 import static com.codahale.metrics.MetricRegistry.name;
 
@@ -53,6 +56,12 @@ public abstract class Extractor implements EmbeddedPersistable {
         COPY
     }
 
+    public enum ConditionType {
+        NONE,
+        STRING,
+        REGEX
+    }
+
     protected final AtomicLong exceptions;
     protected final AtomicLong converterExceptions;
 
@@ -65,13 +74,27 @@ public abstract class Extractor implements EmbeddedPersistable {
     protected final String creatorUserId;
     protected final Map<String, Object> extractorConfig;
     protected final List<Converter> converters;
+    protected final ConditionType conditionType;
+    protected final String conditionValue;
+
+    protected Pattern regexConditionPattern;
 
     private final String totalTimerName;
     private final String converterTimerName;
 
-    public abstract void run(Message msg);
+    protected abstract Result run(String field);
 
-    public Extractor(String id, String title, Type type, CursorStrategy cursorStrategy, String sourceField, String targetField, Map<String, Object> extractorConfig, String creatorUserId, List<Converter> converters) throws ReservedFieldException {
+    public Extractor(String id,
+                     String title,
+                     Type type,
+                     CursorStrategy cursorStrategy,
+                     String sourceField,
+                     String targetField,
+                     Map<String, Object> extractorConfig,
+                     String creatorUserId,
+                     List<Converter> converters,
+                     ConditionType conditionType,
+                     String conditionValue) throws ReservedFieldException {
         if (Message.RESERVED_FIELDS.contains(targetField) && !Message.RESERVED_SETTABLE_FIELDS.contains(targetField)) {
             throw new ReservedFieldException("You cannot apply an extractor on reserved field [" + targetField + "].");
         }
@@ -88,12 +111,72 @@ public abstract class Extractor implements EmbeddedPersistable {
         this.extractorConfig = extractorConfig;
         this.creatorUserId = creatorUserId;
         this.converters = converters;
+        this.conditionType = conditionType;
+        this.conditionValue = conditionValue;
+
+        if (conditionType.equals(ConditionType.REGEX)) {
+            this.regexConditionPattern = Pattern.compile(conditionValue, Pattern.DOTALL);
+        }
 
         this.totalTimerName = name(getClass(), getType().toString().toLowerCase(), getId(), "executionTime");
         this.converterTimerName = name(getClass(), getType().toString().toLowerCase(), getId(), "converterExecutionTime");
     }
 
-    public void runConverters(Message msg) {
+    public void runExtractor(GraylogServer server, Message msg) {
+        // We can only work on Strings.
+        if (!(msg.getField(sourceField) instanceof String)) {
+            return;
+        }
+
+        String field = (String) msg.getField(sourceField);
+
+        // Decide if to extract at all.
+        if (conditionType.equals(ConditionType.STRING)) {
+            if (!field.contains(conditionValue)) {
+                return;
+            }
+        } else if (conditionType.equals(ConditionType.REGEX)) {
+            if (!regexConditionPattern.matcher(field).find()) {
+                return;
+            }
+        }
+
+        Timer timer = server.metrics().timer(getTotalTimerName());
+        final Timer.Context timerContext = timer.time();
+
+        Result result = run(field);
+
+        if (result == null || result.getValue() == null) {
+            timerContext.close();
+            return;
+        } else {
+            msg.addField(targetField, result.getValue());
+        }
+
+        // Remove original from message?
+        if (cursorStrategy.equals(CursorStrategy.CUT)) {
+            StringBuilder sb = new StringBuilder(field);
+            sb.delete(result.getBeginIndex(), result.getEndIndex());
+
+            String finalResult = sb.toString();
+
+            if(finalResult.isEmpty()) {
+                finalResult = "fullyCutByExtractor";
+            }
+
+            msg.removeField(sourceField);
+            msg.addField(sourceField, finalResult);
+        }
+
+        runConverters(server, msg);
+
+        timerContext.stop();
+    }
+
+    public void runConverters(GraylogServer server, Message msg) {
+        Timer cTimer = server.metrics().timer(getConverterTimerName());
+        final Timer.Context cTimerContext = cTimer.time();
+
         for (Converter converter : converters) {
             try {
                 if (!(msg.getFields().get(targetField) instanceof String)) {
@@ -110,6 +193,8 @@ public abstract class Extractor implements EmbeddedPersistable {
                 continue;
             }
         }
+
+        cTimerContext.stop();
     }
 
     public class ReservedFieldException extends Exception {
@@ -150,6 +235,14 @@ public abstract class Extractor implements EmbeddedPersistable {
         return creatorUserId;
     }
 
+    public String getConditionValue() {
+        return conditionValue;
+    }
+
+    public ConditionType getConditionType() {
+        return conditionType;
+    }
+
     public Map<String, Object> getPersistedFields() {
         return new HashMap<String, Object>() {{
             put("id", id);
@@ -160,6 +253,8 @@ public abstract class Extractor implements EmbeddedPersistable {
             put("source_field", sourceField);
             put("creator_user_id", creatorUserId);
             put("extractor_config", extractorConfig);
+            put("condition_type", conditionType.toString().toLowerCase());
+            put("condition_value", conditionValue);
             put("converters", converterConfigMap());
         }};
     }
@@ -199,4 +294,29 @@ public abstract class Extractor implements EmbeddedPersistable {
         exceptions.incrementAndGet();
     }
 
+    public class Result {
+
+        private final String value;
+        private final int beginIndex;
+        private final int endIndex;
+
+        public Result(String value, int beginIndex, int endIndex) {
+            this.value = value;
+            this.beginIndex = beginIndex;
+            this.endIndex = endIndex;
+        }
+
+        public String getValue() {
+            return value;
+        }
+
+        public int getBeginIndex() {
+            return beginIndex;
+        }
+
+        public int getEndIndex() {
+            return endIndex;
+        }
+
+    }
 }

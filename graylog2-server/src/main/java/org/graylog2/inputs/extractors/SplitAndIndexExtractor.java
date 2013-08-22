@@ -36,8 +36,17 @@ public class SplitAndIndexExtractor extends Extractor {
     public final String splitChar;
     public final int index;
 
-    public SplitAndIndexExtractor(String id, String title, CursorStrategy cursorStrategy, String sourceField, String targetField, Map<String, Object> extractorConfig, String creatorUserId, List<Converter> converters) throws ReservedFieldException, ConfigurationException {
-        super(id, title, Type.SPLIT_AND_INDEX, cursorStrategy, sourceField, targetField, extractorConfig, creatorUserId, converters);
+    public SplitAndIndexExtractor(String id,
+                                  String title,
+                                  CursorStrategy cursorStrategy,
+                                  String sourceField,
+                                  String targetField,
+                                  Map<String, Object> extractorConfig,
+                                  String creatorUserId,
+                                  List<Converter> converters,
+                                  ConditionType conditionType,
+                                  String conditionValue) throws ReservedFieldException, ConfigurationException {
+        super(id, title, Type.SPLIT_AND_INDEX, cursorStrategy, sourceField, targetField, extractorConfig, creatorUserId, converters, conditionType, conditionValue);
 
         if (extractorConfig == null || extractorConfig.get("index") == null || extractorConfig.get("split_by") == null) {
             throw new ConfigurationException("Missing configuration fields. Required: index, split_by");
@@ -52,37 +61,16 @@ public class SplitAndIndexExtractor extends Extractor {
     }
 
     @Override
-    public void run(Message msg) {
-        // We can only work on Strings.
-        if (!(msg.getField(sourceField) instanceof String)) {
-            return;
-        }
-
-        String original = (String) msg.getField(sourceField);
-
-        String result = cut(original, splitChar, index);
+    protected Result run(String value) {
+        String result = cut(value, splitChar, index);
 
         if (result == null) {
-            return;
+            return null;
         }
 
-        msg.addField(targetField, result);
+        int[] range = getCutIndices(value, splitChar, index);
 
-        // Remove original from message?
-        if (cursorStrategy.equals(CursorStrategy.CUT)) {
-            int[] range = getCutIndices(original, splitChar, index);
-            StringBuilder sb = new StringBuilder(original);
-            sb.delete(range[0], range[1]);
-
-            String finalResult = sb.toString();
-
-            if(finalResult.isEmpty()) {
-                finalResult = "fullyCutByExtractor";
-            }
-
-            msg.removeField(sourceField);
-            msg.addField(sourceField, finalResult);
-        }
+        return new Result(result, range[0], range[1]);
     }
 
     public static String cut(String s, String splitChar, int index) {

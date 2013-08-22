@@ -36,8 +36,17 @@ public class SubstringExtractor extends Extractor {
     private int beginIndex = -1;
     private int endIndex = -1;
 
-    public SubstringExtractor(String id, String title, CursorStrategy cursorStrategy, String sourceField, String targetField, Map<String, Object> extractorConfig, String creatorUserId, List<Converter> converters) throws ReservedFieldException, ConfigurationException {
-        super(id, title, Type.SUBSTRING, cursorStrategy, sourceField, targetField, extractorConfig, creatorUserId, converters);
+    public SubstringExtractor(String id,
+                              String title,
+                              CursorStrategy cursorStrategy,
+                              String sourceField,
+                              String targetField,
+                              Map<String, Object> extractorConfig,
+                              String creatorUserId,
+                              List<Converter> converters,
+                              ConditionType conditionType,
+                              String conditionValue) throws ReservedFieldException, ConfigurationException {
+        super(id, title, Type.SUBSTRING, cursorStrategy, sourceField, targetField, extractorConfig, creatorUserId, converters, conditionType, conditionValue);
 
         if (extractorConfig == null || extractorConfig.get("begin_index") == null || extractorConfig.get("end_index") == null) {
             throw new ConfigurationException("Missing configuration fields. Required: begin_index, end_index");
@@ -52,37 +61,8 @@ public class SubstringExtractor extends Extractor {
     }
 
     @Override
-    public void run(Message msg) {
-        // We can only work on Strings.
-        if (!(msg.getField(sourceField) instanceof String)) {
-            return;
-        }
-
-        String original = (String) msg.getField(sourceField);
-
-
-        String result = Tools.safeSubstring(original, beginIndex, endIndex);
-
-        if (result == null) {
-            return;
-        }
-
-        msg.addField(targetField, result);
-
-        // Remove original from message?
-        if (cursorStrategy.equals(CursorStrategy.CUT)) {
-            StringBuilder sb = new StringBuilder(original);
-            sb.delete(beginIndex, endIndex);
-
-            String finalResult = sb.toString();
-
-            if(finalResult.isEmpty()) {
-                finalResult = "fullyCutByExtractor";
-            }
-
-            msg.removeField(sourceField);
-            msg.addField(sourceField, finalResult);
-        }
+    protected Result run(String value) {
+        return new Result(Tools.safeSubstring(value, beginIndex, endIndex), beginIndex, endIndex);
     }
 
 }

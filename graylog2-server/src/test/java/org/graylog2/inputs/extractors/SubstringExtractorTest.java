@@ -21,6 +21,7 @@ package org.graylog2.inputs.extractors;
 
 import com.google.common.collect.Lists;
 import org.graylog2.ConfigurationException;
+import org.graylog2.GraylogServerStub;
 import org.graylog2.plugin.Message;
 import org.graylog2.plugin.Tools;
 import org.graylog2.plugin.inputs.Converter;
@@ -46,8 +47,8 @@ public class SubstringExtractorTest {
 
         msg.addField("somefield", "<10> 07 Aug 2013 somesubsystem: this is my message for username9001 id:9001");
 
-        SubstringExtractor x = new SubstringExtractor("foo", "foo", Extractor.CursorStrategy.COPY, "somefield", "our_result", config(17, 30), "foo", noConverters());
-        x.run(msg);
+        SubstringExtractor x = new SubstringExtractor("foo", "foo", Extractor.CursorStrategy.COPY, "somefield", "our_result", config(17, 30), "foo", noConverters(), Extractor.ConditionType.NONE, null);
+        x.runExtractor(new GraylogServerStub(), msg);
 
         assertNotNull(msg.getField("our_result"));
         assertEquals("<10> 07 Aug 2013 somesubsystem: this is my message for username9001 id:9001", msg.getField("somefield"));
@@ -60,8 +61,8 @@ public class SubstringExtractorTest {
 
         msg.addField("somefield", "<10> 07 Aug 2013 somesubsystem: this is my message for username9001 id:9001");
 
-        SubstringExtractor x = new SubstringExtractor("foo", "foo", Extractor.CursorStrategy.CUT, "somefield", "our_result", config(17, 30), "foo", noConverters());
-        x.run(msg);
+        SubstringExtractor x = new SubstringExtractor("foo", "foo", Extractor.CursorStrategy.CUT, "somefield", "our_result", config(17, 30), "foo", noConverters(), Extractor.ConditionType.NONE, null);
+        x.runExtractor(new GraylogServerStub(), msg);
 
         assertNotNull(msg.getField("our_result"));
         assertEquals("<10> 07 Aug 2013 : this is my message for username9001 id:9001", msg.getField("somefield"));
@@ -74,8 +75,8 @@ public class SubstringExtractorTest {
 
         msg.addField("somefield", "<10> 07 Aug 2013 somesubsystem: this is my message for username9001 id:9001");
 
-        SubstringExtractor x = new SubstringExtractor("foo", "foo", Extractor.CursorStrategy.COPY, "somefield", "our_result", config(100, 200), "foo", noConverters());
-        x.run(msg);
+        SubstringExtractor x = new SubstringExtractor("foo", "foo", Extractor.CursorStrategy.COPY, "somefield", "our_result", config(100, 200), "foo", noConverters(), Extractor.ConditionType.NONE, null);
+        x.runExtractor(new GraylogServerStub(), msg);
 
         assertNull(msg.getField("our_result"));
         assertEquals("<10> 07 Aug 2013 somesubsystem: this is my message for username9001 id:9001", msg.getField("somefield"));
@@ -87,8 +88,8 @@ public class SubstringExtractorTest {
 
         msg.addField("somefield", "<10> 07 Aug 2013 somesubsystem: this is my message for username9001 id:9001");
 
-        SubstringExtractor x = new SubstringExtractor("foo", "foo", Extractor.CursorStrategy.CUT, "somefield", "our_result", config(100, 200), "foo", noConverters());
-        x.run(msg);
+        SubstringExtractor x = new SubstringExtractor("foo", "foo", Extractor.CursorStrategy.CUT, "somefield", "our_result", config(100, 200), "foo", noConverters(), Extractor.ConditionType.NONE, null);
+        x.runExtractor(new GraylogServerStub(), msg);
 
         assertNull(msg.getField("our_result"));
         assertEquals("<10> 07 Aug 2013 somesubsystem: this is my message for username9001 id:9001", msg.getField("somefield"));
@@ -98,8 +99,8 @@ public class SubstringExtractorTest {
     public void testDoesNotFailOnNonExistentSourceField() throws Exception {
         Message msg = new Message("The short message", "TestUnit", Tools.getUTCTimestampWithMilliseconds());
 
-        SubstringExtractor x = new SubstringExtractor("foo", "foo", Extractor.CursorStrategy.CUT, "LOLIDONTEXIST", "our_result", config(0,1), "foo", noConverters());
-        x.run(msg);
+        SubstringExtractor x = new SubstringExtractor("foo", "foo", Extractor.CursorStrategy.CUT, "LOLIDONTEXIST", "our_result", config(0,1), "foo", noConverters(), Extractor.ConditionType.NONE, null);
+        x.runExtractor(new GraylogServerStub(), msg);
     }
 
     @Test
@@ -108,8 +109,8 @@ public class SubstringExtractorTest {
 
         msg.addField("somefield", 9001);
 
-        SubstringExtractor x = new SubstringExtractor("foo", "foo", Extractor.CursorStrategy.CUT, "somefield", "our_result", config(0,1), "foo", noConverters());
-        x.run(msg);
+        SubstringExtractor x = new SubstringExtractor("foo", "foo", Extractor.CursorStrategy.CUT, "somefield", "our_result", config(0,1), "foo", noConverters(), Extractor.ConditionType.NONE, null);
+        x.runExtractor(new GraylogServerStub(), msg);
     }
 
     @Test
@@ -118,8 +119,8 @@ public class SubstringExtractorTest {
 
         msg.addField("somefield", "<10> 07 Aug 2013 somesubsystem: this is my message for username9001 id:9001");
 
-        SubstringExtractor x = new SubstringExtractor("foo", "foo", Extractor.CursorStrategy.CUT, "somefield", "our_result", config(0,75), "foo", noConverters());
-        x.run(msg);
+        SubstringExtractor x = new SubstringExtractor("foo", "foo", Extractor.CursorStrategy.CUT, "somefield", "our_result", config(0,75), "foo", noConverters(), Extractor.ConditionType.NONE, null);
+        x.runExtractor(new GraylogServerStub(), msg);
 
         assertNotNull(msg.getField("our_result"));
         assertEquals("fullyCutByExtractor", msg.getField("somefield"));
@@ -127,27 +128,53 @@ public class SubstringExtractorTest {
 
     @Test(expected = ConfigurationException.class)
     public void testDoesNotInitializeOnNullConfigMap() throws Exception {
-        new SubstringExtractor("foo", "foo", Extractor.CursorStrategy.CUT, "somefield", "somefield", null, "foo", noConverters());
+        new SubstringExtractor("foo", "foo", Extractor.CursorStrategy.CUT, "somefield", "somefield", null, "foo", noConverters(), Extractor.ConditionType.NONE, null);
     }
 
     @Test(expected = ConfigurationException.class)
     public void testDoesNotInitializeOnNullStartValue() throws Exception {
-        new SubstringExtractor("foo", "foo", Extractor.CursorStrategy.CUT, "somefield", "somefield", config(null, 2), "foo", noConverters());
+        new SubstringExtractor("foo", "foo", Extractor.CursorStrategy.CUT, "somefield", "somefield", config(null, 2), "foo", noConverters(), Extractor.ConditionType.NONE, null);
     }
 
     @Test(expected = ConfigurationException.class)
     public void testDoesNotInitializeOnNullEndValue() throws Exception {
-        new SubstringExtractor("foo", "foo", Extractor.CursorStrategy.CUT, "somefield", "somefield", config(1, null), "foo", noConverters());
+        new SubstringExtractor("foo", "foo", Extractor.CursorStrategy.CUT, "somefield", "somefield", config(1, null), "foo", noConverters(), Extractor.ConditionType.NONE, null);
     }
 
     @Test(expected = ConfigurationException.class)
     public void testDoesNotInitializeOnStringStartValue() throws Exception {
-        new SubstringExtractor("foo", "foo", Extractor.CursorStrategy.CUT, "somefield", "somefield", config("1", 2), "foo", noConverters());
+        new SubstringExtractor("foo", "foo", Extractor.CursorStrategy.CUT, "somefield", "somefield", config("1", 2), "foo", noConverters(), Extractor.ConditionType.NONE, null);
     }
 
     @Test(expected = ConfigurationException.class)
     public void testDoesNotInitializeOnStringEndValue() throws Exception {
-        new SubstringExtractor("foo", "foo", Extractor.CursorStrategy.CUT, "somefield", "somefield", config(1, "2"), "foo", noConverters());
+        new SubstringExtractor("foo", "foo", Extractor.CursorStrategy.CUT, "somefield", "somefield", config(1, "2"), "foo", noConverters(), Extractor.ConditionType.NONE, null);
+    }
+
+    @Test
+         public void testDoesNotRunWhenRegexConditionFails() throws Exception {
+        Message msg = new Message("The short message", "TestUnit", Tools.getUTCTimestampWithMilliseconds());
+
+        msg.addField("somefield", "<10> 07 Aug 2013 somesubsystem: this is my message for username9001 id:9001");
+
+        SubstringExtractor x = new SubstringExtractor("foo", "foo", Extractor.CursorStrategy.COPY, "somefield", "our_result", config(0, 3), "foo", noConverters(), Extractor.ConditionType.REGEX, "^XXX");
+        x.runExtractor(new GraylogServerStub(), msg);
+
+        assertNull(msg.getField("our_result"));
+        assertEquals("<10> 07 Aug 2013 somesubsystem: this is my message for username9001 id:9001", msg.getField("somefield"));
+    }
+
+    @Test
+    public void testDoesNotRunWhenStringConditionFails() throws Exception {
+        Message msg = new Message("The short message", "TestUnit", Tools.getUTCTimestampWithMilliseconds());
+
+        msg.addField("somefield", "<10> 07 Aug 2013 somesubsystem: this is my message for username9001 id:9001");
+
+        SubstringExtractor x = new SubstringExtractor("foo", "foo", Extractor.CursorStrategy.COPY, "somefield", "our_result", config(0, 3), "foo", noConverters(), Extractor.ConditionType.STRING, "FOOBAR");
+        x.runExtractor(new GraylogServerStub(), msg);
+
+        assertNull(msg.getField("our_result"));
+        assertEquals("<10> 07 Aug 2013 somesubsystem: this is my message for username9001 id:9001", msg.getField("somefield"));
     }
 
     public static Map<String, Object> config(final Object start, final Object end) {

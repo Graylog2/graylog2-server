@@ -38,8 +38,17 @@ public class RegexExtractor extends Extractor {
 
     private final Pattern pattern;
 
-    public RegexExtractor(String id, String title, CursorStrategy cursorStrategy, String sourceField, String targetField, Map<String, Object> extractorConfig, String creatorUserId, List<Converter> converters) throws ReservedFieldException, ConfigurationException {
-        super(id, title, Type.REGEX, cursorStrategy, sourceField, targetField, extractorConfig, creatorUserId, converters);
+    public RegexExtractor(String id,
+                          String title,
+                          CursorStrategy cursorStrategy,
+                          String sourceField,
+                          String targetField,
+                          Map<String, Object> extractorConfig,
+                          String creatorUserId,
+                          List<Converter> converters,
+                          ConditionType conditionType,
+                          String conditionValue) throws ReservedFieldException, ConfigurationException {
+        super(id, title, Type.REGEX, cursorStrategy, sourceField, targetField, extractorConfig, creatorUserId, converters, conditionType, conditionValue);
 
         if (extractorConfig == null || extractorConfig.get("regex_value") == null || ((String) extractorConfig.get("regex_value")).isEmpty()) {
             throw new ConfigurationException("Missing regex configuration field: regex_value");
@@ -49,36 +58,14 @@ public class RegexExtractor extends Extractor {
     }
 
     @Override
-    public void run(Message msg) {
-        // We can only work on Strings.
-        if (!(msg.getField(sourceField) instanceof String)) {
-            return;
-        }
-
-        String original = (String) msg.getField(sourceField);
-        final Matcher matcher = pattern.matcher(original);
+    protected Result run(String value) {
+        final Matcher matcher = pattern.matcher(value);
 
         if (!matcher.find() || matcher.groupCount() == 0) {
-            return;
+            return null;
         }
 
-        String result = original.substring(matcher.start(1), matcher.end(1));
-        msg.addField(targetField, result);
-
-        // Remove original from message?
-        if (cursorStrategy.equals(CursorStrategy.CUT)) {
-            StringBuilder sb = new StringBuilder(original);
-            sb.delete(matcher.start(1), matcher.end(1));
-
-            String finalResult = sb.toString();
-
-            if(finalResult.isEmpty()) {
-                finalResult = "fullyCutByExtractor";
-            }
-
-            msg.removeField(sourceField);
-            msg.addField(sourceField, finalResult);
-        }
+        return new Result(value.substring(matcher.start(1), matcher.end(1)), matcher.start(1), matcher.end(1));
     }
 
 }

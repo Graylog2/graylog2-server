@@ -48,25 +48,13 @@ public class ExtractorFilter implements MessageFilter {
         }
 
         for (Extractor extractor : msg.getSourceInput().getExtractors().values()) {
-            Timer timer = server.metrics().timer(extractor.getTotalTimerName());
-            final Timer.Context timerContext = timer.time();
-
             try {
-                extractor.run(msg);
+                extractor.runExtractor(server, msg);
             } catch (Exception e) {
                 extractor.incrementExceptions();
                 LOG.error("Could not apply extractor.", e);
-                timerContext.close();
                 continue;
             }
-
-            Timer cTimer = server.metrics().timer(extractor.getConverterTimerName());
-            final Timer.Context cTimerContext = cTimer.time();
-
-            extractor.runConverters(msg);
-
-            cTimerContext.stop();
-            timerContext.stop();
         }
 
         return false;

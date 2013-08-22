@@ -21,6 +21,7 @@ package org.graylog2.inputs.extractors;
 
 import com.google.common.collect.Lists;
 import org.graylog2.ConfigurationException;
+import org.graylog2.GraylogServerStub;
 import org.graylog2.plugin.Message;
 import org.graylog2.plugin.Tools;
 import org.graylog2.plugin.inputs.Converter;
@@ -46,8 +47,8 @@ public class RegexExtractorTest {
 
         msg.addField("somefield", "<10> 07 Aug 2013 somesubsystem: this is my message for username9001 id:9001");
 
-        RegexExtractor x = new RegexExtractor("foo", "foo", Extractor.CursorStrategy.COPY, "somefield", "our_result", config("id:(\\d+)"), "foo", noConverters());
-        x.run(msg);
+        RegexExtractor x = new RegexExtractor("foo", "foo", Extractor.CursorStrategy.COPY, "somefield", "our_result", config("id:(\\d+)"), "foo", noConverters(), Extractor.ConditionType.NONE, null);
+        x.runExtractor(new GraylogServerStub(), msg);
 
         assertNotNull(msg.getField("our_result"));
         assertEquals("<10> 07 Aug 2013 somesubsystem: this is my message for username9001 id:9001", msg.getField("somefield"));
@@ -60,8 +61,8 @@ public class RegexExtractorTest {
 
         msg.addField("somefield", "<10> 07 Aug 2013 somesubsystem: this is my message for username9001 id:9001");
 
-        RegexExtractor x = new RegexExtractor("foo", "foo", Extractor.CursorStrategy.CUT, "somefield", "our_result", config("id:(\\d+)"), "foo", noConverters());
-        x.run(msg);
+        RegexExtractor x = new RegexExtractor("foo", "foo", Extractor.CursorStrategy.CUT, "somefield", "our_result", config("id:(\\d+)"), "foo", noConverters(), Extractor.ConditionType.NONE, null);
+        x.runExtractor(new GraylogServerStub(), msg);
 
         assertNotNull(msg.getField("our_result"));
         assertEquals("<10> 07 Aug 2013 somesubsystem: this is my message for username9001 id:", msg.getField("somefield"));
@@ -74,8 +75,8 @@ public class RegexExtractorTest {
 
         msg.addField("somefield", "<10> 07 Aug 2013 somesubsystem: this is my message for username9001 id:9001");
 
-        RegexExtractor x = new RegexExtractor("foo", "foo", Extractor.CursorStrategy.COPY, "somefield", "our_result", config("nothing:(\\d+)"), "foo", noConverters());
-        x.run(msg);
+        RegexExtractor x = new RegexExtractor("foo", "foo", Extractor.CursorStrategy.COPY, "somefield", "our_result", config("nothing:(\\d+)"), "foo", noConverters(), Extractor.ConditionType.NONE, null);
+        x.runExtractor(new GraylogServerStub(), msg);
 
         assertNull(msg.getField("our_result"));
         assertEquals("<10> 07 Aug 2013 somesubsystem: this is my message for username9001 id:9001", msg.getField("somefield"));
@@ -87,8 +88,8 @@ public class RegexExtractorTest {
 
         msg.addField("somefield", "<10> 07 Aug 2013 somesubsystem: this is my message for username9001 id:9001");
 
-        RegexExtractor x = new RegexExtractor("foo", "foo", Extractor.CursorStrategy.CUT, "somefield", "our_result", config("nothing:(\\d+)"), "foo", noConverters());
-        x.run(msg);
+        RegexExtractor x = new RegexExtractor("foo", "foo", Extractor.CursorStrategy.CUT, "somefield", "our_result", config("nothing:(\\d+)"), "foo", noConverters(), Extractor.ConditionType.NONE, null);
+        x.runExtractor(new GraylogServerStub(), msg);
 
         assertNull(msg.getField("our_result"));
         assertEquals("<10> 07 Aug 2013 somesubsystem: this is my message for username9001 id:9001", msg.getField("somefield"));
@@ -100,8 +101,8 @@ public class RegexExtractorTest {
 
         msg.addField("somefield", "<10> 07 Aug 2013 somesubsystem: this is my message for username9001 id:9001 lolwut");
 
-        RegexExtractor x = new RegexExtractor("foo", "foo", Extractor.CursorStrategy.COPY, "somefield", "our_result", config("id:(\\d+).*(lolwut)"), "foo", noConverters());
-        x.run(msg);
+        RegexExtractor x = new RegexExtractor("foo", "foo", Extractor.CursorStrategy.COPY, "somefield", "our_result", config("id:(\\d+).*(lolwut)"), "foo", noConverters(), Extractor.ConditionType.NONE, null);
+        x.runExtractor(new GraylogServerStub(), msg);
 
         assertNotNull(msg.getField("our_result"));
         assertEquals("<10> 07 Aug 2013 somesubsystem: this is my message for username9001 id:9001 lolwut", msg.getField("somefield"));
@@ -112,8 +113,8 @@ public class RegexExtractorTest {
     public void testDoesNotFailOnNonExistentSourceField() throws Exception {
         Message msg = new Message("The short message", "TestUnit", Tools.getUTCTimestampWithMilliseconds());
 
-        RegexExtractor x = new RegexExtractor("foo", "foo", Extractor.CursorStrategy.CUT, "LOLIDONTEXIST", "our_result", config("id:(\\d+)"), "foo", noConverters());
-        x.run(msg);
+        RegexExtractor x = new RegexExtractor("foo", "foo", Extractor.CursorStrategy.CUT, "LOLIDONTEXIST", "our_result", config("id:(\\d+)"), "foo", noConverters(), Extractor.ConditionType.NONE, null);
+        x.runExtractor(new GraylogServerStub(), msg);
     }
 
     @Test
@@ -122,8 +123,8 @@ public class RegexExtractorTest {
 
         msg.addField("somefield", 9001);
 
-        RegexExtractor x = new RegexExtractor("foo", "foo", Extractor.CursorStrategy.CUT, "somefield", "our_result", config("id:(\\d+)"), "foo", noConverters());
-        x.run(msg);
+        RegexExtractor x = new RegexExtractor("foo", "foo", Extractor.CursorStrategy.CUT, "somefield", "our_result", config("id:(\\d+)"), "foo", noConverters(), Extractor.ConditionType.NONE, null);
+        x.runExtractor(new GraylogServerStub(), msg);
     }
 
     @Test
@@ -132,8 +133,8 @@ public class RegexExtractorTest {
 
         msg.addField("somefield", "<10> 07 Aug 2013 somesubsystem: this is my message for username9001 id:9001");
 
-        RegexExtractor x = new RegexExtractor("foo", "foo", Extractor.CursorStrategy.CUT, "somefield", "our_result", config("(.*)"), "foo", noConverters());
-        x.run(msg);
+        RegexExtractor x = new RegexExtractor("foo", "foo", Extractor.CursorStrategy.CUT, "somefield", "our_result", config("(.*)"), "foo", noConverters(), Extractor.ConditionType.NONE, null);
+        x.runExtractor(new GraylogServerStub(), msg);
 
         assertNotNull(msg.getField("our_result"));
         assertEquals("fullyCutByExtractor", msg.getField("somefield"));
@@ -141,17 +142,43 @@ public class RegexExtractorTest {
 
     @Test(expected = ConfigurationException.class)
     public void testDoesNotInitializeOnNullConfigMap() throws Exception {
-        new RegexExtractor("foo", "foo", Extractor.CursorStrategy.CUT, "somefield", "somefield", null, "foo", noConverters());
+        new RegexExtractor("foo", "foo", Extractor.CursorStrategy.CUT, "somefield", "somefield", null, "foo", noConverters(), Extractor.ConditionType.NONE, null);
     }
 
     @Test(expected = ConfigurationException.class)
     public void testDoesNotInitializeOnNullRegexValue() throws Exception {
-        new RegexExtractor("foo", "foo", Extractor.CursorStrategy.CUT, "somefield", "somefield", config(null), "foo", noConverters());
+        new RegexExtractor("foo", "foo", Extractor.CursorStrategy.CUT, "somefield", "somefield", config(null), "foo", noConverters(), Extractor.ConditionType.NONE, null);
     }
 
     @Test(expected = ConfigurationException.class)
     public void testDoesNotInitializeOnEmptyRegexValue() throws Exception {
-        new RegexExtractor("foo", "foo", Extractor.CursorStrategy.CUT, "somefield", "somefield", config(""), "foo", noConverters());
+        new RegexExtractor("foo", "foo", Extractor.CursorStrategy.CUT, "somefield", "somefield", config(""), "foo", noConverters(), Extractor.ConditionType.NONE, null);
+    }
+
+    @Test
+    public void testDoesNotRunWhenRegexConditionFails() throws Exception {
+        Message msg = new Message("The short message", "TestUnit", Tools.getUTCTimestampWithMilliseconds());
+
+        msg.addField("somefield", "<10> 07 Aug 2013 somesubsystem: this is my message for username9001 id:9001");
+
+        RegexExtractor x = new RegexExtractor("foo", "foo", Extractor.CursorStrategy.COPY, "somefield", "our_result", config("id:(\\d+)"), "foo", noConverters(), Extractor.ConditionType.REGEX, "^XXX");
+        x.runExtractor(new GraylogServerStub(), msg);
+
+        assertNull(msg.getField("our_result"));
+        assertEquals("<10> 07 Aug 2013 somesubsystem: this is my message for username9001 id:9001", msg.getField("somefield"));
+    }
+
+    @Test
+    public void testDoesNotRunWhenStringConditionFails() throws Exception {
+        Message msg = new Message("The short message", "TestUnit", Tools.getUTCTimestampWithMilliseconds());
+
+        msg.addField("somefield", "<10> 07 Aug 2013 somesubsystem: this is my message for username9001 id:9001");
+
+        RegexExtractor x = new RegexExtractor("foo", "foo", Extractor.CursorStrategy.COPY, "somefield", "our_result", config("id:(\\d+)"), "foo", noConverters(), Extractor.ConditionType.STRING, "FOOBAR");
+        x.runExtractor(new GraylogServerStub(), msg);
+
+        assertNull(msg.getField("our_result"));
+        assertEquals("<10> 07 Aug 2013 somesubsystem: this is my message for username9001 id:9001", msg.getField("somefield"));
     }
 
     public static Map<String, Object> config(final String regex) {
