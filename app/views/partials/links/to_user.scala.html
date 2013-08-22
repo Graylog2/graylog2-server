@@ -1,3 +1,6 @@
 @(user: User)
-
-<a href="/users/@user.getId"><i class="icon icon-user"></i> @user.getName</a>
+@if(user != null) {
+<a href="/users/@user.getId"><i class="icon icon-user"></i> @user.getFullName</a>
+} else {
+	Unknown user
+}

@@ -1,6 +1,5 @@
 package models;
 
-import com.google.common.collect.Lists;
 import lib.APIException;
 import lib.Api;
 import lib.Tools;
@@ -18,28 +17,22 @@ import java.util.List;
 public class User {
 	private static final Logger log = LoggerFactory.getLogger(User.class);
 
-	private final String name;
+    @Deprecated
+    private final String id;
+    private final String name;
 	private final String email;
 	private final String fullName;
 	private final List<String> permissions;
 
     private final String passwordHash;
 
-	@Deprecated
-	public User(String name, String email) {
-		this.name = name;
-		this.email = email;
-		fullName = "";
-		this.permissions = Lists.newArrayList();
-        passwordHash = null;
-	}
-
     public User(UserResponse ur, String passwordHash) {
         this(ur.id, ur.username, "", ur.fullName, ur.permissions, passwordHash);
     }
 
 	public User(String id, String name, String email, String fullName, List<String> permissions, String passwordHash) {
-		this.name = name;
+        this.id = id;
+        this.name = name;
 		this.email = email;
 		this.fullName = fullName;
 		this.permissions = permissions;
@@ -87,7 +80,7 @@ public class User {
         }
         // a different user was requested, go and fetch it from the server
         try {
-            final UserResponse response = Api.get("/users" + username, UserResponse.class, currentUser.getName(), currentUser.getPasswordHash());
+            final UserResponse response = Api.get("/users/" + username, UserResponse.class, currentUser.getName(), currentUser.getPasswordHash());
             // TODO this user is not cached locally for now. we should be tracking REST requests.
             return new User(response, null);
         } catch (IOException e) {
@@ -95,12 +88,13 @@ public class User {
         } catch (APIException e) {
             log.error("Not allowed to load user " + username, e);
         }
+        log.error("Couldn't load user, this is a bug. Handle this.");
         return null;
 	}
 
+    @Deprecated
     public String getId() {
-        // TODO implement me
-        return "foo-bar-userid";
+        return getName();
     }
 	
 	public String getName() {
