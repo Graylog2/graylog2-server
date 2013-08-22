@@ -51,6 +51,12 @@ public class ExtractorSummaryResponse {
 
     public List<Map<String, Object>> converters;
 
+    @SerializedName("condition_type")
+    public String conditionType;
+
+    @SerializedName("condition_value")
+    public String conditionValue;
+
     public long exceptions;
 
     @SerializedName("converter_exceptions")

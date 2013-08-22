@@ -1,0 +1,18 @@
+@(extractor: models.Extractor)
+
+@if(!extractor.getConditionType().equals(Extractor.ConditionType.NONE)) {
+    <div class="extractor-condition-summary">
+        <strong>Condition:</strong>
+        Will only attempt to run if the message
+
+        @if(extractor.getConditionType().equals(Extractor.ConditionType.STRING)) {
+            includes the string
+        }
+
+        @if(extractor.getConditionType().equals(Extractor.ConditionType.REGEX)) {
+            matches the regular expression
+        }
+
+        <em>@extractor.getConditionValue()</em>.
+    </div>
+}

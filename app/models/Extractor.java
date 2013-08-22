@@ -48,6 +48,12 @@ public class Extractor {
         COPY
     }
 
+    public enum ConditionType {
+        NONE,
+        STRING,
+        REGEX
+    }
+
     private final String id;
     private final String title;
     private final CursorStrategy cursorStrategy;
@@ -57,6 +63,8 @@ public class Extractor {
     private final User creatorUser;
     private final Map<String, Object> extractorConfig;
     private final List<Converter> converters;
+    private final ConditionType conditionType;
+    private final String conditionValue;
     private final ExtractorMetrics metrics;
     private final long exceptions;
     private final long converterExceptions;
@@ -72,14 +80,16 @@ public class Extractor {
                 esr.extractorConfig,
                 User.load(esr.creatorUserId),
                 buildConverterList(esr.converters),
+                ConditionType.valueOf(esr.conditionType.toUpperCase()),
+                esr.conditionValue,
                 new ExtractorMetrics(esr.metrics.get("total"), esr.metrics.get("converters")),
                 esr.exceptions,
                 esr.converterExceptions
         );
     }
 
-    public Extractor(CursorStrategy cursorStrategy, String title, String sourceField, String targetField, Type type, User creatorUser) {
-        this(null, title, cursorStrategy, sourceField, targetField, type, new HashMap<String, Object>(), creatorUser, new ArrayList<Converter>(), null, 0, 0);
+    public Extractor(CursorStrategy cursorStrategy, String title, String sourceField, String targetField, Type type, User creatorUser, ConditionType conditionType, String conditionValue) {
+        this(null, title, cursorStrategy, sourceField, targetField, type, new HashMap<String, Object>(), creatorUser, new ArrayList<Converter>(), conditionType, conditionValue, null, 0, 0);
     }
 
     public Extractor(String id,
@@ -91,6 +101,8 @@ public class Extractor {
                      Map<String, Object> extractorConfig,
                      User creatorUser,
                      List<Converter> converters,
+                     ConditionType conditionType,
+                     String conditionValue,
                      ExtractorMetrics metrics,
                      long exceptions,
                      long converterExceptions) {
@@ -103,6 +115,9 @@ public class Extractor {
 
         this.extractorConfig = extractorConfig;
         this.converters = converters;
+
+        this.conditionType = conditionType;
+        this.conditionValue = conditionValue;
 
         this.exceptions = exceptions;
         this.converterExceptions = converterExceptions;
@@ -127,6 +142,8 @@ public class Extractor {
         request.creatorUserId = creatorUser.getId();
         request.extractorConfig = extractorConfig;
         request.converters = converterList;
+        request.conditionType = conditionType.toString().toLowerCase();
+        request.conditionValue =  conditionValue;
 
         Api.post(node, "system/inputs/" + input.getId() + "/extractors", request, 201, EmptyResponse.class);
     }
@@ -291,6 +308,14 @@ public class Extractor {
 
     public List<Converter> getConverters() {
         return converters;
+    }
+
+    public ConditionType getConditionType() {
+        return conditionType;
+    }
+
+    public String getConditionValue() {
+        return conditionValue;
     }
 
     public ExtractorMetrics getMetrics() {

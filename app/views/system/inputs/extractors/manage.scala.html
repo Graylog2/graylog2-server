@@ -58,7 +58,6 @@
                 </dl>
             </div>
 
-
         </div>
     </div>
 
@@ -185,6 +184,8 @@
                                 </div>
                             }
                         </div>
+
+                        @views.html.system.inputs.extractors.partials.extractor_conditions(extractor)
 
                         @views.html.system.inputs.extractors.partials.extractor_metrics(extractor.getMetrics)
 

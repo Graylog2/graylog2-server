@@ -95,7 +95,9 @@ public class ExtractorsController extends AuthenticatedController {
                         form.get("source_field")[0],
                         form.get("target_field")[0],
                         extractorType,
-                        currentUser()
+                        currentUser(),
+                        Extractor.ConditionType.valueOf(form.get("condition_type")[0].toUpperCase()),
+                        form.get("condition_value")[0]
                 );
             } catch (NullPointerException e) {
                 Logger.error("Cannot build extractor configuration.", e);

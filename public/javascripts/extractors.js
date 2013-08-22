@@ -228,4 +228,25 @@ $(document).ready(function() {
         $(".extractor-details-" + extractorId).toggle();
     });
 
+    // No condition type.
+    $("#no-condition-type").on("click", function() {
+        $("#condition-value-input").hide();
+    });
+
+    // String condition type.
+    $("#string-condition-type").on("click", function() {
+        var div = $("#condition-value-input");
+        div.show();
+        $("input", div).attr("placeholder", "");
+        $("label", div).html("Field must include this string:");
+    });
+
+    // Regex condition type.
+    $("#regex-condition-type").on("click", function() {
+        var div = $("#condition-value-input");
+        div.show();
+        $("input", div).attr("placeholder", "^\d{3,}");
+        $("label", div).html("Field must match this regular expression:");
+    });
+
 });

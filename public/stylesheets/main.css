@@ -622,3 +622,8 @@ form #stream-rules {
     margin-left: 2px;
     cursor: pointer;
 }
+
+.extractor-condition-summary {
+    margin-left: 5px;
+    margin-top: 10px;
+}

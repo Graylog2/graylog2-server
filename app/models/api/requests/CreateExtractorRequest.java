@@ -50,4 +50,10 @@ public class CreateExtractorRequest extends ApiRequest {
 
     public Map<String, Map<String, Object>> converters;
 
+    @SerializedName("condition_type")
+    public String conditionType;
+
+    @SerializedName("condition_value")
+    public String conditionValue;
+
 }
