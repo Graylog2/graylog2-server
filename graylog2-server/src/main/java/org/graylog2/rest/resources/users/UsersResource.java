@@ -122,6 +122,43 @@ public class UsersResource extends RestResource {
         return Response.status(Response.Status.CREATED).entity(json(result)).build();
     }
 
+    @PUT
+    @Path("{username}/permissions")
+    @RequiresPermissions(RestPermissions.PERMISSIONS_EDIT)
+    public Response editPermissions(@PathParam("username") String username, String body) {
+        List<String> permissions = null;
+        try {
+            permissions = objectMapper.readValue(body, List.class);
+        } catch (IOException e) {
+            // TODO
+        }
+        if (permissions == null) {
+            return Response.status(Response.Status.BAD_REQUEST).build();
+        }
+        final User user = User.load(username, core);
+        user.setPermissions(permissions);
+        try {
+            user.save();
+        } catch (ValidationException e) {
+            throw new InternalServerErrorException(e);
+        }
+        return Response.status(Response.Status.CREATED).build();
+    }
+
+    @DELETE
+    @Path("{username}/permissions")
+    @RequiresPermissions(RestPermissions.PERMISSIONS_EDIT)
+    public Response deletePermissions(@PathParam("username") String username) {
+        final User user = User.load(username, core);
+        user.setPermissions(Lists.<String>newArrayList());
+        try {
+            user.save();
+        } catch (ValidationException e) {
+            throw new InternalServerErrorException(e);
+        }
+        return Response.status(Response.Status.NO_CONTENT).build();
+    }
+
     private HashMap<String, Object> toMap(User user) {
         final HashMap<String,Object> map = Maps.newHashMap();
         map.put("username", user.getName());

@@ -173,6 +173,10 @@ public class User extends Persisted {
         return (List<String>) o;
     }
 
+    public void setPermissions(List<String> permissions) {
+        fields.put(PERMISSIONS, permissions);
+    }
+
     private static class LocalAdminUser extends User {
         LocalAdminUser(Core core) {
             super(null, Maps.<String, Object>newHashMap(), core);

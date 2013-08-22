@@ -22,4 +22,5 @@ package org.graylog2.security;
 public class RestPermissions {
     public static final String USERS_CREATE =  "users:create";
     public static final String USERS_LIST = "users:list";
+    public static final String PERMISSIONS_EDIT = "permissions:edit";
 }
