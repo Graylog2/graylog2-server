@@ -43,6 +43,8 @@ public class ConverterFactory {
                 return new SyslogPriLevelConverter(config);
             case SYSLOG_PRI_FACILITY:
                 return new SyslogPriFacilityConverter(config);
+            case IP_ANONYMIZER:
+                return new IPAnonymizerConverter(config);
             default:
                 throw new NoSuchConverterException();
         }
