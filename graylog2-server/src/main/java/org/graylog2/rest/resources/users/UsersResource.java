@@ -116,7 +116,7 @@ public class UsersResource extends RestResource {
         }
 
         Map<String, Object> result = Maps.newHashMap();
-        result.put("user_id", id.toStringMongod());
+        result.put("id", id.toStringMongod());
 
         return Response.status(Response.Status.CREATED).entity(json(result)).build();
     }
@@ -162,6 +162,7 @@ public class UsersResource extends RestResource {
 
     private HashMap<String, Object> toMap(User user, boolean includePermissions) {
         final HashMap<String,Object> map = Maps.newHashMap();
+        map.put("id", user.getId().toString());
         map.put("username", user.getName());
         map.put("full_name", user.getFullName());
         if (includePermissions) {
