@@ -70,6 +70,16 @@ public class SubstringExtractorTest {
     }
 
     @Test
+    public void testBasicExtractionWithCutStrategyCanOverwriteSameField() throws Exception {
+        Message msg = new Message("The short message", "TestUnit", Tools.getUTCTimestampWithMilliseconds());
+
+        SubstringExtractor x = new SubstringExtractor("foo", "foo", Extractor.CursorStrategy.CUT, "message", "message", config(4, 17), "foo", noConverters(), Extractor.ConditionType.NONE, null);
+        x.runExtractor(new GraylogServerStub(), msg);
+
+        assertEquals("short message", msg.getField("message"));
+    }
+
+    @Test
     public void testBasicExtractionDoesNotFailOnNonMatch() throws Exception {
         Message msg = new Message("The short message", "TestUnit", Tools.getUTCTimestampWithMilliseconds());
 

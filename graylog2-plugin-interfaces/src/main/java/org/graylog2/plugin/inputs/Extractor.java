@@ -154,8 +154,9 @@ public abstract class Extractor implements EmbeddedPersistable {
         }
 
         // Remove original from message?
-        if (cursorStrategy.equals(CursorStrategy.CUT)) {
+        if (cursorStrategy.equals(CursorStrategy.CUT) && !targetField.equals(sourceField)) {
             StringBuilder sb = new StringBuilder(field);
+
             sb.delete(result.getBeginIndex(), result.getEndIndex());
 
             String finalResult = sb.toString();

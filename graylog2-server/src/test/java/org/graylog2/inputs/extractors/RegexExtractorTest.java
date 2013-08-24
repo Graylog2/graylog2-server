@@ -70,6 +70,16 @@ public class RegexExtractorTest {
     }
 
     @Test
+    public void testBasicExtractionWithCutStrategyCanOverwriteSameField() throws Exception {
+        Message msg = new Message("The short message", "TestUnit", Tools.getUTCTimestampWithMilliseconds());
+
+        RegexExtractor x = new RegexExtractor("foo", "foo", Extractor.CursorStrategy.CUT, "message", "message", config("The (.+)"), "foo", noConverters(), Extractor.ConditionType.NONE, null);
+        x.runExtractor(new GraylogServerStub(), msg);
+
+        assertEquals("short message", msg.getField("message"));
+    }
+
+    @Test
     public void testBasicExtractionDoesNotFailOnNonMatch() throws Exception {
         Message msg = new Message("The short message", "TestUnit", Tools.getUTCTimestampWithMilliseconds());
 
