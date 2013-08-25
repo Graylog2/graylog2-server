@@ -43,4 +43,9 @@ public class HashConverter extends Converter {
         return DigestUtils.md5Hex(value);
     }
 
+    @Override
+    public boolean buildsMultipleFields() {
+        return false;
+    }
+
 }

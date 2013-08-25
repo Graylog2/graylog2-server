@@ -58,4 +58,9 @@ public class SplitAndCountConverter extends Converter {
         return value.split(splitByEscaped).length;
     }
 
+    @Override
+    public boolean buildsMultipleFields() {
+        return false;
+    }
+
 }

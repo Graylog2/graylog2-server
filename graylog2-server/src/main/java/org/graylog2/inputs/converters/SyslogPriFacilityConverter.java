@@ -50,4 +50,9 @@ public class SyslogPriFacilityConverter extends Converter {
         return Tools.syslogFacilityToReadable(SyslogPriUtilities.facilityFromPriority(priority));
     }
 
+    @Override
+    public boolean buildsMultipleFields() {
+        return false;
+    }
+
 }

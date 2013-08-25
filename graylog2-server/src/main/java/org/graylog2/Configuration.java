@@ -143,9 +143,6 @@ public class Configuration {
     @Parameter("rules_file")
     private String droolsRulesFile;
 
-    @Parameter(value = "enable_tokenizer_filter", required = true)
-    private boolean enableTokenizerFilter = true;
-
     @Parameter(value = "enable_graphite_output", required = false)
     private boolean enableGraphiteOutput = false;
 
@@ -353,10 +350,6 @@ public class Configuration {
         }
 
         return replicaServers;
-    }
-
-    public boolean isEnableTokenizerFilter() {
-        return enableTokenizerFilter;
     }
 
     public boolean isEnableGraphiteOutput() {

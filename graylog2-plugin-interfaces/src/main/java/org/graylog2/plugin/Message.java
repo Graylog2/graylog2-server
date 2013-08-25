@@ -153,6 +153,10 @@ public class Message {
     }
     
     public void addField(String key, Object value) {
+        if (value == null) {
+            return;
+        }
+
         // Don't accept protected keys. (some are allowed though lol)
         if (RESERVED_FIELDS.contains(key) && !RESERVED_SETTABLE_FIELDS.contains(key)) {
             return;
@@ -167,6 +171,10 @@ public class Message {
     }      
 
     public void addFields(Map<String, String> fields) {
+        if(fields == null) {
+            return;
+        }
+
         for (Map.Entry<String, String> field : fields.entrySet()) {
             addField(field.getKey(), field.getValue());
         }

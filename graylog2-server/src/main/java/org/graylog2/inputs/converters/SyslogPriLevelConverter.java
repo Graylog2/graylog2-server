@@ -49,4 +49,9 @@ public class SyslogPriLevelConverter extends Converter {
         return SyslogPriUtilities.levelFromPriority(priority);
     }
 
+    @Override
+    public boolean buildsMultipleFields() {
+        return false;
+    }
+
 }

@@ -45,4 +45,9 @@ public class IPAnonymizerConverter extends Converter {
         return p.matcher(value).replaceAll(REPLACEMENT);
     }
 
+    @Override
+    public boolean buildsMultipleFields() {
+        return false;
+    }
+
 }

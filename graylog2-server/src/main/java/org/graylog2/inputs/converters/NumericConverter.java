@@ -48,4 +48,9 @@ public class NumericConverter extends Converter {
         return result;
     }
 
+    @Override
+    public boolean buildsMultipleFields() {
+        return false;
+    }
+
 }

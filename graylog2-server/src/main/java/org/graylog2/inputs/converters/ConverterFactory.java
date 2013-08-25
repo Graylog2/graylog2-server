@@ -45,6 +45,8 @@ public class ConverterFactory {
                 return new SyslogPriFacilityConverter(config);
             case IP_ANONYMIZER:
                 return new IPAnonymizerConverter(config);
+            case TOKENIZER:
+                return new TokenizerConverter(config);
             default:
                 throw new NoSuchConverterException();
         }

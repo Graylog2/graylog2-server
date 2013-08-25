@@ -52,4 +52,9 @@ public class DateConverter extends Converter {
         return DateTime.parse(value, DateTimeFormat.forPattern(dateFormat));
     }
 
+    @Override
+    public boolean buildsMultipleFields() {
+        return false;
+    }
+
 }

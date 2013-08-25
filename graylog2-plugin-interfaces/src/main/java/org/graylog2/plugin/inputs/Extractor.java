@@ -184,10 +184,12 @@ public abstract class Extractor implements EmbeddedPersistable {
                     continue;
                 }
 
-                String value = (String) msg.getFields().get(targetField);
-
-                msg.removeField(targetField);
-                msg.addField(targetField, converter.convert(value));
+                if (!converter.buildsMultipleFields()) {
+                    msg.removeField(targetField);
+                    msg.addField(targetField, converter.convert((String) msg.getFields().get(targetField)));
+                } else {
+                    msg.addFields((Map<String, String>) converter.convert((String) msg.getFields().get(targetField)));
+                }
             } catch (Exception e) {
                 this.converterExceptions.incrementAndGet();
                 LOG.error("Could not apply converter [{}].", converter.getType(), e);

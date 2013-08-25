@@ -37,6 +37,7 @@ public abstract class Converter {
         SPLIT_AND_COUNT,
         SYSLOG_PRI_LEVEL,
         SYSLOG_PRI_FACILITY,
+        TOKENIZER,
         IP_ANONYMIZER
     }
 
@@ -57,5 +58,6 @@ public abstract class Converter {
     }
 
     public abstract Object convert(String value);
+    public abstract boolean buildsMultipleFields();
 
 }

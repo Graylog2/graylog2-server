@@ -235,7 +235,6 @@ public final class Main {
         // Register message filters. (Order is important here)
         server.registerFilter(new ExtractorFilter());
         server.registerFilter(new BlacklistFilter());
-        if (configuration.isEnableTokenizerFilter()) { server.registerFilter(new TokenizerFilter()); }
         server.registerFilter(new StreamMatcherFilter());
         server.registerFilter(new RewriteFilter());
 
