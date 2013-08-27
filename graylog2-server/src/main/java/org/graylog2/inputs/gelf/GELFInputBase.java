@@ -106,4 +106,9 @@ public class GELFInputBase extends MessageInput {
         throw new RuntimeException("Must be overridden in GELF input classes.");
     }
 
+    @Override
+    public String linkToDocs() {
+        return "";
+    }
+
 }

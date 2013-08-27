@@ -56,6 +56,7 @@ public abstract class MessageInput {
 
     public abstract boolean isExclusive();
     public abstract String getName();
+    public abstract String linkToDocs();
     public abstract Map<String, Object> getAttributes();
 
     public void setId(String id) {

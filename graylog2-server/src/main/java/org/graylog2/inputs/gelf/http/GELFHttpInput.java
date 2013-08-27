@@ -83,4 +83,9 @@ public class GELFHttpInput extends GELFInputBase {
         return NAME;
     }
 
+    @Override
+    public String linkToDocs() {
+        return "http://support.torch.sh/help/kb/graylog2-server/using-the-gelf-http-input";
+    }
+
 }

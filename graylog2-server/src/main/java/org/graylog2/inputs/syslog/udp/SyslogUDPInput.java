@@ -71,5 +71,4 @@ public class SyslogUDPInput extends SyslogInputBase {
         return NAME;
     }
 
-
 }

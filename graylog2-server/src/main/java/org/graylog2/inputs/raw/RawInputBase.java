@@ -120,4 +120,9 @@ public class RawInputBase extends MessageInput {
         throw new RuntimeException("Must be overridden in syslog input classes.");
     }
 
+    @Override
+    public String linkToDocs() {
+        return "";
+    }
+
 }

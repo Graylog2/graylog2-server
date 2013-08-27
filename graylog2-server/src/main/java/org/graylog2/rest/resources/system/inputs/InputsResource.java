@@ -229,6 +229,7 @@ public class InputsResource extends RestResource {
         result.put("name", input.getName());
         result.put("is_exclusive", input.isExclusive());
         result.put("requested_configuration", input.getRequestedConfiguration().asList());
+        result.put("link_to_docs", input.linkToDocs());
 
         return json(result);
     }
