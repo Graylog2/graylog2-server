@@ -1,5 +1,5 @@
 /**
- * Copyright 2012 Lennart Koopmann <lennart@socketfeed.com>
+ * Copyright 2012 Kay Roepke <kroepke@googlemail.com>
  *
  * This file is part of Graylog2.
  *
@@ -17,31 +17,39 @@
  * along with Graylog2.  If not, see <http://www.gnu.org/licenses/>.
  *
  */
-
-package org.graylog2.inputs.gelf;
+package org.graylog2.inputs.gelf.http;
 
 import org.graylog2.Core;
 import org.graylog2.plugin.inputs.MessageInput;
 import org.jboss.netty.channel.ChannelPipeline;
 import org.jboss.netty.channel.ChannelPipelineFactory;
 import org.jboss.netty.channel.Channels;
+import org.jboss.netty.handler.codec.http.HttpContentDecompressor;
+import org.jboss.netty.handler.codec.http.HttpRequestDecoder;
+import org.jboss.netty.handler.codec.http.HttpResponseEncoder;
 
-/**
- * @author Lennart Koopmann <lennart@socketfeed.com>
- */
-public class GELFUDPPipelineFactory implements ChannelPipelineFactory {
+public class GELFHttpPipelineFactory implements ChannelPipelineFactory {
 
-    private final Core server;
+    private final Core graylogServer;
     private final MessageInput sourceInput;
 
-    public GELFUDPPipelineFactory(Core server, MessageInput sourceInput) {
-        this.server = server;
+    public GELFHttpPipelineFactory(Core graylogServer, MessageInput sourceInput) {
+        this.graylogServer = graylogServer;
         this.sourceInput = sourceInput;
     }
 
     @Override
     public ChannelPipeline getPipeline() throws Exception {
-        return Channels.pipeline(new GELFDispatcher(server, sourceInput));
+        final ChannelPipeline pipeline = Channels.pipeline();
+
+        pipeline.addLast("decoder", new HttpRequestDecoder());
+        pipeline.addLast("encoder", new HttpResponseEncoder());
+
+        // only add support for incoming compressed messages, we don't return much (if any) data to the client.
+        pipeline.addLast("decompressor", new HttpContentDecompressor());
+
+        pipeline.addLast("handler", new GELFHttpHandler(graylogServer, sourceInput));
+
+        return pipeline;
     }
-    
 }

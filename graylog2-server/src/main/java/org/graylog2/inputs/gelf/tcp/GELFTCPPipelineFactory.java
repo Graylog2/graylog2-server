@@ -1,5 +1,5 @@
 /**
- * Copyright 2012 Kay Roepke <kroepke@googlemail.com>
+ * Copyright 2012 Lennart Koopmann <lennart@socketfeed.com>
  *
  * This file is part of Graylog2.
  *
@@ -17,39 +17,37 @@
  * along with Graylog2.  If not, see <http://www.gnu.org/licenses/>.
  *
  */
-package org.graylog2.inputs.http;
+
+package org.graylog2.inputs.gelf.tcp;
 
 import org.graylog2.Core;
+import org.graylog2.inputs.gelf.GELFDispatcher;
 import org.graylog2.plugin.inputs.MessageInput;
 import org.jboss.netty.channel.ChannelPipeline;
 import org.jboss.netty.channel.ChannelPipelineFactory;
 import org.jboss.netty.channel.Channels;
-import org.jboss.netty.handler.codec.http.HttpContentDecompressor;
-import org.jboss.netty.handler.codec.http.HttpRequestDecoder;
-import org.jboss.netty.handler.codec.http.HttpResponseEncoder;
+import org.jboss.netty.handler.codec.frame.DelimiterBasedFrameDecoder;
+import org.jboss.netty.handler.codec.frame.Delimiters;
 
-public class GELFHttpPipelineFactory implements ChannelPipelineFactory {
+/**
+ * @author Lennart Koopmann <lennart@socketfeed.com>
+ */
+public class GELFTCPPipelineFactory implements ChannelPipelineFactory {
 
-    private final Core graylogServer;
+    private final Core server;
     private final MessageInput sourceInput;
 
-    public GELFHttpPipelineFactory(Core graylogServer, MessageInput sourceInput) {
-        this.graylogServer = graylogServer;
+    public GELFTCPPipelineFactory(Core server, MessageInput sourceInput) {
+        this.server = server;
         this.sourceInput = sourceInput;
     }
 
     @Override
     public ChannelPipeline getPipeline() throws Exception {
-        final ChannelPipeline pipeline = Channels.pipeline();
-
-        pipeline.addLast("decoder", new HttpRequestDecoder());
-        pipeline.addLast("encoder", new HttpResponseEncoder());
-
-        // only add support for incoming compressed messages, we don't return much (if any) data to the client.
-        pipeline.addLast("decompressor", new HttpContentDecompressor());
-
-        pipeline.addLast("handler", new GELFHttpHandler(graylogServer, sourceInput));
-
-        return pipeline;
+        ChannelPipeline p = Channels.pipeline();
+        p.addLast("framer", new DelimiterBasedFrameDecoder(2 * 1024 * 1024, Delimiters.nulDelimiter()));
+        p.addLast("handler", new GELFDispatcher(server, sourceInput));
+        return p;
     }
+
 }

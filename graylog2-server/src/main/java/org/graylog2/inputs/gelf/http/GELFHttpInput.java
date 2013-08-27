@@ -17,7 +17,7 @@
  * along with Graylog2.  If not, see <http://www.gnu.org/licenses/>.
  *
  */
-package org.graylog2.inputs.http;
+package org.graylog2.inputs.gelf.http;
 
 import org.graylog2.plugin.inputs.*;
 import org.graylog2.plugin.configuration.Configuration;

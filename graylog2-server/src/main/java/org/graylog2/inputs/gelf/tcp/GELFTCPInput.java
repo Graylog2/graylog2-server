@@ -18,9 +18,10 @@
  *
  */
 
-package org.graylog2.inputs.gelf;
+package org.graylog2.inputs.gelf.tcp;
 
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
+import org.graylog2.inputs.gelf.GELFInputBase;
 import org.graylog2.plugin.inputs.*;
 import org.jboss.netty.bootstrap.ServerBootstrap;
 import org.jboss.netty.channel.socket.nio.NioServerSocketChannelFactory;
