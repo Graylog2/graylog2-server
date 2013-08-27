@@ -74,6 +74,7 @@ public class GELFProcessor {
         if (!lm.isComplete()) {
             incompleteMessages.mark();
             LOG.debug("Skipping incomplete message.");
+            return;
         }
 
         // Add to process buffer.
