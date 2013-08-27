@@ -18,9 +18,10 @@
  *
  */
 
-package org.graylog2.inputs.syslog;
+package org.graylog2.inputs.syslog.udp;
 
 import org.graylog2.Core;
+import org.graylog2.inputs.syslog.SyslogDispatcher;
 import org.graylog2.plugin.configuration.Configuration;
 import org.graylog2.plugin.inputs.MessageInput;
 import org.jboss.netty.channel.ChannelPipeline;
@@ -30,13 +31,13 @@ import org.jboss.netty.channel.Channels;
 /**
  * @author Lennart Koopmann <lennart@socketfeed.com>
  */
-public class SyslogPipelineFactory implements ChannelPipelineFactory {
+public class SyslogUDPPipelineFactory implements ChannelPipelineFactory {
 
     private final Core server;
     private final Configuration config;
     private final MessageInput sourceInput;
 
-    public SyslogPipelineFactory(Core server, Configuration config, MessageInput sourceInput) {
+    public SyslogUDPPipelineFactory(Core server, Configuration config, MessageInput sourceInput) {
         this.server = server;
         this.config = config;
         this.sourceInput = sourceInput;

@@ -18,9 +18,10 @@
  *
  */
 
-package org.graylog2.inputs.syslog;
+package org.graylog2.inputs.syslog.tcp;
 
 import org.graylog2.Core;
+import org.graylog2.inputs.syslog.SyslogDispatcher;
 import org.graylog2.plugin.configuration.Configuration;
 import org.graylog2.plugin.inputs.MessageInput;
 import org.jboss.netty.buffer.ChannelBuffer;

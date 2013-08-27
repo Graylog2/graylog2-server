@@ -18,28 +18,19 @@
  *
  */
 
-package org.graylog2.inputs.syslog;
+package org.graylog2.inputs.syslog.tcp;
 
-import com.google.common.collect.Maps;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
+import org.graylog2.inputs.syslog.SyslogInputBase;
 import org.graylog2.plugin.configuration.fields.BooleanField;
 import org.graylog2.plugin.inputs.*;
-import org.graylog2.plugin.configuration.Configuration;
-import org.graylog2.plugin.configuration.ConfigurationException;
 import org.graylog2.plugin.configuration.ConfigurationRequest;
-import org.jboss.netty.bootstrap.ConnectionlessBootstrap;
 import org.jboss.netty.bootstrap.ServerBootstrap;
-import org.jboss.netty.channel.Channel;
 import org.jboss.netty.channel.ChannelException;
-import org.jboss.netty.channel.FixedReceiveBufferSizePredictorFactory;
-import org.jboss.netty.channel.socket.nio.NioDatagramChannelFactory;
 import org.jboss.netty.channel.socket.nio.NioServerSocketChannelFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import org.graylog2.plugin.GraylogServer;
-
-import java.util.Map;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
