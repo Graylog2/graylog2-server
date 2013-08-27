@@ -66,14 +66,14 @@ public class SyslogTCPInput extends SyslogInputBase {
                         .setNameFormat("input-" + inputId + "-syslogtcp-worker-%d")
                         .build());
 
-        ServerBootstrap tcpBootstrap = new ServerBootstrap(
+        bootstrap = new ServerBootstrap(
                 new NioServerSocketChannelFactory(bossThreadPool, workerThreadPool)
         );
 
-        tcpBootstrap.setPipelineFactory(new SyslogTCPPipelineFactory(core, config, this));
+        bootstrap.setPipelineFactory(new SyslogTCPPipelineFactory(core, config, this));
 
         try {
-            channel = tcpBootstrap.bind(socketAddress);
+            channel = ((ServerBootstrap) bootstrap).bind(socketAddress);
             LOG.info("Started syslog TCP input on {}", socketAddress);
         } catch (ChannelException e) {
             String msg = "Could not bind syslog TCP input to address " + socketAddress;

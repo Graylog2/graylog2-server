@@ -42,69 +42,39 @@ import java.util.concurrent.Executors;
 /**
  * @author Lennart Koopmann <lennart@socketfeed.com>
  */
-public class GELFUDPInput extends MessageInput {
+public class GELFUDPInput extends GELFInputBase {
 
     private static final Logger LOG = LoggerFactory.getLogger(GELFUDPInput.class);
 
     public static final String NAME = "GELF UDP";
 
     @Override
-    public void configure(Configuration config, GraylogServer graylogServer) throws ConfigurationException {
-        //To change body of implemented methods use File | Settings | File Templates.
-    }
-
-    @Override
-    public void launch() throws MisfireException {
-        //To change body of implemented methods use File | Settings | File Templates.
-    }
-
-    @Override
-    public void stop() {
-        //To change body of implemented methods use File | Settings | File Templates.
-    }
-
-    @Override
-    public ConfigurationRequest getRequestedConfiguration() {
-        return null;  //To change body of implemented methods use File | Settings | File Templates.
-    }
-
-    @Override
-    public boolean isExclusive() {
-        return false;  //To change body of implemented methods use File | Settings | File Templates.
-    }
-
-    @Override
-    public String getName() {
-        return null;  //To change body of implemented methods use File | Settings | File Templates.
-    }
-
-    @Override
-    public Map<String, Object> getAttributes() {
-        return null;  //To change body of implemented methods use File | Settings | File Templates.
-    }
-
-    /*@Override
     public void launch() throws MisfireException {
         final ExecutorService workerThreadPool = Executors.newCachedThreadPool(
                 new ThreadFactoryBuilder()
                         .setNameFormat("input-" + inputId + "-gelfudp-worker-%d")
                         .build());
 
-        final ConnectionlessBootstrap bootstrap = new ConnectionlessBootstrap(new NioDatagramChannelFactory(workerThreadPool));
+        bootstrap = new ConnectionlessBootstrap(new NioDatagramChannelFactory(workerThreadPool));
 
         bootstrap.setOption("receiveBufferSizePredictorFactory", new FixedReceiveBufferSizePredictorFactory(
                 core.getConfiguration().getUdpRecvBufferSizes())
         );
-        bootstrap.setPipelineFactory(new GELFUDPPipelineFactory(core));
+        bootstrap.setPipelineFactory(new GELFUDPPipelineFactory(core, this));
 
         try {
-            bootstrap.bind(socketAddress);
-            LOG.info("Started UDP GELF server on {}", socketAddress);
+            ((ConnectionlessBootstrap) bootstrap).bind(socketAddress);
+            LOG.info("Started GELF UDP input on {}", socketAddress);
         } catch (Exception e) {
-            String msg = "Could not bind UDP GELF server to address " + socketAddress;
+            String msg = "Could not bind UDP GELF input to address " + socketAddress;
             LOG.error(msg, e);
             throw new MisfireException(msg);
         }
-    }*/
+    }
+
+    @Override
+    public String getName() {
+        return NAME;
+    }
 
 }

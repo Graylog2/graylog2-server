@@ -20,85 +20,56 @@
 
 package org.graylog2.inputs.gelf;
 
+import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import org.graylog2.plugin.inputs.*;
-import org.graylog2.plugin.configuration.Configuration;
-import org.graylog2.plugin.configuration.ConfigurationException;
-import org.graylog2.plugin.configuration.ConfigurationRequest;
+import org.jboss.netty.bootstrap.ServerBootstrap;
+import org.jboss.netty.channel.socket.nio.NioServerSocketChannelFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import org.graylog2.plugin.GraylogServer;
-
-import java.util.Map;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 /**
  * @author Lennart Koopmann <lennart@socketfeed.com>
  */
-public class GELFTCPInput extends MessageInput {
+public class GELFTCPInput extends GELFInputBase {
 
     private static final Logger LOG = LoggerFactory.getLogger(GELFTCPInput.class);
 
     public static final String NAME = "GELF TCP";
 
-
-    @Override
-    public void configure(Configuration config, GraylogServer graylogServer) throws ConfigurationException {
-        //To change body of implemented methods use File | Settings | File Templates.
-    }
-
     @Override
     public void launch() throws MisfireException {
-        /*final ExecutorService bossThreadPool = Executors.newCachedThreadPool(
+        final ExecutorService bossThreadPool = Executors.newCachedThreadPool(
                 new ThreadFactoryBuilder()
-                        .setNameFormat("input-gelftcp-boss-%d")
+                        .setNameFormat("input-" + inputId + "-gelftcp-boss-%d")
                         .build());
 
         final ExecutorService workerThreadPool = Executors.newCachedThreadPool(
                 new ThreadFactoryBuilder()
-                        .setNameFormat("input-gelftcp-worker-%d")
+                        .setNameFormat("input-" + inputId + "-gelftcp-worker-%d")
                         .build());
 
-        ServerBootstrap tcpBootstrap = new ServerBootstrap(
+        bootstrap = new ServerBootstrap(
                 new NioServerSocketChannelFactory(bossThreadPool, workerThreadPool)
         );
 
-        tcpBootstrap.shutdown();
-
-        tcpBootstrap.setPipelineFactory(new GELFTCPPipelineFactory((Core) server));
-
-        SocketAddress socketAddress = config.get("listen_address").asSocketAddress();
+        bootstrap.setPipelineFactory(new GELFTCPPipelineFactory(core, this));
 
         try {
-            tcpBootstrap.bind(socketAddress);
-            LOG.info("Started TCP GELF server on {}", socketAddress);
-        } catch (ChannelException e) {
-            LOG.error("Could not bind TCP GELF server to address " + socketAddress, e);
-        }*/
-    }
-
-    @Override
-    public void stop() {
-        //To change body of implemented methods use File | Settings | File Templates.
-    }
-
-    @Override
-    public ConfigurationRequest getRequestedConfiguration() {
-        return null;  //To change body of implemented methods use File | Settings | File Templates.
-    }
-
-    @Override
-    public boolean isExclusive() {
-        return false;  //To change body of implemented methods use File | Settings | File Templates.
+            ((ServerBootstrap) bootstrap).bind(socketAddress);
+            LOG.info("Started TCP GELF input on {}", socketAddress);
+        } catch (Exception e) {
+            String msg = "Could not bind TCP GELF input to address " + socketAddress;
+            LOG.error(msg, e);
+            throw new MisfireException(msg);
+        }
     }
 
     @Override
     public String getName() {
-        return null;  //To change body of implemented methods use File | Settings | File Templates.
-    }
-
-    @Override
-    public Map<String, Object> getAttributes() {
-        return null;  //To change body of implemented methods use File | Settings | File Templates.
+        return NAME;
     }
 
 }

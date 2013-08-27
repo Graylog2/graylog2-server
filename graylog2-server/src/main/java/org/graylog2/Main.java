@@ -212,8 +212,8 @@ public final class Main {
         server.inputs().register(SyslogUDPInput.class, SyslogUDPInput.NAME);
         server.inputs().register(SyslogTCPInput.class, SyslogTCPInput.NAME);
         server.inputs().register(RawUDPInput.class, RawUDPInput.NAME);
-        //server.inputs().register(GELFUDPInput.class, GELFUDPInput.NAME);
-        //server.inputs().register(GELFTCPInput.class, GELFTCPInput.NAME);
+        server.inputs().register(GELFUDPInput.class, GELFUDPInput.NAME);
+        server.inputs().register(GELFTCPInput.class, GELFTCPInput.NAME);
         //server.inputs().register(GELFHttpInput.class, GELFHttpInput.NAME);
 
         // Register initializers.

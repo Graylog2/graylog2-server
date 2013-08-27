@@ -64,7 +64,7 @@ public class SyslogUDPInput extends SyslogInputBase {
         bootstrap.setPipelineFactory(new SyslogPipelineFactory(core, config, this));
 
         try {
-            channel = bootstrap.bind(socketAddress);
+            channel = ((ConnectionlessBootstrap) bootstrap).bind(socketAddress);
             LOG.info("Started syslog UDP input server on {}", socketAddress);
         } catch (ChannelException e) {
             String msg = "Could not bind UDP syslog input to address " + socketAddress;
