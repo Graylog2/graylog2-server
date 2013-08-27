@@ -59,7 +59,7 @@ public class GELFTCPInput extends GELFInputBase {
         bootstrap.setPipelineFactory(new GELFTCPPipelineFactory(core, this));
 
         try {
-            ((ServerBootstrap) bootstrap).bind(socketAddress);
+            channel = ((ServerBootstrap) bootstrap).bind(socketAddress);
             LOG.info("Started TCP GELF input on {}", socketAddress);
         } catch (Exception e) {
             String msg = "Could not bind TCP GELF input to address " + socketAddress;

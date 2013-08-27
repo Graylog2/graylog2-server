@@ -19,92 +19,68 @@
  */
 package org.graylog2.inputs.gelf.http;
 
+import com.google.common.util.concurrent.ThreadFactoryBuilder;
+import org.graylog2.Core;
+import org.graylog2.inputs.gelf.GELFInputBase;
 import org.graylog2.plugin.inputs.*;
 import org.graylog2.plugin.configuration.Configuration;
 import org.graylog2.plugin.configuration.ConfigurationException;
 import org.graylog2.plugin.configuration.ConfigurationRequest;
+import org.jboss.netty.bootstrap.Bootstrap;
+import org.jboss.netty.bootstrap.ServerBootstrap;
+import org.jboss.netty.channel.Channel;
+import org.jboss.netty.channel.socket.nio.NioServerSocketChannelFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import org.graylog2.plugin.GraylogServer;
 
+import java.net.InetSocketAddress;
 import java.util.Map;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
-public class GELFHttpInput extends MessageInput {
+public class GELFHttpInput extends GELFInputBase {
 
     private static final Logger LOG = LoggerFactory.getLogger(GELFHttpInput.class);
 
     public static final String NAME = "GELF HTTP";
 
     @Override
-    public void configure(Configuration config, GraylogServer graylogServer) throws ConfigurationException {
-        //To change body of implemented methods use File | Settings | File Templates.
-    }
-
-    @Override
     public void launch() throws MisfireException {
-        //To change body of implemented methods use File | Settings | File Templates.
-    }
+        final ExecutorService bossExecutor = Executors.newCachedThreadPool(
+                new ThreadFactoryBuilder()
+                        .setNameFormat("input-" + inputId + "-gelfhttp-boss-%d")
+                        .build());
 
-    @Override
-    public void stop() {
-        //To change body of implemented methods use File | Settings | File Templates.
-    }
+        final ExecutorService workerExecutor = Executors.newCachedThreadPool(
+                new ThreadFactoryBuilder()
+                        .setNameFormat("input-" + inputId + "-gelfhttp-worker-%d")
+                        .build());
 
-    @Override
-    public ConfigurationRequest getRequestedConfiguration() {
-        return null;  //To change body of implemented methods use File | Settings | File Templates.
+        bootstrap = new ServerBootstrap(
+                new NioServerSocketChannelFactory(bossExecutor, workerExecutor)
+        );
+        bootstrap.setPipelineFactory(new GELFHttpPipelineFactory(core, this));
+
+        try {
+            channel = ((ServerBootstrap) bootstrap).bind(socketAddress);
+            LOG.debug("Started GELF HTTP input on {}", socketAddress);
+        } catch (Exception e) {
+            String msg = "Could not bind GELF HTTP input to address " + socketAddress;
+            LOG.error(msg, e);
+            throw new MisfireException(msg);
+        }
     }
 
     @Override
     public boolean isExclusive() {
-        return false;  //To change body of implemented methods use File | Settings | File Templates.
+        return false;
     }
 
     @Override
     public String getName() {
-        return null;  //To change body of implemented methods use File | Settings | File Templates.
+        return NAME;
     }
-
-    @Override
-    public Map<String, Object> getAttributes() {
-        return null;  //To change body of implemented methods use File | Settings | File Templates.
-    }
-
-    /*@Override
-    public void initialize(final Map<String, String> configuration, GraylogServer graylogServer) {
-        final InetSocketAddress socketAddress = new InetSocketAddress(
-                configuration.get("listen_address"),
-                Integer.parseInt(configuration.get("listen_port"))
-        );
-
-        final ExecutorService bossExecutor = Executors.newCachedThreadPool(
-            new ThreadFactoryBuilder()
-                .setNameFormat("input-gelfhttp-boss-%d")
-                .build());
-
-        final ExecutorService workerExecutor = Executors.newCachedThreadPool(
-            new ThreadFactoryBuilder()
-                .setNameFormat("input-gelfhttp-worker-%d")
-                .build());
-
-        final ServerBootstrap httpBootstrap = new ServerBootstrap(
-            new NioServerSocketChannelFactory(bossExecutor, workerExecutor)
-        );
-        httpBootstrap.setPipelineFactory(new GELFHttpPipelineFactory((Core) graylogServer));
-
-        try {
-            httpBootstrap.bind(socketAddress);
-            LOG.debug("Started HTTP GELF server on {}", socketAddress);
-        } catch (final ChannelException e) {
-            LOG.error("Could not bind HTTP GELF server to address " + socketAddress, e);
-        }
-        Runtime.getRuntime().addShutdownHook(new Thread() {
-            @Override
-            public void run() {
-                httpBootstrap.releaseExternalResources();
-            }
-        });
-    }*/
 
 }

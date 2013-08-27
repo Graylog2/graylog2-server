@@ -73,6 +73,7 @@ public class GELFInputBase extends MessageInput {
             channel.close();
         }
         if (bootstrap != null) {
+            bootstrap.releaseExternalResources();
             bootstrap.shutdown();
         }
     }

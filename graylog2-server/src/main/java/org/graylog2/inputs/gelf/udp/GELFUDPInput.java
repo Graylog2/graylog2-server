@@ -57,7 +57,7 @@ public class GELFUDPInput extends GELFInputBase {
         bootstrap.setPipelineFactory(new GELFUDPPipelineFactory(core, this));
 
         try {
-            ((ConnectionlessBootstrap) bootstrap).bind(socketAddress);
+            channel = ((ConnectionlessBootstrap) bootstrap).bind(socketAddress);
             LOG.info("Started GELF UDP input on {}", socketAddress);
         } catch (Exception e) {
             String msg = "Could not bind UDP GELF input to address " + socketAddress;
