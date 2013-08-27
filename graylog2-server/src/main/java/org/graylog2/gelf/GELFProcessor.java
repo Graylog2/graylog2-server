@@ -144,8 +144,13 @@ public class GELFProcessor {
             String key = entry.getKey();
             JsonNode value = entry.getValue();
 
-            // Skip standard fields.
-            if (null != lm.getField(key) || Message.RESERVED_FIELDS.contains(key)) {
+            // We already set short_message and host as message and source. Do not add as fields again.
+            if (key.equals("short_message") || key.equals("host")) {
+                continue;
+            }
+
+            // Skip standard or already set fields.
+            if (lm.getField(key) != null || Message.RESERVED_FIELDS.contains(key)) {
                 continue;
             }
 
