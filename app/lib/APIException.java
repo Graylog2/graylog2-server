@@ -13,7 +13,7 @@ public class APIException extends Exception {
 		super(msg);
 		this.httpCode = httpCode;
 	}
-	
+
 	public int getHttpCode() {
 		return httpCode;
 	}

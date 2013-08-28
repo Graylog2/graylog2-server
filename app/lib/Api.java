@@ -172,7 +172,7 @@ public class Api {
             } catch (InterruptedException e) {
                 // TODO
             } catch (ExecutionException e) {
-                throw new APIException(-1, "REST call [" + url + "] failed: " + e.getMessage());
+                throw new APIException(-1, "REST call [" + url + "] failed." + e);
             } catch (MalformedURLException e) {
                 throw new RuntimeException("Malformed URL.", e);
             }

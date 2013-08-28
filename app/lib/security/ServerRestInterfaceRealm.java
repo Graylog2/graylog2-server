@@ -21,20 +21,18 @@ package lib.security;
 
 import lib.APIException;
 import lib.Api;
-import lib.Tools;
 import models.User;
 import models.api.responses.system.UserResponse;
 import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.authc.*;
 import org.apache.shiro.authz.AuthorizationInfo;
-import org.apache.shiro.crypto.BlowfishCipherService;
 import org.apache.shiro.crypto.hash.SimpleHash;
 import org.apache.shiro.realm.AuthorizingRealm;
 import org.apache.shiro.subject.PrincipalCollection;
 import org.apache.shiro.subject.Subject;
-import org.apache.shiro.util.ByteSource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import play.libs.Crypto;
 import play.mvc.Http;
 
 import java.io.IOException;
@@ -50,6 +48,7 @@ public class ServerRestInterfaceRealm extends AuthorizingRealm {
         // TODO currently we don't have any authorization information yet :(
         return null;
     }
+
 
     @Override
     protected AuthenticationInfo doGetAuthenticationInfo(AuthenticationToken authToken) throws AuthenticationException {
@@ -69,15 +68,17 @@ public class ServerRestInterfaceRealm extends AuthorizingRealm {
 
             User.setCurrent(user);
 
-            final ByteSource encryptedPassword = new BlowfishCipherService().encrypt(passwordHash.getBytes(), Tools.appSecretAsBytes(16));
-            Http.Context.current().session().put("creds", encryptedPassword.toBase64());
+            // well, "sessiondid"
+            final String sessionid = Crypto.encryptAES(token.getUsername() + "\t" + passwordHash);
+            Http.Context.current().session().put("sessionid", sessionid);
             new Subject.Builder(SecurityUtils.getSecurityManager())
                     .authenticated(true)
                     .buildSubject();
         } catch (IOException e) {
             throw new AuthenticationException("Unable to communicate with graylog2-server backend", e);
         } catch (APIException e) {
-            throw new AuthenticationException("Server responded with non-200 code", e);
+            throw new Graylog2ServerUnvavailableException("Could not connect to Graylog2 Server.", e);
+            // throw new AuthenticationException("Server responded with non-200 code", e);
         }
         return new SimpleAuthenticationInfo(response.username, authToken.getCredentials(), "rest-interface");
     }

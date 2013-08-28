@@ -1,21 +1,22 @@
 package models;
 
+import com.google.common.collect.Lists;
 import lib.APIException;
 import lib.Api;
-import lib.Tools;
 import models.api.responses.system.UserResponse;
-import org.apache.shiro.codec.Base64;
-import org.apache.shiro.crypto.BlowfishCipherService;
-import org.apache.shiro.util.ByteSource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import play.libs.Crypto;
 import play.mvc.Http;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.StringTokenizer;
+import java.util.concurrent.atomic.AtomicReference;
 
 public class User {
 	private static final Logger log = LoggerFactory.getLogger(User.class);
+
 
     @Deprecated
     private final String id;
@@ -41,29 +42,43 @@ public class User {
 
     public static User current() {
         User currentUser = (User) Http.Context.current().args.get("currentUser");
-        if (currentUser == null) {
-            // get the encrypted password from the session, and retrieve our user with it.
-            final Http.Session session = Http.Context.current().session();
-            final String encryptedPassword = session.get("creds");
-            if (encryptedPassword == null) {
-                log.error("No credentials found in session cookie, this is a bug.");
-                return null;
-            }
-            final ByteSource passwordSha1Bytes = new BlowfishCipherService().decrypt(
-                    Base64.decode(encryptedPassword.getBytes()),
-                    Tools.appSecretAsBytes(16));
-            final String username = session.get("username");
-            try {
-                final String passwordSha1 = new String(passwordSha1Bytes.getBytes());
-                final UserResponse response = Api.get("/users/" + username, UserResponse.class, username, passwordSha1);
-                currentUser = new User(response, passwordSha1);
-                setCurrent(currentUser);
-            } catch (IOException e) {
-                log.error("Could not reach graylog2 server", e);
-            } catch (APIException e) {
-                log.error("Unauthorized to load user " + username, e);
-            }
+        if (currentUser != null) {
+            // we've done this all before, just return the user.
+            return currentUser;
+        }
 
+        // is there a logged in user at all?
+        final Http.Session session = Http.Context.current().session();
+        final String sessionid = session.get("sessionid");
+        if (sessionid == null) {
+            // there is no authenticated user yet.
+            log.info("Accessing the current user failed, there's no sessionid in the cookie.");
+            return null;
+        }
+        final String userPassHash = Crypto.decryptAES(sessionid);
+        final StringTokenizer tokenizer = new StringTokenizer(userPassHash, "\t");
+        if (tokenizer.countTokens() != 2) {
+            return null;
+        }
+        final String userName = tokenizer.nextToken();
+        final String passwordSha1 = tokenizer.nextToken();
+
+        // special case for the local admin user for the web interface
+        if (userName != null) {
+            final LocalAdminUser localAdminUser = LocalAdminUser.getInstance();
+            if (userName.equals(localAdminUser.getName())) {
+                User.setCurrent(localAdminUser);
+                return localAdminUser;
+            }
+        }
+        try {
+            final UserResponse response = Api.get("/users/" + userName, UserResponse.class, userName, passwordSha1);
+            currentUser = new User(response, passwordSha1);
+            setCurrent(currentUser);
+        } catch (IOException e) {
+            log.error("Could not reach graylog2 server", e);
+        } catch (APIException e) {
+            log.error("Unauthorized to load user " + userName, e);
         }
         return currentUser;
     }
@@ -71,6 +86,7 @@ public class User {
     public static void setCurrent(User user) {
         // save the current user in the request for easy access
         Http.Context.current().args.put("currentUser", user);
+        log.debug("Setting the request's current user to {}", user);
     }
 
     public static User load(String username) {
@@ -115,5 +131,26 @@ public class User {
 
     public String getPasswordHash() {
         return passwordHash;
+    }
+
+    public static class LocalAdminUser extends User {
+
+        private static AtomicReference<LocalAdminUser> instance = new AtomicReference<>(null);
+
+        private LocalAdminUser(String id, String name, String email, String fullName, List<String> permissions, String passwordHash) {
+            super(id, name, email, fullName, permissions, passwordHash);
+        }
+
+        public static void createSharedInstance(String username, String passwordHash) {
+            final LocalAdminUser adminUser = new LocalAdminUser("0", username, "None",  "Interface Admin", Lists.newArrayList("*"), passwordHash);
+            if (! instance.compareAndSet(null, adminUser)) {
+                throw new IllegalStateException("Attempted to reset the local admin user object. This is a bug.");
+            }
+        }
+
+        public static LocalAdminUser getInstance() {
+            return instance.get();
+        }
+
     }
 }

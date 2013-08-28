@@ -1,5 +1,7 @@
 package controllers;
 
+import com.google.common.collect.Maps;
+import lib.security.Graylog2ServerUnvavailableException;
 import models.LoginRequest;
 import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.authc.AuthenticationException;
@@ -11,6 +13,8 @@ import play.data.Form;
 import play.mvc.Controller;
 import play.mvc.Result;
 
+import java.util.HashMap;
+
 import static play.data.Form.form;
 
 public class SessionsController extends Controller {
@@ -19,12 +23,23 @@ public class SessionsController extends Controller {
 	final static Form<LoginRequest> userForm = form(LoginRequest.class);
 	
 	public static Result index() {
-		// Redirect if already logged in.
-		if (session("username") != null && !session("username").isEmpty()) {
-			return redirect("/");
-		}
-		return ok(views.html.sessions.login.render(userForm));
-	}
+        // Redirect if already logged in.
+        final Subject subject = SecurityUtils.getSubject();
+        if (subject.isAuthenticated()) {
+            log.debug("User {} already authenticated, redirecting to /", subject);
+            redirect("/");
+        }
+        if (session("username") != null && !session("username").isEmpty()) {
+            return redirect("/");
+        }
+        Form<LoginRequest> form = userForm;
+        if (subject.isRemembered()) {
+            final HashMap<String, String> prefilledForm = Maps.newHashMap();
+            prefilledForm.put("username", subject.getPrincipal().toString());
+            form = userForm.bind(prefilledForm, "username");
+        }
+        return ok(views.html.sessions.login.render(form));
+    }
 	
 	public static Result create() {
 		Form<LoginRequest> loginRequest = userForm.bindFromRequest();
@@ -39,17 +54,20 @@ public class SessionsController extends Controller {
 		final Subject subject = SecurityUtils.getSubject();
 		try {
 			subject.login(new UsernamePasswordToken(r.username, r.password));
-			subject.getSession();
-			session("authSession", subject.getSession().toString());
 			return redirect("/");
 		} catch (AuthenticationException e) {
 			log.warn("Unable to authenticate user {}. Redirecting back to '/'", r.username, e);
-			flash("error", "Sorry, those credentials are invalid.");
+            if (e instanceof Graylog2ServerUnvavailableException) {
+                flash("error", "Could not reach any Graylog2 server!");
+            } else {
+                flash("error", "Sorry, those credentials are invalid.");
+            }
 			return redirect("/login");
 		}
 	}
 
 	public static Result destroy() {
+        SecurityUtils.getSubject().logout();
 		session().clear();
 		return redirect("/login");
 	}

@@ -19,28 +19,23 @@
  */
 package lib.security;
 
-import models.User;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import play.mvc.Http.Context;
-import play.mvc.Result;
-import play.mvc.Security.Authenticator;
+import org.apache.shiro.authc.AuthenticationException;
 
-public class RedirectAuthenticator extends Authenticator {
-    private static final Logger log = LoggerFactory.getLogger(RedirectAuthenticator.class);
+public class Graylog2ServerUnvavailableException extends AuthenticationException {
 
-    @Override
-    public String getUsername(Context ctx) {
-        final User currentUser = User.current();
-        if (currentUser == null) {
-            return null;
-        }
-        return currentUser.getName();
+    public Graylog2ServerUnvavailableException() {
+        super();
     }
 
-    @Override
-	public Result onUnauthorized(Context ctx) {
-		return redirect(controllers.routes.SessionsController.index());
-	}
-	
+    public Graylog2ServerUnvavailableException(String message) {
+        super(message);
+    }
+
+    public Graylog2ServerUnvavailableException(Throwable cause) {
+        super(cause);
+    }
+
+    public Graylog2ServerUnvavailableException(String message, Throwable cause) {
+        super(message, cause);
+    }
 }
