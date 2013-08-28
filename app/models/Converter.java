@@ -35,7 +35,8 @@ public class Converter {
         SPLIT_AND_COUNT,
         IP_ANONYMIZER,
         SYSLOG_PRI_LEVEL,
-        SYSLOG_PRI_FACILITY
+        SYSLOG_PRI_FACILITY,
+        TOKENIZER
     }
 
     private final Type type;

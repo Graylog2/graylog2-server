@@ -47,6 +47,9 @@ public class InputTypeSummaryResponse {
     @SerializedName("requested_configuration")
     public Map<String, Map<String, Object>> requestedConfiguration;
 
+    @SerializedName("link_to_docs")
+    public String linkToDocs;
+
     public List<RequestedConfigurationField> getRequestedConfiguration() {
         List<RequestedConfigurationField> fields = Lists.newArrayList();
         List<RequestedConfigurationField> tmpBools = Lists.newArrayList();

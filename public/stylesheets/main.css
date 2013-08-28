@@ -640,3 +640,11 @@ form #stream-rules {
 .fail-match {
     color: #da4f49;
 }
+
+.input-docs {
+    margin-left: 3px;
+}
+
+.input-docs:hover {
+    text-decoration: none;
+}
