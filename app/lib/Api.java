@@ -60,7 +60,9 @@ public class Api {
                         .setScheme(Realm.AuthScheme.BASIC)
                         .build());
             }
-
+            if (log.isDebugEnabled()) {
+                log.debug("API Request: {}", requestBuilder.build().toString());
+            }
 			final Response response = requestBuilder.execute().get();
 
 			if (response.getStatusCode() != 200) {
@@ -89,6 +91,22 @@ public class Api {
         try {
             AsyncHttpClient.BoundRequestBuilder requestBuilder = client.preparePut(url.toString());
             requestBuilder.addHeader("Accept", "application/json");
+
+            if (url.getUserInfo() != null) {
+                final String[] userPass = url.getUserInfo().split(":", 2);
+                if (userPass[0] != null && userPass[1] != null) {
+                    requestBuilder.setRealm(new Realm.RealmBuilder()
+                            .setPrincipal(userPass[0])
+                            .setPassword(userPass[1])
+                            .setUsePreemptiveAuth(true)
+                            .setScheme(Realm.AuthScheme.BASIC)
+                            .build());
+                }
+            }
+            if (log.isDebugEnabled()) {
+                log.debug("API Request: {}", requestBuilder.build().toString());
+            }
+
             final Response response = requestBuilder.execute().get();
 
             if (response.getStatusCode() != 200) {
@@ -113,6 +131,22 @@ public class Api {
             AsyncHttpClient.BoundRequestBuilder requestBuilder = client.preparePost(url.toString());
             requestBuilder.addHeader("Accept", "application/json");
             requestBuilder.setBody(body);
+
+            if (url.getUserInfo() != null) {
+                final String[] userPass = url.getUserInfo().split(":", 2);
+                if (userPass[0] != null && userPass[1] != null) {
+                    requestBuilder.setRealm(new Realm.RealmBuilder()
+                            .setPrincipal(userPass[0])
+                            .setPassword(userPass[1])
+                            .setUsePreemptiveAuth(true)
+                            .setScheme(Realm.AuthScheme.BASIC)
+                            .build());
+                }
+            }
+            if (log.isDebugEnabled()) {
+                log.debug("API Request: {}", requestBuilder.build().toString());
+            }
+
             final Response response = requestBuilder.execute().get();
 
             if (response.getStatusCode() != expectedResponseCode) {
@@ -136,6 +170,22 @@ public class Api {
         try {
             AsyncHttpClient.BoundRequestBuilder requestBuilder = client.prepareDelete(url.toString());
             requestBuilder.addHeader("Accept", "application/json");
+
+            if (url.getUserInfo() != null) {
+                final String[] userPass = url.getUserInfo().split(":", 2);
+                if (userPass[0] != null && userPass[1] != null) {
+                    requestBuilder.setRealm(new Realm.RealmBuilder()
+                            .setPrincipal(userPass[0])
+                            .setPassword(userPass[1])
+                            .setUsePreemptiveAuth(true)
+                            .setScheme(Realm.AuthScheme.BASIC)
+                            .build());
+                }
+            }
+            if (log.isDebugEnabled()) {
+                log.debug("API Request: {}", requestBuilder.build().toString());
+            }
+
             final Response response = requestBuilder.execute().get();
 
             if (response.getStatusCode() != expectedResponseCode) {
@@ -165,6 +215,22 @@ public class Api {
             try {
                 AsyncHttpClient.BoundRequestBuilder requestBuilder = client.prepareGet(url.toString());
                 requestBuilder.addHeader("Accept", "application/json");
+
+                if (url.getUserInfo() != null) {
+                    final String[] userPass = url.getUserInfo().split(":", 2);
+                    if (userPass[0] != null && userPass[1] != null) {
+                        requestBuilder.setRealm(new Realm.RealmBuilder()
+                                .setPrincipal(userPass[0])
+                                .setPassword(userPass[1])
+                                .setUsePreemptiveAuth(true)
+                                .setScheme(Realm.AuthScheme.BASIC)
+                                .build());
+                    }
+                }
+                if (log.isDebugEnabled()) {
+                    log.debug("API Request: {}", requestBuilder.build().toString());
+                }
+
                 final Response response = requestBuilder.execute().get();
 
                 if (response.getStatusCode() != 200) {
@@ -250,9 +316,6 @@ public class Api {
         } catch (URISyntaxException e) {
             log.error("Could not create target URI", e);
             return null;
-        }
-        if (log.isDebugEnabled()) {
-            log.debug("API call targets URI {}", targetAddress.toASCIIString());
         }
         return new URL(targetAddress.toASCIIString());
     }
