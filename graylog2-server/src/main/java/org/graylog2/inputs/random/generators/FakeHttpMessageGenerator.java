@@ -22,6 +22,8 @@ package org.graylog2.inputs.random.generators;
 import org.graylog2.plugin.Message;
 import org.graylog2.plugin.Tools;
 
+import java.util.*;
+
 /**
  * @author Lennart Koopmann <lennart@torch.sh>
  */
@@ -29,12 +31,87 @@ public class FakeHttpMessageGenerator {
 
     private final String source;
 
+    private final Random rand = new Random();
+
     public FakeHttpMessageGenerator(String source) {
         this.source = source;
     }
 
     public Message generate() {
-        return new Message("foo", source, Tools.getUTCTimestampWithMilliseconds());
+        int x = rand.nextInt(100);
+        int y = rand.nextInt(100);
+
+        boolean isSuccessful = (y < 98);
+
+        if (x <= 90) {
+            // GET
+            return buildGETMessage(isSuccessful);
+        } else if(x > 90 && x <= 95) {
+            // POST
+            return buildPOSTMessage(isSuccessful);
+        } else if(x > 95 && x <= 97) {
+            // DELETE
+            return buildDELETEMessage(isSuccessful);
+        } else {
+            // PUT
+            return buildPUTMessage(isSuccessful);
+        }
+    }
+
+    // GET
+
+    public Message buildGETMessage(boolean isSuccessful) {
+        return isSuccessful ? successfulGET() : failedGET();
+    }
+
+    public Message successfulGET() {
+        return new Message("successful GET", source, Tools.getUTCTimestampWithMilliseconds());
+    }
+
+    public Message failedGET() {
+        return new Message("failed GET", source, Tools.getUTCTimestampWithMilliseconds());
+    }
+
+    // POST
+
+    public Message buildPOSTMessage(boolean isSuccessful) {
+        return isSuccessful ? successfulPOST() : failedPOST();
+    }
+
+    public Message successfulPOST() {
+        return new Message("successful POST", source, Tools.getUTCTimestampWithMilliseconds());
+    }
+
+    public Message failedPOST() {
+        return new Message("failed POST", source, Tools.getUTCTimestampWithMilliseconds());
+    }
+
+    // PUT
+
+    public Message buildPUTMessage(boolean isSuccessful) {
+        return isSuccessful ? successfulPUT() : failedPUT();
+    }
+
+    public Message successfulPUT() {
+        return new Message("successful PUT", source, Tools.getUTCTimestampWithMilliseconds());
+    }
+
+    public Message failedPUT() {
+        return new Message("failed PUT", source, Tools.getUTCTimestampWithMilliseconds());
+    }
+
+    // DELETE
+
+    public Message buildDELETEMessage(boolean isSuccessful) {
+        return isSuccessful ? successfulDELETE() : failedDELETE();
+    }
+
+    public Message successfulDELETE() {
+        return new Message("successful DELETE", source, Tools.getUTCTimestampWithMilliseconds());
+    }
+
+    public Message failedDELETE() {
+        return new Message("failed DELETE", source, Tools.getUTCTimestampWithMilliseconds());
     }
 
 }
