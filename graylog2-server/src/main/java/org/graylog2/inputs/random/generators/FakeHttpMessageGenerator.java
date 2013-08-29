@@ -27,8 +27,14 @@ import org.graylog2.plugin.Tools;
  */
 public class FakeHttpMessageGenerator {
 
+    private final String source;
+
+    public FakeHttpMessageGenerator(String source) {
+        this.source = source;
+    }
+
     public Message generate() {
-        return new Message("foo", "random-input", Tools.getUTCTimestampWithMilliseconds());
+        return new Message("foo", source, Tools.getUTCTimestampWithMilliseconds());
     }
 
 }

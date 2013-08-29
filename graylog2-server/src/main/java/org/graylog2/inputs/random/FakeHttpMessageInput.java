@@ -22,17 +22,19 @@ package org.graylog2.inputs.random;
 import org.graylog2.Core;
 import org.graylog2.inputs.random.generators.FakeHttpMessageGenerator;
 import org.graylog2.plugin.GraylogServer;
-import org.graylog2.plugin.buffers.BufferOutOfCapacityException;
-import org.graylog2.plugin.buffers.ProcessingDisabledException;
 import org.graylog2.plugin.configuration.Configuration;
 import org.graylog2.plugin.configuration.ConfigurationException;
 import org.graylog2.plugin.configuration.ConfigurationRequest;
+import org.graylog2.plugin.configuration.fields.ConfigurationField;
+import org.graylog2.plugin.configuration.fields.NumberField;
+import org.graylog2.plugin.configuration.fields.TextField;
 import org.graylog2.plugin.inputs.MessageInput;
 import org.graylog2.plugin.inputs.MisfireException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.Map;
+import java.util.Random;
 
 /**
  * @author Lennart Koopmann <lennart@torch.sh>
@@ -43,26 +45,43 @@ public class FakeHttpMessageInput extends MessageInput {
 
     public static final String NAME = "Random HTTP message generator";
 
+    public static final String CK_SOURCE = "source";
+    public static final String CK_SLEEP = "sleep";
+    public static final String CK_SLEEP_DEVIATION_PERCENT = "sleep_deviation";
+
     protected GraylogServer graylogServer;
     protected Configuration config;
 
+    private final Random rand = new Random();
+
     private boolean stopRequested = false;
-    private int sleepMs = 50;
+
+    private String source;
+    private int sleepMs;
+    private int maxSleepDeviation;
 
     @Override
     public void configure(Configuration config, GraylogServer graylogServer) throws ConfigurationException {
         this.graylogServer = graylogServer;
         this.config = config;
+
+        if (!checkConfig(config)) {
+            throw new ConfigurationException(config.getSource().toString());
+        }
+
+        source = config.getString(CK_SOURCE);
+        sleepMs = (int) config.getInt(CK_SLEEP);
+        maxSleepDeviation = (int) config.getInt(CK_SLEEP_DEVIATION_PERCENT);
     }
 
     @Override
     public void launch() throws MisfireException {
-        FakeHttpMessageGenerator generator = new FakeHttpMessageGenerator();
+        FakeHttpMessageGenerator generator = new FakeHttpMessageGenerator(source);
         while(!stopRequested) {
             graylogServer.getProcessBuffer().insertCached(generator.generate(), this);
 
             try {
-                Thread.sleep(sleepMs);
+                Thread.sleep(calculateSleepTime());
             } catch (InterruptedException e) {
                 break;
             }
@@ -76,7 +95,33 @@ public class FakeHttpMessageInput extends MessageInput {
 
     @Override
     public ConfigurationRequest getRequestedConfiguration() {
-        return new ConfigurationRequest();
+        ConfigurationRequest c = new ConfigurationRequest();
+
+        c.addField(new NumberField(
+                CK_SLEEP,
+                "Sleep time",
+                25,
+                "How many milliseconds to sleep between generating messages.",
+                ConfigurationField.Optional.NOT_OPTIONAL
+        ));
+
+        c.addField(new NumberField(
+                CK_SLEEP_DEVIATION_PERCENT,
+                "Maximum random sleep time deviation",
+                30,
+                "The deviation is used to generate a more realistic and non-steady message flow.",
+                ConfigurationField.Optional.NOT_OPTIONAL
+        ));
+
+        c.addField(new TextField(
+                CK_SOURCE,
+                "Source name",
+                "example.org",
+                "What to use as source of the generate messages.",
+                ConfigurationField.Optional.NOT_OPTIONAL
+        ));
+
+        return c;
     }
 
     @Override
@@ -98,4 +143,31 @@ public class FakeHttpMessageInput extends MessageInput {
     public Map<String, Object> getAttributes() {
         return config.getSource();
     }
+
+    private boolean checkConfig(Configuration config) {
+        return config.stringIsSet(CK_SOURCE)
+                && config.intIsSet(CK_SLEEP)
+                && config.intIsSet(CK_SLEEP_DEVIATION_PERCENT);
+    }
+
+    private int calculateSleepTime() {
+        int deviationPercent = rand.nextInt((maxSleepDeviation - 0) + 1) + 0;
+
+        double x = sleepMs/100.0*deviationPercent;
+
+        // Add or substract?
+        double result = 0;
+        if (rand.nextBoolean()) {
+            result = sleepMs-x;
+        } else {
+            result = sleepMs+x;
+        }
+
+        if (result < 0) {
+            return 1;
+        } else {
+            return Math.round((int) result);
+        }
+    }
+
 }
