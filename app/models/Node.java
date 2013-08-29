@@ -96,7 +96,7 @@ public class Node {
 
     public static Node random() throws IOException, APIException {
         List<Node> nodes = all();
-        return all().get(randomGenerator.nextInt(nodes.size()));
+        return nodes.get(randomGenerator.nextInt(nodes.size()));
     }
 
     public String getThreadDump() throws IOException, APIException {
