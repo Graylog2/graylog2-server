@@ -49,6 +49,13 @@ public class Node {
     private final String hostname;
     private final boolean isMaster;
 
+    private static final Node INITIAL_NODE;
+    static {
+        final NodeSummaryResponse r = new NodeSummaryResponse();
+        r.transportAddress = Configuration.getServerRestUris().get(0);
+        INITIAL_NODE = new Node(r);
+    }
+
     public Node(NodeSummaryResponse r) {
         transportAddress = r.transportAddress;
         lastSeen = new DateTime(r.lastSeen);
@@ -59,10 +66,10 @@ public class Node {
     }
 
     public static Node fromId(String id) {
-        NodeSummaryResponse response = null;
+        NodeSummaryResponse response;
         try {
             response = Api.get(
-                    Configuration.getServerRestUris().get(0),
+                    INITIAL_NODE,
                     "/cluster/nodes/" + id,
                     NodeSummaryResponse.class);
         } catch (IOException e) {
@@ -77,7 +84,7 @@ public class Node {
     public static List<Node> all() throws IOException, APIException {
         List<Node> nodes = Lists.newArrayList();
 
-        NodeResponse response = Api.get(Configuration.getServerRestUris().get(0), "/cluster/nodes/", NodeResponse.class);
+        NodeResponse response = Api.get(INITIAL_NODE, "/cluster/nodes/", NodeResponse.class);
         for (NodeSummaryResponse nsr : response.nodes) {
             nodes.add(new Node(nsr));
         }

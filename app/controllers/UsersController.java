@@ -28,7 +28,7 @@ import java.util.List;
 public class UsersController extends AuthenticatedController {
 
     public static Result index() {
-        final List<User> allUsers = Users.all(currentUser());
+        final List<User> allUsers = Users.all();
         return ok(views.html.users.index.render(currentUser(), allUsers));
     }
 }

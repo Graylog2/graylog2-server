@@ -41,6 +41,15 @@ public class User {
     }
 
     public static User current() {
+        // this method really covers three use cases:
+        // 1. accessing the current user from within controller or view code
+        //    the user was authenticated and is available from the request context
+        // 2. loading the user from the REST API using the credentials from the cookie,
+        //    set by a previously successful login
+        //    this is performed once each time a request is done after initial log in
+        // 3. if the authenticated user is the locally configured user, there is no REST call performed
+        //    instead a local user object is returned immediately
+
         User currentUser = (User) Http.Context.current().args.get("currentUser");
         if (currentUser != null) {
             // we've done this all before, just return the user.
@@ -96,7 +105,7 @@ public class User {
         }
         // a different user was requested, go and fetch it from the server
         try {
-            final UserResponse response = Api.get("/users/" + username, UserResponse.class, currentUser.getName(), currentUser.getPasswordHash());
+            final UserResponse response = Api.get("/users/" + username, UserResponse.class);
             // TODO this user is not cached locally for now. we should be tracking REST requests.
             return new User(response, null);
         } catch (IOException e) {

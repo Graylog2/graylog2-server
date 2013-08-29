@@ -33,10 +33,10 @@ import java.util.List;
 public class Users {
     private static final Logger log = LoggerFactory.getLogger(Users.class);
 
-    public static List<User> all(User currentUser) {
+    public static List<User> all() {
         UsersListResponse response;
         try {
-            response = Api.get("/users", UsersListResponse.class, currentUser.getName(), currentUser.getPasswordHash());
+            response = Api.get("/users", UsersListResponse.class);
             List<User> users = Lists.newArrayList();
             for (UserResponse userResponse : response.users) {
                 users.add(new User(userResponse, null)); // we don't have password's for the user list, obviously
