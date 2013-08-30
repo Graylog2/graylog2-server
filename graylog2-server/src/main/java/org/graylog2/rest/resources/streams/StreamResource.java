@@ -21,7 +21,6 @@ package org.graylog2.rest.resources.streams;
 
 import com.beust.jcommander.internal.Lists;
 import com.codahale.metrics.annotation.Timed;
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.google.common.collect.Maps;
 import org.bson.types.ObjectId;
 import org.graylog2.database.NotFoundException;
@@ -53,7 +52,7 @@ public class StreamResource extends RestResource {
     @Timed
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
-    public Response create(String body, @QueryParam("pretty") boolean prettyPrint) {
+    public Response create(String body) {
         CreateRequest cr;
         try {
             cr = objectMapper.readValue(body, CreateRequest.class);
@@ -86,7 +85,7 @@ public class StreamResource extends RestResource {
     @GET
     @Timed
     @Produces(MediaType.APPLICATION_JSON)
-    public String get(@QueryParam("pretty") boolean prettyPrint) {
+    public String get() {
         List<Map<String, Object>> streams = Lists.newArrayList();
         for (Stream stream : StreamImpl.loadAllEnabled(core)) {
         	streams.add(((StreamImpl) stream).asMap());
@@ -96,21 +95,12 @@ public class StreamResource extends RestResource {
         result.put("total", streams.size());
         result.put("streams", streams);
 
-        try {
-            if (prettyPrint) {
-                return objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(result);
-            } else {
-                return objectMapper.writeValueAsString(result);
-            }
-        } catch (JsonProcessingException e) {
-            LOG.error("Error while generating JSON", e);
-            throw new WebApplicationException(e, Response.Status.INTERNAL_SERVER_ERROR);
-        }
+        return json(result);
     }
     
     @GET @Path("/{streamId}") @Timed
     @Produces(MediaType.APPLICATION_JSON)
-    public String get(@PathParam("streamId") String streamId, @QueryParam("pretty") boolean prettyPrint) {
+    public String get(@PathParam("streamId") String streamId) {
         if (streamId == null || streamId.isEmpty()) {
         	LOG.error("Missing streamId. Returning HTTP 400.");
         	throw new WebApplicationException(400);

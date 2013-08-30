@@ -42,7 +42,7 @@ public class SearchResource extends RestResource {
 
     @GET @Path("/universal") @Timed
     @Produces(MediaType.APPLICATION_JSON)
-    public String search(@QueryParam("query") String query, @QueryParam("timerange") int timerange, @QueryParam("limit") int limit, @QueryParam("pretty") boolean prettyPrint) {
+    public String search(@QueryParam("query") String query, @QueryParam("timerange") int timerange, @QueryParam("limit") int limit) {
         if (query == null || query.isEmpty()) {
         	LOG.error("Missing parameters. Returning HTTP 400.");
         	throw new WebApplicationException(400);
@@ -62,7 +62,7 @@ public class SearchResource extends RestResource {
     
     @GET @Path("/universal/histogram") @Timed
     @Produces(MediaType.APPLICATION_JSON)
-    public String histogram(@QueryParam("query") String query, @QueryParam("interval") String interval, @QueryParam("timerange") int timerange, @QueryParam("pretty") boolean prettyPrint) {
+    public String histogram(@QueryParam("query") String query, @QueryParam("interval") String interval, @QueryParam("timerange") int timerange) {
         interval = interval.toUpperCase();
 
         if (query == null || query.isEmpty() || interval == null || interval.isEmpty()) {

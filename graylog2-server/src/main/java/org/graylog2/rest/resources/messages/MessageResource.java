@@ -43,7 +43,7 @@ public class MessageResource extends RestResource {
 
     @GET @Path("/{messageId}") @Timed
     @Produces(MediaType.APPLICATION_JSON)
-    public String search(@PathParam("index") String index, @PathParam("messageId") String messageId, @QueryParam("pretty") boolean prettyPrint) {
+    public String search(@PathParam("index") String index, @PathParam("messageId") String messageId) {
         if (messageId == null || messageId.isEmpty()) {
         	LOG.error("Missing parameters. Returning HTTP 400.");
         	throw new WebApplicationException(400);
@@ -65,7 +65,7 @@ public class MessageResource extends RestResource {
     
     @GET @Path("/analyze") @Timed
     @Produces(MediaType.APPLICATION_JSON)
-    public String analyze(@PathParam("index") String index, @QueryParam("string") String string, @QueryParam("pretty") boolean prettyPrint) {
+    public String analyze(@PathParam("index") String index, @QueryParam("string") String string) {
         if (string == null || string.isEmpty()) {
         	LOG.error("Missing parameters. Returning HTTP 400.");
         	throw new WebApplicationException(400);
