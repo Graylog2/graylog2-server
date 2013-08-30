@@ -29,9 +29,27 @@ import java.util.*;
  */
 public class FakeHttpMessageGenerator {
 
+    private static final int MAX_WEIGHT = 50;
+
     private final String source;
 
-    private final Random rand = new Random();
+    private final Random rand = new Random(System.currentTimeMillis());
+
+    private final List<Weighted> GET_RESOURCES = new ArrayList<Weighted>() {{
+        add(new Resource("/login", "LoginController", "login", 10));
+        add(new Resource("/users", "UsersController", "index", 2));
+        add(new Resource("/posts", "PostsController", "index", 40));
+        add(new Resource("/posts/45326", "PostsController", "show", 12));
+        add(new Resource("/posts/45326/edit", "PostsController", "edit", 1));
+    }};
+
+    private final List<Weighted> USER_IDS = new ArrayList<Weighted>() {{
+        add(new UserId(9001, 10));
+        add(new UserId(54351, 1));
+        add(new UserId(74422, 5));
+        add(new UserId(6476752, 12));
+        add(new UserId(6469981, 40));
+    }};
 
     public FakeHttpMessageGenerator(String source) {
         this.source = source;
@@ -68,6 +86,17 @@ public class FakeHttpMessageGenerator {
         return sb.toString();
     }
 
+    private <T> T getWeighted(List<Weighted> list) {
+        while (true) {
+            int x = rand.nextInt(MAX_WEIGHT);
+            Weighted obj = list.get(rand.nextInt(list.size()));
+
+            if (obj.getWeight() >= x) {
+                return (T) obj;
+            }
+        }
+    }
+
     // GET
 
     private Message buildGETMessage(boolean isSuccessful) {
@@ -75,17 +104,23 @@ public class FakeHttpMessageGenerator {
     }
 
     private Message successfulGET() {
-        int code = 200;
-        String resource = "/login";
-        int tookMs = 86; // TODO make more random, some that are really long
+        Resource resource = getWeighted(GET_RESOURCES);
 
-        Message msg = new Message(shortMessage("GET", resource, code, tookMs), source, Tools.getUTCTimestampWithMilliseconds());
+        int code = 200;
+
+        int tookMs = 86; // TODO make more random, some that are really long
+        UserId userId = getWeighted(USER_IDS);
+
+        Message msg = new Message(shortMessage("GET", resource.getResource(), code, tookMs), source, Tools.getUTCTimestampWithMilliseconds());
+
         msg.addField("http_method", "GET");
         msg.addField("http_response_code", code);
-        msg.addField("resource", resource);
-        msg.addField("controller", "LoginController");
-        msg.addField("action", "login");
-        msg.addField("user_id", 9001);
+
+        msg.addField("resource", resource.getResource());
+        msg.addField("controller", resource.getController());
+        msg.addField("action", resource.getAction());
+
+        msg.addField("user_id", userId.getId());
         msg.addField("took_ms", tookMs);
 
         return msg;
@@ -135,6 +170,66 @@ public class FakeHttpMessageGenerator {
 
     private Message failedDELETE() {
         return new Message("failed DELETE", source, Tools.getUTCTimestampWithMilliseconds());
+    }
+
+    private abstract class Weighted {
+
+        protected final int weight;
+
+        protected Weighted(int weight) {
+            if (weight <= 0 || weight > MAX_WEIGHT) {
+                throw new RuntimeException("Invalid resource weight: " + weight);
+            }
+
+            this.weight = weight;
+        }
+
+        public int getWeight() {
+            return weight;
+        }
+
+    }
+
+    private class Resource extends Weighted {
+
+        private final String resource;
+        private final String controller;
+        private final String action;
+
+        public Resource(String resource, String controller, String action, int weight) {
+            super(weight);
+
+            this.resource = resource;
+            this.controller = controller;
+            this.action = action;
+        }
+
+        public String getResource() {
+            return resource;
+        }
+
+        public String getController() {
+            return controller;
+        }
+
+        public String getAction() {
+            return action;
+        }
+    }
+
+    private class UserId extends Weighted {
+
+        private final int id;
+
+        public UserId(int id, int weight) {
+            super(weight);
+
+            this.id = id;
+        }
+
+        public int getId() {
+            return id;
+        }
     }
 
 }
