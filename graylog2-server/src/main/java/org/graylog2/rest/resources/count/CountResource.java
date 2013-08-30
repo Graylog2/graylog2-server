@@ -50,7 +50,7 @@ public class CountResource extends RestResource {
 
     @GET @Path("/histogram") @Timed
     @Produces(MediaType.APPLICATION_JSON)
-    public String histogram(@QueryParam("interval") String interval, @QueryParam("timerange") int timerange, @QueryParam("pretty") boolean prettyPrint) {
+    public String histogram(@QueryParam("interval") String interval, @QueryParam("timerange") int timerange) {
         if (interval == null || interval.isEmpty()) {
             LOG.error("Missing parameters. Returning HTTP 400.");
             throw new WebApplicationException(400);

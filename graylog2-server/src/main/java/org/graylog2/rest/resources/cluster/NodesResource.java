@@ -45,7 +45,7 @@ public class NodesResource extends RestResource {
     @Timed
     @Path("/{nodeId}")
     @Produces(MediaType.APPLICATION_JSON)
-    public String node(@PathParam("nodeId") String nodeId, @QueryParam("pretty") boolean prettyPrint) {
+    public String node(@PathParam("nodeId") String nodeId) {
         if (nodeId == null || nodeId.isEmpty()) {
             LOG.error("Missing nodeId. Returning HTTP 400.");
             throw new WebApplicationException(400);
@@ -64,7 +64,7 @@ public class NodesResource extends RestResource {
     @GET
     @Timed
     @Produces(MediaType.APPLICATION_JSON)
-    public String list(@QueryParam("pretty") boolean prettyPrint) {
+    public String list() {
         List<Map<String, Object>> nodes = Lists.newArrayList();
 
         for (Node node : Node.allActive(core).values()) {
