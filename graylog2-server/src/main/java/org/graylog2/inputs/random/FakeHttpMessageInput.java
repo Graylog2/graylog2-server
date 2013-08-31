@@ -21,6 +21,7 @@ package org.graylog2.inputs.random;
 
 import org.graylog2.Core;
 import org.graylog2.inputs.random.generators.FakeHttpMessageGenerator;
+import org.graylog2.inputs.random.generators.Tools;
 import org.graylog2.plugin.GraylogServer;
 import org.graylog2.plugin.configuration.Configuration;
 import org.graylog2.plugin.configuration.ConfigurationException;
@@ -81,7 +82,7 @@ public class FakeHttpMessageInput extends MessageInput {
             graylogServer.getProcessBuffer().insertCached(generator.generate(), this);
 
             try {
-                Thread.sleep(calculateSleepTime());
+                Thread.sleep(Tools.deviation(sleepMs, maxSleepDeviation, rand));
             } catch (InterruptedException e) {
                 break;
             }
@@ -150,26 +151,6 @@ public class FakeHttpMessageInput extends MessageInput {
         return config.stringIsSet(CK_SOURCE)
                 && config.intIsSet(CK_SLEEP)
                 && config.intIsSet(CK_SLEEP_DEVIATION_PERCENT);
-    }
-
-    private int calculateSleepTime() {
-        int deviationPercent = rand.nextInt(maxSleepDeviation);
-
-        double x = sleepMs/100.0*deviationPercent;
-
-        // Add or substract?
-        double result = 0;
-        if (rand.nextBoolean()) {
-            result = sleepMs-x;
-        } else {
-            result = sleepMs+x;
-        }
-
-        if (result < 0) {
-            return 1;
-        } else {
-            return Math.round((int) result);
-        }
     }
 
 }
