@@ -25,6 +25,7 @@ import com.google.common.collect.Maps;
 import org.graylog2.indexer.Indexer;
 import org.graylog2.indexer.results.DateHistogramResult;
 import org.graylog2.indexer.results.SearchResult;
+import org.graylog2.indexer.results.TermsResult;
 import org.graylog2.rest.resources.RestResource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -47,15 +48,36 @@ public class SearchResource extends RestResource {
         	LOG.error("Missing parameters. Returning HTTP 400.");
         	throw new WebApplicationException(400);
         }
-        
-        SearchResult sr = core.getIndexer().searches().universalSearch(query, timerange, limit);
-        
+
+        SearchResult sr = core.getIndexer().searches().search(query, timerange, limit);
+
         Map<String, Object> result = Maps.newHashMap();
         result.put("query", sr.getOriginalQuery());
         result.put("messages", sr.getResults());
         result.put("fields", sr.getFields());
         result.put("time", sr.took().millis());
         result.put("total_results", sr.getTotalResults());
+
+        return json(result);
+    }
+
+    @GET @Path("/universal/terms") @Timed
+    @Produces(MediaType.APPLICATION_JSON)
+    public String terms(@QueryParam("field") String field, @QueryParam("query") String query, @QueryParam("size") int size, @QueryParam("timerange") int timerange) {
+        if (field == null || field.isEmpty() || query == null || query.isEmpty()) {
+            LOG.error("Missing parameters. Returning HTTP 400.");
+            throw new WebApplicationException(400);
+        }
+
+        TermsResult tr = core.getIndexer().searches().terms(field, size, query, timerange);
+
+        Map<String, Object> result = Maps.newHashMap();
+        result.put("query", query);
+        result.put("time", tr.took().millis());
+        result.put("terms", tr.getTerms());
+        result.put("missing", tr.getMissing()); // The number of docs missing a value.
+        result.put("other", tr.getOther()); // The count of terms other than the one provided by the entries.
+        result.put("total", tr.getTotal()); // The total count of terms.
 
         return json(result);
     }
@@ -77,7 +99,7 @@ public class SearchResource extends RestResource {
         	throw new WebApplicationException(400);
         }
         
-        DateHistogramResult dhr = core.getIndexer().searches().universalSearchHistogram(query, Indexer.DateHistogramInterval.valueOf(interval), timerange);
+        DateHistogramResult dhr = core.getIndexer().searches().histogram(query, Indexer.DateHistogramInterval.valueOf(interval), timerange);
 
         Map<String, Object> result = Maps.newHashMap();
         result.put("query", dhr.getOriginalQuery());

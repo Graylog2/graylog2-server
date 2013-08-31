@@ -35,29 +35,18 @@ import com.beust.jcommander.internal.Sets;
 /**
  * @author Lennart Koopmann <lennart@socketfeed.com>
  */
-public class SearchResult {
-	
-	private final String originalQuery;
-	private final TimeValue took;
+public class SearchResult extends IndexQueryResult {
+
 	private final int totalResults;
 	private final List<ResultMessage> results;
 	private final Set<String> fields;
 
 	public SearchResult(SearchHits searchHits, String originalQuery, TimeValue took) {
-		this.originalQuery = originalQuery;
+        super(originalQuery, took);
+
 		this.results = buildResults(searchHits);
 		this.fields = extractFields(searchHits);
-		this.took = took;
-		
 		this.totalResults = (int) searchHits.getTotalHits();
-	}
-	
-	public String getOriginalQuery() {
-		 return originalQuery;
-	}
-	
-	public TimeValue took() {
-		return took;
 	}
 	
 	public int getTotalResults() {
