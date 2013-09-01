@@ -14,7 +14,7 @@
 <ul class="search-result-fields">
 	@for(f <- searchResult.getFields()) {
 		<li>
-            <i class="icon icon-cog"></i>
+            <i class="icon icon-cog open-analyze-field"></i>
             &nbsp;
 
 			<input type="checkbox"
@@ -25,6 +25,8 @@
 			/>
 
 			<label for="field-selector-@f.getHash">@f.getName()</label>
+
+            @views.html.sidebars.partials.analyze_field(f)
         </li>
 	}
 </ul>

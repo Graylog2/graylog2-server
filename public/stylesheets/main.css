@@ -397,7 +397,7 @@ form #stream-rules {
     border-bottom: 2px solid #ccc;
 }
 
-.search-result-fields i {
+.search-result-fields .icon-cog {
     position: relative;
     top: 3px;
 }
@@ -647,4 +647,17 @@ form #stream-rules {
 
 .input-docs:hover {
     text-decoration: none;
+}
+
+.open-analyze-field {
+    cursor: pointer;
+}
+
+.open-analyze-field-active {
+    color: #0085A7;
+}
+
+.analyze-field {
+    margin-top: 7px;
+    margin-left: 10px;
 }

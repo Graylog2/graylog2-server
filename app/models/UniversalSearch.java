@@ -6,6 +6,7 @@ import java.net.URL;
 import lib.APIException;
 import lib.Api;
 import models.api.responses.DateHistogramResponse;
+import models.api.responses.FieldStatsResponse;
 import models.api.responses.SearchResultResponse;
 import models.api.results.DateHistogramResult;
 import models.api.results.SearchResult;
@@ -42,5 +43,14 @@ public class UniversalSearch {
 		DateHistogramResponse response = Api.get(resource, DateHistogramResponse.class);
 		return new DateHistogramResult(response.query, response.time, response.interval, response.results);
 	}
+
+    public FieldStatsResponse fieldStats(String field) throws IOException, APIException {
+/*        String sField = Api.urlEncode(field);
+        String resource = "search/universal/stats?field=" + sField + "&query=" + query + "&timerange=" + timerange;
+
+        return Api.get(resource, FieldStatsResponse.class); */
+
+        return new FieldStatsResponse();
+    }
 	
 }

@@ -42,6 +42,9 @@ GET         /system/users                                                       
 # Systemjobs
 POST        /systemjobs/trigger                                                      controllers.SystemJobsController.trigger()
 
+# API: Search (i.e. facets)
+GET         /a/search/fieldstats                                                     controllers.SearchApiController.fieldStats(q ?= "", timerange ?= "", field ?= "")
+
 # API: Message counts and histograms
 GET         /a/messagecounts/histogram                                               controllers.MessageCountsController.histogram(timerange ?= "")
 GET         /a/messagecounts/total                                                   controllers.MessageCountsController.total()
