@@ -75,7 +75,7 @@ public class LogMessageTest {
         Message lm = new Message("foo", "bar", 0);
         lm.addField("ohai", "hai");
 
-        Map<String, String> map = new HashMap<String, String>();
+        Map<String, Object> map = new HashMap<String, Object>();
         map.put("lol", "wut");
         map.put("aha", "pipes");
 
@@ -106,7 +106,7 @@ public class LogMessageTest {
     @Test
     public void testAddFieldsTrimsWhiteSpacesTabsAndStuffFromKeyAndValueWhenInsertedAsMap() {
         Message lm = new Message("foo", "bar", 0);
-        Map<String, String> av = Maps.newHashMap();
+        Map<String, Object> av = Maps.newHashMap();
         
         av.put(" one", "value_one");
         av.put(" two  ", "value_two");

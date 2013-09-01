@@ -39,8 +39,8 @@ public class StructuredSyslog {
     private static final Logger LOG = LoggerFactory.getLogger(StructuredSyslog.class);
 
     @SuppressWarnings({ "rawtypes", "unchecked" })
-	public static Map<String, String> extractFields(StructuredSyslogServerEvent msg) {
-        Map<String, String> fields = Maps.newHashMap();
+	public static Map<String, Object> extractFields(StructuredSyslogServerEvent msg) {
+        Map<String, Object> fields = Maps.newHashMap();
         try {
 			Map raw = msg.getStructuredMessage().getStructuredData();
             if (raw != null) {

@@ -170,12 +170,12 @@ public class Message {
         this.fields.put(key.trim(), value);
     }      
 
-    public void addFields(Map<String, String> fields) {
+    public void addFields(Map<String, Object> fields) {
         if(fields == null) {
             return;
         }
 
-        for (Map.Entry<String, String> field : fields.entrySet()) {
+        for (Map.Entry<String, Object> field : fields.entrySet()) {
             addField(field.getKey(), field.getValue());
         }
     }

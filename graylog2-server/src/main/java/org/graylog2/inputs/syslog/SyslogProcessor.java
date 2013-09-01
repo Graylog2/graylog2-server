@@ -150,8 +150,8 @@ public class SyslogProcessor {
         return m;
     }
 
-    private Map<String, String> parseAdditionalData(SyslogServerEventIF msg) {
-        Map<String, String> structuredData = Maps.newHashMap();
+    private Map<String, Object> parseAdditionalData(SyslogServerEventIF msg) {
+        Map<String, Object> structuredData = Maps.newHashMap();
         
         // Structured syslog has more data we can parse.
         if (msg instanceof StructuredSyslogServerEvent) {
