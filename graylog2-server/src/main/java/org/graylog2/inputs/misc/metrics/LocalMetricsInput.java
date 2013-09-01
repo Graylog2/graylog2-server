@@ -48,30 +48,24 @@ public class LocalMetricsInput extends MessageInput {
     private static final String CK_REPORT_INTERVAL = "report_interval";
     private static final String CK_REPORT_UNIT = "report_unit";
     private static final String CK_DURATION_UNIT = "duration_unit";
-    private static final String CK_RATE_UNIT = "duration_unit";
+    private static final String CK_RATE_UNIT = "rate_unit";
 
     @Override
     public void configure(Configuration config, GraylogServer graylogServer) throws ConfigurationException {
         this.config = config;
         this.graylogServer = graylogServer;
 
-        // TODO: READ FROM CONFIG. NEEDS FINISHED DROPDOWN IMPL.
         reporter = Graylog2Reporter.forRegistry(graylogServer.metrics())
-                            .convertDurationsTo(TimeUnit.MILLISECONDS)
-                            .convertRatesTo(TimeUnit.SECONDS)
-                            //.convertDurationsTo(TimeUnit.valueOf(config.getString(CK_DURATION_UNIT)))
-                            //.convertRatesTo(TimeUnit.valueOf(config.getString(CK_RATE_UNIT)))
+                            .convertDurationsTo(TimeUnit.valueOf(config.getString(CK_DURATION_UNIT)))
+                            .convertRatesTo(TimeUnit.valueOf(config.getString(CK_RATE_UNIT)))
                             .build(new InProcessMessageWriter(graylogServer, this));
     }
 
     @Override
     public void launch() throws MisfireException {
-        // TODO: READ FROM CONFIG. NEEDS FINISHED DROPDOWN IMPL.
-
         reporter.start(
                 config.getInt(CK_REPORT_INTERVAL),
-                //TimeUnit.valueOf(config.getString(CK_REPORT_UNIT))
-                TimeUnit.SECONDS
+                TimeUnit.valueOf(config.getString(CK_REPORT_UNIT))
         );
     }
 
@@ -120,7 +114,7 @@ public class LocalMetricsInput extends MessageInput {
                 new DropdownField(
                         CK_RATE_UNIT,
                         "Time unit of measured rates",
-                        TimeUnit.MICROSECONDS.toString(),
+                        TimeUnit.SECONDS.toString(),
                         DropdownField.ValueTemplates.timeUnits(),
                         "The time unit that will be used in for example meter values. Think of: 7 per second",
                         ConfigurationField.Optional.NOT_OPTIONAL

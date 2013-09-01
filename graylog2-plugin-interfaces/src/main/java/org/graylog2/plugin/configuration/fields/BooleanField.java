@@ -82,4 +82,9 @@ public class BooleanField implements ConfigurationField {
         return Lists.newArrayList();
     }
 
+    @Override
+    public Map<String, Map<String, String>> getAdditionalInformation() {
+        return Maps.newHashMap();
+    }
+
 }

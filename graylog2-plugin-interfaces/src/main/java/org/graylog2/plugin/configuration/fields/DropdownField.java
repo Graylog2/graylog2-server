@@ -38,6 +38,7 @@ public class DropdownField implements ConfigurationField {
     private final String defaultValue;
     private final String description;
     private final Optional optional;
+    private final Map<String, String> values;
 
     public DropdownField(String name, String humanName, String defaultValue, Map<String, String> values, Optional isOptional) {
         this(name, humanName, defaultValue, values, null, isOptional);
@@ -49,6 +50,7 @@ public class DropdownField implements ConfigurationField {
         this.defaultValue = defaultValue;
         this.description = description;
         this.optional = isOptional;
+        this.values = values;
     }
 
     @Override
@@ -85,13 +87,21 @@ public class DropdownField implements ConfigurationField {
         return Lists.newArrayList();
     }
 
+    @Override
+    public Map<String, Map<String, String>> getAdditionalInformation() {
+        Map<String, Map<String, String>> result = Maps.newHashMap();
+        result.put("values", values);
+        return result;
+    }
+
     public static class ValueTemplates {
 
         public static Map<String, String> timeUnits() {
             Map<String, String> units = Maps.newHashMap();
 
             for(TimeUnit unit : TimeUnit.values()) {
-                units.put(unit.toString(), unit.toString().toLowerCase());
+                String human = unit.toString().toLowerCase();
+                units.put(unit.toString(), Character.toUpperCase(human.charAt(0)) + human.substring(1));
             }
 
             return units;

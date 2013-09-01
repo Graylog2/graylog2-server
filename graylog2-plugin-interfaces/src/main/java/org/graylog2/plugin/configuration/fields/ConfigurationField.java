@@ -51,5 +51,6 @@ public interface ConfigurationField {
     public Object getDefaultValue();
     public Optional isOptional();
     public List<String> getAttributes();
+    public Map<String, Map<String, String>> getAdditionalInformation();
 
 }

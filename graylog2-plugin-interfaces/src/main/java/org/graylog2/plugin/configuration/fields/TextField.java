@@ -22,6 +22,7 @@
 package org.graylog2.plugin.configuration.fields;
 
 import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
 
 import java.util.HashMap;
 import java.util.List;
@@ -102,6 +103,11 @@ public class TextField implements ConfigurationField {
     @Override
     public List<String> getAttributes() {
         return attributes;
+    }
+
+    @Override
+    public Map<String, Map<String, String>> getAdditionalInformation() {
+        return Maps.newHashMap();
     }
 
 }

@@ -61,6 +61,7 @@ public class ConfigurationRequest {
             config.put("default_value", f.getDefaultValue());
             config.put("is_optional", f.isOptional().equals(ConfigurationField.Optional.OPTIONAL));
             config.put("attributes", f.getAttributes());
+            config.put("additional_info", f.getAdditionalInformation());
 
             configs.put(f.getName(), config);
         }
