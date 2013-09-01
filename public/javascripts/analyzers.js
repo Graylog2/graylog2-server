@@ -14,32 +14,40 @@ $(document).ready(function() {
 
     function showOverview(field, container) {
         var overview = $(".overview", container);
-        overview.show();
 
-        showSpinner(overview);
-
-        /*$.ajax({
-            url: '/a/messages/' + index + '/' + messageId,
-            success: function(data) {
-                // do shit
+        $.ajax({
+            url: '/a/search/fieldstats',
+            data: {
+                "timerange": originalSearchTimerange(),
+                "q": originalSearchQuery(),
+                "field": field
             },
-            error: function() {
-                showError("Could not load term statistics.");
+            success: function(data) {
+                overview.show();
+                $(".analyzer-content", container).show();
+                $("dd.count", overview).text(data.count);
+                $("dd.mean", overview).text(data.mean.toFixed(2));
+                $("dd.stddev", overview).text(data.std_deviation.toFixed(2));
+                $("dd.min", overview).text(data.min);
+                $("dd.max", overview).text(data.max);
+                $("dd.sum", overview).text(data.sum.toFixed(2));
+                $("dd.variance", overview).text(data.variance.toFixed(2));
+                $("dd.squares", overview).text(data.sum_of_squares.toFixed(2));
+            },
+            statusCode: { 400: function() {
+                $(".wrong-type", overview).show();
+                overview.show();
+            }},
+            error: function(data) {
+               if(data.status != 400) {
+                    overview.hide();
+                    showError("Could not load field statistics.");
+               }
             },
             complete: function() {
-                hideSpinner(overview);
+                $(".spinner", container).hide();
             }
-        });*/
-    }
-
-    function showSpinner(container) {
-        $(".analyzer-content", container).hide();
-        $(".spinner", container).show();
-    }
-
-    function hideSpinner(container) {
-        $(".spinner", container).hide();
-        $(".analyzer-content", container).show();
+        });
     }
 
 });

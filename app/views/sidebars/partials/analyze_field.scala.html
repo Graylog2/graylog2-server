@@ -15,12 +15,40 @@
     </div>
 
     <div class="overview" style="display: none;">
-        <h4><i class='icon-refresh icon-spin'></i> &nbsp;Loading statistics.</h4>
+        <div class="spinner">
+            <h4><i class='icon-refresh icon-spin'></i> &nbsp;Loading statistics.</h4>
+        </div>
+
+        <div class='wrong-type' style="display: none;">
+            <i class="icon icon-info"></i>
+            Statistical analysis is only available for numeric field types.
+        </div>
 
         <div class="analyzer-content" style="display: none;">
             <dl>
                 <dt>Total messages:</dt>
-                <dd></dd>
+                <dd class="count"></dd>
+
+                <dt>Mean:</dt>
+                <dd class="mean"></dd>
+
+                <dt>Std. deviation:</dt>
+                <dd class="stddev"></dd>
+
+                <dt>Minimum:</dt>
+                <dd class="min"></dd>
+
+                <dt>Maximum:</dt>
+                <dd class="max"></dd>
+
+                <dt>Sum:</dt>
+                <dd class="sum"></dd>
+
+                <dt>Variance:</dt>
+                <dd class="variance"></dd>
+
+                <dt>Sum of squares:</dt>
+                <dd class="squares"></dd>
             </dl>
         </div>
     </div>

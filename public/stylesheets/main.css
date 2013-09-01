@@ -661,3 +661,21 @@ form #stream-rules {
     margin-top: 7px;
     margin-left: 10px;
 }
+
+.analyzer-content dl {
+    margin-top: 5px;
+    margin-bottom: 5px;
+}
+
+.analyzer-content dt {
+    float: left;
+}
+
+.analyzer-content dd {
+    margin-left: 105px;
+}
+
+.analyze-field .overview .wrong-type {
+    margin-top: 5px;
+    color: #bbb;
+}

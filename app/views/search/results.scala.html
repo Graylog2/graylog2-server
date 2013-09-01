@@ -3,6 +3,9 @@
 
 @main("Search results", sidebars.searchresults(searchResult), query, currentUser) {
 
+<span id="original-search-query" style="display: none;">@searchResult.getOriginalQuery</span>
+<span id="original-search-timerange" style="display: none;">@searchResult.getOriginalTimerange</span>
+
 <a href="" class="btn btn-small pull-right">Refresh</a>
 
 <h1><i class="icon-search"></i> Search results</h1>

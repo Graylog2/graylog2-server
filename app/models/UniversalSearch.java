@@ -26,7 +26,8 @@ public class UniversalSearch {
 		
 		SearchResultResponse response = Api.get(resource, SearchResultResponse.class);
 		SearchResult result = new SearchResult(
-				response.query,
+				query,
+                timerange,
 				response.total_results,
 				response.time,
 				response.messages,
@@ -45,12 +46,10 @@ public class UniversalSearch {
 	}
 
     public FieldStatsResponse fieldStats(String field) throws IOException, APIException {
-/*        String sField = Api.urlEncode(field);
+        String sField = Api.urlEncode(field);
         String resource = "search/universal/stats?field=" + sField + "&query=" + query + "&timerange=" + timerange;
 
-        return Api.get(resource, FieldStatsResponse.class); */
-
-        return new FieldStatsResponse();
+        return Api.get(resource, FieldStatsResponse.class);
     }
 	
 }

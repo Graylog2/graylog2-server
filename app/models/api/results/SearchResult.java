@@ -10,13 +10,15 @@ import models.api.responses.MessageSummaryResponse;
 public class SearchResult {
 	
 	private final String originalQuery;
+    private final int originalTimerange;
 	private final int totalResultCount;
 	private final int tookMs;
 	private final List<MessageSummaryResponse> results;
 	private final List<Field> fields;
 
-	public SearchResult(String originalQuery, int totalResultCount, int tookMs, List<MessageSummaryResponse> results, List<String> fields) {
+	public SearchResult(String originalQuery, int timerange, int totalResultCount, int tookMs, List<MessageSummaryResponse> results, List<String> fields) {
 		this.originalQuery = originalQuery;
+        this.originalTimerange = timerange;
 		this.totalResultCount = totalResultCount;
 		this.tookMs = tookMs;
 		this.results = results;
@@ -30,8 +32,12 @@ public class SearchResult {
 	public String getOriginalQuery() {
 		return originalQuery;
 	}
-	
-	public int getTookMs() {
+
+    public int getOriginalTimerange() {
+        return originalTimerange;
+    }
+
+    public int getTookMs() {
 		return tookMs;
 	}
 	

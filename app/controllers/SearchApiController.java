@@ -36,7 +36,7 @@ import java.util.Map;
 public class SearchApiController extends AuthenticatedController {
 
     public static Result fieldStats(String q, String timerange, String field) {
-        /*int range;
+        int range;
         try {
             range = Integer.parseInt(timerange);
         } catch (NumberFormatException e) {
@@ -62,10 +62,13 @@ public class SearchApiController extends AuthenticatedController {
         } catch (IOException e) {
             return internalServerError("io exception");
         } catch (APIException e) {
-            return internalServerError("api exception " + e);
-        } */
+            if (e.getHttpCode() == 400) {
+                // This usually means the field does not have a numeric type. Pass through!
+                return badRequest();
+            }
 
-        return ok();
+            return internalServerError("api exception " + e);
+        }
     }
 
 }

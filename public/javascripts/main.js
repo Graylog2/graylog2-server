@@ -360,6 +360,14 @@ $(document).ready(function() {
 	
 });
 
+function originalSearchQuery() {
+    return $("#original-search-query").html();
+}
+
+function originalSearchTimerange() {
+    return $("#original-search-timerange").html();
+}
+
 function showError(message) {
     toastr.error(message, "Error", {
         "debug": false,
