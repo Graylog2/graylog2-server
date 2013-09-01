@@ -20,7 +20,9 @@
 package org.graylog2.metrics.reporter;
 
 import com.codahale.metrics.*;
+import com.google.common.collect.Maps;
 
+import java.util.Map;
 import java.util.SortedMap;
 import java.util.concurrent.TimeUnit;
 
@@ -39,6 +41,7 @@ public class Graylog2Reporter extends ScheduledReporter {
         private TimeUnit rateUnit;
         private TimeUnit durationUnit;
         private MetricFilter filter;
+        private String source;
 
         private Builder(MetricRegistry registry) {
             this.registry = registry;
@@ -46,6 +49,7 @@ public class Graylog2Reporter extends ScheduledReporter {
             this.rateUnit = TimeUnit.SECONDS;
             this.durationUnit = TimeUnit.MILLISECONDS;
             this.filter = MetricFilter.ALL;
+            this.source = "metrics";
         }
 
         public Builder withClock(Clock clock) {
@@ -68,15 +72,24 @@ public class Graylog2Reporter extends ScheduledReporter {
             return this;
         }
 
+        public Builder useSource(String source) {
+            this.source = source;
+            return this;
+        }
+
         public Graylog2Reporter build(GELFTarget sender) {
-            return new Graylog2Reporter(registry, sender, clock, rateUnit, durationUnit, filter);
+            return new Graylog2Reporter(registry, sender, clock, rateUnit, durationUnit, filter, source);
         }
     }
 
-    private Graylog2Reporter(MetricRegistry registry, GELFTarget sender, Clock clock, TimeUnit rateUnit,
-                             TimeUnit durationUnit, MetricFilter filter) {
-        super(registry, "graylog2-reporter", filter, rateUnit, durationUnit);
+    private final GELFTarget sender;
+    private final String source;
 
+    private Graylog2Reporter(MetricRegistry registry, GELFTarget sender, Clock clock, TimeUnit rateUnit,
+                             TimeUnit durationUnit, MetricFilter filter, String source) {
+        super(registry, "graylog2-reporter", filter, rateUnit, durationUnit);
+        this.sender = sender;
+        this.source = source;
     }
 
     @Override
@@ -86,7 +99,123 @@ public class Graylog2Reporter extends ScheduledReporter {
                        SortedMap<String, Meter> meters,
                        SortedMap<String, Timer> timers) {
 
-        System.out.println("REPORTING METERS: " + meters);
+        reportGauges(gauges);
+        reportCounters(counters);
+        reportHistograms(histograms);
+        reportMeters(meters);
+        reportTimers(timers);
+    }
+
+    private void reportMeters(SortedMap<String, Meter> meters) {
+        for(Map.Entry<String, Meter> x : meters.entrySet()) {
+            Meter meter = x.getValue();
+
+            Map<String, Object> fields = Maps.newHashMap();
+            fields.put("count", meter.getCount());
+            fields.put("mean_rate", convertRate(meter.getMeanRate()));
+            fields.put("one_minute_rate", convertRate(meter.getOneMinuteRate()));
+            fields.put("five_minute_rate", convertRate(meter.getFiveMinuteRate()));
+            fields.put("fifteen_minute_rate", convertRate(meter.getFifteenMinuteRate()));
+
+            fields.put("name", x.getKey());
+            fields.put("metrics_type", "meter");
+            fields.put("type", "metrics");
+
+            sender.deliver(buildShortMessage(x.getKey()), source, fields);
+        }
+    }
+
+    private void reportGauges(SortedMap<String, Gauge> gauges) {
+        for(Map.Entry<String, Gauge> x : gauges.entrySet()) {
+            Gauge gauge = x.getValue();
+
+            Map<String, Object> fields = Maps.newHashMap();
+            fields.put("value", gauge.getValue());
+
+            fields.put("name", x.getKey());
+            fields.put("metrics_type", "gauge");
+            fields.put("type", "metrics");
+
+            sender.deliver(buildShortMessage(x.getKey()), source, fields);
+        }
+    }
+
+    private void reportCounters(SortedMap<String, Counter> counters) {
+        for(Map.Entry<String, Counter> x : counters.entrySet()) {
+            Counter counter = x.getValue();
+
+            Map<String, Object> fields = Maps.newHashMap();
+            fields.put("count", counter.getCount());
+
+            fields.put("name", x.getKey());
+            fields.put("metrics_type", "counter");
+            fields.put("type", "metrics");
+
+            sender.deliver(buildShortMessage(x.getKey()), source, fields);
+        }
+    }
+
+    private void reportHistograms(SortedMap<String, Histogram> histograms) {
+        for(Map.Entry<String, Histogram> x : histograms.entrySet()) {
+            Snapshot snapshot = x.getValue().getSnapshot();
+
+            Map<String, Object> fields = Maps.newHashMap();
+            fields.put("count", x.getValue().getCount());
+            fields.put("75th_percentile", snapshot.get75thPercentile());
+            fields.put("95th_percentile", snapshot.get95thPercentile());
+            fields.put("98th_percentile", snapshot.get98thPercentile());
+            fields.put("999th_percentile", snapshot.get999thPercentile());
+            fields.put("99th_percentile", snapshot.get99thPercentile());
+            fields.put("max", snapshot.getMax());
+            fields.put("mean", snapshot.getMean());
+            fields.put("median", snapshot.getMedian());
+            fields.put("min", snapshot.getMin());
+            fields.put("std_deviation", snapshot.getStdDev());
+
+            fields.put("name", x.getKey());
+            fields.put("metrics_type", "histogram");
+            fields.put("type", "metrics");
+
+            sender.deliver(buildShortMessage(x.getKey()), source, fields);
+        }
+    }
+
+    private void reportTimers(SortedMap<String, Timer> timers) {
+        for(Map.Entry<String, Timer> x : timers.entrySet()) {
+            Timer timer = x.getValue();
+            Snapshot snapshot = timer.getSnapshot();
+
+            Map<String, Object> fields = Maps.newHashMap();
+            fields.put("count", timer.getCount());
+            fields.put("one_minute_rate", convertRate(timer.getOneMinuteRate()));
+            fields.put("five_minute_rate", convertRate(timer.getFiveMinuteRate()));
+            fields.put("fifteen_minute_rate", convertRate(timer.getFifteenMinuteRate()));
+            fields.put("mean_rate", convertRate(timer.getMeanRate()));
+            fields.put("75th_percentile", convertDuration(snapshot.get75thPercentile()));
+            fields.put("95th_percentile", convertDuration(snapshot.get95thPercentile()));
+            fields.put("98th_percentile", convertDuration(snapshot.get98thPercentile()));
+            fields.put("999th_percentile", convertDuration(snapshot.get999thPercentile()));
+            fields.put("99th_percentile", convertDuration(snapshot.get99thPercentile()));
+            fields.put("max", convertDuration(snapshot.getMax()));
+            fields.put("mean", convertDuration(snapshot.getMean()));
+            fields.put("median", convertDuration(snapshot.getMedian()));
+            fields.put("min", convertDuration(snapshot.getMin()));
+            fields.put("std_deviation", convertDuration(snapshot.getStdDev()));
+
+            fields.put("name", x.getKey());
+            fields.put("metrics_type", "timer");
+            fields.put("type", "metrics");
+
+            sender.deliver(buildShortMessage(x.getKey()), source, fields);
+        }
+    }
+
+    public String buildShortMessage(String name) {
+        StringBuilder sb = new StringBuilder();
+
+        sb.append("metrics: ").append(name);
+
+        return sb.toString();
     }
 
 }
