@@ -66,6 +66,7 @@ public class InputTypeSummaryResponse {
                         continue;
                     case "dropdown":
                         fields.add(new DropdownField(c));
+                        continue;
                     default:
                         Logger.info("Unknown field type [" + fieldType + "].");
                 }

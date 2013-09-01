@@ -104,6 +104,9 @@ public class InputsController extends AuthenticatedController {
                         case "boolean":
                             value = stringValue.equals("true");
                             break;
+                        case "dropdown":
+                            value = stringValue;
+                            break;
                         default: continue;
                     }
 

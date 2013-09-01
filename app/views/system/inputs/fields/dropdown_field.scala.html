@@ -1,4 +1,4 @@
-@(field: lib.plugin.configuration.RequestedConfigurationField)
+@(field: lib.plugin.configuration.DropdownField)
 
 <label>@field.getHumanName</label>
 <span class="help-block">@field.getDescription</span>
@@ -10,12 +10,15 @@
         }
 >
 
-</select>
+@for((k,v) <- field.getValues()) {
+    <option value="@k"
 
-
-<!-- TODO:
-pre-selected field:
-@if(!field.getDefaultValue().toString().isEmpty()) {
-    field.getDefaultValue().toString)"
+    @if(!field.getDefaultValue().toString().isEmpty() && field.getDefaultValue().toString().equals(k)) {
+        selected="selected"
+    }
+    >
+        @v
+    </option>
 }
--->
+
+</select>

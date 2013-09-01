@@ -66,7 +66,7 @@ public class Api {
 			final Response response = requestBuilder.execute().get();
 
 			if (response.getStatusCode() != 200) {
-				throw new APIException(response.getStatusCode(), "REST call GET [" + url + "] returned " + response.getStatusText());
+				throw new APIException(response.getStatusCode(), "REST call GET [" + url + "] returned " + response.getStatusText(), response.getResponseBody());
 			}
 
             // TODO: better make this better bro
@@ -110,7 +110,7 @@ public class Api {
             final Response response = requestBuilder.execute().get();
 
             if (response.getStatusCode() != 200) {
-                throw new APIException(response.getStatusCode(), "REST call PUT [" + url + "] returned " + response.getStatusText());
+                throw new APIException(response.getStatusCode(), "REST call PUT [" + url + "] returned " + response.getStatusText(), response.getResponseBody());
             }
 
             Gson gson = new Gson();
@@ -150,7 +150,7 @@ public class Api {
             final Response response = requestBuilder.execute().get();
 
             if (response.getStatusCode() != expectedResponseCode) {
-                throw new APIException(response.getStatusCode(), "REST call POST [" + url + "] returned " + response.getStatusText());
+                throw new APIException(response.getStatusCode(), "REST call POST [" + url + "] returned " + response.getStatusText(), response.getResponseBody());
             }
 
             Gson gson = new Gson();
@@ -189,7 +189,7 @@ public class Api {
             final Response response = requestBuilder.execute().get();
 
             if (response.getStatusCode() != expectedResponseCode) {
-                throw new APIException(response.getStatusCode(), "REST call DELETE [" + url + "] returned " + response.getStatusText());
+                throw new APIException(response.getStatusCode(), "REST call DELETE [" + url + "] returned " + response.getStatusText(), response.getResponseBody());
             }
 
             Gson gson = new Gson();
@@ -234,7 +234,7 @@ public class Api {
                 final Response response = requestBuilder.execute().get();
 
                 if (response.getStatusCode() != 200) {
-                    throw new APIException(response.getStatusCode(), "REST call [" + url + "] returned " + response.getStatusText());
+                    throw new APIException(response.getStatusCode(), "REST call [" + url + "] returned " + response.getStatusText(), response.getResponseBody());
                 }
 
                 Gson gson = new Gson();
