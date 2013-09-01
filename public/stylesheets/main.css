@@ -665,6 +665,10 @@ form #stream-rules {
 .analyzer-content dl {
     margin-top: 5px;
     margin-bottom: 5px;
+    border-left: 3px solid #eee;
+    padding-left: 7px;
+    padding-top: 1px;
+    padding-bottom: 1px;
 }
 
 .analyzer-content dt {
