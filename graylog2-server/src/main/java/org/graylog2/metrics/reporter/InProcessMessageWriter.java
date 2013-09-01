@@ -45,6 +45,8 @@ public class InProcessMessageWriter implements GELFTarget {
         Message message = new Message(shortMessage, source, Tools.getUTCTimestampWithMilliseconds());
         message.addFields(fields);
 
+        message.addField("node_id", server.getNodeId());
+
         server.getProcessBuffer().insertCached(message, input);
     }
 
