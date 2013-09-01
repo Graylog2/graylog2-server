@@ -29,8 +29,11 @@ import org.elasticsearch.index.query.FilterBuilders;
 import org.elasticsearch.index.query.QueryBuilder;
 import org.elasticsearch.search.SearchHit;
 import org.elasticsearch.search.facet.FacetBuilders;
+import org.elasticsearch.search.facet.FacetPhaseExecutionException;
 import org.elasticsearch.search.facet.datehistogram.DateHistogramFacet;
 import org.elasticsearch.search.facet.datehistogram.DateHistogramFacetBuilder;
+import org.elasticsearch.search.facet.statistical.StatisticalFacet;
+import org.elasticsearch.search.facet.statistical.StatisticalFacetBuilder;
 import org.elasticsearch.search.facet.terms.TermsFacet;
 import org.elasticsearch.search.facet.terms.TermsFacetBuilder;
 import org.elasticsearch.search.sort.SortOrder;
@@ -38,6 +41,7 @@ import org.graylog2.Core;
 import org.graylog2.indexer.IndexHelper;
 import org.graylog2.indexer.Indexer;
 import org.graylog2.indexer.results.DateHistogramResult;
+import org.graylog2.indexer.results.FieldStatsResult;
 import org.graylog2.indexer.results.SearchResult;
 import org.graylog2.indexer.results.TermsResult;
 import org.graylog2.plugin.Tools;
@@ -56,8 +60,9 @@ public class Searches {
     private final static int LIMIT = 150;
 
     private final static String TERMS_FACET_NAME = "gl2_terms";
+    private final static String STATS_FACET_NAME = "gl2_stats";
 
-	public Searches(Client client, Core server) {
+    public Searches(Client client, Core server) {
 		this.server = server;
 		this.c = client;
 	}
@@ -90,6 +95,30 @@ public class Searches {
 
         return new TermsResult(
                 (TermsFacet) r.getFacets().facet(TERMS_FACET_NAME),
+                query,
+                r.getTook()
+        );
+    }
+
+    public FieldStatsResult fieldStats(String field, String query, int timerange) throws FieldTypeException {
+        SearchRequestBuilder srb = standardSearchRequest(query);
+
+        StatisticalFacetBuilder stats = new StatisticalFacetBuilder(STATS_FACET_NAME);
+        stats.global(false);
+        stats.facetFilter(IndexHelper.getTimestampRangeFilter(timerange));
+        stats.field(field);
+
+        srb.addFacet(stats);
+
+        SearchResponse r;
+        try {
+            r = c.search(srb.request()).actionGet();
+        }  catch (org.elasticsearch.action.search.SearchPhaseExecutionException e) {
+            throw new FieldTypeException();
+        }
+
+        return new FieldStatsResult(
+                (StatisticalFacet) r.getFacets().facet(STATS_FACET_NAME),
                 query,
                 r.getTook()
         );
@@ -157,5 +186,7 @@ public class Searches {
         }
     }
 
-	
+
+    public class FieldTypeException extends Exception {
+    }
 }

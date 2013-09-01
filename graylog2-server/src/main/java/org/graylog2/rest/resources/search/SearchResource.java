@@ -24,8 +24,10 @@ import com.codahale.metrics.annotation.Timed;
 import com.google.common.collect.Maps;
 import org.graylog2.indexer.Indexer;
 import org.graylog2.indexer.results.DateHistogramResult;
+import org.graylog2.indexer.results.FieldStatsResult;
 import org.graylog2.indexer.results.SearchResult;
 import org.graylog2.indexer.results.TermsResult;
+import org.graylog2.indexer.searches.Searches;
 import org.graylog2.rest.resources.RestResource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -78,6 +80,37 @@ public class SearchResource extends RestResource {
         result.put("missing", tr.getMissing()); // The number of docs missing a value.
         result.put("other", tr.getOther()); // The count of terms other than the one provided by the entries.
         result.put("total", tr.getTotal()); // The total count of terms.
+
+        return json(result);
+    }
+
+    @GET @Path("/universal/stats") @Timed
+    @Produces(MediaType.APPLICATION_JSON)
+    public String stats(@QueryParam("field") String field, @QueryParam("query") String query, @QueryParam("timerange") int timerange) {
+        if (field == null || field.isEmpty() || query == null || query.isEmpty()) {
+            LOG.error("Missing parameters. Returning HTTP 400.");
+            throw new WebApplicationException(400);
+        }
+
+        FieldStatsResult sr;
+        try {
+            sr = core.getIndexer().searches().fieldStats(field, query, timerange);
+        } catch(Searches.FieldTypeException e) {
+            LOG.error("Stats query failed. Make sure that field [{}] is a numeric type.", field);
+            throw new WebApplicationException(400);
+        }
+
+        Map<String, Object> result = Maps.newHashMap();
+        result.put("query", query);
+        result.put("time", sr.took().millis());
+        result.put("count", sr.getCount());
+        result.put("sum", sr.getSum());
+        result.put("sum_of_squares", sr.getSumOfSquares());
+        result.put("mean", sr.getMean());
+        result.put("min", sr.getMin());
+        result.put("max", sr.getMax());
+        result.put("variance", sr.getVariance());
+        result.put("std_deviation", sr.getStdDeviation());
 
         return json(result);
     }
