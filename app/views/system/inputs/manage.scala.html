@@ -119,6 +119,10 @@
                             @if(field.getType().equals("boolean")) {
                                 @views.html.system.inputs.fields.boolean_field(field)
                             }
+
+                            @if(field.getType().equals("dropdown")) {
+                                @views.html.system.inputs.fields.dropdown_field(field)
+                            }
                         }
                     </div>
                     <div class="modal-footer">

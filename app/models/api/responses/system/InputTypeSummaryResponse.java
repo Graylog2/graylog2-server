@@ -21,10 +21,7 @@ package models.api.responses.system;
 
 import com.google.common.collect.Lists;
 import com.google.gson.annotations.SerializedName;
-import lib.plugin.configuration.BooleanField;
-import lib.plugin.configuration.NumberField;
-import lib.plugin.configuration.RequestedConfigurationField;
-import lib.plugin.configuration.TextField;
+import lib.plugin.configuration.*;
 import play.Logger;
 
 import java.util.List;
@@ -67,6 +64,8 @@ public class InputTypeSummaryResponse {
                     case "boolean":
                         tmpBools.add(new BooleanField(c));
                         continue;
+                    case "dropdown":
+                        fields.add(new DropdownField(c));
                     default:
                         Logger.info("Unknown field type [" + fieldType + "].");
                 }
