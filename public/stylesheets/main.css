@@ -104,19 +104,28 @@ h4 {
 #universalsearch {
 	padding: 5px;
 	margin-bottom: 10px;
-	height: 40px;
 }
 
-#universalsearch-container {
-	width: 100%;
+.universalsearch-timerange-selector {
+    font-size: 12px;
 }
 
-#universalsearch-timerange {
-	width: 100px;
-	padding-right: 8px;
+.universalsearch-timerange-selector label {
+    font-size: 12px;
+    margin-left: 5px !important;
 }
 
-.searchform input {
+.universalsearch-timerange-selector .radio input {
+    margin-left: -17px;
+    position: relative;
+    top: -2px;
+ }
+
+.universalsearch-form {
+    margin-bottom: 0;
+}
+
+.universalsearch-form .query input {
 	font-family: monospace;
 	font-size: 13px;
 	width: 100%;
@@ -129,21 +138,9 @@ h4 {
 	-moz-transition: none;
 	transition: none;
 	outline:none;
-	padding-right: 0;
-}
-
-.searchform select {
-	width: 100px;	
-	height: 24px;
-	font-size: 12px;
-	margin: 0px;
-	position: relative;
-	top: -5px;
-}
-
-.searchform {
-	margin: 0;
 	padding: 0;
+    margin-left: 5px;
+    margin-bottom: 5px;
 }
 
 .messages {
@@ -682,4 +679,18 @@ form #stream-rules {
 .analyze-field .overview .wrong-type {
     margin-top: 5px;
     color: #bbb;
+}
+
+.timerange-selector {
+    border-top: 1px solid #eee;
+    border-bottom: 1px solid #eee;
+    margin-top: 5px;
+    padding-top: 9px;
+    padding-bottom: 0px;
+    margin-bottom: 9px;
+    margin-left: 5px;
+}
+
+.trs-relative select {
+    font-size: 12px;
 }

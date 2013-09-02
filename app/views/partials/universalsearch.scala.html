@@ -1,0 +1,48 @@
+@(searchQuery: String)
+@import views.helpers.TimerangeSelector
+
+<div class="row-fluid no-bm">
+    <div class="span12" id="universalsearch">
+
+        <form class="universalsearch-form" action="@controllers.routes.SearchController.index()" method="GET">
+
+            <div class="universalsearch-timerange-selector">
+                <label class="radio inline">
+                    <input type="radio" name="timerange-selector-type" value="relative" checked="checked"> Relative
+                </label>
+                <label class="radio inline">
+                    <input type="radio" name="timerange-selector-type" value="date-selector"> Date selector
+                </label>
+                <label class="radio inline">
+                    <input type="radio" name="timerange-selector-type" value="free-selector"> Free selector
+                </label>
+                <label class="radio inline">
+                    <input type="radio" name="timerange-selector-type" value="keyword"> Keyword
+                </label>
+            </div>
+
+            <div class="timerange-selector relative">
+                @partials.timerangeselectors.relative(request)
+            </div>
+
+            <div class="timerange-selector date-selector" style="display: none;">
+                date selector
+            </div>
+
+            <div class="timerange-selector free-selector" style="display: none;">
+                free selector
+            </div>
+
+            <div class="timerange-selector keyword" style="display: none;">
+                keyword
+            </div>
+
+            <div class="query">
+                <input type="text" class="input-medium" name="q" value="@searchQuery"
+                    placeholder='Type your search query here and press enter. ("not found AND http) OR http_response_code:[400 TO *]' />
+            </div>
+
+        </form>
+
+    </div>
+ </div>

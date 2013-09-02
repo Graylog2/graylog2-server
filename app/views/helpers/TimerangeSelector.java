@@ -9,9 +9,9 @@ public class TimerangeSelector {
 
 	@SuppressWarnings("serial")
 	public static final SortedMap<Integer, String> ranges = new TreeMap<Integer, String>() {{
-		put(5*60, "5 min");
-		put(15*60, "15 min");
-		put(30*60, "30 min");
+		put(5*60, "5 minutes");
+		put(15*60, "15 minutes");
+		put(30*60, "30 minutes");
 		put(60*60, "1 hour");
 		put(2*60*60, "2 hours");
 		put(8*60*60, "8 hours");
@@ -33,7 +33,7 @@ public class TimerangeSelector {
 			if (isSelected(request, range.getKey())) {
 				options.append(SELECTED);
 			}
-			options.append(">");
+			options.append(">Search in the last ");
 			options.append(range.getValue());
 			options.append("</option>");
 		}
@@ -41,7 +41,7 @@ public class TimerangeSelector {
 		// Special case "All time".
 		options.append("<option value='0'");
 		if (isSelected(request, 0)) { options.append(SELECTED); }
-		options.append(">All time</option>");
+		options.append(">Search in all messages</option>");
 		
 		return options.toString();
 	}

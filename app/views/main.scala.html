@@ -1,6 +1,4 @@
 @(title: String, sidebarContent: Html, searchQuery: String = "", currentUser: User)(content: Html)
-@import views.helpers.TimerangeSelector
-
 
 <!DOCTYPE html>
 <html lang="en">
@@ -13,28 +11,7 @@
         @partials.top()
 
 		<div class="container-fluid">
-			<div class="row-fluid no-bm">
-	    		<div class="span12" id="universalsearch">
-					<form class="searchform" action="@controllers.routes.SearchController.index()" method="GET">
-						<!--  sorry, i used a table lol -->
-						<table id="universalsearch-container">
-						<tr>
-							<td id="universalsearch-timerange">
-								<select name="timerange">
-									@Html(TimerangeSelector.getOptions(request))
-								</select>
-							</td>
-							
-							<td>
-							<input type="text" class="input-medium" name="q"
-								value="@searchQuery"
-								placeholder='Type your search query here and press enter. ("not found AND http) OR http_response_code:[400 TO *]' />
-						    </td>
-						</tr>
-						</table>
-					</form>
-				</div>
-	    	</div>
+			@partials.universalsearch(searchQuery)
 
             <div class="row-fluid error-bar">
             @if(flash.get("error") != null && !flash.get("error").isEmpty()) {
