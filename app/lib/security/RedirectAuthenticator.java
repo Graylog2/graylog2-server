@@ -31,11 +31,11 @@ public class RedirectAuthenticator extends Authenticator {
 
     @Override
     public String getUsername(Context ctx) {
-        final User currentUser = User.current();
-        if (currentUser == null) {
+        final User sessionUser = User.authenticateSessionUser();
+        if (sessionUser == null) {
             return null;
         }
-        return currentUser.getName();
+        return sessionUser.getName();
     }
 
     @Override

@@ -38,44 +38,36 @@ public class Api {
 	}
 
 	public static <T> T get(URL url, Class<T> responseClass, String username, String password) throws APIException, IOException {
-		try {
-			AsyncHttpClient.BoundRequestBuilder requestBuilder = client.prepareGet(url.toString());
+        try {
+            AsyncHttpClient.BoundRequestBuilder requestBuilder = client.prepareGet(url.toString());
 
-            // TODO: better make this better bro
+            // TODO: should we always insist on things being wrapped in json?
             if (!responseClass.equals(String.class)) {
 			    requestBuilder.addHeader("Accept", "application/json");
             }
             // explicit username and password have priority if they are set, to be able to perform the login
             // otherwise we take them from the node url
-            if (username == null && url.getUserInfo() != null) {
-                final String[] userPass = url.getUserInfo().split(":", 2);
-                username = userPass[0];
-                password = userPass[1];
-            }
+            String userInfo = url.getUserInfo();
             if (username != null && password != null) {
-                requestBuilder.setRealm(new Realm.RealmBuilder()
-                        .setPrincipal(username)
-                        .setPassword(password)
-                        .setUsePreemptiveAuth(true)
-                        .setScheme(Realm.AuthScheme.BASIC)
-                        .build());
+                userInfo = username + ":" + password;
             }
+            applyBasicAuthentication(requestBuilder, userInfo);
+
             if (log.isDebugEnabled()) {
                 log.debug("API Request: {}", requestBuilder.build().toString());
             }
-			final Response response = requestBuilder.execute().get();
+            final Response response = requestBuilder.execute().get();
 
-			if (response.getStatusCode() != 200) {
-				throw new APIException(response.getStatusCode(), "REST call GET [" + url + "] returned " + response.getStatusText(), response.getResponseBody());
-			}
-
-            // TODO: better make this better bro
-            if (responseClass.equals(String.class)) {
-                return (T) response.getResponseBody("UTF-8");
+            if (response.getStatusCode() != 200) {
+                throw new APIException(response.getStatusCode(), "REST call GET [" + url + "] returned " + response.getStatusText());
             }
 
-			Gson gson = new Gson();
-			return gson.fromJson(response.getResponseBody("UTF-8"), responseClass);
+            // TODO: should we always insist on things being wrapped in json?
+            if (responseClass.equals(String.class)) {
+                return responseClass.cast(response.getResponseBody("UTF-8"));
+            }
+
+            return deserializeJson(response, responseClass);
 		} catch (InterruptedException e) {
 			// TODO
 		} catch (ExecutionException e) {
@@ -84,7 +76,7 @@ public class Api {
 			throw new RuntimeException("Malformed URL.", e);
 		}
 
-		return (T) null;
+		return null;
 	}
 
     public static <T> T put(URL url, Class<T> responseClass) throws APIException, IOException {
@@ -92,17 +84,7 @@ public class Api {
             AsyncHttpClient.BoundRequestBuilder requestBuilder = client.preparePut(url.toString());
             requestBuilder.addHeader("Accept", "application/json");
 
-            if (url.getUserInfo() != null) {
-                final String[] userPass = url.getUserInfo().split(":", 2);
-                if (userPass[0] != null && userPass[1] != null) {
-                    requestBuilder.setRealm(new Realm.RealmBuilder()
-                            .setPrincipal(userPass[0])
-                            .setPassword(userPass[1])
-                            .setUsePreemptiveAuth(true)
-                            .setScheme(Realm.AuthScheme.BASIC)
-                            .build());
-                }
-            }
+            applyBasicAuthentication(requestBuilder, url.getUserInfo());
             if (log.isDebugEnabled()) {
                 log.debug("API Request: {}", requestBuilder.build().toString());
             }
@@ -110,11 +92,10 @@ public class Api {
             final Response response = requestBuilder.execute().get();
 
             if (response.getStatusCode() != 200) {
-                throw new APIException(response.getStatusCode(), "REST call PUT [" + url + "] returned " + response.getStatusText(), response.getResponseBody());
+                throw new APIException(response.getStatusCode(), "REST call PUT [" + url + "] returned " + response.getStatusText());
             }
 
-            Gson gson = new Gson();
-            return gson.fromJson(response.getResponseBody("UTF-8"), responseClass);
+            return deserializeJson(response, responseClass);
         } catch (InterruptedException e) {
             // TODO
         } catch (ExecutionException e) {
@@ -123,7 +104,7 @@ public class Api {
             throw new RuntimeException("Malformed URL.", e);
         }
 
-        return (T) null;
+        return null;
     }
 
     public static <T> T post(URL url, String body, int expectedResponseCode, Class<T> responseClass) throws APIException, IOException {
@@ -132,17 +113,7 @@ public class Api {
             requestBuilder.addHeader("Accept", "application/json");
             requestBuilder.setBody(body);
 
-            if (url.getUserInfo() != null) {
-                final String[] userPass = url.getUserInfo().split(":", 2);
-                if (userPass[0] != null && userPass[1] != null) {
-                    requestBuilder.setRealm(new Realm.RealmBuilder()
-                            .setPrincipal(userPass[0])
-                            .setPassword(userPass[1])
-                            .setUsePreemptiveAuth(true)
-                            .setScheme(Realm.AuthScheme.BASIC)
-                            .build());
-                }
-            }
+            applyBasicAuthentication(requestBuilder, url.getUserInfo());
             if (log.isDebugEnabled()) {
                 log.debug("API Request: {}", requestBuilder.build().toString());
             }
@@ -150,11 +121,10 @@ public class Api {
             final Response response = requestBuilder.execute().get();
 
             if (response.getStatusCode() != expectedResponseCode) {
-                throw new APIException(response.getStatusCode(), "REST call POST [" + url + "] returned " + response.getStatusText(), response.getResponseBody());
+                throw new APIException(response.getStatusCode(), "REST call POST [" + url + "] returned " + response.getStatusText());
             }
 
-            Gson gson = new Gson();
-            return gson.fromJson(response.getResponseBody("UTF-8"), responseClass);
+            return deserializeJson(response, responseClass);
         } catch (InterruptedException e) {
             // TODO
         } catch (ExecutionException e) {
@@ -163,7 +133,7 @@ public class Api {
             throw new RuntimeException("Malformed URL.", e);
         }
 
-        return (T) null;
+        return null;
     }
 
     public static <T> T delete(URL url, int expectedResponseCode, Class<T> responseClass) throws APIException, IOException {
@@ -171,17 +141,7 @@ public class Api {
             AsyncHttpClient.BoundRequestBuilder requestBuilder = client.prepareDelete(url.toString());
             requestBuilder.addHeader("Accept", "application/json");
 
-            if (url.getUserInfo() != null) {
-                final String[] userPass = url.getUserInfo().split(":", 2);
-                if (userPass[0] != null && userPass[1] != null) {
-                    requestBuilder.setRealm(new Realm.RealmBuilder()
-                            .setPrincipal(userPass[0])
-                            .setPassword(userPass[1])
-                            .setUsePreemptiveAuth(true)
-                            .setScheme(Realm.AuthScheme.BASIC)
-                            .build());
-                }
-            }
+            applyBasicAuthentication(requestBuilder, url.getUserInfo());
             if (log.isDebugEnabled()) {
                 log.debug("API Request: {}", requestBuilder.build().toString());
             }
@@ -189,11 +149,10 @@ public class Api {
             final Response response = requestBuilder.execute().get();
 
             if (response.getStatusCode() != expectedResponseCode) {
-                throw new APIException(response.getStatusCode(), "REST call DELETE [" + url + "] returned " + response.getStatusText(), response.getResponseBody());
+                throw new APIException(response.getStatusCode(), "REST call DELETE [" + url + "] returned " + response.getStatusText());
             }
 
-            Gson gson = new Gson();
-            return gson.fromJson(response.getResponseBody("UTF-8"), responseClass);
+            return deserializeJson(response, responseClass);
         } catch (InterruptedException e) {
             // TODO
         } catch (ExecutionException e) {
@@ -202,10 +161,27 @@ public class Api {
             throw new RuntimeException("Malformed URL.", e);
         }
 
-        return (T) null;
+        return null;
+    }
+
+    private static void applyBasicAuthentication(AsyncHttpClient.BoundRequestBuilder requestBuilder, String userInfo) {
+        if (userInfo != null) {
+            final String[] userPass = userInfo.split(":", 2);
+            if (userPass[0] != null && userPass[1] != null) {
+                requestBuilder.setRealm(new Realm.RealmBuilder()
+                        .setPrincipal(userPass[0])
+                        .setPassword(userPass[1])
+                        .setUsePreemptiveAuth(true)
+                        .setScheme(Realm.AuthScheme.BASIC)
+                        .build());
+            }
+        }
     }
 
 
+    private static <T> T deserializeJson(Response response, Class<T> responseClass) throws IOException {
+        return new Gson().fromJson(response.getResponseBody("UTF-8"), responseClass);
+    }
 
     public static <T> List<T> getFromAllNodes(String resource, Class<T> responseClass) throws APIException, IOException {
         List<T> result = Lists.newArrayList();
@@ -216,17 +192,7 @@ public class Api {
                 AsyncHttpClient.BoundRequestBuilder requestBuilder = client.prepareGet(url.toString());
                 requestBuilder.addHeader("Accept", "application/json");
 
-                if (url.getUserInfo() != null) {
-                    final String[] userPass = url.getUserInfo().split(":", 2);
-                    if (userPass[0] != null && userPass[1] != null) {
-                        requestBuilder.setRealm(new Realm.RealmBuilder()
-                                .setPrincipal(userPass[0])
-                                .setPassword(userPass[1])
-                                .setUsePreemptiveAuth(true)
-                                .setScheme(Realm.AuthScheme.BASIC)
-                                .build());
-                    }
-                }
+                applyBasicAuthentication(requestBuilder, url.getUserInfo());
                 if (log.isDebugEnabled()) {
                     log.debug("API Request: {}", requestBuilder.build().toString());
                 }
@@ -234,11 +200,10 @@ public class Api {
                 final Response response = requestBuilder.execute().get();
 
                 if (response.getStatusCode() != 200) {
-                    throw new APIException(response.getStatusCode(), "REST call [" + url + "] returned " + response.getStatusText(), response.getResponseBody());
+                    throw new APIException(response.getStatusCode(), "REST call [" + url + "] returned " + response.getStatusText());
                 }
 
-                Gson gson = new Gson();
-                result.add(gson.fromJson(response.getResponseBody("UTF-8"), responseClass));
+                result.add(deserializeJson(response, responseClass));
             } catch (InterruptedException e) {
                 // TODO
             } catch (ExecutionException e) {
@@ -251,25 +216,18 @@ public class Api {
         return result;
     }
 
-
-
-
     ////////
 
     public static <T> T get(String part, Class<T> responseClass) throws IOException, APIException {
         return get(buildTarget(Node.random(), part), responseClass, null, null);
     }
 
-	public static <T> T get(Node node, String part, Class<T> responseClass) throws IOException, APIException {
-        return get(buildTarget(node, part), responseClass, null, null);
+    public static <T> T getUnauthenticated(Node node, String part, Class<T> responseClass) throws IOException, APIException {
+        return get(buildTarget(node, part, null, null), responseClass, null, null);
     }
 
-    public static <T> T post(String part, ApiRequest body, Class<T> responseClass) throws IOException, APIException {
-		return post(buildTarget(Node.random(), part), body.toJson(), 200, responseClass);
-	}
-
-    public static <T> T post(Node node, String part, ApiRequest body, Class<T> responseClass) throws IOException, APIException {
-        return post(buildTarget(node, part), body.toJson(), 201, responseClass);
+    public static <T> T get(Node node, String part, Class<T> responseClass) throws IOException, APIException {
+        return get(buildTarget(node, part), responseClass, null, null);
     }
 
     public static <T> T post(Node node, String part, ApiRequest body, int expectedResponseCode, Class<T> responseClass) throws IOException, APIException {
@@ -280,10 +238,6 @@ public class Api {
         return put(buildTarget(node, part), responseClass);
     }
 
-    public static <T> T delete(Node node, String part, Class<T> responseClass) throws IOException, APIException {
-        return delete(buildTarget(node, part), 204, responseClass);
-    }
-
     public static <T> T delete(Node node, String part, int expectedResponseCode, Class<T> responseClass) throws IOException, APIException {
         return delete(buildTarget(node, part), expectedResponseCode, responseClass);
     }
@@ -291,22 +245,43 @@ public class Api {
     ////////
 
     public static URL buildTarget(Node node, String resource) throws MalformedURLException {
+        return buildTarget(node, resource, null);
+    }
+
+    public static URL buildTarget(Node node, String resource, String query) throws MalformedURLException {
         final User user = User.current();
-        return buildTarget(node, resource, user.getName(), user.getPasswordHash());
+        String name = null;
+        String passwordHash = null;
+        if (user != null) {
+            name = user.getName();
+            passwordHash = user.getPasswordHash();
+        }
+        return buildTarget(node, resource, query, name, passwordHash);
     }
 
     public static URL buildTarget(Node node, String resource, String username, String password) throws MalformedURLException {
+        return buildTarget(node, resource, null, username, password);
+    }
+
+    public static URL buildTarget(Node node, String resource, String queryParams, String username, String password) throws MalformedURLException {
         final URI targetAddress;
         try {
             final URI transportAddress = new URI(node.getTransportAddress());
-            final String userInfo = username + ":" + password;
+            final String userInfo;
+            if (username == null || password == null) {
+                userInfo = null;
+            }
+            else {
+                userInfo = username + ":" + password;
+            }
+
             String path = resource;
             if (! resource.startsWith("/")) {
                 path = "/" + resource;
             }
-            // TODO hack until we separate out the query parameters
-            String query = null;
-            if (path.contains("?")) {
+            String query = queryParams;
+            if (queryParams == null && path.contains("?")) {
+                // TODO hack until we separate out the query parameters
                 final int pos = path.indexOf("?");
                 query = path.substring(pos + 1);
                 path = path.substring(0, pos);

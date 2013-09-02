@@ -40,31 +40,16 @@ public class User {
         this.passwordHash = passwordHash;
     }
 
-    public static User current() {
-        // this method really covers three use cases:
-        // 1. accessing the current user from within controller or view code
-        //    the user was authenticated and is available from the request context
-        // 2. loading the user from the REST API using the credentials from the cookie,
-        //    set by a previously successful login
-        //    this is performed once each time a request is done after initial log in
-        // 3. if the authenticated user is the locally configured user, there is no REST call performed
-        //    instead a local user object is returned immediately
-
-        User currentUser = (User) Http.Context.current().args.get("currentUser");
-        if (currentUser != null) {
-            // we've done this all before, just return the user.
-            return currentUser;
-        }
-
+    public static User authenticateSessionUser() {
         // is there a logged in user at all?
         final Http.Session session = Http.Context.current().session();
-        final String sessionid = session.get("sessionid");
-        if (sessionid == null) {
+        final String sessionId = session.get("sessionid");
+        if (sessionId == null) {
             // there is no authenticated user yet.
             log.info("Accessing the current user failed, there's no sessionid in the cookie.");
             return null;
         }
-        final String userPassHash = Crypto.decryptAES(sessionid);
+        final String userPassHash = Crypto.decryptAES(sessionId);
         final StringTokenizer tokenizer = new StringTokenizer(userPassHash, "\t");
         if (tokenizer.countTokens() != 2) {
             return null;
@@ -82,14 +67,19 @@ public class User {
         }
         try {
             final UserResponse response = Api.get("/users/" + userName, UserResponse.class, userName, passwordSha1);
-            currentUser = new User(response, passwordSha1);
+            User currentUser = new User(response, passwordSha1);
             setCurrent(currentUser);
+            return currentUser;
         } catch (IOException e) {
             log.error("Could not reach graylog2 server", e);
         } catch (APIException e) {
             log.error("Unauthorized to load user " + userName, e);
         }
-        return currentUser;
+        return null;
+    }
+
+    public static User current() {
+        return (User) Http.Context.current().args.get("currentUser");
     }
 
     public static void setCurrent(User user) {

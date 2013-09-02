@@ -24,7 +24,8 @@ import com.google.common.collect.Maps;
 import lib.APIException;
 import lib.Api;
 import lib.Configuration;
-import models.api.responses.*;
+import models.api.responses.NodeResponse;
+import models.api.responses.NodeSummaryResponse;
 import models.api.responses.system.InputSummaryResponse;
 import models.api.responses.system.InputsResponse;
 import org.joda.time.DateTime;
@@ -56,6 +57,8 @@ public class Node {
         INITIAL_NODE = new Node(r);
     }
 
+    private static final List<Node> nodes = Lists.newArrayList();
+
     public Node(NodeSummaryResponse r) {
         transportAddress = r.transportAddress;
         lastSeen = new DateTime(r.lastSeen);
@@ -82,13 +85,13 @@ public class Node {
     }
 
     public static List<Node> all() throws IOException, APIException {
-        List<Node> nodes = Lists.newArrayList();
-
-        NodeResponse response = Api.get(INITIAL_NODE, "/cluster/nodes/", NodeResponse.class);
-        for (NodeSummaryResponse nsr : response.nodes) {
-            nodes.add(new Node(nsr));
+        // TODO don't just get the node list once
+        if (nodes.size() == 0) {
+            NodeResponse response = Api.getUnauthenticated(INITIAL_NODE, "/cluster/nodes/", NodeResponse.class);
+            for (NodeSummaryResponse nsr : response.nodes) {
+                nodes.add(new Node(nsr));
+            }
         }
-
         return nodes;
     }
 
