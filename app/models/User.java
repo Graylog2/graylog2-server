@@ -3,6 +3,7 @@ package models;
 import com.google.common.collect.Lists;
 import lib.APIException;
 import lib.Api;
+import lib.ApiClient;
 import models.api.responses.system.UserResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -66,7 +67,11 @@ public class User {
             }
         }
         try {
-            final UserResponse response = Api.get("/users/" + userName, UserResponse.class, userName, passwordSha1);
+            UserResponse response = ApiClient.get(UserResponse.class)
+                    .credentials(userName, passwordSha1)
+                    .path("/users/{0}", userName)
+                    .execute();
+
             User currentUser = new User(response, passwordSha1);
             setCurrent(currentUser);
             return currentUser;
@@ -111,15 +116,15 @@ public class User {
     public String getId() {
         return getName();
     }
-	
+
 	public String getName() {
 		return name;
 	}
-	
+
 	public String getEmail() {
 		return email;
 	}
-	
+
 	public String getFullName() {
 		return fullName;
 	}

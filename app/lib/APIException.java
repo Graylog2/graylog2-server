@@ -6,12 +6,18 @@ public class APIException extends Exception {
 	private final String body;
 
 	public APIException(int httpCode) {
-        this(httpCode, null, null);
+        this(httpCode, null, (String)null);
 
     }
 
     public APIException(int httpCode, String msg) {
-        this(httpCode, msg, null);
+        this(httpCode, msg, (String) null);
+    }
+
+    public APIException(int httpCode, String msg, Throwable cause) {
+        super(msg, cause);
+        this.httpCode = httpCode;
+        this.body = null;
     }
 
 
