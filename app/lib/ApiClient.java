@@ -10,8 +10,11 @@ import com.ning.http.client.Realm;
 import com.ning.http.client.Response;
 import models.Node;
 import models.User;
+import models.api.requests.ApiRequest;
+import models.api.responses.EmptyResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import play.mvc.Http;
 
 import java.io.IOException;
 import java.net.MalformedURLException;
@@ -46,11 +49,25 @@ public class ApiClient {
     public static <T> ApiRequestBuilder<T> post(Class<T> responseClass) {
         return new ApiRequestBuilder<>(ApiRequestBuilder.Method.POST, responseClass);
     }
+
+    public static ApiRequestBuilder<EmptyResponse> post() {
+        return post(EmptyResponse.class);
+    }
+
     public static <T> ApiRequestBuilder<T> put(Class<T> responseClass) {
         return new ApiRequestBuilder<>(ApiRequestBuilder.Method.PUT, responseClass);
     }
+
+    public static ApiRequestBuilder<EmptyResponse> put() {
+        return put(EmptyResponse.class);
+    }
+
     public static <T> ApiRequestBuilder<T> delete(Class<T> responseClass) {
         return new ApiRequestBuilder<>(ApiRequestBuilder.Method.DELETE, responseClass);
+    }
+
+    public static ApiRequestBuilder<EmptyResponse> delete() {
+        return delete(EmptyResponse.class);
     }
 
     private static void applyBasicAuthentication(AsyncHttpClient.BoundRequestBuilder requestBuilder, String userInfo) {
@@ -128,9 +145,11 @@ public class ApiClient {
         private String username;
         private String password;
         private final Method method;
+        private ApiRequest body;
         private final Class<T> responseClass;
         private final ArrayList<Object> pathParams = Lists.newArrayList();
         private final ArrayList<String> queryParams = Lists.newArrayList();
+        private int httpStatusCode = Http.Status.OK;
 
         private AsyncHttpClient.BoundRequestBuilder requestBuilder;
 
@@ -180,6 +199,16 @@ public class ApiClient {
             return this;
         }
 
+        public ApiRequestBuilder<T> body(ApiRequest body) {
+            this.body = body;
+            return this;
+        }
+
+        public ApiRequestBuilder<T> expect(int httpStatusCode) {
+            this.httpStatusCode = httpStatusCode;
+            return this;
+        }
+
         public T execute() throws APIException, IOException {
             if (node == null) {
                 try {
@@ -211,6 +240,13 @@ public class ApiClient {
 
             applyBasicAuthentication(requestBuilder, url.getUserInfo());
 
+            if (body != null) {
+                if (method != Method.PUT && method != Method.POST) {
+                    throw new IllegalArgumentException("Cannot set request body on non-PUT or POST requests.");
+                }
+                requestBuilder.addHeader("Content-Type", "application/json");
+                requestBuilder.setBody(body.toJson());
+            }
             // TODO: should we always insist on things being wrapped in json?
             if (!responseClass.equals(String.class)) {
                 requestBuilder.addHeader("Accept", "application/json");
@@ -222,8 +258,8 @@ public class ApiClient {
             try {
                 Response response = requestBuilder.execute().get();
 
-                // TODO this is wrong
-                if (response.getStatusCode() != 200) {
+                // TODO this is wrong, shouldn't it accept some callback instead of throwing an exception?
+                if (response.getStatusCode() != httpStatusCode) {
                     throw new APIException(response.getStatusCode(), "REST call GET [" + url + "] returned " + response.getStatusText());
                 }
 

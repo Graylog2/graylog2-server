@@ -2,11 +2,11 @@ package models;
 
 import com.google.common.collect.Lists;
 import lib.APIException;
-import lib.Api;
 import lib.ApiClient;
 import models.api.responses.system.UserResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import play.Play;
 import play.libs.Crypto;
 import play.mvc.Http;
 
@@ -100,7 +100,7 @@ public class User {
         }
         // a different user was requested, go and fetch it from the server
         try {
-            final UserResponse response = Api.get("/users/" + username, UserResponse.class);
+            final UserResponse response = ApiClient.get(UserResponse.class).path("/users/{0}", username).execute();
             // TODO this user is not cached locally for now. we should be tracking REST requests.
             return new User(response, null);
         } catch (IOException e) {
@@ -148,7 +148,10 @@ public class User {
         public static void createSharedInstance(String username, String passwordHash) {
             final LocalAdminUser adminUser = new LocalAdminUser("0", username, "None",  "Interface Admin", Lists.newArrayList("*"), passwordHash);
             if (! instance.compareAndSet(null, adminUser)) {
-                throw new IllegalStateException("Attempted to reset the local admin user object. This is a bug.");
+                // unless we are in test mode, this would be a bug.
+                if (! Play.application().isTest()) {
+                    throw new IllegalStateException("Attempted to reset the local admin user object. This is a bug.");
+                }
             }
         }
 

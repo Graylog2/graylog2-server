@@ -21,7 +21,7 @@ package models;
 
 import com.google.common.collect.Lists;
 import lib.APIException;
-import lib.Api;
+import lib.ApiClient;
 import lib.notifications.DeflectorExistsAsIndexNotification;
 import lib.notifications.NotificationType;
 import models.api.responses.system.GetNotificationsResponse;
@@ -29,7 +29,6 @@ import models.api.responses.system.NotificationSummaryResponse;
 import org.joda.time.DateTime;
 
 import java.io.IOException;
-import java.net.URL;
 import java.util.List;
 
 /**
@@ -71,7 +70,7 @@ public class Notification {
     }
 
     public static List<Notification> all() throws IOException, APIException {
-        GetNotificationsResponse r = Api.get("system/notifications", GetNotificationsResponse.class);
+        GetNotificationsResponse r = ApiClient.get(GetNotificationsResponse.class).path("/system/notifications").execute();
 
         List<Notification> notifications = Lists.newArrayList();
         for (NotificationSummaryResponse notification : r.notifications) {

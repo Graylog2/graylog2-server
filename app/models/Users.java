@@ -21,7 +21,7 @@ package models;
 
 import com.google.common.collect.Lists;
 import lib.APIException;
-import lib.Api;
+import lib.ApiClient;
 import models.api.responses.system.UserResponse;
 import models.api.responses.system.UsersListResponse;
 import org.slf4j.Logger;
@@ -36,7 +36,7 @@ public class Users {
     public static List<User> all() {
         UsersListResponse response;
         try {
-            response = Api.get("/users", UsersListResponse.class);
+            response = ApiClient.get(UsersListResponse.class).path("/users").execute();
             List<User> users = Lists.newArrayList();
             for (UserResponse userResponse : response.users) {
                 users.add(new User(userResponse, null)); // we don't have password's for the user list, obviously

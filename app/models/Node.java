@@ -22,7 +22,7 @@ package models;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import lib.APIException;
-import lib.Api;
+import lib.ApiClient;
 import lib.Configuration;
 import models.api.responses.NodeResponse;
 import models.api.responses.NodeSummaryResponse;
@@ -50,12 +50,8 @@ public class Node {
     private final String hostname;
     private final boolean isMaster;
 
-    private static final Node INITIAL_NODE;
-    static {
-        final NodeSummaryResponse r = new NodeSummaryResponse();
-        r.transportAddress = Configuration.getServerRestUris().get(0);
-        INITIAL_NODE = new Node(r);
-    }
+    // populate this lazily to avoid blowing tests...(the Configuration class isn't loaded at that point)
+    private static Node INITIAL_NODE;
 
     private static final List<Node> nodes = Lists.newArrayList();
 
@@ -71,10 +67,10 @@ public class Node {
     public static Node fromId(String id) {
         NodeSummaryResponse response;
         try {
-            response = Api.get(
-                    INITIAL_NODE,
-                    "/cluster/nodes/" + id,
-                    NodeSummaryResponse.class);
+            response = ApiClient.get(NodeSummaryResponse.class)
+                    .node(getInitialNode())
+                    .path("/cluster/nodes/{0}", id)
+                    .execute();
         } catch (IOException e) {
             return null;
         } catch (APIException e) {
@@ -87,7 +83,10 @@ public class Node {
     public static List<Node> all() throws IOException, APIException {
         // TODO don't just get the node list once
         if (nodes.size() == 0) {
-            NodeResponse response = Api.getUnauthenticated(INITIAL_NODE, "/cluster/nodes/", NodeResponse.class);
+            NodeResponse response = ApiClient.get(NodeResponse.class)
+                    .path("/cluster/nodes")
+                    .node(getInitialNode())
+                    .execute();
             for (NodeSummaryResponse nsr : response.nodes) {
                 nodes.add(new Node(nsr));
             }
@@ -109,8 +108,17 @@ public class Node {
         return nodes.get(randomGenerator.nextInt(nodes.size()));
     }
 
+    public static synchronized Node getInitialNode() {
+        if (INITIAL_NODE == null) {
+            final NodeSummaryResponse r = new NodeSummaryResponse();
+            r.transportAddress = Configuration.getServerRestUris().get(0);
+            INITIAL_NODE = new Node(r);
+        }
+        return INITIAL_NODE;
+    }
+
     public String getThreadDump() throws IOException, APIException {
-        return Api.get(this, "/system/threaddump", String.class);
+        return ApiClient.get(String.class).node(this).path("/system/threaddump").execute();
     }
 
     public List<Input> getInputs() {
@@ -124,7 +132,8 @@ public class Node {
     }
 
     public Input getInput(String inputId) throws IOException, APIException {
-        return new Input(Api.get(this, "/system/inputs/" + inputId, InputSummaryResponse.class));
+        final InputSummaryResponse inputSummaryResponse = ApiClient.get(InputSummaryResponse.class).node(this).path("/system/inputs/{0}", inputId).execute();
+        return new Input(inputSummaryResponse);
     }
 
     public int numberOfInputs() {
@@ -162,7 +171,7 @@ public class Node {
      */
     private InputsResponse inputs()  {
         try {
-            return Api.get(this, "/system/inputs", InputsResponse.class);
+            return ApiClient.get(InputsResponse.class).node(this).path("/system/inputs").execute();
         } catch (Exception e) {
             Logger.error("Could not get inputs.", e);
             throw new RuntimeException("Could not get inputs.", e);

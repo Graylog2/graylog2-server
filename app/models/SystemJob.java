@@ -20,19 +20,15 @@
 package models;
 
 import com.google.common.collect.Lists;
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
 import lib.APIException;
-import lib.Api;
+import lib.ApiClient;
 import models.api.requests.SystemJobTriggerRequest;
-import models.api.responses.EmptyResponse;
 import models.api.responses.system.GetSystemJobsResponse;
 import models.api.responses.system.SystemJobSummaryResponse;
 import org.joda.time.DateTime;
-import play.Logger;
+import play.mvc.Http;
 
 import java.io.IOException;
-import java.net.URL;
 import java.util.List;
 import java.util.UUID;
 
@@ -68,7 +64,11 @@ public class SystemJob {
     }
 
     public static void trigger(Type type, User user) throws IOException, APIException {
-        Api.post(Node.random(), "system/jobs", new SystemJobTriggerRequest(type, user), 202, EmptyResponse.class);
+        ApiClient.post()
+                .path("/system/jobs")
+                .body(new SystemJobTriggerRequest(type, user))
+                .expect(Http.Status.ACCEPTED)
+                .execute();
     }
 
     public UUID getId() {
@@ -99,7 +99,7 @@ public class SystemJob {
         List<SystemJob> jobs = Lists.newArrayList();
 
         for(Node node : Node.all()) {
-            GetSystemJobsResponse r = Api.get(node, "system/jobs", GetSystemJobsResponse.class);
+            GetSystemJobsResponse r = ApiClient.get(GetSystemJobsResponse.class).node(node).path("/system/jobs").execute();
 
             for (SystemJobSummaryResponse job : r.jobs) {
                 jobs.add(new SystemJob(job));

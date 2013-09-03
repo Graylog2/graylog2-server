@@ -20,12 +20,10 @@
 package models;
 
 import lib.APIException;
-import lib.Api;
-import models.api.responses.system.ServerJVMStatsResponse;
+import lib.ApiClient;
 import models.api.responses.system.ServerThroughputResponse;
 
 import java.io.IOException;
-import java.net.URL;
 
 /**
  * @author Lennart Koopmann <lennart@torch.sh>
@@ -43,7 +41,7 @@ public class Throughput {
     }
 
     public static int get(Node node) throws IOException, APIException {
-        return Api.get(node, "system/throughput", ServerThroughputResponse.class).throughput;
+        return ApiClient.get(ServerThroughputResponse.class).node(node).path("/system/throughput").execute().throughput;
     }
 
 }

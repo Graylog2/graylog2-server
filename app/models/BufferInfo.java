@@ -20,7 +20,7 @@
 package models;
 
 import lib.APIException;
-import lib.Api;
+import lib.ApiClient;
 import models.api.responses.BufferSummaryResponse;
 import models.api.responses.BuffersResponse;
 import models.api.responses.MasterCacheSummaryResponse;
@@ -62,7 +62,10 @@ public class BufferInfo {
     }
 
     public static BufferInfo ofNode(Node node) throws IOException, APIException {
-        return new BufferInfo(Api.get(node, "system/buffers", BuffersResponse.class));
+        return new BufferInfo(ApiClient.get(BuffersResponse.class)
+                .node(node)
+                .path("/system/buffers")
+                .execute());
     }
 
 }

@@ -1,13 +1,12 @@
 package models;
 
-import java.io.IOException;
-import java.net.URL;
-
 import lib.APIException;
-import lib.Api;
+import lib.ApiClient;
 import models.api.responses.GetStreamsResponse;
 import models.api.responses.StreamSummaryResponse;
 import models.api.results.StreamsResult;
+
+import java.io.IOException;
 
 public class Stream {
 	
@@ -18,7 +17,7 @@ public class Stream {
 	}
 
 	public static StreamsResult allEnabled() throws IOException, APIException {
-		GetStreamsResponse r = Api.get("streams", GetStreamsResponse.class);
+		GetStreamsResponse r = ApiClient.get(GetStreamsResponse.class).path("streams").execute();
 		
 		return new StreamsResult(r.total, r.streams);
 	}

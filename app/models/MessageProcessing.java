@@ -20,9 +20,7 @@
 package models;
 
 import lib.APIException;
-import lib.Api;
-import models.api.responses.EmptyResponse;
-import play.Logger;
+import lib.ApiClient;
 
 import java.io.IOException;
 
@@ -33,12 +31,18 @@ public class MessageProcessing {
 
     public static void pause(String nodeId) throws IOException, APIException {
         Node node = Node.fromId(nodeId);
-        Api.put(node, "system/processing/pause", EmptyResponse.class);
+        ApiClient.put()
+                .path("/system/processing/pause")
+                .node(node)
+                .execute();
     }
 
     public static void resume(String nodeId) throws IOException, APIException {
         Node node = Node.fromId(nodeId);
-        Api.put(node, "system/processing/resume", EmptyResponse.class);
+        ApiClient.put()
+                .path("/system/processing/resume")
+                .node(node)
+                .execute();
     }
 
 }
