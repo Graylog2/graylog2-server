@@ -22,22 +22,20 @@ package models;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import lib.APIException;
-import lib.Api;
+import lib.ApiClient;
 import lib.ExclusiveInputException;
 import models.api.requests.InputLaunchRequest;
-import models.api.responses.EmptyResponse;
 import models.api.responses.MessageSummaryResponse;
 import models.api.responses.system.InputSummaryResponse;
 import models.api.responses.system.InputTypeSummaryResponse;
 import models.api.responses.system.InputTypesResponse;
 import models.api.results.MessageResult;
 import org.joda.time.DateTime;
-import play.Logger;
+import play.mvc.Http;
 
 import java.io.IOException;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.TimeUnit;
 
 /**
  * @author Lennart Koopmann <lennart@torch.sh>
@@ -85,11 +83,11 @@ public class Input {
     }
 
     public static Map<String, String> getTypes(Node node) throws IOException, APIException {
-        return Api.get(node, "system/inputs/types", InputTypesResponse.class).types;
+        return  ApiClient.get(InputTypesResponse.class).node(node).path("/system/inputs/types").execute().types;
     }
 
     public static InputTypeSummaryResponse getTypeInformation(Node node, String type) throws IOException, APIException {
-        return Api.get(node, "system/inputs/types/" + type, InputTypeSummaryResponse.class);
+        return  ApiClient.get(InputTypeSummaryResponse.class).node(node).path("/system/inputs/types/{0}", type).execute();
     }
 
     public static Map<String, InputTypeSummaryResponse> getAllTypeInformation(Node node) throws IOException, APIException {
@@ -119,11 +117,20 @@ public class Input {
         request.configuration = configuration;
         request.creatorUserId = userId;
 
-        Api.post(node, "system/inputs", request, 202, EmptyResponse.class);
+        ApiClient.post()
+                .path("/system/inputs")
+                .node(node)
+                .body(request)
+                .expect(Http.Status.ACCEPTED)
+                .execute();
     }
 
     public static void terminate(Node node, String inputId) throws IOException, APIException {
-        Api.delete(node, "/system/inputs/" + inputId, 202, EmptyResponse.class);
+        ApiClient.delete()
+                .path("/system/inputs/{0}", inputId)
+                .node(node)
+                .expect(Http.Status.ACCEPTED)
+                .execute();
     }
 
     public MessageResult getRecentlyReceivedMessage(String nodeId) throws IOException, APIException {

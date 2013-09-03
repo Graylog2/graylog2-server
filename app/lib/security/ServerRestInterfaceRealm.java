@@ -20,7 +20,7 @@
 package lib.security;
 
 import lib.APIException;
-import lib.Api;
+import lib.ApiClient;
 import models.User;
 import models.api.responses.system.UserResponse;
 import org.apache.shiro.SecurityUtils;
@@ -63,7 +63,10 @@ public class ServerRestInterfaceRealm extends AuthorizingRealm {
 
             log.debug("Trying to log in {} via REST", token.getUsername());
             // TODO string concat in url sucks, use messageformat or something that actually encodes, too
-            response = Api.get("/users/" + token.getUsername(), UserResponse.class, token.getUsername(), passwordHash);
+            response = ApiClient.get(UserResponse.class)
+                    .path("/users/{0}", token.getUsername())
+                    .credentials(token.getUsername(), passwordHash)
+                    .execute();
             final User user = new User(response, passwordHash);
 
             User.setCurrent(user);

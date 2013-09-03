@@ -1,12 +1,11 @@
 package models;
 
-import java.io.IOException;
-import java.net.URL;
-
 import lib.APIException;
-import lib.Api;
+import lib.ApiClient;
 import models.api.responses.DateHistogramResponse;
 import models.api.results.DateHistogramResult;
+
+import java.io.IOException;
 
 public class MessageCountHistogram {
 
@@ -19,10 +18,11 @@ public class MessageCountHistogram {
 	}
 	
 	public DateHistogramResult histogram() throws IOException, APIException {
-		String i = Api.urlEncode(interval);
-		String resource = "count/histogram?interval=" + i + "&timerange=" + timerange;
-		
-		DateHistogramResponse response = Api.get(resource, DateHistogramResponse.class);
+        DateHistogramResponse response = ApiClient.get(DateHistogramResponse.class)
+                .path("/count/histogram")
+                .queryParam("interval", interval)
+                .queryParam("timerange", timerange)
+                .execute();
 		return new DateHistogramResult("match_all", response.time, response.interval, response.results);
 	}
 	

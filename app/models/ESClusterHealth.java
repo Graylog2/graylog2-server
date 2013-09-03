@@ -20,12 +20,11 @@
 package models;
 
 import lib.APIException;
-import lib.Api;
+import lib.ApiClient;
 import lib.ClusterHealthStatus;
 import models.api.responses.system.ESClusterHealthResponse;
 
 import java.io.IOException;
-import java.net.URL;
 
 /**
  * @author Lennart Koopmann <lennart@torch.sh>
@@ -47,7 +46,7 @@ public class ESClusterHealth {
     }
 
     public static ESClusterHealth get() throws IOException, APIException {
-        ESClusterHealthResponse r = Api.get("system/indexer/cluster/health", ESClusterHealthResponse.class);
+        ESClusterHealthResponse r = ApiClient.get(ESClusterHealthResponse.class).path("/system/indexer/cluster/health").execute();
 
         return new ESClusterHealth(r);
     }

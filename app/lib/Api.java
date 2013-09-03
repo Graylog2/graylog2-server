@@ -8,13 +8,14 @@ import com.ning.http.client.Realm;
 import com.ning.http.client.Response;
 import models.Node;
 import models.User;
-import models.api.requests.ApiRequest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
-import java.io.UnsupportedEncodingException;
-import java.net.*;
+import java.net.MalformedURLException;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.net.URL;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 
@@ -216,34 +217,6 @@ public class Api {
         return result;
     }
 
-    ////////
-
-    public static <T> T get(String part, Class<T> responseClass) throws IOException, APIException {
-        return get(buildTarget(Node.random(), part), responseClass, null, null);
-    }
-
-    public static <T> T getUnauthenticated(Node node, String part, Class<T> responseClass) throws IOException, APIException {
-        return get(buildTarget(node, part, null, null), responseClass, null, null);
-    }
-
-    public static <T> T get(Node node, String part, Class<T> responseClass) throws IOException, APIException {
-        return get(buildTarget(node, part), responseClass, null, null);
-    }
-
-    public static <T> T post(Node node, String part, ApiRequest body, int expectedResponseCode, Class<T> responseClass) throws IOException, APIException {
-        return post(buildTarget(node, part), body.toJson(), expectedResponseCode, responseClass);
-    }
-
-    public static <T> T put(Node node, String part, Class<T> responseClass) throws IOException, APIException {
-        return put(buildTarget(node, part), responseClass);
-    }
-
-    public static <T> T delete(Node node, String part, int expectedResponseCode, Class<T> responseClass) throws IOException, APIException {
-        return delete(buildTarget(node, part), expectedResponseCode, responseClass);
-    }
-
-    ////////
-
     public static URL buildTarget(Node node, String resource) throws MalformedURLException {
         return buildTarget(node, resource, null);
     }
@@ -295,21 +268,4 @@ public class Api {
         return new URL(targetAddress.toASCIIString());
     }
 
-    @Deprecated
-	public static String urlEncode(String x) {
-		if (x == null || x.isEmpty()) {
-			return "";
-		}
-
-		try {
-
-			return URLEncoder.encode(x, "UTF-8");
-		} catch (UnsupportedEncodingException e) {
-			throw new RuntimeException("Unsupported Encoding");
-		}
-	}
-
-    public static <T> T get(String part, Class<T> responseClass, String username, String password) throws IOException, APIException {
-		return get(buildTarget(Node.random(), part), responseClass, username, password);
-	}
 }

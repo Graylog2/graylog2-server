@@ -21,13 +21,12 @@ package models;
 
 import com.google.common.collect.Lists;
 import lib.APIException;
-import lib.Api;
+import lib.ApiClient;
 import models.api.responses.system.GetSystemMessagesResponse;
 import models.api.responses.system.SystemMessageSummaryResponse;
 import org.joda.time.DateTime;
 
 import java.io.IOException;
-import java.net.URL;
 import java.util.List;
 
 /**
@@ -51,8 +50,10 @@ public class SystemMessage {
     }
 
     public static List<SystemMessage> all(int page) throws IOException, APIException {
-        GetSystemMessagesResponse r = Api.get("system/messages?page=" + page, GetSystemMessagesResponse.class);
-
+        GetSystemMessagesResponse r = ApiClient.get(GetSystemMessagesResponse.class)
+                .path("/system/messages")
+                .queryParam("page", page)
+                .execute();
         List<SystemMessage> messages = Lists.newArrayList();
         for (SystemMessageSummaryResponse message : r.messages) {
             messages.add(new SystemMessage(message));
@@ -62,7 +63,7 @@ public class SystemMessage {
     }
 
     public static int total() throws IOException, APIException {
-        return Api.get("system/messages", GetSystemMessagesResponse.class).total;
+        return ApiClient.get(GetSystemMessagesResponse.class).path("/system/messages").execute().total;
     }
 
     public DateTime getTimestamp() {

@@ -21,9 +21,8 @@ package lib.extractors.testers;
 
 import com.google.common.collect.Maps;
 import lib.APIException;
-import lib.Api;
+import lib.ApiClient;
 import models.api.responses.SplitAndIndexTestResponse;
-import models.api.responses.SubstringTestResponse;
 
 import java.io.IOException;
 import java.util.Map;
@@ -34,12 +33,14 @@ import java.util.Map;
 public class SplitAndIndexTest {
 
     public static Map<String, Object> test(String splitBy, int index, String string) throws IOException, APIException {
-        String pString = Api.urlEncode(string);
-        String pSplitBy = Api.urlEncode(splitBy);
+        SplitAndIndexTestResponse r = ApiClient.get(SplitAndIndexTestResponse.class)
+                .path("/tools/split_and_index_tester")
+                .queryParam("split_by", splitBy)
+                .queryParam("index", index)
+                .queryParam("string", string)
+                .execute();
 
-        String part = "/tools/split_and_index_tester?split_by=" + pSplitBy + "&index=" + index + "&string=" + pString;
-
-        SplitAndIndexTestResponse r = Api.get(part, SplitAndIndexTestResponse.class);
+                //Api.get(part, SplitAndIndexTestResponse.class);
 
         Map<String, Object> match = Maps.newHashMap();
         match.put("start", r.beginIndex);

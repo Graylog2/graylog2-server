@@ -10,6 +10,9 @@ public class Configuration {
 
     // Variables that can be overriden. (for example in tests)
     private static String graylog2ServerUris = Play.application().configuration().getString("graylog2-server.uris");
+    private static String userName = Play.application().configuration().getString("local-user.name");
+    private static String passwordHash = Play.application().configuration().getString("local-user.password-sha1");
+
 
 	public static List<String> getServerRestUris() {
         List<String> uris = Lists.newArrayList();
@@ -29,6 +32,16 @@ public class Configuration {
     public static void setServerRestUris(String URIs) {
         graylog2ServerUris = URIs;
         Logger.info("graylog2-server.uris overridden with <" + URIs + ">.");
+    }
+
+    public static void setUserName(String username) {
+        Logger.info("local-user.name overridden with <" + username + ">.");
+        userName = username;
+    }
+
+    public static void setPassword(String password) {
+        Logger.info("local-user.password-sha1 overridden with <" + passwordHash + ">.");
+        passwordHash = password;
     }
 	
 }

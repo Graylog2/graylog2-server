@@ -21,8 +21,7 @@ package lib.extractors.testers;
 
 import com.google.common.collect.Maps;
 import lib.APIException;
-import lib.Api;
-import models.api.responses.RegexTestResponse;
+import lib.ApiClient;
 import models.api.responses.SubstringTestResponse;
 
 import java.io.IOException;
@@ -34,11 +33,12 @@ import java.util.Map;
 public class SubstringTest {
 
     public static Map<String, Object> test(int start, int end, String string) throws IOException, APIException {
-        String pString = Api.urlEncode(string);
-
-        String part = "/tools/substring_tester?begin_index=" + start + "&end_index=" + end + "&string=" + pString;
-
-        SubstringTestResponse r = Api.get(part, SubstringTestResponse.class);
+        SubstringTestResponse r = ApiClient.get(SubstringTestResponse.class)
+                .path("/tools/substring_tester")
+                .queryParam("begin_index", start)
+                .queryParam("end_index", end)
+                .queryParam("string", string)
+                .execute();
 
         Map<String, Object> match = Maps.newHashMap();
         match.put("start", r.beginIndex);

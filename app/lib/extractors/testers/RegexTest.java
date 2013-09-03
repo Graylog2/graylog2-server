@@ -20,9 +20,8 @@
 package lib.extractors.testers;
 
 import com.google.common.collect.Maps;
-
 import lib.APIException;
-import lib.Api;
+import lib.ApiClient;
 import models.api.responses.RegexTestResponse;
 
 import java.io.IOException;
@@ -34,12 +33,11 @@ import java.util.Map;
 public class RegexTest {
 
     public static Map<String, Object> test(String regex, String string) throws IOException, APIException {
-        String pRegex = Api.urlEncode(regex);
-        String pString = Api.urlEncode(string);
-
-        String part = "/tools/regex_tester?regex=" + pRegex + "&string=" + pString;
-
-        RegexTestResponse r = Api.get(part, RegexTestResponse.class);
+        RegexTestResponse r = ApiClient.get(RegexTestResponse.class)
+                .path("/tools/regex_tester")
+                .queryParam("regex", regex)
+                .queryParam("string", string)
+                .execute();
 
         Map<String, Object> match = Maps.newHashMap();
         match.put("start", r.match.start);

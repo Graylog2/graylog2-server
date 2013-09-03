@@ -1,22 +1,21 @@
 package models;
 
-import java.io.IOException;
-import java.net.URL;
-import java.util.ArrayList;
-
 import lib.APIException;
-import lib.Api;
+import lib.ApiClient;
 import models.api.responses.GetMessageResponse;
 import models.api.responses.MessageAnalyzeResponse;
 import models.api.results.MessageAnalyzeResult;
 import models.api.results.MessageResult;
 
+import java.io.IOException;
+import java.util.ArrayList;
+
 public class Message {
 
 	public static MessageResult get(String index, String id) throws IOException, APIException {
-		String resource = "messages/" + index + "/" + id;
-		
-		GetMessageResponse r = Api.get(resource, GetMessageResponse.class);
+        final GetMessageResponse r = ApiClient.get(GetMessageResponse.class)
+                .path("/messages/{0}/{1}", index, id)
+                .execute();
 		return new MessageResult(r.message, r.index);
 	}
 	
@@ -24,10 +23,11 @@ public class Message {
 		if (what == null || what.isEmpty()) {
 			return new MessageAnalyzeResult(new ArrayList<String>());
 		}
-		
-		String resource = "messages/" + index + "/analyze?string=" + Api.urlEncode(what);
-		
-		MessageAnalyzeResponse r = Api.get(resource, MessageAnalyzeResponse.class);
+
+        MessageAnalyzeResponse r = ApiClient.get(MessageAnalyzeResponse.class)
+                .path("/messages/{0}/analyze", index)
+                .queryParam("string", what)
+                .execute();
 		return new MessageAnalyzeResult(r.tokens);
 	}
 	
