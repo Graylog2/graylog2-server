@@ -80,7 +80,7 @@ public class Node {
         return new Node(response);
     }
 
-    public static List<Node> all() throws IOException, APIException {
+    public synchronized static List<Node> all() throws IOException, APIException {
         // TODO don't just get the node list once
         if (nodes.size() == 0) {
             NodeResponse response = ApiClient.get(NodeResponse.class)
