@@ -1,9 +1,12 @@
 import com.google.common.collect.Lists;
+import lib.ServerNodes;
 import lib.security.LocalAdminUserRealm;
 import lib.security.PlayAuthenticationListener;
 import lib.security.RethrowingFirstSuccessfulStrategy;
 import lib.security.ServerRestInterfaceRealm;
+import models.Node;
 import models.User;
+import models.api.responses.NodeSummaryResponse;
 import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.authc.AuthenticationListener;
 import org.apache.shiro.authc.Authenticator;
@@ -53,6 +56,26 @@ public class Global extends GlobalSettings {
             );
 		}
 		SecurityUtils.setSecurityManager(securityManager);
+
+        final String graylog2ServerUris = app.configuration().getString("graylog2-server.uris", "");
+        if (graylog2ServerUris.isEmpty()) {
+            log.error("graylog2-server.uris is not set!");
+            throw new IllegalStateException("graylog2-server.uris is empty");
+        }
+        final String[] uris = graylog2ServerUris.split(",");
+        if (uris.length == 0) {
+            log.error("graylog2-server.uris is empty!");
+            throw new IllegalStateException("graylog2-server.uris is empty");
+        }
+        final Node[] initialNodes = new Node[uris.length];
+        int i = 0;
+        for (String uri : uris) {
+            final NodeSummaryResponse r = new NodeSummaryResponse();
+            r.transportAddress =  uri;
+            initialNodes[i++] = new Node(r);
+        }
+
+        ServerNodes.initialize(initialNodes);
 	}
 
 	private void setupLocalUser(SimpleAccountRealm realm, Application app) {
