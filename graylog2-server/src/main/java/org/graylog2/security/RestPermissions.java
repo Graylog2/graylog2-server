@@ -19,8 +19,49 @@
  */
 package org.graylog2.security;
 
+import com.google.common.base.Splitter;
+import com.google.common.collect.ArrayListMultimap;
+import com.google.common.collect.ListMultimap;
+
+import java.lang.reflect.Field;
+import java.lang.reflect.Modifier;
+import java.util.Collection;
+import java.util.Iterator;
+import java.util.Map;
+
 public class RestPermissions {
+    // These should all be in the form of "group:action", because allPermissions() below depends on it.
+    // Should this ever change, you need to adapt the code below, too.
     public static final String USERS_CREATE =  "users:create";
     public static final String USERS_LIST = "users:list";
     public static final String USERPERMISSIONS_EDIT = "userpermissions:edit";
+
+    private static Map<String, Collection<String>> allPermissions;
+
+    public static synchronized Map<String, Collection<String>> allPermissions() {
+        if (allPermissions == null) {
+            final Field[] declaredFields = RestPermissions.class.getDeclaredFields();
+            ListMultimap<String, String> all = ArrayListMultimap.create();
+            for (Field declaredField : declaredFields) {
+                if (! Modifier.isStatic(declaredField.getModifiers())) {
+                    continue;
+                }
+                if (! String.class.isAssignableFrom(declaredField.getType())) {
+                    continue;
+                }
+                declaredField.setAccessible(true);
+                try {
+                    final String permission = (String) declaredField.get(RestPermissions.class);
+                    final Iterator<String> split = Splitter.on(':').limit(2).split(permission).iterator();
+                    final String group = split.next();
+                    final String action = split.next();
+                    all.put(group, action);
+                } catch (IllegalAccessException ignored) {
+                }
+            }
+            allPermissions = all.asMap();
+        }
+        return allPermissions;
+    }
+
 }

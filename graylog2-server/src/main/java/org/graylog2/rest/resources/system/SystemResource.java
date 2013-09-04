@@ -27,6 +27,7 @@ import org.graylog2.Core;
 import org.graylog2.ProcessingPauseLockedException;
 import org.graylog2.plugin.Tools;
 import org.graylog2.rest.resources.RestResource;
+import org.graylog2.security.RestPermissions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -138,4 +139,11 @@ public class SystemResource extends RestResource {
         return output.toString();
     }
 
+    @GET
+    @Path("/permissions")
+    @Timed
+    @Produces(MediaType.APPLICATION_JSON)
+    public String permissions() {
+        return json(RestPermissions.allPermissions());
+    }
 }
