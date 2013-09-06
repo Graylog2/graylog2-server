@@ -114,7 +114,7 @@ public class SearchResource extends RestResource {
 
         return json(result);
     }
-    
+
     @GET @Path("/universal/histogram") @Timed
     @Produces(MediaType.APPLICATION_JSON)
     public String histogram(@QueryParam("query") String query, @QueryParam("interval") String interval, @QueryParam("timerange") int timerange) {

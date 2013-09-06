@@ -129,6 +129,10 @@ public class Deflector { // extends Ablenkblech
             pointTo(newTarget, oldTarget);
             activity.setMessage("Cycled deflector from <" + oldTarget + "> to <" + newTarget + ">");
         }
+
+
+        LOG.info("Setting old index <{}> to read-only.", oldTarget);
+        server.getIndexer().indices().setReadOnly(oldTarget);
         LOG.info("Done!");
 
         server.getActivityWriter().write(activity);

@@ -33,6 +33,8 @@ import org.elasticsearch.action.admin.indices.delete.DeleteIndexRequest;
 import org.elasticsearch.action.admin.indices.exists.indices.IndicesExistsRequest;
 import org.elasticsearch.action.admin.indices.exists.indices.IndicesExistsResponse;
 import org.elasticsearch.action.admin.indices.mapping.put.PutMappingRequest;
+import org.elasticsearch.action.admin.indices.settings.UpdateSettingsRequest;
+import org.elasticsearch.action.admin.indices.settings.UpdateSettingsResponse;
 import org.elasticsearch.action.admin.indices.stats.IndexStats;
 import org.elasticsearch.action.admin.indices.stats.IndicesStatsRequest;
 import org.elasticsearch.action.admin.indices.stats.IndicesStatsResponse;
@@ -46,6 +48,8 @@ import org.elasticsearch.action.search.SearchType;
 import org.elasticsearch.action.support.replication.ReplicationType;
 import org.elasticsearch.client.Client;
 import org.elasticsearch.cluster.metadata.IndexMetaData;
+import org.elasticsearch.common.settings.ImmutableSettings;
+import org.elasticsearch.common.settings.Settings;
 import org.elasticsearch.common.unit.TimeValue;
 import org.elasticsearch.index.query.QueryBuilder;
 import org.elasticsearch.search.SearchHit;
@@ -204,4 +208,14 @@ public class Indices {
         return b;
     }
 
+    public void setReadOnly(String index) {
+        ImmutableSettings.Builder sb = ImmutableSettings.builder();
+
+        // http://www.elasticsearch.org/guide/reference/api/admin-indices-update-settings/
+        sb.put("index.blocks.write", true); // Block writing.
+        sb.put("index.blocks.read", false); // Allow reading.
+        sb.put("index.blocks.metadata", false); // Allow getting metadata.
+
+        c.admin().indices().updateSettings(new UpdateSettingsRequest(index).settings(sb.build())).actionGet();
+    }
 }
