@@ -14,8 +14,7 @@
                     </a>
                     <ul class="dropdown-menu">
                         <li><a href="#" data-selector-name="relative">Relative</a></li>
-                        <li><a href="#" data-selector-name="date-selector">Date selector</a></li>
-                        <li><a href="#" data-selector-name="free-selector">Free selector</a></li>
+                        <li><a href="#" data-selector-name="absolute">Absolute</a></li>
                         <li><a href="#" data-selector-name="keyword">Keyword</a></li>
                     </ul>
                 </div>
@@ -24,12 +23,8 @@
                     @partials.timerangeselectors.relative(request)
                 </div>
 
-                <div class="timerange-selector date-selector" style="display: none;">
-                    date selector
-                </div>
-
-                <div class="timerange-selector free-selector" style="display: none;">
-                    free selector
+                <div class="timerange-selector absolute" style="display: none;">
+                    @partials.timerangeselectors.absolute()
                 </div>
 
                 <div class="timerange-selector keyword" style="display: none;">

@@ -714,3 +714,16 @@ form #stream-rules {
     margin-top: 5px;
     margin-left: 1px;
 }
+
+.timerange-selector input {
+    height: 15px;
+    font-size: 12px;
+}
+
+.timerange-selector-container .absolute i {
+    font-size: 15px;
+    margin-left: 6px;
+    margin-right: 5px;
+    position: relative;
+    top: -2px;
+}
