@@ -681,18 +681,36 @@ form #stream-rules {
     color: #bbb;
 }
 
-.timerange-selector {
+.timerange-selector-container {
     border-bottom: 1px solid #eee;
-    padding-bottom: 0px;
-    margin-bottom: 9px;
+    padding-bottom: 6px;
+    margin-bottom: 8px;
     margin-left: 5px;
+    height: 25px;
 }
 
-.trs-relative select {
+.timerange-selector select {
+    margin-bottom: 0px;
+}
+
+#relative-timerange-selector {
     font-size: 12px;
+    line-height: 15px;
+    height: 25px;
 }
 
 .timerange-chooser {
     float: left;
     margin-right: 5px;
+}
+
+.timerange-chooser .btn {
+    padding: 4px 7px;
+    line-height: 15px;
+    font-size: 12px;
+}
+
+.timerange-chooser .btn .caret {
+    margin-top: 5px;
+    margin-left: 1px;
 }

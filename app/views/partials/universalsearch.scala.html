@@ -6,33 +6,35 @@
 
         <form class="universalsearch-form" action="@controllers.routes.SearchController.index()" method="GET">
 
-            <div class="btn-group timerange-chooser">
-                <a class="btn btn-info dropdown-toggle" data-toggle="dropdown" href="#">
-                    <i class="icon icon-time"></i>
-                    <span class="caret"></span>
-                </a>
-                <ul class="dropdown-menu">
-                    <li><a href="#">Relative</a></li>
-                    <li><a href="#">Date selector</a></li>
-                    <li><a href="#">Free selector</a></li>
-                    <li><a href="#">Keyword</a></li>
-                </ul>
-            </div>
+            <div class="timerange-selector-container">
+                <div class="btn-group timerange-chooser">
+                    <a class="btn btn-info dropdown-toggle" data-toggle="dropdown" href="#">
+                        <i class="icon icon-time"></i>
+                        <span class="caret"></span>
+                    </a>
+                    <ul class="dropdown-menu">
+                        <li><a href="#" data-selector-name="relative">Relative</a></li>
+                        <li><a href="#" data-selector-name="date-selector">Date selector</a></li>
+                        <li><a href="#" data-selector-name="free-selector">Free selector</a></li>
+                        <li><a href="#" data-selector-name="keyword">Keyword</a></li>
+                    </ul>
+                </div>
 
-            <div class="timerange-selector relative">
-                @partials.timerangeselectors.relative(request)
-            </div>
+                <div class="timerange-selector relative">
+                    @partials.timerangeselectors.relative(request)
+                </div>
 
-            <div class="timerange-selector date-selector" style="display: none;">
-                date selector
-            </div>
+                <div class="timerange-selector date-selector" style="display: none;">
+                    date selector
+                </div>
 
-            <div class="timerange-selector free-selector" style="display: none;">
-                free selector
-            </div>
+                <div class="timerange-selector free-selector" style="display: none;">
+                    free selector
+                </div>
 
-            <div class="timerange-selector keyword" style="display: none;">
-                keyword
+                <div class="timerange-selector keyword" style="display: none;">
+                    keyword
+                </div>
             </div>
 
             <div class="query">

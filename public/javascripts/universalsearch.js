@@ -1,12 +1,12 @@
 $(document).ready(function() {
 
-    $(".universalsearch-timerange-selector input[name='timerange-selector-type']").on("change", function() {
+    $(".timerange-chooser .dropdown-menu a").on("click", function() {
         $(".timerange-selector").hide();
-        $(".timerange-selector").attr("disabled", "disabled");
+        $(".timerange-selector input,select").attr("disabled", "disabled");
 
-        var selected = $("." + $(this).val(), $(".universalsearch-form"));
+        var selected = $("." + $(this).attr("data-selector-name"), $(".universalsearch-form"));
         selected.show();
-        selected.removeAttr("disabled");
+        $("input,select", selected).removeAttr("disabled");
     });
 
 });
