@@ -722,8 +722,12 @@ form #stream-rules {
 
 .timerange-selector-container .absolute i {
     font-size: 15px;
-    margin-left: 6px;
-    margin-right: 5px;
+    margin-left: 4px;
+    margin-right: 3px;
     position: relative;
     top: -2px;
+}
+
+.timerange-chooser .selected {
+    font-weight: bold;
 }

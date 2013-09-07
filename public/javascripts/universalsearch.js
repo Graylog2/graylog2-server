@@ -7,6 +7,9 @@ $(document).ready(function() {
         var selected = $("." + $(this).attr("data-selector-name"), $(".universalsearch-form"));
         selected.show();
         $("input,select", selected).removeAttr("disabled");
+
+        $("a", $(this).parent().parent()).removeClass("selected");
+        $(this).addClass("selected");
     });
 
     $("#universalsearch .timerange-selector-container .absolute .date-select").datepicker({
