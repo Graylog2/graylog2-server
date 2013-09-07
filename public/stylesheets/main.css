@@ -679,7 +679,7 @@ form #stream-rules {
     margin-left: 105px;
 }
 
-.analyze-field .overview .wrong-type {
+.analyze-field .statistics .wrong-type {
     margin-top: 5px;
     color: #bbb;
 }
