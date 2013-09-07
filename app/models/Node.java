@@ -20,11 +20,9 @@
 package models;
 
 import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
 import lib.APIException;
 import lib.ApiClient;
-import lib.Configuration;
-import models.api.responses.NodeResponse;
+import lib.ServerNodes;
 import models.api.responses.NodeSummaryResponse;
 import models.api.responses.system.InputSummaryResponse;
 import models.api.responses.system.InputsResponse;
@@ -53,8 +51,6 @@ public class Node {
     // populate this lazily to avoid blowing tests...(the Configuration class isn't loaded at that point)
     private static Node INITIAL_NODE;
 
-    private static final List<Node> nodes = Lists.newArrayList();
-
     public Node(NodeSummaryResponse r) {
         transportAddress = r.transportAddress;
         lastSeen = new DateTime(r.lastSeen);
@@ -68,7 +64,7 @@ public class Node {
         NodeSummaryResponse response;
         try {
             response = ApiClient.get(NodeSummaryResponse.class)
-                    .node(getInitialNode())
+                    .node(ServerNodes.any())
                     .path("/cluster/nodes/{0}", id)
                     .execute();
         } catch (IOException e) {
@@ -80,41 +76,19 @@ public class Node {
         return new Node(response);
     }
 
+    @Deprecated
     public synchronized static List<Node> all() throws IOException, APIException {
-        // TODO don't just get the node list once
-        if (nodes.size() == 0) {
-            NodeResponse response = ApiClient.get(NodeResponse.class)
-                    .path("/cluster/nodes")
-                    .node(getInitialNode())
-                    .execute();
-            for (NodeSummaryResponse nsr : response.nodes) {
-                nodes.add(new Node(nsr));
-            }
-        }
-        return nodes;
+        return ServerNodes.all();
     }
 
-    public static Map<String, Node> map() throws IOException, APIException {
-        Map<String, Node> map = Maps.newHashMap();
-        for (Node node : all()) {
-            map.put(node.getNodeId(), node);
-        }
-
-        return map;
+    @Deprecated
+    public static Map<String, Node> asMap() throws IOException, APIException {
+        return ServerNodes.asMap();
     }
 
+    @Deprecated
     public static Node random() throws IOException, APIException {
-        List<Node> nodes = all();
-        return nodes.get(randomGenerator.nextInt(nodes.size()));
-    }
-
-    public static synchronized Node getInitialNode() {
-        if (INITIAL_NODE == null) {
-            final NodeSummaryResponse r = new NodeSummaryResponse();
-            r.transportAddress = Configuration.getServerRestUris().get(0);
-            INITIAL_NODE = new Node(r);
-        }
-        return INITIAL_NODE;
+        return ServerNodes.any();
     }
 
     public String getThreadDump() throws IOException, APIException {
@@ -176,5 +150,14 @@ public class Node {
             Logger.error("Could not get inputs.", e);
             throw new RuntimeException("Could not get inputs.", e);
         }
+    }
+
+    @Override
+    public String toString() {
+        return "Node{" +
+                "nodeId='" + nodeId + '\'' +
+                ", transportAddress='" + transportAddress + '\'' +
+                ", isMaster=" + isMaster +
+                '}';
     }
 }

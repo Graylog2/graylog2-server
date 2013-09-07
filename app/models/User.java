@@ -84,7 +84,14 @@ public class User {
     }
 
     public static User current() {
-        return (User) Http.Context.current().args.get("currentUser");
+        try {
+            return (User) Http.Context.current().args.get("currentUser");
+        } catch (RuntimeException e) {
+            // Http.Context.current() throws a plain RuntimeException if there's no context,
+            // for example in background threads.
+            // That is fine, because we don't have a current user in those scenarios anyway.
+            return null;
+        }
     }
 
     public static void setCurrent(User user) {

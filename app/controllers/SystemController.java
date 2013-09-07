@@ -67,11 +67,11 @@ public class SystemController extends AuthenticatedController {
 
         try {
             List<ServerJVMStats> serverJvmStats = ServerJVMStats.get();
-            Map<String, Node> nodes = Node.map();
+            Map<String, Node> nodes = Node.asMap();
             Map<String, BufferInfo> bufferInfo = Maps.newHashMap();
 
             // Ask every node for buffer info.
-            for(Node node : Node.all()) {
+            for(Node node : nodes.values()) {
                 bufferInfo.put(node.getNodeId(), BufferInfo.ofNode(node));
             }
 

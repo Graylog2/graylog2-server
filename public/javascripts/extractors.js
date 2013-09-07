@@ -206,7 +206,10 @@ $(document).ready(function() {
     $("#add-converter-fields button").on("click", function() {
         var type = $("#add-converter").val();
 
-        $(".xtrc-converter-" + type).show();
+        var converter = $(".xtrc-converter-" + type);
+
+        converter.show();
+        converter.find(':checkbox').attr("checked", "checked");
         return false;
     });
 
