@@ -728,6 +728,18 @@ form #stream-rules {
     top: -2px;
 }
 
+.timerange-selector .set-to-now {
+    font-size: 12px;
+    line-height: 15px;
+    padding: 4px 4px;
+}
+
+.timerange-selector .set-to-now .icon {
+    font-size: 12px;
+    position: relative;
+    top: 1px;
+}
+
 .timerange-chooser .selected {
     font-weight: bold;
 }

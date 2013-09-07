@@ -15,11 +15,26 @@ $(document).ready(function() {
     $("#universalsearch .timerange-selector-container .absolute .date-select").datepicker({
         format: "yyyy-mm-dd"
     }).on("changeDate", function(ev) {
-        var d = new Date();
-        var hours = ('0' + d.getHours()).slice(-2);
-        var minutes = ('0' + d.getMinutes()).slice(-2);
-
-        $(this).val($(this).val() + " " + hours + "-" + minutes + "-00.000");
+        $(this).val($(this).val() + " 00-00-00");
     });
+
+    $("#universalsearch .timerange-selector-container .absolute .set-to-now").on("click", function() {
+        var input = $("input", $(this).parent());
+
+        var date = new Date();
+        input.val(dateTimeFormatted(date));
+    });
+
+    function dateTimeFormatted(date) {
+        var day = ('0' + date.getDate()).slice(-2); // wtf javascript. this returns the day.
+        var month = ('0' + (date.getMonth() + 1)).slice(-2);
+        var year = date.getFullYear();
+
+        var hour = ('0' + date.getHours()).slice(-2);
+        var minute = ('0' + date.getMinutes()).slice(-2);
+        var second = ('0' + date.getSeconds()).slice(-2);
+
+        return year + "-" + month + "-" + day + " " + hour + "-" + minute + "-" + second;
+    }
 
 });
