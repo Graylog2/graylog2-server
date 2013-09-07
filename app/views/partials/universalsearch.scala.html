@@ -6,19 +6,17 @@
 
         <form class="universalsearch-form" action="@controllers.routes.SearchController.index()" method="GET">
 
-            <div class="universalsearch-timerange-selector">
-                <label class="radio inline">
-                    <input type="radio" name="timerange-selector-type" value="relative" checked="checked"> Relative
-                </label>
-                <label class="radio inline">
-                    <input type="radio" name="timerange-selector-type" value="date-selector"> Date selector
-                </label>
-                <label class="radio inline">
-                    <input type="radio" name="timerange-selector-type" value="free-selector"> Free selector
-                </label>
-                <label class="radio inline">
-                    <input type="radio" name="timerange-selector-type" value="keyword"> Keyword
-                </label>
+            <div class="btn-group timerange-chooser">
+                <a class="btn btn-info dropdown-toggle" data-toggle="dropdown" href="#">
+                    <i class="icon icon-time"></i>
+                    <span class="caret"></span>
+                </a>
+                <ul class="dropdown-menu">
+                    <li><a href="#">Relative</a></li>
+                    <li><a href="#">Date selector</a></li>
+                    <li><a href="#">Free selector</a></li>
+                    <li><a href="#">Keyword</a></li>
+                </ul>
             </div>
 
             <div class="timerange-selector relative">

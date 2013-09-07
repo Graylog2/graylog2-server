@@ -682,10 +682,7 @@ form #stream-rules {
 }
 
 .timerange-selector {
-    border-top: 1px solid #eee;
     border-bottom: 1px solid #eee;
-    margin-top: 5px;
-    padding-top: 9px;
     padding-bottom: 0px;
     margin-bottom: 9px;
     margin-left: 5px;
@@ -693,4 +690,9 @@ form #stream-rules {
 
 .trs-relative select {
     font-size: 12px;
+}
+
+.timerange-chooser {
+    float: left;
+    margin-right: 5px;
 }
