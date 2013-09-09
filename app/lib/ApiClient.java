@@ -290,7 +290,7 @@ public class ApiClient {
 
         URL prepareUrl() {
             // if this is null there's not much we can do anyway...
-            Preconditions.checkNotNull(pathTemplate, "pathTemplate() needs to be set to a non-null value.");
+            Preconditions.checkNotNull(pathTemplate, "path() needs to be set to a non-null value.");
 
             final URL builtUrl;
             try {
