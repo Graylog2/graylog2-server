@@ -86,41 +86,6 @@ public class LogMessageTest {
         assertEquals("hai", lm.getField("ohai"));
     }
 
-    
-    @Test
-    public void testAddFieldTrimsWhiteSpacesTabsAndStuffFromKeyAndValue() {
-        Message lm = new Message("foo", "bar", 0);
-        lm.addField(" one", "value_one");
-        lm.addField(" two  ", "value_two");
-        lm.addField("three ", "value_three");
-        lm.addField("  four   ", "value_four_lol_tab");
-        lm.addField("five", 5); // zomg integer
-        
-        assertEquals("value_one", lm.getField("one"));
-        assertEquals("value_two", lm.getField("two"));
-        assertEquals("value_three", lm.getField("three"));
-        assertEquals("value_four_lol_tab", lm.getField("four"));
-        assertEquals(5, lm.getField("five"));
-    }
-    
-    @Test
-    public void testAddFieldsTrimsWhiteSpacesTabsAndStuffFromKeyAndValueWhenInsertedAsMap() {
-        Message lm = new Message("foo", "bar", 0);
-        Map<String, Object> av = Maps.newHashMap();
-        
-        av.put(" one", "value_one");
-        av.put(" two  ", "value_two");
-        av.put("three ", "value_three");
-        av.put("  four   ", "value_four_lol_tab");
-        
-        lm.addFields(av);
-        
-        assertEquals("value_one", lm.getField("one"));
-        assertEquals("value_two", lm.getField("two"));
-        assertEquals("value_three", lm.getField("three"));
-        assertEquals("value_four_lol_tab", lm.getField("four"));
-    }
-
     @Test
     public void testRemoveField() {
         Message lm = new Message("foo", "bar", 0);
