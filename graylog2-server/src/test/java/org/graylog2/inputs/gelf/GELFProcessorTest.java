@@ -37,7 +37,7 @@ public class GELFProcessorTest {
     public final static String GELF_JSON_INCOMPLETE = "{\"short_message\":\"foo\",\"host\":\"bar\"}";
     public final static String GELF_JSON_INCOMPLETE_WITH_ID = "{\"short_message\":\"foo\",\"host\":\"bar\",\"_id\":\":7\",\"_something\":\"foo\"}";
     public final static String GELF_JSON_WITH_MAP = "{\"short_message\":\"foo\",\"host\":\"bar\",\"_lol\":{\"foo\":\"zomg\"}}";
-    
+
     @Test
     public void testMessageReceived() throws Exception {
         GraylogServerStub serverStub = new GraylogServerStub();
@@ -60,7 +60,7 @@ public class GELFProcessorTest {
         assertEquals(usedTimestamp, (Double) lm.getField("timestamp"), 1e-8);
         assertEquals("ü", lm.getField("_lol_utf8"));
         assertEquals("bar", lm.getField("_foo"));
-        assertEquals(13, lm.getFields().size());
+        assertEquals(11, lm.getFields().size());
     }
 
     @Test
@@ -90,7 +90,7 @@ public class GELFProcessorTest {
         assertEquals(1, serverStub.callsToProcessBufferInserter);
         assertNull(lm.getField("id"));
         assertEquals("foo", lm.getField("_something"));
-        assertEquals(8, lm.getFields().size());
+        assertEquals(5, lm.getFields().size());
     }
     
     @Test
@@ -105,6 +105,6 @@ public class GELFProcessorTest {
 
         assertEquals(1, serverStub.callsToProcessBufferInserter);
         assertEquals("{\"foo\":\"zomg\"}", lm.getField("_lol"));
-        assertEquals(8, lm.getFields().size());
+        assertEquals(5, lm.getFields().size());
     }
 }
