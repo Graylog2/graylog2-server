@@ -1,5 +1,5 @@
 language: javai
 services: mysql # for sonar
-before_script: mysql -e 'create database sonar;'
+before_script: mysql -e "create database sonar; GRANT ALL PRIVILEGES ON sonar.* To 'sonar'@'localhost' IDENTIFIED BY 'sonar'";
 before_install: ./install-syslog4j-jar.sh # installs syslog4j jar to local maven repo
-after_script: 'mvn sonar:sonar -Dsonar.host.url="http://sonar.torch.sh" -Dsonar.jdbc.url="jdbc:mysql://localhost:3306/sonar?useUnicode=true&characterEncoding=utf8&rewriteBatchedStatements=true" -Dsonar.jdbc.username=travis'
+after_script: 'mvn sonar:sonar -Dsonar.host.url="http://sonar.torch.sh" -Dsonar.jdbc.url="jdbc:mysql://localhost:3306/sonar?useUnicode=true&characterEncoding=utf8&rewriteBatchedStatements=true"'
