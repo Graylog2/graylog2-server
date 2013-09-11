@@ -4,4 +4,4 @@ before_script:
   - mysql -e "create database sonar;"
   - mysql -e "set password for 'travis' = password('travis');"
 before_install: ./install-syslog4j-jar.sh # installs syslog4j jar to local maven repo
-after_script: 'mvn sonar:sonar -Dsonar.host.url="http://sonar.torch.sh" -Dsonar.jdbc.url="jdbc:mysql://localhost:3306/sonar?useUnicode=true&characterEncoding=utf8&rewriteBatchedStatements=true" sonar.jdbc.username="travis" sonar.jdbc.password="travis"'
+after_script: 'mvn sonar:sonar -Dsonar.host.url="http://sonar.torch.sh" -Dsonar.jdbc.url="jdbc:mysql://localhost:3306/sonar?useUnicode=true&characterEncoding=utf8&rewriteBatchedStatements=true" -Dsonar.jdbc.username="travis" -Dsonar.jdbc.password="travis"'
