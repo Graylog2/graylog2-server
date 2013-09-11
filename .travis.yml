@@ -1,18 +1,5 @@
----
 language: java
-script: ./travis_tests_with_sonar.sh
 jdk:
-- oraclejdk7
-- openjdk7
-- openjdk6
-before_install: ./install-syslog4j-jar.sh
-env:
-  global:
-  - secure: |-
-      nX57htEg/2ymCjdxcSYWOFoKS4d9YTsw6NLDs+ezsPx+PlFrQ4bokPZcc+fx
-      mtsQzBTuF2MVBoTpHUlLOQEdZpqoH/yDDAPoawqMTa+UQSSJnHhTEqvzs+oq
-      Ii7QvaAGgEByLXTlsXWcaHvXtbthvEGz+dMKtEXbCDijb/x7470=
-  - secure: |-
-      OuZHhgMzEakno3WOGUgJXd7Il0gY5+52erH9OfaK6NQNsXgZTwaNiMDssccS
-      9KTsHRVO8NoSsq++T5N8xZ3pGbpSZjWL/MCm1APb8iO/BDUvG39Y0l0rsCge
-      mfv4xqVlDQakkQSLqkbHXYoccZzWMziFGDcIwrKlNZ0FAfB8bUQ=
+  - oraclejdk7
+  - openjdk7
+  - openjdk6
