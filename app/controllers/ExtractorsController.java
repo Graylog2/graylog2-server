@@ -19,10 +19,8 @@
  */
 package controllers;
 
-import com.google.common.collect.Maps;
-import com.google.gson.Gson;
 import lib.APIException;
-import lib.Api;
+import lib.ApiClient;
 import lib.BreadcrumbList;
 import models.Extractor;
 import models.Input;
@@ -31,7 +29,6 @@ import play.Logger;
 import play.mvc.Result;
 
 import java.io.IOException;
-import java.util.List;
 import java.util.Map;
 
 /**
@@ -52,7 +49,7 @@ public class ExtractorsController extends AuthenticatedController {
                     Extractor.all(node, input))
             );
         } catch (IOException e) {
-            return status(500, views.html.errors.error.render(Api.ERROR_MSG_IO, e, request()));
+            return status(500, views.html.errors.error.render(ApiClient.ERROR_MSG_IO, e, request()));
         } catch (APIException e) {
             String message = "Could not fetch system information. We expected HTTP 200, but got a HTTP " + e.getHttpCode() + ".";
             return status(500, views.html.errors.error.render(message, e, request()));
@@ -74,7 +71,7 @@ public class ExtractorsController extends AuthenticatedController {
                     example)
             );
         } catch (IOException e) {
-            return status(500, views.html.errors.error.render(Api.ERROR_MSG_IO, e, request()));
+            return status(500, views.html.errors.error.render(ApiClient.ERROR_MSG_IO, e, request()));
         } catch (APIException e) {
             String message = "Could not fetch system information. We expected HTTP 200, but got a HTTP " + e.getHttpCode() + ".";
             return status(500, views.html.errors.error.render(message, e, request()));
@@ -108,7 +105,7 @@ public class ExtractorsController extends AuthenticatedController {
             extractor.loadConvertersFromForm(form);
             extractor.create(node, node.getInput(inputId));
         } catch (IOException e) {
-            return status(500, views.html.errors.error.render(Api.ERROR_MSG_IO, e, request()));
+            return status(500, views.html.errors.error.render(ApiClient.ERROR_MSG_IO, e, request()));
         } catch (APIException e) {
             String message = "Could not create extractor! We expected HTTP 200, but got a HTTP " + e.getHttpCode() + ".";
             return status(500, views.html.errors.error.render(message, e, request()));
@@ -124,7 +121,7 @@ public class ExtractorsController extends AuthenticatedController {
 
             return redirect(routes.ExtractorsController.manage(nodeId, inputId));
         } catch (IOException e) {
-            return status(500, views.html.errors.error.render(Api.ERROR_MSG_IO, e, request()));
+            return status(500, views.html.errors.error.render(ApiClient.ERROR_MSG_IO, e, request()));
         } catch (APIException e) {
             String message = "Could not delete extractor! We expected HTTP 204, but got a HTTP " + e.getHttpCode() + ".";
             return status(500, views.html.errors.error.render(message, e, request()));

@@ -1,13 +1,9 @@
 package controllers;
 
-import java.io.IOException;
-import java.util.Map;
-
 import com.google.common.collect.Maps;
 import com.google.gson.Gson;
-
 import lib.APIException;
-import lib.Api;
+import lib.ApiClient;
 import models.FieldMapper;
 import models.Input;
 import models.Message;
@@ -15,7 +11,10 @@ import models.Node;
 import models.api.results.MessageAnalyzeResult;
 import models.api.results.MessageResult;
 import play.Logger;
-import play.mvc.*;
+import play.mvc.Result;
+
+import java.io.IOException;
+import java.util.Map;
 
 public class MessagesController extends AuthenticatedController {
 
@@ -42,7 +41,7 @@ public class MessagesController extends AuthenticatedController {
 
             return ok(views.html.messages.show_as_partial.render(message, getSourceInput(sourceNode, message), sourceNode));
 		} catch (IOException e) {
-			return status(500, views.html.errors.error.render(Api.ERROR_MSG_IO, e, request()));
+			return status(500, views.html.errors.error.render(ApiClient.ERROR_MSG_IO, e, request()));
 		} catch (APIException e) {
 			String message = "Could not get message. We expected HTTP 200, but got a HTTP " + e.getHttpCode() + ".";
 			return status(500, views.html.errors.error.render(message, e, request()));
@@ -61,7 +60,7 @@ public class MessagesController extends AuthenticatedController {
 			MessageAnalyzeResult result = Message.analyze(index, analyzeField);
 			return ok(new Gson().toJson(result.getTokens())).as("application/json");
 		} catch (IOException e) {
-			return status(500, views.html.errors.error.render(Api.ERROR_MSG_IO, e, request()));
+			return status(500, views.html.errors.error.render(ApiClient.ERROR_MSG_IO, e, request()));
 		} catch (APIException e) {
 			String message = "There was a problem with your search. We expected HTTP 200, but got a HTTP " + e.getHttpCode() + ".";
 			return status(500, views.html.errors.error.render(message, e, request()));

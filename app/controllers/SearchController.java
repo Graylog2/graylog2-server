@@ -1,16 +1,16 @@
 package controllers;
 
-import java.io.IOException;
-
 import lib.APIException;
-import lib.Api;
+import lib.ApiClient;
 import lib.SearchTools;
 import models.FieldMapper;
 import models.UniversalSearch;
 import models.api.results.DateHistogramResult;
 import models.api.results.SearchResult;
 import play.Logger;
-import play.mvc.*;
+import play.mvc.Result;
+
+import java.io.IOException;
 
 public class SearchController extends AuthenticatedController {
 
@@ -42,7 +42,7 @@ public class SearchController extends AuthenticatedController {
                 return ok(views.html.search.noresults.render(currentUser(), q));
             }
 		} catch (IOException e) {
-			return status(504, views.html.errors.error.render(Api.ERROR_MSG_IO, e, request()));
+			return status(504, views.html.errors.error.render(ApiClient.ERROR_MSG_IO, e, request()));
 		} catch (APIException e) {
 			String message = "There was a problem with your search. We expected HTTP 200, but got a HTTP " + e.getHttpCode() + ".";
 			return status(504, views.html.errors.error.render(message, e, request()));

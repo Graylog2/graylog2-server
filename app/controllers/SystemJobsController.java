@@ -20,7 +20,7 @@
 package controllers;
 
 import lib.APIException;
-import lib.Api;
+import lib.ApiClient;
 import models.SystemJob;
 import play.Logger;
 import play.mvc.Http;
@@ -51,7 +51,7 @@ public class SystemJobsController {
             SystemJob.trigger(SystemJob.Type.valueOf(body.asFormUrlEncoded().get("job")[0]), currentUser());
             return redirect(routes.SystemController.index(1));
         } catch (IOException e) {
-            return status(504, views.html.errors.error.render(Api.ERROR_MSG_IO, e, request()));
+            return status(504, views.html.errors.error.render(ApiClient.ERROR_MSG_IO, e, request()));
         } catch (APIException e) {
             String message = "Could not trigger system job. We expected HTTP 202, but got a HTTP " + e.getHttpCode() + ".";
             return status(504, views.html.errors.error.render(message, e, request()));

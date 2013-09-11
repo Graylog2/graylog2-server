@@ -3,11 +3,9 @@ package lib;
 import com.google.common.base.Joiner;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Lists;
+import com.google.common.collect.Sets;
 import com.google.gson.Gson;
-import com.ning.http.client.AsyncHttpClient;
-import com.ning.http.client.AsyncHttpClientConfig;
-import com.ning.http.client.Realm;
-import com.ning.http.client.Response;
+import com.ning.http.client.*;
 import models.Node;
 import models.User;
 import models.api.requests.ApiRequest;
@@ -22,15 +20,18 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.text.MessageFormat;
-import java.util.ArrayList;
-import java.util.Collections;
+import java.util.*;
 import java.util.concurrent.ExecutionException;
 
 public class ApiClient {
     private static final Logger log = LoggerFactory.getLogger(ApiClient.class);
 
+    public static final String ERROR_MSG_IO = "Could not connect to graylog2-server. Please make sure that it is running and you configured the correct REST URI.";
+
     private static AsyncHttpClient client;
-    static {
+
+    // explicitly called so we can override it in tests, until we have dependency injection
+    public static void initialize() {
         AsyncHttpClientConfig.Builder builder = new AsyncHttpClientConfig.Builder();
         builder.setAllowPoolingConnection(false);
         client = new AsyncHttpClient(builder.build());
@@ -41,6 +42,11 @@ public class ApiClient {
                 client.close();
             }
         }));
+    }
+
+    // default visibility for access from tests (overrides the effects of initialize())
+    static void setHttpClient(AsyncHttpClient client) {
+        ApiClient.client = client;
     }
 
     public static <T> ApiRequestBuilder<T> get(Class<T> responseClass) {
@@ -115,15 +121,7 @@ public class ApiClient {
             if (! resource.startsWith("/")) {
                 path = "/" + resource;
             }
-            String query = queryParams;
-            if (queryParams == null && path.contains("?")) {
-                log.warn("Use queryParam() to add query parameters, do not append them to the path, because that screws up escaping.");
-                // TODO hack until we separate out the query parameters
-                final int pos = path.indexOf("?");
-                query = path.substring(pos + 1);
-                path = path.substring(0, pos);
-            }
-            targetAddress = new URI(transportAddress.getScheme(), userInfo, transportAddress.getHost(), transportAddress.getPort(), path, query, null);
+            targetAddress = new URI(transportAddress.getScheme(), userInfo, transportAddress.getHost(), transportAddress.getPort(), path, queryParams, null);
 
         } catch (URISyntaxException e) {
             log.error("Could not create target URI", e);
@@ -144,6 +142,7 @@ public class ApiClient {
         }
         private String pathTemplate;
         private Node node;
+        private List<Node> nodes;
         private String username;
         private String password;
         private final Method method;
@@ -152,8 +151,6 @@ public class ApiClient {
         private final ArrayList<Object> pathParams = Lists.newArrayList();
         private final ArrayList<String> queryParams = Lists.newArrayList();
         private int httpStatusCode = Http.Status.OK;
-
-        private AsyncHttpClient.BoundRequestBuilder requestBuilder;
 
         public ApiRequestBuilder(Method method, Class<T> responseClass) {
             this.method = method;
@@ -185,6 +182,19 @@ public class ApiClient {
             this.node = node;
             return this;
         }
+        public ApiRequestBuilder<T> nodes(Node... nodes) {
+            if (this.nodes != null) {
+                // TODO makes this sane
+                throw new IllegalStateException();
+            }
+            this.nodes = Lists.newArrayList(nodes);
+            return this;
+        }
+
+        public ApiRequestBuilder<T> fromAllNodes() {
+            this.nodes = ServerNodes.all();
+            return this;
+        }
 
         public ApiRequestBuilder<T> queryParam(String name, String value) {
             queryParams.add(name + "=" + value);
@@ -213,46 +223,13 @@ public class ApiClient {
 
         public T execute() throws APIException, IOException {
             if (node == null) {
-                try {
-                    node(Node.random());
-                } catch (IOException e) {
-                    // TODO
-                    log.error("Could not get random node", e);
-                } catch (APIException e) {
-                    // TODO
+                if (nodes != null) {
+                    log.error("Multiple nodes are set, but execute() was called. This is most likely a bug and you meant to call executeOnAll()!");
                 }
+                node(ServerNodes.any());
             }
-            final URL url = prepareUrl();
-
-            // *sigh* the generic requestBuilder methods are protected/private making this verbose :(
-            switch (method) {
-                case GET:
-                    requestBuilder = client.prepareGet(url.toString());
-                    break;
-                case POST:
-                    requestBuilder = client.preparePost(url.toString());
-                    break;
-                case PUT:
-                    requestBuilder = client.preparePut(url.toString());
-                    break;
-                case DELETE:
-                    requestBuilder = client.prepareDelete(url.toString());
-                    break;
-            }
-
-            applyBasicAuthentication(requestBuilder, url.getUserInfo());
-
-            if (body != null) {
-                if (method != Method.PUT && method != Method.POST) {
-                    throw new IllegalArgumentException("Cannot set request body on non-PUT or POST requests.");
-                }
-                requestBuilder.addHeader("Content-Type", "application/json");
-                requestBuilder.setBody(body.toJson());
-            }
-            // TODO: should we always insist on things being wrapped in json?
-            if (!responseClass.equals(String.class)) {
-                requestBuilder.addHeader("Accept", "application/json");
-            }
+            final URL url = prepareUrl(node);
+            final AsyncHttpClient.BoundRequestBuilder requestBuilder = requestBuilderForUrl(url);
 
             if (log.isDebugEnabled()) {
                 log.debug("API Request: {}", requestBuilder.build().toString());
@@ -288,7 +265,86 @@ public class ApiClient {
             return null;
         }
 
-        URL prepareUrl() {
+        public Collection<T> executeOnAll() {
+            HashSet<T> results = Sets.newHashSet();
+            if (node == null && nodes == null) {
+                nodes = ServerNodes.all();
+            }
+
+            Collection<ListenableFuture<Response>> requests = Lists.newArrayList();
+            final Collection<Response> responses = Lists.newArrayList();
+            for (Node currentNode : nodes) {
+                final URL url = prepareUrl(currentNode);
+                try {
+                    final AsyncHttpClient.BoundRequestBuilder requestBuilder = requestBuilderForUrl(url);
+                    if (log.isDebugEnabled()) {
+                        log.debug("API Request: {}", requestBuilder.build().toString());
+                    }
+                    requests.add(requestBuilder.execute(new AsyncCompletionHandler<Response>() {
+                        @Override
+                        public Response onCompleted(Response response) throws Exception {
+                            responses.add(response);
+                            return response;
+                        }
+                    }));
+                } catch (IOException e) {
+                    log.error("Cannot execute request", e);
+                }
+            }
+            for (ListenableFuture<Response> request : requests) {
+                try {
+                    final Response response = request.get();
+                    results.add(deserializeJson(response, responseClass));
+                } catch (InterruptedException e) {
+                    e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+                } catch (ExecutionException e) {
+                    e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+                } catch (IOException e) {
+                    e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+                }
+            }
+
+
+            return results;
+        }
+
+        private AsyncHttpClient.BoundRequestBuilder requestBuilderForUrl(URL url) {
+            // *sigh* the generic requestBuilder methods are protected/private making this verbose :(
+            final AsyncHttpClient.BoundRequestBuilder requestBuilder;
+            switch (method) {
+                case GET:
+                    requestBuilder = client.prepareGet(url.toString());
+                    break;
+                case POST:
+                    requestBuilder = client.preparePost(url.toString());
+                    break;
+                case PUT:
+                    requestBuilder = client.preparePut(url.toString());
+                    break;
+                case DELETE:
+                    requestBuilder = client.prepareDelete(url.toString());
+                    break;
+                default:
+                    throw new IllegalStateException("Illegal method " + method.toString());
+            }
+
+            applyBasicAuthentication(requestBuilder, url.getUserInfo());
+
+            if (body != null) {
+                if (method != Method.PUT && method != Method.POST) {
+                    throw new IllegalArgumentException("Cannot set request body on non-PUT or POST requests.");
+                }
+                requestBuilder.addHeader("Content-Type", "application/json");
+                requestBuilder.setBody(body.toJson());
+            }
+            // TODO: should we always insist on things being wrapped in json?
+            if (!responseClass.equals(String.class)) {
+                requestBuilder.addHeader("Accept", "application/json");
+            }
+            return requestBuilder;
+        }
+
+        URL prepareUrl(Node node) {
             // if this is null there's not much we can do anyway...
             Preconditions.checkNotNull(pathTemplate, "path() needs to be set to a non-null value.");
 
