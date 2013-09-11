@@ -1,19 +1,18 @@
-env:
-  global:
-    - secure: |- # SONAR_MYSQL_USER
-        fnPNZoPDs1r01z36Hj+TZUDvKKQDhOjhpW4mYHXePEx6fVVkNxU3d51smFQU
-        \n2T+xkfysGFpl8ChBYBcioiqPjGmRwstB3nEdsMJnY195q2L0Nvl6Hwvqs+
-        YE\nuU0lvy3Kcmr8zefYG9wiESY8KkrPVkPtIbK7NhK4yfucpmTBG14=
-    - secure: |- # SONAR_MYSQL_PASS
-        I8Pcw0bccrk8L66npmmm8dE2rU9FgJNAYJiDOHpbW0sjGXNbO9tl7gX/rwxW
-        \nS1/3sRmL6tVy3nj9FjYiDKCyi9XU7CP5HNsMMkLanRwo3s+taeH8WfT9QW
-        JH\nq76Oa/BBYf65mNV5ypmmmrfTTK3tM9VtTGFMC5O9i0O6lGE9edE= 
-
+---
 language: java
 jdk:
-  - oraclejdk7
-  - openjdk7
-  - openjdk6
-
-before_install: ./install-syslog4j-jar.sh # installs syslog4j jar to local maven repo
+- oraclejdk7
+- openjdk7
+- openjdk6
+before_install: ./install-syslog4j-jar.sh
 after_script: ./travis_sonar.sh
+env:
+  global:
+  - secure: |-
+      nX57htEg/2ymCjdxcSYWOFoKS4d9YTsw6NLDs+ezsPx+PlFrQ4bokPZcc+fx
+      mtsQzBTuF2MVBoTpHUlLOQEdZpqoH/yDDAPoawqMTa+UQSSJnHhTEqvzs+oq
+      Ii7QvaAGgEByLXTlsXWcaHvXtbthvEGz+dMKtEXbCDijb/x7470=
+  - secure: |-
+      OuZHhgMzEakno3WOGUgJXd7Il0gY5+52erH9OfaK6NQNsXgZTwaNiMDssccS
+      9KTsHRVO8NoSsq++T5N8xZ3pGbpSZjWL/MCm1APb8iO/BDUvG39Y0l0rsCge
+      mfv4xqVlDQakkQSLqkbHXYoccZzWMziFGDcIwrKlNZ0FAfB8bUQ=
