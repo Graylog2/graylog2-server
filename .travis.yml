@@ -9,5 +9,10 @@ global:
       JH\nq76Oa/BBYf65mNV5ypmmmrfTTK3tM9VtTGFMC5O9i0O6lGE9edE= 
 
 language: java
+jdk:
+  - oraclejdk7
+  - openjdk7
+  - openjdk6
+
 before_install: ./install-syslog4j-jar.sh # installs syslog4j jar to local maven repo
 after_script: ./travis_sonar.sh
