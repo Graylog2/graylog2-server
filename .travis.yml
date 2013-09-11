@@ -1,12 +1,13 @@
-global:
-  - secure: |- # SONAR_MYSQL_USER
-      fnPNZoPDs1r01z36Hj+TZUDvKKQDhOjhpW4mYHXePEx6fVVkNxU3d51smFQU
-      \n2T+xkfysGFpl8ChBYBcioiqPjGmRwstB3nEdsMJnY195q2L0Nvl6Hwvqs+
-      YE\nuU0lvy3Kcmr8zefYG9wiESY8KkrPVkPtIbK7NhK4yfucpmTBG14=
-  - secure: |- # SONAR_MYSQL_PASS
-      I8Pcw0bccrk8L66npmmm8dE2rU9FgJNAYJiDOHpbW0sjGXNbO9tl7gX/rwxW
-      \nS1/3sRmL6tVy3nj9FjYiDKCyi9XU7CP5HNsMMkLanRwo3s+taeH8WfT9QW
-      JH\nq76Oa/BBYf65mNV5ypmmmrfTTK3tM9VtTGFMC5O9i0O6lGE9edE= 
+env:
+  global:
+    - secure: |- # SONAR_MYSQL_USER
+        fnPNZoPDs1r01z36Hj+TZUDvKKQDhOjhpW4mYHXePEx6fVVkNxU3d51smFQU
+        \n2T+xkfysGFpl8ChBYBcioiqPjGmRwstB3nEdsMJnY195q2L0Nvl6Hwvqs+
+        YE\nuU0lvy3Kcmr8zefYG9wiESY8KkrPVkPtIbK7NhK4yfucpmTBG14=
+    - secure: |- # SONAR_MYSQL_PASS
+        I8Pcw0bccrk8L66npmmm8dE2rU9FgJNAYJiDOHpbW0sjGXNbO9tl7gX/rwxW
+        \nS1/3sRmL6tVy3nj9FjYiDKCyi9XU7CP5HNsMMkLanRwo3s+taeH8WfT9QW
+        JH\nq76Oa/BBYf65mNV5ypmmmrfTTK3tM9VtTGFMC5O9i0O6lGE9edE= 
 
 language: java
 jdk:
