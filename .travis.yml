@@ -1,2 +1,4 @@
-language: java
+language: javai
+services: mysql # for sonar
+before_script: mysql -e 'create database sonar;'
 before_install: ./install-syslog4j-jar.sh # installs syslog4j jar to local maven repo
