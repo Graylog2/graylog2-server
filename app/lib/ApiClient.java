@@ -336,6 +336,8 @@ public class ApiClient {
                 }
                 requestBuilder.addHeader("Content-Type", "application/json");
                 requestBuilder.setBody(body.toJson());
+            } else if(method == Method.POST) {
+                log.warn("POST without body, this doesn't make sense,", new IllegalStateException());
             }
             // TODO: should we always insist on things being wrapped in json?
             if (!responseClass.equals(String.class)) {
