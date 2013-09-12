@@ -66,17 +66,7 @@
             </span>
 
             <h3>
-                <i class="icon icon-code-fork"></i>
-
-                @if(nodes.get(jvm.getNodeId).isMaster()) {
-                    <i class="icon icon-star" title="Master Node"></i>
-                }
-
-                <a href="@routes.SystemController.node(jvm.getNodeId)" class="node-link">
-                    @nodes.get(jvm.getNodeId).getShortNodeId()
-                    /
-                    @nodes.get(jvm.getNodeId).getHostname()
-                </a>
+                @views.html.partials.node_title_link(nodes.get(jvm.getNodeId))
 
                 @if(jvm.isProcessing) {
                     <span class="label label-success">Processing</span>

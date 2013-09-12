@@ -328,6 +328,18 @@ $(document).ready(function() {
        return false;
     });
 
+    // Show fine-grained log level controls.
+    $(".trigger-fine-log-level-controls").on("click", function() {
+        $(".fine-log-level-controls[data-node-id='" + $(this).attr("data-node-id") + "']").toggle();
+    });
+
+    // Check all fine-grained node log level checkboxes.
+    $(".fine-log-level-controls .select-all").on("click", function() {
+        var checkboxes = $(".fine-log-level-controls[data-node-id='" + $(this).attr("data-node-id") + "'] input[type=checkbox]");
+        // The checkbox is already changed when this event is fired so we do not need to invert the condition.
+        checkboxes.prop("checked", checkboxes.prop("checked"));
+    });
+
 	function displayFailureInSidebar(message) {
 		x = "<span class='alert alert-error sidebar-alert'><i class='icon-warning-sign'></i> " + message + "</span>"
 		$("#sidebar-inner").html(x);
