@@ -709,3 +709,7 @@ form #stream-rules {
 .master-node {
     color: #f89406;
 }
+
+.permission-select {
+    width: 350px;
+}

@@ -22,36 +22,33 @@ package models;
 import com.google.common.collect.Lists;
 import lib.APIException;
 import lib.ApiClient;
-import models.api.responses.system.UserResponse;
-import models.api.responses.system.UsersListResponse;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import models.api.responses.RestPermissionsResponse;
 
 import java.io.IOException;
 import java.util.List;
 
-public class Users {
-    private static final Logger log = LoggerFactory.getLogger(Users.class);
+/**
+ * Combines the permissions of both the server and the web-interface.
+ *
+ * This does not take into account different server versions yet!
+ */
+public class Permissions {
 
-    public static List<User> all() {
-        UsersListResponse response;
+    public static List<String> all() {
+        List<String> permissions = Lists.newArrayList();
         try {
-            response = ApiClient.get(UsersListResponse.class).path("/users").execute();
-            List<User> users = Lists.newArrayList();
-            for (UserResponse userResponse : response.users) {
-                users.add(new User(userResponse, null)); // we don't have password's for the user list, obviously
+            RestPermissionsResponse response = ApiClient.get(RestPermissionsResponse.class).path("/system/permissions").execute();
+            for (String group : response.permissions.keySet()) {
+                for (String action : response.permissions.get(group)) {
+                    permissions.add(group + ":" + action);
+                }
             }
-            return users;
-        } catch (IOException e) {
-            log.error("Could not retrieve list of users", e);
         } catch (APIException e) {
-            log.error("Could not retrieve list of users", e);
+            throw new RuntimeException(e);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
         }
-        return Lists.newArrayList();
-    }
-
-    public static User loadUser(String username) {
-        return User.load(username);
+        return permissions;
     }
 
 }

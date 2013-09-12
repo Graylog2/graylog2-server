@@ -17,25 +17,11 @@
  * along with Graylog2.  If not, see <http://www.gnu.org/licenses/>.
  *
  */
-package controllers;
+package models.api.responses;
 
-import models.Permissions;
-import models.User;
-import models.Users;
-import play.mvc.Result;
+import java.util.Collection;
+import java.util.Map;
 
-import java.util.List;
-
-public class UsersController extends AuthenticatedController {
-
-    public static Result index() {
-        final List<User> allUsers = Users.all();
-        final List<String> permissions = Permissions.all();
-        return ok(views.html.users.index.render(currentUser(), allUsers, permissions));
-    }
-
-    public static Result edit(String username) {
-        User user = Users.loadUser(username);
-        return ok(views.html.users.edit.render(currentUser(), user));
-    }
+public class RestPermissionsResponse {
+    public Map<String, Collection<String>> permissions;
 }

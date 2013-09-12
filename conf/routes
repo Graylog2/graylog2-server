@@ -38,6 +38,7 @@ POST        /system/inputs/:node_id/:input_id/extractors/:extractor_id/delete   
 
 # Users
 GET         /system/users                                                            controllers.UsersController.index()
+GET         /system/users/edit/:username                                             controllers.UsersController.edit(username: String)
 
 # Systemjobs
 POST        /systemjobs/trigger                                                      controllers.SystemJobsController.trigger()
