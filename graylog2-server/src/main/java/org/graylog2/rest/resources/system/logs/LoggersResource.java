@@ -42,8 +42,8 @@ public class LoggersResource extends RestResource {
     private static final Map<String, Subsystem> SUBSYSTEMS = new HashMap<String, Subsystem>() {{
         put("graylog2", new Subsystem("Graylog2", "org.graylog2", "All messages from graylog2-owned systems."));
         put("indexer", new Subsystem("Indexer", "org.elasticsearch", "All messages related to indexing and searching."));
-        put("authentication", new Subsystem("Authentication", "org.graylog2", "All user authentication messages."));
-        put("sockets", new Subsystem("Sockets", "org.graylog2", "All messages related to socket communication."));
+        put("authentication", new Subsystem("Authentication", "org.apache.shiro", "All user authentication messages."));
+        put("sockets", new Subsystem("Sockets", "netty", "All messages related to socket communication."));
     }};
 
     @GET
