@@ -5,6 +5,7 @@ import java.io.IOException;
 import lib.APIException;
 import lib.Api;
 import lib.SearchTools;
+import lib.timeranges.*;
 import models.FieldMapper;
 import models.UniversalSearch;
 import models.api.results.DateHistogramResult;
@@ -14,25 +15,42 @@ import play.mvc.*;
 
 public class SearchController extends AuthenticatedController {
 
-    public static Result index(String q, String timerange, String interval) {
-    	int range;
-    	try {
-    		range = Integer.parseInt(timerange);
-    	} catch (NumberFormatException e) {
-    		Logger.warn("Could not parse timerange. Setting to 0.");
-    		range = 0;
-    	}
-    	
+    public static Result index(String q, String rangeType, int relative, String interval) {
     	if (q == null || q.isEmpty()) {
     		q = "*";
     	}
-    	
+
+        // Histogram interval.
     	if (interval == null || interval.isEmpty() || !SearchTools.isAllowedDateHistogramInterval(interval)) {
-    		interval = SearchTools.determineDefaultDateHistogramInterval(range);
+    		interval = "hour";
     	}
-    	
+
+        // Determine timerange type.
+        TimeRange.Type timerangeType;
+        TimeRange timerange;
+        try {
+            timerangeType = TimeRange.Type.valueOf(rangeType.toUpperCase());
+            switch (timerangeType) {
+                case RELATIVE:
+                    timerange = new RelativeRange(relative);
+                    break;
+                case ABSOLUTE:
+                    timerange = new AbsoluteRange("foo", "bar");
+                    break;
+                case KEYWORD:
+                    timerange = new KeywordRange("ZOMG");
+                    break;
+                default:
+                    throw new InvalidRangeParametersException();
+            }
+        } catch(InvalidRangeParametersException e2) {
+            return status(400, views.html.errors.error.render("Invalid range parameters provided.", e2, request()));
+        } catch(IllegalArgumentException e1) {
+            return status(400, views.html.errors.error.render("Invalid range type provided.", e1, request()));
+        }
+
 		try {
-			UniversalSearch search = new UniversalSearch(q, range);
+			UniversalSearch search = new UniversalSearch(timerange, q);
 			SearchResult searchResult = FieldMapper.run(search.search());
 			DateHistogramResult histogramResult = search.dateHistogram(interval);
 

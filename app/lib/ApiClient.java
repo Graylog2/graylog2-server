@@ -24,6 +24,7 @@ import java.net.URL;
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Map;
 import java.util.concurrent.ExecutionException;
 
 public class ApiClient {
@@ -191,6 +192,14 @@ public class ApiClient {
 
         public ApiRequestBuilder<T> queryParam(String name, int value) {
             return queryParam(name, Integer.toString(value));
+        }
+
+        public ApiRequestBuilder<T> queryParams(Map<String, String> params) {
+            for(Map.Entry<String, String> p : params.entrySet()) {
+                queryParam(p.getKey(), p.getValue());
+            }
+
+            return this;
         }
 
         public ApiRequestBuilder<T> credentials(String username, String password) {

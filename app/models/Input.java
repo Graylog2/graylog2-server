@@ -24,6 +24,8 @@ import com.google.common.collect.Maps;
 import lib.APIException;
 import lib.ApiClient;
 import lib.ExclusiveInputException;
+import lib.timeranges.InvalidRangeParametersException;
+import lib.timeranges.RelativeRange;
 import models.api.requests.InputLaunchRequest;
 import models.api.responses.MessageSummaryResponse;
 import models.api.responses.system.InputSummaryResponse;
@@ -136,7 +138,10 @@ public class Input {
     public MessageResult getRecentlyReceivedMessage(String nodeId) throws IOException, APIException {
         String query = "gl2_source_node:" + nodeId + " AND gl2_source_input:" + id;
 
-        UniversalSearch search = new UniversalSearch(query, 60*60*24);
+        UniversalSearch search = null;
+        try {
+            search = new UniversalSearch(new RelativeRange(60*60*24), query);
+        } catch (InvalidRangeParametersException e) {}
         List<MessageSummaryResponse> messages = search.search().getMessages();
 
         MessageSummaryResponse result;

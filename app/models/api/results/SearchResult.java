@@ -5,20 +5,21 @@ import java.util.List;
 import com.google.common.collect.Lists;
 
 import lib.Field;
+import lib.timeranges.TimeRange;
 import models.api.responses.MessageSummaryResponse;
 
 public class SearchResult {
 	
 	private final String originalQuery;
-    private final int originalTimerange;
+    private final TimeRange timeRange;
 	private final int totalResultCount;
 	private final int tookMs;
 	private final List<MessageSummaryResponse> results;
 	private final List<Field> fields;
 
-	public SearchResult(String originalQuery, int timerange, int totalResultCount, int tookMs, List<MessageSummaryResponse> results, List<String> fields) {
+	public SearchResult(String originalQuery, TimeRange timeRange, int totalResultCount, int tookMs, List<MessageSummaryResponse> results, List<String> fields) {
 		this.originalQuery = originalQuery;
-        this.originalTimerange = timerange;
+        this.timeRange = timeRange;
 		this.totalResultCount = totalResultCount;
 		this.tookMs = tookMs;
 		this.results = results;
@@ -33,8 +34,8 @@ public class SearchResult {
 		return originalQuery;
 	}
 
-    public int getOriginalTimerange() {
-        return originalTimerange;
+    public TimeRange getTimeRange() {
+        return timeRange;
     }
 
     public int getTookMs() {
