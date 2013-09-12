@@ -318,6 +318,18 @@ $(document).ready(function() {
         return validate('[data-inputtype="' + $(this).attr("data-type") + '"] form');
     });
 
+    // Open user creation modal
+    $("#create-user-btn").on("click", function() {
+        $('#create-user-dialog').modal();
+    });
+
+    $(".create-user").on("click", function() {
+        return true;
+    });
+
+    // permission chooser
+    $(".permission-select").chosen({search_contains:true, width:"350px"});
+
     // Submit button confirmation.
     $('button[data-confirm]').on("click", function() {
         return confirm($(this).attr("data-confirm"));

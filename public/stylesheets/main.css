@@ -683,3 +683,7 @@ form #stream-rules {
     margin-top: 5px;
     color: #bbb;
 }
+
+.permission-select {
+    width: 350px;
+}
