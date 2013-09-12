@@ -713,3 +713,27 @@ form #stream-rules {
 .permission-select {
     width: 350px;
 }
+
+.loglevel-metrics-row {
+    margin-top: 2px;
+    margin-left: 10px;
+}
+
+.loglevel-metrics dl {
+    margin-bottom: 5px;
+    margin-top: 5px;
+}
+
+.loglevel-metrics dt {
+    float: left;
+    margin-right: 5px;
+}
+
+.subsystems {
+    margin-top: 5px;
+    margin-left: 10px;
+}
+
+.subsystems-row {
+    margin-bottom: 10px;
+}

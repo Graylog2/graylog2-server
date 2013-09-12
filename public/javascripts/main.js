@@ -345,6 +345,11 @@ $(document).ready(function() {
         $(".fine-log-level-controls[data-node-id='" + $(this).attr("data-node-id") + "']").toggle();
     });
 
+    // Show log level metrics.
+    $(".trigger-log-level-metrics").on("click", function() {
+        $(".loglevel-metrics[data-node-id='" + $(this).attr("data-node-id") + "']").toggle();
+    });
+
     // Check all fine-grained node log level checkboxes.
     $(".fine-log-level-controls .select-all").on("click", function() {
         var checkboxes = $(".fine-log-level-controls[data-node-id='" + $(this).attr("data-node-id") + "'] input[type=checkbox]");

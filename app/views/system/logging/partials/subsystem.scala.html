@@ -1,0 +1,24 @@
+@(nodeId: String, subsystem: String, level: String, description: String)
+
+<div class="subsystem span6">
+    <h3 class="u-light">
+        Subsystem: @subsystem
+
+        <div class="btn-group pull-right">
+            <a class="btn btn-mini dropdown-toggle" data-toggle="dropdown" href="#">
+                @level
+                <span class="caret"></span>
+            </a>
+            <ul class="dropdown-menu">
+                <li><a href="#">Fatal</a></li>
+                <li><a href="#">Error</a></li>
+                <li><a href="#">Warn</a></li>
+                <li><a href="#">Info</a></li>
+                <li><a href="#">Debug</a></li>
+                <li><a href="#">Trace</a></li>
+            </ul>
+        </div>
+    </h3>
+
+    @description
+</div>
