@@ -20,16 +20,14 @@
 package models;
 
 import com.google.common.collect.Lists;
-import com.google.common.collect.Sets;
 import lib.APIException;
-import lib.Api;
+import lib.ApiClient;
 import models.api.responses.ByteListing;
 import models.api.responses.system.ServerJVMStatsResponse;
 
 import java.io.IOException;
-import java.net.URL;
+import java.util.Collection;
 import java.util.List;
-import java.util.Set;
 
 /**
  * @author Lennart Koopmann <lennart@torch.sh>
@@ -99,7 +97,7 @@ public class ServerJVMStats {
 
     public static List<ServerJVMStats> get() throws IOException, APIException {
         List<ServerJVMStats> result = Lists.newArrayList();
-        List<ServerJVMStatsResponse> rs = Api.getFromAllNodes("system/jvm", ServerJVMStatsResponse.class);
+        Collection<ServerJVMStatsResponse> rs = ApiClient.get(ServerJVMStatsResponse.class).fromAllNodes().path("/system/jvm").executeOnAll();
 
         for (ServerJVMStatsResponse r : rs) {
             result.add(new ServerJVMStats(r));

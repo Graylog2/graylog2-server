@@ -21,15 +21,11 @@ package controllers;
 
 import com.google.common.collect.Maps;
 import com.google.gson.Gson;
-import lib.APIException;
-import lib.Api;
-import lib.BreadcrumbList;
-import lib.ExclusiveInputException;
+import lib.*;
 import models.Input;
 import models.Node;
 import models.api.responses.system.InputTypeSummaryResponse;
 import models.api.results.MessageResult;
-import play.Logger;
 import play.mvc.Result;
 
 import java.io.IOException;
@@ -65,7 +61,7 @@ public class InputsController extends AuthenticatedController {
                     Input.getAllTypeInformation(node)
             ));
         } catch (IOException e) {
-            return status(500, views.html.errors.error.render(Api.ERROR_MSG_IO, e, request()));
+            return status(500, views.html.errors.error.render(ApiClient.ERROR_MSG_IO, e, request()));
         } catch (APIException e) {
             String message = "Could not fetch system information. We expected HTTP 200, but got a HTTP " + e.getHttpCode() + ".";
             return status(500, views.html.errors.error.render(message, e, request()));
@@ -126,7 +122,7 @@ public class InputsController extends AuthenticatedController {
 
             return redirect(routes.InputsController.manage(nodeId));
         } catch (IOException e) {
-            return status(500, views.html.errors.error.render(Api.ERROR_MSG_IO, e, request()));
+            return status(500, views.html.errors.error.render(ApiClient.ERROR_MSG_IO, e, request()));
         } catch (APIException e) {
             String message = "Could not launch input. We expected HTTP 202, but got a HTTP " + e.getHttpCode() + ".";
             return status(500, views.html.errors.error.render(message, e, request()));
@@ -139,7 +135,7 @@ public class InputsController extends AuthenticatedController {
 
             return redirect(routes.InputsController.manage(nodeId));
         } catch (IOException e) {
-            return status(500, views.html.errors.error.render(Api.ERROR_MSG_IO, e, request()));
+            return status(500, views.html.errors.error.render(ApiClient.ERROR_MSG_IO, e, request()));
         } catch (APIException e) {
             String message = "Could not send terminate request. We expected HTTP 202, but got a HTTP " + e.getHttpCode() + ".";
             return status(500, views.html.errors.error.render(message, e, request()));

@@ -1,4 +1,5 @@
 import com.google.common.collect.Lists;
+import lib.ApiClient;
 import lib.ServerNodes;
 import lib.security.LocalAdminUserRealm;
 import lib.security.PlayAuthenticationListener;
@@ -75,6 +76,7 @@ public class Global extends GlobalSettings {
             initialNodes[i++] = new Node(r);
         }
 
+        ApiClient.initialize();
         ServerNodes.initialize(initialNodes);
 	}
 
