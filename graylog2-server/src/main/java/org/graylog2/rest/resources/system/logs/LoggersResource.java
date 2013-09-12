@@ -29,8 +29,7 @@ import org.slf4j.LoggerFactory;
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
-import java.util.Enumeration;
-import java.util.Map;
+import java.util.*;
 
 /**
  * @author Lennart Koopmann <lennart@torch.sh>
@@ -40,11 +39,18 @@ public class LoggersResource extends RestResource {
 
     private static final org.slf4j.Logger LOG = LoggerFactory.getLogger(LoggersResource.class);
 
+    private static final Map<String, Subsystem> SUBSYSTEMS = new HashMap<String, Subsystem>() {{
+        put("graylog2", new Subsystem("Graylog2", "org.graylog2", "All messages from graylog2-owned systems."));
+        put("indexer", new Subsystem("Indexer", "org.elasticsearch", "All messages related to indexing and searching."));
+        put("authentication", new Subsystem("Authentication", "org.graylog2", "All user authentication messages."));
+        put("sockets", new Subsystem("Sockets", "org.graylog2", "All messages related to socket communication."));
+    }};
+
     @GET
     @Timed
     @Produces(MediaType.APPLICATION_JSON)
     public String loggers() {
-        Map<String, Object> result = Maps.newHashMap();
+        Map<String, Object> loggerList = Maps.newHashMap();
 
         Enumeration loggers = Logger.getRootLogger().getLoggerRepository().getCurrentLoggers();
         while(loggers.hasMoreElements()) {
@@ -54,16 +60,60 @@ public class LoggersResource extends RestResource {
             loggerInfo.put("level", logger.getEffectiveLevel().toString().toLowerCase());
             loggerInfo.put("level_syslog", logger.getEffectiveLevel().getSyslogEquivalent());
 
-            result.put(logger.getName(), loggerInfo);
+            loggerList.put(logger.getName(), loggerInfo);
+        }
+
+        Map<String, Object> result = Maps.newHashMap();
+        result.put("loggers", loggerList);
+        result.put("total", loggerList.size());
+
+        return json(result);
+    }
+
+    @GET
+    @Timed
+    @Path("/subsystems")
+    @Produces(MediaType.APPLICATION_JSON)
+    public String subsytems() {
+        Map<String, Object> result = Maps.newHashMap();
+
+        for(Map.Entry<String, Subsystem> subsystem : SUBSYSTEMS.entrySet()) {
+            Map<String, Object> info = Maps.newHashMap();
+            info.put("title", subsystem.getValue().getTitle());
+            info.put("category", subsystem.getValue().getCategory());
+            info.put("description", subsystem.getValue().getDescription());
+
+            result.put(subsystem.getKey(), info);
         }
 
         return json(result);
     }
 
     @PUT
+    @Path("/subsystems/{subsystem}/level/{level}")
+    @Timed
+    public Response setSubsystemLoggerLevel(@PathParam("subsystem") String subsystemTitle, @PathParam("level") String level) {
+        if (!SUBSYSTEMS.containsKey(subsystemTitle)) {
+            LOG.warn("No such subsystem: [{}]. Returning 404.", subsystemTitle);
+            return Response.status(404).build();
+        }
+
+        Subsystem subsystem = SUBSYSTEMS.get(subsystemTitle);
+
+        // This is never null. Worst case is a logger that does not exist.
+        Logger logger = Logger.getLogger(subsystem.getCategory());
+
+        // Setting the level falls back to DEBUG if provided level is invalid.
+        Level newLevel = Level.toLevel(level.toUpperCase());
+        logger.setLevel(newLevel);
+
+        return Response.ok().build();
+    }
+
+    @PUT
     @Path("/{loggerName}/level/{level}")
     @Timed
-    public Response setLoggerLevel(@PathParam("loggerName") String loggerName, @PathParam("level") String level) {
+    public Response setSingleLoggerLevel(@PathParam("loggerName") String loggerName, @PathParam("level") String level) {
         // This is never null. Worst case is a logger that does not exist.
         Logger logger = Logger.getLogger(loggerName);
 
@@ -74,4 +124,28 @@ public class LoggersResource extends RestResource {
         return Response.ok().build();
     }
 
+    private static class Subsystem {
+
+        private final String title;
+        private final String category;
+        private final String description;
+
+        public Subsystem(String title, String category, String description) {
+            this.title = title;
+            this.category = category;
+            this.description = description;
+        }
+
+        private String getTitle() {
+            return title;
+        }
+
+        private String getCategory() {
+            return category;
+        }
+
+        private String getDescription() {
+            return description;
+        }
+    }
 }
