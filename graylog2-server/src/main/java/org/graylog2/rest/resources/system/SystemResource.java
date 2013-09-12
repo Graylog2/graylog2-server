@@ -144,6 +144,8 @@ public class SystemResource extends RestResource {
     @Timed
     @Produces(MediaType.APPLICATION_JSON)
     public String permissions() {
-        return json(RestPermissions.allPermissions());
+        Map<String, Object> result = Maps.newHashMap();
+        result.put("permissions", RestPermissions.allPermissions());
+        return json(result);
     }
 }
