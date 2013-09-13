@@ -48,6 +48,7 @@ public class User extends Persisted {
     private static final String COLLECTION = "users";
     public static final String USERNAME = "username";
     public static final String PASSWORD = "password";
+    public static final String EMAIL = "email";
     public static final String FULL_NAME = "full_name";
     private static final String PERMISSIONS = "permissions";
 
@@ -150,6 +151,7 @@ public class User extends Persisted {
         return new HashMap<String, Validator>() {{
             put(USERNAME, new FilledStringValidator());
             put(PASSWORD, new FilledStringValidator());
+            put(EMAIL, new FilledStringValidator());
             put(FULL_NAME, new FilledStringValidator());
             put(PERMISSIONS, new ListValidator());
         }};
@@ -166,6 +168,11 @@ public class User extends Persisted {
 
     public String getName() {
         return fields.get(USERNAME).toString();
+    }
+
+    public String getEmail() {
+        final Object email = fields.get(EMAIL);
+        return email == null ? "" : email.toString();
     }
 
     public List<String> getPermissions() {
@@ -185,6 +192,10 @@ public class User extends Persisted {
         @Override
         public String getFullName() {
             return "Administrator";
+        }
+
+        public String getEmail() {
+            return "none";
         }
 
         @Override
