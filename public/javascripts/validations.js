@@ -39,7 +39,11 @@ function dispatchRuleValidation(ref, validatorType) {
     }
 }
 
-d
+function validationFailure(el, msg) {
+    el.popover({
+        content: msg
+    }).popover("show");
+}
 
 // Validators.
 function validateDefined(el) {

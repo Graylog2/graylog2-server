@@ -39,6 +39,7 @@ public class Permissions {
         try {
             RestPermissionsResponse response = ApiClient.get(RestPermissionsResponse.class).path("/system/permissions").execute();
             for (String group : response.permissions.keySet()) {
+                permissions.add(group + ":*");
                 for (String action : response.permissions.get(group)) {
                     permissions.add(group + ":" + action);
                 }

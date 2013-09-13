@@ -113,9 +113,8 @@ public class User {
         } catch (IOException e) {
             log.error("Could not load user " + username, e);
         } catch (APIException e) {
-            log.error("Not allowed to load user " + username, e);
+            log.info("User " + username + " does not exist", e);
         }
-        log.error("Couldn't load user, this is a bug. Handle this.");
         return null;
 	}
 

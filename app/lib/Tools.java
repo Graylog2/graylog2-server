@@ -19,8 +19,12 @@
  */
 package lib;
 
+import com.google.common.collect.Maps;
 import play.Play;
+import play.data.Form;
+import play.mvc.Controller;
 
+import java.util.Map;
 import java.util.Random;
 
 /**
@@ -83,5 +87,24 @@ public class Tools {
         }
         // sb is now at least 16 bytes long, take the first keySize
         return sb.toString().substring(0, keySize).getBytes();
+    }
+
+    public static <T> Form<T> bindMultiValueFormFromRequest(Class<T> requestClass) {
+        Map<String, String> newData = Maps.newHashMap();
+        Map<String, String[]> urlFormEncoded = Controller.request().body().asFormUrlEncoded();
+        if (urlFormEncoded != null) {
+            for (String key : urlFormEncoded.keySet()) {
+                String[] value = urlFormEncoded.get(key);
+                if (value.length == 1) {
+                    newData.put(key, value[0]);
+                } else if (value.length > 1) {
+                    for (int i = 0; i < value.length; i++) {
+                        newData.put(key + "[" + i + "]", value[i]);
+                    }
+                }
+            }
+        }
+        // bind to the MyEntity form object
+        return new Form<>(requestClass).bind(newData);
     }
 }

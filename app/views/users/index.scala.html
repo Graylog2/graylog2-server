@@ -40,50 +40,7 @@
 
     <div class="row-fluid">
         <div class="pull-right">
-            <button id="create-user-btn" class="btn btn-success">Create new account.</button>
+            <a id="create-user-btn" class="btn btn-success" href="@routes.UsersController.newUser()">Create new account.</a>
         </div>
-    </div>
-
-    <!-- create user modal dialog -->
-    <div id="create-user-dialog" class="modal hide fade">
-        <div class="modal-header">
-            <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
-            <h2>
-                <i class="icon-signin"></i>
-                Create a new account
-            </h2>
-        </div>
-        <form action="/system/user" method="POST">
-            <div class="modal-body">
-                <fieldset>
-                    <label for="username">Username</label>
-                    <span class="help-block">Select a unique user name used to log in with.</span>
-                    <input id="username" type="text" required/>
-
-                    <label for="fullname">Full Name</label>
-                    <span class="help-block">Give a descriptive name for this account, e.g. the full name.</span>
-                    <input id="fullname" type="text" required/>
-
-                    <label for="email">Email Address</label>
-                    <span class="help-block">Give the contact email address.</span>
-                    <input id="email" type="text" required />
-
-                    <label for="permissions">Permissions</label>
-                    <span class="help-block">Choose the permissions granted to the account.</span>
-                    <select data-placeholder="Choose permissions..." multiple class="permission-select">
-                        @for(permission <- permissions) {
-                            <option>@permission</option>
-                        }
-                    </select>
-                </fieldset>
-            </div>
-            <div class="modal-footer">
-                <button class="btn" data-dismiss="modal" aria-hidden="true">Close</button>
-                <button type="submit" class="btn btn-primary create-user">
-                    <i class="icon icon-rocket"></i>
-                    Create
-                </button>
-            </div>
-        </form>
     </div>
 }
