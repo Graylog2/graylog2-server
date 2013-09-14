@@ -50,7 +50,7 @@ POST        /systemjobs/trigger                                                 
 GET         /system/logging                                                          controllers.LoggingController.index()
 
 # API: Search (i.e. facets)
-GET         /a/search/fieldstats                                                     controllers.SearchApiController.fieldStats(q ?= "", timerange ?= "", field ?= "")
+GET         /a/search/fieldstats                                                     controllers.SearchApiController.fieldStats(q ?= "", field ?= "", rangetype ?= "", relative:Integer ?= -1, interval ?= "")
 
 # API: Message counts and histograms
 GET         /a/messagecounts/histogram                                               controllers.MessageCountsController.histogram(timerange ?= "")

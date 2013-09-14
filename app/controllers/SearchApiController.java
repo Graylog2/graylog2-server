@@ -22,6 +22,8 @@ package controllers;
 import com.google.common.collect.Maps;
 import com.google.gson.Gson;
 import lib.APIException;
+import lib.SearchTools;
+import lib.timeranges.*;
 import models.UniversalSearch;
 import models.api.responses.FieldStatsResponse;
 import play.Logger;
@@ -35,17 +37,42 @@ import java.util.Map;
  */
 public class SearchApiController extends AuthenticatedController {
 
-    public static Result fieldStats(String q, String timerange, String field) {
-        int range;
+    public static Result fieldStats(String q, String field, String rangeType, int relative, String interval) {
+        if (q == null || q.isEmpty()) {
+            q = "*";
+        }
+
+        // Histogram interval.
+        if (interval == null || interval.isEmpty() || !SearchTools.isAllowedDateHistogramInterval(interval)) {
+            interval = "hour";
+        }
+
+        // Determine timerange type.
+        TimeRange.Type timerangeType;
+        TimeRange timerange;
         try {
-            range = Integer.parseInt(timerange);
-        } catch (NumberFormatException e) {
-            Logger.warn("Could not parse timerange. Setting to 0.");
-            range = 0;
+            timerangeType = TimeRange.Type.valueOf(rangeType.toUpperCase());
+            switch (timerangeType) {
+                case RELATIVE:
+                    timerange = new RelativeRange(relative);
+                    break;
+                case ABSOLUTE:
+                    timerange = new AbsoluteRange("foo", "bar");
+                    break;
+                case KEYWORD:
+                    timerange = new KeywordRange("ZOMG");
+                    break;
+                default:
+                    throw new InvalidRangeParametersException();
+            }
+        } catch(InvalidRangeParametersException e2) {
+            return status(400, views.html.errors.error.render("Invalid range parameters provided.", e2, request()));
+        } catch(IllegalArgumentException e1) {
+            return status(400, views.html.errors.error.render("Invalid range type provided.", e1, request()));
         }
 
         try {
-            UniversalSearch search = new UniversalSearch(q, range);
+            UniversalSearch search = new UniversalSearch(timerange, q);
             FieldStatsResponse stats = search.fieldStats(field);
 
             Map<String, Object> result = Maps.newHashMap();

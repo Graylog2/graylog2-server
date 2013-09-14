@@ -47,7 +47,7 @@ public class TimerangeSelector {
 	}
 	
 	private static boolean isSelected(Request request, int range) {
-		String param = request.getQueryString("timerange");
+		String param = request.getQueryString("relative");
 		if (param == null || param.isEmpty()) {
 			return false;
 		}

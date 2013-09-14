@@ -23,9 +23,9 @@ public class UniversalSearch {
 
     public SearchResult search() throws IOException, APIException {
         SearchResultResponse response = ApiClient.get(SearchResultResponse.class)
-                .path("/search/universal")
-                .queryParam("query", query)
+                .path("/search/universal/{0}", timeRange.getType().toString().toLowerCase())
                 .queryParams(timeRange.getQueryParams())
+                .queryParam("query", query)
                 .execute();
 
         SearchResult result = new SearchResult(
@@ -42,7 +42,7 @@ public class UniversalSearch {
 
     public DateHistogramResult dateHistogram(String interval) throws IOException, APIException {
         DateHistogramResponse response = ApiClient.get(DateHistogramResponse.class)
-                .path("/search/universal/histogram")
+                .path("/search/universal/{0}/histogram", timeRange.getType().toString().toLowerCase())
                 .queryParam("interval", interval)
                 .queryParam("query", query)
                 .queryParams(timeRange.getQueryParams())
@@ -52,7 +52,7 @@ public class UniversalSearch {
 
     public FieldStatsResponse fieldStats(String field) throws IOException, APIException {
         return ApiClient.get(FieldStatsResponse.class)
-                .path("/search/universal/stats")
+                .path("/search/universal/{0}/stats", timeRange.getType().toString().toLowerCase())
                 .queryParam("field", field)
                 .queryParam("query", query)
                 .queryParams(timeRange.getQueryParams())

@@ -30,7 +30,7 @@ public class RelativeRange implements TimeRange {
     private final int range;
 
     public RelativeRange(int range) throws InvalidRangeParametersException {
-        if (range <= 0) {
+        if (range < 0) {
             throw new InvalidRangeParametersException();
         }
 

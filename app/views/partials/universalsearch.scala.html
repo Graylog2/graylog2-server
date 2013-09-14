@@ -6,6 +6,8 @@
 
         <form class="universalsearch-form" action="@controllers.routes.SearchController.index()" method="GET">
 
+            <input type="hidden" name="rangetype" value="relative" id="universalsearch-rangetype" />
+
             <div class="pull-right">
                 <input type="submit" class="btn btn-success btn-small" value="Search"/>
             </div>

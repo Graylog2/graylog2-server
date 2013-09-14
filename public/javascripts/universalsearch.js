@@ -2,6 +2,7 @@ $(document).ready(function() {
 
     $(".timerange-chooser .dropdown-menu a").on("click", function() {
         $(".timerange-selector").hide();
+        $("#universalsearch-rangetype").val($(this).attr("data-selector-name"));
         $(".timerange-selector input,select").attr("disabled", "disabled");
 
         var selected = $("." + $(this).attr("data-selector-name"), $(".universalsearch-form"));
