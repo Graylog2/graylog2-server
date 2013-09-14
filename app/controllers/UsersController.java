@@ -19,16 +19,64 @@
  */
 package controllers;
 
+import lib.BreadcrumbList;
+import lib.Tools;
+import models.CreateUserRequest;
+import models.Permissions;
 import models.User;
 import models.Users;
+import org.apache.shiro.crypto.hash.SimpleHash;
+import play.data.Form;
 import play.mvc.Result;
 
 import java.util.List;
 
 public class UsersController extends AuthenticatedController {
 
+    private static final Form<CreateUserRequest> createUserForm = Form.form(CreateUserRequest.class);
+
     public static Result index() {
         final List<User> allUsers = Users.all();
-        return ok(views.html.users.index.render(currentUser(), allUsers));
+        final List<String> permissions = Permissions.all();
+        return ok(views.html.users.index.render(currentUser(), allUsers, permissions));
+    }
+
+    public static Result newUser() {
+        BreadcrumbList bc = new BreadcrumbList();
+        bc.addCrumb("System", routes.SystemController.index(0));
+        bc.addCrumb("Users", routes.UsersController.index());
+        bc.addCrumb("Create new", routes.UsersController.newUser());
+
+        final List<String> permissions = Permissions.all();
+        return ok(views.html.users.new_user.render(currentUser(), permissions, bc));
+    }
+
+    public static Result create() {
+        Form<CreateUserRequest> createUserRequestForm = Tools.bindMultiValueFormFromRequest(CreateUserRequest.class);
+        final CreateUserRequest request = createUserRequestForm.get();
+
+        if (createUserRequestForm.hasErrors()) {
+            return newUser(); // TODO we really want to pass the filled-out form here. TehSuck
+        }
+        // hash it before sending it across
+        request.password = new SimpleHash("SHA1", request.password).toString();
+        Users.create(request);
+        return redirect(routes.UsersController.index());
+    }
+
+    public static Result edit(String username) {
+        User user = Users.loadUser(username);
+        return ok(views.html.users.edit.render(currentUser(), user));
+    }
+
+    public static Result uniqueUsername(String username) {
+        if (User.LocalAdminUser.getInstance().getName().equals(username)) {
+            return noContent();
+        }
+        if (Users.loadUser(username) == null) {
+            return notFound();
+        } else {
+            return noContent();
+        }
     }
 }

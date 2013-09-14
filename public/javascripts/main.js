@@ -318,6 +318,47 @@ $(document).ready(function() {
         return validate('[data-inputtype="' + $(this).attr("data-type") + '"] form');
     });
 
+    // permission chooser
+    $(".permission-select").chosen({search_contains:true, width:"350px", inherit_select_classes:true});
+
+    var createUsernameField = $("form#create-user-form #username");
+    if (createUsernameField.length) {
+        var domElement = createUsernameField[0];
+        delayedAjaxCallOnKeyup( domElement, function() {
+            var username =  createUsernameField.val();
+            $.ajax({
+                url: "/a/system/users/" + encodeURIComponent(username),
+                type: "GET",
+                cache: false,
+                global: false,
+                statusCode: {
+                    204: function() {
+                        validationFailure( createUsernameField, "Username is already taken.");
+                        domElement.setCustomValidity('The entered user name is already taken.');
+                    },
+                    404: function() {
+                        createUsernameField.popover("destroy");
+                        domElement.setCustomValidity('');
+                    }
+                }
+            });
+        }, 150 );
+    }
+    var repeatPasswordField = $("form#create-user-form #password-repeat");
+    if (repeatPasswordField.length) {
+        var domElement1 = repeatPasswordField[0];
+        delayedAjaxCallOnKeyup(domElement1, function() {
+            var password = $("form#create-user-form #password").val();
+            if (password == repeatPasswordField.val()) {
+                domElement1.setCustomValidity('');
+                repeatPasswordField.popover("destroy");
+            } else {
+                domElement1.setCustomValidity("Passwords do not match!");
+                validationFailure( repeatPasswordField, "Passwords do not match!");
+            }
+        }, 150);
+    }
+
     // Submit button confirmation.
     $('button[data-confirm]').on("click", function() {
         return confirm($(this).attr("data-confirm"));
@@ -326,6 +367,23 @@ $(document).ready(function() {
     // Paginator disabled links should not trigger anything.
     $(".pagination .disabled a").on("click", function() {
        return false;
+    });
+
+    // Show fine-grained log level controls.
+    $(".trigger-fine-log-level-controls").on("click", function() {
+        $(".fine-log-level-controls[data-node-id='" + $(this).attr("data-node-id") + "']").toggle();
+    });
+
+    // Show log level metrics.
+    $(".trigger-log-level-metrics").on("click", function() {
+        $(".loglevel-metrics[data-node-id='" + $(this).attr("data-node-id") + "']").toggle();
+    });
+
+    // Check all fine-grained node log level checkboxes.
+    $(".fine-log-level-controls .select-all").on("click", function() {
+        var checkboxes = $(".fine-log-level-controls[data-node-id='" + $(this).attr("data-node-id") + "'] input[type=checkbox]");
+        // The checkbox is already changed when this event is fired so we do not need to invert the condition.
+        checkboxes.prop("checked", checkboxes.prop("checked"));
     });
 
 	function displayFailureInSidebar(message) {
@@ -387,3 +445,20 @@ function showWarning(message) {
 String.prototype.splice = function( idx, rem, s ) {
     return (this.slice(0,idx) + s + this.slice(idx + Math.abs(rem)));
 };
+
+function delayedAjaxCallOnKeyup(el, callback, delay) {
+    var timer = null;
+    el.onkeyup = function() {
+        if (timer) {
+            window.clearTimeout(timer);
+        }
+        timer = window.setTimeout( function() {
+            timer = null;
+            callback();
+        }, delay );
+    };
+    el.onblur = function() {
+        callback();
+    };
+    el = null;
+}

@@ -459,7 +459,7 @@ form #stream-rules {
     margin-bottom: 10px;
 }
 
-.node-row .node-link {
+.node-link {
     color: #000;
 }
 
@@ -681,6 +681,7 @@ form #stream-rules {
     color: #bbb;
 }
 
+<<<<<<< HEAD
 .timerange-selector-container {
     border-bottom: 1px solid #eee;
     padding-bottom: 6px;
@@ -742,4 +743,58 @@ form #stream-rules {
 
 .timerange-chooser .selected {
     font-weight: bold;
+}
+
+.fine-log-level-controls dl {
+    margin-bottom: 0px;
+    margin-top: 5px;
+    margin-left: 10px;
+}
+
+.fine-log-level-controls dt {
+    float: left;
+    margin-right: 15px;
+}
+
+.fine-log-level-controls label {
+    margin-bottom: 0px;
+    font-size: 12px;
+}
+
+.fine-log-level-controls input {
+    position: relative;
+    top: -3px;
+    margin-right: 2px;
+}
+
+.master-node {
+    color: #f89406;
+}
+
+.permission-select {
+    width: 350px;
+}
+
+.loglevel-metrics-row {
+    margin-top: 2px;
+    margin-left: 10px;
+}
+
+.loglevel-metrics dl {
+    margin-bottom: 5px;
+    margin-top: 5px;
+}
+
+.loglevel-metrics dt {
+    float: left;
+    margin-right: 5px;
+}
+
+.subsystems {
+    margin-top: 5px;
+    margin-left: 10px;
+}
+
+.subsystems-row {
+    margin-bottom: 10px;
 }

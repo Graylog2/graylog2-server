@@ -49,4 +49,18 @@ public class Users {
         }
         return Lists.newArrayList();
     }
+
+    public static User loadUser(String username) {
+        return User.load(username);
+    }
+
+    public static void create(CreateUserRequest request) {
+        try {
+            ApiClient.post().path("/users").body(request).execute();
+        } catch (APIException e) {
+            log.error("Unable to create user", e);
+        } catch (IOException e) {
+            log.error("Unable to create user", e);
+        }
+    }
 }
