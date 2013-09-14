@@ -25,6 +25,8 @@ import java.util.Set;
 import com.google.common.collect.Lists;
 import org.elasticsearch.index.query.FilterBuilder;
 import org.elasticsearch.index.query.FilterBuilders;
+import org.graylog2.indexer.searches.timeranges.RelativeRange;
+import org.graylog2.indexer.searches.timeranges.TimeRange;
 import org.graylog2.plugin.Tools;
 
 /**
@@ -53,15 +55,34 @@ public class IndexHelper {
         return r;
     }
 
-    public static FilterBuilder getTimestampRangeFilter(int timerange) {
-    	if (timerange <= 0) {
+    public static FilterBuilder getTimestampRangeFilter(TimeRange range) {
+    	if (range == null) {
     		return null;
     	}
-    	
-		String from = Tools.buildElasticSearchTimeFormatFromDouble(Tools.getUTCTimestamp()-timerange);
-		return FilterBuilders.rangeFilter("timestamp").from(from);
+
+        switch (range.getType()) {
+            case RELATIVE:
+                return buildRelativeFilterBuilder(range);
+            case ABSOLUTE:
+                throw new RuntimeException("Implement range type: absolute");
+            case KEYWORD:
+                throw new RuntimeException("Implement range type: keyword");
+            default:
+                throw new RuntimeException("No such range type: [" + range.getType() + "]");
+        }
     }
-    
+
+    private static FilterBuilder buildRelativeFilterBuilder(TimeRange range) {
+        RelativeRange rr = (RelativeRange) range;
+        int from = 0;
+        if (rr.getRange() > 0) {
+            from = Tools.getUTCTimestamp()-rr.getRange();
+        }
+
+        String fromDate = Tools.buildElasticSearchTimeFormatFromDouble(from);
+        return FilterBuilders.rangeFilter("timestamp").from(fromDate);
+    }
+
     private static String getPrefix(Set<String> names) {
         if (names.isEmpty()) {
             return "";

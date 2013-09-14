@@ -44,7 +44,10 @@ import org.graylog2.indexer.results.DateHistogramResult;
 import org.graylog2.indexer.results.FieldStatsResult;
 import org.graylog2.indexer.results.SearchResult;
 import org.graylog2.indexer.results.TermsResult;
+import org.graylog2.indexer.searches.timeranges.TimeRange;
 import org.graylog2.plugin.Tools;
+
+import javax.ws.rs.WebApplicationException;
 
 import static org.elasticsearch.index.query.QueryBuilders.matchAllQuery;
 import static org.elasticsearch.index.query.QueryBuilders.queryString;
@@ -67,16 +70,16 @@ public class Searches {
 		this.c = client;
 	}
 	
-	public SearchResult search(String query, int timerange, int limit) {
+	public SearchResult search(String query, TimeRange range, int limit) {
         if(limit <= 0) {
             limit = LIMIT;
         }
 
-		SearchResponse r = c.search(standardSearchRequest(query, limit, timerange, SortOrder.DESC).request()).actionGet();
+		SearchResponse r = c.search(standardSearchRequest(query, limit, range, SortOrder.DESC).request()).actionGet();
 		return new SearchResult(r.getHits(), query, r.getTook());
 	}
 
-    public TermsResult terms(String field, int size, String query, int timerange) {
+    public TermsResult terms(String field, int size, String query, TimeRange range) {
         if (size == 0) {
             size = 50;
         }
@@ -84,7 +87,7 @@ public class Searches {
         SearchRequestBuilder srb = standardSearchRequest(query);
 
         TermsFacetBuilder terms = new TermsFacetBuilder(TERMS_FACET_NAME);
-        terms.facetFilter(IndexHelper.getTimestampRangeFilter(timerange));
+        terms.facetFilter(IndexHelper.getTimestampRangeFilter(range));
         terms.global(false);
         terms.field(field);
         terms.size(size);
@@ -100,12 +103,12 @@ public class Searches {
         );
     }
 
-    public FieldStatsResult fieldStats(String field, String query, int timerange) throws FieldTypeException {
+    public FieldStatsResult fieldStats(String field, String query, TimeRange range) throws FieldTypeException {
         SearchRequestBuilder srb = standardSearchRequest(query);
 
         StatisticalFacetBuilder stats = new StatisticalFacetBuilder(STATS_FACET_NAME);
         stats.global(false);
-        stats.facetFilter(IndexHelper.getTimestampRangeFilter(timerange));
+        stats.facetFilter(IndexHelper.getTimestampRangeFilter(range));
         stats.field(field);
 
         srb.addFacet(stats);
@@ -124,10 +127,10 @@ public class Searches {
         );
     }
 	
-	public DateHistogramResult histogram(String query, Indexer.DateHistogramInterval interval, int timerange) {
-		DateHistogramFacetBuilder fb = FacetBuilders.dateHistogramFacet("histogram")
+	public DateHistogramResult histogram(String query, Indexer.DateHistogramInterval interval, TimeRange range) {
+        DateHistogramFacetBuilder fb = FacetBuilders.dateHistogramFacet("histogram")
 				.field("timestamp")
-				.facetFilter(IndexHelper.getTimestampRangeFilter(timerange))
+				.facetFilter(IndexHelper.getTimestampRangeFilter(range))
 				.interval(interval.toString().toLowerCase());
 		
 		SearchRequestBuilder srb = c.prepareSearch();
@@ -148,10 +151,10 @@ public class Searches {
     }
 
     private SearchRequestBuilder standardSearchRequest(String query) {
-        return standardSearchRequest(query, 0, 0, null);
+        return standardSearchRequest(query, 0, null, null);
     }
 
-    private SearchRequestBuilder standardSearchRequest(String query, int limit, int timerange, SortOrder sort) {
+    private SearchRequestBuilder standardSearchRequest(String query, int limit, TimeRange range, SortOrder sort) {
         SearchRequestBuilder srb = c.prepareSearch();
         srb.setIndices(server.getDeflector().getAllDeflectorIndexNames()); // XXX 020: have a method that builds time ranged index requests
         srb.setQuery(queryString(query));
@@ -160,8 +163,8 @@ public class Searches {
             srb.setSize(limit);
         }
 
-        if (timerange > 0) {
-            srb.setFilter(IndexHelper.getTimestampRangeFilter(timerange));
+        if (range != null) {
+            srb.setFilter(IndexHelper.getTimestampRangeFilter(range));
         }
 
         if (sort != null) {

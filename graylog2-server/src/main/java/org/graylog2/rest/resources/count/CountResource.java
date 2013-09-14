@@ -48,36 +48,4 @@ public class CountResource extends RestResource {
         return json(result);
     }
 
-    @GET @Path("/histogram") @Timed
-    @Produces(MediaType.APPLICATION_JSON)
-    public String histogram(@QueryParam("interval") String interval, @QueryParam("timerange") int timerange) {
-        if (interval == null || interval.isEmpty()) {
-            LOG.error("Missing parameters. Returning HTTP 400.");
-            throw new WebApplicationException(400);
-        }
-
-        if (timerange <= 0) {
-        	LOG.error("Invalid timerange. Returning HTTP 400.");
-        	throw new WebApplicationException(400);
-        }
-
-        interval = interval.toUpperCase();
-        try {
-        	Indexer.DateHistogramInterval.valueOf(interval);
-        } catch (IllegalArgumentException e) {
-        	LOG.error("Invalid interval type. Returning HTTP 400.");
-        	throw new WebApplicationException(400);
-        }
-        
-        DateHistogramResult dhr = core.getIndexer().counts().histogram(Indexer.DateHistogramInterval.valueOf(interval), timerange);
-
-        // TODO: Replace with Jackson JAX-RS provider and proper data binding
-        Map<String, Object> result = Maps.newHashMap();
-        result.put("query", dhr.getOriginalQuery());
-        result.put("interval", dhr.getInterval().toString().toLowerCase());
-        result.put("results", dhr.getResults());
-        result.put("time", dhr.took().millis());
-
-        return json(result);
-    }
 }

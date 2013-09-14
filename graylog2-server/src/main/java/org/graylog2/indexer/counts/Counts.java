@@ -51,20 +51,4 @@ public class Counts {
         return c.count(new CountRequest(server.getDeflector().getAllDeflectorIndexNames())).actionGet().getCount();
     }
 	
-
-	public DateHistogramResult histogram(Indexer.DateHistogramInterval interval, int timerange) {
-		DateHistogramFacetBuilder fb = FacetBuilders.dateHistogramFacet("histogram")
-				.field("timestamp")
-				.facetFilter(IndexHelper.getTimestampRangeFilter(timerange))
-				.interval(interval.toString().toLowerCase());
-		
-		SearchRequestBuilder srb = c.prepareSearch();
-		srb.setIndices(server.getDeflector().getAllDeflectorIndexNames()); // XXX 020: have a method that builds time ranged index requests
-		srb.setQuery(matchAllQuery());
-		srb.addFacet(fb);
-		
-		SearchResponse r = c.search(srb.request()).actionGet();
-		return new DateHistogramResult((DateHistogramFacet) r.getFacets().facet("histogram"), "match_all", interval, r.getTook());
-	}
-	
 }
