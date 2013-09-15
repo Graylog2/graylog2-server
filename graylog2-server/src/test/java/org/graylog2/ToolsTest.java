@@ -223,9 +223,9 @@ public class ToolsTest {
          * to avoid problems on test systems in other time zones, that are not CEST and do
          * not end with a +02:00 or shit.)
          */
-        assert(DateTime.parse("2013-09-15 02-21-02", Tools.timeFormatterWithOptionalMilliseconds()).toString().startsWith("2013-09-15T02:21:02.000+"));
-        assert(DateTime.parse("2013-09-15 02-21-02.123", Tools.timeFormatterWithOptionalMilliseconds()).toString().startsWith("2013-09-15T02:21:02.123+"));
-        assert(DateTime.parse("2013-09-15 02-21-02.12", Tools.timeFormatterWithOptionalMilliseconds()).toString().startsWith("2013-09-15T02:21:02.120+"));
-        assert(DateTime.parse("2013-09-15 02-21-02.1", Tools.timeFormatterWithOptionalMilliseconds()).toString().startsWith("2013-09-15T02:21:02.100+"));
+        assert(DateTime.parse("2013-09-15 02-21-02", Tools.timeFormatterWithOptionalMilliseconds()).toString().startsWith("2013-09-15T02:21:02.000"));
+        assert(DateTime.parse("2013-09-15 02-21-02.123", Tools.timeFormatterWithOptionalMilliseconds()).toString().startsWith("2013-09-15T02:21:02.123"));
+        assert(DateTime.parse("2013-09-15 02-21-02.12", Tools.timeFormatterWithOptionalMilliseconds()).toString().startsWith("2013-09-15T02:21:02.120"));
+        assert(DateTime.parse("2013-09-15 02-21-02.1", Tools.timeFormatterWithOptionalMilliseconds()).toString().startsWith("2013-09-15T02:21:02.100"));
     }
 }
