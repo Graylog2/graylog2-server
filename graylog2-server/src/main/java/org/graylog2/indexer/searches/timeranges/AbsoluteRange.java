@@ -19,18 +19,34 @@
  */
 package org.graylog2.indexer.searches.timeranges;
 
-import java.util.Map;
-
 /**
  * @author Lennart Koopmann <lennart@torch.sh>
  */
-public interface TimeRange {
+public class AbsoluteRange implements TimeRange{
 
-    public enum Type {
-        RELATIVE,
-        ABSOLUTE
+    private final String from;
+    private final String to;
+
+    public AbsoluteRange(String from, String to) throws InvalidRangeParametersException {
+        if (from == null || from.isEmpty() || to == null || to.isEmpty()) {
+            throw new InvalidRangeParametersException();
+        }
+
+        this.from = from;
+        this.to = to;
     }
 
-    public Type getType();
+    @Override
+    public Type getType() {
+        return Type.ABSOLUTE;
+    }
+
+    public String getFrom() {
+        return from;
+    }
+
+    public String getTo() {
+        return to;
+    }
 
 }

@@ -28,6 +28,7 @@ import org.graylog2.indexer.results.FieldStatsResult;
 import org.graylog2.indexer.results.SearchResult;
 import org.graylog2.indexer.results.TermsResult;
 import org.graylog2.indexer.searches.Searches;
+import org.graylog2.indexer.searches.timeranges.AbsoluteRange;
 import org.graylog2.indexer.searches.timeranges.InvalidRangeParametersException;
 import org.graylog2.indexer.searches.timeranges.RelativeRange;
 import org.graylog2.indexer.searches.timeranges.TimeRange;
@@ -46,9 +47,13 @@ import java.util.Map;
 public class SearchResource extends RestResource {
     private static final Logger LOG = LoggerFactory.getLogger(SearchResource.class);
 
+    /*
+     * Relative timerange.
+     */
+
     @GET @Path("/universal/relative") @Timed
     @Produces(MediaType.APPLICATION_JSON)
-    public String search(@QueryParam("query") String query, @QueryParam("range") int range, @QueryParam("limit") int limit) {
+    public String searchRelative(@QueryParam("query") String query, @QueryParam("range") int range, @QueryParam("limit") int limit) {
         checkQuery(query);
 
         return json(buildSearchResult(
@@ -58,7 +63,7 @@ public class SearchResource extends RestResource {
 
     @GET @Path("/universal/relative/terms") @Timed
     @Produces(MediaType.APPLICATION_JSON)
-    public String terms(@QueryParam("field") String field, @QueryParam("query") String query, @QueryParam("size") int size, @QueryParam("range") int range) {
+    public String termsRelative(@QueryParam("field") String field, @QueryParam("query") String query, @QueryParam("size") int size, @QueryParam("range") int range) {
         checkQueryAndField(query, field);
 
         return json(buildTermsResult(
@@ -68,7 +73,7 @@ public class SearchResource extends RestResource {
 
     @GET @Path("/universal/relative/stats") @Timed
     @Produces(MediaType.APPLICATION_JSON)
-    public String stats(@QueryParam("field") String field, @QueryParam("query") String query, @QueryParam("range") int range) {
+    public String statsRelative(@QueryParam("field") String field, @QueryParam("query") String query, @QueryParam("range") int range) {
         checkQueryAndField(query, field);
 
         return json(buildFieldStatsResult(
@@ -78,7 +83,7 @@ public class SearchResource extends RestResource {
 
     @GET @Path("/universal/relative/histogram") @Timed
     @Produces(MediaType.APPLICATION_JSON)
-    public String histogram(@QueryParam("query") String query, @QueryParam("interval") String interval, @QueryParam("range") int range) {
+    public String histogramRelative(@QueryParam("query") String query, @QueryParam("interval") String interval, @QueryParam("range") int range) {
         interval = interval.toUpperCase();
         checkQueryAndInterval(query, interval);
         validateInterval(interval);
@@ -92,6 +97,56 @@ public class SearchResource extends RestResource {
         ));
     }
 
+    /*
+     * Absolute timerange.
+     */
+
+    @GET @Path("/universal/absolute") @Timed
+    @Produces(MediaType.APPLICATION_JSON)
+    public String searchKeyword(@QueryParam("query") String query, @QueryParam("from") String from, @QueryParam("to") String to, @QueryParam("limit") int limit) {
+        checkQuery(query);
+
+        return json(buildSearchResult(
+                core.getIndexer().searches().search(query, buildAbsoluteTimeRange(from, to), limit)
+        ));
+    }
+
+    @GET @Path("/universal/absolute/terms") @Timed
+    @Produces(MediaType.APPLICATION_JSON)
+    public String termsKeyword(@QueryParam("field") String field, @QueryParam("query") String query, @QueryParam("size") int size, @QueryParam("from") String from, @QueryParam("to") String to) {
+        checkQueryAndField(query, field);
+
+        return json(buildTermsResult(
+                core.getIndexer().searches().terms(field, size, query, buildAbsoluteTimeRange(from, to))
+        ));
+    }
+
+    @GET @Path("/universal/absolute/stats") @Timed
+    @Produces(MediaType.APPLICATION_JSON)
+    public String statsKeyword(@QueryParam("field") String field, @QueryParam("query") String query, @QueryParam("from") String from, @QueryParam("to") String to) {
+        checkQueryAndField(query, field);
+
+        return json(buildFieldStatsResult(
+                fieldStats(field, query, buildAbsoluteTimeRange(from, to))
+        ));
+    }
+
+    @GET @Path("/universal/absolute/histogram") @Timed
+    @Produces(MediaType.APPLICATION_JSON)
+    public String histogramKeyword(@QueryParam("query") String query, @QueryParam("interval") String interval, @QueryParam("from") String from, @QueryParam("to") String to) {
+        interval = interval.toUpperCase();
+        checkQueryAndInterval(query, interval);
+        validateInterval(interval);
+
+        return json(buildHistogramResult(
+                core.getIndexer().searches().histogram(
+                        query,
+                        Indexer.DateHistogramInterval.valueOf(interval),
+                        buildAbsoluteTimeRange(from, to)
+                )
+        ));
+    }
+
     private void validateInterval(String interval) {
         try {
             Indexer.DateHistogramInterval.valueOf(interval);
@@ -100,7 +155,6 @@ public class SearchResource extends RestResource {
             throw new WebApplicationException(400);
         }
     }
-
 
     private void checkQuery(String query) {
         if (query == null || query.isEmpty()) {
@@ -135,6 +189,15 @@ public class SearchResource extends RestResource {
     private TimeRange buildRelativeTimeRange(int range) {
         try {
             return new RelativeRange(range);
+        } catch (InvalidRangeParametersException e) {
+            LOG.warn("Invalid timerange parameters provided. Returning HTTP 400.");
+            throw new WebApplicationException(400);
+        }
+    }
+
+    private TimeRange buildAbsoluteTimeRange(String from, String to) {
+        try {
+            return new AbsoluteRange(from, to);
         } catch (InvalidRangeParametersException e) {
             LOG.warn("Invalid timerange parameters provided. Returning HTTP 400.");
             throw new WebApplicationException(400);
