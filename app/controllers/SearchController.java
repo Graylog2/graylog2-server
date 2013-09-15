@@ -15,7 +15,7 @@ import java.io.IOException;
 
 public class SearchController extends AuthenticatedController {
 
-    public static Result index(String q, String rangeType, int relative, String interval) {
+    public static Result index(String q, String rangeType, int relative, String from, String to, String interval) {
     	if (q == null || q.isEmpty()) {
     		q = "*";
     	}
@@ -35,10 +35,7 @@ public class SearchController extends AuthenticatedController {
                     timerange = new RelativeRange(relative);
                     break;
                 case ABSOLUTE:
-                    timerange = new AbsoluteRange("foo", "bar");
-                    break;
-                case KEYWORD:
-                    timerange = new KeywordRange("ZOMG");
+                    timerange = new AbsoluteRange(from, to);
                     break;
                 default:
                     throw new InvalidRangeParametersException();
