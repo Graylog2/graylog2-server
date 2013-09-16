@@ -21,6 +21,7 @@ package controllers;
 
 import lib.APIException;
 import com.google.gson.Gson;
+import lib.NaturalDateTest;
 import lib.extractors.testers.RegexTest;
 import lib.extractors.testers.SplitAndIndexTest;
 import lib.extractors.testers.SubstringTest;
@@ -71,6 +72,23 @@ public class ToolsApiController extends AuthenticatedController {
         } catch (IOException e) {
             return internalServerError("io exception");
         } catch (APIException e) {
+            return internalServerError("api exception " + e);
+        }
+    }
+
+    public static Result naturalDateTest(String string) {
+        if (string.isEmpty()) {
+            return badRequest();
+        }
+
+        try {
+            return ok(new Gson().toJson(NaturalDateTest.test(string))).as("application/json");
+        } catch (IOException e) {
+            return internalServerError("io exception");
+        } catch (APIException e) {
+            if (e.getHttpCode() == 422) {
+                return status(422);
+            }
             return internalServerError("api exception " + e);
         }
     }

@@ -26,6 +26,26 @@ $(document).ready(function() {
         input.val(dateTimeFormatted(date));
     });
 
+    $("#universalsearch .timerange-selector-container .keyword input").typeWatch({
+        callback: function (string) {
+            $.ajax({
+                url: '/a/tools/natural_date_test',
+                data: {
+                    "string": string,
+                },
+                success: function(data) {
+                    console.log(data);
+                },
+                statusCode: { 422: function() {
+                    console.log("INVALID");
+                }}
+            });
+        },
+        wait: 750,
+        highlight: true,
+        captureLength: 2
+    });
+
     function dateTimeFormatted(date) {
         var day = ('0' + date.getDate()).slice(-2); // wtf javascript. this returns the day.
         var month = ('0' + (date.getMonth() + 1)).slice(-2);
