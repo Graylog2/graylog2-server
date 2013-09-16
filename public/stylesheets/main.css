@@ -686,7 +686,10 @@ form #stream-rules {
     padding-bottom: 6px;
     margin-bottom: 8px;
     margin-left: 5px;
-    height: 25px;
+}
+
+.timerange-selector-container .input-prepend,.input-append {
+    margin-bottom: 0px;
 }
 
 .timerange-selector select {
@@ -718,6 +721,7 @@ form #stream-rules {
 .timerange-selector input {
     height: 15px;
     font-size: 12px;
+    margin-bottom: 0px;
 }
 
 .timerange-selector-container .absolute i {
@@ -725,7 +729,7 @@ form #stream-rules {
     margin-left: 4px;
     margin-right: 3px;
     position: relative;
-    top: -2px;
+    top: 2px;
 }
 
 .timerange-selector .set-to-now {
@@ -796,4 +800,16 @@ form #stream-rules {
 
 .subsystems-row {
     margin-bottom: 10px;
+}
+
+#universalsearch .timerange-selector-container .keyword .preview {
+    margin-top: 4px;
+    margin-left: 45px;
+    font-size: 11px;
+}
+
+#universalsearch .timerange-selector-container .keyword .preview .fromto span {
+    background-color: #fec;
+    padding-left: 3px;
+    padding-right: 3px;
 }
