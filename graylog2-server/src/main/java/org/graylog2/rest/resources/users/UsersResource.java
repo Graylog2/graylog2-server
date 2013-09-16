@@ -34,12 +34,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.ws.rs.*;
-import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
-import javax.ws.rs.core.SecurityContext;
 import java.io.IOException;
-import java.security.Principal;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -57,17 +54,17 @@ public class UsersResource extends RestResource {
 
     @GET
     @Path("{username}")
-    public Response get(@Context SecurityContext securityContext, @PathParam("username") String username) {
-        final Principal principal = securityContext.getUserPrincipal();
+    public Response get(@PathParam("username") String username) {
         final User user = User.load(username, core);
 
         if (user == null) {
             return Response.status(Response.Status.NOT_FOUND).build();
         }
         // if the requested username does not match the authenticated user, then we don't return permission information
-        // TODO also check if the principal has the necessary permissions to actually see the permissions (for editing them!)
-        final boolean isSameUser = principal.getName().equals(username);
-        return Response.ok().entity(json(toMap(user, isSameUser))).build();
+        final boolean allowedToSeePermissions = getSubject().isPermitted(RestPermissions.USERPERMISSIONS_EDIT);
+        final boolean permissionsAllowed = getSubject().getPrincipal().toString().equals(username) || allowedToSeePermissions;
+
+        return Response.ok().entity(json(toMap(user, permissionsAllowed))).build();
     }
 
     @GET
