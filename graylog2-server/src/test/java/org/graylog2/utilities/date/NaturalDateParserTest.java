@@ -48,4 +48,9 @@ public class NaturalDateParserTest {
         new NaturalDateParser().parse("LOLWUT");
     }
 
+    @Test(expected = NaturalDateParser.DateNotParsableException.class)
+    public void testParseFailsOnEmptyDate() throws Exception, NaturalDateParser.DateNotParsableException {
+        new NaturalDateParser().parse("");
+    }
+
 }
