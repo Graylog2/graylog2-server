@@ -24,15 +24,20 @@ import com.codahale.metrics.Timer;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.Maps;
+import org.apache.shiro.subject.Subject;
 import org.bson.types.ObjectId;
 import org.graylog2.Core;
+import org.graylog2.security.ShiroSecurityContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.WebApplicationException;
+import javax.ws.rs.core.Context;
 import javax.ws.rs.core.Response;
+import javax.ws.rs.core.SecurityContext;
+import java.security.Principal;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
@@ -51,6 +56,9 @@ public abstract class RestResource {
     @QueryParam("pretty")
     boolean prettyPrint;
 
+    @Context
+    SecurityContext securityContext;
+
 	protected RestResource() { /* */ }
 
     protected int page(int page) {
@@ -59,6 +67,20 @@ public abstract class RestResource {
         }
 
         return page-1;
+    }
+
+    protected Subject getSubject() {
+        if (securityContext == null) {
+            LOG.error("Cannot retrieve current subject, SecurityContext isn't set.");
+            return null;
+        }
+        final Principal p = securityContext.getUserPrincipal();
+        if (!(p instanceof ShiroSecurityContext.ShiroPrincipal)) {
+            LOG.error("Unknown SecurityContext class {}, cannot continue.", securityContext);
+            throw new IllegalStateException();
+        }
+        ShiroSecurityContext.ShiroPrincipal principal = (ShiroSecurityContext.ShiroPrincipal) p;
+        return principal.getSubject();
     }
 
 	protected ObjectId loadObjectId(String id) {

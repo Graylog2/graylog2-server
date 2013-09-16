@@ -52,12 +52,7 @@ public class ShiroSecurityContext implements SecurityContext {
 
     @Override
     public Principal getUserPrincipal() {
-        return new Principal() {
-            @Override
-            public String getName() {
-                return subject.getPrincipal().toString();
-            }
-        };
+        return new ShiroPrincipal();
     }
 
     @Override
@@ -78,5 +73,16 @@ public class ShiroSecurityContext implements SecurityContext {
 
     public void loginSubject() throws AuthenticationException {
         subject.login(token);
+    }
+
+    public class ShiroPrincipal implements Principal {
+        @Override
+        public String getName() {
+            return subject.getPrincipal().toString();
+        }
+
+        public Subject getSubject() {
+            return subject;
+        }
     }
 }
