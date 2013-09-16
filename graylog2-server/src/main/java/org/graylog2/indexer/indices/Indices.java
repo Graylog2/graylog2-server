@@ -32,6 +32,7 @@ import org.elasticsearch.action.admin.indices.create.CreateIndexResponse;
 import org.elasticsearch.action.admin.indices.delete.DeleteIndexRequest;
 import org.elasticsearch.action.admin.indices.exists.indices.IndicesExistsRequest;
 import org.elasticsearch.action.admin.indices.exists.indices.IndicesExistsResponse;
+import org.elasticsearch.action.admin.indices.flush.FlushRequest;
 import org.elasticsearch.action.admin.indices.mapping.put.PutMappingRequest;
 import org.elasticsearch.action.admin.indices.settings.UpdateSettingsRequest;
 import org.elasticsearch.action.admin.indices.settings.UpdateSettingsResponse;
@@ -217,6 +218,15 @@ public class Indices {
         sb.put("index.blocks.metadata", false); // Allow getting metadata.
 
         c.admin().indices().updateSettings(new UpdateSettingsRequest(index).settings(sb.build())).actionGet();
+    }
+
+    public void flush(String index) {
+        FlushRequest flush = new FlushRequest(index);
+        flush.force(true); // Just flushes. Even if it is not necessary.
+        flush.full(false);
+        flush.refresh(true);
+
+        c.admin().indices().flush(new FlushRequest(index).force(true)).actionGet();
     }
 
 }

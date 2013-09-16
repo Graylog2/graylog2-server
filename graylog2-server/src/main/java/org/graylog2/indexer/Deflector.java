@@ -132,6 +132,8 @@ public class Deflector { // extends Ablenkblech
             activity.setMessage("Cycled deflector from <" + oldTarget + "> to <" + newTarget + ">");
         }
 
+        LOG.info("Flushing old index <{}>.", oldTarget);
+        server.getIndexer().indices().flush(oldTarget);
 
         LOG.info("Setting old index <{}> to read-only.", oldTarget);
         server.getIndexer().indices().setReadOnly(oldTarget);
