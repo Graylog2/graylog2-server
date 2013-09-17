@@ -19,36 +19,50 @@
  */
 package controllers;
 
+import com.google.common.collect.ImmutableSet;
 import lib.BreadcrumbList;
 import lib.Tools;
+import models.ChangeUserRequest;
 import models.CreateUserRequest;
 import models.Permissions;
 import models.User;
-import models.Users;
 import org.apache.shiro.crypto.hash.SimpleHash;
 import play.data.Form;
 import play.mvc.Result;
+import views.html.users.new_user;
 
 import java.util.List;
 
 public class UsersController extends AuthenticatedController {
 
     private static final Form<CreateUserRequest> createUserForm = Form.form(CreateUserRequest.class);
+    private static final Form<ChangeUserRequest> changeUserForm = Form.form(ChangeUserRequest.class);
 
     public static Result index() {
-        final List<User> allUsers = Users.all();
+        final List<User> allUsers = User.all();
         final List<String> permissions = Permissions.all();
         return ok(views.html.users.index.render(currentUser(), allUsers, permissions));
     }
 
-    public static Result newUser() {
+    public static Result newUserForm() {
         BreadcrumbList bc = new BreadcrumbList();
         bc.addCrumb("System", routes.SystemController.index(0));
         bc.addCrumb("Users", routes.UsersController.index());
-        bc.addCrumb("Create new", routes.UsersController.newUser());
+        bc.addCrumb("Create new", routes.UsersController.newUserForm());
 
         final List<String> permissions = Permissions.all();
-        return ok(views.html.users.new_user.render(currentUser(), permissions, bc));
+        return ok(new_user.render(createUserForm, currentUser(), permissions, ImmutableSet.<String>of(), bc));
+    }
+
+    public static Result editUserForm(String username) {
+        BreadcrumbList bc = new BreadcrumbList();
+        bc.addCrumb("System", routes.SystemController.index(0));
+        bc.addCrumb("Users", routes.UsersController.index());
+        bc.addCrumb("Edit " + username, routes.UsersController.editUserForm(username));
+
+        User user = User.load(username);
+        final Form<ChangeUserRequest> form = changeUserForm.fill(new ChangeUserRequest(user));
+        return ok(views.html.users.edit.render(form, username, currentUser(), Permissions.all(), ImmutableSet.copyOf(user.getPermissions()), bc));
     }
 
     public static Result create() {
@@ -56,27 +70,45 @@ public class UsersController extends AuthenticatedController {
         final CreateUserRequest request = createUserRequestForm.get();
 
         if (createUserRequestForm.hasErrors()) {
-            return newUser(); // TODO we really want to pass the filled-out form here. TehSuck
+            BreadcrumbList bc = new BreadcrumbList();
+            bc.addCrumb("System", routes.SystemController.index(0));
+            bc.addCrumb("Users", routes.UsersController.index());
+            bc.addCrumb("Create new", routes.UsersController.newUserForm());
+            final List<String> permissions = Permissions.all();
+            return badRequest(new_user.render(createUserRequestForm, currentUser(), permissions, ImmutableSet.copyOf(request.permissions), bc));
         }
         // hash it before sending it across
         request.password = new SimpleHash("SHA1", request.password).toString();
-        Users.create(request);
+        User.create(request);
         return redirect(routes.UsersController.index());
     }
 
-    public static Result edit(String username) {
-        User user = Users.loadUser(username);
-        return ok(views.html.users.edit.render(currentUser(), user));
-    }
-
-    public static Result uniqueUsername(String username) {
+    public static Result isUniqueUsername(String username) {
         if (User.LocalAdminUser.getInstance().getName().equals(username)) {
             return noContent();
         }
-        if (Users.loadUser(username) == null) {
+        if (User.load(username) == null) {
             return notFound();
         } else {
             return noContent();
         }
+    }
+
+    public static Result saveChanges(String username) {
+        final Form<ChangeUserRequest> requestForm = Tools.bindMultiValueFormFromRequest(ChangeUserRequest.class);
+        if (requestForm.hasErrors()) {
+            final BreadcrumbList bc = new BreadcrumbList();
+            bc.addCrumb("System", routes.SystemController.index(0));
+            bc.addCrumb("Users", routes.UsersController.index());
+            bc.addCrumb("Edit " + username, routes.UsersController.editUserForm(username));
+
+            final List<String> all = Permissions.all();
+
+            return badRequest(views.html.users.edit.render(requestForm, username, currentUser(), all, ImmutableSet.copyOf(requestForm.get().permissions), bc));
+        }
+        final User user = User.load(username);
+        user.update(requestForm.get());
+
+        return redirect(routes.UsersController.index());
     }
 }

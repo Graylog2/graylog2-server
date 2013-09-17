@@ -29,7 +29,7 @@
                     </td>
                     <td>
                         <div class="pull-right">
-                            <button id="edit-user" class="btn btn-mini" data-username="@user.getName" title="Edit"><i class="icon-edit icon-large"></i></button>
+                            <a id="edit-user" href="@routes.UsersController.editUserForm(user.getName)" class="btn btn-mini" title="Edit"><i class="icon-edit icon-large"></i></a>
                         </div>
                     </td>
                 </tr>
@@ -40,7 +40,7 @@
 
     <div class="row-fluid">
         <div class="pull-right">
-            <a id="create-user-btn" class="btn btn-success" href="@routes.UsersController.newUser()">Create new account.</a>
+            <a id="create-user-btn" class="btn btn-success" href="@routes.UsersController.newUserForm()">Create new account.</a>
         </div>
     </div>
 }

@@ -1,4 +1,4 @@
-@(currentUser: User, permissions: java.util.List[String], breadcrumbs: lib.BreadcrumbList)
+@(form: Form[CreateUserRequest], currentUser: User, permissions: java.util.List[String], selectedPermissions: java.util.Set[String], breadcrumbs: lib.BreadcrumbList)
 
 @main("Users", views.html.system.sidebar(), "", currentUser) {
 
@@ -8,15 +8,15 @@
         <form id="create-user-form" action="@routes.UsersController.create()" method="POST">
             <label for="username">Username</label>
             <span class="help-block">Select a unique user name used to log in with.</span>
-            <input name="username" id="username" type="text" required />
+            <input name="username" id="username" type="text" value="@form("username").value()" required />
 
             <label for="fullname">Full Name</label>
             <span class="help-block">Give a descriptive name for this account, e.g. the full name.</span>
-            <input name="fullname" id="fullname" type="text" required/>
+            <input name="fullname" id="fullname" type="text" value="@form("fullname").value()" required/>
 
             <label for="email">Email Address</label>
             <span class="help-block">Give the contact email address.</span>
-            <input name="email" id="email" type="email" required />
+            <input name="email" id="email" type="email" value="@form("email").value()" required />
 
             <label for="password">Password</label>
             <span class="help-block"></span>
@@ -30,14 +30,15 @@
             <span class="help-block">Choose the permissions granted to the account.</span>
             <select name="permissions" id="permissions" data-placeholder="Choose permissions..." multiple class="permission-select">
             @for(permission <- permissions) {
-                <option>@permission</option>
+                <option @{if(selectedPermissions.contains(permission)) "selected"}>@permission</option>
             }
             </select>
-            <button class="btn" data-dismiss="modal" aria-hidden="true">Close</button>
+
             <button type="submit" class="btn btn-primary create-user">
                 <i class="icon icon-rocket"></i>
                 Create User
             </button>
+
         </form>
     </div>
 

@@ -4,6 +4,7 @@ import com.google.common.collect.Lists;
 import lib.APIException;
 import lib.ApiClient;
 import models.api.responses.system.UserResponse;
+import models.api.responses.system.UsersListResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import play.Play;
@@ -18,7 +19,6 @@ import java.util.concurrent.atomic.AtomicReference;
 public class User {
 	private static final Logger log = LoggerFactory.getLogger(User.class);
 
-
     @Deprecated
     private final String id;
     private final String name;
@@ -29,7 +29,7 @@ public class User {
     private final String passwordHash;
 
     public User(UserResponse ur, String passwordHash) {
-        this(ur.id, ur.username, "", ur.fullName, ur.permissions, passwordHash);
+        this(ur.id, ur.username, ur.email, ur.fullName, ur.permissions, passwordHash);
     }
 
 	public User(String id, String name, String email, String fullName, List<String> permissions, String passwordHash) {
@@ -118,6 +118,42 @@ public class User {
         return null;
 	}
 
+    public static List<User> all() {
+        UsersListResponse response;
+        try {
+            response = ApiClient.get(UsersListResponse.class).path("/users").execute();
+            List<User> users = Lists.newArrayList();
+            for (UserResponse userResponse : response.users) {
+                users.add(new User(userResponse, null)); // we don't have password's for the user list, obviously
+            }
+            return users;
+        } catch (IOException e) {
+            log.error("Could not retrieve list of users", e);
+        } catch (APIException e) {
+            log.error("Could not retrieve list of users", e);
+        }
+        return Lists.newArrayList();
+    }
+
+    public static void create(CreateUserRequest request) {
+        try {
+            ApiClient.post().path("/users").body(request).expect(Http.Status.CREATED).execute();
+        } catch (APIException e) {
+            log.error("Unable to create user", e);
+        } catch (IOException e) {
+            log.error("Unable to create user", e);
+        }
+    }
+
+    public void update(ChangeUserRequest request) {
+        try {
+            ApiClient.put().path("/users/{0}", getName()).body(request).expect(Http.Status.NO_CONTENT).execute();
+        } catch (APIException e) {
+            log.error("Unable to update user", e);
+        } catch (IOException e) {
+            log.error("Unable to update user", e);
+        }
+    }
     @Deprecated
     public String getId() {
         return getName();
@@ -136,6 +172,9 @@ public class User {
 	}
 
 	public List<String> getPermissions() {
+        if (permissions == null) {
+            return Lists.newArrayList();
+        }
 		return permissions;
 	}
 

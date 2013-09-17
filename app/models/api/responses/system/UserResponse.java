@@ -13,5 +13,7 @@ public class UserResponse {
 
 	public String id;
 
+    public String email;
+
 	public List<String> permissions;
 }

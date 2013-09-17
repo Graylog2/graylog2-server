@@ -38,10 +38,11 @@ POST        /system/inputs/:node_id/:input_id/extractors/:extractor_id/delete   
 
 # Users
 GET         /system/users                                                            controllers.UsersController.index()
-GET         /a/system/users/:username                                                controllers.UsersController.uniqueUsername(username: String)
+GET         /a/system/users/:username                                                controllers.UsersController.isUniqueUsername(username: String)
 POST        /system/users                                                            controllers.UsersController.create()
-GET         /system/users/new                                                        controllers.UsersController.newUser()
-GET         /system/users/edit/:username                                             controllers.UsersController.edit(username: String)
+POST        /system/users/:username                                                  controllers.UsersController.saveChanges(username: String)
+GET         /system/users/new                                                        controllers.UsersController.newUserForm()
+GET         /system/users/edit/:username                                             controllers.UsersController.editUserForm(username: String)
 
 # Systemjobs
 POST        /systemjobs/trigger                                                      controllers.SystemJobsController.trigger()
