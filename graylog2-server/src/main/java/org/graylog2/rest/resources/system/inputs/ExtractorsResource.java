@@ -22,7 +22,6 @@ package org.graylog2.rest.resources.system.inputs;
 import com.beust.jcommander.internal.Lists;
 import com.codahale.metrics.annotation.Timed;
 import com.google.common.collect.Maps;
-import org.elasticsearch.common.UUID;
 import org.graylog2.ConfigurationException;
 import org.graylog2.database.ValidationException;
 import org.graylog2.inputs.Input;
@@ -83,7 +82,7 @@ public class ExtractorsResource extends RestResource {
             throw new WebApplicationException(Response.Status.BAD_REQUEST);
         }
 
-        String id = UUID.randomUUID().toString();
+        String id = new com.eaio.uuid.UUID().toString();
         Extractor extractor;
         try {
             extractor = ExtractorFactory.factory(

@@ -54,7 +54,6 @@ public class OptimizeIndexJob extends SystemJob {
 
         or.maxNumSegments(1);
         or.onlyExpungeDeletes(false);
-        or.refresh(true);
         or.flush(true);
         or.waitForMerge(true); // This makes us block until the operation finished.
 

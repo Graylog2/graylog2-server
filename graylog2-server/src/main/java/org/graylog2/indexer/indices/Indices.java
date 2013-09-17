@@ -224,7 +224,6 @@ public class Indices {
         FlushRequest flush = new FlushRequest(index);
         flush.force(true); // Just flushes. Even if it is not necessary.
         flush.full(false);
-        flush.refresh(true);
 
         c.admin().indices().flush(new FlushRequest(index).force(true)).actionGet();
     }
