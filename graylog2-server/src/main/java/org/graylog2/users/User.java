@@ -184,6 +184,14 @@ public class User extends Persisted {
         fields.put(PERMISSIONS, permissions);
     }
 
+    public void setEmail(String email) {
+        fields.put(EMAIL, email);
+    }
+
+    public void setFullName(String fullname) {
+        fields.put(FULL_NAME, fullname);
+    }
+
     private static class LocalAdminUser extends User {
         LocalAdminUser(Core core) {
             super(null, Maps.<String, Object>newHashMap(), core);

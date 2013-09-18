@@ -33,6 +33,7 @@ public class RestPermissions {
     // These should all be in the form of "group:action", because allPermissions() below depends on it.
     // Should this ever change, you need to adapt the code below, too.
     public static final String USERS_CREATE =  "users:create";
+    public static final String USERS_EDIT = "users:edit";
     public static final String USERS_LIST = "users:list";
     public static final String USERPERMISSIONS_EDIT = "userpermissions:edit";
 
