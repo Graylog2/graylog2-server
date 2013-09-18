@@ -135,16 +135,16 @@ public class Deflector { // extends Ablenkblech
             LOG.info("Setting old index <{}> to read-only.", oldTarget);
             server.getIndexer().indices().setReadOnly(oldTarget);
             activity.setMessage("Cycled deflector from <" + oldTarget + "> to <" + newTarget + ">");
+
+            try {
+                server.getSystemJobManager().submit(new OptimizeIndexJob(server, oldTarget));
+            } catch (SystemJobConcurrencyException e) {
+                // The concurrency limit is very high. This should never happen.
+                LOG.error("Cannot optimize index <{}>.", oldTarget, e);
+            }
         }
 
         LOG.info("Done!");
-
-        try {
-            server.getSystemJobManager().submit(new OptimizeIndexJob(server, oldTarget));
-        } catch (SystemJobConcurrencyException e) {
-            // The concurrency limit is very high. This should never happen.
-            LOG.error("Cannot optimize index <{}>.", oldTarget, e);
-        }
 
         server.getActivityWriter().write(activity);
     }
