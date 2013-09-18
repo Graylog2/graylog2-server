@@ -47,6 +47,7 @@ import org.graylog2.metrics.jersey2.AnyExceptionClassMapper;
 import org.graylog2.metrics.jersey2.MetricsDynamicBinding;
 import org.graylog2.outputs.Outputs;
 import org.graylog2.plugin.GraylogServer;
+import org.graylog2.plugin.Tools;
 import org.graylog2.plugin.alarms.callbacks.AlarmCallback;
 import org.graylog2.plugin.alarms.transports.Transport;
 import org.graylog2.plugin.buffers.Buffer;
@@ -78,6 +79,7 @@ import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.net.InetSocketAddress;
+import java.net.URI;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ExecutorService;
@@ -159,6 +161,20 @@ public class Core implements GraylogServer {
         this.metricRegistry = metrics;
         
         this.configuration = configuration; // TODO use dependency injection
+
+        if (this.configuration.getRestTransportUri() == null) {
+                String guessedIf = null;
+                try {
+                    guessedIf = Tools.guessPrimaryNetworkAddress().getHostAddress();
+                } catch (Exception e) {
+                    LOG.error("Could not guess primary network address for rest_transport_uri. Please configure it in your graylog2.conf.", e);
+                    throw new RuntimeException("No rest_transport_uri.");
+                }
+
+                String transportStr = "http://" + guessedIf + ":12900/";
+                LOG.info("No rest_transport_uri set. Falling back to [{}].", transportStr);
+                this.configuration.setRestTransportUri(transportStr);
+        }
 
         mongoConnection = new MongoConnection();    // TODO use dependency injection
         mongoConnection.setUser(configuration.getMongoUser());

@@ -30,10 +30,12 @@ import com.github.joschi.jadconfig.validators.PositiveIntegerValidator;
 import com.google.common.collect.Lists;
 import com.lmax.disruptor.*;
 import com.mongodb.ServerAddress;
+import org.graylog2.plugin.Tools;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.ws.rs.core.UriBuilder;
+import java.net.SocketException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.UnknownHostException;
@@ -58,7 +60,10 @@ public class Configuration {
     
     @Parameter(value = "rest_listen_uri", required = true)
     private String restListenUri = "http://127.0.0.1:12900/";
-    
+
+    @Parameter(value = "rest_transport_uri", required = false)
+    private String restTransportUri;
+
     @Parameter(value = "udp_recvbuffer_sizes", required = true, validator = PositiveIntegerValidator.class)
     private int udpRecvBufferSizes = 1048576;
     
@@ -415,14 +420,29 @@ public class Configuration {
     public void validate() throws ValidationException {
 
         if (isMongoUseAuth() && (null == getMongoUser() || null == getMongoPassword())) {
-
             throw new ValidationException("mongodb_user and mongodb_password have to be set if mongodb_useauth is true");
         }
     }
 
     public URI getRestListenUri() {
+        return getUriStandard(restListenUri);
+    }
+
+    public URI getRestTransportUri() {
+        if (restTransportUri == null || restTransportUri.isEmpty()) {
+            return null;
+        }
+
+        return getUriStandard(restTransportUri);
+    }
+
+    public void calculateRestTransportUri() {
+
+    }
+
+    private URI getUriStandard(String from) {
         try {
-            URI uri = new URI(restListenUri);
+            URI uri = new URI(from);
 
             // The port is set to -1 if not defined. Default to 80 here.
             if (uri.getPort() == -1) {
@@ -441,5 +461,9 @@ public class Configuration {
 
     public String getRootPasswordSha1() {
         return rootPasswordSha1;
+    }
+
+    public void setRestTransportUri(String restTransportUri) {
+        this.restTransportUri = restTransportUri;
     }
 }

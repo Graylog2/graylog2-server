@@ -44,10 +44,10 @@ public class NodePingThread implements Runnable {
     @Override
     public void run() {
         try {
-            Node.thisNode(core).alive();
+            Node.thisNode(core).alive(core.isMaster(), core.getConfiguration().getRestTransportUri());
         } catch (NodeNotFoundException e) {
             LOG.warn("Did not find meta info of this node. Re-registering.");
-            Node.register(core, core.isMaster(), core.getConfiguration().getRestListenUri());
+            Node.register(core, core.isMaster(), core.getConfiguration().getRestTransportUri());
         }
 
         // Remove old nodes that are no longer running. (Just some housekeeping)

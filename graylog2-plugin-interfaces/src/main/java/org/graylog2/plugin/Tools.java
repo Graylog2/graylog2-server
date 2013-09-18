@@ -24,13 +24,8 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.lang.management.ManagementFactory;
-import java.net.InetAddress;
-import java.net.UnknownHostException;
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Collection;
-import java.util.List;
-import java.util.UUID;
+import java.net.*;
+import java.util.*;
 import java.util.zip.GZIPInputStream;
 import java.util.zip.InflaterInputStream;
 
@@ -368,5 +363,24 @@ public final class Tools {
          */
         return Ints.tryParse(x.toString());
     }
- 
+
+    public static InetAddress guessPrimaryNetworkAddress() throws SocketException, NoInterfaceFoundException {
+        Enumeration<NetworkInterface> interfaces = NetworkInterface.getNetworkInterfaces();
+
+        for (NetworkInterface interf : Collections.list(interfaces)) {
+            if (!interf.isLoopback() && interf.isUp()) {
+                // Interface is not loopback and up. Try to get the first address.
+                for(InetAddress addr : Collections.list(interf.getInetAddresses())) {
+                    if (addr instanceof Inet4Address) {
+                        return addr;
+                    }
+                }
+            }
+        }
+
+        throw new NoInterfaceFoundException();
+    }
+
+    public static class NoInterfaceFoundException extends Exception {
+    }
 }

@@ -44,7 +44,6 @@ public class Node extends Persisted {
 
     public static final int PING_TIMEOUT = 7; // <3
     private static final String COLLECTION = "nodes";
-    private Object shortNodeId;
 
     protected Node(Core core, Map<String, Object> fields) {
         super(core, fields);
@@ -54,12 +53,12 @@ public class Node extends Persisted {
         super(core, id, fields);
     }
 
-    public static void register(Core core, boolean isMaster, URI restListenUri) {
+    public static void register(Core core, boolean isMaster, URI restTransportUri) {
         Map<String, Object> fields = Maps.newHashMap();
         fields.put("last_seen", Tools.getUTCTimestamp());
         fields.put("node_id", core.getNodeId());
         fields.put("is_master", isMaster);
-        fields.put("transport_address", restListenUri.toString());
+        fields.put("transport_address", restTransportUri.toString());
 
         try {
             new Node(core, fields).save();
@@ -121,8 +120,16 @@ public class Node extends Persisted {
         return query(query, COLLECTION).size() == 0;
     }
 
-    public void alive() {
+    /**
+     * Mark this node as alive and probably update some settings that may have changed since last server boot.
+     *
+     * @param isMaster
+     * @param restTransportAddress
+     */
+    public void alive(boolean isMaster, URI restTransportAddress) {
         fields.put("last_seen", Tools.getUTCTimestamp());
+        fields.put("is_master", isMaster);
+        fields.put("transport_address", restTransportAddress.toString());
         try {
             save();
         } catch (ValidationException e) {
