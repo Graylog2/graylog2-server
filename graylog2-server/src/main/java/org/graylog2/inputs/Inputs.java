@@ -155,10 +155,10 @@ public class Inputs {
                 }
             } catch (NoSuchInputTypeException e) {
                 LOG.warn("Cannot launch persisted input. No such type [{}].", io.getType());
-                throw new WebApplicationException(e, Response.Status.NOT_FOUND);
+                continue;
             } catch (ConfigurationException e) {
-                LOG.error("Missing or invalid input configuration.", e);
-                throw new WebApplicationException(e, Response.Status.BAD_REQUEST);
+                LOG.error("Missing or invalid input plugin configuration.", e);
+                continue;
             }
 
             launch(input, io.getInputId());
