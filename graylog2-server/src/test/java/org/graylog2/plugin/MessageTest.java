@@ -28,6 +28,7 @@ import static junit.framework.Assert.assertNull;
  * @author Lennart Koopmann <lennart@torch.sh>
  */
 public class MessageTest {
+
     @Test
     public void testAddFieldDoesOnlyAcceptAlphanumericKeys() throws Exception {
         Message m = new Message("foo", "bar", 0);
@@ -45,5 +46,25 @@ public class MessageTest {
         m = new Message("foo", "bar", 0);
         m.addField("someäthing", "bar");
         assertNull(m.getField("someäthing"));
+    }
+
+    @Test
+    public void testAddFieldTrimsValue() throws Exception {
+        Message m = new Message("foo", "bar", 0);
+        m.addField("something", " bar ");
+        assertEquals("bar", m.getField("something"));
+
+        m.addField("something2", " bar");
+        assertEquals("bar", m.getField("something2"));
+
+        m.addField("something3", "bar ");
+        assertEquals("bar", m.getField("something3"));
+    }
+
+    @Test
+    public void testAddFieldWorksWithIntegers() throws Exception {
+        Message m = new Message("foo", "bar", 0);
+        m.addField("something", 3);
+        assertEquals(3, m.getField("something"));
     }
 }

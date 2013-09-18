@@ -157,6 +157,10 @@ public class Message {
             return;
         }
 
+        if (String.class.equals(value.getClass())) {
+            value = ((String) value).trim();
+        }
+
         // Don't accept protected keys. (some are allowed though lol)
         if (RESERVED_FIELDS.contains(key) && !RESERVED_SETTABLE_FIELDS.contains(key)) {
             return;
@@ -168,7 +172,7 @@ public class Message {
         }
 
         this.fields.put(key.trim(), value);
-    }      
+    }
 
     public void addFields(Map<String, Object> fields) {
         if(fields == null) {
