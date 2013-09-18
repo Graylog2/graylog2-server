@@ -1,6 +1,14 @@
+---
 language: java
-ijdk:
-  - oraclejdk7
-  - openjdk7
-  - openjdk6
-before_install: ./install-syslog4j-jar.sh # installs syslog4j jar to local maven repo
+jdk:
+- oraclejdk7
+- openjdk7
+- openjdk6
+before_install: ./install-syslog4j-jar.sh
+notifications:
+  campfire:
+    rooms:
+      secure: |-
+        daYSGcc6cr3eBW006/1Vx00Xxsa2hlfqa8k7Uuod1E0D+69oI5nm1nd7J+2V
+        SY7lH/kwr60Xe61TtUJ9pXHZssHNcRfmF6INKwUsErgIjUKpluW6hjsgXw/q
+        OBFuG7vowG0tdhdsnE/qcnfkkB9bm/YgUeDfpMW4vZpdUhnBwbI=
