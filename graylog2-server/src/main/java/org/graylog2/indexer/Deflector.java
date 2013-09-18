@@ -25,8 +25,9 @@ import org.elasticsearch.action.admin.indices.stats.IndexStats;
 import org.elasticsearch.indices.InvalidAliasNameException;
 import org.graylog2.Core;
 import org.graylog2.indexer.indices.jobs.OptimizeIndexJob;
-import org.graylog2.system.activities.Activity;
 import org.graylog2.indexer.ranges.IndexRange;
+import org.graylog2.plugin.Tools;
+import org.graylog2.system.activities.Activity;
 import org.graylog2.system.jobs.SystemJobConcurrencyException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -35,7 +36,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
-import org.graylog2.plugin.Tools;
 
 /**
  *
@@ -129,14 +129,14 @@ public class Deflector { // extends Ablenkblech
         } else {
             // Re-pointing from existing old index to the new one.
             pointTo(newTarget, oldTarget);
+            LOG.info("Flushing old index <{}>.", oldTarget);
+            server.getIndexer().indices().flush(oldTarget);
+
+            LOG.info("Setting old index <{}> to read-only.", oldTarget);
+            server.getIndexer().indices().setReadOnly(oldTarget);
             activity.setMessage("Cycled deflector from <" + oldTarget + "> to <" + newTarget + ">");
         }
 
-        LOG.info("Flushing old index <{}>.", oldTarget);
-        server.getIndexer().indices().flush(oldTarget);
-
-        LOG.info("Setting old index <{}> to read-only.", oldTarget);
-        server.getIndexer().indices().setReadOnly(oldTarget);
         LOG.info("Done!");
 
         try {
