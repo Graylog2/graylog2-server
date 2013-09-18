@@ -31,4 +31,8 @@ public class NoSuchInputTypeException extends Throwable {
         super(s);
     }
 
+    public NoSuchInputTypeException(String s, Throwable e) {
+        super(s, e);
+    }
+
 }

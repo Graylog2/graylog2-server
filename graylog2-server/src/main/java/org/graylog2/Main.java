@@ -39,8 +39,8 @@ import org.graylog2.inputs.gelf.http.GELFHttpInput;
 import org.graylog2.inputs.gelf.udp.GELFUDPInput;
 import org.graylog2.inputs.misc.metrics.LocalMetricsInput;
 import org.graylog2.inputs.random.FakeHttpMessageInput;
-import org.graylog2.inputs.random.generators.FakeHttpMessageGenerator;
-import org.graylog2.inputs.raw.RawUDPInput;
+import org.graylog2.inputs.raw.tcp.RawTCPInput;
+import org.graylog2.inputs.raw.udp.RawUDPInput;
 import org.graylog2.inputs.syslog.tcp.SyslogTCPInput;
 import org.graylog2.inputs.syslog.udp.SyslogUDPInput;
 import org.graylog2.outputs.ElasticSearchOutput;
@@ -215,6 +215,7 @@ public final class Main {
         server.inputs().register(SyslogUDPInput.class, SyslogUDPInput.NAME);
         server.inputs().register(SyslogTCPInput.class, SyslogTCPInput.NAME);
         server.inputs().register(RawUDPInput.class, RawUDPInput.NAME);
+        server.inputs().register(RawTCPInput.class, RawTCPInput.NAME);
         server.inputs().register(GELFUDPInput.class, GELFUDPInput.NAME);
         server.inputs().register(GELFTCPInput.class, GELFTCPInput.NAME);
         server.inputs().register(GELFHttpInput.class, GELFHttpInput.NAME);

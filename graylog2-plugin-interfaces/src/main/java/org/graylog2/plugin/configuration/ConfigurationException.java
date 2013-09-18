@@ -39,5 +39,9 @@ public class ConfigurationException extends Exception {
     public ConfigurationException(String msg) {
         super(msg);
     }
+
+    public ConfigurationException(String msg, Throwable e) {
+        super(msg, e);
+    }
     
 }
