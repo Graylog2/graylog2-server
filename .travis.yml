@@ -12,11 +12,15 @@ env:
       7SvCgLvni0ewVVs8P2F9dGeG7HZ0WRJ3tcdZCcJG9IBk6xNcWAQveZ2goBKJ
       0Y0YksLljdKHv8mn02KX2tZxLVYjgzq09Dvn0+bGOzQU+TLbkPY=
 before_script:
-  - wget http://downloads.typesafe.com/play/${PLAY_VERSION}/play-${PLAY_VERSION}.zip
-  - unzip -q play-${PLAY_VERSION}.zip
+- wget http://downloads.typesafe.com/play/${PLAY_VERSION}/play-${PLAY_VERSION}.zip
+- unzip -q play-${PLAY_VERSION}.zip
 script: play-${PLAY_VERSION}/play test
-
-# http://about.travis-ci.org/docs/user/addons/
 addons:
-  # Credentials are in secure ENV variables above.
   sauce_connect: true
+notifications:
+  campfire:
+    rooms:
+      secure: |-
+        CGjN85r7K+0X4aspi5B76HGsWvU40YKbTRbkZ1Q9AvDxMoPINDiSP4rMtg/7
+        JL1MUpSvfejtf36kmkUe0O3Kl6xm7vao5zBBdHu4ZM5K4E9ZCihrMi/1crid
+        O0HiTHSmLQUelekzHhkAHi+AbtPZQFoXzRPZ5LN7f+ECKjlfwhY=
