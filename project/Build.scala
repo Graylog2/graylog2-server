@@ -20,8 +20,10 @@ object ApplicationBuild extends Build {
 
     "org.apache.shiro" % "shiro-core" % "1.2.2",
 
+//    "com.google.inject" % "guice" % "3.0",
+    "org.fluentlenium" % "fluentlenium-core" % "0.9.0" % "test",
+    "org.fluentlenium" % "fluentlenium-festassert" % "0.9.0" % "test",
     "org.mockito" % "mockito-all" % "1.9.5" % "test",
-    "org.seleniumhq.selenium" % "selenium-java" % "2.33.0" % "test",
     "javax.ws.rs" % "jsr311-api" % "0.11" % "test",
     "com.sun.jersey" % "jersey-grizzly2" % "1.17.1" % "test",
     "com.sun.jersey" % "jersey-bundle" % "1.17.1" % "test",
