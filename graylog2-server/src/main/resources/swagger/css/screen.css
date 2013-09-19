@@ -400,15 +400,24 @@ body #content_message {
 }
 
 body #header {
-    background-color: #89bf04;
-    padding: 14px;
+    background-color: #000;
+    color: #fff;
+    padding: 10px;
+    padding-top: 13px;
+}
+
+.subtitle {
+    margin-left: 35px;
+    position: relative;
+    top: -5px;
+    font-size: 14px;
 }
 
 body #header a#logo {
     font-size: 1.5em;
     font-weight: bold;
     text-decoration: none;
-    background: transparent url(../images/logo_small.png) no-repeat left center;
+    background: transparent url(../images/toplogo.png) no-repeat left center;
     padding: 20px 0 20px 40px;
     color: white;
 }
@@ -1779,4 +1788,8 @@ pre code {
 
 .info_contact {
   padding-bottom: 5px;
+}
+
+#swagger-ui-container {
+    margin-top: 20px;
 }
