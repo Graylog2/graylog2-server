@@ -65,7 +65,7 @@ public class DocumentationResource extends RestResource {
         return Response.status(Response.Status.OK)
                 .entity(json(result))
                 .header("Access-Control-Allow-Origin", "*") // Headers for Swagger UI.
-                .header("Access-Control-Allow-Methods", "POST, GET, OPTIONS , PUT")
+                .header("Access-Control-Allow-Methods", "GET")
                 .header("Access-Control-Allow-Headers", "Content-Type, api_key, Authorization")
                 .build();
     }

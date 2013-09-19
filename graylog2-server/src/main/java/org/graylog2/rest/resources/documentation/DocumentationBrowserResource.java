@@ -38,11 +38,20 @@ public class DocumentationBrowserResource extends RestResource {
     private ClassLoader classLoader = ClassLoader.getSystemClassLoader();
 
     @GET
-    @Path("/{route: .+}")
+    public Response root() {
+        return asset("index.html");
+    }
+
+    @GET
+    @Path("/{route: .*}")
     public Response asset(@PathParam("route") String route) {
         // Directory traversal should not be possible but just to make sure..
         if (route.contains("..")) {
             throw new WebApplicationException(Response.Status.BAD_REQUEST);
+        }
+
+        if (route.trim().equals("")) {
+            route = "index.html";
         }
 
         byte[] read;
