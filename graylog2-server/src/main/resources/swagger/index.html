@@ -17,12 +17,18 @@
   <script src='/api-browser/swagger-ui.js' type='text/javascript'></script>
   <script src='/api-browser/lib/highlight.7.3.pack.js' type='text/javascript'></script>
   <script type="text/javascript">
+    var apiTarget = window.location.protocol+"//"+window.location.hostname+":"+window.location.port;
     $(function () {
       window.swaggerUi = new SwaggerUi({
-      url: window.location.protocol+"//"+window.location.hostname+":"+window.location.port+"/api-docs",
+      url: apiTarget+"/api-docs",
       dom_id: "swagger-ui-container",
       supportedSubmitMethods: ['get', 'post', 'put', 'delete'],
       onComplete: function(swaggerApi, swaggerUi){
+        if(apiTarget != swaggerApi.system.basePath) {
+          alert("IMPORTANT: Please use the configured REST transport address (" + swaggerApi.system.basePath + ") if you want working examples. " +
+                  "This connection to " + apiTarget + " will cause problems with Access-Control-Allow-Origin.");
+        }
+
         if(console) {
           console.log("Loaded SwaggerUI")
         }
