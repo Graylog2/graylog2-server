@@ -40,7 +40,10 @@ public class DocumentationBrowserResource extends RestResource {
     @GET
     @Path("/{route: .+}")
     public Response asset(@PathParam("route") String route) {
-        // TODO dir traversal
+        // Directory traversal should not be possible but just to make sure..
+        if (route.contains("..")) {
+            throw new WebApplicationException(Response.Status.BAD_REQUEST);
+        }
 
         byte[] read;
         try {
