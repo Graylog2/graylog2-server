@@ -35,6 +35,7 @@ import javax.inject.Inject;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Context;
+import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.SecurityContext;
 import java.security.Principal;
@@ -149,6 +150,32 @@ public abstract class RestResource {
         metrics.put("rate", rate);
 
         return metrics;
+    }
+
+    protected String guessContentType(String filename) {
+        // A really dump but for us good enough apporach. We only need this for a very few static files we control.
+
+        if (filename.endsWith(".png")) {
+            return "image/png";
+        }
+
+        if (filename.endsWith(".gif")) {
+            return "image/gif";
+        }
+
+        if (filename.endsWith(".css")) {
+            return "text/css";
+        }
+
+        if (filename.endsWith(".js")) {
+            return "application/javascript";
+        }
+
+        if (filename.endsWith(".html")) {
+            return "text/html";
+        }
+
+        return MediaType.TEXT_PLAIN;
     }
 
 }

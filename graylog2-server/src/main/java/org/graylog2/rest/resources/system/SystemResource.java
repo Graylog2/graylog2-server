@@ -26,6 +26,8 @@ import com.google.common.collect.Maps;
 import org.graylog2.Core;
 import org.graylog2.ProcessingPauseLockedException;
 import org.graylog2.plugin.Tools;
+import org.graylog2.rest.documentation.annotations.Api;
+import org.graylog2.rest.documentation.annotations.ApiOperation;
 import org.graylog2.rest.resources.RestResource;
 import org.graylog2.security.RestPermissions;
 import org.slf4j.Logger;
@@ -42,12 +44,14 @@ import java.util.Map;
 /**
  * @author Lennart Koopmann <lennart@torch.sh>
  */
+@Api(value = "System", description = "System information of this node.")
 @Path("/system")
 public class SystemResource extends RestResource {
 
     private static final Logger LOG = LoggerFactory.getLogger(SystemResource.class);
 
     @GET @Timed
+    @ApiOperation(value = "Get system overview")
     @Produces(MediaType.APPLICATION_JSON)
     public String system() {
         Map<String, Object> result = Maps.newHashMap();
@@ -61,9 +65,11 @@ public class SystemResource extends RestResource {
     }
 
     @GET @Timed
+    @ApiOperation(value = "Get list of all message fields that exist",
+                  notes = "This operation is comparably fast because it reads directly from the indexer mapping.")
     @Path("/fields")
     @Produces(MediaType.APPLICATION_JSON)
-    public String analyze() {
+    public String fields() {
         Map<String, Object> result = Maps.newHashMap();
         result.put("fields", core.getIndexer().getAllMessageFields());
 
@@ -71,6 +77,9 @@ public class SystemResource extends RestResource {
     }
 
     @PUT @Timed
+    @ApiOperation(value = "Pauses message processing",
+                  notes = "Inputs that are able to reject or requeue messages will do so, others will buffer messages in " +
+                          "memory. Keep an eye on the heap space utilization while message processing is paused.")
     @Path("/processing/pause")
     public Response pauseProcessing() {
         core.pauseMessageProcessing(false);
@@ -80,6 +89,7 @@ public class SystemResource extends RestResource {
     }
 
     @PUT @Timed
+    @ApiOperation(value = "Resume message processing")
     @Path("/processing/resume")
     public Response resumeProcessing() {
         try {
@@ -96,7 +106,6 @@ public class SystemResource extends RestResource {
     @PUT @Timed
     @Path("/processing/pause/unlock")
     public Response unlockProcessingPause() {
-
         /*
          * This is meant to be only used in exceptional cases, when something that locked the processing pause
          * has crashed and never unlocked so we need to unlock manually. #donttellanybody
@@ -108,6 +117,7 @@ public class SystemResource extends RestResource {
     }
 
     @GET
+    @ApiOperation(value = "Get JVM information")
     @Path("/jvm") @Timed
     @Produces(MediaType.APPLICATION_JSON)
     public String jvm() {
@@ -127,8 +137,9 @@ public class SystemResource extends RestResource {
         return json(result);
     }
 
-    @GET
-    @Path("/threaddump") @Timed
+    @GET @Timed
+    @ApiOperation(value = "Get a thread dump")
+    @Path("/threaddump")
     @Produces(MediaType.TEXT_PLAIN)
     public String threaddump() {
         // The ThreadDump is built by  internal codahale.metrics servlet library we are abusing.
@@ -139,9 +150,9 @@ public class SystemResource extends RestResource {
         return output.toString();
     }
 
-    @GET
+    @GET @Timed
+    @ApiOperation(value = "Get all available user permissions.")
     @Path("/permissions")
-    @Timed
     @Produces(MediaType.APPLICATION_JSON)
     public String permissions() {
         Map<String, Object> result = Maps.newHashMap();
