@@ -32,6 +32,9 @@ import org.graylog2.indexer.searches.timeranges.AbsoluteRange;
 import org.graylog2.indexer.searches.timeranges.InvalidRangeParametersException;
 import org.graylog2.indexer.searches.timeranges.RelativeRange;
 import org.graylog2.indexer.searches.timeranges.TimeRange;
+import org.graylog2.rest.documentation.annotations.Api;
+import org.graylog2.rest.documentation.annotations.ApiOperation;
+import org.graylog2.rest.documentation.annotations.ApiParam;
 import org.graylog2.rest.resources.RestResource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -43,6 +46,7 @@ import java.util.Map;
 /**
  * @author Lennart Koopmann <lennart@torch.sh>
  */
+@Api(value = "Search", description = "Message search")
 @Path("/search")
 public class SearchResource extends RestResource {
     private static final Logger LOG = LoggerFactory.getLogger(SearchResource.class);
@@ -52,8 +56,14 @@ public class SearchResource extends RestResource {
      */
 
     @GET @Path("/universal/relative") @Timed
+    @ApiOperation(value = "Message search with relative timerange.",
+                  notes = "Search for messages in a relative timerange, specified as seconds from now. " +
+                          "Example: 300 means search from 5 minutes ago to now.")
     @Produces(MediaType.APPLICATION_JSON)
-    public String searchRelative(@QueryParam("query") String query, @QueryParam("range") int range, @QueryParam("limit") int limit) {
+    public String searchRelative(
+            @ApiParam(title = "query", description = "Query (Lucene syntax)", required = true) @QueryParam("query") String query,
+            @ApiParam(title = "range", description = "Relative timeframe to search in. See method description.", required = true) @QueryParam("range") int range,
+            @ApiParam(title = "limit", description = "Maximum number of messages to return.", required = true) @QueryParam("limit") int limit) {
         checkQuery(query);
 
         return json(buildSearchResult(
