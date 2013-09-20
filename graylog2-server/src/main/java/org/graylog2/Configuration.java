@@ -436,10 +436,6 @@ public class Configuration {
         return getUriStandard(restTransportUri);
     }
 
-    public void calculateRestTransportUri() {
-
-    }
-
     private URI getUriStandard(String from) {
         try {
             URI uri = new URI(from);

@@ -171,7 +171,7 @@ public class Core implements GraylogServer {
                     throw new RuntimeException("No rest_transport_uri.");
                 }
 
-                String transportStr = "http://" + guessedIf + ":12900/";
+                String transportStr = "http://" + guessedIf + ":" + configuration.getRestListenUri().getPort();
                 LOG.info("No rest_transport_uri set. Falling back to [{}].", transportStr);
                 this.configuration.setRestTransportUri(transportStr);
         }
