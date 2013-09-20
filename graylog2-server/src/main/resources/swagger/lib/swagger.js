@@ -936,6 +936,14 @@
         throw "SwaggerRequest operation is required.";
       }
       this.type = this.type.toUpperCase();
+
+      if(this.type != "GET") {
+        if(!confirm("Really execute this non-GET operation? It will be executed on the graylog2-server node.")){
+          $(".response_throbber").hide();
+          return;
+        }
+      }
+
       headers = params.headers;
       myHeaders = {};
       body = params.body;
@@ -1042,6 +1050,7 @@
       if (responseContentType) {
         myHeaders["Accept"] = responseContentType;
       }
+
       if (!((headers != null) && (headers.mock != null))) {
         obj = {
           url: this.url,
