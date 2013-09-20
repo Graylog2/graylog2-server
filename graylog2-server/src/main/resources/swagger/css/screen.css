@@ -1793,3 +1793,10 @@ pre code {
 #swagger-ui-container {
     margin-top: 20px;
 }
+
+#credits {
+    text-align: center;
+    margin-top: 50px;
+    font-size: 12px;
+    color: #ccc;
+}
