@@ -19,49 +19,53 @@
  */
 package selenium.tests.sessions;
 
+import org.fluentlenium.adapter.FluentTest;
+import org.fluentlenium.adapter.util.SharedDriver;
+import org.fluentlenium.core.annotation.Page;
 import org.junit.Test;
-import org.openqa.selenium.NoSuchElementException;
-import selenium.LoggedIn;
+import selenium.pages.DashboardPage;
+import selenium.pages.LoginPage;
 
-import static junit.framework.Assert.assertNotNull;
-import static junit.framework.Assert.assertTrue;
-import static junit.framework.Assert.fail;
-import static org.fluentlenium.core.filter.FilterConstructor.withId;
+import static org.fest.assertions.fluentlenium.FluentLeniumAssertions.assertThat;
 import static play.test.Helpers.running;
 import static play.test.Helpers.testServer;
 
 /**
  * @author Lennart Koopmann <lennart@torch.sh>
  */
-public class SessionsTest extends LoggedIn {
+@SharedDriver(type = SharedDriver.SharedType.PER_CLASS)
+public class SessionsTest extends FluentTest {
+    public static final int WEB_PORT = 9999;
+
+    @Page
+    public LoginPage loginPage;
+
+    @Override
+    public String getDefaultBaseUrl() {
+        return "http://localhost:" + WEB_PORT + "/";
+    }
 
     @Test
-    public void loggingInWorks() {
+    public void login() {
         running(testServer(WEB_PORT), new Runnable() {
+            @Override
             public void run() {
-                // Assertions in method.
-                doLogin();
+                loginPage.go();
+                final DashboardPage dashboardPage = loginPage.loginAs("admin", "123123123");
+                assertThat(dashboardPage).isAt();
             }
         });
     }
 
     @Test
-    public void loggingOutWorks() {
+    public void loginErrorNoUser() {
         running(testServer(WEB_PORT), new Runnable() {
+            @Override
             public void run() {
-                doLogin();
-
-                browser.find("#logout").click();
-                assertTrue(browser.title().startsWith("Welcome to Graylog2"));
-
-                try {
-                    browser.findFirst("input", withId("username"));
-                    browser.findFirst("input", withId("password"));
-                } catch(NoSuchElementException e) {
-                    fail("Logout did not bring us back to the login page it seems.");
-                }
+                loginPage.go();
+                final LoginPage loginPage1 = loginPage.loginWithError("admin", "");
+                assertThat(loginPage1).isAt();
             }
         });
     }
-
 }
