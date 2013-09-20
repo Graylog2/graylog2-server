@@ -27,17 +27,14 @@ import java.lang.annotation.Target;
 /**
  * @author Lennart Koopmann <lennart@torch.sh>
  */
-@Target({ElementType.PARAMETER, ElementType.METHOD, ElementType.FIELD})
+@Target(ElementType.METHOD)
 @Retention(RetentionPolicy.RUNTIME)
-public @interface ApiParam {
+public @interface ApiResponse {
 
-    /** Name of this parameter  */
-    String title();
+    /** HTTP response code */
+    int code();
 
-    /** A longer description */
-    String description() default "";
-
-    /** Is this parameter required? */
-    boolean required() default false;
+    /** Description of the code */
+    String message();
 
 }

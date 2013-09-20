@@ -24,6 +24,7 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import org.graylog2.cluster.Node;
 import org.graylog2.plugin.Tools;
+import org.graylog2.rest.documentation.annotations.*;
 import org.graylog2.rest.resources.RestResource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -36,6 +37,7 @@ import java.util.Map;
 /**
  * @author Lennart Koopmann <lennart@torch.sh>
  */
+@Api(value = "Cluster: Nodes", description = "Nodes of this cluster / Node discovery")
 @Path("/cluster/nodes")
 public class NodesResource extends RestResource {
 
@@ -44,8 +46,14 @@ public class NodesResource extends RestResource {
     @GET
     @Timed
     @Path("/{nodeId}")
+    @ApiOperation(value = "Information about a node.",
+                  notes = "This is returning information of a node in context to its state in the cluster. " +
+                          "Use the system API of the node itself to get system information.")
     @Produces(MediaType.APPLICATION_JSON)
-    public String node(@PathParam("nodeId") String nodeId) {
+    @ApiResponses(value = {
+            @ApiResponse(code = 404, message = "Node not found.")
+    })
+    public String node(@ApiParam(title = "nodeId", required = true) @PathParam("nodeId") String nodeId) {
         if (nodeId == null || nodeId.isEmpty()) {
             LOG.error("Missing nodeId. Returning HTTP 400.");
             throw new WebApplicationException(400);
@@ -63,6 +71,7 @@ public class NodesResource extends RestResource {
 
     @GET
     @Timed
+    @ApiOperation(value = "List all active nodes in this cluster.")
     @Produces(MediaType.APPLICATION_JSON)
     public String list() {
         List<Map<String, Object>> nodes = Lists.newArrayList();

@@ -22,9 +22,7 @@ package org.graylog2.rest.documentation.generator;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import org.graylog2.Core;
-import org.graylog2.rest.documentation.annotations.Api;
-import org.graylog2.rest.documentation.annotations.ApiOperation;
-import org.graylog2.rest.documentation.annotations.ApiParam;
+import org.graylog2.rest.documentation.annotations.*;
 import org.reflections.Reflections;
 import org.reflections.scanners.MethodAnnotationsScanner;
 import org.reflections.util.ClasspathHelper;
@@ -237,7 +235,21 @@ public class Generator {
     }
 
     private List<Map<String, Object>> determineResponses(Method method) {
-        return Lists.newArrayList();
+        List<Map<String, Object>> result = Lists.newArrayList();
+
+        if (method.isAnnotationPresent(ApiResponses.class)) {
+            ApiResponses responses = method.getAnnotation(ApiResponses.class);
+            for(ApiResponse response : responses.value()) {
+                Map<String, Object> responseDescription = Maps.newHashMap();
+
+                responseDescription.put("code", response.code());
+                responseDescription.put("message", response.message());
+
+                result.add(responseDescription);
+            }
+        }
+
+        return result;
     }
 
     // Leading slash but no trailing.
