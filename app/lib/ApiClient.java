@@ -5,6 +5,8 @@ import com.google.common.base.Preconditions;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 import com.google.gson.Gson;
+import com.google.inject.Inject;
+import com.google.inject.Singleton;
 import com.ning.http.client.*;
 import models.Node;
 import models.User;
@@ -23,25 +25,38 @@ import java.text.MessageFormat;
 import java.util.*;
 import java.util.concurrent.ExecutionException;
 
+@Singleton
 public class ApiClient {
     private static final Logger log = LoggerFactory.getLogger(ApiClient.class);
 
     public static final String ERROR_MSG_IO = "Could not connect to graylog2-server. Please make sure that it is running and you configured the correct REST URI.";
 
     private static AsyncHttpClient client;
+    private final ServerNodes serverNodes;
+    private Thread shutdownHook;
 
-    // explicitly called so we can override it in tests, until we have dependency injection
-    public static void initialize() {
+    @Inject
+    private ApiClient(ServerNodes serverNodes) {
+        this.serverNodes = serverNodes;
+    }
+
+    public void start() {
         AsyncHttpClientConfig.Builder builder = new AsyncHttpClientConfig.Builder();
         builder.setAllowPoolingConnection(false);
         client = new AsyncHttpClient(builder.build());
 
-        Runtime.getRuntime().addShutdownHook(new Thread(new Runnable() {
+        shutdownHook = new Thread(new Runnable() {
             @Override
             public void run() {
                 client.close();
             }
-        }));
+        });
+        Runtime.getRuntime().addShutdownHook(shutdownHook);
+    }
+
+    public void stop() {
+        Runtime.getRuntime().removeShutdownHook(shutdownHook);
+        client.close();
     }
 
     // default visibility for access from tests (overrides the effects of initialize())

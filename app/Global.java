@@ -1,6 +1,11 @@
 import com.google.common.collect.Lists;
+import com.google.inject.AbstractModule;
+import com.google.inject.Guice;
+import com.google.inject.Injector;
+import com.google.inject.Module;
+import com.google.inject.name.Names;
 import lib.ApiClient;
-import lib.ServerNodes;
+import lib.ServerNodesRefreshService;
 import lib.security.LocalAdminUserRealm;
 import lib.security.PlayAuthenticationListener;
 import lib.security.RethrowingFirstSuccessfulStrategy;
@@ -23,6 +28,7 @@ import play.Configuration;
 import play.GlobalSettings;
 
 import java.io.File;
+import java.util.List;
 
 /**
  *
@@ -30,6 +36,7 @@ import java.io.File;
 @SuppressWarnings("unused")
 public class Global extends GlobalSettings {
 	private static final Logger log = LoggerFactory.getLogger(Global.class);
+    private Injector injector;
 
     @Override
     public Configuration onLoadConfig(Configuration configuration, File file, ClassLoader classLoader) {
@@ -76,11 +83,27 @@ public class Global extends GlobalSettings {
             initialNodes[i++] = new Node(r);
         }
 
-        ApiClient.initialize();
-        ServerNodes.initialize(initialNodes);
+        List<Module> modules = Lists.newArrayList();
+        modules.add(new AbstractModule() {
+            @Override
+            protected void configure() {
+                bind(Node[].class).annotatedWith(Names.named("Initial Nodes")).toInstance(initialNodes);
+            }
+        });
+        injector = Guice.createInjector(modules);
+
+        // start the services that need starting
+        injector.getInstance(ApiClient.class).start();
+        injector.getInstance(ServerNodesRefreshService.class).start();
+
 	}
 
-	private void setupLocalUser(SimpleAccountRealm realm, Application app) {
+    @Override
+    public <A> A getControllerInstance(Class<A> controllerClass) throws Exception {
+        return injector.getInstance(controllerClass);
+    }
+
+    private void setupLocalUser(SimpleAccountRealm realm, Application app) {
 		final Configuration config = app.configuration();
         final String username = config.getString("local-user.name", "localadmin");
         final String passwordHash = config.getString("local-user.password-sha1");

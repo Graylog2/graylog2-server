@@ -20,65 +20,36 @@
 package lib;
 
 import com.google.common.collect.ImmutableList;
-import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
-import com.google.common.util.concurrent.ThreadFactoryBuilder;
+import com.google.inject.Inject;
+import com.google.inject.Singleton;
+import com.google.inject.name.Named;
 import models.Node;
-import models.api.responses.NodeResponse;
-import models.api.responses.NodeSummaryResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
-import java.util.concurrent.Callable;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicReference;
 
+@Singleton
 public class ServerNodes {
     private static final Logger log = LoggerFactory.getLogger(ServerNodes.class);
 
-    private final Random random;
+    private final Random random = new Random();
 
     private AtomicReference<ImmutableList<Node>> nodes = new AtomicReference<>();
-
-    private ScheduledExecutorService executor;
 
     private static ServerNodes INSTANCE;
     private static ImmutableList<Node> initialNodes;
 
-    private ServerNodes() {
-        random = new Random();
-
-        final Node initialNode = initialNodes.get(random.nextInt(initialNodes.size()));
-        final NodeRefreshOperation refreshOperation = new NodeRefreshOperation(initialNode);
-        final List<Node> nodeList;
-        try {
-            nodeList = refreshOperation.call();
-        } catch (Exception e) {
-            // TODO retry
-            log.error("Could not retrieve graylog2 node list from initial node {}", initialNode);
-            throw new RuntimeException(e);
-        }
-        nodes.set(ImmutableList.copyOf(nodeList));
-
-        executor = Executors.newSingleThreadScheduledExecutor(
-                new ThreadFactoryBuilder().setNameFormat("node-refresh-").setDaemon(true).build()
-        );
-        executor.scheduleAtFixedRate(new Runnable() {
-            @Override
-            public void run() {
-                refreshNodeList();
-            }
-        }, 5, 5, TimeUnit.SECONDS);
-    }
-
-    public static void initialize(Node... nodes) {
+    @Inject
+    private ServerNodes(@Named("Initial Nodes") Node[] nodes) {
+        log.info("Creating ServerNodes with initial nodes {}", nodes);
         initialNodes = ImmutableList.copyOf(nodes);
-        INSTANCE = new ServerNodes();
+        setCurrentNodes(initialNodes);
+        INSTANCE = this;
     }
 
     public static ServerNodes getInstance() {
@@ -86,20 +57,6 @@ public class ServerNodes {
             throw new IllegalStateException("ServerNodes.initialize() was not called.");
         }
         return INSTANCE;
-    }
-
-    public void refreshNodeList() {
-        final Node initialNode = any();
-        final NodeRefreshOperation refreshOperation = new NodeRefreshOperation(initialNode);
-        final List<Node> nodeList;
-        try {
-            nodeList = refreshOperation.call();
-        } catch (Exception e) {
-            // TODO retry
-            log.error("Could not retrieve graylog2 node list from node {}", initialNode);
-            throw new RuntimeException(e);
-        }
-        nodes.set(ImmutableList.copyOf(nodeList));
     }
 
     public static List<Node> all() {
@@ -121,27 +78,7 @@ public class ServerNodes {
         return map;
     }
 
-    private class NodeRefreshOperation implements Callable<List<Node>> {
-        private final Node node;
-
-        public NodeRefreshOperation(Node node) {
-            this.node = node;
-        }
-        @Override
-        public List<Node> call() throws Exception {
-            List<Node> newNodes = Lists.newArrayList();
-            log.debug("Updating graylog2 server node list from node {}", node);
-            NodeResponse response = ApiClient.get(NodeResponse.class)
-                    .path("/cluster/nodes")
-                    .node(node)
-                    .execute();
-            int i = 0;
-            for (NodeSummaryResponse nsr : response.nodes) {
-                log.debug("Adding graylog2 server node {} to current set of nodes ({}/{})", nsr.transportAddress, ++i, response.nodes.size());
-                newNodes.add(new Node(nsr));
-            }
-            return newNodes;
-        }
+    public void setCurrentNodes(List<Node> nodeList) {
+        nodes.set(ImmutableList.copyOf(nodeList));
     }
-
 }
