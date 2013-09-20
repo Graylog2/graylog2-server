@@ -24,8 +24,10 @@
       dom_id: "swagger-ui-container",
       supportedSubmitMethods: ['get', 'post', 'put', 'delete'],
       onComplete: function(swaggerApi, swaggerUi){
-        if(apiTarget != swaggerApi.system.basePath) {
-          alert("IMPORTANT: Please use the configured REST transport address (" + swaggerApi.system.basePath + ") if you want working examples. " +
+
+        // We are taking the base path of the system API here. This will break if you should ever rename it lol.
+        if(apiTarget != swaggerApi.System.basePath) {
+          alert("IMPORTANT: Please use the configured REST transport address (" + swaggerApi.System.basePath + ") if you want working examples. " +
                   "This connection to " + apiTarget + " will cause problems with Access-Control-Allow-Origin.");
         }
 
