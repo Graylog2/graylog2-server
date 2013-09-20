@@ -102,7 +102,7 @@ public class SplitAndIndexExtractorTest {
         x.runExtractor(new GraylogServerStub(), msg);
 
         assertNotNull(msg.getField("our_result"));
-        assertEquals("<10> 07 Aug 2013 somesubsystem: this is my message for username9001 ", msg.getField("somefield"));
+        assertEquals("<10> 07 Aug 2013 somesubsystem: this is my message for username9001", msg.getField("somefield"));
         assertEquals("id:9001", msg.getField("our_result"));
     }
 
