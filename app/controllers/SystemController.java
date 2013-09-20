@@ -23,6 +23,7 @@ import com.google.common.collect.Maps;
 import lib.APIException;
 import lib.ApiClient;
 import lib.BreadcrumbList;
+import lib.ServerNodes;
 import models.*;
 import play.mvc.*;
 
@@ -67,7 +68,7 @@ public class SystemController extends AuthenticatedController {
 
         try {
             List<ServerJVMStats> serverJvmStats = ServerJVMStats.get();
-            Map<String, Node> nodes = Node.asMap();
+            Map<String, Node> nodes = ServerNodes.asMap();
             Map<String, BufferInfo> bufferInfo = Maps.newHashMap();
 
             // Ask every node for buffer info.
