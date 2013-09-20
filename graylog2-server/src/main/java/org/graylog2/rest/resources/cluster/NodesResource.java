@@ -37,7 +37,7 @@ import java.util.Map;
 /**
  * @author Lennart Koopmann <lennart@torch.sh>
  */
-@Api(value = "Cluster: Nodes", description = "Nodes of this cluster / Node discovery")
+@Api(value = "Cluster/Nodes", description = "Node discovery")
 @Path("/cluster/nodes")
 public class NodesResource extends RestResource {
 

@@ -25,6 +25,7 @@ import com.google.common.collect.Maps;
 import org.elasticsearch.indices.IndexMissingException;
 import org.graylog2.indexer.messages.DocumentNotFoundException;
 import org.graylog2.indexer.results.ResultMessage;
+import org.graylog2.rest.documentation.annotations.*;
 import org.graylog2.rest.resources.RestResource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -37,21 +38,28 @@ import java.util.Map;
 /**
  * @author Lennart Koopmann <lennart@torch.sh>
  */
+@Api(value = "Messages", description = "Single messages")
 @Path("/messages/{index}")
 public class MessageResource extends RestResource {
     private static final Logger LOG = LoggerFactory.getLogger(MessageResource.class);
 
     @GET @Path("/{messageId}") @Timed
+    @ApiOperation(value = "Get a single message.")
     @Produces(MediaType.APPLICATION_JSON)
-    public String search(@PathParam("index") String index, @PathParam("messageId") String messageId) {
+    @ApiResponses(value = {
+            @ApiResponse(code = 404, message = "Specified index does not exist."),
+            @ApiResponse(code = 404, message = "Message does not exist.")
+    })
+    public String search(
+            @ApiParam(title = "index", description = "The index this message is stored in.", required = true) @PathParam("index") String index,
+            @ApiParam(title = "messageId", required = true) @PathParam("messageId") String messageId) {
         if (messageId == null || messageId.isEmpty()) {
         	LOG.error("Missing parameters. Returning HTTP 400.");
         	throw new WebApplicationException(400);
         }
-        
-        ResultMessage m;
+
 		try {
-			m = core.getIndexer().messages().get(messageId, index);
+			return json(core.getIndexer().messages().get(messageId, index));
 		} catch (IndexMissingException e) {
         	LOG.error("Index does not exist. Returning HTTP 404.");
         	throw new WebApplicationException(404);
@@ -59,13 +67,18 @@ public class MessageResource extends RestResource {
         	LOG.error("Message does not exist. Returning HTTP 404.");
         	throw new WebApplicationException(404);
 		}
-
-        return json(m);
     }
     
     @GET @Path("/analyze") @Timed
+    @ApiOperation(value = "Analyze a message string",
+                  notes = "Returns what tokens/terms a message string (message or full_message) is slit to.")
     @Produces(MediaType.APPLICATION_JSON)
-    public String analyze(@PathParam("index") String index, @QueryParam("string") String string) {
+    @ApiResponses(value = {
+            @ApiResponse(code = 404, message = "Specified index does not exist."),
+    })
+    public String analyze(
+            @ApiParam(title = "index", description = "The index the message containing the string is stored in.", required = true) @PathParam("index") String index,
+            @ApiParam(title = "string", description = "The string to analyze.", required = true) @QueryParam("string") String string) {
         if (string == null || string.isEmpty()) {
         	LOG.error("Missing parameters. Returning HTTP 400.");
         	throw new WebApplicationException(400);

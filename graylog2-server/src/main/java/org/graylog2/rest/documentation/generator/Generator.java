@@ -89,6 +89,7 @@ public class Generator {
                 }
 
                 Map<String, Object> apiDescription = Maps.newHashMap();
+                apiDescription.put("name", info.value());
                 apiDescription.put("path", path.value());
                 apiDescription.put("description", info.description());
 

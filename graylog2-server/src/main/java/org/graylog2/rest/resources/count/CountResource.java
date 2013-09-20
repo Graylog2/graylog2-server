@@ -21,6 +21,8 @@ package org.graylog2.rest.resources.count;
 
 import com.codahale.metrics.annotation.Timed;
 import com.google.common.collect.Maps;
+import org.graylog2.rest.documentation.annotations.Api;
+import org.graylog2.rest.documentation.annotations.ApiOperation;
 import org.graylog2.rest.resources.RestResource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -34,12 +36,12 @@ import java.util.Map;
 /**
  * @author Lennart Koopmann <lennart@torch.sh>
  */
+@Api(value = "Counts", description = "Message counts")
 @Path("/count")
 public class CountResource extends RestResource {
-	
-    private static final Logger LOG = LoggerFactory.getLogger(CountResource.class);
 
     @GET @Path("/total") @Timed
+    @ApiOperation(value = "Total number of messages in all your indices.")
     @Produces(MediaType.APPLICATION_JSON)
     public String total() {
         Map<String, Long> result = Maps.newHashMap();
