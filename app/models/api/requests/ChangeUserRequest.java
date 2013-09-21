@@ -17,23 +17,27 @@
  * along with Graylog2.  If not, see <http://www.gnu.org/licenses/>.
  *
  */
-package models;
+package models.api.requests;
 
-import static play.data.validation.Constraints.Required;
+import models.User;
+import models.api.requests.ApiRequest;
+import play.data.validation.Constraints;
 
-public class CreateUserRequest extends ChangeUserRequest {
-    @Required
-    public String username;
-    @Required
-    public String password;
+import java.util.List;
 
-    public CreateUserRequest() { /* required for data binding */ }
+public class ChangeUserRequest extends ApiRequest {
+    @Constraints.Required
+    public String fullname;
+    @Constraints.Required
+    public String email;
+    @Constraints.Required
+    public List<String> permissions;
 
-    public CreateUserRequest(User user) {
-        this.username = user.getName();
+    public ChangeUserRequest() { /* for data binding */ }
+
+    public ChangeUserRequest(User user) {
         this.fullname = user.getFullName();
         this.email = user.getEmail();
-        this.password = "";
         this.permissions = user.getPermissions();
     }
 }

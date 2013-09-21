@@ -3,6 +3,8 @@ package models;
 import com.google.common.collect.Lists;
 import lib.APIException;
 import lib.ApiClient;
+import models.api.requests.ChangeUserRequest;
+import models.api.requests.CreateUserRequest;
 import models.api.responses.system.UserResponse;
 import models.api.responses.system.UsersListResponse;
 import org.slf4j.Logger;

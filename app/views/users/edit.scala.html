@@ -1,4 +1,4 @@
-@(form: Form[ChangeUserRequest], username: String, currentUser: User, permissions: java.util.List[String], selectedPermissions: java.util.Set[String], breadcrumbs: lib.BreadcrumbList)
+@(form: Form[models.api.requests.ChangeUserRequest], username: String, currentUser: User, permissions: java.util.List[String], selectedPermissions: java.util.Set[String], breadcrumbs: lib.BreadcrumbList)
 
 @main("Users", sidebars.standard(currentUser), "", currentUser) {
 

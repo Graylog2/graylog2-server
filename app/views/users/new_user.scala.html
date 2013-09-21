@@ -1,4 +1,4 @@
-@(form: Form[CreateUserRequest], currentUser: User, permissions: java.util.List[String], selectedPermissions: java.util.Set[String], breadcrumbs: lib.BreadcrumbList)
+@(form: Form[models.api.requests.CreateUserRequest], currentUser: User, permissions: java.util.List[String], selectedPermissions: java.util.Set[String], breadcrumbs: lib.BreadcrumbList)
 
 @main("Users", views.html.system.sidebar(), "", currentUser) {
 
@@ -43,3 +43,4 @@
     </div>
 
 }
+
