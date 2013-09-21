@@ -20,6 +20,7 @@
 package controllers;
 
 import com.google.common.collect.Maps;
+import com.google.inject.Inject;
 import lib.APIException;
 import lib.ApiClient;
 import lib.BreadcrumbList;
@@ -34,9 +35,12 @@ import java.util.Map;
 /**
  * @author Lennart Koopmann <lennart@torch.sh>
  */
-public class SystemController extends AuthenticatedController {
+public class SystemController extends BaseAuthenticatedController {
 
-    public static Result index(Integer page) {
+    @Inject
+    private BufferInfo.Factory bufferInfoFactory;
+
+    public Result index(Integer page) {
         try {
             List<Notification> notifications = Notification.all();
             List<SystemJob> systemJobs = SystemJob.all();
@@ -61,7 +65,7 @@ public class SystemController extends AuthenticatedController {
         }
     }
 
-    public static Result nodes() {
+    public  Result nodes() {
         BreadcrumbList bc = new BreadcrumbList();
         bc.addCrumb("System", routes.SystemController.index(0));
         bc.addCrumb("Nodes", routes.SystemController.nodes());
@@ -73,7 +77,7 @@ public class SystemController extends AuthenticatedController {
 
             // Ask every node for buffer info.
             for(Node node : nodes.values()) {
-                bufferInfo.put(node.getNodeId(), BufferInfo.ofNode(node));
+                bufferInfo.put(node.getNodeId(), bufferInfoFactory.ofNode(node));
             }
 
             return ok(views.html.system.nodes.render(currentUser(), bc, serverJvmStats, nodes, bufferInfo));
@@ -85,12 +89,12 @@ public class SystemController extends AuthenticatedController {
         }
     }
 
-    public static Result node(String nodeId) {
+    public Result node(String nodeId) {
         // TODO
         return ok("implement me");
     }
 
-    public static Result threadDump(String nodeId) {
+    public Result threadDump(String nodeId) {
         try {
             Node node = Node.fromId(nodeId);
 

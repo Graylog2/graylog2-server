@@ -10,6 +10,7 @@ import lib.security.LocalAdminUserRealm;
 import lib.security.PlayAuthenticationListener;
 import lib.security.RethrowingFirstSuccessfulStrategy;
 import lib.security.ServerRestInterfaceRealm;
+import models.ModelFactoryModule;
 import models.Node;
 import models.User;
 import models.api.responses.NodeSummaryResponse;
@@ -90,6 +91,7 @@ public class Global extends GlobalSettings {
                 bind(Node[].class).annotatedWith(Names.named("Initial Nodes")).toInstance(initialNodes);
             }
         });
+        modules.add(new ModelFactoryModule());
         injector = Guice.createInjector(modules);
 
         // start the services that need starting

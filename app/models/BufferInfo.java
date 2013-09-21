@@ -19,11 +19,15 @@
  */
 package models;
 
+import com.google.inject.Inject;
+import com.google.inject.assistedinject.Assisted;
 import lib.APIException;
 import lib.ApiClient;
 import models.api.responses.BufferSummaryResponse;
 import models.api.responses.BuffersResponse;
 import models.api.responses.MasterCacheSummaryResponse;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 
@@ -31,13 +35,30 @@ import java.io.IOException;
  * @author Lennart Koopmann <lennart@torch.sh>
  */
 public class BufferInfo {
+    public interface Factory {
+        public BufferInfo ofNode(Node node);
+    }
 
-    public final BufferSummaryResponse inputBuffer;
-    public final BufferSummaryResponse outputBuffer;
-    public final MasterCacheSummaryResponse inputMasterCache;
-    public final MasterCacheSummaryResponse outputMasterCache;
+    private static final Logger log = LoggerFactory.getLogger(BufferInfo.class);
 
-    public BufferInfo(BuffersResponse br) {
+    private final BufferSummaryResponse inputBuffer;
+    private final BufferSummaryResponse outputBuffer;
+    private final MasterCacheSummaryResponse inputMasterCache;
+    private final MasterCacheSummaryResponse outputMasterCache;
+
+    @Inject
+    public BufferInfo(ApiClient api, @Assisted Node node) {
+        BuffersResponse br = null;
+        try {
+            br = api.get(BuffersResponse.class)
+                    .node(node)
+                    .path("/system/buffers")
+                    .execute();
+        } catch (APIException e) {
+            log.error("Unable to read buffer info from node " + node, e);
+        } catch (IOException e) {
+            log.error("Unexpected exception", e);
+        }
         inputBuffer = br.buffers.get("input");
         outputBuffer = br.buffers.get("output");
 
@@ -60,12 +81,4 @@ public class BufferInfo {
     public MasterCacheSummaryResponse getOutputMasterCache() {
         return outputMasterCache;
     }
-
-    public static BufferInfo ofNode(Node node) throws IOException, APIException {
-        return new BufferInfo(ApiClient.get(BuffersResponse.class)
-                .node(node)
-                .path("/system/buffers")
-                .execute());
-    }
-
 }

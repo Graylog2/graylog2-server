@@ -21,10 +21,10 @@ GET         /streams                                                            
 GET         /streams/new                                                             controllers.StreamsController.newStream()
 
 # System
-GET         /system                                                                  controllers.SystemController.index(page:Integer ?= 1)
-GET         /system/nodes                                                            controllers.SystemController.nodes()
-GET         /system/nodes/:node_id                                                   controllers.SystemController.node(node_id: String)
-GET         /system/threaddump/:node_id                                              controllers.SystemController.threadDump(node_id: String)
+GET         /system                                                                  @controllers.SystemController.index(page:Integer ?= 1)
+GET         /system/nodes                                                            @controllers.SystemController.nodes()
+GET         /system/nodes/:node_id                                                   @controllers.SystemController.node(node_id: String)
+GET         /system/threaddump/:node_id                                              @controllers.SystemController.threadDump(node_id: String)
 GET         /system/inputs/:node_id                                                  controllers.InputsController.manage(node_id: String)
 POST        /system/inputs/:node_id                                                  controllers.InputsController.launch(node_id: String)
 POST        /system/inputs/:node_id/:input_id/terminate                              controllers.InputsController.terminate(node_id: String, input_id: String)
