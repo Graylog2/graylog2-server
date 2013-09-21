@@ -21,12 +21,8 @@ package controllers;
 
 import com.google.inject.Inject;
 import lib.ApiClient;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 public class BaseAuthenticatedController extends AuthenticatedController {
-    private static final Logger log = LoggerFactory.getLogger(BaseAuthenticatedController.class);
-
     private ApiClient api;
 
     public ApiClient api() {
@@ -35,7 +31,6 @@ public class BaseAuthenticatedController extends AuthenticatedController {
 
     @Inject
     public void setApi(ApiClient api) {
-        log.info("injected api client instance {}", api);
         this.api = api;
     }
 }
