@@ -1,7 +1,7 @@
 package controllers;
 
 import com.google.common.collect.Maps;
-import lib.security.Graylog2ServerUnvavailableException;
+import lib.security.Graylog2ServerUnavailableException;
 import models.LoginRequest;
 import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.authc.AuthenticationException;
@@ -57,7 +57,7 @@ public class SessionsController extends Controller {
 			return redirect("/");
 		} catch (AuthenticationException e) {
 			log.warn("Unable to authenticate user {}. Redirecting back to '/'", r.username, e);
-            if (e instanceof Graylog2ServerUnvavailableException) {
+            if (e instanceof Graylog2ServerUnavailableException) {
                 flash("error", "Could not reach any Graylog2 server!");
             } else {
                 flash("error", "Sorry, those credentials are invalid.");

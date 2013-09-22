@@ -21,21 +21,21 @@ package lib.security;
 
 import org.apache.shiro.authc.AuthenticationException;
 
-public class Graylog2ServerUnvavailableException extends AuthenticationException {
+public class Graylog2ServerUnavailableException extends AuthenticationException {
 
-    public Graylog2ServerUnvavailableException() {
+    public Graylog2ServerUnavailableException() {
         super();
     }
 
-    public Graylog2ServerUnvavailableException(String message) {
+    public Graylog2ServerUnavailableException(String message) {
         super(message);
     }
 
-    public Graylog2ServerUnvavailableException(Throwable cause) {
+    public Graylog2ServerUnavailableException(Throwable cause) {
         super(cause);
     }
 
-    public Graylog2ServerUnvavailableException(String message, Throwable cause) {
+    public Graylog2ServerUnavailableException(String message, Throwable cause) {
         super(message, cause);
     }
 }

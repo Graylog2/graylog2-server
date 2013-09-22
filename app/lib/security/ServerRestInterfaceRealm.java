@@ -80,7 +80,7 @@ public class ServerRestInterfaceRealm extends AuthorizingRealm {
         } catch (IOException e) {
             throw new AuthenticationException("Unable to communicate with graylog2-server backend", e);
         } catch (APIException e) {
-            throw new Graylog2ServerUnvavailableException("Could not connect to Graylog2 Server.", e);
+            throw new Graylog2ServerUnavailableException("Could not connect to Graylog2 Server.", e);
             // throw new AuthenticationException("Server responded with non-200 code", e);
         }
         return new SimpleAuthenticationInfo(response.username, authToken.getCredentials(), "rest-interface");
