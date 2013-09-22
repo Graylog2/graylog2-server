@@ -153,8 +153,19 @@ public class SearchResource extends RestResource {
     }
 
     @GET @Path("/universal/absolute/stats") @Timed
+    @ApiOperation(value = "Field statistics for a query using an absolute timerange.",
+            notes = "Returns statistics like min/max or standard deviation of numeric fields " +
+                    "over the whole query result set.")
     @Produces(MediaType.APPLICATION_JSON)
-    public String statsKeyword(@QueryParam("field") String field, @QueryParam("query") String query, @QueryParam("from") String from, @QueryParam("to") String to) {
+    @ApiResponses(value = {
+            @ApiResponse(code = 400, message = "Invalid timerange parameters provided."),
+            @ApiResponse(code = 400, message = "Field is not of numeric type.")
+})
+    public String statsKeyword(
+            @ApiParam(title = "field", description = "Message field of numeric type to return statistics for", required = true) @QueryParam("field") String field,
+            @ApiParam(title = "query", description = "Query (Lucene syntax)", required = true) @QueryParam("query") String query,
+            @ApiParam(title = "from", description = "Timerange start. See search method description for date format", required = true) @QueryParam("from") String from,
+            @ApiParam(title = "to", description = "Timerange end. See search method description for date format", required = true) @QueryParam("to") String to) {
         checkQueryAndField(query, field);
 
         return json(buildFieldStatsResult(
