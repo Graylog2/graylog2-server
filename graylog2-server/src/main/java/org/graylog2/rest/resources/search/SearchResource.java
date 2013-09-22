@@ -32,9 +32,7 @@ import org.graylog2.indexer.searches.timeranges.AbsoluteRange;
 import org.graylog2.indexer.searches.timeranges.InvalidRangeParametersException;
 import org.graylog2.indexer.searches.timeranges.RelativeRange;
 import org.graylog2.indexer.searches.timeranges.TimeRange;
-import org.graylog2.rest.documentation.annotations.Api;
-import org.graylog2.rest.documentation.annotations.ApiOperation;
-import org.graylog2.rest.documentation.annotations.ApiParam;
+import org.graylog2.rest.documentation.annotations.*;
 import org.graylog2.rest.resources.RestResource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -60,10 +58,13 @@ public class SearchResource extends RestResource {
                   notes = "Search for messages in a relative timerange, specified as seconds from now. " +
                           "Example: 300 means search from 5 minutes ago to now.")
     @Produces(MediaType.APPLICATION_JSON)
+    @ApiResponses(value = {
+            @ApiResponse(code = 400, message = "Invalid timerange parameters provided.")
+    })
     public String searchRelative(
             @ApiParam(title = "query", description = "Query (Lucene syntax)", required = true) @QueryParam("query") String query,
             @ApiParam(title = "range", description = "Relative timeframe to search in. See method description.", required = true) @QueryParam("range") int range,
-            @ApiParam(title = "limit", description = "Maximum number of messages to return.", required = true) @QueryParam("limit") int limit) {
+            @ApiParam(title = "limit", description = "Maximum number of messages to return.", required = false) @QueryParam("limit") int limit) {
         checkQuery(query);
 
         return json(buildSearchResult(
@@ -82,8 +83,18 @@ public class SearchResource extends RestResource {
     }
 
     @GET @Path("/universal/relative/stats") @Timed
+    @ApiOperation(value = "Field statistics for a query using a relative timerange.",
+                  notes = "Returns statistics like min/max or standard deviation of numeric fields " +
+                          "over the whole query result set.")
+    @ApiResponses(value = {
+            @ApiResponse(code = 400, message = "Invalid timerange parameters provided."),
+            @ApiResponse(code = 400, message = "Field is not of numeric type.")
+    })
     @Produces(MediaType.APPLICATION_JSON)
-    public String statsRelative(@QueryParam("field") String field, @QueryParam("query") String query, @QueryParam("range") int range) {
+    public String statsRelative(
+            @ApiParam(title = "field", description = "Message field of numeric type to return statistics for", required = true) @QueryParam("field") String field,
+            @ApiParam(title = "query", description = "Query (Lucene syntax)", required = true) @QueryParam("query") String query,
+            @ApiParam(title = "range", description = "Relative timeframe to search in. See search method description.", required = true) @QueryParam("range") int range) {
         checkQueryAndField(query, field);
 
         return json(buildFieldStatsResult(
@@ -112,8 +123,18 @@ public class SearchResource extends RestResource {
      */
 
     @GET @Path("/universal/absolute") @Timed
+    @ApiOperation(value = "Message search with absolute timerange.",
+                  notes = "Search for messages using an absolute timerange, specified as from/to " +
+                          "with format yyyy-MM-dd HH-mm-ss.SSS or yyyy-MM-dd HH-mm-ss.")
     @Produces(MediaType.APPLICATION_JSON)
-    public String searchKeyword(@QueryParam("query") String query, @QueryParam("from") String from, @QueryParam("to") String to, @QueryParam("limit") int limit) {
+    @ApiResponses(value = {
+            @ApiResponse(code = 400, message = "Invalid timerange parameters provided.")
+    })
+    public String searchKeyword(
+            @ApiParam(title = "query", description = "Query (Lucene syntax)", required = true) @QueryParam("query") String query,
+            @ApiParam(title = "from", description = "Timerange start. See description for date format", required = true) @QueryParam("from") String from,
+            @ApiParam(title = "to", description = "Timerange end. See description for date format", required = true) @QueryParam("to") String to,
+            @ApiParam(title = "limit", description = "Maximum number of messages to return.", required = false) @QueryParam("limit") int limit) {
         checkQuery(query);
 
         return json(buildSearchResult(
