@@ -21,8 +21,9 @@ package controllers;
 
 import com.google.inject.Inject;
 import lib.ApiClient;
+import play.mvc.Controller;
 
-public class BaseAuthenticatedController extends AuthenticatedController {
+public class BaseController extends Controller {
     private ApiClient api;
 
     public ApiClient api() {

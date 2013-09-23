@@ -35,7 +35,7 @@ import java.util.Map;
 /**
  * @author Lennart Koopmann <lennart@torch.sh>
  */
-public class SystemController extends BaseAuthenticatedController {
+public class SystemController extends AuthenticatedController {
 
     @Inject
     private BufferInfo.Factory bufferInfoFactory;
