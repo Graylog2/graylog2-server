@@ -24,6 +24,8 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import org.graylog2.cluster.Node;
 import org.graylog2.plugin.Tools;
+import org.graylog2.rest.documentation.annotations.Api;
+import org.graylog2.rest.documentation.annotations.ApiOperation;
 import org.graylog2.rest.resources.RestResource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -38,6 +40,7 @@ import java.util.Map;
 /**
  * @author Lennart Koopmann <lennart@torch.sh>
  */
+@Api(value = "System/Cluster", description = "Node discovery")
 @Path("/system/cluster")
 public class ClusterResource extends RestResource {
 
@@ -45,6 +48,7 @@ public class ClusterResource extends RestResource {
 
     @GET @Timed
     @Path("/nodes")
+    @ApiOperation(value = "List all active nodes in this cluster.")
     @Produces(MediaType.APPLICATION_JSON)
     public String nodes() {
         List<Map<String, Object>> nodeList = Lists.newArrayList();

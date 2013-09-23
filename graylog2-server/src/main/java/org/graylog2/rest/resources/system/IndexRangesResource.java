@@ -21,6 +21,10 @@ package org.graylog2.rest.resources.system;
 
 import com.codahale.metrics.annotation.Timed;
 import org.graylog2.indexer.ranges.RebuildIndexRangesJob;
+import org.graylog2.rest.documentation.annotations.Api;
+import org.graylog2.rest.documentation.annotations.ApiOperation;
+import org.graylog2.rest.documentation.annotations.ApiResponse;
+import org.graylog2.rest.documentation.annotations.ApiResponses;
 import org.graylog2.rest.resources.RestResource;
 import org.graylog2.system.jobs.SystemJob;
 import org.graylog2.system.jobs.SystemJobConcurrencyException;
@@ -37,6 +41,7 @@ import javax.ws.rs.core.Response;
 /**
  * @author Lennart Koopmann <lennart@torch.sh>
  */
+@Api(value = "System/IndexRanges", description = "Index timeranges")
 @Path("/system/indices/ranges")
 public class IndexRangesResource extends RestResource {
 
@@ -44,6 +49,13 @@ public class IndexRangesResource extends RestResource {
 
     @POST @Timed
     @Path("/rebuild")
+    @ApiOperation(value = "Rebuild/sync index range information.",
+                  notes = "This triggers a systemjob that scans every index and stores meta information " +
+                          "about what indices contain messages in what timeranges. It atomically overwrites " +
+                          "already existing meta information.")
+    @ApiResponses(value = {
+            @ApiResponse(code = 202, message = "Rebuild/sync systemjob triggered.")
+    })
     @Produces(MediaType.APPLICATION_JSON)
     public Response rebuild() {
         SystemJob rebuildJob = new RebuildIndexRangesJob(core);
