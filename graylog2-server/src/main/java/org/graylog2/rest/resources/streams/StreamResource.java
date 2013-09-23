@@ -54,7 +54,7 @@ public class StreamResource extends RestResource {
     @ApiOperation(value = "Create a stream")
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
-    public Response create(String body) {
+    public Response create(@ApiParam(title = "JSON body", required = true) String body) {
         CreateRequest cr;
         try {
             cr = objectMapper.readValue(body, CreateRequest.class);
