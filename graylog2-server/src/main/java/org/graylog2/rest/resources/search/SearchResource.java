@@ -73,8 +73,16 @@ public class SearchResource extends RestResource {
     }
 
     @GET @Path("/universal/relative/terms") @Timed
+    @ApiOperation(value = "Most common field terms of a query using a relative timerange.")
+    @ApiResponses(value = {
+            @ApiResponse(code = 400, message = "Invalid timerange parameters provided.")
+    })
     @Produces(MediaType.APPLICATION_JSON)
-    public String termsRelative(@QueryParam("field") String field, @QueryParam("query") String query, @QueryParam("size") int size, @QueryParam("range") int range) {
+    public String termsRelative(
+            @ApiParam(title = "field", description = "Message field of to return terms of", required = true) @QueryParam("field") String field,
+            @ApiParam(title = "query", description = "Query (Lucene syntax)", required = true) @QueryParam("query") String query,
+            @ApiParam(title = "size", description = "Maximum number of terms to return", required = false) @QueryParam("size") int size,
+            @ApiParam(title = "range", description = "Relative timeframe to search in. See search method description.", required = true) @QueryParam("range") int range) {
         checkQueryAndField(query, field);
 
         return json(buildTermsResult(
@@ -143,8 +151,17 @@ public class SearchResource extends RestResource {
     }
 
     @GET @Path("/universal/absolute/terms") @Timed
+    @ApiOperation(value = "Most common field terms of a query using an absolute timerange.")
+    @ApiResponses(value = {
+            @ApiResponse(code = 400, message = "Invalid timerange parameters provided.")
+    })
     @Produces(MediaType.APPLICATION_JSON)
-    public String termsKeyword(@QueryParam("field") String field, @QueryParam("query") String query, @QueryParam("size") int size, @QueryParam("from") String from, @QueryParam("to") String to) {
+    public String termsKeyword(
+            @ApiParam(title = "field", description = "Message field of to return terms of", required = true) @QueryParam("field") String field,
+            @ApiParam(title = "query", description = "Query (Lucene syntax)", required = true) @QueryParam("query") String query,
+            @ApiParam(title = "size", description = "Maximum number of terms to return", required = false) @QueryParam("size") int size,
+            @ApiParam(title = "from", description = "Timerange start. See search method description for date format", required = true) @QueryParam("from") String from,
+            @ApiParam(title = "to", description = "Timerange end. See search method description for date format", required = true) @QueryParam("to") String to) {
         checkQueryAndField(query, field);
 
         return json(buildTermsResult(
@@ -160,7 +177,7 @@ public class SearchResource extends RestResource {
     @ApiResponses(value = {
             @ApiResponse(code = 400, message = "Invalid timerange parameters provided."),
             @ApiResponse(code = 400, message = "Field is not of numeric type.")
-})
+    })
     public String statsKeyword(
             @ApiParam(title = "field", description = "Message field of numeric type to return statistics for", required = true) @QueryParam("field") String field,
             @ApiParam(title = "query", description = "Query (Lucene syntax)", required = true) @QueryParam("query") String query,
@@ -188,6 +205,9 @@ public class SearchResource extends RestResource {
                 )
         ));
     }
+
+
+
 
     private void validateInterval(String interval) {
         try {
