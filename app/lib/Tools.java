@@ -20,7 +20,6 @@
 package lib;
 
 import com.google.common.collect.Maps;
-import play.Play;
 import play.data.Form;
 import play.mvc.Controller;
 
@@ -77,16 +76,6 @@ public class Tools {
         }
 
         return "Invalid";
-    }
-
-    public static byte[] appSecretAsBytes(int keySize) {
-        final String secret = Play.application().configuration().getString("application.secret");
-        final StringBuilder sb = new StringBuilder(secret);
-        while (sb.length() < keySize) {
-            sb.append(secret);
-        }
-        // sb is now at least 16 bytes long, take the first keySize
-        return sb.toString().substring(0, keySize).getBytes();
     }
 
     public static <T> Form<T> bindMultiValueFormFromRequest(Class<T> requestClass) {
