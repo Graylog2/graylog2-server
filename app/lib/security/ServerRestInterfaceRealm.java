@@ -62,7 +62,6 @@ public class ServerRestInterfaceRealm extends AuthorizingRealm {
             final String passwordHash = sha1.toString();
 
             log.debug("Trying to log in {} via REST", token.getUsername());
-            // TODO string concat in url sucks, use messageformat or something that actually encodes, too
             response = ApiClient.get(UserResponse.class)
                     .path("/users/{0}", token.getUsername())
                     .credentials(token.getUsername(), passwordHash)
