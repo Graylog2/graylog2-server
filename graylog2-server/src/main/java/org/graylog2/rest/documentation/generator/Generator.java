@@ -170,7 +170,12 @@ public class Generator {
                     operation.put("summary", apiOperation.value());
                     operation.put("notes", apiOperation.notes());
                     operation.put("nickname", method.getName());
-                    operation.put("parameters", determineParameters(method));
+
+                    List<Map<String, Object>> parameters = determineParameters(method);
+                    if (parameters != null && !parameters.isEmpty()) {
+                        operation.put("parameters", parameters);
+                    }
+
                     operation.put("responseMessages", determineResponses(method));
 
                     operations.add(operation);
@@ -228,7 +233,11 @@ public class Generator {
                 parameter.put("paramType", paramType);
             }
 
-            parameters.add(parameter);
+            // There might be un-annotated parameters.
+            if (!parameter.isEmpty()) {
+                parameters.add(parameter);
+            }
+
             i++;
         }
 
