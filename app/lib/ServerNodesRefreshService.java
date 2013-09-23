@@ -42,11 +42,13 @@ public class ServerNodesRefreshService {
     private final ApiClient api;
     private final ServerNodes serverNodes;
     private ScheduledExecutorService executor;
+    private Node.Factory nodeFactory;
 
     @Inject
-    private ServerNodesRefreshService(ApiClient api, ServerNodes serverNodes) {
+    private ServerNodesRefreshService(ApiClient api, ServerNodes serverNodes, Node.Factory nodeFactory) {
         this.api = api;
         this.serverNodes = serverNodes;
+        this.nodeFactory = nodeFactory;
         executor = Executors.newSingleThreadScheduledExecutor(
                 new ThreadFactoryBuilder()
                         .setNameFormat("servernodes-refresh-%d")
@@ -71,7 +73,7 @@ public class ServerNodesRefreshService {
             int i = 0;
             for (NodeSummaryResponse nsr : response.nodes) {
                 log.debug("Adding graylog2 server node {} to current set of nodes ({}/{})", nsr.transportAddress, ++i, response.nodes.size());
-                newNodes.add(new Node(nsr));
+                newNodes.add(nodeFactory.fromSummaryResponse(nsr));
             }
             return newNodes;
         }

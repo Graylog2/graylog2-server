@@ -29,16 +29,14 @@ import java.io.IOException;
  */
 public class MessageProcessing {
 
-    public static void pause(String nodeId) throws IOException, APIException {
-        Node node = Node.fromId(nodeId);
+    public static void pause(Node node) throws IOException, APIException {
         ApiClient.put()
                 .path("/system/processing/pause")
                 .node(node)
                 .execute();
     }
 
-    public static void resume(String nodeId) throws IOException, APIException {
-        Node node = Node.fromId(nodeId);
+    public static void resume(Node node) throws IOException, APIException {
         ApiClient.put()
                 .path("/system/processing/resume")
                 .node(node)

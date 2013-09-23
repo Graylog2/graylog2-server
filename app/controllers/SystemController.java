@@ -39,13 +39,15 @@ public class SystemController extends AuthenticatedController {
 
     @Inject
     private BufferInfo.Factory bufferInfoFactory;
+    @Inject
+    private Node.Factory nodeFactory;
 
     public Result index(Integer page) {
         try {
             List<Notification> notifications = Notification.all();
             List<SystemJob> systemJobs = SystemJob.all();
             int totalSystemMessages = SystemMessage.total();
-            List<SystemMessage> systemMessages = SystemMessage.all(Integer.valueOf(page-1));
+            List<SystemMessage> systemMessages = SystemMessage.all(page-1);
             ESClusterHealth clusterHealth = ESClusterHealth.get();
 
             return ok(views.html.system.index.render(
@@ -96,7 +98,7 @@ public class SystemController extends AuthenticatedController {
 
     public Result threadDump(String nodeId) {
         try {
-            Node node = Node.fromId(nodeId);
+            Node node = nodeFactory.fromId(nodeId);
 
             BreadcrumbList bc = new BreadcrumbList();
             bc.addCrumb("System", routes.SystemController.index(0));

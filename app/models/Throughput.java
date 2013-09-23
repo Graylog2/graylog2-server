@@ -21,6 +21,7 @@ package models;
 
 import lib.APIException;
 import lib.ApiClient;
+import lib.ServerNodes;
 import models.api.responses.system.ServerThroughputResponse;
 
 import java.io.IOException;
@@ -33,7 +34,7 @@ public class Throughput {
     public static int getTotal() throws IOException, APIException {
         int total = 0;
 
-        for(Node node: Node.all()) {
+        for(Node node: ServerNodes.all()) {
             total += get(node);
         }
 

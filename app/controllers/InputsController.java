@@ -21,7 +21,11 @@ package controllers;
 
 import com.google.common.collect.Maps;
 import com.google.gson.Gson;
-import lib.*;
+import com.google.inject.Inject;
+import lib.APIException;
+import lib.ApiClient;
+import lib.BreadcrumbList;
+import lib.ExclusiveInputException;
 import models.Input;
 import models.Node;
 import models.api.responses.system.InputTypeSummaryResponse;
@@ -36,11 +40,14 @@ import java.util.Map;
  */
 public class InputsController extends AuthenticatedController {
 
-    public static Result manage(String nodeId) {
+    @Inject
+    private Node.Factory nodeFactory;
+
+    public Result manage(String nodeId) {
         // TODO: account field attributes using JS (greater than, listen_address, ...)
         // TODO: persist inputs
 
-        Node node = Node.fromId(nodeId);
+        Node node = nodeFactory.fromId(nodeId);
 
         if (node == null) {
             String message = "Did not find node.";
@@ -68,7 +75,7 @@ public class InputsController extends AuthenticatedController {
         }
     }
 
-    public static Result launch(String nodeId) {
+    public Result launch(String nodeId) {
         Map<String, Object> configuration = Maps.newHashMap();
         Map<String, String[]> form = request().body().asFormUrlEncoded();
 
@@ -76,7 +83,7 @@ public class InputsController extends AuthenticatedController {
         String inputTitle = form.get("title")[0];
 
         try {
-            InputTypeSummaryResponse inputInfo = Input.getTypeInformation(Node.fromId(nodeId), inputType);
+            InputTypeSummaryResponse inputInfo = Input.getTypeInformation(nodeFactory.fromId(nodeId), inputType);
 
             for (Map.Entry<String, String[]> f : form.entrySet()) {
                 if (!f.getKey().startsWith("configuration_")) {
@@ -114,7 +121,7 @@ public class InputsController extends AuthenticatedController {
             }
 
             try {
-                Input.launch(Node.fromId(nodeId), inputTitle, inputType, configuration, currentUser().getId(), inputInfo.isExclusive);
+                Input.launch(nodeFactory.fromId(nodeId), inputTitle, inputType, configuration, currentUser().getId(), inputInfo.isExclusive);
             } catch (ExclusiveInputException e) {
                 flash("error", "This input is exclusive and already running.");
                 return redirect(routes.InputsController.manage(nodeId));
@@ -129,9 +136,9 @@ public class InputsController extends AuthenticatedController {
         }
     }
 
-    public static Result terminate(String nodeId, String inputId) {
+    public Result terminate(String nodeId, String inputId) {
         try {
-            Input.terminate(Node.fromId(nodeId), inputId);
+            Input.terminate(nodeFactory.fromId(nodeId), inputId);
 
             return redirect(routes.InputsController.manage(nodeId));
         } catch (IOException e) {
@@ -142,9 +149,9 @@ public class InputsController extends AuthenticatedController {
         }
     }
 
-    public static Result recentMessage(String nodeId, String inputId) {
+    public Result recentMessage(String nodeId, String inputId) {
         try {
-            Node node = Node.fromId(nodeId);
+            Node node = nodeFactory.fromId(nodeId);
             MessageResult recentlyReceivedMessage = node.getInput(inputId).getRecentlyReceivedMessage(nodeId);
 
             if (recentlyReceivedMessage == null) {

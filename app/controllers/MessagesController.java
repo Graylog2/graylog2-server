@@ -2,6 +2,7 @@ package controllers;
 
 import com.google.common.collect.Maps;
 import com.google.gson.Gson;
+import com.google.inject.Inject;
 import lib.APIException;
 import lib.ApiClient;
 import models.FieldMapper;
@@ -18,7 +19,10 @@ import java.util.Map;
 
 public class MessagesController extends AuthenticatedController {
 
-    public static Result single(String index, String id) {
+    @Inject
+    private Node.Factory nodeFactory;
+
+    public Result single(String index, String id) {
         try {
             MessageResult message = Message.get(index, id);
 
@@ -34,7 +38,7 @@ public class MessagesController extends AuthenticatedController {
         }
     }
 
-	public static Result singleAsPartial(String index, String id) {
+	public Result singleAsPartial(String index, String id) {
 		try {
             MessageResult message = FieldMapper.run(Message.get(index, id));
             Node sourceNode = getSourceNode(message);
@@ -48,7 +52,7 @@ public class MessagesController extends AuthenticatedController {
 		}
 	}
 	
-	public static Result analyze(String index, String id, String field) {
+	public Result analyze(String index, String id, String field) {
 		try {
 			MessageResult message = Message.get(index, id);
 			
@@ -67,9 +71,9 @@ public class MessagesController extends AuthenticatedController {
 		}
 	}
 
-    private static Node getSourceNode(MessageResult m) {
+    private Node getSourceNode(MessageResult m) {
         try {
-            return Node.fromId(m.getSourceNodeId());
+            return nodeFactory.fromId(m.getSourceNodeId());
         } catch(Exception e) {
             Logger.warn("Could not derive source node from message <" + m.getId() + ">.", e);
         }

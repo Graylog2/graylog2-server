@@ -20,8 +20,12 @@
 package models;
 
 import com.google.common.collect.Lists;
+import com.google.inject.Inject;
+import com.google.inject.assistedinject.Assisted;
+import com.google.inject.assistedinject.AssistedInject;
 import lib.APIException;
 import lib.ApiClient;
+import lib.ServerNodes;
 import models.api.requests.SystemJobTriggerRequest;
 import models.api.responses.system.GetSystemJobsResponse;
 import models.api.responses.system.SystemJobSummaryResponse;
@@ -36,6 +40,12 @@ import java.util.UUID;
  * @author Lennart Koopmann <lennart@torch.sh>
  */
 public class SystemJob {
+    public interface Factory {
+        SystemJob fromSummaryResponse(SystemJobSummaryResponse r);
+    }
+
+    @Inject
+    private static Factory systemJobFactory;
 
     // Some known SystemJob types that can be triggered manually from the web interface.
     public enum Type {
@@ -52,11 +62,12 @@ public class SystemJob {
     private final boolean isCancelable;
     private final boolean providesProgress;
 
-    public SystemJob(SystemJobSummaryResponse s) {
+    @AssistedInject
+    public SystemJob(Node.Factory nodeFactory, @Assisted SystemJobSummaryResponse s) {
         this.id = UUID.fromString(s.id);
         this.name = s.name;
         this.description = s.description;
-        this.node = Node.fromId(s.nodeId);
+        this.node = nodeFactory.fromId(s.nodeId);
         this.startedAt = DateTime.parse(s.startedAt);
         this.percentComplete = s.percentComplete;
         this.isCancelable = s.isCancelable;
@@ -98,11 +109,11 @@ public class SystemJob {
     public static List<SystemJob> all() throws IOException, APIException {
         List<SystemJob> jobs = Lists.newArrayList();
 
-        for(Node node : Node.all()) {
+        for(Node node : ServerNodes.all()) {
             GetSystemJobsResponse r = ApiClient.get(GetSystemJobsResponse.class).node(node).path("/system/jobs").execute();
 
             for (SystemJobSummaryResponse job : r.jobs) {
-                jobs.add(new SystemJob(job));
+                jobs.add(systemJobFactory.fromSummaryResponse(job));
             }
         }
 

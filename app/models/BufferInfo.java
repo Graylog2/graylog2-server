@@ -19,8 +19,8 @@
  */
 package models;
 
-import com.google.inject.Inject;
 import com.google.inject.assistedinject.Assisted;
+import com.google.inject.assistedinject.AssistedInject;
 import lib.APIException;
 import lib.ApiClient;
 import models.api.responses.BufferSummaryResponse;
@@ -46,7 +46,7 @@ public class BufferInfo {
     private final MasterCacheSummaryResponse inputMasterCache;
     private final MasterCacheSummaryResponse outputMasterCache;
 
-    @Inject
+    @AssistedInject
     public BufferInfo(ApiClient api, @Assisted Node node) {
         BuffersResponse br = null;
         try {

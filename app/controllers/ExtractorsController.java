@@ -19,6 +19,7 @@
  */
 package controllers;
 
+import com.google.inject.Inject;
 import lib.APIException;
 import lib.ApiClient;
 import lib.BreadcrumbList;
@@ -36,9 +37,12 @@ import java.util.Map;
  */
 public class ExtractorsController extends AuthenticatedController {
 
-    public static Result manage(String nodeId, String inputId) {
+    @Inject
+    private Node.Factory nodeFactory;
+
+    public Result manage(String nodeId, String inputId) {
         try {
-            Node node = Node.fromId(nodeId);
+            Node node = nodeFactory.fromId(nodeId);
             Input input = node.getInput(inputId);
 
             return ok(views.html.system.inputs.extractors.manage.render(
@@ -56,9 +60,9 @@ public class ExtractorsController extends AuthenticatedController {
         }
     }
 
-    public static Result newExtractor(String nodeId, String inputId, String extractorType, String field, String example) {
+    public Result newExtractor(String nodeId, String inputId, String extractorType, String field, String example) {
         try {
-            Node node = Node.fromId(nodeId);
+            Node node = nodeFactory.fromId(nodeId);
             Input input = node.getInput(inputId);
 
             return ok(views.html.system.inputs.extractors.new_extractor.render(
@@ -78,10 +82,10 @@ public class ExtractorsController extends AuthenticatedController {
         }
     }
 
-    public static Result create(String nodeId, String inputId) {
+    public Result create(String nodeId, String inputId) {
         Map<String, String[]> form = request().body().asFormUrlEncoded();
         Extractor.Type extractorType = Extractor.Type.valueOf(form.get("extractor_type")[0].toUpperCase());
-        Node node = Node.fromId(nodeId);
+        Node node = nodeFactory.fromId(nodeId);
 
         Extractor extractor;
         try {
@@ -114,9 +118,9 @@ public class ExtractorsController extends AuthenticatedController {
         return redirect(routes.ExtractorsController.manage(nodeId, inputId));
     }
 
-    public static Result delete(String nodeId, String inputId, String extractorId) {
+    public Result delete(String nodeId, String inputId, String extractorId) {
         try {
-            Node node = Node.fromId(nodeId);
+            Node node = nodeFactory.fromId(nodeId);
             Extractor.delete(node, node.getInput(inputId), extractorId);
 
             return redirect(routes.ExtractorsController.manage(nodeId, inputId));

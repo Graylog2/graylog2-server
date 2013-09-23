@@ -3,6 +3,7 @@ package controllers;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.gson.Gson;
+import com.google.inject.Inject;
 import lib.APIException;
 import models.*;
 import play.mvc.Http;
@@ -15,7 +16,10 @@ import java.util.Set;
 
 public class SystemApiController extends AuthenticatedController {
 
-    public static Result fields() {
+    @Inject
+    private Node.Factory nodeFactory;
+
+    public Result fields() {
         try {
             Set<String> fields = Core.getMessageFields();
 
@@ -30,7 +34,7 @@ public class SystemApiController extends AuthenticatedController {
         }
     }
 
-    public static Result jobs() {
+    public Result jobs() {
         try {
             List<Map<String, Object>> jobs = Lists.newArrayList();
             for(SystemJob j : SystemJob.all()) {
@@ -53,7 +57,7 @@ public class SystemApiController extends AuthenticatedController {
         }
     }
 
-    public static Result notifications() {
+    public Result notifications() {
         try {
             Map<String, Object> result = Maps.newHashMap();
             result.put("count", Notification.all().size());
@@ -66,7 +70,7 @@ public class SystemApiController extends AuthenticatedController {
         }
     }
 
-    public static Result totalThroughput() {
+    public Result totalThroughput() {
         try {
             Map<String, Object> result = Maps.newHashMap();
             result.put("throughput", Throughput.getTotal());
@@ -79,10 +83,10 @@ public class SystemApiController extends AuthenticatedController {
         }
     }
 
-    public static Result nodeThroughput(String nodeId) {
+    public Result nodeThroughput(String nodeId) {
         try {
             Map<String, Object> result = Maps.newHashMap();
-            result.put("throughput", Throughput.get(Node.fromId(nodeId)));
+            result.put("throughput", Throughput.get(nodeFactory.fromId(nodeId)));
 
             return ok(new Gson().toJson(result)).as("application/json");
         } catch (IOException e) {
@@ -92,10 +96,12 @@ public class SystemApiController extends AuthenticatedController {
         }
     }
 
-    public static Result pauseMessageProcessing() {
+    public Result pauseMessageProcessing() {
         try {
             Http.RequestBody body = request().body();
-            MessageProcessing.pause(body.asFormUrlEncoded().get("node_id")[0]);
+            final String nodeId = body.asFormUrlEncoded().get("node_id")[0];
+            final Node node = nodeFactory.fromId(nodeId);
+            MessageProcessing.pause(node);
             return ok();
         } catch (IOException e) {
             return internalServerError("io exception");
@@ -104,10 +110,12 @@ public class SystemApiController extends AuthenticatedController {
         }
     }
 
-    public static Result resumeMessageProcessing() {
+    public Result resumeMessageProcessing() {
         try {
             Http.RequestBody body = request().body();
-            MessageProcessing.resume(body.asFormUrlEncoded().get("node_id")[0]);
+            final String nodeId = body.asFormUrlEncoded().get("node_id")[0];
+            final Node node = nodeFactory.fromId(nodeId);
+            MessageProcessing.resume(node);
             return ok();
         } catch (IOException e) {
             return internalServerError("io exception");
