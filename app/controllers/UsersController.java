@@ -22,14 +22,15 @@ package controllers;
 import com.google.common.collect.ImmutableSet;
 import lib.BreadcrumbList;
 import lib.Tools;
-import models.api.requests.ChangeUserRequest;
-import models.api.requests.CreateUserRequest;
 import models.Permissions;
 import models.User;
+import models.api.requests.ChangeUserRequest;
+import models.api.requests.CreateUserRequest;
 import org.apache.shiro.crypto.hash.SimpleHash;
 import play.data.Form;
 import play.mvc.Result;
 import views.html.users.new_user;
+import views.html.users.show;
 
 import java.util.List;
 
@@ -42,6 +43,20 @@ public class UsersController extends AuthenticatedController {
         final List<User> allUsers = User.all();
         final List<String> permissions = Permissions.all();
         return ok(views.html.users.index.render(currentUser(), allUsers, permissions));
+    }
+
+    public static Result show(String username) {
+        final User user = User.load(username);
+        if (user == null) {
+            return notFound();
+        }
+
+        BreadcrumbList bc = new BreadcrumbList();
+        bc.addCrumb("System", routes.SystemController.index(0));
+        bc.addCrumb("Users", routes.UsersController.index());
+        bc.addCrumb(user.getFullName(), routes.UsersController.show(username));
+
+        return ok(show.render(user, currentUser(), bc));
     }
 
     public static Result newUserForm() {

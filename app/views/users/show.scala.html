@@ -1,0 +1,13 @@
+@(user: User, currentUser: User, breadcrumbs: lib.BreadcrumbList)
+
+@main("Users", sidebars.standard(currentUser), "", currentUser) {
+
+    @views.html.partials.breadcrumbs(breadcrumbs)
+
+    <div>
+        <span id="username">@user.getName</span>
+        <span id="fullname">@user.getFullName</span>
+        <span id="email">@user.getEmail</span>
+        <span id="permissions">@user.getPermissions</span>
+    </div>
+}

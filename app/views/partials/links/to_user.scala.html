@@ -1,6 +1,6 @@
 @(user: User)
 @if(user != null) {
-<a href="/users/@user.getId"><i class="icon icon-user"></i> @user.getFullName</a>
+<a href="@routes.UsersController.show(user.getName)"><i class="icon icon-user"></i> @user.getFullName</a>
 } else {
 	Unknown user
 }
