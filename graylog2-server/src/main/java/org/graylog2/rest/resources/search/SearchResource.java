@@ -111,8 +111,15 @@ public class SearchResource extends RestResource {
     }
 
     @GET @Path("/universal/relative/histogram") @Timed
+    @ApiOperation(value = "Datetime histogram a query using a relative timerange.")
+    @ApiResponses(value = {
+            @ApiResponse(code = 400, message = "Invalid interval provided.")
+    })
     @Produces(MediaType.APPLICATION_JSON)
-    public String histogramRelative(@QueryParam("query") String query, @QueryParam("interval") String interval, @QueryParam("range") int range) {
+    public String histogramRelative(
+            @ApiParam(title = "query", description = "Query (Lucene syntax)", required = true) @QueryParam("query") String query,
+            @ApiParam(title = "interval", description = "Histogram interval / bucket size. (year, quarter, month, week, day, hour or minute)", required = true) @QueryParam("interval") String interval,
+            @ApiParam(title = "range", description = "Relative timeframe to search in. See search method description.", required = true) @QueryParam("range") int range) {
         interval = interval.toUpperCase();
         checkQueryAndInterval(query, interval);
         validateInterval(interval);
