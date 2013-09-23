@@ -224,10 +224,10 @@ public class Generator {
                 String paramType = "";
                 if (annotation instanceof QueryParam) {
                     paramType = "query";
-                }
-
-                if (annotation instanceof PathParam) {
+                } else if (annotation instanceof PathParam) {
                     paramType = "path";
+                } else {
+                    paramType = "body";
                 }
 
                 parameter.put("paramType", paramType);
