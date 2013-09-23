@@ -198,8 +198,17 @@ public class SearchResource extends RestResource {
     }
 
     @GET @Path("/universal/absolute/histogram") @Timed
+    @ApiOperation(value = "Datetime histogram a query using an absolute timerange.")
+    @ApiResponses(value = {
+            @ApiResponse(code = 400, message = "Invalid timerange parameters provided."),
+            @ApiResponse(code = 400, message = "Invalid interval provided.")
+    })
     @Produces(MediaType.APPLICATION_JSON)
-    public String histogramAbsolute(@QueryParam("query") String query, @QueryParam("interval") String interval, @QueryParam("from") String from, @QueryParam("to") String to) {
+    public String histogramAbsolute(
+            @ApiParam(title = "query", description = "Query (Lucene syntax)", required = true) @QueryParam("query") String query,
+            @ApiParam(title = "interval", description = "Histogram interval / bucket size. (year, quarter, month, week, day, hour or minute)", required = true) @QueryParam("interval") String interval,
+            @ApiParam(title = "from", description = "Timerange start. See search method description for date format", required = true) @QueryParam("from") String from,
+            @ApiParam(title = "to", description = "Timerange end. See search method description for date format", required = true) @QueryParam("to") String to) {
         interval = interval.toUpperCase();
         checkQueryAndInterval(query, interval);
         validateInterval(interval);
