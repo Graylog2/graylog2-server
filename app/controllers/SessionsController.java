@@ -22,7 +22,7 @@ public class SessionsController extends Controller {
 
 	final static Form<LoginRequest> userForm = form(LoginRequest.class);
 	
-	public static Result index() {
+	public Result index() {
         // Redirect if already logged in.
         final Subject subject = SecurityUtils.getSubject();
         if (subject.isAuthenticated()) {
@@ -41,12 +41,12 @@ public class SessionsController extends Controller {
         return ok(views.html.sessions.login.render(form));
     }
 	
-	public static Result create() {
+	public Result create() {
 		Form<LoginRequest> loginRequest = userForm.bindFromRequest();
 
 		if (loginRequest.hasErrors()) {
 			flash("error", "Please fill out all fields.");
-			return redirect("/login");
+            return badRequest(views.html.sessions.login.render(loginRequest));
 		}
 		
 		LoginRequest r = loginRequest.get();
@@ -62,11 +62,11 @@ public class SessionsController extends Controller {
             } else {
                 flash("error", "Sorry, those credentials are invalid.");
             }
-			return redirect("/login");
+			return badRequest(views.html.sessions.login.render(loginRequest));
 		}
 	}
 
-	public static Result destroy() {
+	public Result destroy() {
         SecurityUtils.getSubject().logout();
 		session().clear();
 		return redirect("/login");

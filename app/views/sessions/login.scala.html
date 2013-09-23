@@ -16,7 +16,7 @@
             }
 
 			@helper.form(action = controllers.routes.SessionsController.create()) {
-				<input type="text" id="username" class="span4" name="username" placeholder="Username" autofocus>
+				<input type="text" id="username" class="span4" name="username" placeholder="Username" value="@loginForm.field("username").value()" autofocus>
 				<input type="password" id="password" class="span4" name="password" placeholder="Password">
 				<button type="submit" id="signin" name="submit" class="btn btn-info btn-block">Sign in</button>
 			}

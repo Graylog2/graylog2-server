@@ -3,9 +3,9 @@
 # ~~~~
 
 # Authentication
-GET         /login                                                                   controllers.SessionsController.index()
-POST        /session                                                                 controllers.SessionsController.create()
-GET         /logout                                                                  controllers.SessionsController.destroy()
+GET         /login                                                                   @controllers.SessionsController.index()
+POST        /login                                                                   @controllers.SessionsController.create()
+GET         /logout                                                                  @controllers.SessionsController.destroy()
 
 # Home page
 GET         /                                                                        controllers.DashboardController.index()
