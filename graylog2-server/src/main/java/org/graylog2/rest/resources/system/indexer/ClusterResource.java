@@ -21,6 +21,8 @@ package org.graylog2.rest.resources.system.indexer;
 
 import com.codahale.metrics.annotation.Timed;
 import com.google.common.collect.Maps;
+import org.graylog2.rest.documentation.annotations.Api;
+import org.graylog2.rest.documentation.annotations.ApiOperation;
 import org.graylog2.rest.resources.RestResource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -34,6 +36,7 @@ import java.util.Map;
 /**
  * @author Lennart Koopmann <lennart@torch.sh>
  */
+@Api(value = "Indexer/Cluster", description = "Indexer cluster information")
 @Path("/system/indexer/cluster")
 public class ClusterResource extends RestResource {
 
@@ -41,6 +44,7 @@ public class ClusterResource extends RestResource {
 
     @GET @Timed
     @Path("/name")
+    @ApiOperation(value = "Get the cluster name")
     @Produces(MediaType.APPLICATION_JSON)
     public String name() {
         Map<String, Object> result = Maps.newHashMap();
@@ -51,6 +55,7 @@ public class ClusterResource extends RestResource {
 
     @GET @Timed
     @Path("/health")
+    @ApiOperation(value = "Get cluster and shard health overview")
     @Produces(MediaType.APPLICATION_JSON)
     public String health() {
         Map<String, Integer> shards = Maps.newHashMap();

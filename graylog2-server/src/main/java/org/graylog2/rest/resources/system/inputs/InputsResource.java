@@ -34,6 +34,7 @@ import org.graylog2.plugin.inputs.MessageInput;
 import org.graylog2.plugin.configuration.Configuration;
 import org.graylog2.plugin.configuration.ConfigurationException;
 import org.graylog2.plugin.configuration.fields.ConfigurationField;
+import org.graylog2.rest.documentation.annotations.*;
 import org.graylog2.rest.resources.RestResource;
 import org.graylog2.rest.resources.system.inputs.requests.InputLaunchRequest;
 import org.graylog2.system.activities.Activity;
@@ -54,16 +55,20 @@ import java.util.UUID;
 /**
  * @author Lennart Koopmann <lennart@torch.sh>
  */
+@Api(value = "System/Inputs", description = "Message inputs of this node")
 @Path("/system/inputs")
 public class InputsResource extends RestResource {
 
     private static final Logger LOG = LoggerFactory.getLogger(InputsResource.class);
 
-    @GET
-    @Timed
+    @GET @Timed
     @Produces(MediaType.APPLICATION_JSON)
+    @ApiOperation(value = "Get information of a single input on this node")
     @Path("/{inputId}")
-    public String single(@PathParam("inputId") String inputId) {
+    @ApiResponses(value = {
+            @ApiResponse(code = 404, message = "No such input on this node.")
+    })
+    public String single(@ApiParam(title = "inputId", required = true) @PathParam("inputId") String inputId) {
         MessageInput input = core.inputs().getRunningInputs().get(inputId);
 
         if (input == null) {
@@ -75,8 +80,8 @@ public class InputsResource extends RestResource {
 
     }
 
-    @GET
-    @Timed
+    @GET @Timed
+    @ApiOperation(value = "Get all inputs of this node")
     @Produces(MediaType.APPLICATION_JSON)
     public String list() {
         List<Map<String, Object>> inputs = Lists.newArrayList();
@@ -92,11 +97,16 @@ public class InputsResource extends RestResource {
         return json(result);
     }
 
-    @POST
-    @Timed
+    @POST @Timed
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
-    public Response create(String body) {
+    @ApiOperation(value = "Launch input on this node")
+    @ApiResponses(value = {
+            @ApiResponse(code = 404, message = "No such input type registered"),
+            @ApiResponse(code = 400, message = "Missing or invalid configuration"),
+            @ApiResponse(code = 400, message = "Type is exclusive and already has input running")
+    })
+    public Response create(@ApiParam(title = "JSON body", required = true) String body) {
         InputLaunchRequest lr;
         try {
             lr = objectMapper.readValue(body, InputLaunchRequest.class);
@@ -170,9 +180,9 @@ public class InputsResource extends RestResource {
         return Response.status(Response.Status.ACCEPTED).entity(json(result)).build();
     }
 
-    @GET
-    @Timed
+    @GET @Timed
     @Path("/types")
+    @ApiOperation(value = "Get all available input types of this node")
     @Produces(MediaType.APPLICATION_JSON)
     public String types() {
         Map<String, Object> result = Maps.newHashMap();
@@ -181,11 +191,14 @@ public class InputsResource extends RestResource {
         return json(result);
     }
 
-    @DELETE
-    @Timed
+    @DELETE @Timed
     @Path("/{inputId}")
+    @ApiOperation(value = "Terminate input on this node")
     @Produces(MediaType.APPLICATION_JSON)
-    public Response terminate(@PathParam("inputId") String inputId) {
+    @ApiResponses(value = {
+            @ApiResponse(code = 404, message = "No such input on this node.")
+    })
+    public Response terminate(@ApiParam(title = "inputId", required = true) @PathParam("inputId") String inputId) {
         MessageInput input = core.inputs().getRunningInputs().get(inputId);
 
         String msg = "Attempting to terminate input [" + input.getName()+ "]. Reason: REST request.";
@@ -210,11 +223,14 @@ public class InputsResource extends RestResource {
         return Response.status(Response.Status.ACCEPTED).build();
     }
 
-    @GET
-    @Timed
+    @GET @Timed
     @Path("/types/{inputType}")
+    @ApiOperation(value = "Get information about a single input type")
     @Produces(MediaType.APPLICATION_JSON)
-    public String info(@PathParam("inputType") String inputType) {
+    @ApiResponses(value = {
+            @ApiResponse(code = 404, message = "No such input type registered.")
+    })
+    public String info(@ApiParam(title = "inputType", required = true) @PathParam("inputType") String inputType) {
 
         MessageInput input;
         try {
