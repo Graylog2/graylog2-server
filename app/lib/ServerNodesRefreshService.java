@@ -98,11 +98,9 @@ public class ServerNodesRefreshService {
         final List<Node> nodeList;
         try {
             nodeList = refreshOperation.call();
+            serverNodes.setCurrentNodes(nodeList);
         } catch (Exception e) {
-            // TODO retry
-            log.error("Could not retrieve graylog2 node list from node " + initialNode, e);
-            throw new RuntimeException(e);
+            log.warn("Could not retrieve graylog2 node list from node " + initialNode + ". Retrying automatically.", e);
         }
-        serverNodes.setCurrentNodes(nodeList);
     }
 }
