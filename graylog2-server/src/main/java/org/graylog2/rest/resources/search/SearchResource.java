@@ -22,6 +22,7 @@ package org.graylog2.rest.resources.search;
 
 import com.codahale.metrics.annotation.Timed;
 import com.google.common.collect.Maps;
+import org.graylog2.indexer.IndexHelper;
 import org.graylog2.indexer.Indexer;
 import org.graylog2.indexer.results.DateHistogramResult;
 import org.graylog2.indexer.results.FieldStatsResult;
@@ -67,9 +68,14 @@ public class SearchResource extends RestResource {
             @ApiParam(title = "limit", description = "Maximum number of messages to return.", required = false) @QueryParam("limit") int limit) {
         checkQuery(query);
 
-        return json(buildSearchResult(
-                core.getIndexer().searches().search(query, buildRelativeTimeRange(range), limit)
-        ));
+        try {
+            return json(buildSearchResult(
+                    core.getIndexer().searches().search(query, buildRelativeTimeRange(range), limit)
+            ));
+        } catch (IndexHelper.InvalidRangeFormatException e) {
+            LOG.warn("Invalid timerange parameters provided. Returning HTTP 400.", e);
+            throw new WebApplicationException(400);
+        }
     }
 
     @GET @Path("/universal/relative/terms") @Timed
@@ -85,9 +91,14 @@ public class SearchResource extends RestResource {
             @ApiParam(title = "range", description = "Relative timeframe to search in. See search method description.", required = true) @QueryParam("range") int range) {
         checkQueryAndField(query, field);
 
-        return json(buildTermsResult(
-                core.getIndexer().searches().terms(field, size, query, buildRelativeTimeRange(range))
-        ));
+        try {
+            return json(buildTermsResult(
+                    core.getIndexer().searches().terms(field, size, query, buildRelativeTimeRange(range))
+            ));
+        } catch (IndexHelper.InvalidRangeFormatException e) {
+            LOG.warn("Invalid timerange parameters provided. Returning HTTP 400.", e);
+            throw new WebApplicationException(400);
+        }
     }
 
     @GET @Path("/universal/relative/stats") @Timed
@@ -105,15 +116,21 @@ public class SearchResource extends RestResource {
             @ApiParam(title = "range", description = "Relative timeframe to search in. See search method description.", required = true) @QueryParam("range") int range) {
         checkQueryAndField(query, field);
 
-        return json(buildFieldStatsResult(
-                fieldStats(field, query, buildRelativeTimeRange(range))
-        ));
+        try {
+            return json(buildFieldStatsResult(
+                    fieldStats(field, query, buildRelativeTimeRange(range))
+            ));
+        } catch (IndexHelper.InvalidRangeFormatException e) {
+            LOG.warn("Invalid timerange parameters provided. Returning HTTP 400.", e);
+            throw new WebApplicationException(400);
+        }
     }
 
     @GET @Path("/universal/relative/histogram") @Timed
     @ApiOperation(value = "Datetime histogram of a query using a relative timerange.")
     @ApiResponses(value = {
-            @ApiResponse(code = 400, message = "Invalid interval provided.")
+            @ApiResponse(code = 400, message = "Invalid interval provided."),
+            @ApiResponse(code = 400, message = "Invalid timerange parameters provided.")
     })
     @Produces(MediaType.APPLICATION_JSON)
     public String histogramRelative(
@@ -124,13 +141,18 @@ public class SearchResource extends RestResource {
         checkQueryAndInterval(query, interval);
         validateInterval(interval);
 
-        return json(buildHistogramResult(
-                core.getIndexer().searches().histogram(
-                        query,
-                        Indexer.DateHistogramInterval.valueOf(interval),
-                        buildRelativeTimeRange(range)
-                )
-        ));
+        try {
+            return json(buildHistogramResult(
+                    core.getIndexer().searches().histogram(
+                            query,
+                            Indexer.DateHistogramInterval.valueOf(interval),
+                            buildRelativeTimeRange(range)
+                    )
+            ));
+        } catch (IndexHelper.InvalidRangeFormatException e) {
+            LOG.warn("Invalid timerange parameters provided. Returning HTTP 400.", e);
+            throw new WebApplicationException(400);
+        }
     }
 
     /*
@@ -152,9 +174,14 @@ public class SearchResource extends RestResource {
             @ApiParam(title = "limit", description = "Maximum number of messages to return.", required = false) @QueryParam("limit") int limit) {
         checkQuery(query);
 
-        return json(buildSearchResult(
-                core.getIndexer().searches().search(query, buildAbsoluteTimeRange(from, to), limit)
-        ));
+        try {
+            return json(buildSearchResult(
+                    core.getIndexer().searches().search(query, buildAbsoluteTimeRange(from, to), limit)
+            ));
+        } catch (IndexHelper.InvalidRangeFormatException e) {
+            LOG.warn("Invalid timerange parameters provided. Returning HTTP 400.", e);
+            throw new WebApplicationException(400);
+        }
     }
 
     @GET @Path("/universal/absolute/terms") @Timed
@@ -171,9 +198,14 @@ public class SearchResource extends RestResource {
             @ApiParam(title = "to", description = "Timerange end. See search method description for date format", required = true) @QueryParam("to") String to) {
         checkQueryAndField(query, field);
 
-        return json(buildTermsResult(
-                core.getIndexer().searches().terms(field, size, query, buildAbsoluteTimeRange(from, to))
-        ));
+        try {
+            return json(buildTermsResult(
+                    core.getIndexer().searches().terms(field, size, query, buildAbsoluteTimeRange(from, to))
+            ));
+        } catch (IndexHelper.InvalidRangeFormatException e) {
+            LOG.warn("Invalid timerange parameters provided. Returning HTTP 400.", e);
+            throw new WebApplicationException(400);
+        }
     }
 
     @GET @Path("/universal/absolute/stats") @Timed
@@ -192,9 +224,14 @@ public class SearchResource extends RestResource {
             @ApiParam(title = "to", description = "Timerange end. See search method description for date format", required = true) @QueryParam("to") String to) {
         checkQueryAndField(query, field);
 
-        return json(buildFieldStatsResult(
-                fieldStats(field, query, buildAbsoluteTimeRange(from, to))
-        ));
+        try {
+            return json(buildFieldStatsResult(
+                    fieldStats(field, query, buildAbsoluteTimeRange(from, to))
+            ));
+        } catch (IndexHelper.InvalidRangeFormatException e) {
+            LOG.warn("Invalid timerange parameters provided. Returning HTTP 400.", e);
+            throw new WebApplicationException(400);
+        }
     }
 
     @GET @Path("/universal/absolute/histogram") @Timed
@@ -213,13 +250,18 @@ public class SearchResource extends RestResource {
         checkQueryAndInterval(query, interval);
         validateInterval(interval);
 
-        return json(buildHistogramResult(
-                core.getIndexer().searches().histogram(
-                        query,
-                        Indexer.DateHistogramInterval.valueOf(interval),
-                        buildAbsoluteTimeRange(from, to)
-                )
-        ));
+        try {
+            return json(buildHistogramResult(
+                    core.getIndexer().searches().histogram(
+                            query,
+                            Indexer.DateHistogramInterval.valueOf(interval),
+                            buildAbsoluteTimeRange(from, to)
+                    )
+            ));
+        } catch (IndexHelper.InvalidRangeFormatException e) {
+            LOG.warn("Invalid timerange parameters provided. Returning HTTP 400.", e);
+            throw new WebApplicationException(400);
+        }
     }
 
 
@@ -256,7 +298,7 @@ public class SearchResource extends RestResource {
         }
     }
 
-    private FieldStatsResult fieldStats(String field, String query, TimeRange timeRange) {
+    private FieldStatsResult fieldStats(String field, String query, TimeRange timeRange) throws IndexHelper.InvalidRangeFormatException {
         try {
             return core.getIndexer().searches().fieldStats(field, query, timeRange);
         } catch(Searches.FieldTypeException e) {

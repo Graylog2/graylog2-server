@@ -59,7 +59,7 @@ public class IndexHelper {
         return r;
     }
 
-    public static FilterBuilder getTimestampRangeFilter(TimeRange range) {
+    public static FilterBuilder getTimestampRangeFilter(TimeRange range) throws InvalidRangeFormatException {
     	if (range == null) {
     		return null;
     	}
@@ -74,14 +74,22 @@ public class IndexHelper {
         }
     }
 
-    private static FilterBuilder absoluteFilterBuilder(AbsoluteRange range) {
+    private static FilterBuilder absoluteFilterBuilder(AbsoluteRange range) throws InvalidRangeFormatException {
         // Parse to DateTime first because it is intelligent and can deal with missing microseconds for example.
-        DateTime fromDate = DateTime.parse(range.getFrom(), Tools.timeFormatterWithOptionalMilliseconds());
-        DateTime toDate = DateTime.parse(range.getTo(), Tools.timeFormatterWithOptionalMilliseconds());
+        DateTime fromDate;
+        DateTime toDate;
+
+        try {
+            fromDate = DateTime.parse(range.getFrom(), Tools.timeFormatterWithOptionalMilliseconds());
+            toDate = DateTime.parse(range.getTo(), Tools.timeFormatterWithOptionalMilliseconds());
+        } catch(IllegalArgumentException e) {
+            throw new InvalidRangeFormatException();
+        }
 
         return FilterBuilders.rangeFilter("timestamp")
                 .gte(Tools.buildElasticSearchTimeFormatFromDateTime(fromDate))
                 .lte(Tools.buildElasticSearchTimeFormatFromDateTime(toDate));
+
     }
 
     private static FilterBuilder relativeFilterBuilder(RelativeRange range) {
@@ -113,5 +121,7 @@ public class IndexHelper {
         
         return r;
     }
-    
+
+    public static class InvalidRangeFormatException extends Throwable {
+    }
 }
