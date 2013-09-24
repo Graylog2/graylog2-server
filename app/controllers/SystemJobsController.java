@@ -39,7 +39,7 @@ import static play.mvc.Results.status;
  */
 public class SystemJobsController {
 
-    public static Result trigger() {
+    public Result trigger() {
         Http.RequestBody body = request().body();
 
         if (body.asFormUrlEncoded().get("job") == null) {

@@ -8,17 +8,17 @@ POST        /login                                                              
 GET         /logout                                                                  @controllers.SessionsController.destroy()
 
 # Home page
-GET         /                                                                        controllers.DashboardController.index()
+GET         /                                                                        @controllers.DashboardController.index()
 
 # Search
-GET         /search                                                                  controllers.SearchController.index(q ?= "", rangetype ?= "", relative:Integer ?= -1, from ?= "", to ?= "", interval ?= "")
+GET         /search                                                                  @controllers.SearchController.index(q ?= "", rangetype ?= "", relative:Integer ?= -1, from ?= "", to ?= "", interval ?= "")
 
 # Messages
 GET         /messages/:index/:id/partial                                             @controllers.MessagesController.singleAsPartial(index: String, id: String)
 
 # Streams
-GET         /streams                                                                 controllers.StreamsController.index()
-GET         /streams/new                                                             controllers.StreamsController.newStream()
+GET         /streams                                                                 @controllers.StreamsController.index()
+GET         /streams/new                                                             @controllers.StreamsController.newStream()
 
 # System
 GET         /system                                                                  @controllers.SystemController.index(page:Integer ?= 1)
@@ -28,7 +28,7 @@ GET         /system/threaddump/:node_id                                         
 GET         /system/inputs/:node_id                                                  @controllers.InputsController.manage(node_id: String)
 POST        /system/inputs/:node_id                                                  @controllers.InputsController.launch(node_id: String)
 POST        /system/inputs/:node_id/:input_id/terminate                              @controllers.InputsController.terminate(node_id: String, input_id: String)
-GET         /system/mappers                                                          controllers.MappersController.index()
+GET         /system/mappers                                                          @controllers.MappersController.index()
 
 # Extractors
 GET         /system/inputs/:node_id/:input_id/extractors                             @controllers.ExtractorsController.manage(node_id: String, input_id: String)
@@ -37,26 +37,26 @@ POST        /system/inputs/:node_id/:input_id/extractors                        
 POST        /system/inputs/:node_id/:input_id/extractors/:extractor_id/delete        @controllers.ExtractorsController.delete(node_id: String, input_id: String, extractor_id: String)
 
 # Users
-GET         /system/users                                                            controllers.UsersController.index()
-GET         /a/system/users/:username                                                controllers.UsersController.isUniqueUsername(username: String)
-POST        /system/users                                                            controllers.UsersController.create()
-GET         /system/users/:username                                                  controllers.UsersController.show(username: String)
-POST        /system/users/:username                                                  controllers.UsersController.saveChanges(username: String)
-GET         /system/users/new                                                        controllers.UsersController.newUserForm()
-GET         /system/users/edit/:username                                             controllers.UsersController.editUserForm(username: String)
+GET         /system/users                                                            @controllers.UsersController.index()
+GET         /a/system/users/:username                                                @controllers.UsersController.isUniqueUsername(username: String)
+POST        /system/users                                                            @controllers.UsersController.create()
+GET         /system/users/show/:username                                             @controllers.UsersController.show(username: String)
+POST        /system/users/:username                                                  @controllers.UsersController.saveChanges(username: String)
+GET         /system/users/new                                                        @controllers.UsersController.newUserForm()
+GET         /system/users/edit/:username                                             @controllers.UsersController.editUserForm(username: String)
 
 # Systemjobs
-POST        /systemjobs/trigger                                                      controllers.SystemJobsController.trigger()
+POST        /systemjobs/trigger                                                      @controllers.SystemJobsController.trigger()
 
 # Logging
-GET         /system/logging                                                          controllers.LoggingController.index()
+GET         /system/logging                                                          @controllers.LoggingController.index()
 
 # API: Search (i.e. facets)
-GET         /a/search/fieldstats                                                     controllers.SearchApiController.fieldStats(q ?= "", field ?= "", rangetype ?= "", relative:Integer ?= -1, interval ?= "")
+GET         /a/search/fieldstats                                                     @controllers.SearchApiController.fieldStats(q ?= "", field ?= "", rangetype ?= "", relative:Integer ?= -1, interval ?= "")
 
 # API: Message counts and histograms
-GET         /a/messagecounts/histogram                                               controllers.MessageCountsController.histogram(timerange ?= "")
-GET         /a/messagecounts/total                                                   controllers.MessageCountsController.total()
+GET         /a/messagecounts/histogram                                               @controllers.MessageCountsController.histogram(timerange ?= "")
+GET         /a/messagecounts/total                                                   @controllers.MessageCountsController.total()
 
 # API: Message analyzing
 GET         /a/analyze/:index/:id/:field                                             @controllers.MessagesController.analyze(index: String, id: String, field: String)
@@ -77,10 +77,10 @@ GET         /a/system/inputs/:node_id/:input_id/recent_message                  
 GET         /a/messages/:index/:id                                                   @controllers.MessagesController.single(index: String, id: String)
 
 # API: Tools
-GET         /a/tools/regex_test                                                      controllers.ToolsApiController.regexTest(regex ?= "", string ?= "")
-GET         /a/tools/substring_test                                                  controllers.ToolsApiController.substringTest(start:Integer ?= 0, end:Integer ?= 0, string ?= "")
-GET         /a/tools/split_and_index_test                                            controllers.ToolsApiController.splitAndIndexTest(split_by:String ?= "", index:Integer ?= 0, string ?= "")
-GET         /a/tools/natural_date_test                                               controllers.ToolsApiController.naturalDateTest(string ?= "")
+GET         /a/tools/regex_test                                                      @controllers.ToolsApiController.regexTest(regex ?= "", string ?= "")
+GET         /a/tools/substring_test                                                  @controllers.ToolsApiController.substringTest(start:Integer ?= 0, end:Integer ?= 0, string ?= "")
+GET         /a/tools/split_and_index_test                                            @controllers.ToolsApiController.splitAndIndexTest(split_by:String ?= "", index:Integer ?= 0, string ?= "")
+GET         /a/tools/natural_date_test                                               @controllers.ToolsApiController.naturalDateTest(string ?= "")
 
 # Map static resources from the /public folder to the /assets URL path
 GET         /assets/*file                                                            controllers.Assets.at(path="/public", file)

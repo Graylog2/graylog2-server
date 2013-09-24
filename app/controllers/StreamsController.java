@@ -10,7 +10,7 @@ import java.io.IOException;
 
 public class StreamsController extends AuthenticatedController {
 
-	public static Result index() {
+	public Result index() {
 		try {
 			StreamsResult streams = Stream.allEnabled();
 
@@ -23,7 +23,7 @@ public class StreamsController extends AuthenticatedController {
 		}
 	}
 
-    public static Result newStream() {
+    public Result newStream() {
         return ok(views.html.streams.new_stream.render(currentUser()));
     }
 	

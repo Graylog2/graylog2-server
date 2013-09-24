@@ -37,7 +37,7 @@ import java.util.Map;
  */
 public class LoggingController extends AuthenticatedController {
 
-    public static Result index() {
+    public Result index() {
         BreadcrumbList bc = new BreadcrumbList();
         bc.addCrumb("System", routes.SystemController.index(0));
         bc.addCrumb("Logging", routes.LoggingController.index());

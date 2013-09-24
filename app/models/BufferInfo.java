@@ -59,6 +59,9 @@ public class BufferInfo {
         } catch (IOException e) {
             log.error("Unexpected exception", e);
         }
+        if (br == null) {
+            throw new RuntimeException("Could not load buffer info for node " + node);
+        }
         inputBuffer = br.buffers.get("input");
         outputBuffer = br.buffers.get("output");
 

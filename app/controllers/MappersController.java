@@ -26,7 +26,7 @@ import play.mvc.Result;
  */
 public class MappersController extends AuthenticatedController {
 
-    public static Result index() {
+    public Result index() {
         return ok(views.html.system.mappers.index.render(currentUser()));
     }
 

@@ -39,40 +39,34 @@ public class UsersController extends AuthenticatedController {
     private static final Form<CreateUserRequest> createUserForm = Form.form(CreateUserRequest.class);
     private static final Form<ChangeUserRequest> changeUserForm = Form.form(ChangeUserRequest.class);
 
-    public static Result index() {
+    public Result index() {
         final List<User> allUsers = User.all();
         final List<String> permissions = Permissions.all();
         return ok(views.html.users.index.render(currentUser(), allUsers, permissions));
     }
 
-    public static Result show(String username) {
+    public Result show(String username) {
         final User user = User.load(username);
         if (user == null) {
             return notFound();
         }
 
-        BreadcrumbList bc = new BreadcrumbList();
-        bc.addCrumb("System", routes.SystemController.index(0));
-        bc.addCrumb("Users", routes.UsersController.index());
+        BreadcrumbList bc = breadcrumbs();
         bc.addCrumb(user.getFullName(), routes.UsersController.show(username));
 
         return ok(show.render(user, currentUser(), bc));
     }
 
-    public static Result newUserForm() {
-        BreadcrumbList bc = new BreadcrumbList();
-        bc.addCrumb("System", routes.SystemController.index(0));
-        bc.addCrumb("Users", routes.UsersController.index());
+    public Result newUserForm() {
+        BreadcrumbList bc = breadcrumbs();
         bc.addCrumb("Create new", routes.UsersController.newUserForm());
 
         final List<String> permissions = Permissions.all();
         return ok(new_user.render(createUserForm, currentUser(), permissions, ImmutableSet.<String>of(), bc));
     }
 
-    public static Result editUserForm(String username) {
-        BreadcrumbList bc = new BreadcrumbList();
-        bc.addCrumb("System", routes.SystemController.index(0));
-        bc.addCrumb("Users", routes.UsersController.index());
+    public Result editUserForm(String username) {
+        BreadcrumbList bc = breadcrumbs();
         bc.addCrumb("Edit " + username, routes.UsersController.editUserForm(username));
 
         User user = User.load(username);
@@ -80,14 +74,12 @@ public class UsersController extends AuthenticatedController {
         return ok(views.html.users.edit.render(form, username, currentUser(), Permissions.all(), ImmutableSet.copyOf(user.getPermissions()), bc));
     }
 
-    public static Result create() {
+    public Result create() {
         Form<CreateUserRequest> createUserRequestForm = Tools.bindMultiValueFormFromRequest(CreateUserRequest.class);
         final CreateUserRequest request = createUserRequestForm.get();
 
         if (createUserRequestForm.hasErrors()) {
-            BreadcrumbList bc = new BreadcrumbList();
-            bc.addCrumb("System", routes.SystemController.index(0));
-            bc.addCrumb("Users", routes.UsersController.index());
+            BreadcrumbList bc = breadcrumbs();
             bc.addCrumb("Create new", routes.UsersController.newUserForm());
             final List<String> permissions = Permissions.all();
             return badRequest(new_user.render(createUserRequestForm, currentUser(), permissions, ImmutableSet.copyOf(request.permissions), bc));
@@ -98,7 +90,7 @@ public class UsersController extends AuthenticatedController {
         return redirect(routes.UsersController.index());
     }
 
-    public static Result isUniqueUsername(String username) {
+    public Result isUniqueUsername(String username) {
         if (User.LocalAdminUser.getInstance().getName().equals(username)) {
             return noContent();
         }
@@ -109,7 +101,7 @@ public class UsersController extends AuthenticatedController {
         }
     }
 
-    public static Result saveChanges(String username) {
+    public Result saveChanges(String username) {
         final Form<ChangeUserRequest> requestForm = Tools.bindMultiValueFormFromRequest(ChangeUserRequest.class);
         if (requestForm.hasErrors()) {
             final BreadcrumbList bc = new BreadcrumbList();
@@ -125,5 +117,12 @@ public class UsersController extends AuthenticatedController {
         user.update(requestForm.get());
 
         return redirect(routes.UsersController.index());
+    }
+
+    private static BreadcrumbList breadcrumbs() {
+        BreadcrumbList bc = new BreadcrumbList();
+        bc.addCrumb("System", routes.SystemController.index(0));
+        bc.addCrumb("Users", routes.UsersController.index());
+        return bc;
     }
 }

@@ -1,23 +1,22 @@
 package controllers;
 
+import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
+import com.google.gson.Gson;
+import lib.APIException;
+import models.MessageCount;
+import models.MessageCountHistogram;
+import models.api.results.DateHistogramResult;
+import models.api.results.MessageCountResult;
+import play.mvc.Result;
+
 import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 
-import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
-import com.google.gson.Gson;
-
-import lib.APIException;
-import models.MessageCountHistogram;
-import models.api.results.DateHistogramResult;
-import models.MessageCount;
-import models.api.results.MessageCountResult;
-import play.mvc.*;
-
 public class MessageCountsController extends AuthenticatedController {
 
-    public static Result total() {
+    public Result total() {
         try {
             MessageCount count = new MessageCount();
             MessageCountResult countResult = count.total();
@@ -33,7 +32,7 @@ public class MessageCountsController extends AuthenticatedController {
         }
     }
 
-	public static Result histogram(String timerange) {
+	public Result histogram(String timerange) {
     	int range;
     	try {
     		range = Integer.parseInt(timerange);

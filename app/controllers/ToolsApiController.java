@@ -34,7 +34,7 @@ import java.io.IOException;
  */
 public class ToolsApiController extends AuthenticatedController {
 
-    public static Result regexTest(String regex, String string) {
+    public Result regexTest(String regex, String string) {
         try {
             if (regex.isEmpty() || string.isEmpty()) {
                 return badRequest();
@@ -48,7 +48,7 @@ public class ToolsApiController extends AuthenticatedController {
         }
     }
 
-    public static Result substringTest(int start, int end, String string) {
+    public Result substringTest(int start, int end, String string) {
         try {
             if (start < 0 || end <= 0 || string.isEmpty()) {
                 return badRequest();
@@ -62,7 +62,7 @@ public class ToolsApiController extends AuthenticatedController {
         }
     }
 
-    public static Result splitAndIndexTest(String splitBy, int index, String string) {
+    public Result splitAndIndexTest(String splitBy, int index, String string) {
         try {
             if (splitBy.isEmpty()|| index < 0 || string.isEmpty()) {
                 return badRequest();
@@ -76,7 +76,7 @@ public class ToolsApiController extends AuthenticatedController {
         }
     }
 
-    public static Result naturalDateTest(String string) {
+    public Result naturalDateTest(String string) {
         if (string.isEmpty()) {
             return badRequest();
         }

@@ -3,19 +3,21 @@ package controllers;
 import lib.APIException;
 import lib.ApiClient;
 import lib.SearchTools;
-import lib.timeranges.*;
+import lib.timeranges.AbsoluteRange;
+import lib.timeranges.InvalidRangeParametersException;
+import lib.timeranges.RelativeRange;
+import lib.timeranges.TimeRange;
 import models.FieldMapper;
 import models.UniversalSearch;
 import models.api.results.DateHistogramResult;
 import models.api.results.SearchResult;
-import play.Logger;
 import play.mvc.Result;
 
 import java.io.IOException;
 
 public class SearchController extends AuthenticatedController {
 
-    public static Result index(String q, String rangeType, int relative, String from, String to, String interval) {
+    public Result index(String q, String rangeType, int relative, String from, String to, String interval) {
     	if (q == null || q.isEmpty()) {
     		q = "*";
     	}

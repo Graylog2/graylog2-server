@@ -26,7 +26,6 @@ import lib.SearchTools;
 import lib.timeranges.*;
 import models.UniversalSearch;
 import models.api.responses.FieldStatsResponse;
-import play.Logger;
 import play.mvc.Result;
 
 import java.io.IOException;
@@ -37,7 +36,7 @@ import java.util.Map;
  */
 public class SearchApiController extends AuthenticatedController {
 
-    public static Result fieldStats(String q, String field, String rangeType, int relative, String interval) {
+    public Result fieldStats(String q, String field, String rangeType, int relative, String interval) {
         if (q == null || q.isEmpty()) {
             q = "*";
         }
