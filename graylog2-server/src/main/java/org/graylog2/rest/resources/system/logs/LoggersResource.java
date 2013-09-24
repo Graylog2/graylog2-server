@@ -23,6 +23,7 @@ import com.codahale.metrics.annotation.Timed;
 import com.google.common.collect.Maps;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
+import org.graylog2.rest.documentation.annotations.*;
 import org.graylog2.rest.resources.RestResource;
 import org.slf4j.LoggerFactory;
 
@@ -34,6 +35,7 @@ import java.util.*;
 /**
  * @author Lennart Koopmann <lennart@torch.sh>
  */
+@Api(value = "System/Loggers", description = "Internal Graylog2 loggers")
 @Path("/system/loggers")
 public class LoggersResource extends RestResource {
 
@@ -46,8 +48,8 @@ public class LoggersResource extends RestResource {
         put("sockets", new Subsystem("Sockets", "netty", "All messages related to socket communication."));
     }};
 
-    @GET
-    @Timed
+    @GET @Timed
+    @ApiOperation(value = "List all loggers and their current levels")
     @Produces(MediaType.APPLICATION_JSON)
     public String loggers() {
         Map<String, Object> loggerList = Maps.newHashMap();
@@ -70,9 +72,9 @@ public class LoggersResource extends RestResource {
         return json(result);
     }
 
-    @GET
-    @Timed
+    @GET @Timed
     @Path("/subsystems")
+    @ApiOperation(value = "List all logger subsystems")
     @Produces(MediaType.APPLICATION_JSON)
     public String subsytems() {
         Map<String, Object> result = Maps.newHashMap();
@@ -89,10 +91,16 @@ public class LoggersResource extends RestResource {
         return json(result);
     }
 
-    @PUT
+    @PUT @Timed
+    @ApiOperation(value = "Set the loglevel of a whole subsystem",
+                  notes = "Provided level is falling back to DEBUG if it does not exist")
+    @ApiResponses(value = {
+            @ApiResponse(code = 404, message = "No such subsystem.")
+    })
     @Path("/subsystems/{subsystem}/level/{level}")
-    @Timed
-    public Response setSubsystemLoggerLevel(@PathParam("subsystem") String subsystemTitle, @PathParam("level") String level) {
+    public Response setSubsystemLoggerLevel(
+            @ApiParam(title = "subsystem", required = true) @PathParam("subsystem") String subsystemTitle,
+            @ApiParam(title = "level", required = true) @PathParam("level") String level) {
         if (!SUBSYSTEMS.containsKey(subsystemTitle)) {
             LOG.warn("No such subsystem: [{}]. Returning 404.", subsystemTitle);
             return Response.status(404).build();
@@ -110,10 +118,13 @@ public class LoggersResource extends RestResource {
         return Response.ok().build();
     }
 
-    @PUT
+    @PUT @Timed
+    @ApiOperation(value = "Set the loglevel of a single logger",
+            notes = "Provided level is falling back to DEBUG if it does not exist")
     @Path("/{loggerName}/level/{level}")
-    @Timed
-    public Response setSingleLoggerLevel(@PathParam("loggerName") String loggerName, @PathParam("level") String level) {
+    public Response setSingleLoggerLevel(
+            @ApiParam(title = "loggerName", required = true) @PathParam("loggerName") String loggerName,
+            @ApiParam(title = "level", required = true) @PathParam("level") String level) {
         // This is never null. Worst case is a logger that does not exist.
         Logger logger = Logger.getLogger(loggerName);
 
