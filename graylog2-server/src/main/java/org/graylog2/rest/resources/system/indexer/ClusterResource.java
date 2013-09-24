@@ -46,7 +46,7 @@ public class ClusterResource extends RestResource {
     @Path("/name")
     @ApiOperation(value = "Get the cluster name")
     @Produces(MediaType.APPLICATION_JSON)
-    public String name() {
+    public String clusterName() {
         Map<String, Object> result = Maps.newHashMap();
         result.put("name", core.getIndexer().cluster().getName());
 
@@ -57,7 +57,7 @@ public class ClusterResource extends RestResource {
     @Path("/health")
     @ApiOperation(value = "Get cluster and shard health overview")
     @Produces(MediaType.APPLICATION_JSON)
-    public String health() {
+    public String clusterHealth() {
         Map<String, Integer> shards = Maps.newHashMap();
         shards.put("active", core.getIndexer().cluster().getActiveShards());
         shards.put("initializing", core.getIndexer().cluster().getInitializingShards());
