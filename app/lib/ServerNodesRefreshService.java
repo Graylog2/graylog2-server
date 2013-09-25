@@ -67,7 +67,7 @@ public class ServerNodesRefreshService {
             List<Node> newNodes = Lists.newArrayList();
             log.debug("Updating graylog2 server node list from node {}", node);
             NodeResponse response = api.get(NodeResponse.class)
-                    .path("/cluster/nodes")
+                    .path("/system/cluster/nodes")
                     .node(node)
                     .execute();
             int i = 0;
