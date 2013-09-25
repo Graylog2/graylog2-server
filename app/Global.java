@@ -47,24 +47,6 @@ public class Global extends GlobalSettings {
 
     @Override
 	public void onStart(Application app) {
-        LocalAdminUserRealm localAdminRealm = new LocalAdminUserRealm("local-accounts");
-		localAdminRealm.setCredentialsMatcher(new HashedCredentialsMatcher("SHA1"));
-		setupLocalUser(localAdminRealm, app);
-
-		Realm serverRestInterfaceRealm = new ServerRestInterfaceRealm();
-		final DefaultSecurityManager securityManager =
-				new DefaultSecurityManager(
-						Lists.newArrayList(localAdminRealm, serverRestInterfaceRealm)
-				);
-		final Authenticator authenticator = securityManager.getAuthenticator();
-		if (authenticator instanceof ModularRealmAuthenticator) {
-            ModularRealmAuthenticator a = (ModularRealmAuthenticator) authenticator;
-            a.setAuthenticationStrategy(new RethrowingFirstSuccessfulStrategy());
-			a.setAuthenticationListeners(
-                Lists.<AuthenticationListener>newArrayList(new PlayAuthenticationListener())
-            );
-		}
-		SecurityUtils.setSecurityManager(securityManager);
 
         final String graylog2ServerUris = app.configuration().getString("graylog2-server.uris", "");
         if (graylog2ServerUris.isEmpty()) {
@@ -98,7 +80,26 @@ public class Global extends GlobalSettings {
         injector.getInstance(ApiClient.class).start();
         injector.getInstance(ServerNodesRefreshService.class).start();
 
-	}
+        LocalAdminUserRealm localAdminRealm = new LocalAdminUserRealm("local-accounts");
+        localAdminRealm.setCredentialsMatcher(new HashedCredentialsMatcher("SHA1"));
+        setupLocalUser(localAdminRealm, app);
+
+        Realm serverRestInterfaceRealm = injector.getInstance(ServerRestInterfaceRealm.class);
+        final DefaultSecurityManager securityManager =
+                new DefaultSecurityManager(
+                        Lists.newArrayList(localAdminRealm, serverRestInterfaceRealm)
+                );
+        final Authenticator authenticator = securityManager.getAuthenticator();
+        if (authenticator instanceof ModularRealmAuthenticator) {
+            ModularRealmAuthenticator a = (ModularRealmAuthenticator) authenticator;
+            a.setAuthenticationStrategy(new RethrowingFirstSuccessfulStrategy());
+            a.setAuthenticationListeners(
+                    Lists.<AuthenticationListener>newArrayList(new PlayAuthenticationListener())
+            );
+        }
+        SecurityUtils.setSecurityManager(securityManager);
+
+    }
 
     @Override
     public <A> A getControllerInstance(Class<A> controllerClass) throws Exception {

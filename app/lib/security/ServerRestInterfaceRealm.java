@@ -19,6 +19,8 @@
  */
 package lib.security;
 
+import com.google.inject.Inject;
+import com.google.inject.Singleton;
 import lib.APIException;
 import lib.ApiClient;
 import models.User;
@@ -40,8 +42,15 @@ import java.io.IOException;
 /**
  * Shiro Realm implementation that uses a Graylog2-server as the source of the subject's information.
  */
+@Singleton
 public class ServerRestInterfaceRealm extends AuthorizingRealm {
     private static final Logger log = LoggerFactory.getLogger(ServerRestInterfaceRealm.class);
+    private final ApiClient api;
+
+    @Inject
+    private ServerRestInterfaceRealm(ApiClient api) {
+        this.api = api;
+    }
 
     @Override
     protected AuthorizationInfo doGetAuthorizationInfo(PrincipalCollection principals) {
@@ -62,7 +71,7 @@ public class ServerRestInterfaceRealm extends AuthorizingRealm {
             final String passwordHash = sha1.toString();
 
             log.debug("Trying to log in {} via REST", token.getUsername());
-            response = ApiClient.get(UserResponse.class)
+            response = api.get(UserResponse.class)
                     .path("/users/{0}", token.getUsername())
                     .credentials(token.getUsername(), passwordHash)
                     .execute();
