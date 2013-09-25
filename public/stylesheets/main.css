@@ -802,6 +802,10 @@ form #stream-rules {
     margin-bottom: 10px;
 }
 
+#universalsearch .timerange-selector-container .keyword .icon {
+    margin-left: 5px;
+}
+
 #universalsearch .timerange-selector-container .keyword .preview {
     margin-top: 4px;
     margin-left: 45px;
