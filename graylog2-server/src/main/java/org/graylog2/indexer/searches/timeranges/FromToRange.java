@@ -19,19 +19,12 @@
  */
 package org.graylog2.indexer.searches.timeranges;
 
-import java.util.Map;
-
 /**
  * @author Lennart Koopmann <lennart@torch.sh>
  */
-public interface TimeRange {
+public interface FromToRange {
 
-    public enum Type {
-        RELATIVE,
-        ABSOLUTE,
-        KEYWORD
-    }
-
-    public Type getType();
+    public String getFrom();
+    public String getTo();
 
 }

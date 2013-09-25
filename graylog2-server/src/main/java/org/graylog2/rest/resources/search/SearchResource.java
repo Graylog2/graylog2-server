@@ -64,6 +64,13 @@ public class SearchResource extends RestResource {
         }
     }
 
+    protected void checkQueryAndKeyword(String query, String keyword) {
+        if (keyword == null || keyword.isEmpty() || query == null || query.isEmpty()) {
+            LOG.warn("Missing parameters. Returning HTTP 400.");
+            throw new WebApplicationException(400);
+        }
+    }
+
     protected void checkQueryAndField(String query, String field) {
         if (field == null || field.isEmpty() || query == null || query.isEmpty()) {
             LOG.warn("Missing parameters. Returning HTTP 400.");

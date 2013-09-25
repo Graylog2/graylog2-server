@@ -19,26 +19,41 @@
  */
 package org.graylog2.indexer.searches.timeranges;
 
+import org.graylog2.utilities.date.NaturalDateParser;
+
+import java.util.Date;
+
 /**
  * @author Lennart Koopmann <lennart@torch.sh>
  */
-public class AbsoluteRange implements TimeRange, FromToRange {
+public class KeywordRange implements TimeRange, FromToRange {
 
+    private final String keyword;
     private final String from;
     private final String to;
 
-    public AbsoluteRange(String from, String to) throws InvalidRangeParametersException {
-        if (from == null || from.isEmpty() || to == null || to.isEmpty()) {
-            throw new InvalidRangeParametersException();
-        }
-
-        this.from = from;
-        this.to = to;
-    }
-
     @Override
     public Type getType() {
-        return Type.ABSOLUTE;
+        return Type.KEYWORD;
+    }
+
+    public KeywordRange(String keyword) throws InvalidRangeParametersException {
+        if (keyword == null || keyword.isEmpty()) {
+            throw new InvalidRangeParametersException();
+        }
+        try {
+            NaturalDateParser.Result result = new NaturalDateParser().parse(keyword);
+            from = result.getFrom();
+            to = result.getTo();
+        } catch (NaturalDateParser.DateNotParsableException e) {
+            throw new InvalidRangeParametersException("Could not parse from natural date: " + keyword);
+        }
+
+        this.keyword = keyword;
+    }
+
+    public String getKeyword() {
+        return keyword;
     }
 
     public String getFrom() {
@@ -48,5 +63,5 @@ public class AbsoluteRange implements TimeRange, FromToRange {
     public String getTo() {
         return to;
     }
-
 }
+

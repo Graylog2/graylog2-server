@@ -25,9 +25,7 @@ import java.util.Set;
 import com.google.common.collect.Lists;
 import org.elasticsearch.index.query.FilterBuilder;
 import org.elasticsearch.index.query.FilterBuilders;
-import org.graylog2.indexer.searches.timeranges.AbsoluteRange;
-import org.graylog2.indexer.searches.timeranges.RelativeRange;
-import org.graylog2.indexer.searches.timeranges.TimeRange;
+import org.graylog2.indexer.searches.timeranges.*;
 import org.graylog2.plugin.Tools;
 import org.joda.time.DateTime;
 import org.joda.time.format.DateTimeFormat;
@@ -68,13 +66,15 @@ public class IndexHelper {
             case RELATIVE:
                 return relativeFilterBuilder((RelativeRange) range);
             case ABSOLUTE:
-                return absoluteFilterBuilder((AbsoluteRange) range);
+                return fromToRangeFilterBuilder((AbsoluteRange) range);
+            case KEYWORD:
+                return fromToRangeFilterBuilder((KeywordRange) range);
             default:
                 throw new RuntimeException("No such range type: [" + range.getType() + "]");
         }
     }
 
-    private static FilterBuilder absoluteFilterBuilder(AbsoluteRange range) throws InvalidRangeFormatException {
+    private static FilterBuilder fromToRangeFilterBuilder(FromToRange range) throws InvalidRangeFormatException {
         // Parse to DateTime first because it is intelligent and can deal with missing microseconds for example.
         DateTime fromDate;
         DateTime toDate;
@@ -89,7 +89,6 @@ public class IndexHelper {
         return FilterBuilders.rangeFilter("timestamp")
                 .gte(Tools.buildElasticSearchTimeFormatFromDateTime(fromDate))
                 .lte(Tools.buildElasticSearchTimeFormatFromDateTime(toDate));
-
     }
 
     private static FilterBuilder relativeFilterBuilder(RelativeRange range) {
