@@ -20,8 +20,8 @@
 package lib;
 
 import com.google.common.collect.Maps;
+import com.google.inject.Inject;
 import models.api.responses.NaturalDateTestResponse;
-import models.api.responses.SplitAndIndexTestResponse;
 
 import java.io.IOException;
 import java.util.Map;
@@ -31,8 +31,15 @@ import java.util.Map;
  */
 public class NaturalDateTest {
 
-    public static Map<String, String> test(String string) throws APIException, IOException {
-        NaturalDateTestResponse r = ApiClient.get(NaturalDateTestResponse.class)
+    private final ApiClient api;
+
+    @Inject
+    private NaturalDateTest(ApiClient api) {
+        this.api = api;
+    }
+
+    public Map<String, String> test(String string) throws APIException, IOException {
+        NaturalDateTestResponse r = api.get(NaturalDateTestResponse.class)
                 .path("/tools/natural_date_tester")
                 .queryParam("string", string)
                 .execute();

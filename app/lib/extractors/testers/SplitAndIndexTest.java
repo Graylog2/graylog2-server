@@ -20,6 +20,7 @@
 package lib.extractors.testers;
 
 import com.google.common.collect.Maps;
+import com.google.inject.Inject;
 import lib.APIException;
 import lib.ApiClient;
 import models.api.responses.SplitAndIndexTestResponse;
@@ -32,8 +33,15 @@ import java.util.Map;
  */
 public class SplitAndIndexTest {
 
-    public static Map<String, Object> test(String splitBy, int index, String string) throws IOException, APIException {
-        SplitAndIndexTestResponse r = ApiClient.get(SplitAndIndexTestResponse.class)
+    private final ApiClient api;
+
+    @Inject
+    private SplitAndIndexTest(ApiClient api) {
+        this.api = api;
+    }
+
+    public Map<String, Object> test(String splitBy, int index, String string) throws IOException, APIException {
+        SplitAndIndexTestResponse r = api.get(SplitAndIndexTestResponse.class)
                 .path("/tools/split_and_index_tester")
                 .queryParam("split_by", splitBy)
                 .queryParam("index", index)

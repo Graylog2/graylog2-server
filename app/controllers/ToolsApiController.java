@@ -19,8 +19,9 @@
  */
 package controllers;
 
-import lib.APIException;
 import com.google.gson.Gson;
+import com.google.inject.Inject;
+import lib.APIException;
 import lib.NaturalDateTest;
 import lib.extractors.testers.RegexTest;
 import lib.extractors.testers.SplitAndIndexTest;
@@ -34,13 +35,29 @@ import java.io.IOException;
  */
 public class ToolsApiController extends AuthenticatedController {
 
+    private final RegexTest regexTest;
+    private final SubstringTest substringTest;
+    private final SplitAndIndexTest splitAndIndexTest;
+    private final NaturalDateTest naturalDateTest;
+
+    @Inject
+    private ToolsApiController(RegexTest regexTest,
+                               SubstringTest substringTest,
+                               SplitAndIndexTest splitAndIndexTest,
+                               NaturalDateTest naturalDateTest) {
+        this.regexTest = regexTest;
+        this.substringTest = substringTest;
+        this.splitAndIndexTest = splitAndIndexTest;
+        this.naturalDateTest = naturalDateTest;
+    }
+
     public Result regexTest(String regex, String string) {
         try {
             if (regex.isEmpty() || string.isEmpty()) {
                 return badRequest();
             }
 
-            return ok(new Gson().toJson(RegexTest.test(regex, string))).as("application/json");
+            return ok(new Gson().toJson(regexTest.test(regex, string))).as("application/json");
         } catch (IOException e) {
             return internalServerError("io exception");
         } catch (APIException e) {
@@ -54,7 +71,7 @@ public class ToolsApiController extends AuthenticatedController {
                 return badRequest();
             }
 
-            return ok(new Gson().toJson(SubstringTest.test(start, end, string))).as("application/json");
+            return ok(new Gson().toJson(substringTest.test(start, end, string))).as("application/json");
         } catch (IOException e) {
             return internalServerError("io exception");
         } catch (APIException e) {
@@ -64,11 +81,11 @@ public class ToolsApiController extends AuthenticatedController {
 
     public Result splitAndIndexTest(String splitBy, int index, String string) {
         try {
-            if (splitBy.isEmpty()|| index < 0 || string.isEmpty()) {
+            if (splitBy.isEmpty() || index < 0 || string.isEmpty()) {
                 return badRequest();
             }
 
-            return ok(new Gson().toJson(SplitAndIndexTest.test(splitBy, index, string))).as("application/json");
+            return ok(new Gson().toJson(splitAndIndexTest.test(splitBy, index, string))).as("application/json");
         } catch (IOException e) {
             return internalServerError("io exception");
         } catch (APIException e) {
@@ -82,7 +99,7 @@ public class ToolsApiController extends AuthenticatedController {
         }
 
         try {
-            return ok(new Gson().toJson(NaturalDateTest.test(string))).as("application/json");
+            return ok(new Gson().toJson(naturalDateTest.test(string))).as("application/json");
         } catch (IOException e) {
             return internalServerError("io exception");
         } catch (APIException e) {
