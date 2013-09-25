@@ -1,9 +1,12 @@
 function validate(formcontainer) {
     errors = false;
     $(formcontainer + " .validatable").each(function() {
-        var validatorTypes = $(this).attr("data-validate").split(" ");
-        for (var i = 0; i < validatorTypes.length; i++) {
-            dispatchRuleValidation($(this), validatorTypes[i]);
+        // Do not check disabled form fields.
+        if(!$(this).is(':disabled')) {
+            var validatorTypes = $(this).attr("data-validate").split(" ");
+            for (var i = 0; i < validatorTypes.length; i++) {
+                dispatchRuleValidation($(this), validatorTypes[i]);
+            }
         }
     });
 

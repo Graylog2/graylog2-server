@@ -359,6 +359,11 @@ $(document).ready(function() {
         }, 150);
     }
 
+    // Universalsearch validation.
+    $("#universalsearch").on("submit", function() {
+        return validate("#universalsearch");
+    });
+
     // Submit button confirmation.
     $('button[data-confirm]').on("click", function() {
         return confirm($(this).attr("data-confirm"));
