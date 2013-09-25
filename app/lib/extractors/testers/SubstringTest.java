@@ -20,6 +20,7 @@
 package lib.extractors.testers;
 
 import com.google.common.collect.Maps;
+import com.google.inject.Inject;
 import lib.APIException;
 import lib.ApiClient;
 import models.api.responses.SubstringTestResponse;
@@ -32,8 +33,16 @@ import java.util.Map;
  */
 public class SubstringTest {
 
-    public static Map<String, Object> test(int start, int end, String string) throws IOException, APIException {
-        SubstringTestResponse r = ApiClient.get(SubstringTestResponse.class)
+
+    private final ApiClient api;
+
+    @Inject
+    private SubstringTest(ApiClient api) {
+        this.api = api;
+    }
+
+    public Map<String, Object> test(int start, int end, String string) throws IOException, APIException {
+        SubstringTestResponse r = api.get(SubstringTestResponse.class)
                 .path("/tools/substring_tester")
                 .queryParam("begin_index", start)
                 .queryParam("end_index", end)

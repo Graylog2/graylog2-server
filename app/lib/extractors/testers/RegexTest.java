@@ -20,6 +20,7 @@
 package lib.extractors.testers;
 
 import com.google.common.collect.Maps;
+import com.google.inject.Inject;
 import lib.APIException;
 import lib.ApiClient;
 import models.api.responses.RegexTestResponse;
@@ -32,8 +33,15 @@ import java.util.Map;
  */
 public class RegexTest {
 
-    public static Map<String, Object> test(String regex, String string) throws IOException, APIException {
-        RegexTestResponse r = ApiClient.get(RegexTestResponse.class)
+    private final ApiClient api;
+
+    @Inject
+    private RegexTest(ApiClient api) {
+        this.api = api;
+    }
+
+    public Map<String, Object> test(String regex, String string) throws IOException, APIException {
+        RegexTestResponse r = api.get(RegexTestResponse.class)
                 .path("/tools/regex_tester")
                 .queryParam("regex", regex)
                 .queryParam("string", string)
