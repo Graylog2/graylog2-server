@@ -1,5 +1,9 @@
 ---
 language: java
+jdk:
+- oraclejdk7
+- openjdk7
+- openjdk6
 env:
   global:
   - PLAY_VERSION=2.1.4
