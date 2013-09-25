@@ -1,6 +1,6 @@
 @(request: play.mvc.Http.Request)
 @import views.helpers.TimerangeSelector
 
-<select id="relative-timerange-selector" name="relative">
+<select id="relative-timerange-selector" name="relative" @if(request.getQueryString("rangetype") != null && !request.getQueryString("rangetype").equals("relative")) { disabled="disabled" }>
     @Html(TimerangeSelector.getOptions(request))
 </select>

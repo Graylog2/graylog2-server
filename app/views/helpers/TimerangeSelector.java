@@ -24,7 +24,7 @@ public class TimerangeSelector {
 	}};
 	
 	private static final String SELECTED = " selected='selected'";
-	
+
 	public static String getOptions(Request request) {
 		StringBuilder options = new StringBuilder();
 

@@ -1,6 +1,12 @@
 <input type="text"
        name="keyword"
-       disabled="disabled"
+
+       @if(request.getQueryString("rangetype") != null && request.getQueryString("rangetype").equals("keyword")) {
+           value="@request.getQueryString("keyword")"
+       } else {
+           disabled="disabled"
+       }
+
        placeholder="last week" />
 
 <div class="preview" style="display: none;">

@@ -1,16 +1,23 @@
 @(searchQuery: String)
-@import views.helpers.TimerangeSelector
 
 <div class="row-fluid no-bm">
     <div class="span12" id="universalsearch">
 
         <form class="universalsearch-form" action="@controllers.routes.SearchController.index()" method="GET">
 
-            <input type="hidden" name="rangetype" value="relative" id="universalsearch-rangetype" />
+            <input type="hidden" name="rangetype"
+                    value="@if(request.getQueryString("rangetype") == null) {relative} else {@request.getQueryString("rangetype")}"
+                    id="universalsearch-rangetype" />
 
             <div class="pull-right">
                 <input type="submit" class="btn btn-success btn-small" value="Search"/>
             </div>
+
+            @***************************************************************
+            * Parameter selection here sucks and I promise to fix it soon. *
+            *                                                              *
+            * Lennart, September 25th 2013 (never forget)                  *
+            ***************************************************************@
 
             <div class="timerange-selector-container">
                 <div class="btn-group timerange-chooser">
@@ -19,21 +26,21 @@
                         <span class="caret"></span>
                     </a>
                     <ul class="dropdown-menu">
-                        <li><a href="#" data-selector-name="relative" class="selected">Relative</a></li>
-                        <li><a href="#" data-selector-name="absolute">Absolute</a></li>
-                        <li><a href="#" data-selector-name="keyword">Keyword</a></li>
+                        <li><a href="#" data-selector-name="relative" @if(request.getQueryString("rangetype") == null) { class="selected" } @if(request.getQueryString("rangetype") != null && request.getQueryString("rangetype").equals("relative")) { class="selected" }>Relative</a></li>
+                        <li><a href="#" data-selector-name="absolute" @if(request.getQueryString("rangetype") != null && request.getQueryString("rangetype").equals("absolute")) { class="selected" }>Absolute</a></li>
+                        <li><a href="#" data-selector-name="keyword" @if(request.getQueryString("rangetype") != null && request.getQueryString("rangetype").equals("keyword")) { class="selected" }>Keyword</a></li>
                     </ul>
                 </div>
 
-                <div class="timerange-selector relative">
+                <div class="timerange-selector relative"  style="display: @if(request.getQueryString("rangetype") == null) { block } @if(request.getQueryString("rangetype") != null && request.getQueryString("rangetype").equals("relative")) { block } else { none };">
                     @partials.timerangeselectors.relative(request)
                 </div>
 
-                <div class="timerange-selector absolute" style="display: none;">
+                <div class="timerange-selector absolute" style="display: @if(request.getQueryString("rangetype") != null && request.getQueryString("rangetype").equals("absolute")) { block } else { none };">
                     @partials.timerangeselectors.absolute()
                 </div>
 
-                <div class="timerange-selector keyword" style="display: none;">
+                <div class="timerange-selector keyword" style="display: @if(request.getQueryString("rangetype") != null && request.getQueryString("rangetype").equals("keyword")) { block } else { none };">
                     @partials.timerangeselectors.keyword()
                 </div>
             </div>

@@ -6,7 +6,13 @@
     <input type="text"
            name="from"
            placeholder="yyyy-MM-dd HH-mm-ss.SSS"
-           disabled="disabled"
+
+           @if(request.getQueryString("rangetype") != null && request.getQueryString("rangetype").equals("absolute")) {
+                value="@request.getQueryString("from")"
+           } else {
+                disabled="disabled"
+           }
+
            class="date-select" />
 </div>
 
@@ -16,7 +22,13 @@
     <input type="text"
            name="to"
            placeholder="yyyy-MM-dd HH-mm-ss.SSS"
-           disabled="disabled"
+
+           @if(request.getQueryString("rangetype") != null && request.getQueryString("rangetype").equals("absolute")) {
+                value="@request.getQueryString("to")"
+           } else {
+                disabled="disabled"
+           }
+
            class="date-select" />
 
     <button class="btn set-to-now" type="button">

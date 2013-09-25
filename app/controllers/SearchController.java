@@ -3,21 +3,19 @@ package controllers;
 import lib.APIException;
 import lib.ApiClient;
 import lib.SearchTools;
-import lib.timeranges.AbsoluteRange;
-import lib.timeranges.InvalidRangeParametersException;
-import lib.timeranges.RelativeRange;
-import lib.timeranges.TimeRange;
+import lib.timeranges.*;
 import models.FieldMapper;
 import models.UniversalSearch;
 import models.api.results.DateHistogramResult;
 import models.api.results.SearchResult;
+import play.Logger;
 import play.mvc.Result;
 
 import java.io.IOException;
 
 public class SearchController extends AuthenticatedController {
 
-    public Result index(String q, String rangeType, int relative, String from, String to, String interval) {
+    public Result index(String q, String rangeType, int relative, String from, String to, String keyword, String interval) {
     	if (q == null || q.isEmpty()) {
     		q = "*";
     	}
@@ -26,6 +24,8 @@ public class SearchController extends AuthenticatedController {
     	if (interval == null || interval.isEmpty() || !SearchTools.isAllowedDateHistogramInterval(interval)) {
     		interval = "hour";
     	}
+
+        Logger.info(rangeType.toUpperCase());
 
         // Determine timerange type.
         TimeRange.Type timerangeType;
@@ -38,6 +38,9 @@ public class SearchController extends AuthenticatedController {
                     break;
                 case ABSOLUTE:
                     timerange = new AbsoluteRange(from, to);
+                    break;
+                case KEYWORD:
+                    timerange = new KeywordRange(keyword);
                     break;
                 default:
                     throw new InvalidRangeParametersException();

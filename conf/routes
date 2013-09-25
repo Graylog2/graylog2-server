@@ -11,7 +11,7 @@ GET         /logout                                                             
 GET         /                                                                        @controllers.DashboardController.index()
 
 # Search
-GET         /search                                                                  @controllers.SearchController.index(q ?= "", rangetype ?= "", relative:Integer ?= -1, from ?= "", to ?= "", interval ?= "")
+GET         /search                                                                  @controllers.SearchController.index(q ?= "", rangetype ?= "", relative:Integer ?= -1, from ?= "", to ?= "", keyword ?= "", interval ?= "")
 
 # Messages
 GET         /messages/:index/:id/partial                                             @controllers.MessagesController.singleAsPartial(index: String, id: String)
