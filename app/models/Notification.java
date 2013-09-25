@@ -23,10 +23,12 @@ import com.google.common.collect.Lists;
 import lib.APIException;
 import lib.ApiClient;
 import lib.notifications.DeflectorExistsAsIndexNotification;
+import lib.notifications.MultiMasterNotification;
 import lib.notifications.NotificationType;
 import models.api.responses.system.GetNotificationsResponse;
 import models.api.responses.system.NotificationSummaryResponse;
 import org.joda.time.DateTime;
+import play.Logger;
 
 import java.io.IOException;
 import java.util.List;
@@ -37,7 +39,8 @@ import java.util.List;
 public class Notification {
 
     public enum Type {
-        DEFLECTOR_EXISTS_AS_INDEX
+        DEFLECTOR_EXISTS_AS_INDEX,
+        MULTI_MASTER
     }
 
     public enum Severity {
@@ -55,7 +58,9 @@ public class Notification {
     public NotificationType get() {
         switch (type) {
             case DEFLECTOR_EXISTS_AS_INDEX:
-                return new DeflectorExistsAsIndexNotification(timestamp);
+                return new DeflectorExistsAsIndexNotification();
+            case MULTI_MASTER:
+                return new MultiMasterNotification();
         }
 
         throw new RuntimeException("No notification registered for " + type);
@@ -74,7 +79,12 @@ public class Notification {
 
         List<Notification> notifications = Lists.newArrayList();
         for (NotificationSummaryResponse notification : r.notifications) {
-            notifications.add(new Notification(notification));
+            try {
+                notifications.add(new Notification(notification));
+            } catch(IllegalArgumentException e) {
+                Logger.warn("There is a notification type we can't handle: [" + notification.type + "]");
+                continue;
+            }
         }
 
         return notifications;

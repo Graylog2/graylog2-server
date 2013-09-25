@@ -25,11 +25,11 @@
                 </div>
 
                 <div class="notification-solutions">
-                    <h4>
-                        Your options:
-                    </h4>
-
                     @if(!notification.get().options().isEmpty) {
+                        <h4>
+                            Your options:
+                        </h4>
+
                         <form action="/systemjobs/trigger" method="POST">
                             @for((jobType, description) <- notification.get().options()) {
                                 <label class="radio">
