@@ -30,10 +30,11 @@ import java.util.Map;
 public class MultiMasterNotification implements NotificationType {
 
     private static final String TITLE = "Multiple graylog2-server masters in the cluster";
-    private static final String DESCRIPTION = "There are multiple graylog2-server instances configured as master " +
+    private static final String DESCRIPTION = "There were multiple graylog2-server instances configured as master " +
             "in your Graylog2 cluster. The cluster handles this automatically by launching new nodes as slaves if " +
             "there already is a master but you should still fix this. Check the graylog2.conf of every node and " +
-            "make sure that only one instance has is_master set to true.";
+            "make sure that only one instance has is_master set to true. Close this notification if you think you " +
+            "resolved the problem. It will pop back up if you start a second master node again.";
 
     @Override
     public Map<SystemJob.Type, String> options() {
@@ -48,6 +49,11 @@ public class MultiMasterNotification implements NotificationType {
     @Override
     public String getDescription() {
         return DESCRIPTION;
+    }
+
+    @Override
+    public boolean isCloseable() {
+        return true;
     }
 
 }

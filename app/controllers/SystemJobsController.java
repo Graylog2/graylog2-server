@@ -37,7 +37,7 @@ import static play.mvc.Results.status;
 /**
  * @author Lennart Koopmann <lennart@torch.sh>
  */
-public class SystemJobsController {
+public class SystemJobsController extends AuthenticatedController {
 
     public Result trigger() {
         Http.RequestBody body = request().body();

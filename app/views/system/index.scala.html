@@ -14,6 +14,10 @@
 
         @for(notification <- notifications) {
             <div class="notification alert alert-error">
+                @if(notification.get().isCloseable()) {
+                    <button type="button" class="close" data-notificationtype="@notification.getType().toString().toLowerCase()">&times;</button>
+                }
+
                 <h3>
                     <i class="icon icon-bolt"></i>
                     @notification.get().getTitle

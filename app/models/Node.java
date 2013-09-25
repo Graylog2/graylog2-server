@@ -61,7 +61,7 @@ public class Node {
         try {
             r = ApiClient.get(NodeSummaryResponse.class)
                     .node(ServerNodes.any())
-                    .path("/cluster/nodes/{0}", nodeId)
+                    .path("/system/cluster/nodes/{0}", nodeId)
                     .execute();
         } catch (IOException e) {
             throw new RuntimeException(e);

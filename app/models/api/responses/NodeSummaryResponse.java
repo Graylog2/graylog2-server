@@ -26,7 +26,7 @@ import com.google.gson.annotations.SerializedName;
  */
 public class NodeSummaryResponse {
 
-    @SerializedName("node_id")
+    @SerializedName("id")
     public String nodeId;
 
     @SerializedName("short_node_id")

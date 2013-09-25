@@ -37,7 +37,7 @@ public class SystemJobTriggerRequest extends ApiRequest {
 
     public SystemJobTriggerRequest(SystemJob.Type type, User user) {
         this.jobName = type.toString().toLowerCase();
-        this.creatorUserId = user.getId();
+        this.creatorUserId = user.getName();
     }
 
 }

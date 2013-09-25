@@ -56,4 +56,9 @@ public class DeflectorExistsAsIndexNotification implements NotificationType {
        return DESCRIPTION;
     }
 
+    @Override
+    public boolean isCloseable() {
+        return false;
+    }
+
 }

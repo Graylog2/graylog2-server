@@ -31,5 +31,6 @@ public interface NotificationType {
     public Map<SystemJob.Type, String> options();
     public String getTitle();
     public String getDescription();
+    public boolean isCloseable();
 
 }
