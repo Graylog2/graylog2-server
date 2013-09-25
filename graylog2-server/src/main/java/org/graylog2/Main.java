@@ -43,6 +43,7 @@ import org.graylog2.inputs.raw.tcp.RawTCPInput;
 import org.graylog2.inputs.raw.udp.RawUDPInput;
 import org.graylog2.inputs.syslog.tcp.SyslogTCPInput;
 import org.graylog2.inputs.syslog.udp.SyslogUDPInput;
+import org.graylog2.notifications.Notification;
 import org.graylog2.outputs.ElasticSearchOutput;
 import org.graylog2.plugin.Tools;
 import org.graylog2.plugin.initializers.InitializerConfigurationException;
@@ -191,6 +192,11 @@ public final class Main {
                         + "This is a mis-configuration you should fix.";
                 LOG.warn(what);
                 server.getActivityWriter().write(new Activity(what, Main.class));
+
+                // Write a notification.
+                if (Notification.isFirst(server, Notification.Type.MULTI_MASTER)) {
+                    Notification.publish(server, Notification.Type.MULTI_MASTER, Notification.Severity.URGENT);
+                }
 
                 configuration.setIsMaster(false);
             } else {
