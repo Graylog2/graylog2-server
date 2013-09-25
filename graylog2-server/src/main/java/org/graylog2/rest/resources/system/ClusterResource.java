@@ -24,15 +24,12 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import org.graylog2.cluster.Node;
 import org.graylog2.plugin.Tools;
-import org.graylog2.rest.documentation.annotations.Api;
-import org.graylog2.rest.documentation.annotations.ApiOperation;
+import org.graylog2.rest.documentation.annotations.*;
 import org.graylog2.rest.resources.RestResource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.ws.rs.GET;
-import javax.ws.rs.Path;
-import javax.ws.rs.Produces;
+import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 import java.util.List;
 import java.util.Map;
@@ -55,15 +52,7 @@ public class ClusterResource extends RestResource {
         Map<String, Node> nodes = Node.allActive(core);
 
         for(Map.Entry<String, Node> e : nodes.entrySet()) {
-            Node node = e.getValue();
-            Map<String, Object> nodeMap = Maps.newHashMap();
-
-            nodeMap.put("id", node.getNodeId());
-            nodeMap.put("is_master", node.isMaster());
-            nodeMap.put("transport_address", node.getTransportAddress());
-            nodeMap.put("last_seen", Tools.getISO8601String(node.getLastSeen()));
-
-            nodeList.add(nodeMap);
+            nodeList.add(nodeSummary(e.getValue()));
         }
 
         Map<String, Object> result = Maps.newHashMap();
@@ -73,5 +62,45 @@ public class ClusterResource extends RestResource {
         return json(result);
     }
 
+    @GET
+    @Timed
+    @Path("/nodes/{nodeId}")
+    @ApiOperation(value = "Information about a node.",
+            notes = "This is returning information of a node in context to its state in the cluster. " +
+                    "Use the system API of the node itself to get system information.")
+    @Produces(MediaType.APPLICATION_JSON)
+    @ApiResponses(value = {
+            @ApiResponse(code = 404, message = "Node not found.")
+    })
+    public String node(@ApiParam(title = "nodeId", required = true) @PathParam("nodeId") String nodeId) {
+        if (nodeId == null || nodeId.isEmpty()) {
+            LOG.error("Missing nodeId. Returning HTTP 400.");
+            throw new WebApplicationException(400);
+        }
+
+        Node node = Node.byNodeId(core, nodeId);
+
+        if (node == null) {
+            LOG.error("Node <{}> not found.", nodeId);
+            throw new WebApplicationException(404);
+        }
+
+        return json(nodeSummary(node));
+    }
+
+    private Map<String, Object> nodeSummary(Node node) {
+        Map<String, Object> m  = Maps.newHashMap();
+
+        m.put("id", node.getNodeId());
+        m.put("is_master", node.isMaster());
+        m.put("hostname", Tools.getLocalCanonicalHostname());
+        m.put("transport_address", node.getTransportAddress());
+        m.put("last_seen", Tools.getISO8601String(node.getLastSeen()));
+
+        // Only meant to be used for representation. Not a real ID.
+        m.put("short_node_id", node.getShortNodeId());
+
+        return m;
+    }
 
 }
