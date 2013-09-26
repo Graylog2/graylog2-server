@@ -22,18 +22,17 @@ package org.graylog2.rest.resources.system;
 import com.codahale.metrics.annotation.Timed;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
+import com.mongodb.BasicDBObject;
 import org.graylog2.notifications.Notification;
 import org.graylog2.plugin.Tools;
-import org.graylog2.rest.documentation.annotations.Api;
-import org.graylog2.rest.documentation.annotations.ApiOperation;
+import org.graylog2.rest.documentation.annotations.*;
 import org.graylog2.rest.resources.RestResource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.ws.rs.GET;
-import javax.ws.rs.Path;
-import javax.ws.rs.Produces;
+import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
 import java.util.List;
 import java.util.Map;
 
@@ -73,4 +72,25 @@ public class NotificationsResource extends RestResource {
         return json(result);
     }
 
+    @DELETE @Timed
+    @Path("/{notificationType}")
+    @ApiOperation(value = "Delete a notification")
+    @Produces(MediaType.APPLICATION_JSON)
+    @ApiResponses(value = {
+            @ApiResponse(code = 404, message = "No such notification type.")
+    })
+    public Response deleteNotification(@ApiParam(title = "notificationType") @PathParam("notificationType") String notificationType) {
+        Notification.Type type;
+
+        try {
+            type = Notification.Type.valueOf(notificationType.toUpperCase());
+        } catch (IllegalArgumentException e) {
+            LOG.warn("No such notification type: [" + notificationType + "]");
+            return Response.status(400).build();
+        }
+
+        Notification.destroy(new BasicDBObject("type", type.toString().toLowerCase()), core, Notification.COLLECTION);
+
+        return Response.status(Response.Status.NO_CONTENT).build();
+    }
 }
