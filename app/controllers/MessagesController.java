@@ -5,10 +5,7 @@ import com.google.gson.Gson;
 import com.google.inject.Inject;
 import lib.APIException;
 import lib.ApiClient;
-import models.FieldMapper;
-import models.Input;
-import models.MessageLoader;
-import models.Node;
+import models.*;
 import models.api.results.MessageAnalyzeResult;
 import models.api.results.MessageResult;
 import play.Logger;
@@ -20,7 +17,7 @@ import java.util.Map;
 public class MessagesController extends AuthenticatedController {
 
     @Inject
-    private Node.Factory nodeFactory;
+    private NodeService nodeService;
 
     @Inject
     private MessageLoader messageLoader;
@@ -76,7 +73,7 @@ public class MessagesController extends AuthenticatedController {
 
     private Node getSourceNode(MessageResult m) {
         try {
-            return nodeFactory.fromId(m.getSourceNodeId());
+            return nodeService.loadNode(m.getSourceNodeId());
         } catch(Exception e) {
             Logger.warn("Could not derive source node from message <" + m.getId() + ">.", e);
         }

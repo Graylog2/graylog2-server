@@ -24,7 +24,6 @@ import com.google.inject.assistedinject.Assisted;
 import com.google.inject.assistedinject.AssistedInject;
 import lib.APIException;
 import lib.ApiClient;
-import lib.ServerNodes;
 import models.api.responses.NodeSummaryResponse;
 import models.api.responses.system.InputSummaryResponse;
 import models.api.responses.system.InputsResponse;
@@ -40,8 +39,6 @@ import java.util.List;
 public class Node {
 
     public interface Factory {
-
-        Node fromId(String id);
         Node fromSummaryResponse(NodeSummaryResponse r);
     }
     private final ApiClient api;
@@ -52,29 +49,6 @@ public class Node {
     private final String shortNodeId;
     private final String hostname;
     private final boolean isMaster;
-
-    @AssistedInject
-    public Node(ApiClient api, @Assisted String nodeId) {
-        this.api = api;
-
-        NodeSummaryResponse r;
-        try {
-            r = ApiClient.get(NodeSummaryResponse.class)
-                    .node(ServerNodes.any())
-                    .path("/system/cluster/nodes/{0}", nodeId)
-                    .execute();
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        } catch (APIException e) {
-            throw new RuntimeException(e);
-        }
-        transportAddress = r.transportAddress;
-        lastSeen = new DateTime(r.lastSeen);
-        this.nodeId = r.nodeId;
-        shortNodeId = r.shortNodeId;
-        hostname = r.hostname;
-        isMaster = r.isMaster;
-    }
 
     @AssistedInject
     public Node(ApiClient api, @Assisted NodeSummaryResponse r) {

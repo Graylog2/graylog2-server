@@ -28,6 +28,7 @@ import lib.BreadcrumbList;
 import lib.ExclusiveInputException;
 import models.Input;
 import models.Node;
+import models.NodeService;
 import models.api.responses.system.InputTypeSummaryResponse;
 import models.api.results.MessageResult;
 import play.mvc.Result;
@@ -41,13 +42,13 @@ import java.util.Map;
 public class InputsController extends AuthenticatedController {
 
     @Inject
-    private Node.Factory nodeFactory;
+    private NodeService nodeService;
 
     public Result manage(String nodeId) {
         // TODO: account field attributes using JS (greater than, listen_address, ...)
         // TODO: persist inputs
 
-        Node node = nodeFactory.fromId(nodeId);
+        Node node = nodeService.loadNode(nodeId);
 
         if (node == null) {
             String message = "Did not find node.";
@@ -83,7 +84,7 @@ public class InputsController extends AuthenticatedController {
         String inputTitle = form.get("title")[0];
 
         try {
-            InputTypeSummaryResponse inputInfo = Input.getTypeInformation(nodeFactory.fromId(nodeId), inputType);
+            InputTypeSummaryResponse inputInfo = Input.getTypeInformation(nodeService.loadNode(nodeId), inputType);
 
             for (Map.Entry<String, String[]> f : form.entrySet()) {
                 if (!f.getKey().startsWith("configuration_")) {
@@ -121,7 +122,7 @@ public class InputsController extends AuthenticatedController {
             }
 
             try {
-                Input.launch(nodeFactory.fromId(nodeId), inputTitle, inputType, configuration, currentUser().getId(), inputInfo.isExclusive);
+                Input.launch(nodeService.loadNode(nodeId), inputTitle, inputType, configuration, currentUser().getId(), inputInfo.isExclusive);
             } catch (ExclusiveInputException e) {
                 flash("error", "This input is exclusive and already running.");
                 return redirect(routes.InputsController.manage(nodeId));
@@ -138,7 +139,7 @@ public class InputsController extends AuthenticatedController {
 
     public Result terminate(String nodeId, String inputId) {
         try {
-            Input.terminate(nodeFactory.fromId(nodeId), inputId);
+            Input.terminate(nodeService.loadNode(nodeId), inputId);
 
             return redirect(routes.InputsController.manage(nodeId));
         } catch (IOException e) {
@@ -151,7 +152,7 @@ public class InputsController extends AuthenticatedController {
 
     public Result recentMessage(String nodeId, String inputId) {
         try {
-            Node node = nodeFactory.fromId(nodeId);
+            Node node = nodeService.loadNode(nodeId);
             MessageResult recentlyReceivedMessage = node.getInput(inputId).getRecentlyReceivedMessage(nodeId);
 
             if (recentlyReceivedMessage == null) {

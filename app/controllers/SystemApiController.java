@@ -17,7 +17,7 @@ import java.util.Set;
 public class SystemApiController extends AuthenticatedController {
 
     @Inject
-    private Node.Factory nodeFactory;
+    private NodeService nodeService;
 
     public Result fields() {
         try {
@@ -86,7 +86,7 @@ public class SystemApiController extends AuthenticatedController {
     public Result nodeThroughput(String nodeId) {
         try {
             Map<String, Object> result = Maps.newHashMap();
-            result.put("throughput", Throughput.get(nodeFactory.fromId(nodeId)));
+            result.put("throughput", Throughput.get(nodeService.loadNode(nodeId)));
 
             return ok(new Gson().toJson(result)).as("application/json");
         } catch (IOException e) {
@@ -100,7 +100,7 @@ public class SystemApiController extends AuthenticatedController {
         try {
             Http.RequestBody body = request().body();
             final String nodeId = body.asFormUrlEncoded().get("node_id")[0];
-            final Node node = nodeFactory.fromId(nodeId);
+            final Node node = nodeService.loadNode(nodeId);
             MessageProcessing.pause(node);
             return ok();
         } catch (IOException e) {
@@ -114,7 +114,7 @@ public class SystemApiController extends AuthenticatedController {
         try {
             Http.RequestBody body = request().body();
             final String nodeId = body.asFormUrlEncoded().get("node_id")[0];
-            final Node node = nodeFactory.fromId(nodeId);
+            final Node node = nodeService.loadNode(nodeId);
             MessageProcessing.resume(node);
             return ok();
         } catch (IOException e) {

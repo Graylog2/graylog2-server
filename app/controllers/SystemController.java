@@ -40,7 +40,7 @@ public class SystemController extends AuthenticatedController {
     @Inject
     private BufferInfo.Factory bufferInfoFactory;
     @Inject
-    private Node.Factory nodeFactory;
+    private NodeService nodeService;
     @Inject
     private ClusterService clusterService;
 
@@ -100,7 +100,7 @@ public class SystemController extends AuthenticatedController {
 
     public Result threadDump(String nodeId) {
         try {
-            Node node = nodeFactory.fromId(nodeId);
+            Node node = nodeService.loadNode(nodeId);
 
             BreadcrumbList bc = new BreadcrumbList();
             bc.addCrumb("System", routes.SystemController.index(0));

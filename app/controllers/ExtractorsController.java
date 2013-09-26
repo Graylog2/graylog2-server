@@ -26,6 +26,7 @@ import lib.BreadcrumbList;
 import models.Extractor;
 import models.Input;
 import models.Node;
+import models.NodeService;
 import play.Logger;
 import play.mvc.Result;
 
@@ -38,11 +39,11 @@ import java.util.Map;
 public class ExtractorsController extends AuthenticatedController {
 
     @Inject
-    private Node.Factory nodeFactory;
+    private NodeService nodeService;
 
     public Result manage(String nodeId, String inputId) {
         try {
-            Node node = nodeFactory.fromId(nodeId);
+            Node node = nodeService.loadNode(nodeId);
             Input input = node.getInput(inputId);
 
             return ok(views.html.system.inputs.extractors.manage.render(
@@ -62,7 +63,7 @@ public class ExtractorsController extends AuthenticatedController {
 
     public Result newExtractor(String nodeId, String inputId, String extractorType, String field, String example) {
         try {
-            Node node = nodeFactory.fromId(nodeId);
+            Node node = nodeService.loadNode(nodeId);
             Input input = node.getInput(inputId);
 
             return ok(views.html.system.inputs.extractors.new_extractor.render(
@@ -85,7 +86,7 @@ public class ExtractorsController extends AuthenticatedController {
     public Result create(String nodeId, String inputId) {
         Map<String, String[]> form = request().body().asFormUrlEncoded();
         Extractor.Type extractorType = Extractor.Type.valueOf(form.get("extractor_type")[0].toUpperCase());
-        Node node = nodeFactory.fromId(nodeId);
+        Node node = nodeService.loadNode(nodeId);
 
         Extractor extractor;
         try {
@@ -120,7 +121,7 @@ public class ExtractorsController extends AuthenticatedController {
 
     public Result delete(String nodeId, String inputId, String extractorId) {
         try {
-            Node node = nodeFactory.fromId(nodeId);
+            Node node = nodeService.loadNode(nodeId);
             Extractor.delete(node, node.getInput(inputId), extractorId);
 
             return redirect(routes.ExtractorsController.manage(nodeId, inputId));

@@ -63,11 +63,11 @@ public class SystemJob {
     private final boolean providesProgress;
 
     @AssistedInject
-    public SystemJob(Node.Factory nodeFactory, @Assisted SystemJobSummaryResponse s) {
+    public SystemJob(NodeService nodeService, @Assisted SystemJobSummaryResponse s) {
         this.id = UUID.fromString(s.id);
         this.name = s.name;
         this.description = s.description;
-        this.node = nodeFactory.fromId(s.nodeId);
+        this.node = nodeService.loadNode(s.nodeId);
         this.startedAt = DateTime.parse(s.startedAt);
         this.percentComplete = s.percentComplete;
         this.isCancelable = s.isCancelable;
