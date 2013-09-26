@@ -46,7 +46,7 @@ public class ServerNodes {
 
     @Inject
     private ServerNodes(@Named("Initial Nodes") Node[] nodes) {
-        log.info("Creating ServerNodes with initial nodes {}", nodes);
+        log.info("Creating ServerNodes with initial nodes {}", (Object)nodes);
         initialNodes = ImmutableList.copyOf(nodes);
         setCurrentNodes(initialNodes);
         INSTANCE = this;

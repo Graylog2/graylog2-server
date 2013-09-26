@@ -41,6 +41,8 @@ public class SystemController extends AuthenticatedController {
     private BufferInfo.Factory bufferInfoFactory;
     @Inject
     private Node.Factory nodeFactory;
+    @Inject
+    private ClusterService clusterService;
 
     public Result index(Integer page) {
         try {
@@ -48,7 +50,7 @@ public class SystemController extends AuthenticatedController {
             List<SystemJob> systemJobs = SystemJob.all();
             int totalSystemMessages = SystemMessage.total();
             List<SystemMessage> systemMessages = SystemMessage.all(page-1);
-            ESClusterHealth clusterHealth = ESClusterHealth.get();
+            ESClusterHealth clusterHealth = clusterService.getESClusterHealth();
 
             return ok(views.html.system.index.render(
                     currentUser(),

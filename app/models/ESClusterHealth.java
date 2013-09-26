@@ -19,12 +19,8 @@
  */
 package models;
 
-import lib.APIException;
-import lib.ApiClient;
 import lib.ClusterHealthStatus;
 import models.api.responses.system.ESClusterHealthResponse;
-
-import java.io.IOException;
 
 /**
  * @author Lennart Koopmann <lennart@torch.sh>
@@ -43,12 +39,6 @@ public class ESClusterHealth {
         this.initializingShards = r.shards.initializing;
         this.relocatingShards = r.shards.relocating;
         this.unassignedShards = r.shards.unassigned;
-    }
-
-    public static ESClusterHealth get() throws IOException, APIException {
-        ESClusterHealthResponse r = ApiClient.get(ESClusterHealthResponse.class).path("/system/indexer/cluster/health").execute();
-
-        return new ESClusterHealth(r);
     }
 
     public ClusterHealthStatus getStatus() {
