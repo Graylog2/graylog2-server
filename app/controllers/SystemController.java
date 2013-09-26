@@ -38,11 +38,11 @@ import java.util.Map;
 public class SystemController extends AuthenticatedController {
 
     @Inject
-    private BufferInfo.Factory bufferInfoFactory;
-    @Inject
     private NodeService nodeService;
     @Inject
     private ClusterService clusterService;
+    @Inject
+    private ServerNodes serverNodes;
 
     public Result index(Integer page) {
         try {
@@ -74,23 +74,16 @@ public class SystemController extends AuthenticatedController {
         bc.addCrumb("System", routes.SystemController.index(0));
         bc.addCrumb("Nodes", routes.SystemController.nodes());
 
-        try {
-            List<ServerJVMStats> serverJvmStats = ServerJVMStats.get();
-            Map<String, Node> nodes = ServerNodes.asMap();
-            Map<String, BufferInfo> bufferInfo = Maps.newHashMap();
+        List<ServerJVMStats> serverJvmStats = clusterService.getClusterJvmStats();
+        Map<String, Node> nodes = serverNodes.asMap();
+        Map<String, BufferInfo> bufferInfo = Maps.newHashMap();
 
-            // Ask every node for buffer info.
-            for(Node node : nodes.values()) {
-                bufferInfo.put(node.getNodeId(), bufferInfoFactory.ofNode(node));
-            }
-
-            return ok(views.html.system.nodes.render(currentUser(), bc, serverJvmStats, nodes, bufferInfo));
-        } catch (IOException e) {
-            return status(504, views.html.errors.error.render(ApiClient.ERROR_MSG_IO, e, request()));
-        } catch (APIException e) {
-            String message = "Could not fetch system information. We expected HTTP 200, but got a HTTP " + e.getHttpCode() + ".";
-            return status(504, views.html.errors.error.render(message, e, request()));
+        // Ask every node for buffer info.
+        for(Node node : nodes.values()) {
+            bufferInfo.put(node.getNodeId(), node.getBufferInfo());
         }
+
+        return ok(views.html.system.nodes.render(currentUser(), bc, serverJvmStats, nodes, bufferInfo));
     }
 
     public Result node(String nodeId) {

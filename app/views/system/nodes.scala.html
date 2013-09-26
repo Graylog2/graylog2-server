@@ -26,7 +26,7 @@
     @for(jvm <- jvms) {
         <div class="row-fluid message-processing-host node-row">
             <span class="pull-right node-throughput-info">
-                @if(jvm.isProcessing) {
+                @if(nodes.get(jvm.getNodeId).isProcessing) {
                     <span class="sentence">
                         Processing
                         <strong class="node-throughput" data-node-id="@jvm.getNodeId">0</strong>
@@ -55,7 +55,7 @@
 
                         <li class="divider"></li>
                         <li>
-                        @if(jvm.isProcessing) {
+                        @if(nodes.get(jvm.getNodeId).isProcessing) {
                             <a class="change-message-processing"
                             data-action="pause"
                             data-node-id="@jvm.getNodeId"
@@ -74,7 +74,7 @@
             <h3>
                 @views.html.partials.node_title_link(nodes.get(jvm.getNodeId))
 
-                @if(jvm.isProcessing) {
+                @if(nodes.get(jvm.getNodeId).isProcessing) {
                     <span class="label label-success">Processing</span>
                 } else {
                     <span class="label label-important">Processing paused</span>

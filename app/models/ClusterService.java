@@ -19,14 +19,18 @@
 
 package models;
 
+import com.google.common.collect.Lists;
 import com.google.inject.Inject;
 import lib.APIException;
 import lib.ApiClient;
 import models.api.responses.system.ESClusterHealthResponse;
+import models.api.responses.system.ServerJVMStatsResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
+import java.util.Collection;
+import java.util.List;
 
 public class ClusterService {
     private static final Logger log = LoggerFactory.getLogger(ClusterService.class);
@@ -47,5 +51,16 @@ public class ClusterService {
             log.error("Could not load es cluster health", e);
         }
         return null;
+    }
+
+    public List<ServerJVMStats> getClusterJvmStats() {
+        List<ServerJVMStats> result = Lists.newArrayList();
+        Collection<ServerJVMStatsResponse> rs = api.get(ServerJVMStatsResponse.class).fromAllNodes().path("/system/jvm").executeOnAll();
+
+        for (ServerJVMStatsResponse r : rs) {
+            result.add(new ServerJVMStats(r));
+        }
+
+        return result;
     }
 }

@@ -43,4 +43,7 @@ public class NodeSummaryResponse {
     @SerializedName("is_master")
     public boolean isMaster;
 
+    @SerializedName("is_processing")
+    public boolean isProcessing;
+
 }
