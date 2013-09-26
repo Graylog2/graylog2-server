@@ -38,13 +38,13 @@ import java.util.Map;
  * @author Lennart Koopmann <lennart@torch.sh>
  */
 @Api(value = "System/Cluster", description = "Node discovery")
-@Path("/system/cluster")
+@Path("/system/cluster/nodes")
 public class ClusterResource extends RestResource {
 
     private static final Logger LOG = LoggerFactory.getLogger(ClusterResource.class);
 
     @GET @Timed
-    @Path("/nodes")
+    @Path("/")
     @ApiOperation(value = "List all active nodes in this cluster.")
     @Produces(MediaType.APPLICATION_JSON)
     public String nodes() {
@@ -64,7 +64,7 @@ public class ClusterResource extends RestResource {
 
     @GET
     @Timed
-    @Path("/nodes/{nodeId}")
+    @Path("/{nodeId}")
     @ApiOperation(value = "Information about a node.",
             notes = "This is returning information of a node in context to its state in the cluster. " +
                     "Use the system API of the node itself to get system information.")
@@ -96,6 +96,7 @@ public class ClusterResource extends RestResource {
         m.put("hostname", Tools.getLocalCanonicalHostname());
         m.put("transport_address", node.getTransportAddress());
         m.put("last_seen", Tools.getISO8601String(node.getLastSeen()));
+        m.put("is_processing", core.isProcessing());
 
         // Only meant to be used for representation. Not a real ID.
         m.put("short_node_id", node.getShortNodeId());

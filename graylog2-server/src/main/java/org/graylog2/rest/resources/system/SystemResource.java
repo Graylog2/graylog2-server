@@ -132,7 +132,6 @@ public class SystemResource extends RestResource {
         result.put("node_id", core.getNodeId());
         result.put("pid", Tools.getPID());
         result.put("info", Tools.getSystemInformation());
-        result.put("is_processing", core.isProcessing());
 
         return json(result);
     }
