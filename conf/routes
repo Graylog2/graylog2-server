@@ -65,6 +65,7 @@ GET         /a/analyze/:index/:id/:field                                        
 GET         /a/system/fields                                                         @controllers.SystemApiController.fields()
 GET         /a/system/jobs                                                           @controllers.SystemApiController.jobs()
 GET         /a/system/notifications                                                  @controllers.SystemApiController.notifications()
+DELETE      /a/system/notifications/:notification_type                               @controllers.SystemApiController.deleteNotification(notification_type: String)
 GET         /a/system/throughput                                                     @controllers.SystemApiController.totalThroughput()
 GET         /a/system/throughput/node/:node_id                                       @controllers.SystemApiController.nodeThroughput(node_id: String)
 PUT         /a/system/processing/pause                                               @controllers.SystemApiController.pauseMessageProcessing()

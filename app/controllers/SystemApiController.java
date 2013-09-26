@@ -70,6 +70,19 @@ public class SystemApiController extends AuthenticatedController {
         }
     }
 
+    public Result deleteNotification(String notificationType) {
+        try {
+            Notification.delete(Notification.Type.valueOf(notificationType.toUpperCase()));
+            return ok();
+        } catch (IllegalArgumentException e1) {
+            return notFound("no such notification type");
+        } catch (APIException e2) {
+            return internalServerError("api exception " + e2);
+        } catch (IOException e3) {
+            return internalServerError("io exception");
+        }
+    }
+
     public Result totalThroughput() {
         try {
             Map<String, Object> result = Maps.newHashMap();

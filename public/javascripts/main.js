@@ -164,6 +164,26 @@ $(document).ready(function() {
         });
     })();
 
+    // Close a notification.
+    $(".delete-notification").on("click", function() {
+        if (!confirm("Really delete this notification?")) {
+            return false;
+        }
+
+        var notificationContainer = $(this).parent();
+
+        $.ajax({
+            url: "/a/system/notifications/" + $(this).attr("data-notificationtype"),
+            type: "DELETE",
+            success: function(data) {
+                notificationContainer.hide();
+            },
+            error: function() {
+                showError("Could not delete notification.");
+            }
+        });
+    });
+
     // Stream rules.
     $("#new-stream-rule .sr-input").on("keyup change", function() {
         value = $(this).val();

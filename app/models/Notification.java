@@ -66,6 +66,13 @@ public class Notification {
         throw new RuntimeException("No notification registered for " + type);
     }
 
+    public static void delete(Type type) throws APIException, IOException {
+        ApiClient.delete()
+                .path("/system/notifications/{0}", type.toString().toLowerCase())
+                .expect(204)
+                .execute();
+    }
+
     public Type getType() {
         return type;
     }

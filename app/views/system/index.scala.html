@@ -15,7 +15,7 @@
         @for(notification <- notifications) {
             <div class="notification alert alert-error">
                 @if(notification.get().isCloseable()) {
-                    <button type="button" class="close" data-notificationtype="@notification.getType().toString().toLowerCase()">&times;</button>
+                    <button type="button" class="close delete-notification" data-notificationtype="@notification.getType().toString().toLowerCase()">&times;</button>
                 }
 
                 <h3>
