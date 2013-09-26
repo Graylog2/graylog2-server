@@ -49,8 +49,8 @@ public class SplitAndIndexTesterResource extends RestResource {
             throw new WebApplicationException(Response.Status.BAD_REQUEST);
         }
 
-        String cut = SplitAndIndexExtractor.cut(string, splitBy, index);
-        int[] positions = SplitAndIndexExtractor.getCutIndices(string, splitBy, index);
+        String cut = SplitAndIndexExtractor.cut(string, splitBy, index-1);
+        int[] positions = SplitAndIndexExtractor.getCutIndices(string, splitBy, index-1);
         boolean successful = (cut != null);
 
         Map<String, Object> result = Maps.newHashMap();

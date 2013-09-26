@@ -53,7 +53,7 @@ public class SplitAndIndexExtractor extends Extractor {
         }
 
         try {
-            index = (Integer) extractorConfig.get("index");
+            index = ((Integer) extractorConfig.get("index"))-1;
             splitChar = (String) extractorConfig.get("split_by");
         } catch (ClassCastException e) {
             throw new ConfigurationException("Parameters cannot be casted.");
