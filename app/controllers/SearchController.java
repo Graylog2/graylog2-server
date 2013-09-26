@@ -8,7 +8,6 @@ import models.FieldMapper;
 import models.UniversalSearch;
 import models.api.results.DateHistogramResult;
 import models.api.results.SearchResult;
-import play.Logger;
 import play.mvc.Result;
 
 import java.io.IOException;
@@ -24,8 +23,6 @@ public class SearchController extends AuthenticatedController {
     	if (interval == null || interval.isEmpty() || !SearchTools.isAllowedDateHistogramInterval(interval)) {
     		interval = "hour";
     	}
-
-        Logger.info(rangeType.toUpperCase());
 
         // Determine timerange type.
         TimeRange.Type timerangeType;
