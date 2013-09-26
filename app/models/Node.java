@@ -134,6 +134,19 @@ public class Node {
         return isProcessing;
     }
 
+    public void pause() throws IOException, APIException {
+        api.put()
+            .path("/system/processing/pause")
+            .node(this)
+            .execute();
+    }
+
+    public void resume() throws IOException, APIException {
+        api.put()
+            .path("/system/processing/resume")
+            .node(this)
+            .execute();
+    }
 
     /**
      * This swallows all exceptions to allow easy lazy-loading in views without exception handling.

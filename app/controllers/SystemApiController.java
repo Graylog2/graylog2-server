@@ -101,7 +101,7 @@ public class SystemApiController extends AuthenticatedController {
             Http.RequestBody body = request().body();
             final String nodeId = body.asFormUrlEncoded().get("node_id")[0];
             final Node node = nodeService.loadNode(nodeId);
-            MessageProcessing.pause(node);
+            node.pause();
             return ok();
         } catch (IOException e) {
             return internalServerError("io exception");
@@ -115,7 +115,7 @@ public class SystemApiController extends AuthenticatedController {
             Http.RequestBody body = request().body();
             final String nodeId = body.asFormUrlEncoded().get("node_id")[0];
             final Node node = nodeService.loadNode(nodeId);
-            MessageProcessing.resume(node);
+            node.resume();
             return ok();
         } catch (IOException e) {
             return internalServerError("io exception");
