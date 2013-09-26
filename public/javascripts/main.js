@@ -27,24 +27,29 @@ $(document).ready(function() {
 			
 			// Inject terms of a message when modal is requested.
 			$('.terms-msg-modal').on('show', function() {
-				messageId = $(this).attr("data-msg-id");
-				spinner = $("#terms-msg-" + messageId + " .modal-body .spinner");
-				list = $("#terms-msg-" + messageId + " .modal-body ul");
-				list_link = $("#terms-msg-" + messageId + "-as-list");
-				
-				$.get("/a/analyze/" + index + "/" + messageId + "/message", function(data) {
-					if (data.length > 0) {
-						for(var i = 0; i < data.length; i++) {
-							list.append("<li>" + data[i] + "</li>");
-						}
-					} else {
-						list.append("<li>No terms extracted</li>")
-					}
-					
-					// Hide spinner, show list link.
-					spinner.hide();
-					list_link.show();
-				})
+                messageId = $(this).attr("data-msg-id");
+                spinner = $("#terms-msg-" + messageId + " .modal-body .spinner");
+                list = $("#terms-msg-" + messageId + " .modal-body ul");
+                list_link = $("#terms-msg-" + messageId + "-as-list");
+
+                if ($(this).attr("data-loaded") != "true") {
+                    $.get("/a/analyze/" + index + "/" + messageId + "/message", function(data) {
+                        if (data.length > 0) {
+                            for(var i = 0; i < data.length; i++) {
+                                list.append("<li>" + data[i] + "</li>");
+                            }
+                        } else {
+                            list.append("<li>No terms extracted</li>")
+                        }
+
+                        // Hide spinner, show list link.
+                        spinner.hide();
+                        list_link.show();
+                    });
+
+                    // Mark as already loaded so we don't add the terms again on next open.
+                    $(this).attr("data-loaded", "true");
+                }
 				
 				// Show as list link.
 				list_link.bind("click", function() {
