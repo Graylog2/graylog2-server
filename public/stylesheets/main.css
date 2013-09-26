@@ -817,3 +817,7 @@ form #stream-rules {
     padding-left: 3px;
     padding-right: 3px;
 }
+
+.no-active-nodes {
+    margin-top: 8px;
+}
