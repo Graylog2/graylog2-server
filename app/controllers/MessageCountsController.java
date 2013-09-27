@@ -21,11 +21,11 @@ package controllers;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.gson.Gson;
+import com.google.inject.Inject;
 import lib.APIException;
-import models.MessageCount;
 import models.MessageCountHistogram;
+import models.MessagesService;
 import models.api.results.DateHistogramResult;
-import models.api.results.MessageCountResult;
 import play.mvc.Result;
 
 import java.io.IOException;
@@ -33,21 +33,16 @@ import java.util.List;
 import java.util.Map;
 
 public class MessageCountsController extends AuthenticatedController {
+    @Inject
+    private MessagesService messagesService;
 
     public Result total() {
-        try {
-            MessageCount count = new MessageCount();
-            MessageCountResult countResult = count.total();
+        int countResult = messagesService.total();
 
-            Map<String, Integer> result = Maps.newHashMap();
-            result.put("events", countResult.getEventsCount());
+        Map<String, Integer> result = Maps.newHashMap();
+        result.put("events", countResult);
 
-            return ok(new Gson().toJson(result)).as("application/json");
-        } catch (IOException e) {
-            return internalServerError("io exception");
-        } catch (APIException e) {
-            return internalServerError("api exception " + e);
-        }
+        return ok(new Gson().toJson(result)).as("application/json");
     }
 
 	public Result histogram(String timerange) {
