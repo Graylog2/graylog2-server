@@ -53,6 +53,7 @@ GET         /system/logging                                                     
 
 # API: Search (i.e. facets)
 GET         /a/search/fieldstats                                                     @controllers.SearchApiController.fieldStats(q ?= "", field ?= "", rangetype ?= "", relative:Integer ?= -1, from ?= "", to ?= "", keyword ?= "", interval ?= "")
+GET         /a/search/fieldterms                                                     @controllers.SearchApiController.fieldTerms(q ?= "", field ?= "", rangetype ?= "", relative:Integer ?= -1, from ?= "", to ?= "", keyword ?= "", interval ?= "")
 
 # API: Message counts and histograms
 GET         /a/messagecounts/histogram                                               @controllers.MessageCountsController.histogram(timerange ?= "")

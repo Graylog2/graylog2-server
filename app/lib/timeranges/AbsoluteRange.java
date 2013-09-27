@@ -24,7 +24,7 @@ import java.util.Map;
 /**
  * @author Lennart Koopmann <lennart@torch.sh>
  */
-public class AbsoluteRange implements TimeRange {
+public class AbsoluteRange extends TimeRange {
 
     private final String from;
     private final String to;

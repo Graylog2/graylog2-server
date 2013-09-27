@@ -1,5 +1,5 @@
-/*
- * Copyright 2013 TORCH UG
+/**
+ * Copyright 2013 Lennart Koopmann <lennart@torch.sh>
  *
  * This file is part of Graylog2.
  *
@@ -15,37 +15,21 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with Graylog2.  If not, see <http://www.gnu.org/licenses/>.
+ *
  */
-package lib.timeranges;
+package models.api.responses;
 
-import java.util.HashMap;
 import java.util.Map;
 
 /**
  * @author Lennart Koopmann <lennart@torch.sh>
  */
-public class KeywordRange extends TimeRange {
+public class FieldTermsResponse {
 
-    private final String keyword;
-
-    public KeywordRange(String keyword) throws InvalidRangeParametersException {
-        if (keyword == null || keyword.isEmpty()) {
-            throw new InvalidRangeParametersException();
-        }
-
-        this.keyword = keyword;
-    }
-
-    @Override
-    public Type getType() {
-        return Type.KEYWORD;
-    }
-
-    @Override
-    public Map<String, String> getQueryParams() {
-        return new HashMap<String, String>() {{
-            put("keyword", String.valueOf(keyword));
-        }};
-    }
+    public long total;
+    public long missing;
+    public int time;
+    public long other;
+    public Map<String, Long> terms;
 
 }

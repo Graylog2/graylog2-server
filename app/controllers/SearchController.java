@@ -43,23 +43,9 @@ public class SearchController extends AuthenticatedController {
     	}
 
         // Determine timerange type.
-        TimeRange.Type timerangeType;
         TimeRange timerange;
         try {
-            timerangeType = TimeRange.Type.valueOf(rangeType.toUpperCase());
-            switch (timerangeType) {
-                case RELATIVE:
-                    timerange = new RelativeRange(relative);
-                    break;
-                case ABSOLUTE:
-                    timerange = new AbsoluteRange(from, to);
-                    break;
-                case KEYWORD:
-                    timerange = new KeywordRange(keyword);
-                    break;
-                default:
-                    throw new InvalidRangeParametersException();
-            }
+            timerange = TimeRange.factory(rangeType, relative, from, to, keyword);
         } catch(InvalidRangeParametersException e2) {
             return status(400, views.html.errors.error.render("Invalid range parameters provided.", e2, request()));
         } catch(IllegalArgumentException e1) {

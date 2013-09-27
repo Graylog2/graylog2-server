@@ -23,7 +23,7 @@ import java.util.Map;
 /**
  * @author Lennart Koopmann <lennart@torch.sh>
  */
-public interface TimeRange {
+public abstract class TimeRange {
 
     public enum Type {
         RELATIVE,
@@ -31,7 +31,20 @@ public interface TimeRange {
         KEYWORD
     }
 
-    public Type getType();
-    public Map<String, String> getQueryParams();
+    public abstract Type getType();
+    public abstract Map<String, String> getQueryParams();
+
+    public static TimeRange factory(String rangeType, int relative, String from, String to, String keyword) throws InvalidRangeParametersException {
+        switch (Type.valueOf(rangeType.toUpperCase())) {
+            case RELATIVE:
+                return new RelativeRange(relative);
+            case ABSOLUTE:
+                return new AbsoluteRange(from, to);
+            case KEYWORD:
+                return new KeywordRange(keyword);
+            default:
+                throw new InvalidRangeParametersException();
+        }
+    }
 
 }

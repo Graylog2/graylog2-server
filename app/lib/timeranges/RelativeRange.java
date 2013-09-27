@@ -24,7 +24,7 @@ import java.util.Map;
 /**
  * @author Lennart Koopmann <lennart@torch.sh>
  */
-public class RelativeRange implements TimeRange {
+public class RelativeRange extends TimeRange {
 
     private final int range;
 

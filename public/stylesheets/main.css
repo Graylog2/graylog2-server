@@ -821,3 +821,70 @@ form #stream-rules {
 .no-active-nodes {
     margin-top: 8px;
 }
+
+.quickvalues {
+    height: 400px;
+    width: 500px;
+    padding: 10px;
+    position: relative;
+    top: -40px;
+    right: 550px;
+    margin-bottom: -420px;
+    color: #fff;
+    -webkit-border-radius: 10px 0px 10px 10px;
+    -moz-border-radius: 10px 0px 10px 10px;
+    border-radius: 10px 0px 10px 10px;
+}
+
+.quickvalues .inner {
+    height: 375px;
+    margin-bottom: 5px;
+    overflow: hidden;
+}
+
+.quickvalues h2 {
+    color: #fff;
+}
+
+.quickvalues .arrow {
+    color: #000;
+    position: relative;
+    left: 510px;
+    top: 10px;
+    font-size: 15px;
+    display: block;
+    margin-bottom: -15px;
+    opacity: 0.8;
+    width: 15px;
+    filter:alpha(opacity=80);
+}
+
+.quickvalues .icons {
+    position: relative;
+    top: -5px;
+}
+
+.quickvalues .icons .quickvalues-refresh {
+    margin-right: 2px;
+    cursor: pointer;
+}
+
+.quickvalues .icons .quickvalues-close {
+    font-size: 13px;
+    cursor: pointer;
+}
+
+.quickvalues .icons .icon:hover {
+    color: #4DBCE9;
+}
+
+.quickvalues .terms {
+    margin-bottom: 5px;
+}
+
+.alpha80 {
+    background: rgb(0, 0, 0) transparent;
+    background: rgba(0, 0, 0, 0.8);
+    filter:progid:DXImageTransform.Microsoft.gradient(startColorstr=#99000000, endColorstr=#99000000);
+    -ms-filter: "progid:DXImageTransform.Microsoft.gradient(startColorstr=#99000000, endColorstr=#99000000)";
+}
