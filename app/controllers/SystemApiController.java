@@ -42,18 +42,12 @@ public class SystemApiController extends AuthenticatedController {
     private MessagesService messagesService;
 
     public Result fields() {
-        try {
-            Set<String> fields = messagesService.getMessageFields();
+        Set<String> fields = messagesService.getMessageFields();
 
-            Map<String, Set<String>> result = Maps.newHashMap();
-            result.put("fields", fields);
+        Map<String, Set<String>> result = Maps.newHashMap();
+        result.put("fields", fields);
 
-            return ok(new Gson().toJson(result)).as("application/json");
-        } catch (IOException e) {
-            return internalServerError("io exception");
-        } catch (APIException e) {
-            return internalServerError("api exception " + e);
-        }
+        return ok(new Gson().toJson(result)).as("application/json");
     }
 
     public Result jobs() {
