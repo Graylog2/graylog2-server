@@ -185,31 +185,6 @@ public class Indexer {
 
         return !response.hasFailures();
     }
-
-    public Set<String> getAllMessageFields() {
-        Set<String> fields = Sets.newHashSet();
-
-        ClusterStateRequest csr = new ClusterStateRequest().filterBlocks(true).filterNodes(true);
-        ClusterState cs = client.admin().cluster().state(csr).actionGet().getState();
-        for (Map.Entry<String, IndexMetaData> d : cs.getMetaData().indices().entrySet()) {
-            try {
-                MappingMetaData mmd = d.getValue().mapping(TYPE);
-                if (mmd == null) {
-                    // There is no mapping if there are no messages in the index.
-                    continue;
-                }
-
-                Map<String, Object> mapping = (Map<String, Object>) mmd.getSourceAsMap().get("properties");
-
-                fields.addAll(mapping.keySet());
-            } catch(Exception e) {
-                LOG.error("Error while trying to get fields of <{}>", d.getKey(), e);
-                continue;
-            }
-        }
-
-        return fields;
-    }
     
     public void runIndexRetention() throws NoTargetIndexException {
         Map<String, IndexStats> indices = server.getDeflector().getAllDeflectorIndices();

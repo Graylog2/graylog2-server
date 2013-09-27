@@ -71,7 +71,7 @@ public class SystemResource extends RestResource {
     @Produces(MediaType.APPLICATION_JSON)
     public String fields() {
         Map<String, Object> result = Maps.newHashMap();
-        result.put("fields", core.getIndexer().getAllMessageFields());
+        result.put("fields", core.getIndexer().indices().getAllMessageFields());
 
         return json(result);
     }
