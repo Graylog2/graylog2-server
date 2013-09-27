@@ -18,6 +18,8 @@ public class SystemApiController extends AuthenticatedController {
 
     @Inject
     private NodeService nodeService;
+    @Inject
+    private ClusterService clusterService;
 
     public Result fields() {
         try {
@@ -84,29 +86,19 @@ public class SystemApiController extends AuthenticatedController {
     }
 
     public Result totalThroughput() {
-        try {
-            Map<String, Object> result = Maps.newHashMap();
-            result.put("throughput", Throughput.getTotal());
+        Map<String, Object> result = Maps.newHashMap();
+        result.put("throughput", clusterService.getClusterThroughput());
 
-            return ok(new Gson().toJson(result)).as("application/json");
-        } catch (IOException e) {
-            return internalServerError("io exception");
-        } catch (APIException e) {
-            return internalServerError("api exception " + e);
-        }
+        return ok(new Gson().toJson(result)).as("application/json");
     }
 
     public Result nodeThroughput(String nodeId) {
-        try {
-            Map<String, Object> result = Maps.newHashMap();
-            result.put("throughput", Throughput.get(nodeService.loadNode(nodeId)));
+        Map<String, Object> result = Maps.newHashMap();
+        final Node node = nodeService.loadNode(nodeId);
+        int throughput = node.getThroughput();
+        result.put("throughput", throughput);
 
-            return ok(new Gson().toJson(result)).as("application/json");
-        } catch (IOException e) {
-            return internalServerError("io exception");
-        } catch (APIException e) {
-            return internalServerError("api exception " + e);
-        }
+        return ok(new Gson().toJson(result)).as("application/json");
     }
 
     public Result pauseMessageProcessing() {

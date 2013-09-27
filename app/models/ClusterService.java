@@ -25,6 +25,7 @@ import lib.APIException;
 import lib.ApiClient;
 import models.api.responses.system.ESClusterHealthResponse;
 import models.api.responses.system.ServerJVMStatsResponse;
+import models.api.responses.system.ServerThroughputResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -62,5 +63,15 @@ public class ClusterService {
         }
 
         return result;
+    }
+
+    public int getClusterThroughput() {
+        final Collection<ServerThroughputResponse> responses =
+                api.get(ServerThroughputResponse.class).fromAllNodes().path("/system/throughput").executeOnAll();
+        int t = 0;
+        for (ServerThroughputResponse r : responses) {
+            t += r.throughput;
+        }
+        return t;
     }
 }
