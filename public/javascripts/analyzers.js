@@ -104,10 +104,10 @@ $(document).ready(function() {
          *   - show and explain "other"
          *   - auto-reload
          *   - scroll positioning
-         *   - highlight bar on hover
          *   - export (JSON, CSV)
          *   - show how many terms?
          *   - bar broken with many .0 percent
+         *   - do not break on long key names (metric names i.e.)
          *
          */
 
@@ -147,7 +147,7 @@ $(document).ready(function() {
 
                 $(".terms-distribution", quickvalues).show();
 
-                var colors = d3.scale.category20();
+                var colors = d3.scale.category20c();
 
                 sortedKeys = Object.keys(data.terms).sort(function(a,b){return data.terms[b] - data.terms[a]});
 
@@ -157,8 +157,8 @@ $(document).ready(function() {
 
                     var percent = (val/data.total*100).toFixed(2);
 
-                    $(".terms tbody", quickvalues).append("<tr><td>" + key + "</td><td>" + percent + "%</td><td>" + val + "</td></tr>");
-                    $(".terms-distribution", quickvalues).append("<div class='terms-bar' style='width: " + percent + "%; background-color: " + colors(i) + " !important;'></div>");
+                    $(".terms tbody", quickvalues).append("<tr data-i='" + i + "' data-name='" + key + "'><td>" + key + "</td><td>" + percent + "%</td><td>" + val + "</td></tr>");
+                    $(".terms-distribution", quickvalues).append("<div class='terms-bar terms-bar-" + i + "' style='width: " + percent + "%; background-color: " + colors(i) + ";'></div>");
                 }
             },
             error: function(data) {
@@ -169,10 +169,23 @@ $(document).ready(function() {
             },
             complete: function() {
                 $(".nano").nanoScroller();
+                $(".terms tbody tr", container)
+                    .on("mouseenter", highlightTermsBar)
+                    .on("mouseleave", resetTermsBar);
             }
         });
-
-
     }
+
+    function highlightTermsBar() {
+        var bar = $(".terms-bar-" + $(this).attr("data-i"));
+        bar.attr("data-original-color", bar.css("background-color"));
+        bar.css("background-color", "#dd514c");
+    }
+
+    function resetTermsBar() {
+        var bar = $(".terms-bar-" + $(this).attr("data-i"));
+        bar.css("background-color", bar.attr("data-original-color"));
+    }
+
 
 });
