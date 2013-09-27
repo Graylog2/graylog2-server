@@ -38,8 +38,6 @@ $(document).ready(function() {
                 break;
         }
 
-        params["foo"] = "bar";
-
         $.ajax({
             url: '/a/search/fieldstats',
             data: params,
