@@ -879,7 +879,23 @@ form #stream-rules {
 }
 
 .quickvalues .terms {
-    margin-bottom: 5px;
+    margin-bottom: 0px;
+}
+
+.quickvalues .nano {
+    margin-top: 2px;
+}
+
+.quickvalues .content, .nano {
+    height: 310px;
+}
+
+.quickvalues .nano .pane {
+    padding-top: 3px;
+}
+
+.quickvalues .terms tbody tr:hover {
+    background-color: #3F404C;
 }
 
 .quickvalues .terms-bar {
@@ -908,3 +924,6 @@ form #stream-rules {
     filter:progid:DXImageTransform.Microsoft.gradient(startColorstr=#99000000, endColorstr=#99000000);
     -ms-filter: "progid:DXImageTransform.Microsoft.gradient(startColorstr=#99000000, endColorstr=#99000000)";
 }
+
+.nano .pane   { background: #888; }
+.nano .slider { background: #111; }

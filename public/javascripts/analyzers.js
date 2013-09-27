@@ -103,8 +103,11 @@ $(document).ready(function() {
          *
          *   - show and explain "other"
          *   - auto-reload
-         *   - sort table values
-         *   - different colors
+         *   - scroll positioning
+         *   - highlight bar on hover
+         *   - export (JSON, CSV)
+         *   - show how many terms?
+         *   - bar broken with many .0 percent
          *
          */
 
@@ -165,7 +168,7 @@ $(document).ready(function() {
                 }
             },
             complete: function() {
-                // TODO $(".spinner", container).hide();
+                $(".nano").nanoScroller();
             }
         });
 
