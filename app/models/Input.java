@@ -18,21 +18,16 @@
  */
 package models;
 
-import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
+import com.google.inject.assistedinject.Assisted;
+import com.google.inject.assistedinject.AssistedInject;
 import lib.APIException;
 import lib.ApiClient;
-import lib.ExclusiveInputException;
 import lib.timeranges.InvalidRangeParametersException;
 import lib.timeranges.RelativeRange;
-import models.api.requests.InputLaunchRequest;
 import models.api.responses.MessageSummaryResponse;
 import models.api.responses.system.InputSummaryResponse;
-import models.api.responses.system.InputTypeSummaryResponse;
-import models.api.responses.system.InputTypesResponse;
 import models.api.results.MessageResult;
 import org.joda.time.DateTime;
-import play.mvc.Http;
 
 import java.io.IOException;
 import java.util.List;
@@ -42,7 +37,11 @@ import java.util.Map;
  * @author Lennart Koopmann <lennart@torch.sh>
  */
 public class Input {
+    public interface Factory {
+        Input fromSummaryResponse(InputSummaryResponse input);
+    }
 
+    private final ApiClient api;
     private final String type;
     private final String id;
     private final String persistId;
@@ -52,28 +51,17 @@ public class Input {
     private final DateTime startedAt;
     private final Map<String, Object> attributes;
 
-    public Input(InputSummaryResponse is) {
-        this(
-                is.type,
-                is.inputId,
-                is.persistId,
-                is.name,
-                is.title,
-                is.startedAt,
-                User.load(is.creatorUserId),
-                is.attributes
-        );
-    }
-
-    public Input(String type, String id, String persistId, String name, String title, String startedAt, User creatorUser, Map<String, Object> attributes) {
-        this.type = type;
-        this.id = id;
-        this.persistId = persistId;
-        this.name = name;
-        this.title = title;
-        this.startedAt = DateTime.parse(startedAt);
-        this.creatorUser = creatorUser;
-        this.attributes = attributes;
+    @AssistedInject
+    private Input(ApiClient api, @Assisted InputSummaryResponse is) {
+        this.api = api;
+        this.type = is.type;
+        this.id = is.inputId;
+        this.persistId = is.persistId;
+        this.name = is.name;
+        this.title = is.title;
+        this.startedAt = DateTime.parse(is.startedAt);
+        this.creatorUser = User.load(is.creatorUserId);
+        this.attributes = is.attributes;
 
         // We might get a double parsed from JSON here. Make sure to round it to Integer. (would be .0 anyways)
         for (Map.Entry<String, Object> e : attributes.entrySet()) {
@@ -83,55 +71,8 @@ public class Input {
         }
     }
 
-    public static Map<String, String> getTypes(Node node) throws IOException, APIException {
-        return  ApiClient.get(InputTypesResponse.class).node(node).path("/system/inputs/types").execute().types;
-    }
-
-    public static InputTypeSummaryResponse getTypeInformation(Node node, String type) throws IOException, APIException {
-        return  ApiClient.get(InputTypeSummaryResponse.class).node(node).path("/system/inputs/types/{0}", type).execute();
-    }
-
-    public static Map<String, InputTypeSummaryResponse> getAllTypeInformation(Node node) throws IOException, APIException {
-        Map<String, InputTypeSummaryResponse> types = Maps.newHashMap();
-
-        List<InputTypeSummaryResponse> bools = Lists.newArrayList();
-        for (String type : getTypes(node).keySet()) {
-            InputTypeSummaryResponse itr = getTypeInformation(node, type);
-            types.put(itr.type, itr);
-        }
-
-        return types;
-    }
-
-    public static void launch(Node node, String title, String type, Map<String, Object> configuration, String userId, boolean isExclusive) throws IOException, APIException, ExclusiveInputException {
-        if (isExclusive) {
-            for (Input input : node.getInputs()) {
-                if(input.getType().equals(type)) {
-                    throw new ExclusiveInputException();
-                }
-            }
-        }
-
-        InputLaunchRequest request = new InputLaunchRequest();
-        request.title = title;
-        request.type = type;
-        request.configuration = configuration;
-        request.creatorUserId = userId;
-
-        ApiClient.post()
-                .path("/system/inputs")
-                .node(node)
-                .body(request)
-                .expect(Http.Status.ACCEPTED)
-                .execute();
-    }
-
-    public static void terminate(Node node, String inputId) throws IOException, APIException {
-        ApiClient.delete()
-                .path("/system/inputs/{0}", inputId)
-                .node(node)
-                .expect(Http.Status.ACCEPTED)
-                .execute();
+    public void terminate(Node node) throws IOException, APIException {
+        node.terminateInput(id);
     }
 
     public MessageResult getRecentlyReceivedMessage(String nodeId) throws IOException, APIException {
@@ -139,8 +80,9 @@ public class Input {
 
         UniversalSearch search = null;
         try {
-            search = new UniversalSearch(new RelativeRange(60*60*24), query);
-        } catch (InvalidRangeParametersException e) {}
+            search = new UniversalSearch(new RelativeRange(60 * 60 * 24), query);
+        } catch (InvalidRangeParametersException e) {
+        }
         List<MessageSummaryResponse> messages = search.search().getMessages();
 
         MessageSummaryResponse result;
