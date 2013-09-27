@@ -20,10 +20,12 @@ public class SystemApiController extends AuthenticatedController {
     private NodeService nodeService;
     @Inject
     private ClusterService clusterService;
+    @Inject
+    private MessagesService messagesService;
 
     public Result fields() {
         try {
-            Set<String> fields = Core.getMessageFields();
+            Set<String> fields = messagesService.getMessageFields();
 
             Map<String, Set<String>> result = Maps.newHashMap();
             result.put("fields", fields);
