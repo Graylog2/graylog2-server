@@ -42,6 +42,7 @@ public class Input {
     }
 
     private final ApiClient api;
+    private final UniversalSearch.Factory searchFactory;
     private final String type;
     private final String id;
     private final String persistId;
@@ -52,8 +53,9 @@ public class Input {
     private final Map<String, Object> attributes;
 
     @AssistedInject
-    private Input(ApiClient api, @Assisted InputSummaryResponse is) {
+    private Input(ApiClient api, UniversalSearch.Factory searchFactory, @Assisted InputSummaryResponse is) {
         this.api = api;
+        this.searchFactory = searchFactory;
         this.type = is.type;
         this.id = is.inputId;
         this.persistId = is.persistId;
@@ -80,8 +82,9 @@ public class Input {
 
         UniversalSearch search = null;
         try {
-            search = new UniversalSearch(new RelativeRange(60 * 60 * 24), query);
+            search = searchFactory.queryWithRange(query, new RelativeRange(60 * 60 * 24));
         } catch (InvalidRangeParametersException e) {
+            return null; // cannot happen(tm)
         }
         List<MessageSummaryResponse> messages = search.search().getMessages();
 
