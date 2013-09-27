@@ -37,3 +37,8 @@
         <i class="icon icon-magic"></i>
     </button>
 </div>
+
+@if(request.getQueryString("rangetype") != null && request.getQueryString("rangetype").equals("absolute")) {
+    <span id="universalsearch-from-permanent" style="display: none;">@request.getQueryString("from")</span>
+    <span id="universalsearch-to-permanent" style="display: none;">@request.getQueryString("to")</span>
+}

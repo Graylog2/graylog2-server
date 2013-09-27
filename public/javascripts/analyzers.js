@@ -15,13 +15,34 @@ $(document).ready(function() {
     function showStatistics(field, container) {
         var statistics = $(".statistics", container);
 
+        // TODO: read this from somewhere stored once.
+        var rangeType = $("#universalsearch-rangetype-permanent").text();
+        var query = $("#universalsearch-query-permanent").text();
+
+        var params = {
+            "rangetype": rangeType,
+            "q": query,
+            "field": field
+        }
+
+        switch(rangeType) {
+            case "relative":
+                params["relative"] = $("#universalsearch-relative-permanent").text();
+                break;
+            case "absolute":
+                params["from"] = $("#universalsearch-from-permanent").text();
+                params["to"] = $("#universalsearch-to-permanent").text();
+                break;
+            case "keyword":
+                params["keyword"] = $("#universalsearch-keyword-permanent").text();
+                break;
+        }
+
+        params["foo"] = "bar";
+
         $.ajax({
             url: '/a/search/fieldstats',
-            data: {
-                "timerange": originalSearchTimerange(),
-                "q": originalSearchQuery(),
-                "field": field
-            },
+            data: params,
             success: function(data) {
                 statistics.show();
                 $(".analyzer-content", container).show();

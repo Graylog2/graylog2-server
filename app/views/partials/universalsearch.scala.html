@@ -13,6 +13,16 @@
                 <input type="submit" class="btn btn-success btn-small" value="Search"/>
             </div>
 
+            @*** Those are never changed by JS and can be read by methods that need the *original* information. ***@
+            @if(request.getQueryString("rangetype") != null && !request.getQueryString("rangetype").isEmpty) {
+                <span id="universalsearch-rangetype-permanent" style="display: none;">@request.getQueryString("rangetype")</span>
+            }
+
+            @if(searchQuery != null && !searchQuery.isEmpty) {
+                <span id="universalsearch-query-permanent" style="display: none;">@searchQuery</span>
+            }
+            @******************************************************************************************************@
+
             @***************************************************************
             * Parameter selection here sucks and I promise to fix it soon. *
             *                                                              *
@@ -46,7 +56,7 @@
             </div>
 
             <div class="query">
-                <input type="text" class="input-medium" name="q" value="@searchQuery"
+                <input type="text" id="universalsearch-query" class="input-medium" name="q" value="@searchQuery"
                     placeholder='Type your search query here and press enter. ("not found AND http) OR http_response_code:[400 TO *]' />
             </div>
 

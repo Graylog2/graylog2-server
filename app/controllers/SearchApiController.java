@@ -36,7 +36,7 @@ import java.util.Map;
  */
 public class SearchApiController extends AuthenticatedController {
 
-    public Result fieldStats(String q, String field, String rangeType, int relative, String interval) {
+    public Result fieldStats(String q, String field, String rangeType, int relative, String from, String to, String keyword, String interval) {
         if (q == null || q.isEmpty()) {
             q = "*";
         }
@@ -56,10 +56,10 @@ public class SearchApiController extends AuthenticatedController {
                     timerange = new RelativeRange(relative);
                     break;
                 case ABSOLUTE:
-                    timerange = new AbsoluteRange("foo", "bar");
+                    timerange = new AbsoluteRange(from, to);
                     break;
                 case KEYWORD:
-                    timerange = new KeywordRange("ZOMG");
+                    timerange = new KeywordRange(keyword);
                     break;
                 default:
                     throw new InvalidRangeParametersException();

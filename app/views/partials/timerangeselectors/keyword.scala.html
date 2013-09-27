@@ -22,3 +22,7 @@
         Keyword not recognized.
     </div>
 </div>
+
+@if(request.getQueryString("rangetype") != null && request.getQueryString("rangetype").equals("keyword")) {
+    <span id="universalsearch-keyword-permanent" style="display: none;">@request.getQueryString("keyword")</span>
+}
