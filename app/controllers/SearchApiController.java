@@ -20,6 +20,7 @@ package controllers;
 
 import com.google.common.collect.Maps;
 import com.google.gson.Gson;
+import com.google.inject.Inject;
 import lib.APIException;
 import lib.SearchTools;
 import lib.timeranges.*;
@@ -34,6 +35,9 @@ import java.util.Map;
  * @author Lennart Koopmann <lennart@torch.sh>
  */
 public class SearchApiController extends AuthenticatedController {
+
+    @Inject
+    private UniversalSearch.Factory searchFactory;
 
     public Result fieldStats(String q, String field, String rangeType, int relative, String from, String to, String keyword, String interval) {
         if (q == null || q.isEmpty()) {
@@ -70,7 +74,7 @@ public class SearchApiController extends AuthenticatedController {
         }
 
         try {
-            UniversalSearch search = new UniversalSearch(timerange, q);
+            UniversalSearch search = searchFactory.queryWithRange(q, timerange);
             FieldStatsResponse stats = search.fieldStats(field);
 
             Map<String, Object> result = Maps.newHashMap();

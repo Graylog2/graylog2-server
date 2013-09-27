@@ -18,6 +18,7 @@
  */
 package controllers;
 
+import com.google.inject.Inject;
 import lib.APIException;
 import lib.ApiClient;
 import lib.SearchTools;
@@ -31,6 +32,9 @@ import play.mvc.Result;
 import java.io.IOException;
 
 public class SearchController extends AuthenticatedController {
+
+    @Inject
+    private UniversalSearch.Factory searchFactory;
 
     public Result index(String q, String rangeType, int relative, String from, String to, String keyword, String interval) {
     	if (q == null || q.isEmpty()) {
@@ -67,7 +71,7 @@ public class SearchController extends AuthenticatedController {
         }
 
 		try {
-			UniversalSearch search = new UniversalSearch(timerange, q);
+			UniversalSearch search = searchFactory.queryWithRange(q, timerange);
 			SearchResult searchResult = FieldMapper.run(search.search());
 			DateHistogramResult histogramResult = search.dateHistogram(interval);
 
