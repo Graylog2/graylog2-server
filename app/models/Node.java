@@ -59,6 +59,7 @@ public class Node {
     private final String hostname;
     private final boolean isMaster;
     private final boolean isProcessing;
+
     @AssistedInject
     public Node(ApiClient api, Input.Factory inputFactory, @Assisted NodeSummaryResponse r) {
         this.api = api;
