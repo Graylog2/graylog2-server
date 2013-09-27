@@ -92,6 +92,8 @@ $(document).ready(function() {
 
             $(".terms tbody", quickvalues).empty();
             $(".terms tbody", quickvalues).append("<tr><td colspan='3'>" + inlineSpin + "</td></tr>");
+
+            $(".terms-distribution", quickvalues).hide();
         }
 
         quickvalues.show();
@@ -142,11 +144,18 @@ $(document).ready(function() {
 
                 $(".terms-distribution", quickvalues).show();
 
-                for(var term in data.terms){
-                    var percent = (data.terms[term]/data.total*100).toFixed(2);
+                var colors = d3.scale.category20();
 
-                    $(".terms tbody", quickvalues).append("<tr><td>" + term + "</td><td>" + percent + "%</td><td>" + data.terms[term] + "</td></tr>");
-                    $(".terms-distribution", quickvalues).append("<div class='bar' style='width: " + percent + "%;'></div>");
+                sortedKeys = Object.keys(data.terms).sort(function(a,b){return data.terms[b] - data.terms[a]});
+
+                for(var i = 0; i < sortedKeys.length; i++){
+                    var key = sortedKeys[i];
+                    var val = data.terms[key];
+
+                    var percent = (val/data.total*100).toFixed(2);
+
+                    $(".terms tbody", quickvalues).append("<tr><td>" + key + "</td><td>" + percent + "%</td><td>" + val + "</td></tr>");
+                    $(".terms-distribution", quickvalues).append("<div class='terms-bar' style='width: " + percent + "%; background-color: " + colors(i) + " !important;'></div>");
                 }
             },
             error: function(data) {
