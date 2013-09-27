@@ -117,7 +117,7 @@ public class SearchApiController extends AuthenticatedController {
 
 
         try {
-            UniversalSearch search = new UniversalSearch(timerange, q);
+            UniversalSearch search = searchFactory.queryWithRange(q, timerange);;
             FieldTermsResponse terms = search.fieldTerms(field);
 
             Map<String, Object> result = Maps.newHashMap();
