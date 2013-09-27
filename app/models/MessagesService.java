@@ -81,7 +81,7 @@ public class MessagesService {
             return Cache.getOrElse(TOTAL_CNT_CACHE_KEY, new Callable<Integer>() {
                 @Override
                 public Integer call() throws Exception {
-                    MessageCountResponse response = ApiClient.get(MessageCountResponse.class).path("/count/total").execute();
+                    MessageCountResponse response = api.get(MessageCountResponse.class).path("/count/total").execute();
                     return response.events;
                 }
             }, TOTAL_CNT_CACHE_TTL);
