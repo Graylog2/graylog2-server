@@ -44,7 +44,6 @@ public class ClusterResource extends RestResource {
     private static final Logger LOG = LoggerFactory.getLogger(ClusterResource.class);
 
     @GET @Timed
-    @Path("/")
     @ApiOperation(value = "List all active nodes in this cluster.")
     @Produces(MediaType.APPLICATION_JSON)
     public String nodes() {
