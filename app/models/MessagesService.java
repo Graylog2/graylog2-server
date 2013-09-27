@@ -26,6 +26,7 @@ import lib.APIException;
 import lib.ApiClient;
 import models.api.responses.GetMessageResponse;
 import models.api.responses.MessageAnalyzeResponse;
+import models.api.responses.MessageCountResponse;
 import models.api.responses.MessageFieldResponse;
 import models.api.results.MessageAnalyzeResult;
 import models.api.results.MessageResult;
@@ -41,8 +42,13 @@ import java.util.concurrent.Callable;
 @Singleton
 public class MessagesService {
     private static final Logger log = LoggerFactory.getLogger(MessagesService.class);
+
     public static final int MESSAGE_FIELDS_CACHE_TTL = 5; // seconds
     public static final String MESSAGE_FIELDS_CACHE_KEY = "core.message_fields";
+
+    public static final int TOTAL_CNT_CACHE_TTL = 2; // seconds
+    public static final String TOTAL_CNT_CACHE_KEY = "counts.total";
+
     private final ApiClient api;
 
     @Inject
@@ -50,7 +56,7 @@ public class MessagesService {
         this.api = api;
     }
 
-    public Set<String> getMessageFields() throws IOException, APIException {
+    public Set<String> getMessageFields() {
         try {
             return Cache.getOrElse(MESSAGE_FIELDS_CACHE_KEY, new Callable<Set<String>>() {
                 @Override
@@ -70,6 +76,25 @@ public class MessagesService {
         return Sets.newHashSet();
     }
 
+    public int total() {
+        try {
+            return Cache.getOrElse(TOTAL_CNT_CACHE_KEY, new Callable<Integer>() {
+                @Override
+                public Integer call() throws Exception {
+                    MessageCountResponse response = api.get(MessageCountResponse.class).path("/count/total").execute();
+                    return response.events;
+                }
+            }, TOTAL_CNT_CACHE_TTL);
+        } catch (IOException e) {
+            log.error("Could not load total message count", e);
+        } catch (APIException e) {
+            log.error("Could not load total message count", e);
+        } catch (Exception e) {
+            log.error("Unexpected error condition", e);
+            throw new IllegalStateException(e);
+        }
+        return 0;
+    }
     public MessageResult getMessage(String index, String id) throws IOException, APIException {
         final GetMessageResponse r = api.get(GetMessageResponse.class)
                 .path("/messages/{0}/{1}", index, id)

@@ -25,7 +25,6 @@ import lib.APIException;
 import lib.ApiClient;
 import lib.BreadcrumbList;
 import lib.ExclusiveInputException;
-import models.Input;
 import models.Node;
 import models.NodeService;
 import models.api.responses.system.InputTypeSummaryResponse;
@@ -65,7 +64,7 @@ public class InputsController extends AuthenticatedController {
                     currentUser(),
                     bc,
                     node,
-                    Input.getAllTypeInformation(node)
+                    node.getAllInputTypeInformation()
             ));
         } catch (IOException e) {
             return status(500, views.html.errors.error.render(ApiClient.ERROR_MSG_IO, e, request()));
@@ -83,7 +82,8 @@ public class InputsController extends AuthenticatedController {
         String inputTitle = form.get("title")[0];
 
         try {
-            InputTypeSummaryResponse inputInfo = Input.getTypeInformation(nodeService.loadNode(nodeId), inputType);
+            final Node node = nodeService.loadNode(nodeId);
+            InputTypeSummaryResponse inputInfo = node.getInputTypeInformation(inputType);
 
             for (Map.Entry<String, String[]> f : form.entrySet()) {
                 if (!f.getKey().startsWith("configuration_")) {
@@ -121,7 +121,9 @@ public class InputsController extends AuthenticatedController {
             }
 
             try {
-                Input.launch(nodeService.loadNode(nodeId), inputTitle, inputType, configuration, currentUser().getId(), inputInfo.isExclusive);
+                if (! node.launchInput(inputTitle, inputType, configuration, currentUser(), inputInfo.isExclusive)) {
+                    return status(500, views.html.errors.error.render(ApiClient.ERROR_MSG_IO, new RuntimeException("Could not launch input " + inputTitle), request()));
+                }
             } catch (ExclusiveInputException e) {
                 flash("error", "This input is exclusive and already running.");
                 return redirect(routes.InputsController.manage(nodeId));
@@ -137,16 +139,10 @@ public class InputsController extends AuthenticatedController {
     }
 
     public Result terminate(String nodeId, String inputId) {
-        try {
-            Input.terminate(nodeService.loadNode(nodeId), inputId);
-
-            return redirect(routes.InputsController.manage(nodeId));
-        } catch (IOException e) {
-            return status(500, views.html.errors.error.render(ApiClient.ERROR_MSG_IO, e, request()));
-        } catch (APIException e) {
-            String message = "Could not send terminate request. We expected HTTP 202, but got a HTTP " + e.getHttpCode() + ".";
-            return status(500, views.html.errors.error.render(message, e, request()));
+        if (! nodeService.loadNode(nodeId).terminateInput(inputId)) {
+            flash("Could not terminate input " + inputId);
         }
+        return redirect(routes.InputsController.manage(nodeId));
     }
 
     public Result recentMessage(String nodeId, String inputId) {

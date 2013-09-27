@@ -28,6 +28,7 @@ public class ModelFactoryModule extends AbstractModule {
     @Override
     protected void configure() {
         install(new FactoryModuleBuilder().build(Node.Factory.class));
+        install(new FactoryModuleBuilder().build(Input.Factory.class));
         install(new FactoryModuleBuilder().build(SystemJob.Factory.class));
         // TODO crutch, because we need the factory for systemjobs in all().
         // can this be done with a second factory for the list?
