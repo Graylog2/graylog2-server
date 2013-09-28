@@ -43,7 +43,7 @@ public class ApiClientTest {
     public void testBuildTarget() throws Exception {
         final NodeSummaryResponse r = new NodeSummaryResponse();
         r.transportAddress = "http://horst:12900";
-        Node node = new Node(null, r); // TODO DI
+        Node node = new Node(null, null, r); // TODO DI
         final URL url = ApiClient.get(EmptyResponse.class).path("/some/resource").credentials("user", "password").node(node).prepareUrl(node);
         final URL passwordWithAmpInUrl = ApiClient.get(EmptyResponse.class).path("/some/resource").credentials("user", "pass@word").node(node).prepareUrl(node);
         final URL usernameWithAmpInUrl = ApiClient.get(EmptyResponse.class).path("/some/resource").credentials("us@er", "password").node(node).prepareUrl(node);
@@ -63,7 +63,7 @@ public class ApiClientTest {
     public void testSingleExecute() throws Exception {
         final NodeSummaryResponse r = new NodeSummaryResponse();
         r.transportAddress = "http://horst:12900";
-        Node node = new Node(null, r); // TODO DI
+        Node node = new Node(null, null, r); // TODO DI
 
         final ApiClient.ApiRequestBuilder<EmptyResponse> requestBuilder = ApiClient.get(EmptyResponse.class).path("/some/resource").credentials("user", "password").node(node);
         stubHttpProvider.expectResponse(requestBuilder.prepareUrl(node), 200, "{}");
@@ -77,9 +77,9 @@ public class ApiClientTest {
     public void testParallelExecution() throws Exception {
         final NodeSummaryResponse r = new NodeSummaryResponse();
         r.transportAddress = "http://horst1:12900";
-        Node node1 = new Node(null, r); // TODO DI
+        Node node1 = new Node(null, null, r); // TODO DI
         r.transportAddress = "http://horst2:12900";
-        Node node2 = new Node(null, r); // TODO DI
+        Node node2 = new Node(null, null, r); // TODO DI
 
         final ApiClient.ApiRequestBuilder<EmptyResponse> requestBuilder = ApiClient.get(EmptyResponse.class).path("/some/resource");
         final URL url1 = requestBuilder.prepareUrl(node1);

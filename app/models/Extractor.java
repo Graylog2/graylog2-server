@@ -20,16 +20,15 @@ package models;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
+import com.google.inject.assistedinject.Assisted;
+import com.google.inject.assistedinject.AssistedInject;
 import lib.APIException;
 import lib.ApiClient;
 import models.api.requests.CreateExtractorRequest;
 import models.api.responses.system.ExtractorSummaryResponse;
-import models.api.responses.system.ExtractorsResponse;
 import play.mvc.Http;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -38,22 +37,58 @@ import java.util.Map;
  */
 public class Extractor {
 
+    public interface Factory {
+        Extractor fromResponse(ExtractorSummaryResponse esr);
+        Extractor forCreate(CursorStrategy cursorStrategy,
+                            @Assisted("title") String title,
+                            @Assisted("sourceField") String sourceField,
+                            @Assisted("targetField") String targetField,
+                            Type type,
+                            User creatorUser,
+                            ConditionType conditionType,
+                            @Assisted("conditionValue") String conditionValue);
+    }
+
     public enum Type {
-        SUBSTRING,
-        REGEX,
-        SPLIT_AND_INDEX
+        SUBSTRING("Substring"),
+        REGEX("Regular expression"),
+        SPLIT_AND_INDEX("Split & Index");
+        private final String description;
+
+        Type(String description) {
+            this.description = description;
+        }
+
+        public String toHumanReadable() {
+            return description;
+        }
+
+        public static Type fromString(String name) {
+            return valueOf(name.toUpperCase());
+        }
     }
 
     public enum CursorStrategy {
         CUT,
-        COPY
-    }
+        COPY;
 
+        public static CursorStrategy fromString(String name) {
+            return valueOf(name.toUpperCase());
+        }
+
+    }
     public enum ConditionType {
         NONE,
         STRING,
-        REGEX
+        REGEX;
+
+        public static ConditionType fromString(String name) {
+            return valueOf(name.toUpperCase());
+        }
+
     }
+    private final ApiClient api;
+    private final UserService userService;
 
     private final String id;
     private final String title;
@@ -70,61 +105,57 @@ public class Extractor {
     private final long exceptions;
     private final long converterExceptions;
 
-    public Extractor(ExtractorSummaryResponse esr) {
-        this(
-                esr.id,
-                esr.title,
-                CursorStrategy.valueOf(esr.cursorStrategy.toUpperCase()),
-                esr.sourceField,
-                esr.targetField,
-                Type.valueOf(esr.type.toUpperCase()),
-                esr.extractorConfig,
-                User.load(esr.creatorUserId),
-                buildConverterList(esr.converters),
-                ConditionType.valueOf(esr.conditionType.toUpperCase()),
-                esr.conditionValue,
-                new ExtractorMetrics(esr.metrics.get("total"), esr.metrics.get("converters")),
-                esr.exceptions,
-                esr.converterExceptions
-        );
+    @AssistedInject
+    private Extractor(ApiClient api, UserService userService, @Assisted ExtractorSummaryResponse esr) {
+        this.api = api;
+        this.userService = userService;
+
+        this.id = esr.id;
+        this.title = esr.title;
+        this.cursorStrategy = CursorStrategy.fromString(esr.cursorStrategy);
+        this.sourceField = esr.sourceField;
+        this.targetField = esr.targetField;
+        this.extractorType = Type.fromString(esr.type);
+        this.creatorUser = userService.load(esr.creatorUserId);
+        this.extractorConfig = esr.extractorConfig;
+        this.converters = buildConverterList(esr.converters);
+        this.conditionType = ConditionType.fromString(esr.conditionType);
+        this.conditionValue = esr.conditionValue;
+        this.metrics = new ExtractorMetrics(esr.metrics.get("total"), esr.metrics.get("converters"));
+        this.exceptions = esr.exceptions;
+        this.converterExceptions = esr.converterExceptions;
+
     }
 
-    public Extractor(CursorStrategy cursorStrategy, String title, String sourceField, String targetField, Type type, User creatorUser, ConditionType conditionType, String conditionValue) {
-        this(null, title, cursorStrategy, sourceField, targetField, type, new HashMap<String, Object>(), creatorUser, new ArrayList<Converter>(), conditionType, conditionValue, null, 0, 0);
-    }
+    @AssistedInject
+    private Extractor(ApiClient api,
+                     UserService userService,
+                     @Assisted CursorStrategy cursorStrategy,
+                     @Assisted("title") String title,
+                     @Assisted("sourceField") String sourceField,
+                     @Assisted("targetField") String targetField,
+                     @Assisted Type type,
+                     @Assisted User creatorUser,
+                     @Assisted ConditionType conditionType,
+                     @Assisted("conditionValue") String conditionValue) {
+        this.api = api;
+        this.userService = userService;
 
-    public Extractor(String id,
-                     String title,
-                     CursorStrategy cursorStrategy,
-                     String sourceField,
-                     String targetField,
-                     Type type,
-                     Map<String, Object> extractorConfig,
-                     User creatorUser,
-                     List<Converter> converters,
-                     ConditionType conditionType,
-                     String conditionValue,
-                     ExtractorMetrics metrics,
-                     long exceptions,
-                     long converterExceptions) {
-        this.id = id;
+        this.id = null;
         this.title = title;
         this.cursorStrategy = cursorStrategy;
         this.sourceField = sourceField;
         this.targetField = targetField;
         this.extractorType = type;
-
-        this.extractorConfig = extractorConfig;
-        this.converters = converters;
-
+        this.extractorConfig = Maps.newHashMap();
+        this.creatorUser = creatorUser;
+        this.converters = Lists.newArrayList();
         this.conditionType = conditionType;
         this.conditionValue = conditionValue;
+        this.metrics = null;
+        this.exceptions = 0;
+        this.converterExceptions = 0;
 
-        this.exceptions = exceptions;
-        this.converterExceptions = converterExceptions;
-
-        this.creatorUser = creatorUser;
-        this.metrics = metrics;
     }
 
     public void create(Node node, Input input) throws IOException, APIException {
@@ -146,44 +177,12 @@ public class Extractor {
         request.conditionType = conditionType.toString().toLowerCase();
         request.conditionValue =  conditionValue;
 
-        ApiClient.post()
+        api.post()
                 .path("/system/inputs/{0}/extractors", input.getId())
                 .node(node)
                 .expect(Http.Status.CREATED)
                 .body(request)
                 .execute();
-    }
-
-    public static List<Extractor> all(Node node, Input input) throws IOException, APIException {
-        List<Extractor> extractors = Lists.newArrayList();
-
-        final ExtractorsResponse extractorsResponse = ApiClient.get(ExtractorsResponse.class)
-                .path("/system/inputs/{0}/extractors", input.getId())
-                .node(node)
-                .execute();
-        for(ExtractorSummaryResponse ex : extractorsResponse.extractors) {
-            extractors.add(new Extractor(ex));
-        }
-
-        return extractors;
-    }
-
-    public static void delete(Node node, Input input, String extractorId) throws IOException, APIException {
-        ApiClient.delete()
-                .path("/system/inputs/{0}/extractors/{1}", input.getId(), extractorId)
-                .node(node)
-                .expect(Http.Status.NO_CONTENT)
-                .execute();
-    }
-
-    private static final Map<Type, String> TYPE_MAPPING = new HashMap<Type, String>() {{
-        put(Type.SUBSTRING, "Substring");
-        put(Type.REGEX, "Regular expression");
-        put(Type.SPLIT_AND_INDEX, "Split & Index");
-    }};
-
-    public static String typeToHuman(Type type) {
-        return TYPE_MAPPING.get(type);
     }
 
     public void loadConfigFromForm(Type extractorType, Map<String,String[]> form) {
@@ -197,8 +196,6 @@ public class Extractor {
             case SPLIT_AND_INDEX:
                 loadSplitAndIndexConfig(form);
                 break;
-            default:
-                throw new RuntimeException("Unknown extractor type <" + extractorType.toString() + ">");
         }
     }
 
@@ -275,12 +272,12 @@ public class Extractor {
         return form.get(key) != null && form.get(key)[0] != null && !form.get(key)[0].isEmpty();
     }
 
-    private static List<Converter> buildConverterList(List<Map<String, Object>> converters) {
+    private List<Converter> buildConverterList(List<Map<String, Object>> converters) {
         List<Converter> cl = Lists.newArrayList();
 
         for(Map<String, Object> converterSummary : converters) {
             cl.add(new Converter(
-                    Converter.Type.valueOf(converterSummary.get("type").toString().toUpperCase()),
+                    Converter.Type.fromString(converterSummary.get("type").toString()),
                     (Map<String, Object>) converterSummary.get("config")
             ));
         }

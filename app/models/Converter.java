@@ -18,8 +18,6 @@
  */
 package models;
 
-import com.google.common.collect.Maps;
-
 import java.util.Map;
 
 /**
@@ -35,7 +33,11 @@ public class Converter {
         IP_ANONYMIZER,
         SYSLOG_PRI_LEVEL,
         SYSLOG_PRI_FACILITY,
-        TOKENIZER
+        TOKENIZER;
+
+        public static Type fromString(String type) {
+            return valueOf(type.toUpperCase());
+        }
     }
 
     private final Type type;

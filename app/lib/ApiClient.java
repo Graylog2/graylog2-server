@@ -28,6 +28,7 @@ import com.google.inject.Singleton;
 import com.ning.http.client.*;
 import models.Node;
 import models.User;
+import models.UserService;
 import models.api.requests.ApiRequest;
 import models.api.responses.EmptyResponse;
 import org.slf4j.Logger;
@@ -128,7 +129,7 @@ public class ApiClient {
     }
 
     private static URL buildTarget(Node node, String resource, String query) throws MalformedURLException {
-        final User user = User.current();
+        final User user = UserService.current();
         String name = null;
         String passwordHash = null;
         if (user != null) {

@@ -22,10 +22,7 @@ import com.google.inject.Inject;
 import lib.APIException;
 import lib.ApiClient;
 import lib.BreadcrumbList;
-import models.Extractor;
-import models.Input;
-import models.Node;
-import models.NodeService;
+import models.*;
 import play.Logger;
 import play.mvc.Result;
 
@@ -39,6 +36,10 @@ public class ExtractorsController extends AuthenticatedController {
 
     @Inject
     private NodeService nodeService;
+    @Inject
+    private ExtractorService extractorService;
+    @Inject
+    private Extractor.Factory extractorFactory;
 
     public Result manage(String nodeId, String inputId) {
         try {
@@ -50,7 +51,7 @@ public class ExtractorsController extends AuthenticatedController {
                     standardBreadcrumbs(node, input),
                     node,
                     input,
-                    Extractor.all(node, input))
+                    extractorService.all(node, input))
             );
         } catch (IOException e) {
             return status(500, views.html.errors.error.render(ApiClient.ERROR_MSG_IO, e, request()));
@@ -90,7 +91,7 @@ public class ExtractorsController extends AuthenticatedController {
         Extractor extractor;
         try {
             try {
-                extractor = new Extractor(
+                extractor = extractorFactory.forCreate(
                         Extractor.CursorStrategy.valueOf(form.get("cut_or_copy")[0].toUpperCase()),
                         form.get("title")[0],
                         form.get("source_field")[0],
@@ -121,7 +122,7 @@ public class ExtractorsController extends AuthenticatedController {
     public Result delete(String nodeId, String inputId, String extractorId) {
         try {
             Node node = nodeService.loadNode(nodeId);
-            Extractor.delete(node, node.getInput(inputId), extractorId);
+            extractorService.delete(node, node.getInput(inputId), extractorId);
 
             return redirect(routes.ExtractorsController.manage(nodeId, inputId));
         } catch (IOException e) {

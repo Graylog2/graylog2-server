@@ -77,7 +77,7 @@
             <label for="extractor_type">How do you want to extract data from this field?</label>
             <select name="extractor_type" id="extractor_type">
                 @for(et <- Extractor.Type.values()) {
-                    <option value="@et.toString.toLowerCase">@Extractor.typeToHuman(et)</option>
+                    <option value="@et.toString.toLowerCase">@et.toHumanReadable</option>
                 }
             </select>
 
@@ -98,7 +98,7 @@
                 <div class="row-fluid node-row">
                     <h3>
                         <i class="icon icon-ellipsis-vertical"></i>
-                        <strong>@extractor.getTitle</strong> (@Extractor.typeToHuman(extractor.getType))
+                        <strong>@extractor.getTitle</strong> (@extractor.getType().toHumanReadable)
 
                         @if(extractor.getTotalExceptions > 0) {
                             <span class="badge badge-important xtrc-exception-bubble" data-extractor-id="@extractor.getId">

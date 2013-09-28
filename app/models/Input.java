@@ -53,7 +53,7 @@ public class Input {
     private final Map<String, Object> attributes;
 
     @AssistedInject
-    private Input(ApiClient api, UniversalSearch.Factory searchFactory, @Assisted InputSummaryResponse is) {
+    private Input(ApiClient api, UniversalSearch.Factory searchFactory, UserService userService, @Assisted InputSummaryResponse is) {
         this.api = api;
         this.searchFactory = searchFactory;
         this.type = is.type;
@@ -62,7 +62,7 @@ public class Input {
         this.name = is.name;
         this.title = is.title;
         this.startedAt = DateTime.parse(is.startedAt);
-        this.creatorUser = User.load(is.creatorUserId);
+        this.creatorUser = userService.load(is.creatorUserId);
         this.attributes = is.attributes;
 
         // We might get a double parsed from JSON here. Make sure to round it to Integer. (would be .0 anyways)

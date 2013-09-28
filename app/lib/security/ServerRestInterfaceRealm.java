@@ -23,6 +23,7 @@ import com.google.inject.Singleton;
 import lib.APIException;
 import lib.ApiClient;
 import models.User;
+import models.UserService;
 import models.api.responses.system.UserResponse;
 import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.authc.*;
@@ -45,10 +46,12 @@ import java.io.IOException;
 public class ServerRestInterfaceRealm extends AuthorizingRealm {
     private static final Logger log = LoggerFactory.getLogger(ServerRestInterfaceRealm.class);
     private final ApiClient api;
+    private final User.Factory userFactory;
 
     @Inject
-    private ServerRestInterfaceRealm(ApiClient api) {
+    private ServerRestInterfaceRealm(ApiClient api, User.Factory userFactory) {
         this.api = api;
+        this.userFactory = userFactory;
     }
 
     @Override
@@ -74,9 +77,9 @@ public class ServerRestInterfaceRealm extends AuthorizingRealm {
                     .path("/users/{0}", token.getUsername())
                     .credentials(token.getUsername(), passwordHash)
                     .execute();
-            final User user = new User(response, passwordHash);
+            final User user = userFactory.fromResponse(response, passwordHash);
 
-            User.setCurrent(user);
+            UserService.setCurrent(user);
 
             // well, "sessiondid"
             final String sessionid = Crypto.encryptAES(token.getUsername() + "\t" + passwordHash);

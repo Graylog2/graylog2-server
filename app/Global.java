@@ -24,13 +24,11 @@ import com.google.inject.Module;
 import com.google.inject.name.Names;
 import lib.ApiClient;
 import lib.ServerNodesRefreshService;
-import lib.security.LocalAdminUserRealm;
-import lib.security.PlayAuthenticationListener;
-import lib.security.RethrowingFirstSuccessfulStrategy;
-import lib.security.ServerRestInterfaceRealm;
+import lib.security.*;
+import models.LocalAdminUser;
 import models.ModelFactoryModule;
 import models.Node;
-import models.User;
+import models.UserService;
 import models.api.responses.NodeSummaryResponse;
 import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.authc.AuthenticationListener;
@@ -97,6 +95,8 @@ public class Global extends GlobalSettings {
         // start the services that need starting
         injector.getInstance(ApiClient.class).start();
         injector.getInstance(ServerNodesRefreshService.class).start();
+        // TODO replace with custom AuthenticatedAction filter
+        RedirectAuthenticator.userService = injector.getInstance(UserService.class);
 
         LocalAdminUserRealm localAdminRealm = new LocalAdminUserRealm("local-accounts");
         localAdminRealm.setCredentialsMatcher(new HashedCredentialsMatcher("SHA1"));
@@ -139,7 +139,7 @@ public class Global extends GlobalSettings {
                 passwordHash,
 				"local-admin"
 		);
-        User.LocalAdminUser.createSharedInstance(username, passwordHash);
+        LocalAdminUser.createSharedInstance(username, passwordHash);
     }
 
 }

@@ -18,7 +18,8 @@
  */
 package lib.security;
 
-import models.User;
+import models.LocalAdminUser;
+import models.UserService;
 import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.authc.AuthenticationException;
 import org.apache.shiro.authc.AuthenticationInfo;
@@ -48,7 +49,7 @@ public class LocalAdminUserRealm extends SimpleAccountRealm {
             }
             UsernamePasswordToken userPass = (UsernamePasswordToken) token;
 
-            User.setCurrent(User.LocalAdminUser.getInstance());
+            UserService.setCurrent(LocalAdminUser.getInstance());
             final String sessionid = Crypto.encryptAES(userPass.getUsername() + "\t" + new String(userPass.getPassword()));
             Http.Context.current().session().put("sessionid", sessionid);
             new Subject.Builder(SecurityUtils.getSecurityManager())

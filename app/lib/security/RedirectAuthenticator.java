@@ -18,7 +18,9 @@
  */
 package lib.security;
 
+import com.google.inject.Inject;
 import models.User;
+import models.UserService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import play.mvc.Http.Context;
@@ -28,9 +30,13 @@ import play.mvc.Security.Authenticator;
 public class RedirectAuthenticator extends Authenticator {
     private static final Logger log = LoggerFactory.getLogger(RedirectAuthenticator.class);
 
+    // TODO crutch, we need to write out own AuthenticatedAction filter... :(
+    @Inject
+    public static UserService userService;
+
     @Override
     public String getUsername(Context ctx) {
-        final User sessionUser = User.authenticateSessionUser();
+        final User sessionUser = userService.authenticateSessionUser();
         if (sessionUser == null) {
             return null;
         }

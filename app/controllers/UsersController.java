@@ -19,10 +19,13 @@
 package controllers;
 
 import com.google.common.collect.ImmutableSet;
+import com.google.inject.Inject;
 import lib.BreadcrumbList;
 import lib.Tools;
+import models.LocalAdminUser;
 import models.Permissions;
 import models.User;
+import models.UserService;
 import models.api.requests.ChangeUserRequest;
 import models.api.requests.CreateUserRequest;
 import org.apache.shiro.crypto.hash.SimpleHash;
@@ -38,6 +41,9 @@ public class UsersController extends AuthenticatedController {
     private static final Form<CreateUserRequest> createUserForm = Form.form(CreateUserRequest.class);
     private static final Form<ChangeUserRequest> changeUserForm = Form.form(ChangeUserRequest.class);
 
+    @Inject
+    private UserService userService;
+
     public Result index() {
         final List<User> allUsers = User.all();
         final List<String> permissions = Permissions.all();
@@ -45,7 +51,7 @@ public class UsersController extends AuthenticatedController {
     }
 
     public Result show(String username) {
-        final User user = User.load(username);
+        final User user = userService.load(username);
         if (user == null) {
             return notFound();
         }
@@ -68,7 +74,7 @@ public class UsersController extends AuthenticatedController {
         BreadcrumbList bc = breadcrumbs();
         bc.addCrumb("Edit " + username, routes.UsersController.editUserForm(username));
 
-        User user = User.load(username);
+        User user = userService.load(username);
         final Form<ChangeUserRequest> form = changeUserForm.fill(new ChangeUserRequest(user));
         return ok(views.html.users.edit.render(form, username, currentUser(), Permissions.all(), ImmutableSet.copyOf(user.getPermissions()), bc));
     }
@@ -90,10 +96,10 @@ public class UsersController extends AuthenticatedController {
     }
 
     public Result isUniqueUsername(String username) {
-        if (User.LocalAdminUser.getInstance().getName().equals(username)) {
+        if (LocalAdminUser.getInstance().getName().equals(username)) {
             return noContent();
         }
-        if (User.load(username) == null) {
+        if (userService.load(username) == null) {
             return notFound();
         } else {
             return noContent();
@@ -112,7 +118,7 @@ public class UsersController extends AuthenticatedController {
 
             return badRequest(views.html.users.edit.render(requestForm, username, currentUser(), all, ImmutableSet.copyOf(requestForm.get().permissions), bc));
         }
-        final User user = User.load(username);
+        final User user = userService.load(username);
         user.update(requestForm.get());
 
         return redirect(routes.UsersController.index());
