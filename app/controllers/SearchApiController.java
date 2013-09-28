@@ -107,15 +107,6 @@ public class SearchApiController extends AuthenticatedController {
             return status(400, views.html.errors.error.render("Invalid range type provided.", e1, request()));
         }
 
-
-        ////////////// REMOVE ME
-        try {
-            Thread.sleep(500);
-        } catch (InterruptedException e) {
-            e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
-        }
-
-
         try {
             UniversalSearch search = searchFactory.queryWithRange(q, timerange);;
             FieldTermsResponse terms = search.fieldTerms(field);

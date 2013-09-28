@@ -889,6 +889,10 @@ form #stream-rules {
     color: #4DBCE9;
 }
 
+.quickvalues .icons .loading {
+    color: #4AA02C;
+}
+
 .quickvalues .icons .quickvalues-refresh {
     margin-right: 1px;
 }

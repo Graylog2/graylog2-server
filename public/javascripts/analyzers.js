@@ -167,14 +167,16 @@ $(document).ready(function() {
         /*
          * TODO:
          *
-         *   - auto-reload enable/disable
          *   - show button as selected, second click closes again
          *   - min.js.map
-         *   - fix parent hell
+         *   - show little loading sign
          *
          */
 
-        // TODO: deduplicate
+        if(reload) {
+            $(".quickvalues-autorefresh", quickvalues).addClass("loading");
+        }
+
         var rangeType = $("#universalsearch-rangetype-permanent").text();
         var query = $("#universalsearch-query-permanent").text();
 
@@ -235,7 +237,10 @@ $(document).ready(function() {
                 $(".nano").nanoScroller();
 
                 if (reload) {
-                    // Call again in 2.5sec
+                    // Loading complete. Set autoreload button to old color again.
+                    $(".quickvalues-autorefresh", quickvalues).removeClass("loading");
+
+                    // Call everything again in 2.5sec
                     setTimeout(function() {
                         showQuickValues(field, container, false, direction, true);
                     }, 3000)
