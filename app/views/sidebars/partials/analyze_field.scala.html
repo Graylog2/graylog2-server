@@ -16,15 +16,15 @@
         </ul>
     </div>
 
-    <div class="quickvalues alpha80" data-field="@f.getName" style="display: none;">
+    <div class="quickvalues alpha80" data-field="@f.getName" data-autorefresh="true" style="display: none;">
         <i class="icon icon-play arrow"></i>
 
         <div class="inner">
             <span class="pull-right icons">
-                <i class="icon icon-refresh quickvalues-refresh" title="Refresh"></i>
-                <i class="icon icon-play-circle active quickvalues-autorefresh" title="Automatic refresh"></i>
+                <i class="icon icon-refresh quickvalues-refresh" data-field="@f.getName" title="Refresh"></i>
+                <i class="icon icon-play-circle active quickvalues-autorefresh" data-field="@f.getName" title="Automatic refresh"></i>
                 <i class="icon icon-download-alt quickvalues-export" title="Download"></i>
-                <i class="icon icon-remove quickvalues-close" title="Close"></i>
+                <i class="icon icon-remove quickvalues-close" data-field="@f.getName" title="Close"></i>
             </span>
 
             <h2>Quick value breakdown of <em>@f.getName</em></h2>

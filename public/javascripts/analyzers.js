@@ -22,18 +22,19 @@ $(document).ready(function() {
         // Hide all others.
         $(".quickvalues").hide();
 
-        var direction = "down";
-        if (($(window).height() - $(this).offset().top) < 400) {
-            direction = "up";
-        }
+        // Mark active.
+        $(".quickvalues", $(this).parent()).attr("data-active", "true");
 
-        showQuickValues($(this).attr("data-field"), $(this).parent(), true, direction);
+        showQuickValues($(this).attr("data-field"), $(this).parent(), true, calculateDirection($(this)), true);
     });
 
     $(".quickvalues .quickvalues-refresh").on("click", function(e) {
         e.preventDefault();
 
-        showQuickValues($(this).parent().parent().parent().attr("data-field"), $(this).parent().parent().parent().parent().parent(), true);
+        var button = $(".analyze-field .show-quickvalues[data-field=" + $(this).attr("data-field") + "]");
+        var quickvalues = $(".quickvalues[data-field=" + $(this).attr("data-field") + "]");
+
+        showQuickValues($(this).attr("data-field"), quickvalues.parent(), true, calculateDirection(button), false);
     });
 
     $(".quickvalues .quickvalues-export").on("click", function(e) {
@@ -46,7 +47,29 @@ $(document).ready(function() {
     $(".quickvalues .quickvalues-close").on("click", function(e) {
         e.preventDefault();
 
-        $(this).parent().parent().parent().hide();
+        var quickvalues = $(".quickvalues[data-field=" + $(this).attr("data-field") + "]");
+
+        quickvalues.attr("data-active", "false");
+        quickvalues.hide();
+    });
+
+    $(".quickvalues .quickvalues-autorefresh").on("click", function(e) {
+        e.preventDefault();
+        var quickvalues = $(".quickvalues[data-field=" + $(this).attr("data-field") + "]");;
+
+        if ($(this).hasClass("active")) {
+            // Disabling autorefresh.
+            quickvalues.attr("data-autorefresh", "false");
+            $(this).removeClass("active");
+        } else {
+            // Enabling autorefresh.
+            quickvalues.attr("data-autorefresh", "true");
+            $(this).addClass("active");
+
+            // Load once to trigger reload cycle again.
+            var button = $(".analyze-field .show-quickvalues[data-field=" + $(this).attr("data-field") + "]");
+            showQuickValues($(this).attr("data-field"), quickvalues.parent(), true, calculateDirection(button), true);
+        }
     });
 
     function showStatistics(field, container) {
@@ -106,21 +129,18 @@ $(document).ready(function() {
         });
     }
 
-    function showQuickValues(field, container, visibleReload, direction) {
+    function showQuickValues(field, container, manualReload, direction, reload) {
         var quickvalues = $(".quickvalues", container);
 
-        if (!visibleReload && quickvalues.css("display") == "none") {
-            // Call again in 2.5sec
-            setTimeout(function() {
-                showQuickValues(field, container, false, direction);
-            }, 2500)
-
+        // Never update anything if this is a non-visible reload and we are not active or auto-refresh is disabled.
+        // Prevents unneeded calculations when the windows is hidden and auto-refresh is enabled.
+        if (reload && (quickvalues.attr("data-active") != "true" || quickvalues.attr("data-autorefresh") == "false")) {
             return;
         }
 
         var inlineSpin = "<i class='icon icon-spinner icon-spin'></i>";
 
-        if (visibleReload) {
+        if (manualReload) {
             $(".terms-total", quickvalues).html(inlineSpin);
             $(".terms-missing", quickvalues).html(inlineSpin);
             $(".terms-other", quickvalues).html(inlineSpin);
@@ -131,12 +151,15 @@ $(document).ready(function() {
             $(".terms-distribution", quickvalues).hide();
         }
 
-        if (direction == "up") {
-            quickvalues.removeClass("quickvalues-down");
-            quickvalues.addClass("quickvalues-up");
-        } else {
-            quickvalues.removeClass("quickvalues-up");
-            quickvalues.addClass("quickvalues-down");
+        switch(direction)  {
+            case "up":
+                quickvalues.removeClass("quickvalues-down");
+                quickvalues.addClass("quickvalues-up");
+                break;
+            case "down":
+                quickvalues.removeClass("quickvalues-up");
+                quickvalues.addClass("quickvalues-down");
+                break;
         }
 
         quickvalues.show();
@@ -146,6 +169,8 @@ $(document).ready(function() {
          *
          *   - auto-reload enable/disable
          *   - show button as selected, second click closes again
+         *   - min.js.map
+         *   - fix parent hell
          *
          */
 
@@ -202,17 +227,19 @@ $(document).ready(function() {
             },
             error: function(data) {
                 if(data.status != 400) {
-                    statistics.hide();
+                    quickvalues.hide();
                     showError("Could not load quick values.");
                 }
             },
             complete: function() {
                 $(".nano").nanoScroller();
 
-                // Call again in 2.5sec
-                setTimeout(function() {
-                    showQuickValues(field, container, false, direction);
-                }, 2500)
+                if (reload) {
+                    // Call again in 2.5sec
+                    setTimeout(function() {
+                        showQuickValues(field, container, false, direction, true);
+                    }, 3000)
+                }
             }
         });
     }
@@ -231,6 +258,14 @@ $(document).ready(function() {
     function resetTermsBar() {
         var bar = $(".terms-bar-" + $(this).attr("data-i"));
         bar.css("background-color", bar.attr("data-original-color"));
+    }
+
+    function calculateDirection(linkel) {
+        if (($(window).height() - linkel.offset().top) < 400) {
+            return "up";
+        } else {
+            return "down";
+        }
     }
 
 });
