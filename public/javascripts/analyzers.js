@@ -17,13 +17,21 @@ $(document).ready(function() {
     })
 
     $(".analyze-field .show-quickvalues").on("click", function(e) {
+        if ($(this).attr("disabled") == "disabled") {
+            return;
+        }
+
         e.preventDefault();
 
-        // Hide all others.
+        // Hide and disable all others.
         $(".quickvalues").hide();
+        $(".show-quickvalues").removeAttr("disabled");
+        $(".quickvalues").attr("data-active", "false");
 
-        // Mark active.
+        // Mark this one as active.
         $(".quickvalues", $(this).parent()).attr("data-active", "true");
+
+        $(this).attr("disabled", "disabled");
 
         showQuickValues($(this).attr("data-field"), $(this).parent(), true, calculateDirection($(this)), true);
     });
@@ -48,6 +56,9 @@ $(document).ready(function() {
         e.preventDefault();
 
         var quickvalues = $(".quickvalues[data-field=" + $(this).attr("data-field") + "]");
+        var button = $(".analyze-field .show-quickvalues[data-field=" + $(this).attr("data-field") + "]");
+
+        button.removeAttr("disabled");
 
         quickvalues.attr("data-active", "false");
         quickvalues.hide();
@@ -169,7 +180,7 @@ $(document).ready(function() {
          *
          *   - show button as selected, second click closes again
          *   - min.js.map
-         *   - show little loading sign
+         *   - do not fail on huge numbers (long cast fail)
          *
          */
 
