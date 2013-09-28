@@ -178,8 +178,6 @@ $(document).ready(function() {
         /*
          * TODO:
          *
-         *   - show button as selected, second click closes again
-         *   - min.js.map
          *   - do not fail on huge numbers (long cast fail)
          *
          */
