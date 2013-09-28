@@ -885,8 +885,12 @@ form #stream-rules {
     cursor: pointer;
 }
 
+.quickvalues .icons .active {
+    color: #4DBCE9;
+}
+
 .quickvalues .icons .quickvalues-refresh {
-    margin-right: 2px;
+    margin-right: 1px;
 }
 
 .quickvalues .icons .quickvalues-close {

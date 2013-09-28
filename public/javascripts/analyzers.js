@@ -106,12 +106,21 @@ $(document).ready(function() {
         });
     }
 
-    function showQuickValues(field, container, spin, direction) {
+    function showQuickValues(field, container, visibleReload, direction) {
         var quickvalues = $(".quickvalues", container);
+
+        if (!visibleReload && quickvalues.css("display") == "none") {
+            // Call again in 2.5sec
+            setTimeout(function() {
+                showQuickValues(field, container, false, direction);
+            }, 2500)
+
+            return;
+        }
 
         var inlineSpin = "<i class='icon icon-spinner icon-spin'></i>";
 
-        if (spin) {
+        if (visibleReload) {
             $(".terms-total", quickvalues).html(inlineSpin);
             $(".terms-missing", quickvalues).html(inlineSpin);
             $(".terms-other", quickvalues).html(inlineSpin);
@@ -135,8 +144,8 @@ $(document).ready(function() {
         /*
          * TODO:
          *
-         *   - auto-reload
-         *   - do not open multiple
+         *   - auto-reload enable/disable
+         *   - show button as selected, second click closes again
          *
          */
 
@@ -199,12 +208,19 @@ $(document).ready(function() {
             },
             complete: function() {
                 $(".nano").nanoScroller();
-                $(".terms tbody tr", container)
-                    .on("mouseenter", highlightTermsBar)
-                    .on("mouseleave", resetTermsBar);
+
+                // Call again in 2.5sec
+                setTimeout(function() {
+                    showQuickValues(field, container, false, direction);
+                }, 2500)
             }
         });
     }
+
+    // Quickterms table row highlighting.
+    $(".quickvalues .terms tbody tr")
+        .live("mouseenter", highlightTermsBar)
+        .live("mouseleave", resetTermsBar);
 
     function highlightTermsBar() {
         var bar = $(".terms-bar-" + $(this).attr("data-i"));
