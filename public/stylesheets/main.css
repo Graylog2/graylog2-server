@@ -827,13 +827,23 @@ form #stream-rules {
     width: 500px;
     padding: 10px;
     position: relative;
-    top: -40px;
     right: 550px;
     margin-bottom: -420px;
     color: #fff;
+}
+
+.quickvalues-down {
+    top: -40px;
     -webkit-border-radius: 10px 0px 10px 10px;
     -moz-border-radius: 10px 0px 10px 10px;
     border-radius: 10px 0px 10px 10px;
+}
+
+.quickvalues-up {
+    top: -410px;
+    -webkit-border-radius: 10px 10px 0px 10px;
+    -moz-border-radius: 10px 10px 0px 10px;
+    border-radius: 10px 10px 0px 10px;
 }
 
 .quickvalues .inner {
@@ -850,13 +860,20 @@ form #stream-rules {
     color: #000;
     position: relative;
     left: 510px;
-    top: 10px;
     font-size: 15px;
     display: block;
     margin-bottom: -15px;
     opacity: 0.8;
     width: 15px;
     filter:alpha(opacity=80);
+}
+
+.quickvalues-up .arrow {
+    top: 380px;
+}
+
+.quickvalues-down .arrow {
+    top: 10px;
 }
 
 .quickvalues .icons {
@@ -867,7 +884,6 @@ form #stream-rules {
 .quickvalues .icons .icon {
     cursor: pointer;
 }
-
 
 .quickvalues .icons .quickvalues-refresh {
     margin-right: 2px;

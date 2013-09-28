@@ -1,31 +1,48 @@
 $(document).ready(function() {
 
-    $(".open-analyze-field").on("click", function() {
+    $(".open-analyze-field").on("click", function(e) {
+        e.preventDefault();
+
         $(".analyze-field", $(this).parent()).toggle();
         $(this).toggleClass("open-analyze-field-active");
     });
 
-    $(".analyze-field .generate-statistics").on("click", function() {
+    $(".analyze-field .generate-statistics").on("click", function(e) {
+        e.preventDefault();
+
         var container = $(this).parent();
         $(this).attr("disabled", "disabled");
 
         showStatistics($(this).attr("data-field"), container);
     })
 
-    $(".analyze-field .show-quickvalues").on("click", function() {
-        showQuickValues($(this).attr("data-field"), $(this).parent(), true);
+    $(".analyze-field .show-quickvalues").on("click", function(e) {
+        e.preventDefault();
+
+        var direction = "down";
+        if (($(window).height() - $(this).offset().top) < 400) {
+            direction = "up";
+        }
+
+        showQuickValues($(this).attr("data-field"), $(this).parent(), true, direction);
     });
 
-    $(".quickvalues .quickvalues-refresh").on("click", function() {
+    $(".quickvalues .quickvalues-refresh").on("click", function(e) {
+        e.preventDefault();
+
         showQuickValues($(this).parent().parent().parent().attr("data-field"), $(this).parent().parent().parent().parent().parent(), true);
     });
 
-    $(".quickvalues .quickvalues-export").on("click", function() {
+    $(".quickvalues .quickvalues-export").on("click", function(e) {
+        e.preventDefault();
+
         // TODO
         alert("Exporting statistics is not implemented yet. (Issue: #239)");
     });
 
-    $(".quickvalues .quickvalues-close").on("click", function() {
+    $(".quickvalues .quickvalues-close").on("click", function(e) {
+        e.preventDefault();
+
         $(this).parent().parent().parent().hide();
     });
 
@@ -86,7 +103,7 @@ $(document).ready(function() {
         });
     }
 
-    function showQuickValues(field, container, spin) {
+    function showQuickValues(field, container, spin, direction) {
         var quickvalues = $(".quickvalues", container);
 
         var inlineSpin = "<i class='icon icon-spinner icon-spin'></i>";
@@ -102,6 +119,14 @@ $(document).ready(function() {
             $(".terms-distribution", quickvalues).hide();
         }
 
+        if (direction == "up") {
+            quickvalues.removeClass("quickvalues-down");
+            quickvalues.addClass("quickvalues-up");
+        } else {
+            quickvalues.removeClass("quickvalues-up");
+            quickvalues.addClass("quickvalues-down");
+        }
+
         quickvalues.show();
 
         /*
@@ -109,7 +134,7 @@ $(document).ready(function() {
          *
          *   - auto-reload
          *   - scroll positioning
-         *   - bar broken with many .0 percent
+         *   - do not open multiple
          *
          */
 
