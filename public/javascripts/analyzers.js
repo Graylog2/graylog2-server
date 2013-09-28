@@ -109,7 +109,6 @@ $(document).ready(function() {
          *
          *   - auto-reload
          *   - scroll positioning
-         *   - show how many terms?
          *   - bar broken with many .0 percent
          *
          */
@@ -159,9 +158,9 @@ $(document).ready(function() {
                     var key = sortedKeys[i];
                     var val = data.terms[key];
 
-                    var percent = (val/data.total*100).toFixed(2);
+                    var percent = (val/data.total*100);
 
-                    $(".terms tbody", quickvalues).append("<tr data-i='" + i + "' data-name='" + key + "'><td>" + key + "</td><td>" + percent + "%</td><td>" + val + "</td></tr>");
+                    $(".terms tbody", quickvalues).append("<tr data-i='" + i + "' data-name='" + key + "'><td>" + key + "</td><td>" + percent.toFixed(2) + "%</td><td>" + val + "</td></tr>");
                     $(".terms-distribution", quickvalues).append("<div class='terms-bar terms-bar-" + i + "' style='width: " + percent + "%; background-color: " + colors(i) + ";'></div>");
                 }
             },
