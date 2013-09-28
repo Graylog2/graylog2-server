@@ -20,6 +20,11 @@ $(document).ready(function() {
         showQuickValues($(this).parent().parent().parent().attr("data-field"), $(this).parent().parent().parent().parent().parent(), true);
     });
 
+    $(".quickvalues .quickvalues-export").on("click", function() {
+        // TODO
+        alert("Exporting statistics is not implemented yet. (Issue: #239)");
+    });
+
     $(".quickvalues .quickvalues-close").on("click", function() {
         $(this).parent().parent().parent().hide();
     });
@@ -104,10 +109,8 @@ $(document).ready(function() {
          *   - show and explain "other"
          *   - auto-reload
          *   - scroll positioning
-         *   - export (JSON, CSV)
          *   - show how many terms?
          *   - bar broken with many .0 percent
-         *   - do not break on long key names (metric names i.e.)
          *
          */
 

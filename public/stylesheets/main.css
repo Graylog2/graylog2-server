@@ -864,14 +864,17 @@ form #stream-rules {
     top: -5px;
 }
 
+.quickvalues .icons .icon {
+    cursor: pointer;
+}
+
+
 .quickvalues .icons .quickvalues-refresh {
     margin-right: 2px;
-    cursor: pointer;
 }
 
 .quickvalues .icons .quickvalues-close {
     font-size: 13px;
-    cursor: pointer;
 }
 
 .quickvalues .icons .icon:hover {
@@ -881,6 +884,11 @@ form #stream-rules {
 .quickvalues .terms {
     margin-bottom: 0px;
     width: 480px;
+    table-layout:fixed;
+}
+
+.quickvalues .terms td {
+    word-wrap:break-word;
 }
 
 .quickvalues .nano {
