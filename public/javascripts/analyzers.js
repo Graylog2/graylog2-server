@@ -94,6 +94,7 @@ $(document).ready(function() {
         if (spin) {
             $(".terms-total", quickvalues).html(inlineSpin);
             $(".terms-missing", quickvalues).html(inlineSpin);
+            $(".terms-other", quickvalues).html(inlineSpin);
 
             $(".terms tbody", quickvalues).empty();
             $(".terms tbody", quickvalues).append("<tr><td colspan='3'>" + inlineSpin + "</td></tr>");
@@ -106,7 +107,6 @@ $(document).ready(function() {
         /*
          * TODO:
          *
-         *   - show and explain "other"
          *   - auto-reload
          *   - scroll positioning
          *   - show how many terms?
@@ -142,6 +142,7 @@ $(document).ready(function() {
             data: params,
             success: function(data) {
                 $(".terms-total", quickvalues).text(data.total);
+                $(".terms-other", quickvalues).text(data.other);
                 $(".terms-missing", quickvalues).text(data.missing);
 
                 // Remove all items before writing again.
