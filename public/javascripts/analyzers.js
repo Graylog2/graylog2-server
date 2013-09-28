@@ -175,13 +175,6 @@ $(document).ready(function() {
 
         quickvalues.show();
 
-        /*
-         * TODO:
-         *
-         *   - do not fail on huge numbers (long cast fail)
-         *
-         */
-
         if(reload) {
             $(".quickvalues-autorefresh", quickvalues).addClass("loading");
         }
