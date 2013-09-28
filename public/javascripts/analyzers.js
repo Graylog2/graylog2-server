@@ -19,6 +19,9 @@ $(document).ready(function() {
     $(".analyze-field .show-quickvalues").on("click", function(e) {
         e.preventDefault();
 
+        // Hide all others.
+        $(".quickvalues").hide();
+
         var direction = "down";
         if (($(window).height() - $(this).offset().top) < 400) {
             direction = "up";
@@ -133,7 +136,6 @@ $(document).ready(function() {
          * TODO:
          *
          *   - auto-reload
-         *   - scroll positioning
          *   - do not open multiple
          *
          */
@@ -214,6 +216,5 @@ $(document).ready(function() {
         var bar = $(".terms-bar-" + $(this).attr("data-i"));
         bar.css("background-color", bar.attr("data-original-color"));
     }
-
 
 });
