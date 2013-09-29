@@ -1,38 +1,46 @@
 @(message: api.results.MessageResult, sourceInput: Input, sourceNode: Node)
 
-<div class="pull-right sidebar-back">
-	<i class="icon-remove"></i>
+<div class="detail-message">
+    <div class="pull-right sidebar-back">
+        <i class="icon-remove"></i>
+    </div>
+
+    <h2>Message @message.getId()</h2>
+
+    Received by
+    @if(sourceInput != null) {
+        input <em>@sourceInput.getTitle</em>
+    } else {
+        <em>deleted input</em>
+    }
+
+    on
+
+    @if(sourceNode != null) {
+        @views.html.partials.links.to_node(sourceNode)
+    } else {
+        <em>outdated node</em>.
+    }
+
+    <br />
+    Timestamp: @message.getTimestamp()
+    <i class="icon-question-sign"></i> <a href="#terms-msg-@message.getId()" role="button" data-toggle="modal" data-backdrop="false">Terms</a>
+    <br />
+
+    Index: <em>@message.getIndex()</em>
+
+    @partials.message_terms(message.getId())
+
+    <div class="nano">
+        <div class="content">
+
+            <dl>
+            @for((key, value) <- message.getFields()) {
+                <dt style="float: left; padding-right: 5px;">@key:</dt>
+                <dd style="word-wrap: break-word;">@lib.Tools.removeTrailingNewline(value)</dd>
+            }
+            </dl>
+
+        </div>
+    </div>
 </div>
-
-<h2>Message @message.getId()</h2>
-
-Received by
-@if(sourceInput != null) {
-    input <em>@sourceInput.getTitle</em>
-} else {
-    <em>deleted input</em>
-}
-
-on
-
-@if(sourceNode != null) {
-    @views.html.partials.links.to_node(sourceNode)
-} else {
-    <em>outdated node</em>.
-}
-
-<br />
-Timestamp: @message.getTimestamp()
-
-<i class="icon-question-sign"></i> <a href="#terms-msg-@message.getId()" role="button" data-toggle="modal" data-backdrop="false">Terms</a>
-
-<dl>
-@for((key, value) <- message.getFields()) {
-	<dt style="float: left; padding-right: 5px;">@key:</dt>
-	<dd style="word-wrap: break-word;">@lib.Tools.removeTrailingNewline(value)</dd>
-}
-</dl>
-
-<strong>Index: <em>@message.getIndex()</em></strong>
-
-@partials.message_terms(message.getId())

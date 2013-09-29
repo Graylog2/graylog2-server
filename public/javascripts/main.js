@@ -24,6 +24,15 @@ $(document).ready(function() {
 		.fail(function() { displayFailureInSidebar("Sorry, could not load message."); })
 		
 		.complete(function() {
+
+            if ($("#sidebar-replacement dl").height() > $(window).height()-265-15) {
+                // We need a scrollbar.
+                $("#sidebar .nano").css("height", $(window).height()-265-15);
+                $("#sidebar .nano").nanoScroller();
+            } else {
+                // No scrollbar required.
+                $("#sidebar .nano").css("height", $("#sidebar-replacement dl").height()+15);
+            }
 			
 			// Inject terms of a message when modal is requested.
 			$('.terms-msg-modal').on('show', function() {
@@ -74,7 +83,11 @@ $(document).ready(function() {
 		// Remove highlighting.
 		$(".messages tbody > tr").removeClass("message-highlighted");
 	});
-	
+
+    // Sidebar nanoscroller.
+    $("#sidebar .nano").css("height", $(window).height()-200);
+    $("#sidebar .nano").nanoScroller();
+
 	// Adding more fields to the message result table.
 	$(".field-selector").bind("change", function() {
 		hash = $(this).attr("data-field-hash");

@@ -817,13 +817,13 @@ form #stream-rules {
     margin-left: 5px;
 }
 
-#universalsearch .timerange-selector-container .keyword .preview {
+#universalsearch .timerange-selector-container .keyword .keyword-preview {
     margin-top: 4px;
     margin-left: 45px;
     font-size: 11px;
 }
 
-#universalsearch .timerange-selector-container .keyword .preview .fromto span {
+#universalsearch .timerange-selector-container .keyword .keyword-preview .fromto span {
     background-color: #fec;
     padding-left: 3px;
     padding-right: 3px;
@@ -930,7 +930,7 @@ form #stream-rules {
     margin-top: 2px;
 }
 
-.quickvalues .content, .nano {
+.quickvalues .content, .quickvalues .content  .nano {
     height: 310px;
 }
 
@@ -1008,4 +1008,8 @@ form #stream-rules {
 #sidebar .menu a:hover {
     background-color: #ccc;
     text-decoration: none !important;
+}
+
+.detail-message dl {
+    margin-bottom: 0px;
 }

@@ -29,7 +29,7 @@ $(document).ready(function() {
 
     $("#universalsearch .timerange-selector-container .keyword input").typeWatch({
         callback: function (string) {
-            var preview = $("#universalsearch .timerange-selector-container .keyword .preview");
+            var preview = $("#universalsearch .timerange-selector-container .keyword .keyword-preview");
             if (string.length == 0) {
                 preview.hide();
                 return;
