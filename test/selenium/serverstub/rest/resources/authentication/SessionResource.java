@@ -19,8 +19,8 @@
  */
 package selenium.serverstub.rest.resources.authentication;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.Maps;
-import org.codehaus.jackson.map.ObjectMapper;
 import selenium.serverstub.ServerStub;
 import selenium.serverstub.rest.resources.RestResource;
 

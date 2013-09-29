@@ -19,9 +19,9 @@
  */
 package selenium.serverstub.rest.resources.cluster;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
-import org.codehaus.jackson.map.ObjectMapper;
 import org.joda.time.DateTime;
 import org.joda.time.format.ISODateTimeFormat;
 import selenium.serverstub.ServerStub;
