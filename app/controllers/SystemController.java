@@ -82,12 +82,17 @@ public class SystemController extends AuthenticatedController {
             bufferInfo.put(node.getNodeId(), node.getBufferInfo());
         }
 
-        return ok(views.html.system.nodes.render(currentUser(), bc, serverJvmStats, nodes, bufferInfo));
+        return ok(views.html.system.nodes.index.render(currentUser(), bc, serverJvmStats, nodes, bufferInfo));
     }
 
     public Result node(String nodeId) {
-        // TODO
-        return ok("implement me");
+        Node node = nodeService.loadNode(nodeId);
+
+        BreadcrumbList bc = new BreadcrumbList();
+        bc.addCrumb("System", routes.SystemController.index(0));
+        bc.addCrumb("Nodes", routes.SystemController.nodes());
+
+        return ok(views.html.system.nodes.show.render(currentUser(), bc, node));
     }
 
     public Result threadDump(String nodeId) {

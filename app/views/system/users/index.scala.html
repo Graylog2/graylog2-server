@@ -1,6 +1,6 @@
 @(currentUser: User, users: java.util.List[User], permissions:java.util.List[String])
 
-@main("Users", sidebars.standard(currentUser), "", currentUser) {
+@main("Users", views.html.system.sidebar(), "", currentUser) {
 
     <div class="row-fluid">
         <h2><i class="icon icon-user"></i> User accounts</h2>

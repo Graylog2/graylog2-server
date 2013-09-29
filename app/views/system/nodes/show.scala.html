@@ -1,0 +1,13 @@
+@(currentUser: User, breadcrumbs: lib.BreadcrumbList, node: Node)
+
+@main("Node " + node.getNodeId, views.html.system.sidebar(), "", currentUser) {
+
+    @views.html.partials.breadcrumbs(breadcrumbs)
+
+    <div class="row-fluid">
+        <h1><i class="icon icon-sitemap"></i> Node @node.getHostname / @node.getShortNodeId</h1>
+    </div>
+
+    @views.html.partials.preview("Node detail page is not finished yet.", 258)
+
+}

@@ -1,8 +1,10 @@
 @(user: User, currentUser: User, breadcrumbs: lib.BreadcrumbList)
 
-@main("Users", sidebars.standard(currentUser), "", currentUser) {
+@main("Users", views.html.system.sidebar(), "", currentUser) {
 
     @views.html.partials.breadcrumbs(breadcrumbs)
+
+    @views.html.partials.preview("User detail pages are not finished yet.", 257)
 
     <div>
         <span id="username">@user.getName</span>

@@ -31,8 +31,8 @@ import models.api.requests.CreateUserRequest;
 import org.apache.shiro.crypto.hash.SimpleHash;
 import play.data.Form;
 import play.mvc.Result;
-import views.html.users.new_user;
-import views.html.users.show;
+import views.html.system.users.new_user;
+import views.html.system.users.show;
 
 import java.util.List;
 
@@ -47,7 +47,7 @@ public class UsersController extends AuthenticatedController {
     public Result index() {
         final List<User> allUsers = User.all();
         final List<String> permissions = Permissions.all();
-        return ok(views.html.users.index.render(currentUser(), allUsers, permissions));
+        return ok(views.html.system.users.index.render(currentUser(), allUsers, permissions));
     }
 
     public Result show(String username) {
@@ -76,7 +76,7 @@ public class UsersController extends AuthenticatedController {
 
         User user = userService.load(username);
         final Form<ChangeUserRequest> form = changeUserForm.fill(new ChangeUserRequest(user));
-        return ok(views.html.users.edit.render(form, username, currentUser(), Permissions.all(), ImmutableSet.copyOf(user.getPermissions()), bc));
+        return ok(views.html.system.users.edit.render(form, username, currentUser(), Permissions.all(), ImmutableSet.copyOf(user.getPermissions()), bc));
     }
 
     public Result create() {
@@ -116,7 +116,7 @@ public class UsersController extends AuthenticatedController {
 
             final List<String> all = Permissions.all();
 
-            return badRequest(views.html.users.edit.render(requestForm, username, currentUser(), all, ImmutableSet.copyOf(requestForm.get().permissions), bc));
+            return badRequest(views.html.system.users.edit.render(requestForm, username, currentUser(), all, ImmutableSet.copyOf(requestForm.get().permissions), bc));
         }
         final User user = userService.load(username);
         user.update(requestForm.get());

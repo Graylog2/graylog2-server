@@ -49,7 +49,14 @@ $(document).ready(function() {
         e.preventDefault();
 
         // TODO
-        alert("Exporting statistics is not implemented yet. (Issue: #239)");
+        alert("Exporting statistics is not implemented yet. (GitHub issue: #239)");
+    });
+
+    $(".analyze-field .generate-graph .dropdown-menu a").on("click", function(e) {
+        e.preventDefault();
+
+        // TODO
+        alert("Graphing of custom values is not implemented yet. (GitHub issue: #259)");
     });
 
     $(".quickvalues .quickvalues-close").on("click", function(e) {
