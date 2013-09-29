@@ -127,7 +127,7 @@
     </div>
 
     <div class="row-fluid">
-        <h2><i class="icon icon-comments-alt"></i> Messages and notifications</h2>
+        <h2><i class="icon icon-comments-alt"></i> System messages</h2>
 
         <table class="system-messages table table-striped table-hover table-condensed">
             <thead>
@@ -156,4 +156,5 @@
 
         @partials.paginator(page, SystemMessage.PER_PAGE, totalSystemMessages, routes.SystemController.index(_))
     </div>
+
 }

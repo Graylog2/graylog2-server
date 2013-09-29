@@ -75,6 +75,13 @@ h4 {
 	border-bottom: 1px dotted #4DBCE9;
 }
 
+#footer {
+    text-align: center;
+    font-size: 11px;
+    color: #aaa;
+    margin-bottom: 15px;
+}
+
 #logout {
 	margin-top: -11px;
 }
