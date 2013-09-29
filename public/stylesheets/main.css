@@ -837,21 +837,18 @@ form #stream-rules {
     height: 400px;
     width: 500px;
     padding: 10px;
-    position: relative;
-    right: 550px;
+    position: fixed;
     margin-bottom: -420px;
     color: #fff;
 }
 
 .quickvalues-down {
-    top: -40px;
     -webkit-border-radius: 10px 0px 10px 10px;
     -moz-border-radius: 10px 0px 10px 10px;
     border-radius: 10px 0px 10px 10px;
 }
 
 .quickvalues-up {
-    top: -410px;
     -webkit-border-radius: 10px 10px 0px 10px;
     -moz-border-radius: 10px 10px 0px 10px;
     border-radius: 10px 10px 0px 10px;

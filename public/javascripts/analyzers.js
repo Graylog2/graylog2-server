@@ -169,6 +169,9 @@ $(document).ready(function() {
             $(".terms-distribution", quickvalues).hide();
         }
 
+        var button = $(".analyze-field .show-quickvalues[data-field=" + field + "]");
+        updatePosition(button, quickvalues);
+
         switch(direction)  {
             case "up":
                 quickvalues.removeClass("quickvalues-down");
@@ -237,10 +240,8 @@ $(document).ready(function() {
                 }
             },
             error: function(data) {
-                if(data.status != 400) {
-                    quickvalues.hide();
-                    showError("Could not load quick values.");
-                }
+                quickvalues.hide();
+                showError("Could not load quick values.");
             },
             complete: function() {
                 $(".nano").nanoScroller();
@@ -280,6 +281,22 @@ $(document).ready(function() {
         } else {
             return "down";
         }
+    }
+
+    // Update all the positions, all the time.
+    // Updating total event counts;
+    (function updateAllPositions() {
+        $(".quickvalues").each(function(i) {
+            var button = $(".analyze-field .show-quickvalues[data-field=" + $(this).attr("data-field") + "]");
+            updatePosition(button, $(this));
+        });
+
+        setTimeout(updateAllPositions, 25);
+    })();
+
+    function updatePosition(button, quickvalues) {
+        quickvalues.css("top", button.offset().top-$(window).scrollTop()-20);
+        quickvalues.css("left", button.offset().left-$(window).scrollLeft()-622);
     }
 
 });
