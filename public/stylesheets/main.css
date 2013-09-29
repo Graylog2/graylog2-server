@@ -274,6 +274,11 @@ form #stream-rules {
     margin-top: 10px;
 }
 
+.notification-badge-link:hover {
+    border: 0px !important;
+    text-decoration: none !important;
+}
+
 .row-fluid {
     margin-bottom: 15px;
 }
