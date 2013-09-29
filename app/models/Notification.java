@@ -22,6 +22,7 @@ import com.google.common.collect.Lists;
 import lib.APIException;
 import lib.ApiClient;
 import lib.notifications.DeflectorExistsAsIndexNotification;
+import lib.notifications.EsOpenFilesNotification;
 import lib.notifications.MultiMasterNotification;
 import lib.notifications.NotificationType;
 import models.api.responses.system.GetNotificationsResponse;
@@ -39,7 +40,8 @@ public class Notification {
 
     public enum Type {
         DEFLECTOR_EXISTS_AS_INDEX,
-        MULTI_MASTER
+        MULTI_MASTER,
+        ES_OPEN_FILES
     }
 
     public enum Severity {
@@ -60,6 +62,8 @@ public class Notification {
                 return new DeflectorExistsAsIndexNotification();
             case MULTI_MASTER:
                 return new MultiMasterNotification();
+            case ES_OPEN_FILES:
+                return new EsOpenFilesNotification();
         }
 
         throw new RuntimeException("No notification registered for " + type);
