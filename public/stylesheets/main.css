@@ -998,3 +998,14 @@ form #stream-rules {
 .preview .icon {
     color: #000;
 }
+
+#sidebar .menu a {
+    display: block;
+    font-size: 13px;
+    padding: 5px 10px;
+}
+
+#sidebar .menu a:hover {
+    background-color: #ccc;
+    text-decoration: none !important;
+}
