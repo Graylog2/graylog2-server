@@ -2,14 +2,17 @@
 
 @main("Streams", null, "", currentUser) {
 
-    <a href="/streams/new" class="btn btn-primary btn-small pull-right">Create stream</a>
+    <a href="/streams/new" class="btn btn-success btn-small pull-right">Create stream</a>
 
-    <h1>Streams</h1>
-    @streams.getTotal total
+    <h1>
+        <i class="icon icon-barcode"></i>
+        Streams
+    </h1>
 
-    <br /><br />
-    @for(stream <- streams.getStreams) {
-       @stream<br />
-    }
+    @views.html.partials.preview(
+        "The streams are not finished yet. Take a look at the create stream dialog by clicking on the button in the upper right corner to get an idea of " +
+                "the new streams. All alerting and monitoring will be covered in this streams section.",
+        186
+    )
 
 }
