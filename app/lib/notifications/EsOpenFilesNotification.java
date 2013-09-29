@@ -31,7 +31,7 @@ public class EsOpenFilesNotification implements NotificationType {
 
     private static final String TITLE = "ElasticSearch nodes with too low open file limit";
     private static final String DESCRIPTION = "There are ElasticSearch nodes in the cluster that have a too low " +
-                                              "open file limit. This will be causing problems that can be hard to diagnose. " +
+                                              "open file limit. (below 64000) This will be causing problems that can be hard to diagnose. " +
                                               "Read how to raise the maximum number of open files in " +
                                               "<a href='http://support.torch.sh/help/kb/graylog2-server/how-to-raise-the-open-file-limit-for-elasticsearch' target='_blank'>the documentation</a>.";
 
