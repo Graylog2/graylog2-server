@@ -2,6 +2,21 @@
 
 @main("Dashboard", sidebars.standard(currentUser), "", currentUser) {
 
-   Containing <span class="total-events">[<i class="icon-spinner icon-spin"></i>]</span> events.
+    <div class="preview-welcome">
+        <h1>Welcome to the first Graylog2 v0.20.0 preview version!</h1>
+
+        <p class="important">
+            <i class="icon icon-warning-sign"></i>
+            This is a very early version that should not be used in production. It may contain some nasty bugs, a lot is
+            not finished yet and some things are completely missing.
+        </p>
+
+        <p class="contact">
+            We would love to hear your feedback. If you have any questions, miss anything or have trouble,
+            <strong>please</strong> send us a quick email to <a href="mailto:support@@torch.sh">support@@torch.sh</a>.
+        </p>
+    </div>
+
+    @views.html.partials.preview("You will see the main dashboard with configurable widgets here.", 250)
 
 }
