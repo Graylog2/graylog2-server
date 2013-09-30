@@ -101,8 +101,8 @@ public class Configuration {
     @Parameter(value = "ring_size", required = true, validator = PositiveIntegerValidator.class)
     private int ringSize = 1024;
 
-    @Parameter(value = "elasticsearch_config_file", required = true, validator = FileReadableValidator.class)
-    private String elasticSearchConfigFile = "/etc/graylog2-elasticsearch.yml";
+    @Parameter(value = "elasticsearch_config_file", required = false, validator = FileReadableValidator.class)
+    private String elasticSearchConfigFile; // = "/etc/graylog2-elasticsearch.yml";
 
     @Parameter(value = "elasticsearch_index_prefix", required = true)
     private String elasticsearchIndexPrefix = "graylog2";
@@ -193,6 +193,31 @@ public class Configuration {
 
     @Parameter(value = "root_password_sha2", required = true)
     private String rootPasswordSha2;
+
+    /* Elasticsearch defaults */
+    @Parameter(value = "elasticsearch_cluster_name", required = true)
+    private String esClusterName = "graylog2";
+
+    @Parameter(value = "elasticsearch_node_name", required = true)
+    private String esNodeName = "graylog2-server";
+
+    @Parameter(value = "elasticsearch_node_master", required = true)
+    private boolean esIsMasterEligible = false;
+
+    @Parameter(value = "elasticsearch_node_data", required = true)
+    private boolean esStoreData = false;
+
+    @Parameter(value = "elasticsearch_transport_tcp_port", validator = InetPortValidator.class, required = true)
+    private int esTransportTcpPort = 9350;
+
+    @Parameter(value = "elasticsearch_http_enabled", required = false)
+    private boolean esIsHttpEnabled = false;
+
+    @Parameter(value = "elasticsearch_discovery_zen_ping_multicast_enabled", required = false)
+    private boolean esMulticastDiscovery = true;
+
+    @Parameter(value = "elasticsearch_discovery_zen_ping_unicast_hosts", required = false, converter = StringListConverter.class)
+    private List<String> esUnicastHosts;
 
     public boolean isMaster() {
         return isMaster;
@@ -460,4 +485,37 @@ public class Configuration {
     public void setRestTransportUri(String restTransportUri) {
         this.restTransportUri = restTransportUri;
     }
+
+    public String getEsClusterName() {
+        return esClusterName;
+    }
+
+    public String getEsNodeName() {
+        return esNodeName;
+    }
+
+    public boolean isEsIsMasterEligible() {
+        return esIsMasterEligible;
+    }
+
+    public boolean isEsStoreData() {
+        return esStoreData;
+    }
+
+    public int getEsTransportTcpPort() {
+        return esTransportTcpPort;
+    }
+
+    public boolean isEsIsHttpEnabled() {
+        return esIsHttpEnabled;
+    }
+
+    public boolean isEsMulticastDiscovery() {
+        return esMulticastDiscovery;
+    }
+
+    public List<String> getEsUnicastHosts() {
+        return esUnicastHosts;
+    }
+
 }

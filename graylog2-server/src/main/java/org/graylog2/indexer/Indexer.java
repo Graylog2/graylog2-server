@@ -1,7 +1,7 @@
 package org.graylog2.indexer;
 
-import com.beust.jcommander.internal.Sets;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.common.base.Joiner;
 import com.google.common.collect.Maps;
 import org.apache.commons.io.FileUtils;
 import org.elasticsearch.ElasticSearchTimeoutException;
@@ -9,7 +9,6 @@ import org.elasticsearch.action.WriteConsistencyLevel;
 import org.elasticsearch.action.admin.cluster.health.ClusterHealthRequest;
 import org.elasticsearch.action.admin.cluster.node.info.NodesInfoRequest;
 import org.elasticsearch.action.admin.cluster.node.info.NodesInfoResponse;
-import org.elasticsearch.action.admin.cluster.state.ClusterStateRequest;
 import org.elasticsearch.action.admin.indices.stats.IndexStats;
 import org.elasticsearch.action.bulk.BulkRequestBuilder;
 import org.elasticsearch.action.bulk.BulkResponse;
@@ -17,16 +16,13 @@ import org.elasticsearch.action.index.IndexRequest.OpType;
 import org.elasticsearch.action.index.IndexRequestBuilder;
 import org.elasticsearch.action.support.replication.ReplicationType;
 import org.elasticsearch.client.Client;
-import org.elasticsearch.cluster.ClusterState;
-import org.elasticsearch.cluster.metadata.IndexMetaData;
-import org.elasticsearch.cluster.metadata.MappingMetaData;
 import org.elasticsearch.common.settings.loader.YamlSettingsLoader;
 import org.elasticsearch.common.xcontent.XContentType;
 import org.elasticsearch.node.Node;
 import org.elasticsearch.node.NodeBuilder;
+import org.graylog2.Configuration;
 import org.graylog2.Core;
 import org.graylog2.UI;
-import org.graylog2.system.activities.Activity;
 import org.graylog2.indexer.cluster.Cluster;
 import org.graylog2.indexer.counts.Counts;
 import org.graylog2.indexer.indices.Indices;
@@ -35,6 +31,7 @@ import org.graylog2.indexer.ranges.IndexRange;
 import org.graylog2.indexer.searches.Searches;
 import org.graylog2.plugin.Message;
 import org.graylog2.plugin.indexer.MessageGateway;
+import org.graylog2.system.activities.Activity;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -42,7 +39,6 @@ import java.io.File;
 import java.io.IOException;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
 import static org.elasticsearch.node.NodeBuilder.nodeBuilder;
@@ -82,10 +78,25 @@ public class Indexer {
 
         // Overwrite from a custom ElasticSearch config file.
         try {
-            esSettings = FileUtils.readFileToString(new File(graylogServer.getConfiguration().getElasticSearchConfigFile()));
-            settings.putAll(new YamlSettingsLoader().load(esSettings));
+            if (graylogServer.getConfiguration().getElasticSearchConfigFile() != null) {
+                esSettings = FileUtils.readFileToString(new File(graylogServer.getConfiguration().getElasticSearchConfigFile()));
+                settings.putAll(new YamlSettingsLoader().load(esSettings));
+            }
         } catch (IOException e) {
-            throw new RuntimeException("Cannot read elasticsearch configuration.", e);
+            LOG.warn("Cannot read elasticsearch configuration.");
+        }
+
+        // override loaded settings with ours from graylog2.conf
+        final Configuration conf = server.getConfiguration();
+        settings.put("cluster.name", conf.getEsClusterName());
+        settings.put("node.name", conf.getEsNodeName());
+        settings.put("transport.tcp.port", String.valueOf(conf.getEsTransportTcpPort()));
+        settings.put("node.master", conf.isEsIsMasterEligible() ? "true" : "false");
+        settings.put("node.data", conf.isEsStoreData() ? "true" : "false");
+        settings.put("http.enabled", conf.isEsIsHttpEnabled() ? "true" : "false");
+        settings.put("discovery.zen.ping.multicast.enabled", conf.isEsMulticastDiscovery() ? "true" : "false");
+        if (conf.getEsUnicastHosts() != null) {
+            settings.put("discovery.zen.ping.unicast.hosts", Joiner.on(",").join(conf.getEsUnicastHosts()));
         }
 
         builder.settings().put(settings);
