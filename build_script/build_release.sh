@@ -33,7 +33,7 @@ cp -R ../graylog2-server/target/graylog2-server.jar ../README.markdown ../COPYIN
 
 # Copy example config files
 cp ../misc/graylog2.conf $BUILD_DIR/graylog2.conf.example
-cp ../misc/elasticsearch.yml $BUILD_DIR/elasticsearch.yml.example
+# cp ../misc/elasticsearch.yml $BUILD_DIR/elasticsearch.yml.example
 
 # Copy control script
 cp -R copy/bin $BUILD_DIR
@@ -55,5 +55,6 @@ cd builds/
 echo "Building Tarball ..."
 gnutar cfz $BUILD_NAME.tar.gz $BUILD_NAME
 rm -rf ./$BUILD_NAME
+mv $BUILD_NAME.tar.gz $BUILD_NAME.tgz
 
 echo "DONE! Created Graylog2 release $BUILD_NAME on $BUILD_DATE"
