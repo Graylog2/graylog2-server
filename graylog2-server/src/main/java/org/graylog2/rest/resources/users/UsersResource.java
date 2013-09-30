@@ -152,6 +152,19 @@ public class UsersResource extends RestResource {
         return Response.noContent().build();
     }
 
+    @DELETE
+    @Path("{username}")
+    @RequiresPermissions(RestPermissions.USERS_EDIT)
+    public Response deleteUser(@PathParam("username") String username) {
+        final User user = User.load(username, core);
+        if (user.isReadOnly()) {
+            throw new BadRequestException("Cannot delete readonly user " + username);
+        }
+
+        user.destroy();
+        return Response.noContent().build();
+    }
+
     @PUT
     @Path("{username}/permissions")
     @RequiresPermissions(RestPermissions.USERPERMISSIONS_EDIT)
