@@ -99,6 +99,11 @@ public class UsersController extends AuthenticatedController {
         return redirect(routes.UsersController.index());
     }
 
+    public Result delete(String username) {
+        userService.delete(username);
+        return redirect(routes.UsersController.index());
+    }
+
     public Result isUniqueUsername(String username) {
 //        if (LocalAdminUser.getInstance().getName().equals(username)) {
 //            return noContent();

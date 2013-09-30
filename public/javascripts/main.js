@@ -392,6 +392,11 @@ $(document).ready(function() {
         }, 150);
     }
 
+    $(".delete-user-form").on("submit", function() {
+        console.log("fooked");
+        return confirm("Really remove user " + $(this).attr("data-username") + "?");
+    });
+
     // Universalsearch validation.
     $("#universalsearch").on("submit", function() {
         return validate("#universalsearch");

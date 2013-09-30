@@ -150,4 +150,14 @@ public class UserService {
         }
         return null;
     }
+
+    public void delete(String username) {
+        try {
+            api.delete().path("/users/{0}", username).expect(Http.Status.NO_CONTENT).execute();
+        } catch (APIException e) {
+            log.error("Unable to delete user " + username, e);
+        } catch (IOException e) {
+            log.error("Unable to delete user " + username, e);
+        }
+    }
 }
