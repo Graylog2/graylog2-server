@@ -33,7 +33,7 @@ public class PlayAuthenticationListener implements AuthenticationListener {
     @Override
     public void onSuccess(AuthenticationToken token, AuthenticationInfo info) {
         final Http.Session session = Http.Context.current().session();
-        log.warn("Authenticated user {}", info.getPrincipals().getPrimaryPrincipal());
+        log.debug("Authenticated user {}", info.getPrincipals().getPrimaryPrincipal());
     }
 
     @Override
