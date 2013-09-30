@@ -127,13 +127,13 @@ public class UserService {
         final String passwordSha1 = tokenizer.nextToken();
 
         // special case for the local admin user for the web interface
-        if (userName != null) {
-            final LocalAdminUser localAdminUser = LocalAdminUser.getInstance();
-            if (userName.equals(localAdminUser.getName())) {
-                setCurrent(localAdminUser);
-                return localAdminUser;
-            }
-        }
+//        if (userName != null) {
+//            final LocalAdminUser localAdminUser = LocalAdminUser.getInstance();
+//            if (userName.equals(localAdminUser.getName())) {
+//                setCurrent(localAdminUser);
+//                return localAdminUser;
+//            }
+//        }
         try {
             UserResponse response = api.get(UserResponse.class)
                     .credentials(userName, passwordSha1)
