@@ -90,7 +90,7 @@ public class Extractor {
     private final ApiClient api;
     private final UserService userService;
 
-    private final String id;
+    private String id;
     private final String title;
     private final CursorStrategy cursorStrategy;
     private final Type extractorType;
@@ -158,7 +158,7 @@ public class Extractor {
 
     }
 
-    public void create(Node node, Input input) throws IOException, APIException {
+    public Extractor create(Node node, Input input) throws IOException, APIException {
         CreateExtractorRequest request = new CreateExtractorRequest();
 
         Map<String, Map<String, Object>> converterList = Maps.newHashMap();
@@ -177,12 +177,14 @@ public class Extractor {
         request.conditionType = conditionType.toString().toLowerCase();
         request.conditionValue =  conditionValue;
 
-        api.post()
+        final Map response = api.post(Map.class)
                 .path("/system/inputs/{0}/extractors", input.getId())
                 .node(node)
                 .expect(Http.Status.CREATED)
                 .body(request)
                 .execute();
+        this.id = response.get("extractor_id").toString();
+        return this;
     }
 
     public void loadConfigFromForm(Type extractorType, Map<String,String[]> form) {
