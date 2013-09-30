@@ -50,7 +50,7 @@ public class ConfigurationTest {
         validProperties.put("mongodb_port", "27017");
         validProperties.put("use_gelf", "true");
         validProperties.put("gelf_listen_port", "12201");
-        validProperties.put("root_password_sha1", "d033e22ae348aeb5660fc2140aec35850c4da997"); // sha1 of admin
+        validProperties.put("root_password_sha2", "8c6976e5b5410415bde908bd4dee15dfb167a9c873fc4bb8a81f6f2ab448a918"); // sha2 of admin
 
         // Additional numerical properties
         validProperties.put("mongodb_max_connections", "100");
