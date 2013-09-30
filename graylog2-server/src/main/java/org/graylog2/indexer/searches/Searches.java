@@ -70,12 +70,12 @@ public class Searches {
 		this.c = client;
 	}
 	
-	public SearchResult search(String query, TimeRange range, int limit) throws IndexHelper.InvalidRangeFormatException {
+	public SearchResult search(String query, TimeRange range, int limit, int offset) throws IndexHelper.InvalidRangeFormatException {
         if(limit <= 0) {
             limit = LIMIT;
         }
 
-		SearchResponse r = c.search(standardSearchRequest(query, limit, range, SortOrder.DESC).request()).actionGet();
+		SearchResponse r = c.search(standardSearchRequest(query, limit, offset, range, SortOrder.DESC).request()).actionGet();
 		return new SearchResult(r.getHits(), query, r.getTook());
 	}
 
@@ -151,13 +151,14 @@ public class Searches {
     }
 
     private SearchRequestBuilder standardSearchRequest(String query) throws IndexHelper.InvalidRangeFormatException {
-        return standardSearchRequest(query, 0, null, null);
+        return standardSearchRequest(query, 0, 0, null, null);
     }
 
-    private SearchRequestBuilder standardSearchRequest(String query, int limit, TimeRange range, SortOrder sort) throws IndexHelper.InvalidRangeFormatException {
+    private SearchRequestBuilder standardSearchRequest(String query, int limit, int offset, TimeRange range, SortOrder sort) throws IndexHelper.InvalidRangeFormatException {
         SearchRequestBuilder srb = c.prepareSearch();
         srb.setIndices(server.getDeflector().getAllDeflectorIndexNames()); // XXX 020: have a method that builds time ranged index requests
         srb.setQuery(queryString(query));
+        srb.setFrom(offset);
 
         if (limit > 0) {
             srb.setSize(limit);

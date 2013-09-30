@@ -53,12 +53,13 @@ public class AbsoluteSearchResource extends SearchResource {
             @ApiParam(title = "query", description = "Query (Lucene syntax)", required = true) @QueryParam("query") String query,
             @ApiParam(title = "from", description = "Timerange start. See description for date format", required = true) @QueryParam("from") String from,
             @ApiParam(title = "to", description = "Timerange end. See description for date format", required = true) @QueryParam("to") String to,
-            @ApiParam(title = "limit", description = "Maximum number of messages to return.", required = false) @QueryParam("limit") int limit) {
+            @ApiParam(title = "limit", description = "Maximum number of messages to return.", required = false) @QueryParam("limit") int limit,
+            @ApiParam(title = "offset", description = "Offset", required = false) @QueryParam("offset") int offset) {
         checkQuery(query);
 
         try {
             return json(buildSearchResult(
-                    core.getIndexer().searches().search(query, buildAbsoluteTimeRange(from, to), limit)
+                    core.getIndexer().searches().search(query, buildAbsoluteTimeRange(from, to), limit, offset)
             ));
         } catch (IndexHelper.InvalidRangeFormatException e) {
             LOG.warn("Invalid timerange parameters provided. Returning HTTP 400.", e);

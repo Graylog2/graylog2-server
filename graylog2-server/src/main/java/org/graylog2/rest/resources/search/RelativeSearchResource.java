@@ -52,12 +52,13 @@ public class RelativeSearchResource extends SearchResource {
     public String searchRelative(
             @ApiParam(title = "query", description = "Query (Lucene syntax)", required = true) @QueryParam("query") String query,
             @ApiParam(title = "range", description = "Relative timeframe to search in. See method description.", required = true) @QueryParam("range") int range,
-            @ApiParam(title = "limit", description = "Maximum number of messages to return.", required = false) @QueryParam("limit") int limit) {
+            @ApiParam(title = "limit", description = "Maximum number of messages to return.", required = false) @QueryParam("limit") int limit,
+            @ApiParam(title = "offset", description = "Offset", required = false) @QueryParam("offset") int offset) {
         checkQuery(query);
 
         try {
             return json(buildSearchResult(
-                    core.getIndexer().searches().search(query, buildRelativeTimeRange(range), limit)
+                    core.getIndexer().searches().search(query, buildRelativeTimeRange(range), limit, offset)
             ));
         } catch (IndexHelper.InvalidRangeFormatException e) {
             LOG.warn("Invalid timerange parameters provided. Returning HTTP 400.", e);
