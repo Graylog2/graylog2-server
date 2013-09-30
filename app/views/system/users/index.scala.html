@@ -1,6 +1,7 @@
 @(currentUser: User, users: java.util.List[User], permissions:java.util.List[String])
 
 @main("Users", views.html.system.sidebar(), "", currentUser) {
+    @views.html.partials.preview("Users can be stored in Graylog2's MongoDB instance, or be read from LDAP. Currently only those accounts configured in MongoDB are available. Note that the built-in admin account is not yet listed here, either.", 266)
 
     <div class="row-fluid">
         <h2><i class="icon icon-user"></i> User accounts</h2>

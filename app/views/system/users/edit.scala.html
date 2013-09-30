@@ -5,6 +5,7 @@
     @views.html.partials.breadcrumbs(breadcrumbs)
 
     <div>
+        @views.html.partials.preview("Editing users will show a list of permissions and roles that can be assigned to users. Those consist of both permissions for the server's REST API as well as the Web Interface's features.", 255)
         <form action="@routes.UsersController.saveChanges(username)" method="POST">
 
             <label for="fullname">Full Name</label>
