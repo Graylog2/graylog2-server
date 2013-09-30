@@ -46,7 +46,6 @@ import play.Application;
 import play.Configuration;
 import play.GlobalSettings;
 
-import java.io.File;
 import java.util.List;
 
 /**
@@ -58,13 +57,13 @@ public class Global extends GlobalSettings {
     private Injector injector;
 
     @Override
-    public Configuration onLoadConfig(Configuration configuration, File file, ClassLoader classLoader) {
-        // TODO implement dynamic work area to override configuration settings
-        return super.onLoadConfig(configuration, file, classLoader);
-    }
-
-    @Override
 	public void onStart(Application app) {
+
+        final String appSecret = app.configuration().getString("application.secret");
+        if (appSecret == null || appSecret.isEmpty()) {
+            log.error("Please configure application.secret in your application.conf");
+            throw new IllegalStateException("No application.secret configured.");
+        }
 
         final String graylog2ServerUris = app.configuration().getString("graylog2-server.uris", "");
         if (graylog2ServerUris.isEmpty()) {
