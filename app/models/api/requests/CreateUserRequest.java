@@ -18,8 +18,8 @@
  */
 package models.api.requests;
 
+import com.google.common.collect.Lists;
 import models.User;
-import models.api.requests.ChangeUserRequest;
 
 import static play.data.validation.Constraints.Required;
 
@@ -36,6 +36,6 @@ public class CreateUserRequest extends ChangeUserRequest {
         this.fullname = user.getFullName();
         this.email = user.getEmail();
         this.password = "";
-        this.permissions = user.getPermissions();
+        this.permissions = Lists.newArrayList("*"); // TODO PREVIEW user.getPermissions();
     }
 }

@@ -19,6 +19,7 @@
 package controllers;
 
 import com.google.common.collect.ImmutableSet;
+import com.google.common.collect.Lists;
 import com.google.inject.Inject;
 import lib.BreadcrumbList;
 import lib.Tools;
@@ -91,7 +92,9 @@ public class UsersController extends AuthenticatedController {
             return badRequest(new_user.render(createUserRequestForm, currentUser(), permissions, ImmutableSet.copyOf(request.permissions), bc));
         }
         // hash it before sending it across
-        request.password = new SimpleHash("SHA1", request.password).toString();
+        request.password = new SimpleHash("SHA-256", request.password).toString();
+        // TODO PREVIEW: remove hardcoded permissions once the permission editor is ready
+        request.permissions = Lists.newArrayList("*");
         userService.create(request);
         return redirect(routes.UsersController.index());
     }

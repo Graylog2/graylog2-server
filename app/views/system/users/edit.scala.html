@@ -14,7 +14,7 @@
             <label for="email">Email Address</label>
             <span class="help-block">Give the contact email address.</span>
             <input name="email" id="email" type="email" value="@form("email").value()" required />
-
+            <!--
             <label for="permissions">Permissions</label>
             <span class="help-block">Choose the permissions granted to the account.</span>
             <select name="permissions" id="permissions" data-placeholder="Choose permissions..." multiple required class="permission-select">
@@ -22,12 +22,14 @@
                 <option @{if(selectedPermissions.contains(permission)) "selected"}>@permission</option>
             }
             </select>
-
-            <button type="reset" class="btn">Reset form</button>
-            <button type="submit" class="btn btn-primary create-user">
-                <i class="icon icon-rocket"></i>
-                Save changes
-            </button>
+            -->
+            <div class="pull-right">
+                <button type="reset" class="btn">Reset form</button>
+                <button type="submit" class="btn btn-primary create-user">
+                    <i class="icon icon-rocket"></i>
+                    Save changes
+                </button>
+            </div>
         </form>
     </div>
 }

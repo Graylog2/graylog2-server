@@ -18,8 +18,8 @@
  */
 package models.api.requests;
 
+import com.google.common.collect.Lists;
 import models.User;
-import models.api.requests.ApiRequest;
 import play.data.validation.Constraints;
 
 import java.util.List;
@@ -29,7 +29,7 @@ public class ChangeUserRequest extends ApiRequest {
     public String fullname;
     @Constraints.Required
     public String email;
-    @Constraints.Required
+
     public List<String> permissions;
 
     public ChangeUserRequest() { /* for data binding */ }
@@ -37,6 +37,6 @@ public class ChangeUserRequest extends ApiRequest {
     public ChangeUserRequest(User user) {
         this.fullname = user.getFullName();
         this.email = user.getEmail();
-        this.permissions = user.getPermissions();
+        this.permissions = Lists.newArrayList("*"); // TODO PREVIEW user.getPermissions();
     }
 }
