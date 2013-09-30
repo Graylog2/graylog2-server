@@ -11,24 +11,30 @@
 
 @if(searchResult.getTotalResultCount() > 0) {
 <h3>Select fields</h3>
-<ul class="search-result-fields">
-	@for(f <- searchResult.getFields()) {
-		<li>
-            <i class="icon icon-cog open-analyze-field"></i>
-            &nbsp;
+<div class="nano">
+    <div class="content">
+        <div class="inner-content">
+            <ul class="search-result-fields">
+                @for(f <- searchResult.getFields()) {
+                    <li>
+                        <i class="icon icon-cog open-analyze-field"></i>
+                        &nbsp;
 
-			<input type="checkbox"
-				id="field-selector-@f.getHash"
-				class="field-selector"
-				data-field-hash="@f.getHash"
-				@if(f.isStandardSelected) { checked="checked" }
-			/>
+                        <input type="checkbox"
+                            id="field-selector-@f.getHash"
+                            class="field-selector"
+                            data-field-hash="@f.getHash"
+                            @if(f.isStandardSelected) { checked="checked" }
+                        />
 
-			<label for="field-selector-@f.getHash">@f.getName()</label>
+                        <label for="field-selector-@f.getHash">@f.getName()</label>
 
-            @views.html.sidebars.partials.analyze_field(f)
-        </li>
-	}
-</ul>
+                        @views.html.sidebars.partials.analyze_field(f)
+                    </li>
+                }
+            </ul>
+        </div>
+    </div>
+</div>
 
 }

@@ -25,14 +25,7 @@ $(document).ready(function() {
 		
 		.complete(function() {
 
-            if ($("#sidebar-replacement dl").height() > $(window).height()-265-15) {
-                // We need a scrollbar.
-                $("#sidebar .nano").css("height", $(window).height()-265-15);
-                $("#sidebar .nano").nanoScroller();
-            } else {
-                // No scrollbar required.
-                $("#sidebar .nano").css("height", $("#sidebar-replacement dl").height()+15);
-            }
+            sizeSidebar();
 			
 			// Inject terms of a message when modal is requested.
 			$('.terms-msg-modal').on('show', function() {
@@ -82,11 +75,13 @@ $(document).ready(function() {
 		
 		// Remove highlighting.
 		$(".messages tbody > tr").removeClass("message-highlighted");
+
+        // Set old sidebar to the correct height again.
+        sizeSidebar();
 	});
 
-    // Sidebar nanoscroller.
-    $("#sidebar .nano").css("height", $(window).height()-200);
-    $("#sidebar .nano").nanoScroller();
+    // Always do this on first load.
+    sizeSidebar();
 
 	// Adding more fields to the message result table.
 	$(".field-selector").bind("change", function() {
@@ -458,6 +453,24 @@ $(document).ready(function() {
 
 	    return kvp.join('&'); 
 	}
+
+    function sizeSidebar() {
+        if ($("#sidebar .inner-content").filter(':visible').height() > $(window).height()-265-15) {
+            // We need a scrollbar.
+            $("#sidebar .nano").filter(':visible').css("height", $(window).height()-265-15);
+            $("#sidebar .nano").filter(':visible').nanoScroller();
+        } else {
+            // No scrollbar required.
+            $("#sidebar .nano").filter(':visible').css("height", $("#sidebar .inner-content").filter(':visible').height()+15);
+        }
+    }
+
+    // Resize the sidebar regularly if window size changes.
+    (function fixSidebarForWindow() {
+        sizeSidebar();
+
+        setTimeout(fixSidebarForWindow, 250);
+    })();
 	
 });
 
