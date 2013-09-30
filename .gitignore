@@ -15,6 +15,7 @@ dist
 /.settings
 .ecltarget
 
+conf/development.conf
 
 .target
 .DS_Store
