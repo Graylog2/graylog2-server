@@ -54,7 +54,7 @@ public class MessageCountsController extends AuthenticatedController {
     	}
 		
 		try {
-			MessageCountHistogram count = new MessageCountHistogram("minute", range);
+			MessageCountHistogram count = new MessageCountHistogram(api(), "minute", range);
 			DateHistogramResult histogramResult = count.histogram();
 			
 			List<Map<String, Object>> lines = Lists.newArrayList();

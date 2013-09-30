@@ -27,16 +27,18 @@ import java.io.IOException;
 
 public class MessageCountHistogram {
 
-	private final String interval;
+    private final ApiClient api;
+    private final String interval;
 	private final int timerange;
 	
-	public MessageCountHistogram(String interval, int timerange) {
-		this.interval = interval;
+	public MessageCountHistogram(ApiClient api, String interval, int timerange) {
+        this.api = api;
+        this.interval = interval;
 		this.timerange = timerange;
 	}
 	
 	public DateHistogramResult histogram() throws IOException, APIException {
-        DateHistogramResponse response = ApiClient.get(DateHistogramResponse.class)
+        DateHistogramResponse response = api.get(DateHistogramResponse.class)
                 .path("/count/histogram")
                 .queryParam("interval", interval)
                 .queryParam("timerange", timerange)
