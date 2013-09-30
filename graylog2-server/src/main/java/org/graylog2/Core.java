@@ -79,7 +79,6 @@ import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.net.InetSocketAddress;
-import java.net.URI;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ExecutorService;
@@ -108,7 +107,7 @@ public class Core implements GraylogServer {
     private static final int SCHEDULED_THREADS_POOL_SIZE = 30;
     private ScheduledExecutorService scheduler;
 
-    public static final String GRAYLOG2_VERSION = "0.20.0-dev";
+    public static final String GRAYLOG2_VERSION = "0.20.0-preview.1";
     public static final String GRAYLOG2_CODENAME = "Amigo Humanos (Flipper)";
 
     private Indexer indexer;
