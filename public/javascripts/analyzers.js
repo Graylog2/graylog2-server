@@ -244,7 +244,7 @@ $(document).ready(function() {
                 showError("Could not load quick values.");
             },
             complete: function() {
-                $(".nano").nanoScroller();
+                $(".nano", quickvalues).nanoScroller();
 
                 if (reload) {
                     // Loading complete. Set autoreload button to old color again.

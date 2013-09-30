@@ -457,11 +457,11 @@ $(document).ready(function() {
     function sizeSidebar() {
         if ($("#sidebar .inner-content").filter(':visible').height() > $(window).height()-265-15) {
             // We need a scrollbar.
-            $("#sidebar .nano").filter(':visible').css("height", $(window).height()-265-15);
-            $("#sidebar .nano").filter(':visible').nanoScroller();
+            $("#sidebar .nano").not(".quickvalues .nano").filter(':visible').css("height", $(window).height()-265-15);
+            $("#sidebar .nano").not(".quickvalues .nano").filter(':visible').nanoScroller();
         } else {
             // No scrollbar required.
-            $("#sidebar .nano").filter(':visible').css("height", $("#sidebar .inner-content").filter(':visible').height()+15);
+            $("#sidebar .nano").not(".quickvalues .nano").filter(':visible').css("height", $("#sidebar .inner-content").filter(':visible').height()+15);
         }
     }
 
