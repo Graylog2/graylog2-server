@@ -33,7 +33,7 @@ public class Version {
     public static final Version vDEV = new Version(0, 20, 0, "dev");
     public static final Version v0_20_0_PREVIEW_1 = new Version(0, 20, 0, "preview.1");
 
-    public static final Version VERSION = vDEV;
+    public static final Version VERSION = v0_20_0_PREVIEW_1;
 
     public final int major;
     public final int minor;
