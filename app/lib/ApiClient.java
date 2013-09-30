@@ -297,7 +297,7 @@ public class ApiClient {
                 throw new RuntimeException("Malformed URL.", e);
             } catch (ExecutionException e) {
                 log.error("REST call failed", e);
-                throw new APIException(-1, "REST call GET [" + url + "] failed: " + e.getMessage());
+                throw new APIException(-1, "REST call GET [" + url + "] failed: " + e.getMessage(), e.getCause());
             } catch (IOException e) {
                 // TODO
                 log.error("unhandled IOException", e);

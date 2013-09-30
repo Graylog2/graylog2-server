@@ -22,7 +22,6 @@ import com.google.common.collect.ImmutableSet;
 import com.google.inject.Inject;
 import lib.BreadcrumbList;
 import lib.Tools;
-import models.LocalAdminUser;
 import models.PermissionsService;
 import models.User;
 import models.UserService;
@@ -98,9 +97,9 @@ public class UsersController extends AuthenticatedController {
     }
 
     public Result isUniqueUsername(String username) {
-        if (LocalAdminUser.getInstance().getName().equals(username)) {
-            return noContent();
-        }
+//        if (LocalAdminUser.getInstance().getName().equals(username)) {
+//            return noContent();
+//        }
         if (userService.load(username) == null) {
             return notFound();
         } else {

@@ -17,7 +17,7 @@
 
             <label for="permissions">Permissions</label>
             <span class="help-block">Choose the permissions granted to the account.</span>
-            <select name="permissions" id="permissions" data-placeholder="Choose permissions..." multiple class="permission-select">
+            <select name="permissions" id="permissions" data-placeholder="Choose permissions..." multiple required class="permission-select">
             @for(permission <- permissions) {
                 <option @{if(selectedPermissions.contains(permission)) "selected"}>@permission</option>
             }
