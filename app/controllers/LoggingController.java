@@ -19,15 +19,14 @@
 package controllers;
 
 import com.google.common.collect.Maps;
-import lib.APIException;
-import lib.ApiClient;
+import com.google.inject.Inject;
 import lib.BreadcrumbList;
 import lib.ServerNodes;
 import models.InternalLogger;
 import models.Node;
+import models.NodeService;
 import play.mvc.Result;
 
-import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 
@@ -36,24 +35,20 @@ import java.util.Map;
  */
 public class LoggingController extends AuthenticatedController {
 
+    @Inject
+    private NodeService nodeService;
+
     public Result index() {
         BreadcrumbList bc = new BreadcrumbList();
         bc.addCrumb("System", routes.SystemController.index(0));
         bc.addCrumb("Logging", routes.LoggingController.index());
 
-        try {
-            Map<Node, List<InternalLogger>> loggers = Maps.newHashMap();
-            for (Node node : ServerNodes.all()) {
-                loggers.put(node, InternalLogger.all(node));
-            }
-
-            return ok(views.html.system.logging.index.render(currentUser(), bc, loggers));
-        } catch (IOException e) {
-            return status(504, views.html.errors.error.render(ApiClient.ERROR_MSG_IO, e, request()));
-        } catch (APIException e) {
-            String message = "Could not fetch system information. We expected HTTP 200, but got a HTTP " + e.getHttpCode() + ".";
-            return status(504, views.html.errors.error.render(message, e, request()));
+        Map<Node, List<InternalLogger>> loggers = Maps.newHashMap();
+        for (Node node : ServerNodes.all()) {
+            loggers.put(node, node.allLoggers());
         }
+
+        return ok(views.html.system.logging.index.render(currentUser(), bc, loggers));
     }
 
 }

@@ -79,7 +79,7 @@ public class Global extends GlobalSettings {
         for (String uri : uris) {
             final NodeSummaryResponse r = new NodeSummaryResponse();
             r.transportAddress =  uri;
-            initialNodes[i++] = new Node(null, null, r);  // TODO DI this is wrong, can we use the factory already here?
+            initialNodes[i++] = new Node(r);  // TODO DI this is wrong, can we use the factory already here?
         }
 
         List<Module> modules = Lists.newArrayList();
@@ -93,14 +93,15 @@ public class Global extends GlobalSettings {
         injector = Guice.createInjector(modules);
 
         // start the services that need starting
-        injector.getInstance(ApiClient.class).start();
+        final ApiClient api = injector.getInstance(ApiClient.class);
+        api.start();
         injector.getInstance(ServerNodesRefreshService.class).start();
         // TODO replace with custom AuthenticatedAction filter
         RedirectAuthenticator.userService = injector.getInstance(UserService.class);
 
         LocalAdminUserRealm localAdminRealm = new LocalAdminUserRealm("local-accounts");
         localAdminRealm.setCredentialsMatcher(new HashedCredentialsMatcher("SHA1"));
-        setupLocalUser(localAdminRealm, app);
+        setupLocalUser(api, localAdminRealm, app);
 
         Realm serverRestInterfaceRealm = injector.getInstance(ServerRestInterfaceRealm.class);
         final DefaultSecurityManager securityManager =
@@ -124,7 +125,7 @@ public class Global extends GlobalSettings {
         return injector.getInstance(controllerClass);
     }
 
-    private void setupLocalUser(SimpleAccountRealm realm, Application app) {
+    private void setupLocalUser(ApiClient api, SimpleAccountRealm realm, Application app) {
 		final Configuration config = app.configuration();
         final String username = config.getString("local-user.name", "localadmin");
         final String passwordHash = config.getString("local-user.password-sha1");
@@ -139,7 +140,7 @@ public class Global extends GlobalSettings {
                 passwordHash,
 				"local-admin"
 		);
-        LocalAdminUser.createSharedInstance(username, passwordHash);
+        LocalAdminUser.createSharedInstance(api, username, passwordHash);
     }
 
 }

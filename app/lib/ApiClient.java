@@ -83,30 +83,30 @@ public class ApiClient {
         ApiClient.client = client;
     }
 
-    public static <T> ApiRequestBuilder<T> get(Class<T> responseClass) {
+    public <T> ApiRequestBuilder<T> get(Class<T> responseClass) {
         return new ApiRequestBuilder<>(ApiRequestBuilder.Method.GET, responseClass);
     }
-    public static <T> ApiRequestBuilder<T> post(Class<T> responseClass) {
+    public <T> ApiRequestBuilder<T> post(Class<T> responseClass) {
         return new ApiRequestBuilder<>(ApiRequestBuilder.Method.POST, responseClass);
     }
 
-    public static ApiRequestBuilder<EmptyResponse> post() {
+    public ApiRequestBuilder<EmptyResponse> post() {
         return post(EmptyResponse.class);
     }
 
-    public static <T> ApiRequestBuilder<T> put(Class<T> responseClass) {
+    public <T> ApiRequestBuilder<T> put(Class<T> responseClass) {
         return new ApiRequestBuilder<>(ApiRequestBuilder.Method.PUT, responseClass);
     }
 
-    public static ApiRequestBuilder<EmptyResponse> put() {
+    public ApiRequestBuilder<EmptyResponse> put() {
         return put(EmptyResponse.class);
     }
 
-    public static <T> ApiRequestBuilder<T> delete(Class<T> responseClass) {
+    public <T> ApiRequestBuilder<T> delete(Class<T> responseClass) {
         return new ApiRequestBuilder<>(ApiRequestBuilder.Method.DELETE, responseClass);
     }
 
-    public static ApiRequestBuilder<EmptyResponse> delete() {
+    public ApiRequestBuilder<EmptyResponse> delete() {
         return delete(EmptyResponse.class);
     }
 

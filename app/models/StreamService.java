@@ -16,44 +16,28 @@
  * You should have received a copy of the GNU General Public License
  * along with Graylog2.  If not, see <http://www.gnu.org/licenses/>.
  */
-
 package models;
 
 import com.google.inject.Inject;
 import lib.APIException;
 import lib.ApiClient;
-import lib.ServerNodes;
-import models.api.responses.NodeSummaryResponse;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import models.api.responses.GetStreamsResponse;
+import models.api.results.StreamsResult;
 
 import java.io.IOException;
 
-public class NodeService {
-    private static final Logger log = LoggerFactory.getLogger(NodeService.class);
+public class StreamService {
 
     private final ApiClient api;
-    private final Node.Factory nodeFactory;
 
     @Inject
-    public NodeService(ApiClient api, Node.Factory nodeFactory) {
+    private StreamService(ApiClient api) {
         this.api = api;
-        this.nodeFactory = nodeFactory;
     }
 
-    public Node loadNode(String nodeId) {
-        NodeSummaryResponse r;
-        try {
-            r = api.get(NodeSummaryResponse.class)
-                    .node(ServerNodes.any())
-                    .path("/system/cluster/nodes/{0}", nodeId)
-                    .execute();
-            return nodeFactory.fromSummaryResponse(r);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        } catch (APIException e) {
-            throw new RuntimeException(e);
-        }
-    }
+    public StreamsResult allEnabled() throws IOException, APIException {
+        GetStreamsResponse r = api.get(GetStreamsResponse.class).path("/streams").execute();
 
+        return new StreamsResult(r.total, r.streams);
+    }
 }

@@ -18,15 +18,8 @@
  */
 package models;
 
-import com.google.common.collect.Lists;
-import lib.APIException;
-import lib.ApiClient;
-import models.api.responses.system.GetSystemMessagesResponse;
 import models.api.responses.system.SystemMessageSummaryResponse;
 import org.joda.time.DateTime;
-
-import java.io.IOException;
-import java.util.List;
 
 /**
  * @author Lennart Koopmann <lennart@torch.sh>
@@ -46,23 +39,6 @@ public class SystemMessage {
         this.caller = sms.caller;
         this.content = sms.content;
         this.nodeId = sms.nodeId;
-    }
-
-    public static List<SystemMessage> all(int page) throws IOException, APIException {
-        GetSystemMessagesResponse r = ApiClient.get(GetSystemMessagesResponse.class)
-                .path("/system/messages")
-                .queryParam("page", page)
-                .execute();
-        List<SystemMessage> messages = Lists.newArrayList();
-        for (SystemMessageSummaryResponse message : r.messages) {
-            messages.add(new SystemMessage(message));
-        }
-
-        return messages;
-    }
-
-    public static int total() throws IOException, APIException {
-        return ApiClient.get(GetSystemMessagesResponse.class).path("/system/messages").execute().total;
     }
 
     public DateTime getTimestamp() {

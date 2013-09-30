@@ -23,7 +23,7 @@ import com.google.inject.Inject;
 import lib.BreadcrumbList;
 import lib.Tools;
 import models.LocalAdminUser;
-import models.Permissions;
+import models.PermissionsService;
 import models.User;
 import models.UserService;
 import models.api.requests.ChangeUserRequest;
@@ -43,10 +43,12 @@ public class UsersController extends AuthenticatedController {
 
     @Inject
     private UserService userService;
+    @Inject
+    private PermissionsService permissionsService;
 
     public Result index() {
-        final List<User> allUsers = User.all();
-        final List<String> permissions = Permissions.all();
+        final List<User> allUsers = userService.all();
+        final List<String> permissions = permissionsService.all();
         return ok(views.html.system.users.index.render(currentUser(), allUsers, permissions));
     }
 
@@ -66,7 +68,7 @@ public class UsersController extends AuthenticatedController {
         BreadcrumbList bc = breadcrumbs();
         bc.addCrumb("Create new", routes.UsersController.newUserForm());
 
-        final List<String> permissions = Permissions.all();
+        final List<String> permissions = permissionsService.all();
         return ok(new_user.render(createUserForm, currentUser(), permissions, ImmutableSet.<String>of(), bc));
     }
 
@@ -76,7 +78,7 @@ public class UsersController extends AuthenticatedController {
 
         User user = userService.load(username);
         final Form<ChangeUserRequest> form = changeUserForm.fill(new ChangeUserRequest(user));
-        return ok(views.html.system.users.edit.render(form, username, currentUser(), Permissions.all(), ImmutableSet.copyOf(user.getPermissions()), bc));
+        return ok(views.html.system.users.edit.render(form, username, currentUser(), permissionsService.all(), ImmutableSet.copyOf(user.getPermissions()), bc));
     }
 
     public Result create() {
@@ -86,12 +88,12 @@ public class UsersController extends AuthenticatedController {
         if (createUserRequestForm.hasErrors()) {
             BreadcrumbList bc = breadcrumbs();
             bc.addCrumb("Create new", routes.UsersController.newUserForm());
-            final List<String> permissions = Permissions.all();
+            final List<String> permissions = permissionsService.all();
             return badRequest(new_user.render(createUserRequestForm, currentUser(), permissions, ImmutableSet.copyOf(request.permissions), bc));
         }
         // hash it before sending it across
         request.password = new SimpleHash("SHA1", request.password).toString();
-        User.create(request);
+        userService.create(request);
         return redirect(routes.UsersController.index());
     }
 
@@ -114,7 +116,7 @@ public class UsersController extends AuthenticatedController {
             bc.addCrumb("Users", routes.UsersController.index());
             bc.addCrumb("Edit " + username, routes.UsersController.editUserForm(username));
 
-            final List<String> all = Permissions.all();
+            final List<String> all = permissionsService.all();
 
             return badRequest(views.html.system.users.edit.render(requestForm, username, currentUser(), all, ImmutableSet.copyOf(requestForm.get().permissions), bc));
         }

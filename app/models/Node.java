@@ -29,6 +29,8 @@ import models.api.requests.InputLaunchRequest;
 import models.api.responses.BuffersResponse;
 import models.api.responses.NodeSummaryResponse;
 import models.api.responses.system.*;
+import models.api.responses.system.loggers.LoggerSummary;
+import models.api.responses.system.loggers.LoggersResponse;
 import org.joda.time.DateTime;
 import org.slf4j.LoggerFactory;
 import play.Logger;
@@ -60,6 +62,11 @@ public class Node {
     private final boolean isMaster;
     private final boolean isProcessing;
 
+    /* for initial set up in test */
+    public Node(NodeSummaryResponse r) {
+        this(null, null, r);
+    }
+
     @AssistedInject
     public Node(ApiClient api, Input.Factory inputFactory, @Assisted NodeSummaryResponse r) {
         this.api = api;
@@ -87,6 +94,25 @@ public class Node {
             log.error("Unexpected exception", e);
         }
         return null;
+    }
+
+    public List<InternalLogger> allLoggers() {
+        List<InternalLogger> loggers = Lists.newArrayList();
+        try {
+            LoggersResponse response = api.get(LoggersResponse.class)
+                    .node(this)
+                    .path("/system/loggers")
+                    .execute();
+
+            for (Map.Entry<String, LoggerSummary> logger : response.loggers.entrySet()) {
+                loggers.add(new InternalLogger(logger.getKey(), logger.getValue().level, logger.getValue().syslogLevel));
+            }
+        } catch (APIException e) {
+            log.error("Unable to load loggers for node " + this, e);
+        } catch (IOException e) {
+            log.error("Unable to load loggers for node " + this, e);
+        }
+        return loggers;
     }
 
     public String getThreadDump() throws IOException, APIException {

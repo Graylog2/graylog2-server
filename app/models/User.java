@@ -24,9 +24,7 @@ import com.google.inject.assistedinject.AssistedInject;
 import lib.APIException;
 import lib.ApiClient;
 import models.api.requests.ChangeUserRequest;
-import models.api.requests.CreateUserRequest;
 import models.api.responses.system.UserResponse;
-import models.api.responses.system.UsersListResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import play.mvc.Http;
@@ -37,6 +35,7 @@ import java.util.List;
 public class User {
 	private static final Logger log = LoggerFactory.getLogger(User.class);
 
+    private final ApiClient api;
     @Deprecated
     private final String id;
     private final String name;
@@ -47,11 +46,12 @@ public class User {
     private final String passwordHash;
 
     @AssistedInject
-    public User(@Assisted UserResponse ur, @Assisted String passwordHash) {
-        this(ur.id, ur.username, ur.email, ur.fullName, ur.permissions, passwordHash);
+    public User(ApiClient api, @Assisted UserResponse ur, @Assisted String passwordHash) {
+        this(api, ur.id, ur.username, ur.email, ur.fullName, ur.permissions, passwordHash);
     }
 
-	public User(String id, String name, String email, String fullName, List<String> permissions, String passwordHash) {
+	public User(ApiClient api, String id, String name, String email, String fullName, List<String> permissions, String passwordHash) {
+        this.api = api;
         this.id = id;
         this.name = name;
 		this.email = email;
@@ -60,36 +60,9 @@ public class User {
         this.passwordHash = passwordHash;
     }
 
-    public static List<User> all() {
-        UsersListResponse response;
-        try {
-            response = ApiClient.get(UsersListResponse.class).path("/users").execute();
-            List<User> users = Lists.newArrayList();
-            for (UserResponse userResponse : response.users) {
-                users.add(new User(userResponse, null)); // we don't have password's for the user list, obviously
-            }
-            return users;
-        } catch (IOException e) {
-            log.error("Could not retrieve list of users", e);
-        } catch (APIException e) {
-            log.error("Could not retrieve list of users", e);
-        }
-        return Lists.newArrayList();
-    }
-
-    public static void create(CreateUserRequest request) {
-        try {
-            ApiClient.post().path("/users").body(request).expect(Http.Status.CREATED).execute();
-        } catch (APIException e) {
-            log.error("Unable to create user", e);
-        } catch (IOException e) {
-            log.error("Unable to create user", e);
-        }
-    }
-
     public void update(ChangeUserRequest request) {
         try {
-            ApiClient.put().path("/users/{0}", getName()).body(request).expect(Http.Status.NO_CONTENT).execute();
+            api.put().path("/users/{0}", getName()).body(request).expect(Http.Status.NO_CONTENT).execute();
         } catch (APIException e) {
             log.error("Unable to update user", e);
         } catch (IOException e) {

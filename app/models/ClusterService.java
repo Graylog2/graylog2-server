@@ -23,11 +23,12 @@ import com.google.common.collect.Lists;
 import com.google.inject.Inject;
 import lib.APIException;
 import lib.ApiClient;
-import models.api.responses.system.ESClusterHealthResponse;
-import models.api.responses.system.ServerJVMStatsResponse;
-import models.api.responses.system.ServerThroughputResponse;
+import lib.ServerNodes;
+import models.api.requests.SystemJobTriggerRequest;
+import models.api.responses.system.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import play.mvc.Http;
 
 import java.io.IOException;
 import java.util.Collection;
@@ -36,10 +37,74 @@ import java.util.List;
 public class ClusterService {
     private static final Logger log = LoggerFactory.getLogger(ClusterService.class);
     private final ApiClient api;
+    private final SystemJob.Factory systemJobFactory;
 
     @Inject
-    private ClusterService(ApiClient api) {
+    private ClusterService(ApiClient api, SystemJob.Factory systemJobFactory) {
         this.api = api;
+        this.systemJobFactory = systemJobFactory;
+    }
+
+    public void triggerSystemJob(SystemJob.Type type, User user) throws IOException, APIException {
+        api.post()
+                .path("/system/jobs")
+                .body(new SystemJobTriggerRequest(type, user))
+                .expect(Http.Status.ACCEPTED)
+                .execute();
+    }
+
+    public List<Notification> allNotifications() throws IOException, APIException {
+        GetNotificationsResponse r = api.get(GetNotificationsResponse.class).path("/system/notifications").execute();
+
+        List<Notification> notifications = Lists.newArrayList();
+        for (NotificationSummaryResponse notification : r.notifications) {
+            try {
+                notifications.add(new Notification(notification));
+            } catch(IllegalArgumentException e) {
+                play.Logger.warn("There is a notification type we can't handle: [" + notification.type + "]");
+                continue;
+            }
+        }
+
+        return notifications;
+    }
+
+    public void deleteNotification(Notification.Type type) throws APIException, IOException {
+        api.delete()
+                .path("/system/notifications/{0}", type.toString().toLowerCase())
+                .expect(204)
+                .execute();
+    }
+
+    public List<SystemMessage> getSystemMessages(int page) throws IOException, APIException {
+        GetSystemMessagesResponse r = api.get(GetSystemMessagesResponse.class)
+                .path("/system/messages")
+                .queryParam("page", page)
+                .execute();
+        List<SystemMessage> messages = Lists.newArrayList();
+        for (SystemMessageSummaryResponse message : r.messages) {
+            messages.add(new SystemMessage(message));
+        }
+
+        return messages;
+    }
+
+    public int getNumberOfSystemMessages() throws IOException, APIException {
+        return api.get(GetSystemMessagesResponse.class).path("/system/messages").execute().total;
+    }
+
+    public List<SystemJob> allSystemJobs() throws IOException, APIException {
+        List<SystemJob> jobs = Lists.newArrayList();
+
+        for(Node node : ServerNodes.all()) {
+            GetSystemJobsResponse r = api.get(GetSystemJobsResponse.class).node(node).path("/system/jobs").execute();
+
+            for (SystemJobSummaryResponse job : r.jobs) {
+                jobs.add(systemJobFactory.fromSummaryResponse(job));
+            }
+        }
+
+        return jobs;
     }
 
     public ESClusterHealth getESClusterHealth() {
