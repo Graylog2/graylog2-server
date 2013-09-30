@@ -18,9 +18,10 @@
  */
 package controllers;
 
+import com.google.inject.Inject;
 import lib.APIException;
 import lib.ApiClient;
-import models.Stream;
+import models.StreamService;
 import models.api.results.StreamsResult;
 import play.mvc.Result;
 
@@ -28,9 +29,12 @@ import java.io.IOException;
 
 public class StreamsController extends AuthenticatedController {
 
+    @Inject
+    private StreamService streamService;
+
 	public Result index() {
 		try {
-			StreamsResult streams = Stream.allEnabled();
+			StreamsResult streams = streamService.allEnabled();
 
 			return ok(views.html.streams.index.render(currentUser(), streams));
 		} catch (IOException e) {

@@ -18,14 +18,26 @@
  */
 package models;
 
-import models.api.responses.StreamSummaryResponse;
+import com.google.inject.Inject;
+import lib.APIException;
+import lib.ApiClient;
+import models.api.responses.GetStreamsResponse;
+import models.api.results.StreamsResult;
 
-public class Stream {
-	
-	private final String id;
+import java.io.IOException;
 
-	public Stream(StreamSummaryResponse ssr) {
-		this.id = ssr.id;
-	}
+public class StreamService {
 
+    private final ApiClient api;
+
+    @Inject
+    private StreamService(ApiClient api) {
+        this.api = api;
+    }
+
+    public StreamsResult allEnabled() throws IOException, APIException {
+        GetStreamsResponse r = api.get(GetStreamsResponse.class).path("/streams").execute();
+
+        return new StreamsResult(r.total, r.streams);
+    }
 }

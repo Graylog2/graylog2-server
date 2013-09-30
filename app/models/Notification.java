@@ -18,20 +18,12 @@
  */
 package models;
 
-import com.google.common.collect.Lists;
-import lib.APIException;
-import lib.ApiClient;
 import lib.notifications.DeflectorExistsAsIndexNotification;
 import lib.notifications.EsOpenFilesNotification;
 import lib.notifications.MultiMasterNotification;
 import lib.notifications.NotificationType;
-import models.api.responses.system.GetNotificationsResponse;
 import models.api.responses.system.NotificationSummaryResponse;
 import org.joda.time.DateTime;
-import play.Logger;
-
-import java.io.IOException;
-import java.util.List;
 
 /**
  * @author Lennart Koopmann <lennart@torch.sh>
@@ -41,7 +33,11 @@ public class Notification {
     public enum Type {
         DEFLECTOR_EXISTS_AS_INDEX,
         MULTI_MASTER,
-        ES_OPEN_FILES
+        ES_OPEN_FILES;
+
+        public static Type fromString(String name) {
+            return valueOf(name.toUpperCase());
+        }
     }
 
     public enum Severity {
@@ -69,35 +65,12 @@ public class Notification {
         throw new RuntimeException("No notification registered for " + type);
     }
 
-    public static void delete(Type type) throws APIException, IOException {
-        ApiClient.delete()
-                .path("/system/notifications/{0}", type.toString().toLowerCase())
-                .expect(204)
-                .execute();
-    }
-
     public Type getType() {
         return type;
     }
 
     public DateTime getTimestamp() {
         return timestamp;
-    }
-
-    public static List<Notification> all() throws IOException, APIException {
-        GetNotificationsResponse r = ApiClient.get(GetNotificationsResponse.class).path("/system/notifications").execute();
-
-        List<Notification> notifications = Lists.newArrayList();
-        for (NotificationSummaryResponse notification : r.notifications) {
-            try {
-                notifications.add(new Notification(notification));
-            } catch(IllegalArgumentException e) {
-                Logger.warn("There is a notification type we can't handle: [" + notification.type + "]");
-                continue;
-            }
-        }
-
-        return notifications;
     }
 
 }

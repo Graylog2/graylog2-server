@@ -45,10 +45,10 @@ public class SystemController extends AuthenticatedController {
 
     public Result index(Integer page) {
         try {
-            List<Notification> notifications = Notification.all();
-            List<SystemJob> systemJobs = SystemJob.all();
-            int totalSystemMessages = SystemMessage.total();
-            List<SystemMessage> systemMessages = SystemMessage.all(page-1);
+            List<Notification> notifications = clusterService.allNotifications();
+            List<SystemJob> systemJobs = clusterService.allSystemJobs();
+            int totalSystemMessages = clusterService.getNumberOfSystemMessages();
+            List<SystemMessage> systemMessages = clusterService.getSystemMessages(page - 1);
             ESClusterHealth clusterHealth = clusterService.getESClusterHealth();
 
             return ok(views.html.system.index.render(
