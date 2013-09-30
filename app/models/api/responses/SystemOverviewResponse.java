@@ -20,24 +20,21 @@ package models.api.responses;
 
 import com.google.gson.annotations.SerializedName;
 
-/**
- * @author Lennart Koopmann <lennart@torch.sh>
- */
-public class NodeSummaryResponse {
+public class SystemOverviewResponse {
 
-    @SerializedName("id")
-    public String nodeId;
+    public String facility;
 
-    @SerializedName("short_node_id")
-    public String shortNodeId;
+    public String codename;
 
-    @SerializedName("last_seen")
-    public String lastSeen;
+    @SerializedName("server_id")
+    public String serverId;
 
-    @SerializedName("transport_address")
-    public String transportAddress;
+    @SerializedName("started_at")
+    public String startedAt;
 
-    @SerializedName("is_master")
-    public boolean isMaster;
+    public String hostname;
+
+    @SerializedName("is_processing")
+    public boolean isProcessing;
 
 }

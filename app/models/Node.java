@@ -28,6 +28,7 @@ import lib.ExclusiveInputException;
 import models.api.requests.InputLaunchRequest;
 import models.api.responses.BuffersResponse;
 import models.api.responses.NodeSummaryResponse;
+import models.api.responses.SystemOverviewResponse;
 import models.api.responses.system.*;
 import models.api.responses.system.loggers.LoggerSummary;
 import models.api.responses.system.loggers.LoggersResponse;
@@ -58,9 +59,8 @@ public class Node {
     private final String nodeId;
     private final String shortNodeId;
 
-    private final String hostname;
     private final boolean isMaster;
-    private final boolean isProcessing;
+    private SystemOverviewResponse systemInfo;
 
     /* for initial set up in test */
     public Node(NodeSummaryResponse r) {
@@ -76,9 +76,7 @@ public class Node {
         lastSeen = new DateTime(r.lastSeen);
         nodeId = r.nodeId;
         shortNodeId = r.shortNodeId;
-        hostname = r.hostname;
         isMaster = r.isMaster;
-        isProcessing = r.isProcessing;
     }
 
     public BufferInfo getBufferInfo() {
@@ -203,6 +201,16 @@ public class Node {
         return types;
     }
 
+    public synchronized void loadSystemInformation() {
+        try {
+            systemInfo = api.get(SystemOverviewResponse.class).path("/system").node(this).execute();
+        } catch (APIException e) {
+            log.error("Unable to load system information for node " + this, e);
+        } catch (IOException e) {
+            log.error("Unable to load system information for node " + this, e);
+        }
+    }
+
     public String getTransportAddress() {
         return transportAddress;
     }
@@ -220,7 +228,10 @@ public class Node {
     }
 
     public String getHostname() {
-        return hostname;
+        if (systemInfo == null) {
+            loadSystemInformation();
+        }
+        return systemInfo.hostname;
     }
 
     public boolean isMaster() {
@@ -228,7 +239,10 @@ public class Node {
     }
 
     public boolean isProcessing() {
-        return isProcessing;
+        if (systemInfo == null) {
+            loadSystemInformation();
+        }
+        return systemInfo.isProcessing;
     }
 
     public void pause() throws IOException, APIException {
