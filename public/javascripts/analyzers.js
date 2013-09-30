@@ -170,7 +170,7 @@ $(document).ready(function() {
         }
 
         var button = $(".analyze-field .show-quickvalues[data-field=" + field + "]");
-        updatePosition(button, quickvalues);
+        updatePosition(button, quickvalues, direction);
 
         switch(direction)  {
             case "up":
@@ -288,15 +288,27 @@ $(document).ready(function() {
     (function updateAllPositions() {
         $(".quickvalues").each(function(i) {
             var button = $(".analyze-field .show-quickvalues[data-field=" + $(this).attr("data-field") + "]");
-            updatePosition(button, $(this));
+            updatePosition(button, $(this), calculateDirection(button));
         });
 
         setTimeout(updateAllPositions, 25);
     })();
 
-    function updatePosition(button, quickvalues) {
-        quickvalues.css("top", button.offset().top-$(window).scrollTop()-20);
-        quickvalues.css("left", button.offset().left-$(window).scrollLeft()-622);
+    function updatePosition(button, quickvalues, direction) {
+
+        var left = button.offset().left-$(window).scrollLeft()-622;
+
+        switch(direction)  {
+            case "up":
+                var top = button.offset().top-$(window).scrollTop()-390;
+                break;
+            case "down":
+                var top = button.offset().top-$(window).scrollTop()-20;
+                break;
+        }
+
+        quickvalues.css("top", top);
+        quickvalues.css("left", left);
     }
 
 });
