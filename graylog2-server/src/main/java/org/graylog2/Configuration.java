@@ -30,12 +30,10 @@ import com.github.joschi.jadconfig.validators.PositiveIntegerValidator;
 import com.google.common.collect.Lists;
 import com.lmax.disruptor.*;
 import com.mongodb.ServerAddress;
-import org.graylog2.plugin.Tools;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.ws.rs.core.UriBuilder;
-import java.net.SocketException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.UnknownHostException;
@@ -193,8 +191,8 @@ public class Configuration {
     @Parameter(value = "root_username", required = false)
     private String rootUsername = "admin";
 
-    @Parameter(value = "root_password_sha1", required = true)
-    private String rootPasswordSha1;
+    @Parameter(value = "root_password_sha2", required = true)
+    private String rootPasswordSha2;
 
     public boolean isMaster() {
         return isMaster;
@@ -455,8 +453,8 @@ public class Configuration {
         return rootUsername;
     }
 
-    public String getRootPasswordSha1() {
-        return rootPasswordSha1;
+    public String getRootPasswordSha2() {
+        return rootPasswordSha2;
     }
 
     public void setRestTransportUri(String restTransportUri) {

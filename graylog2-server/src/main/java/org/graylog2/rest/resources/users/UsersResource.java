@@ -24,6 +24,7 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
+import org.apache.shiro.crypto.hash.SimpleHash;
 import org.bson.types.ObjectId;
 import org.graylog2.database.ValidationException;
 import org.graylog2.rest.resources.RestResource;
@@ -94,7 +95,8 @@ public class UsersResource extends RestResource {
         // Create user.
         Map<String, Object> userData = Maps.newHashMap();
         userData.put("username", cr.username);
-        userData.put("password", cr.password);
+        final String hashedPassword = new SimpleHash("SHA-1", cr.password, core.getConfiguration().getPasswordSecret()).toString();
+        userData.put("password", hashedPassword);
         userData.put("full_name", cr.fullname);
         userData.put("email", cr.email);
         userData.put("permissions", cr.permissions);

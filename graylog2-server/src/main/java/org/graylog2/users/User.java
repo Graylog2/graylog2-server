@@ -95,30 +95,6 @@ public class User extends Persisted {
         return users;
     }
 
-    public static boolean exists(String username, String passwordHash, Core core) {
-        DBObject query = new BasicDBObject();
-        query.put(USERNAME, username);
-        query.put(PASSWORD, passwordHash);
-
-        List<DBObject> result = query(query, core, COLLECTION);
-
-        if (result == null)     { return false; }
-        if (result.size() == 0) { return false; }
-
-        if (result.size() > 1) {
-            throw new RuntimeException("There was more than one matching user. This should never happen.");
-        }
-
-        String dbUsername = (String) result.get(0).get(USERNAME);
-        String dbPasswordHash = (String) result.get(0).get(PASSWORD);
-
-        if (dbUsername != null && dbPasswordHash != null) {
-            return dbUsername.equals(username) && dbPasswordHash.equals(passwordHash);
-        }
-
-        return false;
-    }
-
     // TODO remove this and use a proper salted digest, this is not secure at all
     @Deprecated
     public static String saltPass(String password, String salt) {
@@ -190,6 +166,10 @@ public class User extends Persisted {
 
     public void setFullName(String fullname) {
         fields.put(FULL_NAME, fullname);
+    }
+
+    public String getHashedPassword() {
+        return fields.get(PASSWORD).toString();
     }
 
     private static class LocalAdminUser extends User {

@@ -64,16 +64,14 @@ public class MongoDbRealm extends AuthorizingRealm {
         UsernamePasswordToken token = (UsernamePasswordToken) authToken;
         log.debug("Retrieving authc info for user {}", token.getUsername());
 
-        final SimpleAccount simpleAccount;
-        if (User.exists(token.getUsername(), new String(token.getPassword()), core)) {
+        SimpleAccount simpleAccount = null;
+        final User user = User.load(token.getUsername(), core);
+        if (user != null) {
             simpleAccount = new SimpleAccount(token.getPrincipal(),
-                    token.getCredentials(),
+                    user.getHashedPassword(),
                     ByteSource.Util.bytes(core.getConfiguration().getPasswordSecret()),
                     "graylog2MongoDbRealm");
             log.debug("User {} authenticated by hashed password", token.getUsername());
-        } else {
-            log.warn("User {} could not be authenticated", token.getUsername());
-            throw new AuthenticationException("Unknown user or wrong credentials.");
         }
 
         return simpleAccount;

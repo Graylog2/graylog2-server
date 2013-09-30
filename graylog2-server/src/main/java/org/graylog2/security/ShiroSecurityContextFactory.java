@@ -22,6 +22,7 @@ package org.graylog2.security;
 import com.google.common.collect.Lists;
 import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.authc.UsernamePasswordToken;
+import org.apache.shiro.authc.credential.HashedCredentialsMatcher;
 import org.apache.shiro.mgt.DefaultSecurityManager;
 import org.apache.shiro.realm.Realm;
 import org.apache.shiro.subject.Subject;
@@ -48,10 +49,11 @@ public class ShiroSecurityContextFactory implements SecurityContextFactory {
         final Configuration config = core.getConfiguration();
         inMemoryRealm.addRootAccount(
                 config.getRootUsername(),
-                config.getRootPasswordSha1()
+                config.getRootPasswordSha2()
         );
 
         final MongoDbRealm mongoDbRealm = new MongoDbRealm(core);
+        mongoDbRealm.setCredentialsMatcher(new HashedCredentialsMatcher("SHA-1"));
         mongoDbRealm.setCachingEnabled(false);
 
         sm = new DefaultSecurityManager(Lists.<Realm>newArrayList(mongoDbRealm, inMemoryRealm));
