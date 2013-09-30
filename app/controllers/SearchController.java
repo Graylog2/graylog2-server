@@ -43,7 +43,7 @@ public class SearchController extends AuthenticatedController {
 
         // Histogram interval.
     	if (interval == null || interval.isEmpty() || !SearchTools.isAllowedDateHistogramInterval(interval)) {
-    		interval = "hour";
+    		interval = "minute";
     	}
 
         // Determine timerange type.
