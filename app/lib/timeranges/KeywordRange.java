@@ -37,7 +37,7 @@ public class KeywordRange extends TimeRange {
     }
 
     @Override
-    public Type getType() {
+    public TimeRange.Type getType() {
         return Type.KEYWORD;
     }
 

@@ -39,7 +39,7 @@ public class AbsoluteRange extends TimeRange {
     }
 
     @Override
-    public Type getType() {
+    public TimeRange.Type getType() {
         return Type.ABSOLUTE;
     }
 

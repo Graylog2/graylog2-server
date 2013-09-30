@@ -36,7 +36,7 @@ public class RelativeRange extends TimeRange {
         this.range = range;
     }
 
-    public Type getType() {
+    public TimeRange.Type getType() {
         return Type.RELATIVE;
     }
 
