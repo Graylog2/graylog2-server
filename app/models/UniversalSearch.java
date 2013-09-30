@@ -84,7 +84,7 @@ public class UniversalSearch {
     }
 
     public FieldTermsResponse fieldTerms(String field) throws IOException, APIException {
-        return ApiClient.get(FieldTermsResponse.class)
+        return api.get(FieldTermsResponse.class)
                 .path("/search/universal/{0}/terms", timeRange.getType().toString().toLowerCase())
                 .queryParam("field", field)
                 .queryParam("query", query)
