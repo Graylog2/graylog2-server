@@ -45,7 +45,7 @@ public class UsersController extends AuthenticatedController {
     private UserService userService;
 
     public Result index() {
-        final List<User> allUsers = User.all();
+        final List<User> allUsers = userService.all();
         final List<String> permissions = Permissions.all();
         return ok(views.html.system.users.index.render(currentUser(), allUsers, permissions));
     }
@@ -91,7 +91,7 @@ public class UsersController extends AuthenticatedController {
         }
         // hash it before sending it across
         request.password = new SimpleHash("SHA1", request.password).toString();
-        User.create(request);
+        userService.create(request);
         return redirect(routes.UsersController.index());
     }
 

@@ -18,16 +18,20 @@
  */
 package models;
 
+import com.google.common.collect.Lists;
 import com.google.inject.Inject;
 import lib.APIException;
 import lib.ApiClient;
+import models.api.requests.CreateUserRequest;
 import models.api.responses.system.UserResponse;
+import models.api.responses.system.UsersListResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import play.libs.Crypto;
 import play.mvc.Http;
 
 import java.io.IOException;
+import java.util.List;
 import java.util.StringTokenizer;
 
 public class UserService {
@@ -60,6 +64,33 @@ public class UserService {
         log.debug("Setting the request's current user to {}", user);
     }
 
+    public List<User> all() {
+        UsersListResponse response;
+        try {
+            response = api.get(UsersListResponse.class).path("/users").execute();
+            List<User> users = Lists.newArrayList();
+            for (UserResponse userResponse : response.users) {
+                users.add(new User(api, userResponse, null)); // we don't have password's for the user list, obviously
+            }
+            return users;
+        } catch (IOException e) {
+            log.error("Could not retrieve list of users", e);
+        } catch (APIException e) {
+            log.error("Could not retrieve list of users", e);
+        }
+        return Lists.newArrayList();
+    }
+
+    public void create(CreateUserRequest request) {
+        try {
+            api.post().path("/users").body(request).expect(Http.Status.CREATED).execute();
+        } catch (APIException e) {
+            log.error("Unable to create user", e);
+        } catch (IOException e) {
+            log.error("Unable to create user", e);
+        }
+    }
+
     public User load(String username) {
         final User currentUser = current();
         if (username.equals(currentUser.getName())) {
@@ -67,7 +98,7 @@ public class UserService {
         }
         // a different user was requested, go and fetch it from the server
         try {
-            final UserResponse response = ApiClient.get(UserResponse.class).path("/users/{0}", username).execute();
+            final UserResponse response = api.get(UserResponse.class).path("/users/{0}", username).execute();
             // TODO this user is not cached locally for now. we should be tracking REST requests.
             return userFactory.fromResponse(response, null);
         } catch (IOException e) {
@@ -104,7 +135,7 @@ public class UserService {
             }
         }
         try {
-            UserResponse response = ApiClient.get(UserResponse.class)
+            UserResponse response = api.get(UserResponse.class)
                     .credentials(userName, passwordSha1)
                     .path("/users/{0}", userName)
                     .execute();
