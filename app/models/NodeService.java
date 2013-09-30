@@ -19,15 +19,23 @@
 
 package models;
 
+import com.google.common.collect.Lists;
 import com.google.inject.Inject;
 import lib.APIException;
 import lib.ApiClient;
 import lib.ServerNodes;
 import models.api.responses.NodeSummaryResponse;
+import models.api.responses.system.loggers.LoggerSummary;
+import models.api.responses.system.loggers.LoggersResponse;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
+import java.util.List;
+import java.util.Map;
 
 public class NodeService {
+    private static final Logger log = LoggerFactory.getLogger(NodeService.class);
 
     private final ApiClient api;
     private final Node.Factory nodeFactory;
@@ -51,5 +59,24 @@ public class NodeService {
         } catch (APIException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    public List<InternalLogger> allLoggers(Node node) {
+        List<InternalLogger> loggers = Lists.newArrayList();
+        try {
+            LoggersResponse response = api.get(LoggersResponse.class)
+                    .node(node)
+                    .path("/system/loggers")
+                    .execute();
+
+            for (Map.Entry<String, LoggerSummary> logger : response.loggers.entrySet()) {
+                loggers.add(new InternalLogger(logger.getKey(), logger.getValue().level, logger.getValue().syslogLevel));
+            }
+        } catch (APIException e) {
+            log.error("Unable to load loggers for node " + node, e);
+        } catch (IOException e) {
+            log.error("Unable to load loggers for node " + node, e);
+        }
+        return loggers;
     }
 }
