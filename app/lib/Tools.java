@@ -21,6 +21,7 @@ package lib;
 import com.google.common.collect.Maps;
 import play.data.Form;
 import play.mvc.Controller;
+import play.mvc.Http;
 
 import java.util.Map;
 import java.util.Random;
@@ -95,4 +96,25 @@ public class Tools {
         // bind to the MyEntity form object
         return new Form<>(requestClass).bind(newData);
     }
+
+    public static String stringSearchParamOrEmpty(Http.Request request, String param) {
+        if (request.getQueryString(param) == null || request.getQueryString(param).isEmpty()) {
+            return "";
+        } else {
+            return request.getQueryString(param);
+        }
+    }
+
+    public static int intSearchParamOrEmpty(Http.Request request, String param) {
+        if (request.getQueryString(param) == null || request.getQueryString(param).isEmpty()) {
+            return 0;
+        } else {
+            try {
+                return Integer.parseInt(request.getQueryString(param));
+            } catch (NumberFormatException e) {
+                return 0;
+            }
+        }
+    }
+
 }

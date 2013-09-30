@@ -1,5 +1,22 @@
-@(currentUser: User, searchResult: api.results.SearchResult, histogram: api.results.DateHistogramResult, query: String)
+@(currentUser: User, search: UniversalSearch, searchResult: api.results.SearchResult, histogram: api.results.DateHistogramResult, query: String, page: Integer)
 @import views.helpers.DateHistogramResolutionSelector
+
+@paginatorLength() = @{10}
+
+@lowestPage() = @{
+    ((page.toDouble / paginatorLength()).floor * paginatorLength()).toInt
+}
+
+@highestPage() = @{
+    if ((lowestPage() + paginatorLength()) * UniversalSearch.PER_PAGE >= searchResult.getTotalResultCount)
+        searchResult.getTotalResultCount / UniversalSearch.PER_PAGE  + 1
+    else
+        lowestPage() + paginatorLength()
+}
+
+@route(page: Integer) = @{
+    search.getRoute(request, page);
+}
 
 @main("Search results", sidebars.searchresults(searchResult), query, currentUser) {
 
@@ -86,5 +103,51 @@
 		}
 	</tbody>
 </table>
+
+@****** extract this paginator to a partial! ****@
+
+<div class="pagination pagination-centered">
+    <ul>
+        @if(page == 1){
+            <li class="disabled"><a href="#">Previous</a></li>
+        } else {
+            <li><a href="@route(page-1)">Previous</a></li>
+
+        }
+
+        @if(page < paginatorLength()) {
+            <li class="disabled"><a href="#">&laquo;</a></li>
+        } else {
+            @if(lowestPage()-paginatorLength() <= 0) {
+                <li><a href="@route(1)">&laquo;</a></li>
+            } else {
+                <li><a href="@route(lowestPage()-paginatorLength())">&laquo;</a></li>
+            }
+        }
+
+        @for(i <- lowestPage().max(1) until page) {
+            <li><a href="@route(i)">@i</a></li>
+        }
+
+        <li class="active"><a href="#">@page</a></li>
+
+        @for(i <- page+1 to highestPage()) {
+            <li><a href="@route(i)">@i</a></li>
+        }
+
+        @if(highestPage() * UniversalSearch.PER_PAGE <= searchResult.getTotalResultCount && highestPage() > page && page * UniversalSearch.PER_PAGE != searchResult.getTotalResultCount) {
+            <li><a href="@route(highestPage())">&raquo;</a></li>
+        } else {
+            <li class="disabled"><a href="#">&raquo;</a></li>
+        }
+
+        @if(page < highestPage()) {
+            <li><a href="@route(page+1)">Next</a></li>
+        } else {
+            <li class="disabled"><a href="#">Next</a></li>
+
+        }
+    </ul>
+</div>
 
 }

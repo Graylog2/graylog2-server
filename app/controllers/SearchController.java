@@ -36,7 +36,9 @@ public class SearchController extends AuthenticatedController {
     @Inject
     private UniversalSearch.Factory searchFactory;
 
-    public Result index(String q, String rangeType, int relative, String from, String to, String keyword, String interval) {
+    public Result index(String q, String rangeType, int relative, String from, String to, String keyword, String interval, int page) {
+
+
     	if (q == null || q.isEmpty()) {
     		q = "*";
     	}
@@ -57,12 +59,12 @@ public class SearchController extends AuthenticatedController {
         }
 
 		try {
-			UniversalSearch search = searchFactory.queryWithRange(q, timerange);
+			UniversalSearch search = searchFactory.queryWithRangeAndPage(q, timerange, page);
 			SearchResult searchResult = FieldMapper.run(search.search());
 			DateHistogramResult histogramResult = search.dateHistogram(interval);
 
             if (searchResult.getTotalResultCount() > 0) {
-			    return ok(views.html.search.results.render(currentUser(), searchResult, histogramResult, q));
+			    return ok(views.html.search.results.render(currentUser(), search, searchResult, histogramResult, q, page));
             } else {
                 return ok(views.html.search.noresults.render(currentUser(), q));
             }
