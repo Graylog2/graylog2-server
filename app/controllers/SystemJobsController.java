@@ -18,8 +18,10 @@
  */
 package controllers;
 
+import com.google.inject.Inject;
 import lib.APIException;
 import lib.ApiClient;
+import models.ClusterService;
 import models.SystemJob;
 import play.Logger;
 import play.mvc.Http;
@@ -27,16 +29,13 @@ import play.mvc.Result;
 
 import java.io.IOException;
 
-import static controllers.AuthenticatedController.currentUser;
-import static play.mvc.Controller.request;
-import static play.mvc.Results.forbidden;
-import static play.mvc.Results.redirect;
-import static play.mvc.Results.status;
-
 /**
  * @author Lennart Koopmann <lennart@torch.sh>
  */
 public class SystemJobsController extends AuthenticatedController {
+
+    @Inject
+    private ClusterService clusterService;
 
     public Result trigger() {
         Http.RequestBody body = request().body();
@@ -47,7 +46,8 @@ public class SystemJobsController extends AuthenticatedController {
         }
 
         try {
-            SystemJob.trigger(SystemJob.Type.valueOf(body.asFormUrlEncoded().get("job")[0]), currentUser());
+            final String jobType = body.asFormUrlEncoded().get("job")[0];
+            clusterService.triggerSystemJob(SystemJob.Type.fromString(jobType), currentUser());
             return redirect(routes.SystemController.index(1));
         } catch (IOException e) {
             return status(504, views.html.errors.error.render(ApiClient.ERROR_MSG_IO, e, request()));

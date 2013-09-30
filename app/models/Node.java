@@ -62,6 +62,11 @@ public class Node {
     private final boolean isMaster;
     private final boolean isProcessing;
 
+    /* for initial set up in test */
+    public Node(NodeSummaryResponse r) {
+        this(null, null, r);
+    }
+
     @AssistedInject
     public Node(ApiClient api, Input.Factory inputFactory, @Assisted NodeSummaryResponse r) {
         this.api = api;

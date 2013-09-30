@@ -21,14 +21,9 @@ package models;
 import com.google.inject.Inject;
 import com.google.inject.assistedinject.Assisted;
 import com.google.inject.assistedinject.AssistedInject;
-import lib.APIException;
-import lib.ApiClient;
-import models.api.requests.SystemJobTriggerRequest;
 import models.api.responses.system.SystemJobSummaryResponse;
 import org.joda.time.DateTime;
-import play.mvc.Http;
 
-import java.io.IOException;
 import java.util.UUID;
 
 /**
@@ -45,7 +40,11 @@ public class SystemJob {
     // Some known SystemJob types that can be triggered manually from the web interface.
     public enum Type {
         FIX_DEFLECTOR_DELETE_INDEX,
-        FIX_DEFLECTOR_MOVE_INDEX
+        FIX_DEFLECTOR_MOVE_INDEX;
+
+        public static Type fromString(String name) {
+            return valueOf(name.toUpperCase());
+        }
     }
 
     private final UUID id;
@@ -67,14 +66,6 @@ public class SystemJob {
         this.percentComplete = s.percentComplete;
         this.isCancelable = s.isCancelable;
         this.providesProgress = s.providesProgress;
-    }
-
-    public static void trigger(Type type, User user) throws IOException, APIException {
-        ApiClient.post()
-                .path("/system/jobs")
-                .body(new SystemJobTriggerRequest(type, user))
-                .expect(Http.Status.ACCEPTED)
-                .execute();
     }
 
     public UUID getId() {

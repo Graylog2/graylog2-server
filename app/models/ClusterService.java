@@ -24,9 +24,11 @@ import com.google.inject.Inject;
 import lib.APIException;
 import lib.ApiClient;
 import lib.ServerNodes;
+import models.api.requests.SystemJobTriggerRequest;
 import models.api.responses.system.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import play.mvc.Http;
 
 import java.io.IOException;
 import java.util.Collection;
@@ -41,6 +43,14 @@ public class ClusterService {
     private ClusterService(ApiClient api, SystemJob.Factory systemJobFactory) {
         this.api = api;
         this.systemJobFactory = systemJobFactory;
+    }
+
+    public void triggerSystemJob(SystemJob.Type type, User user) throws IOException, APIException {
+        api.post()
+                .path("/system/jobs")
+                .body(new SystemJobTriggerRequest(type, user))
+                .expect(Http.Status.ACCEPTED)
+                .execute();
     }
 
     public List<Notification> allNotifications() throws IOException, APIException {

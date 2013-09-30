@@ -79,7 +79,7 @@ public class Global extends GlobalSettings {
         for (String uri : uris) {
             final NodeSummaryResponse r = new NodeSummaryResponse();
             r.transportAddress =  uri;
-            initialNodes[i++] = new Node(null, null, r);  // TODO DI this is wrong, can we use the factory already here?
+            initialNodes[i++] = new Node(r);  // TODO DI this is wrong, can we use the factory already here?
         }
 
         List<Module> modules = Lists.newArrayList();
