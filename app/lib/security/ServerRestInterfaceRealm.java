@@ -38,6 +38,7 @@ import play.libs.Crypto;
 import play.mvc.Http;
 
 import java.io.IOException;
+import java.net.ConnectException;
 
 /**
  * Shiro Realm implementation that uses a Graylog2-server as the source of the subject's information.
@@ -69,8 +70,8 @@ public class ServerRestInterfaceRealm extends AuthorizingRealm {
         }
         UsernamePasswordToken token = (UsernamePasswordToken) authToken;
         try {
-            final SimpleHash sha1 = new SimpleHash("SHA1", token.getPassword());
-            final String passwordHash = sha1.toString();
+            final SimpleHash sha2 = new SimpleHash("SHA-256", token.getPassword());
+            final String passwordHash = sha2.toString();
 
             log.debug("Trying to log in {} via REST", token.getUsername());
             response = api.get(UserResponse.class)
@@ -88,9 +89,14 @@ public class ServerRestInterfaceRealm extends AuthorizingRealm {
                     .authenticated(true)
                     .buildSubject();
         } catch (IOException e) {
-            throw new AuthenticationException("Unable to communicate with graylog2-server backend", e);
-        } catch (APIException e) {
             throw new Graylog2ServerUnavailableException("Could not connect to Graylog2 Server.", e);
+        } catch (APIException e) {
+            if (e.getCause() != null && e.getCause() instanceof ConnectException) {
+                throw new Graylog2ServerUnavailableException("Could not connect to Graylog2 Server.", e);
+            } else {
+                throw new AuthenticationException("Unable to communicate with graylog2-server backend", e);
+            }
+
             // throw new AuthenticationException("Server responded with non-200 code", e);
         }
         return new SimpleAuthenticationInfo(response.username, authToken.getCredentials(), "rest-interface");

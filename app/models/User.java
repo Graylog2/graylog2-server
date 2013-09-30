@@ -29,6 +29,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import play.mvc.Http;
 
+import javax.annotation.Nullable;
 import java.io.IOException;
 import java.util.List;
 
@@ -46,7 +47,7 @@ public class User {
     private final String passwordHash;
 
     @AssistedInject
-    public User(ApiClient api, @Assisted UserResponse ur, @Assisted String passwordHash) {
+    public User(ApiClient api, @Assisted UserResponse ur, @Nullable @Assisted String passwordHash) {
         this(api, ur.id, ur.username, ur.email, ur.fullName, ur.permissions, passwordHash);
     }
 
