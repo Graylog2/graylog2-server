@@ -18,16 +18,16 @@ env:
 before_script:
 - wget http://downloads.typesafe.com/play/${PLAY_VERSION}/play-${PLAY_VERSION}.zip
 - unzip -q play-${PLAY_VERSION}.zip
-- travis/graylog2-server.sh
+- # travis/graylog2-server.sh
 script: play-${PLAY_VERSION}/play test
 after_script:
 - kill `cat $HOME/graylog2-server/graylog2-travis-server.pid`
-- ls -lR1 $HOME/.m2/repository/
+- cat $HOME/.m2/repository/javax/inject/javax.inject/1/_maven.repositories
 services:
   - mongodb
   - elasticsearch
 addons:
-  sauce_connect: true
+  sauce_connect: false
 notifications:
   campfire:
     rooms:
