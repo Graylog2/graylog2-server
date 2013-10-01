@@ -22,6 +22,7 @@ before_script:
 script: play-${PLAY_VERSION}/play test
 after_script:
 - kill `cat $HOME/graylog2-server/graylog2-travis-server.pid`
+- ls -lR1 $HOME/.m2/repository/
 services:
   - mongodb
   - elasticsearch
