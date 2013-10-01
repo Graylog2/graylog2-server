@@ -24,9 +24,15 @@ import org.fluentlenium.adapter.FluentTest;
 import org.fluentlenium.adapter.util.SharedDriver;
 import org.fluentlenium.core.annotation.Page;
 import org.junit.Test;
+import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.firefox.FirefoxDriver;
+import org.openqa.selenium.remote.DesiredCapabilities;
+import org.openqa.selenium.remote.RemoteWebDriver;
 import selenium.pages.DashboardPage;
 import selenium.pages.LoginPage;
 
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -46,6 +52,34 @@ public class SessionsTest extends FluentTest {
     @Override
     public String getDefaultBaseUrl() {
         return "http://localhost:" + WEB_PORT + "/";
+    }
+
+    @Override
+    public WebDriver getDefaultDriver() {
+        String sauceUser = System.getenv("SAUCE_USERNAME");
+        String saucePassword = System.getenv("SAUCE_ACCESS_KEY");
+
+        // Decide whether to use sauceLabs or local browser to execute Selenium tests.
+        RemoteWebDriver driver;
+        if (sauceUser != null && saucePassword != null && !sauceUser.isEmpty() && !saucePassword.isEmpty()) {
+            URL saucelabs = null;
+            try {
+                saucelabs = new URL("http://" + sauceUser + ":" + saucePassword + "@localhost:4445/wd/hub");
+            } catch (MalformedURLException e) {
+                // ignore
+            }
+
+            // https://saucelabs.com/docs/platforms
+            DesiredCapabilities capabilities = DesiredCapabilities.firefox();
+            capabilities.setCapability("platform", "Windows 8");
+            capabilities.setCapability("version", "21");
+            capabilities.setCapability("tunnel-identifier", System.getenv("TRAVIS_JOB_NUMBER"));
+
+            driver = new RemoteWebDriver(saucelabs, capabilities);
+        } else {
+            driver = new FirefoxDriver();
+        }
+        return driver;
     }
 
     private Map<String, ? extends Object> getApplicationConfig() {
