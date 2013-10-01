@@ -43,6 +43,8 @@ import java.net.URL;
 import java.text.MessageFormat;
 import java.util.*;
 import java.util.concurrent.ExecutionException;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 
 @Singleton
 public class ApiClient {
@@ -50,7 +52,7 @@ public class ApiClient {
 
     public static final String ERROR_MSG_IO = "Could not connect to graylog2-server. Please make sure that it is running and you configured the correct REST URI.";
 
-    private static AsyncHttpClient client;
+    private AsyncHttpClient client;
     private final ServerNodes serverNodes;
     private Thread shutdownHook;
 
@@ -79,15 +81,15 @@ public class ApiClient {
     }
 
     // default visibility for access from tests (overrides the effects of initialize())
-    static void setHttpClient(AsyncHttpClient client) {
-        ApiClient.client = client;
+    public void setHttpClient(AsyncHttpClient client) {
+        this.client = client;
     }
 
     public <T> ApiRequestBuilder<T> get(Class<T> responseClass) {
-        return new ApiRequestBuilder<>(ApiRequestBuilder.Method.GET, responseClass);
+        return new ApiRequestBuilder<>(Method.GET, responseClass);
     }
     public <T> ApiRequestBuilder<T> post(Class<T> responseClass) {
-        return new ApiRequestBuilder<>(ApiRequestBuilder.Method.POST, responseClass);
+        return new ApiRequestBuilder<>(Method.POST, responseClass);
     }
 
     public ApiRequestBuilder<EmptyResponse> post() {
@@ -95,7 +97,7 @@ public class ApiClient {
     }
 
     public <T> ApiRequestBuilder<T> put(Class<T> responseClass) {
-        return new ApiRequestBuilder<>(ApiRequestBuilder.Method.PUT, responseClass);
+        return new ApiRequestBuilder<>(Method.PUT, responseClass);
     }
 
     public ApiRequestBuilder<EmptyResponse> put() {
@@ -103,7 +105,7 @@ public class ApiClient {
     }
 
     public <T> ApiRequestBuilder<T> delete(Class<T> responseClass) {
-        return new ApiRequestBuilder<>(ApiRequestBuilder.Method.DELETE, responseClass);
+        return new ApiRequestBuilder<>(Method.DELETE, responseClass);
     }
 
     public ApiRequestBuilder<EmptyResponse> delete() {
@@ -167,13 +169,14 @@ public class ApiClient {
     }
 
 
-    public static class ApiRequestBuilder<T> {
-        public static enum Method {
-            GET,
-            POST,
-            PUT,
-            DELETE
-        }
+    public enum Method {
+        GET,
+        POST,
+        PUT,
+        DELETE
+    }
+
+    public class ApiRequestBuilder<T> {
         private String pathTemplate;
         private Node node;
         private List<Node> nodes;
@@ -185,6 +188,8 @@ public class ApiClient {
         private final ArrayList<Object> pathParams = Lists.newArrayList();
         private final ArrayList<String> queryParams = Lists.newArrayList();
         private int httpStatusCode = Http.Status.OK;
+        private TimeUnit timeoutUnit = TimeUnit.SECONDS;
+        private int timeoutValue = 5;
 
         public ApiRequestBuilder(Method method, Class<T> responseClass) {
             this.method = method;
@@ -263,6 +268,12 @@ public class ApiClient {
             return this;
         }
 
+        public ApiRequestBuilder<T> timeout(int value, TimeUnit unit) {
+            this.timeoutValue = value;
+            this.timeoutUnit = unit;
+            return this;
+        }
+
         public T execute() throws APIException, IOException {
             if (node == null) {
                 if (nodes != null) {
@@ -273,11 +284,12 @@ public class ApiClient {
             final URL url = prepareUrl(node);
             final AsyncHttpClient.BoundRequestBuilder requestBuilder = requestBuilderForUrl(url);
 
+            final Request request = requestBuilder.build();
             if (log.isDebugEnabled()) {
-                log.debug("API Request: {}", requestBuilder.build().toString());
+                log.debug("API Request: {}", request.toString());
             }
             try {
-                Response response = requestBuilder.execute().get();
+                Response response = requestBuilder.execute().get(timeoutValue, timeoutUnit);
 
                 // TODO this is wrong, shouldn't it accept some callback instead of throwing an exception?
                 if (response.getStatusCode() != httpStatusCode) {
@@ -297,11 +309,14 @@ public class ApiClient {
                 throw new RuntimeException("Malformed URL.", e);
             } catch (ExecutionException e) {
                 log.error("REST call failed", e);
-                throw new APIException(-1, "REST call GET [" + url + "] failed: " + e.getMessage(), e.getCause());
+                throw new APIException(-1, "REST call " + request.getMethod() + " [" + request.getUrl() + "] failed: " + e.getMessage(), e.getCause());
             } catch (IOException e) {
                 // TODO
                 log.error("unhandled IOException", e);
                 throw e;
+            } catch (TimeoutException e) {
+                log.warn("Timed out requesting {}", request);
+                throw new APIException(-1, "REST call " + request.getMethod() + " [" + request.getUrl() + "] failed: " + e.getMessage(), e);
             }
             // TODO should this throw an exception instead?
             return null;
@@ -335,13 +350,15 @@ public class ApiClient {
             }
             for (ListenableFuture<Response> request : requests) {
                 try {
-                    final Response response = request.get();
+                    final Response response = request.get(timeoutValue, timeoutUnit);
                     results.add(deserializeJson(response, responseClass));
                 } catch (InterruptedException e) {
                     e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
                 } catch (ExecutionException e) {
                     e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
                 } catch (IOException e) {
+                    e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+                } catch (TimeoutException e) {
                     e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
                 }
             }
@@ -371,6 +388,7 @@ public class ApiClient {
             }
 
             applyBasicAuthentication(requestBuilder, url.getUserInfo());
+            requestBuilder.setPerRequestConfig(new PerRequestConfig(null, (int)timeoutUnit.toMillis(timeoutValue)));
 
             if (body != null) {
                 if (method != Method.PUT && method != Method.POST) {

@@ -40,6 +40,7 @@ import org.slf4j.LoggerFactory;
 import java.net.URL;
 import java.util.Collection;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 public class ApiClientTest {
     private static final Logger log = LoggerFactory.getLogger(ApiClientTest.class);
@@ -68,6 +69,7 @@ public class ApiClientTest {
 
         final Injector injector = setup(new Node[] {node});
         final ApiClient api = injector.getInstance(ApiClient.class);
+        api.setHttpClient(client);
 
         final URL url = api.get(EmptyResponse.class).path("/some/resource").credentials("user", "password").node(node).prepareUrl(node);
         final URL passwordWithAmpInUrl = api.get(EmptyResponse.class).path("/some/resource").credentials("user", "pass@word").node(node).prepareUrl(node);
@@ -92,8 +94,14 @@ public class ApiClientTest {
 
         final Injector injector = setup(new Node[] {node});
         final ApiClient api = injector.getInstance(ApiClient.class);
+        api.setHttpClient(client);
 
-        final ApiClient.ApiRequestBuilder<EmptyResponse> requestBuilder = api.get(EmptyResponse.class).path("/some/resource").credentials("user", "password").node(node);
+        final ApiClient.ApiRequestBuilder<EmptyResponse> requestBuilder =
+                api.get(EmptyResponse.class)
+                        .path("/some/resource")
+                        .credentials("user", "password")
+                        .node(node)
+                        .timeout(1, TimeUnit.SECONDS);
         stubHttpProvider.expectResponse(requestBuilder.prepareUrl(node), 200, "{}");
         final EmptyResponse response = requestBuilder.execute();
 
@@ -111,6 +119,7 @@ public class ApiClientTest {
 
         final Injector injector = setup(new Node[] {node1, node2});
         final ApiClient api = injector.getInstance(ApiClient.class);
+        api.setHttpClient(client);
 
         final ApiClient.ApiRequestBuilder<EmptyResponse> requestBuilder = api.get(EmptyResponse.class).path("/some/resource");
         final URL url1 = requestBuilder.prepareUrl(node1);
@@ -129,11 +138,11 @@ public class ApiClientTest {
         builder.setAllowPoolingConnection(false);
         stubHttpProvider = new StubHttpProvider();
         client = new AsyncHttpClient(stubHttpProvider, builder.build());
-        ApiClient.setHttpClient(client);
     }
 
     @After
     public void tearDown() throws Exception {
         client.close();
+        client = null;
     }
 }

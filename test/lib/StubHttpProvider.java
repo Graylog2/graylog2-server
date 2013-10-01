@@ -34,10 +34,7 @@ import java.nio.charset.Charset;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.concurrent.Callable;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.TimeoutException;
+import java.util.concurrent.*;
 
 public class StubHttpProvider implements AsyncHttpProvider {
 
@@ -148,7 +145,14 @@ public class StubHttpProvider implements AsyncHttpProvider {
         } catch (Exception e) {
             e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
         }
-        return new ImmediateFuture<>(t);
+        final T finalT = t;
+        final Future<T> futureT = Executors.newSingleThreadExecutor().submit(new Callable<T>() {
+            @Override
+            public T call() throws Exception {
+                return finalT;
+            }
+        });
+        return new ImmediateFuture<>(futureT);
     }
 
     @Override
@@ -305,9 +309,9 @@ public class StubHttpProvider implements AsyncHttpProvider {
 
     private class ImmediateFuture<V> extends AbstractListenableFuture<V> {
 
-        private final V response;
+        private final Future<V> response;
 
-        public ImmediateFuture(V response) {
+        public ImmediateFuture(Future<V> response) {
             this.response = response;
         }
 
@@ -354,12 +358,12 @@ public class StubHttpProvider implements AsyncHttpProvider {
 
         @Override
         public V get() throws InterruptedException, ExecutionException {
-            return response;
+            return response.get();
         }
 
         @Override
         public V get(long timeout, TimeUnit unit) throws InterruptedException, ExecutionException, TimeoutException {
-            return get();
+            return response.get(timeout, unit);
         }
     }
 }

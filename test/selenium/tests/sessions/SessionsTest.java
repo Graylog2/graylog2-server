@@ -19,6 +19,7 @@
  */
 package selenium.tests.sessions;
 
+import com.google.common.collect.Maps;
 import org.fluentlenium.adapter.FluentTest;
 import org.fluentlenium.adapter.util.SharedDriver;
 import org.fluentlenium.core.annotation.Page;
@@ -26,9 +27,11 @@ import org.junit.Test;
 import selenium.pages.DashboardPage;
 import selenium.pages.LoginPage;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import static org.fest.assertions.fluentlenium.FluentLeniumAssertions.assertThat;
-import static play.test.Helpers.running;
-import static play.test.Helpers.testServer;
+import static play.test.Helpers.*;
 
 /**
  * @author Lennart Koopmann <lennart@torch.sh>
@@ -45,9 +48,16 @@ public class SessionsTest extends FluentTest {
         return "http://localhost:" + WEB_PORT + "/";
     }
 
+    private Map<String, ? extends Object> getApplicationConfig() {
+        final HashMap map = Maps.newHashMap();
+        map.put("application.secret", "qwertyqwertyqwertyqwerty");
+        map.put("graylog2-server.uris", "http://localhost:12900");
+        return map;
+    }
+
     @Test
     public void login() {
-        running(testServer(WEB_PORT), new Runnable() {
+        running(testServer(WEB_PORT, fakeApplication(getApplicationConfig())), new Runnable() {
             @Override
             public void run() {
                 loginPage.go();
@@ -59,7 +69,7 @@ public class SessionsTest extends FluentTest {
 
     @Test
     public void loginErrorNoUser() {
-        running(testServer(WEB_PORT), new Runnable() {
+        running(testServer(WEB_PORT, fakeApplication(getApplicationConfig())), new Runnable() {
             @Override
             public void run() {
                 loginPage.go();
