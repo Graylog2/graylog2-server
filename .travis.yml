@@ -20,6 +20,7 @@ before_script:
 - unzip -q play-${PLAY_VERSION}.zip
 - travis/graylog2-server.sh
 script: play-${PLAY_VERSION}/play test
+after_script: ps awux | grep graylog2-server
 services:
   - mongodb
   - elasticsearch

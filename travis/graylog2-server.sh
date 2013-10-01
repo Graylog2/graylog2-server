@@ -1,6 +1,6 @@
 #!/bin/bash
 
-pushd $TRAVIS_HOME
+pushd $HOME
 
 git clone https://github.com/Graylog2/graylog2-server.git
 
