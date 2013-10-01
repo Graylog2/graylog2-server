@@ -13,5 +13,3 @@ cp $TRAVIS_BUILD_DIR/travis/server.conf graylog2-travis-server.conf
 nohup java -jar graylog2-server/target/graylog2-server.jar -f graylog2-travis-server.conf -l -p graylog2-travis-server.pid &
 
 popd
-
-mvn install:install-file -DgroupId=javax.inject -DartifactId=javax.inject -Dversion=1 -Dpackaging=jar -Dfile=travis/javax.inject-1.jar
