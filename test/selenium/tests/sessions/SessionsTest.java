@@ -95,7 +95,7 @@ public class SessionsTest extends FluentTest {
             @Override
             public void run() {
                 loginPage.go();
-                final DashboardPage dashboardPage = loginPage.loginAs("admin", "123123123");
+                final DashboardPage dashboardPage = loginPage.loginAs("admin", "admin");
                 assertThat(dashboardPage).isAt();
             }
         });
