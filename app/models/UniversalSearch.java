@@ -55,7 +55,12 @@ public class UniversalSearch {
         this.api = api;
         this.query = query;
         this.timeRange = timeRange;
-        this.page = page;
+
+        if (page == 0) {
+            this.page = 0;
+        } else {
+            this.page = page-1;
+        }
     }
 
     public SearchResult search() throws IOException, APIException {
