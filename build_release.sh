@@ -10,14 +10,16 @@ else
   exit 1
 fi  
 
-# move development.conf out of the conf folder so it's not included in the package
-mv conf/development.conf /tmp/gl2build-development.conf
+# move configs around so we have our standard config packaged
+mv conf/graylog2-web-interface.conf /tmp/gl2build-tmp.conf
+mv misc/graylog2-web-interface.conf.example conf/graylog2-web-interface.conf
 
 # .tar.gz
 play universal:package-zip-tarball
 
-# move development.conf back
-mv /tmp/gl2build-development.conf conf/development.conf
+# move local development config back
+mv /tmp/gl2build-tmp.conf conf/graylog2-web-interface.conf
+mv conf/graylog2-web-interface.conf misc/graylog2-web-interface.conf.example
 
 date
 echo "Your package(s) are ready at target/universal"

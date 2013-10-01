@@ -60,7 +60,6 @@ public class Global extends GlobalSettings {
 
     @Override
 	public void onStart(Application app) {
-System.out.println("START");
         final String appSecret = app.configuration().getString("application.secret");
         if (appSecret == null || appSecret.isEmpty()) {
             log.error("Please configure application.secret in your conf/graylog2-web-interface.conf");
