@@ -34,6 +34,7 @@ import org.apache.shiro.subject.PrincipalCollection;
 import org.apache.shiro.subject.Subject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import play.api.PlayException;
 import play.libs.Crypto;
 import play.mvc.Http;
 
@@ -98,6 +99,9 @@ public class ServerRestInterfaceRealm extends AuthorizingRealm {
             }
 
             // throw new AuthenticationException("Server responded with non-200 code", e);
+        } catch (PlayException e) {
+            log.error("Misconfigured play application. Please make sure your application.secret is longer than 16 characters!", e);
+            throw new RuntimeException(e);
         }
         return new SimpleAuthenticationInfo(response.username, authToken.getCredentials(), "rest-interface");
     }
