@@ -15,7 +15,7 @@ dist
 /.settings
 .ecltarget
 
-conf/development.conf
+conf/graylog2-web-interface.conf
 
 .target
 .DS_Store

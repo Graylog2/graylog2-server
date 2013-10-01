@@ -135,6 +135,13 @@ System.out.println("START");
 
     @Override
     public Configuration onLoadConfig(Configuration configuration, File file, ClassLoader classLoader) {
+        /*
+         *
+         * This is merging the standard bundled application.conf with our graylog2-web-interface.conf.
+         * The application.conf must always be empty when packaged so there is nothing hidden from the user.
+         * We are merging, because the Configuration object alreay contains some information the web-interface needs.
+         *
+         */
         return new Configuration(
                 ConfigFactory.parseFileAnySyntax(new File("conf/graylog2-web-interface.conf"))
                         .withFallback(configuration.getWrappedConfiguration().underlying())
