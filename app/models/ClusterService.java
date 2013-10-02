@@ -38,11 +38,13 @@ public class ClusterService {
     private static final Logger log = LoggerFactory.getLogger(ClusterService.class);
     private final ApiClient api;
     private final SystemJob.Factory systemJobFactory;
+    private final ServerNodes serverNodes;
 
     @Inject
-    private ClusterService(ApiClient api, SystemJob.Factory systemJobFactory) {
+    private ClusterService(ApiClient api, SystemJob.Factory systemJobFactory, ServerNodes serverNodes) {
         this.api = api;
         this.systemJobFactory = systemJobFactory;
+        this.serverNodes = serverNodes;
     }
 
     public void triggerSystemJob(SystemJob.Type type, User user) throws IOException, APIException {
@@ -96,7 +98,7 @@ public class ClusterService {
     public List<SystemJob> allSystemJobs() throws IOException, APIException {
         List<SystemJob> jobs = Lists.newArrayList();
 
-        for(Node node : ServerNodes.all()) {
+        for(Node node : serverNodes.all()) {
             GetSystemJobsResponse r = api.get(GetSystemJobsResponse.class).node(node).path("/system/jobs").execute();
 
             for (SystemJobSummaryResponse job : r.jobs) {

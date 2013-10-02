@@ -37,6 +37,8 @@ public class LoggingController extends AuthenticatedController {
 
     @Inject
     private NodeService nodeService;
+    @Inject
+    private ServerNodes serverNodes;
 
     public Result index() {
         BreadcrumbList bc = new BreadcrumbList();
@@ -44,7 +46,7 @@ public class LoggingController extends AuthenticatedController {
         bc.addCrumb("Logging", routes.LoggingController.index());
 
         Map<Node, List<InternalLogger>> loggers = Maps.newHashMap();
-        for (Node node : ServerNodes.all()) {
+        for (Node node : serverNodes.all()) {
             loggers.put(node, node.allLoggers());
         }
 

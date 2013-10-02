@@ -231,7 +231,7 @@ public class ApiClient {
         }
 
         public ApiRequestBuilder<T> fromAllNodes() {
-            this.nodes = ServerNodes.all();
+            this.nodes = serverNodes.all();
             return this;
         }
 
@@ -279,7 +279,7 @@ public class ApiClient {
                 if (nodes != null) {
                     log.error("Multiple nodes are set, but execute() was called. This is most likely a bug and you meant to call executeOnAll()!");
                 }
-                node(ServerNodes.any());
+                node(serverNodes.any());
             }
             final URL url = prepareUrl(node);
             final AsyncHttpClient.BoundRequestBuilder requestBuilder = requestBuilderForUrl(url);
@@ -325,7 +325,7 @@ public class ApiClient {
         public Collection<T> executeOnAll() {
             HashSet<T> results = Sets.newHashSet();
             if (node == null && nodes == null) {
-                nodes = ServerNodes.all();
+                nodes = serverNodes.all();
             }
 
             Collection<ListenableFuture<Response>> requests = Lists.newArrayList();

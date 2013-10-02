@@ -40,7 +40,6 @@ public class ServerNodes {
 
     private AtomicReference<ImmutableList<Node>> nodes = new AtomicReference<>();
 
-    private static ServerNodes INSTANCE;
     private static ImmutableList<Node> initialNodes;
 
     @Inject
@@ -48,27 +47,18 @@ public class ServerNodes {
         log.info("Creating ServerNodes with initial nodes {}", (Object)nodes);
         initialNodes = ImmutableList.copyOf(nodes);
         setCurrentNodes(initialNodes);
-        INSTANCE = this;
     }
 
-    public static ServerNodes getInstance() {
-        if (INSTANCE == null) {
-            throw new IllegalStateException("ServerNodes.initialize() was not called.");
-        }
-        return INSTANCE;
+    public List<Node> all() {
+        return nodes.get();
     }
 
-    public static List<Node> all() {
-        return getInstance().nodes.get();
+    public Node any() {
+        final ImmutableList<Node> nodeList = nodes.get();
+        return nodeList.get(random.nextInt(nodeList.size()));
     }
 
-    public static Node any() {
-        final ServerNodes instance = getInstance();
-        final ImmutableList<Node> nodeList = instance.nodes.get();
-        return nodeList.get(instance.random.nextInt(nodeList.size()));
-    }
-
-    public static Map<String, Node> asMap() {
+    public Map<String, Node> asMap() {
         Map<String, Node> map = Maps.newHashMap();
         for (Node node : all()) {
             map.put(node.getNodeId(), node);
@@ -78,6 +68,10 @@ public class ServerNodes {
     }
 
     public void setCurrentNodes(List<Node> nodeList) {
-        nodes.set(ImmutableList.copyOf(nodeList));
+        if (nodeList.isEmpty()) {
+            nodes.set(initialNodes);
+        } else {
+            nodes.set(ImmutableList.copyOf(nodeList));
+        }
     }
 }
