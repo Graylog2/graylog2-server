@@ -37,6 +37,7 @@ import org.graylog2.initializers.*;
 import org.graylog2.inputs.gelf.tcp.GELFTCPInput;
 import org.graylog2.inputs.gelf.http.GELFHttpInput;
 import org.graylog2.inputs.gelf.udp.GELFUDPInput;
+import org.graylog2.inputs.misc.jsonpath.JsonPathInput;
 import org.graylog2.inputs.misc.metrics.LocalMetricsInput;
 import org.graylog2.inputs.random.FakeHttpMessageInput;
 import org.graylog2.inputs.raw.tcp.RawTCPInput;
@@ -227,6 +228,7 @@ public final class Main {
         server.inputs().register(GELFHttpInput.class, GELFHttpInput.NAME);
         server.inputs().register(FakeHttpMessageInput.class, FakeHttpMessageInput.NAME);
         server.inputs().register(LocalMetricsInput.class, LocalMetricsInput.NAME);
+        server.inputs().register(JsonPathInput.class, JsonPathInput.NAME);
 
         // Register initializers.
         server.initializers().register(new DroolsInitializer());
