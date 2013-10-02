@@ -19,14 +19,12 @@
  */
 package org.graylog2.rest.documentation.generator;
 
+import com.google.common.collect.ComparisonChain;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import org.graylog2.Core;
 import org.graylog2.rest.documentation.annotations.*;
 import org.reflections.Reflections;
-import org.reflections.scanners.MethodAnnotationsScanner;
-import org.reflections.util.ClasspathHelper;
-import org.reflections.util.ConfigurationBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -34,9 +32,7 @@ import javax.ws.rs.*;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
 import java.lang.reflect.Type;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 /**
  * This is generating API information in Swagger format.
@@ -95,7 +91,12 @@ public class Generator {
 
                 apis.add(apiDescription);
             }
-
+            Collections.sort(apis, new Comparator<Map<String, Object>>() {
+                @Override
+                public int compare(Map<String, Object> o1, Map<String, Object> o2) {
+                    return ComparisonChain.start().compare(o1.get("name").toString(), o2.get("name").toString()).result();
+                }
+            });
             Map<String, String> info = Maps.newHashMap();
             info.put("title", "Graylog2 REST API");
 
