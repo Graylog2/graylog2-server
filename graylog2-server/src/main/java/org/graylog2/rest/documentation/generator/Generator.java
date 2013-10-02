@@ -191,6 +191,15 @@ public class Generator {
             basePath = basePath.substring(0, basePath.length() - 1);
         }
 
+        Collections.sort(apis, new Comparator<Map<String, Object>>() {
+            @Override
+            public int compare(Map<String, Object> o1, Map<String, Object> o2) {
+                return ComparisonChain.start()
+                        .compare(o1.get("path").toString(), o2.get("path").toString())
+                        .result();
+            }
+        });
+
         result.put("apis", apis);
         result.put("basePath", basePath);
         result.put("resourcePath", cleanRoute(route));
