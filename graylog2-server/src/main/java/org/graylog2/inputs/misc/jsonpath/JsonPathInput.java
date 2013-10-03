@@ -84,6 +84,8 @@ public class JsonPathInput extends MessageInput {
 
     @Override
     public void launch() throws MisfireException {
+        final MessageInput parentInput = this;
+
         Runnable task = new Runnable() {
             @Override
             public void run() {
@@ -108,6 +110,9 @@ public class JsonPathInput extends MessageInput {
 
                 Message m = new Message(selector.buildShortMessage(fields), config.getString(CK_SOURCE), Tools.getUTCTimestampWithMilliseconds());
                 m.addFields(fields);
+
+                // Add to buffer.
+                graylogServer.getProcessBuffer().insertCached(m, parentInput);
             }
         };
 

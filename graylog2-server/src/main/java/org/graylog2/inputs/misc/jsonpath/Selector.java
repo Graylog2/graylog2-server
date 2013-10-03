@@ -19,8 +19,12 @@
  */
 package org.graylog2.inputs.misc.jsonpath;
 
+import com.google.common.collect.Maps;
 import com.jayway.jsonpath.JsonPath;
+import net.minidev.json.JSONArray;
+import net.minidev.json.JSONObject;
 
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -34,15 +38,36 @@ public class Selector {
         this.jsonPath = jsonPath;
     }
 
+
+    // This returns a map of message fields because we may want to support reading multiple fields in the future.
     public Map<String, Object> read(String json) {
-        return jsonPath.read(json);
+        Object result = jsonPath.read(json);
+        Map<String, Object> fields = Maps.newHashMap();
+
+        if (result instanceof Integer || result instanceof Double || result instanceof Long) {
+            fields.put("result", result);
+            return fields;
+        }
+
+        if (result instanceof List) {
+            List list = (List) result;
+            if (!list.isEmpty()) {
+                fields.put("result", list.get(0).toString());
+                return fields;
+            }
+        }
+
+        // Now it's most likely a string or something we do not map.
+        fields.put("result", result.toString());
+        return fields;
     }
 
     public String buildShortMessage(Map<String, Object> fields) {
         StringBuilder shortMessage = new StringBuilder();
-        shortMessage.append(jsonPath.getPath()).append(":");
+        shortMessage.append("JSON API poll result: ");
+        shortMessage.append(jsonPath.getPath()).append(" -> ");
         if (fields.toString().length() > 50) {
-            shortMessage.append(fields.toString().substring(50));
+            shortMessage.append(fields.toString().substring(0, 50)).append("[...]");
         } else {
             shortMessage.append(fields.toString());
         }
