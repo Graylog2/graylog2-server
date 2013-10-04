@@ -454,7 +454,13 @@ $(document).ready(function() {
             scrollToSearchbarHint();
             query.effect("bounce");
             var originalQuery = query.val();
-            query.val(originalQuery + " AND " + field + ":" + value)
+
+            // If the query is "*", replace it fully. Makes no sense to generate "* AND foo:bar". (even though it would work)
+            if ($.trim(originalQuery) == "*") {
+                query.val(ourQuery);
+            } else {
+                query.val(originalQuery + " AND " + ourQuery)
+            }
         }
     });
 
