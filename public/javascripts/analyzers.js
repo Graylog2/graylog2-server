@@ -235,7 +235,9 @@ $(document).ready(function() {
 
                     var percent = (val/data.total*100);
 
-                    $(".terms tbody", quickvalues).append("<tr data-i='" + i + "' data-name='" + key + "'><td>" + key + "</td><td>" + percent.toFixed(2) + "%</td><td>" + val + "</td></tr>");
+                    var searchLink = "<a href='#' title='Search for this value. (Press shift to search immediately)' class='search-link' data-field='" + field + "' data-value='" + key + "'><i class='icon icon-search'></i></a>";
+
+                    $(".terms tbody", quickvalues).append("<tr data-i='" + i + "' data-name='" + key + "'><td>"+ searchLink +"</td><td>" + key + "</td><td>" + percent.toFixed(2) + "%</td><td>" + val + "</td></tr>");
                     $(".terms-distribution", quickvalues).append("<div class='terms-bar terms-bar-" + i + "' style='width: " + percent + "%; background-color: " + colors(i) + ";'></div>");
                 }
             },

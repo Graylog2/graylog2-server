@@ -1022,3 +1022,23 @@ form #stream-rules {
 .detail-message dl {
     margin-bottom: 0px;
 }
+
+#scroll-to-search-hint {
+    position: fixed;
+    left: 50%;
+    margin-left: -125px;
+    top: 50px;
+    color: #fff;
+    font-size: 80px;
+    padding: 25px;
+    z-index: 2000;
+    width: 200px;
+    text-align: center;
+    -webkit-border-radius: 10px 10px 10px 10px;
+    -moz-border-radius: 10px 10px 10px 10px;
+    border-radius: 10px 10px 10px 10px;
+}
+
+#scroll-to-search-hint, #scroll-to-search-hint i {
+    cursor: pointer;
+}

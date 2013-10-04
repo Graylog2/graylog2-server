@@ -429,6 +429,45 @@ $(document).ready(function() {
         checkboxes.prop("checked", checkboxes.prop("checked"));
     });
 
+    // Create a search on the fly.
+    $(".search-link").live("click", function(e) {
+        e.preventDefault();
+
+        var field = $(this).attr("data-field");
+        var value = $(this).attr("data-value");
+
+        // Check if both required fields are properly set.
+        if (field == undefined || value == undefined || field == "" || value == "") {
+            return;
+        }
+
+        var ourQuery = field + ":" + value;
+        var query = $("#universalsearch-query");
+
+        if (e.shiftKey) {
+            // Shift key was pressed. Replace full query and search directly.
+            query.val(ourQuery);
+            query.effect("bounce", { complete: function() {
+                $("#universalsearch form").submit();
+            }});
+        } else {
+            scrollToSearchbarHint();
+            query.effect("bounce");
+            var originalQuery = query.val();
+            query.val(originalQuery + " AND " + field + ":" + value)
+        }
+    });
+
+    $("#scroll-to-search-hint, #scroll-to-search-hint i").on("click", function() {
+        $("html, body").animate({ scrollTop: 0 }, "fast");
+    });
+
+    function scrollToSearchbarHint() {
+        if ($(document).scrollTop() > 50) {
+            $("#scroll-to-search-hint").fadeIn("fast").delay(1500).fadeOut("fast");
+        }
+    }
+
 	function displayFailureInSidebar(message) {
 		x = "<span class='alert alert-error sidebar-alert'><i class='icon-warning-sign'></i> " + message + "</span>"
 		$("#sidebar-inner").html(x);
