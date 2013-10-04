@@ -15,7 +15,7 @@
     <div class="content">
         <div class="inner-content">
             <ul class="search-result-fields">
-                @for(f <- searchResult.getFields()) {
+                @for(f <- searchResult.getFields().sortBy(_.getName)) {
                     <li>
                         <i class="icon icon-cog open-analyze-field"></i>
                         &nbsp;
