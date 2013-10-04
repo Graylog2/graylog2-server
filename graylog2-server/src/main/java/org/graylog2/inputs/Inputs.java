@@ -56,7 +56,7 @@ public class Inputs {
     private Map<String, String> availableInputs;
 
     private ExecutorService executor = Executors.newCachedThreadPool(
-            new ThreadFactoryBuilder().setNameFormat("systemjob-executor-%d").build()
+            new ThreadFactoryBuilder().setNameFormat("inputs-%d").build()
     );
 
     public Inputs(Core core) {
@@ -83,6 +83,8 @@ public class Inputs {
 
                     // Clean up.
                     cleanInput(input);
+                } catch(Exception e) {
+                    LOG.error("Error in input <{}>", input.getId(), e);
                 }
             }
         });
@@ -164,5 +166,6 @@ public class Inputs {
             launch(input, io.getInputId());
         }
     }
+
 
 }
