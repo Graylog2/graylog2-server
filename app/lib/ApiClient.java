@@ -293,7 +293,7 @@ public class ApiClient {
 
                 // TODO this is wrong, shouldn't it accept some callback instead of throwing an exception?
                 if (response.getStatusCode() != httpStatusCode) {
-                    throw new APIException(response.getStatusCode(), "REST call GET [" + url + "] returned " + response.getStatusText());
+                    throw new APIException(request, response);
                 }
 
                 // TODO: should we always insist on things being wrapped in json?
@@ -309,14 +309,13 @@ public class ApiClient {
                 throw new RuntimeException("Malformed URL.", e);
             } catch (ExecutionException e) {
                 log.error("REST call failed", e);
-                throw new APIException(-1, "REST call " + request.getMethod() + " [" + request.getUrl() + "] failed: " + e.getMessage(), e.getCause());
+                throw new APIException(request, e);
             } catch (IOException e) {
                 // TODO
                 log.error("unhandled IOException", e);
                 throw e;
             } catch (TimeoutException e) {
                 log.warn("Timed out requesting {}", request);
-                throw new APIException(-1, "REST call " + request.getMethod() + " [" + request.getUrl() + "] failed: " + e.getMessage(), e);
             }
             // TODO should this throw an exception instead?
             return null;

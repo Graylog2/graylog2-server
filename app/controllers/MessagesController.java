@@ -76,7 +76,7 @@ public class MessagesController extends AuthenticatedController {
 			
 			String analyzeField = (String) message.getFields().get(field);
 			if (analyzeField == null || analyzeField.isEmpty()) {
-				throw new APIException(404, "Message does not have requested field.");
+				return status(404, "Message does not have requested field " + field);
 			}
 			
 			MessageAnalyzeResult result = messagesService.analyze(index, analyzeField);
