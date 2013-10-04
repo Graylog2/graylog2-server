@@ -19,9 +19,11 @@
 package lib;
 
 import com.google.common.collect.Maps;
+import play.api.templates.Html;
 import play.data.Form;
 import play.mvc.Controller;
 import play.mvc.Http;
+import scala.collection.mutable.StringBuilder;
 
 import java.util.Map;
 import java.util.Random;
@@ -53,6 +55,24 @@ public class Tools {
         } else {
             return x;
         }
+    }
+
+    /**
+     * Turn the argument into either itself or a HTML-safe non-breaking space if it is a string.
+     * @return HTML-safe non-breaking space of the argument itself
+     */
+    public static Object orNbsp(Object x) {
+        if (x == null) {
+            return new Html(new StringBuilder("&nbsp;"));
+        }
+
+        if (x instanceof String) {
+            final String s = x.toString();
+            if (s.isEmpty()) {
+                return new Html(new StringBuilder("&nbsp;"));
+            }
+        }
+        return x;
     }
 
     public static String syslogLevelToHuman(int level) {

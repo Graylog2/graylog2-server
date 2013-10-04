@@ -37,7 +37,7 @@
                 <dl>
                 @for((key, value) <- message.getFields()) {
                     <dt style="float: left; padding-right: 5px;">@key:</dt>
-                    <dd style="word-wrap: break-word;">@lib.Tools.removeTrailingNewline(value)</dd>
+                    <dd style="word-wrap: break-word;">@lib.Tools.orNbsp(lib.Tools.removeTrailingNewline(value))</dd>
                 }
                 </dl>
             </div>
