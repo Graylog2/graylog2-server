@@ -131,6 +131,18 @@ h4 {
     margin-bottom: 0;
 }
 
+.universalsearch-form #search-container {
+    margin-left: 5px;
+}
+
+.universalsearch-form button {
+    font-size: 13px;
+}
+
+.universalsearch-form div .query {
+    overflow: hidden;
+}
+
 .universalsearch-form .query input {
 	font-family: monospace;
 	font-size: 13px;

@@ -9,10 +9,6 @@
                     value="@if(request.getQueryString("rangetype") == null) {relative} else {@request.getQueryString("rangetype")}"
                     id="universalsearch-rangetype" />
 
-            <div class="pull-right">
-                <input type="submit" class="btn btn-success btn-small" value="Search"/>
-            </div>
-
             @*** Those are never changed by JS and can be read by methods that need the *original* information. ***@
             @if(request.getQueryString("rangetype") != null && !request.getQueryString("rangetype").isEmpty) {
                 <span id="universalsearch-rangetype-permanent" style="display: none;">@request.getQueryString("rangetype")</span>
@@ -55,9 +51,11 @@
                 </div>
             </div>
 
-            <div class="query">
-                <input type="text" id="universalsearch-query" class="input-medium" name="q" value="@searchQuery"
-                    placeholder='Type your search query here and press enter. ("not found AND http) OR http_response_code:[400 TO *]' />
+            <div id="search-container">
+                <button type="submit" class="btn btn-success icon-search pull-left"></button>
+                <div class="query">
+                    <input type="text" id="universalsearch-query" name="q" value="@searchQuery" placeholder='Type your search qeuery here and press enter. ("not found AND http) OR http_response_code:[400 TO *]' />
+                </div>
             </div>
 
         </form>
