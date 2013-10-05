@@ -18,7 +18,6 @@
  */
 package lib;
 
-import com.google.common.base.Joiner;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
@@ -27,18 +26,17 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import com.ning.http.client.*;
 import models.Node;
-import models.User;
-import models.UserService;
 import models.api.requests.ApiRequest;
 import models.api.responses.EmptyResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import play.libs.F;
 import play.mvc.Http;
 
+import javax.ws.rs.core.UriBuilder;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URI;
-import java.net.URISyntaxException;
 import java.net.URL;
 import java.text.MessageFormat;
 import java.util.*;
@@ -130,44 +128,6 @@ public class ApiClient {
         return new Gson().fromJson(response.getResponseBody("UTF-8"), responseClass);
     }
 
-    private static URL buildTarget(Node node, String resource, String query) throws MalformedURLException {
-        final User user = UserService.current();
-        String name = null;
-        String passwordHash = null;
-        if (user != null) {
-            name = user.getName();
-            passwordHash = user.getPasswordHash();
-        }
-        return buildTarget(node, resource, query, name, passwordHash);
-    }
-
-    private static URL buildTarget(Node node, String resource, String queryParams, String username, String password) throws MalformedURLException {
-        final URI targetAddress;
-        try {
-            final URI transportAddress = new URI(node.getTransportAddress());
-            final String userInfo;
-            if (username == null || password == null) {
-                userInfo = null;
-            }
-            else {
-                userInfo = username + ":" + password;
-            }
-
-            String path = resource;
-            if (! resource.startsWith("/")) {
-                path = "/" + resource;
-            }
-            targetAddress = new URI(transportAddress.getScheme(), userInfo, transportAddress.getHost(), transportAddress.getPort(), path, queryParams, null);
-
-        } catch (URISyntaxException e) {
-            log.error("Could not create target URI", e);
-            return null;
-        }
-        final String s = targetAddress.toASCIIString();
-        // FIXME this steht ab (fixes https://github.com/Graylog2/graylog2-server/issues/223)
-        return new URL(s.replace("+", "%2b"));
-    }
-
 
     public enum Method {
         GET,
@@ -186,7 +146,7 @@ public class ApiClient {
         private ApiRequest body;
         private final Class<T> responseClass;
         private final ArrayList<Object> pathParams = Lists.newArrayList();
-        private final ArrayList<String> queryParams = Lists.newArrayList();
+        private final ArrayList<F.Tuple<String,String>> queryParams = Lists.newArrayList();
         private int httpStatusCode = Http.Status.OK;
         private TimeUnit timeoutUnit = TimeUnit.SECONDS;
         private int timeoutValue = 5;
@@ -236,7 +196,7 @@ public class ApiClient {
         }
 
         public ApiRequestBuilder<T> queryParam(String name, String value) {
-            queryParams.add(name + "=" + value);
+            queryParams.add(F.Tuple(name, value));
             return this;
         }
 
@@ -409,24 +369,25 @@ public class ApiClient {
             // if this is null there's not much we can do anyway...
             Preconditions.checkNotNull(pathTemplate, "path() needs to be set to a non-null value.");
 
-            final URL builtUrl;
+            URI builtUrl;
             try {
                 String path = MessageFormat.format(pathTemplate, pathParams.toArray());
-                String query = null;
-                if (!queryParams.isEmpty()) {
-                    query = Joiner.on('&').join(queryParams);
+                final UriBuilder uriBuilder = UriBuilder.fromUri(node.getTransportAddress());
+                uriBuilder.path(path);
+                for (F.Tuple<String, String> queryParam : queryParams) {
+                    uriBuilder.queryParam(queryParam._1, queryParam._2);
                 }
+
                 if (username != null && password != null) {
-                    builtUrl = buildTarget(node, path, query, username, password);
-                } else {
-                    builtUrl = buildTarget(node, path, query);
+                    uriBuilder.userInfo(username + ":" + password);
                 }
+                builtUrl = uriBuilder.build();
+                return builtUrl.toURL();
             } catch (MalformedURLException e) {
                 // TODO handle this properly
                 log.error("Could not build target URL", e);
                 throw new RuntimeException(e);
             }
-            return builtUrl;
         }
     }
 }

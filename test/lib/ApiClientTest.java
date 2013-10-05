@@ -79,11 +79,14 @@ public class ApiClientTest {
         Assert.assertEquals(url.getUserInfo(), "user:password");
         Assert.assertEquals("password should be escaped", "user:pass%40word", passwordWithAmpInUrl.getUserInfo());
         Assert.assertEquals("username should be escaped", "us%40er:password", usernameWithAmpInUrl.getUserInfo());
-        Assert.assertEquals("query param with + should be escaped", "query=%20(.%2b)", queryParamWithPlus.getQuery());
+        Assert.assertEquals("query param with + should be escaped", "query=+(.%2B)", queryParamWithPlus.getQuery());
 
         final URL urlWithNonAsciiChars = api.get(EmptyResponse.class).node(node).path("/some/resourçe").credentials("Sigurðsson", "password").prepareUrl(node);
         Assert.assertEquals("non-ascii chars are escaped in path", "/some/resour%C3%A7e", urlWithNonAsciiChars.getPath());
         Assert.assertEquals("non-ascii chars are escape in userinfo", "Sigur%C3%B0sson:password", urlWithNonAsciiChars.getUserInfo());
+
+        final URL queryWithAmp = api.get(EmptyResponse.class).node(node).path("/").queryParam("foo", "this&that").prepareUrl(node);
+        Assert.assertEquals("Query params are escaped", "foo=this%26that", queryWithAmp.getQuery());
     }
 
     @Test

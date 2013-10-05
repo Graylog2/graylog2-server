@@ -23,15 +23,15 @@ object ApplicationBuild extends Build {
     "org.fluentlenium" % "fluentlenium-core" % "0.9.0" % "test",
     "org.fluentlenium" % "fluentlenium-festassert" % "0.9.0" % "test",
     "org.mockito" % "mockito-all" % "1.9.5" % "test",
-    "javax.ws.rs" % "jsr311-api" % "0.11" % "test",
+    "javax.ws.rs" % "jsr311-api" % "0.11",
     "com.sun.jersey" % "jersey-grizzly2" % "1.17.1" % "test",
     "com.sun.jersey" % "jersey-bundle" % "1.17.1" % "test",
-    "com.sun.jersey" % "jersey-server" % "1.17.1" % "test",
+    "com.sun.jersey" % "jersey-server" % "1.17.1",
     "org.codehaus.jackson" % "jackson-core-asl" % "1.9.12" % "test"
 )
 
   val main = play.Project(appName, appVersion, appDependencies).settings(
-    // Add your own project settings here      
+    // Add your own project settings here
   )
 
 }
