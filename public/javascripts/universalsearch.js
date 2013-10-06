@@ -17,7 +17,7 @@ $(document).ready(function() {
     $("#universalsearch .timerange-selector-container .absolute .date-select").datepicker({
         format: "yyyy-mm-dd"
     }).on("changeDate", function(ev) {
-        $(this).val($(this).val() + " 00-00-00");
+        $(this).val($(this).val() + " 00:00:00");
     });
 
     $("#universalsearch .timerange-selector-container .absolute .set-to-now").on("click", function() {
@@ -70,7 +70,7 @@ $(document).ready(function() {
         var minute = ('0' + date.getMinutes()).slice(-2);
         var second = ('0' + date.getSeconds()).slice(-2);
 
-        return year + "-" + month + "-" + day + " " + hour + "-" + minute + "-" + second;
+        return year + "-" + month + "-" + day + " " + hour + ":" + minute + ":" + second;
     }
 
 });

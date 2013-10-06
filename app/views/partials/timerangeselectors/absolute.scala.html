@@ -5,7 +5,7 @@
 
     <input type="text"
            name="from"
-           placeholder="yyyy-MM-dd HH-mm-ss.SSS"
+           placeholder="@lib.DateFormat.ES_DATE_FORMAT"
 
            @if(request.getQueryString("rangetype") != null && request.getQueryString("rangetype").equals("absolute")) {
                 value="@request.getQueryString("from")"
@@ -22,7 +22,7 @@
 <div class="input-append">
     <input type="text"
            name="to"
-           placeholder="yyyy-MM-dd HH-mm-ss.SSS"
+           placeholder="@lib.DateFormat.ES_DATE_FORMAT"
 
            @if(request.getQueryString("rangetype") != null && request.getQueryString("rangetype").equals("absolute")) {
                 value="@request.getQueryString("to")"
