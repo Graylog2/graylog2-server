@@ -41,6 +41,13 @@ public class SystemMessage {
         this.nodeId = sms.nodeId;
     }
 
+    public SystemMessage(SystemMessage sm) {
+        this.timestamp = sm.timestamp;
+        this.caller = sm.caller;
+        this.content = sm.content;
+        this.nodeId = sm.nodeId;
+    }
+
     public DateTime getTimestamp() {
         return timestamp;
     }

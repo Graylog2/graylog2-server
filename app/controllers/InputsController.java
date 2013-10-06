@@ -59,12 +59,14 @@ public class InputsController extends AuthenticatedController {
         bc.addCrumb(node.getShortNodeId(), routes.SystemController.node(node.getNodeId()));
         bc.addCrumb("Inputs", routes.InputsController.manage(node.getNodeId()));
 
+        String highlightInputId = request().getQueryString("input_id");
         try {
             return ok(views.html.system.inputs.manage.render(
                     currentUser(),
                     bc,
                     node,
-                    node.getAllInputTypeInformation()
+                    node.getAllInputTypeInformation(),
+                    highlightInputId
             ));
         } catch (IOException e) {
             return status(500, views.html.errors.error.render(ApiClient.ERROR_MSG_IO, e, request()));
