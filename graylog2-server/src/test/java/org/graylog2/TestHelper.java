@@ -30,6 +30,7 @@ import java.util.zip.GZIPOutputStream;
 import org.graylog2.gelf.GELFMessageChunk;
 import org.graylog2.plugin.Message;
 import org.graylog2.plugin.Tools;
+import org.joda.time.DateTime;
 
 public class TestHelper {
 
@@ -89,7 +90,7 @@ public class TestHelper {
     }
     
     public static Message simpleLogMessage() {
-        Message m = new Message("bar", "foo", Tools.getUTCTimestampWithMilliseconds());
+        Message m = new Message("bar", "foo", new DateTime());
         
         return m;
     }

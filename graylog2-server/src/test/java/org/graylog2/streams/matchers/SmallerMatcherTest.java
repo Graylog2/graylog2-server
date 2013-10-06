@@ -24,6 +24,7 @@ import org.graylog2.plugin.Message;
 import org.bson.types.ObjectId;
 import com.mongodb.BasicDBObject;
 import org.graylog2.streams.StreamRuleImpl;
+import org.joda.time.DateTime;
 import org.junit.Test;
 import static org.junit.Assert.*;
 
@@ -38,7 +39,7 @@ public class SmallerMatcherTest {
 
         StreamRuleImpl rule = new StreamRuleImpl(mongoRule);
 
-        Message msg = new Message("foo", "bar", 0);
+        Message msg = new Message("foo", "bar", new DateTime());
         msg.addField("something", "20");
 
         SmallerMatcher matcher = new SmallerMatcher();
@@ -55,7 +56,7 @@ public class SmallerMatcherTest {
 
         StreamRuleImpl rule = new StreamRuleImpl(mongoRule);
 
-        Message msg = new Message("foo", "bar", 0);
+        Message msg = new Message("foo", "bar", new DateTime());
         msg.addField("something", "-90000");
 
         SmallerMatcher matcher = new SmallerMatcher();
@@ -72,7 +73,7 @@ public class SmallerMatcherTest {
 
         StreamRuleImpl rule = new StreamRuleImpl(mongoRule);
 
-        Message msg = new Message("foo", "bar", 0);
+        Message msg = new Message("foo", "bar", new DateTime());
         msg.addField("something", "27");
 
         SmallerMatcher matcher = new SmallerMatcher();
@@ -89,7 +90,7 @@ public class SmallerMatcherTest {
 
         StreamRuleImpl rule = new StreamRuleImpl(mongoRule);
 
-        Message msg = new Message("foo", "bar", 0);
+        Message msg = new Message("foo", "bar", new DateTime());
         msg.addField("something", "-9001");
 
         SmallerMatcher matcher = new SmallerMatcher();
@@ -106,7 +107,7 @@ public class SmallerMatcherTest {
 
         StreamRuleImpl rule = new StreamRuleImpl(mongoRule);
 
-        Message msg = new Message("foo", "bar", 0);
+        Message msg = new Message("foo", "bar", new DateTime());
         msg.addField("something", "-9001");
 
         SmallerMatcher matcher = new SmallerMatcher();

@@ -30,6 +30,7 @@ import org.graylog2.plugin.Message;
 import org.graylog2.plugin.Tools;
 import org.graylog2.plugin.buffers.BufferOutOfCapacityException;
 import org.graylog2.plugin.inputs.MessageInput;
+import org.joda.time.DateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -100,15 +101,19 @@ public class GELFProcessor {
         }
         
         // Timestamp.
-        double timestamp = doubleValue(json, "timestamp");
-        if (timestamp <= 0) {
-            timestamp = Tools.getUTCTimestampWithMilliseconds();
+        double messageTimestamp = doubleValue(json, "timestamp");
+        DateTime timestamp;
+        if (messageTimestamp <= 0) {
+            timestamp = new DateTime();
+        } else {
+            timestamp = Tools.dateTimeFromDouble(messageTimestamp);
         }
         
         Message lm = new Message(
         		this.stringValue(json, "short_message"),
         		this.stringValue(json, "host"),
-        		timestamp);
+        		timestamp
+        );
         
         lm.addField("full_message", this.stringValue(json, "full_message"));
         

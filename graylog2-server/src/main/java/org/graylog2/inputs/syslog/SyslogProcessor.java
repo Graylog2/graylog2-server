@@ -24,6 +24,7 @@ import com.codahale.metrics.Meter;
 import com.codahale.metrics.Timer;
 import org.graylog2.plugin.configuration.Configuration;
 import org.graylog2.plugin.inputs.MessageInput;
+import org.joda.time.DateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.graylog2.Core;
@@ -183,13 +184,12 @@ public class SyslogProcessor {
         return msg.getHost();
     }
 
-    private double parseDate(SyslogServerEventIF msg) throws IllegalStateException {
+    private DateTime parseDate(SyslogServerEventIF msg) throws IllegalStateException {
         // Check if date could be parsed.
         if (msg.getDate() == null) {
             if (config.getBoolean(SyslogInputBase.CK_ALLOW_OVERRIDE_DATE)) {
-                // empty Date constructor allocates a Date object and initializes it so that it represents the time at which it was allocated.
-                msg.setDate(new Date());
                 LOG.info("Date could not be parsed. Was set to NOW because {} is true.", SyslogInputBase.CK_ALLOW_OVERRIDE_DATE);
+                return new DateTime();
             } else {
                 LOG.info("Syslog message is missing date or date could not be parsed. (Possibly set {} to true) "
                         + "Not further handling. Message was: {}", SyslogInputBase.CK_ALLOW_OVERRIDE_DATE, new String(msg.getRaw()));
@@ -197,7 +197,7 @@ public class SyslogProcessor {
             }
         }
 
-        return Tools.getUTCTimestampWithMilliseconds(msg.getDate().getTime());
+        return new DateTime(msg.getDate());
     }
 
     /**

@@ -34,6 +34,7 @@ import org.graylog2.plugin.configuration.fields.NumberField;
 import org.graylog2.plugin.configuration.fields.TextField;
 import org.graylog2.plugin.inputs.MessageInput;
 import org.graylog2.plugin.inputs.MisfireException;
+import org.joda.time.DateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -112,7 +113,7 @@ public class JsonPathInput extends MessageInput {
                     Selector selector = new Selector(jsonPath);
                     Map<String, Object> fields = selector.read(json);
 
-                    Message m = new Message(selector.buildShortMessage(fields), config.getString(CK_SOURCE), Tools.getUTCTimestampWithMilliseconds());
+                    Message m = new Message(selector.buildShortMessage(fields), config.getString(CK_SOURCE), new DateTime());
                     m.addFields(fields);
 
                     // Add to buffer.

@@ -87,8 +87,8 @@ public class IndexHelper {
         }
 
         return FilterBuilders.rangeFilter("timestamp")
-                .gte(Tools.buildElasticSearchTimeFormatFromDateTime(fromDate))
-                .lte(Tools.buildElasticSearchTimeFormatFromDateTime(toDate));
+                .gte(Tools.buildElasticSearchTimeFormat(fromDate))
+                .lte(Tools.buildElasticSearchTimeFormat(toDate));
     }
 
     private static FilterBuilder relativeFilterBuilder(RelativeRange range) {
@@ -97,7 +97,7 @@ public class IndexHelper {
             from = Tools.getUTCTimestamp()-range.getRange();
         }
 
-        String fromDate = Tools.buildElasticSearchTimeFormatFromDouble(from);
+        String fromDate = Tools.buildElasticSearchTimeFormat(Tools.dateTimeFromDouble(from));
         return FilterBuilders.rangeFilter("timestamp")
                 .gte(fromDate);
     }

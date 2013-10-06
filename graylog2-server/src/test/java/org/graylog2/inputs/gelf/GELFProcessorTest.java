@@ -26,6 +26,7 @@ import org.graylog2.plugin.Tools;
 import org.graylog2.GraylogServerStub;
 import org.graylog2.TestHelper;
 import org.graylog2.plugin.Message;
+import org.joda.time.DateTime;
 import org.junit.Test;
 import static org.junit.Assert.*;
 
@@ -57,7 +58,7 @@ public class GELFProcessorTest {
         assertEquals("bar", lm.getField("source"));
         assertEquals("lol.js", lm.getField("file"));
         assertEquals(23L, lm.getField("line"));
-        assertEquals(usedTimestamp, (Double) lm.getField("timestamp"), 1e-8);
+        assertEquals(Tools.dateTimeFromDouble(usedTimestamp), lm.getField("timestamp"));
         assertEquals("ü", lm.getField("_lol_utf8"));
         assertEquals("bar", lm.getField("_foo"));
         assertEquals(11, lm.getFields().size());
@@ -74,7 +75,10 @@ public class GELFProcessorTest {
         Message lm = serverStub.lastInsertedToProcessBuffer;
 
         assertEquals(1, serverStub.callsToProcessBufferInserter);
-        assertEquals(Tools.getUTCTimestampWithMilliseconds(), (Double) lm.getField("timestamp"), 2);
+
+        // This or the last second is fine.
+        int messageSecond = ((DateTime) lm.getField("timestamp")).secondOfMinute().get();
+        assert(DateTime.now().secondOfMinute().get() == messageSecond || DateTime.now().secondOfMinute().get() == messageSecond-1);
     }
 
     @Test

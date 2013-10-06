@@ -30,6 +30,7 @@ import org.elasticsearch.action.admin.indices.mapping.put.PutMappingRequestBuild
 import org.elasticsearch.client.Client;
 
 import com.google.common.collect.Maps;
+import org.graylog2.plugin.Tools;
 
 
 /**
@@ -112,7 +113,7 @@ public class Mapping {
     private static Map<String, String> typeTimeWithMillis() {
         final Map<String, String> type = Maps.newHashMap();
         type.put("type", "date");
-        type.put("format", "yyyy-MM-dd HH-mm-ss.SSS");
+        type.put("format", Tools.ES_DATE_FORMAT);
 
         return type;
     }
