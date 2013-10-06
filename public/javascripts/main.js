@@ -123,9 +123,15 @@ $(document).ready(function() {
                 url: '/a/system/throughput',
                 success: function(data) {
                     $(".total-throughput").html(data.throughput);
+                    if (data.nodecount > 1) {
+                        $(".total-nodes").html(" across <strong>" + data.nodecount + "</strong> nodes");
+                    } else {
+                        $(".total-nodes").html(" on 1 node");
+                    }
                 },
                 error: function() {
                     $(".total-throughput").html("?");
+                    $(".total-nodes").html("?");
                 },
                 complete: function() {
                     setTimeout(updateTotalThroughput, 1000);

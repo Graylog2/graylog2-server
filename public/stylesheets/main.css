@@ -83,7 +83,12 @@ h4 {
 }
 
 #logout {
-	margin-top: -11px;
+	margin-top: -3px;
+    margin-right: 2px;
+}
+
+#global-throughput {
+    margin-right: 10px;
 }
 
 #search {

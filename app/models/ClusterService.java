@@ -28,6 +28,7 @@ import models.api.requests.SystemJobTriggerRequest;
 import models.api.responses.system.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import play.libs.F;
 import play.mvc.Http;
 
 import java.io.IOException;
@@ -132,13 +133,13 @@ public class ClusterService {
         return result;
     }
 
-    public int getClusterThroughput() {
+    public F.Tuple<Integer, Integer> getClusterThroughput() {
         final Collection<ServerThroughputResponse> responses =
                 api.get(ServerThroughputResponse.class).fromAllNodes().path("/system/throughput").executeOnAll();
         int t = 0;
         for (ServerThroughputResponse r : responses) {
             t += r.throughput;
         }
-        return t;
+        return F.Tuple(t, responses.size());
     }
 }

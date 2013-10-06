@@ -24,6 +24,7 @@ import com.google.gson.Gson;
 import com.google.inject.Inject;
 import lib.APIException;
 import models.*;
+import play.libs.F;
 import play.mvc.Http;
 import play.mvc.Result;
 
@@ -101,7 +102,9 @@ public class SystemApiController extends AuthenticatedController {
 
     public Result totalThroughput() {
         Map<String, Object> result = Maps.newHashMap();
-        result.put("throughput", clusterService.getClusterThroughput());
+        final F.Tuple<Integer, Integer> throughputPerNodes = clusterService.getClusterThroughput();
+        result.put("throughput", throughputPerNodes._1);
+        result.put("nodecount", throughputPerNodes._2);
 
         return ok(new Gson().toJson(result)).as("application/json");
     }
