@@ -65,7 +65,6 @@ public class UsersResource extends RestResource {
     })
     public Response get(@ApiParam(title = "username", description = "The username to return information for.", required = true) @PathParam("username") String username) {
         final User user = User.load(username, core);
-
         if (user == null) {
             return Response.status(Response.Status.NOT_FOUND).build();
         }
@@ -145,6 +144,9 @@ public class UsersResource extends RestResource {
         CreateRequest cr = getCreateRequest(body);
 
         final User user = User.load(username, core);
+        if (user == null) {
+            return Response.status(Response.Status.NOT_FOUND).build();
+        }
         if (user.isReadOnly()) {
             throw new BadRequestException("Cannot modify readonly user " + username);
         }
@@ -176,6 +178,9 @@ public class UsersResource extends RestResource {
     @ApiResponses({@ApiResponse(code = 400, message = "When attempting to remove a read only user (e.g. built-in or LDAP user).")})
     public Response deleteUser(@ApiParam(title = "username", description = "The name of the user to delete.", required = true) @PathParam("username") String username) {
         final User user = User.load(username, core);
+        if (user == null) {
+            return Response.status(Response.Status.NOT_FOUND).build();
+        }
         if (user.isReadOnly()) {
             throw new BadRequestException("Cannot delete readonly user " + username);
         }
@@ -202,6 +207,9 @@ public class UsersResource extends RestResource {
         }
 
         final User user = User.load(username, core);
+        if (user == null) {
+            return Response.status(Response.Status.NOT_FOUND).build();
+        }
         user.setPermissions(permissionRequest.permissions);
         try {
             user.save();
@@ -221,6 +229,9 @@ public class UsersResource extends RestResource {
     })
     public Response deletePermissions(@ApiParam(title = "username", description = "The name of the user to modify.", required = true) @PathParam("username") String username) {
         final User user = User.load(username, core);
+        if (user == null) {
+            return Response.status(Response.Status.NOT_FOUND).build();
+        }
         user.setPermissions(Lists.<String>newArrayList());
         try {
             user.save();
