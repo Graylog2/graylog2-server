@@ -558,6 +558,10 @@ String.prototype.splice = function( idx, rem, s ) {
     return (this.slice(0,idx) + s + this.slice(idx + Math.abs(rem)));
 };
 
+function htmlEscape(x) {
+    return $('<div/>').text(x).html();
+}
+
 function delayedAjaxCallOnKeyup(el, callback, delay) {
     var timer = null;
     el.onkeyup = function() {
