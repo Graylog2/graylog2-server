@@ -90,7 +90,7 @@ public class SessionsTest extends FluentTest {
         final FakeApplication application = fakeApplication();
         try {
             final File configFile = application.getWrappedApplication().getFile("conf/graylog2-web-interface.conf");
-            log.warn("Trying to create file " + configFile.getAbsolutePath() + " : " + configFile.createNewFile());
+            System.out.println("Trying to create file " + configFile.getAbsolutePath() + " : " + configFile.createNewFile());
             final BufferedWriter writer = new BufferedWriter(new FileWriter(configFile));
             writer.write("graylog2-server.uris=\"http://localhost:12900\"");
             writer.newLine();
@@ -99,7 +99,7 @@ public class SessionsTest extends FluentTest {
             writer.flush();
             writer.close();
         } catch (IOException e) {
-            log.error("could not write config file", e);
+            System.out.println("could not write config file " + e);
         }
         return application;
     }
