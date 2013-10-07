@@ -233,7 +233,7 @@ public class ToolsTest {
     public void testTimeFromDouble() {
         assert(Tools.dateTimeFromDouble(1381076986.306509).toString().startsWith("2013-10-06T18:29:46.307"));
         assert(Tools.dateTimeFromDouble(1381076986).toString().startsWith("2013-10-06T18:29:46"));
-        assert(Tools.dateTimeFromDouble(1381079085.6).toString().startsWith("2013-10-06T19:04:45.006"));
-        assert(Tools.dateTimeFromDouble(1381079085.06).toString().startsWith("2013-10-06T19:04:45.006"));
+        assert(Tools.dateTimeFromDouble(1381079085.6).toString().startsWith("2013-10-06T19:04:45.600"));
+        assert(Tools.dateTimeFromDouble(1381079085.06).toString().startsWith("2013-10-06T19:04:45.060"));
     }
 }

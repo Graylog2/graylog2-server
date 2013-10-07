@@ -48,8 +48,6 @@ public final class Tools {
     public static final String ES_DATE_FORMAT = "yyyy-MM-dd HH:mm:ss.SSS";
     public static final String ES_DATE_FORMAT_NO_MS = "yyyy-MM-dd HH:mm:ss";
 
-    private static final DecimalFormat doubleTimestampFormatter = new DecimalFormat("#.###");
-
     private Tools() { }
 
     /**
@@ -253,31 +251,11 @@ public final class Tools {
 
     /*
      * The double representation of a UNIX timestamp with milliseconds is a strange, human readable format.
-     * We need to rip it apart and build milliseconds since UNIX from it to have a long value.
      *
      * This sucks and no format should use the double representation. Change GELF to use long. (zomg)
      */
     public static DateTime dateTimeFromDouble(double x) {
-        String d = doubleTimestampFormatter.format(x);
-        int delimiterPos = d.indexOf(".");
-
-        int scan = 0;
-        if (delimiterPos == -1) {
-            scan = d.length();
-        } else {
-            scan = delimiterPos;
-        }
-
-        // Get everything to the delimiter and multiply *1000 to get a long of milliseconds since UNIX.
-        long epoch = Integer.parseInt(d.substring(0, scan))*1000L;
-
-        int fraction = 0;
-        if (delimiterPos != -1) {
-            // Add the fraction which already is in milliseconds.
-            fraction = Integer.parseInt(d.substring(scan+1));
-        }
-
-        return new DateTime(epoch + fraction);
+        return new DateTime(Math.round(x*1000));
     }
 
     /**
