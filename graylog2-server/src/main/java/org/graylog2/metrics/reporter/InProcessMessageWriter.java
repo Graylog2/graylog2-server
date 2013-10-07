@@ -25,7 +25,6 @@ import org.graylog2.plugin.Message;
 import org.graylog2.plugin.Tools;
 import org.graylog2.plugin.inputs.MessageInput;
 import org.joda.time.DateTime;
-import org.joda.time.DateTimeZone;
 
 import java.util.Map;
 
@@ -44,7 +43,7 @@ public class InProcessMessageWriter implements GELFTarget {
 
     @Override
     public void deliver(String shortMessage, String source, Map<String, Object> fields) {
-        Message message = new Message(shortMessage, source, new DateTime(DateTimeZone.UTC));
+        Message message = new Message(shortMessage, source, new DateTime());
         message.addFields(fields);
 
         message.addField("node_id", server.getNodeId());

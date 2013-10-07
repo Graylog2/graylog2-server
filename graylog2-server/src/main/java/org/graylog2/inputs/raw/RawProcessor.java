@@ -28,7 +28,6 @@ import org.graylog2.plugin.buffers.BufferOutOfCapacityException;
 import org.graylog2.plugin.configuration.Configuration;
 import org.graylog2.plugin.inputs.MessageInput;
 import org.joda.time.DateTime;
-import org.joda.time.DateTimeZone;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -69,7 +68,7 @@ public class RawProcessor {
         // Convert to LogMessage
         Message lm;
         try {
-            lm = new Message(msg, parseSource(msg, remoteAddress), new DateTime(DateTimeZone.UTC));
+            lm = new Message(msg, parseSource(msg, remoteAddress), new DateTime());
         } catch (Exception e) {
             failures.mark();
             LOG.error("Could not parse raw message. Not further handling.", e);
