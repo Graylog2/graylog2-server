@@ -131,7 +131,7 @@ $(document).ready(function() {
                 },
                 error: function() {
                     $(".total-throughput").html("?");
-                    $(".total-nodes").html("?");
+                    $(".total-nodes").html("");
                 },
                 complete: function() {
                     setTimeout(updateTotalThroughput, 1000);

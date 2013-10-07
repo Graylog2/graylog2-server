@@ -23,12 +23,14 @@ import models.User;
 import models.UserService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import play.mvc.Http;
 import play.mvc.Http.Context;
 import play.mvc.Result;
 import play.mvc.Security.Authenticator;
 
 public class RedirectAuthenticator extends Authenticator {
     private static final Logger log = LoggerFactory.getLogger(RedirectAuthenticator.class);
+    public static final String GRAYLOG_2_SERVER_MISSING_KEY = "GRAYLOG2SERVERMISSING";
 
     // TODO crutch, we need to write out own AuthenticatedAction filter... :(
     @Inject
@@ -36,15 +38,23 @@ public class RedirectAuthenticator extends Authenticator {
 
     @Override
     public String getUsername(Context ctx) {
-        final User sessionUser = userService.authenticateSessionUser();
-        if (sessionUser == null) {
+        try {
+            final User sessionUser = userService.authenticateSessionUser();
+            if (sessionUser == null) {
+                return null;
+            }
+            return sessionUser.getName();
+        } catch (Graylog2ServerUnavailableException e) {
+            ctx.args.put(GRAYLOG_2_SERVER_MISSING_KEY, e);
             return null;
         }
-        return sessionUser.getName();
     }
 
     @Override
 	public Result onUnauthorized(Context ctx) {
+        if (ctx.args.containsKey(GRAYLOG_2_SERVER_MISSING_KEY)) {
+            return status(Http.Status.GATEWAY_TIMEOUT);
+        }
 		return redirect(controllers.routes.SessionsController.index());
 	}
 	

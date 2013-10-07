@@ -22,6 +22,7 @@ import com.google.common.collect.Lists;
 import com.google.inject.Inject;
 import lib.APIException;
 import lib.ApiClient;
+import lib.security.Graylog2ServerUnavailableException;
 import models.api.requests.CreateUserRequest;
 import models.api.responses.system.UserResponse;
 import models.api.responses.system.UsersListResponse;
@@ -147,6 +148,9 @@ public class UserService {
             log.error("Could not reach graylog2 server", e);
         } catch (APIException e) {
             log.error("Unauthorized to load user " + userName, e);
+        } catch (Graylog2ServerUnavailableException e) {
+            // this leads to a different return code in RedirectAuthenticator.
+            throw e;
         }
         return null;
     }

@@ -25,6 +25,7 @@ import com.google.gson.Gson;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import com.ning.http.client.*;
+import lib.security.Graylog2ServerUnavailableException;
 import models.Node;
 import models.api.requests.ApiRequest;
 import models.api.responses.EmptyResponse;
@@ -35,6 +36,7 @@ import play.mvc.Http;
 
 import javax.ws.rs.core.UriBuilder;
 import java.io.IOException;
+import java.net.ConnectException;
 import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URL;
@@ -268,7 +270,10 @@ public class ApiClient {
                 log.error("Malformed URL", e);
                 throw new RuntimeException("Malformed URL.", e);
             } catch (ExecutionException e) {
-                log.error("REST call failed", e);
+                log.error("REST call failed", e.getCause());
+                if (e.getCause() instanceof ConnectException) {
+                    throw new Graylog2ServerUnavailableException(e);
+                }
                 throw new APIException(request, e);
             } catch (IOException e) {
                 // TODO
