@@ -35,7 +35,7 @@
         <div class="content">
             <div class="inner-content">
                 <dl>
-                @for((key, value) <- message.getFields().toList.sortBy {_._1}) {
+                @for((key, value) <- message.getFields()) {
                     <dt style="float: left; padding-right: 5px;">@key:</dt>
                     <dd style="word-wrap: break-word;">@lib.Tools.orNbsp(lib.Tools.removeTrailingNewline(value))</dd>
                 }
