@@ -27,7 +27,6 @@ package org.graylog2;
 import org.graylog2.plugin.Tools;
 import com.google.common.collect.Lists;
 import org.joda.time.DateTime;
-import org.joda.time.format.ISODateTimeFormat;
 import org.junit.Test;
 
 import java.io.ByteArrayOutputStream;
@@ -223,10 +222,10 @@ public class ToolsTest {
          * to avoid problems on test systems in other time zones, that are not CEST and do
          * not end with a +02:00 or shit.)
          */
-        assert(DateTime.parse("2013-09-15 02:21:02", Tools.timeFormatterWithOptionalMilliseconds()).toString().startsWith("2013-09-15T02:21:02.000"));
-        assert(DateTime.parse("2013-09-15 02:21:02.123", Tools.timeFormatterWithOptionalMilliseconds()).toString().startsWith("2013-09-15T02:21:02.123"));
-        assert(DateTime.parse("2013-09-15 02:21:02.12", Tools.timeFormatterWithOptionalMilliseconds()).toString().startsWith("2013-09-15T02:21:02.120"));
-        assert(DateTime.parse("2013-09-15 02:21:02.1", Tools.timeFormatterWithOptionalMilliseconds()).toString().startsWith("2013-09-15T02:21:02.100"));
+        assertTrue(DateTime.parse("2013-09-15 02:21:02", Tools.timeFormatterWithOptionalMilliseconds()).toString().startsWith("2013-09-15T02:21:02.000"));
+        assertTrue(DateTime.parse("2013-09-15 02:21:02.123", Tools.timeFormatterWithOptionalMilliseconds()).toString().startsWith("2013-09-15T02:21:02.123"));
+        assertTrue(DateTime.parse("2013-09-15 02:21:02.12", Tools.timeFormatterWithOptionalMilliseconds()).toString().startsWith("2013-09-15T02:21:02.120"));
+        assertTrue(DateTime.parse("2013-09-15 02:21:02.1", Tools.timeFormatterWithOptionalMilliseconds()).toString().startsWith("2013-09-15T02:21:02.100"));
     }
 
     @Test
@@ -234,7 +233,7 @@ public class ToolsTest {
         try {
             System.out.println(Tools.dateTimeFromDouble(1381076986.306509));
             System.out.println(Tools.dateTimeFromDouble(1381076986.306509).toString());
-            Tools.dateTimeFromDouble(1381076986.306509).toString().startsWith("2013-10-06T18:29:46.307");
+            System.out.println(Tools.dateTimeFromDouble(1381076986.306509).toString().startsWith("2013-10-06T18:29:46.307"));
             assertTrue(Tools.dateTimeFromDouble(1381076986.306509).toString().startsWith("2013-10-06T18:29:46.307"));
         } catch(Exception e) {
             e.printStackTrace();
