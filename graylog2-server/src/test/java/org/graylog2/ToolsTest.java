@@ -235,6 +235,7 @@ public class ToolsTest {
             System.out.println(Tools.dateTimeFromDouble(1381076986.306509));
             System.out.println(Tools.dateTimeFromDouble(1381076986.306509).toString());
             Tools.dateTimeFromDouble(1381076986.306509).toString().startsWith("2013-10-06T18:29:46.307");
+            assert(Tools.dateTimeFromDouble(1381076986.306509).toString().startsWith("2013-10-06T18:29:46.307"));
         } catch(Exception e) {
             e.printStackTrace();
         }
