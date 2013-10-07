@@ -22,6 +22,7 @@ package org.graylog2.inputs.random.generators;
 import org.graylog2.plugin.Message;
 import org.graylog2.plugin.Tools;
 import org.joda.time.DateTime;
+import org.joda.time.DateTimeZone;
 
 import java.util.*;
 
@@ -124,7 +125,7 @@ public class FakeHttpMessageGenerator {
         int tookMs = org.graylog2.inputs.random.generators.Tools.deviation(msBase, deviation, rand);
         UserId userId = getWeighted(USER_IDS);
 
-        Message msg = new Message(shortMessage("GET", resource.getResource(), code, tookMs), source, new DateTime());
+        Message msg = new Message(shortMessage("GET", resource.getResource(), code, tookMs), source, new DateTime(DateTimeZone.UTC));
 
         msg.addField("http_method", "GET");
         msg.addField("http_response_code", code);
@@ -146,11 +147,11 @@ public class FakeHttpMessageGenerator {
     }
 
     private Message successfulPOST() {
-        return new Message("successful POST", source, new DateTime());
+        return new Message("successful POST", source, new DateTime(DateTimeZone.UTC));
     }
 
     private Message failedPOST() {
-        return new Message("failed POST", source, new DateTime());
+        return new Message("failed POST", source, new DateTime(DateTimeZone.UTC));
     }
 
     // PUT
@@ -160,11 +161,11 @@ public class FakeHttpMessageGenerator {
     }
 
     private Message successfulPUT() {
-        return new Message("successful PUT", source, new DateTime());
+        return new Message("successful PUT", source, new DateTime(DateTimeZone.UTC));
     }
 
     private Message failedPUT() {
-        return new Message("failed PUT", source, new DateTime());
+        return new Message("failed PUT", source, new DateTime(DateTimeZone.UTC));
     }
 
     // DELETE
@@ -174,11 +175,11 @@ public class FakeHttpMessageGenerator {
     }
 
     private Message successfulDELETE() {
-        return new Message("successful DELETE", source, new DateTime());
+        return new Message("successful DELETE", source, new DateTime(DateTimeZone.UTC));
     }
 
     private Message failedDELETE() {
-        return new Message("failed DELETE", source, new DateTime());
+        return new Message("failed DELETE", source, new DateTime(DateTimeZone.UTC));
     }
 
     private abstract class Weighted {
