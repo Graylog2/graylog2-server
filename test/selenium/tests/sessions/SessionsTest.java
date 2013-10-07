@@ -27,6 +27,8 @@ import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.firefox.FirefoxDriver;
 import org.openqa.selenium.remote.DesiredCapabilities;
 import org.openqa.selenium.remote.RemoteWebDriver;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import play.test.FakeApplication;
 import selenium.pages.DashboardPage;
 import selenium.pages.LoginPage;
@@ -47,7 +49,7 @@ import static play.test.Helpers.*;
 @SharedDriver(type = SharedDriver.SharedType.PER_CLASS)
 public class SessionsTest extends FluentTest {
     public static final int WEB_PORT = 9999;
-
+    private static final Logger log = LoggerFactory.getLogger(SessionsTest.class);
     @Page
     public LoginPage loginPage;
 
@@ -88,7 +90,7 @@ public class SessionsTest extends FluentTest {
         final FakeApplication application = fakeApplication();
         try {
             final File configFile = application.getWrappedApplication().getFile("conf/graylog2-web-interface.conf");
-            configFile.createNewFile();
+            log.warn("Trying to create file " + configFile.getAbsolutePath() + " : " + configFile.createNewFile());
             final BufferedWriter writer = new BufferedWriter(new FileWriter(configFile));
             writer.write("graylog2-server.uris=\"http://localhost:12900\"");
             writer.newLine();
@@ -97,7 +99,7 @@ public class SessionsTest extends FluentTest {
             writer.flush();
             writer.close();
         } catch (IOException e) {
-
+            log.error("could not write config file", e);
         }
         return application;
     }

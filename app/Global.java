@@ -137,15 +137,15 @@ public class Global extends GlobalSettings {
     public Configuration onLoadConfig(Configuration configuration, File file, ClassLoader classLoader) {
         final File configFile = new File(file, "conf/graylog2-web-interface.conf");
         if (!configFile.exists()) {
-            log.error("Your configuration should be at {} but does not exist, cannot continue without it.", configFile);
+            log.error("Your configuration should be at {} but does not exist, cannot continue without it.", configFile.getAbsoluteFile());
             throw new IllegalStateException("Missing configuration file " + configFile.getAbsolutePath());
         } else if (!configFile.canRead()) {
-            log.error("Your configuration at {} is not readable, cannot continue without it.", configFile);
+            log.error("Your configuration at {} is not readable, cannot continue without it.", configFile.getAbsoluteFile());
             throw new IllegalStateException("Unreadable configuration file " + configFile.getAbsolutePath());
         }
         final Config config = ConfigFactory.parseFileAnySyntax(configFile);
         if (config.isEmpty()) {
-            log.error("Your configuration file at {} is empty, cannot continue without content.", configFile.getAbsolutePath());
+            log.error("Your configuration file at {} is empty, cannot continue without content.", configFile.getAbsoluteFile());
             throw new IllegalStateException("Empty configuration file " + configFile.getAbsolutePath());
         /*
          *
