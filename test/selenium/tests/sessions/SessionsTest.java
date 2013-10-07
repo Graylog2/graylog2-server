@@ -19,6 +19,7 @@
  */
 package selenium.tests.sessions;
 
+import com.google.common.collect.Maps;
 import org.fluentlenium.adapter.FluentTest;
 import org.fluentlenium.adapter.util.SharedDriver;
 import org.fluentlenium.core.annotation.Page;
@@ -33,12 +34,9 @@ import play.test.FakeApplication;
 import selenium.pages.DashboardPage;
 import selenium.pages.LoginPage;
 
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.Map;
 
 import static org.fest.assertions.fluentlenium.FluentLeniumAssertions.assertThat;
 import static play.test.Helpers.*;
@@ -87,21 +85,11 @@ public class SessionsTest extends FluentTest {
     }
 
     private FakeApplication getApp() {
-        final FakeApplication application = fakeApplication();
-        try {
-            final File configFile = application.getWrappedApplication().getFile("conf/graylog2-web-interface.conf");
-            System.out.println("Trying to create file " + configFile.getAbsolutePath() + " : " + configFile.createNewFile());
-            final BufferedWriter writer = new BufferedWriter(new FileWriter(configFile));
-            writer.write("graylog2-server.uris=\"http://localhost:12900\"");
-            writer.newLine();
-            writer.write("application.secret=\"qwertyqwertyqwertyqwerty\"");
-            writer.newLine();
-            writer.flush();
-            writer.close();
-        } catch (IOException e) {
-            System.out.println("could not write config file " + e);
-        }
-        return application;
+        System.setProperty("skip.config.check", "true");
+        Map<String, Object> options = Maps.newHashMap();
+        options.put("application.secret", "qwertyqwertyqwertyqwerty");
+        options.put("graylog2-server.uris", "http://localhost:12900");
+        return fakeApplication(options);
     }
 
     @Test

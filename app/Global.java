@@ -135,16 +135,23 @@ public class Global extends GlobalSettings {
 
     @Override
     public Configuration onLoadConfig(Configuration configuration, File file, ClassLoader classLoader) {
+        boolean isTest = false;
+        if (System.getProperty("skip.config.check", "false").equals("true")) {
+            log.info("In test mode, not performing config file checks.");
+            isTest = true;
+        }
         final File configFile = new File(file, "conf/graylog2-web-interface.conf");
-        if (!configFile.exists()) {
-            log.error("Your configuration should be at {} but does not exist, cannot continue without it.", configFile.getAbsoluteFile());
-            throw new IllegalStateException("Missing configuration file " + configFile.getAbsolutePath());
-        } else if (!configFile.canRead()) {
-            log.error("Your configuration at {} is not readable, cannot continue without it.", configFile.getAbsoluteFile());
-            throw new IllegalStateException("Unreadable configuration file " + configFile.getAbsolutePath());
+        if (! isTest) {
+            if (!configFile.exists()) {
+                log.error("Your configuration should be at {} but does not exist, cannot continue without it.", configFile.getAbsoluteFile());
+                throw new IllegalStateException("Missing configuration file " + configFile.getAbsolutePath());
+            } else if (!configFile.canRead()) {
+                log.error("Your configuration at {} is not readable, cannot continue without it.", configFile.getAbsoluteFile());
+                throw new IllegalStateException("Unreadable configuration file " + configFile.getAbsolutePath());
+            }
         }
         final Config config = ConfigFactory.parseFileAnySyntax(configFile);
-        if (config.isEmpty()) {
+        if (config.isEmpty() && !isTest) {
             log.error("Your configuration file at {} is empty, cannot continue without content.", configFile.getAbsoluteFile());
             throw new IllegalStateException("Empty configuration file " + configFile.getAbsolutePath());
         /*
