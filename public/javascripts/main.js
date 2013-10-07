@@ -447,6 +447,25 @@ $(document).ready(function() {
             return;
         }
 
+        // escape common lucene special characters: + - && || ! ( ) { } [ ] ^ " ~ * ? : \
+        value = value.replace(/\+/, "\\+", "g");
+        value = value.replace(/-/, "\\-", "g");
+        value = value.replace(/!/, "\\!", "g");
+        value = value.replace(/\\^/, "\\^", "g");
+        value = value.replace(/"/, "\\\"", "g");
+        value = value.replace(/~/, "\\~", "g");
+        value = value.replace(/\*/, "\\*", "g");
+        value = value.replace(/\?/, "\\?", "g");
+        value = value.replace(/:/, "\\:", "g");
+        value = value.replace(/\\/, "\\\\", "g");
+        value = value.replace(/\|\|/, "\\|\\|", "g");
+        value = value.replace(/&&/, "\\&\\&", "g");
+        value = value.replace(/\[/, "\\[", "g");
+        value = value.replace(/\]/, "\\]", "g");
+        value = value.replace(/\(/, "\\(", "g");
+        value = value.replace(/\)/, "\\)", "g");
+        value = value.replace(/\{/, "\\}", "g");
+        value = value.replace(/\}/, "\\}", "g");
         var ourQuery = field + ":" + value;
         var query = $("#universalsearch-query");
 
