@@ -47,7 +47,6 @@ import org.slf4j.LoggerFactory;
 import play.Application;
 import play.Configuration;
 import play.GlobalSettings;
-import play.Play;
 
 import java.io.File;
 import java.util.List;
@@ -137,17 +136,15 @@ public class Global extends GlobalSettings {
     @Override
     public Configuration onLoadConfig(Configuration configuration, File file, ClassLoader classLoader) {
         final File configFile = new File(file, "conf/graylog2-web-interface.conf");
-        if (!Play.isTest()) {
-            if (!configFile.exists()) {
-                log.error("Your configuration should be at {} but does not exist, cannot continue without it.", configFile);
-                throw new IllegalStateException("Missing configuration file " + configFile.getAbsolutePath());
-            } else if (!configFile.canRead()) {
-                log.error("Your configuration at {} is not readable, cannot continue without it.", configFile);
-                throw new IllegalStateException("Unreadable configuration file " + configFile.getAbsolutePath());
-            }
+        if (!configFile.exists()) {
+            log.error("Your configuration should be at {} but does not exist, cannot continue without it.", configFile);
+            throw new IllegalStateException("Missing configuration file " + configFile.getAbsolutePath());
+        } else if (!configFile.canRead()) {
+            log.error("Your configuration at {} is not readable, cannot continue without it.", configFile);
+            throw new IllegalStateException("Unreadable configuration file " + configFile.getAbsolutePath());
         }
         final Config config = ConfigFactory.parseFileAnySyntax(configFile);
-        if (config.isEmpty() && !Play.isTest()) {
+        if (config.isEmpty()) {
             log.error("Your configuration file at {} is empty, cannot continue without content.", configFile.getAbsolutePath());
             throw new IllegalStateException("Empty configuration file " + configFile.getAbsolutePath());
         /*

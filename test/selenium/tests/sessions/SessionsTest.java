@@ -19,7 +19,6 @@
  */
 package selenium.tests.sessions;
 
-import com.google.common.collect.Maps;
 import org.fluentlenium.adapter.FluentTest;
 import org.fluentlenium.adapter.util.SharedDriver;
 import org.fluentlenium.core.annotation.Page;
@@ -28,13 +27,16 @@ import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.firefox.FirefoxDriver;
 import org.openqa.selenium.remote.DesiredCapabilities;
 import org.openqa.selenium.remote.RemoteWebDriver;
+import play.test.FakeApplication;
 import selenium.pages.DashboardPage;
 import selenium.pages.LoginPage;
 
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.util.HashMap;
-import java.util.Map;
 
 import static org.fest.assertions.fluentlenium.FluentLeniumAssertions.assertThat;
 import static play.test.Helpers.*;
@@ -82,16 +84,27 @@ public class SessionsTest extends FluentTest {
         return driver;
     }
 
-    private Map<String, ? extends Object> getApplicationConfig() {
-        final HashMap map = Maps.newHashMap();
-        map.put("application.secret", "qwertyqwertyqwertyqwerty");
-        map.put("graylog2-server.uris", "http://localhost:12900");
-        return map;
+    private FakeApplication getApp() {
+        final FakeApplication application = fakeApplication();
+        try {
+            final File configFile = application.getWrappedApplication().getFile("conf/graylog2-web-interface.conf");
+            configFile.createNewFile();
+            final BufferedWriter writer = new BufferedWriter(new FileWriter(configFile));
+            writer.write("graylog2-server.uris=\"http://localhost:12900\"");
+            writer.newLine();
+            writer.write("application.secret=\"qwertyqwertyqwertyqwerty\"");
+            writer.newLine();
+            writer.flush();
+            writer.close();
+        } catch (IOException e) {
+
+        }
+        return application;
     }
 
     @Test
     public void login() {
-        running(testServer(WEB_PORT, fakeApplication(getApplicationConfig())), new Runnable() {
+        running(testServer(WEB_PORT, getApp()), new Runnable() {
             @Override
             public void run() {
                 loginPage.go();
@@ -103,7 +116,7 @@ public class SessionsTest extends FluentTest {
 
     @Test
     public void loginErrorNoUser() {
-        running(testServer(WEB_PORT, fakeApplication(getApplicationConfig())), new Runnable() {
+        running(testServer(WEB_PORT, getApp()), new Runnable() {
             @Override
             public void run() {
                 loginPage.go();
