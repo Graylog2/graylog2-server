@@ -235,14 +235,14 @@ public class ToolsTest {
             System.out.println(Tools.dateTimeFromDouble(1381076986.306509));
             System.out.println(Tools.dateTimeFromDouble(1381076986.306509).toString());
             Tools.dateTimeFromDouble(1381076986.306509).toString().startsWith("2013-10-06T18:29:46.307");
-            assert(Tools.dateTimeFromDouble(1381076986.306509).toString().startsWith("2013-10-06T18:29:46.307"));
+            assertTrue(Tools.dateTimeFromDouble(1381076986.306509).toString().startsWith("2013-10-06T18:29:46.307"));
         } catch(Exception e) {
             e.printStackTrace();
         }
 
-        assert(Tools.dateTimeFromDouble(1381076986.306509).toString().startsWith("2013-10-06T18:29:46.307"));
-        assert(Tools.dateTimeFromDouble(1381076986).toString().startsWith("2013-10-06T18:29:46"));
-        assert(Tools.dateTimeFromDouble(1381079085.6).toString().startsWith("2013-10-06T19:04:45.600"));
-        assert(Tools.dateTimeFromDouble(1381079085.06).toString().startsWith("2013-10-06T19:04:45.060"));
+        assertTrue(Tools.dateTimeFromDouble(1381076986.306509).toString().startsWith("2013-10-06T18:29:46.307"));
+        assertTrue(Tools.dateTimeFromDouble(1381076986).toString().startsWith("2013-10-06T18:29:46"));
+        assertTrue(Tools.dateTimeFromDouble(1381079085.6).toString().startsWith("2013-10-06T19:04:45.600"));
+        assertTrue(Tools.dateTimeFromDouble(1381079085.06).toString().startsWith("2013-10-06T19:04:45.060"));
     }
 }
