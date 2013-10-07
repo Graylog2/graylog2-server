@@ -255,7 +255,7 @@ public final class Tools {
      * This sucks and no format should use the double representation. Change GELF to use long. (zomg)
      */
     public static DateTime dateTimeFromDouble(double x) {
-        return new DateTime(Math.round(x*1000), DateTimeZone.UTC);
+        return new DateTime(Math.round(x*1000));
     }
 
     /**
