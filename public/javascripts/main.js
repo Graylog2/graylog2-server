@@ -474,6 +474,10 @@ $(document).ready(function() {
         $("html, body").animate({ scrollTop: 0 }, "fast");
     });
 
+    $("#global-throughput").on("click", function() {
+        window.location.href = "/system";
+    });
+
     function scrollToSearchbarHint() {
         if ($(document).scrollTop() > 50) {
             $("#scroll-to-search-hint").fadeIn("fast").delay(1500).fadeOut("fast");

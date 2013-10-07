@@ -88,7 +88,12 @@ h4 {
 }
 
 #global-throughput {
-    margin-right: 10px;
+    padding-top: 5px;
+    padding-bottom: 5px;
+    padding-right: 5px;
+    padding-left: 10px;
+    margin-right: 5px;
+    cursor: pointer;
 }
 
 #search {
@@ -1047,3 +1052,4 @@ form #stream-rules {
 #scroll-to-search-hint, #scroll-to-search-hint i {
     cursor: pointer;
 }
+
