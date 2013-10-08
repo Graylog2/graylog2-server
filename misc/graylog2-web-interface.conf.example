@@ -7,7 +7,3 @@ graylog2-server.uris=""
 # If you deploy your application to several instances be sure to use the same key!
 # Generate for example with: pwgen -s 96
 application.secret=""
-
-# HTTP listen port and address (Default: 0.0.0.0:9000)
-#http.http.port=9000
-#http.address=0.0.0.0
