@@ -27,6 +27,8 @@ import com.google.inject.Singleton;
 import com.ning.http.client.*;
 import lib.security.Graylog2ServerUnavailableException;
 import models.Node;
+import models.User;
+import models.UserService;
 import models.api.requests.ApiRequest;
 import models.api.responses.EmptyResponse;
 import org.slf4j.Logger;
@@ -152,6 +154,7 @@ public class ApiClient {
         private int httpStatusCode = Http.Status.OK;
         private TimeUnit timeoutUnit = TimeUnit.SECONDS;
         private int timeoutValue = 5;
+        private boolean unauthenticated = false;
 
         public ApiRequestBuilder(Method method, Class<T> responseClass) {
             this.method = method;
@@ -217,6 +220,11 @@ public class ApiClient {
         public ApiRequestBuilder<T> credentials(String username, String password) {
             this.username = username;
             this.password = password;
+            return this;
+        }
+
+        public ApiRequestBuilder<T> unauthenticated() {
+            this.unauthenticated = true;
             return this;
         }
 
@@ -383,6 +391,18 @@ public class ApiClient {
                     uriBuilder.queryParam(queryParam._1, queryParam._2);
                 }
 
+                if (unauthenticated) {
+                    if (username != null) {
+                        log.error("Both credentials() and unauthenticated() are set for this request, this is a bug, using current user.");
+                    }
+                }
+                if (!unauthenticated) {
+                    final User current = UserService.current();
+                    if (current != null) {
+                        username = current.getName();
+                        password = current.getPasswordHash();
+                    }
+                }
                 if (username != null && password != null) {
                     uriBuilder.userInfo(username + ":" + password);
                 }
