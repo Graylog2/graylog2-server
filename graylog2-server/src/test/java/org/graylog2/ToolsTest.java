@@ -153,9 +153,12 @@ public class ToolsTest {
     @Test
     public void testGenerateServerId() {
         String id = Tools.generateServerId();
-        
-        assertTrue(id.startsWith(Tools.getLocalHostname() + "-"));
-        assertTrue(id.length() > (Tools.getLocalHostname() + "-").length());
+
+        /*
+         * Make sure it has dashes in it. We need that to build a short ID later.
+         * Short version: Everything falls apart if this is not an UUID-style ID.
+         */
+        assertTrue(id.contains("-"));
     }
     
     @Test
