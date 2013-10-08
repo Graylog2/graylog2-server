@@ -1053,3 +1053,18 @@ form #stream-rules {
     cursor: pointer;
 }
 
+.graph-range-selector{
+    outline:1px solid #eee;
+    background: rgba(0,0,0,0.3);
+    position:absolute;
+    top:0;
+    z-index:1;
+    cursor:pointer;
+    pointer-events:none;
+}
+.rickshaw_graph:active,
+.rickshaw_graph:focus,
+.rickshaw_graph *:active,
+.rickshaw_graph *:focus{
+    cursor:crosshair !important;
+}

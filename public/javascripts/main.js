@@ -558,6 +558,18 @@ $(document).ready(function() {
 	
 });
 
+function searchDateTimeFormatted(date) {
+    var day = ('0' + date.getDate()).slice(-2); // wtf javascript. this returns the day.
+    var month = ('0' + (date.getMonth() + 1)).slice(-2);
+    var year = date.getFullYear();
+
+    var hour = ('0' + date.getHours()).slice(-2);
+    var minute = ('0' + date.getMinutes()).slice(-2);
+    var second = ('0' + date.getSeconds()).slice(-2);
+
+    return year + "-" + month + "-" + day + " " + hour + ":" + minute + ":" + second;
+}
+
 function showError(message) {
     toastr.error(message, "Error", {
         "debug": false,
