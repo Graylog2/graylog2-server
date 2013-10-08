@@ -1,8 +1,3 @@
-/*
- * TODO:
- *   - TZ problems
- */
-
 Rickshaw.namespace('Rickshaw.Graph.Graylog2Selector');
 Rickshaw.Graph.RangeSelector = Rickshaw.Class.create({
 
@@ -93,9 +88,12 @@ Rickshaw.Graph.RangeSelector = Rickshaw.Class.create({
             var from = $('#universalsearch .absolute input[name="from"]');
             var to = $('#universalsearch .absolute input[name="to"]');
 
+            var fromDate = new Date((position.xMin+new Date().getTimezoneOffset()*60)*1000);
+            var toDate = new Date((position.xMax+new Date().getTimezoneOffset()*60)*1000);
+
             activateTimerangeChooser("absolute", $('.timerange-selector-container .dropdown-menu a[data-selector-name="absolute"]'));
-            from.val(searchDateTimeFormatted(new Date(position.xMin*1000)));
-            to.val(searchDateTimeFormatted(new Date(position.xMax*1000)));
+            from.val(searchDateTimeFormatted(fromDate));
+            to.val(searchDateTimeFormatted(toDate));
 
             $(".timerange-selector-container").effect("bounce", { complete: function() {
                 // Submit search directly if alt key is pressed.
