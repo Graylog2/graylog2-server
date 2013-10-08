@@ -235,7 +235,7 @@ $(document).ready(function() {
 
                     var percent = (val/data.total*100);
 
-                    var searchLink = "<a href='#' title='Search for this value. (Press shift to search immediately)' class='search-link' data-field='" + htmlEscape(field) + "' data-value='" + htmlEscape(key) + "'><i class='icon icon-search'></i></a>";
+                    var searchLink = "<a href='#' title='Search for this value. (Press alt to search immediately, shift to negate)' class='search-link' data-field='" + htmlEscape(field) + "' data-value='" + htmlEscape(key) + "'><i class='icon icon-search'></i></a>";
 
                     $(".terms tbody", quickvalues).append("<tr data-i='" + i + "' data-name='" + htmlEscape(key) + "'><td>"+ searchLink +"</td><td>" + htmlEscape(key) + "</td><td>" + percent.toFixed(2) + "%</td><td>" + htmlEscape(val) + "</td></tr>");
                     $(".terms-distribution", quickvalues).append("<div class='terms-bar terms-bar-" + i + "' style='width: " + percent + "%; background-color: " + colors(i) + ";'></div>");

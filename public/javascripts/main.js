@@ -470,7 +470,12 @@ $(document).ready(function() {
         var query = $("#universalsearch-query");
 
         if (e.shiftKey) {
-            // Shift key was pressed. Replace full query and search directly.
+            // Shift key was pressed. Negate!
+            ourQuery = "NOT " + ourQuery;
+        }
+
+        if (e.altKey) {
+            // CTRL key was pressed. Search immediately!
             query.val(ourQuery);
             query.effect("bounce", { complete: function() {
                 $("#universalsearch form").submit();
@@ -481,7 +486,7 @@ $(document).ready(function() {
             var originalQuery = query.val();
 
             // If the query is "*", replace it fully. Makes no sense to generate "* AND foo:bar". (even though it would work)
-            if ($.trim(originalQuery) == "*") {
+            if ($.trim(originalQuery) == "*" || $.trim(originalQuery) == "") {
                 query.val(ourQuery);
             } else {
                 query.val(originalQuery + " AND " + ourQuery)
