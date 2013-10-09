@@ -80,6 +80,11 @@ $(document).ready(function() {
         sizeSidebar();
 	});
 
+    // Hide sidebar completely.
+    $(".sidebar-hide").live("click", function() {
+        hideSidebar();
+    });
+
     // Always do this on first load.
     sizeSidebar();
 

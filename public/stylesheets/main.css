@@ -225,7 +225,7 @@ h4 {
 	top: 3px;	
 }
 
-.sidebar-back {
+.sidebar-back, .sidebar-hide {
 	cursor: pointer;
 }
 
