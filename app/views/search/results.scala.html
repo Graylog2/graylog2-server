@@ -35,41 +35,51 @@
 <div id="result-graph"></div>
 
 <script>
-	var resultGraph = new Rickshaw.Graph( {
-	        element: document.querySelector("#result-graph"),
-	        width: $("#main-content").width()-12,
-	        height: 175,
-	        renderer: "bar",
-	        series: [ {
-	        		name: "Messages",
-	        		data: @Html(histogram.asJSONString()),
-	        	    color: '#26ADE4'
-	        } ]
-	});
-	
-	new Rickshaw.Graph.Axis.Y( {
-		graph: resultGraph,
-		tickFormat: Rickshaw.Fixtures.Number.formatKMBT,
-	});
-	
-	new Rickshaw.Graph.Axis.Time({
-		graph: resultGraph,
-		ticksTreatment: "glow"
-	});
+    drawResultGraph = function() {
+        if ($("#result-graph").length == 0) {
+            return;
+        }
 
-	new Rickshaw.Graph.HoverDetail( {
-		graph: resultGraph,
-		formatter: function(series, x, y) {
-			var content = parseInt(y) + " " + series.name;
-			return content;
-		}
-	});
+        $("#result-graph").html("");
 
-	resultGraph.render();
+        var resultGraph = new Rickshaw.Graph( {
+                element: document.querySelector("#result-graph"),
+                width: $("#main-content").width()-12,
+                height: 175,
+                renderer: "bar",
+                series: [ {
+                        name: "Messages",
+                        data: @Html(histogram.asJSONString()),
+                        color: '#26ADE4'
+                } ]
+        });
 
-var RangeSelector = new Rickshaw.Graph.RangeSelector( {
-graph: resultGraph
-});
+        new Rickshaw.Graph.Axis.Y( {
+            graph: resultGraph,
+            tickFormat: Rickshaw.Fixtures.Number.formatKMBT,
+        });
+
+        new Rickshaw.Graph.Axis.Time({
+            graph: resultGraph,
+            ticksTreatment: "glow"
+        });
+
+        new Rickshaw.Graph.HoverDetail( {
+            graph: resultGraph,
+            formatter: function(series, x, y) {
+                var content = parseInt(y) + " " + series.name;
+                return content;
+            }
+        });
+
+        var RangeSelector = new Rickshaw.Graph.Graylog2Selector( {
+            graph: resultGraph
+        });
+
+        resultGraph.render();
+    }
+
+    drawResultGraph();
 </script>
 
 <div class="graph-resolution-selector">

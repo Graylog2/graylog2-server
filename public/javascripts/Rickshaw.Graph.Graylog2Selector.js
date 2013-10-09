@@ -1,5 +1,5 @@
 Rickshaw.namespace('Rickshaw.Graph.Graylog2Selector');
-Rickshaw.Graph.RangeSelector = Rickshaw.Class.create({
+Rickshaw.Graph.Graylog2Selector = Rickshaw.Class.create({
 
     initialize: function(args) {
         var graph = args.graph;

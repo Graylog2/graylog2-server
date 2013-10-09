@@ -183,6 +183,15 @@ $(document).ready(function() {
         });
     })();
 
+    // Call resizedWindow() only at end of resize event so we do not trigger all the time while resizing.
+    var resizeMutex;
+    $(window).resize(function() {
+        clearTimeout(resizeMutex);
+        resizeMutex = setTimeout(function() {
+            onResizedWindow();
+        }, 200);
+    });
+
     // Close a notification.
     $(".delete-notification").on("click", function() {
         if (!confirm("Really delete this notification?")) {
@@ -555,6 +564,10 @@ $(document).ready(function() {
 
         setTimeout(fixSidebarForWindow, 250);
     })();
+
+    function onResizedWindow(){
+        drawResultGraph();
+    }
 	
 });
 
@@ -617,4 +630,13 @@ function delayedAjaxCallOnKeyup(el, callback, delay) {
         callback();
     };
     el = null;
+}
+
+function hideSidebar() {
+    $("#sidebar").hide();
+    $("#main-content").removeClass("span8");
+    $("#main-content").addClass("span12");
+
+    // Rebuild search result graph. (only doing something is there is one)
+    drawResultGraph();
 }
