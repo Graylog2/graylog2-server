@@ -20,6 +20,8 @@
 
 package org.graylog2.inputs.syslog.tcp;
 
+import com.codahale.metrics.Gauge;
+import com.codahale.metrics.MetricRegistry;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import org.graylog2.inputs.syslog.SyslogInputBase;
 import org.graylog2.plugin.configuration.fields.BooleanField;
@@ -31,6 +33,7 @@ import org.jboss.netty.channel.socket.nio.NioServerSocketChannelFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.Map;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -47,6 +50,11 @@ public class SyslogTCPInput extends SyslogInputBase {
 
     @Override
     public void launch() throws MisfireException {
+        // Register throughput counter gauges.
+        for(Map.Entry<String,Gauge<Long>> gauge : throughputCounter.gauges().entrySet()) {
+            core.metrics().register(MetricRegistry.name(SyslogTCPInput.class, gauge.getKey()), gauge.getValue());
+        }
+
         final ExecutorService bossThreadPool = Executors.newCachedThreadPool(
                 new ThreadFactoryBuilder()
                         .setNameFormat("input-" + inputId + "-syslogtcp-boss-%d")
@@ -61,7 +69,7 @@ public class SyslogTCPInput extends SyslogInputBase {
                 new NioServerSocketChannelFactory(bossThreadPool, workerThreadPool)
         );
 
-        bootstrap.setPipelineFactory(new SyslogTCPPipelineFactory(core, config, this));
+        bootstrap.setPipelineFactory(new SyslogTCPPipelineFactory(core, config, this, throughputCounter));
 
         try {
             channel = ((ServerBootstrap) bootstrap).bind(socketAddress);

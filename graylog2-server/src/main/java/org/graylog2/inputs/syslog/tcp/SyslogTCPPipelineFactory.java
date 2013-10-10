@@ -21,6 +21,7 @@
 package org.graylog2.inputs.syslog.tcp;
 
 import org.graylog2.Core;
+import org.graylog2.inputs.ThroughputCounter;
 import org.graylog2.inputs.syslog.SyslogDispatcher;
 import org.graylog2.plugin.configuration.Configuration;
 import org.graylog2.plugin.inputs.MessageInput;
@@ -39,11 +40,13 @@ public class SyslogTCPPipelineFactory implements ChannelPipelineFactory {
     private final Core server;
     private final Configuration config;
     private final MessageInput sourceInput;
+    private final ThroughputCounter throughputCounter;
 
-    public SyslogTCPPipelineFactory(Core server, Configuration config, MessageInput sourceInput) {
+    public SyslogTCPPipelineFactory(Core server, Configuration config, MessageInput sourceInput, ThroughputCounter throughputCounter) {
         this.server = server;
         this.config = config;
         this.sourceInput = sourceInput;
+        this.throughputCounter = throughputCounter;
     }
 
     @Override
@@ -58,6 +61,7 @@ public class SyslogTCPPipelineFactory implements ChannelPipelineFactory {
                 
         ChannelPipeline p = Channels.pipeline();
         p.addLast("framer", new DelimiterBasedFrameDecoder(2 * 1024 * 1024, delimiter));
+        p.addLast("traffic-counter", throughputCounter);
         p.addLast("handler", new SyslogDispatcher(server, config, sourceInput));
         return p;
     }

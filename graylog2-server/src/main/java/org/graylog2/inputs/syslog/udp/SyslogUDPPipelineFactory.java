@@ -21,6 +21,7 @@
 package org.graylog2.inputs.syslog.udp;
 
 import org.graylog2.Core;
+import org.graylog2.inputs.ThroughputCounter;
 import org.graylog2.inputs.syslog.SyslogDispatcher;
 import org.graylog2.plugin.configuration.Configuration;
 import org.graylog2.plugin.inputs.MessageInput;
@@ -36,16 +37,19 @@ public class SyslogUDPPipelineFactory implements ChannelPipelineFactory {
     private final Core server;
     private final Configuration config;
     private final MessageInput sourceInput;
+    private final ThroughputCounter throughputCounter;
 
-    public SyslogUDPPipelineFactory(Core server, Configuration config, MessageInput sourceInput) {
+    public SyslogUDPPipelineFactory(Core server, Configuration config, MessageInput sourceInput, ThroughputCounter throughputCounter) {
         this.server = server;
         this.config = config;
         this.sourceInput = sourceInput;
+        this.throughputCounter = throughputCounter;
     }
 
     @Override
     public ChannelPipeline getPipeline() throws Exception {
         ChannelPipeline p = Channels.pipeline();
+        p.addLast("traffic-counter", throughputCounter);
         p.addLast("handler", new SyslogDispatcher(server, config, sourceInput));
         
         return p;
