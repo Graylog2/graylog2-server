@@ -151,7 +151,7 @@ public class ApiClient {
         private final Class<T> responseClass;
         private final ArrayList<Object> pathParams = Lists.newArrayList();
         private final ArrayList<F.Tuple<String,String>> queryParams = Lists.newArrayList();
-        private int httpStatusCode = Http.Status.OK;
+        private Set<Integer> expectedResponseCodes = Sets.newHashSet();
         private TimeUnit timeoutUnit = TimeUnit.SECONDS;
         private int timeoutValue = 5;
         private boolean unauthenticated = false;
@@ -233,8 +233,11 @@ public class ApiClient {
             return this;
         }
 
-        public ApiRequestBuilder<T> expect(int httpStatusCode) {
-            this.httpStatusCode = httpStatusCode;
+        public ApiRequestBuilder<T> expect(int... httpStatusCodes) {
+            for(int code : httpStatusCodes) {
+                this.expectedResponseCodes.add(code);
+            }
+
             return this;
         }
 
@@ -258,11 +261,17 @@ public class ApiClient {
             if (log.isDebugEnabled()) {
                 log.debug("API Request: {}", request.toString());
             }
+
+            // Set 200 OK as standard if not defined.
+            if (expectedResponseCodes.isEmpty()) {
+                expectedResponseCodes.add(Http.Status.OK);
+            }
+
             try {
                 Response response = requestBuilder.execute().get(timeoutValue, timeoutUnit);
 
                 // TODO this is wrong, shouldn't it accept some callback instead of throwing an exception?
-                if (response.getStatusCode() != httpStatusCode) {
+                if (!expectedResponseCodes.contains(response.getStatusCode())) {
                     throw new APIException(request, response);
                 }
 
@@ -271,7 +280,11 @@ public class ApiClient {
                     return responseClass.cast(response.getResponseBody("UTF-8"));
                 }
 
-                return deserializeJson(response, responseClass);
+                if (response.getStatusCode() >= 200 && response.getStatusCode() < 300) {
+                    return deserializeJson(response, responseClass);
+                } else {
+                    return null;
+                }
             } catch (InterruptedException e) {
                 // TODO
             } catch (MalformedURLException e) {
