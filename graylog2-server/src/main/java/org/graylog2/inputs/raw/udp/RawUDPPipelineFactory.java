@@ -20,12 +20,16 @@
 package org.graylog2.inputs.raw.udp;
 
 import org.graylog2.Core;
+import org.graylog2.inputs.ThroughputCounter;
 import org.graylog2.inputs.raw.RawDispatcher;
 import org.graylog2.plugin.configuration.Configuration;
 import org.graylog2.plugin.inputs.MessageInput;
 import org.jboss.netty.channel.ChannelPipeline;
 import org.jboss.netty.channel.ChannelPipelineFactory;
 import org.jboss.netty.channel.Channels;
+import org.jboss.netty.handler.traffic.AbstractTrafficShapingHandler;
+import org.jboss.netty.handler.traffic.GlobalTrafficShapingHandler;
+import org.jboss.netty.util.HashedWheelTimer;
 
 /**
  * @author Lennart Koopmann <lennart@torch.sh>
@@ -35,16 +39,19 @@ public class RawUDPPipelineFactory implements ChannelPipelineFactory {
     private final Core server;
     private final Configuration config;
     private final MessageInput sourceInput;
+    private final ThroughputCounter throughputCounter;
 
-    public RawUDPPipelineFactory(Core server, Configuration config, MessageInput sourceInput) {
+    public RawUDPPipelineFactory(Core server, Configuration config, MessageInput sourceInput, ThroughputCounter throughputCounter) {
         this.server = server;
         this.config = config;
         this.sourceInput = sourceInput;
+        this.throughputCounter = throughputCounter;
     }
 
     @Override
     public ChannelPipeline getPipeline() throws Exception {
         ChannelPipeline p = Channels.pipeline();
+        p.addLast("traffic-counter", throughputCounter);
         p.addLast("handler", new RawDispatcher(server, config, sourceInput));
 
         return p;

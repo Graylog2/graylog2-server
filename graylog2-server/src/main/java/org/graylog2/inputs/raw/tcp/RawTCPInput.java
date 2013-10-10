@@ -19,6 +19,8 @@
  */
 package org.graylog2.inputs.raw.tcp;
 
+import com.codahale.metrics.Gauge;
+import com.codahale.metrics.MetricRegistry;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import org.graylog2.inputs.raw.RawInputBase;
 import org.graylog2.inputs.raw.udp.RawUDPInput;
@@ -36,6 +38,7 @@ import org.jboss.netty.channel.socket.nio.NioServerSocketChannelFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.Map;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -52,6 +55,11 @@ public class RawTCPInput extends RawInputBase {
 
     @Override
     public void launch() throws MisfireException {
+        // Register throughput counter gauges.
+        for(Map.Entry<String,Gauge<Long>> gauge : throughputCounter.gauges().entrySet()) {
+            core.metrics().register(MetricRegistry.name(RawUDPInput.class, gauge.getKey()), gauge.getValue());
+        }
+
         final ExecutorService bossThreadPool = Executors.newCachedThreadPool(
                 new ThreadFactoryBuilder()
                         .setNameFormat("input-" + inputId + "-rawtcp-boss-%d")
@@ -66,7 +74,7 @@ public class RawTCPInput extends RawInputBase {
                 new NioServerSocketChannelFactory(bossThreadPool, workerThreadPool)
         );
 
-        bootstrap.setPipelineFactory(new RawTCPPipelineFactory(core, config, this));
+        bootstrap.setPipelineFactory(new RawTCPPipelineFactory(core, config, this, throughputCounter));
 
         try {
             channel = ((ServerBootstrap) bootstrap).bind(socketAddress);

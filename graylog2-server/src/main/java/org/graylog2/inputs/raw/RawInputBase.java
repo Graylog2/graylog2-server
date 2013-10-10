@@ -20,6 +20,7 @@
 package org.graylog2.inputs.raw;
 
 import org.graylog2.Core;
+import org.graylog2.inputs.ThroughputCounter;
 import org.graylog2.plugin.GraylogServer;
 import org.graylog2.plugin.configuration.Configuration;
 import org.graylog2.plugin.configuration.ConfigurationException;
@@ -29,7 +30,6 @@ import org.graylog2.plugin.configuration.fields.TextField;
 import org.graylog2.plugin.inputs.MessageInput;
 import org.graylog2.plugin.inputs.MisfireException;
 import org.jboss.netty.bootstrap.Bootstrap;
-import org.jboss.netty.bootstrap.ConnectionlessBootstrap;
 import org.jboss.netty.channel.Channel;
 
 import java.net.InetSocketAddress;
@@ -47,9 +47,15 @@ public class RawInputBase extends MessageInput {
     protected Bootstrap bootstrap;
     protected Channel channel;
 
+    protected final ThroughputCounter throughputCounter;
+
     protected Core core;
     protected Configuration config;
     protected InetSocketAddress socketAddress;
+
+    public RawInputBase() {
+        this.throughputCounter = new ThroughputCounter();
+    }
 
     @Override
     public void configure(Configuration config, GraylogServer graylogServer) throws ConfigurationException {

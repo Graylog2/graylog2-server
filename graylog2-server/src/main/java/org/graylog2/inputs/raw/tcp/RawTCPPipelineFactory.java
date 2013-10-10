@@ -20,6 +20,7 @@
 package org.graylog2.inputs.raw.tcp;
 
 import org.graylog2.Core;
+import org.graylog2.inputs.ThroughputCounter;
 import org.graylog2.inputs.raw.RawDispatcher;
 import org.graylog2.inputs.syslog.SyslogDispatcher;
 import org.graylog2.inputs.syslog.tcp.SyslogTCPInput;
@@ -31,6 +32,7 @@ import org.jboss.netty.channel.ChannelPipelineFactory;
 import org.jboss.netty.channel.Channels;
 import org.jboss.netty.handler.codec.frame.DelimiterBasedFrameDecoder;
 import org.jboss.netty.handler.codec.frame.Delimiters;
+import org.jboss.netty.handler.traffic.GlobalTrafficShapingHandler;
 
 /**
  * @author Lennart Koopmann <lennart@torch.sh>
@@ -40,11 +42,13 @@ public class RawTCPPipelineFactory implements ChannelPipelineFactory {
     private final Core server;
     private final Configuration config;
     private final MessageInput sourceInput;
+    private final ThroughputCounter throughputCounter;
 
-    public RawTCPPipelineFactory(Core server, Configuration config, MessageInput sourceInput) {
+    public RawTCPPipelineFactory(Core server, Configuration config, MessageInput sourceInput, ThroughputCounter throughputCounter) {
         this.server = server;
         this.config = config;
         this.sourceInput = sourceInput;
+        this.throughputCounter = throughputCounter;
     }
 
     @Override
@@ -59,7 +63,9 @@ public class RawTCPPipelineFactory implements ChannelPipelineFactory {
 
         ChannelPipeline p = Channels.pipeline();
         p.addLast("framer", new DelimiterBasedFrameDecoder(2 * 1024 * 1024, delimiter));
+        p.addLast("traffic-counter", throughputCounter);
         p.addLast("handler", new RawDispatcher(server, config, sourceInput));
+
         return p;
     }
 

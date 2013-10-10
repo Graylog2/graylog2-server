@@ -19,6 +19,8 @@
  */
 package org.graylog2.inputs.raw.udp;
 
+import com.codahale.metrics.Gauge;
+import com.codahale.metrics.MetricRegistry;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import org.graylog2.inputs.raw.RawInputBase;
 import org.graylog2.plugin.inputs.MisfireException;
@@ -26,9 +28,11 @@ import org.jboss.netty.bootstrap.ConnectionlessBootstrap;
 import org.jboss.netty.channel.ChannelException;
 import org.jboss.netty.channel.FixedReceiveBufferSizePredictorFactory;
 import org.jboss.netty.channel.socket.nio.NioDatagramChannelFactory;
+import org.jboss.netty.handler.traffic.TrafficCounter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.Map;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -43,6 +47,11 @@ public class RawUDPInput extends RawInputBase {
 
     @Override
     public void launch() throws MisfireException {
+        // Register throughput counter gauges.
+        for(Map.Entry<String,Gauge<Long>> gauge : throughputCounter.gauges().entrySet()) {
+            core.metrics().register(MetricRegistry.name(RawUDPInput.class, gauge.getKey()), gauge.getValue());
+        }
+
         final ExecutorService workerThreadPool = Executors.newCachedThreadPool(
                 new ThreadFactoryBuilder()
                         .setNameFormat("input-" + inputId + "-rawudp-worker-%d")
@@ -53,7 +62,7 @@ public class RawUDPInput extends RawInputBase {
         bootstrap.setOption("receiveBufferSizePredictorFactory", new FixedReceiveBufferSizePredictorFactory(
                 core.getConfiguration().getUdpRecvBufferSizes())
         );
-        bootstrap.setPipelineFactory(new RawUDPPipelineFactory(core, config, this));
+        bootstrap.setPipelineFactory(new RawUDPPipelineFactory(core, config, this, throughputCounter));
 
         try {
             channel = ((ConnectionlessBootstrap) bootstrap).bind(socketAddress);
