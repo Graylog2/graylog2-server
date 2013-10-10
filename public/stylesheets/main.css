@@ -1068,3 +1068,27 @@ form #stream-rules {
 .rickshaw_graph *:focus{
     cursor:crosshair !important;
 }
+
+.input-io .value {
+    font-family: monospace;
+}
+
+.input-io .channel-direction {
+    position: relative;
+    left: 2px;
+    margin-right: 1px;
+}
+
+.input-io .channel-direction-down {
+    position: relative;
+    top: 1px;
+}
+
+.input-io .channel-direction-up {
+    position: relative;
+    top: -1px;
+}
+
+.input-io .total {
+    color: #b8b8b8;
+}

@@ -188,6 +188,27 @@ $(document).ready(function() {
         });
     })();
 
+    // Updating IO of input.
+    (function updateInputIO() {
+        $(".input-io").each(function() {
+            var inputId = $(this).attr("data-input-id");
+            var nodeId = $(this).attr("data-node-id");
+
+            var io = $(this);
+
+            $.ajax({
+                url: '/a/system/inputs/' + encodeURIComponent(nodeId) + '/' + encodeURIComponent(inputId) + '/io',
+                success: function(data) {
+                    $(".persec .rx", io).text(data.rx);
+                    $(".persec .tx", io).text(data.tx);
+                    $(".total .rx", io).text(data.total_rx);
+                    $(".total .tx", io).text(data.total_tx);
+                }
+            });
+
+        }).promise().done(function(){ setTimeout(updateInputIO, 1000); });;
+    })();
+
     // Call resizedWindow() only at end of resize event so we do not trigger all the time while resizing.
     var resizeMutex;
     $(window).resize(function() {

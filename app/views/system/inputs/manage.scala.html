@@ -1,4 +1,4 @@
-@(currentUser: User, breadcrumbs: lib.BreadcrumbList, node: Node, inputTypes: Map[String, models.api.responses.system.InputTypeSummaryResponse], highlightInput: String)
+@(currentUser: User, breadcrumbs: lib.BreadcrumbList, node: Node, inputTypes: Map[String, models.api.responses.system.InputTypeSummaryResponse])
 
 @main("Inputs of node", views.html.system.sidebar(), "", currentUser) {
 
@@ -31,11 +31,7 @@
 
         @if(node.numberOfInputs > 0) {
             @for(input <- node.getInputs) {
-                @if(input.getId.equals(highlightInput)) {
-                    <div class="row-fluid node-row alert-info">
-                } else {
-                    <div class="row-fluid node-row">
-                }
+                <div class="row-fluid node-row">
                     <span class="pull-right node-row-info">
                         <span class="text">Started by @views.html.partials.links.to_user(input.getCreatorUser) at @input.getStartedAt</span>
                         &nbsp;
@@ -69,6 +65,31 @@
                             </a>
                         }
                     </h3>
+
+                    @if(input.getReadBytes >= 0 && input.getWrittenBytes >= 0) {
+                        <div class="input-io" data-node-id="@node.getNodeId" data-input-id="@input.getId">
+                            Network IO:
+
+                            <span class="persec">
+                                <i class="icon icon-caret-down channel-direction channel-direction-down"></i>
+                                <span class="rx value">@lib.Tools.byteToHuman(input.getReadBytes)</span>
+
+                                <i class="icon icon-caret-up channel-direction channel-direction-up"></i>
+                                <span class="tx value">@lib.Tools.byteToHuman(input.getWrittenBytes)</span>
+                            </span>
+
+                            <span class="total">
+                                (total:
+                                    <i class="icon icon-caret-down channel-direction channel-direction-down"></i>
+                                    <span class="rx value">@lib.Tools.byteToHuman(input.getTotalReadBytes)</span>
+
+                                    <i class="icon icon-caret-up channel-direction channel-direction-up"></i>
+                                    <span class="tx value">@lib.Tools.byteToHuman(input.getTotalWrittenBytes)</span>
+                                )
+                            </span>
+
+                        </div>
+                    }
 
                     <div class="well well-small">
                         <ul>

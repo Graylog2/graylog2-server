@@ -121,7 +121,7 @@ public class Node {
         List<Input> inputs = Lists.newArrayList();
 
         for (InputSummaryResponse input : inputs().inputs) {
-            inputs.add(inputFactory.fromSummaryResponse(input));
+            inputs.add(inputFactory.fromSummaryResponse(input, this));
         }
 
         return inputs;
@@ -129,7 +129,7 @@ public class Node {
 
     public Input getInput(String inputId) throws IOException, APIException {
         final InputSummaryResponse inputSummaryResponse = api.get(InputSummaryResponse.class).node(this).path("/system/inputs/{0}", inputId).execute();
-        return inputFactory.fromSummaryResponse(inputSummaryResponse);
+        return inputFactory.fromSummaryResponse(inputSummaryResponse, this);
     }
 
     public int numberOfInputs() {

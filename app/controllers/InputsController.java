@@ -59,14 +59,12 @@ public class InputsController extends AuthenticatedController {
         bc.addCrumb(node.getShortNodeId(), routes.SystemController.node(node.getNodeId()));
         bc.addCrumb("Inputs", routes.InputsController.manage(node.getNodeId()));
 
-        String highlightInputId = request().getQueryString("input_id");
         try {
             return ok(views.html.system.inputs.manage.render(
                     currentUser(),
                     bc,
                     node,
-                    node.getAllInputTypeInformation(),
-                    highlightInputId
+                    node.getAllInputTypeInformation()
             ));
         } catch (IOException e) {
             return status(500, views.html.errors.error.render(ApiClient.ERROR_MSG_IO, e, request()));
@@ -145,27 +143,6 @@ public class InputsController extends AuthenticatedController {
             flash("Could not terminate input " + inputId);
         }
         return redirect(routes.InputsController.manage(nodeId));
-    }
-
-    public Result recentMessage(String nodeId, String inputId) {
-        try {
-            Node node = nodeService.loadNode(nodeId);
-            MessageResult recentlyReceivedMessage = node.getInput(inputId).getRecentlyReceivedMessage(nodeId);
-
-            if (recentlyReceivedMessage == null) {
-                return notFound();
-            }
-
-            Map<String, Object> result = Maps.newHashMap();
-            result.put("id", recentlyReceivedMessage.getId());
-            result.put("fields", recentlyReceivedMessage.getFields());
-
-            return ok(new Gson().toJson(result)).as("application/json");
-        } catch (IOException e) {
-            return status(500);
-        } catch (APIException e) {
-            return status(e.getHttpCode());
-        }
     }
 
 }

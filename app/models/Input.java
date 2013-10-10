@@ -25,9 +25,11 @@ import lib.ApiClient;
 import lib.timeranges.InvalidRangeParametersException;
 import lib.timeranges.RelativeRange;
 import models.api.responses.MessageSummaryResponse;
+import models.api.responses.metrics.GaugeResponse;
 import models.api.responses.system.InputSummaryResponse;
 import models.api.results.MessageResult;
 import org.joda.time.DateTime;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.util.List;
@@ -37,12 +39,16 @@ import java.util.Map;
  * @author Lennart Koopmann <lennart@torch.sh>
  */
 public class Input {
+
+    private static final org.slf4j.Logger log = LoggerFactory.getLogger(Input.class);
+
     public interface Factory {
-        Input fromSummaryResponse(InputSummaryResponse input);
+        Input fromSummaryResponse(InputSummaryResponse input, Node node);
     }
 
     private final ApiClient api;
     private final UniversalSearch.Factory searchFactory;
+    private final Node node;
     private final String type;
     private final String id;
     private final String persistId;
@@ -53,9 +59,10 @@ public class Input {
     private final Map<String, Object> attributes;
 
     @AssistedInject
-    private Input(ApiClient api, UniversalSearch.Factory searchFactory, UserService userService, @Assisted InputSummaryResponse is) {
+    private Input(ApiClient api, UniversalSearch.Factory searchFactory, UserService userService, @Assisted InputSummaryResponse is, @Assisted Node node) {
         this.api = api;
         this.searchFactory = searchFactory;
+        this.node = node;
         this.type = is.type;
         this.id = is.inputId;
         this.persistId = is.persistId;
@@ -124,6 +131,56 @@ public class Input {
 
     public DateTime getStartedAt() {
         return startedAt;
+    }
+
+    public long getReadBytes() {
+        return getGaugeValue(buildNetworkIOMetricName("read_bytes", false));
+    }
+
+    public long getWrittenBytes() {
+        return getGaugeValue(buildNetworkIOMetricName("written_bytes", false));
+    }
+
+    public long getTotalReadBytes() {
+        return getGaugeValue(buildNetworkIOMetricName("read_bytes", true));
+    }
+
+    public long getTotalWrittenBytes() {
+        return getGaugeValue(buildNetworkIOMetricName("written_bytes", true));
+    }
+
+    private String buildNetworkIOMetricName(String base, boolean total) {
+        StringBuilder metricName = new StringBuilder(base).append("_");
+
+        if (total) {
+            metricName.append("total");
+        } else {
+            metricName.append("1sec");
+        }
+
+        return metricName.toString();
+    }
+
+    private Long getGaugeValue(String name) {
+        try {
+            GaugeResponse response = api.get(GaugeResponse.class)
+                .node(node)
+                .path("/system/metrics/{0}.{1}", type, name)
+                .expect(200, 404)
+                .execute();
+
+            if (response == null) {
+                return -1L;
+            } else {
+                return (Long) response.value;
+            }
+        } catch (APIException e) {
+            log.error("Unable to read throughput info of input [{}]", this.id, e);
+        } catch (IOException e) {
+            log.error("Unexpected exception", e);
+        }
+
+        return -1L;
     }
 
     public Map<String, Object> getAttributes() {

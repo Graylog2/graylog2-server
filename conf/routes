@@ -74,7 +74,8 @@ PUT         /a/system/processing/pause                                          
 PUT         /a/system/processing/resume                                              @controllers.SystemApiController.resumeMessageProcessing()
 
 # API: Inputs
-GET         /a/system/inputs/:node_id/:input_id/recent_message                       @controllers.InputsController.recentMessage(node_id: String, input_id: String)
+GET         /a/system/inputs/:node_id/:input_id/recent_message                       @controllers.InputsApiController.recentMessage(node_id: String, input_id: String)
+GET         /a/system/inputs/:node_id/:input_id/io                                   @controllers.InputsApiController.io(node_id: String, input_id: String)
 
 # API: Messages
 GET         /a/messages/:index/:id                                                   @controllers.MessagesController.single(index: String, id: String)
