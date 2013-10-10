@@ -74,7 +74,7 @@ public class MetricsResource extends RestResource {
         Metric metric = core.metrics().getMetrics().get(metricName);
 
         if (metric == null) {
-            LOG.warn("I do not have a metric called [{}], returning 404.", metricName);
+            LOG.debug("I do not have a metric called [{}], returning 404.", metricName);
             throw new WebApplicationException(404);
         }
 
