@@ -20,6 +20,7 @@
 package org.graylog2.inputs.gelf.http;
 
 import org.graylog2.Core;
+import org.graylog2.inputs.ThroughputCounter;
 import org.graylog2.plugin.inputs.MessageInput;
 import org.jboss.netty.channel.ChannelPipeline;
 import org.jboss.netty.channel.ChannelPipelineFactory;
@@ -32,16 +33,19 @@ public class GELFHttpPipelineFactory implements ChannelPipelineFactory {
 
     private final Core graylogServer;
     private final MessageInput sourceInput;
+    private final ThroughputCounter throughputCounter;
 
-    public GELFHttpPipelineFactory(Core graylogServer, MessageInput sourceInput) {
+    public GELFHttpPipelineFactory(Core graylogServer, MessageInput sourceInput, ThroughputCounter throughputCounter) {
         this.graylogServer = graylogServer;
         this.sourceInput = sourceInput;
+        this.throughputCounter = throughputCounter;
     }
 
     @Override
     public ChannelPipeline getPipeline() throws Exception {
         final ChannelPipeline pipeline = Channels.pipeline();
 
+        pipeline.addLast("traffic-counter", throughputCounter);
         pipeline.addLast("decoder", new HttpRequestDecoder());
         pipeline.addLast("encoder", new HttpResponseEncoder());
 

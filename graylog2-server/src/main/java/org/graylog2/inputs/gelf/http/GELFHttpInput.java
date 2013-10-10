@@ -19,6 +19,8 @@
  */
 package org.graylog2.inputs.gelf.http;
 
+import com.codahale.metrics.Gauge;
+import com.codahale.metrics.MetricRegistry;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import org.graylog2.Core;
 import org.graylog2.inputs.gelf.GELFInputBase;
@@ -48,6 +50,11 @@ public class GELFHttpInput extends GELFInputBase {
 
     @Override
     public void launch() throws MisfireException {
+        // Register throughput counter gauges.
+        for(Map.Entry<String,Gauge<Long>> gauge : throughputCounter.gauges().entrySet()) {
+            core.metrics().register(MetricRegistry.name(GELFHttpInput.class, gauge.getKey()), gauge.getValue());
+        }
+
         final ExecutorService bossExecutor = Executors.newCachedThreadPool(
                 new ThreadFactoryBuilder()
                         .setNameFormat("input-" + inputId + "-gelfhttp-boss-%d")
@@ -61,7 +68,7 @@ public class GELFHttpInput extends GELFInputBase {
         bootstrap = new ServerBootstrap(
                 new NioServerSocketChannelFactory(bossExecutor, workerExecutor)
         );
-        bootstrap.setPipelineFactory(new GELFHttpPipelineFactory(core, this));
+        bootstrap.setPipelineFactory(new GELFHttpPipelineFactory(core, this, throughputCounter));
 
         try {
             channel = ((ServerBootstrap) bootstrap).bind(socketAddress);
