@@ -392,6 +392,15 @@ $(document).ready(function() {
         return validate('[data-inputtype="' + $(this).attr("data-type") + '"] form');
     });
 
+    // Add static field to input.
+    $(".input-list .add-static-field").on("click", function() {
+        var modal = $(".input-add-static-field");
+        modal.modal();
+
+        $("input", modal).val("");
+        $("form", modal).attr("target", "/system/inputs/" + $(this).attr("data-node-id") + "/" + $(this).attr("data-input-id") + "/staticfields");
+    })
+
     // permission chooser
     $(".permission-select").chosen({search_contains:true, width:"350px", inherit_select_classes:true});
 

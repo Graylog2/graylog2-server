@@ -145,4 +145,8 @@ public class InputsController extends AuthenticatedController {
         return redirect(routes.InputsController.manage(nodeId));
     }
 
+    public Result addStaticField(String nodeId, String inputId) {
+
+    }
+
 }

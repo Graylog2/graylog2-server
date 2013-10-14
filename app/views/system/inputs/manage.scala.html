@@ -51,6 +51,7 @@
                             </a>
                             <ul class="dropdown-menu">
                                 <li><a href="@routes.ExtractorsController.manage(node.getNodeId, input.getId)">Manage extractors</a></li>
+                                <li><a href="#" class="add-static-field" data-node-id="@node.getNodeId" data-input-id="@input.getId">Add static field</a></li>
                             </ul>
                         </div>
                     </span>
@@ -163,5 +164,40 @@
             </form>
         </div>
     }
+
+    @***************************************************************
+    * Static field dialog                                          *
+    ***************************************************************@
+    <div class="input-add-static-field modal hide fade">
+        <div class="modal-header">
+            <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+            <h2>
+                <i class="icon-tag"></i>
+                Add static field
+            </h2>
+
+            Define a static field that is added to every message that comes in via this input. The field is
+            <strong>not</strong> overwritten If the message already has that key.
+        </div>
+
+        <form action="" method="POST">
+            <div class="modal-body">
+                <label>Key</label>
+                <input name="key" required="true" type="text" class="input-xlarge">
+
+                <label>Value</label>
+                <input name="value" required="true" type="text" class="input-xlarge">
+            </div>
+
+            <div class="modal-footer">
+                <button class="btn" data-dismiss="modal" aria-hidden="true">Close</button>
+                <button type="submit" class="btn btn-primary">
+                    <i class="icon icon-pushpin"></i>
+                    Add field
+                </button>
+            </div>
+        </form>
+
+    </div>
 
 }
