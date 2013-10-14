@@ -46,6 +46,7 @@ public abstract class MessageInput {
     protected DateTime createdAt;
 
     private Map<String, Extractor> extractors = Maps.newConcurrentMap();
+    private Map<String, String> staticFields = Maps.newConcurrentMap();
 
     public abstract void configure(Configuration config, GraylogServer graylogServer) throws ConfigurationException;
 
@@ -121,6 +122,14 @@ public abstract class MessageInput {
 
     public Map<String, Extractor> getExtractors() {
         return this.extractors;
+    }
+
+    public void addStaticField(String key, String value) {
+        this.staticFields.put(key, value);
+    }
+
+    public Map<String, String> getStaticFields() {
+        return this.staticFields;
     }
 
 }

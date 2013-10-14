@@ -247,6 +247,7 @@ public final class Main {
         server.initializers().register(new MasterCacheWorkersInitializer());
 
         // Register message filters. (Order is important here)
+        server.registerFilter(new StaticFieldFilter());
         server.registerFilter(new ExtractorFilter());
         server.registerFilter(new BlacklistFilter());
         server.registerFilter(new StreamMatcherFilter());

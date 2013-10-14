@@ -261,6 +261,7 @@ public class InputsResource extends RestResource {
         inputMap.put("creator_user_id", input.getCreatorUserId());
         inputMap.put("started_at", Tools.getISO8601String(input.getCreatedAt()));
         inputMap.put("attributes", input.getAttributesWithMaskedPasswords());
+        inputMap.put("static_fields", input.getStaticFields());
 
         return inputMap;
     }

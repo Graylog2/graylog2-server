@@ -35,6 +35,7 @@ import org.graylog2.database.validators.MapValidator;
 import org.graylog2.database.validators.Validator;
 import org.graylog2.inputs.converters.ConverterFactory;
 import org.graylog2.inputs.extractors.ExtractorFactory;
+import org.graylog2.plugin.database.EmbeddedPersistable;
 import org.graylog2.plugin.inputs.Converter;
 import org.graylog2.plugin.inputs.Extractor;
 import org.graylog2.users.User;
@@ -54,6 +55,7 @@ public class Input extends Persisted {
     public static final String COLLECTION = "inputs";
 
     public static final String EMBEDDED_EXTRACTORS = "extractors";
+    public static final String EMBEDDED_STATIC_FIELDS = "static_fields";
 
     public Input(Core core, Map<String, Object> fields) {
         super(core, fields);
@@ -109,11 +111,32 @@ public class Input extends Persisted {
             }};
         }
 
+        if (key.equals(EMBEDDED_STATIC_FIELDS)) {
+            return new HashMap<String, Validator>() {{
+                put("key", new FilledStringValidator());
+                put("value", new FilledStringValidator());
+            }};
+        }
+
         return Maps.newHashMap();
     }
 
     public void addExtractor(Extractor extractor) throws ValidationException {
         embed(EMBEDDED_EXTRACTORS, extractor);
+    }
+
+    public void addStaticField(final String key, final String value) throws ValidationException {
+        EmbeddedPersistable obj = new EmbeddedPersistable() {
+            @Override
+            public Map<String, Object> getPersistedFields() {
+                return new HashMap<String, Object>() {{
+                    put("key", key);
+                    put("value", value);
+                }};
+            }
+        };
+
+        embed(EMBEDDED_STATIC_FIELDS, obj);
     }
 
     public void removeExtractor(String extractorId) {
@@ -160,12 +183,34 @@ public class Input extends Persisted {
 
                 extractors.add(extractor);
             } catch (Exception e) {
-                LOG.error("Cannot build extractor from persisted data.", e);
+                LOG.error("Cannot build extractor from persisted data. Skipping.", e);
                 continue;
             }
         }
 
         return extractors;
+    }
+
+    public Map<String, String> getStaticFields() {
+        Map<String, String> staticFields = Maps.newHashMap();
+
+        if (fields.get(EMBEDDED_STATIC_FIELDS) == null) {
+            return staticFields;
+        }
+
+        BasicDBList list = (BasicDBList) fields.get(EMBEDDED_STATIC_FIELDS);
+        Iterator<Object> iterator = list.iterator();
+        while(iterator.hasNext()) {
+            try {
+                DBObject field = (BasicDBObject) iterator.next();
+                staticFields.put((String) field.get("key"), (String) field.get("value"));
+            } catch (Exception e) {
+                LOG.error("Cannot build static field from persisted data. Skipping.", e);
+                continue;
+            }
+        }
+
+        return staticFields;
     }
 
     public String getType() {

@@ -146,14 +146,22 @@ public class Inputs {
             MessageInput input = null;
             try {
                 input = Inputs.factory(io.getType());
+
+                // Add all standard fields.
                 input.configure(new Configuration(io.getConfiguration()), core);
                 input.setTitle(io.getTitle());
                 input.setCreatorUserId(io.getCreatorUserId());
                 input.setPersistId(io.getId().toStringMongod());
                 input.setCreatedAt(io.getCreatedAt());
 
+                // Add extractors.
                 for (Extractor extractor : io.getExtractors()) {
                     input.addExtractor(extractor.getId(), extractor);
+                }
+
+                // Add static fields.
+                for (Map.Entry<String, String> field : io.getStaticFields().entrySet()) {
+                    input.addStaticField(field.getKey(), field.getValue());
                 }
             } catch (NoSuchInputTypeException e) {
                 LOG.warn("Cannot launch persisted input. No such type [{}].", io.getType());

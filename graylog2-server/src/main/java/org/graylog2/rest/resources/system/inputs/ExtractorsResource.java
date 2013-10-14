@@ -47,7 +47,7 @@ import java.util.Map;
 /**
  * @author Lennart Koopmann <lennart@torch.sh>
  */
-@Api(value = "Extractors", description = "Extractors on this node")
+@Api(value = "Extractors", description = "Extractors of an input")
 @Path("/system/inputs/{inputId}/extractors")
 public class ExtractorsResource extends RestResource {
 
