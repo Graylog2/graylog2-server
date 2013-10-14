@@ -1,5 +1,5 @@
-/*
- * Copyright 2013 TORCH UG
+/**
+ * Copyright 2013 Lennart Koopmann <lennart@torch.sh>
  *
  * This file is part of Graylog2.
  *
@@ -15,38 +15,26 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with Graylog2.  If not, see <http://www.gnu.org/licenses/>.
+ *
  */
-package models.api.responses.system;
+package models.api.requests;
 
-import com.google.gson.annotations.SerializedName;
-
-import java.util.Map;
+import play.data.validation.Constraints;
 
 /**
  * @author Lennart Koopmann <lennart@torch.sh>
  */
-public class InputSummaryResponse {
+public class AddStaticFieldRequest extends ApiRequest {
 
-    public String type;
+    @Constraints.Required
+    public String key;
 
-    @SerializedName("input_id")
-    public String inputId;
+    @Constraints.Required
+    public String value;
 
-    @SerializedName("persist_id")
-    public String persistId;
-
-    public String name;
-    public String title;
-
-    @SerializedName("creator_user_id")
-    public String creatorUserId;
-
-    @SerializedName("started_at")
-    public String startedAt;
-
-    @SerializedName("static_fields")
-    public Map<String, String> staticFields;
-
-    public Map<String, Object> attributes;
+    public AddStaticFieldRequest(String key, String value) {
+        this.key = key;
+        this.value = value;
+    }
 
 }

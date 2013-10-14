@@ -398,7 +398,7 @@ $(document).ready(function() {
         modal.modal();
 
         $("input", modal).val("");
-        $("form", modal).attr("target", "/system/inputs/" + $(this).attr("data-node-id") + "/" + $(this).attr("data-input-id") + "/staticfields");
+        $("form", modal).attr("action", "/system/inputs/" + $(this).attr("data-node-id") + "/" + $(this).attr("data-input-id") + "/staticfields");
     })
 
     // permission chooser

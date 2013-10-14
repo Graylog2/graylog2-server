@@ -43,9 +43,6 @@ public class InputsController extends AuthenticatedController {
     private NodeService nodeService;
 
     public Result manage(String nodeId) {
-        // TODO: account field attributes using JS (greater than, listen_address, ...)
-        // TODO: persist inputs
-
         Node node = nodeService.loadNode(nodeId);
 
         if (node == null) {
@@ -139,14 +136,32 @@ public class InputsController extends AuthenticatedController {
     }
 
     public Result terminate(String nodeId, String inputId) {
-        if (! nodeService.loadNode(nodeId).terminateInput(inputId)) {
+        if (!nodeService.loadNode(nodeId).terminateInput(inputId)) {
             flash("Could not terminate input " + inputId);
         }
         return redirect(routes.InputsController.manage(nodeId));
     }
 
     public Result addStaticField(String nodeId, String inputId) {
+        Map<String, String[]> form = request().body().asFormUrlEncoded();
 
+        if(form.get("key") == null || form.get("value") == null) {
+            flash("error", "Missing parameters.");
+            return redirect(routes.InputsController.manage(nodeId));
+        }
+
+        String key = form.get("key")[0];
+        String value = form.get("value")[0];
+
+        try {
+            nodeService.loadNode(nodeId).getInput(inputId).addStaticField(key, value);
+            return redirect(routes.InputsController.manage(nodeId));
+        } catch (IOException e) {
+            return status(500, views.html.errors.error.render(ApiClient.ERROR_MSG_IO, e, request()));
+        } catch (APIException e) {
+            String message = "Could not add static field. We expected HTTP 202, but got a HTTP " + e.getHttpCode() + ".";
+            return status(500, views.html.errors.error.render(message, e, request()));
+        }
     }
 
 }

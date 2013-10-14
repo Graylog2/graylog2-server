@@ -24,12 +24,15 @@ import lib.APIException;
 import lib.ApiClient;
 import lib.timeranges.InvalidRangeParametersException;
 import lib.timeranges.RelativeRange;
+import models.api.requests.AddStaticFieldRequest;
+import models.api.responses.EmptyResponse;
 import models.api.responses.MessageSummaryResponse;
 import models.api.responses.metrics.GaugeResponse;
 import models.api.responses.system.InputSummaryResponse;
 import models.api.results.MessageResult;
 import org.joda.time.DateTime;
 import org.slf4j.LoggerFactory;
+import play.mvc.Http;
 
 import java.io.IOException;
 import java.util.List;
@@ -57,6 +60,7 @@ public class Input {
     private final User creatorUser;
     private final DateTime startedAt;
     private final Map<String, Object> attributes;
+    private final Map<String, String> staticFields;
 
     @AssistedInject
     private Input(ApiClient api, UniversalSearch.Factory searchFactory, UserService userService, @Assisted InputSummaryResponse is, @Assisted Node node) {
@@ -71,6 +75,7 @@ public class Input {
         this.startedAt = DateTime.parse(is.startedAt);
         this.creatorUser = userService.load(is.creatorUserId);
         this.attributes = is.attributes;
+        this.staticFields = is.staticFields;
 
         // We might get a double parsed from JSON here. Make sure to round it to Integer. (would be .0 anyways)
         for (Map.Entry<String, Object> e : attributes.entrySet()) {
@@ -131,6 +136,19 @@ public class Input {
 
     public DateTime getStartedAt() {
         return startedAt;
+    }
+
+    public Map<String, String> getStaticFields() {
+        return staticFields;
+    }
+
+    public void addStaticField(String key, String value) throws APIException, IOException {
+        api.post(EmptyResponse.class)
+                .node(node)
+                .path("/system/inputs/{0}/staticfields", id)
+                .body(new AddStaticFieldRequest(key, value))
+                .expect(Http.Status.CREATED)
+                .execute();
     }
 
     public long getReadBytes() {
