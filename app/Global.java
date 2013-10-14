@@ -16,6 +16,7 @@
  * You should have received a copy of the GNU General Public License
  * along with Graylog2.  If not, see <http://www.gnu.org/licenses/>.
  */
+
 import com.google.common.collect.Lists;
 import com.google.inject.AbstractModule;
 import com.google.inject.Guice;
@@ -42,11 +43,13 @@ import org.apache.shiro.authc.pam.ModularRealmAuthenticator;
 import org.apache.shiro.mgt.DefaultSecurityManager;
 import org.apache.shiro.realm.Realm;
 import org.apache.shiro.realm.SimpleAccountRealm;
+import org.graylog2.logback.appender.AccessLog;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import play.Application;
 import play.Configuration;
 import play.GlobalSettings;
+import play.api.mvc.EssentialFilter;
 
 import java.io.File;
 import java.util.List;
@@ -126,6 +129,12 @@ public class Global extends GlobalSettings {
         }
         SecurityUtils.setSecurityManager(securityManager);
 
+    }
+
+    @Override
+    @SuppressWarnings("unchecked")
+    public <T extends EssentialFilter> Class<T>[] filters() {
+        return new Class[] {AccessLog.class};
     }
 
     @Override

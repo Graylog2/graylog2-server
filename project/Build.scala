@@ -20,6 +20,9 @@ object ApplicationBuild extends Build {
     "com.google.inject" % "guice" % "3.0",
     "com.google.inject.extensions" % "guice-assistedinject" % "3.0",
     "javax.inject" % "javax.inject" % "1",
+
+    "org.graylog2" % "play2-graylog2_2.10" % "1.0-SNAPSHOT",
+
     "org.fluentlenium" % "fluentlenium-core" % "0.9.0" % "test",
     "org.fluentlenium" % "fluentlenium-festassert" % "0.9.0" % "test",
     "org.mockito" % "mockito-all" % "1.9.5" % "test",
@@ -34,7 +37,8 @@ object ApplicationBuild extends Build {
 )
 
   val main = play.Project(appName, appVersion, appDependencies).settings(
-    // Add your own project settings here
+    resolvers += Resolver.url("Graylog2 Play Repository", url("http://graylog2.github.io/play2-graylog2/releases/"))(Resolver.ivyStylePatterns),
+    resolvers += Resolver.url("Graylog2 Play Snapshot Repository", url("http://graylog2.github.io/play2-graylog2/snapshots/"))(Resolver.ivyStylePatterns)
   )
 
 }

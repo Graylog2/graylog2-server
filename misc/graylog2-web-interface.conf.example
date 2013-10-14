@@ -7,3 +7,20 @@ graylog2-server.uris=""
 # If you deploy your application to several instances be sure to use the same key!
 # Generate for example with: pwgen -s 96
 application.secret=""
+
+
+# The web interface can send its log output and access log to graylog2.
+# The access log is disabled by default, by uncommenting the line below you can enable it.
+# graylog2.appender.send-access-log=true
+
+# Currently the log output can only target one server, this will change in future versions.
+# Please make sure that you start a GELF TCP input on the server you are sending, too, otherwise it will fail.
+# By default, no such input is started!
+# graylog2.appender.host=127.0.0.1:12201
+
+# Please see https://github.com/Graylog2/play2-graylog2/blob/master/project-code/README for more configuration options
+# for the Graylog2 appender.
+
+# HTTP listen port and address (Default: 0.0.0.0:9000)
+#http.http.port=9000
+#http.address=0.0.0.0
