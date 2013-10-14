@@ -105,4 +105,46 @@ public class StaticFieldsResource extends RestResource {
         return Response.status(Response.Status.CREATED).build();
     }
 
+    @DELETE
+    @Timed
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON)
+    @ApiOperation(value = "Remove static field of an input")
+    @ApiResponses(value = {
+            @ApiResponse(code = 404, message = "No such input on this node."),
+            @ApiResponse(code = 404, message = "No such static field.")
+    })
+    @Path("/{key}")
+    public Response delete(@ApiParam(title = "Key", required = true) @PathParam("key") String key,
+                           @ApiParam(title = "inputId", required = true) @PathParam("inputId") String inputId) {
+        if (inputId == null || inputId.isEmpty()) {
+            LOG.error("Missing inputId. Returning HTTP 400.");
+            throw new WebApplicationException(400);
+        }
+
+        MessageInput input = core.inputs().getRunningInputs().get(inputId);
+
+        if (input == null) {
+            LOG.error("Input <{}> not found.", inputId);
+            throw new WebApplicationException(404);
+        }
+
+        if(!input.getStaticFields().containsKey(key)) {
+            LOG.error("No such static field [{}] on input <{}>.", key, inputId);
+            throw new WebApplicationException(404);
+        }
+
+        input.getStaticFields().remove(key);
+
+        Input mongoInput = Input.find(core, input.getPersistId());
+        mongoInput.removeStaticField(key);
+
+        String msg = "Removed static field [" + key + "] of input <" + inputId + ">.";
+        LOG.info(msg);
+        core.getActivityWriter().write(new Activity(msg, StaticFieldsResource.class));
+
+        return Response.status(Response.Status.NO_CONTENT).build();
+    }
+
+
 }

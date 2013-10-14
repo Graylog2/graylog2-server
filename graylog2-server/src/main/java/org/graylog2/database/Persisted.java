@@ -212,8 +212,18 @@ public abstract class Persisted {
         collection().update(new BasicDBObject("_id", id), new BasicDBObject("$push", new BasicDBObject(key, dbo)));
     }
 
-    public void removeEmbedded(String key, String extractorId) {
-        BasicDBObject aryQry = new BasicDBObject("id", extractorId);
+    public void removeEmbedded(String key, String searchId) {
+        BasicDBObject aryQry = new BasicDBObject("id", searchId);
+        BasicDBObject qry = new BasicDBObject("_id", id);
+        BasicDBObject update = new BasicDBObject("$pull", new BasicDBObject(key, aryQry));
+
+        // http://docs.mongodb.org/manual/reference/operator/pull/
+
+        collection().update(qry, update);
+    }
+
+    public void removeEmbedded(String arrayKey, String key, String searchId) {
+        BasicDBObject aryQry = new BasicDBObject(arrayKey, searchId);
         BasicDBObject qry = new BasicDBObject("_id", id);
         BasicDBObject update = new BasicDBObject("$pull", new BasicDBObject(key, aryQry));
 

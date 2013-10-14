@@ -143,6 +143,10 @@ public class Input extends Persisted {
         removeEmbedded(EMBEDDED_EXTRACTORS, extractorId);
     }
 
+    public void removeStaticField(String key) {
+        removeEmbedded("key", EMBEDDED_STATIC_FIELDS, key);
+    }
+
     public String getTitle() {
         return (String) fields.get("title");
     }
