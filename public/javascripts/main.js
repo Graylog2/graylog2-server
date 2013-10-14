@@ -399,7 +399,21 @@ $(document).ready(function() {
 
         $("input", modal).val("");
         $("form", modal).attr("action", "/system/inputs/" + $(this).attr("data-node-id") + "/" + $(this).attr("data-input-id") + "/staticfields");
-    })
+    });
+
+    // Remove static field.
+    $(".input-list .static-fields ul li").on("mouseenter", function() {
+        $(".remove-static-field", $(this)).show();
+    }).on("mouseleave", function() {
+        $(".remove-static-field", $(this)).hide();
+    });
+
+    // Validate static fields
+    $(".new-static-field").on("click", function(e) {
+        if (!validate("#new-static-field-form")) {
+            e.preventDefault();
+        }
+    });
 
     // permission chooser
     $(".permission-select").chosen({search_contains:true, width:"350px", inherit_select_classes:true});
@@ -453,7 +467,7 @@ $(document).ready(function() {
     });
 
     // Submit button confirmation.
-    $('button[data-confirm]').on("click", function() {
+    $('button[data-confirm], a[data-confirm]').on("click", function() {
         return confirm($(this).attr("data-confirm"));
     });
 

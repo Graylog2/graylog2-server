@@ -39,6 +39,12 @@ function dispatchRuleValidation(ref, validatorType) {
                 errors = true;
             };
             break;
+        case "alphanum_underscore":
+            if (!validateAlphanumericUnderscores(ref)) {
+                validationFailure(ref, "must only contain alphanum chars or underscores");
+                errors = true;
+            }
+            break;
     }
 }
 
@@ -64,4 +70,8 @@ function validatePositiveNumber(el) {
 
 function validateNegativeNumber(el) {
     return parseInt(el.val()) < 0;
+}
+
+function validateAlphanumericUnderscores(el) {
+    return el.val().match("^\\w*$");
 }

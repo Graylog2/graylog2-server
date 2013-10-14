@@ -143,11 +143,17 @@ public class Input {
     }
 
     public void addStaticField(String key, String value) throws APIException, IOException {
-        api.post(EmptyResponse.class)
-                .node(node)
+        api.post().node(node)
                 .path("/system/inputs/{0}/staticfields", id)
                 .body(new AddStaticFieldRequest(key, value))
                 .expect(Http.Status.CREATED)
+                .execute();
+    }
+
+    public void removeStaticField(String key) throws APIException, IOException {
+        api.delete().node(node)
+                .path("/system/inputs/{0}/staticfields/{1}", id, key)
+                .expect(Http.Status.NO_CONTENT)
                 .execute();
     }
 

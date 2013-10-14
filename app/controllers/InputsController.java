@@ -164,4 +164,16 @@ public class InputsController extends AuthenticatedController {
         }
     }
 
+    public Result removeStaticField(String nodeId, String inputId, String key) {
+        try {
+            nodeService.loadNode(nodeId).getInput(inputId).removeStaticField(key);
+            return redirect(routes.InputsController.manage(nodeId));
+        } catch (IOException e) {
+            return status(500, views.html.errors.error.render(ApiClient.ERROR_MSG_IO, e, request()));
+        } catch (APIException e) {
+            String message = "Could not delete static field. We expected HTTP 204, but got a HTTP " + e.getHttpCode() + ".";
+            return status(500, views.html.errors.error.render(message, e, request()));
+        }
+    }
+
 }

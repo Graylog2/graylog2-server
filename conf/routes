@@ -29,6 +29,7 @@ GET         /system/inputs/:node_id                                             
 POST        /system/inputs/:node_id                                                  @controllers.InputsController.launch(node_id: String)
 POST        /system/inputs/:node_id/:input_id/terminate                              @controllers.InputsController.terminate(node_id: String, input_id: String)
 POST        /system/inputs/:node_id/:input_id/staticfields                           @controllers.InputsController.addStaticField(node_id: String, input_id: String)
+GET         /system/inputs/:node_id/:input_id/staticfields/:key/delete               @controllers.InputsController.removeStaticField(node_id: String, input_id: String, key: String)
 GET         /system/mappers                                                          @controllers.MappersController.index()
 
 # Extractors

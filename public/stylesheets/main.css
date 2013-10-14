@@ -1092,3 +1092,16 @@ form #stream-rules {
 .input-io .total {
     color: #b8b8b8;
 }
+
+.input-list .static-fields {
+    margin-top: 5px;
+    margin-left: 3px;
+}
+
+.input-list .static-fields ul {
+    margin-left: 1px;
+}
+
+.input-list .static-fields ul .remove-static-field {
+    margin-left: 5px;
+}
