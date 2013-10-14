@@ -457,7 +457,6 @@ $(document).ready(function() {
     }
 
     $(".delete-user-form").on("submit", function() {
-        console.log("fooked");
         return confirm("Really remove user " + $(this).attr("data-username") + "?");
     });
 
