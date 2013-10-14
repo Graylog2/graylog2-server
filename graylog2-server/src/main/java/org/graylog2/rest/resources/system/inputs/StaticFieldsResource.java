@@ -78,6 +78,12 @@ public class StaticFieldsResource extends RestResource {
             throw new WebApplicationException(e, Response.Status.BAD_REQUEST);
         }
 
+        // Check if key is a valid message key.
+        if (!Message.validKey(csfr.key)) {
+            LOG.error("Invalid key: [{}]", csfr.key);
+            throw new WebApplicationException(Response.Status.BAD_REQUEST);
+        }
+
         if (csfr.key == null || csfr.value == null || csfr.key.isEmpty() || csfr.value.isEmpty()) {
             LOG.error("Missing parameters. Returning HTTP 400.");
             throw new WebApplicationException(Response.Status.BAD_REQUEST);
