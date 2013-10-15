@@ -157,6 +157,14 @@ public class Input {
                 .execute();
     }
 
+    public long getConnections() {
+        return getGaugeValue("open_connections");
+    }
+
+    public long getTotalConnections() {
+        return getGaugeValue("total_connections");
+    }
+
     public long getReadBytes() {
         return getGaugeValue(buildNetworkIOMetricName("read_bytes", false));
     }

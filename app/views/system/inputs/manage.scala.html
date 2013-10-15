@@ -92,6 +92,14 @@
                         </div>
                     }
 
+                    @if(input.getConnections >= 0 && input.getTotalConnections >= 0) {
+                        <div class="input-connections" data-node-id="@node.getNodeId" data-input-id="@input.getId">
+                            Total connections:
+                            <span class="total">@input.getTotalConnections</span>
+                            (<span class="active">@input.getConnections</span> active)
+                        </div>
+                    }
+
                     <div class="well well-small">
                         <ul>
                             @for((k,v) <- input.getAttributes) {

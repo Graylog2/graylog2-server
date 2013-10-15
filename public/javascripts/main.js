@@ -209,6 +209,25 @@ $(document).ready(function() {
         }).promise().done(function(){ setTimeout(updateInputIO, 1000); });;
     })();
 
+    // Updating connection counts of input.
+    (function updateInputConnections() {
+        $(".input-connections").each(function() {
+            var inputId = $(this).attr("data-input-id");
+            var nodeId = $(this).attr("data-node-id");
+
+            var connections = $(this);
+
+            $.ajax({
+                url: '/a/system/inputs/' + encodeURIComponent(nodeId) + '/' + encodeURIComponent(inputId) + '/connections',
+                success: function(data) {
+                    $(".total", connections).text(data.total);
+                    $(".active", connections).text(data.active);
+                }
+            });
+
+        }).promise().done(function(){ setTimeout(updateInputConnections, 1000); });;
+    })();
+
     // Call resizedWindow() only at end of resize event so we do not trigger all the time while resizing.
     var resizeMutex;
     $(window).resize(function() {

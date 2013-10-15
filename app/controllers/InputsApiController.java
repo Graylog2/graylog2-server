@@ -62,6 +62,25 @@ public class InputsApiController extends AuthenticatedController  {
         }
     }
 
+    public Result connections(String nodeId, String inputId) {
+        try {
+            Map<String, Object> result = Maps.newHashMap();
+
+            final Node node = nodeService.loadNode(nodeId);
+            final Input input = node.getInput(inputId);
+
+            result.put("active", input.getConnections());
+            result.put("total", input.getTotalConnections());
+
+            return ok(new Gson().toJson(result)).as("application/json");
+        } catch (IOException e) {
+            return internalServerError("io exception");
+        } catch (
+                APIException e) {
+            return internalServerError("api exception " + e);
+        }
+    }
+
     public Result recentMessage(String nodeId, String inputId) {
         try {
             Node node = nodeService.loadNode(nodeId);
