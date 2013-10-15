@@ -17,7 +17,7 @@
  * along with Graylog2.  If not, see <http://www.gnu.org/licenses/>.
  *
  */
-package org.graylog2.inputs;
+package org.graylog2.inputs.util;
 
 import com.codahale.metrics.Gauge;
 import com.google.common.collect.Lists;

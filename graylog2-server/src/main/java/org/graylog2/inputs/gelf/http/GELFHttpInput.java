@@ -55,6 +55,10 @@ public class GELFHttpInput extends GELFInputBase {
             core.metrics().register(MetricRegistry.name(GELFHttpInput.class, gauge.getKey()), gauge.getValue());
         }
 
+        // Register connection counter gauges.
+        core.metrics().register(MetricRegistry.name(GELFHttpInput.class, "open_connections"), connectionCounter.gaugeCurrent());
+        core.metrics().register(MetricRegistry.name(GELFHttpInput.class, "total_connections"), connectionCounter.gaugeTotal());
+
         final ExecutorService bossExecutor = Executors.newCachedThreadPool(
                 new ThreadFactoryBuilder()
                         .setNameFormat("input-" + inputId + "-gelfhttp-boss-%d")
@@ -68,7 +72,7 @@ public class GELFHttpInput extends GELFInputBase {
         bootstrap = new ServerBootstrap(
                 new NioServerSocketChannelFactory(bossExecutor, workerExecutor)
         );
-        bootstrap.setPipelineFactory(new GELFHttpPipelineFactory(core, this, throughputCounter));
+        bootstrap.setPipelineFactory(new GELFHttpPipelineFactory(core, this, throughputCounter, connectionCounter));
 
         try {
             channel = ((ServerBootstrap) bootstrap).bind(socketAddress);

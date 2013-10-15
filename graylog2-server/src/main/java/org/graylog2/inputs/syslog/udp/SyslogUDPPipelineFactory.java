@@ -21,7 +21,8 @@
 package org.graylog2.inputs.syslog.udp;
 
 import org.graylog2.Core;
-import org.graylog2.inputs.ThroughputCounter;
+import org.graylog2.inputs.util.ConnectionCounter;
+import org.graylog2.inputs.util.ThroughputCounter;
 import org.graylog2.inputs.syslog.SyslogDispatcher;
 import org.graylog2.plugin.configuration.Configuration;
 import org.graylog2.plugin.inputs.MessageInput;

@@ -21,7 +21,8 @@
 package org.graylog2.inputs.gelf.udp;
 
 import org.graylog2.Core;
-import org.graylog2.inputs.ThroughputCounter;
+import org.graylog2.inputs.util.ConnectionCounter;
+import org.graylog2.inputs.util.ThroughputCounter;
 import org.graylog2.inputs.gelf.GELFDispatcher;
 import org.graylog2.plugin.inputs.MessageInput;
 import org.jboss.netty.channel.ChannelPipeline;

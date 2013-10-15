@@ -20,16 +20,14 @@
 package org.graylog2.inputs.raw.udp;
 
 import org.graylog2.Core;
-import org.graylog2.inputs.ThroughputCounter;
+import org.graylog2.inputs.util.ConnectionCounter;
+import org.graylog2.inputs.util.ThroughputCounter;
 import org.graylog2.inputs.raw.RawDispatcher;
 import org.graylog2.plugin.configuration.Configuration;
 import org.graylog2.plugin.inputs.MessageInput;
 import org.jboss.netty.channel.ChannelPipeline;
 import org.jboss.netty.channel.ChannelPipelineFactory;
 import org.jboss.netty.channel.Channels;
-import org.jboss.netty.handler.traffic.AbstractTrafficShapingHandler;
-import org.jboss.netty.handler.traffic.GlobalTrafficShapingHandler;
-import org.jboss.netty.util.HashedWheelTimer;
 
 /**
  * @author Lennart Koopmann <lennart@torch.sh>
