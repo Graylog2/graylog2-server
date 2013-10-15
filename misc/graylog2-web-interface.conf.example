@@ -20,7 +20,3 @@ application.secret=""
 
 # Please see https://github.com/Graylog2/play2-graylog2/blob/master/project-code/README for more configuration options
 # for the Graylog2 appender.
-
-# HTTP listen port and address (Default: 0.0.0.0:9000)
-#http.http.port=9000
-#http.address=0.0.0.0
