@@ -40,10 +40,7 @@ import org.elasticsearch.search.sort.SortOrder;
 import org.graylog2.Core;
 import org.graylog2.indexer.IndexHelper;
 import org.graylog2.indexer.Indexer;
-import org.graylog2.indexer.results.DateHistogramResult;
-import org.graylog2.indexer.results.FieldStatsResult;
-import org.graylog2.indexer.results.SearchResult;
-import org.graylog2.indexer.results.TermsResult;
+import org.graylog2.indexer.results.*;
 import org.graylog2.indexer.searches.timeranges.TimeRange;
 import org.graylog2.plugin.Tools;
 
@@ -127,7 +124,7 @@ public class Searches {
         );
     }
 	
-	public DateHistogramResult histogram(String query, Indexer.DateHistogramInterval interval, TimeRange range) throws IndexHelper.InvalidRangeFormatException {
+	public HistogramResult histogram(String query, Indexer.DateHistogramInterval interval, TimeRange range) throws IndexHelper.InvalidRangeFormatException {
         DateHistogramFacetBuilder fb = FacetBuilders.dateHistogramFacet("histogram")
 				.field("timestamp")
 				.facetFilter(IndexHelper.getTimestampRangeFilter(range))
@@ -141,6 +138,22 @@ public class Searches {
 		SearchResponse r = c.search(srb.request()).actionGet();
 		return new DateHistogramResult((DateHistogramFacet) r.getFacets().facet("histogram"), query, interval, r.getTook());
 	}
+
+    public HistogramResult fieldHistogram(String query, String field, Indexer.DateHistogramInterval interval, TimeRange range) throws IndexHelper.InvalidRangeFormatException {
+        DateHistogramFacetBuilder fb = FacetBuilders.dateHistogramFacet("histogram")
+                .keyField("timestamp")
+                .valueField(field)
+                .facetFilter(IndexHelper.getTimestampRangeFilter(range))
+                .interval(interval.toString().toLowerCase());
+
+        SearchRequestBuilder srb = c.prepareSearch();
+        srb.setIndices(server.getDeflector().getAllDeflectorIndexNames()); // XXX 020: have a method that builds time ranged index requests
+        srb.setQuery(queryString(query));
+        srb.addFacet(fb);
+
+        SearchResponse r = c.search(srb.request()).actionGet();
+        return new FieldHistogramResult((DateHistogramFacet) r.getFacets().facet("histogram"), query, interval, r.getTook());
+    }
 
     public SearchHit firstOfIndex(String index) {
         return oneOfIndex(index, matchAllQuery(), SortOrder.DESC);
@@ -189,7 +202,6 @@ public class Searches {
             return null;
         }
     }
-
 
     public class FieldTypeException extends Exception {
     }

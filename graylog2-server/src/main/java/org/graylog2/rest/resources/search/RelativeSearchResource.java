@@ -143,6 +143,38 @@ public class RelativeSearchResource extends SearchResource {
         }
     }
 
+    @GET @Path("/fieldhistogram") @Timed
+    @ApiOperation(value = "Field value histogram of a query using a relative timerange.")
+    @ApiResponses(value = {
+            @ApiResponse(code = 400, message = "Invalid interval provided."),
+            @ApiResponse(code = 400, message = "Invalid timerange parameters provided.")
+    })
+    @Produces(MediaType.APPLICATION_JSON)
+    public String fieldHistogramRelative(
+            @ApiParam(title = "query", description = "Query (Lucene syntax)", required = true) @QueryParam("query") String query,
+            @ApiParam(title = "field", description = "Field of whose values to get the histogram of", required = true) @QueryParam("field") String field,
+            @ApiParam(title = "interval", description = "Histogram interval / bucket size. (year, quarter, month, week, day, hour or minute)", required = true) @QueryParam("interval") String interval,
+            @ApiParam(title = "range", description = "Relative timeframe to search in. See search method description.", required = true) @QueryParam("range") int range) {
+        interval = interval.toUpperCase();
+        checkQueryAndInterval(query, interval);
+        validateInterval(interval);
+        checkStringSet(field);
+
+        try {
+            return json(buildHistogramResult(
+                    core.getIndexer().searches().fieldHistogram(
+                            query,
+                            field,
+                            Indexer.DateHistogramInterval.valueOf(interval),
+                            buildRelativeTimeRange(range)
+                    )
+            ));
+        } catch (IndexHelper.InvalidRangeFormatException e) {
+            LOG.warn("Invalid timerange parameters provided. Returning HTTP 400.", e);
+            throw new WebApplicationException(400);
+        }
+    }
+
     private TimeRange buildRelativeTimeRange(int range) {
         try {
             return new RelativeRange(range);

@@ -24,10 +24,7 @@ import com.codahale.metrics.annotation.Timed;
 import com.google.common.collect.Maps;
 import org.graylog2.indexer.IndexHelper;
 import org.graylog2.indexer.Indexer;
-import org.graylog2.indexer.results.DateHistogramResult;
-import org.graylog2.indexer.results.FieldStatsResult;
-import org.graylog2.indexer.results.SearchResult;
-import org.graylog2.indexer.results.TermsResult;
+import org.graylog2.indexer.results.*;
 import org.graylog2.indexer.searches.Searches;
 import org.graylog2.indexer.searches.timeranges.AbsoluteRange;
 import org.graylog2.indexer.searches.timeranges.InvalidRangeParametersException;
@@ -85,6 +82,13 @@ public class SearchResource extends RestResource {
         }
     }
 
+    protected void checkStringSet(String string) {
+        if (string == null || string.isEmpty()) {
+            LOG.warn("Missing parameters. Returning HTTP 400.");
+            throw new WebApplicationException(400);
+        }
+    }
+
     protected FieldStatsResult fieldStats(String field, String query, TimeRange timeRange) throws IndexHelper.InvalidRangeFormatException {
         try {
             return core.getIndexer().searches().fieldStats(field, query, timeRange);
@@ -131,7 +135,7 @@ public class SearchResource extends RestResource {
         return result;
     }
 
-    protected Map<String, Object> buildHistogramResult(DateHistogramResult histogram) {
+    protected Map<String, Object> buildHistogramResult(HistogramResult histogram) {
         Map<String, Object> result = Maps.newHashMap();
         result.put("interval", histogram.getInterval().toString().toLowerCase());
         result.put("results", histogram.getResults());
