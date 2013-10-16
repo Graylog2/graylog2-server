@@ -197,7 +197,7 @@ public class Input {
         try {
             GaugeResponse response = api.get(GaugeResponse.class)
                 .node(node)
-                .path("/system/metrics/{0}.{1}", type, name)
+                .path("/system/metrics/{0}.{1}.{2}", type, id, name)
                 .expect(200, 404)
                 .execute();
 
