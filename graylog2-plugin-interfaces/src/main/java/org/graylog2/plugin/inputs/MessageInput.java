@@ -132,4 +132,8 @@ public abstract class MessageInput {
         return this.staticFields;
     }
 
+    public String getUniqueReadableId() {
+        String readableId = getClass().getName() + "." + getId();
+        return readableId;
+    }
 }
