@@ -142,6 +142,32 @@ public class KeywordSearchResource extends SearchResource {
         }
     }
 
+    @GET @Path("/fieldhistogram") @Timed
+    @ApiOperation(value = "Datetime histogram of a query using keyword timerange.")
+    @ApiResponses(value = {
+            @ApiResponse(code = 400, message = "Invalid timerange parameters provided."),
+            @ApiResponse(code = 400, message = "Invalid interval provided."),
+            @ApiResponse(code = 400, message = "Field is not of numeric type.")
+    })
+    @Produces(MediaType.APPLICATION_JSON)
+    public String fieldHistogramKeyword(
+            @ApiParam(title = "query", description = "Query (Lucene syntax)", required = true) @QueryParam("query") String query,
+            @ApiParam(title = "field", description = "Field of whose values to get the histogram of", required = true) @QueryParam("field") String field,
+            @ApiParam(title = "interval", description = "Histogram interval / bucket size. (year, quarter, month, week, day, hour or minute)", required = true) @QueryParam("interval") String interval,
+            @ApiParam(title = "keyword", description = "Range keyword", required = true) @QueryParam("keyword") String keyword) {
+        checkQueryAndInterval(query, interval);
+        interval = interval.toUpperCase();
+        validateInterval(interval);
+        checkStringSet(field);
+
+        try {
+            return json(buildHistogramResult(fieldHistogram(field, query, interval, buildKeywordTimeRange(keyword))));
+        } catch (IndexHelper.InvalidRangeFormatException e) {
+            LOG.warn("Invalid timerange parameters provided. Returning HTTP 400.", e);
+            throw new WebApplicationException(400);
+        }
+    }
+
     private TimeRange buildKeywordTimeRange(String keyword) {
         try {
             return new KeywordRange(keyword);

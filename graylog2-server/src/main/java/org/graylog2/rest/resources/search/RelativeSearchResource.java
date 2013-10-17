@@ -148,7 +148,8 @@ public class RelativeSearchResource extends SearchResource {
     @ApiOperation(value = "Field value histogram of a query using a relative timerange.")
     @ApiResponses(value = {
             @ApiResponse(code = 400, message = "Invalid interval provided."),
-            @ApiResponse(code = 400, message = "Invalid timerange parameters provided.")
+            @ApiResponse(code = 400, message = "Invalid timerange parameters provided."),
+            @ApiResponse(code = 400, message = "Field is not of numeric type.")
     })
     @Produces(MediaType.APPLICATION_JSON)
     public String fieldHistogramRelative(

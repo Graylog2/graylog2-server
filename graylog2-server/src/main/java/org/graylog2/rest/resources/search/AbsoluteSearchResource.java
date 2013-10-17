@@ -147,6 +147,34 @@ public class AbsoluteSearchResource extends SearchResource {
         }
     }
 
+    @GET @Path("/fieldhistogram") @Timed
+    @ApiOperation(value = "Field value histogram of a query using an absolute timerange.")
+    @ApiResponses(value = {
+            @ApiResponse(code = 400, message = "Invalid timerange parameters provided."),
+            @ApiResponse(code = 400, message = "Invalid interval provided."),
+            @ApiResponse(code = 400, message = "Field is not of numeric type.")
+    })
+    @Produces(MediaType.APPLICATION_JSON)
+    public String fieldHistogramAbsolute(
+            @ApiParam(title = "query", description = "Query (Lucene syntax)", required = true) @QueryParam("query") String query,
+            @ApiParam(title = "field", description = "Field of whose values to get the histogram of", required = true) @QueryParam("field") String field,
+            @ApiParam(title = "interval", description = "Histogram interval / bucket size. (year, quarter, month, week, day, hour or minute)", required = true) @QueryParam("interval") String interval,
+            @ApiParam(title = "from", description = "Timerange start. See search method description for date format", required = true) @QueryParam("from") String from,
+            @ApiParam(title = "to", description = "Timerange end. See search method description for date format", required = true) @QueryParam("to") String to) {
+        checkQueryAndInterval(query, interval);
+        interval = interval.toUpperCase();
+        validateInterval(interval);
+        checkStringSet(field);
+
+        try {
+            return json(buildHistogramResult(fieldHistogram(field, query, interval, buildAbsoluteTimeRange(from, to))));
+        } catch (IndexHelper.InvalidRangeFormatException e) {
+            LOG.warn("Invalid timerange parameters provided. Returning HTTP 400.", e);
+            throw new WebApplicationException(400);
+        }
+
+    }
+
     private TimeRange buildAbsoluteTimeRange(String from, String to) {
         try {
             return new AbsoluteRange(from, to);
