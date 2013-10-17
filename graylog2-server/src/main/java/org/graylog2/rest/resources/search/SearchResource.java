@@ -98,6 +98,20 @@ public class SearchResource extends RestResource {
         }
     }
 
+    protected HistogramResult fieldHistogram(String field, String query, String interval, TimeRange timeRange) throws IndexHelper.InvalidRangeFormatException {
+        try {
+            return core.getIndexer().searches().fieldHistogram(
+                    query,
+                    field,
+                    Indexer.DateHistogramInterval.valueOf(interval),
+                    timeRange
+            );
+        } catch(Searches.FieldTypeException e) {
+            LOG.error("Field histogram query failed. Make sure that field [{}] is a numeric type.", field);
+            throw new WebApplicationException(400);
+        }
+    }
+
     protected Map<String, Object> buildTermsResult(TermsResult tr) {
         Map<String, Object> result = Maps.newHashMap();
         result.put("time", tr.took().millis());

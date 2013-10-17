@@ -129,8 +129,8 @@ public class AbsoluteSearchResource extends SearchResource {
             @ApiParam(title = "interval", description = "Histogram interval / bucket size. (year, quarter, month, week, day, hour or minute)", required = true) @QueryParam("interval") String interval,
             @ApiParam(title = "from", description = "Timerange start. See search method description for date format", required = true) @QueryParam("from") String from,
             @ApiParam(title = "to", description = "Timerange end. See search method description for date format", required = true) @QueryParam("to") String to) {
-        interval = interval.toUpperCase();
         checkQueryAndInterval(query, interval);
+        interval = interval.toUpperCase();
         validateInterval(interval);
 
         try {

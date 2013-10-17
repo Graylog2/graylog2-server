@@ -76,8 +76,8 @@ public class KeywordSearchResource extends SearchResource {
             @ApiParam(title = "query", description = "Query (Lucene syntax)", required = true) @QueryParam("query") String query,
             @ApiParam(title = "interval", description = "Histogram interval / bucket size. (year, quarter, month, week, day, hour or minute)", required = true) @QueryParam("interval") String interval,
             @ApiParam(title = "keyword", description = "Range keyword", required = true) @QueryParam("keyword") String keyword) {
-        interval = interval.toUpperCase();
         checkQueryAndInterval(query, interval);
+        interval = interval.toUpperCase();
         validateInterval(interval);
 
         try {

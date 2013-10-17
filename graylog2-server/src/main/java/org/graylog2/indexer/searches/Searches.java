@@ -139,7 +139,7 @@ public class Searches {
 		return new DateHistogramResult((DateHistogramFacet) r.getFacets().facet("histogram"), query, interval, r.getTook());
 	}
 
-    public HistogramResult fieldHistogram(String query, String field, Indexer.DateHistogramInterval interval, TimeRange range) throws IndexHelper.InvalidRangeFormatException {
+    public HistogramResult fieldHistogram(String query, String field, Indexer.DateHistogramInterval interval, TimeRange range) throws FieldTypeException, IndexHelper.InvalidRangeFormatException {
         DateHistogramFacetBuilder fb = FacetBuilders.dateHistogramFacet("histogram")
                 .keyField("timestamp")
                 .valueField(field)
@@ -151,7 +151,13 @@ public class Searches {
         srb.setQuery(queryString(query));
         srb.addFacet(fb);
 
-        SearchResponse r = c.search(srb.request()).actionGet();
+        SearchResponse r;
+        try {
+            r = c.search(srb.request()).actionGet();
+        }  catch (org.elasticsearch.action.search.SearchPhaseExecutionException e) {
+            throw new FieldTypeException();
+        }
+
         return new FieldHistogramResult((DateHistogramFacet) r.getFacets().facet("histogram"), query, interval, r.getTook());
     }
 
