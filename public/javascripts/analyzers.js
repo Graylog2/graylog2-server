@@ -52,11 +52,17 @@ $(document).ready(function() {
         alert("Exporting statistics is not implemented yet. (GitHub issue: #239)");
     });
 
-    $(".analyze-field .generate-graph .dropdown-menu a").on("click", function(e) {
+    $(".analyze-field .generate-graph .pie-chart").on("click", function(e) {
         e.preventDefault();
 
         // TODO
-        alert("Graphing of custom values is not implemented yet. (GitHub issue: #259)");
+        alert("Pie charts are not implemented yet. (GitHub issue: #259)");
+    });
+
+    $(".analyze-field .generate-graph .line-chart").on("click", function(e) {
+        e.preventDefault();
+
+        addLineChart($(this).parent().parent().parent().attr("data-field"));
     });
 
     $(".quickvalues .quickvalues-close").on("click", function(e) {
@@ -311,6 +317,46 @@ $(document).ready(function() {
 
         quickvalues.css("top", top);
         quickvalues.css("left", left);
+    }
+
+    function addLineChart(field) {
+        var rangeType = $("#universalsearch-rangetype-permanent").text();
+        var query = $("#universalsearch-query-permanent").text();
+
+        var params = {
+            "rangetype": rangeType,
+            "q": query,
+            "field": field
+        }
+
+        switch(rangeType) {
+            case "relative":
+                params["relative"] = $("#universalsearch-relative-permanent").text();
+                break;
+            case "absolute":
+                params["from"] = $("#universalsearch-from-permanent").text();
+                params["to"] = $("#universalsearch-to-permanent").text();
+                break;
+            case "keyword":
+                params["keyword"] = $("#universalsearch-keyword-permanent").text();
+                break;
+        }
+
+        $.ajax({
+            url: '/a/search/fieldterms',
+            data: params,
+            success: function(data) {
+                console.log("success!");
+            },
+            error: function(data) {
+                showError("Could not load histogram.");
+            },
+            complete: function() {
+
+            }
+        });
+
+
     }
 
 });

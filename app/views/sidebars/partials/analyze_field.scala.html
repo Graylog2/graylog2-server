@@ -4,15 +4,14 @@
 
     <a href="#" class="btn btn-info btn-mini show-quickvalues" data-field="@f.getName">Quick values</a>
 
-    <div class="btn-group generate-graph">
+    <div class="btn-group generate-graph" data-field="@f.getName">
         <a class="btn btn-mini dropdown-toggle" data-toggle="dropdown" href="#">
             Generate chart
             <span class="caret"></span>
         </a>
         <ul class="dropdown-menu">
-            <li><a href="#">Line chart</a></li>
-            <li><a href="#">Pie chart</a></li>
-            <li><a href="#">Bar chart</a></li>
+            <li><a href="#" class="line-chart">Line chart</a></li>
+            <li><a href="#" class="pie-chart">Pie chart</a></li>
         </ul>
     </div>
 

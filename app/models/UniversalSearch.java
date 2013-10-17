@@ -25,10 +25,7 @@ import lib.APIException;
 import lib.ApiClient;
 import lib.Tools;
 import lib.timeranges.TimeRange;
-import models.api.responses.DateHistogramResponse;
-import models.api.responses.FieldStatsResponse;
-import models.api.responses.FieldTermsResponse;
-import models.api.responses.SearchResultResponse;
+import models.api.responses.*;
 import models.api.results.DateHistogramResult;
 import models.api.results.SearchResult;
 import play.mvc.Call;
@@ -107,6 +104,16 @@ public class UniversalSearch {
         return api.get(FieldTermsResponse.class)
                 .path("/search/universal/{0}/terms", timeRange.getType().toString().toLowerCase())
                 .queryParam("field", field)
+                .queryParam("query", query)
+                .queryParams(timeRange.getQueryParams())
+                .execute();
+    }
+
+    public FieldHistogramResponse fieldHistogram(String field, String interval) throws IOException, APIException {
+        return api.get(FieldHistogramResponse.class)
+                .path("/search/universal/{0}/fieldhistogram", timeRange.getType().toString().toLowerCase())
+                .queryParam("field", field)
+                .queryParam("interval", interval)
                 .queryParam("query", query)
                 .queryParams(timeRange.getQueryParams())
                 .execute();

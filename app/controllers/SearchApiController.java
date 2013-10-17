@@ -25,6 +25,7 @@ import lib.APIException;
 import lib.SearchTools;
 import lib.timeranges.*;
 import models.UniversalSearch;
+import models.api.responses.FieldHistogramResponse;
 import models.api.responses.FieldStatsResponse;
 import models.api.responses.FieldTermsResponse;
 import play.mvc.Result;
@@ -40,14 +41,9 @@ public class SearchApiController extends AuthenticatedController {
     @Inject
     private UniversalSearch.Factory searchFactory;
 
-    public Result fieldStats(String q, String field, String rangeType, int relative, String from, String to, String keyword, String interval) {
+    public Result fieldStats(String q, String field, String rangeType, int relative, String from, String to, String keyword) {
         if (q == null || q.isEmpty()) {
             q = "*";
-        }
-
-        // Histogram interval.
-        if (interval == null || interval.isEmpty() || !SearchTools.isAllowedDateHistogramInterval(interval)) {
-            interval = "hour";
         }
 
         // Determine timerange type.
@@ -87,12 +83,52 @@ public class SearchApiController extends AuthenticatedController {
         }
     }
 
-    public Result fieldTerms(String q, String field, String rangeType, int relative, String from, String to, String keyword, String interval) {
+    public Result fieldTerms(String q, String field, String rangeType, int relative, String from, String to, String keyword) {
         if (q == null || q.isEmpty()) {
             q = "*";
         }
 
-        // Histogram interval.
+        // Determine timerange type.
+        TimeRange timerange;
+        try {
+            timerange = TimeRange.factory(rangeType, relative, from, to, keyword);
+        } catch(InvalidRangeParametersException e2) {
+            return status(400, views.html.errors.error.render("Invalid range parameters provided.", e2, request()));
+        } catch(IllegalArgumentException e1) {
+            return status(400, views.html.errors.error.render("Invalid range type provided.", e1, request()));
+        }
+
+        try {
+            UniversalSearch search = searchFactory.queryWithRange(q, timerange);
+            FieldTermsResponse terms = search.fieldTerms(field);
+
+            Map<String, Object> result = Maps.newHashMap();
+            result.put("total", terms.total);
+            result.put("missing", terms.missing);
+            result.put("time", terms.time);
+            result.put("other", terms.other);
+            result.put("terms", terms.terms);
+
+            return ok(new Gson().toJson(result)).as("application/json");
+        } catch (IOException e) {
+            return internalServerError("io exception");
+        } catch (APIException e) {
+            if (e.getHttpCode() == 400) {
+                // This usually means the field does not have a numeric type. Pass through!
+                return badRequest();
+            }
+
+            return internalServerError("api exception " + e);
+        }
+    }
+
+
+    public Result fieldHistogram(String q, String field, String rangeType, int relative, String from, String to, String keyword, String interval) {
+        if (q == null || q.isEmpty()) {
+            q = "*";
+        }
+
+        // Interval.
         if (interval == null || interval.isEmpty() || !SearchTools.isAllowedDateHistogramInterval(interval)) {
             interval = "hour";
         }
@@ -108,15 +144,11 @@ public class SearchApiController extends AuthenticatedController {
         }
 
         try {
-            UniversalSearch search = searchFactory.queryWithRange(q, timerange);;
-            FieldTermsResponse terms = search.fieldTerms(field);
+            UniversalSearch search = searchFactory.queryWithRange(q, timerange);
+            FieldHistogramResponse histo = search.fieldHistogram(field, interval);
 
             Map<String, Object> result = Maps.newHashMap();
-            result.put("total", terms.total);
-            result.put("missing", terms.missing);
-            result.put("time", terms.time);
-            result.put("other", terms.other);
-            result.put("terms", terms.terms);
+            result.put("results", histo.results);
 
             return ok(new Gson().toJson(result)).as("application/json");
         } catch (IOException e) {

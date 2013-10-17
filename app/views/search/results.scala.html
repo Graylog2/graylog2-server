@@ -87,6 +87,10 @@
     <strong>Resolution:</strong> @Html(DateHistogramResolutionSelector.getOptions(histogram.getInterval()))
 </div>
 
+<div class="field-graphs">
+
+</div>
+
 <table class="table table-condensed table-hover table-striped messages">
 	<thead>
 		<tr>
@@ -126,7 +130,6 @@
             <li class="disabled"><a href="#">Previous</a></li>
         } else {
             <li><a href="@route(page-1)">Previous</a></li>
-
         }
 
         @if(page < paginatorLength()) {

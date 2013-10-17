@@ -1,5 +1,5 @@
-/*
- * Copyright 2013 TORCH UG
+/**
+ * Copyright 2013 Lennart Koopmann <lennart@torch.sh>
  *
  * This file is part of Graylog2.
  *
@@ -15,13 +15,17 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with Graylog2.  If not, see <http://www.gnu.org/licenses/>.
+ *
  */
 package models.api.responses;
 
 import java.util.Map;
 
-public class DateHistogramResponse extends HistogramResponse {
+/**
+ * @author Lennart Koopmann <lennart@torch.sh>
+ */
+public class FieldHistogramResponse extends HistogramResponse {
 
-	public Map<String, Long> results;
-	
+    public Map<String, Map<String, Object>> results;
+
 }
