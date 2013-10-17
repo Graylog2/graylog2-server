@@ -326,7 +326,8 @@ $(document).ready(function() {
         var params = {
             "rangetype": rangeType,
             "q": query,
-            "field": field
+            "field": field,
+            "interval": "minute"
         }
 
         switch(rangeType) {
@@ -343,10 +344,38 @@ $(document).ready(function() {
         }
 
         $.ajax({
-            url: '/a/search/fieldterms',
+            url: '/a/search/fieldhistogram',
             data: params,
             success: function(data) {
-                console.log("success!");
+                console.log(data);
+
+                $("#field-graphs").append("<div class='field-graph' data-field='" + field + "'></div>");
+                var graphElem = $('div[data-field="' + field + '"]', $("#field-graphs"));
+
+                var graph = new Rickshaw.Graph( {
+                    element: graphElem.get()[0],
+                    width: $("#main-content").width()-12,
+                    height: 175,
+                    renderer: "bar",
+                    stroke: true,
+                    series: [ {
+                        name: "Messages",
+                        data: data.values,
+                        color: '#26ADE4'
+                    } ]
+                });
+
+                new Rickshaw.Graph.Axis.Y( {
+                    graph: graph,
+                    tickFormat: Rickshaw.Fixtures.Number.formatKMBT
+                });
+
+                new Rickshaw.Graph.Axis.Time({
+                    graph: graph,
+                    ticksTreatment: "glow"
+                });
+
+                graph.render();
             },
             error: function(data) {
                 showError("Could not load histogram.");

@@ -56,7 +56,7 @@
 
         new Rickshaw.Graph.Axis.Y( {
             graph: resultGraph,
-            tickFormat: Rickshaw.Fixtures.Number.formatKMBT,
+            tickFormat: Rickshaw.Fixtures.Number.formatKMBT
         });
 
         new Rickshaw.Graph.Axis.Time({
@@ -82,13 +82,12 @@
     drawResultGraph();
 </script>
 
+<div id="field-graphs">
+</div>
+
 <div class="graph-resolution-selector">
     <i class="icon-time"></i>
     <strong>Resolution:</strong> @Html(DateHistogramResolutionSelector.getOptions(histogram.getInterval()))
-</div>
-
-<div class="field-graphs">
-
 </div>
 
 <table class="table table-condensed table-hover table-striped messages">

@@ -148,7 +148,9 @@ public class SearchApiController extends AuthenticatedController {
             FieldHistogramResponse histo = search.fieldHistogram(field, interval);
 
             Map<String, Object> result = Maps.newHashMap();
-            result.put("results", histo.results);
+            result.put("time", histo.time);
+            result.put("interval", histo.interval);
+            result.put("values", histo.getFormattedResults());
 
             return ok(new Gson().toJson(result)).as("application/json");
         } catch (IOException e) {

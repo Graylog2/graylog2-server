@@ -19,6 +19,10 @@
  */
 package models.api.responses;
 
+import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
+
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -27,5 +31,24 @@ import java.util.Map;
 public class FieldHistogramResponse extends HistogramResponse {
 
     public Map<String, Map<String, Object>> results;
+
+    /**
+     * [{ x: -1893456000, y: 92228531 }, { x: -1577923200, y: 106021568 }]
+     *
+     * @return A JSON map representation of the result, suitable for Rickshaw data graphing.
+     */
+    public List<Map<String, Object>> getFormattedResults() {
+        List<Map<String, Object>> points = Lists.newArrayList();
+
+        for (Map.Entry<String, Map<String, Object>> result : results.entrySet()) {
+            Map<String, Object> point = Maps.newHashMap();
+            point.put("x", Long.parseLong(result.getKey()));
+            point.put("y", result.getValue().get("mean"));
+
+            points.add(point);
+        }
+
+        return points;
+    }
 
 }
