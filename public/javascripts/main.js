@@ -707,3 +707,6 @@ function hideSidebar() {
     // Rebuild search result graph. (only doing something is there is one)
     drawResultGraph();
 }
+
+// This is holding all field graphs.
+fieldGraphs = [];

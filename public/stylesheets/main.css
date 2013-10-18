@@ -1018,17 +1018,6 @@ form #stream-rules {
     color: #000;
 }
 
-#sidebar .menu a {
-    display: block;
-    font-size: 13px;
-    padding: 5px 10px;
-}
-
-#sidebar .menu a:hover {
-    background-color: #ccc;
-    text-decoration: none !important;
-}
-
 .detail-message dl {
     margin-bottom: 0px;
 }
@@ -1104,4 +1093,12 @@ form #stream-rules {
 
 .input-list .static-fields ul .remove-static-field {
     margin-left: 5px;
+}
+
+.field-graph-container {
+    margin-top: 30px;
+}
+
+.field-graph-container .dropdown-menu a.selected {
+    font-weight: bold;
 }

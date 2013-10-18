@@ -83,6 +83,50 @@
 </script>
 
 <div id="field-graphs">
+    @****** field graph template. this is copied, filled and appended for every new field graph. ****@
+    <div id="field-graph-template" class="field-graph-container" style="display: none;">
+        <h3>
+            <i class="icon icon-ellipsis-vertical"></i>
+            <span class="title"></span>
+
+            <div class="btn-group graph-settings">
+                <a class="btn btn-mini dropdown-toggle" data-toggle="dropdown" href="#">
+                    Settings
+                    <span class="caret"></span>
+                </a>
+
+                <ul class="dropdown-menu">
+                    <li class="dropdown-submenu">
+                        <a href="#">Type</a>
+
+                        <ul class="dropdown-menu type-selector">
+                            <li><a href="#" data-type="area">Area</a></li>
+                            <li><a href="#" class="selected" data-type="bar">Bar</a></li>
+                            <li><a href="#" data-type="line">Line</a></li>
+                            <li><a href="#" data-type="scatterplot">Scatterplot</a></li>
+                        </ul>
+                    </li>
+
+                    <li class="dropdown-submenu">
+                        <a href="#">Interpolation</a>
+
+                        <ul class="dropdown-menu interpolation-selector">
+                            <li><a href="#" class="selected"  data-type="linear">linear</a></li>
+                            <li><a href="#" data-type="step-after">step-after</a></li>
+                            <li><a href="#" data-type="basis">basis</a></li>
+                            <li><a href="#" data-type="bundle">bundle</a></li>
+                            <li><a href="#" data-type="cardinal">cardinal</a></li>
+                            <li><a href="#" data-type="monotone">monotone</a></li>
+                        </ul>
+                    </li>
+
+                    <li><a href="#">Hide</a></li>
+                </ul>
+            </div>
+        </h3>
+
+        <div class='field-graph'></div>
+    </div>
 </div>
 
 <div class="graph-resolution-selector">

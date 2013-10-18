@@ -343,23 +343,39 @@ $(document).ready(function() {
                 break;
         }
 
+        /*
+         * TODO:
+         *   - spinner
+         *   - avoid multiple graphs of same type
+         *   - export to image, ...
+         *   - persist in localstorage
+         */
+
         $.ajax({
             url: '/a/search/fieldhistogram',
             data: params,
             success: function(data) {
-                console.log(data);
+                var template = $("#field-graph-template").clone();
+                template.removeAttr("id");
+                template.attr("data-field", field);
+                template.css("display", "block");
+                $("h3 .title", template).text(field);
+                $("ul", template).attr("data-field", field);
 
-                $("#field-graphs").append("<div class='field-graph' data-field='" + field + "'></div>");
-                var graphElem = $('div[data-field="' + field + '"]', $("#field-graphs"));
+                $("#field-graphs").append(template);
+
+                var graphContainer = $('.field-graph-container[data-field="' + field + '"]', $("#field-graphs"));
+                var graphElem = $('.field-graph', graphContainer);
 
                 var graph = new Rickshaw.Graph( {
                     element: graphElem.get()[0],
                     width: $("#main-content").width()-12,
                     height: 175,
+                    interpolation: "linear",
                     renderer: "bar",
                     stroke: true,
                     series: [ {
-                        name: "Messages",
+                        name: "value",
                         data: data.values,
                         color: '#26ADE4'
                     } ]
@@ -376,16 +392,36 @@ $(document).ready(function() {
                 });
 
                 graph.render();
+
+                fieldGraphs[field] = graph;
             },
             error: function(data) {
                 showError("Could not load histogram.");
             },
-            complete: function() {
-
-            }
+            complete: function() {}
         });
-
-
     }
+
+    // Changing type of value graphs.
+    $("ul.type-selector li a").live("click", function(e) {
+        e.preventDefault();
+        var graph = fieldGraphs[$(this).closest("ul").attr("data-field")];
+        graph.setRenderer($(this).attr("data-type"));
+        graph.render();
+
+        $("a", $(this).closest("ul")).removeClass("selected");
+        $(this).addClass("selected");
+    });
+
+    // Changing interpolation of value graphs.
+    $("ul.interpolation-selector li a").live("click", function(e) {
+        e.preventDefault();
+        var graph = fieldGraphs[$(this).closest("ul").attr("data-field")];
+        graph.interpolation = $(this).text();
+        graph.render();
+
+        $("a", $(this).closest("ul")).removeClass("selected");
+        $(this).addClass("selected");
+    });
 
 });
