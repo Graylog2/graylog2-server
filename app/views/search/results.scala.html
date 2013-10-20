@@ -64,15 +64,17 @@
             ticksTreatment: "glow"
         });
 
-        new Rickshaw.Graph.HoverDetail( {
+        new Rickshaw.Graph.HoverDetail({
             graph: resultGraph,
             formatter: function(series, x, y) {
-                var content = parseInt(y) + " " + series.name;
+                var date = '<span class="date">' + new Date(x * 1000).toUTCString() + '</span>';
+                var swatch = '<span class="detail_swatch"></span>';
+                var content = parseInt(y) + ' messages<br>' + date;
                 return content;
             }
         });
 
-        var RangeSelector = new Rickshaw.Graph.Graylog2Selector( {
+        new Rickshaw.Graph.Graylog2Selector( {
             graph: resultGraph
         });
 

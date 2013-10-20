@@ -348,7 +348,9 @@ $(document).ready(function() {
          *   - spinner
          *   - avoid multiple graphs of same type
          *   - export to image, ...
+         *   - only on numerical
          *   - persist in localstorage
+         *   - smaller scatterplot dots
          */
 
         $.ajax({
@@ -391,6 +393,20 @@ $(document).ready(function() {
                     ticksTreatment: "glow"
                 });
 
+                new Rickshaw.Graph.HoverDetail({
+                    graph: graph,
+                    formatter: function(series, x, y) {
+                        var date = '<span class="date">' + new Date(x * 1000).toUTCString() + '</span>';
+                        var swatch = '<span class="detail_swatch"></span>';
+                        var content = field + ': ' + parseInt(y) + '<br>' + date;
+                        return content;
+                    }
+                });
+
+                new Rickshaw.Graph.Graylog2Selector( {
+                    graph: graph
+                });
+
                 graph.render();
 
                 fieldGraphs[field] = graph;
@@ -406,7 +422,13 @@ $(document).ready(function() {
     $("ul.type-selector li a").live("click", function(e) {
         e.preventDefault();
         var graph = fieldGraphs[$(this).closest("ul").attr("data-field")];
-        graph.setRenderer($(this).attr("data-type"));
+        var type = $(this).attr("data-type");
+        graph.setRenderer(type);
+
+        if (type == "scatterplot") {
+            graph.renderer.dotSize = 2;
+        }
+
         graph.render();
 
         $("a", $(this).closest("ul")).removeClass("selected");
