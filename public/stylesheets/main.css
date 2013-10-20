@@ -1107,3 +1107,16 @@ form #stream-rules {
 .field-graph-container .dropdown-menu a.selected {
     font-weight: bold;
 }
+
+.field-graph-container .graph-settings, .field-graph-container .add-to-dashboard {
+    font-size: 11px;
+}
+
+.field-graph-container .graph-settings a:hover {
+    text-decoration: none;
+}
+
+.field-graph-container h3 .type-description {
+    color: #bbb;
+    font-size: 11px;
+}

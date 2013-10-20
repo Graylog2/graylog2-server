@@ -62,7 +62,7 @@ $(document).ready(function() {
     $(".analyze-field .generate-graph .line-chart").on("click", function(e) {
         e.preventDefault();
 
-        addLineChart($(this).parent().parent().parent().attr("data-field"));
+        renderFieldChart($(this).parent().parent().parent().attr("data-field"));
     });
 
     $(".quickvalues .quickvalues-close").on("click", function(e) {
@@ -100,8 +100,8 @@ $(document).ready(function() {
         var statistics = $(".statistics", container);
 
         // TODO: deduplicate
-        var rangeType = $("#universalsearch-rangetype-permanent").text();
-        var query = $("#universalsearch-query-permanent").text();
+        var rangeType = $("#universalsearch-rangetype-permanent").text().trim();
+        var query = $("#universalsearch-query-permanent").text().trim();
 
         var params = {
             "rangetype": rangeType,
@@ -195,8 +195,8 @@ $(document).ready(function() {
             $(".quickvalues-autorefresh", quickvalues).addClass("loading");
         }
 
-        var rangeType = $("#universalsearch-rangetype-permanent").text();
-        var query = $("#universalsearch-query-permanent").text();
+        var rangeType = $("#universalsearch-rangetype-permanent").text().trim();
+        var query = $("#universalsearch-query-permanent").text().trim();
 
         var params = {
             "rangetype": rangeType,
@@ -319,15 +319,33 @@ $(document).ready(function() {
         quickvalues.css("left", left);
     }
 
-    function addLineChart(field) {
-        var rangeType = $("#universalsearch-rangetype-permanent").text();
-        var query = $("#universalsearch-query-permanent").text();
+    function renderFieldChart(field, opts) {
+        if (opts == undefined) {
+            opts = {};
+        }
+console.log(opts);
+
+        // Options.
+        if (opts.interval == undefined) {
+            opts.interval = $("#universalsearch-interval-permanent").text().trim();
+        }
+
+        if (opts.interpolation == undefined) {
+            opts.interpolation = "linear";
+        }
+
+        if (opts.renderer == undefined) {
+            opts.renderer = "bar";
+        }
+
+        var rangeType = $("#universalsearch-rangetype-permanent").text().trim();
+        var query = $("#universalsearch-query-permanent").text().trim();
 
         var params = {
             "rangetype": rangeType,
             "q": query,
             "field": field,
-            "interval": "minute"
+            "interval": opts.interval
         }
 
         switch(rangeType) {
@@ -346,11 +364,14 @@ $(document).ready(function() {
         /*
          * TODO:
          *   - spinner
-         *   - avoid multiple graphs of same type
          *   - export to image, ...
-         *   - only on numerical
          *   - persist in localstorage
+         *   - window resizing
+         *   - hiding
          */
+
+        // Delete a possibly already existing graph of this value.
+        $('.field-graph-container[data-field="' + field + '"]', $("#field-graphs")).remove();
 
         $.ajax({
             url: '/a/search/fieldhistogram',
@@ -363,6 +384,10 @@ $(document).ready(function() {
                 $("h3 .title", template).text(field);
                 $("ul", template).attr("data-field", field);
 
+                template.attr("data-config-interval", opts.interval);
+                template.attr("data-config-interpolation", opts.interpolation);
+                template.attr("data-config-renderer", opts.renderer);
+
                 $("#field-graphs").append(template);
 
                 var graphContainer = $('.field-graph-container[data-field="' + field + '"]', $("#field-graphs"));
@@ -372,8 +397,8 @@ $(document).ready(function() {
                     element: graphElem.get()[0],
                     width: $("#main-content").width()-12,
                     height: 175,
-                    interpolation: "linear",
-                    renderer: "bar",
+                    interpolation: opts.interpolation,
+                    renderer: opts.renderer,
                     series: [ {
                         name: "value",
                         data: data.values,
@@ -405,7 +430,25 @@ $(document).ready(function() {
                     graph: graph
                 });
 
+                if (opts.renderer == "scatterplot") {
+                    graph.renderer.dotSize = 2;
+                }
+
+                if (opts.renderer == "area") {
+                    graph.renderer.stroke = true;
+                }
+
                 graph.render();
+
+                // Highlight menu items.
+                $(".field-graph-container ul.interval-selector li a").removeClass("selected");
+                $('.field-graph-container ul.interval-selector li a[data-type="' + opts.interval + '"]').addClass("selected");
+
+                $(".field-graph-container ul.interpolation-selector li a").removeClass("selected");
+                $('.field-graph-container ul.interpolation-selector li a[data-type="' + opts.interpolation + '"]').addClass("selected");
+
+                $(".field-graph-container ul.type-selector li a").removeClass("selected");
+                $('.field-graph-container ul.type-selector li a[data-type="' + opts.renderer + '"]').addClass("selected");
 
                 fieldGraphs[field] = graph;
             },
@@ -422,9 +465,12 @@ $(document).ready(function() {
     }
 
     // Changing type of value graphs.
-    $("ul.type-selector li a").live("click", function(e) {
+    $(".field-graph-container ul.type-selector li a").live("click", function(e) {
         e.preventDefault();
-        var graph = fieldGraphs[$(this).closest("ul").attr("data-field")];
+
+        var field = $(this).closest("ul").attr("data-field");
+
+        var graph = fieldGraphs[field];
         var type = $(this).attr("data-type");
         graph.setRenderer(type);
 
@@ -438,19 +484,52 @@ $(document).ready(function() {
 
         graph.render();
 
+        var graphContainer = $('.field-graph-container[data-field="' + field + '"]', $("#field-graphs"));
+        graphContainer.attr("data-config-renderer", type);
+
         $("a", $(this).closest("ul")).removeClass("selected");
         $(this).addClass("selected");
     });
 
     // Changing interpolation of value graphs.
-    $("ul.interpolation-selector li a").live("click", function(e) {
+    $(".field-graph-container ul.interpolation-selector li a").live("click", function(e) {
         e.preventDefault();
-        var graph = fieldGraphs[$(this).closest("ul").attr("data-field")];
-        graph.interpolation = $(this).text();
+
+        var field = $(this).closest("ul").attr("data-field");
+        var interpolation = $(this).text();
+
+        var graph = fieldGraphs[field];
+        graph.interpolation = interpolation;
         graph.render();
+
+        var graphContainer = $('.field-graph-container[data-field="' + field + '"]', $("#field-graphs"));
+        graphContainer.attr("data-config-interpolation", interpolation);
 
         $("a", $(this).closest("ul")).removeClass("selected");
         $(this).addClass("selected");
+    });
+
+    // Changing interval of value graphs.
+    $(".field-graph-container ul.interval-selector li a").live("click", function(e) {
+        e.preventDefault();
+        var field = $(this).closest("ul").attr("data-field");
+        var graphContainer = $('.field-graph-container[data-field="' + field + '"]', $("#field-graphs"));
+
+        renderFieldChart(field, {
+            interval: $(this).attr("data-type"),
+            renderer: graphContainer.attr("data-config-renderer"),
+            interpolation: graphContainer.attr("data-config-interpolation")
+        });
+
+        $("a", $(this).closest("ul")).removeClass("selected");
+        $(this).addClass("selected");
+    });
+
+    $(".field-graph-container .add-to-dashboard").live("click", function(e) {
+        e.preventDefault();
+
+        // TODO
+        alert("Adding charts to dashboards is not implemented yet. (GitHub issue: #327)");
     });
 
 });

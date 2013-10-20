@@ -90,11 +90,11 @@
         <h3>
             <i class="icon icon-ellipsis-vertical"></i>
             <span class="title"></span>
+            <span class="type-description">(mean)</span>
 
             <div class="btn-group graph-settings">
-                <a class="btn btn-mini dropdown-toggle" data-toggle="dropdown" href="#">
-                    Settings
-                    <span class="caret"></span>
+                <a data-toggle="dropdown" href="#">
+                    <i class="icon icon-cog" title="Customize"></i>
                 </a>
 
                 <ul class="dropdown-menu">
@@ -122,9 +122,27 @@
                         </ul>
                     </li>
 
+                    <li class="dropdown-submenu">
+                        <a href="#">Interval</a>
+
+                        <ul class="dropdown-menu interval-selector">
+                            <li><a href="#" data-type="minute">Minute</a></li>
+                            <li><a href="#" data-type="hour">Hour</a></li>
+                            <li><a href="#" data-type="day">Day</a></li>
+                            <li><a href="#" data-type="week">Week</a></li>
+                            <li><a href="#" data-type="month">Month</a></li>
+                            <li><a href="#" data-type="quarter">Quarter</a></li>
+                            <li><a href="#" data-type="year">Year</a></li>
+                        </ul>
+                    </li>
+
                     <li><a href="#">Hide</a></li>
                 </ul>
             </div>
+
+            <a href="#">
+                <i class="icon icon-dashboard add-to-dashboard" title="Add to dashboard"></i>
+            </a>
         </h3>
 
         <div class='field-graph'></div>

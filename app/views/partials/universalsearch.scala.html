@@ -14,9 +14,15 @@
                 <span id="universalsearch-rangetype-permanent" style="display: none;">@request.getQueryString("rangetype")</span>
             }
 
-            @if(searchQuery != null && !searchQuery.isEmpty) {
-                <span id="universalsearch-query-permanent" style="display: none;">@searchQuery</span>
-            }
+            <span id="universalsearch-query-permanent" style="display: none;">@searchQuery</span>
+
+            <span id="universalsearch-interval-permanent" style="display: none;">
+                @if(request.getQueryString("interval") != null && !request.getQueryString("interval").isEmpty) {
+                    @request.getQueryString("interval")
+                } else {
+                    minute
+                }
+            </span>
             @******************************************************************************************************@
 
             @***************************************************************
