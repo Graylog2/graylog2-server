@@ -323,7 +323,6 @@ $(document).ready(function() {
         if (opts == undefined) {
             opts = {};
         }
-console.log(opts);
 
         // Options.
         if (opts.interval == undefined) {
@@ -366,8 +365,6 @@ console.log(opts);
          *   - spinner
          *   - export to image, ...
          *   - persist in localstorage
-         *   - window resizing
-         *   - hiding
          */
 
         // Delete a possibly already existing graph of this value.
@@ -523,6 +520,16 @@ console.log(opts);
 
         $("a", $(this).closest("ul")).removeClass("selected");
         $(this).addClass("selected");
+    });
+
+    // Changing interval of value graphs.
+    $(".field-graph-container li a.hide").live("click", function(e) {
+        e.preventDefault();
+        var field = $(this).closest("ul").attr("data-field");
+        var graphContainer = $('.field-graph-container[data-field="' + field + '"]', $("#field-graphs"));
+
+        graphContainer.remove();
+        delete fieldGraphs[field];
     });
 
     $(".field-graph-container .add-to-dashboard").live("click", function(e) {

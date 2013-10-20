@@ -634,6 +634,11 @@ $(document).ready(function() {
 
     function onResizedWindow(){
         drawResultGraph();
+
+        for (var field in fieldGraphs) {
+            fieldGraphs[field].configure({ width: $("#main-content").width()-12 });
+            fieldGraphs[field].render();
+        }
     }
 	
 });
