@@ -350,7 +350,6 @@ $(document).ready(function() {
          *   - export to image, ...
          *   - only on numerical
          *   - persist in localstorage
-         *   - smaller scatterplot dots
          */
 
         $.ajax({
@@ -375,7 +374,6 @@ $(document).ready(function() {
                     height: 175,
                     interpolation: "linear",
                     renderer: "bar",
-                    stroke: true,
                     series: [ {
                         name: "value",
                         data: data.values,
@@ -412,8 +410,13 @@ $(document).ready(function() {
                 fieldGraphs[field] = graph;
             },
             error: function(data) {
-                showError("Could not load histogram.");
+                if(data.status != 400) {
+                    showError("Could not load histogram.");
+                }
             },
+            statusCode: { 400: function() {
+                alert("Line charts are only available for numeric field types.");
+            }},
             complete: function() {}
         });
     }
@@ -427,6 +430,10 @@ $(document).ready(function() {
 
         if (type == "scatterplot") {
             graph.renderer.dotSize = 2;
+        }
+
+        if (type == "area") {
+            graph.renderer.stroke = true;
         }
 
         graph.render();
