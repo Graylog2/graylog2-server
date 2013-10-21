@@ -60,6 +60,11 @@ public class Collector {
             }
 
             Response r = requestBuilder.execute().get();
+
+            if (r.getStatusCode() != 200) {
+                throw new RuntimeException("Expected HTTP status code 200, got " + r.getStatusCode());
+            }
+
             return r.getResponseBody();
         } finally {
             client.close();
