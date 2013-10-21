@@ -1108,8 +1108,8 @@ form #stream-rules {
     font-weight: bold;
 }
 
-.field-graph-container .graph-settings {
-    font-size: 11px;
+.field-graph-container .graph-settings, .field-graph-container .pin  {
+    font-size: 12px;
 }
 
 .field-graph-container .graph-settings a:hover {

@@ -544,4 +544,11 @@ $(document).ready(function() {
         alert("Adding charts to dashboards is not implemented yet. (GitHub issue: #327)");
     });
 
+    $(".field-graph-container .pin").live("click", function(e) {
+        e.preventDefault();
+
+        // TODO
+        alert("Pinning/persisting charts is not implemented yet. (GitHub issue: #329)");
+    });
+
 });
