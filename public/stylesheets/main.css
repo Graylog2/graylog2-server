@@ -1108,7 +1108,7 @@ form #stream-rules {
     font-weight: bold;
 }
 
-.field-graph-container .graph-settings, .field-graph-container .add-to-dashboard {
+.field-graph-container .graph-settings {
     font-size: 11px;
 }
 
