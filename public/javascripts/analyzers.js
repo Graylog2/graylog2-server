@@ -360,11 +360,14 @@ $(document).ready(function() {
                 break;
         }
 
+        $("#field-graphs .spinner").show();
+
         /*
          * TODO:
-         *   - spinner
          *   - export to image, ...
-         *   - persist in localstorage
+         *   - persist in localstorage?
+         *   - overflowing select box
+         *   - add multiple lines?
          */
 
         // Delete a possibly already existing graph of this value.
@@ -457,7 +460,9 @@ $(document).ready(function() {
             statusCode: { 400: function() {
                 alert("Line charts are only available for numeric field types.");
             }},
-            complete: function() {}
+            complete: function() {
+                $("#field-graphs .spinner").hide();
+            }
         });
     }
 

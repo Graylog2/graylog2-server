@@ -1120,3 +1120,8 @@ form #stream-rules {
     color: #bbb;
     font-size: 11px;
 }
+
+#field-graphs .spinner {
+    margin-top: 30px;
+    text-align: center;
+}
