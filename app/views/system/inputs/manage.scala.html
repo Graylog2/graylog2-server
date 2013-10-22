@@ -68,7 +68,7 @@
                     </h3>
 
                     @if(input.getReadBytes >= 0 && input.getWrittenBytes >= 0) {
-                        <div class="input-io" data-node-id="@node.getNodeId" data-input-id="@input.getId">
+                        <div class="input-io focuslimit" data-node-id="@node.getNodeId" data-input-id="@input.getId">
                             Network IO:
 
                             <span class="persec">
@@ -93,7 +93,7 @@
                     }
 
                     @if(input.getConnections >= 0 && input.getTotalConnections >= 0) {
-                        <div class="input-connections" data-node-id="@node.getNodeId" data-input-id="@input.getId">
+                        <div class="input-connections focuslimit" data-node-id="@node.getNodeId" data-input-id="@input.getId">
                             Total connections:
                             <span class="total">@input.getTotalConnections</span>
                             (<span class="active">@input.getConnections</span> active)

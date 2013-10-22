@@ -11,7 +11,7 @@
 
     <div class="row-fluid">
         <div class="alert alert-success">
-            Processing <strong class="total-throughput"></strong> messages per second.
+            Processing <strong class="total-throughput focuslimit"></strong> messages per second.
         </div>
     </div>
 
@@ -29,7 +29,7 @@
                 @if(nodes.get(jvm.getNodeId).isProcessing) {
                     <span class="sentence">
                         Processing
-                        <strong class="node-throughput" data-node-id="@jvm.getNodeId">0</strong>
+                        <strong class="node-throughput focuslimit" data-node-id="@jvm.getNodeId">?</strong>
                         messages per second.
                     </span>
                 } else {
