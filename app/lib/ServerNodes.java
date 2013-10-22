@@ -178,4 +178,8 @@ public class ServerNodes {
     public void linkConfiguredNode(Node configuredNode, Node resolvedNode) {
         configuredNodes.put(configuredNode, resolvedNode);
     }
+
+    public boolean isDisconnected() {
+        return serverNodes.isEmpty();
+    }
 }
