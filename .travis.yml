@@ -29,8 +29,10 @@ addons:
   sauce_connect: true
 notifications:
   campfire:
+    on_success: change
+    on_failure: always
     rooms:
       secure: |-
-        CGjN85r7K+0X4aspi5B76HGsWvU40YKbTRbkZ1Q9AvDxMoPINDiSP4rMtg/7
-        JL1MUpSvfejtf36kmkUe0O3Kl6xm7vao5zBBdHu4ZM5K4E9ZCihrMi/1crid
-        O0HiTHSmLQUelekzHhkAHi+AbtPZQFoXzRPZ5LN7f+ECKjlfwhY=
+        NwOeFYH729EO9isap7y9rTvxl26Og1HYVMvqzzTpA6x9hI/1VZ78iKYQuaca
+        vX64upgHP+hrNVWqM9mxBmdhctndK/r7mK6/RoMr9x1EFQRtzXOBm8HXSnxk
+        l6Vdx0VAWZylzUkUL+x6GKpa3Lrtg4Bz76xlypLFYOp04C0TCjQ=
