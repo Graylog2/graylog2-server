@@ -7,8 +7,10 @@ jdk:
 before_install: ./install-syslog4j-jar.sh
 notifications:
   campfire:
+    on_success: change
+    on_failure: always
     rooms:
       secure: |-
-        daYSGcc6cr3eBW006/1Vx00Xxsa2hlfqa8k7Uuod1E0D+69oI5nm1nd7J+2V
-        SY7lH/kwr60Xe61TtUJ9pXHZssHNcRfmF6INKwUsErgIjUKpluW6hjsgXw/q
-        OBFuG7vowG0tdhdsnE/qcnfkkB9bm/YgUeDfpMW4vZpdUhnBwbI=
+        NwOeFYH729EO9isap7y9rTvxl26Og1HYVMvqzzTpA6x9hI/1VZ78iKYQuaca
+        vX64upgHP+hrNVWqM9mxBmdhctndK/r7mK6/RoMr9x1EFQRtzXOBm8HXSnxk
+        l6Vdx0VAWZylzUkUL+x6GKpa3Lrtg4Bz76xlypLFYOp04C0TCjQ=
