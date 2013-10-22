@@ -32,8 +32,8 @@ import play.libs.F;
 import play.mvc.Http;
 
 import java.io.IOException;
-import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 
 public class ClusterService {
     private static final Logger log = LoggerFactory.getLogger(ClusterService.class);
@@ -124,9 +124,9 @@ public class ClusterService {
 
     public List<ServerJVMStats> getClusterJvmStats() {
         List<ServerJVMStats> result = Lists.newArrayList();
-        Collection<ServerJVMStatsResponse> rs = api.get(ServerJVMStatsResponse.class).fromAllNodes().path("/system/jvm").executeOnAll();
+        Map<Node, ServerJVMStatsResponse> rs = api.get(ServerJVMStatsResponse.class).fromAllNodes().path("/system/jvm").executeOnAll();
 
-        for (ServerJVMStatsResponse r : rs) {
+        for (ServerJVMStatsResponse r : rs.values()) {
             result.add(new ServerJVMStats(r));
         }
 
@@ -134,10 +134,10 @@ public class ClusterService {
     }
 
     public F.Tuple<Integer, Integer> getClusterThroughput() {
-        final Collection<ServerThroughputResponse> responses =
+        final Map<Node, ServerThroughputResponse> responses =
                 api.get(ServerThroughputResponse.class).fromAllNodes().path("/system/throughput").executeOnAll();
         int t = 0;
-        for (ServerThroughputResponse r : responses) {
+        for (ServerThroughputResponse r : responses.values()) {
             t += r.throughput;
         }
         return F.Tuple(t, responses.size());

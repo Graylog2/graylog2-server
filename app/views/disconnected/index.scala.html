@@ -1,0 +1,24 @@
+@(context: Http.Context, serverNodes: lib.ServerNodes)
+
+@saferepair("Disconnected") {
+
+    <div class="row-fluid">
+        <div class="span12" id="main-content">
+            <div>
+                <h1 class="text-center">Graylog2 Web Interface is disconnected.</h1>
+
+                <div class="row-fluid">
+
+                    <div class="span4">
+                        <div class="alert alert-danger">
+                            <p>Unable to connect to any Graylog2 servers. This usually is a temporary problem, but could also be a configuration error.</p>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+}

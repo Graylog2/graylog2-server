@@ -22,13 +22,16 @@ import com.google.common.collect.Lists;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import lib.security.Graylog2ServerUnavailableException;
 import models.Node;
 import models.api.responses.NodeResponse;
 import models.api.responses.NodeSummaryResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.Callable;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
@@ -72,17 +75,40 @@ public class ServerNodesRefreshService {
             int i = 0;
             for (NodeSummaryResponse nsr : response.nodes) {
                 log.debug("Adding graylog2 server node {} to current set of nodes ({}/{})", nsr.transportAddress, ++i, response.nodes.size());
-                newNodes.add(nodeFactory.fromSummaryResponse(nsr));
+                final Node newNode = nodeFactory.fromSummaryResponse(nsr);
+                newNode.setActive(true);
+                newNodes.add(newNode);
             }
             return newNodes;
         }
+    }
+
+    private void resolveConfiguredNodes() {
+        // either we have just started and never seen any servers, or we lost connection to all servers in our cluster
+        // resolve all configured nodes, to figure out the proper transport addresses in this network
+        final Collection<Node> configuredNodes = serverNodes.getConfiguredNodes();
+        final Map<Node, NodeSummaryResponse> responses =
+                api.get(NodeSummaryResponse.class).path("/system/cluster/node").nodes(configuredNodes).executeOnAll();
+        List<Node> resolvedNodes = Lists.newArrayList();
+        for (Map.Entry<Node, NodeSummaryResponse> nsr : responses.entrySet()) {
+            final Node resolvedNode = nodeFactory.fromSummaryResponse(nsr.getValue());
+            resolvedNode.setActive(true);
+            resolvedNodes.add(resolvedNode);
+            serverNodes.linkConfiguredNode(nsr.getKey(), resolvedNode);
+        }
+        serverNodes.put(resolvedNodes);
     }
 
     public void start() {
         executor.scheduleWithFixedDelay(new Runnable() {
             @Override
             public void run() {
-                refreshNodeList();
+                try {
+                    refreshNodeList();
+                } catch (Graylog2ServerUnavailableException e) {
+                    resolveConfiguredNodes();
+                }
+
             }
         }, 0L, 5L, TimeUnit.SECONDS);
     }
@@ -91,15 +117,22 @@ public class ServerNodesRefreshService {
         executor.shutdown();
     }
 
-    public void refreshNodeList() {
+    /**
+     * Re-reads the cluster node state from a server.
+     *
+     * @return true if a cluster node list could be read, false if the read failed
+     */
+    private boolean refreshNodeList() {
         final Node initialNode = serverNodes.any();
         final RefreshOperation refreshOperation = new RefreshOperation(initialNode);
         final List<Node> nodeList;
         try {
             nodeList = refreshOperation.call();
-            serverNodes.setCurrentNodes(nodeList);
+            serverNodes.put(nodeList);
+            return true;
         } catch (Exception e) {
             log.warn("Could not retrieve graylog2 node list from node " + initialNode + ". Retrying automatically.", e);
         }
+        return false;
     }
 }

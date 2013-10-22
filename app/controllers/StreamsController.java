@@ -43,6 +43,9 @@ public class StreamsController extends AuthenticatedController {
 			String message = "Could not fetch streams. We expected HTTP 200, but got a HTTP " + e.getHttpCode() + ".";
 			return status(504, views.html.errors.error.render(message, e, request()));
 		}
+        catch (Exception e) {
+            return internalServerError();
+        }
 	}
 
     public Result newStream() {

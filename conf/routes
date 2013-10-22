@@ -7,6 +7,9 @@ GET         /login                                                              
 POST        /login                                                                   @controllers.SessionsController.create()
 GET         /logout                                                                  @controllers.SessionsController.destroy()
 
+# Unconnected web interface
+GET         /disconnected                                                            @controllers.LonesomeInterfaceController.index()
+
 # Home page
 GET         /                                                                        @controllers.DashboardController.index()
 

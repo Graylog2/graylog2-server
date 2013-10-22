@@ -18,18 +18,10 @@
  */
 package lib;
 
-import com.google.common.collect.Lists;
-import com.google.inject.AbstractModule;
-import com.google.inject.Guice;
-import com.google.inject.Injector;
-import com.google.inject.Module;
-import com.google.inject.name.Names;
 import com.ning.http.client.AsyncHttpClient;
 import com.ning.http.client.AsyncHttpClientConfig;
-import models.ModelFactoryModule;
 import models.Node;
 import models.api.responses.EmptyResponse;
-import models.api.responses.NodeSummaryResponse;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
@@ -39,36 +31,22 @@ import org.slf4j.LoggerFactory;
 
 import java.net.URL;
 import java.util.Collection;
-import java.util.List;
+import java.util.Iterator;
+import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
-public class ApiClientTest {
+public class ApiClientTest extends BaseApiTest {
     private static final Logger log = LoggerFactory.getLogger(ApiClientTest.class);
 
     private StubHttpProvider stubHttpProvider;
     private AsyncHttpClient client;
 
-    public Injector setup(final Node[] initialNodes) {
-        List<Module> modules = Lists.newArrayList();
-        modules.add(new ModelFactoryModule());
-
-        modules.add(new AbstractModule() {
-            @Override
-            protected void configure() {
-                bind(Node[].class).annotatedWith(Names.named("Initial Nodes")).toInstance(initialNodes);
-            }
-        });
-        return Guice.createInjector(modules);
-    }
-
     @Test
     public void testBuildTarget() throws Exception {
-        final NodeSummaryResponse r = new NodeSummaryResponse();
-        r.transportAddress = "http://horst:12900";
-        final Node node = new Node(r); // can't use injector here... we need to have the initial list :(
+        setupNodes(AddressNodeId.create("http://horst:12900"));
 
-        final Injector injector = setup(new Node[] {node});
-        final ApiClient api = injector.getInstance(ApiClient.class);
+        // we only have one node configured here
+        final Node node = serverNodes.any();
         api.setHttpClient(client);
 
         final URL url = api.get(EmptyResponse.class).path("/some/resource").credentials("user", "password").node(node).prepareUrl(node);
@@ -91,15 +69,13 @@ public class ApiClientTest {
 
     @Test
     public void testSingleExecute() throws Exception {
-        final NodeSummaryResponse r = new NodeSummaryResponse();
-        r.transportAddress = "http://horst:12900";
-        final Node node = new Node(r); // can't use injector here... we need to have the initial list :(
+        setupNodes(AddressNodeId.create("http://horst:12900"));
 
-        final Injector injector = setup(new Node[] {node});
-        final ApiClient api = injector.getInstance(ApiClient.class);
+        // we only have one node configured here
+        final Node node = serverNodes.any();
         api.setHttpClient(client);
 
-        final ApiClient.ApiRequestBuilder<EmptyResponse> requestBuilder =
+        final ApiClientImpl.ApiRequestBuilder<EmptyResponse> requestBuilder =
                 api.get(EmptyResponse.class)
                         .path("/some/resource")
                         .credentials("user", "password")
@@ -114,23 +90,21 @@ public class ApiClientTest {
 
     @Test
     public void testParallelExecution() throws Exception {
-        final NodeSummaryResponse r = new NodeSummaryResponse();
-        r.transportAddress = "http://horst1:12900";
-        Node node1 = new Node(r); // TODO DI
-        r.transportAddress = "http://horst2:12900";
-        Node node2 = new Node(r); // TODO DI
+        setupNodes(AddressNodeId.create("http://horst1:12900"), AddressNodeId.create("http://horst2:12900"));
 
-        final Injector injector = setup(new Node[] {node1, node2});
-        final ApiClient api = injector.getInstance(ApiClient.class);
+        final Collection<Node> nodes = serverNodes.all();
+        final Iterator<Node> it = nodes.iterator();
+        Node node1 = it.next();
+        Node node2 = it.next();
         api.setHttpClient(client);
 
-        final ApiClient.ApiRequestBuilder<EmptyResponse> requestBuilder = api.get(EmptyResponse.class).path("/some/resource");
+        final ApiClientImpl.ApiRequestBuilder<EmptyResponse> requestBuilder = api.get(EmptyResponse.class).path("/some/resource");
         final URL url1 = requestBuilder.prepareUrl(node1);
         final URL url2 = requestBuilder.prepareUrl(node2);
         stubHttpProvider.expectResponse(url1, 200, "{}");
         stubHttpProvider.expectResponse(url2, 200, "{}");
 
-        final Collection<EmptyResponse> responses = requestBuilder.nodes(node1, node2).executeOnAll();
+        final Map<Node, EmptyResponse> responses = requestBuilder.nodes(node1, node2).executeOnAll();
         Assert.assertFalse(responses.isEmpty());
         Assert.assertTrue(stubHttpProvider.isExpectationsFulfilled());
     }
@@ -148,4 +122,5 @@ public class ApiClientTest {
         client.close();
         client = null;
     }
+
 }

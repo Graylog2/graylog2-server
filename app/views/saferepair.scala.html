@@ -1,0 +1,37 @@
+@(title: String)(content: Html)
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Graylog2 - @title</title>
+    @partials.head()
+</head>
+<body>
+
+    <div id="top" class="navbar navbar-fixed-top">
+        <div class="container-fluid">
+            <div class="row-fluid">
+                <a href="/"><img src="@routes.Assets.at("images/toplogo.png")" id="toplogo" /></a>
+            </div>
+        </div>
+    </div>
+
+<div class="container-fluid">
+    <div class="row-fluid error-bar">
+        @if(flash.get("error") != null && !flash.get("error").isEmpty()) {
+        <div class="alert alert-error main-error">
+            <strong>Error!</strong>
+            <a class="close" data-dismiss="alert" href="#">×</a>@flash.get("error")
+        </div>
+        }
+    </div>
+
+    @content
+</div>
+
+<div id="footer">
+    graylog2-web-interface v@lib.Version.VERSION.getName()
+    (@System.getProperty("java.vendor") @System.getProperty("java.version") on @System.getProperty("os.name") @System.getProperty("os.version"))
+</div>
+</body>
+</html>

@@ -19,6 +19,7 @@
 package lib.security;
 
 import com.google.inject.Inject;
+import controllers.routes;
 import models.User;
 import models.UserService;
 import org.slf4j.Logger;
@@ -53,7 +54,17 @@ public class RedirectAuthenticator extends Authenticator {
     @Override
 	public Result onUnauthorized(Context ctx) {
         if (ctx.args.containsKey(GRAYLOG_2_SERVER_MISSING_KEY)) {
-            return status(Http.Status.GATEWAY_TIMEOUT);
+            // the client is not "unauthorized" per se, but we couldn't reach any backend to authenticate against.
+            // if this is a XMLHttpRequest, we respond with a 504 Gateway Timeout, to trigger the error handlers in Javascript
+            final String xhr = ctx.request().getHeader("X-Requested-With");
+            if (xhr != null && xhr.equalsIgnoreCase("xmlhttprequest")) {
+                return status(Http.Status.GATEWAY_TIMEOUT);
+            }
+
+            // otherwise we couldn't reach any backend, and need to tell the user so.
+            // we redirect to a special controller, which won't try to load user.
+            ctx.session().put("disconnected_orig_uri", ctx.request().uri());
+            return redirect(routes.LonesomeInterfaceController.index());
         }
 		return redirect(controllers.routes.SessionsController.index());
 	}

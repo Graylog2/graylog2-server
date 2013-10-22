@@ -33,9 +33,7 @@ import lib.security.RethrowingFirstSuccessfulStrategy;
 import lib.security.ServerRestInterfaceRealm;
 import models.LocalAdminUser;
 import models.ModelFactoryModule;
-import models.Node;
 import models.UserService;
-import models.api.responses.NodeSummaryResponse;
 import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.authc.AuthenticationListener;
 import org.apache.shiro.authc.Authenticator;
@@ -52,6 +50,7 @@ import play.GlobalSettings;
 import play.api.mvc.EssentialFilter;
 
 import java.io.File;
+import java.net.URI;
 import java.util.List;
 
 /**
@@ -84,19 +83,17 @@ public class Global extends GlobalSettings {
             log.error("graylog2-server.uris is empty!");
             throw new IllegalStateException("graylog2-server.uris is empty");
         }
-        final Node[] initialNodes = new Node[uris.length];
+        final URI[] initialNodes = new URI[uris.length];
         int i = 0;
         for (String uri : uris) {
-            final NodeSummaryResponse r = new NodeSummaryResponse();
-            r.transportAddress =  uri;
-            initialNodes[i++] = new Node(r);  // TODO DI this is wrong, can we use the factory already here?
+            initialNodes[i++] = URI.create(uri);
         }
 
         List<Module> modules = Lists.newArrayList();
         modules.add(new AbstractModule() {
             @Override
             protected void configure() {
-                bind(Node[].class).annotatedWith(Names.named("Initial Nodes")).toInstance(initialNodes);
+                bind(URI[].class).annotatedWith(Names.named("Initial Nodes")).toInstance(initialNodes);
             }
         });
         modules.add(new ModelFactoryModule());
@@ -129,6 +126,12 @@ public class Global extends GlobalSettings {
         }
         SecurityUtils.setSecurityManager(securityManager);
 
+    }
+
+    @Override
+    public void onStop(Application app) {
+        injector.getInstance(ApiClient.class).stop();
+        injector.getInstance(ServerNodesRefreshService.class).stop();
     }
 
     @Override
