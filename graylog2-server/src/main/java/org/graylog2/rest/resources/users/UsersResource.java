@@ -29,6 +29,7 @@ import org.bson.types.ObjectId;
 import org.graylog2.database.ValidationException;
 import org.graylog2.rest.documentation.annotations.*;
 import org.graylog2.rest.resources.RestResource;
+import org.graylog2.rest.resources.users.requests.ChangePasswordRequest;
 import org.graylog2.rest.resources.users.requests.CreateRequest;
 import org.graylog2.rest.resources.users.requests.PermissionEditRequest;
 import org.graylog2.security.RestPermissions;
@@ -43,6 +44,11 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import static javax.ws.rs.core.Response.Status.*;
+import static javax.ws.rs.core.Response.noContent;
+import static javax.ws.rs.core.Response.ok;
+import static javax.ws.rs.core.Response.status;
 
 /**
  * @author Lennart Koopmann <lennart@torch.sh>
@@ -66,13 +72,13 @@ public class UsersResource extends RestResource {
     public Response get(@ApiParam(title = "username", description = "The username to return information for.", required = true) @PathParam("username") String username) {
         final User user = User.load(username, core);
         if (user == null) {
-            return Response.status(Response.Status.NOT_FOUND).build();
+            return status(NOT_FOUND).build();
         }
         // if the requested username does not match the authenticated user, then we don't return permission information
         final boolean allowedToSeePermissions = getSubject().isPermitted(RestPermissions.USERPERMISSIONS_EDIT);
         final boolean permissionsAllowed = getSubject().getPrincipal().toString().equals(username) || allowedToSeePermissions;
 
-        return Response.ok().entity(json(toMap(user, permissionsAllowed))).build();
+        return ok().entity(json(toMap(user, permissionsAllowed))).build();
     }
 
     @GET
@@ -86,7 +92,7 @@ public class UsersResource extends RestResource {
         }
         final HashMap<Object, Object> map = Maps.newHashMap();
         map.put("users", resultUsers);
-        return Response.ok(json(map)).build();
+        return ok(json(map)).build();
     }
 
     @POST
@@ -119,13 +125,13 @@ public class UsersResource extends RestResource {
             id = user.save();
         } catch (ValidationException e) {
             LOG.error("Validation error.", e);
-            throw new WebApplicationException(e, Response.Status.BAD_REQUEST);
+            throw new WebApplicationException(e, BAD_REQUEST);
         }
         // TODO don't expose mongo object id here, we never accept it. set location header instead
         Map<String, Object> result = Maps.newHashMap();
         result.put("id", id.toStringMongod());
 
-        return Response.status(Response.Status.CREATED).entity(json(result)).build();
+        return status(CREATED).entity(json(result)).build();
     }
 
     @PUT
@@ -145,7 +151,7 @@ public class UsersResource extends RestResource {
 
         final User user = User.load(username, core);
         if (user == null) {
-            return Response.status(Response.Status.NOT_FOUND).build();
+            return status(NOT_FOUND).build();
         }
         if (user.isReadOnly()) {
             throw new BadRequestException("Cannot modify readonly user " + username);
@@ -179,7 +185,7 @@ public class UsersResource extends RestResource {
     public Response deleteUser(@ApiParam(title = "username", description = "The name of the user to delete.", required = true) @PathParam("username") String username) {
         final User user = User.load(username, core);
         if (user == null) {
-            return Response.status(Response.Status.NOT_FOUND).build();
+            return status(NOT_FOUND).build();
         }
         if (user.isReadOnly()) {
             throw new BadRequestException("Cannot delete readonly user " + username);
@@ -208,7 +214,7 @@ public class UsersResource extends RestResource {
 
         final User user = User.load(username, core);
         if (user == null) {
-            return Response.status(Response.Status.NOT_FOUND).build();
+            return status(NOT_FOUND).build();
         }
         user.setPermissions(permissionRequest.permissions);
         try {
@@ -230,7 +236,7 @@ public class UsersResource extends RestResource {
     public Response deletePermissions(@ApiParam(title = "username", description = "The name of the user to modify.", required = true) @PathParam("username") String username) {
         final User user = User.load(username, core);
         if (user == null) {
-            return Response.status(Response.Status.NOT_FOUND).build();
+            return status(NOT_FOUND).build();
         }
         user.setPermissions(Lists.<String>newArrayList());
         try {
@@ -238,7 +244,60 @@ public class UsersResource extends RestResource {
         } catch (ValidationException e) {
             throw new InternalServerErrorException(e);
         }
-        return Response.status(Response.Status.NO_CONTENT).build();
+        return status(NO_CONTENT).build();
+    }
+
+    @PUT
+    @Path("{username}/password")
+    @RequiresPermissions(RestPermissions.USERPASSWORD_CHANGE)
+    @ApiOperation("Update the password for a user.")
+    @ApiResponses({
+            @ApiResponse(code = 201, message = "The password was successfully updated. Subsequent requests must be made with the new password."),
+            @ApiResponse(code = 400, message = "If the given old password does not match the password of the given user."),
+            @ApiResponse(code = 403, message = "If the requesting user has insufficient privileges to update the password for the given user or the old password was wrong."),
+            @ApiResponse(code = 404, message = "If the user does not exist.")
+    })
+    public Response changePassword(
+            @ApiParam(title = "username", description = "The name of the user whose password to change.", required = true) @PathParam("username") String username,
+            @ApiParam(title = "JSON body", description = "The hashed old and new passwords.", required = true) String body) {
+
+        if (body == null || body.isEmpty()) {
+            throw new BadRequestException("Missing request body.");
+        }
+
+        final ChangePasswordRequest cr;
+        try {
+            cr = objectMapper.readValue(body, ChangePasswordRequest.class);
+        } catch (IOException e) {
+            LOG.error("Error while parsing JSON", e);
+            throw new WebApplicationException(e, BAD_REQUEST);
+        }
+
+        final User user = User.load(username, core);
+        if (user == null) {
+            return status(NOT_FOUND).build();
+        }
+
+        if (!getSubject().isPermitted(RestPermissions.USERPASSWORD_CHANGE + ":" + user.getName())) {
+            return status(FORBIDDEN).build();
+        }
+
+        // TODO check whether we must ignore the old_password (for admins changing other people's passwords)
+
+        final String oldPasswordHash = new SimpleHash("SHA-1", cr.old_password, core.getConfiguration().getPasswordSecret()).toString();
+        final String currentPasswordHash = user.getHashedPassword();
+        if (currentPasswordHash.equals(oldPasswordHash)) {
+            // ok to set the new password
+            final String newHashedPassword = new SimpleHash("SHA-1", cr.password, core.getConfiguration().getPasswordSecret()).toString();
+            user.setHashedPassword(newHashedPassword);
+            try {
+                user.save();
+            } catch (ValidationException e) {
+                throw new BadRequestException("Validation error for " + username, e);
+            }
+            return noContent().build();
+        }
+        return status(FORBIDDEN).build();
     }
 
     private HashMap<String, Object> toMap(User user) {
@@ -264,7 +323,7 @@ public class UsersResource extends RestResource {
             cr = objectMapper.readValue(body, CreateRequest.class);
         } catch(IOException e) {
             LOG.error("Error while parsing JSON", e);
-            throw new WebApplicationException(e, Response.Status.BAD_REQUEST);
+            throw new WebApplicationException(e, BAD_REQUEST);
         }
         return cr;
     }

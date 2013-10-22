@@ -36,6 +36,7 @@ public class RestPermissions {
     public static final String USERS_EDIT = "users:edit";
     public static final String USERS_LIST = "users:list";
     public static final String USERPERMISSIONS_EDIT = "userpermissions:edit";
+    public static final String USERPASSWORD_CHANGE = "userpassword:change";
 
     private static Map<String, Collection<String>> allPermissions;
 

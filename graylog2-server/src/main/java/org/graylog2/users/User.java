@@ -172,6 +172,10 @@ public class User extends Persisted {
         return fields.get(PASSWORD).toString();
     }
 
+    public void setHashedPassword(String hashedPassword) {
+        fields.put(PASSWORD, hashedPassword);
+    }
+
     private static class LocalAdminUser extends User {
         LocalAdminUser(Core core) {
             super(null, Maps.<String, Object>newHashMap(), core);
