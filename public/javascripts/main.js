@@ -460,11 +460,11 @@ $(document).ready(function() {
             });
         }, 150 );
     }
-    var repeatPasswordField = $("form#create-user-form #password-repeat");
+    var repeatPasswordField = $("form #password-repeat");
     if (repeatPasswordField.length) {
         var domElement1 = repeatPasswordField[0];
         delayedAjaxCallOnKeyup(domElement1, function() {
-            var password = $("form#create-user-form #password").val();
+            var password = $("form #password").val();
             if (password == repeatPasswordField.val()) {
                 domElement1.setCustomValidity('');
                 repeatPasswordField.popover("destroy");
@@ -670,6 +670,18 @@ function showError(message) {
 
 function showWarning(message) {
     toastr.warning(message, "Attention", {
+        "debug": false,
+        "positionClass": "toast-bottom-full-width",
+        "onclick": null,
+        "fadeIn": 300,
+        "fadeOut": 1000,
+        "timeOut": 7000,
+        "extendedTimeOut": 1000
+    });
+}
+
+function showSuccess(message) {
+    toastr.success(message, "Information", {
         "debug": false,
         "positionClass": "toast-bottom-full-width",
         "onclick": null,

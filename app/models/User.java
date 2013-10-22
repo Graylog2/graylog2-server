@@ -23,6 +23,7 @@ import com.google.inject.assistedinject.Assisted;
 import com.google.inject.assistedinject.AssistedInject;
 import lib.APIException;
 import lib.ApiClient;
+import models.api.requests.ChangePasswordRequest;
 import models.api.requests.ChangeUserRequest;
 import models.api.responses.system.UserResponse;
 import org.slf4j.Logger;
@@ -96,6 +97,23 @@ public class User {
 
     public String getPasswordHash() {
         return passwordHash;
+    }
+
+    public boolean updatePassword(ChangePasswordRequest request) {
+        try {
+            api.put()
+                .path("/users/{0}/password", getName())
+                .body(request)
+                .expect(Http.Status.NO_CONTENT)
+                .execute();
+        } catch (APIException e) {
+            log.error("Unable to update password", e);
+            return false;
+        } catch (IOException e) {
+            log.error("Unable to update password", e);
+            return false;
+        }
+        return true;
     }
 
     public interface Factory {

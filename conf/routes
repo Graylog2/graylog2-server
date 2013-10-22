@@ -50,6 +50,7 @@ GET         /system/users/show/:username                                        
 POST        /system/users/save/:username                                             @controllers.UsersController.saveChanges(username: String)
 GET         /system/users/new                                                        @controllers.UsersController.newUserForm()
 GET         /system/users/edit/:username                                             @controllers.UsersController.editUserForm(username: String)
+POST        /system/users/password/:username                                         @controllers.UsersController.changePassword(username: String)
 
 # Systemjobs
 POST        /systemjobs/trigger                                                      @controllers.SystemJobsController.trigger()

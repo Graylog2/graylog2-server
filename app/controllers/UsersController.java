@@ -26,6 +26,7 @@ import lib.Tools;
 import models.PermissionsService;
 import models.User;
 import models.UserService;
+import models.api.requests.ChangePasswordRequest;
 import models.api.requests.ChangeUserRequest;
 import models.api.requests.CreateUserRequest;
 import org.apache.shiro.crypto.hash.SimpleHash;
@@ -40,6 +41,7 @@ public class UsersController extends AuthenticatedController {
 
     private static final Form<CreateUserRequest> createUserForm = Form.form(CreateUserRequest.class);
     private static final Form<ChangeUserRequest> changeUserForm = Form.form(ChangeUserRequest.class);
+    private static final Form<ChangePasswordRequest> changePasswordForm = Form.form(ChangePasswordRequest.class);
 
     @Inject
     private UserService userService;
@@ -130,6 +132,23 @@ public class UsersController extends AuthenticatedController {
         final User user = userService.load(username);
         user.update(requestForm.get());
 
+        return redirect(routes.UsersController.index());
+    }
+
+    public Result changePassword(String username) {
+        final Form<ChangePasswordRequest> requestForm = changePasswordForm.bindFromRequest("old_password", "password");
+
+        final ChangePasswordRequest request = requestForm.get();
+        final User user = userService.load(username);
+        request.old_password = new SimpleHash("SHA-256", request.old_password).toString();
+        request.password = new SimpleHash("SHA-256", request.password).toString();
+
+        if (requestForm.hasErrors() || !user.updatePassword(request)) {
+            flash("error", "Could not update the password.");
+            return redirect(routes.UsersController.editUserForm(username));
+        }
+
+        flash("success", "Successfully changed the password for user " + user.getFullName());
         return redirect(routes.UsersController.index());
     }
 
