@@ -35,7 +35,6 @@ public class OptimizeIndexJob extends SystemJob {
 
     public static final int MAX_CONCURRENCY = 1000;
 
-    private final Core core;
     private final String index;
 
     public OptimizeIndexJob(Core core, String index) {
