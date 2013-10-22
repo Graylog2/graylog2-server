@@ -406,7 +406,8 @@ class ApiClientImpl implements ApiClient {
                 if (method != Method.PUT && method != Method.POST) {
                     throw new IllegalArgumentException("Cannot set request body on non-PUT or POST requests.");
                 }
-                requestBuilder.addHeader("Content-Type", "application/json");
+                requestBuilder.addHeader("Content-Type", "application/json; charset=utf-8");
+                requestBuilder.setBodyEncoding("UTF-8");
                 requestBuilder.setBody(body.toJson());
             } else if(method == Method.POST) {
                 log.warn("POST without body, this doesn't make sense,", new IllegalStateException());
@@ -415,6 +416,7 @@ class ApiClientImpl implements ApiClient {
             if (!responseClass.equals(String.class)) {
                 requestBuilder.addHeader("Accept", "application/json");
             }
+            requestBuilder.addHeader("Accept-Charset", "utf-8");
             return requestBuilder;
         }
 
