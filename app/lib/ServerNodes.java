@@ -179,7 +179,7 @@ public class ServerNodes {
         configuredNodes.put(configuredNode, resolvedNode);
     }
 
-    public boolean isDisconnected() {
-        return serverNodes.isEmpty();
+    public boolean isConnected() {
+        return skipInactive(serverNodes).hasNext();
     }
 }

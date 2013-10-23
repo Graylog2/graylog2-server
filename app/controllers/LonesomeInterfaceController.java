@@ -29,7 +29,7 @@ public class LonesomeInterfaceController extends BaseController {
     private ServerNodes serverNodes;
 
     public Result index() {
-        if (!serverNodes.isDisconnected()) {
+        if (serverNodes.isConnected()) {
             return redirect(routes.DashboardController.index());
         }
         return ok(views.html.disconnected.index.render(Http.Context.current(), serverNodes));
