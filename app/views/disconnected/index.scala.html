@@ -11,17 +11,17 @@
                     <div class="row-fluid">
                         <div class="alert alert-danger">
                         @if(nodesEverConnectedTo.isEmpty) {
-                            <p>The web interface was unable to connect to any Graylog2 Server in the cluster so far.</p>
-                            <p>Please check that the configured nodes shown to the right are correct and that the servers are reachable.</p>
+                            <p>The web interface was unable to connect to any Graylog2 node in the cluster so far.</p>
+                            <p>Please check that the configured nodes shown on the left hand side are correct and that the servers are reachable.</p>
                         } else {
-                            <p>The web interface lost connection to all servers it has been connected to.</p>
+                            <p>The web interface could not connect to any of the Graylog2 nodes it has been connected to before.</p>
                             <p>Please check that the servers shown to the right are running and reachable.</p>
                         }
                         </div>
                         @views.html.partials.preview("The times shown on this page are lacking consistent timezone handling.", 228)
                         <div class="row-fluid" id="nodes-box">
                             <div class="span6">
-                                <h3>Nodes from configuration</h3>
+                                <h3>Configured nodes</h3>
                                 @for(node <- configuredNodes.sortBy(_.getTransportAddress)) {
                                     <div class="well well-small">
                                         <a class="btn btn-mini btn-info pull-right" target="_blank" href="@node.getTransportAddress/api-browser">API Browser</a>
@@ -33,9 +33,9 @@
                                 }
                             </div>
                             <div class="span6">
-                                <h3>Previously connected nodes</h3>
+                                <h3>Discovered nodes</h3>
                                 @if(nodesEverConnectedTo.isEmpty) {
-                                    <p>None of the configured nodes could be reached so far.</p>
+                                    <p>None of the configured nodes could be reached recently.</p>
                                 } else {
                                     @for(node <- nodesEverConnectedTo.sortBy(_.getTransportAddress)) {
                                         <div class="well well-small">
