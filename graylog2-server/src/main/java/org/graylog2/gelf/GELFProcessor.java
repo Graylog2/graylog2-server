@@ -149,6 +149,11 @@ public class GELFProcessor {
             String key = entry.getKey();
             JsonNode value = entry.getValue();
 
+            // Don't include GELF syntax underscore in message field key.
+            if (key.startsWith("_") && key.length() > 1) {
+                key = key.substring(1);
+            }
+
             // We already set short_message and host as message and source. Do not add as fields again.
             if (key.equals("short_message") || key.equals("host")) {
                 continue;
