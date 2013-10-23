@@ -24,7 +24,7 @@ import java.util.Map;
 /**
  * @author Lennart Koopmann <lennart@torch.sh>
  */
-public interface TimeRange {
+public interface TimeRange extends FromRange {
 
     public enum Type {
         RELATIVE,

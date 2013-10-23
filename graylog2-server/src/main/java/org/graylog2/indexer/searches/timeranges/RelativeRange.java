@@ -19,6 +19,9 @@
  */
 package org.graylog2.indexer.searches.timeranges;
 
+import org.graylog2.plugin.Tools;
+import org.joda.time.DateTime;
+
 import java.util.HashMap;
 import java.util.Map;
 
@@ -46,4 +49,13 @@ public class RelativeRange implements TimeRange {
         return range;
     }
 
+    @Override
+    public DateTime getFrom() {
+        int from = 0;
+        if (getRange() > 0) {
+            from = Tools.getUTCTimestamp()-getRange();
+        }
+
+        return new DateTime(from*1000L);
+    }
 }

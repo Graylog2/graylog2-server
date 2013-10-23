@@ -20,8 +20,7 @@
 package org.graylog2.indexer.searches.timeranges;
 
 import org.graylog2.utilities.date.NaturalDateParser;
-
-import java.util.Date;
+import org.joda.time.DateTime;
 
 /**
  * @author Lennart Koopmann <lennart@torch.sh>
@@ -29,8 +28,8 @@ import java.util.Date;
 public class KeywordRange implements TimeRange, FromToRange {
 
     private final String keyword;
-    private final String from;
-    private final String to;
+    private final DateTime from;
+    private final DateTime to;
 
     @Override
     public Type getType() {
@@ -56,11 +55,11 @@ public class KeywordRange implements TimeRange, FromToRange {
         return keyword;
     }
 
-    public String getFrom() {
+    public DateTime getFrom() {
         return from;
     }
 
-    public String getTo() {
+    public DateTime getTo() {
         return to;
     }
 }

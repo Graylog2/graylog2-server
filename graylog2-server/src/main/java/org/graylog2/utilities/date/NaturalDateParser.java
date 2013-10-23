@@ -60,42 +60,42 @@ public class NaturalDateParser {
 
     public class Result {
 
-        private String from;
-        private String to;
+        private DateTime from;
+        private DateTime to;
 
         public Result(Date from, Date to) {
             if (from != null) {
-                this.from = dateFormat(from);
+                this.from = new DateTime(from);
             } else {
-                this.from = dateFormat(new Date());
+                this.from = new DateTime();
             }
 
             if (to != null) {
-                this.to = dateFormat(to);
+                this.to = new DateTime(to);
             } else {
-                this.to = dateFormat(new Date());
+                this.to = new DateTime();
             }
         }
 
-        public String getFrom() {
+        public DateTime getFrom() {
             return from;
         }
 
-        public String getTo() {
+        public DateTime getTo() {
             return to;
         }
 
         public Map<String, String> asMap() {
             Map<String, String> result = Maps.newHashMap();
 
-            result.put("from", getFrom());
-            result.put("to", getTo());
+            result.put("from", dateFormat(getFrom()));
+            result.put("to", dateFormat(getTo()));
 
             return result;
         }
 
-        private String dateFormat(Date x) {
-            return new DateTime(x).toString(DateTimeFormat.forPattern(Tools.ES_DATE_FORMAT_NO_MS));
+        private String dateFormat(DateTime x) {
+            return x.toString(DateTimeFormat.forPattern(Tools.ES_DATE_FORMAT_NO_MS));
         }
 
     }

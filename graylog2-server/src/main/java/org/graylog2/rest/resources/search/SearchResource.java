@@ -126,6 +126,7 @@ public class SearchResource extends RestResource {
     protected Map<String, Object> buildSearchResult(SearchResult sr) {
         Map<String, Object> result = Maps.newHashMap();
         result.put("query", sr.getOriginalQuery());
+        result.put("used_indices", sr.getUsedIndices());
         result.put("messages", sr.getResults());
         result.put("fields", sr.getFields());
         result.put("time", sr.took().millis());

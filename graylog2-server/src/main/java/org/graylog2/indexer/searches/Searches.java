@@ -46,6 +46,8 @@ import org.graylog2.plugin.Tools;
 
 import javax.ws.rs.WebApplicationException;
 
+import java.util.Set;
+
 import static org.elasticsearch.index.query.QueryBuilders.matchAllQuery;
 import static org.elasticsearch.index.query.QueryBuilders.queryString;
 
@@ -72,8 +74,10 @@ public class Searches {
             limit = LIMIT;
         }
 
-		SearchResponse r = c.search(standardSearchRequest(query, limit, offset, range, SortOrder.DESC).request()).actionGet();
-		return new SearchResult(r.getHits(), query, r.getTook());
+        Set<String> indices = IndexHelper.determineAffectedIndices(server, range);
+
+        SearchResponse r = c.search(standardSearchRequest(query, indices, limit, offset, range, SortOrder.DESC).request()).actionGet();
+		return new SearchResult(r.getHits(), indices, query, r.getTook());
 	}
 
     public TermsResult terms(String field, int size, String query, TimeRange range) throws IndexHelper.InvalidRangeFormatException {
@@ -81,7 +85,7 @@ public class Searches {
             size = 50;
         }
 
-        SearchRequestBuilder srb = standardSearchRequest(query);
+        SearchRequestBuilder srb = standardSearchRequest(query, IndexHelper.determineAffectedIndices(server, range));
 
         TermsFacetBuilder terms = new TermsFacetBuilder(TERMS_FACET_NAME);
         terms.facetFilter(IndexHelper.getTimestampRangeFilter(range));
@@ -101,7 +105,7 @@ public class Searches {
     }
 
     public FieldStatsResult fieldStats(String field, String query, TimeRange range) throws FieldTypeException, IndexHelper.InvalidRangeFormatException {
-        SearchRequestBuilder srb = standardSearchRequest(query);
+        SearchRequestBuilder srb = standardSearchRequest(query, IndexHelper.determineAffectedIndices(server, range));
 
         StatisticalFacetBuilder stats = new StatisticalFacetBuilder(STATS_FACET_NAME);
         stats.global(false);
@@ -131,7 +135,7 @@ public class Searches {
 				.interval(interval.toString().toLowerCase());
 		
 		SearchRequestBuilder srb = c.prepareSearch();
-		srb.setIndices(server.getDeflector().getAllDeflectorIndexNames()); // XXX 020: have a method that builds time ranged index requests
+		srb.setIndices(IndexHelper.determineAffectedIndices(server, range).toArray(new String[]{}));
 		srb.setQuery(queryString(query));
 		srb.addFacet(fb);
 		
@@ -147,7 +151,7 @@ public class Searches {
                 .interval(interval.toString().toLowerCase());
 
         SearchRequestBuilder srb = c.prepareSearch();
-        srb.setIndices(server.getDeflector().getAllDeflectorIndexNames()); // XXX 020: have a method that builds time ranged index requests
+        srb.setIndices(IndexHelper.determineAffectedIndices(server, range).toArray(new String[]{}));
         srb.setQuery(queryString(query));
         srb.addFacet(fb);
 
@@ -169,13 +173,13 @@ public class Searches {
         return oneOfIndex(index, matchAllQuery(), SortOrder.ASC);
     }
 
-    private SearchRequestBuilder standardSearchRequest(String query) throws IndexHelper.InvalidRangeFormatException {
-        return standardSearchRequest(query, 0, 0, null, null);
+    private SearchRequestBuilder standardSearchRequest(String query, Set<String> indices) throws IndexHelper.InvalidRangeFormatException {
+        return standardSearchRequest(query, indices, 0, 0, null, null);
     }
 
-    private SearchRequestBuilder standardSearchRequest(String query, int limit, int offset, TimeRange range, SortOrder sort) throws IndexHelper.InvalidRangeFormatException {
+    private SearchRequestBuilder standardSearchRequest(String query, Set<String> indices, int limit, int offset, TimeRange range, SortOrder sort) throws IndexHelper.InvalidRangeFormatException {
         SearchRequestBuilder srb = c.prepareSearch();
-        srb.setIndices(server.getDeflector().getAllDeflectorIndexNames()); // XXX 020: have a method that builds time ranged index requests
+        srb.setIndices(indices.toArray(new String[]{}));
         srb.setQuery(queryString(query));
         srb.setFrom(offset);
 

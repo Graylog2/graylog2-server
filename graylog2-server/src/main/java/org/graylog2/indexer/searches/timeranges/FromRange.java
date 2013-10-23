@@ -19,37 +19,13 @@
  */
 package org.graylog2.indexer.searches.timeranges;
 
-import org.graylog2.plugin.Tools;
 import org.joda.time.DateTime;
 
 /**
  * @author Lennart Koopmann <lennart@torch.sh>
  */
-public class AbsoluteRange implements TimeRange, FromToRange {
+public interface FromRange {
 
-    private final DateTime from;
-    private final DateTime to;
-
-    public AbsoluteRange(String from, String to) throws InvalidRangeParametersException {
-        if (from == null || from.isEmpty() || to == null || to.isEmpty()) {
-            throw new InvalidRangeParametersException();
-        }
-
-        this.from = DateTime.parse(from, Tools.timeFormatterWithOptionalMilliseconds());
-        this.to = DateTime.parse(to, Tools.timeFormatterWithOptionalMilliseconds());
-    }
-
-    @Override
-    public Type getType() {
-        return Type.ABSOLUTE;
-    }
-
-    public DateTime getFrom() {
-        return from;
-    }
-
-    public DateTime getTo() {
-        return to;
-    }
+    public DateTime getFrom();
 
 }

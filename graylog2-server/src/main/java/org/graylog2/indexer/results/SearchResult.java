@@ -40,13 +40,15 @@ public class SearchResult extends IndexQueryResult {
 	private final int totalResults;
 	private final List<ResultMessage> results;
 	private final Set<String> fields;
+    private final Set<String> usedIndices;
 
-	public SearchResult(SearchHits searchHits, String originalQuery, TimeValue took) {
+	public SearchResult(SearchHits searchHits, Set<String> usedIndices, String originalQuery, TimeValue took) {
         super(originalQuery, took);
 
 		this.results = buildResults(searchHits);
 		this.fields = extractFields(searchHits);
 		this.totalResults = (int) searchHits.getTotalHits();
+        this.usedIndices = usedIndices;
 	}
 	
 	public int getTotalResults() {
@@ -92,4 +94,9 @@ public class SearchResult extends IndexQueryResult {
 		
 		return fields;
 	}
+
+    public Set<String> getUsedIndices() {
+        return usedIndices;
+    }
+
 }

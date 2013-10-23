@@ -19,12 +19,13 @@
  */
 package org.graylog2.indexer.searches.timeranges;
 
+import org.joda.time.DateTime;
+
 /**
  * @author Lennart Koopmann <lennart@torch.sh>
  */
-public interface FromToRange {
+public interface FromToRange extends FromRange {
 
-    public String getFrom();
-    public String getTo();
+    public DateTime getTo();
 
 }

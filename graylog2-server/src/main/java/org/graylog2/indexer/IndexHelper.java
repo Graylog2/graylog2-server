@@ -25,11 +25,11 @@ import java.util.Set;
 import com.google.common.collect.Lists;
 import org.elasticsearch.index.query.FilterBuilder;
 import org.elasticsearch.index.query.FilterBuilders;
+import org.graylog2.Core;
+import org.graylog2.indexer.ranges.IndexRange;
 import org.graylog2.indexer.searches.timeranges.*;
 import org.graylog2.plugin.Tools;
 import org.joda.time.DateTime;
-import org.joda.time.format.DateTimeFormat;
-import org.joda.time.format.DateTimeFormatter;
 
 /**
  * @author Lennart Koopmann <lennart@socketfeed.com>
@@ -64,7 +64,7 @@ public class IndexHelper {
 
         switch (range.getType()) {
             case RELATIVE:
-                return relativeFilterBuilder((RelativeRange) range);
+                return fromRangeBuilder((RelativeRange) range);
             case ABSOLUTE:
                 return fromToRangeFilterBuilder((AbsoluteRange) range);
             case KEYWORD:
@@ -75,31 +75,13 @@ public class IndexHelper {
     }
 
     private static FilterBuilder fromToRangeFilterBuilder(FromToRange range) throws InvalidRangeFormatException {
-        // Parse to DateTime first because it is intelligent and can deal with missing microseconds for example.
-        DateTime fromDate;
-        DateTime toDate;
-
-        try {
-            fromDate = DateTime.parse(range.getFrom(), Tools.timeFormatterWithOptionalMilliseconds());
-            toDate = DateTime.parse(range.getTo(), Tools.timeFormatterWithOptionalMilliseconds());
-        } catch(IllegalArgumentException e) {
-            throw new InvalidRangeFormatException();
-        }
-
         return FilterBuilders.rangeFilter("timestamp")
-                .gte(Tools.buildElasticSearchTimeFormat(fromDate))
-                .lte(Tools.buildElasticSearchTimeFormat(toDate));
+                .gte(Tools.buildElasticSearchTimeFormat(range.getFrom()))
+                .lte(Tools.buildElasticSearchTimeFormat(range.getTo()));
     }
 
-    private static FilterBuilder relativeFilterBuilder(RelativeRange range) {
-        int from = 0;
-        if (range.getRange() > 0) {
-            from = Tools.getUTCTimestamp()-range.getRange();
-        }
-
-        String fromDate = Tools.buildElasticSearchTimeFormat(new DateTime(from*1000L));
-        return FilterBuilders.rangeFilter("timestamp")
-                .gte(fromDate);
+    private static FilterBuilder fromRangeBuilder(FromRange range) {
+        return FilterBuilders.rangeFilter("timestamp").gte(Tools.buildElasticSearchTimeFormat(range.getFrom()));
     }
 
     private static String getPrefix(Set<String> names) {
@@ -119,6 +101,21 @@ public class IndexHelper {
         }
         
         return r;
+    }
+
+    public static Set<String> determineAffectedIndices(Core core, TimeRange range) {
+        Set<String> indices = Sets.newHashSet();
+
+        for (IndexRange indexRange : IndexRange.getFrom(core, (int) (range.getFrom().getMillis()/1000))) {
+            indices.add(indexRange.getIndexName());
+        }
+
+        // Always include the most recent index in some cases.
+        if (indices.isEmpty() || !(range instanceof FromToRange)) {
+            indices.add(core.getDeflector().getCurrentActualTargetIndex());
+        }
+
+        return indices;
     }
 
     public static class InvalidRangeFormatException extends Throwable {
