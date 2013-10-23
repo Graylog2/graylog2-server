@@ -24,6 +24,8 @@ import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.authc.UsernamePasswordToken;
 import org.apache.shiro.authc.credential.HashedCredentialsMatcher;
 import org.apache.shiro.mgt.DefaultSecurityManager;
+import org.apache.shiro.mgt.DefaultSessionStorageEvaluator;
+import org.apache.shiro.mgt.DefaultSubjectDAO;
 import org.apache.shiro.realm.Realm;
 import org.apache.shiro.subject.Subject;
 import org.graylog2.Configuration;
@@ -41,7 +43,7 @@ import javax.ws.rs.core.SecurityContext;
  */
 public class ShiroSecurityContextFactory implements SecurityContextFactory {
     private static final Logger log = LoggerFactory.getLogger(ShiroSecurityContextFactory.class);
-    private org.apache.shiro.mgt.SecurityManager sm;
+    private DefaultSecurityManager sm;
 
     public ShiroSecurityContextFactory(Core core) {
         final GraylogSimpleAccountRealm inMemoryRealm = new GraylogSimpleAccountRealm();
@@ -57,6 +59,12 @@ public class ShiroSecurityContextFactory implements SecurityContextFactory {
         mongoDbRealm.setCachingEnabled(false);
 
         sm = new DefaultSecurityManager(Lists.<Realm>newArrayList(mongoDbRealm, inMemoryRealm));
+        final DefaultSubjectDAO subjectDAO = new DefaultSubjectDAO();
+        final DefaultSessionStorageEvaluator sessionStorageEvaluator = new DefaultSessionStorageEvaluator();
+        sessionStorageEvaluator.setSessionStorageEnabled(false);
+        subjectDAO.setSessionStorageEvaluator(sessionStorageEvaluator);
+        sm.setSubjectDAO(subjectDAO);
+
         SecurityUtils.setSecurityManager(sm);
     }
     @Override
