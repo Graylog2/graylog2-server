@@ -6,7 +6,17 @@
 </h2>
 
 <p>
-	Found @searchResult.getTotalResultCount() messages in @searchResult.getTookMs()ms.
+	Found @searchResult.getTotalResultCount() messages in @searchResult.getTookMs()ms,
+
+    searched in @searchResult.getUsedIndices().size()
+
+    @if(searchResult.getUsedIndices().size() == 1) {
+        index.
+    } else {
+        indices.
+    }
+
+    <a href="#used-indices" role="button" data-toggle="modal" data-backdrop="true"><i class="icon-question-sign"></i></a>
 </p>
 
 @if(searchResult.getTotalResultCount() > 0) {
@@ -36,5 +46,27 @@
         </div>
     </div>
 </div>
-
 }
+
+<div id="used-indices" class="modal hide fade" tabindex="-1" role="dialog">
+    <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal">x</button>
+        <h2>Used indices</h2>
+        Graylog2 is intelligently selecting the indices it needs to search upon based on the timeframe you selected.
+        This list of indices is mainly useful for debugging purposes.
+    </div>
+
+    <div class="modal-body">
+        <h4>Indices used for this search:</h4>
+
+        <ul class="index-list">
+        @for(index <- searchResult.getUsedIndices().sorted) {
+            <li>@index</li>
+        }
+        </ul>
+    </div>
+
+    <div class="modal-footer">
+        <button class="btn" data-dismiss="modal" aria-hidden="true">Close</button>
+    </div>
+</div>

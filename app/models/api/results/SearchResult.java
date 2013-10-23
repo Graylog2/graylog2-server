@@ -34,14 +34,16 @@ public class SearchResult {
 	private final int tookMs;
 	private final List<MessageSummaryResponse> results;
 	private final List<Field> fields;
+    private final List<String> usedIndices;
 
-	public SearchResult(String originalQuery, TimeRange timeRange, int totalResultCount, int tookMs, List<MessageSummaryResponse> results, List<String> fields) {
+	public SearchResult(String originalQuery, TimeRange timeRange, int totalResultCount, int tookMs, List<MessageSummaryResponse> results, List<String> fields, List<String> usedIndices) {
 		this.originalQuery = originalQuery;
         this.timeRange = timeRange;
 		this.totalResultCount = totalResultCount;
 		this.tookMs = tookMs;
 		this.results = results;
 		this.fields = buildFields(fields);
+        this.usedIndices = usedIndices;
 	}
 	
 	public List<MessageSummaryResponse> getMessages() {
@@ -67,8 +69,12 @@ public class SearchResult {
 	public List<Field> getFields() {
 		return fields;
 	}
-	
-	private List<Field> buildFields(List<String> sFields) {
+
+    public List<String> getUsedIndices() {
+        return usedIndices;
+    }
+
+    private List<Field> buildFields(List<String> sFields) {
 		List<Field> fields = Lists.newArrayList();
 
         if (sFields != null) {

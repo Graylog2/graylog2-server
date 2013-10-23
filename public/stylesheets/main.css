@@ -1125,3 +1125,10 @@ form #stream-rules {
     margin-top: 30px;
     text-align: center;
 }
+
+#used-indices .index-list {
+    margin-left: 25px;
+    margin-top: 5px;
+    list-style-type: square;
+;
+}

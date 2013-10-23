@@ -18,6 +18,8 @@
  */
 package models.api.responses;
 
+import com.google.gson.annotations.SerializedName;
+
 import java.util.List;
 
 public class SearchResultResponse {
@@ -27,5 +29,8 @@ public class SearchResultResponse {
 	public int total_results;
 	public List<MessageSummaryResponse> messages;
 	public List<String> fields;
+
+    @SerializedName("used_indices")
+    public List<String> usedIndices;
 	
 }

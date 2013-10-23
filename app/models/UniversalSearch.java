@@ -75,7 +75,8 @@ public class UniversalSearch {
                 response.total_results,
                 response.time,
                 response.messages,
-                response.fields
+                response.fields,
+                response.usedIndices
         );
 
         return result;
