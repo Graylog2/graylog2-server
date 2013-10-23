@@ -1,7 +1,6 @@
 @(context: Http.Context, configuredNodes: List[models.Node], nodesEverConnectedTo: List[models.Node], serverNodes: lib.ServerNodes)
 
-    @saferepair("Disconnected") {
-
+    @loggedout("Disconnected") {
         <div class="container" id="disconnected-box">
             <div class="row">
                 <div class="span8 offset2 well" id="disconnected-box-content">
