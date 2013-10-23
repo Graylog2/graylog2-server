@@ -39,6 +39,8 @@ import org.apache.shiro.authc.AuthenticationListener;
 import org.apache.shiro.authc.Authenticator;
 import org.apache.shiro.authc.pam.ModularRealmAuthenticator;
 import org.apache.shiro.mgt.DefaultSecurityManager;
+import org.apache.shiro.mgt.DefaultSessionStorageEvaluator;
+import org.apache.shiro.mgt.DefaultSubjectDAO;
 import org.apache.shiro.realm.Realm;
 import org.apache.shiro.realm.SimpleAccountRealm;
 import org.graylog2.logback.appender.AccessLog;
@@ -116,6 +118,13 @@ public class Global extends GlobalSettings {
                 new DefaultSecurityManager(
                         Lists.newArrayList(serverRestInterfaceRealm)
                 );
+        // disable storing sessions (TODO we might want to write a session store bridge to play's session cookie)
+        final DefaultSessionStorageEvaluator sessionStorageEvaluator = new DefaultSessionStorageEvaluator();
+        sessionStorageEvaluator.setSessionStorageEnabled(false);
+        final DefaultSubjectDAO subjectDAO = new DefaultSubjectDAO();
+        subjectDAO.setSessionStorageEvaluator(sessionStorageEvaluator);
+        securityManager.setSubjectDAO(subjectDAO);
+
         final Authenticator authenticator = securityManager.getAuthenticator();
         if (authenticator instanceof ModularRealmAuthenticator) {
             ModularRealmAuthenticator a = (ModularRealmAuthenticator) authenticator;

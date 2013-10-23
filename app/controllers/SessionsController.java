@@ -18,7 +18,6 @@
  */
 package controllers;
 
-import com.google.common.collect.Maps;
 import lib.security.Graylog2ServerUnavailableException;
 import models.LoginRequest;
 import org.apache.shiro.SecurityUtils;
@@ -30,8 +29,6 @@ import org.slf4j.LoggerFactory;
 import play.data.Form;
 import play.mvc.Controller;
 import play.mvc.Result;
-
-import java.util.HashMap;
 
 import static play.data.Form.form;
 
@@ -50,13 +47,7 @@ public class SessionsController extends Controller {
         if (session("username") != null && !session("username").isEmpty()) {
             return redirect("/");
         }
-        Form<LoginRequest> form = userForm;
-        if (subject.isRemembered()) {
-            final HashMap<String, String> prefilledForm = Maps.newHashMap();
-            prefilledForm.put("username", subject.getPrincipal().toString());
-            form = userForm.bind(prefilledForm, "username");
-        }
-        return ok(views.html.sessions.login.render(form));
+        return ok(views.html.sessions.login.render(userForm));
     }
 	
 	public Result create() {
@@ -71,7 +62,7 @@ public class SessionsController extends Controller {
 
 		final Subject subject = SecurityUtils.getSubject();
 		try {
-			subject.login(new UsernamePasswordToken(r.username, r.password));
+			subject.login(new UsernamePasswordToken(r.username, r.password, request().remoteAddress()));
 			return redirect("/");
 		} catch (AuthenticationException e) {
 			log.warn("Unable to authenticate user {}. Redirecting back to '/'", r.username, e);
