@@ -1,37 +1,23 @@
 @(title: String)(content: Html)
 
 <!DOCTYPE html>
-<html lang="en">
-<head>
-    <title>Graylog2 - @title</title>
-    @partials.head()
-</head>
-<body>
 
-    <div id="top" class="navbar navbar-fixed-top">
-        <div class="container-fluid">
-            <div class="row-fluid">
-                <a href="/"><img src="@routes.Assets.at("images/toplogo.png")" id="toplogo" /></a>
-            </div>
-        </div>
-    </div>
+<html>
+    <head>
+        <title>@title</title>
+        <link rel="shortcut icon" type="image/png" href="@routes.Assets.at("images/favicon.png")">
 
-<div class="container-fluid">
-    <div class="row-fluid error-bar">
-        @if(flash.get("error") != null && !flash.get("error").isEmpty()) {
-        <div class="alert alert-error main-error">
-            <strong>Error!</strong>
-            <a class="close" data-dismiss="alert" href="#">×</a>@flash.get("error")
-        </div>
-        }
-    </div>
+        <link rel="stylesheet" media="screen" href="@routes.Assets.at("stylesheets/bootstrap.min.css")">
+        <link rel="stylesheet" media="screen" href="@routes.Assets.at("stylesheets/fonts.css")">
+        <link rel="stylesheet" media="screen" href="@routes.Assets.at("stylesheets/font-awesome.min.css")">
+        <link rel="stylesheet" media="screen" href="@routes.Assets.at("stylesheets/main.css")">
+        <link rel="stylesheet" media="screen" href="@routes.Assets.at("stylesheets/disconnected.css")">
 
+        <script src="@routes.Assets.at("javascripts/jquery-1.7.1.min.js")" type="text/javascript"></script>
+        <script src="@routes.Assets.at("javascripts/bootstrap.min.js")" type="text/javascript"></script>
+    </head>
+
+    <body>
     @content
-</div>
-
-<div id="footer">
-    graylog2-web-interface v@lib.Version.VERSION.getName()
-    (@System.getProperty("java.vendor") @System.getProperty("java.version") on @System.getProperty("os.name") @System.getProperty("os.version"))
-</div>
-</body>
+    </body>
 </html>

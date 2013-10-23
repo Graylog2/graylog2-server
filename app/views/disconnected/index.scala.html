@@ -1,24 +1,72 @@
-@(context: Http.Context, serverNodes: lib.ServerNodes)
+@(context: Http.Context, configuredNodes: List[models.Node], nodesEverConnectedTo: List[models.Node], serverNodes: lib.ServerNodes)
 
-@saferepair("Disconnected") {
+    @saferepair("Disconnected") {
 
-    <div class="row-fluid">
-        <div class="span12" id="main-content">
-            <div>
-                <h1 class="text-center">Graylog2 Web Interface is disconnected.</h1>
+        <div class="container" id="disconnected-box">
+            <div class="row">
+                <div class="span8 offset2 well" id="disconnected-box-content">
+                    <legend>
+                        <i class="icon-group"></i> Graylog2 Web Interface is disconnected.
+                    </legend>
 
-                <div class="row-fluid">
-
-                    <div class="span4">
+                    <div class="row-fluid">
                         <div class="alert alert-danger">
-                            <p>Unable to connect to any Graylog2 servers. This usually is a temporary problem, but could also be a configuration error.</p>
+                        @if(nodesEverConnectedTo.isEmpty) {
+                            <p>The web interface was unable to connect to any Graylog2 Server in the cluster so far.</p>
+                            <p>Please check that the configured nodes shown to the right are correct and that the servers are reachable.</p>
+                        } else {
+                            <p>The web interface lost connection to all servers it has been connected to.</p>
+                            <p>Please check that the servers shown to the right are running and reachable.</p>
+                        }
+                        </div>
+                        @views.html.partials.preview("The times shown on this page are lacking consistent timezone handling.", 228)
+                        <div class="row-fluid" id="nodes-box">
+                            <div class="span6">
+                                <h3>Nodes from configuration</h3>
+                                @for(node <- configuredNodes.sortBy(_.getTransportAddress)) {
+                                    <div class="well well-small">
+                                        <a class="btn btn-mini btn-info pull-right" target="_blank" href="@node.getTransportAddress/api-browser">API Browser</a>
+                                        <h5><i class="icon-sitemap"></i> @node.getTransportAddress</h5>
+                                        @if(serverNodes.getDiscoveredNodeVia(node).getNodeId == null) {
+                                            <span class="muted never-seen-warning"><i class="icon-warning-sign"></i> Never connected!</span>
+                                        }
+                                    </div>
+                                }
+                            </div>
+                            <div class="span6">
+                                <h3>Previously connected nodes</h3>
+                                @if(nodesEverConnectedTo.isEmpty) {
+                                    <p>None of the configured nodes could be reached so far.</p>
+                                } else {
+                                    @for(node <- nodesEverConnectedTo.sortBy(_.getTransportAddress)) {
+                                        <div class="well well-small">
+                                            <h5><i class="icon-sitemap"></i> @node.getTransportAddress
+                                            @if(serverNodes.getConfigNodeOf(node) != null && !serverNodes.getConfigNodeOf(node).getTransportAddress.equals(node.getTransportAddress)) {
+                                                <h6 class="muted via-node-headline">via <i class="icon-sitemap"></i> <span class="via-node-link">@serverNodes.getConfigNodeOf(node).getTransportAddress</span></h6>
+                                            }
+                                            </h5>
+                                            <dl class="dl-horizontal">
+                                                <dt>Short Node ID</dt>
+                                                <dd>@node.getShortNodeId</dd>
+                                                <dt>Last reported</dt>
+                                                <dd>@node.getLastSeen.toString("yyyy-MM-dd HH:mm:ss.SSS")</dd>
+                                                <dt>Last connection</dt>
+                                                @if(node.getLastContact == null) {
+                                                    <dd>Never contacted.</dd>
+                                                } else {
+                                                    <dd>@node.getLastContact.toString("yyyy-MM-dd HH:mm:ss.SSS")</dd>
+                                                }
+                                                <dt>Failure Count</dt>
+                                                <dd>@node.getFailureCount</dd>
+                                            </dl>
+                                        </div>
+                                    }
+                                }
+                            </div>
                         </div>
                     </div>
-
                 </div>
             </div>
         </div>
-    </div>
 
-
-}
+    }

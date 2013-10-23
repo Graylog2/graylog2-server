@@ -33,6 +33,7 @@ import models.api.responses.system.*;
 import models.api.responses.system.loggers.LoggerSummary;
 import models.api.responses.system.loggers.LoggersResponse;
 import org.joda.time.DateTime;
+import org.joda.time.DateTimeZone;
 import org.slf4j.LoggerFactory;
 import play.Logger;
 import play.mvc.Http;
@@ -347,6 +348,10 @@ public class Node {
         return failureCount.get();
     }
 
+    public DateTime getLastContact() {
+        return lastContact;
+    }
+
     public void merge(Node updatedNode) {
         log.debug("Merging node {} in this node {}", updatedNode, this);
         this.lastSeen = updatedNode.lastSeen;
@@ -357,7 +362,7 @@ public class Node {
     }
 
     public void touch() {
-        this.lastContact = DateTime.now();
+        this.lastContact = DateTime.now(DateTimeZone.UTC);
         setActive(true);
     }
 

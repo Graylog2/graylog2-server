@@ -72,7 +72,7 @@ public class ServerNodes {
             nodeIterator = skipInactive(serverNodes);
         }
         final ImmutableList<Node> nodes = ImmutableList.copyOf(nodeIterator);
-        if (nodes.isEmpty()) {
+        if (!allowInactive && nodes.isEmpty()) {
             throw new Graylog2ServerUnavailableException();
         }
         return nodes;
@@ -89,6 +89,9 @@ public class ServerNodes {
 
     public Node any(boolean allowInactive) {
         final List<Node> all = all(allowInactive);
+        if (all.isEmpty()) {
+            throw new Graylog2ServerUnavailableException();
+        }
         final int i = random.nextInt(all.size());
         return all.get(i);
     }
@@ -171,12 +174,21 @@ public class ServerNodes {
         };
     }
 
-    public Collection<Node> getConfiguredNodes() {
-        return configuredNodes.keySet();
+    public List<Node> getConfiguredNodes() {
+        return ImmutableList.copyOf(configuredNodes.keySet());
     }
 
     public void linkConfiguredNode(Node configuredNode, Node resolvedNode) {
         configuredNodes.put(configuredNode, resolvedNode);
+    }
+
+    public Node getDiscoveredNodeVia(Node configuredNode) {
+        final Node node = configuredNodes.get(configuredNode);
+        return node;
+    }
+
+    public Node getConfigNodeOf(Node serverNode) {
+        return configuredNodes.inverse().get(serverNode);
     }
 
     public boolean isConnected() {

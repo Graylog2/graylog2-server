@@ -20,8 +20,11 @@ package controllers;
 
 import com.google.inject.Inject;
 import lib.ServerNodes;
+import models.Node;
 import play.mvc.Http;
 import play.mvc.Result;
+
+import java.util.List;
 
 public class LonesomeInterfaceController extends BaseController {
 
@@ -32,6 +35,9 @@ public class LonesomeInterfaceController extends BaseController {
         if (serverNodes.isConnected()) {
             return redirect(routes.DashboardController.index());
         }
-        return ok(views.html.disconnected.index.render(Http.Context.current(), serverNodes));
+        final List<Node> configuredNodes = serverNodes.getConfiguredNodes();
+        final List<Node> nodesEverConnectedTo = serverNodes.all(true);
+
+        return ok(views.html.disconnected.index.render(Http.Context.current(), configuredNodes, nodesEverConnectedTo, serverNodes));
     }
 }
