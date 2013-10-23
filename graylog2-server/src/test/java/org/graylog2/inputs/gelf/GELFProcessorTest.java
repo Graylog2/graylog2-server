@@ -59,8 +59,8 @@ public class GELFProcessorTest {
         assertEquals("lol.js", lm.getField("file"));
         assertEquals(23L, lm.getField("line"));
         assertEquals(Tools.dateTimeFromDouble(usedTimestamp), lm.getField("timestamp"));
-        assertEquals("ü", lm.getField("_lol_utf8"));
-        assertEquals("bar", lm.getField("_foo"));
+        assertEquals("ü", lm.getField("lol_utf8"));
+        assertEquals("bar", lm.getField("foo"));
         assertEquals(11, lm.getFields().size());
     }
 
@@ -92,9 +92,9 @@ public class GELFProcessorTest {
         Message lm = serverStub.lastInsertedToProcessBuffer;
 
         assertEquals(1, serverStub.callsToProcessBufferInserter);
-        assertNull(lm.getField("id"));
-        assertEquals("foo", lm.getField("_something"));
-        assertEquals(5, lm.getFields().size());
+        assertNotEquals(7, lm.getField("_id"));
+        assertEquals("foo", lm.getField("something"));
+        assertEquals(6, lm.getFields().size());
     }
     
     @Test
@@ -108,7 +108,7 @@ public class GELFProcessorTest {
         Message lm = serverStub.lastInsertedToProcessBuffer;
 
         assertEquals(1, serverStub.callsToProcessBufferInserter);
-        assertEquals("{\"foo\":\"zomg\"}", lm.getField("_lol"));
+        assertEquals("{\"foo\":\"zomg\"}", lm.getField("lol"));
         assertEquals(5, lm.getFields().size());
     }
 }
