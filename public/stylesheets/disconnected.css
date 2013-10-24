@@ -29,6 +29,10 @@ body {
     margin-left: 20px;
 }
 
+.discovered-node-link {
+    margin-left: 20px;
+}
+
 #nodes-box {
     margin-top: 10px;
 }

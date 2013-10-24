@@ -516,7 +516,7 @@ $(document).ready(function() {
             fieldGraphs[field].render();
         }
     }
-	
+
 });
 
 function searchDateTimeFormatted(date) {
