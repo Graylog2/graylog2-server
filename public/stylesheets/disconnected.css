@@ -29,8 +29,16 @@ body {
     margin-left: 20px;
 }
 
+.via-node-headline:hover {
+    cursor: pointer;
+}
+
 .discovered-node-link {
     margin-left: 20px;
+}
+
+.discovered-node-link:hover {
+    cursor: pointer;
 }
 
 #nodes-box {
