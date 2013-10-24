@@ -81,4 +81,45 @@ public class MetricsResource extends RestResource {
         return json(metric);
     }
 
+    @GET @Timed
+    @Path("/namespace/{namespace}")
+    @ApiOperation(value = "Get all metrics of a namespace")
+    @ApiResponses(value = {
+            @ApiResponse(code = 404, message = "No such metric namespace")
+    })
+    @Produces(MediaType.APPLICATION_JSON)
+    public String byNamespace(@ApiParam(title = "namespace", required = true) @PathParam("namespace") String namespace) {
+        Map<String, Object> metrics = Maps.newHashMap();
+
+        for(Map.Entry<String, Metric> e : core.metrics().getMetrics().entrySet()) {
+            if (e.getKey().startsWith(namespace)) {
+                try {
+                    String type = e.getValue().getClass().getSimpleName().toLowerCase();
+
+                    if (type.isEmpty()) {
+                        type = "gauge";
+                    }
+
+                    String metricName = e.getKey();
+                    Map<String, Object> m = Maps.newHashMap();
+                    m.put("name", metricName.substring(metricName.lastIndexOf(".") + 1));
+                    m.put("type", type);
+                    m.put("metric", e.getValue());
+
+                    metrics.put(metricName, m);
+                } catch(Exception ex) {
+                    LOG.warn("Could not read metric in namespace list.", ex);
+                    continue;
+                }
+            }
+        }
+
+        if (metrics.isEmpty()) {
+            LOG.debug("No metrics with namespace [{}] found, returning 404.", namespace);
+            throw new WebApplicationException(404);
+        }
+
+        return json(metrics);
+    }
+
 }
