@@ -74,7 +74,7 @@ public class UsersResource extends RestResource {
             return status(NOT_FOUND).build();
         }
         // if the requested username does not match the authenticated user, then we don't return permission information
-        final boolean allowedToSeePermissions = getSubject().isPermitted(RestPermissions.USERPERMISSIONS_EDIT);
+        final boolean allowedToSeePermissions = getSubject().isPermitted(RestPermissions.USERS_PERMISSIONSEDIT);
         final boolean permissionsAllowed = getSubject().getPrincipal().toString().equals(username) || allowedToSeePermissions;
 
         return ok().entity(json(toMap(user, permissionsAllowed))).build();
@@ -206,7 +206,7 @@ public class UsersResource extends RestResource {
 
     @PUT
     @Path("{username}/permissions")
-    @RequiresPermissions(RestPermissions.USERPERMISSIONS_EDIT)
+    @RequiresPermissions(RestPermissions.USERS_PERMISSIONSEDIT)
     @ApiOperation("Update a user's permission set.")
     @ApiResponses({
             @ApiResponse(code = 400, message = "Missing or invalid permission data.")
@@ -237,7 +237,7 @@ public class UsersResource extends RestResource {
 
     @DELETE
     @Path("{username}/permissions")
-    @RequiresPermissions(RestPermissions.USERPERMISSIONS_EDIT)
+    @RequiresPermissions(RestPermissions.USERS_PERMISSIONSEDIT)
     @ApiOperation("Revoke all permissions for a user without deleting the account.")
     @ApiResponses({
             @ApiResponse(code = 500, message = "When saving the user failed.")
@@ -258,7 +258,6 @@ public class UsersResource extends RestResource {
 
     @PUT
     @Path("{username}/password")
-    @RequiresPermissions(RestPermissions.USERPASSWORD_CHANGE)
     @ApiOperation("Update the password for a user.")
     @ApiResponses({
             @ApiResponse(code = 201, message = "The password was successfully updated. Subsequent requests must be made with the new password."),
@@ -287,7 +286,7 @@ public class UsersResource extends RestResource {
             return status(NOT_FOUND).build();
         }
 
-        if (!getSubject().isPermitted(RestPermissions.USERPASSWORD_CHANGE + ":" + user.getName())) {
+        if (!getSubject().isPermitted(RestPermissions.USERS_PASSWORDCHANGE + ":" + user.getName())) {
             return status(FORBIDDEN).build();
         }
 
