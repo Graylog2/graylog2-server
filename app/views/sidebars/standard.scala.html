@@ -1,7 +1,7 @@
 @(currentUser: User)
 
 <h2>Welcome, @currentUser.getFullName()</h2>
-Your current time: @{new Date()}
+Your current time: @views.helpers.DateHelper.current()
 
 <br /><br />
 Containing <span class="total-events focuslimit">[<i class="icon-spinner icon-spin"></i>]</span> events.

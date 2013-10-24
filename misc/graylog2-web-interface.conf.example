@@ -8,6 +8,10 @@ graylog2-server.uris=""
 # Generate for example with: pwgen -s 96
 application.secret=""
 
+# Web interface timezone
+# Graylog2 stores all timestamps in UTC. To properly display times, set the default timezone of the interface.
+# If you leave this out, Graylog2 will pick your system default as the timezone. Usually you will want to configure it explicitly.
+# timezone="Europe/Berlin"
 
 # The web interface can send its log output and access log to graylog2.
 # The access log is disabled by default, by uncommenting the line below you can enable it.

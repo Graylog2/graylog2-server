@@ -27,6 +27,7 @@ import com.typesafe.config.Config;
 import com.typesafe.config.ConfigFactory;
 import lib.ApiClient;
 import lib.ServerNodesRefreshService;
+import lib.Tools;
 import lib.security.PlayAuthenticationListener;
 import lib.security.RedirectAuthenticator;
 import lib.security.RethrowingFirstSuccessfulStrategy;
@@ -44,6 +45,7 @@ import org.apache.shiro.mgt.DefaultSubjectDAO;
 import org.apache.shiro.realm.Realm;
 import org.apache.shiro.realm.SimpleAccountRealm;
 import org.graylog2.logback.appender.AccessLog;
+import org.joda.time.DateTimeZone;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import play.Application;
@@ -90,6 +92,16 @@ public class Global extends GlobalSettings {
         for (String uri : uris) {
             initialNodes[i++] = URI.create(uri);
         }
+        final String timezone = app.configuration().getString("timezone");
+        if (!timezone.isEmpty()) {
+            try {
+                Tools.setApplicationTimeZone(DateTimeZone.forID(timezone));
+            } catch (IllegalArgumentException e) {
+                log.error("Invalid timezone {} specified!", timezone);
+                throw new IllegalStateException(e);
+            }
+        }
+        log.info("Using application default timezone {}", Tools.getApplicationTimeZone());
 
         List<Module> modules = Lists.newArrayList();
         modules.add(new AbstractModule() {

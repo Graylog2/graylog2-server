@@ -26,6 +26,7 @@ import lib.ApiClient;
 import models.api.requests.ChangePasswordRequest;
 import models.api.requests.ChangeUserRequest;
 import models.api.responses.system.UserResponse;
+import org.joda.time.DateTimeZone;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import play.mvc.Http;
@@ -97,6 +98,10 @@ public class User {
 
     public String getPasswordHash() {
         return passwordHash;
+    }
+
+    public DateTimeZone getTimeZone() {
+        return null;
     }
 
     public boolean updatePassword(ChangePasswordRequest request) {

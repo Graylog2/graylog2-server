@@ -19,6 +19,10 @@
 package lib;
 
 import com.google.common.collect.Maps;
+import models.User;
+import models.UserService;
+import org.joda.time.DateTime;
+import org.joda.time.DateTimeZone;
 import play.api.templates.Html;
 import play.data.Form;
 import play.mvc.Controller;
@@ -32,6 +36,8 @@ import java.util.Random;
  * @author Lennart Koopmann <lennart@torch.sh>
  */
 public class Tools {
+
+    private static DateTimeZone globalTimezone = DateTimeZone.getDefault();
 
     private Tools() { /* pure utility class */ }
 
@@ -146,6 +152,23 @@ public class Tools {
 
         String pre = "kMGTPE".charAt(exp-1) + "i";
         return String.format("%.1f%sB", bytes / Math.pow(1024, exp), pre);
+    }
+
+    public static DateTimeZone getApplicationTimeZone() {
+        return globalTimezone;
+    }
+
+    public static void setApplicationTimeZone(DateTimeZone tz) {
+        globalTimezone = tz;
+    }
+
+    public static DateTime inUserTimeZone(DateTime timestamp) {
+        DateTimeZone tz = globalTimezone;
+        final User currentUser = UserService.current();
+        if (currentUser != null) {
+            currentUser.getTimeZone();
+        }
+        return timestamp.toDateTime(tz);
     }
 
 }

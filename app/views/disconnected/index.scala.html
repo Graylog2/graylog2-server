@@ -1,4 +1,5 @@
 @(context: Http.Context, configuredNodes: List[models.Node], nodesEverConnectedTo: List[models.Node], serverNodes: lib.ServerNodes)
+@import lib.Tools
 
     @loggedout("Disconnected") {
         <div class="container" id="disconnected-box">
@@ -48,12 +49,12 @@
                                                 <dt>Short Node ID</dt>
                                                 <dd>@node.getShortNodeId</dd>
                                                 <dt>Last reported</dt>
-                                                <dd>@node.getLastSeen.toString("yyyy-MM-dd HH:mm:ss.SSS")</dd>
+                                                <dd>@views.helpers.DateHelper.timestampShort(node.getLastSeen)</dd>
                                                 <dt>Last connection</dt>
                                                 @if(node.getLastContact == null) {
                                                     <dd>Never contacted.</dd>
                                                 } else {
-                                                    <dd>@node.getLastContact.toString("yyyy-MM-dd HH:mm:ss.SSS")</dd>
+                                                    <dd>@views.helpers.DateHelper.timestampShort(node.getLastContact)</dd>
                                                 }
                                                 <dt>Failure Count</dt>
                                                 <dd>@node.getFailureCount</dd>

@@ -19,15 +19,26 @@
  */
 package views.helpers;
 
+import lib.DateFormat;
+import lib.Tools;
 import org.joda.time.DateTime;
+import play.api.templates.Html;
 
 /**
  * @author Lennart Koopmann <lennart@torch.sh>
  */
 public class DateHelper {
 
-    public static String current() {
-        return DateTime.now().toString();
+    public static Html current() {
+        return timestamp(DateTime.now());
+    }
+
+    public static Html timestamp(DateTime instant) {
+        return views.html.partials.dates.instant.render(Tools.inUserTimeZone(instant), DateFormat.DEFAULT_DATE_FORMAT);
+    }
+
+    public static Html timestampShort(DateTime instant) {
+        return views.html.partials.dates.instant.render(Tools.inUserTimeZone(instant), DateFormat.SHORT_DATE_FORMAT);
     }
 
 }
