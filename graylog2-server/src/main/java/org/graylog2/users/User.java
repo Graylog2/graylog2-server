@@ -30,6 +30,7 @@ import org.graylog2.database.ValidationException;
 import org.graylog2.database.validators.FilledStringValidator;
 import org.graylog2.database.validators.ListValidator;
 import org.graylog2.database.validators.Validator;
+import org.joda.time.DateTimeZone;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -50,7 +51,8 @@ public class User extends Persisted {
     public static final String PASSWORD = "password";
     public static final String EMAIL = "email";
     public static final String FULL_NAME = "full_name";
-    private static final String PERMISSIONS = "permissions";
+    public static final String PERMISSIONS = "permissions";
+    public static final String TIMEZONE = "timezone";
 
     public User(Map<String, Object> fields, Core core) {
         super(core, fields);
@@ -176,6 +178,22 @@ public class User extends Persisted {
         fields.put(PASSWORD, hashedPassword);
     }
 
+    public DateTimeZone getTimeZone() {
+        final Object o = fields.get(TIMEZONE);
+        try {
+            if (o != null) {
+                return DateTimeZone.forID(o.toString());
+            }
+        } catch (IllegalArgumentException e) {
+            LOG.warn("Invalid timezone {} saved for user {}", o.toString(), getName());
+        }
+        return null;
+    }
+
+    public void setTimeZone(DateTimeZone timeZone) {
+        fields.put(TIMEZONE, timeZone.getID());
+    }
+
     private static class LocalAdminUser extends User {
         LocalAdminUser(Core core) {
             super(null, Maps.<String, Object>newHashMap(), core);
@@ -202,6 +220,11 @@ public class User extends Persisted {
         @Override
         public List<String> getPermissions() {
             return Lists.newArrayList("*");
+        }
+
+        @Override
+        public DateTimeZone getTimeZone() {
+            return null;
         }
 
         @Override

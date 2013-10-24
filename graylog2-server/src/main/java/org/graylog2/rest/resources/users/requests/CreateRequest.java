@@ -31,4 +31,5 @@ public class CreateRequest {
     public String email;
     public String fullname;
     public List<String> permissions;
+    public String timezone;
 }

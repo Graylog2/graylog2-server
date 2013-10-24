@@ -34,6 +34,7 @@ import org.graylog2.rest.resources.users.requests.CreateRequest;
 import org.graylog2.rest.resources.users.requests.PermissionEditRequest;
 import org.graylog2.security.RestPermissions;
 import org.graylog2.users.User;
+import org.joda.time.DateTimeZone;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -46,9 +47,7 @@ import java.util.List;
 import java.util.Map;
 
 import static javax.ws.rs.core.Response.Status.*;
-import static javax.ws.rs.core.Response.noContent;
-import static javax.ws.rs.core.Response.ok;
-import static javax.ws.rs.core.Response.status;
+import static javax.ws.rs.core.Response.*;
 
 /**
  * @author Lennart Koopmann <lennart@torch.sh>
@@ -111,13 +110,15 @@ public class UsersResource extends RestResource {
 
         // Create user.
         Map<String, Object> userData = Maps.newHashMap();
-        userData.put("username", cr.username);
+        userData.put(User.USERNAME, cr.username);
         final String hashedPassword = new SimpleHash("SHA-1", cr.password, core.getConfiguration().getPasswordSecret()).toString();
-        userData.put("password", hashedPassword);
-        userData.put("full_name", cr.fullname);
-        userData.put("email", cr.email);
-        userData.put("permissions", cr.permissions);
-
+        userData.put(User.PASSWORD, hashedPassword);
+        userData.put(User.FULL_NAME, cr.fullname);
+        userData.put(User.EMAIL, cr.email);
+        userData.put(User.PERMISSIONS, cr.permissions);
+        if (cr.timezone != null) {
+            userData.put(User.TIMEZONE, cr.timezone);
+        }
         User user = new User(userData, core);
         ObjectId id;
         try {
@@ -165,6 +166,14 @@ public class UsersResource extends RestResource {
         }
         if (cr.permissions != null) {
             user.setPermissions(cr.permissions);
+        }
+        if (cr.timezone != null) {
+            try {
+                final DateTimeZone tz = DateTimeZone.forID(cr.timezone);
+                user.setTimeZone(tz);
+            } catch (IllegalArgumentException e) {
+                LOG.error("Invalid timezone {}, discarding it for user {}.", cr.timezone, username);
+            }
         }
         try {
             // TODO JPA this is wrong, the primary key is the username
@@ -312,6 +321,9 @@ public class UsersResource extends RestResource {
         map.put("full_name", user.getFullName());
         if (includePermissions) {
             map.put("permissions", user.getPermissions());
+        }
+        if (user.getTimeZone() != null) {
+            map.put("timezone", user.getTimeZone().getID());
         }
         map.put("read_only", user.isReadOnly());
         return map;
