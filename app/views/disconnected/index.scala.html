@@ -19,12 +19,11 @@
                             <p>Please check that the servers shown to the right are running and reachable.</p>
                         }
                         </div>
-                        @views.html.partials.preview("The times shown on this page are lacking consistent timezone handling.", 228)
                         <div class="row-fluid" id="nodes-box">
                             <div class="span6">
                                 <h3>Configured nodes</h3>
                                 @for(node <- configuredNodes.sortBy(_.getTransportAddress)) {
-                                    <div class="well well-small">
+                                    <div class="well well-small" id="">
                                         <a class="btn btn-mini btn-info pull-right" target="_blank" href="@node.getTransportAddress/api-browser">API Browser</a>
                                         <h5><i class="icon-sitemap"></i> @node.getTransportAddress</h5>
                                         @if(serverNodes.getDiscoveredNodeVia(node).getNodeId == null) {
