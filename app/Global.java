@@ -92,7 +92,7 @@ public class Global extends GlobalSettings {
         for (String uri : uris) {
             initialNodes[i++] = URI.create(uri);
         }
-        final String timezone = app.configuration().getString("timezone");
+        final String timezone = app.configuration().getString("timezone", "");
         if (!timezone.isEmpty()) {
             try {
                 Tools.setApplicationTimeZone(DateTimeZone.forID(timezone));
