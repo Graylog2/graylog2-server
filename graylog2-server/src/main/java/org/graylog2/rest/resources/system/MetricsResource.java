@@ -119,7 +119,11 @@ public class MetricsResource extends RestResource {
             throw new WebApplicationException(404);
         }
 
-        return json(metrics);
+        Map<String, Object> result = Maps.newHashMap();
+        result.put("metrics", metrics);
+        result.put("total", metrics.size());
+
+        return json(result);
     }
 
 }
