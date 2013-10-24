@@ -22,6 +22,7 @@ package org.graylog2.inputs.syslog;
 
 import com.google.common.collect.Maps;
 import org.graylog2.GraylogServerStub;
+import org.graylog2.inputs.InputStub;
 import org.graylog2.plugin.Message;
 import org.graylog2.plugin.configuration.Configuration;
 import org.junit.Ignore;
@@ -53,10 +54,10 @@ public class SyslogProcessorTest {
 
         // TODO have a proper configuration here
 
-        SyslogProcessor processor = new SyslogProcessor(serverStub, new Configuration(new HashMap<String, Object>()));
+        SyslogProcessor processor = new SyslogProcessor(serverStub, new Configuration(new HashMap<String, Object>()), new InputStub());
 
-        processor.messageReceived(ValidNonStructuredMessage, InetAddress.getLocalHost(), null);
-        processor.messageReceived(ValidNonStructuredMessage, InetAddress.getLocalHost(), null);
+        processor.messageReceived(ValidNonStructuredMessage, InetAddress.getLocalHost());
+        processor.messageReceived(ValidNonStructuredMessage, InetAddress.getLocalHost());
 
         Message lm = serverStub.lastInsertedToProcessBuffer;
 
@@ -77,9 +78,9 @@ public class SyslogProcessorTest {
 
         Map<String, Object> inputConfig = Maps.newHashMap();
         inputConfig.put(SyslogInputBase.CK_STORE_FULL_MESSAGE, true);
-        SyslogProcessor processor = new SyslogProcessor(serverStub, new Configuration(inputConfig));
+        SyslogProcessor processor = new SyslogProcessor(serverStub, new Configuration(inputConfig), new InputStub());
 
-        processor.messageReceived(ValidNonStructuredMessageWithShortDate, InetAddress.getLocalHost(), null);
+        processor.messageReceived(ValidNonStructuredMessageWithShortDate, InetAddress.getLocalHost());
 
         Message lm = serverStub.lastInsertedToProcessBuffer;
 
@@ -100,9 +101,9 @@ public class SyslogProcessorTest {
 
         Map<String, Object> inputConfig = Maps.newHashMap();
         inputConfig.put(SyslogInputBase.CK_STORE_FULL_MESSAGE, true);
-        SyslogProcessor processor = new SyslogProcessor(serverStub, new Configuration(inputConfig));
+        SyslogProcessor processor = new SyslogProcessor(serverStub, new Configuration(inputConfig), new InputStub());
 
-        processor.messageReceived(ValidStructuredMessage, InetAddress.getLocalHost(), null);
+        processor.messageReceived(ValidStructuredMessage, InetAddress.getLocalHost());
 
         Message lm = serverStub.lastInsertedToProcessBuffer;
 
@@ -127,10 +128,10 @@ public class SyslogProcessorTest {
 
         Map<String, Object> inputConfig = Maps.newHashMap();
         inputConfig.put(SyslogInputBase.CK_STORE_FULL_MESSAGE, true);
-        SyslogProcessor processor = new SyslogProcessor(serverStub, new Configuration(inputConfig));
+        SyslogProcessor processor = new SyslogProcessor(serverStub, new Configuration(inputConfig), new InputStub());
 
-        processor.messageReceived(ValidStructuedMessageWithDifferentDateFormat, InetAddress.getLocalHost(), null);
-        processor.messageReceived(ValidStructuedMessageWithDifferentDateFormat, InetAddress.getLocalHost(), null);
+        processor.messageReceived(ValidStructuedMessageWithDifferentDateFormat, InetAddress.getLocalHost());
+        processor.messageReceived(ValidStructuedMessageWithDifferentDateFormat, InetAddress.getLocalHost());
 
         Message lm = serverStub.lastInsertedToProcessBuffer;
 
@@ -150,9 +151,9 @@ public class SyslogProcessorTest {
         GraylogServerStub serverStub = new GraylogServerStub();
         org.graylog2.Configuration configStub = new org.graylog2.Configuration();
         serverStub.setConfigurationStub(configStub);
-        SyslogProcessor processor = new SyslogProcessor(serverStub, new Configuration(new HashMap<String, Object>()));
+        SyslogProcessor processor = new SyslogProcessor(serverStub, new Configuration(new HashMap<String, Object>()), new InputStub());
 
-        processor.messageReceived("LOLWAT", InetAddress.getLocalHost(), null);
+        processor.messageReceived("LOLWAT", InetAddress.getLocalHost());
 
         // Message is not inserted to process buffer.
         assertEquals(0, serverStub.callsToProcessBufferInserter);
@@ -167,9 +168,9 @@ public class SyslogProcessorTest {
 
         Map<String, Object> inputConfig = Maps.newHashMap();
         inputConfig.put(SyslogInputBase.CK_STORE_FULL_MESSAGE, false);
-        SyslogProcessor processor = new SyslogProcessor(serverStub, new Configuration(inputConfig));
+        SyslogProcessor processor = new SyslogProcessor(serverStub, new Configuration(inputConfig), new InputStub());
         
-        processor.messageReceived(ValidNonStructuredMessage, InetAddress.getLocalHost(), null);
+        processor.messageReceived(ValidNonStructuredMessage, InetAddress.getLocalHost());
 
         Message lm = serverStub.lastInsertedToProcessBuffer;
 

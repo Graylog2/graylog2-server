@@ -45,13 +45,11 @@ public class RawDispatcher extends SimpleChannelHandler {
 
     private final RawProcessor processor;
     private final Meter receivedMessages;
-    private final MessageInput sourceInput;
 
     public RawDispatcher(Core server, Configuration config, MessageInput sourceInput) {
-        this.processor = new RawProcessor(server, config);
-        this.sourceInput = sourceInput;
+        this.processor = new RawProcessor(server, config, sourceInput);
 
-        this.receivedMessages = server.metrics().meter(name(RawDispatcher.class, "receivedMessages"));
+        this.receivedMessages = server.metrics().meter(name(sourceInput.getUniqueReadableId(), "receivedMessages"));
     }
 
     @Override
@@ -65,7 +63,7 @@ public class RawDispatcher extends SimpleChannelHandler {
         byte[] readable = new byte[buffer.readableBytes()];
         buffer.toByteBuffer().get(readable, buffer.readerIndex(), buffer.readableBytes());
 
-        this.processor.messageReceived(new String(readable), remoteAddress.getAddress(), sourceInput);
+        this.processor.messageReceived(new String(readable), remoteAddress.getAddress());
     }
 
     @Override

@@ -54,6 +54,7 @@ public class GELFHttpHandler extends SimpleChannelHandler {
 
     private final Meter receivedMessages;
     private final Meter gelfMessages;
+
     private final MessageInput sourceInput;
 
     private final GELFProcessor gelfProcessor;
@@ -61,7 +62,9 @@ public class GELFHttpHandler extends SimpleChannelHandler {
     public GELFHttpHandler(Core server, MessageInput sourceInput) {
         this.server = server;
         this.gelfProcessor = new GELFProcessor(server);
+
         this.sourceInput = sourceInput;
+
         this.receivedMessages = server.metrics().meter(name(GELFHttpHandler.class, "receivedMessages"));
         this.gelfMessages = server.metrics().meter(name(GELFHttpHandler.class, "gelfMessages"));
     }

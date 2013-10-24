@@ -136,4 +136,5 @@ public abstract class MessageInput {
         String readableId = getClass().getName() + "." + getId();
         return readableId;
     }
+
 }

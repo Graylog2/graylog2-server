@@ -47,11 +47,6 @@ public class GELFProcessor {
     private static final Logger LOG = LoggerFactory.getLogger(GELFProcessor.class);
     private Core server;
 
-    private final Meter incomingMessages;
-    private final Meter incompleteMessages;
-    private final Meter processedMessages;
-    private final Timer gelfParsedTime;
-
     private final ObjectMapper objectMapper;
 
     public GELFProcessor(Core server) {
@@ -59,33 +54,30 @@ public class GELFProcessor {
 
         objectMapper = new ObjectMapper();
         objectMapper.configure(JsonParser.Feature.ALLOW_UNQUOTED_CONTROL_CHARS, true);
-
-        this.incomingMessages = server.metrics().meter(name(GELFProcessor.class, "incomingMessages"));
-        this.incompleteMessages = server.metrics().meter(name(GELFProcessor.class, "incompleteMessages"));
-        this.processedMessages = server.metrics().meter(name(GELFProcessor.class, "processedMessages"));
-        this.gelfParsedTime = server.metrics().timer(name(GELFProcessor.class, "gelfParsedTime"));
     }
 
     public void messageReceived(GELFMessage message, MessageInput sourceInput) throws BufferOutOfCapacityException {
-        incomingMessages.mark();
+        String metricName = sourceInput.getUniqueReadableId();
+
+        server.metrics().meter(name(metricName, "incomingMessages")).mark();
         
         // Convert to LogMessage
-        Message lm = parse(message.getJSON());
+        Message lm = parse(message.getJSON(), sourceInput);
 
         if (!lm.isComplete()) {
-            incompleteMessages.mark();
+            server.metrics().meter(name(metricName, "incompleteMessages")).mark();
             LOG.debug("Skipping incomplete message.");
             return;
         }
 
         // Add to process buffer.
         LOG.debug("Adding received GELF message <{}> to process buffer: {}", lm.getId(), lm);
-        processedMessages.mark();
+        server.metrics().meter(name(metricName, "processedMessages")).mark();
         server.getProcessBuffer().insertCached(lm, sourceInput);
     }
 
-    private Message parse(String message) {
-        Timer.Context tcx = gelfParsedTime.time();
+    private Message parse(String message, MessageInput sourceInput) {
+        Timer.Context tcx = server.metrics().timer(name(sourceInput.getUniqueReadableId(), "gelfParsedTime")).time();
 
         JsonNode json;
 

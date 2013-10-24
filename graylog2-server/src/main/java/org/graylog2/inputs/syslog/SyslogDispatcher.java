@@ -45,13 +45,10 @@ public class SyslogDispatcher extends SimpleChannelHandler {
 
     private SyslogProcessor processor;
     private final Meter receivedMessages;
-    private final MessageInput sourceInput;
 
     public SyslogDispatcher(Core server, Configuration config, MessageInput sourceInput) {
-        this.processor = new SyslogProcessor(server, config);
-        this.sourceInput = sourceInput;
-
-        this.receivedMessages = server.metrics().meter(name(SyslogDispatcher.class, "receivedMessages"));
+        this.processor = new SyslogProcessor(server, config, sourceInput);
+        this.receivedMessages = server.metrics().meter(name(sourceInput.getUniqueReadableId(), "receivedMessages"));
     }
 
     @Override
@@ -65,7 +62,7 @@ public class SyslogDispatcher extends SimpleChannelHandler {
         byte[] readable = new byte[buffer.readableBytes()];
         buffer.toByteBuffer().get(readable, buffer.readerIndex(), buffer.readableBytes());
 
-        this.processor.messageReceived(new String(readable), remoteAddress.getAddress(), sourceInput);
+        this.processor.messageReceived(new String(readable), remoteAddress.getAddress());
     }
 
     @Override
