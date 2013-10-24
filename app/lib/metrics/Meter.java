@@ -21,11 +21,13 @@ package lib.metrics;
 import models.api.responses.metrics.RateMetricsResponse;
 
 import java.text.DecimalFormat;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * @author Lennart Koopmann <lennart@torch.sh>
  */
-public class Meter {
+public class Meter implements Metric {
 
     DecimalFormat df = new DecimalFormat("#.##");
 
@@ -35,12 +37,22 @@ public class Meter {
     public final double fiveMinute;
     public final double fifteenMinute;
 
-    public Meter(RateMetricsResponse rate) {
-        this.total = rate.total;
-        this.mean = rate.mean;
-        this.oneMinute = rate.oneMinute;
-        this.fiveMinute = rate.fiveMinute;
-        this.fifteenMinute = rate.fifteenMinute;
+    public Meter(Map<String, Object> rate) {
+        this.total = (long) rate.get("total");
+        this.mean = (double) rate.get("mean");
+        this.oneMinute = (double) rate.get("one_minute");
+        this.fiveMinute = (double) rate.get("five_minute");
+        this.fifteenMinute = (double) rate.get("fifteen_minute");
+    }
+
+    public Meter(final RateMetricsResponse rate) {
+        this(new HashMap<String, Object>() {{
+            put("total", rate.total);
+            put("mean", rate.mean);
+            put("one_minute", rate.oneMinute);
+            put("five_minute", rate.fiveMinute);
+            put("fifteen_minute", rate.fifteenMinute);
+        }});
     }
 
     public long getTotal() {

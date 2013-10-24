@@ -18,12 +18,16 @@
  */
 package lib.metrics;
 
+import com.google.common.collect.Maps;
 import models.api.responses.metrics.TimerMetricsResponse;
+
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * @author Lennart Koopmann <lennart@torch.sh>
  */
-public class Timing {
+public class Timer implements Metric {
 
     public enum Unit {
         MICROSECONDS
@@ -37,18 +41,30 @@ public class Timing {
     private final long percentile98th;
     private final long percentile99th;
 
-    public Timing(TimerMetricsResponse t, Unit durationUnit) {
+    public Timer(Map<String, Object> timing, Unit durationUnit) {
         if (!durationUnit.equals(Unit.MICROSECONDS)) {
-            throw new RuntimeException("Extractor timings must be in microseconds.");
+            throw new RuntimeException("Timings must be in microseconds.");
         }
 
-        this.standardDeviation = t.stdDev;
-        this.minimum = t.min;
-        this.maximum = t.max;
-        this.mean = t.mean;
-        this.percentile95th = t.percentile95th;
-        this.percentile98th = t.percentile98th;
-        this.percentile99th = t.percentile99th;
+        this.standardDeviation = (long) timing.get("std_dev");
+        this.minimum = (long) timing.get("min");
+        this.maximum = (long) timing.get("max");
+        this.mean = (long) timing.get("mean");
+        this.percentile95th = (long) timing.get("95th_percentile");
+        this.percentile98th = (long) timing.get("98th_percentile");
+        this.percentile99th = (long) timing.get("99th_percentile");
+    }
+
+    public Timer(final TimerMetricsResponse t, Unit durationUnit) {
+        this(new HashMap<String, Object>() {{
+            put("std_dev", t.stdDev);
+            put("min", t.min);
+            put("max", t.max);
+            put("mean", t.max);
+            put("95th_percentile", t.percentile95th);
+            put("98th_percentile", t.percentile98th);
+            put("99th_percentile", t.percentile99th);
+        }}, durationUnit);
     }
 
     public long getStandardDeviation() {

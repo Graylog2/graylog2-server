@@ -19,12 +19,8 @@
 package models;
 
 import lib.metrics.Meter;
-import lib.metrics.Timing;
-import models.api.responses.metrics.RateMetricsResponse;
-import models.api.responses.metrics.TimerMetricsResponse;
+import lib.metrics.Timer;
 import models.api.responses.metrics.TimerRateMetricsResponse;
-
-import java.text.DecimalFormat;
 
 /**
  * @author Lennart Koopmann <lennart@torch.sh>
@@ -33,16 +29,16 @@ public class ExtractorMetrics {
 
     private Meter meter;
 
-    private Timing totalTiming;
-    private Timing converterTiming;
+    private Timer totalTiming;
+    private Timer converterTiming;
 
     public ExtractorMetrics(TimerRateMetricsResponse total, TimerRateMetricsResponse converters) {
         if (total.durationUnit != null) {
-            this.totalTiming = new Timing(total.time, Timing.Unit.valueOf(total.durationUnit.toUpperCase()));
+            this.totalTiming = new Timer(total.time, Timer.Unit.valueOf(total.durationUnit.toUpperCase()));
         }
 
         if (converters.durationUnit != null) {
-            this.converterTiming = new Timing(converters.time, Timing.Unit.valueOf(converters.durationUnit.toUpperCase()));
+            this.converterTiming = new Timer(converters.time, Timer.Unit.valueOf(converters.durationUnit.toUpperCase()));
         }
 
         if (total.rate == null) {
@@ -52,11 +48,11 @@ public class ExtractorMetrics {
         }
     }
 
-    public Timing getTotalTiming() {
+    public Timer getTotalTiming() {
         return totalTiming;
     }
 
-    public Timing getConverterTiming() {
+    public Timer getConverterTiming() {
         return converterTiming;
     }
 
