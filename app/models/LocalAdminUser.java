@@ -30,12 +30,12 @@ public class LocalAdminUser extends User {
 
     private static AtomicReference<models.LocalAdminUser> instance = new AtomicReference<>(null);
 
-    LocalAdminUser(ApiClient api, String id, String name, String email, String fullName, List<String> permissions, String passwordHash) {
-        super(api, id, name, email, fullName, permissions, passwordHash);
+    LocalAdminUser(ApiClient api, String id, String name, String email, String fullName, List<String> permissions, String passwordHash, String tz) {
+        super(api, id, name, email, fullName, permissions, passwordHash, tz);
     }
 
     public static void createSharedInstance(ApiClient api, String username, String passwordHash) {
-        final models.LocalAdminUser adminUser = new models.LocalAdminUser(api,"0", username, "None",  "Interface Admin", Lists.newArrayList("*"), passwordHash);
+        final models.LocalAdminUser adminUser = new models.LocalAdminUser(api,"0", username, "None",  "Interface Admin", Lists.newArrayList("*"), passwordHash, null);
         if (! instance.compareAndSet(null, adminUser)) {
             // unless we are in test mode, this would be a bug.
             if (! Play.application().isTest()) {

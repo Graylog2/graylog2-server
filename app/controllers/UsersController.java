@@ -22,6 +22,7 @@ import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Lists;
 import com.google.inject.Inject;
 import lib.BreadcrumbList;
+import lib.DateTools;
 import lib.Tools;
 import models.PermissionsService;
 import models.User;
@@ -32,6 +33,7 @@ import models.api.requests.CreateUserRequest;
 import org.apache.shiro.crypto.hash.SimpleHash;
 import play.data.Form;
 import play.mvc.Result;
+import views.html.system.users.edit;
 import views.html.system.users.new_user;
 import views.html.system.users.show;
 
@@ -71,7 +73,13 @@ public class UsersController extends AuthenticatedController {
         bc.addCrumb("Create new", routes.UsersController.newUserForm());
 
         final List<String> permissions = permissionsService.all();
-        return ok(new_user.render(createUserForm, currentUser(), permissions, ImmutableSet.<String>of(), bc));
+        return ok(new_user.render(
+                createUserForm,
+                currentUser(),
+                permissions,
+                ImmutableSet.<String>of(),
+                DateTools.getGroupedTimezoneIds().asMap(),
+                bc));
     }
 
     public Result editUserForm(String username) {
@@ -80,7 +88,15 @@ public class UsersController extends AuthenticatedController {
 
         User user = userService.load(username);
         final Form<ChangeUserRequest> form = changeUserForm.fill(new ChangeUserRequest(user));
-        return ok(views.html.system.users.edit.render(form, username, currentUser(), permissionsService.all(), ImmutableSet.copyOf(user.getPermissions()), bc));
+        return ok(edit.render(
+                form,
+                username,
+                currentUser(),
+                permissionsService.all(),
+                ImmutableSet.copyOf(user.getPermissions()),
+                DateTools.getGroupedTimezoneIds().asMap(),
+                bc)
+        );
     }
 
     public Result create() {
@@ -91,7 +107,13 @@ public class UsersController extends AuthenticatedController {
             BreadcrumbList bc = breadcrumbs();
             bc.addCrumb("Create new", routes.UsersController.newUserForm());
             final List<String> permissions = permissionsService.all();
-            return badRequest(new_user.render(createUserRequestForm, currentUser(), permissions, ImmutableSet.copyOf(request.permissions), bc));
+            return badRequest(new_user.render(
+                    createUserRequestForm,
+                    currentUser(),
+                    permissions,
+                    ImmutableSet.copyOf(request.permissions),
+                    DateTools.getGroupedTimezoneIds().asMap(),
+                    bc));
         }
         // hash it before sending it across
         request.password = new SimpleHash("SHA-256", request.password).toString();
@@ -127,7 +149,14 @@ public class UsersController extends AuthenticatedController {
 
             final List<String> all = permissionsService.all();
 
-            return badRequest(views.html.system.users.edit.render(requestForm, username, currentUser(), all, ImmutableSet.copyOf(requestForm.get().permissions), bc));
+            return badRequest(edit.render(
+                    requestForm,
+                    username,
+                    currentUser(),
+                    all,
+                    ImmutableSet.copyOf(requestForm.get().permissions),
+                    DateTools.getGroupedTimezoneIds().asMap(),
+                    bc));
         }
         final User user = userService.load(username);
         user.update(requestForm.get());

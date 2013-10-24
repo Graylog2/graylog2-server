@@ -1,4 +1,11 @@
-@(form: Form[models.api.requests.ChangeUserRequest], username: String, currentUser: User, permissions: java.util.List[String], selectedPermissions: java.util.Set[String], breadcrumbs: lib.BreadcrumbList)
+@(form: Form[models.api.requests.ChangeUserRequest],
+        username: String,
+        currentUser: User,
+        permissions: List[String],
+        selectedPermissions: Set[String],
+        timezones: Map[String, Collection[String]],
+        breadcrumbs: lib.BreadcrumbList)
+@import com.google.common.collect.ImmutableList
 
 @main("Users", views.html.system.sidebar(), "", currentUser) {
 
@@ -31,6 +38,25 @@
                 }
                     </select>
                     -->
+
+                        </div>
+                    </div>
+                    <div class="control-group">
+                        <label class="control-label" for="timezone">Time Zone</label>
+                        <div class="controls">
+                            <select name="timezone" id="timezone" data-placeholder="Pick your time zone" class="timezone-select">
+                                @for(group <- ImmutableList.copyOf(timezones.keys).sorted) {
+                                    <optgroup label="@group">
+                                    @for(zone <- ImmutableList.copyOf(timezones.get(group).iterator()).sorted) {
+                                        @if(form("timezone").valueOr("").equals(group+"/"+zone)) {
+                                        <option value="@group/@zone" selected>@zone</option>
+                                        } else {
+                                        <option value="@group/@zone">@zone</option>
+                                        }
+                                    }
+                                    </optgroup>
+                                }
+                            </select>
 
                         </div>
                     </div>

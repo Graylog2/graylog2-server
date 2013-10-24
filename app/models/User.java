@@ -45,15 +45,16 @@ public class User {
 	private final String email;
 	private final String fullName;
 	private final List<String> permissions;
-
     private final String passwordHash;
+    private final DateTimeZone timezone;
 
     @AssistedInject
     public User(ApiClient api, @Assisted UserResponse ur, @Nullable @Assisted String passwordHash) {
-        this(api, ur.id, ur.username, ur.email, ur.fullName, ur.permissions, passwordHash);
+        this(api, ur.id, ur.username, ur.email, ur.fullName, ur.permissions, passwordHash, ur.timezone);
     }
 
-	public User(ApiClient api, String id, String name, String email, String fullName, List<String> permissions, String passwordHash) {
+	public User(ApiClient api, String id, String name, String email, String fullName, List<String> permissions, String passwordHash, String timezone) {
+        DateTimeZone timezone1 = null;
         this.api = api;
         this.id = id;
         this.name = name;
@@ -61,6 +62,15 @@ public class User {
 		this.fullName = fullName;
 		this.permissions = permissions;
         this.passwordHash = passwordHash;
+        try {
+            if (timezone != null) {
+                timezone1 = DateTimeZone.forID(timezone);
+            }
+        } catch (IllegalArgumentException e) {
+            log.warn("Invalid time zone name {} when loading user {}.", timezone, name);
+        } finally {
+            this.timezone = timezone1;
+        }
     }
 
     public void update(ChangeUserRequest request) {
@@ -101,7 +111,7 @@ public class User {
     }
 
     public DateTimeZone getTimeZone() {
-        return null;
+        return timezone;
     }
 
     public boolean updatePassword(ChangePasswordRequest request) {

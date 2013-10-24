@@ -1,4 +1,11 @@
-@(form: Form[models.api.requests.CreateUserRequest], currentUser: User, permissions: java.util.List[String], selectedPermissions: java.util.Set[String], breadcrumbs: lib.BreadcrumbList)
+
+@(form: Form[models.api.requests.CreateUserRequest],
+        currentUser: User,
+        permissions: List[String],
+        selectedPermissions: Set[String],
+        timezones: Map[String, Collection[String]],
+        breadcrumbs: lib.BreadcrumbList)
+@import com.google.common.collect.ImmutableList
 
 @main("Users", views.html.system.sidebar(), "", currentUser) {
 
@@ -35,6 +42,20 @@
             }
             </select>
             -->
+
+            <label for="timezone">Time Zone</label>
+            <span class="help-block">Choose your local time zone or leave it empty to use the system's default.</span>
+            <select name="timezone" id="timezone" data-placeholder="Pick your time zone" class="timezone-select">
+                <option></option>
+            @for(group <- ImmutableList.copyOf(timezones.keys).sorted) {
+                <optgroup label="@group">
+                @for(zone <- ImmutableList.copyOf(timezones.get(group).iterator()).sorted) {
+                    <option value="@group/@zone">@zone</option>
+                }
+                </optgroup>
+            }
+            </select>
+
             <div class="pull-right">
                 <button type="submit" class="btn btn-primary create-user">
                     <i class="icon icon-rocket"></i>

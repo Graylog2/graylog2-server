@@ -32,11 +32,16 @@ public class ChangeUserRequest extends ApiRequest {
 
     public List<String> permissions;
 
+    public String timezone;
+
     public ChangeUserRequest() { /* for data binding */ }
 
     public ChangeUserRequest(User user) {
         this.fullname = user.getFullName();
         this.email = user.getEmail();
         this.permissions = Lists.newArrayList("*"); // TODO PREVIEW user.getPermissions();
+        if (user.getTimeZone() != null) {
+            this.timezone = user.getTimeZone().getID();
+        }
     }
 }

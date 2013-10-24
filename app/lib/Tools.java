@@ -37,8 +37,6 @@ import java.util.Random;
  */
 public class Tools {
 
-    private static DateTimeZone globalTimezone = DateTimeZone.getDefault();
-
     private Tools() { /* pure utility class */ }
 
     public static int random(int min, int max) {
@@ -152,23 +150,6 @@ public class Tools {
 
         String pre = "kMGTPE".charAt(exp-1) + "i";
         return String.format("%.1f%sB", bytes / Math.pow(1024, exp), pre);
-    }
-
-    public static DateTimeZone getApplicationTimeZone() {
-        return globalTimezone;
-    }
-
-    public static void setApplicationTimeZone(DateTimeZone tz) {
-        globalTimezone = tz;
-    }
-
-    public static DateTime inUserTimeZone(DateTime timestamp) {
-        DateTimeZone tz = globalTimezone;
-        final User currentUser = UserService.current();
-        if (currentUser != null) {
-            currentUser.getTimeZone();
-        }
-        return timestamp.toDateTime(tz);
     }
 
 }

@@ -312,6 +312,9 @@ $(document).ready(function() {
     // permission chooser
     $(".permission-select").chosen({search_contains:true, width:"350px", inherit_select_classes:true});
 
+    // timezone chooser
+    $(".timezone-select").chosen({search_contains:true, inherit_select_classes:true, allow_single_deselect:true});
+
     var createUsernameField = $("form#create-user-form #username");
     if (createUsernameField.length) {
         var domElement = createUsernameField[0];

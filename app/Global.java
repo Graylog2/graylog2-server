@@ -26,8 +26,8 @@ import com.google.inject.name.Names;
 import com.typesafe.config.Config;
 import com.typesafe.config.ConfigFactory;
 import lib.ApiClient;
+import lib.DateTools;
 import lib.ServerNodesRefreshService;
-import lib.Tools;
 import lib.security.PlayAuthenticationListener;
 import lib.security.RedirectAuthenticator;
 import lib.security.RethrowingFirstSuccessfulStrategy;
@@ -95,13 +95,13 @@ public class Global extends GlobalSettings {
         final String timezone = app.configuration().getString("timezone", "");
         if (!timezone.isEmpty()) {
             try {
-                Tools.setApplicationTimeZone(DateTimeZone.forID(timezone));
+                DateTools.setApplicationTimeZone(DateTimeZone.forID(timezone));
             } catch (IllegalArgumentException e) {
                 log.error("Invalid timezone {} specified!", timezone);
                 throw new IllegalStateException(e);
             }
         }
-        log.info("Using application default timezone {}", Tools.getApplicationTimeZone());
+        log.info("Using application default timezone {}", DateTools.getApplicationTimeZone());
 
         List<Module> modules = Lists.newArrayList();
         modules.add(new AbstractModule() {

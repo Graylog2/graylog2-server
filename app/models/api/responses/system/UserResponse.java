@@ -34,4 +34,6 @@ public class UserResponse {
     public String email;
 
 	public List<String> permissions;
+
+    public String timezone;
 }
