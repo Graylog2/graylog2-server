@@ -20,6 +20,7 @@
 
 package org.graylog2.rest.resources;
 
+import com.codahale.metrics.Meter;
 import com.codahale.metrics.Timer;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -119,7 +120,7 @@ public abstract class RestResource {
         return r;
     }
 
-    protected Map<String, Object> buildMetricsMap(Timer t) {
+    protected Map<String, Object> buildTimerMap(Timer t) {
         Map<String, Object> metrics = Maps.newHashMap();
 
         if (t == null) {
@@ -147,6 +148,26 @@ public abstract class RestResource {
         metrics.put("rate_unit", "events/second");
         metrics.put("duration_unit", timeUnit.toString().toLowerCase());
         metrics.put("time", time);
+        metrics.put("rate", rate);
+
+        return metrics;
+    }
+
+    protected Map<String, Object> buildMeterMap(Meter m) {
+        Map<String, Object> metrics = Maps.newHashMap();
+
+        if (m == null) {
+            return metrics;
+        }
+
+        Map<String, Object> rate = Maps.newHashMap();
+        rate.put("one_minute", m.getOneMinuteRate());
+        rate.put("five_minute", m.getFiveMinuteRate());
+        rate.put("fifteen_minute", m.getFifteenMinuteRate());
+        rate.put("total", m.getCount());
+        rate.put("mean", m.getMeanRate());
+
+        metrics.put("rate_unit", "events/second");
         metrics.put("rate", rate);
 
         return metrics;

@@ -237,8 +237,8 @@ public class ExtractorsResource extends RestResource {
         map.put("converter_exceptions", extractor.getConverterExceptionCount());
 
         Map<String, Object> metrics = Maps.newHashMap();
-        metrics.put("total",  buildMetricsMap(core.metrics().getTimers().get(extractor.getTotalTimerName())));
-        metrics.put("converters", buildMetricsMap(core.metrics().getTimers().get(extractor.getConverterTimerName())));
+        metrics.put("total",  buildTimerMap(core.metrics().getTimers().get(extractor.getTotalTimerName())));
+        metrics.put("converters", buildTimerMap(core.metrics().getTimers().get(extractor.getConverterTimerName())));
         map.put("metrics", metrics);
 
         return map;

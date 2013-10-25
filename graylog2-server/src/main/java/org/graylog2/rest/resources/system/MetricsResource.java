@@ -19,7 +19,9 @@
  */
 package org.graylog2.rest.resources.system;
 
+import com.codahale.metrics.Meter;
 import com.codahale.metrics.Metric;
+import com.codahale.metrics.Timer;
 import com.codahale.metrics.annotation.Timed;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
@@ -107,7 +109,17 @@ public class MetricsResource extends RestResource {
                     metric.put("full_name", metricName);
                     metric.put("name", metricName.substring(metricName.lastIndexOf(".") + 1));
                     metric.put("type", type);
-                    metric.put("metric", e.getValue());
+
+
+                    // Add interval information for timer.
+                    if (e.getValue() instanceof Timer) {
+                        metric.put("metric", buildTimerMap((Timer) e.getValue()));
+                    } else if(e.getValue() instanceof Meter) {
+                        metric.put("metric", buildMeterMap((Meter) e.getValue()));
+                    } else {
+                        // TODO: implement for other types? histogram? gauge!
+                        metric.put("metric", e.getValue());
+                    }
 
                     metrics.add(metric);
                 } catch(Exception ex) {
