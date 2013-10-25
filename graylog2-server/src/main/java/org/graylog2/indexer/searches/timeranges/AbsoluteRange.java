@@ -35,8 +35,12 @@ public class AbsoluteRange implements TimeRange, FromToRange {
             throw new InvalidRangeParametersException();
         }
 
-        this.from = DateTime.parse(from, Tools.timeFormatterWithOptionalMilliseconds());
-        this.to = DateTime.parse(to, Tools.timeFormatterWithOptionalMilliseconds());
+        try {
+            this.from = DateTime.parse(from, Tools.timeFormatterWithOptionalMilliseconds());
+            this.to = DateTime.parse(to, Tools.timeFormatterWithOptionalMilliseconds());
+        } catch (IllegalArgumentException e) {
+            throw new InvalidRangeParametersException();
+        }
     }
 
     @Override
