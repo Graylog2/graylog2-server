@@ -31,18 +31,18 @@ public class Meter implements Metric {
 
     DecimalFormat df = new DecimalFormat("#.##");
 
-    public final long total;
+    public final double total;
     public final double mean;
     public final double oneMinute;
     public final double fiveMinute;
     public final double fifteenMinute;
 
-    public Meter(Map<String, Object> rate) {
-        this.total = (long) rate.get("total");
-        this.mean = (double) rate.get("mean");
-        this.oneMinute = (double) rate.get("one_minute");
-        this.fiveMinute = (double) rate.get("five_minute");
-        this.fifteenMinute = (double) rate.get("fifteen_minute");
+    public Meter(Map<String, Object> metric) {
+        this.total = (double) metric.get("total");
+        this.mean = (double) metric.get("mean");
+        this.oneMinute = (double) metric.get("one_minute");
+        this.fiveMinute = (double) metric.get("five_minute");
+        this.fifteenMinute = (double) metric.get("fifteen_minute");
     }
 
     public Meter(final RateMetricsResponse rate) {
@@ -55,7 +55,7 @@ public class Meter implements Metric {
         }});
     }
 
-    public long getTotal() {
+    public double getTotal() {
         return total;
     }
 

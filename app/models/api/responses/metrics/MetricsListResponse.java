@@ -19,10 +19,11 @@
  */
 package models.api.responses.metrics;
 
-import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
 import lib.metrics.Metric;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * @author Lennart Koopmann <lennart@torch.sh>
@@ -31,11 +32,11 @@ public class MetricsListResponse {
 
     List<MetricsListItem> metrics;
 
-    public List<Metric> getMetrics() {
-        List<Metric> result = Lists.newArrayList();
+    public Map<String, Metric> getMetrics() {
+        Map<String, Metric> result = Maps.newHashMap();
 
         for (MetricsListItem m : metrics) {
-            result.add(m.getMetric());
+            result.put(m.fullName, m.getMetric());
         }
 
         return result;

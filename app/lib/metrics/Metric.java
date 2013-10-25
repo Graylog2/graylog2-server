@@ -27,7 +27,8 @@ public interface Metric {
     public enum TYPE {
         TIMER,
         METER,
-        GAUGE
+        GAUGE,
+        HISTOGRAM
     }
 
 }

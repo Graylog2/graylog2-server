@@ -1,0 +1,20 @@
+@(currentUser: User, breadcrumbs: lib.BreadcrumbList, node: Node, metricNames: Set[String])
+
+@main("Metrics", views.html.system.sidebar(), "", currentUser) {
+
+    @views.html.partials.breadcrumbs(breadcrumbs)
+
+    <div class="row-fluid">
+        <h1>
+            <i class="icon icon-bar-chart"></i>
+            Metrics of @node.getShortNodeId
+            / @node.getHostname
+        </h1>
+        All Graylog2 nodes provide a set of internal metrics for diagnosis, debugging and monitoring. Note that you can access
+        all metrics via JMX, too.
+    </div>
+
+    @for(metricName <- metricNames) {
+        @metricName<br>
+    }
+}

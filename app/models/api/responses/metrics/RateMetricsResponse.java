@@ -25,7 +25,7 @@ import com.google.gson.annotations.SerializedName;
  */
 public class RateMetricsResponse {
 
-    public long total;
+    public double total;
     public double mean;
 
     @SerializedName("one_minute")

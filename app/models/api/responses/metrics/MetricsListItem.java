@@ -23,6 +23,7 @@ import com.google.gson.annotations.SerializedName;
 import lib.metrics.Meter;
 import lib.metrics.Metric;
 import lib.metrics.Timer;
+import play.Logger;
 
 import java.util.Map;
 
@@ -40,18 +41,32 @@ public class MetricsListItem {
     Map<String, Object> metric;
 
     public Metric getMetric() {
-        Metric.TYPE type = Metric.TYPE.valueOf((String) metric.get("type"));
+        Metric.TYPE metricType = Metric.TYPE.valueOf(this.type.toUpperCase());
 
-        switch (type) {
-            case TIMER:
-                return new Timer(metric, Timer.Unit.valueOf((String) metric.get("unit")));
-            case METER:
-                return new Meter(metric);
-            case GAUGE:
-                break;
+        try {
+            switch (metricType) {
+                case TIMER:
+                    String timeUnit = (String) metric.get("duration_unit");
+                    Map<String, Object> timing = (Map<String, Object>) metric.get("time");
+                    return new Timer(timing, Timer.Unit.valueOf(timeUnit.toUpperCase()));
+                case METER:
+                    Map<String, Object> rate = (Map<String, Object>) metric.get("rate");
+                    return new Meter(rate);
+                case GAUGE:
+                    // TODO
+Logger.info("AHHHH GAUGE");
+                    return null;
+                case HISTOGRAM:
+                    // TODO (what type is that even?)
+Logger.info("AHHHH HISTO");
+                    return null;
+            }
+        } catch(Exception e) {
+            Logger.error("Could not parse metric: " + metric.toString(), e);
+            throw new RuntimeException("Could not map metric to type. (more information in log) Type was: [" + this.type + "]", e);
         }
 
-        throw new RuntimeException("Could not map metric to type. Type was: [" + metric.get("type") + "]");
+        throw new RuntimeException("No such metric type recognized: [" + this.type + "]");
     }
 
 }

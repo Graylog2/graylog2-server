@@ -20,6 +20,7 @@ package models;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
+import com.google.common.collect.Sets;
 import com.google.inject.assistedinject.Assisted;
 import com.google.inject.assistedinject.AssistedInject;
 import lib.APIException;
@@ -45,6 +46,7 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -298,12 +300,21 @@ public class Node {
         return systemInfo.isProcessing;
     }
 
-    public List<Metric> getMetrics(String namespace) throws APIException, IOException {
+    public Set<String> getMetricNames() throws APIException, IOException {
+        Set<String> metricNames = Sets.newHashSet();
+
+        for (String name : getMetrics("org.graylog2").keySet()) {
+            metricNames.add(name);
+        }
+
+        return metricNames;
+    }
+
+    public Map<String, Metric> getMetrics(String namespace) throws APIException, IOException {
         MetricsListResponse response = api.get(MetricsListResponse.class)
                 .path("/system/metrics/namespace/{0}", namespace)
                 .expect(200, 404)
                 .execute();
-
 
         return response.getMetrics();
     }

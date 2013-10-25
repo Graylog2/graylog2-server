@@ -25,20 +25,20 @@ import com.google.gson.annotations.SerializedName;
  */
 public class TimerMetricsResponse {
 
-    public long min;
-    public long max;
-    public long mean;
+    public double min;
+    public double max;
+    public double mean;
 
     @SerializedName("std_dev")
-    public long stdDev;
+    public double stdDev;
 
     @SerializedName("95th_percentile")
-    public long percentile95th;
+    public double percentile95th;
 
     @SerializedName("98th_percentile")
-    public long percentile98th;
+    public double percentile98th;
 
     @SerializedName("99th_percentile")
-    public long percentile99th;
+    public double percentile99th;
 
 }

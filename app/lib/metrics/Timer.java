@@ -33,26 +33,26 @@ public class Timer implements Metric {
         MICROSECONDS
     }
 
-    private final long standardDeviation;
-    private final long minimum;
-    private final long maximum;
-    private final long mean;
-    private final long percentile95th;
-    private final long percentile98th;
-    private final long percentile99th;
+    private final double standardDeviation;
+    private final double minimum;
+    private final double maximum;
+    private final double mean;
+    private final double percentile95th;
+    private final double percentile98th;
+    private final double percentile99th;
 
     public Timer(Map<String, Object> timing, Unit durationUnit) {
         if (!durationUnit.equals(Unit.MICROSECONDS)) {
             throw new RuntimeException("Timings must be in microseconds.");
         }
 
-        this.standardDeviation = (long) timing.get("std_dev");
-        this.minimum = (long) timing.get("min");
-        this.maximum = (long) timing.get("max");
-        this.mean = (long) timing.get("mean");
-        this.percentile95th = (long) timing.get("95th_percentile");
-        this.percentile98th = (long) timing.get("98th_percentile");
-        this.percentile99th = (long) timing.get("99th_percentile");
+        this.standardDeviation = (double) timing.get("std_dev");
+        this.minimum = (double) timing.get("min");
+        this.maximum = (double) timing.get("max");
+        this.mean = (double) timing.get("mean");
+        this.percentile95th = (double) timing.get("95th_percentile");
+        this.percentile98th = (double) timing.get("98th_percentile");
+        this.percentile99th = (double) timing.get("99th_percentile");
     }
 
     public Timer(final TimerMetricsResponse t, Unit durationUnit) {
@@ -60,38 +60,38 @@ public class Timer implements Metric {
             put("std_dev", t.stdDev);
             put("min", t.min);
             put("max", t.max);
-            put("mean", t.max);
+            put("mean", t.mean);
             put("95th_percentile", t.percentile95th);
             put("98th_percentile", t.percentile98th);
             put("99th_percentile", t.percentile99th);
         }}, durationUnit);
     }
 
-    public long getStandardDeviation() {
+    public double getStandardDeviation() {
         return standardDeviation;
     }
 
-    public long getMinimum() {
+    public double getMinimum() {
         return minimum;
     }
 
-    public long getMaximum() {
+    public double getMaximum() {
         return maximum;
     }
 
-    public long getMean() {
+    public double getMean() {
         return mean;
     }
 
-    public long get95thPercentile() {
+    public double get95thPercentile() {
         return percentile95th;
     }
 
-    public long get98thPercentile() {
+    public double get98thPercentile() {
         return percentile98th;
     }
 
-    public long get99thPercentile() {
+    public double get99thPercentile() {
         return percentile99th;
     }
 

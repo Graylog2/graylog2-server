@@ -9,7 +9,7 @@
 
     @if(metrics.getMeter != null) {
         <div class="meter">
-            @metrics.getMeter.getTotal total invocations since boot,
+            @metrics.getMeter.getTotal.toInt total invocations since boot,
 
             averages:
             @metrics.getMeter.getOneMinuteFormatted,

@@ -44,14 +44,15 @@
                         <span class="caret"></span>
                     </a>
                     <ul class="dropdown-menu">
-                        <li><a href="/system/threaddump/@jvm.getNodeId">Get thread dump</a></li>
-                        <li><a href="/system/inputs/@jvm.getNodeId">Manage inputs</a></li>
+                        <li><a href="@routes.InputsController.manage(jvm.getNodeId)">Manage inputs</a></li>
+                        <li><a href="@routes.MetricsController.ofNode(jvm.getNodeId)">Metrics</a></li>
                         <li>
                             <a href="@nodes.get(jvm.getNodeId).getTransportAddress/api-browser" target="_blank">
                                 API Browser
                                 <i class="icon icon-external-link" style="font-size: 11px;"></i>
                             </a>
                         </li>
+                        <li><a href="@routes.SystemController.threadDump(jvm.getNodeId)">Get thread dump</a></li>
 
                         <li class="divider"></li>
                         <li>
