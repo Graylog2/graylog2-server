@@ -24,3 +24,9 @@ body {
     padding-top: 8px;
     padding-bottom: 2px;
 }
+
+.footer {
+    font-size: 11px;
+    color: #aaa;
+    text-align: right;
+}

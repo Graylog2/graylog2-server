@@ -94,5 +94,8 @@ GET         /a/tools/substring_test                                             
 GET         /a/tools/split_and_index_test                                            @controllers.ToolsApiController.splitAndIndexTest(split_by:String ?= "", index:Integer ?= 0, string ?= "")
 GET         /a/tools/natural_date_test                                               @controllers.ToolsApiController.naturalDateTest(string ?= "")
 
+# API: Server Connection
+GET         /a/connection/available                                                  @controllers.LonesomeInterfaceController.checkServerAvailability()
+
 # Map static resources from the /public folder to the /assets URL path
 GET         /assets/*file                                                            controllers.Assets.at(path="/public", file)

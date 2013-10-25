@@ -18,12 +18,15 @@
  */
 package controllers;
 
+import com.google.common.collect.Maps;
+import com.google.gson.Gson;
 import com.google.inject.Inject;
 import lib.ServerNodes;
 import models.Node;
 import play.mvc.Http;
 import play.mvc.Result;
 
+import java.util.HashMap;
 import java.util.List;
 
 public class LonesomeInterfaceController extends BaseController {
@@ -39,5 +42,13 @@ public class LonesomeInterfaceController extends BaseController {
         final List<Node> nodesEverConnectedTo = serverNodes.all(true);
 
         return ok(views.html.disconnected.index.render(Http.Context.current(), configuredNodes, nodesEverConnectedTo, serverNodes));
+    }
+
+    public Result checkServerAvailability() {
+        final HashMap<String,Object> map = Maps.newHashMap();
+        map.put("connected", serverNodes.isConnected());
+        map.put("connected_nodes_count", serverNodes.connectedNodesCount());
+        map.put("total_nodes_count", serverNodes.totalNodesCount());
+        return ok(new Gson().toJson(map)).as("application/json");
     }
 }

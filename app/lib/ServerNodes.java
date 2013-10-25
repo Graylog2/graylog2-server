@@ -151,7 +151,7 @@ public class ServerNodes {
 
     public Map<String, Node> asMap() {
         Map<String, Node> map = Maps.newHashMap();
-        for (Node serverNode : serverNodes) {
+        for (Node serverNode : ImmutableList.copyOf(skipInactive(serverNodes))) {
             map.put(serverNode.getNodeId(), serverNode);
         }
 
@@ -189,6 +189,14 @@ public class ServerNodes {
 
     public Node getConfigNodeOf(Node serverNode) {
         return configuredNodes.inverse().get(serverNode);
+    }
+
+    public int connectedNodesCount() {
+        return Iterators.size(skipInactive(serverNodes));
+    }
+
+    public int totalNodesCount() {
+        return serverNodes.size();
     }
 
     public boolean isConnected() {

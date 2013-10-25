@@ -13,5 +13,34 @@ $(document).ready(function () {
         nodeElem.effect("pulsate");
     });
 
+    // Notification count badge.
+    (function checkServerAvailability() {
+        $.ajax({
+            url: '/a/connection/available',
+            success: function(data) {
+                var connected = data.connected;
+                var count = data.connected_nodes_count;
+                var total = data.total_nodes_count;
+
+                $("#connected-count").html(count);
+                $("#total-count").html(total);
+                $(".footer").removeClass("hidden");
+                if (connected) {
+                    $("#username").prop("disabled", false);
+                    $("#password").prop("disabled", false);
+                    $("#checkconnection").addClass("hidden");
+                    $("#signin").removeClass("hidden");
+                } else {
+                    $("#username").prop("disabled", true);
+                    $("#password").prop("disabled", true);
+                    $("#checkconnection").removeClass("hidden");
+                    $("#signin").addClass("hidden");
+                }
+            },
+            complete: function() {
+                setTimeout(checkServerAvailability, 1000);
+            }
+        });
+    })();
 });
 

@@ -18,6 +18,8 @@
  */
 package controllers;
 
+import com.google.inject.Inject;
+import lib.ServerNodes;
 import lib.security.Graylog2ServerUnavailableException;
 import models.LoginRequest;
 import org.apache.shiro.SecurityUtils;
@@ -27,15 +29,17 @@ import org.apache.shiro.subject.Subject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import play.data.Form;
-import play.mvc.Controller;
 import play.mvc.Result;
 
 import static play.data.Form.form;
 
-public class SessionsController extends Controller {
+public class SessionsController extends BaseController {
 	private static final Logger log = LoggerFactory.getLogger(SessionsController.class);
 
 	final static Form<LoginRequest> userForm = form(LoginRequest.class);
+
+    @Inject
+    ServerNodes serverNodes;
 	
 	public Result index() {
         // Redirect if already logged in.
@@ -47,15 +51,22 @@ public class SessionsController extends Controller {
         if (session("username") != null && !session("username").isEmpty()) {
             return redirect("/");
         }
-        return ok(views.html.sessions.login.render(userForm));
+        checkServerConnections();
+        return ok(views.html.sessions.login.render(userForm, !serverNodes.isConnected()));
     }
-	
-	public Result create() {
+
+    private void checkServerConnections() {
+        if (!serverNodes.isConnected()) {
+            flash("error", "No Graylog2 servers available. Cannot log in.");
+        }
+    }
+
+    public Result create() {
 		Form<LoginRequest> loginRequest = userForm.bindFromRequest();
 
 		if (loginRequest.hasErrors()) {
 			flash("error", "Please fill out all fields.");
-            return badRequest(views.html.sessions.login.render(loginRequest));
+            return badRequest(views.html.sessions.login.render(loginRequest, !serverNodes.isConnected()));
 		}
 		
 		LoginRequest r = loginRequest.get();
@@ -67,11 +78,11 @@ public class SessionsController extends Controller {
 		} catch (AuthenticationException e) {
 			log.warn("Unable to authenticate user {}. Redirecting back to '/'", r.username, e);
             if (e instanceof Graylog2ServerUnavailableException) {
-                flash("error", "Could not reach any Graylog2 server!");
+                checkServerConnections();
             } else {
                 flash("error", "Sorry, those credentials are invalid.");
             }
-			return badRequest(views.html.sessions.login.render(loginRequest));
+			return badRequest(views.html.sessions.login.render(loginRequest, !serverNodes.isConnected()));
 		}
 	}
 
