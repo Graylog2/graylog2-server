@@ -19,6 +19,9 @@
  */
 package models.api.responses.metrics;
 
+import com.google.common.collect.Lists;
+import lib.metrics.Metric;
+
 import java.util.List;
 
 /**
@@ -27,5 +30,15 @@ import java.util.List;
 public class MetricsListResponse {
 
     List<MetricsListItem> metrics;
+
+    public List<Metric> getMetrics() {
+        List<Metric> result = Lists.newArrayList();
+
+        for (MetricsListItem m : metrics) {
+            result.add(m.getMetric());
+        }
+
+        return result;
+    }
 
 }

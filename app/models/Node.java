@@ -298,14 +298,15 @@ public class Node {
         return systemInfo.isProcessing;
     }
 
-    /*public List<Metric> getMetrics(String namespace) throws APIException, IOException {
+    public List<Metric> getMetrics(String namespace) throws APIException, IOException {
         MetricsListResponse response = api.get(MetricsListResponse.class)
                 .path("/system/metrics/namespace/{0}", namespace)
                 .expect(200, 404)
                 .execute();
 
 
-    }*/
+        return response.getMetrics();
+    }
 
     public void pause() throws IOException, APIException {
         api.put()
