@@ -20,6 +20,7 @@
 
 package org.graylog2.rest.resources;
 
+import com.codahale.metrics.Histogram;
 import com.codahale.metrics.Meter;
 import com.codahale.metrics.Timer;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -149,6 +150,27 @@ public abstract class RestResource {
         metrics.put("duration_unit", timeUnit.toString().toLowerCase());
         metrics.put("time", time);
         metrics.put("rate", rate);
+
+        return metrics;
+    }
+    protected Map<String, Object> buildHistogramMap(Histogram h) {
+        Map<String, Object> metrics = Maps.newHashMap();
+
+        if (h == null) {
+            return metrics;
+        }
+
+        Map<String, Object> time = Maps.newHashMap();
+        time.put("max", h.getSnapshot().getMax());
+        time.put("min", h.getSnapshot().getMin());
+        time.put("mean", (long) h.getSnapshot().getMean());
+        time.put("95th_percentile", (long) h.getSnapshot().get95thPercentile());
+        time.put("98th_percentile", (long) h.getSnapshot().get98thPercentile());
+        time.put("99th_percentile", (long) h.getSnapshot().get99thPercentile());
+        time.put("std_dev", (long) h.getSnapshot().getStdDev());
+
+        metrics.put("time", time);
+        metrics.put("count", h.getCount());
 
         return metrics;
     }
