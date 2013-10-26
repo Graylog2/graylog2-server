@@ -47,7 +47,7 @@ public class MetricsController extends AuthenticatedController {
         bc.addCrumb("Metrics", routes.MetricsController.ofNode(node.getNodeId()));
 
         try {
-            return ok(views.html.system.metrics.of_node.render(currentUser(), bc, node, node.getMetricNames()));
+            return ok(views.html.system.metrics.of_node.render(currentUser(), bc, node, node.getMetrics("org.graylog2")));
         } catch (IOException e) {
             return status(500, views.html.errors.error.render(ApiClient.ERROR_MSG_IO, e, request()));
         } catch (APIException e) {

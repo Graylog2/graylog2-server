@@ -33,7 +33,7 @@ public class MetricsListResponse {
     List<MetricsListItem> metrics;
 
     public Map<String, Metric> getMetrics() {
-        Map<String, Metric> result = Maps.newHashMap();
+        Map<String, Metric> result = Maps.newTreeMap();
 
         for (MetricsListItem m : metrics) {
             result.put(m.fullName, m.getMetric());

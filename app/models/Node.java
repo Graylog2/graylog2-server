@@ -300,18 +300,9 @@ public class Node {
         return systemInfo.isProcessing;
     }
 
-    public Set<String> getMetricNames() throws APIException, IOException {
-        Set<String> metricNames = Sets.newHashSet();
-
-        for (String name : getMetrics("org.graylog2").keySet()) {
-            metricNames.add(name);
-        }
-
-        return metricNames;
-    }
-
     public Map<String, Metric> getMetrics(String namespace) throws APIException, IOException {
         MetricsListResponse response = api.get(MetricsListResponse.class)
+                .node(this)
                 .path("/system/metrics/namespace/{0}", namespace)
                 .expect(200, 404)
                 .execute();

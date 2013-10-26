@@ -27,7 +27,7 @@ import java.util.Map;
 /**
  * @author Lennart Koopmann <lennart@torch.sh>
  */
-public class Meter implements Metric {
+public class Meter extends Metric {
 
     DecimalFormat df = new DecimalFormat("#.##");
 
@@ -38,6 +38,8 @@ public class Meter implements Metric {
     public final double fifteenMinute;
 
     public Meter(Map<String, Object> metric) {
+        super(MetricType.METER);
+
         this.total = (double) metric.get("total");
         this.mean = (double) metric.get("mean");
         this.oneMinute = (double) metric.get("one_minute");

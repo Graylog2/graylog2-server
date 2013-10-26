@@ -20,9 +20,7 @@
 package models.api.responses.metrics;
 
 import com.google.gson.annotations.SerializedName;
-import lib.metrics.Meter;
-import lib.metrics.Metric;
-import lib.metrics.Timer;
+import lib.metrics.*;
 import play.Logger;
 
 import java.util.Map;
@@ -41,25 +39,23 @@ public class MetricsListItem {
     Map<String, Object> metric;
 
     public Metric getMetric() {
-        Metric.TYPE metricType = Metric.TYPE.valueOf(this.type.toUpperCase());
+        Metric.MetricType metricType = Metric.MetricType.valueOf(this.type.toUpperCase());
 
         try {
             switch (metricType) {
                 case TIMER:
-                    String timeUnit = (String) metric.get("duration_unit");
+                    String timerTimeUnit = (String) metric.get("duration_unit");
                     Map<String, Object> timing = (Map<String, Object>) metric.get("time");
-                    return new Timer(timing, Timer.Unit.valueOf(timeUnit.toUpperCase()));
+                    return new Timer(timing, Timer.Unit.valueOf(timerTimeUnit.toUpperCase()));
                 case METER:
                     Map<String, Object> rate = (Map<String, Object>) metric.get("rate");
                     return new Meter(rate);
                 case GAUGE:
-                    // TODO
-Logger.info("AHHHH GAUGE");
-                    return null;
+                    return new Gauge(metric.get("value"));
                 case HISTOGRAM:
-                    // TODO (what type is that even?)
-Logger.info("AHHHH HISTO");
-                    return null;
+                    Map<String, Object> histoTiming = (Map<String, Object>) metric.get("time");
+                    double count = (double) metric.get("count");
+                    return new Histogram(histoTiming, count);
             }
         } catch(Exception e) {
             Logger.error("Could not parse metric: " + metric.toString(), e);

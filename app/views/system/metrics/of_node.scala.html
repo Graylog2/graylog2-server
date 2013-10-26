@@ -1,4 +1,4 @@
-@(currentUser: User, breadcrumbs: lib.BreadcrumbList, node: Node, metricNames: Set[String])
+@(currentUser: User, breadcrumbs: lib.BreadcrumbList, node: Node, metrics: Map[String, lib.metrics.Metric])
 
 @main("Metrics", views.html.system.sidebar(), "", currentUser) {
 
@@ -12,9 +12,37 @@
         </h1>
         All Graylog2 nodes provide a set of internal metrics for diagnosis, debugging and monitoring. Note that you can access
         all metrics via JMX, too.
+
+        <br />
+        This node is reporting a total of @metrics.size() metrics.
     </div>
 
-    @for(metricName <- metricNames) {
-        @metricName<br>
+    <ul class="metric-list">
+    @for((name, metric) <- metrics) {
+        @if(metric != null) {
+            <li>
+                <div class="name">
+                    @if(metric.getType.equals(lib.metrics.Metric.MetricType.TIMER)) {
+                        <i class="icon icon-time"></i>
+                    }
+
+                    @if(metric.getType.equals(lib.metrics.Metric.MetricType.HISTOGRAM)) {
+                        <i class="icon icon-signal"></i>
+                    }
+
+                    @if(metric.getType.equals(lib.metrics.Metric.MetricType.METER)) {
+                        <i class="icon icon-play-circle"></i>
+                    }
+
+                    @if(metric.getType.equals(lib.metrics.Metric.MetricType.GAUGE)) {
+                        <i class="icon icon-dashboard"></i>
+                    }
+
+                    <span class="prefix">@name.substring(0,"org.graylog2.".length)</span>
+                    @name.substring("org.graylog2.".length)
+                </div>
+            </li>
+        }
     }
+    </ul>
 }

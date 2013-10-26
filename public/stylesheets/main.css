@@ -1130,5 +1130,18 @@ form #stream-rules {
     margin-left: 25px;
     margin-top: 5px;
     list-style-type: square;
-;
+}
+
+.metric-list li {
+    margin-bottom: 5px;
+}
+
+.metric-list li .prefix {
+    color: #ddd;
+    margin-right: -4px;
+}
+
+.metric-list li .name {
+    font-size: 13px;
+    font-family: monospace;
 }

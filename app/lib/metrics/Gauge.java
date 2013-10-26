@@ -22,23 +22,17 @@ package lib.metrics;
 /**
  * @author Lennart Koopmann <lennart@torch.sh>
  */
-public class Metric {
+public class Gauge extends Metric {
 
-    public enum MetricType {
-        TIMER,
-        METER,
-        GAUGE,
-        HISTOGRAM
+    private final Object value;
+
+    public Gauge(Object value) {
+        super(MetricType.GAUGE);
+
+        this.value = value;
     }
 
-    private MetricType type;
-
-    public Metric(MetricType type) {
-        this.type = type;
+    public Object getValue() {
+        return value;
     }
-
-    public MetricType getType() {
-        return type;
-    }
-
 }

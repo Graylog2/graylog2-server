@@ -1,5 +1,5 @@
-/*
- * Copyright 2013 TORCH UG
+/**
+ * Copyright 2013 Lennart Koopmann <lennart@torch.sh>
  *
  * This file is part of Graylog2.
  *
@@ -15,22 +15,18 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with Graylog2.  If not, see <http://www.gnu.org/licenses/>.
+ *
  */
 package lib.metrics;
 
-import models.api.responses.metrics.TimerMetricsResponse;
-
-import java.util.HashMap;
 import java.util.Map;
 
 /**
  * @author Lennart Koopmann <lennart@torch.sh>
  */
-public class Timer extends Metric {
+public class Histogram extends Metric {
 
-    public enum Unit {
-        MICROSECONDS
-    }
+    private final double count;
 
     private final double standardDeviation;
     private final double minimum;
@@ -40,32 +36,23 @@ public class Timer extends Metric {
     private final double percentile98th;
     private final double percentile99th;
 
-    public Timer(Map<String, Object> timing, Unit durationUnit) {
-        super(MetricType.TIMER);
 
-        if (!durationUnit.equals(Unit.MICROSECONDS)) {
-            throw new RuntimeException("Timings must be in microseconds.");
-        }
+    public Histogram(Map<String, Object> histo, double count) {
+        super(MetricType.HISTOGRAM);
 
-        this.standardDeviation = (double) timing.get("std_dev");
-        this.minimum = (double) timing.get("min");
-        this.maximum = (double) timing.get("max");
-        this.mean = (double) timing.get("mean");
-        this.percentile95th = (double) timing.get("95th_percentile");
-        this.percentile98th = (double) timing.get("98th_percentile");
-        this.percentile99th = (double) timing.get("99th_percentile");
+        this.count = count;
+
+        this.standardDeviation = (double) histo.get("std_dev");
+        this.minimum = (double) histo.get("min");
+        this.maximum = (double) histo.get("max");
+        this.mean = (double) histo.get("mean");
+        this.percentile95th = (double) histo.get("95th_percentile");
+        this.percentile98th = (double) histo.get("98th_percentile");
+        this.percentile99th = (double) histo.get("99th_percentile");
     }
 
-    public Timer(final TimerMetricsResponse t, Unit durationUnit) {
-        this(new HashMap<String, Object>() {{
-            put("std_dev", t.stdDev);
-            put("min", t.min);
-            put("max", t.max);
-            put("mean", t.mean);
-            put("95th_percentile", t.percentile95th);
-            put("98th_percentile", t.percentile98th);
-            put("99th_percentile", t.percentile99th);
-        }}, durationUnit);
+    public double getCount() {
+        return count;
     }
 
     public double getStandardDeviation() {
@@ -84,16 +71,15 @@ public class Timer extends Metric {
         return mean;
     }
 
-    public double get95thPercentile() {
+    public double getPercentile95th() {
         return percentile95th;
     }
 
-    public double get98thPercentile() {
+    public double getPercentile98th() {
         return percentile98th;
     }
 
-    public double get99thPercentile() {
+    public double getPercentile99th() {
         return percentile99th;
     }
-
 }
