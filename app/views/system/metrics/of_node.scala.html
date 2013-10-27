@@ -1,4 +1,4 @@
-@(currentUser: User, breadcrumbs: lib.BreadcrumbList, node: Node, metrics: Map[String, lib.metrics.Metric])
+@(currentUser: User, breadcrumbs: lib.BreadcrumbList, node: Node, metrics: Map[String, lib.metrics.Metric], preFilter: String)
 
 @main("Metrics", views.html.system.sidebar(), "", currentUser) {
 
@@ -17,12 +17,17 @@
         This node is reporting a total of @metrics.size() metrics.
     </div>
 
-    <input type="text" class="metrics-filter span11" placeholder="Type a metric name to filter..." />
+    <input type="text" class="metrics-filter span11" value="@preFilter" placeholder="Type a metric name to filter..." />
 
     <ul class="metric-list">
     @for((name, metric) <- metrics) {
         @if(metric != null) {
-            <li data-metricname="@name">
+            <li data-metricname="@name"
+                @if(!name.matches("^" + preFilter + ".*")){
+                        style="display: none;"
+                }
+            >
+
                 <div class="name">
                     @if(metric.getType.equals(lib.metrics.Metric.MetricType.TIMER)) {
                         <i class="icon icon-time"></i>
@@ -42,6 +47,12 @@
 
                     <span class="prefix">@name.substring(0,"org.graylog2.".length)</span>@name.substring("org.graylog2.".length)
                 </div>
+
+            USE metrics partial here. include rate in timer, too
+
+                @if(metric.getType.equals(lib.metrics.Metric.MetricType.TIMER)) {
+                    @views.html.partials.metrics.timing.render(metric.asInstanceOf[lib.metrics.Timer])
+                }
             </li>
         }
     }
