@@ -25,8 +25,13 @@ body {
     padding-bottom: 2px;
 }
 
+#login-box form {
+    margin-bottom: 10px;
+}
+
 .footer {
     font-size: 11px;
     color: #aaa;
     text-align: right;
+    margin-bottom: 2px;
 }
