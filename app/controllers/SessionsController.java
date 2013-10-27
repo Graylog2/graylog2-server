@@ -46,7 +46,7 @@ public class SessionsController extends BaseController {
         final Subject subject = SecurityUtils.getSubject();
         if (subject.isAuthenticated()) {
             log.debug("User {} already authenticated, redirecting to /", subject);
-            redirect("/");
+            return redirect("/");
         }
         if (session("username") != null && !session("username").isEmpty()) {
             return redirect("/");
