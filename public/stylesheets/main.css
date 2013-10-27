@@ -1138,10 +1138,13 @@ form #stream-rules {
 
 .metric-list li .prefix {
     color: #ddd;
-    margin-right: -4px;
 }
 
 .metric-list li .name {
     font-size: 13px;
     font-family: monospace;
+}
+
+.metrics-filter {
+    margin-bottom: 15px !important;
 }

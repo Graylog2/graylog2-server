@@ -453,6 +453,17 @@ $(document).ready(function() {
         $("html, body").animate({ scrollTop: 0 }, "fast");
     });
 
+    $(".metrics-filter").on("keyup", function() {
+        var val = $(this).val();
+
+        $(".metric-list li").hide();
+        $(".metric-list li").each(function(i) {
+            if ($(this).attr("data-metricname").match(new RegExp("^" + val + ".*", "g"))) {
+               $(this).show();
+            }
+        });
+    });
+
     $("#global-throughput").on("click", function() {
         window.location.href = "/system";
     });

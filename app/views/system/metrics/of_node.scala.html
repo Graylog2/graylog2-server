@@ -17,10 +17,12 @@
         This node is reporting a total of @metrics.size() metrics.
     </div>
 
+    <input type="text" class="metrics-filter span11" placeholder="Type a metric name to filter..." />
+
     <ul class="metric-list">
     @for((name, metric) <- metrics) {
         @if(metric != null) {
-            <li>
+            <li data-metricname="@name">
                 <div class="name">
                     @if(metric.getType.equals(lib.metrics.Metric.MetricType.TIMER)) {
                         <i class="icon icon-time"></i>
@@ -38,8 +40,7 @@
                         <i class="icon icon-dashboard"></i>
                     }
 
-                    <span class="prefix">@name.substring(0,"org.graylog2.".length)</span>
-                    @name.substring("org.graylog2.".length)
+                    <span class="prefix">@name.substring(0,"org.graylog2.".length)</span>@name.substring("org.graylog2.".length)
                 </div>
             </li>
         }
