@@ -21,6 +21,7 @@ package controllers;
 import com.google.inject.Inject;
 import lib.ServerNodes;
 import lib.security.Graylog2ServerUnavailableException;
+import lib.security.RedirectAuthenticator;
 import models.LoginRequest;
 import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.authc.AuthenticationException;
@@ -40,12 +41,14 @@ public class SessionsController extends BaseController {
 
     @Inject
     ServerNodes serverNodes;
-	
+	@Inject
+    RedirectAuthenticator authenticator;
+
 	public Result index() {
         // Redirect if already logged in.
-        final Subject subject = SecurityUtils.getSubject();
-        if (subject.isAuthenticated()) {
-            log.debug("User {} already authenticated, redirecting to /", subject);
+        String loggedInUserName = authenticator.getUsername(ctx());
+        if (loggedInUserName != null) {
+            log.debug("User {} already authenticated, redirecting to /", loggedInUserName);
             return redirect("/");
         }
         if (session("username") != null && !session("username").isEmpty()) {
