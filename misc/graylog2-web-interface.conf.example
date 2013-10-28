@@ -12,15 +12,3 @@ application.secret=""
 # Graylog2 stores all timestamps in UTC. To properly display times, set the default timezone of the interface.
 # If you leave this out, Graylog2 will pick your system default as the timezone. Usually you will want to configure it explicitly.
 # timezone="Europe/Berlin"
-
-# The web interface can send its log output and access log to graylog2.
-# The access log is disabled by default, by uncommenting the line below you can enable it.
-# graylog2.appender.send-access-log=true
-
-# Currently the log output can only target one server, this will change in future versions.
-# Please make sure that you start a GELF TCP input on the server you are sending, too, otherwise it will fail.
-# By default, no such input is started!
-# graylog2.appender.host=127.0.0.1:12201
-
-# Please see https://github.com/Graylog2/play2-graylog2/blob/master/project-code/README for more configuration options
-# for the Graylog2 appender.
