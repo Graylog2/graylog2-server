@@ -51,6 +51,7 @@
                             </a>
                             <ul class="dropdown-menu">
                                 <li><a href="@routes.ExtractorsController.manage(node.getNodeId, input.getId)">Manage extractors</a></li>
+                                <li><a href="@routes.MetricsController.ofNode(node.getNodeId, (input.getType + "." + input.getId))">Show metrics</a></li>
                                 <li><a href="#" class="add-static-field" data-node-id="@node.getNodeId" data-input-id="@input.getId">Add static field</a></li>
                             </ul>
                         </div>
