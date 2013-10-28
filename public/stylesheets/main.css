@@ -1182,3 +1182,11 @@ dl.metric-histogram dd {
 .metric-list li .name .open:hover {
     text-decoration: none;
 }
+
+.message-field-dropdown {
+    font-size: 12px;
+}
+
+.message-field-dropdown .key {
+    color: #000;
+}
