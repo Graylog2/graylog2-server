@@ -107,7 +107,7 @@ public class Core implements GraylogServer {
     private static final int SCHEDULED_THREADS_POOL_SIZE = 30;
     private ScheduledExecutorService scheduler;
 
-    public static final String GRAYLOG2_VERSION = "0.20.0-preview.4";
+    public static final String GRAYLOG2_VERSION = "0.20.0-preview.5";
     public static final String GRAYLOG2_CODENAME = "Amigo Humanos (Flipper)";
 
     private Indexer indexer;
