@@ -24,7 +24,6 @@ import com.codahale.metrics.annotation.Timed;
 import com.google.common.collect.Maps;
 import org.elasticsearch.indices.IndexMissingException;
 import org.graylog2.indexer.messages.DocumentNotFoundException;
-import org.graylog2.indexer.results.ResultMessage;
 import org.graylog2.rest.documentation.annotations.*;
 import org.graylog2.rest.resources.RestResource;
 import org.slf4j.Logger;
@@ -71,7 +70,7 @@ public class MessageResource extends RestResource {
     
     @GET @Path("/analyze") @Timed
     @ApiOperation(value = "Analyze a message string",
-                  notes = "Returns what tokens/terms a message string (message or full_message) is slit to.")
+                  notes = "Returns what tokens/terms a message string (message or full_message) is split to.")
     @Produces(MediaType.APPLICATION_JSON)
     @ApiResponses(value = {
             @ApiResponse(code = 404, message = "Specified index does not exist."),
