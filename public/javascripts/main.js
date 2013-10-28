@@ -464,6 +464,11 @@ $(document).ready(function() {
         });
     });
 
+    $(".metric-list li .name .open").on("click", function(e) {
+        e.preventDefault();
+        $('.metric-list li .metric[data-metricname="' + $(this).attr("data-metricname") + '"]').toggle();
+    });
+
     $("#global-throughput").on("click", function() {
         window.location.href = "/system";
     });

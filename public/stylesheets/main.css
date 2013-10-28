@@ -1137,7 +1137,7 @@ form #stream-rules {
 }
 
 .metric-list li .prefix {
-    color: #ddd;
+    color: #aaa;
 }
 
 .metric-list li .name {
@@ -1145,6 +1145,40 @@ form #stream-rules {
     font-family: monospace;
 }
 
+.metric-list li .metric {
+    display: none;
+    margin-left: 10px;
+}
+
+.metric-list dl {
+    margin-top: 0px;
+    margin-bottom: 0px;
+}
+
 .metrics-filter {
     margin-bottom: 15px !important;
+}
+
+dl.metric-def dt {
+    float: left;
+}
+
+dl.metric-timer dd {
+    margin-left: 125px;
+}
+
+dl.metric-meter dd {
+    margin-left: 95px;
+}
+
+dl.metric-gauge dd {
+    margin-left: 80px;
+}
+
+dl.metric-histogram dd {
+    margin-left: 125px;
+}
+
+.metric-list li .name .open:hover {
+    text-decoration: none;
 }

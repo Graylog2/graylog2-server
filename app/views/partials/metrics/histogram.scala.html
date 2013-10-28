@@ -1,0 +1,27 @@
+@(histo: lib.metrics.Histogram)
+
+<dl class="metric-def metric-histogram">
+    <dt>95th percentile:</dt>
+    <dd>@histo.getPercentile95th</dd>
+
+    <dt>98th percentile:</dt>
+    <dd>@histo.getPercentile98th</dd>
+
+    <dt>99th percentile:</dt>
+    <dd>@histo.getPercentile99th</dd>
+
+    <dt>Standard deviation:</dt>
+    <dd>@histo.getStandardDeviation</dd>
+
+    <dt>Mean:</dt>
+    <dd>@histo.getMean</dd>
+
+    <dt>Minimum:</dt>
+    <dd>@histo.getMinimum</dd>
+
+    <dt>Maximum:</dt>
+    <dd>@histo.getMaximum</dd>
+
+    <dt>Count:</dt>
+    <dd>@histo.getCount</dd>
+</dl>

@@ -22,12 +22,7 @@
     <ul class="metric-list">
     @for((name, metric) <- metrics) {
         @if(metric != null) {
-            <li data-metricname="@name"
-                @if(!name.matches("^" + preFilter + ".*")){
-                        style="display: none;"
-                }
-            >
-
+            <li data-metricname="@name" @if(!name.matches("^" + preFilter + ".*")){ style="display: none;" }>
                 <div class="name">
                     @if(metric.getType.equals(lib.metrics.Metric.MetricType.TIMER)) {
                         <i class="icon icon-time"></i>
@@ -45,14 +40,14 @@
                         <i class="icon icon-dashboard"></i>
                     }
 
-                    <span class="prefix">@name.substring(0,"org.graylog2.".length)</span>@name.substring("org.graylog2.".length)
+                    <a href="#" class="open" data-metricname="@name">
+                        <span class="prefix">@name.substring(0,"org.graylog2.".length)</span>@name.substring("org.graylog2.".length)
+                    </a>
                 </div>
 
-            USE metrics partial here. include rate in timer, too
-
-                @if(metric.getType.equals(lib.metrics.Metric.MetricType.TIMER)) {
-                    @views.html.partials.metrics.timing.render(metric.asInstanceOf[lib.metrics.Timer])
-                }
+                <div class="metric" data-metricname="@name">
+                    @views.html.system.metrics.partials.metric.render(metric)
+                </div>
             </li>
         }
     }

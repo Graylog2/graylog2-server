@@ -1,0 +1,18 @@
+@(meter: lib.metrics.Meter)
+
+<dl class="metric-def metric-meter">
+    <dt>Total:</dt>
+    <dd>@meter.getTotal.toInt events</dd>
+
+    <dt>Mean:</dt>
+    <dd>@meter.getMeanFormatted events/sec</dd>
+
+    <dt>1 minute avg:</dt>
+    <dd>@meter.getOneMinuteFormatted events/sec</dd>
+
+    <dt>5 minute avg:</dt>
+    <dd>@meter.getFiveMinuteFormatted events/sec</dd>
+
+    <dt>15 minute avg:</dt>
+    <dd>@meter.getFiveMinuteFormatted events/sec</dd>
+</dl>

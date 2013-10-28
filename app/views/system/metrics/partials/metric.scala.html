@@ -1,0 +1,21 @@
+@(metric: lib.metrics.Metric)
+
+@if(metric.getType.equals(lib.metrics.Metric.MetricType.TIMER)) {
+    <h3 class="u-light" style="display: inline;">Timer</h3><br />
+    @views.html.partials.metrics.timing.render(metric.asInstanceOf[lib.metrics.Timer])
+}
+
+@if(metric.getType.equals(lib.metrics.Metric.MetricType.METER)) {
+    <h3 class="u-light" style="display: inline;">Meter</h3><br />
+    @views.html.partials.metrics.meter(metric.asInstanceOf[lib.metrics.Meter])
+}
+
+@if(metric.getType.equals(lib.metrics.Metric.MetricType.GAUGE)) {
+    <h3 class="u-light" style="display: inline;">Gauge</h3><br />
+    @views.html.partials.metrics.gauge(metric.asInstanceOf[lib.metrics.Gauge])
+}
+
+@if(metric.getType.equals(lib.metrics.Metric.MetricType.HISTOGRAM)) {
+    <h3 class="u-light" style="display: inline;">Histogram</h3><br />
+    @views.html.partials.metrics.histogram(metric.asInstanceOf[lib.metrics.Histogram])
+}

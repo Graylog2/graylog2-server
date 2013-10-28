@@ -1,7 +1,14 @@
 @(timing: lib.metrics.Timer)
-<dl>
+
+<dl class="metric-def metric-timer">
+    <dt>95th percentile:</dt>
+    <dd>@timing.get95thPercentile()&#956;s</dd>
+
     <dt>98th percentile:</dt>
     <dd>@timing.get98thPercentile&#956;s</dd>
+
+    <dt>99th percentile:</dt>
+    <dd>@timing.get99thPercentile&#956;s</dd>
 
     <dt>Standard deviation:</dt>
     <dd>@timing.getStandardDeviation&#956;s</dd>
