@@ -402,25 +402,25 @@ $(document).ready(function() {
         }
 
         // escape common lucene special characters: + - && || ! ( ) { } [ ] ^ " ~ * ? : \
-        value = value.replace(/\\/, "\\\\", "g"); // this one must be on top to avoid double-escaping lol
-        value = value.replace(/\//, "\\/", "g");
-        value = value.replace(/\+/, "\\+", "g");
-        value = value.replace(/-/, "\\-", "g");
-        value = value.replace(/!/, "\\!", "g");
-        value = value.replace(/\\^/, "\\^", "g");
-        value = value.replace(/"/, "\\\"", "g");
-        value = value.replace(/~/, "\\~", "g");
-        value = value.replace(/\*/, "\\*", "g");
-        value = value.replace(/\?/, "\\?", "g");
-        value = value.replace(/:/, "\\:", "g");
-        value = value.replace(/\|\|/, "\\|\\|", "g");
-        value = value.replace(/&&/, "\\&\\&", "g");
-        value = value.replace(/\[/, "\\[", "g");
-        value = value.replace(/\]/, "\\]", "g");
-        value = value.replace(/\(/, "\\(", "g");
-        value = value.replace(/\)/, "\\)", "g");
-        value = value.replace(/\{/, "\\}", "g");
-        value = value.replace(/\}/, "\\}", "g");
+        value = value.replace(/\\/g, "\\\\"); // this one must be on top to avoid double-escaping lol
+        value = value.replace(/\//g, "\\/");
+        value = value.replace(/\+/g, "\\+");
+        value = value.replace(/-/g, "\\-");
+        value = value.replace(/!/g, "\\!");
+        value = value.replace(/\\^/g, "\\^");
+        value = value.replace(/"/g, "\\\"");
+        value = value.replace(/~/g, "\\~");
+        value = value.replace(/\*/g, "\\*");
+        value = value.replace(/\?/g, "\\?");
+        value = value.replace(/:/g, "\\:");
+        value = value.replace(/\|\|/g, "\\|\\|");
+        value = value.replace(/&&/g, "\\&\\&");
+        value = value.replace(/\[/g, "\\[");
+        value = value.replace(/\]/g, "\\]");
+        value = value.replace(/\(/g, "\\(");
+        value = value.replace(/\)/g, "\\)");
+        value = value.replace(/\{/g, "\\}");
+        value = value.replace(/\}/g, "\\}");
 
         var ourQuery = field + ":" + value;
         var query = $("#universalsearch-query");
