@@ -21,7 +21,7 @@ object ApplicationBuild extends Build {
     "com.google.inject.extensions" % "guice-assistedinject" % "3.0",
     "javax.inject" % "javax.inject" % "1",
 
-    "org.graylog2" % "play2-graylog2_2.10" % "1.0-SNAPSHOT",
+    "org.graylog2" % "play2-graylog2_2.10" % "1.0",
 
     "org.fluentlenium" % "fluentlenium-core" % "0.9.0" % "test",
     "org.fluentlenium" % "fluentlenium-festassert" % "0.9.0" % "test",
