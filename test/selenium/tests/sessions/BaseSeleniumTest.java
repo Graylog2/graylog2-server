@@ -109,7 +109,12 @@ public class BaseSeleniumTest extends FluentTest {
 
     protected synchronized static Client esClient() {
         if (client == null) {
-            final NodeBuilder builder = NodeBuilder.nodeBuilder().client(true).clusterName("graylog2");
+            final NodeBuilder builder = NodeBuilder.nodeBuilder().client(true);
+            if (System.getenv("TRAVIS").equals("true")) {
+                builder.clusterName("elasticsearch");
+            } else {
+                builder.clusterName("graylog2");
+            }
             builder.settings()
                     .put("node.name", "selenium-test-client")
                     .put("http.enabled", "false")
