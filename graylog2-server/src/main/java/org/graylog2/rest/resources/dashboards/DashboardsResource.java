@@ -88,7 +88,7 @@ public class DashboardsResource extends RestResource {
     @GET @Timed
     @ApiOperation(value = "Get a list of all dashboards")
     @Produces(MediaType.APPLICATION_JSON)
-    public String get() {
+    public String list() {
         List<Map<String, Object>> dashboards = Lists.newArrayList();
 
         for (Dashboard dashboard: Dashboard.all(core)) {
@@ -100,6 +100,23 @@ public class DashboardsResource extends RestResource {
         result.put("dashboards", dashboards);
 
         return json(result);
+    }
+
+    @GET @Timed
+    @ApiOperation(value = "Get a single dashboards")
+    @Path("/{dashboardId}")
+    @ApiResponses(value = {
+            @ApiResponse(code = 404, message = "Dashboard not found."),
+            @ApiResponse(code = 400, message = "Invalid ObjectId.")
+    })
+    @Produces(MediaType.APPLICATION_JSON)
+    public String get(@ApiParam(title = "dashboardId", required = true) @PathParam("dashboardId") String dashboardId) {
+        try {
+            Dashboard dashboard = Dashboard.load(loadObjectId(dashboardId), core);
+            return json(dashboard.asMap());
+        } catch (org.graylog2.database.NotFoundException e) {
+            throw new WebApplicationException(404);
+        }
     }
 
     @DELETE @Timed
