@@ -47,12 +47,12 @@ public class GELFTCPInput extends GELFInputBase {
     public void launch() throws MisfireException {
         // Register throughput counter gauges.
         for(Map.Entry<String,Gauge<Long>> gauge : throughputCounter.gauges().entrySet()) {
-            core.metrics().register(MetricRegistry.name(GELFTCPInput.class, gauge.getKey()), gauge.getValue());
+            core.metrics().register(MetricRegistry.name(getUniqueReadableId(), gauge.getKey()), gauge.getValue());
         }
 
         // Register connection counter gauges.
-        core.metrics().register(MetricRegistry.name(GELFTCPInput.class, "open_connections"), connectionCounter.gaugeCurrent());
-        core.metrics().register(MetricRegistry.name(GELFTCPInput.class, "total_connections"), connectionCounter.gaugeTotal());
+        core.metrics().register(MetricRegistry.name(getUniqueReadableId(), "open_connections"), connectionCounter.gaugeCurrent());
+        core.metrics().register(MetricRegistry.name(getUniqueReadableId(), "total_connections"), connectionCounter.gaugeTotal());
 
         final ExecutorService bossThreadPool = Executors.newCachedThreadPool(
                 new ThreadFactoryBuilder()
