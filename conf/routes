@@ -63,6 +63,7 @@ GET         /system/logging                                                     
 GET         /dashboards                                                              @controllers.DashboardsController.index()
 GET         /dashboards/new                                                          @controllers.DashboardsController.newDashboard()
 POST        /dashboards/create                                                       @controllers.DashboardsController.create()
+POST        /dashboards/:id/delete                                                   @controllers.DashboardsController.delete(id: String)
 
 # API: Search (i.e. facets)
 GET         /a/search/fieldstats                                                     @controllers.SearchApiController.fieldStats(q ?= "", field ?= "", rangetype ?= "", relative:Integer ?= -1, from ?= "", to ?= "", keyword ?= "")

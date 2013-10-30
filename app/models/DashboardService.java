@@ -64,4 +64,8 @@ public class DashboardService {
         api.post().path("/dashboards").body(request).expect(Http.Status.CREATED).execute();
     }
 
+    public void delete(String id) throws APIException, IOException {
+        api.delete().path("/dashboards/{0}", id).expect(Http.Status.NO_CONTENT).execute();
+    }
+
 }

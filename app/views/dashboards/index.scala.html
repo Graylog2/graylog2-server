@@ -18,10 +18,25 @@
     }
 
     @for(dashboard <- dashboards) {
-        <div class="row-fluid node-row">
-            <h3>@dashboard.getTitle</h3>
-            Created at @lib.DateTools.inUserTimeZone(dashboard.getCreatedAt())
-            by @views.html.partials.links.to_user.render(dashboard.getCreatorUser)
+        <div class="row-fluid node-row dashboard-row">
+            <div class="pull-right">
+                Created by @views.html.partials.links.to_user.render(dashboard.getCreatorUser)
+                at @lib.DateTools.inUserTimeZone(dashboard.getCreatedAt())
+
+                @helper.form(action = routes.DashboardsController.delete(dashboard.getId)) {
+                    <button type="submit" class="btn btn-danger btn-mini" data-confirm="Really delete dashboard?">
+                        Delete
+                    </button>
+                }
+            </div>
+
+            <h3>
+                <i class="icon icon-ellipsis-vertical"></i>
+                @dashboard.getTitle
+            </h3>
+
+            0 widgets.
+            @dashboard.getDescription
         </div>
     }
 

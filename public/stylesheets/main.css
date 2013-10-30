@@ -1190,3 +1190,12 @@ dl.metric-histogram dd {
 .message-field-dropdown .key {
     color: #000;
 }
+
+.dashboard-row form {
+    display: inline;
+}
+
+.dashboard-row form button {
+    margin-top: -4px;
+    margin-left: 5px;
+}
