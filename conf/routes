@@ -61,6 +61,7 @@ GET         /system/logging                                                     
 
 # Dashboards
 GET         /dashboards                                                              @controllers.DashboardsController.index()
+GET         /dashboard/:id                                                           @controllers.DashboardsController.show(id: String)
 GET         /dashboards/new                                                          @controllers.DashboardsController.newDashboard()
 POST        /dashboards/create                                                       @controllers.DashboardsController.create()
 POST        /dashboards/:id/delete                                                   @controllers.DashboardsController.delete(id: String)

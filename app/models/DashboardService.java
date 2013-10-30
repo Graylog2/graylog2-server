@@ -45,6 +45,12 @@ public class DashboardService {
         this.dashboardFactory = dashboardFactory;
     }
 
+
+    public Dashboard get(String id) throws APIException, IOException {
+        DashboardSummaryResponse d = api.get(DashboardSummaryResponse.class).path("/dashboards/{0}", id).execute();
+        return dashboardFactory.fromSummaryResponse(d);
+    }
+
     public List<Dashboard> getAll() throws APIException, IOException {
         List<Dashboard> dashboards = Lists.newArrayList();
         GetDashboardsResponse response = api.get(GetDashboardsResponse.class).path("/dashboards").execute();

@@ -59,6 +59,19 @@ public class DashboardsController extends AuthenticatedController {
         }
     }
 
+    public Result show(String id) {
+        try {
+            Dashboard dashboard = dashboardService.get(id);
+
+            return ok(views.html.dashboards.show.render(currentUser(), dashboard));
+        } catch (APIException e) {
+            String message = "Could not get dashboards. We expected HTTP 200, but got a HTTP " + e.getHttpCode() + ".";
+            return status(504, views.html.errors.error.render(message, e, request()));
+        } catch (IOException e) {
+            return status(504, views.html.errors.error.render(ApiClient.ERROR_MSG_IO, e, request()));
+        }
+    }
+
     public Result newDashboard() {
         final BreadcrumbList bc = new BreadcrumbList();
         bc.addCrumb("Dashboards", routes.DashboardsController.index());

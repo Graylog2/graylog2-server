@@ -1,0 +1,7 @@
+@(currentUser: User, dashboard: Dashboard)
+
+@main(dashboard.getTitle, sidebars.standard(currentUser), "", currentUser) {
+
+    @dashboard
+
+}
