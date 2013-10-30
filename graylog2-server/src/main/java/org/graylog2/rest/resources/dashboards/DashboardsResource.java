@@ -24,14 +24,11 @@ import com.codahale.metrics.annotation.Timed;
 import com.google.common.collect.Maps;
 import org.bson.types.ObjectId;
 import org.graylog2.dashboards.Dashboard;
-import org.graylog2.database.ValidationException;
-import org.graylog2.plugin.streams.Stream;
-import org.graylog2.rest.documentation.annotations.Api;
-import org.graylog2.rest.documentation.annotations.ApiOperation;
-import org.graylog2.rest.documentation.annotations.ApiParam;
+import org.graylog2.database.*;
+import org.graylog2.rest.documentation.annotations.*;
 import org.graylog2.rest.resources.RestResource;
 import org.graylog2.rest.resources.dashboards.requests.CreateRequest;
-import org.graylog2.streams.StreamImpl;
+import org.graylog2.system.activities.Activity;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 import org.slf4j.Logger;
@@ -104,5 +101,29 @@ public class DashboardsResource extends RestResource {
 
         return json(result);
     }
+
+    @DELETE @Timed
+    @ApiOperation(value = "Delete a dashboard and all its widgets")
+    @Produces(MediaType.APPLICATION_JSON)
+    @Path("/{dashboardId}")
+    @ApiResponses(value = {
+            @ApiResponse(code = 404, message = "Dashboard not found."),
+            @ApiResponse(code = 400, message = "Invalid ObjectId.")
+    })
+    public Response delete(@ApiParam(title = "dashboardId", required = true) @PathParam("dashboardId") String dashboardId) {
+        try {
+            Dashboard dashboard = Dashboard.load(loadObjectId(dashboardId), core);
+            dashboard.destroy();
+
+            String msg = "Deleted dashboard <" + dashboard.getId() + ">. Reason: REST request.";
+            LOG.info(msg);
+            core.getActivityWriter().write(new Activity(msg, DashboardsResource.class));
+        } catch (org.graylog2.database.NotFoundException e) {
+            throw new WebApplicationException(404);
+        }
+
+        return Response.status(Response.Status.fromStatusCode(204)).build();
+    }
+
 
 }

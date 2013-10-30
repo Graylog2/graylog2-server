@@ -21,11 +21,11 @@ package org.graylog2.dashboards;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
-import com.mongodb.BasicDBList;
 import com.mongodb.BasicDBObject;
 import com.mongodb.DBObject;
 import org.bson.types.ObjectId;
 import org.graylog2.Core;
+import org.graylog2.database.NotFoundException;
 import org.graylog2.database.Persisted;
 import org.graylog2.database.validators.DateValidator;
 import org.graylog2.database.validators.FilledStringValidator;
@@ -42,7 +42,7 @@ import java.util.Map;
  */
 public class Dashboard extends Persisted {
 
-    private static final String COLLECTION = "dashboards";
+    public static final String COLLECTION = "dashboards";
 
     public Dashboard(Map<String, Object> fields, Core core) {
         super(core, fields);
@@ -55,6 +55,16 @@ public class Dashboard extends Persisted {
     @Override
     public String getCollectionName() {
         return COLLECTION;
+    }
+
+    public static Dashboard load(ObjectId id, Core core) throws NotFoundException {
+        BasicDBObject o = (BasicDBObject) get(id, core, COLLECTION);
+
+        if (o == null) {
+            throw new NotFoundException();
+        }
+
+        return new Dashboard((ObjectId) o.get("_id"), o.toMap(), core);
     }
 
     public static List<Dashboard> all(Core core) {
