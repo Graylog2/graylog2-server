@@ -59,6 +59,11 @@ POST        /systemjobs/trigger                                                 
 # Logging
 GET         /system/logging                                                          @controllers.LoggingController.index()
 
+# Dashboards
+GET         /dashboards                                                              @controllers.DashboardsController.index()
+GET         /dashboards/new                                                          @controllers.DashboardsController.newDashboard()
+POST        /dashboards/create                                                       @controllers.DashboardsController.create()
+
 # API: Search (i.e. facets)
 GET         /a/search/fieldstats                                                     @controllers.SearchApiController.fieldStats(q ?= "", field ?= "", rangetype ?= "", relative:Integer ?= -1, from ?= "", to ?= "", keyword ?= "")
 GET         /a/search/fieldterms                                                     @controllers.SearchApiController.fieldTerms(q ?= "", field ?= "", rangetype ?= "", relative:Integer ?= -1, from ?= "", to ?= "", keyword ?= "")

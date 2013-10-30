@@ -1,0 +1,19 @@
+@(currentUser: User, breadcrumbs: lib.BreadcrumbList, form: Form[models.api.requests.dashboards.CreateDashboardRequest])
+@import helper.twitterBootstrap._
+
+@main("Create dashboard", sidebars.standard(currentUser), "", currentUser) {
+
+    @views.html.partials.breadcrumbs(breadcrumbs)
+
+    <div class="row-fluid">
+        <h1><i class="icon icon-dashboard"></i> Create dashboard</h1>
+    </div>
+
+    @helper.form(action = routes.DashboardsController.create()) {
+        @helper.inputText(form("title"), '_label -> "Title", 'required -> "required")
+        @helper.inputText(form("description"), '_label -> "Description", 'required -> "required")
+
+        <input type="submit" class="btn btn-success" value="Create" />
+    }
+
+}
