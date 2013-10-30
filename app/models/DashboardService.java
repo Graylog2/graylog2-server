@@ -37,10 +37,12 @@ import java.util.List;
 public class DashboardService {
 
     private final ApiClient api;
+    private final Dashboard.Factory dashboardFactory;
 
     @Inject
-    private DashboardService(ApiClient api) {
+    private DashboardService(ApiClient api, Dashboard.Factory dashboardFactory) {
         this.api = api;
+        this.dashboardFactory = dashboardFactory;
     }
 
     public List<Dashboard> getAll() throws APIException, IOException {
@@ -52,7 +54,7 @@ public class DashboardService {
         }
 
         for(DashboardSummaryResponse dr : response.dashboards) {
-            dashboards.add(new Dashboard(dr));
+            dashboards.add(dashboardFactory.fromSummaryResponse(dr));
         }
 
         return dashboards;

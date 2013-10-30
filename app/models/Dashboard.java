@@ -19,25 +19,33 @@
  */
 package models;
 
+import com.google.inject.assistedinject.Assisted;
+import com.google.inject.assistedinject.AssistedInject;
 import models.api.responses.dashboards.DashboardSummaryResponse;
+import org.joda.time.DateTime;
 
 /**
  * @author Lennart Koopmann <lennart@torch.sh>
  */
 public class Dashboard {
 
+    public interface Factory {
+        Dashboard fromSummaryResponse(DashboardSummaryResponse dsr);
+    }
+
     private final String id;
     private final String title;
     private final String description;
-    private final String createdAt;
-    private final String creatorUserId;
+    private final DateTime createdAt;
+    private final User creatorUser;
 
-    public Dashboard(DashboardSummaryResponse dsr) {
+    @AssistedInject
+    private Dashboard(UserService usr, @Assisted DashboardSummaryResponse dsr) {
         this.id = dsr.id;
         this.title = dsr.title;
         this.description = dsr.description;
-        this.createdAt = dsr.createdAt;
-        this.creatorUserId = dsr.creatorUserId;
+        this.createdAt = DateTime.parse(dsr.createdAt);
+        this.creatorUser = usr.load(dsr.creatorUserId);
     }
 
     public String getId() {
@@ -52,12 +60,12 @@ public class Dashboard {
         return description;
     }
 
-    public String getCreatedAt() {
+    public DateTime getCreatedAt() {
         return createdAt;
     }
 
-    public String getCreatorUserId() {
-        return creatorUserId;
+    public User getCreatorUser() {
+        return creatorUser;
     }
 
 }
