@@ -88,7 +88,7 @@ public class ServerNodesRefreshService {
         // resolve all configured nodes, to figure out the proper transport addresses in this network
         final Collection<Node> configuredNodes = serverNodes.getConfiguredNodes();
         final Map<Node, NodeSummaryResponse> responses =
-                api.get(NodeSummaryResponse.class).path("/system/cluster/node").nodes(configuredNodes).executeOnAll();
+                api.get(NodeSummaryResponse.class).path("/system/cluster/node").nodes(configuredNodes).timeout(2, TimeUnit.SECONDS).executeOnAll();
         List<Node> resolvedNodes = Lists.newArrayList();
         for (Map.Entry<Node, NodeSummaryResponse> nsr : responses.entrySet()) {
             final Node resolvedNode = nodeFactory.fromSummaryResponse(nsr.getValue());
@@ -100,6 +100,10 @@ public class ServerNodesRefreshService {
     }
 
     public void start() {
+        // try to resolve the configured nodes immediately on startup, so we can rely on this being done in tests.
+        // won't make a difference to a production instance (except delay startup sequence slightly)
+        resolveConfiguredNodes();
+
         executor.scheduleWithFixedDelay(new Runnable() {
             @Override
             public void run() {

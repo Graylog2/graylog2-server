@@ -1,5 +1,5 @@
-/**
- * Copyright 2013 Kay Roepke <lennart@torch.sh>
+/*
+ * Copyright 2013 TORCH UG
  *
  * This file is part of Graylog2.
  *
@@ -15,34 +15,32 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with Graylog2.  If not, see <http://www.gnu.org/licenses/>.
- *
  */
 package selenium.pages;
 
 import controllers.routes;
 import org.fluentlenium.core.FluentPage;
-import org.fluentlenium.core.annotation.Page;
 
 import static org.fest.assertions.Assertions.assertThat;
 
-public class DashboardPage extends FluentPage {
+public class SearchPage extends FluentPage {
 
-    @Page
-    SearchPage searchPage;
+    private String queryString;
+    private String rangeType;
+    private Integer relativeTimeSpan;
+    private String fromTime;
+    private String toTime;
+    private String keyword;
+    private String interval;
+    private Integer pageNumber;
 
     @Override
     public String getUrl() {
-        return routes.DashboardController.index().url();
+        return routes.SearchController.index(queryString, rangeType, relativeTimeSpan, fromTime, toTime, keyword, interval, pageNumber).url();
     }
 
     @Override
     public void isAt() {
-        assertThat(title()).contains("Dashboard");
-    }
-
-    public SearchPage searchFor(String searchQuery) {
-        fill("#universalsearch-query").with(searchQuery);
-        submit(".universalsearch-form");
-        return searchPage;
+        assertThat(title()).contains("Search results");
     }
 }

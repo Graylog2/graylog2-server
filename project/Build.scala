@@ -23,6 +23,8 @@ object ApplicationBuild extends Build {
 
     "org.graylog2" % "play2-graylog2_2.10" % "1.0",
 
+    "org.elasticsearch" % "elasticsearch" % "0.90.5" % "test",
+
     "org.fluentlenium" % "fluentlenium-core" % "0.9.0" % "test",
     "org.fluentlenium" % "fluentlenium-festassert" % "0.9.0" % "test",
     "org.mockito" % "mockito-all" % "1.9.5" % "test",

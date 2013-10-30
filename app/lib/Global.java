@@ -1,4 +1,4 @@
-/*
+package lib;/*
  * Copyright 2013 TORCH UG
  *
  * This file is part of Graylog2.
@@ -25,9 +25,6 @@ import com.google.inject.Module;
 import com.google.inject.name.Names;
 import com.typesafe.config.Config;
 import com.typesafe.config.ConfigFactory;
-import lib.ApiClient;
-import lib.DateTools;
-import lib.ServerNodesRefreshService;
 import lib.security.PlayAuthenticationListener;
 import lib.security.RedirectAuthenticator;
 import lib.security.RethrowingFirstSuccessfulStrategy;
@@ -63,7 +60,21 @@ import java.util.List;
 @SuppressWarnings("unused")
 public class Global extends GlobalSettings {
 	private static final Logger log = LoggerFactory.getLogger(Global.class);
-    private Injector injector;
+
+    private static Injector injector;
+
+    /**
+     * Retrieve the application's global Guice injector.
+     *
+     * Unfortunately there seems to be no supported way to store custom objects in the application,
+     * thus we need to make this accessor static. However, running more than one Play application in
+     * the same JVM won't work anyway, so we are on the safe side here.
+     *
+     * @return the Guice injector for this application.
+     */
+    public static Injector getInjector() {
+        return injector;
+    }
 
     @Override
 	public void onStart(Application app) {
