@@ -53,7 +53,7 @@ cd builds/
 
 # tar it
 echo "Building Tarball ..."
-gnutar cfz $BUILD_NAME.tar.gz $BUILD_NAME
+gtar cfz $BUILD_NAME.tar.gz $BUILD_NAME
 rm -rf ./$BUILD_NAME
 mv $BUILD_NAME.tar.gz $BUILD_NAME.tgz
 
