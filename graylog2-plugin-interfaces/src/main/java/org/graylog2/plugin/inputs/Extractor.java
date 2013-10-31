@@ -195,7 +195,7 @@ public abstract class Extractor implements EmbeddedPersistable {
                 }
             } catch (Exception e) {
                 this.converterExceptions.incrementAndGet();
-                LOG.error("Could not apply converter [{}].", converter.getType(), e);
+                LOG.error("Could not apply converter [" + converter.getType() + "] of extractor [" + getId() + "].", e);
                 continue;
             }
         }
