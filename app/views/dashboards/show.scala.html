@@ -1,7 +1,11 @@
-@(currentUser: User, dashboard: Dashboard)
+@(currentUser: User, breadcrumbs: lib.BreadcrumbList, dashboard: Dashboard)
 
-@main(dashboard.getTitle, sidebars.standard(currentUser), "", currentUser) {
+@main(dashboard.getTitle, null, "", currentUser, false) {
+    <i class="icon icon-fullscreen pull-right toggle-fullscreen" title="Fullscreen"></i>
 
-    @dashboard
+    @views.html.partials.breadcrumbs(breadcrumbs)
+
+    <h1>@dashboard.getTitle</h1>
+    @dashboard.getDescription
 
 }

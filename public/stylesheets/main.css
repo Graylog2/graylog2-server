@@ -1199,3 +1199,8 @@ dl.metric-histogram dd {
     margin-top: -4px;
     margin-left: 5px;
 }
+
+.toggle-fullscreen {
+    font-size: 15px;
+    cursor: pointer;
+}

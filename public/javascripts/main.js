@@ -474,6 +474,11 @@ $(document).ready(function() {
         window.location.href = "/system";
     });
 
+    $(".toggle-fullscreen").on("click", function(e) {
+        e.preventDefault();
+        $(document).toggleFullScreen();
+    });
+
     function scrollToSearchbarHint() {
         if ($(document).scrollTop() > 50) {
             $("#scroll-to-search-hint").fadeIn("fast").delay(1500).fadeOut("fast");

@@ -63,7 +63,11 @@ public class DashboardsController extends AuthenticatedController {
         try {
             Dashboard dashboard = dashboardService.get(id);
 
-            return ok(views.html.dashboards.show.render(currentUser(), dashboard));
+            final BreadcrumbList bc = new BreadcrumbList();
+            bc.addCrumb("Dashboards", routes.DashboardsController.index());
+            bc.addCrumb(dashboard.getTitle(), routes.DashboardsController.show(dashboard.getId()));
+
+            return ok(views.html.dashboards.show.render(currentUser(), bc, dashboard));
         } catch (APIException e) {
             String message = "Could not get dashboards. We expected HTTP 200, but got a HTTP " + e.getHttpCode() + ".";
             return status(504, views.html.errors.error.render(message, e, request()));
