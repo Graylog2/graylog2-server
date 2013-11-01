@@ -1,6 +1,6 @@
 @(currentUser: User)
 
-@main("Create new stream", null, "", currentUser) {
+@main("Create new stream", views.html.sidebars.standard(currentUser), "", currentUser) {
     <h1>
         <i class="icon-pushpin"></i>
         Create stream
