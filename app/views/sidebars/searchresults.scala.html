@@ -7,16 +7,11 @@
 
 <p>
 	Found @searchResult.getTotalResultCount() messages in @searchResult.getTookMs()ms,
+    searched in
 
-    searched in @searchResult.getUsedIndices().size()
-
-    @if(searchResult.getUsedIndices().size() == 1) {
-        index.
-    } else {
-        indices.
-    }
-
-    <a href="#used-indices" role="button" data-toggle="modal" data-backdrop="true"><i class="icon-question-sign"></i></a>
+    <a href="#used-indices" role="button" data-toggle="modal" data-backdrop="true">
+        @searchResult.getUsedIndices().size()
+        @if(searchResult.getUsedIndices().size() == 1) {index} else {indices}</a>.
 </p>
 
 @if(searchResult.getTotalResultCount() > 0) {
