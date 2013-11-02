@@ -1,0 +1,15 @@
+@(widgetType: String)
+
+<div class="btn-group">
+    <a data-toggle="dropdown" href="#" class="add-to-dashboard" data-widget-type="@widgetType">
+        <i class="icon icon-dashboard" title="Add to dashboard"></i>
+    </a>
+
+    @****** the actual dashboards are loaded in here using JS ****@
+
+    <ul class="dropdown-menu dashboard-selector">
+        <li>
+            <a href="@routes.DashboardsController.newDashboard()">No dashboards. Create one?</a>
+        </li>
+    </ul>
+</div>

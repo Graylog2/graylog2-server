@@ -1,18 +1,20 @@
-@(searchResult: api.results.SearchResult)
+@(searchResult: models.api.results.SearchResult)
 
 <h2>
 	<i class="icon-search"></i>
 	Search results
 </h2>
 
-<p>
+
 	Found @searchResult.getTotalResultCount() messages in @searchResult.getTookMs()ms,
     searched in
 
     <a href="#used-indices" role="button" data-toggle="modal" data-backdrop="true">
         @searchResult.getUsedIndices().size()
         @if(searchResult.getUsedIndices().size() == 1) {index} else {indices}</a>.
-</p>
+
+    @views.html.partials.dashboards.add_to_dashboard.render("search-result-count")
+
 
 @if(searchResult.getTotalResultCount() > 0) {
 <h3>Select fields</h3>

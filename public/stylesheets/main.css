@@ -1204,3 +1204,15 @@ dl.metric-histogram dd {
     font-size: 15px;
     cursor: pointer;
 }
+
+.add-to-dashboard:hover {
+    text-decoration: none;
+}
+
+.add-to-dashboard {
+    font-size: 12px;
+}
+
+ul.dashboard-selector {
+    left: -185px;
+}

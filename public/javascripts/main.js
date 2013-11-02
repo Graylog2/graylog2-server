@@ -627,4 +627,7 @@ function hideSidebar() {
 }
 
 // This is holding all field graphs.
-fieldGraphs = [];
+fieldGraphs = {};
+
+// All dashboards.
+globalDashboards = {};
