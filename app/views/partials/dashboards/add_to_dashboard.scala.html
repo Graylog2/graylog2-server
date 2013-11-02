@@ -7,7 +7,7 @@
 
     @****** the actual dashboards are loaded in here using JS ****@
 
-    <ul class="dropdown-menu dashboard-selector">
+    <ul class="dropdown-menu dashboard-selector" data-widget-type="@widgetType">
         <li>
             <a href="@routes.DashboardsController.newDashboard()">No dashboards. Create one?</a>
         </li>

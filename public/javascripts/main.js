@@ -626,6 +626,28 @@ function hideSidebar() {
     drawResultGraph();
 }
 
+function originalUniversalSearchSettings() {
+    var result = {};
+
+    result.query =  $("#universalsearch-query-permanent").text().trim();
+    result.rangeType = $("#universalsearch-rangetype-permanent").text().trim();
+
+    switch(result.rangeType) {
+        case "relative":
+            result.relative = $("#universalsearch-relative-permanent").text().trim();
+            break;
+        case "absolute":
+            result.from = $("#universalsearch-from-permanent").text().trim();
+            result.to = $("#universalsearch-to-permanent").text().trim();
+            break;
+        case "keyword":
+            result.keyword = $("#universalsearch-keyword-permanent").text().trim();
+            break;
+    }
+
+    return result;
+}
+
 // This is holding all field graphs.
 fieldGraphs = {};
 
