@@ -17,11 +17,12 @@
  * along with Graylog2.  If not, see <http://www.gnu.org/licenses/>.
  *
  */
-package controllers;
+package controllers.api;
 
 import com.google.common.collect.Maps;
 import com.google.gson.Gson;
 import com.google.inject.Inject;
+import controllers.AuthenticatedController;
 import lib.APIException;
 import lib.Tools;
 import models.Input;
@@ -36,7 +37,7 @@ import java.util.Map;
 /**
  * @author Lennart Koopmann <lennart@torch.sh>
  */
-public class InputsApiController extends AuthenticatedController  {
+public class InputsApiController extends AuthenticatedController {
 
     @Inject
     private NodeService nodeService;

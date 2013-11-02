@@ -16,12 +16,13 @@
  * You should have received a copy of the GNU General Public License
  * along with Graylog2.  If not, see <http://www.gnu.org/licenses/>.
  */
-package controllers;
+package controllers.api;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.gson.Gson;
 import com.google.inject.Inject;
+import controllers.AuthenticatedController;
 import lib.APIException;
 import models.*;
 import play.libs.F;
