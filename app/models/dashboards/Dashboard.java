@@ -63,7 +63,7 @@ public class Dashboard {
     public void addWidget(DashboardWidget widget, User user) throws APIException, IOException {
         AddWidgetRequest request = new AddWidgetRequest(widget, user);
 
-        api.post().path("/dashboards/{1}/widgets", id)
+        api.post().path("/dashboards/{0}/widgets", id)
                 .body(request)
                 .expect(Http.Status.CREATED)
                 .execute();

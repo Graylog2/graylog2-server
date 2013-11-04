@@ -21,7 +21,6 @@ package models.dashboards.widgets;
 
 import com.google.common.collect.Maps;
 import lib.timeranges.TimeRange;
-import models.api.requests.ApiRequest;
 
 import java.util.Map;
 

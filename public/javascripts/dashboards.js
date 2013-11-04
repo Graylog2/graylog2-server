@@ -47,7 +47,7 @@ $(document).ready(function() {
     function addWidget(dashboardId, params) {
         $.ajax({
             url: '/a/dashboards/' + dashboardId + '/widgets',
-            type: 'PUT',
+            type: 'POST',
             data: params,
             success: function() {
                 showSuccess("Widget added to dashboard!")
