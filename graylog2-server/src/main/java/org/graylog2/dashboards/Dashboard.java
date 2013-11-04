@@ -25,8 +25,10 @@ import com.mongodb.BasicDBObject;
 import com.mongodb.DBObject;
 import org.bson.types.ObjectId;
 import org.graylog2.Core;
+import org.graylog2.dashboards.widgets.DashboardWidget;
 import org.graylog2.database.NotFoundException;
 import org.graylog2.database.Persisted;
+import org.graylog2.database.ValidationException;
 import org.graylog2.database.validators.DateValidator;
 import org.graylog2.database.validators.FilledStringValidator;
 import org.graylog2.database.validators.Validator;
@@ -43,6 +45,8 @@ import java.util.Map;
 public class Dashboard extends Persisted {
 
     public static final String COLLECTION = "dashboards";
+
+    public static final String EMBEDDED_WIDGETS = "widgets";
 
     public Dashboard(Map<String, Object> fields, Core core) {
         super(core, fields);
@@ -76,6 +80,14 @@ public class Dashboard extends Persisted {
         }
 
         return dashboards;
+    }
+
+    public void addWidget(DashboardWidget widget) throws ValidationException {
+        embed(EMBEDDED_WIDGETS, widget);
+    }
+
+    public void removeWidget(String widgetId) {
+        removeEmbedded(EMBEDDED_WIDGETS, widgetId);
     }
 
     @Override

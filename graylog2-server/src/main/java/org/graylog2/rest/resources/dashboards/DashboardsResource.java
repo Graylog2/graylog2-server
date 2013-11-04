@@ -24,9 +24,12 @@ import com.codahale.metrics.annotation.Timed;
 import com.google.common.collect.Maps;
 import org.bson.types.ObjectId;
 import org.graylog2.dashboards.Dashboard;
+import org.graylog2.dashboards.widgets.DashboardWidget;
 import org.graylog2.database.*;
+import org.graylog2.database.NotFoundException;
 import org.graylog2.rest.documentation.annotations.*;
 import org.graylog2.rest.resources.RestResource;
+import org.graylog2.rest.resources.dashboards.requests.AddWidgetRequest;
 import org.graylog2.rest.resources.dashboards.requests.CreateRequest;
 import org.graylog2.system.activities.Activity;
 import org.joda.time.DateTime;
@@ -127,7 +130,7 @@ public class DashboardsResource extends RestResource {
             @ApiResponse(code = 404, message = "Dashboard not found."),
             @ApiResponse(code = 400, message = "Invalid ObjectId.")
     })
-    public Response delete(@ApiParam(title = "dashboardId", required = true) @PathParam("dashboardId") String dashboardId) {
+    public Response delete(@ApiParam(title = "Dashboard ID", required = true) @PathParam("dashboardId") String dashboardId) {
         try {
             Dashboard dashboard = Dashboard.load(loadObjectId(dashboardId), core);
             dashboard.destroy();
@@ -142,5 +145,84 @@ public class DashboardsResource extends RestResource {
         return Response.status(Response.Status.fromStatusCode(204)).build();
     }
 
+    @POST
+    @Timed
+    @ApiOperation(value = "Add a widget to a dashboard")
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON)
+    @ApiResponses(value = {
+            @ApiResponse(code = 404, message = "Dashboard not found."),
+            @ApiResponse(code = 400, message = "Validation error."),
+            @ApiResponse(code = 400, message = "No such widget type.")
+    })
+    @Path("/{dashboardId}/widgets")
+    public Response addWidget(@ApiParam(title = "JSON body", required = true) String body,
+                              @ApiParam(title = "Dashboard ID", required = true) @PathParam("dashboardId") String dashboardId) {
+        AddWidgetRequest awr;
+        try {
+            awr = objectMapper.readValue(body, AddWidgetRequest.class);
+        } catch(IOException e) {
+            LOG.error("Error while parsing JSON", e);
+            throw new WebApplicationException(e, Response.Status.BAD_REQUEST);
+        }
+
+        DashboardWidget widget;
+        try {
+            widget = DashboardWidget.fromRequest(awr);
+            Dashboard dashboard = Dashboard.load(new ObjectId(dashboardId), core);
+
+            dashboard.addWidget(widget);
+        } catch(NotFoundException e) {
+            LOG.error("Dashboard not found.", e);
+            throw new WebApplicationException(e, Response.Status.NOT_FOUND);
+        } catch (ValidationException e1) {
+            LOG.error("Validation error.", e1);
+            throw new WebApplicationException(e1, Response.Status.BAD_REQUEST);
+        } catch (DashboardWidget.NoSuchWidgetTypeException e2) {
+            LOG.error("No such widget type.", e2);
+            throw new WebApplicationException(e2, Response.Status.BAD_REQUEST);
+        }
+
+        Map<String, Object> result = Maps.newHashMap();
+        result.put("widget_id", widget.getId());
+
+        return Response.status(Response.Status.CREATED).entity(json(result)).build();
+    }
+
+    @DELETE @Timed
+    @ApiOperation(value = "Delete a widget")
+    @Path("/{dashboardId}/widgets/{widgetId}")
+    @ApiResponses(value = {
+            @ApiResponse(code = 404, message = "Dashboard not found."),
+            @ApiResponse(code = 404, message = "Widget not found.")
+    })
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response remove(
+            @ApiParam(title = "Dashboard ID", required = true) @PathParam("dashboardId") String dashboardId,
+            @ApiParam(title = "Widget ID", required = true) @PathParam("widgetId") String widgetId) {
+        if (dashboardId == null || dashboardId.isEmpty()) {
+            LOG.error("Missing dashboard ID. Returning HTTP 400.");
+            throw new WebApplicationException(400);
+        }
+
+        if (widgetId == null || widgetId.isEmpty()) {
+            LOG.error("Missing widget ID. Returning HTTP 400.");
+            throw new WebApplicationException(400);
+        }
+
+        try {
+            Dashboard dashboard = Dashboard.load(new ObjectId(dashboardId), core);
+            dashboard.removeWidget(widgetId);
+        } catch(NotFoundException e) {
+            LOG.error("Dashboard not found.", e);
+            throw new WebApplicationException(e, Response.Status.NOT_FOUND);
+        }
+
+        String msg = "Deleted widget <" + widgetId + "> from dashboard <" + dashboardId + ">. Reason: REST request.";
+        LOG.info(msg);
+        core.getActivityWriter().write(new Activity(msg, DashboardsResource.class));
+
+        return Response.status(Response.Status.NO_CONTENT).build();
+    }
 
 }
