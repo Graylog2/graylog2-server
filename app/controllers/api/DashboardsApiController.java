@@ -25,13 +25,17 @@ import com.google.inject.Inject;
 import controllers.AuthenticatedController;
 import lib.APIException;
 import lib.ApiClient;
-import models.Dashboard;
-import models.DashboardService;
+import lib.timeranges.InvalidRangeParametersException;
+import lib.timeranges.TimeRange;
+import models.dashboards.Dashboard;
+import models.dashboards.DashboardService;
 import models.NodeService;
+import models.dashboards.widgets.DashboardWidget;
+import models.dashboards.widgets.SearchResultCountWidget;
+import play.Logger;
 import play.mvc.Result;
 
 import java.io.IOException;
-import java.util.List;
 import java.util.Map;
 
 /**
@@ -61,6 +65,54 @@ public class DashboardsApiController extends AuthenticatedController {
             return ok(new Gson().toJson(result)).as("application/json");
         } catch (APIException e) {
             String message = "Could not get dashboards. We expected HTTP 200, but got a HTTP " + e.getHttpCode() + ".";
+            return status(504, views.html.errors.error.render(message, e, request()));
+        } catch (IOException e) {
+            return status(504, views.html.errors.error.render(ApiClient.ERROR_MSG_IO, e, request()));
+        }
+    }
+
+    public Result addWidget(String dashboardId) {
+        try {
+            Map<String, String> params = flattenFormUrlEncoded(request().body().asFormUrlEncoded());
+            String query = params.get("query");
+            String rangeType = params.get("rangeType");
+
+            Dashboard dashboard = dashboardService.get(dashboardId);
+
+            // Determine timerange type.
+            TimeRange timerange;
+            try {
+                int relative = 0;
+                if (params.get("relative") != null) {
+                    relative = Integer.parseInt(params.get("relative"));
+                }
+
+                timerange = TimeRange.factory(rangeType, relative, params.get("from"), params.get("to"), params.get("keyword"));
+            } catch(InvalidRangeParametersException e2) {
+                return status(400, views.html.errors.error.render("Invalid range parameters provided.", e2, request()));
+            } catch(IllegalArgumentException e1) {
+                return status(400, views.html.errors.error.render("Invalid range type provided.", e1, request()));
+            }
+
+            SearchResultCountWidget widget;
+            try {
+                switch (DashboardWidget.Type.valueOf(params.get("widgetType"))) {
+                    case SEARCH_RESULT_COUNT:
+                        widget = new SearchResultCountWidget(query, timerange);
+                        break;
+                    default:
+                        throw new IllegalArgumentException();
+                }
+            } catch (IllegalArgumentException e) {
+                Logger.error("No such widget type: " + params.get("widgetType"));
+                return badRequest();
+            }
+
+            dashboard.addWidget(widget, currentUser());
+
+            return created();
+        } catch (APIException e) {
+            String message = "Could not add widget. We got a HTTP " + e.getHttpCode() + ".";
             return status(504, views.html.errors.error.render(message, e, request()));
         } catch (IOException e) {
             return status(504, views.html.errors.error.render(ApiClient.ERROR_MSG_IO, e, request()));

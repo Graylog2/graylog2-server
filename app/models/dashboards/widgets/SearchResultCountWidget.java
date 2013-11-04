@@ -1,5 +1,5 @@
-/*
- * Copyright 2013 TORCH UG
+/**
+ * Copyright 2013 Lennart Koopmann <lennart@torch.sh>
  *
  * This file is part of Graylog2.
  *
@@ -15,38 +15,38 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with Graylog2.  If not, see <http://www.gnu.org/licenses/>.
+ *
  */
-package controllers;
+package models.dashboards.widgets;
 
 import com.google.common.collect.Maps;
-import com.google.inject.Inject;
-import lib.ApiClient;
-import play.mvc.Controller;
+import lib.timeranges.TimeRange;
+import models.api.requests.ApiRequest;
 
 import java.util.Map;
 
-public class BaseController extends Controller {
-    private ApiClient api;
+/**
+ * @author Lennart Koopmann <lennart@torch.sh>
+ */
+public class SearchResultCountWidget extends DashboardWidget {
 
-    public ApiClient api() {
-        return api;
+    private final String query;
+    private final TimeRange timerange;
+
+    public SearchResultCountWidget(String query, TimeRange timerange) {
+        super(Type.SEARCH_RESULT_COUNT);
+
+        this.query = query;
+        this.timerange = timerange;
     }
 
-    @Inject
-    public void setApi(ApiClient api) {
-        this.api = api;
-    }
+    @Override
+    public Map<String, Object> getConfig() {
+        Map<String, Object> config = Maps.newHashMap();
+        config.putAll(timerange.getQueryParams());
+        config.put("query", query);
 
-    public Map<String, String> flattenFormUrlEncoded(Map<String, String[]> form) {
-        Map<String, String> result = Maps.newHashMap();
-
-        for (Map.Entry<String, String[]> e : form.entrySet()) {
-            if (e.getValue()[0] != null) {
-                result.put(e.getKey(), e.getValue()[0]);
-            }
-        }
-
-        return result;
+        return config;
     }
 
 }

@@ -38,12 +38,24 @@ $(document).ready(function() {
     }
 
     function addSearchResultCountWidget(dashboardId) {
-        // PUT /a/dashboards/:dashboardId/widgets?type=search-result-count
+        var params = originalUniversalSearchSettings();
+        params.widgetType = "SEARCH_RESULT_COUNT";
 
-        var data = originalUniversalSearchSettings();
-        data.widget_type = "search-result-count";
+        addWidget(dashboardId, params);
+    }
 
-        console.log(data); // PUT body
+    function addWidget(dashboardId, params) {
+        $.ajax({
+            url: '/a/dashboards/' + dashboardId + '/widgets',
+            type: 'PUT',
+            data: params,
+            success: function() {
+                showSuccess("Widget added to dashboard!")
+            },
+            error: function(data) {
+                showError("Could not add widget to dashboard.");
+            }
+        });
     }
 
 });

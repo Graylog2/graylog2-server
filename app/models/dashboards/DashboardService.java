@@ -17,7 +17,7 @@
  * along with Graylog2.  If not, see <http://www.gnu.org/licenses/>.
  *
  */
-package models;
+package models.dashboards;
 
 import com.google.common.collect.Lists;
 import com.google.inject.Inject;
@@ -44,7 +44,6 @@ public class DashboardService {
         this.api = api;
         this.dashboardFactory = dashboardFactory;
     }
-
 
     public Dashboard get(String id) throws APIException, IOException {
         DashboardSummaryResponse d = api.get(DashboardSummaryResponse.class).path("/dashboards/{0}", id).execute();

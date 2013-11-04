@@ -20,6 +20,7 @@ package models;
 
 import com.google.inject.AbstractModule;
 import com.google.inject.assistedinject.FactoryModuleBuilder;
+import models.dashboards.Dashboard;
 
 /**
  * Provides the bindings for the factories of our models to avoid having lots of static methods everywhere.

@@ -17,12 +17,21 @@
  * along with Graylog2.  If not, see <http://www.gnu.org/licenses/>.
  *
  */
-package models;
+package models.dashboards;
 
 import com.google.inject.assistedinject.Assisted;
 import com.google.inject.assistedinject.AssistedInject;
+import lib.APIException;
+import lib.ApiClient;
+import models.User;
+import models.UserService;
+import models.api.requests.dashboards.AddWidgetRequest;
 import models.api.responses.dashboards.DashboardSummaryResponse;
+import models.dashboards.widgets.DashboardWidget;
 import org.joda.time.DateTime;
+import play.mvc.Http;
+
+import java.io.IOException;
 
 /**
  * @author Lennart Koopmann <lennart@torch.sh>
@@ -39,13 +48,25 @@ public class Dashboard {
     private final DateTime createdAt;
     private final User creatorUser;
 
+    private final ApiClient api;
+
     @AssistedInject
-    private Dashboard(UserService usr, @Assisted DashboardSummaryResponse dsr) {
+    private Dashboard(UserService userService, ApiClient api, @Assisted DashboardSummaryResponse dsr) {
         this.id = dsr.id;
         this.title = dsr.title;
         this.description = dsr.description;
         this.createdAt = DateTime.parse(dsr.createdAt);
-        this.creatorUser = usr.load(dsr.creatorUserId);
+        this.creatorUser = userService.load(dsr.creatorUserId);
+        this.api = api;
+    }
+
+    public void addWidget(DashboardWidget widget, User user) throws APIException, IOException {
+        AddWidgetRequest request = new AddWidgetRequest(widget, user);
+
+        api.post().path("/dashboards/{1}/widgets", id)
+                .body(request)
+                .expect(Http.Status.CREATED)
+                .execute();
     }
 
     public String getId() {
