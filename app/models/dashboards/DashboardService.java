@@ -45,14 +45,21 @@ public class DashboardService {
         this.dashboardFactory = dashboardFactory;
     }
 
+
     public Dashboard get(String id) throws APIException, IOException {
-        DashboardSummaryResponse d = api.get(DashboardSummaryResponse.class).path("/dashboards/{0}", id).execute();
+        DashboardSummaryResponse d = api.get(DashboardSummaryResponse.class)
+                .fromMasterNode()
+                .path("/dashboards/{0}", id)
+                .execute();
         return dashboardFactory.fromSummaryResponse(d);
     }
 
     public List<Dashboard> getAll() throws APIException, IOException {
         List<Dashboard> dashboards = Lists.newArrayList();
-        GetDashboardsResponse response = api.get(GetDashboardsResponse.class).path("/dashboards").execute();
+        GetDashboardsResponse response = api.get(GetDashboardsResponse.class)
+                .fromMasterNode()
+                .path("/dashboards")
+                .execute();
 
         if (response == null || response.dashboards == null) {
             return dashboards;
@@ -66,11 +73,18 @@ public class DashboardService {
     }
 
     public void create(CreateDashboardRequest request) throws APIException, IOException {
-        api.post().path("/dashboards").body(request).expect(Http.Status.CREATED).execute();
+        api.post().path("/dashboards")
+                .fromMasterNode()
+                .body(request)
+                .expect(Http.Status.CREATED)
+                .execute();
     }
 
     public void delete(String id) throws APIException, IOException {
-        api.delete().path("/dashboards/{0}", id).expect(Http.Status.NO_CONTENT).execute();
+        api.delete().path("/dashboards/{0}", id)
+                .fromMasterNode()
+                .expect(Http.Status.NO_CONTENT)
+                .execute();
     }
 
 }

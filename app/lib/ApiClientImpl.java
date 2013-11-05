@@ -215,6 +215,11 @@ class ApiClientImpl implements ApiClient {
             return this;
         }
 
+        public ApiRequestBuilder<T> fromMasterNode() {
+            this.node = serverNodes.master();
+            return this;
+        }
+
         public ApiRequestBuilder<T> queryParam(String name, String value) {
             queryParams.add(F.Tuple(name, value));
             return this;

@@ -78,6 +78,23 @@ public class ServerNodes {
         return nodes;
     }
 
+    public Node master() {
+        final List<Node> all = all(false);
+
+        if (all.isEmpty()) {
+            throw new Graylog2ServerUnavailableException();
+        }
+
+        for (Node node : all) {
+            if (node.isMaster()) {
+                return node;
+            }
+        }
+
+        // No active master node was found.
+        throw new Graylog2ServerUnavailableException();
+    }
+
     /**
      * Retrieve a random single active node.
      *
