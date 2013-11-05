@@ -27,6 +27,7 @@ import org.graylog2.dashboards.Dashboard;
 import org.graylog2.dashboards.widgets.DashboardWidget;
 import org.graylog2.database.*;
 import org.graylog2.database.NotFoundException;
+import org.graylog2.indexer.searches.timeranges.InvalidRangeParametersException;
 import org.graylog2.rest.documentation.annotations.*;
 import org.graylog2.rest.resources.RestResource;
 import org.graylog2.rest.resources.dashboards.requests.AddWidgetRequest;
@@ -181,6 +182,9 @@ public class DashboardsResource extends RestResource {
         } catch (DashboardWidget.NoSuchWidgetTypeException e2) {
             LOG.error("No such widget type.", e2);
             throw new WebApplicationException(e2, Response.Status.BAD_REQUEST);
+        } catch (InvalidRangeParametersException e3) {
+            LOG.error("Invalid timerange parameters provided.", e3);
+            throw new WebApplicationException(e3, Response.Status.BAD_REQUEST);
         }
 
         Map<String, Object> result = Maps.newHashMap();
@@ -224,5 +228,14 @@ public class DashboardsResource extends RestResource {
 
         return Response.status(Response.Status.NO_CONTENT).build();
     }
+
+    /*
+     * TODO:
+     *  - add query & timerange info to count widget
+     *  - build registry
+     *  - build updater (just printing out registered widgets and settings for now)
+     *  - read from persisted
+     *  - return results via REST
+     */
 
 }

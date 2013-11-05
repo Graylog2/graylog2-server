@@ -19,6 +19,7 @@
  */
 package org.graylog2.dashboards.widgets;
 
+import org.graylog2.indexer.searches.timeranges.*;
 import org.graylog2.plugin.database.EmbeddedPersistable;
 import org.graylog2.rest.resources.dashboards.requests.AddWidgetRequest;
 
@@ -47,7 +48,7 @@ public abstract class DashboardWidget implements EmbeddedPersistable {
         this.creatorUserId = creatorUserId;
     }
 
-    public static DashboardWidget fromRequest(AddWidgetRequest awr) throws NoSuchWidgetTypeException {
+    public static DashboardWidget fromRequest(AddWidgetRequest awr) throws NoSuchWidgetTypeException, InvalidRangeParametersException {
         Type type;
         try {
             type = Type.valueOf(awr.type.toUpperCase());
@@ -57,9 +58,26 @@ public abstract class DashboardWidget implements EmbeddedPersistable {
 
         String id = UUID.randomUUID().toString();
 
+        // Build timerange.
+        TimeRange timeRange;
+
+        if (awr.config.get("range_type") == null) {
+            throw new InvalidRangeParametersException("range_type not set");
+        }
+
+        if (awr.config.get("range_type").equals("relative")) {
+            timeRange = new RelativeRange(Integer.parseInt((String) awr.config.get("range")));
+        } else if(awr.config.get("range_type").equals("keyword")) {
+            timeRange = new KeywordRange((String) awr.config.get("keyword"));
+        } else if(awr.config.get("range_type").equals("absolute")) {
+            timeRange = new AbsoluteRange((String) awr.config.get("from"), (String) awr.config.get("to"));
+        } else {
+            throw new InvalidRangeParametersException("range_type not recognized");
+        }
+
         switch (type) {
             case SEARCH_RESULT_COUNT:
-                return new SearchResultCountWidget(id, awr.config, awr.creatorUserId);
+                return new SearchResultCountWidget(id, awr.config, (String) awr.config.get("query"), timeRange, awr.creatorUserId);
             default:
                 throw new NoSuchWidgetTypeException();
         }
@@ -86,8 +104,11 @@ public abstract class DashboardWidget implements EmbeddedPersistable {
             put("id", id);
             put("type", type.toString().toLowerCase());
             put("creator_user_id", creatorUserId);
+            put("config", getPersistedConfig());
         }};
     }
+
+    public abstract Map<String, Object> getPersistedConfig();
 
     public static class NoSuchWidgetTypeException extends Exception {
     }

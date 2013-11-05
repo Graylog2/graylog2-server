@@ -19,6 +19,9 @@
  */
 package org.graylog2.dashboards.widgets;
 
+import org.graylog2.indexer.searches.timeranges.TimeRange;
+
+import java.util.HashMap;
 import java.util.Map;
 
 /**
@@ -26,8 +29,29 @@ import java.util.Map;
  */
 public class SearchResultCountWidget extends DashboardWidget {
 
-    public SearchResultCountWidget(String id, Map<String, Object> config, String creatorUserId) {
+    private final String query;
+    private final TimeRange timeRange;
+
+    public SearchResultCountWidget(String id, Map<String, Object> config, String query, TimeRange timeRange, String creatorUserId) {
         super(Type.SEARCH_RESULT_COUNT, id, config, creatorUserId);
+
+        this.query = query;
+        this.timeRange = timeRange;
     }
 
+    public String getQuery() {
+        return query;
+    }
+
+    public TimeRange getTimeRange() {
+        return timeRange;
+    }
+
+    @Override
+    public Map<String, Object> getPersistedConfig() {
+        return new HashMap<String, Object>() {{
+            put("query", query);
+            put("timerange", timeRange.getPersistedConfig());
+        }};
+    }
 }

@@ -24,6 +24,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
+import com.google.common.collect.Maps;
 import org.bson.types.ObjectId;
 import org.graylog2.Core;
 
@@ -141,13 +142,7 @@ public abstract class Persisted {
 		doc.put("_id", id); // ID was created in constructor or taken from original doc already.
 
         // Do field transformations
-        for (Map.Entry<String, Object> x : doc.entrySet()) {
-
-            // JodaTime DateTime is not accepted by MongoDB. Convert to java.util.Date...
-            if (x.getValue() instanceof org.joda.time.DateTime) {
-                doc.put(x.getKey(), ((DateTime) x.getValue()).toDate());
-            }
-        }
+        fieldTransformations(doc);
 
 		/*
 		 * We are running an upsert. This means that the existing
@@ -208,7 +203,10 @@ public abstract class Persisted {
             throw new ValidationException();
         }
 
-        BasicDBObject dbo = new BasicDBObject(o.getPersistedFields());
+        Map<String, Object> fields = Maps.newHashMap(o.getPersistedFields());
+        fieldTransformations(fields);
+
+        BasicDBObject dbo = new BasicDBObject(fields);
         collection().update(new BasicDBObject("_id", id), new BasicDBObject("$push", new BasicDBObject(key, dbo)));
     }
 
@@ -234,6 +232,23 @@ public abstract class Persisted {
 
     public ObjectId getId() {
         return this.id;
+    }
+
+    private void fieldTransformations(Map<String, Object> doc) {
+        for (Map.Entry<String, Object> x : doc.entrySet()) {
+
+            // Work on embedded Maps, too.
+            if (x.getValue() instanceof Map) {
+                fieldTransformations((Map<String, Object>) x.getValue());
+                continue;
+            }
+
+            // JodaTime DateTime is not accepted by MongoDB. Convert to java.util.Date...
+            if (x.getValue() instanceof org.joda.time.DateTime) {
+                doc.put(x.getKey(), ((DateTime) x.getValue()).toDate());
+            }
+
+        }
     }
 
     public abstract String getCollectionName();

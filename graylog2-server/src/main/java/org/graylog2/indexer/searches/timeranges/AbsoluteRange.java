@@ -22,6 +22,9 @@ package org.graylog2.indexer.searches.timeranges;
 import org.graylog2.plugin.Tools;
 import org.joda.time.DateTime;
 
+import java.util.HashMap;
+import java.util.Map;
+
 /**
  * @author Lennart Koopmann <lennart@torch.sh>
  */
@@ -46,6 +49,15 @@ public class AbsoluteRange implements TimeRange, FromToRange {
     @Override
     public Type getType() {
         return Type.ABSOLUTE;
+    }
+
+    @Override
+    public Map<String, Object> getPersistedConfig() {
+        return new HashMap<String, Object>() {{
+            put("type", getType().toString().toLowerCase());
+            put("from", getFrom());
+            put("to", getTo());
+        }};
     }
 
     public DateTime getFrom() {

@@ -34,4 +34,6 @@ public interface TimeRange extends FromRange {
 
     public Type getType();
 
+    public Map<String, Object> getPersistedConfig();
+
 }
