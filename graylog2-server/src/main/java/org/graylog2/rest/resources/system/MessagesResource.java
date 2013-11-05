@@ -44,7 +44,7 @@ import java.util.Map;
  */
 @Api(value = "System/Messages", description = "Internal Graylog2 messages")
 @Path("/system/messages")
-public class MessagesResource extends RestResource {
+public class    MessagesResource extends RestResource {
 
     private static final Logger LOG = LoggerFactory.getLogger(MessagesResource.class);
 

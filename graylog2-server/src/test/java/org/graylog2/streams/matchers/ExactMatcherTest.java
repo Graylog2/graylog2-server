@@ -34,11 +34,11 @@ public class ExactMatcherTest {
     public void testSuccessfulMatch() {
         BasicDBObject mongoRule = new BasicDBObject();
         mongoRule.put("_id", new ObjectId());
-        mongoRule.put("rule_type", StreamRuleImpl.TYPE_EXACT);
+        mongoRule.put("type", StreamRuleImpl.TYPE_EXACT);
         mongoRule.put("field", "something");
         mongoRule.put("value", "foo");
 
-        StreamRuleImpl rule = new StreamRuleImpl(mongoRule);
+        StreamRuleMock rule = new StreamRuleMock(mongoRule);
 
         Message msg = new Message("foo", "bar", new DateTime());
         msg.addField("something", "foo");
@@ -51,11 +51,11 @@ public class ExactMatcherTest {
     public void testMissedMatch() {
         BasicDBObject mongoRule = new BasicDBObject();
         mongoRule.put("_id", new ObjectId());
-        mongoRule.put("rule_type", StreamRuleImpl.TYPE_EXACT);
+        mongoRule.put("type", StreamRuleImpl.TYPE_EXACT);
         mongoRule.put("field", "something");
         mongoRule.put("value", "foo");
 
-        StreamRuleImpl rule = new StreamRuleImpl(mongoRule);
+        StreamRuleMock rule = new StreamRuleMock(mongoRule);
 
         Message msg = new Message("foo", "bar", new DateTime());
         msg.addField("something", "nonono");

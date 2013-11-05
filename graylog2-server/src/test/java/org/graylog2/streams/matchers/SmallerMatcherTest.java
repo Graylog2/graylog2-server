@@ -33,11 +33,11 @@ public class SmallerMatcherTest {
     public void testSuccessfulMatch() {
         BasicDBObject mongoRule = new BasicDBObject();
         mongoRule.put("_id", new ObjectId());
-        mongoRule.put("rule_type", StreamRuleImpl.TYPE_GREATER);
+        mongoRule.put("type", StreamRuleImpl.TYPE_GREATER);
         mongoRule.put("field", "something");
         mongoRule.put("value", "100");
 
-        StreamRuleImpl rule = new StreamRuleImpl(mongoRule);
+        StreamRuleMock rule = new StreamRuleMock(mongoRule);
 
         Message msg = new Message("foo", "bar", new DateTime());
         msg.addField("something", "20");
@@ -50,11 +50,11 @@ public class SmallerMatcherTest {
     public void testSuccessfulMatchWithNegativeValue() {
         BasicDBObject mongoRule = new BasicDBObject();
         mongoRule.put("_id", new ObjectId());
-        mongoRule.put("rule_type", StreamRuleImpl.TYPE_GREATER);
+        mongoRule.put("type", StreamRuleImpl.TYPE_GREATER);
         mongoRule.put("field", "something");
         mongoRule.put("value", "-54354");
 
-        StreamRuleImpl rule = new StreamRuleImpl(mongoRule);
+        StreamRuleMock rule = new StreamRuleMock(mongoRule);
 
         Message msg = new Message("foo", "bar", new DateTime());
         msg.addField("something", "-90000");
@@ -67,11 +67,11 @@ public class SmallerMatcherTest {
     public void testMissedMatch() {
         BasicDBObject mongoRule = new BasicDBObject();
         mongoRule.put("_id", new ObjectId());
-        mongoRule.put("rule_type", StreamRuleImpl.TYPE_GREATER);
+        mongoRule.put("type", StreamRuleImpl.TYPE_GREATER);
         mongoRule.put("field", "something");
         mongoRule.put("value", "26");
 
-        StreamRuleImpl rule = new StreamRuleImpl(mongoRule);
+        StreamRuleMock rule = new StreamRuleMock(mongoRule);
 
         Message msg = new Message("foo", "bar", new DateTime());
         msg.addField("something", "27");
@@ -84,11 +84,11 @@ public class SmallerMatcherTest {
     public void testMissedMatchWithEqualValues() {
         BasicDBObject mongoRule = new BasicDBObject();
         mongoRule.put("_id", new ObjectId());
-        mongoRule.put("rule_type", StreamRuleImpl.TYPE_GREATER);
+        mongoRule.put("type", StreamRuleImpl.TYPE_GREATER);
         mongoRule.put("field", "something");
         mongoRule.put("value", "-9001");
 
-        StreamRuleImpl rule = new StreamRuleImpl(mongoRule);
+        StreamRuleMock rule = new StreamRuleMock(mongoRule);
 
         Message msg = new Message("foo", "bar", new DateTime());
         msg.addField("something", "-9001");
@@ -101,11 +101,11 @@ public class SmallerMatcherTest {
     public void testMissedMatchWithInvalidValue() {
         BasicDBObject mongoRule = new BasicDBObject();
         mongoRule.put("_id", new ObjectId());
-        mongoRule.put("rule_type", StreamRuleImpl.TYPE_GREATER);
+        mongoRule.put("type", StreamRuleImpl.TYPE_GREATER);
         mongoRule.put("field", "something");
         mongoRule.put("value", "LOL I AM NOT EVEN A NUMBER");
 
-        StreamRuleImpl rule = new StreamRuleImpl(mongoRule);
+        StreamRuleMock rule = new StreamRuleMock(mongoRule);
 
         Message msg = new Message("foo", "bar", new DateTime());
         msg.addField("something", "-9001");

@@ -69,7 +69,7 @@ public abstract class Persisted {
         }
     }
 
-	protected static DBObject get(ObjectId id, Core core, String collectionName) {
+    protected static DBObject get(ObjectId id, Core core, String collectionName) {
 		return collection(core, collectionName).findOne(new BasicDBObject("_id", id));
 	}
 

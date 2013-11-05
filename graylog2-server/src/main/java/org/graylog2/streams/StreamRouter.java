@@ -54,7 +54,7 @@ public class StreamRouter {
 
             for (StreamRule rule : stream.getStreamRules()) {
                 try {
-                    StreamRuleMatcher matcher = StreamRuleMatcherFactory.build(rule.getRuleType());
+                    StreamRuleMatcher matcher = StreamRuleMatcherFactory.build(rule.getType());
                     if (!matchStreamRule(msg, matcher, rule)) {
                         missed = true;
                         break;
@@ -77,7 +77,7 @@ public class StreamRouter {
         try {
             return matcher.match(msg, rule);
         } catch (Exception e) {
-            LOG.warn("Could not match stream rule <" + rule.getRuleType() + "/" + rule.getValue() + ">: " + e.getMessage(), e);
+            LOG.warn("Could not match stream rule <" + rule.getType() + "/" + rule.getValue() + ">: " + e.getMessage(), e);
             return false;
         }
     }

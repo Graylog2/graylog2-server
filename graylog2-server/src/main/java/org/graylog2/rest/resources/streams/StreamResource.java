@@ -30,6 +30,7 @@ import org.graylog2.rest.documentation.annotations.*;
 import org.graylog2.rest.resources.RestResource;
 import org.graylog2.rest.resources.streams.requests.CreateRequest;
 import org.graylog2.streams.StreamImpl;
+import org.graylog2.streams.StreamRuleImpl;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 import org.slf4j.Logger;
@@ -56,12 +57,14 @@ public class StreamResource extends RestResource {
     @Produces(MediaType.APPLICATION_JSON)
     public Response create(@ApiParam(title = "JSON body", required = true) String body) {
         CreateRequest cr;
+
         try {
             cr = objectMapper.readValue(body, CreateRequest.class);
         } catch(IOException e) {
             LOG.error("Error while parsing JSON", e);
             throw new WebApplicationException(e, Response.Status.BAD_REQUEST);
         }
+
 
         // Create stream.
         Map<String, Object> streamData = Maps.newHashMap();
@@ -76,6 +79,26 @@ public class StreamResource extends RestResource {
         } catch (ValidationException e) {
             LOG.error("Validation error.", e);
             throw new WebApplicationException(e, Response.Status.BAD_REQUEST);
+        }
+
+        if (cr.rules != null && cr.rules.size() > 0) {
+            for (org.graylog2.rest.resources.streams.rules.requests.CreateRequest request : cr.rules) {
+                Map<String, Object> streamRuleData = Maps.newHashMap();
+
+                streamRuleData.put("type", request.type);
+                streamRuleData.put("field", request.field);
+                streamRuleData.put("value", request.value);
+                streamRuleData.put("inverted", request.inverted);
+                streamRuleData.put("stream_id", id);
+
+                StreamRuleImpl streamRule = new StreamRuleImpl(streamRuleData, core);
+                try {
+                    streamRule.save();
+                } catch (ValidationException e) {
+                    LOG.error("Validation error while trying to save a stream rule: ", e);
+                    throw new WebApplicationException(e, Response.Status.BAD_REQUEST);
+                }
+            }
         }
 
         Map<String, Object> result = Maps.newHashMap();

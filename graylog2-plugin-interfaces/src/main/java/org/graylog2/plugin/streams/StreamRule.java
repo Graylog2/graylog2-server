@@ -31,9 +31,9 @@ public interface StreamRule {
 
     public ObjectId getObjectId();
 
-    public int getRuleType();
+    public int getType();
 
     public String getField();
     public String getValue();
-    
+    public Boolean getInverted();
 }

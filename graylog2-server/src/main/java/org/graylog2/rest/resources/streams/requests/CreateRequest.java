@@ -21,6 +21,8 @@ package org.graylog2.rest.resources.streams.requests;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
+import java.util.List;
+
 /**
  * @author Lennart Koopmann <lennart@torch.sh>
  */
@@ -28,7 +30,10 @@ public class CreateRequest {
 
 	public String title;
 
+    public String category;
+
 	@JsonProperty("creator_user_id")
 	public String creatorUserId;
 
+    public List<org.graylog2.rest.resources.streams.rules.requests.CreateRequest> rules;
 }

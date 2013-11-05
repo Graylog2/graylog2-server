@@ -34,11 +34,11 @@ public class RegexMatcherTest {
     public void testSuccessfulMatch() {
         BasicDBObject mongoRule = new BasicDBObject();
         mongoRule.put("_id", new ObjectId());
-        mongoRule.put("rule_type", StreamRuleImpl.TYPE_REGEX);
+        mongoRule.put("type", StreamRuleImpl.TYPE_REGEX);
         mongoRule.put("field", "something");
         mongoRule.put("value", "^foo");
 
-        StreamRuleImpl rule = new StreamRuleImpl(mongoRule);
+        StreamRuleMock rule = new StreamRuleMock(mongoRule);
 
         Message msg = new Message("foo", "bar", new DateTime());
         msg.addField("something", "foobar");
@@ -51,11 +51,11 @@ public class RegexMatcherTest {
     public void testMissedMatch() {
         BasicDBObject mongoRule = new BasicDBObject();
         mongoRule.put("_id", new ObjectId());
-        mongoRule.put("rule_type", StreamRuleImpl.TYPE_REGEX);
+        mongoRule.put("type", StreamRuleImpl.TYPE_REGEX);
         mongoRule.put("field", "something");
         mongoRule.put("value", "^foo");
 
-        StreamRuleImpl rule = new StreamRuleImpl(mongoRule);
+        StreamRuleMock rule = new StreamRuleMock(mongoRule);
 
         Message msg = new Message("foo", "bar", new DateTime());
         msg.addField("something", "zomg");
@@ -68,11 +68,11 @@ public class RegexMatcherTest {
     public void testSuccessfulComplexRegexMatch() {
         BasicDBObject mongoRule = new BasicDBObject();
         mongoRule.put("_id", new ObjectId());
-        mongoRule.put("rule_type", StreamRuleImpl.TYPE_REGEX);
+        mongoRule.put("type", StreamRuleImpl.TYPE_REGEX);
         mongoRule.put("field", "some_field");
         mongoRule.put("value", "foo=^foo|bar\\d.+wat");
 
-        StreamRuleImpl rule = new StreamRuleImpl(mongoRule);
+        StreamRuleMock rule = new StreamRuleMock(mongoRule);
 
         Message msg = new Message("foo", "bar", new DateTime());
         msg.addField("some_field", "bar1foowat");
