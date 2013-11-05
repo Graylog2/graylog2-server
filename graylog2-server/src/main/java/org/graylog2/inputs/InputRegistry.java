@@ -21,7 +21,6 @@ package org.graylog2.inputs;
 
 
 import com.google.common.collect.Maps;
-import com.google.common.collect.Sets;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import com.mongodb.BasicDBObject;
 import org.bson.types.ObjectId;
@@ -35,21 +34,17 @@ import org.graylog2.system.activities.Activity;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.ws.rs.WebApplicationException;
-import javax.ws.rs.core.Response;
-import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
  * @author Lennart Koopmann <lennart@torch.sh>
  */
-public class Inputs {
+public class InputRegistry {
 
-    private static final Logger LOG = LoggerFactory.getLogger(Inputs.class);
+    private static final Logger LOG = LoggerFactory.getLogger(InputRegistry.class);
 
     private final Core core;
     private Map<String, MessageInput> runningInputs;
@@ -59,7 +54,7 @@ public class Inputs {
             new ThreadFactoryBuilder().setNameFormat("inputs-%d").build()
     );
 
-    public Inputs(Core core) {
+    public InputRegistry(Core core) {
         this.core = core;
         runningInputs = Maps.newHashMap();
         availableInputs = Maps.newHashMap();
@@ -78,7 +73,7 @@ public class Inputs {
                 } catch (MisfireException e) {
                     String msg = "The [" + input.getClass().getCanonicalName() + "] input with ID <" + input.getId() + "> " +
                             "was accepted but misfired. Reason: " + e.getMessage();
-                    core.getActivityWriter().write(new Activity(msg, Inputs.class));
+                    core.getActivityWriter().write(new Activity(msg, InputRegistry.class));
                     LOG.error(msg, e);
 
                     // Clean up.
@@ -145,7 +140,7 @@ public class Inputs {
         for (Input io : Input.allOfThisNode(core)) {
             MessageInput input = null;
             try {
-                input = Inputs.factory(io.getType());
+                input = InputRegistry.factory(io.getType());
 
                 // Add all standard fields.
                 input.configure(new Configuration(io.getConfiguration()), core);

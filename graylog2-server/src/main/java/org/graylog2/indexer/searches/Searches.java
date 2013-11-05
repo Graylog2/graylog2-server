@@ -20,9 +20,12 @@
 
 package org.graylog2.indexer.searches;
 
+import org.elasticsearch.action.count.CountRequest;
+import org.elasticsearch.action.count.CountRequestBuilder;
 import org.elasticsearch.action.search.SearchRequest;
 import org.elasticsearch.action.search.SearchRequestBuilder;
 import org.elasticsearch.action.search.SearchResponse;
+import org.elasticsearch.action.search.SearchType;
 import org.elasticsearch.client.Client;
 import org.elasticsearch.index.query.FilterBuilder;
 import org.elasticsearch.index.query.FilterBuilders;
@@ -68,8 +71,18 @@ public class Searches {
 		this.server = server;
 		this.c = client;
 	}
-	
-	public SearchResult search(String query, TimeRange range, int limit, int offset) throws IndexHelper.InvalidRangeFormatException {
+
+    public CountResult count(String query, TimeRange range) throws IndexHelper.InvalidRangeFormatException {
+        Set<String> indices = IndexHelper.determineAffectedIndices(server, range);
+
+        SearchRequestBuilder srb = standardSearchRequest(query, indices, range);
+        srb.setSearchType(SearchType.COUNT);
+
+        SearchResponse r = c.search(srb.request()).actionGet();
+        return new CountResult(r.getHits().getTotalHits(), r.getTookInMillis());
+    }
+
+    public SearchResult search(String query, TimeRange range, int limit, int offset) throws IndexHelper.InvalidRangeFormatException {
         if(limit <= 0) {
             limit = LIMIT;
         }
@@ -175,6 +188,10 @@ public class Searches {
 
     private SearchRequestBuilder standardSearchRequest(String query, Set<String> indices) throws IndexHelper.InvalidRangeFormatException {
         return standardSearchRequest(query, indices, 0, 0, null, null);
+    }
+
+    private SearchRequestBuilder standardSearchRequest(String query, Set<String> indices, TimeRange range) throws IndexHelper.InvalidRangeFormatException {
+        return standardSearchRequest(query, indices, 0, 0, range, null);
     }
 
     private SearchRequestBuilder standardSearchRequest(String query, Set<String> indices, int limit, int offset, TimeRange range, SortOrder sort) throws IndexHelper.InvalidRangeFormatException {

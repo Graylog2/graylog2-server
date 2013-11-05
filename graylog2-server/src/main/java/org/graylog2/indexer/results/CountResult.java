@@ -1,5 +1,5 @@
 /**
- * Copyright 2013 Lennart Koopmann <lennart@socketfeed.com>
+ * Copyright 2013 Lennart Koopmann <lennart@torch.sh>
  *
  * This file is part of Graylog2.
  *
@@ -17,12 +17,27 @@
  * along with Graylog2.  If not, see <http://www.gnu.org/licenses/>.
  *
  */
-
-package org.graylog2.periodical;
+package org.graylog2.indexer.results;
 
 /**
- * @author Lennart Koopmann <lennart@socketfeed.com>
+ * @author Lennart Koopmann <lennart@torch.sh>
  */
-public class CacheFlusherThread {
-    
+public class CountResult {
+
+    private final long count;
+    private final long tookMs;
+
+    public CountResult(long count, long tookMs) {
+        this.count = count;
+        this.tookMs = tookMs;
+    }
+
+    public long getCount() {
+        return count;
+    }
+
+    public long getTookMs() {
+        return tookMs;
+    }
+
 }

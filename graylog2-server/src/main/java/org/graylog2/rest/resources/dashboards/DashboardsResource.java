@@ -44,6 +44,7 @@ import javax.ws.rs.core.Response;
 import java.io.IOException;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ExecutionException;
 
 /**
  * @author Lennart Koopmann <lennart@torch.sh>
@@ -58,7 +59,12 @@ public class DashboardsResource extends RestResource {
     @ApiOperation(value = "Create a dashboard")
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
+    @ApiResponses(value = {
+            @ApiResponse(code = 403, message = "Request must be performed against master node.")
+    })
     public Response create(@ApiParam(title = "JSON body", required = true) String body) {
+        restrictToMaster();
+
         CreateRequest cr;
         try {
             cr = objectMapper.readValue(body, CreateRequest.class);
@@ -83,6 +89,8 @@ public class DashboardsResource extends RestResource {
             throw new WebApplicationException(e, Response.Status.BAD_REQUEST);
         }
 
+        core.dashboards().add(dashboard);
+
         Map<String, Object> result = Maps.newHashMap();
         result.put("dashboard_id", id.toStringMongod());
 
@@ -90,9 +98,13 @@ public class DashboardsResource extends RestResource {
     }
 
     @GET @Timed
-    @ApiOperation(value = "Get a list of all dashboards")
+    @ApiOperation(value = "Get a list of all dashboards and all configurations of their widgets.")
     @Produces(MediaType.APPLICATION_JSON)
+    @ApiResponses(value = {
+            @ApiResponse(code = 403, message = "Request must be performed against master node.")
+    })
     public String list() {
+        restrictToMaster();
         List<Map<String, Object>> dashboards = Lists.newArrayList();
 
         for (Dashboard dashboard: Dashboard.all(core)) {
@@ -107,14 +119,16 @@ public class DashboardsResource extends RestResource {
     }
 
     @GET @Timed
-    @ApiOperation(value = "Get a single dashboards")
+    @ApiOperation(value = "Get a single dashboards and all configurations of its widgets.")
     @Path("/{dashboardId}")
     @ApiResponses(value = {
             @ApiResponse(code = 404, message = "Dashboard not found."),
-            @ApiResponse(code = 400, message = "Invalid ObjectId.")
+            @ApiResponse(code = 403, message = "Request must be performed against master node.")
     })
     @Produces(MediaType.APPLICATION_JSON)
     public String get(@ApiParam(title = "dashboardId", required = true) @PathParam("dashboardId") String dashboardId) {
+        restrictToMaster();
+
         try {
             Dashboard dashboard = Dashboard.load(loadObjectId(dashboardId), core);
             return json(dashboard.asMap());
@@ -129,9 +143,11 @@ public class DashboardsResource extends RestResource {
     @Path("/{dashboardId}")
     @ApiResponses(value = {
             @ApiResponse(code = 404, message = "Dashboard not found."),
-            @ApiResponse(code = 400, message = "Invalid ObjectId.")
+            @ApiResponse(code = 403, message = "Request must be performed against master node.")
     })
-    public Response delete(@ApiParam(title = "Dashboard ID", required = true) @PathParam("dashboardId") String dashboardId) {
+    public Response delete(@ApiParam(title = "dashboardId", required = true) @PathParam("dashboardId") String dashboardId) {
+        restrictToMaster();
+
         try {
             Dashboard dashboard = Dashboard.load(loadObjectId(dashboardId), core);
             dashboard.destroy();
@@ -154,11 +170,14 @@ public class DashboardsResource extends RestResource {
     @ApiResponses(value = {
             @ApiResponse(code = 404, message = "Dashboard not found."),
             @ApiResponse(code = 400, message = "Validation error."),
-            @ApiResponse(code = 400, message = "No such widget type.")
+            @ApiResponse(code = 400, message = "No such widget type."),
+            @ApiResponse(code = 403, message = "Request must be performed against master node.")
     })
     @Path("/{dashboardId}/widgets")
     public Response addWidget(@ApiParam(title = "JSON body", required = true) String body,
-                              @ApiParam(title = "Dashboard ID", required = true) @PathParam("dashboardId") String dashboardId) {
+                              @ApiParam(title = "dashboardId", required = true) @PathParam("dashboardId") String dashboardId) {
+        restrictToMaster();
+
         AddWidgetRequest awr;
         try {
             awr = objectMapper.readValue(body, AddWidgetRequest.class);
@@ -169,7 +188,7 @@ public class DashboardsResource extends RestResource {
 
         DashboardWidget widget;
         try {
-            widget = DashboardWidget.fromRequest(awr);
+            widget = DashboardWidget.fromRequest(core, awr);
             Dashboard dashboard = Dashboard.load(new ObjectId(dashboardId), core);
 
             dashboard.addWidget(widget);
@@ -198,12 +217,15 @@ public class DashboardsResource extends RestResource {
     @Path("/{dashboardId}/widgets/{widgetId}")
     @ApiResponses(value = {
             @ApiResponse(code = 404, message = "Dashboard not found."),
-            @ApiResponse(code = 404, message = "Widget not found.")
+            @ApiResponse(code = 404, message = "Widget not found."),
+            @ApiResponse(code = 403, message = "Request must be performed against master node.")
     })
     @Produces(MediaType.APPLICATION_JSON)
     public Response remove(
-            @ApiParam(title = "Dashboard ID", required = true) @PathParam("dashboardId") String dashboardId,
-            @ApiParam(title = "Widget ID", required = true) @PathParam("widgetId") String widgetId) {
+            @ApiParam(title = "dashboardId", required = true) @PathParam("dashboardId") String dashboardId,
+            @ApiParam(title = "widgetId", required = true) @PathParam("widgetId") String widgetId) {
+        restrictToMaster();
+
         if (dashboardId == null || dashboardId.isEmpty()) {
             LOG.error("Missing dashboard ID. Returning HTTP 400.");
             throw new WebApplicationException(400);
@@ -229,13 +251,47 @@ public class DashboardsResource extends RestResource {
         return Response.status(Response.Status.NO_CONTENT).build();
     }
 
+    @GET @Timed
+    @ApiOperation(value = "Get a single widget value.")
+    @Path("/{dashboardId}/widgets/{widgetId}/value")
+    @ApiResponses(value = {
+            @ApiResponse(code = 404, message = "Dashboard not found."),
+            @ApiResponse(code = 404, message = "Widget not found."),
+            @ApiResponse(code = 403, message = "Request must be performed against master node."),
+            @ApiResponse(code = 504, message = "Computation failed on indexer side.")
+    })
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response widgetValue(@ApiParam(title = "dashboardId", required = true) @PathParam("dashboardId") String dashboardId,
+                              @ApiParam(title = "widgetId", required = true) @PathParam("widgetId") String widgetId) {
+        restrictToMaster();
+
+        Dashboard dashboard = core.dashboards().get(dashboardId);
+
+        if (dashboard == null) {
+            LOG.error("Dashboard not found.");
+            throw new WebApplicationException(404);
+        }
+
+        DashboardWidget widget = dashboard.getWidget(widgetId);
+
+        if (widget == null) {
+            LOG.error("Widget not found.");
+            throw new WebApplicationException(404);
+        }
+
+        try {
+            return Response.status(Response.Status.OK).entity(json(widget.getComputationResult().asMap())).build();
+        } catch (ExecutionException e) {
+            LOG.error("Error while computing dashboard.", e);
+            return Response.status(Response.Status.GATEWAY_TIMEOUT).build();
+        }
+    }
+
     /*
      * TODO:
-     *  - add query & timerange info to count widget
-     *  - build registry
-     *  - build updater (just printing out registered widgets and settings for now)
-     *  - read from persisted
+     *  - restrict non-GET to master, connect to master only in ApiClient for non-GET
      *  - return results via REST
+     *  - widget metrics. identify intensive widgets easily
      */
 
 }

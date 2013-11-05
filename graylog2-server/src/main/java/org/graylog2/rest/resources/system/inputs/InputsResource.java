@@ -22,18 +22,15 @@ package org.graylog2.rest.resources.system.inputs;
 import com.beust.jcommander.internal.Lists;
 import com.codahale.metrics.annotation.Timed;
 import com.google.common.collect.Maps;
-import com.google.common.collect.Sets;
-import com.mongodb.BasicDBObject;
 import org.bson.types.ObjectId;
 import org.graylog2.database.ValidationException;
 import org.graylog2.inputs.Input;
-import org.graylog2.inputs.Inputs;
+import org.graylog2.inputs.InputRegistry;
 import org.graylog2.inputs.NoSuchInputTypeException;
 import org.graylog2.plugin.Tools;
 import org.graylog2.plugin.inputs.MessageInput;
 import org.graylog2.plugin.configuration.Configuration;
 import org.graylog2.plugin.configuration.ConfigurationException;
-import org.graylog2.plugin.configuration.fields.ConfigurationField;
 import org.graylog2.rest.documentation.annotations.*;
 import org.graylog2.rest.resources.RestResource;
 import org.graylog2.rest.resources.system.inputs.requests.InputLaunchRequest;
@@ -49,7 +46,6 @@ import javax.ws.rs.core.Response;
 import java.io.IOException;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.UUID;
 
 /**
@@ -122,7 +118,7 @@ public class InputsResource extends RestResource {
         DateTime createdAt = new DateTime(DateTimeZone.UTC);
         MessageInput input = null;
         try {
-            input = Inputs.factory(lr.type);
+            input = InputRegistry.factory(lr.type);
             input.configure(inputConfig, core);
             input.setTitle(lr.title);
             input.setCreatorUserId(lr.creatorUserId);
@@ -234,7 +230,7 @@ public class InputsResource extends RestResource {
 
         MessageInput input;
         try {
-            input = Inputs.factory(inputType);
+            input = InputRegistry.factory(inputType);
         } catch (NoSuchInputTypeException e) {
             LOG.error("There is no such input type registered.", e);
             throw new WebApplicationException(e, Response.Status.NOT_FOUND);

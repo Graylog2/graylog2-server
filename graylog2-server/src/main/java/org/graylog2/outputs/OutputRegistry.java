@@ -33,14 +33,14 @@ import java.util.List;
 /**
  * @author Lennart Koopmann <lennart@torch.sh>
  */
-public class Outputs {
+public class OutputRegistry {
 
-    private static final Logger LOG = LoggerFactory.getLogger(Outputs.class);
+    private static final Logger LOG = LoggerFactory.getLogger(OutputRegistry.class);
 
     private final Core core;
     private List<MessageOutput> outputs;
 
-    public Outputs(Core core) {
+    public OutputRegistry(Core core) {
         this.core = core;
 
         outputs = Lists.newArrayList();

@@ -37,7 +37,7 @@ import com.beust.jcommander.internal.Sets;
  */
 public class SearchResult extends IndexQueryResult {
 
-	private final int totalResults;
+	private final long totalResults;
 	private final List<ResultMessage> results;
 	private final Set<String> fields;
     private final Set<String> usedIndices;
@@ -47,11 +47,11 @@ public class SearchResult extends IndexQueryResult {
 
 		this.results = buildResults(searchHits);
 		this.fields = extractFields(searchHits);
-		this.totalResults = (int) searchHits.getTotalHits();
+		this.totalResults = (long) searchHits.getTotalHits();
         this.usedIndices = usedIndices;
 	}
 	
-	public int getTotalResults() {
+	public long getTotalResults() {
 		return totalResults;
 	}
 	

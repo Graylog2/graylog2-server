@@ -34,6 +34,7 @@ import org.graylog2.buffers.BasicCache;
 import org.graylog2.buffers.Cache;
 import org.graylog2.buffers.OutputBuffer;
 import org.graylog2.buffers.ProcessBuffer;
+import org.graylog2.dashboards.DashboardRegistry;
 import org.graylog2.database.HostCounterCacheImpl;
 import org.graylog2.database.MongoBridge;
 import org.graylog2.database.MongoConnection;
@@ -41,11 +42,11 @@ import org.graylog2.gelf.GELFChunkManager;
 import org.graylog2.indexer.Deflector;
 import org.graylog2.indexer.Indexer;
 import org.graylog2.initializers.Initializers;
-import org.graylog2.inputs.Inputs;
+import org.graylog2.inputs.InputRegistry;
 import org.graylog2.jersey.container.netty.NettyContainer;
 import org.graylog2.metrics.jersey2.AnyExceptionClassMapper;
 import org.graylog2.metrics.jersey2.MetricsDynamicBinding;
-import org.graylog2.outputs.Outputs;
+import org.graylog2.outputs.OutputRegistry;
 import org.graylog2.plugin.GraylogServer;
 import org.graylog2.plugin.Tools;
 import org.graylog2.plugin.alarms.callbacks.AlarmCallback;
@@ -123,8 +124,10 @@ public class Core implements GraylogServer {
     private List<AlarmCallback> alarmCallbacks = Lists.newArrayList();
 
     private Initializers initializers;
-    private Inputs inputs;
-    private Outputs outputs;
+    private InputRegistry inputs;
+    private OutputRegistry outputs;
+
+    private DashboardRegistry dashboards;
     
     private ProcessBuffer processBuffer;
     private OutputBuffer outputBuffer;
@@ -191,8 +194,13 @@ public class Core implements GraylogServer {
         mongoConnection.connect();
 
         initializers = new Initializers(this);
-        inputs = new Inputs(this);
-        outputs = new Outputs(this);
+        inputs = new InputRegistry(this);
+        outputs = new OutputRegistry(this);
+
+        if (isMaster()) {
+            dashboards = new DashboardRegistry(this);
+            dashboards.loadPersisted();
+        }
 
         activityWriter = new ActivityWriter(this);
 
@@ -591,11 +599,19 @@ public class Core implements GraylogServer {
         return initializers;
     }
 
-    public Inputs inputs() {
+    public InputRegistry inputs() {
         return inputs;
     }
 
-    public Outputs outputs() {
+    public OutputRegistry outputs() {
         return outputs;
+    }
+
+    public DashboardRegistry dashboards() {
+        if (!isMaster()) {
+            throw new RuntimeException("Dashboards can only be accessed on master nodes.");
+        }
+
+        return dashboards;
     }
 }

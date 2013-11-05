@@ -221,4 +221,11 @@ public abstract class RestResource {
         return MediaType.TEXT_PLAIN;
     }
 
+    protected void restrictToMaster() {
+        if(!core.isMaster()) {
+            LOG.warn("Rejected request that is only allowed against master nodes. Returning HTTP 403.");
+            throw new WebApplicationException(403);
+        }
+    }
+
 }

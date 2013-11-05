@@ -32,8 +32,11 @@ import org.graylog2.database.ValidationException;
 import org.graylog2.database.validators.DateValidator;
 import org.graylog2.database.validators.FilledStringValidator;
 import org.graylog2.database.validators.Validator;
+import org.graylog2.indexer.searches.timeranges.InvalidRangeParametersException;
 import org.graylog2.plugin.Tools;
 import org.joda.time.DateTime;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.HashMap;
 import java.util.List;
@@ -44,9 +47,13 @@ import java.util.Map;
  */
 public class Dashboard extends Persisted {
 
+    private static final Logger LOG = LoggerFactory.getLogger(Dashboard.class);
+
     public static final String COLLECTION = "dashboards";
 
     public static final String EMBEDDED_WIDGETS = "widgets";
+
+    private Map<String, DashboardWidget> widgets = Maps.newHashMap();
 
     public Dashboard(Map<String, Object> fields, Core core) {
         super(core, fields);
@@ -76,18 +83,49 @@ public class Dashboard extends Persisted {
 
         List<DBObject> results = query(new BasicDBObject(), core, COLLECTION);
         for (DBObject o : results) {
-            dashboards.add(new Dashboard((ObjectId) o.get("_id"), o.toMap(), core));
+            Map<String, Object> fields = o.toMap();
+            Dashboard dashboard = new Dashboard((ObjectId) o.get("_id"), fields, core);
+
+            // Add all widgets of this dashboard.
+            if (fields.containsKey(EMBEDDED_WIDGETS)) {
+                for (BasicDBObject widgetFields : (List<BasicDBObject>) fields.get(EMBEDDED_WIDGETS)) {
+                    DashboardWidget widget = null;
+                    try {
+                        widget = DashboardWidget.fromPersisted(core, widgetFields);
+                    } catch (DashboardWidget.NoSuchWidgetTypeException e) {
+                        LOG.error("No such widget type: [{}] - Dashboard: [" + dashboard.getId() + "]", widgetFields.get("type"), e);
+                        continue;
+                    } catch (InvalidRangeParametersException e) {
+                        LOG.error("Invalid range parameters of widget in dashboard: [{}]", dashboard.getId(), e);
+                        continue;
+                    }
+                    dashboard.addPersistedWidget(widget);
+                }
+            }
+
+
+            dashboards.add(dashboard);
         }
 
         return dashboards;
     }
 
+    public void addPersistedWidget(DashboardWidget widget) {
+        widgets.put(widget.getId(), widget);
+    }
+
     public void addWidget(DashboardWidget widget) throws ValidationException {
         embed(EMBEDDED_WIDGETS, widget);
+        widgets.put(widget.getId(), widget);
     }
 
     public void removeWidget(String widgetId) {
         removeEmbedded(EMBEDDED_WIDGETS, widgetId);
+        widgets.remove(widgetId);
+    }
+
+    public DashboardWidget getWidget(String widgetId) {
+        return widgets.get(widgetId);
     }
 
     @Override
