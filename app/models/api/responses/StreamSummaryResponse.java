@@ -19,6 +19,9 @@
 package models.api.responses;
 
 import com.google.gson.annotations.SerializedName;
+import models.StreamRule;
+
+import java.util.List;
 
 public class StreamSummaryResponse {
 
@@ -26,10 +29,13 @@ public class StreamSummaryResponse {
 	public String title;
 	
 	@SerializedName("created_at")
-	public String createdAt;
+	public TimestampResponse createdAt;
 	
 	@SerializedName("creator_user_id")
 	public String creatorUserId;
+
+    @SerializedName("rules")
+    public List<StreamRuleSummaryResponse> streamRules;
 	
 	// public List<StreamRuleSummary> rules;
 	

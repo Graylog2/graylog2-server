@@ -298,7 +298,17 @@ class ApiClientImpl implements ApiClient {
                 }
 
                 if (response.getStatusCode() >= 200 && response.getStatusCode() < 300) {
-                    return deserializeJson(response, responseClass);
+                    T result = null;
+                    try {
+                        result = deserializeJson(response, responseClass);
+
+                        return result;
+                    } catch (Exception e) {
+                        log.error("Caught Exception while deserializing JSON request: " + e);
+                        log.debug("Response from backend was: " + response.getResponseBody("UTF-8"));
+
+                        throw new APIException(request, response);
+                    }
                 } else {
                     return null;
                 }

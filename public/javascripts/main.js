@@ -173,7 +173,13 @@ $(document).ready(function() {
     })
 
     // Add stream rule to stream rule list when saved.
+    var rule_count;
     $("#add-stream-rule").on("click", function() {
+        if (rule_count == undefined) {
+            rule_count = 0;
+        } else {
+            rule_count++;
+        }
         if (!validate("#sr")) {
             return false;
         }
@@ -187,7 +193,11 @@ $(document).ready(function() {
             inverted: $("#sr-inverted-box").is(":checked")
         }
         // Add hidden field that is transmitted in form add visible entry.
-        field = "<input type='hidden' name='rules[]' value='" + JSON.stringify(rule) + "' />"
+        field = "<input type='hidden' name='rules["+rule_count+"].field' value='" + JSON.stringify(rule.field) + "' />\n" +
+            "<input type='hidden' name='rules["+rule_count+"].type' value='" + JSON.stringify(rule.type) + "' />\n" +
+            "<input type='hidden' name='rules["+rule_count+"].value' value='" + JSON.stringify(rule.value) + "' />\n" +
+            "<input type='hidden' name='rules["+rule_count+"].inverted' value='" + JSON.stringify(rule.inverted) + "' />\n"
+
         remover = "<a href='#' class='sr-remove'><i class='icon-remove'></i></a>";
         $("#stream-rules").append("<li>" + field + $("#sr-result").html().replace(/<(?:.|\n)*?>/gm, '') + " " + remover + "</li>");
 

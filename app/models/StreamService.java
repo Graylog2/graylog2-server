@@ -21,8 +21,10 @@ package models;
 import com.google.inject.Inject;
 import lib.APIException;
 import lib.ApiClient;
+import models.api.requests.streams.CreateStreamRequest;
 import models.api.responses.GetStreamsResponse;
 import models.api.results.StreamsResult;
+import play.mvc.Http;
 
 import java.io.IOException;
 
@@ -36,8 +38,17 @@ public class StreamService {
     }
 
     public StreamsResult allEnabled() throws IOException, APIException {
-        GetStreamsResponse r = api.get(GetStreamsResponse.class).path("/streams").execute();
+        GetStreamsResponse r = null;
+        r = api.get(GetStreamsResponse.class).path("/streams").execute();
 
         return new StreamsResult(r.total, r.streams);
+    }
+
+    public void create(CreateStreamRequest request) throws APIException, IOException {
+        api.post().path("/streams").body(request).expect(Http.Status.CREATED).execute();
+    }
+
+    public void delete(String streamId) throws APIException, IOException {
+        api.delete().path("/streams/" + streamId).expect(Http.Status.NO_CONTENT).execute();
     }
 }

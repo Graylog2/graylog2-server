@@ -18,16 +18,25 @@
  */
 package controllers;
 
+import com.google.common.collect.Lists;
 import com.google.inject.Inject;
 import lib.APIException;
 import lib.ApiClient;
 import models.StreamService;
+import models.api.requests.streams.CreateStreamRequest;
+import models.api.responses.StreamSummaryResponse;
 import models.api.results.StreamsResult;
+import play.Logger;
+import play.data.Form;
+import play.data.validation.ValidationError;
 import play.mvc.Result;
 
 import java.io.IOException;
+import java.util.List;
+import java.util.Map;
 
 public class StreamsController extends AuthenticatedController {
+    private static final Form<CreateStreamRequest> createStreamForm = Form.form(CreateStreamRequest.class);
 
     @Inject
     private StreamService streamService;
@@ -50,6 +59,44 @@ public class StreamsController extends AuthenticatedController {
 
     public Result newStream() {
         return ok(views.html.streams.new_stream.render(currentUser()));
+    }
+
+    public Result create() {
+        Form<CreateStreamRequest> form = createStreamForm.bindFromRequest();
+        System.out.println("Form is: " + form);
+        if (form.hasErrors()) {
+            flash("error", "Please fill in all fields: " + form.errors());
+
+            return redirect(routes.StreamsController.newStream());
+        }
+
+        try {
+            CreateStreamRequest csr = form.get();
+            System.out.println("csr: " + csr.toJson());
+            System.out.println("rules: " + csr.rules);
+            csr.creatorUserId = currentUser().getName();
+            streamService.create(csr);
+        } catch (APIException e) {
+            String message = "Could not create stream. We expected HTTP 201, but got a HTTP " + e.getHttpCode() + ".";
+            return status(504, views.html.errors.error.render(message, e, request()));
+        } catch (IOException e) {
+            return status(504, views.html.errors.error.render(ApiClient.ERROR_MSG_IO, e, request()));
+        }
+
+        return redirect(routes.StreamsController.index());
+    }
+
+    public Result delete(String stream_id) {
+        try {
+            streamService.delete(stream_id);
+        } catch (APIException e) {
+            String message = "Could not delete stream. We expect HTTP 204, but got a HTTP " + e.getHttpCode() + ".";
+            return status(504, views.html.errors.error.render(message, e, request()));
+        } catch (IOException e) {
+            return status(504, views.html.errors.error.render(ApiClient.ERROR_MSG_IO, e, request()));
+        }
+
+        return redirect(routes.StreamsController.index());
     }
 	
 }

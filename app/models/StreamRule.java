@@ -19,47 +19,48 @@
 package models;
 
 import com.google.common.collect.Lists;
+import models.api.responses.StreamRuleSummaryResponse;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 public class StreamRule {
 
-    public static final Map<Integer, StreamRule> RULES = new HashMap<Integer, StreamRule>() {{
-        put(1, new StreamRule(1, "match exactly"));
-        put(2, new StreamRule(2, "match regular expression"));
-        put(3, new StreamRule(3, "greater than", "be greater than"));
-        put(4, new StreamRule(4, "smaller than", "be smaller than"));
+    public static final Map<Integer, List<String>> RULES = new HashMap<Integer, List<String>>() {{
+        put(1, Lists.newArrayList("match exactly", "match exactly"));
+        put(2, Lists.newArrayList("match regular expression", "match regular expression"));
+        put(3, Lists.newArrayList("greater than", "be greater than"));
+        put(4, Lists.newArrayList("smaller than", "be smaller than"));
     }};
 
-    private final int id;
-    private final String name;
-    private final String sentenceRepresentation;
+    private final String id;
+    private final String field;
+    private final String value;
+    private final int type;
 
-    public StreamRule(int id, String name) {
-        this.id = id;
-        this.name = name;
-        this.sentenceRepresentation = name;
+    public StreamRule(StreamRuleSummaryResponse srsr) {
+        this.id = srsr.id;
+        this.field = srsr.field;
+        this.value = srsr.value;
+        this.type = srsr.type;
     }
 
-    public StreamRule(int id, String name, String sentenceRepresentation) {
-        this.id = id;
-        this.name = name;
-        this.sentenceRepresentation = sentenceRepresentation;
-    }
-
-    public int getId() {
+    public String getId() {
         return id;
     }
 
-    public String getName() {
-        return name;
-    }
-
     public String getSentenceRepresentation() {
-        return sentenceRepresentation;
+        String sentence;
+        try {
+            sentence = RULES.get(this.type).get(1);
+        } catch (Exception e) {
+            return "unknown";
+        }
+        return sentence;
     }
 
+    public String toString() {
+        return ("Field " + this.field + " must " + this.getSentenceRepresentation() + " " + this.value);
+    }
 }

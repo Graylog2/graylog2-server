@@ -18,14 +18,51 @@
  */
 package models;
 
+import com.google.common.collect.Lists;
+import models.api.responses.StreamRuleSummaryResponse;
 import models.api.responses.StreamSummaryResponse;
+import models.api.responses.TimestampResponse;
+
+import java.util.List;
 
 public class Stream {
 	
 	private final String id;
+    private final String title;
+    private final String creatorUserId;
+    private final TimestampResponse createdAt;
+    private final List<StreamRule> streamRules;
 
 	public Stream(StreamSummaryResponse ssr) {
 		this.id = ssr.id;
+        this.title = ssr.title;
+        this.creatorUserId = ssr.creatorUserId;
+        this.createdAt = ssr.createdAt;
+
+        this.streamRules = Lists.newArrayList();
+
+        for (StreamRuleSummaryResponse streamRuleSummaryResponse : ssr.streamRules) {
+            streamRules.add(new StreamRule(streamRuleSummaryResponse));
+        }
 	}
 
+    public String getId() {
+        return id;
+    }
+
+    public String getTitle() {
+        return title;
+    }
+
+    public String getCreatorUserId() {
+        return creatorUserId;
+    }
+
+    public TimestampResponse getCreatedAt() {
+        return createdAt;
+    }
+
+    public List<StreamRule> getStreamRules() {
+        return streamRules;
+    }
 }

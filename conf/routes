@@ -22,6 +22,8 @@ GET         /messages/:index/:id/partial                                        
 # Streams
 GET         /streams                                                                 @controllers.StreamsController.index()
 GET         /streams/new                                                             @controllers.StreamsController.newStream()
+POST        /streams/new                                                             @controllers.StreamsController.create()
+POST        /streams/:stream_id/delete                                               @controllers.StreamsController.delete(stream_id: String)
 
 # System
 GET         /system                                                                  @controllers.SystemController.index(page:Integer ?= 1)

@@ -1,4 +1,4 @@
-@(currentUser: User, streams: api.results.StreamsResult)
+@(currentUser: User, streams: models.api.results.StreamsResult)
 
 @main("Streams", views.html.sidebars.standard(currentUser), "", currentUser) {
 
@@ -14,5 +14,51 @@
                 "the new streams. All alerting and monitoring will be covered in this streams section.",
         186
     )
+
+    @for(stream <- streams.getStreams()) {
+        <div class="row-fluid node-row">
+            <span class="pull-right node-row-info">
+                <span class="text">Created by @stream.getCreatorUserId</span>
+                    &nbsp;
+
+                <form action="@routes.StreamsController.delete(stream.getId)" method="POST">
+                    <button class="btn btn-danger btn-mini"
+                    type="submit"
+                    data-confirm="Really delete Stream?">
+                                    Delete
+                    </button>
+                </form>
+
+                <div class="btn-group">
+                    <a class="btn btn-mini dropdown-toggle" data-toggle="dropdown" href="#">
+                            Action
+                        <span class="caret"></span>
+                    </a>
+                    <ul class="dropdown-menu">
+                        <li><a href="/">Manage rules</a></li>
+                        <li><a href="/">Show metrics</a></li>
+                    </ul>
+                </div>
+            </span>
+
+            <h3>
+                <i class="icon icon-ellipsis-vertical"></i>
+                @stream.getTitle
+            </h3>
+
+            <div class="well well-small">
+                <ul>
+                @if(stream.getStreamRules.size > 0) {
+                    @for(streamRule <- stream.getStreamRules) {
+                    <li>@streamRule</li>
+                    }
+                } else {
+                    <li><i>No rules defined - go add some!</i></li>
+                }
+                </ul>
+            </div>
+
+        </div>
+    }
 
 }
