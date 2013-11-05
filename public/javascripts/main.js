@@ -199,15 +199,27 @@ $(document).ready(function() {
             "<input type='hidden' name='rules["+rule_count+"].inverted' value='" + JSON.stringify(rule.inverted) + "' />\n"
 
         remover = "<a href='#' class='sr-remove'><i class='icon-remove'></i></a>";
-        $("#stream-rules").append("<li>" + field + $("#sr-result").html().replace(/<(?:.|\n)*?>/gm, '') + " " + remover + "</li>");
+        $("#stream-rules").append("<li id='rule'>" + field + $("#sr-result").html().replace(/<(?:.|\n)*?>/gm, '') + " " + remover + "</li>");
 
         // Remove stream rule binding.
         $(".sr-remove").on("click", function() {
+            var parent_list = $(this).parents("ul");
             $(this).parent().remove();
+            renumber_rules(parent_list);
             return false;
         });
 
         $("#new-stream-rule").modal("hide");
+
+        var renumber_rules = function($rules) {
+            $('li#rule', $rules).each(function($index) {
+                $('input', $(this)).each (function() {
+                    var new_name = $(this).attr('name').replace(/rules\[\d+\]/g, 'rules['+$index+']');
+                    $(this).attr('name', new_name);
+                    alert($(this).attr('name'));
+                });
+            });
+        }
     });
 
     // Typeahead for message fields.
