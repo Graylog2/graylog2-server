@@ -43,6 +43,7 @@ public class RelativeRange extends TimeRange {
     @Override
     public Map<String, String> getQueryParams() {
         return new HashMap<String, String>() {{
+            put("range_type", getType().toString().toLowerCase());
             put("range", String.valueOf(range));
         }};
     }

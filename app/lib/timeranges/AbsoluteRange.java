@@ -46,6 +46,7 @@ public class AbsoluteRange extends TimeRange {
     @Override
     public Map<String, String> getQueryParams() {
         return new HashMap<String, String>() {{
+            put("range_type", getType().toString().toLowerCase());
             put("from", from);
             put("to", to);
         }};
