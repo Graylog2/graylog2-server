@@ -50,7 +50,6 @@ public class RelativeRange implements TimeRange {
         return new HashMap<String, Object>() {{
             put("type", getType().toString().toLowerCase());
             put("range", getRange());
-            put("from", getFrom());
         }};
     }
 

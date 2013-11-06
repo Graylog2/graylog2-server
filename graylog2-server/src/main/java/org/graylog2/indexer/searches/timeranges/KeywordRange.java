@@ -59,8 +59,6 @@ public class KeywordRange implements TimeRange, FromToRange {
         return new HashMap<String, Object>() {{
             put("type", getType().toString().toLowerCase());
             put("keyword", getKeyword());
-            put("from", getFrom());
-            put("to", getTo());
         }};
     }
 

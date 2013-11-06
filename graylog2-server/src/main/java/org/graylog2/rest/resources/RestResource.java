@@ -25,9 +25,11 @@ import com.codahale.metrics.Meter;
 import com.codahale.metrics.Timer;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
 import com.google.common.collect.Maps;
 import org.apache.shiro.subject.Subject;
 import org.bson.types.ObjectId;
+import org.codehaus.jackson.map.SerializationConfig;
 import org.graylog2.Core;
 import org.graylog2.security.ShiroSecurityContext;
 import org.slf4j.Logger;
@@ -62,7 +64,13 @@ public abstract class RestResource {
     @Context
     SecurityContext securityContext;
 
-	protected RestResource() { /* */ }
+	protected RestResource() {
+        /*
+          * Jackson is serializing java.util.Date (coming out of MongoDB for example) as UNIX epoch by default.
+          * Make it write ISO8601 instead.
+          */
+        objectMapper.configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false);
+    }
 
     protected int page(int page) {
         if (page <= 0) {

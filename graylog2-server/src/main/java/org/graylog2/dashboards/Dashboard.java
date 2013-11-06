@@ -147,13 +147,34 @@ public class Dashboard extends Persisted {
         // We work on the result a bit to allow correct JSON serializing.
         Map<String, Object> result = Maps.newHashMap(fields);
 
+        // TODO this sucks and should be done somewhere globally.
         result.remove("_id");
         result.put("id", ((ObjectId) fields.get("_id")).toStringMongod());
-
         result.remove("created_at");
         result.put("created_at", (Tools.getISO8601String((DateTime) fields.get("created_at"))));
 
-        // TODO this sucks and should be done somewhere globally.
+        if (!result.containsKey("widgets")) {
+            result.put("widgets", Lists.newArrayList());
+        }
+
+        // Transform dates in widgets to ISO8601.
+        /*for(Map<String, Object> w : (List<Map<String, Object>>) result.get("widgets")){
+            Map<String, Object> config = (Map<String, Object>) w.get("config");
+            if (config == null || !config.containsKey("timerange")) {
+                continue;
+            }
+
+            Map<String, Object> timerange = (Map<String, Object>) config.get("timerange");
+            for(Map.Entry<String, Object> x : timerange.entrySet()) {
+System.out.println(x.getValue().getClass().getCanonicalName());
+                if (x.getValue() instanceof Map) {
+                    Map<String, Object> dateMap = (Map<String, Object>) x.getValue();
+System.out.println(new DateTime(dateMap.get("$date")));
+                }
+            }
+        }*/
+
+        // Sorry. (This will all get removed once we got rid of Persisted.java)
 
         return result;
     }
