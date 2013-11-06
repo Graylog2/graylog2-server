@@ -8,4 +8,21 @@
     <h1>@dashboard.getTitle</h1>
     @dashboard.getDescription
 
+
+    <div class="dashboard">
+        <div class="gridster">
+            <ul>
+            @for(widget <- dashboard.getWidgets) {
+                <li data-row="1" data-col="1" data-sizex="1" data-sizey="1">
+                    <div class="widget">
+                        @if(widget.getType.equals(models.dashboards.widgets.DashboardWidget.Type.SEARCH_RESULT_COUNT)) {
+                            @views.html.dashboards.widgets.search_result_count(widget.asInstanceOf[models.dashboards.widgets.SearchResultCountWidget])
+                        }
+                    </div>
+                </li>
+            }
+            </ul>
+        </div>
+    </div>
+
 }

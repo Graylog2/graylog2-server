@@ -12,6 +12,11 @@ $(document).ready(function() {
         }
     });
 
+    $(".gridster ul").gridster({
+        widget_margins: [10, 10],
+        widget_base_dimensions: [400, 150]
+    });
+
     function applyDashboardsToAllSelectors() {
         if (Object.keys(globalDashboards).length > 0) {
             $("a.add-to-dashboard[data-widget-type]").each(function() {

@@ -1217,10 +1217,48 @@ ul.dashboard-selector {
     left: -185px;
 }
 
+
 .edit-user-form {
     margin-bottom: 0px;
 }
 
 table#users-list td.centered {
+    text-align: center;
+}
+
+.dashboard {
+    margin-top: 5px;
+}
+
+.dashboard .gridster .gs-w {
+    cursor: pointer;
+    background-color: #f4f4f4;
+    border: 1px solid #ececec;
+}
+
+.dashboard .gridster .player {
+    border-style: dashed;
+    border-color: #cbcbcb;
+}
+
+.dashboard .gridster .preview-holder {
+    border: none !important;
+    background: #0085A7 !important;
+}
+
+.dashboard .widget {
+    margin: 10px;
+}
+
+.dashboard .widget .search-result-count .value {
+    font-size: 70px;
+    font-family: monospace;
+    text-align: center;
+    margin-top: 50px;
+    height: 60px;
+}
+
+.dashboard .widget .search-result-count .title {
+    font-size: 15px;
     text-align: center;
 }
