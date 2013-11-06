@@ -47,4 +47,42 @@ public abstract class TimeRange {
         }
     }
 
+    /**
+     * Builds a timerange from Maps like those, coming from API responses:
+     *
+     * {
+     *   "range": 3600,
+     *   "type": "relative"
+     * }
+     *
+     * {
+     *   "to": "2013-11-05T16:01:02.000+0000",
+     *   "from": "2013-11-05T15:42:17.000+0000",
+     *   "type": "absolute"
+     * }
+     *
+     * "timerange": {
+     *   "keyword": "november 5h last year",
+     *   "type": "keyword"
+     * }
+     *
+     * @param timerangeConfig
+     * @return
+     * @throws InvalidRangeParametersException
+     */
+    public static TimeRange factory(Map<String, Object> timerangeConfig) throws InvalidRangeParametersException {
+        String rangeType = (String) timerangeConfig.get("type");
+
+        switch (Type.valueOf(rangeType.toUpperCase())) {
+            case RELATIVE:
+                return new RelativeRange(((Double) timerangeConfig.get("range")).intValue());
+            case ABSOLUTE:
+                return new AbsoluteRange((String) timerangeConfig.get("from"), (String) timerangeConfig.get("to"));
+            case KEYWORD:
+                return new KeywordRange((String) timerangeConfig.get("keyword"));
+            default:
+                throw new InvalidRangeParametersException();
+        }
+    }
+
 }

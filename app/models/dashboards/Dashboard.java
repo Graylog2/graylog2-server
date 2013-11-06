@@ -19,24 +19,32 @@
  */
 package models.dashboards;
 
+import com.google.common.collect.Lists;
 import com.google.inject.assistedinject.Assisted;
 import com.google.inject.assistedinject.AssistedInject;
 import lib.APIException;
 import lib.ApiClient;
+import lib.timeranges.InvalidRangeParametersException;
 import models.User;
 import models.UserService;
 import models.api.requests.dashboards.AddWidgetRequest;
 import models.api.responses.dashboards.DashboardSummaryResponse;
+import models.api.responses.dashboards.DashboardWidgetResponse;
 import models.dashboards.widgets.DashboardWidget;
 import org.joda.time.DateTime;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import play.mvc.Http;
 
 import java.io.IOException;
+import java.util.List;
 
 /**
  * @author Lennart Koopmann <lennart@torch.sh>
  */
 public class Dashboard {
+
+    private static final Logger LOG = LoggerFactory.getLogger(Dashboard.class);
 
     public interface Factory {
         Dashboard fromSummaryResponse(DashboardSummaryResponse dsr);
@@ -48,6 +56,8 @@ public class Dashboard {
     private final DateTime createdAt;
     private final User creatorUser;
 
+    private List<DashboardWidget> widgets;
+
     private final ApiClient api;
 
     @AssistedInject
@@ -58,6 +68,7 @@ public class Dashboard {
         this.createdAt = DateTime.parse(dsr.createdAt);
         this.creatorUser = userService.load(dsr.creatorUserId);
         this.api = api;
+        this.widgets = parseWidgets(dsr.widgets);
     }
 
     public void addWidget(DashboardWidget widget, User user) throws APIException, IOException {
@@ -67,6 +78,10 @@ public class Dashboard {
                 .body(request)
                 .expect(Http.Status.CREATED)
                 .execute();
+    }
+
+    public List<DashboardWidget> getWidgets() {
+        return widgets;
     }
 
     public String getId() {
@@ -87,6 +102,24 @@ public class Dashboard {
 
     public User getCreatorUser() {
         return creatorUser;
+    }
+
+    private List<DashboardWidget> parseWidgets(List<DashboardWidgetResponse> widgetDefinitions) {
+        List<DashboardWidget> widgets = Lists.newArrayList();
+
+        for (DashboardWidgetResponse w : widgetDefinitions) {
+            try {
+                widgets.add(DashboardWidget.factory(w));
+            } catch (DashboardWidget.NoSuchWidgetTypeException e) {
+                LOG.error("Skipping not supported widget: [{}]", w.type, e);
+                continue;
+            } catch (InvalidRangeParametersException e) {
+                LOG.error("Skipping widget with invalid timerange parameters: [{}]", w.id, e);
+                continue;
+            }
+        }
+
+        return widgets;
     }
 
 }

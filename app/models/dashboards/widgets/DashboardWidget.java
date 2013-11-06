@@ -19,7 +19,9 @@
  */
 package models.dashboards.widgets;
 
-import models.api.requests.ApiRequest;
+import lib.timeranges.InvalidRangeParametersException;
+import lib.timeranges.TimeRange;
+import models.api.responses.dashboards.DashboardWidgetResponse;
 
 import java.util.Map;
 
@@ -33,15 +35,42 @@ public abstract class DashboardWidget {
     }
 
     private final Type type;
+    private final String id;
 
     protected DashboardWidget(Type type) {
-        this.type =  type;
+        this(type, null);
+    }
+
+    protected DashboardWidget(Type type, String id) {
+        this.type = type;
+        this.id = id;
     }
 
     public Type getType() {
         return type;
     }
 
+    public static DashboardWidget factory(DashboardWidgetResponse w) throws NoSuchWidgetTypeException, InvalidRangeParametersException {
+        Type type;
+        try {
+            type = Type.valueOf(w.type.toUpperCase());
+        } catch(IllegalArgumentException e) {
+            throw new NoSuchWidgetTypeException();
+        }
+
+        switch (type) {
+            case SEARCH_RESULT_COUNT:
+                return new SearchResultCountWidget(
+                        (String) w.config.get("query"),
+                        TimeRange.factory((Map<String, Object>) w.config.get("timerange"))
+                );
+            default:
+                throw new NoSuchWidgetTypeException();
+        }
+    }
+
     public abstract Map<String, Object> getConfig();
 
+    public static class NoSuchWidgetTypeException extends Throwable {
+    }
 }

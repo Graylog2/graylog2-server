@@ -21,23 +21,19 @@ package models.api.responses.dashboards;
 
 import com.google.gson.annotations.SerializedName;
 
-import java.util.List;
+import java.util.Map;
 
 /**
  * @author Lennart Koopmann <lennart@torch.sh>
  */
-public class DashboardSummaryResponse {
+public class DashboardWidgetResponse {
 
     public String id;
-    public String title;
-    public String description;
-
-    public List<DashboardWidgetResponse> widgets;
-
-    @SerializedName("created_at")
-    public String createdAt;
+    public String type;
 
     @SerializedName("creator_user_id")
     public String creatorUserId;
+
+    public Map<String, Object> config;
 
 }
