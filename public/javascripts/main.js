@@ -501,6 +501,10 @@ $(document).ready(function() {
         $(document).toggleFullScreen();
     });
 
+    $(".number-format").each(function() {
+        $(this).text(numeral($(this).text()).format($(this).attr("data-format")));
+    });
+
     function scrollToSearchbarHint() {
         if ($(document).scrollTop() > 50) {
             $("#scroll-to-search-hint").fadeIn("fast").delay(1500).fadeOut("fast");
@@ -669,6 +673,39 @@ function originalUniversalSearchSettings() {
 
     return result;
 }
+
+function isNumber(n) {
+    return !isNaN(parseFloat(n)) && isFinite(n);
+}
+
+// Animated change of numbers.
+(function($) {
+    $.fn.animatedIntChange = function(countTo, duration) {
+        return this.each(function() {
+            var elem = $(this);
+            var origStripped = elem.text().replace(/,/g, "");
+
+            if (!isNumber(origStripped)) {
+                elem.text(numeral(countTo).format("0,0"));
+                return;
+            }
+
+            var countFrom = parseInt(origStripped);
+            $({value: countFrom}).animate({value: countTo}, {
+                easing: "linear",
+                duration: duration,
+                step: function() {
+                    elem.text(numeral(Math.floor(this.value)).format("0,0"));
+                },
+                complete: function() {
+                    if (parseInt(elem.text()) !== countTo) {
+                        elem.text(numeral(countTo).format("0,0"));
+                    }
+                }
+            });
+        });
+    };
+})(jQuery);
 
 // This is holding all field graphs.
 fieldGraphs = {};

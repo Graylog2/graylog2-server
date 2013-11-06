@@ -25,10 +25,10 @@ $(document).ready(function() {
             $.ajax({
                 url: '/a/messagecounts/total',
                 success: function(data) {
-                    $(".total-events").html(data.events);
+                    $(".total-events").animatedIntChange(data.events, 500)
                 },
                 error: function() {
-                    $(".total-events").html("?");
+                    $(".total-events").text("?");
                 },
                 complete: function() {
                     setTimeout(updateTotalEvents, interval);
@@ -50,7 +50,8 @@ $(document).ready(function() {
             $.ajax({
                 url: '/a/system/throughput',
                 success: function(data) {
-                    $(".total-throughput").html(data.throughput);
+                    $(".total-throughput").text(data.throughput);
+
                     if (data.nodecount > 1) {
                         $(".total-nodes").html(" across <strong>" + data.nodecount + "</strong> nodes");
                     } else {
@@ -83,10 +84,10 @@ $(document).ready(function() {
                 $.ajax({
                     url: '/a/system/throughput/node/' + $(this).attr("data-node-id"),
                     success: function(data) {
-                        thisNodeT.html(data.throughput);
+                        thisNodeT.text(data.throughput);
                     },
                     error: function() {
-                        thisNodeT.html("?");
+                        thisNodeT.text("?");
                     },
                     complete: function() {
                         // Trigger next call of the whole function when we updated the last element.
@@ -160,10 +161,10 @@ $(document).ready(function() {
             success: function(data) {
                 var count = data.count;
                 if (count > 0) {
-                    $("#notification-badge").html(count);
+                    $("#notification-badge").text(count);
                 } else {
                     // Badges are collapsing when empty so we make a 0 collapse.
-                    $("#notification-badge").html("");
+                    $("#notification-badge").text("");
                 }
             },
             complete: function() {
