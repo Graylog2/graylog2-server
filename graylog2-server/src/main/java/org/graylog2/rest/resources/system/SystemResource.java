@@ -25,10 +25,14 @@ import com.codahale.metrics.jvm.ThreadDump;
 import com.google.common.collect.Maps;
 import org.graylog2.Core;
 import org.graylog2.ProcessingPauseLockedException;
+import org.graylog2.database.ValidationException;
 import org.graylog2.plugin.Tools;
 import org.graylog2.rest.documentation.annotations.Api;
 import org.graylog2.rest.documentation.annotations.ApiOperation;
+import org.graylog2.rest.documentation.annotations.ApiParam;
 import org.graylog2.rest.resources.RestResource;
+import org.graylog2.rest.resources.system.requests.LdapSettingsRequest;
+import org.graylog2.security.LdapSettings;
 import org.graylog2.security.RestPermissions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -37,8 +41,12 @@ import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.lang.management.ManagementFactory;
 import java.util.Map;
+
+import static javax.ws.rs.core.Response.noContent;
+import static javax.ws.rs.core.Response.ok;
 
 
 /**
@@ -87,7 +95,7 @@ public class SystemResource extends RestResource {
         core.pauseMessageProcessing(false);
 
         LOG.info("Paused message processing - triggered by REST call.");
-        return Response.ok().build();
+        return ok().build();
     }
 
     @PUT @Timed
@@ -102,7 +110,7 @@ public class SystemResource extends RestResource {
         }
 
         LOG.info("Resumed message processing - triggered by REST call.");
-        return Response.ok().build();
+        return ok().build();
     }
 
     @PUT @Timed
@@ -115,7 +123,7 @@ public class SystemResource extends RestResource {
         core.unlockProcessingPause();
 
         LOG.info("Manually unlocked message processing pause - triggered by REST call.");
-        return Response.ok().build();
+        return ok().build();
     }
 
     @GET
@@ -159,5 +167,69 @@ public class SystemResource extends RestResource {
         Map<String, Object> result = Maps.newHashMap();
         result.put("permissions", RestPermissions.allPermissions());
         return json(result);
+    }
+
+    @GET @Timed
+    @ApiOperation("Get the LDAP configuration if it is configured")
+    @Path("/ldap/settings")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response getLdapSettings() {
+        final LdapSettings ldapSettings = LdapSettings.load(core);
+        if (ldapSettings == null) {
+            return noContent().build();
+        }
+        Map<String, Object> result = Maps.newHashMap();
+        result.put("enabled", ldapSettings.isEnabled());
+        result.put("system_username", ldapSettings.getSystemUserName());
+        result.put("system_password", ldapSettings.getSystemPassword()); // TODO AES encrypt
+        result.put("ldap_uri", ldapSettings.getUri());
+        result.put("search_base", ldapSettings.getSearchBase());
+        result.put("principal_search_pattern", ldapSettings.getPrincipalSearchPattern());
+        result.put("username_attribute", ldapSettings.getUsernameAttribute());
+        return ok(json(result)).build();
+    }
+
+    @PUT @Timed
+    @ApiOperation("Update the LDAP configuration")
+    @Path("/ldap/settings")
+    @Consumes(MediaType.APPLICATION_JSON)
+    public Response updateLdapSettings(@ApiParam(title = "JSON body", required = true) String body) {
+        LdapSettingsRequest request;
+        try {
+            request = objectMapper.readValue(body, LdapSettingsRequest.class);
+        } catch(IOException e) {
+            LOG.error("Error while parsing JSON", e);
+            throw new WebApplicationException(e, Response.Status.BAD_REQUEST);
+        }
+        // load the existing config, or create a new one. we only support having one, currently
+        LdapSettings ldapSettings = LdapSettings.load(core);
+        if (ldapSettings == null) {
+            ldapSettings = new LdapSettings(core);
+        }
+        ldapSettings.setSystemUsername(request.systemUsername);
+        ldapSettings.setSystemPassword(request.systemPassword);
+        ldapSettings.setUri(request.ldapUri);
+        ldapSettings.setPrincipalSearchPattern(request.principalSearchPattern);
+        ldapSettings.setSearchBase(request.searchBase);
+        ldapSettings.setEnabled(request.isEnabled);
+        ldapSettings.setUsernameAttribute(request.usernameAttribute);
+
+        try {
+            ldapSettings.save();
+        } catch (ValidationException e) {
+            LOG.error("Invalid LDAP settings, not updated!", e);
+            throw new WebApplicationException(e, Response.Status.BAD_REQUEST);
+        }
+        core.getLdapRealm().applySettings(ldapSettings);
+
+        return noContent().build();
+    }
+
+    @DELETE @Timed
+    @ApiOperation("Remove the LDAP configuration")
+    @Path("/ldap/settings")
+    public Response deleteLdapSettings() {
+        LdapSettings.delete(core);
+        return noContent().build();
     }
 }

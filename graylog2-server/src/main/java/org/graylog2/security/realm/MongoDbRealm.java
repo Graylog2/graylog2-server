@@ -71,7 +71,6 @@ public class MongoDbRealm extends AuthorizingRealm {
                     user.getHashedPassword(),
                     ByteSource.Util.bytes(core.getConfiguration().getPasswordSecret()),
                     "graylog2MongoDbRealm");
-            log.debug("User {} authenticated by hashed password", token.getUsername());
         }
 
         return simpleAccount;

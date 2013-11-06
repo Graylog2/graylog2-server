@@ -89,6 +89,7 @@ public class UsersResource extends RestResource {
         for (User user : users) {
             resultUsers.add(toMap(user));
         }
+        resultUsers.add(toMap(new User.LocalAdminUser(core)));
         final HashMap<Object, Object> map = Maps.newHashMap();
         map.put("users", resultUsers);
         return ok(json(map)).build();
@@ -325,6 +326,7 @@ public class UsersResource extends RestResource {
             map.put("timezone", user.getTimeZone().getID());
         }
         map.put("read_only", user.isReadOnly());
+        map.put("external", user.isExternalUser());
         return map;
     }
 

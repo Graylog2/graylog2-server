@@ -53,6 +53,7 @@ public class User extends Persisted {
     public static final String FULL_NAME = "full_name";
     public static final String PERMISSIONS = "permissions";
     public static final String TIMEZONE = "timezone";
+    public static final String EXTERNAL_USER = "external_user";
 
     public User(Map<String, Object> fields, Core core) {
         super(core, fields);
@@ -148,6 +149,10 @@ public class User extends Persisted {
         return fields.get(USERNAME).toString();
     }
 
+    public void setName(String username) {
+        fields.put(USERNAME, username);
+    }
+
     public String getEmail() {
         final Object email = fields.get(EMAIL);
         return email == null ? "" : email.toString();
@@ -194,8 +199,16 @@ public class User extends Persisted {
         fields.put(TIMEZONE, timeZone.getID());
     }
 
-    private static class LocalAdminUser extends User {
-        LocalAdminUser(Core core) {
+    public boolean isExternalUser() {
+        return Boolean.valueOf(String.valueOf(fields.get(EXTERNAL_USER)));
+    }
+
+    public void setExternal(boolean external) {
+        fields.put(EXTERNAL_USER, external);
+    }
+
+    public static class LocalAdminUser extends User {
+        public LocalAdminUser(Core core) {
             super(null, Maps.<String, Object>newHashMap(), core);
         }
 
@@ -213,8 +226,14 @@ public class User extends Persisted {
             return core.getConfiguration().getRootUsername();
         }
 
+        @Override
         public boolean isReadOnly() {
             return true;
+        }
+
+        @Override
+        public boolean isExternalUser() {
+            return false;
         }
 
         @Override
