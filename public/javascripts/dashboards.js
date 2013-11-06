@@ -13,19 +13,21 @@ $(document).ready(function() {
     });
 
     function applyDashboardsToAllSelectors() {
-        $("a.add-to-dashboard[data-widget-type]").each(function() {
-            var dashboardList = $("ul.dashboard-selector", $(this).parent());
-            $("li", dashboardList).remove();
+        if (Object.keys(globalDashboards).length > 0) {
+            $("a.add-to-dashboard[data-widget-type]").each(function() {
+                var dashboardList = $("ul.dashboard-selector", $(this).parent());
+                $("li", dashboardList).remove();
 
-            for (var key in globalDashboards) {
-                var dashboard = globalDashboards[key];
-                var link = "<li><a href='#' data-dashboard-id='" + key + "'>" + htmlEscape(dashboard.title) + "</a></li>"
-                dashboardList.append(link);
-            }
-        });
+                for (var key in globalDashboards) {
+                    var dashboard = globalDashboards[key];
+                    var link = "<li><a href='#' data-dashboard-id='" + key + "'>" + htmlEscape(dashboard.title) + "</a></li>"
+                    dashboardList.append(link);
+                }
+            });
+        }
     }
 
-    $("ul.dashboard-selector li a").live("click", function() {
+    $('ul.dashboard-selector li a[data-dashboard-id]').live("click", function() {
         delegateAddToDashboard($(this).closest("ul.dashboard-selector").attr("data-widget-type"), $(this).attr("data-dashboard-id"));
     })
 
