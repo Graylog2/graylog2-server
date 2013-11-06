@@ -216,7 +216,6 @@ $(document).ready(function() {
                 $('input', $(this)).each (function() {
                     var new_name = $(this).attr('name').replace(/rules\[\d+\]/g, 'rules['+$index+']');
                     $(this).attr('name', new_name);
-                    alert($(this).attr('name'));
                 });
             });
         }
