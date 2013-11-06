@@ -16,29 +16,31 @@
  * You should have received a copy of the GNU General Public License
  * along with Graylog2.  If not, see <http://www.gnu.org/licenses/>.
  */
-package models.api.responses.system;
+package models.api.requests.accounts;
 
 import com.google.gson.annotations.SerializedName;
+import models.api.requests.ApiRequest;
 
-import java.util.List;
+public class LdapSettingsRequest extends ApiRequest {
+    @SerializedName("enabled")
+    public boolean enabled;
 
-public class UserResponse {
+    @SerializedName("system_username")
+    public String systemUsername;
 
-	public String username;
+    @SerializedName("system_password")
+    public String systemPassword;
 
-	@SerializedName("full_name")
-	public String fullName;
+    @SerializedName("ldap_uri")
+    public String ldapUri;
 
-	public String id;
+    @SerializedName("search_base")
+    public String searchBase;
 
-    public String email;
+    @SerializedName("principal_search_pattern")
+    public String principalSearchPattern;
 
-	public List<String> permissions;
+    @SerializedName("username_attribute")
+    public String usernameAttribute;
 
-    public String timezone;
-
-    @SerializedName("read_only")
-    public boolean readonly;
-
-    public boolean external;
 }

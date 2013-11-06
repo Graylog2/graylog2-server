@@ -39,10 +39,7 @@ import play.mvc.Http;
 
 import javax.ws.rs.core.UriBuilder;
 import java.io.IOException;
-import java.net.ConnectException;
-import java.net.MalformedURLException;
-import java.net.URI;
-import java.net.URL;
+import java.net.*;
 import java.text.MessageFormat;
 import java.util.*;
 import java.util.concurrent.ExecutionException;
@@ -350,7 +347,7 @@ class ApiClientImpl implements ApiClient {
                 nodes = serverNodes.all();
             }
 
-            Collection<F.Tuple> requests = Lists.newArrayList();
+            Collection<F.Tuple<ListenableFuture<Response>, Node>> requests = Lists.newArrayList();
             final Collection<Response> responses = Lists.newArrayList();
             for (Node currentNode : nodes) {
                 final URL url = prepareUrl(currentNode);
@@ -366,7 +363,7 @@ class ApiClientImpl implements ApiClient {
                             return response;
                         }
                     });
-                    requests.add(new F.Tuple(future, currentNode));
+                    requests.add(new F.Tuple<>(future, currentNode));
                 } catch (IOException e) {
                     log.error("Cannot execute request", e);
                     currentNode.markFailure();
@@ -401,6 +398,14 @@ class ApiClientImpl implements ApiClient {
         private AsyncHttpClient.BoundRequestBuilder requestBuilderForUrl(URL url) {
             // *sigh* the generic requestBuilder methods are protected/private making this verbose :(
             final AsyncHttpClient.BoundRequestBuilder requestBuilder;
+            final String userInfo = url.getUserInfo();
+            // have to hack around here, because the userInfo will unescape the @ in usernames :(
+            try {
+                url = UriBuilder.fromUri(url.toURI()).userInfo(null).build().toURL();
+            } catch (URISyntaxException | MalformedURLException ignore) {
+                // cannot happen, because it was a valid url before
+            }
+
             switch (method) {
                 case GET:
                     requestBuilder = client.prepareGet(url.toString());
@@ -418,7 +423,7 @@ class ApiClientImpl implements ApiClient {
                     throw new IllegalStateException("Illegal method " + method.toString());
             }
 
-            applyBasicAuthentication(requestBuilder, url.getUserInfo());
+            applyBasicAuthentication(requestBuilder, userInfo);
             requestBuilder.setPerRequestConfig(new PerRequestConfig(null, (int)timeoutUnit.toMillis(timeoutValue)));
 
             if (body != null) {
@@ -439,6 +444,7 @@ class ApiClientImpl implements ApiClient {
             return requestBuilder;
         }
 
+        // default visibility for tests
         URL prepareUrl(Node node) {
             // if this is null there's not much we can do anyway...
             Preconditions.checkNotNull(pathTemplate, "path() needs to be set to a non-null value.");

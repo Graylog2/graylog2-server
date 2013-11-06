@@ -47,13 +47,15 @@ public class User {
 	private final List<String> permissions;
     private final String passwordHash;
     private final DateTimeZone timezone;
+    private final boolean readonly;
+    private final boolean external;
 
     @AssistedInject
     public User(ApiClient api, @Assisted UserResponse ur, @Nullable @Assisted String passwordHash) {
-        this(api, ur.id, ur.username, ur.email, ur.fullName, ur.permissions, passwordHash, ur.timezone);
+        this(api, ur.id, ur.username, ur.email, ur.fullName, ur.permissions, passwordHash, ur.timezone, ur.readonly, ur.external);
     }
 
-	public User(ApiClient api, String id, String name, String email, String fullName, List<String> permissions, String passwordHash, String timezone) {
+	public User(ApiClient api, String id, String name, String email, String fullName, List<String> permissions, String passwordHash, String timezone, boolean readonly, boolean external) {
         DateTimeZone timezone1 = null;
         this.api = api;
         this.id = id;
@@ -71,6 +73,8 @@ public class User {
         } finally {
             this.timezone = timezone1;
         }
+        this.readonly = readonly;
+        this.external = external;
     }
 
     public void update(ChangeUserRequest request) {
@@ -129,6 +133,14 @@ public class User {
             return false;
         }
         return true;
+    }
+
+    public boolean isReadonly() {
+        return readonly;
+    }
+
+    public boolean isExternal() {
+        return external;
     }
 
     public interface Factory {

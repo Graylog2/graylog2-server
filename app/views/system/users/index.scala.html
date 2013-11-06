@@ -1,13 +1,12 @@
 @(currentUser: User, users: java.util.List[User], permissions:java.util.List[String])
 
 @main("Users", views.html.system.sidebar(), "", currentUser) {
-    @views.html.partials.preview("Users can be stored in Graylog2's MongoDB instance, or be read from LDAP. Currently only those accounts configured in MongoDB are available. Note that the built-in admin account is not yet listed here, either.", 266)
-
     <div class="row-fluid">
         <h2><i class="icon icon-user"></i> User accounts</h2>
-        <table class="table table-striped table-hover table-condensed">
+        <table class="table table-striped table-hover table-condensed" id="users-list">
             <thead>
                 <tr>
+                    <td></td>
                     <td>Name</td>
                     <td>User Id</td>
                     <td>Email Address</td>
@@ -20,20 +19,36 @@
                 <tr class="@{
                     if(user.getName.equals(currentUser.getName)) "info" else ""
                 }">
+                    <td class="centered">
+                    @if(user.isReadonly) {
+                        <i title="System User" class="icon-lock"></i>
+                    }
+                    @if(user.isExternal) {
+                        <i title="LDAP User" class="icon-cloud"></i>
+                    }
+                    </td>
                     <td>@user.getFullName</td>
                     <td>@user.getName</td>
                     <td>@user.getEmail</td>
                     <td>
                     @for(permission <- user.getPermissions) {
-                        <span class="label label-inverse">@permission</span>
+                        @if(permission.equals("*")) {
+                        <span class="label label-info">Admin</span>
+                        } else {
+                        <span class="label">@permission</span>
+                        }
                     }
                     </td>
                     <td>
                         <div class="pull-right">
-                            <form class="delete-user-form" data-username="@user.getName" method="POST" action="@routes.UsersController.delete(user.getName)">
+                            @if(!user.isReadonly) {
+                            <form class="edit-user-form" data-username="@user.getName" method="POST" action="@routes.UsersController.delete(user.getName)">
+                                @if(!user.isExternal) {
                                 <button id="delete-user" type="submit" class="btn btn-mini" title="Delete"><i class="icon-remove icon-large"></i></button>
+                                }
                                 <a id="edit-user" href="@routes.UsersController.editUserForm(user.getName)" class="btn btn-mini" title="Edit"><i class="icon-edit icon-large"></i></a>
                             </form>
+                            }
                         </div>
                     </td>
                 </tr>
@@ -44,6 +59,7 @@
 
     <div class="row-fluid">
         <div class="pull-right">
+            <a id="configure-ldap" class="btn btn-info" href="@routes.LdapController.index()">Configure LDAP</a>
             <a id="create-user-btn" class="btn btn-success" href="@routes.UsersController.newUserForm()">Create new account</a>
         </div>
     </div>

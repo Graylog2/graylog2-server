@@ -1216,3 +1216,11 @@ dl.metric-histogram dd {
 ul.dashboard-selector {
     left: -185px;
 }
+
+.edit-user-form {
+    margin-bottom: 0px;
+}
+
+table#users-list td.centered {
+    text-align: center;
+}
