@@ -27,10 +27,13 @@ import org.apache.shiro.authc.AuthenticationToken;
 import org.apache.shiro.authz.AuthorizationInfo;
 import org.apache.shiro.crypto.hash.SimpleHash;
 import org.apache.shiro.realm.ldap.AbstractLdapRealm;
+import org.apache.shiro.realm.ldap.JndiLdapContextFactory;
 import org.apache.shiro.realm.ldap.LdapContextFactory;
 import org.apache.shiro.subject.PrincipalCollection;
 import org.graylog2.Core;
 import org.graylog2.database.ValidationException;
+import org.graylog2.rest.resources.system.requests.LdapSettingsRequest;
+import org.graylog2.rest.resources.system.requests.LdapTestLoginRequest;
 import org.graylog2.security.LdapSettings;
 import org.graylog2.users.User;
 import org.slf4j.Logger;
@@ -43,6 +46,8 @@ import javax.naming.directory.Attributes;
 import javax.naming.directory.SearchControls;
 import javax.naming.directory.SearchResult;
 import javax.naming.ldap.LdapContext;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 public class LdapRealm extends AbstractLdapRealm {
@@ -173,5 +178,45 @@ public class LdapRealm extends AbstractLdapRealm {
     protected AuthorizationInfo queryForAuthorizationInfo(PrincipalCollection principal, LdapContextFactory
         ldapContextFactory) throws NamingException {
         return null;
+    }
+
+    public NamingException testConnection(LdapSettingsRequest request) {
+        JndiLdapContextFactory defaultFactory = new JndiLdapContextFactory();
+        defaultFactory.setUrl(request.ldapUri.toString());
+        defaultFactory.setSystemUsername(request.systemUsername);
+        defaultFactory.setSystemPassword(request.systemPassword);
+        try {
+            final LdapContext context = defaultFactory.getSystemLdapContext();
+            context.close();
+        } catch (NamingException e) {
+            return e;
+        }
+        return null;
+    }
+
+    public Map<String, String> testLogin(LdapTestLoginRequest request) throws NamingException {
+        JndiLdapContextFactory defaultFactory = new JndiLdapContextFactory();
+        defaultFactory.setUrl(request.ldapUri.toString());
+        defaultFactory.setSystemUsername(request.systemUsername);
+        defaultFactory.setSystemPassword(request.systemPassword);
+
+        final HashMap<String,String> attributes = Maps.newHashMap();
+        final LdapContext context = defaultFactory.getSystemLdapContext();
+        final SearchControls cons = new SearchControls();
+        cons.setSearchScope(SearchControls.SUBTREE_SCOPE);
+        final NamingEnumeration<SearchResult> results;
+        results = context.search(request.searchBase, request.principalSearchPattern, new Object[]{request.testUsername}, cons);
+        if (results.hasMore()) {
+            final SearchResult next = results.next();
+            final Attributes attrs = next.getAttributes();
+            final NamingEnumeration<String> iDs = attrs.getIDs();
+            while (iDs.hasMore()) {
+                final String key = iDs.next();
+                if (key.equals("userPassword")) continue;
+                attributes.put(key, attrs.get(key).get().toString());
+            }
+        }
+        context.close();
+        return attributes;
     }
 }

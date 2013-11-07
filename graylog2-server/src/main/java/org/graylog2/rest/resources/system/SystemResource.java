@@ -32,11 +32,13 @@ import org.graylog2.rest.documentation.annotations.ApiOperation;
 import org.graylog2.rest.documentation.annotations.ApiParam;
 import org.graylog2.rest.resources.RestResource;
 import org.graylog2.rest.resources.system.requests.LdapSettingsRequest;
+import org.graylog2.rest.resources.system.requests.LdapTestLoginRequest;
 import org.graylog2.security.LdapSettings;
 import org.graylog2.security.RestPermissions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.naming.NamingException;
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
@@ -186,6 +188,56 @@ public class SystemResource extends RestResource {
         result.put("search_base", ldapSettings.getSearchBase());
         result.put("principal_search_pattern", ldapSettings.getPrincipalSearchPattern());
         result.put("username_attribute", ldapSettings.getUsernameAttribute());
+        return ok(json(result)).build();
+    }
+
+    @POST @Timed
+    @ApiOperation("")
+    @Path("/ldap/testconnection")
+    @Consumes(MediaType.APPLICATION_JSON)
+    public Response testLdapConnection(@ApiParam(title = "JSON body", required = true) String body) {
+        LdapSettingsRequest request;
+        try {
+            request = objectMapper.readValue(body, LdapSettingsRequest.class);
+        } catch(IOException e) {
+            LOG.error("Error while parsing JSON", e);
+            throw new WebApplicationException(e, Response.Status.BAD_REQUEST);
+        }
+
+        final NamingException namingException = core.getLdapRealm().testConnection(request);
+        Map<String, Object> result = Maps.newHashMap();
+        if (namingException == null) {
+            result.put("successful", true);
+        } else {
+            result.put("successful", false);
+            result.put("exception", namingException.toString());
+        }
+        return ok(json(result)).build();
+    }
+
+    @POST @Timed
+    @ApiOperation("")
+    @Path("/ldap/testlogin")
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response testLdapLogin(@ApiParam(title = "JSON body", required = true) String body) {
+        LdapTestLoginRequest request;
+        try {
+            request = objectMapper.readValue(body, LdapTestLoginRequest.class);
+        } catch(IOException e) {
+            LOG.error("Error while parsing JSON", e);
+            throw new WebApplicationException(e, Response.Status.BAD_REQUEST);
+        }
+
+        Map<String, Object> result = Maps.newHashMap();
+        try {
+            final Map<String, String> attributes = core.getLdapRealm().testLogin(request);
+            result.put("successful", true);
+            result.put("attributes", attributes);
+        } catch (NamingException e) {
+            result.put("successful", false);
+            result.put("exception", e.toString());
+        }
         return ok(json(result)).build();
     }
 
