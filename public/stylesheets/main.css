@@ -1200,7 +1200,7 @@ dl.metric-histogram dd {
     margin-left: 5px;
 }
 
-.toggle-fullscreen {
+.dashboard-controls i {
     font-size: 15px;
     cursor: pointer;
 }
@@ -1230,15 +1230,18 @@ table#users-list td.centered {
     margin-top: 5px;
 }
 
+.dashboard .gridster ul li {
+    margin-top: 5px;
+}
+
 .dashboard .gridster .gs-w {
-    cursor: pointer;
-    background-color: #f4f4f4;
+    background-color: #fafafa;
     border: 1px solid #ececec;
 }
 
 .dashboard .gridster .player {
     border-style: dashed;
-    border-color: #cbcbcb;
+    border-color: #adadad;
 }
 
 .dashboard .gridster .preview-holder {
@@ -1250,15 +1253,48 @@ table#users-list td.centered {
     margin: 10px;
 }
 
+.dashboard .widget .widget-top {
+    position: relative;
+    margin-bottom: -15px;
+    top: -5px;
+    font-size: 11px;
+    line-height: 11px;
+}
+
+.dashboard .widget .controls {
+    position: relative;
+    left: -3px;
+}
+
+.dashboard .widget .reloading {
+    margin-right: 2px;
+    font-weight: bold;
+    color: #0085A7;
+    display: none;
+}
+
 .dashboard .widget .search-result-count .value {
-    font-size: 70px;
-    font-family: monospace;
+    line-height: 70px !important;
     text-align: center;
-    margin-top: 50px;
-    height: 60px;
+    font-size: 70px;
+    position: relative;
+    top: 12px;
+}
+
+.dashboard .widget .search-result-count .icon {
+    color: #ebebeb;
+}
+
+.dashboard .widget .loading-failed {
+    color: #ff4646 !important;
 }
 
 .dashboard .widget .search-result-count .title {
-    font-size: 15px;
+    font-size: 16px;
+    margin-top: 20px;
     text-align: center;
+}
+
+.dashboard .widget .controls {
+    display: none;
 }

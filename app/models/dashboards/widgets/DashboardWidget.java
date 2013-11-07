@@ -19,10 +19,16 @@
  */
 package models.dashboards.widgets;
 
+import lib.APIException;
+import lib.ApiClient;
 import lib.timeranges.InvalidRangeParametersException;
 import lib.timeranges.TimeRange;
 import models.api.responses.dashboards.DashboardWidgetResponse;
+import models.api.responses.dashboards.DashboardWidgetValueResponse;
+import models.dashboards.Dashboard;
+import play.mvc.Http;
 
+import java.io.IOException;
 import java.util.Map;
 
 /**
@@ -36,21 +42,40 @@ public abstract class DashboardWidget {
 
     private final Type type;
     private final String id;
+    private final Dashboard dashboard;
 
-    protected DashboardWidget(Type type) {
-        this(type, null);
+    protected DashboardWidget(Type type, Dashboard dashboard) {
+        this(type, null, dashboard);
     }
 
-    protected DashboardWidget(Type type, String id) {
+    protected DashboardWidget(Type type, String id, Dashboard dashboard) {
         this.type = type;
         this.id = id;
+        this.dashboard = dashboard;
     }
 
     public Type getType() {
         return type;
     }
 
-    public static DashboardWidget factory(DashboardWidgetResponse w) throws NoSuchWidgetTypeException, InvalidRangeParametersException {
+    public String getId() {
+        return id;
+    }
+
+    public Dashboard getDashboard() {
+        return dashboard;
+    }
+
+    public DashboardWidgetValueResponse getValue(ApiClient api) throws APIException, IOException {
+        return api.get(DashboardWidgetValueResponse.class)
+                    .path("/dashboards/{0}/widgets/{1}/value", dashboard.getId(), id)
+                    .onlyMasterNode()
+                    .execute();
+    }
+
+
+
+    public static DashboardWidget factory(Dashboard dashboard, DashboardWidgetResponse w) throws NoSuchWidgetTypeException, InvalidRangeParametersException {
         Type type;
         try {
             type = Type.valueOf(w.type.toUpperCase());
@@ -61,6 +86,8 @@ public abstract class DashboardWidget {
         switch (type) {
             case SEARCH_RESULT_COUNT:
                 return new SearchResultCountWidget(
+                        dashboard,
+                        w.id,
                         (String) w.config.get("query"),
                         TimeRange.factory((Map<String, Object>) w.config.get("timerange"))
                 );

@@ -71,6 +71,25 @@ public class DashboardsApiController extends AuthenticatedController {
         }
     }
 
+    public Result widgetValue(String dashboardId, String widgetId) {
+        try {
+            Dashboard dashboard = dashboardService.get(dashboardId);
+            DashboardWidget widget = dashboard.getWidget(widgetId);
+
+            Map<String, Object> result = Maps.newHashMap();
+            result.put("result", widget.getValue(api()).result);
+            result.put("took_ms", widget.getValue(api()).tookMs);
+            result.put("calculated_at", widget.getValue(api()).calculatedAt);
+
+            return ok(new Gson().toJson(result)).as("application/json");
+        } catch (APIException e) {
+            String message = "Could not get dashboard. We expected HTTP 200, but got a HTTP " + e.getHttpCode() + ".";
+            return status(504, views.html.errors.error.render(message, e, request()));
+        } catch (IOException e) {
+            return status(504, views.html.errors.error.render(ApiClient.ERROR_MSG_IO, e, request()));
+        }
+    }
+
     public Result addWidget(String dashboardId) {
         try {
             Map<String, String> params = flattenFormUrlEncoded(request().body().asFormUrlEncoded());
@@ -98,7 +117,7 @@ public class DashboardsApiController extends AuthenticatedController {
             try {
                 switch (DashboardWidget.Type.valueOf(params.get("widgetType"))) {
                     case SEARCH_RESULT_COUNT:
-                        widget = new SearchResultCountWidget(query, timerange);
+                        widget = new SearchResultCountWidget(dashboard, query, timerange);
                         break;
                     default:
                         throw new IllegalArgumentException();
@@ -113,6 +132,20 @@ public class DashboardsApiController extends AuthenticatedController {
             return created();
         } catch (APIException e) {
             String message = "Could not add widget. We got a HTTP " + e.getHttpCode() + ".";
+            return status(504, views.html.errors.error.render(message, e, request()));
+        } catch (IOException e) {
+            return status(504, views.html.errors.error.render(ApiClient.ERROR_MSG_IO, e, request()));
+        }
+    }
+
+    public Result removeWidget(String dashboardId, String widgetId) {
+        try {
+            Dashboard dashboard = dashboardService.get(dashboardId);
+            dashboard.removeWidget(widgetId);
+
+            return noContent();
+        } catch (APIException e) {
+            String message = "Could not get dashboard. We expected HTTP 200, but got a HTTP " + e.getHttpCode() + ".";
             return status(504, views.html.errors.error.render(message, e, request()));
         } catch (IOException e) {
             return status(504, views.html.errors.error.render(ApiClient.ERROR_MSG_IO, e, request()));

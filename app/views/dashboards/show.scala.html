@@ -1,28 +1,48 @@
 @(currentUser: User, breadcrumbs: lib.BreadcrumbList, dashboard: models.dashboards.Dashboard)
 
 @main(dashboard.getTitle, null, "", currentUser, false) {
-    <i class="icon icon-fullscreen pull-right toggle-fullscreen" title="Fullscreen"></i>
+
+    <div class="pull-right dashboard-controls">
+        <i class="icon icon-lock unlock-dashboard-widgets" title="Unlock widget positions"></i>
+        <i class="icon icon-unlock lock-dashboard-widgets" title="Lock widget positions" style="display: none;"></i>
+        &nbsp;
+        <i class="icon icon-fullscreen toggle-fullscreen" title="Fullscreen"></i>
+    </div>
 
     @views.html.partials.breadcrumbs(breadcrumbs)
 
     <h1>@dashboard.getTitle</h1>
-    @dashboard.getDescription
+    @dashboard.getDescription (Unlock widget positions by clicking on the lock symbol on the top right. Then drag them to any position you like.)
+
 
 
     <div class="dashboard">
         <div class="gridster">
             <ul>
-            @for(widget <- dashboard.getWidgets) {
+            @for(widget <- dashboard.getWidgets.values()) {
                 <li data-row="1" data-col="1" data-sizex="1" data-sizey="1">
-                    <div class="widget">
+                    <div class="widget" data-widget-type="@widget.getType.toString.toLowerCase" data-dashboard-id="@widget.getDashboard.getId" data-widget-id="@widget.getId">
+
+                        <div class="pull-left widget-top controls">
+                            <a href="#" class="remove-widget"><i class="icon icon-remove"></i></a>
+                        </div>
+
+                        <div class="pull-right widget-top info">
+                            <span class="reloading">&middot;</span>
+                            <span class="cache-info"></span>
+                        </div>
+
                         @if(widget.getType.equals(models.dashboards.widgets.DashboardWidget.Type.SEARCH_RESULT_COUNT)) {
                             @views.html.dashboards.widgets.search_result_count(widget.asInstanceOf[models.dashboards.widgets.SearchResultCountWidget])
                         }
+
                     </div>
                 </li>
             }
             </ul>
         </div>
+
+        <br style="clear: both;" />
     </div>
 
 }

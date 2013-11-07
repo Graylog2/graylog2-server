@@ -69,7 +69,7 @@ GET         /system/logging                                                     
 
 # Dashboards
 GET         /dashboards                                                              @controllers.DashboardsController.index()
-GET         /dashboard/:id                                                           @controllers.DashboardsController.show(id: String)
+GET         /dashboards/:id                                                           @controllers.DashboardsController.show(id: String)
 GET         /dashboards/new                                                          @controllers.DashboardsController.newDashboard()
 POST        /dashboards/create                                                       @controllers.DashboardsController.create()
 POST        /dashboards/:id/delete                                                   @controllers.DashboardsController.delete(id: String)
@@ -115,7 +115,9 @@ GET         /a/connection/available                                             
 
 # API: Dashboards
 GET         /a/dashboards                                                            @controllers.api.DashboardsApiController.index()
+GET         /a/dashboards/:dashboard_id/widgets/:widget_id/value                     @controllers.api.DashboardsApiController.widgetValue(dashboard_id: String, widget_id: String)
 POST        /a/dashboards/:dashboard_id/widgets                                      @controllers.api.DashboardsApiController.addWidget(dashboard_id: String)
+POST        /a/dashboards/:dashboard_id/widgets/:widget_id/delete                    @controllers.api.DashboardsApiController.removeWidget(dashboard_id: String, widget_id: String)
 
 # Map static resources from the /public folder to the /assets URL path
 GET         /assets/*file                                                            controllers.Assets.at(path="/public", file)

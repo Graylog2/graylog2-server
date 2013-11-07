@@ -212,7 +212,7 @@ class ApiClientImpl implements ApiClient {
             return this;
         }
 
-        public ApiRequestBuilder<T> fromMasterNode() {
+        public ApiRequestBuilder<T> onlyMasterNode() {
             this.node = serverNodes.master();
             return this;
         }

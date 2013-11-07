@@ -567,6 +567,19 @@ $(document).ready(function() {
         }
     }
 
+    // Set up numeral language.
+    try {
+        var browserLang = navigator.language || navigator.userLanguage;
+        if (browserLang.indexOf("-") > 0) {
+            var userShortLanguage = browserLang.substr(0, browserLang.indexOf("-"));
+            numeral.language(userShortLanguage);
+        } else {
+            numeral.language(browserLang);
+        }
+    } catch(err) {
+        numeral.language("en");
+    }
+
 });
 
 function searchDateTimeFormatted(date) {

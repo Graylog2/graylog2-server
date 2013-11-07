@@ -21,6 +21,7 @@ package models.dashboards.widgets;
 
 import com.google.common.collect.Maps;
 import lib.timeranges.TimeRange;
+import models.dashboards.Dashboard;
 
 import java.util.Map;
 
@@ -32,8 +33,12 @@ public class SearchResultCountWidget extends DashboardWidget {
     private final String query;
     private final TimeRange timerange;
 
-    public SearchResultCountWidget(String query, TimeRange timerange) {
-        super(Type.SEARCH_RESULT_COUNT);
+    public SearchResultCountWidget(Dashboard dashboard, String query, TimeRange timerange) {
+        this(dashboard, null, query, timerange);
+    }
+
+    public SearchResultCountWidget(Dashboard dashboard, String id, String query, TimeRange timerange) {
+        super(Type.SEARCH_RESULT_COUNT, id, dashboard);
 
         this.query = query;
         this.timerange = timerange;

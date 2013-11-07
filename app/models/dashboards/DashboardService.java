@@ -48,7 +48,7 @@ public class DashboardService {
 
     public Dashboard get(String id) throws APIException, IOException {
         DashboardSummaryResponse d = api.get(DashboardSummaryResponse.class)
-                .fromMasterNode()
+                .onlyMasterNode()
                 .path("/dashboards/{0}", id)
                 .execute();
         return dashboardFactory.fromSummaryResponse(d);
@@ -57,7 +57,7 @@ public class DashboardService {
     public List<Dashboard> getAll() throws APIException, IOException {
         List<Dashboard> dashboards = Lists.newArrayList();
         GetDashboardsResponse response = api.get(GetDashboardsResponse.class)
-                .fromMasterNode()
+                .onlyMasterNode()
                 .path("/dashboards")
                 .execute();
 
@@ -74,7 +74,7 @@ public class DashboardService {
 
     public void create(CreateDashboardRequest request) throws APIException, IOException {
         api.post().path("/dashboards")
-                .fromMasterNode()
+                .onlyMasterNode()
                 .body(request)
                 .expect(Http.Status.CREATED)
                 .execute();
@@ -82,7 +82,7 @@ public class DashboardService {
 
     public void delete(String id) throws APIException, IOException {
         api.delete().path("/dashboards/{0}", id)
-                .fromMasterNode()
+                .onlyMasterNode()
                 .expect(Http.Status.NO_CONTENT)
                 .execute();
     }

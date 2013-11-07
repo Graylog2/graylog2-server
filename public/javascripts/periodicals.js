@@ -151,7 +151,7 @@ $(document).ready(function() {
                 }
             });
 
-        }).promise().done(function(){ setTimeout(updateInputConnections, interval); });;
+        }).promise().done(function(){ setTimeout(updateInputConnections, interval); });
     })();
 
     // Notification count badge.

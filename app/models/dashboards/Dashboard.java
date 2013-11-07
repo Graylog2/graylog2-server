@@ -19,7 +19,7 @@
  */
 package models.dashboards;
 
-import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
 import com.google.inject.assistedinject.Assisted;
 import com.google.inject.assistedinject.AssistedInject;
 import lib.APIException;
@@ -38,6 +38,7 @@ import play.mvc.Http;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.Map;
 
 /**
  * @author Lennart Koopmann <lennart@torch.sh>
@@ -56,7 +57,7 @@ public class Dashboard {
     private final DateTime createdAt;
     private final User creatorUser;
 
-    private List<DashboardWidget> widgets;
+    private Map<String, DashboardWidget> widgets;
 
     private final ApiClient api;
 
@@ -75,12 +76,24 @@ public class Dashboard {
         AddWidgetRequest request = new AddWidgetRequest(widget, user);
 
         api.post().path("/dashboards/{0}/widgets", id)
+                .onlyMasterNode()
                 .body(request)
                 .expect(Http.Status.CREATED)
                 .execute();
     }
 
-    public List<DashboardWidget> getWidgets() {
+    public void removeWidget(String widgetId) throws APIException, IOException {
+        api.delete().path("/dashboards/{0}/widgets/{1}", id, widgetId)
+                .onlyMasterNode()
+                .expect(Http.Status.NO_CONTENT)
+                .execute();
+    }
+
+    public DashboardWidget getWidget(String id) {
+        return widgets.get(id);
+    }
+
+    public Map<String, DashboardWidget> getWidgets() {
         return widgets;
     }
 
@@ -104,12 +117,12 @@ public class Dashboard {
         return creatorUser;
     }
 
-    private List<DashboardWidget> parseWidgets(List<DashboardWidgetResponse> widgetDefinitions) {
-        List<DashboardWidget> widgets = Lists.newArrayList();
+    private Map<String, DashboardWidget> parseWidgets(List<DashboardWidgetResponse> widgetDefinitions) {
+        Map<String, DashboardWidget> widgets = Maps.newHashMap();
 
         for (DashboardWidgetResponse w : widgetDefinitions) {
             try {
-                widgets.add(DashboardWidget.factory(w));
+                widgets.put(w.id, DashboardWidget.factory(this, w));
             } catch (DashboardWidget.NoSuchWidgetTypeException e) {
                 LOG.error("Skipping not supported widget: [{}]", w.type, e);
                 continue;

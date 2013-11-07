@@ -35,7 +35,7 @@
                 <a href="@routes.DashboardsController.show(dashboard.getId)">@dashboard.getTitle</a>
             </h3>
 
-            0 widgets.
+            @dashboard.getWidgets.size() widgets.
             @dashboard.getDescription
         </div>
     }
