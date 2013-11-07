@@ -18,16 +18,30 @@
  */
 package controllers;
 
+import com.google.gson.Gson;
 import com.google.inject.Inject;
+import lib.APIException;
 import models.accounts.LdapSettings;
 import models.accounts.LdapSettingsService;
 import models.api.requests.accounts.LdapSettingsRequest;
+import models.api.requests.accounts.LdapTestConnectionRequest;
+import models.api.requests.accounts.LdapTestLoginRequest;
+import models.api.responses.accounts.LdapConnectionTestResponse;
+import models.api.responses.accounts.LdapLoginTestResponse;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import play.data.DynamicForm;
 import play.data.Form;
 import play.mvc.Result;
+
+import javax.ws.rs.core.MediaType;
+import java.io.IOException;
+import java.util.Map;
+
 import static play.data.Form.form;
 
 public class LdapController extends AuthenticatedController {
-
+    private static final Logger log = LoggerFactory.getLogger(LdapController.class);
     private final Form<LdapSettingsRequest> settingsForm = form(LdapSettingsRequest.class);
 
     @Inject
@@ -49,11 +63,48 @@ public class LdapController extends AuthenticatedController {
     }
 
     public Result apiTestLdapConnection() {
-        return ok();
+        final DynamicForm dynamicForm = form().bindFromRequest("url", "systemUsername", "systemPassword");
+        final Map<String,String> formData = dynamicForm.data();
+        log.warn("trying " + formData);
+        LdapConnectionTestResponse result;
+        try {
+            final LdapTestConnectionRequest request = new LdapTestConnectionRequest();
+            request.ldapUri = formData.get("url");
+            request.systemUsername = formData.get("systemUsername");
+            request.systemPassword = formData.get("systemPassword");
+            result = api().post(LdapConnectionTestResponse.class).path("/system/ldap/testconnection").body(request).execute();
+        } catch (APIException e) {
+            // couldn't connect
+            return internalServerError();
+        } catch (IOException e) {
+            log.error("Unable to connect", e);
+            return internalServerError();
+        }
+        return ok(new Gson().toJson(result)).as(MediaType.APPLICATION_JSON);
     }
 
     public Result apiTestLdapLogin() {
-        return ok();
+        final DynamicForm dynamicForm = form().bindFromRequest("url", "systemUsername", "systemPassword", "searchBase", "principalSearchPattern", "testUsername", "testPassword");
+        final Map<String, String> formData = dynamicForm.data();
+
+        LdapLoginTestResponse result;
+        try {
+            LdapTestLoginRequest request = new LdapTestLoginRequest();
+            request.ldapUri = formData.get("url");
+            request.systemUsername = formData.get("systemUsername");
+            request.systemPassword = formData.get("systemPassword");
+            request.searchBase = formData.get("searchBase");
+            request.principalSearchPattern = formData.get("principalSearchPattern");
+            request.testUsername = formData.get("testUsername");
+            request.testPassword = formData.get("testPassword");
+            result = api().post(LdapLoginTestResponse.class).path("/system/ldap/testlogin").body(request).execute();
+        } catch (APIException e) {
+            return internalServerError();
+        } catch (IOException e) {
+            log.error("Unable to connect", e);
+            return internalServerError();
+        }
+        return ok(new Gson().toJson(result)).as(MediaType.APPLICATION_JSON);
     }
 
     public Result saveLdapSettings() {

@@ -19,9 +19,9 @@
                 <div class="controls">
                     <div class="input-prepend input-append">
                         <span class="add-on" id="ldap-uri-scheme">ldap://</span>
-                        <input type="text" class="inline input-large" id="ldap-uri-host" value="" placeholder="Hostname">
+                        <input type="text" class="inline input-large" id="ldap-uri-host" value="" placeholder="Hostname" required>
                         <span class="add-on">:</span>
-                        <input type="text" class="inline input-mini" id="ldap-uri-port" value="" placeholder="Port">
+                        <input type="text" class="inline input-mini" id="ldap-uri-port" value="" placeholder="Port" required>
                     </div>
                     <label class="checkbox inline">
                         <input type="checkbox" id="ldap-uri-ssl"> SSL
@@ -34,7 +34,7 @@
                 <label class="control-label" for="systemUsername">System Username</label>
                 <div class="controls">
                     <input type="text" id="systemUsername" value="@ldapForm("systemUsername").value()" name="systemUsername" placeholder="System User DN">
-                    <span class="help-block">The username for the initial connection to the LDAP server, usually a DN.</span>
+                    <span class="help-block">The username for the initial connection to the LDAP server, e.g. <code>uid=admin,ou=system</code></span>
                 </div>
             </div>
             <div class="control-group">
@@ -44,11 +44,18 @@
                     <span class="help-block">The password for the initial connection to the LDAP server.</span>
                 </div>
             </div>
+
+            <div class="form-actions">
+                <button type="button" id="ldap-test-connection" class="btn btn-warning">Test Server Connection</button>
+                <span class="help-inline">Performs a background connection check with the address and credentials above.</span>
+                <span class="help-block" id="ldap-connectionfailure-reason"></span>
+            </div>
+
             <div class="control-group">
-                <label class="control-label" for="searchBase">Search Base</label>
+                <label class="control-label" for="searchBase">Search Base DN</label>
                 <div class="controls">
                     <input type="text" id="searchBase" class="input-xxlarge" name="searchBase" placeholder="Search Base" value="@ldapForm("searchBase").value()">
-                    <span class="help-block">The base tree to limit the LDAP search query to.</span>
+                    <span class="help-block">The base tree to limit the LDAP search query to, e.g. <code>cn=users,dc=example,dc=com</code></span>
                 </div>
             </div>
 
@@ -69,8 +76,21 @@
             </div>
 
             <div class="form-actions">
-                <button type="submit" class="btn">Save</button>
-                <button type="button" id="ldap-test-connection" class="btn btn-success" disabled>Test Connection</button>
+                <p>Optionally you can perform a login test here. If you omit the password, just the LDAP entry will be loaded and shown below and not authentication attempt will be made.</p>
+                <input type="text" id="ldap-test-username" value="" placeholder="Username for login test">
+                <input type="password" id="ldap-test-password" value="" placeholder="Password">
+                <button type="button" id="ldap-test-login" class="btn btn-warning">Test login</button>
+                <span class="help-inline">Loads the LDAP entry for the given user name.</span>
+                <span class="help-block" id="ldap-loginfailure-reason"></span>
+                <div class="well hidden" id="attr-well">
+                    <h3 id="principal"></h3>
+                    <dl id="ldap-entry-attributes">
+                    </dl>
+                </div>
+            </div>
+
+            <div class="form-actions">
+                <button type="submit" class="btn btn-primary">Save</button>
             </div>
         }
     </div>

@@ -58,6 +58,8 @@ POST        /system/users/password/:username                                    
 #LDAP configuration
 GET         /system/ldap                                                             @controllers.LdapController.index()
 POST        /system/ldap                                                             @controllers.LdapController.saveLdapSettings()
+POST        /a/system/ldap/testconnect                                               @controllers.LdapController.apiTestLdapConnection()
+POST        /a/system/ldap/testlogin                                                 @controllers.LdapController.apiTestLdapLogin()
 
 # Systemjobs
 POST        /systemjobs/trigger                                                      @controllers.SystemJobsController.trigger()
