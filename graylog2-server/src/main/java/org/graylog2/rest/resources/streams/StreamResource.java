@@ -167,4 +167,48 @@ public class StreamResource extends RestResource {
         
         return Response.status(Response.Status.fromStatusCode(204)).build();
     }
+
+    @POST @Path("/{streamId}/pause") @Timed
+    @ApiOperation(value = "Pause a stream")
+    @ApiResponses(value = {
+            @ApiResponse(code = 404, message = "Stream not found."),
+            @ApiResponse(code = 400, message = "Invalid or missing Stream id.")
+    })
+    public Response pause(@ApiParam(title = "streamId", required = true) @PathParam("streamId") String streamId) {
+        if (streamId == null || streamId.isEmpty()) {
+            LOG.error("Missing streamId. Returning HTTP 400.");
+            throw new WebApplicationException(400);
+        }
+
+        try {
+            StreamImpl stream = StreamImpl.load(loadObjectId(streamId), core);
+            stream.pause();
+        } catch (NotFoundException e) {
+            throw new WebApplicationException(404);
+        }
+
+        return Response.status(Response.Status.fromStatusCode(204)).build();
+    }
+
+    @POST @Path("/{streamId}/resume") @Timed
+    @ApiOperation(value = "Resume a stream")
+    @ApiResponses(value = {
+            @ApiResponse(code = 404, message = "Stream not found."),
+            @ApiResponse(code = 400, message = "Invalid or missing Stream id.")
+    })
+    public Response resume(@ApiParam(title = "streamId", required = true) @PathParam("streamId") String streamId) {
+        if (streamId == null || streamId.isEmpty()) {
+            LOG.error("Missing streamId. Returning HTTP 400.");
+            throw new WebApplicationException(400);
+        }
+
+        try {
+            StreamImpl stream = StreamImpl.load(loadObjectId(streamId), core);
+            stream.resume();
+        } catch (NotFoundException e) {
+            throw new WebApplicationException(404);
+        }
+
+        return Response.status(Response.Status.fromStatusCode(204)).build();
+    }
 }

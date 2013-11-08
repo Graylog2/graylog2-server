@@ -28,10 +28,7 @@ import org.bson.types.ObjectId;
 import org.graylog2.Core;
 import org.graylog2.database.NotFoundException;
 import org.graylog2.database.Persisted;
-import org.graylog2.database.validators.DateValidator;
-import org.graylog2.database.validators.FilledStringValidator;
-import org.graylog2.database.validators.IntegerValidator;
-import org.graylog2.database.validators.Validator;
+import org.graylog2.database.validators.*;
 import org.graylog2.plugin.streams.StreamRule;
 
 import java.util.ArrayList;
@@ -52,19 +49,6 @@ public class StreamRuleImpl extends Persisted implements StreamRule {
     public static final int TYPE_REGEX = 2;
     public static final int TYPE_GREATER = 3;
     public static final int TYPE_SMALLER = 4;
-
-    private ObjectId objectId = null;
-    private int type = 0;
-    private String value = null;
-    private String field = null;
-    private Boolean inverted = false;
-
-    /*public StreamRuleImpl(DBObject rule) {
-        this.objectId = (ObjectId) rule.get("_id");
-        this.ruleType = (Integer) rule.get("rule_type");
-        this.value = (String) rule.get("value");
-        this.field = (String) rule.get("field");
-    }*/
 
     public StreamRuleImpl(Map<String, Object> fields, Core core) {
         super(core, fields);
@@ -102,17 +86,16 @@ public class StreamRuleImpl extends Persisted implements StreamRule {
     /**
      * @return the objectId
      */
-    @Override
     public ObjectId getObjectId() {
-        return objectId;
+        return (ObjectId) fields.get("_id");
     }
 
     /**
      * @return the ruleType
      */
     @Override
-    public int getType() {
-        return type;
+    public Integer getType() {
+        return (Integer) fields.get("type");
     }
 
     /**
@@ -120,16 +103,24 @@ public class StreamRuleImpl extends Persisted implements StreamRule {
      */
     @Override
     public String getValue() {
-        return value;
+        return (String) fields.get("value");
     }
 
 	@Override
 	public String getField() {
-		return field;
+		return (String) fields.get("field");
 	}
 
     public Boolean getInverted() {
-        return inverted;
+        return (Boolean) fields.get("inverted");
+    }
+
+    public ObjectId getStreamId() {
+        return (ObjectId) fields.get("stream_id");
+    }
+
+    public StreamImpl getStream() throws NotFoundException {
+        return StreamImpl.load(getStreamId(), core);
     }
 
     @Override
@@ -142,6 +133,7 @@ public class StreamRuleImpl extends Persisted implements StreamRule {
             put("type", new IntegerValidator());
             put("value", new FilledStringValidator());
             put("field", new FilledStringValidator());
+            put("stream_id", new ObjectIdValidator());
         }};
     }
 
@@ -155,7 +147,13 @@ public class StreamRuleImpl extends Persisted implements StreamRule {
         Map<String, Object> result = Maps.newHashMap(fields);
         result.remove("_id");
         result.put("id", ((ObjectId) fields.get("_id")).toStringMongod());
+        result.put("stream_id", getStreamId().toStringMongod());
 
         return result;
+    }
+
+    @Override
+    public String toString() {
+        return ("StreamRuleImpl: <" + this.fields.toString() + ">");
     }
 }

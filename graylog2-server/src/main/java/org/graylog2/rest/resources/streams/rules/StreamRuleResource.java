@@ -4,12 +4,11 @@ import com.beust.jcommander.internal.Lists;
 import com.codahale.metrics.annotation.Timed;
 import com.google.common.collect.Maps;
 import org.bson.types.ObjectId;
-import org.graylog2.database.ValidationException;
+import org.graylog2.database.*;
+import org.graylog2.database.NotFoundException;
 import org.graylog2.plugin.streams.Stream;
 import org.graylog2.plugin.streams.StreamRule;
-import org.graylog2.rest.documentation.annotations.Api;
-import org.graylog2.rest.documentation.annotations.ApiOperation;
-import org.graylog2.rest.documentation.annotations.ApiParam;
+import org.graylog2.rest.documentation.annotations.*;
 import org.graylog2.rest.resources.RestResource;
 import org.graylog2.rest.resources.streams.StreamResource;
 import org.graylog2.rest.resources.streams.rules.requests.CreateRequest;
@@ -105,5 +104,32 @@ public class StreamRuleResource extends RestResource {
         result.put("stream_rules", streamRules);
 
         return json(result);
+    }
+
+    @DELETE @Path("/{streamRuleId}") @Timed
+    @ApiOperation(value = "Delete a stream rule")
+    @ApiResponses(value = {
+            @ApiResponse(code = 404, message = "Stream rule not found."),
+            @ApiResponse(code = 400, message = "Invalid ObjectId.")
+    })
+    public Response delete(@ApiParam(title = "streamid", description = "The stream id this new rule belongs to.", required = true) @PathParam("streamid") String streamid,
+                         @ApiParam(title = "streamRuleId", required = true) @PathParam("streamRuleId") String streamRuleId) {
+        if (streamRuleId == null || streamRuleId.isEmpty()) {
+            LOG.error("Missing streamRuleId. Returning HTTP 400.");
+            throw new WebApplicationException(400);
+        }
+
+        try {
+            StreamRuleImpl streamRule = StreamRuleImpl.load(loadObjectId(streamRuleId), core);
+            if (streamRule.getStreamId().toString().equals(streamid)) {
+                streamRule.destroy();
+            } else {
+                throw new NotFoundException();
+            }
+        } catch (org.graylog2.database.NotFoundException e) {
+            throw new WebApplicationException(404);
+        }
+
+        return Response.status(Response.Status.fromStatusCode(204)).build();
     }
 }

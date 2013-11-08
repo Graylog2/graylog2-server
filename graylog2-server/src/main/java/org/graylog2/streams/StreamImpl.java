@@ -96,6 +96,24 @@ public class StreamImpl extends Persisted implements Stream {
     	return streams;
     }
 
+    public void pause() {
+        try {
+            this.fields.put("disabled", true);
+            this.save();
+        } catch (ValidationException e) {
+            LOG.error("Caught exception while saving object: ", e);
+        }
+    }
+
+    public void resume() {
+        try {
+            this.fields.put("disabled", false);
+            this.save();
+        } catch (ValidationException e) {
+            LOG.error("Caught exception while saving object: ", e);
+        }
+    }
+
     public Set<Map<String, String>> getOutputConfigurations(String className) {
     	return null;
     }
@@ -180,6 +198,11 @@ public class StreamImpl extends Persisted implements Stream {
 	public String getTitle() {
 		return (String) fields.get("title");
 	}
+
+    public Boolean isPaused() {
+        Boolean disabled = (Boolean)this.fields.get("disabled");
+        return (disabled != null && disabled);
+    }
 	
 	public Map<String, Object> asMap() {
 		// We work on the result a bit to allow correct JSON serializing.

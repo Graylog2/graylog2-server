@@ -20,11 +20,17 @@
 
 package org.graylog2.streams;
 
+import com.google.common.cache.Cache;
+import com.google.common.cache.CacheBuilder;
+import com.google.common.cache.CacheLoader;
+import com.google.common.cache.LoadingCache;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.graylog2.streams.matchers.StreamRuleMatcher;
 
 import java.util.List;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.TimeUnit;
 
 import com.google.common.collect.Lists;
 import org.graylog2.Core;
@@ -40,10 +46,11 @@ import org.graylog2.plugin.streams.StreamRule;
 public class StreamRouter {
 
     private static final Logger LOG = LoggerFactory.getLogger(StreamRouter.class);
+    private static LoadingCache<String, List<Stream>> cachedStreams;
 
     public List<Stream> route(Core server, Message msg) {
         List<Stream> matches = Lists.newArrayList();
-        List<Stream> streams = StreamImpl.loadAllEnabled(server);
+        List<Stream> streams = getStreams(server);
 
         for (Stream stream : streams) {
             boolean missed = false;
@@ -71,6 +78,28 @@ public class StreamRouter {
         }
 
         return matches;
+    }
+
+    private List<Stream> getStreams(final Core server) {
+        if (cachedStreams == null)
+            cachedStreams = CacheBuilder.newBuilder()
+                    .maximumSize(1)
+                    .expireAfterWrite(1, TimeUnit.SECONDS)
+                    .build(
+                            new CacheLoader<String, List<Stream>>() {
+                                @Override
+                                public List<Stream> load(String s) throws Exception {
+                                    return StreamImpl.loadAllEnabled(server);
+                                }
+                            }
+                    );
+        List<Stream> result = null;
+        try {
+            result = cachedStreams.get("streams");
+        } catch (ExecutionException e) {
+            LOG.error("Caught exception while fetching from cache", e);
+        }
+        return result;
     }
 
     public boolean matchStreamRule(Message msg, StreamRuleMatcher matcher, StreamRule rule) {
