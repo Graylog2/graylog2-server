@@ -37,13 +37,13 @@ public class FieldHistogramResponse extends HistogramResponse {
      *
      * @return A JSON map representation of the result, suitable for Rickshaw data graphing.
      */
-    public List<Map<String, Object>> getFormattedResults() {
+    public List<Map<String, Object>> getFormattedResults(String value) {
         List<Map<String, Object>> points = Lists.newArrayList();
 
         for (Map.Entry<String, Map<String, Object>> result : results.entrySet()) {
             Map<String, Object> point = Maps.newHashMap();
             point.put("x", Long.parseLong(result.getKey()));
-            point.put("y", result.getValue().get("mean"));
+            point.put("y", result.getValue().get(value));
 
             points.add(point);
         }

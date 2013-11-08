@@ -124,7 +124,7 @@ public class SearchApiController extends AuthenticatedController {
     }
 
 
-    public Result fieldHistogram(String q, String field, String rangeType, int relative, String from, String to, String keyword, String interval) {
+    public Result fieldHistogram(String q, String field, String rangeType, int relative, String from, String to, String keyword, String interval, String valueType) {
         if (q == null || q.isEmpty()) {
             q = "*";
         }
@@ -151,7 +151,7 @@ public class SearchApiController extends AuthenticatedController {
             Map<String, Object> result = Maps.newHashMap();
             result.put("time", histo.time);
             result.put("interval", histo.interval);
-            result.put("values", histo.getFormattedResults());
+            result.put("values", histo.getFormattedResults(valueType));
 
             return ok(new Gson().toJson(result)).as("application/json");
         } catch (IOException e) {

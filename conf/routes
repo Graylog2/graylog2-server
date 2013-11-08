@@ -77,7 +77,7 @@ POST        /dashboards/:id/delete                                              
 # API: Search (i.e. facets)
 GET         /a/search/fieldstats                                                     @controllers.api.SearchApiController.fieldStats(q ?= "", field ?= "", rangetype ?= "", relative:Integer ?= -1, from ?= "", to ?= "", keyword ?= "")
 GET         /a/search/fieldterms                                                     @controllers.api.SearchApiController.fieldTerms(q ?= "", field ?= "", rangetype ?= "", relative:Integer ?= -1, from ?= "", to ?= "", keyword ?= "")
-GET         /a/search/fieldhistogram                                                 @controllers.api.SearchApiController.fieldHistogram(q ?= "", field ?= "", rangetype ?= "", relative:Integer ?= -1, from ?= "", to ?= "", keyword ?= "", interval ?= "")
+GET         /a/search/fieldhistogram                                                 @controllers.api.SearchApiController.fieldHistogram(q ?= "", field ?= "", rangetype ?= "", relative:Integer ?= -1, from ?= "", to ?= "", keyword ?= "", interval ?= "", valueType ?= "")
 
 # API: Message counts and histograms
 GET         /a/messagecounts/histogram                                               @controllers.MessageCountsController.histogram(timerange ?= "")

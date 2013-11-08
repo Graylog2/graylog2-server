@@ -337,6 +337,10 @@ $(document).ready(function() {
             opts.renderer = "bar";
         }
 
+        if (opts.valuetype == undefined) {
+            opts.valuetype = "mean";
+        }
+
         var rangeType = $("#universalsearch-rangetype-permanent").text().trim();
         var query = $("#universalsearch-query-permanent").text().trim();
 
@@ -344,7 +348,8 @@ $(document).ready(function() {
             "rangetype": rangeType,
             "q": query,
             "field": field,
-            "interval": opts.interval
+            "interval": opts.interval,
+            "valueType": opts.valuetype
         }
 
         switch(rangeType) {
@@ -387,6 +392,9 @@ $(document).ready(function() {
                 template.attr("data-config-interval", opts.interval);
                 template.attr("data-config-interpolation", opts.interpolation);
                 template.attr("data-config-renderer", opts.renderer);
+                template.attr("data-config-valuetype", opts.valuetype)
+
+                $(".type-description", template).text("(" + opts.valuetype + ")");
 
                 $("#field-graphs").append(template);
 
@@ -449,6 +457,9 @@ $(document).ready(function() {
 
                 $(".field-graph-container ul.type-selector li a").removeClass("selected");
                 $('.field-graph-container ul.type-selector li a[data-type="' + opts.renderer + '"]').addClass("selected");
+
+                $(".field-graph-container ul.valuetype-selector li a").removeClass("selected");
+                $('.field-graph-container ul.valuetype-selector li a[data-type="' + opts.valuetype + '"]').addClass("selected");
 
                 fieldGraphs[field] = graph;
             },
@@ -517,17 +528,43 @@ $(document).ready(function() {
         var field = $(this).closest("ul").attr("data-field");
         var graphContainer = $('.field-graph-container[data-field="' + field + '"]', $("#field-graphs"));
 
+        var interval = $(this).attr("data-type");
+
         renderFieldChart(field, {
-            interval: $(this).attr("data-type"),
+            interval: interval,
             renderer: graphContainer.attr("data-config-renderer"),
-            interpolation: graphContainer.attr("data-config-interpolation")
+            interpolation: graphContainer.attr("data-config-interpolation"),
+            valuetype:  graphContainer.attr("data-config-valuetype")
         });
+
+        graphContainer.attr("data-config-interval", interval);
 
         $("a", $(this).closest("ul")).removeClass("selected");
         $(this).addClass("selected");
     });
 
-    // Changing interval of value graphs.
+    // Changing value type of value graphs.
+    $(".field-graph-container ul.valuetype-selector li a").live("click", function(e) {
+        e.preventDefault();
+        var field = $(this).closest("ul").attr("data-field");
+        var graphContainer = $('.field-graph-container[data-field="' + field + '"]', $("#field-graphs"));
+
+        var valuetype = $(this).attr("data-type");
+
+        renderFieldChart(field, {
+            interval: graphContainer.attr("data-config-interval"),
+            renderer: graphContainer.attr("data-config-renderer"),
+            interpolation: graphContainer.attr("data-config-interpolation"),
+            valuetype: valuetype
+        });
+
+        graphContainer.attr("data-config-valuetype", valuetype);
+
+        $("a", $(this).closest("ul")).removeClass("selected");
+        $(this).addClass("selected");
+    });
+
+    // Removing a value graph.
     $(".field-graph-container li a.hide").live("click", function(e) {
         e.preventDefault();
         var field = $(this).closest("ul").attr("data-field");

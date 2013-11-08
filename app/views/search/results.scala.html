@@ -90,7 +90,7 @@
         <h3>
             <i class="icon icon-ellipsis-vertical"></i>
             <span class="title"></span>
-            <span class="type-description">(mean)</span>
+            <span class="type-description"></span>
 
             <div class="btn-group graph-settings">
                 <a data-toggle="dropdown" href="#">
@@ -98,6 +98,18 @@
                 </a>
 
                 <ul class="dropdown-menu">
+                    <li class="dropdown-submenu">
+                        <a href="#">Value</a>
+
+                        <ul class="dropdown-menu valuetype-selector">
+                            <li><a href="#" class="selected" data-type="mean">mean</a></li>
+                            <li><a href="#" data-type="max">maximum</a></li>
+                            <li><a href="#" data-type="min">minimum</a></li>
+                            <li><a href="#" data-type="total">total</a></li>
+                            <li><a href="#" data-type="count">count</a></li>
+                        </ul>
+                    </li>
+
                     <li class="dropdown-submenu">
                         <a href="#">Type</a>
 
