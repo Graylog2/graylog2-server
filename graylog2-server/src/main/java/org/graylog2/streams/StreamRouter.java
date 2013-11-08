@@ -20,13 +20,13 @@
 
 package org.graylog2.streams;
 
-import com.beust.jcommander.internal.Maps;
 import com.codahale.metrics.Meter;
 import com.codahale.metrics.MetricRegistry;
 import com.codahale.metrics.Timer;
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
+import com.google.common.collect.Maps;
 import org.bson.types.ObjectId;
 import org.graylog2.plugin.GraylogServer;
 import org.slf4j.Logger;

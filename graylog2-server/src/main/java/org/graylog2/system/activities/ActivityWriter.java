@@ -19,7 +19,7 @@
  */
 package org.graylog2.system.activities;
 
-import com.beust.jcommander.internal.Maps;
+import com.google.common.collect.Maps;
 import org.graylog2.Core;
 import org.graylog2.database.ValidationException;
 import org.graylog2.plugin.Tools;

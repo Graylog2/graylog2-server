@@ -20,9 +20,6 @@
 
 package org.graylog2.filters;
 
-import com.beust.jcommander.internal.Maps;
-import com.codahale.metrics.Meter;
-import com.codahale.metrics.MetricRegistry;
 import org.graylog2.Core;
 import org.graylog2.plugin.GraylogServer;
 import org.graylog2.plugin.filters.MessageFilter;
@@ -33,7 +30,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.List;
-import java.util.Map;
 
 /**
  * @author Lennart Koopmann <lennart@socketfeed.com>
