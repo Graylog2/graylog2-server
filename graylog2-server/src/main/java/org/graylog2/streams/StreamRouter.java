@@ -20,15 +20,21 @@
 
 package org.graylog2.streams;
 
-import com.google.common.cache.Cache;
+import com.beust.jcommander.internal.Maps;
+import com.codahale.metrics.Meter;
+import com.codahale.metrics.MetricRegistry;
+import com.codahale.metrics.Timer;
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
+import org.bson.types.ObjectId;
+import org.graylog2.plugin.GraylogServer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.graylog2.streams.matchers.StreamRuleMatcher;
 
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 
@@ -47,19 +53,28 @@ public class StreamRouter {
 
     private static final Logger LOG = LoggerFactory.getLogger(StreamRouter.class);
     private static LoadingCache<String, List<Stream>> cachedStreams;
+    private static LoadingCache<ObjectId, List<StreamRule>> cachedStreamRules;
+
+    private final Map<String, Meter> streamIncomingMeters = Maps.newHashMap();
+    private final Map<String, Timer> streamExecutionTimers = Maps.newHashMap();
 
     public List<Stream> route(Core server, Message msg) {
         List<Stream> matches = Lists.newArrayList();
         List<Stream> streams = getStreams(server);
 
         for (Stream stream : streams) {
+            Timer timer = getExecutionTimer(stream.getId().toStringMongod(), server);
+            final Timer.Context timerContext = timer.time();
+
             boolean missed = false;
 
-            if (stream.getStreamRules().isEmpty()) {
+            List<StreamRule> streamRules = getStreamRules(stream.getId(), server);
+
+            if (streamRules.isEmpty()) {
                 continue;
             }
 
-            for (StreamRule rule : stream.getStreamRules()) {
+            for (StreamRule rule : streamRules) {
                 try {
                     StreamRuleMatcher matcher = StreamRuleMatcherFactory.build(rule.getType());
                     if (!matchStreamRule(msg, matcher, rule)) {
@@ -73,8 +88,10 @@ public class StreamRouter {
 
             // All rules were matched.
             if (!missed) {
+                getIncomingMeter(stream.getId().toStringMongod(), server).mark();
                 matches.add(stream);
             }
+            timerContext.close();
         }
 
         return matches;
@@ -102,6 +119,28 @@ public class StreamRouter {
         return result;
     }
 
+    private List<StreamRule> getStreamRules(ObjectId streamId, final Core server) {
+        if (cachedStreamRules == null)
+            cachedStreamRules = CacheBuilder.newBuilder()
+                    .expireAfterWrite(1, TimeUnit.SECONDS)
+                    .build(
+                            new CacheLoader<ObjectId, List<StreamRule>>() {
+                                @Override
+                                public List<StreamRule> load(ObjectId s) throws Exception {
+                                    return StreamRuleImpl.findAllForStream(s, server);
+                                }
+                            }
+                    );
+        List<StreamRule> result = null;
+        try {
+            result = cachedStreamRules.get(streamId);
+        } catch (ExecutionException e) {
+            LOG.error("Caught exception while fetching from cache", e);
+        }
+
+        return result;
+    }
+
     public boolean matchStreamRule(Message msg, StreamRuleMatcher matcher, StreamRule rule) {
         try {
             return matcher.match(msg, rule);
@@ -109,6 +148,26 @@ public class StreamRouter {
             LOG.warn("Could not match stream rule <" + rule.getType() + "/" + rule.getValue() + ">: " + e.getMessage(), e);
             return false;
         }
+    }
+
+    protected Meter getIncomingMeter(String streamId, GraylogServer server) {
+        Meter meter = this.streamIncomingMeters.get(streamId);
+        if (meter == null) {
+            meter = server.metrics().meter(MetricRegistry.name(Stream.class, streamId, "incomingMessages"));
+            this.streamIncomingMeters.put(streamId, meter);
+        }
+
+        return meter;
+    }
+
+    protected Timer getExecutionTimer(String streamId, GraylogServer server) {
+        Timer timer = this.streamExecutionTimers.get(streamId);
+        if (timer == null) {
+            timer = server.metrics().timer(MetricRegistry.name(Stream.class, streamId, "executionTime"));
+            this.streamExecutionTimers.put(streamId, timer);
+        }
+
+        return timer;
     }
 
 }
