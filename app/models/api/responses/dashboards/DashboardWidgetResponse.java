@@ -30,6 +30,7 @@ public class DashboardWidgetResponse {
 
     public String id;
     public String type;
+    public String description;
 
     @SerializedName("creator_user_id")
     public String creatorUserId;

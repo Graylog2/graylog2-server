@@ -1278,7 +1278,7 @@ table#users-list td.centered {
     text-align: center;
     font-size: 70px;
     position: relative;
-    top: 12px;
+    top: 20px;
 }
 
 .dashboard .widget .search-result-count .icon {
@@ -1291,10 +1291,20 @@ table#users-list td.centered {
 
 .dashboard .widget .search-result-count .title {
     font-size: 16px;
-    margin-top: 20px;
+    margin-top: 35px;
     text-align: center;
 }
 
 .dashboard .widget .controls {
     display: none;
+}
+
+.dashboard .widget .edit-description {
+    display: none;
+    color: #0085A7 !important;
+    font-size: 12px;
+}
+
+.dashboard .widget .edit-description .icon {
+    color: #0085A7 !important;
 }

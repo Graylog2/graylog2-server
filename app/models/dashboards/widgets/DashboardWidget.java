@@ -42,15 +42,13 @@ public abstract class DashboardWidget {
 
     private final Type type;
     private final String id;
+    private final String description;
     private final Dashboard dashboard;
 
-    protected DashboardWidget(Type type, Dashboard dashboard) {
-        this(type, null, dashboard);
-    }
-
-    protected DashboardWidget(Type type, String id, Dashboard dashboard) {
+    protected DashboardWidget(Type type, String id, String description, Dashboard dashboard) {
         this.type = type;
         this.id = id;
+        this.description = description;
         this.dashboard = dashboard;
     }
 
@@ -60,6 +58,10 @@ public abstract class DashboardWidget {
 
     public String getId() {
         return id;
+    }
+
+    public String getDescription() {
+        return (description == null ? "Description" : description);
     }
 
     public Dashboard getDashboard() {
@@ -88,6 +90,7 @@ public abstract class DashboardWidget {
                 return new SearchResultCountWidget(
                         dashboard,
                         w.id,
+                        w.description,
                         (String) w.config.get("query"),
                         TimeRange.factory((Map<String, Object>) w.config.get("timerange"))
                 );

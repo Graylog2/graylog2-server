@@ -34,11 +34,11 @@ public class SearchResultCountWidget extends DashboardWidget {
     private final TimeRange timerange;
 
     public SearchResultCountWidget(Dashboard dashboard, String query, TimeRange timerange) {
-        this(dashboard, null, query, timerange);
+        this(dashboard, null, null, query, timerange);
     }
 
-    public SearchResultCountWidget(Dashboard dashboard, String id, String query, TimeRange timerange) {
-        super(Type.SEARCH_RESULT_COUNT, id, dashboard);
+    public SearchResultCountWidget(Dashboard dashboard, String id, String description, String query, TimeRange timerange) {
+        super(Type.SEARCH_RESULT_COUNT, id, description, dashboard);
 
         this.query = query;
         this.timerange = timerange;
