@@ -26,7 +26,6 @@ import org.bson.types.ObjectId;
 import org.graylog2.dashboards.Dashboard;
 import org.graylog2.dashboards.widgets.DashboardWidget;
 import org.graylog2.database.*;
-import org.graylog2.database.NotFoundException;
 import org.graylog2.indexer.searches.timeranges.InvalidRangeParametersException;
 import org.graylog2.rest.documentation.annotations.*;
 import org.graylog2.rest.resources.RestResource;
@@ -151,6 +150,7 @@ public class DashboardsResource extends RestResource {
 
         try {
             Dashboard dashboard = Dashboard.load(loadObjectId(dashboardId), core);
+            core.dashboards().remove(dashboardId);
             dashboard.destroy();
 
             String msg = "Deleted dashboard <" + dashboard.getId() + ">. Reason: REST request.";
@@ -190,12 +190,15 @@ public class DashboardsResource extends RestResource {
         DashboardWidget widget;
         try {
             widget = DashboardWidget.fromRequest(core, awr);
-            Dashboard dashboard = Dashboard.load(new ObjectId(dashboardId), core);
+
+            Dashboard dashboard = core.dashboards().get(dashboardId);
+
+            if (dashboard == null) {
+                LOG.error("Dashboard not found.");
+                throw new WebApplicationException(404);
+            }
 
             dashboard.addWidget(widget);
-        } catch(NotFoundException e) {
-            LOG.error("Dashboard not found.", e);
-            throw new WebApplicationException(e, Response.Status.NOT_FOUND);
         } catch (ValidationException e1) {
             LOG.error("Validation error.", e1);
             throw new WebApplicationException(e1, Response.Status.BAD_REQUEST);
@@ -237,13 +240,13 @@ public class DashboardsResource extends RestResource {
             throw new WebApplicationException(400);
         }
 
-        try {
-            Dashboard dashboard = Dashboard.load(new ObjectId(dashboardId), core);
-            dashboard.removeWidget(widgetId);
-        } catch(NotFoundException e) {
-            LOG.error("Dashboard not found.", e);
-            throw new WebApplicationException(e, Response.Status.NOT_FOUND);
+        Dashboard dashboard = core.dashboards().get(dashboardId);
+
+        if (dashboard == null) {
+            LOG.error("Dashboard not found.");
+            throw new WebApplicationException(404);
         }
+        dashboard.removeWidget(widgetId);
 
         String msg = "Deleted widget <" + widgetId + "> from dashboard <" + dashboardId + ">. Reason: REST request.";
         LOG.info(msg);
