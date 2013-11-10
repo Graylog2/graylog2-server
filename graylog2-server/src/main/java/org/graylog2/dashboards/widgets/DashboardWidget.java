@@ -53,15 +53,17 @@ public abstract class DashboardWidget implements EmbeddedPersistable {
     private final String id;
     private final Map<String, Object> config;
     private final String creatorUserId;
+    private String description;
 
     private final Cache<String, ComputationResult> cache;
 
-    protected DashboardWidget(Core core, Type type, String id, Map<String, Object> config, String creatorUserId) {
+    protected DashboardWidget(Core core, Type type, String id, String description, Map<String, Object> config, String creatorUserId) {
         this.core = core;
         this.type =  type;
         this.id = id;
         this.config = config;
         this.creatorUserId = creatorUserId;
+        this.description = description;
 
         this.cache = CacheBuilder.newBuilder()
                 .maximumSize(1)
@@ -100,7 +102,7 @@ public abstract class DashboardWidget implements EmbeddedPersistable {
 
         switch (type) {
             case SEARCH_RESULT_COUNT:
-                return new SearchResultCountWidget(core, id, awr.config, (String) awr.config.get("query"), timeRange, awr.creatorUserId);
+                return new SearchResultCountWidget(core, id, null, awr.config, (String) awr.config.get("query"), timeRange, awr.creatorUserId);
             default:
                 throw new NoSuchWidgetTypeException();
         }
@@ -140,9 +142,15 @@ public abstract class DashboardWidget implements EmbeddedPersistable {
             throw new InvalidRangeParametersException("range_type not recognized");
         }
 
+        // Is a description set?
+        String description = null;
+        if (fields.containsField("description")) {
+            description = (String) fields.get("description");
+        }
+
         switch (type) {
             case SEARCH_RESULT_COUNT:
-                return new SearchResultCountWidget(core, (String) fields.get("id"), config, (String) config.get("query"), timeRange, (String) fields.get("creator_user_id"));
+                return new SearchResultCountWidget(core, (String) fields.get("id"), description, config, (String) config.get("query"), timeRange, (String) fields.get("creator_user_id"));
             default:
                 throw new NoSuchWidgetTypeException();
         }
@@ -154,6 +162,14 @@ public abstract class DashboardWidget implements EmbeddedPersistable {
 
     public String getId() {
         return id;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
     }
 
     public Map<String, Object> getConfig() {
@@ -168,6 +184,7 @@ public abstract class DashboardWidget implements EmbeddedPersistable {
         return new HashMap<String, Object>() {{
             put("id", id);
             put("type", type.toString().toLowerCase());
+            put("description", description);
             put("creator_user_id", creatorUserId);
             put("config", getPersistedConfig());
         }};

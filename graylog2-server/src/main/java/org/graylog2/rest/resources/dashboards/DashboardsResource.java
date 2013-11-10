@@ -32,6 +32,7 @@ import org.graylog2.rest.documentation.annotations.*;
 import org.graylog2.rest.resources.RestResource;
 import org.graylog2.rest.resources.dashboards.requests.AddWidgetRequest;
 import org.graylog2.rest.resources.dashboards.requests.CreateRequest;
+import org.graylog2.rest.resources.dashboards.requests.UpdateWidgetRequest;
 import org.graylog2.system.activities.Activity;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
@@ -287,11 +288,62 @@ public class DashboardsResource extends RestResource {
         }
     }
 
-    /*
-     * TODO:
-     *  - restrict non-GET to master, connect to master only in ApiClient for non-GET
-     *  - return results via REST
-     *  - widget metrics. identify intensive widgets easily
-     */
+    @PUT @Timed
+    @ApiOperation(value = "Update description of a widget")
+    @Path("/{dashboardId}/widgets/{widgetId}/description")
+    @ApiResponses(value = {
+            @ApiResponse(code = 404, message = "Dashboard not found."),
+            @ApiResponse(code = 404, message = "Widget not found."),
+            @ApiResponse(code = 403, message = "Request must be performed against master node.")
+    })
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response updateDescription(
+            @ApiParam(title = "JSON body", required = true) String body,
+            @ApiParam(title = "dashboardId", required = true) @PathParam("dashboardId") String dashboardId,
+            @ApiParam(title = "widgetId", required = true) @PathParam("widgetId") String widgetId) {
+        restrictToMaster();
+
+        UpdateWidgetRequest uwr;
+        try {
+            uwr = objectMapper.readValue(body, UpdateWidgetRequest.class);
+        } catch(IOException e) {
+            LOG.error("Error while parsing JSON", e);
+            throw new WebApplicationException(e, Response.Status.BAD_REQUEST);
+        }
+
+        if (dashboardId == null || dashboardId.isEmpty()) {
+            LOG.error("Missing dashboard ID. Returning HTTP 400.");
+            throw new WebApplicationException(400);
+        }
+
+        if (widgetId == null || widgetId.isEmpty()) {
+            LOG.error("Missing widget ID. Returning HTTP 400.");
+            throw new WebApplicationException(400);
+        }
+
+        try {
+            Dashboard dashboard = core.dashboards().get(dashboardId);
+
+            if (dashboard == null) {
+                LOG.error("Dashboard not found.");
+                throw new WebApplicationException(404);
+            }
+
+            DashboardWidget widget = dashboard.getWidget(widgetId);
+
+            if (widget == null) {
+                LOG.error("Widget not found.");
+                throw new WebApplicationException(404);
+            }
+
+            dashboard.updateWidgetDescription(widget, uwr.description);
+        } catch (ValidationException e) {
+            LOG.error("Validation error.", e);
+            throw new WebApplicationException(e, Response.Status.BAD_REQUEST);
+        }
+
+        LOG.info("Updated description of widget <" + widgetId + "> on dashboard <" + dashboardId + ">. Reason: REST request.");
+        return Response.status(Response.Status.OK).build();
+    }
 
 }

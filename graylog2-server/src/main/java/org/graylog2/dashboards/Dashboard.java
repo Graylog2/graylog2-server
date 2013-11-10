@@ -128,6 +128,13 @@ public class Dashboard extends Persisted {
         return widgets.get(widgetId);
     }
 
+    public void updateWidgetDescription(DashboardWidget widget, String newDescription) throws ValidationException {
+        // Updating objects in arrays is a bit flaky in MongoDB. Let'S go the simple and stupid way until weh ave a proper DBA layer.
+        widget.setDescription(newDescription);
+        removeWidget(widget.getId());
+        addWidget(widget);
+    }
+
     @Override
     protected Map<String, Validator> getValidations() {
         return new HashMap<String, Validator>() {{
