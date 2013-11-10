@@ -106,6 +106,52 @@ $(document).ready(function() {
         $(".unlock-dashboard-widgets").show();
     });
 
+    $(".dashboard .widget .edit-description").on("click", function() {
+        var widget = $(this).closest(".widget");
+
+        $(".description", widget).hide();
+        $(".description-form", widget).show();
+    });
+
+    $(".dashboard .widget .description-form input").on("keyup", function() {
+        var widget = $(this).closest(".widget");
+
+        if ($(this).val().length > 0) {
+            $("button.update-description", widget).prop("disabled", false);
+        } else {
+            $("button.update-description", widget).prop("disabled", true);
+        }
+    });
+
+    $("button.update-description").on("click", function() {
+        var widget = $(this).closest(".widget");
+        var dashboardId = widget.attr("data-dashboard-id");
+        var widgetId = widget.attr("data-widget-id");
+
+        var newVal = $(".description-value", widget).val().trim();
+
+        $.ajax({
+            url: '/a/dashboards/' + dashboardId + '/widgets/' + widgetId + '/description',
+            data: {
+                description: newVal
+            },
+            type: 'POST',
+            success: function(data) {
+                $(".description .title", widget).text(newVal);
+                $(".description", widget).show();
+                $(".description-form", widget).hide();
+                $(".description", widget).show();
+
+                showSuccess("Widget description updated!")
+            },
+            error: function(data) {
+                showError("Could not update widget description.")
+            },
+            complete: function(data) {
+            }
+        });
+    });
+
     // Periodically poll every widget.
     (function updateDashboardWidgets() {
         var interval = 1000;

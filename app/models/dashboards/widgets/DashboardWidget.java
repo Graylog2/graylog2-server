@@ -23,6 +23,7 @@ import lib.APIException;
 import lib.ApiClient;
 import lib.timeranges.InvalidRangeParametersException;
 import lib.timeranges.TimeRange;
+import models.api.requests.dashboards.WidgetUpdateRequest;
 import models.api.responses.dashboards.DashboardWidgetResponse;
 import models.api.responses.dashboards.DashboardWidgetValueResponse;
 import models.dashboards.Dashboard;
@@ -74,7 +75,16 @@ public abstract class DashboardWidget {
                     .execute();
     }
 
+    public void updateDescription(ApiClient api, String newDescription) throws APIException, IOException {
+        WidgetUpdateRequest wur = new WidgetUpdateRequest();
+        wur.description = newDescription;
 
+        api.put().path("/dashboards/{0}/widgets/{1}/description", dashboard.getId(), id)
+                .onlyMasterNode()
+                .body(wur)
+                .onlyMasterNode()
+                .execute();
+    }
 
     public static DashboardWidget factory(Dashboard dashboard, DashboardWidgetResponse w) throws NoSuchWidgetTypeException, InvalidRangeParametersException {
         Type type;

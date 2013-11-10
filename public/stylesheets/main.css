@@ -1308,3 +1308,7 @@ table#users-list td.centered {
 .dashboard .widget .edit-description .icon {
     color: #0085A7 !important;
 }
+
+.dashboard .widget .description-form {
+    display: none;
+}

@@ -152,4 +152,26 @@ public class DashboardsApiController extends AuthenticatedController {
         }
     }
 
+    public Result updateWidgetDescription(String dashboardId, String widgetId) {
+        String newDescription = flattenFormUrlEncoded(request().body().asFormUrlEncoded()).get("description");
+
+        if (newDescription == null || newDescription.trim().isEmpty()) {
+            return badRequest();
+        }
+
+        try {
+            Dashboard dashboard = dashboardService.get(dashboardId);
+            DashboardWidget widget = dashboard.getWidget(widgetId);
+
+            widget.updateDescription(api(), newDescription.trim());
+
+            return ok().as("application/json");
+        } catch (APIException e) {
+            String message = "Could not get widget. We expected HTTP 200, but got a HTTP " + e.getHttpCode() + ".";
+            return status(504, views.html.errors.error.render(message, e, request()));
+        } catch (IOException e) {
+            return status(504, views.html.errors.error.render(ApiClient.ERROR_MSG_IO, e, request()));
+        }
+    }
+
 }
