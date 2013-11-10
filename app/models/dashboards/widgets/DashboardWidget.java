@@ -26,7 +26,6 @@ import lib.timeranges.TimeRange;
 import models.api.responses.dashboards.DashboardWidgetResponse;
 import models.api.responses.dashboards.DashboardWidgetValueResponse;
 import models.dashboards.Dashboard;
-import play.mvc.Http;
 
 import java.io.IOException;
 import java.util.Map;
