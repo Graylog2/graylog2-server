@@ -14,8 +14,6 @@
     <h1>@dashboard.getTitle</h1>
     @dashboard.getDescription (Unlock widget positions by clicking on the lock symbol on the top right. Then drag them to any position you like.)
 
-
-
     <div class="dashboard">
         <div class="gridster">
             <ul>
@@ -29,7 +27,17 @@
 
                         <div class="pull-right widget-top info">
                             <span class="reloading">&middot;</span>
-                            <span class="cache-info"></span>
+                            <span class="calculated-at hidden-unlocked"></span>
+                            <span class="cache-info only-unlocked">
+                                <span class="cache-time">
+                                    <span class="cache-time-value">@widget.getCacheTime</span>
+                                    seconds cached
+                                </span>
+
+                                <a href="#" class="edit-cache-time">
+                                    <i class="icon icon-edit"></i>
+                                </a>
+                            </span>
                         </div>
 
                         @if(widget.getType.equals(models.dashboards.widgets.DashboardWidget.Type.SEARCH_RESULT_COUNT)) {
@@ -45,4 +53,25 @@
         <br style="clear: both;" />
     </div>
 
+
+    <div id="dashboardwidget-cache-time" class="modal hide fade" tabindex="-1" role="dialog">
+        <div class="modal-header">
+            <button type="button" class="close" data-dismiss="modal">x</button>
+            <h2>Change widget cache time</h2>
+            Every widget has a configured cache time. Increasing this cache time leads to less
+            search load in the cluster. (minimum is 1 second)
+        </div>
+
+        <div class="modal-body">
+            <div class="input-prepend input-append">
+                <span class="add-on">Seconds:</span>
+                <input type="text" class="input-mini cachetime-value" />
+                <button class="btn btn-success update-cachetime">Update</button>
+            </div>
+        </div>
+
+        <div class="modal-footer">
+            <button class="btn" data-dismiss="modal" aria-hidden="true">Close</button>
+        </div>
+    </div>
 }

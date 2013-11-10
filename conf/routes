@@ -118,7 +118,8 @@ GET         /a/dashboards                                                       
 GET         /a/dashboards/:dashboard_id/widgets/:widget_id/value                     @controllers.api.DashboardsApiController.widgetValue(dashboard_id: String, widget_id: String)
 POST        /a/dashboards/:dashboard_id/widgets                                      @controllers.api.DashboardsApiController.addWidget(dashboard_id: String)
 POST        /a/dashboards/:dashboard_id/widgets/:widget_id/delete                    @controllers.api.DashboardsApiController.removeWidget(dashboard_id: String, widget_id: String)
-POST        /a/dashboards/:dashboard_id/widgets/:widget_id/description                @controllers.api.DashboardsApiController.updateWidgetDescription(dashboard_id: String, widget_id: String)
+POST        /a/dashboards/:dashboard_id/widgets/:widget_id/description               @controllers.api.DashboardsApiController.updateWidgetDescription(dashboard_id: String, widget_id: String)
+POST        /a/dashboards/:dashboard_id/widgets/:widget_id/cachetime                 @controllers.api.DashboardsApiController.updateWidgetCacheTime(dashboard_id: String, widget_id: String)
 
 # Map static resources from the /public folder to the /assets URL path
 GET         /assets/*file                                                            controllers.Assets.at(path="/public", file)

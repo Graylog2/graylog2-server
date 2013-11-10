@@ -19,6 +19,7 @@
  */
 package models.api.requests.dashboards;
 
+import com.google.gson.annotations.SerializedName;
 import models.api.requests.ApiRequest;
 
 /**
@@ -27,5 +28,8 @@ import models.api.requests.ApiRequest;
 public class WidgetUpdateRequest extends ApiRequest {
 
     public String description;
+
+    @SerializedName("cache_time")
+    public int cacheTime;
 
 }

@@ -32,6 +32,9 @@ public class DashboardWidgetResponse {
     public String type;
     public String description;
 
+    @SerializedName("cache_time")
+    public int cacheTime;
+
     @SerializedName("creator_user_id")
     public String creatorUserId;
 

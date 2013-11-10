@@ -44,12 +44,14 @@ public abstract class DashboardWidget {
     private final String id;
     private final String description;
     private final Dashboard dashboard;
+    private final int cacheTime;
 
-    protected DashboardWidget(Type type, String id, String description, Dashboard dashboard) {
+    protected DashboardWidget(Type type, String id, String description, int cacheTime, Dashboard dashboard) {
         this.type = type;
         this.id = id;
         this.description = description;
         this.dashboard = dashboard;
+        this.cacheTime = cacheTime;
     }
 
     public Type getType() {
@@ -68,6 +70,10 @@ public abstract class DashboardWidget {
         return dashboard;
     }
 
+    public int getCacheTime() {
+        return cacheTime;
+    }
+
     public DashboardWidgetValueResponse getValue(ApiClient api) throws APIException, IOException {
         return api.get(DashboardWidgetValueResponse.class)
                     .path("/dashboards/{0}/widgets/{1}/value", dashboard.getId(), id)
@@ -80,7 +86,16 @@ public abstract class DashboardWidget {
         wur.description = newDescription;
 
         api.put().path("/dashboards/{0}/widgets/{1}/description", dashboard.getId(), id)
+                .body(wur)
                 .onlyMasterNode()
+                .execute();
+    }
+
+    public void updateCacheTime(ApiClient api, int cacheTime) throws APIException, IOException {
+        WidgetUpdateRequest wur = new WidgetUpdateRequest();
+        wur.cacheTime = cacheTime;
+
+        api.put().path("/dashboards/{0}/widgets/{1}/cachetime", dashboard.getId(), id)
                 .body(wur)
                 .onlyMasterNode()
                 .execute();
@@ -100,6 +115,7 @@ public abstract class DashboardWidget {
                         dashboard,
                         w.id,
                         w.description,
+                        w.cacheTime,
                         (String) w.config.get("query"),
                         TimeRange.factory((Map<String, Object>) w.config.get("timerange"))
                 );

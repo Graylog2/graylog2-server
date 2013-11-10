@@ -1312,3 +1312,7 @@ table#users-list td.centered {
 .dashboard .widget .description-form {
     display: none;
 }
+
+.dashboard .widget .info .cache-info {
+    display: none;
+}

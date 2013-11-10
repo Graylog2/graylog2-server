@@ -174,4 +174,33 @@ public class DashboardsApiController extends AuthenticatedController {
         }
     }
 
+    public Result updateWidgetCacheTime(String dashboardId, String widgetId) {
+        String newCacheTimeS = flattenFormUrlEncoded(request().body().asFormUrlEncoded()).get("cacheTime");
+
+        if (newCacheTimeS == null) {
+            return badRequest();
+        }
+
+        int newCacheTime;
+        try {
+            newCacheTime = Integer.parseInt(newCacheTimeS);
+        } catch (NumberFormatException e) {
+            return badRequest();
+        }
+
+        try {
+            Dashboard dashboard = dashboardService.get(dashboardId);
+            DashboardWidget widget = dashboard.getWidget(widgetId);
+
+            widget.updateCacheTime(api(), newCacheTime);
+
+            return ok().as("application/json");
+        } catch (APIException e) {
+            String message = "Could not get widget. We expected HTTP 200, but got a HTTP " + e.getHttpCode() + ".";
+            return status(504, views.html.errors.error.render(message, e, request()));
+        } catch (IOException e) {
+            return status(504, views.html.errors.error.render(ApiClient.ERROR_MSG_IO, e, request()));
+        }
+    }
+
 }
