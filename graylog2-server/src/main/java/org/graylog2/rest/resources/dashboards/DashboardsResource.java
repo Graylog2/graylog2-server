@@ -349,4 +349,63 @@ public class DashboardsResource extends RestResource {
         return Response.status(Response.Status.OK).build();
     }
 
+    @PUT @Timed
+    @ApiOperation(value = "Update cache time of a widget")
+    @Path("/{dashboardId}/widgets/{widgetId}/cachetime")
+    @ApiResponses(value = {
+            @ApiResponse(code = 404, message = "Dashboard not found."),
+            @ApiResponse(code = 404, message = "Widget not found."),
+            @ApiResponse(code = 403, message = "Request must be performed against master node.")
+    })
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response updateCacheTime(
+            @ApiParam(title = "JSON body", required = true) String body,
+            @ApiParam(title = "dashboardId", required = true) @PathParam("dashboardId") String dashboardId,
+            @ApiParam(title = "widgetId", required = true) @PathParam("widgetId") String widgetId) {
+        restrictToMaster();
+
+        UpdateWidgetRequest uwr;
+        try {
+            uwr = objectMapper.readValue(body, UpdateWidgetRequest.class);
+        } catch(IOException e) {
+            LOG.error("Error while parsing JSON", e);
+            throw new WebApplicationException(e, Response.Status.BAD_REQUEST);
+        }
+
+        if (dashboardId == null || dashboardId.isEmpty()) {
+            LOG.error("Missing dashboard ID. Returning HTTP 400.");
+            throw new WebApplicationException(400);
+        }
+
+        if (widgetId == null || widgetId.isEmpty()) {
+            LOG.error("Missing widget ID. Returning HTTP 400.");
+            throw new WebApplicationException(400);
+        }
+
+        try {
+            Dashboard dashboard = core.dashboards().get(dashboardId);
+
+            if (dashboard == null) {
+                LOG.error("Dashboard not found.");
+                throw new WebApplicationException(404);
+            }
+
+            DashboardWidget widget = dashboard.getWidget(widgetId);
+
+            if (widget == null) {
+                LOG.error("Widget not found.");
+                throw new WebApplicationException(404);
+            }
+
+            dashboard.updateWidgetCacheTime(widget, uwr.cacheTime);
+        } catch (ValidationException e) {
+            LOG.error("Validation error.", e);
+            throw new WebApplicationException(e, Response.Status.BAD_REQUEST);
+        }
+
+        LOG.info("Updated cache time of widget <" + widgetId + "> on dashboard <" + dashboardId + "> to " +
+                "[" + uwr.cacheTime + "]. Reason: REST request.");
+        return Response.status(Response.Status.OK).build();
+    }
+
 }

@@ -29,7 +29,6 @@ import org.graylog2.plugin.database.EmbeddedPersistable;
 import org.graylog2.rest.resources.dashboards.requests.AddWidgetRequest;
 import org.joda.time.DateTime;
 
-import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
@@ -48,16 +47,19 @@ public abstract class DashboardWidget implements EmbeddedPersistable {
 
     private static final String RESULT_CACHE_KEY = "result";
 
+    public static final int DEFAULT_CACHE_TIME = 10;
+
     private final Core core;
     private final Type type;
     private final String id;
     private final Map<String, Object> config;
     private final String creatorUserId;
+    private int cacheTime;
     private String description;
 
-    private final Cache<String, ComputationResult> cache;
+    private Cache<String, ComputationResult> cache;
 
-    protected DashboardWidget(Core core, Type type, String id, String description, Map<String, Object> config, String creatorUserId) {
+    protected DashboardWidget(Core core, Type type, String id, String description, int cacheTimeS, Map<String, Object> config, String creatorUserId) {
         this.core = core;
         this.type =  type;
         this.id = id;
@@ -65,9 +67,19 @@ public abstract class DashboardWidget implements EmbeddedPersistable {
         this.creatorUserId = creatorUserId;
         this.description = description;
 
-        this.cache = CacheBuilder.newBuilder()
+        if (cacheTimeS < 1) {
+            this.cacheTime = DEFAULT_CACHE_TIME;
+        } else {
+            this.cacheTime = cacheTimeS;
+        }
+
+        this.cache = buildCache(this.cacheTime);
+    }
+
+    private Cache<String, ComputationResult> buildCache(int cacheTime) {
+        return CacheBuilder.newBuilder()
                 .maximumSize(1)
-                .expireAfterWrite(10, TimeUnit.SECONDS)
+                .expireAfterWrite(cacheTime, TimeUnit.SECONDS)
                 .build();
     }
 
@@ -102,7 +114,7 @@ public abstract class DashboardWidget implements EmbeddedPersistable {
 
         switch (type) {
             case SEARCH_RESULT_COUNT:
-                return new SearchResultCountWidget(core, id, null, awr.config, (String) awr.config.get("query"), timeRange, awr.creatorUserId);
+                return new SearchResultCountWidget(core, id, null, 0, awr.config, (String) awr.config.get("query"), timeRange, awr.creatorUserId);
             default:
                 throw new NoSuchWidgetTypeException();
         }
@@ -148,9 +160,15 @@ public abstract class DashboardWidget implements EmbeddedPersistable {
             description = (String) fields.get("description");
         }
 
+        // Do we have a configured cache time?
+        int cacheTime = 0;
+        if (fields.containsField("cache_time")) {
+            cacheTime = (Integer) fields.get("cache_time");
+        }
+
         switch (type) {
             case SEARCH_RESULT_COUNT:
-                return new SearchResultCountWidget(core, (String) fields.get("id"), description, config, (String) config.get("query"), timeRange, (String) fields.get("creator_user_id"));
+                return new SearchResultCountWidget(core, (String) fields.get("id"), description, cacheTime, config, (String) config.get("query"), timeRange, (String) fields.get("creator_user_id"));
             default:
                 throw new NoSuchWidgetTypeException();
         }
@@ -172,6 +190,15 @@ public abstract class DashboardWidget implements EmbeddedPersistable {
         this.description = description;
     }
 
+    public void setCacheTime(int cacheTime) {
+        this.cache = buildCache(cacheTime);
+        this.cacheTime = cacheTime;
+    }
+
+    public int getCacheTime() {
+        return cacheTime;
+    }
+
     public Map<String, Object> getConfig() {
         return config;
     }
@@ -185,6 +212,7 @@ public abstract class DashboardWidget implements EmbeddedPersistable {
             put("id", id);
             put("type", type.toString().toLowerCase());
             put("description", description);
+            put("cache_time", cacheTime);
             put("creator_user_id", creatorUserId);
             put("config", getPersistedConfig());
         }};

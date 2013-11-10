@@ -36,8 +36,8 @@ public class SearchResultCountWidget extends DashboardWidget {
     private final String query;
     private final TimeRange timeRange;
 
-    public SearchResultCountWidget(Core core, String id, String description, Map<String, Object> config, String query, TimeRange timeRange, String creatorUserId) {
-        super(core, Type.SEARCH_RESULT_COUNT, id, description, config, creatorUserId);
+    public SearchResultCountWidget(Core core, String id, String description, int cacheTime, Map<String, Object> config, String query, TimeRange timeRange, String creatorUserId) {
+        super(core, Type.SEARCH_RESULT_COUNT, id, description, cacheTime, config, creatorUserId);
 
         this.query = query;
         this.timeRange = timeRange;
