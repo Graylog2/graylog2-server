@@ -27,4 +27,8 @@
         </fieldset>
     </form>
 
-@views.html.partials.streamrules.stream_rule_form.render("add-stream-rule", null)
+@if(stream == null) {
+    @views.html.partials.streamrules.stream_rule_form.render("add-stream-rule", null, null)
+} else {
+    @views.html.partials.streamrules.stream_rule_form.render("add-stream-rule", stream.getId, null)
+}

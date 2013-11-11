@@ -10,7 +10,7 @@
     </h1>
 
     @views.html.partials.preview(
-        "The streams are not finished yet. Basic functionality is available, you can already create streams and get results based on their rules. A shiny new rule editor and all alerting and monitoring will be covered in this streams section in the next version.",
+        "The streams are not finished yet. Basic functionality is available, you can already create streams and get results based on their rules. A shiny new rule editor, all alerting and monitoring will be covered in this streams section in the next version.",
         186
     )
 
@@ -34,7 +34,7 @@
                         <span class="caret"></span>
                     </a>
                     <ul class="dropdown-menu">
-                        <li><a href="#" data-toggle="modal" data-target="#new-stream-rule">Add rule</a></li>
+                        <li class="disabled"><a href="#" class="show-stream-rule">Add rule (coming soon)</a></li>
                         <li class="disabled"><a href="#">Add alert (coming soon)</a></li>
                         <li class="dropdown-submenu">
                             <a href="#">Show Metrics on</a>
@@ -55,25 +55,25 @@
                 <a href="@routes.SearchController.indexForStream(stream.getId, "*", "relative", 300)">@stream.getTitle</a>
             </h3>
 
-            <div class="well well-small">
-                <ul>
-                @if(stream.getStreamRules.size > 0) {
-                    @for(streamRule <- stream.getStreamRules) {
-                    <li>
-                        @streamRule <a class="remove-streamrule" href="#"
-                            data-removeUrl="@routes.StreamRulesController.delete(streamRule.getStreamId, streamRule.getId)">
-                            <i class="icon-remove"></i>
-                        </a>
-                    </li>
-                    }
-                } else {
-                    <li id="stream-rules-placeholder"><i>No rules defined - <a href="@routes.StreamRulesController.index(stream.getId)">go add some</a>!</i></li>
-                }
-                </ul>
-            </div>
-
             <form class="add-streamrule-form" data-stream-id="@stream.getId" action="#">
-                @views.html.partials.streamrules.stream_rule_form.render("add-stream-rule-to-existing", null)
+                <div class="well well-small">
+                    <ul>
+                    @if(stream.getStreamRules.size > 0) {
+                        @for(streamRule <- stream.getStreamRules) {
+                            <li>
+                                @streamRule <a class="remove-streamrule" href="#"
+                            data-removeUrl="@routes.StreamRulesController.delete(streamRule.getStreamId, streamRule.getId)">
+                                <i class="icon-remove"></i>
+                            </a>
+                            </li>
+                        }
+                    } else {
+                        <li id="stream-rules-placeholder"><i>No rules defined - <a href="@routes.StreamRulesController.index(stream.getId)">go add some</a>!</i></li>
+                    }
+                    </ul>
+                </div>
+
+                @views.html.partials.streamrules.stream_rule_form.render("add-stream-rule-to-existing", stream.getId, null)
             </form>
         </div>
 

@@ -1,5 +1,5 @@
-@(buttonId: String, streamRule: StreamRule)
-<div id="new-stream-rule" class="modal hide fade">
+@(buttonId: String, streamId: String, streamRule: StreamRule)
+<div class="modal hide fade new-stream-rule2" id="new-stream-rule" data-stream-id="@streamId">
     <div class="modal-header">
         <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
         <h2>
@@ -67,7 +67,7 @@
     </div>
     <div class="modal-footer">
         <button class="btn" data-dismiss="modal" aria-hidden="true">Close</button>
-        <button class="btn btn-success validate" id="@buttonId">
+        <button class="btn btn-success validate @buttonId">
             Add
         </button>
     </div>
