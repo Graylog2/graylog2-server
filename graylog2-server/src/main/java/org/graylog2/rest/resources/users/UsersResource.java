@@ -290,7 +290,10 @@ public class UsersResource extends RestResource {
         if (!getSubject().isPermitted(RestPermissions.USERS_PASSWORDCHANGE + ":" + user.getName())) {
             return status(FORBIDDEN).build();
         }
-
+        if (user.isExternalUser()) {
+            LOG.error("Cannot change password for external LDAP user.");
+            return status(FORBIDDEN).build();
+        }
         // TODO check whether we must ignore the old_password (for admins changing other people's passwords)
 
         final String oldPasswordHash = new SimpleHash("SHA-1", cr.old_password, core.getConfiguration().getPasswordSecret()).toString();
