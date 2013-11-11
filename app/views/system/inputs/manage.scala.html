@@ -16,7 +16,7 @@
     <div class="row-fluid input-new">
 
         <select id="input-type">
-            @for((inputType,info) <- inputTypes) {
+            @for((inputType,info) <- inputTypes.toSeq.sortBy(_._2.name)) {
                 <option value="@inputType">@info.name</option>
             }
         </select>
