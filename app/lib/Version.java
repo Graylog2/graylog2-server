@@ -36,8 +36,9 @@ public class Version {
     public static final Version v0_20_0_PREVIEW_3 = new Version(0, 20, 0, "preview.3");
     public static final Version v0_20_0_PREVIEW_4 = new Version(0, 20, 0, "preview.4");
     public static final Version v0_20_0_PREVIEW_5 = new Version(0, 20, 0, "preview.5");
+    public static final Version v0_20_0_PREVIEW_6 = new Version(0, 20, 0, "preview.6");
 
-    public static final Version VERSION = v0_20_0_PREVIEW_5;
+    public static final Version VERSION = v0_20_0_PREVIEW_6;
 
     public final int major;
     public final int minor;
