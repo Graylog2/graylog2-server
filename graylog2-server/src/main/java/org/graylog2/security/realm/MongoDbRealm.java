@@ -71,6 +71,10 @@ public class MongoDbRealm extends AuthorizingRealm {
                     user.getHashedPassword(),
                     ByteSource.Util.bytes(core.getConfiguration().getPasswordSecret()),
                     "graylog2MongoDbRealm");
+            // if ldap is disabled, and this user was created via LDAP, it is locked and cannot be used to authenticate.
+            if (user.isExternalUser() && !core.getLdapRealm().isEnabled()) {
+                throw new LockedAccountException("LDAP authentication is currently disabled.");
+            }
         }
 
         return simpleAccount;

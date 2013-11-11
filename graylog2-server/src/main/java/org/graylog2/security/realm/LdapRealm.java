@@ -101,6 +101,10 @@ public class LdapRealm extends AbstractLdapRealm {
         }
     }
 
+    public boolean isEnabled() {
+        return enabled;
+    }
+
     @Override
     protected AuthenticationInfo queryForAuthenticationInfo(AuthenticationToken token,
             LdapContextFactory ldapContextFactory) throws NamingException {
