@@ -10,6 +10,12 @@
         you create in other parts of Graylog2 with one click.
     </div>
 
+    @views.html.partials.preview(
+        "The dashboards are not finished yet. There is only one widget type, some information is missing and widget positions " +
+                "are not persisted yet.",
+        370
+    )
+
     @if(dashboards.isEmpty) {
         <div class="alert alert-warn">
             <i class="icon icon-info-sign"></i>
