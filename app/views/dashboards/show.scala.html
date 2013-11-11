@@ -18,7 +18,7 @@
         <div class="gridster">
             <ul>
             @for(widget <- dashboard.getWidgets.values()) {
-                <li data-row="1" data-col="1" data-sizex="1" data-sizey="1">
+                <li data-row="1" data-col="1" data-sizex="@widget.getWidth" data-sizey="@widget.getHeight">
                     <div class="widget" data-widget-type="@widget.getType.toString.toLowerCase" data-dashboard-id="@widget.getDashboard.getId" data-widget-id="@widget.getId">
 
                         <div class="pull-left widget-top controls only-unlocked">
@@ -42,6 +42,10 @@
 
                         @if(widget.getType.equals(models.dashboards.widgets.DashboardWidget.Type.SEARCH_RESULT_COUNT)) {
                             @views.html.dashboards.widgets.search_result_count(widget.asInstanceOf[models.dashboards.widgets.SearchResultCountWidget])
+                        }
+
+                        @if(widget.getType.equals(models.dashboards.widgets.DashboardWidget.Type.SEARCH_RESULT_FIELD_VALUE)) {
+                            @views.html.dashboards.widgets.search_result_field_value_chart(widget.asInstanceOf[models.dashboards.widgets.SearchResultFieldValueChartWidget])
                         }
 
                     </div>

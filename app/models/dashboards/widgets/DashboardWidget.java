@@ -37,7 +37,8 @@ import java.util.Map;
 public abstract class DashboardWidget {
 
     public enum Type {
-        SEARCH_RESULT_COUNT
+        SEARCH_RESULT_COUNT,
+        SEARCH_RESULT_FIELD_VALUE
     }
 
     private final Type type;
@@ -125,6 +126,8 @@ public abstract class DashboardWidget {
     }
 
     public abstract Map<String, Object> getConfig();
+    public abstract int getWidth();
+    public abstract int getHeight();
 
     public static class NoSuchWidgetTypeException extends Throwable {
     }

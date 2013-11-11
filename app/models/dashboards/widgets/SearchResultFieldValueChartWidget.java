@@ -20,7 +20,6 @@
 package models.dashboards.widgets;
 
 import com.google.common.collect.Maps;
-import lib.timeranges.TimeRange;
 import models.dashboards.Dashboard;
 
 import java.util.Map;
@@ -28,32 +27,18 @@ import java.util.Map;
 /**
  * @author Lennart Koopmann <lennart@torch.sh>
  */
-public class SearchResultCountWidget extends DashboardWidget {
+public class SearchResultFieldValueChartWidget extends DashboardWidget {
 
-    private static final int WIDTH = 1;
-    private static final int HEIGHT = 1;
+    private static final int WIDTH = 2;
+    private static final int HEIGHT = 2;
 
-    private final String query;
-    private final TimeRange timerange;
-
-    public SearchResultCountWidget(Dashboard dashboard, String query, TimeRange timerange) {
-        this(dashboard, null, null, 0, query, timerange);
-    }
-
-    public SearchResultCountWidget(Dashboard dashboard, String id, String description, int cacheTime, String query, TimeRange timerange) {
-        super(Type.SEARCH_RESULT_COUNT, id, description, cacheTime, dashboard);
-
-        this.query = query;
-        this.timerange = timerange;
+    protected SearchResultFieldValueChartWidget(String id, String description, int cacheTime, Dashboard dashboard) {
+        super(Type.SEARCH_RESULT_FIELD_VALUE, id, description, cacheTime, dashboard);
     }
 
     @Override
     public Map<String, Object> getConfig() {
-        Map<String, Object> config = Maps.newHashMap();
-        config.putAll(timerange.getQueryParams());
-        config.put("query", query);
-
-        return config;
+        return Maps.newHashMap();
     }
 
     @Override
