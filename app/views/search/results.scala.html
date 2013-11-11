@@ -183,7 +183,7 @@
 			<th style="width: 150px;" id="result-th-36cd38f49b9afa08222c0dc9ebfe35eb">Source</th>
 			<th id="result-th-78e731027d8fd50ed642340b7c9a63b3">Message</th>
 			
-			@for(f <- searchResult.getFields()) {
+			@for(f <- searchResult.getPageFields()) {
 				@if(!f.isStandardSelected()) {
 					<th style="display: none;" id="result-th-@f.getHash()">@f.getName()</th>
 				}
@@ -197,7 +197,7 @@
 			<td class="result-td-36cd38f49b9afa08222c0dc9ebfe35eb">@r.message.get("source")</td>
 			<td class="messages-message result-td-78e731027d8fd50ed642340b7c9a63b3">@r.message.get("message")</td>
 			
-			@for(f <- searchResult.getFields()) {
+			@for(f <- searchResult.getPageFields()) {
 				@if(!f.isStandardSelected()) {
 					<td style="display: none;" class="result-td-@f.getHash()">@r.message.get(f.getName())</td>
 				}

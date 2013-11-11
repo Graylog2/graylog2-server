@@ -1320,3 +1320,7 @@ table#users-list td.centered {
 .configuration-field-optional {
     font-size: 11px;
 }
+
+.message-result-fields-range {
+    font-size: 11px;
+}

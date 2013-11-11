@@ -554,6 +554,26 @@ $(document).ready(function() {
         $(this).text(numeral($(this).text()).format($(this).attr("data-format")));
     });
 
+    $(".message-result-fields-range .page").on("click", function(e) {
+        e.preventDefault();
+
+        $(".search-result-fields li.search-result-field-type").hide();
+        $(".search-result-fields li.page").show();
+
+        $(".message-result-fields-range a").css("font-weight", "normal");
+        $(this).css("font-weight", "bold");
+    });
+
+    $(".message-result-fields-range .all").on("click", function(e) {
+        e.preventDefault();
+
+        $(".search-result-fields li.search-result-field-type").hide();
+        $(".search-result-fields li.all").show();
+
+        $(".message-result-fields-range a").css("font-weight", "normal");
+        $(this).css("font-weight", "bold");
+    });
+
     function scrollToSearchbarHint() {
         if ($(document).scrollTop() > 50) {
             $("#scroll-to-search-hint").fadeIn("fast").delay(1500).fadeOut("fast");

@@ -20,26 +20,28 @@
 
 
 @if(searchResult.getTotalResultCount() > 0) {
-<h3>Select fields</h3>
+<h3>
+    Message fields
+
+    <span class="message-result-fields-range">
+        <a href="#" class="page" style="font-weight: bold;">of current page</a>
+        /
+        <a href="#" class="all">all</a>
+    </span>
+</h3>
 <div class="nano">
     <div class="content">
         <div class="inner-content">
             <ul class="search-result-fields">
-                @for(f <- searchResult.getFields().sortBy(_.getName)) {
-                    <li>
-                        <i class="icon icon-cog open-analyze-field"></i>
-                        &nbsp;
+                @for(f <- searchResult.getPageFields().sortBy(_.getName)) {
+                    <li class="search-result-field-type page">
+                        @views.html.sidebars.partials.search_result_field.render(f)
+                    </li>
+                }
 
-                        <input type="checkbox"
-                            id="field-selector-@f.getHash"
-                            class="field-selector"
-                            data-field-hash="@f.getHash"
-                            @if(f.isStandardSelected) { checked="checked" }
-                        />
-
-                        <label for="field-selector-@f.getHash">@f.getName()</label>
-
-                        @views.html.sidebars.partials.analyze_field(f)
+                @for(f <- searchResult.getAllFields().sortBy(_.getName)) {
+                    <li class="search-result-field-type all" style="display: none;">
+                        @views.html.sidebars.partials.search_result_field.render(f)
                     </li>
                 }
             </ul>

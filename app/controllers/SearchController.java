@@ -18,25 +18,27 @@
  */
 package controllers;
 
+import com.google.common.collect.Lists;
 import com.google.inject.Inject;
 import lib.APIException;
 import lib.ApiClient;
+import lib.Field;
 import lib.SearchTools;
 import lib.timeranges.*;
-import models.FieldMapper;
-import models.Stream;
-import models.StreamService;
-import models.UniversalSearch;
+import models.*;
 import models.api.results.DateHistogramResult;
 import models.api.results.SearchResult;
 import play.mvc.Result;
 
 import java.io.IOException;
+import java.util.List;
 
 public class SearchController extends AuthenticatedController {
 
     @Inject
     private UniversalSearch.Factory searchFactory;
+    @Inject
+    private MessagesService messagesService;
 
     @Inject
     private StreamService streamService;
@@ -83,6 +85,14 @@ public class SearchController extends AuthenticatedController {
             }
 
             searchResult = FieldMapper.run(search.search());
+
+            List<Field> allFields = Lists.newArrayList();
+            for(String f : messagesService.getMessageFields()) {
+                allFields.add(new Field(f));
+            }
+
+            searchResult.setAllFields(allFields);
+
             histogramResult = search.dateHistogram(interval);
         } catch (IOException e) {
             return status(504, views.html.errors.error.render(ApiClient.ERROR_MSG_IO, e, request()));
@@ -117,6 +127,14 @@ public class SearchController extends AuthenticatedController {
             }
 
             searchResult = FieldMapper.run(search.search());
+
+            List<Field> allFields = Lists.newArrayList();
+            for(String f : messagesService.getMessageFields()) {
+                allFields.add(new Field(f));
+            }
+
+            searchResult.setAllFields(allFields);
+
             histogramResult = search.dateHistogram(interval);
         } catch (IOException e) {
             return status(504, views.html.errors.error.render(ApiClient.ERROR_MSG_IO, e, request()));
