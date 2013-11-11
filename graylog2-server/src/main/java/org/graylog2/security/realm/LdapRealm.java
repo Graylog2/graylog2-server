@@ -108,7 +108,7 @@ public class LdapRealm extends AbstractLdapRealm {
         readLock.lock();
         try {
             if (!enabled) {
-                log.info("LDAP realm is disabled");
+                log.debug("LDAP realm is disabled");
                 return null;
             }
             final LdapContext ldapContext = ldapContextFactory.getSystemLdapContext();
