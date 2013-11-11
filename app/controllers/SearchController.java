@@ -120,6 +120,10 @@ public class SearchController extends AuthenticatedController {
             return status(400, views.html.errors.error.render("Invalid range type provided.", e1, request()));
         }
 
+        if (q.trim().isEmpty()) {
+            q = "*";
+        }
+
         SearchResult searchResult;
         DateHistogramResult histogramResult;
         try {
