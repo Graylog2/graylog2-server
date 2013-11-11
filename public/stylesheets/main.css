@@ -1345,3 +1345,15 @@ table#users-list td.centered {
     position: relative;
     top: -3px;
 }
+
+.stream-row h3 a {
+    color: #000;
+}
+
+.stream-row h3 .label {
+    position: relative;
+    top: -2px;
+    left: 2px;
+    font-family: "Arial", sans-serif;
+    font-size: 11px;
+}

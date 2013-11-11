@@ -24,7 +24,7 @@
                     <button class="btn btn-danger btn-mini"
                     type="submit"
                     data-confirm="Really delete Stream?">
-                                    Delete
+                        Delete
                     </button>
                 </form>
 
@@ -39,10 +39,13 @@
                         <li class="dropdown-submenu">
                             <a href="#">Show Metrics on</a>
                             <ul class="dropdown-menu valuetype-selector">
-                                @for(nodeId <- nodes.keySet()) {
-                                    <li><a href="@routes.MetricsController.ofNode(nodeId, "org.graylog2.plugin.streams.Stream." + stream.getId)">
-                                        @nodeId
-                                    </a></li>
+                                @for(node <- nodes.values()) {
+                                    <li>
+                                        <a href="@routes.MetricsController.ofNode(node.getNodeId, "org.graylog2.plugin.streams.Stream." + stream.getId)">
+                                            <i class="icon icon-code-fork"></i>
+                                            @node.getShortNodeId / @node.getHostname
+                                        </a>
+                                    </li>
                                 }
                             </ul>
                         </li>
@@ -51,8 +54,10 @@
             </span>
 
             <h3>
-                <i class="icon icon-list"></i>
+                <i class="icon icon-ellipsis-vertical"></i>
                 <a href="@routes.SearchController.indexForStream(stream.getId, "*", "relative", 300)">@stream.getTitle</a>
+
+                <span class="label label-success">Active</span>
             </h3>
 
             <form class="add-streamrule-form" data-stream-id="@stream.getId" action="#">
