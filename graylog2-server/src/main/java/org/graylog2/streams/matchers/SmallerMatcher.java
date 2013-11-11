@@ -33,6 +33,7 @@ public class SmallerMatcher implements StreamRuleMatcher {
 	@Override
 	public boolean match(Message msg, StreamRule rule) {
         Integer msgVal = getInt(msg.getField(rule.getField()));
+
         if (msgVal == null) {
             return false;
         }

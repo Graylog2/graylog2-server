@@ -30,7 +30,11 @@ public class ExactMatcher implements StreamRuleMatcher {
 
 	@Override
 	public boolean match(Message msg, StreamRule rule) {
-		String field = (String)msg.getField(rule.getField());
+        if (!msg.getFields().containsKey(rule.getField())) {
+            return false;
+        }
+
+		Object field = msg.getField(rule.getField());
 		
 		if (field == null) {
 			return false;
