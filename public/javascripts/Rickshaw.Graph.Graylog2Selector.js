@@ -88,6 +88,11 @@ Rickshaw.Graph.Graylog2Selector = Rickshaw.Class.create({
             var from = $('#universalsearch .absolute input[name="from"]');
             var to = $('#universalsearch .absolute input[name="to"]');
 
+            if (!isNumber(position.xMin) || !isNumber(position.xMax)) {
+                clearSelection();
+                return;
+            }
+
             var fromDate = new Date((position.xMin+new Date().getTimezoneOffset()*60)*1000);
             var toDate = new Date((position.xMax+new Date().getTimezoneOffset()*60)*1000);
 
