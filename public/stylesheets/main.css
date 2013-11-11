@@ -1316,3 +1316,7 @@ table#users-list td.centered {
 .dashboard .widget .info .cache-info {
     display: none;
 }
+
+.configuration-field-optional {
+    font-size: 11px;
+}

@@ -1,6 +1,12 @@
 @(field: lib.plugin.configuration.RequestedConfigurationField)
 
-<label>@field.getHumanName</label>
+<label>
+    @field.getHumanName
+
+    @if(field.isOptional) {
+        <span class="configuration-field-optional">(optional)</span>
+    }
+</label>
 <span class="help-block">@field.getDescription</span>
 <input name="configuration_@field.getTitle"
 
@@ -10,7 +16,7 @@
 
     type="number"
     @if(!field.getDefaultValue().toString().isEmpty()) {
-        placeholder="@Math.round(Float.parseFloat(field.getDefaultValue().toString))"
+        value="@Math.round(Float.parseFloat(field.getDefaultValue().toString))"
     }
 
     @if(!field.getAttributes.isEmpty) {
