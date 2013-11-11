@@ -71,6 +71,7 @@
                 </form>
             </div>
             <div class="span6">
+                @if(!currentUser.isExternal) {
                 <form class="form-horizontal" action="@routes.UsersController.changePassword(username)" method="POST">
                     <div class="control-group">
                         <label class="control-label" for="old-password">Old Password</label>
@@ -96,6 +97,7 @@
                         </div>
                     </div>
                 </form>
+                }
             </div>
         </div>
     </div>
