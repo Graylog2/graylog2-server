@@ -18,7 +18,6 @@
  */
 package org.graylog2.security.realm;
 
-import com.google.common.base.Charsets;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import org.apache.shiro.authc.AuthenticationException;
@@ -27,26 +26,18 @@ import org.apache.shiro.authc.AuthenticationToken;
 import org.apache.shiro.authz.AuthorizationInfo;
 import org.apache.shiro.crypto.hash.SimpleHash;
 import org.apache.shiro.realm.ldap.AbstractLdapRealm;
-import org.apache.shiro.realm.ldap.JndiLdapContextFactory;
 import org.apache.shiro.realm.ldap.LdapContextFactory;
 import org.apache.shiro.subject.PrincipalCollection;
 import org.graylog2.Core;
 import org.graylog2.database.ValidationException;
-import org.graylog2.rest.resources.system.requests.LdapSettingsRequest;
-import org.graylog2.rest.resources.system.requests.LdapTestLoginRequest;
-import org.graylog2.security.LdapSettings;
+import org.graylog2.security.ldap.LdapConnector;
+import org.graylog2.security.ldap.LdapSettings;
 import org.graylog2.users.User;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.naming.NamingEnumeration;
 import javax.naming.NamingException;
-import javax.naming.directory.Attribute;
-import javax.naming.directory.Attributes;
-import javax.naming.directory.SearchControls;
-import javax.naming.directory.SearchResult;
 import javax.naming.ldap.LdapContext;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
@@ -54,6 +45,7 @@ public class LdapRealm extends AbstractLdapRealm {
     private static final Logger log = LoggerFactory.getLogger(LdapRealm.class);
 
     private final Core core;
+    public final LdapConnector ldapConnector;
 
     // we need to protect updating the settings with a rw-mutex because the
     // settings are applied separate from each other and would conflict with the
@@ -67,8 +59,9 @@ public class LdapRealm extends AbstractLdapRealm {
 
     private boolean enabled = false;
 
-    public LdapRealm(Core core) {
+    public LdapRealm(Core core, LdapConnector ldapConnector) {
         this.core = core;
+        this.ldapConnector = ldapConnector;
         core.setLdapRealm(this);
         final LdapSettings settings = LdapSettings.load(core);
 
@@ -109,9 +102,9 @@ public class LdapRealm extends AbstractLdapRealm {
     }
 
     @Override
-    protected AuthenticationInfo queryForAuthenticationInfo(AuthenticationToken token, LdapContextFactory
-        ldapContextFactory) throws NamingException {
-        final NamingEnumeration<SearchResult> results;
+    protected AuthenticationInfo queryForAuthenticationInfo(AuthenticationToken token,
+            LdapContextFactory ldapContextFactory) throws NamingException {
+        final Map<String, String> entry;
         readLock.lock();
         try {
             if (!enabled) {
@@ -119,104 +112,63 @@ public class LdapRealm extends AbstractLdapRealm {
                 return null;
             }
             final LdapContext ldapContext = ldapContextFactory.getSystemLdapContext();
-            final SearchControls cons = new SearchControls();
-            cons.setSearchScope(SearchControls.SUBTREE_SCOPE);
-            results = ldapContext.search(searchBase, principalSearchPattern, new Object[]{token.getPrincipal()}, cons);
+            entry = ldapConnector.searchPrincipal(ldapContext,
+                                                  searchBase,
+                                                  principalSearchPattern,
+                                                  token.getPrincipal().toString());
         } finally {
             readLock.unlock();
         }
 
-        // we want to read at most one result
-        if (results.hasMore()) {
-            final SearchResult result = results.next();
-            final Attributes attributes = result.getAttributes();
-
-            // TODO let users configure an objectClass so that we know what to read from ldap.
-            // we currently assume inetOrgPerson
-            final Object cn = attributes.get("cn").get();
-            Attribute rfc822Mailbox = attributes.get("rfc822Mailbox");
-            if (rfc822Mailbox == null) {
-                rfc822Mailbox = attributes.get("mail");
-            }
-            final Object mail = rfc822Mailbox.get();
-            final byte[] passwordBytes = (byte[])attributes.get("userPassword").get();
-            final String userPassword = new String(passwordBytes, Charsets.UTF_8);
-            final Object userName = attributes.get(usernameAttribute).get();
-            if (userName == null) {
-                throw new AuthenticationException("No attribute named " + usernameAttribute + " defined for user " + token.getPrincipal() + ". Cannot authenticate.");
-            }
-
-            final String username = userName.toString();
-            User user = User.load(username, core);
-            if (user == null) {
-                user = new User(Maps.<String, Object>newHashMap(), core);
-            }
-            user.setFullName(cn.toString());
-            user.setName(username);
-            user.setEmail(mail != null ? mail.toString() : "");
-            final String hashedPassword = new SimpleHash("SHA-256", userPassword).toString(); // the web interface sends its password as SHA-256(realpassword)
-            final String hashToStore = new SimpleHash("SHA-1", hashedPassword, core.getConfiguration().getPasswordSecret()).toString();
-            user.setHashedPassword(hashToStore);
-            user.setPermissions(Lists.<String>newArrayList("*")); // TODO groups
-            user.setExternal(true); // TODO fix this in respect to isReadOnly. Maybe split "core" part of user data in db?
-            try {
-                user.save();
-            } catch (ValidationException e) {
-                log.error("Cannot migrate LDAP user {} to local storage", token.getPrincipal());
-                throw new AuthenticationException("Cannot migrate user from LDAP");
-            }
+        if (entry.isEmpty()) {
+            log.debug("Unable to find an LDAP entry for user {}", token.getPrincipal());
             return null;
-            //return new SimpleAccount(userName, userPassword, "ldap");
         }
 
-        // no decision, we don't have an LDAP user for that principal.
-        // TODO should this fail the entire authentication attempt?
+        // TODO let users configure an objectClass so that we know what to read from ldap.
+        // we currently assume inetOrgPerson
+        final String cn = entry.get("cn");
+        String mail = entry.get("rfc822Mailbox");
+        if (mail == null) {
+            // TODO does this happen, isn't rfc822Mailbox the canonical attribute name?
+            mail = entry.get("mail");
+        }
+        final String userPassword = entry.get("userPassword");
+        final String username = entry.get(usernameAttribute);
+        if (username == null) {
+            throw new AuthenticationException("No attribute named " + usernameAttribute + " defined for user " + token.getPrincipal() + ". Cannot authenticate.");
+        }
+
+        // load from mongodb and potentially merge the info we got from ldap
+        User user = User.load(username, core);
+        if (user == null) {
+            user = new User(Maps.<String, Object>newHashMap(), core);
+        }
+        user.setFullName(cn);
+        user.setName(username);
+        user.setEmail(mail != null ? mail : "");
+        final String hashedPassword = new SimpleHash("SHA-256",
+                                                     userPassword).toString(); // the web interface sends its password as SHA-256(realpassword)
+        final String hashToStore = new SimpleHash("SHA-1",
+                                                  hashedPassword,
+                                                  core.getConfiguration().getPasswordSecret()).toString();
+        user.setHashedPassword(hashToStore);
+        user.setPermissions(Lists.<String>newArrayList("*")); // TODO groups
+        user.setExternal(true); // TODO fix this in respect to isReadOnly. Maybe split "core" part of user data in db?
+        try {
+            user.save();
+        } catch (ValidationException e) {
+            log.error("Cannot migrate LDAP user {} to local storage", token.getPrincipal());
+            throw new AuthenticationException("Cannot migrate user from LDAP");
+        }
+        // delegate checking to the mongodb realm, which now has the user because we just copied it from ldap
         return null;
     }
 
     @Override
     protected AuthorizationInfo queryForAuthorizationInfo(PrincipalCollection principal, LdapContextFactory
-        ldapContextFactory) throws NamingException {
+            ldapContextFactory) throws NamingException {
         return null;
     }
 
-    public NamingException testConnection(LdapSettingsRequest request) {
-        JndiLdapContextFactory defaultFactory = new JndiLdapContextFactory();
-        defaultFactory.setUrl(request.ldapUri.toString());
-        defaultFactory.setSystemUsername(request.systemUsername);
-        defaultFactory.setSystemPassword(request.systemPassword);
-        try {
-            final LdapContext context = defaultFactory.getSystemLdapContext();
-            context.close();
-        } catch (NamingException e) {
-            return e;
-        }
-        return null;
-    }
-
-    public Map<String, String> testLogin(LdapTestLoginRequest request) throws NamingException {
-        JndiLdapContextFactory defaultFactory = new JndiLdapContextFactory();
-        defaultFactory.setUrl(request.ldapUri.toString());
-        defaultFactory.setSystemUsername(request.systemUsername);
-        defaultFactory.setSystemPassword(request.systemPassword);
-
-        final HashMap<String,String> attributes = Maps.newHashMap();
-        final LdapContext context = defaultFactory.getSystemLdapContext();
-        final SearchControls cons = new SearchControls();
-        cons.setSearchScope(SearchControls.SUBTREE_SCOPE);
-        final NamingEnumeration<SearchResult> results;
-        results = context.search(request.searchBase, request.principalSearchPattern, new Object[]{request.testUsername}, cons);
-        if (results.hasMore()) {
-            final SearchResult next = results.next();
-            final Attributes attrs = next.getAttributes();
-            final NamingEnumeration<String> iDs = attrs.getIDs();
-            while (iDs.hasMore()) {
-                final String key = iDs.next();
-                if (key.equals("userPassword")) continue;
-                attributes.put(key, attrs.get(key).get().toString());
-            }
-        }
-        context.close();
-        return attributes;
-    }
 }
