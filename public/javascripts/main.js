@@ -246,7 +246,6 @@ $(document).ready(function() {
 
             success: function(data) {
                 var streamrule_id = data.streamrule_id;
-                //console.log(streamrule_id);
 
                 // Add hidden field that is transmitted in form add visible entry.
                 field = "<input type='hidden' name='rules["+streamrule_id+"].field' value='" + rule.field + "' />\n" +
@@ -254,12 +253,9 @@ $(document).ready(function() {
                     "<input type='hidden' name='rules["+streamrule_id+"].value' value='" + rule.value + "' />\n" +
                     "<input type='hidden' name='rules["+streamrule_id+"].inverted' value='" + rule.inverted + "' />\n"
 
-                console.log("1");
-
                 remover = "<a href='#' class='sr-remove'><i class='icon-remove'></i></a>";
                 $("div.well", form).find("ul").append("<li id='rule'>" + field + $("#sr-result").html().replace(/<(?:.|\n)*?>/gm, '') + " " + remover + "</li>");
 
-                console.log("2");
                 // Remove stream rule binding.
                 $(".sr-remove").on("click", function() {
                     var parent_list = $(this).parents("ul");
@@ -268,7 +264,6 @@ $(document).ready(function() {
                     return false;
                 });
 
-                console.log("3");
                 var renumber_rules = function($rules) {
                     $('li#rule', $rules).each(function($index) {
                         $('input', $(this)).each (function() {
@@ -278,7 +273,6 @@ $(document).ready(function() {
                     });
                 }
 
-                console.log("4");
                 dialog.modal("hide");
             }
         })
@@ -290,8 +284,6 @@ $(document).ready(function() {
 
     $(".show-stream-rule").on("click", function() {
         var streamId = $(this).closest(".stream-row").attr("data-stream-id");
-        console.log(streamId);
-        console.log($('div.new-stream-rule2[data-stream-id="' + streamId + '"]'));
         $('div.new-stream-rule2[data-stream-id="' + streamId + '"]').modal();
     });
 
