@@ -64,7 +64,7 @@ public class LdapController extends AuthenticatedController {
 
     public Result apiTestLdapConnection() {
         final DynamicForm dynamicForm = form().bindFromRequest("url", "systemUsername", "systemPassword");
-        final Map<String,String> formData = dynamicForm.data();
+        final Map<String, String> formData = dynamicForm.data();
         log.warn("trying " + formData);
         LdapConnectionTestResponse result;
         try {
@@ -84,7 +84,8 @@ public class LdapController extends AuthenticatedController {
     }
 
     public Result apiTestLdapLogin() {
-        final DynamicForm dynamicForm = form().bindFromRequest("url", "systemUsername", "systemPassword", "searchBase", "principalSearchPattern", "testUsername", "testPassword");
+        final DynamicForm dynamicForm = form().bindFromRequest("url", "systemUsername", "systemPassword", "searchBase",
+                "principalSearchPattern", "usernameAttribute", "testUsername", "testPassword");
         final Map<String, String> formData = dynamicForm.data();
 
         LdapLoginTestResponse result;
@@ -95,6 +96,7 @@ public class LdapController extends AuthenticatedController {
             request.systemPassword = formData.get("systemPassword");
             request.searchBase = formData.get("searchBase");
             request.principalSearchPattern = formData.get("principalSearchPattern");
+            request.usernameAttribute = formData.get("usernameAttribute");
             request.testUsername = formData.get("testUsername");
             request.testPassword = formData.get("testPassword");
             result = api().post(LdapLoginTestResponse.class).path("/system/ldap/testlogin").body(request).execute();

@@ -84,7 +84,7 @@ $(document).ready(function() {
 
     $("#ldap-test-login").on("click", function() {
         $(this).prop("disabled", true);
-        $("#ldap-entry-attributes").innerHTML = "";
+        $("#ldap-entry-attributes").html("");
         $("#attr-well").addClass("hidden");
         $.ajax({
             type: "POST",
@@ -102,23 +102,23 @@ $(document).ready(function() {
             success: function(loginResult) {
                 if (loginResult.successful) {
                     $("#ldap-test-login").removeClass().addClass("btn btn-success").text("Login ok!");
+
+                    var usernameAttr = $("#usernameAttribute").val();
+                    if (loginResult.attributes && usernameAttr) {
+                        if (loginResult.attributes[usernameAttr]) {
+                            $("#principal").text(loginResult.attributes[usernameAttr]);
+                        }
+                    }
+                    Object.keys(loginResult.attributes).forEach(function(element) {
+                        $("#ldap-entry-attributes")
+                            .append("<dt>" + element + "</dt>")
+                            .append("<dd>" + loginResult.attributes[element] + "</dd>");
+                    });
+                    $("#attr-well").removeClass("hidden");
                 } else {
                     $("#ldap-test-login").removeClass().addClass("btn btn-danger").text("Login failed!");
+                    $("#attr-well").addClass("hidden");
                 }
-
-                var usernameAttr = $("#usernameAttribute").val();
-                if (usernameAttr) {
-                    if (loginResult.attributes[usernameAttr]) {
-                        $("#principal").text(loginResult.attributes[usernameAttr]);
-                    }
-                }
-                Object.keys(loginResult.attributes).forEach(function(element) {
-                    $("#ldap-entry-attributes")
-                        .append("<dt>" + element + "</dt>")
-                        .append("<dd>" + loginResult.attributes[element] + "</dd>");
-                });
-                $("#attr-well").removeClass("hidden");
-
             },
             complete: function() {
                 $("#ldap-test-login").prop("disabled", false);
