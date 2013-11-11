@@ -44,7 +44,9 @@ public class SearchController extends AuthenticatedController {
     private StreamService streamService;
 
     public Result indexForStream(String streamId, String q, String rangeType, int relative, String from, String to, String keyword, String interval, int page) {
-        Stream stream;
+        return ok("not implemented yet");
+
+        /*Stream stream;
         try {
             stream = streamService.get(streamId);
         } catch (IOException e) {
@@ -105,7 +107,7 @@ public class SearchController extends AuthenticatedController {
             return ok(views.html.search.results.render(currentUser(), search, searchResult, histogramResult, oldQuery, page, stream));
         } else {
             return ok(views.html.search.noresults.render(currentUser(), oldQuery));
-        }
+        }*/
     }
 
     public Result index(String q, String rangeType, int relative, String from, String to, String keyword, String interval, int page) {
