@@ -21,6 +21,7 @@ package org.graylog2.security.ldap;
 import com.google.common.base.Charsets;
 import com.google.common.collect.Maps;
 import org.apache.shiro.realm.ldap.JndiLdapContextFactory;
+import org.graylog2.Core;
 import org.graylog2.rest.resources.system.requests.LdapTestLoginRequest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -37,23 +38,41 @@ import java.util.Map;
 
 public class LdapConnector {
     private static final Logger log = LoggerFactory.getLogger(LdapConnector.class);
+    private final Core core;
+
+    public LdapConnector(Core core) {
+        this.core = core;
+    }
 
     public Map<String, String> checkCredentials(
-            LdapSettings settings,
+            URI ldapUri, String username, String password,
+            String searchBase,
+            String principalSearchPattern,
+            String usernameAttribute,
             String principal,
-            String credential) {
+            String credential) throws NamingException {
         try {
             final Map<String, String> entry = loadAccount(
-                    settings.getUri(),
-                    settings.getSystemUserName(),
-                    settings.getSystemPassword(),
-                    settings.getSearchBase(),
-                    settings.getPrincipalSearchPattern(),
+                    ldapUri,
+                    username,
+                    password,
+                    searchBase,
+                    principalSearchPattern,
                     principal);
+
+            if (credential != null) {
+                final String ldapPassword = entry.get("userPassword");
+                // UGGGHHH!
+                if (ldapPassword.equals(credential)) {
+                    return entry;
+                } else {
+                    throw new NamingException("Password mismatch!");
+                }
+            }
             return entry;
         } catch (NamingException e) {
             log.info("Unable to load account from LDAP server", e);
-            return null;
+            throw e;
         }
     }
 
@@ -76,7 +95,7 @@ public class LdapConnector {
             return defaultFactory.getSystemLdapContext();
         } catch (NamingException e) {
             log.error("Unable to connect to LDAP server {} with username {} using password: {}",
-                    new Object[] {ldapUri.toString(), username, password != null});
+                      new Object[]{ldapUri.toString(), username, password != null});
             throw e;
         }
     }
@@ -91,9 +110,9 @@ public class LdapConnector {
         cons.setSearchScope(SearchControls.SUBTREE_SCOPE);
 
         final NamingEnumeration<SearchResult> results;
-        results = context.search(searchBase, principalSearchPattern, new Object[]{ principal }, cons);
+        results = context.search(searchBase, principalSearchPattern, new Object[]{principal}, cons);
 
-        final HashMap<String,String> entry = Maps.newHashMap();
+        final HashMap<String, String> entry = Maps.newHashMap();
         if (results.hasMore()) {
             final SearchResult next = results.next();
             final Attributes attrs = next.getAttributes();
@@ -120,14 +139,17 @@ public class LdapConnector {
         defaultFactory.setSystemPassword(request.systemPassword);
         defaultFactory.setPoolingEnabled(false);
 
-        final HashMap<String,String> attributes = Maps.newHashMap();
+        final HashMap<String, String> attributes = Maps.newHashMap();
         final LdapContext context = defaultFactory.getSystemLdapContext();
 
         final SearchControls cons = new SearchControls();
         cons.setSearchScope(SearchControls.SUBTREE_SCOPE);
 
         final NamingEnumeration<SearchResult> results;
-        results = context.search(request.searchBase, request.principalSearchPattern, new Object[]{request.testUsername}, cons);
+        results = context.search(request.searchBase,
+                                 request.principalSearchPattern,
+                                 new Object[]{request.testUsername},
+                                 cons);
 
         if (results.hasMore()) {
             final SearchResult next = results.next();
