@@ -221,6 +221,10 @@ $(document).ready(function() {
         }
     });
 
+    $("#add-stream-rule-to-existing").on("click", function() {
+        var streamrow = $(this).closest("#stream-row");
+    });
+
     // Typeahead for message fields.
     $.ajax({
         url: '/a/system/fields',
@@ -247,7 +251,7 @@ $(document).ready(function() {
                             }
                         });
 
-                        if (!included) {
+                        if (!included) {                                              FA
                             $(this).removeClass("systemjob-progress");
                             $(".progress .bar", $(this)).css("width", "100%");
                             $(".progress", $(this)).removeClass("active");
@@ -580,6 +584,17 @@ $(document).ready(function() {
         numeral.language("en");
     }
 
+    $(".remove-streamrule").on("click", function(event) {
+        var result = confirm("Really delete stream rule?");
+        if (result) {
+            var elem = $(this).parent();
+            $(elem).css( "background-color", "red" )
+            var url = event.currentTarget.attributes["data-removeUrl"].value;
+            $.post(url, {}, function() {
+                elem.remove();
+            });
+        }
+    });
 });
 
 function searchDateTimeFormatted(date) {

@@ -1,4 +1,4 @@
-package models.api.responses;
+package models.api.responses.streams;
 
 /**
  * @author Dennis Oelkers <dennis@torch.sh>
@@ -8,4 +8,6 @@ public class StreamRuleSummaryResponse {
     public String field;
     public String value;
     public int type;
+
+    public String stream_id;
 }

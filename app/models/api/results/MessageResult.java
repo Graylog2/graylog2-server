@@ -19,14 +19,15 @@
 package models.api.results;
 
 import com.google.common.collect.ImmutableSet;
+import com.google.common.collect.Lists;
+import com.google.inject.Inject;
+import lib.APIException;
+import models.Stream;
 
-import java.util.Comparator;
-import java.util.Map;
-import java.util.Set;
-import java.util.TreeMap;
+import java.io.IOException;
+import java.util.*;
 
 public class MessageResult {
-
     private final static Set<String> HIDDEN_FIELDS = ImmutableSet.of(
             "_id",
             "timestamp",
@@ -41,6 +42,7 @@ public class MessageResult {
     private final String timestamp;
     private final String sourceNodeId;
     private final String sourceInputId;
+    private final List<String> streamIds;
 
     public MessageResult(Map<String, Object> message, String index) {
         // this comparator sorts fields alphabetically, but always leaves full_message at the end.
@@ -80,6 +82,7 @@ public class MessageResult {
         this.sourceNodeId = (String) message.get("gl2_source_node");
         this.sourceInputId = (String) message.get("gl2_source_input");
         this.index = index;
+        this.streamIds = (List<String>) message.get("streams");
     }
 
     public String getId() {
@@ -105,5 +108,24 @@ public class MessageResult {
     public String getSourceInputId() {
         return sourceInputId;
     }
+
+    public List<String> getStreamIds() {
+        if (this.streamIds != null) {
+            return this.streamIds;
+        } else {
+            return Lists.newArrayList();
+        }
+    }
+
+    /*public List<Stream> getStreams() throws IOException, APIException {
+        List<Stream> result = Lists.newArrayList();
+        for (String streamId : getStreamIds()) {
+            System.out.println("Fetching stream " + streamId);
+            Stream stream = streamService.get(streamId);
+            if (stream != null)
+                result.add(stream);
+        }
+        return result;
+    }*/
 
 }

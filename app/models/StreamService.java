@@ -22,7 +22,8 @@ import com.google.inject.Inject;
 import lib.APIException;
 import lib.ApiClient;
 import models.api.requests.streams.CreateStreamRequest;
-import models.api.responses.GetStreamsResponse;
+import models.api.responses.streams.GetStreamsResponse;
+import models.api.responses.streams.StreamSummaryResponse;
 import models.api.results.StreamsResult;
 import play.mvc.Http;
 
@@ -42,6 +43,13 @@ public class StreamService {
         r = api.get(GetStreamsResponse.class).path("/streams").execute();
 
         return new StreamsResult(r.total, r.streams);
+    }
+
+    public Stream get(String streamId) throws IOException, APIException {
+        StreamSummaryResponse streamResponse = null;
+        streamResponse = api.get(StreamSummaryResponse.class).path("/streams/"+streamId).execute();
+
+        return new Stream(streamResponse);
     }
 
     public void create(CreateStreamRequest request) throws APIException, IOException {

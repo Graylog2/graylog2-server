@@ -2,8 +2,6 @@ package models.api.requests.streams;
 
 import models.api.requests.ApiRequest;
 
-import javax.validation.Valid;
-
 /**
  * @author Dennis Oelkers <dennis@torch.sh>
  */

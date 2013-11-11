@@ -16,7 +16,9 @@
  * You should have received a copy of the GNU General Public License
  * along with Graylog2.  If not, see <http://www.gnu.org/licenses/>.
  */
-package models.api.responses;
+package models.api.responses.streams;
+
+import models.api.responses.streams.StreamSummaryResponse;
 
 import java.util.List;
 

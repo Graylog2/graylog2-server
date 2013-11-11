@@ -19,8 +19,6 @@
  */
 package models.api.responses.dashboards;
 
-import models.api.responses.StreamSummaryResponse;
-
 import java.util.List;
 
 /**

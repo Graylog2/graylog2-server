@@ -23,7 +23,7 @@ import java.util.List;
 import com.google.common.collect.Lists;
 
 import models.Stream;
-import models.api.responses.StreamSummaryResponse;
+import models.api.responses.streams.StreamSummaryResponse;
 
 public class StreamsResult {
 
@@ -49,4 +49,15 @@ public class StreamsResult {
 		return streams;
 	}
 
+    public static StreamsResult mergeResults(List<StreamsResult> streamsResults) {
+        int total = 0;
+        List<StreamSummaryResponse> streams = Lists.newArrayList();
+
+        for (StreamsResult streamsResult : streamsResults) {
+            total += streamsResult.total;
+            streams.addAll(streamsResult.streams);
+        }
+
+        return new StreamsResult(total, streams);
+    }
 }

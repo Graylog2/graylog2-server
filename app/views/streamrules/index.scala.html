@@ -1,0 +1,10 @@
+@(currentUser: User, stream: Stream, streamrules: List[StreamRule])
+
+@main("Streamrules", views.html.sidebars.standard(currentUser), "", currentUser) {
+    <a href="@routes.StreamsController.newStream" class="btn btn-success btn-small pull-right">Create stream</a>
+
+    <h1>
+        <i class="icon icon-barcode"></i>
+        Rules for Stream "@stream.getTitle"
+    </h1>
+}

@@ -1,4 +1,4 @@
-@(currentUser: User, streams: models.api.results.StreamsResult)
+@(currentUser: User, streams: models.api.results.StreamsResult, nodes: Map[String, Node])
 
 @main("Streams", views.html.sidebars.standard(currentUser), "", currentUser) {
 
@@ -10,13 +10,12 @@
     </h1>
 
     @views.html.partials.preview(
-        "The streams are not finished yet. Take a look at the create stream dialog by clicking on the button in the upper right corner to get an idea of " +
-                "the new streams. All alerting and monitoring will be covered in this streams section.",
+        "The streams are not finished yet. Basic functionality is available, you can already create streams and get results based on their rules. A shiny new rule editor and all alerting and monitoring will be covered in this streams section in the next version.",
         186
     )
 
     @for(stream <- streams.getStreams()) {
-        <div class="row-fluid node-row">
+        <div class="row-fluid node-row stream-row" data-stream-id="@stream.getId">
             <span class="pull-right node-row-info">
                 <span class="text">Created by @stream.getCreatorUserId</span>
                     &nbsp;
@@ -35,30 +34,50 @@
                         <span class="caret"></span>
                     </a>
                     <ul class="dropdown-menu">
-                        <li><a href="/">Manage rules</a></li>
-                        <li><a href="/">Show metrics</a></li>
+                        <li><a href="#" data-toggle="modal" data-target="#new-stream-rule">Add rule</a></li>
+                        <li class="disabled"><a href="#">Add alert (coming soon)</a></li>
+                        <li class="dropdown-submenu">
+                            <a href="#">Show Metrics on</a>
+                            <ul class="dropdown-menu valuetype-selector">
+                                @for(nodeId <- nodes.keySet()) {
+                                    <li><a href="@routes.MetricsController.ofNode(nodeId, "org.graylog2.plugin.streams.Stream." + stream.getId)">
+                                        @nodeId
+                                    </a></li>
+                                }
+                            </ul>
+                        </li>
                     </ul>
                 </div>
             </span>
 
             <h3>
-                <i class="icon icon-ellipsis-vertical"></i>
-                @stream.getTitle
+                <i class="icon icon-list"></i>
+                <a href="@routes.SearchController.indexForStream(stream.getId, "*", "relative", 300)">@stream.getTitle</a>
             </h3>
 
             <div class="well well-small">
                 <ul>
                 @if(stream.getStreamRules.size > 0) {
                     @for(streamRule <- stream.getStreamRules) {
-                    <li>@streamRule</li>
+                    <li>
+                        @streamRule <a class="remove-streamrule" href="#"
+                            data-removeUrl="@routes.StreamRulesController.delete(streamRule.getStreamId, streamRule.getId)">
+                            <i class="icon-remove"></i>
+                        </a>
+                    </li>
                     }
                 } else {
-                    <li><i>No rules defined - go add some!</i></li>
+                    <li id="stream-rules-placeholder"><i>No rules defined - <a href="@routes.StreamRulesController.index(stream.getId)">go add some</a>!</i></li>
                 }
                 </ul>
             </div>
 
+            <form class="add-streamrule-form" data-stream-id="@stream.getId" action="#">
+                @views.html.partials.streamrules.stream_rule_form.render("add-stream-rule-to-existing", null)
+            </form>
         </div>
+
+        <!-- $(".stream-row .add-streamrule-form[data-stream-id=fsdfs]") -->
     }
 
 }

@@ -19,7 +19,7 @@
 package models;
 
 import com.google.common.collect.Lists;
-import models.api.responses.StreamRuleSummaryResponse;
+import models.api.responses.streams.StreamRuleSummaryResponse;
 
 import java.util.HashMap;
 import java.util.List;
@@ -38,12 +38,14 @@ public class StreamRule {
     private final String field;
     private final String value;
     private final int type;
+    private final String stream_id;
 
     public StreamRule(StreamRuleSummaryResponse srsr) {
         this.id = srsr.id;
         this.field = srsr.field;
         this.value = srsr.value;
         this.type = srsr.type;
+        this.stream_id = srsr.stream_id;
     }
 
     public String getId() {
@@ -58,6 +60,10 @@ public class StreamRule {
             return "unknown";
         }
         return sentence;
+    }
+
+    public String getStreamId() {
+        return stream_id;
     }
 
     public String toString() {

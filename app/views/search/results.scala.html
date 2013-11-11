@@ -1,4 +1,4 @@
-@(currentUser: User, search: UniversalSearch, searchResult: models.api.results.SearchResult, histogram: models.api.results.DateHistogramResult, query: String, page: Integer)
+@(currentUser: User, search: UniversalSearch, searchResult: models.api.results.SearchResult, histogram: models.api.results.DateHistogramResult, query: String, page: Integer)(implicit stream: Stream)
 @import views.helpers.DateHistogramResolutionSelector
 
 @paginatorLength() = @{10}
@@ -25,7 +25,13 @@
 
 <a href="" class="btn btn-small pull-right">Refresh</a>
 
-<h1><i class="icon-search"></i> Search results</h1>
+<h1>
+    @if(stream == null) {
+        <i class="icon-search"></i> Search results
+    } else {
+        <i class="icon-barcode"></i> Stream "@stream.getTitle"
+    }
+</h1>
 
 <style>
 .y_ticks { color: #000; }

@@ -24,6 +24,8 @@ import lib.ApiClient;
 import lib.SearchTools;
 import lib.timeranges.*;
 import models.FieldMapper;
+import models.Stream;
+import models.StreamService;
 import models.UniversalSearch;
 import models.api.results.DateHistogramResult;
 import models.api.results.SearchResult;
@@ -36,44 +38,111 @@ public class SearchController extends AuthenticatedController {
     @Inject
     private UniversalSearch.Factory searchFactory;
 
-    public Result index(String q, String rangeType, int relative, String from, String to, String keyword, String interval, int page) {
+    @Inject
+    private StreamService streamService;
 
-
-    	if (q == null || q.isEmpty()) {
-    		q = "*";
-    	}
-
-        // Histogram interval.
-    	if (interval == null || interval.isEmpty() || !SearchTools.isAllowedDateHistogramInterval(interval)) {
-    		interval = "minute";
-    	}
-
-        // Determine timerange type.
-        TimeRange timerange;
+    public Result indexForStream(String streamId, String q, String rangeType, int relative, String from, String to, String keyword, String interval, int page) {
+        Stream stream;
         try {
-            timerange = TimeRange.factory(rangeType, relative, from, to, keyword);
+            stream = streamService.get(streamId);
+        } catch (IOException e) {
+            return status(504, views.html.errors.error.render(ApiClient.ERROR_MSG_IO, e, request()));
+        } catch (APIException e) {
+            String message = "Unable to fetch stream. We expected HTTP 200, but got a HTTP " + e.getHttpCode() + ".";
+            return status(504, views.html.errors.error.render(message, e, request()));
+        }
+
+        String predicate = "stream==" + streamId;
+        String oldQuery = q;
+
+        if (q == null || q.trim().equals("*") || q.trim().isEmpty()) {
+            q = predicate;
+        } else {
+            q = "(" + q + ") AND " + predicate;
+        }
+
+        if (oldQuery.equals("*")) {
+            oldQuery = "";
+        }
+
+        UniversalSearch search;
+        try {
+            search = getSearch(q, rangeType, relative, from, to, keyword, page);
         } catch(InvalidRangeParametersException e2) {
             return status(400, views.html.errors.error.render("Invalid range parameters provided.", e2, request()));
         } catch(IllegalArgumentException e1) {
             return status(400, views.html.errors.error.render("Invalid range type provided.", e1, request()));
         }
 
-		try {
-			UniversalSearch search = searchFactory.queryWithRangeAndPage(q, timerange, page);
-			SearchResult searchResult = FieldMapper.run(search.search());
-			DateHistogramResult histogramResult = search.dateHistogram(interval);
-
-            if (searchResult.getTotalResultCount() > 0) {
-			    return ok(views.html.search.results.render(currentUser(), search, searchResult, histogramResult, q, page));
-            } else {
-                return ok(views.html.search.noresults.render(currentUser(), q));
+        SearchResult searchResult;
+        DateHistogramResult histogramResult;
+        try {
+            // Histogram interval.
+            if (interval == null || interval.isEmpty() || !SearchTools.isAllowedDateHistogramInterval(interval)) {
+                interval = "minute";
             }
-		} catch (IOException e) {
-			return status(504, views.html.errors.error.render(ApiClient.ERROR_MSG_IO, e, request()));
-		} catch (APIException e) {
-			String message = "There was a problem with your search. We expected HTTP 200, but got a HTTP " + e.getHttpCode() + ".";
-			return status(504, views.html.errors.error.render(message, e, request()));
-		}
+
+            searchResult = FieldMapper.run(search.search());
+            histogramResult = search.dateHistogram(interval);
+        } catch (IOException e) {
+            return status(504, views.html.errors.error.render(ApiClient.ERROR_MSG_IO, e, request()));
+        } catch (APIException e) {
+            String message = "There was a problem with your search. We expected HTTP 200, but got a HTTP " + e.getHttpCode() + ".";
+            return status(504, views.html.errors.error.render(message, e, request()));
+        }
+
+        if (searchResult.getTotalResultCount() > 0) {
+            return ok(views.html.search.results.render(currentUser(), search, searchResult, histogramResult, oldQuery, page, stream));
+        } else {
+            return ok(views.html.search.noresults.render(currentUser(), oldQuery));
+        }
     }
 
+    public Result index(String q, String rangeType, int relative, String from, String to, String keyword, String interval, int page) {
+        UniversalSearch search;
+        try {
+            search = getSearch(q, rangeType, relative, from, to, keyword, page);
+        } catch(InvalidRangeParametersException e2) {
+            return status(400, views.html.errors.error.render("Invalid range parameters provided.", e2, request()));
+        } catch(IllegalArgumentException e1) {
+            return status(400, views.html.errors.error.render("Invalid range type provided.", e1, request()));
+        }
+
+        SearchResult searchResult;
+        DateHistogramResult histogramResult;
+        try {
+            // Histogram interval.
+            if (interval == null || interval.isEmpty() || !SearchTools.isAllowedDateHistogramInterval(interval)) {
+                interval = "minute";
+            }
+
+            searchResult = FieldMapper.run(search.search());
+            histogramResult = search.dateHistogram(interval);
+        } catch (IOException e) {
+            return status(504, views.html.errors.error.render(ApiClient.ERROR_MSG_IO, e, request()));
+        } catch (APIException e) {
+            String message = "There was a problem with your search. We expected HTTP 200, but got a HTTP " + e.getHttpCode() + ".";
+            return status(504, views.html.errors.error.render(message, e, request()));
+        }
+
+        if (searchResult.getTotalResultCount() > 0) {
+            return ok(views.html.search.results.render(currentUser(), search, searchResult, histogramResult, q, page, null));
+        } else {
+            return ok(views.html.search.noresults.render(currentUser(), q));
+        }
+    }
+
+    private UniversalSearch getSearch(String q, String rangeType, int relative,String from, String to, String keyword, int page)
+        throws InvalidRangeParametersException, IllegalArgumentException {
+        if (q == null || q.isEmpty()) {
+            q = "*";
+        }
+
+        // Determine timerange type.
+        TimeRange timerange = TimeRange.factory(rangeType, relative, from, to, keyword);
+
+        UniversalSearch search = searchFactory.queryWithRangeAndPage(q, timerange, page);
+
+        return search;
+    }
 }

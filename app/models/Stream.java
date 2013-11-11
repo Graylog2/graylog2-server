@@ -19,8 +19,8 @@
 package models;
 
 import com.google.common.collect.Lists;
-import models.api.responses.StreamRuleSummaryResponse;
-import models.api.responses.StreamSummaryResponse;
+import models.api.responses.streams.StreamRuleSummaryResponse;
+import models.api.responses.streams.StreamSummaryResponse;
 import models.api.responses.TimestampResponse;
 
 import java.util.List;
@@ -32,6 +32,7 @@ public class Stream {
     private final String creatorUserId;
     private final TimestampResponse createdAt;
     private final List<StreamRule> streamRules;
+    private final Boolean disabled;
 
 	public Stream(StreamSummaryResponse ssr) {
 		this.id = ssr.id;
@@ -40,6 +41,8 @@ public class Stream {
         this.createdAt = ssr.createdAt;
 
         this.streamRules = Lists.newArrayList();
+
+        this.disabled = ssr.disabled;
 
         for (StreamRuleSummaryResponse streamRuleSummaryResponse : ssr.streamRules) {
             streamRules.add(new StreamRule(streamRuleSummaryResponse));
@@ -64,5 +67,9 @@ public class Stream {
 
     public List<StreamRule> getStreamRules() {
         return streamRules;
+    }
+
+    public Boolean getDisabled() {
+        return (disabled != null && disabled);
     }
 }
