@@ -50,13 +50,12 @@ public class SystemController extends AuthenticatedController {
             int totalSystemMessages = clusterService.getNumberOfSystemMessages();
             List<SystemMessage> systemMessages = clusterService.getSystemMessages(page - 1);
             ESClusterHealth clusterHealth = clusterService.getESClusterHealth();
-            final SystemMessageHtmlAnnotator systemMessageAnnotator = new SystemMessageHtmlAnnotator(systemMessages);
 
             return ok(views.html.system.index.render(
                     currentUser(),
                     systemJobs,
                     clusterHealth,
-                    systemMessageAnnotator.getMessageList(),
+                    systemMessages,
                     totalSystemMessages,
                     page,
                     notifications
