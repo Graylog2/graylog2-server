@@ -10,6 +10,6 @@ data-field-hash="@field.getHash"
 @if(field.isStandardSelected) { checked="checked" }
 />
 
-<label for="field-selector-@field.getHash">@field.getName()</label>
+<label for="field-selector-@field.getHash" class="field-name">@field.getName()</label>
 
 @views.html.sidebars.partials.analyze_field(field)

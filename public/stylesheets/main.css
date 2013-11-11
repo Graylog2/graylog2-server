@@ -1324,3 +1324,24 @@ table#users-list td.centered {
 .message-result-fields-range {
     font-size: 11px;
 }
+
+.message-result-fields-search {
+    margin-top: 3px;
+    margin-bottom: 5px;
+}
+
+.message-result-fields-search input {
+    font-size: 11px;
+    padding: 1px;
+    padding-left: 3px;
+}
+
+.message-result-fields-search .add-on {
+    font-size: 11px;
+    height: 14px;
+}
+
+.message-result-fields-search .add-on .icon {
+    position: relative;
+    top: -3px;
+}

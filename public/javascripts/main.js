@@ -576,7 +576,10 @@ $(document).ready(function() {
         $(".search-result-fields li.search-result-field-type").hide();
         $(".search-result-fields li.page").show();
 
+        $(".message-result-fields-search input").val("");
+
         $(".message-result-fields-range a").css("font-weight", "normal");
+        $(".search-result-fields").attr("data-selected", "page");
         $(this).css("font-weight", "bold");
     });
 
@@ -586,8 +589,24 @@ $(document).ready(function() {
         $(".search-result-fields li.search-result-field-type").hide();
         $(".search-result-fields li.all").show();
 
+        $(".message-result-fields-search input").val("");
+
         $(".message-result-fields-range a").css("font-weight", "normal");
+        $(".search-result-fields").attr("data-selected", "all");
         $(this).css("font-weight", "bold");
+    });
+
+    $(".message-result-fields-search input").on("keyup", function(e) {
+        var val = $(this).val();
+        $(".search-result-fields li.search-result-field-type").hide();
+
+        $(".search-result-fields li.search-result-field-type").each(function(i) {
+            if ($(".field-name", $(this)).text().match(new RegExp("^" + val + ".*", "g"))) {
+                if ($(this).hasClass($(".search-result-fields").attr("data-selected"))) {
+                    $(this).show();
+                }
+            }
+        });
     });
 
     function scrollToSearchbarHint() {
