@@ -5,6 +5,7 @@ import lib.APIException;
 import lib.ApiClient;
 import models.api.requests.streams.CreateStreamRequest;
 import models.api.requests.streams.CreateStreamRuleRequest;
+import models.api.responses.streams.CreateStreamRuleResponse;
 import models.api.responses.streams.GetStreamRulesResponse;
 import models.api.responses.streams.StreamRuleSummaryResponse;
 import models.api.results.StreamRulesResult;
@@ -31,8 +32,8 @@ public class StreamRuleService {
         return new StreamRulesResult(r.total, r.stream_rules);
     }
 
-    public void create(String streamId, CreateStreamRuleRequest request) throws APIException, IOException {
-        api.post().path("/streams/" + streamId + "/rules").body(request).expect(Http.Status.CREATED).execute();
+    public CreateStreamRuleResponse create(String streamId, CreateStreamRuleRequest request) throws APIException, IOException {
+        return api.post(CreateStreamRuleResponse.class).path("/streams/" + streamId + "/rules").body(request).expect(Http.Status.CREATED).execute();
     }
 
     public void delete(String streamId, String streamRuleId) throws APIException, IOException {

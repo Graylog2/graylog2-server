@@ -1,5 +1,6 @@
 package controllers;
 
+import com.google.gson.Gson;
 import com.google.inject.Inject;
 import lib.APIException;
 import lib.ApiClient;
@@ -7,6 +8,7 @@ import models.Stream;
 import models.StreamRuleService;
 import models.StreamService;
 import models.api.requests.streams.CreateStreamRuleRequest;
+import models.api.responses.streams.CreateStreamRuleResponse;
 import play.data.Form;
 import play.mvc.Result;
 
@@ -40,17 +42,18 @@ public class StreamRulesController extends AuthenticatedController {
 
     public Result create(String streamId) {
         Form<CreateStreamRuleRequest> form = createStreamRuleForm.bindFromRequest();
+        CreateStreamRuleResponse response = null;
 
         try {
             CreateStreamRuleRequest csrr = form.get();
-            streamRuleService.create(streamId, csrr);
+            response = streamRuleService.create(streamId, csrr);
         } catch (APIException e) {
             String message = "Could not create stream rule. We expected HTTP 201, but got a HTTP " + e.getHttpCode() + ".";
             return status(504, message);
         } catch (IOException e) {
             return status(504, e.toString());
         }
-        return ok();
+        return created(new Gson().toJson(response)).as("application/json");
     }
 
     public Result delete(String streamId, String streamRuleId){

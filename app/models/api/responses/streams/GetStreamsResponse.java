@@ -18,8 +18,6 @@
  */
 package models.api.responses.streams;
 
-import models.api.responses.streams.StreamSummaryResponse;
-
 import java.util.List;
 
 public class GetStreamsResponse {

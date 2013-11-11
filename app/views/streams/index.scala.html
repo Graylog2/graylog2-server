@@ -34,7 +34,7 @@
                         <span class="caret"></span>
                     </a>
                     <ul class="dropdown-menu">
-                        <li class="disabled"><a href="#">Add rule (coming soon)</a></li>
+                        <li><a href="#" class="show-stream-rule">Add rule</a></li>
                         <li class="disabled"><a href="#">Add alert (coming soon)</a></li>
                         <li class="dropdown-submenu">
                             <a href="#">Show Metrics on</a>
@@ -68,7 +68,7 @@
                             </li>
                         }
                     } else {
-                        <li id="stream-rules-placeholder"><i>No rules defined - <a href="@routes.StreamRulesController.index(stream.getId)">go add some</a>!</i></li>
+                        <li id="stream-rules-placeholder"><i>No rules defined - go add some!</i></li>
                     }
                     </ul>
                 </div>

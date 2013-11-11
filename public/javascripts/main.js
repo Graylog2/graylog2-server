@@ -222,10 +222,7 @@ $(document).ready(function() {
     });
 
     $(".add-stream-rule-to-existing").on("click", function() {
-        $(this).closest("form").append("<li><i>foo</i></li>");
-        /*var streamrow = $(this).closest("#stream-row");
-        streamrow.( "color", "red" );*/
-        //$("#new-stream-rule").modal("hide");
+        var streamId = $(this).closest(".stream-row").attr("data-stream-id");
 
         rule = {
             field: $("#sr-field").val(),
@@ -233,33 +230,60 @@ $(document).ready(function() {
             value: $("#sr-value").val(),
             inverted: $("#sr-inverted-box").is(":checked")
         }
-        // Add hidden field that is transmitted in form add visible entry.
-        field = "<input type='hidden' name='rules["+rule_count+"].field' value='" + JSON.stringify(rule.field) + "' />\n" +
-            "<input type='hidden' name='rules["+rule_count+"].type' value='" + JSON.stringify(rule.type) + "' />\n" +
-            "<input type='hidden' name='rules["+rule_count+"].value' value='" + JSON.stringify(rule.value) + "' />\n" +
-            "<input type='hidden' name='rules["+rule_count+"].inverted' value='" + JSON.stringify(rule.inverted) + "' />\n"
 
-        remover = "<a href='#' class='sr-remove'><i class='icon-remove'></i></a>";
-        $(this).closest("div#stream-rules").append("<li id='rule'>" + field + $("#sr-result").html().replace(/<(?:.|\n)*?>/gm, '') + " " + remover + "</li>");
-
-        // Remove stream rule binding.
-        $(".sr-remove").on("click", function() {
-            var parent_list = $(this).parents("ul");
-            $(this).parent().remove();
-            renumber_rules(parent_list);
+        /*if (!validate("#sr")) {
             return false;
-        });
+        }*/
 
-        var renumber_rules = function($rules) {
-            $('li#rule', $rules).each(function($index) {
-                $('input', $(this)).each (function() {
-                    var new_name = $(this).attr('name').replace(/rules\[\d+\]/g, 'rules['+$index+']');
-                    $(this).attr('name', new_name);
+        var url = '/streams/' + streamId + '/rules';
+        var dialog = $(this).closest("div#new-stream-rule");
+        var form = $(this).closest("form");
+
+        $.ajax({
+            url: url,
+            type: "POST",
+            data: rule,
+
+            success: function(data) {
+                var streamrule_id = data.streamrule_id;
+                //console.log(streamrule_id);
+
+                // Add hidden field that is transmitted in form add visible entry.
+                field = "<input type='hidden' name='rules["+streamrule_id+"].field' value='" + rule.field + "' />\n" +
+                    "<input type='hidden' name='rules["+streamrule_id+"].type' value='" + rule.type + "' />\n" +
+                    "<input type='hidden' name='rules["+streamrule_id+"].value' value='" + rule.value + "' />\n" +
+                    "<input type='hidden' name='rules["+streamrule_id+"].inverted' value='" + rule.inverted + "' />\n"
+
+                console.log("1");
+
+                remover = "<a href='#' class='sr-remove'><i class='icon-remove'></i></a>";
+                $("div.well", form).find("ul").append("<li id='rule'>" + field + $("#sr-result").html().replace(/<(?:.|\n)*?>/gm, '') + " " + remover + "</li>");
+
+                console.log("2");
+                // Remove stream rule binding.
+                $(".sr-remove").on("click", function() {
+                    var parent_list = $(this).parents("ul");
+                    $(this).parent().remove();
+                    renumber_rules(parent_list);
+                    return false;
                 });
-            });
-        }
 
-        $(this).closest("div#new-stream-rule").modal("hide");
+                console.log("3");
+                var renumber_rules = function($rules) {
+                    $('li#rule', $rules).each(function($index) {
+                        $('input', $(this)).each (function() {
+                            var new_name = $(this).attr('name').replace(/rules\[\d+\]/g, 'rules['+$index+']');
+                            $(this).attr('name', new_name);
+                        });
+                    });
+                }
+
+                console.log("4");
+                dialog.modal("hide");
+            }
+        })
+
+
 
         return false;
     });
@@ -654,7 +678,7 @@ $(document).ready(function() {
         var result = confirm("Really delete stream rule?");
         if (result) {
             var elem = $(this).parent();
-            $(elem).css( "background-color", "red" )
+            //$(elem).css( "background-color", "red" )
             var url = event.currentTarget.attributes["data-removeUrl"].value;
             $.post(url, {}, function() {
                 elem.remove();
