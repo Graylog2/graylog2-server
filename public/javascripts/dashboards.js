@@ -6,9 +6,6 @@ $(document).ready(function() {
         success: function(data) {
             globalDashboards = data;
             applyDashboardsToAllSelectors();
-        },
-        error: function(data) {
-            showError("Could not load list of dashboards");
         }
     });
 
