@@ -19,7 +19,11 @@
  */
 package org.graylog2.indexer.results;
 
+import org.elasticsearch.common.bytes.BytesReference;
 import org.elasticsearch.common.unit.TimeValue;
+import org.elasticsearch.common.xcontent.XContentHelper;
+
+import java.io.IOException;
 
 /**
  * @author Lennart Koopmann <lennart@torch.sh>
@@ -28,14 +32,25 @@ public class IndexQueryResult {
 
     private final String originalQuery;
     private final TimeValue took;
+    private final BytesReference builtQuery;
 
-    public IndexQueryResult(String originalQuery, TimeValue took) {
+    public IndexQueryResult(String originalQuery, BytesReference builtQuery, TimeValue took) {
         this.originalQuery = originalQuery;
         this.took = took;
+        this.builtQuery = builtQuery;
     }
 
     public String getOriginalQuery() {
         return originalQuery;
+    }
+
+    public String getBuiltQuery() {
+        try {
+            return XContentHelper.convertToJson(builtQuery, false);
+        } catch (IOException ignored) {
+            // exception comes from InputStream, but that stream is from a byte array, so won't do IO.
+        }
+        return null;
     }
 
     public TimeValue took() {

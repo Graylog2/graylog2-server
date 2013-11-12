@@ -19,6 +19,7 @@
  */
 package org.graylog2.indexer.results;
 
+import org.elasticsearch.common.bytes.BytesReference;
 import org.elasticsearch.common.unit.TimeValue;
 import org.elasticsearch.search.facet.statistical.StatisticalFacet;
 
@@ -36,8 +37,8 @@ public class FieldStatsResult extends IndexQueryResult {
     private final double variance;
     private final double stdDeviation;
 
-    public FieldStatsResult(StatisticalFacet f, String originalQuery, TimeValue took) {
-        super(originalQuery, took);
+    public FieldStatsResult(StatisticalFacet f, String originalQuery, BytesReference builtQuery, TimeValue took) {
+        super(originalQuery, builtQuery, took);
 
         this.count = f.getCount();
         this.sum = f.getTotal();

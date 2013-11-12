@@ -20,6 +20,7 @@
 package org.graylog2.indexer.results;
 
 import com.google.common.collect.Maps;
+import org.elasticsearch.common.bytes.BytesReference;
 import org.elasticsearch.common.unit.TimeValue;
 import org.elasticsearch.search.facet.terms.TermsFacet;
 
@@ -36,8 +37,8 @@ public class TermsResult extends IndexQueryResult {
     private final long other;
     private final Map<String, Integer> terms;
 
-    public TermsResult(TermsFacet f, String originalQuery, TimeValue took) {
-        super(originalQuery, took);
+    public TermsResult(TermsFacet f, String originalQuery, BytesReference builtQuery, TimeValue took) {
+        super(originalQuery, builtQuery, took);
 
         this.total = f.getTotalCount();
         this.missing = f.getMissingCount();
