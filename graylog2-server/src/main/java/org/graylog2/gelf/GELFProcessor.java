@@ -20,7 +20,6 @@
 
 package org.graylog2.gelf;
 
-import com.codahale.metrics.Meter;
 import com.codahale.metrics.Timer;
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -60,7 +59,7 @@ public class GELFProcessor {
         String metricName = sourceInput.getUniqueReadableId();
 
         server.metrics().meter(name(metricName, "incomingMessages")).mark();
-        
+
         // Convert to LogMessage
         Message lm = parse(message.getJSON(), sourceInput);
 
@@ -91,7 +90,7 @@ public class GELFProcessor {
         if (json == null) {
             throw new IllegalStateException("JSON is null/could not be parsed (invalid JSON)");
         }
-        
+
         // Timestamp.
         double messageTimestamp = doubleValue(json, "timestamp");
         DateTime timestamp;
@@ -100,15 +99,15 @@ public class GELFProcessor {
         } else {
             timestamp = Tools.dateTimeFromDouble(messageTimestamp);
         }
-        
+
         Message lm = new Message(
         		this.stringValue(json, "short_message"),
         		this.stringValue(json, "host"),
         		timestamp
         );
-        
+
         lm.addField("full_message", this.stringValue(json, "full_message"));
-        
+
         String file = this.stringValue(json, "file");
 
         if (file != null && !file.isEmpty()) {
@@ -119,7 +118,7 @@ public class GELFProcessor {
         if (line > -1) {
         	lm.addField("line", line);
         }
-        
+
         // Level is set by server if not specified by client.
         long level = this.longValue(json, "level");
         if (level > -1) {
@@ -156,17 +155,23 @@ public class GELFProcessor {
                 continue;
             }
 
-            // Convert JSON containers to Strings.
+            // Convert JSON containers to Strings, and pick a suitable number representation.
+            Object fieldValue;
             if (value.isContainerNode()) {
-                lm.addField(key, value.toString());
+                fieldValue = value.toString();
+            } else if (value.isFloatingPointNumber()) {
+                fieldValue = value.asDouble();
+            } else if (value.isIntegralNumber()) {
+                fieldValue = value.asLong();
             } else {
-                lm.addField(key, value.asText());
+                fieldValue = value.asText();
             }
+            lm.addField(key, fieldValue);
         }
 
         // Stop metrics timer.
         tcx.stop();
-        
+
         return lm;
     }
 

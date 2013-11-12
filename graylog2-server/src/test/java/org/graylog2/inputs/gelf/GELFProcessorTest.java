@@ -20,16 +20,19 @@
 
 package org.graylog2.inputs.gelf;
 
-import org.graylog2.gelf.GELFProcessor;
-import org.graylog2.gelf.GELFMessage;
-import org.graylog2.inputs.InputStub;
-import org.graylog2.plugin.Tools;
 import org.graylog2.GraylogServerStub;
 import org.graylog2.TestHelper;
+import org.graylog2.gelf.GELFMessage;
+import org.graylog2.gelf.GELFProcessor;
+import org.graylog2.inputs.InputStub;
 import org.graylog2.plugin.Message;
+import org.graylog2.plugin.Tools;
 import org.joda.time.DateTime;
+import org.junit.Before;
 import org.junit.Test;
-import static org.junit.Assert.*;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotEquals;
 
 public class GELFProcessorTest {
 
@@ -39,12 +42,17 @@ public class GELFProcessorTest {
     public final static String GELF_JSON_INCOMPLETE = "{\"short_message\":\"foo\",\"host\":\"bar\"}";
     public final static String GELF_JSON_INCOMPLETE_WITH_ID = "{\"short_message\":\"foo\",\"host\":\"bar\",\"_id\":\":7\",\"_something\":\"foo\"}";
     public final static String GELF_JSON_WITH_MAP = "{\"short_message\":\"foo\",\"host\":\"bar\",\"_lol\":{\"foo\":\"zomg\"}}";
+    public final static String GELF_JSON_WITH_NUMBERS = "{\"short_message\": \"foo\",\"host\": \"bar\",\"integer\": 5,\"float\": 7.6,\"stringbutnumber\": \"4\"}\n";
+    private GraylogServerStub serverStub;
+    private GELFProcessor processor;
 
+    @Before
+    public void before() {
+        serverStub = new GraylogServerStub();
+        processor = new GELFProcessor(serverStub);
+    }
     @Test
     public void testMessageReceived() throws Exception {
-        GraylogServerStub serverStub = new GraylogServerStub();
-        GELFProcessor processor = new GELFProcessor(serverStub);
-
         processor.messageReceived(new GELFMessage(TestHelper.zlibCompress(GELF_JSON_COMPLETE)), new InputStub());
         processor.messageReceived(new GELFMessage(TestHelper.gzipCompress(GELF_JSON_COMPLETE)), new InputStub());
         // All GELF types are tested in GELFMessageTest.
@@ -67,9 +75,6 @@ public class GELFProcessorTest {
 
     @Test
     public void testMessageReceivedSetsCreatedAtToNowIfNotSet() throws Exception {
-        GraylogServerStub serverStub = new GraylogServerStub();
-        GELFProcessor processor = new GELFProcessor(serverStub);
-
         processor.messageReceived(new GELFMessage(TestHelper.zlibCompress(GELF_JSON_INCOMPLETE)), new InputStub());
         // All GELF types are tested in GELFMessageTest.
 
@@ -84,9 +89,6 @@ public class GELFProcessorTest {
 
     @Test
     public void testMessageReceivedSkipsSettingIDField() throws Exception {
-        GraylogServerStub serverStub = new GraylogServerStub();
-        GELFProcessor processor = new GELFProcessor(serverStub);
-
         processor.messageReceived(new GELFMessage(TestHelper.zlibCompress(GELF_JSON_INCOMPLETE_WITH_ID)), new InputStub());
         // All GELF types are tested in GELFMessageTest.
 
@@ -100,9 +102,6 @@ public class GELFProcessorTest {
     
     @Test
     public void testMessageReceivedConvertsMapsToString() throws Exception {
-        GraylogServerStub serverStub = new GraylogServerStub();
-        GELFProcessor processor = new GELFProcessor(serverStub);
-
         processor.messageReceived(new GELFMessage(TestHelper.zlibCompress(GELF_JSON_WITH_MAP)), new InputStub());
         // All GELF types are tested in GELFMessageTest.
 
@@ -111,5 +110,16 @@ public class GELFProcessorTest {
         assertEquals(1, serverStub.callsToProcessBufferInserter);
         assertEquals("{\"foo\":\"zomg\"}", lm.getField("lol"));
         assertEquals(5, lm.getFields().size());
+    }
+
+    @Test
+    public void testNumbersHaveProperTypes() throws Exception {
+        processor.messageReceived(new GELFMessage(TestHelper.zlibCompress(GELF_JSON_WITH_NUMBERS)), new InputStub());
+
+        final Message lm = serverStub.lastInsertedToProcessBuffer;
+
+        assertEquals("integer should be a long", 5l, lm.getField("integer"));
+        assertEquals("floating point should be a double", 7.6d, lm.getField("float"));
+        assertEquals("quoted number should be a string", "4", lm.getField("stringbutnumber"));
     }
 }
