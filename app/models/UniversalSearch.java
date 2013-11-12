@@ -71,6 +71,7 @@ public class UniversalSearch {
 
         SearchResult result = new SearchResult(
                 query,
+                response.builtQuery,
                 timeRange,
                 response.total_results,
                 response.time,

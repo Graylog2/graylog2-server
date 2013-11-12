@@ -18,17 +18,17 @@
  */
 package models.api.results;
 
-import java.util.List;
-
 import com.google.common.collect.Lists;
-
 import lib.Field;
 import lib.timeranges.TimeRange;
 import models.api.responses.MessageSummaryResponse;
 
+import java.util.List;
+
 public class SearchResult {
 	
 	private final String originalQuery;
+    private final String builtQuery;
     private final TimeRange timeRange;
 	private final int totalResultCount;
 	private final int tookMs;
@@ -37,8 +37,9 @@ public class SearchResult {
     private final List<String> usedIndices;
     private List<Field> allFields;
 
-    public SearchResult(String originalQuery, TimeRange timeRange, int totalResultCount, int tookMs, List<MessageSummaryResponse> results, List<String> fields, List<String> usedIndices) {
+    public SearchResult(String originalQuery, String builtQuery, TimeRange timeRange, int totalResultCount, int tookMs, List<MessageSummaryResponse> results, List<String> fields, List<String> usedIndices) {
 		this.originalQuery = originalQuery;
+        this.builtQuery = builtQuery;
         this.timeRange = timeRange;
 		this.totalResultCount = totalResultCount;
 		this.tookMs = tookMs;
@@ -95,4 +96,7 @@ public class SearchResult {
 		return fields;
 	}
 
+    public String getBuiltQuery() {
+        return builtQuery;
+    }
 }

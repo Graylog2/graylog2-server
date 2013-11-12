@@ -171,7 +171,20 @@
     </div>
 </div>
 
+<div id="built-query" class="modal hide fade" tabindex="-1" role="dialog">
+    <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal">x</button>
+        <h2>Executed ElasticSearch Query</h2>
+        <pre id="query-text">
+        </pre>
+        <script>
+            $("#query-text").text(JSON.stringify(@Html(searchResult.getBuiltQuery()), null, 4));
+        </script>
+    </div>
+</div>
+
 <div class="graph-resolution-selector">
+    <a href="#built-query" class="pull-right" role="button" data-toggle="modal" data-backdrop="true"><i class="icon-bug"></i></a>
     <i class="icon-time"></i>
     <strong>Resolution:</strong> @Html(DateHistogramResolutionSelector.getOptions(histogram.getInterval()))
 </div>

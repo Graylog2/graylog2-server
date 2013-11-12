@@ -32,5 +32,8 @@ public class SearchResultResponse {
 
     @SerializedName("used_indices")
     public List<String> usedIndices;
+
+    @SerializedName("built_query")
+    public String builtQuery;
 	
 }
