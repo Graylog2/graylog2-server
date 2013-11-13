@@ -71,10 +71,23 @@ public class InputRegistry {
                 try {
                     input.launch();
                 } catch (MisfireException e) {
-                    String msg = "The [" + input.getClass().getCanonicalName() + "] input with ID <" + input.getId() + "> " +
-                            "was accepted but misfired. Reason: " + e.getMessage();
-                    core.getActivityWriter().write(new Activity(msg, InputRegistry.class));
-                    LOG.error(msg, e);
+                    StringBuilder msg = new StringBuilder("The [" + input.getClass().getCanonicalName() + "] input with ID <" + input.getId() + "> " +
+                            "was accepted but misfired. Reason: ").append(e.getMessage());
+
+                    // Go down the whole cause chain to build a message that provides as much information as possible.
+                    int maxLevel = 7; // ;)
+                    Throwable cause = e.getCause();
+                    for (int i = 0; i < maxLevel; i++) {
+                        if (cause == null) {
+                            break;
+                        }
+
+                        msg.append(", ").append(cause.getMessage());
+                        cause = cause.getCause();
+                    }
+
+                    core.getActivityWriter().write(new Activity(msg.toString(), InputRegistry.class));
+                    LOG.error(msg.toString(), e);
 
                     // Clean up.
                     cleanInput(input);
