@@ -22,6 +22,13 @@ $(document).ready(function () {
                 var count = data.connected_nodes_count;
                 var total = data.total_nodes_count;
 
+                if (total == 0) {
+                    $("#total-count-zero").removeClass("hidden");
+                    $("#total-count-nonzero").addClass("hidden");
+                } else {
+                    $("#total-count-zero").addClass("hidden");
+                    $("#total-count-nonzero").removeClass("hidden");
+                }
                 $("#connected-count").html(count);
                 $("#total-count").html(total);
                 $(".footer").removeClass("hidden");

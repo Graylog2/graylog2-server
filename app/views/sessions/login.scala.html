@@ -22,7 +22,8 @@
                 <button type="submit" id="signin" name="submit" class="btn btn-info btn-block @if(disconnected){hidden}">Sign in</button>
             }
             <div class="footer hidden">
-                <span><span id="connected-count"></span> of <span id="total-count"></span> nodes connected.</span>
+                <span id="total-count-zero" class="hidden">None of the configured nodes could be reached.</span>
+                <span id="total-count-nonzero"><span id="connected-count"></span> of <span id="total-count"></span> nodes connected.</span>
             </div>
 		</div>
 	</div>
