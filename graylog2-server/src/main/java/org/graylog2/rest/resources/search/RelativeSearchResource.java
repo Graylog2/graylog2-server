@@ -32,6 +32,7 @@ import org.slf4j.LoggerFactory;
 
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
+import java.util.Map;
 
 /**
  * @author Lennart Koopmann <lennart@torch.sh>
@@ -54,13 +55,24 @@ public class RelativeSearchResource extends SearchResource {
             @ApiParam(title = "query", description = "Query (Lucene syntax)", required = true) @QueryParam("query") String query,
             @ApiParam(title = "range", description = "Relative timeframe to search in. See method description.", required = true) @QueryParam("range") int range,
             @ApiParam(title = "limit", description = "Maximum number of messages to return.", required = false) @QueryParam("limit") int limit,
-            @ApiParam(title = "offset", description = "Offset", required = false) @QueryParam("offset") int offset) {
+            @ApiParam(title = "offset", description = "Offset", required = false) @QueryParam("offset") int offset,
+            @ApiParam(title = "filter", description = "Filter", required = false) @QueryParam("filter") String filter) {
         checkQuery(query);
 
         try {
-            return json(buildSearchResult(
-                    core.getIndexer().searches().search(query, buildRelativeTimeRange(range), limit, offset)
-            ));
+            Map<String, Object> searchResult;
+
+            if (filter == null) {
+                searchResult = buildSearchResult(
+                        core.getIndexer().searches().search(query, buildRelativeTimeRange(range), limit, offset)
+                );
+            } else {
+                searchResult = buildSearchResult(
+                        core.getIndexer().searches().search(query, filter, buildRelativeTimeRange(range), limit, offset)
+                );
+            }
+
+            return json(searchResult);
         } catch (IndexHelper.InvalidRangeFormatException e) {
             LOG.warn("Invalid timerange parameters provided. Returning HTTP 400.", e);
             throw new WebApplicationException(400);
