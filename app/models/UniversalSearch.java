@@ -39,6 +39,7 @@ public class UniversalSearch {
 
     private final ApiClient api;
     private final String query;
+    private final String filter;
     private final TimeRange timeRange;
     private final Integer page;
 
@@ -49,6 +50,12 @@ public class UniversalSearch {
 
     @AssistedInject
     private UniversalSearch(ApiClient api, @Assisted TimeRange timeRange, @Assisted String query, @Assisted Integer page) {
+        this(api, timeRange, query, page, null);
+    }
+
+    @AssistedInject
+    private UniversalSearch(ApiClient api, @Assisted TimeRange timeRange, @Assisted("query") String query, @Assisted Integer page, @Assisted("filter") String filter) {
+        this.filter = filter;
         this.api = api;
         this.query = query;
         this.timeRange = timeRange;
@@ -67,6 +74,7 @@ public class UniversalSearch {
                 .queryParam("query", query)
                 .queryParam("limit", PER_PAGE)
                 .queryParam("offset", page*PER_PAGE)
+                .queryParam("filter", (filter == null ? "*" : filter))
                 .execute();
 
         SearchResult result = new SearchResult(
@@ -143,6 +151,7 @@ public class UniversalSearch {
     public interface Factory {
         UniversalSearch queryWithRange(String query, TimeRange timeRange);
         UniversalSearch queryWithRangeAndPage(String query, TimeRange timeRange, Integer page);
+        UniversalSearch queryWithFilterRangeAndPage(@Assisted("query") String query, @Assisted("filter") String filter, TimeRange timeRange, Integer page);
     }
 
 }

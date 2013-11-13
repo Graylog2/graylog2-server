@@ -44,9 +44,7 @@ public class SearchController extends AuthenticatedController {
     private StreamService streamService;
 
     public Result indexForStream(String streamId, String q, String rangeType, int relative, String from, String to, String keyword, String interval, int page) {
-        return ok("not implemented yet");
-
-        /*Stream stream;
+        Stream stream;
         try {
             stream = streamService.get(streamId);
         } catch (IOException e) {
@@ -56,22 +54,11 @@ public class SearchController extends AuthenticatedController {
             return status(504, views.html.errors.error.render(message, e, request()));
         }
 
-        String predicate = "stream==" + streamId;
-        String oldQuery = q;
-
-        if (q == null || q.trim().equals("*") || q.trim().isEmpty()) {
-            q = predicate;
-        } else {
-            q = "(" + q + ") AND " + predicate;
-        }
-
-        if (oldQuery.equals("*")) {
-            oldQuery = "";
-        }
+        String filter = "streams:" + streamId;
 
         UniversalSearch search;
         try {
-            search = getSearch(q, rangeType, relative, from, to, keyword, page);
+            search = getSearch(q, filter, rangeType, relative, from, to, keyword, page);
         } catch(InvalidRangeParametersException e2) {
             return status(400, views.html.errors.error.render("Invalid range parameters provided.", e2, request()));
         } catch(IllegalArgumentException e1) {
@@ -104,24 +91,20 @@ public class SearchController extends AuthenticatedController {
         }
 
         if (searchResult.getTotalResultCount() > 0) {
-            return ok(views.html.search.results.render(currentUser(), search, searchResult, histogramResult, oldQuery, page, stream));
+            return ok(views.html.search.results.render(currentUser(), search, searchResult, histogramResult, q, page, stream));
         } else {
-            return ok(views.html.search.noresults.render(currentUser(), oldQuery));
-        }*/
+            return ok(views.html.search.noresults.render(currentUser(), q, searchResult));
+        }
     }
 
     public Result index(String q, String rangeType, int relative, String from, String to, String keyword, String interval, int page) {
         UniversalSearch search;
         try {
-            search = getSearch(q, rangeType, relative, from, to, keyword, page);
+            search = getSearch(q, null, rangeType, relative, from, to, keyword, page);
         } catch(InvalidRangeParametersException e2) {
             return status(400, views.html.errors.error.render("Invalid range parameters provided.", e2, request()));
         } catch(IllegalArgumentException e1) {
             return status(400, views.html.errors.error.render("Invalid range type provided.", e1, request()));
-        }
-
-        if (q.trim().isEmpty()) {
-            q = "*";
         }
 
         SearchResult searchResult;
@@ -156,16 +139,20 @@ public class SearchController extends AuthenticatedController {
         }
     }
 
-    private UniversalSearch getSearch(String q, String rangeType, int relative,String from, String to, String keyword, int page)
+    private UniversalSearch getSearch(String q, String filter, String rangeType, int relative,String from, String to, String keyword, int page)
         throws InvalidRangeParametersException, IllegalArgumentException {
-        if (q == null || q.isEmpty()) {
+        if (q == null || q.trim().isEmpty()) {
             q = "*";
         }
 
         // Determine timerange type.
         TimeRange timerange = TimeRange.factory(rangeType, relative, from, to, keyword);
 
-        UniversalSearch search = searchFactory.queryWithRangeAndPage(q, timerange, page);
+        UniversalSearch search;
+        if (filter == null)
+            search= searchFactory.queryWithRangeAndPage(q, timerange, page);
+        else
+            search = searchFactory.queryWithFilterRangeAndPage(q, filter, timerange, page);
 
         return search;
     }
