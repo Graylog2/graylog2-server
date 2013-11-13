@@ -25,7 +25,10 @@ import org.elasticsearch.action.search.SearchRequestBuilder;
 import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.action.search.SearchType;
 import org.elasticsearch.client.Client;
+import org.elasticsearch.index.query.FilterBuilder;
+import org.elasticsearch.index.query.FilterBuilders;
 import org.elasticsearch.index.query.QueryBuilder;
+import org.elasticsearch.index.query.QueryBuilders;
 import org.elasticsearch.search.SearchHit;
 import org.elasticsearch.search.facet.FacetBuilders;
 import org.elasticsearch.search.facet.datehistogram.DateHistogramFacet;
@@ -90,6 +93,19 @@ public class Searches {
         SearchResponse r = c.search(request).actionGet();
 		return new SearchResult(r.getHits(), indices, query, request.source(), r.getTook());
 	}
+
+    public SearchResult search(String query, String filter, TimeRange range, int limit, int offset) throws IndexHelper.InvalidRangeFormatException {
+        if(limit <= 0) {
+            limit = LIMIT;
+        }
+
+        Set<String> indices = IndexHelper.determineAffectedIndices(server, range);
+
+        SearchRequest request = filteredSearchRequest(query, filter, indices, limit, offset, range, SortOrder.DESC).request();
+
+        SearchResponse r = c.search(request).actionGet();
+        return new SearchResult(r.getHits(), indices, query, request.source(), r.getTook());
+    }
 
     public TermsResult terms(String field, int size, String query, TimeRange range) throws IndexHelper.InvalidRangeFormatException {
         if (size == 0) {
@@ -219,6 +235,23 @@ public class Searches {
         if (sort != null) {
             srb.addSort("timestamp", sort);
         }
+
+        return srb;
+    }
+
+    private SearchRequestBuilder filteredSearchRequest(String query, String filter, Set<String> indices, int limit, int offset, TimeRange range, SortOrder sort) throws IndexHelper.InvalidRangeFormatException {
+        SearchRequestBuilder srb = standardSearchRequest(query, indices, limit, offset, range, sort);
+
+
+        FilterBuilder fb = FilterBuilders.queryFilter(
+                QueryBuilders.queryString(filter)
+        );
+
+        if (range != null) {
+            fb = FilterBuilders.andFilter(IndexHelper.getTimestampRangeFilter(range), fb);
+        }
+
+        srb.setFilter(fb);
 
         return srb;
     }
