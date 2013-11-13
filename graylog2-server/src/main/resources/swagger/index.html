@@ -27,7 +27,7 @@
       onComplete: function(swaggerApi, swaggerUi){
 
         // We are taking the base path of the system API here. This will break if you should ever rename it lol.
-        if(apiTarget != swaggerApi.System.basePath) {
+        if(swaggerApi.System && apiTarget != swaggerApi.System.basePath) {
           alert("IMPORTANT: Please use the configured REST transport address (" + swaggerApi.System.basePath + ") if you want working examples. " +
                   "This connection to " + apiTarget + " will cause problems with Access-Control-Allow-Origin.");
         }
