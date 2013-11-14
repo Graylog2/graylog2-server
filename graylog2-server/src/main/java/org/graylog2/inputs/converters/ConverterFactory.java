@@ -47,6 +47,8 @@ public class ConverterFactory {
                 return new IPAnonymizerConverter(config);
             case TOKENIZER:
                 return new TokenizerConverter(config);
+            case CSV:
+                return new CsvConverter(config);
             default:
                 throw new NoSuchConverterException();
         }

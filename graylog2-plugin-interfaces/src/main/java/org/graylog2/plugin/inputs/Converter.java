@@ -21,8 +21,6 @@
  */
 package org.graylog2.plugin.inputs;
 
-import com.google.common.collect.Maps;
-
 import java.util.Map;
 
 /**
@@ -38,7 +36,8 @@ public abstract class Converter {
         SYSLOG_PRI_LEVEL,
         SYSLOG_PRI_FACILITY,
         TOKENIZER,
-        IP_ANONYMIZER
+        IP_ANONYMIZER,
+        CSV
     }
 
     private final Type type;

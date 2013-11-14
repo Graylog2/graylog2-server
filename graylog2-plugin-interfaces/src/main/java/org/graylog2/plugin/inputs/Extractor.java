@@ -48,7 +48,8 @@ public abstract class Extractor implements EmbeddedPersistable {
     public enum Type {
         SUBSTRING,
         REGEX,
-        SPLIT_AND_INDEX
+        SPLIT_AND_INDEX,
+        COPY_INPUT
     }
 
     public enum CursorStrategy {

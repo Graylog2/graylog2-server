@@ -51,6 +51,8 @@ public class ExtractorFactory {
                 return new SubstringExtractor(id, title, cursorStrategy, sourceField, targetField, extractorConfig, creatorUserId, converters, conditionType, conditionValue);
             case SPLIT_AND_INDEX:
                 return new SplitAndIndexExtractor(id, title, cursorStrategy, sourceField, targetField, extractorConfig, creatorUserId, converters, conditionType, conditionValue);
+            case COPY_INPUT:
+                return new CopyInputExtractor(id, title, cursorStrategy, sourceField, targetField, extractorConfig, creatorUserId, converters, conditionType, conditionValue);
             default:
                 throw new NoSuchExtractorException();
         }
