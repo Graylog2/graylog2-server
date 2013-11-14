@@ -56,7 +56,8 @@ public class Version {
         this.additional = additional;
     }
 
-    public String getName() {
+    @Override
+    public String toString() {
         StringBuilder sb = new StringBuilder();
 
         sb.append(major).append(".").append(minor).append(".").append(patch);
@@ -79,7 +80,7 @@ public class Version {
 
         Version version = (Version) obj;
 
-        return getName().equals(version.getName());
+        return toString().equals(version.toString());
     }
 
 }

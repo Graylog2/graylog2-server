@@ -32,11 +32,11 @@ public class VersionTest {
 
     @Test
     public void testGetName() throws Exception {
-        assertEquals("0.20.0", new Version(0, 20, 0).getName());
-        assertEquals("1.0.0", new Version(1, 0, 0).getName());
-        assertEquals("1.2.3", new Version(1, 2, 3).getName());
-        assertEquals("0.0.7", new Version(0, 0, 7).getName());
-        assertEquals("1.0.0-preview.1", new Version(1, 0, 0, "preview.1").getName());
+        assertEquals("0.20.0", new Version(0, 20, 0).toString());
+        assertEquals("1.0.0", new Version(1, 0, 0).toString());
+        assertEquals("1.2.3", new Version(1, 2, 3).toString());
+        assertEquals("0.0.7", new Version(0, 0, 7).toString());
+        assertEquals("1.0.0-preview.1", new Version(1, 0, 0, "preview.1").toString());
     }
 
     @Test
