@@ -26,6 +26,8 @@ import lib.APIException;
 import lib.ApiClient;
 import models.api.requests.CreateExtractorRequest;
 import models.api.responses.system.ExtractorSummaryResponse;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import play.mvc.Http;
 
 import java.io.IOException;
@@ -36,6 +38,7 @@ import java.util.Map;
  * @author Lennart Koopmann <lennart@torch.sh>
  */
 public class Extractor {
+    private static final Logger log = LoggerFactory.getLogger(Extractor.class);
 
     public interface Factory {
         Extractor fromResponse(ExtractorSummaryResponse esr);
@@ -52,7 +55,8 @@ public class Extractor {
     public enum Type {
         SUBSTRING("Substring"),
         REGEX("Regular expression"),
-        SPLIT_AND_INDEX("Split & Index");
+        SPLIT_AND_INDEX("Split & Index"),
+        COPY_INPUT("Copy Input");
         private final String description;
 
         Type(String description) {
@@ -221,6 +225,44 @@ public class Extractor {
             case SPLIT_AND_COUNT:
                 if (formFieldSet(form, "converter_split_and_count_by")) {
                     config.put("split_by", form.get("converter_split_and_count_by")[0]);
+                }
+                break;
+            case CSV:
+                if (formFieldSet(form, "csv_column_header")) {
+                    config.put("column_header", form.get("csv_column_header")[0]);
+                }
+                if (formFieldSet(form, "csv_separator")) {
+                    String csv_separator = form.get("csv_separator")[0];
+                    char c = ',';
+                    if (csv_separator.length() == 1) {
+                        c = csv_separator.charAt(0);
+                    } else if (csv_separator.length() == 2) {
+                        if (csv_separator.charAt(0) == '\\') {
+                            switch (csv_separator.charAt(1)) {
+                                case 'n': c = '\n'; break;
+                                case 't': c = '\t'; break;
+                                case '\\': c = '\\'; break;
+                                default: log.error("Unknown escape sequence {}, cannot create CSV converter", csv_separator);
+                            }
+                        } else {
+                            log.error("Illegal escape sequence '{}', cannot create CSV converter", csv_separator);
+                        }
+                    } else {
+                        log.error("No valid separator, cannot create CSV converter.");
+                    }
+                    config.put("separator", c);
+                }
+                if (formFieldSet(form, "csv_quote_char")) {
+                    config.put("quote_char", form.get("csv_quote_char")[0]);
+                }
+                if (formFieldSet(form, "csv_escape_char")) {
+                    config.put("escape_char", form.get("csv_escape_char")[0]);
+                }
+                if (formFieldSet(form, "csv_strict_quotes")) {
+                    config.put("strict_quotes", Boolean.valueOf(form.get("csv_strict_quotes")[0]));
+                }
+                if (formFieldSet(form, "csv_trim_leading_whitespace")) {
+                    config.put("trim_leading_whitespace", Boolean.valueOf(form.get("csv_trim_leading_whitespace")[0]));
                 }
                 break;
         }

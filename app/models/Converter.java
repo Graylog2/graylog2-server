@@ -33,7 +33,8 @@ public class Converter {
         IP_ANONYMIZER,
         SYSLOG_PRI_LEVEL,
         SYSLOG_PRI_FACILITY,
-        TOKENIZER;
+        TOKENIZER,
+        CSV;
 
         public static Type fromString(String type) {
             return valueOf(type.toUpperCase());

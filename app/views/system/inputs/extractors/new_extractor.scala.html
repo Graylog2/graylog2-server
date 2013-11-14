@@ -34,6 +34,10 @@
                 @views.html.system.inputs.extractors.configurations.split_and_index()
             }
 
+            @if(extractorType.equals(Extractor.Type.COPY_INPUT)) {
+                @views.html.system.inputs.extractors.configurations.copy_input()
+            }
+
             <label class="radio">
                 <input type="radio" name="condition_type" id="no-condition-type" value="none" checked />
                 Always try to extract
@@ -95,6 +99,7 @@
                     <option value="hash">Hash</option>
                     <option value="split-and-count">Split & Count</option>
                     <option value="tokenizer">Key=Value pairs to fields</option>
+                    <option value="csv">CSV to fields</option>
                     <option value="ip-anonymizer">Anonymize IPv4 addresses</option>
                     <option value="syslog-pri-level">Syslog level from PRI</option>
                     <option value="syslog-pri-facility">Syslog facility from PRI</option>
@@ -110,6 +115,7 @@
             @views.html.system.inputs.extractors.converters.split_and_count()
             @views.html.system.inputs.extractors.converters.ip_anonymizer()
             @views.html.system.inputs.extractors.converters.tokenizer()
+            @views.html.system.inputs.extractors.converters.csv()
 
             <div class="alert alert-info">
                 Please note that you cannot use the cutting feature on standard fields
