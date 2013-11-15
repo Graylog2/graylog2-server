@@ -112,7 +112,7 @@ public class StreamResource extends RestResource {
     @Produces(MediaType.APPLICATION_JSON)
     public String get() {
         List<Map<String, Object>> streams = Lists.newArrayList();
-        for (Stream stream : StreamImpl.loadAllEnabled(core)) {
+        for (Stream stream : StreamImpl.loadAll(core)) {
         	streams.add(((StreamImpl) stream).asMap());
         }
         
@@ -122,7 +122,23 @@ public class StreamResource extends RestResource {
 
         return json(result);
     }
-    
+
+    @GET @Path("/enabled") @Timed
+    @ApiOperation(value = "Get a list of all streams")
+    @Produces(MediaType.APPLICATION_JSON)
+    public String getEnabled() {
+        List<Map<String, Object>> streams = Lists.newArrayList();
+        for (Stream stream : StreamImpl.loadAllEnabled(core)) {
+            streams.add(((StreamImpl) stream).asMap());
+        }
+
+        Map<String, Object> result = Maps.newHashMap();
+        result.put("total", streams.size());
+        result.put("streams", streams);
+
+        return json(result);
+    }
+
     @GET @Path("/{streamId}") @Timed
     @ApiOperation(value = "Get a single stream")
     @Produces(MediaType.APPLICATION_JSON)
@@ -187,7 +203,7 @@ public class StreamResource extends RestResource {
             throw new WebApplicationException(404);
         }
 
-        return Response.status(Response.Status.fromStatusCode(204)).build();
+        return Response.status(Response.Status.fromStatusCode(200)).build();
     }
 
     @POST @Path("/{streamId}/resume") @Timed
@@ -209,6 +225,6 @@ public class StreamResource extends RestResource {
             throw new WebApplicationException(404);
         }
 
-        return Response.status(Response.Status.fromStatusCode(204)).build();
+        return Response.status(Response.Status.fromStatusCode(200)).build();
     }
 }
