@@ -19,22 +19,32 @@
 package models;
 
 import com.google.common.collect.Lists;
+import com.google.inject.assistedinject.Assisted;
+import com.google.inject.assistedinject.AssistedInject;
 import models.api.responses.streams.StreamRuleSummaryResponse;
 import models.api.responses.streams.StreamSummaryResponse;
 import models.api.responses.TimestampResponse;
+import org.joda.time.DateTime;
 
 import java.util.List;
 
 public class Stream {
+
+    public interface Factory {
+        public Stream fromSummaryResponse(StreamSummaryResponse ssr);
+    }
 	
 	private final String id;
     private final String title;
     private final String creatorUserId;
-    private final TimestampResponse createdAt;
+    private final String createdAt;
     private final List<StreamRule> streamRules;
     private final Boolean disabled;
 
-	public Stream(StreamSummaryResponse ssr) {
+    private UserService userService;
+
+	@AssistedInject
+    private Stream(UserService userService, @Assisted StreamSummaryResponse ssr) {
 		this.id = ssr.id;
         this.title = ssr.title;
         this.creatorUserId = ssr.creatorUserId;
@@ -43,6 +53,8 @@ public class Stream {
         this.streamRules = Lists.newArrayList();
 
         this.disabled = ssr.disabled;
+
+        this.userService = userService;
 
         for (StreamRuleSummaryResponse streamRuleSummaryResponse : ssr.streamRules) {
             streamRules.add(new StreamRule(streamRuleSummaryResponse));
@@ -61,8 +73,12 @@ public class Stream {
         return creatorUserId;
     }
 
-    public TimestampResponse getCreatedAt() {
-        return createdAt;
+    public User getCreatorUser() {
+        return userService.load(this.creatorUserId);
+    }
+
+    public DateTime getCreatedAt() {
+        return DateTime.parse(createdAt);
     }
 
     public List<StreamRule> getStreamRules() {
