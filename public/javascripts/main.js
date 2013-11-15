@@ -689,10 +689,20 @@ $(document).ready(function() {
         var result = confirm("Really delete stream rule?");
         if (result) {
             var elem = $(this).parent();
-            //$(elem).css( "background-color", "red" )
             var url = event.currentTarget.attributes["data-removeUrl"].value;
             $.post(url, {}, function() {
                 elem.remove();
+            });
+        }
+    })
+
+    $(".remove-stream").on("click", function(event) {
+        var result = confirm("Really delete stream?");
+        if (result) {
+            var elem = $(this).closest(".stream-row");
+            var url = event.currentTarget.attributes["data-removeUrl"].value;
+            $.post(url, {}, function() {
+                elem.fadeOut();
             });
         }
     });

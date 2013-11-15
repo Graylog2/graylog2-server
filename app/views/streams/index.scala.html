@@ -1,4 +1,4 @@
-@(currentUser: User, streams: models.api.results.StreamsResult, nodes: Map[String, Node])
+@(currentUser: User, streams: List[Stream], nodes: Map[String, Node])
 
 @main("Streams", views.html.sidebars.standard(currentUser), "", currentUser) {
 
@@ -14,19 +14,19 @@
         186
     )
 
-    @for(stream <- streams.getStreams()) {
+    @for(stream <- streams) {
         <div class="row-fluid node-row stream-row" data-stream-id="@stream.getId">
             <span class="pull-right node-row-info">
-                <span class="text">Created by @stream.getCreatorUserId</span>
+                <span class="text">Created by @views.html.partials.links.to_user.render(stream.getCreatorUser)
+                    at @lib.DateTools.inUserTimeZone(stream.getCreatedAt())
+                </span>
                     &nbsp;
 
-                <form action="@routes.StreamsController.delete(stream.getId)" method="POST">
-                    <button class="btn btn-danger btn-mini"
+                <button class="btn btn-danger btn-mini remove-stream"
                     type="submit"
-                    data-confirm="Really delete Stream?">
+                    data-removeUrl="@routes.StreamsController.delete(stream.getId)">
                         Delete
-                    </button>
-                </form>
+                </button>
 
                 <div class="btn-group">
                     <a class="btn btn-mini dropdown-toggle" data-toggle="dropdown" href="#">
@@ -49,15 +49,24 @@
                                 }
                             </ul>
                         </li>
+                        @if(stream.getDisabled() == false) {
+                            <li><a href="@routes.StreamsController.pause(stream.getId)" data-confirm="Really pause stream?">Pause this stream</a></li>
+                        } else {
+                            <li><a href="@routes.StreamsController.resume(stream.getId)">Resume this stream</a></li>
+                        }
                     </ul>
                 </div>
             </span>
 
             <h3>
                 <i class="icon icon-ellipsis-vertical"></i>
-                <a href="@routes.SearchController.indexForStream(stream.getId, "*", "relative", 300)">@stream.getTitle</a>
+                <a href="@routes.StreamSearchController.index(stream.getId, "*", "relative", 300)">@stream.getTitle</a>
 
-                <span class="label label-success">Active</span>
+                @if(stream.getDisabled() == false) {
+                    <span class="label label-success">Active</span>
+                } else {
+                    <span class="label label-warning">Paused</span>
+                }
             </h3>
 
             <form class="add-streamrule-form" data-stream-id="@stream.getId" action="#">
