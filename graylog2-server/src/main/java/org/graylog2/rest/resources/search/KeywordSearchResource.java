@@ -52,13 +52,20 @@ public class KeywordSearchResource extends SearchResource {
             @ApiParam(title = "query", description = "Query (Lucene syntax)", required = true) @QueryParam("query") String query,
             @ApiParam(title = "keyword", description = "Range keyword", required = true) @QueryParam("keyword") String keyword,
             @ApiParam(title = "limit", description = "Maximum number of messages to return.", required = false) @QueryParam("limit") int limit,
-            @ApiParam(title = "offset", description = "Offset", required = false) @QueryParam("offset") int offset) {
+            @ApiParam(title = "offset", description = "Offset", required = false) @QueryParam("offset") int offset,
+            @ApiParam(title = "filter", description = "Filter", required = false) @QueryParam("filter") String filter) {
         checkQueryAndKeyword(query, keyword);
 
         try {
-            return json(buildSearchResult(
-                    core.getIndexer().searches().search(query, buildKeywordTimeRange(keyword), limit, offset)
-            ));
+            if (filter == null) {
+                return json(buildSearchResult(
+                        core.getIndexer().searches().search(query, buildKeywordTimeRange(keyword), limit, offset)
+                ));
+            } else {
+                return json(buildSearchResult(
+                        core.getIndexer().searches().search(query, filter, buildKeywordTimeRange(keyword), limit, offset)
+                ));
+            }
         } catch (IndexHelper.InvalidRangeFormatException e) {
             LOG.warn("Invalid timerange parameters provided. Returning HTTP 400.", e);
             throw new WebApplicationException(400);
