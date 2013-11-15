@@ -41,6 +41,9 @@ public interface GraylogServer extends Runnable {
     public boolean isMaster();
     
     public String getNodeId();
+
+    // This is just temporary. Move to graylog2-plugins.
+    public Object getGELFChunkManager();
     
     public MessageGateway getMessageGateway();
     

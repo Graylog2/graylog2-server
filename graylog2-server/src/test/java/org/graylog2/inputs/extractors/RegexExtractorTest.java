@@ -23,7 +23,6 @@ import com.google.common.collect.Lists;
 import org.graylog2.ConfigurationException;
 import org.graylog2.GraylogServerStub;
 import org.graylog2.plugin.Message;
-import org.graylog2.plugin.Tools;
 import org.graylog2.plugin.inputs.Converter;
 import org.graylog2.plugin.inputs.Extractor;
 import org.joda.time.DateTime;

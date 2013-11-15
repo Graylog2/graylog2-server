@@ -27,22 +27,11 @@
 
     <properties>
         <metrics.version>3.0.0</metrics.version>
-        <jackson.version>2.2.0</jackson.version>
         <mainClass>org.graylog2.Main</mainClass>
         <jersey.version>2.0</jersey.version>
     </properties>
 
     <dependencies>
-        <dependency>
-            <groupId>com.fasterxml.jackson.core</groupId>
-            <artifactId>jackson-core</artifactId>
-            <version>${jackson.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>com.fasterxml.jackson.core</groupId>
-            <artifactId>jackson-databind</artifactId>
-            <version>${jackson.version}</version>
-        </dependency>
         <dependency>
             <groupId>commons-codec</groupId>
             <artifactId>commons-codec</artifactId>
@@ -117,11 +106,6 @@
             <version>3.2.1</version>
         </dependency>
         <dependency>
-            <groupId>io.netty</groupId>
-            <artifactId>netty</artifactId>
-            <version>3.8.0.Final</version>
-        </dependency>
-        <dependency>
             <groupId>com.librato.metrics</groupId>
             <artifactId>metrics-librato</artifactId>
             <version>2.1.2.4</version>
@@ -132,9 +116,9 @@
             <version>${project.parent.version}</version>
         </dependency>
         <dependency>
-            <groupId>org.productivity.java</groupId>
-            <artifactId>syslog4j-graylog2</artifactId>
-            <version>0.9.48-graylog2</version>
+            <groupId>org.graylog2</groupId>
+            <artifactId>graylog2-inputs</artifactId>
+            <version>${project.parent.version}</version>
         </dependency>
         <dependency>
             <groupId>com.github.stephenc.high-scale-lib</groupId>
@@ -160,11 +144,6 @@
             <groupId>com.joestelmach</groupId>
             <artifactId>natty</artifactId>
             <version>0.6</version>
-        </dependency>
-        <dependency>
-            <groupId>com.jayway.jsonpath</groupId>
-            <artifactId>json-path</artifactId>
-            <version>0.8.1</version>
         </dependency>
         <dependency>
             <groupId>net.sf.opencsv</groupId>
