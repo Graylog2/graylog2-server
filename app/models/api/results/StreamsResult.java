@@ -22,34 +22,41 @@ import java.util.List;
 
 import com.google.common.collect.Lists;
 
+import com.google.inject.Inject;
 import models.Stream;
+import models.StreamService;
 import models.api.responses.streams.StreamSummaryResponse;
 
 public class StreamsResult {
 
 	private final int total;
 	private final List<StreamSummaryResponse> streams;
-	
-	public StreamsResult(int total, List<StreamSummaryResponse> streams) {
+
+    private final Stream.Factory streamFactory;
+
+    @Inject
+	public StreamsResult(Stream.Factory streamFactory, int total, List<StreamSummaryResponse> streams) {
 		this.total = total;
 		this.streams = streams;
+        this.streamFactory = streamFactory;
 	}
-	
+
 	public int getTotal() {
 		return total;
 	}
 	
-	public List<Stream> getStreams() {
-		List<Stream> streams = Lists.newArrayList();
+	public List<StreamSummaryResponse> getStreams() {
+		/*List<Stream> streams = Lists.newArrayList();
 		
 		for (StreamSummaryResponse ssr : this.streams) {
-			streams.add(new Stream(ssr));
+            streams.add(streamFactory.fromSummaryResponse(ssr));
 		}
-		
-		return streams;
+
+		return streams;*/
+        return streams;
 	}
 
-    public static StreamsResult mergeResults(List<StreamsResult> streamsResults) {
+    /*public static StreamsResult mergeResults(List<StreamsResult> streamsResults) {
         int total = 0;
         List<StreamSummaryResponse> streams = Lists.newArrayList();
 
@@ -59,5 +66,5 @@ public class StreamsResult {
         }
 
         return new StreamsResult(total, streams);
-    }
+    }*/
 }

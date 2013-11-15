@@ -24,12 +24,13 @@ import lib.ApiClient;
 import lib.ServerNodes;
 import models.Node;
 import models.StreamService;
+import models.Stream;
 import models.api.requests.streams.CreateStreamRequest;
-import models.api.results.StreamsResult;
 import play.data.Form;
 import play.mvc.Result;
 
 import java.io.IOException;
+import java.util.List;
 import java.util.Map;
 
 public class StreamsController extends AuthenticatedController {
@@ -43,7 +44,7 @@ public class StreamsController extends AuthenticatedController {
 
     public Result index() {
 		try {
-			StreamsResult streams = streamService.allEnabled();
+			List<Stream> streams = streamService.all();
             Map<String, Node> nodes = serverNodes.asMap();
 
 			return ok(views.html.streams.index.render(currentUser(), streams, nodes));
@@ -96,5 +97,30 @@ public class StreamsController extends AuthenticatedController {
 
         return redirect(routes.StreamsController.index());
     }
-	
+
+    public Result pause(String stream_id) {
+        try {
+            streamService.pause(stream_id);
+        } catch (APIException e) {
+            String message = "Could not delete stream. We expect HTTP 204, but got a HTTP " + e.getHttpCode() + ".";
+            return status(504, views.html.errors.error.render(message, e, request()));
+        } catch (IOException e) {
+            return status(504, views.html.errors.error.render(ApiClient.ERROR_MSG_IO, e, request()));
+        }
+
+        return redirect(routes.StreamsController.index());
+    }
+
+    public Result resume(String stream_id) {
+        try {
+            streamService.resume(stream_id);
+        } catch (APIException e) {
+            String message = "Could not delete stream. We expect HTTP 204, but got a HTTP " + e.getHttpCode() + ".";
+            return status(504, views.html.errors.error.render(message, e, request()));
+        } catch (IOException e) {
+            return status(504, views.html.errors.error.render(ApiClient.ERROR_MSG_IO, e, request()));
+        }
+
+        return redirect(routes.StreamsController.index());
+    }
 }

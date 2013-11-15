@@ -97,6 +97,7 @@ public class UniversalSearch {
                 .queryParam("interval", interval)
                 .queryParam("query", query)
                 .queryParams(timeRange.getQueryParams())
+                .queryParam("filter", (filter == null ? "*" : filter))
                 .execute();
         return new DateHistogramResult(response.query, response.time, response.interval, response.results);
     }
@@ -107,6 +108,7 @@ public class UniversalSearch {
                 .queryParam("field", field)
                 .queryParam("query", query)
                 .queryParams(timeRange.getQueryParams())
+                .queryParam("filter", (filter == null ? "*" : filter))
                 .execute();
     }
 
@@ -116,6 +118,7 @@ public class UniversalSearch {
                 .queryParam("field", field)
                 .queryParam("query", query)
                 .queryParams(timeRange.getQueryParams())
+                .queryParam("filter", (filter == null ? "*" : filter))
                 .execute();
     }
 
@@ -126,6 +129,7 @@ public class UniversalSearch {
                 .queryParam("interval", interval)
                 .queryParam("query", query)
                 .queryParams(timeRange.getQueryParams())
+                .queryParam("filter", (filter == null ? "*" : filter))
                 .execute();
     }
 

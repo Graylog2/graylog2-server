@@ -29,7 +29,7 @@ public class StreamSummaryResponse {
 	public String title;
 	
 	@SerializedName("created_at")
-	public TimestampResponse createdAt;
+	public String createdAt;
 	
 	@SerializedName("creator_user_id")
 	public String creatorUserId;

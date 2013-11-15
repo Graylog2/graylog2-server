@@ -15,7 +15,22 @@
 }
 
 @route(page: Integer) = @{
-    search.getRoute(request, page);
+    /* This lousy hack is necessary, because there are no proper
+       classes in play to create or modify Call objects in a
+       programmatic manner to add or replace query parameters.
+     */
+    val s = request.uri()
+    val Matcher = """([?&])page=[0-9]+""".r
+    Matcher.findFirstIn(s) match {
+        case Some(_) => Matcher.replaceAllIn(s, "$1page="+page)
+        case None => {
+            val FirstParam = """\?""".r
+            FirstParam.findFirstIn(s) match {
+                case Some(_) => s + "&page="+page
+                case None => s + "?page="+page
+            }
+        }
+    }
 }
 
 @main("Search results", sidebars.searchresults(searchResult), query, currentUser) {

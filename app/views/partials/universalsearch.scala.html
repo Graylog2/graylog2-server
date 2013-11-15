@@ -3,7 +3,7 @@
 <div class="row-fluid no-bm">
     <div class="span12" id="universalsearch">
 
-        <form class="universalsearch-form" action="@if(stream == null) { @controllers.routes.SearchController.index() } else { @controllers.routes.SearchController.indexForStream(stream.getId) }" method="GET">
+        <form class="universalsearch-form" action="@if(stream == null) { @controllers.routes.SearchController.index() } else { @controllers.routes.StreamSearchController.index(stream.getId) }" method="GET">
             <input type="hidden" name="rangetype"
                     value="@if(request.getQueryString("rangetype") == null) {relative} else {@request.getQueryString("rangetype")}"
                     id="universalsearch-rangetype" />
