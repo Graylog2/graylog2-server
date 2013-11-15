@@ -42,7 +42,7 @@ public class CommandLineArguments {
     private String pluginShortname;
     
     @Parameter(names = {"-v", "--plugin-version"}, description = "Install plugin with this version")
-    private String pluginVersion = Core.GRAYLOG2_VERSION;
+    private String pluginVersion = Core.GRAYLOG2_VERSION.toString();
 
     @Parameter(names = {"-m", "--force-plugin"}, description = "Force plugin installation even if this version of graylog2-server is not officially supported.")
     private boolean forcePlugin = false;
