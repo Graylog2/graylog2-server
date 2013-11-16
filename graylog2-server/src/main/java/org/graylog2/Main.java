@@ -171,8 +171,8 @@ public final class Main {
         Core server = new Core();
         server.initialize(configuration, metrics);
 
-        // Could it be that there is another master instance already?
-        Node.register(server, configuration.isMaster(), configuration.getRestTransportUri());
+        // Register this node.
+        Node.registerServer(server, configuration.isMaster(), configuration.getRestTransportUri());
 
         Node thisNode = null;
         try {

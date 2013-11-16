@@ -65,7 +65,6 @@ public class StreamResource extends RestResource {
             throw new WebApplicationException(e, Response.Status.BAD_REQUEST);
         }
 
-
         // Create stream.
         Map<String, Object> streamData = Maps.newHashMap();
         streamData.put("title", cr.title);

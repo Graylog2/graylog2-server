@@ -49,7 +49,7 @@ public class AnonymousInformationCollector {
         info.put("version", Core.GRAYLOG2_VERSION);
         info.put("number_of_loaded_modules", numberOfLoadedModules());
         info.put("number_of_elasticsearch_nodes", server.getIndexer().cluster().getNumberOfNodes());
-        info.put("number_of_graylog2_server_nodes", Node.allActive(server).size());
+        info.put("number_of_graylog2_server_nodes", Node.allActive(server, Node.Type.SERVER).size());
         info.put("number_of_total_messages", server.getIndexer().indices().getTotalNumberOfMessages());
         info.put("number_of_indices", server.getDeflector().getAllDeflectorIndices().size());
         info.put("number_of_streams", StreamImpl.loadAllEnabled(server).size());

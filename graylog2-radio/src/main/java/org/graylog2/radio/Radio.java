@@ -20,13 +20,21 @@
 package org.graylog2.radio;
 
 import com.codahale.metrics.MetricRegistry;
+import com.google.common.util.concurrent.ThreadFactoryBuilder;
+import com.ning.http.client.AsyncHttpClient;
+import com.ning.http.client.AsyncHttpClientConfig;
 import org.graylog2.plugin.Tools;
 import org.graylog2.plugin.Version;
 import org.graylog2.plugin.system.NodeId;
+import org.graylog2.radio.cluster.Ping;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 
 /**
  * @author Lennart Koopmann <lennart@torch.sh>
@@ -41,7 +49,18 @@ public class Radio {
     private MetricRegistry metricRegistry;
     private Configuration configuration;
 
+    private static final int SCHEDULED_THREADS_POOL_SIZE = 10;
+    private ScheduledExecutorService scheduler;
+
+    private final AsyncHttpClient httpClient;
+
     private String nodeId;
+
+    public Radio() {
+        AsyncHttpClientConfig.Builder builder = new AsyncHttpClientConfig.Builder();
+        builder.setAllowPoolingConnection(false);
+        httpClient = new AsyncHttpClient(builder.build());
+    }
 
     public void initialize(Configuration configuration, MetricRegistry metrics) {
         startedAt = new DateTime(DateTimeZone.UTC);
@@ -66,13 +85,18 @@ public class Radio {
             LOG.info("No rest_transport_uri set. Falling back to [{}].", transportStr);
             this.configuration.setRestTransportUri(transportStr);
         }
+
+        scheduler = Executors.newScheduledThreadPool(SCHEDULED_THREADS_POOL_SIZE,
+                new ThreadFactoryBuilder().setNameFormat("scheduled-%d").build()
+        );
+
+        // Start regular pings.
+        Ping.Pinger pinger = new Ping.Pinger(httpClient, nodeId, configuration.getRestTransportUri(), configuration.getGraylog2ServerUri());
+        scheduler.scheduleAtFixedRate(pinger, 0, 5, TimeUnit.SECONDS);
     }
 
     public String getNodeId() {
         return nodeId;
     }
 
-    public void register() {
-        LOG.info("Registering this radio instance [{}] in the Graylog2 cluster at [{}]", getNodeId(), configuration.getRestListenUri());
-    }
 }

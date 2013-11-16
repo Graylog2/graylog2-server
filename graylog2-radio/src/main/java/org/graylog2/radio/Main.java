@@ -115,8 +115,6 @@ public class Main {
         Radio radio = new Radio();
         radio.initialize(configuration, metrics);
 
-        radio.register();
-
         // Connect Kafka
 
         // Launch inputs

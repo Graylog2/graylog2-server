@@ -50,7 +50,7 @@ public class ClusterResource extends RestResource {
     @ApiOperation(value = "List all active nodes in this cluster.")
     public String nodes() {
         List<Map<String, Object>> nodeList = Lists.newArrayList();
-        Map<String, Node> nodes = Node.allActive(core);
+        Map<String, Node> nodes = Node.allActive(core, Node.Type.SERVER);
 
         for(Map.Entry<String, Node> e : nodes.entrySet()) {
             nodeList.add(nodeSummary(e.getValue()));
@@ -106,6 +106,7 @@ public class ClusterResource extends RestResource {
         Map<String, Object> m  = Maps.newHashMap();
 
         m.put("id", node.getNodeId());
+        m.put("type", node.getType().toString().toLowerCase());
         m.put("is_master", node.isMaster());
         m.put("transport_address", node.getTransportAddress());
         m.put("last_seen", Tools.getISO8601String(node.getLastSeen()));
