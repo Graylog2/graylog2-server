@@ -31,16 +31,21 @@ import java.util.regex.Pattern;
  * @author Lennart Koopmann <lennart@torch.sh>
  */
 public class TokenizerConverter extends Converter {
+	
+	private static char DEFAULT_DELIMITER = '=';
+	private char delimiter;
 
-    private static final Pattern p = Pattern.compile("[a-zA-Z0-9_-]*");
-    private static final Pattern kvPattern = Pattern.compile("\\s?=\\s?");
-    private static final Pattern spacePattern = Pattern.compile(" ");
-    private static final Pattern quotedValuePattern = Pattern.compile("([a-zA-Z0-9_-]+=\"[^\"]+\")");
-    private static final CharMatcher QUOTE_MATCHER = CharMatcher.is('"').precomputed();
-    private static final CharMatcher EQUAL_SIGN_MATCHER = CharMatcher.is('=').precomputed();
+    private Pattern p = Pattern.compile("[a-zA-Z0-9_-]*");
+    private Pattern spacePattern = Pattern.compile(" ");
+    private CharMatcher QUOTE_MATCHER = CharMatcher.is('"').precomputed();
+    
+    private Pattern kvPattern;
+    private Pattern quotedValuePattern;
+    private CharMatcher delimiterMatcher;
 
     public TokenizerConverter(Map<String, Object> config) {
         super(Type.TOKENIZER, config);
+        this.setKeyValueDelimiter(firstCharOrDefault(config.get("delimiter"), DEFAULT_DELIMITER));
     }
 
     @Override
@@ -48,25 +53,27 @@ public class TokenizerConverter extends Converter {
         if (value == null || value.isEmpty()) {
             return value;
         }
+        
+        String delimiterAsString = Character.toString(this.delimiter);
 
         Map<String, String> fields = Maps.newHashMap();
 
-        if (value.contains("=")) {
-            final String nmsg = kvPattern.matcher(value).replaceAll("=");
-            if (nmsg.contains("=\"")) {
-                Matcher m = quotedValuePattern.matcher(nmsg);
+        if (value.contains(delimiterAsString)) {
+            final String nmsg = this.kvPattern.matcher(value).replaceAll(delimiterAsString);
+            if (nmsg.contains(delimiter + "\"")) {
+                Matcher m = this.quotedValuePattern.matcher(nmsg);
                 while (m.find()) {
-                    String[] kv = m.group(1).split("=");
+                    String[] kv = m.group(1).split(delimiterAsString);
                     if (kv.length == 2 && p.matcher(kv[0]).matches()) {
                         fields.put(kv[0].trim(), QUOTE_MATCHER.removeFrom(kv[1]).trim());
                     }
                 }
             } else {
-                final String[] parts = spacePattern.split(nmsg);
+                final String[] parts = this.spacePattern.split(nmsg);
                 if (parts != null) {
                     for (String part : parts) {
-                        if (part.contains("=") && EQUAL_SIGN_MATCHER.countIn(part) == 1) {
-                            String[] kv = part.split("=");
+                        if (part.contains(delimiterAsString) && this.delimiterMatcher.countIn(part) == 1) {
+                            String[] kv = part.split(delimiterAsString);
                             if (kv.length == 2 && p.matcher(kv[0]).matches() && !fields.containsKey(kv[0])) {
                                 fields.put(kv[0].trim(), kv[1].trim());
                             }
@@ -77,6 +84,23 @@ public class TokenizerConverter extends Converter {
         }
 
         return fields;
+    }
+    
+    public void setKeyValueDelimiter(char delimiter) {
+    	this.delimiter = delimiter;
+    	this.compilePatterns();
+    }
+    
+    private void compilePatterns() {
+    	this.kvPattern = Pattern.compile("\\s?" + this.delimiter + "\\s?");
+    	this.quotedValuePattern = Pattern.compile("([a-zA-Z0-9_-]+" + this.delimiter + "\"[^\"]+\")");
+    	this.delimiterMatcher = CharMatcher.is(delimiter).precomputed();
+    }
+    
+    private char firstCharOrDefault(Object character, char defaultValue) {
+    	if (character == null)
+    		return defaultValue;
+    	return character.toString().charAt(0);
     }
 
     @Override
