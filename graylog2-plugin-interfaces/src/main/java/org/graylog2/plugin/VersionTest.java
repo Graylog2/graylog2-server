@@ -17,8 +17,9 @@
  * along with Graylog2.  If not, see <http://www.gnu.org/licenses/>.
  *
  */
-package org.graylog2;
+package org.graylog2.plugin;
 
+import org.graylog2.plugin.Version;
 import org.junit.Test;
 
 import static junit.framework.Assert.assertEquals;

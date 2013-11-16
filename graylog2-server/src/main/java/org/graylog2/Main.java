@@ -99,7 +99,7 @@ public final class Main {
         try {
             jadConfig.process();
         } catch (RepositoryException e) {
-            LOG.error("Couldn't load configuration file " + configFile, e);
+            LOG.error("Couldn't load configuration file: [{}]", configFile, e);
             System.exit(1);
         } catch (ValidationException e) {
             LOG.error("Invalid configuration", e);

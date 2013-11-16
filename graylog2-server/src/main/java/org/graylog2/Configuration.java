@@ -30,12 +30,11 @@ import com.github.joschi.jadconfig.validators.PositiveIntegerValidator;
 import com.google.common.collect.Lists;
 import com.lmax.disruptor.*;
 import com.mongodb.ServerAddress;
+import org.graylog2.plugin.Tools;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.ws.rs.core.UriBuilder;
 import java.net.URI;
-import java.net.URISyntaxException;
 import java.net.UnknownHostException;
 import java.util.Arrays;
 import java.util.List;
@@ -300,7 +299,7 @@ public class Configuration {
     public int getElasticSearchMaxDocsPerIndex() {
         return this.elasticsearchMaxDocsPerIndex;
     }
-    
+
     public int getElasticSearchShards() {
         return this.elasticsearchShards;
     }
@@ -448,7 +447,7 @@ public class Configuration {
     }
 
     public URI getRestListenUri() {
-        return getUriStandard(restListenUri);
+        return Tools.getUriStandard(restListenUri);
     }
 
     public URI getRestTransportUri() {
@@ -456,22 +455,7 @@ public class Configuration {
             return null;
         }
 
-        return getUriStandard(restTransportUri);
-    }
-
-    private URI getUriStandard(String from) {
-        try {
-            URI uri = new URI(from);
-
-            // The port is set to -1 if not defined. Default to 80 here.
-            if (uri.getPort() == -1) {
-                return UriBuilder.fromUri(uri).port(80).build();
-            }
-
-            return uri;
-        } catch (URISyntaxException e) {
-            throw new RuntimeException("Could not parse REST listen URI.", e);
-        }
+        return Tools.getUriStandard(restTransportUri);
     }
 
     public String getRootUsername() {

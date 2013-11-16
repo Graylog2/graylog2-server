@@ -28,7 +28,6 @@
     <properties>
         <metrics.version>3.0.0</metrics.version>
         <mainClass>org.graylog2.Main</mainClass>
-        <jersey.version>2.0</jersey.version>
     </properties>
 
     <dependencies>
@@ -42,31 +41,6 @@
             <groupId>log4j</groupId>
             <artifactId>log4j</artifactId>
             <version>1.2.17</version>
-        </dependency>
-        <dependency>
-            <groupId>com.beust</groupId>
-            <artifactId>jcommander</artifactId>
-            <version>1.30</version>
-        </dependency>
-        <dependency>
-            <groupId>commons-io</groupId>
-            <artifactId>commons-io</artifactId>
-            <version>2.4</version>
-        </dependency>
-        <dependency>
-            <groupId>com.github.joschi</groupId>
-            <artifactId>jadconfig</artifactId>
-            <version>0.4</version>
-        </dependency>
-        <dependency>
-            <groupId>org.slf4j</groupId>
-            <artifactId>slf4j-log4j12</artifactId>
-            <version>1.7.5</version>
-        </dependency>
-        <dependency>
-            <groupId>org.slf4j</groupId>
-            <artifactId>jul-to-slf4j</artifactId>
-            <version>1.7.5</version>
         </dependency>
         <dependency>
             <groupId>org.jmock</groupId>
@@ -124,16 +98,6 @@
             <groupId>com.github.stephenc.high-scale-lib</groupId>
             <artifactId>high-scale-lib</artifactId>
             <version>1.1.4</version>
-        </dependency>
-        <dependency>
-            <groupId>org.glassfish.jersey.core</groupId>
-            <artifactId>jersey-server</artifactId>
-            <version>${jersey.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.graylog2</groupId>
-            <artifactId>jersey-netty</artifactId>
-            <version>1.0-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>org.apache.shiro</groupId>

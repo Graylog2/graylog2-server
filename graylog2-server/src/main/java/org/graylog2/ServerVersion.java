@@ -19,16 +19,12 @@
  */
 package org.graylog2;
 
+import org.graylog2.plugin.Version;
+
 /**
  * @author Lennart Koopmann <lennart@torch.sh>
  */
-public class Version {
-
-    /*
-     * Following semantic versioning.
-     *
-     * http://semver.org/
-     */
+public class ServerVersion {
 
     public static final Version vDEV = new Version(0, 20, 0, "dev");
     public static final Version v0_20_0_PREVIEW_1 = new Version(0, 20, 0, "preview.1");
@@ -39,48 +35,5 @@ public class Version {
     public static final Version v0_20_0_PREVIEW_6 = new Version(0, 20, 0, "preview.6");
 
     public static final Version VERSION = v0_20_0_PREVIEW_6;
-
-    public final int major;
-    public final int minor;
-    public final int patch;
-    public final String additional;
-
-    public Version(int major, int minor, int patch) {
-        this(major, minor, patch, null);
-    }
-
-    public Version(int major, int minor, int patch, String additional) {
-        this.major = major;
-        this.minor = minor;
-        this.patch = patch;
-        this.additional = additional;
-    }
-
-    @Override
-    public String toString() {
-        StringBuilder sb = new StringBuilder();
-
-        sb.append(major).append(".").append(minor).append(".").append(patch);
-
-        if (additional != null && !additional.isEmpty()) {
-            sb.append("-").append(additional);
-        }
-
-        return sb.toString();
-    }
-
-    public boolean equals(Object obj) {
-        if (obj == null || getClass() != obj.getClass()) {
-            return false;
-        }
-
-        if (this == obj) {
-            return true;
-        }
-
-        Version version = (Version) obj;
-
-        return toString().equals(version.toString());
-    }
 
 }

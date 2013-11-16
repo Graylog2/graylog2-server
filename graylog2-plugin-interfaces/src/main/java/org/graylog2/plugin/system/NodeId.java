@@ -17,7 +17,7 @@
  * along with Graylog2.  If not, see <http://www.gnu.org/licenses/>.
  *
  */
-package org.graylog2.system;
+package org.graylog2.plugin.system;
 
 import org.apache.commons.io.FileUtils;
 import org.graylog2.plugin.Tools;

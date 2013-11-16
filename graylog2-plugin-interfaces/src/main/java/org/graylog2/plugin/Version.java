@@ -1,0 +1,76 @@
+/**
+ * Copyright 2013 Lennart Koopmann <lennart@torch.sh>
+ *
+ * This file is part of Graylog2.
+ *
+ * Graylog2 is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * Graylog2 is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with Graylog2.  If not, see <http://www.gnu.org/licenses/>.
+ *
+ */
+package org.graylog2.plugin;
+
+/**
+ * @author Lennart Koopmann <lennart@torch.sh>
+ */
+public class Version {
+
+    /*
+     * Following semantic versioning.
+     *
+     * http://semver.org/
+     */
+
+    public final int major;
+    public final int minor;
+    public final int patch;
+    public final String additional;
+
+    public Version(int major, int minor, int patch) {
+        this(major, minor, patch, null);
+    }
+
+    public Version(int major, int minor, int patch, String additional) {
+        this.major = major;
+        this.minor = minor;
+        this.patch = patch;
+        this.additional = additional;
+    }
+
+    @Override
+    public String toString() {
+        StringBuilder sb = new StringBuilder();
+
+        sb.append(major).append(".").append(minor).append(".").append(patch);
+
+        if (additional != null && !additional.isEmpty()) {
+            sb.append("-").append(additional);
+        }
+
+        return sb.toString();
+    }
+
+    public boolean equals(Object obj) {
+        if (obj == null || getClass() != obj.getClass()) {
+            return false;
+        }
+
+        if (this == obj) {
+            return true;
+        }
+
+        Version version = (Version) obj;
+
+        return toString().equals(version.toString());
+    }
+
+}

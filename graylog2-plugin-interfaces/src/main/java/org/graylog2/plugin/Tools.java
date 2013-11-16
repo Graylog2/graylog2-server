@@ -20,9 +20,7 @@
 
 package org.graylog2.plugin;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
+import java.io.*;
 import java.lang.management.ManagementFactory;
 import java.net.*;
 import java.text.DecimalFormat;
@@ -31,12 +29,15 @@ import java.util.zip.GZIPInputStream;
 import java.util.zip.InflaterInputStream;
 
 import com.google.common.primitives.Ints;
+import org.apache.commons.io.IOUtils;
 import org.drools.util.codec.Base64;
 import org.elasticsearch.search.SearchHit;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 import org.joda.time.Instant;
 import org.joda.time.format.*;
+
+import javax.ws.rs.core.UriBuilder;
 
 /**
  * Utilty class for various tool/helper functions.
@@ -365,6 +366,21 @@ public final class Tools {
         }
 
         throw new NoInterfaceFoundException();
+    }
+
+    public static URI getUriStandard(String from) {
+        try {
+            URI uri = new URI(from);
+
+            // The port is set to -1 if not defined. Default to 80 here.
+            if (uri.getPort() == -1) {
+                return UriBuilder.fromUri(uri).port(80).build();
+            }
+
+            return uri;
+        } catch (URISyntaxException e) {
+            throw new RuntimeException("Could not parse REST listen URI.", e);
+        }
     }
 
     public static class NoInterfaceFoundException extends Exception {
