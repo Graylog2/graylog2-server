@@ -21,6 +21,7 @@ package org.graylog2.inputs.misc.metrics;
 
 import org.graylog2.inputs.misc.metrics.agent.*;
 import org.graylog2.plugin.GraylogServer;
+import org.graylog2.plugin.InputHost;
 import org.graylog2.plugin.configuration.Configuration;
 import org.graylog2.plugin.configuration.ConfigurationException;
 import org.graylog2.plugin.configuration.ConfigurationRequest;
@@ -42,7 +43,7 @@ public class LocalMetricsInput extends MessageInput {
     public static final String NAME = "Internal metrics reporter";
 
     private Configuration config;
-    private GraylogServer graylogServer;
+    private InputHost graylogServer;
     private Graylog2Reporter reporter;
 
     private static final String CK_REPORT_INTERVAL = "report_interval";
@@ -52,7 +53,7 @@ public class LocalMetricsInput extends MessageInput {
     private static final String CK_SOURCE = "source";
 
     @Override
-    public void configure(Configuration config, GraylogServer graylogServer) throws ConfigurationException {
+    public void configure(Configuration config, InputHost graylogServer) throws ConfigurationException {
         this.config = config;
         this.graylogServer = graylogServer;
 

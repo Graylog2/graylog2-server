@@ -21,6 +21,7 @@ package org.graylog2.inputs;
 
 import com.google.common.collect.Maps;
 import org.graylog2.plugin.GraylogServer;
+import org.graylog2.plugin.InputHost;
 import org.graylog2.plugin.configuration.Configuration;
 import org.graylog2.plugin.configuration.ConfigurationException;
 import org.graylog2.plugin.configuration.ConfigurationRequest;
@@ -35,7 +36,7 @@ import java.util.Map;
 public class InputStub extends MessageInput {
 
     @Override
-    public void configure(Configuration config, GraylogServer graylogServer) throws ConfigurationException {
+    public void configure(Configuration config, InputHost graylogServer) throws ConfigurationException {
     }
 
     @Override

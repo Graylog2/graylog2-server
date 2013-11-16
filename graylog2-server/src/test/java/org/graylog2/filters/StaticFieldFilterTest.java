@@ -20,6 +20,7 @@
 package org.graylog2.filters;
 
 import org.graylog2.plugin.GraylogServer;
+import org.graylog2.plugin.InputHost;
 import org.graylog2.plugin.Message;
 import org.graylog2.plugin.configuration.Configuration;
 import org.graylog2.plugin.configuration.ConfigurationException;
@@ -76,7 +77,7 @@ public class StaticFieldFilterTest {
     private class FakeInput extends MessageInput {
 
         @Override
-        public void configure(Configuration config, GraylogServer graylogServer) throws ConfigurationException {
+        public void configure(Configuration config, InputHost graylogServer) throws ConfigurationException {
             //To change body of implemented methods use File | Settings | File Templates.
         }
 

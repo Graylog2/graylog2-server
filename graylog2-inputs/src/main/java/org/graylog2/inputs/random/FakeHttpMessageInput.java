@@ -21,7 +21,7 @@ package org.graylog2.inputs.random;
 
 import org.graylog2.inputs.random.generators.FakeHttpMessageGenerator;
 import org.graylog2.inputs.random.generators.Tools;
-import org.graylog2.plugin.GraylogServer;
+import org.graylog2.plugin.InputHost;
 import org.graylog2.plugin.configuration.Configuration;
 import org.graylog2.plugin.configuration.ConfigurationException;
 import org.graylog2.plugin.configuration.ConfigurationRequest;
@@ -49,7 +49,7 @@ public class FakeHttpMessageInput extends MessageInput {
     public static final String CK_SLEEP = "sleep";
     public static final String CK_SLEEP_DEVIATION_PERCENT = "sleep_deviation";
 
-    protected GraylogServer graylogServer;
+    protected InputHost graylogServer;
     protected Configuration config;
 
     private final Random rand = new Random();
@@ -61,7 +61,7 @@ public class FakeHttpMessageInput extends MessageInput {
     private int maxSleepDeviation;
 
     @Override
-    public void configure(Configuration config, GraylogServer graylogServer) throws ConfigurationException {
+    public void configure(Configuration config, InputHost graylogServer) throws ConfigurationException {
         this.graylogServer = graylogServer;
         this.config = config;
 

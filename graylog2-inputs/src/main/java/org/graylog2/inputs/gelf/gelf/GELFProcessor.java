@@ -25,6 +25,7 @@ import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.graylog2.plugin.GraylogServer;
+import org.graylog2.plugin.InputHost;
 import org.graylog2.plugin.Message;
 import org.graylog2.plugin.Tools;
 import org.graylog2.plugin.buffers.BufferOutOfCapacityException;
@@ -44,11 +45,11 @@ import static com.codahale.metrics.MetricRegistry.name;
 public class GELFProcessor {
 
     private static final Logger LOG = LoggerFactory.getLogger(GELFProcessor.class);
-    private GraylogServer server;
+    private InputHost server;
 
     private final ObjectMapper objectMapper;
 
-    public GELFProcessor(GraylogServer server) {
+    public GELFProcessor(InputHost server) {
         this.server = server;
 
         objectMapper = new ObjectMapper();

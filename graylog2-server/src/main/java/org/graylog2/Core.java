@@ -44,6 +44,7 @@ import org.graylog2.initializers.Initializers;
 import org.graylog2.inputs.InputRegistry;
 import org.graylog2.inputs.gelf.gelf.GELFChunkManager;
 import org.graylog2.jersey.container.netty.NettyContainer;
+import org.graylog2.plugin.InputHost;
 import org.graylog2.plugin.rest.AnyExceptionClassMapper;
 import org.graylog2.metrics.jersey2.MetricsDynamicBinding;
 import org.graylog2.outputs.OutputRegistry;
@@ -97,7 +98,7 @@ import java.util.concurrent.atomic.AtomicInteger;
  * 
  * @author Lennart Koopmann <lennart@socketfeed.com>
  */
-public class Core implements GraylogServer {
+public class Core implements GraylogServer, InputHost {
 
     private static final Logger LOG = LoggerFactory.getLogger(Core.class);
 

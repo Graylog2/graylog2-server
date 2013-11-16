@@ -23,6 +23,7 @@ import com.google.common.collect.Maps;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import com.jayway.jsonpath.JsonPath;
 import org.graylog2.plugin.GraylogServer;
+import org.graylog2.plugin.InputHost;
 import org.graylog2.plugin.Message;
 import org.graylog2.plugin.configuration.Configuration;
 import org.graylog2.plugin.configuration.ConfigurationException;
@@ -50,7 +51,7 @@ public class JsonPathInput extends MessageInput {
     public static final String NAME = "JSON path from HTTP API";
 
     private Configuration config;
-    private GraylogServer graylogServer;
+    private InputHost graylogServer;
 
     private static final String CK_URL = "target_url";
     private static final String CK_PATH = "path";
@@ -74,7 +75,7 @@ public class JsonPathInput extends MessageInput {
      */
 
     @Override
-    public void configure(Configuration config, GraylogServer graylogServer) throws ConfigurationException {
+    public void configure(Configuration config, InputHost graylogServer) throws ConfigurationException {
         this.config = config;
         this.graylogServer = graylogServer;
 

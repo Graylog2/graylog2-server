@@ -28,8 +28,11 @@ import org.glassfish.jersey.server.ContainerFactory;
 import org.glassfish.jersey.server.ResourceConfig;
 import org.glassfish.jersey.server.internal.scanning.PackageNamesScanner;
 import org.graylog2.jersey.container.netty.NettyContainer;
+import org.graylog2.plugin.GraylogServer;
+import org.graylog2.plugin.InputHost;
 import org.graylog2.plugin.Tools;
 import org.graylog2.plugin.Version;
+import org.graylog2.plugin.buffers.Buffer;
 import org.graylog2.plugin.rest.AnyExceptionClassMapper;
 import org.graylog2.plugin.system.NodeId;
 import org.graylog2.radio.cluster.Ping;
@@ -55,7 +58,7 @@ import java.util.concurrent.TimeUnit;
 /**
  * @author Lennart Koopmann <lennart@torch.sh>
  */
-public class Radio {
+public class Radio implements InputHost {
 
     private static final Logger LOG = LoggerFactory.getLogger(Radio.class);
 
@@ -168,8 +171,23 @@ public class Radio {
 
     }
 
+    @Override
+    public Buffer getProcessBuffer() {
+        return null;
+    }
+
     public String getNodeId() {
         return nodeId;
+    }
+
+    @Override
+    public Object getGELFChunkManager() {
+        return null;
+    }
+
+    @Override
+    public MetricRegistry metrics() {
+        return metricRegistry;
     }
 
     public DateTime getStartedAt() {

@@ -17,37 +17,24 @@
  * along with Graylog2.  If not, see <http://www.gnu.org/licenses/>.
  *
  */
-package org.graylog2.inputs.misc.metrics.agent;
+package org.graylog2.radio.inputs;
 
-import org.graylog2.plugin.GraylogServer;
-import org.graylog2.plugin.InputHost;
-import org.graylog2.plugin.Message;
 import org.graylog2.plugin.inputs.MessageInput;
-import org.joda.time.DateTime;
-
-import java.util.Map;
 
 /**
  * @author Lennart Koopmann <lennart@torch.sh>
  */
-public class InProcessMessageWriter implements GELFTarget {
+public class InputRegistry {
 
-    private final InputHost server;
-    private final MessageInput input;
-
-    public InProcessMessageWriter(InputHost server, MessageInput input) {
-        this.server = server;
-        this.input = input;
-    }
-
-    @Override
-    public void deliver(String shortMessage, String source, Map<String, Object> fields) {
-        Message message = new Message(shortMessage, source, new DateTime());
-        message.addFields(fields);
-
-        message.addField("node_id", server.getNodeId());
-
-        server.getProcessBuffer().insertCached(message, input);
+    public static MessageInput factory(String type) throws NoSuchInputTypeException {
+        try {
+            Class c = Class.forName(type);
+            return (MessageInput) c.newInstance();
+        } catch (ClassNotFoundException e) {
+            throw new NoSuchInputTypeException("There is no input of type <" + type + "> registered.");
+        } catch (Exception e) {
+            throw new RuntimeException("Could not create input of type <" + type + ">", e);
+        }
     }
 
 }

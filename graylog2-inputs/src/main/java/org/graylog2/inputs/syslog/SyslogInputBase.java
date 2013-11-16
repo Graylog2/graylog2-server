@@ -19,9 +19,9 @@
  */
 package org.graylog2.inputs.syslog;
 
+import org.graylog2.plugin.InputHost;
 import org.graylog2.plugin.inputs.util.ConnectionCounter;
 import org.graylog2.plugin.inputs.util.ThroughputCounter;
-import org.graylog2.plugin.GraylogServer;
 import org.graylog2.plugin.configuration.Configuration;
 import org.graylog2.plugin.configuration.ConfigurationException;
 import org.graylog2.plugin.configuration.ConfigurationRequest;
@@ -51,7 +51,7 @@ public class SyslogInputBase extends MessageInput {
     protected final ThroughputCounter throughputCounter;
     protected final ConnectionCounter connectionCounter;
 
-    protected GraylogServer graylogServer;
+    protected InputHost graylogServer;
     protected Configuration config;
     protected InetSocketAddress socketAddress;
 
@@ -70,7 +70,7 @@ public class SyslogInputBase extends MessageInput {
         }
     }
 
-    public void configure(Configuration config, GraylogServer graylogServer) throws ConfigurationException {
+    public void configure(Configuration config, InputHost graylogServer) throws ConfigurationException {
         this.graylogServer = graylogServer;
         this.config = config;
 

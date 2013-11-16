@@ -25,6 +25,7 @@ import java.util.Map;
 
 import com.codahale.metrics.Meter;
 import org.graylog2.plugin.GraylogServer;
+import org.graylog2.plugin.InputHost;
 import org.graylog2.plugin.inputs.MessageInput;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -43,13 +44,13 @@ public class GELFChunkManager extends Thread {
     private Map<String, Map<Integer, GELFMessageChunk>> chunks = Maps.newConcurrentMap();
     private GELFProcessor processor;
     
-	private GraylogServer server;
+	private InputHost server;
 
     // The number of seconds a chunk is valid. Every message with chunks older than this will be dropped.
     public static final int SECONDS_VALID = 5;
     private final Meter outdatedMessagesDropped;
 
-    public GELFChunkManager(GraylogServer server) {
+    public GELFChunkManager(InputHost server) {
         this.processor = new GELFProcessor(server);
         this.server = server;
 

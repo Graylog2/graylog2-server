@@ -34,16 +34,11 @@ import org.graylog2.plugin.streams.Stream;
  */
 public interface GraylogServer extends Runnable {
 
-    public Buffer getProcessBuffer();
-
     public Buffer getOutputBuffer();
     
     public boolean isMaster();
     
     public String getNodeId();
-
-    // This is just temporary. Move to graylog2-plugins.
-    public Object getGELFChunkManager();
     
     public MessageGateway getMessageGateway();
     
