@@ -1,4 +1,4 @@
-package org.graylog2.metrics.jersey2;
+package org.graylog2.plugin.rest;
 
 import com.google.common.base.Throwables;
 import org.glassfish.jersey.spi.ExtendedExceptionMapper;

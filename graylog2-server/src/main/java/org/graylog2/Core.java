@@ -44,7 +44,7 @@ import org.graylog2.initializers.Initializers;
 import org.graylog2.inputs.InputRegistry;
 import org.graylog2.inputs.gelf.gelf.GELFChunkManager;
 import org.graylog2.jersey.container.netty.NettyContainer;
-import org.graylog2.metrics.jersey2.AnyExceptionClassMapper;
+import org.graylog2.plugin.rest.AnyExceptionClassMapper;
 import org.graylog2.metrics.jersey2.MetricsDynamicBinding;
 import org.graylog2.outputs.OutputRegistry;
 import org.graylog2.plugin.GraylogServer;

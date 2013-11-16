@@ -60,8 +60,8 @@ public class SystemResource extends RestResource {
         result.put("facility", "graylog2-server");
         result.put("codename", Core.GRAYLOG2_CODENAME);
         result.put("server_id", core.getNodeId());
-       	result.put("version", Core.GRAYLOG2_VERSION);
-        result.put("started_at", core.getStartedAt().toString());
+       	result.put("version", Core.GRAYLOG2_VERSION.toString());
+        result.put("started_at", Tools.getISO8601String(core.getStartedAt()));
         result.put("is_processing", core.isProcessing());
         result.put("hostname", Tools.getLocalCanonicalHostname());
 

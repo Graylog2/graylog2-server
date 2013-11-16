@@ -23,15 +23,31 @@ import com.codahale.metrics.MetricRegistry;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import com.ning.http.client.AsyncHttpClient;
 import com.ning.http.client.AsyncHttpClientConfig;
+import org.glassfish.hk2.utilities.binding.AbstractBinder;
+import org.glassfish.jersey.server.ContainerFactory;
+import org.glassfish.jersey.server.ResourceConfig;
+import org.glassfish.jersey.server.internal.scanning.PackageNamesScanner;
+import org.graylog2.jersey.container.netty.NettyContainer;
 import org.graylog2.plugin.Tools;
 import org.graylog2.plugin.Version;
+import org.graylog2.plugin.rest.AnyExceptionClassMapper;
 import org.graylog2.plugin.system.NodeId;
 import org.graylog2.radio.cluster.Ping;
+import org.jboss.netty.bootstrap.ServerBootstrap;
+import org.jboss.netty.channel.ChannelPipeline;
+import org.jboss.netty.channel.ChannelPipelineFactory;
+import org.jboss.netty.channel.Channels;
+import org.jboss.netty.channel.socket.nio.NioServerSocketChannelFactory;
+import org.jboss.netty.handler.codec.http.HttpRequestDecoder;
+import org.jboss.netty.handler.codec.http.HttpResponseEncoder;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.IOException;
+import java.net.InetSocketAddress;
+import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
@@ -95,8 +111,68 @@ public class Radio {
         scheduler.scheduleAtFixedRate(pinger, 0, 5, TimeUnit.SECONDS);
     }
 
+    public void startRestApi() throws IOException {
+        final ExecutorService bossExecutor = Executors.newCachedThreadPool(
+                new ThreadFactoryBuilder()
+                        .setNameFormat("restapi-boss-%d")
+                        .build());
+
+        final ExecutorService workerExecutor = Executors.newCachedThreadPool(
+                new ThreadFactoryBuilder()
+                        .setNameFormat("restapi-worker-%d")
+                        .build());
+
+        final ServerBootstrap bootstrap = new ServerBootstrap(new NioServerSocketChannelFactory(
+                bossExecutor,
+                workerExecutor
+        ));
+
+        ResourceConfig rc = new ResourceConfig();
+        rc.property(NettyContainer.PROPERTY_BASE_URI, configuration.getRestListenUri());
+        rc.registerClasses(AnyExceptionClassMapper.class);
+        rc.register(new Graylog2Binder());
+        rc.registerFinder(new PackageNamesScanner(new String[] {"org.graylog2.radio.rest.resources"}, true));
+        final NettyContainer jerseyHandler = ContainerFactory.createContainer(NettyContainer.class, rc);
+
+        bootstrap.setPipelineFactory(new ChannelPipelineFactory() {
+            @Override
+            public ChannelPipeline getPipeline() throws Exception {
+                ChannelPipeline pipeline = Channels.pipeline();
+                pipeline.addLast("decoder", new HttpRequestDecoder());
+                pipeline.addLast("encoder", new HttpResponseEncoder());
+                pipeline.addLast("jerseyHandler", jerseyHandler);
+                return pipeline;
+            }
+        }) ;
+        bootstrap.setOption("child.tcpNoDelay", true);
+        bootstrap.setOption("child.keepAlive", true);
+
+        bootstrap.bind(new InetSocketAddress(configuration.getRestListenUri().getPort()));
+        Runtime.getRuntime().addShutdownHook(new Thread() {
+            @Override
+            public void run() {
+                bootstrap.releaseExternalResources();
+            }
+        });
+
+        LOG.info("Started REST API at <{}>", configuration.getRestListenUri());
+    }
+
+    private class Graylog2Binder extends AbstractBinder {
+
+        @Override
+        protected void configure() {
+            bind(metricRegistry).to(MetricRegistry.class);
+            bind(Radio.this).to(Radio.class);
+        }
+
+    }
+
     public String getNodeId() {
         return nodeId;
     }
 
+    public DateTime getStartedAt() {
+        return startedAt;
+    }
 }

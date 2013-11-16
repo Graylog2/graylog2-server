@@ -115,6 +115,14 @@ public class Main {
         Radio radio = new Radio();
         radio.initialize(configuration, metrics);
 
+        // Start REST API.
+        try {
+            radio.startRestApi();
+        } catch(Exception e) {
+            LOG.error("Could not start REST API on <{}>. Terminating.", configuration.getRestListenUri(), e);
+            System.exit(1);
+        }
+
         // Connect Kafka
 
         // Launch inputs
