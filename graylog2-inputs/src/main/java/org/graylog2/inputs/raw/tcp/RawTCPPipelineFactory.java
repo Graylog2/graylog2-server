@@ -21,6 +21,7 @@ package org.graylog2.inputs.raw.tcp;
 
 import org.graylog2.inputs.raw.RawDispatcher;
 import org.graylog2.plugin.GraylogServer;
+import org.graylog2.plugin.InputHost;
 import org.graylog2.plugin.configuration.Configuration;
 import org.graylog2.plugin.inputs.MessageInput;
 import org.graylog2.plugin.inputs.util.ConnectionCounter;
@@ -37,13 +38,13 @@ import org.jboss.netty.handler.codec.frame.Delimiters;
  */
 public class RawTCPPipelineFactory implements ChannelPipelineFactory {
 
-    private final GraylogServer server;
+    private final InputHost server;
     private final Configuration config;
     private final MessageInput sourceInput;
     private final ThroughputCounter throughputCounter;
     private final ConnectionCounter connectionCounter;
 
-    public RawTCPPipelineFactory(GraylogServer server, Configuration config, MessageInput sourceInput, ThroughputCounter throughputCounter, ConnectionCounter connectionCounter) {
+    public RawTCPPipelineFactory(InputHost server, Configuration config, MessageInput sourceInput, ThroughputCounter throughputCounter, ConnectionCounter connectionCounter) {
         this.server = server;
         this.config = config;
         this.sourceInput = sourceInput;

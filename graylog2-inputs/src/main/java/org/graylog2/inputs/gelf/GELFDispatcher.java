@@ -25,6 +25,7 @@ import org.graylog2.inputs.gelf.gelf.GELFChunkManager;
 import org.graylog2.inputs.gelf.gelf.GELFProcessor;
 import org.graylog2.inputs.gelf.gelf.GELFMessage;
 import org.graylog2.plugin.GraylogServer;
+import org.graylog2.plugin.InputHost;
 import org.graylog2.plugin.inputs.MessageInput;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -44,14 +45,14 @@ public class GELFDispatcher extends SimpleChannelHandler {
     private static final Logger LOG = LoggerFactory.getLogger(GELFDispatcher.class);
 
     private GELFProcessor processor;
-    private GraylogServer server;
+    private InputHost server;
     private final MessageInput sourceInput;
 
     private final Meter receivedMessages;
     private final Meter dispatchedChunkedMessages;
     private final Meter dispatchedUnchunkedMessages;
 
-    public GELFDispatcher(GraylogServer server, MessageInput sourceInput) {
+    public GELFDispatcher(InputHost server, MessageInput sourceInput) {
         this.server = server;
         this.processor = new GELFProcessor(server);
         this.sourceInput = sourceInput;

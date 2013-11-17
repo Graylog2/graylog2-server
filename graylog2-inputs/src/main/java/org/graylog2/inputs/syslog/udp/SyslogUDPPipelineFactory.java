@@ -21,6 +21,7 @@
 package org.graylog2.inputs.syslog.udp;
 
 import org.graylog2.plugin.GraylogServer;
+import org.graylog2.plugin.InputHost;
 import org.graylog2.plugin.inputs.util.ThroughputCounter;
 import org.graylog2.inputs.syslog.SyslogDispatcher;
 import org.graylog2.plugin.configuration.Configuration;
@@ -34,12 +35,12 @@ import org.jboss.netty.channel.Channels;
  */
 public class SyslogUDPPipelineFactory implements ChannelPipelineFactory {
 
-    private final GraylogServer server;
+    private final InputHost server;
     private final Configuration config;
     private final MessageInput sourceInput;
     private final ThroughputCounter throughputCounter;
 
-    public SyslogUDPPipelineFactory(GraylogServer server, Configuration config, MessageInput sourceInput, ThroughputCounter throughputCounter) {
+    public SyslogUDPPipelineFactory(InputHost server, Configuration config, MessageInput sourceInput, ThroughputCounter throughputCounter) {
         this.server = server;
         this.config = config;
         this.sourceInput = sourceInput;

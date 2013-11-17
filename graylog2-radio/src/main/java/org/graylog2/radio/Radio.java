@@ -28,7 +28,6 @@ import org.glassfish.jersey.server.ContainerFactory;
 import org.glassfish.jersey.server.ResourceConfig;
 import org.glassfish.jersey.server.internal.scanning.PackageNamesScanner;
 import org.graylog2.jersey.container.netty.NettyContainer;
-import org.graylog2.plugin.GraylogServer;
 import org.graylog2.plugin.InputHost;
 import org.graylog2.plugin.Tools;
 import org.graylog2.plugin.Version;
@@ -36,6 +35,7 @@ import org.graylog2.plugin.buffers.Buffer;
 import org.graylog2.plugin.rest.AnyExceptionClassMapper;
 import org.graylog2.plugin.system.NodeId;
 import org.graylog2.radio.cluster.Ping;
+import org.graylog2.radio.inputs.InputRegistry;
 import org.jboss.netty.bootstrap.ServerBootstrap;
 import org.jboss.netty.channel.ChannelPipeline;
 import org.jboss.netty.channel.ChannelPipelineFactory;
@@ -71,6 +71,8 @@ public class Radio implements InputHost {
     private static final int SCHEDULED_THREADS_POOL_SIZE = 10;
     private ScheduledExecutorService scheduler;
 
+    private InputRegistry inputs;
+
     private final AsyncHttpClient httpClient;
 
     private String nodeId;
@@ -86,6 +88,8 @@ public class Radio implements InputHost {
 
         NodeId id = new NodeId(configuration.getNodeIdFile());
         this.nodeId = id.readOrGenerate();
+
+        this.inputs = new InputRegistry(this);
 
         this.metricRegistry = metrics;
 
@@ -193,4 +197,9 @@ public class Radio implements InputHost {
     public DateTime getStartedAt() {
         return startedAt;
     }
+
+    public InputRegistry inputs() {
+        return inputs;
+    }
+
 }

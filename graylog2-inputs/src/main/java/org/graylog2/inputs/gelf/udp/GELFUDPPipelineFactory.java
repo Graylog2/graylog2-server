@@ -21,6 +21,7 @@
 package org.graylog2.inputs.gelf.udp;
 
 import org.graylog2.plugin.GraylogServer;
+import org.graylog2.plugin.InputHost;
 import org.graylog2.plugin.inputs.util.ThroughputCounter;
 import org.graylog2.inputs.gelf.GELFDispatcher;
 import org.graylog2.plugin.inputs.MessageInput;
@@ -33,11 +34,11 @@ import org.jboss.netty.channel.Channels;
  */
 public class GELFUDPPipelineFactory implements ChannelPipelineFactory {
 
-    private final GraylogServer server;
+    private final InputHost server;
     private final MessageInput sourceInput;
     private final ThroughputCounter throughputCounter;
 
-    public GELFUDPPipelineFactory(GraylogServer server, MessageInput sourceInput, ThroughputCounter throughputCounter) {
+    public GELFUDPPipelineFactory(InputHost server, MessageInput sourceInput, ThroughputCounter throughputCounter) {
         this.server = server;
         this.sourceInput = sourceInput;
         this.throughputCounter = throughputCounter;

@@ -26,6 +26,7 @@ import com.codahale.metrics.Meter;
 import org.graylog2.inputs.gelf.gelf.GELFMessage;
 import org.graylog2.inputs.gelf.gelf.GELFProcessor;
 import org.graylog2.plugin.GraylogServer;
+import org.graylog2.plugin.InputHost;
 import org.graylog2.plugin.inputs.MessageInput;
 import org.jboss.netty.buffer.ChannelBuffer;
 import org.jboss.netty.channel.Channel;
@@ -49,7 +50,7 @@ public class GELFHttpHandler extends SimpleChannelHandler {
 
     private static final Logger LOG = LoggerFactory.getLogger(GELFHttpHandler.class);
 
-	private final GraylogServer server;
+	private final InputHost server;
 
     private final Meter receivedMessages;
     private final Meter gelfMessages;
@@ -58,7 +59,7 @@ public class GELFHttpHandler extends SimpleChannelHandler {
 
     private final GELFProcessor gelfProcessor;
 
-    public GELFHttpHandler(GraylogServer server, MessageInput sourceInput) {
+    public GELFHttpHandler(InputHost server, MessageInput sourceInput) {
         this.server = server;
         this.gelfProcessor = new GELFProcessor(server);
 

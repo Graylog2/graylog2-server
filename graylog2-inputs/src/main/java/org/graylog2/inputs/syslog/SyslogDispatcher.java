@@ -22,6 +22,7 @@ package org.graylog2.inputs.syslog;
 
 import com.codahale.metrics.Meter;
 import org.graylog2.plugin.GraylogServer;
+import org.graylog2.plugin.InputHost;
 import org.graylog2.plugin.configuration.Configuration;
 import org.graylog2.plugin.inputs.MessageInput;
 import org.graylog2.inputs.syslog.SyslogProcessor;
@@ -47,7 +48,7 @@ public class SyslogDispatcher extends SimpleChannelHandler {
     private SyslogProcessor processor;
     private final Meter receivedMessages;
 
-    public SyslogDispatcher(GraylogServer server, Configuration config, MessageInput sourceInput) {
+    public SyslogDispatcher(InputHost server, Configuration config, MessageInput sourceInput) {
         this.processor = new SyslogProcessor(server, config, sourceInput);
         this.receivedMessages = server.metrics().meter(name(sourceInput.getUniqueReadableId(), "receivedMessages"));
     }

@@ -23,6 +23,7 @@ package org.graylog2.inputs.syslog;
 import com.codahale.metrics.Meter;
 import com.codahale.metrics.Timer;
 import org.graylog2.plugin.GraylogServer;
+import org.graylog2.plugin.InputHost;
 import org.graylog2.plugin.configuration.Configuration;
 import org.graylog2.plugin.inputs.MessageInput;
 import org.joda.time.DateTime;
@@ -49,7 +50,7 @@ import static com.codahale.metrics.MetricRegistry.name;
 public class SyslogProcessor {
 
     private static final Logger LOG = LoggerFactory.getLogger(SyslogProcessor.class);
-    private final GraylogServer server;
+    private final InputHost server;
     private final Configuration config;
 
     private final MessageInput sourceInput;
@@ -62,7 +63,7 @@ public class SyslogProcessor {
     private final Meter processedMessages;
     private final Timer syslogParsedTime;
 
-    public SyslogProcessor(GraylogServer server, Configuration config, MessageInput sourceInput) {
+    public SyslogProcessor(InputHost server, Configuration config, MessageInput sourceInput) {
         this.server = server;
         this.config = config;
 

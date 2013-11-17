@@ -19,12 +19,84 @@
  */
 package org.graylog2.radio.inputs;
 
+import com.google.common.collect.Maps;
+import com.google.common.util.concurrent.ThreadFactoryBuilder;
+import org.graylog2.plugin.GraylogServer;
+import org.graylog2.plugin.InputHost;
 import org.graylog2.plugin.inputs.MessageInput;
+import org.graylog2.plugin.inputs.MisfireException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.util.Map;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 /**
  * @author Lennart Koopmann <lennart@torch.sh>
  */
 public class InputRegistry {
+
+    private static final Logger LOG = LoggerFactory.getLogger(InputRegistry.class);
+
+    private final InputHost server;
+    private Map<String, MessageInput> runningInputs;
+    private Map<String, String> availableInputs;
+
+    private ExecutorService executor = Executors.newCachedThreadPool(
+            new ThreadFactoryBuilder().setNameFormat("inputs-%d").build()
+    );
+
+    public InputRegistry(InputHost server) {
+        this.server = server;
+        runningInputs = Maps.newHashMap();
+        availableInputs = Maps.newHashMap();
+    }
+
+    public String launch(final MessageInput input, String id) {
+        input.setId(id);
+        runningInputs.put(id, input);
+
+        executor.submit(new Runnable() {
+            @Override
+            public void run() {
+                LOG.info("Starting [{}] input with ID <{}>", input.getClass().getCanonicalName(), input.getId());
+                try {
+                    input.launch();
+                } catch (MisfireException e) {
+                    StringBuilder msg = new StringBuilder("The [" + input.getClass().getCanonicalName() + "] input with ID <" + input.getId() + "> " +
+                            "was accepted but misfired. Reason: ").append(e.getMessage());
+
+                    // Go down the whole cause chain to build a message that provides as much information as possible.
+                    int maxLevel = 7; // ;)
+                    Throwable cause = e.getCause();
+                    for (int i = 0; i < maxLevel; i++) {
+                        if (cause == null) {
+                            break;
+                        }
+
+                        msg.append(", ").append(cause.getMessage());
+                        cause = cause.getCause();
+                    }
+
+                    LOG.error(msg.toString(), e);
+
+                    // Clean up.
+                    cleanInput(input);
+                } catch(Exception e) {
+                    LOG.error("Error in input <{}>", input.getId(), e);
+                }
+            }
+        });
+
+        return id;
+    }
+
+
+    public void cleanInput(MessageInput input) {
+        // Remove from running list.
+        getRunningInputs().remove(input.getId());
+    }
 
     public static MessageInput factory(String type) throws NoSuchInputTypeException {
         try {
@@ -35,6 +107,20 @@ public class InputRegistry {
         } catch (Exception e) {
             throw new RuntimeException("Could not create input of type <" + type + ">", e);
         }
+    }
+
+    public boolean hasTypeRunning(Class klazz) {
+        for (MessageInput input : runningInputs.values()) {
+            if (input.getClass().equals(klazz)) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    public Map<String, MessageInput> getRunningInputs() {
+        return runningInputs;
     }
 
 }

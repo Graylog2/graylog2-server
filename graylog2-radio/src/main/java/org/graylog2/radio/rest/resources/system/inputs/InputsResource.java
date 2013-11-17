@@ -82,7 +82,7 @@ public class InputsResource extends RestResource {
 
         String inputId = UUID.randomUUID().toString();
 
-        /*
+
         // Don't run if exclusive and another instance is already running.
         if (input.isExclusive() && radio.inputs().hasTypeRunning(input.getClass())) {
             LOG.error("Type is exclusive and already has input running.");
@@ -91,7 +91,7 @@ public class InputsResource extends RestResource {
 
         // Launch input. (this will run async and clean up itself in case of an error.)
         radio.inputs().launch(input, inputId);
-        */
+
 
         return Response.status(Response.Status.ACCEPTED).build();
     }

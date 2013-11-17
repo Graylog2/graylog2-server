@@ -22,6 +22,7 @@ package org.graylog2.inputs.raw;
 import com.codahale.metrics.Meter;
 import com.codahale.metrics.Timer;
 import org.graylog2.plugin.GraylogServer;
+import org.graylog2.plugin.InputHost;
 import org.graylog2.plugin.Message;
 import org.graylog2.plugin.buffers.BufferOutOfCapacityException;
 import org.graylog2.plugin.configuration.Configuration;
@@ -40,7 +41,7 @@ import static com.codahale.metrics.MetricRegistry.name;
 public class RawProcessor {
 
     private static final Logger LOG = LoggerFactory.getLogger(RawProcessor.class);
-    private final GraylogServer server;
+    private final InputHost server;
     private final Configuration config;
 
     private final MessageInput sourceInput;
@@ -51,7 +52,7 @@ public class RawProcessor {
     private final Meter processedMessages;
     private final Timer parseTime;
 
-    public RawProcessor(GraylogServer server, Configuration config, MessageInput sourceInput) {
+    public RawProcessor(InputHost server, Configuration config, MessageInput sourceInput) {
         this.server = server;
         this.config = config;
 

@@ -21,6 +21,7 @@ package org.graylog2.inputs.raw;
 
 import com.codahale.metrics.Meter;
 import org.graylog2.plugin.GraylogServer;
+import org.graylog2.plugin.InputHost;
 import org.graylog2.plugin.configuration.Configuration;
 import org.graylog2.plugin.inputs.MessageInput;
 import org.jboss.netty.buffer.ChannelBuffer;
@@ -45,7 +46,7 @@ public class RawDispatcher extends SimpleChannelHandler {
     private final RawProcessor processor;
     private final Meter receivedMessages;
 
-    public RawDispatcher(GraylogServer server, Configuration config, MessageInput sourceInput) {
+    public RawDispatcher(InputHost server, Configuration config, MessageInput sourceInput) {
         this.processor = new RawProcessor(server, config, sourceInput);
 
         this.receivedMessages = server.metrics().meter(name(sourceInput.getUniqueReadableId(), "receivedMessages"));
