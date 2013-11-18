@@ -22,6 +22,7 @@ package org.graylog2.radio.rest.resources;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
+import com.google.common.collect.Maps;
 import org.graylog2.radio.Radio;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -30,6 +31,7 @@ import javax.inject.Inject;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Response;
+import java.util.Map;
 
 /**
  * @author Lennart Koopmann <lennart@torch.sh>
@@ -65,6 +67,19 @@ public class RestResource {
             LOG.error("Error while generating JSON", e);
             throw new WebApplicationException(e, Response.Status.INTERNAL_SERVER_ERROR);
         }
+    }
+
+    protected Map<String, Long> bytesToValueMap(long bytes) {
+        Map<String, Long> r = Maps.newHashMap();
+
+        int kb = 1024;
+        int mb = kb*1024;
+
+        r.put("bytes", bytes);
+        r.put("kilobytes", bytes/kb);
+        r.put("megabytes", bytes/mb);
+
+        return r;
     }
 
 }

@@ -50,4 +50,23 @@ public class SystemResource extends RestResource {
         return json(result);
     }
 
+    @GET @Timed
+    @Path("/jvm")
+    @Produces(MediaType.APPLICATION_JSON)
+    public String jvm() {
+        Runtime runtime = Runtime.getRuntime();
+
+        Map<String, Object> result = Maps.newHashMap();
+        result.put("free_memory", bytesToValueMap(runtime.freeMemory()));
+        result.put("max_memory",  bytesToValueMap(runtime.maxMemory()));
+        result.put("total_memory", bytesToValueMap(runtime.totalMemory()));
+        result.put("used_memory", bytesToValueMap(runtime.totalMemory() - runtime.freeMemory()));
+
+        result.put("node_id", radio.getNodeId());
+        result.put("pid", Tools.getPID());
+        result.put("info", Tools.getSystemInformation());
+
+        return json(result);
+    }
+
 }
