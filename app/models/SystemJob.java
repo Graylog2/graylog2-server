@@ -61,11 +61,16 @@ public class SystemJob {
         this.id = UUID.fromString(s.id);
         this.name = s.name;
         this.description = s.description;
-        this.node = nodeService.loadNode(s.nodeId);
         this.startedAt = DateTime.parse(s.startedAt);
         this.percentComplete = s.percentComplete;
         this.isCancelable = s.isCancelable;
         this.providesProgress = s.providesProgress;
+
+        try {
+            this.node = nodeService.loadNode(s.nodeId);
+        } catch (NodeService.NodeNotFoundException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     public UUID getId() {

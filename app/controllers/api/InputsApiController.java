@@ -24,6 +24,7 @@ import com.google.gson.Gson;
 import com.google.inject.Inject;
 import controllers.AuthenticatedController;
 import lib.APIException;
+import lib.ApiClient;
 import lib.Tools;
 import models.Input;
 import models.Node;
@@ -57,9 +58,10 @@ public class InputsApiController extends AuthenticatedController {
             return ok(new Gson().toJson(result)).as("application/json");
         } catch (IOException e) {
             return internalServerError("io exception");
-        } catch (
-        APIException e) {
+        } catch (APIException e) {
             return internalServerError("api exception " + e);
+        } catch (NodeService.NodeNotFoundException e) {
+            return status(404, views.html.errors.error.render(ApiClient.ERROR_MSG_NODE_NOT_FOUND, e, request()));
         }
     }
 
@@ -76,9 +78,10 @@ public class InputsApiController extends AuthenticatedController {
             return ok(new Gson().toJson(result)).as("application/json");
         } catch (IOException e) {
             return internalServerError("io exception");
-        } catch (
-                APIException e) {
+        } catch (APIException e) {
             return internalServerError("api exception " + e);
+        } catch (NodeService.NodeNotFoundException e) {
+            return status(404, views.html.errors.error.render(ApiClient.ERROR_MSG_NODE_NOT_FOUND, e, request()));
         }
     }
 
@@ -100,6 +103,8 @@ public class InputsApiController extends AuthenticatedController {
             return status(500);
         } catch (APIException e) {
             return status(e.getHttpCode());
+        } catch (NodeService.NodeNotFoundException e) {
+            return status(404, views.html.errors.error.render(ApiClient.ERROR_MSG_NODE_NOT_FOUND, e, request()));
         }
     }
 

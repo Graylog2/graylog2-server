@@ -38,21 +38,23 @@ public class MetricsController extends AuthenticatedController {
     private NodeService nodeService;
 
     public Result ofNode(String nodeId, String preFilter) {
-        Node node = nodeService.loadNode(nodeId);
-
-        BreadcrumbList bc = new BreadcrumbList();
-        bc.addCrumb("System", routes.SystemController.index(0));
-        bc.addCrumb("Nodes", routes.SystemController.nodes());
-        bc.addCrumb(node.getShortNodeId(), routes.SystemController.node(node.getNodeId()));
-        bc.addCrumb("Metrics", routes.MetricsController.ofNode(node.getNodeId(), ""));
-
         try {
+            Node node = nodeService.loadNode(nodeId);
+
+            BreadcrumbList bc = new BreadcrumbList();
+            bc.addCrumb("System", routes.SystemController.index(0));
+            bc.addCrumb("Nodes", routes.SystemController.nodes());
+            bc.addCrumb(node.getShortNodeId(), routes.SystemController.node(node.getNodeId()));
+            bc.addCrumb("Metrics", routes.MetricsController.ofNode(node.getNodeId(), ""));
+
             return ok(views.html.system.metrics.of_node.render(currentUser(), bc, node, node.getMetrics("org.graylog2"), preFilter));
         } catch (IOException e) {
             return status(500, views.html.errors.error.render(ApiClient.ERROR_MSG_IO, e, request()));
         } catch (APIException e) {
             String message = "Could not fetch system information. We expected HTTP 200, but got a HTTP " + e.getHttpCode() + ".";
             return status(500, views.html.errors.error.render(message, e, request()));
+        } catch (NodeService.NodeNotFoundException e) {
+            return status(404, views.html.errors.error.render(ApiClient.ERROR_MSG_NODE_NOT_FOUND, e, request()));
         }
     }
 

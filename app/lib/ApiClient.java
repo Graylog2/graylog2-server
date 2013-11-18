@@ -29,6 +29,7 @@ import models.api.responses.EmptyResponse;
 @ImplementedBy(ApiClientImpl.class)
 public interface ApiClient {
     String ERROR_MSG_IO = "Could not connect to graylog2-server. Please make sure that it is running and you configured the correct REST URI.";
+    String ERROR_MSG_NODE_NOT_FOUND = "Node not found.";
 
     void start();
 

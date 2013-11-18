@@ -44,20 +44,20 @@ public class InputsController extends AuthenticatedController {
     private NodeService nodeService;
 
     public Result manage(String nodeId) {
-        Node node = nodeService.loadNode(nodeId);
-
-        if (node == null) {
-            String message = "Did not find node.";
-            return status(404, views.html.errors.error.render(message, new RuntimeException(), request()));
-        }
-
-        BreadcrumbList bc = new BreadcrumbList();
-        bc.addCrumb("System", routes.SystemController.index(0));
-        bc.addCrumb("Nodes", routes.SystemController.nodes());
-        bc.addCrumb(node.getShortNodeId(), routes.SystemController.node(node.getNodeId()));
-        bc.addCrumb("Inputs", routes.InputsController.manage(node.getNodeId()));
-
         try {
+            Node node = nodeService.loadNode(nodeId);
+
+            if (node == null) {
+                String message = "Did not find node.";
+                return status(404, views.html.errors.error.render(message, new RuntimeException(), request()));
+            }
+
+            BreadcrumbList bc = new BreadcrumbList();
+            bc.addCrumb("System", routes.SystemController.index(0));
+            bc.addCrumb("Nodes", routes.SystemController.nodes());
+            bc.addCrumb(node.getShortNodeId(), routes.SystemController.node(node.getNodeId()));
+            bc.addCrumb("Inputs", routes.InputsController.manage(node.getNodeId()));
+
             return ok(views.html.system.inputs.manage.render(
                     currentUser(),
                     bc,
@@ -69,24 +69,26 @@ public class InputsController extends AuthenticatedController {
         } catch (APIException e) {
             String message = "Could not fetch system information. We expected HTTP 200, but got a HTTP " + e.getHttpCode() + ".";
             return status(500, views.html.errors.error.render(message, e, request()));
+        } catch (NodeService.NodeNotFoundException e) {
+            return status(404, views.html.errors.error.render(ApiClient.ERROR_MSG_NODE_NOT_FOUND, e, request()));
         }
     }
 
     public Result manageRadio(String radioId) {
-        Radio radio = nodeService.loadRadio(radioId);
-
-        if (radio == null) {
-            String message = "Did not find radio.";
-            return status(404, views.html.errors.error.render(message, new RuntimeException(), request()));
-        }
-
-        BreadcrumbList bc = new BreadcrumbList();
-        bc.addCrumb("System", routes.SystemController.index(0));
-        bc.addCrumb("Nodes", routes.SystemController.nodes());
-        bc.addCrumb(radio.getShortNodeId(), routes.RadiosController.show(radio.getId()));
-        bc.addCrumb("Inputs", routes.InputsController.manageRadio(radio.getId()));
-
         try {
+            Radio radio = nodeService.loadRadio(radioId);
+
+            if (radio == null) {
+                String message = "Did not find radio.";
+                return status(404, views.html.errors.error.render(message, new RuntimeException(), request()));
+            }
+
+            BreadcrumbList bc = new BreadcrumbList();
+            bc.addCrumb("System", routes.SystemController.index(0));
+            bc.addCrumb("Nodes", routes.SystemController.nodes());
+            bc.addCrumb(radio.getShortNodeId(), routes.RadiosController.show(radio.getId()));
+            bc.addCrumb("Inputs", routes.InputsController.manageRadio(radio.getId()));
+
             return ok(views.html.system.inputs.manage_radio.render(
                     currentUser(),
                     bc,
@@ -98,6 +100,8 @@ public class InputsController extends AuthenticatedController {
         } catch (APIException e) {
             String message = "Could not fetch system information. We expected HTTP 200, but got a HTTP " + e.getHttpCode() + ".";
             return status(500, views.html.errors.error.render(message, e, request()));
+        } catch (NodeService.NodeNotFoundException e) {
+            return status(404, views.html.errors.error.render(ApiClient.ERROR_MSG_NODE_NOT_FOUND, e, request()));
         }
     }
 
@@ -162,6 +166,8 @@ public class InputsController extends AuthenticatedController {
         } catch (APIException e) {
             String message = "Could not launch input. We expected HTTP 202, but got a HTTP " + e.getHttpCode() + ".";
             return status(500, views.html.errors.error.render(message, e, request()));
+        } catch (NodeService.NodeNotFoundException e) {
+            return status(404, views.html.errors.error.render(ApiClient.ERROR_MSG_NODE_NOT_FOUND, e, request()));
         }
     }
 
@@ -228,13 +234,20 @@ public class InputsController extends AuthenticatedController {
         } catch (APIException e) {
             String message = "Could not launch input. We expected HTTP 202, but got a HTTP " + e.getHttpCode() + ".";
             return status(500, views.html.errors.error.render(message, e, request()));
+        } catch (NodeService.NodeNotFoundException e) {
+            return status(404, views.html.errors.error.render(ApiClient.ERROR_MSG_NODE_NOT_FOUND, e, request()));
         }
     }
 
     public Result terminate(String nodeId, String inputId) {
-        if (!nodeService.loadNode(nodeId).terminateInput(inputId)) {
-            flash("Could not terminate input " + inputId);
+        try {
+            if (!nodeService.loadNode(nodeId).terminateInput(inputId)) {
+                flash("Could not terminate input " + inputId);
+            }
+        } catch (NodeService.NodeNotFoundException e) {
+            return status(404, views.html.errors.error.render(ApiClient.ERROR_MSG_NODE_NOT_FOUND, e, request()));
         }
+
         return redirect(routes.InputsController.manage(nodeId));
     }
 
@@ -257,6 +270,8 @@ public class InputsController extends AuthenticatedController {
         } catch (APIException e) {
             String message = "Could not add static field. We expected HTTP 202, but got a HTTP " + e.getHttpCode() + ".";
             return status(500, views.html.errors.error.render(message, e, request()));
+        } catch (NodeService.NodeNotFoundException e) {
+            return status(404, views.html.errors.error.render(ApiClient.ERROR_MSG_NODE_NOT_FOUND, e, request()));
         }
     }
 
@@ -269,6 +284,8 @@ public class InputsController extends AuthenticatedController {
         } catch (APIException e) {
             String message = "Could not delete static field. We expected HTTP 204, but got a HTTP " + e.getHttpCode() + ".";
             return status(500, views.html.errors.error.render(message, e, request()));
+        } catch (NodeService.NodeNotFoundException e) {
+            return status(404, views.html.errors.error.render(ApiClient.ERROR_MSG_NODE_NOT_FOUND, e, request()));
         }
     }
 

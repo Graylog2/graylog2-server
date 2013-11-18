@@ -47,7 +47,7 @@ public class NodeService {
         this.radioFactory = radioFactory;
     }
 
-    public Node loadNode(String nodeId) {
+    public Node loadNode(String nodeId) throws NodeNotFoundException {
         NodeSummaryResponse r;
         try {
             r = api.get(NodeSummaryResponse.class)
@@ -57,11 +57,16 @@ public class NodeService {
         } catch (IOException e) {
             throw new RuntimeException(e);
         } catch (APIException e) {
+            if (e.getHttpCode() == 404) {
+                throw new NodeNotFoundException();
+            }
+
+
             throw new RuntimeException(e);
         }
     }
 
-    public Radio loadRadio(String radioId) {
+    public Radio loadRadio(String radioId) throws NodeNotFoundException {
         RadioSummaryResponse r;
 
         try {
@@ -72,6 +77,10 @@ public class NodeService {
         } catch (IOException e) {
             throw new RuntimeException(e);
         } catch (APIException e) {
+            if (e.getHttpCode() == 404) {
+                throw new NodeNotFoundException();
+            }
+
             throw new RuntimeException(e);
         }
     }
@@ -87,4 +96,6 @@ public class NodeService {
         return radios;
     }
 
+    public class NodeNotFoundException extends Exception {
+    }
 }

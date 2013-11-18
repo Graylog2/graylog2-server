@@ -96,13 +96,17 @@ public class SystemController extends AuthenticatedController {
     }
 
     public Result node(String nodeId) {
-        Node node = nodeService.loadNode(nodeId);
+        try {
+            Node node = nodeService.loadNode(nodeId);
 
-        BreadcrumbList bc = new BreadcrumbList();
-        bc.addCrumb("System", routes.SystemController.index(0));
-        bc.addCrumb("Nodes", routes.SystemController.nodes());
+            BreadcrumbList bc = new BreadcrumbList();
+            bc.addCrumb("System", routes.SystemController.index(0));
+            bc.addCrumb("Nodes", routes.SystemController.nodes());
 
-        return ok(views.html.system.nodes.show.render(currentUser(), bc, node));
+            return ok(views.html.system.nodes.show.render(currentUser(), bc, node));
+        } catch (NodeService.NodeNotFoundException e) {
+            return status(404, views.html.errors.error.render(ApiClient.ERROR_MSG_NODE_NOT_FOUND, e, request()));
+        }
     }
 
     public Result threadDump(String nodeId) {
@@ -121,6 +125,8 @@ public class SystemController extends AuthenticatedController {
         } catch (APIException e) {
             String message = "Could not fetch system information. We expected HTTP 200, but got a HTTP " + e.getHttpCode() + ".";
             return status(504, views.html.errors.error.render(message, e, request()));
+        } catch (NodeService.NodeNotFoundException e) {
+            return status(404, views.html.errors.error.render(ApiClient.ERROR_MSG_NODE_NOT_FOUND, e, request()));
         }
     }
 

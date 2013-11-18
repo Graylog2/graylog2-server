@@ -58,6 +58,8 @@ public class ExtractorsController extends AuthenticatedController {
         } catch (APIException e) {
             String message = "Could not fetch system information. We expected HTTP 200, but got a HTTP " + e.getHttpCode() + ".";
             return status(500, views.html.errors.error.render(message, e, request()));
+        } catch (NodeService.NodeNotFoundException e) {
+            return status(404, views.html.errors.error.render(ApiClient.ERROR_MSG_NODE_NOT_FOUND, e, request()));
         }
     }
 
@@ -80,16 +82,19 @@ public class ExtractorsController extends AuthenticatedController {
         } catch (APIException e) {
             String message = "Could not fetch system information. We expected HTTP 200, but got a HTTP " + e.getHttpCode() + ".";
             return status(500, views.html.errors.error.render(message, e, request()));
+        } catch (NodeService.NodeNotFoundException e) {
+            return status(404, views.html.errors.error.render(ApiClient.ERROR_MSG_NODE_NOT_FOUND, e, request()));
         }
     }
 
     public Result create(String nodeId, String inputId) {
         Map<String, String[]> form = request().body().asFormUrlEncoded();
         Extractor.Type extractorType = Extractor.Type.valueOf(form.get("extractor_type")[0].toUpperCase());
-        Node node = nodeService.loadNode(nodeId);
 
         Extractor extractor;
         try {
+            Node node = nodeService.loadNode(nodeId);
+
             try {
                 extractor = extractorFactory.forCreate(
                         Extractor.CursorStrategy.valueOf(form.get("cut_or_copy")[0].toUpperCase()),
@@ -114,6 +119,8 @@ public class ExtractorsController extends AuthenticatedController {
         } catch (APIException e) {
             String message = "Could not create extractor! We expected HTTP 200, but got a HTTP " + e.getHttpCode() + ".";
             return status(500, views.html.errors.error.render(message, e, request()));
+        } catch (NodeService.NodeNotFoundException e) {
+            return status(404, views.html.errors.error.render(ApiClient.ERROR_MSG_NODE_NOT_FOUND, e, request()));
         }
 
         return redirect(routes.ExtractorsController.manage(nodeId, inputId));
@@ -130,6 +137,8 @@ public class ExtractorsController extends AuthenticatedController {
         } catch (APIException e) {
             String message = "Could not delete extractor! We expected HTTP 204, but got a HTTP " + e.getHttpCode() + ".";
             return status(500, views.html.errors.error.render(message, e, request()));
+        } catch (NodeService.NodeNotFoundException e) {
+            return status(404, views.html.errors.error.render(ApiClient.ERROR_MSG_NODE_NOT_FOUND, e, request()));
         }
     }
 

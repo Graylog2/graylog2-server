@@ -24,6 +24,7 @@ import com.google.gson.Gson;
 import com.google.inject.Inject;
 import controllers.AuthenticatedController;
 import lib.APIException;
+import lib.ApiClient;
 import models.*;
 import play.libs.F;
 import play.mvc.Http;
@@ -111,12 +112,16 @@ public class SystemApiController extends AuthenticatedController {
     }
 
     public Result nodeThroughput(String nodeId) {
-        Map<String, Object> result = Maps.newHashMap();
-        final Node node = nodeService.loadNode(nodeId);
-        int throughput = node.getThroughput();
-        result.put("throughput", throughput);
+        try {
+            Map<String, Object> result = Maps.newHashMap();
+            final Node node = nodeService.loadNode(nodeId);
+            int throughput = node.getThroughput();
+            result.put("throughput", throughput);
 
-        return ok(new Gson().toJson(result)).as("application/json");
+            return ok(new Gson().toJson(result)).as("application/json");
+        } catch (NodeService.NodeNotFoundException e) {
+            return status(404, views.html.errors.error.render(ApiClient.ERROR_MSG_NODE_NOT_FOUND, e, request()));
+        }
     }
 
     public Result pauseMessageProcessing() {
@@ -130,6 +135,8 @@ public class SystemApiController extends AuthenticatedController {
             return internalServerError("io exception");
         } catch (APIException e) {
             return internalServerError("api exception " + e);
+        } catch (NodeService.NodeNotFoundException e) {
+            return status(404, views.html.errors.error.render(ApiClient.ERROR_MSG_NODE_NOT_FOUND, e, request()));
         }
     }
 
@@ -144,6 +151,8 @@ public class SystemApiController extends AuthenticatedController {
             return internalServerError("io exception");
         } catch (APIException e) {
             return internalServerError("api exception " + e);
+        } catch (NodeService.NodeNotFoundException e) {
+            return status(404, views.html.errors.error.render(ApiClient.ERROR_MSG_NODE_NOT_FOUND, e, request()));
         }
     }
 }
