@@ -23,13 +23,18 @@ package org.graylog2.rest.resources;
 import com.codahale.metrics.Histogram;
 import com.codahale.metrics.Meter;
 import com.codahale.metrics.Timer;
+import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.ObjectWriter;
+import com.fasterxml.jackson.databind.PropertyNamingStrategy;
 import com.fasterxml.jackson.databind.SerializationFeature;
+import com.fasterxml.jackson.jaxrs.cfg.EndpointConfigBase;
+import com.fasterxml.jackson.jaxrs.cfg.ObjectWriterInjector;
+import com.fasterxml.jackson.jaxrs.cfg.ObjectWriterModifier;
 import com.google.common.collect.Maps;
 import org.apache.shiro.subject.Subject;
 import org.bson.types.ObjectId;
-import org.codehaus.jackson.map.SerializationConfig;
 import org.graylog2.Core;
 import org.graylog2.security.ShiroSecurityContext;
 import org.slf4j.Logger;
@@ -38,10 +43,7 @@ import org.slf4j.LoggerFactory;
 import javax.inject.Inject;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.WebApplicationException;
-import javax.ws.rs.core.Context;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response;
-import javax.ws.rs.core.SecurityContext;
+import javax.ws.rs.core.*;
 import java.security.Principal;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
@@ -58,8 +60,7 @@ public abstract class RestResource {
     @Inject
     protected Core core;
 
-    @QueryParam("pretty")
-    boolean prettyPrint;
+    private boolean prettyPrint;
 
     @Context
     SecurityContext securityContext;
@@ -70,6 +71,21 @@ public abstract class RestResource {
           * Make it write ISO8601 instead.
           */
         objectMapper.configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false);
+        objectMapper.setPropertyNamingStrategy(PropertyNamingStrategy.CAMEL_CASE_TO_LOWER_CASE_WITH_UNDERSCORES);
+    }
+
+    @QueryParam("pretty")
+    public void setPrettyPrint(boolean prettyPrint) {
+        if (prettyPrint) {
+            /* sigh jersey, hooray @cowtowncoder : https://twitter.com/cowtowncoder/status/402226988603035648 */
+            ObjectWriterInjector.set(new ObjectWriterModifier() {
+                @Override
+                public ObjectWriter modify(EndpointConfigBase<?> endpoint, MultivaluedMap<String, Object> responseHeaders, Object valueToWrite, ObjectWriter w, JsonGenerator g) {
+                    return w.withDefaultPrettyPrinter();
+                }
+            });
+        }
+        this.prettyPrint = prettyPrint;
     }
 
     protected int page(int page) {

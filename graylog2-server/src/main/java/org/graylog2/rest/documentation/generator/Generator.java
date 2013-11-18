@@ -164,6 +164,13 @@ public class Generator {
                         }
                     }
 
+                    Produces produces = null;
+                    if (clazz.isAnnotationPresent(Produces.class) || method.isAnnotationPresent(Produces.class)) {
+                        produces = clazz.getAnnotation(Produces.class);
+                        if (method.isAnnotationPresent(Produces.class)) {
+                            produces = method.getAnnotation(Produces.class);
+                        }
+                    }
                     api.put("path", methodPath);
 
                     Map<String, Object> operation = Maps.newHashMap();
@@ -171,6 +178,10 @@ public class Generator {
                     operation.put("summary", apiOperation.value());
                     operation.put("notes", apiOperation.notes());
                     operation.put("nickname", method.getName());
+                    if (produces != null) {
+                        operation.put("produces", produces.value());
+                    }
+                    operation.put("type", method.getReturnType().getSimpleName());
 
                     List<Map<String, Object>> parameters = determineParameters(method);
                     if (parameters != null && !parameters.isEmpty()) {
@@ -236,6 +247,9 @@ public class Generator {
                     paramType = "query";
                 } else if (annotation instanceof PathParam) {
                     paramType = "path";
+                } else if (annotation instanceof HeaderParam) {
+                    // TODO skip header params for now, we use them for Accept headers until we return proper objects
+                    continue;
                 } else {
                     paramType = "body";
                 }

@@ -22,17 +22,16 @@ package org.graylog2.rest.resources.search;
 import com.codahale.metrics.annotation.Timed;
 import org.graylog2.indexer.IndexHelper;
 import org.graylog2.indexer.Indexer;
-import org.graylog2.indexer.searches.Searches;
 import org.graylog2.indexer.searches.timeranges.InvalidRangeParametersException;
 import org.graylog2.indexer.searches.timeranges.RelativeRange;
 import org.graylog2.indexer.searches.timeranges.TimeRange;
 import org.graylog2.rest.documentation.annotations.*;
+import org.graylog2.rest.resources.search.responses.SearchResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
-import java.util.Map;
 
 /**
  * @author Lennart Koopmann <lennart@torch.sh>
@@ -45,13 +44,13 @@ public class RelativeSearchResource extends SearchResource {
 
     @GET @Timed
     @ApiOperation(value = "Message search with relative timerange.",
-            notes = "Search for messages in a relative timerange, specified as seconds from now. " +
-                    "Example: 300 means search from 5 minutes ago to now.")
-    @Produces(MediaType.APPLICATION_JSON)
+                  notes = "Search for messages in a relative timerange, specified as seconds from now. " +
+                          "Example: 300 means search from 5 minutes ago to now.")
     @ApiResponses(value = {
             @ApiResponse(code = 400, message = "Invalid timerange parameters provided.")
     })
-    public String searchRelative(
+    @Produces({ MediaType.APPLICATION_JSON, "text/csv" })
+    public SearchResponse searchRelative(
             @ApiParam(title = "query", description = "Query (Lucene syntax)", required = true) @QueryParam("query") String query,
             @ApiParam(title = "range", description = "Relative timeframe to search in. See method description.", required = true) @QueryParam("range") int range,
             @ApiParam(title = "limit", description = "Maximum number of messages to return.", required = false) @QueryParam("limit") int limit,
@@ -60,19 +59,19 @@ public class RelativeSearchResource extends SearchResource {
         checkQuery(query);
 
         try {
-            Map<String, Object> searchResult;
+            SearchResponse searchResponse;
 
             if (filter == null) {
-                searchResult = buildSearchResult(
+                searchResponse = buildSearchResponse(
                         core.getIndexer().searches().search(query, buildRelativeTimeRange(range), limit, offset)
                 );
             } else {
-                searchResult = buildSearchResult(
+                searchResponse = buildSearchResponse(
                         core.getIndexer().searches().search(query, filter, buildRelativeTimeRange(range), limit, offset)
                 );
             }
 
-            return json(searchResult);
+            return searchResponse;
         } catch (IndexHelper.InvalidRangeFormatException e) {
             LOG.warn("Invalid timerange parameters provided. Returning HTTP 400.", e);
             throw new WebApplicationException(400);

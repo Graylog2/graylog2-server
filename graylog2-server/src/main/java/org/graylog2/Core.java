@@ -21,6 +21,7 @@
 package org.graylog2;
 
 import com.codahale.metrics.MetricRegistry;
+import com.fasterxml.jackson.jaxrs.json.JacksonJsonProvider;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
@@ -61,6 +62,7 @@ import org.graylog2.plugin.inputs.MessageInput;
 import org.graylog2.plugin.outputs.MessageOutput;
 import org.graylog2.plugin.streams.Stream;
 import org.graylog2.plugins.PluginLoader;
+import org.graylog2.rest.ObjectMapperProvider;
 import org.graylog2.security.ShiroSecurityBinding;
 import org.graylog2.security.ShiroSecurityContextFactory;
 import org.graylog2.security.realm.LdapRealm;
@@ -76,6 +78,7 @@ import org.jboss.netty.channel.Channels;
 import org.jboss.netty.channel.socket.nio.NioServerSocketChannelFactory;
 import org.jboss.netty.handler.codec.http.HttpRequestDecoder;
 import org.jboss.netty.handler.codec.http.HttpResponseEncoder;
+import org.jboss.netty.handler.stream.ChunkedWriteHandler;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 import org.slf4j.Logger;
@@ -354,11 +357,14 @@ public class Core implements GraylogServer, InputHost {
                 bossExecutor,
                 workerExecutor
         ));
-        ResourceConfig rc = new ResourceConfig();
-        rc.property(NettyContainer.PROPERTY_BASE_URI, configuration.getRestListenUri());
-        rc.registerClasses(MetricsDynamicBinding.class, AnyExceptionClassMapper.class, ShiroSecurityBinding.class);
-        rc.register(new Graylog2Binder());
-        rc.registerFinder(new PackageNamesScanner(new String[] {"org.graylog2.rest.resources"}, true));
+
+        ResourceConfig rc = new ResourceConfig()
+                .property(NettyContainer.PROPERTY_BASE_URI, configuration.getRestListenUri())
+                .registerClasses(MetricsDynamicBinding.class, AnyExceptionClassMapper.class, ShiroSecurityBinding.class)
+                .register(new Graylog2Binder())
+                .register(ObjectMapperProvider.class)
+                .register(JacksonJsonProvider.class)
+                .registerFinder(new PackageNamesScanner(new String[]{"org.graylog2.rest.resources"}, true));
         final NettyContainer jerseyHandler = ContainerFactory.createContainer(NettyContainer.class, rc);
         jerseyHandler.setSecurityContextFactory(new ShiroSecurityContextFactory(this));
 
@@ -368,6 +374,7 @@ public class Core implements GraylogServer, InputHost {
                 ChannelPipeline pipeline = Channels.pipeline();
                 pipeline.addLast("decoder", new HttpRequestDecoder());
                 pipeline.addLast("encoder", new HttpResponseEncoder());
+                pipeline.addLast("chunks", new ChunkedWriteHandler());
                 pipeline.addLast("jerseyHandler", jerseyHandler);
                 return pipeline;
             }

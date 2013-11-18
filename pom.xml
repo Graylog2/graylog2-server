@@ -56,8 +56,8 @@
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <metrics.version>3.0.0</metrics.version>
-        <jackson.version>2.2.0</jackson.version>
-        <jersey.version>2.0</jersey.version>
+        <jackson.version>2.3.0</jackson.version>
+        <jersey.version>2.4.1</jersey.version>
     </properties>
 
     <repositories>
@@ -144,7 +144,7 @@
         <dependency>
             <groupId>com.jayway.jsonpath</groupId>
             <artifactId>json-path</artifactId>
-            <version>0.8.1</version>
+            <version>0.9.1</version>
         </dependency>
         <dependency>
             <groupId>com.ning</groupId>
@@ -164,6 +164,11 @@
         <dependency>
             <groupId>com.fasterxml.jackson.core</groupId>
             <artifactId>jackson-databind</artifactId>
+            <version>${jackson.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.fasterxml.jackson.jaxrs</groupId>
+            <artifactId>jackson-jaxrs-json-provider</artifactId>
             <version>${jackson.version}</version>
         </dependency>
         <dependency>
