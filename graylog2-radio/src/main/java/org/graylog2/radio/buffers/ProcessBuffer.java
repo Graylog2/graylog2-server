@@ -43,7 +43,6 @@ import static com.codahale.metrics.MetricRegistry.name;
  */
 public class ProcessBuffer extends Buffer {
 
-
     private static final Logger LOG = LoggerFactory.getLogger(ProcessBuffer.class);
 
     public static final String SOURCE_INPUT_ATTR_NAME = "gl2_source_input";

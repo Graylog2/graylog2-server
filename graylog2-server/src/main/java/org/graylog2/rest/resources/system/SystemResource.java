@@ -145,7 +145,7 @@ public class SystemResource extends RestResource {
     @Path("/threaddump")
     @Produces(MediaType.TEXT_PLAIN)
     public String threaddump() {
-        // The ThreadDump is built by  internal codahale.metrics servlet library we are abusing.
+        // The ThreadDump is built by internal codahale.metrics servlet library we are abusing.
         ThreadDump threadDump = new ThreadDump(ManagementFactory.getThreadMXBean());
         ByteArrayOutputStream output = new ByteArrayOutputStream();
 
@@ -162,6 +162,5 @@ public class SystemResource extends RestResource {
         result.put("permissions", RestPermissions.allPermissions());
         return json(result);
     }
-
 
 }

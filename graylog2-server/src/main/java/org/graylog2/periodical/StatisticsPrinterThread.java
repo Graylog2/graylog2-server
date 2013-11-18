@@ -20,7 +20,7 @@
 package org.graylog2.periodical;
 
 import org.graylog2.Core;
-import org.graylog2.buffers.BufferWatermark;
+import org.graylog2.plugin.buffers.BufferWatermark;
 import org.joda.time.DateTime;
 
 /**

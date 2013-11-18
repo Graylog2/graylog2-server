@@ -24,7 +24,7 @@ import java.util.Map;
 import java.util.Set;
 
 import org.graylog2.Core;
-import org.graylog2.buffers.BufferWatermark;
+import org.graylog2.plugin.buffers.BufferWatermark;
 import org.graylog2.plugin.Tools;
 import org.joda.time.DateTime;
 import org.slf4j.Logger;

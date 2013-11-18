@@ -223,4 +223,7 @@ public class Radio implements InputHost {
         return configuration;
     }
 
+    public Cache getInputCache() {
+        return inputCache;
+    }
 }

@@ -17,15 +17,13 @@
  * along with Graylog2.  If not, see <http://www.gnu.org/licenses/>.
  *
  */
-package org.graylog2.rest.resources.system;
+package org.graylog2.radio.rest.resources.system;
 
 import com.codahale.metrics.annotation.Timed;
 import com.google.common.collect.Maps;
-import org.graylog2.Core;
 import org.graylog2.plugin.buffers.BufferWatermark;
-import org.graylog2.rest.documentation.annotations.Api;
-import org.graylog2.rest.documentation.annotations.ApiOperation;
-import org.graylog2.rest.resources.RestResource;
+import org.graylog2.radio.Radio;
+import org.graylog2.radio.rest.resources.RestResource;
 
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
@@ -36,55 +34,45 @@ import java.util.Map;
 /**
  * @author Lennart Koopmann <lennart@torch.sh>
  */
-@Api(value = "System/Buffers", description = "Buffer information of this node.")
 @Path("/system/buffers")
-public class BufferResource extends RestResource {
+public class BuffersResource extends RestResource {
 
     @GET @Timed
-    @ApiOperation(value = "Get current utilization of buffers and caches of this node.")
     @Produces(MediaType.APPLICATION_JSON)
     public String utilization() {
         Map<String, Object> result = Maps.newHashMap();
-        result.put("buffers", buffers(core));
-        result.put("master_caches", masterCaches(core));
+        result.put("buffers", buffers(radio));
+        result.put("master_caches", masterCaches(radio));
 
         return json(result);
     }
 
-    private Map<String, Object> masterCaches(Core core) {
+    private Map<String, Object> masterCaches(Radio radio) {
         Map<String, Object> caches = Maps.newHashMap();
         Map<String, Object> input = Maps.newHashMap();
-        Map<String, Object> output = Maps.newHashMap();
 
-        input.put("size", core.getInputCache().size());
-        output.put("size", core.getOutputCache().size());
+        input.put("size", radio.getInputCache().size());
 
         caches.put("input", input);
-        caches.put("output", output);
 
         return caches;
     }
 
-    private Map<String, Object> buffers(Core core) {
+    private Map<String, Object> buffers(Radio radio) {
         Map<String, Object> buffers = Maps.newHashMap();
         Map<String, Object> input = Maps.newHashMap();
-        Map<String, Object> output = Maps.newHashMap();
 
-        int ringSize = core.getConfiguration().getRingSize();
+        BufferWatermark pWm = new BufferWatermark(
+                radio.getConfiguration().getRingSize(),
+                radio.processBufferWatermark()
+        );
 
-        BufferWatermark pWm = new BufferWatermark(ringSize, core.processBufferWatermark());
         input.put("utilization_percent", pWm.getUtilizationPercentage());
         input.put("utilization", pWm.getUtilization());
 
-        BufferWatermark oWm = new BufferWatermark(ringSize, core.outputBufferWatermark());
-        output.put("utilization_percent", oWm.getUtilizationPercentage());
-        output.put("utilization", oWm.getUtilization());
-
         buffers.put("input", input);
-        buffers.put("output", output);
 
         return buffers;
     }
-
 
 }

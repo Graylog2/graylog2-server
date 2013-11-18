@@ -20,6 +20,7 @@
 package org.graylog2.radio.rest.resources.system;
 
 import com.codahale.metrics.annotation.Timed;
+import com.codahale.metrics.jvm.ThreadDump;
 import com.google.common.collect.Maps;
 import org.graylog2.plugin.Tools;
 import org.graylog2.radio.Radio;
@@ -29,6 +30,8 @@ import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
+import java.io.ByteArrayOutputStream;
+import java.lang.management.ManagementFactory;
 import java.util.Map;
 
 /**
@@ -67,6 +70,18 @@ public class SystemResource extends RestResource {
         result.put("info", Tools.getSystemInformation());
 
         return json(result);
+    }
+
+    @GET @Timed
+    @Path("/threaddump")
+    @Produces(MediaType.TEXT_PLAIN)
+    public String threaddump() {
+        // The ThreadDump is built by internal codahale.metrics servlet library we are abusing.
+        ThreadDump threadDump = new ThreadDump(ManagementFactory.getThreadMXBean());
+        ByteArrayOutputStream output = new ByteArrayOutputStream();
+
+        threadDump.dump(output);
+        return output.toString();
     }
 
 }
