@@ -27,6 +27,7 @@ import lib.APIException;
 import lib.ApiClient;
 import lib.ExclusiveInputException;
 import models.api.requests.InputLaunchRequest;
+import models.api.responses.BuffersResponse;
 import models.api.responses.SystemOverviewResponse;
 import models.api.responses.cluster.RadioSummaryResponse;
 import models.api.responses.system.*;
@@ -61,6 +62,7 @@ public class Radio extends ClusterEntity {
 
     private NodeJVMStats jvmInfo;
     private SystemOverviewResponse systemInfo;
+    private BufferInfo bufferInfo;
 
     @AssistedInject
     public Radio(ApiClient api, Input.Factory inputFactory, @Assisted RadioSummaryResponse r) {
@@ -99,6 +101,20 @@ public class Radio extends ClusterEntity {
         }
     }
 
+    public synchronized void loadBufferInformation() {
+        try {
+            bufferInfo = new BufferInfo(api.get(BuffersResponse.class)
+                    .path("/system/buffers")
+                    .radio(this)
+                    .execute());
+        } catch (APIException e) {
+            log.error("Unable to load buffer information for radio " + this, e);
+        } catch (IOException e) {
+            log.error("Unable to load buffer information for radio " + this, e);
+        }
+    }
+
+    @Override
     public String getShortNodeId() {
         return shortNodeId;
     }
@@ -141,6 +157,7 @@ public class Radio extends ClusterEntity {
         return transportAddress.toASCIIString();
     }
 
+    @Override
     public String getHostname() {
         if (systemInfo == null) {
             loadSystemInformation();
@@ -230,6 +247,17 @@ public class Radio extends ClusterEntity {
             log.error("Could not launch input " + title, e);
         }
         return false;
+    }
+
+    public BufferInfo getBuffers() {
+        if (bufferInfo == null) {
+            loadBufferInformation();
+        }
+        return bufferInfo;
+    }
+
+    public String getThreadDump() throws IOException, APIException {
+        return api.get(String.class).radio(this).path("/system/threaddump").execute();
     }
 
     @Override

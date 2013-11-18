@@ -106,6 +106,12 @@
         @for(radio <- radios.values()) {
             <div class="row-fluid message-processing-host node-row">
                 <div class="pull-right node-throughput-info">
+                    <span class="sentence">
+                        Processing
+                        <strong class="radio-throughput focuslimit" data-node-id="@radio.getId">?</strong>
+                        messages per second.
+                    </span>
+
                     <div class="btn-group">
                         <a class="btn btn-mini dropdown-toggle" data-toggle="dropdown" href="#">
                                 Action
@@ -114,7 +120,7 @@
                         <ul class="dropdown-menu">
                             <li><a href="@routes.InputsController.manageRadio(radio.getId)">Manage inputs</a></li>
                             <li><a href="#">Metrics</a></li>
-                            <li><a href="#">Get thread dump</a></li>
+                            <li><a href="@routes.SystemController.threadDumpRadio(radio.getId)">Get thread dump</a></li>
                         </ul>
                     </div>
                 </div>
@@ -128,7 +134,7 @@
                     <div class="bar" style="width: @(radio.jvm().totalMemoryPercentage()-radio.jvm().usedMemoryPercentage)%"></div>
                 </div>
 
-                <strong>UNKOWN messages</strong> in master cache.
+                <strong>@radio.getBuffers.getInputMasterCache.size messages</strong> in master cache.
 
                 The JVM is using <strong>@radio.jvm().getUsedMemory.getMegabytes() of @radio.jvm().getTotalMemory.getMegabytes() MB</strong>
                 heap space and will not attempt to use more than <strong>@radio.jvm().getMaxMemory.getMegabytes() MB</strong>.

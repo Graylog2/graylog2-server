@@ -257,10 +257,12 @@ public class Node extends ClusterEntity {
         return nodeId;
     }
 
+    @Override
     public String getShortNodeId() {
         return shortNodeId;
     }
 
+    @Override
     public String getHostname() {
         if (systemInfo == null) {
             loadSystemInformation();

@@ -54,6 +54,8 @@ public abstract class ClusterEntity {
         return uri;
     }
 
+    public abstract String getShortNodeId();
+    public abstract String getHostname();
     public abstract String getTransportAddress();
     public abstract void touch();
     public abstract void markFailure();
