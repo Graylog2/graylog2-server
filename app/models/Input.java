@@ -46,12 +46,12 @@ public class Input {
     private static final org.slf4j.Logger log = LoggerFactory.getLogger(Input.class);
 
     public interface Factory {
-        Input fromSummaryResponse(InputSummaryResponse input, Node node);
+        Input fromSummaryResponse(InputSummaryResponse input, ClusterEntity node);
     }
 
     private final ApiClient api;
     private final UniversalSearch.Factory searchFactory;
-    private final Node node;
+    private final ClusterEntity node;
     private final String type;
     private final String id;
     private final String persistId;
@@ -63,7 +63,7 @@ public class Input {
     private final Map<String, String> staticFields;
 
     @AssistedInject
-    private Input(ApiClient api, UniversalSearch.Factory searchFactory, UserService userService, @Assisted InputSummaryResponse is, @Assisted Node node) {
+    private Input(ApiClient api, UniversalSearch.Factory searchFactory, UserService userService, @Assisted InputSummaryResponse is, @Assisted ClusterEntity node) {
         this.api = api;
         this.searchFactory = searchFactory;
         this.node = node;
@@ -83,10 +83,6 @@ public class Input {
                 attributes.put(e.getKey(), Math.round((Double) e.getValue()));
             }
         }
-    }
-
-    public void terminate(Node node) throws IOException, APIException {
-        node.terminateInput(id);
     }
 
     public MessageResult getRecentlyReceivedMessage(String nodeId) throws IOException, APIException {
@@ -143,7 +139,7 @@ public class Input {
     }
 
     public void addStaticField(String key, String value) throws APIException, IOException {
-        api.post().node(node)
+        api.post().clusterEntity(node)
                 .path("/system/inputs/{0}/staticfields", id)
                 .body(new AddStaticFieldRequest(key, value))
                 .expect(Http.Status.CREATED)
@@ -151,7 +147,7 @@ public class Input {
     }
 
     public void removeStaticField(String key) throws APIException, IOException {
-        api.delete().node(node)
+        api.delete().clusterEntity(node)
                 .path("/system/inputs/{0}/staticfields/{1}", id, key)
                 .expect(Http.Status.NO_CONTENT)
                 .execute();
@@ -196,7 +192,7 @@ public class Input {
     private Long getGaugeValue(String name) {
         try {
             GaugeResponse response = api.get(GaugeResponse.class)
-                .node(node)
+                .clusterEntity(node)
                 .path("/system/metrics/{0}.{1}.{2}", type, id, name)
                 .expect(200, 404)
                 .execute();

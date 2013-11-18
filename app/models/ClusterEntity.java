@@ -57,5 +57,6 @@ public abstract class ClusterEntity {
     public abstract String getTransportAddress();
     public abstract void touch();
     public abstract void markFailure();
+    public abstract boolean terminateInput(String inputId);
 
 }

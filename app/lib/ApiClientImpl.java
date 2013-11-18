@@ -194,6 +194,17 @@ class ApiClientImpl implements ApiClient {
             return this;
         }
 
+        public ApiRequestBuilder<T> clusterEntity(ClusterEntity entity) {
+            if (entity instanceof Radio) {
+                this.radio = (Radio) entity;
+            } else if(entity instanceof Node){
+                this.node = (Node) entity;
+            } else {
+                log.warn("You passed a ClusterEntity that is not of type Node or Radio. Selected nothing.");
+            }
+            return this;
+        }
+
         public ApiRequestBuilder<T> nodes(Node... nodes) {
             if (this.nodes != null) {
                 // TODO makes this sane

@@ -19,18 +19,26 @@
  */
 package models;
 
+import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
 import com.google.inject.assistedinject.Assisted;
 import com.google.inject.assistedinject.AssistedInject;
 import lib.APIException;
 import lib.ApiClient;
+import lib.ExclusiveInputException;
+import models.api.requests.InputLaunchRequest;
 import models.api.responses.SystemOverviewResponse;
 import models.api.responses.cluster.RadioSummaryResponse;
-import models.api.responses.system.ClusterEntityJVMStatsResponse;
+import models.api.responses.system.*;
 import org.joda.time.DateTime;
 import org.slf4j.LoggerFactory;
+import play.Logger;
+import play.mvc.Http;
 
 import java.io.IOException;
 import java.net.URI;
+import java.util.List;
+import java.util.Map;
 
 /**
  * @author Lennart Koopmann <lennart@torch.sh>
@@ -112,6 +120,23 @@ public class Radio extends ClusterEntity {
     }
 
     @Override
+    public boolean terminateInput(String inputId) {
+        try {
+            api.delete().path("/system/inputs/{0}", inputId)
+                    .radio(this)
+                    .expect(Http.Status.ACCEPTED)
+                    .execute();
+            return true;
+        } catch (APIException e) {
+            log.error("Could not terminate input " + inputId, e);
+        } catch (IOException e) {
+            log.error("Could not terminate input " + inputId, e);
+        }
+
+        return false;
+    }
+
+    @Override
     public String getTransportAddress() {
         return transportAddress.toASCIIString();
     }
@@ -131,6 +156,80 @@ public class Radio extends ClusterEntity {
     @Override
     public void markFailure() {
         // No failure counting in radios for now.
+    }
+
+    public Map<String, InputTypeSummaryResponse> getAllInputTypeInformation() throws IOException, APIException {
+        Map<String, InputTypeSummaryResponse> types = Maps.newHashMap();
+
+        for (String type : getInputTypes().keySet()) {
+            InputTypeSummaryResponse itr = getInputTypeInformation(type);
+            types.put(itr.type, itr);
+        }
+
+        return types;
+    }
+
+    public Map<String, String> getInputTypes() throws IOException, APIException {
+        return api.get(InputTypesResponse.class).radio(this).path("/system/inputs/types").execute().types;
+    }
+
+    public InputTypeSummaryResponse getInputTypeInformation(String type) throws IOException, APIException {
+        return api.get(InputTypeSummaryResponse.class).radio(this).path("/system/inputs/types/{0}", type).execute();
+    }
+
+    public List<Input> getInputs() {
+        List<Input> inputs = Lists.newArrayList();
+
+        for (InputSummaryResponse input : inputs().inputs) {
+            inputs.add(inputFactory.fromSummaryResponse(input, this));
+        }
+
+        return inputs;
+    }
+
+
+    public int numberOfInputs() {
+        return inputs().total;
+    }
+
+    private InputsResponse inputs() {
+        try {
+            return api.get(InputsResponse.class).radio(this).path("/system/inputs").execute();
+        } catch (Exception e) {
+            Logger.error("Could not get inputs.", e);
+            throw new RuntimeException("Could not get inputs.", e);
+        }
+    }
+
+    public boolean launchInput(String title, String type, Map<String, Object> configuration, User creator, boolean isExclusive) throws ExclusiveInputException {
+        if (isExclusive) {
+            for (Input input : getInputs()) {
+                if (input.getType().equals(type)) {
+                    throw new ExclusiveInputException();
+                }
+            }
+        }
+
+        InputLaunchRequest request = new InputLaunchRequest();
+        request.title = title;
+        request.type = type;
+        request.configuration = configuration;
+        request.creatorUserId = creator.getId();
+
+        try {
+            api.post()
+                    .path("/system/inputs")
+                    .radio(this)
+                    .body(request)
+                    .expect(Http.Status.ACCEPTED)
+                    .execute();
+            return true;
+        } catch (APIException e) {
+            log.error("Could not launch input " + title, e);
+        } catch (IOException e) {
+            log.error("Could not launch input " + title, e);
+        }
+        return false;
     }
 
     @Override

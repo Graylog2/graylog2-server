@@ -193,6 +193,7 @@ public class Node extends ClusterEntity {
         return false;
     }
 
+    @Override
     public boolean terminateInput(String inputId) {
         try {
             api.delete().path("/system/inputs/{0}", inputId)
@@ -205,6 +206,7 @@ public class Node extends ClusterEntity {
         } catch (IOException e) {
             log.error("Could not terminate input " + inputId, e);
         }
+
         return false;
     }
 

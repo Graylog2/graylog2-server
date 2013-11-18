@@ -61,6 +61,21 @@ public class NodeService {
         }
     }
 
+    public Radio loadRadio(String radioId) {
+        RadioSummaryResponse r;
+
+        try {
+            r = api.get(RadioSummaryResponse.class)
+                    .path("/system/radios/{0}", radioId)
+                    .execute();
+            return radioFactory.fromSummaryResponse(r);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        } catch (APIException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
     public Map<String, Radio> radios() throws APIException, IOException {
         Map<String, Radio> radios = Maps.newHashMap();
 
