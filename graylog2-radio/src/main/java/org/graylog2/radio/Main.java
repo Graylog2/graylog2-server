@@ -29,6 +29,16 @@ import com.github.joschi.jadconfig.ValidationException;
 import com.github.joschi.jadconfig.repositories.PropertiesRepository;
 import org.apache.commons.io.IOUtils;
 import org.apache.log4j.Level;
+import org.graylog2.inputs.gelf.http.GELFHttpInput;
+import org.graylog2.inputs.gelf.tcp.GELFTCPInput;
+import org.graylog2.inputs.gelf.udp.GELFUDPInput;
+import org.graylog2.inputs.misc.jsonpath.JsonPathInput;
+import org.graylog2.inputs.misc.metrics.LocalMetricsInput;
+import org.graylog2.inputs.random.FakeHttpMessageInput;
+import org.graylog2.inputs.raw.tcp.RawTCPInput;
+import org.graylog2.inputs.raw.udp.RawUDPInput;
+import org.graylog2.inputs.syslog.tcp.SyslogTCPInput;
+import org.graylog2.inputs.syslog.udp.SyslogUDPInput;
 import org.graylog2.plugin.Tools;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -123,12 +133,24 @@ public class Main {
             System.exit(1);
         }
 
-        // Start pinging Graylog2 cluster to show that we are alive.
-        radio.startPings();
+        // Register inputs. (find an automatic way here (annotations?) and do the same in graylog2-server.Main
+        radio.inputs().register(SyslogUDPInput.class, SyslogUDPInput.NAME);
+        radio.inputs().register(SyslogTCPInput.class, SyslogTCPInput.NAME);
+        radio.inputs().register(RawUDPInput.class, RawUDPInput.NAME);
+        radio.inputs().register(RawTCPInput.class, RawTCPInput.NAME);
+        radio.inputs().register(GELFUDPInput.class, GELFUDPInput.NAME);
+        radio.inputs().register(GELFTCPInput.class, GELFTCPInput.NAME);
+        radio.inputs().register(GELFHttpInput.class, GELFHttpInput.NAME);
+        radio.inputs().register(FakeHttpMessageInput.class, FakeHttpMessageInput.NAME);
+        radio.inputs().register(LocalMetricsInput.class, LocalMetricsInput.NAME);
+        radio.inputs().register(JsonPathInput.class, JsonPathInput.NAME);
 
         // Connect Kafka
 
         // Launch inputs
+
+        // Start pinging Graylog2 cluster to show that we are alive.
+        radio.startPings();
 
         LOG.info("Graylog2 Radio up and running.");
 

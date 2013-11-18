@@ -25,6 +25,7 @@ import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import org.graylog2.plugin.GraylogServer;
 import org.graylog2.plugin.InputHost;
+import org.graylog2.plugin.Tools;
 import org.graylog2.plugin.configuration.Configuration;
 import org.graylog2.plugin.configuration.ConfigurationException;
 import org.graylog2.plugin.configuration.ConfigurationRequest;
@@ -115,6 +116,22 @@ public abstract class MessageInput {
         }
 
         return result;
+    }
+
+    public Map<String, Object> asMap() {
+        Map<String, Object> inputMap = Maps.newHashMap();
+
+        inputMap.put("type", this.getClass().getCanonicalName());
+        inputMap.put("input_id", this.getId());
+        inputMap.put("persist_id", this.getPersistId());
+        inputMap.put("name", this.getName());
+        inputMap.put("title", this.getTitle());
+        inputMap.put("creator_user_id", this.getCreatorUserId());
+        inputMap.put("started_at", Tools.getISO8601String(this.getCreatedAt()));
+        inputMap.put("attributes", this.getAttributesWithMaskedPasswords());
+        inputMap.put("static_fields", this.getStaticFields());
+
+        return inputMap;
     }
 
     public void addExtractor(String id, Extractor extractor) {

@@ -24,9 +24,7 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import org.graylog2.cluster.Node;
 import org.graylog2.plugin.Tools;
-import org.graylog2.rest.documentation.annotations.Api;
-import org.graylog2.rest.documentation.annotations.ApiOperation;
-import org.graylog2.rest.documentation.annotations.ApiParam;
+import org.graylog2.rest.documentation.annotations.*;
 import org.graylog2.rest.resources.RestResource;
 import org.graylog2.rest.resources.system.radio.requests.PingRequest;
 import org.slf4j.Logger;
@@ -52,19 +50,38 @@ public class RadiosResource extends RestResource {
 
     @GET @Timed
     @ApiOperation(value = "List all active radios in this cluster.")
-    public String nodes() {
-        List<Map<String, Object>> nodeList = Lists.newArrayList();
-        Map<String, Node> nodes = Node.allActive(core, Node.Type.RADIO);
+    public String radios() {
+        List<Map<String, Object>> radioList = Lists.newArrayList();
+        Map<String, Node> radios = Node.allActive(core, Node.Type.RADIO);
 
-        for(Map.Entry<String, Node> e : nodes.entrySet()) {
-            nodeList.add(radioSummary(e.getValue()));
+        for(Map.Entry<String, Node> radio : radios.entrySet()) {
+            radioList.add(radioSummary(radio.getValue()));
         }
 
         Map<String, Object> result = Maps.newHashMap();
-        result.put("total", nodes.size());
-        result.put("radios", nodeList);
+        result.put("total", radios.size());
+        result.put("radios", radioList);
 
         return json(result);
+    }
+
+    @GET @Timed
+    @ApiOperation(value = "Information about a radio.",
+            notes = "This is returning information of a radio in context to its state in the cluster. " +
+                    "Use the system API of the node itself to get system information.")
+    @Path("/{radioId}")
+    @ApiResponses(value = {
+            @ApiResponse(code = 404, message = "Radio not found.")
+    })
+    public String radio(@ApiParam(title = "radioId", required = true) @PathParam("radioId") String radioId) {
+        Node radio = Node.byNodeId(core, radioId);
+
+        if (radio == null) {
+            LOG.error("Radio <{}> not found.", radioId);
+            throw new WebApplicationException(404);
+        }
+
+        return json(radioSummary(radio));
     }
 
     @PUT @Timed

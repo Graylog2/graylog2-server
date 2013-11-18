@@ -19,7 +19,9 @@
  */
 package org.graylog2.radio.rest.resources.system.inputs;
 
+import com.beust.jcommander.internal.Lists;
 import com.codahale.metrics.annotation.Timed;
+import com.google.common.collect.Maps;
 import org.graylog2.plugin.configuration.Configuration;
 import org.graylog2.plugin.configuration.ConfigurationException;
 import org.graylog2.plugin.inputs.MessageInput;
@@ -36,6 +38,8 @@ import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.io.IOException;
+import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 /**
@@ -46,8 +50,23 @@ public class InputsResource extends RestResource {
 
     private static final Logger LOG = LoggerFactory.getLogger(InputsResource.class);
 
-    @POST
-    @Timed
+    @GET @Timed
+    @Produces(MediaType.APPLICATION_JSON)
+    public String list() {
+        List<Map<String, Object>> inputs = Lists.newArrayList();
+
+        for (MessageInput input : radio.inputs().getRunningInputs().values()) {
+            inputs.add(input.asMap());
+        }
+
+        Map<String, Object> result = Maps.newHashMap();
+        result.put("inputs", inputs);
+        result.put("total", radio.inputs().runningCount());
+
+        return json(result);
+    }
+
+    @POST @Timed
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
     public Response launch(String body) {
@@ -94,6 +113,39 @@ public class InputsResource extends RestResource {
 
 
         return Response.status(Response.Status.ACCEPTED).build();
+    }
+
+    @GET @Timed
+    @Path("/types")
+    @Produces(MediaType.APPLICATION_JSON)
+    public String types() {
+        Map<String, Object> result = Maps.newHashMap();
+        result.put("types", radio.inputs().getAvailableInputs());
+
+        return json(result);
+    }
+
+    @GET @Timed
+    @Path("/types/{inputType}")
+    @Produces(MediaType.APPLICATION_JSON)
+    public String info(@PathParam("inputType") String inputType) {
+
+        MessageInput input;
+        try {
+            input = InputRegistry.factory(inputType);
+        } catch (NoSuchInputTypeException e) {
+            LOG.error("There is no such input type registered.", e);
+            throw new WebApplicationException(e, Response.Status.NOT_FOUND);
+        }
+
+        Map<String, Object> result = Maps.newHashMap();
+        result.put("type", input.getClass().getCanonicalName());
+        result.put("name", input.getName());
+        result.put("is_exclusive", input.isExclusive());
+        result.put("requested_configuration", input.getRequestedConfiguration().asList());
+        result.put("link_to_docs", input.linkToDocs());
+
+        return json(result);
     }
 
 }

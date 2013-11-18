@@ -92,6 +92,9 @@ public class InputRegistry {
         return id;
     }
 
+    public int runningCount() {
+        return runningInputs.size();
+    }
 
     public void cleanInput(MessageInput input) {
         // Remove from running list.
@@ -119,8 +122,15 @@ public class InputRegistry {
         return false;
     }
 
+    public void register(Class clazz, String name) {
+        availableInputs.put(clazz.getCanonicalName(), name);
+    }
+
     public Map<String, MessageInput> getRunningInputs() {
         return runningInputs;
     }
 
+    public Map<String, String> getAvailableInputs() {
+        return availableInputs;
+    }
 }

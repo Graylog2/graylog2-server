@@ -72,7 +72,7 @@ public class InputsResource extends RestResource {
             throw new WebApplicationException(404);
         }
 
-        return json(toMap(input));
+        return json(input.asMap());
 
     }
 
@@ -83,7 +83,7 @@ public class InputsResource extends RestResource {
         List<Map<String, Object>> inputs = Lists.newArrayList();
 
         for (MessageInput input : core.inputs().getRunningInputs().values()) {
-            inputs.add(toMap(input));
+            inputs.add(input.asMap());
         }
 
         Map<String, Object> result = Maps.newHashMap();
@@ -245,22 +245,5 @@ public class InputsResource extends RestResource {
 
         return json(result);
     }
-
-    private Map<String, Object> toMap(MessageInput input) {
-        Map<String, Object> inputMap = Maps.newHashMap();
-
-        inputMap.put("type", input.getClass().getCanonicalName());
-        inputMap.put("input_id", input.getId());
-        inputMap.put("persist_id", input.getPersistId());
-        inputMap.put("name", input.getName());
-        inputMap.put("title", input.getTitle());
-        inputMap.put("creator_user_id", input.getCreatorUserId());
-        inputMap.put("started_at", Tools.getISO8601String(input.getCreatedAt()));
-        inputMap.put("attributes", input.getAttributesWithMaskedPasswords());
-        inputMap.put("static_fields", input.getStaticFields());
-
-        return inputMap;
-    }
-
 
 }
