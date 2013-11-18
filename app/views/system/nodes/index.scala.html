@@ -1,4 +1,9 @@
-@(currentUser: User, breadcrumbs: lib.BreadcrumbList, jvms: List[ServerJVMStats], nodes: Map[String, Node], buffers: Map[String, BufferInfo])
+@(currentUser: User,
+    breadcrumbs: lib.BreadcrumbList,
+    jvms: List[NodeJVMStats],
+    nodes: Map[String, Node],
+    radios: Map[String, Radio],
+    buffers: Map[String, BufferInfo])
 
 @main("Nodes", views.html.system.sidebar(), "", currentUser) {
 
@@ -22,7 +27,7 @@
         until they are processed or you run out of memory. Messages already accepted will be processed completely.
     </div>
 
-    <h2><i class="icon icon-cloud"></i> Graylog2 nodes</h2>
+    <h2><i class="icon icon-cloud"></i> Server nodes</h2>
     @for(jvm <- jvms) {
         <div class="row-fluid message-processing-host node-row">
             <span class="pull-right node-throughput-info">
@@ -87,7 +92,7 @@
                 <div class="bar" style="width: @(jvm.totalMemoryPercentage()-jvm.usedMemoryPercentage)%"></div>
             </div>
 
-            <strong>@buffers.get(jvm.getNodeId).getInputMasterCache.size messages</strong> in input buffer.
+            <strong>@buffers.get(jvm.getNodeId).getInputMasterCache.size messages</strong> in master cache.
 
             The JVM is using <strong>@jvm.getUsedMemory.getMegabytes() of @jvm.getTotalMemory.getMegabytes() MB</strong>
             heap space and will not attempt to use more than <strong>@jvm.getMaxMemory.getMegabytes() MB</strong>.
@@ -95,7 +100,46 @@
         </div>
     }
 
-    @if(jvms.isEmpty) {
+
+    <h2><i class="icon icon-bolt"></i> Radio nodes</h2>
+    @if(!radios.isEmpty) {
+        @for(radio <- radios.values()) {
+            <div class="row-fluid message-processing-host node-row">
+                <div class="pull-right node-throughput-info">
+                    <div class="btn-group">
+                        <a class="btn btn-mini dropdown-toggle" data-toggle="dropdown" href="#">
+                                Action
+                            <span class="caret"></span>
+                        </a>
+                        <ul class="dropdown-menu">
+                            <li><a href="#">Manage inputs</a></li>
+                            <li><a href="#">Metrics</a></li>
+                            <li><a href="#">Get thread dump</a></li>
+                        </ul>
+                    </div>
+                </div>
+
+                <h3>
+                    @views.html.partials.radio_title_link(radio)
+                </h3>
+
+                <div class="progress">
+                    <div class="bar bar-warning" style="width: @radio.jvm().usedMemoryPercentage()%;"></div>
+                    <div class="bar" style="width: @(radio.jvm().totalMemoryPercentage()-radio.jvm().usedMemoryPercentage)%"></div>
+                </div>
+
+                <strong>UNKOWN messages</strong> in master cache.
+
+                The JVM is using <strong>@radio.jvm().getUsedMemory.getMegabytes() of @radio.jvm().getTotalMemory.getMegabytes() MB</strong>
+                heap space and will not attempt to use more than <strong>@radio.jvm().getMaxMemory.getMegabytes() MB</strong>.
+
+            </div>
+        }
+    } else {
+        <div class="alert alert-info">No registered Graylog2 radio instances.</div>
+    }
+
+    @if(jvms.isEmpty && radios.isEmpty) {
         <div class="row-fluid no-active-nodes">
             <div class="alert alert-error">
                 No active nodes.

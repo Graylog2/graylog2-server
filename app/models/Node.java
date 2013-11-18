@@ -20,7 +20,6 @@ package models;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
-import com.google.common.collect.Sets;
 import com.google.inject.assistedinject.Assisted;
 import com.google.inject.assistedinject.AssistedInject;
 import lib.APIException;
@@ -29,7 +28,7 @@ import lib.ExclusiveInputException;
 import lib.metrics.Metric;
 import models.api.requests.InputLaunchRequest;
 import models.api.responses.BuffersResponse;
-import models.api.responses.NodeSummaryResponse;
+import models.api.responses.cluster.NodeSummaryResponse;
 import models.api.responses.SystemOverviewResponse;
 import models.api.responses.metrics.MetricsListResponse;
 import models.api.responses.system.*;
@@ -43,17 +42,15 @@ import play.mvc.Http;
 
 import java.io.IOException;
 import java.net.URI;
-import java.net.URISyntaxException;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * @author Lennart Koopmann <lennart@torch.sh>
  */
-public class Node {
+public class Node extends ClusterEntity {
 
     public interface Factory {
         Node fromSummaryResponse(NodeSummaryResponse r);
@@ -89,7 +86,7 @@ public class Node {
 
         transportAddress = normalizeUriPath(r.transportAddress);
         lastSeen = new DateTime(r.lastSeen);
-        nodeId = r.nodeId;
+        nodeId = r.id;
         shortNodeId = r.shortNodeId;
         isMaster = r.isMaster;
         fromConfiguration = false;
@@ -106,27 +103,6 @@ public class Node {
         shortNodeId = "unresolved";
         isMaster = false;
         fromConfiguration = true;
-    }
-
-    private URI normalizeUriPath(String address) {
-        final URI uri = URI.create(address);
-        return normalizeUriPath(uri);
-    }
-
-    private URI normalizeUriPath(URI uri) {
-        if (uri.getPath() == null || uri.getPath().isEmpty()) {
-            return uri;
-        }
-        if (uri.getPath().equals("/")) {
-            try {
-                return new URI(uri.getScheme(), uri.getUserInfo(), uri.getHost(), uri.getPort(), "", uri.getQuery(), uri.getFragment());
-            } catch (URISyntaxException e) { // sigh exception.
-                log.error("Could not process transportAddress {}, invalid URI syntax", uri.toASCIIString());
-                return uri;
-            }
-        }
-        log.info("Could not normalize path on node transport address, it contained some unrecognized path: {}", uri.toASCIIString());
-        return uri;
     }
 
     public BufferInfo getBufferInfo() {
@@ -262,6 +238,7 @@ public class Node {
         }
     }
 
+    @Override
     public String getTransportAddress() {
         return transportAddress.toASCIIString();
     }

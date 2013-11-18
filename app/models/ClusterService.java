@@ -122,12 +122,12 @@ public class ClusterService {
         return null;
     }
 
-    public List<ServerJVMStats> getClusterJvmStats() {
-        List<ServerJVMStats> result = Lists.newArrayList();
-        Map<Node, ServerJVMStatsResponse> rs = api.get(ServerJVMStatsResponse.class).fromAllNodes().path("/system/jvm").executeOnAll();
+    public List<NodeJVMStats> getClusterJvmStats() {
+        List<NodeJVMStats> result = Lists.newArrayList();
+        Map<Node, ClusterEntityJVMStatsResponse> rs = api.get(ClusterEntityJVMStatsResponse.class).fromAllNodes().path("/system/jvm").executeOnAll();
 
-        for (ServerJVMStatsResponse r : rs.values()) {
-            result.add(new ServerJVMStats(r));
+        for (ClusterEntityJVMStatsResponse r : rs.values()) {
+            result.add(new NodeJVMStats(r));
         }
 
         return result;

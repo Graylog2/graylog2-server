@@ -25,7 +25,7 @@ import com.google.gson.Gson;
 import lib.APIException;
 import lib.ApiClient;
 import models.api.requests.InputLaunchRequest;
-import models.api.responses.NodeSummaryResponse;
+import models.api.responses.cluster.NodeSummaryResponse;
 import models.api.responses.system.InputSummaryResponse;
 import models.api.responses.system.InputsResponse;
 import org.elasticsearch.client.Client;

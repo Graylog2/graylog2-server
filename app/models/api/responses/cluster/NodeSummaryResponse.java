@@ -16,35 +16,16 @@
  * You should have received a copy of the GNU General Public License
  * along with Graylog2.  If not, see <http://www.gnu.org/licenses/>.
  */
-package models.api.responses.system;
+package models.api.responses.cluster;
 
 import com.google.gson.annotations.SerializedName;
-import models.api.responses.ByteListing;
 
 /**
  * @author Lennart Koopmann <lennart@torch.sh>
  */
-public class ServerJVMStatsResponse {
+public class NodeSummaryResponse extends ClusterEntitySummaryResponse {
 
-    @SerializedName("node_id")
-    public String nodeId;
-
-    public String info;
-    public String pid;
-
-    @SerializedName("is_processing")
-    public boolean isProcessing;
-
-    @SerializedName("max_memory")
-    public ByteListing maxMemory;
-
-    @SerializedName("used_memory")
-    public ByteListing usedMemory;
-
-    @SerializedName("total_memory")
-    public ByteListing totalMemory;
-
-    @SerializedName("free_memory")
-    public ByteListing freeMemory;
+    @SerializedName("is_master")
+    public boolean isMaster;
 
 }

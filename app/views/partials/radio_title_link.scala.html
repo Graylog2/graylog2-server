@@ -1,0 +1,9 @@
+@(radio: Radio)
+
+<i class="icon icon-code-fork"></i>
+
+<a href="@routes.SystemController.node(radio.getId())" class="node-link">
+    @radio.getShortNodeId()
+    /
+    @radio.getHostname()
+</a>

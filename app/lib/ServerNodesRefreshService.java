@@ -24,8 +24,8 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import lib.security.Graylog2ServerUnavailableException;
 import models.Node;
-import models.api.responses.NodeResponse;
-import models.api.responses.NodeSummaryResponse;
+import models.api.responses.cluster.NodesResponse;
+import models.api.responses.cluster.NodeSummaryResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -68,7 +68,7 @@ public class ServerNodesRefreshService {
         public List<Node> call() throws Exception {
             List<Node> newNodes = Lists.newArrayList();
             log.debug("Updating graylog2 server node list from node {}", node);
-            NodeResponse response = api.get(NodeResponse.class)
+            NodesResponse response = api.get(NodesResponse.class)
                     .path("/system/cluster/nodes")
                     .node(node)
                     .execute();

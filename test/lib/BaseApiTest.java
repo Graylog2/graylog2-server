@@ -29,7 +29,7 @@ import com.google.inject.Module;
 import com.google.inject.name.Names;
 import models.ModelFactoryModule;
 import models.Node;
-import models.api.responses.NodeSummaryResponse;
+import models.api.responses.cluster.NodeSummaryResponse;
 
 import javax.annotation.Nullable;
 import java.net.URI;
@@ -61,7 +61,7 @@ public class BaseApiTest {
         for (AddressNodeId n : nodeDesc) {
             NodeSummaryResponse r = new NodeSummaryResponse();
             r.transportAddress = n.address;
-            r.nodeId = n.nodeId;
+            r.id = n.nodeId;
             final Node node = factory.fromSummaryResponse(r);
             node.touch();
             nodes.add(node);

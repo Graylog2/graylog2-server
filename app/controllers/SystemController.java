@@ -68,12 +68,12 @@ public class SystemController extends AuthenticatedController {
         }
     }
 
-    public  Result nodes() {
+    public Result nodes() {
         BreadcrumbList bc = new BreadcrumbList();
         bc.addCrumb("System", routes.SystemController.index(0));
         bc.addCrumb("Nodes", routes.SystemController.nodes());
 
-        List<ServerJVMStats> serverJvmStats = clusterService.getClusterJvmStats();
+        List<NodeJVMStats> serverJvmStats = clusterService.getClusterJvmStats();
         Map<String, Node> nodes = serverNodes.asMap();
         Map<String, BufferInfo> bufferInfo = Maps.newHashMap();
 
@@ -82,7 +82,17 @@ public class SystemController extends AuthenticatedController {
             bufferInfo.put(node.getNodeId(), node.getBufferInfo());
         }
 
-        return ok(views.html.system.nodes.index.render(currentUser(), bc, serverJvmStats, nodes, bufferInfo));
+        Map<String, Radio> radios = null;
+        try {
+            radios = nodeService.radios();
+        } catch (IOException e) {
+            return status(504, views.html.errors.error.render(ApiClient.ERROR_MSG_IO, e, request()));
+        } catch (APIException e) {
+            String message = "Could not fetch radio information. We expected HTTP 200, but got a HTTP " + e.getHttpCode() + ".";
+            return status(504, views.html.errors.error.render(message, e, request()));
+        }
+
+        return ok(views.html.system.nodes.index.render(currentUser(), bc, serverJvmStats, nodes, radios, bufferInfo));
     }
 
     public Result node(String nodeId) {

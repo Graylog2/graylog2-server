@@ -19,25 +19,32 @@
 
 package models;
 
+import com.google.common.collect.Maps;
 import com.google.inject.Inject;
 import lib.APIException;
 import lib.ApiClient;
-import models.api.responses.NodeSummaryResponse;
+import models.api.responses.cluster.NodeSummaryResponse;
+import models.api.responses.cluster.RadioSummaryResponse;
+import models.api.responses.cluster.RadiosResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
+import java.util.List;
+import java.util.Map;
 
 public class NodeService {
     private static final Logger log = LoggerFactory.getLogger(NodeService.class);
 
     private final ApiClient api;
     private final Node.Factory nodeFactory;
+    private final Radio.Factory radioFactory;
 
     @Inject
-    public NodeService(ApiClient api, Node.Factory nodeFactory) {
+    public NodeService(ApiClient api, Node.Factory nodeFactory, Radio.Factory radioFactory) {
         this.api = api;
         this.nodeFactory = nodeFactory;
+        this.radioFactory = radioFactory;
     }
 
     public Node loadNode(String nodeId) {
@@ -52,6 +59,17 @@ public class NodeService {
         } catch (APIException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    public Map<String, Radio> radios() throws APIException, IOException {
+        Map<String, Radio> radios = Maps.newHashMap();
+
+        RadiosResponse r = api.get(RadiosResponse.class).path("/system/radios").execute();
+        for (RadioSummaryResponse radio : r.radios) {
+            radios.put(radio.id, radioFactory.fromSummaryResponse(radio));
+        }
+
+        return radios;
     }
 
 }

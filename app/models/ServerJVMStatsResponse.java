@@ -1,5 +1,5 @@
-/*
- * Copyright 2013 TORCH UG
+/**
+ * Copyright 2013 Lennart Koopmann <lennart@torch.sh>
  *
  * This file is part of Graylog2.
  *
@@ -15,29 +15,19 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with Graylog2.  If not, see <http://www.gnu.org/licenses/>.
+ *
  */
-package models.api.responses;
+package models;
 
 import com.google.gson.annotations.SerializedName;
+import models.api.responses.system.ClusterEntityJVMStatsResponse;
 
 /**
  * @author Lennart Koopmann <lennart@torch.sh>
  */
-public class NodeSummaryResponse {
+public class ServerJVMStatsResponse extends ClusterEntityJVMStatsResponse {
 
-    @SerializedName("id")
-    public String nodeId;
-
-    @SerializedName("short_node_id")
-    public String shortNodeId;
-
-    @SerializedName("last_seen")
-    public String lastSeen;
-
-    @SerializedName("transport_address")
-    public String transportAddress;
-
-    @SerializedName("is_master")
-    public boolean isMaster;
+    @SerializedName("is_processing")
+    public boolean isProcessing;
 
 }

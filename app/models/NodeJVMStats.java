@@ -19,12 +19,12 @@
 package models;
 
 import models.api.responses.ByteListing;
-import models.api.responses.system.ServerJVMStatsResponse;
+import models.api.responses.system.ClusterEntityJVMStatsResponse;
 
 /**
  * @author Lennart Koopmann <lennart@torch.sh>
  */
-public class ServerJVMStats {
+public class NodeJVMStats {
 
     private final String nodeId;
     private final String info;
@@ -34,7 +34,7 @@ public class ServerJVMStats {
     private final ByteListing totalMemory;
     private final ByteListing freeMemory;
 
-    public ServerJVMStats(ServerJVMStatsResponse r) {
+    public NodeJVMStats(ClusterEntityJVMStatsResponse r) {
         this.nodeId = r.nodeId;
         this.info = r.info;
         this.pid = r.pid;
