@@ -123,6 +123,9 @@ public class Main {
             System.exit(1);
         }
 
+        // Start pinging Graylog2 cluster to show that we are alive.
+        radio.startPings();
+
         // Connect Kafka
 
         // Launch inputs

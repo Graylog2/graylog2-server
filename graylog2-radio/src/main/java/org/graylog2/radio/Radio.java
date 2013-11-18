@@ -112,10 +112,6 @@ public class Radio implements InputHost {
         scheduler = Executors.newScheduledThreadPool(SCHEDULED_THREADS_POOL_SIZE,
                 new ThreadFactoryBuilder().setNameFormat("scheduled-%d").build()
         );
-
-        // Start regular pings.
-        Ping.Pinger pinger = new Ping.Pinger(httpClient, nodeId, configuration.getRestTransportUri(), configuration.getGraylog2ServerUri());
-        scheduler.scheduleAtFixedRate(pinger, 0, 1, TimeUnit.SECONDS);
     }
 
     public void startRestApi() throws IOException {
@@ -163,6 +159,12 @@ public class Radio implements InputHost {
         });
 
         LOG.info("Started REST API at <{}>", configuration.getRestListenUri());
+    }
+
+    public void startPings() {
+        // Start regular pings.
+        Ping.Pinger pinger = new Ping.Pinger(httpClient, nodeId, configuration.getRestTransportUri(), configuration.getGraylog2ServerUri());
+        scheduler.scheduleAtFixedRate(pinger, 0, 1, TimeUnit.SECONDS);
     }
 
     private class Graylog2Binder extends AbstractBinder {
