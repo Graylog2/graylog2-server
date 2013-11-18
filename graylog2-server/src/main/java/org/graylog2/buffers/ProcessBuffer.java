@@ -26,6 +26,7 @@ import com.lmax.disruptor.dsl.Disruptor;
 import com.lmax.disruptor.dsl.ProducerType;
 import org.graylog2.Core;
 import org.graylog2.buffers.processors.ProcessBufferProcessor;
+import org.graylog2.inputs.Cache;
 import org.graylog2.plugin.buffers.Buffer;
 import org.graylog2.plugin.Message;
 import org.graylog2.plugin.buffers.MessageEvent;

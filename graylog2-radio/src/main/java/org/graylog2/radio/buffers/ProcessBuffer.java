@@ -1,5 +1,5 @@
 /**
- * Copyright 2012 Lennart Koopmann <lennart@socketfeed.com>
+ * Copyright 2013 Lennart Koopmann <lennart@torch.sh>
  *
  * This file is part of Graylog2.
  *
@@ -17,114 +17,127 @@
  * along with Graylog2.  If not, see <http://www.gnu.org/licenses/>.
  *
  */
-
-package org.graylog2.buffers;
+package org.graylog2.radio.buffers;
 
 import com.codahale.metrics.Meter;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import com.lmax.disruptor.dsl.Disruptor;
 import com.lmax.disruptor.dsl.ProducerType;
-import org.graylog2.Core;
-import org.graylog2.buffers.processors.OutputBufferProcessor;
 import org.graylog2.inputs.Cache;
-import org.graylog2.plugin.buffers.Buffer;
 import org.graylog2.plugin.Message;
+import org.graylog2.plugin.buffers.Buffer;
+import org.graylog2.plugin.buffers.BufferOutOfCapacityException;
 import org.graylog2.plugin.buffers.MessageEvent;
 import org.graylog2.plugin.inputs.MessageInput;
+import org.graylog2.radio.Radio;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import org.graylog2.plugin.buffers.BufferOutOfCapacityException;
 
 import static com.codahale.metrics.MetricRegistry.name;
 
 /**
- * @author Lennart Koopmann <lennart@socketfeed.com>
+ * @author Lennart Koopmann <lennart@torch.sh>
  */
-public class OutputBuffer extends Buffer {
+public class ProcessBuffer extends Buffer {
 
-    private static final Logger LOG = LoggerFactory.getLogger(OutputBuffer.class);
+
+    private static final Logger LOG = LoggerFactory.getLogger(ProcessBuffer.class);
+
+    public static final String SOURCE_INPUT_ATTR_NAME = "gl2_source_input";
+    public static final String SOURCE_RADIO_ATTR_NAME = "gl2_source_radio";
 
     protected ExecutorService executor = Executors.newCachedThreadPool(
             new ThreadFactoryBuilder()
-                .setNameFormat("outputbufferprocessor-%d")
-                .build()
+                    .setNameFormat("processbufferprocessor-%d")
+                    .build()
     );
-    
-    private Core server;
-    
-    private final Cache overflowCache;
+
+    private Radio radio;
+
+    private final Cache masterCache;
 
     private final Meter incomingMessages;
     private final Meter rejectedMessages;
     private final Meter cachedMessages;
 
-    public OutputBuffer(Core server, Cache overflowCache) {
-        this.server = server;
-        this.overflowCache = overflowCache;
+    public ProcessBuffer(Radio radio, Cache masterCache) {
+        this.radio = radio;
+        this.masterCache = masterCache;
 
-        incomingMessages = server.metrics().meter(name(OutputBuffer.class, "incomingMessages"));
-        rejectedMessages = server.metrics().meter(name(OutputBuffer.class, "rejectedMessages"));
-        cachedMessages = server.metrics().meter(name(OutputBuffer.class, "cachedMessages"));
+        incomingMessages = radio.metrics().meter(name(ProcessBuffer.class, "incomingMessages"));
+        rejectedMessages = radio.metrics().meter(name(ProcessBuffer.class, "rejectedMessages"));
+        cachedMessages = radio.metrics().meter(name(ProcessBuffer.class, "cachedMessages"));
     }
 
     public void initialize() {
         Disruptor disruptor = new Disruptor<MessageEvent>(
                 MessageEvent.EVENT_FACTORY,
-                server.getConfiguration().getRingSize(),
+                radio.getConfiguration().getRingSize(),
                 executor,
                 ProducerType.MULTI,
-                server.getConfiguration().getProcessorWaitStrategy()
+                radio.getConfiguration().getProcessorWaitStrategy()
         );
-        
-        LOG.info("Initialized OutputBuffer with ring size <{}> "
-                + "and wait strategy <{}>.", server.getConfiguration().getRingSize(),
-                server.getConfiguration().getProcessorWaitStrategy().getClass().getSimpleName());
 
-        OutputBufferProcessor[] processors = new OutputBufferProcessor[server.getConfiguration().getOutputBufferProcessors()];
-        
-        for (int i = 0; i < server.getConfiguration().getOutputBufferProcessors(); i++) {
-            processors[i] = new OutputBufferProcessor(this.server, i, server.getConfiguration().getOutputBufferProcessors());
+        LOG.info("Initialized ProcessBuffer with ring size <{}> "
+                + "and wait strategy <{}>.", radio.getConfiguration().getRingSize(),
+                radio.getConfiguration().getProcessorWaitStrategy().getClass().getSimpleName());
+
+        ProcessBufferProcessor[] processors = new ProcessBufferProcessor[radio.getConfiguration().getProcessBufferProcessors()];
+
+        for (int i = 0; i < radio.getConfiguration().getProcessBufferProcessors(); i++) {
+            processors[i] = new ProcessBufferProcessor(radio, i, radio.getConfiguration().getProcessBufferProcessors());
         }
-        
+
         disruptor.handleEventsWith(processors);
-        
+
         ringBuffer = disruptor.start();
     }
 
     @Override
     public void insertCached(Message message, MessageInput sourceInput) {
+        message.setSourceInput(sourceInput);
+
+        message.addField(SOURCE_INPUT_ATTR_NAME, sourceInput.getId());
+        message.addField(SOURCE_RADIO_ATTR_NAME, radio.getNodeId());
+
         if (!hasCapacity()) {
             LOG.debug("Out of capacity. Writing to cache.");
             cachedMessages.mark();
-            overflowCache.add(message);
+            masterCache.add(message);
             return;
         }
-        
+
         insert(message);
     }
 
     @Override
     public void insertFailFast(Message message, MessageInput sourceInput) throws BufferOutOfCapacityException {
+        message.setSourceInput(sourceInput);
+
+        message.addField(SOURCE_INPUT_ATTR_NAME, sourceInput.getId());
+        message.addField(SOURCE_RADIO_ATTR_NAME, radio.getNodeId());
+
         if (!hasCapacity()) {
             LOG.debug("Rejecting message, because I am full and caching was disabled by input. Raise my size or add more processors.");
             rejectedMessages.mark();
             throw new BufferOutOfCapacityException();
         }
-        
+
         insert(message);
     }
-    
+
     private void insert(Message message) {
         long sequence = ringBuffer.next();
         MessageEvent event = ringBuffer.get(sequence);
         event.setMessage(message);
         ringBuffer.publish(sequence);
 
-        server.outputBufferWatermark().incrementAndGet();
+        radio.processBufferWatermark().incrementAndGet();
         incomingMessages.mark();
     }
+
 
 }

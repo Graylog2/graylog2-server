@@ -21,8 +21,7 @@ package org.graylog2.periodical;
 
 import com.codahale.metrics.Meter;
 import org.graylog2.Core;
-import org.graylog2.buffers.Cache;
-import org.graylog2.buffers.ProcessBuffer;
+import org.graylog2.inputs.Cache;
 import org.graylog2.plugin.Message;
 import org.graylog2.plugin.buffers.Buffer;
 import org.graylog2.plugin.buffers.BufferOutOfCapacityException;

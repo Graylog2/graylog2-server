@@ -17,7 +17,7 @@
  * along with Graylog2.  If not, see <http://www.gnu.org/licenses/>.
  *
  */
-package org.graylog2.buffers;
+package org.graylog2.inputs;
 
 import com.google.common.collect.Queues;
 import java.util.concurrent.ConcurrentLinkedQueue;
