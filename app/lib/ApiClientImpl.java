@@ -274,10 +274,8 @@ class ApiClientImpl implements ApiClient {
                 throw new RuntimeException("You set both and a Node and a Radio as target. This is not possible.");
             }
 
-            boolean againstNode = false;
-            boolean againstRadio = false;
+            final ClusterEntity target;
 
-            final URL url;
             if (radio == null) {
                 if (node == null) {
                     if (nodes != null) {
@@ -285,13 +283,13 @@ class ApiClientImpl implements ApiClient {
                     }
                     node(serverNodes.any());
                 }
-                url = prepareUrl(node);
-                againstNode = true;
+
+                target = node;
             } else {
-                url = prepareUrl(radio);
-                againstRadio = true;
+                target = radio;
             }
 
+            final URL url = prepareUrl(target);
             final AsyncHttpClient.BoundRequestBuilder requestBuilder = requestBuilderForUrl(url);
 
             final Request request = requestBuilder.build();
@@ -307,9 +305,7 @@ class ApiClientImpl implements ApiClient {
             try {
                 Response response = requestBuilder.execute().get(timeoutValue, timeoutUnit);
 
-                if (againstNode) {
-                    node.touch();
-                }
+                target.touch();
 
                 // TODO this is wrong, shouldn't it accept some callback instead of throwing an exception?
                 if (!expectedResponseCodes.contains(response.getStatusCode())) {
@@ -338,14 +334,14 @@ class ApiClientImpl implements ApiClient {
                 }
             } catch (InterruptedException e) {
                 // TODO
-                node.markFailure();
+                target.markFailure();
             } catch (MalformedURLException e) {
                 log.error("Malformed URL", e);
                 throw new RuntimeException("Malformed URL.", e);
             } catch (ExecutionException e) {
                 if (e.getCause() instanceof ConnectException) {
                     log.warn("Graylog2 server unavailable. Connection refused.");
-                    node.markFailure();
+                    target.markFailure();
                     throw new Graylog2ServerUnavailableException(e);
                 }
                 log.error("REST call failed", e.getCause());
@@ -353,11 +349,11 @@ class ApiClientImpl implements ApiClient {
             } catch (IOException e) {
                 // TODO
                 log.error("unhandled IOException", e);
-                node.markFailure();
+                target.markFailure();
                 throw e;
             } catch (TimeoutException e) {
                 log.warn("Timed out requesting {}", request);
-                node.markFailure();
+                target.markFailure();
             }
             // TODO should this throw an exception instead?
             return null;

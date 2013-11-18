@@ -124,6 +124,16 @@ public class Radio extends ClusterEntity {
     }
 
     @Override
+    public void touch() {
+        // We don't do touches against radios.
+    }
+
+    @Override
+    public void markFailure() {
+        // No failure counting in radios for now.
+    }
+
+    @Override
     public String toString() {
         final StringBuilder b = new StringBuilder();
         if (id == null) {

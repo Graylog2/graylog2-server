@@ -329,6 +329,7 @@ public class Node extends ClusterEntity {
         return fromConfiguration;
     }
 
+    @Override
     public void markFailure() {
         failureCount.incrementAndGet();
         setActive(false);
@@ -352,6 +353,7 @@ public class Node extends ClusterEntity {
         this.setActive(updatedNode.isActive());
     }
 
+    @Override
     public void touch() {
         this.lastContact = DateTime.now(DateTimeZone.UTC);
         setActive(true);
