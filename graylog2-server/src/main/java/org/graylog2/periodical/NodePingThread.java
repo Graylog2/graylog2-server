@@ -33,7 +33,7 @@ public class NodePingThread implements Runnable {
     private static final Logger LOG = LoggerFactory.getLogger(NodePingThread.class);
 
     public static final int INITIAL_DELAY = 0;
-    public static final int PERIOD = 5;
+    public static final int PERIOD = 1;
 
     private final Core core;
 

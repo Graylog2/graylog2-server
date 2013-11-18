@@ -115,7 +115,7 @@ public class Radio implements InputHost {
 
         // Start regular pings.
         Ping.Pinger pinger = new Ping.Pinger(httpClient, nodeId, configuration.getRestTransportUri(), configuration.getGraylog2ServerUri());
-        scheduler.scheduleAtFixedRate(pinger, 0, 5, TimeUnit.SECONDS);
+        scheduler.scheduleAtFixedRate(pinger, 0, 1, TimeUnit.SECONDS);
     }
 
     public void startRestApi() throws IOException {

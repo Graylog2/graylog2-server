@@ -43,7 +43,7 @@ public class Node extends Persisted {
 
     private static final Logger LOG = LoggerFactory.getLogger(Node.class);
 
-    public static final int PING_TIMEOUT = 7; // <3
+    public static final int PING_TIMEOUT = 2;
     private static final String COLLECTION = "nodes";
 
     public enum Type {
