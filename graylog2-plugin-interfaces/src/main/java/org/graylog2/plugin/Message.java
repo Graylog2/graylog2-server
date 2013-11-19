@@ -25,12 +25,11 @@ package org.graylog2.plugin;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
-import java.util.Collections;
-
 import org.graylog2.plugin.inputs.MessageInput;
 import org.graylog2.plugin.streams.Stream;
 import org.joda.time.DateTime;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.regex.Pattern;
@@ -45,7 +44,7 @@ public class Message {
 
     private MessageInput sourceInput;
 
-    private static final Pattern ALPHANUMERIC_ASCII_AND_UNDERSCORE = Pattern.compile("^\\w*$");
+    private static final Pattern ALPHANUMERIC_ASCII_AND_UNDERSCORE_AND_DOTS = Pattern.compile("^[\\w\\.]*$");
 
     // Used for drools to filter out messages.
     private boolean filterOut = false;
@@ -178,7 +177,7 @@ public class Message {
     }
 
     public static boolean validKey(String key) {
-        return ALPHANUMERIC_ASCII_AND_UNDERSCORE.matcher(key).matches();
+        return ALPHANUMERIC_ASCII_AND_UNDERSCORE_AND_DOTS.matcher(key).matches();
     }
 
     public void addFields(Map<String, Object> fields) {
