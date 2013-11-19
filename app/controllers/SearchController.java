@@ -19,14 +19,19 @@
 package controllers;
 
 import com.google.common.collect.Lists;
+import com.google.common.net.MediaType;
 import com.google.inject.Inject;
-import lib.*;
-import lib.timeranges.*;
-import models.*;
+import lib.APIException;
+import lib.ApiClient;
+import lib.Field;
+import lib.SearchTools;
+import lib.timeranges.InvalidRangeParametersException;
+import lib.timeranges.TimeRange;
+import models.FieldMapper;
+import models.MessagesService;
+import models.UniversalSearch;
 import models.api.results.DateHistogramResult;
 import models.api.results.SearchResult;
-import play.mvc.Call;
-import play.mvc.Http;
 import play.mvc.Result;
 
 import java.io.IOException;
@@ -74,6 +79,32 @@ public class SearchController extends AuthenticatedController {
         } else {
             return ok(views.html.search.noresults.render(currentUser(), q, searchResult));
         }
+    }
+
+    public Result exportAsCsv(String q, String rangeType, int relative, String from, String to, String keyword) {
+        UniversalSearch search;
+        try {
+            search = getSearch(q, null, rangeType, relative, from, to, keyword, 0);
+        } catch(InvalidRangeParametersException e2) {
+            return status(400, views.html.errors.error.render("Invalid range parameters provided.", e2, request()));
+        } catch(IllegalArgumentException e1) {
+            return status(400, views.html.errors.error.render("Invalid range type provided.", e1, request()));
+        }
+
+        final String s;
+        try {
+            s = search.searchAsCsv();
+        } catch (IOException e) {
+            return status(504, views.html.errors.error.render(ApiClient.ERROR_MSG_IO, e, request()));
+        } catch (APIException e) {
+            String message = "There was a problem with your search. We expected HTTP 200, but got a HTTP " + e.getHttpCode() + ".";
+            return status(504, views.html.errors.error.render(message, e, request()));
+        }
+
+        // TODO streaming the result
+        response().setContentType(MediaType.CSV_UTF_8.toString());
+        response().setHeader("Content-Disposition", "attachment; filename=graylog2-searchresult.csv");
+        return ok(s);
     }
 
     protected List<Field> getAllFields() {

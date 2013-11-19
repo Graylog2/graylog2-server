@@ -18,6 +18,7 @@
  */
 package models;
 
+import com.google.common.net.MediaType;
 import com.google.inject.assistedinject.Assisted;
 import com.google.inject.assistedinject.AssistedInject;
 import controllers.routes;
@@ -63,19 +64,24 @@ public class UniversalSearch {
         if (page == 0) {
             this.page = 0;
         } else {
-            this.page = page-1;
+            this.page = page - 1;
         }
     }
 
-    public SearchResult search() throws IOException, APIException {
-        SearchResultResponse response = api.get(SearchResultResponse.class)
+    private <T> T doSearch(Class<T> clazz, MediaType mediaType, int pageSize) throws APIException, IOException {
+        return api.get(clazz)
                 .path("/search/universal/{0}", timeRange.getType().toString().toLowerCase())
                 .queryParams(timeRange.getQueryParams())
                 .queryParam("query", query)
-                .queryParam("limit", PER_PAGE)
-                .queryParam("offset", page*PER_PAGE)
+                .queryParam("limit", pageSize)
+                .queryParam("offset", page * pageSize)
                 .queryParam("filter", (filter == null ? "*" : filter))
+                .accept(mediaType)
                 .execute();
+    }
+
+    public SearchResult search() throws IOException, APIException {
+        SearchResultResponse response = doSearch(SearchResultResponse.class, MediaType.JSON_UTF_8, PER_PAGE);
 
         SearchResult result = new SearchResult(
                 query,
@@ -89,6 +95,10 @@ public class UniversalSearch {
         );
 
         return result;
+    }
+
+    public String searchAsCsv() throws IOException, APIException {
+        return doSearch(String.class, MediaType.CSV_UTF_8, 100000);  // TODO fix huge page size by using scroll searches and streaming results
     }
 
     public DateHistogramResult dateHistogram(String interval) throws IOException, APIException {
@@ -152,9 +162,27 @@ public class UniversalSearch {
         );
     }
 
+    public Call getCsvRoute(Request request) {
+        int relative = Tools.intSearchParamOrEmpty(request, "relative");
+        String from = Tools.stringSearchParamOrEmpty(request, "from");
+        String to = Tools.stringSearchParamOrEmpty(request, "to");
+        String keyword = Tools.stringSearchParamOrEmpty(request, "keyword");
+
+        return routes.SearchController.exportAsCsv(
+                query,
+                timeRange.getType().toString().toLowerCase(),
+                relative,
+                from,
+                to,
+                keyword
+        );
+    }
+
     public interface Factory {
         UniversalSearch queryWithRange(String query, TimeRange timeRange);
+
         UniversalSearch queryWithRangeAndPage(String query, TimeRange timeRange, Integer page);
+
         UniversalSearch queryWithFilterRangeAndPage(@Assisted("query") String query, @Assisted("filter") String filter, TimeRange timeRange, Integer page);
     }
 

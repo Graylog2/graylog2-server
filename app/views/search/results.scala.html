@@ -199,6 +199,7 @@
 </div>
 
 <div class="graph-resolution-selector">
+    <a href="@search.getCsvRoute(request())" class="pull-right" id="csv-download" title="Download all @searchResult.getTotalResultCount results as CSV"><i class="icon-cloud-download"></i> CSV</a>
     <a href="#built-query" class="pull-right" role="button" data-toggle="modal" data-backdrop="true"><i class="icon-bug"></i></a>
     <i class="icon-time"></i>
     <strong>Resolution:</strong> @Html(DateHistogramResolutionSelector.getOptions(histogram.getInterval()))

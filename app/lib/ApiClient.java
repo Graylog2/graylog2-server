@@ -38,19 +38,19 @@ public interface ApiClient {
     // default visibility for access from tests (overrides the effects of initialize())
     void setHttpClient(AsyncHttpClient client);
 
-    <T> ApiClientImpl.ApiRequestBuilder<T> get(Class<T> responseClass);
+    <T> ApiRequestBuilder<T> get(Class<T> responseClass);
 
-    <T> ApiClientImpl.ApiRequestBuilder<T> post(Class<T> responseClass);
+    <T> ApiRequestBuilder<T> post(Class<T> responseClass);
 
-    ApiClientImpl.ApiRequestBuilder<EmptyResponse> post();
+    ApiRequestBuilder<EmptyResponse> post();
 
-    <T> ApiClientImpl.ApiRequestBuilder<T> put(Class<T> responseClass);
+    <T> ApiRequestBuilder<T> put(Class<T> responseClass);
 
-    ApiClientImpl.ApiRequestBuilder<EmptyResponse> put();
+    ApiRequestBuilder<EmptyResponse> put();
 
-    <T> ApiClientImpl.ApiRequestBuilder<T> delete(Class<T> responseClass);
+    <T> ApiRequestBuilder<T> delete(Class<T> responseClass);
 
-    ApiClientImpl.ApiRequestBuilder<EmptyResponse> delete();
+    ApiRequestBuilder<EmptyResponse> delete();
 
     public enum Method {
         GET,

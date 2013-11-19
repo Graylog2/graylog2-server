@@ -22,6 +22,7 @@ import com.google.common.base.Preconditions;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
+import com.google.common.net.MediaType;
 import com.google.gson.Gson;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
@@ -89,36 +90,36 @@ class ApiClientImpl implements ApiClient {
     }
 
     @Override
-    public <T> ApiRequestBuilder<T> get(Class<T> responseClass) {
+    public <T> lib.ApiRequestBuilder<T> get(Class<T> responseClass) {
         return new ApiRequestBuilder<>(Method.GET, responseClass);
     }
     @Override
-    public <T> ApiRequestBuilder<T> post(Class<T> responseClass) {
+    public <T> lib.ApiRequestBuilder<T> post(Class<T> responseClass) {
         return new ApiRequestBuilder<>(Method.POST, responseClass);
     }
 
     @Override
-    public ApiRequestBuilder<EmptyResponse> post() {
+    public lib.ApiRequestBuilder<EmptyResponse> post() {
         return post(EmptyResponse.class);
     }
 
     @Override
-    public <T> ApiRequestBuilder<T> put(Class<T> responseClass) {
+    public <T> lib.ApiRequestBuilder<T> put(Class<T> responseClass) {
         return new ApiRequestBuilder<>(Method.PUT, responseClass);
     }
 
     @Override
-    public ApiRequestBuilder<EmptyResponse> put() {
+    public lib.ApiRequestBuilder<EmptyResponse> put() {
         return put(EmptyResponse.class);
     }
 
     @Override
-    public <T> ApiRequestBuilder<T> delete(Class<T> responseClass) {
+    public <T> lib.ApiRequestBuilder<T> delete(Class<T> responseClass) {
         return new ApiRequestBuilder<>(Method.DELETE, responseClass);
     }
 
     @Override
-    public ApiRequestBuilder<EmptyResponse> delete() {
+    public lib.ApiRequestBuilder<EmptyResponse> delete() {
         return delete(EmptyResponse.class);
     }
 
@@ -141,7 +142,7 @@ class ApiClientImpl implements ApiClient {
     }
 
 
-    public class ApiRequestBuilder<T> {
+    private class ApiRequestBuilder<T> implements lib.ApiRequestBuilder<T> {
         private String pathTemplate;
         private Node node;
         private Radio radio;
@@ -157,44 +158,52 @@ class ApiClientImpl implements ApiClient {
         private TimeUnit timeoutUnit = TimeUnit.SECONDS;
         private int timeoutValue = 5;
         private boolean unauthenticated = false;
+        private MediaType mediaType = MediaType.JSON_UTF_8;
 
         public ApiRequestBuilder(Method method, Class<T> responseClass) {
             this.method = method;
             this.responseClass = responseClass;
         }
 
+        @Override
         public ApiRequestBuilder<T> path(String pathTemplate) {
             this.pathTemplate = pathTemplate;
             return this;
         }
 
         // convenience
-        public ApiRequestBuilder<T> path(String pathTemplate, Object... params) {
+        @Override
+        public lib.ApiRequestBuilder<T> path(String pathTemplate, Object... params) {
             path(pathTemplate);
             pathParams(params);
             return this;
         }
 
-        public ApiRequestBuilder<T> pathParams(Object... params) {
+        @Override
+        public lib.ApiRequestBuilder<T> pathParams(Object... params) {
             Collections.addAll(pathParams, params);
             return this;
         }
 
-        public ApiRequestBuilder<T> pathParam(Object param) {
+        @Override
+        public lib.ApiRequestBuilder<T> pathParam(Object param) {
             return pathParams(param);
         }
 
+        @Override
         public ApiRequestBuilder<T> node(Node node) {
             this.node = node;
             return this;
         }
 
-        public ApiRequestBuilder<T> radio(Radio radio) {
+        @Override
+        public lib.ApiRequestBuilder<T> radio(Radio radio) {
             this.radio = radio;
             return this;
         }
 
-        public ApiRequestBuilder<T> clusterEntity(ClusterEntity entity) {
+        @Override
+        public lib.ApiRequestBuilder<T> clusterEntity(ClusterEntity entity) {
             if (entity instanceof Radio) {
                 this.radio = (Radio) entity;
             } else if(entity instanceof Node){
@@ -205,7 +214,8 @@ class ApiClientImpl implements ApiClient {
             return this;
         }
 
-        public ApiRequestBuilder<T> nodes(Node... nodes) {
+        @Override
+        public lib.ApiRequestBuilder<T> nodes(Node... nodes) {
             if (this.nodes != null) {
                 // TODO makes this sane
                 throw new IllegalStateException();
@@ -214,7 +224,8 @@ class ApiClientImpl implements ApiClient {
             return this;
         }
 
-        public ApiRequestBuilder<T> nodes(Collection<Node> nodes) {
+        @Override
+        public lib.ApiRequestBuilder<T> nodes(Collection<Node> nodes) {
             if (this.nodes != null) {
                 // TODO makes this sane
                 throw new IllegalStateException();
@@ -223,26 +234,31 @@ class ApiClientImpl implements ApiClient {
             return this;
         }
 
-        public ApiRequestBuilder<T> fromAllNodes() {
+        @Override
+        public lib.ApiRequestBuilder<T> fromAllNodes() {
             this.nodes = serverNodes.all();
             return this;
         }
 
-        public ApiRequestBuilder<T> onlyMasterNode() {
+        @Override
+        public lib.ApiRequestBuilder<T> onlyMasterNode() {
             this.node = serverNodes.master();
             return this;
         }
 
+        @Override
         public ApiRequestBuilder<T> queryParam(String name, String value) {
             queryParams.add(F.Tuple(name, value));
             return this;
         }
 
-        public ApiRequestBuilder<T> queryParam(String name, int value) {
+        @Override
+        public lib.ApiRequestBuilder<T> queryParam(String name, int value) {
             return queryParam(name, Integer.toString(value));
         }
 
-        public ApiRequestBuilder<T> queryParams(Map<String, String> params) {
+        @Override
+        public lib.ApiRequestBuilder<T> queryParams(Map<String, String> params) {
             for(Map.Entry<String, String> p : params.entrySet()) {
                 queryParam(p.getKey(), p.getValue());
             }
@@ -250,23 +266,27 @@ class ApiClientImpl implements ApiClient {
             return this;
         }
 
+        @Override
         public ApiRequestBuilder<T> credentials(String username, String password) {
             this.username = username;
             this.password = password;
             return this;
         }
 
-        public ApiRequestBuilder<T> unauthenticated() {
+        @Override
+        public lib.ApiRequestBuilder<T> unauthenticated() {
             this.unauthenticated = true;
             return this;
         }
 
-        public ApiRequestBuilder<T> body(ApiRequest body) {
+        @Override
+        public lib.ApiRequestBuilder<T> body(ApiRequest body) {
             this.body = body;
             return this;
         }
 
-        public ApiRequestBuilder<T> expect(int... httpStatusCodes) {
+        @Override
+        public lib.ApiRequestBuilder<T> expect(int... httpStatusCodes) {
             for(int code : httpStatusCodes) {
                 this.expectedResponseCodes.add(code);
             }
@@ -274,12 +294,20 @@ class ApiClientImpl implements ApiClient {
             return this;
         }
 
+        @Override
         public ApiRequestBuilder<T> timeout(int value, TimeUnit unit) {
             this.timeoutValue = value;
             this.timeoutUnit = unit;
             return this;
         }
 
+        @Override
+        public lib.ApiRequestBuilder<T> accept(MediaType mediaType) {
+            this.mediaType = mediaType;
+            return this;
+        }
+
+        @Override
         public T execute() throws APIException, IOException {
             if (radio != null && (node != null || nodes != null)) {
                 throw new RuntimeException("You set both and a Node and a Radio as target. This is not possible.");
@@ -302,6 +330,7 @@ class ApiClientImpl implements ApiClient {
 
             final URL url = prepareUrl(target);
             final AsyncHttpClient.BoundRequestBuilder requestBuilder = requestBuilderForUrl(url);
+            requestBuilder.addHeader(Http.HeaderNames.ACCEPT, mediaType.toString());
 
             final Request request = requestBuilder.build();
             if (log.isDebugEnabled()) {
@@ -314,6 +343,7 @@ class ApiClientImpl implements ApiClient {
             }
 
             try {
+                // TODO implement streaming responses
                 Response response = requestBuilder.execute().get(timeoutValue, timeoutUnit);
 
                 target.touch();
@@ -323,15 +353,24 @@ class ApiClientImpl implements ApiClient {
                     throw new APIException(request, response);
                 }
 
-                // TODO: should we always insist on things being wrapped in json?
+                // TODO: once we switch to jackson we can take the media type into account automatically
+                final MediaType responseContentType = MediaType.parse(response.getContentType());
+                if (! responseContentType.is(mediaType.withoutParameters())) {
+                    log.warn("We said we'd accept {} but got {} back, let's see how that's going to work out...", mediaType, responseContentType);
+                }
                 if (responseClass.equals(String.class)) {
                     return responseClass.cast(response.getResponseBody("UTF-8"));
                 }
 
                 if (response.getStatusCode() >= 200 && response.getStatusCode() < 300) {
-                    T result = null;
+                    T result;
                     try {
-                        result = deserializeJson(response, responseClass);
+                        if (responseContentType.is(MediaType.JSON_UTF_8.withoutParameters())) {
+                            result = deserializeJson(response, responseClass);
+                        } else {
+                            log.error("Don't know how to deserialize objects with content in {}, expected {}, failing.", responseContentType, mediaType);
+                            throw new APIException(request, response);
+                        }
 
                         return result;
                     } catch (Exception e) {
@@ -370,6 +409,7 @@ class ApiClientImpl implements ApiClient {
             return null;
         }
 
+        @Override
         public Map<Node, T> executeOnAll() {
             HashMap<Node, T> results = Maps.newHashMap();
             if (node == null && nodes == null) {
@@ -382,6 +422,7 @@ class ApiClientImpl implements ApiClient {
                 final URL url = prepareUrl(currentNode);
                 try {
                     final AsyncHttpClient.BoundRequestBuilder requestBuilder = requestBuilderForUrl(url);
+                    requestBuilder.addHeader(Http.HeaderNames.ACCEPT, mediaType.toString());
                     if (log.isDebugEnabled()) {
                         log.debug("API Request: {}", requestBuilder.build().toString());
                     }

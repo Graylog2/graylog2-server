@@ -15,6 +15,7 @@ GET         /                                                                   
 
 # Search
 GET         /search                                                                  @controllers.SearchController.index(q ?= "", rangetype ?= "", relative:Integer ?= -1, from ?= "", to ?= "", keyword ?= "", interval ?= "", page:Integer ?= 1)
+GET         /search/csv                                                              @controllers.SearchController.exportAsCsv(q ?= "", rangetype ?= "", relative:Integer ?= -1, from ?= "", to ?= "", keyword ?= "")
 
 # Messages
 GET         /messages/:index/:id/partial                                             @controllers.MessagesController.singleAsPartial(index: String, id: String)
