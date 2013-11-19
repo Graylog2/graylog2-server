@@ -36,8 +36,6 @@ import java.io.OutputStreamWriter;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Type;
 
-import static com.google.common.base.Objects.firstNonNull;
-
 @Provider
 @Produces("text/csv")
 public class SearchResponseCsvWriter implements MessageBodyWriter<SearchResponse> {
@@ -73,7 +71,7 @@ public class SearchResponseCsvWriter implements MessageBodyWriter<SearchResponse
             // first collect all values from the current message
             for (String fieldName : sortedFields) {
                 final Object val = message.message.get(fieldName);
-                fieldValues[idx++] = firstNonNull(val, "").toString(); // TODO what about placeholder for null? should be in searchresult (transient field?)
+                fieldValues[idx++] = ((val == null) ? null : val.toString());
             }
             // write the complete line, some fields might not be present in the message, so there might be null values
             csvWriter.writeNext(fieldValues);
