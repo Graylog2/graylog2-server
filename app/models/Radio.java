@@ -260,6 +260,17 @@ public class Radio extends ClusterEntity {
         return api.get(String.class).radio(this).path("/system/threaddump").execute();
     }
 
+    public int getThroughput() {
+        try {
+            return api.get(NodeThroughputResponse.class).radio(this).path("/system/throughput").execute().throughput;
+        } catch (APIException e) {
+            log.error("Could not load throughput for radio " + this, e);
+        } catch (IOException e) {
+            log.error("Could not load throughput for radio " + this, e);
+        }
+        return 0;
+    }
+
     @Override
     public String toString() {
         final StringBuilder b = new StringBuilder();

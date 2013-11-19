@@ -134,10 +134,10 @@ public class ClusterService {
     }
 
     public F.Tuple<Integer, Integer> getClusterThroughput() {
-        final Map<Node, ServerThroughputResponse> responses =
-                api.get(ServerThroughputResponse.class).fromAllNodes().path("/system/throughput").executeOnAll();
+        final Map<Node, NodeThroughputResponse> responses =
+                api.get(NodeThroughputResponse.class).fromAllNodes().path("/system/throughput").executeOnAll();
         int t = 0;
-        for (ServerThroughputResponse r : responses.values()) {
+        for (NodeThroughputResponse r : responses.values()) {
             t += r.throughput;
         }
         return F.Tuple(t, responses.size());

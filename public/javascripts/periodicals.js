@@ -80,9 +80,17 @@ $(document).ready(function() {
             }
 
             $(".node-throughput").each(function(i) {
+                var nodeType = $(this).attr("data-node-type");
+                var url;
+                if (!!nodeType && $(this).attr("data-node-type") == "radio") {
+                    url = "/a/system/throughput/radio/" + $(this).attr("data-radio-id");
+                } else {
+                    url = "/a/system/throughput/node/" + $(this).attr("data-node-id");
+                }
+
                 var thisNodeT = $(this);
                 $.ajax({
-                    url: '/a/system/throughput/node/' + $(this).attr("data-node-id"),
+                    url: url,
                     success: function(data) {
                         thisNodeT.text(data.throughput);
                     },

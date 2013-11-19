@@ -21,7 +21,7 @@ package models.api.responses.system;
 /**
  * @author Lennart Koopmann <lennart@torch.sh>
  */
-public class ServerThroughputResponse {
+public class NodeThroughputResponse {
 
     public int throughput;
 

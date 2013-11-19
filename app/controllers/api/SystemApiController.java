@@ -115,8 +115,19 @@ public class SystemApiController extends AuthenticatedController {
         try {
             Map<String, Object> result = Maps.newHashMap();
             final Node node = nodeService.loadNode(nodeId);
-            int throughput = node.getThroughput();
-            result.put("throughput", throughput);
+            result.put("throughput", node.getThroughput());
+
+            return ok(new Gson().toJson(result)).as("application/json");
+        } catch (NodeService.NodeNotFoundException e) {
+            return status(404, views.html.errors.error.render(ApiClient.ERROR_MSG_NODE_NOT_FOUND, e, request()));
+        }
+    }
+
+    public Result radioThroughput(String radioId) {
+        try {
+            Map<String, Object> result = Maps.newHashMap();
+            final Radio radio = nodeService.loadRadio(radioId);
+            result.put("throughput", radio.getThroughput());
 
             return ok(new Gson().toJson(result)).as("application/json");
         } catch (NodeService.NodeNotFoundException e) {

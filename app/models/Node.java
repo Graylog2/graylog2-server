@@ -307,7 +307,7 @@ public class Node extends ClusterEntity {
 
     public int getThroughput() {
         try {
-            return api.get(ServerThroughputResponse.class).node(this).path("/system/throughput").execute().throughput;
+            return api.get(NodeThroughputResponse.class).node(this).path("/system/throughput").execute().throughput;
         } catch (APIException e) {
             log.error("Could not load throughput for node " + this, e);
         } catch (IOException e) {

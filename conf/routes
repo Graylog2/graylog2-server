@@ -81,7 +81,7 @@ GET         /system/logging                                                     
 # Dashboards
 GET         /dashboards                                                              @controllers.DashboardsController.index()
 GET         /dashboards/new                                                          @controllers.DashboardsController.newDashboard()
-GET         /dashboards/:id                                                     @controllers.DashboardsController.show(id: String)
+GET         /dashboards/:id                                                          @controllers.DashboardsController.show(id: String)
 POST        /dashboards/create                                                       @controllers.DashboardsController.create()
 POST        /dashboards/:id/delete                                                   @controllers.DashboardsController.delete(id: String)
 
@@ -104,6 +104,7 @@ GET         /a/system/notifications                                             
 DELETE      /a/system/notifications/:notification_type                               @controllers.api.SystemApiController.deleteNotification(notification_type: String)
 GET         /a/system/throughput                                                     @controllers.api.SystemApiController.totalThroughput()
 GET         /a/system/throughput/node/:node_id                                       @controllers.api.SystemApiController.nodeThroughput(node_id: String)
+GET         /a/system/throughput/radio/:radio_id                                     @controllers.api.SystemApiController.radioThroughput(radio_id: String)
 PUT         /a/system/processing/pause                                               @controllers.api.SystemApiController.pauseMessageProcessing()
 PUT         /a/system/processing/resume                                              @controllers.api.SystemApiController.resumeMessageProcessing()
 
