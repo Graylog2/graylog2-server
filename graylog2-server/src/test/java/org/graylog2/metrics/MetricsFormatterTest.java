@@ -17,10 +17,9 @@
  * along with Graylog2.  If not, see <http://www.gnu.org/licenses/>.
  *
  */
-package metrics;
+package org.graylog2.metrics;
 
 import com.google.common.collect.Maps;
-import org.graylog2.metrics.MetricsFormatter;
 import org.junit.Test;
 
 import java.util.HashMap;
