@@ -17,13 +17,11 @@
  * along with Graylog2.  If not, see <http://www.gnu.org/licenses/>.
  *
  */
-package org.graylog2.rest.resources.system;
+package org.graylog2.radio.rest.resources.system;
 
 import com.codahale.metrics.annotation.Timed;
 import com.google.common.collect.Maps;
-import org.graylog2.rest.documentation.annotations.Api;
-import org.graylog2.rest.documentation.annotations.ApiOperation;
-import org.graylog2.rest.resources.RestResource;
+import org.graylog2.radio.rest.resources.RestResource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -36,16 +34,14 @@ import java.util.Map;
 /**
  * @author Lennart Koopmann <lennart@torch.sh>
  */
-@Api(value = "System/Throughput", description = "Message throughput of this node")
 @Path("/system/throughput")
 public class ThroughputResource extends RestResource {
 
     @GET @Timed
-    @ApiOperation(value = "Current throughput of this node in messages per second")
     @Produces(MediaType.APPLICATION_JSON)
     public String total() {
         Map<String, Object> result = Maps.newHashMap();
-        result.put("throughput", core.getCurrentThroughput());
+        result.put("throughput", radio.getCurrentThroughput());
 
         return json(result);
     }

@@ -23,6 +23,7 @@ import com.codahale.metrics.MetricRegistry;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import com.ning.http.client.AsyncHttpClient;
 import com.ning.http.client.AsyncHttpClientConfig;
+import org.cliffc.high_scale_lib.Counter;
 import org.glassfish.hk2.utilities.binding.AbstractBinder;
 import org.glassfish.jersey.server.ContainerFactory;
 import org.glassfish.jersey.server.ResourceConfig;
@@ -39,6 +40,7 @@ import org.graylog2.plugin.system.NodeId;
 import org.graylog2.radio.buffers.ProcessBuffer;
 import org.graylog2.radio.cluster.Ping;
 import org.graylog2.radio.inputs.InputRegistry;
+import org.graylog2.radio.periodical.ThroughputCounterManagerThread;
 import org.jboss.netty.bootstrap.ServerBootstrap;
 import org.jboss.netty.channel.ChannelPipeline;
 import org.jboss.netty.channel.ChannelPipelineFactory;
@@ -79,6 +81,9 @@ public class Radio implements InputHost {
     private Cache inputCache;
     private ProcessBuffer processBuffer;
     private AtomicInteger processBufferWatermark = new AtomicInteger();
+
+    private Counter throughputCounter = new Counter();
+    private long throughput = 0;
 
     private final AsyncHttpClient httpClient;
 
@@ -123,6 +128,9 @@ public class Radio implements InputHost {
         scheduler = Executors.newScheduledThreadPool(SCHEDULED_THREADS_POOL_SIZE,
                 new ThreadFactoryBuilder().setNameFormat("scheduled-%d").build()
         );
+
+        ThroughputCounterManagerThread tt = new ThroughputCounterManagerThread(this);
+        scheduler.scheduleAtFixedRate(tt, 0, 1, TimeUnit.SECONDS);
     }
 
     public void startRestApi() throws IOException {
@@ -226,4 +234,17 @@ public class Radio implements InputHost {
     public Cache getInputCache() {
         return inputCache;
     }
+
+    public Counter getThroughputCounter() {
+        return throughputCounter;
+    }
+
+    public void setCurrentThroughput(long x) {
+        this.throughput = x;
+    }
+
+    public long getCurrentThroughput() {
+        return this.throughput;
+    }
+
 }
