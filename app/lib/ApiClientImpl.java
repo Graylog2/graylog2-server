@@ -93,6 +93,7 @@ class ApiClientImpl implements ApiClient {
     public <T> lib.ApiRequestBuilder<T> get(Class<T> responseClass) {
         return new ApiRequestBuilder<>(Method.GET, responseClass);
     }
+
     @Override
     public <T> lib.ApiRequestBuilder<T> post(Class<T> responseClass) {
         return new ApiRequestBuilder<>(Method.POST, responseClass);
@@ -153,7 +154,7 @@ class ApiClientImpl implements ApiClient {
         private ApiRequest body;
         private final Class<T> responseClass;
         private final ArrayList<Object> pathParams = Lists.newArrayList();
-        private final ArrayList<F.Tuple<String,String>> queryParams = Lists.newArrayList();
+        private final ArrayList<F.Tuple<String, String>> queryParams = Lists.newArrayList();
         private Set<Integer> expectedResponseCodes = Sets.newHashSet();
         private TimeUnit timeoutUnit = TimeUnit.SECONDS;
         private int timeoutValue = 5;
@@ -206,7 +207,7 @@ class ApiClientImpl implements ApiClient {
         public lib.ApiRequestBuilder<T> clusterEntity(ClusterEntity entity) {
             if (entity instanceof Radio) {
                 this.radio = (Radio) entity;
-            } else if(entity instanceof Node){
+            } else if (entity instanceof Node) {
                 this.node = (Node) entity;
             } else {
                 log.warn("You passed a ClusterEntity that is not of type Node or Radio. Selected nothing.");
@@ -259,7 +260,7 @@ class ApiClientImpl implements ApiClient {
 
         @Override
         public lib.ApiRequestBuilder<T> queryParams(Map<String, String> params) {
-            for(Map.Entry<String, String> p : params.entrySet()) {
+            for (Map.Entry<String, String> p : params.entrySet()) {
                 queryParam(p.getKey(), p.getValue());
             }
 
@@ -287,7 +288,7 @@ class ApiClientImpl implements ApiClient {
 
         @Override
         public lib.ApiRequestBuilder<T> expect(int... httpStatusCodes) {
-            for(int code : httpStatusCodes) {
+            for (int code : httpStatusCodes) {
                 this.expectedResponseCodes.add(code);
             }
 
@@ -354,8 +355,14 @@ class ApiClientImpl implements ApiClient {
                 }
 
                 // TODO: once we switch to jackson we can take the media type into account automatically
-                final MediaType responseContentType = MediaType.parse(response.getContentType());
-                if (! responseContentType.is(mediaType.withoutParameters())) {
+                final MediaType responseContentType;
+                if (response.getContentType() == null) {
+                    responseContentType = MediaType.JSON_UTF_8;
+                } else {
+                    responseContentType = MediaType.parse(response.getContentType());
+                }
+
+                if (!responseContentType.is(mediaType.withoutParameters())) {
                     log.warn("We said we'd accept {} but got {} back, let's see how that's going to work out...", mediaType, responseContentType);
                 }
                 if (responseClass.equals(String.class)) {
@@ -494,7 +501,7 @@ class ApiClientImpl implements ApiClient {
             }
 
             applyBasicAuthentication(requestBuilder, userInfo);
-            requestBuilder.setPerRequestConfig(new PerRequestConfig(null, (int)timeoutUnit.toMillis(timeoutValue)));
+            requestBuilder.setPerRequestConfig(new PerRequestConfig(null, (int) timeoutUnit.toMillis(timeoutValue)));
 
             if (body != null) {
                 if (method != Method.PUT && method != Method.POST) {
@@ -503,7 +510,7 @@ class ApiClientImpl implements ApiClient {
                 requestBuilder.addHeader("Content-Type", "application/json; charset=utf-8");
                 requestBuilder.setBodyEncoding("UTF-8");
                 requestBuilder.setBody(body.toJson());
-            } else if(method == Method.POST) {
+            } else if (method == Method.POST) {
                 log.warn("POST without body, this doesn't make sense,", new IllegalStateException());
             }
             // TODO: should we always insist on things being wrapped in json?
