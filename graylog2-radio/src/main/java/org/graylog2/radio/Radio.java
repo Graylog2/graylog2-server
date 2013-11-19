@@ -41,6 +41,8 @@ import org.graylog2.radio.buffers.ProcessBuffer;
 import org.graylog2.radio.cluster.Ping;
 import org.graylog2.radio.inputs.InputRegistry;
 import org.graylog2.radio.periodical.ThroughputCounterManagerThread;
+import org.graylog2.radio.transports.RadioTransport;
+import org.graylog2.radio.transports.kafka.KafkaProducer;
 import org.jboss.netty.bootstrap.ServerBootstrap;
 import org.jboss.netty.channel.ChannelPipeline;
 import org.jboss.netty.channel.ChannelPipelineFactory;
@@ -87,6 +89,8 @@ public class Radio implements InputHost {
 
     private final AsyncHttpClient httpClient;
 
+    private RadioTransport transport;
+
     private String nodeId;
 
     public Radio() {
@@ -108,8 +112,9 @@ public class Radio implements InputHost {
         processBuffer = new ProcessBuffer(this, inputCache);
         processBuffer.initialize();
 
-        this.inputs = new InputRegistry(this);
+        transport = new KafkaProducer(this);
 
+        this.inputs = new InputRegistry(this);
 
         if (this.configuration.getRestTransportUri() == null) {
             String guessedIf;
@@ -245,6 +250,10 @@ public class Radio implements InputHost {
 
     public long getCurrentThroughput() {
         return this.throughput;
+    }
+
+    public RadioTransport getTransport() {
+        return transport;
     }
 
 }

@@ -75,6 +75,8 @@ public class ProcessBufferProcessor implements EventHandler<MessageEvent> {
 
   System.out.println(msg);
 
+        radio.getTransport().send(msg);
+
         // Set this for actually written messages only! (after kafka success - batch size?)
         radio.getThroughputCounter().add(1);
 

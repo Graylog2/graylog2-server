@@ -47,6 +47,12 @@ public class Configuration {
     @Parameter(value = "rest_transport_uri", required = false)
     private String restTransportUri;
 
+    @Parameter(value = "kafka_brokers", required = true)
+    private String kafkaBrokers;
+
+    @Parameter(value = "kafka_required_acks", required = true)
+    private int kafkaRequiredAcks = 1;
+
     @Parameter(value = "ring_size", required = true, validator = PositiveIntegerValidator.class)
     private int ringSize = 1024;
 
@@ -113,6 +119,14 @@ public class Configuration {
 
     public int getProcessBufferProcessors() {
         return processBufferProcessors;
+    }
+
+    public String getKafkaBrokers() {
+        return kafkaBrokers;
+    }
+
+    public int getKafkaRequiredAcks() {
+        return kafkaRequiredAcks;
     }
 
 }
