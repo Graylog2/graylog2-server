@@ -143,7 +143,7 @@ class ApiClientImpl implements ApiClient {
     }
 
 
-    private class ApiRequestBuilder<T> implements lib.ApiRequestBuilder<T> {
+    public class ApiRequestBuilder<T> implements lib.ApiRequestBuilder<T> {
         private String pathTemplate;
         private Node node;
         private Radio radio;
@@ -522,7 +522,7 @@ class ApiClientImpl implements ApiClient {
         }
 
         // default visibility for tests
-        URL prepareUrl(ClusterEntity target) {
+        public URL prepareUrl(ClusterEntity target) {
             // if this is null there's not much we can do anyway...
             Preconditions.checkNotNull(pathTemplate, "path() needs to be set to a non-null value.");
 

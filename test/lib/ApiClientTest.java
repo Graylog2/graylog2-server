@@ -75,7 +75,7 @@ public class ApiClientTest extends BaseApiTest {
         final Node node = serverNodes.any();
         api.setHttpClient(client);
 
-        final ApiClientImpl.ApiRequestBuilder<EmptyResponse> requestBuilder =
+        final ApiRequestBuilder<EmptyResponse> requestBuilder =
                 api.get(EmptyResponse.class)
                         .path("/some/resource")
                         .credentials("user", "password")
@@ -98,7 +98,7 @@ public class ApiClientTest extends BaseApiTest {
         Node node2 = it.next();
         api.setHttpClient(client);
 
-        final ApiClientImpl.ApiRequestBuilder<EmptyResponse> requestBuilder = api.get(EmptyResponse.class).path("/some/resource");
+        final ApiRequestBuilder<EmptyResponse> requestBuilder = api.get(EmptyResponse.class).path("/some/resource");
         final URL url1 = requestBuilder.prepareUrl(node1);
         final URL url2 = requestBuilder.prepareUrl(node2);
         stubHttpProvider.expectResponse(url1, 200, "{}");

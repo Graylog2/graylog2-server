@@ -25,6 +25,7 @@ import models.Radio;
 import models.api.requests.ApiRequest;
 
 import java.io.IOException;
+import java.net.URL;
 import java.util.Collection;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
@@ -74,4 +75,7 @@ public interface ApiRequestBuilder<T> {
     T execute() throws APIException, IOException;
 
     Map<Node, T> executeOnAll();
+
+    // solely for test purposes
+    URL prepareUrl(ClusterEntity node);
 }
