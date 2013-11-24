@@ -19,40 +19,88 @@
  */
 package org.graylog2.radio.transports.kafka;
 
+import com.google.common.collect.Maps;
 import kafka.javaapi.producer.Producer;
 import kafka.producer.KeyedMessage;
 import kafka.producer.ProducerConfig;
 import org.graylog2.plugin.Message;
+import org.graylog2.plugin.RadioMessage;
 import org.graylog2.radio.Radio;
 import org.graylog2.radio.transports.RadioTransport;
+import org.joda.time.DateTime;
+import org.msgpack.MessagePack;
+import org.msgpack.packer.Packer;
+import org.msgpack.template.Template;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.util.Map;
 import java.util.Properties;
+
+import static org.msgpack.template.Templates.TInteger;
+import static org.msgpack.template.Templates.TString;
+import static org.msgpack.template.Templates.tMap;
 
 /**
  * @author Lennart Koopmann <lennart@torch.sh>
  */
 public class KafkaProducer implements RadioTransport {
 
+    private static final Logger LOG = LoggerFactory.getLogger(KafkaProducer.class);
+
     public final static String KAFKA_TOPIC = "graylog2-radio-messages";
 
-    private final Producer<String, String> producer;
+    private final Producer<byte[], byte[]> producer;
+
+    private final MessagePack msgPack;
 
     public KafkaProducer(Radio radio) {
+        msgPack = new MessagePack();
+
         Properties props = new Properties();
         props.put("metadata.broker.list", radio.getConfiguration().getKafkaBrokers());
-        props.put("serializer.class", "kafka.serializer.StringEncoder");
+        props.put("partitioner.class", "kafka.producer.DefaultPartitioner");
+        props.put("serializer.class", "kafka.serializer.DefaultEncoder");
         props.put("request.required.acks", String.valueOf(radio.getConfiguration().getKafkaRequiredAcks()));
 
         ProducerConfig config = new ProducerConfig(props);
-        producer = new Producer<String, String>(config);
+        producer = new Producer<byte[], byte[]>(config);
     }
 
     @Override
     public void send(Message msg) {
-        // TODO serialize message lol
-        KeyedMessage<String, String> data = new KeyedMessage<String, String>(KAFKA_TOPIC, null, msg.getMessage());
+        KeyedMessage<byte[], byte[]> data;
+
+        try {
+            data = new KeyedMessage<byte[], byte[]>(KAFKA_TOPIC, msg.getId().getBytes(), serialize(msg));
+        } catch(IOException e) {
+            LOG.error("Could not serialize message.");
+            return;
+        }
 
         producer.send(data);
+    }
+
+    public byte[] serialize(Message msg) throws IOException {
+        Map<String, Integer> ints = Maps.newHashMap();
+        Map<String, String>  strings = Maps.newHashMap();
+
+        for(Map.Entry<String, Object> field : msg.getFields().entrySet()) {
+            if (field.getValue() instanceof String) {
+                strings.put(field.getKey(), (String) field.getValue());
+            } else if (field.getValue() instanceof Integer) {
+                ints.put(field.getKey(), (Integer) field.getValue());
+            }
+        }
+
+        RadioMessage radioMessage = new RadioMessage();
+        radioMessage.strings = strings;
+        radioMessage.ints = ints;
+        radioMessage.timestamp = ((DateTime) msg.getField("timestamp")).getMillis();
+
+        return msgPack.write(radioMessage);
     }
 
 }

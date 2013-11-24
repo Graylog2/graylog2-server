@@ -216,6 +216,11 @@
             <artifactId>kafka_2.9.2</artifactId>
             <version>0.8.0-beta1</version>
         </dependency>
+        <dependency>
+            <groupId>org.msgpack</groupId>
+            <artifactId>msgpack</artifactId>
+            <version>0.6.8</version>
+        </dependency>
 
        <!--
            IT GET'S REALLY BAD HERE!

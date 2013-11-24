@@ -28,17 +28,22 @@ import com.google.common.collect.Maps;
 import org.graylog2.plugin.inputs.MessageInput;
 import org.graylog2.plugin.streams.Stream;
 import org.joda.time.DateTime;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.regex.Pattern;
 
+
 /**
  * @author Lennart Koopmann <lennart@torch.sh>
  */
 public class Message {
-	
+
+    private static final Logger LOG = LoggerFactory.getLogger(Message.class);
+
     private Map<String, Object> fields = Maps.newHashMap();
     private List<Stream> streams = Lists.newArrayList();
 
@@ -64,7 +69,9 @@ public class Message {
         "source",
         "timestamp",
         "gl2_source_node",
-        "gl2_source_input"
+        "gl2_source_input",
+        "gl2_source_radio",
+        "gl2_source_radio_input"
     );
 
     public static final ImmutableSet<String> RESERVED_SETTABLE_FIELDS = ImmutableSet.of(
@@ -72,7 +79,9 @@ public class Message {
             "source",
             "timestamp",
             "gl2_source_node",
-            "gl2_source_input"
+            "gl2_source_input",
+            "gl2_source_radio",
+            "gl2_source_radio_input"
     );
 
     private static final ImmutableSet<String> REQUIRED_FIELDS = ImmutableSet.of(
@@ -186,6 +195,26 @@ public class Message {
         }
 
         for (Map.Entry<String, Object> field : fields.entrySet()) {
+            addField(field.getKey(), field.getValue());
+        }
+    }
+
+    public void addStringFields(Map<String, String> fields) {
+        if(fields == null) {
+            return;
+        }
+
+        for (Map.Entry<String, String> field : fields.entrySet()) {
+            addField(field.getKey(), field.getValue());
+        }
+    }
+
+    public void addIntegerFields(Map<String, Integer> fields) {
+        if(fields == null) {
+            return;
+        }
+
+        for (Map.Entry<String, Integer> field : fields.entrySet()) {
             addField(field.getKey(), field.getValue());
         }
     }

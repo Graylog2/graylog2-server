@@ -45,8 +45,8 @@ public class ProcessBuffer extends Buffer {
 
     private static final Logger LOG = LoggerFactory.getLogger(ProcessBuffer.class);
 
-    public static final String SOURCE_INPUT_ATTR_NAME = "gl2_source_input";
     public static final String SOURCE_RADIO_ATTR_NAME = "gl2_source_radio";
+    public static final String SOURCE_RADIO_INPUT_ATTR_NAME = "gl2_source_radio_input";
 
     protected ExecutorService executor = Executors.newCachedThreadPool(
             new ThreadFactoryBuilder()
@@ -99,7 +99,7 @@ public class ProcessBuffer extends Buffer {
     public void insertCached(Message message, MessageInput sourceInput) {
         message.setSourceInput(sourceInput);
 
-        message.addField(SOURCE_INPUT_ATTR_NAME, sourceInput.getId());
+        message.addField(SOURCE_RADIO_INPUT_ATTR_NAME, sourceInput.getId());
         message.addField(SOURCE_RADIO_ATTR_NAME, radio.getNodeId());
 
         if (!hasCapacity()) {
@@ -116,7 +116,7 @@ public class ProcessBuffer extends Buffer {
     public void insertFailFast(Message message, MessageInput sourceInput) throws BufferOutOfCapacityException {
         message.setSourceInput(sourceInput);
 
-        message.addField(SOURCE_INPUT_ATTR_NAME, sourceInput.getId());
+        message.addField(SOURCE_RADIO_INPUT_ATTR_NAME, sourceInput.getId());
         message.addField(SOURCE_RADIO_ATTR_NAME, radio.getNodeId());
 
         if (!hasCapacity()) {

@@ -59,28 +59,30 @@ public class ProcessBufferProcessor implements EventHandler<MessageEvent> {
 
     @Override
     public void onEvent(MessageEvent event, long sequence, boolean endOfBatch) throws Exception {
-        // Because Trisha said so. (http://code.google.com/p/disruptor/wiki/FrequentlyAskedQuestions)
-        if ((sequence % numberOfConsumers) != ordinal) {
-            return;
+        try {
+            // Because Trisha said so. (http://code.google.com/p/disruptor/wiki/FrequentlyAskedQuestions)
+            if ((sequence % numberOfConsumers) != ordinal) {
+                return;
+            }
+
+            radio.processBufferWatermark().decrementAndGet();
+
+            incomingMessages.mark();
+            final Timer.Context tcx = processTime.time();
+
+            Message msg = event.getMessage();
+
+            LOG.debug("Starting to process message <{}>.", msg.getId());
+
+            radio.getTransport().send(msg);
+            radio.getThroughputCounter().add(1);
+
+            LOG.debug("Message <{}> written to RadioTransport.", msg.getId());
+
+            outgoingMessages.mark();
+            tcx.stop();
+        } catch(Exception e) {
+            LOG.error("Error in buffer processor.", e);
         }
-
-        radio.processBufferWatermark().decrementAndGet();
-
-        incomingMessages.mark();
-        final Timer.Context tcx = processTime.time();
-
-        Message msg = event.getMessage();
-
-        LOG.debug("Starting to process message <{}>.", msg.getId());
-
-  System.out.println(msg);
-
-        radio.getTransport().send(msg);
-
-        // Set this for actually written messages only! (after kafka success - batch size?)
-        radio.getThroughputCounter().add(1);
-
-        outgoingMessages.mark();
-        tcx.stop();
     }
 }
