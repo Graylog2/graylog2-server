@@ -66,6 +66,21 @@ public class InputsResource extends RestResource {
         return json(result);
     }
 
+    @GET @Timed
+    @Produces(MediaType.APPLICATION_JSON)
+    @Path("/{inputId}")
+    public String single(@PathParam("inputId") String inputId) {
+        MessageInput input = radio.inputs().getRunningInputs().get(inputId);
+
+        if (input == null) {
+            LOG.info("Input [{}] not found. Returning HTTP 404.", inputId);
+            throw new WebApplicationException(404);
+        }
+
+        return json(input.asMap());
+
+    }
+
     @POST @Timed
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)

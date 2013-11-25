@@ -86,6 +86,7 @@ public class KafkaInput extends MessageInput {
     public static final String CK_FETCH_WAIT_MAX = "fetch_wait_max";
     public static final String CK_ZOOKEEPER = "zookeeper";
     public static final String CK_TOPIC_FILTER = "topic_filter";
+    public static final String CK_THREADS = "threads";
 
     @Override
     public void launch() throws MisfireException {
@@ -105,7 +106,7 @@ public class KafkaInput extends MessageInput {
 
         TopicFilter filter = new Whitelist(config.getString(CK_TOPIC_FILTER));
 
-        List<KafkaStream<byte[], byte[]>> streams = cc.createMessageStreamsByFilter(filter, 5);
+        List<KafkaStream<byte[], byte[]>> streams = cc.createMessageStreamsByFilter(filter, (int) config.getInt(CK_THREADS));
         ExecutorService executor = Executors.newFixedThreadPool(5);
 
         final MessageInput thisInput = this;
@@ -187,7 +188,7 @@ public class KafkaInput extends MessageInput {
         cr.addField(new TextField(
                 CK_TOPIC_FILTER,
                 "Topic filter regex",
-                "^graylog2$",
+                "^graylog2-radio-messages$",
                 "Every topic that matches this regular expression will be consumed.",
                 ConfigurationField.Optional.NOT_OPTIONAL
 
@@ -206,6 +207,14 @@ public class KafkaInput extends MessageInput {
                 "Fetch maximum wait time (ms)",
                 100,
                 "Wait for this time or the configured minimum size of a message batch before fetching.",
+                ConfigurationField.Optional.NOT_OPTIONAL)
+        );
+
+        cr.addField(new NumberField(
+                CK_THREADS,
+                "Processor threads",
+                10,
+                "Number of processor threads to spawn.",
                 ConfigurationField.Optional.NOT_OPTIONAL)
         );
 
@@ -236,7 +245,8 @@ public class KafkaInput extends MessageInput {
         return config.intIsSet(CK_FETCH_MIN_BYTES)
                 && config.intIsSet(CK_FETCH_WAIT_MAX)
                 && config.stringIsSet(CK_ZOOKEEPER)
-                && config.stringIsSet(CK_TOPIC_FILTER);
+                && config.stringIsSet(CK_TOPIC_FILTER)
+                && config.intIsSet(CK_THREADS)  && config.getInt(CK_THREADS) > 0;
     }
 
     private void setupMetrics() {
