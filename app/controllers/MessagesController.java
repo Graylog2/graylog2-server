@@ -60,8 +60,9 @@ public class MessagesController extends AuthenticatedController {
 		try {
             MessageResult message = FieldMapper.run(messagesService.getMessage(index, id));
             Node sourceNode = getSourceNode(message);
+            Radio sourceRadio = getSourceRadio(message);
 
-            return ok(views.html.messages.show_as_partial.render(message, getSourceInput(sourceNode, message), sourceNode));
+            return ok(views.html.messages.show_as_partial.render(message, getSourceInput(sourceNode, message), sourceNode, sourceRadio, getSourceInput(sourceRadio, message)));
 		} catch (IOException e) {
 			return status(500, views.html.errors.error.render(ApiClient.ERROR_MSG_IO, e, request()));
 		} catch (APIException e) {
@@ -99,12 +100,37 @@ public class MessagesController extends AuthenticatedController {
         return null;
     }
 
+
+    private Radio getSourceRadio(MessageResult m) {
+        if (m.viaRadio()) {
+            try {
+                return nodeService.loadRadio(m.getSourceRadioId());
+            } catch(Exception e) {
+                Logger.warn("Could not derive source radio from message <" + m.getId() + ">.", e);
+            }
+        }
+
+        return null;
+    }
+
     private static Input getSourceInput(Node node, MessageResult m) {
         if (node != null) {
             try {
                 return node.getInput(m.getSourceInputId());
             } catch(Exception e) {
                 Logger.warn("Could not derive source input from message <" + m.getId() + ">.", e);
+            }
+        }
+
+        return null;
+    }
+
+    private static Input getSourceInput(Radio radio, MessageResult m) {
+        if (radio != null) {
+            try {
+                return radio.getInput(m.getSourceRadioInputId());
+            } catch(Exception e) {
+                Logger.warn("Could not derive source radio input from message <" + m.getId() + ">.", e);
             }
         }
 

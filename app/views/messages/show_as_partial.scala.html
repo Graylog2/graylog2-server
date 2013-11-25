@@ -1,4 +1,4 @@
-@(message: models.api.results.MessageResult, sourceInput: Input, sourceNode: Node)
+@(message: models.api.results.MessageResult, sourceInput: Input, sourceNode: Node, sourceRadio: Radio, sourceRadioInput: Input)
 
 <div class="detail-message">
     <div class="pull-right sidebar-back">
@@ -9,7 +9,8 @@
 
     Received by
     @if(sourceInput != null) {
-        input <em>@sourceInput.getTitle</em>
+        <i class="icon icon-cloud-download"></i>
+        <em>@sourceInput.getTitle</em>
     } else {
         <em>deleted input</em>
     }
@@ -19,7 +20,20 @@
     @if(sourceNode != null) {
         @views.html.partials.links.to_node(sourceNode)
     } else {
-        <em>outdated node</em>.
+        <em>outdated node</em>
+    }
+
+    @if(sourceRadio != null) {
+        via
+
+        @if(sourceRadioInput != null) {
+            <i class="icon icon-cloud-download"></i>
+            <em>@sourceRadioInput.getTitle</em>
+        } else {
+            <em>deleted input</em>
+        }
+
+        on @views.html.partials.links.to_radio(sourceRadio)
     }
 
     <br />

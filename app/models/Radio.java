@@ -204,6 +204,11 @@ public class Radio extends ClusterEntity {
         return inputs;
     }
 
+    public Input getInput(String inputId) throws IOException, APIException {
+        final InputSummaryResponse inputSummaryResponse = api.get(InputSummaryResponse.class).radio(this).path("/system/inputs/{0}", inputId).execute();
+        return inputFactory.fromSummaryResponse(inputSummaryResponse, this);
+    }
+
 
     public int numberOfInputs() {
         return inputs().total;

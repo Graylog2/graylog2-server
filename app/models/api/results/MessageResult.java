@@ -33,7 +33,8 @@ public class MessageResult {
             "timestamp",
             "streams",
             "gl2_source_input",
-            "gl2_source_node"
+            "gl2_source_node",
+            "gl2_source_radio"
     );
 
     private final Map<String, Object> fields;
@@ -42,6 +43,8 @@ public class MessageResult {
     private final String timestamp;
     private final String sourceNodeId;
     private final String sourceInputId;
+    private final String sourceRadioId;
+    private final String sourceRadioInputId;
     private final List<String> streamIds;
 
     public MessageResult(Map<String, Object> message, String index) {
@@ -83,6 +86,14 @@ public class MessageResult {
         this.sourceInputId = (String) message.get("gl2_source_input");
         this.index = index;
         this.streamIds = (List<String>) message.get("streams");
+
+        if(message.containsKey("gl2_source_radio")) {
+            sourceRadioId = (String) message.get("gl2_source_radio");
+            sourceRadioInputId = (String) message.get("gl2_source_radio_input");
+        } else {
+            sourceRadioId = null;
+            sourceRadioInputId = null;
+        }
     }
 
     public String getId() {
@@ -107,6 +118,18 @@ public class MessageResult {
 
     public String getSourceInputId() {
         return sourceInputId;
+    }
+
+    public boolean viaRadio() {
+        return sourceRadioId != null;
+    }
+
+    public String getSourceRadioId() {
+        return sourceRadioId;
+    }
+
+    public String getSourceRadioInputId() {
+        return sourceRadioInputId;
     }
 
     public List<String> getStreamIds() {
