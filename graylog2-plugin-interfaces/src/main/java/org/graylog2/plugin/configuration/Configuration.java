@@ -74,6 +74,10 @@ public class Configuration {
         return strings.get(key);
     }
 
+    public void setString(String key, String value) {
+        strings.put(key, value);
+    }
+
     public long getInt(String key) {
         return ints.get(key);
     }
