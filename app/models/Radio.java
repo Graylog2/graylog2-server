@@ -21,6 +21,7 @@ package models;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
+import com.google.common.net.MediaType;
 import com.google.inject.assistedinject.Assisted;
 import com.google.inject.assistedinject.AssistedInject;
 import lib.APIException;
@@ -256,7 +257,11 @@ public class Radio extends ClusterEntity {
     }
 
     public String getThreadDump() throws IOException, APIException {
-        return api.get(String.class).radio(this).path("/system/threaddump").execute();
+        return api.get(String.class)
+                .radio(this)
+                .path("/system/threaddump")
+                .accept(MediaType.ANY_TEXT_TYPE)
+                .execute();
     }
 
     public int getThroughput() {
