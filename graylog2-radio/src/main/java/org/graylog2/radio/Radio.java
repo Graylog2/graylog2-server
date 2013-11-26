@@ -40,6 +40,7 @@ import org.graylog2.plugin.system.NodeId;
 import org.graylog2.radio.buffers.ProcessBuffer;
 import org.graylog2.radio.cluster.Ping;
 import org.graylog2.radio.inputs.InputRegistry;
+import org.graylog2.radio.periodical.MasterCacheWorkerThread;
 import org.graylog2.radio.periodical.ThroughputCounterManagerThread;
 import org.graylog2.radio.transports.RadioTransport;
 import org.graylog2.radio.transports.kafka.KafkaProducer;
@@ -137,6 +138,9 @@ public class Radio implements InputHost {
 
         ThroughputCounterManagerThread tt = new ThroughputCounterManagerThread(this);
         scheduler.scheduleAtFixedRate(tt, 0, 1, TimeUnit.SECONDS);
+
+        MasterCacheWorkerThread masterCacheWorker = new MasterCacheWorkerThread(this, inputCache, processBuffer);
+        scheduler.scheduleAtFixedRate(masterCacheWorker, 0, 1, TimeUnit.SECONDS);
     }
 
     public void launchPersistedInputs() throws InterruptedException, ExecutionException, IOException {
@@ -197,6 +201,10 @@ public class Radio implements InputHost {
 
     public void ping() {
         pinger.ping();
+    }
+
+    public boolean isProcessing() {
+        return true;
     }
 
     private class Graylog2Binder extends AbstractBinder {

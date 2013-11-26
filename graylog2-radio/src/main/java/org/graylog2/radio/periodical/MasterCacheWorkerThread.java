@@ -1,5 +1,5 @@
 /**
- * Copyright 2013 Lennart Koopmann <lennart@socketfeed.com>
+ * Copyright 2013 Lennart Koopmann <lennart@torch.sh>
  *
  * This file is part of Graylog2.
  *
@@ -17,62 +17,59 @@
  * along with Graylog2.  If not, see <http://www.gnu.org/licenses/>.
  *
  */
-package org.graylog2.periodical;
+package org.graylog2.radio.periodical;
 
 import com.codahale.metrics.Meter;
-import org.graylog2.Core;
 import org.graylog2.inputs.Cache;
 import org.graylog2.plugin.Message;
 import org.graylog2.plugin.buffers.Buffer;
 import org.graylog2.plugin.buffers.BufferOutOfCapacityException;
+import org.graylog2.radio.Radio;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import static com.codahale.metrics.MetricRegistry.name;
 
 /**
- * @author Lennart Koopmann <lennart@socketfeed.com>
+ * @author Lennart Koopmann <lennart@torch.sh>
  */
 public class MasterCacheWorkerThread implements Runnable {
 
     private static final Logger LOG = LoggerFactory.getLogger(MasterCacheWorkerThread.class);
 
-    public static final int INITIAL_DELAY = 0;
-    public static final int PERIOD = 1;
-
     private final Cache cache;
     private final String cacheName;
     private final Buffer targetBuffer;
-    private final Core core;
+    private final Radio radio;
 
     private final Meter writtenMessages;
     private final Meter outOfCapacity;
-    
-    public MasterCacheWorkerThread(Core core, Cache cache, Buffer targetBuffer) {
-        writtenMessages = core.metrics().meter(name(MasterCacheWorkerThread.class, "writtenMessages"));
-        outOfCapacity =  core.metrics().meter(name(MasterCacheWorkerThread.class, "FailedWritesOutOfCapacity"));
+
+    public MasterCacheWorkerThread(Radio radio, Cache cache, Buffer targetBuffer) {
+        writtenMessages = radio.metrics().meter(name(MasterCacheWorkerThread.class, "writtenMessages"));
+        outOfCapacity =  radio.metrics().meter(name(MasterCacheWorkerThread.class, "FailedWritesOutOfCapacity"));
 
         this.cache = cache;
         this.cacheName = cache.getClass().getCanonicalName();
-        
+
         this.targetBuffer = targetBuffer;
-        this.core = core;
+        this.radio = radio;
     }
 
     @Override
     public void run() {
         while(true) {
             try {
-                if (cache.size() > 0 && core.isProcessing()) {
+                if (cache.size() > 0 && radio.isProcessing()) {
                     LOG.debug("{} contains {} messages. Trying to process them.", cacheName, cache.size());
-                    
+
                     while (true) {
                         if (cache.size() <= 0) {
                             LOG.debug("Read all messages from {}.", cacheName);
                             break;
                         }
-                        
-                        if (targetBuffer.hasCapacity() && core.isProcessing()) {
+
+                        if (targetBuffer.hasCapacity() && radio.isProcessing()) {
                             try {
                                 LOG.debug("Reading message from {}.", cacheName);
                                 Message msg = cache.pop();
@@ -92,11 +89,11 @@ public class MasterCacheWorkerThread implements Runnable {
                     Thread.sleep(1000);
                 } catch(InterruptedException ex) { /* */ }
             }
-            
+
             try {
-                Thread.sleep(100);
+                Thread.sleep(50);
             } catch(InterruptedException ex) { /* */ }
         }
     }
-    
+
 }
