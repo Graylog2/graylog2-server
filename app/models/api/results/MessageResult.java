@@ -34,7 +34,8 @@ public class MessageResult {
             "streams",
             "gl2_source_input",
             "gl2_source_node",
-            "gl2_source_radio"
+            "gl2_source_radio",
+            "gl2_source_radio_input"
     );
 
     private final Map<String, Object> fields;
