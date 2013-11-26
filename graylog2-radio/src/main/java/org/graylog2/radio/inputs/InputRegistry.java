@@ -70,7 +70,7 @@ public class InputRegistry {
         mapper = new ObjectMapper();
     }
 
-    public String launch(final MessageInput input, String id) {
+    public String launch(final MessageInput input, String id, boolean register) {
         input.setId(id);
         runningInputs.put(id, input);
 
@@ -107,10 +107,12 @@ public class InputRegistry {
         });
 
         // Register in server cluster.
-        try {
-            registerInCluster(input);
-        } catch (Exception e) {
-            LOG.error("Could not register input in Graylog2 cluster. It will be lost on next restart of this radio node.");
+        if (register) {
+            try {
+                registerInCluster(input);
+            } catch (Exception e) {
+                LOG.error("Could not register input in Graylog2 cluster. It will be lost on next restart of this radio node.");
+            }
         }
 
         return id;
@@ -169,7 +171,7 @@ public class InputRegistry {
                 continue;
             }
 
-            launch(input, isr.id);
+            launch(input, isr.id, false);
         }
     }
 

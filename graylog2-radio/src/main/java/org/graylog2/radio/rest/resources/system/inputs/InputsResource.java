@@ -125,8 +125,7 @@ public class InputsResource extends RestResource {
         }
 
         // Launch input. (this will run async and clean up itself in case of an error.)
-        radio.inputs().launch(input, inputId);
-
+        radio.inputs().launch(input, inputId, true);
 
         return Response.status(Response.Status.ACCEPTED).build();
     }
