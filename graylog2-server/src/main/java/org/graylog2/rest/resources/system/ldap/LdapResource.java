@@ -31,7 +31,7 @@ import org.graylog2.rest.documentation.annotations.ApiParam;
 import org.graylog2.rest.resources.RestResource;
 import org.graylog2.rest.resources.system.ldap.requests.LdapTestConfigRequest;
 import org.graylog2.rest.resources.system.ldap.responses.LdapTestConfigResponse;
-import org.graylog2.rest.resources.system.requests.LdapSettingsRequest;
+import org.graylog2.rest.resources.system.ldap.requests.LdapSettingsRequest;
 import org.graylog2.security.ldap.LdapConnector;
 import org.graylog2.security.ldap.LdapSettings;
 import org.slf4j.Logger;
