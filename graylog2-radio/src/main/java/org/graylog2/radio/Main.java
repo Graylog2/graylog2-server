@@ -146,18 +146,13 @@ public class Main {
             try {
                 radio.launchPersistedInputs();
                 break;
-            } catch (InterruptedException e) {
-                retryPersistedInputs(e);
-                continue;
-            } catch (ExecutionException e) {
-                retryPersistedInputs(e);
-                continue;
-            } catch (IOException e) {
-                retryPersistedInputs(e);
-                continue;
             } catch(Exception e) {
-                LOG.error("Unexpected error when trying to fetch persisted inputs. Terminating.", e);
-                System.exit(1);
+                LOG.error("Could not load persisted inputs. Trying again in one second.", e);
+                try {
+                    Thread.sleep(1000);
+                } catch (InterruptedException e1) {
+                    return;
+                }
             }
         }
 
@@ -199,15 +194,6 @@ public class Main {
             IOUtils.closeQuietly(pidFileWriter);
             // make sure to remove our pid when we exit
             new File(pidFile).deleteOnExit();
-        }
-    }
-
-    public static void retryPersistedInputs(Throwable e) {
-        LOG.error("Could not load persisted inputs. Trying again in one second.", e);
-        try {
-            Thread.sleep(1000);
-        } catch (InterruptedException e1) {
-            return;
         }
     }
 

@@ -130,6 +130,32 @@ public class InputsResource extends RestResource {
         return Response.status(Response.Status.ACCEPTED).build();
     }
 
+
+    @DELETE @Timed
+    @Path("/{inputId}")
+    public Response terminate(@PathParam("inputId") String inputId) {
+        MessageInput input = radio.inputs().getRunningInputs().get(inputId);
+
+        String msg = "Attempting to terminate input [" + input.getName()+ "]. Reason: REST request.";
+        LOG.info(msg);
+
+        if (input == null) {
+            LOG.info("Cannot terminate input. Input not found.");
+            throw new WebApplicationException(404);
+        }
+
+        // Shutdown actual input.
+        input.stop();
+        radio.inputs().getRunningInputs().remove(input.getId());
+
+        // Unregister on server cluster.
+
+        String msg2 = "Terminated input [" + input.getName()+ "]. Reason: REST request.";
+        LOG.info(msg2);
+
+        return Response.status(Response.Status.ACCEPTED).build();
+    }
+
     @GET @Timed
     @Path("/types")
     @Produces(MediaType.APPLICATION_JSON)
