@@ -56,7 +56,6 @@ public class Radio extends ClusterEntity {
     private final Input.Factory inputFactory;
 
     private final URI transportAddress;
-    private DateTime lastSeen;
     private String id;
     private String shortNodeId;
 
@@ -70,7 +69,6 @@ public class Radio extends ClusterEntity {
         this.inputFactory = inputFactory;
 
         transportAddress = normalizeUriPath(r.transportAddress);
-        lastSeen = new DateTime(r.lastSeen);
         id = r.id;
         shortNodeId = r.shortNodeId;
     }
@@ -121,10 +119,6 @@ public class Radio extends ClusterEntity {
 
     public String getId() {
         return id;
-    }
-
-    public DateTime getLastSeen() {
-        return lastSeen;
     }
 
     public NodeJVMStats jvm() {

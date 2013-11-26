@@ -251,6 +251,18 @@ public class InputsController extends AuthenticatedController {
         return redirect(routes.InputsController.manage(nodeId));
     }
 
+    public Result terminateRadio(String radioId, String inputId) {
+        try {
+            if (!nodeService.loadRadio(radioId).terminateInput(inputId)) {
+                flash("Could not terminate input " + inputId);
+            }
+        } catch (NodeService.NodeNotFoundException e) {
+            return status(404, views.html.errors.error.render(ApiClient.ERROR_MSG_NODE_NOT_FOUND, e, request()));
+        }
+
+        return redirect(routes.InputsController.manageRadio(radioId));
+    }
+
     public Result addStaticField(String nodeId, String inputId) {
         Map<String, String[]> form = request().body().asFormUrlEncoded();
 
