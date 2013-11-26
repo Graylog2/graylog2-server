@@ -27,7 +27,7 @@
         until they are processed or you run out of memory. Messages already accepted will be processed completely.
     </div>
 
-    <h2><i class="icon icon-cloud"></i> Server nodes</h2>
+    <h2><i class="icon icon-code-fork"></i> Server nodes</h2>
     @for(jvm <- jvms) {
         <div class="row-fluid message-processing-host node-row">
             <span class="pull-right node-throughput-info">
@@ -101,7 +101,7 @@
     }
 
 
-    <h2 class="radios-head"><i class="icon icon-bolt"></i> Radio nodes</h2>
+    <h2 class="radios-head"><i class="icon icon-double-angle-down"></i> Radio nodes</h2>
     @if(!radios.isEmpty) {
         @for(radio <- radios.values()) {
             <div class="row-fluid message-processing-host node-row">
