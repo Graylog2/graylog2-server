@@ -77,7 +77,7 @@ public class StaticFieldFilterTest {
     private class FakeInput extends MessageInput {
 
         @Override
-        public void configure(Configuration config, InputHost graylogServer) throws ConfigurationException {
+        public void checkConfiguration() throws ConfigurationException {
             //To change body of implemented methods use File | Settings | File Templates.
         }
 

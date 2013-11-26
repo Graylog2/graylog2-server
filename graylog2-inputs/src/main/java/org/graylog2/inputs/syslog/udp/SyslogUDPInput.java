@@ -58,7 +58,7 @@ public class SyslogUDPInput extends SyslogInputBase {
                         .build());
 
         bootstrap = new ConnectionlessBootstrap(new NioDatagramChannelFactory(workerThreadPool));
-        bootstrap.setPipelineFactory(new SyslogUDPPipelineFactory(graylogServer, config, this, throughputCounter));
+        bootstrap.setPipelineFactory(new SyslogUDPPipelineFactory(graylogServer, configuration, this, throughputCounter));
 
         try {
             channel = ((ConnectionlessBootstrap) bootstrap).bind(socketAddress);

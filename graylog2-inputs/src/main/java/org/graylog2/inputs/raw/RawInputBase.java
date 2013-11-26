@@ -50,8 +50,6 @@ public class RawInputBase extends MessageInput {
     protected final ThroughputCounter throughputCounter;
     protected final ConnectionCounter connectionCounter;
 
-    protected InputHost graylogServer;
-    protected Configuration config;
     protected InetSocketAddress socketAddress;
 
     public RawInputBase() {
@@ -60,17 +58,14 @@ public class RawInputBase extends MessageInput {
     }
 
     @Override
-    public void configure(Configuration config, InputHost graylogServer) throws ConfigurationException {
-        this.graylogServer = graylogServer;
-        this.config = config;
-
-        if (!checkConfig(config)) {
-            throw new ConfigurationException(config.getSource().toString());
+    public void checkConfiguration() throws ConfigurationException {
+        if (!checkConfig(configuration)) {
+            throw new ConfigurationException(configuration.getSource().toString());
         }
 
         this.socketAddress = new InetSocketAddress(
-                config.getString(CK_BIND_ADDRESS),
-                (int) config.getInt(CK_PORT)
+                configuration.getString(CK_BIND_ADDRESS),
+                (int) configuration.getInt(CK_PORT)
         );
     }
 
@@ -111,7 +106,7 @@ public class RawInputBase extends MessageInput {
 
     @Override
     public Map<String, Object> getAttributes() {
-        return config.getSource();
+        return configuration.getSource();
     }
 
     protected boolean checkConfig(Configuration config) {

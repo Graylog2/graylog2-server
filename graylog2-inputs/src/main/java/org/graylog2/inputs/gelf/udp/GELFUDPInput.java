@@ -49,7 +49,7 @@ public class GELFUDPInput extends GELFInputBase {
     public void launch() throws MisfireException {
         // Register throughput counter gauges.
         for(Map.Entry<String,Gauge<Long>> gauge : throughputCounter.gauges().entrySet()) {
-            core.metrics().register(MetricRegistry.name(getUniqueReadableId(), gauge.getKey()), gauge.getValue());
+            graylogServer.metrics().register(MetricRegistry.name(getUniqueReadableId(), gauge.getKey()), gauge.getValue());
         }
 
         final ExecutorService workerThreadPool = Executors.newCachedThreadPool(
@@ -58,7 +58,7 @@ public class GELFUDPInput extends GELFInputBase {
                         .build());
 
         bootstrap = new ConnectionlessBootstrap(new NioDatagramChannelFactory(workerThreadPool));
-        bootstrap.setPipelineFactory(new GELFUDPPipelineFactory(core, this, throughputCounter));
+        bootstrap.setPipelineFactory(new GELFUDPPipelineFactory(graylogServer, this, throughputCounter));
 
         try {
             channel = ((ConnectionlessBootstrap) bootstrap).bind(socketAddress);

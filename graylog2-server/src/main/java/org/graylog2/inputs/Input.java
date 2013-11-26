@@ -27,6 +27,7 @@ import com.mongodb.DBObject;
 import org.bson.types.ObjectId;
 import org.graylog2.ConfigurationException;
 import org.graylog2.Core;
+import org.graylog2.cluster.Node;
 import org.graylog2.database.Persisted;
 import org.graylog2.database.ValidationException;
 import org.graylog2.database.validators.DateValidator;
@@ -68,6 +69,15 @@ public class Input extends Persisted {
     public static List<Input> allOfThisNode(Core core) {
         List<Input> inputs = Lists.newArrayList();
         for (DBObject o : query(new BasicDBObject("node_id", core.getNodeId()), core, COLLECTION)) {
+            inputs.add(new Input(core, (ObjectId) o.get("_id"), o.toMap()));
+        }
+
+        return inputs;
+    }
+
+    public static List<Input> allOfRadio(Core core, Node radio) {
+        List<Input> inputs = Lists.newArrayList();
+        for (DBObject o : query(new BasicDBObject("radio_id", radio.getNodeId()), core, COLLECTION)) {
             inputs.add(new Input(core, (ObjectId) o.get("_id"), o.toMap()));
         }
 

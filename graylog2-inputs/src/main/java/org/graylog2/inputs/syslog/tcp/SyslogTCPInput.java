@@ -73,7 +73,7 @@ public class SyslogTCPInput extends SyslogInputBase {
                 new NioServerSocketChannelFactory(bossThreadPool, workerThreadPool)
         );
 
-        bootstrap.setPipelineFactory(new SyslogTCPPipelineFactory(graylogServer, config, this, throughputCounter, connectionCounter));
+        bootstrap.setPipelineFactory(new SyslogTCPPipelineFactory(graylogServer, configuration, this, throughputCounter, connectionCounter));
 
         try {
             channel = ((ServerBootstrap) bootstrap).bind(socketAddress);

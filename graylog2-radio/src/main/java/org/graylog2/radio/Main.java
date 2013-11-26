@@ -125,6 +125,12 @@ public class Main {
         Radio radio = new Radio();
         radio.initialize(configuration, metrics);
 
+        // Register in Graylog2 cluster.
+        radio.ping();
+
+        // Start regular pinging Graylog2 cluster to show that we are alive.
+        radio.startPings();
+
         // Start REST API.
         try {
             radio.startRestApi();
@@ -132,6 +138,8 @@ public class Main {
             LOG.error("Could not start REST API on <{}>. Terminating.", configuration.getRestListenUri(), e);
             System.exit(1);
         }
+
+        radio.run();
 
         // Register inputs. (find an automatic way here (annotations?) and do the same in graylog2-server.Main
         radio.inputs().register(SyslogUDPInput.class, SyslogUDPInput.NAME);
@@ -144,13 +152,6 @@ public class Main {
         radio.inputs().register(FakeHttpMessageInput.class, FakeHttpMessageInput.NAME);
         radio.inputs().register(LocalMetricsInput.class, LocalMetricsInput.NAME);
         radio.inputs().register(JsonPathInput.class, JsonPathInput.NAME);
-
-        // Connect Kafka
-
-        // Launch inputs
-
-        // Start pinging Graylog2 cluster to show that we are alive.
-        radio.startPings();
 
         LOG.info("Graylog2 Radio up and running.");
 

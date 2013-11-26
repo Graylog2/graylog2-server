@@ -19,18 +19,31 @@
  */
 package org.graylog2.radio.inputs;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.Maps;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
-import org.graylog2.plugin.GraylogServer;
+import com.ning.http.client.Response;
 import org.graylog2.plugin.InputHost;
+import org.graylog2.plugin.configuration.Configuration;
+import org.graylog2.plugin.configuration.ConfigurationException;
 import org.graylog2.plugin.inputs.MessageInput;
 import org.graylog2.plugin.inputs.MisfireException;
+import org.graylog2.radio.Radio;
+import org.graylog2.radio.inputs.api.InputSummaryResponse;
+import org.graylog2.radio.inputs.api.PersistedInputsResponse;
+import org.graylog2.radio.inputs.api.RegisterInputRequest;
+import org.joda.time.DateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.ws.rs.core.UriBuilder;
+import java.io.IOException;
+import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 
 /**
  * @author Lennart Koopmann <lennart@torch.sh>
@@ -39,18 +52,22 @@ public class InputRegistry {
 
     private static final Logger LOG = LoggerFactory.getLogger(InputRegistry.class);
 
-    private final InputHost server;
+    private final Radio radio;
     private Map<String, MessageInput> runningInputs;
     private Map<String, String> availableInputs;
+
+    private ObjectMapper mapper;
 
     private ExecutorService executor = Executors.newCachedThreadPool(
             new ThreadFactoryBuilder().setNameFormat("inputs-%d").build()
     );
 
-    public InputRegistry(InputHost server) {
-        this.server = server;
+    public InputRegistry(InputHost radio) {
+        this.radio = (Radio) radio;
         runningInputs = Maps.newHashMap();
         availableInputs = Maps.newHashMap();
+
+        mapper = new ObjectMapper();
     }
 
     public String launch(final MessageInput input, String id) {
@@ -89,6 +106,13 @@ public class InputRegistry {
             }
         });
 
+        // Register in server cluster.
+        try {
+            registerInCluster(input);
+        } catch (Exception e) {
+            LOG.error("Could not register input in Graylog2 cluster. It will be lost on next restart of this radio node.");
+        }
+
         return id;
     }
 
@@ -120,6 +144,74 @@ public class InputRegistry {
         }
 
         return false;
+    }
+
+    public void launchPersisted() throws InterruptedException, ExecutionException, IOException {
+        for (InputSummaryResponse isr : getAllPersisted()) {
+
+            MessageInput input = null;
+            try {
+                input = InputRegistry.factory(isr.type);
+
+                // Add all standard fields.
+                input.initialize(new Configuration(isr.configuration), radio);
+                input.setTitle(isr.title);
+                input.setCreatorUserId(isr.creatorUserId);
+                input.setPersistId(isr.id);
+                input.setCreatedAt(new DateTime(isr.createdAt));
+
+                input.checkConfiguration();
+            } catch (NoSuchInputTypeException e) {
+                LOG.warn("Cannot launch persisted input. No such type [{}].", isr.type);
+                continue;
+            } catch (ConfigurationException e) {
+                LOG.error("Missing or invalid input input configuration.", e);
+                continue;
+            }
+
+            launch(input, isr.id);
+        }
+    }
+
+    // TODO make this use a generic ApiClient class that knows the graylog2-server node address(es) or something.
+    public void registerInCluster(MessageInput input) throws ExecutionException, InterruptedException, IOException {
+        final UriBuilder uriBuilder = UriBuilder.fromUri(radio.getConfiguration().getGraylog2ServerUri());
+        uriBuilder.path("/system/radios/" + radio.getNodeId() + "/inputs");
+
+        RegisterInputRequest rir = new RegisterInputRequest(input, radio.getNodeId());
+
+        String json;
+        try {
+            json = mapper.writeValueAsString(rir);
+        } catch (IOException e) {
+            throw new RuntimeException("Could not create JSON for register input request.", e);
+        }
+
+        Future<Response> f = radio.getHttpClient().preparePost(uriBuilder.build().toString())
+                .setBody(json)
+                .execute();
+
+        Response r = f.get();
+
+        if (r.getStatusCode() != 201) {
+            throw new RuntimeException("Expected HTTP response [201] for input registration but got [" + r.getStatusCode() + "].");
+        }
+    }
+
+    // TODO make this use a generic ApiClient class that knows the graylog2-server node address(es) or something.
+    public List<InputSummaryResponse> getAllPersisted() throws ExecutionException, InterruptedException, IOException {
+        final UriBuilder uriBuilder = UriBuilder.fromUri(radio.getConfiguration().getGraylog2ServerUri());
+        uriBuilder.path("/system/radios/" + radio.getNodeId() + "/inputs");
+
+        Future<Response> f = radio.getHttpClient().prepareGet(uriBuilder.build().toString()).execute();
+
+        Response r = f.get();
+
+        if (r.getStatusCode() != 200) {
+            throw new RuntimeException("Expected HTTP response [200] for list of persisted input but got [" + r.getStatusCode() + "].");
+        }
+
+        return mapper.readValue(r.getResponseBody(), PersistedInputsResponse.class).inputs;
     }
 
     public void register(Class clazz, String name) {

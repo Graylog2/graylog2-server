@@ -156,7 +156,7 @@ public class InputRegistry {
                 input = InputRegistry.factory(io.getType());
 
                 // Add all standard fields.
-                input.configure(new Configuration(io.getConfiguration()), core);
+                input.initialize(new Configuration(io.getConfiguration()), core);
                 input.setTitle(io.getTitle());
                 input.setCreatorUserId(io.getCreatorUserId());
                 input.setPersistId(io.getId().toStringMongod());
@@ -171,6 +171,8 @@ public class InputRegistry {
                 for (Map.Entry<String, String> field : io.getStaticFields().entrySet()) {
                     input.addStaticField(field.getKey(), field.getValue());
                 }
+
+                input.checkConfiguration();
             } catch (NoSuchInputTypeException e) {
                 LOG.warn("Cannot launch persisted input. No such type [{}].", io.getType());
                 continue;

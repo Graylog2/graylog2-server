@@ -73,7 +73,7 @@ public class RawTCPInput extends RawInputBase {
                 new NioServerSocketChannelFactory(bossThreadPool, workerThreadPool)
         );
 
-        bootstrap.setPipelineFactory(new RawTCPPipelineFactory(graylogServer, config, this, throughputCounter, connectionCounter));
+        bootstrap.setPipelineFactory(new RawTCPPipelineFactory(graylogServer, configuration, this, throughputCounter, connectionCounter));
 
         try {
             channel = ((ServerBootstrap) bootstrap).bind(socketAddress);

@@ -36,7 +36,7 @@ import java.util.Map;
 public class InputStub extends MessageInput {
 
     @Override
-    public void configure(Configuration config, InputHost graylogServer) throws ConfigurationException {
+    public void checkConfiguration() throws ConfigurationException {
     }
 
     @Override

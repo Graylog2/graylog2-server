@@ -22,11 +22,17 @@ package org.graylog2.rest.resources.system.radio;
 import com.codahale.metrics.annotation.Timed;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
+import org.bson.types.ObjectId;
 import org.graylog2.cluster.Node;
+import org.graylog2.database.ValidationException;
+import org.graylog2.inputs.Input;
 import org.graylog2.plugin.Tools;
 import org.graylog2.rest.documentation.annotations.*;
 import org.graylog2.rest.resources.RestResource;
 import org.graylog2.rest.resources.system.radio.requests.PingRequest;
+import org.graylog2.rest.resources.system.radio.requests.RegisterInputRequest;
+import org.joda.time.DateTime;
+import org.joda.time.DateTimeZone;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -82,6 +88,96 @@ public class RadiosResource extends RestResource {
         }
 
         return json(radioSummary(radio));
+    }
+
+
+    @POST @Timed
+    @ApiOperation(value = "Register input of a radio.",
+            notes = "Radio inputs register their own inputs here for persistence after they successfully launched it.")
+    @Path("/{radioId}/inputs")
+    @ApiResponses(value = {
+            @ApiResponse(code = 404, message = "Radio not found."),
+            @ApiResponse(code = 400, message = "Missing or invalid configuration")
+    })
+    public Response registerInput(@ApiParam(title = "JSON body", required = true) String body,
+                                @ApiParam(title = "radioId", required = true) @PathParam("radioId") String radioId) {
+        Node radio = Node.byNodeId(core, radioId);
+
+        if (radio == null) {
+            LOG.error("Radio <{}> not found.", radioId);
+            throw new WebApplicationException(404);
+        }
+
+        RegisterInputRequest rir;
+        try {
+            rir = objectMapper.readValue(body, RegisterInputRequest.class);
+        } catch(IOException e) {
+            LOG.error("Error while parsing JSON", e);
+            throw new WebApplicationException(e, Response.Status.BAD_REQUEST);
+        }
+
+        Map<String, Object> inputData = Maps.newHashMap();
+        inputData.put("input_id", rir.inputId);
+        inputData.put("title", rir.title);
+        inputData.put("type", rir.type);
+        inputData.put("creator_user_id", rir.creatorUserId);
+        inputData.put("configuration", rir.configuration);
+        inputData.put("created_at", new DateTime(DateTimeZone.UTC));
+        inputData.put("radio_id", rir.radioId);
+
+        Input mongoInput = new Input(core, inputData);
+
+        // Write to database.
+        ObjectId id;
+        try {
+            id = mongoInput.save();
+        } catch (ValidationException e) {
+            LOG.error("Validation error.", e);
+            throw new WebApplicationException(e, Response.Status.BAD_REQUEST);
+        }
+
+        Map<String, Object> result = Maps.newHashMap();
+        result.put("persist_id", id.toStringMongod());
+
+        return Response.status(Response.Status.CREATED).entity(json(result)).build();
+    }
+
+    @GET @Timed
+    @ApiOperation(value = "Persisted inputs of a radio.",
+            notes = "This is returning the configured persisted inputs of a radio node. This is *not* returning the actually " +
+                    "running inputs on a radio node. Radio nodes use this resource to get their configured inputs on startup.")
+    @Path("/{radioId}/inputs")
+    @ApiResponses(value = {
+            @ApiResponse(code = 404, message = "Radio not found.")
+    })
+    public String persistedInputs(@ApiParam(title = "radioId", required = true) @PathParam("radioId") String radioId) {
+        Node radio = Node.byNodeId(core, radioId);
+
+        if (radio == null) {
+            LOG.error("Radio <{}> not found.", radioId);
+            throw new WebApplicationException(404);
+        }
+
+        Map<String, Object> result = Maps.newHashMap();
+        List<Map<String, Object>> inputs = Lists.newArrayList();
+
+        for (Input input : Input.allOfRadio(core, radio)) {
+            Map<String, Object> inputSummary = Maps.newHashMap();
+
+            inputSummary.put("type", input.getType());
+            inputSummary.put("id", input.getId().toStringMongod());
+            inputSummary.put("title", input.getTitle());
+            inputSummary.put("configuration", input.getConfiguration());
+            inputSummary.put("creator_user_id", input.getCreatorUserId());
+            inputSummary.put("created_at", Tools.getISO8601String(input.getCreatedAt()));
+
+            inputs.add(inputSummary);
+        }
+
+        result.put("inputs", inputs);
+        result.put("total", inputs.size());
+
+        return json(result);
     }
 
     @PUT @Timed

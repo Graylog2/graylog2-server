@@ -47,12 +47,12 @@ public class GELFTCPInput extends GELFInputBase {
     public void launch() throws MisfireException {
         // Register throughput counter gauges.
         for(Map.Entry<String,Gauge<Long>> gauge : throughputCounter.gauges().entrySet()) {
-            core.metrics().register(MetricRegistry.name(getUniqueReadableId(), gauge.getKey()), gauge.getValue());
+            graylogServer.metrics().register(MetricRegistry.name(getUniqueReadableId(), gauge.getKey()), gauge.getValue());
         }
 
         // Register connection counter gauges.
-        core.metrics().register(MetricRegistry.name(getUniqueReadableId(), "open_connections"), connectionCounter.gaugeCurrent());
-        core.metrics().register(MetricRegistry.name(getUniqueReadableId(), "total_connections"), connectionCounter.gaugeTotal());
+        graylogServer.metrics().register(MetricRegistry.name(getUniqueReadableId(), "open_connections"), connectionCounter.gaugeCurrent());
+        graylogServer.metrics().register(MetricRegistry.name(getUniqueReadableId(), "total_connections"), connectionCounter.gaugeTotal());
 
         final ExecutorService bossThreadPool = Executors.newCachedThreadPool(
                 new ThreadFactoryBuilder()
@@ -68,7 +68,7 @@ public class GELFTCPInput extends GELFInputBase {
                 new NioServerSocketChannelFactory(bossThreadPool, workerThreadPool)
         );
 
-        bootstrap.setPipelineFactory(new GELFTCPPipelineFactory(core, this, throughputCounter, connectionCounter));
+        bootstrap.setPipelineFactory(new GELFTCPPipelineFactory(graylogServer, this, throughputCounter, connectionCounter));
 
         try {
             channel = ((ServerBootstrap) bootstrap).bind(socketAddress);

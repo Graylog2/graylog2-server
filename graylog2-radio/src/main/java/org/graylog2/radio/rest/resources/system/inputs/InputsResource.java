@@ -102,10 +102,12 @@ public class InputsResource extends RestResource {
         MessageInput input;
         try {
             input = InputRegistry.factory(lr.type);
-            input.configure(inputConfig, radio);
+            input.initialize(inputConfig, radio);
             input.setTitle(lr.title);
             input.setCreatorUserId(lr.creatorUserId);
             input.setCreatedAt(createdAt);
+
+            input.checkConfiguration();
         } catch (NoSuchInputTypeException e) {
             LOG.error("There is no such input type registered.", e);
             throw new WebApplicationException(e, Response.Status.NOT_FOUND);
@@ -115,7 +117,6 @@ public class InputsResource extends RestResource {
         }
 
         String inputId = UUID.randomUUID().toString();
-
 
         // Don't run if exclusive and another instance is already running.
         if (input.isExclusive() && radio.inputs().hasTypeRunning(input.getClass())) {

@@ -42,8 +42,6 @@ public class LocalMetricsInput extends MessageInput {
 
     public static final String NAME = "Internal metrics reporter";
 
-    private Configuration config;
-    private InputHost graylogServer;
     private Graylog2Reporter reporter;
 
     private static final String CK_REPORT_INTERVAL = "report_interval";
@@ -53,22 +51,19 @@ public class LocalMetricsInput extends MessageInput {
     private static final String CK_SOURCE = "source";
 
     @Override
-    public void configure(Configuration config, InputHost graylogServer) throws ConfigurationException {
-        this.config = config;
-        this.graylogServer = graylogServer;
-
+    public void checkConfiguration() throws ConfigurationException {
         reporter = Graylog2Reporter.forRegistry(graylogServer.metrics())
-                            .useSource(config.getString(CK_SOURCE))
-                            .convertDurationsTo(TimeUnit.valueOf(config.getString(CK_DURATION_UNIT)))
-                            .convertRatesTo(TimeUnit.valueOf(config.getString(CK_RATE_UNIT)))
+                            .useSource(configuration.getString(CK_SOURCE))
+                            .convertDurationsTo(TimeUnit.valueOf(configuration.getString(CK_DURATION_UNIT)))
+                            .convertRatesTo(TimeUnit.valueOf(configuration.getString(CK_RATE_UNIT)))
                             .build(new InProcessMessageWriter(graylogServer, this));
     }
 
     @Override
     public void launch() throws MisfireException {
         reporter.start(
-                config.getInt(CK_REPORT_INTERVAL),
-                TimeUnit.valueOf(config.getString(CK_REPORT_UNIT))
+                configuration.getInt(CK_REPORT_INTERVAL),
+                TimeUnit.valueOf(configuration.getString(CK_REPORT_UNIT))
         );
     }
 
@@ -148,7 +143,7 @@ public class LocalMetricsInput extends MessageInput {
 
     @Override
     public Map<String, Object> getAttributes() {
-        return config.getSource();
+        return configuration.getSource();
     }
 
     @Override

@@ -80,6 +80,10 @@ public class Ping {
 
         @Override
         public void run() {
+            ping();
+        }
+
+        public void ping() {
             LOG.debug("Updating (ping) this radio instance [{}] in the Graylog2 cluster at [{}]", nodeId, serverUri);
             try {
                 Ping.ping(httpClient, serverUri, ourUri, nodeId);

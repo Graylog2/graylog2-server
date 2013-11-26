@@ -42,14 +42,11 @@ public class RadioInput extends KafkaInput {
     public static final String NAME = "Graylog2 Radio Input";
 
     @Override
-    public void configure(Configuration config, InputHost graylogServer) throws ConfigurationException {
-        this.server = graylogServer;
-        this.config = config;
+    public void checkConfiguration() throws ConfigurationException {
+        configuration.setString(CK_TOPIC_FILTER, "^graylog2-radio-messages$");
 
-        this.config.setString(CK_TOPIC_FILTER, "^graylog2-radio-messages$");
-
-        if (!checkConfig(config)) {
-            throw new ConfigurationException(config.getSource().toString());
+        if (!checkConfig(configuration)) {
+            throw new ConfigurationException(configuration.getSource().toString());
         }
     }
 
@@ -109,7 +106,7 @@ public class RadioInput extends KafkaInput {
 
     @Override
     public Map<String, Object> getAttributes() {
-        return config.getSource();
+        return configuration.getSource();
     }
 
     @Override
