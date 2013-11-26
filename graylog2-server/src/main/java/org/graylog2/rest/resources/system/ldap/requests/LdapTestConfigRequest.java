@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 TORCH UG
+ * Copyright 2013 TORCH GmbH
  *
  * This file is part of Graylog2.
  *
@@ -16,30 +16,24 @@
  * You should have received a copy of the GNU General Public License
  * along with Graylog2.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.graylog2.rest.resources.system.requests;
+package org.graylog2.rest.resources.system.ldap.requests;
 
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 
 import java.net.URI;
 
 @JsonAutoDetect
-public class LdapSettingsRequest {
-
-    public boolean enabled;
-
-    public String systemUsername;
-
-    public String systemPassword;
-
-    public URI ldapUri;
-
-    public boolean useStartTls;
+public class LdapTestConfigRequest {
 
     public boolean activeDirectory;
-
+    public URI ldapUri;
+    public String systemUsername;
+    public String systemPassword;
+    public boolean useStartTls;
     public String searchBase;
-
     public String searchPattern;
+    public String principal;
+    public String password;
 
-    public String displayNameAttribute;
+    public boolean testConnectOnly;
 }

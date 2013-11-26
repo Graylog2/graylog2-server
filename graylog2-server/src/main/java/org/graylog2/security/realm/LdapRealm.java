@@ -87,8 +87,8 @@ public class LdapRealm extends AbstractLdapRealm {
             }
             setUrl(settings.getUri().toString());
             setSearchBase(settings.getSearchBase());
-            principalSearchPattern = settings.getPrincipalSearchPattern();
-            usernameAttribute = settings.getUsernameAttribute();
+            principalSearchPattern = settings.getSearchPattern();
+            usernameAttribute = settings.getDisplayNameAttribute();
             enabled = settings.isEnabled();
             // TODO validation of principalSearchPattern etc
         } catch (Exception e) {
@@ -116,10 +116,10 @@ public class LdapRealm extends AbstractLdapRealm {
                 return null;
             }
             final LdapContext ldapContext = ldapContextFactory.getSystemLdapContext();
-            entry = ldapConnector.searchPrincipal(ldapContext,
-                                                  searchBase,
-                                                  principalSearchPattern,
-                                                  token.getPrincipal().toString());
+            entry = ldapConnector._searchPrincipal(ldapContext,
+                                                   searchBase,
+                                                   principalSearchPattern,
+                                                   token.getPrincipal().toString());
         } finally {
             readLock.unlock();
         }

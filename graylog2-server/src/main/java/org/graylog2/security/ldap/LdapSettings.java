@@ -40,9 +40,11 @@ public class LdapSettings extends Persisted {
     public static final String SYSTEM_USERNAME = "system_username";
     public static final String SYSTEM_PASSWORD = "system_password";
     public static final String LDAP_URI = "ldap_uri";
-    public static final String PRINCIPAL_SEARCH_PATTERN = "principal_search_pattern";
+    public static final String SEARCH_PATTERN = "principal_search_pattern";
     public static final String SEARCH_BASE = "search_base";
-    public static final String USERNAME_ATTRIBUTE = "username_attribute";
+    public static final String DISPLAY_NAME_ATTRIBUTE = "username_attribute";
+    public static final String USE_START_TLS = "use_start_tls";
+    public static final String ACTIVE_DIRECTORY = "active_directory";
 
     public LdapSettings(Core core) {
         super(core, Maps.<String, Object>newHashMap());
@@ -123,22 +125,22 @@ public class LdapSettings extends Persisted {
         fields.put(SEARCH_BASE, searchBase);
     }
 
-    public String getPrincipalSearchPattern() {
-        final Object o = fields.get(PRINCIPAL_SEARCH_PATTERN);
+    public String getSearchPattern() {
+        final Object o = fields.get(SEARCH_PATTERN);
         return o != null ? o.toString() : "";
     }
 
-    public void setPrincipalSearchPattern(String principalSearchPattern) {
-        fields.put(PRINCIPAL_SEARCH_PATTERN, principalSearchPattern);
+    public void setSearchPattern(String searchPattern) {
+        fields.put(SEARCH_PATTERN, searchPattern);
     }
 
-    public String getUsernameAttribute() {
-        final Object o = fields.get(USERNAME_ATTRIBUTE);
+    public String getDisplayNameAttribute() {
+        final Object o = fields.get(DISPLAY_NAME_ATTRIBUTE);
         return o != null ? o.toString() : "";
     }
 
-    public void setUsernameAttribute(String usernameAttribute) {
-        fields.put(USERNAME_ATTRIBUTE, usernameAttribute);
+    public void setDisplayNameAttribute(String displayNameAttribute) {
+        fields.put(DISPLAY_NAME_ATTRIBUTE, displayNameAttribute);
     }
 
     public boolean isEnabled() {
@@ -149,4 +151,23 @@ public class LdapSettings extends Persisted {
     public void setEnabled(boolean enabled) {
         fields.put(ENABLED, enabled);
     }
+
+    public void setUseStartTls(boolean useStartTls) {
+        fields.put(USE_START_TLS, useStartTls);
+    }
+
+    public boolean isUseStartTls() {
+        final Object o = fields.get(USE_START_TLS);
+        return o != null ? Boolean.valueOf(o.toString()) : false;
+    }
+
+    public void setActiveDirectory(boolean activeDirectory) {
+        fields.put(ACTIVE_DIRECTORY, activeDirectory);
+    }
+
+    public boolean isActiveDirectory() {
+        final Object o = fields.get(ACTIVE_DIRECTORY);
+        return o != null ? Boolean.valueOf(o.toString()) : false;
+    }
+
 }

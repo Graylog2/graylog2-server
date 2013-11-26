@@ -17,6 +17,10 @@
 	<logger name="org.apache.shiro">
         <level value="info" />
 	</logger>
+    <!-- this emits a harmless warning for ActiveDirectory every time which we can't work around :( -->
+    <logger name="org.apache.directory.api.ldap.model.message.BindRequestImpl">
+        <level value="error" />
+    </logger>
 	<!-- Root Logger -->
 	<root>
 		<priority value="warn" />

@@ -33,16 +33,12 @@ import org.graylog2.Core;
 import org.graylog2.jersey.container.netty.SecurityContextFactory;
 import org.graylog2.security.ldap.LdapConnector;
 import org.graylog2.security.realm.GraylogSimpleAccountRealm;
-import org.graylog2.security.realm.LdapRealm;
 import org.graylog2.security.realm.MongoDbRealm;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.ws.rs.core.SecurityContext;
 
-/**
- * @author Kay Roepke <kay@torch.sh>
- */
 public class ShiroSecurityContextFactory implements SecurityContextFactory {
     private static final Logger log = LoggerFactory.getLogger(ShiroSecurityContextFactory.class);
     private DefaultSecurityManager sm;
@@ -60,12 +56,14 @@ public class ShiroSecurityContextFactory implements SecurityContextFactory {
         mongoDbRealm.setCredentialsMatcher(new HashedCredentialsMatcher("SHA-1"));
         mongoDbRealm.setCachingEnabled(false);
 
-        final LdapRealm ldapRealm = new LdapRealm(core, new LdapConnector(core));
-        // the incoming password is always SHA-256 hashed, so we will re-hash whatever comes from LDAP, too.
-        ldapRealm.setCredentialsMatcher(new HashedCredentialsMatcher("SHA-256"));
-        ldapRealm.setCachingEnabled(false);
+        final LdapConnector ldapConnector = new LdapConnector(core);
+        core.setLdapConnector(ldapConnector);
+//        final LdapRealm ldapRealm = new LdapRealm(core, ldapConnector);
+//        // the incoming password is always SHA-256 hashed, so we will re-hash whatever comes from LDAP, too.
+//        ldapRealm.setCredentialsMatcher(new HashedCredentialsMatcher("SHA-256"));
+//        ldapRealm.setCachingEnabled(false);
 
-        sm = new DefaultSecurityManager(Lists.<Realm>newArrayList(ldapRealm, mongoDbRealm, inMemoryRealm));
+        sm = new DefaultSecurityManager(Lists.<Realm>newArrayList(mongoDbRealm, inMemoryRealm));
         final DefaultSubjectDAO subjectDAO = new DefaultSubjectDAO();
         final DefaultSessionStorageEvaluator sessionStorageEvaluator = new DefaultSessionStorageEvaluator();
         sessionStorageEvaluator.setSessionStorageEnabled(false);

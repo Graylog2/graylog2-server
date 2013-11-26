@@ -211,8 +211,22 @@ public class Generator {
             }
         });
 
+        // TODO so hardcode, much sucke, wow.
+        // this needs to be dynamic, obviously.
+        Map<String, Object> models = Maps.newHashMap();
+        Map<String, Object> ldapTestConfigRequest = Maps.newHashMap();
+        ldapTestConfigRequest.put("id", "LdapTestConfigRequest");
+        ldapTestConfigRequest.put("properties", Maps.newHashMap());
+        models.put("LdapTestConfigRequest", ldapTestConfigRequest);
+
+        Map<String, Object> ldapTestConfigResponse = Maps.newHashMap();
+        ldapTestConfigResponse.put("id", "LdapTestConfigResponse");
+        ldapTestConfigResponse.put("properties", Maps.newHashMap());
+        models.put("LdapTestConfigResponse", ldapTestConfigResponse);
+
         result.put("apis", apis);
         result.put("basePath", basePath);
+        result.put("models", models);
         result.put("resourcePath", cleanRoute(route));
         result.put("apiVersion", Core.GRAYLOG2_VERSION);
         result.put("swaggerVersion", EMULATED_SWAGGER_VERSION);
@@ -239,6 +253,8 @@ public class Generator {
                         parameter.put("type", "string");
                     } else if(parameterClass.equals(int.class) || parameterClass.equals(Integer.class)) {
                         parameter.put("type", "integer");
+                    } else {
+                        parameter.put("type", method.getParameterTypes()[i].getSimpleName());
                     }
                 }
 
