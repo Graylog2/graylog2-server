@@ -22,8 +22,15 @@ import com.google.gson.annotations.SerializedName;
 import models.api.requests.ApiRequest;
 
 public class LdapSettingsRequest extends ApiRequest {
+
     @SerializedName("enabled")
     public boolean enabled;
+
+    @SerializedName("active_directory")
+    public boolean activeDirectory;
+
+    @SerializedName("ldap_uri")
+    public String ldapUri;
 
     @SerializedName("system_username")
     public String systemUsername;
@@ -31,16 +38,16 @@ public class LdapSettingsRequest extends ApiRequest {
     @SerializedName("system_password")
     public String systemPassword;
 
-    @SerializedName("ldap_uri")
-    public String ldapUri;
+    @SerializedName("use_start_tls")
+    public boolean useStartTls;
 
     @SerializedName("search_base")
     public String searchBase;
 
-    @SerializedName("principal_search_pattern")
-    public String principalSearchPattern;
+    @SerializedName("search_pattern")
+    public String searchPattern;
 
-    @SerializedName("username_attribute")
-    public String usernameAttribute;
+    @SerializedName("display_name_attribute")
+    public String displayNameAttribute;
 
 }

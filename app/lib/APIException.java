@@ -22,6 +22,7 @@ import com.google.common.base.Splitter;
 import com.ning.http.client.Request;
 import com.ning.http.client.Response;
 
+import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.Iterator;
@@ -80,6 +81,10 @@ public class APIException extends Exception {
             sb.append(" returned");
             sb.append(' ');
             sb.append(response.getStatusCode()).append(' ').append(response.getStatusText());
+            try {
+                String body = response.getResponseBody();
+                sb.append(" body: ").append(body);
+            } catch (IOException ignored) {}
         }
         return sb.toString();
     }

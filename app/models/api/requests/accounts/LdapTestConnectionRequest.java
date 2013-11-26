@@ -23,6 +23,9 @@ import models.api.requests.ApiRequest;
 
 public class LdapTestConnectionRequest extends ApiRequest {
 
+    @SerializedName("active_directory")
+    public boolean isActiveDirectory;
+
     @SerializedName("ldap_uri")
     public String ldapUri;
 
@@ -32,4 +35,21 @@ public class LdapTestConnectionRequest extends ApiRequest {
     @SerializedName("system_password")
     public String systemPassword;
 
+    @SerializedName("use_start_tls")
+    public boolean useStartTls;
+
+    @SerializedName("test_connect_only")
+    public boolean testConnectOnly;
+
+    @SerializedName("search_base")
+    public String searchBase;
+
+    @SerializedName("search_pattern")
+    public String searchPattern;
+
+    @SerializedName("principal")
+    public String principal;
+
+    @SerializedName("password")
+    public String password;
 }

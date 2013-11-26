@@ -51,9 +51,11 @@ public class LdapSettings {
         response.setSystemUsername(request.systemUsername);
         response.setSystemPassword(request.systemPassword);
         response.setLdapUri(URI.create(request.ldapUri));
-        response.setPrincipalSearchPattern(request.principalSearchPattern);
+        response.setSearchPattern(request.searchPattern);
         response.setSearchBase(request.searchBase);
-        response.setUsernameAttribute(request.usernameAttribute);
+        response.setDisplayNameAttribute(request.displayNameAttribute);
+        response.setActiveDirectory(request.activeDirectory);
+        response.setUseStartTls(request.useStartTls);
         this.response = response;
     }
 
@@ -78,9 +80,11 @@ public class LdapSettings {
         request.systemUsername = getSystemUsername();
         request.systemPassword = getSystemPassword();
         request.ldapUri = getLdapUri().toString();
-        request.principalSearchPattern = getPrincipalSearchPattern();
+        request.searchPattern = getSearchPattern();
         request.searchBase = getSearchBase();
-        request.usernameAttribute = getUsernameAttribute();
+        request.displayNameAttribute = getDisplayNameAttribute();
+        request.activeDirectory = isActiveDirectory();
+        request.useStartTls = isUseStartTls();
         return request;
     }
 
@@ -106,28 +110,33 @@ public class LdapSettings {
         return response.isEnabled();
     }
 
-    public void setUsernameAttribute(String usernameAttribute) {
-        response.setUsernameAttribute(usernameAttribute);
+    public void setEnabled(boolean enabled) {
+        response.setEnabled(enabled);
     }
+
 
     public String getSystemPassword() {
         return response.getSystemPassword();
     }
 
-    public void setPrincipalSearchPattern(String principalSearchPattern) {
-        response.setPrincipalSearchPattern(principalSearchPattern);
+    public void setSearchPattern(String searchPattern) {
+        response.setSearchPattern(searchPattern);
     }
 
-    public String getUsernameAttribute() {
-        return response.getUsernameAttribute();
+    public String getDisplayNameAttribute() {
+        return response.getDisplayNameAttribute();
+    }
+
+    public void setDisplayUsername(String systemUsername) {
+        response.setSystemUsername(systemUsername);
     }
 
     public void setSearchBase(String searchBase) {
         response.setSearchBase(searchBase);
     }
 
-    public String getPrincipalSearchPattern() {
-        return response.getPrincipalSearchPattern();
+    public String getSearchPattern() {
+        return response.getSearchPattern();
     }
 
     public String getSystemUsername() {
@@ -150,11 +159,20 @@ public class LdapSettings {
         response.setLdapUri(ldapUri);
     }
 
-    public void setEnabled(boolean enabled) {
-        response.setEnabled(enabled);
+    public void setUseStartTls(boolean useStartTls) {
+        response.setUseStartTls(useStartTls);
     }
 
-    public void setSystemUsername(String systemUsername) {
-        response.setSystemUsername(systemUsername);
+    public boolean isUseStartTls() {
+        return response.isUseStartTls();
     }
+
+    public void setActiveDirectory(boolean activeDirectory) {
+        response.setActiveDirectory(activeDirectory);
+    }
+
+    public boolean isActiveDirectory() {
+        return response.isActiveDirectory();
+    }
+
 }

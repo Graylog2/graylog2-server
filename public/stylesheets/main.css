@@ -1365,3 +1365,11 @@ table#users-list td.centered {
 h2.radios-head {
     margin-top: 15px;
 }
+
+.ldap-success {
+    color: #008000;
+}
+
+.ldap-failure {
+    color: #800000;
+}

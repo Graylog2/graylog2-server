@@ -38,11 +38,17 @@ public class LdapSettingsResponse {
     @SerializedName("search_base")
     private String searchBase;
 
-    @SerializedName("principal_search_pattern")
-    private String principalSearchPattern;
+    @SerializedName("search_pattern")
+    private String searchPattern;
 
-    @SerializedName("username_attribute")
-    private String usernameAttribute;
+    @SerializedName("display_name_attribute")
+    private String displayNameAttribute;
+
+    @SerializedName("active_directory")
+    private boolean activeDirectory;
+
+    @SerializedName("use_start_tls")
+    private boolean useStartTls;
 
     public boolean isEnabled() {
         return enabled;
@@ -84,19 +90,35 @@ public class LdapSettingsResponse {
         this.searchBase = searchBase;
     }
 
-    public String getPrincipalSearchPattern() {
-        return principalSearchPattern;
+    public String getSearchPattern() {
+        return searchPattern;
     }
 
-    public void setPrincipalSearchPattern(String principalSearchPattern) {
-        this.principalSearchPattern = principalSearchPattern;
+    public void setSearchPattern(String searchPattern) {
+        this.searchPattern = searchPattern;
     }
 
-    public String getUsernameAttribute() {
-        return usernameAttribute;
+    public String getDisplayNameAttribute() {
+        return displayNameAttribute;
     }
 
-    public void setUsernameAttribute(String usernameAttribute) {
-        this.usernameAttribute = usernameAttribute;
+    public void setDisplayNameAttribute(String displayNameAttribute) {
+        this.displayNameAttribute = displayNameAttribute;
+    }
+
+    public void setActiveDirectory(boolean activeDirectory) {
+        this.activeDirectory = activeDirectory;
+    }
+
+    public boolean isActiveDirectory() {
+        return activeDirectory;
+    }
+
+    public void setUseStartTls(boolean useStartTls) {
+        this.useStartTls = useStartTls;
+    }
+
+    public boolean isUseStartTls() {
+        return useStartTls;
     }
 }

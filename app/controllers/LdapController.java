@@ -25,9 +25,7 @@ import models.accounts.LdapSettings;
 import models.accounts.LdapSettingsService;
 import models.api.requests.accounts.LdapSettingsRequest;
 import models.api.requests.accounts.LdapTestConnectionRequest;
-import models.api.requests.accounts.LdapTestLoginRequest;
 import models.api.responses.accounts.LdapConnectionTestResponse;
-import models.api.responses.accounts.LdapLoginTestResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import play.data.DynamicForm;
@@ -38,6 +36,7 @@ import javax.ws.rs.core.MediaType;
 import java.io.IOException;
 import java.util.Map;
 
+import static com.google.common.base.Objects.firstNonNull;
 import static play.data.Form.form;
 
 public class LdapController extends AuthenticatedController {
@@ -63,18 +62,16 @@ public class LdapController extends AuthenticatedController {
     }
 
     public Result apiTestLdapConnection() {
-        final DynamicForm dynamicForm = form().bindFromRequest("url", "systemUsername", "systemPassword");
+        final DynamicForm dynamicForm = form().bindFromRequest("url", "systemUsername", "systemPassword", "ldapType", "useStartTls");
         final Map<String, String> formData = dynamicForm.data();
-        log.warn("trying " + formData);
         LdapConnectionTestResponse result;
         try {
-            final LdapTestConnectionRequest request = new LdapTestConnectionRequest();
-            request.ldapUri = formData.get("url");
-            request.systemUsername = formData.get("systemUsername");
-            request.systemPassword = formData.get("systemPassword");
-            result = api().post(LdapConnectionTestResponse.class).path("/system/ldap/testconnection").body(request).execute();
+            final LdapTestConnectionRequest request = getLdapTestConnectionRequest(formData);
+            request.testConnectOnly = true;
+            result = api().post(LdapConnectionTestResponse.class).path("/system/ldap/test").body(request).execute();
         } catch (APIException e) {
             // couldn't connect
+            log.error("Unable to test connection: {}", e.getMessage());
             return internalServerError();
         } catch (IOException e) {
             log.error("Unable to connect", e);
@@ -84,29 +81,40 @@ public class LdapController extends AuthenticatedController {
     }
 
     public Result apiTestLdapLogin() {
-        final DynamicForm dynamicForm = form().bindFromRequest("url", "systemUsername", "systemPassword", "searchBase",
-                "principalSearchPattern", "usernameAttribute", "testUsername", "testPassword");
+        final DynamicForm dynamicForm = form().bindFromRequest(
+                "url", "systemUsername", "systemPassword", "ldapType", "useStartTls",
+                "searchBase", "searchPattern", "principal", "password");
         final Map<String, String> formData = dynamicForm.data();
 
-        LdapLoginTestResponse result;
+        LdapConnectionTestResponse result;
         try {
-            LdapTestLoginRequest request = new LdapTestLoginRequest();
-            request.ldapUri = formData.get("url");
-            request.systemUsername = formData.get("systemUsername");
-            request.systemPassword = formData.get("systemPassword");
+            final LdapTestConnectionRequest request = getLdapTestConnectionRequest(formData);
+            // also try to login, don't just test the connection
+            request.testConnectOnly = false;
+
             request.searchBase = formData.get("searchBase");
-            request.principalSearchPattern = formData.get("principalSearchPattern");
-            request.usernameAttribute = formData.get("usernameAttribute");
-            request.testUsername = formData.get("testUsername");
-            request.testPassword = formData.get("testPassword");
-            result = api().post(LdapLoginTestResponse.class).path("/system/ldap/testlogin").body(request).execute();
+            request.searchPattern = formData.get("searchPattern");
+            request.principal = formData.get("principal");
+            request.password = formData.get("password");
+            result = api().post(LdapConnectionTestResponse.class).path("/system/ldap/test").body(request).execute();
         } catch (APIException e) {
+            log.error("Unable to test login: {}", e.getMessage());
             return internalServerError();
         } catch (IOException e) {
             log.error("Unable to connect", e);
             return internalServerError();
         }
         return ok(new Gson().toJson(result)).as(MediaType.APPLICATION_JSON);
+    }
+
+    private LdapTestConnectionRequest getLdapTestConnectionRequest(Map<String, String> formData) {
+        final LdapTestConnectionRequest request = new LdapTestConnectionRequest();
+        request.ldapUri = formData.get("url");
+        request.systemUsername = formData.get("systemUsername");
+        request.systemPassword = formData.get("systemPassword");
+        request.isActiveDirectory = firstNonNull(formData.get("ldapType"), "ldap").equalsIgnoreCase("ad");
+        request.useStartTls = firstNonNull(formData.get("useStartTls"), "false").equals("true");
+        return request;
     }
 
     public Result saveLdapSettings() {
