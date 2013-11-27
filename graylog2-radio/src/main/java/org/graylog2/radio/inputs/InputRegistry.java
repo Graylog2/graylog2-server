@@ -200,6 +200,19 @@ public class InputRegistry {
         }
     }
 
+    public void unregisterInCluster(MessageInput input) throws ExecutionException, InterruptedException, IOException {
+        final UriBuilder uriBuilder = UriBuilder.fromUri(radio.getConfiguration().getGraylog2ServerUri());
+        uriBuilder.path("/system/radios/" + radio.getNodeId() + "/inputs/" + input.getPersistId());
+
+        Future<Response> f = radio.getHttpClient().prepareDelete(uriBuilder.build().toString()).execute();
+
+        Response r = f.get();
+
+        if (r.getStatusCode() != 204) {
+            throw new RuntimeException("Expected HTTP response [204] for input unregistration but got [" + r.getStatusCode() + "].");
+        }
+    }
+
     // TODO make this use a generic ApiClient class that knows the graylog2-server node address(es) or something.
     public List<InputSummaryResponse> getAllPersisted() throws ExecutionException, InterruptedException, IOException {
         final UriBuilder uriBuilder = UriBuilder.fromUri(radio.getConfiguration().getGraylog2ServerUri());
@@ -227,4 +240,5 @@ public class InputRegistry {
     public Map<String, String> getAvailableInputs() {
         return availableInputs;
     }
+
 }

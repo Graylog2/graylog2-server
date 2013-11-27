@@ -22,6 +22,8 @@ package org.graylog2.rest.resources.system.radio;
 import com.codahale.metrics.annotation.Timed;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
+import com.mongodb.BasicDBObject;
+import com.mongodb.DBObject;
 import org.bson.types.ObjectId;
 import org.graylog2.cluster.Node;
 import org.graylog2.database.ValidationException;
@@ -142,6 +144,31 @@ public class RadiosResource extends RestResource {
         return Response.status(Response.Status.CREATED).entity(json(result)).build();
     }
 
+    @DELETE @Timed
+    @ApiOperation(value = "Unregister input of a radio.",
+            notes = "Radios unregister their inputs when they are stopped/terminated on the radio.")
+    @Path("/{radioId}/inputs/{inputId}")
+    @ApiResponses(value = {
+            @ApiResponse(code = 404, message = "Radio not found.")
+    })
+    public Response unregisterInput(@ApiParam(title = "radioId", required = true) @PathParam("radioId") String radioId,
+                                    @ApiParam(title = "inputId", required = true) @PathParam("inputId") String inputId) {
+        Node radio = Node.byNodeId(core, radioId);
+
+        if (radio == null) {
+            LOG.error("Radio <{}> not found.", radioId);
+            throw new WebApplicationException(404);
+        }
+
+        DBObject query = new BasicDBObject();
+        query.put("_id", new ObjectId(inputId));
+        query.put("radio_id", radioId);
+
+        Input.destroy(query, core, Input.COLLECTION);
+
+        return Response.status(Response.Status.NO_CONTENT).build();
+    }
+
     @GET @Timed
     @ApiOperation(value = "Persisted inputs of a radio.",
             notes = "This is returning the configured persisted inputs of a radio node. This is *not* returning the actually " +
@@ -179,6 +206,7 @@ public class RadiosResource extends RestResource {
 
         return json(result);
     }
+
 
     @PUT @Timed
     @ApiOperation(value = "Ping - Accepts pings of graylog2-radio nodes.",
