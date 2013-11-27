@@ -27,7 +27,8 @@ import org.graylog2.plugin.Version;
 public class RadioVersion {
 
     public static final Version vDEV = new Version(0, 20, 0, "dev");
+    public static final Version v0_20_0_PREVIEW_7 = new Version(0, 20, 0, "preview.7");
 
-    public static final Version VERSION = vDEV;
+    public static final Version VERSION = v0_20_0_PREVIEW_7;
 
 }
