@@ -27,10 +27,12 @@ import com.google.inject.assistedinject.AssistedInject;
 import lib.APIException;
 import lib.ApiClient;
 import lib.ExclusiveInputException;
+import lib.metrics.Metric;
 import models.api.requests.InputLaunchRequest;
 import models.api.responses.BuffersResponse;
 import models.api.responses.SystemOverviewResponse;
 import models.api.responses.cluster.RadioSummaryResponse;
+import models.api.responses.metrics.MetricsListResponse;
 import models.api.responses.system.*;
 import org.joda.time.DateTime;
 import org.slf4j.LoggerFactory;
@@ -273,6 +275,16 @@ public class Radio extends ClusterEntity {
             log.error("Could not load throughput for radio " + this, e);
         }
         return 0;
+    }
+
+    public Map<String, Metric> getMetrics(String namespace) throws APIException, IOException {
+        MetricsListResponse response = api.get(MetricsListResponse.class)
+                .radio(this)
+                .path("/system/metrics/namespace/{0}", namespace)
+                .expect(200, 404)
+                .execute();
+
+        return response.getMetrics();
     }
 
     @Override

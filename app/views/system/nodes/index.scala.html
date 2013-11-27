@@ -119,7 +119,7 @@
                         </a>
                         <ul class="dropdown-menu">
                             <li><a href="@routes.InputsController.manageRadio(radio.getId)">Manage inputs</a></li>
-                            <li class="disabled"><a href="#">Metrics</a></li>
+                            <li><a href="@routes.MetricsController.ofRadio(radio.getId)">Metrics</a></li>
                             <li><a href="@routes.SystemController.threadDumpRadio(radio.getId)">Get thread dump</a></li>
                         </ul>
                     </div>
@@ -138,7 +138,6 @@
 
                 The JVM is using <strong>@radio.jvm().getUsedMemory.getMegabytes() of @radio.jvm().getTotalMemory.getMegabytes() MB</strong>
                 heap space and will not attempt to use more than <strong>@radio.jvm().getMaxMemory.getMegabytes() MB</strong>.
-
             </div>
         }
     } else {

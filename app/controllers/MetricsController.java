@@ -23,8 +23,10 @@ import com.google.inject.Inject;
 import lib.APIException;
 import lib.ApiClient;
 import lib.BreadcrumbList;
+import models.ClusterEntity;
 import models.Node;
 import models.NodeService;
+import models.Radio;
 import play.mvc.Result;
 
 import java.io.IOException;
@@ -57,5 +59,27 @@ public class MetricsController extends AuthenticatedController {
             return status(404, views.html.errors.error.render(ApiClient.ERROR_MSG_NODE_NOT_FOUND, e, request()));
         }
     }
+
+    public Result ofRadio(String radioId, String preFilter) {
+        try {
+            Radio radio = nodeService.loadRadio(radioId);
+
+            BreadcrumbList bc = new BreadcrumbList();
+            bc.addCrumb("System", routes.SystemController.index(0));
+            bc.addCrumb("Nodes", routes.SystemController.nodes());
+            bc.addCrumb(radio.getShortNodeId(), routes.RadiosController.show(radio.getId()));
+            bc.addCrumb("Metrics", routes.MetricsController.ofRadio(radio.getId(), ""));
+
+            return ok(views.html.system.metrics.of_node.render(currentUser(), bc, radio, radio.getMetrics("org.graylog2"), preFilter));
+        } catch (IOException e) {
+            return status(500, views.html.errors.error.render(ApiClient.ERROR_MSG_IO, e, request()));
+        } catch (APIException e) {
+            String message = "Could not fetch system information. We expected HTTP 200, but got a HTTP " + e.getHttpCode() + ".";
+            return status(500, views.html.errors.error.render(message, e, request()));
+        } catch (NodeService.NodeNotFoundException e) {
+            return status(404, views.html.errors.error.render(ApiClient.ERROR_MSG_NODE_NOT_FOUND, e, request()));
+        }
+    }
+
 
 }

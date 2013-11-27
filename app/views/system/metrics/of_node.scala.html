@@ -1,4 +1,4 @@
-@(currentUser: User, breadcrumbs: lib.BreadcrumbList, node: Node, metrics: Map[String, lib.metrics.Metric], preFilter: String)
+@(currentUser: User, breadcrumbs: lib.BreadcrumbList, node: ClusterEntity, metrics: Map[String, lib.metrics.Metric], preFilter: String)
 
 @main("Metrics", views.html.system.sidebar(), "", currentUser) {
 
