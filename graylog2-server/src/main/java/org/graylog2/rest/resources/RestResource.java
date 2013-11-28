@@ -32,7 +32,6 @@ import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.jaxrs.cfg.EndpointConfigBase;
 import com.fasterxml.jackson.jaxrs.cfg.ObjectWriterInjector;
 import com.fasterxml.jackson.jaxrs.cfg.ObjectWriterModifier;
-import com.fasterxml.jackson.module.mrbean.MrBeanModule;
 import com.google.common.collect.Maps;
 import org.apache.shiro.subject.Subject;
 import org.bson.types.ObjectId;
@@ -73,7 +72,6 @@ public abstract class RestResource {
           */
         objectMapper.configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false);
         objectMapper.setPropertyNamingStrategy(PropertyNamingStrategy.CAMEL_CASE_TO_LOWER_CASE_WITH_UNDERSCORES);
-        objectMapper.registerModule(new MrBeanModule());
     }
 
     @QueryParam("pretty")

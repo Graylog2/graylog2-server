@@ -60,11 +60,11 @@ public class SessionsResource extends RestResource {
         ThreadContext.bind(subject);
 
         try {
-            subject.login(new UsernamePasswordToken(createRequest.getUsername(), createRequest.getPassword()));
+            subject.login(new UsernamePasswordToken(createRequest.username, createRequest.password));
             subject.getSession().setTimeout(TimeUnit.MINUTES.toMillis(5));
             subject.getSession().touch();
         } catch (AuthenticationException e) {
-            log.warn("Unable to log in user " + createRequest.getUsername(), e);
+            log.warn("Unable to log in user " + createRequest.username, e);
         } catch (UnknownSessionException e) {
             subject.logout();
         }
@@ -93,9 +93,10 @@ public class SessionsResource extends RestResource {
     }
 
     @JsonAutoDetect
-    public interface SessionCreateRequest {
-        public String getUsername();
-        public String getPassword();
+    public static class SessionCreateRequest {
+        public SessionCreateRequest(){}
+        public String username;
+        public String password;
     }
 
     @JsonAutoDetect

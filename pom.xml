@@ -172,11 +172,11 @@
             <artifactId>jackson-jaxrs-json-provider</artifactId>
             <version>${jackson.version}</version>
         </dependency>
-        <dependency>
+        <!-- Jersey repackages ASM and this conflicts... :( dependency>
             <groupId>com.fasterxml.jackson.module</groupId>
             <artifactId>jackson-module-mrbean</artifactId>
             <version>${jackson.version}</version>
-        </dependency>
+        </dependency -->
         <dependency>
             <groupId>com.beust</groupId>
             <artifactId>jcommander</artifactId>
