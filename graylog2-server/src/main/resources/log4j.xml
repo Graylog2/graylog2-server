@@ -14,8 +14,14 @@
 	<logger name="org.graylog2">
 		<level value="warn" />
 	</logger>
+    <logger name="org.graylog2.security.realm">
+        <level value="debug"/>
+    </logger>
+    <logger name="org.graylog2.security.MongoDbSessionDAO">
+        <level value="debug"/>
+    </logger>
 	<logger name="org.apache.shiro">
-        <level value="info" />
+        <level value="debug" />
 	</logger>
     <!-- this emits a harmless warning for ActiveDirectory every time which we can't work around :( -->
     <logger name="org.apache.directory.api.ldap.model.message.BindRequestImpl">

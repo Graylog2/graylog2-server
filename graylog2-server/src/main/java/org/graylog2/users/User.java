@@ -38,6 +38,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import static com.google.common.base.Objects.firstNonNull;
+
 
 /**
  * @author Lennart Koopmann <lennart@socketfeed.com>
@@ -176,7 +178,7 @@ public class User extends Persisted {
     }
 
     public String getHashedPassword() {
-        return fields.get(PASSWORD).toString();
+        return firstNonNull(fields.get(PASSWORD), "").toString();
     }
 
     public void setHashedPassword(String hashedPassword) {

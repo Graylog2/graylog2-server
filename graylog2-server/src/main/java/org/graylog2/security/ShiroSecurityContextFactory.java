@@ -27,6 +27,7 @@ import org.apache.shiro.mgt.DefaultSecurityManager;
 import org.apache.shiro.mgt.DefaultSessionStorageEvaluator;
 import org.apache.shiro.mgt.DefaultSubjectDAO;
 import org.apache.shiro.realm.Realm;
+import org.apache.shiro.session.mgt.DefaultSessionManager;
 import org.apache.shiro.subject.Subject;
 import org.graylog2.Configuration;
 import org.graylog2.Core;
@@ -51,9 +52,9 @@ public class ShiroSecurityContextFactory implements SecurityContextFactory {
                 config.getRootUsername(),
                 config.getRootPasswordSha2()
         );
+        inMemoryRealm.setCredentialsMatcher(new HashedCredentialsMatcher("SHA-256"));
 
         final MongoDbRealm mongoDbRealm = new MongoDbRealm(core);
-        mongoDbRealm.setCredentialsMatcher(new HashedCredentialsMatcher("SHA-1"));
         mongoDbRealm.setCachingEnabled(false);
 
         final LdapConnector ldapConnector = new LdapConnector(core);
@@ -66,9 +67,16 @@ public class ShiroSecurityContextFactory implements SecurityContextFactory {
         sm = new DefaultSecurityManager(Lists.<Realm>newArrayList(mongoDbRealm, inMemoryRealm));
         final DefaultSubjectDAO subjectDAO = new DefaultSubjectDAO();
         final DefaultSessionStorageEvaluator sessionStorageEvaluator = new DefaultSessionStorageEvaluator();
-        sessionStorageEvaluator.setSessionStorageEnabled(false);
+        sessionStorageEvaluator.setSessionStorageEnabled(true);
         subjectDAO.setSessionStorageEvaluator(sessionStorageEvaluator);
         sm.setSubjectDAO(subjectDAO);
+
+        final DefaultSessionManager defaultSessionManager = (DefaultSessionManager) sm.getSessionManager();
+        defaultSessionManager.setSessionDAO(new MongoDbSessionDAO(core));
+        defaultSessionManager.setDeleteInvalidSessions(true);
+        // DO NOT USE global session timeout!!! It's fucky.
+        //defaultSessionManager.setGlobalSessionTimeout(TimeUnit.SECONDS.toMillis(5));
+        core.setSecurityManager(sm);
 
         SecurityUtils.setSecurityManager(sm);
     }

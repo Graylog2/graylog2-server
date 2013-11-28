@@ -25,6 +25,7 @@ import com.fasterxml.jackson.jaxrs.json.JacksonJsonProvider;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
+import org.apache.shiro.mgt.DefaultSecurityManager;
 import org.cliffc.high_scale_lib.Counter;
 import org.glassfish.hk2.utilities.binding.AbstractBinder;
 import org.glassfish.jersey.server.ContainerFactory;
@@ -163,6 +164,7 @@ public class Core implements GraylogServer, InputHost {
     private MetricRegistry metricRegistry;
     private LdapRealm ldapRealm;
     private LdapConnector ldapConnector;
+    private DefaultSecurityManager securityManager;
 
     public void initialize(Configuration configuration, MetricRegistry metrics) {
     	startedAt = new DateTime(DateTimeZone.UTC);
@@ -343,6 +345,14 @@ public class Core implements GraylogServer, InputHost {
         return ldapConnector;
     }
 
+    public DefaultSecurityManager getSecurityManager() {
+        return securityManager;
+    }
+
+    public void setSecurityManager(DefaultSecurityManager securityManager) {
+        this.securityManager = securityManager;
+    }
+
     private class Graylog2Binder extends AbstractBinder {
 
         @Override
@@ -376,6 +386,7 @@ public class Core implements GraylogServer, InputHost {
                 .register(ObjectMapperProvider.class)
                 .register(JacksonJsonProvider.class)
                 .registerFinder(new PackageNamesScanner(new String[]{"org.graylog2.rest.resources"}, true));
+
         final NettyContainer jerseyHandler = ContainerFactory.createContainer(NettyContainer.class, rc);
         jerseyHandler.setSecurityContextFactory(new ShiroSecurityContextFactory(this));
 
