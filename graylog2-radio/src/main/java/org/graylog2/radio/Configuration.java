@@ -39,7 +39,7 @@ public class Configuration {
     private String nodeIdFile = "/etc/graylog2-radio-node-id";
 
     @Parameter(value = "rest_listen_uri", required = true)
-    private String restListenUri = "http://127.0.0.1:12900/";
+    private String restListenUri = "http://127.0.0.1:12950/";
 
     @Parameter(value = "graylog2_server_uri", required = true)
     private String graylog2ServerUri;
