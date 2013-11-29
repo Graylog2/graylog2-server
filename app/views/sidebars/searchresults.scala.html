@@ -16,8 +16,6 @@
         @searchResult.getUsedIndices().size()
         @if(searchResult.getUsedIndices().size() == 1) {index} else {indices}</a>.
 
-    @views.html.partials.dashboards.add_to_dashboard.render("search-result-count")
-
 
 @if(searchResult.getTotalResultCount() > 0) {
 <h3>
