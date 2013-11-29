@@ -36,7 +36,7 @@ public class Configuration {
     private static final Logger LOG = LoggerFactory.getLogger(Configuration.class);
 
     @Parameter(value = "node_id_file", required = false)
-    private String nodeIdFile = "graylog2-radio-node-id";
+    private String nodeIdFile = "/etc/graylog2-radio-node-id";
 
     @Parameter(value = "rest_listen_uri", required = true)
     private String restListenUri = "http://127.0.0.1:12900/";
