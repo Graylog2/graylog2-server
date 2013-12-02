@@ -224,11 +224,13 @@ $(document).ready(function() {
     $(".add-stream-rule-to-existing").on("click", function() {
         var streamId = $(this).closest(".stream-row").attr("data-stream-id");
 
+        var modalBody = $(this).closest(".new-stream-rule2").find(".modal-body");
+
         rule = {
-            field: $("#sr-field").val(),
-            type: parseInt($("#sr-type").val()),
-            value: $("#sr-value").val(),
-            inverted: $("#sr-inverted-box").is(":checked")
+            field: $("#sr-field", modalBody).val(),
+            type: parseInt($("#sr-type", modalBody).val()),
+            value: $("#sr-value", modalBody).val(),
+            inverted: $("#sr-inverted-box", modalBody).is(":checked")
         }
 
         /*if (!validate("#sr")) {
@@ -255,6 +257,7 @@ $(document).ready(function() {
 
                 remover = "<a href='#' class='sr-remove'><i class='icon-remove'></i></a>";
                 $("div.well", form).find("ul").append("<li id='rule'>" + field + $("#sr-result").html().replace(/<(?:.|\n)*?>/gm, '') + " " + remover + "</li>");
+                $("div.well", form).find("li#stream-rules-placeholder").hide();
 
                 // Remove stream rule binding.
                 $(".sr-remove").on("click", function() {
