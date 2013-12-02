@@ -34,6 +34,7 @@
                         <span class="caret"></span>
                     </a>
                     <ul class="dropdown-menu">
+                        <li><a href="@routes.StreamRulesController.index(stream.getId)" class="show-stream-rule">Edit rules</a></li>
                         <li><a href="#" class="show-stream-rule">Add rule</a></li>
                         <li class="disabled"><a href="#">Add alert (coming soon)</a></li>
                         <li class="dropdown-submenu">
@@ -71,7 +72,7 @@
 
             <form class="add-streamrule-form" data-stream-id="@stream.getId" action="#">
                 <div class="well well-small">
-                    <ul>
+                    <ul class="streamrules-list">
                     @if(stream.getStreamRules.size > 0) {
                         @for(streamRule <- stream.getStreamRules) {
                             <li>
@@ -81,7 +82,9 @@
                             </a>
                             </li>
                         }
+                        <li id="stream-rules-placeholder" style="display:none"><i>No rules defined - go add some!</i></li>
                     } else {
+
                         <li id="stream-rules-placeholder"><i>No rules defined - go add some!</i></li>
                     }
                     </ul>
