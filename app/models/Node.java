@@ -85,7 +85,7 @@ public class Node extends ClusterEntity {
         this.inputFactory = inputFactory;
 
         transportAddress = normalizeUriPath(r.transportAddress);
-        lastSeen = new DateTime(r.lastSeen);
+        lastSeen = new DateTime(r.lastSeen, DateTimeZone.UTC);
         nodeId = r.id;
         shortNodeId = r.shortNodeId;
         isMaster = r.isMaster;

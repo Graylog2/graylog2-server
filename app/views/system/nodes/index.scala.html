@@ -57,7 +57,7 @@
                                 <i class="icon icon-external-link" style="font-size: 11px;"></i>
                             </a>
                         </li>
-                        <li><a href="@routes.SystemController.threadDump(jvm.getNodeId)">Get thread dump</a></li>
+                        <li><a href="@routes.NodesController.threadDump(jvm.getNodeId)">Get thread dump</a></li>
 
                         <li class="divider"></li>
                         <li>
@@ -120,7 +120,7 @@
                         <ul class="dropdown-menu">
                             <li><a href="@routes.InputsController.manageRadio(radio.getId)">Manage inputs</a></li>
                             <li><a href="@routes.MetricsController.ofRadio(radio.getId)">Metrics</a></li>
-                            <li><a href="@routes.SystemController.threadDumpRadio(radio.getId)">Get thread dump</a></li>
+                            <li><a href="@routes.RadiosController.threadDump(radio.getId)">Get thread dump</a></li>
                         </ul>
                     </div>
                 </div>

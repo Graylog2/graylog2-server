@@ -1433,3 +1433,12 @@ h2.radios-head {
     margin-top: 2px;
     margin-left: 6px;
 }
+
+form.node-processing-change {
+    display: inline;
+}
+
+form.node-processing-change input {
+    position: relative;
+    left: 20px;
+}

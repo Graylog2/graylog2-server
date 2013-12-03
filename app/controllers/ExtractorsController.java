@@ -145,8 +145,8 @@ public class ExtractorsController extends AuthenticatedController {
     private static BreadcrumbList standardBreadcrumbs(Node node, Input input) {
         BreadcrumbList bc = new BreadcrumbList();
         bc.addCrumb("System", routes.SystemController.index(0));
-        bc.addCrumb("Nodes", routes.SystemController.nodes());
-        bc.addCrumb(node.getShortNodeId(), routes.SystemController.node(node.getNodeId()));
+        bc.addCrumb("Nodes", routes.NodesController.nodes());
+        bc.addCrumb(node.getShortNodeId(), routes.NodesController.node(node.getNodeId()));
         bc.addCrumb("Input: " + input.getTitle(), null);
         bc.addCrumb("Extractors", routes.ExtractorsController.manage(node.getNodeId(), input.getId()));
 

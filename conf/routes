@@ -35,11 +35,11 @@ GET         /streams/:stream_id/resume                                          
 
 # System
 GET         /system                                                                  @controllers.SystemController.index(page:Integer ?= 1)
-GET         /system/nodes                                                            @controllers.SystemController.nodes()
-GET         /system/nodes/:node_id                                                   @controllers.SystemController.node(node_id: String)
+GET         /system/nodes                                                            @controllers.NodesController.nodes()
+GET         /system/nodes/:node_id                                                   @controllers.NodesController.node(node_id: String)
 GET         /system/radios/:radio_id                                                 @controllers.RadiosController.show(radio_id: String)
-GET         /system/threaddump/:node_id                                              @controllers.SystemController.threadDump(node_id: String)
-GET         /system/threaddump/radio/:radio_id                                       @controllers.SystemController.threadDumpRadio(radio_id: String)
+GET         /system/threaddump/:node_id                                              @controllers.NodesController.threadDump(node_id: String)
+GET         /system/threaddump/radio/:radio_id                                       @controllers.RadiosController.threadDump(radio_id: String)
 GET         /system/inputs/:node_id                                                  @controllers.InputsController.manage(node_id: String)
 GET         /system/inputs/radio/:radio_id                                           @controllers.InputsController.manageRadio(radio_id: String)
 POST        /system/inputs/:node_id                                                  @controllers.InputsController.launch(node_id: String)
@@ -54,6 +54,8 @@ GET         /system/metrics/radio/:radio_id                                     
 GET         /system/indices                                                          @controllers.IndicesController.index()
 GET         /system/indices/ranges/rebuild                                           @controllers.IndicesController.reCalculateRanges()
 GET         /system/deflector/cycle                                                  @controllers.IndicesController.cycleDeflector()
+POST        /system/nodes/:node_id/processing/pause                                  @controllers.NodesController.pauseMessageProcessing(node_id: String)
+POST        /system/nodes/:node_id/processing/resume                                 @controllers.NodesController.resumeMessageProcessing(node_id: String)
 
 # Extractors
 GET         /system/inputs/:node_id/:input_id/extractors                             @controllers.ExtractorsController.manage(node_id: String, input_id: String)

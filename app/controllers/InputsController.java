@@ -54,8 +54,8 @@ public class InputsController extends AuthenticatedController {
 
             BreadcrumbList bc = new BreadcrumbList();
             bc.addCrumb("System", routes.SystemController.index(0));
-            bc.addCrumb("Nodes", routes.SystemController.nodes());
-            bc.addCrumb(node.getShortNodeId(), routes.SystemController.node(node.getNodeId()));
+            bc.addCrumb("Nodes", routes.NodesController.nodes());
+            bc.addCrumb(node.getShortNodeId(), routes.NodesController.node(node.getNodeId()));
             bc.addCrumb("Inputs", routes.InputsController.manage(node.getNodeId()));
 
             return ok(views.html.system.inputs.manage.render(
@@ -85,7 +85,7 @@ public class InputsController extends AuthenticatedController {
 
             BreadcrumbList bc = new BreadcrumbList();
             bc.addCrumb("System", routes.SystemController.index(0));
-            bc.addCrumb("Nodes", routes.SystemController.nodes());
+            bc.addCrumb("Nodes", routes.NodesController.nodes());
             bc.addCrumb(radio.getShortNodeId(), routes.RadiosController.show(radio.getId()));
             bc.addCrumb("Inputs", routes.InputsController.manageRadio(radio.getId()));
 

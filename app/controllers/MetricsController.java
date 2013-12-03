@@ -45,8 +45,8 @@ public class MetricsController extends AuthenticatedController {
 
             BreadcrumbList bc = new BreadcrumbList();
             bc.addCrumb("System", routes.SystemController.index(0));
-            bc.addCrumb("Nodes", routes.SystemController.nodes());
-            bc.addCrumb(node.getShortNodeId(), routes.SystemController.node(node.getNodeId()));
+            bc.addCrumb("Nodes", routes.NodesController.nodes());
+            bc.addCrumb(node.getShortNodeId(), routes.NodesController.node(node.getNodeId()));
             bc.addCrumb("Metrics", routes.MetricsController.ofNode(node.getNodeId(), ""));
 
             return ok(views.html.system.metrics.of_node.render(currentUser(), bc, node, node.getMetrics("org.graylog2"), preFilter));
@@ -66,7 +66,7 @@ public class MetricsController extends AuthenticatedController {
 
             BreadcrumbList bc = new BreadcrumbList();
             bc.addCrumb("System", routes.SystemController.index(0));
-            bc.addCrumb("Nodes", routes.SystemController.nodes());
+            bc.addCrumb("Nodes", routes.NodesController.nodes());
             bc.addCrumb(radio.getShortNodeId(), routes.RadiosController.show(radio.getId()));
             bc.addCrumb("Metrics", routes.MetricsController.ofRadio(radio.getId(), ""));
 

@@ -433,7 +433,7 @@ $(document).ready(function() {
     });
 
     // Submit button confirmation.
-    $('button[data-confirm], a[data-confirm]').on("click", function() {
+    $('input[data-confirm], button[data-confirm], a[data-confirm]').on("click", function() {
         return confirm($(this).attr("data-confirm"));
     });
 

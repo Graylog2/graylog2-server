@@ -6,8 +6,64 @@
 
     <div class="row-fluid">
         <h1><i class="icon icon-sitemap"></i> Node @node.getHostname / @node.getShortNodeId</h1>
+        This page shows details of a Graylog2 server node that is active and reachable in your cluster.
     </div>
 
-    @views.html.partials.preview("Node detail page is not finished yet.", 258)
+    @if(node.isMaster) {
+        <div class="row-fluid">
+            <div class="alert alert-success">
+                <i class="icon icon-star"></i> &nbsp;This is the master node.
+            </div>
+        </div>
+    }
+
+
+    <div class="row-fluid">
+        @if(node.isProcessing) {
+            <div class="alert alert-success">
+                <form action="@routes.NodesController.pauseMessageProcessing(node.getNodeId)" method="POST" class="node-processing-change">
+                    <input type="submit" class="btn btn-mini btn-danger pull-right" value="Pause processing" data-confirm="Really pause message processing?">
+                </form>
+
+                <i class="icon icon-ok-sign"></i> &nbsp; Node is processing messages.
+            </div>
+        } else {
+            <div class="alert alert-danger">
+                <form action="@routes.NodesController.resumeMessageProcessing(node.getNodeId)" method="POST" class="node-processing-change">
+                    <input type="submit" class="btn btn-mini btn-success pull-right" value="Resume processing" data-confirm="Really resume message processing?">
+                </form>
+
+                <i class="icon icon-warning-sign"></i> &nbsp; Node is <strong>not</strong> processing messages.
+            </div>
+        }
+    </div>
+
+
+    <div class="row-fluid">
+        <h2>System</h2>
+        Node ID: @node.getNodeId
+        Hostname: @node.getHostname
+    </div>
+
+    <div class="row-fluid">
+        <h2>REST API</h2>
+        @node.getFailureCount failures
+        Last reported as active: @node.getLastSeen
+        Last web interface contact: @node.getLastContact
+    </div>
 
 }
+
+    <!-- TODO
+        * threaddump
+        * version
+        * buffers
+        * heap usage
+        * metrics
+        * full node id
+        * throughput
+        * important configs
+        * transport address
+        * provided inputs + launch input
+        * link api browser
+    -->
