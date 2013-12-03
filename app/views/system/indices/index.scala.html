@@ -14,8 +14,8 @@
                 <span class="caret"></span>
             </a>
             <ul class="dropdown-menu">
-                <li><a href="#">Recalculate index ranges</a></li>
-                <li><a href="#">Manually cycle deflector</a></li>
+                <li><a href="@routes.IndicesController.reCalculateRanges()" data-confirm="This will trigger a background system job. Go on?">Recalculate index ranges</a></li>
+                <li><a href="@routes.IndicesController.cycleDeflector()" data-confirm="Really manually cycle deflector? Follow the documentation link on this page to learn more.">Manually cycle deflector</a></li>
             </ul>
         </div>
     </div>
@@ -51,7 +51,7 @@
                 }
                 @index.getName
                 <span class="starts">
-                    Starts <span class="moment-from-now" title="@index.getRange.getStarts">@index.getRange.getStarts</span>,
+                    Contains messages up to <span class="moment-from-now" title="@index.getRange.getStarts">@index.getRange.getStarts</span>,
                     @if(index.getInfo != null) {
                         @lib.Tools.byteToHuman(index.getInfo.getStoreSizeBytes) /
                         <span class="number-format" data-format="0,0">@index.getInfo.getDocuments.count</span> messages
@@ -115,10 +115,3 @@
     }
 
 }
-
-    <!--
-        TODO:
-        re-sync ranges
-        minimize on start
-        test & document manual cycling
-    -->

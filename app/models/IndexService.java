@@ -72,4 +72,15 @@ public class IndexService {
                 .execute();
     }
 
+    public void recalculateRanges() throws APIException, IOException {
+        api.post().path("/system/indices/ranges/rebuild")
+                .expect(202)
+                .execute();
+    }
+
+    public void cycleDeflector() throws APIException, IOException {
+        api.post().path("/system/deflector/cycle")
+                .onlyMasterNode()
+                .execute();
+    }
 }
