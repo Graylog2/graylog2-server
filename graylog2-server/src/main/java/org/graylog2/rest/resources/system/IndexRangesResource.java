@@ -20,6 +20,7 @@
 package org.graylog2.rest.resources.system;
 
 import com.codahale.metrics.annotation.Timed;
+import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import org.graylog2.indexer.ranges.IndexRange;
 import org.graylog2.indexer.ranges.RebuildIndexRangesJob;
@@ -38,6 +39,7 @@ import org.slf4j.LoggerFactory;
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -53,7 +55,8 @@ public class IndexRangesResource extends RestResource {
     @ApiOperation(value = "Get a list of all index ranges")
     @Produces(MediaType.APPLICATION_JSON)
     public String list() {
-        Map<String, Object> ranges = Maps.newHashMap();
+        Map<String, Object> result = Maps.newHashMap();
+        List<Map<String, Object>> ranges = Lists.newArrayList();
 
         for (IndexRange range : IndexRange.getFrom(core, 0)) {
             Map<String, Object> rangeInfo = Maps.newHashMap();
@@ -70,11 +73,15 @@ public class IndexRangesResource extends RestResource {
             }
 
             rangeInfo.put("starts", Tools.getISO8601String(range.getStart()));
+            rangeInfo.put("index", range.getIndexName());
 
-            ranges.put(range.getIndexName(), rangeInfo);
+            ranges.add(rangeInfo);
         }
 
-        return json(ranges);
+        result.put("ranges", ranges);
+        result.put("total", ranges.size());
+
+        return json(result);
     }
 
     @POST @Timed
