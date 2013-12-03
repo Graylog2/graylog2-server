@@ -39,6 +39,7 @@ public class ModelFactoryModule extends AbstractModule {
         install(new FactoryModuleBuilder().build(LdapSettings.Factory.class));
         install(new FactoryModuleBuilder().build(Stream.Factory.class));
         install(new FactoryModuleBuilder().build(Radio.Factory.class));
+        install(new FactoryModuleBuilder().build(Index.Factory.class));
 
         // TODO crutch, because we need the factory for systemjobs in all().
         // can this be done with a second factory for the list?

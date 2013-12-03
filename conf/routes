@@ -51,6 +51,7 @@ GET         /system/inputs/:node_id/:input_id/staticfields/:key/delete          
 GET         /system/mappers                                                          @controllers.MappersController.index()
 GET         /system/metrics/:node_id                                                 @controllers.MetricsController.ofNode(node_id: String, prefilter ?= "")
 GET         /system/metrics/radio/:radio_id                                          @controllers.MetricsController.ofRadio(radio_id: String, prefilter ?= "")
+GET         /system/indices                                                          @controllers.IndicesController.index()
 
 # Extractors
 GET         /system/inputs/:node_id/:input_id/extractors                             @controllers.ExtractorsController.manage(node_id: String, input_id: String)

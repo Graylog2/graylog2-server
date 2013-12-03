@@ -91,39 +91,9 @@
 
     <div class="row-fluid">
         @partials.support.head_bubble("the-elasticsearch-cluster-status-explained")
-
         <h2><i class="icon icon-tasks"></i> ElasticSearch cluster</h2>
-        @if(clusterHealth == null) {
-            <div class="es-cluster-status alert alert-error">
-                <i class="icon icon-ambulance"></i> <strong>Cluster information currently unavailable</strong>
-            </div>
-        } else {
-            @if(clusterHealth.isGreen) {
-                <div class="es-cluster-status alert alert-success">
-                    <i class="icon icon-ok-sign"></i> Cluster is green.
-            }
 
-
-            @if(clusterHealth.isYellow) {
-                <div class="es-cluster-status alert alert-warning">
-                    <i class="icon icon-warning-sign"></i> <strong>Cluster is yellow.</strong>
-            }
-
-            @if(clusterHealth.isRed) {
-                <div class="es-cluster-status alert alert-error">
-                    <i class="icon icon-ambulance"></i> <strong>Cluster is red.</strong>
-            }
-
-                <div class="pull-right">
-                    Shards:
-                    @clusterHealth.getActiveShards active,
-                    @clusterHealth.getInitializingShards initializing,
-                    @clusterHealth.getRelocatingShards relocating,
-                    @clusterHealth.getUnassignedShards unassigned
-                </div>
-            </div>
-        }
-
+        @views.html.partials.es_cluster_health.render(clusterHealth)
     </div>
 
     <div class="row-fluid">

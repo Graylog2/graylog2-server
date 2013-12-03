@@ -553,6 +553,16 @@ $(document).ready(function() {
         $(this).text(numeral($(this).text()).format($(this).attr("data-format")));
     });
 
+    $(".moment-from-now").each(function() {
+        $(this).text(moment($(this).text()).fromNow());
+    });
+
+    $(".moment-humanize").each(function() {
+        $(this).text(moment.duration(parseInt($(this).text()), $(this).attr("data-unit")).humanize());
+    });
+
+    $(".shard-routing .shards .shard").tooltip();
+
     $(".message-result-fields-range .page").on("click", function(e) {
         e.preventDefault();
 

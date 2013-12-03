@@ -1,0 +1,113 @@
+@(currentUser: User,
+        breadcrumbs: lib.BreadcrumbList,
+        indices: List[Index],
+        clusterHealth: ESClusterHealth,
+        deflectorTarget: String,
+        deflectorConfig: models.api.responses.system.indices.DeflectorConfigResponse)
+
+@main("Indices", views.html.system.sidebar(), "", currentUser) {
+
+    <div class="pull-right">
+        <div class="btn-group">
+            <a class="btn btn-info btn-small dropdown-toggle" data-toggle="dropdown" href="#">
+                Maintenance
+                <span class="caret"></span>
+            </a>
+            <ul class="dropdown-menu">
+                <li><a href="#">Recalculate index ranges</a></li>
+                <li><a href="#">Manually cycle deflector</a></li>
+            </ul>
+        </div>
+    </div>
+
+    @views.html.partials.breadcrumbs(breadcrumbs)
+
+    <div class="row-fluid">
+        <h1><i class="icon icon-reorder"></i> Indices</h1>
+        This is an overview of all indices (message stores) Graylog2 is currently taking in account
+        for searches and analysis. You can learn more about the index model in the
+        <a href="http://support.torch.sh/help/kb/general/the-graylog2-index-model-explained" target="_blank">
+        documentation</a>.
+
+        Your current configuration is <span class="number-format" data-format="0,0">@deflectorConfig.maxDocsPerIndex</span>
+        documents per index and a maximum number of @deflectorConfig.maxNumberOfIndices indices.
+    </div>
+
+    <div class="alert alert-success">
+        <i class="icon icon-th"></i> &nbsp;@indices.length indices with a total of <span class="total-events focuslimit">?</span> messages under management.
+        <span class="pull-right">Current write-active index is <i>@deflectorTarget</i>.</span>
+    </div>
+
+    <div class="row-fluid">
+        @views.html.partials.es_cluster_health.render(clusterHealth)
+    </div>
+
+    @for(index <- indices.sortWith(_.getNumber > _.getNumber)) {
+        <div class="row-fluid index-description">
+            <h3>
+                <i class="icon icon-ellipsis-vertical"></i>
+                @if(index.getName.equals(deflectorTarget)) {
+                    <i class="icon icon-bolt" title="Write-active index"></i>
+                }
+                @index.getName
+                <span class="starts">
+                    Starts <span class="moment-from-now" title="@index.getRange.getStarts">@index.getRange.getStarts</span>,
+                    @if(index.getInfo != null) {
+                        @lib.Tools.byteToHuman(index.getInfo.getStoreSizeBytes) /
+                        <span class="number-format" data-format="0,0">@index.getInfo.getDocuments.count</span> messages
+                    }
+                </span>
+            </h3>
+
+            @if(index.getRange.isProvidesCalculationInfo) {
+                Range re-calculated <span class="moment-from-now" title="@index.getRange.getCalculatedAt">@index.getRange.getCalculatedAt</span>
+                in @(index.getRange.getCalculationTookMs)ms.
+            }
+
+            @if(index.getInfo != null) {
+                @index.getInfo.getSegments segments,
+                @index.getInfo.getOpenSearchContexts open search contexts,
+                @index.getInfo.getDocuments.deleted deleted messages
+
+                <div class="row-fluid" style="margin-bottom: 10px;">
+                    @views.html.system.indices.partials.shard_meters.render("Primary shard operations", index.getInfo.getPrimaryShards)
+                    @views.html.system.indices.partials.shard_meters.render("Total shard operations", index.getInfo.getAllShards)
+                </div>
+
+                <div class="shard-routing">
+                    <h3 class="u-light" style="display: inline;">Shard routing</h3>
+
+                    <ul class="shards">
+                        @for(route <- index.getInfo.getShardRouting.sortBy(_.id)) {
+                            <li class="shard shard-@route.state
+                                @if(route.primary) {
+                                    shard-primary
+                                }"
+
+                                data-title="State: <i>@route.state</i> on @route.nodeHostname (@route.nodeName)"
+                                data-html="true"
+                            >
+                                <span class="id">S@route.id</span>
+                            </li>
+                        }
+                    </ul>
+
+                    <br style="clear: both;" />
+                    <div class="description span10">
+                        Bold shards are primaries, others are replicas. Replicas are elected to primaries automatically
+                        when primaries leave the cluster. Size and document counts only reflect primary shards and no
+                        possible replica duplication.
+                    </div>
+                </div>
+            }
+        </div>
+    }
+
+}
+
+    <!--
+        TODO:
+        re-sync ranges
+        minimize on start
+        test & document manual cycling
+    -->

@@ -1,0 +1,28 @@
+@(title: String, sm: Index#Info#ShardMeter)
+
+<div class="shard-meters span4">
+    <h3 class="u-light" style="display: inline;">@title</h3>
+    <dl>
+
+        <dt>Index:</dt>
+        <dd>@views.html.system.indices.partials.shard_meter.render(sm.getIndexMeter)</dd>
+
+        <dt>Flush:</dt>
+        <dd>@views.html.system.indices.partials.shard_meter.render(sm.getFlushMeter)</dd>
+
+        <dt>Merge:</dt>
+        <dd>@views.html.system.indices.partials.shard_meter.render(sm.getMergeMeter)</dd>
+
+        <dt>Query:</dt>
+        <dd>@views.html.system.indices.partials.shard_meter.render(sm.getSearchQueryMeter)</dd>
+
+        <dt>Fetch:</dt>
+        <dd>@views.html.system.indices.partials.shard_meter.render(sm.getSearchFetchMeter)</dd>
+
+        <dt>Get:</dt>
+        <dd>@views.html.system.indices.partials.shard_meter.render(sm.getGetMeter)</dd>
+
+        <dt>Refresh:</dt>
+        <dd>@views.html.system.indices.partials.shard_meter.render(sm.getRefreshMeter)</dd>
+    </dl>
+</div>

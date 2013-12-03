@@ -1368,3 +1368,60 @@ h2.radios-head {
 .ldap-failure {
     color: #800000;
 }
+
+.index-description h3 .starts {
+    font-size: 11px;
+}
+
+.shard-meters {
+    margin-top: 10px;
+}
+
+.shard-meters dl {
+    margin-bottom: 0px;
+    margin-top: 0px;
+}
+
+.shard-meters dl dt {
+    float: left;
+}
+
+.shard-meters dl dd {
+    margin-left: 65px;
+}
+
+.shard-routing .shards .shard {
+    padding: 10px;
+    margin: 5px;
+    width: 50px;
+    float: left;
+    text-align: center;
+}
+
+.shard-routing .shards .shard-started {
+    background-color: #dff0d8;
+}
+
+.shard-routing .shards .shard-relocating {
+    background-color: #de9df4;
+}
+
+.shard-routing .shards .shard-initializing {
+    background-color: #f4ddbc;
+}
+
+.shard-routing .shards .shard-unassigned {
+    background-color: #c3c3c3;
+}
+
+.shard-routing .shards .shard-primary .id {
+    font-weight: bold;
+    margin-bottom: 3px;
+    border-bottom: 1px solid #000;
+}
+
+.shard-routing .description {
+    font-size: 11px;
+    margin-top: 2px;
+    margin-left: 6px;
+}
