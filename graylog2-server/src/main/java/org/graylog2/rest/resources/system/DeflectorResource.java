@@ -24,6 +24,9 @@ import com.google.common.collect.Maps;
 import org.graylog2.rest.documentation.annotations.Api;
 import org.graylog2.rest.documentation.annotations.ApiOperation;
 import org.graylog2.rest.resources.RestResource;
+import org.graylog2.system.activities.Activity;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
@@ -36,6 +39,8 @@ import java.util.Map;
 @Api(value = "System/Deflector", description = "Index deflector management")
 @Path("/system/deflector")
 public class DeflectorResource extends RestResource {
+
+    private static final Logger LOG = LoggerFactory.getLogger(DeflectorResource.class);
 
     @GET @Timed
     @ApiOperation(value = "Get current deflector status")
@@ -68,6 +73,12 @@ public class DeflectorResource extends RestResource {
     @ApiOperation(value = "Cycle deflector to new/next index")
     @Path("/cycle")
     public Response cycle() {
+        restrictToMaster();
+
+        String msg = "Cycling deflector. Reason: REST request.";
+        LOG.info(msg);
+        core.getActivityWriter().write(new Activity(msg, DeflectorResource.class));
+
         core.getDeflector().cycle();
         return Response.ok().build();
     }
