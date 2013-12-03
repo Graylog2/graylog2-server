@@ -1369,6 +1369,14 @@ h2.radios-head {
     color: #800000;
 }
 
+.index-description {
+    margin-bottom: 7px;
+}
+
+.index-description .index-info {
+    margin-bottom: 10px;
+}
+
 .index-description h3 .starts {
     font-size: 11px;
 }

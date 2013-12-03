@@ -563,6 +563,13 @@ $(document).ready(function() {
 
     $(".shard-routing .shards .shard").tooltip();
 
+    $(".index-description .open-index-details").on("click", function(e) {
+        e.preventDefault();
+
+        $(".index-info", $(this).closest(".index-description")).show();
+        $(this).hide();
+    });
+
     $(".message-result-fields-range .page").on("click", function(e) {
         e.preventDefault();
 

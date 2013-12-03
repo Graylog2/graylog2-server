@@ -56,50 +56,61 @@
                         @lib.Tools.byteToHuman(index.getInfo.getStoreSizeBytes) /
                         <span class="number-format" data-format="0,0">@index.getInfo.getDocuments.count</span> messages
                     }
+
+                    @if(!index.getName.equals(deflectorTarget)) {
+                        <a href="#" class="open-index-details"><i class="icon icon-caret-down"></i> Details</a>
+                    }
                 </span>
             </h3>
 
-            @if(index.getRange.isProvidesCalculationInfo) {
-                Range re-calculated <span class="moment-from-now" title="@index.getRange.getCalculatedAt">@index.getRange.getCalculatedAt</span>
-                in @(index.getRange.getCalculationTookMs)ms.
-            }
+            <div class="index-info"
+                @if(!index.getName.equals(deflectorTarget)) {
+                    style="display: none;"
+                }
+            >
+                @if(index.getRange.isProvidesCalculationInfo) {
+                    Range re-calculated <span class="moment-from-now" title="@index.getRange.getCalculatedAt">@index.getRange.getCalculatedAt</span>
+                    in @(index.getRange.getCalculationTookMs)ms.
+                }
 
-            @if(index.getInfo != null) {
-                @index.getInfo.getSegments segments,
-                @index.getInfo.getOpenSearchContexts open search contexts,
-                @index.getInfo.getDocuments.deleted deleted messages
+                @if(index.getInfo != null) {
+                    @index.getInfo.getSegments segments,
+                    @index.getInfo.getOpenSearchContexts open search contexts,
+                    @index.getInfo.getDocuments.deleted deleted messages
 
-                <div class="row-fluid" style="margin-bottom: 10px;">
-                    @views.html.system.indices.partials.shard_meters.render("Primary shard operations", index.getInfo.getPrimaryShards)
-                    @views.html.system.indices.partials.shard_meters.render("Total shard operations", index.getInfo.getAllShards)
-                </div>
-
-                <div class="shard-routing">
-                    <h3 class="u-light" style="display: inline;">Shard routing</h3>
-
-                    <ul class="shards">
-                        @for(route <- index.getInfo.getShardRouting.sortBy(_.id)) {
-                            <li class="shard shard-@route.state
-                                @if(route.primary) {
-                                    shard-primary
-                                }"
-
-                                data-title="State: <i>@route.state</i> on @route.nodeHostname (@route.nodeName)"
-                                data-html="true"
-                            >
-                                <span class="id">S@route.id</span>
-                            </li>
-                        }
-                    </ul>
-
-                    <br style="clear: both;" />
-                    <div class="description span10">
-                        Bold shards are primaries, others are replicas. Replicas are elected to primaries automatically
-                        when primaries leave the cluster. Size and document counts only reflect primary shards and no
-                        possible replica duplication.
+                    <div class="row-fluid" style="margin-bottom: 10px;">
+                        @views.html.system.indices.partials.shard_meters.render("Primary shard operations", index.getInfo.getPrimaryShards)
+                        @views.html.system.indices.partials.shard_meters.render("Total shard operations", index.getInfo.getAllShards)
                     </div>
-                </div>
-            }
+
+                    <div class="shard-routing">
+                        <h3 class="u-light" style="display: inline;">Shard routing</h3>
+
+                        <ul class="shards">
+                            @for(route <- index.getInfo.getShardRouting.sortBy(_.id)) {
+                                <li class="shard shard-@route.state
+                                    @if(route.primary) {
+                                        shard-primary
+                                    }"
+
+                                    data-title="State: <i>@route.state</i> on @route.nodeHostname (@route.nodeName)"
+                                    data-html="true"
+                                >
+                                    <span class="id">S@route.id</span>
+                                </li>
+                            }
+                        </ul>
+
+                        <br style="clear: both;" />
+                        <div class="description span10">
+                            Bold shards are primaries, others are replicas. Replicas are elected to primaries automatically
+                            when primaries leave the cluster. Size and document counts only reflect primary shards and no
+                            possible replica duplication.
+                        </div>
+                        <br style="clear: both;" />
+                    </div>
+                }
+            </div>
         </div>
     }
 
