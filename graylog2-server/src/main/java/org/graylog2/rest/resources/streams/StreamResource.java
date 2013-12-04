@@ -21,21 +21,27 @@ package org.graylog2.rest.resources.streams;
 
 import com.beust.jcommander.internal.Lists;
 import com.codahale.metrics.annotation.Timed;
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.google.common.collect.Maps;
 import org.bson.types.ObjectId;
+import org.graylog2.Core;
 import org.graylog2.database.NotFoundException;
 import org.graylog2.database.ValidationException;
+import org.graylog2.plugin.Message;
 import org.graylog2.plugin.streams.Stream;
+import org.graylog2.plugin.streams.StreamRule;
 import org.graylog2.rest.documentation.annotations.*;
 import org.graylog2.rest.resources.RestResource;
 import org.graylog2.rest.resources.streams.requests.CreateRequest;
 import org.graylog2.streams.StreamImpl;
+import org.graylog2.streams.StreamRouter;
 import org.graylog2.streams.StreamRuleImpl;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.inject.Inject;
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
@@ -50,6 +56,9 @@ import java.util.Map;
 @Path("/streams")
 public class StreamResource extends RestResource {
 	private static final Logger LOG = LoggerFactory.getLogger(StreamResource.class);
+
+    @Inject
+    protected Core core;
 
     @POST @Timed
     @ApiOperation(value = "Create a stream")
@@ -225,5 +234,63 @@ public class StreamResource extends RestResource {
         }
 
         return Response.status(Response.Status.fromStatusCode(200)).build();
+    }
+
+    @POST @Path("/{streamId}/testMatch") @Timed
+    @ApiOperation(value = "Test matching of a stream against a supplied message")
+    @ApiResponses(value = {
+            @ApiResponse(code = 404, message = "Stream not found."),
+            @ApiResponse(code = 400, message = "Invalid or missing Stream id.")
+    })
+    public String testMatch(@ApiParam(title = "streamId", required = true) @PathParam("streamId") String streamId, @ApiParam(title = "JSON body", required = true) String body) {
+        if (body == null || body.isEmpty()) {
+            LOG.error("Missing parameters. Returning HTTP 400.");
+            throw new WebApplicationException(400);
+        }
+
+        Map<String, Map<String, Object>> serialisedMessage;
+        try {
+            serialisedMessage = objectMapper.readValue(body, new TypeReference<Map<String, Map<String, Object>>>() {});
+        } catch (IOException e) {
+            LOG.error("Received invalid JSON body. Returning HTTP 400.");
+            throw new WebApplicationException(400);
+        }
+
+        if (serialisedMessage.get("message") == null) {
+            LOG.error("Received invalid JSON body. Returning HTTP 400.");
+            throw new WebApplicationException(400);
+        }
+
+        StreamImpl stream = fetchStream(streamId);
+        Message message = new Message(serialisedMessage.get("message"));
+
+        StreamRouter router = new StreamRouter();
+
+        Map<StreamRule, Boolean> ruleMatches = router.getRuleMatches(core, stream, message);
+        Map<String, Boolean> rules = Maps.newHashMap();
+
+        for (StreamRule ruleMatch : ruleMatches.keySet()) {
+            rules.put(ruleMatch.getObjectId().toStringMongod(), ruleMatches.get(ruleMatch));
+        }
+
+        Map<String, Object> result = Maps.newHashMap();
+        result.put("matches", router.doesStreamMatch(ruleMatches));
+        result.put("rules", rules);
+
+        return json(result);
+    }
+
+    protected StreamImpl fetchStream(String streamId) {
+        if (streamId == null || streamId.isEmpty()) {
+            LOG.error("Missing streamId. Returning HTTP 400.");
+            throw new WebApplicationException(400);
+        }
+
+        try {
+            StreamImpl stream = StreamImpl.load(loadObjectId(streamId), core);
+            return stream;
+        } catch (NotFoundException e) {
+            throw new WebApplicationException(404);
+        }
     }
 }

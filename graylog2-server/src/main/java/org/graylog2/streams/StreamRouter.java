@@ -66,28 +66,12 @@ public class StreamRouter {
             Timer timer = getExecutionTimer(stream.getId().toStringMongod(), server);
             final Timer.Context timerContext = timer.time();
 
-            boolean missed = false;
+            Map<StreamRule, Boolean> result = getRuleMatches(server, stream, msg);
 
-            List<StreamRule> streamRules = getStreamRules(stream.getId(), server);
-
-            if (streamRules.isEmpty()) {
-                continue;
-            }
-
-            for (StreamRule rule : streamRules) {
-                try {
-                    StreamRuleMatcher matcher = StreamRuleMatcherFactory.build(rule.getType());
-                    if (!matchStreamRule(msg, matcher, rule)) {
-                        missed = true;
-                        break;
-                    }
-                } catch (InvalidStreamRuleTypeException e) {
-                    LOG.warn("Invalid stream rule type. Skipping matching for this rule. " + e.getMessage(), e);
-                }
-            }
+            boolean matched = !result.isEmpty() && doesStreamMatch(result);
 
             // All rules were matched.
-            if (!missed) {
+            if (matched) {
                 getIncomingMeter(stream.getId().toStringMongod(), server).mark();
                 matches.add(stream);
             }
@@ -139,6 +123,27 @@ public class StreamRouter {
         }
 
         return result;
+    }
+
+    public Map<StreamRule, Boolean> getRuleMatches(final Core server, Stream stream, Message msg) {
+        Map<StreamRule, Boolean> result = Maps.newHashMap();
+
+        List<StreamRule> streamRules = getStreamRules(stream.getId(), server);
+
+        for (StreamRule rule : streamRules) {
+            try {
+                StreamRuleMatcher matcher = StreamRuleMatcherFactory.build(rule.getType());
+                result.put(rule, matchStreamRule(msg, matcher, rule));
+            } catch (InvalidStreamRuleTypeException e) {
+                LOG.warn("Invalid stream rule type. Skipping matching for this rule. " + e.getMessage(), e);
+            }
+        }
+
+        return result;
+    }
+
+    public boolean doesStreamMatch(Map<StreamRule, Boolean> ruleMatches) {
+        return !ruleMatches.values().contains(false);
     }
 
     public boolean matchStreamRule(Message msg, StreamRuleMatcher matcher, StreamRule rule) {

@@ -88,8 +88,12 @@ public class SearchResource extends RestResource {
     }
 
     protected FieldStatsResult fieldStats(String field, String query, TimeRange timeRange) throws IndexHelper.InvalidRangeFormatException {
+        return fieldStats(field, query, null, timeRange);
+    }
+
+    protected FieldStatsResult fieldStats(String field, String query, String filter, TimeRange timeRange) throws IndexHelper.InvalidRangeFormatException {
         try {
-            return core.getIndexer().searches().fieldStats(field, query, timeRange);
+            return core.getIndexer().searches().fieldStats(field, query, filter, timeRange);
         } catch(Searches.FieldTypeException e) {
             LOG.error("Stats query failed. Make sure that field [{}] is a numeric type.", field);
             throw new WebApplicationException(400);

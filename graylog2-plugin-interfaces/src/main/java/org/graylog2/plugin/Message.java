@@ -96,6 +96,10 @@ public class Message {
         fields.put("timestamp", timestamp);
     }
 
+    public Message(Map<String, Object> fields) {
+        this.fields.putAll(fields);
+    }
+
     public boolean isComplete() {
     	for (String key : REQUIRED_FIELDS) {
     		if (getField(key) == null || ((String) getField(key)).isEmpty()) {

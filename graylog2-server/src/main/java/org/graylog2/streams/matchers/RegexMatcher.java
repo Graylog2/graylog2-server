@@ -33,7 +33,7 @@ public class RegexMatcher implements StreamRuleMatcher {
     public boolean match(Message msg, StreamRule rule) {
         if (msg.getField(rule.getField()) == null)
             return false;
-        return Pattern.compile(rule.getValue(), Pattern.DOTALL).matcher(msg.getField(rule.getField()).toString()).find();
+        return rule.getInverted() ^ Pattern.compile(rule.getValue(), Pattern.DOTALL).matcher(msg.getField(rule.getField()).toString()).find();
     }
 
 }
