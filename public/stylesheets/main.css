@@ -1442,3 +1442,29 @@ form.node-processing-change input {
     position: relative;
     left: 20px;
 }
+
+.node-heap-usage {
+    margin-top: 7px;
+    margin-bottom: 7px;
+}
+
+.node-buffer-usage {
+    margin-top: 3px;
+    margin-bottom: 7px;
+}
+
+.system-system dt {
+     float: left;
+ }
+
+.system-system dd {
+    margin-left: 75px;
+}
+
+.system-rest dt {
+    float: left;
+}
+
+.system-rest dd {
+    margin-left: 120px;
+}
