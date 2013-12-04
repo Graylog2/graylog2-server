@@ -4,6 +4,7 @@ import com.google.gson.Gson;
 import com.google.inject.Inject;
 import lib.APIException;
 import lib.ApiClient;
+import lib.BreadcrumbList;
 import models.Stream;
 import models.StreamRuleService;
 import models.StreamService;
@@ -37,7 +38,7 @@ public class StreamRulesController extends AuthenticatedController {
             return status(504, views.html.errors.error.render(ApiClient.ERROR_MSG_IO, e, request()));
         }
 
-        return ok(views.html.streamrules.index.render(currentUser(), stream, stream.getStreamRules()));
+        return ok(views.html.streamrules.index.render(currentUser(), stream, stream.getStreamRules(), standardBreadcrumbs(stream)));
     }
 
     public Result create(String streamId) {
@@ -67,5 +68,13 @@ public class StreamRulesController extends AuthenticatedController {
         }
 
         return ok();
+    }
+
+    private static BreadcrumbList standardBreadcrumbs(Stream stream) {
+        BreadcrumbList bc = new BreadcrumbList();
+        bc.addCrumb("All Streams", routes.StreamsController.index());
+        bc.addCrumb("Stream: " + stream.getTitle(), null);
+
+        return bc;
     }
 }

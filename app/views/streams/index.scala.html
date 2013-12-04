@@ -34,7 +34,7 @@
                         <span class="caret"></span>
                     </a>
                     <ul class="dropdown-menu">
-                        <li><a href="@routes.StreamRulesController.index(stream.getId)" class="show-stream-rule">Edit rules</a></li>
+                        <li><a href="@routes.StreamRulesController.index(stream.getId)">Edit rules</a></li>
                         <li><a href="#" class="show-stream-rule">Add rule</a></li>
                         <li class="disabled"><a href="#">Add alert (coming soon)</a></li>
                         <li class="dropdown-submenu">
@@ -71,30 +71,12 @@
             </h3>
 
             <form class="add-streamrule-form" data-stream-id="@stream.getId" action="#">
-                <div class="well well-small">
-                    <ul class="streamrules-list">
-                    @if(stream.getStreamRules.size > 0) {
-                        @for(streamRule <- stream.getStreamRules) {
-                            <li>
-                                @streamRule <a class="remove-streamrule" href="#"
-                            data-removeUrl="@routes.StreamRulesController.delete(streamRule.getStreamId, streamRule.getId)">
-                                <i class="icon-remove"></i>
-                            </a>
-                            </li>
-                        }
-                        <li id="stream-rules-placeholder" style="display:none"><i>No rules defined - go add some!</i></li>
-                    } else {
+                @views.html.partials.streamrules.list_well.render(stream.getStreamRules)
 
-                        <li id="stream-rules-placeholder"><i>No rules defined - go add some!</i></li>
-                    }
-                    </ul>
-                </div>
-
-                @views.html.partials.streamrules.stream_rule_form.render("add-stream-rule-to-existing", stream.getId, null)
+                @views.html.partials.streamrules.stream_rule_form.render("add-stream-rule-to-existing", "new-stream-rule", stream.getId, null)
             </form>
         </div>
 
-        <!-- $(".stream-row .add-streamrule-form[data-stream-id=fsdfs]") -->
     }
 
 }

@@ -1,0 +1,33 @@
+@(streamRules: List[StreamRule])
+<div class="alert alert-info" id="streamrules-list-container">
+    <ul class="streamrules-list">
+        @if(streamRules.size > 0) {
+            @for(streamRule <- streamRules) {
+                <li data-streamrule-id="@streamRule.getId">
+                    @streamRule
+
+                    <a class="edit-streamrule" href="#"
+                        data-streamrule-id="@streamRule.getId">
+                        <i class="icon-edit"></i>
+                    </a>
+
+                    <a class="remove-streamrule" href="#"
+                        data-removeUrl="@routes.StreamRulesController.delete(streamRule.getStreamId, streamRule.getId)">
+                        <i class="icon-remove"></i>
+                    </a>
+
+                </li>
+            }
+            <li id="stream-rules-placeholder" style="display:none"><i>No rules defined - go add some!</i></li>
+        } else {
+
+            <li id="stream-rules-placeholder"><i>No rules defined - go add some!</i></li>
+        }
+    </ul>
+</div>
+
+<div id="streamrules-edit-forms">
+    @for(streamRule <- streamRules) {
+        @views.html.partials.streamrules.stream_rule_form.render("update-stream-rule", "edit-stream-rule", streamRule.getStreamId, streamRule)
+    }
+</div>

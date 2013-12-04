@@ -28,7 +28,7 @@
     </form>
 
 @if(stream == null) {
-    @views.html.partials.streamrules.stream_rule_form.render("add-stream-rule", null, null)
+    @views.html.partials.streamrules.stream_rule_form.render("add-stream-rule", "new-stream-rule", null, null)
 } else {
-    @views.html.partials.streamrules.stream_rule_form.render("add-stream-rule", stream.getId, null)
+    @views.html.partials.streamrules.stream_rule_form.render("add-stream-rule", "new-stream-rule", stream.getId, null)
 }

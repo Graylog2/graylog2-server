@@ -38,18 +38,36 @@ public class StreamRule {
     private final String field;
     private final String value;
     private final int type;
+    private final Boolean inverted;
     private final String stream_id;
 
     public StreamRule(StreamRuleSummaryResponse srsr) {
         this.id = srsr.id;
         this.field = srsr.field;
         this.value = srsr.value;
+        this.inverted = srsr.inverted;
         this.type = srsr.type;
         this.stream_id = srsr.stream_id;
     }
 
     public String getId() {
         return id;
+    }
+
+    public String getField() {
+        return field;
+    }
+
+    public String getValue() {
+        return value;
+    }
+
+    public int getType() {
+        return type;
+    }
+
+    public Boolean getInverted() {
+        return inverted;
     }
 
     public String getSentenceRepresentation() {

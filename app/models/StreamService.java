@@ -23,13 +23,16 @@ import com.google.inject.Inject;
 import lib.APIException;
 import lib.ApiClient;
 import models.api.requests.streams.CreateStreamRequest;
+import models.api.requests.streams.TestMatchRequest;
 import models.api.responses.streams.GetStreamsResponse;
 import models.api.responses.streams.StreamSummaryResponse;
+import models.api.responses.streams.TestMatchResponse;
 import models.api.results.StreamsResult;
 import play.mvc.Http;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.Map;
 
 public class StreamService {
 
@@ -91,5 +94,11 @@ public class StreamService {
 
     public void resume(String streamId) throws APIException, IOException {
         api.post().path("/streams/" + streamId + "/resume").expect(Http.Status.OK).execute();
+    }
+
+    public TestMatchResponse testMatch(String streamId, TestMatchRequest request) throws APIException, IOException {
+        TestMatchResponse testMatchResponse = null;
+        testMatchResponse = api.post(TestMatchResponse.class).path("/streams/" + streamId + "/testMatch").body(request).expect(Http.Status.OK).execute();
+        return testMatchResponse;
     }
 }

@@ -141,5 +141,8 @@ POST        /a/dashboards/:dashboard_id/widgets/:widget_id/delete               
 POST        /a/dashboards/:dashboard_id/widgets/:widget_id/description               @controllers.api.DashboardsApiController.updateWidgetDescription(dashboard_id: String, widget_id: String)
 POST        /a/dashboards/:dashboard_id/widgets/:widget_id/cachetime                 @controllers.api.DashboardsApiController.updateWidgetCacheTime(dashboard_id: String, widget_id: String)
 
+# API: Streams
+POST        /a/streams/:stream_id/testMatch                                          @controllers.api.StreamsApiController.testMatch(stream_id: String)
+
 # Map static resources from the /public folder to the /assets URL path
 GET         /assets/*file                                                            controllers.Assets.at(path="/public", file)

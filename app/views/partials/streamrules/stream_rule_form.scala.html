@@ -1,10 +1,21 @@
-@(buttonId: String, streamId: String, streamRule: StreamRule)
-<div class="modal hide fade new-stream-rule2" id="new-stream-rule" data-stream-id="@streamId">
+@(buttonId: String, container: String, streamId: String, streamRule: StreamRule)
+
+<div class="modal hide fade @container" id=@container
+    @if(streamRule == null) {
+        data-stream-id=@streamId
+    } else {
+        data-streamrule-id=@streamRule.getId
+    }
+    >
     <div class="modal-header">
         <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
         <h2>
             <i class="icon-signin"></i>
-            Add stream rule
+            @if(streamRule != null) {
+                Edit Stream rule
+            } else {
+                Add stream rule
+            }
         </h2>
     </div>
     <div class="modal-body">
@@ -15,7 +26,10 @@
             class="sr-input typeahead-fields validatable"
             data-reflect="#sr-result-field"
             data-validate="defined"
-            placeholder="user_id">
+            @if(streamRule != null) {
+                value="@streamRule.getField"
+            }
+            placeholder="user_id" />
 
             <label>Type</label>
             <select name="category"
@@ -25,7 +39,11 @@
             data-validate="defined"
             required="true">
                 @for((id, rule) <- StreamRule.RULES) {
-                    <option value="@id" data-reflect-string="@rule.get(0)">@rule.get(0)</option>
+                    <option value="@id"
+                        @if(streamRule != null && streamRule.getType == id) {
+                            selected="true"
+                        }
+                            data-reflect-string="@rule.get(0)">@rule.get(0)</option>
                 }
             </select>
 
@@ -35,10 +53,17 @@
             class="sr-input validatable"
             data-validate="defined"
             data-reflect="#sr-result-value"
-            placeholder="19983">
+            @if(streamRule != null) {
+                value="@streamRule.getValue"
+            }
+            placeholder="19983" />
 
             <label class="checkbox">
-                <input type="checkbox" id="sr-inverted"> Inverted
+                <input type="checkbox"
+                    @if(streamRule != null) {
+                       value="@streamRule.getInverted"
+                    }
+                       id="sr-inverted" /> Inverted
             </label>
 
             <p>
@@ -68,7 +93,11 @@
     <div class="modal-footer">
         <button class="btn" data-dismiss="modal" aria-hidden="true">Close</button>
         <button class="btn btn-success validate @buttonId">
-            Add
+            @if(streamRule != null) {
+                Update
+            } else {
+                Add
+            }
         </button>
     </div>
 </div>

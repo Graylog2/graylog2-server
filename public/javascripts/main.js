@@ -1,5 +1,10 @@
 $(document).ready(function() {
 
+    $(".messages tbody > tr").bind("contextmenu", function() {
+        alert("foo");
+        return false;
+    });
+
 	// Opening messages in sidebar with click in message result table.
 	$(".messages tbody > tr").bind("click", function() {
 		messageId = $(this).attr("data-message-id");
@@ -135,6 +140,9 @@ $(document).ready(function() {
     // Stream rules.
     $("#new-stream-rule .sr-input").on("keyup change", function() {
         value = $(this).val();
+        console.log(value);
+        modalBody = $(this).closest("form").find(".modal-body");
+        console.log(modalBody);
 
         if (value != undefined && value != "") {
             // Selectbox options can have a custom replace string.
@@ -143,7 +151,7 @@ $(document).ready(function() {
                 value = s.attr("data-reflect-string");
 
                 // Inverted?
-                if ($("#sr-inverted").is(':checked')) {
+                if ($("#sr-inverted", modalBody).is(':checked')) {
                     value = "not " + value;
                 }
             }
@@ -222,15 +230,16 @@ $(document).ready(function() {
     });
 
     $(".add-stream-rule-to-existing").on("click", function() {
-        var streamId = $(this).closest(".stream-row").attr("data-stream-id");
+        //var streamId = $(this).closest(".stream-row").attr("data-stream-id");
+        var streamId = $(this).closest("form").attr("data-stream-id");
 
-        var modalBody = $(this).closest(".new-stream-rule2").find(".modal-body");
+        var modalBody = $(this).closest("form").find(".modal-body");
 
         rule = {
             field: $("#sr-field", modalBody).val(),
             type: parseInt($("#sr-type", modalBody).val()),
             value: $("#sr-value", modalBody).val(),
-            inverted: $("#sr-inverted-box", modalBody).is(":checked")
+            inverted: $("#sr-inverted", modalBody).is(":checked")
         }
 
         /*if (!validate("#sr")) {
@@ -252,9 +261,10 @@ $(document).ready(function() {
                 var streamrule_id = data.streamrule_id;
 
                 // Add hidden field that is transmitted in form add visible entry.
+                edit = "<a class='edit-streamrule' href='#' data-streamrule-id='"+streamrule_id+"'><i class='icon icon-edit'></i></a>";
                 remover = "<a class='remove-streamrule' href='#' data-removeurl='/streams/"+streamId+"/rules/"+streamrule_id+"/delete'><i class='icon-remove'></i></a>";
-                $("div.well", form).find("ul").append("<li>" + $("#sr-result").html().replace(/<(?:.|\n)*?>/gm, '') + " " + remover + "</li>");
-                $("div.well", form).find("li#stream-rules-placeholder").hide();
+                $("div#streamrules-list-container", form).find("ul").append("<li data-streamrule-id='" + streamrule_id + "'>" + $("#sr-result").html().replace(/<(?:.|\n)*?>/gm, '') + " " + edit + remover + "</li>");
+                $("div#streamrules-list-container", form).find("li#stream-rules-placeholder").hide();
 
                 dialog.modal("hide");
             }
@@ -266,8 +276,11 @@ $(document).ready(function() {
     });
 
     $(".show-stream-rule").on("click", function() {
-        var streamId = $(this).closest(".stream-row").attr("data-stream-id");
-        $('div.new-stream-rule2[data-stream-id="' + streamId + '"]').modal();
+        var streamId = $(this).attr("data-stream-id");
+        if ( streamId == undefined) {
+            streamId = $(this).closest(".stream-row").attr("data-stream-id");
+        }
+        $('div.new-stream-rule[data-stream-id="' + streamId + '"]').modal();
     });
 
     // Typeahead for message fields.
@@ -699,7 +712,15 @@ $(document).ready(function() {
                 }
             });
         }
-    })
+
+        return false;
+    });
+
+    $(".streamrules-list").on("click", "li a.edit-streamrule", function(event) {
+        var streamRuleId = $(this).attr("data-streamrule-id");
+        $('div.edit-stream-rule[data-streamrule-id="' + streamRuleId + '"]').modal();
+        return false;
+    });
 
     $(".remove-stream").on("click", function(event) {
         var result = confirm("Really delete stream?");
