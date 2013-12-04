@@ -23,6 +23,7 @@ import com.google.inject.Inject;
 import lib.APIException;
 import lib.ApiClient;
 import lib.BreadcrumbList;
+import models.Node;
 import models.NodeService;
 import models.Radio;
 import play.mvc.Result;
@@ -38,7 +39,18 @@ public class RadiosController extends AuthenticatedController {
     private NodeService nodeService;
 
     public Result show(String radioId) {
-        return ok("implement me");
+        try {
+            Radio radio = nodeService.loadRadio(radioId);
+
+            BreadcrumbList bc = new BreadcrumbList();
+            bc.addCrumb("System", routes.SystemController.index(0));
+            bc.addCrumb("Nodes", routes.NodesController.nodes());
+            bc.addCrumb(radio.getShortNodeId(), routes.RadiosController.show(radio.getId()));
+
+            return ok(views.html.system.radios.show.render(currentUser(), bc, radio));
+        } catch (NodeService.NodeNotFoundException e) {
+            return status(404, views.html.errors.error.render(ApiClient.ERROR_MSG_NODE_NOT_FOUND, e, request()));
+        }
     }
 
     public Result threadDump(String radioId) {
