@@ -86,7 +86,7 @@ public class GELFInputBase extends MessageInput {
         ConfigurationRequest r = new ConfigurationRequest();
 
         r.addField(ConfigurationRequest.Templates.bindAddress(CK_BIND_ADDRESS));
-        r.addField(ConfigurationRequest.Templates.portNumber(CK_PORT));
+        r.addField(ConfigurationRequest.Templates.portNumber(CK_PORT, 12201));
 
         return r;
     }

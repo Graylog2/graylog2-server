@@ -21,7 +21,9 @@
 */
 package org.graylog2.plugin.streams;
 
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import org.bson.types.ObjectId;
+import org.graylog2.plugin.database.ObjectIdSerializer;
 
 /**
  *
@@ -29,11 +31,18 @@ import org.bson.types.ObjectId;
  */
 public interface StreamRule {
 
+    @JsonSerialize(contentUsing=ObjectIdSerializer.class)
     public ObjectId getObjectId();
 
     public Integer getType();
-
     public String getField();
     public String getValue();
     public Boolean getInverted();
+    @JsonSerialize(contentUsing=ObjectIdSerializer.class)
+    public ObjectId getStreamId();
+
+    public void setType(Integer type);
+    public void setField(String field);
+    public void setValue(String value);
+    public void setInverted(Boolean inverted);
 }

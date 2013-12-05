@@ -98,6 +98,10 @@ public class StreamRuleImpl extends Persisted implements StreamRule {
         return (Integer) fields.get("type");
     }
 
+    public void setType(Integer type) {
+        fields.put("type", type);
+    }
+
     /**
      * @return the value
      */
@@ -106,10 +110,18 @@ public class StreamRuleImpl extends Persisted implements StreamRule {
         return (String) fields.get("value");
     }
 
+    public void setValue(String value) {
+        fields.put("value", value);
+    }
+
 	@Override
 	public String getField() {
 		return (String) fields.get("field");
 	}
+
+    public void setField(String field) {
+        fields.put("field", field);
+    }
 
     public Boolean getInverted() {
         if (fields.get("inverted") == null) {
@@ -118,13 +130,17 @@ public class StreamRuleImpl extends Persisted implements StreamRule {
         return (Boolean) fields.get("inverted");
     }
 
+    public void setInverted(Boolean inverted) {
+        fields.put("inverted", inverted);
+    }
+
     public ObjectId getStreamId() {
         return (ObjectId) fields.get("stream_id");
     }
 
-    public StreamImpl getStream() throws NotFoundException {
+    /*public StreamImpl getStream() throws NotFoundException {
         return StreamImpl.load(getStreamId(), core);
-    }
+    }*/
 
     @Override
     public String getCollectionName() {
