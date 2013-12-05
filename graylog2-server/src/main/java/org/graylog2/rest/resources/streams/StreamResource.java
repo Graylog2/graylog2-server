@@ -264,7 +264,7 @@ public class StreamResource extends RestResource {
         StreamImpl stream = fetchStream(streamId);
         Message message = new Message(serialisedMessage.get("message"));
 
-        StreamRouter router = new StreamRouter();
+        StreamRouter router = new StreamRouter(false);
 
         Map<StreamRule, Boolean> ruleMatches = router.getRuleMatches(core, stream, message);
         Map<String, Boolean> rules = Maps.newHashMap();

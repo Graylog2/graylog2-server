@@ -48,7 +48,7 @@ public class StreamRuleResource extends RestResource {
             throw new WebApplicationException(e, Response.Status.BAD_REQUEST);
         }
 
-        final List<Stream> streams = StreamImpl.loadAllEnabled(core);
+        final List<Stream> streams = StreamImpl.loadAll(core);
 
         StreamImpl stream = null;
 
@@ -86,6 +86,57 @@ public class StreamRuleResource extends RestResource {
         return Response.status(Response.Status.CREATED).entity(json(result)).build();
     }
 
+    @POST @Path("/{streamRuleId}")
+    @Timed
+    @ApiOperation(value = "Update a stream rule")
+    @ApiResponses(value = {
+            @ApiResponse(code = 404, message = "Stream or stream rule not found."),
+            @ApiResponse(code = 400, message = "Invalid JSON Body.")
+    })
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response update(@ApiParam(title = "streamid", description = "The stream id this rule belongs to.", required = true) @PathParam("streamid") String streamid,
+                           @ApiParam(title = "streamRuleId", description = "The stream rule id we are updating", required = true) @PathParam("streamRuleId") String streamRuleId,
+                           @ApiParam(title = "JSON body", required = true) String body) {
+        CreateRequest cr;
+
+        try {
+            cr = objectMapper.readValue(body, CreateRequest.class);
+        } catch(IOException e) {
+            LOG.error("Error while parsing JSON", e);
+            throw new WebApplicationException(e, Response.Status.BAD_REQUEST);
+        }
+
+        StreamRule streamRule;
+        try {
+            streamRule = StreamRuleImpl.load(loadObjectId(streamRuleId), core);
+            if (streamRule.getStreamId().toString().equals(streamid)) {
+            } else {
+                throw new NotFoundException();
+            }
+        } catch (org.graylog2.database.NotFoundException e) {
+            throw new WebApplicationException(404);
+        }
+
+        streamRule.setField(cr.field);
+        streamRule.setType(cr.type);
+        streamRule.setInverted(cr.inverted);
+        streamRule.setValue(cr.value);
+
+        ObjectId id;
+        try {
+            id = ((StreamRuleImpl)streamRule).save();
+        } catch (ValidationException e) {
+            LOG.error("Validation error.", e);
+            throw new WebApplicationException(e, Response.Status.BAD_REQUEST);
+        }
+
+        Map<String, Object> result = Maps.newHashMap();
+        result.put("streamrule_id", id.toStringMongod());
+
+        return Response.status(Response.Status.OK).entity(json(result)).build();
+    }
+
     @GET @Timed
     @ApiOperation(value = "Get a list of all stream rules")
     @Produces(MediaType.APPLICATION_JSON)
@@ -104,6 +155,22 @@ public class StreamRuleResource extends RestResource {
         result.put("stream_rules", streamRules);
 
         return json(result);
+    }
+
+    @GET @Path("/{streamRuleId}")
+    @Timed
+    @ApiOperation(value = "Get a single stream rules")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response get(@ApiParam(title = "streamid", description = "The id of the stream whose stream rule we want.", required = true) @PathParam("streamid") String streamid,
+                      @ApiParam(title = "streamRuleId", description = "The stream rule id we are getting", required = true) @PathParam("streamRuleId") String streamRuleId) {
+        StreamRule streamRule;
+        try {
+            streamRule = StreamRuleImpl.load(loadObjectId(streamRuleId), core);
+        } catch (org.graylog2.database.NotFoundException e) {
+            throw new WebApplicationException(404);
+        }
+
+        return Response.status(Response.Status.OK).entity(json(((StreamRuleImpl)streamRule).asMap())).build();
     }
 
     @DELETE @Path("/{streamRuleId}") @Timed

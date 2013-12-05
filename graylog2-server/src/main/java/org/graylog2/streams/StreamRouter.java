@@ -28,6 +28,7 @@ import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
 import com.google.common.collect.Maps;
 import org.bson.types.ObjectId;
+import org.graylog2.database.NotFoundException;
 import org.graylog2.plugin.GraylogServer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -58,6 +59,16 @@ public class StreamRouter {
     private final Map<String, Meter> streamIncomingMeters = Maps.newHashMap();
     private final Map<String, Timer> streamExecutionTimers = Maps.newHashMap();
 
+    private Boolean useCaching = false;
+
+    public StreamRouter() {
+        this(false);
+    }
+
+    public StreamRouter(Boolean useCaching) {
+        this.useCaching = useCaching;
+    }
+
     public List<Stream> route(Core server, Message msg) {
         List<Stream> matches = Lists.newArrayList();
         List<Stream> streams = getStreams(server);
@@ -68,7 +79,7 @@ public class StreamRouter {
 
             Map<StreamRule, Boolean> result = getRuleMatches(server, stream, msg);
 
-            boolean matched = !result.isEmpty() && doesStreamMatch(result);
+            boolean matched = doesStreamMatch(result);
 
             // All rules were matched.
             if (matched) {
@@ -82,47 +93,60 @@ public class StreamRouter {
     }
 
     private List<Stream> getStreams(final Core server) {
-        if (cachedStreams == null)
-            cachedStreams = CacheBuilder.newBuilder()
-                    .maximumSize(1)
-                    .expireAfterWrite(1, TimeUnit.SECONDS)
-                    .build(
-                            new CacheLoader<String, List<Stream>>() {
-                                @Override
-                                public List<Stream> load(String s) throws Exception {
-                                    return StreamImpl.loadAllEnabled(server);
+        if (this.useCaching) {
+            if (cachedStreams == null)
+                cachedStreams = CacheBuilder.newBuilder()
+                        .maximumSize(1)
+                        .expireAfterWrite(1, TimeUnit.SECONDS)
+                        .build(
+                                new CacheLoader<String, List<Stream>>() {
+                                    @Override
+                                    public List<Stream> load(String s) throws Exception {
+                                        return StreamImpl.loadAllEnabled(server);
+                                    }
                                 }
-                            }
-                    );
-        List<Stream> result = null;
-        try {
-            result = cachedStreams.get("streams");
-        } catch (ExecutionException e) {
-            LOG.error("Caught exception while fetching from cache", e);
+                        );
+            List<Stream> result = null;
+            try {
+                result = cachedStreams.get("streams");
+            } catch (ExecutionException e) {
+                LOG.error("Caught exception while fetching from cache", e);
+            }
+            return result;
+        } else {
+            return StreamImpl.loadAllEnabled(server);
         }
-        return result;
     }
 
     private List<StreamRule> getStreamRules(ObjectId streamId, final Core server) {
-        if (cachedStreamRules == null)
-            cachedStreamRules = CacheBuilder.newBuilder()
-                    .expireAfterWrite(1, TimeUnit.SECONDS)
-                    .build(
-                            new CacheLoader<ObjectId, List<StreamRule>>() {
-                                @Override
-                                public List<StreamRule> load(ObjectId s) throws Exception {
-                                    return StreamRuleImpl.findAllForStream(s, server);
+        if (this.useCaching) {
+            if (cachedStreamRules == null)
+                cachedStreamRules = CacheBuilder.newBuilder()
+                        .expireAfterWrite(1, TimeUnit.SECONDS)
+                        .build(
+                                new CacheLoader<ObjectId, List<StreamRule>>() {
+                                    @Override
+                                    public List<StreamRule> load(ObjectId s) throws Exception {
+                                        return StreamRuleImpl.findAllForStream(s, server);
+                                    }
                                 }
-                            }
-                    );
-        List<StreamRule> result = null;
-        try {
-            result = cachedStreamRules.get(streamId);
-        } catch (ExecutionException e) {
-            LOG.error("Caught exception while fetching from cache", e);
-        }
+                        );
+            List<StreamRule> result = null;
+            try {
+                result = cachedStreamRules.get(streamId);
+            } catch (ExecutionException e) {
+                LOG.error("Caught exception while fetching from cache", e);
+            }
 
-        return result;
+            return result;
+        } else {
+            try {
+                return StreamRuleImpl.findAllForStream(streamId, server);
+            } catch (NotFoundException e) {
+                LOG.error("Caught exception while fetching stream rules", e);
+                return null;
+            }
+        }
     }
 
     public Map<StreamRule, Boolean> getRuleMatches(final Core server, Stream stream, Message msg) {
@@ -143,7 +167,7 @@ public class StreamRouter {
     }
 
     public boolean doesStreamMatch(Map<StreamRule, Boolean> ruleMatches) {
-        return !ruleMatches.values().contains(false);
+        return !ruleMatches.isEmpty() && !ruleMatches.values().contains(false);
     }
 
     public boolean matchStreamRule(Message msg, StreamRuleMatcher matcher, StreamRule rule) {
