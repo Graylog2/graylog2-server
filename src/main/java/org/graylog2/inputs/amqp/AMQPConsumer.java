@@ -36,6 +36,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
+import com.rabbitmq.client.ShutdownListener;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.graylog2.Core;
@@ -61,6 +62,7 @@ public class AMQPConsumer implements Runnable {
     Connection connection;
     Channel channel;
     ExecutorService executor;
+    ShutdownListener shutdownListener;
     
     private final Meter handledMessages = Metrics.newMeter(AMQPConsumer.class, "HandledAMQPMessages", "messages", TimeUnit.SECONDS);
     private final Meter handledSyslogMessages = Metrics.newMeter(AMQPConsumer.class, "HandledAMQPSyslogMessages", "messages", TimeUnit.SECONDS);
@@ -101,7 +103,8 @@ public class AMQPConsumer implements Runnable {
             arguments.put("x-message-ttl", queueConfig.getTtl()); // 15 minutes.
 
             // Automatically re-connect.
-            this.connection.addShutdownListener(new AMQPReconnector(server, queueConfig));
+            shutdownListener = new AMQPReconnector(server, queueConfig);
+            connection.addShutdownListener(shutdownListener);
 
             // Declare and bind queue.
             channel.queueDeclare(queueConfig.getQueueName(), isDurable, isExclusive, isAutoDelete, arguments);
@@ -139,6 +142,8 @@ public class AMQPConsumer implements Runnable {
 
     public void disconnect() {
         try {
+            connection.removeShutdownListener(shutdownListener);
+
             AMQPInput.getConsumers().remove(queueConfig.getId());
             
             channel.close();
@@ -166,6 +171,7 @@ public class AMQPConsumer implements Runnable {
     public void consume() throws IOException {
         boolean autoAck = false;
 
+        channel.basicQos(1);
         channel.basicConsume(queueConfig.getQueueName(), autoAck, createConsumer(channel));
     }
 
@@ -198,7 +204,7 @@ public class AMQPConsumer implements Runnable {
                             try {
                                gelfProcessor.messageReceived(gelf, false);
                             } catch (BufferOutOfCapacityException e) {
-                                LOG.warn("ProcessBufferProcessor is out of capacity. Requeuing message!");
+                                LOG.debug("ProcessBufferProcessor is out of capacity. Requeuing message!");
                                 channel.basicReject(envelope.getDeliveryTag(), true);
                                 reQueuedMessages.mark();
                                 return;
@@ -210,7 +216,7 @@ public class AMQPConsumer implements Runnable {
                             try {
                                 syslogProcessor.messageReceived(new String(body), connection.getAddress(), false);
                              } catch (BufferOutOfCapacityException e) {
-                                LOG.warn("ProcessBufferProcessor is out of capacity. Requeuing message!");
+                                LOG.debug("ProcessBufferProcessor is out of capacity. Requeuing message!");
                                 channel.basicReject(envelope.getDeliveryTag(), true);
                                 reQueuedMessages.mark();
                                 return;

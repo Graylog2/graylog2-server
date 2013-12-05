@@ -45,7 +45,8 @@ public class ProcessBuffer implements Buffer {
 
     private static final Logger LOG = LoggerFactory.getLogger(ProcessBuffer.class);
     
-    protected static RingBuffer<LogMessageEvent> ringBuffer;
+    protected RingBuffer<LogMessageEvent> ringBuffer;
+    protected Disruptor disruptor;
 
     protected ExecutorService executor = Executors.newCachedThreadPool(
             new ThreadFactoryBuilder()
@@ -67,7 +68,7 @@ public class ProcessBuffer implements Buffer {
     }
 
     public void initialize() {
-        Disruptor disruptor = new Disruptor<LogMessageEvent>(
+        disruptor = new Disruptor<LogMessageEvent>(
                 LogMessageEvent.EVENT_FACTORY,
                 server.getConfiguration().getRingSize(),
                 executor,
@@ -128,4 +129,7 @@ public class ProcessBuffer implements Buffer {
         return ringBuffer.remainingCapacity() > 0;
     }
 
+    public void shutdown() {
+        disruptor.shutdown();
+    }
 }
