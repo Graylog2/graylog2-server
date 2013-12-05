@@ -132,6 +132,14 @@ public class Radio extends ClusterEntity {
         return jvmInfo;
     }
 
+    public String getPid() {
+        return jvm().getPid();
+    }
+
+    public String getJVMDescription() {
+        return jvm().getInfo();
+    }
+
     @Override
     public boolean terminateInput(String inputId) {
         try {
@@ -154,12 +162,25 @@ public class Radio extends ClusterEntity {
         return transportAddress.toASCIIString();
     }
 
+    public URI getTransportAddressUri() {
+        return transportAddress;
+    }
+
     @Override
     public String getHostname() {
         if (systemInfo == null) {
             loadSystemInformation();
         }
+
         return systemInfo.hostname;
+    }
+
+    public String getVersion() {
+        if (systemInfo == null) {
+            loadSystemInformation();
+        }
+
+        return systemInfo.version;
     }
 
     @Override

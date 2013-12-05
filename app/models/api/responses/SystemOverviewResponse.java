@@ -23,7 +23,7 @@ import com.google.gson.annotations.SerializedName;
 public class SystemOverviewResponse {
 
     public String facility;
-
+    public String version;
     public String codename;
 
     @SerializedName("server_id")

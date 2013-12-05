@@ -20,6 +20,7 @@ package models;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
+import com.google.common.net.MediaType;
 import com.google.inject.assistedinject.Assisted;
 import com.google.inject.assistedinject.AssistedInject;
 import lib.APIException;
@@ -71,6 +72,7 @@ public class Node extends ClusterEntity {
 
     private final boolean fromConfiguration;
     private SystemOverviewResponse systemInfo;
+    private NodeJVMStats jvmInfo;
 
     private AtomicInteger failureCount = new AtomicInteger(0);
 
@@ -140,7 +142,11 @@ public class Node extends ClusterEntity {
     }
 
     public String getThreadDump() throws IOException, APIException {
-        return api.get(String.class).node(this).path("/system/threaddump").execute();
+        return api.get(String.class)
+                .node(this)
+                .path("/system/threaddump")
+                .accept(MediaType.ANY_TEXT_TYPE)
+                .execute();
     }
 
     public List<Input> getInputs() {
@@ -240,6 +246,16 @@ public class Node extends ClusterEntity {
         }
     }
 
+    public synchronized void loadJVMInformation() {
+        try {
+            jvmInfo = new NodeJVMStats(api.get(ClusterEntityJVMStatsResponse.class).path("/system/jvm").node(this).execute());
+        } catch (APIException e) {
+            log.error("Unable to load JVM information for node " + this, e);
+        } catch (IOException e) {
+            log.error("Unable to load JVM information for node " + this, e);
+        }
+    }
+
     @Override
     public String getTransportAddress() {
         return transportAddress.toASCIIString();
@@ -264,9 +280,7 @@ public class Node extends ClusterEntity {
 
     @Override
     public String getHostname() {
-        if (systemInfo == null) {
-            loadSystemInformation();
-        }
+        requireSystemInfo();
         return systemInfo.hostname;
     }
 
@@ -275,10 +289,33 @@ public class Node extends ClusterEntity {
     }
 
     public boolean isProcessing() {
-        if (systemInfo == null) {
-            loadSystemInformation();
-        }
+        requireSystemInfo();
         return systemInfo.isProcessing;
+    }
+
+    public String getVersion() {
+        requireSystemInfo();
+        return systemInfo.version;
+    }
+
+    public String getCodename() {
+        requireSystemInfo();
+        return systemInfo.codename;
+    }
+
+    public String getPid() {
+        requireJVMInfo();
+        return jvmInfo.getPid();
+    }
+
+    public String getJVMDescription() {
+        requireJVMInfo();
+        return jvmInfo.getInfo();
+    }
+
+    public NodeJVMStats jvm() {
+        requireJVMInfo();
+        return jvmInfo;
     }
 
     public Map<String, Metric> getMetrics(String namespace) throws APIException, IOException {
@@ -423,5 +460,16 @@ public class Node extends ClusterEntity {
         }
         b.append("}");
         return b.toString();
+    }
+
+    public void requireSystemInfo() {
+        if (systemInfo == null) {
+            loadSystemInformation();
+        }
+    }
+    public void requireJVMInfo() {
+        if (jvmInfo == null) {
+            loadJVMInformation();
+        }
     }
 }
