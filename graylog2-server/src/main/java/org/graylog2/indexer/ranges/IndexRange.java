@@ -28,6 +28,8 @@ import org.graylog2.Core;
 import org.graylog2.system.activities.Activity;
 import org.graylog2.database.Persisted;
 import org.graylog2.database.validators.Validator;
+import org.joda.time.DateTime;
+import org.joda.time.DateTimeZone;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -86,6 +88,30 @@ public class IndexRange extends Persisted {
 
     public String getIndexName() {
         return (String) fields.get("index");
+    }
+
+    public DateTime getCalculatedAt() {
+        if (fields.containsKey("calculated_at")) {
+            int ts = (Integer) fields.get("calculated_at");
+            long unixMs = ts*1000L;
+            return new DateTime(unixMs, DateTimeZone.UTC);
+        } else {
+            return null;
+        }
+    }
+
+    public DateTime getStart() {
+        int ts = (Integer) fields.get("start");
+        long unixMs = ts*1000L;
+        return new DateTime(unixMs, DateTimeZone.UTC);
+    }
+
+    public int getCalculationTookMs() {
+        if (fields.containsKey("took_ms")) {
+            return (Integer) fields.get("took_ms");
+        } else {
+            return -1;
+        }
     }
 
     @Override

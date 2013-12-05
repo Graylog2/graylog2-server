@@ -265,7 +265,10 @@ public class Core implements GraylogServer, InputHost {
         deflector.setUp();
 
         scheduler = Executors.newScheduledThreadPool(SCHEDULED_THREADS_POOL_SIZE,
-                new ThreadFactoryBuilder().setNameFormat("scheduled-%d").build()
+                new ThreadFactoryBuilder()
+                        .setNameFormat("scheduled-%d")
+                        .setDaemon(true)
+                        .build()
         );
 
         // Load and register plugins.

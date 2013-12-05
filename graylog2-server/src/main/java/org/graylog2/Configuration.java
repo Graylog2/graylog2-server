@@ -185,7 +185,7 @@ public class Configuration {
     private String pluginDir = "plugin";
 
     @Parameter(value = "node_id_file", required = false)
-    private String nodeIdFile = "graylog2-server-node-id";
+    private String nodeIdFile = "/etc/graylog2-server-node-id";
 
     @Parameter(value = "root_username", required = false)
     private String rootUsername = "admin";

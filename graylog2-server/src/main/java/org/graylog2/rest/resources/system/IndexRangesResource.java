@@ -20,7 +20,11 @@
 package org.graylog2.rest.resources.system;
 
 import com.codahale.metrics.annotation.Timed;
+import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
+import org.graylog2.indexer.ranges.IndexRange;
 import org.graylog2.indexer.ranges.RebuildIndexRangesJob;
+import org.graylog2.plugin.Tools;
 import org.graylog2.rest.documentation.annotations.Api;
 import org.graylog2.rest.documentation.annotations.ApiOperation;
 import org.graylog2.rest.documentation.annotations.ApiResponse;
@@ -28,15 +32,15 @@ import org.graylog2.rest.documentation.annotations.ApiResponses;
 import org.graylog2.rest.resources.RestResource;
 import org.graylog2.system.jobs.SystemJob;
 import org.graylog2.system.jobs.SystemJobConcurrencyException;
+import org.joda.time.DateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.ws.rs.POST;
-import javax.ws.rs.Path;
-import javax.ws.rs.Produces;
-import javax.ws.rs.WebApplicationException;
+import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+import java.util.List;
+import java.util.Map;
 
 /**
  * @author Lennart Koopmann <lennart@torch.sh>
@@ -46,6 +50,39 @@ import javax.ws.rs.core.Response;
 public class IndexRangesResource extends RestResource {
 
     private static final Logger LOG = LoggerFactory.getLogger(IndexRangesResource.class);
+
+    @GET @Timed
+    @ApiOperation(value = "Get a list of all index ranges")
+    @Produces(MediaType.APPLICATION_JSON)
+    public String list() {
+        Map<String, Object> result = Maps.newHashMap();
+        List<Map<String, Object>> ranges = Lists.newArrayList();
+
+        for (IndexRange range : IndexRange.getFrom(core, 0)) {
+            Map<String, Object> rangeInfo = Maps.newHashMap();
+
+            // Calculated at and the calculation time in ms are not always set, depending on how/why the entry was created.
+            DateTime calculatedAt = range.getCalculatedAt();
+            if (calculatedAt != null) {
+                rangeInfo.put("calculated_at", Tools.getISO8601String(calculatedAt));
+            }
+
+            int calculationTookMs = range.getCalculationTookMs();
+            if (calculationTookMs >= 0) {
+                rangeInfo.put("calculation_took_ms", calculationTookMs);
+            }
+
+            rangeInfo.put("starts", Tools.getISO8601String(range.getStart()));
+            rangeInfo.put("index", range.getIndexName());
+
+            ranges.add(rangeInfo);
+        }
+
+        result.put("ranges", ranges);
+        result.put("total", ranges.size());
+
+        return json(result);
+    }
 
     @POST @Timed
     @Path("/rebuild")

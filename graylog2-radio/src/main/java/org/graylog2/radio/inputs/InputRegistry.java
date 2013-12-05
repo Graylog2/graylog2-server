@@ -32,6 +32,7 @@ import org.graylog2.radio.Radio;
 import org.graylog2.radio.inputs.api.InputSummaryResponse;
 import org.graylog2.radio.inputs.api.PersistedInputsResponse;
 import org.graylog2.radio.inputs.api.RegisterInputRequest;
+import org.graylog2.radio.inputs.api.RegisterInputResponse;
 import org.joda.time.DateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -194,6 +195,11 @@ public class InputRegistry {
                 .execute();
 
         Response r = f.get();
+
+        RegisterInputResponse response = mapper.readValue(r.getResponseBody(), RegisterInputResponse.class);
+
+        // Set the ID that was generated in the server as persist ID of this input.
+        input.setPersistId(response.persistId);
 
         if (r.getStatusCode() != 201) {
             throw new RuntimeException("Expected HTTP response [201] for input registration but got [" + r.getStatusCode() + "].");

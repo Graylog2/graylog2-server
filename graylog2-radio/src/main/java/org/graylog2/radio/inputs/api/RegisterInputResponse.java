@@ -1,5 +1,5 @@
 /**
- * Copyright 2013 Lennart Koopmann <lennart@socketfeed.com>
+ * Copyright 2013 Lennart Koopmann <lennart@torch.sh>
  *
  * This file is part of Graylog2.
  *
@@ -17,30 +17,16 @@
  * along with Graylog2.  If not, see <http://www.gnu.org/licenses/>.
  *
  */
+package org.graylog2.radio.inputs.api;
 
-package org.graylog2.streams.matchers;
-
-import org.graylog2.plugin.Message;
-import org.graylog2.plugin.streams.StreamRule;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
 /**
- * @author Lennart Koopmann <lennart@socketfeed.com>
+ * @author Lennart Koopmann <lennart@torch.sh>
  */
-public class ExactMatcher implements StreamRuleMatcher {
+public class RegisterInputResponse {
 
-	@Override
-	public boolean match(Message msg, StreamRule rule) {
-        if (!msg.getFields().containsKey(rule.getField())) {
-            return false;
-        }
-
-		Object field = msg.getField(rule.getField());
-		
-		if (field == null) {
-			return false;
-		}
-		
-		return rule.getInverted() ^ field.equals(rule.getValue());
-	}
+    @JsonProperty("persist_id")
+    public String persistId;
 
 }

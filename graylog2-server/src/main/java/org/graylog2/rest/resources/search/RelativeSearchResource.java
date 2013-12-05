@@ -88,12 +88,13 @@ public class RelativeSearchResource extends SearchResource {
             @ApiParam(title = "field", description = "Message field of to return terms of", required = true) @QueryParam("field") String field,
             @ApiParam(title = "query", description = "Query (Lucene syntax)", required = true) @QueryParam("query") String query,
             @ApiParam(title = "size", description = "Maximum number of terms to return", required = false) @QueryParam("size") int size,
-            @ApiParam(title = "range", description = "Relative timeframe to search in. See search method description.", required = true) @QueryParam("range") int range) {
+            @ApiParam(title = "range", description = "Relative timeframe to search in. See search method description.", required = true) @QueryParam("range") int range,
+            @ApiParam(title = "filter", description = "Filter", required = false) @QueryParam("filter") String filter) {
         checkQueryAndField(query, field);
 
         try {
             return json(buildTermsResult(
-                    core.getIndexer().searches().terms(field, size, query, buildRelativeTimeRange(range))
+                    core.getIndexer().searches().terms(field, size, query, filter, buildRelativeTimeRange(range))
             ));
         } catch (IndexHelper.InvalidRangeFormatException e) {
             LOG.warn("Invalid timerange parameters provided. Returning HTTP 400.", e);
@@ -113,12 +114,13 @@ public class RelativeSearchResource extends SearchResource {
     public String statsRelative(
             @ApiParam(title = "field", description = "Message field of numeric type to return statistics for", required = true) @QueryParam("field") String field,
             @ApiParam(title = "query", description = "Query (Lucene syntax)", required = true) @QueryParam("query") String query,
-            @ApiParam(title = "range", description = "Relative timeframe to search in. See search method description.", required = true) @QueryParam("range") int range) {
+            @ApiParam(title = "range", description = "Relative timeframe to search in. See search method description.", required = true) @QueryParam("range") int range,
+            @ApiParam(title = "filter", description = "Filter", required = false) @QueryParam("filter") String filter) {
         checkQueryAndField(query, field);
 
         try {
             return json(buildFieldStatsResult(
-                    fieldStats(field, query, buildRelativeTimeRange(range))
+                    fieldStats(field, query, filter, buildRelativeTimeRange(range))
             ));
         } catch (IndexHelper.InvalidRangeFormatException e) {
             LOG.warn("Invalid timerange parameters provided. Returning HTTP 400.", e);
