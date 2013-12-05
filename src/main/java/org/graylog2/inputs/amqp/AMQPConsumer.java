@@ -171,6 +171,7 @@ public class AMQPConsumer implements Runnable {
     public void consume() throws IOException {
         boolean autoAck = false;
 
+        channel.basicQos(1);
         channel.basicConsume(queueConfig.getQueueName(), autoAck, createConsumer(channel));
     }
 
