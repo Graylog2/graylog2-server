@@ -29,17 +29,21 @@ import org.graylog2.rest.documentation.annotations.Api;
 import org.graylog2.rest.documentation.annotations.ApiOperation;
 import org.graylog2.rest.documentation.annotations.ApiParam;
 import org.graylog2.rest.resources.RestResource;
+import org.graylog2.security.ShiroSecurityContext;
 import org.joda.time.DateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.ws.rs.*;
+import javax.ws.rs.container.ContainerRequestContext;
+import javax.ws.rs.core.Context;
 import javax.ws.rs.core.Response;
+import javax.ws.rs.core.SecurityContext;
 import java.io.Serializable;
 import java.util.Date;
 import java.util.concurrent.TimeUnit;
 
-import static javax.ws.rs.core.Response.serverError;
+import static javax.ws.rs.core.Response.noContent;
 
 @Path("/system/sessions")
 @Api(value = "Sessions", description = "Interactive user sessions")
@@ -48,9 +52,15 @@ public class SessionsResource extends RestResource {
 
     @POST
     @ApiOperation(value = "Create a new session", notes = "This request creates a new session for a user or reactivates an existing session: the equivalent of logging in.")
-    public Session newSession(@HeaderParam("X-Graylog2-Session-Id") String sessionId, SessionCreateRequest createRequest) {
+    public Session newSession(@Context ContainerRequestContext requestContext, SessionCreateRequest createRequest) {
         final Session result = new Session();
-
+        final SecurityContext securityContext = requestContext.getSecurityContext();
+        if (!(securityContext instanceof ShiroSecurityContext)) {
+            throw new InternalServerErrorException("Unsupported SecurityContext class, this is a bug!");
+        }
+        final ShiroSecurityContext shiroSecurityContext = (ShiroSecurityContext) securityContext;
+        // we treat the BASIC auth username as the sessionid
+        final String sessionId = shiroSecurityContext.getUsername();
         // pretend that we had session id before
         Serializable id = null;
         if (sessionId != null && !sessionId.isEmpty()) {
@@ -61,6 +71,7 @@ public class SessionsResource extends RestResource {
 
         try {
             subject.login(new UsernamePasswordToken(createRequest.username, createRequest.password));
+            // TODO make this configurable
             subject.getSession().setTimeout(TimeUnit.MINUTES.toMillis(5));
             subject.getSession().touch();
         } catch (AuthenticationException e) {
@@ -84,12 +95,13 @@ public class SessionsResource extends RestResource {
     @RequiresAuthentication
     public Response terminateSession(@ApiParam(title = "sessionId", required = true) @PathParam("sessionId") String sessionId) {
         final Subject subject = getSubject();
-        if (subject.getSession().getId().equals(sessionId)) {
+        final org.apache.shiro.session.Session session = subject.getSession();
+        if (session != null && session.getId().equals(sessionId)) {
             core.getSecurityManager().logout(subject);
         } else {
             log.warn("Trying to destroy session {} that does not belong to the current user {}", sessionId, subject.getPrincipal());
         }
-        return serverError().build();
+        return noContent().build();
     }
 
     @JsonAutoDetect

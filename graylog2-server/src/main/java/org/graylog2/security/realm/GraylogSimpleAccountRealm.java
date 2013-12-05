@@ -1,8 +1,5 @@
 package org.graylog2.security.realm;
 
-import org.apache.shiro.authc.AuthenticationException;
-import org.apache.shiro.authc.AuthenticationInfo;
-import org.apache.shiro.authc.AuthenticationToken;
 import org.apache.shiro.authc.SimpleAccount;
 import org.apache.shiro.authz.Permission;
 import org.apache.shiro.authz.permission.AllPermission;
@@ -29,9 +26,4 @@ public class GraylogSimpleAccountRealm extends SimpleAccountRealm {
         ));
     }
 
-    @Override
-    protected AuthenticationInfo doGetAuthenticationInfo(AuthenticationToken token) throws AuthenticationException {
-        log.debug("Retrieving authentication info for user {}", token.getPrincipal());
-        return super.doGetAuthenticationInfo(token);
-    }
 }

@@ -32,6 +32,7 @@ import org.graylog2.rest.resources.RestResource;
 import org.graylog2.rest.resources.users.requests.ChangePasswordRequest;
 import org.graylog2.rest.resources.users.requests.CreateRequest;
 import org.graylog2.rest.resources.users.requests.PermissionEditRequest;
+import org.graylog2.security.AccessToken;
 import org.graylog2.security.RestPermissions;
 import org.graylog2.users.User;
 import org.joda.time.DateTimeZone;
@@ -310,6 +311,36 @@ public class UsersResource extends RestResource {
             return noContent().build();
         }
         return status(FORBIDDEN).build();
+    }
+
+    @GET
+    @Path("{username}/tokens")
+    @ApiOperation("Retrieves the list of access tokens for a user")
+    public Response listTokens(@PathParam("username") String username) {
+        // TODO
+        return serverError().build();
+    }
+
+    @POST
+    @Path("{username}/tokens")
+    @RequiresPermissions(RestPermissions.USERS_TOKENCREATE)
+    @ApiOperation("Generates a new access token for a user")
+    public Response generateNewToken(@PathParam("username") String username) {
+        final User user = User.load(username, core);
+        if (user == null) {
+            throw new NotFoundException("Unknown user " + username);
+        }
+        final AccessToken accessToken = AccessToken.create(core, username);
+        Map<String, String> result = Maps.newHashMap();
+        result.put("token", accessToken.getToken());
+        return ok(result).build();
+    }
+
+    @DELETE
+    @Path("{username}/tokens/{token}")
+    public Response revokeToken(@PathParam("username") String username, @PathParam("token") String token) {
+        // TODO
+        return serverError().build();
     }
 
     private HashMap<String, Object> toMap(User user) {

@@ -18,6 +18,7 @@
  */
 package org.graylog2.security;
 
+import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import org.apache.shiro.session.Session;
 import org.apache.shiro.session.UnknownSessionException;
@@ -30,6 +31,7 @@ import org.slf4j.LoggerFactory;
 
 import java.io.Serializable;
 import java.util.Collection;
+import java.util.List;
 import java.util.Map;
 
 public class MongoDbSessionDAO extends AbstractSessionDAO {
@@ -72,6 +74,10 @@ public class MongoDbSessionDAO extends AbstractSessionDAO {
             // expired session or it was never there to begin with
             return null;
         }
+        return getSimpleSession(sessionId, dbSession);
+    }
+
+    private SimpleSession getSimpleSession(Serializable sessionId, MongoDbSession dbSession) {
         final SimpleSession session = new SimpleSession();
         assignSessionId(session, sessionId);
         session.setHost(dbSession.getHost());
@@ -103,7 +109,7 @@ public class MongoDbSessionDAO extends AbstractSessionDAO {
 
     @Override
     public void delete(Session session) {
-        log.debug("Deleting session {}", session, new Throwable());
+        log.debug("Deleting session {}", session);
         final Serializable id = session.getId();
         final MongoDbSession dbSession = MongoDbSession.load(id.toString(), core);
         dbSession.destroy();
@@ -111,8 +117,14 @@ public class MongoDbSessionDAO extends AbstractSessionDAO {
 
     @Override
     public Collection<Session> getActiveSessions() {
-        log.debug("Trying to get all active sessions.", new Throwable());
-        // TODO
-        return null;
+        log.debug("Retrieving all active sessions.");
+
+        Collection<MongoDbSession> dbSessions = MongoDbSession.loadAll(core);
+        List<Session> sessions = Lists.newArrayList();
+        for (MongoDbSession dbSession : dbSessions) {
+            sessions.add(getSimpleSession(dbSession.getSessionId(), dbSession));
+        }
+
+        return sessions;
     }
 }

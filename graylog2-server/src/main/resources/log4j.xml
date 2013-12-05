@@ -21,7 +21,7 @@
         <level value="debug"/>
     </logger>
 	<logger name="org.apache.shiro">
-        <level value="debug" />
+        <level value="error" />
 	</logger>
     <!-- this emits a harmless warning for ActiveDirectory every time which we can't work around :( -->
     <logger name="org.apache.directory.api.ldap.model.message.BindRequestImpl">

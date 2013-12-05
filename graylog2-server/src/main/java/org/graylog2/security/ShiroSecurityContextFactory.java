@@ -21,8 +21,12 @@ package org.graylog2.security;
 
 import com.google.common.collect.Lists;
 import org.apache.shiro.SecurityUtils;
+import org.apache.shiro.authc.AuthenticationToken;
+import org.apache.shiro.authc.Authenticator;
 import org.apache.shiro.authc.UsernamePasswordToken;
 import org.apache.shiro.authc.credential.HashedCredentialsMatcher;
+import org.apache.shiro.authc.pam.FirstSuccessfulStrategy;
+import org.apache.shiro.authc.pam.ModularRealmAuthenticator;
 import org.apache.shiro.mgt.DefaultSecurityManager;
 import org.apache.shiro.mgt.DefaultSessionStorageEvaluator;
 import org.apache.shiro.mgt.DefaultSubjectDAO;
@@ -33,8 +37,7 @@ import org.graylog2.Configuration;
 import org.graylog2.Core;
 import org.graylog2.jersey.container.netty.SecurityContextFactory;
 import org.graylog2.security.ldap.LdapConnector;
-import org.graylog2.security.realm.GraylogSimpleAccountRealm;
-import org.graylog2.security.realm.MongoDbRealm;
+import org.graylog2.security.realm.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -54,8 +57,10 @@ public class ShiroSecurityContextFactory implements SecurityContextFactory {
         );
         inMemoryRealm.setCredentialsMatcher(new HashedCredentialsMatcher("SHA-256"));
 
-        final MongoDbRealm mongoDbRealm = new MongoDbRealm(core);
-        mongoDbRealm.setCachingEnabled(false);
+        final PasswordAuthenticator passwordAuthenticator = new PasswordAuthenticator(core);
+        passwordAuthenticator.setCachingEnabled(false);
+        final MongoDbAuthorizationRealm mongoDbAuthorizationRealm = new MongoDbAuthorizationRealm(core);
+        mongoDbAuthorizationRealm.setCachingEnabled(false);
 
         final LdapConnector ldapConnector = new LdapConnector(core);
         core.setLdapConnector(ldapConnector);
@@ -64,10 +69,25 @@ public class ShiroSecurityContextFactory implements SecurityContextFactory {
 //        ldapRealm.setCredentialsMatcher(new HashedCredentialsMatcher("SHA-256"));
 //        ldapRealm.setCachingEnabled(false);
 
-        sm = new DefaultSecurityManager(Lists.<Realm>newArrayList(mongoDbRealm, inMemoryRealm));
+        final SessionAuthenticator sessionAuthenticator = new SessionAuthenticator(core);
+        sessionAuthenticator.setCachingEnabled(false);
+        final AccessTokenAuthenticator accessTokenAuthenticator = new AccessTokenAuthenticator(core);
+        accessTokenAuthenticator.setCachingEnabled(false);
+
+        sm = new DefaultSecurityManager(Lists.<Realm>newArrayList(
+                sessionAuthenticator,
+                accessTokenAuthenticator,
+                passwordAuthenticator,
+                inMemoryRealm));
+        final Authenticator authenticator = sm.getAuthenticator();
+        if (authenticator instanceof ModularRealmAuthenticator) {
+            ((ModularRealmAuthenticator) authenticator).setAuthenticationStrategy(new FirstSuccessfulStrategy());
+        }
+        sm.setAuthorizer(mongoDbAuthorizationRealm);
+
         final DefaultSubjectDAO subjectDAO = new DefaultSubjectDAO();
         final DefaultSessionStorageEvaluator sessionStorageEvaluator = new DefaultSessionStorageEvaluator();
-        sessionStorageEvaluator.setSessionStorageEnabled(true);
+        sessionStorageEvaluator.setSessionStorageEnabled(false);
         subjectDAO.setSessionStorageEvaluator(sessionStorageEvaluator);
         sm.setSubjectDAO(subjectDAO);
 
@@ -80,12 +100,26 @@ public class ShiroSecurityContextFactory implements SecurityContextFactory {
 
         SecurityUtils.setSecurityManager(sm);
     }
+
     @Override
     public SecurityContext create(String userName, String credential, boolean isSecure, String authcScheme, String host) {
 
+        AuthenticationToken authToken;
+        if (credential == null) {
+            authToken = new UsernamePasswordToken(userName, credential, host);
+        } else {
+            if (credential.equalsIgnoreCase("session")) {
+                authToken = new SessionIdToken(userName, host);
+            } else if (credential.equalsIgnoreCase("token")) {
+                authToken = new AccessTokenAuthToken(userName, host);
+            } else {
+                authToken = new UsernamePasswordToken(userName, credential, host);
+            }
+        }
+
         return new ShiroSecurityContext(
                 new Subject.Builder(sm).host(host).sessionCreationEnabled(false).buildSubject(),
-                new UsernamePasswordToken(userName, credential, host),
+                authToken,
                 isSecure,
                 authcScheme
         );

@@ -37,6 +37,7 @@ public class RestPermissions {
     public static final String USERS_LIST = "users:list";
     public static final String USERS_PERMISSIONSEDIT = "users:permissionsedit";
     public static final String USERS_PASSWORDCHANGE = "users:passwordchange";
+    public static final String USERS_TOKENCREATE = "users:tokencreate";
 
     private static Map<String, Collection<String>> allPermissions;
 
