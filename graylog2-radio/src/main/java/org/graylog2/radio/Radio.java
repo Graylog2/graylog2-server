@@ -35,7 +35,7 @@ import org.graylog2.jersey.container.netty.NettyContainer;
 import org.graylog2.plugin.InputHost;
 import org.graylog2.plugin.Tools;
 import org.graylog2.plugin.Version;
-import org.graylog2.plugin.buffers.Buffer;
+import org.graylog2.plugin.buffers.BatchBuffer;
 import org.graylog2.plugin.rest.AnyExceptionClassMapper;
 import org.graylog2.plugin.system.NodeId;
 import org.graylog2.radio.buffers.ProcessBuffer;
@@ -224,7 +224,7 @@ public class Radio implements InputHost {
     }
 
     @Override
-    public Buffer getProcessBuffer() {
+    public BatchBuffer getProcessBuffer() {
         return processBuffer;
     }
 

@@ -22,13 +22,15 @@ package org.graylog2.buffers;
 
 import com.codahale.metrics.Meter;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
+import com.lmax.disruptor.EventTranslatorOneArg;
 import com.lmax.disruptor.dsl.Disruptor;
 import com.lmax.disruptor.dsl.ProducerType;
 import org.graylog2.Core;
 import org.graylog2.buffers.processors.ProcessBufferProcessor;
 import org.graylog2.inputs.Cache;
-import org.graylog2.plugin.buffers.Buffer;
 import org.graylog2.plugin.Message;
+import org.graylog2.plugin.buffers.BatchBuffer;
+import org.graylog2.plugin.buffers.BufferOutOfCapacityException;
 import org.graylog2.plugin.buffers.MessageEvent;
 import org.graylog2.plugin.buffers.ProcessingDisabledException;
 import org.graylog2.plugin.inputs.MessageInput;
@@ -37,28 +39,34 @@ import org.slf4j.LoggerFactory;
 
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import org.graylog2.plugin.buffers.BufferOutOfCapacityException;
 
 import static com.codahale.metrics.MetricRegistry.name;
 
 /**
  * @author Lennart Koopmann <lennart@socketfeed.com>
  */
-public class ProcessBuffer extends Buffer {
+public class ProcessBuffer extends BatchBuffer {
 
     private static final Logger LOG = LoggerFactory.getLogger(ProcessBuffer.class);
 
     public static final String SOURCE_INPUT_ATTR_NAME = "gl2_source_input";
     public static final String SOURCE_NODE_ATTR_NAME = "gl2_source_node";
 
+    private static final EventTranslatorOneArg<MessageEvent, Message> MESSAGE_EVENT_TRANSLATOR = new EventTranslatorOneArg<MessageEvent, Message>() {
+        @Override
+        public void translateTo(MessageEvent messageEvent, long l, Message o) {
+            messageEvent.setMessage(o);
+        }
+    };
+
     protected ExecutorService executor = Executors.newCachedThreadPool(
             new ThreadFactoryBuilder()
-                .setNameFormat("processbufferprocessor-%d")
-                .build()
+                    .setNameFormat("processbufferprocessor-%d")
+                    .build()
     );
 
     private Core server;
-    
+
     private final Cache masterCache;
 
     private final Meter incomingMessages;
@@ -82,22 +90,22 @@ public class ProcessBuffer extends Buffer {
                 ProducerType.MULTI,
                 server.getConfiguration().getProcessorWaitStrategy()
         );
-        
+
         LOG.info("Initialized ProcessBuffer with ring size <{}> "
                 + "and wait strategy <{}>.", server.getConfiguration().getRingSize(),
                 server.getConfiguration().getProcessorWaitStrategy().getClass().getSimpleName());
 
         ProcessBufferProcessor[] processors = new ProcessBufferProcessor[server.getConfiguration().getProcessBufferProcessors()];
-        
+
         for (int i = 0; i < server.getConfiguration().getProcessBufferProcessors(); i++) {
             processors[i] = new ProcessBufferProcessor(this.server, i, server.getConfiguration().getProcessBufferProcessors());
         }
-        
+
         disruptor.handleEventsWith(processors);
-        
+
         ringBuffer = disruptor.start();
     }
-    
+
     @Override
     public void insertCached(Message message, MessageInput sourceInput) {
         message.setSourceInput(sourceInput);
@@ -142,12 +150,42 @@ public class ProcessBuffer extends Buffer {
 
         insert(message);
     }
-    
+
+    @Override
+    public void insertFailFast(Message[] messages, MessageInput sourceInput) throws BufferOutOfCapacityException, ProcessingDisabledException {
+        if (ringBuffer.getBufferSize() < messages.length) {
+            throw new IllegalStateException("Message batch size too large for atomic bulk insert to be possible - RingBuffer size (" + ringBuffer.getBufferSize() + ") < message batch size (" + messages.length + ")");
+        }
+
+        if (!hasCapacity(messages.length)) {
+            LOG.warn("Rejecting message, because I am full. Raise my size or add more processors.");
+            rejectedMessages.mark(messages.length);
+            throw new BufferOutOfCapacityException();
+        }
+
+        for (Message message : messages) {
+            message.setSourceInput(sourceInput);
+
+            message.addField(SOURCE_INPUT_ATTR_NAME, sourceInput.getId());
+            message.addField(SOURCE_NODE_ATTR_NAME, server.getNodeId());
+        }
+
+        boolean published = ringBuffer.tryPublishEvents(MESSAGE_EVENT_TRANSLATOR, messages);
+
+        if (published) {
+            server.processBufferWatermark().addAndGet(messages.length);
+            incomingMessages.mark(messages.length);
+
+        } else {
+            LOG.warn("Rejecting message, because I am full. Raise my size or add more processors.");
+            rejectedMessages.mark(messages.length);
+            throw new BufferOutOfCapacityException();
+
+        }
+    }
+
     private void insert(Message message) {
-        long sequence = ringBuffer.next();
-        MessageEvent event = ringBuffer.get(sequence);
-        event.setMessage(message);
-        ringBuffer.publish(sequence);
+        ringBuffer.publishEvent(MESSAGE_EVENT_TRANSLATOR, message);
 
         server.processBufferWatermark().incrementAndGet();
         incomingMessages.mark();

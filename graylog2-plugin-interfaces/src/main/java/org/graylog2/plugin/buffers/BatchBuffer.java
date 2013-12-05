@@ -9,8 +9,8 @@
  * so, subject to the following conditions:
  *
  * The above copyright notice and this permission notice shall be included in all
- * copies or substantial portions of the Software. 
- * 
+ * copies or substantial portions of the Software.
+ *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -18,38 +18,28 @@
  * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
-*/
+ */
 package org.graylog2.plugin.buffers;
 
-import com.lmax.disruptor.RingBuffer;
 import org.graylog2.plugin.Message;
 import org.graylog2.plugin.inputs.MessageInput;
 
 /**
- *
- * @author Lennart Koopmann <lennart@socketfeed.com>
+ * @author James Furness
  */
-public abstract class Buffer {
+public abstract class BatchBuffer extends Buffer {
 
-    protected RingBuffer<MessageEvent> ringBuffer;
+    /**
+     * Try to insert a batch of messages atomically if sufficient slots are available, failing without blocking or inserting
+     * any messages if sufficient slots are not available.
+     *
+     * @throws BufferOutOfCapacityException if the buffer is bigger than the batch but insufficient free slots are available
+     * @throws IllegalStateException        if the batch is bigger than the buffer, so an atomic insert is impossible
+     */
+    public abstract void insertFailFast(Message[] messages, MessageInput sourceInput) throws BufferOutOfCapacityException, ProcessingDisabledException;
 
-    public abstract void insertFailFast(Message message, MessageInput sourceInput) throws BufferOutOfCapacityException, ProcessingDisabledException;
-    public abstract void insertCached(Message message, MessageInput sourceInput);
-
-    public int getBufferSize() {
-        return ringBuffer.getBufferSize();
+    public boolean hasCapacity(int i) {
+        return ringBuffer.remainingCapacity() >= i;
     }
 
-    public boolean isEmpty() {
-        return getUsage() == 0;
-    }
-
-    public boolean hasCapacity() {
-        return ringBuffer.remainingCapacity() > 0;
-    }
-
-    public long getUsage() {
-        return Long.valueOf(ringBuffer.getBufferSize())-ringBuffer.remainingCapacity();
-    }
-    
 }
