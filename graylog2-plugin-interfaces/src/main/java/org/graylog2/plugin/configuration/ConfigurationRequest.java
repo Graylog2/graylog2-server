@@ -80,11 +80,11 @@ public class ConfigurationRequest {
             );
         }
 
-        public static ConfigurationField portNumber(String name) {
+        public static ConfigurationField portNumber(String name, int port) {
             return new NumberField(
                     name,
                     "Port",
-                    514,
+                    port,
                     "Port to listen on.",
                     NumberField.Attribute.IS_PORT_NUMBER
             );
