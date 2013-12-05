@@ -41,6 +41,7 @@ import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
+import java.util.concurrent.ExecutionException;
 
 /**
  * @author Lennart Koopmann <lennart@torch.sh>
@@ -144,11 +145,19 @@ public class InputsResource extends RestResource {
             throw new WebApplicationException(404);
         }
 
+        // Unregister on server cluster.
+        try {
+            radio.inputs().unregisterInCluster(input);
+        } catch (Exception e) {
+            LOG.error("Could not unregister input [" + input.getName()+ "] on server cluster. Not continuing.", e);
+            return Response.status(Response.Status.BAD_GATEWAY).build();
+        }
+
+        LOG.info("Unregistered input [" + input.getName()+ "] on server cluster.");
+
         // Shutdown actual input.
         input.stop();
         radio.inputs().getRunningInputs().remove(input.getId());
-
-        // Unregister on server cluster.
 
         String msg2 = "Terminated input [" + input.getName()+ "]. Reason: REST request.";
         LOG.info(msg2);

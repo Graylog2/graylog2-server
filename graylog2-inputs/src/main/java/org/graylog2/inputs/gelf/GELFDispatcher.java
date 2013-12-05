@@ -65,7 +65,6 @@ public class GELFDispatcher extends SimpleChannelHandler {
     @Override
     public void messageReceived(ChannelHandlerContext ctx, MessageEvent e) throws Exception {
         receivedMessages.mark();
-        
         ChannelBuffer buffer = (ChannelBuffer) e.getMessage();
 
         byte[] readable = new byte[buffer.readableBytes()];

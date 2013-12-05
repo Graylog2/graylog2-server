@@ -51,6 +51,7 @@ public class GELFChunkManager extends Thread {
     private final Meter outdatedMessagesDropped;
 
     public GELFChunkManager(InputHost server) {
+
         this.processor = new GELFProcessor(server);
         this.server = server;
 

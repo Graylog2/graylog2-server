@@ -1,0 +1,84 @@
+#!/bin/bash
+
+CMD=$1
+NOHUP=`which nohup`
+
+# resolve links - $0 may be a softlink
+RADIOCTL="$0"
+
+while [ -h "$RADIOCTL" ]; do
+  ls=`ls -ld "$RADIOCTL"`
+  link=`expr "$ls" : '.*-> \(.*\)$'`
+  if expr "$link" : '/.*' > /dev/null; then
+    RADIOCTL="$link"
+  else
+    RADIOCTL=`dirname "$RADIOCTL"`/"$link"
+  fi
+done
+
+RADIOCTL_DIR=`dirname "$RADIOCTL"`
+RADIO_JAR=graylog2-radio.jar
+RADIO_CONF=/etc/graylog2-radio.conf
+RADIO_PID=/tmp/graylog2-radio.pid
+LOG_FILE=log/graylog2-radio.log
+
+start() {
+    echo "Starting graylog2-radio ..."
+    cd "$RADIOCTL_DIR/.."
+    $NOHUP java -jar ${RADIO_JAR} -f ${RADIO_CONF} -p ${RADIO_PID} >> ${LOG_FILE} &
+}
+
+stop() {
+    PID=`cat ${RADIO_PID}`
+    echo "Stopping graylog2-radio ($PID) ..."
+    if kill $PID; then
+        rm ${RADIO_PID}
+    fi
+}
+
+restart() {
+    echo "Restarting graylog2-radio ..."
+    stop
+    start
+}
+
+status() {
+    pid=$(get_pid)
+    if [ ! -z $pid ]; then
+        if pid_running $pid; then
+            echo "graylog2-radio running as pid $pid"
+            return 0
+        else
+            echo "Stale pid file with $pid - removing..."
+            rm ${RADIO_PID}
+        fi
+    fi
+
+    echo "graylog2-radio not running"
+}
+
+get_pid() {
+    cat ${RADIO_PID} 2> /dev/null
+}
+
+pid_running() {
+    kill -0 $1 2> /dev/null
+}
+
+case "$CMD" in
+    start)
+        start
+        ;;
+    stop)
+        stop
+        ;;
+    restart)
+        restart
+        ;;
+    status)
+        status
+        ;;
+    *)
+        echo "Usage $0 {start|stop|restart|status}"
+        RETVAL=1
+esac

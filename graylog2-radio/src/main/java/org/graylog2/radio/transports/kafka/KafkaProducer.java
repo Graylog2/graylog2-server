@@ -64,6 +64,10 @@ public class KafkaProducer implements RadioTransport {
         props.put("partitioner.class", "kafka.producer.DefaultPartitioner");
         props.put("serializer.class", "kafka.serializer.DefaultEncoder");
         props.put("request.required.acks", String.valueOf(radio.getConfiguration().getKafkaRequiredAcks()));
+        props.put("client.id", "graylog2-radio-" + radio.getNodeId());
+        props.put("producer.type", radio.getConfiguration().getKafkaProducerType());
+        props.put("queue.buffering.max.ms", String.valueOf(radio.getConfiguration().getKafkaBatchMaxWaitMs()));
+        props.put("batch.num.messages", String.valueOf(radio.getConfiguration().getKafkaBatchSize()));
 
         ProducerConfig config = new ProducerConfig(props);
         producer = new Producer<byte[], byte[]>(config);

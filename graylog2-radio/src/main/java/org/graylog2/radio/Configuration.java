@@ -53,6 +53,15 @@ public class Configuration {
     @Parameter(value = "kafka_required_acks", required = true)
     private int kafkaRequiredAcks = 1;
 
+    @Parameter(value = "kafka_producer_type", required = true)
+    private String kafkaProducerType = "async";
+
+    @Parameter(value = "kafka_batch_size", required = true)
+    private int kafkaBatchSize = 200;
+
+    @Parameter(value = "kafka_batch_max_wait_ms", required = true)
+    private int kafkaBatchMaxWaitMs = 250;
+
     @Parameter(value = "ring_size", required = true, validator = PositiveIntegerValidator.class)
     private int ringSize = 1024;
 
@@ -127,6 +136,18 @@ public class Configuration {
 
     public int getKafkaRequiredAcks() {
         return kafkaRequiredAcks;
+    }
+
+    public String getKafkaProducerType() {
+        return kafkaProducerType;
+    }
+
+    public int getKafkaBatchSize() {
+        return kafkaBatchSize;
+    }
+
+    public int getKafkaBatchMaxWaitMs() {
+        return kafkaBatchMaxWaitMs;
     }
 
 }
