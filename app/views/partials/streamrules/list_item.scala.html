@@ -1,0 +1,16 @@
+@(streamRule: StreamRule)
+
+<li data-streamrule-id="@streamRule.getId">
+    @streamRule
+
+    <a class="edit-streamrule" href="#"
+        data-streamrule-id="@streamRule.getId">
+        <i class="icon-edit"></i>
+    </a>
+
+    <a class="remove-streamrule" href="#"
+        data-stream-id=@streamRule.getStreamId
+        data-removeUrl="@routes.StreamRulesController.delete(streamRule.getStreamId, streamRule.getId)">
+        <i class="icon-remove"></i>
+    </a>
+</li>

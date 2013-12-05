@@ -6,6 +6,7 @@ import lib.APIException;
 import lib.ApiClient;
 import lib.BreadcrumbList;
 import models.Stream;
+import models.StreamRule;
 import models.StreamRuleService;
 import models.StreamService;
 import models.api.requests.streams.CreateStreamRuleRequest;
@@ -48,13 +49,42 @@ public class StreamRulesController extends AuthenticatedController {
         try {
             CreateStreamRuleRequest csrr = form.get();
             response = streamRuleService.create(streamId, csrr);
+            /*if (request().accepts("application/json"))
+                return created(new Gson().toJson(response)).as("application/json");
+            else {*/
+                StreamRule streamRule = streamRuleService.get(streamId, response.streamrule_id);
+                return created(views.html.partials.streamrules.list_item.render(streamRule));
+            //}
         } catch (APIException e) {
             String message = "Could not create stream rule. We expected HTTP 201, but got a HTTP " + e.getHttpCode() + ".";
             return status(504, message);
         } catch (IOException e) {
             return status(504, e.toString());
         }
-        return created(new Gson().toJson(response)).as("application/json");
+
+    }
+
+    public Result update(String streamId, String streamRuleId) {
+        Form<CreateStreamRuleRequest> form = createStreamRuleForm.bindFromRequest();
+        CreateStreamRuleResponse response = null;
+
+        try {
+            CreateStreamRuleRequest csrr = form.get();
+            response = streamRuleService.update(streamId, streamRuleId, csrr);
+            System.out.println(request().accepts("application/json"));
+            /*if (request().accepts("application/json"))
+                return created(new Gson().toJson(response)).as("application/json");
+            else {*/
+                StreamRule streamRule = streamRuleService.get(streamId, response.streamrule_id);
+                return created(views.html.partials.streamrules.list_item.render(streamRule));
+            //}
+        } catch (APIException e) {
+            String message = "Could not create stream rule. We expected HTTP 200, but got a HTTP " + e.getHttpCode() + ".";
+            System.out.println(message);
+            return status(504, message);
+        } catch (IOException e) {
+            return status(504, e.toString());
+        }
     }
 
     public Result delete(String streamId, String streamRuleId){

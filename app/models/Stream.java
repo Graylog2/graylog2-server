@@ -41,10 +41,11 @@ public class Stream {
     private final List<StreamRule> streamRules;
     private final Boolean disabled;
 
-    private UserService userService;
+    private final UserService userService;
+    private final StreamRule.Factory streamRuleFactory;
 
 	@AssistedInject
-    private Stream(UserService userService, @Assisted StreamSummaryResponse ssr) {
+    private Stream(UserService userService, StreamRule.Factory streamRuleFactory, @Assisted StreamSummaryResponse ssr) {
 		this.id = ssr.id;
         this.title = ssr.title;
         this.creatorUserId = ssr.creatorUserId;
@@ -55,9 +56,10 @@ public class Stream {
         this.disabled = ssr.disabled;
 
         this.userService = userService;
+        this.streamRuleFactory = streamRuleFactory;
 
         for (StreamRuleSummaryResponse streamRuleSummaryResponse : ssr.streamRules) {
-            streamRules.add(new StreamRule(streamRuleSummaryResponse));
+            streamRules.add(streamRuleFactory.fromSummaryResponse(streamRuleSummaryResponse));
         }
 	}
 

@@ -19,13 +19,21 @@
 package models;
 
 import com.google.common.collect.Lists;
+import com.google.inject.assistedinject.Assisted;
+import com.google.inject.assistedinject.AssistedInject;
+import lib.APIException;
 import models.api.responses.streams.StreamRuleSummaryResponse;
 
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 public class StreamRule {
+
+    public interface Factory {
+        public StreamRule fromSummaryResponse(StreamRuleSummaryResponse srsr);
+    }
 
     public static final Map<Integer, List<String>> RULES = new HashMap<Integer, List<String>>() {{
         put(1, Lists.newArrayList("match exactly", "match exactly"));
@@ -41,13 +49,17 @@ public class StreamRule {
     private final Boolean inverted;
     private final String stream_id;
 
-    public StreamRule(StreamRuleSummaryResponse srsr) {
+    private final StreamService streamService;
+
+    @AssistedInject
+    private StreamRule(StreamService streamService, @Assisted StreamRuleSummaryResponse srsr) {
         this.id = srsr.id;
         this.field = srsr.field;
         this.value = srsr.value;
         this.inverted = srsr.inverted;
         this.type = srsr.type;
         this.stream_id = srsr.stream_id;
+        this.streamService = streamService;
     }
 
     public String getId() {
@@ -84,7 +96,16 @@ public class StreamRule {
         return stream_id;
     }
 
+    public Stream getStream() throws IOException, APIException {
+        if (this.streamService == null)
+            throw new RuntimeException("foo");
+        return this.streamService.get(stream_id);
+    }
+
     public String toString() {
-        return ("Field " + this.field + " must " + this.getSentenceRepresentation() + " " + this.value);
+        String inverter = "";
+        if (this.getInverted())
+            inverter = " not ";
+        return ("Field " + this.field + " must " + inverter + this.getSentenceRepresentation() + " " + this.value);
     }
 }

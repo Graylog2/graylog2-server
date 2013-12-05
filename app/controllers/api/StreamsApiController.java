@@ -6,6 +6,8 @@ import com.google.gson.Gson;
 import com.google.inject.Inject;
 import controllers.AuthenticatedController;
 import lib.APIException;
+import models.Stream;
+import models.StreamRule;
 import models.StreamService;
 import models.api.requests.streams.TestMatchRequest;
 import models.api.responses.streams.TestMatchResponse;

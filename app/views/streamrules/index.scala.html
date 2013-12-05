@@ -43,8 +43,9 @@
 
         <div class="xtrc-message" style="display: none;">
             We found this message.
+
             <strong>Next step:</strong>
-            Select a field you want to apply the extractor on by clicking on its name.
+            Add/delete/modify the configured stream rules to see if matching is successfull or not.
 
             <div class="well well-small" id="sample-message">
                 <h2>Message <span></span></h2>
@@ -70,9 +71,9 @@
                 </button>
             </div>
         </h2>
-        <form class="add-streamrule-form" data-stream-id="@stream.getId" action="#">
+        <div id="streamrules-list-container">
             @views.html.partials.streamrules.list_well.render(streamrules)
-            @views.html.partials.streamrules.stream_rule_form.render("add-stream-rule-to-existing", "new-stream-rule", stream.getId, null)
-        </form>
+            @views.html.partials.streamrules.stream_rule_form.render(stream.getId, null)
+        </div>
     </div>
 }

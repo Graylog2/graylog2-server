@@ -49,6 +49,8 @@ $(document).ready(function() {
                 success: function(data) {
                     showMessage($(".xtrc-message-fields", container), data.fields, data.id);
                     jQuery.data(document.body, "message", data);
+                    var msgContainer = $("div.xtrc-message");
+                    msgContainer.trigger("sampleMessageChanged");
                     if (callback != undefined) {
                         callback(data);
                     }
