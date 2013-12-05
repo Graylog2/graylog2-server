@@ -182,7 +182,7 @@ public class KafkaInput extends MessageInput {
         cr.addField(new TextField(
                 CK_TOPIC_FILTER,
                 "Topic filter regex",
-                "^graylog2-radio-messages$",
+                "^your-topic$",
                 "Every topic that matches this regular expression will be consumed.",
                 ConfigurationField.Optional.NOT_OPTIONAL
 
@@ -227,7 +227,7 @@ public class KafkaInput extends MessageInput {
 
     @Override
     public String linkToDocs() {
-        return "";
+        return "http://support.torch.sh/help/kb/getting-your-logs-into-graylog2/using-the-kafka-message-input";
     }
 
     @Override

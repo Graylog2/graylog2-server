@@ -57,7 +57,7 @@ public class RadioInput extends KafkaInput {
 
     @Override
     public String linkToDocs() {
-        return "";
+        return "http://support.torch.sh/help/kb/graylog2-server/using-graylog2-radio-v020x";
     }
 
     @Override
