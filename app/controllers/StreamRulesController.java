@@ -71,7 +71,6 @@ public class StreamRulesController extends AuthenticatedController {
         try {
             CreateStreamRuleRequest csrr = form.get();
             response = streamRuleService.update(streamId, streamRuleId, csrr);
-            System.out.println(request().accepts("application/json"));
             /*if (request().accepts("application/json"))
                 return created(new Gson().toJson(response)).as("application/json");
             else {*/
@@ -80,7 +79,6 @@ public class StreamRulesController extends AuthenticatedController {
             //}
         } catch (APIException e) {
             String message = "Could not create stream rule. We expected HTTP 200, but got a HTTP " + e.getHttpCode() + ".";
-            System.out.println(message);
             return status(504, message);
         } catch (IOException e) {
             return status(504, e.toString());

@@ -254,6 +254,9 @@ $(document).ready(function() {
     }
 
     function testStreamRules(message, streamId, match, nomatch, error) {
+        if (message == undefined) {
+            return;
+        }
         var data = { "message" : message.fields };
 
         $.ajax({
