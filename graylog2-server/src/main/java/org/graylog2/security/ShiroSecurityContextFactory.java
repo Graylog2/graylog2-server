@@ -27,6 +27,7 @@ import org.apache.shiro.authc.UsernamePasswordToken;
 import org.apache.shiro.authc.credential.HashedCredentialsMatcher;
 import org.apache.shiro.authc.pam.FirstSuccessfulStrategy;
 import org.apache.shiro.authc.pam.ModularRealmAuthenticator;
+import org.apache.shiro.cache.MemoryConstrainedCacheManager;
 import org.apache.shiro.mgt.DefaultSecurityManager;
 import org.apache.shiro.mgt.DefaultSessionStorageEvaluator;
 import org.apache.shiro.mgt.DefaultSubjectDAO;
@@ -86,7 +87,13 @@ public class ShiroSecurityContextFactory implements SecurityContextFactory {
         sm.setAuthorizer(mongoDbAuthorizationRealm);
 
         final DefaultSubjectDAO subjectDAO = new DefaultSubjectDAO();
-        final DefaultSessionStorageEvaluator sessionStorageEvaluator = new DefaultSessionStorageEvaluator();
+        final DefaultSessionStorageEvaluator sessionStorageEvaluator = new DefaultSessionStorageEvaluator() {
+            @Override
+            public boolean isSessionStorageEnabled(Subject subject) {
+                // save to session if we already have a session. do not create on just for saving the subject
+                return (subject.getSession(false) != null);
+            }
+        };
         sessionStorageEvaluator.setSessionStorageEnabled(false);
         subjectDAO.setSessionStorageEvaluator(sessionStorageEvaluator);
         sm.setSubjectDAO(subjectDAO);
@@ -94,6 +101,7 @@ public class ShiroSecurityContextFactory implements SecurityContextFactory {
         final DefaultSessionManager defaultSessionManager = (DefaultSessionManager) sm.getSessionManager();
         defaultSessionManager.setSessionDAO(new MongoDbSessionDAO(core));
         defaultSessionManager.setDeleteInvalidSessions(true);
+        defaultSessionManager.setCacheManager(new MemoryConstrainedCacheManager());
         // DO NOT USE global session timeout!!! It's fucky.
         //defaultSessionManager.setGlobalSessionTimeout(TimeUnit.SECONDS.toMillis(5));
         core.setSecurityManager(sm);

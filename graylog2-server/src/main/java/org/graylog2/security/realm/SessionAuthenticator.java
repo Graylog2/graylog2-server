@@ -23,6 +23,7 @@ import org.apache.shiro.authc.credential.AllowAllCredentialsMatcher;
 import org.apache.shiro.realm.AuthenticatingRealm;
 import org.apache.shiro.session.Session;
 import org.apache.shiro.subject.Subject;
+import org.apache.shiro.util.ThreadContext;
 import org.graylog2.Core;
 import org.graylog2.security.SessionIdToken;
 import org.graylog2.users.User;
@@ -54,6 +55,7 @@ public class SessionAuthenticator extends AuthenticatingRealm {
         final Object username = subject.getPrincipal();
         final User user = User.load(String.valueOf(username), core);
         if (user == null) {
+            log.debug("No user named {} found for session {}", username, sessionIdToken.getSessionId());
             return null;
         }
         if (user.isExternalUser() && !core.getLdapRealm().isEnabled()) {
@@ -63,6 +65,9 @@ public class SessionAuthenticator extends AuthenticatingRealm {
         if (log.isDebugEnabled()) {
             log.debug("Found session {} for user name {}", session.getId(), username);
         }
+        session.touch();
+        ThreadContext.bind(subject);
+
         return new SimpleAccount(user.getName(), null, "session authenticator");
     }
 }

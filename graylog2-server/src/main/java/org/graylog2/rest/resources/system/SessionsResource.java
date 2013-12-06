@@ -19,9 +19,11 @@
 package org.graylog2.rest.resources.system;
 
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
+import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.authc.AuthenticationException;
 import org.apache.shiro.authc.UsernamePasswordToken;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
+import org.apache.shiro.mgt.DefaultSecurityManager;
 import org.apache.shiro.session.UnknownSessionException;
 import org.apache.shiro.subject.Subject;
 import org.apache.shiro.util.ThreadContext;
@@ -72,8 +74,12 @@ public class SessionsResource extends RestResource {
         try {
             subject.login(new UsernamePasswordToken(createRequest.username, createRequest.password));
             // TODO make this configurable
-            subject.getSession().setTimeout(TimeUnit.MINUTES.toMillis(5));
+            subject.getSession().setTimeout(TimeUnit.HOURS.toMillis(8));
             subject.getSession().touch();
+
+            // save subject in session, otherwise we can't get the username back in subsequent requests.
+            ((DefaultSecurityManager) SecurityUtils.getSecurityManager()).getSubjectDAO().save(subject);
+
         } catch (AuthenticationException e) {
             log.warn("Unable to log in user " + createRequest.username, e);
         } catch (UnknownSessionException e) {
@@ -95,12 +101,13 @@ public class SessionsResource extends RestResource {
     @RequiresAuthentication
     public Response terminateSession(@ApiParam(title = "sessionId", required = true) @PathParam("sessionId") String sessionId) {
         final Subject subject = getSubject();
-        final org.apache.shiro.session.Session session = subject.getSession();
-        if (session != null && session.getId().equals(sessionId)) {
-            core.getSecurityManager().logout(subject);
-        } else {
-            log.warn("Trying to destroy session {} that does not belong to the current user {}", sessionId, subject.getPrincipal());
+        core.getSecurityManager().logout(subject);
+
+        final org.apache.shiro.session.Session session = subject.getSession(false);
+        if (session == null || !session.getId().equals(sessionId)) {
+            return Response.status(Response.Status.NOT_FOUND).build();
         }
+
         return noContent().build();
     }
 
@@ -109,6 +116,7 @@ public class SessionsResource extends RestResource {
         public SessionCreateRequest(){}
         public String username;
         public String password;
+        public String host;
     }
 
     @JsonAutoDetect

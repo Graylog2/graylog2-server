@@ -21,9 +21,8 @@ package org.graylog2.security;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import org.apache.shiro.session.Session;
-import org.apache.shiro.session.UnknownSessionException;
 import org.apache.shiro.session.mgt.SimpleSession;
-import org.apache.shiro.session.mgt.eis.AbstractSessionDAO;
+import org.apache.shiro.session.mgt.eis.CachingSessionDAO;
 import org.bson.types.ObjectId;
 import org.graylog2.Core;
 import org.slf4j.Logger;
@@ -34,7 +33,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
-public class MongoDbSessionDAO extends AbstractSessionDAO {
+public class MongoDbSessionDAO extends CachingSessionDAO {
     private static final Logger log = LoggerFactory.getLogger(MongoDbSessionDAO.class);
 
     private final Core core;
@@ -60,7 +59,7 @@ public class MongoDbSessionDAO extends AbstractSessionDAO {
         }
         fields.put("attributes", attributes);
         final MongoDbSession dbSession = new MongoDbSession(core, fields);
-
+        log.debug("Created session {}", id);
         final ObjectId objectId = dbSession.saveWithoutValidation();
 
         return id;
@@ -90,9 +89,9 @@ public class MongoDbSessionDAO extends AbstractSessionDAO {
     }
 
     @Override
-    public void update(Session session) throws UnknownSessionException {
+    protected void doUpdate(Session session) {
         final MongoDbSession dbSession = MongoDbSession.load(session.getId().toString(), core);
-        log.debug("Updating session {}", session, new Throwable());
+        log.debug("Updating session {}", session);
         dbSession.setHost(session.getHost());
         dbSession.setTimeout(session.getTimeout());
         dbSession.setStartTimestamp(session.getStartTimestamp());
@@ -108,7 +107,7 @@ public class MongoDbSessionDAO extends AbstractSessionDAO {
     }
 
     @Override
-    public void delete(Session session) {
+    protected void doDelete(Session session) {
         log.debug("Deleting session {}", session);
         final Serializable id = session.getId();
         final MongoDbSession dbSession = MongoDbSession.load(id.toString(), core);
