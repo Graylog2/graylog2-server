@@ -71,6 +71,7 @@ public class ServerNodesRefreshService {
             NodesResponse response = api.get(NodesResponse.class)
                     .path("/system/cluster/nodes")
                     .node(node)
+                    .unauthenticated()
                     .execute();
             int i = 0;
             for (NodeSummaryResponse nsr : response.nodes) {

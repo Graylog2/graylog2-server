@@ -60,7 +60,7 @@ public interface ApiRequestBuilder<T> {
 
     ApiRequestBuilder<T> queryParams(Map<String, String> params);
 
-    ApiRequestBuilder<T> credentials(String username, String password);
+    ApiRequestBuilder<T> session(String sessionId);
 
     ApiRequestBuilder<T> unauthenticated();
 

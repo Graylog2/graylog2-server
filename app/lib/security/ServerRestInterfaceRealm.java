@@ -26,17 +26,18 @@ import models.User;
 import models.UserService;
 import models.api.responses.system.UserResponse;
 import org.apache.shiro.SecurityUtils;
-import org.apache.shiro.authc.*;
+import org.apache.shiro.authc.AuthenticationException;
+import org.apache.shiro.authc.AuthenticationInfo;
+import org.apache.shiro.authc.AuthenticationToken;
+import org.apache.shiro.authc.SimpleAuthenticationInfo;
+import org.apache.shiro.authc.credential.AllowAllCredentialsMatcher;
 import org.apache.shiro.authz.AuthorizationInfo;
-import org.apache.shiro.crypto.hash.SimpleHash;
 import org.apache.shiro.realm.AuthorizingRealm;
 import org.apache.shiro.subject.PrincipalCollection;
 import org.apache.shiro.subject.Subject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import play.api.PlayException;
-import play.libs.Crypto;
-import play.mvc.Http;
 
 import java.io.IOException;
 import java.net.ConnectException;
@@ -54,11 +55,15 @@ public class ServerRestInterfaceRealm extends AuthorizingRealm {
     private ServerRestInterfaceRealm(ApiClient api, User.Factory userFactory) {
         this.api = api;
         this.userFactory = userFactory;
+        setAuthenticationTokenClass(SessionIdAuthenticationToken.class);
+        // when requesting the current user does not fail with the session id we have, then we are authenticated.
+        setCredentialsMatcher(new AllowAllCredentialsMatcher());
     }
 
     @Override
     protected AuthorizationInfo doGetAuthorizationInfo(PrincipalCollection principals) {
         // TODO currently we don't have any authorization information yet :(
+        // re-use the user data we load for the authentication info below (available from currentUser)
         return null;
     }
 
@@ -66,27 +71,19 @@ public class ServerRestInterfaceRealm extends AuthorizingRealm {
     @Override
     protected AuthenticationInfo doGetAuthenticationInfo(AuthenticationToken authToken) throws AuthenticationException {
         final UserResponse response;
-        if (!(authToken instanceof UsernamePasswordToken)) {
-            throw new IllegalStateException("Expected UsernamePasswordToken");
-        }
-        UsernamePasswordToken token = (UsernamePasswordToken) authToken;
-        try {
-            final SimpleHash sha2 = new SimpleHash("SHA-256", token.getPassword());
-            final String passwordHash = sha2.toString();
 
-            log.debug("Trying to log in {} via REST", token.getUsername());
-            final String passwordString = new String(token.getPassword());
+        // we don't handle any other type, see constructor
+        @SuppressWarnings("CastToConcreteClass")
+        SessionIdAuthenticationToken token = (SessionIdAuthenticationToken) authToken;
+        try {
+            final String sessionId = token.getPrincipal().toString();
             response = api.get(UserResponse.class)
                     .path("/users/{0}", token.getUsername())
-                    .credentials(token.getUsername(), passwordString)
+                    .session(sessionId)
                     .execute();
-            final User user = userFactory.fromResponse(response, passwordHash);
+            final User user = userFactory.fromResponse(response, sessionId);
 
             UserService.setCurrent(user);
-
-            // well, "sessiondid"
-            final String sessionid = Crypto.encryptAES(token.getUsername() + "\t" + passwordString);
-            Http.Context.current().session().put("sessionid", sessionid);
             new Subject.Builder(SecurityUtils.getSecurityManager())
                     .authenticated(true)
                     .buildSubject();
@@ -98,12 +95,10 @@ public class ServerRestInterfaceRealm extends AuthorizingRealm {
             } else {
                 throw new AuthenticationException("Unable to communicate with graylog2-server backend", e);
             }
-
-            // throw new AuthenticationException("Server responded with non-200 code", e);
         } catch (PlayException e) {
             log.error("Misconfigured play application. Please make sure your application.secret is longer than 16 characters!", e);
             throw new RuntimeException(e);
         }
-        return new SimpleAuthenticationInfo(response.username, authToken.getCredentials(), "rest-interface");
+        return new SimpleAuthenticationInfo(response.username, null, "rest-interface");
     }
 }

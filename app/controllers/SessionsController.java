@@ -18,19 +18,27 @@
  */
 package controllers;
 
+import com.google.gson.annotations.SerializedName;
 import com.google.inject.Inject;
+import lib.APIException;
 import lib.ServerNodes;
 import lib.security.Graylog2ServerUnavailableException;
 import lib.security.RedirectAuthenticator;
 import models.LoginRequest;
+import models.UserService;
+import models.api.requests.ApiRequest;
 import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.authc.AuthenticationException;
-import org.apache.shiro.authc.UsernamePasswordToken;
-import org.apache.shiro.subject.Subject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import play.data.Form;
+import play.libs.Crypto;
+import play.mvc.Http;
 import play.mvc.Result;
+import play.mvc.Security;
+
+import java.io.IOException;
+import java.util.Date;
 
 import static play.data.Form.form;
 
@@ -74,25 +82,63 @@ public class SessionsController extends BaseController {
 		
 		LoginRequest r = loginRequest.get();
 
-		final Subject subject = SecurityUtils.getSubject();
-		try {
-			subject.login(new UsernamePasswordToken(r.username, r.password, request().remoteAddress()));
-			return redirect("/");
-		} catch (AuthenticationException e) {
-			log.warn("Unable to authenticate user {}. Redirecting back to '/'", r.username, e);
-            if (e instanceof Graylog2ServerUnavailableException) {
+        try {
+            final SessionResponse sessionResponse = api().post(SessionResponse.class)
+                    .path("/system/sessions")
+                    .unauthenticated()
+                    .body(new SessionCreateRequest(r.username, r.password, request().remoteAddress()))
+                    .execute();
+            // if we have successfully created a session, we can save that id for the next request
+            final String cookieContent = Crypto.encryptAES(r.username + "\t" + sessionResponse.sessionId);
+            Http.Context.current().session().put("sessionid", cookieContent);
+            // upon redirect, the auth layer will load the user with the given session and log the user in.
+            return redirect("/");
+        } catch (APIException e) {
+            log.warn("Unable to authenticate user {}. Redirecting back to '/'", r.username, e);
+            if (e.getCause() instanceof Graylog2ServerUnavailableException) {
                 checkServerConnections();
             } else {
                 flash("error", "Sorry, those credentials are invalid.");
             }
-			return badRequest(views.html.sessions.login.render(loginRequest, !serverNodes.isConnected()));
-		}
+        } catch (IOException e) {
+            flash("error", "Unable to reach Graylog2 Server.");
+        } catch (AuthenticationException e) {
+        }
+        return badRequest(views.html.sessions.login.render(loginRequest, !serverNodes.isConnected()));
 	}
 
-	public Result destroy() {
+    @Security.Authenticated(RedirectAuthenticator.class)
+    public Result destroy() {
+        final String sessionId = UserService.current().getSessionId();
+        try {
+            if (sessionId != null) {
+                api().delete().path("/system/sessions/{0}", sessionId).expect(Http.Status.NO_CONTENT).execute();
+            }
+        } catch (APIException | IOException e) {
+            log.error("Unable to end session for user {}", UserService.current().getName());
+        }
         SecurityUtils.getSubject().logout();
 		session().clear();
 		return redirect("/login");
 	}
-	
+
+    private class SessionResponse {
+        @SerializedName("session_id")
+        public String sessionId;
+
+        @SerializedName("valid_until")
+        public Date validUntil;
+    }
+
+    private class SessionCreateRequest extends ApiRequest {
+        private final String username;
+        private final String password;
+        private final String host;
+
+        public SessionCreateRequest(String username, String password, String host) {
+            this.username = username;
+            this.password = password;
+            this.host = host;
+        }
+    }
 }

@@ -49,19 +49,14 @@ public class ApiClientTest extends BaseApiTest {
         final Node node = serverNodes.any();
         api.setHttpClient(client);
 
-        final URL url = api.get(EmptyResponse.class).path("/some/resource").credentials("user", "password").node(node).prepareUrl(node);
-        final URL passwordWithAmpInUrl = api.get(EmptyResponse.class).path("/some/resource").credentials("user", "pass@word").node(node).prepareUrl(node);
-        final URL usernameWithAmpInUrl = api.get(EmptyResponse.class).path("/some/resource").credentials("us@er", "password").node(node).prepareUrl(node);
-        final URL queryParamWithPlus = api.get(EmptyResponse.class).path("/some/resource").queryParam("query", " (.+)").node(node).prepareUrl(node);
+        final URL url = api.get(EmptyResponse.class).path("/some/resource").session("foo").node(node).prepareUrl(node);
+        final URL queryParamWithPlus = api.get(EmptyResponse.class).path("/some/resource").queryParam("query", " (.+)").node(node).unauthenticated().prepareUrl(node);
 
-        Assert.assertEquals(url.getUserInfo(), "user:password");
-        Assert.assertEquals("password should be escaped", "user:pass%40word", passwordWithAmpInUrl.getUserInfo());
-        Assert.assertEquals("username should be escaped", "us%40er:password", usernameWithAmpInUrl.getUserInfo());
+        Assert.assertEquals(url.getUserInfo(), "foo:session");
         Assert.assertEquals("query param with + should be escaped", "query=+(.%2B)", queryParamWithPlus.getQuery());
 
-        final URL urlWithNonAsciiChars = api.get(EmptyResponse.class).node(node).path("/some/resourçe").credentials("Sigurðsson", "password").prepareUrl(node);
+        final URL urlWithNonAsciiChars = api.get(EmptyResponse.class).node(node).path("/some/resourçe").unauthenticated().prepareUrl(node);
         Assert.assertEquals("non-ascii chars are escaped in path", "/some/resour%C3%A7e", urlWithNonAsciiChars.getPath());
-        Assert.assertEquals("non-ascii chars are escape in userinfo", "Sigur%C3%B0sson:password", urlWithNonAsciiChars.getUserInfo());
 
         final URL queryWithAmp = api.get(EmptyResponse.class).node(node).path("/").queryParam("foo", "this&that").prepareUrl(node);
         Assert.assertEquals("Query params are escaped", "foo=this%26that", queryWithAmp.getQuery());
@@ -78,7 +73,7 @@ public class ApiClientTest extends BaseApiTest {
         final ApiRequestBuilder<EmptyResponse> requestBuilder =
                 api.get(EmptyResponse.class)
                         .path("/some/resource")
-                        .credentials("user", "password")
+                        .unauthenticated()
                         .node(node)
                         .timeout(1, TimeUnit.SECONDS);
         stubHttpProvider.expectResponse(requestBuilder.prepareUrl(node), 200, "{}");

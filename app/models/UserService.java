@@ -59,6 +59,14 @@ public class UserService {
         }
     }
 
+    public static String currentSessionId() {
+        try {
+            return (String) Http.Context.current().args.get("sessionId");
+        } catch (RuntimeException e) {
+            return null;
+        }
+    }
+
     public static void setCurrent(User user) {
         // save the current user in the request for easy access
         Http.Context.current().args.put("currentUser", user);
@@ -113,20 +121,20 @@ public class UserService {
     public User authenticateSessionUser() {
         // is there a logged in user at all?
         final Http.Session session = Http.Context.current().session();
-        final String sessionId = session.get("sessionid");
-        if (sessionId == null) {
+        final String encryptedSessionId = session.get("sessionid");
+        if (encryptedSessionId == null) {
             // there is no authenticated user yet.
             log.info("Accessing the current user failed, there's no sessionid in the cookie.");
             return null;
         }
-        final String userPassHash = Crypto.decryptAES(sessionId);
-        final StringTokenizer tokenizer = new StringTokenizer(userPassHash, "\t");
+        final String userAndSessionId = Crypto.decryptAES(encryptedSessionId);
+        final StringTokenizer tokenizer = new StringTokenizer(userAndSessionId, "\t");
         if (tokenizer.countTokens() != 2) {
             return null;
         }
         final String userName = tokenizer.nextToken();
-        final String passwordSha2 = tokenizer.nextToken();
-
+        final String sessionId = tokenizer.nextToken();
+        Http.Context.current().args.put("sessionId", sessionId);
         // special case for the local admin user for the web interface
 //        if (userName != null) {
 //            final LocalAdminUser localAdminUser = LocalAdminUser.getInstance();
@@ -137,11 +145,11 @@ public class UserService {
 //        }
         try {
             UserResponse response = api.get(UserResponse.class)
-                    .credentials(userName, passwordSha2)
                     .path("/users/{0}", userName)
+                    .session(sessionId)
                     .execute();
 
-            User currentUser = userFactory.fromResponse(response, passwordSha2);
+            User currentUser = userFactory.fromResponse(response, sessionId);
             setCurrent(currentUser);
             return currentUser;
         } catch (IOException e) {

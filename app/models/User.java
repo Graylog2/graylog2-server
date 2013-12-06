@@ -45,17 +45,17 @@ public class User {
 	private final String email;
 	private final String fullName;
 	private final List<String> permissions;
-    private final String passwordHash;
+    private final String sessionId;
     private final DateTimeZone timezone;
     private final boolean readonly;
     private final boolean external;
 
     @AssistedInject
-    public User(ApiClient api, @Assisted UserResponse ur, @Nullable @Assisted String passwordHash) {
-        this(api, ur.id, ur.username, ur.email, ur.fullName, ur.permissions, passwordHash, ur.timezone, ur.readonly, ur.external);
+    public User(ApiClient api, @Assisted UserResponse ur, @Nullable @Assisted String sessionId) {
+        this(api, ur.id, ur.username, ur.email, ur.fullName, ur.permissions, sessionId, ur.timezone, ur.readonly, ur.external);
     }
 
-	public User(ApiClient api, String id, String name, String email, String fullName, List<String> permissions, String passwordHash, String timezone, boolean readonly, boolean external) {
+	public User(ApiClient api, String id, String name, String email, String fullName, List<String> permissions, String sessionId, String timezone, boolean readonly, boolean external) {
         DateTimeZone timezone1 = null;
         this.api = api;
         this.id = id;
@@ -63,7 +63,7 @@ public class User {
 		this.email = email;
 		this.fullName = fullName;
 		this.permissions = permissions;
-        this.passwordHash = passwordHash;
+        this.sessionId = sessionId;
         try {
             if (timezone != null) {
                 timezone1 = DateTimeZone.forID(timezone);
@@ -110,8 +110,8 @@ public class User {
 		return permissions;
 	}
 
-    public String getPasswordHash() {
-        return passwordHash;
+    public String getSessionId() {
+        return sessionId;
     }
 
     public DateTimeZone getTimeZone() {
@@ -144,7 +144,7 @@ public class User {
     }
 
     public interface Factory {
-        User fromResponse(UserResponse ur, String passwordHash);
+        User fromResponse(UserResponse ur, String sessionId);
     }
 
 }
