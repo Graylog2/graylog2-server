@@ -5,7 +5,12 @@
         <i class="icon-mail-reply" title="Go back"></i>
     </div>
 
-    <h2>Message @message.getId()</h2>
+    <h2>
+        <i class="icon icon-envelope"></i>
+        <a href="@routes.MessagesController.show(message.getIndex, message.getId)">
+            Message @message.getId()
+        </a>
+    </h2>
 
     Received by
     @if(sourceInput != null) {
@@ -36,14 +41,25 @@
         on @views.html.partials.links.to_radio(sourceRadio)
     }
 
-    <br />
-    Timestamp: @message.getTimestamp()
-    <i class="icon-question-sign"></i> <a href="#terms-msg-@message.getId()" role="button" data-toggle="modal" data-backdrop="true">Terms</a>
-    <br />
+    <p>
+        Timestamp: @message.getTimestamp()
+        <br />
 
-    Index: <em>@message.getIndex()</em>
+        Index: <em>@message.getIndex()</em>
+    </p>
 
     @partials.message_terms(message.getId())
+
+    <div class="btn-group actions">
+        <a class="btn btn-info btn-mini dropdown-toggle" data-toggle="dropdown" href="#">
+                Actions
+            <span class="caret"></span>
+        </a>
+        <ul class="dropdown-menu">
+            <li><a href="#terms-msg-@message.getId()" role="button" data-toggle="modal" data-backdrop="true">Show message terms</a></li>
+            <li><a href="@routes.MessagesController.show(message.getIndex, message.getId)">Permalink</a></li>
+        </ul>
+    </div>
 
     <div class="nano">
         <div class="content">
@@ -63,9 +79,9 @@
                                         <a href="#">Create extractor</a>
 
                                         <ul class="dropdown-menu type-selector">
-                                            <li><a href="#" data-type="area"><a href="@routes.ExtractorsController.newExtractor(sourceNode.getNodeId, sourceInput.getId, "regex", key, lib.Tools.removeTrailingNewline(value).toString)">Regular expression</a></a></li>
-                                            <li><a href="#" data-type="area"><a href="@routes.ExtractorsController.newExtractor(sourceNode.getNodeId, sourceInput.getId, "substring", key, lib.Tools.removeTrailingNewline(value).toString)">Substring</a></a></li>
-                                            <li><a href="#" data-type="area"><a href="@routes.ExtractorsController.newExtractor(sourceNode.getNodeId, sourceInput.getId, "split_and_index", key, lib.Tools.removeTrailingNewline(value).toString)">Split &amp; Index</a></a></li>
+                                            <li><a href="@routes.ExtractorsController.newExtractor(sourceNode.getNodeId, sourceInput.getId, "regex", key, lib.Tools.removeTrailingNewline(value).toString)">Regular expression</a></li>
+                                            <li><a href="@routes.ExtractorsController.newExtractor(sourceNode.getNodeId, sourceInput.getId, "substring", key, lib.Tools.removeTrailingNewline(value).toString)">Substring</a></li>
+                                            <li><a href="@routes.ExtractorsController.newExtractor(sourceNode.getNodeId, sourceInput.getId, "split_and_index", key, lib.Tools.removeTrailingNewline(value).toString)">Split &amp; Index</a></li>
                                         </ul>
                                     </li>
                                 }
@@ -78,4 +94,5 @@
             </div>
         </div>
     </div>
+
 </div>

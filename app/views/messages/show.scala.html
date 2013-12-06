@@ -1,0 +1,72 @@
+@(currentUser: User, message: models.api.results.MessageResult, sourceInput: Input, sourceNode: Node, sourceRadio: Radio, sourceRadioInput: Input)
+
+@main("Message " + message.getId, sidebars.standard(currentUser), "", currentUser) {
+
+    <div class="row-fluid">
+        <h1><i class="icon icon-envelope"></i> Message @message.getId()</h1>
+
+        Received by
+        @if(sourceInput != null) {
+            <i class="icon icon-cloud-download"></i>
+            <em>@sourceInput.getTitle</em>
+        } else {
+            <em>deleted input</em>
+        }
+
+        on
+
+        @if(sourceNode != null) {
+            @views.html.partials.links.to_node(sourceNode)
+        } else {
+            <em>outdated node</em>
+        }
+
+        @if(sourceRadio != null) {
+            via
+
+            @if(sourceRadioInput != null) {
+                <i class="icon icon-cloud-download"></i>
+                <em>@sourceRadioInput.getTitle</em>
+            } else {
+                <em>deleted input</em>
+            }
+
+            on @views.html.partials.links.to_radio(sourceRadio)
+        }
+
+        /
+        Timestamp: @message.getTimestamp()
+
+        /
+        Index: <em>@message.getIndex()</em>
+
+        <dl>
+        @for((key, value) <- message.getFields()) {
+            <dt>
+                <div class="btn-group message-field-dropdown">
+                    <a data-toggle="dropdown" href="#" class="key">
+                    @key
+                    </a>
+
+                    <ul class="dropdown-menu">
+
+                    @if(sourceNode != null && sourceInput != null) {
+                        <li class="dropdown-submenu">
+                            <a href="#">Create extractor</a>
+
+                            <ul class="dropdown-menu type-selector">
+                                <li><a href="@routes.ExtractorsController.newExtractor(sourceNode.getNodeId, sourceInput.getId, "regex", key, lib.Tools.removeTrailingNewline(value).toString)">Regular expression</a></li>
+                                <li><a href="@routes.ExtractorsController.newExtractor(sourceNode.getNodeId, sourceInput.getId, "substring", key, lib.Tools.removeTrailingNewline(value).toString)">Substring</a></li>
+                                <li><a href="@routes.ExtractorsController.newExtractor(sourceNode.getNodeId, sourceInput.getId, "split_and_index", key, lib.Tools.removeTrailingNewline(value).toString)">Split &amp; Index</a></li>
+                            </ul>
+                        </li>
+                    }
+                    </ul>
+                </div>
+            </dt>
+            <dd style="word-wrap: break-word;">@lib.Tools.orNbsp(lib.Tools.removeTrailingNewline(value))</dd>
+        }
+        </dl>
+    </div>
+
+}

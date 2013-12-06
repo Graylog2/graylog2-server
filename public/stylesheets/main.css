@@ -1027,6 +1027,10 @@ form #stream-rules {
     margin-bottom: 0px;
 }
 
+.detail-message h2 a {
+    color: #000;
+}
+
 #scroll-to-search-hint {
     position: fixed;
     left: 50%;
