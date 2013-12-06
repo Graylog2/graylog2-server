@@ -38,6 +38,7 @@ public class ModelFactoryModule extends AbstractModule {
         install(new FactoryModuleBuilder().build(Dashboard.Factory.class));
         install(new FactoryModuleBuilder().build(LdapSettings.Factory.class));
         install(new FactoryModuleBuilder().build(Stream.Factory.class));
+        install(new FactoryModuleBuilder().build(StreamRule.Factory.class));
         install(new FactoryModuleBuilder().build(Radio.Factory.class));
         install(new FactoryModuleBuilder().build(Index.Factory.class));
 

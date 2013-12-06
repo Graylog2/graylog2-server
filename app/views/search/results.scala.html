@@ -38,7 +38,19 @@
 <span id="original-search-query" style="display: none;">@searchResult.getOriginalQuery</span>
 <span id="original-search-timerange" style="display: none;">@searchResult.getTimeRange</span>
 
-<a href="" class="btn btn-small pull-right">Refresh</a>
+<div class="pull-right">
+    <a href="#built-query" class="btn btn-small" role="button" data-toggle="modal" data-backdrop="true"><i class="icon-bug"></i></a>
+
+    <div class="btn-group">
+        <a class="btn btn-small dropdown-toggle" data-toggle="dropdown" href="#">
+            <i class="icon-cloud-download"></i> Export
+            <span class="caret"></span>
+        </a>
+        <ul class="dropdown-menu">
+            <li><a href="@search.getCsvRoute(request())">Download as CSV</a></li>
+        </ul>
+    </div>
+</div>
 
 <h1>
     @if(stream == null) {
@@ -204,8 +216,6 @@
 </div>
 
 <div class="graph-resolution-selector">
-    <a href="@search.getCsvRoute(request())" class="pull-right" id="csv-download" title="Download all @searchResult.getTotalResultCount results as CSV"><i class="icon-cloud-download"></i> CSV</a>
-    <a href="#built-query" class="pull-right" role="button" data-toggle="modal" data-backdrop="true"><i class="icon-bug"></i></a>
     <i class="icon-time"></i>
     <strong>Resolution:</strong> @Html(DateHistogramResolutionSelector.getOptions(histogram.getInterval()))
 </div>

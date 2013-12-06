@@ -1,6 +1,7 @@
 package models.api.results;
 
 import com.google.common.collect.Lists;
+import com.google.inject.Inject;
 import models.StreamRule;
 import models.api.responses.streams.StreamRuleSummaryResponse;
 
@@ -26,9 +27,9 @@ public class StreamRulesResult {
     public List<StreamRule> getStreamRules() {
         List<StreamRule> streamRules = Lists.newArrayList();
 
-        for (StreamRuleSummaryResponse srsr : this.streamRules) {
-            streamRules.add(new StreamRule(srsr));
-        }
+        /*for (StreamRuleSummaryResponse srsr : this.streamRules) {
+            streamRules.add(streamRuleFactory.fromSummaryResponse(srsr));
+        }*/
 
         return streamRules;
     }

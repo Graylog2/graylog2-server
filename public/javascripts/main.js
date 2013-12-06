@@ -1,5 +1,10 @@
 $(document).ready(function() {
 
+    $(".messages tbody > tr").bind("contextmenu", function() {
+        alert("foo");
+        return false;
+    });
+
 	// Opening messages in sidebar with click in message result table.
 	$(".messages tbody > tr").bind("click", function() {
 		messageId = $(this).attr("data-message-id");
@@ -130,144 +135,6 @@ $(document).ready(function() {
                 showError("Could not delete notification.");
             }
         });
-    });
-
-    // Stream rules.
-    $("#new-stream-rule .sr-input").on("keyup change", function() {
-        value = $(this).val();
-
-        if (value != undefined && value != "") {
-            // Selectbox options can have a custom replace string.
-            s = $("option:selected", this);
-            if (s != undefined && s.attr("data-reflect-string") != undefined && s.attr("data-reflect-string") != "") {
-                value = s.attr("data-reflect-string");
-
-                // Inverted?
-                if ($("#sr-inverted").is(':checked')) {
-                    value = "not " + value;
-                }
-            }
-        } else {
-            value = $(this).attr("placeholder");
-        }
-
-        $($(this).attr("data-reflect")).html(value);
-    });
-
-    // Stream rules inverter.
-    $("#sr-inverted").on("click", function() {
-        old_val = $("#new-stream-rule #sr-result-category").html();
-
-        if ($(this).is(":checked")) {
-            // Add the not.
-            new_val = "not " + old_val;
-        } else {
-            // Remove the not.
-            if (old_val.substr(0,3) == "not") {
-                new_val = old_val.substr(3);
-            } else {
-                new_val = old_val;
-            }
-        }
-        $("#new-stream-rule #sr-result-category").html(new_val);
-    })
-
-    // Add stream rule to stream rule list when saved.
-    var rule_count;
-    $(".add-stream-rule").on("click", function() {
-        if (rule_count == undefined) {
-            rule_count = 0;
-        } else {
-            rule_count++;
-        }
-        if (!validate("#sr")) {
-            return false;
-        }
-
-        $("#stream-rules-placeholder").hide();
-
-        rule = {
-            field: $("#sr-field").val(),
-            type: parseInt($("#sr-type").val()),
-            value: $("#sr-value").val(),
-            inverted: $("#sr-inverted-box").is(":checked")
-        }
-        // Add hidden field that is transmitted in form add visible entry.
-        field = "<input type='hidden' name='rules["+rule_count+"].field' value='" + rule.field + "' />\n" +
-            "<input type='hidden' name='rules["+rule_count+"].type' value='" + rule.type + "' />\n" +
-            "<input type='hidden' name='rules["+rule_count+"].value' value='" + rule.value + "' />\n" +
-            "<input type='hidden' name='rules["+rule_count+"].inverted' value='" + rule.inverted + "' />\n"
-
-        remover = "<a href='#' class='sr-remove'><i class='icon-remove'></i></a>";
-        $("#stream-rules").append("<li id='rule'>" + field + $("#sr-result").html().replace(/<(?:.|\n)*?>/gm, '') + " " + remover + "</li>");
-
-        // Remove stream rule binding.
-        $(".sr-remove").on("click", function() {
-            var parent_list = $(this).parents("ul");
-            $(this).parent().remove();
-            renumber_rules(parent_list);
-            return false;
-        });
-
-        $("#new-stream-rule").modal("hide");
-
-        var renumber_rules = function($rules) {
-            $('li#rule', $rules).each(function($index) {
-                $('input', $(this)).each (function() {
-                    var new_name = $(this).attr('name').replace(/rules\[\d+\]/g, 'rules['+$index+']');
-                    $(this).attr('name', new_name);
-                });
-            });
-        }
-    });
-
-    $(".add-stream-rule-to-existing").on("click", function() {
-        var streamId = $(this).closest(".stream-row").attr("data-stream-id");
-
-        var modalBody = $(this).closest(".new-stream-rule2").find(".modal-body");
-
-        rule = {
-            field: $("#sr-field", modalBody).val(),
-            type: parseInt($("#sr-type", modalBody).val()),
-            value: $("#sr-value", modalBody).val(),
-            inverted: $("#sr-inverted-box", modalBody).is(":checked")
-        }
-
-        /*if (!validate("#sr")) {
-            return false;
-        }*/
-
-        var url = '/streams/' + streamId + '/rules';
-        var dialog = $(this).closest("div#new-stream-rule");
-        var form = $(this).closest("form");
-
-        console.log(url);
-
-        $.ajax({
-            url: url,
-            type: "POST",
-            data: rule,
-
-            success: function(data) {
-                var streamrule_id = data.streamrule_id;
-
-                // Add hidden field that is transmitted in form add visible entry.
-                remover = "<a class='remove-streamrule' href='#' data-removeurl='/streams/"+streamId+"/rules/"+streamrule_id+"/delete'><i class='icon-remove'></i></a>";
-                $("div.well", form).find("ul").append("<li>" + $("#sr-result").html().replace(/<(?:.|\n)*?>/gm, '') + " " + remover + "</li>");
-                $("div.well", form).find("li#stream-rules-placeholder").hide();
-
-                dialog.modal("hide");
-            }
-        })
-
-
-
-        return false;
-    });
-
-    $(".show-stream-rule").on("click", function() {
-        var streamId = $(this).closest(".stream-row").attr("data-stream-id");
-        $('div.new-stream-rule2[data-stream-id="' + streamId + '"]').modal();
     });
 
     // Typeahead for message fields.
@@ -471,26 +338,35 @@ $(document).ready(function() {
             return;
         }
 
-        // escape common lucene special characters: + - && || ! ( ) { } [ ] ^ " ~ * ? : \
-        value = value.replace(/\\/g, "\\\\"); // this one must be on top to avoid double-escaping lol
-        value = value.replace(/\//g, "\\/");
-        value = value.replace(/\+/g, "\\+");
-        value = value.replace(/-/g, "\\-");
-        value = value.replace(/!/g, "\\!");
-        value = value.replace(/\\^/g, "\\^");
-        value = value.replace(/"/g, "\\\"");
-        value = value.replace(/~/g, "\\~");
-        value = value.replace(/\*/g, "\\*");
-        value = value.replace(/\?/g, "\\?");
-        value = value.replace(/:/g, "\\:");
-        value = value.replace(/\|\|/g, "\\|\\|");
-        value = value.replace(/&&/g, "\\&\\&");
-        value = value.replace(/\[/g, "\\[");
-        value = value.replace(/\]/g, "\\]");
-        value = value.replace(/\(/g, "\\(");
-        value = value.replace(/\)/g, "\\)");
-        value = value.replace(/\{/g, "\\}");
-        value = value.replace(/\}/g, "\\}");
+        // Replace newlines.
+        value = value.replace(/\n/g, " ");
+        value = value.replace(/<br>/g, " ");
+
+        // If its a search phase we need to wrap it really good.
+        if (value.indexOf(" ") >= 0) {
+            value = "\"" + value + "\"";
+        } else {
+            // escape common lucene special characters: + - && || ! ( ) { } [ ] ^ " ~ * ? : \
+            value = value.replace(/\\/g, "\\\\"); // this one must be on top to avoid double-escaping lol
+            value = value.replace(/\//g, "\\/");
+            value = value.replace(/\+/g, "\\+");
+            value = value.replace(/-/g, "\\-");
+            value = value.replace(/!/g, "\\!");
+            value = value.replace(/\\^/g, "\\^");
+            value = value.replace(/"/g, "\\\"");
+            value = value.replace(/~/g, "\\~");
+            value = value.replace(/\*/g, "\\*");
+            value = value.replace(/\?/g, "\\?");
+            value = value.replace(/:/g, "\\:");
+            value = value.replace(/\|\|/g, "\\|\\|");
+            value = value.replace(/&&/g, "\\&\\&");
+            value = value.replace(/\[/g, "\\[");
+            value = value.replace(/\]/g, "\\]");
+            value = value.replace(/\(/g, "\\(");
+            value = value.replace(/\)/g, "\\)");
+            value = value.replace(/\{/g, "\\}");
+            value = value.replace(/\}/g, "\\}");
+        }
 
         var ourQuery = field + ":" + value;
         var query = $("#universalsearch-query");
@@ -568,6 +444,10 @@ $(document).ready(function() {
 
         $(".index-info", $(this).closest(".index-description")).show();
         $(this).hide();
+    });
+
+    $(".nolink").on("live", function(e) {
+        e.preventDefault();
     });
 
     $(".message-result-fields-range .page").on("click", function(e) {
@@ -684,22 +564,6 @@ $(document).ready(function() {
     } catch(err) {
         numeral.language("en");
     }
-
-    $(".streamrules-list").on("click", "li a.remove-streamrule", function(event) {
-        var result = confirm("Really delete stream rule?");
-        if (result) {
-            var elem = $(this).parent();
-            var url = event.currentTarget.attributes["data-removeUrl"].value;
-            $.post(url, {}, function() {
-                var parent_list = $(elem).closest("ul");
-                elem.remove();
-
-                if ($("li", parent_list).size() == 1) {
-                    $("#stream-rules-placeholder", parent_list).show();
-                }
-            });
-        }
-    })
 
     $(".remove-stream").on("click", function(event) {
         var result = confirm("Really delete stream?");

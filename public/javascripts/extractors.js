@@ -31,7 +31,7 @@ $(document).ready(function() {
         showManualMessageSelector(subcontainer);
     });
 
-    function showManualMessageSelector(subcontainer, container) {
+    function showManualMessageSelector(subcontainer, container, callback) {
         var manualSelector = $(".manual-selector", container);
         manualSelector.show();
 
@@ -48,6 +48,12 @@ $(document).ready(function() {
                 url: '/a/messages/' + index + '/' + messageId,
                 success: function(data) {
                     showMessage($(".xtrc-message-fields", container), data.fields, data.id);
+                    jQuery.data(document.body, "message", data);
+                    var msgContainer = $("div.xtrc-message");
+                    msgContainer.trigger("sampleMessageChanged");
+                    if (callback != undefined) {
+                        callback(data);
+                    }
                 },
                 error: function() {
                     showError("Could not load message. Make sure that ID and index are correct.");

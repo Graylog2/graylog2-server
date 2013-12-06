@@ -16,7 +16,7 @@
                 <li id="stream-rules-placeholder">No rules defined</li>
             </ul>
 
-            <button class="btn btn-small" type="button" data-toggle="modal" data-target="#new-stream-rule">
+            <button class="btn btn-small " type="button" data-toggle="modal" data-target="#streamrule-form-modal">
                 Add rule
             </button>
             <br /><br />
@@ -28,7 +28,7 @@
     </form>
 
 @if(stream == null) {
-    @views.html.partials.streamrules.stream_rule_form.render("add-stream-rule", null, null)
+    @views.html.partials.streamrules.stream_rule_form.render(null, null)
 } else {
-    @views.html.partials.streamrules.stream_rule_form.render("add-stream-rule", stream.getId, null)
+    @views.html.partials.streamrules.stream_rule_form.render(stream.getId, null)
 }

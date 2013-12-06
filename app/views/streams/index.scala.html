@@ -34,8 +34,8 @@
                         <span class="caret"></span>
                     </a>
                     <ul class="dropdown-menu">
-                        <li><a href="@routes.StreamRulesController.index(stream.getId)" class="show-stream-rule">Edit rules</a></li>
-                        <li><a href="#" class="show-stream-rule">Add rule</a></li>
+                        <li><a href="@routes.StreamRulesController.index(stream.getId)">Edit rules</a></li>
+                        <li><a href="#" data-stream-id=@stream.getId class="show-stream-rule">Add rule</a></li>
                         <li class="disabled"><a href="#">Add alert (coming soon)</a></li>
                         <li class="dropdown-submenu">
                             <a href="#">Show Metrics on</a>
@@ -70,31 +70,10 @@
                 }
             </h3>
 
-            <form class="add-streamrule-form" data-stream-id="@stream.getId" action="#">
-                <div class="well well-small">
-                    <ul class="streamrules-list">
-                    @if(stream.getStreamRules.size > 0) {
-                        @for(streamRule <- stream.getStreamRules) {
-                            <li>
-                                @streamRule <a class="remove-streamrule" href="#"
-                            data-removeUrl="@routes.StreamRulesController.delete(streamRule.getStreamId, streamRule.getId)">
-                                <i class="icon-remove"></i>
-                            </a>
-                            </li>
-                        }
-                        <li id="stream-rules-placeholder" style="display:none"><i>No rules defined - go add some!</i></li>
-                    } else {
-
-                        <li id="stream-rules-placeholder"><i>No rules defined - go add some!</i></li>
-                    }
-                    </ul>
-                </div>
-
-                @views.html.partials.streamrules.stream_rule_form.render("add-stream-rule-to-existing", stream.getId, null)
-            </form>
+            <div id="streamrules-list-container">
+                @views.html.partials.streamrules.list_well.render(stream.getStreamRules)
+                @views.html.partials.streamrules.stream_rule_form(stream.getId, null)
+            </div>
         </div>
-
-        <!-- $(".stream-row .add-streamrule-form[data-stream-id=fsdfs]") -->
     }
-
 }

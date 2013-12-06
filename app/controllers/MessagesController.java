@@ -40,6 +40,37 @@ public class MessagesController extends AuthenticatedController {
     @Inject
     private MessagesService messagesService;
 
+    public Result show(String index, String id) {
+        try {
+            MessageResult message = messagesService.getMessage(index, id);
+            Node sourceNode = getSourceNode(message);
+            Radio sourceRadio = getSourceRadio(message);
+
+            return ok(views.html.messages.show.render(currentUser(), message, getSourceInput(sourceNode, message), sourceNode, sourceRadio, getSourceInput(sourceRadio, message)));
+        } catch (IOException e) {
+            return status(500, views.html.errors.error.render(ApiClient.ERROR_MSG_IO, e, request()));
+        } catch (APIException e) {
+            String message = "Could not get message. We expected HTTP 200, but got a HTTP " + e.getHttpCode() + ".";
+            return status(500, views.html.errors.error.render(message, e, request()));
+        }
+    }
+
+	public Result partial(String index, String id) {
+		try {
+            MessageResult message = FieldMapper.run(messagesService.getMessage(index, id));
+            Node sourceNode = getSourceNode(message);
+            Radio sourceRadio = getSourceRadio(message);
+
+            return ok(views.html.messages.show_as_partial.render(message, getSourceInput(sourceNode, message), sourceNode, sourceRadio, getSourceInput(sourceRadio, message)));
+		} catch (IOException e) {
+			return status(500, views.html.errors.error.render(ApiClient.ERROR_MSG_IO, e, request()));
+		} catch (APIException e) {
+			String message = "Could not get message. We expected HTTP 200, but got a HTTP " + e.getHttpCode() + ".";
+			return status(500, views.html.errors.error.render(message, e, request()));
+		}
+	}
+
+    // TODO move this to an API controller.
     public Result single(String index, String id) {
         try {
             MessageResult message = messagesService.getMessage(index, id);
@@ -55,21 +86,6 @@ public class MessagesController extends AuthenticatedController {
             return status(e.getHttpCode());
         }
     }
-
-	public Result singleAsPartial(String index, String id) {
-		try {
-            MessageResult message = FieldMapper.run(messagesService.getMessage(index, id));
-            Node sourceNode = getSourceNode(message);
-            Radio sourceRadio = getSourceRadio(message);
-
-            return ok(views.html.messages.show_as_partial.render(message, getSourceInput(sourceNode, message), sourceNode, sourceRadio, getSourceInput(sourceRadio, message)));
-		} catch (IOException e) {
-			return status(500, views.html.errors.error.render(ApiClient.ERROR_MSG_IO, e, request()));
-		} catch (APIException e) {
-			String message = "Could not get message. We expected HTTP 200, but got a HTTP " + e.getHttpCode() + ".";
-			return status(500, views.html.errors.error.render(message, e, request()));
-		}
-	}
 	
 	public Result analyze(String index, String id, String field) {
 		try {

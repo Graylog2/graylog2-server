@@ -1,10 +1,79 @@
-@(currentUser: User, stream: Stream, streamrules: List[StreamRule])
+@(currentUser: User, stream: Stream, streamrules: List[StreamRule], breadcrumbs: lib.BreadcrumbList)
 
 @main("Streamrules", views.html.sidebars.standard(currentUser), "", currentUser) {
-    <a href="@routes.StreamsController.newStream" class="btn btn-success btn-small pull-right">Create stream</a>
 
-    <h1>
-        <i class="icon icon-barcode"></i>
-        Rules for Stream "@stream.getTitle"
-    </h1>
+    @views.html.partials.breadcrumbs(breadcrumbs)
+
+    <div class="row-fluid">
+        <h1>
+            <i class="icon icon-barcode"></i>
+            Rules for Stream "@stream.getTitle"
+        </h1>
+
+        This screen is dedicated to an easy and comfortable creation and manipulation of stream rules. You can see the
+        effect configured stream rules have on message matching here.
+    </div>
+
+    <div class="row-fluid streamrule-sample-message">
+        <h2>
+            <i class="icon icon-signin"></i>
+            See results of stream
+        </h2>
+
+        <div class="subcontainer">
+            Start by loading a sample message, so we have some data to work on. This alows you to see the effect
+            of your stream rules immediately and enables you to tweak them to your desired result.
+
+            <div class="buttons">
+                <button class="btn btn-small xtrc-load-manual">
+                    Manually load a message
+                </button>
+            </div>
+        </div>
+        <div class="manual-selector" style="display: none;">
+            You can load any message manually using the form below. The <em>message ID</em> and <em>index</em>
+            can be found in the detail view of any message. Make sure that the selected message has the exact
+            same format as those received by this input or you extractor might now match.
+            <form class="form-inline manual-selector-form">
+                <input type="text" name="message_id" class="input-xlarge" placeholder="Message ID" required="true">
+                <input type="text" name="index" class="input-medium" placeholder="Index" required="true">
+                    <button type="submit" class="btn manual-selector-load" data-stream-id="@stream.getId">Load message</button>
+            </form>
+        </div>
+
+        <div class="xtrc-message" style="display: none;">
+            We found this message.
+
+            <strong>Next step:</strong>
+            Add/delete/modify the configured stream rules to see if matching is successfull or not.
+
+            <div class="well well-small" id="sample-message">
+                <h2>Message <span></span></h2>
+                <dl class="xtrc-message-fields">
+                </dl>
+            </div>
+
+        </div>
+    </div>
+
+    <div class="row-fluid configured-streamrules">
+        <h2>
+            <i class="icon icon-cogs"></i>
+            Configured Stream Rules
+
+            <div class="buttons pull-right">
+                <button class="btn btn-small btn-small test-stream-rules" data-stream-id="@stream.getId">
+                    Test stream rules
+                </button>
+
+                <button class="btn btn-success btn-small show-stream-rule" data-stream-id="@stream.getId">
+                    Create stream rule
+                </button>
+            </div>
+        </h2>
+        <div id="streamrules-list-container">
+            @views.html.partials.streamrules.list_well.render(streamrules)
+            @views.html.partials.streamrules.stream_rule_form.render(stream.getId, null)
+        </div>
+    </div>
 }

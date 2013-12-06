@@ -8,6 +8,7 @@ public class StreamRuleSummaryResponse {
     public String field;
     public String value;
     public int type;
+    public Boolean inverted;
 
     public String stream_id;
 }
