@@ -89,7 +89,7 @@ public class SyslogInputBase extends MessageInput {
         ConfigurationRequest r = new ConfigurationRequest();
 
         r.addField(ConfigurationRequest.Templates.bindAddress(CK_BIND_ADDRESS));
-        r.addField(ConfigurationRequest.Templates.portNumber(CK_PORT));
+        r.addField(ConfigurationRequest.Templates.portNumber(CK_PORT, 514));
 
         r.addField(
                 new BooleanField(

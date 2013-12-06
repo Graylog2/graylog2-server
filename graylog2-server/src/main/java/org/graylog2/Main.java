@@ -254,7 +254,7 @@ public final class Main {
         server.registerFilter(new StaticFieldFilter());
         server.registerFilter(new ExtractorFilter());
         server.registerFilter(new BlacklistFilter());
-        server.registerFilter(new StreamMatcherFilter()); // # ISSUE 274
+        server.registerFilter(new StreamMatcherFilter());
         server.registerFilter(new RewriteFilter());
 
         // Register outputs.
