@@ -338,26 +338,35 @@ $(document).ready(function() {
             return;
         }
 
-        // escape common lucene special characters: + - && || ! ( ) { } [ ] ^ " ~ * ? : \
-        value = value.replace(/\\/g, "\\\\"); // this one must be on top to avoid double-escaping lol
-        value = value.replace(/\//g, "\\/");
-        value = value.replace(/\+/g, "\\+");
-        value = value.replace(/-/g, "\\-");
-        value = value.replace(/!/g, "\\!");
-        value = value.replace(/\\^/g, "\\^");
-        value = value.replace(/"/g, "\\\"");
-        value = value.replace(/~/g, "\\~");
-        value = value.replace(/\*/g, "\\*");
-        value = value.replace(/\?/g, "\\?");
-        value = value.replace(/:/g, "\\:");
-        value = value.replace(/\|\|/g, "\\|\\|");
-        value = value.replace(/&&/g, "\\&\\&");
-        value = value.replace(/\[/g, "\\[");
-        value = value.replace(/\]/g, "\\]");
-        value = value.replace(/\(/g, "\\(");
-        value = value.replace(/\)/g, "\\)");
-        value = value.replace(/\{/g, "\\}");
-        value = value.replace(/\}/g, "\\}");
+        // Replace newlines.
+        value = value.replace(/\n/g, " ");
+        value = value.replace(/<br>/g, " ");
+
+        // If its a search phase we need to wrap it really good.
+        if (value.indexOf(" ") >= 0) {
+            value = "\"" + value + "\"";
+        } else {
+            // escape common lucene special characters: + - && || ! ( ) { } [ ] ^ " ~ * ? : \
+            value = value.replace(/\\/g, "\\\\"); // this one must be on top to avoid double-escaping lol
+            value = value.replace(/\//g, "\\/");
+            value = value.replace(/\+/g, "\\+");
+            value = value.replace(/-/g, "\\-");
+            value = value.replace(/!/g, "\\!");
+            value = value.replace(/\\^/g, "\\^");
+            value = value.replace(/"/g, "\\\"");
+            value = value.replace(/~/g, "\\~");
+            value = value.replace(/\*/g, "\\*");
+            value = value.replace(/\?/g, "\\?");
+            value = value.replace(/:/g, "\\:");
+            value = value.replace(/\|\|/g, "\\|\\|");
+            value = value.replace(/&&/g, "\\&\\&");
+            value = value.replace(/\[/g, "\\[");
+            value = value.replace(/\]/g, "\\]");
+            value = value.replace(/\(/g, "\\(");
+            value = value.replace(/\)/g, "\\)");
+            value = value.replace(/\{/g, "\\}");
+            value = value.replace(/\}/g, "\\}");
+        }
 
         var ourQuery = field + ":" + value;
         var query = $("#universalsearch-query");
@@ -435,6 +444,10 @@ $(document).ready(function() {
 
         $(".index-info", $(this).closest(".index-description")).show();
         $(this).hide();
+    });
+
+    $(".nolink").on("live", function(e) {
+        e.preventDefault();
     });
 
     $(".message-result-fields-range .page").on("click", function(e) {

@@ -225,10 +225,6 @@ h4 {
 	top: 3px;	
 }
 
-#csv-download {
-    margin-left: 0.75em;
-}
-
 .sidebar-back, .sidebar-hide {
 	cursor: pointer;
 }
@@ -1027,6 +1023,10 @@ form #stream-rules {
     margin-bottom: 0px;
 }
 
+.detail-message h2 a {
+    color: #000;
+}
+
 #scroll-to-search-hint {
     position: fixed;
     left: 50%;
@@ -1468,4 +1468,12 @@ form.node-processing-change input {
 
 .system-rest dd {
     margin-left: 120px;
+}
+
+.nolink {
+    color: #000;
+}
+
+.nolink:hover {
+    text-decoration: none;
 }
