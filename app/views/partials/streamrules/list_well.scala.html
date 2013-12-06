@@ -7,14 +7,7 @@
             }
             <li id="stream-rules-placeholder" style="display:none"><i>No rules defined - go add some!</i></li>
         } else {
-
             <li id="stream-rules-placeholder"><i>No rules defined - go add some!</i></li>
         }
     </ul>
-</div>
-
-<div id="streamrules-edit-forms">
-    @for(streamRule <- streamRules) {
-        @views.html.partials.streamrules.stream_rule_form.render(streamRule.getStreamId, streamRule)
-    }
 </div>

@@ -1,5 +1,8 @@
 $(document).ready(function() {
-    $("#streamrule-form .sr-input").on("keyup change", function() {
+    $(document.body).on("keyup change", ".sr-input", function(foo) {
+        console.log(foo);
+
+        console.log("keyup change");
         value = $(this).val();
         var modalBody = $(this).closest("form#streamrule-form").find(".modal-body");
 
@@ -35,8 +38,6 @@ $(document).ready(function() {
                     $("#stream-rules-placeholder", parent_list).show();
                 }
 
-
-
                 testStreamRulesAndColorize(streamId);
             });
         }
@@ -45,10 +46,9 @@ $(document).ready(function() {
     });
 
     // Stream rules inverter.
-    $("input#sr-inverted").on("click", function() {
+    $(".streamrules-list").on("click", "#sr-inverted", function() {
         var modalBody = $(this).closest("form#streamrule-form").find(".modal-body");
-
-        old_val = $("#sr-result-category", modalBody).html();
+        var old_val = $("#sr-result-category", modalBody).html();
 
         if ($(this).is(":checked")) {
             // Add the not.
@@ -105,7 +105,7 @@ $(document).ready(function() {
         }
     }
 
-    $(".streamrule-form-submit").on("click", function() {
+    $(document.body).on("click", "button.streamrule-form-submit", function() {
         var form = $(this).closest("form#streamrule-form");
         var streamId = form.attr("data-stream-id");
         var streamRuleId = form.attr("data-streamrule-id");
@@ -122,7 +122,6 @@ $(document).ready(function() {
         if (streamId != undefined || streamRuleId != undefined) {
             var url, callback;
             var container = $(this).closest("div#streamrules-list-container");
-            var edit = "<a class='edit-streamrule' href='#' data-streamrule-id='"+streamRuleId+"'><i class='icon icon-edit'></i></a>";
 
             if (streamId != undefined) {
                 url = '/streams/' + streamId + '/rules';
@@ -140,7 +139,6 @@ $(document).ready(function() {
                 }
             }
 
-
             $.ajax({
                 url: url,
                 type: "POST",
@@ -148,10 +146,10 @@ $(document).ready(function() {
                 dataType: "html",
 
                 success: function(data) {
+                    dialog.modal("hide");
                     callback(data);
 
                     testStreamRulesAndColorize(streamId);
-                    dialog.modal("hide");
                 }
             });
         } else {
@@ -162,61 +160,18 @@ $(document).ready(function() {
         return false;
     });
 
-    $(".add-stream-rule-to-existing").on("click", function() {
-        //var streamId = $(this).closest(".stream-row").attr("data-stream-id");
-        var streamId = $(this).closest("form#streamrule-form").attr("data-stream-id");
-
-        var modalBody = $(this).closest("form").find(".modal-body");
-
-        rule = {
-            field: $("#sr-field", modalBody).val(),
-            type: parseInt($("#sr-type", modalBody).val()),
-            value: $("#sr-value", modalBody).val(),
-            inverted: $("#sr-inverted", modalBody).is(":checked")
-        }
-
-        /*if (!validate("#sr")) {
-         return false;
-         }*/
-
-        var url = '/streams/' + streamId + '/rules';
-        var dialog = $(this).closest("div#new-stream-rule");
-        var form = $(this).closest("form#streamrules-form");
-
-        console.log(url);
-
-        $.ajax({
-            url: url,
-            type: "POST",
-            data: rule,
-
-            success: function(data) {
-                var streamrule_id = data.streamrule_id;
-
-                // Add hidden field that is transmitted in form add visible entry.
-                edit = "<a class='edit-streamrule' href='#' data-streamrule-id='"+streamrule_id+"'><i class='icon icon-edit'></i></a>";
-                remover = "<a class='remove-streamrule' href='#' data-removeurl='/streams/"+streamId+"/rules/"+streamrule_id+"/delete'><i class='icon-remove'></i></a>";
-                $("div#streamrules-list-container", form).find("ul").append("<li data-streamrule-id='" + streamrule_id + "'>" + $("#sr-result").html().replace(/<(?:.|\n)*?>/gm, '') + " " + edit + remover + "</li>");
-                $("div#streamrules-list-container", form).find("li#stream-rules-placeholder").hide();
-
-                dialog.modal("hide");
-            }
-        })
-
-        return false;
-    });
-
     $(".show-stream-rule").on("click", function() {
         var streamId = $(this).attr("data-stream-id");
         var form = $('form#streamrule-form[data-stream-id="' + streamId + '"]');
-        form[0].reset();
         form.find("div.modal").modal();
         return false;
     });
 
     $(".streamrules-list").on("click", "li a.edit-streamrule", function(event) {
         var streamRuleId = $(this).attr("data-streamrule-id");
-        $('form#streamrule-form[data-streamrule-id="' + streamRuleId + '"]').find("div.modal").modal();
+        var form = $('form#streamrule-form[data-streamrule-id="' + streamRuleId + '"]');
+        form.find(".sr-input").change();
+        form.find("div.modal").modal();
         return false;
     });
 
@@ -237,6 +192,10 @@ $(document).ready(function() {
 
     function testStreamRulesAndColorize(streamId) {
         var message = jQuery.data(document.body, "message");
+
+        if (message == undefined) {
+            return;
+        }
         var container = $("#streamrules-list-container").find("div.alert");
 
         testStreamRules(message, streamId,

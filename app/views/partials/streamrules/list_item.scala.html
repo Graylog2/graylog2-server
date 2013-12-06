@@ -13,4 +13,7 @@
         data-removeUrl="@routes.StreamRulesController.delete(streamRule.getStreamId, streamRule.getId)">
         <i class="icon-remove"></i>
     </a>
+    <div style="position:absolute;color:#000000">
+        @views.html.partials.streamrules.stream_rule_form.render(streamRule.getStreamId, streamRule)
+    </div>
 </li>
