@@ -1,8 +1,5 @@
 $(document).ready(function() {
     $(document.body).on("keyup change", ".sr-input", function(foo) {
-        console.log(foo);
-
-        console.log("keyup change");
         value = $(this).val();
         var modalBody = $(this).closest("form#streamrule-form").find(".modal-body");
 
@@ -88,11 +85,11 @@ $(document).ready(function() {
         $("#stream-rules").append("<li id='rule'>" + field + $("#sr-result").html().replace(/<(?:.|\n)*?>/gm, '') + " " + remover + "</li>");
 
         // Remove stream rule binding.
-        $(".sr-remove").on("click", function() {
+        $(".sr-remove").on("click", function(e) {
             var parent_list = $(this).parents("ul");
             $(this).parent().remove();
             renumber_rules(parent_list);
-            return false;
+            e.preventDefault();
         });
 
         var renumber_rules = function($rules) {
@@ -105,7 +102,7 @@ $(document).ready(function() {
         }
     }
 
-    $(document.body).on("click", "button.streamrule-form-submit", function() {
+    $(document.body).on("click", "button.streamrule-form-submit", function(e) {
         var form = $(this).closest("form#streamrule-form");
         var streamId = form.attr("data-stream-id");
         var streamRuleId = form.attr("data-streamrule-id");
@@ -157,31 +154,31 @@ $(document).ready(function() {
             dialog.modal("hide");
         }
 
-        return false;
+        e.preventDefault();
     });
 
-    $(".show-stream-rule").on("click", function() {
+    $(".show-stream-rule").on("click", function(e) {
         var streamId = $(this).attr("data-stream-id");
         var form = $('form#streamrule-form[data-stream-id="' + streamId + '"]');
         form.find("div.modal").modal();
-        return false;
+        e.preventDefault();
     });
 
-    $(".streamrules-list").on("click", "li a.edit-streamrule", function(event) {
+    $(".streamrules-list").on("click", "li a.edit-streamrule", function(e) {
         var streamRuleId = $(this).attr("data-streamrule-id");
         var form = $('form#streamrule-form[data-streamrule-id="' + streamRuleId + '"]');
         form.find(".sr-input").change();
         form.find("div.modal").modal();
-        return false;
+        e.preventDefault();
     });
 
     // Stream match Testing functions
-    $(".test-stream-rules").on("click", function() {
+    $(".test-stream-rules").on("click", function(e) {
         var streamId = $(this).attr("data-stream-id");
 
         testStreamRulesAndColorize(streamId);
 
-        return false;
+        e.preventDefault();
     });
 
     $("div.xtrc-message").bind("sampleMessageChanged", function() {
