@@ -73,7 +73,7 @@
                             </a>
 
                             <ul class="dropdown-menu">
-
+                                <li><a href="#" class="search-link" data-field="@key" data-value="@lib.Tools.removeTrailingNewline(value)">Search for value</a></li>
                                 @if(sourceNode != null && sourceInput != null) {
                                     <li class="dropdown-submenu">
                                         <a href="#">Create extractor</a>
@@ -88,7 +88,7 @@
                             </ul>
                         </div>
                     </dt>
-                    <dd style="word-wrap: break-word;">@lib.Tools.orNbsp(lib.Tools.removeTrailingNewline(value))</dd>
+                    <dd style="word-wrap: break-word;"><a href="#" data-field="@key" data-value="@lib.Tools.removeTrailingNewline(value)" class="search-link nolink">@lib.Tools.orNbsp(lib.Tools.removeTrailingNewline(value))</a></dd>
                 }
                 </dl>
             </div>

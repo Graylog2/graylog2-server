@@ -1469,3 +1469,11 @@ form.node-processing-change input {
 .system-rest dd {
     margin-left: 120px;
 }
+
+.nolink {
+    color: #000;
+}
+
+.nolink:hover {
+    text-decoration: none;
+}
