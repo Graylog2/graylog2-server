@@ -1477,3 +1477,13 @@ form.node-processing-change input {
 .nolink:hover {
     text-decoration: none;
 }
+
+.closed-indices {
+    cursor: pointer;
+}
+
+.closed-indices ul {
+    margin-top: 5px;
+    list-style-type: square;
+    margin-left: 25px;
+}

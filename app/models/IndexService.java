@@ -23,10 +23,7 @@ import com.google.common.collect.Lists;
 import com.google.inject.Inject;
 import lib.APIException;
 import lib.ApiClient;
-import models.api.responses.system.indices.DeflectorConfigResponse;
-import models.api.responses.system.indices.DeflectorInformationResponse;
-import models.api.responses.system.indices.IndexRangeSummary;
-import models.api.responses.system.indices.IndexRangesResponse;
+import models.api.responses.system.indices.*;
 
 import java.io.IOException;
 import java.util.List;
@@ -69,6 +66,12 @@ public class IndexService {
         return api.get(DeflectorConfigResponse.class)
                 .onlyMasterNode()
                 .path("/system/deflector/config")
+                .execute();
+    }
+
+    public ClosedIndicesResponse getClosedIndices() throws APIException, IOException {
+        return api.get(ClosedIndicesResponse.class)
+                .path("/system/indexer/indices/closed")
                 .execute();
     }
 

@@ -489,6 +489,13 @@ $(document).ready(function() {
         });
     });
 
+    $(".closed-indices").on("click", function() {
+        $("ul", $(this)).show();
+        $(".show-indices", $(this)).hide();
+        $(this).off("click");
+        $(this).css("cursor", "auto");
+    });
+
     function scrollToSearchbarHint() {
         if ($(document).scrollTop() > 50) {
             $("#scroll-to-search-hint").fadeIn("fast").delay(1500).fadeOut("fast");

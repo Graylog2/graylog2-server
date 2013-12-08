@@ -26,6 +26,7 @@ import lib.BreadcrumbList;
 import models.ClusterService;
 import models.ESClusterHealth;
 import models.IndexService;
+import models.api.responses.system.indices.ClosedIndicesResponse;
 import models.api.responses.system.indices.DeflectorConfigResponse;
 import models.api.responses.system.indices.DeflectorInformationResponse;
 import play.mvc.Result;
@@ -52,11 +53,13 @@ public class IndicesController extends AuthenticatedController {
             ESClusterHealth clusterHealth = clusterService.getESClusterHealth();
             DeflectorInformationResponse deflector = indexService.getDeflectorInfo();
             DeflectorConfigResponse deflectorConfig = indexService.getDeflectorConfig();
+            ClosedIndicesResponse closedIndices = indexService.getClosedIndices();
 
             return ok(views.html.system.indices.index.render(
                     currentUser(),
                     bc,
                     indexService.all(),
+                    closedIndices.indices,
                     clusterHealth,
                     deflector.currentTarget,
                     deflectorConfig
