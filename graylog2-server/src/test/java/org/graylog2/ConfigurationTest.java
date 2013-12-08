@@ -57,6 +57,8 @@ public class ConfigurationTest {
         validProperties.put("mongodb_threads_allowed_to_block_multiplier", "50");
         validProperties.put("amqp_port", "5672");
         validProperties.put("forwarder_loggly_timeout", "3");
+
+        validProperties.put("retention_strategy", "delete");
     }
 
     @After

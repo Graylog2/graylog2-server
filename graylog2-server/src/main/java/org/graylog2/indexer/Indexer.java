@@ -197,41 +197,6 @@ public class Indexer {
         return !response.hasFailures();
     }
     
-    public void runIndexRetention() throws NoTargetIndexException {
-        Map<String, IndexStats> indices = server.getDeflector().getAllDeflectorIndices();
-        int indexCount = indices.size();
-        int maxIndices = server.getConfiguration().getMaxNumberOfIndices();
-        
-        // Do we have more indices than the configured maximum?
-        if (indexCount <= maxIndices) {
-            LOG.debug("Number of indices ({}) lower than limit ({}). Not performing any retention actions.",
-                    indexCount, maxIndices);
-            return;
-        }
-        
-        // We have more indices than the configured maximum! Remove as many as needed.
-        int remove = indexCount-maxIndices;
-        String msg = "Number of indices (" + indexCount + ") higher than limit (" + maxIndices + "). Deleting " + remove + " indices.";
-        LOG.info(msg);
-        server.getActivityWriter().write(new Activity(msg, Indexer.class));
-        
-        for (String indexName : IndexHelper.getOldestIndices(indices.keySet(), remove)) {
-            // Never delete the current deflector target.
-            if (server.getDeflector().getNewestTargetName().equals(indexName)) {
-                LOG.info("Not deleting current deflector target <{}>.", indexName);
-                continue;
-            }
-            
-            msg = "Retention cleaning: Deleting index <" + indexName + ">";
-            LOG.info(msg);
-            server.getActivityWriter().write(new Activity(msg, Indexer.class));
-            
-            // Sorry if this should ever go mad. Delete the index!
-            indices().delete(indexName);
-            IndexRange.destroy(server, indexName);
-        }
-    }
-    
     public Searches searches() {
     	return searches;
     }

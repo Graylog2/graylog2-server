@@ -27,6 +27,7 @@ import org.elasticsearch.action.ActionFuture;
 import org.elasticsearch.action.WriteConsistencyLevel;
 import org.elasticsearch.action.admin.cluster.state.ClusterStateRequest;
 import org.elasticsearch.action.admin.indices.alias.get.IndicesGetAliasesRequest;
+import org.elasticsearch.action.admin.indices.close.CloseIndexRequest;
 import org.elasticsearch.action.admin.indices.create.CreateIndexRequest;
 import org.elasticsearch.action.admin.indices.create.CreateIndexResponse;
 import org.elasticsearch.action.admin.indices.delete.DeleteIndexRequest;
@@ -125,6 +126,10 @@ public class Indices {
 
     public void delete(String indexName) {
         c.admin().indices().delete(new DeleteIndexRequest(indexName)).actionGet();
+    }
+
+    public void close(String indexName) {
+        c.admin().indices().close(new CloseIndexRequest(indexName)).actionGet();
     }
 
     public long numberOfMessages(String indexName) throws IndexNotFoundException {

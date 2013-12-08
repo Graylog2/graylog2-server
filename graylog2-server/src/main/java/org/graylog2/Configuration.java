@@ -75,6 +75,9 @@ public class Configuration {
 
     @Parameter(value = "no_retention")
     private boolean noRetention;
+
+    @Parameter(value = "retention_strategy", required = true)
+    private String retentionStrategy;
     
     @Parameter(value = "elasticsearch_max_number_of_indices", required = true, validator = PositiveIntegerValidator.class)
     private int maxNumberOfIndices = 20;
@@ -500,6 +503,10 @@ public class Configuration {
 
     public List<String> getEsUnicastHosts() {
         return esUnicastHosts;
+    }
+
+    public String getRetentionStrategy() {
+        return retentionStrategy;
     }
 
 }
