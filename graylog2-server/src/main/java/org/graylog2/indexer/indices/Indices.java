@@ -259,4 +259,14 @@ public class Indices {
         c.admin().indices().flush(new FlushRequest(index).force(true)).actionGet();
     }
 
+    public boolean isReopened(String indexName) {
+        ClusterState clusterState = c.admin().cluster().state(new ClusterStateRequest()).actionGet().getState();
+        IndexMetaData metaData = clusterState.getMetaData().getIndices().get(indexName);
+
+        if (metaData == null) {
+            return false;
+        }
+
+        return metaData.getSettings().getAsBoolean("index.graylog2_reopened", false);
+    }
 }

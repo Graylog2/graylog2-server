@@ -43,7 +43,7 @@ public class IndexRetentionThread implements Runnable {
     private final Core server;
     
     public static final int INITIAL_DELAY = 0;
-    public static final int PERIOD = 60; // Run every minute.
+    public static final int PERIOD = 300; // Run every five minutes.
 
     public IndexRetentionThread(Core server) {
         this.server = server;
@@ -69,7 +69,6 @@ public class IndexRetentionThread implements Runnable {
         LOG.info(msg);
         server.getActivityWriter().write(new Activity(msg, IndexRetentionThread.class));
 
-
         try {
             runRetention(
                     RetentionStrategyFactory.fromString(server, server.getConfiguration().getRetentionStrategy()),
@@ -85,9 +84,18 @@ public class IndexRetentionThread implements Runnable {
 
     public void runRetention(RetentionStrategy strategy, Map<String, IndexStats> indices, int removeCount) throws NoTargetIndexException {
         for (String indexName : IndexHelper.getOldestIndices(indices.keySet(), removeCount)) {
-            // Never delete the current deflector target.
+            // Never run against the current deflector target.
             if (server.getDeflector().getNewestTargetName().equals(indexName)) {
-                LOG.info("Not deleting current deflector target <{}>.", indexName);
+                LOG.info("Not running retention against current deflector target <{}>.", indexName);
+                continue;
+            }
+
+            /*
+             * Never run against a re-opened index. Indices are marked as re-opened by storing a setting
+             * attribute and we can check for that here.
+             */
+            if (server.getIndexer().indices().isReopened(indexName)) {
+                LOG.info("Not running retention against reopened index <{}>.", indexName);
                 continue;
             }
 
