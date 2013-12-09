@@ -197,14 +197,16 @@ $(document).ready(function() {
 
         testStreamRules(message, streamId,
             function(result) {
-                container[0].classList.remove("alert-error");
+                container.switchClass("alert-info alert-error", "alert-success");
+                /*container[0].classList.remove("alert-error");
                 container[0].classList.remove("alert-info");
-                container[0].classList.add("alert-success");
+                container[0].classList.add("alert-success");*/
             },
             function (result) {
-                container[0].classList.remove("alert-success");
+                container.switchClass("alert-info alert-success", "alert-error");
+                /*container[0].classList.remove("alert-success");
                 container[0].classList.remove("alert-info");
-                container[0].classList.add("alert-error");
+                container[0].classList.add("alert-error");*/
                 colorizeRuleResults(result.rules, $(".streamrules-list")[0]);
             });
     }
