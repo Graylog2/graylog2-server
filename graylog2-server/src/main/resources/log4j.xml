@@ -14,11 +14,8 @@
 	<logger name="org.graylog2">
 		<level value="warn" />
 	</logger>
-    <logger name="org.graylog2.security.realm">
-        <level value="debug"/>
-    </logger>
-    <logger name="org.graylog2.security.MongoDbSessionDAO">
-        <level value="debug"/>
+    <logger name="org.graylog2.rest.documentation.generator.Generator">
+        <level value="info"/>
     </logger>
 	<logger name="org.apache.shiro">
         <level value="error" />

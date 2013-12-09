@@ -19,6 +19,7 @@
 package org.graylog2.rest.resources.system;
 
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.authc.AuthenticationException;
 import org.apache.shiro.authc.UsernamePasswordToken;
@@ -48,13 +49,14 @@ import java.util.concurrent.TimeUnit;
 import static javax.ws.rs.core.Response.noContent;
 
 @Path("/system/sessions")
-@Api(value = "Sessions", description = "Interactive user sessions")
+@Api(value = "System/Sessions", description = "Login for interactive user sessions")
 public class SessionsResource extends RestResource {
     private static final Logger log = LoggerFactory.getLogger(SessionsResource.class);
 
     @POST
     @ApiOperation(value = "Create a new session", notes = "This request creates a new session for a user or reactivates an existing session: the equivalent of logging in.")
-    public Session newSession(@Context ContainerRequestContext requestContext, SessionCreateRequest createRequest) {
+    public Session newSession(@Context ContainerRequestContext requestContext,
+            @ApiParam(title = "Login request", description = "Username and credentials", required = true) SessionCreateRequest createRequest) {
         final Session result = new Session();
         final SecurityContext securityContext = requestContext.getSecurityContext();
         if (!(securityContext instanceof ShiroSecurityContext)) {
@@ -114,14 +116,22 @@ public class SessionsResource extends RestResource {
     @JsonAutoDetect
     public static class SessionCreateRequest {
         public SessionCreateRequest(){}
+
+        @JsonProperty(required = true)
         public String username;
+
+        @JsonProperty(required = true)
         public String password;
+
         public String host;
     }
 
     @JsonAutoDetect
     public class Session {
-        public String sessionId;
+        @JsonProperty(required = true)
         public Date validUntil;
+
+        @JsonProperty(required = true)
+        public String sessionId;
     }
 }

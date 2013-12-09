@@ -19,28 +19,38 @@
  */
 package org.graylog2.rest.documentation.generator;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.PropertyNamingStrategy;
+import com.fasterxml.jackson.databind.SerializationFeature;
 import org.graylog2.Core;
+import org.junit.BeforeClass;
 import org.junit.Test;
 
 import java.util.List;
 import java.util.Map;
 
-import static junit.framework.Assert.assertEquals;
-import static junit.framework.Assert.assertNotNull;
-import static junit.framework.Assert.assertTrue;
-import static junit.framework.TestCase.fail;
+import static junit.framework.Assert.*;
 
 /**
  * @author Lennart Koopmann <lennart@torch.sh>
  */
 public class GeneratorTest {
 
+    static ObjectMapper objectMapper;
+
+    @BeforeClass
+    public static void init() {
+        objectMapper = new ObjectMapper();
+        objectMapper.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
+        objectMapper.setPropertyNamingStrategy(PropertyNamingStrategy.CAMEL_CASE_TO_LOWER_CASE_WITH_UNDERSCORES);
+    }
+
     @Test
     public void testGenerateOverview() throws Exception {
-        Generator generator = new Generator("org.graylog2.rest.resources");
+        Generator generator = new Generator("org.graylog2.rest.resources", objectMapper);
         Map<String, Object> result = generator.generateOverview();
 
-        assertEquals(Core.GRAYLOG2_VERSION, result.get("apiVersion"));
+        assertEquals(Core.GRAYLOG2_VERSION.toString(), result.get("apiVersion"));
         assertEquals(Generator.EMULATED_SWAGGER_VERSION, result.get("swaggerVersion"));
 
         assertNotNull(result.get("apis"));
@@ -49,7 +59,7 @@ public class GeneratorTest {
 
     @Test
     public void testGenerateForRoute() throws Exception {
-        Generator generator = new Generator("org.graylog2.rest.resources");
+        Generator generator = new Generator("org.graylog2.rest.resources", objectMapper);
         Map<String, Object> result = generator.generateForRoute("/system", "http://localhost:12900/");
     }
 

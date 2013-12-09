@@ -20,15 +20,16 @@
 package org.graylog2.rest.resources.documentation;
 
 import com.codahale.metrics.annotation.Timed;
-import com.google.common.collect.Maps;
-import org.graylog2.Core;
 import org.graylog2.rest.documentation.annotations.Api;
 import org.graylog2.rest.documentation.annotations.ApiOperation;
 import org.graylog2.rest.documentation.annotations.ApiParam;
 import org.graylog2.rest.documentation.generator.Generator;
 import org.graylog2.rest.resources.RestResource;
 
-import javax.ws.rs.*;
+import javax.ws.rs.GET;
+import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
+import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.util.Map;
@@ -47,7 +48,7 @@ public class DocumentationResource extends RestResource {
     @ApiOperation(value = "Get API documentation")
     @Produces(MediaType.APPLICATION_JSON)
     public Response overview() {
-        return buildSuccessfulCORSResponse(new Generator(RESOURCE_PACKAGE).generateOverview());
+        return buildSuccessfulCORSResponse(new Generator(RESOURCE_PACKAGE, objectMapper).generateOverview());
     }
 
     @GET
@@ -57,7 +58,7 @@ public class DocumentationResource extends RestResource {
     @Path("/{route: .+}")
     public Response route(
             @ApiParam(title = "route", description = "Route to fetch. For example /system", required = true) @PathParam("route") String route) {        return buildSuccessfulCORSResponse(
-                new Generator(RESOURCE_PACKAGE).generateForRoute(route, core.getConfiguration().getRestTransportUri().toString())
+                new Generator(RESOURCE_PACKAGE, objectMapper).generateForRoute(route, core.getConfiguration().getRestTransportUri().toString())
         );
     }
 

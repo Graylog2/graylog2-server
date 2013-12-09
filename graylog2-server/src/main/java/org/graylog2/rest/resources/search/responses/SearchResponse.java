@@ -18,11 +18,13 @@
  */
 package org.graylog2.rest.resources.search.responses;
 
+import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import org.graylog2.indexer.results.ResultMessage;
 
 import java.util.List;
 import java.util.Set;
 
+@JsonAutoDetect
 public class SearchResponse {
     public String query;
     public String builtQuery;
