@@ -1,4 +1,11 @@
 $(document).ready(function() {
+    $("div.streamrule-sample-message").sampleMessageLoader({
+        subcontainer: $('div.subcontainer', $('div.streamrule-sample-message')),
+        selector: $('div.manual-selector', $('div.streamrule-sample-message')),
+        message: $('div.sample-message-display', $('div.streamrule-sample-message')),
+        spinner: $('div.spinner', $('div.streamrule-sample-message'))
+    });
+
     $(document.body).on("keyup change", ".sr-input", function(foo) {
         value = $(this).val();
         var modalBody = $(this).closest("form#streamrule-form").find(".modal-body");
@@ -181,15 +188,13 @@ $(document).ready(function() {
         e.preventDefault();
     });
 
-    $("div.xtrc-message").bind("sampleMessageChanged", function() {
+    $("div.sample-message-display").bind("sampleMessageChanged", function(e, data) {
         var streamId = $("form#streamrule-form[data-stream-id]").attr("data-stream-id");
 
-        testStreamRulesAndColorize(streamId);
+        testStreamRulesAndColorize(streamId, data);
     });
 
-    function testStreamRulesAndColorize(streamId) {
-        var message = jQuery.data(document.body, "message");
-
+    function testStreamRulesAndColorize(streamId, message) {
         if (message == undefined) {
             return;
         }
@@ -198,15 +203,9 @@ $(document).ready(function() {
         testStreamRules(message, streamId,
             function(result) {
                 container.switchClass("alert-info alert-error", "alert-success");
-                /*container[0].classList.remove("alert-error");
-                container[0].classList.remove("alert-info");
-                container[0].classList.add("alert-success");*/
             },
             function (result) {
                 container.switchClass("alert-info alert-success", "alert-error");
-                /*container[0].classList.remove("alert-success");
-                container[0].classList.remove("alert-info");
-                container[0].classList.add("alert-error");*/
                 colorizeRuleResults(result.rules, $(".streamrules-list")[0]);
             });
     }

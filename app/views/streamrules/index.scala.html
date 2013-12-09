@@ -25,7 +25,7 @@
             of your stream rules immediately and enables you to tweak them to your desired result.
 
             <div class="buttons">
-                <button class="btn btn-small xtrc-load-manual">
+                <button class="btn btn-small message-load-manual">
                     Manually load a message
                 </button>
             </div>
@@ -40,16 +40,18 @@
                     <button type="submit" class="btn manual-selector-load" data-stream-id="@stream.getId">Load message</button>
             </form>
         </div>
+        <div class="spinner" style="display: none;"><h2><i class='icon-refresh icon-spin'></i> &nbsp;Loading message</h2></div>
 
-        <div class="xtrc-message" style="display: none;">
+        <div class="sample-message-display" style="display: none;">
             We found this message.
 
             <strong>Next step:</strong>
             Add/delete/modify the configured stream rules to see if matching is successfull or not.
 
             <div class="well well-small" id="sample-message">
-                <h2>Message <span></span></h2>
-                <dl class="xtrc-message-fields">
+                <h2>Message {{messageId}}<span></span></h2>
+                <dl class="sample-message-fields">
+                    <dt data-field="{{field}}" data-value="{{value}}" data-occurrence="repeat">{{field}}</dt><dd data-occurrence="repeat">{{value}}</dd>
                 </dl>
             </div>
 
