@@ -50,7 +50,6 @@
         var user = $('#input_apiUser')[0].value;
         var pass = $('#input_apiPassword')[0].value;
         if(user && user.trim() != "" && pass && pass.trim() != "") {
-            pass = CryptoJS.SHA256(pass);
             window.authorizations.add("basic", new PasswordAuthorization("creds", user, pass));
         }
     };

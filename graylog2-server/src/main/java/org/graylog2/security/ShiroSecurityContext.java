@@ -95,7 +95,10 @@ public class ShiroSecurityContext implements SecurityContext {
     public void loginSubject() throws AuthenticationException {
         subject.login(token);
         // the subject instance will change to include the session
-        subject = ThreadContext.getSubject();
+        final Subject newSubject = ThreadContext.getSubject();
+        if (newSubject != null) {
+            subject = newSubject;
+        }
     }
 
     public class ShiroPrincipal implements Principal {
