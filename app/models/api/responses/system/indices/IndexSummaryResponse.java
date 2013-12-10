@@ -36,4 +36,7 @@ public class IndexSummaryResponse {
 
     public List<ShardRoutingResponse> routing;
 
+    @SerializedName("is_reopened")
+    public boolean isReopened;
+
 }

@@ -90,6 +90,8 @@ public class Index {
         private final long storeSizeBytes;
         private final long segments;
 
+        private final boolean isReopened;
+
         private final ShardDocumentsResponse documents;
         private final ShardMeter primaryShards;
         private final ShardMeter allShards;
@@ -106,6 +108,8 @@ public class Index {
             this.documents = primaries.documents;
 
             this.shardRouting = i.routing;
+
+            this.isReopened = i.isReopened;
         }
 
         public int getOpenSearchContexts() {
@@ -134,6 +138,10 @@ public class Index {
 
         public ShardMeter getAllShards() {
             return allShards;
+        }
+
+        public boolean isReopened() {
+            return isReopened;
         }
 
         public class ShardMeter {
