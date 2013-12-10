@@ -9,10 +9,23 @@
         messageContainer = options['message'];
         callback = options['callback'];
 
-        $('button', subcontainer).on("click", function(e) {
+        selectorButton = options['selectorButton'] || $('button', subcontainer);
+        recentButton = options['recentButton'];
+
+        selectorButton.on("click", function(e) {
             subcontainer.hide();
             selector.show();
         });
+
+        if (recentButton) {
+            recentButton.on("click", function(e) {
+                var nodeId = $(this).attr("data-node-id");
+                var inputId = $(this).attr("data-input-id");
+                var url = '/a/system/inputs/' + nodeId + '/' + inputId + '/recent_message';
+
+                loadMessage(undefined, undefined, url);
+            });
+        }
 
         $('form', selector).on("submit", function(e) {
             e.preventDefault();
