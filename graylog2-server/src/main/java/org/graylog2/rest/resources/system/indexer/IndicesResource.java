@@ -64,7 +64,7 @@ public class IndicesResource extends RestResource {
     @Path("/{index}")
     @ApiOperation(value = "Get information of an index and its shards.")
     @Produces(MediaType.APPLICATION_JSON)
-    public Response list(@ApiParam(title = "index") @PathParam("index") String index) {
+    public Response single(@ApiParam(title = "index") @PathParam("index") String index) {
         Map<String, Object> result = Maps.newHashMap();
 
         IndexStats indexStats;
@@ -85,6 +85,7 @@ public class IndicesResource extends RestResource {
             result.put("primary_shards", indexStats(indexStats.getPrimaries()));
             result.put("all_shards", indexStats(indexStats.getTotal()));
             result.put("routing", routing);
+            result.put("is_reopened", core.getIndexer().indices().isReopened(index));
         } catch (Exception e) {
             LOG.error("Could not get indices information.", e);
             return Response.status(500).build();
