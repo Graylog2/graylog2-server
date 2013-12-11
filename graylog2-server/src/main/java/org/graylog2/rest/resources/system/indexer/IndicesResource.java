@@ -26,6 +26,7 @@ import com.google.common.collect.Sets;
 import org.elasticsearch.action.admin.cluster.node.info.NodeInfo;
 import org.elasticsearch.action.admin.cluster.node.info.NodesInfoRequest;
 import org.elasticsearch.action.admin.cluster.state.ClusterStateRequest;
+import org.elasticsearch.action.admin.indices.close.CloseIndexRequest;
 import org.elasticsearch.action.admin.indices.open.OpenIndexRequest;
 import org.elasticsearch.action.admin.indices.settings.UpdateSettingsRequest;
 import org.elasticsearch.action.admin.indices.stats.*;
@@ -33,9 +34,7 @@ import org.elasticsearch.cluster.ClusterState;
 import org.elasticsearch.cluster.metadata.IndexMetaData;
 import org.elasticsearch.cluster.routing.ShardRouting;
 import org.graylog2.indexer.ranges.RebuildIndexRangesJob;
-import org.graylog2.rest.documentation.annotations.Api;
-import org.graylog2.rest.documentation.annotations.ApiOperation;
-import org.graylog2.rest.documentation.annotations.ApiParam;
+import org.graylog2.rest.documentation.annotations.*;
 import org.graylog2.rest.resources.RestResource;
 import org.graylog2.system.jobs.SystemJob;
 import org.graylog2.system.jobs.SystemJobConcurrencyException;
@@ -145,6 +144,60 @@ public class IndicesResource extends RestResource {
 
         // Open index.
         core.getIndexer().getClient().admin().indices().open(new OpenIndexRequest(index)).actionGet();
+
+        // Trigger index ranges rebuild job.
+        SystemJob rebuildJob = new RebuildIndexRangesJob(core);
+        try {
+            core.getSystemJobManager().submit(rebuildJob);
+        } catch (SystemJobConcurrencyException e) {
+            LOG.error("Concurrency level of this job reached: " + e.getMessage());
+            throw new WebApplicationException(403);
+        }
+
+        return Response.noContent().build();
+    }
+
+    @POST @Timed
+    @Path("/{index}/close")
+    @ApiOperation(value = "Close an index. This will also trigger an index ranges rebuild job.")
+    @Produces(MediaType.APPLICATION_JSON)
+    @ApiResponses(value = {
+            @ApiResponse(code = 403, message = "You cannot close the current deflector target index.")
+    })
+    public Response close(@ApiParam(title = "index") @PathParam("index") String index) {
+        if (core.getDeflector().getCurrentActualTargetIndex().equals(index)) {
+            return Response.status(403).build();
+        }
+
+        // Close index.
+        core.getIndexer().getClient().admin().indices().close(new CloseIndexRequest(index)).actionGet();
+
+        // Trigger index ranges rebuild job.
+        SystemJob rebuildJob = new RebuildIndexRangesJob(core);
+        try {
+            core.getSystemJobManager().submit(rebuildJob);
+        } catch (SystemJobConcurrencyException e) {
+            LOG.error("Concurrency level of this job reached: " + e.getMessage());
+            throw new WebApplicationException(403);
+        }
+
+        return Response.noContent().build();
+    }
+
+    @DELETE @Timed
+    @Path("/{index}")
+    @ApiOperation(value = "Close an index. This will also trigger an index ranges rebuild job.")
+    @Produces(MediaType.APPLICATION_JSON)
+    @ApiResponses(value = {
+            @ApiResponse(code = 403, message = "You cannot delete the current deflector target index.")
+    })
+    public Response delete(@ApiParam(title = "index") @PathParam("index") String index) {
+        if (core.getDeflector().getCurrentActualTargetIndex().equals(index)) {
+            return Response.status(403).build();
+        }
+
+        // Delete index.
+        core.getIndexer().indices().delete(index);
 
         // Trigger index ranges rebuild job.
         SystemJob rebuildJob = new RebuildIndexRangesJob(core);

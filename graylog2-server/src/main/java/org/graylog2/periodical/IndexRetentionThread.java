@@ -85,7 +85,7 @@ public class IndexRetentionThread implements Runnable {
     public void runRetention(RetentionStrategy strategy, Map<String, IndexStats> indices, int removeCount) throws NoTargetIndexException {
         for (String indexName : IndexHelper.getOldestIndices(indices.keySet(), removeCount)) {
             // Never run against the current deflector target.
-            if (server.getDeflector().getNewestTargetName().equals(indexName)) {
+            if (server.getDeflector().getCurrentActualTargetIndex().equals(indexName)) {
                 LOG.info("Not running retention against current deflector target <{}>.", indexName);
                 continue;
             }
