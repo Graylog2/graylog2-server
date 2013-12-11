@@ -196,7 +196,7 @@ $(document).ready(function() {
 
     function testStreamRulesAndColorize(streamId, message) {
         if (message == undefined) {
-            return;
+            message = jQuery.data(document.body, "message");
         }
         var container = $("#streamrules-list-container").find("div.alert");
 

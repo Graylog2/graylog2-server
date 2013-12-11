@@ -47,6 +47,7 @@
                 url: url,
                 success: function(data) {
                     showMessage(messageContainer, data.fields, data.id);
+                    jQuery.data(document.body, "message", data);
                     messageContainer.trigger("sampleMessageChanged", data);
                     hideSpinner(spinner);
                     selector.hide();
