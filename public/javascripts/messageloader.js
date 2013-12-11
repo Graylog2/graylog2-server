@@ -82,7 +82,7 @@
                 var newElems = placeHolders.clone();
                 var i = 0;
                 newElems.each( function(c, elem) {
-                    var newElem = elem.outerHTML.replace(/\{\{field\}\}/g, field).replace(/\{\{value\}\}/g, msg[field]);
+                    var newElem = elem.outerHTML.replace(/\{\{field\}\}/g, field).replace(/\{\{value\}\}/g, htmlEscape(msg[field]));
                     var newElem = $( newElem ).removeAttr("data-occurrence");
                     newElem.appendTo(list);
                 });

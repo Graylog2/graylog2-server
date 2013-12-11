@@ -23,6 +23,7 @@ import lib.Tools;
 import models.api.responses.MessageSummaryResponse;
 import models.api.results.MessageResult;
 import models.api.results.SearchResult;
+import org.apache.commons.lang3.StringEscapeUtils;
 import play.api.templates.Html;
 
 import java.util.List;
@@ -107,7 +108,7 @@ public class FieldMapper {
             return null;
         }
 
-        String s = fullMessage.toString();
+        String s = StringEscapeUtils.escapeHtml4(fullMessage.toString());
         s = s.replaceAll("\\n", "<br>");
         return Html.apply(s);
     }
