@@ -86,4 +86,26 @@ public class IndexService {
                 .onlyMasterNode()
                 .execute();
     }
+
+    // Not part an Index model instance method because opening/closing can be applied to indices without calculated ranges.
+    public void close(String index) throws APIException, IOException {
+        api.post().path("/system/indexer/indices/{0}/close", index)
+                .expect(204)
+                .execute();
+    }
+
+    // Not part an Index model instance method because opening/closing can be applied to indices without calculated ranges.
+    public void reopen(String index) throws APIException, IOException {
+        api.post().path("/system/indexer/indices/{0}/reopen", index)
+                .expect(204)
+                .execute();
+    }
+
+    // Not part an Index model instance method because opening/closing can be applied to indices without calculated ranges.
+    public void delete(String index) throws APIException, IOException {
+        api.delete().path("/system/indexer/indices/{0}", index)
+                .expect(204)
+                .execute();
+    }
+
 }

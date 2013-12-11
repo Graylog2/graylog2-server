@@ -72,6 +72,42 @@ public class IndicesController extends AuthenticatedController {
         }
     }
 
+    public Result closeIndex(String index) {
+        try {
+            indexService.close(index);
+            return redirect(routes.IndicesController.index());
+        } catch (APIException e) {
+            String message = "Could not close index. We expected HTTP 204, but got a HTTP " + e.getHttpCode() + ".";
+            return status(504, views.html.errors.error.render(message, e, request()));
+        } catch (IOException e) {
+            return status(504, views.html.errors.error.render(ApiClient.ERROR_MSG_IO, e, request()));
+        }
+    }
+
+    public Result reopenIndex(String index) {
+        try {
+            indexService.reopen(index);
+            return redirect(routes.IndicesController.index());
+        } catch (APIException e) {
+            String message = "Could not reopen index. We expected HTTP 204, but got a HTTP " + e.getHttpCode() + ".";
+            return status(504, views.html.errors.error.render(message, e, request()));
+        } catch (IOException e) {
+            return status(504, views.html.errors.error.render(ApiClient.ERROR_MSG_IO, e, request()));
+        }
+    }
+
+    public Result deleteIndex(String index) {
+        try {
+            indexService.delete(index);
+            return redirect(routes.IndicesController.index());
+        } catch (APIException e) {
+            String message = "Could not delete index. We expected HTTP 204, but got a HTTP " + e.getHttpCode() + ".";
+            return status(504, views.html.errors.error.render(message, e, request()));
+        } catch (IOException e) {
+            return status(504, views.html.errors.error.render(ApiClient.ERROR_MSG_IO, e, request()));
+        }
+    }
+
     public Result reCalculateRanges() {
         try {
             indexService.recalculateRanges();
