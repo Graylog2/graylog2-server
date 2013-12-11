@@ -1,4 +1,4 @@
-@(currentUser: User, streams: List[Stream], nodes: Map[String, Node])
+@(currentUser: User, streams: List[Stream], nodes: Map[String, Node], throughput: Map[String, Double])
 
 @main("Streams", views.html.sidebars.standard(currentUser), "", currentUser) {
 
@@ -35,7 +35,7 @@
                     </a>
                     <ul class="dropdown-menu">
                         <li><a href="@routes.StreamRulesController.index(stream.getId)">Edit rules</a></li>
-                        <li><a href="#" data-stream-id=@stream.getId class="show-stream-rule">Add rule</a></li>
+                        <li><a href="#" data-stream-id=@stream.getId class="show-stream-rule">Quick add rule</a></li>
                         <li class="disabled"><a href="#">Add alert (coming soon)</a></li>
                         <li class="dropdown-submenu">
                             <a href="#">Show Metrics on</a>
@@ -61,16 +61,28 @@
 
             <h3>
                 <i class="icon icon-ellipsis-vertical"></i>
-                <a href="@routes.StreamSearchController.index(stream.getId, "*", "relative", 300)">@stream.getTitle</a>
+                <a href="@routes.StreamSearchController.index(stream.getId, "*", "relative", 300)">
+                    @stream.getTitle
+                </a>
 
                 @if(stream.getDisabled() == false) {
                     <span class="label label-success">Active</span>
                 } else {
                     <span class="label label-warning">Paused</span>
                 }
+
             </h3>
 
-            <div id="streamrules-list-container">
+            <span class="persec">
+                <div class="comingsoon" title="Coming soon!">
+                        Throughput:
+                    <i class="icon icon-caret-down channel-direction channel-direction-down"></i>
+                    <span class="rx value">x.x<span>
+                            messages/second
+                    </span>
+                </div>
+
+                <div id="streamrules-list-container">
                 @views.html.partials.streamrules.list_well.render(stream.getStreamRules)
                 @views.html.partials.streamrules.stream_rule_form(stream.getId, null)
             </div>

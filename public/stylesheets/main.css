@@ -1487,3 +1487,7 @@ form.node-processing-change input {
     list-style-type: square;
     margin-left: 25px;
 }
+
+.comingsoon {
+    color: #aaaaaa;
+}
