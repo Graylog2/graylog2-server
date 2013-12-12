@@ -1531,3 +1531,7 @@ dl.sample-message-fields {
 .streamrule-checker .streamrules-list li.alert-success {
     background-color: #b9e4b7;
 }
+
+.configured-streamrules {
+    margin-bottom: 5px;
+}
