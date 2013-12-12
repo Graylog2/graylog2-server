@@ -50,7 +50,7 @@ $(document).ready(function() {
     });
 
     // Stream rules inverter.
-    $(".streamrules-list").on("click", "#sr-inverted", function() {
+    $("form#streamrule-form").on("click", "#sr-inverted", function() {
         var modalBody = $(this).closest("form#streamrule-form").find(".modal-body");
         var old_val = $("#sr-result-category", modalBody).html();
 
