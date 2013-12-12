@@ -1491,3 +1491,21 @@ form.node-processing-change input {
 .comingsoon {
     color: #aaaaaa;
 }
+
+.stream-row .throughput {
+    margin-right: 5px;
+    position: relative;
+    top: 3px;
+}
+
+#streamrule-form-modal .well {
+    font-family: 'Open Sans', sans-serif !important;
+}
+
+#streamrule-form {
+    margin-bottom: 0px;
+}
+
+.stream-row-details {
+    margin-left: 5px;
+}
