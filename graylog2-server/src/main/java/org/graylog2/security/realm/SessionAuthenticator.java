@@ -58,7 +58,7 @@ public class SessionAuthenticator extends AuthenticatingRealm {
             log.debug("No user named {} found for session {}", username, sessionIdToken.getSessionId());
             return null;
         }
-        if (user.isExternalUser() && !core.getLdapRealm().isEnabled()) {
+        if (user.isExternalUser() && !core.getLdapAuthenticator().isEnabled()) {
             throw new LockedAccountException("LDAP authentication is currently disabled.");
         }
 

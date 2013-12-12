@@ -29,10 +29,11 @@ import org.graylog2.rest.documentation.annotations.Api;
 import org.graylog2.rest.documentation.annotations.ApiOperation;
 import org.graylog2.rest.documentation.annotations.ApiParam;
 import org.graylog2.rest.resources.RestResource;
+import org.graylog2.rest.resources.system.ldap.requests.LdapSettingsRequest;
 import org.graylog2.rest.resources.system.ldap.requests.LdapTestConfigRequest;
 import org.graylog2.rest.resources.system.ldap.responses.LdapTestConfigResponse;
-import org.graylog2.rest.resources.system.ldap.requests.LdapSettingsRequest;
 import org.graylog2.security.ldap.LdapConnector;
+import org.graylog2.security.ldap.LdapEntry;
 import org.graylog2.security.ldap.LdapSettings;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -47,7 +48,6 @@ import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
 import java.util.Map;
 
-import static java.util.AbstractMap.SimpleImmutableEntry;
 import static javax.ws.rs.core.Response.noContent;
 import static javax.ws.rs.core.Response.ok;
 
@@ -138,14 +138,16 @@ public class LdapResource extends RestResource {
 
         String userPrincipalName = null;
         try {
-            final SimpleImmutableEntry<String, Map<String, String>> entry = ldapConnector.search(
+            final LdapEntry entry = ldapConnector.search(
                     connection,
                     request.searchBase,
                     request.searchPattern,
                     request.principal,
                     request.activeDirectory);
-            userPrincipalName = entry.getKey();
-            response.entry = entry.getValue();
+            if (entry != null) {
+                userPrincipalName = entry.getDn();
+                response.entry = entry.getAttributes();
+            }
         } catch (LdapException e) {
             response.entry = null;
             response.exception = e.getMessage();
@@ -198,7 +200,7 @@ public class LdapResource extends RestResource {
             log.error("Invalid LDAP settings, not updated!", e);
             throw new WebApplicationException(e, Response.Status.BAD_REQUEST);
         }
-        //core.getLdapRealm().applySettings(ldapSettings);
+        core.getLdapAuthenticator().applySettings(ldapSettings);
 
         return noContent().build();
     }

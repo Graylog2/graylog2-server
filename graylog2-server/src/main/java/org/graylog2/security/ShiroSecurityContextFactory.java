@@ -66,19 +66,20 @@ public class ShiroSecurityContextFactory implements SecurityContextFactory {
 
         final LdapConnector ldapConnector = new LdapConnector(core);
         core.setLdapConnector(ldapConnector);
-//        final LdapRealm ldapRealm = new LdapRealm(core, ldapConnector);
-//        // the incoming password is always SHA-256 hashed, so we will re-hash whatever comes from LDAP, too.
-//        ldapRealm.setCredentialsMatcher(new HashedCredentialsMatcher("SHA-256"));
-//        ldapRealm.setCachingEnabled(false);
+        final LdapUserAuthenticator ldapUserAuthenticator = new LdapUserAuthenticator(core, ldapConnector);
+        ldapUserAuthenticator.setCachingEnabled(false);
+        core.setLdapAuthenticator(ldapUserAuthenticator);
 
         final SessionAuthenticator sessionAuthenticator = new SessionAuthenticator(core);
         sessionAuthenticator.setCachingEnabled(false);
         final AccessTokenAuthenticator accessTokenAuthenticator = new AccessTokenAuthenticator(core);
         accessTokenAuthenticator.setCachingEnabled(false);
 
+
         sm = new DefaultSecurityManager(Lists.<Realm>newArrayList(
                 sessionAuthenticator,
                 accessTokenAuthenticator,
+                ldapUserAuthenticator,
                 passwordAuthenticator,
                 inMemoryRealm));
         final Authenticator authenticator = sm.getAuthenticator();

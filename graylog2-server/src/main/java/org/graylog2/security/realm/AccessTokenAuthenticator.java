@@ -52,7 +52,7 @@ public class AccessTokenAuthenticator extends AuthenticatingRealm {
         if (user == null) {
             return null;
         }
-        if (user.isExternalUser() && !core.getLdapRealm().isEnabled()) {
+        if (user.isExternalUser() && !core.getLdapAuthenticator().isEnabled()) {
             throw new LockedAccountException("LDAP authentication is currently disabled.");
         }
         if (log.isDebugEnabled()) {

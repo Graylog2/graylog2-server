@@ -43,26 +43,23 @@ public class PasswordAuthenticator extends AuthenticatingRealm {
         UsernamePasswordToken token = (UsernamePasswordToken) authToken;
         log.debug("Retrieving authc info for user {}", token.getUsername());
 
-        SimpleAccount simpleAccount = null;
         final User user = User.load(token.getUsername(), core);
-        if (user instanceof User.LocalAdminUser) {
+        if (user instanceof User.LocalAdminUser || user == null) {
             // skip the local admin user here, it's ugly, but for auth that user is treated specially.
             return null;
         }
-        if (user != null) {
-            simpleAccount = new SimpleAccount(token.getPrincipal(),
-                    user.getHashedPassword(),
-                    ByteSource.Util.bytes(core.getConfiguration().getPasswordSecret()),
-                    "graylog2MongoDbRealm");
-            // if ldap is disabled, and this user was created via LDAP, it is locked and cannot be used to authenticate.
-            if (user.isExternalUser() && !core.getLdapRealm().isEnabled()) {
-                throw new LockedAccountException("LDAP authentication is currently disabled.");
-            }
+        if (user.isExternalUser()) {
+            // we don't store passwords for LDAP users, so we can't handle them here.
+            log.trace("Skipping mongodb-based password check for LDAP user {}", token.getUsername());
+            return null;
         }
 
-        if (log.isDebugEnabled() && user != null) {
+        if (log.isDebugEnabled()) {
             log.debug("Found user {} to be authenticated with password.", user.getName());
         }
-        return simpleAccount;
+        return new SimpleAccount(token.getPrincipal(),
+                user.getHashedPassword(),
+                ByteSource.Util.bytes(core.getConfiguration().getPasswordSecret()),
+                "graylog2MongoDbRealm");
     }
 }

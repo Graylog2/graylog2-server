@@ -69,7 +69,7 @@ import org.graylog2.rest.ObjectMapperProvider;
 import org.graylog2.security.ShiroSecurityBinding;
 import org.graylog2.security.ShiroSecurityContextFactory;
 import org.graylog2.security.ldap.LdapConnector;
-import org.graylog2.security.realm.LdapRealm;
+import org.graylog2.security.realm.LdapUserAuthenticator;
 import org.graylog2.streams.StreamImpl;
 import org.graylog2.system.activities.Activity;
 import org.graylog2.system.activities.ActivityWriter;
@@ -162,7 +162,7 @@ public class Core implements GraylogServer, InputHost {
     
     private DateTime startedAt;
     private MetricRegistry metricRegistry;
-    private LdapRealm ldapRealm;
+    private LdapUserAuthenticator ldapUserAuthenticator;
     private LdapConnector ldapConnector;
     private DefaultSecurityManager securityManager;
 
@@ -523,12 +523,12 @@ public class Core implements GraylogServer, InputHost {
         return this.systemJobManager;
     }
 
-    public void setLdapRealm(LdapRealm ldapRealm) {
-        this.ldapRealm = ldapRealm;
+    public void setLdapAuthenticator(LdapUserAuthenticator authenticator) {
+        this.ldapUserAuthenticator = authenticator;
     }
 
-    public LdapRealm getLdapRealm() {
-        return ldapRealm;
+    public LdapUserAuthenticator getLdapAuthenticator() {
+        return ldapUserAuthenticator;
     }
 
     @Override
