@@ -22,7 +22,7 @@
     <parent>
         <groupId>org.graylog2</groupId>
         <artifactId>graylog2-parent</artifactId>
-        <version>0.20.0-preview.7</version>
+        <version>0.20.0-preview.8</version>
     </parent>
 
     <properties>
