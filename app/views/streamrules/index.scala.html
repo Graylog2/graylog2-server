@@ -1,6 +1,6 @@
 @(currentUser: User, stream: Stream, streamrules: List[StreamRule], breadcrumbs: lib.BreadcrumbList)
 
-@main("Streamrules", views.html.sidebars.standard(currentUser), "", currentUser) {
+@main("Rules of stream " + stream.getId , views.html.sidebars.standard(currentUser), "", currentUser) {
 
     @views.html.partials.breadcrumbs(breadcrumbs)
 
@@ -78,6 +78,8 @@
         </p>
     </div>
 
+    <a href="@routes.StreamsController.index()" class="btn btn-success">I'm done!</a>
+
     <script type="text/javascript">
     $(document).ready(function() {
         var hash = window.location.hash.substring(1);
@@ -90,5 +92,5 @@
         }
     });
     </script>
-    <a href="@routes.StreamsController.index()" class="btn btn-success">Finish</a>
+
 }
