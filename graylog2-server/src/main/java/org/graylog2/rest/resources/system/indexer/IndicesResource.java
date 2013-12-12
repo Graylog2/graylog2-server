@@ -22,26 +22,32 @@ package org.graylog2.rest.resources.system.indexer;
 import com.codahale.metrics.annotation.Timed;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
+import com.google.common.collect.Sets;
 import org.elasticsearch.action.admin.cluster.node.info.NodeInfo;
 import org.elasticsearch.action.admin.cluster.node.info.NodesInfoRequest;
+import org.elasticsearch.action.admin.cluster.state.ClusterStateRequest;
+import org.elasticsearch.action.admin.indices.close.CloseIndexRequest;
+import org.elasticsearch.action.admin.indices.open.OpenIndexRequest;
+import org.elasticsearch.action.admin.indices.settings.UpdateSettingsRequest;
 import org.elasticsearch.action.admin.indices.stats.*;
+import org.elasticsearch.cluster.ClusterState;
+import org.elasticsearch.cluster.metadata.IndexMetaData;
 import org.elasticsearch.cluster.routing.ShardRouting;
-import org.graylog2.rest.documentation.annotations.Api;
-import org.graylog2.rest.documentation.annotations.ApiOperation;
-import org.graylog2.rest.documentation.annotations.ApiParam;
+import org.graylog2.indexer.ranges.RebuildIndexRangesJob;
+import org.graylog2.rest.documentation.annotations.*;
 import org.graylog2.rest.resources.RestResource;
+import org.graylog2.system.jobs.SystemJob;
+import org.graylog2.system.jobs.SystemJobConcurrencyException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.ws.rs.GET;
-import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
-import javax.ws.rs.Produces;
+import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 
 /**
@@ -57,7 +63,7 @@ public class IndicesResource extends RestResource {
     @Path("/{index}")
     @ApiOperation(value = "Get information of an index and its shards.")
     @Produces(MediaType.APPLICATION_JSON)
-    public Response list(@ApiParam(title = "index") @PathParam("index") String index) {
+    public Response single(@ApiParam(title = "index") @PathParam("index") String index) {
         Map<String, Object> result = Maps.newHashMap();
 
         IndexStats indexStats;
@@ -78,12 +84,131 @@ public class IndicesResource extends RestResource {
             result.put("primary_shards", indexStats(indexStats.getPrimaries()));
             result.put("all_shards", indexStats(indexStats.getTotal()));
             result.put("routing", routing);
+            result.put("is_reopened", core.getIndexer().indices().isReopened(index));
         } catch (Exception e) {
             LOG.error("Could not get indices information.", e);
             return Response.status(500).build();
         }
 
         return Response.ok().entity(json(result)).build();
+    }
+
+    @GET @Timed
+    @Path("/closed")
+    @ApiOperation(value = "Get a list of closed indices that can be reopened.")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response closed() {
+        Map<String, Object> result = Maps.newHashMap();
+
+        Set<String> closedIndices = Sets.newHashSet();
+        try {
+            // Get a list of all indices and select those that are closed. This is only possible via metadata.
+            ClusterStateRequest csr = new ClusterStateRequest()
+                    .filterNodes(true)
+                    .filterRoutingTable(true)
+                    .filterBlocks(true)
+                    .filterMetaData(false);
+            ClusterState state = core.getIndexer().getClient().admin().cluster().state(csr).actionGet().getState();
+            for (IndexMetaData indexMeta : state.getMetaData().getIndices().values()) {
+                // Only search in our indices.
+                if (!indexMeta.getIndex().startsWith(core.getConfiguration().getElasticSearchIndexPrefix())) {
+                    continue;
+                }
+
+                if(indexMeta.getState().equals(IndexMetaData.State.CLOSE)) {
+                    closedIndices.add(indexMeta.getIndex());
+                }
+            }
+        } catch (Exception e) {
+            LOG.error("Could not get closed indices.", e);
+            return Response.status(500).build();
+        }
+
+        result.put("indices", closedIndices);
+        result.put("total", closedIndices.size());
+
+        return Response.ok().entity(json(result)).build();
+    }
+
+    @POST @Timed
+    @Path("/{index}/reopen")
+    @ApiOperation(value = "Reopen a closed index. This will also trigger an index ranges rebuild job.")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response reopen(@ApiParam(title = "index") @PathParam("index") String index) {
+        // Mark this index as re-opened. It will never be touched by retention.
+        UpdateSettingsRequest settings = new UpdateSettingsRequest(index);
+        settings.settings(new HashMap() {{
+            put("graylog2_reopened", true);
+        }});
+        core.getIndexer().getClient().admin().indices().updateSettings(settings).actionGet();
+
+        // Open index.
+        core.getIndexer().getClient().admin().indices().open(new OpenIndexRequest(index)).actionGet();
+
+        // Trigger index ranges rebuild job.
+        SystemJob rebuildJob = new RebuildIndexRangesJob(core);
+        try {
+            core.getSystemJobManager().submit(rebuildJob);
+        } catch (SystemJobConcurrencyException e) {
+            LOG.error("Concurrency level of this job reached: " + e.getMessage());
+            throw new WebApplicationException(403);
+        }
+
+        return Response.noContent().build();
+    }
+
+    @POST @Timed
+    @Path("/{index}/close")
+    @ApiOperation(value = "Close an index. This will also trigger an index ranges rebuild job.")
+    @Produces(MediaType.APPLICATION_JSON)
+    @ApiResponses(value = {
+            @ApiResponse(code = 403, message = "You cannot close the current deflector target index.")
+    })
+    public Response close(@ApiParam(title = "index") @PathParam("index") String index) {
+        if (core.getDeflector().getCurrentActualTargetIndex().equals(index)) {
+            return Response.status(403).build();
+        }
+
+        // Close index.
+        core.getIndexer().getClient().admin().indices().close(new CloseIndexRequest(index)).actionGet();
+
+        // Trigger index ranges rebuild job.
+        SystemJob rebuildJob = new RebuildIndexRangesJob(core);
+        try {
+            core.getSystemJobManager().submit(rebuildJob);
+        } catch (SystemJobConcurrencyException e) {
+            LOG.error("Concurrency level of this job reached: " + e.getMessage());
+            throw new WebApplicationException(403);
+        }
+
+        return Response.noContent().build();
+    }
+
+    @DELETE @Timed
+    @Path("/{index}")
+    @ApiOperation(value = "Close an index. This will also trigger an index ranges rebuild job.")
+    @Produces(MediaType.APPLICATION_JSON)
+    @ApiResponses(value = {
+            @ApiResponse(code = 403, message = "You cannot delete the current deflector target index.")
+    })
+    public Response delete(@ApiParam(title = "index") @PathParam("index") String index) {
+        if (core.getDeflector().getCurrentActualTargetIndex().equals(index)) {
+            return Response.status(403).build();
+        }
+
+        // Delete index.
+        core.getIndexer().indices().delete(index);
+
+        // Trigger index ranges rebuild job.
+        SystemJob rebuildJob = new RebuildIndexRangesJob(core);
+        try {
+            core.getSystemJobManager().submit(rebuildJob);
+        } catch (SystemJobConcurrencyException e) {
+            LOG.error("Concurrency level of this job reached: " + e.getMessage());
+            throw new WebApplicationException(403);
+        }
+
+        return Response.noContent().build();
     }
 
     private Map<String, Object> shardRouting(ShardRouting route) {

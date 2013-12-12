@@ -20,10 +20,18 @@
 
 package org.graylog2.periodical;
 
+import org.elasticsearch.action.admin.indices.stats.IndexStats;
+import org.graylog2.indexer.IndexHelper;
 import org.graylog2.indexer.NoTargetIndexException;
+import org.graylog2.indexer.ranges.IndexRange;
+import org.graylog2.indexer.retention.RetentionStrategyFactory;
+import org.graylog2.plugin.indexer.retention.RetentionStrategy;
+import org.graylog2.system.activities.Activity;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.graylog2.Core;
+
+import java.util.Map;
 
 /**
  * @author Lennart Koopmann <lennart@socketfeed.com>
@@ -43,10 +51,64 @@ public class IndexRetentionThread implements Runnable {
 
     @Override
     public void run() {
+        Map<String, IndexStats> indices = server.getDeflector().getAllDeflectorIndices();
+        int indexCount = indices.size();
+        int maxIndices = server.getConfiguration().getMaxNumberOfIndices();
+
+        // Do we have more indices than the configured maximum?
+        if (indexCount <= maxIndices) {
+            LOG.debug("Number of indices ({}) lower than limit ({}). Not performing any retention actions.",
+                    indexCount, maxIndices);
+            return;
+        }
+
+        // We have more indices than the configured maximum! Remove as many as needed.
+        int removeCount = indexCount-maxIndices;
+        String msg = "Number of indices (" + indexCount + ") higher than limit (" + maxIndices + "). " +
+                "Running retention for " + removeCount + " indices.";
+        LOG.info(msg);
+        server.getActivityWriter().write(new Activity(msg, IndexRetentionThread.class));
+
         try {
-            server.getIndexer().runIndexRetention();
+            runRetention(
+                    RetentionStrategyFactory.fromString(server, server.getConfiguration().getRetentionStrategy()),
+                    indices,
+                    removeCount
+            );
+        } catch (RetentionStrategyFactory.NoSuchStrategyException e) {
+            LOG.error("Could not run index retention. No such strategy.", e);
         } catch (NoTargetIndexException e) {
-            LOG.error("Couldn't run index retention", e);
+            LOG.error("Could not run index retention. No target index.", e);
+        }
+    }
+
+    public void runRetention(RetentionStrategy strategy, Map<String, IndexStats> indices, int removeCount) throws NoTargetIndexException {
+        for (String indexName : IndexHelper.getOldestIndices(indices.keySet(), removeCount)) {
+            // Never run against the current deflector target.
+            if (server.getDeflector().getCurrentActualTargetIndex().equals(indexName)) {
+                LOG.info("Not running retention against current deflector target <{}>.", indexName);
+                continue;
+            }
+
+            /*
+             * Never run against a re-opened index. Indices are marked as re-opened by storing a setting
+             * attribute and we can check for that here.
+             */
+            if (server.getIndexer().indices().isReopened(indexName)) {
+                LOG.info("Not running retention against reopened index <{}>.", indexName);
+                continue;
+            }
+
+            String msg = "Running retention strategy [" + strategy.getClass().getCanonicalName() + "] " +
+                    "for index <" + indexName + ">";
+            LOG.info(msg);
+            server.getActivityWriter().write(new Activity(msg, IndexRetentionThread.class));
+
+            // Sorry if this should ever go mad. Run retention strategy!
+            strategy.runStrategy(indexName);
+
+            // Remove index from ranges.
+            IndexRange.destroy(server, indexName);
         }
     }
 

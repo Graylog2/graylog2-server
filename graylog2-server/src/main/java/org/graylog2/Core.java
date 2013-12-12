@@ -639,6 +639,26 @@ public class Core implements GraylogServer, InputHost {
         return metricRegistry;
     }
 
+    /**
+     * Shortcut to delete an index. This is for plugin compat. We seriously need proper DI.
+     *
+     * @param indexName The name of the index to delete.
+     */
+    @Override
+    public void deleteIndexShortcut(String indexName) {
+        getIndexer().indices().delete(indexName);
+    }
+
+    /**
+     * Shortcut to close an index. This is for plugin compat. We seriously need proper DI.
+     *
+     * @param indexName The name of the index to close.
+     */
+    @Override
+    public void closeIndexShortcut(String indexName) {
+        getIndexer().indices().close(indexName);
+    }
+
     public Initializers initializers() {
         return initializers;
     }

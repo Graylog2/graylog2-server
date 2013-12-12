@@ -46,4 +46,7 @@ public interface GraylogServer extends Runnable {
 
     public MetricRegistry metrics();
 
+    void deleteIndexShortcut(String indexName);
+
+    void closeIndexShortcut(String indexName);
 }
