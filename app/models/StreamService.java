@@ -24,6 +24,7 @@ import lib.APIException;
 import lib.ApiClient;
 import models.api.requests.streams.CreateStreamRequest;
 import models.api.requests.streams.TestMatchRequest;
+import models.api.responses.streams.CreateStreamResponse;
 import models.api.responses.streams.GetStreamsResponse;
 import models.api.responses.streams.StreamSummaryResponse;
 import models.api.responses.streams.TestMatchResponse;
@@ -80,8 +81,10 @@ public class StreamService {
         return streamFactory.fromSummaryResponse(streamResponse);
     }
 
-    public void create(CreateStreamRequest request) throws APIException, IOException {
-        api.post().path("/streams").body(request).expect(Http.Status.CREATED).execute();
+    public String create(CreateStreamRequest request) throws APIException, IOException {
+        CreateStreamResponse csr = null;
+        csr = api.post(CreateStreamResponse.class).path("/streams").body(request).expect(Http.Status.CREATED).execute();
+        return csr.streamId;
     }
 
     public void delete(String streamId) throws APIException, IOException {
