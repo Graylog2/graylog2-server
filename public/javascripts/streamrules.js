@@ -202,9 +202,16 @@ $(document).ready(function() {
 
         testStreamRules(message, streamId,
             function(result) {
+                // All matched.
                 container.switchClass("alert-info alert-error", "alert-success");
+                $("li", container).addClass("alert-success");
+                var matchStatus = $("i.match-status");
+                matchStatus.show();
+                matchStatus.addClass("icon");
+                matchStatus.addClass("icon-ok");
             },
             function (result) {
+                // Not all matched.
                 container.switchClass("alert-info alert-success", "alert-error");
                 colorizeRuleResults(result.rules, $(".streamrules-list")[0]);
             });
@@ -234,21 +241,30 @@ $(document).ready(function() {
     }
 
     function colorizeRuleResults(rules, list) {
-        var ruleslist = $("li", list);
-        for (var i=0; i < ruleslist.size(); i++) {
-            var rule = ruleslist[i];
-            var streamruleId = rule.getAttribute("data-streamrule-id");
-            if (streamruleId == undefined) continue;
-            var match = rules[streamruleId];
-            if (match != undefined) {
-                if (match) {
-                    rule.classList.add("alert-success")
-                    rule.classList.remove("alert-danger")
-                } else {
-                    rule.classList.add("alert-danger")
-                    rule.classList.remove("alert-success")
+        $("li", list).each(function() {
+            var rule = $(this);
+
+            var streamruleId = rule.attr("data-streamrule-id");
+            if (streamruleId != undefined) {
+                var matchStatus = $("i.match-status", rule);
+                matchStatus.show();
+                matchStatus.addClass("icon");
+
+                var match = rules[streamruleId];
+                if (match != undefined) {
+                    if (match) {
+                        matchStatus.addClass("icon-ok");
+                        matchStatus.removeClass("icon-warning-sign");
+                        rule.addClass("alert-success");
+                        rule.removeClass("alert-danger");
+                    } else {
+                        matchStatus.addClass("icon-warning-sign");
+                        matchStatus.removeClass("icon-ok");
+                        rule.addClass("alert-danger");
+                        rule.removeClass("alert-success");
+                    }
                 }
             }
-        }
+        });
     }
 });

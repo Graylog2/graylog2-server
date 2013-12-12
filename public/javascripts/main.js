@@ -319,7 +319,7 @@ $(document).ready(function() {
         $(".loglevel-metrics[data-node-id='" + $(this).attr("data-node-id") + "']").toggle();
     });
 
-    // Show stream rules.
+    // Show configured stream rules in streams list.
     $(".stream-row .trigger-stream-rules").on("click", function(e) {
         e.preventDefault();
 

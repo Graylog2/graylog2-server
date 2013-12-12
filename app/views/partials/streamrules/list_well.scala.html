@@ -5,9 +5,10 @@
             @for(streamRule <- streamRules) {
                 @views.html.partials.streamrules.list_item(streamRule)
             }
-            <li id="stream-rules-placeholder" style="display:none"><i>No rules defined - go add some!</i></li>
+
+            <li id="stream-rules-placeholder" style="display:none"><i>No rules defined</i></li>
         } else {
-            <li id="stream-rules-placeholder"><i>No rules defined - go add some!</i></li>
+            <li id="stream-rules-placeholder"><i>No rules defined</i></li>
         }
     </ul>
 </div>
