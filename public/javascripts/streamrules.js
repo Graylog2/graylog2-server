@@ -253,15 +253,11 @@ $(document).ready(function() {
                 var match = rules[streamruleId];
                 if (match != undefined) {
                     if (match) {
-                        matchStatus.addClass("icon-ok");
-                        matchStatus.removeClass("icon-warning-sign");
-                        rule.addClass("alert-success");
-                        rule.removeClass("alert-danger");
+                        matchStatus.switchClass("icon-warning-sign", "icon-ok");
+                        rule.switchClass("alert-danger", "alert-success");
                     } else {
-                        matchStatus.addClass("icon-warning-sign");
-                        matchStatus.removeClass("icon-ok");
-                        rule.addClass("alert-danger");
-                        rule.removeClass("alert-success");
+                        matchStatus.switchClass("icon-ok", "icon-warning-sign");
+                        rule.switchClass("alert-success", "alert-danger");
                     }
                 }
             }
