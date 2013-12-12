@@ -13,7 +13,7 @@
         to be alerted whenever there are more logins than usual.
     </div>
 
-    @for(stream <- streams) {
+    @for(stream <- streams.sortBy(_.getTitle)) {
         <div class="row-fluid node-row stream-row" data-stream-id="@stream.getId">
             <span class="pull-right node-row-info">
                 <span class="throughput">
