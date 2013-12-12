@@ -323,7 +323,7 @@ $(document).ready(function() {
     $(".stream-row .trigger-stream-rules").on("click", function(e) {
         e.preventDefault();
 
-        var rules = $('.streamrules-list-container[data-stream-id="' + $(this).closest(".stream-row").attr("data-stream-id") + '"]');
+        var rules = $('.streamrules-list-container[data-stream-id="' + $(this).closest(".stream-row").attr("data-stream-id") + '"]').find("div.streamrules-details");
 
         if (rules.is(":visible")) {
             rules.hide();

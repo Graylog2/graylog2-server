@@ -38,9 +38,13 @@ $(document).ready(function() {
                 var parent_list = $(elem).closest("ul");
                 elem.remove();
 
-                if ($("li", parent_list).size() == 1) {
+                var rules_count = $("li", parent_list).size();
+
+                if (rules_count == 1) {
                     $("#stream-rules-placeholder", parent_list).show();
                 }
+
+                $(".stream-rule-count[data-stream-id="+streamId+"]").text(rules_count - 1);
 
                 testStreamRulesAndColorize(streamId);
             });
@@ -68,48 +72,8 @@ $(document).ready(function() {
         $("#sr-result-category", modalBody).html(new_val);
     })
 
-    // Add stream rule to stream rule list when saved.
-    var rule_count;
-    function addRuleToNewStream(rule) {
-        if (rule_count == undefined) {
-            rule_count = 0;
-        } else {
-            rule_count++;
-        }
-        if (!validate("#sr")) {
-            return false;
-        }
-
-        $("#stream-rules-placeholder").hide();
-
-        // Add hidden field that is transmitted in form add visible entry.
-        field = "<input type='hidden' name='rules["+rule_count+"].field' value='" + rule.field + "' />\n" +
-            "<input type='hidden' name='rules["+rule_count+"].type' value='" + rule.type + "' />\n" +
-            "<input type='hidden' name='rules["+rule_count+"].value' value='" + rule.value + "' />\n" +
-            "<input type='hidden' name='rules["+rule_count+"].inverted' value='" + rule.inverted + "' />\n"
-
-        remover = "<a href='#' class='sr-remove'><i class='icon-remove'></i></a>";
-        $("#stream-rules").append("<li id='rule'>" + field + $("#sr-result").html().replace(/<(?:.|\n)*?>/gm, '') + " " + remover + "</li>");
-
-        // Remove stream rule binding.
-        $(".sr-remove").on("click", function(e) {
-            var parent_list = $(this).parents("ul");
-            $(this).parent().remove();
-            renumber_rules(parent_list);
-            e.preventDefault();
-        });
-
-        var renumber_rules = function($rules) {
-            $('li#rule', $rules).each(function($index) {
-                $('input', $(this)).each (function() {
-                    var new_name = $(this).attr('name').replace(/rules\[\d+\]/g, 'rules['+$index+']');
-                    $(this).attr('name', new_name);
-                });
-            });
-        }
-    }
-
     $(document.body).on("click", "button.streamrule-form-submit", function(e) {
+        console.log($(this));
         var form = $(this).closest("form#streamrule-form");
         var streamId = form.attr("data-stream-id");
         var streamRuleId = form.attr("data-streamrule-id");
@@ -123,43 +87,38 @@ $(document).ready(function() {
             inverted: $("#sr-inverted", modalBody).is(":checked")
         }
 
-        if (streamId != undefined || streamRuleId != undefined) {
-            var url, callback;
-            var container = $(this).closest("div#streamrules-list-container");
+        var url, callback;
+        var container = $(this).closest("div.streamrules-list-container");
 
-            if (streamId != undefined) {
-                url = '/streams/' + streamId + '/rules';
-                callback = function(data) {
-                    container.find("ul").append(data);
-                    container.find("li#stream-rules-placeholder").hide();
-                }
+        if (streamId != undefined) {
+            url = '/streams/' + streamId + '/rules';
+            callback = function(data) {
+                container.find("ul").append(data);
+                container.find("li#stream-rules-placeholder").hide();
             }
-
-            if (streamRuleId != undefined) {
-                streamId = form.attr("data-parent-stream-id");
-                url = '/streams/' + streamId + '/rules/' + streamRuleId;
-                callback = function(data) {
-                    container.find("ul").find("li[data-streamrule-id=" + streamRuleId + "]").replaceWith(data);
-                }
-            }
-
-            $.ajax({
-                url: url,
-                type: "POST",
-                data: rule,
-                dataType: "html",
-
-                success: function(data) {
-                    dialog.modal("hide");
-                    callback(data);
-
-                    testStreamRulesAndColorize(streamId);
-                }
-            });
-        } else {
-            addRuleToNewStream(rule);
-            dialog.modal("hide");
         }
+
+        if (streamRuleId != undefined) {
+            streamId = form.attr("data-parent-stream-id");
+            url = '/streams/' + streamId + '/rules/' + streamRuleId;
+            callback = function(data) {
+                container.find("ul").find("li[data-streamrule-id=" + streamRuleId + "]").replaceWith(data);
+            }
+        }
+
+        $.ajax({
+            url: url,
+            type: "POST",
+            data: rule,
+            dataType: "html",
+
+            success: function(data) {
+                dialog.modal("hide");
+                callback(data);
+
+                testStreamRulesAndColorize(streamId);
+            }
+        });
 
         e.preventDefault();
     });
@@ -167,6 +126,7 @@ $(document).ready(function() {
     $(".show-stream-rule").on("click", function(e) {
         var streamId = $(this).attr("data-stream-id");
         var form = $('form#streamrule-form[data-stream-id="' + streamId + '"]');
+        $("input[type=text]", form).val("");
         form.find("div.modal").modal();
         e.preventDefault();
     });
@@ -198,7 +158,7 @@ $(document).ready(function() {
         if (message == undefined) {
             message = jQuery.data(document.body, "message");
         }
-        var container = $("#streamrules-list-container").find("div.alert");
+        var container = $(".streamrules-list-container").find("div.alert");
 
         testStreamRules(message, streamId,
             function(result) {
@@ -207,8 +167,7 @@ $(document).ready(function() {
                 $("li", container).addClass("alert-success");
                 var matchStatus = $("i.match-status");
                 matchStatus.show();
-                matchStatus.addClass("icon");
-                matchStatus.addClass("icon-ok");
+                matchStatus.addClass("icon icon-ok");
             },
             function (result) {
                 // Not all matched.
@@ -254,10 +213,10 @@ $(document).ready(function() {
                 if (match != undefined) {
                     if (match) {
                         matchStatus.switchClass("icon-warning-sign", "icon-ok");
-                        rule.switchClass("alert-danger", "alert-success");
+                        rule.switchClass("alert-danger alert-info", "alert-success");
                     } else {
                         matchStatus.switchClass("icon-ok", "icon-warning-sign");
-                        rule.switchClass("alert-success", "alert-danger");
+                        rule.switchClass("alert-success alert-info", "alert-danger");
                     }
                 }
             }

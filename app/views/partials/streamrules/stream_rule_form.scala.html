@@ -2,11 +2,11 @@
 
 <form id="streamrule-form"
     @if(streamRule != null) {
-        data-parent-stream-id=@streamId
-        data-streamrule-id=@streamRule.getId
+        data-parent-stream-id="@streamId"
+        data-streamrule-id="@streamRule.getId"
     }
     @if(streamRule == null && streamId != null) {
-        data-stream-id=@streamId
+        data-stream-id="@streamId"
     }
     >
     <div class="modal hide fade" id="streamrule-form-modal">

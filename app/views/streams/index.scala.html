@@ -81,7 +81,7 @@
                         Edit rules
                     </a>
                 } else {
-                    This stream has @stream.getStreamRules.size() configured
+                    This stream has <span class="stream-rule-count" data-stream-id="@stream.getId">@stream.getStreamRules.size()</span> configured
                     @if(stream.getStreamRules.size() == 1) {
                         rule.
                     } else {
@@ -95,11 +95,13 @@
                 }
             </div>
 
-            <div class="streamrules-list-container" data-stream-id="@stream.getId" style="display: none;">
+            <div class="streamrules-list-container" data-stream-id="@stream.getId">
+                <div class="streamrules-details" style="display: none;">
                 @views.html.partials.streamrules.list_well.render(stream.getStreamRules)
+                </div>
+                @views.html.partials.streamrules.stream_rule_form.render(stream.getId, null)
             </div>
 
-            @views.html.partials.streamrules.stream_rule_form(stream.getId, null)
         </div>
     }
 

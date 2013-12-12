@@ -67,7 +67,7 @@
 
         Load a message above to test rules. Rules with green background matched, others did not.
 
-        <div id="streamrules-list-container" class="streamrule-checker">
+        <div class="streamrules-list-container streamrule-checker" data-stream-id="@stream.getId">
             @views.html.partials.streamrules.list_well.render(streamrules)
             @views.html.partials.streamrules.stream_rule_form.render(stream.getId, null)
         </div>
