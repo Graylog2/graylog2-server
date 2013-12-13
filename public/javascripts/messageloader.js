@@ -76,7 +76,6 @@
 
         function showMessage(container, msg, messageid) {
             var oldContainer = jQuery.data(container, "oldMessageContainer");
-            console.log(oldContainer);
             if (oldContainer != undefined)
                 container.html(oldContainer);
 
