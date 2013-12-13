@@ -1,4 +1,4 @@
-@(message: models.api.results.MessageResult, sourceInput: Input, sourceNode: Node, sourceRadio: Radio, sourceRadioInput: Input, streams: List[Stream])
+@(message: models.api.results.MessageResult, messageStreams: List[Stream], sourceInput: Input, sourceNode: Node, sourceRadio: Radio, sourceRadioInput: Input, streams: List[Stream])
 
 <div class="detail-message">
     <div class="pull-right sidebar-back">
@@ -8,7 +8,7 @@
     <h2>
         <i class="icon icon-envelope"></i>
         <a href="@routes.MessagesController.show(message.getIndex, message.getId)">
-            @message.getId()
+            @message.getId
         </a>
     </h2>
 
@@ -107,6 +107,14 @@
                     </dt>
                     <dd style="word-wrap: break-word;"><a href="#" data-field="@key" data-value="@lib.Tools.removeTrailingNewline(value)" class="search-link nolink">@lib.Tools.orNbsp(lib.Tools.removeTrailingNewline(value))</a></dd>
                 }
+                    <dt>Streams</dt>
+                    <dd>
+                        <ul>
+                            @for(stream <- messageStreams) {
+                                <li><a href="@routes.StreamSearchController.index(stream.getId, "*", "relative", 300)">@stream.getTitle</a></li>
+                            }
+                        </ul>
+                    </dd>
                 </dl>
             </div>
         </div>
