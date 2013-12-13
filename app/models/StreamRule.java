@@ -106,6 +106,6 @@ public class StreamRule {
         String inverter = "";
         if (this.getInverted())
             inverter = " not ";
-        return ("Field " + this.field + " must " + inverter + this.getSentenceRepresentation() + " " + this.value);
+        return (this.field + " must " + inverter + this.getSentenceRepresentation() + " " + this.value);
     }
 }

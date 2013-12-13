@@ -38,6 +38,9 @@ public class MessagesController extends AuthenticatedController {
     private NodeService nodeService;
 
     @Inject
+    private StreamService streamService;
+
+    @Inject
     private MessagesService messagesService;
 
     public Result show(String index, String id) {
@@ -61,7 +64,14 @@ public class MessagesController extends AuthenticatedController {
             Node sourceNode = getSourceNode(message);
             Radio sourceRadio = getSourceRadio(message);
 
-            return ok(views.html.messages.show_as_partial.render(message, getSourceInput(sourceNode, message), sourceNode, sourceRadio, getSourceInput(sourceRadio, message)));
+            return ok(views.html.messages.show_as_partial.render(
+                    message,
+                    getSourceInput(sourceNode, message),
+                    sourceNode,
+                    sourceRadio,
+                    getSourceInput(sourceRadio, message),
+                    streamService.all())
+            );
 		} catch (IOException e) {
 			return status(500, views.html.errors.error.render(ApiClient.ERROR_MSG_IO, e, request()));
 		} catch (APIException e) {

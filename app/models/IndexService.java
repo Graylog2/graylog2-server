@@ -23,10 +23,7 @@ import com.google.common.collect.Lists;
 import com.google.inject.Inject;
 import lib.APIException;
 import lib.ApiClient;
-import models.api.responses.system.indices.DeflectorConfigResponse;
-import models.api.responses.system.indices.DeflectorInformationResponse;
-import models.api.responses.system.indices.IndexRangeSummary;
-import models.api.responses.system.indices.IndexRangesResponse;
+import models.api.responses.system.indices.*;
 
 import java.io.IOException;
 import java.util.List;
@@ -72,6 +69,12 @@ public class IndexService {
                 .execute();
     }
 
+    public ClosedIndicesResponse getClosedIndices() throws APIException, IOException {
+        return api.get(ClosedIndicesResponse.class)
+                .path("/system/indexer/indices/closed")
+                .execute();
+    }
+
     public void recalculateRanges() throws APIException, IOException {
         api.post().path("/system/indices/ranges/rebuild")
                 .expect(202)
@@ -83,4 +86,26 @@ public class IndexService {
                 .onlyMasterNode()
                 .execute();
     }
+
+    // Not part an Index model instance method because opening/closing can be applied to indices without calculated ranges.
+    public void close(String index) throws APIException, IOException {
+        api.post().path("/system/indexer/indices/{0}/close", index)
+                .expect(204)
+                .execute();
+    }
+
+    // Not part an Index model instance method because opening/closing can be applied to indices without calculated ranges.
+    public void reopen(String index) throws APIException, IOException {
+        api.post().path("/system/indexer/indices/{0}/reopen", index)
+                .expect(204)
+                .execute();
+    }
+
+    // Not part an Index model instance method because opening/closing can be applied to indices without calculated ranges.
+    public void delete(String index) throws APIException, IOException {
+        api.delete().path("/system/indexer/indices/{0}", index)
+                .expect(204)
+                .execute();
+    }
+
 }

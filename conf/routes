@@ -58,6 +58,9 @@ GET         /system/indices/ranges/rebuild                                      
 GET         /system/deflector/cycle                                                  @controllers.IndicesController.cycleDeflector()
 POST        /system/nodes/:node_id/processing/pause                                  @controllers.NodesController.pauseMessageProcessing(node_id: String)
 POST        /system/nodes/:node_id/processing/resume                                 @controllers.NodesController.resumeMessageProcessing(node_id: String)
+GET         /system/indices/:index/close                                             @controllers.IndicesController.closeIndex(index: String)
+GET         /system/indices/:index/reopen                                            @controllers.IndicesController.reopenIndex(index: String)
+GET         /system/indices/:index/delete                                            @controllers.IndicesController.deleteIndex(index: String)
 
 # Extractors
 GET         /system/inputs/:node_id/:input_id/extractors                             @controllers.ExtractorsController.manage(node_id: String, input_id: String)

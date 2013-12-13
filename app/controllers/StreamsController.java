@@ -18,10 +18,12 @@
  */
 package controllers;
 
+import com.google.common.collect.Maps;
 import com.google.inject.Inject;
 import lib.APIException;
 import lib.ApiClient;
 import lib.ServerNodes;
+import lib.metrics.Meter;
 import models.Node;
 import models.StreamService;
 import models.Stream;
@@ -71,10 +73,12 @@ public class StreamsController extends AuthenticatedController {
             return redirect(routes.StreamsController.newStream());
         }
 
+        String newStreamId;
+
         try {
             CreateStreamRequest csr = form.get();
             csr.creatorUserId = currentUser().getName();
-            streamService.create(csr);
+            newStreamId = streamService.create(csr);
         } catch (APIException e) {
             String message = "Could not create stream. We expected HTTP 201, but got a HTTP " + e.getHttpCode() + ".";
             return status(504, views.html.errors.error.render(message, e, request()));
@@ -82,7 +86,7 @@ public class StreamsController extends AuthenticatedController {
             return status(504, views.html.errors.error.render(ApiClient.ERROR_MSG_IO, e, request()));
         }
 
-        return redirect(routes.StreamsController.index());
+        return redirect(routes.StreamRulesController.index(newStreamId));
     }
 
     public Result delete(String stream_id) {

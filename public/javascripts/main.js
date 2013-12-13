@@ -319,6 +319,25 @@ $(document).ready(function() {
         $(".loglevel-metrics[data-node-id='" + $(this).attr("data-node-id") + "']").toggle();
     });
 
+    // Show configured stream rules in streams list.
+    $(".stream-row .trigger-stream-rules").on("click", function(e) {
+        e.preventDefault();
+
+        var rules = $('.streamrules-list-container[data-stream-id="' + $(this).closest(".stream-row").attr("data-stream-id") + '"]').find("div.streamrules-details");
+
+        if (rules.is(":visible")) {
+            rules.hide();
+            $(".icon", this).removeClass("icon-caret-up");
+            $(".icon", this).addClass("icon-caret-down");
+            $("span", this).text("Show rules");
+        } else {
+            rules.show();
+            $(".icon", this).removeClass("icon-caret-down");
+            $(".icon", this).addClass("icon-caret-up");
+            $("span", this).text("Hide rules");
+        }
+    });
+
     // Check all fine-grained node log level checkboxes.
     $(".fine-log-level-controls .select-all").on("click", function() {
         var checkboxes = $(".fine-log-level-controls[data-node-id='" + $(this).attr("data-node-id") + "'] input[type=checkbox]");
@@ -487,6 +506,13 @@ $(document).ready(function() {
                 }
             }
         });
+    });
+
+    $(".closed-indices").on("click", function() {
+        $("ul", $(this)).show();
+        $(".show-indices", $(this)).hide();
+        $(this).off("click");
+        $(this).css("cursor", "auto");
     });
 
     function scrollToSearchbarHint() {

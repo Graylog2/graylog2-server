@@ -19,24 +19,14 @@
  */
 package models.api.responses.system.indices;
 
-import com.google.gson.annotations.SerializedName;
-
 import java.util.List;
 
 /**
  * @author Lennart Koopmann <lennart@torch.sh>
  */
-public class IndexSummaryResponse {
+public class ClosedIndicesResponse {
 
-    @SerializedName("all_shards")
-    public IndexShardsResponse allShards;
-
-    @SerializedName("primary_shards")
-    public IndexShardsResponse primaryShards;
-
-    public List<ShardRoutingResponse> routing;
-
-    @SerializedName("is_reopened")
-    public boolean isReopened;
+    public List<String> indices;
+    public int total;
 
 }

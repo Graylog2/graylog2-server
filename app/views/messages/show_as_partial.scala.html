@@ -1,4 +1,4 @@
-@(message: models.api.results.MessageResult, sourceInput: Input, sourceNode: Node, sourceRadio: Radio, sourceRadioInput: Input)
+@(message: models.api.results.MessageResult, sourceInput: Input, sourceNode: Node, sourceRadio: Radio, sourceRadioInput: Input, streams: List[Stream])
 
 <div class="detail-message">
     <div class="pull-right sidebar-back">
@@ -8,7 +8,7 @@
     <h2>
         <i class="icon icon-envelope"></i>
         <a href="@routes.MessagesController.show(message.getIndex, message.getId)">
-            Message @message.getId()
+            @message.getId()
         </a>
     </h2>
 
@@ -56,6 +56,23 @@
             <span class="caret"></span>
         </a>
         <ul class="dropdown-menu">
+            <li class="dropdown-submenu">
+                <a href="#">Test against stream</a>
+                <ul class="dropdown-menu">
+                    @if(streams == null || streams.isEmpty) {
+                        <li><a href="@routes.StreamsController.index()">No streams configured</a></li>
+                    } else {
+                        @for(stream <- streams) {
+                            <li>
+                                <a href="@routes.StreamRulesController.index(stream.getId)#@(message.getId).@(message.getIndex)">
+                                    @stream.getTitle
+                                </a>
+                            </li>
+                        }
+                    }
+
+                </ul>
+            </li>
             <li><a href="#terms-msg-@message.getId()" role="button" data-toggle="modal" data-backdrop="true">Show message terms</a></li>
             <li><a href="@routes.MessagesController.show(message.getIndex, message.getId)">Permalink</a></li>
         </ul>

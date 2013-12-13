@@ -1477,3 +1477,61 @@ form.node-processing-change input {
 .nolink:hover {
     text-decoration: none;
 }
+
+.closed-indices {
+    cursor: pointer;
+}
+
+.closed-indices ul {
+    margin-top: 5px;
+    list-style-type: square;
+    margin-left: 25px;
+}
+
+.comingsoon {
+    color: #aaaaaa;
+}
+
+.stream-row .throughput {
+    margin-right: 5px;
+    position: relative;
+    top: 3px;
+}
+
+#streamrule-form-modal .well {
+    font-family: 'Open Sans', sans-serif !important;
+}
+
+#streamrule-form {
+    margin-bottom: 0px;
+}
+
+.stream-row-details {
+    margin-left: 5px;
+}
+
+.streamrule-checker .streamrules-list li {
+    padding: 8px;
+    padding-left: 10px;
+    margin: 1px;
+}
+
+.streamrule-checker .streamrules-list li i.match-status {
+    margin-right: 5px;
+}
+
+dl.sample-message-fields {
+    margin-bottom: 0px;
+}
+
+.streamrule-checker .streamrules-list li.alert-danger {
+    background-color: #f4b7c6;
+}
+
+.streamrule-checker .streamrules-list li.alert-success {
+    background-color: #b9e4b7;
+}
+
+.configured-streamrules {
+    margin-bottom: 5px;
+}

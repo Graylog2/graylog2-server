@@ -1,6 +1,7 @@
 @(streamRule: StreamRule)
 
 <li data-streamrule-id="@streamRule.getId">
+    <i class="match-status" style="display: none:"></i> <!-- placeholder for rule checks -->
     @streamRule
 
     <a class="edit-streamrule" href="#"
@@ -13,4 +14,7 @@
         data-removeUrl="@routes.StreamRulesController.delete(streamRule.getStreamId, streamRule.getId)">
         <i class="icon-remove"></i>
     </a>
+    <div style="position:absolute;color:#000000">
+        @views.html.partials.streamrules.stream_rule_form.render(streamRule.getStreamId, streamRule)
+    </div>
 </li>
