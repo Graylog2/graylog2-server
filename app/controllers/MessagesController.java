@@ -83,6 +83,7 @@ public class MessagesController extends AuthenticatedController {
     // TODO move this to an API controller.
     public Result single(String index, String id) {
         try {
+
             MessageResult message = messagesService.getMessage(index, id);
 
             Map<String, Object> result = Maps.newHashMap();
