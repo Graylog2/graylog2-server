@@ -18,8 +18,9 @@
  */
 package org.graylog2.security.ldap;
 
-import com.google.common.base.Charsets;
 import com.google.common.collect.Maps;
+import com.google.common.util.concurrent.SimpleTimeLimiter;
+import com.google.common.util.concurrent.UncheckedTimeoutException;
 import org.apache.directory.api.ldap.model.cursor.CursorException;
 import org.apache.directory.api.ldap.model.cursor.EntryCursor;
 import org.apache.directory.api.ldap.model.entry.Attribute;
@@ -35,16 +36,11 @@ import org.graylog2.Core;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.naming.NamingEnumeration;
-import javax.naming.NamingException;
-import javax.naming.directory.Attributes;
-import javax.naming.directory.SearchControls;
-import javax.naming.directory.SearchResult;
-import javax.naming.ldap.LdapContext;
 import java.text.MessageFormat;
 import java.util.HashMap;
 import java.util.Iterator;
-import java.util.Map;
+import java.util.concurrent.Callable;
+import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
 public class LdapConnector {
@@ -56,47 +52,41 @@ public class LdapConnector {
         this.core = core;
     }
 
-    public Map<String, String> _searchPrincipal(
-            LdapContext context,
-            String searchBase,
-            String principalSearchPattern,
-            String principal) throws NamingException {
-
-        final SearchControls cons = new SearchControls();
-        cons.setSearchScope(SearchControls.SUBTREE_SCOPE);
-
-        final NamingEnumeration<SearchResult> results;
-        results = context.search(searchBase, principalSearchPattern, new Object[]{principal}, cons);
-
-        final HashMap<String, String> entry = Maps.newHashMap();
-        if (results.hasMore()) {
-            final SearchResult next = results.next();
-            final Attributes attrs = next.getAttributes();
-            final NamingEnumeration<String> iDs = attrs.getIDs();
-            while (iDs.hasMore()) {
-                final String key = iDs.next();
-                final Object val = attrs.get(key).get();
-                final String stringVal;
-                if (val instanceof byte[]) {
-                    stringVal = new String((byte[]) val, Charsets.UTF_8);
-                } else {
-                    stringVal = val.toString();
-                }
-                entry.put(key, stringVal);
-            }
-        }
-        return entry;
-    }
-
     public LdapNetworkConnection connect(LdapConnectionConfig config) throws LdapException {
         final LdapNetworkConnection connection = new LdapNetworkConnection(config);
-        connection.setTimeOut(TimeUnit.SECONDS.toMillis(5));
+        connection.setTimeOut(TimeUnit.SECONDS.toMillis(2)); // TODO timeout value
 
         if (log.isTraceEnabled()) {
-            log.trace("Connecting to LDAP server {}:{}, binding with user {}", new Object[] {config.getLdapHost(), config.getLdapPort(), config.getName()});
+            log.trace("Connecting to LDAP server {}:{}, binding with user {}",
+                      new Object[]{config.getLdapHost(), config.getLdapPort(), config.getName()});
         }
         // this will perform an anonymous bind if there were no system credentials
+        final SimpleTimeLimiter timeLimiter = new SimpleTimeLimiter(Executors.newSingleThreadExecutor());
+        @SuppressWarnings("unchecked")
+        final Callable<Boolean> timeLimitedConnection = timeLimiter.newProxy(
+                new Callable<Boolean>() {
+                    @Override
+                    public Boolean call() throws Exception {
+                        return connection.connect();
+                    }
+                }, Callable.class,
+                2, TimeUnit.SECONDS); // TODO timeout value
+        try {
+            final Boolean connected = timeLimitedConnection.call();
+            if (!connected) {
+                return null;
+            }
+        } catch (UncheckedTimeoutException e) {
+            log.error("Timed out connecting to LDAP server", e);
+            throw new LdapException("Could not connect to LDAP server", e.getCause());
+        } catch (LdapException e) {
+            throw e;
+        } catch (Exception e) {
+            // unhandled different exception, should really not happen here.
+            throw new LdapException("Unexpected error connecting to LDAP", e);
+        }
         connection.bind();
+
         return connection;
     }
 
@@ -106,7 +96,8 @@ public class LdapConnector {
 
         final String filter = MessageFormat.format(searchPattern, principal);
         if (log.isTraceEnabled()) {
-            log.trace("Search {} for {}, starting at {}", new Object[] {activeDirectory ? "ActiveDirectory" : "LDAP", filter, searchBase});
+            log.trace("Search {} for {}, starting at {}",
+                      new Object[]{activeDirectory ? "ActiveDirectory" : "LDAP", filter, searchBase});
         }
         final EntryCursor entryCursor = connection.search(searchBase,
                                                           filter,
@@ -125,7 +116,7 @@ public class LdapConnector {
                     ldapEntry.setDn(attribute.getString());
                 }
                 if (attribute.isHumanReadable()) {
-                    ldapEntry.put(attribute.getId(),attribute.getString());
+                    ldapEntry.put(attribute.getId(), attribute.getString());
                 }
             }
         } else {
