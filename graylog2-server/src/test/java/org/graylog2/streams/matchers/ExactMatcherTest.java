@@ -21,11 +21,8 @@
 package org.graylog2.streams.matchers;
 
 import org.graylog2.plugin.Message;
-import org.bson.types.ObjectId;
-import com.mongodb.BasicDBObject;
 import org.graylog2.plugin.streams.StreamRule;
 import org.graylog2.streams.StreamRuleImpl;
-import org.joda.time.DateTime;
 import org.junit.Test;
 import static org.junit.Assert.*;
 

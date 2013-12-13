@@ -5,7 +5,6 @@ import org.bson.types.ObjectId;
 import org.graylog2.plugin.Message;
 import org.graylog2.plugin.streams.StreamRule;
 import org.graylog2.streams.InvalidStreamRuleTypeException;
-import org.graylog2.streams.StreamRuleImpl;
 import org.graylog2.streams.StreamRuleMatcherFactory;
 import org.joda.time.DateTime;
 
