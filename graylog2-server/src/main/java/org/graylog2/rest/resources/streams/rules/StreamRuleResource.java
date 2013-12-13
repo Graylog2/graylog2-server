@@ -8,6 +8,7 @@ import org.graylog2.database.*;
 import org.graylog2.database.NotFoundException;
 import org.graylog2.plugin.streams.Stream;
 import org.graylog2.plugin.streams.StreamRule;
+import org.graylog2.plugin.streams.StreamRuleType;
 import org.graylog2.rest.documentation.annotations.*;
 import org.graylog2.rest.resources.RestResource;
 import org.graylog2.rest.resources.streams.StreamResource;
@@ -119,7 +120,7 @@ public class StreamRuleResource extends RestResource {
         }
 
         streamRule.setField(cr.field);
-        streamRule.setType(cr.type);
+        streamRule.setType(StreamRuleType.fromInteger(cr.type));
         streamRule.setInverted(cr.inverted);
         streamRule.setValue(cr.value);
 

@@ -34,14 +34,14 @@ public interface StreamRule {
     @JsonSerialize(contentUsing=ObjectIdSerializer.class)
     public ObjectId getObjectId();
 
-    public Integer getType();
+    public StreamRuleType getType();
     public String getField();
     public String getValue();
     public Boolean getInverted();
     @JsonSerialize(contentUsing=ObjectIdSerializer.class)
     public ObjectId getStreamId();
 
-    public void setType(Integer type);
+    public void setType(StreamRuleType type);
     public void setField(String field);
     public void setValue(String value);
     public void setInverted(Boolean inverted);

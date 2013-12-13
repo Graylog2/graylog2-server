@@ -22,7 +22,7 @@ package org.graylog2.streams.matchers;
 
 import org.graylog2.plugin.Message;
 import org.graylog2.plugin.streams.StreamRule;
-import org.graylog2.streams.StreamRuleImpl;
+import org.graylog2.plugin.streams.StreamRuleType;
 import org.junit.Test;
 import static org.junit.Assert.*;
 
@@ -166,7 +166,7 @@ public class SmallerMatcherTest extends MatcherTest {
 
     protected StreamRule getSampleRule() {
         StreamRule rule = super.getSampleRule();
-        rule.setType(StreamRuleImpl.TYPE_SMALLER);
+        rule.setType(StreamRuleType.SMALLER);
 
         return rule;
     }
