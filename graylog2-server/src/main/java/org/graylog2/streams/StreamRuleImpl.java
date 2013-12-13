@@ -30,6 +30,7 @@ import org.graylog2.database.NotFoundException;
 import org.graylog2.database.Persisted;
 import org.graylog2.database.validators.*;
 import org.graylog2.plugin.streams.StreamRule;
+import org.graylog2.plugin.streams.StreamRuleType;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -45,10 +46,10 @@ public class StreamRuleImpl extends Persisted implements StreamRule {
 
     private static final String COLLECTION = "streamrules";
 
-    public static final int TYPE_EXACT = 1;
+    /*public static final int TYPE_EXACT = 1;
     public static final int TYPE_REGEX = 2;
     public static final int TYPE_GREATER = 3;
-    public static final int TYPE_SMALLER = 4;
+    public static final int TYPE_SMALLER = 4;*/
 
     public StreamRuleImpl(Map<String, Object> fields, Core core) {
         super(core, fields);
@@ -94,12 +95,13 @@ public class StreamRuleImpl extends Persisted implements StreamRule {
      * @return the ruleType
      */
     @Override
-    public Integer getType() {
-        return (Integer) fields.get("type");
+    public StreamRuleType getType() {
+        //return (Integer) fields.get("type");
+        return StreamRuleType.fromInteger((Integer) fields.get("type"));
     }
 
-    public void setType(Integer type) {
-        fields.put("type", type);
+    public void setType(StreamRuleType type) {
+        fields.put("type", type.toInteger());
     }
 
     /**

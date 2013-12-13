@@ -20,6 +20,7 @@
 
 package org.graylog2.streams;
 
+import org.graylog2.plugin.streams.StreamRuleType;
 import org.graylog2.streams.matchers.*;
 
 /**
@@ -27,20 +28,20 @@ import org.graylog2.streams.matchers.*;
  */
 public class StreamRuleMatcherFactory {
 
-    public static StreamRuleMatcher build(int ruleType) throws InvalidStreamRuleTypeException {
+    public static StreamRuleMatcher build(StreamRuleType ruleType) throws InvalidStreamRuleTypeException {
         StreamRuleMatcher matcher = null;
 
         switch (ruleType) {
-            case StreamRuleImpl.TYPE_EXACT:
+            case EXACT:
                 matcher = new ExactMatcher();
                 break;
-            case StreamRuleImpl.TYPE_REGEX:
+            case REGEX:
                 matcher = new RegexMatcher();
                 break;
-            case StreamRuleImpl.TYPE_GREATER:
+            case GREATER:
                 matcher = new GreaterMatcher();
                 break;
-            case StreamRuleImpl.TYPE_SMALLER:
+            case SMALLER:
                 matcher = new SmallerMatcher();
                 break;
             default:

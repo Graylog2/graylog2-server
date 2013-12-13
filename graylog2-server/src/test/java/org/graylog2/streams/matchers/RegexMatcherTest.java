@@ -21,64 +21,88 @@
 package org.graylog2.streams.matchers;
 
 import org.graylog2.plugin.Message;
-import org.bson.types.ObjectId;
-import com.mongodb.BasicDBObject;
-import org.graylog2.streams.StreamRuleImpl;
-import org.joda.time.DateTime;
+import org.graylog2.plugin.streams.StreamRule;
+import org.graylog2.plugin.streams.StreamRuleType;
 import org.junit.Test;
 import static org.junit.Assert.*;
 
-public class RegexMatcherTest {
+public class RegexMatcherTest extends MatcherTest {
 
     @Test
     public void testSuccessfulMatch() {
-        BasicDBObject mongoRule = new BasicDBObject();
-        mongoRule.put("_id", new ObjectId());
-        mongoRule.put("type", StreamRuleImpl.TYPE_REGEX);
-        mongoRule.put("field", "something");
-        mongoRule.put("value", "^foo");
+        StreamRule rule = getSampleRule();
+        rule.setValue("^foo");
 
-        StreamRuleMock rule = new StreamRuleMock(mongoRule);
-
-        Message msg = new Message("foo", "bar", new DateTime());
+        Message msg = getSampleMessage();
         msg.addField("something", "foobar");
 
-        RegexMatcher matcher = new RegexMatcher();
+        StreamRuleMatcher matcher = getMatcher(rule);
+        assertTrue(matcher.match(msg, rule));
+    }
+
+    @Test
+    public void testSuccessfulInvertedMatch() {
+        StreamRule rule = getSampleRule();
+        rule.setValue("^foo");
+        rule.setInverted(true);
+
+        Message msg = getSampleMessage();
+        msg.addField("something", "zomg");
+
+        StreamRuleMatcher matcher = getMatcher(rule);
         assertTrue(matcher.match(msg, rule));
     }
 
     @Test
     public void testMissedMatch() {
-        BasicDBObject mongoRule = new BasicDBObject();
-        mongoRule.put("_id", new ObjectId());
-        mongoRule.put("type", StreamRuleImpl.TYPE_REGEX);
-        mongoRule.put("field", "something");
-        mongoRule.put("value", "^foo");
+        StreamRule rule = getSampleRule();
+        rule.setValue("^foo");
 
-        StreamRuleMock rule = new StreamRuleMock(mongoRule);
-
-        Message msg = new Message("foo", "bar", new DateTime());
+        Message msg = getSampleMessage();
         msg.addField("something", "zomg");
 
-        RegexMatcher matcher = new RegexMatcher();
+        StreamRuleMatcher matcher = getMatcher(rule);
+        assertFalse(matcher.match(msg, rule));
+    }
+
+    @Test
+    public void testMissedInvertedMatch() {
+        StreamRule rule = getSampleRule();
+        rule.setValue("^foo");
+        rule.setInverted(true);
+
+        Message msg = getSampleMessage();
+        msg.addField("something", "foobar");
+
+        StreamRuleMatcher matcher = getMatcher(rule);
         assertFalse(matcher.match(msg, rule));
     }
 
     @Test
     public void testSuccessfulComplexRegexMatch() {
-        BasicDBObject mongoRule = new BasicDBObject();
-        mongoRule.put("_id", new ObjectId());
-        mongoRule.put("type", StreamRuleImpl.TYPE_REGEX);
-        mongoRule.put("field", "some_field");
-        mongoRule.put("value", "foo=^foo|bar\\d.+wat");
+        StreamRule rule = getSampleRule();
+        rule.setField("some_field");
+        rule.setValue("foo=^foo|bar\\d.+wat");
 
-        StreamRuleMock rule = new StreamRuleMock(mongoRule);
-
-        Message msg = new Message("foo", "bar", new DateTime());
+        Message msg = getSampleMessage();
         msg.addField("some_field", "bar1foowat");
 
-        RegexMatcher matcher = new RegexMatcher();
+        StreamRuleMatcher matcher = getMatcher(rule);
         assertTrue(matcher.match(msg, rule));
     }
 
+    protected StreamRule getSampleRule() {
+        StreamRule rule = super.getSampleRule();
+        rule.setType(StreamRuleType.REGEX);
+
+        return rule;
+    }
+
+    protected StreamRuleMatcher getMatcher(StreamRule rule) {
+        StreamRuleMatcher matcher = super.getMatcher(rule);
+
+        assertEquals(matcher.getClass(), RegexMatcher.class);
+
+        return matcher;
+    }
 }
