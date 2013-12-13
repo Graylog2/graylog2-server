@@ -1,4 +1,4 @@
-@(currentUser: User, query: String, searchResult: models.api.results.SearchResult)
+@(currentUser: User, query: String, searchResult: models.api.results.SearchResult)(implicit stream: Stream)
 
 @main("Search results", sidebars.standard(currentUser), query, currentUser) {
     <h1>

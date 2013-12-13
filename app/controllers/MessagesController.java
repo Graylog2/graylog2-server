@@ -18,6 +18,7 @@
  */
 package controllers;
 
+import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.gson.Gson;
 import com.google.inject.Inject;
@@ -30,6 +31,7 @@ import play.Logger;
 import play.mvc.Result;
 
 import java.io.IOException;
+import java.util.List;
 import java.util.Map;
 
 public class MessagesController extends AuthenticatedController {
@@ -63,9 +65,16 @@ public class MessagesController extends AuthenticatedController {
             MessageResult message = FieldMapper.run(messagesService.getMessage(index, id));
             Node sourceNode = getSourceNode(message);
             Radio sourceRadio = getSourceRadio(message);
+            List<Stream> messageInStreams = Lists.newArrayList();
+
+            for (String streamId : message.getStreamIds()) {
+                messageInStreams.add(streamService.get(streamId));
+            }
+
 
             return ok(views.html.messages.show_as_partial.render(
                     message,
+                    messageInStreams,
                     getSourceInput(sourceNode, message),
                     sourceNode,
                     sourceRadio,
@@ -83,6 +92,7 @@ public class MessagesController extends AuthenticatedController {
     // TODO move this to an API controller.
     public Result single(String index, String id) {
         try {
+
             MessageResult message = messagesService.getMessage(index, id);
 
             Map<String, Object> result = Maps.newHashMap();

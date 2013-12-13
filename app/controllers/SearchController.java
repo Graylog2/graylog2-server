@@ -77,7 +77,7 @@ public class SearchController extends AuthenticatedController {
         if (searchResult.getTotalResultCount() > 0) {
             return ok(views.html.search.results.render(currentUser(), search, searchResult, histogramResult, q, page, null));
         } else {
-            return ok(views.html.search.noresults.render(currentUser(), q, searchResult));
+            return ok(views.html.search.noresults.render(currentUser(), q, searchResult, null));
         }
     }
 

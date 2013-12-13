@@ -75,6 +75,11 @@
         }
 
         function showMessage(container, msg, messageid) {
+            var oldContainer = jQuery.data(container, "oldMessageContainer");
+            if (oldContainer != undefined)
+                container.html(oldContainer);
+
+            jQuery.data(container, "oldMessageContainer", container.html());
             var list = $("dl", container);
             var placeHolders = $("[data-occurrence=repeat]", list);
 

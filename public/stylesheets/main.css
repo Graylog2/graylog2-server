@@ -506,6 +506,11 @@ form #stream-rules {
     margin-bottom: 0;
 }
 
+.xtrc-select-message .spinner {
+    margin-top: 10px;
+    margin-bottom: 10px;
+}
+
 .xtrc-message-fields {
     margin: 0;
 }
