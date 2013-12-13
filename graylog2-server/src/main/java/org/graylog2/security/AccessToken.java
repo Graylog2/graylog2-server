@@ -18,6 +18,7 @@
  */
 package org.graylog2.security;
 
+import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.mongodb.BasicDBObject;
 import com.mongodb.DBObject;
@@ -28,6 +29,9 @@ import org.graylog2.database.Persisted;
 import org.graylog2.database.ValidationException;
 import org.graylog2.database.validators.FilledStringValidator;
 import org.graylog2.database.validators.Validator;
+import org.graylog2.plugin.Tools;
+import org.joda.time.DateTime;
+import org.joda.time.DateTimeZone;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -42,8 +46,10 @@ public class AccessToken extends Persisted {
     public static final String USERNAME = "username";
     public static final String ACCESS_TOKENS = "access_tokens";
     public static final String TOKEN = "token";
+    public static final String NAME = "NAME";
 
     private static final SecureRandom RANDOM = new SecureRandom();
+    public static final String LAST_ACCESS = "last_access";
 
     public AccessToken(Core core, Map<String, Object> fields) {
         super(core, fields);
@@ -63,6 +69,7 @@ public class AccessToken extends Persisted {
         Map<String, Validator> validations = Maps.newHashMap();
         validations.put(USERNAME, new FilledStringValidator());
         validations.put(TOKEN, new FilledStringValidator());
+        validations.put(NAME, new FilledStringValidator());
         return validations;
     }
 
@@ -72,9 +79,9 @@ public class AccessToken extends Persisted {
     }
 
     @SuppressWarnings("unchecked")
-    public static AccessToken load(String pat, Core core) {
+    public static AccessToken load(String token, Core core) {
         DBObject query = new BasicDBObject();
-        query.put(TOKEN, pat);
+        query.put(TOKEN, token);
         final List<DBObject> objects = query(query, core, ACCESS_TOKENS);
 
         if (objects.isEmpty()) {
@@ -89,7 +96,21 @@ public class AccessToken extends Persisted {
         return new AccessToken(core, (ObjectId) id, tokenObject.toMap());
     }
 
-    public static AccessToken create(Core core, String username) {
+    @SuppressWarnings("unchecked")
+    public static List<AccessToken> loadAll(String username, Core core) {
+        DBObject query = new BasicDBObject();
+        query.put(USERNAME, username);
+        final List<DBObject> objects = query(query, core, ACCESS_TOKENS);
+        List<AccessToken> tokens = Lists.newArrayList();
+        for (DBObject tokenObject : objects) {
+            final Object id = tokenObject.get("_id");
+            final AccessToken accessToken = new AccessToken(core, (ObjectId) id, tokenObject.toMap());
+            tokens.add(accessToken);
+        }
+        return tokens;
+    }
+
+    public static AccessToken create(Core core, String username, String name) {
         Map<String, Object> fields = Maps.newHashMap();
         AccessToken accessToken;
         ObjectId id = null;
@@ -101,6 +122,8 @@ public class AccessToken extends Persisted {
             final String token = new BigInteger(256, RANDOM).toString(32);
             fields.put(TOKEN, token);
             fields.put(USERNAME, username);
+            fields.put(NAME, name);
+            fields.put(LAST_ACCESS, Tools.dateTimeFromDouble(0)); // aka never.
             accessToken = new AccessToken(core, fields);
             try {
                 id = accessToken.saveWithoutValidation();
@@ -110,6 +133,16 @@ public class AccessToken extends Persisted {
             throw new IllegalStateException("Could not create unique access token, tried 10 times. This is bad.");
         }
         return accessToken;
+    }
+
+    public void touch() throws ValidationException {
+        fields.put(LAST_ACCESS, DateTime.now(DateTimeZone.UTC));
+        save();
+    }
+
+    public DateTime getLastAccess() {
+        final Object o = fields.get(LAST_ACCESS);
+        return (DateTime) o;
     }
 
     @Override
@@ -133,6 +166,14 @@ public class AccessToken extends Persisted {
 
     public void setToken(String token) {
         fields.put(TOKEN, token);
+    }
+
+    public String getName() {
+        return String.valueOf(fields.get(NAME));
+    }
+
+    public void setName(String name) {
+        fields.put(NAME, name);
     }
 
 }
