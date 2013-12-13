@@ -48,7 +48,7 @@ public class ShiroAuthorizationFilter implements ContainerRequestFilter {
         final ShiroSecurityContext context = (ShiroSecurityContext) securityContext;
         final Subject subject = context.getSubject();
         try {
-            log.info("Checking authorization for user {}, needs permissions {}", subject, annotation.value());
+            log.debug("Checking authorization for user {}, needs permissions {}", subject, annotation.value());
             new ContextAwarePermissionAnnotationHandler(context).assertAuthorized(annotation);
         } catch (AuthorizationException e) {
             log.info("User not authorized.", e);
