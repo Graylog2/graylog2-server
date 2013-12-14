@@ -36,28 +36,30 @@
     </div>
 
     <div class="row-fluid">
-        <div class="alert alert-info closed-indices">
-            <i class="icon icon-ban-circle"></i>&nbsp;
+        @if(!closedIndices.isEmpty) {
+            <div class="alert alert-info closed-indices">
+                <i class="icon icon-ban-circle"></i>&nbsp;
 
-            @if(closedIndices.size() == 1) {
-                There is a closed index you can reopen.
-            } else {
-                There are @closedIndices.size() closed indices you can reopen.
-            }
-
-            <a href="#" class="pull-right show-indices"><i class="icon icon-caret-down"></i> Show</a>
-
-            <ul style="display: none;">
-                @for(index <- closedIndices.sorted) {
-                    <li>
-                        @index
-                        <a href="@routes.IndicesController.reopenIndex(index)" data-confirm="Really reopen index @index? It might take a few seconds until it appears in the list." title="Reopen">
-                            <i class="icon icon-retweet"></i>
-                        </a>
-                    </li>
+                @if(closedIndices.size() == 1) {
+                    There is a closed index you can reopen.
+                } else {
+                    There are @closedIndices.size() closed indices you can reopen.
                 }
-            </ul>
-        </div>
+
+                <a href="#" class="pull-right show-indices"><i class="icon icon-caret-down"></i> Show</a>
+
+                <ul style="display: none;">
+                    @for(index <- closedIndices.sorted) {
+                        <li>
+                            @index
+                            <a href="@routes.IndicesController.reopenIndex(index)" data-confirm="Really reopen index @index? It might take a few seconds until it appears in the list." title="Reopen">
+                                <i class="icon icon-retweet"></i>
+                            </a>
+                        </li>
+                    }
+                </ul>
+            </div>
+        }
 
         <div class="alert alert-success" style="margin-top: 10px;">
             <i class="icon icon-th"></i> &nbsp;@indices.length indices with a total of <span class="total-events focuslimit">?</span> messages under management.
