@@ -107,15 +107,18 @@
                     </dt>
                     <dd style="word-wrap: break-word;"><a href="#" data-field="@key" data-value="@lib.Tools.removeTrailingNewline(value)" class="search-link nolink">@lib.Tools.orNbsp(lib.Tools.removeTrailingNewline(value))</a></dd>
                 }
-                    <dt>Streams</dt>
-                    <dd>
-                        <ul>
-                            @for(stream <- messageStreams) {
-                                <li><a href="@routes.StreamSearchController.index(stream.getId, "*", "relative", 300)">@stream.getTitle</a></li>
-                            }
-                        </ul>
-                    </dd>
                 </dl>
+
+                @if(!messageStreams.isEmpty) {
+                    <div class="message-streams">
+                        <h4 class="u-light" style="display: inline;">Routed into the following streams:</h4><br />
+                        <ul>
+                        @for(stream <- messageStreams) {
+                            <li><a href="@routes.StreamSearchController.index(stream.getId, "*", "relative", 300)">@stream.getTitle</a></li>
+                        }
+                        </ul>
+                    </div>
+                }
             </div>
         </div>
     </div>

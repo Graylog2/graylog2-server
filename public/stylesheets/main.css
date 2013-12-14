@@ -1541,3 +1541,18 @@ dl.sample-message-fields {
 .configured-streamrules {
     margin-bottom: 5px;
 }
+
+.message-streams {
+    margin-top: 10px;
+}
+
+.message-streams h4 {
+    font-size: 13px;
+    font-weight: bold;
+}
+
+.message-streams ul {
+    list-style-type: square;
+    margin-left: 25px;
+    margin-top: 2px;
+}

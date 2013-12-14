@@ -51,7 +51,13 @@ public class MessagesController extends AuthenticatedController {
             Node sourceNode = getSourceNode(message);
             Radio sourceRadio = getSourceRadio(message);
 
-            return ok(views.html.messages.show.render(currentUser(), message, getSourceInput(sourceNode, message), sourceNode, sourceRadio, getSourceInput(sourceRadio, message)));
+            List<Stream> messageInStreams = Lists.newArrayList();
+
+            for (String streamId : message.getStreamIds()) {
+                messageInStreams.add(streamService.get(streamId));
+            }
+
+            return ok(views.html.messages.show.render(currentUser(), message, messageInStreams, getSourceInput(sourceNode, message), sourceNode, sourceRadio, getSourceInput(sourceRadio, message)));
         } catch (IOException e) {
             return status(500, views.html.errors.error.render(ApiClient.ERROR_MSG_IO, e, request()));
         } catch (APIException e) {
@@ -70,7 +76,6 @@ public class MessagesController extends AuthenticatedController {
             for (String streamId : message.getStreamIds()) {
                 messageInStreams.add(streamService.get(streamId));
             }
-
 
             return ok(views.html.messages.show_as_partial.render(
                     message,

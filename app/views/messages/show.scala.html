@@ -1,8 +1,8 @@
-@(currentUser: User, message: models.api.results.MessageResult, sourceInput: Input, sourceNode: Node, sourceRadio: Radio, sourceRadioInput: Input)
+@(currentUser: User, message: models.api.results.MessageResult,  messageStreams: List[models.Stream], sourceInput: Input, sourceNode: Node, sourceRadio: Radio, sourceRadioInput: Input)
 
 @main("Message " + message.getId, sidebars.standard(currentUser), "", currentUser) {
 
-    <div class="row-fluid">
+    <div class="row-fluid" style="margin-bottom: 0px;">
         <h1><i class="icon icon-envelope"></i> Message @message.getId()</h1>
 
         Received by
@@ -40,7 +40,7 @@
         /
         Index: <em>@message.getIndex()</em>
 
-        <dl>
+        <dl style="margin-bottom: 0px;">
         @for((key, value) <- message.getFields()) {
             <dt>
                 <div class="btn-group message-field-dropdown">
@@ -68,6 +68,17 @@
             <dd style="word-wrap: break-word;"><a href="#" data-field="@key" data-value="@lib.Tools.removeTrailingNewline(value)" class="search-link nolink">@lib.Tools.orNbsp(lib.Tools.removeTrailingNewline(value))</a></dd>
         }
         </dl>
+
+        @if(!messageStreams.isEmpty) {
+            <div class="message-streams">
+                <h4 class="u-light" style="display: inline;">Routed into the following streams:</h4><br />
+                <ul>
+                @for(stream <- messageStreams) {
+                    <li><a href="@routes.StreamSearchController.index(stream.getId, "*", "relative", 300)">@stream.getTitle</a></li>
+                }
+                </ul>
+            </div>
+        }
     </div>
 
 }
