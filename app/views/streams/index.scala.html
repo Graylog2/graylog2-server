@@ -1,6 +1,6 @@
 @(currentUser: User, streams: List[Stream], nodes: Map[String, Node])
 
-@main("Streams", views.html.sidebars.standard(currentUser), "", currentUser) {
+@main("Streams", views.html.sidebars.standard(currentUser), "", currentUser, false) {
 
     <a href="/streams/new" class="btn btn-success btn-small pull-right">Create stream</a>
 
