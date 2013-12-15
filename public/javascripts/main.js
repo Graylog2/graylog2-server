@@ -1,10 +1,5 @@
 $(document).ready(function() {
 
-    $(".messages tbody > tr").bind("contextmenu", function() {
-        alert("foo");
-        return false;
-    });
-
 	// Opening messages in sidebar with click in message result table.
 	$(".messages tbody > tr").bind("click", function() {
 		messageId = $(this).attr("data-message-id");
