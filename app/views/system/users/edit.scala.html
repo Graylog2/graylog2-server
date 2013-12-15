@@ -11,94 +11,97 @@
 
     @views.html.partials.breadcrumbs(breadcrumbs)
 
-    <div>
-        @views.html.partials.preview("Editing users will show a list of permissions and roles that can be assigned to users. Those consist of both permissions for the server's REST API as well as the Web Interface's features.", 255)
-        <div class="row-fluid">
-            <div class="span6">
-                <form class="form-horizontal" action="@routes.UsersController.saveChanges(username)" method="POST">
-                    <div class="control-group">
-                        <label class="control-label" for="fullname">Full Name</label>
-                        <div class="controls">
-                            <input name="fullname" id="fullname" type="text" value="@form("fullname").value()" required/>
-                            <span class="help-inline">A descriptive name for this account.</span>
-                        </div>
-                    </div>
-                    <div class="control-group">
-                    <label class="control-label" for="email">Email Address</label>
-                        <div class="controls">
-                            <input name="email" id="email" type="email" value="@form("email").value()" required />
-                            <!--
-            <label for="permissions">Permissions</label>
-            <span class="help-block">Choose the permissions granted to the account.</span>
-            <select name="permissions" id="permissions" data-placeholder="Choose permissions..." multiple required class="permission-select">
-            @for(permission <- permissions) {
-                    <option @{
-                        if(selectedPermissions.contains(permission)) "selected"
-                    }>@permission </option>
-                }
-                    </select>
-                    -->
+    <div class="row-fluid">
+        <h1><i class="icon icon-edit"></i> Edit user &laquo;@username&raquo;</h1>
+        You can either change the details of a user here or set a new password.
+    </div>
 
-                        </div>
+    <div class="row-fluid">
+        <div class="span6">
+            <form class="form-horizontal" action="@routes.UsersController.saveChanges(username)" method="POST">
+                <div class="control-group">
+                    <label class="control-label" for="fullname">Full Name</label>
+                    <div class="controls">
+                        <input name="fullname" id="fullname" type="text" value="@form("fullname").value()" required/>
+                        <span class="help-inline">A descriptive name for this account.</span>
                     </div>
-                    <div class="control-group">
-                        <label class="control-label" for="timezone">Time Zone</label>
-                        <div class="controls">
-                            <select name="timezone" id="timezone" data-placeholder="Pick your time zone" class="timezone-select">
-                                @for(group <- ImmutableList.copyOf(timezones.keys).sorted) {
-                                    <optgroup label="@group">
-                                    @for(zone <- ImmutableList.copyOf(timezones.get(group).iterator()).sorted) {
-                                        @if(form("timezone").valueOr("").equals(group+"/"+zone)) {
-                                        <option value="@group/@zone" selected>@zone</option>
-                                        } else {
-                                        <option value="@group/@zone">@zone</option>
-                                        }
+                </div>
+                <div class="control-group">
+                <label class="control-label" for="email">Email Address</label>
+                    <div class="controls">
+                        <input name="email" id="email" type="email" value="@form("email").value()" required />
+                        <!--
+        <label for="permissions">Permissions</label>
+        <span class="help-block">Choose the permissions granted to the account.</span>
+        <select name="permissions" id="permissions" data-placeholder="Choose permissions..." multiple required class="permission-select">
+        @for(permission <- permissions) {
+                <option @{
+                    if(selectedPermissions.contains(permission)) "selected"
+                }>@permission </option>
+            }
+                </select>
+                -->
+
+                    </div>
+                </div>
+                <div class="control-group">
+                    <label class="control-label" for="timezone">Time Zone</label>
+                    <div class="controls">
+                        <select name="timezone" id="timezone" data-placeholder="Pick your time zone" class="timezone-select">
+                            @for(group <- ImmutableList.copyOf(timezones.keys).sorted) {
+                                <optgroup label="@group">
+                                @for(zone <- ImmutableList.copyOf(timezones.get(group).iterator()).sorted) {
+                                    @if(form("timezone").valueOr("").equals(group+"/"+zone)) {
+                                    <option value="@group/@zone" selected>@zone</option>
+                                    } else {
+                                    <option value="@group/@zone">@zone</option>
                                     }
-                                    </optgroup>
                                 }
-                            </select>
+                                </optgroup>
+                            }
+                        </select>
 
-                        </div>
                     </div>
-                    <div class="control-group">
-                        <div class="controls">
-                        <button type="submit" class="btn btn-primary create-user">
-                            <i class="icon icon-rocket"></i>
-                            Save changes
+                </div>
+                <div class="control-group">
+                    <div class="controls">
+                    <button type="submit" class="btn btn-success create-user">
+                        Save changes
+                    </button>
+                </div>
+                </div>
+            </form>
+        </div>
+        <div class="span6">
+            @if(!currentUser.isExternal) {
+            <form class="form-horizontal" action="@routes.UsersController.changePassword(username)" method="POST">
+                <div class="control-group">
+                    <label class="control-label" for="old-password">Old Password</label>
+                    <div class="controls">
+                        <input type="password" id="old-password" name="old_password" required />
+                    </div>
+                </div>
+                <div class="control-group">
+                    <label class="control-label" for="password">New Password</label>
+                    <div class="controls">
+                        <input type="password" id="password" name="password" required />
+                    </div>
+                </div>
+                <div class="control-group">
+                    <label class="control-label" for="password-repeat">Confirm Password</label>
+                    <div class="controls">
+                        <input type="password" id="password-repeat" required/>
+                    </div>
+                </div>
+                <div class="control-group">
+                    <div class="controls">
+                        <button class="btn btn-success" type="submit">
+                            Update Password
                         </button>
                     </div>
-                    </div>
-                </form>
-            </div>
-            <div class="span6">
-                @if(!currentUser.isExternal) {
-                <form class="form-horizontal" action="@routes.UsersController.changePassword(username)" method="POST">
-                    <div class="control-group">
-                        <label class="control-label" for="old-password">Old Password</label>
-                        <div class="controls">
-                            <input type="password" id="old-password" name="old_password" required />
-                        </div>
-                    </div>
-                    <div class="control-group">
-                        <label class="control-label" for="password">New Password</label>
-                        <div class="controls">
-                            <input type="password" id="password" name="password" required />
-                        </div>
-                    </div>
-                    <div class="control-group">
-                        <label class="control-label" for="password-repeat">Confirm Password</label>
-                        <div class="controls">
-                            <input type="password" id="password-repeat" required/>
-                        </div>
-                    </div>
-                    <div class="control-group">
-                        <div class="controls">
-                            <button class="btn" type="submit">Update Password</button>
-                        </div>
-                    </div>
-                </form>
-                }
-            </div>
+                </div>
+            </form>
+            }
         </div>
     </div>
 }
