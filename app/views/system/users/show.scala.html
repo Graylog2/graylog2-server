@@ -4,12 +4,17 @@
 
     @views.html.partials.breadcrumbs(breadcrumbs)
 
-    @views.html.partials.preview("User detail pages are not finished yet.", 257)
-
-    <div>
-        <span id="username">@user.getName</span>
-        <span id="fullname">@user.getFullName</span>
-        <span id="email">@user.getEmail</span>
-        <span id="permissions">@user.getPermissions</span>
+    <div class="row-fluid">
+        <h1><i class="icon icon-user"></i> User &raquo;@user.getName&laquo;</h1>
+        <i class="icon icon-envelope-alt"></i>
+        <a href="mailto:@user.getEmail">@user.getEmail</a>
     </div>
+
+    <dl class="user-details">
+        <dt>Full name</dt>
+        <dd>@user.getFullName</dd>
+
+        <dt>Timezone</dt>
+        <dd>@user.getTimeZone</dd>
+    </dl>
 }
