@@ -88,16 +88,20 @@
                 }
             </h3>
 
-            <div class="progress">
-                <div class="bar bar-warning" style="width: @jvm.usedMemoryPercentage()%;"></div>
-                <div class="bar" style="width: @(jvm.totalMemoryPercentage()-jvm.usedMemoryPercentage)%"></div>
+            <div class="node-heap-usage" data-node-id="@jvm.getNodeId">
+                <div class="progress">
+                    <div class="bar bar-warning heap-used-percent" style="width: @jvm.usedMemoryPercentage()%;"></div>
+                    <div class="bar heap-total-percent" style="width: @(jvm.totalMemoryPercentage()-jvm.usedMemoryPercentage)%"></div>
+                </div>
+
+                <strong><span class="input-master-cache">@buffers.get(jvm.getNodeId).getInputMasterCache.size</span>
+                messages</strong> in master cache.
+
+                The JVM is using <strong><span class="heap-used">@jvm.getUsedMemory.getMegabytes()</span>
+                of <span class="heap-total">@jvm.getTotalMemory.getMegabytes()</span> MB</strong>
+                heap space and will not attempt to use more than
+                <strong><span class="heap-max">@jvm.getMaxMemory.getMegabytes()</span> MB</strong>.
             </div>
-
-            <strong>@buffers.get(jvm.getNodeId).getInputMasterCache.size messages</strong> in master cache.
-
-            The JVM is using <strong>@jvm.getUsedMemory.getMegabytes() of @jvm.getTotalMemory.getMegabytes() MB</strong>
-            heap space and will not attempt to use more than <strong>@jvm.getMaxMemory.getMegabytes() MB</strong>.
-
         </div>
     }
 
@@ -131,15 +135,20 @@
                     @views.html.partials.radio_title_link(radio)
                 </h3>
 
-                <div class="progress">
-                    <div class="bar bar-warning" style="width: @radio.jvm().usedMemoryPercentage()%;"></div>
-                    <div class="bar" style="width: @(radio.jvm().totalMemoryPercentage()-radio.jvm().usedMemoryPercentage)%"></div>
+                <div class="node-heap-usage" data-radio-id="@radio.getId" data-node-type="radio">
+                    <div class="progress">
+                        <div class="bar bar-warning heap-used-percent" style="width: @radio.jvm().usedMemoryPercentage()%;"></div>
+                        <div class="bar heap-total-percent" style="width: @(radio.jvm().totalMemoryPercentage()-radio.jvm().usedMemoryPercentage)%"></div>
+                    </div>
+
+                    <strong><span class="input-master-cache">@radio.getBuffers.getInputMasterCache.size</span>
+                    messages</strong> in master cache.
+
+                    The JVM is using <strong><span class="heap-used">@radio.jvm().getUsedMemory.getMegabytes()</span>
+                    of <span class="heap-total">@radio.jvm().getTotalMemory.getMegabytes()</span> MB</strong>
+                    heap space and will not attempt to use more than
+                    <strong><span class="heap-max">@radio.jvm().getMaxMemory.getMegabytes()</span> MB</strong>.
                 </div>
-
-                <strong>@radio.getBuffers.getInputMasterCache.size messages</strong> in master cache.
-
-                The JVM is using <strong>@radio.jvm().getUsedMemory.getMegabytes() of @radio.jvm().getTotalMemory.getMegabytes() MB</strong>
-                heap space and will not attempt to use more than <strong>@radio.jvm().getMaxMemory.getMegabytes() MB</strong>.
             </div>
         }
     } else {

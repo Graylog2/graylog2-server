@@ -108,6 +108,50 @@ $(document).ready(function() {
         };
     })();
 
+    // Node heap usage.
+    (function updateNodeHeapUsage() {
+        if ($(".node-heap-usage").length > 0) {
+            var interval = 1000;
+
+            if(!focussed) {
+                setTimeout(updateNodeHeapUsage, interval);
+                return;
+            }
+
+            $(".node-heap-usage").each(function(i) {
+                var nodeType = $(this).attr("data-node-type");
+                var url;
+                if (!!nodeType && $(this).attr("data-node-type") == "radio") {
+                    url = "/a/system/radio/" + $(this).attr("data-radio-id") + "/heap"
+                } else {
+                    url = "/a/system/node/" + $(this).attr("data-node-id") + "/heap"
+                }
+
+                var thisHeap = $(this);
+                $.ajax({
+                    url: url,
+                    success: function(data) {
+                        var total_percentage = data.total_percentage-data.used_percentage;
+                        $(".progress .heap-used-percent", thisHeap).css("width", data.used_percentage + "%");
+                        $(".progress .heap-total-percent", thisHeap).css("width", total_percentage + "%");
+
+                        $(".heap-used", thisHeap).text(data.used);
+                        $(".heap-total", thisHeap).text(data.total);
+                        $(".heap-max", thisHeap).text(data.max);
+
+                        $(".input-master-cache", thisHeap).text(data.input_master_cache);
+                    },
+                    complete: function() {
+                        // Trigger next call of the whole function when we updated the last element.
+                        if (i == $(".node-heap-usage").length-1) {
+                            setTimeout(updateNodeHeapUsage, interval);
+                        }
+                    }
+                });
+            });
+        };
+    })();
+
     // IO of input.
     (function updateInputIO() {
         var interval = 1000;

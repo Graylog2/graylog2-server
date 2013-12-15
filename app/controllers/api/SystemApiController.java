@@ -119,7 +119,7 @@ public class SystemApiController extends AuthenticatedController {
 
             return ok(new Gson().toJson(result)).as("application/json");
         } catch (NodeService.NodeNotFoundException e) {
-            return status(404, views.html.errors.error.render(ApiClient.ERROR_MSG_NODE_NOT_FOUND, e, request()));
+            return status(404, "node not found");
         }
     }
 
@@ -131,7 +131,27 @@ public class SystemApiController extends AuthenticatedController {
 
             return ok(new Gson().toJson(result)).as("application/json");
         } catch (NodeService.NodeNotFoundException e) {
-            return status(404, views.html.errors.error.render(ApiClient.ERROR_MSG_NODE_NOT_FOUND, e, request()));
+            return status(404, "node not found");
+        }
+    }
+
+    public Result heap(String nodeId) {
+        try {
+            Map<String, Object> result = Maps.newHashMap();
+            Node node = nodeService.loadNode(nodeId);
+
+            return ok(new Gson().toJson(jvmMap(node.jvm(), node.getBufferInfo().getInputMasterCache().size))).as("application/json");
+        } catch (NodeService.NodeNotFoundException e) {
+            return status(404, "node not found");
+        }
+    }
+
+    public Result radioHeap(String radioId) {
+        try {
+            Radio radio = nodeService.loadRadio(radioId);
+            return ok(new Gson().toJson(jvmMap(radio.jvm(), radio.getBuffers().getInputMasterCache().size))).as("application/json");
+        } catch (NodeService.NodeNotFoundException e) {
+            return status(404, "radio not found");
         }
     }
 
@@ -147,7 +167,7 @@ public class SystemApiController extends AuthenticatedController {
         } catch (APIException e) {
             return internalServerError("api exception " + e);
         } catch (NodeService.NodeNotFoundException e) {
-            return status(404, views.html.errors.error.render(ApiClient.ERROR_MSG_NODE_NOT_FOUND, e, request()));
+            return status(404, "node not found");
         }
     }
 
@@ -163,8 +183,22 @@ public class SystemApiController extends AuthenticatedController {
         } catch (APIException e) {
             return internalServerError("api exception " + e);
         } catch (NodeService.NodeNotFoundException e) {
-            return status(404, views.html.errors.error.render(ApiClient.ERROR_MSG_NODE_NOT_FOUND, e, request()));
+            return status(404, "node not found");
         }
+    }
+
+    private Map<String, Object> jvmMap(NodeJVMStats jvm, long inputMasterCacheSize) {
+        Map<String, Object> result = Maps.newHashMap();
+
+        result.put("free", jvm.getFreeMemory().getMegabytes());
+        result.put("max", jvm.getMaxMemory().getMegabytes());
+        result.put("total", jvm.getTotalMemory().getMegabytes());
+        result.put("used", jvm.getUsedMemory().getMegabytes());
+        result.put("used_percentage", jvm.usedMemoryPercentage());
+        result.put("total_percentage", jvm.totalMemoryPercentage());
+        result.put("input_master_cache", inputMasterCacheSize);
+
+        return result;
     }
 
 }
