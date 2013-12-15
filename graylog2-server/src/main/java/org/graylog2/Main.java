@@ -259,18 +259,30 @@ public final class Main {
 
         // Register outputs.
         server.outputs().register(new ElasticSearchOutput(server));
-        
-        try {
-        	server.startRestApi();
-        } catch(Exception e) {
-        	LOG.error("Could not start REST API on <{}>. Terminating.", configuration.getRestListenUri(), e);
-        	System.exit(1);
-        }
-        
-        // Blocks until we shut down.
+
+        // Start services.
         server.run();
 
-        LOG.info("Graylog2 {} exiting.", Core.GRAYLOG2_VERSION);
+        // Start REST API.
+        try {
+            server.startRestApi();
+        } catch(Exception e) {
+            LOG.error("Could not start REST API on <{}>. Terminating.", configuration.getRestListenUri(), e);
+            System.exit(1);
+        }
+
+        server.getActivityWriter().write(new Activity("Started up.", Main.class));
+        LOG.info("Graylog2 up and running.");
+
+        while (true) {
+            try {
+                Thread.sleep(1000);
+            } catch (InterruptedException e) {
+                return;
+            } finally {
+                LOG.info("Graylog2 {} exiting.", Core.GRAYLOG2_VERSION);
+            }
+        }
     }
 
     private static void savePidFile(String pidFile) {

@@ -330,14 +330,6 @@ public class Core implements GraylogServer, InputHost {
                         + " because of missing or invalid configuration.", e);
             }
         }*/
-
-        activityWriter.write(new Activity("Started up.", Core.class));
-        LOG.info("Graylog2 up and running.");
-
-        while (true) {
-            try { Thread.sleep(1000); } catch (InterruptedException e) { /* lol, i don't care */ }
-        }
-
     }
 
     public void setLdapConnector(LdapConnector ldapConnector) {
