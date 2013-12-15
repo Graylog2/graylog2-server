@@ -177,6 +177,7 @@ h4 {
 	table-layout: fixed;
 	border-collapse: collapse;
 	width: 100%;
+    word-break: break-all;
 }
 
 .messages-message {
