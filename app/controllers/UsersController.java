@@ -53,7 +53,7 @@ public class UsersController extends AuthenticatedController {
     public Result index() {
         final List<User> allUsers = userService.all();
         final List<String> permissions = permissionsService.all();
-        return ok(views.html.system.users.index.render(currentUser(), allUsers, permissions));
+        return ok(views.html.system.users.index.render(currentUser(), breadcrumbs(), allUsers, permissions));
     }
 
     public Result show(String username) {
@@ -70,7 +70,7 @@ public class UsersController extends AuthenticatedController {
 
     public Result newUserForm() {
         BreadcrumbList bc = breadcrumbs();
-        bc.addCrumb("Create new", routes.UsersController.newUserForm());
+        bc.addCrumb("New", routes.UsersController.newUserForm());
 
         final List<String> permissions = permissionsService.all();
         return ok(new_user.render(

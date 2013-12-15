@@ -1,9 +1,16 @@
-@(currentUser: User, ldapForm: Form[models.api.requests.accounts.LdapSettingsRequest])
+@(currentUser: User, breadcrumbs: lib.BreadcrumbList, ldapForm: Form[models.api.requests.accounts.LdapSettingsRequest])
 
 @main("LDAP Settings", views.html.system.sidebar(), "", currentUser) {
-    <div class="row-fluid">
-        <h2><i class="icon-cloud"></i> LDAP Settings</h2>
 
+    @views.html.partials.breadcrumbs(breadcrumbs)
+
+    <div class="row-fluid">
+        <h1><i class="icon-wrench"></i> LDAP Settings</h1>
+        This page is the only resource you need to set up the Graylog2 LDAP integration. You can test the
+        connection to your LDAP server and even try to log in with an LDAP account of your choice right away.
+    </div>
+
+    <div class="row-fluid">
         @helper.form(action = routes.LdapController.saveLdapSettings(), 'class -> "form-horizontal", 'id -> "ldap-settings") {
             <div class="control-group">
                 <label class="control-label" for="ldap-enabled">Use LDAP</label>

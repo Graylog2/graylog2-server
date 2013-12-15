@@ -21,6 +21,7 @@ package controllers;
 import com.google.gson.Gson;
 import com.google.inject.Inject;
 import lib.APIException;
+import lib.BreadcrumbList;
 import models.accounts.LdapSettings;
 import models.accounts.LdapSettingsService;
 import models.api.requests.accounts.LdapSettingsRequest;
@@ -47,7 +48,6 @@ public class LdapController extends AuthenticatedController {
     private LdapSettingsService ldapSettingsService;
 
     public Result index() {
-
         final LdapSettings ldapSettings = ldapSettingsService.load();
         final Form<LdapSettingsRequest> ldapSettingsForm;
         if (ldapSettings == null) {
@@ -58,7 +58,7 @@ public class LdapController extends AuthenticatedController {
         } else {
             ldapSettingsForm = settingsForm.fill(ldapSettings.toRequest());
         }
-        return ok(views.html.system.ldap.index.render(currentUser(), ldapSettingsForm));
+        return ok(views.html.system.ldap.index.render(currentUser(), breadcrumbs(), ldapSettingsForm));
     }
 
     public Result apiTestLdapConnection() {
@@ -121,7 +121,7 @@ public class LdapController extends AuthenticatedController {
         final Form<LdapSettingsRequest> form = settingsForm.bindFromRequest();
         if (form.hasErrors()) {
             flash("error", "Please correct these errors: " + form.errors());
-            return badRequest(views.html.system.ldap.index.render(currentUser(), form));
+            return badRequest(views.html.system.ldap.index.render(currentUser(), breadcrumbs(), form));
         }
         final LdapSettingsRequest formValue = form.get();
         final LdapSettings settings = ldapSettingsService.create(formValue);
@@ -144,4 +144,14 @@ public class LdapController extends AuthenticatedController {
         }
         return redirect(routes.UsersController.index());
     }
+
+    private BreadcrumbList breadcrumbs() {
+        BreadcrumbList bc = new BreadcrumbList();
+        bc.addCrumb("System", routes.SystemController.index(0));
+        bc.addCrumb("Users", routes.UsersController.index());
+        bc.addCrumb("LDAP settings", routes.LdapController.index());
+
+        return bc;
+    }
+
 }

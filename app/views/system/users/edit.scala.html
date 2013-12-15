@@ -16,7 +16,7 @@
         You can either change the details of a user here or set a new password.
     </div>
 
-    <div class="row-fluid">
+    <div class="row-fluid" style="margin-top: 30px;">
         <div class="span6">
             <form class="form-horizontal" action="@routes.UsersController.saveChanges(username)" method="POST">
                 <div class="control-group">
@@ -74,33 +74,33 @@
         </div>
         <div class="span6">
             @if(!currentUser.isExternal) {
-            <form class="form-horizontal" action="@routes.UsersController.changePassword(username)" method="POST">
-                <div class="control-group">
-                    <label class="control-label" for="old-password">Old Password</label>
-                    <div class="controls">
-                        <input type="password" id="old-password" name="old_password" required />
+                <form class="form-horizontal" action="@routes.UsersController.changePassword(username)" method="POST">
+                    <div class="control-group">
+                        <label class="control-label" for="old-password">Old Password</label>
+                        <div class="controls">
+                            <input type="password" id="old-password" name="old_password" required />
+                        </div>
                     </div>
-                </div>
-                <div class="control-group">
-                    <label class="control-label" for="password">New Password</label>
-                    <div class="controls">
-                        <input type="password" id="password" name="password" required />
+                    <div class="control-group">
+                        <label class="control-label" for="password">New Password</label>
+                        <div class="controls">
+                            <input type="password" id="password" name="password" required />
+                        </div>
                     </div>
-                </div>
-                <div class="control-group">
-                    <label class="control-label" for="password-repeat">Confirm Password</label>
-                    <div class="controls">
-                        <input type="password" id="password-repeat" required/>
+                    <div class="control-group">
+                        <label class="control-label" for="password-repeat">Confirm Password</label>
+                        <div class="controls">
+                            <input type="password" id="password-repeat" required/>
+                        </div>
                     </div>
-                </div>
-                <div class="control-group">
-                    <div class="controls">
-                        <button class="btn btn-success" type="submit">
-                            Update Password
-                        </button>
+                    <div class="control-group">
+                        <div class="controls">
+                            <button class="btn btn-success" type="submit">
+                                Update Password
+                            </button>
+                        </div>
                     </div>
-                </div>
-            </form>
+                </form>
             }
         </div>
     </div>
