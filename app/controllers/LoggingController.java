@@ -20,13 +20,17 @@ package controllers;
 
 import com.google.common.collect.Maps;
 import com.google.inject.Inject;
+import lib.APIException;
+import lib.ApiClient;
 import lib.BreadcrumbList;
 import lib.ServerNodes;
 import models.InternalLogger;
+import models.InternalLoggerSubsystem;
 import models.Node;
 import models.NodeService;
 import play.mvc.Result;
 
+import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 
@@ -46,11 +50,29 @@ public class LoggingController extends AuthenticatedController {
         bc.addCrumb("Logging", routes.LoggingController.index());
 
         Map<Node, List<InternalLogger>> loggers = Maps.newHashMap();
+        Map<Node, Map<String, InternalLoggerSubsystem>> subsystems = Maps.newHashMap();
         for (Node node : serverNodes.all()) {
             loggers.put(node, node.allLoggers());
+            subsystems.put(node, node.allLoggerSubsystems());
         }
 
-        return ok(views.html.system.logging.index.render(currentUser(), bc, loggers));
+        return ok(views.html.system.logging.index.render(currentUser(), bc, loggers, subsystems));
+    }
+
+    public Result setSubsystemLevel(String nodeId, String subsystem, String level) {
+        try {
+            Node node = nodeService.loadNode(nodeId);
+            node.setSubsystemLoggerLevel(subsystem, level);
+
+            return redirect(routes.LoggingController.index());
+        } catch (IOException e) {
+            return status(500, views.html.errors.error.render(ApiClient.ERROR_MSG_IO, e, request()));
+        } catch (APIException e) {
+            String message = "Could not set log level. We expected HTTP 200, but got a HTTP " + e.getHttpCode() + ".";
+            return status(500, views.html.errors.error.render(message, e, request()));
+        } catch (NodeService.NodeNotFoundException e) {
+            return status(404, views.html.errors.error.render(ApiClient.ERROR_MSG_NODE_NOT_FOUND, e, request()));
+        }
     }
 
 }

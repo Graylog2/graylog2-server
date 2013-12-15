@@ -305,12 +305,14 @@ $(document).ready(function() {
     });
 
     // Show fine-grained log level controls.
-    $(".trigger-fine-log-level-controls").on("click", function() {
+    $(".trigger-fine-log-level-controls").on("click", function(e) {
+        e.preventDefault();
         $(".fine-log-level-controls[data-node-id='" + $(this).attr("data-node-id") + "']").toggle();
     });
 
     // Show log level metrics.
-    $(".trigger-log-level-metrics").on("click", function() {
+    $(".trigger-log-level-metrics").on("click", function(e) {
+        e.preventDefault();
         $(".loglevel-metrics[data-node-id='" + $(this).attr("data-node-id") + "']").toggle();
     });
 

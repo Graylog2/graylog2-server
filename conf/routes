@@ -90,6 +90,7 @@ POST        /systemjobs/trigger                                                 
 
 # Logging
 GET         /system/logging                                                          @controllers.LoggingController.index()
+GET         /system/logging/node/:node_id/subsystem/:subsystem/:level                @controllers.LoggingController.setSubsystemLevel(node_id: String, subsystem: String, level: String)
 
 # Dashboards
 GET         /dashboards                                                              @controllers.DashboardsController.index()
@@ -122,6 +123,8 @@ PUT         /a/system/processing/pause                                          
 PUT         /a/system/processing/resume                                              @controllers.api.SystemApiController.resumeMessageProcessing()
 GET         /a/system/node/:node_id/heap                                             @controllers.api.SystemApiController.heap(node_id: String)
 GET         /a/system/radio/:radio_id/heap                                           @controllers.api.SystemApiController.radioHeap(radio_id: String)
+GET         /a/system/internallogs/:node_id                                          @controllers.api.SystemApiController.internalLogsOfNode(node_id: String)
+GET         /a/system/internallogs/:node_id/metrics                                  @controllers.api.SystemApiController.internalLogMetricsOfNode(node_id: String)
 
 # API: Inputs
 GET         /a/system/inputs/:node_id/:input_id/recent_message                       @controllers.api.InputsApiController.recentMessage(node_id: String, input_id: String)

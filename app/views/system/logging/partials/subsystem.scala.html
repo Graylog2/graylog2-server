@@ -1,21 +1,37 @@
-@(nodeId: String, subsystem: String, level: String, description: String)
+@(nodeId: String, name: String, subsystem: String, description: String, info: InternalLoggerSubsystem)
 
 <div class="subsystem span6">
     <h3 class="u-light">
-        Subsystem: @subsystem
-
+        Subsystem: @name
         <div class="btn-group pull-right">
             <a class="btn btn-mini dropdown-toggle" data-toggle="dropdown" href="#">
-                @level
+                @info.getLevel.capitalize
                 <span class="caret"></span>
             </a>
             <ul class="dropdown-menu">
-                <li><a href="#">Fatal</a></li>
-                <li><a href="#">Error</a></li>
-                <li><a href="#">Warn</a></li>
-                <li><a href="#">Info</a></li>
-                <li><a href="#">Debug</a></li>
-                <li><a href="#">Trace</a></li>
+                <li @if(info.getLevel.equals("fatal")) { class="active" }>
+                    <a href="@routes.LoggingController.setSubsystemLevel(nodeId, subsystem, "fatal")">Fatal</a>
+                </li>
+
+                <li @if(info.getLevel.equals("error")) { class="active" }>
+                    <a href="@routes.LoggingController.setSubsystemLevel(nodeId, subsystem, "error")">Error</a>
+                </li>
+
+                <li @if(info.getLevel.equals("warn")) { class="active" }>
+                    <a href="@routes.LoggingController.setSubsystemLevel(nodeId, subsystem, "warn")">Warn</a>
+                </li>
+
+                <li @if(info.getLevel.equals("info")) { class="active" }>
+                    <a href="@routes.LoggingController.setSubsystemLevel(nodeId, subsystem, "info")">Info</a>
+                </li>
+
+                <li @if(info.getLevel.equals("debug")) { class="active" }>
+                    <a href="@routes.LoggingController.setSubsystemLevel(nodeId, subsystem, "debug")">Debug</a>
+                </li>
+
+                <li @if(info.getLevel.equals("trace")) { class="active" }>
+                    <a href="@routes.LoggingController.setSubsystemLevel(nodeId, subsystem, "trace")">Trace</a>
+                </li>
             </ul>
         </div>
     </h3>

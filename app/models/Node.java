@@ -33,6 +33,8 @@ import models.api.responses.cluster.NodeSummaryResponse;
 import models.api.responses.SystemOverviewResponse;
 import models.api.responses.metrics.MetricsListResponse;
 import models.api.responses.system.*;
+import models.api.responses.system.loggers.LoggerSubsystemSummary;
+import models.api.responses.system.loggers.LoggerSubsystemsResponse;
 import models.api.responses.system.loggers.LoggerSummary;
 import models.api.responses.system.loggers.LoggersResponse;
 import org.joda.time.DateTime;
@@ -122,6 +124,29 @@ public class Node extends ClusterEntity {
         return null;
     }
 
+    public Map<String, InternalLoggerSubsystem> allLoggerSubsystems() {
+        Map<String, InternalLoggerSubsystem> subsystems = Maps.newHashMap();
+        try {
+            LoggerSubsystemsResponse response = api.get(LoggerSubsystemsResponse.class)
+                    .node(this)
+                    .path("/system/loggers/subsystems")
+                    .execute();
+
+            for (Map.Entry<String, LoggerSubsystemSummary> ss : response.subsystems.entrySet()) {
+                subsystems.put(ss.getKey(), new InternalLoggerSubsystem(
+                        ss.getValue().title,
+                        ss.getValue().level,
+                        ss.getValue().levelSyslog
+                ));
+            }
+        } catch (APIException e) {
+            log.error("Unable to load subsystems for node " + this, e);
+        } catch (IOException e) {
+            log.error("Unable to load subsystems for node " + this, e);
+        }
+        return subsystems;
+    }
+
     public List<InternalLogger> allLoggers() {
         List<InternalLogger> loggers = Lists.newArrayList();
         try {
@@ -139,6 +164,12 @@ public class Node extends ClusterEntity {
             log.error("Unable to load loggers for node " + this, e);
         }
         return loggers;
+    }
+
+    public void setSubsystemLoggerLevel(String subsystem, String level) throws APIException, IOException {
+        api.put().node(this)
+                .path("/system/loggers/subsystems/{0}/level/{1}", subsystem, level)
+                .execute();
     }
 
     public String getThreadDump() throws IOException, APIException {
@@ -326,6 +357,10 @@ public class Node extends ClusterEntity {
                 .execute();
 
         return response.getMetrics();
+    }
+
+    public Metric getSingleMetric(String metricName) throws APIException, IOException {
+        return getMetrics(metricName).get(metricName);
     }
 
     public void pause() throws IOException, APIException {

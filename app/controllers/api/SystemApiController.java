@@ -25,6 +25,8 @@ import com.google.inject.Inject;
 import controllers.AuthenticatedController;
 import lib.APIException;
 import lib.ApiClient;
+import lib.metrics.Meter;
+import lib.metrics.Metric;
 import models.*;
 import play.libs.F;
 import play.mvc.Http;
@@ -184,6 +186,60 @@ public class SystemApiController extends AuthenticatedController {
             return internalServerError("api exception " + e);
         } catch (NodeService.NodeNotFoundException e) {
             return status(404, "node not found");
+        }
+    }
+
+    public Result internalLogsOfNode(String nodeId) {
+        try {
+            Map<String, Object> result = Maps.newHashMap();
+            Node node = nodeService.loadNode(nodeId);
+            Meter meter = (Meter) node.getSingleMetric("org.apache.log4j.Appender.all");
+            result.put("total", meter.getTotal());
+
+            return ok(new Gson().toJson(result)).as("application/json");
+        } catch (NodeService.NodeNotFoundException e) {
+            return status(404, "node not found");
+        } catch (IOException e) {
+            return internalServerError("io exception");
+        } catch (APIException e) {
+            return internalServerError("api exception " + e);
+        }
+    }
+
+    public Result internalLogMetricsOfNode(String nodeId) {
+        try {
+            Map<String, Object> result = Maps.newHashMap();
+            Node node = nodeService.loadNode(nodeId);
+
+            String[] levels = new String[]{
+                    "org.apache.log4j.Appender.debug",
+                    "org.apache.log4j.Appender.error",
+                    "org.apache.log4j.Appender.fatal",
+                    "org.apache.log4j.Appender.info",
+                    "org.apache.log4j.Appender.trace",
+                    "org.apache.log4j.Appender.warn"
+            };
+
+            for (String level : levels) {
+                String shortName = level.substring(level.lastIndexOf(".")+1);
+                Map<String, Object> meterMap = Maps.newHashMap();
+
+                Meter meter = (Meter) node.getSingleMetric(level);
+
+                meterMap.put("total", meter.getTotal());
+                meterMap.put("mean_rate", meter.getMeanFormatted());
+                meterMap.put("one_min_rate", meter.getOneMinuteFormatted());
+
+                result.put(shortName, meterMap);
+            }
+
+            return ok(new Gson().toJson(result)).as("application/json");
+        } catch (NodeService.NodeNotFoundException e) {
+            return status(404, "node not found");
+        } catch (IOException e) {
+            return internalServerError("io exception");
+        } catch (APIException e) {
+            return internalServerError("api exception " + e);
         }
     }
 

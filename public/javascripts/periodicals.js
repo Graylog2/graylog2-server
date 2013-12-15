@@ -225,4 +225,60 @@ $(document).ready(function() {
         });
     })();
 
+    // Total log message counts of a node;
+    (function updateTotalLogs() {
+        if ($(".total-logs").length > 0) {
+            var interval = 1000;
+
+            if(!focussed) {
+                setTimeout(updateTotalLogs, interval);
+                return;
+            }
+
+            $(".total-logs").each(function() {
+                var nodeId = $(this).attr("data-node-id");
+
+                var logs = $(this);
+                $.ajax({
+                    url: '/a/system/internallogs/' + encodeURIComponent(nodeId),
+                    success: function(data) {
+                        logs.animatedIntChange(data.total, 500);
+                    }
+                });
+
+            }).promise().done(function(){ setTimeout(updateTotalLogs, interval); });
+        }
+    })();
+
+    // Total log level metrics of a node;
+    (function updateLogLevelMetrics() {
+        if ($(".loglevel-metrics").length > 0) {
+            var interval = 1000;
+
+            if(!focussed) {
+                setTimeout(updateLogLevelMetrics, interval);
+                return;
+            }
+
+            $(".loglevel-metrics:visible").each(function() {
+                var nodeId = $(this).attr("data-node-id");
+
+                var theseMetrics = $(this);
+                $.ajax({
+                    url: '/a/system/internallogs/' + encodeURIComponent(nodeId) + '/metrics',
+                    success: function(data) {
+                        for (var level in data) {
+                            var metrics = data[level];
+                            var list = $("dl.loglevel-metrics-list[data-level=" + level + "]", theseMetrics);
+                            $(".loglevel-metric-total", list).animatedIntChange(metrics.total, 500);
+                            $(".loglevel-metric-mean", list).animatedIntChange(metrics.mean_rate, 500);
+                            $(".loglevel-metric-1min", list).animatedIntChange(metrics.one_min_rate, 500);
+                        }
+                    }
+                });
+
+            }).promise().done(function(){ setTimeout(updateLogLevelMetrics, interval); });
+        }
+    })();
+
 });
