@@ -74,19 +74,32 @@ public class LoggersResource extends RestResource {
 
     @GET @Timed
     @Path("/subsystems")
-    @ApiOperation(value = "List all logger subsystems")
+    @ApiOperation(value = "List all logger subsystems and their current levels")
     @Produces(MediaType.APPLICATION_JSON)
     public String subsytems() {
         Map<String, Object> result = Maps.newHashMap();
+        Map<String, Object> subsystems = Maps.newHashMap();
 
         for(Map.Entry<String, Subsystem> subsystem : SUBSYSTEMS.entrySet()) {
-            Map<String, Object> info = Maps.newHashMap();
-            info.put("title", subsystem.getValue().getTitle());
-            info.put("category", subsystem.getValue().getCategory());
-            info.put("description", subsystem.getValue().getDescription());
+            try {
+                Map<String, Object> info = Maps.newHashMap();
+                info.put("title", subsystem.getValue().getTitle());
+                info.put("category", subsystem.getValue().getCategory());
+                info.put("description", subsystem.getValue().getDescription());
 
-            result.put(subsystem.getKey(), info);
+                // Get level.
+                Level effectiveLevel = Logger.getLogger(subsystem.getValue().getCategory()).getEffectiveLevel();
+                info.put("level", effectiveLevel.toString().toLowerCase());
+                info.put("level_syslog", effectiveLevel.getSyslogEquivalent());
+
+                subsystems.put(subsystem.getKey(), info);
+            } catch(Exception e) {
+                LOG.error("Error while listing logger subsystem.", e);
+                continue;
+            }
         }
+
+        result.put("subsystems", subsystems);
 
         return json(result);
     }
