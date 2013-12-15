@@ -106,9 +106,8 @@ public class Indexer {
         try {
             client.admin().cluster().health(new ClusterHealthRequest().waitForYellowStatus()).actionGet(5, TimeUnit.SECONDS);
         } catch(ElasticSearchTimeoutException e) {
-            UI.exitHardWithWall("No ElasticSearch master was found.", new String[]{ "graylog2-server/connecting-to-an-elasticsearch-cluster" });
+            UI.exitHardWithWall("No ElasticSearch master was found.", new String[]{ "graylog2-server/configuring-and-tuning-elasticsearch-for-graylog2-v0200" });
         }
-
 
         Runtime.getRuntime().addShutdownHook(new Thread() {
             @Override
