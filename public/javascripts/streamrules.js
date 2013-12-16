@@ -73,7 +73,6 @@ $(document).ready(function() {
     })
 
     $(document.body).on("click", "button.streamrule-form-submit", function(e) {
-        console.log($(this));
         var form = $(this).closest("form#streamrule-form");
         var streamId = form.attr("data-stream-id");
         var streamRuleId = form.attr("data-streamrule-id");
@@ -93,7 +92,7 @@ $(document).ready(function() {
         if (streamId != undefined) {
             url = '/streams/' + streamId + '/rules';
             callback = function(data) {
-                container.find("ul").append(data);
+                container.find("ul.streamrules-list").append(data);
                 container.find("li#stream-rules-placeholder").hide();
             }
         }
