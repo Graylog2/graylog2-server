@@ -19,16 +19,24 @@
  */
 package org.graylog2.savedsearches;
 
+import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
+import com.mongodb.BasicDBList;
+import com.mongodb.BasicDBObject;
+import com.mongodb.DBObject;
 import org.bson.types.ObjectId;
 import org.graylog2.Core;
+import org.graylog2.database.NotFoundException;
 import org.graylog2.database.Persisted;
 import org.graylog2.database.validators.DateValidator;
 import org.graylog2.database.validators.FilledStringValidator;
 import org.graylog2.database.validators.MapValidator;
 import org.graylog2.database.validators.Validator;
+import org.graylog2.plugin.Tools;
+import org.joda.time.DateTime;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -51,6 +59,27 @@ public class SavedSearch extends Persisted {
         return COLLECTION;
     }
 
+    public static List<SavedSearch> all(Core core) {
+        List<SavedSearch> searches = Lists.newArrayList();
+
+        List<DBObject> results = query(new BasicDBObject(), core, COLLECTION);
+        for (DBObject o : results) {
+            searches.add(new SavedSearch((ObjectId) o.get("_id"), o.toMap(), core));
+        }
+
+        return searches;
+    }
+
+    public static SavedSearch load(ObjectId id, Core core) throws NotFoundException {
+        BasicDBObject o = (BasicDBObject) get(id, core, COLLECTION);
+
+        if (o == null) {
+            throw new NotFoundException();
+        }
+
+        return new SavedSearch((ObjectId) o.get("_id"), o.toMap(), core);
+    }
+
     @Override
     protected Map<String, Validator> getValidations() {
         return new HashMap<String, Validator>() {{
@@ -64,5 +93,15 @@ public class SavedSearch extends Persisted {
     @Override
     protected Map<String, Validator> getEmbeddedValidations(String key) {
         return Maps.newHashMap();
+    }
+
+    public Map<String, Object> asMap() {
+        return new HashMap() {{
+            put("id", ((ObjectId) fields.get("_id")).toStringMongod());
+            put("title", fields.get("title"));
+            put("query", fields.get("query"));
+            put("created_at", (Tools.getISO8601String((DateTime) fields.get("created_at"))));
+            put("creator_user_id", fields.get("creator_user_id"));
+        }};
     }
 }

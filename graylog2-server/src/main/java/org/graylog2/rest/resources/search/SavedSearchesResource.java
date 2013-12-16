@@ -20,13 +20,12 @@
 package org.graylog2.rest.resources.search;
 
 import com.codahale.metrics.annotation.Timed;
+import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import org.bson.types.ObjectId;
 import org.graylog2.Core;
-import org.graylog2.database.ValidationException;
-import org.graylog2.rest.documentation.annotations.Api;
-import org.graylog2.rest.documentation.annotations.ApiOperation;
-import org.graylog2.rest.documentation.annotations.ApiParam;
+import org.graylog2.database.*;
+import org.graylog2.rest.documentation.annotations.*;
 import org.graylog2.rest.resources.search.requests.CreateSavedSearchRequest;
 import org.graylog2.rest.resources.streams.requests.CreateRequest;
 import org.graylog2.savedsearches.SavedSearch;
@@ -42,6 +41,7 @@ import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.io.IOException;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -91,6 +91,44 @@ public class SavedSearchesResource extends SearchResource {
         result.put("search_id", id.toStringMongod());
 
         return Response.status(Response.Status.CREATED).entity(json(result)).build();
+    }
+
+    @GET @Timed
+    @ApiOperation(value = "Get a list of all saved searches")
+    @Produces(MediaType.APPLICATION_JSON)
+    public String list() {
+        List<Map<String, Object>> searches = Lists.newArrayList();
+        for (SavedSearch search : SavedSearch.all(core)) {
+            searches.add(search.asMap());
+        }
+
+        Map<String, Object> result = Maps.newHashMap();
+        result.put("total", searches.size());
+        result.put("searches", searches);
+
+        return json(result);
+    }
+
+    @DELETE @Path("/{searchId}") @Timed
+    @ApiOperation(value = "Delete a saved search")
+    @ApiResponses(value = {
+            @ApiResponse(code = 404, message = "Saved search not found."),
+            @ApiResponse(code = 400, message = "Invalid ObjectId.")
+    })
+    public Response delete(@ApiParam(title = "searchId", required = true) @PathParam("searchId") String searchId) {
+        if (searchId == null || searchId.isEmpty()) {
+            LOG.error("Missing searchId. Returning HTTP 400.");
+            throw new WebApplicationException(400);
+        }
+
+        try {
+            SavedSearch search = SavedSearch.load(loadObjectId(searchId), core);
+            search.destroy();
+        } catch (org.graylog2.database.NotFoundException e) {
+            throw new WebApplicationException(404);
+        }
+
+        return Response.status(Response.Status.fromStatusCode(204)).build();
     }
 
 }
