@@ -269,7 +269,7 @@ public class Node extends ClusterEntity {
     // TODO nodes should not have state beyond their activity status
     public synchronized void loadSystemInformation() {
         try {
-            systemInfo = api.get(SystemOverviewResponse.class).path("/system").node(this).execute();
+            this.systemInfo = api.get(SystemOverviewResponse.class).path("/system").node(this).execute();
         } catch (APIException e) {
             log.error("Unable to load system information for node " + this, e);
         } catch (IOException e) {
@@ -321,7 +321,7 @@ public class Node extends ClusterEntity {
 
     public boolean isProcessing() {
         requireSystemInfo();
-        return systemInfo.isProcessing;
+        return this.systemInfo.isProcessing;
     }
 
     public String getVersion() {
@@ -498,13 +498,9 @@ public class Node extends ClusterEntity {
     }
 
     public void requireSystemInfo() {
-        if (systemInfo == null) {
-            loadSystemInformation();
-        }
+        loadSystemInformation();
     }
     public void requireJVMInfo() {
-        if (jvmInfo == null) {
-            loadJVMInformation();
-        }
+        loadJVMInformation();
     }
 }
