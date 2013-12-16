@@ -304,12 +304,6 @@ $(document).ready(function() {
        return false;
     });
 
-    // Show fine-grained log level controls.
-    $(".trigger-fine-log-level-controls").on("click", function(e) {
-        e.preventDefault();
-        $(".fine-log-level-controls[data-node-id='" + $(this).attr("data-node-id") + "']").toggle();
-    });
-
     // Show log level metrics.
     $(".trigger-log-level-metrics").on("click", function(e) {
         e.preventDefault();
@@ -359,13 +353,6 @@ $(document).ready(function() {
             $(".icon", this).addClass("icon-caret-up");
             $("span", this).text("Hide rules");
         }
-    });
-
-    // Check all fine-grained node log level checkboxes.
-    $(".fine-log-level-controls .select-all").on("click", function() {
-        var checkboxes = $(".fine-log-level-controls[data-node-id='" + $(this).attr("data-node-id") + "'] input[type=checkbox]");
-        // The checkbox is already changed when this event is fired so we do not need to invert the condition.
-        checkboxes.prop("checked", checkboxes.prop("checked"));
     });
 
     // Create a search on the fly.

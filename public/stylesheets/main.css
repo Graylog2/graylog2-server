@@ -789,28 +789,6 @@ form #stream-rules {
     font-weight: bold;
 }
 
-.fine-log-level-controls dl {
-    margin-bottom: 0px;
-    margin-top: 5px;
-    margin-left: 10px;
-}
-
-.fine-log-level-controls dt {
-    float: left;
-    margin-right: 15px;
-}
-
-.fine-log-level-controls label {
-    margin-bottom: 0px;
-    font-size: 12px;
-}
-
-.fine-log-level-controls input {
-    position: relative;
-    top: -3px;
-    margin-right: 2px;
-}
-
 .master-node {
     color: #f89406;
 }

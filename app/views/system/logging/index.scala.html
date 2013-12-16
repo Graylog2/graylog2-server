@@ -14,14 +14,9 @@
     @for((node, nodeLoggers) <- loggers) {
         <div class="row-fluid log-writing-node node-row">
             <div class="pull-right">
-                <a href="#" class="btn btn-mini btn-primary trigger-log-level-metrics" data-node-id="@node.getNodeId">
+                <a href="#" class="btn btn-mini trigger-log-level-metrics" data-node-id="@node.getNodeId">
                     <i class="icon icon-dashboard"></i>
                     Metrics
-                </a>
-
-                <a href="#" class="btn btn-mini btn-primary trigger-fine-log-level-controls" data-node-id="@node.getNodeId">
-                    <i class="icon icon-sort-by-alphabet"></i>
-                    Log level control
                 </a>
             </div>
 
@@ -85,28 +80,6 @@
                         @views.html.system.logging.partials.loglevel_metrics("trace")
                     </div>
                 </div>
-            </div>
-
-            <div class="fine-log-level-controls" style="display: none;" data-node-id="@node.getNodeId">
-                <dl>
-                    <dt>
-                        <label>
-                            <input type="checkbox" class="select-all" data-node-id="@node.getNodeId"/>
-                            Select all
-                        </label>
-                    </dt>
-                    <dd>&nbsp;</dd>
-
-                    @for(logger <- nodeLoggers.sortBy(_.getTitle)) {
-                        <dt>
-                            <label>
-                                <input type="checkbox" value="@logger.getTitle" data-node-id="@node.getNodeId" />
-                                @logger.getLevel.toUpperCase
-                            </label>
-                        </dt>
-                        <dd>@logger.getTitle</dd>
-                    }
-                </dl>
             </div>
         </div>
     }
