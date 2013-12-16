@@ -54,6 +54,7 @@ public class SearchTest extends BaseSeleniumTest {
 
     @BeforeClass
     public static void setupTest() {
+        skipOnTravis();
         try {
             client.admin().cluster().health(new ClusterHealthRequest().waitForYellowStatus()).actionGet(5, TimeUnit.SECONDS);
             // remove all messages we might have sent

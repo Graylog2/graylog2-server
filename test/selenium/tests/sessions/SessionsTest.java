@@ -20,6 +20,7 @@
 package selenium.tests.sessions;
 
 import org.fluentlenium.core.annotation.Page;
+import org.junit.BeforeClass;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -38,6 +39,11 @@ public class SessionsTest extends BaseSeleniumTest {
 
     @Page
     public LoginPage loginPage;
+
+    @BeforeClass
+    public static void setup() {
+        skipOnTravis();
+    }
 
     @Test
     public void login() {

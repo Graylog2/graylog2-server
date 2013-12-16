@@ -40,6 +40,7 @@ import org.jboss.netty.channel.ChannelFuture;
 import org.jboss.netty.channel.ChannelFutureListener;
 import org.jboss.netty.channel.socket.nio.NioClientSocketChannelFactory;
 import org.jboss.netty.handler.codec.frame.Delimiters;
+import org.junit.Assume;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.firefox.FirefoxDriver;
 import org.openqa.selenium.remote.DesiredCapabilities;
@@ -65,6 +66,10 @@ public class BaseSeleniumTest extends FluentTest {
 
     private static Client client;
     private ApiClient api;
+
+    protected static void skipOnTravis() {
+        Assume.assumeTrue("Skipping on Travis CI because of race condition on build machines", System.getenv("TRAVIS") == null);
+    }
 
     @Override
     public String getDefaultBaseUrl() {
