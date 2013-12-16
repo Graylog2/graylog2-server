@@ -90,7 +90,7 @@ POST        /systemjobs/trigger                                                 
 
 # Logging
 GET         /system/logging                                                          @controllers.LoggingController.index()
-GET         /system/logging/node/:node_id/subsystem/:subsystem/:level                @controllers.LoggingController.setSubsystemLevel(node_id: String, subsystem: String, level: String)
+PUT         /system/logging/node/:node_id/subsystem/:subsystem/:level                @controllers.LoggingController.setSubsystemLevel(node_id: String, subsystem: String, level: String)
 
 # Dashboards
 GET         /dashboards                                                              @controllers.DashboardsController.index()

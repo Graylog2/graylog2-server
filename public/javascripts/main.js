@@ -316,6 +316,32 @@ $(document).ready(function() {
         $(".loglevel-metrics[data-node-id='" + $(this).attr("data-node-id") + "']").toggle();
     });
 
+    // Change subsystem log level.
+    $(".subsystem .dropdown-menu a[data-level]").on("click", function(e) {
+        e.preventDefault();
+
+        var newLevel = $(this).attr("data-level");
+        var subsystem = $(this).closest(".subsystem").attr("data-subsystem");
+        var nodeId = $(this).closest(".subsystem").attr("data-node-id");
+
+        var link = $(this);
+        var dropdown = $(this).closest("ul.dropdown-menu");
+
+        $.ajax({
+            url: '/system/logging/node/' + encodeURIComponent(nodeId) + '/subsystem/' + encodeURIComponent(subsystem) + '/' + encodeURIComponent(newLevel) + '',
+            type: "PUT",
+            success: function(data) {
+                $("li", dropdown).removeClass("active");
+                link.closest("li").addClass("active");
+                $(".dropdown-toggle .loglevel-title", link.closest(".subsystem")).text(newLevel.capitalize());
+                showSuccess("Log level of subsystem changed.");
+            },
+            error: function() {
+                showError("Could not change log level of subsystem.");
+            }
+        });
+    });
+
     // Show configured stream rules in streams list.
     $(".stream-row .trigger-stream-rules").on("click", function(e) {
         e.preventDefault();
@@ -651,6 +677,10 @@ function showSuccess(message) {
 String.prototype.splice = function( idx, rem, s ) {
     return (this.slice(0,idx) + s + this.slice(idx + Math.abs(rem)));
 };
+
+String.prototype.capitalize = function() {
+    return this.charAt(0).toUpperCase() + this.slice(1);
+}
 
 function htmlEscape(x) {
     return $('<div/>').text(x).html();
