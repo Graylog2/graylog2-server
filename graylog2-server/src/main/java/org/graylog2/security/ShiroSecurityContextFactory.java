@@ -61,6 +61,7 @@ public class ShiroSecurityContextFactory implements SecurityContextFactory {
 
         final PasswordAuthenticator passwordAuthenticator = new PasswordAuthenticator(core);
         passwordAuthenticator.setCachingEnabled(false);
+        passwordAuthenticator.setCredentialsMatcher(new HashedCredentialsMatcher("SHA-1"));
         final MongoDbAuthorizationRealm mongoDbAuthorizationRealm = new MongoDbAuthorizationRealm(core);
         mongoDbAuthorizationRealm.setCachingEnabled(false);
 
