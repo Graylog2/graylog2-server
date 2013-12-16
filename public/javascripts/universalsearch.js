@@ -54,6 +54,59 @@ $(document).ready(function() {
         captureLength: 0
     });
 
+    // Save a search: Open save dialog.
+    $(".save-search").on("click", function(e) {
+        e.preventDefault();
+
+        $(this).hide();
+        $(".save-search-form").show();
+    });
+
+    // Save a search: Ask for title and actually trigger saving.
+    $(".save-search-form button.do-save").on("click", function(e) {
+        e.preventDefault();
+
+        var input = $("#save-search-title");
+        var button = $(this);
+        var title = input.val();
+
+        button.prop("disabled", true);
+        input.prop("disabled", true);
+
+        button.html("<i class='icon icon-spin icon-spinner'></i>&nbsp; Saving");
+
+        var params = {};
+        params.query = originalUniversalSearchSettings();
+        params.title = title
+
+        $.ajax({
+            url: '/savedsearches/create',
+            type: 'POST',
+            data: {
+                "params": JSON.stringify(params)
+            },
+            success: function(data) {
+                button.html("<i class='icon icon-ok'></i>&nbsp; Saved");
+            },
+            error: function(data) {
+                button.html("<i class='icon icon-warning-sign'></i>&nbsp; Failed");
+                button.switchClass("btn-success", "btn-danger");
+                showError("Could not save search.")
+            }
+        });
+
+    });
+
+    // Enable save button when text is entered.
+    $("#save-search-title").on("keyup", function(e) {
+        var button = $(".save-search-form button.do-save");
+        if($(this).val() != undefined && $(this).val().trim() != "") {
+            button.prop("disabled", false);
+        } else {
+            button.prop("disabled", true);
+        }
+    });
+
 });
 
 function activateTimerangeChooser(selectorName, link) {

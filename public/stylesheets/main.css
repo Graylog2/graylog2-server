@@ -1540,3 +1540,10 @@ dl.sample-message-fields {
     margin-left: 5px;
     margin-right: 5px;
 }
+
+input#save-search-title {
+    padding: 1px;
+    padding-left: 5px;
+    font-size: 12px;
+    padding-top: 3px;
+}

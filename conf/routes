@@ -62,6 +62,9 @@ GET         /system/indices/:index/close                                        
 GET         /system/indices/:index/reopen                                            @controllers.IndicesController.reopenIndex(index: String)
 GET         /system/indices/:index/delete                                            @controllers.IndicesController.deleteIndex(index: String)
 
+# Saved searches
+POST        /savedsearches/create                                                    @controllers.api.SavedSearchesApiController.create()
+
 # Extractors
 GET         /system/inputs/:node_id/:input_id/extractors                             @controllers.ExtractorsController.manage(node_id: String, input_id: String)
 GET         /system/inputs/:node_id/:input_id/extractors/new                         @controllers.ExtractorsController.newExtractor(node_id: String, input_id: String, extractor_type ?= "", field ?= "", example ?= "")

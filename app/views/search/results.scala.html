@@ -50,13 +50,25 @@
             <li><a href="@search.getCsvRoute(request())">Download as CSV</a></li>
         </ul>
     </div>
+
+    <a href="#" class="btn btn-small btn-success save-search" title="Save this search so you can execute it at any time with just a click.">
+        Save search
+    </a>
+
+    <div class="save-search-form input-append" style="display: none;">
+        <input type="text" placeholder="Give the search a title" id="save-search-title" />
+        <button class="btn btn-small btn-success do-save" disabled="true">
+            <i class="icon icon-save"></i>&nbsp;
+            Save
+        </button>
+    </div>
 </div>
 
 <h1>
     @if(stream == null) {
         <i class="icon-search"></i> Search results
     } else {
-        <i class="icon-barcode"></i> Stream "@stream.getTitle"
+        <i class="icon-barcode"></i> Stream &laquo;@stream.getTitle&raquo;
     }
 </h1>
 
