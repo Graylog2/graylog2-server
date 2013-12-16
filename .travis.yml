@@ -5,7 +5,7 @@ jdk:
 - openjdk7
 env:
   global:
-  - PLAY_VERSION=2.2.0
+  - PLAY_VERSION=2.2.2-RC1
   - secure: |-
       x85VA9iP+/ZkBaWiupbGeJBDM4MBTp98yBVnWIe+vbWMj07zmvrIfM6rsdgT
       hZ1uBgEzGfpZ/vnU8CQN6KYXmyG2Vy4j2RlOhHf7aChNh38VzCq+97gXmLCR
