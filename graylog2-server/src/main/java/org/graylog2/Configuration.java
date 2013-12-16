@@ -196,6 +196,9 @@ public class Configuration {
     @Parameter(value = "root_password_sha2", required = true)
     private String rootPasswordSha2;
 
+    @Parameter(value = "allow_leading_wildcard_searches", required = false)
+    private boolean allowLeadingWildcardSearches = false;
+
     /* Elasticsearch defaults */
     @Parameter(value = "elasticsearch_cluster_name", required = true)
     private String esClusterName = "graylog2";
@@ -509,4 +512,7 @@ public class Configuration {
         return retentionStrategy;
     }
 
+    public boolean isAllowLeadingWildcardSearches() {
+        return allowLeadingWildcardSearches;
+    }
 }

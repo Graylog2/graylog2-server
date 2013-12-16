@@ -181,7 +181,7 @@ public class Searches {
 				.interval(interval.toString().toLowerCase());
 
         QueryStringQueryBuilder qs = queryString(query);
-        qs.allowLeadingWildcard(false);
+        qs.allowLeadingWildcard(server.getConfiguration().isAllowLeadingWildcardSearches());
 
         SearchRequestBuilder srb = c.prepareSearch();
 		srb.setIndices(IndexHelper.determineAffectedIndices(server, range).toArray(new String[]{}));
