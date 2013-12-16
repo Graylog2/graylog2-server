@@ -115,8 +115,6 @@ public class UsersController extends AuthenticatedController {
                     DateTools.getGroupedTimezoneIds().asMap(),
                     bc));
         }
-        // hash it before sending it across
-        request.password = new SimpleHash("SHA-256", request.password).toString();
         // TODO PREVIEW: remove hardcoded permissions once the permission editor is ready
         request.permissions = Lists.newArrayList("*");
         userService.create(request);
