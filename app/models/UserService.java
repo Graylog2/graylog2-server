@@ -26,6 +26,8 @@ import lib.security.Graylog2ServerUnavailableException;
 import models.api.requests.CreateUserRequest;
 import models.api.responses.system.UserResponse;
 import models.api.responses.system.UsersListResponse;
+import org.apache.shiro.subject.SimplePrincipalCollection;
+import org.apache.shiro.subject.Subject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import play.libs.Crypto;
@@ -150,6 +152,10 @@ public class UserService {
                     .execute();
 
             User currentUser = userFactory.fromResponse(response, sessionId);
+            currentUser.setSubject(new Subject.Builder()
+                    .principals(new SimplePrincipalCollection(currentUser.getName(), "REST session realm"))
+                    .authenticated(true)
+                    .buildSubject());
             setCurrent(currentUser);
             return currentUser;
         } catch (IOException e) {

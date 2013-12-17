@@ -1,6 +1,8 @@
 @(form: Form[models.api.requests.ChangeUserRequest],
         username: String,
         currentUser: User,
+        user: User,
+        requiresOldPassword: Boolean,
         permissions: List[String],
         selectedPermissions: Set[String],
         timezones: Map[String, Collection[String]],
@@ -73,14 +75,16 @@
             </form>
         </div>
         <div class="span6">
-            @if(!currentUser.isExternal) {
+            @if(!user.isExternal) {
                 <form class="form-horizontal" action="@routes.UsersController.changePassword(username)" method="POST">
+                    @if(requiresOldPassword) {
                     <div class="control-group">
                         <label class="control-label" for="old-password">Old Password</label>
                         <div class="controls">
                             <input type="password" id="old-password" name="old_password" required />
                         </div>
                     </div>
+                    }
                     <div class="control-group">
                         <label class="control-label" for="password">New Password</label>
                         <div class="controls">

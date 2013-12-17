@@ -26,6 +26,7 @@ import lib.ApiClient;
 import models.api.requests.ChangePasswordRequest;
 import models.api.requests.ChangeUserRequest;
 import models.api.responses.system.UserResponse;
+import org.apache.shiro.subject.Subject;
 import org.joda.time.DateTimeZone;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -49,6 +50,7 @@ public class User {
     private final DateTimeZone timezone;
     private final boolean readonly;
     private final boolean external;
+    private Subject subject;
 
     @AssistedInject
     public User(ApiClient api, @Assisted UserResponse ur, @Nullable @Assisted String sessionId) {
@@ -141,6 +143,14 @@ public class User {
 
     public boolean isExternal() {
         return external;
+    }
+
+    public void setSubject(Subject subject) {
+        this.subject = subject;
+    }
+
+    public Subject getSubject() {
+        return subject;
     }
 
     public interface Factory {

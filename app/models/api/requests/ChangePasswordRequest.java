@@ -24,7 +24,6 @@ import static play.data.validation.Constraints.Required;
 
 public class ChangePasswordRequest extends ApiRequest {
 
-    @Required
     @SerializedName("old_password")
     public String old_password;
 
