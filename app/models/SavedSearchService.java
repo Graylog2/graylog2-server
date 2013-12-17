@@ -19,12 +19,16 @@
  */
 package models;
 
+import com.google.common.collect.Lists;
 import com.google.inject.Inject;
 import lib.APIException;
 import lib.ApiClient;
 import models.api.requests.searches.CreateSavedSearchRequest;
+import models.api.responses.searches.SavedSearchSummaryResponse;
+import models.api.responses.searches.SavedSearchesResponse;
 
 import java.io.IOException;
+import java.util.List;
 
 /**
  * @author Lennart Koopmann <lennart@torch.sh>
@@ -45,6 +49,18 @@ public class SavedSearchService {
                 .body(cssr)
                 .expect(201)
                 .execute();
+    }
+
+    public List<SavedSearch> all() throws APIException, IOException {
+        List<SavedSearch> list = Lists.newArrayList();
+
+        SavedSearchesResponse response = api.get(SavedSearchesResponse.class).path("/search/saved").execute();
+
+        for (SavedSearchSummaryResponse search : response.searches) {
+            list.add(savedSearchFactory.fromSummaryResponse(search));
+        }
+
+        return list;
     }
 
 }

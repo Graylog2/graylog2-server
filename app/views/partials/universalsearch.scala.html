@@ -30,7 +30,7 @@
             * Lennart, September 25th 2013 (never forget)                  *
             ***************************************************************@
 
-            <div class="timerange-selector-container">
+            <div class="timerange-selector-container" style="float: left;">
                 <div class="btn-group timerange-chooser">
                     <a class="btn btn-info dropdown-toggle" data-toggle="dropdown" href="#">
                         <i class="icon icon-time"></i>
@@ -43,18 +43,28 @@
                     </ul>
                 </div>
 
-                <div class="timerange-selector relative"  style="display: @if(request.getQueryString("rangetype") == null) { block } @if(request.getQueryString("rangetype") != null && request.getQueryString("rangetype").equals("relative")) { block } else { none };">
+                <div class="timerange-selector relative"  style="width: 270px; display: @if(request.getQueryString("rangetype") == null) { block } @if(request.getQueryString("rangetype") != null && request.getQueryString("rangetype").equals("relative")) { block } else { none };">
                     @partials.timerangeselectors.relative(request)
                 </div>
 
-                <div class="timerange-selector absolute" style="display: @if(request.getQueryString("rangetype") != null && request.getQueryString("rangetype").equals("absolute")) { block } else { none };">
+                <div class="timerange-selector absolute" style="width: 570px; display: @if(request.getQueryString("rangetype") != null && request.getQueryString("rangetype").equals("absolute")) { block } else { none };">
                     @partials.timerangeselectors.absolute()
                 </div>
 
-                <div class="timerange-selector keyword" style="display: @if(request.getQueryString("rangetype") != null && request.getQueryString("rangetype").equals("keyword")) { block } else { none };">
+                <div class="timerange-selector keyword" style="width: 270px; display: @if(request.getQueryString("rangetype") != null && request.getQueryString("rangetype").equals("keyword")) { block } else { none };">
                     @partials.timerangeselectors.keyword()
                 </div>
             </div>
+
+            <div class="saved-searches-selector-container">
+                <button class="btn" id="saved-searches-toggle">Saved searches</button>
+
+                <select id="saved-searches-selector" data-placeholder="Choose a search" style="display: none;">
+                    <option></option>
+                </select>
+            </div>
+
+            <br style="clear: both;" />
 
             <div class="pull-right search-help">
                 @views.html.partials.support.bubble.render("graylog2-web-interface/the-search-bar-explained")

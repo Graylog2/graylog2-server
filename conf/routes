@@ -63,6 +63,7 @@ GET         /system/indices/:index/reopen                                       
 GET         /system/indices/:index/delete                                            @controllers.IndicesController.deleteIndex(index: String)
 
 # Saved searches
+GET         /savedsearches                                                           @controllers.api.SavedSearchesApiController.list()
 POST        /savedsearches/create                                                    @controllers.api.SavedSearchesApiController.create()
 
 # Extractors

@@ -20,15 +20,20 @@
 package controllers.api;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
+import com.google.gson.Gson;
 import com.google.inject.Inject;
 import controllers.AuthenticatedController;
 import lib.APIException;
 import lib.ServerNodes;
+import models.SavedSearch;
 import models.SavedSearchService;
 import models.api.requests.searches.CreateSavedSearchRequest;
 import play.mvc.Result;
 
 import java.io.IOException;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -41,6 +46,26 @@ public class SavedSearchesApiController extends AuthenticatedController {
 
     @Inject
     private SavedSearchService savedSearchService;
+
+    public Result list() {
+        try {
+            List<Map<String, Object>> response = Lists.newArrayList();
+
+            for (SavedSearch s : savedSearchService.all()) {
+                Map<String, Object> search = Maps.newHashMap();
+                search.put("id", s.getId());
+                search.put("title", s.getTitle());
+
+                response.add(search);
+            }
+
+            return ok(new Gson().toJson(response)).as("application/json");
+        } catch (IOException e) {
+            return internalServerError("io exception");
+        } catch (APIException e) {
+            return internalServerError("api exception " + e);
+        }
+    }
 
     public Result create() {
         Map<String,String> params = flattenFormUrlEncoded(request().body().asFormUrlEncoded());

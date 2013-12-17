@@ -19,9 +19,13 @@
  */
 package models;
 
+import com.google.gson.annotations.SerializedName;
 import com.google.inject.assistedinject.Assisted;
 import com.google.inject.assistedinject.AssistedInject;
 import models.api.responses.searches.SavedSearchSummaryResponse;
+import org.joda.time.DateTime;
+
+import java.util.Map;
 
 /**
  * @author Lennart Koopmann <lennart@torch.sh>
@@ -32,9 +36,39 @@ public class SavedSearch {
         public SavedSearch fromSummaryResponse(SavedSearchSummaryResponse sssr);
     }
 
-    @AssistedInject
-    private SavedSearch(@Assisted SavedSearchSummaryResponse ssr) {
+    private String id;
+    private String title;
+    private Map<String, Object> query;
+    private DateTime createdAt;
+    private User creatorUserId;
 
+    @AssistedInject
+    private SavedSearch(UserService userService, @Assisted SavedSearchSummaryResponse ssr) {
+        this.id = ssr.id;
+        this.title = ssr.title;
+        this.query = ssr.query;
+        this.createdAt = new DateTime(ssr.createdAt);
+        this.creatorUserId = userService.load(ssr.creatorUserId);
+    }
+
+    public String getId() {
+        return id;
+    }
+
+    public String getTitle() {
+        return title;
+    }
+
+    public Map<String, Object> getQuery() {
+        return query;
+    }
+
+    public DateTime getCreatedAt() {
+        return createdAt;
+    }
+
+    public User getCreatorUserId() {
+        return creatorUserId;
     }
 
 }

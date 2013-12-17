@@ -107,6 +107,40 @@ $(document).ready(function() {
         }
     });
 
+    // Open saved searches selector.
+    $("#saved-searches-toggle").on("click", function(e) {
+        e.preventDefault();
+
+        $(this).hide();
+
+        $("#saved-searches-selector").show();
+        $("#saved-searches-selector").chosen({
+            disable_search_threshold: 3,
+            no_results_text: "No such search found:"
+        });
+    });
+
+    // Saved search selected. Get details and send to page that redirects to the actual search.
+    $("#saved-searches-selector").on("change", function(e) {
+        // Get
+        console.log($("#saved-searches-selector").val());
+    });
+
+    // Fill saved searches selector.
+    if ($("#saved-searches-selector").size() > 0) {
+        $.ajax({
+            url: '/savedsearches',
+            type: 'GET',
+            success: function(data) {
+                for (var i = 0; i < data.length; i++) {
+                    var search = data[i];
+                    var option = "<option value='" + htmlEscape(search.id) + "'>" + htmlEscape(search.title) + "</option>";
+                    $("#saved-searches-selector").append(option);
+                }
+            }
+        });
+    }
+
 });
 
 function activateTimerangeChooser(selectorName, link) {

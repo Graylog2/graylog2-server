@@ -1547,3 +1547,13 @@ input#save-search-title {
     font-size: 12px;
     padding-top: 3px;
 }
+
+#saved-searches-toggle {
+    padding: 4px 7px;
+    line-height: 15px;
+    font-size: 12px !important;
+}
+
+#saved_searches_selector_chosen {
+ font-family: "Helvetica Neue", Helvetica, Arial, sans-serif !important;
+}
