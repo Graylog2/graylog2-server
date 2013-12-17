@@ -63,4 +63,11 @@ public class SavedSearchService {
         return list;
     }
 
+    public SavedSearch get(String searchId) throws APIException, IOException {
+        SavedSearchSummaryResponse response = api.get(SavedSearchSummaryResponse.class)
+                .path("/search/saved/{0}", searchId)
+                .execute();
+
+        return savedSearchFactory.fromSummaryResponse(response);
+    }
 }

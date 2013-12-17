@@ -51,15 +51,13 @@
                     @partials.timerangeselectors.absolute()
                 </div>
 
-                <div class="timerange-selector keyword" style="width: 270px; display: @if(request.getQueryString("rangetype") != null && request.getQueryString("rangetype").equals("keyword")) { block } else { none };">
+                <div class="timerange-selector keyword" style="width: 353px; display: @if(request.getQueryString("rangetype") != null && request.getQueryString("rangetype").equals("keyword")) { block } else { none };">
                     @partials.timerangeselectors.keyword()
                 </div>
             </div>
 
             <div class="saved-searches-selector-container">
-                <button class="btn" id="saved-searches-toggle">Saved searches</button>
-
-                <select id="saved-searches-selector" data-placeholder="Choose a search" style="display: none;">
+                <select id="saved-searches-selector" data-placeholder="Choose a saved search" style="display: none;">
                     <option></option>
                 </select>
             </div>

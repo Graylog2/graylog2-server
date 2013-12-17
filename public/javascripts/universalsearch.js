@@ -107,23 +107,11 @@ $(document).ready(function() {
         }
     });
 
-    // Open saved searches selector.
-    $("#saved-searches-toggle").on("click", function(e) {
-        e.preventDefault();
-
-        $(this).hide();
-
-        $("#saved-searches-selector").show();
-        $("#saved-searches-selector").chosen({
-            disable_search_threshold: 3,
-            no_results_text: "No such search found:"
-        });
-    });
-
     // Saved search selected. Get details and send to page that redirects to the actual search.
     $("#saved-searches-selector").on("change", function(e) {
         // Get
-        console.log($("#saved-searches-selector").val());
+        var searchId = $("#saved-searches-selector").val();
+        window.location = "/savedsearches/" + encodeURI(searchId) + "/execute";
     });
 
     // Fill saved searches selector.
@@ -132,11 +120,29 @@ $(document).ready(function() {
             url: '/savedsearches',
             type: 'GET',
             success: function(data) {
-                for (var i = 0; i < data.length; i++) {
-                    var search = data[i];
+                // Convert to array for sorting.
+                var array = $.map(data, function(value, index) {
+                    return [value];
+                });
+
+                // fml, js
+                array.sort(function(a, b) {
+                    var textA = a.title.toUpperCase();
+                    var textB = b.title.toUpperCase();
+                    return (textA < textB) ? -1 : (textA > textB) ? 1 : 0;
+                });
+
+                for (var i = 0; i < array.length; i++) {
+                    var search = array[i];
                     var option = "<option value='" + htmlEscape(search.id) + "'>" + htmlEscape(search.title) + "</option>";
                     $("#saved-searches-selector").append(option);
                 }
+
+                $("#saved-searches-selector").show();
+                $("#saved-searches-selector").chosen({
+                    disable_search_threshold: 3,
+                    no_results_text: "No such search found:"
+                });
             }
         });
     }

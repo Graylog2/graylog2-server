@@ -137,6 +137,10 @@ h4 {
     top: -2px;
  }
 
+.keyword input {
+    width: 290px;
+}
+
 .universalsearch-form {
     margin-bottom: 0;
 }
@@ -1546,12 +1550,6 @@ input#save-search-title {
     padding-left: 5px;
     font-size: 12px;
     padding-top: 3px;
-}
-
-#saved-searches-toggle {
-    padding: 4px 7px;
-    line-height: 15px;
-    font-size: 12px !important;
 }
 
 #saved_searches_selector_chosen {

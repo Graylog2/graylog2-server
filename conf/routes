@@ -64,6 +64,7 @@ GET         /system/indices/:index/delete                                       
 
 # Saved searches
 GET         /savedsearches                                                           @controllers.api.SavedSearchesApiController.list()
+GET         /savedsearches/:search_id/execute                                        @controllers.api.SavedSearchesApiController.execute(search_id: String)
 POST        /savedsearches/create                                                    @controllers.api.SavedSearchesApiController.create()
 
 # Extractors

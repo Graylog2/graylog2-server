@@ -24,7 +24,8 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.gson.Gson;
 import com.google.inject.Inject;
-import controllers.AuthenticatedController;
+import controllers.*;
+import controllers.routes;
 import lib.APIException;
 import lib.ServerNodes;
 import models.SavedSearch;
@@ -60,6 +61,47 @@ public class SavedSearchesApiController extends AuthenticatedController {
             }
 
             return ok(new Gson().toJson(response)).as("application/json");
+        } catch (IOException e) {
+            return internalServerError("io exception");
+        } catch (APIException e) {
+            return internalServerError("api exception " + e);
+        }
+    }
+
+    public Result execute(String searchId) {
+        try {
+            SavedSearch search = savedSearchService.get(searchId);
+
+            int relative = 0;
+            if (search.getQuery().containsKey("relative")) {
+                relative = Integer.parseInt((String) search.getQuery().get("relative"));
+            }
+
+            String from = "";
+            if (search.getQuery().containsKey("from")) {
+                from = (String) search.getQuery().get("from");
+            }
+
+            String to = "";
+            if (search.getQuery().containsKey("to")) {
+                to = (String) search.getQuery().get("to");
+            }
+
+            String keyword = "";
+            if (search.getQuery().containsKey("keyword")) {
+                keyword = (String) search.getQuery().get("keyword");
+            }
+
+            return redirect(routes.SearchController.index(
+                    (String) search.getQuery().get("query"),
+                    (String) search.getQuery().get("rangeType"),
+                    relative,
+                    from,
+                    to,
+                    keyword,
+                    "minute",
+                    0
+            ));
         } catch (IOException e) {
             return internalServerError("io exception");
         } catch (APIException e) {
