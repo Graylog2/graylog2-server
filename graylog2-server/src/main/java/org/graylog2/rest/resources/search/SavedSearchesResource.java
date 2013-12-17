@@ -109,6 +109,26 @@ public class SavedSearchesResource extends SearchResource {
         return json(result);
     }
 
+    @GET @Path("/{searchId}") @Timed
+    @ApiOperation(value = "Get a single saved search")
+    @ApiResponses(value = {
+            @ApiResponse(code = 404, message = "Saved search not found."),
+            @ApiResponse(code = 400, message = "Invalid ObjectId.")
+    })
+    public String get(@ApiParam(title = "searchId", required = true) @PathParam("searchId") String searchId) {
+        if (searchId == null || searchId.isEmpty()) {
+            LOG.error("Missing searchId. Returning HTTP 400.");
+            throw new WebApplicationException(400);
+        }
+
+        try {
+            SavedSearch search = SavedSearch.load(loadObjectId(searchId), core);
+            return json(search.asMap());
+        } catch (org.graylog2.database.NotFoundException e) {
+            throw new WebApplicationException(404);
+        }
+    }
+
     @DELETE @Path("/{searchId}") @Timed
     @ApiOperation(value = "Delete a saved search")
     @ApiResponses(value = {
