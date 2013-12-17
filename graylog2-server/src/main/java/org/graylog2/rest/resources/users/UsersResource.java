@@ -295,16 +295,40 @@ public class UsersResource extends RestResource {
             return status(FORBIDDEN).build();
         }
         if (user.isExternalUser()) {
-            LOG.error("Cannot change password for external LDAP user.");
+            LOG.error("Cannot change password for LDAP user.");
             return status(FORBIDDEN).build();
         }
-        // TODO check whether we must ignore the old_password (for admins changing other people's passwords)
 
-        final String oldPasswordHash = new SimpleHash("SHA-1", cr.old_password, core.getConfiguration().getPasswordSecret()).toString();
+        boolean checkOldPassword = true;
+        // users with the wildcard permission for password change do not have to supply the old password, unless they try to change their own password.
+        // the rationale is to prevent accidental or malicious change of admin passwords (e.g. to prevent locking out legitimate admins)
+        if (getSubject().isPermitted(RestPermissions.USERS_PASSWORDCHANGE + ":*")) {
+            if (username.equals(getSubject().getPrincipal())) {
+                LOG.debug("User {} is allowed to change the password of any user, but attempts to change own password. Must supply the old password.", getSubject().getPrincipal());
+                checkOldPassword = true;
+            } else {
+                LOG.debug("User {} is allowed to change the password for any user, including {}, ignoring old password", getSubject().getPrincipal(), username);
+                checkOldPassword = false;
+            }
+        }
+
         final String currentPasswordHash = user.getHashedPassword();
-        if (currentPasswordHash.equals(oldPasswordHash)) {
-            // ok to set the new password
-            final String newHashedPassword = new SimpleHash("SHA-1", cr.password, core.getConfiguration().getPasswordSecret()).toString();
+        boolean changeAllowed = false;
+        final String secret = core.getConfiguration().getPasswordSecret();
+        if (checkOldPassword) {
+            if (cr.old_password == null) {
+                LOG.info("Changing password for user {} must supply the old password.", username);
+                return status(BAD_REQUEST).build();
+            }
+            final String oldPasswordHash = new SimpleHash("SHA-1", cr.old_password, secret).toString();
+            if (currentPasswordHash.equals(oldPasswordHash)) {
+                changeAllowed = true;
+            }
+        } else {
+            changeAllowed = true;
+        }
+        if (changeAllowed) {
+            final String newHashedPassword = new SimpleHash("SHA-1", cr.password, secret).toString();
             user.setHashedPassword(newHashedPassword);
             try {
                 user.save();

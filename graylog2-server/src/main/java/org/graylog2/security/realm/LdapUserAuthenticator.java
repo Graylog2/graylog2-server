@@ -58,7 +58,7 @@ public class LdapUserAuthenticator extends AuthenticatingRealm {
 
         final LdapConnectionConfig config = new LdapConnectionConfig();
         final LdapSettings ldapSettings = settings.get();
-        if (!ldapSettings.isEnabled()) {
+        if (ldapSettings == null || !ldapSettings.isEnabled()) {
             log.trace("LDAP is disabled, skipping");
             return null;
         }

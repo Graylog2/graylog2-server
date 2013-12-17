@@ -69,8 +69,10 @@ public class User extends Persisted {
     }
 
     public static User load(String username, Core core) {
+        LOG.debug("Loading user {}", username);
         // special case for the locally defined user, we don't store that in MongoDB.
         if (core.getConfiguration().getRootUsername().equals(username)) {
+            LOG.debug("User {} is the built-in admin user", username);
             return new LocalAdminUser(core);
         }
 
@@ -88,6 +90,7 @@ public class User extends Persisted {
         final DBObject userObject = result.get(0);
 
         final Object userId = userObject.get("_id");
+        LOG.debug("Loaded user {}/{}from MongoDB", username, userId);
         return new User((ObjectId) userId, userObject.toMap(), core);
     }
 
