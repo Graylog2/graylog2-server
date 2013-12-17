@@ -159,3 +159,5 @@ POST        /a/streams/:stream_id/testMatch                                     
 
 # Map static resources from the /public folder to the /assets URL path
 GET         /assets/*file                                                            controllers.Assets.at(path="/public", file)
+
+GET         /opensearch.xml                                                          controllers.OpenSearchController.index()
