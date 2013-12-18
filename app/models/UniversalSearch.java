@@ -33,10 +33,12 @@ import play.mvc.Call;
 import play.mvc.Http.Request;
 
 import java.io.IOException;
+import java.util.concurrent.TimeUnit;
 
 public class UniversalSearch {
 
     public static final int PER_PAGE = 100;
+    public static final int KEITH = 61;  // http://en.wikipedia.org/wiki/61_(number) -> Keith
 
     private final ApiClient api;
     private final String query;
@@ -77,6 +79,7 @@ public class UniversalSearch {
                 .queryParam("offset", page * pageSize)
                 .queryParam("filter", (filter == null ? "*" : filter))
                 .accept(mediaType)
+                .timeout(KEITH, TimeUnit.SECONDS)
                 .execute();
     }
 
@@ -108,6 +111,7 @@ public class UniversalSearch {
                 .queryParam("query", query)
                 .queryParams(timeRange.getQueryParams())
                 .queryParam("filter", (filter == null ? "*" : filter))
+                .timeout(KEITH, TimeUnit.SECONDS)
                 .execute();
         return new DateHistogramResult(response.query, response.time, response.interval, response.results);
     }
@@ -119,6 +123,7 @@ public class UniversalSearch {
                 .queryParam("query", query)
                 .queryParams(timeRange.getQueryParams())
                 .queryParam("filter", (filter == null ? "*" : filter))
+                .timeout(KEITH, TimeUnit.SECONDS)
                 .execute();
     }
 
@@ -129,6 +134,7 @@ public class UniversalSearch {
                 .queryParam("query", query)
                 .queryParams(timeRange.getQueryParams())
                 .queryParam("filter", (filter == null ? "*" : filter))
+                .timeout(KEITH, TimeUnit.SECONDS)
                 .execute();
     }
 
@@ -140,6 +146,7 @@ public class UniversalSearch {
                 .queryParam("query", query)
                 .queryParams(timeRange.getQueryParams())
                 .queryParam("filter", (filter == null ? "*" : filter))
+                .timeout(KEITH, TimeUnit.SECONDS)
                 .execute();
     }
 
