@@ -31,7 +31,7 @@ $(document).ready(function() {
             $.ajax({
                 url: '/a/tools/natural_date_test',
                 data: {
-                    "string": string,
+                    "string": string
                 },
                 success: function(data) {
                     $(".not-recognized").hide();
@@ -109,9 +109,16 @@ $(document).ready(function() {
 
     // Saved search selected. Get details and send to page that redirects to the actual search.
     $("#saved-searches-selector").on("change", function(e) {
-        // Get
         var searchId = $("#saved-searches-selector").val();
-        window.location = "/savedsearches/" + encodeURI(searchId) + "/execute";
+
+        var container = $(this).closest(".saved-searches-selector-container");
+        if(!!container.attr("data-stream-id")) {
+            var url = "/savedsearches/" + encodeURI(searchId) + "/execute?" + "streamId=" + container.attr("data-stream-id");
+        } else {
+            var url = "/savedsearches/" + encodeURI(searchId) + "/execute";
+        }
+
+        window.location = url;
     });
 
     // Fill saved searches selector.
@@ -125,24 +132,26 @@ $(document).ready(function() {
                     return [value];
                 });
 
-                // fml, js
-                array.sort(function(a, b) {
-                    var textA = a.title.toUpperCase();
-                    var textB = b.title.toUpperCase();
-                    return (textA < textB) ? -1 : (textA > textB) ? 1 : 0;
-                });
+                if (array.length > 0) {
+                    // fml, js
+                    array.sort(function(a, b) {
+                        var textA = a.title.toUpperCase();
+                        var textB = b.title.toUpperCase();
+                        return (textA < textB) ? -1 : (textA > textB) ? 1 : 0;
+                    });
 
-                for (var i = 0; i < array.length; i++) {
-                    var search = array[i];
-                    var option = "<option value='" + htmlEscape(search.id) + "'>" + htmlEscape(search.title) + "</option>";
-                    $("#saved-searches-selector").append(option);
+                    for (var i = 0; i < array.length; i++) {
+                        var search = array[i];
+                        var option = "<option value='" + htmlEscape(search.id) + "'>" + htmlEscape(search.title) + "</option>";
+                        $("#saved-searches-selector").append(option);
+                    }
+
+                    $("#saved-searches-selector").show();
+                    $("#saved-searches-selector").chosen({
+                        disable_search_threshold: 3,
+                        no_results_text: "No such search found:"
+                    });
                 }
-
-                $("#saved-searches-selector").show();
-                $("#saved-searches-selector").chosen({
-                    disable_search_threshold: 3,
-                    no_results_text: "No such search found:"
-                });
             }
         });
     }

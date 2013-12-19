@@ -70,4 +70,8 @@ public class SavedSearchService {
 
         return savedSearchFactory.fromSummaryResponse(response);
     }
+
+    public void delete(SavedSearch search) throws APIException, IOException {
+        api.delete().path("/search/saved/{0}", search.getId()).expect(204).execute();
+    }
 }

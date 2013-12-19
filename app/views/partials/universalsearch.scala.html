@@ -56,7 +56,7 @@
                 </div>
             </div>
 
-            <div class="saved-searches-selector-container">
+            <div class="saved-searches-selector-container" @if(stream != null) { data-stream-id="@stream.getId" }>
                 <select id="saved-searches-selector" data-placeholder="Choose a saved search" style="display: none;">
                     <option></option>
                 </select>

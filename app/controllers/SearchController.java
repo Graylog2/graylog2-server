@@ -27,9 +27,7 @@ import lib.Field;
 import lib.SearchTools;
 import lib.timeranges.InvalidRangeParametersException;
 import lib.timeranges.TimeRange;
-import models.FieldMapper;
-import models.MessagesService;
-import models.UniversalSearch;
+import models.*;
 import models.api.results.DateHistogramResult;
 import models.api.results.SearchResult;
 import play.mvc.Result;
@@ -41,10 +39,14 @@ public class SearchController extends AuthenticatedController {
 
     @Inject
     protected UniversalSearch.Factory searchFactory;
+
     @Inject
     protected MessagesService messagesService;
 
-    public Result index(String q, String rangeType, int relative, String from, String to, String keyword, String interval, int page) {
+    @Inject
+    protected SavedSearchService savedSearchService;
+
+    public Result index(String q, String rangeType, int relative, String from, String to, String keyword, String interval, int page, String savedSearchId) {
         UniversalSearch search;
         try {
             search = getSearch(q, null, rangeType, relative, from, to, keyword, page);
@@ -56,7 +58,14 @@ public class SearchController extends AuthenticatedController {
 
         SearchResult searchResult;
         DateHistogramResult histogramResult;
+        SavedSearch savedSearch;
         try {
+            if(savedSearchId != null && !savedSearchId.isEmpty()) {
+                savedSearch = savedSearchService.get(savedSearchId);
+            } else {
+                savedSearch = null;
+            }
+
             // Histogram interval.
             if (interval == null || interval.isEmpty() || !SearchTools.isAllowedDateHistogramInterval(interval)) {
                 interval = "minute";
@@ -75,9 +84,9 @@ public class SearchController extends AuthenticatedController {
         }
 
         if (searchResult.getTotalResultCount() > 0) {
-            return ok(views.html.search.results.render(currentUser(), search, searchResult, histogramResult, q, page, null));
+            return ok(views.html.search.results.render(currentUser(), search, searchResult, histogramResult, q, page, savedSearch, null));
         } else {
-            return ok(views.html.search.noresults.render(currentUser(), q, searchResult, null));
+            return ok(views.html.search.noresults.render(currentUser(), q, searchResult, savedSearch, null));
         }
     }
 

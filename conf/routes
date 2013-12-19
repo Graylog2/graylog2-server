@@ -14,7 +14,7 @@ GET         /disconnected                                                       
 GET         /                                                                        @controllers.DashboardController.index()
 
 # Search
-GET         /search                                                                  @controllers.SearchController.index(q ?= "", rangetype ?= "", relative:Integer ?= -1, from ?= "", to ?= "", keyword ?= "", interval ?= "", page:Integer ?= 1)
+GET         /search                                                                  @controllers.SearchController.index(q ?= "", rangetype ?= "", relative:Integer ?= -1, from ?= "", to ?= "", keyword ?= "", interval ?= "", page:Integer ?= 1, saved:String ?= "")
 GET         /search/csv                                                              @controllers.SearchController.exportAsCsv(q ?= "", rangetype ?= "", relative:Integer ?= -1, from ?= "", to ?= "", keyword ?= "")
 
 # Messages
@@ -25,7 +25,7 @@ GET         /messages/:index/:id/partial                                        
 GET         /streams                                                                 @controllers.StreamsController.index()
 GET         /streams/new                                                             @controllers.StreamsController.newStream()
 POST        /streams/new                                                             @controllers.StreamsController.create()
-GET         /streams/:stream_id/messages                                             @controllers.StreamSearchController.index(stream_id: String, q ?= "", rangetype ?= "", relative:Integer ?= -1, from ?= "", to ?= "", keyword ?= "", interval ?= "", page:Integer ?= 1)
+GET         /streams/:stream_id/messages                                             @controllers.StreamSearchController.index(stream_id: String, q ?= "", rangetype ?= "", relative:Integer ?= -1, from ?= "", to ?= "", keyword ?= "", interval ?= "", page:Integer ?= 1, saved:String ?= "")
 POST        /streams/:stream_id/delete                                               @controllers.StreamsController.delete(stream_id: String)
 POST        /streams/:stream_id/rules/:streamrule_id/delete                          @controllers.StreamRulesController.delete(stream_id: String, streamrule_id: String)
 GET         /streams/:stream_id/rules                                                @controllers.StreamRulesController.index(stream_id: String)
@@ -64,8 +64,9 @@ GET         /system/indices/:index/delete                                       
 
 # Saved searches
 GET         /savedsearches                                                           @controllers.api.SavedSearchesApiController.list()
-GET         /savedsearches/:search_id/execute                                        @controllers.api.SavedSearchesApiController.execute(search_id: String)
+GET         /savedsearches/:search_id/execute                                        @controllers.SavedSearchesController.execute(search_id: String, streamId ?= "")
 POST        /savedsearches/create                                                    @controllers.api.SavedSearchesApiController.create()
+GET         /savedsearches/:search_id/delete                                         @controllers.SavedSearchesController.delete(search_id: String)
 
 # Extractors
 GET         /system/inputs/:node_id/:input_id/extractors                             @controllers.ExtractorsController.manage(node_id: String, input_id: String)
@@ -84,7 +85,7 @@ GET         /system/users/new                                                   
 GET         /system/users/edit/:username                                             @controllers.UsersController.editUserForm(username: String)
 POST        /system/users/password/:username                                         @controllers.UsersController.changePassword(username: String)
 
-#LDAP configuration
+# LDAP configuration
 GET         /system/ldap                                                             @controllers.LdapController.index()
 POST        /system/ldap                                                             @controllers.LdapController.saveLdapSettings()
 POST        /a/system/ldap/testconnect                                               @controllers.LdapController.apiTestLdapConnection()

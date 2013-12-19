@@ -7,10 +7,7 @@ import lib.SearchTools;
 import lib.Tools;
 import lib.timeranges.InvalidRangeParametersException;
 import lib.timeranges.TimeRange;
-import models.FieldMapper;
-import models.Stream;
-import models.StreamService;
-import models.UniversalSearch;
+import models.*;
 import models.api.results.DateHistogramResult;
 import models.api.results.SearchResult;
 import play.mvc.Call;
@@ -26,7 +23,7 @@ public class StreamSearchController extends SearchController {
     @Inject
     private StreamService streamService;
 
-    public Result index(String streamId, String q, String rangeType, int relative, String from, String to, String keyword, String interval, int page) {
+    public Result index(String streamId, String q, String rangeType, int relative, String from, String to, String keyword, String interval, int page, String savedSearchId) {
         Stream stream;
         try {
             stream = streamService.get(streamId);
@@ -50,7 +47,14 @@ public class StreamSearchController extends SearchController {
 
         SearchResult searchResult;
         DateHistogramResult histogramResult;
+        SavedSearch savedSearch;
         try {
+            if(savedSearchId != null && !savedSearchId.isEmpty()) {
+                savedSearch = savedSearchService.get(savedSearchId);
+            } else {
+                savedSearch = null;
+            }
+
             // Histogram interval.
             if (interval == null || interval.isEmpty() || !SearchTools.isAllowedDateHistogramInterval(interval)) {
                 interval = "minute";
@@ -69,9 +73,9 @@ public class StreamSearchController extends SearchController {
         }
 
         if (searchResult.getTotalResultCount() > 0) {
-            return ok(views.html.search.results.render(currentUser(), search, searchResult, histogramResult, q, page, stream));
+            return ok(views.html.search.results.render(currentUser(), search, searchResult, histogramResult, q, page, savedSearch, stream));
         } else {
-            return ok(views.html.search.noresults.render(currentUser(), q, searchResult, stream));
+            return ok(views.html.search.noresults.render(currentUser(), q, searchResult, savedSearch, stream));
         }
     }
 }

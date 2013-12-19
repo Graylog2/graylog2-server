@@ -165,7 +165,8 @@ public class UniversalSearch {
                 to,
                 keyword,
                 interval,
-                page
+                page,
+                ""
         );
     }
 

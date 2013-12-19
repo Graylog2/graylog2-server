@@ -1,4 +1,4 @@
-@(currentUser: User, search: UniversalSearch, searchResult: models.api.results.SearchResult, histogram: models.api.results.DateHistogramResult, query: String, page: Integer)(implicit stream: Stream)
+@(currentUser: User, search: UniversalSearch, searchResult: models.api.results.SearchResult, histogram: models.api.results.DateHistogramResult, query: String, page: Integer, savedSearch: SavedSearch)(implicit stream: Stream)
 @import views.helpers.DateHistogramResolutionSelector
 
 @paginatorLength() = @{10}
@@ -50,6 +50,10 @@
             <li><a href="@search.getCsvRoute(request())">Download as CSV</a></li>
         </ul>
     </div>
+
+    @if(savedSearch != null) {
+        <a href="@routes.SavedSearchesController.delete(savedSearch.getId)" class="btn btn-small btn-danger" data-confirm='Really delete saved search "@savedSearch.getTitle"?'>Delete saved search</a>
+    }
 
     <a href="#" class="btn btn-small btn-success save-search" title="Save this search so you can execute it at any time with just a click.">
         Save search
