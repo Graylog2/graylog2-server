@@ -22,9 +22,7 @@ import java.io.IOException;
 /**
  * @author Dennis Oelkers <dennis@torch.sh>
  */
-public class StreamsApiController extends Controller {
-    private static final Form<TestMatchRequest> testMatchForm = Form.form(TestMatchRequest.class);
-
+public class StreamsApiController extends AuthenticatedController {
     @Inject
     StreamService streamService;
 
