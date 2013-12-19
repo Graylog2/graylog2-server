@@ -59,13 +59,13 @@ import java.util.List;
  */
 @SuppressWarnings("unused")
 public class Global extends GlobalSettings {
-	private static final Logger log = LoggerFactory.getLogger(Global.class);
+    private static final Logger log = LoggerFactory.getLogger(Global.class);
 
     private static Injector injector;
 
     /**
      * Retrieve the application's global Guice injector.
-     *
+     * <p/>
      * Unfortunately there seems to be no supported way to store custom objects in the application,
      * thus we need to make this accessor static. However, running more than one Play application in
      * the same JVM won't work anyway, so we are on the safe side here.
@@ -77,7 +77,7 @@ public class Global extends GlobalSettings {
     }
 
     @Override
-	public void onStart(Application app) {
+    public void onStart(Application app) {
         final String appSecret = app.configuration().getString("application.secret");
         if (appSecret == null || appSecret.isEmpty()) {
             log.error("Please configure application.secret in your conf/graylog2-web-interface.conf");
@@ -169,7 +169,7 @@ public class Global extends GlobalSettings {
     @Override
     @SuppressWarnings("unchecked")
     public <T extends EssentialFilter> Class<T>[] filters() {
-        return new Class[] {AccessLog.class};
+        return new Class[]{AccessLog.class};
     }
 
     @Override
@@ -184,8 +184,17 @@ public class Global extends GlobalSettings {
             log.info("In test mode, not performing config file checks.");
             isTest = true;
         }
+        final String configOverrideLocation = Tools.firstNonNull("",
+                System.getProperty("config.file"),
+                System.getProperty("config.url"),
+                System.getProperty("config.resource"));
+        if (!configOverrideLocation.isEmpty()) {
+            log.warn("Using configuration from overridden location at {}", configOverrideLocation);
+            return configuration;
+        }
+
         final File configFile = new File(file, "conf/graylog2-web-interface.conf");
-        if (! isTest) {
+        if (!isTest) {
             if (!configFile.exists()) {
                 log.error("Your configuration should be at {} but does not exist, cannot continue without it.", configFile.getAbsoluteFile());
                 throw new IllegalStateException("Missing configuration file " + configFile.getAbsolutePath());
@@ -212,20 +221,20 @@ public class Global extends GlobalSettings {
     }
 
     private void setupLocalUser(ApiClient api, SimpleAccountRealm realm, Application app) {
-		final Configuration config = app.configuration();
+        final Configuration config = app.configuration();
         final String username = config.getString("local-user.name", "localadmin");
         final String passwordHash = config.getString("local-user.password-sha2");
         if (passwordHash == null) {
-			log.warn("No password hash for local user {} set. " +
-					"If you lose connection to the graylog2-server at {}, you will be unable to log in!",
+            log.warn("No password hash for local user {} set. " +
+                    "If you lose connection to the graylog2-server at {}, you will be unable to log in!",
                     username, config.getString("graylog2-server"));
-			return;
-		}
-		realm.addAccount(
+            return;
+        }
+        realm.addAccount(
                 username,
                 passwordHash,
-				"local-admin"
-		);
+                "local-admin"
+        );
         LocalAdminUser.createSharedInstance(api, username, passwordHash);
     }
 

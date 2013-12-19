@@ -152,4 +152,12 @@ public class Tools {
         return String.format("%.1f%sB", bytes / Math.pow(1024, exp), pre);
     }
 
+    public static <T> T firstNonNull(T defaultValue, T... objects) {
+        for (T object : objects) {
+            if (object != null) {
+                return object;
+            }
+        }
+        return defaultValue;
+    }
 }
