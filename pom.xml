@@ -57,7 +57,7 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <metrics.version>3.0.0</metrics.version>
         <jackson.version>2.3.0</jackson.version>
-        <jersey.version>2.0</jersey.version>
+        <jersey.version>2.5</jersey.version>
         <apache-directory-version>1.0.0-M20</apache-directory-version>
     </properties>
 
