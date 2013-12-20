@@ -42,7 +42,7 @@ public class SearchApiController extends AuthenticatedController {
     @Inject
     private UniversalSearch.Factory searchFactory;
 
-    public Result fieldStats(String q, String field, String rangeType, int relative, String from, String to, String keyword) {
+    public Result fieldStats(String q, String field, String rangeType, int relative, String from, String to, String keyword, String streamId) {
         if (q == null || q.isEmpty()) {
             q = "*";
         }
@@ -57,8 +57,13 @@ public class SearchApiController extends AuthenticatedController {
             return status(400, views.html.errors.error.render("Invalid range type provided.", e1, request()));
         }
 
+        String filter = null;
+        if (streamId != null && !streamId.isEmpty()) {
+            filter = "streams:" + streamId;
+        }
+
         try {
-            UniversalSearch search = searchFactory.queryWithRange(q, timerange);
+            UniversalSearch search = searchFactory.queryWithRangeAndFilter(q, timerange, filter);
             FieldStatsResponse stats = search.fieldStats(field);
 
             Map<String, Object> result = Maps.newHashMap();

@@ -23,6 +23,7 @@ import lib.APIException;
 import lib.ApiClient;
 import lib.timeranges.InvalidRangeParametersException;
 import lib.timeranges.TimeRange;
+import models.Stream;
 import models.api.requests.dashboards.WidgetUpdateRequest;
 import models.api.responses.dashboards.DashboardWidgetResponse;
 import models.api.responses.dashboards.DashboardWidgetValueResponse;
@@ -44,15 +45,21 @@ public abstract class DashboardWidget {
     private final Type type;
     private final String id;
     private final String description;
+    private final Stream stream;
     private final Dashboard dashboard;
     private final int cacheTime;
 
     protected DashboardWidget(Type type, String id, String description, int cacheTime, Dashboard dashboard) {
+        this(type, id, description, cacheTime, null, dashboard);
+    }
+
+    protected DashboardWidget(Type type, String id, String description, int cacheTime, Stream stream, Dashboard dashboard) {
         this.type = type;
         this.id = id;
         this.description = description;
         this.dashboard = dashboard;
         this.cacheTime = cacheTime;
+        this.stream = stream;
     }
 
     public Type getType() {

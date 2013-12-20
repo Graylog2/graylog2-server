@@ -29,6 +29,7 @@ import lib.timeranges.TimeRange;
 import models.api.responses.*;
 import models.api.results.DateHistogramResult;
 import models.api.results.SearchResult;
+import play.Logger;
 import play.mvc.Call;
 import play.mvc.Http.Request;
 
@@ -49,6 +50,11 @@ public class UniversalSearch {
     @AssistedInject
     private UniversalSearch(ApiClient api, @Assisted TimeRange timeRange, @Assisted String query) {
         this(api, timeRange, query, 0);
+    }
+
+    @AssistedInject
+    private UniversalSearch(ApiClient api, @Assisted TimeRange timeRange, @Assisted String query, @Assisted("filter") String filter) {
+        this(api, timeRange, query, 0, filter);
     }
 
     @AssistedInject
@@ -188,6 +194,8 @@ public class UniversalSearch {
 
     public interface Factory {
         UniversalSearch queryWithRange(String query, TimeRange timeRange);
+
+        UniversalSearch queryWithRangeAndFilter(String query, TimeRange timeRange, @Assisted("filter") String filter);
 
         UniversalSearch queryWithRangeAndPage(String query, TimeRange timeRange, Integer page);
 

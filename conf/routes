@@ -106,7 +106,7 @@ POST        /dashboards/create                                                  
 POST        /dashboards/:id/delete                                                   @controllers.DashboardsController.delete(id: String)
 
 # API: Search (i.e. facets)
-GET         /a/search/fieldstats                                                     @controllers.api.SearchApiController.fieldStats(q ?= "", field ?= "", rangetype ?= "", relative:Integer ?= -1, from ?= "", to ?= "", keyword ?= "")
+GET         /a/search/fieldstats                                                     @controllers.api.SearchApiController.fieldStats(q ?= "", field ?= "", rangetype ?= "", relative:Integer ?= -1, from ?= "", to ?= "", keyword ?= "", stream_id ?= "")
 GET         /a/search/fieldterms                                                     @controllers.api.SearchApiController.fieldTerms(q ?= "", field ?= "", rangetype ?= "", relative:Integer ?= -1, from ?= "", to ?= "", keyword ?= "")
 GET         /a/search/fieldhistogram                                                 @controllers.api.SearchApiController.fieldHistogram(q ?= "", field ?= "", rangetype ?= "", relative:Integer ?= -1, from ?= "", to ?= "", keyword ?= "", interval ?= "", valueType ?= "")
 

@@ -1,4 +1,4 @@
-@(field: lib.Field)
+@(field: lib.Field, streamId: String)
 
 <i class="icon icon-cog open-analyze-field"></i>
 &nbsp;
@@ -12,4 +12,4 @@ data-field-hash="@field.getHash"
 
 <label for="field-selector-@field.getHash" class="field-name">@field.getName()</label>
 
-@views.html.sidebars.partials.analyze_field(field)
+@views.html.sidebars.partials.analyze_field(field, streamId)

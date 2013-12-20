@@ -109,6 +109,10 @@ $(document).ready(function() {
             "field": field
         }
 
+        if(!!container.attr("data-stream-id")) {
+            params["stream_id"] = container.attr("data-stream-id");
+        }
+
         switch(rangeType) {
             case "relative":
                 params["relative"] = $("#universalsearch-relative-permanent").text();
