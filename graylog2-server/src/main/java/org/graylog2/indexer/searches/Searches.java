@@ -150,9 +150,18 @@ public class Searches {
             srb = filteredSearchRequest(query, filter, IndexHelper.determineAffectedIndices(server, range));
         }
 
+        System.out.println("WOW FILTER:" + filter);
+
         StatisticalFacetBuilder stats = new StatisticalFacetBuilder(STATS_FACET_NAME);
         stats.global(false);
-        stats.facetFilter(IndexHelper.getTimestampRangeFilter(range));
+
+        // wow such dsl
+        stats.facetFilter(
+                FilterBuilders.boolFilter()
+                        .must(IndexHelper.getTimestampRangeFilter(range))
+                        .must(FilterBuilders.queryFilter(QueryBuilders.queryString(filter)))
+        );
+
         stats.field(field);
 
         srb.addFacet(stats);
