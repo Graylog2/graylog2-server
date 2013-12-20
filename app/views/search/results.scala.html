@@ -33,7 +33,15 @@
     }
 }
 
-@main("Search results", sidebars.searchresults(searchResult, stream.getId), query, currentUser) {
+@streamId = @{
+    if (stream == null) {
+        null
+    } else {
+        stream.getId
+    }
+}
+
+@main("Search results", sidebars.searchresults(searchResult, streamId), query, currentUser) {
 
 <span id="original-search-query" style="display: none;">@searchResult.getOriginalQuery</span>
 <span id="original-search-timerange" style="display: none;">@searchResult.getTimeRange</span>

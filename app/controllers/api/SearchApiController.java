@@ -89,7 +89,7 @@ public class SearchApiController extends AuthenticatedController {
         }
     }
 
-    public Result fieldTerms(String q, String field, String rangeType, int relative, String from, String to, String keyword) {
+    public Result fieldTerms(String q, String field, String rangeType, int relative, String from, String to, String keyword, String streamId) {
         if (q == null || q.isEmpty()) {
             q = "*";
         }
@@ -104,8 +104,13 @@ public class SearchApiController extends AuthenticatedController {
             return status(400, views.html.errors.error.render("Invalid range type provided.", e1, request()));
         }
 
+        String filter = null;
+        if (streamId != null && !streamId.isEmpty()) {
+            filter = "streams:" + streamId;
+        }
+
         try {
-            UniversalSearch search = searchFactory.queryWithRange(q, timerange);
+            UniversalSearch search = searchFactory.queryWithRangeAndFilter(q, timerange, filter);
             FieldTermsResponse terms = search.fieldTerms(field);
 
             Map<String, Object> result = Maps.newHashMap();

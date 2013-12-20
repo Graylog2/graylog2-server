@@ -221,6 +221,10 @@ $(document).ready(function() {
                 break;
         }
 
+        if(!!container.attr("data-stream-id")) {
+            params["stream_id"] = container.attr("data-stream-id");
+        }
+
         $.ajax({
             url: '/a/search/fieldterms',
             data: params,

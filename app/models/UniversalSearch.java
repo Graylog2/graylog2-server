@@ -33,6 +33,7 @@ import play.Logger;
 import play.mvc.Call;
 import play.mvc.Http.Request;
 
+import javax.annotation.Nullable;
 import java.io.IOException;
 import java.util.concurrent.TimeUnit;
 
@@ -53,7 +54,7 @@ public class UniversalSearch {
     }
 
     @AssistedInject
-    private UniversalSearch(ApiClient api, @Assisted TimeRange timeRange, @Assisted String query, @Assisted("filter") String filter) {
+    private UniversalSearch(ApiClient api, @Assisted TimeRange timeRange, @Assisted String query, @Nullable @Assisted("filter") String filter) {
         this(api, timeRange, query, 0, filter);
     }
 
