@@ -138,7 +138,8 @@ public class RelativeSearchResource extends SearchResource {
     public String histogramRelative(
             @ApiParam(title = "query", description = "Query (Lucene syntax)", required = true) @QueryParam("query") String query,
             @ApiParam(title = "interval", description = "Histogram interval / bucket size. (year, quarter, month, week, day, hour or minute)", required = true) @QueryParam("interval") String interval,
-            @ApiParam(title = "range", description = "Relative timeframe to search in. See search method description.", required = true) @QueryParam("range") int range) {
+            @ApiParam(title = "range", description = "Relative timeframe to search in. See search method description.", required = true) @QueryParam("range") int range,
+            @ApiParam(title = "filter", description = "Filter", required = false) @QueryParam("filter") String filter) {
         checkQueryAndInterval(query, interval);
         interval = interval.toUpperCase();
         validateInterval(interval);
@@ -148,6 +149,7 @@ public class RelativeSearchResource extends SearchResource {
                     core.getIndexer().searches().histogram(
                             query,
                             Indexer.DateHistogramInterval.valueOf(interval),
+                            filter,
                             buildRelativeTimeRange(range)
                     )
             ));

@@ -146,7 +146,7 @@ public class Searches {
         return fieldStats(field, query, null, range);
     }
 
-    public FieldStatsResult fieldStats(String field, String query, String filter,  TimeRange range) throws FieldTypeException, IndexHelper.InvalidRangeFormatException {
+    public FieldStatsResult fieldStats(String field, String query, String filter, TimeRange range) throws FieldTypeException, IndexHelper.InvalidRangeFormatException {
         SearchRequestBuilder srb;
 
         if (filter == null) {
@@ -187,12 +187,21 @@ public class Searches {
                 r.getTook()
         );
     }
-	
-	public HistogramResult histogram(String query, Indexer.DateHistogramInterval interval, TimeRange range) throws IndexHelper.InvalidRangeFormatException {
+
+    public HistogramResult histogram(String query, Indexer.DateHistogramInterval interval, TimeRange range) throws IndexHelper.InvalidRangeFormatException {
+        return histogram(query, interval, null, range);
+    }
+
+    public HistogramResult histogram(String query, Indexer.DateHistogramInterval interval, String filter, TimeRange range) throws IndexHelper.InvalidRangeFormatException {
         DateHistogramFacetBuilder fb = FacetBuilders.dateHistogramFacet("histogram")
 				.field("timestamp")
-				.facetFilter(IndexHelper.getTimestampRangeFilter(range))
 				.interval(interval.toString().toLowerCase());
+
+        fb.facetFilter(
+                FilterBuilders.boolFilter()
+                        .must(IndexHelper.getTimestampRangeFilter(range))
+                        .must(FilterBuilders.queryFilter(QueryBuilders.queryString(filter)))
+        );
 
         QueryStringQueryBuilder qs = queryString(query);
         qs.allowLeadingWildcard(server.getConfiguration().isAllowLeadingWildcardSearches());
