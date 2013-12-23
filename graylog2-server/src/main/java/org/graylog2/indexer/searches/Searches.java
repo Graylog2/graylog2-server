@@ -203,12 +203,13 @@ public class Searches {
                                        interval, r.getTook());
 	}
 
-    public HistogramResult fieldHistogram(String query, String field, Indexer.DateHistogramInterval interval, TimeRange range) throws FieldTypeException, IndexHelper.InvalidRangeFormatException {
+    public HistogramResult fieldHistogram(String query, String field, Indexer.DateHistogramInterval interval, String filter, TimeRange range) throws FieldTypeException, IndexHelper.InvalidRangeFormatException {
         DateHistogramFacetBuilder fb = FacetBuilders.dateHistogramFacet("histogram")
                 .keyField("timestamp")
                 .valueField(field)
-                .facetFilter(IndexHelper.getTimestampRangeFilter(range))
                 .interval(interval.toString().toLowerCase());
+
+        fb.facetFilter(standardFilters(range, filter));
 
         SearchRequestBuilder srb = c.prepareSearch();
         srb.setIndices(IndexHelper.determineAffectedIndices(server, range).toArray(new String[]{}));

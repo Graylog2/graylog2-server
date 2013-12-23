@@ -173,14 +173,15 @@ public class AbsoluteSearchResource extends SearchResource {
             @ApiParam(title = "field", description = "Field of whose values to get the histogram of", required = true) @QueryParam("field") String field,
             @ApiParam(title = "interval", description = "Histogram interval / bucket size. (year, quarter, month, week, day, hour or minute)", required = true) @QueryParam("interval") String interval,
             @ApiParam(title = "from", description = "Timerange start. See search method description for date format", required = true) @QueryParam("from") String from,
-            @ApiParam(title = "to", description = "Timerange end. See search method description for date format", required = true) @QueryParam("to") String to) {
+            @ApiParam(title = "to", description = "Timerange end. See search method description for date format", required = true) @QueryParam("to") String to,
+            @ApiParam(title = "filter", description = "Filter", required = false) @QueryParam("filter") String filter) {
         checkQueryAndInterval(query, interval);
         interval = interval.toUpperCase();
         validateInterval(interval);
         checkStringSet(field);
 
         try {
-            return json(buildHistogramResult(fieldHistogram(field, query, interval, buildAbsoluteTimeRange(from, to))));
+            return json(buildHistogramResult(fieldHistogram(field, query, interval, filter, buildAbsoluteTimeRange(from, to))));
         } catch (IndexHelper.InvalidRangeFormatException e) {
             LOG.warn("Invalid timerange parameters provided. Returning HTTP 400.", e);
             throw new WebApplicationException(400);

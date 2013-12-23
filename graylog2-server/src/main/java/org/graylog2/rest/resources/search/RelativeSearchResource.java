@@ -171,14 +171,15 @@ public class RelativeSearchResource extends SearchResource {
             @ApiParam(title = "query", description = "Query (Lucene syntax)", required = true) @QueryParam("query") String query,
             @ApiParam(title = "field", description = "Field of whose values to get the histogram of", required = true) @QueryParam("field") String field,
             @ApiParam(title = "interval", description = "Histogram interval / bucket size. (year, quarter, month, week, day, hour or minute)", required = true) @QueryParam("interval") String interval,
-            @ApiParam(title = "range", description = "Relative timeframe to search in. See search method description.", required = true) @QueryParam("range") int range) {
+            @ApiParam(title = "range", description = "Relative timeframe to search in. See search method description.", required = true) @QueryParam("range") int range,
+            @ApiParam(title = "filter", description = "Filter", required = false) @QueryParam("filter") String filter) {
         checkQueryAndInterval(query, interval);
         interval = interval.toUpperCase();
         validateInterval(interval);
         checkStringSet(field);
 
         try {
-            return json(buildHistogramResult(fieldHistogram(field, query, interval, buildRelativeTimeRange(range))));
+            return json(buildHistogramResult(fieldHistogram(field, query, interval, filter, buildRelativeTimeRange(range))));
         } catch (IndexHelper.InvalidRangeFormatException e) {
             LOG.warn("Invalid timerange parameters provided. Returning HTTP 400.", e);
             throw new WebApplicationException(400);
