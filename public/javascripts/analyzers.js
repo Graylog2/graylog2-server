@@ -62,7 +62,14 @@ $(document).ready(function() {
     $(".analyze-field .generate-graph .line-chart").on("click", function(e) {
         e.preventDefault();
 
-        renderFieldChart($(this).parent().parent().parent().attr("data-field"));
+        opts = {}
+
+        var container = $(this).closest(".analyze-field");
+        if (!!container.attr("data-stream-id")) {
+            opts["streamid"] = container.attr("data-stream-id");
+        }
+
+        renderFieldChart($(this).parent().parent().parent().attr("data-field"), opts);
     });
 
     $(".quickvalues .quickvalues-close").on("click", function(e) {
@@ -349,6 +356,10 @@ $(document).ready(function() {
             opts.valuetype = "mean";
         }
 
+        if (opts.streamid == undefined) {
+            opts.streamid = "";
+        }
+
         var rangeType = $("#universalsearch-rangetype-permanent").text().trim();
         var query = $("#universalsearch-query-permanent").text().trim();
 
@@ -357,7 +368,8 @@ $(document).ready(function() {
             "q": query,
             "field": field,
             "interval": opts.interval,
-            "valueType": opts.valuetype
+            "valueType": opts.valuetype,
+            "streamId": opts.streamid
         }
 
         switch(rangeType) {
@@ -400,7 +412,8 @@ $(document).ready(function() {
                 template.attr("data-config-interval", opts.interval);
                 template.attr("data-config-interpolation", opts.interpolation);
                 template.attr("data-config-renderer", opts.renderer);
-                template.attr("data-config-valuetype", opts.valuetype)
+                template.attr("data-config-valuetype", opts.valuetype);
+                template.attr("data-config-streamid", opts.streamid);
 
                 $(".type-description", template).text("(" + opts.valuetype + ")");
 
@@ -542,6 +555,7 @@ $(document).ready(function() {
             interval: interval,
             renderer: graphContainer.attr("data-config-renderer"),
             interpolation: graphContainer.attr("data-config-interpolation"),
+            streamid: graphContainer.attr("data-config-streamid"),
             valuetype:  graphContainer.attr("data-config-valuetype")
         });
 
@@ -563,6 +577,7 @@ $(document).ready(function() {
             interval: graphContainer.attr("data-config-interval"),
             renderer: graphContainer.attr("data-config-renderer"),
             interpolation: graphContainer.attr("data-config-interpolation"),
+            streamid: graphContainer.attr("data-config-streamid"),
             valuetype: valuetype
         });
 

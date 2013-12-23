@@ -29,6 +29,7 @@ import models.UniversalSearch;
 import models.api.responses.FieldHistogramResponse;
 import models.api.responses.FieldStatsResponse;
 import models.api.responses.FieldTermsResponse;
+import play.Logger;
 import play.mvc.Result;
 
 import java.io.IOException;
@@ -134,7 +135,7 @@ public class SearchApiController extends AuthenticatedController {
     }
 
 
-    public Result fieldHistogram(String q, String field, String rangeType, int relative, String from, String to, String keyword, String interval, String valueType) {
+    public Result fieldHistogram(String q, String field, String rangeType, int relative, String from, String to, String keyword, String interval, String valueType, String streamId) {
         if (q == null || q.isEmpty()) {
             q = "*";
         }
@@ -154,8 +155,13 @@ public class SearchApiController extends AuthenticatedController {
             return status(400, views.html.errors.error.render("Invalid range type provided.", e1, request()));
         }
 
+        String filter = null;
+        if (streamId != null && !streamId.isEmpty()) {
+            filter = "streams:" + streamId;
+        }
+
         try {
-            UniversalSearch search = searchFactory.queryWithRange(q, timerange);
+            UniversalSearch search = searchFactory.queryWithRangeAndFilter(q, timerange, filter);
             FieldHistogramResponse histo = search.fieldHistogram(field, interval);
 
             Map<String, Object> result = Maps.newHashMap();
