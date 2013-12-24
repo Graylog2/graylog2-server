@@ -95,7 +95,7 @@
         <dependency>
             <groupId>org.elasticsearch</groupId>
             <artifactId>elasticsearch</artifactId>
-            <version>0.90.9</version>
+            <version>0.90.7</version>
         </dependency>
         <dependency>
             <groupId>org.drools</groupId>
