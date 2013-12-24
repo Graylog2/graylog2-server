@@ -852,6 +852,7 @@ form #stream-rules {
     position: fixed;
     margin-bottom: -420px;
     color: #fff;
+    z-index: 5000;
 }
 
 .quickvalues-down {

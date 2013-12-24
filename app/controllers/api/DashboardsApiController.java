@@ -32,6 +32,7 @@ import models.dashboards.DashboardService;
 import models.NodeService;
 import models.dashboards.widgets.DashboardWidget;
 import models.dashboards.widgets.SearchResultCountWidget;
+import models.dashboards.widgets.StreamSearchResultCountWidget;
 import play.Logger;
 import play.mvc.Result;
 
@@ -113,11 +114,14 @@ public class DashboardsApiController extends AuthenticatedController {
                 return status(400, views.html.errors.error.render("Invalid range type provided.", e1, request()));
             }
 
-            SearchResultCountWidget widget;
+            DashboardWidget widget;
             try {
                 switch (DashboardWidget.Type.valueOf(params.get("widgetType"))) {
                     case SEARCH_RESULT_COUNT:
                         widget = new SearchResultCountWidget(dashboard, query, timerange);
+                        break;
+                    case STREAM_SEARCH_RESULT_COUNT:
+                        widget = new StreamSearchResultCountWidget(dashboard, query, timerange, params.get("streamId"));
                         break;
                     default:
                         throw new IllegalArgumentException();

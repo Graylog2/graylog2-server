@@ -1,0 +1,23 @@
+@(widget: models.dashboards.widgets.StreamSearchResultCountWidget)
+
+<div class="search-result-count">
+    <div class="value"><i class="icon icon-refresh"></i></div>
+    <div class="title">
+        <div class="description">
+            <span class="title">
+                @widget.getDescription
+            </span>
+
+            <a href="#" class="only-unlocked edit-description">
+                <i class="icon icon-edit"></i>
+            </a>
+        </div>
+
+        <div class="description-form">
+            <div class="input-append">
+                <input type="text" value="@widget.getDescription" class="description-value" />
+                <button class="btn btn-success update-description">Update</button>
+            </div>
+        </div>
+    </div>
+</div>

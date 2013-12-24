@@ -86,7 +86,12 @@
 
 <h4>
     Found <span class="number-format" data-format="0,0">@searchResult.getTotalResultCount</span> messages.
-    @views.html.partials.dashboards.add_to_dashboard.render("search-result-count")
+
+    @if(stream == null) {
+        @views.html.partials.dashboards.add_to_dashboard.render("search-result-count", null)
+    } else {
+        @views.html.partials.dashboards.add_to_dashboard.render("stream-search-result-count", Array("data-stream-id='" + streamId + "'"))
+    }
 </h4>
 
 <style>

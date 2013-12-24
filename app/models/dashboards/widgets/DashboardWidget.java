@@ -39,6 +39,7 @@ public abstract class DashboardWidget {
 
     public enum Type {
         SEARCH_RESULT_COUNT,
+        STREAM_SEARCH_RESULT_COUNT,
         SEARCH_RESULT_FIELD_VALUE
     }
 
@@ -126,6 +127,16 @@ public abstract class DashboardWidget {
                         w.cacheTime,
                         (String) w.config.get("query"),
                         TimeRange.factory((Map<String, Object>) w.config.get("timerange"))
+                );
+            case STREAM_SEARCH_RESULT_COUNT:
+                return new StreamSearchResultCountWidget(
+                        dashboard,
+                        w.id,
+                        w.description,
+                        w.cacheTime,
+                        (String) w.config.get("query"),
+                        TimeRange.factory((Map<String, Object>) w.config.get("timerange")),
+                        (String) w.config.get("stream_id")
                 );
             default:
                 throw new NoSuchWidgetTypeException();

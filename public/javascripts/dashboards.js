@@ -32,7 +32,7 @@ $(document).ready(function() {
     }
 
     $("ul.dashboard-selector li a[data-dashboard-id]").live("click", function() {
-        delegateAddToDashboard($(this).closest("ul.dashboard-selector").attr("data-widget-type"), $(this).attr("data-dashboard-id"));
+        delegateAddToDashboard($(this).closest("ul.dashboard-selector").attr("data-widget-type"), $(this).attr("data-dashboard-id"), $(this).closest("ul.dashboard-selector"));
     })
 
     $(".dashboard .widget .remove-widget").live("click", function(e) {
@@ -58,10 +58,13 @@ $(document).ready(function() {
         });
     });
 
-    function delegateAddToDashboard(widgetType, dashboardId) {
+    function delegateAddToDashboard(widgetType, dashboardId, elem) {
         switch(widgetType) {
             case "search-result-count":
                 addSearchResultCountWidget(dashboardId);
+                break;
+            case "stream-search-result-count":
+                addStreamSearchResultCountWidget(dashboardId, elem.attr("data-stream-id"));
                 break;
         }
     }
@@ -69,6 +72,14 @@ $(document).ready(function() {
     function addSearchResultCountWidget(dashboardId) {
         var params = originalUniversalSearchSettings();
         params.widgetType = "SEARCH_RESULT_COUNT";
+
+        addWidget(dashboardId, params);
+    }
+
+    function addStreamSearchResultCountWidget(dashboardId, streamId) {
+        var params = originalUniversalSearchSettings();
+        params.widgetType = "STREAM_SEARCH_RESULT_COUNT";
+        params.streamId = streamId;
 
         addWidget(dashboardId, params);
     }
@@ -214,11 +225,38 @@ $(document).ready(function() {
                 case "search_result_count":
                     updateSearchResultCountWidget($(this));
                     break;
+                case "stream_search_result_count":
+                    updateStreamSearchResultCountWidget($(this));
+                    break;
             }
         }).promise().done(function(){ setTimeout(updateDashboardWidgets, interval); });
     })();
 
     function updateSearchResultCountWidget(widget) {
+        var dashboardId = widget.attr("data-dashboard-id");
+        var widgetId = widget.attr("data-widget-id");
+
+        $(".reloading", widget).show();
+
+        $.ajax({
+            url: '/a/dashboards/' + dashboardId + '/widgets/' + widgetId + '/value',
+            type: 'GET',
+            success: function(data) {
+                $(".value", widget).text(numeral(data.result).format());
+                $(".calculated-at", widget).attr("title", data.calculated_at);
+                $(".calculated-at", widget).text(moment(data.calculated_at).fromNow());
+            },
+            error: function(data) {
+                widget.attr("data-disabled", "true");
+                showErrorInWidget(widget);
+            },
+            complete: function(data) {
+                $(".reloading", widget).hide();
+            }
+        });
+    }
+
+    function updateStreamSearchResultCountWidget(widget) {
         var dashboardId = widget.attr("data-dashboard-id");
         var widgetId = widget.attr("data-widget-id");
 

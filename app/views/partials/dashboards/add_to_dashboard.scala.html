@@ -1,4 +1,4 @@
-@(widgetType: String)
+@(widgetType: String, params: Array[String])
 
 <div class="btn-group">
     <a data-toggle="dropdown" href="#" class="add-to-dashboard" data-widget-type="@widgetType">
@@ -7,7 +7,13 @@
 
     @****** the actual dashboards are loaded in here using JS ****@
 
-    <ul class="dropdown-menu dashboard-selector" data-widget-type="@widgetType">
+    <ul class="dropdown-menu dashboard-selector" data-widget-type="@widgetType"
+        @if(params != null) {
+            @for(param <- params) {
+                @Html(param)
+            }
+        }
+    >
         <li>
             <a href="@routes.DashboardsController.newDashboard()">No dashboards. Create one?</a>
         </li>

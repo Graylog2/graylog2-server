@@ -27,6 +27,7 @@ import models.dashboards.Dashboard;
 import models.dashboards.DashboardService;
 import models.NodeService;
 import models.api.requests.dashboards.CreateDashboardRequest;
+import play.Logger;
 import play.data.Form;
 import play.mvc.Result;
 
