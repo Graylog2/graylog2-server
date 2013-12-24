@@ -38,11 +38,11 @@ public class StreamSearchResultCountWidget extends DashboardWidget {
     private final String streamId;
 
     public StreamSearchResultCountWidget(Dashboard dashboard, String query, TimeRange timerange, String streamId) {
-        this(dashboard, null, null, 0, query, timerange, streamId);
+        this(dashboard, null, null, 0, query, timerange, streamId, null);
     }
 
-    public StreamSearchResultCountWidget(Dashboard dashboard, String id, String description, int cacheTime, String query, TimeRange timerange, String streamId) {
-        super(DashboardWidget.Type.STREAM_SEARCH_RESULT_COUNT, id, description, cacheTime, dashboard);
+    public StreamSearchResultCountWidget(Dashboard dashboard, String id, String description, int cacheTime, String query, TimeRange timerange, String streamId, String creatorUserId) {
+        super(DashboardWidget.Type.STREAM_SEARCH_RESULT_COUNT, id, description, cacheTime, dashboard, creatorUserId);
 
         this.query = query;
         this.timerange = timerange;

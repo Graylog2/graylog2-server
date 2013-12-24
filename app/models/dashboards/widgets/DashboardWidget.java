@@ -46,21 +46,21 @@ public abstract class DashboardWidget {
     private final Type type;
     private final String id;
     private final String description;
-    private final Stream stream;
     private final Dashboard dashboard;
     private final int cacheTime;
+    private final String creatorUserId;
 
     protected DashboardWidget(Type type, String id, String description, int cacheTime, Dashboard dashboard) {
-        this(type, id, description, cacheTime, null, dashboard);
+        this(type, id, description, cacheTime, dashboard, null);
     }
 
-    protected DashboardWidget(Type type, String id, String description, int cacheTime, Stream stream, Dashboard dashboard) {
+    protected DashboardWidget(Type type, String id, String description, int cacheTime, Dashboard dashboard, String creatorUserId) {
         this.type = type;
         this.id = id;
         this.description = description;
         this.dashboard = dashboard;
         this.cacheTime = cacheTime;
-        this.stream = stream;
+        this.creatorUserId = creatorUserId;
     }
 
     public Type getType() {
@@ -126,7 +126,8 @@ public abstract class DashboardWidget {
                         w.description,
                         w.cacheTime,
                         (String) w.config.get("query"),
-                        TimeRange.factory((Map<String, Object>) w.config.get("timerange"))
+                        TimeRange.factory((Map<String, Object>) w.config.get("timerange")),
+                        w.creatorUserId
                 );
             case STREAM_SEARCH_RESULT_COUNT:
                 return new StreamSearchResultCountWidget(
@@ -136,7 +137,8 @@ public abstract class DashboardWidget {
                         w.cacheTime,
                         (String) w.config.get("query"),
                         TimeRange.factory((Map<String, Object>) w.config.get("timerange")),
-                        (String) w.config.get("stream_id")
+                        (String) w.config.get("stream_id"),
+                        w.creatorUserId
                 );
             default:
                 throw new NoSuchWidgetTypeException();
@@ -146,6 +148,10 @@ public abstract class DashboardWidget {
     public abstract Map<String, Object> getConfig();
     public abstract int getWidth();
     public abstract int getHeight();
+
+    public String getCreatorUserId() {
+        return creatorUserId;
+    }
 
     public static class NoSuchWidgetTypeException extends Throwable {
     }

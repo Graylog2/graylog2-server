@@ -58,6 +58,12 @@ $(document).ready(function() {
         });
     });
 
+    $(".dashboard .widget .show-config").live("click", function(e) {
+        var widget = $(this).closest(".widget");
+
+        $(".widget-config[data-widget-id=" + widget.attr("data-widget-id") + "]").modal();
+    });
+
     function delegateAddToDashboard(widgetType, dashboardId, elem) {
         switch(widgetType) {
             case "search-result-count":
