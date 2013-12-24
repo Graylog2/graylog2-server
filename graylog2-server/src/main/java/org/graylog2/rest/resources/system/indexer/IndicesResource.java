@@ -33,6 +33,7 @@ import org.elasticsearch.action.admin.indices.stats.*;
 import org.elasticsearch.cluster.ClusterState;
 import org.elasticsearch.cluster.metadata.IndexMetaData;
 import org.elasticsearch.cluster.routing.ShardRouting;
+import org.elasticsearch.common.collect.UnmodifiableIterator;
 import org.graylog2.indexer.ranges.RebuildIndexRangesJob;
 import org.graylog2.rest.documentation.annotations.*;
 import org.graylog2.rest.resources.RestResource;
@@ -109,7 +110,11 @@ public class IndicesResource extends RestResource {
                     .filterBlocks(true)
                     .filterMetaData(false);
             ClusterState state = core.getIndexer().getClient().admin().cluster().state(csr).actionGet().getState();
-            for (IndexMetaData indexMeta : state.getMetaData().getIndices().values()) {
+
+            UnmodifiableIterator<IndexMetaData> it = state.getMetaData().getIndices().valuesIt();
+
+            while(it.hasNext()) {
+                IndexMetaData indexMeta = it.next();
                 // Only search in our indices.
                 if (!indexMeta.getIndex().startsWith(core.getConfiguration().getElasticSearchIndexPrefix())) {
                     continue;

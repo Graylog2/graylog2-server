@@ -51,6 +51,7 @@ import org.elasticsearch.client.Client;
 import org.elasticsearch.cluster.ClusterState;
 import org.elasticsearch.cluster.metadata.IndexMetaData;
 import org.elasticsearch.cluster.metadata.MappingMetaData;
+import org.elasticsearch.common.hppc.cursors.ObjectObjectCursor;
 import org.elasticsearch.common.settings.ImmutableSettings;
 import org.elasticsearch.common.unit.TimeValue;
 import org.elasticsearch.index.query.QueryBuilder;
@@ -62,6 +63,7 @@ import org.graylog2.indexer.Mapping;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 
@@ -178,7 +180,7 @@ public class Indices {
 
     public String aliasTarget(String alias) {
         // The ES return value of this has an awkward format: The first key of the hash is the target index. Thanks.
-        return c.admin().indices().getAliases(new IndicesGetAliasesRequest(alias)).actionGet().getAliases().keySet().iterator().next();
+        return c.admin().indices().getAliases(new IndicesGetAliasesRequest(alias)).actionGet().getAliases().keysIt().next();
     }
 
     public boolean create(String indexName) {
@@ -200,7 +202,15 @@ public class Indices {
     }
 
     public ImmutableMap<String, IndexMetaData> getMetadata() {
-        return ImmutableMap.copyOf(c.admin().cluster().state(new ClusterStateRequest()).actionGet().getState().getMetaData().indices());
+        Map<String, IndexMetaData> metaData = Maps.newHashMap();
+
+        Iterator<ObjectObjectCursor<String, IndexMetaData>> it = c.admin().cluster().state(new ClusterStateRequest()).actionGet().getState().getMetaData().indices().iterator();
+        while(it.hasNext()) {
+            ObjectObjectCursor<String, IndexMetaData> next = it.next();
+            metaData.put(next.key, next.value);
+        }
+
+        return ImmutableMap.copyOf(metaData);
     }
 
     public Set<String> getAllMessageFields() {
@@ -208,9 +218,12 @@ public class Indices {
 
         ClusterStateRequest csr = new ClusterStateRequest().filterBlocks(true).filterNodes(true).filteredIndices(allIndicesAlias());
         ClusterState cs = c.admin().cluster().state(csr).actionGet().getState();
-        for (Map.Entry<String, IndexMetaData> d : cs.getMetaData().indices().entrySet()) {
+
+        Iterator<ObjectObjectCursor<String,IndexMetaData>> it = cs.getMetaData().indices().iterator();
+        while(it.hasNext()) {
+            ObjectObjectCursor<String, IndexMetaData> m = it.next();
             try {
-                MappingMetaData mmd = d.getValue().mapping(Indexer.TYPE);
+                MappingMetaData mmd = m.value.mapping(Indexer.TYPE);
                 if (mmd == null) {
                     // There is no mapping if there are no messages in the index.
                     continue;
@@ -220,7 +233,7 @@ public class Indices {
 
                 fields.addAll(mapping.keySet());
             } catch(Exception e) {
-                LOG.error("Error while trying to get fields of <{}>", d.getKey(), e);
+                LOG.error("Error while trying to get fields of <{}>", m.index, e);
                 continue;
             }
         }

@@ -95,7 +95,20 @@
         <dependency>
             <groupId>org.elasticsearch</groupId>
             <artifactId>elasticsearch</artifactId>
-            <version>0.90.7</version>
+            <version>0.90.9</version>
+            <!-- fuckeria jersey. really. do not repackage stuff under different groupids
+              TODO we really do not want to do this, because whenever someone decides to use lucene-expressions WE FOOKED.
+             -->
+            <exclusions>
+                <exclusion>
+                    <groupId>org.ow2.asm</groupId>
+                    <artifactId>asm</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>org.ow2.asm</groupId>
+                    <artifactId>asm-commons</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
         <dependency>
             <groupId>org.drools</groupId>
