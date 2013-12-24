@@ -42,7 +42,8 @@ import java.util.concurrent.TimeUnit;
 public abstract class DashboardWidget implements EmbeddedPersistable {
 
     public enum Type {
-        SEARCH_RESULT_COUNT
+        SEARCH_RESULT_COUNT,
+        STREAM_SEARCH_RESULT_COUNT
     }
 
     private static final String RESULT_CACHE_KEY = "result";
@@ -88,7 +89,7 @@ public abstract class DashboardWidget implements EmbeddedPersistable {
         try {
             type = Type.valueOf(awr.type.toUpperCase());
         } catch(IllegalArgumentException e) {
-            throw new NoSuchWidgetTypeException();
+            throw new NoSuchWidgetTypeException("No such widget type <" + awr.type + ">");
         }
 
         String id = UUID.randomUUID().toString();
@@ -115,6 +116,8 @@ public abstract class DashboardWidget implements EmbeddedPersistable {
         switch (type) {
             case SEARCH_RESULT_COUNT:
                 return new SearchResultCountWidget(core, id, null, 0, awr.config, (String) awr.config.get("query"), timeRange, awr.creatorUserId);
+            case STREAM_SEARCH_RESULT_COUNT:
+                return new StreamSearchResultCountWidget(core, id, null, 0, awr.config, (String) awr.config.get("query"), timeRange, awr.creatorUserId);
             default:
                 throw new NoSuchWidgetTypeException();
         }
@@ -166,9 +169,12 @@ public abstract class DashboardWidget implements EmbeddedPersistable {
             cacheTime = (Integer) fields.get("cache_time");
         }
 
+        // XXX TODO: these long constructors suck and 90% of it can be unified in a step before
         switch (type) {
             case SEARCH_RESULT_COUNT:
                 return new SearchResultCountWidget(core, (String) fields.get("id"), description, cacheTime, config, (String) config.get("query"), timeRange, (String) fields.get("creator_user_id"));
+            case STREAM_SEARCH_RESULT_COUNT:
+                return new StreamSearchResultCountWidget(core, (String) fields.get("id"), description, cacheTime, config, (String) config.get("query"), timeRange, (String) fields.get("creator_user_id"));
             default:
                 throw new NoSuchWidgetTypeException();
         }
@@ -234,6 +240,15 @@ public abstract class DashboardWidget implements EmbeddedPersistable {
     protected abstract ComputationResult compute();
 
     public static class NoSuchWidgetTypeException extends Exception {
+
+        public NoSuchWidgetTypeException() {
+            super();
+        }
+
+        public NoSuchWidgetTypeException(String msg) {
+            super(msg);
+        }
+
     }
 
 }
