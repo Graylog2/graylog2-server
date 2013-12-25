@@ -1263,7 +1263,7 @@ table#users-list td.centered {
     display: none;
 }
 
-.dashboard .widget .search-result-count .value {
+.dashboard .widget .search_result_count .value {
     line-height: 70px !important;
     text-align: center;
     font-size: 70px;
@@ -1271,7 +1271,7 @@ table#users-list td.centered {
     top: 20px;
 }
 
-.dashboard .widget .search-result-count .icon {
+.dashboard .widget .search_result_count .icon {
     color: #ebebeb;
 }
 
@@ -1279,7 +1279,7 @@ table#users-list td.centered {
     color: #ff4646 !important;
 }
 
-.dashboard .widget .search-result-count .title {
+.dashboard .widget .search_result_count .title {
     font-size: 16px;
     margin-top: 35px;
     text-align: center;

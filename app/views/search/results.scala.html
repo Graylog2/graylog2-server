@@ -88,9 +88,9 @@
     Found <span class="number-format" data-format="0,0">@searchResult.getTotalResultCount</span> messages.
 
     @if(stream == null) {
-        @views.html.partials.dashboards.add_to_dashboard.render("search-result-count", null)
+        @views.html.partials.dashboards.add_to_dashboard.render("search_result_count", null)
     } else {
-        @views.html.partials.dashboards.add_to_dashboard.render("stream-search-result-count", Array("data-stream-id='" + streamId + "'"))
+        @views.html.partials.dashboards.add_to_dashboard.render("stream_search_result_count", Array("data-stream-id='" + streamId + "'"))
     }
 </h4>
 
