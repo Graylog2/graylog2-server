@@ -115,9 +115,9 @@ public abstract class DashboardWidget implements EmbeddedPersistable {
 
         switch (type) {
             case SEARCH_RESULT_COUNT:
-                return new SearchResultCountWidget(core, id, null, 0, awr.config, (String) awr.config.get("query"), timeRange, awr.creatorUserId);
+                return new SearchResultCountWidget(core, id, awr.description, 0, awr.config, (String) awr.config.get("query"), timeRange, awr.creatorUserId);
             case STREAM_SEARCH_RESULT_COUNT:
-                return new StreamSearchResultCountWidget(core, id, null, 0, awr.config, (String) awr.config.get("query"), timeRange, awr.creatorUserId);
+                return new StreamSearchResultCountWidget(core, id, awr.description, 0, awr.config, (String) awr.config.get("query"), timeRange, awr.creatorUserId);
             default:
                 throw new NoSuchWidgetTypeException();
         }

@@ -28,6 +28,7 @@ import java.util.Map;
  */
 public class AddWidgetRequest {
 
+    public String description;
     public String type;
     public Map<String, Object> config;
 
