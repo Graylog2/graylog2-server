@@ -36,8 +36,8 @@ public class SearchResultCountWidget extends DashboardWidget {
     private final String query;
     private final TimeRange timerange;
 
-    public SearchResultCountWidget(Dashboard dashboard, String query, TimeRange timerange) {
-        this(dashboard, null, null, 0, query, timerange, null);
+    public SearchResultCountWidget(Dashboard dashboard, String query, TimeRange timerange, String description) {
+        this(dashboard, null, description, 0, query, timerange, null);
     }
 
     public SearchResultCountWidget(Dashboard dashboard, String id, String description, int cacheTime, String query, TimeRange timerange, String creatorUserId) {

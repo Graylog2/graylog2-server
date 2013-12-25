@@ -32,6 +32,7 @@ import java.util.Map;
 public class AddWidgetRequest extends ApiRequest {
 
     public String type;
+    public String description;
     public Map<String, Object> config;
 
     @SerializedName("creator_user_id")
@@ -39,6 +40,7 @@ public class AddWidgetRequest extends ApiRequest {
 
     public AddWidgetRequest(DashboardWidget widget, User user) {
         this.type = widget.getType().toString().toLowerCase();
+        this.description = widget.getDescription();
         this.config = widget.getConfig();
         this.creatorUserId = user.getName();
     }

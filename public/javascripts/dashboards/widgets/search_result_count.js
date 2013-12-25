@@ -1,8 +1,8 @@
-function addWidget_search_result_count(dashboardId, eventElem) {
+function addWidget_search_result_count(dashboardId, description, eventElem) {
     var params = originalUniversalSearchSettings();
     params.widgetType = "SEARCH_RESULT_COUNT";
 
-    addWidget(dashboardId, params);
+    addWidget(dashboardId, description, params);
 }
 
 function updateWidget_search_result_count(widget) {

@@ -32,9 +32,12 @@ $(document).ready(function() {
     }
 
     $("ul.dashboard-selector li a[data-dashboard-id]").live("click", function() {
+        var description = prompt("Give the widget a title:");
+
         delegateAddToDashboard(
             $(this).closest("ul.dashboard-selector").attr("data-widget-type"),
             $(this).attr("data-dashboard-id"),
+            description,
             $(this).closest("ul.dashboard-selector")
         );
     })
@@ -68,9 +71,9 @@ $(document).ready(function() {
         $(".widget-config[data-widget-id=" + widget.attr("data-widget-id") + "]").modal();
     });
 
-    function delegateAddToDashboard(widgetType, dashboardId, elem) {
+    function delegateAddToDashboard(widgetType, dashboardId, description, elem) {
         var funcName = "addWidget_" + widgetType;
-        window[funcName](dashboardId, elem);
+        window[funcName](dashboardId, description, elem);
     }
 
     // Periodically poll every widget.
@@ -207,7 +210,11 @@ $(document).ready(function() {
 
 });
 
-function addWidget(dashboardId, params) {
+function addWidget(dashboardId, description, params) {
+    if(description != undefined && description != "") {
+        params.description = description;
+    }
+
     $.ajax({
         url: '/a/dashboards/' + dashboardId + '/widgets',
         type: 'POST',

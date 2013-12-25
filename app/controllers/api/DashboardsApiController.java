@@ -96,6 +96,7 @@ public class DashboardsApiController extends AuthenticatedController {
             Map<String, String> params = flattenFormUrlEncoded(request().body().asFormUrlEncoded());
             String query = params.get("query");
             String rangeType = params.get("rangeType");
+            String description = params.get("description");
 
             Dashboard dashboard = dashboardService.get(dashboardId);
 
@@ -118,10 +119,10 @@ public class DashboardsApiController extends AuthenticatedController {
             try {
                 switch (DashboardWidget.Type.valueOf(params.get("widgetType"))) {
                     case SEARCH_RESULT_COUNT:
-                        widget = new SearchResultCountWidget(dashboard, query, timerange);
+                        widget = new SearchResultCountWidget(dashboard, query, timerange, description);
                         break;
                     case STREAM_SEARCH_RESULT_COUNT:
-                        widget = new StreamSearchResultCountWidget(dashboard, query, timerange, params.get("streamId"));
+                        widget = new StreamSearchResultCountWidget(dashboard, query, timerange, description, params.get("streamId"));
                         break;
                     default:
                         throw new IllegalArgumentException();

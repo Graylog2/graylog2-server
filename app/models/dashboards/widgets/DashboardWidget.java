@@ -72,7 +72,7 @@ public abstract class DashboardWidget {
     }
 
     public String getDescription() {
-        return (description == null ? "Description" : description);
+        return (description == null || description.isEmpty() ? "Description" : description);
     }
 
     public Dashboard getDashboard() {
