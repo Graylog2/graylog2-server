@@ -34,6 +34,14 @@ public abstract class TimeRange {
     public abstract Type getType();
     public abstract Map<String, String> getQueryParams();
 
+    public String nullSafeParam(String key) {
+        if (getQueryParams().containsKey(key)) {
+            return getQueryParams().get(key);
+        }
+
+        return "";
+    }
+
     public static TimeRange factory(String rangeType, int relative, String from, String to, String keyword) throws InvalidRangeParametersException {
         switch (Type.valueOf(rangeType.toUpperCase())) {
             case RELATIVE:

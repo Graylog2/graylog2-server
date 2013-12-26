@@ -22,6 +22,7 @@ package models.dashboards.widgets;
 import com.google.common.collect.Maps;
 import lib.timeranges.TimeRange;
 import models.dashboards.Dashboard;
+import play.mvc.Call;
 
 import java.util.Map;
 
@@ -58,6 +59,13 @@ public class StreamSearchResultCountWidget extends DashboardWidget {
 
         return config;
     }
+
+
+    @Override
+    public Call replayRoute() {
+        return prepareStreamBoundReplayRoute(streamId, query, timerange);
+    }
+
 
     @Override
     public int getWidth() {

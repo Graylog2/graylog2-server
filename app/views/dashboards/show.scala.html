@@ -54,10 +54,6 @@
                             @views.html.dashboards.widgets.stream_search_result_count(widget.asInstanceOf[models.dashboards.widgets.StreamSearchResultCountWidget])
                         }
 
-                        @if(widget.getType.equals(models.dashboards.widgets.DashboardWidget.Type.SEARCH_RESULT_FIELD_VALUE)) {
-                            @views.html.dashboards.widgets.search_result_field_value_chart(widget.asInstanceOf[models.dashboards.widgets.SearchResultFieldValueChartWidget])
-                        }
-
                     </div>
                 </li>
             }
@@ -128,6 +124,9 @@
             <div class="modal-footer">
                 <a class="btn" href="@routes.MetricsController.ofMasterNode("org.graylog2.dashboards.widgets.*." + widget.getId)">
                     Show widget metrics
+                </a>
+                <a class="btn btn-success" href="@widget.replayRoute()">
+                    Replay search
                 </a>
                 <button class="btn btn-primary" data-dismiss="modal" aria-hidden="true">Close</button>
             </div>

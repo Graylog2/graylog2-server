@@ -19,8 +19,10 @@
  */
 package models.dashboards.widgets;
 
+import controllers.routes;
 import lib.APIException;
 import lib.ApiClient;
+import lib.DateTools;
 import lib.timeranges.InvalidRangeParametersException;
 import lib.timeranges.TimeRange;
 import models.Stream;
@@ -28,6 +30,8 @@ import models.api.requests.dashboards.WidgetUpdateRequest;
 import models.api.responses.dashboards.DashboardWidgetResponse;
 import models.api.responses.dashboards.DashboardWidgetValueResponse;
 import models.dashboards.Dashboard;
+import org.joda.time.DateTime;
+import play.mvc.Call;
 
 import java.io.IOException;
 import java.util.Map;
@@ -146,8 +150,38 @@ public abstract class DashboardWidget {
     }
 
     public abstract Map<String, Object> getConfig();
+    public abstract Call replayRoute();
     public abstract int getWidth();
     public abstract int getHeight();
+
+    protected Call prepareNonStreamBoundReplayRoute(String query, TimeRange timerange) {
+        return routes.SearchController.index(
+                (query == null) ? "" : query,
+                timerange.getType().name().toLowerCase(),
+                timerange.getQueryParams().containsKey("range") ? Integer.valueOf(timerange.nullSafeParam("range")) : 0,
+                timerange.getQueryParams().containsKey("from") ? new DateTime(timerange.nullSafeParam("from")).toString(DateTools.SHORT_DATE_FORMAT) : "",
+                timerange.getQueryParams().containsKey("to") ? new DateTime(timerange.nullSafeParam("to")).toString(DateTools.SHORT_DATE_FORMAT) : "",
+                timerange.nullSafeParam("keyword"),
+                "minute",
+                0,
+                ""
+        );
+    }
+
+    protected Call prepareStreamBoundReplayRoute(String streamId, String query, TimeRange timerange) {
+        return routes.StreamSearchController.index(
+                streamId,
+                (query == null) ? "" : query,
+                timerange.getType().name().toLowerCase(),
+                timerange.getQueryParams().containsKey("range") ? Integer.valueOf(timerange.nullSafeParam("range")) : 0,
+                timerange.getQueryParams().containsKey("from") ? new DateTime(timerange.nullSafeParam("from")).toString(DateTools.SHORT_DATE_FORMAT) : "",
+                timerange.getQueryParams().containsKey("to") ? new DateTime(timerange.nullSafeParam("to")).toString(DateTools.SHORT_DATE_FORMAT) : "",
+                timerange.nullSafeParam("keyword"),
+                "minute",
+                0,
+                ""
+        );
+    }
 
     public String getCreatorUserId() {
         return creatorUserId;
