@@ -60,6 +60,18 @@ public class MetricsController extends AuthenticatedController {
         }
     }
 
+    public Result ofMasterNode(String preFilter) {
+        try {
+            String masterId = nodeService.loadMasterNode().getNodeId();
+            return redirect(routes.MetricsController.ofNode(masterId, preFilter));
+        } catch (IOException e) {
+            return status(500, views.html.errors.error.render(ApiClient.ERROR_MSG_IO, e, request()));
+        } catch (APIException e) {
+            String message = "Could not fetch master node information. We expected HTTP 200, but got a HTTP " + e.getHttpCode() + ".";
+            return status(500, views.html.errors.error.render(message, e, request()));
+        }
+    }
+
     public Result ofRadio(String radioId, String preFilter) {
         try {
             Radio radio = nodeService.loadRadio(radioId);

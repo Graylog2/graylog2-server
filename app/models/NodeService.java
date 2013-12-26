@@ -66,6 +66,15 @@ public class NodeService {
         }
     }
 
+    public Node loadMasterNode() throws APIException, IOException {
+        NodeSummaryResponse r = api.get(NodeSummaryResponse.class)
+                .path("/system/cluster/node")
+                .onlyMasterNode()
+                .execute();
+
+        return nodeFactory.fromSummaryResponse(r);
+    }
+
     public Radio loadRadio(String radioId) throws NodeNotFoundException {
         RadioSummaryResponse r;
 
