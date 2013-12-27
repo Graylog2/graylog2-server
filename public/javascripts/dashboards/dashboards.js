@@ -95,8 +95,8 @@ $(document).ready(function() {
         dashboardGrid.enable();
         $(".dashboard .gridster .gs-w").css("cursor", "move");
         $(this).hide();
-        $(".dashboard .widget .only-unlocked").show();
-        $(".dashboard .widget .hidden-unlocked").hide();
+        $(".only-unlocked").show();
+        $(".hidden-unlocked").hide();
         $(".lock-dashboard-widgets").show();
     });
 
@@ -104,8 +104,8 @@ $(document).ready(function() {
         dashboardGrid.disable();
         $(".dashboard .gridster .gs-w").css("cursor", "default");
         $(this).hide();
-        $(".dashboard .widget .hidden-unlocked").show();
-        $(".dashboard .widget .only-unlocked").hide();
+        $(".hidden-unlocked").show();
+        $(".only-unlocked").hide();
         $(".unlock-dashboard-widgets").show();
     });
 

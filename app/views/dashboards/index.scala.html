@@ -3,7 +3,7 @@
 @main("Dashboards", sidebars.standard(currentUser), "", currentUser) {
 
     <div class="row-fluid">
-        <a href="@routes.DashboardsController.newDashboard()" class="btn btn-success btn-small pull-right">Create dashboard</a>
+        <a href="@routes.DashboardsController.newDashboard()" class="btn btn-success pull-right">Create dashboard</a>
 
         <h1><i class="icon icon-dashboard"></i> Dashboards</h1>
         Use dashboards to create specific views on your messages. Create a new dashboard here and add any graph or chart
@@ -27,7 +27,7 @@
         <div class="row-fluid node-row dashboard-row">
             <div class="pull-right">
                 Created by @views.html.partials.links.to_user.render(dashboard.getCreatorUser)
-                at @lib.DateTools.inUserTimeZone(dashboard.getCreatedAt())
+                <span class="moment-from-now" title="@dashboard.getCreatedAt()">@dashboard.getCreatedAt()</span>
 
                 @helper.form(action = routes.DashboardsController.delete(dashboard.getId)) {
                     <button type="submit" class="btn btn-danger btn-mini" data-confirm="Really delete dashboard?">

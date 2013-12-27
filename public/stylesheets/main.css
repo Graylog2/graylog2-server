@@ -1482,12 +1482,6 @@ form.node-processing-change input {
     color: #aaaaaa;
 }
 
-.stream-row .throughput {
-    margin-right: 5px;
-    position: relative;
-    top: 3px;
-}
-
 #streamrule-form-modal .well {
     font-family: 'Open Sans', sans-serif !important;
 }
@@ -1555,4 +1549,17 @@ input#save-search-title {
 
 #saved_searches_selector_chosen {
  font-family: "Helvetica Neue", Helvetica, Arial, sans-serif !important;
+}
+
+.edit-dashboard {
+    font-size: 11px;
+}
+
+.dashboard-row h3 a {
+    color: #000;
+}
+
+.stream-row .throughput .value {
+    font-family: monospace;
+    font-size: 12px;
 }

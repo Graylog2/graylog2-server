@@ -2,7 +2,7 @@
 
 @main("Streams", views.html.sidebars.standard(currentUser), "", currentUser, false) {
 
-    <a href="/streams/new" class="btn btn-success btn-small pull-right">Create stream</a>
+    <a href="/streams/new" class="btn btn-success pull-right">Create stream</a>
 
     <div class="row-fluid">
         <h1><i class="icon icon-barcode"></i> Streams</h1>
@@ -16,13 +16,8 @@
     @for(stream <- streams.sortBy(_.getTitle)) {
         <div class="row-fluid node-row stream-row" data-stream-id="@stream.getId">
             <span class="pull-right node-row-info">
-                <span class="throughput">
-                    <span class="comingsoon" title="Coming soon!">
-                        Throughput:
-                        <span class="value">?</span>
-                        messages/second
-                    </span>
-                </span>
+                Created by @views.html.partials.links.to_user.render(stream.getCreatorUser)
+                <span class="moment-from-now" title="@stream.getCreatedAt()">@stream.getCreatedAt()</span>
 
                 <button class="btn btn-danger btn-mini remove-stream"
                     type="submit"
@@ -75,13 +70,22 @@
             </h3>
 
             <div class="stream-row-details">
+                <span class="throughput">
+                    <span title="Coming soon!">
+                        IO:
+                        <i class="icon icon-caret-right"></i>
+                        <span class="value">0</span>
+                        messages/second,
+                    </span>
+                </span>
+
                 @if(stream.getStreamRules.isEmpty) {
-                    This stream has no configured rules yet.
+                    no configured rules.
                     <a href="@routes.StreamRulesController.index(stream.getId)">
                         Edit rules
                     </a>
                 } else {
-                    This stream has <span class="stream-rule-count" data-stream-id="@stream.getId">@stream.getStreamRules.size()</span> configured
+                    <span class="stream-rule-count" data-stream-id="@stream.getId">@stream.getStreamRules.size()</span> configured
                     @if(stream.getStreamRules.size() == 1) {
                         rule.
                     } else {
@@ -90,7 +94,7 @@
 
                     <a href="#" class="trigger-stream-rules">
                         <i class="icon icon-caret-down"></i>
-                        <span>Show rules</span>
+                        <span>Show</span>
                     </a>
                 }
             </div>
