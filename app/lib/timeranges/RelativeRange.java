@@ -48,4 +48,12 @@ public class RelativeRange extends TimeRange {
         }};
     }
 
+    @Override
+    public String toString() {
+        StringBuilder sb =  new StringBuilder("Relative time range [").append(this.getClass().getCanonicalName()).append("] - ");
+        sb.append("range: ").append(this.range);
+
+        return sb.toString();
+    }
+
 }

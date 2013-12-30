@@ -31,6 +31,7 @@ import models.api.responses.dashboards.DashboardWidgetResponse;
 import models.api.responses.dashboards.DashboardWidgetValueResponse;
 import models.dashboards.Dashboard;
 import org.joda.time.DateTime;
+import play.Logger;
 import play.mvc.Call;
 
 import java.io.IOException;
@@ -44,7 +45,7 @@ public abstract class DashboardWidget {
     public enum Type {
         SEARCH_RESULT_COUNT,
         STREAM_SEARCH_RESULT_COUNT,
-        SEARCH_RESULT_FIELD_VALUE
+        FIELD_CHART
     }
 
     private final Type type;
@@ -142,6 +143,18 @@ public abstract class DashboardWidget {
                         (String) w.config.get("query"),
                         TimeRange.factory((Map<String, Object>) w.config.get("timerange")),
                         (String) w.config.get("stream_id"),
+                        w.creatorUserId
+                );
+            case FIELD_CHART:
+                return new FieldChartWidget(
+                        dashboard,
+                        w.id,
+                        w.description,
+                        w.cacheTime,
+                        (String) w.config.get("query"),
+                        TimeRange.factory((Map<String, Object>) w.config.get("timerange")),
+                        (w.config.containsKey("stream_id") ? (String) w.config.get("stream_id") : null),
+                        w.config,
                         w.creatorUserId
                 );
             default:

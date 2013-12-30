@@ -70,7 +70,7 @@ public class DashboardsController extends AuthenticatedController {
 
             return ok(views.html.dashboards.show.render(currentUser(), bc, dashboard));
         } catch (APIException e) {
-            String message = "Could not get dashboards. We expected HTTP 200, but got a HTTP " + e.getHttpCode() + ".";
+            String message = "Could not get dashboard. We expected HTTP 200, but got a HTTP " + e.getHttpCode() + ".";
             return status(504, views.html.errors.error.render(message, e, request()));
         } catch (IOException e) {
             return status(504, views.html.errors.error.render(ApiClient.ERROR_MSG_IO, e, request()));

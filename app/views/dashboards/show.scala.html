@@ -141,7 +141,7 @@
                 Type: @widget.getType.toString.toLowerCase, cached for @widget.getCacheTime seconds.
 
                 <p style="margin-bottom: 0px; margin-top: 5px;">
-                @if(widget.getConfig.containsKey("stream_id")) {
+                @if(widget.getConfig.containsKey("stream_id") && widget.getConfig.get("stream_id") != null) {
                     Bound to stream
                     <a href="@routes.StreamSearchController.index(widget.getConfig.get("stream_id").asInstanceOf[String], "*", "relative", 300)">@widget.getConfig.get("stream_id")</a>.
                 } else {

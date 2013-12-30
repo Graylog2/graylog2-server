@@ -31,12 +31,14 @@ import models.dashboards.Dashboard;
 import models.dashboards.DashboardService;
 import models.NodeService;
 import models.dashboards.widgets.DashboardWidget;
+import models.dashboards.widgets.FieldChartWidget;
 import models.dashboards.widgets.SearchResultCountWidget;
 import models.dashboards.widgets.StreamSearchResultCountWidget;
 import play.Logger;
 import play.mvc.Result;
 
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.Map;
 
 /**
@@ -93,7 +95,7 @@ public class DashboardsApiController extends AuthenticatedController {
 
     public Result addWidget(String dashboardId) {
         try {
-            Map<String, String> params = flattenFormUrlEncoded(request().body().asFormUrlEncoded());
+            final Map<String, String> params = flattenFormUrlEncoded(request().body().asFormUrlEncoded());
             String query = params.get("query");
             String rangeType = params.get("rangeType");
             String description = params.get("description");
@@ -123,6 +125,17 @@ public class DashboardsApiController extends AuthenticatedController {
                         break;
                     case STREAM_SEARCH_RESULT_COUNT:
                         widget = new StreamSearchResultCountWidget(dashboard, query, timerange, description, params.get("streamId"));
+                        break;
+                    case FIELD_CHART:
+                        Map<String, Object> config = new HashMap<String, Object>() {{
+                            put("field", params.get("field"));
+                            put("valuetype", params.get("valuetype"));
+                            put("renderer", params.get("renderer"));
+                            put("interpolation", params.get("interpolation"));
+                            put("interval", params.get("interval"));
+                        }};
+
+                        widget = new FieldChartWidget(dashboard, query, timerange, description, params.get("streamId"), config);
                         break;
                     default:
                         throw new IllegalArgumentException();

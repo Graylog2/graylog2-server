@@ -52,4 +52,12 @@ public class AbsoluteRange extends TimeRange {
         }};
     }
 
+    @Override
+    public String toString() {
+        StringBuilder sb =  new StringBuilder("Absolute time range [").append(this.getClass().getCanonicalName()).append("] - ");
+        sb.append("from: ").append(this.from).append(" to: ").append(this.to);
+
+        return sb.toString();
+    }
+
 }

@@ -45,6 +45,10 @@ public class StreamSearchResultCountWidget extends DashboardWidget {
     public StreamSearchResultCountWidget(Dashboard dashboard, String id, String description, int cacheTime, String query, TimeRange timerange, String streamId, String creatorUserId) {
         super(DashboardWidget.Type.STREAM_SEARCH_RESULT_COUNT, id, description, cacheTime, dashboard, creatorUserId);
 
+        if (streamId == null || streamId.isEmpty()) {
+            throw new RuntimeException("Missing streamId for widget [" + id + "] on dashboard [" + dashboard.getId() + "].");
+        }
+
         this.query = query;
         this.timerange = timerange;
         this.streamId = streamId;
@@ -60,12 +64,10 @@ public class StreamSearchResultCountWidget extends DashboardWidget {
         return config;
     }
 
-
     @Override
     public Call replayRoute() {
         return prepareStreamBoundReplayRoute(streamId, query, timerange);
     }
-
 
     @Override
     public int getWidth() {

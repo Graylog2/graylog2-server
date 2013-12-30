@@ -49,4 +49,12 @@ public class KeywordRange extends TimeRange {
         }};
     }
 
+    @Override
+    public String toString() {
+        StringBuilder sb =  new StringBuilder("Keyword time range [").append(this.getClass().getCanonicalName()).append("] - ");
+        sb.append("keyword: ").append(this.keyword);
+
+        return sb.toString();
+    }
+
 }
