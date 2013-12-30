@@ -26,6 +26,7 @@ import com.mongodb.DBObject;
 import org.bson.types.ObjectId;
 import org.graylog2.Core;
 import org.graylog2.dashboards.widgets.DashboardWidget;
+import org.graylog2.dashboards.widgets.InvalidWidgetConfigurationException;
 import org.graylog2.database.NotFoundException;
 import org.graylog2.database.Persisted;
 import org.graylog2.database.ValidationException;
@@ -97,6 +98,9 @@ public class Dashboard extends Persisted {
                         continue;
                     } catch (InvalidRangeParametersException e) {
                         LOG.error("Invalid range parameters of widget in dashboard: [{}]", dashboard.getId(), e);
+                        continue;
+                    } catch (InvalidWidgetConfigurationException e) {
+                        LOG.error("Invalid configuration of widget in dashboard: [{}]", dashboard.getId(), e);
                         continue;
                     }
                     dashboard.addPersistedWidget(widget);

@@ -25,6 +25,7 @@ import com.google.common.collect.Maps;
 import org.bson.types.ObjectId;
 import org.graylog2.dashboards.Dashboard;
 import org.graylog2.dashboards.widgets.DashboardWidget;
+import org.graylog2.dashboards.widgets.InvalidWidgetConfigurationException;
 import org.graylog2.database.*;
 import org.graylog2.indexer.searches.timeranges.InvalidRangeParametersException;
 import org.graylog2.rest.documentation.annotations.*;
@@ -107,7 +108,7 @@ public class DashboardsResource extends RestResource {
         restrictToMaster();
         List<Map<String, Object>> dashboards = Lists.newArrayList();
 
-        for (Dashboard dashboard: Dashboard.all(core)) {
+        for (Dashboard dashboard : Dashboard.all(core)) {
             dashboards.add(dashboard.asMap());
         }
 
@@ -208,6 +209,9 @@ public class DashboardsResource extends RestResource {
         } catch (InvalidRangeParametersException e3) {
             LOG.error("Invalid timerange parameters provided.", e3);
             throw new WebApplicationException(e3, Response.Status.BAD_REQUEST);
+        } catch (InvalidWidgetConfigurationException e4) {
+            LOG.error("Invalid widget configuration.", e4);
+            throw new WebApplicationException(e4, Response.Status.BAD_REQUEST);
         }
 
         Map<String, Object> result = Maps.newHashMap();
