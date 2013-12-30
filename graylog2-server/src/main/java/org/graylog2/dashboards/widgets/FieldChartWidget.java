@@ -20,7 +20,13 @@
 package org.graylog2.dashboards.widgets;
 
 import org.graylog2.Core;
+import org.graylog2.indexer.IndexHelper;
+import org.graylog2.indexer.Indexer;
+import org.graylog2.indexer.results.HistogramResult;
+import org.graylog2.indexer.searches.Searches;
 import org.graylog2.indexer.searches.timeranges.TimeRange;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -29,6 +35,8 @@ import java.util.Map;
  * @author Lennart Koopmann <lennart@torch.sh>
  */
 public class FieldChartWidget extends DashboardWidget {
+
+    private static final Logger LOG = LoggerFactory.getLogger(FieldChartWidget.class);
 
     private final Core core;
     private final String query;
@@ -43,7 +51,12 @@ public class FieldChartWidget extends DashboardWidget {
             throw new InvalidWidgetConfigurationException("Missing or invalid widget configuration. Provided config was: " + config.toString());
         }
 
-        this.query = query;
+        if (query == null || query.trim().isEmpty()) {
+            this.query = "*";
+        } else {
+            this.query = query;
+        }
+
         this.timeRange = timeRange;
         this.core = core;
         this.config = config;
@@ -72,7 +85,30 @@ public class FieldChartWidget extends DashboardWidget {
 
     @Override
     protected ComputationResult compute() {
-        return new ComputationResult(0, 9001);
+        String filter = null;
+        if (streamId != null && !streamId.isEmpty()) {
+            filter = "streams:" + filter;
+        }
+
+        try {
+            HistogramResult histogramResult = core.getIndexer().searches().fieldHistogram(
+                    query,
+                    (String) config.get("field"),
+                    Indexer.DateHistogramInterval.valueOf(((String) config.get("interval")).toUpperCase()),
+                    filter,
+                    timeRange
+            );
+
+            return new ComputationResult(histogramResult.getResults(), histogramResult.took().millis());
+        } catch (Searches.FieldTypeException e) {
+            String msg = "Could not calculate [" + this.getClass().getCanonicalName() + "] widget <" + getId() + ">. Not a numeric field? The field was [" + config.get("field") + "]";
+            LOG.error(msg, e);
+            throw new RuntimeException(msg);
+        } catch (IndexHelper.InvalidRangeFormatException e) {
+            String msg = "Could not calculate [" + this.getClass().getCanonicalName() + "] widget <" + getId() + ">. Invalid time range.";
+            LOG.error(msg, e);
+            throw new RuntimeException(msg);
+        }
     }
 
     private boolean checkConfig(Map<String, Object> config) {

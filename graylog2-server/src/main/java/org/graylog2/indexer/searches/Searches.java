@@ -175,7 +175,7 @@ public class Searches {
             request = srb.request();
             r = c.search(request).actionGet();
         }  catch (org.elasticsearch.action.search.SearchPhaseExecutionException e) {
-            throw new FieldTypeException();
+            throw new FieldTypeException(e);
         }
 
         return new FieldStatsResult(
@@ -230,7 +230,7 @@ public class Searches {
         try {
             r = c.search(request).actionGet();
         }  catch (org.elasticsearch.action.search.SearchPhaseExecutionException e) {
-            throw new FieldTypeException();
+            throw new FieldTypeException(e);
         }
 
         return new FieldHistogramResult((DateHistogramFacet) r.getFacets().facet("histogram"), query, request.source(),
@@ -334,5 +334,10 @@ public class Searches {
     }
 
     public class FieldTypeException extends Exception {
+
+        public FieldTypeException(Throwable e) {
+            super(e);
+        }
+
     }
 }
