@@ -14,12 +14,23 @@
     <h1>
         @dashboard.getTitle
 
-        <a href="#" class="edit-dashboard only-unlocked" style="display: none;">
+        <a href="#" class="edit-dashboard only-unlocked" style="display: none; line-height: 12px;">
             <i class="icon icon-pencil" title="Edit"></i>
         </a>
     </h1>
 
-    <p>
+    <form action="#" method="POST" class="edit-dashboard-form">
+        <label for="title">Title:</label>
+        <input type="text" name="title" class="input-xxlarge" id="title" value="@dashboard.getTitle" />
+
+        <label for="description">Description:</label>
+        <input type="text" name="description" class="input-xxlarge" id="description" value="@dashboard.getDescription" />
+
+        <br />
+        <button class="btn btn-success">Update dashboard</button>
+    </form>
+
+    <p class="dashboard-description">
         @dashboard.getDescription
         (Unlock widget positions by clicking on the lock symbol on the top right. Then drag them to any position you like.)
     </p>

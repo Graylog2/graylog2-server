@@ -417,6 +417,10 @@ $(document).ready(function() {
 
                 $(".type-description", template).text("(" + opts.valuetype + ")");
 
+                //// XXX REMOVE
+                /*var dashboardList = $(".graph-settings .dropdown-menu .dashboards");
+                for ()*/
+
                 $("#field-graphs").append(template);
 
                 var graphContainer = $('.field-graph-container[data-field="' + field + '"]', $("#field-graphs"));
@@ -595,13 +599,6 @@ $(document).ready(function() {
 
         graphContainer.remove();
         delete fieldGraphs[field];
-    });
-
-    $(".field-graph-container .add-to-dashboard").live("click", function(e) {
-        e.preventDefault();
-
-        // TODO
-        alert("Adding charts to dashboards is not implemented yet. (GitHub issue: #327)");
     });
 
     $(".field-graph-container .pin").live("click", function(e) {

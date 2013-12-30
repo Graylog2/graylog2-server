@@ -18,8 +18,8 @@ $(document).ready(function() {
 
     function applyDashboardsToAllSelectors() {
         if (Object.keys(globalDashboards).length > 0) {
-            $("a.add-to-dashboard[data-widget-type]").each(function() {
-                var dashboardList = $("ul.dashboard-selector", $(this).parent());
+            $(".dashboard-selector[data-widget-type]").each(function() {
+                var dashboardList = $(this);
                 $("li", dashboardList).remove();
 
                 for (var key in globalDashboards) {
@@ -90,6 +90,13 @@ $(document).ready(function() {
             window[funcName]($(this));
         }).promise().done(function(){ setTimeout(updateDashboardWidgets, interval); });
     })();
+
+    // Change dashboard title.
+    $(".edit-dashboard").on("click", function() {
+        $(this).closest("h1").hide();
+        $(".dashboard-description").hide();
+        $("form.edit-dashboard-form").show();
+    });
 
     $(".unlock-dashboard-widgets").on("click", function() {
         dashboardGrid.enable();

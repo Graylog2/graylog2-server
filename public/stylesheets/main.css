@@ -1563,3 +1563,7 @@ input#save-search-title {
     font-family: monospace;
     font-size: 12px;
 }
+
+form.edit-dashboard-form {
+    display: none;
+}

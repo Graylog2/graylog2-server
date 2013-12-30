@@ -215,7 +215,17 @@
                         </ul>
                     </li>
 
-                    <li><a href="#" class="add-to-dashboard">Add to dashboard</a></li>
+                    <li class="dropdown-submenu">
+                        <a href="#">Add to dashboard</a>
+
+                        <ul class="dropdown-menu dashboard-selector" data-widget-type="field_chart">
+                            <li>
+                                <a href="@routes.DashboardsController.newDashboard()">No dashboards. Create one?</a>
+                            </li>
+                        </ul>
+                    </li>
+
+
                     <li><a href="#" class="hide">Hide</a></li>
                 </ul>
             </div>
