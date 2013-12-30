@@ -86,8 +86,31 @@ $(document).ready(function() {
         }
 
         $(".dashboard .widget[data-widget-type][data-disabled!='true']").each(function() {
-            var funcName = "updateWidget_" + $(this).attr("data-widget-type");
-            window[funcName]($(this));
+            var widget = $(this);
+            var dashboardId = widget.attr("data-dashboard-id");
+            var widgetId = widget.attr("data-widget-id");
+
+            $(".reloading", widget).show();
+
+            $.ajax({
+                url: '/a/dashboards/' + dashboardId + '/widgets/' + widgetId + '/value',
+                type: 'GET',
+                success: function(data) {
+                    // Pass to widget specific function to display actual value(s).
+                    var funcName = "updateWidget_" + widget.attr("data-widget-type");
+                    window[funcName](widget, data);
+
+                    $(".calculated-at", widget).attr("title", data.calculated_at);
+                    $(".calculated-at", widget).text(moment(data.calculated_at).fromNow());
+                },
+                error: function(data) {
+                    widget.attr("data-disabled", "true");
+                    showErrorInWidget(widget);
+                },
+                complete: function(data) {
+                    $(".reloading", widget).hide();
+                }
+            });
         }).promise().done(function(){ setTimeout(updateDashboardWidgets, interval); });
     })();
 

@@ -16,3 +16,7 @@ function addWidget_field_chart(dashboardId, description, eventElem) {
 
     addWidget(dashboardId, description, params);
 }
+
+function updateWidget_field_chart(widget, data) {
+    console.log(data);
+}
