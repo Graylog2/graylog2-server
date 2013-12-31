@@ -87,7 +87,7 @@ public class FieldChartWidget extends DashboardWidget {
     protected ComputationResult compute() {
         String filter = null;
         if (streamId != null && !streamId.isEmpty()) {
-            filter = "streams:" + filter;
+            filter = "streams:" + streamId;
         }
 
         try {
