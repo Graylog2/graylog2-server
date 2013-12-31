@@ -19,7 +19,7 @@
         </a>
     </h1>
 
-    <form action="#" method="POST" class="edit-dashboard-form">
+    <form action="@routes.DashboardsController.update(dashboard.getId)" method="POST" class="edit-dashboard-form">
         <label for="title">Title:</label>
         <input type="text" name="title" class="input-xxlarge" id="title" value="@dashboard.getTitle" />
 

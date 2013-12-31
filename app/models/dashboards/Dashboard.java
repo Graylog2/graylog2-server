@@ -28,6 +28,7 @@ import lib.timeranges.InvalidRangeParametersException;
 import models.User;
 import models.UserService;
 import models.api.requests.dashboards.AddWidgetRequest;
+import models.api.requests.dashboards.UpdateDashboardRequest;
 import models.api.responses.dashboards.DashboardSummaryResponse;
 import models.api.responses.dashboards.DashboardWidgetResponse;
 import models.dashboards.widgets.DashboardWidget;
@@ -86,6 +87,13 @@ public class Dashboard {
         api.delete().path("/dashboards/{0}/widgets/{1}", id, widgetId)
                 .onlyMasterNode()
                 .expect(Http.Status.NO_CONTENT)
+                .execute();
+    }
+
+    public void update(UpdateDashboardRequest udr) throws APIException, IOException {
+        api.put().path("/dashboards/{0}", id)
+                .body(udr)
+                .expect(Http.Status.OK)
                 .execute();
     }
 
