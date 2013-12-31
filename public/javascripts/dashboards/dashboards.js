@@ -221,7 +221,7 @@ $(document).ready(function() {
             },
             type: 'POST',
             success: function(data) {
-                $(".description .title", widget).text(newVal);
+                $(".description .widget-title", widget).text(newVal);
                 $(".description", widget).show();
                 $(".description-form", widget).hide();
                 $(".description", widget).show();

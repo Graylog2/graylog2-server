@@ -1,7 +1,18 @@
-@(widget: models.dashboards.widgets.StreamSearchResultCountWidget)
+@(widget: models.dashboards.widgets.FieldChartWidget)
 
-<div class="search_result_count">
-    <div class="value"><i class="icon icon-refresh"></i></div>
+<div class="field_chart">
+
+    <div class="dashboard-chart"
+        data-config-field="@widget.getConfig.get("field")"
+        data-config-interpolation="@widget.getConfig.get("interpolation")"
+        data-config-renderer="@widget.getConfig.get("renderer")"
+        data-config-valuetype="@widget.getConfig.get("valuetype")"
+    >
+        <div class="reloading">
+            <i class="icon icon-refresh"></i>
+        </div>
+    </div>
+
     <div class="widget-subline">
         <div class="description">
             <span class="widget-title">

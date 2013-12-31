@@ -417,10 +417,6 @@ $(document).ready(function() {
 
                 $(".type-description", template).text("(" + opts.valuetype + ")");
 
-                //// XXX REMOVE
-                /*var dashboardList = $(".graph-settings .dropdown-menu .dashboards");
-                for ()*/
-
                 $("#field-graphs").append(template);
 
                 var graphContainer = $('.field-graph-container[data-field="' + field + '"]', $("#field-graphs"));

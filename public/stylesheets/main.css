@@ -1279,12 +1279,6 @@ table#users-list td.centered {
     color: #ff4646 !important;
 }
 
-.dashboard .widget .search_result_count .title {
-    font-size: 16px;
-    margin-top: 35px;
-    text-align: center;
-}
-
 .dashboard .widget .controls {
     display: none;
 }
@@ -1566,4 +1560,38 @@ input#save-search-title {
 
 form.edit-dashboard-form {
     display: none;
+}
+
+.dashboard .widget .field_chart .dashboard-chart {
+    position: relative;
+    top: 15px;
+}
+
+.dashboard .widget .field_chart .dashboard-chart .x_tick {
+    top: 25px;
+}
+
+.dashboard .widget .field_chart .reloading {
+    line-height: 70px !important;
+    text-align: center;
+    font-size: 70px;
+    position: relative;
+    top: 5px;
+    color: #ebebeb;
+}
+
+.dashboard .widget .widget-subline {
+    font-size: 16px;
+    margin-top: 35px;
+    text-align: center;
+}
+
+.dashboard .widget .field_chart .description {
+    margin-top: 40px;
+    text-align: center;
+}
+
+.dashboard .widget .field_chart .description-form {
+    margin-top: 37px;
+    text-align: center;
 }

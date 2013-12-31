@@ -75,6 +75,10 @@
                             @views.html.dashboards.widgets.stream_search_result_count(widget.asInstanceOf[models.dashboards.widgets.StreamSearchResultCountWidget])
                         }
 
+                        @if(widget.getType.equals(models.dashboards.widgets.DashboardWidget.Type.FIELD_CHART)) {
+                            @views.html.dashboards.widgets.field_chart(widget.asInstanceOf[models.dashboards.widgets.FieldChartWidget])
+                        }
+
                     </div>
                 </li>
             }
