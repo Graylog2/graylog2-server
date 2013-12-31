@@ -114,6 +114,14 @@ public class Dashboard extends Persisted {
         return dashboards;
     }
 
+    public void setTitle(String title) {
+        this.fields.put("title", title);
+    }
+
+    public void setDescription(String description) {
+        this.fields.put("description", description);
+    }
+
     public void addPersistedWidget(DashboardWidget widget) {
         widgets.put(widget.getId(), widget);
     }

@@ -32,6 +32,7 @@ import org.graylog2.rest.documentation.annotations.*;
 import org.graylog2.rest.resources.RestResource;
 import org.graylog2.rest.resources.dashboards.requests.AddWidgetRequest;
 import org.graylog2.rest.resources.dashboards.requests.CreateRequest;
+import org.graylog2.rest.resources.dashboards.requests.UpdateRequest;
 import org.graylog2.rest.resources.dashboards.requests.UpdateWidgetRequest;
 import org.graylog2.system.activities.Activity;
 import org.joda.time.DateTime;
@@ -164,8 +165,51 @@ public class DashboardsResource extends RestResource {
         return Response.status(Response.Status.fromStatusCode(204)).build();
     }
 
-    @POST
-    @Timed
+    @PUT @Timed
+    @ApiOperation(value = "Update the settings of a dashboard.")
+    @Produces(MediaType.APPLICATION_JSON)
+    @Path("/{dashboardId}")
+    @ApiResponses(value = {
+            @ApiResponse(code = 404, message = "Dashboard not found.")
+    })
+    public Response update(@ApiParam(title = "JSON body", required = true) String body,
+                           @ApiParam(title = "dashboardId", required = true) @PathParam("dashboardId") String dashboardId) {
+        try {
+            UpdateRequest cr;
+            try {
+                cr = objectMapper.readValue(body, UpdateRequest.class);
+            } catch(IOException e) {
+                LOG.error("Error while parsing JSON", e);
+                throw new WebApplicationException(e, Response.Status.BAD_REQUEST);
+            }
+
+            Dashboard dashboard = Dashboard.load(loadObjectId(dashboardId), core);
+
+            if(cr.title != null) {
+                dashboard.setTitle(cr.title);
+            }
+
+            if (cr.description != null) {
+                dashboard.setDescription(cr.description);
+            }
+
+            // Validations are happening here.
+            dashboard.save();
+
+            String msg = "Deleted dashboard <" + dashboard.getId() + ">. Reason: REST request.";
+            LOG.info(msg);
+            core.getActivityWriter().write(new Activity(msg, DashboardsResource.class));
+        } catch (org.graylog2.database.NotFoundException e) {
+            throw new WebApplicationException(404);
+        } catch (ValidationException e) {
+            LOG.error("Validation error.", e);
+            throw new WebApplicationException(e, Response.Status.BAD_REQUEST);
+        }
+
+        return Response.status(Response.Status.OK).build();
+    }
+
+    @POST @Timed
     @ApiOperation(value = "Add a widget to a dashboard")
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
