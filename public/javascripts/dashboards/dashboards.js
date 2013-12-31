@@ -85,7 +85,7 @@ $(document).ready(function() {
             return;
         }
 
-        $(".dashboard .widget[data-widget-type][data-disabled!='true']").each(function() {
+        $(".dashboard .widget[data-widget-type]").each(function() {
             var widget = $(this);
             var dashboardId = widget.attr("data-dashboard-id");
             var widgetId = widget.attr("data-widget-id");
@@ -104,7 +104,6 @@ $(document).ready(function() {
                     $(".calculated-at", widget).text(moment(data.calculated_at).fromNow());
                 },
                 error: function(data) {
-                    widget.attr("data-disabled", "true");
                     showErrorInWidget(widget);
                 },
                 complete: function(data) {
@@ -235,7 +234,7 @@ $(document).ready(function() {
     });
 
     function showErrorInWidget(widget) {
-        $(".value", widget).html("<i class='icon icon-warning-sign loading-failed'></i>");
+        $(".value, .dashboard-chart", widget).html("<i class='icon icon-warning-sign loading-failed'></i>");
     }
 
 });

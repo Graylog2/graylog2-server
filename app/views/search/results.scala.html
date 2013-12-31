@@ -218,7 +218,13 @@
                     <li class="dropdown-submenu">
                         <a href="#">Add to dashboard</a>
 
-                        <ul class="dropdown-menu dashboard-selector" data-widget-type="field_chart">
+                        <ul class="dropdown-menu dashboard-selector"
+                            @if(stream != null) {
+                                data-stream-id="@stream.getId"
+                            }
+
+                            data-widget-type="field_chart"
+                        >
                             <li>
                                 <a href="@routes.DashboardsController.newDashboard()">No dashboards. Create one?</a>
                             </li>

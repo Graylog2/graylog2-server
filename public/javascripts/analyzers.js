@@ -450,7 +450,7 @@ $(document).ready(function() {
                     formatter: function(series, x, y) {
                         var date = '<span class="date">' + new Date(x * 1000).toUTCString() + '</span>';
                         var swatch = '<span class="detail_swatch"></span>';
-                        var content = field + ': ' + parseInt(y) + '<br>' + date;
+                        var content = '[' + opts.valuetype + '] ' + field + ': ' + parseInt(y) + '<br>' + date;
                         return content;
                     }
                 });

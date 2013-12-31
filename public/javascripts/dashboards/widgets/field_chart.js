@@ -11,7 +11,7 @@ function addWidget_field_chart(dashboardId, description, eventElem) {
     params.interval = chart.attr("data-config-interval");
 
     if (!!eventElem.attr("data-stream-id")) {
-        params.streamId =  eventElem.attr("data-stream-id");
+        params.streamId = eventElem.attr("data-stream-id");
     }
 
     addWidget(dashboardId, description, params);
@@ -74,7 +74,7 @@ function updateWidget_field_chart(widget, data) {
             field = graphElem.attr("data-config-field");
             var date = '<span class="date">' + new Date(x * 1000).toUTCString() + '</span>';
             var swatch = '<span class="detail_swatch"></span>';
-            var content = field + ': ' + parseInt(y) + '<br>' + date;
+            var content = '[' + graphElem.attr("data-config-valuetype") + '] ' + field + ': ' + parseInt(y) + '<br>' + date;
             return content;
         }
     });

@@ -1595,3 +1595,11 @@ form.edit-dashboard-form {
     margin-top: 37px;
     text-align: center;
 }
+
+.dashboard .widget .field_chart .loading-failed {
+    display: block;
+    text-align: center;
+    font-size: 70px;
+    position: relative;
+    top: -10px;
+}
