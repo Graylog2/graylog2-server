@@ -37,6 +37,10 @@ function updateWidget_field_chart(widget, data) {
         series.push(point);
     }
 
+    if(series.length == 0) {
+        return;
+    }
+
     graphElem.html("");
 
     var renderer = graphElem.attr("data-config-renderer");
