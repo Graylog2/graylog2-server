@@ -19,6 +19,8 @@
  */
 package controllers.api;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.Maps;
 import com.google.gson.Gson;
 import com.google.inject.Inject;
@@ -27,6 +29,7 @@ import lib.APIException;
 import lib.ApiClient;
 import lib.timeranges.InvalidRangeParametersException;
 import lib.timeranges.TimeRange;
+import models.api.requests.dashboards.UserSetWidgetPositionsRequest;
 import models.dashboards.Dashboard;
 import models.dashboards.DashboardService;
 import models.NodeService;
@@ -72,6 +75,24 @@ public class DashboardsApiController extends AuthenticatedController {
         } catch (IOException e) {
             return status(504, views.html.errors.error.render(ApiClient.ERROR_MSG_IO, e, request()));
         }
+    }
+
+    public Result setWidgetPositions(String dashboardId) {
+        JsonNode request = request().body().asJson();
+        ObjectMapper mapper = new ObjectMapper();
+
+        try {
+            Dashboard dashboard = dashboardService.get(dashboardId);
+            UserSetWidgetPositionsRequest positions = mapper.readValue(request.toString(), UserSetWidgetPositionsRequest.class);
+            dashboard.setWidgetPositions(positions.positions);
+        } catch (APIException e) {
+            String message = "Could not update positions. We expected HTTP 200, but got a HTTP " + e.getHttpCode() + ".";
+            return status(504, views.html.errors.error.render(message, e, request()));
+        } catch (IOException e) {
+            return status(504, views.html.errors.error.render(ApiClient.ERROR_MSG_IO, e, request()));
+        }
+
+        return ok();
     }
 
     public Result widgetValue(String dashboardId, String widgetId) {

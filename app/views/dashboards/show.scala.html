@@ -36,10 +36,10 @@
     </p>
 
     <div class="dashboard">
-        <div class="gridster">
+        <div class="gridster" data-dashboard-id="@dashboard.getId">
             <ul>
             @for(widget <- dashboard.getWidgets.values()) {
-                <li data-row="1" data-col="1" data-sizex="@widget.getWidth" data-sizey="@widget.getHeight">
+                <li data-row="@widget.getRow" data-col="@widget.getCol" data-sizex="@widget.getWidth" data-sizey="@widget.getHeight">
                     <div class="widget" data-widget-type="@widget.getType.toString.toLowerCase" data-dashboard-id="@widget.getDashboard.getId" data-widget-id="@widget.getId">
 
                         <div class="pull-left widget-top controls only-unlocked">

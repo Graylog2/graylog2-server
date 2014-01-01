@@ -17,29 +17,18 @@
  * along with Graylog2.  If not, see <http://www.gnu.org/licenses/>.
  *
  */
-package models.api.responses.dashboards;
-
-import com.google.gson.annotations.SerializedName;
-
-import java.util.List;
-import java.util.Map;
+package models.api.requests.dashboards;
 
 /**
  * @author Lennart Koopmann <lennart@torch.sh>
  */
-public class DashboardSummaryResponse {
+public class UserWidgetPositionRequest {
 
     public String id;
-    public String title;
-    public String description;
+    public int col;
+    public int row;
 
-    public List<DashboardWidgetResponse> widgets;
-    public Map<String, WidgetPositionResponse> positions;
-
-    @SerializedName("created_at")
-    public String createdAt;
-
-    @SerializedName("creator_user_id")
-    public String creatorUserId;
+    public int size_x;
+    public int size_y;
 
 }

@@ -12,7 +12,42 @@ $(document).ready(function() {
     if ($(".gridster").size() > 0){
         dashboardGrid = $(".gridster ul").gridster({
             widget_margins: [10, 10],
-            widget_base_dimensions: [400, 150]
+            widget_base_dimensions: [400, 150],
+            draggable: {
+                stop: function() {
+                    var positions = this.serialize();
+                    var dashboardId = $(".gridster").attr("data-dashboard-id");
+
+                    var payload = {
+                        positions: positions
+                    }
+
+                    $.ajax({
+                        url: '/a/dashboards/' + dashboardId + '/positions',
+                        type: 'POST',
+                        data: JSON.stringify(payload),
+                        processData: false,
+                        contentType: 'application/json',
+                        success: function(data) {
+                            // not doing anything here for now. no need to notify user about success IMO
+                        },
+                        error: function(data) {
+                            showError("Could not save widget positions.");
+                        }
+                    });
+                }
+            },
+            serialize_params: function(widgetListItem, pos) {
+                var widget = $(".widget", widgetListItem);
+
+                return {
+                    id: widget.attr("data-widget-id"),
+                    col: pos.col,
+                    row: pos.row,
+                    size_x: pos.size_x,
+                    size_y: pos.size_y
+                }
+            }
         }).data('gridster').disable();
     }
 

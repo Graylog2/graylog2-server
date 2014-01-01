@@ -27,10 +27,10 @@ import lib.ApiClient;
 import lib.timeranges.InvalidRangeParametersException;
 import models.User;
 import models.UserService;
-import models.api.requests.dashboards.AddWidgetRequest;
-import models.api.requests.dashboards.UpdateDashboardRequest;
+import models.api.requests.dashboards.*;
 import models.api.responses.dashboards.DashboardSummaryResponse;
 import models.api.responses.dashboards.DashboardWidgetResponse;
+import models.api.responses.dashboards.WidgetPositionResponse;
 import models.dashboards.widgets.DashboardWidget;
 import org.joda.time.DateTime;
 import org.slf4j.Logger;
@@ -38,6 +38,7 @@ import org.slf4j.LoggerFactory;
 import play.mvc.Http;
 
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -58,7 +59,8 @@ public class Dashboard {
     private final DateTime createdAt;
     private final User creatorUser;
 
-    private Map<String, DashboardWidget> widgets;
+    private final Map<String, DashboardWidget> widgets;
+    private final Map<String, WidgetPositionResponse> positions;
 
     private final ApiClient api;
 
@@ -70,6 +72,7 @@ public class Dashboard {
         this.createdAt = DateTime.parse(dsr.createdAt);
         this.creatorUser = userService.load(dsr.creatorUserId);
         this.api = api;
+        this.positions = dsr.positions == null ? new HashMap<String, WidgetPositionResponse>() : dsr.positions;
         this.widgets = parseWidgets(dsr.widgets);
     }
 
@@ -97,12 +100,34 @@ public class Dashboard {
                 .execute();
     }
 
+    public void setWidgetPositions(List<UserWidgetPositionRequest> positions) throws APIException, IOException {
+        SetWidgetPositionsRequest req = new SetWidgetPositionsRequest();
+
+        for (UserWidgetPositionRequest userPosition : positions) {
+            WidgetPositionRequest position = new WidgetPositionRequest();
+            position.id = userPosition.id;
+            position.col = userPosition.col;
+            position.row = userPosition.row;
+
+            req.positions.add(position);
+        }
+
+        api.put().path("/dashboards/{0}/positions", id)
+                .body(req)
+                .expect(Http.Status.OK)
+                .execute();
+    }
+
     public DashboardWidget getWidget(String id) {
         return widgets.get(id);
     }
 
     public Map<String, DashboardWidget> getWidgets() {
         return widgets;
+    }
+
+    public Map<String, WidgetPositionResponse> getPositions() {
+        return positions;
     }
 
     public String getId() {

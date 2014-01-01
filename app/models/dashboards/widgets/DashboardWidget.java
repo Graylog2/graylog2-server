@@ -55,6 +55,9 @@ public abstract class DashboardWidget {
     private final int cacheTime;
     private final String creatorUserId;
 
+    private int col = 1;
+    private int row = 1;
+
     protected DashboardWidget(Type type, String id, String description, int cacheTime, Dashboard dashboard) {
         this(type, id, description, cacheTime, dashboard, null);
     }
@@ -86,6 +89,14 @@ public abstract class DashboardWidget {
 
     public int getCacheTime() {
         return cacheTime;
+    }
+
+    public void setCol(int col) {
+        this.col = col;
+    }
+
+    public void setRow(int row) {
+        this.row = row;
     }
 
     public DashboardWidgetValueResponse getValue(ApiClient api) throws APIException, IOException {
@@ -123,9 +134,11 @@ public abstract class DashboardWidget {
             throw new NoSuchWidgetTypeException();
         }
 
+        DashboardWidget widget;
+
         switch (type) {
             case SEARCH_RESULT_COUNT:
-                return new SearchResultCountWidget(
+                widget = new SearchResultCountWidget(
                         dashboard,
                         w.id,
                         w.description,
@@ -134,8 +147,9 @@ public abstract class DashboardWidget {
                         TimeRange.factory((Map<String, Object>) w.config.get("timerange")),
                         w.creatorUserId
                 );
+                break;
             case STREAM_SEARCH_RESULT_COUNT:
-                return new StreamSearchResultCountWidget(
+                widget = new StreamSearchResultCountWidget(
                         dashboard,
                         w.id,
                         w.description,
@@ -145,8 +159,9 @@ public abstract class DashboardWidget {
                         (String) w.config.get("stream_id"),
                         w.creatorUserId
                 );
+                break;
             case FIELD_CHART:
-                return new FieldChartWidget(
+                widget = new FieldChartWidget(
                         dashboard,
                         w.id,
                         w.description,
@@ -157,9 +172,17 @@ public abstract class DashboardWidget {
                         w.config,
                         w.creatorUserId
                 );
+                break;
             default:
                 throw new NoSuchWidgetTypeException();
         }
+        // Read and set positions. Defaults to 1, which is then rescued by the JS dashboard library.
+        if (dashboard.getPositions().containsKey(w.id)) {
+            widget.setCol(dashboard.getPositions().get(w.id).col);
+            widget.setRow(dashboard.getPositions().get(w.id).row);
+        }
+
+        return widget;
     }
 
     public abstract Map<String, Object> getConfig();
@@ -198,6 +221,14 @@ public abstract class DashboardWidget {
 
     public String getCreatorUserId() {
         return creatorUserId;
+    }
+
+    public int getCol() {
+        return col;
+    }
+
+    public int getRow() {
+        return row;
     }
 
     public static class NoSuchWidgetTypeException extends Throwable {
