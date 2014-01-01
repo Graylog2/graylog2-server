@@ -35,6 +35,7 @@ import org.graylog2.database.validators.FilledStringValidator;
 import org.graylog2.database.validators.Validator;
 import org.graylog2.indexer.searches.timeranges.InvalidRangeParametersException;
 import org.graylog2.plugin.Tools;
+import org.graylog2.rest.resources.dashboards.requests.WidgetPositionRequest;
 import org.joda.time.DateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -126,6 +127,22 @@ public class Dashboard extends Persisted {
         widgets.put(widget.getId(), widget);
     }
 
+    public void updateWidgetPositions(List<WidgetPositionRequest> positions) throws ValidationException {
+        Map<String, Map<String, Object>> map = Maps.newHashMap();
+
+        for (WidgetPositionRequest position : positions) {
+            Map<String, Object> x = Maps.newHashMap();
+            x.put("col", position.col);
+            x.put("row", position.row);
+
+            map.put(position.id, x);
+        }
+
+        fields.put("positions", map);
+
+        save();
+    }
+
     public void addWidget(DashboardWidget widget) throws ValidationException {
         embed(EMBEDDED_WIDGETS, widget);
         widgets.put(widget.getId(), widget);
@@ -181,6 +198,10 @@ public class Dashboard extends Persisted {
 
         if (!result.containsKey("widgets")) {
             result.put("widgets", Lists.newArrayList());
+        }
+
+        if (!result.containsKey("positions")) {
+            result.put("positions", Lists.newArrayList());
         }
 
         return result;

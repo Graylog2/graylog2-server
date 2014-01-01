@@ -30,10 +30,7 @@ import org.graylog2.database.*;
 import org.graylog2.indexer.searches.timeranges.InvalidRangeParametersException;
 import org.graylog2.rest.documentation.annotations.*;
 import org.graylog2.rest.resources.RestResource;
-import org.graylog2.rest.resources.dashboards.requests.AddWidgetRequest;
-import org.graylog2.rest.resources.dashboards.requests.CreateRequest;
-import org.graylog2.rest.resources.dashboards.requests.UpdateRequest;
-import org.graylog2.rest.resources.dashboards.requests.UpdateWidgetRequest;
+import org.graylog2.rest.resources.dashboards.requests.*;
 import org.graylog2.system.activities.Activity;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
@@ -195,10 +192,36 @@ public class DashboardsResource extends RestResource {
 
             // Validations are happening here.
             dashboard.save();
+        } catch (org.graylog2.database.NotFoundException e) {
+            throw new WebApplicationException(404);
+        } catch (ValidationException e) {
+            LOG.error("Validation error.", e);
+            throw new WebApplicationException(e, Response.Status.BAD_REQUEST);
+        }
 
-            String msg = "Deleted dashboard <" + dashboard.getId() + ">. Reason: REST request.";
-            LOG.info(msg);
-            core.getActivityWriter().write(new Activity(msg, DashboardsResource.class));
+        return Response.status(Response.Status.OK).build();
+    }
+
+    @PUT @Timed
+    @ApiOperation(value = "Update/set the positions of dashboard widgets.")
+    @Produces(MediaType.APPLICATION_JSON)
+    @Path("/{dashboardId}/positions")
+    @ApiResponses(value = {
+            @ApiResponse(code = 404, message = "Dashboard not found.")
+    })
+    public Response setPositions(@ApiParam(title = "JSON body", required = true) String body,
+                           @ApiParam(title = "dashboardId", required = true) @PathParam("dashboardId") String dashboardId) {
+        try {
+            UpdateWidgetPositionsRequest uwpr;
+            try {
+                uwpr = objectMapper.readValue(body, UpdateWidgetPositionsRequest.class);
+            } catch(IOException e) {
+                LOG.error("Error while parsing JSON", e);
+                throw new WebApplicationException(e, Response.Status.BAD_REQUEST);
+            }
+
+            Dashboard dashboard = Dashboard.load(loadObjectId(dashboardId), core);
+            dashboard.updateWidgetPositions(uwpr.positions);
         } catch (org.graylog2.database.NotFoundException e) {
             throw new WebApplicationException(404);
         } catch (ValidationException e) {
