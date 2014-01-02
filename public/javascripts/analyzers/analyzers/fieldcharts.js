@@ -26,6 +26,10 @@ $(document).ready(function() {
         }
 
         // Options.
+        if (opts.chartid == undefined) {
+            opts.chartid = generateId();
+        }
+
         if (opts.interval == undefined) {
             opts.interval = $("#universalsearch-interval-permanent").text().trim();
         }
@@ -44,6 +48,10 @@ $(document).ready(function() {
 
         if (opts.streamid == undefined) {
             opts.streamid = "";
+        }
+
+        if (opts.pinned == undefined) {
+            opts.pinned = false;
         }
 
         var rangeType = $("#universalsearch-rangetype-permanent").text().trim();
@@ -95,13 +103,20 @@ $(document).ready(function() {
                 $("h3 .title", template).text(field);
                 $("ul", template).attr("data-field", field);
 
+                template.attr("data-chart-id", opts.chartid);
                 template.attr("data-config-interval", opts.interval);
                 template.attr("data-config-interpolation", opts.interpolation);
                 template.attr("data-config-renderer", opts.renderer);
                 template.attr("data-config-valuetype", opts.valuetype);
                 template.attr("data-config-streamid", opts.streamid);
+                template.attr("data-config-pinned", opts.pinned);
 
                 $(".type-description", template).text("(" + opts.valuetype + ")");
+
+                if(opts.pinned) {
+                    $(".pin", template).hide();
+                    $(".unpin", template).show();
+                }
 
                 $("#field-graphs").append(template);
 
@@ -169,6 +184,13 @@ $(document).ready(function() {
                 $('.field-graph-container ul.valuetype-selector li a[data-type="' + opts.valuetype + '"]').addClass("selected");
 
                 fieldGraphs[field] = graph;
+
+                // Is this chart pinned? We need to update it's settings then.
+                var pinned = getPinnedCharts();
+                if (pinned[opts.chartid] != undefined) {
+                    pinned[opts.chartid] = opts;
+                    setPinnedCharts(pinned);
+                }
             },
             error: function(data) {
                 if(data.status != 400) {
@@ -207,6 +229,14 @@ $(document).ready(function() {
         var graphContainer = $('.field-graph-container[data-field="' + field + '"]', $("#field-graphs"));
         graphContainer.attr("data-config-renderer", type);
 
+        // Is this chart pinned? We need to update it's settings then.
+        var pinned = getPinnedCharts();
+        var chartId = graphContainer.attr("data-chart-id");
+        if (pinned[chartId] != undefined) {
+            pinned[chartId] = chartOptionsFromContainer(graphContainer);
+            setPinnedCharts(pinned);
+        }
+
         $("a", $(this).closest("ul")).removeClass("selected");
         $(this).addClass("selected");
     });
@@ -224,6 +254,14 @@ $(document).ready(function() {
 
         var graphContainer = $('.field-graph-container[data-field="' + field + '"]', $("#field-graphs"));
         graphContainer.attr("data-config-interpolation", interpolation);
+
+        // Is this chart pinned? We need to update it's settings then.
+        var pinned = getPinnedCharts();
+        var chartId = graphContainer.attr("data-chart-id");
+        if (pinned[chartId] != undefined) {
+            pinned[chartId] = chartOptionsFromContainer(graphContainer);
+            setPinnedCharts(pinned);
+        }
 
         $("a", $(this).closest("ul")).removeClass("selected");
         $(this).addClass("selected");
@@ -277,19 +315,76 @@ $(document).ready(function() {
 
     function chartOptionsFromContainer(cc) {
         return {
+            field: cc.attr("data-field"),
+            chartid: cc.attr("data-chart-id"),
             interval: cc.attr("data-config-interval"),
             renderer: cc.attr("data-config-renderer"),
             interpolation: cc.attr("data-config-interpolation"),
             streamid: cc.attr("data-config-streamid"),
-            valuetype:  cc.attr("data-config-valuetype")
+            valuetype: cc.attr("data-config-valuetype")
         }
     }
 
     $(".field-graph-container .pin").live("click", function(e) {
         e.preventDefault();
+        var graphElem = $(this).closest(".field-graph-container");
 
-        // TODO
-        alert("Pinning/persisting charts is not implemented yet. (GitHub issue: #329)");
+        var chartOpts = chartOptionsFromContainer(graphElem);
+        chartOpts.field = graphElem.attr("data-field");
+        var chartId = chartOpts.chartid;
+
+        // Get all pinned charts.
+        var pinned = getPinnedCharts();
+
+        // Write chart with current options.
+        pinned[chartId] = chartOpts;
+
+        setPinnedCharts(pinned);
+
+        // Mark as pinned.
+        $(this).hide();
+        $(".unpin", graphElem).show();
     });
+
+    $(".clear-pinned-charts").on("click", function(e) {
+        e.preventDefault();
+
+        setPinnedCharts({});
+
+        $(this).hide();
+        showSuccess("All charts have been unpinned.")
+    });
+
+    // Load all pinned charts
+    (function() {
+        var charts = getPinnedCharts();
+
+        // Are there even any pinned charts?
+        if (Object.keys(charts).length > 0) {
+            // Whoop whoop, pinned charts! Display the clear button first.
+            $(".clear-pinned-charts").show();
+
+            // Display all charts.
+            for(var id in charts) {
+                var chart = charts[id];
+                chart.pinned = true;
+
+                renderFieldChart(chart.field, chart)
+            }
+        }
+    })();
+
+    function getPinnedCharts() {
+        var pinned = store.get("pinned-field-charts");
+        if (pinned == undefined) {
+            pinned = {};
+        }
+
+        return pinned;
+    }
+
+    function setPinnedCharts(pinned) {
+        store.set("pinned-field-charts", pinned);
+    }
 
 });

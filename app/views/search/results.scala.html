@@ -59,6 +59,10 @@
         </ul>
     </div>
 
+    <a href="#" class="btn btn-small clear-pinned-charts" title="Reset/clear all pinned charts." style="display: none;">
+        Clear pinned charts
+    </a>
+
     @if(savedSearch != null) {
         <a href="@routes.SavedSearchesController.delete(savedSearch.getId)" class="btn btn-small btn-danger" data-confirm='Really delete saved search "@savedSearch.getTitle"?'>Delete saved search</a>
     }
@@ -237,6 +241,12 @@
             </div>
 
             <a href="#" class="pin"><i class="icon icon-pushpin" title="Pin"></i></a>
+            <a href="#" class="unpin" style="display: none;">
+                <span class="icon-stack">
+                    <i class="icon-pushpin"></i>
+                    <i class="icon-ban-circle icon-stack-base text-error"></i>
+                </span>
+            </a>
         </h3>
 
         <div class='field-graph'>

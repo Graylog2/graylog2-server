@@ -721,6 +721,19 @@ function isNumber(n) {
     return !isNaN(parseFloat(n)) && isFinite(n);
 }
 
+function generateShortId() {
+    return Math.random().toString(36).substr(2, 9);
+}
+
+function generateId() {
+    var r = "";
+    for(var i = 0; i < 4; i++) {
+        r = r + generateShortId();
+    }
+
+    return r;
+}
+
 // Animated change of numbers.
 (function($) {
     $.fn.animatedIntChange = function(countTo, duration) {
