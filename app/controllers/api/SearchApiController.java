@@ -139,11 +139,7 @@ public class SearchApiController extends AuthenticatedController {
         if (q == null || q.isEmpty()) {
             q = "*";
         }
-        try {
-            Thread.sleep(2000);
-        } catch (InterruptedException e) {
-            e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
-        }
+
         // Interval.
         if (interval == null || interval.isEmpty() || !SearchTools.isAllowedDateHistogramInterval(interval)) {
             interval = "hour";
