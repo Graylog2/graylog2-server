@@ -1603,3 +1603,7 @@ form.edit-dashboard-form {
     position: relative;
     top: -10px;
 }
+
+.no-widgets {
+    margin-top: 15px;
+}
