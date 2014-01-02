@@ -382,22 +382,24 @@ $(document).ready(function() {
 
     // Load all pinned charts
     (function() {
-        var charts = getPinnedCharts();
+        if ($("#field-graphs").length > 0) {
+            var charts = getPinnedCharts();
 
-        // Are there even any pinned charts?
-        if (Object.keys(charts).length > 0) {
-            // Whoop whoop, pinned charts! Display the clear button first.
-            $(".clear-pinned-charts").show();
+            // Are there even any pinned charts?
+            if (Object.keys(charts).length > 0) {
+                // Whoop whoop, pinned charts! Display the clear button first.
+                $(".clear-pinned-charts").show();
 
-            // Display all charts.
-            for(var id in charts) {
-                var chart = charts[id];
-                chart.pinned = true;
+                // Display all charts.
+                for(var id in charts) {
+                    var chart = charts[id];
+                    chart.pinned = true;
 
-                renderFieldChart(chart.field, chart);
+                    renderFieldChart(chart.field, chart);
 
-                // Disable chart generator link so we can't generate this chart from scratch again (until unpinned).
-                $("a.line-chart", $('div.generate-graph[data-field="' + chart.field + '"]')).closest("li").addClass("disabled");
+                    // Disable chart generator link so we can't generate this chart from scratch again (until unpinned).
+                    $("a.line-chart", $('div.generate-graph[data-field="' + chart.field + '"]')).closest("li").addClass("disabled");
+                }
             }
         }
     })();
