@@ -120,7 +120,8 @@ $(document).ready(function() {
                     $(".unpin", template).show();
                 }
 
-                $("#field-graphs").append(template);
+                // Place the chart after all others but before the spinner.
+                $("#field-graphs .spinner").before(template);
 
                 var graphContainer = $('.field-graph-container[data-field="' + field + '"]', $("#field-graphs"));
                 var graphElem = $('.field-graph', graphContainer);

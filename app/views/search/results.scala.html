@@ -155,6 +155,13 @@
     drawResultGraph();
 </script>
 
+<div class="graph-resolution-selector">
+    <i class="icon-time"></i>
+    <strong>Resolution:</strong> @Html(DateHistogramResolutionSelector.getOptions(histogram.getInterval()))
+</div>
+
+<hr style="margin-bottom: -20px;" />
+
 <div id="field-graphs">
     @****** field graph template. this is copied, filled and appended for every new field graph. ****@
     <div id="field-graph-template" class="field-graph-container" style="display: none;">
@@ -253,7 +260,7 @@
         </div>
     </div>
 
-    <div class="spinner" style="display: none;">
+    <div class="spinner" style="display: none; height: 200px;">
         <i class="icon-spin icon-refresh icon-3x spinner"></i>
     </div>
 </div>
@@ -268,11 +275,6 @@
             $("#query-text").text(JSON.stringify(@Html(searchResult.getBuiltQuery()), null, 4));
         </script>
     </div>
-</div>
-
-<div class="graph-resolution-selector">
-    <i class="icon-time"></i>
-    <strong>Resolution:</strong> @Html(DateHistogramResolutionSelector.getOptions(histogram.getInterval()))
 </div>
 
 <table class="table table-condensed table-hover table-striped messages">
