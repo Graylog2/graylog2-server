@@ -1103,8 +1103,21 @@ form #stream-rules {
     font-weight: bold;
 }
 
-.field-graph-container .graph-settings, .field-graph-container .pin, .field-graph-container .unpin  {
+.field-graph-container .graph-settings,
+.field-graph-container .pin,
+.field-graph-container .unpin {
     font-size: 12px;
+}
+
+.field-graph-container .pin {
+    position: relative;
+    top: 1px;
+}
+
+.field-graph-container .unpin {
+    position: relative;
+    top: 1px;
+    left: -7px;
 }
 
 .field-graph-container .unpin .icon-stack-base {

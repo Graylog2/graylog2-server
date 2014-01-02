@@ -18,6 +18,8 @@ $(document).ready(function() {
         }
 
         renderFieldChart($(this).parent().parent().parent().attr("data-field"), opts);
+
+        $(this).closest("li").addClass("disabled");
     });
 
     function renderFieldChart(field, opts) {
@@ -309,8 +311,14 @@ $(document).ready(function() {
         var field = $(this).closest("ul").attr("data-field");
         var graphContainer = $('.field-graph-container[data-field="' + field + '"]', $("#field-graphs"));
 
+        unpinChart(graphContainer.attr("data-chart-id"));
+
         graphContainer.remove();
         delete fieldGraphs[field];
+
+
+        // Enable chart generator link so we can generate this chart from again later.
+        $("a.line-chart", $('div.generate-graph[data-field="' + field + '"]')).closest("li").removeClass("disabled");
     });
 
     function chartOptionsFromContainer(cc) {
@@ -346,10 +354,26 @@ $(document).ready(function() {
         $(".unpin", graphElem).show();
     });
 
+    $(".field-graph-container .unpin").live("click", function(e) {
+        e.preventDefault();
+        var graphElem = $(this).closest(".field-graph-container");
+        graphElem.attr("data-config-pinned", "false");
+
+        unpinChart(graphElem.attr("data-chart-id"));
+
+        // Mark as unpinned.
+        $(this).hide();
+        $(".pin", graphElem).show();
+    });
+
     $(".clear-pinned-charts").on("click", function(e) {
         e.preventDefault();
 
         setPinnedCharts({});
+
+        // Mark all as unpinned.
+        $(".field-graph-container .unpin").hide();
+        $(".field-graph-container .pin").show();
 
         $(this).hide();
         showSuccess("All charts have been unpinned.")
@@ -369,7 +393,10 @@ $(document).ready(function() {
                 var chart = charts[id];
                 chart.pinned = true;
 
-                renderFieldChart(chart.field, chart)
+                renderFieldChart(chart.field, chart);
+
+                // Disable chart generator link so we can't generate this chart from scratch again (until unpinned).
+                $("a.line-chart", $('div.generate-graph[data-field="' + chart.field + '"]')).closest("li").addClass("disabled");
             }
         }
     })();
@@ -385,6 +412,12 @@ $(document).ready(function() {
 
     function setPinnedCharts(pinned) {
         store.set("pinned-field-charts", pinned);
+    }
+
+    function unpinChart(id) {
+        var pinned = getPinnedCharts();
+        delete pinned[id];
+        setPinnedCharts(pinned);
     }
 
 });
