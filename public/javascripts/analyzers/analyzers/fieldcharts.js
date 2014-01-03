@@ -255,11 +255,12 @@ $(document).ready(function() {
         graph.render();
 
         var graphContainer = $('.field-graph-container[data-field="' + field + '"]', $("#field-graphs"));
+        var graphOpts = chartOptionsFromContainer(graphContainer);
         changeGraphConfig(graphContainer, "renderer", type);
 
         // Is this chart pinned? We need to update it's settings then.
         var pinned = getPinnedCharts();
-        var chartId = graphContainer.attr("data-chart-id");
+        var chartId = graphOpts.chartid;
         if (pinned[chartId] != undefined) {
             pinned[chartId] = chartOptionsFromContainer(graphContainer);
             setPinnedCharts(pinned);
@@ -281,11 +282,12 @@ $(document).ready(function() {
         graph.render();
 
         var graphContainer = $('.field-graph-container[data-field="' + field + '"]', $("#field-graphs"));
+        var graphOpts = chartOptionsFromContainer(graphContainer);
         changeGraphConfig(graphContainer, "interpolation", interpolation);
 
         // Is this chart pinned? We need to update it's settings then.
         var pinned = getPinnedCharts();
-        var chartId = graphContainer.attr("data-chart-id");
+        var chartId = graphOpts.chartid;
         if (pinned[chartId] != undefined) {
             pinned[chartId] = chartOptionsFromContainer(graphContainer);
             setPinnedCharts(pinned);
@@ -336,8 +338,9 @@ $(document).ready(function() {
         e.preventDefault();
         var field = $(this).closest("ul").attr("data-field");
         var graphContainer = $('.field-graph-container[data-field="' + field + '"]', $("#field-graphs"));
+        var graphOpts = chartOptionsFromContainer(graphContainer);
 
-        unpinChart(graphContainer.attr("data-chart-id"));
+        unpinChart(graphOpts.chartid);
 
         graphContainer.remove();
         delete fieldGraphs[field];
@@ -381,9 +384,10 @@ $(document).ready(function() {
     $(".field-graph-container .unpin").live("click", function(e) {
         e.preventDefault();
         var graphElem = $(this).closest(".field-graph-container");
-        changeGraphConfig(graphElem, "pinned", false);
+        var graphOpts = chartOptionsFromContainer(graphElem);
 
-        unpinChart(graphElem.attr("data-chart-id"));
+        changeGraphConfig(graphElem, "pinned", false);
+        unpinChart(graphOpts.chartid);
 
         // Mark as unpinned.
         $(this).hide();
