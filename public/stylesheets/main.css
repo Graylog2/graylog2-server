@@ -1624,3 +1624,41 @@ form.edit-dashboard-form {
 .no-widgets {
     margin-top: 15px;
 }
+
+.sources th a {
+     color: #0088cc;
+}
+
+.sources th a:hover {
+    text-decoration: none;
+    color: #4DBCE9;
+    border-bottom: 1px dotted #4DBCE9;
+}
+
+.sources tbody tr a {
+    color: #000;
+}
+
+.sources tbody tr a:hover {
+    text-decoration: none;
+    color: #4DBCE9;
+    border-bottom: 1px dotted #4DBCE9;
+}
+
+.dynatable-per-page-label {
+    font-size: 14px;
+}
+
+.dynatable-search {
+    font-size: 14px;
+}
+
+.dynatable-search input, .dynatable-per-page select {
+    position: relative;
+    top: 3px;
+    margin-left: 3px;
+}
+
+.dynatable-pagination-links li:first-child {
+    display: none;
+}

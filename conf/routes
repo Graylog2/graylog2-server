@@ -86,6 +86,9 @@ GET         /system/users/new                                                   
 GET         /system/users/edit/:username                                             @controllers.UsersController.editUserForm(username: String)
 POST        /system/users/password/:username                                         @controllers.UsersController.changePassword(username: String)
 
+# Source
+GET         /sources                                                                 @controllers.SourcesController.list()
+
 # LDAP configuration
 GET         /system/ldap                                                             @controllers.LdapController.index()
 POST        /system/ldap                                                             @controllers.LdapController.saveLdapSettings()

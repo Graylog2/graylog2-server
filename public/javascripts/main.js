@@ -521,6 +521,15 @@ $(document).ready(function() {
         $(this).css("cursor", "auto");
     });
 
+    $(".sources").dynatable({
+        inputs: {
+            perPageText: "Per page: "
+        },
+        dataset: {
+            perPageDefault: 50
+        }
+    });
+
     function scrollToSearchbarHint() {
         if ($(document).scrollTop() > 50) {
             $("#scroll-to-search-hint").fadeIn("fast").delay(1500).fadeOut("fast");
