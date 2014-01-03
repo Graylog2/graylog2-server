@@ -1662,3 +1662,13 @@ form.edit-dashboard-form {
 .dynatable-pagination-links li:first-child {
     display: none;
 }
+
+.field-graph-query-container {
+    position: relative;
+    top: -5px;
+}
+
+.field-graph-query {
+    font-family: monospace;
+    color: #9da096;
+}
