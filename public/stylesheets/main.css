@@ -1109,19 +1109,15 @@ form #stream-rules {
     font-size: 12px;
 }
 
-.field-graph-container .pin {
-    position: relative;
-    top: 1px;
-}
-
+.field-graph-container .pin,
 .field-graph-container .unpin {
     position: relative;
     top: 1px;
-    left: -7px;
 }
 
-.field-graph-container .unpin .icon-stack-base {
-    font-size: 18px;
+
+.field-graph-container .unpin {
+    color: #b94a48;
 }
 
 .field-graph-container .graph-settings a:hover {
