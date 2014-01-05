@@ -177,7 +177,7 @@ h4 {
 
 .messages {
 	font-size: 11px;
-	margin-top: 30px;
+	margin-top: 15px;
 	table-layout: fixed;
 	border-collapse: collapse;
 	width: 100%;
@@ -427,6 +427,7 @@ form #stream-rules {
 
 .graph-resolution-selector {
     margin-top: 30px;
+    margin-bottom: 30px;
 }
 
 #sidebar-graph {
@@ -1104,7 +1105,7 @@ form #stream-rules {
 }
 
 .field-graph-container {
-    margin-top: 30px;
+    height: 260px;
 }
 
 .field-graph-container .dropdown-menu a.selected {
