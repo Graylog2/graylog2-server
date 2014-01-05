@@ -1,4 +1,5 @@
 $(document).ready(function() {
+    var palette = new Rickshaw.Color.Palette({ scheme: 'colorwheel' });
 
     $(".analyze-field .generate-graph .pie-chart").on("click", function(e) {
         e.preventDefault();
@@ -108,7 +109,6 @@ $(document).ready(function() {
          * TODO:
          *   - export to image, ...
          *   - overflowing select box
-         *   - add multiple lines?
          */
 
         // Delete a possibly already existing graph with this id. (for updates)
@@ -251,9 +251,14 @@ $(document).ready(function() {
                         $(".merge-hint span", $(this)).switchClass("merge-drop-ready", "alpha80");
                     },
                     drop: function(event, ui) {
-                        // MERGE LOGIC GOES HERE.
+                        // Merge charts.
+                        var target = $(this).attr("data-chart-id");
+                        var dragged = ui.draggable.attr("data-chart-id");
+
                         ui.draggable.hide();
                         $(this).css("background-color", "#fff");
+
+                        mergeCharts(target, dragged);
                     }
                 });
             },
@@ -440,6 +445,30 @@ $(document).ready(function() {
         $(this).hide();
         showSuccess("All charts have been unpinned.")
     });
+
+    function mergeCharts(targetId, draggedId) {
+        var targetChart = fieldGraphs[targetId];
+        var draggedChart = fieldGraphs[draggedId];
+
+        console.log(targetChart);
+
+        // TODO support multiple
+        // TODO colors
+        // TODO chart title for legend
+        var addSeries = {
+            name: "value2",
+            color: palette.color()
+        };
+
+        addSeries["data"] = draggedChart.series[0].data;
+
+        var targetSeries = targetChart.series;
+        targetSeries.push(addSeries);
+
+        targetChart.update();
+
+        console.log(targetChart);
+    }
 
     // Load all pinned charts
     (function() {
