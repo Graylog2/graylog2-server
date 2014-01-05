@@ -978,6 +978,14 @@ form #stream-rules {
     -ms-filter: "progid:DXImageTransform.Microsoft.gradient(startColorstr=#99000000, endColorstr=#99000000)";
 }
 
+.alpha70 {
+    background: rgb(0, 0, 0) transparent;
+    background: rgba(0, 0, 0, 0.7);
+    filter:progid:DXImageTransform.Microsoft.gradient(startColorstr=#99000000, endColorstr=#99000000);
+    -ms-filter: "progid:DXImageTransform.Microsoft.gradient(startColorstr=#99000000, endColorstr=#99000000)";
+}
+
+
 .nano .pane   { background: #888; }
 .nano .slider { background: #111; }
 
@@ -1667,4 +1675,27 @@ form.edit-dashboard-form {
 .field-graph-query {
     font-family: monospace;
     color: #9da096;
+}
+
+.field-graph-container .reposition-handle {
+    cursor: move;
+}
+
+.field-graph-container .merge-hint {
+    text-align: center;
+    position: relative;
+    top: -115px;
+    margin-bottom: -21px;
+    display: none;
+    z-index: 2000;
+}
+
+.field-graph-container .merge-hint span {
+    padding: 15px 50px;
+    font-size: 15px;
+    color: #fff;
+}
+
+.field-graph-container .merge-drop-ready {
+    background-color: #000;
 }
