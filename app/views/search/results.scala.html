@@ -130,10 +130,13 @@
             tickFormat: Rickshaw.Fixtures.Number.formatKMBT
         });
 
-        new Rickshaw.Graph.Axis.Time({
-            graph: resultGraph,
-            ticksTreatment: "glow"
-        });
+        // Only show a x-axis (time) when there is more than one bucked.
+        if(resultGraph.series != undefined && resultGraph.series[0] != undefined && resultGraph.series[0].data.length > 1) {
+            new Rickshaw.Graph.Axis.Time({
+                graph: resultGraph,
+                ticksTreatment: "glow"
+            });
+        }
 
         new Rickshaw.Graph.HoverDetail({
             graph: resultGraph,
