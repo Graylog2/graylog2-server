@@ -164,7 +164,8 @@ $(document).ready(function() {
 
                 new Rickshaw.Graph.Axis.Y( {
                     graph: graph,
-                    tickFormat: Rickshaw.Fixtures.Number.formatKMBT
+                    tickFormat: Rickshaw.Fixtures.Number.formatKMBT,
+                    pixelsPerTick: 30
                 });
 
                 new Rickshaw.Graph.Axis.Time({
@@ -450,10 +451,13 @@ $(document).ready(function() {
         var targetChart = fieldGraphs[targetId];
         var draggedChart = fieldGraphs[draggedId];
 
-        console.log(targetChart);
+        var targetElem = $('.field-graph-container[data-chart-id="' + targetId + '"]');
+
+        // Update title and description.
+        $(".type-description", targetElem).hide();
+        $(".title", targetElem).text("Combined chart");
 
         // TODO support multiple
-        // TODO colors
         // TODO chart title for legend
         var addSeries = {
             name: "value2",
@@ -465,9 +469,8 @@ $(document).ready(function() {
         var targetSeries = targetChart.series;
         targetSeries.push(addSeries);
 
+        // Reflect all the chart changes we made.
         targetChart.update();
-
-        console.log(targetChart);
     }
 
     // Load all pinned charts
