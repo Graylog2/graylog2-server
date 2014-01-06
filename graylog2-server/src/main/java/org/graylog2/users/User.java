@@ -129,11 +129,6 @@ public class User extends Persisted {
         return COLLECTION;
     }
 
-    @Override
-    public ObjectId getId() {
-        return this.id;
-    }
-
     protected Map<String, Validator> getValidations() {
         return new HashMap<String, Validator>() {{
             put(USERNAME, new FilledStringValidator());
@@ -246,6 +241,11 @@ public class User extends Persisted {
     public static class LocalAdminUser extends User {
         public LocalAdminUser(Core core) {
             super(null, Maps.<String, Object>newHashMap(), core);
+        }
+
+        @Override
+        public String getId() {
+            return "local:admin";
         }
 
         @Override

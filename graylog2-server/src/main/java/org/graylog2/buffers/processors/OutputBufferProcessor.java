@@ -20,23 +20,18 @@
 
 package org.graylog2.buffers.processors;
 
-import java.util.List;
-import java.util.Map;
-import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.LinkedBlockingQueue;
-import java.util.concurrent.ThreadPoolExecutor;
-import java.util.concurrent.TimeUnit;
-
 import com.codahale.metrics.Histogram;
 import com.codahale.metrics.Meter;
-import org.bson.types.ObjectId;
+import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
+import com.google.common.util.concurrent.ThreadFactoryBuilder;
+import com.lmax.disruptor.EventHandler;
+import org.bson.types.ObjectId;
 import org.graylog2.Core;
-import org.graylog2.plugin.buffers.MessageEvent;
 import org.graylog2.outputs.OutputRouter;
 import org.graylog2.outputs.OutputStreamConfigurationImpl;
 import org.graylog2.plugin.Message;
+import org.graylog2.plugin.buffers.MessageEvent;
 import org.graylog2.plugin.outputs.MessageOutput;
 import org.graylog2.plugin.outputs.OutputStreamConfiguration;
 import org.graylog2.plugin.streams.Stream;
@@ -44,9 +39,9 @@ import org.graylog2.streams.StreamImpl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.google.common.collect.Lists;
-import com.google.common.util.concurrent.ThreadFactoryBuilder;
-import com.lmax.disruptor.EventHandler;
+import java.util.List;
+import java.util.Map;
+import java.util.concurrent.*;
 
 import static com.codahale.metrics.MetricRegistry.name;
 
@@ -164,7 +159,7 @@ public class OutputBufferProcessor implements EventHandler<MessageEvent> {
         
         for (Message message : messages) {
             for (Stream stream : message.getStreams()) {
-                distinctStreams.put(stream.getId(), stream);
+                distinctStreams.put(new ObjectId(stream.getId()), stream);
             }
         }
         

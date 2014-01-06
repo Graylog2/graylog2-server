@@ -41,12 +41,12 @@ public class DashboardRegistry {
 
     public void loadPersisted() {
         for (Dashboard dashboard : Dashboard.all(core)) {
-            dashboards.put(dashboard.getId().toString(), dashboard);
+            dashboards.put(dashboard.getId(), dashboard);
         }
     }
 
     public void add(Dashboard dashboard) {
-        dashboards.put(dashboard.getId().toString(), dashboard);
+        dashboards.put(dashboard.getId(), dashboard);
     }
 
     public Dashboard get(String dashboardId) {
