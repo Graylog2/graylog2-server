@@ -177,7 +177,8 @@ $(document).ready(function() {
                     graph: graph,
                     formatter: function(series, x, y) {
                         var date = '<span class="date">' + new Date(x * 1000).toUTCString() + '</span>';
-                        var content = '[' + opts.valuetype + '] ' + field + ': ' + parseInt(y) + '<br>' + date;
+                        var swatch = '<span class="detail_swatch" style="background-color: ' + series.color + '"></span>';
+                        var content = swatch + '[' + opts.valuetype + '] ' + field + ': ' + parseInt(y) + '<br>' + date;
                         return content;
                     }
                 });
@@ -452,22 +453,40 @@ $(document).ready(function() {
         var draggedChart = fieldGraphs[draggedId];
 
         var targetElem = $('.field-graph-container[data-chart-id="' + targetId + '"]');
+        var draggedElem = $('.field-graph-container[data-chart-id="' + draggedId + '"]');
+
+        // TODO support multiple (data-lines must be an array)
+        var draggedOpts = JSON.parse(draggedElem.attr("data-lines"));
+
+        var lineColor = palette.color();
 
         // Update title and description.
         $(".type-description", targetElem).hide();
         $(".title", targetElem).text("Combined chart");
 
+        if (draggedOpts.query == undefined || draggedOpts.query.trim() == "") {
+            draggedOpts.query = "*";
+        }
+
+        // Add query to query list of chart.
+        var queryDescription = "<div class='field-graph-query-color' style='background-color: " + lineColor + ";'></div> "
+                    + "Query: <span class='field-graph-query'>" + htmlEscape(draggedOpts.query) + "</span>";
+
+        $("ul.field-graph-query-container", targetElem).append("<li>" + queryDescription + "</li>");
+
         // TODO support multiple
-        // TODO chart title for legend
         var addSeries = {
             name: "value2",
-            color: palette.color()
+            color: lineColor
         };
 
         addSeries["data"] = draggedChart.series[0].data;
 
         var targetSeries = targetChart.series;
         targetSeries.push(addSeries);
+
+        // TODO make this a graph options. what to choose by default?
+        //targetChart.renderer.unstack = true;
 
         // Reflect all the chart changes we made.
         targetChart.update();

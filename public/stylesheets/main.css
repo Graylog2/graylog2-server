@@ -1105,7 +1105,7 @@ form #stream-rules {
 }
 
 .field-graph-container {
-    height: 260px;
+    padding-bottom: 35px;
 }
 
 .field-graph-container .dropdown-menu a.selected {
@@ -1123,7 +1123,6 @@ form #stream-rules {
     position: relative;
     top: 1px;
 }
-
 
 .field-graph-container .unpin {
     color: #b94a48;
@@ -1699,4 +1698,11 @@ form.edit-dashboard-form {
 
 .field-graph-container .merge-drop-ready {
     background-color: #000;
+}
+
+.field-graph-query-color {
+    width: 8px;
+    height: 8px;
+    display: inline-block;
+    margin-right: 1px;
 }
