@@ -158,7 +158,8 @@ $(document).ready(function() {
                     series: [ {
                         name: "value",
                         data: data.values,
-                        color: '#26ADE4'
+                        color: '#26ADE4',
+                        gl2_query: opts.query
                     } ]
                 });
 
@@ -458,32 +459,36 @@ $(document).ready(function() {
         // TODO support multiple (data-lines must be an array)
         var draggedOpts = JSON.parse(draggedElem.attr("data-lines"));
 
-        var lineColor = palette.color();
-
         // Update title and description.
         $(".type-description", targetElem).hide();
         $(".title", targetElem).text("Combined chart");
 
-        if (draggedOpts.query == undefined || draggedOpts.query.trim() == "") {
-            draggedOpts.query = "*";
+        for (var i = 0; i < draggedChart.series.length; i++) {
+            var lineColor = palette.color();
+            var series = draggedChart.series[i];
+            var query = series.gl2_query;
+
+            if (query == undefined || query == "") {
+                query = "*";
+            }
+
+            // Add query to query list of chart.
+            var queryDescription = "<div class='field-graph-query-color' style='background-color: " + lineColor + ";'></div> "
+                + "Query: <span class='field-graph-query'>" + htmlEscape(query) + "</span>";
+
+            $("ul.field-graph-query-container", targetElem).append("<li>" + queryDescription + "</li>");
+
+            // TODO support multiple
+            var addSeries = {
+                name: "value" + i,
+                color: lineColor,
+                gl2_query: query
+            };
+
+            addSeries["data"] = series.data;
+
+            targetChart.series.push(addSeries);
         }
-
-        // Add query to query list of chart.
-        var queryDescription = "<div class='field-graph-query-color' style='background-color: " + lineColor + ";'></div> "
-                    + "Query: <span class='field-graph-query'>" + htmlEscape(draggedOpts.query) + "</span>";
-
-        $("ul.field-graph-query-container", targetElem).append("<li>" + queryDescription + "</li>");
-
-        // TODO support multiple
-        var addSeries = {
-            name: "value2",
-            color: lineColor
-        };
-
-        addSeries["data"] = draggedChart.series[0].data;
-
-        var targetSeries = targetChart.series;
-        targetSeries.push(addSeries);
 
         // TODO make this a graph options. what to choose by default?
         //targetChart.renderer.unstack = true;
