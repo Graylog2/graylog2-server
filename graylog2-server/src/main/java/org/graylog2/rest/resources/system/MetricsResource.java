@@ -26,6 +26,9 @@ import com.codahale.metrics.Timer;
 import com.codahale.metrics.annotation.Timed;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
+import com.mongodb.BasicDBObject;
+import com.mongodb.DBCursor;
+import com.mongodb.DBObject;
 import org.graylog2.rest.documentation.annotations.*;
 import org.graylog2.rest.resources.RestResource;
 import org.slf4j.Logger;
@@ -33,6 +36,8 @@ import org.slf4j.LoggerFactory;
 
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
+import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
@@ -141,4 +146,98 @@ public class MetricsResource extends RestResource {
         return json(result);
     }
 
+    enum MetricType {
+        GAUGE,
+        COUNTER,
+        HISTOGRAM,
+        METER,
+        TIMER
+    }
+
+    @GET
+    @Timed
+    @Path("/{metricName}/history")
+    @ApiOperation(value = "Get history of a single metric", notes = "The maximum retention time is currently only 5 minutes.")
+    public String historicSingleMetric(
+            @ApiParam(title = "metricName", required = true) @PathParam("metricName") String metricName,
+            @ApiParam(title = "after", description = "Only values for after this UTC timestamp (1970 epoch)") @QueryParam("after") @DefaultValue("-1") long after
+    ) {
+        BasicDBObject andQuery = new BasicDBObject();
+        List<BasicDBObject> obj = new ArrayList<BasicDBObject>();
+        obj.add(new BasicDBObject("name", metricName));
+        if (after != -1) {
+            obj.add(new BasicDBObject("$gt",  new BasicDBObject("$gt", new Date(after))));
+        }
+        andQuery.put("$and", obj);
+
+        final DBCursor cursor = core.getMongoConnection().getDatabase().getCollection("graylog2_metrics")
+                .find(andQuery).sort(new BasicDBObject("timestamp", 1));
+        Map<String, Object> metricsData = Maps.newHashMap();
+        metricsData.put("name", metricName);
+        List<Object> values = Lists.newArrayList();
+        metricsData.put("values", values);
+
+        while (cursor.hasNext()) {
+            final DBObject value = cursor.next();
+            metricsData.put("node", value.get("node"));
+
+            final MetricType metricType = MetricType.valueOf(((String) value.get("type")).toUpperCase());
+            Map<String, Object> dataPoint = Maps.newHashMap();
+            values.add(dataPoint);
+
+            dataPoint.put("timestamp", value.get("timestamp"));
+            metricsData.put("type", metricType.toString().toLowerCase());
+
+            switch (metricType) {
+                case GAUGE:
+                    final Object gaugeValue = value.get("value");
+                    dataPoint.put("value", gaugeValue);
+                    break;
+                case COUNTER:
+                    dataPoint.put("count", value.get("count"));
+                    break;
+                case HISTOGRAM:
+                    dataPoint.put("75-percentile", value.get("75-percentile"));
+                    dataPoint.put("95-percentile", value.get("95-percentile"));
+                    dataPoint.put("98-percentile", value.get("98-percentile"));
+                    dataPoint.put("99-percentile", value.get("99-percentile"));
+                    dataPoint.put("999-percentile", value.get("999-percentile"));
+                    dataPoint.put("max", value.get("max"));
+                    dataPoint.put("min", value.get("min"));
+                    dataPoint.put("mean", value.get("mean"));
+                    dataPoint.put("median", value.get("median"));
+                    dataPoint.put("std_dev", value.get("std_dev"));
+                    break;
+                case METER:
+                    dataPoint.put("count", value.get("count"));
+                    dataPoint.put("1-minute-rate", value.get("1-minute-rate"));
+                    dataPoint.put("5-minute-rate", value.get("5-minute-rate"));
+                    dataPoint.put("15-minute-rate", value.get("15-minute-rate"));
+                    dataPoint.put("mean-rate", value.get("mean-rate"));
+                    break;
+                case TIMER:
+                    dataPoint.put("count", value.get("count"));
+                    dataPoint.put("rate-unit", value.get("rate-unit"));
+                    dataPoint.put("1-minute-rate", value.get("1-minute-rate"));
+                    dataPoint.put("5-minute-rate", value.get("5-minute-rate"));
+                    dataPoint.put("15-minute-rate", value.get("15-minute-rate"));
+                    dataPoint.put("mean-rate", value.get("mean-rate"));
+                    dataPoint.put("duration-unit", value.get("duration-unit"));
+                    dataPoint.put("75-percentile", value.get("75-percentile"));
+                    dataPoint.put("95-percentile", value.get("95-percentile"));
+                    dataPoint.put("98-percentile", value.get("98-percentile"));
+                    dataPoint.put("99-percentile", value.get("99-percentile"));
+                    dataPoint.put("999-percentile", value.get("999-percentile"));
+                    dataPoint.put("max", value.get("max"));
+                    dataPoint.put("min", value.get("min"));
+                    dataPoint.put("mean", value.get("mean"));
+                    dataPoint.put("median", value.get("median"));
+                    dataPoint.put("stddev", value.get("stddev"));
+                    break;
+            }
+
+        }
+
+        return json(metricsData);
+    }
 }

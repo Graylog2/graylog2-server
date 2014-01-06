@@ -199,6 +199,9 @@ public class Configuration {
     @Parameter(value = "allow_leading_wildcard_searches", required = false)
     private boolean allowLeadingWildcardSearches = false;
 
+    @Parameter(value = "enable_metrics_collection", required = false)
+    private boolean metricsCollectionEnabled = false;
+
     /* Elasticsearch defaults */
     @Parameter(value = "elasticsearch_cluster_name", required = true)
     private String esClusterName = "graylog2";
@@ -515,4 +518,9 @@ public class Configuration {
     public boolean isAllowLeadingWildcardSearches() {
         return allowLeadingWildcardSearches;
     }
+
+    public boolean isMetricsCollectionEnabled() {
+        return metricsCollectionEnabled;
+    }
+
 }
