@@ -159,7 +159,7 @@ public class InputRegistry {
                 input.initialize(new Configuration(io.getConfiguration()), core);
                 input.setTitle(io.getTitle());
                 input.setCreatorUserId(io.getCreatorUserId());
-                input.setPersistId(io.getId().toStringMongod());
+                input.setPersistId(io.getId());
                 input.setCreatedAt(io.getCreatedAt());
 
                 // Add extractors.
