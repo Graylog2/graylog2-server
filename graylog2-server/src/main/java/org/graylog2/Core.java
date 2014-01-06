@@ -239,6 +239,7 @@ public class Core implements GraylogServer, InputHost {
         gelfChunkManager = new GELFChunkManager(this);
 
         indexer = new Indexer(this);
+        indexer.start();
 
         Runtime.getRuntime().addShutdownHook(new Thread() {
             @Override
