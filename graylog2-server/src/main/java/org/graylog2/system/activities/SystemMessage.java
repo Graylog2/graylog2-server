@@ -102,11 +102,6 @@ public class SystemMessage extends Persisted {
     }
 
     @Override
-    public ObjectId getId() {
-        return this.id;
-    }
-
-    @Override
     protected Map<String, Validator> getValidations() {
         return new HashMap<String, Validator>() {{
             put("caller", new FilledStringValidator());

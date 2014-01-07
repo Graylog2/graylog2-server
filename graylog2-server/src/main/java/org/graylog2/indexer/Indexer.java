@@ -9,7 +9,6 @@ import org.elasticsearch.action.WriteConsistencyLevel;
 import org.elasticsearch.action.admin.cluster.health.ClusterHealthRequest;
 import org.elasticsearch.action.admin.cluster.node.info.NodesInfoRequest;
 import org.elasticsearch.action.admin.cluster.node.info.NodesInfoResponse;
-import org.elasticsearch.action.admin.indices.stats.IndexStats;
 import org.elasticsearch.action.bulk.BulkRequestBuilder;
 import org.elasticsearch.action.bulk.BulkResponse;
 import org.elasticsearch.action.index.IndexRequest.OpType;
@@ -27,11 +26,9 @@ import org.graylog2.indexer.cluster.Cluster;
 import org.graylog2.indexer.counts.Counts;
 import org.graylog2.indexer.indices.Indices;
 import org.graylog2.indexer.messages.Messages;
-import org.graylog2.indexer.ranges.IndexRange;
 import org.graylog2.indexer.searches.Searches;
 import org.graylog2.plugin.Message;
 import org.graylog2.plugin.indexer.MessageGateway;
-import org.graylog2.system.activities.Activity;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -49,15 +46,15 @@ public class Indexer {
     private static final Logger LOG = LoggerFactory.getLogger(Indexer.class);
 
     private Client client;
-    private final MessageGateway messageGateway;
+    private MessageGateway messageGateway;
     private final ObjectMapper objectMapper = new ObjectMapper();
     public static final String TYPE = "message";
     
-    private final Searches searches;
-    private final Counts counts;
-    private final Messages messages;
-    private final Cluster cluster;
-    private final Indices indices;
+    private Searches searches;
+    private Counts counts;
+    private Messages messages;
+    private Cluster cluster;
+    private Indices indices;
 	
     private Core server;
 
@@ -66,38 +63,12 @@ public class Indexer {
     }
 
     public Indexer(Core graylogServer) {
-        server = graylogServer;
+        this.server = graylogServer;
+    }
 
+    public void start() {
         final NodeBuilder builder = nodeBuilder().client(true);
-        String esSettings;
-        Map<String, String> settings = Maps.newHashMap();
-
-        // TODO: fill this with usueful stuff to make elasticsearch.yml optional.
-        // Standard Configuration.
-        settings.put("discovery.initial_state_timeout", "3s");
-
-        // Overwrite from a custom ElasticSearch config file.
-        try {
-            if (graylogServer.getConfiguration().getElasticSearchConfigFile() != null) {
-                esSettings = FileUtils.readFileToString(new File(graylogServer.getConfiguration().getElasticSearchConfigFile()));
-                settings.putAll(new YamlSettingsLoader().load(esSettings));
-            }
-        } catch (IOException e) {
-            LOG.warn("Cannot read elasticsearch configuration.");
-        }
-
-        // override loaded settings with ours from graylog2.conf
-        final Configuration conf = server.getConfiguration();
-        settings.put("cluster.name", conf.getEsClusterName());
-        settings.put("node.name", conf.getEsNodeName());
-        settings.put("transport.tcp.port", String.valueOf(conf.getEsTransportTcpPort()));
-        settings.put("node.master", conf.isEsIsMasterEligible() ? "true" : "false");
-        settings.put("node.data", conf.isEsStoreData() ? "true" : "false");
-        settings.put("http.enabled", conf.isEsIsHttpEnabled() ? "true" : "false");
-        settings.put("discovery.zen.ping.multicast.enabled", conf.isEsMulticastDiscovery() ? "true" : "false");
-        if (conf.getEsUnicastHosts() != null) {
-            settings.put("discovery.zen.ping.unicast.hosts", Joiner.on(",").join(conf.getEsUnicastHosts()));
-        }
+        Map<String, String> settings = readNodeSettings(server.getConfiguration());
 
         builder.settings().put(settings);
         final Node node = builder.node();
@@ -115,15 +86,50 @@ public class Indexer {
                 node.close();
             }
         });
-        
-        messageGateway = new MessageGatewayImpl(graylogServer);
-        searches = new Searches(client, graylogServer);
-        counts = new Counts(client, graylogServer);
-        messages = new Messages(client, graylogServer);
-        cluster = new Cluster(client, graylogServer);
-        indices = new Indices(client, graylogServer);
+
+        messageGateway = new MessageGatewayImpl(server);
+        searches = new Searches(client, server);
+        counts = new Counts(client, server);
+        messages = new Messages(client, server);
+        cluster = new Cluster(client, server);
+        indices = new Indices(client, server);
     }
-    
+
+    // default visibility for tests
+    Map<String, String> readNodeSettings(Configuration conf) {
+        Map<String, String> settings = Maps.newHashMap();
+
+        // Standard Configuration.
+        settings.put("cluster.name", conf.getEsClusterName());
+
+        settings.put("node.name", conf.getEsNodeName());
+        settings.put("node.master", Boolean.toString(conf.isEsIsMasterEligible()));
+        settings.put("node.data", Boolean.toString(conf.isEsStoreData()));
+
+        settings.put("http.enabled", Boolean.toString(conf.isEsIsHttpEnabled()));
+        settings.put("transport.tcp.port", String.valueOf(conf.getEsTransportTcpPort()));
+
+        settings.put("discovery.initial_state_timeout", conf.getEsInitialStateTimeout());
+        settings.put("discovery.zen.ping.multicast.enabled", Boolean.toString(conf.isEsMulticastDiscovery()));
+
+        if (conf.getEsUnicastHosts() != null) {
+            settings.put("discovery.zen.ping.unicast.hosts", Joiner.on(",").join(conf.getEsUnicastHosts()));
+        }
+
+        // Overwrite from a custom ElasticSearch config file.
+        try {
+            final String esConfigFilePath = conf.getElasticSearchConfigFile();
+            if (esConfigFilePath != null) {
+                String esSettings = FileUtils.readFileToString(new File(esConfigFilePath));
+                settings.putAll(new YamlSettingsLoader().load(esSettings));
+            }
+        } catch (IOException e) {
+            LOG.warn("Cannot read elasticsearch configuration.");
+        }
+
+        return settings;
+    }
+
     public Client getClient() {
         return client;
     }

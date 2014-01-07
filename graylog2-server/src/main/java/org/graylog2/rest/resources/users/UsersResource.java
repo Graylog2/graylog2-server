@@ -399,7 +399,7 @@ public class UsersResource extends RestResource {
 
     private HashMap<String, Object> toMap(User user, boolean includePermissions) {
         final HashMap<String,Object> map = Maps.newHashMap();
-        map.put("id", Objects.firstNonNull(user.getId(), "").toString());
+        map.put("id", Objects.firstNonNull(user.getId(), ""));
         map.put("username", user.getName());
         map.put("email", user.getEmail());
         map.put("full_name", user.getFullName());

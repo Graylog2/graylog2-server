@@ -48,6 +48,7 @@ import org.graylog2.inputs.gelf.gelf.GELFChunkManager;
 import org.graylog2.jersey.container.netty.NettyContainer;
 import org.graylog2.metrics.jersey2.MetricsDynamicBinding;
 import org.graylog2.outputs.OutputRegistry;
+import org.graylog2.periodical.MongoDbMetricsReporter;
 import org.graylog2.plugin.GraylogServer;
 import org.graylog2.plugin.InputHost;
 import org.graylog2.plugin.Tools;
@@ -94,6 +95,7 @@ import java.util.Map;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -165,6 +167,7 @@ public class Core implements GraylogServer, InputHost {
     private LdapUserAuthenticator ldapUserAuthenticator;
     private LdapConnector ldapConnector;
     private DefaultSecurityManager securityManager;
+    private MongoDbMetricsReporter metricsReporter;
 
     public void initialize(Configuration configuration, MetricRegistry metrics) {
     	startedAt = new DateTime(DateTimeZone.UTC);
@@ -173,8 +176,12 @@ public class Core implements GraylogServer, InputHost {
         this.nodeId = id.readOrGenerate();
 
         this.metricRegistry = metrics;
-        
         this.configuration = configuration; // TODO use dependency injection
+
+        if (configuration.isMetricsCollectionEnabled()) {
+            metricsReporter = MongoDbMetricsReporter.forRegistry(this, metricRegistry).build();
+            metricsReporter.start(1, TimeUnit.SECONDS);
+        }
 
         if (this.configuration.getRestTransportUri() == null) {
                 String guessedIf;
@@ -232,11 +239,15 @@ public class Core implements GraylogServer, InputHost {
         gelfChunkManager = new GELFChunkManager(this);
 
         indexer = new Indexer(this);
+        indexer.start();
 
         Runtime.getRuntime().addShutdownHook(new Thread() {
             @Override
             public void run() {
                 activityWriter.write(new Activity("Shutting down.", GraylogServer.class));
+                if (Core.this.configuration.isMetricsCollectionEnabled() && metricsReporter != null) {
+                    metricsReporter.stop();
+                }
             }
         });
     }

@@ -23,7 +23,6 @@ import com.beust.jcommander.internal.Lists;
 import com.codahale.metrics.annotation.Timed;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.google.common.collect.Maps;
-import org.bson.types.ObjectId;
 import org.graylog2.Core;
 import org.graylog2.database.NotFoundException;
 import org.graylog2.database.ValidationException;
@@ -81,9 +80,10 @@ public class StreamResource extends RestResource {
         streamData.put("created_at", new DateTime(DateTimeZone.UTC));
 
         StreamImpl stream = new StreamImpl(streamData, core);
-        ObjectId id;
+        String id;
         try {
-            id = stream.save();
+            stream.save();
+            id = stream.getId();
         } catch (ValidationException e) {
             LOG.error("Validation error.", e);
             throw new WebApplicationException(e, Response.Status.BAD_REQUEST);
@@ -110,7 +110,7 @@ public class StreamResource extends RestResource {
         }
 
         Map<String, Object> result = Maps.newHashMap();
-        result.put("stream_id", id.toStringMongod());
+        result.put("stream_id", id);
 
         return Response.status(Response.Status.CREATED).entity(json(result)).build();
     }
@@ -270,7 +270,7 @@ public class StreamResource extends RestResource {
         Map<String, Boolean> rules = Maps.newHashMap();
 
         for (StreamRule ruleMatch : ruleMatches.keySet()) {
-            rules.put(ruleMatch.getObjectId().toStringMongod(), ruleMatches.get(ruleMatch));
+            rules.put(ruleMatch.getId(), ruleMatches.get(ruleMatch));
         }
 
         Map<String, Object> result = Maps.newHashMap();

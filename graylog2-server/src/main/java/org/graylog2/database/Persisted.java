@@ -20,25 +20,24 @@
 
 package org.graylog2.database;
 
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
-
-import com.google.common.collect.Maps;
-import org.bson.types.ObjectId;
-import org.graylog2.Core;
-
 import com.beust.jcommander.internal.Lists;
+import com.google.common.collect.Maps;
 import com.mongodb.BasicDBObject;
 import com.mongodb.DBCollection;
 import com.mongodb.DBCursor;
 import com.mongodb.DBObject;
+import org.bson.types.ObjectId;
+import org.graylog2.Core;
 import org.graylog2.database.validators.Validator;
 import org.graylog2.plugin.database.EmbeddedPersistable;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.util.Date;
+import java.util.List;
+import java.util.Map;
 
 /**
  * @author Lennart Koopmann <lennart@torch.sh>
@@ -151,7 +150,7 @@ public abstract class Persisted {
 		 */
 		BasicDBObject q = new BasicDBObject("_id", id);
 		collection().update(q, doc, true, false);
-		
+
 		return id;
 	}
 
@@ -230,8 +229,12 @@ public abstract class Persisted {
         collection().update(qry, update);
     }
 
-    public ObjectId getId() {
+    public ObjectId getObjectId() {
         return this.id;
+    }
+
+    public String getId() {
+        return getObjectId().toStringMongod();
     }
 
     private void fieldTransformations(Map<String, Object> doc) {

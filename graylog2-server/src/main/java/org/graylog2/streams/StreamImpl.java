@@ -20,11 +20,16 @@
 
 package org.graylog2.streams;
 
-import java.util.*;
-
+import com.beust.jcommander.internal.Lists;
+import com.google.common.collect.Maps;
+import com.google.common.collect.Sets;
+import com.mongodb.BasicDBObject;
+import com.mongodb.DBObject;
 import org.bson.types.ObjectId;
 import org.graylog2.Core;
-import org.graylog2.database.*;
+import org.graylog2.database.NotFoundException;
+import org.graylog2.database.Persisted;
+import org.graylog2.database.ValidationException;
 import org.graylog2.database.validators.DateValidator;
 import org.graylog2.database.validators.FilledStringValidator;
 import org.graylog2.database.validators.Validator;
@@ -33,15 +38,11 @@ import org.graylog2.plugin.Tools;
 import org.graylog2.plugin.alarms.AlarmReceiver;
 import org.graylog2.plugin.streams.Stream;
 import org.graylog2.plugin.streams.StreamRule;
-
-import com.beust.jcommander.internal.Lists;
-import com.google.common.collect.Maps;
-import com.google.common.collect.Sets;
-import com.mongodb.BasicDBObject;
-import com.mongodb.DBObject;
 import org.joda.time.DateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.util.*;
 
 /**
  * Representing a single stream from the streams collection. Also provides method
@@ -200,11 +201,6 @@ public class StreamImpl extends Persisted implements Stream {
     public String getCollectionName() {
         return COLLECTION;
     }
-
-    @Override
-	public ObjectId getId() {
-		return this.id;
-	}
 
     @Override
 	public String getTitle() {

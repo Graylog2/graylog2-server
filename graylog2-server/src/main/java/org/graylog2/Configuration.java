@@ -199,20 +199,23 @@ public class Configuration {
     @Parameter(value = "allow_leading_wildcard_searches", required = false)
     private boolean allowLeadingWildcardSearches = false;
 
+    @Parameter(value = "enable_metrics_collection", required = false)
+    private boolean metricsCollectionEnabled = false;
+
     /* Elasticsearch defaults */
-    @Parameter(value = "elasticsearch_cluster_name", required = true)
+    @Parameter(value = "elasticsearch_cluster_name", required = false)
     private String esClusterName = "graylog2";
 
-    @Parameter(value = "elasticsearch_node_name", required = true)
+    @Parameter(value = "elasticsearch_node_name", required = false)
     private String esNodeName = "graylog2-server";
 
-    @Parameter(value = "elasticsearch_node_master", required = true)
+    @Parameter(value = "elasticsearch_node_master", required = false)
     private boolean esIsMasterEligible = false;
 
-    @Parameter(value = "elasticsearch_node_data", required = true)
+    @Parameter(value = "elasticsearch_node_data", required = false)
     private boolean esStoreData = false;
 
-    @Parameter(value = "elasticsearch_transport_tcp_port", validator = InetPortValidator.class, required = true)
+    @Parameter(value = "elasticsearch_transport_tcp_port", validator = InetPortValidator.class, required = false)
     private int esTransportTcpPort = 9350;
 
     @Parameter(value = "elasticsearch_http_enabled", required = false)
@@ -223,6 +226,9 @@ public class Configuration {
 
     @Parameter(value = "elasticsearch_discovery_zen_ping_unicast_hosts", required = false, converter = StringListConverter.class)
     private List<String> esUnicastHosts;
+
+    @Parameter(value = "elasticsearch_discovery_initial_state_timeout", required = false)
+    private String esInitialStateTimeout = "3s";
 
     public boolean isMaster() {
         return isMaster;
@@ -508,6 +514,11 @@ public class Configuration {
         return esUnicastHosts;
     }
 
+    public String getEsInitialStateTimeout() {
+        return esInitialStateTimeout;
+    }
+
+
     public String getRetentionStrategy() {
         return retentionStrategy;
     }
@@ -515,4 +526,9 @@ public class Configuration {
     public boolean isAllowLeadingWildcardSearches() {
         return allowLeadingWildcardSearches;
     }
+
+    public boolean isMetricsCollectionEnabled() {
+        return metricsCollectionEnabled;
+    }
+
 }
