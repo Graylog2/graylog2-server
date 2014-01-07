@@ -24,9 +24,11 @@ import org.elasticsearch.action.admin.indices.stats.IndexStats;
 import org.graylog2.indexer.IndexHelper;
 import org.graylog2.indexer.NoTargetIndexException;
 import org.graylog2.indexer.ranges.IndexRange;
+import org.graylog2.indexer.ranges.RebuildIndexRangesJob;
 import org.graylog2.indexer.retention.RetentionStrategyFactory;
 import org.graylog2.plugin.indexer.retention.RetentionStrategy;
 import org.graylog2.system.activities.Activity;
+import org.graylog2.system.jobs.SystemJobConcurrencyException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.graylog2.Core;
@@ -106,9 +108,15 @@ public class IndexRetentionThread implements Runnable {
 
             // Sorry if this should ever go mad. Run retention strategy!
             strategy.runStrategy(indexName);
+        }
 
-            // Remove index from ranges.
-            IndexRange.destroy(server, indexName);
+        // Re-calculate index ranges.
+        try {
+            server.getSystemJobManager().submit(new RebuildIndexRangesJob(server));
+        } catch (SystemJobConcurrencyException e) {
+            String msg = "Could not re-calculate index ranges after running retention: Maximum concurrency of job is reached. Please run manually later.";
+            server.getActivityWriter().write(new Activity(msg, IndexRetentionThread.class));
+            LOG.error(msg);
         }
     }
 
