@@ -40,7 +40,7 @@ public class ExactMatcher implements StreamRuleMatcher {
 			return false;
 		}
 		
-		return rule.getInverted() ^ value.toString().equals(rule.getValue());
+		return rule.getInverted() ^ value.toString().trim().equals(rule.getValue());
 	}
 
 }
