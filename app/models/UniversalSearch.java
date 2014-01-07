@@ -190,19 +190,37 @@ public class UniversalSearch {
         String keyword = Tools.stringSearchParamOrEmpty(request, "keyword");
         String interval = Tools.stringSearchParamOrEmpty(request, "interval");
 
-        return routes.SearchController.index(
-                query,
-                timeRange.getType().toString().toLowerCase(),
-                relative,
-                from,
-                to,
-                keyword,
-                interval,
-                page,
-                "",
-                sortField,
-                sortOrder
-        );
+        // TODO we desperately need to pass the streamid and then build the filter here, instead of passing the filter and then trying to reassemble the streamid.
+        if (filter != null && filter.startsWith("streams:")) {
+            return routes.StreamSearchController.index(
+                    filter.split(":")[1],
+                    query,
+                    timeRange.getType().toString().toLowerCase(),
+                    relative,
+                    from,
+                    to,
+                    keyword,
+                    interval,
+                    page,
+                    "",
+                    sortField,
+                    sortOrder
+            );
+        } else {
+            return routes.SearchController.index(
+                    query,
+                    timeRange.getType().toString().toLowerCase(),
+                    relative,
+                    from,
+                    to,
+                    keyword,
+                    interval,
+                    page,
+                    "",
+                    sortField,
+                    sortOrder
+            );
+        }
     }
 
     public Call getCsvRoute(Request request) {
