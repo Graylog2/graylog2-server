@@ -1,0 +1,28 @@
+@(currentUser: User, query: String, searchResult: models.api.results.SearchResult, savedSearch: SavedSearch)(implicit stream: Stream)
+@import views.helpers.QueryErrorHelper
+
+@main("Query error", sidebars.standard(currentUser), query, currentUser) {
+
+    @if(savedSearch != null) {
+        <a href="@routes.SavedSearchesController.delete(savedSearch.getId)" class="btn btn-small btn-danger pull-right" data-confirm='Really delete saved search "@savedSearch.getTitle"?'>Delete saved search</a>
+    }
+
+    <h1>
+        <i class="icon-search icon-large"></i>
+        Malformed query
+    </h1>
+
+    <p>
+        Your search could not be executed. <strong>Take a look at the
+        <a href="http://support.torch.sh/help/kb/graylog2-web-interface/the-search-bar-explained" target="_blank">documentation</a>
+        if you need help with the search syntax.</strong>
+    </p>
+
+    @if(searchResult.getError.beginLine == 1) {
+    <p>
+        Your query had an error at the following position:
+    </p>
+    <pre>@Html(QueryErrorHelper.markupOriginalQuery(searchResult))</pre>
+    }
+    @partials.support_sources()
+}

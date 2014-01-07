@@ -71,7 +71,11 @@ public class SearchController extends AuthenticatedController {
                 interval = "minute";
             }
 
-            searchResult = FieldMapper.run(search.search());
+            searchResult = search.search();
+            if (searchResult.getError() != null) {
+                return ok(views.html.search.queryerror.render(currentUser(), q, searchResult, savedSearch, null));
+            }
+            searchResult = FieldMapper.run(searchResult);
 
             searchResult.setAllFields(getAllFields());
 

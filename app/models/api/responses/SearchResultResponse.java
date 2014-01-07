@@ -35,5 +35,20 @@ public class SearchResultResponse {
 
     @SerializedName("built_query")
     public String builtQuery;
-	
+
+    public QueryParseError error;
+
+    public static class QueryParseError {
+        @SerializedName("begin_column")
+        public int beginColumn;
+
+        @SerializedName("begin_line")
+        public int beginLine;
+
+        @SerializedName("end_column")
+        public int endColumn;
+
+        @SerializedName("end_line")
+        public int endLine;
+    }
 }

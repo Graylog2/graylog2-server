@@ -29,7 +29,6 @@ import lib.timeranges.TimeRange;
 import models.api.responses.*;
 import models.api.results.DateHistogramResult;
 import models.api.results.SearchResult;
-import play.Logger;
 import play.mvc.Call;
 import play.mvc.Http.Request;
 
@@ -87,6 +86,7 @@ public class UniversalSearch {
                 .queryParam("filter", (filter == null ? "*" : filter))
                 .accept(mediaType)
                 .timeout(KEITH, TimeUnit.SECONDS)
+                .expect(200, 400)
                 .execute();
     }
 
@@ -101,7 +101,8 @@ public class UniversalSearch {
                 response.time,
                 response.messages,
                 response.fields,
-                response.usedIndices
+                response.usedIndices,
+                response.error
         );
 
         return result;

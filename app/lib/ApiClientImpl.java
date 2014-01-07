@@ -377,7 +377,8 @@ class ApiClientImpl implements ApiClient {
                     return responseClass.cast(response.getResponseBody("UTF-8"));
                 }
 
-                if (response.getStatusCode() >= 200 && response.getStatusCode() < 300) {
+                if (expectedResponseCodes.contains(response.getStatusCode())
+                        || (response.getStatusCode() >= 200 && response.getStatusCode() < 300)) {
                     T result;
                     try {
                         if (responseContentType.is(MediaType.JSON_UTF_8.withoutParameters())) {

@@ -4,14 +4,10 @@ import com.google.inject.Inject;
 import lib.APIException;
 import lib.ApiClient;
 import lib.SearchTools;
-import lib.Tools;
 import lib.timeranges.InvalidRangeParametersException;
-import lib.timeranges.TimeRange;
 import models.*;
 import models.api.results.DateHistogramResult;
 import models.api.results.SearchResult;
-import play.mvc.Call;
-import play.mvc.Http;
 import play.mvc.Result;
 
 import java.io.IOException;
@@ -60,7 +56,11 @@ public class StreamSearchController extends SearchController {
                 interval = "minute";
             }
 
-            searchResult = FieldMapper.run(search.search());
+            searchResult = search.search();
+            if (searchResult.getError() != null) {
+                return ok(views.html.search.queryerror.render(currentUser(), q, searchResult, savedSearch, stream));
+            }
+            searchResult = FieldMapper.run(searchResult);
 
             searchResult.setAllFields(getAllFields());
 

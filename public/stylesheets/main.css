@@ -1700,6 +1700,10 @@ form.edit-dashboard-form {
     background-color: #000;
 }
 
+.parse-error {
+    background-color: #f00;
+    color: #fff;
+}
 .field-graph-query-color {
     width: 8px;
     height: 8px;

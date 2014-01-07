@@ -22,6 +22,7 @@ import com.google.common.collect.Lists;
 import lib.Field;
 import lib.timeranges.TimeRange;
 import models.api.responses.MessageSummaryResponse;
+import models.api.responses.SearchResultResponse;
 
 import java.util.List;
 
@@ -33,18 +34,20 @@ public class SearchResult {
 	private final int totalResultCount;
 	private final int tookMs;
 	private final List<MessageSummaryResponse> results;
-	private final List<Field> fields;
+    private final SearchResultResponse.QueryParseError error;
+    private final List<Field> fields;
     private final List<String> usedIndices;
     private List<Field> allFields;
 
-    public SearchResult(String originalQuery, String builtQuery, TimeRange timeRange, int totalResultCount, int tookMs, List<MessageSummaryResponse> results, List<String> fields, List<String> usedIndices) {
+    public SearchResult(String originalQuery, String builtQuery, TimeRange timeRange, int totalResultCount, int tookMs, List<MessageSummaryResponse> results, List<String> fields, List<String> usedIndices, SearchResultResponse.QueryParseError error) {
 		this.originalQuery = originalQuery;
         this.builtQuery = builtQuery;
         this.timeRange = timeRange;
 		this.totalResultCount = totalResultCount;
 		this.tookMs = tookMs;
 		this.results = results;
-		this.fields = buildFields(fields);
+        this.error = error;
+        this.fields = buildFields(fields);
         this.usedIndices = usedIndices;
 	}
 	
@@ -99,4 +102,9 @@ public class SearchResult {
     public String getBuiltQuery() {
         return builtQuery;
     }
+
+    public SearchResultResponse.QueryParseError getError() {
+        return error;
+    }
+
 }
