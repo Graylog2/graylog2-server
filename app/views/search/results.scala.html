@@ -291,13 +291,29 @@
 <table class="table table-condensed table-hover table-striped messages">
 	<thead>
 		<tr>
-			<th style="width: 135px;">Timestamp</th>
-			<th style="width: 180px;" id="result-th-36cd38f49b9afa08222c0dc9ebfe35eb">Source</th>
-			<th id="result-th-78e731027d8fd50ed642340b7c9a63b3">Message</th>
+			<th style="width: 135px;">
+                Timestamp
+                @views.html.search.partials.column_sorter.render("timestamp", search, page)
+            </th>
+
+			<th style="width: 180px;" id="result-th-36cd38f49b9afa08222c0dc9ebfe35eb">
+                Source
+                @views.html.search.partials.column_sorter.render("source", search, page)
+            </th>
+
+			<th id="result-th-78e731027d8fd50ed642340b7c9a63b3">
+                Message
+                @views.html.search.partials.column_sorter.render("message", search, page)
+            </th>
 			
 			@for(f <- searchResult.getPageFields()) {
 				@if(!f.isStandardSelected()) {
-					<th style="display: none;" id="result-th-@f.getHash()">@f.getName()</th>
+					<th id="result-th-@f.getHash"
+                        @if(!search.getOrder.getField.equals(f.getName)) { style="display: none;" }
+                    >
+                        @f.getName
+                        @views.html.search.partials.column_sorter.render(f.getName, search, page)
+                    </th>
 				}
 			}
 		</tr>
@@ -311,7 +327,11 @@
 			
 			@for(f <- searchResult.getPageFields()) {
 				@if(!f.isStandardSelected()) {
-					<td style="display: none;" class="result-td-@f.getHash()">@r.message.get(f.getName())</td>
+					<td class="result-td-@f.getHash()"
+                        @if(!search.getOrder.getField.equals(f.getName)) { style="display: none;" }
+                    >
+                        @r.message.get(f.getName())
+                    </td>
 				}
 			}
 		</tr>

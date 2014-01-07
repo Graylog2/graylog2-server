@@ -19,7 +19,9 @@ public class StreamSearchController extends SearchController {
     @Inject
     private StreamService streamService;
 
-    public Result index(String streamId, String q, String rangeType, int relative, String from, String to, String keyword, String interval, int page, String savedSearchId) {
+    public Result index(String streamId, String q, String rangeType, int relative, String from, String to, String keyword, String interval, int page, String savedSearchId, String sortField, String sortOrder) {
+        SearchSort sort = buildSearchSort(sortField, sortOrder);
+
         Stream stream;
         try {
             stream = streamService.get(streamId);
@@ -34,7 +36,7 @@ public class StreamSearchController extends SearchController {
 
         UniversalSearch search;
         try {
-            search = getSearch(q, filter, rangeType, relative, from, to, keyword, page);
+            search = getSearch(q, filter, rangeType, relative, from, to, keyword, page, sort);
         } catch(InvalidRangeParametersException e2) {
             return status(400, views.html.errors.error.render("Invalid range parameters provided.", e2, request()));
         } catch(IllegalArgumentException e1) {
@@ -78,4 +80,5 @@ public class StreamSearchController extends SearchController {
             return ok(views.html.search.noresults.render(currentUser(), q, searchResult, savedSearch, stream));
         }
     }
+
 }

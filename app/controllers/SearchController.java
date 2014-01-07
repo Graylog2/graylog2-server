@@ -46,10 +46,12 @@ public class SearchController extends AuthenticatedController {
     @Inject
     protected SavedSearchService savedSearchService;
 
-    public Result index(String q, String rangeType, int relative, String from, String to, String keyword, String interval, int page, String savedSearchId) {
+    public Result index(String q, String rangeType, int relative, String from, String to, String keyword, String interval, int page, String savedSearchId, String sortField, String sortOrder) {
+        SearchSort sort = buildSearchSort(sortField, sortOrder);
+
         UniversalSearch search;
         try {
-            search = getSearch(q, null, rangeType, relative, from, to, keyword, page);
+            search = getSearch(q, null, rangeType, relative, from, to, keyword, page, sort);
         } catch(InvalidRangeParametersException e2) {
             return status(400, views.html.errors.error.render("Invalid range parameters provided.", e2, request()));
         } catch(IllegalArgumentException e1) {
@@ -97,7 +99,7 @@ public class SearchController extends AuthenticatedController {
     public Result exportAsCsv(String q, String rangeType, int relative, String from, String to, String keyword) {
         UniversalSearch search;
         try {
-            search = getSearch(q, null, rangeType, relative, from, to, keyword, 0);
+            search = getSearch(q, null, rangeType, relative, from, to, keyword, 0, UniversalSearch.DEFAULT_SORT);
         } catch(InvalidRangeParametersException e2) {
             return status(400, views.html.errors.error.render("Invalid range parameters provided.", e2, request()));
         } catch(IllegalArgumentException e1) {
@@ -128,7 +130,7 @@ public class SearchController extends AuthenticatedController {
         return allFields;
     }
 
-    protected UniversalSearch getSearch(String q, String filter, String rangeType, int relative,String from, String to, String keyword, int page)
+    protected UniversalSearch getSearch(String q, String filter, String rangeType, int relative,String from, String to, String keyword, int page, SearchSort order)
         throws InvalidRangeParametersException, IllegalArgumentException {
         if (q == null || q.trim().isEmpty()) {
             q = "*";
@@ -138,11 +140,24 @@ public class SearchController extends AuthenticatedController {
         TimeRange timerange = TimeRange.factory(rangeType, relative, from, to, keyword);
 
         UniversalSearch search;
-        if (filter == null)
-            search= searchFactory.queryWithRangeAndPage(q, timerange, page);
-        else
-            search = searchFactory.queryWithFilterRangeAndPage(q, filter, timerange, page);
+        if (filter == null) {
+            search = searchFactory.queryWithRangePageAndOrder(q, timerange, page, order);
+        } else {
+            search = searchFactory.queryWithFilterRangePageAndOrder(q, filter, timerange, page, order);
+        }
 
         return search;
+    }
+
+    protected SearchSort buildSearchSort(String sortField, String sortOrder) {
+        if (sortField == null || sortOrder == null || sortField.isEmpty() || sortOrder.isEmpty()) {
+            return UniversalSearch.DEFAULT_SORT;
+        }
+
+        try {
+            return new SearchSort(sortField, SearchSort.Direction.valueOf(sortOrder.toUpperCase()));
+        } catch(IllegalArgumentException e) {
+            return UniversalSearch.DEFAULT_SORT;
+        }
     }
 }

@@ -200,6 +200,8 @@ public abstract class DashboardWidget {
                 timerange.nullSafeParam("keyword"),
                 "minute",
                 0,
+                "",
+                "",
                 ""
         );
     }
@@ -215,6 +217,8 @@ public abstract class DashboardWidget {
                 timerange.nullSafeParam("keyword"),
                 "minute",
                 0,
+                "",
+                "",
                 ""
         );
     }

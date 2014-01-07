@@ -107,7 +107,9 @@ public class SavedSearchesController extends AuthenticatedController {
                     keyword,
                     "minute",
                     0,
-                    searchId
+                    searchId,
+                    "",
+                    ""
             );
         } else {
             return routes.StreamSearchController.index(
@@ -120,7 +122,9 @@ public class SavedSearchesController extends AuthenticatedController {
                     keyword,
                     "minute",
                     0,
-                    searchId
+                    searchId,
+                    "",
+                    ""
             );
         }
     }

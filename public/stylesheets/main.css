@@ -1710,3 +1710,27 @@ form.edit-dashboard-form {
     display: inline-block;
     margin-right: 1px;
 }
+
+.messages th .sort-order {
+    margin-left: 2px;
+    font-size: 11px;
+    color: #000;
+}
+
+.messages th .sort-order:hover {
+    color: #000;
+    text-decoration: none;
+}
+
+.messages th a:hover {
+    text-decoration: none;
+}
+
+.messages th .sort-order-asc {
+    position: relative;
+    top: -1px;
+}
+
+.messages th .choose-sort-order {
+    color: #8c8e86;
+}
