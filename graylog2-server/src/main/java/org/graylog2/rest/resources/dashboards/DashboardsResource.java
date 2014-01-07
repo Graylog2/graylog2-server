@@ -23,6 +23,7 @@ import com.beust.jcommander.internal.Lists;
 import com.codahale.metrics.annotation.Timed;
 import com.google.common.collect.Maps;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
+import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.bson.types.ObjectId;
 import org.graylog2.dashboards.Dashboard;
 import org.graylog2.dashboards.widgets.DashboardWidget;
@@ -32,6 +33,7 @@ import org.graylog2.indexer.searches.timeranges.InvalidRangeParametersException;
 import org.graylog2.rest.documentation.annotations.*;
 import org.graylog2.rest.resources.RestResource;
 import org.graylog2.rest.resources.dashboards.requests.*;
+import org.graylog2.security.RestPermissions;
 import org.graylog2.system.activities.Activity;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
@@ -58,6 +60,7 @@ public class DashboardsResource extends RestResource {
     @POST
     @Timed
     @ApiOperation(value = "Create a dashboard")
+    @RequiresPermissions(RestPermissions.DASHBOARDS_CREATE)
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
     @ApiResponses(value = {
@@ -109,7 +112,9 @@ public class DashboardsResource extends RestResource {
         List<Map<String, Object>> dashboards = Lists.newArrayList();
 
         for (Dashboard dashboard : Dashboard.all(core)) {
-            dashboards.add(dashboard.asMap());
+            if (isPermitted(RestPermissions.DASHBOARDS_READ, dashboard.getId())) {
+                dashboards.add(dashboard.asMap());
+            }
         }
 
         Map<String, Object> result = Maps.newHashMap();
@@ -129,6 +134,7 @@ public class DashboardsResource extends RestResource {
     @Produces(MediaType.APPLICATION_JSON)
     public String get(@ApiParam(title = "dashboardId", required = true) @PathParam("dashboardId") String dashboardId) {
         restrictToMaster();
+        checkPermission(RestPermissions.DASHBOARDS_READ, dashboardId);
 
         try {
             Dashboard dashboard = Dashboard.load(loadObjectId(dashboardId), core);
@@ -148,6 +154,7 @@ public class DashboardsResource extends RestResource {
     })
     public Response delete(@ApiParam(title = "dashboardId", required = true) @PathParam("dashboardId") String dashboardId) {
         restrictToMaster();
+        checkPermission(RestPermissions.DASHBOARDS_EDIT, dashboardId);
 
         try {
             Dashboard dashboard = Dashboard.load(loadObjectId(dashboardId), core);
@@ -173,6 +180,7 @@ public class DashboardsResource extends RestResource {
     })
     public Response update(@ApiParam(title = "JSON body", required = true) String body,
                            @ApiParam(title = "dashboardId", required = true) @PathParam("dashboardId") String dashboardId) {
+        checkPermission(RestPermissions.DASHBOARDS_EDIT, dashboardId);
         try {
             UpdateRequest cr;
             try {
@@ -213,6 +221,7 @@ public class DashboardsResource extends RestResource {
     })
     public Response setPositions(@ApiParam(title = "JSON body", required = true) String body,
                            @ApiParam(title = "dashboardId", required = true) @PathParam("dashboardId") String dashboardId) {
+        checkPermission(RestPermissions.DASHBOARDS_EDIT, dashboardId);
         try {
             UpdateWidgetPositionsRequest uwpr;
             try {
@@ -248,6 +257,7 @@ public class DashboardsResource extends RestResource {
     public Response addWidget(@ApiParam(title = "JSON body", required = true) String body,
                               @ApiParam(title = "dashboardId", required = true) @PathParam("dashboardId") String dashboardId) {
         restrictToMaster();
+        checkPermission(RestPermissions.DASHBOARDS_EDIT, dashboardId);
 
         AddWidgetRequest awr;
         try {
@@ -302,6 +312,7 @@ public class DashboardsResource extends RestResource {
             @ApiParam(title = "dashboardId", required = true) @PathParam("dashboardId") String dashboardId,
             @ApiParam(title = "widgetId", required = true) @PathParam("widgetId") String widgetId) {
         restrictToMaster();
+        checkPermission(RestPermissions.DASHBOARDS_EDIT, dashboardId);
 
         if (dashboardId == null || dashboardId.isEmpty()) {
             LOG.error("Missing dashboard ID. Returning HTTP 400.");
@@ -341,6 +352,7 @@ public class DashboardsResource extends RestResource {
     public Response widgetValue(@ApiParam(title = "dashboardId", required = true) @PathParam("dashboardId") String dashboardId,
                               @ApiParam(title = "widgetId", required = true) @PathParam("widgetId") String widgetId) {
         restrictToMaster();
+        checkPermission(RestPermissions.DASHBOARDS_READ, dashboardId);
 
         Dashboard dashboard = core.dashboards().get(dashboardId);
 
@@ -378,6 +390,7 @@ public class DashboardsResource extends RestResource {
             @ApiParam(title = "dashboardId", required = true) @PathParam("dashboardId") String dashboardId,
             @ApiParam(title = "widgetId", required = true) @PathParam("widgetId") String widgetId) {
         restrictToMaster();
+        checkPermission(RestPermissions.DASHBOARDS_EDIT, dashboardId);
 
         UpdateWidgetRequest uwr;
         try {
@@ -436,6 +449,7 @@ public class DashboardsResource extends RestResource {
             @ApiParam(title = "dashboardId", required = true) @PathParam("dashboardId") String dashboardId,
             @ApiParam(title = "widgetId", required = true) @PathParam("widgetId") String widgetId) {
         restrictToMaster();
+        checkPermission(RestPermissions.DASHBOARDS_EDIT, dashboardId);
 
         UpdateWidgetRequest uwr;
         try {

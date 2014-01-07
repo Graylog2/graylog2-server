@@ -41,6 +41,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
+import javax.ws.rs.ForbiddenException;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.*;
@@ -108,6 +109,26 @@ public abstract class RestResource {
         }
         ShiroSecurityContext.ShiroPrincipal principal = (ShiroSecurityContext.ShiroPrincipal) p;
         return principal.getSubject();
+    }
+
+    protected boolean isPermitted(String permission, String instanceId) {
+        return getSubject().isPermitted(permission + ":" + instanceId);
+    }
+
+    protected void checkPermission(String permission) {
+        if (!isPermitted(permission)) {
+            throw new ForbiddenException("Not authorized");
+        }
+    }
+
+    protected boolean isPermitted(String permission) {
+        return getSubject().isPermitted(permission);
+    }
+
+    protected void checkPermission(String permission, String instanceId) {
+        if (!isPermitted(permission, instanceId)) {
+            throw new ForbiddenException("Not authorized to access resource id " + instanceId);
+        }
     }
 
 	protected ObjectId loadObjectId(String id) {

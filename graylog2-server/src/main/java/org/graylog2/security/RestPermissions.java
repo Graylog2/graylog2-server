@@ -40,6 +40,12 @@ public class RestPermissions {
     public static final String USERS_TOKENCREATE = "users:tokencreate";
     public static final String USERS_TOKENLIST = "users:tokenlist";
     public static final String USERS_TOKENREMOVE = "users:tokenremove";
+    public static final String THROUGHPUT_READ = "throughput:read";
+    public static final String MESSAGECOUNT_READ = "messagecount:read";
+    public static final String DASHBOARDS_CREATE = "dashboards:create";
+    public static final String DASHBOARDS_LIST = "dashboards:list";
+    public static final String DASHBOARDS_READ = "dashboards:read";
+    public static final String DASHBOARDS_EDIT = "dashboards:edit";
 
     private static Map<String, Collection<String>> allPermissions;
 
