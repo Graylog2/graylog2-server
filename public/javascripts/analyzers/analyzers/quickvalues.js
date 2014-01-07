@@ -202,7 +202,7 @@ $(document).ready(function() {
     }
 
     function calculateDirection(linkel) {
-        if (($(window).height() - linkel.offset().top) < 400) {
+        if (($(window).height() - linkel.offset().top + $(window).scrollTop()) < 400) {
             return "up";
         } else {
             return "down";
@@ -217,11 +217,10 @@ $(document).ready(function() {
             updatePosition(button, $(this), calculateDirection(button));
         });
 
-        setTimeout(updateAllPositions, 25);
+        setTimeout(updateAllPositions, 500);
     })();
 
     function updatePosition(button, quickvalues, direction) {
-
         var left = button.offset().left-$(window).scrollLeft()-622;
 
         switch(direction)  {
