@@ -329,14 +329,7 @@ class ApiClientImpl implements ApiClient {
                 target = radio;
             }
 
-            if (!unauthenticated && sessionId == null) {
-                final User user = UserService.current();
-                if (user != null) {
-                    session(user.getSessionId());
-                } else {
-                    log.warn("You did not add unauthenticated() nor session() but also don't have a current user. You probably meant unauthenticated(). This is a bug!", new Throwable());
-                }
-            }
+            ensureAuthentication();
             final URL url = prepareUrl(target);
             final AsyncHttpClient.BoundRequestBuilder requestBuilder = requestBuilderForUrl(url);
             requestBuilder.addHeader(Http.HeaderNames.ACCEPT, mediaType.toString());
@@ -424,6 +417,17 @@ class ApiClientImpl implements ApiClient {
             throw new APIException(request, new IllegalStateException("Unhandled error condition in API client"));
         }
 
+        private void ensureAuthentication() {
+            if (!unauthenticated && sessionId == null) {
+                final User user = UserService.current();
+                if (user != null) {
+                    session(user.getSessionId());
+                } else {
+                    log.warn("You did not add unauthenticated() nor session() but also don't have a current user. You probably meant unauthenticated(). This is a bug!", new Throwable());
+                }
+            }
+        }
+
         @Override
         public Map<Node, T> executeOnAll() {
             HashMap<Node, T> results = Maps.newHashMap();
@@ -433,6 +437,8 @@ class ApiClientImpl implements ApiClient {
 
             Collection<F.Tuple<ListenableFuture<Response>, Node>> requests = Lists.newArrayList();
             final Collection<Response> responses = Lists.newArrayList();
+
+            ensureAuthentication();
             for (Node currentNode : nodes) {
                 final URL url = prepareUrl(currentNode);
                 try {
