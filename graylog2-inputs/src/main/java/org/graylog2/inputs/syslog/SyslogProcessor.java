@@ -92,7 +92,7 @@ public class SyslogProcessor {
 
         if (!lm.isComplete()) {
             incompleteMessages.mark();
-            LOG.debug("Skipping incomplete message.");
+            LOG.debug("Skipping incomplete message. Parsed fields: [{}]", lm.getFields());
             return;
         }
 
