@@ -83,11 +83,11 @@ public class Searches {
         return new CountResult(r.getHits().getTotalHits(), r.getTookInMillis());
     }
 
-    public SearchResult search(String query, TimeRange range, int limit, int offset) throws IndexHelper.InvalidRangeFormatException {
-        return search(query, null, range, limit, offset);
+    public SearchResult search(String query, TimeRange range, int limit, int offset, Sorting sorting) throws IndexHelper.InvalidRangeFormatException {
+        return search(query, null, range, limit, offset, sorting);
 	}
 
-    public SearchResult search(String query, String filter, TimeRange range, int limit, int offset) throws IndexHelper.InvalidRangeFormatException {
+    public SearchResult search(String query, String filter, TimeRange range, int limit, int offset, Sorting sorting) throws IndexHelper.InvalidRangeFormatException {
         if(limit <= 0) {
             limit = LIMIT;
         }
@@ -102,9 +102,9 @@ public class Searches {
                                             limit,
                                             offset,
                                             range,
-                                            SortOrder.DESC).request();
+                                            sorting).request();
         } else {
-            request = filteredSearchRequest(query, filter, indices, limit, offset, range, SortOrder.DESC).request();
+            request = filteredSearchRequest(query, filter, indices, limit, offset, range, sorting).request();
         }
 
         SearchResponse r = c.search(request).actionGet();
@@ -256,7 +256,7 @@ public class Searches {
         return standardSearchRequest(query, indices, 0, 0, range, null);
     }
 
-    private SearchRequestBuilder standardSearchRequest(String query, Set<String> indices, int limit, int offset, TimeRange range, SortOrder sort) throws IndexHelper.InvalidRangeFormatException {
+    private SearchRequestBuilder standardSearchRequest(String query, Set<String> indices, int limit, int offset, TimeRange range, Sorting sort) throws IndexHelper.InvalidRangeFormatException {
         if (query == null || query.trim().isEmpty()) {
             query = "*";
         }
@@ -283,7 +283,7 @@ public class Searches {
         }
 
         if (sort != null) {
-            srb.addSort("timestamp", sort);
+            srb.addSort(sort.getField(), sort.asElastic());
         }
 
         return srb;
@@ -297,7 +297,7 @@ public class Searches {
         return filteredSearchRequest(query, filter, indices, 0, 0, range, null);
     }
 
-    private SearchRequestBuilder filteredSearchRequest(String query, String filter, Set<String> indices, int limit, int offset, TimeRange range, SortOrder sort) throws IndexHelper.InvalidRangeFormatException {
+    private SearchRequestBuilder filteredSearchRequest(String query, String filter, Set<String> indices, int limit, int offset, TimeRange range, Sorting sort) throws IndexHelper.InvalidRangeFormatException {
         SearchRequestBuilder srb = standardSearchRequest(query, indices, limit, offset, range, sort);
 
         if (range != null && filter != null) {

@@ -34,6 +34,7 @@ import org.graylog2.indexer.results.HistogramResult;
 import org.graylog2.indexer.results.SearchResult;
 import org.graylog2.indexer.results.TermsResult;
 import org.graylog2.indexer.searches.Searches;
+import org.graylog2.indexer.searches.Sorting;
 import org.graylog2.indexer.searches.timeranges.TimeRange;
 import org.graylog2.rest.resources.RestResource;
 import org.graylog2.rest.resources.search.responses.QueryParseError;
@@ -175,6 +176,18 @@ public class SearchResource extends RestResource {
         return result;
     }
 
+    protected Sorting buildSorting(String sort) {
+        if (sort == null || sort.isEmpty()) {
+            return Sorting.DEFAULT;
+        }
+
+        try {
+            return Sorting.fromApiParam(sort);
+        } catch(Exception e) {
+            LOG.error("Falling back to default sorting.", e);
+            return Sorting.DEFAULT;
+        }
+    }
 
     protected BadRequestException createRequestExceptionForParseFailure(String query, SearchPhaseExecutionException e) {
         LOG.warn("Unable to execute search", e);

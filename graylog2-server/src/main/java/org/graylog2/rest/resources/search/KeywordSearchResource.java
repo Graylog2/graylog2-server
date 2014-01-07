@@ -23,6 +23,7 @@ import com.codahale.metrics.annotation.Timed;
 import org.elasticsearch.action.search.SearchPhaseExecutionException;
 import org.graylog2.indexer.IndexHelper;
 import org.graylog2.indexer.Indexer;
+import org.graylog2.indexer.searches.Sorting;
 import org.graylog2.indexer.searches.timeranges.InvalidRangeParametersException;
 import org.graylog2.indexer.searches.timeranges.KeywordRange;
 import org.graylog2.indexer.searches.timeranges.TimeRange;
@@ -55,17 +56,20 @@ public class KeywordSearchResource extends SearchResource {
             @ApiParam(title = "keyword", description = "Range keyword", required = true) @QueryParam("keyword") String keyword,
             @ApiParam(title = "limit", description = "Maximum number of messages to return.", required = false) @QueryParam("limit") int limit,
             @ApiParam(title = "offset", description = "Offset", required = false) @QueryParam("offset") int offset,
-            @ApiParam(title = "filter", description = "Filter", required = false) @QueryParam("filter") String filter) {
+            @ApiParam(title = "filter", description = "Filter", required = false) @QueryParam("filter") String filter,
+            @ApiParam(title = "sort", description = "Sorting (field:asc / field:desc)", required = false) @QueryParam("sort") String sort) {
         checkQueryAndKeyword(query, keyword);
+
+        Sorting sorting = buildSorting(sort);
 
         try {
             if (filter == null) {
                 return buildSearchResponse(
-                        core.getIndexer().searches().search(query, buildKeywordTimeRange(keyword), limit, offset)
+                        core.getIndexer().searches().search(query, buildKeywordTimeRange(keyword), limit, offset, sorting)
                 );
             } else {
                 return buildSearchResponse(
-                        core.getIndexer().searches().search(query, filter, buildKeywordTimeRange(keyword), limit, offset)
+                        core.getIndexer().searches().search(query, filter, buildKeywordTimeRange(keyword), limit, offset, sorting)
                 );
             }
         } catch (IndexHelper.InvalidRangeFormatException e) {
