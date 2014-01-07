@@ -24,8 +24,8 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import lib.security.Graylog2ServerUnavailableException;
 import models.Node;
-import models.api.responses.cluster.NodesResponse;
 import models.api.responses.cluster.NodeSummaryResponse;
+import models.api.responses.cluster.NodesResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -92,6 +92,10 @@ public class ServerNodesRefreshService {
                 api.get(NodeSummaryResponse.class).path("/system/cluster/node").nodes(configuredNodes).timeout(2, TimeUnit.SECONDS).executeOnAll();
         List<Node> resolvedNodes = Lists.newArrayList();
         for (Map.Entry<Node, NodeSummaryResponse> nsr : responses.entrySet()) {
+            if (nsr.getValue() == null) {
+                //skip empty responses, they indicate an error
+                continue;
+            }
             final Node resolvedNode = nodeFactory.fromSummaryResponse(nsr.getValue());
             resolvedNode.setActive(true);
             resolvedNodes.add(resolvedNode);
