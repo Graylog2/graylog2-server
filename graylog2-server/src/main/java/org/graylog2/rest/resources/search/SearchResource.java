@@ -21,6 +21,12 @@
 package org.graylog2.rest.resources.search;
 
 import com.google.common.collect.Maps;
+import org.apache.lucene.queryparser.classic.ParseException;
+import org.apache.lucene.queryparser.classic.Token;
+import org.elasticsearch.ExceptionsHelper;
+import org.elasticsearch.action.search.SearchPhaseExecutionException;
+import org.elasticsearch.action.search.ShardSearchFailure;
+import org.elasticsearch.search.SearchParseException;
 import org.graylog2.indexer.IndexHelper;
 import org.graylog2.indexer.Indexer;
 import org.graylog2.indexer.results.FieldStatsResult;
@@ -30,11 +36,14 @@ import org.graylog2.indexer.results.TermsResult;
 import org.graylog2.indexer.searches.Searches;
 import org.graylog2.indexer.searches.timeranges.TimeRange;
 import org.graylog2.rest.resources.RestResource;
+import org.graylog2.rest.resources.search.responses.QueryParseError;
 import org.graylog2.rest.resources.search.responses.SearchResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.ws.rs.BadRequestException;
 import javax.ws.rs.WebApplicationException;
+import javax.ws.rs.core.Response;
 import java.util.Map;
 
 /**
@@ -167,4 +176,42 @@ public class SearchResource extends RestResource {
     }
 
 
+    protected BadRequestException createRequestExceptionForParseFailure(String query, SearchPhaseExecutionException e) {
+        LOG.warn("Unable to execute search", e);
+        // we won't actually iterate over all of the shard failures, only the first one,
+        // since we assume that parse errors happen on all of the shards.
+        for (ShardSearchFailure failure : e.shardFailures()) {
+            Throwable unwrapped = ExceptionsHelper.unwrapCause(failure.failure());
+            if (!(unwrapped instanceof SearchParseException)) {
+                LOG.warn("Unhandled ShardSearchFailure", e);
+                return new BadRequestException();
+            }
+            Throwable rootCause = ((SearchParseException) unwrapped).getRootCause();
+            if (!(rootCause instanceof ParseException)) {
+                LOG.warn("Root cause of SearchParseException has unexpected type!" + rootCause.getClass(), e);
+                return new BadRequestException();
+            }
+
+            Token currentToken = ((ParseException) rootCause).currentToken;
+            SearchResponse sr = new SearchResponse();
+            sr.query = query;
+            sr.error = new QueryParseError();
+            if (currentToken == null) {
+                LOG.warn("No position/token available for ParseException.");
+            } else {
+                // scan for first usable token with position information
+                while (currentToken != null && sr.error.beginLine == 0) {
+                    sr.error.beginColumn = currentToken.beginColumn;
+                    sr.error.beginLine = currentToken.beginLine;
+                    sr.error.endColumn = currentToken.endColumn;
+                    sr.error.endLine = currentToken.endLine;
+
+                    currentToken = currentToken.next;
+                }
+            }
+            return new BadRequestException(Response.status(Response.Status.BAD_REQUEST).entity(json(sr)).build());
+        }
+
+        return new BadRequestException();
+    }
 }

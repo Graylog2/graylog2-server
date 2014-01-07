@@ -20,6 +20,7 @@
 package org.graylog2.rest.resources.search;
 
 import com.codahale.metrics.annotation.Timed;
+import org.elasticsearch.action.search.SearchPhaseExecutionException;
 import org.graylog2.indexer.IndexHelper;
 import org.graylog2.indexer.Indexer;
 import org.graylog2.indexer.searches.timeranges.InvalidRangeParametersException;
@@ -70,6 +71,8 @@ public class KeywordSearchResource extends SearchResource {
         } catch (IndexHelper.InvalidRangeFormatException e) {
             LOG.warn("Invalid timerange parameters provided. Returning HTTP 400.", e);
             throw new WebApplicationException(400);
+        } catch (SearchPhaseExecutionException e) {
+            throw createRequestExceptionForParseFailure(query, e);
         }
     }
 
