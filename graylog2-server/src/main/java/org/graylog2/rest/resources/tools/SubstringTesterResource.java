@@ -21,6 +21,7 @@ package org.graylog2.rest.resources.tools;
 
 import com.codahale.metrics.annotation.Timed;
 import com.google.common.collect.Maps;
+import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.graylog2.plugin.Tools;
 import org.graylog2.rest.resources.RestResource;
 import org.slf4j.Logger;
@@ -34,6 +35,7 @@ import java.util.Map;
 /**
  * @author Lennart Koopmann <lennart@torch.sh>
  */
+@RequiresAuthentication
 @Path("/tools/substring_tester")
 public class SubstringTesterResource extends RestResource {
 

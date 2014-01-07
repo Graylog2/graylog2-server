@@ -22,15 +22,13 @@ package org.graylog2.rest.resources.search;
 import com.codahale.metrics.annotation.Timed;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
+import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.bson.types.ObjectId;
 import org.graylog2.Core;
-import org.graylog2.database.*;
+import org.graylog2.database.ValidationException;
 import org.graylog2.rest.documentation.annotations.*;
 import org.graylog2.rest.resources.search.requests.CreateSavedSearchRequest;
-import org.graylog2.rest.resources.streams.requests.CreateRequest;
 import org.graylog2.savedsearches.SavedSearch;
-import org.graylog2.streams.StreamImpl;
-import org.graylog2.streams.StreamRuleImpl;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 import org.slf4j.Logger;
@@ -47,6 +45,7 @@ import java.util.Map;
 /**
  * @author Lennart Koopmann <lennart@torch.sh>
  */
+@RequiresAuthentication
 @Api(value = "Search/Saved", description = "Saved searches")
 @Path("/search/saved")
 public class SavedSearchesResource extends SearchResource {

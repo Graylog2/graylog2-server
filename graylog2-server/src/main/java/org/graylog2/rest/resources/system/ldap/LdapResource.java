@@ -24,6 +24,7 @@ import org.apache.directory.api.ldap.model.cursor.CursorException;
 import org.apache.directory.api.ldap.model.exception.LdapException;
 import org.apache.directory.ldap.client.api.LdapConnectionConfig;
 import org.apache.directory.ldap.client.api.LdapNetworkConnection;
+import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.graylog2.database.ValidationException;
 import org.graylog2.rest.documentation.annotations.Api;
 import org.graylog2.rest.documentation.annotations.ApiOperation;
@@ -51,6 +52,7 @@ import java.util.Map;
 import static javax.ws.rs.core.Response.noContent;
 import static javax.ws.rs.core.Response.ok;
 
+@RequiresAuthentication
 @Api(value = "System/LDAP", description = "LDAP settings")
 @Path("/system/ldap")
 public class LdapResource extends RestResource {

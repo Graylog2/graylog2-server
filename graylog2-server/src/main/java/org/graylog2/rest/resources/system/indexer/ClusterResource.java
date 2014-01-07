@@ -21,6 +21,7 @@ package org.graylog2.rest.resources.system.indexer;
 
 import com.codahale.metrics.annotation.Timed;
 import com.google.common.collect.Maps;
+import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.graylog2.rest.documentation.annotations.Api;
 import org.graylog2.rest.documentation.annotations.ApiOperation;
 import org.graylog2.rest.resources.RestResource;
@@ -36,6 +37,7 @@ import java.util.Map;
 /**
  * @author Lennart Koopmann <lennart@torch.sh>
  */
+@RequiresAuthentication
 @Api(value = "Indexer/Cluster", description = "Indexer cluster information")
 @Path("/system/indexer/cluster")
 public class ClusterResource extends RestResource {

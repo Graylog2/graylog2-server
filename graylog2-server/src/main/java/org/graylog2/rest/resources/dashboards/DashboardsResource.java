@@ -22,6 +22,7 @@ package org.graylog2.rest.resources.dashboards;
 import com.beust.jcommander.internal.Lists;
 import com.codahale.metrics.annotation.Timed;
 import com.google.common.collect.Maps;
+import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.bson.types.ObjectId;
 import org.graylog2.dashboards.Dashboard;
 import org.graylog2.dashboards.widgets.DashboardWidget;
@@ -48,6 +49,7 @@ import java.util.concurrent.ExecutionException;
 /**
  * @author Lennart Koopmann <lennart@torch.sh>
  */
+@RequiresAuthentication
 @Api(value = "Dashboards", description = "Manage dashboards")
 @Path("/dashboards")
 public class DashboardsResource extends RestResource {

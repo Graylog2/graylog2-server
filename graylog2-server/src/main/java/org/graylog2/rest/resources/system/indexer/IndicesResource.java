@@ -23,6 +23,7 @@ import com.codahale.metrics.annotation.Timed;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
+import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.elasticsearch.action.admin.cluster.node.info.NodeInfo;
 import org.elasticsearch.action.admin.cluster.node.info.NodesInfoRequest;
 import org.elasticsearch.action.admin.cluster.state.ClusterStateRequest;
@@ -54,6 +55,7 @@ import java.util.Set;
 /**
  * @author Lennart Koopmann <lennart@torch.sh>
  */
+@RequiresAuthentication
 @Api(value = "Indexer/Indices", description = "Index informations")
 @Path("/system/indexer/indices")
 public class IndicesResource extends RestResource {

@@ -23,6 +23,7 @@ import com.codahale.metrics.annotation.Timed;
 import com.google.common.collect.Maps;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
+import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.graylog2.rest.documentation.annotations.*;
 import org.graylog2.rest.resources.RestResource;
 import org.slf4j.LoggerFactory;
@@ -35,6 +36,7 @@ import java.util.*;
 /**
  * @author Lennart Koopmann <lennart@torch.sh>
  */
+@RequiresAuthentication
 @Api(value = "System/Loggers", description = "Internal Graylog2 loggers")
 @Path("/system/loggers")
 public class LoggersResource extends RestResource {

@@ -3,6 +3,7 @@ package org.graylog2.rest.resources.streams.rules;
 import com.beust.jcommander.internal.Lists;
 import com.codahale.metrics.annotation.Timed;
 import com.google.common.collect.Maps;
+import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.bson.types.ObjectId;
 import org.graylog2.database.NotFoundException;
 import org.graylog2.database.ValidationException;
@@ -28,6 +29,7 @@ import java.util.Map;
 /**
  * @author Dennis Oelkers <dennis@torch.sh>
  */
+@RequiresAuthentication
 @Api(value = "StreamRules", description = "Manage stream rules")
 @Path("/streams/{streamid}/rules")
 public class StreamRuleResource extends RestResource {

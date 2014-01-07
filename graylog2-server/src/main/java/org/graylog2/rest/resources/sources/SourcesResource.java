@@ -23,6 +23,7 @@ import com.codahale.metrics.annotation.Timed;
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
 import com.google.common.collect.Maps;
+import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.graylog2.indexer.IndexHelper;
 import org.graylog2.indexer.results.TermsResult;
 import org.graylog2.indexer.searches.timeranges.InvalidRangeParametersException;
@@ -46,6 +47,7 @@ import java.util.concurrent.TimeUnit;
 /**
  * @author Lennart Koopmann <lennart@torch.sh>
  */
+@RequiresAuthentication
 @Api(value = "Sources", description = "Listing message sources (e.g. hosts sending logs)")
 @Path("/sources")
 public class SourcesResource extends RestResource {

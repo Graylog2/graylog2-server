@@ -22,15 +22,15 @@ package org.graylog2.rest.resources.system.inputs;
 import com.beust.jcommander.internal.Lists;
 import com.codahale.metrics.annotation.Timed;
 import com.google.common.collect.Maps;
+import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.bson.types.ObjectId;
 import org.graylog2.database.ValidationException;
 import org.graylog2.inputs.Input;
 import org.graylog2.inputs.InputRegistry;
 import org.graylog2.inputs.NoSuchInputTypeException;
-import org.graylog2.plugin.Tools;
-import org.graylog2.plugin.inputs.MessageInput;
 import org.graylog2.plugin.configuration.Configuration;
 import org.graylog2.plugin.configuration.ConfigurationException;
+import org.graylog2.plugin.inputs.MessageInput;
 import org.graylog2.rest.documentation.annotations.*;
 import org.graylog2.rest.resources.RestResource;
 import org.graylog2.rest.resources.system.inputs.requests.InputLaunchRequest;
@@ -51,6 +51,7 @@ import java.util.UUID;
 /**
  * @author Lennart Koopmann <lennart@torch.sh>
  */
+@RequiresAuthentication
 @Api(value = "System/Inputs", description = "Message inputs of this node")
 @Path("/system/inputs")
 public class InputsResource extends RestResource {

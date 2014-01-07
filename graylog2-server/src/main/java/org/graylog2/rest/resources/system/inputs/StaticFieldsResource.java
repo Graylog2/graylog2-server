@@ -20,6 +20,7 @@
 package org.graylog2.rest.resources.system.inputs;
 
 import com.codahale.metrics.annotation.Timed;
+import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.graylog2.database.ValidationException;
 import org.graylog2.inputs.Input;
 import org.graylog2.plugin.Message;
@@ -39,6 +40,7 @@ import java.io.IOException;
 /**
  * @author Lennart Koopmann <lennart@torch.sh>
  */
+@RequiresAuthentication
 @Api(value = "StaticFields", description = "Static fields of an input")
 @Path("/system/inputs/{inputId}/staticfields")
 public class StaticFieldsResource extends RestResource {

@@ -20,15 +20,9 @@
 package org.graylog2.rest.resources.tools;
 
 import com.codahale.metrics.annotation.Timed;
-import com.google.common.collect.Maps;
-import com.joestelmach.natty.DateGroup;
-import com.joestelmach.natty.Parser;
-import org.graylog2.plugin.Tools;
+import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.graylog2.rest.resources.RestResource;
 import org.graylog2.utilities.date.NaturalDateParser;
-import org.joda.time.DateTime;
-import org.joda.time.format.DateTimeFormat;
-import org.joda.time.format.DateTimeFormatter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -40,6 +34,7 @@ import java.util.Map;
 /**
  * @author Lennart Koopmann <lennart@torch.sh>
  */
+@RequiresAuthentication
 @Path("/tools/natural_date_tester")
 public class NaturalDateTesterResource extends RestResource {
 

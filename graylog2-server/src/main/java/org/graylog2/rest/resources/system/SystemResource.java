@@ -23,6 +23,7 @@ package org.graylog2.rest.resources.system;
 import com.codahale.metrics.annotation.Timed;
 import com.codahale.metrics.jvm.ThreadDump;
 import com.google.common.collect.Maps;
+import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.graylog2.Core;
 import org.graylog2.ProcessingPauseLockedException;
 import org.graylog2.plugin.Tools;
@@ -46,6 +47,7 @@ import static javax.ws.rs.core.Response.ok;
 /**
  * @author Lennart Koopmann <lennart@torch.sh>
  */
+@RequiresAuthentication
 @Api(value = "System", description = "System information of this node.")
 @Path("/system")
 public class SystemResource extends RestResource {

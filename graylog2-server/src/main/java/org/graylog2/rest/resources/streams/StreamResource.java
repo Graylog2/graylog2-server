@@ -23,6 +23,7 @@ import com.beust.jcommander.internal.Lists;
 import com.codahale.metrics.annotation.Timed;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.google.common.collect.Maps;
+import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.graylog2.Core;
 import org.graylog2.database.NotFoundException;
 import org.graylog2.database.ValidationException;
@@ -51,6 +52,7 @@ import java.util.Map;
 /**
  * @author Lennart Koopmann <lennart@torch.sh>
  */
+@RequiresAuthentication
 @Api(value = "Streams", description = "Manage streams")
 @Path("/streams")
 public class StreamResource extends RestResource {

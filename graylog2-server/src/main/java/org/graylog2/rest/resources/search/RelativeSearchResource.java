@@ -20,6 +20,7 @@
 package org.graylog2.rest.resources.search;
 
 import com.codahale.metrics.annotation.Timed;
+import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.elasticsearch.action.search.SearchPhaseExecutionException;
 import org.graylog2.indexer.IndexHelper;
 import org.graylog2.indexer.Indexer;
@@ -38,6 +39,7 @@ import javax.ws.rs.core.MediaType;
 /**
  * @author Lennart Koopmann <lennart@torch.sh>
  */
+@RequiresAuthentication
 @Api(value = "Search/Relative", description = "Message search")
 @Path("/search/universal/relative")
 public class RelativeSearchResource extends SearchResource {
