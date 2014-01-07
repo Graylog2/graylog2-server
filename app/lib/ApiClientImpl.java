@@ -421,8 +421,7 @@ class ApiClientImpl implements ApiClient {
                 log.warn("Timed out requesting {}", request);
                 target.markFailure();
             }
-            // TODO should this throw an exception instead?
-            return null;
+            throw new APIException(request, new IllegalStateException("Unhandled error condition in API client"));
         }
 
         @Override
@@ -463,20 +462,19 @@ class ApiClientImpl implements ApiClient {
                     node.touch();
                     results.put(node, deserializeJson(response, responseClass));
                 } catch (InterruptedException e) {
-                    e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+                    log.error("API call Interrupted", e);
                     node.markFailure();
                 } catch (ExecutionException e) {
-                    e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+                    log.error("API call failed to execute.", e);
                     node.markFailure();
                 } catch (IOException e) {
-                    e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+                    log.error("API failed due to IO error", e);
                     node.markFailure();
                 } catch (TimeoutException e) {
-                    e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+                    log.error("API call timed out", e);
                     node.markFailure();
                 }
             }
-
 
             return results;
         }

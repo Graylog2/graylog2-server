@@ -126,8 +126,12 @@ public class ClusterService {
         List<NodeJVMStats> result = Lists.newArrayList();
         Map<Node, ClusterEntityJVMStatsResponse> rs = api.get(ClusterEntityJVMStatsResponse.class).fromAllNodes().path("/system/jvm").executeOnAll();
 
-        for (ClusterEntityJVMStatsResponse r : rs.values()) {
-            result.add(new NodeJVMStats(r));
+        for (Map.Entry<Node, ClusterEntityJVMStatsResponse> entry : rs.entrySet()) {
+            if (entry.getValue() == null) {
+                log.warn("Skipping failed jvm stats request for node {}", entry.getKey());
+                continue;
+            }
+            result.add(new NodeJVMStats(entry.getValue()));
         }
 
         return result;
@@ -137,8 +141,12 @@ public class ClusterService {
         final Map<Node, NodeThroughputResponse> responses =
                 api.get(NodeThroughputResponse.class).fromAllNodes().path("/system/throughput").executeOnAll();
         int t = 0;
-        for (NodeThroughputResponse r : responses.values()) {
-            t += r.throughput;
+        for (Map.Entry<Node, NodeThroughputResponse> entry : responses.entrySet()) {
+            if (entry.getValue() == null) {
+                log.warn("Skipping failed throughput request for node {}", entry.getKey());
+                continue;
+            }
+            t += entry.getValue().throughput;
         }
         return F.Tuple(t, responses.size());
     }
