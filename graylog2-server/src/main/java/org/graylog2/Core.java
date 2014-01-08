@@ -55,6 +55,7 @@ import org.graylog2.plugin.Tools;
 import org.graylog2.plugin.Version;
 import org.graylog2.plugin.alarms.callbacks.AlarmCallback;
 import org.graylog2.plugin.alarms.transports.Transport;
+import org.graylog2.plugin.buffers.BatchBuffer;
 import org.graylog2.plugin.buffers.Buffer;
 import org.graylog2.plugin.filters.MessageFilter;
 import org.graylog2.plugin.indexer.MessageGateway;
@@ -481,7 +482,7 @@ public class Core implements GraylogServer, InputHost {
     }
 
     @Override
-    public Buffer getProcessBuffer() {
+    public BatchBuffer getProcessBuffer() {
         return this.processBuffer;
     }
 

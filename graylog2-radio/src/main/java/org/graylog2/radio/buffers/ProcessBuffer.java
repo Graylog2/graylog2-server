@@ -21,11 +21,12 @@ package org.graylog2.radio.buffers;
 
 import com.codahale.metrics.Meter;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
+import com.lmax.disruptor.EventTranslatorOneArg;
 import com.lmax.disruptor.dsl.Disruptor;
 import com.lmax.disruptor.dsl.ProducerType;
 import org.graylog2.inputs.Cache;
 import org.graylog2.plugin.Message;
-import org.graylog2.plugin.buffers.Buffer;
+import org.graylog2.plugin.buffers.BatchBuffer;
 import org.graylog2.plugin.buffers.BufferOutOfCapacityException;
 import org.graylog2.plugin.buffers.MessageEvent;
 import org.graylog2.plugin.inputs.MessageInput;
@@ -41,12 +42,19 @@ import static com.codahale.metrics.MetricRegistry.name;
 /**
  * @author Lennart Koopmann <lennart@torch.sh>
  */
-public class ProcessBuffer extends Buffer {
+public class ProcessBuffer extends BatchBuffer {
 
     private static final Logger LOG = LoggerFactory.getLogger(ProcessBuffer.class);
 
     public static final String SOURCE_RADIO_ATTR_NAME = "gl2_source_radio";
     public static final String SOURCE_RADIO_INPUT_ATTR_NAME = "gl2_source_radio_input";
+
+    private static final EventTranslatorOneArg<MessageEvent, Message> MESSAGE_EVENT_TRANSLATOR = new EventTranslatorOneArg<MessageEvent, Message>() {
+        @Override
+        public void translateTo(MessageEvent messageEvent, long l, Message o) {
+            messageEvent.setMessage(o);
+        }
+    };
 
     protected ExecutorService executor = Executors.newCachedThreadPool(
             new ThreadFactoryBuilder()
@@ -126,6 +134,39 @@ public class ProcessBuffer extends Buffer {
         }
 
         insert(message);
+    }
+
+    @Override
+    public void insertFailFast(Message[] messages, MessageInput sourceInput) throws BufferOutOfCapacityException {
+        if (ringBuffer.getBufferSize() < messages.length) {
+            throw new IllegalStateException("Message batch size too large for atomic bulk insert to be possible - RingBuffer size (" + ringBuffer.getBufferSize() + ") < message batch size (" + messages.length + ")");
+        }
+
+        if (!hasCapacity(messages.length)) {
+            LOG.warn("Rejecting message, because I am full. Raise my size or add more processors.");
+            rejectedMessages.mark(messages.length);
+            throw new BufferOutOfCapacityException();
+        }
+
+        for (Message message : messages) {
+            message.setSourceInput(sourceInput);
+
+            message.addField(SOURCE_RADIO_INPUT_ATTR_NAME, sourceInput.getId());
+            message.addField(SOURCE_RADIO_ATTR_NAME, radio.getNodeId());
+        }
+
+        boolean published = ringBuffer.tryPublishEvents(MESSAGE_EVENT_TRANSLATOR, messages);
+
+        if (published) {
+            radio.processBufferWatermark().addAndGet(messages.length);
+            incomingMessages.mark(messages.length);
+
+        } else {
+            LOG.warn("Rejecting message, because I am full. Raise my size or add more processors.");
+            rejectedMessages.mark(messages.length);
+            throw new BufferOutOfCapacityException();
+
+        }
     }
 
     private void insert(Message message) {

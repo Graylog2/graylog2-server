@@ -20,14 +20,14 @@
 package org.graylog2.plugin;
 
 import com.codahale.metrics.MetricRegistry;
-import org.graylog2.plugin.buffers.Buffer;
+import org.graylog2.plugin.buffers.BatchBuffer;
 
 /**
  * @author Lennart Koopmann <lennart@torch.sh>
  */
 public interface InputHost {
 
-    public Buffer getProcessBuffer();
+    public BatchBuffer getProcessBuffer();
 
     public String getNodeId();
 

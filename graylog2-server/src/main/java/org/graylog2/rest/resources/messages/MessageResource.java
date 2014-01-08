@@ -75,7 +75,7 @@ public class MessageResource extends RestResource {
                   notes = "Returns what tokens/terms a message string (message or full_message) is split to.")
     @Produces(MediaType.APPLICATION_JSON)
     @ApiResponses(value = {
-            @ApiResponse(code = 404, message = "Specified index does not exist."),
+            @ApiResponse(code = 404, message = "Specified index does not exist.")
     })
     public String analyze(
             @ApiParam(title = "index", description = "The index the message containing the string is stored in.", required = true) @PathParam("index") String index,
