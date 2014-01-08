@@ -79,7 +79,7 @@ public class GELFChunkManager extends Thread {
                         continue;
                     }
 
-                    // Not oudated. Maybe complete?
+                    // Not outdated. Maybe complete?
                     if (isComplete(messageId)) {
                         // We got a complete message! Re-assemble and insert to GELFProcessor.
                         LOG.debug("Message <{}> seems to be complete. Handling now.", messageId);
@@ -182,7 +182,7 @@ public class GELFChunkManager extends Thread {
             chunks.get(chunk.getId()).put(chunk.getSequenceNumber(), chunk);
         } else {
             // First chunk of message.
-            Map<Integer, GELFMessageChunk> c = Maps.newHashMap();
+            Map<Integer, GELFMessageChunk> c = Maps.newTreeMap();
             c.put(chunk.getSequenceNumber(), chunk);
             chunks.put(chunk.getId(), c);
         }
