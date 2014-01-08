@@ -58,6 +58,7 @@ public class GELFUDPInput extends GELFInputBase {
                         .build());
 
         bootstrap = new ConnectionlessBootstrap(new NioDatagramChannelFactory(workerThreadPool));
+        bootstrap.setOption("receiveBufferSizePredictorFactory", new FixedReceiveBufferSizePredictorFactory(8192));
         bootstrap.setPipelineFactory(new GELFUDPPipelineFactory(graylogServer, this, throughputCounter));
 
         try {
