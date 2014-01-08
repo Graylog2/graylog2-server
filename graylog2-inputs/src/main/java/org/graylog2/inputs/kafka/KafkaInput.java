@@ -137,6 +137,7 @@ public class KafkaInput extends MessageInput {
 
                             event.addStringFields(msg.strings);
                             event.addLongFields(msg.longs);
+                            event.addDoubleFields(msg.doubles);
 
                             graylogServer.getProcessBuffer().insertCached(event, thisInput);
                         } catch (Exception e) {

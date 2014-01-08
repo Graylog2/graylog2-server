@@ -225,6 +225,16 @@ public class Message {
         }
     }
 
+    public void addDoubleFields(Map<String, Double> fields) {
+        if(fields == null) {
+            return;
+        }
+
+        for (Map.Entry<String, Double> field : fields.entrySet()) {
+            addField(field.getKey(), field.getValue());
+        }
+    }
+
     public void removeField(String key) {
     	if (!RESERVED_FIELDS.contains(key)) {
     		this.fields.remove(key);
