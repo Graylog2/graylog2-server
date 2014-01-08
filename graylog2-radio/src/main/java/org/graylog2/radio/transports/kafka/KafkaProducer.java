@@ -88,20 +88,22 @@ public class KafkaProducer implements RadioTransport {
     }
 
     public byte[] serialize(Message msg) throws IOException {
-        Map<String, Integer> ints = Maps.newHashMap();
-        Map<String, String>  strings = Maps.newHashMap();
+        Map<String, Long> longs = Maps.newHashMap();
+        Map<String, String> strings = Maps.newHashMap();
 
         for(Map.Entry<String, Object> field : msg.getFields().entrySet()) {
             if (field.getValue() instanceof String) {
                 strings.put(field.getKey(), (String) field.getValue());
-            } else if (field.getValue() instanceof Integer) {
-                ints.put(field.getKey(), (Integer) field.getValue());
+            } else if (field.getValue() instanceof Long) {
+                longs.put(field.getKey(), (Long) field.getValue());
+            } else if (field.getValue() instanceof Boolean) {
+                strings.put(field.getKey(), ((Boolean) field.getValue()).toString());
             }
         }
 
         RadioMessage radioMessage = new RadioMessage();
         radioMessage.strings = strings;
-        radioMessage.ints = ints;
+        radioMessage.longs = longs;
         radioMessage.timestamp = ((DateTime) msg.getField("timestamp")).getMillis();
 
         return msgPack.write(radioMessage);

@@ -30,7 +30,7 @@ import java.util.Map;
 public class RadioMessage {
 
     public Map<String, String> strings;
-    public Map<String, Integer> ints;
+    public Map<String, Long> longs;
     public long timestamp;
 
 }
