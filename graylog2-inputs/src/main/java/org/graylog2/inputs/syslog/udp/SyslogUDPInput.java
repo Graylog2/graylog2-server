@@ -58,6 +58,7 @@ public class SyslogUDPInput extends SyslogInputBase {
                         .build());
 
         bootstrap = new ConnectionlessBootstrap(new NioDatagramChannelFactory(workerThreadPool));
+        bootstrap.setOption("receiveBufferSizePredictorFactory", new FixedReceiveBufferSizePredictorFactory(8192));
         bootstrap.setPipelineFactory(new SyslogUDPPipelineFactory(graylogServer, configuration, this, throughputCounter));
 
         try {

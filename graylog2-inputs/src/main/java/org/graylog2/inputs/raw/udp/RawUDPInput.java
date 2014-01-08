@@ -58,6 +58,7 @@ public class RawUDPInput extends RawInputBase {
                         .build());
 
         bootstrap = new ConnectionlessBootstrap(new NioDatagramChannelFactory(workerThreadPool));
+        bootstrap.setOption("receiveBufferSizePredictorFactory", new FixedReceiveBufferSizePredictorFactory(8192));
         bootstrap.setPipelineFactory(new RawUDPPipelineFactory(graylogServer, configuration, this, throughputCounter));
 
         try {
