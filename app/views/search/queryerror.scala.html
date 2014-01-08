@@ -20,7 +20,7 @@
 
     @if(searchResult.getError.beginLine == 1) {
     <p>
-        Your query had an error at the following position:
+        Your query was malformed at the following position: (highlighted red)
     </p>
     <pre>@Html(QueryErrorHelper.markupOriginalQuery(searchResult))</pre>
     }

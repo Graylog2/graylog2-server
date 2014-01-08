@@ -1701,8 +1701,10 @@ form.edit-dashboard-form {
 }
 
 .parse-error {
-    background-color: #f00;
+    background-color: #b94a48;
     color: #fff;
+    padding-left: 2px;
+    padding-right: 2px;
 }
 .field-graph-query-color {
     width: 8px;
