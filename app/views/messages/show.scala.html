@@ -41,7 +41,7 @@
         Index: <em>@message.getIndex()</em>
 
         <dl style="margin-bottom: 0px;">
-        @for((key, value) <- message.getFields()) {
+        @for((key, value) <- message.getFormattedFields()) {
             <dt>
                 <div class="btn-group message-field-dropdown">
                     <a data-toggle="dropdown" href="#" class="key">

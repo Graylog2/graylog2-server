@@ -20,11 +20,8 @@ package models.api.results;
 
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Lists;
-import com.google.inject.Inject;
-import lib.APIException;
-import models.Stream;
+import com.google.common.collect.Maps;
 
-import java.io.IOException;
 import java.util.*;
 
 public class MessageResult {
@@ -107,6 +104,24 @@ public class MessageResult {
 
     public Map<String, Object> getFields() {
         return fields;
+    }
+
+    public Map<String, Object> getFormattedFields() {
+        Map<String, Object> formatted = Maps.newHashMap();
+        for (Map.Entry<String, Object> field : getFields().entrySet()) {
+            String key = field.getKey();
+            Object value = field.getValue();
+
+            // Get rid of .0 of doubles. 9001.0 becomes "9001", 9001.25 becomes "9001.25"
+            if(value instanceof Double) {
+                Double d = (Double) value;
+                value = (d.longValue() == d ? "" + d.longValue() : "" + d);
+            }
+
+            formatted.put(key, value);
+        }
+
+        return formatted;
     }
 
     public String getIndex() {
