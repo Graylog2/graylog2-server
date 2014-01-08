@@ -28,6 +28,7 @@ import org.graylog2.notifications.Notification;
 import org.graylog2.plugin.Tools;
 import org.graylog2.rest.documentation.annotations.*;
 import org.graylog2.rest.resources.RestResource;
+import org.graylog2.security.RestPermissions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -54,16 +55,20 @@ public class NotificationsResource extends RestResource {
         List<Map<String, Object>> notifications = Lists.newArrayList();
 
         for (Notification n : Notification.all(core)) {
+            final String notificationType = n.getType().toString().toLowerCase();
+            if (!isPermitted(RestPermissions.NOTIFICATIONS_READ, notificationType)) {
+                continue;
+            }
+
             Map<String, Object> notification = Maps.newHashMap();
             notification.put("timestamp", Tools.getISO8601String(n.getTimestamp()));
             notification.put("severity", n.getSeverity().toString().toLowerCase());
-            notification.put("type", n.getType().toString().toLowerCase());
+            notification.put("type", notificationType);
 
             try {
                 notifications.add(notification);
             } catch(IllegalArgumentException e) {
                 LOG.warn("There is a notification type we can't handle: [" + n.getType() + "]");
-                continue;
             }
         }
 
@@ -83,7 +88,7 @@ public class NotificationsResource extends RestResource {
     })
     public Response deleteNotification(@ApiParam(title = "notificationType") @PathParam("notificationType") String notificationType) {
         Notification.Type type;
-
+        checkPermission(RestPermissions.NOTIFICATIONS_DELETE, notificationType);
         try {
             type = Notification.Type.valueOf(notificationType.toUpperCase());
         } catch (IllegalArgumentException e) {

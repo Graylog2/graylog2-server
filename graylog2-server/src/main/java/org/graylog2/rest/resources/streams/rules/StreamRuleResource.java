@@ -14,6 +14,7 @@ import org.graylog2.rest.documentation.annotations.*;
 import org.graylog2.rest.resources.RestResource;
 import org.graylog2.rest.resources.streams.StreamResource;
 import org.graylog2.rest.resources.streams.rules.requests.CreateRequest;
+import org.graylog2.security.RestPermissions;
 import org.graylog2.streams.StreamImpl;
 import org.graylog2.streams.StreamRuleImpl;
 import org.slf4j.Logger;
@@ -43,6 +44,7 @@ public class StreamRuleResource extends RestResource {
     public Response create(@ApiParam(title = "streamid", description = "The stream id this new rule belongs to.", required = true) @PathParam("streamid") String streamid,
                            @ApiParam(title = "JSON body", required = true) String body) {
         CreateRequest cr;
+        checkPermission(RestPermissions.STREAMS_EDIT, streamid);
 
         try {
             cr = objectMapper.readValue(body, CreateRequest.class);
@@ -102,6 +104,7 @@ public class StreamRuleResource extends RestResource {
                            @ApiParam(title = "streamRuleId", description = "The stream rule id we are updating", required = true) @PathParam("streamRuleId") String streamRuleId,
                            @ApiParam(title = "JSON body", required = true) String body) {
         CreateRequest cr;
+        checkPermission(RestPermissions.STREAMS_EDIT, streamid);
 
         try {
             cr = objectMapper.readValue(body, CreateRequest.class);
@@ -145,6 +148,7 @@ public class StreamRuleResource extends RestResource {
     @Produces(MediaType.APPLICATION_JSON)
     public String get(@ApiParam(title = "streamid", description = "The id of the stream whose stream rules we want.", required = true) @PathParam("streamid") String streamid) {
         List<Map<String, Object>> streamRules = Lists.newArrayList();
+        checkPermission(RestPermissions.STREAMS_READ, streamid);
 
         try {
             for (StreamRule streamRule : StreamRuleImpl.findAllForStream(streamid, core)) {
@@ -167,6 +171,8 @@ public class StreamRuleResource extends RestResource {
     public Response get(@ApiParam(title = "streamid", description = "The id of the stream whose stream rule we want.", required = true) @PathParam("streamid") String streamid,
                       @ApiParam(title = "streamRuleId", description = "The stream rule id we are getting", required = true) @PathParam("streamRuleId") String streamRuleId) {
         StreamRule streamRule;
+        checkPermission(RestPermissions.STREAMS_READ, streamid);
+
         try {
             streamRule = StreamRuleImpl.load(loadObjectId(streamRuleId), core);
         } catch (org.graylog2.database.NotFoundException e) {
@@ -188,6 +194,7 @@ public class StreamRuleResource extends RestResource {
             LOG.error("Missing streamRuleId. Returning HTTP 400.");
             throw new WebApplicationException(400);
         }
+        checkPermission(RestPermissions.STREAMS_EDIT, streamid);
 
         try {
             StreamRuleImpl streamRule = StreamRuleImpl.load(loadObjectId(streamRuleId), core);

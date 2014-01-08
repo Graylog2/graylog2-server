@@ -23,12 +23,14 @@ import com.codahale.metrics.annotation.Timed;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
+import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.bson.types.ObjectId;
 import org.graylog2.Core;
 import org.graylog2.database.ValidationException;
 import org.graylog2.rest.documentation.annotations.*;
 import org.graylog2.rest.resources.search.requests.CreateSavedSearchRequest;
 import org.graylog2.savedsearches.SavedSearch;
+import org.graylog2.security.RestPermissions;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 import org.slf4j.Logger;
@@ -58,6 +60,7 @@ public class SavedSearchesResource extends SearchResource {
     @POST
     @Timed
     @ApiOperation(value = "Create a new saved search")
+    @RequiresPermissions(RestPermissions.SAVEDSEARCHES_CREATE)
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
     public Response create(@ApiParam(title = "JSON body", required = true) String body) {
@@ -98,7 +101,9 @@ public class SavedSearchesResource extends SearchResource {
     public String list() {
         List<Map<String, Object>> searches = Lists.newArrayList();
         for (SavedSearch search : SavedSearch.all(core)) {
-            searches.add(search.asMap());
+            if (isPermitted(RestPermissions.SAVEDSEARCHES_READ, search.getId())) {
+                searches.add(search.asMap());
+            }
         }
 
         Map<String, Object> result = Maps.newHashMap();
@@ -119,6 +124,7 @@ public class SavedSearchesResource extends SearchResource {
             LOG.error("Missing searchId. Returning HTTP 400.");
             throw new WebApplicationException(400);
         }
+        checkPermission(RestPermissions.SAVEDSEARCHES_READ, searchId);
 
         try {
             SavedSearch search = SavedSearch.load(loadObjectId(searchId), core);
@@ -139,7 +145,7 @@ public class SavedSearchesResource extends SearchResource {
             LOG.error("Missing searchId. Returning HTTP 400.");
             throw new WebApplicationException(400);
         }
-
+        checkPermission(RestPermissions.SAVEDSEARCHES_EDIT, searchId);
         try {
             SavedSearch search = SavedSearch.load(loadObjectId(searchId), core);
             search.destroy();

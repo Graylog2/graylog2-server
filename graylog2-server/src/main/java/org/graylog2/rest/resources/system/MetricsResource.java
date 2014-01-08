@@ -30,8 +30,10 @@ import com.mongodb.BasicDBObject;
 import com.mongodb.DBCursor;
 import com.mongodb.DBObject;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
+import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.graylog2.rest.documentation.annotations.*;
 import org.graylog2.rest.resources.RestResource;
+import org.graylog2.security.RestPermissions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -53,6 +55,7 @@ public class MetricsResource extends RestResource {
     private static final Logger LOG = LoggerFactory.getLogger(MetricsResource.class);
 
     @GET @Timed
+    @RequiresPermissions(RestPermissions.METRICS_READALL)
     @ApiOperation(value = "Get all metrics",
                   notes = "Note that this might return a huge result set.")
     @Produces(MediaType.APPLICATION_JSON)
@@ -67,6 +70,7 @@ public class MetricsResource extends RestResource {
     @GET @Timed
     @Path("/names")
     @ApiOperation(value = "Get all metrics keys/names")
+    @RequiresPermissions(RestPermissions.METRICS_ALLKEYS)
     @Produces(MediaType.APPLICATION_JSON)
     public String metricNames() {
         Map<String, Object> result = Maps.newHashMap();
@@ -83,6 +87,7 @@ public class MetricsResource extends RestResource {
     })
     @Produces(MediaType.APPLICATION_JSON)
     public String singleMetric(@ApiParam(title = "metricName", required = true) @PathParam("metricName") String metricName) {
+        checkPermission(RestPermissions.METRICS_READ, metricName);
         Metric metric = core.metrics().getMetrics().get(metricName);
 
         if (metric == null) {
@@ -104,7 +109,7 @@ public class MetricsResource extends RestResource {
         List<Map<String, Object>> metrics = Lists.newArrayList();
 
         for(Map.Entry<String, Metric> e : core.metrics().getMetrics().entrySet()) {
-            if (e.getKey().startsWith(namespace)) {
+            if (e.getKey().startsWith(namespace) && isPermitted(RestPermissions.METRICS_READ, e.getKey())) {
                 try {
                     String type = e.getValue().getClass().getSimpleName().toLowerCase();
                     String metricName = e.getKey();
@@ -164,6 +169,7 @@ public class MetricsResource extends RestResource {
             @ApiParam(title = "metricName", required = true) @PathParam("metricName") String metricName,
             @ApiParam(title = "after", description = "Only values for after this UTC timestamp (1970 epoch)") @QueryParam("after") @DefaultValue("-1") long after
     ) {
+        checkPermission(RestPermissions.METRICS_READHISTORY, metricName);
         BasicDBObject andQuery = new BasicDBObject();
         List<BasicDBObject> obj = new ArrayList<BasicDBObject>();
         obj.add(new BasicDBObject("name", metricName));

@@ -25,6 +25,7 @@ import org.apache.directory.api.ldap.model.exception.LdapException;
 import org.apache.directory.ldap.client.api.LdapConnectionConfig;
 import org.apache.directory.ldap.client.api.LdapNetworkConnection;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
+import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.graylog2.database.ValidationException;
 import org.graylog2.rest.documentation.annotations.Api;
 import org.graylog2.rest.documentation.annotations.ApiOperation;
@@ -33,6 +34,7 @@ import org.graylog2.rest.resources.RestResource;
 import org.graylog2.rest.resources.system.ldap.requests.LdapSettingsRequest;
 import org.graylog2.rest.resources.system.ldap.requests.LdapTestConfigRequest;
 import org.graylog2.rest.resources.system.ldap.responses.LdapTestConfigResponse;
+import org.graylog2.security.RestPermissions;
 import org.graylog2.security.ldap.LdapConnector;
 import org.graylog2.security.ldap.LdapEntry;
 import org.graylog2.security.ldap.LdapSettings;
@@ -53,6 +55,7 @@ import static javax.ws.rs.core.Response.noContent;
 import static javax.ws.rs.core.Response.ok;
 
 @RequiresAuthentication
+@RequiresPermissions(RestPermissions.LDAP_EDIT) // TODO even viewing the settings needs this permission, because it contains a password
 @Api(value = "System/LDAP", description = "LDAP settings")
 @Path("/system/ldap")
 public class LdapResource extends RestResource {

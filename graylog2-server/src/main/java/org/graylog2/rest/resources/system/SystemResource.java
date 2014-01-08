@@ -24,6 +24,8 @@ import com.codahale.metrics.annotation.Timed;
 import com.codahale.metrics.jvm.ThreadDump;
 import com.google.common.collect.Maps;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
+import org.apache.shiro.authz.annotation.RequiresGuest;
+import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.graylog2.Core;
 import org.graylog2.ProcessingPauseLockedException;
 import org.graylog2.plugin.Tools;
@@ -58,6 +60,7 @@ public class SystemResource extends RestResource {
     @ApiOperation(value = "Get system overview")
     @Produces(MediaType.APPLICATION_JSON)
     public String system() {
+        checkPermission(RestPermissions.SYSTEM_READ, core.getNodeId());
         Map<String, Object> result = Maps.newHashMap();
         result.put("facility", "graylog2-server");
         result.put("codename", Core.GRAYLOG2_CODENAME);
@@ -74,6 +77,7 @@ public class SystemResource extends RestResource {
     @ApiOperation(value = "Get list of all message fields that exist",
                   notes = "This operation is comparably fast because it reads directly from the indexer mapping.")
     @Path("/fields")
+    @RequiresPermissions(RestPermissions.FIELDNAMES_READ)
     @Produces(MediaType.APPLICATION_JSON)
     public String fields() {
         Map<String, Object> result = Maps.newHashMap();
@@ -88,6 +92,7 @@ public class SystemResource extends RestResource {
                           "memory. Keep an eye on the heap space utilization while message processing is paused.")
     @Path("/processing/pause")
     public Response pauseProcessing() {
+        checkPermission(RestPermissions.PROCESSING_CHANGESTATE, core.getNodeId());
         core.pauseMessageProcessing(false);
 
         LOG.info("Paused message processing - triggered by REST call.");
@@ -98,6 +103,8 @@ public class SystemResource extends RestResource {
     @ApiOperation(value = "Resume message processing")
     @Path("/processing/resume")
     public Response resumeProcessing() {
+        checkPermission(RestPermissions.PROCESSING_CHANGESTATE, core.getNodeId());
+
         try {
             core.resumeMessageProcessing();
         } catch (ProcessingPauseLockedException e) {
@@ -116,6 +123,8 @@ public class SystemResource extends RestResource {
          * This is meant to be only used in exceptional cases, when something that locked the processing pause
          * has crashed and never unlocked so we need to unlock manually. #donttellanybody
          */
+        checkPermission(RestPermissions.PROCESSING_CHANGESTATE, core.getNodeId());
+
         core.unlockProcessingPause();
 
         LOG.info("Manually unlocked message processing pause - triggered by REST call.");
@@ -127,6 +136,8 @@ public class SystemResource extends RestResource {
     @Path("/jvm") @Timed
     @Produces(MediaType.APPLICATION_JSON)
     public String jvm() {
+        checkPermission(RestPermissions.JVMSTATS_READ, core.getNodeId());
+
         Runtime runtime = Runtime.getRuntime();
 
         Map<String, Object> result = Maps.newHashMap();
@@ -147,6 +158,8 @@ public class SystemResource extends RestResource {
     @Path("/threaddump")
     @Produces(MediaType.TEXT_PLAIN)
     public String threaddump() {
+        checkPermission(RestPermissions.THREADS_DUMP, core.getNodeId());
+
         // The ThreadDump is built by internal codahale.metrics servlet library we are abusing.
         ThreadDump threadDump = new ThreadDump(ManagementFactory.getThreadMXBean());
         ByteArrayOutputStream output = new ByteArrayOutputStream();
@@ -156,6 +169,7 @@ public class SystemResource extends RestResource {
     }
 
     @GET @Timed
+    @RequiresGuest // turns off authentication for this action
     @ApiOperation(value = "Get all available user permissions.")
     @Path("/permissions")
     @Produces(MediaType.APPLICATION_JSON)

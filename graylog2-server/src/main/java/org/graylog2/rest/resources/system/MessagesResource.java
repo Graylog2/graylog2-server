@@ -23,11 +23,13 @@ import com.codahale.metrics.annotation.Timed;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
+import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.graylog2.plugin.Tools;
 import org.graylog2.rest.documentation.annotations.Api;
 import org.graylog2.rest.documentation.annotations.ApiOperation;
 import org.graylog2.rest.documentation.annotations.ApiParam;
 import org.graylog2.rest.resources.RestResource;
+import org.graylog2.security.RestPermissions;
 import org.graylog2.system.activities.SystemMessage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -52,6 +54,7 @@ public class    MessagesResource extends RestResource {
 
     @GET @Timed
     @ApiOperation(value = "Get internal Graylog2 system messages")
+    @RequiresPermissions(RestPermissions.SYSTEMMESSAGES_READ)
     @Produces(MediaType.APPLICATION_JSON)
     public String all( @ApiParam(title = "page", description = "Page", required = false) @QueryParam("page") int page) {
         List<Map<String, Object>> messages = Lists.newArrayList();

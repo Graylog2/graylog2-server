@@ -24,6 +24,7 @@ import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
 import com.google.common.collect.Maps;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
+import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.graylog2.indexer.IndexHelper;
 import org.graylog2.indexer.results.TermsResult;
 import org.graylog2.indexer.searches.timeranges.InvalidRangeParametersException;
@@ -31,6 +32,7 @@ import org.graylog2.indexer.searches.timeranges.RelativeRange;
 import org.graylog2.rest.documentation.annotations.Api;
 import org.graylog2.rest.documentation.annotations.ApiOperation;
 import org.graylog2.rest.resources.RestResource;
+import org.graylog2.security.RestPermissions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -48,6 +50,7 @@ import java.util.concurrent.TimeUnit;
  * @author Lennart Koopmann <lennart@torch.sh>
  */
 @RequiresAuthentication
+@RequiresPermissions(RestPermissions.SOURCES_READ)
 @Api(value = "Sources", description = "Listing message sources (e.g. hosts sending logs)")
 @Path("/sources")
 public class SourcesResource extends RestResource {

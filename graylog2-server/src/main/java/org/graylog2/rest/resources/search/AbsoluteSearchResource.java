@@ -21,6 +21,7 @@ package org.graylog2.rest.resources.search;
 
 import com.codahale.metrics.annotation.Timed;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
+import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.elasticsearch.action.search.SearchPhaseExecutionException;
 import org.graylog2.indexer.IndexHelper;
 import org.graylog2.indexer.Indexer;
@@ -30,6 +31,7 @@ import org.graylog2.indexer.searches.timeranges.InvalidRangeParametersException;
 import org.graylog2.indexer.searches.timeranges.TimeRange;
 import org.graylog2.rest.documentation.annotations.*;
 import org.graylog2.rest.resources.search.responses.SearchResponse;
+import org.graylog2.security.RestPermissions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -40,6 +42,7 @@ import javax.ws.rs.core.MediaType;
  * @author Lennart Koopmann <lennart@torch.sh>
  */
 @RequiresAuthentication
+@RequiresPermissions(RestPermissions.SEARCHES_ABSOLUTE)
 @Api(value = "Search/Absolute", description = "Message search")
 @Path("/search/universal/absolute")
 public class AbsoluteSearchResource extends SearchResource {

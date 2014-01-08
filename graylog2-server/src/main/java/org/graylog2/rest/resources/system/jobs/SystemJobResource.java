@@ -26,6 +26,7 @@ import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.graylog2.rest.documentation.annotations.*;
 import org.graylog2.rest.resources.RestResource;
 import org.graylog2.rest.resources.system.jobs.requests.TriggerRequest;
+import org.graylog2.security.RestPermissions;
 import org.graylog2.system.jobs.NoSuchJobException;
 import org.graylog2.system.jobs.SystemJob;
 import org.graylog2.system.jobs.SystemJobConcurrencyException;
@@ -56,8 +57,11 @@ public class SystemJobResource extends RestResource {
     public String list() {
         List<Map<String, Object>> jobs = Lists.newArrayList();
 
-        for (Map.Entry<String, SystemJob> x : core.getSystemJobManager().getRunningJobs().entrySet()) {
-            jobs.add(x.getValue().toMap());
+        for (Map.Entry<String, SystemJob> entry : core.getSystemJobManager().getRunningJobs().entrySet()) {
+            // TODO jobId is ephemeral, this is not a good key for permission checks. we should use the name of the job type (but there is no way to get it yet)
+            if (isPermitted(RestPermissions.SYSTEMJOBS_READ, entry.getKey())) {
+                jobs.add(entry.getValue().toMap());
+            }
         }
 
         Map<String, Object> result = Maps.newHashMap();
@@ -78,9 +82,10 @@ public class SystemJobResource extends RestResource {
             LOG.error("Missing jobId. Returning HTTP 400.");
             throw new WebApplicationException(400);
         }
+        // TODO jobId is ephemeral, this is not a good key for permission checks. we should use the name of the job type (but there is no way to get it yet)
+        checkPermission(RestPermissions.SYSTEMJOBS_READ, jobId);
 
         SystemJob job = core.getSystemJobManager().getRunningJobs().get(jobId);
-
         if (job == null) {
             LOG.error("No system job with ID <{}> found.", jobId);
             throw new WebApplicationException(404);
@@ -111,6 +116,8 @@ public class SystemJobResource extends RestResource {
             LOG.error("Error while parsing JSON", e);
             throw new WebApplicationException(e, Response.Status.BAD_REQUEST);
         }
+        // TODO cleanup jobId vs jobName checking in permissions
+        checkPermission(RestPermissions.SYSTEMJOBS_CREATE, tr.jobName);
 
         SystemJob job;
         try {

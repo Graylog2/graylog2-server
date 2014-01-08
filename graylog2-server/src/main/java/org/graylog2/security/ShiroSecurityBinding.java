@@ -20,6 +20,7 @@
 package org.graylog2.security;
 
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
+import org.apache.shiro.authz.annotation.RequiresGuest;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.apache.shiro.util.ThreadContext;
 import org.slf4j.Logger;
@@ -42,8 +43,12 @@ public class ShiroSecurityBinding implements DynamicFeature {
 
         if (resourceMethod.isAnnotationPresent(RequiresAuthentication.class) ||
                 resourceClass.isAnnotationPresent(RequiresAuthentication.class)) {
-            log.info("Resource method {}#{} requires an authenticated user.", resourceClass.getCanonicalName(), resourceMethod.getName());
-            context.register(new ShiroAuthenticationFilter());
+            if (resourceMethod.isAnnotationPresent(RequiresGuest.class)) {
+                log.info("Resource method {}#{} is marked as unauthenticated, skipping setting filter.");
+            } else {
+                log.info("Resource method {}#{} requires an authenticated user.", resourceClass.getCanonicalName(), resourceMethod.getName());
+                context.register(new ShiroAuthenticationFilter());
+            }
         }
         if (resourceMethod.isAnnotationPresent(RequiresPermissions.class) ||
                 resourceClass.isAnnotationPresent(RequiresPermissions.class)) {

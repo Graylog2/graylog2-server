@@ -23,10 +23,12 @@ package org.graylog2.rest.resources.messages;
 import com.codahale.metrics.annotation.Timed;
 import com.google.common.collect.Maps;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
+import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.elasticsearch.indices.IndexMissingException;
 import org.graylog2.indexer.messages.DocumentNotFoundException;
 import org.graylog2.rest.documentation.annotations.*;
 import org.graylog2.rest.resources.RestResource;
+import org.graylog2.security.RestPermissions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -58,7 +60,7 @@ public class MessageResource extends RestResource {
         	LOG.error("Missing parameters. Returning HTTP 400.");
         	throw new WebApplicationException(400);
         }
-
+        checkPermission(RestPermissions.MESSAGES_READ, messageId);
 		try {
 			return json(core.getIndexer().messages().get(messageId, index));
 		} catch (IndexMissingException e) {
@@ -74,6 +76,7 @@ public class MessageResource extends RestResource {
     @ApiOperation(value = "Analyze a message string",
                   notes = "Returns what tokens/terms a message string (message or full_message) is split to.")
     @Produces(MediaType.APPLICATION_JSON)
+    @RequiresPermissions(RestPermissions.MESSAGES_ANALYZE)
     @ApiResponses(value = {
             @ApiResponse(code = 404, message = "Specified index does not exist."),
     })

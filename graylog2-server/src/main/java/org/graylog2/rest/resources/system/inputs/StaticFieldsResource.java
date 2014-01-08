@@ -28,6 +28,7 @@ import org.graylog2.plugin.inputs.MessageInput;
 import org.graylog2.rest.documentation.annotations.*;
 import org.graylog2.rest.resources.RestResource;
 import org.graylog2.rest.resources.system.inputs.requests.CreateStaticFieldRequest;
+import org.graylog2.security.RestPermissions;
 import org.graylog2.system.activities.Activity;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -63,6 +64,7 @@ public class StaticFieldsResource extends RestResource {
             LOG.error("Missing inputId. Returning HTTP 400.");
             throw new WebApplicationException(400);
         }
+        checkPermission(RestPermissions.INPUTS_EDIT, inputId);
 
         MessageInput input = core.inputs().getRunningInputs().get(inputId);
 
@@ -129,6 +131,7 @@ public class StaticFieldsResource extends RestResource {
             LOG.error("Missing inputId. Returning HTTP 400.");
             throw new WebApplicationException(400);
         }
+        checkPermission(RestPermissions.INPUTS_EDIT, inputId);
 
         MessageInput input = core.inputs().getRunningInputs().get(inputId);
 

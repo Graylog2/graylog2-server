@@ -24,7 +24,6 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.mongodb.BasicDBObject;
 import com.mongodb.DBObject;
-import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.bson.types.ObjectId;
 import org.graylog2.cluster.Node;
 import org.graylog2.database.ValidationException;
@@ -50,7 +49,7 @@ import static javax.ws.rs.core.Response.ok;
 /**
  * @author Lennart Koopmann <lennart@torch.sh>
  */
-@RequiresAuthentication
+// @RequiresAuthentication unauthenticated because radios do not have any authentication support yet
 @Api(value = "System/Radios", description = "Management of graylog2-radio nodes.")
 @Path("/system/radios")
 public class RadiosResource extends RestResource {

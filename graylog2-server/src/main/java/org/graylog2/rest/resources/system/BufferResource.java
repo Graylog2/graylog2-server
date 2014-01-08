@@ -22,11 +22,13 @@ package org.graylog2.rest.resources.system;
 import com.codahale.metrics.annotation.Timed;
 import com.google.common.collect.Maps;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
+import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.graylog2.Core;
 import org.graylog2.plugin.buffers.BufferWatermark;
 import org.graylog2.rest.documentation.annotations.Api;
 import org.graylog2.rest.documentation.annotations.ApiOperation;
 import org.graylog2.rest.resources.RestResource;
+import org.graylog2.security.RestPermissions;
 
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
@@ -44,6 +46,7 @@ public class BufferResource extends RestResource {
 
     @GET @Timed
     @ApiOperation(value = "Get current utilization of buffers and caches of this node.")
+    @RequiresPermissions(RestPermissions.BUFFERS_READ)
     @Produces(MediaType.APPLICATION_JSON)
     public String utilization() {
         Map<String, Object> result = Maps.newHashMap();
