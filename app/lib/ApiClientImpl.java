@@ -374,10 +374,18 @@ class ApiClientImpl implements ApiClient {
                         || (response.getStatusCode() >= 200 && response.getStatusCode() < 300)) {
                     T result;
                     try {
+                        if (response.getResponseBody().isEmpty()) {
+                            return null;
+                        }
+
                         if (responseContentType.is(MediaType.JSON_UTF_8.withoutParameters())) {
                             result = deserializeJson(response, responseClass);
                         } else {
                             log.error("Don't know how to deserialize objects with content in {}, expected {}, failing.", responseContentType, mediaType);
+                            throw new APIException(request, response);
+                        }
+
+                        if (result == null) {
                             throw new APIException(request, response);
                         }
 
