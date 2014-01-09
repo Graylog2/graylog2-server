@@ -1,17 +1,31 @@
-@(submitUrl: Call, stream: Stream)
+@(submitUrl: Call, stream: Stream, buttonText: String)
 
 <form id="new-stream" action="@submitUrl" method="POST">
     <fieldset>
         <label>Title</label>
-        <input name="title" required="true" type="text" class="input-xxlarge" placeholder="A descriptive name of the new stream" />
+        <input name="title"
+            required="true"
+            type="text"
+            class="input-xxlarge"
+            @if(stream != null) {
+                value="@stream.getTitle"
+            }
+            placeholder="A descriptive name of the new stream" />
 
         <label>Description</label>
-        <input name="description" required="true" type="text" class="input-xxlarge" placeholder="What kind of messages are routed into this stream?" />
+        <input name="description"
+            required="true"
+            type="text"
+            class="input-xxlarge"
+            @if(stream != null) {
+                value="@stream.getDescription"
+            }
+            placeholder="What kind of messages are routed into this stream?" />
 
         <br /><br />
 
         <p>
-            <button type="submit" class="btn btn-success">Create stream and continue</button>
+            <button type="submit" class="btn btn-success">@buttonText</button>
         </p>
     </fieldset>
 </form>

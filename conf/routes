@@ -34,6 +34,8 @@ POST        /streams/:stream_id/rules/:streamrule_id                            
 GET         /streams/:stream_id/alerts                                               @controllers.StreamAlertsController.index(stream_id: String)
 GET         /streams/:stream_id/pause                                                @controllers.StreamsController.pause(stream_id: String)
 GET         /streams/:stream_id/resume                                               @controllers.StreamsController.resume(stream_id: String)
+GET         /streams/:stream_id/edit                                                 @controllers.StreamsController.edit(stream_id: String)
+POST        /streams/:stream_id/update                                               @controllers.StreamsController.update(stream_id: String)
 
 # System
 GET         /system                                                                  @controllers.SystemController.index(page:Integer ?= 1)

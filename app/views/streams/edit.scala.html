@@ -1,0 +1,15 @@
+@(currentUser: User, stream: Stream)
+
+@main("Edit stream", views.html.sidebars.standard(currentUser), "", currentUser) {
+    <h1>
+        <i class="icon-pushpin"></i>
+        Edit stream &raquo;@stream.getTitle&laquo;
+    </h1>
+
+    <div class="row-fluid">
+        Use this page to change basic settings of the stream. The stream rules are configured in an
+        <a href="@routes.StreamRulesController.index(stream.getId)">own interface</a>.
+    </div>
+
+    @views.html.partials.streams.stream_form.render(routes.StreamsController.update(stream.getId), stream, "Update stream")
+}

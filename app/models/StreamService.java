@@ -86,6 +86,10 @@ public class StreamService {
         return csr.streamId;
     }
 
+    public void update(String streamId, CreateStreamRequest request) throws APIException, IOException {
+        api.put().path("/streams/{0}", streamId).body(request).expect(Http.Status.OK).execute();
+    }
+
     public void delete(String streamId) throws APIException, IOException {
         api.delete().path("/streams/" + streamId).expect(Http.Status.NO_CONTENT).execute();
     }

@@ -19,7 +19,7 @@
                 Created by @views.html.partials.links.to_user.render(stream.getCreatorUser)
                 <span class="moment-from-now" title="@stream.getCreatedAt()">@stream.getCreatedAt()</span>
 
-                <button class="btn btn-danger btn-mini remove-stream"
+                &nbsp;<button class="btn btn-danger btn-mini remove-stream"
                     type="submit"
                     data-removeUrl="@routes.StreamsController.delete(stream.getId)">
                         Delete
@@ -31,6 +31,7 @@
                         <span class="caret"></span>
                     </a>
                     <ul class="dropdown-menu">
+                        <li><a href="@routes.StreamsController.edit(stream.getId)">Edit stream</a></li>
                         <li><a href="@routes.StreamRulesController.index(stream.getId)">Edit rules</a></li>
                         <li><a href="#" data-stream-id="@stream.getId" class="show-stream-rule">Quick add rule</a></li>
                         <li class="disabled"><a href="#">Add alert (coming soon)</a></li>

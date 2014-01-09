@@ -63,6 +63,18 @@ public class StreamsController extends AuthenticatedController {
         return ok(views.html.streams.new_stream.render(currentUser()));
     }
 
+    public Result edit(String streamId) {
+        try {
+            Stream stream = streamService.get(streamId);
+            return ok(views.html.streams.edit.render(currentUser(), stream));
+        } catch (IOException e) {
+            return status(504, views.html.errors.error.render(ApiClient.ERROR_MSG_IO, e, request()));
+        } catch (APIException e) {
+            String message = "Could not fetch stream. We expected HTTP 200, but got a HTTP " + e.getHttpCode() + ".";
+            return status(504, views.html.errors.error.render(message, e, request()));
+        }
+    }
+
     public Result create() {
         Form<CreateStreamRequest> form = createStreamForm.bindFromRequest();
         if (form.hasErrors()) {
@@ -85,6 +97,27 @@ public class StreamsController extends AuthenticatedController {
         }
 
         return redirect(routes.StreamRulesController.index(newStreamId));
+    }
+
+    public Result update(String streamId) {
+        Form<CreateStreamRequest> form = createStreamForm.bindFromRequest();
+        if (form.hasErrors()) {
+            flash("error", "Please fill in all fields: " + form.errors());
+
+            return redirect(routes.StreamsController.edit(streamId));
+        }
+
+        try {
+            CreateStreamRequest csr = form.get();
+            streamService.update(streamId, csr);
+        } catch (APIException e) {
+            String message = "Could not create stream. We expected HTTP 201, but got a HTTP " + e.getHttpCode() + ".";
+            return status(504, views.html.errors.error.render(message, e, request()));
+        } catch (IOException e) {
+            return status(504, views.html.errors.error.render(ApiClient.ERROR_MSG_IO, e, request()));
+        }
+
+        return redirect(routes.StreamsController.index());
     }
 
     public Result delete(String stream_id) {
