@@ -20,7 +20,6 @@
 package org.graylog2.rest.resources.users.requests;
 
 import java.util.List;
-import java.util.Map;
 
 /**
  * @author Lennart Koopmann <lennart@torch.sh>

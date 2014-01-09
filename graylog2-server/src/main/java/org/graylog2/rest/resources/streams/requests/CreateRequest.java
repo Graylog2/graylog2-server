@@ -29,8 +29,7 @@ import java.util.List;
 public class CreateRequest {
 
 	public String title;
-
-    public String category;
+    public String description;
 
 	@JsonProperty("creator_user_id")
 	public String creatorUserId;
