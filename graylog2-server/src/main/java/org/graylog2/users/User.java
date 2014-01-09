@@ -166,6 +166,18 @@ public class User extends Persisted {
         return (List<String>) o;
     }
 
+    public Map<String, String> getStartpage() {
+        Map<String, String> startpage = Maps.newHashMap();
+
+        if (fields.containsKey("startpage")) {
+            Map<String, String>  obj = (Map<String, String>) fields.get("startpage");
+            startpage.put("type", obj.get("type"));
+            startpage.put("id", obj.get("id"));
+        }
+
+        return startpage;
+    }
+
     public void setPermissions(List<String> permissions) {
         fields.put(PERMISSIONS, permissions);
     }
@@ -208,6 +220,14 @@ public class User extends Persisted {
 
     public void setExternal(boolean external) {
         fields.put(EXTERNAL_USER, external);
+    }
+
+    public void setStartpage(String type, String id) {
+        Map<String, String> startpage = Maps.newHashMap();
+        startpage.put("type", type);
+        startpage.put("id", id);
+
+        this.fields.put("startpage", startpage);
     }
 
     public static User syncFromLdapEntry(Core core, LdapEntry userEntry, LdapSettings ldapSettings, String username) {

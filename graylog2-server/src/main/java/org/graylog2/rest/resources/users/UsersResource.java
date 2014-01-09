@@ -180,6 +180,13 @@ public class UsersResource extends RestResource {
                 LOG.error("Invalid timezone {}, discarding it for user {}.", cr.timezone, username);
             }
         }
+
+        if (cr.startpage != null) {
+            if (cr.startpage.type != null && !cr.startpage.type.isEmpty() && cr.startpage.id != null && !cr.startpage.id.isEmpty()) {
+                user.setStartpage(cr.startpage.type, cr.startpage.id);
+            }
+        }
+
         try {
             // TODO JPA this is wrong, the primary key is the username
             user.save();
@@ -411,6 +418,8 @@ public class UsersResource extends RestResource {
         }
         map.put("read_only", user.isReadOnly());
         map.put("external", user.isExternalUser());
+        map.put("startpage", user.getStartpage());
+
         return map;
     }
 
