@@ -224,8 +224,11 @@ public class User extends Persisted {
 
     public void setStartpage(String type, String id) {
         Map<String, String> startpage = Maps.newHashMap();
-        startpage.put("type", type);
-        startpage.put("id", id);
+
+        if (type != null && id != null) {
+            startpage.put("type", type);
+            startpage.put("id", id);
+        }
 
         this.fields.put("startpage", startpage);
     }

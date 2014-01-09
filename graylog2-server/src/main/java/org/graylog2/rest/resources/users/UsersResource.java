@@ -182,9 +182,7 @@ public class UsersResource extends RestResource {
         }
 
         if (cr.startpage != null) {
-            if (cr.startpage.type != null && !cr.startpage.type.isEmpty() && cr.startpage.id != null && !cr.startpage.id.isEmpty()) {
-                user.setStartpage(cr.startpage.type, cr.startpage.id);
-            }
+            user.setStartpage(cr.startpage.type, cr.startpage.id);
         }
 
         try {
