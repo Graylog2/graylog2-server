@@ -62,6 +62,7 @@ public class ServerRestInterfaceRealm extends AuthorizingRealm {
         setAuthenticationTokenClass(SessionIdAuthenticationToken.class);
         // when requesting the current user does not fail with the session id we have, then we are authenticated.
         setCredentialsMatcher(new AllowAllCredentialsMatcher());
+        setCachingEnabled(false);
     }
 
     @Override
