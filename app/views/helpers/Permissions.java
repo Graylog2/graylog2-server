@@ -39,7 +39,7 @@ public class Permissions {
         final String instancePermission = permission + ":" + instanceId;
         final boolean permitted = user.getSubject().isPermitted(instancePermission);
         if (log.isDebugEnabled()) {
-            log.debug("{} has permission {}: {}", UserService.current(), instancePermission, permitted);
+            log.debug("{} has permission {}: {}", UserService.current().getName(), instancePermission, permitted);
         }
         return permitted;
     }
@@ -47,7 +47,7 @@ public class Permissions {
     public static Boolean isPermitted(User user, String permission) {
         final boolean permitted = user.getSubject().isPermitted(permission);
         if (log.isDebugEnabled()) {
-            log.debug("{} has permission {}: {}", UserService.current(), permission, permitted);
+            log.debug("{} has permission {}: {}", UserService.current().getName(), permission, permitted);
         }
         return permitted;
     }
