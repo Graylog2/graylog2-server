@@ -20,9 +20,11 @@ package models.api.requests;
 
 import com.google.common.collect.Lists;
 import models.User;
+import models.api.responses.system.StartpageResponse;
 import play.data.validation.Constraints;
 
 import java.util.List;
+import java.util.Map;
 
 public class ChangeUserRequest extends ApiRequest {
     @Constraints.Required
@@ -34,6 +36,8 @@ public class ChangeUserRequest extends ApiRequest {
 
     public String timezone;
 
+    public ChangeStartpageRequest startpage;
+
     public ChangeUserRequest() { /* for data binding */ }
 
     public ChangeUserRequest(User user) {
@@ -42,6 +46,13 @@ public class ChangeUserRequest extends ApiRequest {
         this.permissions = Lists.newArrayList("*"); // TODO PREVIEW user.getPermissions();
         if (user.getTimeZone() != null) {
             this.timezone = user.getTimeZone().getID();
+        }
+
+        this.startpage = new ChangeStartpageRequest();
+
+        if(user.getStartpage() != null) {
+            this.startpage.type = user.getStartpage().getType().toString().toLowerCase();
+            this.startpage.id = user.getStartpage().getId();
         }
     }
 }

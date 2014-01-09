@@ -30,6 +30,16 @@
                         Delete
                     </button>
                 }
+
+                <div class="btn-group">
+                    <a class="btn btn-mini dropdown-toggle" data-toggle="dropdown" href="#">
+                    Action
+                        <span class="caret"></span>
+                    </a>
+                    <ul class="dropdown-menu">
+                        <li><a href="@routes.StartpageController.set("dashboard", dashboard.getId)">Set as startpage</a></li>
+                    </ul>
+                </div>
             </div>
 
             <h3>

@@ -11,7 +11,7 @@ GET         /logout                                                             
 GET         /disconnected                                                            @controllers.LonesomeInterfaceController.index()
 
 # Home page
-GET         /                                                                        @controllers.DashboardController.index()
+GET         /                                                                        @controllers.StartpageController.redirect()
 
 # Search
 GET         /search                                                                  @controllers.SearchController.index(q ?= "", rangetype ?= "", relative:Integer ?= -1, from ?= "", to ?= "", keyword ?= "", interval ?= "", page:Integer ?= 1, saved:String ?= "", sortField:String ?= "", sortOrder:String ?= "")
@@ -86,8 +86,11 @@ GET         /system/users/new                                                   
 GET         /system/users/edit/:username                                             @controllers.UsersController.editUserForm(username: String)
 POST        /system/users/password/:username                                         @controllers.UsersController.changePassword(username: String)
 
-# Source
+# Sources
 GET         /sources                                                                 @controllers.SourcesController.list()
+
+# Startpages
+GET         /startpage/set                                                           @controllers.StartpageController.set(pageType ?= "", id ?= "")
 
 # LDAP configuration
 GET         /system/ldap                                                             @controllers.LdapController.index()

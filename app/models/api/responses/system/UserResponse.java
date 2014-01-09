@@ -19,6 +19,7 @@
 package models.api.responses.system;
 
 import com.google.gson.annotations.SerializedName;
+import models.Startpage;
 
 import java.util.List;
 
@@ -41,4 +42,19 @@ public class UserResponse {
     public boolean readonly;
 
     public boolean external;
+
+    public StartpageResponse startpage;
+
+    public Startpage getStartpage() {
+        if (startpage == null || startpage.type == null || startpage.id == null) {
+            return null;
+        }
+
+        try {
+            return new Startpage(Startpage.Type.valueOf(startpage.type.toUpperCase()), startpage.id);
+        } catch(IllegalArgumentException e) {
+            return null;
+        }
+    }
+
 }

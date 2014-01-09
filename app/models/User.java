@@ -21,6 +21,7 @@ package models;
 import com.google.common.collect.Lists;
 import com.google.inject.assistedinject.Assisted;
 import com.google.inject.assistedinject.AssistedInject;
+import controllers.routes;
 import lib.APIException;
 import lib.ApiClient;
 import models.api.requests.ChangePasswordRequest;
@@ -30,6 +31,7 @@ import org.apache.shiro.subject.Subject;
 import org.joda.time.DateTimeZone;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import play.mvc.Call;
 import play.mvc.Http;
 
 import javax.annotation.Nullable;
@@ -50,14 +52,26 @@ public class User {
     private final DateTimeZone timezone;
     private final boolean readonly;
     private final boolean external;
+    private final Startpage startpage;
+
     private Subject subject;
 
     @AssistedInject
     public User(ApiClient api, @Assisted UserResponse ur, @Nullable @Assisted String sessionId) {
-        this(api, ur.id, ur.username, ur.email, ur.fullName, ur.permissions, sessionId, ur.timezone, ur.readonly, ur.external);
+        this(api, ur.id, ur.username, ur.email, ur.fullName, ur.permissions, sessionId, ur.timezone, ur.readonly, ur.external, ur.getStartpage());
     }
 
-	public User(ApiClient api, String id, String name, String email, String fullName, List<String> permissions, String sessionId, String timezone, boolean readonly, boolean external) {
+	public User(ApiClient api,
+                String id,
+                String name,
+                String email,
+                String fullName,
+                List<String> permissions,
+                String sessionId,
+                String timezone,
+                boolean readonly,
+                boolean external,
+                Startpage startpage) {
         DateTimeZone timezone1 = null;
         this.api = api;
         this.id = id;
@@ -77,6 +91,7 @@ public class User {
         }
         this.readonly = readonly;
         this.external = external;
+        this.startpage = startpage;
     }
 
     public void update(ChangeUserRequest request) {
@@ -153,8 +168,20 @@ public class User {
         return subject;
     }
 
+    public void setStartpage(Startpage startpage) {
+        ChangeUserRequest cur = new ChangeUserRequest(this);
+        cur.startpage.type = startpage.getType().toString().toLowerCase();
+        cur.startpage.id = startpage.getId();
+
+        update(cur);
+    }
+
     public interface Factory {
         User fromResponse(UserResponse ur, String sessionId);
+    }
+
+    public Startpage getStartpage() {
+        return startpage;
     }
 
 }

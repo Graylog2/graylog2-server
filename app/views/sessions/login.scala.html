@@ -20,11 +20,19 @@
                 <input type="password" id="password" class="span4" name="password" placeholder="Password" @if(disconnected) {disabled}>
                 <a id="checkconnection" class="btn btn-warning btn-block @if(!disconnected){hidden}" href="@routes.LonesomeInterfaceController.index()">Check server connections</a>
                 <button type="submit" id="signin" name="submit" class="btn btn-info btn-block @if(disconnected){hidden}">Sign in</button>
+
+                <div class="login-advanced">
+                    <div class="footer hidden pull-right">
+                        <span id="total-count-zero" class="hidden">No configured node was ever reached.</span>
+                        <span id="total-count-nonzero"><span id="connected-count"></span> of <span id="total-count"></span> nodes connected.</span>
+                    </div>
+
+                    <label>
+                        <input type="checkbox" name="noStartpage" value="true" />
+                        Skip custom startpage
+                    </label>
+                </div>
             }
-            <div class="footer hidden">
-                <span id="total-count-zero" class="hidden">None of the configured nodes could be reached.</span>
-                <span id="total-count-nonzero"><span id="connected-count"></span> of <span id="total-count"></span> nodes connected.</span>
-            </div>
 		</div>
 	</div>
 </div>

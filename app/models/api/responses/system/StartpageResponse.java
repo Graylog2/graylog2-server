@@ -1,5 +1,5 @@
-/*
- * Copyright 2013 TORCH UG
+/**
+ * Copyright 2013 Lennart Koopmann <lennart@torch.sh>
  *
  * This file is part of Graylog2.
  *
@@ -15,15 +15,16 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with Graylog2.  If not, see <http://www.gnu.org/licenses/>.
+ *
  */
-package models;
+package models.api.responses.system;
 
-import play.data.validation.Constraints.Required;
+/**
+ * @author Lennart Koopmann <lennart@torch.sh>
+ */
+public class StartpageResponse {
 
-public class LoginRequest {
-
-	@Required public String username;
-	@Required public String password;
-	@Required public boolean noStartpage;
+    public String type;
+    public String id;
 
 }

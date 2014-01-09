@@ -32,6 +32,21 @@ body {
 .footer {
     font-size: 11px;
     color: #aaa;
-    text-align: right;
-    margin-bottom: 2px;
+    margin-top: 3px;
+}
+
+.login-advanced {
+    margin-top: 10px;
+    padding-top: 5px;
+    border-top: 1px solid #ccc;
+}
+
+.login-advanced label {
+    font-size: 12px;
+    width: 150px;
+}
+.login-advanced label input {
+    position: relative;
+    top: -2px;
+    margin-right: 3px;
 }

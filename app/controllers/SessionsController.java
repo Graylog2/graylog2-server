@@ -31,6 +31,7 @@ import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.authc.AuthenticationException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import play.api.mvc.Call;
 import play.data.Form;
 import play.libs.Crypto;
 import play.mvc.Http;
@@ -91,8 +92,13 @@ public class SessionsController extends BaseController {
             // if we have successfully created a session, we can save that id for the next request
             final String cookieContent = Crypto.encryptAES(r.username + "\t" + sessionResponse.sessionId);
             Http.Context.current().session().put("sessionid", cookieContent);
+
             // upon redirect, the auth layer will load the user with the given session and log the user in.
-            return redirect("/");
+            if(r.noStartpage) {
+                return redirect(routes.SystemController.index(0));
+            } else {
+                return redirect(routes.StartpageController.redirect());
+            }
         } catch (APIException e) {
             log.warn("Unable to authenticate user {}. Redirecting back to '/'", r.username, e);
             if (e.getCause() instanceof Graylog2ServerUnavailableException) {

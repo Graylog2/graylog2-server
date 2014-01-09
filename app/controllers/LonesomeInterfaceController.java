@@ -36,7 +36,7 @@ public class LonesomeInterfaceController extends BaseController {
 
     public Result index() {
         if (serverNodes.isConnected()) {
-            return redirect(routes.DashboardController.index());
+            return redirect(routes.StartpageController.redirect());
         }
         final List<Node> configuredNodes = serverNodes.getConfiguredNodes();
         final List<Node> nodesEverConnectedTo = serverNodes.all(true);

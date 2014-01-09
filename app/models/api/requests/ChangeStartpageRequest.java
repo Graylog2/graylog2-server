@@ -1,5 +1,5 @@
-/*
- * Copyright 2013 TORCH UG
+/**
+ * Copyright 2013 Lennart Koopmann <lennart@torch.sh>
  *
  * This file is part of Graylog2.
  *
@@ -15,15 +15,16 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with Graylog2.  If not, see <http://www.gnu.org/licenses/>.
+ *
  */
-package controllers;
+package models.api.requests;
 
-import play.mvc.*;
+/**
+ * @author Lennart Koopmann <lennart@torch.sh>
+ */
+public class ChangeStartpageRequest {
 
-public class DashboardController extends AuthenticatedController {
+    public String type;
+    public String id;
 
-    public Result index() {
-        return ok(views.html.dashboard.index.render(currentUser()));
-    }
-  
 }
