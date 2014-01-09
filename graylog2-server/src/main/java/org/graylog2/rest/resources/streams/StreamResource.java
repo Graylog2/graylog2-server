@@ -25,6 +25,7 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.google.common.collect.Maps;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
+import org.bson.types.ObjectId;
 import org.graylog2.Core;
 import org.graylog2.database.NotFoundException;
 import org.graylog2.database.ValidationException;
@@ -179,6 +180,45 @@ public class StreamResource extends RestResource {
         }
 
         return json(stream.asMap());
+    }
+
+    @PUT @Timed
+    @Path("/{streamId}")
+    @ApiOperation(value = "Update a stream")
+    @RequiresPermissions(RestPermissions.STREAMS_EDIT)
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON)
+    @ApiResponses(value = {
+            @ApiResponse(code = 404, message = "Stream not found."),
+            @ApiResponse(code = 400, message = "Invalid ObjectId.")
+    })
+    public Response update(@ApiParam(title = "JSON body", required = true) String body, @ApiParam(title = "streamId", required = true) @PathParam("streamId") String streamId) {
+        checkPermission(RestPermissions.STREAMS_EDIT, streamId);
+
+        CreateRequest cr;
+        try {
+            cr = objectMapper.readValue(body, CreateRequest.class);
+        } catch(IOException e) {
+            LOG.error("Error while parsing JSON", e);
+            throw new WebApplicationException(e, Response.Status.BAD_REQUEST);
+        }
+
+        StreamImpl stream;
+        try {
+            stream = StreamImpl.load(loadObjectId(streamId), core);
+            stream.destroy();
+        } catch (NotFoundException e) {
+            throw new WebApplicationException(404);
+        }
+
+        try {
+            stream.update(cr);
+        } catch (ValidationException e) {
+            LOG.error("Validation error.", e);
+            throw new WebApplicationException(e, Response.Status.BAD_REQUEST);
+        }
+
+        return Response.status(Response.Status.OK).build();
     }
 
     @DELETE @Path("/{streamId}") @Timed
