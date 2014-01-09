@@ -6,6 +6,7 @@
         permissions: List[String],
         selectedPermissions: Set[String],
         timezones: Map[String, Collection[String]],
+        streams: List[models.Stream],
         breadcrumbs: lib.BreadcrumbList)
 @import com.google.common.collect.ImmutableList
 
@@ -109,7 +110,16 @@
 
         </div>
     </div>
-
+    <div class="row-fluid">
+        <h2>Stream permissions</h2>
+        <form>
+            <select multiple>
+                @for(stream <- streams.sortBy(_.getTitle)) {
+                <option @if(permissions.contains("streams:read:"+stream.getId)) {"selected"}>@stream.getTitle</option>
+                }
+            </select>
+        </form>
+    </div>
     <div class="row-fluid">
         <form action="@routes.StartpageController.reset(user.getName)" method="POST" class="pull-right">
             <button type="submit" class="btn btn-danger btn-small" data-confirm="Really reset startpage?">

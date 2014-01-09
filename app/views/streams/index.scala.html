@@ -1,8 +1,13 @@
 @(currentUser: User, streams: List[Stream], nodes: Map[String, Node])
 
+@import lib.security.RestPermissions._
+@import views.helpers.Permissions._
+
 @main("Streams", views.html.sidebars.standard(currentUser), "", currentUser, false) {
 
+    @if(isPermitted(STREAMS_CREATE)) {
     <a href="/streams/new" class="btn btn-success pull-right">Create stream</a>
+    }
 
     <div class="row-fluid">
         <h1><i class="icon icon-barcode"></i> Streams</h1>
@@ -13,17 +18,18 @@
         to be alerted whenever there are more logins than usual.
     </div>
 
-    @for(stream <- streams.sortBy(_.getTitle)) {
+    @for(stream <- streams.sortBy(_.getTitle).filter(stream => isPermitted(STREAMS_READ, stream.getId))) {
         <div class="row-fluid node-row stream-row" data-stream-id="@stream.getId">
             <span class="pull-right node-row-info">
                 Created by @views.html.partials.links.to_user.render(stream.getCreatorUser)
                 <span class="moment-from-now" title="@stream.getCreatedAt()">@stream.getCreatedAt()</span>
 
-                &nbsp;<button class="btn btn-danger btn-mini remove-stream"
+                &nbsp;@if(isPermitted(STREAMS_EDIT, stream.getId)) {<button class="btn btn-danger btn-mini remove-stream"
                     type="submit"
                     data-removeUrl="@routes.StreamsController.delete(stream.getId)">
                         Delete
                 </button>
+                }
 
                 <div class="btn-group">
                     <a class="btn btn-mini dropdown-toggle" data-toggle="dropdown" href="#">
@@ -31,10 +37,12 @@
                         <span class="caret"></span>
                     </a>
                     <ul class="dropdown-menu">
+                    @if(isPermitted(STREAMS_EDIT, stream.getId)) {
                         <li><a href="@routes.StreamsController.edit(stream.getId)">Edit stream</a></li>
                         <li><a href="@routes.StreamRulesController.index(stream.getId)">Edit rules</a></li>
                         <li @if(stream.getStreamRules.isEmpty()) { class="disabled" } ><a href="#" data-stream-id="@stream.getId" class="show-stream-rule">Quick add rule</a></li>
                         <li><a href="#">Manage alerts</a></li>
+                        @if(isPermitted(METRICS_READ, "org.graylog2.plugin.streams.Stream." + stream.getId)) {
                         <li class="dropdown-submenu">
                             <a href="#">Show Metrics on</a>
                             <ul class="dropdown-menu valuetype-selector">
@@ -48,11 +56,15 @@
                                 }
                             </ul>
                         </li>
+                        }
+                        @if(isPermitted(STREAMS_CHANGESTATE, stream.getId)) {
                         @if(stream.getDisabled() == false) {
                             <li><a href="@routes.StreamsController.pause(stream.getId)" data-confirm="Really pause stream?">Pause this stream</a></li>
                         } else {
                             <li><a href="@routes.StreamsController.resume(stream.getId)">Resume this stream</a></li>
                         }
+                        }
+                    }
                         <li><a href="@routes.StartpageController.set("stream", stream.getId)">Set as startpage</a></li>
                     </ul>
                 </div>
@@ -91,9 +103,11 @@
 
                 @if(stream.getStreamRules.isEmpty) {
                     no configured rules.
+                    @if(isPermitted(STREAMS_EDIT, stream.getId)) {
                     <a href="@routes.StreamRulesController.index(stream.getId)">
                         Edit rules
                     </a>
+                    }
                 } else {
                     <span class="stream-rule-count" data-stream-id="@stream.getId">@stream.getStreamRules.size()</span> configured
                     @if(stream.getStreamRules.size() == 1) {
@@ -119,7 +133,7 @@
         </div>
     }
 
-    @if(streams.isEmpty) {
+    @if(streams.isEmpty && isPermitted(STREAMS_CREATE)) {
         <div class="alert alert-error">
             No streams configured. <a href="@routes.StreamsController.create()">Create one now</a>.
         </div>

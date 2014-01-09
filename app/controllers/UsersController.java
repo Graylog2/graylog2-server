@@ -21,25 +21,28 @@ package controllers;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Lists;
 import com.google.inject.Inject;
-import lib.BreadcrumbList;
-import lib.DateTools;
-import lib.Tools;
+import lib.*;
 import models.PermissionsService;
+import models.StreamService;
 import models.User;
 import models.UserService;
 import models.api.requests.ChangePasswordRequest;
 import models.api.requests.ChangeUserRequest;
 import models.api.requests.CreateUserRequest;
 import org.apache.shiro.subject.Subject;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import play.data.Form;
 import play.mvc.Result;
 import views.html.system.users.edit;
 import views.html.system.users.new_user;
 import views.html.system.users.show;
 
+import java.io.IOException;
 import java.util.List;
 
 public class UsersController extends AuthenticatedController {
+    private static final Logger log = LoggerFactory.getLogger(UsersController.class);
 
     private static final Form<CreateUserRequest> createUserForm = Form.form(CreateUserRequest.class);
     private static final Form<ChangeUserRequest> changeUserForm = Form.form(ChangeUserRequest.class);
@@ -49,6 +52,8 @@ public class UsersController extends AuthenticatedController {
     private UserService userService;
     @Inject
     private PermissionsService permissionsService;
+    @Inject
+    private StreamService streamService;
 
     public Result index() {
         final List<User> allUsers = userService.all();
@@ -73,13 +78,21 @@ public class UsersController extends AuthenticatedController {
         bc.addCrumb("New", routes.UsersController.newUserForm());
 
         final List<String> permissions = permissionsService.all();
-        return ok(new_user.render(
-                createUserForm,
-                currentUser(),
-                permissions,
-                ImmutableSet.<String>of(),
-                DateTools.getGroupedTimezoneIds().asMap(),
-                bc));
+        try {
+            return ok(new_user.render(
+                    createUserForm,
+                    currentUser(),
+                    permissions,
+                    ImmutableSet.<String>of(),
+                    DateTools.getGroupedTimezoneIds().asMap(),
+                    streamService.all(),
+                    bc));
+        } catch (IOException e) {
+            return status(504, views.html.errors.error.render(ApiClient.ERROR_MSG_IO, e, request()));
+        } catch (APIException e) {
+            String message = "Could not fetch streams. We expected HTTP 200, but got a HTTP " + e.getHttpCode() + ".";
+            return status(504, views.html.errors.error.render(message, e, request()));
+        }
     }
 
     public Result editUserForm(String username) {
@@ -89,18 +102,25 @@ public class UsersController extends AuthenticatedController {
         User user = userService.load(username);
         final Form<ChangeUserRequest> form = changeUserForm.fill(new ChangeUserRequest(user));
         boolean requiresOldPassword = checkRequireOldPassword(username);
-
-        return ok(edit.render(
-                form,
-                username,
-                currentUser(),
-                user,
-                requiresOldPassword,
-                permissionsService.all(),
-                ImmutableSet.copyOf(user.getPermissions()),
-                DateTools.getGroupedTimezoneIds().asMap(),
-                bc)
-        );
+        try {
+            return ok(edit.render(
+                    form,
+                    username,
+                    currentUser(),
+                    user,
+                    requiresOldPassword,
+                    permissionsService.all(),
+                    ImmutableSet.copyOf(user.getPermissions()),
+                    DateTools.getGroupedTimezoneIds().asMap(),
+                    streamService.all(),
+                    bc)
+            );
+        } catch (IOException e) {
+            return status(504, views.html.errors.error.render(ApiClient.ERROR_MSG_IO, e, request()));
+        } catch (APIException e) {
+            String message = "Could not fetch streams. We expected HTTP 200, but got a HTTP " + e.getHttpCode() + ".";
+            return status(504, views.html.errors.error.render(message, e, request()));
+        }
     }
 
     public Result create() {
@@ -111,13 +131,21 @@ public class UsersController extends AuthenticatedController {
             BreadcrumbList bc = breadcrumbs();
             bc.addCrumb("Create new", routes.UsersController.newUserForm());
             final List<String> permissions = permissionsService.all();
-            return badRequest(new_user.render(
-                    createUserRequestForm,
-                    currentUser(),
-                    permissions,
-                    ImmutableSet.copyOf(request.permissions),
-                    DateTools.getGroupedTimezoneIds().asMap(),
-                    bc));
+            try {
+                return badRequest(new_user.render(
+                        createUserRequestForm,
+                        currentUser(),
+                        permissions,
+                        ImmutableSet.copyOf(request.permissions),
+                        DateTools.getGroupedTimezoneIds().asMap(),
+                        streamService.all(),
+                        bc));
+            } catch (IOException e) {
+                return status(504, views.html.errors.error.render(ApiClient.ERROR_MSG_IO, e, request()));
+            } catch (APIException e) {
+                String message = "Could not fetch streams. We expected HTTP 200, but got a HTTP " + e.getHttpCode() + ".";
+                return status(504, views.html.errors.error.render(message, e, request()));
+            }
         }
         // TODO PREVIEW: remove hardcoded permissions once the permission editor is ready
         request.permissions = Lists.newArrayList("*");
@@ -154,16 +182,24 @@ public class UsersController extends AuthenticatedController {
             final List<String> all = permissionsService.all();
             boolean requiresOldPassword = checkRequireOldPassword(username);
 
-            return badRequest(edit.render(
-                    requestForm,
-                    username,
-                    currentUser(),
-                    user,
-                    requiresOldPassword,
-                    all,
-                    ImmutableSet.copyOf(requestForm.get().permissions),
-                    DateTools.getGroupedTimezoneIds().asMap(),
-                    bc));
+            try {
+                return badRequest(edit.render(
+                        requestForm,
+                        username,
+                        currentUser(),
+                        user,
+                        requiresOldPassword,
+                        all,
+                        ImmutableSet.copyOf(requestForm.get().permissions),
+                        DateTools.getGroupedTimezoneIds().asMap(),
+                        streamService.all(),
+                        bc));
+            } catch (IOException e) {
+                return status(504, views.html.errors.error.render(ApiClient.ERROR_MSG_IO, e, request()));
+            } catch (APIException e) {
+                String message = "Could not fetch streams. We expected HTTP 200, but got a HTTP " + e.getHttpCode() + ".";
+                return status(504, views.html.errors.error.render(message, e, request()));
+            }
         }
         user.update(requestForm.get());
 

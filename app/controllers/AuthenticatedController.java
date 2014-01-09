@@ -29,5 +29,5 @@ public class AuthenticatedController extends BaseController {
 	protected static User currentUser() {
         return UserService.current();
 	}
-	
+
 }

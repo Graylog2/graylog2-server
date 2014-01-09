@@ -1,4 +1,5 @@
 /*
+/*
  * Copyright 2013 TORCH UG
  *
  * This file is part of Graylog2.

@@ -18,18 +18,19 @@
  */
 package controllers;
 
-import com.google.common.collect.Maps;
 import com.google.inject.Inject;
 import lib.APIException;
 import lib.ApiClient;
-import lib.BreadcrumbList;
 import lib.ServerNodes;
 import models.*;
-import play.mvc.*;
+import play.mvc.Result;
 
 import java.io.IOException;
+import java.util.Collections;
 import java.util.List;
-import java.util.Map;
+
+import static lib.security.RestPermissions.*;
+import static views.helpers.Permissions.isPermitted;
 
 /**
  * @author Lennart Koopmann <lennart@torch.sh>
@@ -45,11 +46,12 @@ public class SystemController extends AuthenticatedController {
 
     public Result index(Integer page) {
         try {
-            List<Notification> notifications = clusterService.allNotifications();
-            List<SystemJob> systemJobs = clusterService.allSystemJobs();
-            int totalSystemMessages = clusterService.getNumberOfSystemMessages();
-            List<SystemMessage> systemMessages = clusterService.getSystemMessages(page - 1);
-            ESClusterHealth clusterHealth = clusterService.getESClusterHealth();
+            List<Notification> notifications = isPermitted(NOTIFICATIONS_READ) ? clusterService.allNotifications() : Collections.<Notification>emptyList();
+            List<SystemJob> systemJobs = isPermitted(SYSTEMJOBS_READ) ? clusterService.allSystemJobs() : Collections.<SystemJob>emptyList();
+            final Boolean permittedSystemMessages = isPermitted(SYSTEMMESSAGES_READ);
+            int totalSystemMessages = permittedSystemMessages ? clusterService.getNumberOfSystemMessages() : 0;
+            List<SystemMessage> systemMessages = permittedSystemMessages ? clusterService.getSystemMessages(page - 1) : Collections.<SystemMessage>emptyList();
+            ESClusterHealth clusterHealth = isPermitted(INDEXERCLUSTER_READ) ? clusterService.getESClusterHealth() : null;
 
             return ok(views.html.system.index.render(
                     currentUser(),
