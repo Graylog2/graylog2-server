@@ -82,8 +82,7 @@ public class StreamService {
     }
 
     public String create(CreateStreamRequest request) throws APIException, IOException {
-        CreateStreamResponse csr = null;
-        csr = api.post(CreateStreamResponse.class).path("/streams").body(request).expect(Http.Status.CREATED).execute();
+        CreateStreamResponse csr = api.post(CreateStreamResponse.class).path("/streams").body(request).expect(Http.Status.CREATED).execute();
         return csr.streamId;
     }
 

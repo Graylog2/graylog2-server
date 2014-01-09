@@ -27,6 +27,7 @@ public class StreamSummaryResponse {
 
 	public String id;
 	public String title;
+    public String description;
 	
 	@SerializedName("created_at")
 	public String createdAt;

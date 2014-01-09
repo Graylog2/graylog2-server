@@ -71,6 +71,14 @@
             </h3>
 
             <div class="stream-row-details">
+                <div class="stream-description">
+                    @if(stream.getDescription != null && !stream.getDescription.isEmpty) {
+                        <strong>Description:</strong> @stream.getDescription
+                    } else {
+                        No description set.
+                    }
+                </div>
+
                 <span class="throughput">
                     <span title="Coming soon!">
                         IO:

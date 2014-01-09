@@ -36,6 +36,7 @@ public class Stream {
 	
 	private final String id;
     private final String title;
+    private final String description;
     private final String creatorUserId;
     private final String createdAt;
     private final List<StreamRule> streamRules;
@@ -48,6 +49,7 @@ public class Stream {
     private Stream(UserService userService, StreamRule.Factory streamRuleFactory, @Assisted StreamSummaryResponse ssr) {
 		this.id = ssr.id;
         this.title = ssr.title;
+        this.description = ssr.description;
         this.creatorUserId = ssr.creatorUserId;
         this.createdAt = ssr.createdAt;
 
@@ -69,6 +71,10 @@ public class Stream {
 
     public String getTitle() {
         return title;
+    }
+
+    public String getDescription() {
+        return description;
     }
 
     public String getCreatorUserId() {

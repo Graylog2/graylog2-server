@@ -1,21 +1,20 @@
 @(submitUrl: Call, stream: Stream)
-    <form id="new-stream" action="@submitUrl" method="POST">
-        <fieldset>
-            <label>Title</label>
-            <input name="title" required="true" type="text" class="input-xlarge" placeholder="A descriptive name of the new stream" />
 
-            <label>Category</label>
-            <select name="category" required="true">
-                <option id="0">Not yet implemented</option>
-            </select>
+<form id="new-stream" action="@submitUrl" method="POST">
+    <fieldset>
+        <label>Title</label>
+        <input name="title" required="true" type="text" class="input-xxlarge" placeholder="A descriptive name of the new stream" />
 
-            <br /><br />
+        <label>Description</label>
+        <input name="description" required="true" type="text" class="input-xxlarge" placeholder="What kind of messages are routed into this stream?" />
 
-            <p>
-                <button type="submit" class="btn btn-success">Create stream and continue</button>
-            </p>
-        </fieldset>
-    </form>
+        <br /><br />
+
+        <p>
+            <button type="submit" class="btn btn-success">Create stream and continue</button>
+        </p>
+    </fieldset>
+</form>
 
 @if(stream == null) {
     @views.html.partials.streamrules.stream_rule_form.render(null, null)
