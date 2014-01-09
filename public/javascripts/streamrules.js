@@ -92,6 +92,11 @@ $(document).ready(function() {
         if (streamId != undefined) {
             url = '/streams/' + streamId + '/rules';
             callback = function(data) {
+                var parent_list = $("ul.streamrules-list", $(".streamrules-list-container[data-stream-id="+streamId+"]"));
+                var rules_count = $("li", parent_list).size();
+
+                $(".stream-rule-count[data-stream-id="+streamId+"]").text(rules_count);
+
                 container.find("ul.streamrules-list").append(data);
                 container.find("li#stream-rules-placeholder").hide();
             }
