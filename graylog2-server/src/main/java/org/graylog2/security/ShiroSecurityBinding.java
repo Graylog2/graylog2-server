@@ -44,9 +44,9 @@ public class ShiroSecurityBinding implements DynamicFeature {
         if (resourceMethod.isAnnotationPresent(RequiresAuthentication.class) ||
                 resourceClass.isAnnotationPresent(RequiresAuthentication.class)) {
             if (resourceMethod.isAnnotationPresent(RequiresGuest.class)) {
-                log.info("Resource method {}#{} is marked as unauthenticated, skipping setting filter.");
+                log.debug("Resource method {}#{} is marked as unauthenticated, skipping setting filter.");
             } else {
-                log.info("Resource method {}#{} requires an authenticated user.", resourceClass.getCanonicalName(), resourceMethod.getName());
+                log.debug("Resource method {}#{} requires an authenticated user.", resourceClass.getCanonicalName(), resourceMethod.getName());
                 context.register(new ShiroAuthenticationFilter());
             }
         }
@@ -56,7 +56,7 @@ public class ShiroSecurityBinding implements DynamicFeature {
             if (a == null) {
                 a = resourceMethod.getAnnotation(RequiresPermissions.class);
             }
-            log.info("Resource method {}#{} requires an authorization checks.", resourceClass.getCanonicalName(), resourceMethod.getName());
+            log.debug("Resource method {}#{} requires an authorization checks.", resourceClass.getCanonicalName(), resourceMethod.getName());
             context.register(new ShiroAuthorizationFilter(a));
         }
         // TODO this is the wrong approach, we should have an Environment and proper request wrapping
