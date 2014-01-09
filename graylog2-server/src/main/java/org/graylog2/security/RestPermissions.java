@@ -32,7 +32,7 @@ import java.util.Map;
 public class RestPermissions {
     // These should all be in the form of "group:action", because allPermissions() below depends on it.
     // Should this ever change, you need to adapt the code below, too.
-    public static final String USERS_CREATE =  "users:create";
+    public static final String USERS_CREATE = "users:create";
     public static final String USERS_EDIT = "users:edit";
     public static final String USERS_LIST = "users:list";
     public static final String USERS_PERMISSIONSEDIT = "users:permissionsedit";
@@ -75,7 +75,6 @@ public class RestPermissions {
     public static final String LOGGERS_READSUBSYSTEM = "loggers:readsubsystem";
     public static final String LOGGERS_EDITSUBSYSTEM = "loggers:editsubsystem";
     public static final String BUFFERS_READ = "buffers:read";
-    public static final String CLUSTER_READ = "cluster:read";
     public static final String DEFLECTOR_READ = "deflector:read";
     public static final String DEFLECTOR_CYCLE = "deflector:cycle";
     public static final String INDEXRANGES_READ = "indexranges:read";
