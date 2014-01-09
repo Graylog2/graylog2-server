@@ -19,7 +19,10 @@
  */
 package controllers;
 
+import com.google.inject.Inject;
 import models.Startpage;
+import models.User;
+import models.UserService;
 import play.mvc.Call;
 import play.mvc.Result;
 
@@ -27,6 +30,9 @@ import play.mvc.Result;
  * @author Lennart Koopmann <lennart@torch.sh>
  */
 public class StartpageController extends AuthenticatedController {
+
+    @Inject
+    private UserService userService;
 
     public Result redirect() {
         Startpage startpage = currentUser().getStartpage();
@@ -60,6 +66,14 @@ public class StartpageController extends AuthenticatedController {
 
         flash("success", "Configured new startpage for your user.");
         return redirect(redirectTarget);
+    }
+
+    public Result reset(String username) {
+        User user = userService.load(username);
+        user.setStartpage(null);
+
+        flash("success", "Startpage of user was reset.");
+        return redirect(routes.UsersController.editUserForm(user.getName()));
     }
 
 }

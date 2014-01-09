@@ -170,8 +170,14 @@ public class User {
 
     public void setStartpage(Startpage startpage) {
         ChangeUserRequest cur = new ChangeUserRequest(this);
-        cur.startpage.type = startpage.getType().toString().toLowerCase();
-        cur.startpage.id = startpage.getId();
+
+        if (startpage == null) {
+            cur.startpage.type = null;
+            cur.startpage.id = null;
+        } else {
+            cur.startpage.type = startpage.getType().toString().toLowerCase();
+            cur.startpage.id = startpage.getId();
+        }
 
         update(cur);
     }

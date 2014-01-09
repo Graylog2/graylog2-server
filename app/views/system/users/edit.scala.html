@@ -106,6 +106,29 @@
                     </div>
                 </form>
             }
+
         </div>
+    </div>
+
+    <div class="row-fluid">
+        <form action="@routes.StartpageController.reset(user.getName)" method="POST" class="pull-right">
+            <button type="submit" class="btn btn-danger btn-small" data-confirm="Really reset startpage?">
+                Reset custom startpage
+            </button>
+        </form>
+
+        <h2><i class="icon icon-circle-arrow-right"></i> Custom startpage</h2>
+        @if(user.getStartpage == null) {
+            No custom startpage configured yet.
+        } else {
+            The startpage is currently set to
+            <em>@user.getStartpage.getType.toString.toLowerCase</em> with ID
+            <em>@user.getStartpage.getId</em>.
+
+            <a href="@user.getStartpage.getCall">
+                &nbsp;<i class="icon icon-angle-right"></i> Open
+            </a>
+
+        }
     </div>
 }
