@@ -52,7 +52,6 @@ public class AlertsController extends AuthenticatedController {
         }
     }
 
-
     public Result addTypeMessageCount(String streamId) {
         Map<String,String> form = flattenFormUrlEncoded(request().body().asFormUrlEncoded());
 
@@ -67,6 +66,7 @@ public class AlertsController extends AuthenticatedController {
             Stream stream = streamService.get(streamId);
 
             CreateAlertConditionRequest request = new CreateAlertConditionRequest();
+            request.creatorUserId = currentUser().getName();
             request.type = "message_count";
             request.parameters.put("grace", Integer.parseInt(form.get("grace")));
             request.parameters.put("time", Integer.parseInt(form.get("time")));

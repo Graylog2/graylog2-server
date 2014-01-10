@@ -20,6 +20,7 @@
 package models.api.requests.alerts;
 
 import com.google.common.collect.Maps;
+import com.google.gson.annotations.SerializedName;
 import models.api.requests.ApiRequest;
 
 import java.util.Map;
@@ -31,6 +32,9 @@ public class CreateAlertConditionRequest extends ApiRequest {
 
     public String type;
     public Map<String, Object> parameters;
+
+    @SerializedName("creator_user_id")
+    public String creatorUserId;
 
     public CreateAlertConditionRequest() {
         this.parameters = Maps.newHashMap();

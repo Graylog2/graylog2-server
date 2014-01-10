@@ -16,7 +16,7 @@
             <option value="field-value">Field value condition</option>
         </select>
 
-        <button class="btn btn-success add-alert">Configure new alert</button>
+        <button class="btn btn-success add-alert">Configure new alert</butto.parcreatcretypen>
     </div>
 
     <form action="@routes.AlertsController.addTypeMessageCount(stream.getId)" method="POST" class="alert-type-form alert-type-form-message-count" id="message-count">
@@ -48,9 +48,9 @@
             <span class="time-descr" data-plural="minutes" data-singular="minute">minutes</span>
 
             <br />
-            and wait at least
+            and then wait at least
             <input name="grace" type="text" class="input-mini validatable" data-validate="positive_number" />
-            minutes until triggering a new alert.
+            minutes until triggering a new alert. (grace period)
 
             <p style="margin-top: 10px;">
                 <button type="submit" class="btn btn-success">Add alert condition</button>
@@ -103,9 +103,9 @@
             <span class="time-descr" data-plural="minutes" data-singular="minute">minutes</span>
 
 
-            and <br /> wait at least
+            and <br /> then wait at least
             <input name="grace" type="text" class="input-mini" />
-            minutes until triggering a new alert.
+            minutes until triggering a new alert. (grace period)
 
 
             <p style="margin-top: 10px;">

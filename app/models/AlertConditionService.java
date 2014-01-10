@@ -41,7 +41,7 @@ public class AlertConditionService {
     }
 
     public void create(Stream stream, CreateAlertConditionRequest r) throws APIException, IOException {
-        api.post().body(r).path("/streams/{0}/alerts/conditions", stream.getId()).execute();
+        api.post().body(r).path("/streams/{0}/alerts/conditions", stream.getId()).expect(201).execute();
     }
 
 }
