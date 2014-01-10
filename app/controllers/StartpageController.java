@@ -50,7 +50,12 @@ public class StartpageController extends AuthenticatedController {
     public Result set(String pageType, String id) {
         Startpage.Type type = Startpage.Type.valueOf(pageType.toUpperCase());
 
-        currentUser().setStartpage(new Startpage(type, id));
+        final boolean success = currentUser().setStartpage(new Startpage(type, id));
+        if (success) {
+            flash("success", "Configured new startpage for your user.");
+        } else {
+            flash("error", "Could not set new startpage for your user.");
+        }
 
         Call redirectTarget;
         switch (type) {
@@ -64,15 +69,18 @@ public class StartpageController extends AuthenticatedController {
                 redirectTarget = routes.SystemController.index(0);
         }
 
-        flash("success", "Configured new startpage for your user.");
         return redirect(redirectTarget);
     }
 
     public Result reset(String username) {
         User user = userService.load(username);
-        user.setStartpage(null);
+        if (user.setStartpage(null)) {
+            flash("success", "Startpage of user was reset.");
+        } else {
+            flash("error", "Could not reset startpage.");
+        }
 
-        flash("success", "Startpage of user was reset.");
+
         return redirect(routes.UsersController.editUserForm(user.getName()));
     }
 

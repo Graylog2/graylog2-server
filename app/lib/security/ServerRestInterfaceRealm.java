@@ -18,6 +18,7 @@
  */
 package lib.security;
 
+import com.google.common.collect.Ordering;
 import com.google.common.collect.Sets;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
@@ -75,6 +76,9 @@ public class ServerRestInterfaceRealm extends AuthorizingRealm {
         }
         final List<String> permissions = currentUser.getPermissions();
         final SimpleAuthorizationInfo authzInfo = new SimpleAuthorizationInfo();
+        if (log.isTraceEnabled()) {
+            log.trace("Permissions for {} are {}", currentUser.getName(), Ordering.natural().sortedCopy(currentUser.getPermissions()));
+        }
         authzInfo.setStringPermissions(Sets.newHashSet(permissions));
         return authzInfo;
     }

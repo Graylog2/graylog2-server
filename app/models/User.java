@@ -21,7 +21,6 @@ package models;
 import com.google.common.collect.Lists;
 import com.google.inject.assistedinject.Assisted;
 import com.google.inject.assistedinject.AssistedInject;
-import controllers.routes;
 import lib.APIException;
 import lib.ApiClient;
 import models.api.requests.ChangePasswordRequest;
@@ -31,7 +30,6 @@ import org.apache.shiro.subject.Subject;
 import org.joda.time.DateTimeZone;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import play.mvc.Call;
 import play.mvc.Http;
 
 import javax.annotation.Nullable;
@@ -94,13 +92,16 @@ public class User {
         this.startpage = startpage;
     }
 
-    public void update(ChangeUserRequest request) {
+    public boolean update(ChangeUserRequest request) {
         try {
             api.put().path("/users/{0}", getName()).body(request).expect(Http.Status.NO_CONTENT).execute();
+            return true;
         } catch (APIException e) {
             log.error("Unable to update user", e);
+            return false;
         } catch (IOException e) {
             log.error("Unable to update user", e);
+            return false;
         }
     }
     @Deprecated
@@ -168,7 +169,7 @@ public class User {
         return subject;
     }
 
-    public void setStartpage(Startpage startpage) {
+    public boolean setStartpage(Startpage startpage) {
         ChangeUserRequest cur = new ChangeUserRequest(this);
 
         if (startpage == null) {
@@ -178,8 +179,7 @@ public class User {
             cur.startpage.type = startpage.getType().toString().toLowerCase();
             cur.startpage.id = startpage.getId();
         }
-
-        update(cur);
+        return update(cur);
     }
 
     public interface Factory {

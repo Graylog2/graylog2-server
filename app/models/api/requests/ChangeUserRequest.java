@@ -18,13 +18,10 @@
  */
 package models.api.requests;
 
-import com.google.common.collect.Lists;
 import models.User;
-import models.api.responses.system.StartpageResponse;
 import play.data.validation.Constraints;
 
 import java.util.List;
-import java.util.Map;
 
 public class ChangeUserRequest extends ApiRequest {
     @Constraints.Required
@@ -43,7 +40,7 @@ public class ChangeUserRequest extends ApiRequest {
     public ChangeUserRequest(User user) {
         this.fullname = user.getFullName();
         this.email = user.getEmail();
-        this.permissions = Lists.newArrayList("*"); // TODO PREVIEW user.getPermissions();
+        this.permissions = user.getPermissions();
         if (user.getTimeZone() != null) {
             this.timezone = user.getTimeZone().getID();
         }
