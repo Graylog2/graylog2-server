@@ -283,11 +283,6 @@ public class Core implements GraylogServer, InputHost {
         );
 
         // Load and register plugins.
-        registerPlugins(MessageFilter.class, "filters");
-        registerPlugins(MessageOutput.class, "outputs");
-        registerPlugins(AlarmCallback.class, "alarm_callbacks");
-        registerPlugins(Transport.class, "transports");
-        registerPlugins(Initializer.class, "initializers");
         registerPlugins(MessageInput.class, "inputs");
 
         // Ramp it all up. (both plugins and built-in types)
@@ -298,28 +293,6 @@ public class Core implements GraylogServer, InputHost {
         inputs().launchPersisted();
 
         /*
-        // Initialize all registered transports.
-        for (Transport transport : this.transports) {
-            try {
-                transport.initialize(PluginConfiguration.load(this, transport.getClass().getCanonicalName()));
-                LOG.debug("Initialized transport: {}", transport.getName());
-            } catch (TransportConfigurationException e) {
-                LOG.error("Could not initialize transport <" + transport.getName() + ">"
-                        + " because of missing or invalid configuration.", e);
-            }
-        }
-
-        // Initialize all registered alarm callbacks.
-        for (AlarmCallback callback : this.alarmCallbacks) {
-            try {
-                callback.initialize(PluginConfiguration.load(this, callback.getClass().getCanonicalName()));
-                LOG.debug("Initialized alarm callback: {}", callback.getName());
-            } catch(AlarmCallbackConfigurationException e) {
-                LOG.error("Could not initialize alarm callback <" + callback.getName() + ">"
-                        + " because of missing or invalid configuration.", e);
-            }
-        }
-
         // Initialize all registered inputs.
         for (MessageInput input : this.inputs) {
             try {
@@ -329,18 +302,8 @@ public class Core implements GraylogServer, InputHost {
             } catch (MessageInputConfigurationException e) {
                 LOG.error("Could not initialize input <{}>.", input.getClass().getCanonicalName(), e);
             }
-        }
-
-        // Initialize all registered outputs.
-        for (MessageOutput output : this.outputs) {
-            try {
-                output.initialize(PluginConfiguration.load(this, output.getClass().getCanonicalName()));
-                LOG.debug("Initialized output: {}", output.getName());
-            } catch(MessageOutputConfigurationException e) {
-                LOG.error("Could not initialize output <" + output.getName() + ">"
-                        + " because of missing or invalid configuration.", e);
-            }
-        }*/
+        }}
+        */
     }
 
     public void setLdapConnector(LdapConnector ldapConnector) {

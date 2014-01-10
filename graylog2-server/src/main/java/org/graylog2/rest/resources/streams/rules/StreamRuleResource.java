@@ -53,19 +53,11 @@ public class StreamRuleResource extends RestResource {
             throw new WebApplicationException(e, Response.Status.BAD_REQUEST);
         }
 
-        final List<Stream> streams = StreamImpl.loadAll(core);
-
         StreamImpl stream = null;
-
-        for (Stream s : streams) {
-            if (s.getId().toString().equals(streamid)) {
-                stream = (StreamImpl) s;
-                break;
-            }
-        }
-
-        if (stream == null) {
-            throw new WebApplicationException("Stream " + streamid + " not found");
+        try {
+            stream = StreamImpl.load(loadObjectId(streamid), core);
+        } catch (org.graylog2.database.NotFoundException e) {
+            throw new WebApplicationException(404);
         }
 
         Map<String, Object> streamRuleData = Maps.newHashMap();

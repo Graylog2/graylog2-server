@@ -39,11 +39,6 @@ public interface Stream {
     public String getId();
 
     public String getTitle();
-    
-    public int getAlarmTimespan();
-    public int getAlarmMessageLimit();
-    public int getAlarmPeriod();
-    public Set<AlarmReceiver> getAlarmReceivers(GraylogServer server);
 
     @Override
     public String toString();

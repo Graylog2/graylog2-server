@@ -1,5 +1,5 @@
 /**
- * Copyright 2012 Lennart Koopmann <lennart@socketfeed.com>
+ * Copyright 2013 Lennart Koopmann <lennart@torch.sh>
  *
  * This file is part of Graylog2.
  *
@@ -17,17 +17,22 @@
  * along with Graylog2.  If not, see <http://www.gnu.org/licenses/>.
  *
  */
-package org.graylog2.alarms.transports;
+package org.graylog2.rest.resources.streams.alerts.requests;
+
+import com.fasterxml.jackson.annotation.JsonProperty;
 
 import java.util.Map;
 
-import org.graylog2.plugin.alarms.Alarm;
+/**
+ * @author Lennart Koopmann <lennart@torch.sh>
+ */
+public class CreateConditionRequest {
 
-public interface EmailLayout {
+    public String type;
 
-    void initialize(Map<String, String> pluginConfiguration);
-    String getContentType();
-    String formatMessageBody(Alarm message, long unixTimestamp);
-    String getSubject(Alarm message, long unixTimestamp);
+    @JsonProperty("creator_user_id")
+    public String creatorUserId;
+
+    public Map<String, Object> parameters;
 
 }

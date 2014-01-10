@@ -20,9 +20,10 @@
 package org.graylog2.initializers;
 
 import java.util.Map;
+
+import org.graylog2.periodical.AlertScannerThread;
 import org.graylog2.plugin.initializers.Initializer;
 import org.graylog2.Core;
-import org.graylog2.periodical.AlarmScannerThread;
 import org.graylog2.plugin.GraylogServer;
 import org.graylog2.plugin.initializers.InitializerConfigurationException;
 
@@ -43,9 +44,9 @@ public class AlarmScannerInitializer extends SimpleFixedRateScheduleInitializer 
     public void initialize(GraylogServer server, Map<String, String> config) throws InitializerConfigurationException {
         configureScheduler(
                 (Core) server,
-                new AlarmScannerThread((Core) server),
-                AlarmScannerThread.INITIAL_DELAY,
-                AlarmScannerThread.PERIOD
+                new AlertScannerThread((Core) server),
+                AlertScannerThread.INITIAL_DELAY,
+                AlertScannerThread.PERIOD
         );
     }
     
