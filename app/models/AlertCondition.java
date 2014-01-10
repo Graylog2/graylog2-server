@@ -19,7 +19,12 @@
  */
 package models;
 
+import com.google.inject.assistedinject.Assisted;
+import com.google.inject.assistedinject.AssistedInject;
 import models.api.responses.alerts.AlertConditionSummaryResponse;
+import org.joda.time.DateTime;
+
+import java.util.Map;
 
 /**
  * @author Lennart Koopmann <lennart@torch.sh>
@@ -28,6 +33,106 @@ public class AlertCondition {
 
     public interface Factory {
         public AlertCondition fromSummaryResponse(AlertConditionSummaryResponse acsr);
+    }
+
+    public enum Type {
+        MESSAGE_COUNT
+    }
+
+    private final String id;
+    private final Type type;
+    private final Map<String, Object> parameters;
+    private final DateTime createdAt;
+    private final User creatorUser;
+
+    private final UserService userService;
+
+    @AssistedInject
+    private AlertCondition(UserService userService, @Assisted AlertConditionSummaryResponse acsr) {
+        this.id = acsr.id;
+        this.type = Type.valueOf(acsr.type.toUpperCase());
+        this.parameters = acsr.parameters;
+        this.createdAt = DateTime.parse(acsr.createdAt);
+        this.creatorUser = userService.load(acsr.creatorUserId);
+
+        this.userService = userService;
+    }
+
+    public String getId() {
+        return id;
+    }
+
+    public Type getType() {
+        return type;
+    }
+
+    public Map<String, Object> getParameters() {
+        return parameters;
+    }
+
+    public DateTime getCreatedAt() {
+        return createdAt;
+    }
+
+    public User getCreatorUser() {
+        return creatorUser;
+    }
+
+    public String getSummary() {
+        switch (type) {
+            case MESSAGE_COUNT:
+                return "Message count condition";
+        }
+
+        throw new RuntimeException("Cannot build summary for unknown alert condition type [" + type + "]");
+    }
+
+    public String getDescription() {
+        StringBuilder sb = new StringBuilder();
+        switch (type) {
+            case MESSAGE_COUNT:
+                int threshold = (int) ((Double) parameters.get("threshold")).longValue();
+                int time = (int) ((Double) parameters.get("time")).longValue();
+                int grace = (int) ((Double) parameters.get("grace")).longValue();
+
+                sb.append("Alert is triggered when there");
+
+                if (threshold == 1) {
+                    sb.append(" is ");
+                } else {
+                    sb.append(" are ");
+                }
+
+                sb.append(parameters.get("threshold_type")).append(" than ").append(threshold);
+
+                if (threshold == 1) {
+                    sb.append(" message ");
+                } else {
+                    sb.append(" messages ");
+                }
+
+                sb.append("in the last ");
+
+                if (time == 1) {
+                    sb.append("minute. ");
+                } else {
+                    sb.append(time).append(" minutes. ");
+                }
+
+                sb.append("Grace period: ").append(grace);
+
+                if (grace == 1) {
+                    sb.append(" minute.");
+                } else {
+                    sb.append(" minutes.");
+                }
+
+                break;
+            default:
+                throw new RuntimeException("Cannot build description for unknown alert condition type [" + type + "]");
+        }
+
+        return sb.toString();
     }
 
 }

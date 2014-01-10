@@ -19,12 +19,16 @@
  */
 package models;
 
+import com.google.common.collect.Lists;
 import com.google.inject.Inject;
 import lib.APIException;
 import lib.ApiClient;
 import models.api.requests.alerts.CreateAlertConditionRequest;
+import models.api.responses.alerts.AlertConditionSummaryResponse;
+import models.api.responses.alerts.AlertConditionsResponse;
 
 import java.io.IOException;
+import java.util.List;
 
 /**
  * @author Lennart Koopmann <lennart@torch.sh>
@@ -38,6 +42,20 @@ public class AlertConditionService {
     private AlertConditionService(ApiClient api, AlertCondition.Factory factory) {
         this.api = api;
         this.alertConditionFactory = factory;
+    }
+
+    public List<AlertCondition> allOfStream(Stream stream) throws APIException, IOException {
+        List<AlertCondition> conditions = Lists.newArrayList();
+
+        AlertConditionsResponse response = api.get(AlertConditionsResponse.class)
+                .path("/streams/{0}/alerts/conditions", stream.getId())
+                .execute();
+
+        for (AlertConditionSummaryResponse c : response.conditions) {
+            conditions.add(alertConditionFactory.fromSummaryResponse(c));
+        }
+
+        return conditions;
     }
 
     public void create(Stream stream, CreateAlertConditionRequest r) throws APIException, IOException {
