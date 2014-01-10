@@ -34,7 +34,7 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import selenium.pages.DashboardPage;
+import selenium.pages.SystemPage;
 import selenium.pages.LoginPage;
 import selenium.pages.SearchPage;
 
@@ -77,8 +77,8 @@ public class SearchTest extends BaseSeleniumTest {
             public void run() {
                 final HostAndPort tcpInputAddr = ensureTcpGelfInput();
                 loginPage.go();
-                final DashboardPage dashboardPage = loginPage.loginAs("admin", "admin");
-                final SearchPage searchResult = dashboardPage.searchFor("something");
+                final SystemPage systemPage = loginPage.loginAs("admin", "admin");
+                final SearchPage searchResult = systemPage.searchFor("something");
                 searchResult.isAt();
                 final FluentWebElement h1 = findFirst("h1");
                 assertThat(h1.getText()).contains("Nothing found");
@@ -95,8 +95,8 @@ public class SearchTest extends BaseSeleniumTest {
                 // this has a race condition, sleep long enough for the message to go through (yes this sucks)
                 Uninterruptibles.sleepUninterruptibly(2, TimeUnit.SECONDS);
 
-                dashboardPage.go();
-                final SearchPage searchPage = dashboardPage.searchFor("something");
+                systemPage.go();
+                final SearchPage searchPage = systemPage.searchFor("something");
                 searchPage.isAt();
                 final FluentWebElement headline = findFirst("h1");
                 assertThat(headline.getText()).contains("Search results");

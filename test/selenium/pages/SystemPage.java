@@ -25,19 +25,19 @@ import org.fluentlenium.core.annotation.Page;
 
 import static org.fest.assertions.Assertions.assertThat;
 
-public class DashboardPage extends FluentPage {
+public class SystemPage extends FluentPage {
 
     @Page
     SearchPage searchPage;
 
     @Override
     public String getUrl() {
-        return routes.DashboardController.index().url();
+        return routes.SystemController.index(0).url();
     }
 
     @Override
     public void isAt() {
-        assertThat(title()).contains("Dashboard");
+        assertThat(title()).contains("System");
     }
 
     public SearchPage searchFor(String searchQuery) {

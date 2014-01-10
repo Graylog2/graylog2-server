@@ -31,7 +31,7 @@ public class LoginPage extends FluentPage {
     private final static String submitElement = "#signin";
 
     @Page
-    public DashboardPage dashboardPage;
+    public SystemPage systemPage;
 
     @Override
     public String getUrl() {
@@ -43,11 +43,11 @@ public class LoginPage extends FluentPage {
         assertThat(title()).contains("Sign in");
     }
 
-    public DashboardPage loginAs(String username, String password) {
+    public SystemPage loginAs(String username, String password) {
         fill(usernameElement).with(username);
         fill(passwordElement).with(password);
         submit(submitElement);
-        return dashboardPage;
+        return systemPage;
     }
 
     public LoginPage loginWithError(String username, String password) {

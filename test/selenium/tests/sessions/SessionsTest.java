@@ -24,7 +24,7 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import selenium.pages.DashboardPage;
+import selenium.pages.SystemPage;
 import selenium.pages.LoginPage;
 
 import static org.fest.assertions.fluentlenium.FluentLeniumAssertions.assertThat;
@@ -51,8 +51,8 @@ public class SessionsTest extends BaseSeleniumTest {
             @Override
             public void run() {
                 loginPage.go();
-                final DashboardPage dashboardPage = loginPage.loginAs("admin", "admin");
-                assertThat(dashboardPage).isAt();
+                final SystemPage systemPage = loginPage.loginAs("admin", "admin");
+                assertThat(systemPage).isAt();
             }
         });
     }
