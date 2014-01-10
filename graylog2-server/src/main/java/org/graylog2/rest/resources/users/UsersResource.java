@@ -52,6 +52,7 @@ import java.util.Map;
 
 import static javax.ws.rs.core.Response.Status.*;
 import static javax.ws.rs.core.Response.*;
+import static org.graylog2.security.RestPermissions.USERS_EDIT;
 
 /**
  * @author Lennart Koopmann <lennart@torch.sh>
@@ -78,7 +79,7 @@ public class UsersResource extends RestResource {
             return status(NOT_FOUND).build();
         }
         // if the requested username does not match the authenticated user, then we don't return permission information
-        final boolean allowedToSeePermissions = getSubject().isPermitted(RestPermissions.USERS_PERMISSIONSEDIT);
+        final boolean allowedToSeePermissions = isPermitted(RestPermissions.USERS_PERMISSIONSEDIT, username);
         final boolean permissionsAllowed = getSubject().getPrincipal().toString().equals(username) || allowedToSeePermissions;
 
         return ok().entity(json(toMap(user, permissionsAllowed))).build();
@@ -142,7 +143,6 @@ public class UsersResource extends RestResource {
 
     @PUT
     @Path("{username}")
-    @RequiresPermissions(RestPermissions.USERS_EDIT)
     @ApiOperation("Modify user details.")
     @ApiResponses({
             @ApiResponse(code = 400, message = "Attempted to modify a read only user account (e.g. built-in or LDAP users)."),
@@ -152,7 +152,7 @@ public class UsersResource extends RestResource {
         if (body == null || body.isEmpty()) {
             throw new BadRequestException("Missing request body.");
         }
-
+        checkPermission(USERS_EDIT, username);
         CreateRequest cr = getCreateRequest(body);
 
         final User user = User.load(username, core);
@@ -198,7 +198,7 @@ public class UsersResource extends RestResource {
 
     @DELETE
     @Path("{username}")
-    @RequiresPermissions(RestPermissions.USERS_EDIT)
+    @RequiresPermissions(USERS_EDIT)
     @ApiOperation("Removes a user account.")
     @ApiResponses({@ApiResponse(code = 400, message = "When attempting to remove a read only user (e.g. built-in or LDAP user).")})
     public Response deleteUser(@ApiParam(title = "username", description = "The name of the user to delete.", required = true) @PathParam("username") String username) {
