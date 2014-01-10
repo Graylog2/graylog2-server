@@ -38,8 +38,9 @@ POST        /streams/:stream_id/update                                          
 
 # Alerts
 GET         /streams/:stream_id/alerts                                               @controllers.AlertsController.index(stream_id: String)
-POST        /streams/:stream_id/alerts/add/messagecount                              @controllers.AlertsController.addTypeMessageCount(stream_id: String)
-POST        /streams/:stream_id/alerts/add/fieldvalue                                @controllers.AlertsController.addTypeFieldValue(stream_id: String)
+POST        /streams/:stream_id/alerts/conditions/add/messagecount                   @controllers.AlertsController.addTypeMessageCount(stream_id: String)
+POST        /streams/:stream_id/alerts/conditions/add/fieldvalue                     @controllers.AlertsController.addTypeFieldValue(stream_id: String)
+POST        /streams/:stream_id/alerts/conditions/:condition_id/delete               @controllers.AlertsController.removeCondition(stream_id: String, condition_id: String)
 
 # System
 GET         /system                                                                  @controllers.SystemController.index(page:Integer ?= 1)

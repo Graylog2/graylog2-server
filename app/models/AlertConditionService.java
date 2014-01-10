@@ -58,6 +58,10 @@ public class AlertConditionService {
         return conditions;
     }
 
+    public void delete(Stream stream, String conditionId) throws APIException, IOException {
+        api.delete().path("/streams/{0}/alerts/conditions/{1}", stream.getId(), conditionId).expect(204).execute();
+    }
+
     public void create(Stream stream, CreateAlertConditionRequest r) throws APIException, IOException {
         api.post().body(r).path("/streams/{0}/alerts/conditions", stream.getId()).expect(201).execute();
     }

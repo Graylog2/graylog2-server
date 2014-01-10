@@ -95,6 +95,21 @@ public class AlertsController extends AuthenticatedController {
         return ok("TODO implement.");
     }
 
+    public Result removeCondition(String streamId, String conditionId) {
+        try {
+            Stream stream = streamService.get(streamId);
+            alertConditionService.delete(stream, conditionId);
+
+            flash("success", "Deleted alert condition.");
+            return redirect(routes.AlertsController.index(streamId));
+        } catch (IOException e) {
+            return status(504, views.html.errors.error.render(ApiClient.ERROR_MSG_IO, e, request()));
+        } catch (APIException e) {
+            String message = "Could not fetch stream. We expected HTTP 200, but got a HTTP " + e.getHttpCode() + ".";
+            return status(504, views.html.errors.error.render(message, e, request()));
+        }
+    }
+
     private boolean checkParam(String key, Map<String,String> form) {
         return form.containsKey(key) && !form.get(key).isEmpty();
     }

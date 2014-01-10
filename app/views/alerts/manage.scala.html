@@ -123,16 +123,16 @@
     <h2 style="margin-bottom: 5px;"><i class="icon icon-tasks"></i> Configured alert conditions</h2>
 
     @for(condition <- alertConditions) {
-        <div class="row-fluid message-processing-host node-row">
+        <div class="row-fluid node-row">
             <span class="pull-right node-row-info">
                 Created by @views.html.partials.links.to_user.render(condition.getCreatorUser)
                 <span class="moment-from-now" title="@condition.getCreatedAt()">@condition.getCreatedAt()</span>
 
                 @if(isPermitted(STREAMS_EDIT, stream.getId)) {
                     &nbsp;
-                    <button class="btn btn-danger btn-mini" type="submit">
-                        Delete
-                    </button>
+                    <form action="@routes.AlertsController.removeCondition(stream.getId, condition.getId)" method="POST" style="position: relative; top: -1px;">
+                        <button type="submit" class="btn btn-danger btn-mini" data-confirm="Really delete alarm condition?">Delete</button>
+                    </form>
                 }
             </span>
 
