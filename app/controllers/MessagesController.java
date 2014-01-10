@@ -34,6 +34,10 @@ import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 
+import static lib.security.RestPermissions.INPUTS_READ;
+import static lib.security.RestPermissions.STREAMS_READ;
+import static views.helpers.Permissions.isPermitted;
+
 public class MessagesController extends AuthenticatedController {
 
     @Inject
@@ -54,7 +58,9 @@ public class MessagesController extends AuthenticatedController {
             List<Stream> messageInStreams = Lists.newArrayList();
 
             for (String streamId : message.getStreamIds()) {
-                messageInStreams.add(streamService.get(streamId));
+                if (isPermitted(STREAMS_READ, streamId)) {
+                    messageInStreams.add(streamService.get(streamId));
+                }
             }
 
             return ok(views.html.messages.show.render(currentUser(), message, messageInStreams, getSourceInput(sourceNode, message), sourceNode, sourceRadio, getSourceInput(sourceRadio, message)));
@@ -74,7 +80,9 @@ public class MessagesController extends AuthenticatedController {
             List<Stream> messageInStreams = Lists.newArrayList();
 
             for (String streamId : message.getStreamIds()) {
-                messageInStreams.add(streamService.get(streamId));
+                if (isPermitted(STREAMS_READ, streamId)) {
+                    messageInStreams.add(streamService.get(streamId));
+                }
             }
 
             return ok(views.html.messages.show_as_partial.render(
@@ -155,7 +163,7 @@ public class MessagesController extends AuthenticatedController {
     }
 
     private static Input getSourceInput(Node node, MessageResult m) {
-        if (node != null) {
+        if (node != null && isPermitted(INPUTS_READ, m.getSourceInputId())) {
             try {
                 return node.getInput(m.getSourceInputId());
             } catch(Exception e) {

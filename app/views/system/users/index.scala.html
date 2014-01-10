@@ -1,5 +1,8 @@
 @(currentUser: User, breadcrumbs: lib.BreadcrumbList, users: List[User], permissions:List[String])
 
+@import views.helpers.Permissions._
+@import lib.security.RestPermissions._
+
 @main("Users", views.html.system.sidebar(), "", currentUser, false) {
 
     @views.html.partials.breadcrumbs(breadcrumbs)
@@ -66,8 +69,8 @@
 
     <div class="row-fluid">
         <div class="pull-right">
-            <a id="configure-ldap" class="btn" href="@routes.LdapController.index()">Configure LDAP</a>
-            <a id="create-user-btn" class="btn btn-success" href="@routes.UsersController.newUserForm()">Create new user</a>
+            @if(isPermitted(LDAP_EDIT)) {<a id="configure-ldap" class="btn" href="@routes.LdapController.index()">Configure LDAP</a>}
+            @if(isPermitted(USERS_CREATE)) { <a id="create-user-btn" class="btn btn-success" href="@routes.UsersController.newUserForm()">Create new user</a> }
         </div>
     </div>
 

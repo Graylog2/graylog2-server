@@ -1,3 +1,8 @@
+@()
+
+@import views.helpers.Permissions
+@import lib.security.RestPermissions
+
 <ul class="nav nav-list">
     <li class="nav-header">System</li>
 
@@ -13,21 +18,27 @@
         </a>
     </li>
 
+    @if(Permissions.isPermitted(RestPermissions.INDICES_READ)) {
     <li>
         <a href="@routes.IndicesController.index()">
             Indices
         </a>
     </li>
+    }
 
+    @if(Permissions.isPermitted(RestPermissions.LOGGERS_READ)) {
     <li>
         <a href="@routes.LoggingController.index()">
             Logging
         </a>
     </li>
+    }
 
+    @if(Permissions.isPermitted(RestPermissions.USERS_LIST)) {
     <li>
         <a href="@routes.UsersController.index()">
             Users
         </a>
     </li>
+    }
 </ul>

@@ -89,7 +89,12 @@ public class ServerNodesRefreshService {
         // resolve all configured nodes, to figure out the proper transport addresses in this network
         final Collection<Node> configuredNodes = serverNodes.getConfiguredNodes();
         final Map<Node, NodeSummaryResponse> responses =
-                api.get(NodeSummaryResponse.class).path("/system/cluster/node").nodes(configuredNodes).timeout(2, TimeUnit.SECONDS).executeOnAll();
+                api.get(NodeSummaryResponse.class)
+                        .path("/system/cluster/node")
+                        .nodes(configuredNodes)
+                        .unauthenticated()
+                        .timeout(2, TimeUnit.SECONDS)
+                        .executeOnAll();
         List<Node> resolvedNodes = Lists.newArrayList();
         for (Map.Entry<Node, NodeSummaryResponse> nsr : responses.entrySet()) {
             if (nsr.getValue() == null) {

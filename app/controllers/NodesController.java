@@ -26,12 +26,16 @@ import lib.ApiClient;
 import lib.BreadcrumbList;
 import lib.ServerNodes;
 import models.*;
-import play.mvc.Http;
 import play.mvc.Result;
 
 import java.io.IOException;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+
+import static lib.security.RestPermissions.BUFFERS_READ;
+import static lib.security.RestPermissions.JVMSTATS_READ;
+import static views.helpers.Permissions.isPermitted;
 
 /**
  * @author Lennart Koopmann <lennart@torch.sh>
@@ -50,13 +54,15 @@ public class NodesController extends AuthenticatedController {
         bc.addCrumb("System", routes.SystemController.index(0));
         bc.addCrumb("Nodes", routes.NodesController.nodes());
 
-        List<NodeJVMStats> serverJvmStats = clusterService.getClusterJvmStats();
+        List<NodeJVMStats> serverJvmStats = isPermitted(JVMSTATS_READ) ? clusterService.getClusterJvmStats() : Collections.<NodeJVMStats>emptyList();
         Map<String, Node> nodes = serverNodes.asMap();
         Map<String, BufferInfo> bufferInfo = Maps.newHashMap();
 
-        // Ask every node for buffer info.
-        for(Node node : nodes.values()) {
-            bufferInfo.put(node.getNodeId(), node.getBufferInfo());
+        if (isPermitted(BUFFERS_READ)) {
+            // Ask every node for buffer info.
+            for(Node node : nodes.values()) {
+                bufferInfo.put(node.getNodeId(), node.getBufferInfo());
+            }
         }
 
         Map<String, Radio> radios = null;

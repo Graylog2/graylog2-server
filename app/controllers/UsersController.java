@@ -39,7 +39,11 @@ import views.html.system.users.new_user;
 import views.html.system.users.show;
 
 import java.io.IOException;
+import java.util.Collections;
 import java.util.List;
+
+import static lib.security.RestPermissions.USERS_LIST;
+import static views.helpers.Permissions.isPermitted;
 
 public class UsersController extends AuthenticatedController {
     private static final Logger log = LoggerFactory.getLogger(UsersController.class);
@@ -56,7 +60,7 @@ public class UsersController extends AuthenticatedController {
     private StreamService streamService;
 
     public Result index() {
-        final List<User> allUsers = userService.all();
+        final List<User> allUsers = isPermitted(USERS_LIST) ? userService.all() : Collections.<User>emptyList();
         final List<String> permissions = permissionsService.all();
         return ok(views.html.system.users.index.render(currentUser(), breadcrumbs(), allUsers, permissions));
     }
