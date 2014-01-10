@@ -1736,3 +1736,34 @@ form.edit-dashboard-form {
 .messages th .choose-sort-order {
     color: #8c8e86;
 }
+
+.add-alert {
+    position: relative;
+    top: -5px;
+}
+
+.alert-type-form {
+    display: none;
+    font-size: 14px;
+}
+
+.alert-type-form input {
+    margin: 0px 5px;
+    padding: 2px;
+}
+
+.alert-type-form select {
+    position: relative;
+    top: 5px;
+}
+
+.threshold-type {
+    position: relative;
+    top: -5px;
+    margin-left: 5px;
+}
+
+.threshold-type input {
+    position: relative;
+    top: 3px;
+}

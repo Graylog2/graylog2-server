@@ -31,11 +31,15 @@ POST        /streams/:stream_id/rules/:streamrule_id/delete                     
 GET         /streams/:stream_id/rules                                                @controllers.StreamRulesController.index(stream_id: String)
 POST        /streams/:stream_id/rules                                                @controllers.StreamRulesController.create(stream_id: String)
 POST        /streams/:stream_id/rules/:streamrule_id                                 @controllers.StreamRulesController.update(stream_id: String, streamrule_id: String)
-GET         /streams/:stream_id/alerts                                               @controllers.StreamAlertsController.index(stream_id: String)
 GET         /streams/:stream_id/pause                                                @controllers.StreamsController.pause(stream_id: String)
 GET         /streams/:stream_id/resume                                               @controllers.StreamsController.resume(stream_id: String)
 GET         /streams/:stream_id/edit                                                 @controllers.StreamsController.edit(stream_id: String)
 POST        /streams/:stream_id/update                                               @controllers.StreamsController.update(stream_id: String)
+
+# Alerts
+GET         /streams/:stream_id/alerts                                               @controllers.AlertsController.index(stream_id: String)
+POST        /streams/:stream_id/alerts/add/messagecount                              @controllers.AlertsController.addTypeMessageCount(stream_id: String)
+POST        /streams/:stream_id/alerts/add/fieldvalue                                @controllers.AlertsController.addTypeFieldValue(stream_id: String)
 
 # System
 GET         /system                                                                  @controllers.SystemController.index(page:Integer ?= 1)

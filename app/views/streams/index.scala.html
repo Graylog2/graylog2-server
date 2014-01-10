@@ -41,7 +41,7 @@
                         <li><a href="@routes.StreamsController.edit(stream.getId)">Edit stream</a></li>
                         <li><a href="@routes.StreamRulesController.index(stream.getId)">Edit rules</a></li>
                         <li @if(stream.getStreamRules.isEmpty()) { class="disabled" } ><a href="#" data-stream-id="@stream.getId" class="show-stream-rule">Quick add rule</a></li>
-                        <li><a href="#">Manage alerts</a></li>
+                        <li><a href="@routes.AlertsController.index(stream.getId)">Manage alerts</a></li>
                         @if(isPermitted(METRICS_READ, "org.graylog2.plugin.streams.Stream." + stream.getId)) {
                         <li class="dropdown-submenu">
                             <a href="#">Show Metrics on</a>

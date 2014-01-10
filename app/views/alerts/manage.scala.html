@@ -1,0 +1,122 @@
+@(currentUser: User, stream: Stream)
+
+@main("Alerts", views.html.sidebars.standard(currentUser), "", currentUser) {
+    <h1>
+        <i class="icon icon-fire"></i>
+        Alerts of stream &raquo;@stream.getTitle&laquo;
+    </h1>
+
+    <div class="row-fluid">
+        You can define thresholds on any message field or message count of a stream and be alerted based on this definition.
+    </div>
+
+    <div class="row-fluid">
+        <select class="add-alert-type">
+            <option value="message-count">Message count condition</option>
+            <option value="field-value">Field value condition</option>
+        </select>
+
+        <button class="btn btn-success add-alert">Configure new alert</button>
+    </div>
+
+    <form action="@routes.AlertsController.addTypeMessageCount(stream.getId)" method="POST" class="alert-type-form alert-type-form-message-count" id="message-count">
+        <div class="well well-small">
+            <h2 style="margin-bottom: 10px;">
+                <i class="icon icon-bell-alt"></i>
+                New alert condition
+            </h2>
+
+            Trigger alert when there are
+
+            <span class="threshold-type">
+                <label class="radio inline">
+                    <input type="radio" name="threshold_type" value="more" checked="checked"> more
+                </label>
+
+                <label class="radio inline">
+                    <input type="radio" name="threshold_type" value="less"> less
+                </label>
+            </span>
+
+            <br />
+            than
+            <input name="threshold" type="text" class="input-mini pluralsingular validatable" data-validate="positive_number" data-pluralsingular="threshold-descr" />
+            <span class="threshold-descr" data-plural="messages" data-singular="message">messages</span>
+            in the last
+
+            <input name="time" type="text" class="input-mini pluralsingular validatable" data-validate="positive_number" data-pluralsingular="time-descr" />
+            <span class="time-descr" data-plural="minutes" data-singular="minute">minutes</span>
+
+            <br />
+            and wait at least
+            <input name="grace" type="text" class="input-mini validatable" data-validate="positive_number" />
+            minutes until triggering a new alert.
+
+            <p style="margin-top: 10px;">
+                <button type="submit" class="btn btn-success">Add alert condition</button>
+            </p>
+
+        </div>
+    </form>
+
+    <form action="@routes.AlertsController.addTypeFieldValue(stream.getId)" method="POST" class="alert-type-form alert-type-form-field-value" id="field-value">
+        <div class="well well-small">
+            <h2 style="margin-bottom: 10px;">
+                <i class="icon icon-bell-alt"></i>
+                New alert condition
+            </h2>
+
+            Trigger alert when the field
+            <input name="field" type="text" class="input-large typeahead-fields" />
+
+            <br />
+            has a
+
+            <select name="type">
+                <option value="mean">mean value</option>
+                <option value="min">minimum value</option>
+                <option value="max">maximum value</option>
+                <option value="mean">sum</option>
+                <option value="stddev">standard deviation</option>
+            </select>
+
+            <br />
+            that was
+
+            <span class="threshold-type">
+                <label class="radio inline">
+                    <input type="radio" name="threshold_type" value="lower" selected="selected"> lower
+                </label>
+
+                <label class="radio inline">
+                    <input type="radio" name="threshold_type" value="higher"> higher
+                </label>
+            </span>
+
+            than
+
+            <input name="threshold" type="text" class="input-small" />
+
+            in the last
+
+            <input name="time" type="text" class="input-mini pluralsingular" data-pluralsingular="time-descr" />
+            <span class="time-descr" data-plural="minutes" data-singular="minute">minutes</span>
+
+
+            and <br /> wait at least
+            <input name="grace" type="text" class="input-mini" />
+            minutes until triggering a new alert.
+
+
+            <p style="margin-top: 10px;">
+                <button type="submit" class="btn btn-success">Add alert condition</button>
+            </p>
+
+        </div>
+    </form>
+
+    <hr />
+
+    <h2><i class="icon icon-tasks"></i> Triggered alerts</h2>
+
+}

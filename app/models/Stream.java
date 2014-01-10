@@ -21,11 +21,14 @@ package models;
 import com.google.common.collect.Lists;
 import com.google.inject.assistedinject.Assisted;
 import com.google.inject.assistedinject.AssistedInject;
+import lib.APIException;
+import models.api.requests.alerts.CreateAlertConditionRequest;
 import models.api.responses.streams.StreamRuleSummaryResponse;
 import models.api.responses.streams.StreamSummaryResponse;
 import models.api.responses.TimestampResponse;
 import org.joda.time.DateTime;
 
+import java.io.IOException;
 import java.util.List;
 
 public class Stream {
@@ -43,10 +46,11 @@ public class Stream {
     private final Boolean disabled;
 
     private final UserService userService;
+    private final AlertConditionService alertConditionService;
     private final StreamRule.Factory streamRuleFactory;
 
 	@AssistedInject
-    private Stream(UserService userService, StreamRule.Factory streamRuleFactory, @Assisted StreamSummaryResponse ssr) {
+    private Stream(UserService userService, AlertConditionService alertConditionService, StreamRule.Factory streamRuleFactory, @Assisted StreamSummaryResponse ssr) {
 		this.id = ssr.id;
         this.title = ssr.title;
         this.description = ssr.description;
@@ -58,12 +62,17 @@ public class Stream {
         this.disabled = ssr.disabled;
 
         this.userService = userService;
+        this.alertConditionService = alertConditionService;
         this.streamRuleFactory = streamRuleFactory;
 
         for (StreamRuleSummaryResponse streamRuleSummaryResponse : ssr.streamRules) {
             streamRules.add(streamRuleFactory.fromSummaryResponse(streamRuleSummaryResponse));
         }
 	}
+
+    public void addAlertCondition(CreateAlertConditionRequest r) throws APIException, IOException {
+        alertConditionService.create(this, r);
+    }
 
     public String getId() {
         return id;

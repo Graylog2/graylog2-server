@@ -537,6 +537,17 @@ $(document).ready(function() {
         $(".choose-sort-order").hide();
     });
 
+    // Make a word plural/singular based on input field value.
+    $("input.pluralsingular").on("keyup", function() {
+        var target = $("." + $(this).attr("data-pluralsingular"));
+ console.log($(this).val());
+        if ($(this).val() == "1") {
+            target.text(target.attr("data-singular"));
+        } else {
+            target.text(target.attr("data-plural"));
+        }
+    });
+
     function scrollToSearchbarHint() {
         if ($(document).scrollTop() > 50) {
             $("#scroll-to-search-hint").fadeIn("fast").delay(1500).fadeOut("fast");
