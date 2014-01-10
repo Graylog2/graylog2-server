@@ -30,12 +30,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
-import java.util.List;
 import java.util.Map;
 
 public class NodeService {
-    private static final Logger log = LoggerFactory.getLogger(NodeService.class);
-
     private final ApiClient api;
     private final Node.Factory nodeFactory;
     private final Radio.Factory radioFactory;

@@ -42,7 +42,9 @@ public class ClusterService {
     private final ServerNodes serverNodes;
 
     @Inject
-    private ClusterService(ApiClient api, SystemJob.Factory systemJobFactory, ServerNodes serverNodes) {
+    private ClusterService(ApiClient api,
+                           SystemJob.Factory systemJobFactory,
+                           ServerNodes serverNodes) {
         this.api = api;
         this.systemJobFactory = systemJobFactory;
         this.serverNodes = serverNodes;

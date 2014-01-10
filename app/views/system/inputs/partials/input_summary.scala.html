@@ -1,0 +1,118 @@
+@(inputState: InputState, inputTypes: Map[String, models.api.responses.system.InputTypeSummaryResponse])
+
+@for(input <- Seq(inputState.getInput)) {
+    <div class="row-fluid node-row">
+        <span class="pull-right node-row-info">
+            <span class="text">Started by @views.html.partials.links.to_user(inputState.getInput.getCreatorUser)</span>
+            @if(input.getGlobal == false) {
+                <span class="text" title="@inputState.getNode.getNodeId">on @views.helpers.ClusterEntityHelper.linkToEntity(inputState.getNode)</span>
+            }
+            <span class="text moment-from-now" title="@inputState.getStartedAt">@inputState.getStartedAt</span>
+                &nbsp;
+
+            <form action="@routes.InputsController.terminate(inputState.getNode.getNodeId, input.getId)" method="POST">
+                <button class="btn btn-danger btn-mini"
+                type="submit"
+                data-confirm="Really terminate input?">
+                                            Terminate
+                </button>
+            </form>
+
+            <div class="btn-group">
+                <a class="btn btn-mini dropdown-toggle" data-toggle="dropdown" href="#">
+                                        Action
+                    <span class="caret"></span>
+                </a>
+                <ul class="dropdown-menu">
+                    <li><a href="@routes.ExtractorsController.manage(inputState.getNode.getNodeId, input.getId)">Manage extractors</a></li>
+                    <li><a href="@routes.MetricsController.ofNode(inputState.getNode.getNodeId, (input.getType + "." + input.getId))">Show metrics</a></li>
+                    <li><a href="#" class="add-static-field" data-node-id="@inputState.getNode.getNodeId" data-input-id="@input.getId">Add static field</a></li>
+                    <li><a href="@routes.SearchController.index("gl2_source_input:" + input.getId, "relative", 28800)">Messages from this input</a></li>
+                </ul>
+            </div>
+        </span>
+
+        <h3>
+            <i class="icon icon-ellipsis-vertical"></i>
+            @input.getTitle (@input.getName)
+
+            @if(inputTypes.get(input.getType).linkToDocs != null && !inputTypes.get(input.getType).linkToDocs.isEmpty) {
+                <a href="@inputTypes.get(input.getType).linkToDocs" target="_blank">
+                    <i class="icon icon-question-sign input-docs"></i>
+                </a>
+            }
+
+            @if(inputState.getState == "running") {
+                <span class="label label-success">
+            } else {
+                <span class="label label-warning">
+            }
+                @inputState.getState
+            </span>
+        </h3>
+
+        @if(input.getReadBytes >= 0 && input.getWrittenBytes >= 0) {
+            <div class="input-io focuslimit" data-node-id="@inputState.getNode.getNodeId" data-input-id="@input.getId">
+                Network IO:
+
+                <span class="persec">
+                    <i class="icon icon-caret-down channel-direction channel-direction-down"></i>
+                    <span class="rx value">@lib.Tools.byteToHuman(input.getReadBytes)</span>
+
+                    <i class="icon icon-caret-up channel-direction channel-direction-up"></i>
+                    <span class="tx value">@lib.Tools.byteToHuman(input.getWrittenBytes)</span>
+                </span>
+
+                <span class="total">
+                    (total:
+                    <i class="icon icon-caret-down channel-direction channel-direction-down"></i>
+                    <span class="rx value">@lib.Tools.byteToHuman(input.getTotalReadBytes)</span>
+
+                    <i class="icon icon-caret-up channel-direction channel-direction-up"></i>
+                    <span class="tx value">@lib.Tools.byteToHuman(input.getTotalWrittenBytes)</span>
+                    )
+                </span>
+
+            </div>
+        }
+
+        @if(input.getConnections >= 0 && input.getTotalConnections >= 0) {
+            <div class="input-connections focuslimit" data-node-id="@inputState.getNode.getNodeId" data-input-id="@input.getId">
+                Total connections:
+                <span class="total">@input.getTotalConnections</span>
+                (<span class="active">@input.getConnections</span> active)
+            </div>
+        }
+
+        <div class="well well-small">
+            <ul>
+            @for((k,v) <- input.getAttributes) {
+                <li>@k: @v</li>
+            }
+            </ul>
+        </div>
+
+        @if(!input.getStaticFields.isEmpty) {
+            <div class="static-fields">
+                <h4 style="display: inline;">
+                    <i class="icon icon-tag"></i> Static fields
+                </h4><br />
+                <ul>
+                @for((k,v) <- input.getStaticFields) {
+                    <li>
+                        @k: @v
+
+                    <a href="@routes.InputsController.removeStaticField(inputState.getNode.getNodeId, input.getId, k)"
+                    class="remove-static-field"
+                    style="display: none;"
+                    data-confirm="Really delete static field?">
+                        <i class="icon icon-remove"></i>
+                    </a>
+                    </li>
+                }
+                </ul>
+            </div>
+        }
+
+        </div>
+}

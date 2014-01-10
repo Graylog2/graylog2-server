@@ -58,12 +58,17 @@ public class Input {
     private final String name;
     private final String title;
     private final User creatorUser;
-    private final DateTime startedAt;
+    private final Boolean global;
+    //private final DateTime startedAt;
     private final Map<String, Object> attributes;
     private final Map<String, String> staticFields;
 
     @AssistedInject
-    private Input(ApiClient api, UniversalSearch.Factory searchFactory, UserService userService, @Assisted InputSummaryResponse is, @Assisted ClusterEntity node) {
+    private Input(ApiClient api,
+                  UniversalSearch.Factory searchFactory,
+                  UserService userService,
+                  @Assisted InputSummaryResponse is,
+                  @Assisted ClusterEntity node) {
         this.api = api;
         this.searchFactory = searchFactory;
         this.node = node;
@@ -72,7 +77,8 @@ public class Input {
         this.persistId = is.persistId;
         this.name = is.name;
         this.title = is.title;
-        this.startedAt = DateTime.parse(is.startedAt);
+        this.global = is.global;
+        //this.startedAt = DateTime.parse(is.startedAt);
         this.creatorUser = userService.load(is.creatorUserId);
         this.attributes = is.attributes;
         this.staticFields = is.staticFields;
@@ -130,9 +136,9 @@ public class Input {
         return creatorUser;
     }
 
-    public DateTime getStartedAt() {
+    /*public DateTime getStartedAt() {
         return startedAt;
-    }
+    }*/
 
     public Map<String, String> getStaticFields() {
         return staticFields;
@@ -215,4 +221,24 @@ public class Input {
         return attributes;
     }
 
+    public Boolean getGlobal() {
+        return global;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        Input input = (Input) o;
+
+        if (!persistId.equals(input.persistId)) return false;
+
+        return true;
+    }
+
+    @Override
+    public int hashCode() {
+        return persistId.hashCode();
+    }
 }

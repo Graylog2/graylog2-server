@@ -211,12 +211,35 @@ $(document).ready(function() {
         $.ajax({
             url: '/a/system/notifications',
             success: function(data) {
-                var count = data.count;
+                console.log(data);
+                var count = data.length;
                 if (count > 0) {
                     $("#notification-badge").text(count);
+                    var urgent = data.filter(function(x) { return x.severity == "URGENT"});
+                    if (urgent.length > 0) {
+                        if (!$("#notification-badge").data("bouncing")) {
+                            var bouncer = setInterval(function() {
+                                if ($("#notification-badge").data("bouncing"))
+                                    $("#notification-badge").effect("bounce")
+                            }, 2000);
+
+                            $("#notification-badge").data("bouncing", bouncer);
+                        }
+                    } else {
+                        if ($("#notification-badge").data("bouncing")) {
+                            clearInterval($("#notification-badge").data("bouncing"));
+                            $("#notification-badge").data("bouncing", undefined);
+                        }
+                    }
+                    $("#notification-badge").show();
                 } else {
                     // Badges are collapsing when empty so we make a 0 collapse.
                     $("#notification-badge").text("");
+                    $("#notification-badge").hide();
+                    if ($("#notification-badge").data("bouncing")) {
+                        clearInterval($("#notification-badge").data("bouncing"));
+                        $("#notification-badge").data("bouncing", undefined);
+                    }
                 }
             },
             complete: function() {

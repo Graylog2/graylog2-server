@@ -18,6 +18,8 @@
  */
 package models.api.responses.system;
 
+import java.util.Map;
+
 /**
  * @author Lennart Koopmann <lennart@torch.sh>
  */
@@ -26,5 +28,8 @@ public class NotificationSummaryResponse {
     public String timestamp;
     public String severity;
     public String type;
+    public String node_id;
+
+    public Map<String, Object> details;
 
 }

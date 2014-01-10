@@ -63,6 +63,26 @@ public class ExtractorsController extends AuthenticatedController {
         }
     }
 
+    public Result manageGlobal(String inputId) {
+        try {
+            Node node = nodeService.loadMasterNode();
+            Input input = node.getInput(inputId);
+
+            return ok(views.html.system.inputs.extractors.manage.render(
+                    currentUser(),
+                    standardBreadcrumbs(node, input),
+                    node,
+                    input,
+                    extractorService.all(node, input))
+            );
+        } catch (IOException e) {
+            return status(500, views.html.errors.error.render(ApiClient.ERROR_MSG_IO, e, request()));
+        } catch (APIException e) {
+            String message = "Could not fetch system information. We expected HTTP 200, but got a HTTP " + e.getHttpCode() + ".";
+            return status(500, views.html.errors.error.render(message, e, request()));
+        }
+    }
+
     public Result newExtractor(String nodeId, String inputId, String extractorType, String field, String example) {
         try {
             Node node = nodeService.loadNode(nodeId);

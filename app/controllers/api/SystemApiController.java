@@ -80,10 +80,11 @@ public class SystemApiController extends AuthenticatedController {
 
     public Result notifications() {
         try {
-            Map<String, Object> result = Maps.newHashMap();
-            result.put("count", clusterService.allNotifications().size());
+            /*Map<String, Object> result = Maps.newHashMap();
+            result.put("count", clusterService.allNotifications().size());*/
+            List<Notification> notifications = clusterService.allNotifications();
 
-            return ok(new Gson().toJson(result)).as("application/json");
+            return ok(new Gson().toJson(notifications)).as("application/json");
         } catch (IOException e) {
             return internalServerError("io exception");
         } catch (APIException e) {

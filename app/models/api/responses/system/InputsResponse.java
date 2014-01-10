@@ -26,6 +26,6 @@ import java.util.List;
 public class InputsResponse {
 
     public int total;
-    public List<InputSummaryResponse> inputs;
+    public List<InputStateSummaryResponse> inputs;
 
 }

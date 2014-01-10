@@ -20,6 +20,12 @@
 
     @if(Permissions.isPermitted(RestPermissions.INDICES_READ)) {
     <li>
+        <a href="@routes.InputsController.index()">
+            Inputs
+        </a>
+    </li>
+
+    <li>
         <a href="@routes.IndicesController.index()">
             Indices
         </a>

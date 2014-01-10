@@ -43,6 +43,7 @@ public class ModelFactoryModule extends AbstractModule {
         install(new FactoryModuleBuilder().build(Index.Factory.class));
         install(new FactoryModuleBuilder().build(SavedSearch.Factory.class));
         install(new FactoryModuleBuilder().build(AlertCondition.Factory.class));
+        install(new FactoryModuleBuilder().build(InputState.Factory.class));
 
         // TODO crutch, because we need the factory for systemjobs in all().
         // can this be done with a second factory for the list?

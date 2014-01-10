@@ -18,22 +18,27 @@
  */
 package models;
 
-import lib.notifications.DeflectorExistsAsIndexNotification;
-import lib.notifications.EsOpenFilesNotification;
-import lib.notifications.MultiMasterNotification;
-import lib.notifications.NotificationType;
+import com.google.inject.Inject;
+import lib.notifications.*;
 import models.api.responses.system.NotificationSummaryResponse;
 import org.joda.time.DateTime;
+
+import java.util.Map;
 
 /**
  * @author Lennart Koopmann <lennart@torch.sh>
  */
 public class Notification {
 
+    @Inject
+    private NodeService nodeService;
+
     public enum Type {
         DEFLECTOR_EXISTS_AS_INDEX,
         MULTI_MASTER,
-        ES_OPEN_FILES;
+        ES_OPEN_FILES,
+        NO_INPUT_RUNNING,
+        INPUT_FAILED_TO_START;
 
         public static Type fromString(String name) {
             return valueOf(name.toUpperCase());
@@ -46,10 +51,16 @@ public class Notification {
 
     private final Type type;
     private final DateTime timestamp;
+    private final Severity severity;
+    private final String node_id;
+    private final Map<String, Object> details;
 
     public Notification(NotificationSummaryResponse x) {
         this.type = Type.valueOf(x.type.toUpperCase());
         this.timestamp = DateTime.parse(x.timestamp);
+        this.severity = Severity.valueOf(x.severity.toUpperCase());
+        this.node_id = x.node_id;
+        this.details = x.details;
     }
 
     public NotificationType get() {
@@ -60,6 +71,10 @@ public class Notification {
                 return new MultiMasterNotification();
             case ES_OPEN_FILES:
                 return new EsOpenFilesNotification();
+            case NO_INPUT_RUNNING:
+                return new NoInputRunningNotification(getNodeId());
+            case INPUT_FAILED_TO_START:
+                return new InputFailedToStartNotification(this);
         }
 
         throw new RuntimeException("No notification registered for " + type);
@@ -73,4 +88,26 @@ public class Notification {
         return timestamp;
     }
 
+    public String getNodeId() {
+        return this.node_id;
+    }
+
+    public Node getNode() {
+        try {
+            return nodeService.loadNode(this.node_id);
+        } catch (NodeService.NodeNotFoundException e) {
+            return null;
+        }
+    }
+
+    public Map<String, Object> getDetails() {
+        return details;
+    }
+
+    public Object getDetail(String id) {
+        if (details == null)
+            return null;
+
+        return details.get(id);
+    }
 }

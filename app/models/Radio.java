@@ -30,6 +30,7 @@ import lib.ExclusiveInputException;
 import lib.metrics.Metric;
 import models.api.requests.InputLaunchRequest;
 import models.api.responses.BuffersResponse;
+import models.api.responses.EmptyResponse;
 import models.api.responses.SystemOverviewResponse;
 import models.api.responses.cluster.RadioSummaryResponse;
 import models.api.responses.metrics.MetricsListResponse;
@@ -115,6 +116,10 @@ public class Radio extends ClusterEntity {
         }
     }
 
+    public String getNodeId() {
+        return getShortNodeId();
+    }
+
     @Override
     public String getShortNodeId() {
         return shortNodeId;
@@ -138,6 +143,23 @@ public class Radio extends ClusterEntity {
 
     public String getJVMDescription() {
         return jvm().getInfo();
+    }
+
+    public boolean launchExistingInput(String inputId) {
+        try {
+            api.get(EmptyResponse.class)
+                    .path("/system/inputs/{0}", inputId)
+                    .radio(this)
+                    .expect(Http.Status.ACCEPTED)
+                    .execute();
+            return true;
+        } catch (APIException e) {
+            log.error("Could not terminate input " + inputId, e);
+        } catch (IOException e) {
+            log.error("Could not terminate input " + inputId, e);
+        }
+
+        return false;
     }
 
     @Override
@@ -215,8 +237,8 @@ public class Radio extends ClusterEntity {
     public List<Input> getInputs() {
         List<Input> inputs = Lists.newArrayList();
 
-        for (InputSummaryResponse input : inputs().inputs) {
-            inputs.add(inputFactory.fromSummaryResponse(input, this));
+        for (InputStateSummaryResponse input : inputs().inputs) {
+            inputs.add(inputFactory.fromSummaryResponse(input.messageinput, this));
         }
 
         return inputs;
@@ -241,7 +263,8 @@ public class Radio extends ClusterEntity {
         }
     }
 
-    public boolean launchInput(String title, String type, Map<String, Object> configuration, User creator, boolean isExclusive) throws ExclusiveInputException {
+    @Override
+    public InputLaunchResponse launchInput(String title, String type, Boolean global, Map<String, Object> configuration, User creator, boolean isExclusive) throws ExclusiveInputException {
         if (isExclusive) {
             for (Input input : getInputs()) {
                 if (input.getType().equals(type)) {
@@ -253,23 +276,24 @@ public class Radio extends ClusterEntity {
         InputLaunchRequest request = new InputLaunchRequest();
         request.title = title;
         request.type = type;
+        request.global = global;
         request.configuration = configuration;
         request.creatorUserId = creator.getId();
 
+        InputLaunchResponse ilr = null;
         try {
-            api.post()
+            ilr = api.post(InputLaunchResponse.class)
                     .path("/system/inputs")
                     .radio(this)
                     .body(request)
                     .expect(Http.Status.ACCEPTED)
                     .execute();
-            return true;
         } catch (APIException e) {
             log.error("Could not launch input " + title, e);
         } catch (IOException e) {
             log.error("Could not launch input " + title, e);
         }
-        return false;
+        return ilr;
     }
 
     public BufferInfo getBuffers() {

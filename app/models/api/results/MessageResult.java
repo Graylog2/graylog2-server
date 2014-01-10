@@ -157,15 +157,4 @@ public class MessageResult {
         }
     }
 
-    /*public List<Stream> getStreams() throws IOException, APIException {
-        List<Stream> result = Lists.newArrayList();
-        for (String streamId : getStreamIds()) {
-            System.out.println("Fetching stream " + streamId);
-            Stream stream = streamService.get(streamId);
-            if (stream != null)
-                result.add(stream);
-        }
-        return result;
-    }*/
-
 }

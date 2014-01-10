@@ -1,0 +1,8 @@
+@(nodeStates: Map[Node, InputState])
+@import views.helpers.InputStateHelper
+
+@for((state, count) <- InputStateHelper.stateCounts(nodeStates)) {
+    <span class="label label-@InputStateHelper.labelClassForState(state)">
+        @count @state
+    </span>
+}

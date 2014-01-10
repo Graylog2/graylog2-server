@@ -19,10 +19,13 @@
  */
 package models;
 
+import lib.ExclusiveInputException;
+import models.api.responses.system.InputLaunchResponse;
 import org.slf4j.LoggerFactory;
 
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.util.Map;
 
 /**
  * @author Lennart Koopmann <lennart@torch.sh>
@@ -60,5 +63,6 @@ public abstract class ClusterEntity {
     public abstract void touch();
     public abstract void markFailure();
     public abstract boolean terminateInput(String inputId);
-
+    public abstract String getNodeId();
+    public abstract InputLaunchResponse launchInput(String title, String type, Boolean global, Map<String, Object> configuration, User creator, boolean isExclusive) throws ExclusiveInputException;
 }

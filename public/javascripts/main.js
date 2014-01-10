@@ -219,13 +219,24 @@ $(document).ready(function() {
     });
 
     // Add static field to input.
-    $(".input-list .add-static-field").on("click", function() {
+    $(".input-list .add-static-field").on("click", function(event) {
+        event.preventDefault();
         var modal = $(".input-add-static-field");
         modal.modal();
 
         $("input", modal).val("");
         $("form", modal).attr("action", "/system/inputs/" + $(this).attr("data-node-id") + "/" + $(this).attr("data-input-id") + "/staticfields");
     });
+
+    $(".input-list .add-static-field-global").on("click", function(event) {
+        event.preventDefault();
+        var modal = $(".input-add-static-field");
+        modal.modal();
+
+        $("input", modal).val("");
+        $("form", modal).attr("action", "/system/inputs/" + $(this).attr("data-input-id") + "/staticfields");
+    });
+
 
     // Remove static field.
     $(".input-list .static-fields ul li").on("mouseenter", function() {
@@ -632,6 +643,19 @@ $(document).ready(function() {
             $.post(url, {}, function() {
                 elem.fadeOut();
             });
+        }
+    });
+
+    $("input.input-global-checkbox").on("click", function(event) {
+        var form = $(this).closest("form");
+        var nodeselector = $("select.input-node-selector", form);
+        console.log(form);
+        console.log(nodeselector);
+
+        if ($(this).is(":checked")) {
+            nodeselector.prop('disabled', true);
+        } else {
+            nodeselector.prop('disabled', false);
         }
     });
 });
