@@ -168,6 +168,14 @@ public class StreamImpl extends Persisted implements Stream {
 
         return conditions;
     }
+
+    public void addAlertCondition(AlertCondition condition) throws ValidationException {
+        embed(EMBEDDED_ALERT_CONDITIONS, condition);
+    }
+
+    public void removeAlertCondition(String conditionId) {
+        removeEmbedded(EMBEDDED_ALERT_CONDITIONS, conditionId);
+    }
 	
     @Override
     public String toString() {
