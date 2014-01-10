@@ -22,8 +22,6 @@
 package org.graylog2.plugin.inputs;
 
 import com.google.common.collect.Maps;
-import com.google.common.collect.Sets;
-import org.graylog2.plugin.GraylogServer;
 import org.graylog2.plugin.InputHost;
 import org.graylog2.plugin.Tools;
 import org.graylog2.plugin.configuration.Configuration;
@@ -34,7 +32,6 @@ import org.joda.time.DateTime;
 
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 /**
  * @author Lennart Koopmann <lennart@socketfeed.com>
@@ -46,6 +43,7 @@ public abstract class MessageInput {
     protected String inputId;
     protected String persistId;
     protected DateTime createdAt;
+    protected Boolean global = false;
 
     protected Configuration configuration;
     protected InputHost graylogServer;
@@ -79,7 +77,7 @@ public abstract class MessageInput {
     }
 
     public String getId() {
-        return inputId;
+        return persistId;
     }
 
     public String getPersistId() {
@@ -112,6 +110,14 @@ public abstract class MessageInput {
 
     public Configuration getConfiguration() {
         return configuration;
+    }
+
+    public Boolean getGlobal() {
+        return global;
+    }
+
+    public void setGlobal(Boolean global) {
+        this.global = global;
     }
 
     public Object getAttributesWithMaskedPasswords() {
@@ -147,6 +153,7 @@ public abstract class MessageInput {
         inputMap.put("started_at", Tools.getISO8601String(this.getCreatedAt()));
         inputMap.put("attributes", this.getAttributesWithMaskedPasswords());
         inputMap.put("static_fields", this.getStaticFields());
+        inputMap.put("global", this.getGlobal());
 
         return inputMap;
     }
@@ -170,6 +177,21 @@ public abstract class MessageInput {
     public String getUniqueReadableId() {
         String readableId = getClass().getName() + "." + getId();
         return readableId;
+    }
+
+    @Override
+    public int hashCode() {
+        return getPersistId().hashCode();
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (obj instanceof MessageInput) {
+            MessageInput input = (MessageInput) obj;
+            return this.getPersistId().equals(input.getPersistId());
+        } else {
+            return false;
+        }
     }
 
 }

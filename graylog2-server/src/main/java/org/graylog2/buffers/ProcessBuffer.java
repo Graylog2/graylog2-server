@@ -102,7 +102,7 @@ public class ProcessBuffer extends Buffer {
     public void insertCached(Message message, MessageInput sourceInput) {
         message.setSourceInput(sourceInput);
 
-        message.addField(SOURCE_INPUT_ATTR_NAME, sourceInput.getId());
+        message.addField(SOURCE_INPUT_ATTR_NAME, sourceInput.getPersistId());
         message.addField(SOURCE_NODE_ATTR_NAME, server.getNodeId());
 
         if (!server.isProcessing()) {

@@ -25,6 +25,8 @@ import com.mongodb.BasicDBObject;
 import com.mongodb.DBObject;
 import org.bson.types.ObjectId;
 import org.graylog2.Core;
+import org.graylog2.cluster.Node;
+import org.graylog2.cluster.NodeNotFoundException;
 import org.graylog2.database.Persisted;
 import org.graylog2.database.ValidationException;
 import org.graylog2.database.validators.Validator;
@@ -33,6 +35,7 @@ import org.joda.time.DateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -48,16 +51,19 @@ public class Notification extends Persisted {
     public enum Type {
         DEFLECTOR_EXISTS_AS_INDEX,
         MULTI_MASTER,
-        ES_OPEN_FILES
+        ES_OPEN_FILES,
+        NO_INPUT_RUNNING,
+        INPUT_FAILED_TO_START
     }
 
     public enum Severity {
         NORMAL, URGENT
     }
 
-    private final Type type;
-    private final Severity severity;
-    private final DateTime timestamp;
+    private Type type;
+    private Severity severity;
+    private DateTime timestamp;
+    private String node_id;
 
     protected Notification(ObjectId id, Core core, Map<String, Object> fields) {
         super(core, id, fields);
@@ -65,6 +71,7 @@ public class Notification extends Persisted {
         this.type = Type.valueOf(((String) fields.get("type")).toUpperCase());
         this.severity = Severity.valueOf(((String) fields.get("severity")).toUpperCase());
         this.timestamp = new DateTime(fields.get("timestamp"));
+        this.node_id = (String)fields.get("node_id");
     }
 
     protected Notification(Core core, Map<String, Object> fields) {
@@ -73,10 +80,81 @@ public class Notification extends Persisted {
         this.type = Type.valueOf(((String) fields.get("type")).toUpperCase());
         this.severity = Severity.valueOf(((String) fields.get("severity")).toUpperCase());
         this.timestamp = new DateTime(fields.get("timestamp"));
+        this.node_id = (String)fields.get("node_id");
     }
 
+    public Notification(Core core) {
+        super(core, new HashMap<String, Object>());
+    }
+
+    public static Notification build(Core core) {
+        return new Notification(core);
+    }
+
+    public static Notification buildNow(Core core) {
+        Notification notification = build(core);
+        notification.addTimestamp(Tools.iso8601());
+
+        return notification;
+    }
     public static void publish(Core core, Type type, Severity severity) {
+        publish(core, type, severity, null);
+    }
+
+    public Notification addType(Type type) {
+        this.type = type;
+        fields.put("type", type.toString().toLowerCase());
+        return this;
+    }
+
+    public Notification addTimestamp(DateTime timestamp) {
+        this.timestamp = timestamp;
+        fields.put("timestamp", Tools.getISO8601String(timestamp));
+
+        return this;
+    }
+
+    public Notification addSeverity(Severity severity) {
+        this.severity = severity;
+        fields.put("severity", severity.toString().toLowerCase());
+        return this;
+    }
+
+    public Notification addNode(Node node) {
+        fields.put("node_id", node.getNodeId());
+        return this;
+    }
+
+    public Notification addThisNode() {
+        Node node;
+        try {
+            node = Node.thisNode(this.core);
+        } catch (NodeNotFoundException e) {
+            return this;
+        }
+
+        addNode(node);
+
+        return this;
+    }
+
+    public Notification publish() {
         // Write only if there is no such warning yet.
+        if (!isFirst(core, this.type)) {
+            return this;
+        }
+        try {
+            this.save();
+        } catch(ValidationException e) {
+            // We have no validations, but just in case somebody adds some...
+            LOG.error("Validating user warning failed.", e);
+        }
+
+        return this;
+    }
+
+    public static void publish(Core core, Type type, Severity severity, Node node) {
+        /*// Write only if there is no such warning yet.
         if (!isFirst(core, type)) {
             return;
         }
@@ -86,6 +164,9 @@ public class Notification extends Persisted {
         fields.put("severity", severity.toString().toLowerCase());
         fields.put("timestamp", Tools.iso8601());
 
+        if (node != null)
+            fields.put("node_id", node.getNodeId());
+
         Notification w = new Notification(core, fields);
 
         try {
@@ -93,11 +174,31 @@ public class Notification extends Persisted {
         } catch(ValidationException e) {
             // We have no validations, but just in case somebody adds some...
             LOG.error("Validating user warning failed.", e);
-        }
+        }*/
+
+        Notification notification = new Notification(core);
+        notification.addType(type).addSeverity(severity).addNode(node).publish();
     }
 
     public static void fixed(Core core, Type type) {
-        destroy(new BasicDBObject("type", type.toString().toLowerCase()), core, COLLECTION);
+        fixed(core, type, null);
+    }
+
+    public static void fixed(Core core, Type type, Node node) {
+        BasicDBObject qry = new BasicDBObject();
+        qry.put("type", type.toString().toLowerCase());
+        if (node != null)
+            qry.put("node_id", node.getNodeId());
+        destroy(qry, core, COLLECTION);
+    }
+
+    public void fixed() {
+        BasicDBObject qry = new BasicDBObject();
+        for (Map.Entry<String, Object> entry : fields.entrySet()) {
+            qry.put(entry.getKey(), entry.getValue());
+        }
+
+        destroy(qry, core, COLLECTION);
     }
 
     public static boolean isFirst(Core core, Type type) {
@@ -129,6 +230,31 @@ public class Notification extends Persisted {
 
     public Severity getSeverity() {
         return severity;
+    }
+
+    public Node getNode() {
+        return Node.byNodeId(core, this.node_id);
+    }
+
+    public String getNodeId() {
+        return this.node_id;
+    }
+
+    public Notification addDetail(String key, Object value) {
+        Map<String, Object> details;
+        if (fields.get("details") == null)
+            fields.put("details", new HashMap<String, Object>());
+
+        details = (Map<String, Object>)fields.get("details");
+        details.put(key, value);
+        return this;
+    }
+
+    public Map<String, Object> asMap() {
+        Map<String, Object> result = Maps.newHashMap(fields);
+        result.remove("_id");
+
+        return result;
     }
 
     @Override

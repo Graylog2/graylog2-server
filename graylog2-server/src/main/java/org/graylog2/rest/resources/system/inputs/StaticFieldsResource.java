@@ -66,7 +66,7 @@ public class StaticFieldsResource extends RestResource {
         }
         checkPermission(RestPermissions.INPUTS_EDIT, inputId);
 
-        MessageInput input = core.inputs().getRunningInputs().get(inputId);
+        MessageInput input = core.inputs().getRunningInput(inputId);
 
         if (input == null) {
             LOG.error("Input <{}> not found.", inputId);
@@ -133,7 +133,7 @@ public class StaticFieldsResource extends RestResource {
         }
         checkPermission(RestPermissions.INPUTS_EDIT, inputId);
 
-        MessageInput input = core.inputs().getRunningInputs().get(inputId);
+        MessageInput input = core.inputs().getRunningInput(inputId);
 
         if (input == null) {
             LOG.error("Input <{}> not found.", inputId);

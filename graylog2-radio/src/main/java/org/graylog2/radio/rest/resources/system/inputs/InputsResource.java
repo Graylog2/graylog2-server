@@ -24,6 +24,7 @@ import com.codahale.metrics.annotation.Timed;
 import com.google.common.collect.Maps;
 import org.graylog2.plugin.configuration.Configuration;
 import org.graylog2.plugin.configuration.ConfigurationException;
+import org.graylog2.plugin.inputs.InputState;
 import org.graylog2.plugin.inputs.MessageInput;
 import org.graylog2.radio.inputs.InputRegistry;
 import org.graylog2.radio.inputs.NoSuchInputTypeException;
@@ -54,14 +55,15 @@ public class InputsResource extends RestResource {
     @GET @Timed
     @Produces(MediaType.APPLICATION_JSON)
     public String list() {
-        List<Map<String, Object>> inputs = Lists.newArrayList();
+        LOG.info("Listing inputs");
+        List<Map<String, Object>> inputStates = Lists.newArrayList();
 
-        for (MessageInput input : radio.inputs().getRunningInputs().values()) {
-            inputs.add(input.asMap());
+        for (InputState inputState : radio.inputs().getRunningInputs()) {
+            inputStates.add(inputState.asMap());
         }
 
         Map<String, Object> result = Maps.newHashMap();
-        result.put("inputs", inputs);
+        result.put("inputs", inputStates);
         result.put("total", radio.inputs().runningCount());
 
         return json(result);
@@ -71,7 +73,7 @@ public class InputsResource extends RestResource {
     @Produces(MediaType.APPLICATION_JSON)
     @Path("/{inputId}")
     public String single(@PathParam("inputId") String inputId) {
-        MessageInput input = radio.inputs().getRunningInputs().get(inputId);
+        MessageInput input = radio.inputs().getRunningInput(inputId);
 
         if (input == null) {
             LOG.info("Input [{}] not found. Returning HTTP 404.", inputId);
@@ -135,7 +137,7 @@ public class InputsResource extends RestResource {
     @DELETE @Timed
     @Path("/{inputId}")
     public Response terminate(@PathParam("inputId") String inputId) {
-        MessageInput input = radio.inputs().getRunningInputs().get(inputId);
+        MessageInput input = radio.inputs().getRunningInput(inputId);
 
         String msg = "Attempting to terminate input [" + input.getName()+ "]. Reason: REST request.";
         LOG.info(msg);
@@ -157,7 +159,7 @@ public class InputsResource extends RestResource {
 
         // Shutdown actual input.
         input.stop();
-        radio.inputs().getRunningInputs().remove(input.getId());
+        radio.inputs().removeFromRunning(input);
 
         String msg2 = "Terminated input [" + input.getName()+ "]. Reason: REST request.";
         LOG.info(msg2);

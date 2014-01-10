@@ -99,7 +99,7 @@ public class ProcessBuffer extends Buffer {
     public void insertCached(Message message, MessageInput sourceInput) {
         message.setSourceInput(sourceInput);
 
-        message.addField(SOURCE_RADIO_INPUT_ATTR_NAME, sourceInput.getId());
+        message.addField(SOURCE_RADIO_INPUT_ATTR_NAME, sourceInput.getPersistId());
         message.addField(SOURCE_RADIO_ATTR_NAME, radio.getNodeId());
 
         if (!hasCapacity()) {

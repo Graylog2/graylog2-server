@@ -70,16 +70,22 @@ public class FakeHttpMessageInput extends MessageInput {
 
     @Override
     public void launch() throws MisfireException {
-        FakeHttpMessageGenerator generator = new FakeHttpMessageGenerator(source);
-        while(!stopRequested) {
-            graylogServer.getProcessBuffer().insertCached(generator.generate(), this);
+        final MessageInput thisInput = this;
+        final FakeHttpMessageGenerator generator = new FakeHttpMessageGenerator(source);
+        Thread t = new Thread(new Runnable() {
+            public void run() {
+                while(!stopRequested) {
+                    graylogServer.getProcessBuffer().insertCached(generator.generate(), thisInput);
 
-            try {
-                Thread.sleep(Tools.deviation(sleepMs, maxSleepDeviation, rand));
-            } catch (InterruptedException e) {
-                break;
+                    try {
+                        Thread.sleep(Tools.deviation(sleepMs, maxSleepDeviation, rand));
+                    } catch (InterruptedException e) {
+                        break;
+                    }
+                }
             }
-        }
+        });
+        t.start();
     }
 
     @Override

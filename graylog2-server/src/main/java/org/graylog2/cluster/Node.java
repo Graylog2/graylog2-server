@@ -127,6 +127,15 @@ public class Node extends Persisted {
         return nodes;
     }
 
+    public static Map<String, Node> allActive(Core core) {
+        Map<String, Node> nodes = Maps.newHashMap();
+
+        for (Type type : Node.Type.values())
+            nodes.putAll(Node.allActive(core, type));
+
+        return nodes;
+    }
+
     public static void dropOutdated(Core core) {
         BasicDBObject query = new BasicDBObject();
         query.put("last_seen", new BasicDBObject("$lt", Tools.getUTCTimestamp()-PING_TIMEOUT));
