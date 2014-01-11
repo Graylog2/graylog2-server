@@ -21,7 +21,14 @@ package org.graylog2.alerts.types;
 
 import org.graylog2.Core;
 import org.graylog2.alerts.AlertCondition;
+import org.graylog2.indexer.IndexHelper;
+import org.graylog2.indexer.searches.timeranges.InvalidRangeParametersException;
+import org.graylog2.indexer.searches.timeranges.RelativeRange;
+import org.graylog2.plugin.Tools;
+import org.graylog2.plugin.streams.Stream;
 import org.joda.time.DateTime;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.Map;
 
@@ -29,6 +36,8 @@ import java.util.Map;
  * @author Lennart Koopmann <lennart@torch.sh>
  */
 public class MessageCountAlertCondition extends AlertCondition {
+
+    private static final Logger LOG = LoggerFactory.getLogger(MessageCountAlertCondition.class);
 
     public enum ThresholdType {
         MORE, LESS
@@ -39,8 +48,8 @@ public class MessageCountAlertCondition extends AlertCondition {
     private ThresholdType thresholdType;
     private int threshold;
 
-    public MessageCountAlertCondition(Core core, String id, DateTime createdAt, String creatorUserId, Map<String, Object> parameters) {
-        super(core, id, Type.MESSAGE_COUNT, createdAt, creatorUserId, parameters);
+    public MessageCountAlertCondition(Core core, Stream stream, String id, DateTime createdAt, String creatorUserId, Map<String, Object> parameters) {
+        super(core, stream, id, Type.MESSAGE_COUNT, createdAt, creatorUserId, parameters);
 
         this.grace = (Integer) parameters.get("grace");
         this.time = (Integer) parameters.get("time");
@@ -59,8 +68,45 @@ public class MessageCountAlertCondition extends AlertCondition {
     }
 
     @Override
-    public boolean triggered() {
-        return false;
+    protected CheckResult runCheck() {
+        try {
+            String filter = "streams:"+stream.getId();
+            long count = core.getIndexer().searches().count("*", new RelativeRange(time * 60), filter).getCount();
+
+            LOG.debug("Alert check <{}> result: [{}]", id, count);
+
+            boolean triggered = false;
+            switch (thresholdType) {
+                case MORE:
+                    triggered = count > threshold;
+                    break;
+                case LESS:
+                    triggered = count < threshold;
+                    break;
+            }
+
+            if (triggered) {
+                StringBuilder resultDescription = new StringBuilder();
+
+                resultDescription.append("Stream had ").append(count).append(" messages in the last ")
+                        .append(time).append(" minutes with trigger condition ")
+                        .append(thresholdType.toString().toLowerCase()).append(" than ")
+                        .append(threshold).append(" messages. ")
+                        .append("(Current grace time: ").append(grace).append(" minutes)");
+
+                return new CheckResult(true, this, resultDescription.toString(), Tools.iso8601());
+            } else {
+                return new CheckResult(false);
+            }
+        } catch (InvalidRangeParametersException e) {
+            // cannot happen lol
+            LOG.error("Invalid timerange.", e);
+            return null;
+        } catch (IndexHelper.InvalidRangeFormatException e) {
+            // lol same here
+            LOG.error("Invalid timerange format.", e);
+            return null;
+        }
     }
 
 }

@@ -20,6 +20,7 @@
 package org.graylog2.periodical;
 
 import org.graylog2.Core;
+import org.graylog2.alerts.Alert;
 import org.graylog2.alerts.AlertCondition;
 import org.graylog2.plugin.streams.Stream;
 import org.graylog2.streams.StreamImpl;
@@ -60,9 +61,24 @@ public class AlertScannerThread implements Runnable {
 
             // Check if a threshold is reached.
             for (AlertCondition alertCondition : stream.getAlertConditions()) {
-                if (alertCondition.triggered()) {
-                    // Send alerts.
-                    LOG.info("Alert condition [{}] of stream [{}] is triggered. Sending alerts.", alertCondition, stream);
+                try {
+                    AlertCondition.CheckResult result = alertCondition.triggered();
+                    if (result.isTriggered()) {
+                        // Alert is triggered!
+                        LOG.info("Alert condition [{}] of stream [{}] is triggered. Sending alerts.", alertCondition, stream);
+
+                        // Persist alert.
+                        Alert alert = Alert.factory(result, server);
+                        alert.save();
+
+                        // Send alerts.
+                    } else {
+                        // Alert not triggered.
+                        LOG.debug("Alert condition [{}] of stream [{}] is not triggered.", alertCondition, stream);
+                    }
+                } catch(Exception e) {
+                    LOG.error("Skipping alert check that threw an exception.", e);
+                    continue;
                 }
             }
 
