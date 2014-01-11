@@ -19,14 +19,20 @@
  */
 package org.graylog2.alerts;
 
+import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
+import com.mongodb.BasicDBObject;
+import com.mongodb.DBObject;
 import org.bson.types.ObjectId;
 import org.graylog2.Core;
 import org.graylog2.database.Persisted;
 import org.graylog2.database.validators.Validator;
+import org.graylog2.plugin.Tools;
+import org.joda.time.DateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -36,10 +42,16 @@ public class Alert extends Persisted {
 
     private static final Logger LOG = LoggerFactory.getLogger(Alert.class);
 
-    private static final String COLLECTION = "alerts";
+    public static final String COLLECTION = "alerts";
+
+    public static final int MAX_LIST_COUNT = 100;
 
     protected Alert(Core core, Map<String, Object> fields) {
         super(core, fields);
+    }
+
+    protected Alert(Core core, ObjectId id, Map<String, Object> fields) {
+        super(core, id, fields);
     }
 
     public static Alert factory(AlertCondition.CheckResult checkResult, Core core) {
@@ -56,6 +68,43 @@ public class Alert extends Persisted {
         fields.put("condition_parameters", checkResult.getTriggeredCondition().getParameters());
 
         return new Alert(core, fields);
+    }
+
+    public static List<Alert> loadRecentOfStream(Core core, String streamId) {
+        BasicDBObject query = new BasicDBObject("stream_id", streamId);
+        BasicDBObject sort = new BasicDBObject("triggered_at", -1);
+
+        final List<DBObject> alertObjects = query(
+                query,
+                sort,
+                MAX_LIST_COUNT,
+                0,
+                core,
+                COLLECTION
+        );
+
+        List<Alert> alerts = Lists.newArrayList();
+
+        for (DBObject alertObj : alertObjects) {
+            alerts.add(new Alert(core, (ObjectId) alertObj.get("_id"), alertObj.toMap()));
+        }
+
+        return alerts;
+    }
+
+    public Map<String,Object> toMap() {
+        Map<String, Object> map = Maps.newHashMap();
+
+        DateTime triggeredAt = new DateTime(fields.get("triggered_at"));
+
+        map.put("id", ((ObjectId) fields.get("_id")).toStringMongod());
+        map.put("condition_id", fields.get("condition_id"));
+        map.put("stream_id", fields.get("stream_id"));
+        map.put("description", fields.get("description"));
+        map.put("condition_parameters", fields.get("condition_parameters"));
+        map.put("triggered_at", Tools.getISO8601String(triggeredAt));
+
+        return map;
     }
 
     @Override

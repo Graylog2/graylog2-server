@@ -23,6 +23,7 @@ import com.codahale.metrics.annotation.Timed;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
+import org.graylog2.alerts.Alert;
 import org.graylog2.alerts.AlertCondition;
 import org.graylog2.database.*;
 import org.graylog2.plugin.Tools;
@@ -79,10 +80,9 @@ public class StreamAlertResource extends RestResource {
             throw new WebApplicationException(404);
         }
 
-
         final AlertCondition alertCondition;
         try {
-            alertCondition = AlertCondition.fromRequest(ccr, Tools.iso8601(), stream, core);
+            alertCondition = AlertCondition.fromRequest(ccr, stream, core);
         } catch (AlertCondition.NoSuchAlertConditionTypeException e) {
             LOG.error("Invalid alarm condition type.", e);
             throw new WebApplicationException(e, Response.Status.BAD_REQUEST);
@@ -102,6 +102,36 @@ public class StreamAlertResource extends RestResource {
     }
 
     @GET @Timed
+    @ApiOperation(value = "Get the " + Alert.MAX_LIST_COUNT + " most recent alarms of this stream.")
+    @Produces(MediaType.APPLICATION_JSON)
+    @ApiResponses(value = {
+            @ApiResponse(code = 404, message = "Stream not found."),
+            @ApiResponse(code = 400, message = "Invalid ObjectId.")
+    })
+    public Response list(@ApiParam(title = "streamId", description = "The stream id this new alert condition belongs to.", required = true) @PathParam("streamId") String streamid) {
+        checkPermission(RestPermissions.STREAMS_READ, streamid);
+
+        StreamImpl stream;
+        try {
+            stream = StreamImpl.load(loadObjectId(streamid), core);
+        } catch (org.graylog2.database.NotFoundException e) {
+            throw new WebApplicationException(404);
+        }
+
+        List<Map<String,Object>> conditions = Lists.newArrayList();
+        for(Alert alert : Alert.loadRecentOfStream(core, stream.getId())) {
+            conditions.add(alert.toMap());
+        }
+
+        long total = Alert.totalCount(core, Alert.COLLECTION);
+
+        Map<String, Object> result = Maps.newHashMap();
+        result.put("alerts", conditions);
+        result.put("total", total);
+
+        return Response.status(Response.Status.OK).entity(json(result)).build();
+    }
+    @GET @Timed
     @Path("conditions")
     @ApiOperation(value = "Get all alert conditions of this stream")
     @Produces(MediaType.APPLICATION_JSON)
@@ -109,7 +139,7 @@ public class StreamAlertResource extends RestResource {
             @ApiResponse(code = 404, message = "Stream not found."),
             @ApiResponse(code = 400, message = "Invalid ObjectId.")
     })
-    public Response list(@ApiParam(title = "streamId", description = "The stream id this new alert condition belongs to.", required = true) @PathParam("streamId") String streamid) {
+    public Response listConditions(@ApiParam(title = "streamId", description = "The stream id this new alert condition belongs to.", required = true) @PathParam("streamId") String streamid) {
         checkPermission(RestPermissions.STREAMS_READ, streamid);
 
         StreamImpl stream;

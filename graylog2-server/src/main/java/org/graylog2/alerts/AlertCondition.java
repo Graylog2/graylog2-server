@@ -32,6 +32,7 @@ import org.slf4j.LoggerFactory;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.UUID;
 
 /**
  * @author Lennart Koopmann <lennart@torch.sh>
@@ -54,7 +55,12 @@ public abstract class AlertCondition implements EmbeddedPersistable {
     private final Map<String, Object> parameters;
 
     protected AlertCondition(Core core, Stream stream, String id, Type type, DateTime createdAt, String creatorUserId, Map<String, Object> parameters) {
-        this.id = id;
+        if(id == null) {
+            this.id = UUID.randomUUID().toString();
+        } else {
+            this.id = id;
+        }
+
         this.stream = stream;
         this.type = type;
         this.createdAt = createdAt;
@@ -67,7 +73,7 @@ public abstract class AlertCondition implements EmbeddedPersistable {
     public abstract String getDescription();
     protected abstract CheckResult runCheck();
 
-    public static AlertCondition fromRequest(CreateConditionRequest ccr, DateTime createdAt, Stream stream, Core core) throws NoSuchAlertConditionTypeException {
+    public static AlertCondition fromRequest(CreateConditionRequest ccr, Stream stream, Core core) throws NoSuchAlertConditionTypeException {
         Type type;
         try {
             type = Type.valueOf(ccr.type.toUpperCase());
@@ -82,10 +88,10 @@ public abstract class AlertCondition implements EmbeddedPersistable {
                 return new MessageCountAlertCondition(
                         core,
                         stream,
-                        (String) parameters.get("id"),
-                        DateTime.parse((String) parameters.get("created_at")),
-                        (String) parameters.get("creator_user_id"),
-                        (Map<String, Object>) parameters.get("parameters")
+                        null,
+                        Tools.iso8601(),
+                        ccr.creatorUserId,
+                        parameters
                 );
         }
 
@@ -144,7 +150,7 @@ public abstract class AlertCondition implements EmbeddedPersistable {
     public Map<String, Object> getPersistedFields() {
         return new HashMap<String, Object>() {{
             put("id", id);
-            put("type", type);
+            put("type", type.toString().toLowerCase());
             put("creator_user_id", creatorUserId);
             put("created_at", Tools.getISO8601String(createdAt));
             put("parameters", parameters);
@@ -154,7 +160,7 @@ public abstract class AlertCondition implements EmbeddedPersistable {
     public Map<String, Object> asMap() {
         return new HashMap<String, Object>() {{
             put("id", id);
-            put("type", type);
+            put("type", type.toString().toLowerCase());
             put("creator_user_id", creatorUserId);
             put("created_at", Tools.getISO8601String(createdAt));
             put("parameters", parameters);
