@@ -211,7 +211,6 @@ $(document).ready(function() {
         $.ajax({
             url: '/a/system/notifications',
             success: function(data) {
-                console.log(data);
                 var count = data.length;
                 if (count > 0) {
                     $("#notification-badge").text(count);

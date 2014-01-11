@@ -17,10 +17,12 @@
  * along with Graylog2.  If not, see <http://www.gnu.org/licenses/>.
  *
  */
-package models;
+package models.alerts;
 
 import com.google.inject.assistedinject.Assisted;
 import com.google.inject.assistedinject.AssistedInject;
+import models.User;
+import models.UserService;
 import models.api.responses.alerts.AlertConditionSummaryResponse;
 import org.joda.time.DateTime;
 

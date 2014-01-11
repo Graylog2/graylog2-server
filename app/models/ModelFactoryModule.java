@@ -21,6 +21,7 @@ package models;
 import com.google.inject.AbstractModule;
 import com.google.inject.assistedinject.FactoryModuleBuilder;
 import models.accounts.LdapSettings;
+import models.alerts.AlertCondition;
 import models.dashboards.Dashboard;
 
 /**

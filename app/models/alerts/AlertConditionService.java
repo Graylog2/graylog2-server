@@ -17,12 +17,13 @@
  * along with Graylog2.  If not, see <http://www.gnu.org/licenses/>.
  *
  */
-package models;
+package models.alerts;
 
 import com.google.common.collect.Lists;
 import com.google.inject.Inject;
 import lib.APIException;
 import lib.ApiClient;
+import models.Stream;
 import models.api.requests.alerts.CreateAlertConditionRequest;
 import models.api.responses.alerts.AlertConditionSummaryResponse;
 import models.api.responses.alerts.AlertConditionsResponse;

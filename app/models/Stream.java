@@ -22,10 +22,14 @@ import com.google.common.collect.Lists;
 import com.google.inject.assistedinject.Assisted;
 import com.google.inject.assistedinject.AssistedInject;
 import lib.APIException;
+import lib.ApiClient;
+import models.alerts.Alert;
+import models.alerts.AlertConditionService;
 import models.api.requests.alerts.CreateAlertConditionRequest;
+import models.api.responses.alerts.AlertSummaryResponse;
+import models.api.responses.alerts.AlertsResponse;
 import models.api.responses.streams.StreamRuleSummaryResponse;
 import models.api.responses.streams.StreamSummaryResponse;
-import models.api.responses.TimestampResponse;
 import org.joda.time.DateTime;
 
 import java.io.IOException;
@@ -36,6 +40,8 @@ public class Stream {
     public interface Factory {
         public Stream fromSummaryResponse(StreamSummaryResponse ssr);
     }
+
+    private final ApiClient api;
 	
 	private final String id;
     private final String title;
@@ -49,8 +55,10 @@ public class Stream {
     private final AlertConditionService alertConditionService;
     private final StreamRule.Factory streamRuleFactory;
 
+    private AlertsResponse alertsResponse;
+
 	@AssistedInject
-    private Stream(UserService userService, AlertConditionService alertConditionService, StreamRule.Factory streamRuleFactory, @Assisted StreamSummaryResponse ssr) {
+    private Stream(ApiClient api, UserService userService, AlertConditionService alertConditionService, StreamRule.Factory streamRuleFactory, @Assisted StreamSummaryResponse ssr) {
 		this.id = ssr.id;
         this.title = ssr.title;
         this.description = ssr.description;
@@ -61,6 +69,7 @@ public class Stream {
 
         this.disabled = ssr.disabled;
 
+        this.api = api;
         this.userService = userService;
         this.alertConditionService = alertConditionService;
         this.streamRuleFactory = streamRuleFactory;
@@ -72,6 +81,20 @@ public class Stream {
 
     public void addAlertCondition(CreateAlertConditionRequest r) throws APIException, IOException {
         alertConditionService.create(this, r);
+    }
+
+    public List<Alert> getAlerts() throws APIException, IOException {
+        List<Alert> alerts = Lists.newArrayList();
+
+        for (AlertSummaryResponse alert : getAlertsInformation().alerts) {
+            alerts.add(new Alert(alert));
+        }
+
+        return alerts;
+    }
+
+    public Long getTotalAlerts() throws APIException, IOException {
+        return getAlertsInformation().total;
     }
 
     public String getId() {
@@ -104,5 +127,13 @@ public class Stream {
 
     public Boolean getDisabled() {
         return (disabled != null && disabled);
+    }
+
+    private final AlertsResponse getAlertsInformation() throws APIException, IOException {
+        if (alertsResponse == null) {
+            alertsResponse = api.get(AlertsResponse.class).path("/streams/{0}/alerts", getId()).execute();
+        }
+
+        return alertsResponse;
     }
 }

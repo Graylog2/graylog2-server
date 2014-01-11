@@ -551,12 +551,31 @@ $(document).ready(function() {
     // Make a word plural/singular based on input field value.
     $("input.pluralsingular").on("keyup", function() {
         var target = $("." + $(this).attr("data-pluralsingular"));
- console.log($(this).val());
+
         if ($(this).val() == "1") {
             target.text(target.attr("data-singular"));
         } else {
             target.text(target.attr("data-plural"));
         }
+    });
+
+    $(".alerts").dynatable({
+        inputs: {
+            perPageText: "Per page: ",
+            searchPlacement: "before",
+            perPagePlacement: "after"
+        },
+        dataset: {
+            perPageDefault: 10
+        }
+    });
+
+    $(".alerts .condition-id").on("click", function(e) {
+        e.preventDefault();
+        $("html, body").animate({ scrollTop: 0 }, "fast");
+        $(".alert-condition[data-condition-id=" + $(this).attr("data-condition-id") + "]").effect(
+            "highlight", { duration: 2000 }
+        );
     });
 
     function scrollToSearchbarHint() {

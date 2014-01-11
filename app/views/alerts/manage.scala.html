@@ -1,4 +1,4 @@
-@(currentUser: User, stream: Stream, alertConditions: List[AlertCondition])
+@(currentUser: User, stream: Stream, alertConditions: List[models.alerts.AlertCondition], totalAlerts: Long, alerts: List[models.alerts.Alert])
 
 @import lib.security.RestPermissions._
 @import views.helpers.Permissions._
@@ -13,14 +13,12 @@
         You can define thresholds on any message field or message count of a stream and be alerted based on this definition.
     </div>
 
-    <div class="row-fluid">
-        <select class="add-alert-type">
-            <option value="message-count">Message count condition</option>
-            <option value="field-value">Field value condition</option>
-        </select>
+    <select class="add-alert-type">
+        <option value="message-count">Message count condition</option>
+        <option value="field-value">Field value condition</option>
+    </select>
 
-        <button class="btn btn-success add-alert">Configure new alert</butto.parcreatcretypen>
-    </div>
+    <button class="btn btn-success add-alert">Configure new alert condition</button>
 
     <form action="@routes.AlertsController.addTypeMessageCount(stream.getId)" method="POST" class="alert-type-form alert-type-form-message-count" id="message-count">
         <div class="well well-small">
@@ -122,39 +120,70 @@
 
     <h2 style="margin-bottom: 5px;"><i class="icon icon-tasks"></i> Configured alert conditions</h2>
 
-    @for(condition <- alertConditions) {
-        <div class="row-fluid node-row">
-            <span class="pull-right node-row-info">
-                Created by @views.html.partials.links.to_user.render(condition.getCreatorUser)
-                <span class="moment-from-now" title="@condition.getCreatedAt()">@condition.getCreatedAt()</span>
-
-                @if(isPermitted(STREAMS_EDIT, stream.getId)) {
-                    &nbsp;
-                    <form action="@routes.AlertsController.removeCondition(stream.getId, condition.getId)" method="POST" style="position: relative; top: -1px;">
-                        <button type="submit" class="btn btn-danger btn-mini" data-confirm="Really delete alarm condition?">Delete</button>
-                    </form>
-                }
-            </span>
-
-            <h3>
-                <i class="icon icon-ellipsis-vertical"></i>
-                @condition.getSummary
-            </h3>
-
-            <div class="alert-condition">
-                @condition.getDescription
-            </div>
-        </div>
-    }
 
     @if(alertConditions.isEmpty) {
         <div style="margin-top: 10px;" class="alert alert-info">
             No configured alarm conditions.
         </div>
+    } else {
+        @for(condition <- alertConditions) {
+            <div class="row-fluid node-row alert-condition" data-condition-id="@condition.getId">
+                <span class="pull-right node-row-info">
+                    Created by @views.html.partials.links.to_user.render(condition.getCreatorUser)
+                    <span class="moment-from-now" title="@condition.getCreatedAt()">@condition.getCreatedAt()</span>
+
+                    @if(isPermitted(STREAMS_EDIT, stream.getId)) {
+                        &nbsp;
+                        <form action="@routes.AlertsController.removeCondition(stream.getId, condition.getId)" method="POST" style="position: relative; top: -1px;">
+                            <button type="submit" class="btn btn-danger btn-mini" data-confirm="Really delete alarm condition?">Delete</button>
+                        </form>
+                    }
+                </span>
+
+                <h3>
+                    <i class="icon icon-ellipsis-vertical"></i>
+                    @condition.getSummary
+                </h3>
+
+                <div class="alert-condition">
+                    @condition.getDescription
+                </div>
+            </div>
+        }
     }
 
     <hr />
 
     <h2><i class="icon icon-bell"></i> Triggered alerts</h2>
+    Showing the most recent alerts. This stream triggered a total of @totalAlerts alerts.
+
+    @if(stream.getAlerts.isEmpty) {
+        <div style="margin-top: 10px;" class="alert alert-info">
+            This stream has never triggered an alert.
+        </div>
+    } else {
+            <table class="alerts table table-striped table-hover table-condensed">
+                <thead>
+                    <tr>
+                        <th style="width: 130px;">Triggered</th>
+                        <th>Condition</th>
+                        <th>Description</th>
+                    </tr>
+                </thead>
+                <tbody>
+                @for(alert <- alerts) {
+                    <tr>
+                        <td>
+                            <span class="moment-from-now" title="@alert.getTriggeredAt">@alert.getTriggeredAt</span>
+                        </td>
+                        <td>
+                            <a href="#" class="condition-id" data-condition-id="@alert.getConditionId">@alert.getConditionId</a>
+                        </td>
+                        <td>@alert.getDescription</td>
+                    </tr>
+                }
+                </tbody>
+            </table>
+    }
 
 }
