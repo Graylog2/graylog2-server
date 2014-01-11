@@ -20,9 +20,13 @@
 package org.graylog2.periodical;
 
 import org.graylog2.Core;
+import org.graylog2.alerts.AlertCondition;
+import org.graylog2.plugin.streams.Stream;
+import org.graylog2.streams.StreamImpl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.List;
 
 /**
  * @author Lennart Koopmann <lennart@socketfeed.com>
@@ -34,15 +38,35 @@ public class AlertScannerThread implements Runnable {
     public static final int INITIAL_DELAY = 10;
     public static final int PERIOD = 60;
     
-    private final Core graylogServer;
+    private final Core server;
     
-    public AlertScannerThread(Core graylogServer) {
-        this.graylogServer = graylogServer;
+    public AlertScannerThread(Core server) {
+        this.server = server;
     }
     
     @Override
     public void run() {
         LOG.debug("Running alert checks.");
+
+        List<Stream> alertedStreams = StreamImpl.loadAllWithConfiguredAlertConditions(server);
+
+        LOG.debug("There are {} streams with configured alert conditions.", alertedStreams.size());
+
+        // Load all streams that have configured alert conditions.
+        for (Stream streamIF : alertedStreams) {
+            StreamImpl stream = (StreamImpl) streamIF;
+
+            LOG.debug("Stream [{}] has [{}] configured alert conditions.", stream, stream.getAlertConditions().size());
+
+            // Check if a threshold is reached.
+            for (AlertCondition alertCondition : stream.getAlertConditions()) {
+                if (alertCondition.triggered()) {
+                    // Send alerts.
+                    LOG.info("Alert condition [{}] of stream [{}] is triggered. Sending alerts.", alertCondition, stream);
+                }
+            }
+
+        }
     }
 
 }
