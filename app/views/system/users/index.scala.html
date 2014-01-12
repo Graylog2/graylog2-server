@@ -3,6 +3,10 @@
 @import views.helpers.Permissions._
 @import lib.security.RestPermissions._
 
+@hasAdminPermission(user: User) = @{
+    user.getPermissions().indexOf("*") != -1;
+}
+
 @main("Users", views.html.system.sidebar(), "", currentUser, false) {
 
     @views.html.partials.breadcrumbs(breadcrumbs)
@@ -42,13 +46,10 @@
                     <td>@user.getFullName</td>
                     <td>@user.getName</td>
                     <td>@user.getEmail</td>
-                    <td>
-                    @for(permission <- user.getPermissions) {
-                        @if(permission.equals("*")) {
+                    <td>@if(hasAdminPermission(user)) {
                         <span class="label label-info">Admin</span>
-                        } else {
-                        <span class="label">@permission</span>
-                        }
+                    } else {
+                        <span class="label">Reader</span>
                     }
                     </td>
                     <td>
