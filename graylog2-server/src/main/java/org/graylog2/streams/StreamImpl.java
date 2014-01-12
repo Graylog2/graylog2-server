@@ -273,4 +273,26 @@ public class StreamImpl extends Persisted implements Stream {
         save();
     }
 
+    public Map<String, List<String>> getAlertReceivers() {
+        if (!fields.containsKey("alert_receivers")) {
+            return Maps.newHashMap();
+        }
+
+        return (Map<String, List<String>>) fields.get("alert_receivers");
+    }
+
+    public void addAlertReceiver(String type, String name) {
+        collection().update(
+                new BasicDBObject("_id", id),
+                new BasicDBObject("$push", new BasicDBObject("alert_receivers." + type, name))
+        );
+    }
+
+    public void removeAlertReceiver(String type, String name) {
+        collection().update(
+                new BasicDBObject("_id", id),
+                new BasicDBObject("$pull", new BasicDBObject("alert_receivers." + type, name))
+        );
+    }
+
 }

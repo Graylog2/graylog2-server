@@ -31,6 +31,7 @@ import org.graylog2.rest.resources.RestResource;
 import org.graylog2.rest.resources.streams.alerts.requests.CreateConditionRequest;
 import org.graylog2.security.RestPermissions;
 import org.graylog2.streams.StreamImpl;
+import org.graylog2.users.User;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -130,6 +131,7 @@ public class StreamAlertResource extends RestResource {
 
         return Response.status(Response.Status.OK).entity(json(result)).build();
     }
+
     @GET @Timed
     @Path("conditions")
     @ApiOperation(value = "Get all alert conditions of this stream")
@@ -180,6 +182,74 @@ public class StreamAlertResource extends RestResource {
         }
 
         stream.removeAlertCondition(conditionId);
+
+        return Response.status(Response.Status.NO_CONTENT).build();
+    }
+
+    @POST @Timed
+    @Path("receivers")
+    @ApiOperation(value = "Add an alert receiver")
+    @ApiResponses(value = {
+            @ApiResponse(code = 404, message = "Stream not found."),
+            @ApiResponse(code = 400, message = "Invalid ObjectId.")
+    })
+    public Response addReceiver(
+            @ApiParam(title = "streamId", description = "The stream id this new alert condition belongs to.", required = true) @PathParam("streamId") String streamid,
+            @ApiParam(title = "entity", description = "Name/ID of user or email address to add as alert receiver.", required = true) @QueryParam("entity") String entity,
+            @ApiParam(title = "type", description = "Type: users or emails", required = true) @QueryParam("type") String type
+            ) {
+        checkPermission(RestPermissions.STREAMS_EDIT, streamid);
+
+        if(!type.equals("users") && !type.equals("emails")) {
+            LOG.warn("No such type: [{}]", type);
+            throw new WebApplicationException(400);
+        }
+
+        StreamImpl stream;
+        try {
+            stream = StreamImpl.load(loadObjectId(streamid), core);
+        } catch (org.graylog2.database.NotFoundException e) {
+            throw new WebApplicationException(404);
+        }
+
+        // Maybe the list already contains this receiver?
+        if (stream.getAlertReceivers().containsKey(type) || stream.getAlertReceivers().get(type) != null) {
+            if (stream.getAlertReceivers().get(type).contains(entity)) {
+                return Response.status(Response.Status.CREATED).build();
+            }
+        }
+
+        stream.addAlertReceiver(type, entity);
+
+        return Response.status(Response.Status.CREATED).build();
+    }
+
+    @DELETE @Timed
+    @Path("receivers")
+    @ApiOperation(value = "Remove an alert receiver")
+    @ApiResponses(value = {
+            @ApiResponse(code = 404, message = "Stream not found."),
+            @ApiResponse(code = 400, message = "Invalid ObjectId.")
+    })
+    public Response removeReceiver(
+            @ApiParam(title = "streamId", description = "The stream id this new alert condition belongs to.", required = true) @PathParam("streamId") String streamid,
+            @ApiParam(title = "entity", description = "Name/ID of user or email address to remove from alert receivers.", required = true) @QueryParam("entity") String entity,
+            @ApiParam(title = "type", description = "Type: users or emails", required = true) @QueryParam("type") String type) {
+        checkPermission(RestPermissions.STREAMS_EDIT, streamid);
+
+        if(!type.equals("users") && !type.equals("emails")) {
+            LOG.warn("No such type: [{}]", type);
+            throw new WebApplicationException(400);
+        }
+
+        StreamImpl stream;
+        try {
+            stream = StreamImpl.load(loadObjectId(streamid), core);
+        } catch (org.graylog2.database.NotFoundException e) {
+            throw new WebApplicationException(404);
+        }
+
+        stream.removeAlertReceiver(type, entity);
 
         return Response.status(Response.Status.NO_CONTENT).build();
     }
