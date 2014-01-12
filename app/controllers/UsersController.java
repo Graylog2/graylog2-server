@@ -35,8 +35,10 @@ import models.api.requests.CreateUserRequestForm;
 import org.apache.shiro.subject.Subject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import play.data.DynamicForm;
 import play.data.Form;
 import play.mvc.Result;
+import views.helpers.Permissions;
 import views.html.system.users.edit;
 import views.html.system.users.new_user;
 import views.html.system.users.show;
@@ -47,6 +49,7 @@ import java.util.List;
 import java.util.Set;
 
 import static lib.security.RestPermissions.USERS_LIST;
+import static lib.security.RestPermissions.USERS_PERMISSIONSEDIT;
 import static views.helpers.Permissions.isPermitted;
 
 public class UsersController extends AuthenticatedController {
@@ -259,6 +262,36 @@ public class UsersController extends AuthenticatedController {
         }
 
         flash("success", "Successfully changed the password for user " + user.getFullName());
+        return redirect(routes.UsersController.index());
+    }
+
+    public Result resetPermissions(String username) {
+        final DynamicForm requestForm = Form.form().bindFromRequest();
+
+        boolean isAdmin = false;
+        final String field = requestForm.get("admin");
+        if (field != null && field.equalsIgnoreCase("on")) {
+            isAdmin = true;
+        }
+        final User user = userService.load(username);
+
+        if (!Permissions.isPermitted(USERS_PERMISSIONSEDIT) || user.isReadonly()) {
+            flash("error", "Unable to reset permissions!");
+            return redirect(routes.UsersController.index());
+        }
+
+        final ChangeUserRequest changeRequest = new ChangeUserRequest(user);
+        if (isAdmin) {
+            changeRequest.permissions = Lists.newArrayList("*");
+        } else {
+            changeRequest.permissions = permissionsService.readerPermissions(username);
+        }
+        final boolean success = user.update(changeRequest);
+        if (success) {
+            flash("success", "Successfully reset permission for " + user.getFullName() + " to " + (isAdmin ? "administrator" : "reader") + " permissions.");
+        } else {
+            flash("error", "Unable to reset permissions for user " + user.getFullName());
+        }
         return redirect(routes.UsersController.index());
     }
 

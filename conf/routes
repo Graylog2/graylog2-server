@@ -95,6 +95,7 @@ GET         /system/users/new                                                   
 GET         /system/users/edit/:username                                             @controllers.UsersController.editUserForm(username: String)
 POST        /system/users/password/:username                                         @controllers.UsersController.changePassword(username: String)
 POST        /system/users/startpage/reset/:username                                  @controllers.StartpageController.reset(username: String)
+POST        /system/users/resetpermissions/:username                                 @controllers.UsersController.resetPermissions(username: String)
 
 # Sources
 GET         /sources                                                                 @controllers.SourcesController.list()
