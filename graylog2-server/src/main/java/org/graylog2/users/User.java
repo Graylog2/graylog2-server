@@ -85,6 +85,7 @@ public class User extends Persisted {
         if (result.size() == 0) { return null; }
 
         if (result.size() > 1) {
+            LOG.error("There was more than one matching user. This should never happen.");
             throw new RuntimeException("There was more than one matching user. This should never happen.");
         }
         final DBObject userObject = result.get(0);
@@ -234,7 +235,7 @@ public class User extends Persisted {
     }
 
     public static User syncFromLdapEntry(Core core, LdapEntry userEntry, LdapSettings ldapSettings, String username) {
-        User user = load(userEntry.getDn(), core);
+        User user = load(username, core);
         // create new user object if necessary
         if (user == null) {
             Map<String, Object> fields = Maps.newHashMap();
