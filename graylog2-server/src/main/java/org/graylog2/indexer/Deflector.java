@@ -113,7 +113,9 @@ public class Deflector { // extends Ablenkblech
         
         // Create new index.
         LOG.info("Creating index target <{}>...", newTarget);
-        server.getIndexer().indices().create(newTarget);
+        if (!server.getIndexer().indices().create(newTarget)) {
+            LOG.error("Could not properly create new target <{}>", newTarget);
+        };
         updateIndexRanges(newTarget);
 
         LOG.info("Done!");
