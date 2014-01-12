@@ -15,7 +15,7 @@ GET         /                                                                   
 
 # Search
 GET         /search                                                                  @controllers.SearchController.index(q ?= "", rangetype ?= "", relative:Integer ?= -1, from ?= "", to ?= "", keyword ?= "", interval ?= "", page:Integer ?= 1, saved:String ?= "", sortField:String ?= "", sortOrder:String ?= "")
-GET         /search/csv                                                              @controllers.SearchController.exportAsCsv(q ?= "", rangetype ?= "", relative:Integer ?= -1, from ?= "", to ?= "", keyword ?= "")
+GET         /search/csv                                                              @controllers.SearchController.exportAsCsv(q ?= "", filter ?= "", rangetype ?= "", relative:Integer ?= -1, from ?= "", to ?= "", keyword ?= "")
 
 # Messages
 GET         /messages/:index/:id                                                     @controllers.MessagesController.show(index: String, id: String)
@@ -37,6 +37,7 @@ GET         /streams/:stream_id/edit                                            
 POST        /streams/:stream_id/update                                               @controllers.StreamsController.update(stream_id: String)
 GET         /streams/:stream_id/clone                                                @controllers.StreamsController.cloneStreamForm(stream_id: String)
 POST        /streams/:stream_id/clone                                                @controllers.StreamsController.cloneStream(stream_id: String)
+GET         /streams/:stream_id/csv                                                  @controllers.StreamSearchController.exportAsCsv(q ?= "", stream_id: String, rangetype ?= "", relative:Integer ?= -1, from ?= "", to ?= "", keyword ?= "")
 
 # Alerts
 GET         /streams/:stream_id/alerts                                               @controllers.AlertsController.index(stream_id: String)

@@ -34,13 +34,21 @@ public class SearchResult {
 	private final int totalResultCount;
 	private final int tookMs;
 	private final List<MessageSummaryResponse> results;
-    private final SearchResultResponse.QueryParseError error;
+    private final SearchResultResponse.QueryError error;
     private final List<Field> fields;
     private final List<String> usedIndices;
     private List<Field> allFields;
 
-    public SearchResult(String originalQuery, String builtQuery, TimeRange timeRange, int totalResultCount, int tookMs, List<MessageSummaryResponse> results, List<String> fields, List<String> usedIndices, SearchResultResponse.QueryParseError error) {
-		this.originalQuery = originalQuery;
+    public SearchResult(String originalQuery,
+                        String builtQuery,
+                        TimeRange timeRange,
+                        int totalResultCount,
+                        int tookMs,
+                        List<MessageSummaryResponse> results,
+                        List<String> fields,
+                        List<String> usedIndices,
+                        SearchResultResponse.QueryError error) {
+        this.originalQuery = originalQuery;
         this.builtQuery = builtQuery;
         this.timeRange = timeRange;
 		this.totalResultCount = totalResultCount;
@@ -103,7 +111,7 @@ public class SearchResult {
         return builtQuery;
     }
 
-    public SearchResultResponse.QueryParseError getError() {
+    public SearchResultResponse.QueryError getError() {
         return error;
     }
 

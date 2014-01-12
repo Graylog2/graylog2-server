@@ -29,6 +29,8 @@ import lib.timeranges.TimeRange;
 import models.api.responses.*;
 import models.api.results.DateHistogramResult;
 import models.api.results.SearchResult;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import play.mvc.Call;
 import play.mvc.Http.Request;
 
@@ -37,6 +39,7 @@ import java.io.IOException;
 import java.util.concurrent.TimeUnit;
 
 public class UniversalSearch {
+    private static final Logger log = LoggerFactory.getLogger(UniversalSearch.class);
 
     public static final int PER_PAGE = 100;
     public static final int KEITH = 61;  // http://en.wikipedia.org/wiki/61_(number) -> Keith
@@ -112,6 +115,10 @@ public class UniversalSearch {
 
     public SearchResult search() throws IOException, APIException {
         SearchResultResponse response = doSearch(SearchResultResponse.class, MediaType.JSON_UTF_8, PER_PAGE);
+        if (response == null) {
+            log.error("We should never get an empty result without throwing an IOException.");
+            throw new APIException(null, null, new RuntimeException("Empty search response, this is likely a bug in exception handling."));
+        }
 
         SearchResult result = new SearchResult(
                 query,
@@ -122,7 +129,7 @@ public class UniversalSearch {
                 response.messages,
                 response.fields,
                 response.usedIndices,
-                response.error
+                response.error != null ? response.error : response.genericError
         );
 
         return result;
@@ -223,20 +230,32 @@ public class UniversalSearch {
         }
     }
 
-    public Call getCsvRoute(Request request) {
+    public Call getCsvRoute(Request request, Stream stream) {
         int relative = Tools.intSearchParamOrEmpty(request, "relative");
         String from = Tools.stringSearchParamOrEmpty(request, "from");
         String to = Tools.stringSearchParamOrEmpty(request, "to");
         String keyword = Tools.stringSearchParamOrEmpty(request, "keyword");
-
-        return routes.SearchController.exportAsCsv(
-                query,
-                timeRange.getType().toString().toLowerCase(),
-                relative,
-                from,
-                to,
-                keyword
-        );
+        if (stream == null) {
+            return routes.SearchController.exportAsCsv(
+                    query,
+                    "",
+                    timeRange.getType().toString().toLowerCase(),
+                    relative,
+                    from,
+                    to,
+                    keyword
+            );
+        } else {
+            return routes.StreamSearchController.exportAsCsv(
+                    query,
+                    stream.getId(),
+                    timeRange.getType().toString().toLowerCase(),
+                    relative,
+                    from,
+                    to,
+                    keyword
+            );
+        }
     }
 
     public SearchSort getOrder() {

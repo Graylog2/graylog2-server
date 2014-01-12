@@ -36,9 +36,15 @@ public class SearchResultResponse {
     @SerializedName("built_query")
     public String builtQuery;
 
-    public QueryParseError error;
+    public ParseError error;
 
-    public static class QueryParseError {
+    @SerializedName("generic_error")
+    public GenericError genericError;
+
+
+    public abstract static class QueryError {}
+
+    public static class ParseError extends QueryError {
         @SerializedName("begin_column")
         public int beginColumn;
 
@@ -51,4 +57,12 @@ public class SearchResultResponse {
         @SerializedName("end_line")
         public int endLine;
     }
+
+    public static class GenericError extends QueryError {
+        @SerializedName("exception_name")
+        public String exceptionName;
+
+        public String message;
+    }
+
 }

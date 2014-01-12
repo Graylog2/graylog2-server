@@ -18,6 +18,7 @@
  */
 package views.helpers;
 
+import models.api.responses.SearchResultResponse;
 import models.api.results.SearchResult;
 import play.api.templates.HtmlFormat;
 
@@ -25,15 +26,30 @@ public class QueryErrorHelper {
 
     public static String markupOriginalQuery(SearchResult response) {
         final String query = response.getOriginalQuery();
-        // TODO we don't highlight multiline queries yet
-        if (response.getError().beginLine > 1 || response.getError().beginLine != response.getError().endLine) {
+        if (!(response.getError() instanceof SearchResultResponse.ParseError)) {
             return query;
         }
-        final int beginColumn = response.getError().beginColumn;
-        final int endColumn = response.getError().endColumn;
+        final SearchResultResponse.ParseError error = (SearchResultResponse.ParseError) response.getError();
+
+        // TODO we don't highlight multiline queries yet
+        if (error.beginLine > 1 || error.beginLine != error.endLine) {
+            return query;
+        }
+        final int beginColumn = error.beginColumn;
+        final int endColumn = error.endColumn;
 
         return HtmlFormat.escape(query.substring(0, beginColumn))
                 + "<span class=\"parse-error\">" + HtmlFormat.escape(query.substring(beginColumn, endColumn)) + "</span>"
                 + HtmlFormat.escape(query.substring(endColumn, query.length()));
     }
+
+    public static boolean canMarkupParseError(SearchResultResponse.QueryError error) {
+        return error instanceof SearchResultResponse.ParseError;
+    }
+
+    public static boolean isGenericError(SearchResultResponse.QueryError error) {
+        return error instanceof SearchResultResponse.GenericError;
+    }
+
+
 }

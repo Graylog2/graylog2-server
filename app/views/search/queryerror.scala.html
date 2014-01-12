@@ -1,5 +1,7 @@
 @(currentUser: User, query: String, searchResult: models.api.results.SearchResult, savedSearch: SavedSearch)(implicit stream: Stream)
+
 @import views.helpers.QueryErrorHelper
+@import models.api.responses.SearchResultResponse.GenericError
 
 @main("Query error", sidebars.standard(currentUser), query, currentUser) {
 
@@ -18,11 +20,21 @@
         if you need help with the search syntax.</strong>
     </p>
 
-    @if(searchResult.getError.beginLine == 1) {
+    @if(QueryErrorHelper.canMarkupParseError(searchResult.getError)) {
     <p>
         Your query was malformed at the following position: (highlighted red)
     </p>
     <pre>@Html(QueryErrorHelper.markupOriginalQuery(searchResult))</pre>
+    }
+
+    @if(QueryErrorHelper.isGenericError(searchResult.getError)) {
+    <p>
+        Your query was malformed and executing it caused the following error:
+    </p>
+    <div class="query-exception alert alert-error">
+        <b>@{searchResult.getError.asInstanceOf[GenericError].exceptionName}</b><br>
+        @{searchResult.getError.asInstanceOf[GenericError].message}
+    </div>
     }
     @views.html.partials.support_sources()
 }
