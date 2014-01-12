@@ -28,7 +28,7 @@ import models.User;
 import models.UserService;
 import models.api.requests.ChangePasswordRequest;
 import models.api.requests.ChangeUserRequest;
-import models.api.requests.CreateUserRequest;
+import models.api.requests.CreateUserRequestForm;
 import org.apache.shiro.subject.Subject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -48,7 +48,7 @@ import static views.helpers.Permissions.isPermitted;
 public class UsersController extends AuthenticatedController {
     private static final Logger log = LoggerFactory.getLogger(UsersController.class);
 
-    private static final Form<CreateUserRequest> createUserForm = Form.form(CreateUserRequest.class);
+    private static final Form<CreateUserRequestForm> createUserForm = Form.form(CreateUserRequestForm.class);
     private static final Form<ChangeUserRequest> changeUserForm = Form.form(ChangeUserRequest.class);
     private static final Form<ChangePasswordRequest> changePasswordForm = Form.form(ChangePasswordRequest.class);
 
@@ -128,8 +128,8 @@ public class UsersController extends AuthenticatedController {
     }
 
     public Result create() {
-        Form<CreateUserRequest> createUserRequestForm = Tools.bindMultiValueFormFromRequest(CreateUserRequest.class);
-        final CreateUserRequest request = createUserRequestForm.get();
+        Form<CreateUserRequestForm> createUserRequestForm = Tools.bindMultiValueFormFromRequest(CreateUserRequestForm.class);
+        final CreateUserRequestForm request = createUserRequestForm.get();
 
         if (createUserRequestForm.hasErrors()) {
             BreadcrumbList bc = breadcrumbs();
@@ -151,9 +151,15 @@ public class UsersController extends AuthenticatedController {
                 return status(504, views.html.errors.error.render(message, e, request()));
             }
         }
-        // TODO PREVIEW: remove hardcoded permissions once the permission editor is ready
-        request.permissions = Lists.newArrayList("*");
-        userService.create(request);
+        if (request.admin) {
+            request.permissions = Lists.newArrayList("*");
+        } else {
+            request.permissions = permissionsService.readerPermissions(request.username);
+        }
+
+        if (!userService.create(request.toApiRequest())) {
+            flash("error", "Could not create user due to an internal error.");
+        }
         return redirect(routes.UsersController.index());
     }
 

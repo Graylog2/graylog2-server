@@ -42,4 +42,15 @@ public class CreateUserRequest extends ChangeUserRequest {
             this.timezone = timeZone.getID();
         }
     }
+
+    public CreateUserRequest(CreateUserRequest c) {
+        username = c.username;
+        password = c.password;
+        fullname = c.fullname;
+        email = c.email;
+        permissions = c.permissions;
+        timezone = c.timezone;
+        startpage = c.startpage;
+
+    }
 }

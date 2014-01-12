@@ -22,6 +22,7 @@ import com.google.common.collect.Lists;
 import com.google.inject.Inject;
 import lib.APIException;
 import lib.ApiClient;
+import models.api.responses.ReaderPermissionsResponse;
 import models.api.responses.RestPermissionsResponse;
 
 import java.io.IOException;
@@ -56,6 +57,24 @@ public class PermissionsService {
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
+        return permissions;
+    }
+
+    public List<String> readerPermissions(String username) {
+        List<String> permissions = Lists.newArrayList();
+
+        try {
+            final ReaderPermissionsResponse response = api
+                    .get(ReaderPermissionsResponse.class)
+                    .path("/system/permissions/reader/{0}", username)
+                    .execute();
+            permissions.addAll(response.permissions);
+        } catch (APIException e) {
+            throw new RuntimeException(e);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+
         return permissions;
     }
 

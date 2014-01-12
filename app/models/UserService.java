@@ -92,13 +92,16 @@ public class UserService {
         return Lists.newArrayList();
     }
 
-    public void create(CreateUserRequest request) {
+    public boolean create(CreateUserRequest request) {
         try {
             api.post().path("/users").body(request).expect(Http.Status.CREATED).execute();
+            return true;
         } catch (APIException e) {
             log.error("Unable to create user", e);
+            return false;
         } catch (IOException e) {
             log.error("Unable to create user", e);
+            return false;
         }
     }
 
