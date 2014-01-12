@@ -157,7 +157,7 @@ public abstract class AlertCondition implements EmbeddedPersistable {
             return false;
         }
 
-        return lastAlertSecondsAgo < grace*60;
+        return lastAlertSecondsAgo < (grace*60)-2;
     }
 
     @Override
