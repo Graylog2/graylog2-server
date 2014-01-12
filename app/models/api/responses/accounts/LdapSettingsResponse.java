@@ -50,6 +50,9 @@ public class LdapSettingsResponse {
     @SerializedName("use_start_tls")
     private boolean useStartTls;
 
+    @SerializedName("default_group")
+    private String defaultGroup;
+
     public boolean isEnabled() {
         return enabled;
     }
@@ -120,5 +123,13 @@ public class LdapSettingsResponse {
 
     public boolean isUseStartTls() {
         return useStartTls;
+    }
+
+    public String getDefaultGroup() {
+        return defaultGroup;
+    }
+
+    public void setDefaultGroup(String defaultGroup) {
+        this.defaultGroup = defaultGroup;
     }
 }

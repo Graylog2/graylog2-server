@@ -124,10 +124,14 @@ public class LdapController extends AuthenticatedController {
             return badRequest(views.html.system.ldap.index.render(currentUser(), breadcrumbs(), form));
         }
         final LdapSettingsRequest formValue = form.get();
-        final LdapSettings settings = ldapSettingsService.create(formValue);
-        if (settings.save()) {
-            flash("success", "LDAP settings updated");
-        } else {
+        try {
+            final LdapSettings settings = ldapSettingsService.create(formValue);
+            if (settings.save()) {
+                flash("success", "LDAP settings updated");
+            } else {
+                flash("error", "Unable to update LDAP settings!");
+            }
+        } catch (RuntimeException e) {
             flash("error", "Unable to update LDAP settings!");
         }
         return redirect(routes.UsersController.index());

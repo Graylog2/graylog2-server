@@ -50,4 +50,6 @@ public class LdapSettingsRequest extends ApiRequest {
     @SerializedName("display_name_attribute")
     public String displayNameAttribute;
 
+    @SerializedName("default_group")
+    public String defaultGroup;
 }

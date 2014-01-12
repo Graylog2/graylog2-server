@@ -56,6 +56,7 @@ public class LdapSettings {
         response.setDisplayNameAttribute(request.displayNameAttribute);
         response.setActiveDirectory(request.activeDirectory);
         response.setUseStartTls(request.useStartTls);
+        response.setDefaultGroup(request.defaultGroup);
         this.response = response;
     }
 
@@ -85,6 +86,7 @@ public class LdapSettings {
         request.displayNameAttribute = getDisplayNameAttribute();
         request.activeDirectory = isActiveDirectory();
         request.useStartTls = isUseStartTls();
+        request.defaultGroup = getDefaultGroup();
         return request;
     }
 
@@ -175,4 +177,11 @@ public class LdapSettings {
         return response.isActiveDirectory();
     }
 
+    public String getDefaultGroup() {
+        return response.getDefaultGroup();
+    }
+
+    public void setDefaultGroup(String defaultGroup) {
+        response.setDefaultGroup(defaultGroup);
+    }
 }

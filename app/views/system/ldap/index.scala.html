@@ -106,6 +106,19 @@
                 </div>
             </div>
 
+            <div class="control-group">
+                <label class="control-label" for="defaultGroup">Default permission group</label>
+                <div class="controls">
+                    <select id="defaultGroup" name="defaultGroup" placeholder="" value="@ldapForm("displayNameAttribute").value()" required>
+                        <option value="reader" @if(ldapForm("defaultGroup").equals("reader")) {selected}>Reader</option>
+                        <option value="admin" @if(ldapForm("defaultGroup").equals("admin")) {selected}>Administrative</option>
+                    </select>
+                    <span class="help-block">This determines the default set of permissions a user will be assigned.</span>
+                    <div class="alert">Changing this will not affect accounts that have previously been created via LDAP!
+                        You can reset permissions of existing accounts or delete the entire account which will cause it to be recreated on the next login.</div>
+                </div>
+            </div>
+
             <div class="form-actions">
                 <p>Optionally you can perform a login test here. If you omit the password, just the LDAP entry will be loaded and shown below and no authentication attempt will be made.</p>
                 <input type="text" id="ldap-test-username" value="" placeholder="Username for login test">
