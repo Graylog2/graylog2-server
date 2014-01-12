@@ -65,7 +65,7 @@ public class AlertScannerThread implements Runnable {
                     AlertCondition.CheckResult result = alertCondition.triggered();
                     if (result.isTriggered()) {
                         // Alert is triggered!
-                        LOG.info("Alert condition [{}] of stream [{}] is triggered. Sending alerts.", alertCondition, stream);
+                        LOG.info("Alert condition [{}] is triggered. Sending alerts.", alertCondition);
 
                         // Persist alert.
                         Alert alert = Alert.factory(result, server);
@@ -74,7 +74,7 @@ public class AlertScannerThread implements Runnable {
                         // Send alerts.
                     } else {
                         // Alert not triggered.
-                        LOG.debug("Alert condition [{}] of stream [{}] is not triggered.", alertCondition, stream);
+                        LOG.debug("Alert condition [{}] is triggered.", alertCondition);
                     }
                 } catch(Exception e) {
                     LOG.error("Skipping alert check that threw an exception.", e);

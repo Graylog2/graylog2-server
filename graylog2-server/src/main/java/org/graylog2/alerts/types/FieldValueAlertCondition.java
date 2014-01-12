@@ -21,6 +21,12 @@ package org.graylog2.alerts.types;
 
 import org.graylog2.Core;
 import org.graylog2.alerts.AlertCondition;
+import org.graylog2.indexer.IndexHelper;
+import org.graylog2.indexer.results.FieldStatsResult;
+import org.graylog2.indexer.searches.Searches;
+import org.graylog2.indexer.searches.timeranges.InvalidRangeParametersException;
+import org.graylog2.indexer.searches.timeranges.RelativeRange;
+import org.graylog2.plugin.Tools;
 import org.graylog2.plugin.streams.Stream;
 import org.joda.time.DateTime;
 import org.slf4j.Logger;
@@ -46,7 +52,7 @@ public class FieldValueAlertCondition extends AlertCondition {
     private final int grace;
     private final int time;
     private final ThresholdType thresholdType;
-    private final int threshold;
+    private final Number threshold;
     private final CheckType type;
     private final String field;
 
@@ -56,7 +62,7 @@ public class FieldValueAlertCondition extends AlertCondition {
         this.grace = (Integer) parameters.get("grace");
         this.time = (Integer) parameters.get("time");
         this.thresholdType = ThresholdType.valueOf(((String) parameters.get("threshold_type")).toUpperCase());
-        this.threshold = (Integer) parameters.get("threshold");
+        this.threshold = (Number) parameters.get("threshold");
         this.type = CheckType.valueOf(((String) parameters.get("type")).toUpperCase());
         this.field = (String) parameters.get("field");
     }
@@ -75,8 +81,77 @@ public class FieldValueAlertCondition extends AlertCondition {
 
     @Override
     protected CheckResult runCheck() {
- System.out.println(getDescription());
-        return new CheckResult(false);
+        try {
+            String filter = "streams:"+stream.getId();
+            FieldStatsResult fieldStatsResult = core.getIndexer().searches().fieldStats(field, "*", filter, new RelativeRange(time * 60));
+
+            double result;
+            switch (type) {
+                case MEAN:
+                    result = fieldStatsResult.getMean();
+                    break;
+                case MIN:
+                    result = fieldStatsResult.getMin();
+                    break;
+                case MAX:
+                    result = fieldStatsResult.getMax();
+                    break;
+                case SUM:
+                    result = fieldStatsResult.getSum();
+                    break;
+                case STDDEV:
+                    result = fieldStatsResult.getStdDeviation();
+                    break;
+                default:
+                    LOG.error("No such field value check type: [{}]. Returning not triggered.", type);
+                    return new CheckResult(false);
+            }
+
+            LOG.debug("Alert check <{}> result: [{}]", id, result);
+
+            if(Double.isInfinite(result)) {
+                // This happens when there are no ES results/docs.
+                LOG.debug("Infinite value. Returning not triggered.");
+                return new CheckResult(false);
+            }
+
+            boolean triggered = false;
+            switch (thresholdType) {
+                case HIGHER:
+                    triggered = result > threshold.doubleValue();
+                    break;
+                case LOWER:
+                    triggered = result < threshold.doubleValue();
+                    break;
+            }
+
+            if (triggered) {
+                StringBuilder resultDescription = new StringBuilder();
+
+                resultDescription.append("Field ").append(field).append(" had a ")
+                        .append(type.toString().toLowerCase()).append(" of ")
+                        .append(result).append(" in the last ")
+                        .append(time).append(" minutes with trigger condition ")
+                        .append(thresholdType.toString().toLowerCase()).append(" than ")
+                        .append(threshold).append(". ")
+                        .append("(Current grace time: ").append(grace).append(" minutes)");
+
+                return new CheckResult(true, this, resultDescription.toString(), Tools.iso8601());
+            } else {
+                return new CheckResult(false);
+            }
+        } catch (InvalidRangeParametersException e) {
+            // cannot happen lol
+            LOG.error("Invalid timerange.", e);
+            return null;
+        } catch (IndexHelper.InvalidRangeFormatException e) {
+            // lol same here
+            LOG.error("Invalid timerange format.", e);
+            return null;
+        } catch (Searches.FieldTypeException e) {
+            LOG.debug("Field [{}] seems not to have a numerical type or doesn't even exist at all. Returning not triggered.", field, e);
+            return new CheckResult(false);
+        }
     }
 
 }
