@@ -18,7 +18,6 @@
  */
 package models.api.requests;
 
-import com.google.common.collect.Lists;
 import models.User;
 import org.joda.time.DateTimeZone;
 
@@ -37,7 +36,7 @@ public class CreateUserRequest extends ChangeUserRequest {
         this.fullname = user.getFullName();
         this.email = user.getEmail();
         this.password = "";
-        this.permissions = Lists.newArrayList("*"); // TODO PREVIEW user.getPermissions();
+        this.permissions  = user.getPermissions();
         final DateTimeZone timeZone = user.getTimeZone();
         if (timezone != null) {
             this.timezone = timeZone.getID();
