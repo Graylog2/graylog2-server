@@ -22,10 +22,7 @@ package org.graylog2.database;
 
 import com.beust.jcommander.internal.Lists;
 import com.google.common.collect.Maps;
-import com.mongodb.BasicDBObject;
-import com.mongodb.DBCollection;
-import com.mongodb.DBCursor;
-import com.mongodb.DBObject;
+import com.mongodb.*;
 import org.bson.types.ObjectId;
 import org.graylog2.Core;
 import org.graylog2.database.validators.Validator;
@@ -116,6 +113,9 @@ public abstract class Persisted {
         return collection(core, collectionName).findOne(query);
     }
 
+    protected static DBObject findOne(DBObject query, DBObject sort, Core core, String collectioName) {
+        return collection(core, collectioName).findOne(query, new BasicDBObject(), sort);
+    }
     public static long totalCount(Core core, String collectionName) {
         return collection(core, collectionName).count();
     }

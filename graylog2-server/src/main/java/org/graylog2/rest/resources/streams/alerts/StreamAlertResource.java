@@ -26,7 +26,6 @@ import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.graylog2.alerts.Alert;
 import org.graylog2.alerts.AlertCondition;
 import org.graylog2.database.*;
-import org.graylog2.plugin.Tools;
 import org.graylog2.rest.documentation.annotations.*;
 import org.graylog2.rest.resources.RestResource;
 import org.graylog2.rest.resources.streams.alerts.requests.CreateConditionRequest;

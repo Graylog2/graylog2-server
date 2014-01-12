@@ -23,12 +23,14 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.mongodb.BasicDBObject;
 import com.mongodb.DBObject;
+import com.mongodb.QueryBuilder;
 import org.bson.types.ObjectId;
 import org.graylog2.Core;
 import org.graylog2.database.Persisted;
 import org.graylog2.database.validators.Validator;
 import org.graylog2.plugin.Tools;
 import org.joda.time.DateTime;
+import org.joda.time.Seconds;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -90,6 +92,22 @@ public class Alert extends Persisted {
         }
 
         return alerts;
+    }
+
+    public static int triggeredSecondsAgo(String streamId, String conditionId, Core core) {
+        DBObject query = QueryBuilder.start("stream_id").is(streamId)
+                .and("condition_id").is(conditionId).get();
+        BasicDBObject sort = new BasicDBObject("triggered_at", -1);
+
+        DBObject alert = findOne(query, sort, core, COLLECTION);
+
+        if(alert == null) {
+            return -1;
+        }
+
+        DateTime triggeredAt = new DateTime(alert.get("triggered_at"));
+
+        return Seconds.secondsBetween(triggeredAt, DateTime.now()).getSeconds();
     }
 
     public Map<String,Object> toMap() {
