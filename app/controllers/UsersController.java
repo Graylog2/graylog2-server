@@ -217,7 +217,7 @@ public class UsersController extends AuthenticatedController {
         }
 
         final ChangeUserRequestForm formData = requestForm.get();
-        Set<String> permissions = Sets.newHashSet(formData.permissions);
+        Set<String> permissions = Sets.newHashSet(user.getPermissions());
         // TODO this does not handle combined permissions like streams:edit,read:1,2 !
         for (String streampermission : formData.streampermissions) {
             permissions.add(RestPermissions.STREAMS_READ + ":" + streampermission);
