@@ -18,6 +18,7 @@
  */
 package models.api.requests;
 
+import com.google.common.collect.Lists;
 import models.User;
 import play.data.validation.Constraints;
 
@@ -29,7 +30,7 @@ public class ChangeUserRequest extends ApiRequest {
     @Constraints.Required
     public String email;
 
-    public List<String> permissions;
+    public List<String> permissions = Lists.newArrayList();
 
     public String timezone;
 

@@ -42,6 +42,7 @@ import org.apache.shiro.subject.Subject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import play.api.PlayException;
+import play.mvc.Http;
 
 import java.io.IOException;
 import java.net.ConnectException;
@@ -69,15 +70,19 @@ public class ServerRestInterfaceRealm extends AuthorizingRealm {
     @Override
     protected AuthorizationInfo doGetAuthorizationInfo(PrincipalCollection principals) {
         // the current user has been previously loaded via doGetAuthenticationInfo before, use those permissions
-        final User currentUser = UserService.current();
-        if (!principals.getPrimaryPrincipal().equals(currentUser.getName())) {
-            log.error("The requested principal is not the current user! TODO load the user");
-            return null;
+        User user = UserService.current();
+        if (!principals.getPrimaryPrincipal().equals(user.getName())) {
+            log.info("retrieving loaded user {} from per-request user cache", principals.getPrimaryPrincipal());
+            user = (User) Http.Context.current().args.get("perRequestUsersCache:" + principals.getPrimaryPrincipal().toString());
+            if (user == null) {
+                log.error("Cannot find previously loaded user, need to load it explicitely. This is unimplemented.");
+                return null;
+            }
         }
-        final List<String> permissions = currentUser.getPermissions();
+        final List<String> permissions = user.getPermissions();
         final SimpleAuthorizationInfo authzInfo = new SimpleAuthorizationInfo();
         if (log.isTraceEnabled()) {
-            log.trace("Permissions for {} are {}", currentUser.getName(), Ordering.natural().sortedCopy(currentUser.getPermissions()));
+            log.trace("Permissions for {} are {}", user.getName(), Ordering.natural().sortedCopy(user.getPermissions()));
         }
         authzInfo.setStringPermissions(Sets.newHashSet(permissions));
         return authzInfo;

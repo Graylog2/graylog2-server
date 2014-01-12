@@ -114,7 +114,10 @@ public class UserService {
         try {
             final UserResponse response = api.get(UserResponse.class).path("/users/{0}", username).execute();
             // TODO this user is not cached locally for now. we should be tracking REST requests.
-            return userFactory.fromResponse(response, null);
+            // TODO we cache the user for this request, but only for checking permissions. this needs to be cleaned up after 0.20.0
+            final User user = userFactory.fromResponse(response, null);
+            Http.Context.current().args.put("perRequestUsersCache:" + user.getName(), user);
+            return user;
         } catch (IOException e) {
             log.error("Could not load user " + username, e);
         } catch (APIException e) {

@@ -1,0 +1,39 @@
+/*
+ * Copyright 2014 TORCH UG
+ *
+ * This file is part of Graylog2.
+ *
+ * Graylog2 is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * Graylog2 is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with Graylog2.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
+$(document).ready(function() {
+    $("#streampermissions")
+        .chosen({search_contains:true, width:"350px", inherit_select_classes:true})
+        .change(function(event, params) {
+            var editSelect = $("#streameditpermissions");
+            editSelect.find("option[value=" + params.deselected +"]").attr('selected', false);
+            editSelect.chosen().trigger("chosen:updated");
+        });
+
+    $("#streameditpermissions")
+        .chosen({search_contains:true, width:"350px", inherit_select_classes:true})
+        .change(function(event, params){
+            if (params.selected) {
+                var readSelect = $("#streampermissions");
+                readSelect.find("option[value=" + params.selected +"]").attr('selected', true);
+                readSelect.chosen().trigger("chosen:updated");
+            }
+        });
+
+});

@@ -26,6 +26,8 @@ import lib.ApiClient;
 import models.api.requests.ChangePasswordRequest;
 import models.api.requests.ChangeUserRequest;
 import models.api.responses.system.UserResponse;
+import org.apache.shiro.SecurityUtils;
+import org.apache.shiro.subject.SimplePrincipalCollection;
 import org.apache.shiro.subject.Subject;
 import org.joda.time.DateTimeZone;
 import org.slf4j.Logger;
@@ -166,6 +168,13 @@ public class User {
     }
 
     public Subject getSubject() {
+        if (subject == null) {
+            // TODO we should do this cleanly via shiro, but time is too short. clean up post-RC
+            return new Subject.Builder(SecurityUtils.getSecurityManager())
+                    .principals(new SimplePrincipalCollection(getName(), "REST realm"))
+                    .authenticated(true)
+                    .buildSubject();
+        }
         return subject;
     }
 

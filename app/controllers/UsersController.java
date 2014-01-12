@@ -20,14 +20,17 @@ package controllers;
 
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Lists;
+import com.google.common.collect.Sets;
 import com.google.inject.Inject;
 import lib.*;
+import lib.security.RestPermissions;
 import models.PermissionsService;
 import models.StreamService;
 import models.User;
 import models.UserService;
 import models.api.requests.ChangePasswordRequest;
 import models.api.requests.ChangeUserRequest;
+import models.api.requests.ChangeUserRequestForm;
 import models.api.requests.CreateUserRequestForm;
 import org.apache.shiro.subject.Subject;
 import org.slf4j.Logger;
@@ -41,6 +44,7 @@ import views.html.system.users.show;
 import java.io.IOException;
 import java.util.Collections;
 import java.util.List;
+import java.util.Set;
 
 import static lib.security.RestPermissions.USERS_LIST;
 import static views.helpers.Permissions.isPermitted;
@@ -49,7 +53,7 @@ public class UsersController extends AuthenticatedController {
     private static final Logger log = LoggerFactory.getLogger(UsersController.class);
 
     private static final Form<CreateUserRequestForm> createUserForm = Form.form(CreateUserRequestForm.class);
-    private static final Form<ChangeUserRequest> changeUserForm = Form.form(ChangeUserRequest.class);
+    private static final Form<ChangeUserRequestForm> changeUserForm = Form.form(ChangeUserRequestForm.class);
     private static final Form<ChangePasswordRequest> changePasswordForm = Form.form(ChangePasswordRequest.class);
 
     @Inject
@@ -104,7 +108,7 @@ public class UsersController extends AuthenticatedController {
         bc.addCrumb("Edit " + username, routes.UsersController.editUserForm(username));
 
         User user = userService.load(username);
-        final Form<ChangeUserRequest> form = changeUserForm.fill(new ChangeUserRequest(user));
+        final Form<ChangeUserRequestForm> form = changeUserForm.fill(new ChangeUserRequestForm(user));
         boolean requiresOldPassword = checkRequireOldPassword(username);
         try {
             return ok(edit.render(
@@ -180,7 +184,7 @@ public class UsersController extends AuthenticatedController {
     }
 
     public Result saveChanges(String username) {
-        final Form<ChangeUserRequest> requestForm = Tools.bindMultiValueFormFromRequest(ChangeUserRequest.class);
+        final Form<ChangeUserRequestForm> requestForm = Form.form(ChangeUserRequestForm.class).bindFromRequest();
         final User user = userService.load(username);
 
         if (requestForm.hasErrors()) {
@@ -211,7 +215,19 @@ public class UsersController extends AuthenticatedController {
                 return status(504, views.html.errors.error.render(message, e, request()));
             }
         }
-        user.update(requestForm.get());
+
+        final ChangeUserRequestForm formData = requestForm.get();
+        Set<String> permissions = Sets.newHashSet(formData.permissions);
+        // TODO this does not handle combined permissions like streams:edit,read:1,2 !
+        for (String streampermission : formData.streampermissions) {
+            permissions.add(RestPermissions.STREAMS_READ + ":" + streampermission);
+        }
+        for (String streameditpermission : formData.streameditpermissions) {
+            permissions.add(RestPermissions.STREAMS_EDIT + ":" + streameditpermission);
+        }
+        final ChangeUserRequest changeRequest = formData.toApiRequest();
+        changeRequest.permissions = Lists.newArrayList(permissions);
+        user.update(changeRequest);
 
         return redirect(routes.UsersController.index());
     }
