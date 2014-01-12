@@ -22,6 +22,7 @@ import com.google.gson.annotations.SerializedName;
 import models.api.responses.TimestampResponse;
 
 import java.util.List;
+import java.util.Map;
 
 public class StreamSummaryResponse {
 
@@ -39,7 +40,8 @@ public class StreamSummaryResponse {
     public List<StreamRuleSummaryResponse> streamRules;
 
     public Boolean disabled;
-	
-	// public List<StreamRuleSummary> rules;
+
+    @SerializedName("alert_receivers")
+	public Map<String, List<String>> alertReceivers;
 	
 }

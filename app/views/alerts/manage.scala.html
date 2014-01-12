@@ -1,4 +1,8 @@
-@(currentUser: User, stream: Stream, alertConditions: List[models.alerts.AlertCondition], totalAlerts: Long, alerts: List[models.alerts.Alert])
+@(currentUser: User, stream: Stream,
+        alertConditions: List[models.alerts.AlertCondition],
+        totalAlerts: Long,
+        alerts: List[models.alerts.Alert],
+        users: String)
 
 @import lib.security.RestPermissions._
 @import views.helpers.Permissions._
@@ -68,7 +72,7 @@
             </h2>
 
             Trigger alert when the field
-            <input name="field" type="text" class="input-large typeahead-fields" />
+            <input name="field" type="text" class="input-large typeahead-fields" autocomplete="off" />
 
             <br />
             has a
@@ -156,6 +160,76 @@
             </div>
         }
     }
+
+    <hr />
+
+    <h2><i class="icon icon-group"></i> Alert receivers</h2>
+
+    <div class="row-fluid" style="margin-bottom: 5px;">
+        The following Graylog2 users will be notified about alerts via email if they have configured
+        an email address in their profile.
+    </div>
+
+    @if(stream.getEmailAlertReceivers.isEmpty && stream.getUserAlertReceivers.isEmpty) {
+        <div style="margin-top: 10px;" class="alert alert-info">
+            No configured alert receivers.
+        </div>
+    } else {
+        <ul>
+            @for(user <- stream.getUserAlertReceivers) {
+                <li>
+                    <i class="icon icon-user"></i>&nbsp;
+                    <a href="@routes.UsersController.show(user)">@user</a>
+
+                    <a href="@routes.AlertsController.removeReceiverUser(stream.getId, user)" data-confirm="Really remove receiver?">
+                        <i class="icon icon-remove"></i>
+                    </a>
+                </li>
+            }
+
+            @for(email <- stream.getEmailAlertReceivers) {
+                <li>
+                    <i class="icon icon-envelope"></i>&nbsp;
+                    @email
+
+                    <a href="@routes.AlertsController.removeReceiverEmail(stream.getId, email)" data-confirm="Really remove receiver?">
+                        <i class="icon icon-remove"></i>
+                    </a>
+                </li>
+            }
+        </ul>
+    }
+
+    <div class="row-fluid" style="margin-top: 15px;">
+        <div class="span6">
+            <form action="@routes.AlertsController.addReceiverUser(stream.getId)" method="POST">
+                <label for="user">Username:</label>
+                <input name="username"
+                style="margin-bottom: 0px;"
+                type="text"
+                id="user"
+                class="input-large"
+                autocomplete="off"
+                data-provide="typeahead"
+                data-source="@users" />
+
+                <button type="submit" class="btn btn-success">Subscribe user</button>
+            </form>
+        </div>
+
+        <div class="span6">
+            <form action="@routes.AlertsController.addReceiverEmail(stream.getId)" method="POST">
+                <label for="email">Email address:</label>
+                <input name="email"
+                style="margin-bottom: 0px;"
+                type="text"
+                id="email"
+                class="input-large" />
+
+                <button type="submit" class="btn btn-success">Subscribe email address</button>
+            </form>
+        </div>
+    </div>
 
     <hr />
 

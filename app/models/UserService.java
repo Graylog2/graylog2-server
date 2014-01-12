@@ -184,4 +184,16 @@ public class UserService {
             log.error("Unable to delete user " + username, e);
         }
     }
+
+    public List<User> allExceptAdmin() {
+        List<User> result = Lists.newArrayList();
+
+        for(User user : all()) {
+            if (!user.getName().equals("admin")) {
+                result.add(user);
+            }
+        }
+
+        return result;
+    }
 }

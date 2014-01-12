@@ -22,12 +22,15 @@ package controllers;
 import com.google.inject.Inject;
 import lib.APIException;
 import lib.ApiClient;
+import models.User;
+import models.UserService;
 import models.alerts.Alert;
 import models.alerts.AlertCondition;
 import models.alerts.AlertConditionService;
 import models.Stream;
 import models.StreamService;
 import models.api.requests.alerts.CreateAlertConditionRequest;
+import play.Logger;
 import play.mvc.Result;
 
 import java.io.IOException;
@@ -43,6 +46,9 @@ public class AlertsController extends AuthenticatedController {
     private StreamService streamService;
 
     @Inject
+    private UserService userService;
+
+    @Inject
     private AlertConditionService alertConditionService;
 
     public Result index(String streamId) {
@@ -52,7 +58,28 @@ public class AlertsController extends AuthenticatedController {
             List<Alert> alerts = stream.getAlerts();
             long totalAlerts = stream.getTotalAlerts();
 
-            return ok(views.html.alerts.manage.render(currentUser(), stream, alertConditions, totalAlerts, alerts));
+            StringBuilder users = new StringBuilder();
+            users.append("[");
+            List<User> userList = userService.allExceptAdmin();
+            int i = 0;
+            for(User user : userList){
+                users.append("\"").append(user.getName()).append("\"");
+
+                if(i != userList.size()-1) {
+                    users.append(",");
+                }
+                i++;
+            }
+            users.append("]");
+
+            return ok(views.html.alerts.manage.render(
+                    currentUser(),
+                    stream,
+                    alertConditions,
+                    totalAlerts,
+                    alerts,
+                    users.toString()
+            ));
         } catch (IOException e) {
             return status(504, views.html.errors.error.render(ApiClient.ERROR_MSG_IO, e, request()));
         } catch (APIException e) {
@@ -142,6 +169,96 @@ public class AlertsController extends AuthenticatedController {
             return status(504, views.html.errors.error.render(ApiClient.ERROR_MSG_IO, e, request()));
         } catch (APIException e) {
             String message = "Could not fetch stream. We expected HTTP 200, but got a HTTP " + e.getHttpCode() + ".";
+            return status(504, views.html.errors.error.render(message, e, request()));
+        }
+    }
+
+    public Result addReceiverUser(String streamId) {
+        Map<String,String> form = flattenFormUrlEncoded(request().body().asFormUrlEncoded());
+        String username = form.get("username");
+
+        if (username == null || username.trim().isEmpty()) {
+            flash("error", "No username provided.");
+            return redirect(routes.AlertsController.index(streamId));
+        }
+
+        try {
+            User receiver = userService.load(username);
+
+            if (receiver == null) {
+                flash("error", "Could not add alert receiver: Unknown user.");
+                return redirect(routes.AlertsController.index(streamId));
+            }
+
+            Stream stream = streamService.get(streamId);
+            stream.addAlertReceiver(receiver);
+
+            flash("success", "Added alert receiver.");
+            return redirect(routes.AlertsController.index(streamId));
+        } catch (IOException e) {
+            return status(504, views.html.errors.error.render(ApiClient.ERROR_MSG_IO, e, request()));
+        } catch (APIException e) {
+            String message = "Could not add alert receiver: We expected HTTP 200, but got a HTTP " + e.getHttpCode() + ".";
+            return status(504, views.html.errors.error.render(message, e, request()));
+        }
+    }
+
+    public Result removeReceiverUser(String streamId, String username) {
+        if (username == null || username.trim().isEmpty()) {
+            flash("error", "No username provided.");
+            return redirect(routes.AlertsController.index(streamId));
+        }
+
+        try {
+            User receiver = userService.load(username);
+
+            if (receiver == null) {
+                flash("error", "Could not remove alert receiver: Unknown user.");
+                return redirect(routes.AlertsController.index(streamId));
+            }
+
+            Stream stream = streamService.get(streamId);
+            stream.removeAlertReceiver(receiver);
+
+            flash("success", "Removed alert receiver.");
+            return redirect(routes.AlertsController.index(streamId));
+        } catch (IOException e) {
+            return status(504, views.html.errors.error.render(ApiClient.ERROR_MSG_IO, e, request()));
+        } catch (APIException e) {
+            String message = "Could not add alert receiver: We expected HTTP 200, but got a HTTP " + e.getHttpCode() + ".";
+            return status(504, views.html.errors.error.render(message, e, request()));
+        }
+    }
+
+    public Result addReceiverEmail(String streamId) {
+        Map<String,String> form = flattenFormUrlEncoded(request().body().asFormUrlEncoded());
+        String email = form.get("email");
+
+        try {
+            Stream stream = streamService.get(streamId);
+            stream.addAlertReceiver(email);
+
+            flash("success", "Added alert receiver.");
+            return redirect(routes.AlertsController.index(streamId));
+        } catch (IOException e) {
+            return status(504, views.html.errors.error.render(ApiClient.ERROR_MSG_IO, e, request()));
+        } catch (APIException e) {
+            String message = "Could not add alert receiver: We expected HTTP 200, but got a HTTP " + e.getHttpCode() + ".";
+            return status(504, views.html.errors.error.render(message, e, request()));
+        }
+    }
+
+    public Result removeReceiverEmail(String streamId, String email) {
+        try {
+            Stream stream = streamService.get(streamId);
+            stream.removeAlertReceiver(email);
+
+            flash("success", "Removed alert receiver.");
+            return redirect(routes.AlertsController.index(streamId));
+        } catch (IOException e) {
+            return status(504, views.html.errors.error.render(ApiClient.ERROR_MSG_IO, e, request()));
+        } catch (APIException e) {
+            String message = "Could not add alert receiver: We expected HTTP 200, but got a HTTP " + e.getHttpCode() + ".";
             return status(504, views.html.errors.error.render(message, e, request()));
         }
     }

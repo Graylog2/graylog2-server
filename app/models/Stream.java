@@ -55,6 +55,9 @@ public class Stream {
     private final AlertConditionService alertConditionService;
     private final StreamRule.Factory streamRuleFactory;
 
+    private final List<String> userAlertReceivers;
+    private final List<String> emailAlertReceivers;
+
     private AlertsResponse alertsResponse;
 
 	@AssistedInject
@@ -74,6 +77,23 @@ public class Stream {
         this.alertConditionService = alertConditionService;
         this.streamRuleFactory = streamRuleFactory;
 
+        if (ssr.alertReceivers != null) {
+            if (ssr.alertReceivers.containsKey("users") && ssr.alertReceivers.get("users") != null) {
+                userAlertReceivers = ssr.alertReceivers.get("users");
+            } else {
+                userAlertReceivers = Lists.newArrayList();
+            }
+
+            if (ssr.alertReceivers.containsKey("emails") && ssr.alertReceivers.get("emails") != null) {
+                emailAlertReceivers = ssr.alertReceivers.get("emails");
+            } else {
+                emailAlertReceivers = Lists.newArrayList();
+            }
+        } else {
+            userAlertReceivers = Lists.newArrayList();
+            emailAlertReceivers = Lists.newArrayList();
+        }
+
         for (StreamRuleSummaryResponse streamRuleSummaryResponse : ssr.streamRules) {
             streamRules.add(streamRuleFactory.fromSummaryResponse(streamRuleSummaryResponse));
         }
@@ -81,6 +101,38 @@ public class Stream {
 
     public void addAlertCondition(CreateAlertConditionRequest r) throws APIException, IOException {
         alertConditionService.create(this, r);
+    }
+
+    public void addAlertReceiver(User user) throws APIException, IOException {
+        api.post().path("/streams/{0}/alerts/receivers", getId())
+                .queryParam("entity", user.getName())
+                .queryParam("type", "users")
+                .expect(201)
+                .execute();
+    }
+
+    public void addAlertReceiver(String email) throws APIException, IOException {
+        api.post().path("/streams/{0}/alerts/receivers", getId())
+                .queryParam("entity", email)
+                .queryParam("type", "emails")
+                .expect(201)
+                .execute();
+    }
+
+    public void removeAlertReceiver(User user) throws APIException, IOException {
+        api.delete().path("/streams/{0}/alerts/receivers", getId())
+                .queryParam("entity", user.getName())
+                .queryParam("type", "users")
+                .expect(204)
+                .execute();
+    }
+
+    public void removeAlertReceiver(String email) throws APIException, IOException {
+        api.delete().path("/streams/{0}/alerts/receivers", getId())
+                .queryParam("entity", email)
+                .queryParam("type", "emails")
+                .expect(204)
+                .execute();
     }
 
     public List<Alert> getAlerts() throws APIException, IOException {
@@ -135,5 +187,13 @@ public class Stream {
         }
 
         return alertsResponse;
+    }
+
+    public List<String> getUserAlertReceivers() {
+        return userAlertReceivers;
+    }
+
+    public List<String> getEmailAlertReceivers() {
+        return emailAlertReceivers;
     }
 }
