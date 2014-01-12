@@ -114,7 +114,7 @@ public class AlertsController extends AuthenticatedController {
             request.type = "field_value";
             request.parameters.put("grace", Integer.parseInt(form.get("grace")));
             request.parameters.put("time", Integer.parseInt(form.get("time")));
-            request.parameters.put("threshold", Integer.parseInt(form.get("threshold")));
+            request.parameters.put("threshold", Double.parseDouble(form.get("threshold")));
             request.parameters.put("threshold_type", form.get("threshold_type"));
             request.parameters.put("type", form.get("type"));
             request.parameters.put("field", form.get("field"));

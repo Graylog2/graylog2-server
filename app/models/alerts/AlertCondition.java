@@ -152,7 +152,7 @@ public class AlertCondition {
 
     private String buildFieldValueDescription() {
         StringBuilder sb = new StringBuilder();
-        int threshold = (int) ((Double) parameters.get("threshold")).longValue();
+        double threshold = (Double) parameters.get("threshold");
         int time = (int) ((Double) parameters.get("time")).longValue();
         int grace = (int) ((Double) parameters.get("grace")).longValue();
 
