@@ -239,7 +239,7 @@ public class UniversalSearch {
                     keyword
             );
         } else {
-            return routes.SearchController.exportAsCsv(
+            return routes.StreamSearchController.exportAsCsv(
                     query,
                     stream.getId(),
                     timeRange.getType().toString().toLowerCase(),
