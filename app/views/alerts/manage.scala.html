@@ -77,7 +77,7 @@
                 <option value="mean">mean value</option>
                 <option value="min">minimum value</option>
                 <option value="max">maximum value</option>
-                <option value="mean">sum</option>
+                <option value="sum">sum</option>
                 <option value="stddev">standard deviation</option>
             </select>
 
@@ -105,8 +105,9 @@
 
 
             and <br /> then wait at least
-            <input name="grace" type="text" class="input-mini" />
-            minutes until triggering a new alert. (grace period)
+            <input name="grace" type="text" class="input-mini pluralsingular" data-pluralsingular="grace-descr" />
+            <span class="grace-descr" data-plural="minutes" data-singular="minute">minutes</span> until triggering
+            a new alert. (grace period)
 
 
             <p style="margin-top: 10px;">

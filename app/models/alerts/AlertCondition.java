@@ -38,7 +38,8 @@ public class AlertCondition {
     }
 
     public enum Type {
-        MESSAGE_COUNT
+        MESSAGE_COUNT,
+        FIELD_VALUE
     }
 
     private final String id;
@@ -90,54 +91,100 @@ public class AlertCondition {
         switch (type) {
             case MESSAGE_COUNT:
                 return "Message count condition";
+            case FIELD_VALUE:
+                return "Field value condition";
         }
 
         throw new RuntimeException("Cannot build summary for unknown alert condition type [" + type + "]");
     }
 
     public String getDescription() {
-        StringBuilder sb = new StringBuilder();
         switch (type) {
             case MESSAGE_COUNT:
-                int threshold = (int) ((Double) parameters.get("threshold")).longValue();
-                int time = (int) ((Double) parameters.get("time")).longValue();
-                int grace = (int) ((Double) parameters.get("grace")).longValue();
-
-                sb.append("Alert is triggered when there");
-
-                if (threshold == 1) {
-                    sb.append(" is ");
-                } else {
-                    sb.append(" are ");
-                }
-
-                sb.append(parameters.get("threshold_type")).append(" than ").append(threshold);
-
-                if (threshold == 1) {
-                    sb.append(" message ");
-                } else {
-                    sb.append(" messages ");
-                }
-
-                sb.append("in the last ");
-
-                if (time == 1) {
-                    sb.append("minute. ");
-                } else {
-                    sb.append(time).append(" minutes. ");
-                }
-
-                sb.append("Grace period: ").append(grace);
-
-                if (grace == 1) {
-                    sb.append(" minute.");
-                } else {
-                    sb.append(" minutes.");
-                }
-
-                break;
+                return buildMessageCountDescription();
+            case FIELD_VALUE:
+                return buildFieldValueDescription();
             default:
                 throw new RuntimeException("Cannot build description for unknown alert condition type [" + type + "]");
+        }
+    }
+
+    private String buildMessageCountDescription() {
+        StringBuilder sb = new StringBuilder();
+        int threshold = (int) ((Double) parameters.get("threshold")).longValue();
+        int time = (int) ((Double) parameters.get("time")).longValue();
+        int grace = (int) ((Double) parameters.get("grace")).longValue();
+
+        sb.append("Alert is triggered when there");
+
+        if (threshold == 1) {
+            sb.append(" is ");
+        } else {
+            sb.append(" are ");
+        }
+
+        sb.append(parameters.get("threshold_type")).append(" than ").append(threshold);
+
+        if (threshold == 1) {
+            sb.append(" message ");
+        } else {
+            sb.append(" messages ");
+        }
+
+        sb.append("in the last ");
+
+        if (time == 1) {
+            sb.append("minute. ");
+        } else {
+            sb.append(time).append(" minutes. ");
+        }
+
+        sb.append("Grace period: ").append(grace);
+
+        if (grace == 1) {
+            sb.append(" minute.");
+        } else {
+            sb.append(" minutes.");
+        }
+
+        return sb.toString();
+    }
+
+    private String buildFieldValueDescription() {
+        StringBuilder sb = new StringBuilder();
+        int threshold = (int) ((Double) parameters.get("threshold")).longValue();
+        int time = (int) ((Double) parameters.get("time")).longValue();
+        int grace = (int) ((Double) parameters.get("grace")).longValue();
+
+        sb.append("Alert is triggered when the field ")
+                .append(parameters.get("field")).append(" has a ")
+                .append(parameters.get("threshold_type"))
+                .append(" ");
+
+        if (parameters.get("type").equals("mean") || parameters.get("type").equals("min")
+            || parameters.get("type").equals("max")) {
+            sb.append(parameters.get("type")).append(" value");
+        } else if(parameters.get("type").equals("stddev")) {
+            sb.append("standard deviation");
+        } else {
+            sb.append(parameters.get("type"));
+        }
+
+        sb.append(" than ").append(threshold)
+            .append(" in the last ");
+
+        if (time == 1) {
+            sb.append("minute. ");
+        } else {
+            sb.append(time).append(" minutes. ");
+        }
+
+        sb.append("Grace period: ").append(grace);
+
+        if (grace == 1) {
+            sb.append(" minute.");
+        } else {
+            sb.append(" minutes.");
         }
 
         return sb.toString();

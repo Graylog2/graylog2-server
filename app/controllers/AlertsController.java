@@ -95,7 +95,40 @@ public class AlertsController extends AuthenticatedController {
     }
 
     public Result addTypeFieldValue(String streamId) {
-        return ok("TODO implement.");
+        Map<String,String> form = flattenFormUrlEncoded(request().body().asFormUrlEncoded());
+
+        if(!checkParam("grace", form) || !checkParam("time", form)
+                || !checkParam("threshold", form)
+                || !checkParam("threshold_type", form)
+                || !checkParam("field", form)
+                || !checkParam("type", form)) {
+            flash("error", "Could not add alert condition: Missing parameters.");
+            return redirect(routes.AlertsController.index(streamId));
+        }
+
+        try {
+            Stream stream = streamService.get(streamId);
+
+            CreateAlertConditionRequest request = new CreateAlertConditionRequest();
+            request.creatorUserId = currentUser().getName();
+            request.type = "field_value";
+            request.parameters.put("grace", Integer.parseInt(form.get("grace")));
+            request.parameters.put("time", Integer.parseInt(form.get("time")));
+            request.parameters.put("threshold", Integer.parseInt(form.get("threshold")));
+            request.parameters.put("threshold_type", form.get("threshold_type"));
+            request.parameters.put("type", form.get("type"));
+            request.parameters.put("field", form.get("field"));
+
+            stream.addAlertCondition(request);
+        } catch (IOException e) {
+            return status(504, views.html.errors.error.render(ApiClient.ERROR_MSG_IO, e, request()));
+        } catch (APIException e) {
+            String message = "Could not create alert condition. We expected HTTP 200, but got a HTTP " + e.getHttpCode() + ".";
+            return status(504, views.html.errors.error.render(message, e, request()));
+        }
+
+        flash("success", "Added alert condition.");
+        return redirect(routes.AlertsController.index(streamId));
     }
 
     public Result removeCondition(String streamId, String conditionId) {
