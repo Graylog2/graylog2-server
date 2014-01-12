@@ -60,7 +60,6 @@ public class RestPermissions {
     public static final String STREAMS_CREATE = "streams:create";
     public static final String STREAMS_READ = "streams:read";
     public static final String STREAMS_EDIT = "streams:edit";
-    public static final String STREAMS_CLONE = "streams:clone";
     public static final String STREAMS_CHANGESTATE = "streams:changestate";
     public static final String INDEXERCLUSTER_READ = "indexercluster:read";
     public static final String INDICES_READ = "indices:read";

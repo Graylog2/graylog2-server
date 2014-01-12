@@ -355,7 +355,7 @@ public class StreamResource extends RestResource {
             throw new WebApplicationException(e, Response.Status.BAD_REQUEST);
         }
 
-        checkPermission(RestPermissions.STREAMS_CLONE, streamId);
+        checkPermission(RestPermissions.STREAMS_CREATE);
         checkPermission(RestPermissions.STREAMS_READ, streamId);
 
         StreamImpl sourceStream = fetchStream(streamId);
