@@ -40,11 +40,10 @@
     </li>
     }
 
-    @if(Permissions.isPermitted(RestPermissions.USERS_LIST)) {
     <li>
         <a href="@routes.UsersController.index()">
             Users
         </a>
     </li>
-    }
+
 </ul>

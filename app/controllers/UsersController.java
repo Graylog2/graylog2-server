@@ -46,7 +46,6 @@ import views.html.system.users.show;
 
 import javax.annotation.Nullable;
 import java.io.IOException;
-import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 
@@ -68,7 +67,7 @@ public class UsersController extends AuthenticatedController {
     private StreamService streamService;
 
     public Result index() {
-        final List<User> allUsers = isPermitted(USERS_LIST) ? userService.all() : Collections.<User>emptyList();
+        final List<User> allUsers = isPermitted(USERS_LIST) ? userService.all() : Lists.newArrayList(currentUser());
         final List<String> permissions = permissionsService.all();
         return ok(views.html.system.users.index.render(currentUser(), breadcrumbs(), allUsers, permissions));
     }
