@@ -96,10 +96,10 @@ public class SearchController extends AuthenticatedController {
         }
     }
 
-    public Result exportAsCsv(String q, String rangeType, int relative, String from, String to, String keyword) {
+    public Result exportAsCsv(String q, String filter, String rangeType, int relative, String from, String to, String keyword) {
         UniversalSearch search;
         try {
-            search = getSearch(q, null, rangeType, relative, from, to, keyword, 0, UniversalSearch.DEFAULT_SORT);
+            search = getSearch(q, filter.isEmpty() ? null : filter, rangeType, relative, from, to, keyword, 0, UniversalSearch.DEFAULT_SORT);
         } catch(InvalidRangeParametersException e2) {
             return status(400, views.html.errors.error.render("Invalid range parameters provided.", e2, request()));
         } catch(IllegalArgumentException e1) {
