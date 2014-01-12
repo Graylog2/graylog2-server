@@ -37,6 +37,7 @@ import org.graylog2.indexer.searches.Searches;
 import org.graylog2.indexer.searches.Sorting;
 import org.graylog2.indexer.searches.timeranges.TimeRange;
 import org.graylog2.rest.resources.RestResource;
+import org.graylog2.rest.resources.search.responses.GenericError;
 import org.graylog2.rest.resources.search.responses.QueryParseError;
 import org.graylog2.rest.resources.search.responses.SearchResponse;
 import org.slf4j.Logger;
@@ -200,29 +201,39 @@ public class SearchResource extends RestResource {
                 return new BadRequestException();
             }
             Throwable rootCause = ((SearchParseException) unwrapped).getRootCause();
-            if (!(rootCause instanceof ParseException)) {
-                LOG.warn("Root cause of SearchParseException has unexpected type!" + rootCause.getClass(), e);
-                return new BadRequestException();
-            }
+            if (rootCause instanceof ParseException) {
 
-            Token currentToken = ((ParseException) rootCause).currentToken;
-            SearchResponse sr = new SearchResponse();
-            sr.query = query;
-            sr.error = new QueryParseError();
-            if (currentToken == null) {
-                LOG.warn("No position/token available for ParseException.");
-            } else {
-                // scan for first usable token with position information
-                while (currentToken != null && sr.error.beginLine == 0) {
-                    sr.error.beginColumn = currentToken.beginColumn;
-                    sr.error.beginLine = currentToken.beginLine;
-                    sr.error.endColumn = currentToken.endColumn;
-                    sr.error.endLine = currentToken.endLine;
+                Token currentToken = ((ParseException) rootCause).currentToken;
+                SearchResponse sr = new SearchResponse();
+                sr.query = query;
+                sr.error = new QueryParseError();
+                if (currentToken == null) {
+                    LOG.warn("No position/token available for ParseException.");
+                } else {
+                    // scan for first usable token with position information
+                    while (currentToken != null && sr.error.beginLine == 0) {
+                        sr.error.beginColumn = currentToken.beginColumn;
+                        sr.error.beginLine = currentToken.beginLine;
+                        sr.error.endColumn = currentToken.endColumn;
+                        sr.error.endLine = currentToken.endLine;
 
-                    currentToken = currentToken.next;
+                        currentToken = currentToken.next;
+                    }
                 }
+                return new BadRequestException(Response.status(Response.Status.BAD_REQUEST).entity(json(sr)).build());
+            } else if(rootCause instanceof NumberFormatException) {
+                final SearchResponse sr = new SearchResponse();
+                sr.query = query;
+                sr.genericError = new GenericError();
+                sr.genericError.exceptionName = rootCause.getClass().getCanonicalName();
+                sr.genericError.message = rootCause.getMessage();
+                return new BadRequestException(Response.status(Response.Status.BAD_REQUEST).entity(json(sr)).build());
+            } else {
+                LOG.warn("Root cause of SearchParseException has unexpected type!" + rootCause.getClass(), e);
+                final SearchResponse sr = new SearchResponse();
+                sr.query = query;
+                return new BadRequestException(Response.status(Response.Status.BAD_REQUEST).entity(json(sr)).build());
             }
-            return new BadRequestException(Response.status(Response.Status.BAD_REQUEST).entity(json(sr)).build());
         }
 
         return new BadRequestException();

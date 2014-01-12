@@ -1,5 +1,5 @@
 /*
- * Copyright 2013, 2014 TORCH GmbH
+ * Copyright 2013 TORCH GmbH
  *
  * This file is part of Graylog2.
  *
@@ -19,21 +19,9 @@
 package org.graylog2.rest.resources.search.responses;
 
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
-import org.graylog2.indexer.results.ResultMessage;
-
-import java.util.List;
-import java.util.Set;
 
 @JsonAutoDetect
-public class SearchResponse {
-    public String query;
-    public String builtQuery;
-    public Set<String> usedIndices;
-    public List<ResultMessage> messages;
-    public Set<String> fields;
-    public long time;
-    public long totalResults;
-
-    public QueryParseError error;
-    public GenericError genericError;
+public class GenericError {
+    public String exceptionName;
+    public String message;
 }
