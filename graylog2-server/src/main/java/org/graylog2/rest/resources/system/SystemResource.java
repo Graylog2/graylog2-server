@@ -23,6 +23,7 @@ package org.graylog2.rest.resources.system;
 import com.codahale.metrics.annotation.Timed;
 import com.codahale.metrics.jvm.ThreadDump;
 import com.google.common.collect.Maps;
+import com.google.common.collect.Ordering;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.apache.shiro.authz.annotation.RequiresGuest;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
@@ -31,18 +32,21 @@ import org.graylog2.ProcessingPauseLockedException;
 import org.graylog2.plugin.Tools;
 import org.graylog2.rest.documentation.annotations.Api;
 import org.graylog2.rest.documentation.annotations.ApiOperation;
+import org.graylog2.rest.documentation.annotations.ApiParam;
 import org.graylog2.rest.resources.RestResource;
+import org.graylog2.rest.resources.system.responses.ReaderPermissionResponse;
 import org.graylog2.security.RestPermissions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.ws.rs.*;
-import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.io.ByteArrayOutputStream;
 import java.lang.management.ManagementFactory;
 import java.util.Map;
 
+import static javax.ws.rs.core.MediaType.APPLICATION_JSON;
+import static javax.ws.rs.core.MediaType.TEXT_PLAIN;
 import static javax.ws.rs.core.Response.ok;
 
 
@@ -58,7 +62,7 @@ public class SystemResource extends RestResource {
 
     @GET @Timed
     @ApiOperation(value = "Get system overview")
-    @Produces(MediaType.APPLICATION_JSON)
+    @Produces(APPLICATION_JSON)
     public String system() {
         checkPermission(RestPermissions.SYSTEM_READ, core.getNodeId());
         Map<String, Object> result = Maps.newHashMap();
@@ -78,7 +82,7 @@ public class SystemResource extends RestResource {
                   notes = "This operation is comparably fast because it reads directly from the indexer mapping.")
     @Path("/fields")
     @RequiresPermissions(RestPermissions.FIELDNAMES_READ)
-    @Produces(MediaType.APPLICATION_JSON)
+    @Produces(APPLICATION_JSON)
     public String fields() {
         Map<String, Object> result = Maps.newHashMap();
         result.put("fields", core.getIndexer().indices().getAllMessageFields());
@@ -134,7 +138,7 @@ public class SystemResource extends RestResource {
     @GET
     @ApiOperation(value = "Get JVM information")
     @Path("/jvm") @Timed
-    @Produces(MediaType.APPLICATION_JSON)
+    @Produces(APPLICATION_JSON)
     public String jvm() {
         checkPermission(RestPermissions.JVMSTATS_READ, core.getNodeId());
 
@@ -156,7 +160,7 @@ public class SystemResource extends RestResource {
     @GET @Timed
     @ApiOperation(value = "Get a thread dump")
     @Path("/threaddump")
-    @Produces(MediaType.TEXT_PLAIN)
+    @Produces(TEXT_PLAIN)
     public String threaddump() {
         checkPermission(RestPermissions.THREADS_DUMP, core.getNodeId());
 
@@ -172,11 +176,26 @@ public class SystemResource extends RestResource {
     @RequiresGuest // turns off authentication for this action
     @ApiOperation(value = "Get all available user permissions.")
     @Path("/permissions")
-    @Produces(MediaType.APPLICATION_JSON)
+    @Produces(APPLICATION_JSON)
     public String permissions() {
         Map<String, Object> result = Maps.newHashMap();
         result.put("permissions", RestPermissions.allPermissions());
         return json(result);
     }
 
+    @GET @Timed
+    @RequiresGuest
+    @ApiOperation(value = "Get the initial permissions assigned to a reader account")
+    @Path("/permissions/reader/{username}")
+    @Produces(APPLICATION_JSON)
+    public ReaderPermissionResponse readerPermissions(
+            @ApiParam(title = "username", required = true)
+            @PathParam("username") String username) {
+        if (username == null || username.isEmpty()) {
+            throw new BadRequestException("Username cannot be null or empty");
+        }
+        final ReaderPermissionResponse response = new ReaderPermissionResponse();
+        response.permissions = Ordering.natural().sortedCopy(RestPermissions.readerPermissions(username));
+        return response;
+    }
 }
