@@ -1,9 +1,9 @@
-
 @(form: Form[models.api.requests.CreateUserRequestForm],
         currentUser: User,
         permissions: List[String],
         selectedPermissions: Set[String],
         timezones: Map[String, Collection[String]],
+        applicationTimeZone: org.joda.time.DateTimeZone,
         streams: List[models.Stream],
         breadcrumbs: lib.BreadcrumbList)
 @import com.google.common.collect.ImmutableList
@@ -54,13 +54,12 @@
             -->
 
             <label for="timezone">Time Zone</label>
-            <span class="help-block">Choose your local time zone or leave it empty to use the system's default.</span>
+            <span class="help-block">Choose your local time zone or leave it as it is to use the system's default.</span>
             <select name="timezone" id="timezone" data-placeholder="Pick your time zone" class="timezone-select">
-                <option></option>
             @for(group <- ImmutableList.copyOf(timezones.keys).sorted) {
                 <optgroup label="@group">
                 @for(zone <- ImmutableList.copyOf(timezones.get(group).iterator()).sorted) {
-                    <option value="@group/@zone">@zone</option>
+                    <option value="@group/@zone" @if(applicationTimeZone.getID.equals(group+"/"+zone)) {selected}>@zone</option>
                 }
                 </optgroup>
             }

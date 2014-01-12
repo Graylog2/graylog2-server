@@ -97,6 +97,7 @@ public class UsersController extends AuthenticatedController {
                     permissions,
                     ImmutableSet.<String>of(),
                     DateTools.getGroupedTimezoneIds().asMap(),
+                    DateTools.getApplicationTimeZone(),
                     streamService.all(),
                     bc));
         } catch (IOException e) {
@@ -150,6 +151,7 @@ public class UsersController extends AuthenticatedController {
                         permissions,
                         ImmutableSet.copyOf(request.permissions),
                         DateTools.getGroupedTimezoneIds().asMap(),
+                        DateTools.getApplicationTimeZone(),
                         streamService.all(),
                         bc));
             } catch (IOException e) {
