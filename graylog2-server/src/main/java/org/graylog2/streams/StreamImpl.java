@@ -174,7 +174,11 @@ public class StreamImpl extends Persisted implements Stream {
                 try {
                     conditions.add(AlertCondition.fromPersisted(conditionFields, this, core));
                 } catch (AlertCondition.NoSuchAlertConditionTypeException e) {
+                    LOG.error("Skipping unknown alert condition type.", e);
+                    continue;
+                } catch (Exception e) {
                     LOG.error("Skipping alert condition.", e);
+                    continue;
                 }
             }
         }

@@ -43,10 +43,10 @@ public class MessageCountAlertCondition extends AlertCondition {
         MORE, LESS
     }
 
-    private int grace;
-    private int time;
-    private ThresholdType thresholdType;
-    private int threshold;
+    private final int grace;
+    private final int time;
+    private final ThresholdType thresholdType;
+    private final int threshold;
 
     public MessageCountAlertCondition(Core core, Stream stream, String id, DateTime createdAt, String creatorUserId, Map<String, Object> parameters) {
         super(core, stream, id, Type.MESSAGE_COUNT, createdAt, creatorUserId, parameters);

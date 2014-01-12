@@ -20,6 +20,7 @@
 package org.graylog2.alerts;
 
 import org.graylog2.Core;
+import org.graylog2.alerts.types.FieldValueAlertCondition;
 import org.graylog2.alerts.types.MessageCountAlertCondition;
 import org.graylog2.plugin.Tools;
 import org.graylog2.plugin.database.EmbeddedPersistable;
@@ -41,7 +42,8 @@ public abstract class AlertCondition implements EmbeddedPersistable {
     private static final Logger LOG = LoggerFactory.getLogger(AlertCondition.class);
 
     public enum Type {
-        MESSAGE_COUNT
+        MESSAGE_COUNT,
+        FIELD_VALUE
     }
 
     protected final String id;
@@ -99,6 +101,15 @@ public abstract class AlertCondition implements EmbeddedPersistable {
                         ccr.creatorUserId,
                         parameters
                 );
+            case FIELD_VALUE:
+                return new FieldValueAlertCondition(
+                        core,
+                        stream,
+                        null,
+                        Tools.iso8601(),
+                        ccr.creatorUserId,
+                        parameters
+                );
         }
 
         throw new NoSuchAlertConditionTypeException("Unhandled alert condition type: " + type);
@@ -115,6 +126,15 @@ public abstract class AlertCondition implements EmbeddedPersistable {
         switch(type) {
             case MESSAGE_COUNT:
                 return new MessageCountAlertCondition(
+                        core,
+                        stream,
+                        (String) fields.get("id"),
+                        DateTime.parse((String) fields.get("created_at")),
+                        (String) fields.get("creator_user_id"),
+                        (Map<String, Object>) fields.get("parameters")
+                );
+            case FIELD_VALUE:
+                return new FieldValueAlertCondition(
                         core,
                         stream,
                         (String) fields.get("id"),
