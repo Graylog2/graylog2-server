@@ -18,6 +18,7 @@
  */
 package controllers;
 
+import com.google.common.base.Predicate;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
@@ -43,13 +44,13 @@ import views.html.system.users.edit;
 import views.html.system.users.new_user;
 import views.html.system.users.show;
 
+import javax.annotation.Nullable;
 import java.io.IOException;
 import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 
-import static lib.security.RestPermissions.USERS_LIST;
-import static lib.security.RestPermissions.USERS_PERMISSIONSEDIT;
+import static lib.security.RestPermissions.*;
 import static views.helpers.Permissions.isPermitted;
 
 public class UsersController extends AuthenticatedController {
@@ -222,6 +223,15 @@ public class UsersController extends AuthenticatedController {
         final ChangeUserRequestForm formData = requestForm.get();
         Set<String> permissions = Sets.newHashSet(user.getPermissions());
         // TODO this does not handle combined permissions like streams:edit,read:1,2 !
+        // remove all streams:edit, streams:read permissions and add the ones from the form back.
+
+        permissions = Sets.newHashSet(Sets.filter(permissions, new Predicate<String>() {
+            @Override
+            public boolean apply(@Nullable String input) {
+                return (input != null) &&
+                        !(input.startsWith(STREAMS_READ) || input.startsWith(STREAMS_EDIT));
+            }
+        }));
         for (String streampermission : formData.streampermissions) {
             permissions.add(RestPermissions.STREAMS_READ + ":" + streampermission);
         }
