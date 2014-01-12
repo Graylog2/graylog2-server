@@ -1793,3 +1793,7 @@ form.edit-dashboard-form {
     color: #4DBCE9;
     border-bottom: 1px dotted #4DBCE9;
 }
+
+.alert-condition .in-grace {
+    color: #8c8e86;
+}

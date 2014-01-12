@@ -32,6 +32,9 @@ public class AlertConditionSummaryResponse {
     public String type;
     public Map<String, Object> parameters;
 
+    @SerializedName("in_grace")
+    public boolean inGrace;
+
     @SerializedName("created_at")
     public String createdAt;
 

@@ -44,6 +44,7 @@ public class AlertCondition {
     private final String id;
     private final Type type;
     private final Map<String, Object> parameters;
+    private final boolean inGrace;
     private final DateTime createdAt;
     private final User creatorUser;
 
@@ -54,6 +55,7 @@ public class AlertCondition {
         this.id = acsr.id;
         this.type = Type.valueOf(acsr.type.toUpperCase());
         this.parameters = acsr.parameters;
+        this.inGrace = acsr.inGrace;
         this.createdAt = DateTime.parse(acsr.createdAt);
         this.creatorUser = userService.load(acsr.creatorUserId);
 
@@ -78,6 +80,10 @@ public class AlertCondition {
 
     public User getCreatorUser() {
         return creatorUser;
+    }
+
+    public boolean isInGrace() {
+        return inGrace;
     }
 
     public String getSummary() {
