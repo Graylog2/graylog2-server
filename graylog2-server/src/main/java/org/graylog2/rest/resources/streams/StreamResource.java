@@ -25,7 +25,9 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.google.common.collect.Maps;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
+import org.bson.types.ObjectId;
 import org.graylog2.Core;
+import org.graylog2.alerts.AlertCondition;
 import org.graylog2.database.NotFoundException;
 import org.graylog2.database.ValidationException;
 import org.graylog2.plugin.Message;
@@ -332,6 +334,86 @@ public class StreamResource extends RestResource {
 
         return json(result);
     }
+
+    @POST @Path("/{streamId}/clone") @Timed
+    @ApiOperation(value = "Clone a stream")
+    @RequiresPermissions(RestPermissions.STREAMS_CREATE)
+    @ApiResponses(value = {
+            @ApiResponse(code = 404, message = "Stream not found."),
+            @ApiResponse(code = 400, message = "Invalid or missing Stream id.")
+    })
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response cloneStream(@ApiParam(title = "streamId", required = true) @PathParam("streamId") String streamId,
+                          @ApiParam(title = "JSON body", required = true) String body) {
+        CreateRequest cr;
+
+        try {
+            cr = objectMapper.readValue(body, CreateRequest.class);
+        } catch(IOException e) {
+            LOG.error("Error while parsing JSON", e);
+            throw new WebApplicationException(e, Response.Status.BAD_REQUEST);
+        }
+
+        checkPermission(RestPermissions.STREAMS_CLONE, streamId);
+        checkPermission(RestPermissions.STREAMS_READ, streamId);
+
+        StreamImpl sourceStream = fetchStream(streamId);
+
+        // Create stream.
+        Map<String, Object> streamData = Maps.newHashMap();
+        streamData.put("title", cr.title);
+        streamData.put("description", cr.description);
+        streamData.put("creator_user_id", cr.creatorUserId);
+        streamData.put("created_at", new DateTime(DateTimeZone.UTC));
+
+        StreamImpl stream = new StreamImpl(streamData, core);
+        String id;
+        try {
+            stream.save();
+            id = stream.getId();
+        } catch (ValidationException e) {
+            LOG.error("Validation error.", e);
+            throw new WebApplicationException(e, Response.Status.BAD_REQUEST);
+        }
+
+        if (sourceStream.getStreamRules().size() > 0) {
+            for (StreamRule streamRule : sourceStream.getStreamRules()) {
+                Map<String, Object> streamRuleData = Maps.newHashMap();
+
+                streamRuleData.put("type", streamRule.getType().toInteger());
+                streamRuleData.put("field", streamRule.getField());
+                streamRuleData.put("value", streamRule.getValue());
+                streamRuleData.put("inverted", streamRule.getInverted());
+                streamRuleData.put("stream_id", new ObjectId(id));
+
+                StreamRuleImpl newStreamRule = new StreamRuleImpl(streamRuleData, core);
+                try {
+                    newStreamRule.save();
+                } catch (ValidationException e) {
+                    LOG.error("Validation error while trying to clone a stream rule: ", e);
+                    throw new WebApplicationException(e, Response.Status.BAD_REQUEST);
+                }
+            }
+        }
+
+        if (sourceStream.getAlertConditions().size() > 0) {
+            for (AlertCondition alertCondition : sourceStream.getAlertConditions()) {
+                try {
+                    stream.addAlertCondition(alertCondition);
+                } catch (ValidationException e) {
+                    LOG.error("Validation error while trying to clone an alert condition: ", e);
+                    throw new WebApplicationException(e, Response.Status.BAD_REQUEST);
+                }
+            }
+        }
+
+        Map<String, Object> result = Maps.newHashMap();
+        result.put("stream_id", id);
+
+        return Response.status(Response.Status.CREATED).entity(json(result)).build();
+    }
+
 
     protected StreamImpl fetchStream(String streamId) {
         if (streamId == null || streamId.isEmpty()) {
