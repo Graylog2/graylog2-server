@@ -45,6 +45,7 @@ public class LdapSettings extends Persisted {
     public static final String DISPLAY_NAME_ATTRIBUTE = "username_attribute";
     public static final String USE_START_TLS = "use_start_tls";
     public static final String ACTIVE_DIRECTORY = "active_directory";
+    public static final String DEFAULT_GROUP = "reader";
 
     public LdapSettings(Core core) {
         super(core, Maps.<String, Object>newHashMap());
@@ -168,6 +169,15 @@ public class LdapSettings extends Persisted {
     public boolean isActiveDirectory() {
         final Object o = fields.get(ACTIVE_DIRECTORY);
         return o != null ? Boolean.valueOf(o.toString()) : false;
+    }
+
+    public String getDefaultGroup() {
+        final Object o = fields.get(DEFAULT_GROUP);
+        return o != null ? o.toString() : "reader"; // reader is the safe default
+    }
+
+    public void setDefaultGroup(String defaultGroup) {
+        fields.put(DEFAULT_GROUP, defaultGroup);
     }
 
 }

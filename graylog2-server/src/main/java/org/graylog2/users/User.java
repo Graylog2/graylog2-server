@@ -31,6 +31,7 @@ import org.graylog2.database.validators.FilledStringValidator;
 import org.graylog2.database.validators.ListValidator;
 import org.graylog2.database.validators.OptionalStringValidator;
 import org.graylog2.database.validators.Validator;
+import org.graylog2.security.RestPermissions;
 import org.graylog2.security.ldap.LdapEntry;
 import org.graylog2.security.ldap.LdapSettings;
 import org.joda.time.DateTimeZone;
@@ -259,7 +260,17 @@ public class User extends Persisted {
         setName(username);
         setExternal(true);
         setEmail(userEntry.getEmail());
-        setPermissions(Lists.<String>newArrayList("*")); // TODO use group mapper to find actual groups
+
+        // only touch the permissions if none existed for this account before
+        // i.e. only determine the new permissions for an account on initially importing it.
+        if (getPermissions() == null) {
+            if (ldapSettings.getDefaultGroup().equals("reader")) {
+                setPermissions(Lists.newArrayList(RestPermissions.readerPermissions(username)));
+
+            } else {
+                setPermissions(Lists.<String>newArrayList("*"));
+            }
+        }
     }
 
     public static class LocalAdminUser extends User {

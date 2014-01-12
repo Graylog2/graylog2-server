@@ -42,4 +42,6 @@ public class LdapSettingsRequest {
     public String searchPattern;
 
     public String displayNameAttribute;
+
+    public String defaultGroup;
 }
