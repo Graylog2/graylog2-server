@@ -28,6 +28,7 @@ import models.Stream;
 import models.api.requests.streams.CreateStreamRequest;
 import play.data.Form;
 import play.mvc.Result;
+import views.html.streams.clone_stream;
 
 import java.io.IOException;
 import java.util.List;
@@ -89,6 +90,34 @@ public class StreamsController extends AuthenticatedController {
             CreateStreamRequest csr = form.get();
             csr.creatorUserId = currentUser().getName();
             newStreamId = streamService.create(csr);
+        } catch (APIException e) {
+            String message = "Could not create stream. We expected HTTP 201, but got a HTTP " + e.getHttpCode() + ".";
+            return status(504, views.html.errors.error.render(message, e, request()));
+        } catch (IOException e) {
+            return status(504, views.html.errors.error.render(ApiClient.ERROR_MSG_IO, e, request()));
+        }
+
+        return redirect(routes.StreamRulesController.index(newStreamId));
+    }
+
+    public Result cloneStreamForm(String stream_id) {
+        return ok(clone_stream.render(currentUser(), stream_id));
+    }
+
+    public Result cloneStream(String stream_id) {
+        Form<CreateStreamRequest> form = createStreamForm.bindFromRequest();
+        if (form.hasErrors()) {
+            flash("error", "Please fill in all fields: " + form.errors());
+
+            return redirect(routes.StreamsController.cloneStreamForm(stream_id));
+        }
+
+        String newStreamId;
+
+        try {
+            CreateStreamRequest csr = form.get();
+            csr.creatorUserId = currentUser().getName();
+            newStreamId = streamService.cloneStream(stream_id, csr);
         } catch (APIException e) {
             String message = "Could not create stream. We expected HTTP 201, but got a HTTP " + e.getHttpCode() + ".";
             return status(504, views.html.errors.error.render(message, e, request()));

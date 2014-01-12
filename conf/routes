@@ -35,6 +35,8 @@ GET         /streams/:stream_id/pause                                           
 GET         /streams/:stream_id/resume                                               @controllers.StreamsController.resume(stream_id: String)
 GET         /streams/:stream_id/edit                                                 @controllers.StreamsController.edit(stream_id: String)
 POST        /streams/:stream_id/update                                               @controllers.StreamsController.update(stream_id: String)
+GET         /streams/:stream_id/clone                                                @controllers.StreamsController.cloneStreamForm(stream_id: String)
+POST        /streams/:stream_id/clone                                                @controllers.StreamsController.cloneStream(stream_id: String)
 
 # Alerts
 GET         /streams/:stream_id/alerts                                               @controllers.AlertsController.index(stream_id: String)

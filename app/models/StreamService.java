@@ -107,4 +107,9 @@ public class StreamService {
         testMatchResponse = api.post(TestMatchResponse.class).path("/streams/" + streamId + "/testMatch").body(request).expect(Http.Status.OK).execute();
         return testMatchResponse;
     }
+
+    public String cloneStream(String streamId, CreateStreamRequest request) throws APIException, IOException {
+        CreateStreamResponse csr = api.post(CreateStreamResponse.class).path("/streams/"+streamId+"/clone").body(request).expect(Http.Status.CREATED).execute();
+        return csr.streamId;
+    }
 }
