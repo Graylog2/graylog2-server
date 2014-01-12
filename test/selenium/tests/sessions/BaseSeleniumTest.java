@@ -26,7 +26,7 @@ import lib.APIException;
 import lib.ApiClient;
 import models.api.requests.InputLaunchRequest;
 import models.api.responses.cluster.NodeSummaryResponse;
-import models.api.responses.system.InputSummaryResponse;
+import models.api.responses.system.InputStateSummaryResponse;
 import models.api.responses.system.InputsResponse;
 import org.elasticsearch.client.Client;
 import org.elasticsearch.node.NodeBuilder;
@@ -142,13 +142,13 @@ public class BaseSeleniumTest extends FluentTest {
             final HostAndPort nodeAddr = HostAndPort.fromParts(uri.getHost(), 12201);
             final InputsResponse ir = api().get(InputsResponse.class).path("/system/inputs").execute();
             if (ir.total > 0) {
-                for (InputSummaryResponse input : ir.inputs) {
-                    if (!input.type.equals("org.graylog2.inputs.gelf.tcp.GELFTCPInput")) {
+                for (InputStateSummaryResponse input : ir.inputs) {
+                    if (!input.messageinput.type.equals("org.graylog2.inputs.gelf.tcp.GELFTCPInput")) {
                         continue;
                     }
                     gelfTcpAddr = HostAndPort.fromParts(
-                            input.attributes.get("bind_address").toString(),
-                            Double.valueOf(input.attributes.get("port").toString()).intValue() // Sad, very sad.
+                            input.messageinput.attributes.get("bind_address").toString(),
+                            Double.valueOf(input.messageinput.attributes.get("port").toString()).intValue() // Sad, very sad.
                     );
                 }
             }
