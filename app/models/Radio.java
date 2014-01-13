@@ -288,6 +288,9 @@ public class Radio extends ClusterEntity {
                     .body(request)
                     .expect(Http.Status.ACCEPTED)
                     .execute();
+
+            // TODO lolwut
+            return new InputLaunchResponse();
         } catch (APIException e) {
             log.error("Could not launch input " + title, e);
         } catch (IOException e) {
