@@ -1,4 +1,4 @@
-@(nodeStates: Map[Node, InputState])
+@(nodeStates: Map[ClusterEntity, InputState])
 @import views.helpers.InputStateHelper
 
 @for((state, count) <- InputStateHelper.stateCounts(nodeStates)) {

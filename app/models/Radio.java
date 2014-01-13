@@ -117,7 +117,7 @@ public class Radio extends ClusterEntity {
     }
 
     public String getNodeId() {
-        return getShortNodeId();
+        return id;
     }
 
     @Override

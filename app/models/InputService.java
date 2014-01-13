@@ -43,6 +43,21 @@ public class InputService {
         this.serverNodes = serverNodes;
     }
 
+    protected Map<ClusterEntity, InputsResponse> getInputsFromAllEntities() {
+        Map<ClusterEntity, InputsResponse> result = Maps.newHashMap();
+        result.putAll(api.get(InputsResponse.class).fromAllNodes().path("/system/inputs").executeOnAll());
+        try {
+            for(Radio radio : nodeService.radios().values()) {
+                result.put(radio, api.get(InputsResponse.class).radio(radio).path("/system/inputs").execute());
+            }
+        } catch (APIException e) {
+            log.error("Unable to fetch radio list: " + e);
+        } catch (IOException e) {
+            log.error("Unable to fetch radio list: " + e);
+        }
+        return result;
+    }
+
     protected Map<Node, InputsResponse> getInputsFromAllNodes() {
         return api.get(InputsResponse.class).fromAllNodes().path("/system/inputs").executeOnAll();
     }
@@ -50,18 +65,18 @@ public class InputService {
     public List<InputState> loadAllInputStates() {
         List<InputState> inputStates = Lists.newArrayList();
 
-        for (Map.Entry<Node, List<InputState>> entry : loadAllInputStatesByNode().entrySet()) {
+        for (Map.Entry<ClusterEntity, List<InputState>> entry : loadAllInputStatesByEntity().entrySet()) {
             inputStates.addAll(entry.getValue());
         }
 
         return inputStates;
     }
 
-    public Map<Node, List<InputState>> loadAllInputStatesByNode() {
-        Map<Node, List<InputState>> result = Maps.newHashMap();
-        Map<Node, InputsResponse> inputsResponseMap = getInputsFromAllNodes();
+    public Map<ClusterEntity, List<InputState>> loadAllInputStatesByEntity() {
+        Map<ClusterEntity, List<InputState>> result = Maps.newHashMap();
+        Map<ClusterEntity, InputsResponse> inputsResponseMap = getInputsFromAllEntities();
 
-        for (Map.Entry<Node, InputsResponse> entry : inputsResponseMap.entrySet()) {
+        for (Map.Entry<ClusterEntity, InputsResponse> entry : inputsResponseMap.entrySet()) {
             List<InputState> nodeList = Lists.newArrayList();
             result.put(entry.getKey(), nodeList);
 
@@ -73,15 +88,15 @@ public class InputService {
         return result;
     }
 
-    public Map<Input, Map<Node, InputState>> loadAllInputStatesByInput() {
-        Map<Node, List<InputState>> inputStatesByNode = loadAllInputStatesByNode();
-        Map<Input, Map<Node, InputState>> result = Maps.newHashMap();
+    public Map<Input, Map<ClusterEntity, InputState>> loadAllInputStatesByInput() {
+        Map<ClusterEntity, List<InputState>> inputStatesByNode = loadAllInputStatesByEntity();
+        Map<Input, Map<ClusterEntity, InputState>> result = Maps.newHashMap();
 
-        for (Map.Entry<Node, List<InputState>> nodeEntry : inputStatesByNode.entrySet()) {
+        for (Map.Entry<ClusterEntity, List<InputState>> nodeEntry : inputStatesByNode.entrySet()) {
             for (InputState inputState : nodeEntry.getValue()) {
                 Input input = inputState.getInput();
                 if (result.get(input) == null) {
-                    Map<Node, InputState> inputStateMap = Maps.newHashMap();
+                    Map<ClusterEntity, InputState> inputStateMap = Maps.newHashMap();
                     result.put(input, inputStateMap);
                 }
 

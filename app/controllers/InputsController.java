@@ -46,9 +46,12 @@ public class InputsController extends AuthenticatedController {
     @Inject
     private ServerNodes servernodes;
 
+    @Inject
+    private ClusterService clusterService;
+
     public Result index() {
         try {
-            Map<Input, Map<Node, InputState>> globalInputs = Maps.newHashMap();
+            Map<Input, Map<ClusterEntity, InputState>> globalInputs = Maps.newHashMap();
             //List<InputState> globalInputs = Lists.newArrayList();
             List<InputState> localInputs = Lists.newArrayList();
 
@@ -57,12 +60,14 @@ public class InputsController extends AuthenticatedController {
                     localInputs.add(inputState);
             }
 
-            for (Map.Entry<Input, Map<Node, InputState>> entry : inputService.loadAllInputStatesByInput().entrySet()) {
+            for (Map.Entry<Input, Map<ClusterEntity, InputState>> entry : inputService.loadAllInputStatesByInput().entrySet()) {
                 if (entry.getKey().getGlobal())
                     globalInputs.put(entry.getKey(), entry.getValue());
             }
 
             List<Node> nodes = servernodes.all();
+            List<Radio> radios = Lists.newArrayList();
+            radios.addAll(nodeService.radios().values());
 
             BreadcrumbList bc = new BreadcrumbList();
             bc.addCrumb("System", routes.SystemController.index(0));
@@ -74,6 +79,7 @@ public class InputsController extends AuthenticatedController {
                     globalInputs,
                     localInputs,
                     nodes,
+                    radios,
                     inputService.getAllInputTypeInformation(),
                     nodeService.loadMasterNode()
             ));
@@ -198,17 +204,21 @@ public class InputsController extends AuthenticatedController {
                 && form.get("global")[0].equals("on"));
 
         try {
-            Node node = null;
+            ClusterEntity node = null;
             InputTypeSummaryResponse inputInfo = null;
             if (form.get("node") != null && form.get("node").length > 0) {
-                node = nodeService.loadNode(form.get("node")[0]);
+                try {
+                    node = nodeService.loadNode(form.get("node")[0]);
+                } catch (NodeService.NodeNotFoundException e) {
+                    node = nodeService.loadRadio(form.get("node")[0]);
+                }
             }
 
             if (global)
                 node = nodeService.loadMasterNode();
 
             if (node == null)
-                throw new WebApplicationException(400);
+                return status(404, views.html.errors.error.render(ApiClient.ERROR_MSG_NODE_NOT_FOUND, new RuntimeException("Could not find Node to launch input on!"), request()));
 
             inputInfo = node.getInputTypeInformation(inputType);
 

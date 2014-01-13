@@ -1,8 +1,9 @@
 @(currentUser: User,
         breadcrumbs: lib.BreadcrumbList,
-        globalInputs: Map[Input, Map[Node, InputState]],
+        globalInputs: Map[Input, Map[ClusterEntity, InputState]],
         localInputs: List[InputState],
         nodes: List[Node],
+        radios: List[Radio],
         inputTypes: Map[String, models.api.responses.system.InputTypeSummaryResponse],
         masterNode: Node
 )
@@ -80,8 +81,18 @@
                         <label>Node(s) to spawn input on:</label>
                         <span class="help-block">Select the node you want to spawn this input on.</span>
                         <select name="node" class="input-node-selector">
+                            @if(nodes.size() > 0) {
+                                <option disabled="true">-- Server nodes --</option>
+                            }
                             @for((node) <- nodes.toSeq.sortBy(_.getNodeId)) {
                                 <option value="@node.getNodeId">@node.getShortNodeId / @node.getHostname</option>
+                            }
+
+                            @if(radios.size() > 0) {
+                                <option disabled="true">-- Radio Nodes --</option>
+                            }
+                            @for((radio) <- radios.toSeq.sortBy(_.getNodeId)) {
+                                <option value="@radio.getNodeId">@radio.getShortNodeId / @radio.getHostname</option>
                             }
                         </select>
 
