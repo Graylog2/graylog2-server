@@ -81,7 +81,7 @@
                         <span class="help-block">Select the node you want to spawn this input on.</span>
                         <select name="node" class="input-node-selector">
                             @for((node) <- nodes.toSeq.sortBy(_.getNodeId)) {
-                                <option value="@node.getNodeId">@node.getShortNodeId</option>
+                                <option value="@node.getNodeId">@node.getShortNodeId / @node.getHostname</option>
                             }
                         </select>
 
