@@ -1,11 +1,16 @@
 @(currentUser: User, breadcrumbs: lib.BreadcrumbList, dashboard: models.dashboards.Dashboard)
 
+@import views.helpers.Permissions._
+@import lib.security.RestPermissions._
+
 @main(dashboard.getTitle, null, "", currentUser, false) {
 
     <div class="pull-right dashboard-controls">
+        @if(isPermitted(DASHBOARDS_EDIT, dashboard.getId)) {
         <i class="icon icon-lock unlock-dashboard-widgets" title="Unlock widget positions"></i>
         <i class="icon icon-unlock lock-dashboard-widgets" title="Lock widget positions" style="display: none;"></i>
         &nbsp;
+        }
         <i class="icon icon-fullscreen toggle-fullscreen" title="Fullscreen"></i>
     </div>
 
@@ -32,7 +37,9 @@
 
     <p class="dashboard-description">
         @dashboard.getDescription
-        (Unlock widget positions by clicking on the lock symbol on the top right. Then drag them to any position you like.)
+        @if(isPermitted(DASHBOARDS_EDIT, dashboard.getId)) {
+            (Unlock widget positions by clicking on the lock symbol on the top right. Then drag them to any position you like.)
+        }
     </p>
 
     @if(dashboard.getWidgets.isEmpty) {
