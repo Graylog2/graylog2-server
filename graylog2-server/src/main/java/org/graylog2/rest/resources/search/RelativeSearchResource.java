@@ -42,7 +42,6 @@ import javax.ws.rs.core.MediaType;
  * @author Lennart Koopmann <lennart@torch.sh>
  */
 @RequiresAuthentication
-@RequiresPermissions(RestPermissions.SEARCHES_RELATIVE)
 @Api(value = "Search/Relative", description = "Message search")
 @Path("/search/universal/relative")
 public class RelativeSearchResource extends SearchResource {

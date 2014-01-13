@@ -42,7 +42,6 @@ import javax.ws.rs.core.MediaType;
  * @author Lennart Koopmann <lennart@torch.sh>
  */
 @RequiresAuthentication
-@RequiresPermissions(RestPermissions.SEARCHES_KEYWORD)
 @Api(value = "Search/Keyword", description = "Message search")
 @Path("/search/universal/keyword")
 public class KeywordSearchResource extends SearchResource {

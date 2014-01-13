@@ -97,24 +97,7 @@ public class RestPermissions {
     private static Map<String, Collection<String>> allPermissions;
 
     public static Set<String> adminPermissions = Sets.newHashSet("*");
-    /*
-    "buffers:read",
-    "dashboards:read,create,edit"
-    "fieldnames:read",
-    "indexercluster:read",
-    "inputs:read",
-    "jvmstats:read",
-    "messagecount:read",
-    "messages:read",
-    "metrics:read",
-    "searches:*",
-    "sources:read",
-    "streams:read,edit:52cf0c413004779f52112ba8",
-    "streams:read:52b2e3713004719cb5914ba5",
-    "system:read",
-    "throughput:read",
-    "users:read,edit:reader",
-    */
+
     public static Set<String> readerBasePermissions = Sets.newHashSet(
             BUFFERS_READ,
             FIELDNAMES_READ,
@@ -124,9 +107,6 @@ public class RestPermissions {
             MESSAGECOUNT_READ,
             MESSAGES_READ,
             METRICS_READ,
-            SEARCHES_ABSOLUTE,
-            SEARCHES_KEYWORD,
-            SEARCHES_RELATIVE,
             SOURCES_READ,
             SYSTEM_READ,
             THROUGHPUT_READ

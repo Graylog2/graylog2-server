@@ -42,7 +42,6 @@ import javax.ws.rs.core.MediaType;
  * @author Lennart Koopmann <lennart@torch.sh>
  */
 @RequiresAuthentication
-@RequiresPermissions(RestPermissions.SEARCHES_ABSOLUTE)
 @Api(value = "Search/Absolute", description = "Message search")
 @Path("/search/universal/absolute")
 public class AbsoluteSearchResource extends SearchResource {
