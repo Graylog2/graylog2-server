@@ -25,6 +25,7 @@ import com.google.inject.Inject;
 import lib.*;
 import models.*;
 import models.api.responses.system.InputTypeSummaryResponse;
+import play.Logger;
 import play.mvc.Result;
 
 import javax.ws.rs.WebApplicationException;
@@ -193,7 +194,7 @@ public class InputsController extends AuthenticatedController {
         return configuration;
     }
 
-    public Result launch(String nodeId) {
+    public Result launch(String nodeIdParam) {
         final Map<String, String[]> form = request().body().asFormUrlEncoded();
 
         final String inputType = form.get("type")[0];
@@ -206,11 +207,21 @@ public class InputsController extends AuthenticatedController {
         try {
             ClusterEntity node = null;
             InputTypeSummaryResponse inputInfo = null;
-            if (form.get("node") != null && form.get("node").length > 0) {
+
+            String nodeId = null;
+            if(nodeIdParam != null && !nodeIdParam.isEmpty()) {
+                nodeId = nodeIdParam;
+            } else {
+                if(form.get("node") != null && form.get("node").length > 0) {
+                    nodeId = form.get("node")[0];
+                }
+            }
+
+            if (nodeId != null) {
                 try {
-                    node = nodeService.loadNode(form.get("node")[0]);
+                    node = nodeService.loadNode(nodeId);
                 } catch (NodeService.NodeNotFoundException e) {
-                    node = nodeService.loadRadio(form.get("node")[0]);
+                    node = nodeService.loadRadio(nodeId);
                 }
             }
 
