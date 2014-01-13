@@ -47,14 +47,15 @@
                             <option @if(isPermitted(user, STREAMS_READ, stream.getId)) {selected} value="@stream.getId">@stream.getTitle</option>
                         }
                         </select>
-                        <span class="help-inline">Choose streams the user can view. Removing read access will remove edit access, too.</span>
+                        <span class="help-inline">Choose streams the user can <strong>view</strong>. Removing read access will remove edit access, too.</span>
+
 
                         <select class="streameditpermissions" name="streameditpermissions[]" id="streameditpermissions" data-placeholder="Choose edit permissions..." multiple>
                         @for(stream <- streams.sortBy(_.getTitle)) {
                             <option @if(isPermitted(user, STREAMS_EDIT, stream.getId)) {selected} value="@stream.getId">@stream.getTitle</option>
                         }
                         </select>
-                        <span class="help-inline">Choose the streams the user can edit. Values chosen here will enable read access, too.</span>
+                        <span class="help-inline">Choose the streams the user can <strong>edit</strong>. Values chosen here will enable read access, too.</span>
 
                     </div>
                 </div>
@@ -66,14 +67,14 @@
                             <option @if(isPermitted(user, DASHBOARDS_READ, dashboard.getId)) {selected} value="@dashboard.getId">@dashboard.getTitle</option>
                         }
                         </select>
-                        <span class="help-inline">Choose dashboards the user can view. Removing read access will remove edit access, too.</span>
+                        <span class="help-inline">Choose dashboards the user can <strong>view</strong>. Removing read access will remove edit access, too.</span>
 
-                        <select id="dashboardeditpermissions" name="dashboardeditpermissions[]" data-placeholder="Choose edit permissions..." multiple>
+                        <select class="dashboardeditpermissions" id="dashboardeditpermissions" name="dashboardeditpermissions[]" data-placeholder="Choose edit permissions..." multiple>
                         @for(dashboard <- dashboards.sortBy(_.getTitle)) {
                             <option @if(isPermitted(user, DASHBOARDS_EDIT, dashboard.getId)) {selected} value="@dashboard.getId">@dashboard.getTitle</option>
                         }
                         </select>
-                        <span class="help-inline">Choose dashboards the user can view. Removing read access will remove edit access, too.</span>
+                        <span class="help-inline">Choose dashboards the user can <strong>edit</strong>. Values chosen here will enable read access, too.</span>
                     </div>
                 </div>
                 }

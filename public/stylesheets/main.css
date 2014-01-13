@@ -1798,8 +1798,8 @@ form.edit-dashboard-form {
     color: #8c8e86;
 }
 
-.streameditpermissions {
-    margin-top: 25px;
+.streameditpermissions, .dashboardeditpermissions{
+    margin-top: 10px;
 }
 
 .query-exception {
