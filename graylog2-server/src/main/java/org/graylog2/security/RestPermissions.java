@@ -98,6 +98,7 @@ public class RestPermissions {
 
     public static Set<String> adminPermissions = Sets.newHashSet("*");
 
+    // Standard set of permissions of readers.
     public static Set<String> readerBasePermissions = Sets.newHashSet(
             BUFFERS_READ,
             FIELDNAMES_READ,
@@ -107,7 +108,6 @@ public class RestPermissions {
             MESSAGECOUNT_READ,
             MESSAGES_READ,
             METRICS_READ,
-            SOURCES_READ,
             SYSTEM_READ,
             THROUGHPUT_READ
     );
