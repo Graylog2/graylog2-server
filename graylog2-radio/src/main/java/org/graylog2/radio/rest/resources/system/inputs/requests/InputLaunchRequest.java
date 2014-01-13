@@ -31,6 +31,8 @@ public class InputLaunchRequest {
     public String title;
     public String type;
 
+    public Boolean global;
+
     @JsonProperty("creator_user_id")
     public String creatorUserId;
 

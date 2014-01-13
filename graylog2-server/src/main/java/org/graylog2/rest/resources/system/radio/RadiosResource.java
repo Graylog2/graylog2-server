@@ -197,6 +197,7 @@ public class RadiosResource extends RestResource {
             inputSummary.put("configuration", input.getConfiguration());
             inputSummary.put("creator_user_id", input.getCreatorUserId());
             inputSummary.put("created_at", Tools.getISO8601String(input.getCreatedAt()));
+            inputSummary.put("global", input.isGlobal());
 
             inputs.add(inputSummary);
         }

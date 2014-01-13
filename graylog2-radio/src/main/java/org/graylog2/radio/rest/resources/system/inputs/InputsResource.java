@@ -55,7 +55,6 @@ public class InputsResource extends RestResource {
     @GET @Timed
     @Produces(MediaType.APPLICATION_JSON)
     public String list() {
-        LOG.info("Listing inputs");
         List<Map<String, Object>> inputStates = Lists.newArrayList();
 
         for (InputState inputState : radio.inputs().getRunningInputs()) {
@@ -109,6 +108,7 @@ public class InputsResource extends RestResource {
             input.setTitle(lr.title);
             input.setCreatorUserId(lr.creatorUserId);
             input.setCreatedAt(createdAt);
+            input.setGlobal(lr.global);
 
             input.checkConfiguration();
         } catch (NoSuchInputTypeException e) {
@@ -120,6 +120,7 @@ public class InputsResource extends RestResource {
         }
 
         String inputId = UUID.randomUUID().toString();
+        input.setPersistId(inputId);
 
         // Don't run if exclusive and another instance is already running.
         if (input.isExclusive() && radio.inputs().hasTypeRunning(input.getClass())) {

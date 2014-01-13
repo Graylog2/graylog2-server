@@ -33,6 +33,8 @@ public class InputSummaryResponse {
     public String title;
     public Map<String, Object> configuration;
 
+    public Boolean global;
+
     @JsonProperty("creator_user_id")
     public String creatorUserId;
 

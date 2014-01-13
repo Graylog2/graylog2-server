@@ -81,7 +81,11 @@ public class Input extends Persisted {
 
     public static List<Input> allOfRadio(Core core, Node radio) {
         List<Input> inputs = Lists.newArrayList();
-        for (DBObject o : query(new BasicDBObject("radio_id", radio.getNodeId()), core, COLLECTION)) {
+        List<BasicDBObject> query = Lists.newArrayList();
+        query.add(new BasicDBObject("radio_id", radio.getNodeId()));
+        query.add(new BasicDBObject("global", true));
+
+        for (DBObject o : query(new BasicDBObject("$or", query), core, COLLECTION)) {
             inputs.add(new Input(core, (ObjectId) o.get("_id"), o.toMap()));
         }
 
