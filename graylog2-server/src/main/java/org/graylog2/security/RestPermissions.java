@@ -117,9 +117,6 @@ public class RestPermissions {
     */
     public static Set<String> readerBasePermissions = Sets.newHashSet(
             BUFFERS_READ,
-            DASHBOARDS_CREATE,
-            DASHBOARDS_EDIT,
-            DASHBOARDS_READ,
             FIELDNAMES_READ,
             INDEXERCLUSTER_READ,
             INPUTS_READ,
