@@ -26,6 +26,7 @@ import com.google.common.collect.Maps;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.bson.types.ObjectId;
+import org.cliffc.high_scale_lib.Counter;
 import org.graylog2.Core;
 import org.graylog2.alerts.AlertCondition;
 import org.graylog2.database.NotFoundException;
@@ -50,6 +51,7 @@ import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -416,6 +418,44 @@ public class StreamResource extends RestResource {
         return Response.status(Response.Status.CREATED).entity(json(result)).build();
     }
 
+    @GET @Timed
+    @Path("/{streamId}/throughput")
+    @ApiOperation(value = "Current throughput of this stream on this node in messages per second")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response oneStreamThroughput(@ApiParam(title="streamId", required = true) @PathParam("streamId") String streamId) {
+        Map<String, Long> result = Maps.newHashMap();
+        result.put("throughput", 0L);
+
+        final HashMap<String,Counter> currentStreamThroughput = core.getCurrentStreamThroughput();
+        if (currentStreamThroughput != null) {
+            final Counter counter = currentStreamThroughput.get(streamId);
+            if (counter != null && isPermitted(RestPermissions.STREAMS_READ, streamId)) {
+                result.put("throughput", counter.get());
+            }
+        }
+        return Response.ok().entity(json(result)).build();
+    }
+
+    @GET @Timed
+    @Path("/throughput")
+    @ApiOperation("Current throughput of all visible streams on this node in messages per second")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response streamThroughput() {
+        Map<String, Map<String, Long>> result = Maps.newHashMap();
+        final Map<String, Long> perStream = Maps.newHashMap();
+        result.put("throughput", perStream);
+
+        final HashMap<String,Counter> currentStreamThroughput = core.getCurrentStreamThroughput();
+        if (currentStreamThroughput != null) {
+            for (Map.Entry<String, Counter> entry : currentStreamThroughput.entrySet()) {
+                if (entry.getValue() != null && isPermitted(RestPermissions.STREAMS_READ, entry.getKey())) {
+                    perStream.put(entry.getKey(), entry.getValue().get());
+                }
+            }
+
+        }
+        return Response.ok().entity(json(result)).build();
+    }
 
     protected StreamImpl fetchStream(String streamId) {
         if (streamId == null || streamId.isEmpty()) {

@@ -90,14 +90,13 @@ import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.net.InetSocketAddress;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.TimeUnit;
+import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.atomic.AtomicReference;
 
 /**
  * Server core, handling and holding basically everything.
@@ -128,6 +127,8 @@ public class Core implements GraylogServer, InputHost {
 
     private Counter benchmarkCounter = new Counter();
     private Counter throughputCounter = new Counter();
+    private AtomicReference<ConcurrentHashMap<String, Counter>> streamThroughput =
+            new AtomicReference<ConcurrentHashMap<String, Counter>>(new ConcurrentHashMap<String, Counter>());
     private long throughput = 0;
 
     private List<MessageFilter> filters = Lists.newArrayList();
@@ -168,6 +169,7 @@ public class Core implements GraylogServer, InputHost {
     private LdapConnector ldapConnector;
     private DefaultSecurityManager securityManager;
     private MongoDbMetricsReporter metricsReporter;
+    private AtomicReference<HashMap<String, Counter>> currentStreamThroughput = new AtomicReference<HashMap<String, Counter>>();
 
     public void initialize(Configuration configuration, MetricRegistry metrics) {
     	startedAt = new DateTime(DateTimeZone.UTC);
@@ -320,6 +322,31 @@ public class Core implements GraylogServer, InputHost {
 
     public void setSecurityManager(DefaultSecurityManager securityManager) {
         this.securityManager = securityManager;
+    }
+
+    public void incrementStreamThroughput(String streamId) {
+        final ConcurrentHashMap<String, Counter> counterMap = streamThroughput.get();
+        Counter counter;
+        synchronized (counterMap) {
+            counter = counterMap.get(streamId);
+            if (counter == null) {
+                counter = new Counter();
+                counterMap.put(streamId, counter);
+            }
+        }
+        counter.increment();
+    }
+
+    public Map<String, Counter> cycleStreamThroughput() {
+        return streamThroughput.getAndSet(new ConcurrentHashMap<String, Counter>());
+    }
+
+    public void setCurrentStreamThroughput(HashMap<String, Counter> throughput) {
+        currentStreamThroughput.set(throughput);
+    }
+
+    public HashMap<String, Counter> getCurrentStreamThroughput() {
+        return currentStreamThroughput.get();
     }
 
     private class Graylog2Binder extends AbstractBinder {

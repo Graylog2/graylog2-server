@@ -22,8 +22,8 @@ package org.graylog2.filters;
 
 import org.graylog2.Core;
 import org.graylog2.plugin.GraylogServer;
-import org.graylog2.plugin.filters.MessageFilter;
 import org.graylog2.plugin.Message;
+import org.graylog2.plugin.filters.MessageFilter;
 import org.graylog2.plugin.streams.Stream;
 import org.graylog2.streams.StreamRouter;
 import org.slf4j.Logger;
@@ -42,8 +42,12 @@ public class StreamMatcherFilter implements MessageFilter {
 
     @Override
     public boolean filter(Message msg, GraylogServer server) {
+        Core core = (Core) server;
+        List<Stream> streams = ROUTER.route(core, msg);
 
-        List<Stream> streams = ROUTER.route((Core) server, msg);
+        for (Stream stream : streams) {
+            core.incrementStreamThroughput(stream.getId());
+        }
         msg.setStreams(streams);
 
         LOG.debug("Routed message <{}> to {} streams.", msg.getId(), streams.size());

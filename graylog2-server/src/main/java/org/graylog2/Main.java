@@ -248,6 +248,7 @@ public final class Main {
         if (commandLineArguments.isStats()) { server.initializers().register(new StatisticsPrinterInitializer()); }
         server.initializers().register(new MasterCacheWorkersInitializer());
         server.initializers().register(new ClusterHealthCheckInitializer());
+        server.initializers().register(new StreamThroughputCounterInitializer());
 
         // Register message filters. (Order is important here)
         server.registerFilter(new StaticFieldFilter());
