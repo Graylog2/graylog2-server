@@ -119,7 +119,7 @@ public class DashboardsApiController extends AuthenticatedController {
             final Map<String, String> params = flattenFormUrlEncoded(request().body().asFormUrlEncoded());
 
             String query = params.get("query");
-            String rangeType = params.get("rangetype");
+            String rangeType = params.get("rangeType");
             String description = params.get("description");
 
             Dashboard dashboard = dashboardService.get(dashboardId);
@@ -128,15 +128,22 @@ public class DashboardsApiController extends AuthenticatedController {
             TimeRange timerange;
             try {
                 int relative = 0;
-                if (params.get("range[relative]") != null) {
-                    relative = Integer.parseInt(params.get("range[relative]"));
+                if (params.get("relative") != null) {
+                    relative = Integer.parseInt(params.get("relative"));
                 }
 
-                timerange = TimeRange.factory(rangeType, relative, params.get("range[from]"), params.get("range[to]"), params.get("range[keyword]"));
+                timerange = TimeRange.factory(rangeType, relative, params.get("from"), params.get("to"), params.get("keyword"));
             } catch(InvalidRangeParametersException e2) {
                 return status(400, views.html.errors.error.render("Invalid range parameters provided.", e2, request()));
             } catch(IllegalArgumentException e1) {
                 return status(400, views.html.errors.error.render("Invalid range type provided.", e1, request()));
+            }
+
+            String streamId;
+            if(params.containsKey("streamId")) {
+                streamId = params.get("streamId");
+            } else {
+                streamId = params.get("streamid");
             }
 
             DashboardWidget widget;
@@ -146,7 +153,7 @@ public class DashboardsApiController extends AuthenticatedController {
                         widget = new SearchResultCountWidget(dashboard, query, timerange, description);
                         break;
                     case STREAM_SEARCH_RESULT_COUNT:
-                        widget = new StreamSearchResultCountWidget(dashboard, query, timerange, description, params.get("streamid"));
+                        widget = new StreamSearchResultCountWidget(dashboard, query, timerange, description, streamId);
                         break;
                     case FIELD_CHART:
                         Map<String, Object> config = new HashMap<String, Object>() {{
@@ -157,7 +164,7 @@ public class DashboardsApiController extends AuthenticatedController {
                             put("interval", params.get("interval"));
                         }};
 
-                        widget = new FieldChartWidget(dashboard, query, timerange, description, params.get("streamid"), config);
+                        widget = new FieldChartWidget(dashboard, query, timerange, description, streamId, config);
                         break;
                     default:
                         throw new IllegalArgumentException();
