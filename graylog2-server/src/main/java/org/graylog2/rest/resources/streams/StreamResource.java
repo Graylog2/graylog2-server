@@ -88,6 +88,7 @@ public class StreamResource extends RestResource {
         streamData.put("created_at", new DateTime(DateTimeZone.UTC));
 
         StreamImpl stream = new StreamImpl(streamData, core);
+        stream.pause();
         String id;
         try {
             stream.save();
@@ -368,6 +369,7 @@ public class StreamResource extends RestResource {
         streamData.put("created_at", new DateTime(DateTimeZone.UTC));
 
         StreamImpl stream = new StreamImpl(streamData, core);
+        stream.pause();
         String id;
         try {
             stream.save();
