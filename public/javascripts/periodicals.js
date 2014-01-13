@@ -84,6 +84,8 @@ $(document).ready(function() {
                 var url;
                 if (!!nodeType && $(this).attr("data-node-type") == "radio") {
                     url = "/a/system/throughput/radio/" + $(this).attr("data-radio-id");
+                } else if (!!nodeType && $(this).attr("data-node-type") == "stream") {
+                    url = "/a/system/throughput/stream/" + $(this).attr("data-stream-id");
                 } else {
                     url = "/a/system/throughput/node/" + $(this).attr("data-node-id");
                 }

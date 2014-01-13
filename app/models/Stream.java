@@ -30,6 +30,7 @@ import models.api.responses.alerts.AlertSummaryResponse;
 import models.api.responses.alerts.AlertsResponse;
 import models.api.responses.streams.StreamRuleSummaryResponse;
 import models.api.responses.streams.StreamSummaryResponse;
+import models.api.responses.streams.StreamThroughputResponse;
 import org.joda.time.DateTime;
 
 import java.io.IOException;
@@ -188,6 +189,19 @@ public class Stream {
 
         return alertsResponse;
     }
+
+    public long getThroughput() throws APIException, IOException {
+        final StreamThroughputResponse throughputResponse = api.get(StreamThroughputResponse.class)
+                .path("/streams/{0}/throughput", getId())
+                .expect(200, 404)
+                .execute();
+
+        if (throughputResponse == null) {
+            return 0L;
+        }
+        return throughputResponse.throughput;
+    }
+
 
     public List<String> getUserAlertReceivers() {
         return userAlertReceivers;

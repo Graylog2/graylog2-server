@@ -24,9 +24,7 @@ import com.google.gson.Gson;
 import com.google.inject.Inject;
 import controllers.AuthenticatedController;
 import lib.APIException;
-import lib.ApiClient;
 import lib.metrics.Meter;
-import lib.metrics.Metric;
 import models.*;
 import play.libs.F;
 import play.mvc.Http;
@@ -45,6 +43,8 @@ public class SystemApiController extends AuthenticatedController {
     private ClusterService clusterService;
     @Inject
     private MessagesService messagesService;
+    @Inject
+    private StreamService streamService;
 
     public Result fields() {
         Set<String> fields = messagesService.getMessageFields();
@@ -135,6 +135,20 @@ public class SystemApiController extends AuthenticatedController {
             return ok(new Gson().toJson(result)).as("application/json");
         } catch (NodeService.NodeNotFoundException e) {
             return status(404, "node not found");
+        }
+    }
+
+    public Result streamThroughput(String streamId) {
+        try {
+            Map<String, Object> result = Maps.newHashMap();
+            final Stream stream = streamService.get(streamId);
+            long throughput = stream.getThroughput();
+            result.put("throughput", throughput);
+            return ok(new Gson().toJson(result)).as("application/json");
+        } catch (APIException e) {
+            return status(504, "Could not load stream " + streamId);
+        } catch (IOException e) {
+            return status(504, "Could not load stream " + streamId);
         }
     }
 

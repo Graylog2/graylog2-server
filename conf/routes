@@ -151,6 +151,7 @@ DELETE      /a/system/notifications/:notification_type                          
 GET         /a/system/throughput                                                     @controllers.api.SystemApiController.totalThroughput()
 GET         /a/system/throughput/node/:node_id                                       @controllers.api.SystemApiController.nodeThroughput(node_id: String)
 GET         /a/system/throughput/radio/:radio_id                                     @controllers.api.SystemApiController.radioThroughput(radio_id: String)
+GET         /a/system/throughput/stream/:stream_id                                   @controllers.api.SystemApiController.streamThroughput(stream_id: String)
 PUT         /a/system/processing/pause                                               @controllers.api.SystemApiController.pauseMessageProcessing()
 PUT         /a/system/processing/resume                                              @controllers.api.SystemApiController.resumeMessageProcessing()
 GET         /a/system/node/:node_id/heap                                             @controllers.api.SystemApiController.heap(node_id: String)
