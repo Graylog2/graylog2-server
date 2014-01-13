@@ -33,6 +33,7 @@ import models.api.requests.ChangePasswordRequest;
 import models.api.requests.ChangeUserRequest;
 import models.api.requests.ChangeUserRequestForm;
 import models.api.requests.CreateUserRequestForm;
+import models.dashboards.DashboardService;
 import org.apache.shiro.subject.Subject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -65,6 +66,8 @@ public class UsersController extends AuthenticatedController {
     private PermissionsService permissionsService;
     @Inject
     private StreamService streamService;
+    @Inject
+    private DashboardService dashboardService;
 
     public Result index() {
         final List<User> allUsers = isPermitted(USERS_LIST) ? userService.all() : Lists.newArrayList(currentUser());
@@ -126,6 +129,7 @@ public class UsersController extends AuthenticatedController {
                     ImmutableSet.copyOf(user.getPermissions()),
                     DateTools.getGroupedTimezoneIds().asMap(),
                     streamService.all(),
+                    dashboardService.getAll(),
                     bc)
             );
         } catch (IOException e) {
@@ -213,6 +217,7 @@ public class UsersController extends AuthenticatedController {
                         ImmutableSet.copyOf(requestForm.get().permissions),
                         DateTools.getGroupedTimezoneIds().asMap(),
                         streamService.all(),
+                        dashboardService.getAll(),
                         bc));
             } catch (IOException e) {
                 return status(504, views.html.errors.error.render(ApiClient.ERROR_MSG_IO, e, request()));
@@ -231,7 +236,8 @@ public class UsersController extends AuthenticatedController {
             @Override
             public boolean apply(@Nullable String input) {
                 return (input != null) &&
-                        !(input.startsWith(STREAMS_READ) || input.startsWith(STREAMS_EDIT));
+                        !(input.startsWith(STREAMS_READ) || input.startsWith(STREAMS_EDIT) ||
+                          input.startsWith(DASHBOARDS_READ) || input.startsWith(DASHBOARDS_EDIT));
             }
         }));
         for (String streampermission : formData.streampermissions) {
@@ -239,6 +245,12 @@ public class UsersController extends AuthenticatedController {
         }
         for (String streameditpermission : formData.streameditpermissions) {
             permissions.add(RestPermissions.STREAMS_EDIT + ":" + streameditpermission);
+        }
+        for (String dashboardpermission : formData.dashboardpermissions) {
+            permissions.add(RestPermissions.DASHBOARDS_READ + ":" + dashboardpermission);
+        }
+        for (String dashboardeditpermissions : formData.dashboardeditpermissions) {
+            permissions.add(RestPermissions.DASHBOARDS_EDIT + ":" + dashboardeditpermissions);
         }
         final ChangeUserRequest changeRequest = formData.toApiRequest();
         changeRequest.permissions = Lists.newArrayList(permissions);

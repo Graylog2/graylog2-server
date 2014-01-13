@@ -29,6 +29,10 @@ public class ChangeUserRequestForm extends ChangeUserRequest {
 
     public List<String> streameditpermissions = Lists.newArrayList();
 
+    public List<String> dashboardpermissions = Lists.newArrayList();
+
+    public List<String> dashboardeditpermissions = Lists.newArrayList();
+
     public ChangeUserRequest toApiRequest() {
         final ChangeUserRequest r = new ChangeUserRequest();
         r.email = email;

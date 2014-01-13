@@ -1,9 +1,14 @@
 @(currentUser: User, dashboards: List[models.dashboards.Dashboard])
 
+@import views.helpers.Permissions._
+@import lib.security.RestPermissions._
+
 @main("Dashboards", sidebars.standard(currentUser), "", currentUser) {
 
     <div class="row-fluid">
+        @if(isPermitted(DASHBOARDS_CREATE)) {
         <a href="@routes.DashboardsController.newDashboard()" class="btn btn-success pull-right">Create dashboard</a>
+        }
 
         <h1><i class="icon icon-dashboard"></i> Dashboards</h1>
         Use dashboards to create specific views on your messages. Create a new dashboard here and add any graph or chart
@@ -12,25 +17,26 @@
         &nbsp;@views.html.partials.support.bubble.render("graylog2-web-interface/the-dashboards-explained")
     </div>
 
-    @if(dashboards.isEmpty) {
+    @if(dashboards.filter(d => isPermitted(DASHBOARDS_READ, d.getId)).isEmpty) {
         <div class="alert alert-warn">
             <i class="icon icon-info-sign"></i>
             No dashboards configured.
         </div>
     }
 
-    @for(dashboard <- dashboards) {
+    @for(dashboard <- dashboards.filter(d => isPermitted(DASHBOARDS_READ, d.getId))) {
         <div class="row-fluid node-row dashboard-row">
             <div class="pull-right">
                 Created by @views.html.partials.links.to_user.render(dashboard.getCreatorUser)
                 <span class="moment-from-now" title="@dashboard.getCreatedAt()">@dashboard.getCreatedAt()</span>
 
+                @if(isPermitted(DASHBOARDS_EDIT, dashboard.getId)) {
                 @helper.form(action = routes.DashboardsController.delete(dashboard.getId)) {
                     <button type="submit" class="btn btn-danger btn-mini" data-confirm="Really delete dashboard?">
                         Delete
                     </button>
                 }
-
+                }
                 <div class="btn-group">
                     <a class="btn btn-mini dropdown-toggle" data-toggle="dropdown" href="#">
                     Action

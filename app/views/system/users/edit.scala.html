@@ -7,6 +7,7 @@
         selectedPermissions: Set[String],
         timezones: Map[String, Collection[String]],
         streams: List[models.Stream],
+        dashboards: List[models.dashboards.Dashboard],
         breadcrumbs: lib.BreadcrumbList)
 @import com.google.common.collect.ImmutableList
 @import views.helpers.Permissions._
@@ -55,6 +56,24 @@
                         </select>
                         <span class="help-inline">Choose the streams the user can edit. Values chosen here will enable read access, too.</span>
 
+                    </div>
+                </div>
+                <div class="control-group">
+                    <label class="control-label" for="dashboardpermissions">Dashboard Permissions</label>
+                    <div class="controls">
+                        <select id="dashboardpermissions" name="dashboardpermissions[]" data-placeholder="Choose read permissions..." multiple>
+                        @for(dashboard <- dashboards.sortBy(_.getTitle)) {
+                            <option @if(isPermitted(user, DASHBOARDS_READ, dashboard.getId)) {selected} value="@dashboard.getId">@dashboard.getTitle</option>
+                        }
+                        </select>
+                        <span class="help-inline">Choose dashboards the user can view. Removing read access will remove edit access, too.</span>
+
+                        <select id="dashboardeditpermissions" name="dashboardeditpermissions[]" data-placeholder="Choose edit permissions..." multiple>
+                        @for(dashboard <- dashboards.sortBy(_.getTitle)) {
+                            <option @if(isPermitted(user, DASHBOARDS_EDIT, dashboard.getId)) {selected} value="@dashboard.getId">@dashboard.getTitle</option>
+                        }
+                        </select>
+                        <span class="help-inline">Choose dashboards the user can view. Removing read access will remove edit access, too.</span>
                     </div>
                 </div>
                 }
