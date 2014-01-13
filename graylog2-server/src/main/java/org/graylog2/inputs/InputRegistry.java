@@ -57,6 +57,7 @@ public class InputRegistry {
     private ExecutorService executor = Executors.newCachedThreadPool(
             new ThreadFactoryBuilder().setNameFormat("inputs-%d").build()
     );
+    private static Map<String, ClassLoader> classLoaders = Maps.newHashMap();
 
     public InputRegistry(Core core) {
         this.core = core;
@@ -159,13 +160,21 @@ public class InputRegistry {
 
     public static MessageInput factory(String type) throws NoSuchInputTypeException {
         try {
-            Class c = Class.forName(type);
+            final ClassLoader classLoader = lookupClassLoader(type);
+            if (classLoader == null) {
+                throw new NoSuchInputTypeException("There is no classloader to load input of type <" + type + ">.");
+            }
+            Class c = Class.forName(type, true, classLoader);
             return (MessageInput) c.newInstance();
         } catch (ClassNotFoundException e) {
              throw new NoSuchInputTypeException("There is no input of type <" + type + "> registered.");
         } catch (Exception e) {
             throw new RuntimeException("Could not create input of type <" + type + ">", e);
         }
+    }
+
+    private static ClassLoader lookupClassLoader(String type) {
+        return classLoaders.get(type);
     }
 
     public static MessageInput getMessageInput(Input io, Core core) throws NoSuchInputTypeException, ConfigurationException {
@@ -196,6 +205,7 @@ public class InputRegistry {
     }
 
     public void register(Class clazz, String name) {
+        classLoaders.put(clazz.getCanonicalName(), clazz.getClassLoader());
         availableInputs.put(clazz.getCanonicalName(), name);
     }
 
