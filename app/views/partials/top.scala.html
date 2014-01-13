@@ -1,3 +1,6 @@
+@import lib.security.RestPermissions._
+@import views.helpers.Permissions._
+
 <div id="top" class="navbar navbar-fixed-top">
  	<div class="container-fluid">
 	  	<div class="row-fluid">
@@ -7,7 +10,11 @@
 	  			<li><a href="/">Home</a></li>
 	  			<li><a href="@routes.StreamsController.index()">Streams</a></li>
                 <li><a href="@routes.DashboardsController.index()">Dashboards</a></li>
-                <li><a href="@routes.SourcesController.list()">Sources</a></li>
+
+                @if(isPermitted(SOURCES_READ)) {
+                    <li><a href="@routes.SourcesController.list()">Sources</a></li>
+                }
+
 	  			<li><a href="@routes.SystemController.index(0)">System</a></li>
 
                 <li>
