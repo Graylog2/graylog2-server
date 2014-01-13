@@ -64,6 +64,8 @@ public class RelativeSearchResource extends SearchResource {
             @ApiParam(title = "offset", description = "Offset", required = false) @QueryParam("offset") int offset,
             @ApiParam(title = "filter", description = "Filter", required = false) @QueryParam("filter") String filter,
             @ApiParam(title = "sort", description = "Sorting (field:asc / field:desc)", required = false) @QueryParam("sort") String sort) {
+        checkSearchPermission(filter, RestPermissions.SEARCHES_RELATIVE);
+
         checkQuery(query);
 
         Sorting sorting = buildSorting(sort);
@@ -102,6 +104,8 @@ public class RelativeSearchResource extends SearchResource {
             @ApiParam(title = "size", description = "Maximum number of terms to return", required = false) @QueryParam("size") int size,
             @ApiParam(title = "range", description = "Relative timeframe to search in. See search method description.", required = true) @QueryParam("range") int range,
             @ApiParam(title = "filter", description = "Filter", required = false) @QueryParam("filter") String filter) {
+        checkSearchPermission(filter, RestPermissions.SEARCHES_RELATIVE);
+
         checkQueryAndField(query, field);
 
         try {
@@ -128,6 +132,8 @@ public class RelativeSearchResource extends SearchResource {
             @ApiParam(title = "query", description = "Query (Lucene syntax)", required = true) @QueryParam("query") String query,
             @ApiParam(title = "range", description = "Relative timeframe to search in. See search method description.", required = true) @QueryParam("range") int range,
             @ApiParam(title = "filter", description = "Filter", required = false) @QueryParam("filter") String filter) {
+        checkSearchPermission(filter, RestPermissions.SEARCHES_RELATIVE);
+
         checkQueryAndField(query, field);
 
         try {
@@ -152,6 +158,8 @@ public class RelativeSearchResource extends SearchResource {
             @ApiParam(title = "interval", description = "Histogram interval / bucket size. (year, quarter, month, week, day, hour or minute)", required = true) @QueryParam("interval") String interval,
             @ApiParam(title = "range", description = "Relative timeframe to search in. See search method description.", required = true) @QueryParam("range") int range,
             @ApiParam(title = "filter", description = "Filter", required = false) @QueryParam("filter") String filter) {
+        checkSearchPermission(filter, RestPermissions.SEARCHES_RELATIVE);
+
         checkQueryAndInterval(query, interval);
         interval = interval.toUpperCase();
         validateInterval(interval);
@@ -185,6 +193,8 @@ public class RelativeSearchResource extends SearchResource {
             @ApiParam(title = "interval", description = "Histogram interval / bucket size. (year, quarter, month, week, day, hour or minute)", required = true) @QueryParam("interval") String interval,
             @ApiParam(title = "range", description = "Relative timeframe to search in. See search method description.", required = true) @QueryParam("range") int range,
             @ApiParam(title = "filter", description = "Filter", required = false) @QueryParam("filter") String filter) {
+        checkSearchPermission(filter, RestPermissions.SEARCHES_RELATIVE);
+
         checkQueryAndInterval(query, interval);
         interval = interval.toUpperCase();
         validateInterval(interval);

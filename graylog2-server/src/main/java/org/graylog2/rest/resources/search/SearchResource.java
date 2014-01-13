@@ -40,10 +40,12 @@ import org.graylog2.rest.resources.RestResource;
 import org.graylog2.rest.resources.search.responses.GenericError;
 import org.graylog2.rest.resources.search.responses.QueryParseError;
 import org.graylog2.rest.resources.search.responses.SearchResponse;
+import org.graylog2.security.RestPermissions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.ws.rs.BadRequestException;
+import javax.ws.rs.ForbiddenException;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Response;
 import java.util.Map;
@@ -238,4 +240,33 @@ public class SearchResource extends RestResource {
 
         return new BadRequestException();
     }
+
+    public void checkSearchPermission(String filter, String searchPermission) {
+        if (filter == null) {
+            checkPermission(searchPermission);
+        } else {
+            if(!filter.startsWith("streams:")) {
+                throw new ForbiddenException("Not allowed to search with filter: [" + filter + "]");
+            }
+
+            String[] parts = filter.split(":");
+            if (parts.length <= 1) {
+                throw new ForbiddenException("Not allowed to search with filter: [" + filter + "]");
+            }
+            
+            String streamList = parts[1];
+            String[] streams = streamList.split(",");
+            if (streams.length == 0 ) {
+                throw new ForbiddenException("Not allowed to search with filter: [" + filter + "]");
+            }
+
+            for(String streamId : streams) {
+                if (!isPermitted(RestPermissions.STREAMS_READ, streamId)) {
+                    LOG.warn("Not allowed to search with filter: [" + filter + "]. (Forbidden stream: " + streamId + ")");
+                    throw new ForbiddenException();
+                }
+            }
+        }
+    }
+
 }

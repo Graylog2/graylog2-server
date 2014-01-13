@@ -65,6 +65,8 @@ public class AbsoluteSearchResource extends SearchResource {
             @ApiParam(title = "offset", description = "Offset", required = false) @QueryParam("offset") int offset,
             @ApiParam(title = "filter", description = "Filter", required = false) @QueryParam("filter") String filter,
             @ApiParam(title = "sort", description = "Sorting (field:asc / field:desc)", required = false) @QueryParam("sort") String sort) {
+        checkSearchPermission(filter, RestPermissions.SEARCHES_ABSOLUTE);
+
         checkQuery(query);
 
         Sorting sorting = buildSorting(sort);
@@ -104,6 +106,8 @@ public class AbsoluteSearchResource extends SearchResource {
             @ApiParam(title = "from", description = "Timerange start. See search method description for date format", required = true) @QueryParam("from") String from,
             @ApiParam(title = "to", description = "Timerange end. See search method description for date format", required = true) @QueryParam("to") String to,
             @ApiParam(title = "filter", description = "Filter", required = false) @QueryParam("filter") String filter) {
+        checkSearchPermission(filter, RestPermissions.SEARCHES_ABSOLUTE);
+
         checkQueryAndField(query, field);
 
         try {
@@ -131,6 +135,8 @@ public class AbsoluteSearchResource extends SearchResource {
             @ApiParam(title = "from", description = "Timerange start. See search method description for date format", required = true) @QueryParam("from") String from,
             @ApiParam(title = "to", description = "Timerange end. See search method description for date format", required = true) @QueryParam("to") String to,
             @ApiParam(title = "filter", description = "Filter", required = false) @QueryParam("filter") String filter) {
+        checkSearchPermission(filter, RestPermissions.SEARCHES_ABSOLUTE);
+
         checkQueryAndField(query, field);
 
         try {
@@ -156,6 +162,8 @@ public class AbsoluteSearchResource extends SearchResource {
             @ApiParam(title = "from", description = "Timerange start. See search method description for date format", required = true) @QueryParam("from") String from,
             @ApiParam(title = "to", description = "Timerange end. See search method description for date format", required = true) @QueryParam("to") String to,
             @ApiParam(title = "filter", description = "Filter", required = false) @QueryParam("filter") String filter) {
+        checkSearchPermission(filter, RestPermissions.SEARCHES_ABSOLUTE);
+
         checkQueryAndInterval(query, interval);
         interval = interval.toUpperCase();
         validateInterval(interval);
@@ -190,6 +198,8 @@ public class AbsoluteSearchResource extends SearchResource {
             @ApiParam(title = "from", description = "Timerange start. See search method description for date format", required = true) @QueryParam("from") String from,
             @ApiParam(title = "to", description = "Timerange end. See search method description for date format", required = true) @QueryParam("to") String to,
             @ApiParam(title = "filter", description = "Filter", required = false) @QueryParam("filter") String filter) {
+        checkSearchPermission(filter, RestPermissions.SEARCHES_ABSOLUTE);
+
         checkQueryAndInterval(query, interval);
         interval = interval.toUpperCase();
         validateInterval(interval);

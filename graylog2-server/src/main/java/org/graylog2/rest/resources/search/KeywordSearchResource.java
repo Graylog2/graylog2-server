@@ -63,6 +63,8 @@ public class KeywordSearchResource extends SearchResource {
             @ApiParam(title = "offset", description = "Offset", required = false) @QueryParam("offset") int offset,
             @ApiParam(title = "filter", description = "Filter", required = false) @QueryParam("filter") String filter,
             @ApiParam(title = "sort", description = "Sorting (field:asc / field:desc)", required = false) @QueryParam("sort") String sort) {
+        checkSearchPermission(filter, RestPermissions.SEARCHES_KEYWORD);
+
         checkQueryAndKeyword(query, keyword);
 
         Sorting sorting = buildSorting(sort);
@@ -97,6 +99,8 @@ public class KeywordSearchResource extends SearchResource {
             @ApiParam(title = "interval", description = "Histogram interval / bucket size. (year, quarter, month, week, day, hour or minute)", required = true) @QueryParam("interval") String interval,
             @ApiParam(title = "keyword", description = "Range keyword", required = true) @QueryParam("keyword") String keyword,
             @ApiParam(title = "filter", description = "Filter", required = false) @QueryParam("filter") String filter) {
+        checkSearchPermission(filter, RestPermissions.SEARCHES_KEYWORD);
+
         checkQueryAndInterval(query, interval);
         interval = interval.toUpperCase();
         validateInterval(interval);
@@ -128,6 +132,8 @@ public class KeywordSearchResource extends SearchResource {
             @ApiParam(title = "size", description = "Maximum number of terms to return", required = false) @QueryParam("size") int size,
             @ApiParam(title = "keyword", description = "Range keyword", required = true) @QueryParam("keyword") String keyword,
             @ApiParam(title = "filter", description = "Filter", required = false) @QueryParam("filter") String filter) {
+        checkSearchPermission(filter, RestPermissions.SEARCHES_KEYWORD);
+
         checkQueryAndField(query, field);
 
         try {
@@ -154,6 +160,8 @@ public class KeywordSearchResource extends SearchResource {
             @ApiParam(title = "query", description = "Query (Lucene syntax)", required = true) @QueryParam("query") String query,
             @ApiParam(title = "keyword", description = "Range keyword", required = true) @QueryParam("keyword") String keyword,
             @ApiParam(title = "filter", description = "Filter", required = false) @QueryParam("filter") String filter) {
+        checkSearchPermission(filter, RestPermissions.SEARCHES_KEYWORD);
+
         checkQueryAndField(query, field);
 
         try {
@@ -180,6 +188,8 @@ public class KeywordSearchResource extends SearchResource {
             @ApiParam(title = "interval", description = "Histogram interval / bucket size. (year, quarter, month, week, day, hour or minute)", required = true) @QueryParam("interval") String interval,
             @ApiParam(title = "keyword", description = "Range keyword", required = true) @QueryParam("keyword") String keyword,
             @ApiParam(title = "filter", description = "Filter", required = false) @QueryParam("filter") String filter) {
+        checkSearchPermission(filter, RestPermissions.SEARCHES_KEYWORD);
+
         checkQueryAndInterval(query, interval);
         interval = interval.toUpperCase();
         validateInterval(interval);
