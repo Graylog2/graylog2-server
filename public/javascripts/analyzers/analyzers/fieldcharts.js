@@ -1,18 +1,11 @@
 $(document).ready(function() {
     var palette = new Rickshaw.Color.Palette({ scheme: 'colorwheel' });
 
-    $(".analyze-field .generate-graph .pie-chart").on("click", function(e) {
-        e.preventDefault();
-
-        // TODO
-        alert("Pie charts are not implemented yet. (GitHub issue: #259)");
-    });
-
-    $(".analyze-field .generate-graph .line-chart").on("click", function(e) {
+    $(".analyze-field .line-chart").on("click", function(e) {
         e.preventDefault();
 
         opts = {}
-        opts.field = $(this).parent().parent().parent().attr("data-field");
+        opts.field = $(this).attr("data-field");
         var container = $(this).closest(".analyze-field");
         if (!!container.attr("data-stream-id")) {
             opts.streamid = container.attr("data-stream-id");
