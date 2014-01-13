@@ -196,6 +196,10 @@ $(document).ready(function() {
                     graph.renderer.stroke = true;
                 }
 
+                // TODO make this a graph options. what to choose by default? #471
+                graph.renderer.unstack = false;
+
+
                 graph.render();
 
                 // Highlight menu items.
@@ -456,7 +460,6 @@ $(document).ready(function() {
         var targetElem = $('.field-graph-container[data-chart-id="' + targetId + '"]');
         var draggedElem = $('.field-graph-container[data-chart-id="' + draggedId + '"]');
 
-        // TODO support multiple (data-lines must be an array)
         var draggedOpts = JSON.parse(draggedElem.attr("data-lines"));
 
         // Update title and description.
@@ -478,7 +481,6 @@ $(document).ready(function() {
 
             $("ul.field-graph-query-container", targetElem).append("<li>" + queryDescription + "</li>");
 
-            // TODO support multiple
             var addSeries = {
                 name: "value" + i,
                 color: lineColor,
@@ -490,8 +492,10 @@ $(document).ready(function() {
             targetChart.series.push(addSeries);
         }
 
-        // TODO make this a graph options. what to choose by default?
-        //targetChart.renderer.unstack = true;
+        // TODO make this a graph options. what to choose by default? #471
+        targetChart.renderer.unstack = false;
+
+        $(".hide-combined-chart", targetElem).hide();
 
         // Reflect all the chart changes we made.
         targetChart.update();
