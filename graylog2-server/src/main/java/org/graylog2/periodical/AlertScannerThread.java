@@ -22,6 +22,7 @@ package org.graylog2.periodical;
 import org.graylog2.Core;
 import org.graylog2.alerts.Alert;
 import org.graylog2.alerts.AlertCondition;
+import org.graylog2.alerts.AlertSender;
 import org.graylog2.plugin.streams.Stream;
 import org.graylog2.streams.StreamImpl;
 import org.slf4j.Logger;
@@ -72,6 +73,8 @@ public class AlertScannerThread implements Runnable {
                         alert.save();
 
                         // Send alerts.
+                        AlertSender sender = new AlertSender(server);
+                        sender.sendEmails(stream, result);
                     } else {
                         // Alert not triggered.
                         LOG.debug("Alert condition [{}] is triggered.", alertCondition);

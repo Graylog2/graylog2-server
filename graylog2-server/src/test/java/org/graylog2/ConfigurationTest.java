@@ -198,39 +198,5 @@ public class ConfigurationTest {
 
         Assert.assertEquals(2, configuration.getMongoReplicaSet().size());
     }
-
-    @Test
-    public void testGetLibratoMetricsStreamFilter() throws RepositoryException, ValidationException {
-        ObjectId id1 = new ObjectId();
-        ObjectId id2 = new ObjectId();
-        ObjectId id3 = new ObjectId();
-        validProperties.put("libratometrics_stream_filter", id1.toString() + "," + id2.toString() + "," + id3.toString());
-
-        Configuration configuration = new Configuration();
-        new JadConfig(new InMemoryRepository(validProperties), configuration).process();
-
-        Assert.assertEquals(3, configuration.getLibratoMetricsStreamFilter().size());
-        Assert.assertTrue(configuration.getLibratoMetricsStreamFilter().contains(id1.toString()));
-        Assert.assertTrue(configuration.getLibratoMetricsStreamFilter().contains(id2.toString()));
-        Assert.assertTrue(configuration.getLibratoMetricsStreamFilter().contains(id3.toString()));
-    }
-
-    @Test
-    public void testGetLibratoMetricsPrefix() throws RepositoryException, ValidationException {
-        validProperties.put("libratometrics_prefix", "lolwut");
-        Configuration configuration = new Configuration();
-        new JadConfig(new InMemoryRepository(validProperties), configuration).process();
-
-        Assert.assertEquals("lolwut", configuration.getLibratoMetricsPrefix());
-    }
-
-    @Test
-    public void testGetLibratoMetricsPrefixHasStandardValue() throws RepositoryException, ValidationException {
-        // Nothing set.
-        Configuration configuration = new Configuration();
-        new JadConfig(new InMemoryRepository(validProperties), configuration).process();
-
-        Assert.assertEquals("gl2-", configuration.getLibratoMetricsPrefix());
-    }
     
 }

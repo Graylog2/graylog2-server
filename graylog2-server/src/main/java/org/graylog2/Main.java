@@ -240,8 +240,6 @@ public final class Main {
         server.initializers().register(new ThroughputCounterInitializer());
         server.initializers().register(new NodePingInitializer());
         server.initializers().register(new AlarmScannerInitializer());
-        if (configuration.isEnableGraphiteOutput())       { server.initializers().register(new GraphiteInitializer()); }
-        if (configuration.isEnableLibratoMetricsOutput()) { server.initializers().register(new LibratoMetricsInitializer()); }
         server.initializers().register(new DeflectorThreadsInitializer());
         server.initializers().register(new AnonymousInformationCollectorInitializer());
         if (configuration.performRetention() && commandLineArguments.performRetention()) {

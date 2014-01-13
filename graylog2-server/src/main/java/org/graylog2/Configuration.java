@@ -148,42 +148,6 @@ public class Configuration {
     @Parameter("rules_file")
     private String droolsRulesFile;
 
-    @Parameter(value = "enable_graphite_output", required = false)
-    private boolean enableGraphiteOutput = false;
-
-    @Parameter(value = "graphite_carbon_host", required = false)
-    private String graphiteCarbonHost = "127.0.0.1";
-
-    @Parameter(value = "graphite_carbon_tcp_port", validator = InetPortValidator.class, required = false)
-    private int graphiteCarbonTcpPort = 2003;
-    
-    @Parameter(value = "graphite_prefix", required = false)
-    private String graphitePrefix = "graylog2-server";
-
-    @Parameter(value = "enable_libratometrics_output", required = false)
-    private boolean enableLibratoMetricsOutput = false;
-    
-    @Parameter(value = "enable_libratometrics_system_metrics", required = false)
-    private boolean enableLibratoSystemMetrics = false;
-
-    @Parameter(value = "libratometrics_api_user", required = false)
-    private String libratometricsApiUser;
-
-    @Parameter(value = "libratometrics_api_token", required = false)
-    private String libratometricsApiToken;
-
-    @Parameter(value = "libratometrics_stream_filter", required = false)
-    private String libratometricsStreamFilter = "";
-
-    @Parameter(value = "libratometrics_host_filter", required = false)
-    private String libratometricsHostFilter = "";
-
-    @Parameter(value = "libratometrics_interval", validator = PositiveIntegerValidator.class, required = false)
-    private int libratometricsInterval = 10;
-
-    @Parameter(value = "libratometrics_prefix", required = false)
-    private String libratometricsPrefix = "gl2-";
-
     @Parameter(value = "plugin_dir", required = false)
     private String pluginDir = "plugin";
 
@@ -230,6 +194,37 @@ public class Configuration {
     @Parameter(value = "elasticsearch_discovery_initial_state_timeout", required = false)
     private String esInitialStateTimeout = "3s";
 
+    // Transport: Email
+    @Parameter(value = "transport_email_enabled", required = false)
+    private boolean emailTransportEnabled = false;
+
+    @Parameter(value = "transport_email_hostname", required = false)
+    private String emailTransportHostname;
+
+    @Parameter(value = "transport_email_port", validator = InetPortValidator.class, required = false)
+    private int emailTransportPort;
+
+    @Parameter(value = "transport_email_use_auth", required = false)
+    private boolean emailTransportUseAuth = false;
+
+    @Parameter(value = "transport_email_use_tls", required = false)
+    private boolean emailTransportUseTls = false;
+
+    @Parameter(value = "transport_email_use_ssl", required = false)
+    private boolean emailTransportUseSsl = true;
+
+    @Parameter(value = "transport_email_auth_username", required = false)
+    private String emailTransportUsername;
+
+    @Parameter(value = "transport_email_auth_password", required = false)
+    private String emailTransportPassword;
+
+    @Parameter(value = "transport_email_subject_prefix", required = false)
+    private String emailTransportSubjectPrefix;
+
+    @Parameter(value = "transport_email_from_email", required = false)
+    private String emailTransportFromEmail;
+
     public boolean isMaster() {
         return isMaster;
     }
@@ -269,11 +264,7 @@ public class Configuration {
     public int getOutputBufferProcessorThreadsMaxPoolSize() {
         return outputBufferProcessorThreadsMaxPoolSize;
     }
-    
-    public int getUdpRecvBufferSizes() {
-        return udpRecvBufferSizes;
-    }
-    
+
     public WaitStrategy getProcessorWaitStrategy() {
         if (processorWaitStrategy.equals("sleeping")) {
             return new SleepingWaitStrategy();
@@ -360,6 +351,8 @@ public class Configuration {
         return droolsRulesFile;
     }
 
+
+
     public List<ServerAddress> getMongoReplicaSet() {
         List<ServerAddress> replicaServers = Lists.newArrayList();
 
@@ -389,57 +382,6 @@ public class Configuration {
         }
 
         return replicaServers;
-    }
-
-    public boolean isEnableGraphiteOutput() {
-        return enableGraphiteOutput;
-    }
-
-    public String getGraphiteCarbonHost() {
-        return graphiteCarbonHost;
-    }
-
-    public int getGraphiteCarbonTcpPort() {
-        return graphiteCarbonTcpPort;
-    }
-    
-    public String getGraphitePrefix() {
-        return graphitePrefix;
-    }
-
-    public boolean isEnableLibratoMetricsOutput() {
-        return enableLibratoMetricsOutput;
-    }
-
-    public boolean isEnableLibratoSystemMetrics() {
-        return enableLibratoSystemMetrics;
-    }
-    
-    public String getLibratoMetricsAPIUser() {
-        return libratometricsApiUser;
-    }
-
-    public String getLibratoMetricsAPIToken() {
-        return libratometricsApiToken;
-    }
-
-    public List<String> getLibratoMetricsStreamFilter() {
-        List<String> r = Lists.newArrayList();
-        r.addAll(Arrays.asList(libratometricsStreamFilter.split(",")));
-
-        return r;
-    }
-
-    public String getLibratoMetricsHostsFilter() {
-        return libratometricsHostFilter;
-    }
-
-    public int getLibratoMetricsInterval() {
-        return libratometricsInterval;
-    }
-
-    public String getLibratoMetricsPrefix() {
-        return libratometricsPrefix;
     }
 
     public String getPluginDir() {
@@ -518,7 +460,6 @@ public class Configuration {
         return esInitialStateTimeout;
     }
 
-
     public String getRetentionStrategy() {
         return retentionStrategy;
     }
@@ -529,6 +470,46 @@ public class Configuration {
 
     public boolean isMetricsCollectionEnabled() {
         return metricsCollectionEnabled;
+    }
+
+    public boolean isEmailTransportEnabled() {
+        return emailTransportEnabled;
+    }
+
+    public String getEmailTransportHostname() {
+        return emailTransportHostname;
+    }
+
+    public int getEmailTransportPort() {
+        return emailTransportPort;
+    }
+
+    public boolean isEmailTransportUseAuth() {
+        return emailTransportUseAuth;
+    }
+
+    public boolean isEmailTransportUseTls() {
+        return emailTransportUseTls;
+    }
+
+    public boolean isEmailTransportUseSsl() {
+        return emailTransportUseSsl;
+    }
+
+    public String getEmailTransportUsername() {
+        return emailTransportUsername;
+    }
+
+    public String getEmailTransportPassword() {
+        return emailTransportPassword;
+    }
+
+    public String getEmailTransportSubjectPrefix() {
+        return emailTransportSubjectPrefix;
+    }
+
+    public String getEmailTransportFromEmail() {
+        return emailTransportFromEmail;
     }
 
 }
