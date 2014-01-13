@@ -75,7 +75,8 @@ public class UsersController extends AuthenticatedController {
     public Result show(String username) {
         final User user = userService.load(username);
         if (user == null) {
-            return notFound();
+            String message = "User not found! Maybe it has been deleted.";
+            return status(404, views.html.errors.error.render(message, new RuntimeException(), request()));
         }
 
         BreadcrumbList bc = breadcrumbs();
