@@ -142,18 +142,20 @@
     @if(isPermitted(USERS_PERMISSIONSEDIT)) {
     <div class="row-fluid">
         <h2><h2><i class="icon icon-bolt"></i> Reset Permissions</h2>
+
         <form class="form form-horizontal" action="@routes.UsersController.resetPermissions(user.getName)" method="POST">
-            <button class="btn btn-danger btn-small pull-right" type="submit" data-confirm="Really reset permissions for @user.getName?">
+            <button class="btn btn-danger" type="submit" data-confirm="Really reset permissions for @user.getName?" style="margin-top: 10px; margin-bottom: 10px;">
                 Reset Permissions
             </button>
-            <div class="control-group">
-                <label for="admin" class="control-label">Assign administrator permissions?</label>
-                <div class="controls">
-                    <input type="checkbox" id="admin" name="admin" @if(isPermitted(user, "*")) {selected} />
-                    <span class="help-inline">All permissions will be reset, assigned stream permissions will be lost!</span>
-                </div>
-            </div>
+
+            <label class="checkbox">
+                <input type="checkbox" id="admin" name="admin" @if(isPermitted(user, "*")) {selected} />
+                Assign administrator permissions?
+            </label>
+
+            All permissions will be reset, assigned stream permissions will be lost!
         </form>
+
     </div>
     }
     <div class="row-fluid">
