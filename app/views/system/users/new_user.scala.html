@@ -24,9 +24,12 @@
             <span class="help-block">Select a unique user name used to log in with.</span>
             <input name="username" id="username" type="text" value="@form("username").value()" required />
 
-            <label for="admin">Is Admin account</label>
+            <label class="checkbox">
+                <input name="admin" id="admin" type="checkbox"/>
+                Is Admin account
+            </label>
             <span class="help-block">Admin accounts have access to all functionality, including adding users.</span>
-            <input name="admin" id="admin" type="checkbox"/>
+
 
             <label for="fullname">Full Name</label>
             <span class="help-block">Give a descriptive name for this account, e.g. the full name.</span>
