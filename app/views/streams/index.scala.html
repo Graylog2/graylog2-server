@@ -2,6 +2,7 @@
 
 @import lib.security.RestPermissions._
 @import views.helpers.Permissions._
+@import views.helpers.StringHelper._
 
 @main("Streams", views.html.sidebars.standard(currentUser), "", currentUser, false) {
 
@@ -122,12 +123,7 @@
                     </a>
                     }
                 } else {
-                    <span class="stream-rule-count" data-stream-id="@stream.getId">@stream.getStreamRules.size()</span> configured
-                    @if(stream.getStreamRules.size() == 1) {
-                        rule.
-                    } else {
-                        rules.
-                    }
+                    <span class="stream-rule-count" data-stream-id="@stream.getId">@stream.getStreamRules.size()</span> configured @pluralize("rule", stream.getStreamRules.size()).
 
                     <a href="#" class="trigger-stream-rules">
                         <i class="icon icon-caret-down"></i>

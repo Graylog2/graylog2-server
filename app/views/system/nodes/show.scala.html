@@ -1,5 +1,7 @@
 @(currentUser: User, breadcrumbs: lib.BreadcrumbList, node: Node)
 
+@import views.helpers.StringHelper._
+
 @main("Node " + node.getNodeId, views.html.system.sidebar(), "", currentUser) {
 
     <div class="pull-right">
@@ -149,7 +151,7 @@
 
     <div class="row-fluid">
         <a href="@routes.InputsController.manage(node.getNodeId)" class="btn btn-small btn-success pull-right">Manage inputs</a>
-        <h2><i class="icon icon-cloud-download"></i> Installed/available input types <span style="font-size: 12px;">@node.getInputs.size() inputs running.</span></h2>
+        <h2><i class="icon icon-cloud-download"></i> Installed/available input types <span style="font-size: 12px;">@node.getInputs.size() @pluralize("input", node.getInputs.size) running.</span></h2>
 
         <table class="table table-striped table-hover table-condensed">
             <thead>

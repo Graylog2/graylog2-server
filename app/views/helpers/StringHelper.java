@@ -32,4 +32,12 @@ public class StringHelper {
         return x.replaceAll("(\r\n|\n)", "<br />");
     }
 
+    public static String pluralize(String x, Integer y) {
+        return (y == 1 ? x : x + "s");
+    }
+
+    public static String pluralize(String x, Integer y, String plural_x) {
+        return (y == 1 ? x : plural_x);
+    }
+
 }
