@@ -152,31 +152,34 @@ public class InputRegistry {
         inputStates.remove(thisInputState);
     }
 
-    public void launchPersisted() throws InterruptedException, ExecutionException, IOException {
+    public String launchPersisted(InputSummaryResponse isr) {
+        MessageInput input = null;
+        try {
+            input = InputRegistry.factory(isr.type);
+
+            // Add all standard fields.
+            input.initialize(new Configuration(isr.configuration), radio);
+            input.setTitle(isr.title);
+            input.setCreatorUserId(isr.creatorUserId);
+            input.setPersistId(isr.id);
+            input.setCreatedAt(new DateTime(isr.createdAt));
+            input.setGlobal(isr.global);
+
+            input.checkConfiguration();
+        } catch (NoSuchInputTypeException e) {
+            LOG.warn("Cannot launch persisted input. No such type [{}].", isr.type);
+            return null;
+        } catch (ConfigurationException e) {
+            LOG.error("Missing or invalid input input configuration.", e);
+            return null;
+        }
+
+        return launch(input, isr.id, false);
+    }
+
+    public void launchAllPersisted() throws InterruptedException, ExecutionException, IOException {
         for (InputSummaryResponse isr : getAllPersisted()) {
-
-            MessageInput input = null;
-            try {
-                input = InputRegistry.factory(isr.type);
-
-                // Add all standard fields.
-                input.initialize(new Configuration(isr.configuration), radio);
-                input.setTitle(isr.title);
-                input.setCreatorUserId(isr.creatorUserId);
-                input.setPersistId(isr.id);
-                input.setCreatedAt(new DateTime(isr.createdAt));
-                input.setGlobal(isr.global);
-
-                input.checkConfiguration();
-            } catch (NoSuchInputTypeException e) {
-                LOG.warn("Cannot launch persisted input. No such type [{}].", isr.type);
-                continue;
-            } catch (ConfigurationException e) {
-                LOG.error("Missing or invalid input input configuration.", e);
-                continue;
-            }
-
-            launch(input, isr.id, false);
+            launchPersisted(isr);
         }
     }
 
@@ -241,6 +244,27 @@ public class InputRegistry {
         }
 
         return mapper.readValue(r.getResponseBody(), PersistedInputsResponse.class).inputs;
+    }
+
+    public InputSummaryResponse getPersisted(String inputId) throws ExecutionException, InterruptedException, IOException {
+        final UriBuilder uriBuilder = UriBuilder.fromUri(radio.getConfiguration().getGraylog2ServerUri());
+        uriBuilder.path("/system/radios/" + radio.getNodeId() + "/inputs");
+
+        Future<Response> f = radio.getHttpClient().prepareGet(uriBuilder.build().toString()).execute();
+
+        Response r = f.get();
+
+        if (r.getStatusCode() != 200) {
+            throw new RuntimeException("Expected HTTP response [200] for list of persisted input but got [" + r.getStatusCode() + "].");
+        }
+
+        List<InputSummaryResponse> response = mapper.readValue(r.getResponseBody(), PersistedInputsResponse.class).inputs;
+        for (InputSummaryResponse isr : response) {
+            if (isr.id.equals(inputId))
+                return isr;
+        }
+
+        return null;
     }
 
     public void register(Class clazz, String name) {

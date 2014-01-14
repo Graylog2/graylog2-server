@@ -28,6 +28,7 @@ import org.graylog2.plugin.inputs.InputState;
 import org.graylog2.plugin.inputs.MessageInput;
 import org.graylog2.radio.inputs.InputRegistry;
 import org.graylog2.radio.inputs.NoSuchInputTypeException;
+import org.graylog2.radio.inputs.api.InputSummaryResponse;
 import org.graylog2.radio.rest.resources.RestResource;
 import org.graylog2.radio.rest.resources.system.inputs.requests.InputLaunchRequest;
 import org.joda.time.DateTime;
@@ -205,4 +206,32 @@ public class InputsResource extends RestResource {
         return json(result);
     }
 
+    @GET @Timed
+    @Path("/{inputId}/launch")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response launchExisting(@PathParam("inputId") String inputId) {
+        try {
+            InputSummaryResponse isr = radio.inputs().getPersisted(inputId);
+            if (isr == null) {
+                throw new WebApplicationException(404);
+            }
+
+            radio.inputs().launchPersisted(isr);
+
+            Map<String, Object> result = Maps.newHashMap();
+            result.put("input_id", inputId);
+            result.put("persist_id", inputId);
+
+            return Response.status(Response.Status.ACCEPTED).entity(json(result)).build();
+        } catch (ExecutionException e) {
+            LOG.error("Unable to launch existing input: ", e);
+            return Response.status(Response.Status.BAD_GATEWAY).build();
+        } catch (InterruptedException e) {
+            LOG.error("Unable to launch existing input: ", e);
+            return Response.status(Response.Status.BAD_GATEWAY).build();
+        } catch (IOException e) {
+            LOG.error("Unable to launch existing input: ", e);
+            return Response.status(Response.Status.BAD_GATEWAY).build();
+        }
+    }
 }
