@@ -24,9 +24,13 @@
                     <span class="caret"></span>
                 </a>
                 <ul class="dropdown-menu">
-                    <li><a href="@routes.ExtractorsController.manage(inputState.getNode.getNodeId, input.getId)">Manage extractors</a></li>
+                    @if(!inputState.getNode.isInstanceOf[Radio]) {
+                        <li><a href="@routes.ExtractorsController.manage(inputState.getNode.getNodeId, input.getId)">Manage extractors</a></li>
+                    }
                     <li><a href="@routes.MetricsController.ofNode(inputState.getNode.getNodeId, (input.getType + "." + input.getId))">Show metrics</a></li>
-                    <li><a href="#" class="add-static-field" data-node-id="@inputState.getNode.getNodeId" data-input-id="@input.getId">Add static field</a></li>
+                    @if(!inputState.getNode.isInstanceOf[Radio]) {
+                        <li><a href="#" class="add-static-field" data-node-id="@inputState.getNode.getNodeId" data-input-id="@input.getId">Add static field</a></li>
+                    }
                     <li><a href="@routes.SearchController.index("gl2_source_input:" + input.getId, "relative", 28800)">Messages from this input</a></li>
                 </ul>
             </div>
