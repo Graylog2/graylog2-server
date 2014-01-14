@@ -105,8 +105,6 @@ public class InputRegistry {
 
                     LOG.error(msg.toString(), e);
 
-                    // Clean up.
-                    cleanInput(input);
                     inputState.setState(InputState.InputStateType.FAILED);
                 } catch(Exception e) {
                     LOG.error("Error in input <{}>", input.getId(), e);
