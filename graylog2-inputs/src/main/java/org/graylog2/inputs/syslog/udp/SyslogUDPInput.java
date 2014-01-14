@@ -54,7 +54,7 @@ public class SyslogUDPInput extends SyslogInputBase {
 
         final ExecutorService workerThreadPool = Executors.newCachedThreadPool(
                 new ThreadFactoryBuilder()
-                        .setNameFormat("input-" + inputId + "-syslogudp-worker-%d")
+                        .setNameFormat("input-" + getId() + "-syslogudp-worker-%d")
                         .build());
 
         bootstrap = new ConnectionlessBootstrap(new NioDatagramChannelFactory(workerThreadPool));

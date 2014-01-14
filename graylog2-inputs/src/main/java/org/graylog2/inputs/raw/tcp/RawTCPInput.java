@@ -61,12 +61,12 @@ public class RawTCPInput extends RawInputBase {
 
         final ExecutorService bossThreadPool = Executors.newCachedThreadPool(
                 new ThreadFactoryBuilder()
-                        .setNameFormat("input-" + inputId + "-rawtcp-boss-%d")
+                        .setNameFormat("input-" + getId() + "-rawtcp-boss-%d")
                         .build());
 
         final ExecutorService workerThreadPool = Executors.newCachedThreadPool(
                 new ThreadFactoryBuilder()
-                        .setNameFormat("input-" + inputId + "-rawtcp-worker-%d")
+                        .setNameFormat("input-" + getId() + "-rawtcp-worker-%d")
                         .build());
 
         bootstrap = new ServerBootstrap(

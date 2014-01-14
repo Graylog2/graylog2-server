@@ -54,7 +54,7 @@ public class RawUDPInput extends RawInputBase {
 
         final ExecutorService workerThreadPool = Executors.newCachedThreadPool(
                 new ThreadFactoryBuilder()
-                        .setNameFormat("input-" + inputId + "-rawudp-worker-%d")
+                        .setNameFormat("input-" + getId() + "-rawudp-worker-%d")
                         .build());
 
         bootstrap = new ConnectionlessBootstrap(new NioDatagramChannelFactory(workerThreadPool));

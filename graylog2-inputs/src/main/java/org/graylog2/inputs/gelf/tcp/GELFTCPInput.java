@@ -56,12 +56,12 @@ public class GELFTCPInput extends GELFInputBase {
 
         final ExecutorService bossThreadPool = Executors.newCachedThreadPool(
                 new ThreadFactoryBuilder()
-                        .setNameFormat("input-" + inputId + "-gelftcp-boss-%d")
+                        .setNameFormat("input-" + getId() + "-gelftcp-boss-%d")
                         .build());
 
         final ExecutorService workerThreadPool = Executors.newCachedThreadPool(
                 new ThreadFactoryBuilder()
-                        .setNameFormat("input-" + inputId + "-gelftcp-worker-%d")
+                        .setNameFormat("input-" + getId() + "-gelftcp-worker-%d")
                         .build());
 
         bootstrap = new ServerBootstrap(
