@@ -76,15 +76,17 @@ public class FieldMapper {
     public static SearchResult run(SearchResult sr) {
         List<FieldMapper> mappers = getAll();
 
-        for(MessageSummaryResponse r : sr.getMessages()) {
-            for (FieldMapper mapper : mappers) {
-                String field = mapper.getField();
+        if (sr != null) {
+            for(MessageSummaryResponse r : sr.getMessages()) {
+                for (FieldMapper mapper : mappers) {
+                    String field = mapper.getField();
 
-                if (r.message.containsKey(field)) {
-                    Object newVal = map(field, mapper.getType(), r.message);
+                    if (r.message.containsKey(field)) {
+                        Object newVal = map(field, mapper.getType(), r.message);
 
-                    r.message.remove(field);
-                    r.message.put(field, newVal);
+                        r.message.remove(field);
+                        r.message.put(field, newVal);
+                    }
                 }
             }
         }
