@@ -176,11 +176,104 @@ $(document).ready(function() {
                     $(".persec .tx", io).text(data.tx);
                     $(".total .rx", io).text(data.total_rx);
                     $(".total .tx", io).text(data.total_tx);
+                    $(".persec .rx", io).data("persec-rx-value", data.rx);
+                    $(".persec .tx", io).data("persec-tx-value", data.tx);
+                    $(".total .rx", io).data("total-rx-value", data.total_rx);
+                    $(".total .tx", io).data("total-tx-value", data.total_tx);
                 }
             });
 
         }).promise().done(function(){ setTimeout(updateInputIO, interval); });;
     })();
+
+
+    function printShortSize(x) {
+        var units = {
+            0:"B",
+            1:"kiB",
+            2:"MiB",
+            3:"GiB",
+            4:"TiB",
+            5:"PiB"
+        };
+
+        if (x == 0)
+            return "0B";
+
+        var nearestUnit = Math.floor(Math.log(x)/Math.log(1024));
+        var result = (x/Math.pow(1024, nearestUnit)).toFixed(1);
+        if (result.indexOf(".0") > -1)
+            result = result.replace(".0", "");
+
+        return (result + units[nearestUnit]).replace(".", ",");
+    }
+
+    function parseShortSize(x) {
+        var units = {
+            0:"B",
+            1:"kiB",
+            2:"MiB",
+            3:"GiB",
+            4:"TiB",
+            5:"PiB"
+        };
+
+        x = x.replace(",", ".");
+
+        for (var i = 5; i >= 0; i--) {
+            if (x.indexOf(units[i]) > 0) {
+                var result = x.replace(units[i], "");
+                return result*Math.pow(1024, i);
+            }
+        }
+    }
+
+    // IO of global input.
+    (function updateGlobalInputIO() {
+        var interval = 1000;
+
+        if(!focussed) {
+            setTimeout(updateGlobalInputIO, interval);
+            return;
+        }
+
+        var globalInputs = $(".global-input-connections").map(
+            function(x) {
+                return $(this).attr("data-input-id")
+            }
+        );
+
+        globalInputs.each(function(x,y) {
+            var count = $(".global-input-io-details[data-input-id="+y+"] .input-io .persec .rx").map(
+                function(a,b) {
+                    return parseShortSize($(b).text());
+                }
+            ).toArray().reduce(function(a,b){return a+b;});
+            $(".global-input-io[data-input-id="+y+"] .global-persec .rx").text(printShortSize(count));
+
+            var count = $(".global-input-io-details[data-input-id="+y+"] .input-io .persec .tx").map(
+                function(a,b) {
+                    return parseShortSize($(b).text());
+                }
+            ).toArray().reduce(function(a,b){return a+b;});
+            $(".global-input-io[data-input-id="+y+"] .global-persec .tx").text(printShortSize(count));
+
+            var count = $(".global-input-io-details[data-input-id="+y+"] .input-io .total .rx").map(
+                function(a,b) {
+                    return parseShortSize($(b).text());
+                }
+            ).toArray().reduce(function(a,b){return a+b;});
+            $(".global-input-io[data-input-id="+y+"] .global-total .rx").text(printShortSize(count));
+
+            var count = $(".global-input-io-details[data-input-id="+y+"] .input-io .total .rx").map(
+                function(a,b) {
+                    return parseShortSize($(b).text());
+                }
+            ).toArray().reduce(function(a,b){return a+b;});
+            $(".global-input-io[data-input-id="+y+"] .global-total .rx").text(printShortSize(count));
+        }).promise().done(function(){ setTimeout(updateGlobalInputIO, interval); });;
+    })();
+
 
     // Connection counts of input.
     (function updateInputConnections() {
@@ -207,6 +300,40 @@ $(document).ready(function() {
 
         }).promise().done(function(){ setTimeout(updateInputConnections, interval); });
     })();
+
+    // Connection counts of global input.
+    (function updateGlobalInputConnections() {
+        var interval = 1000;
+
+        if(!focussed) {
+            setTimeout(updateGlobalInputConnections, interval);
+            return;
+        }
+
+        var globalInputs = $(".global-input-connections").map(
+            function(x) {
+                return $(this).attr("data-input-id")
+            }
+        );
+
+        globalInputs.each(function(x,y) {
+            var count = $(".global-input-connection-details[data-input-id="+y+"] .input-connections .total").map(
+                function(a,b) {
+                    return parseInt($(b).text());
+                }
+            ).toArray().reduce(function(a,b){return a+b;});
+            $(".global-input-connections[data-input-id="+y+"] .global-total").text(count);
+
+            var count = $(".global-input-connection-details[data-input-id="+y+"] .input-connections .active").map(
+                function(a,b) {
+                    return parseInt($(b).text());
+                }
+            ).toArray().reduce(function(a,b){return a+b;});
+            $(".global-input-connections[data-input-id="+y+"] .global-active").text(count);
+        }).promise().done(function(){ setTimeout(updateGlobalInputConnections, interval); });;
+
+    })();
+
 
     // Notification count badge.
     (function updateNotificationCount() {

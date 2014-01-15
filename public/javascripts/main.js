@@ -677,6 +677,22 @@ $(document).ready(function() {
             nodeselector.prop('disabled', false);
         }
     });
+
+    $("a.trigger-input-connection-details").on("click", function(e) {
+        e.preventDefault();
+
+        var inputId = $(this).attr("data-input-id");
+
+        $("div.global-input-connection-details[data-input-id="+inputId+"]").toggle();
+    })
+
+    $("a.trigger-input-io-details").on("click", function(e) {
+        e.preventDefault();
+
+        var inputId = $(this).attr("data-input-id");
+
+        $("div.global-input-io-details[data-input-id="+inputId+"]").toggle();
+    })
 });
 
 function searchDateTimeFormatted(date) {

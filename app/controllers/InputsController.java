@@ -54,7 +54,7 @@ public class InputsController extends AuthenticatedController {
         try {
             Map<Input, Map<ClusterEntity, InputState>> globalInputs = Maps.newHashMap();
             //List<InputState> globalInputs = Lists.newArrayList();
-            List<InputState> localInputs = Lists.newArrayList();
+            final List<InputState> localInputs = Lists.newArrayList();
 
             for (InputState inputState : inputService.loadAllInputStates()) {
                 if (inputState.getInput().getGlobal() == false)
