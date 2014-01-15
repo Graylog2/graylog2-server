@@ -38,7 +38,7 @@ public class MessageTest {
 
         m = new Message("foo", "bar", new DateTime());
         m.addField("some-thing", "bar");
-        assertNull(m.getField("some-thing"));
+        assertEquals("bar", m.getField("some-thing"));
 
         m = new Message("foo", "bar", new DateTime());
         m.addField("somethin$g", "bar");
