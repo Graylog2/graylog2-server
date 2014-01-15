@@ -27,6 +27,12 @@ function dispatchRuleValidation(ref, validatorType) {
                 errors = true;
             };
             break;
+        case "number":
+            if (!validateNumber(ref)) {
+                validationFailure(ref, "must be a number");
+                errors = true;
+            };
+            break;
         case "positive_number":
             if (!validatePositiveNumber(ref)) {
                 validationFailure(ref, "must be a positive number");
@@ -36,6 +42,12 @@ function dispatchRuleValidation(ref, validatorType) {
         case "negative_number":
             if (!validateNegativeNumber(ref)) {
                 validationFailure(ref, "must be a negative number");
+                errors = true;
+            };
+            break;
+        case "not_negative_number":
+            if (!validateNotNegativeNumber(ref)) {
+                validationFailure(ref, "must be a not negative number");
                 errors = true;
             };
             break;
@@ -74,4 +86,12 @@ function validateNegativeNumber(el) {
 
 function validateAlphanumericUnderscores(el) {
     return el.val().match("^\\w*$");
+}
+
+function validateNotNegativeNumber(el) {
+    return (validatePositiveNumber(el) || parseInt(el.val()) == 0);
+}
+
+function validateNumber(el) {
+    return isNumber(el.val());
 }

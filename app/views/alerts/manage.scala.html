@@ -54,7 +54,7 @@
 
             <br />
             and then wait at least
-            <input name="grace" type="text" class="input-mini validatable" data-validate="positive_number" />
+            <input name="grace" type="text" class="input-mini validatable" data-validate="not_negative_number" />
             minutes until triggering a new alert. (grace period)
 
             <p style="margin-top: 10px;">
@@ -100,16 +100,16 @@
 
             than
 
-            <input name="threshold" type="text" class="input-small" />
+            <input name="threshold" type="text" class="input-small validatable" data-validate="number" />
 
             in the last
 
-            <input name="time" type="text" class="input-mini pluralsingular" data-pluralsingular="time-descr" />
+            <input name="time" type="text" class="input-mini pluralsingular validatable" data-pluralsingular="time-descr" data-validate="positive_number" />
             <span class="time-descr" data-plural="minutes" data-singular="minute">minutes</span>
 
 
             and <br /> then wait at least
-            <input name="grace" type="text" class="input-mini pluralsingular" data-pluralsingular="grace-descr" />
+            <input name="grace" type="text" class="input-mini pluralsingular validatable" data-pluralsingular="grace-descr" data-validate="not_negative_number" />
             <span class="grace-descr" data-plural="minutes" data-singular="minute">minutes</span> until triggering
             a new alert. (grace period)
 
