@@ -49,7 +49,7 @@ public class Message {
 
     private MessageInput sourceInput;
 
-    private static final Pattern ALPHANUMERIC_ASCII_AND_UNDERSCORE_AND_DOTS = Pattern.compile("^[\\w\\.]*$");
+    private static final Pattern VALID_KEY_CHARS = Pattern.compile("^[\\w\\.\\-]*$");
 
     // Used for drools to filter out messages.
     private boolean filterOut = false;
@@ -183,8 +183,10 @@ public class Message {
             return;
         }
 
-        // Only allow alphanumeric characters (and underscores)
         if(!validKey(key)) {
+            if (LOG.isDebugEnabled()) {
+                LOG.debug("Ignoring invalid key {} for message {}", key, getId());
+            }
             return;
         }
 
@@ -192,7 +194,7 @@ public class Message {
     }
 
     public static boolean validKey(String key) {
-        return ALPHANUMERIC_ASCII_AND_UNDERSCORE_AND_DOTS.matcher(key).matches();
+        return VALID_KEY_CHARS.matcher(key).matches();
     }
 
     public void addFields(Map<String, Object> fields) {
