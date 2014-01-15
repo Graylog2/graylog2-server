@@ -43,7 +43,9 @@
                         <span class="caret"></span>
                     </a>
                     <ul class="dropdown-menu">
-                        <li><a href="@routes.StartpageController.set("dashboard", dashboard.getId)">Set as startpage</a></li>
+                        <li @if(currentUser.isReadonly) { class="disabled" }>
+                            <a href="@if(currentUser.isReadonly) { # } else { @routes.StartpageController.set("dashboard", dashboard.getId) }">Set as startpage</a>
+                        </li>
                     </ul>
                 </div>
             </div>

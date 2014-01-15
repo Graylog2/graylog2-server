@@ -79,8 +79,9 @@
                         @if(isPermitted(STREAMS_CREATE) && isPermitted(STREAMS_READ, stream.getId)) {
                             <li><a href="@routes.StreamsController.cloneStreamForm(stream.getId)">Clone this stream</a></li>
                         }
-                        <li><a href="@routes.StartpageController.set("stream", stream.getId)">Set as startpage</a></li>
-                    </ul>
+                    <li @if(currentUser.isReadonly) { class="disabled" }>
+                    <a href="@if(currentUser.isReadonly) { # } else { @routes.StartpageController.set("stream", stream.getId) }">Set as startpage</a>
+                    </li>                    </ul>
                 </div>
             </span>
 
