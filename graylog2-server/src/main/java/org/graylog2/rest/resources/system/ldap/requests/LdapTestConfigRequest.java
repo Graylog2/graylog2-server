@@ -34,6 +34,7 @@ public class LdapTestConfigRequest {
     public String searchPattern;
     public String principal;
     public String password;
+    public boolean trustAllCertificates;
 
     public boolean testConnectOnly;
 }

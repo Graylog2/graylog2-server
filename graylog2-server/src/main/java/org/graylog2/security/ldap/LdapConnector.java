@@ -18,7 +18,6 @@
  */
 package org.graylog2.security.ldap;
 
-import com.google.common.collect.Maps;
 import com.google.common.util.concurrent.SimpleTimeLimiter;
 import com.google.common.util.concurrent.UncheckedTimeoutException;
 import org.apache.directory.api.ldap.model.cursor.CursorException;
@@ -37,7 +36,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.text.MessageFormat;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.concurrent.Callable;
 import java.util.concurrent.Executors;
@@ -92,7 +90,6 @@ public class LdapConnector {
 
     public LdapEntry search(LdapNetworkConnection connection, String searchBase, String searchPattern, String principal, boolean activeDirectory) throws LdapException, CursorException {
         final LdapEntry ldapEntry = new LdapEntry();
-        final HashMap<String, String> entry = Maps.newHashMap();
 
         final String filter = MessageFormat.format(searchPattern, principal);
         if (log.isTraceEnabled()) {

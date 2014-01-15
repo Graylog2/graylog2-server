@@ -46,6 +46,7 @@ public class LdapSettings extends Persisted {
     public static final String USE_START_TLS = "use_start_tls";
     public static final String ACTIVE_DIRECTORY = "active_directory";
     public static final String DEFAULT_GROUP = "reader";
+    public static final String TRUST_ALL_CERTS = "trust_all_certificates";
 
     public LdapSettings(Core core) {
         super(core, Maps.<String, Object>newHashMap());
@@ -178,6 +179,15 @@ public class LdapSettings extends Persisted {
 
     public void setDefaultGroup(String defaultGroup) {
         fields.put(DEFAULT_GROUP, defaultGroup);
+    }
+
+    public boolean isTrustAllCertificates() {
+        final Object o = fields.get(TRUST_ALL_CERTS);
+        return o != null ? Boolean.valueOf(o.toString()) : false;
+    }
+
+    public void setTrustAllCertificates(boolean trustAllCertificates) {
+        fields.put(TRUST_ALL_CERTS, trustAllCertificates);
     }
 
 }

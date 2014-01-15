@@ -35,6 +35,8 @@ public class LdapSettingsRequest {
 
     public boolean useStartTls;
 
+    public boolean trustAllCertificates;
+
     public boolean activeDirectory;
 
     public String searchBase;

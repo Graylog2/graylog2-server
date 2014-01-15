@@ -35,20 +35,18 @@ import org.graylog2.rest.resources.system.ldap.requests.LdapSettingsRequest;
 import org.graylog2.rest.resources.system.ldap.requests.LdapTestConfigRequest;
 import org.graylog2.rest.resources.system.ldap.responses.LdapTestConfigResponse;
 import org.graylog2.security.RestPermissions;
+import org.graylog2.security.TrustAllX509TrustManager;
 import org.graylog2.security.ldap.LdapConnector;
 import org.graylog2.security.ldap.LdapEntry;
 import org.graylog2.security.ldap.LdapSettings;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.net.ssl.X509TrustManager;
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.io.IOException;
 import java.net.URI;
-import java.security.cert.CertificateException;
-import java.security.cert.X509Certificate;
 import java.util.Map;
 
 import static javax.ws.rs.core.Response.noContent;
@@ -82,6 +80,7 @@ public class LdapResource extends RestResource {
         result.put("display_name_attribute", ldapSettings.getDisplayNameAttribute());
         result.put("active_directory", ldapSettings.isActiveDirectory());
         result.put("use_start_tls", ldapSettings.isUseStartTls());
+        result.put("trust_all_certificates", ldapSettings.isTrustAllCertificates());
         result.put("default_group", ldapSettings.getDefaultGroup());
 
         return ok(json(result)).build();
@@ -105,21 +104,9 @@ public class LdapResource extends RestResource {
         config.setLdapPort(ldapUri.getPort());
         config.setUseSsl(ldapUri.getScheme().startsWith("ldaps"));
         config.setUseTls(request.useStartTls);
-        // TODO this accepts every and all certificates, which is certainly wrong!
-        config.setTrustManagers(new X509TrustManager() {
-            @Override
-            public void checkClientTrusted(X509Certificate[] x509Certificates, String s) throws CertificateException {
-            }
-
-            @Override
-            public void checkServerTrusted(X509Certificate[] x509Certificates, String s) throws CertificateException {
-            }
-
-            @Override
-            public X509Certificate[] getAcceptedIssuers() {
-                return new X509Certificate[0];
-            }
-        });
+        if (request.trustAllCertificates) {
+            config.setTrustManagers(new TrustAllX509TrustManager());
+        }
         if (request.systemUsername != null && !request.systemUsername.isEmpty()) {
             config.setName(request.systemUsername);
             config.setCredentials(request.systemPassword);
@@ -194,6 +181,7 @@ public class LdapResource extends RestResource {
         ldapSettings.setSystemPassword(request.systemPassword);
         ldapSettings.setUri(request.ldapUri);
         ldapSettings.setUseStartTls(request.useStartTls);
+        ldapSettings.setTrustAllCertificates(request.trustAllCertificates);
         ldapSettings.setActiveDirectory(request.activeDirectory);
         ldapSettings.setSearchPattern(request.searchPattern);
         ldapSettings.setSearchBase(request.searchBase);
@@ -220,4 +208,5 @@ public class LdapResource extends RestResource {
         LdapSettings.delete(core);
         return noContent().build();
     }
+
 }
