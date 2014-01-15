@@ -63,11 +63,6 @@ $(document).ready(function() {
 		})
 	});
 
-	// Date histogram resolution selector.
-	$(".date-histogram-res-selector").each(function() {
-		$(this).attr("href", "/search?" + addParameterToCurrentUrl("interval", $(this).attr("data-resolution")));
-	});
-
 	// Go back in sidebar history / Show original sidebar.
 	$(".sidebar-back").live("click", function() {
 		$("#sidebar-replacement").hide();
