@@ -163,6 +163,14 @@
 
     <hr />
 
+    @if(stream.getUserAlertReceivers.size() > 0) {
+        <div class="sendDummyAlert">
+            <form action="@routes.AlertsController.sendDummyAlert(stream.getId)" method="POST">
+                <button type="submit" class="btn btn-info btn-mini pull-right">Send test alert</button>
+            </form>
+        </div>
+    }
+
     <h2><i class="icon icon-group"></i> Alert receivers</h2>
 
     <div class="row-fluid" style="margin-bottom: 5px;">
@@ -213,7 +221,7 @@
                 data-provide="typeahead"
                 data-source="@users" />
 
-                <button type="submit" class="btn btn-success">Subscribe user</button>
+                <button type="submit" class="btn btn-success">Subscribe</button>
             </form>
         </div>
 
@@ -226,9 +234,10 @@
                 id="email"
                 class="input-large" />
 
-                <button type="submit" class="btn btn-success">Subscribe email address</button>
+                <button type="submit" class="btn btn-success">Subscribe</button>
             </form>
         </div>
+
     </div>
 
     <hr />

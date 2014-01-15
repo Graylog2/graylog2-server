@@ -263,6 +263,19 @@ public class AlertsController extends AuthenticatedController {
         }
     }
 
+    public Result sendDummyAlert(String streamId) {
+        try {
+            streamService.sendDummyAlert(streamId);
+            flash("success", "Sent dummy alert to all subscribers.");
+            return redirect(routes.AlertsController.index(streamId));
+        } catch (IOException e) {
+            return status(504, views.html.errors.error.render(ApiClient.ERROR_MSG_IO, e, request()));
+        } catch (APIException e) {
+            String message = "Could not add alert receiver: We expected HTTP 200, but got a HTTP " + e.getHttpCode() + ".";
+            return status(504, views.html.errors.error.render(message, e, request()));
+        }
+    }
+
     private boolean checkParam(String key, Map<String,String> form) {
         return form.containsKey(key) && !form.get(key).isEmpty();
     }

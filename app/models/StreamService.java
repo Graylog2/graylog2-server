@@ -24,6 +24,7 @@ import lib.APIException;
 import lib.ApiClient;
 import models.api.requests.streams.CreateStreamRequest;
 import models.api.requests.streams.TestMatchRequest;
+import models.api.responses.EmptyResponse;
 import models.api.responses.streams.CreateStreamResponse;
 import models.api.responses.streams.GetStreamsResponse;
 import models.api.responses.streams.StreamSummaryResponse;
@@ -111,5 +112,9 @@ public class StreamService {
     public String cloneStream(String streamId, CreateStreamRequest request) throws APIException, IOException {
         CreateStreamResponse csr = api.post(CreateStreamResponse.class).path("/streams/"+streamId+"/clone").body(request).expect(Http.Status.CREATED).execute();
         return csr.streamId;
+    }
+
+    public void sendDummyAlert(String streamId) throws APIException, IOException {
+        api.get(EmptyResponse.class).path("/streams/"+streamId+"/alerts/sendDummyAlert").expect(Http.Status.NO_CONTENT).execute();
     }
 }
