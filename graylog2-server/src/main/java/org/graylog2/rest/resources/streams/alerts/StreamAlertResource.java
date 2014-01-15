@@ -25,7 +25,11 @@ import com.google.common.collect.Maps;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.graylog2.alerts.Alert;
 import org.graylog2.alerts.AlertCondition;
+import org.graylog2.alerts.AlertSender;
+import org.graylog2.alerts.types.DummyAlertCondition;
 import org.graylog2.database.*;
+import org.graylog2.plugin.Tools;
+import org.graylog2.plugin.alarms.transports.TransportConfigurationException;
 import org.graylog2.rest.documentation.annotations.*;
 import org.graylog2.rest.resources.RestResource;
 import org.graylog2.rest.resources.streams.alerts.requests.CreateConditionRequest;
@@ -254,4 +258,35 @@ public class StreamAlertResource extends RestResource {
         return Response.status(Response.Status.NO_CONTENT).build();
     }
 
+    @GET @Timed
+    @Path("sendDummyAlert")
+    @ApiOperation(value = "Send a test mail for a given stream")
+    @ApiResponses(value = {
+            @ApiResponse(code = 404, message = "Stream not found."),
+            @ApiResponse(code = 400, message = "Invalid ObjectId.")
+    })
+    public Response sendDummyAlert(@ApiParam(title = "streamId", description = "The stream id this new alert condition belongs to.", required = true) @PathParam("streamId") String streamid) {
+        checkPermission(RestPermissions.STREAMS_EDIT, streamid);
+
+        StreamImpl stream;
+        try {
+            stream = StreamImpl.load(loadObjectId(streamid), core);
+        } catch (org.graylog2.database.NotFoundException e) {
+            throw new WebApplicationException(404);
+        }
+
+        AlertSender alertSender = null;
+        try {
+            alertSender = new AlertSender(core);
+        } catch (TransportConfigurationException e) {
+
+        }
+
+        Map<String, Object> parameters = Maps.newHashMap();
+        DummyAlertCondition dummyAlertCondition = new DummyAlertCondition(core, stream, null, null, Tools.iso8601(), "admin", parameters);
+
+        alertSender.sendEmails(stream, dummyAlertCondition.runCheck());
+
+        return Response.status(Response.Status.NO_CONTENT).build();
+    }
 }
