@@ -38,6 +38,9 @@ public class LdapTestConnectionRequest extends ApiRequest {
     @SerializedName("use_start_tls")
     public boolean useStartTls;
 
+    @SerializedName("trust_all_certificates")
+    public boolean trustAllCertificates;
+
     @SerializedName("test_connect_only")
     public boolean testConnectOnly;
 

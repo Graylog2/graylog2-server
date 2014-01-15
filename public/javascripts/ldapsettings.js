@@ -19,6 +19,9 @@ $(document).ready(function() {
         updateSchemeElement(uri);
         $("#ldap-uri-host").attr("value", uri.hostname());
         $("#ldap-uri-port").attr("value", uri.port());
+        if (uri.scheme() === "ldaps") {
+            $("#ldap-uri-ssl").prop("checked", true)
+        }
     })();
 
     $("#ldap-uri-ssl").change(function() {
@@ -98,6 +101,7 @@ $(document).ready(function() {
                 systemUsername: $("#systemUsername").val(),
                 systemPassword: $("#systemPassword").val(),
                 useStartTls: $("#ldap-uri-starttls").is(":checked"),
+                trustAllCertificates: $("#trust-all-certificates").is(":checked"),
                 ldapType: $("#type-activedirectory").is(":checked") ? "ad" : "ldap"
             },
             success: function(connectResult) {
@@ -131,6 +135,7 @@ $(document).ready(function() {
                 systemUsername: $("#systemUsername").val(),
                 systemPassword: $("#systemPassword").val(),
                 useStartTls: $("#ldap-uri-starttls").is(":checked"),
+                trustAllCertificates: $("#trust-all-certificates").is(":checked"),
                 ldapType: $("#type-activedirectory").is(":checked") ? "ad" : "ldap",
                 searchBase: $("#searchBase").val(),
                 searchPattern: $("#searchPattern").val(),

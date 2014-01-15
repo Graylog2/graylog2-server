@@ -62,7 +62,7 @@ public class LdapController extends AuthenticatedController {
     }
 
     public Result apiTestLdapConnection() {
-        final DynamicForm dynamicForm = form().bindFromRequest("url", "systemUsername", "systemPassword", "ldapType", "useStartTls");
+        final DynamicForm dynamicForm = form().bindFromRequest("url", "systemUsername", "systemPassword", "ldapType", "useStartTls", "trustAllCertificates");
         final Map<String, String> formData = dynamicForm.data();
         LdapConnectionTestResponse result;
         try {
@@ -82,7 +82,7 @@ public class LdapController extends AuthenticatedController {
 
     public Result apiTestLdapLogin() {
         final DynamicForm dynamicForm = form().bindFromRequest(
-                "url", "systemUsername", "systemPassword", "ldapType", "useStartTls",
+                "url", "systemUsername", "systemPassword", "ldapType", "useStartTls", "trustAllCertificates",
                 "searchBase", "searchPattern", "principal", "password");
         final Map<String, String> formData = dynamicForm.data();
 
@@ -114,6 +114,7 @@ public class LdapController extends AuthenticatedController {
         request.systemPassword = formData.get("systemPassword");
         request.isActiveDirectory = firstNonNull(formData.get("ldapType"), "ldap").equalsIgnoreCase("ad");
         request.useStartTls = firstNonNull(formData.get("useStartTls"), "false").equals("true");
+        request.trustAllCertificates = firstNonNull(formData.get("trustAllCertificates"), "false").equals("true");
         return request;
     }
 

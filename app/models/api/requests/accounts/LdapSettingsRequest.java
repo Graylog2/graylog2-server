@@ -41,6 +41,9 @@ public class LdapSettingsRequest extends ApiRequest {
     @SerializedName("use_start_tls")
     public boolean useStartTls;
 
+    @SerializedName("trust_all_certificates")
+    public boolean trustAllCertificates;
+
     @SerializedName("search_base")
     public String searchBase;
 

@@ -56,6 +56,7 @@ public class LdapSettings {
         response.setDisplayNameAttribute(request.displayNameAttribute);
         response.setActiveDirectory(request.activeDirectory);
         response.setUseStartTls(request.useStartTls);
+        response.setTrustAllCertificates(request.trustAllCertificates);
         response.setDefaultGroup(request.defaultGroup);
         this.response = response;
     }
@@ -86,6 +87,7 @@ public class LdapSettings {
         request.displayNameAttribute = getDisplayNameAttribute();
         request.activeDirectory = isActiveDirectory();
         request.useStartTls = isUseStartTls();
+        request.trustAllCertificates = isTrustAllCertificates();
         request.defaultGroup = getDefaultGroup();
         return request;
     }
@@ -167,6 +169,14 @@ public class LdapSettings {
 
     public boolean isUseStartTls() {
         return response.isUseStartTls();
+    }
+
+    public boolean isTrustAllCertificates() {
+        return response.isTrustAllCertificates();
+    }
+
+    public void setTrustAllCertificates(boolean trustAllCertificates) {
+        response.setTrustAllCertificates(trustAllCertificates);
     }
 
     public void setActiveDirectory(boolean activeDirectory) {

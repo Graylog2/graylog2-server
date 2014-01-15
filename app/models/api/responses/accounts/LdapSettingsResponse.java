@@ -50,6 +50,9 @@ public class LdapSettingsResponse {
     @SerializedName("use_start_tls")
     private boolean useStartTls;
 
+    @SerializedName("trust_all_certificates")
+    private boolean trustAllCertificates;
+
     @SerializedName("default_group")
     private String defaultGroup;
 
@@ -131,5 +134,13 @@ public class LdapSettingsResponse {
 
     public void setDefaultGroup(String defaultGroup) {
         this.defaultGroup = defaultGroup;
+    }
+
+    public boolean isTrustAllCertificates() {
+        return trustAllCertificates;
+    }
+
+    public void setTrustAllCertificates(boolean trustAllCertificates) {
+        this.trustAllCertificates = trustAllCertificates;
     }
 }

@@ -4,7 +4,7 @@
 
     @views.html.partials.breadcrumbs(breadcrumbs)
 
-    <div class="row-fluid">
+    <div class="row-fluid" xmlns="http://www.w3.org/1999/html">
         <h1><i class="icon-wrench"></i> LDAP Settings</h1>
         This page is the only resource you need to set up the Graylog2 LDAP integration. You can test the
         connection to your LDAP server and even try to log in with an LDAP account of your choice right away.
@@ -46,6 +46,9 @@
                     </label>
                     <label class="checkbox inline">
                         <input type="checkbox" name="useStartTls" value="true" id="ldap-uri-starttls"> StartTLS
+                    </label>
+                    <label class="checkbox inline">
+                        <input type="checkbox" name="trustAllCertificates" value="true" id="trust-all-certificates" @if("true".equals(ldapForm("trustAllCertificates").value())) {checked}> Allow self-signed certificates
                     </label>
                 </div>
             </div>
