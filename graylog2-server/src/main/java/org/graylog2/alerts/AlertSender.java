@@ -84,6 +84,9 @@ public class AlertSender {
             Email email = new SimpleEmail();
             email.setHostName(core.getConfiguration().getEmailTransportHostname());
             email.setSmtpPort(core.getConfiguration().getEmailTransportPort());
+            if (core.getConfiguration().isEmailTransportUseSsl()) {
+                email.setSslSmtpPort(Integer.toString(core.getConfiguration().getEmailTransportPort()));
+            }
 
             if(core.getConfiguration().isEmailTransportUseAuth()) {
                 email.setAuthenticator(new DefaultAuthenticator(
