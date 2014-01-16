@@ -1805,3 +1805,8 @@ form.edit-dashboard-form {
 .query-exception {
     margin-bottom: 15px;
 }
+
+input.required-input-highlight {
+    border-color: rgb(233, 50, 45);
+    color: rgb(233, 50, 45);
+}
