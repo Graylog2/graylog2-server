@@ -58,8 +58,31 @@ public class InputService {
         return result;
     }
 
+    protected List<InputStateSummaryResponse> getInputsFromNode(Node node) {
+        List<InputStateSummaryResponse> result = Lists.newArrayList();
+        try {
+            result = api.get(InputsResponse.class).node(node).path("/system/inputs").execute().inputs;
+        } catch (APIException e) {
+            log.error("Unable to fetch input list: " + e);
+        } catch (IOException e) {
+            log.error("Unable to fetch input list: " + e);
+        }
+
+        return result;
+    }
+
     protected Map<Node, InputsResponse> getInputsFromAllNodes() {
         return api.get(InputsResponse.class).fromAllNodes().path("/system/inputs").executeOnAll();
+    }
+
+    public List<InputState> loadAllInputStates(Node node) {
+        List<InputState> inputStates = Lists.newArrayList();
+
+        for (InputStateSummaryResponse inputsResponse : getInputsFromNode(node)) {
+            inputStates.add(inputStateFactory.fromSummaryResponse(inputsResponse, node));
+        }
+
+        return inputStates;
     }
 
     public List<InputState> loadAllInputStates() {

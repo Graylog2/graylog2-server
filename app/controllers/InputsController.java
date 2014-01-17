@@ -52,8 +52,7 @@ public class InputsController extends AuthenticatedController {
 
     public Result index() {
         try {
-            Map<Input, Map<ClusterEntity, InputState>> globalInputs = Maps.newHashMap();
-            //List<InputState> globalInputs = Lists.newArrayList();
+            final Map<Input, Map<ClusterEntity, InputState>> globalInputs = Maps.newHashMap();
             final List<InputState> localInputs = Lists.newArrayList();
 
             for (InputState inputState : inputService.loadAllInputStates()) {
@@ -93,12 +92,25 @@ public class InputsController extends AuthenticatedController {
     }
 
     public Result manage(String nodeId) {
+        final Map<Input, Map<ClusterEntity, InputState>> globalInputs = Maps.newHashMap();
+        final List<InputState> localInputs = Lists.newArrayList();
+
         try {
             Node node = nodeService.loadNode(nodeId);
 
             if (node == null) {
                 String message = "Did not find node.";
                 return status(404, views.html.errors.error.render(message, new RuntimeException(), request()));
+            }
+
+            for (InputState inputState : inputService.loadAllInputStates(node)) {
+                if (inputState.getInput().getGlobal() == false)
+                    localInputs.add(inputState);
+                else {
+                    Map<ClusterEntity, InputState> clusterEntityInputStateMap = Maps.newHashMap();
+                    clusterEntityInputStateMap.put(node, inputState);
+                    globalInputs.put(inputState.getInput(), clusterEntityInputStateMap);
+                }
             }
 
             BreadcrumbList bc = new BreadcrumbList();
@@ -111,6 +123,8 @@ public class InputsController extends AuthenticatedController {
                     currentUser(),
                     bc,
                     node,
+                    globalInputs,
+                    localInputs,
                     node.getAllInputTypeInformation()
             ));
         } catch (IOException e) {

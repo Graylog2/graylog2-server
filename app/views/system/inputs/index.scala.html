@@ -34,7 +34,7 @@
     <div class="row-fluid input-list">
         <h2><i class="icon icon-cogs"> Running global inputs</i></h2>
         @if(globalInputs.size > 0) {
-            @for((input, nodeStates) <- globalInputs) {
+            @for((input, nodeStates) <- globalInputs.toSeq.sortWith(_._1.getTitle < _._1.getTitle)) {
                 @views.html.system.inputs.partials.global_input_summary(input, nodeStates, inputTypes, masterNode)
             }
         } else {
@@ -45,7 +45,7 @@
         <h2><i class="icon icon-cogs"></i> Running local inputs</h2>
 
         @if(localInputs.size > 0) {
-            @for(inputState <- localInputs) {
+            @for(inputState <- localInputs.toSeq.sortBy(_.getInput.getTitle)) {
                 @views.html.system.inputs.partials.input_summary(inputState, inputTypes)
             }
         } else {

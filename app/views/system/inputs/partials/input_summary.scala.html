@@ -1,4 +1,5 @@
 @(inputState: InputState, inputTypes: Map[String, models.api.responses.system.InputTypeSummaryResponse])
+@import views.helpers.InputStateHelper
 
 @for(input <- Seq(inputState.getInput)) {
     <div class="row-fluid node-row">
@@ -46,13 +47,13 @@
                 </a>
             }
 
-            @if(inputState.getState == "running") {
-                <span class="label label-success">
-            } else {
-                <span class="label label-warning">
-            }
+            <span class="label label-@InputStateHelper.labelClassForState(inputState.getState)">
                 @inputState.getState
             </span>
+
+            @if(input.getGlobal) {
+                <span class="label label-info">global</span>
+            }
         </h3>
 
         @if(input.getReadBytes >= 0 && input.getWrittenBytes >= 0) {
