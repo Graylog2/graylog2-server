@@ -98,6 +98,9 @@ public class Mapping {
         // http://www.elasticsearch.org/guide/reference/mapping/date-format.html
         properties.put("timestamp", typeTimeWithMillis());
 
+        // to support wildcard searches in source we need to lowercase the content (wildcard search lowercases search term)
+        properties.put("source", analyzedString("analyzer_keyword"));
+
         return properties;
     }
 

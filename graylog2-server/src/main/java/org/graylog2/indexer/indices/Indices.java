@@ -184,9 +184,13 @@ public class Indices {
     }
 
     public boolean create(String indexName) {
-        Map<String, Integer> settings = Maps.newHashMap();
+        Map<String, Object> settings = Maps.newHashMap();
         settings.put("number_of_shards", server.getConfiguration().getElasticSearchShards());
         settings.put("number_of_replicas", server.getConfiguration().getElasticSearchReplicas());
+        Map<String, String> keywordLowercase = Maps.newHashMap();
+        keywordLowercase.put("tokenizer", "keyword");
+        keywordLowercase.put("filter", "lowercase");
+        settings.put("index.analysis.analyzer.analyzer_keyword", keywordLowercase);
 
         CreateIndexRequest cir = new CreateIndexRequest(indexName);
         cir.settings(settings);
