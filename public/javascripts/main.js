@@ -704,6 +704,8 @@ $(document).ready(function() {
             $(this).removeClass("required-input-highlight");
         });
     }
+
+    $('input, textarea').placeholder();
 });
 
 function searchDateTimeFormatted(date) {
