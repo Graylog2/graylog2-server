@@ -18,7 +18,8 @@ public class InputState {
         STARTING,
         RUNNING,
         FAILED,
-        STOPPED
+        STOPPED,
+        TERMINATED
     }
 
     protected MessageInput messageInput;
@@ -71,12 +72,21 @@ public class InputState {
         this.startedAt = startedAt;
     }
 
+    public String getDetailedMessage() {
+        return detailedMessage;
+    }
+
+    public void setDetailedMessage(String detailedMessage) {
+        this.detailedMessage = detailedMessage;
+    }
+
     public Map<String, Object> asMap() {
         Map<String, Object> inputStateMap = Maps.newHashMap();
         inputStateMap.put("id", id);
         inputStateMap.put("state", state.toString().toLowerCase());
         inputStateMap.put("started_at", startedAt);
         inputStateMap.put("message_input", messageInput.asMap());
+        inputStateMap.put("detailed_message", detailedMessage);
 
         return inputStateMap;
     }

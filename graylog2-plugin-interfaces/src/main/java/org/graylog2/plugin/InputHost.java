@@ -25,7 +25,7 @@ import org.graylog2.plugin.buffers.Buffer;
 /**
  * @author Lennart Koopmann <lennart@torch.sh>
  */
-public interface InputHost {
+public interface InputHost extends GenericHost {
 
     public Buffer getProcessBuffer();
 

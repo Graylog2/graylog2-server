@@ -26,7 +26,7 @@ import org.graylog2.plugin.configuration.Configuration;
 import org.graylog2.plugin.configuration.ConfigurationException;
 import org.graylog2.plugin.inputs.InputState;
 import org.graylog2.plugin.inputs.MessageInput;
-import org.graylog2.radio.inputs.InputRegistry;
+import org.graylog2.shared.inputs.InputRegistry;
 import org.graylog2.shared.inputs.NoSuchInputTypeException;
 import org.graylog2.radio.inputs.api.InputSummaryResponse;
 import org.graylog2.radio.rest.resources.RestResource;
@@ -145,27 +145,15 @@ public class InputsResource extends RestResource {
     public Response terminate(@PathParam("inputId") String inputId) {
         MessageInput input = radio.inputs().getRunningInput(inputId);
 
-        String msg = "Attempting to terminate input [" + input.getName()+ "]. Reason: REST request.";
-        LOG.info(msg);
-
         if (input == null) {
             LOG.info("Cannot terminate input. Input not found.");
             throw new WebApplicationException(404);
         }
 
-        // Unregister on server cluster.
-        try {
-            radio.inputs().unregisterInCluster(input);
-        } catch (Exception e) {
-            LOG.error("Could not unregister input [" + input.getName()+ "] on server cluster. Not continuing.", e);
-            return Response.status(Response.Status.BAD_GATEWAY).build();
-        }
+        String msg = "Attempting to terminate input [" + input.getName()+ "]. Reason: REST request.";
+        LOG.info(msg);
 
-        LOG.info("Unregistered input [" + input.getName()+ "] on server cluster.");
-
-        // Shutdown actual input.
-        input.stop();
-        radio.inputs().removeFromRunning(input);
+        radio.inputs().terminate(input);
 
         String msg2 = "Terminated input [" + input.getName()+ "]. Reason: REST request.";
         LOG.info(msg2);
@@ -210,28 +198,17 @@ public class InputsResource extends RestResource {
     @Path("/{inputId}/launch")
     @Produces(MediaType.APPLICATION_JSON)
     public Response launchExisting(@PathParam("inputId") String inputId) {
-        try {
-            InputSummaryResponse isr = radio.inputs().getPersisted(inputId);
-            if (isr == null) {
-                throw new WebApplicationException(404);
-            }
-
-            radio.inputs().launchPersisted(isr);
-
-            Map<String, Object> result = Maps.newHashMap();
-            result.put("input_id", inputId);
-            result.put("persist_id", inputId);
-
-            return Response.status(Response.Status.ACCEPTED).entity(json(result)).build();
-        } catch (ExecutionException e) {
-            LOG.error("Unable to launch existing input: ", e);
-            return Response.status(Response.Status.BAD_GATEWAY).build();
-        } catch (InterruptedException e) {
-            LOG.error("Unable to launch existing input: ", e);
-            return Response.status(Response.Status.BAD_GATEWAY).build();
-        } catch (IOException e) {
-            LOG.error("Unable to launch existing input: ", e);
-            return Response.status(Response.Status.BAD_GATEWAY).build();
+        MessageInput isr = radio.inputs().getPersisted(inputId);
+        if (isr == null) {
+            throw new WebApplicationException(404);
         }
+
+        radio.inputs().launchPersisted(isr);
+
+        Map<String, Object> result = Maps.newHashMap();
+        result.put("input_id", inputId);
+        result.put("persist_id", inputId);
+
+        return Response.status(Response.Status.ACCEPTED).entity(json(result)).build();
     }
 }

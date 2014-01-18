@@ -35,7 +35,7 @@ import org.graylog2.plugin.streams.Stream;
  *
  * @author Lennart Koopmann <lennart@socketfeed.com>
  */
-public interface GraylogServer extends Runnable {
+public interface GraylogServer extends Runnable, GenericHost {
 
     public Buffer getOutputBuffer();
     
@@ -56,10 +56,4 @@ public interface GraylogServer extends Runnable {
     public AtomicInteger processBufferWatermark();
 
     public List<MessageFilter> getFilters();
-
-    public boolean isProcessing();
-
-    public boolean isServer();
-
-    public boolean isRadio();
 }

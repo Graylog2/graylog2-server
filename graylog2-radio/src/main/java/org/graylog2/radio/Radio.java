@@ -45,10 +45,11 @@ import org.graylog2.plugin.rest.AnyExceptionClassMapper;
 import org.graylog2.plugin.streams.Stream;
 import org.graylog2.plugin.system.NodeId;
 import org.graylog2.radio.cluster.Ping;
-import org.graylog2.radio.inputs.InputRegistry;
+import org.graylog2.radio.inputs.RadioInputRegistry;
 import org.graylog2.shared.MetricsHost;
 import org.graylog2.shared.ProcessingHost;
 import org.graylog2.shared.buffers.ProcessBuffer;
+import org.graylog2.shared.inputs.InputRegistry;
 import org.graylog2.shared.periodical.MasterCacheWorkerThread;
 import org.graylog2.shared.periodical.ThroughputCounterManagerThread;
 import org.graylog2.radio.transports.RadioTransport;
@@ -90,7 +91,7 @@ public class Radio implements InputHost, MetricsHost, GraylogServer, ProcessingH
     private static final int SCHEDULED_THREADS_POOL_SIZE = 10;
     private ScheduledExecutorService scheduler;
 
-    private InputRegistry inputs;
+    private RadioInputRegistry inputs;
     private Cache inputCache;
     private ProcessBuffer processBuffer;
     private AtomicInteger processBufferWatermark = new AtomicInteger();
@@ -133,7 +134,10 @@ public class Radio implements InputHost, MetricsHost, GraylogServer, ProcessingH
 
         transport = new KafkaProducer(this);
 
-        this.inputs = new InputRegistry(this);
+        this.inputs = new RadioInputRegistry(this,
+                this.getHttpClient(),
+                this.getConfiguration().getGraylog2ServerUri()
+        );
 
         if (this.configuration.getRestTransportUri() == null) {
             String guessedIf;

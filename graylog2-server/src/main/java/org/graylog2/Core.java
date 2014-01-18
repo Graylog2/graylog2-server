@@ -35,6 +35,7 @@ import org.glassfish.jersey.server.filter.EncodingFilter;
 import org.glassfish.jersey.server.internal.scanning.PackageNamesScanner;
 import org.graylog2.blacklists.BlacklistCache;
 import org.graylog2.buffers.OutputBuffer;
+import org.graylog2.inputs.ServerInputRegistry;
 import org.graylog2.shared.buffers.ProcessBuffer;
 import org.graylog2.dashboards.DashboardRegistry;
 import org.graylog2.database.HostCounterCacheImpl;
@@ -45,7 +46,7 @@ import org.graylog2.indexer.Indexer;
 import org.graylog2.initializers.Initializers;
 import org.graylog2.inputs.BasicCache;
 import org.graylog2.inputs.Cache;
-import org.graylog2.inputs.InputRegistry;
+import org.graylog2.shared.inputs.InputRegistry;
 import org.graylog2.inputs.gelf.gelf.GELFChunkManager;
 import org.graylog2.jersey.container.netty.NettyContainer;
 import org.graylog2.metrics.jersey2.MetricsDynamicBinding;
@@ -142,7 +143,7 @@ public class Core implements GraylogServer, InputHost, MetricsHost, ProcessingHo
     private List<AlarmCallback> alarmCallbacks = Lists.newArrayList();
 
     private Initializers initializers;
-    private InputRegistry inputs;
+    private ServerInputRegistry inputs;
     private OutputRegistry outputs;
 
     private DashboardRegistry dashboards;
@@ -221,7 +222,7 @@ public class Core implements GraylogServer, InputHost, MetricsHost, ProcessingHo
         mongoConnection.connect();
 
         initializers = new Initializers(this);
-        inputs = new InputRegistry(this);
+        inputs = new ServerInputRegistry(this);
         outputs = new OutputRegistry(this);
 
         if (isMaster()) {
@@ -301,7 +302,7 @@ public class Core implements GraylogServer, InputHost, MetricsHost, ProcessingHo
         outputs().initialize();
 
         // Load persisted inputs.
-        inputs().launchPersisted();
+        inputs().launchAllPersisted();
 
         /*
         // Initialize all registered inputs.
