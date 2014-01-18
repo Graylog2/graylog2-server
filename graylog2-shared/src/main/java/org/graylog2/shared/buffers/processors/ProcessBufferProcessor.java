@@ -13,9 +13,9 @@
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
  *
- *
  * You should have received a copy of the GNU General Public License
  * along with Graylog2.  If not, see <http://www.gnu.org/licenses/>.
+ *
  */
 
 package org.graylog2.shared.buffers.processors;
@@ -27,6 +27,9 @@ import com.google.inject.assistedinject.Assisted;
 import com.google.inject.assistedinject.AssistedInject;
 import com.lmax.disruptor.EventHandler;
 import org.graylog2.plugin.GraylogServer;
+import org.graylog2.shared.ProcessingHost;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.graylog2.plugin.Message;
 import org.graylog2.plugin.buffers.MessageEvent;
 import org.graylog2.plugin.filters.MessageFilter;
