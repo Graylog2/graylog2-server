@@ -21,7 +21,7 @@
 package org.graylog2;
 
 import org.graylog2.inputs.BasicCache;
-import org.graylog2.buffers.ProcessBuffer;
+import org.graylog2.shared.buffers.ProcessBuffer;
 import org.graylog2.plugin.Message;
 import org.graylog2.plugin.inputs.MessageInput;
 

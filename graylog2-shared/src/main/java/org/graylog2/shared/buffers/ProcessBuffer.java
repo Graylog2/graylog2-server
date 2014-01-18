@@ -18,14 +18,15 @@
  *
  */
 
-package org.graylog2.buffers;
+package org.graylog2.shared.buffers;
 
 import com.codahale.metrics.Meter;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
+import com.lmax.disruptor.WaitStrategy;
 import com.lmax.disruptor.dsl.Disruptor;
 import com.lmax.disruptor.dsl.ProducerType;
-import org.graylog2.Core;
-import org.graylog2.buffers.processors.ProcessBufferProcessor;
+import org.graylog2.plugin.GraylogServer;
+import org.graylog2.shared.buffers.processors.ProcessBufferProcessor;
 import org.graylog2.inputs.Cache;
 import org.graylog2.plugin.buffers.Buffer;
 import org.graylog2.plugin.Message;
@@ -48,8 +49,8 @@ public class ProcessBuffer extends Buffer {
 
     private static final Logger LOG = LoggerFactory.getLogger(ProcessBuffer.class);
 
-    public static final String SOURCE_INPUT_ATTR_NAME = "gl2_source_input";
-    public static final String SOURCE_NODE_ATTR_NAME = "gl2_source_node";
+    public static String SOURCE_INPUT_ATTR_NAME;
+    public static String SOURCE_NODE_ATTR_NAME;
 
     protected ExecutorService executor = Executors.newCachedThreadPool(
             new ThreadFactoryBuilder()
@@ -57,7 +58,7 @@ public class ProcessBuffer extends Buffer {
                 .build()
     );
 
-    private Core server;
+    private GraylogServer server;
     
     private final Cache masterCache;
 
@@ -65,32 +66,42 @@ public class ProcessBuffer extends Buffer {
     private final Meter rejectedMessages;
     private final Meter cachedMessages;
 
-    public ProcessBuffer(Core server, Cache masterCache) {
+    public ProcessBuffer(GraylogServer server, Cache masterCache) {
         this.server = server;
         this.masterCache = masterCache;
 
         incomingMessages = server.metrics().meter(name(ProcessBuffer.class, "incomingMessages"));
         rejectedMessages = server.metrics().meter(name(ProcessBuffer.class, "rejectedMessages"));
         cachedMessages = server.metrics().meter(name(ProcessBuffer.class, "cachedMessages"));
+
+        if (server.isServer()) {
+            SOURCE_INPUT_ATTR_NAME = "gl2_source_input";
+            SOURCE_NODE_ATTR_NAME = "gl2_source_node";
+        }
+
+        if (server.isRadio()) {
+            SOURCE_INPUT_ATTR_NAME = "gl2_source_radio_input";
+            SOURCE_NODE_ATTR_NAME = "gl2_source_radio";
+        }
     }
 
-    public void initialize() {
+    public void initialize(int ringBufferSize, WaitStrategy waitStrategy, int processBufferProcessors) {
         Disruptor disruptor = new Disruptor<MessageEvent>(
                 MessageEvent.EVENT_FACTORY,
-                server.getConfiguration().getRingSize(),
+                ringBufferSize,
                 executor,
                 ProducerType.MULTI,
-                server.getConfiguration().getProcessorWaitStrategy()
+                waitStrategy
         );
         
         LOG.info("Initialized ProcessBuffer with ring size <{}> "
-                + "and wait strategy <{}>.", server.getConfiguration().getRingSize(),
-                server.getConfiguration().getProcessorWaitStrategy().getClass().getSimpleName());
+                + "and wait strategy <{}>.", ringBufferSize,
+                waitStrategy.getClass().getSimpleName());
 
-        ProcessBufferProcessor[] processors = new ProcessBufferProcessor[server.getConfiguration().getProcessBufferProcessors()];
+        ProcessBufferProcessor[] processors = new ProcessBufferProcessor[processBufferProcessors];
         
-        for (int i = 0; i < server.getConfiguration().getProcessBufferProcessors(); i++) {
-            processors[i] = new ProcessBufferProcessor(this.server, i, server.getConfiguration().getProcessBufferProcessors());
+        for (int i = 0; i < processBufferProcessors; i++) {
+            processors[i] = new ProcessBufferProcessor(this.server, i, processBufferProcessors);
         }
         
         disruptor.handleEventsWith(processors);

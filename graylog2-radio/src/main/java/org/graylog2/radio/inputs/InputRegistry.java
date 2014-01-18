@@ -33,8 +33,9 @@ import org.graylog2.plugin.inputs.MisfireException;
 import org.graylog2.radio.Radio;
 import org.graylog2.radio.inputs.api.InputSummaryResponse;
 import org.graylog2.radio.inputs.api.PersistedInputsResponse;
-import org.graylog2.radio.inputs.api.RegisterInputRequest;
+import org.graylog2.shared.rest.resources.system.inputs.requests.RegisterInputRequest;
 import org.graylog2.radio.inputs.api.RegisterInputResponse;
+import org.graylog2.shared.inputs.NoSuchInputTypeException;
 import org.joda.time.DateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -247,18 +248,7 @@ public class InputRegistry {
     }
 
     public InputSummaryResponse getPersisted(String inputId) throws ExecutionException, InterruptedException, IOException {
-        final UriBuilder uriBuilder = UriBuilder.fromUri(radio.getConfiguration().getGraylog2ServerUri());
-        uriBuilder.path("/system/radios/" + radio.getNodeId() + "/inputs");
-
-        Future<Response> f = radio.getHttpClient().prepareGet(uriBuilder.build().toString()).execute();
-
-        Response r = f.get();
-
-        if (r.getStatusCode() != 200) {
-            throw new RuntimeException("Expected HTTP response [200] for list of persisted input but got [" + r.getStatusCode() + "].");
-        }
-
-        List<InputSummaryResponse> response = mapper.readValue(r.getResponseBody(), PersistedInputsResponse.class).inputs;
+        List<InputSummaryResponse> response = getAllPersisted();
         for (InputSummaryResponse isr : response) {
             if (isr.id.equals(inputId))
                 return isr;

@@ -19,6 +19,8 @@
  */
 package org.graylog2.radio;
 
+import com.beust.jcommander.internal.Lists;
+import com.beust.jcommander.internal.Maps;
 import com.codahale.metrics.MetricRegistry;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import com.ning.http.client.AsyncHttpClient;
@@ -32,17 +34,23 @@ import org.graylog2.inputs.BasicCache;
 import org.graylog2.inputs.Cache;
 import org.graylog2.inputs.gelf.gelf.GELFChunkManager;
 import org.graylog2.jersey.container.netty.NettyContainer;
+import org.graylog2.plugin.GraylogServer;
 import org.graylog2.plugin.InputHost;
 import org.graylog2.plugin.Tools;
 import org.graylog2.plugin.Version;
 import org.graylog2.plugin.buffers.Buffer;
+import org.graylog2.plugin.filters.MessageFilter;
+import org.graylog2.plugin.indexer.MessageGateway;
 import org.graylog2.plugin.rest.AnyExceptionClassMapper;
+import org.graylog2.plugin.streams.Stream;
 import org.graylog2.plugin.system.NodeId;
-import org.graylog2.radio.buffers.ProcessBuffer;
 import org.graylog2.radio.cluster.Ping;
 import org.graylog2.radio.inputs.InputRegistry;
-import org.graylog2.radio.periodical.MasterCacheWorkerThread;
-import org.graylog2.radio.periodical.ThroughputCounterManagerThread;
+import org.graylog2.shared.MetricsHost;
+import org.graylog2.shared.ProcessingHost;
+import org.graylog2.shared.buffers.ProcessBuffer;
+import org.graylog2.shared.periodical.MasterCacheWorkerThread;
+import org.graylog2.shared.periodical.ThroughputCounterManagerThread;
 import org.graylog2.radio.transports.RadioTransport;
 import org.graylog2.radio.transports.kafka.KafkaProducer;
 import org.jboss.netty.bootstrap.ServerBootstrap;
@@ -59,13 +67,15 @@ import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.net.InetSocketAddress;
+import java.util.List;
+import java.util.Map;
 import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * @author Lennart Koopmann <lennart@torch.sh>
  */
-public class Radio implements InputHost {
+public class Radio implements InputHost, MetricsHost, GraylogServer, ProcessingHost {
 
     private static final Logger LOG = LoggerFactory.getLogger(Radio.class);
 
@@ -116,7 +126,10 @@ public class Radio implements InputHost {
 
         inputCache = new BasicCache();
         processBuffer = new ProcessBuffer(this, inputCache);
-        processBuffer.initialize();
+        processBuffer.initialize(this.getConfiguration().getRingSize(),
+                this.getConfiguration().getProcessorWaitStrategy(),
+                this.getConfiguration().getProcessBufferProcessors()
+        );
 
         transport = new KafkaProducer(this);
 
@@ -280,5 +293,53 @@ public class Radio implements InputHost {
 
     public AsyncHttpClient getHttpClient() {
         return httpClient;
+    }
+
+    public List<MessageFilter> getFilters() {
+        List<MessageFilter> result = Lists.newArrayList();
+        return result;
+    }
+
+    @Override
+    public void closeIndexShortcut(String indexName) {
+    }
+
+    @Override
+    public void deleteIndexShortcut(String indexName) {
+    }
+
+    @Override
+    public Map<String, Stream> getEnabledStreams() {
+        Map<String, Stream> result = Maps.newHashMap();
+        return result;
+    }
+
+    @Override
+    public MessageGateway getMessageGateway() {
+        return null;
+    }
+
+    @Override
+    public boolean isMaster() {
+        return false;
+    }
+
+    @Override
+    public Buffer getOutputBuffer() {
+        return null;
+    }
+
+    @Override
+    public void run() {
+    }
+
+    @Override
+    public boolean isServer() {
+        return false;
+    }
+
+    @Override
+    public boolean isRadio() {
+        return true;
     }
 }

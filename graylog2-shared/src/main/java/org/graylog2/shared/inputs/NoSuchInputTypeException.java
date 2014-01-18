@@ -17,24 +17,22 @@
  * along with Graylog2.  If not, see <http://www.gnu.org/licenses/>.
  *
  */
-package org.graylog2.radio.periodical;
-
-import org.graylog2.radio.Radio;
+package org.graylog2.shared.inputs;
 
 /**
  * @author Lennart Koopmann <lennart@torch.sh>
  */
-public class ThroughputCounterManagerThread implements Runnable {
+public class NoSuchInputTypeException extends Throwable {
 
-    private final Radio radio;
-
-    public ThroughputCounterManagerThread(Radio radio) {
-        this.radio = radio;
+    public NoSuchInputTypeException() {
     }
 
-    @Override
-    public void run() {
-        radio.setCurrentThroughput(radio.getThroughputCounter().get());
-        radio.getThroughputCounter().set(0);
+    public NoSuchInputTypeException(String s) {
+        super(s);
     }
+
+    public NoSuchInputTypeException(String s, Throwable e) {
+        super(s, e);
+    }
+
 }

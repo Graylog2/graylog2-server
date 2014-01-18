@@ -21,10 +21,13 @@
 */
 package org.graylog2.plugin;
 
+import java.util.List;
 import java.util.Map;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import com.codahale.metrics.MetricRegistry;
 import org.graylog2.plugin.buffers.Buffer;
+import org.graylog2.plugin.filters.MessageFilter;
 import org.graylog2.plugin.indexer.MessageGateway;
 import org.graylog2.plugin.streams.Stream;
 
@@ -49,4 +52,14 @@ public interface GraylogServer extends Runnable {
     void deleteIndexShortcut(String indexName);
 
     void closeIndexShortcut(String indexName);
+
+    public AtomicInteger processBufferWatermark();
+
+    public List<MessageFilter> getFilters();
+
+    public boolean isProcessing();
+
+    public boolean isServer();
+
+    public boolean isRadio();
 }

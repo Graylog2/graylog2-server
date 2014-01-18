@@ -17,9 +17,10 @@
  * along with Graylog2.  If not, see <http://www.gnu.org/licenses/>.
  *
  */
-package org.graylog2.rest.resources.system.radio.requests;
+package org.graylog2.shared.rest.resources.system.inputs.requests;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import org.graylog2.plugin.inputs.MessageInput;
 
 import java.util.Map;
 
@@ -41,5 +42,14 @@ public class RegisterInputRequest {
 
     @JsonProperty("creator_user_id")
     public String creatorUserId;
+
+    public RegisterInputRequest(MessageInput input, String radioId) {
+        this.inputId = input.getId();
+        this.title = input.getTitle();
+        this.type = input.getClass().getCanonicalName();
+        this.configuration = input.getConfiguration().getSource();
+        this.radioId = radioId;
+        this.creatorUserId = input.getCreatorUserId();
+    }
 
 }

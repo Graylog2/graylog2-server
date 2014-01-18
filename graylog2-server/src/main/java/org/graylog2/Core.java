@@ -35,7 +35,7 @@ import org.glassfish.jersey.server.filter.EncodingFilter;
 import org.glassfish.jersey.server.internal.scanning.PackageNamesScanner;
 import org.graylog2.blacklists.BlacklistCache;
 import org.graylog2.buffers.OutputBuffer;
-import org.graylog2.buffers.ProcessBuffer;
+import org.graylog2.shared.buffers.ProcessBuffer;
 import org.graylog2.dashboards.DashboardRegistry;
 import org.graylog2.database.HostCounterCacheImpl;
 import org.graylog2.database.MongoBridge;
@@ -75,6 +75,8 @@ import org.graylog2.security.ShiroSecurityBinding;
 import org.graylog2.security.ShiroSecurityContextFactory;
 import org.graylog2.security.ldap.LdapConnector;
 import org.graylog2.security.realm.LdapUserAuthenticator;
+import org.graylog2.shared.MetricsHost;
+import org.graylog2.shared.ProcessingHost;
 import org.graylog2.streams.StreamImpl;
 import org.graylog2.system.activities.Activity;
 import org.graylog2.system.activities.ActivityWriter;
@@ -109,7 +111,7 @@ import java.util.concurrent.atomic.AtomicReference;
  * 
  * @author Lennart Koopmann <lennart@socketfeed.com>
  */
-public class Core implements GraylogServer, InputHost {
+public class Core implements GraylogServer, InputHost, MetricsHost, ProcessingHost {
 
     private static final Logger LOG = LoggerFactory.getLogger(Core.class);
 
@@ -237,7 +239,10 @@ public class Core implements GraylogServer, InputHost {
         outputCache = new BasicCache();
     
         processBuffer = new ProcessBuffer(this, inputCache);
-        processBuffer.initialize();
+        processBuffer.initialize(this.getConfiguration().getRingSize(),
+                this.getConfiguration().getProcessorWaitStrategy(),
+                this.getConfiguration().getProcessBufferProcessors()
+        );
 
         outputBuffer = new OutputBuffer(this, outputCache);
         outputBuffer.initialize();
@@ -688,5 +693,15 @@ public class Core implements GraylogServer, InputHost {
         }
 
         return dashboards;
+    }
+
+    @Override
+    public boolean isServer() {
+        return true;
+    }
+
+    @Override
+    public boolean isRadio() {
+        return false;
     }
 }

@@ -17,22 +17,28 @@
  * along with Graylog2.  If not, see <http://www.gnu.org/licenses/>.
  *
  */
-package org.graylog2.inputs;
+package org.graylog2.shared.periodical;
+
+import org.graylog2.shared.MetricsHost;
 
 /**
  * @author Lennart Koopmann <lennart@torch.sh>
  */
-public class NoSuchInputTypeException extends Throwable {
+public class ThroughputCounterManagerThread implements Runnable {
 
-    public NoSuchInputTypeException() {
+    public static final int INITIAL_DELAY = 0;
+    public static final int PERIOD = 1;
+
+    private final MetricsHost core;
+
+    public ThroughputCounterManagerThread(MetricsHost core) {
+        this.core = core;
     }
 
-    public NoSuchInputTypeException(String s) {
-        super(s);
-    }
-
-    public NoSuchInputTypeException(String s, Throwable e) {
-        super(s, e);
+    @Override
+    public void run() {
+        core.setCurrentThroughput(core.getThroughputCounter().get());
+        core.getThroughputCounter().set(0);
     }
 
 }

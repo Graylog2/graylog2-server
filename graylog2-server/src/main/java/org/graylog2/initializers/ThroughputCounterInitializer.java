@@ -21,7 +21,7 @@ package org.graylog2.initializers;
 
 import com.google.common.collect.Maps;
 import org.graylog2.Core;
-import org.graylog2.periodical.ThroughputCounterManagerThread;
+import org.graylog2.shared.periodical.ThroughputCounterManagerThread;
 import org.graylog2.plugin.GraylogServer;
 import org.graylog2.plugin.initializers.Initializer;
 import org.graylog2.plugin.initializers.InitializerConfigurationException;

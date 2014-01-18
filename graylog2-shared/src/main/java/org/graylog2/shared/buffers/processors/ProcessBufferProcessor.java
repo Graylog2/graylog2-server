@@ -18,19 +18,18 @@
  *
  */
 
-package org.graylog2.buffers.processors;
+package org.graylog2.shared.buffers.processors;
 
 import com.codahale.metrics.Meter;
 import com.codahale.metrics.Timer;
 import com.lmax.disruptor.EventHandler;
+import org.graylog2.plugin.GraylogServer;
+import org.graylog2.shared.ProcessingHost;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.graylog2.Core;
 import org.graylog2.plugin.buffers.MessageEvent;
 import org.graylog2.plugin.filters.MessageFilter;
 import org.graylog2.plugin.Message;
-
-import java.util.concurrent.TimeUnit;
 
 import static com.codahale.metrics.MetricRegistry.name;
 
@@ -41,7 +40,7 @@ public class ProcessBufferProcessor implements EventHandler<MessageEvent> {
 
     private static final Logger LOG = LoggerFactory.getLogger(ProcessBufferProcessor.class);
 
-    private Core server;
+    private GraylogServer server;
     private final Meter incomingMessages;
     private final Timer processTime;
     private final Meter filteredOutMessages;
@@ -50,7 +49,7 @@ public class ProcessBufferProcessor implements EventHandler<MessageEvent> {
     private final long ordinal;
     private final long numberOfConsumers;
     
-    public ProcessBufferProcessor(Core server, final long ordinal, final long numberOfConsumers) {
+    public ProcessBufferProcessor(GraylogServer server, final long ordinal, final long numberOfConsumers) {
         this.ordinal = ordinal;
         this.numberOfConsumers = numberOfConsumers;
         this.server = server;
