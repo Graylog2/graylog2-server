@@ -25,12 +25,11 @@ import com.google.common.collect.Maps;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import org.graylog2.plugin.InputHost;
 import org.graylog2.plugin.Tools;
+import org.graylog2.plugin.InputHost;
 import org.graylog2.plugin.configuration.ConfigurationException;
 import org.graylog2.plugin.inputs.InputState;
 import org.graylog2.plugin.inputs.MessageInput;
 import org.graylog2.plugin.inputs.MisfireException;
-import org.graylog2.shared.inputs.NoSuchInputTypeException;
-import org.graylog2.system.activities.Activity;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

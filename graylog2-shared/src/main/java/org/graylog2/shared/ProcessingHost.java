@@ -12,12 +12,9 @@ import java.util.concurrent.atomic.AtomicInteger;
  * @author Dennis Oelkers <dennis@torch.sh>
  */
 public interface ProcessingHost extends GenericHost {
+    public List<MessageFilter> getFilters();
     public Buffer getOutputBuffer();
     public AtomicInteger processBufferWatermark();
     public MetricRegistry metrics();
     public String getNodeId();
-    public boolean isProcessing();
-
-    public boolean isServer();
-    public boolean isRadio();
 }

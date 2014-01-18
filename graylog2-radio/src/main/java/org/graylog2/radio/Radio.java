@@ -50,6 +50,7 @@ import org.graylog2.radio.inputs.RadioInputRegistry;
 import org.graylog2.shared.MetricsHost;
 import org.graylog2.shared.ProcessingHost;
 import org.graylog2.shared.buffers.ProcessBuffer;
+import org.graylog2.shared.inputs.InputRegistry;
 import org.graylog2.shared.periodical.MasterCacheWorkerThread;
 import org.graylog2.shared.periodical.ThroughputCounterManagerThread;
 import org.graylog2.radio.transports.RadioTransport;
@@ -140,6 +141,10 @@ public class Radio implements InputHost, GraylogServer, ProcessingHost {
         RadioTransport transport = new KafkaProducer(this);
 
         int processBufferProcessorCount = configuration.getProcessBufferProcessors();
+        this.inputs = new RadioInputRegistry(this,
+                this.getHttpClient(),
+                this.getConfiguration().getGraylog2ServerUri()
+        );
 
         ProcessBufferProcessor[] processors = new ProcessBufferProcessor[processBufferProcessorCount];
 
