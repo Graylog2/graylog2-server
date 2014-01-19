@@ -24,6 +24,7 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import lib.APIException;
 import lib.ApiClient;
+import lib.Configuration;
 import models.api.responses.GetMessageResponse;
 import models.api.responses.MessageAnalyzeResponse;
 import models.api.responses.MessageCountResponse;
@@ -61,7 +62,10 @@ public class MessagesService {
             return Cache.getOrElse(MESSAGE_FIELDS_CACHE_KEY, new Callable<Set<String>>() {
                 @Override
                 public Set<String> call() throws Exception {
-                    final MessageFieldResponse response = api.get(MessageFieldResponse.class).path("/system/fields").execute();
+                    final MessageFieldResponse response = api.get(MessageFieldResponse.class)
+                            .path("/system/fields")
+                            .queryParam("limit", Configuration.getFieldListLimit())
+                            .execute();
                     return response.fields;
                 }
             }, MESSAGE_FIELDS_CACHE_TTL);

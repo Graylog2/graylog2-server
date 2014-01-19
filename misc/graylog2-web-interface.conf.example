@@ -15,3 +15,9 @@ application.secret=""
 # Graylog2 stores all timestamps in UTC. To properly display times, set the default timezone of the interface.
 # If you leave this out, Graylog2 will pick your system default as the timezone. Usually you will want to configure it explicitly.
 # timezone="Europe/Berlin"
+
+# Message field limit
+# Your web interface can cause high load in your browser when you have a lot of different message fields. The default
+# limit of message fields is 100. Set it to 0 if you always want to get all fields. They are for example used in the
+# search result sidebar or for autocompletion of field names.
+field_list_limit=100

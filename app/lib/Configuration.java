@@ -30,7 +30,7 @@ public class Configuration {
     private static String graylog2ServerUris = Play.application().configuration().getString("graylog2-server.uris");
     private static String userName = Play.application().configuration().getString("local-user.name");
     private static String passwordHash = Play.application().configuration().getString("local-user.password-sha2");
-
+    private static int fieldListLimit = Play.application().configuration().getInt("field_list_limit", 100);
 
 	public static List<String> getServerRestUris() {
         List<String> uris = Lists.newArrayList();
@@ -47,6 +47,10 @@ public class Configuration {
 		return uris;
 	}
 
+    public static int getFieldListLimit() {
+        return fieldListLimit;
+    }
+
     public static void setServerRestUris(String URIs) {
         graylog2ServerUris = URIs;
         Logger.info("graylog2-server.uris overridden with <" + URIs + ">.");
@@ -58,7 +62,7 @@ public class Configuration {
     }
 
     public static void setPassword(String password) {
-        Logger.info("local-user.password-sha1 overridden with <" + passwordHash + ">.");
+        Logger.info("local-user.password-sha2 overridden with <" + passwordHash + ">.");
         passwordHash = password;
     }
 	
