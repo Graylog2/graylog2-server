@@ -78,6 +78,7 @@ public class ServerInputRegistry extends InputRegistry {
     protected void finishedLaunch(InputState state) {
         switch (state.getState()) {
             case RUNNING: Notification.fixed(_core, Notification.Type.NO_INPUT_RUNNING);
+                break;
             case FAILED:
                 _core.getActivityWriter().write(new Activity(state.getDetailedMessage(), InputRegistry.class));
                 Notification notification = Notification.buildNow(_core);
@@ -86,6 +87,7 @@ public class ServerInputRegistry extends InputRegistry {
                 notification.addDetail("input_id", state.getMessageInput().getId());
                 notification.addDetail("reason", state.getDetailedMessage());
                 notification.publish();
+                break;
         }
     }
 
