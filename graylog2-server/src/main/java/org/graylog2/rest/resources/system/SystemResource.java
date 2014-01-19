@@ -24,6 +24,7 @@ import com.codahale.metrics.annotation.Timed;
 import com.codahale.metrics.jvm.ThreadDump;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Ordering;
+import com.google.common.collect.Sets;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.apache.shiro.authz.annotation.RequiresGuest;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
@@ -44,6 +45,7 @@ import javax.ws.rs.core.Response;
 import java.io.ByteArrayOutputStream;
 import java.lang.management.ManagementFactory;
 import java.util.Map;
+import java.util.Set;
 
 import static javax.ws.rs.core.MediaType.APPLICATION_JSON;
 import static javax.ws.rs.core.MediaType.TEXT_PLAIN;
@@ -78,14 +80,33 @@ public class SystemResource extends RestResource {
     }
 
     @GET @Timed
-    @ApiOperation(value = "Get list of all message fields that exist",
+    @ApiOperation(value = "Get list of message fields that exist",
                   notes = "This operation is comparably fast because it reads directly from the indexer mapping.")
     @Path("/fields")
     @RequiresPermissions(RestPermissions.FIELDNAMES_READ)
     @Produces(APPLICATION_JSON)
-    public String fields() {
+    public String fields(@ApiParam(title = "limit", description = "Maximum number of fields to return. Set to 0 for all fields.", required = false) @QueryParam("limit") int limit) {
+        boolean unlimited = limit <= 0;
+
+        Set<String> fields;
+        if (unlimited) {
+            fields = core.getIndexer().indices().getAllMessageFields();
+        } else {
+            fields = Sets.newHashSet();
+            int i = 0;
+            for (String field : core.getIndexer().indices().getAllMessageFields()) {
+                if (i == limit) {
+                    break;
+                }
+
+                fields.add(field);
+                i++;
+            }
+
+        }
+
         Map<String, Object> result = Maps.newHashMap();
-        result.put("fields", core.getIndexer().indices().getAllMessageFields());
+        result.put("fields", fields);
 
         return json(result);
     }
