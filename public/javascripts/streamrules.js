@@ -25,7 +25,7 @@ $(document).ready(function() {
             value = $(this).attr("placeholder");
         }
 
-        $($(this).attr("data-reflect"), modalBody).html(value);
+        $($(this).attr("data-reflect"), modalBody).text(value);
     });
 
     $(".streamrules-list").on("click", "li a.remove-streamrule", function(event) {
@@ -69,7 +69,7 @@ $(document).ready(function() {
                 new_val = old_val;
             }
         }
-        $("#sr-result-category", modalBody).html(new_val);
+        $("#sr-result-category", modalBody).text(new_val);
     })
 
     $(document.body).on("click", "button.streamrule-form-submit", function(e) {
