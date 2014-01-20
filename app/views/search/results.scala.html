@@ -1,5 +1,7 @@
+
 @(currentUser: User, search: UniversalSearch, searchResult: models.api.results.SearchResult, histogram: models.api.results.DateHistogramResult, query: String, page: Integer, savedSearch: SavedSearch)(implicit stream: Stream)
 @import views.helpers.DateHistogramResolutionSelector
+@import java.text.DecimalFormat
 
 @paginatorLength() = @{10}
 
@@ -332,7 +334,11 @@
 					<td class="result-td-@f.getHash()"
                         @if(!search.getOrder.getField.equals(f.getName)) { style="display: none;" }
                     >
-                        @r.message.get(f.getName())
+                        @if(r.message.get(f.getName()).isInstanceOf[Double]) {
+                            @{new DecimalFormat("#").format(r.message.get(f.getName))}
+                        } else {
+                            @r.message.get(f.getName())
+                        }
                     </td>
 				}
 			}

@@ -23,6 +23,7 @@ import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 
+import java.text.DecimalFormat;
 import java.util.*;
 
 public class MessageResult {
@@ -118,14 +119,16 @@ public class MessageResult {
 
     public Map<String, Object> getFormattedFields() {
         Map<String, Object> formatted = Maps.newHashMap();
+        final DecimalFormat doubleFormatter = new DecimalFormat("#");
         for (Map.Entry<String, Object> field : getFilteredFields().entrySet()) {
             String key = field.getKey();
             Object value = field.getValue();
 
             // Get rid of .0 of doubles. 9001.0 becomes "9001", 9001.25 becomes "9001.25"
+            // Never format a double in scientific notation.
             if(value instanceof Double) {
                 Double d = (Double) value;
-                value = (d.longValue() == d ? "" + d.longValue() : "" + d);
+                value = (d.longValue() == d ? Long.toString(d.longValue()) : doubleFormatter.format(d));
             }
 
             formatted.put(key, value);
