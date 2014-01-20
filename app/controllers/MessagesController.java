@@ -119,12 +119,28 @@ public class MessagesController extends AuthenticatedController {
             return status(e.getHttpCode());
         }
     }
+
+    public Result singleFiltered(String index, String id) {
+        try {
+            MessageResult message = messagesService.getMessage(index, id);
+
+            Map<String, Object> result = Maps.newHashMap();
+            result.put("id", message.getId());
+            result.put("fields", message.getFilteredFields());
+
+            return ok(new Gson().toJson(result)).as("application/json");
+        } catch (IOException e) {
+            return status(500);
+        } catch (APIException e) {
+            return status(e.getHttpCode());
+        }
+    }
 	
 	public Result analyze(String index, String id, String field) {
 		try {
 			MessageResult message = messagesService.getMessage(index, id);
 			
-			String analyzeField = (String) message.getFields().get(field);
+			String analyzeField = (String) message.getFilteredFields().get(field);
 			if (analyzeField == null || analyzeField.isEmpty()) {
 				return status(404, "Message does not have requested field " + field);
 			}

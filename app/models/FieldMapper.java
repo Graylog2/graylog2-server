@@ -62,11 +62,11 @@ public class FieldMapper {
         for (FieldMapper mapper : mappers) {
             String field = mapper.getField();
 
-            if (msg.getFields().containsKey(field)) {
-                Object newVal = map(field, mapper.getType(), msg.getFields());
+            if (msg.getFilteredFields().containsKey(field)) {
+                Object newVal = map(field, mapper.getType(), msg.getFilteredFields());
 
-                msg.getFields().remove(field);
-                msg.getFields().put(field, newVal);
+                msg.getFilteredFields().remove(field);
+                msg.getFilteredFields().put(field, newVal);
             }
         }
 

@@ -71,10 +71,6 @@ public class MessageResult {
             }
         });
         for (Map.Entry<String, Object> f : message.entrySet()) {
-            if (HIDDEN_FIELDS.contains(f.getKey())) {
-                continue;
-            }
-
             fields.put(f.getKey(), f.getValue());
         }
 
@@ -103,13 +99,26 @@ public class MessageResult {
         return timestamp;
     }
 
+    public Map<String, Object> getFilteredFields() {
+        Map<String, Object> result = Maps.newHashMap();
+
+        for(Map.Entry<String, Object> entry : getFields().entrySet()) {
+            if(HIDDEN_FIELDS.contains(entry.getKey()))
+                continue;
+
+            result.put(entry.getKey(), entry.getValue());
+        }
+
+        return result;
+    }
+
     public Map<String, Object> getFields() {
         return fields;
     }
 
     public Map<String, Object> getFormattedFields() {
         Map<String, Object> formatted = Maps.newHashMap();
-        for (Map.Entry<String, Object> field : getFields().entrySet()) {
+        for (Map.Entry<String, Object> field : getFilteredFields().entrySet()) {
             String key = field.getKey();
             Object value = field.getValue();
 

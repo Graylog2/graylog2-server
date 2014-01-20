@@ -96,7 +96,7 @@ public class InputsApiController extends AuthenticatedController {
 
             Map<String, Object> result = Maps.newHashMap();
             result.put("id", recentlyReceivedMessage.getId());
-            result.put("fields", recentlyReceivedMessage.getFields());
+            result.put("fields", recentlyReceivedMessage.getFilteredFields());
 
             return ok(new Gson().toJson(result)).as("application/json");
         } catch (IOException e) {
