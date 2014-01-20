@@ -26,6 +26,7 @@ import org.elasticsearch.indices.InvalidAliasNameException;
 import org.graylog2.Core;
 import org.graylog2.indexer.indices.jobs.OptimizeIndexJob;
 import org.graylog2.indexer.ranges.IndexRange;
+import org.graylog2.indexer.ranges.RebuildIndexRangesJob;
 import org.graylog2.plugin.Tools;
 import org.graylog2.system.activities.Activity;
 import org.graylog2.system.jobs.SystemJobConcurrencyException;
@@ -241,8 +242,18 @@ public class Deflector { // extends Ablenkblech
         params.put("index", index);
         params.put("start", Tools.getUTCTimestamp());
 
+
         IndexRange range = new IndexRange(server, params);
         range.saveWithoutValidation();
+
+        // Re-calculate index ranges.
+        try {
+            server.getSystemJobManager().submit(new RebuildIndexRangesJob(server));
+        } catch (SystemJobConcurrencyException e) {
+            String msg = "Could not re-calculate index ranges after cycling deflector: Maximum concurrency of job is reached.";
+            server.getActivityWriter().write(new Activity(msg, Deflector.class));
+            LOG.error(msg);
+        }
     }
 
     public String getCurrentActualTargetIndex() {

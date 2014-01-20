@@ -114,7 +114,7 @@ public class IndexRetentionThread implements Runnable {
         try {
             server.getSystemJobManager().submit(new RebuildIndexRangesJob(server));
         } catch (SystemJobConcurrencyException e) {
-            String msg = "Could not re-calculate index ranges after running retention: Maximum concurrency of job is reached. Please run manually later.";
+            String msg = "Could not re-calculate index ranges after running retention: Maximum concurrency of job is reached.";
             server.getActivityWriter().write(new Activity(msg, IndexRetentionThread.class));
             LOG.error(msg);
         }
