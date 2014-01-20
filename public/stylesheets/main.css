@@ -871,7 +871,6 @@ form #stream-rules {
 .quickvalues .inner {
     height: 375px;
     margin-bottom: 5px;
-    overflow: hidden;
 }
 
 .quickvalues h2 {
@@ -941,8 +940,12 @@ form #stream-rules {
     margin-top: 2px;
 }
 
-.quickvalues .content, .quickvalues .content  .nano {
+.quickvalues .content {
     height: 310px;
+}
+
+.quickvalues .nano {
+    height: 320px !important;
 }
 
 .quickvalues .nano .pane {
@@ -1809,4 +1812,33 @@ form.edit-dashboard-form {
 input.required-input-highlight {
     border-color: rgb(233, 50, 45);
     color: rgb(233, 50, 45);
+}
+
+.quickvalues .add-to-dashboard {
+    color: #fff;
+}
+
+.quickvalues_widget table {
+    width: 100%;
+    margin-bottom: 0px;
+}
+
+.quickvalues_widget {
+    padding-top: 15px;
+}
+
+.quickvalues_widget .nano {
+    height: 250px;
+}
+
+.quickvalues_widget .widget-subline {
+    margin-top: 15px !important;
+}
+
+.quickvalues_widget .spinner {
+    text-align: center;
+    font-size: 70px;
+    margin-top: 70px;
+    margin-bottom: 124px;
+    color: #ebebeb;
 }

@@ -1,0 +1,44 @@
+@(widget: models.dashboards.widgets.QuickvaluesWidget)
+
+<div class="quickvalues_widget">
+
+    <div class="spinner">
+        <i class="icon icon-refresh"></i>
+    </div>
+
+    <div class="quickvalues_widget-container nano" style="display: none;">
+        <div class="content">
+            <table class="table table-condensed table-hover table-striped">
+                <thead>
+                    <tr>
+                        <th>Value</th>
+                        <th>%</th>
+                        <th>Count</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <div class="widget-subline">
+        <div class="description">
+            <span class="widget-title">
+                @widget.getDescription
+            </span>
+
+            <a href="#" class="only-unlocked edit-description">
+                <i class="icon icon-edit"></i>
+            </a>
+        </div>
+
+        <div class="description-form">
+            <div class="input-append">
+                <input type="text" value="@widget.getDescription" class="description-value" />
+                <button class="btn btn-success update-description">Update</button>
+            </div>
+        </div>
+    </div>
+</div>

@@ -12,6 +12,13 @@
         <div class="inner">
             <span class="pull-right icons">
                 <i class="icon icon-refresh quickvalues-refresh" data-field="@f.getName" title="Refresh"></i>
+
+                @if(streamId == null || streamId.isEmpty()) {
+                    @views.html.partials.dashboards.add_to_dashboard.render("quickvalues", null)
+                } else {
+                    @views.html.partials.dashboards.add_to_dashboard.render("quickvalues", Array("data-stream-id='" + streamId + "'"))
+                }
+
                 <i class="icon icon-play-circle active quickvalues-autorefresh" data-field="@f.getName" title="Automatic refresh"></i>
                 <!--<i class="icon icon-download-alt quickvalues-export" title="Download"></i>-->
                 <i class="icon icon-remove quickvalues-close" data-field="@f.getName" title="Close"></i>

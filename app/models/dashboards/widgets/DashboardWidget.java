@@ -45,7 +45,8 @@ public abstract class DashboardWidget {
     public enum Type {
         SEARCH_RESULT_COUNT,
         STREAM_SEARCH_RESULT_COUNT,
-        FIELD_CHART
+        FIELD_CHART,
+        QUICKVALUES
     }
 
     private final Type type;
@@ -170,6 +171,19 @@ public abstract class DashboardWidget {
                         TimeRange.factory((Map<String, Object>) w.config.get("timerange")),
                         (w.config.containsKey("stream_id") ? (String) w.config.get("stream_id") : null),
                         w.config,
+                        w.creatorUserId
+                );
+                break;
+            case QUICKVALUES:
+                widget = new QuickvaluesWidget(
+                        dashboard,
+                        w.id,
+                        w.description,
+                        (w.config.containsKey("stream_id") ? (String) w.config.get("stream_id") : null),
+                        w.cacheTime,
+                        (String) w.config.get("query"),
+                        TimeRange.factory((Map<String, Object>) w.config.get("timerange")),
+                        (String) w.config.get("field"),
                         w.creatorUserId
                 );
                 break;

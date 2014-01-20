@@ -33,10 +33,7 @@ import models.api.requests.dashboards.UserSetWidgetPositionsRequest;
 import models.dashboards.Dashboard;
 import models.dashboards.DashboardService;
 import models.NodeService;
-import models.dashboards.widgets.DashboardWidget;
-import models.dashboards.widgets.FieldChartWidget;
-import models.dashboards.widgets.SearchResultCountWidget;
-import models.dashboards.widgets.StreamSearchResultCountWidget;
+import models.dashboards.widgets.*;
 import play.Logger;
 import play.mvc.Result;
 
@@ -165,6 +162,9 @@ public class DashboardsApiController extends AuthenticatedController {
                         }};
 
                         widget = new FieldChartWidget(dashboard, query, timerange, description, streamId, config);
+                        break;
+                    case QUICKVALUES:
+                        widget = new QuickvaluesWidget(dashboard, query, timerange, params.get("field"), description, streamId);
                         break;
                     default:
                         throw new IllegalArgumentException();

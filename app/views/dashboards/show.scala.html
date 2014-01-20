@@ -92,6 +92,10 @@
                                 @views.html.dashboards.widgets.field_chart(widget.asInstanceOf[models.dashboards.widgets.FieldChartWidget])
                             }
 
+                            @if(widget.getType.equals(models.dashboards.widgets.DashboardWidget.Type.QUICKVALUES)) {
+                                @views.html.dashboards.widgets.quickvalues(widget.asInstanceOf[models.dashboards.widgets.QuickvaluesWidget])
+                            }
+
                         </div>
                     </li>
                 }
