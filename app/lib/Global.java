@@ -1,5 +1,5 @@
 package lib;/*
- * Copyright 2013 TORCH UG
+ * Copyright 2013-2014 TORCH GmbH
  *
  * This file is part of Graylog2.
  *
@@ -169,7 +169,7 @@ public class Global extends GlobalSettings {
     @Override
     @SuppressWarnings("unchecked")
     public <T extends EssentialFilter> Class<T>[] filters() {
-        return new Class[]{AccessLog.class};
+        return new Class[]{AccessLog.class, NoCacheHeader.class};
     }
 
     @Override
