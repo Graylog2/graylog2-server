@@ -33,11 +33,17 @@
                     @if(!inputState.getNode.isInstanceOf[Radio] && isPermitted(INPUTS_EDIT, input.getId)) {
                         <li><a href="@routes.ExtractorsController.manage(inputState.getNode.getNodeId, input.getId)">Manage extractors</a></li>
                     }
+
+
                     <li><a href="@routes.MetricsController.ofNode(inputState.getNode.getNodeId, (input.getType + "." + input.getId))">Show metrics</a></li>
+
                     @if(!inputState.getNode.isInstanceOf[Radio] && isPermitted(INPUTS_EDIT, input.getId)) {
                         <li><a href="#" class="add-static-field" data-node-id="@inputState.getNode.getNodeId" data-input-id="@input.getId">Add static field</a></li>
                     }
-                    <li><a href="@routes.SearchController.index("gl2_source_input:" + input.getId, "relative", 28800)">Messages from this input</a></li>
+
+                    @if(isPermitted(SEARCHES_RELATIVE)) {
+                        <li><a href="@routes.SearchController.index("gl2_source_input:" + input.getId, "relative", 28800)">Messages from this input</a></li>
+                    }
                 </ul>
             </div>
         </span>
