@@ -8,6 +8,10 @@
         masterNode: Node
 )
 
+@import controllers.routes;
+@import lib.security.RestPermissions._;
+@import views.helpers.Permissions._;
+
 @main("Inputs of node", views.html.system.sidebar(), "", currentUser) {
 
     @views.html.partials.breadcrumbs(breadcrumbs)
@@ -19,7 +23,7 @@
         </h1>
         Graylog2 nodes accept data via inputs. Launch or terminate as many inputs as you want here.
     </div>
-
+    @if(isPermitted(INPUTS_CREATE)) {
     <div class="row-fluid input-new">
 
         <select id="input-type">
@@ -30,7 +34,8 @@
 
         <button id="configure-input" class="btn btn-success">Launch new input</button>
     </div>
-
+    }
+    @if(isPermitted(INPUTS_READ)) {
     <div class="row-fluid input-list">
         <h2><i class="icon icon-cogs"> Running global inputs</i></h2>
         @if(globalInputs.size > 0) {
@@ -52,7 +57,7 @@
             <div class="alert alert-danger">There are no local inputs.</div>
         }
     </div>
-
+    }
     <div class="alert alert-info">
         Newly added input not appearing? You can find information about misfired inputs
         in the <a href="@routes.SystemController.index()">system messages</a>.

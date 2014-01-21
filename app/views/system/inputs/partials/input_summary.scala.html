@@ -1,5 +1,9 @@
 @(inputState: InputState, inputTypes: Map[String, models.api.responses.system.InputTypeSummaryResponse])
+
 @import views.helpers.InputStateHelper
+@import views.helpers.Permissions._
+@import lib.security.RestPermissions._
+@import controllers.routes
 
 @for(input <- Seq(inputState.getInput)) {
     <div class="row-fluid node-row">
@@ -11,6 +15,7 @@
             <span class="text moment-from-now" title="@inputState.getStartedAt">@inputState.getStartedAt</span>
                 &nbsp;
 
+            @if(isPermitted(PROCESSING_CHANGESTATE)) {
             <form action="@routes.InputsController.terminate(inputState.getNode.getNodeId, input.getId)" method="POST">
                 <button class="btn btn-danger btn-mini"
                 type="submit"
@@ -18,18 +23,18 @@
                                             Terminate
                 </button>
             </form>
-
+            }
             <div class="btn-group">
                 <a class="btn btn-mini dropdown-toggle" data-toggle="dropdown" href="#">
                                         Action
                     <span class="caret"></span>
                 </a>
                 <ul class="dropdown-menu">
-                    @if(!inputState.getNode.isInstanceOf[Radio]) {
+                    @if(!inputState.getNode.isInstanceOf[Radio] && isPermitted(INPUTS_EDIT, input.getId)) {
                         <li><a href="@routes.ExtractorsController.manage(inputState.getNode.getNodeId, input.getId)">Manage extractors</a></li>
                     }
                     <li><a href="@routes.MetricsController.ofNode(inputState.getNode.getNodeId, (input.getType + "." + input.getId))">Show metrics</a></li>
-                    @if(!inputState.getNode.isInstanceOf[Radio]) {
+                    @if(!inputState.getNode.isInstanceOf[Radio] && isPermitted(INPUTS_EDIT, input.getId)) {
                         <li><a href="#" class="add-static-field" data-node-id="@inputState.getNode.getNodeId" data-input-id="@input.getId">Add static field</a></li>
                     }
                     <li><a href="@routes.SearchController.index("gl2_source_input:" + input.getId, "relative", 28800)">Messages from this input</a></li>
@@ -106,13 +111,14 @@
                 @for((k,v) <- input.getStaticFields) {
                     <li>
                         @k: @v
-
+                    @if(isPermitted(INPUTS_EDIT, input.getId)) {
                     <a href="@routes.InputsController.removeStaticField(inputState.getNode.getNodeId, input.getId, k)"
                     class="remove-static-field"
                     style="display: none;"
                     data-confirm="Really delete static field?">
                         <i class="icon icon-remove"></i>
                     </a>
+                    }
                     </li>
                 }
                 </ul>

@@ -23,12 +23,12 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.inject.Inject;
 import lib.*;
+import lib.security.RestPermissions;
 import models.*;
 import models.api.responses.system.InputTypeSummaryResponse;
-import play.Logger;
 import play.mvc.Result;
+import views.helpers.Permissions;
 
-import javax.ws.rs.WebApplicationException;
 import java.io.IOException;
 import java.util.List;
 import java.util.Map;
@@ -52,6 +52,9 @@ public class InputsController extends AuthenticatedController {
 
     public Result index() {
         try {
+            if (!Permissions.isPermitted(RestPermissions.INPUTS_READ)) {
+                return redirect(routes.StartpageController.redirect());
+            }
             final Map<Input, Map<ClusterEntity, InputState>> globalInputs = Maps.newHashMap();
             final List<InputState> localInputs = Lists.newArrayList();
 
@@ -92,6 +95,10 @@ public class InputsController extends AuthenticatedController {
     }
 
     public Result manage(String nodeId) {
+        if (!Permissions.isPermitted(RestPermissions.INPUTS_READ)) {
+            return redirect(routes.StartpageController.redirect());
+        }
+
         final Map<Input, Map<ClusterEntity, InputState>> globalInputs = Maps.newHashMap();
         final List<InputState> localInputs = Lists.newArrayList();
 
@@ -138,6 +145,9 @@ public class InputsController extends AuthenticatedController {
     }
 
     public Result manageRadio(String radioId) {
+        if (!Permissions.isPermitted(RestPermissions.INPUTS_READ)) {
+            return redirect(routes.StartpageController.redirect());
+        }
         try {
             Radio radio = nodeService.loadRadio(radioId);
 
@@ -209,6 +219,9 @@ public class InputsController extends AuthenticatedController {
     }
 
     public Result launch(String nodeIdParam) {
+        if (!Permissions.isPermitted(RestPermissions.INPUTS_EDIT)) {
+            return redirect(routes.StartpageController.redirect());
+        }
         final Map<String, String[]> form = request().body().asFormUrlEncoded();
 
         final String inputType = form.get("type")[0];
@@ -277,6 +290,9 @@ public class InputsController extends AuthenticatedController {
     }
 
     public Result launchRadio(String radioId) {
+        if (!Permissions.isPermitted(RestPermissions.INPUTS_EDIT)) {
+            return redirect(routes.StartpageController.redirect());
+        }
         Map<String, Object> configuration = Maps.newHashMap();
         Map<String, String[]> form = request().body().asFormUrlEncoded();
 
@@ -345,6 +361,10 @@ public class InputsController extends AuthenticatedController {
     }
 
     public Result terminate(String nodeId, String inputId) {
+        if (!Permissions.isPermitted(RestPermissions.INPUTS_TERMINATE)) {
+            return redirect(routes.StartpageController.redirect());
+        }
+
         try {
             if (!nodeService.loadNode(nodeId).terminateInput(inputId)) {
                 flash("Could not terminate input " + inputId);
@@ -357,6 +377,9 @@ public class InputsController extends AuthenticatedController {
     }
 
     public Result terminateRadio(String radioId, String inputId) {
+        if (!Permissions.isPermitted(RestPermissions.INPUTS_TERMINATE)) {
+            return redirect(routes.StartpageController.redirect());
+        }
         try {
             if (!nodeService.loadRadio(radioId).terminateInput(inputId)) {
                 flash("Could not terminate input " + inputId);
@@ -369,6 +392,9 @@ public class InputsController extends AuthenticatedController {
     }
 
     public Result terminateGlobal(String inputId) {
+        if (!Permissions.isPermitted(RestPermissions.INPUTS_TERMINATE)) {
+            return redirect(routes.StartpageController.redirect());
+        }
         Map<ClusterEntity, Boolean> results = inputService.terminateGlobal(inputId);
 
         System.out.println("results: " + results);
@@ -391,6 +417,10 @@ public class InputsController extends AuthenticatedController {
     }
 
     public Result addStaticField(String nodeId, String inputId) {
+        if (!Permissions.isPermitted(RestPermissions.INPUTS_EDIT, inputId)) {
+            return redirect(routes.StartpageController.redirect());
+        }
+
         Map<String, String[]> form = request().body().asFormUrlEncoded();
 
         if(form.get("key") == null || form.get("value") == null) {
@@ -415,10 +445,18 @@ public class InputsController extends AuthenticatedController {
     }
 
     public Result addStaticFieldGlobal(String inputId) {
+        if (!Permissions.isPermitted(RestPermissions.INPUTS_EDIT, inputId)) {
+            return redirect(routes.StartpageController.redirect());
+        }
+
         return addStaticField(servernodes.master().getNodeId(), inputId);
     }
 
     public Result removeStaticField(String nodeId, String inputId, String key) {
+        if (!Permissions.isPermitted(RestPermissions.INPUTS_EDIT, inputId)) {
+            return redirect(routes.StartpageController.redirect());
+        }
+
         try {
             Node node;
             if (nodeId != null && !nodeId.isEmpty())

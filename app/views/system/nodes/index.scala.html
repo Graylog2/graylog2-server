@@ -5,6 +5,10 @@
     radios: Map[String, Radio],
     buffers: Map[String, BufferInfo])
 
+@import controllers.routes;
+@import views.helpers.Permissions.isPermitted
+@import lib.security.RestPermissions._
+
 @main("Nodes", views.html.system.sidebar(), "", currentUser) {
 
     @views.html.partials.breadcrumbs(breadcrumbs)
@@ -60,6 +64,7 @@
                         </li>
                         <li><a href="@routes.NodesController.threadDump(jvm.getNodeId)">Get thread dump</a></li>
 
+                        @if(isPermitted(PROCESSING_CHANGESTATE)) {
                         <li class="divider"></li>
                         <li>
                         @if(nodes.get(jvm.getNodeId).isProcessing) {
@@ -74,6 +79,7 @@
                             href="#">Resume message processing</a>
                         }
                         </li>
+                        }
                     </ul>
                 </div>
             </span>
