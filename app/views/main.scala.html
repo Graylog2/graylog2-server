@@ -1,7 +1,8 @@
 @(title: String, sidebarContent: Html, searchQuery: String = "", currentUser: User, hasSearch: Boolean = true)(content: Html)(implicit stream: Stream = null)
 
-@import lib.security.RestPermissions._
 @import views.helpers.Permissions._
+
+@import lib.security.RestPermissions._
 
 <!DOCTYPE html>
 <html lang="en">

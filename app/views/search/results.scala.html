@@ -1,7 +1,10 @@
 
 @(currentUser: User, search: UniversalSearch, searchResult: models.api.results.SearchResult, histogram: models.api.results.DateHistogramResult, query: String, page: Integer, savedSearch: SavedSearch)(implicit stream: Stream)
+@import lib.security.RestPermissions
 @import views.helpers.DateHistogramResolutionSelector
 @import java.text.DecimalFormat
+@import views.helpers.Permissions
+@import controllers.routes;
 
 @paginatorLength() = @{10}
 
@@ -65,10 +68,11 @@
         Clear pinned charts
     </a>
 
-    @if(savedSearch != null) {
+    @if(savedSearch != null && Permissions.isPermitted(RestPermissions.SAVEDSEARCHES_EDIT)) {
         <a href="@routes.SavedSearchesController.delete(savedSearch.getId)" class="btn btn-small btn-danger" data-confirm='Really delete saved search "@savedSearch.getTitle"?'>Delete saved search</a>
     }
 
+    @if(Permissions.isPermitted(RestPermissions.SAVEDSEARCHES_CREATE)) {
     <a href="#" class="btn btn-small btn-success save-search" title="Save this search so you can execute it at any time with just a click.">
         Save search
     </a>
@@ -80,6 +84,7 @@
             Save
         </button>
     </div>
+    }
 </div>
 
 <h1>

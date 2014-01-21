@@ -1,5 +1,8 @@
 @(searchQuery: String)(implicit stream: Stream = null)
 
+@import views.helpers.Permissions.isPermitted
+@import lib.security.RestPermissions.SAVEDSEARCHES_READ
+
 <div class="row-fluid no-bm">
     <div class="span12" id="universalsearch">
 
@@ -56,12 +59,13 @@
                 </div>
             </div>
 
+            @if(isPermitted(SAVEDSEARCHES_READ)) {
             <div class="saved-searches-selector-container" @if(stream != null) { data-stream-id="@stream.getId" }>
                 <select id="saved-searches-selector" data-placeholder="Choose a saved search" style="display: none;">
                     <option></option>
                 </select>
             </div>
-
+            }
             <br style="clear: both;" />
 
             <div class="pull-right search-help">
