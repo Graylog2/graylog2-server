@@ -269,7 +269,11 @@ $(document).ready(function() {
     });
 
     function showErrorInWidget(widget) {
-        $(".value, .dashboard-chart", widget).html("<i class='icon icon-warning-sign loading-failed'></i>");
+        $(".widget-error-hidden", widget).hide();
+
+        $(".value, .dashboard-chart, .widget-error-active", widget)
+            .show()
+            .html("<i class='icon icon-warning-sign loading-failed'></i>");
     }
 
 });

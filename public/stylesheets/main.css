@@ -1835,7 +1835,7 @@ input.required-input-highlight {
     margin-top: 15px !important;
 }
 
-.quickvalues_widget .spinner {
+.quickvalues_widget .spinner, .quickvalues_widget .widget-error-active {
     text-align: center;
     font-size: 70px;
     margin-top: 70px;

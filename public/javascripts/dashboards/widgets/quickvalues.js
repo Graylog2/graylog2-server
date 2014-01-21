@@ -22,14 +22,19 @@ function updateWidget_quickvalues(widget, data) {
 
     var sortedKeys = Object.keys(terms).sort(function(a,b){return terms[b] - terms[a]});
 
-    for(var i = 0; i < sortedKeys.length; i++){
-        var key = sortedKeys[i];
-        var val = terms[key];
-        var percent = (val/total*100);
+    if (sortedKeys.length > 0) {
+        for(var i = 0; i < sortedKeys.length; i++){
+            var key = sortedKeys[i];
+            var val = terms[key];
+            var percent = (val/total*100);
 
-        rows.append("<tr><td>" + htmlEscape(key) + "</td><td>" + percent.toFixed(2) + "</td><td>" + htmlEscape(val) + "</td></tr>");
+            rows.append("<tr><td>" + htmlEscape(key) + "</td><td>" + percent.toFixed(2) + "</td><td>" + htmlEscape(val) + "</td></tr>");
+        }
+    } else {
+        rows.append("<tr><td colspan='3'>No values.</td></tr>");
     }
 
+    $(".widget-error-active", widget).hide();
     $(".spinner", widget).hide();
     $(".quickvalues_widget-container", widget).show();
 
