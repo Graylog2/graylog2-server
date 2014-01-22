@@ -29,8 +29,8 @@
 
         $('form', selector).on("submit", function(e) {
             e.preventDefault();
-            var index = $("input[name=index]", $(this)).val();
-            var messageId = $("input[name=message_id]", $(this)).val();
+            var index = $("input[name=index]", $(this)).val().trim();
+            var messageId = $("input[name=message_id]", $(this)).val().trim();
 
             loadMessage(index, messageId);
         });
