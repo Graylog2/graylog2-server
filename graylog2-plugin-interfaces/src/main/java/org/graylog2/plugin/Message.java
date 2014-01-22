@@ -176,6 +176,10 @@ public class Message {
 
         if (String.class.equals(value.getClass())) {
             value = ((String) value).trim();
+
+            if (((String) value).isEmpty()) {
+                return;
+            }
         }
 
         // Don't accept protected keys. (some are allowed though lol)
