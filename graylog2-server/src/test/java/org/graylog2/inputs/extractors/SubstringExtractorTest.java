@@ -27,6 +27,7 @@ import org.graylog2.plugin.inputs.Converter;
 import org.graylog2.plugin.inputs.Extractor;
 import org.joda.time.DateTime;
 import org.junit.Test;
+import org.scalatest.events.TestPending;
 
 import java.util.HashMap;
 import java.util.List;
@@ -185,6 +186,17 @@ public class SubstringExtractorTest {
 
         assertNull(msg.getField("our_result"));
         assertEquals("<10> 07 Aug 2013 somesubsystem: this is my message for username9001 id:9001", msg.getField("somefield"));
+    }
+
+    @Test
+    public void testDoesNotCutFromStandardFields() throws Exception {
+        Message msg = new Message("The short message", "TestUnit", new DateTime());
+
+        SubstringExtractor x = new SubstringExtractor("foo", "foo", Extractor.CursorStrategy.CUT, "message", "our_result", config(0, 3), "foo", noConverters(), Extractor.ConditionType.NONE, null);
+        x.runExtractor(new GraylogServerStub(), msg);
+
+        // Would be cut to "short message" if cutting from standard field was allowed.
+        assertEquals("The short message", msg.getField("message"));
     }
 
     public static Map<String, Object> config(final Object start, final Object end) {

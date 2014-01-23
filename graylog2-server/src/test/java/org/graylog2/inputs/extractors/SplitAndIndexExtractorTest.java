@@ -280,6 +280,17 @@ public class SplitAndIndexExtractorTest {
         assertEquals("<10> 07 Aug 2013 somesubsystem: this is my message for username9001 id:9001", msg.getField("somefield"));
     }
 
+    @Test
+    public void testDoesNotCutFromStandardFields() throws Exception {
+        Message msg = new Message("The short message", "TestUnit", new DateTime());
+
+        SplitAndIndexExtractor x = new SplitAndIndexExtractor("foo", "foo", Extractor.CursorStrategy.CUT, "message", "our_result", config(" ", 1), "foo", noConverters(), Extractor.ConditionType.NONE, null);
+        x.runExtractor(new GraylogServerStub(), msg);
+
+        // Would be cut to "short message" if cutting from standard field was allowed.
+        assertEquals("The short message", msg.getField("message"));
+    }
+
     public static Map<String, Object> config(final Object splitChar, final Object targetIndex) {
         return new HashMap<String, Object>() {{
             put("index", targetIndex);
