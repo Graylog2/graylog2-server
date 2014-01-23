@@ -68,14 +68,15 @@ $(document).ready(function() {
 
     $("ul.dashboard-selector li a[data-dashboard-id]").live("click", function() {
         var description = prompt("Give the widget a title:");
-
-        delegateAddToDashboard(
-            $(this).closest("ul.dashboard-selector").attr("data-widget-type"),
-            $(this).attr("data-dashboard-id"),
-            description,
-            $(this).closest("ul.dashboard-selector")
-        );
-    })
+        if (description != null && description != "") {
+            delegateAddToDashboard(
+                $(this).closest("ul.dashboard-selector").attr("data-widget-type"),
+                $(this).attr("data-dashboard-id"),
+                description,
+                $(this).closest("ul.dashboard-selector")
+            );
+        }
+    });
 
     $(".dashboard .widget .remove-widget").live("click", function(e) {
         e.preventDefault();
