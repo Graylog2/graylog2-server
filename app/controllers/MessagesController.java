@@ -59,7 +59,13 @@ public class MessagesController extends AuthenticatedController {
 
             for (String streamId : message.getStreamIds()) {
                 if (isPermitted(STREAMS_READ, streamId)) {
-                    messageInStreams.add(streamService.get(streamId));
+                    try {
+                        messageInStreams.add(streamService.get(streamId));
+                    } catch(APIException e) {
+                        //  We get a 404 if the stream no longer exists.
+                        Logger.debug("Skipping stream of message", e);
+                        continue;
+                    }
                 }
             }
 
@@ -81,7 +87,13 @@ public class MessagesController extends AuthenticatedController {
 
             for (String streamId : message.getStreamIds()) {
                 if (isPermitted(STREAMS_READ, streamId)) {
-                    messageInStreams.add(streamService.get(streamId));
+                    try {
+                        messageInStreams.add(streamService.get(streamId));
+                    } catch(APIException e) {
+                        //  We get a 404 if the stream no longer exists.
+                        Logger.debug("Skipping stream of message", e);
+                        continue;
+                    }
                 }
             }
 
