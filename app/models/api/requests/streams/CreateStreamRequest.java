@@ -11,7 +11,6 @@ public class CreateStreamRequest extends ApiRequest {
     @Constraints.Required
     public String title;
 
-    @Constraints.Required
     public String description;
 
     @SerializedName("creator_user_id")
