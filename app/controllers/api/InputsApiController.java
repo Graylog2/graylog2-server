@@ -86,6 +86,10 @@ public class InputsApiController extends AuthenticatedController {
     }
 
     public Result recentMessage(String nodeId, String inputId) {
+        return recentMessage(nodeId, inputId, true);
+    }
+
+    public Result recentMessage(String nodeId, String inputId, Boolean filtered) {
         try {
             Node node = nodeService.loadNode(nodeId);
             MessageResult recentlyReceivedMessage = node.getInput(inputId).getRecentlyReceivedMessage(nodeId);
@@ -96,7 +100,10 @@ public class InputsApiController extends AuthenticatedController {
 
             Map<String, Object> result = Maps.newHashMap();
             result.put("id", recentlyReceivedMessage.getId());
-            result.put("fields", recentlyReceivedMessage.getFilteredFields());
+            if (filtered)
+                result.put("fields", recentlyReceivedMessage.getFilteredFields());
+            else
+                result.put("fields", recentlyReceivedMessage.getFields());
 
             return ok(new Gson().toJson(result)).as("application/json");
         } catch (IOException e) {
@@ -107,5 +114,4 @@ public class InputsApiController extends AuthenticatedController {
             return status(404, views.html.errors.error.render(ApiClient.ERROR_MSG_NODE_NOT_FOUND, e, request()));
         }
     }
-
 }

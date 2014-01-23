@@ -162,13 +162,14 @@ GET         /a/system/internallogs/:node_id/metrics                             
 GET         /a/system/users/:username                                                @controllers.UsersController.isUniqueUsername(username: String)
 
 # API: Inputs
-GET         /a/system/inputs/:node_id/:input_id/recent_message                       @controllers.api.InputsApiController.recentMessage(node_id: String, input_id: String)
+GET         /a/system/inputs/:node_id/:input_id/recent_message                       @controllers.api.InputsApiController.recentMessage(node_id: String, input_id: String, filtered: Boolean ?= false)
+GET         /a/system/inputs/:node_id/:input_id/recent_message/filtered             @controllers.api.InputsApiController.recentMessage(node_id: String, input_id: String, filtered: Boolean ?= true)
 GET         /a/system/inputs/:node_id/:input_id/io                                   @controllers.api.InputsApiController.io(node_id: String, input_id: String)
 GET         /a/system/inputs/:node_id/:input_id/connections                          @controllers.api.InputsApiController.connections(node_id: String, input_id: String)
 
 # API: Messages
-GET         /a/messages/:index/:id                                                   @controllers.MessagesController.single(index: String, id: String)
-GET         /a/messages/:index/:id/filtered                                          @controllers.MessagesController.singleFiltered(index: String, id: String)
+GET         /a/messages/:index/:id                                                   @controllers.MessagesController.single(index: String, id: String, filtered: Boolean ?= false)
+GET         /a/messages/:index/:id/filtered                                          @controllers.MessagesController.single(index: String, id: String, filtered: Boolean ?= true)
 
 # API: Tools
 GET         /a/tools/regex_test                                                      @controllers.api.ToolsApiController.regexTest(regex ?= "", string ?= "")

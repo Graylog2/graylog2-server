@@ -104,13 +104,20 @@ public class MessagesController extends AuthenticatedController {
 
     // TODO move this to an API controller.
     public Result single(String index, String id) {
+        return single(index, id, false);
+    }
+
+    public Result single(String index, String id, Boolean filtered) {
         try {
 
             MessageResult message = messagesService.getMessage(index, id);
 
             Map<String, Object> result = Maps.newHashMap();
             result.put("id", message.getId());
-            result.put("fields", message.getFields());
+            if (filtered)
+                result.put("fields", message.getFilteredFields());
+            else
+                result.put("fields", message.getFields());
 
             return ok(new Gson().toJson(result)).as("application/json");
         } catch (IOException e) {
@@ -120,22 +127,6 @@ public class MessagesController extends AuthenticatedController {
         }
     }
 
-    public Result singleFiltered(String index, String id) {
-        try {
-            MessageResult message = messagesService.getMessage(index, id);
-
-            Map<String, Object> result = Maps.newHashMap();
-            result.put("id", message.getId());
-            result.put("fields", message.getFilteredFields());
-
-            return ok(new Gson().toJson(result)).as("application/json");
-        } catch (IOException e) {
-            return status(500);
-        } catch (APIException e) {
-            return status(e.getHttpCode());
-        }
-    }
-	
 	public Result analyze(String index, String id, String field) {
 		try {
 			MessageResult message = messagesService.getMessage(index, id);
