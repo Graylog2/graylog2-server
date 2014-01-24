@@ -22,6 +22,7 @@ package models.api.results;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
+import org.joda.time.DateTime;
 
 import java.text.DecimalFormat;
 import java.util.*;
@@ -40,7 +41,7 @@ public class MessageResult {
     private final Map<String, Object> fields;
     private final String index;
     private final String id;
-    private final String timestamp;
+    private final DateTime timestamp;
     private final String sourceNodeId;
     private final String sourceInputId;
     private final String sourceRadioId;
@@ -76,7 +77,8 @@ public class MessageResult {
         }
 
         this.id = (String) message.get("_id");
-        this.timestamp = (String) message.get("timestamp");
+        final Object timestamp1 = message.get("timestamp");
+        this.timestamp = new DateTime(timestamp1);
 
         this.sourceNodeId = (String) message.get("gl2_source_node");
         this.sourceInputId = (String) message.get("gl2_source_input");
@@ -96,7 +98,7 @@ public class MessageResult {
         return id;
     }
 
-    public String getTimestamp() {
+    public DateTime getTimestamp() {
         return timestamp;
     }
 

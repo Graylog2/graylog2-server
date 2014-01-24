@@ -76,4 +76,13 @@ public class DateTools {
         }
         return timestamp.toDateTime(tz);
     }
+
+    public static String inUserTimeZoneShortFormat(DateTime esDate) {
+        final DateTime timestamp = inUserTimeZone(esDate);
+        return timestamp.toString(SHORT_DATE_FORMAT);
+    }
+
+    public static DateTime nowInUTC() {
+        return DateTime.now(DateTimeZone.UTC);
+    }
 }

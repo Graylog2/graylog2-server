@@ -1,5 +1,7 @@
 @(currentUser: User, message: models.api.results.MessageResult,  messageStreams: List[models.Stream], sourceInput: Input, sourceNode: Node, sourceRadio: Radio, sourceRadioInput: Input)
 
+@import lib.DateTools
+
 @main("Message " + message.getId, sidebars.standard(currentUser), "", currentUser) {
 
     <div class="row-fluid" style="margin-bottom: 0px;">
@@ -35,7 +37,7 @@
         }
 
         /
-        Timestamp: @message.getTimestamp()
+        Timestamp: @DateTools.inUserTimeZoneShortFormat(message.getTimestamp())
 
         /
         Index: <em>@message.getIndex()</em>

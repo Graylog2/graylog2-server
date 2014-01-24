@@ -20,6 +20,26 @@ $(document).ready(function() {
         input.val(searchDateTimeFormatted(date));
     });
 
+    // on submit create the iso8601 timestamps for absolute searches
+    $(".universalsearch-form").on("submit", function() {
+        $(".timerange-selector-container .absolute input[type='text']").each(function() {
+            var dateString = $(this).val();
+            if (dateString) {
+                var date = new Date(dateString);
+                $("input[type='hidden']", $(this).parent()).val(date.toISOString());
+            }
+        });
+    });
+    // initialize the user readable dates on page load
+    $("#universalsearch .timerange-selector-container .absolute input[type='hidden']").each(function() {
+        var input = $("input[type='text']", $(this).parent());
+        var dateString = $(this).val();
+        if (dateString) {
+            var date = new Date(dateString);
+            input.val(searchDateTimeFormatted(date));
+        }
+    });
+
     $("#universalsearch .timerange-selector-container .keyword input").typeWatch({
         callback: function (string) {
             var preview = $("#universalsearch .timerange-selector-container .keyword .keyword-preview");

@@ -18,6 +18,9 @@
  */
 package models.api.responses;
 
+import org.joda.time.DateTime;
+import org.joda.time.DateTimeZone;
+
 import java.util.Map;
 
 public class MessageSummaryResponse {
@@ -25,5 +28,8 @@ public class MessageSummaryResponse {
 	public Map<String, Object> message;
 	public String index;
 	public String nodeId;
-	
+
+    public DateTime getTimestamp() {
+        return new DateTime(message.get("timestamp"), DateTimeZone.UTC);
+    }
 }

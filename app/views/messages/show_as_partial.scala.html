@@ -1,5 +1,7 @@
 @(message: models.api.results.MessageResult, messageStreams: List[Stream], sourceInput: Input, sourceNode: Node, sourceRadio: Radio, sourceRadioInput: Input, streams: List[Stream])
 
+@import lib.DateTools
+
 <div class="detail-message">
     <div class="pull-right sidebar-back">
         <i class="icon-mail-reply" title="Go back"></i>
@@ -42,7 +44,7 @@
     }
 
     <p>
-        Timestamp: @message.getTimestamp()
+        Timestamp: @DateTools.inUserTimeZoneShortFormat(message.getTimestamp())
         <br />
 
         Index: <em>@message.getIndex()</em>

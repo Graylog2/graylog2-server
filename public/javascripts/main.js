@@ -716,8 +716,11 @@ function searchDateTimeFormatted(date) {
     var hour = ('0' + date.getHours()).slice(-2);
     var minute = ('0' + date.getMinutes()).slice(-2);
     var second = ('0' + date.getSeconds()).slice(-2);
-
-    return year + "-" + month + "-" + day + " " + hour + ":" + minute + ":" + second;
+    var millis = "";
+    if (date.getMilliseconds() > 0) {
+        millis = '.' + ('0' + date.getMilliseconds()).slice(-3);
+    }
+    return year + "-" + month + "-" + day + " " + hour + ":" + minute + ":" + second + millis;
 }
 
 function showError(message) {
