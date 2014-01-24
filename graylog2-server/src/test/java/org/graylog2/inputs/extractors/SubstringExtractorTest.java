@@ -27,7 +27,6 @@ import org.graylog2.plugin.Tools;
 import org.graylog2.plugin.inputs.Converter;
 import org.graylog2.plugin.inputs.Extractor;
 import org.junit.Test;
-import org.scalatest.events.TestPending;
 
 import java.util.HashMap;
 import java.util.List;
@@ -190,7 +189,7 @@ public class SubstringExtractorTest {
 
     @Test
     public void testDoesNotCutFromStandardFields() throws Exception {
-        Message msg = new Message("The short message", "TestUnit", new DateTime());
+        Message msg = new Message("The short message", "TestUnit", Tools.iso8601());
 
         SubstringExtractor x = new SubstringExtractor("foo", "foo", Extractor.CursorStrategy.CUT, "message", "our_result", config(0, 3), "foo", noConverters(), Extractor.ConditionType.NONE, null);
         x.runExtractor(new GraylogServerStub(), msg);
