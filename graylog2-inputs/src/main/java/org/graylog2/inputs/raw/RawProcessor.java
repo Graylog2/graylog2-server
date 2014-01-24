@@ -21,13 +21,12 @@ package org.graylog2.inputs.raw;
 
 import com.codahale.metrics.Meter;
 import com.codahale.metrics.Timer;
-import org.graylog2.plugin.GraylogServer;
 import org.graylog2.plugin.InputHost;
 import org.graylog2.plugin.Message;
+import org.graylog2.plugin.Tools;
 import org.graylog2.plugin.buffers.BufferOutOfCapacityException;
 import org.graylog2.plugin.configuration.Configuration;
 import org.graylog2.plugin.inputs.MessageInput;
-import org.joda.time.DateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -72,7 +71,7 @@ public class RawProcessor {
         // Convert to LogMessage
         Message lm;
         try {
-            lm = new Message(msg, parseSource(msg, remoteAddress), new DateTime());
+            lm = new Message(msg, parseSource(msg, remoteAddress), Tools.iso8601());
         } catch (Exception e) {
             failures.mark();
             LOG.error("Could not parse raw message. Not further handling.", e);

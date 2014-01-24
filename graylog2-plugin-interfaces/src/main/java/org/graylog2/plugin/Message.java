@@ -36,6 +36,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.regex.Pattern;
 
+import static org.joda.time.DateTimeZone.UTC;
+
 
 /**
  * @author Lennart Koopmann <lennart@torch.sh>
@@ -126,7 +128,8 @@ public class Message {
 
         if (getField("timestamp") instanceof DateTime) {
             // Timestamp
-            obj.put("timestamp", Tools.buildElasticSearchTimeFormat((DateTime) getField("timestamp")));
+            obj.put("timestamp", Tools.buildElasticSearchTimeFormat(
+                    ((DateTime) getField("timestamp")).withZone(UTC)));
         }
 
         // Manually converting stream ID to string - caused strange problems without it.

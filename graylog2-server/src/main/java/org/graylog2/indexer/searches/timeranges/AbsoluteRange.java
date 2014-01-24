@@ -21,6 +21,7 @@ package org.graylog2.indexer.searches.timeranges;
 
 import org.graylog2.plugin.Tools;
 import org.joda.time.DateTime;
+import org.joda.time.format.ISODateTimeFormat;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -39,8 +40,16 @@ public class AbsoluteRange implements TimeRange, FromToRange {
         }
 
         try {
-            this.from = DateTime.parse(from, Tools.timeFormatterWithOptionalMilliseconds());
-            this.to = DateTime.parse(to, Tools.timeFormatterWithOptionalMilliseconds());
+            if (from.contains("T")) {
+                this.from = DateTime.parse(from, ISODateTimeFormat.dateTime());
+            } else {
+                this.from = DateTime.parse(from, Tools.timeFormatterWithOptionalMilliseconds());
+            }
+            if (to.contains("T")) {
+                this.to = DateTime.parse(to, ISODateTimeFormat.dateTime());
+            } else {
+                this.to = DateTime.parse(to, Tools.timeFormatterWithOptionalMilliseconds());
+            }
         } catch (IllegalArgumentException e) {
             throw new InvalidRangeParametersException();
         }

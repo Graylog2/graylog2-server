@@ -22,9 +22,9 @@ import com.google.common.collect.Lists;
 import org.graylog2.ConfigurationException;
 import org.graylog2.GraylogServerStub;
 import org.graylog2.plugin.Message;
+import org.graylog2.plugin.Tools;
 import org.graylog2.plugin.inputs.Converter;
 import org.graylog2.plugin.inputs.Extractor;
-import org.joda.time.DateTime;
 import org.junit.Test;
 
 import java.util.HashMap;
@@ -37,7 +37,7 @@ public class CopyInputExtractorTest {
 
     @Test
     public void testCopy() throws Extractor.ReservedFieldException, ConfigurationException {
-        Message msg = new Message("The short message", "TestUnit", new DateTime());
+        Message msg = new Message("The short message", "TestUnit", Tools.iso8601());
 
         msg.addField("somefield", "foo");
 

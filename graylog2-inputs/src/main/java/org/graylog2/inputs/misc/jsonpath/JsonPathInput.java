@@ -22,9 +22,8 @@ package org.graylog2.inputs.misc.jsonpath;
 import com.google.common.collect.Maps;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import com.jayway.jsonpath.JsonPath;
-import org.graylog2.plugin.GraylogServer;
-import org.graylog2.plugin.InputHost;
 import org.graylog2.plugin.Message;
+import org.graylog2.plugin.Tools;
 import org.graylog2.plugin.configuration.Configuration;
 import org.graylog2.plugin.configuration.ConfigurationException;
 import org.graylog2.plugin.configuration.ConfigurationRequest;
@@ -34,12 +33,14 @@ import org.graylog2.plugin.configuration.fields.NumberField;
 import org.graylog2.plugin.configuration.fields.TextField;
 import org.graylog2.plugin.inputs.MessageInput;
 import org.graylog2.plugin.inputs.MisfireException;
-import org.joda.time.DateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.Map;
-import java.util.concurrent.*;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.ScheduledFuture;
+import java.util.concurrent.TimeUnit;
 
 /**
  * @author Lennart Koopmann <lennart@torch.sh>
@@ -107,7 +108,9 @@ public class JsonPathInput extends MessageInput {
                     Selector selector = new Selector(jsonPath);
                     Map<String, Object> fields = selector.read(json);
 
-                    Message m = new Message(selector.buildShortMessage(fields), configuration.getString(CK_SOURCE), new DateTime());
+                    Message m = new Message(selector.buildShortMessage(fields),
+                                            configuration.getString(CK_SOURCE),
+                                            Tools.iso8601());
                     m.addFields(fields);
 
                     // Add to buffer.

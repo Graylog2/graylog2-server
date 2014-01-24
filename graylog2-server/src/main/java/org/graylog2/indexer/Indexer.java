@@ -1,6 +1,5 @@
 package org.graylog2.indexer;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.base.Joiner;
 import com.google.common.collect.Maps;
 import org.apache.commons.io.FileUtils;
@@ -47,7 +46,6 @@ public class Indexer {
 
     private Client client;
     private MessageGateway messageGateway;
-    private final ObjectMapper objectMapper = new ObjectMapper();
     public static final String TYPE = "message";
     
     private Searches searches;

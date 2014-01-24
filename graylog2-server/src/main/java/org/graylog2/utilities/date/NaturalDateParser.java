@@ -24,22 +24,23 @@ import com.joestelmach.natty.DateGroup;
 import com.joestelmach.natty.Parser;
 import org.graylog2.plugin.Tools;
 import org.joda.time.DateTime;
+import org.joda.time.DateTimeZone;
 import org.joda.time.format.DateTimeFormat;
 
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * @author Lennart Koopmann <lennart@torch.sh>
  */
 public class NaturalDateParser {
 
+    public static final TimeZone UTC = TimeZone.getTimeZone("UTC");
+
     public Result parse(String string) throws DateNotParsableException {
         Date from = null;
         Date to = null;
 
-        Parser parser = new Parser();
+        Parser parser = new Parser(UTC);
         List<DateGroup> groups = parser.parse(string);
         if (!groups.isEmpty()) {
             List<Date> dates = groups.get(0).getDates();
@@ -65,15 +66,15 @@ public class NaturalDateParser {
 
         public Result(Date from, Date to) {
             if (from != null) {
-                this.from = new DateTime(from);
+                this.from = new DateTime(from, DateTimeZone.UTC);
             } else {
-                this.from = new DateTime();
+                this.from = Tools.iso8601();
             }
 
             if (to != null) {
-                this.to = new DateTime(to);
+                this.to = new DateTime(to, DateTimeZone.UTC);
             } else {
-                this.to = new DateTime();
+                this.to = Tools.iso8601();
             }
         }
 
@@ -95,7 +96,7 @@ public class NaturalDateParser {
         }
 
         private String dateFormat(DateTime x) {
-            return x.toString(DateTimeFormat.forPattern(Tools.ES_DATE_FORMAT_NO_MS));
+            return x.toString(DateTimeFormat.forPattern(Tools.ES_DATE_FORMAT_NO_MS).withZoneUTC());
         }
 
     }

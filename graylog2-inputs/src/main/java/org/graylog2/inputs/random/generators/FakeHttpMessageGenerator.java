@@ -124,7 +124,7 @@ public class FakeHttpMessageGenerator {
         int tookMs = org.graylog2.inputs.random.generators.Tools.deviation(msBase, deviation, rand);
         UserId userId = getWeighted(USER_IDS);
 
-        Message msg = new Message(shortMessage("GET", resource.getResource(), code, tookMs), source, new DateTime());
+        Message msg = new Message(shortMessage("GET", resource.getResource(), code, tookMs), source, Tools.iso8601());
 
         msg.addField("http_method", "GET");
         msg.addField("http_response_code", code);
@@ -146,11 +146,11 @@ public class FakeHttpMessageGenerator {
     }
 
     private Message successfulPOST() {
-        return new Message("successful POST", source, new DateTime());
+        return new Message("successful POST", source, Tools.iso8601());
     }
 
     private Message failedPOST() {
-        return new Message("failed POST", source, new DateTime());
+        return new Message("failed POST", source, Tools.iso8601());
     }
 
     // PUT
@@ -160,11 +160,11 @@ public class FakeHttpMessageGenerator {
     }
 
     private Message successfulPUT() {
-        return new Message("successful PUT", source, new DateTime());
+        return new Message("successful PUT", source, Tools.iso8601());
     }
 
     private Message failedPUT() {
-        return new Message("failed PUT", source, new DateTime());
+        return new Message("failed PUT", source, Tools.iso8601());
     }
 
     // DELETE
@@ -174,11 +174,11 @@ public class FakeHttpMessageGenerator {
     }
 
     private Message successfulDELETE() {
-        return new Message("successful DELETE", source, new DateTime());
+        return new Message("successful DELETE", source, Tools.iso8601());
     }
 
     private Message failedDELETE() {
-        return new Message("failed DELETE", source, new DateTime());
+        return new Message("failed DELETE", source, Tools.iso8601());
     }
 
     private abstract class Weighted {

@@ -21,59 +21,61 @@
 package org.graylog2.logmessage;
 
 import org.graylog2.plugin.Message;
-import java.util.Map;
-import java.util.HashMap;
-
+import org.graylog2.plugin.Tools;
 import org.joda.time.DateTime;
 import org.junit.Test;
+
+import java.util.HashMap;
+import java.util.Map;
+
 import static org.junit.Assert.*;
 
 public class LogMessageTest {
 
     @Test
     public void testIdGetsSet() {
-        Message lm = new Message("foo", "bar", new DateTime());
+        Message lm = new Message("foo", "bar", Tools.iso8601());
         assertNotNull(lm.getId());
         assertFalse(lm.getId().isEmpty());
     }
 
     @Test
     public void testIsCompleteSucceeds() {
-        Message lm = new Message("foo", "bar", new DateTime());
+        Message lm = new Message("foo", "bar", Tools.iso8601());
         assertTrue(lm.isComplete());
     }
 
     @Test
     public void testIsCompleteFails() {
-        Message lm = new Message("foo", null, new DateTime());
+        Message lm = new Message("foo", null, Tools.iso8601());
         assertFalse(lm.isComplete());
 
-        lm = new Message("foo", "", new DateTime());
+        lm = new Message("foo", "", Tools.iso8601());
         assertFalse(lm.isComplete());
 
-        lm = new Message(null, "bar", new DateTime());
+        lm = new Message(null, "bar", Tools.iso8601());
         assertFalse(lm.isComplete());
 
-        lm = new Message("", "bar", new DateTime());
+        lm = new Message("", "bar", Tools.iso8601());
         assertFalse(lm.isComplete());
 
-        lm = new Message("", "", new DateTime());
+        lm = new Message("", "", Tools.iso8601());
         assertFalse(lm.isComplete());
 
-        lm = new Message(null, null, new DateTime());
+        lm = new Message(null, null, Tools.iso8601());
         assertFalse(lm.isComplete());
     }
 
     @Test
     public void testAddField() {
-        Message lm = new Message("foo", "bar", new DateTime());
+        Message lm = new Message("foo", "bar", Tools.iso8601());
         lm.addField("ohai", "thar");
         assertEquals("thar", lm.getField("ohai"));
     }
 
     @Test
     public void testAddFieldsWithMap() {
-        Message lm = new Message("foo", "bar", new DateTime());
+        Message lm = new Message("foo", "bar", Tools.iso8601());
         lm.addField("ohai", "hai");
 
         Map<String, Object> map = new HashMap<String, Object>();
@@ -89,7 +91,7 @@ public class LogMessageTest {
 
     @Test
     public void testRemoveField() {
-        Message lm = new Message("foo", "bar", new DateTime());
+        Message lm = new Message("foo", "bar", Tools.iso8601());
         lm.addField("something", "foo");
         lm.addField("something_else", "bar");
 
@@ -101,7 +103,7 @@ public class LogMessageTest {
 
     @Test
     public void testRemoveFieldWithNonExistentKey() {
-        Message lm = new Message("foo", "bar", new DateTime());
+        Message lm = new Message("foo", "bar", Tools.iso8601());
         lm.addField("something", "foo");
         lm.addField("something_else", "bar");
 
@@ -112,7 +114,7 @@ public class LogMessageTest {
     
     @Test
     public void testRemoveFieldDoesNotDeleteReservedFields() {
-        DateTime time = new DateTime();
+        DateTime time = Tools.iso8601();
         Message lm = new Message("foo", "bar", time);
         lm.removeField("source");
         lm.removeField("timestamp");
@@ -127,7 +129,7 @@ public class LogMessageTest {
 
     @Test
     public void testToString() {
-        Message lm = new Message("foo", "bar", new DateTime());
+        Message lm = new Message("foo", "bar", Tools.iso8601());
         lm.toString();
         // Fine if it does not crash.
     }

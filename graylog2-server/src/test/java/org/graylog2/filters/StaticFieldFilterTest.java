@@ -19,15 +19,12 @@
  */
 package org.graylog2.filters;
 
-import org.graylog2.plugin.GraylogServer;
-import org.graylog2.plugin.InputHost;
 import org.graylog2.plugin.Message;
-import org.graylog2.plugin.configuration.Configuration;
+import org.graylog2.plugin.Tools;
 import org.graylog2.plugin.configuration.ConfigurationException;
 import org.graylog2.plugin.configuration.ConfigurationRequest;
 import org.graylog2.plugin.inputs.MessageInput;
 import org.graylog2.plugin.inputs.MisfireException;
-import org.joda.time.DateTime;
 import org.junit.Test;
 
 import java.util.Map;
@@ -41,7 +38,7 @@ public class StaticFieldFilterTest {
 
     @Test
     public void testFilter() throws Exception {
-        Message msg = new Message("hello", "junit", new DateTime());
+        Message msg = new Message("hello", "junit", Tools.iso8601());
 
         FakeInput fakeInput = new FakeInput();
         fakeInput.addStaticField("foo", "bar");
@@ -58,7 +55,7 @@ public class StaticFieldFilterTest {
 
     @Test
     public void testFilterIsNotOverwritingExistingKeys() throws Exception {
-        Message msg = new Message("hello", "junit", new DateTime());
+        Message msg = new Message("hello", "junit", Tools.iso8601());
         msg.addField("foo", "IWILLSURVIVE");
 
         FakeInput fakeInput = new FakeInput();

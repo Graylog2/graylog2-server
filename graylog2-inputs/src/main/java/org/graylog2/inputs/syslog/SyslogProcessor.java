@@ -194,7 +194,7 @@ public class SyslogProcessor {
         if (msg.getDate() == null) {
             if (config.getBoolean(SyslogInputBase.CK_ALLOW_OVERRIDE_DATE)) {
                 LOG.info("Date could not be parsed. Was set to NOW because {} is true.", SyslogInputBase.CK_ALLOW_OVERRIDE_DATE);
-                return new DateTime();
+                return Tools.iso8601();
             } else {
                 LOG.info("Syslog message is missing date or date could not be parsed. (Possibly set {} to true) "
                         + "Not further handling. Message was: {}", SyslogInputBase.CK_ALLOW_OVERRIDE_DATE, new String(msg.getRaw()));

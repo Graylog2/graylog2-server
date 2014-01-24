@@ -23,9 +23,9 @@ import com.google.common.collect.Lists;
 import org.graylog2.ConfigurationException;
 import org.graylog2.GraylogServerStub;
 import org.graylog2.plugin.Message;
+import org.graylog2.plugin.Tools;
 import org.graylog2.plugin.inputs.Converter;
 import org.graylog2.plugin.inputs.Extractor;
-import org.joda.time.DateTime;
 import org.junit.Test;
 import org.scalatest.events.TestPending;
 
@@ -44,7 +44,7 @@ public class SubstringExtractorTest {
 
     @Test
     public void testBasicExtraction() throws Exception {
-        Message msg = new Message("The short message", "TestUnit", new DateTime());
+        Message msg = new Message("The short message", "TestUnit", Tools.iso8601());
 
         msg.addField("somefield", "<10> 07 Aug 2013 somesubsystem: this is my message for username9001 id:9001");
 
@@ -58,7 +58,7 @@ public class SubstringExtractorTest {
 
     @Test
     public void testBasicExtractionWithCutStrategy() throws Exception {
-        Message msg = new Message("The short message", "TestUnit", new DateTime());
+        Message msg = new Message("The short message", "TestUnit", Tools.iso8601());
 
         msg.addField("somefield", "<10> 07 Aug 2013 somesubsystem: this is my message for username9001 id:9001");
 
@@ -72,7 +72,7 @@ public class SubstringExtractorTest {
 
     @Test
     public void testBasicExtractionWithCutStrategyCanOverwriteSameField() throws Exception {
-        Message msg = new Message("The short message", "TestUnit", new DateTime());
+        Message msg = new Message("The short message", "TestUnit", Tools.iso8601());
 
         SubstringExtractor x = new SubstringExtractor("foo", "foo", Extractor.CursorStrategy.CUT, "message", "message", config(4, 17), "foo", noConverters(), Extractor.ConditionType.NONE, null);
         x.runExtractor(new GraylogServerStub(), msg);
@@ -82,7 +82,7 @@ public class SubstringExtractorTest {
 
     @Test
     public void testBasicExtractionDoesNotFailOnNonMatch() throws Exception {
-        Message msg = new Message("The short message", "TestUnit", new DateTime());
+        Message msg = new Message("The short message", "TestUnit", Tools.iso8601());
 
         msg.addField("somefield", "<10> 07 Aug 2013 somesubsystem: this is my message for username9001 id:9001");
 
@@ -95,7 +95,7 @@ public class SubstringExtractorTest {
 
     @Test
     public void testBasicExtractionDoesNotFailOnNonMatchWithCutStrategy() throws Exception {
-        Message msg = new Message("The short message", "TestUnit", new DateTime());
+        Message msg = new Message("The short message", "TestUnit", Tools.iso8601());
 
         msg.addField("somefield", "<10> 07 Aug 2013 somesubsystem: this is my message for username9001 id:9001");
 
@@ -108,7 +108,7 @@ public class SubstringExtractorTest {
 
     @Test
     public void testDoesNotFailOnNonExistentSourceField() throws Exception {
-        Message msg = new Message("The short message", "TestUnit", new DateTime());
+        Message msg = new Message("The short message", "TestUnit", Tools.iso8601());
 
         SubstringExtractor x = new SubstringExtractor("foo", "foo", Extractor.CursorStrategy.CUT, "LOLIDONTEXIST", "our_result", config(0,1), "foo", noConverters(), Extractor.ConditionType.NONE, null);
         x.runExtractor(new GraylogServerStub(), msg);
@@ -116,7 +116,7 @@ public class SubstringExtractorTest {
 
     @Test
     public void testDoesNotFailOnSourceFieldThatIsNotOfTypeString() throws Exception {
-        Message msg = new Message("The short message", "TestUnit", new DateTime());
+        Message msg = new Message("The short message", "TestUnit", Tools.iso8601());
 
         msg.addField("somefield", 9001);
 
@@ -126,7 +126,7 @@ public class SubstringExtractorTest {
 
     @Test
     public void testBasicExtractionWithCutStrategyDoesNotLeaveEmptyFields() throws Exception {
-        Message msg = new Message("The short message", "TestUnit", new DateTime());
+        Message msg = new Message("The short message", "TestUnit", Tools.iso8601());
 
         msg.addField("somefield", "<10> 07 Aug 2013 somesubsystem: this is my message for username9001 id:9001");
 
@@ -164,7 +164,7 @@ public class SubstringExtractorTest {
 
     @Test
          public void testDoesNotRunWhenRegexConditionFails() throws Exception {
-        Message msg = new Message("The short message", "TestUnit", new DateTime());
+        Message msg = new Message("The short message", "TestUnit", Tools.iso8601());
 
         msg.addField("somefield", "<10> 07 Aug 2013 somesubsystem: this is my message for username9001 id:9001");
 
@@ -177,7 +177,7 @@ public class SubstringExtractorTest {
 
     @Test
     public void testDoesNotRunWhenStringConditionFails() throws Exception {
-        Message msg = new Message("The short message", "TestUnit", new DateTime());
+        Message msg = new Message("The short message", "TestUnit", Tools.iso8601());
 
         msg.addField("somefield", "<10> 07 Aug 2013 somesubsystem: this is my message for username9001 id:9001");
 

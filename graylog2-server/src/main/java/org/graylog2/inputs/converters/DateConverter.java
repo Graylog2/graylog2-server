@@ -49,7 +49,7 @@ public class DateConverter extends Converter {
             return value;
         }
 
-        return DateTime.parse(value, DateTimeFormat.forPattern(dateFormat));
+        return DateTime.parse(value, DateTimeFormat.forPattern(dateFormat).withZoneUTC());
     }
 
     @Override

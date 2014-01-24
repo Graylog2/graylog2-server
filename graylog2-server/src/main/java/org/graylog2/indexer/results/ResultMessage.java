@@ -20,17 +20,21 @@
 
 package org.graylog2.indexer.results;
 
-import java.util.Map;
-
 import org.elasticsearch.action.get.GetResponse;
 import org.elasticsearch.search.SearchHit;
+import org.graylog2.plugin.Tools;
+import org.joda.time.format.DateTimeFormat;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.util.Map;
 
 /**
  * @author Lennart Koopmann <lennart@socketfeed.com>
  */
 public class ResultMessage {
-
-	/* 
+    private static final Logger log = LoggerFactory.getLogger(ResultMessage.class);
+    /*
 	 * I suppress all the warnings because Eclipse doesn't know shit
 	 * about JSON POJO serialization.
 	 */
@@ -43,7 +47,6 @@ public class ResultMessage {
 		ResultMessage m = new ResultMessage();
 		m.setMessage(hit.getSource());
 		m.setIndex(hit.getIndex());
-
 		return m;
 	}
 	
@@ -57,7 +60,17 @@ public class ResultMessage {
 	
 	public void setMessage(Map<String, Object> message) {
 		this.message = message;
-	}
+        if (this.message.containsKey("timestamp")) {
+            final Object tsField = this.message.get("timestamp");
+            try {
+                this.message.put("timestamp",
+                                 DateTimeFormat.forPattern(Tools.ES_DATE_FORMAT).withZoneUTC().parseDateTime(String.valueOf(tsField)));
+            } catch (IllegalArgumentException e) {
+                // could not parse date string, this is likely a bug, but we will leave the original value alone
+                log.warn("Could not parse timestamp of message {}", message.get("id"),  e);
+            }
+        }
+    }
 	
 	public void setIndex(String index) {
 		this.index = index;

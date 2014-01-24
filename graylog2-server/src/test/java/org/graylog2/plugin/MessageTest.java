@@ -19,7 +19,6 @@
  */
 package org.graylog2.plugin;
 
-import org.joda.time.DateTime;
 import org.junit.Test;
 
 import static junit.framework.Assert.assertEquals;
@@ -32,26 +31,26 @@ public class MessageTest {
 
     @Test
     public void testAddFieldDoesOnlyAcceptAlphanumericKeys() throws Exception {
-        Message m = new Message("foo", "bar", new DateTime());
+        Message m = new Message("foo", "bar", Tools.iso8601());
         m.addField("some_thing", "bar");
         assertEquals("bar", m.getField("some_thing"));
 
-        m = new Message("foo", "bar", new DateTime());
+        m = new Message("foo", "bar", Tools.iso8601());
         m.addField("some-thing", "bar");
         assertEquals("bar", m.getField("some-thing"));
 
-        m = new Message("foo", "bar", new DateTime());
+        m = new Message("foo", "bar", Tools.iso8601());
         m.addField("somethin$g", "bar");
         assertNull(m.getField("somethin$g"));
 
-        m = new Message("foo", "bar", new DateTime());
+        m = new Message("foo", "bar", Tools.iso8601());
         m.addField("someäthing", "bar");
         assertNull(m.getField("someäthing"));
     }
 
     @Test
     public void testAddFieldTrimsValue() throws Exception {
-        Message m = new Message("foo", "bar", new DateTime());
+        Message m = new Message("foo", "bar", Tools.iso8601());
         m.addField("something", " bar ");
         assertEquals("bar", m.getField("something"));
 
@@ -64,7 +63,7 @@ public class MessageTest {
 
     @Test
     public void testAddFieldWorksWithIntegers() throws Exception {
-        Message m = new Message("foo", "bar", new DateTime());
+        Message m = new Message("foo", "bar", Tools.iso8601());
         m.addField("something", 3);
         assertEquals(3, m.getField("something"));
     }

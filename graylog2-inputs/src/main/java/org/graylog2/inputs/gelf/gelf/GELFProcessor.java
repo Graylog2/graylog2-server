@@ -24,7 +24,6 @@ import com.codahale.metrics.Timer;
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.graylog2.plugin.GraylogServer;
 import org.graylog2.plugin.InputHost;
 import org.graylog2.plugin.Message;
 import org.graylog2.plugin.Tools;
@@ -96,8 +95,9 @@ public class GELFProcessor {
         double messageTimestamp = doubleValue(json, "timestamp");
         DateTime timestamp;
         if (messageTimestamp <= 0) {
-            timestamp = new DateTime();
+            timestamp = Tools.iso8601();
         } else {
+            // we treat this as a unix timestamp
             timestamp = Tools.dateTimeFromDouble(messageTimestamp);
         }
 

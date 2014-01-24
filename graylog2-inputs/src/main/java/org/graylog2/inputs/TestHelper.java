@@ -20,6 +20,10 @@
 
 package org.graylog2.inputs;
 
+import org.graylog2.inputs.gelf.gelf.GELFMessageChunk;
+import org.graylog2.plugin.Message;
+import org.graylog2.plugin.Tools;
+
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -27,9 +31,6 @@ import java.io.UnsupportedEncodingException;
 import java.math.BigInteger;
 import java.util.zip.Deflater;
 import java.util.zip.GZIPOutputStream;
-import org.graylog2.inputs.gelf.gelf.GELFMessageChunk;
-import org.graylog2.plugin.Message;
-import org.joda.time.DateTime;
 
 public class TestHelper {
 
@@ -89,7 +90,7 @@ public class TestHelper {
     }
     
     public static Message simpleLogMessage() {
-        Message m = new Message("bar", "foo", new DateTime());
+        Message m = new Message("bar", "foo", Tools.iso8601());
         
         return m;
     }
