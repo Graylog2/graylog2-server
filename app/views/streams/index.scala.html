@@ -91,9 +91,7 @@
                     @stream.getTitle
                 </a>
 
-                @if(stream.getDisabled() == false) {
-                    <span class="label label-success">Active</span>
-                } else {
+                @if(stream.getDisabled) {
                     <span class="label label-important">Paused</span>
                 }
             </h3>

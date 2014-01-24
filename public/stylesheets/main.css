@@ -1356,6 +1356,8 @@ table#users-list td.centered {
 
 .stream-row h3 a {
     color: #000;
+    font-size: 17px;
+    margin-bottom: 2px;
 }
 
 .stream-row h3 .label {
