@@ -57,6 +57,12 @@ function dispatchRuleValidation(ref, validatorType) {
                 errors = true;
             }
             break;
+        case "timerange_not_empty":
+            if (!validateAbsoluteTimerange(ref)) {
+                validationFailure(ref, "cannot be earlier than 'From'");
+                errors = true;
+            }
+            break;
     }
 }
 
@@ -94,4 +100,13 @@ function validateNotNegativeNumber(el) {
 
 function validateNumber(el) {
     return isNumber(el.val());
+}
+
+function validateAbsoluteTimerange(el) {
+    var parent = $(el).parent().parent();
+    var fromStr = $("input[name='from']", parent).val();
+    var toStr = $("input[name='to']", parent).val();
+    var from = new Date(fromStr);
+    var to = new Date(toStr);
+    return (from <= to)
 }
