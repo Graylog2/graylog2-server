@@ -1,26 +1,27 @@
 #!/bin/bash
 
 CMD=$1
-NOHUP=`which nohup`
+NOHUP=${NOHUP:=$(which nohup)}
 
 # resolve links - $0 may be a softlink
 GRAYLOG2CTL="$0"
 
 while [ -h "$GRAYLOG2CTL" ]; do
-  ls=`ls -ld "$GRAYLOG2CTL"`
-  link=`expr "$ls" : '.*-> \(.*\)$'`
+  ls=$(ls -ld "$GRAYLOG2CTL")
+  link=$(expr "$ls" : '.*-> \(.*\)$')
   if expr "$link" : '/.*' > /dev/null; then
     GRAYLOG2CTL="$link"
   else
-    GRAYLOG2CTL=`dirname "$GRAYLOG2CTL"`/"$link"
+    GRAYLOG2CTL=$(dirname "$GRAYLOG2CTL")/"$link"
   fi
 done
 
-GRAYLOG2CTL_DIR=`dirname "$GRAYLOG2CTL"`
-GRAYLOG2_SERVER_JAR=graylog2-server.jar
-GRAYLOG2_CONF=/etc/graylog2.conf
-GRAYLOG2_PID=/tmp/graylog2.pid
-LOG_FILE=log/graylog2-server.log
+# take variables from environment if set
+GRAYLOG2CTL_DIR=${GRAYLOG2CTL_DIR:=$(dirname "$GRAYLOG2CTL")}
+GRAYLOG2_SERVER_JAR=${GRAYLOG2_SERVER_JAR:=graylog2-server.jar}
+GRAYLOG2_CONF=${GRAYLOG2_CONF:=/etc/graylog2.conf}
+GRAYLOG2_PID=${GRAYLOG2_PID:=/tmp/graylog2.pid}
+LOG_FILE=${LOG_FILE:=log/graylog2-server.log}
 
 start() {
     echo "Starting graylog2-server ..."
@@ -29,7 +30,7 @@ start() {
 }
 
 stop() {
-    PID=`cat ${GRAYLOG2_PID}`
+    PID=$(cat ${GRAYLOG2_PID})
     echo "Stopping graylog2-server ($PID) ..."
     if kill $PID; then
         rm ${GRAYLOG2_PID}
