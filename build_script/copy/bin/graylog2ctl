@@ -26,7 +26,13 @@ LOG_FILE=${LOG_FILE:=log/graylog2-server.log}
 start() {
     echo "Starting graylog2-server ..."
     cd "$GRAYLOG2CTL_DIR/.."
-    $NOHUP java -jar ${GRAYLOG2_SERVER_JAR} -f ${GRAYLOG2_CONF} -p ${GRAYLOG2_PID} >> ${LOG_FILE} &
+    $NOHUP java -jar ${GRAYLOG2_SERVER_JAR} -f ${GRAYLOG2_CONF} -p ${GRAYLOG2_PID} ${LOG4J} >> ${LOG_FILE} &
+}
+
+run() {
+    echo "Running graylog2-server ..."
+    cd "$GRAYLOG2CTL_DIR/.."
+    exec java -jar ${GRAYLOG2_SERVER_JAR} -f ${GRAYLOG2_CONF} -p ${GRAYLOG2_PID} ${LOG4J}
 }
 
 stop() {
