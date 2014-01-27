@@ -1591,6 +1591,7 @@ form.edit-dashboard-form {
 .dashboard .widget .field_chart .dashboard-chart {
     position: relative;
     top: 15px;
+    height: 70px;
 }
 
 .dashboard .widget .field_chart .dashboard-chart .x_tick {
