@@ -12,8 +12,9 @@
                 disabled="disabled"
            }
 
-           class="validatable date-select"
+           class="validatable date-select absolute-from-human"
            data-validate="defined" />
+
     <!-- set during submit via JS -->
     <input type="hidden" name="from" value="@request.getQueryString("from")" />
 </div>
@@ -30,8 +31,9 @@
                 disabled="disabled"
            }
 
-           class="validatable date-select"
+           class="validatable date-select absolute-to-human"
            data-validate="defined timerange_not_empty" />
+
     <!-- set during submit via JS -->
     <input type="hidden" name="to" value="@request.getQueryString("to")" />
 

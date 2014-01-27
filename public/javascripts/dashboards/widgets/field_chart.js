@@ -82,14 +82,15 @@ function updateWidget_field_chart(widget, data) {
 
     new Rickshaw.Graph.Axis.Time({
         graph: graph,
-        ticksTreatment: "glow"
+        ticksTreatment: "glow",
+        timeFixture: new Rickshaw.Fixtures.Graylog2Time() // Cares about correct TZ handling.
     });
 
     new Rickshaw.Graph.HoverDetail({
         graph: graph,
         formatter: function(series, x, y) {
             field = graphElem.attr("data-config-field");
-            var date = '<span class="date">' + new Date(x * 1000).toUTCString() + '</span>';
+            var date = '<span class="date">' + new Date(x * 1000).toString() + '</span>';
             var swatch = '<span class="detail_swatch"></span>';
             var content = '[' + graphElem.attr("data-config-valuetype") + '] ' + field + ': ' + parseInt(y) + '<br>' + date;
             return content;

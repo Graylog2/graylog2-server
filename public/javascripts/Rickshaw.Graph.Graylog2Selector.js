@@ -85,8 +85,8 @@ Rickshaw.Graph.Graylog2Selector = Rickshaw.Class.create({
             position.xMin = Math.round(graph.x.invert(position.minX));
             position.xMax = Math.round(graph.x.invert(position.maxX));
 
-            var from = $('#universalsearch .absolute input[name="from"]');
-            var to = $('#universalsearch .absolute input[name="to"]');
+            var from = $('#universalsearch .absolute .absolute-from-human');
+            var to = $('#universalsearch .absolute .absolute-to-human');
 
             if (!isNumber(position.xMin) || !isNumber(position.xMax)) {
                 clearSelection();

@@ -143,18 +143,22 @@
         if(resultGraph.series != undefined && resultGraph.series[0] != undefined && resultGraph.series[0].data.length > 1) {
             new Rickshaw.Graph.Axis.Time({
                 graph: resultGraph,
-                ticksTreatment: "glow"
+                ticksTreatment: "glow",
+                timeFixture: new Rickshaw.Fixtures.Graylog2Time() // Cares about correct TZ handling.
             });
         }
 
         new Rickshaw.Graph.HoverDetail({
             graph: resultGraph,
             formatter: function(series, x, y) {
-                var date = '<span class="date">' + new Date(x * 1000).toUTCString() + '</span>';
+                var date = '<span class="date">' + new Date(x * 1000 ).toString() + '</span>';
                 var swatch = '<span class="detail_swatch"></span>';
                 var content = parseInt(y) + ' messages<br>' + date;
                 return content;
-            }
+            },
+        xFormatter: function(x) {
+        return new Date(x * 1000).toDateString();
+        },
         });
 
         new Rickshaw.Graph.Graylog2Selector( {

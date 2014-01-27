@@ -164,13 +164,14 @@ $(document).ready(function() {
 
                 new Rickshaw.Graph.Axis.Time({
                     graph: graph,
-                    ticksTreatment: "glow"
+                    ticksTreatment: "glow",
+                    timeFixture: new Rickshaw.Fixtures.Graylog2Time() // Cares about correct TZ handling.
                 });
 
                 new Rickshaw.Graph.HoverDetail({
                     graph: graph,
                     formatter: function(series, x, y) {
-                        var date = '<span class="date">' + new Date(x * 1000).toUTCString() + '</span>';
+                        var date = '<span class="date">' + new Date(x * 1000).toString() + '</span>';
                         var swatch = '<span class="detail_swatch" style="background-color: ' + series.color + '"></span>';
                         var content = swatch + '[' + opts.valuetype + '] ' + field + ': ' + parseInt(y) + '<br>' + date;
                         return content;
