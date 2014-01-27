@@ -22,6 +22,7 @@ GRAYLOG2_SERVER_JAR=${GRAYLOG2_SERVER_JAR:=graylog2-server.jar}
 GRAYLOG2_CONF=${GRAYLOG2_CONF:=/etc/graylog2.conf}
 GRAYLOG2_PID=${GRAYLOG2_PID:=/tmp/graylog2.pid}
 LOG_FILE=${LOG_FILE:=log/graylog2-server.log}
+LOG4J=${LOG4J:=}
 
 start() {
     echo "Starting graylog2-server ..."
