@@ -93,8 +93,8 @@ Rickshaw.Graph.Graylog2Selector = Rickshaw.Class.create({
                 return;
             }
 
-            var fromDate = new Date((position.xMin+new Date().getTimezoneOffset()*60)*1000);
-            var toDate = new Date((position.xMax+new Date().getTimezoneOffset()*60)*1000);
+            var fromDate = new Date((position.xMin)*1000);
+            var toDate = new Date((position.xMax)*1000);
 
             activateTimerangeChooser("absolute", $('.timerange-selector-container .dropdown-menu a[data-selector-name="absolute"]'));
             from.val(searchDateTimeFormatted(fromDate));
