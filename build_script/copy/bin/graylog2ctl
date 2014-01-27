@@ -85,7 +85,10 @@ case "$CMD" in
     status)
         status
         ;;
+    run)
+        run
+        ;;
     *)
-        echo "Usage $0 {start|stop|restart|status}"
+        echo "Usage $0 {start|stop|restart|status|run}"
         RETVAL=1
 esac
