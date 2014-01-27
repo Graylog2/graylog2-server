@@ -206,6 +206,7 @@ public class LdapResource extends RestResource {
     @Path("/settings")
     public Response deleteLdapSettings() {
         LdapSettings.delete(core);
+        core.getLdapAuthenticator().applySettings(null);
         return noContent().build();
     }
 
