@@ -20,6 +20,8 @@ package org.graylog2.rest.resources.search.responses;
 
 import au.com.bytecode.opencsv.CSVWriter;
 import com.google.common.collect.ImmutableSortedSet;
+import com.google.common.collect.Iterables;
+import com.google.common.collect.Lists;
 import org.graylog2.indexer.results.ResultMessage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -59,7 +61,8 @@ public class SearchResponseCsvWriter implements MessageBodyWriter<SearchResponse
             MediaType mediaType, MultivaluedMap<String, Object> httpHeaders, OutputStream entityStream)
             throws IOException, WebApplicationException {
         final CSVWriter csvWriter = new CSVWriter(new OutputStreamWriter(entityStream));
-        final ImmutableSortedSet<String> sortedFields = ImmutableSortedSet.copyOf(searchResponse.fields);
+        final ImmutableSortedSet<String> sortedFields = ImmutableSortedSet.copyOf(
+                Iterables.concat(searchResponse.fields, Lists.newArrayList("source", "timestamp")));
 
         // write field headers
         csvWriter.writeNext(sortedFields.toArray(new String[sortedFields.size()]));
@@ -71,7 +74,7 @@ public class SearchResponseCsvWriter implements MessageBodyWriter<SearchResponse
             // first collect all values from the current message
             for (String fieldName : sortedFields) {
                 final Object val = message.message.get(fieldName);
-                fieldValues[idx++] = ((val == null) ? null : val.toString());
+                fieldValues[idx++] = ((val == null) ? null : val.toString().replaceAll("\n", "\\\\n"));
             }
             // write the complete line, some fields might not be present in the message, so there might be null values
             csvWriter.writeNext(fieldValues);
