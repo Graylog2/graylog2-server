@@ -1844,3 +1844,11 @@ input.required-input-highlight {
     margin-bottom: 124px;
     color: #ebebeb;
 }
+
+.widget .replay-link {
+    color: #000;
+}
+
+.widget .replay-link:hover {
+    text-decoration: none;
+}

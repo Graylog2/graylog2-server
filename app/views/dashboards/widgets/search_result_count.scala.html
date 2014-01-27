@@ -1,7 +1,11 @@
 @(widget: models.dashboards.widgets.SearchResultCountWidget)
 
 <div class="search_result_count">
-    <div class="value"><i class="icon icon-refresh"></i></div>
+
+    <a href="@widget.replayRoute()" class="replay-link">
+        <div class="value"><i class="icon icon-refresh"></i></div>
+    </a>
+
     <div class="widget-subline">
         <div class="description">
             <span class="widget-title">
