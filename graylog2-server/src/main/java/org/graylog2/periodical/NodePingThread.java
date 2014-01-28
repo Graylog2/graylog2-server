@@ -22,6 +22,7 @@ package org.graylog2.periodical;
 import org.graylog2.Core;
 import org.graylog2.cluster.Node;
 import org.graylog2.cluster.NodeNotFoundException;
+import org.graylog2.notifications.Notification;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -49,9 +50,31 @@ public class NodePingThread implements Runnable {
             LOG.warn("Did not find meta info of this node. Re-registering.");
             Node.registerServer(core, core.isMaster(), core.getConfiguration().getRestTransportUri());
         }
+        try {
+            // Remove old nodes that are no longer running. (Just some housekeeping)
+            Node.dropOutdated(core);
 
-        // Remove old nodes that are no longer running. (Just some housekeeping)
-        Node.dropOutdated(core);
+            try {
+                // Check that we still have a master node in the cluster, if not, warn the user.
+                if (!Node.thisNode(core).isAnyMasterPresent()) {
+                    Notification.buildNow(core)
+                            .addThisNode()
+                            .addType(Notification.Type.NO_MASTER)
+                            .addSeverity(Notification.Severity.URGENT)
+                            .publishIfFirst();
+                }
+            } catch (NodeNotFoundException e) {
+                LOG.warn("Our node has immediately been purged again. This should not happen and indicates a clock skew.");
+                Notification.buildNow(core)
+                        .addThisNode()
+                        .addType(Notification.Type.CHECK_SERVER_CLOCKS)
+                        .addSeverity(Notification.Severity.URGENT)
+                        .publishIfFirst();
+
+            }
+        } catch (Exception e) {
+            LOG.warn("Caught exception during node ping.", e);
+        }
     }
 
 }

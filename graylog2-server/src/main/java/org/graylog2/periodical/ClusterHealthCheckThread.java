@@ -27,7 +27,7 @@ public class ClusterHealthCheckThread implements  Runnable {
         try {
             if (core.inputs().runningCount() == 0) {
                 LOG.debug("No input running in cluster!");
-                getNotification().publish();
+                getNotification().publishIfFirst();
             } else {
                 LOG.debug("Running inputs found, disabling notification");
                 getNotification().fixed();
