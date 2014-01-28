@@ -43,6 +43,6 @@ public class CheckServerClocksNotification implements NotificationType {
 
     @Override
     public boolean isCloseable() {
-        return false;
+        return true;
     }
 }
