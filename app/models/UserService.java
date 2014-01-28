@@ -22,7 +22,7 @@ import com.google.common.collect.Lists;
 import com.google.inject.Inject;
 import lib.APIException;
 import lib.ApiClient;
-import lib.security.Graylog2ServerUnavailableException;
+import lib.Graylog2ServerUnavailableException;
 import models.api.requests.CreateUserRequest;
 import models.api.responses.system.UserResponse;
 import models.api.responses.system.UsersListResponse;

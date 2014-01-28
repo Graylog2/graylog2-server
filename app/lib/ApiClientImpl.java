@@ -28,7 +28,6 @@ import com.google.gson.GsonBuilder;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import com.ning.http.client.*;
-import lib.security.Graylog2ServerUnavailableException;
 import models.*;
 import models.api.requests.ApiRequest;
 import models.api.responses.EmptyResponse;

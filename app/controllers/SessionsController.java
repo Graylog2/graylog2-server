@@ -22,7 +22,7 @@ import com.google.gson.annotations.SerializedName;
 import com.google.inject.Inject;
 import lib.APIException;
 import lib.ServerNodes;
-import lib.security.Graylog2ServerUnavailableException;
+import lib.Graylog2ServerUnavailableException;
 import lib.security.RedirectAuthenticator;
 import models.LoginRequest;
 import models.UserService;

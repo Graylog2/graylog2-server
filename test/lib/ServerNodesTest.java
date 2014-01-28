@@ -21,7 +21,6 @@ package lib;
 import com.google.common.collect.ImmutableList;
 import com.ning.http.client.AsyncHttpClient;
 import com.ning.http.client.AsyncHttpClientConfig;
-import lib.security.Graylog2ServerUnavailableException;
 import models.Node;
 import models.api.responses.EmptyResponse;
 import models.api.responses.cluster.NodeSummaryResponse;

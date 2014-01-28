@@ -24,6 +24,7 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import lib.APIException;
 import lib.ApiClient;
+import lib.Graylog2ServerUnavailableException;
 import models.User;
 import models.UserService;
 import models.api.responses.system.UserResponse;

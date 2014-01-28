@@ -22,7 +22,6 @@ import com.google.common.collect.Lists;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
-import lib.security.Graylog2ServerUnavailableException;
 import models.Node;
 import models.api.responses.cluster.NodeSummaryResponse;
 import models.api.responses.cluster.NodesResponse;

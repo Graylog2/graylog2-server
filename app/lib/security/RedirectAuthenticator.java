@@ -20,6 +20,7 @@ package lib.security;
 
 import com.google.inject.Inject;
 import controllers.routes;
+import lib.Graylog2ServerUnavailableException;
 import models.User;
 import models.UserService;
 import org.slf4j.Logger;

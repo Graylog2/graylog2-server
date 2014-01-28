@@ -22,7 +22,6 @@ import com.google.common.collect.*;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import com.google.inject.name.Named;
-import lib.security.Graylog2ServerUnavailableException;
 import models.Node;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -92,7 +91,7 @@ public class ServerNodes {
         }
 
         // No active master node was found.
-        throw new Graylog2ServerUnavailableException();
+        throw new Graylog2MasterUnavailableException();
     }
 
     /**
