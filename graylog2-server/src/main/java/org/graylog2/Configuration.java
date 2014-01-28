@@ -225,6 +225,9 @@ public class Configuration {
     @Parameter(value = "transport_email_from_email", required = false)
     private String emailTransportFromEmail;
 
+    @Parameter(value = "rest_enable_cors", required = false)
+    private boolean restEnableCors = false;
+
     public boolean isMaster() {
         return isMaster;
     }
@@ -510,6 +513,10 @@ public class Configuration {
 
     public String getEmailTransportFromEmail() {
         return emailTransportFromEmail;
+    }
+
+    public boolean isRestEnableCors() {
+        return restEnableCors;
     }
 
 }
