@@ -31,7 +31,6 @@ import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.authc.AuthenticationException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import play.api.mvc.Call;
 import play.data.Form;
 import play.libs.Crypto;
 import play.mvc.Http;
@@ -118,10 +117,13 @@ public class SessionsController extends BaseController {
         final String sessionId = UserService.current().getSessionId();
         try {
             if (sessionId != null) {
-                api().delete().path("/system/sessions/{0}", sessionId).expect(Http.Status.NO_CONTENT).execute();
+                api().delete()
+                        .path("/system/sessions/{0}", sessionId)
+                        .expect(NO_CONTENT, NOT_FOUND)
+                        .execute();
             }
         } catch (APIException | IOException e) {
-            log.error("Unable to end session for user {}", UserService.current().getName());
+            log.info("Unable to end session for user {}", UserService.current().getName());
         }
         SecurityUtils.getSubject().logout();
 		session().clear();
