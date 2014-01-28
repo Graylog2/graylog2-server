@@ -391,7 +391,9 @@ public class Node extends ClusterEntity {
                 .path("/system/metrics/namespace/{0}", namespace)
                 .expect(200, 404)
                 .execute();
-
+        if (response == null) {
+            return Maps.newHashMap();
+        }
         return response.getMetrics();
     }
 
