@@ -89,8 +89,7 @@ public class Notification extends Persisted {
         super(core, new HashMap<String, Object>());
     }
 
-    // this should really never be necessary, because timestamp should always be "now" (or can be overridden)
-    protected static Notification build(Core core) {
+    public static Notification build(Core core) {
         return new Notification(core);
     }
 
