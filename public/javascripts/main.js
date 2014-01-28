@@ -363,6 +363,7 @@ $(document).ready(function() {
 
         var field = $(this).attr("data-field");
         var value = $(this).attr("data-value");
+        var operator = $(this).attr("data-search-link-operator") || "AND";
 
         // Check if both required fields are properly set.
         if (field == undefined || value == undefined || field == "" || value == "") {
@@ -422,7 +423,7 @@ $(document).ready(function() {
             if ($.trim(originalQuery) == "*" || $.trim(originalQuery) == "") {
                 query.val(ourQuery);
             } else {
-                query.val(originalQuery + " AND " + ourQuery)
+                query.val(originalQuery + " " + operator + " " + ourQuery)
             }
         }
     });

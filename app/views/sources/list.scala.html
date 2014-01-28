@@ -33,7 +33,7 @@
                 @for(source <- sources.sortBy(-_.getMessageCount)) {
                     <tr>
                         <td>
-                            <a href="#" class="search-link" data-field="source" data-value="@source.getName">
+                            <a href="#" class="search-link" data-field="source" data-search-link-operator="OR" data-value="@source.getName">
                                 @source.getName
                             </a>
                         </td>
