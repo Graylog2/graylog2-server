@@ -36,9 +36,11 @@ public class Notification {
     public enum Type {
         DEFLECTOR_EXISTS_AS_INDEX,
         MULTI_MASTER,
+        NO_MASTER,
         ES_OPEN_FILES,
         NO_INPUT_RUNNING,
-        INPUT_FAILED_TO_START;
+        INPUT_FAILED_TO_START,
+        CHECK_SERVER_CLOCKS;
 
         public static Type fromString(String name) {
             return valueOf(name.toUpperCase());
@@ -69,12 +71,16 @@ public class Notification {
                 return new DeflectorExistsAsIndexNotification();
             case MULTI_MASTER:
                 return new MultiMasterNotification();
+            case NO_MASTER:
+                return new NoMasterNotification();
             case ES_OPEN_FILES:
                 return new EsOpenFilesNotification();
             case NO_INPUT_RUNNING:
                 return new NoInputRunningNotification(getNodeId());
             case INPUT_FAILED_TO_START:
                 return new InputFailedToStartNotification(this);
+            case CHECK_SERVER_CLOCKS:
+                return new CheckServerClocksNotification();
         }
 
         throw new RuntimeException("No notification registered for " + type);
