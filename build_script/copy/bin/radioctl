@@ -27,13 +27,13 @@ LOG4J=${LOG4J:=}
 start() {
     echo "Starting graylog2-radio ..."
     cd "$RADIOCTL_DIR/.."
-    $NOHUP java -jar ${RADIO_JAR} -f ${RADIO_CONF} -p ${RADIO_PID} ${LOG4J} >> ${LOG_FILE} &
+    $NOHUP java ${LOG4J} -jar ${RADIO_JAR} -f ${RADIO_CONF} -p ${RADIO_PID} >> ${LOG_FILE} &
 }
 
 run() {
     echo "Running graylog2-radio ..."
     cd "$RADIOCTL_DIR/.."
-    exec java -jar ${RADIO_JAR} -f ${RADIO_CONF} -p ${RADIO_PID} $LOG4J
+    exec java ${LOG4J} -jar ${RADIO_JAR} -f ${RADIO_CONF} -p ${RADIO_PID}
 }
 
 stop() {
