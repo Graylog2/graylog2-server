@@ -163,6 +163,13 @@ $(document).ready(function() {
         $(".only-unlocked").show();
         $(".hidden-unlocked").hide();
         $(".lock-dashboard-widgets").show();
+
+        // Replay links fix. We don't want the links to be clickable when dragging.
+        $(".dashboard .widget a.replay-link").each(function() {
+            $(this).css("cursor", "move")
+                .attr("data-original-href", $(this).attr("href"))
+                .attr("href", "javascript: void(0)");
+        })
     });
 
     $(".lock-dashboard-widgets").on("click", function() {
@@ -172,6 +179,12 @@ $(document).ready(function() {
         $(".hidden-unlocked").show();
         $(".only-unlocked").hide();
         $(".unlock-dashboard-widgets").show();
+
+        // Replay links fix. Make the links clickable again.
+        $(".dashboard .widget a.replay-link").each(function() {
+            $(this).css("cursor", "pointer")
+                .attr("href", $(this).attr("data-original-href"));
+        })
     });
 
     $(".dashboard .widget .edit-description").on("click", function() {
