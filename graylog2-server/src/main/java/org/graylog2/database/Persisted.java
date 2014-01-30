@@ -124,12 +124,12 @@ public abstract class Persisted {
 		collection().remove(new BasicDBObject("_id", id));
 	}
 
-    public static void destroyAll(Core core, String collectionName) {
-        collection(core, collectionName).remove(new BasicDBObject());
+    public static WriteResult destroyAll(Core core, String collectionName) {
+        return collection(core, collectionName).remove(new BasicDBObject());
     }
 
-    public static void destroy(DBObject query, Core core, String collectionName) {
-        collection(core, collectionName).remove(query);
+    public static WriteResult destroy(DBObject query, Core core, String collectionName) {
+        return collection(core, collectionName).remove(query);
     }
 
 	public ObjectId save() throws ValidationException {
