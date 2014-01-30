@@ -8,6 +8,7 @@ import lib.timeranges.InvalidRangeParametersException;
 import models.*;
 import models.api.results.DateHistogramResult;
 import models.api.results.SearchResult;
+import play.mvc.Http;
 import play.mvc.Result;
 
 import java.io.IOException;
@@ -28,6 +29,12 @@ public class StreamSearchController extends SearchController {
         } catch (IOException e) {
             return status(504, views.html.errors.error.render(ApiClient.ERROR_MSG_IO, e, request()));
         } catch (APIException e) {
+            if(e.getHttpCode() == Http.Status.NOT_FOUND) {
+                // This stream does not exist.
+                flash("error", "The requested stream was deleted and no longer exist.");
+                return redirect(routes.StreamsController.index());
+            }
+
             String message = "Unable to fetch stream. We expected HTTP 200, but got a HTTP " + e.getHttpCode() + ".";
             return status(504, views.html.errors.error.render(message, e, request()));
         }
