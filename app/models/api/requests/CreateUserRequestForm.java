@@ -18,12 +18,27 @@
  */
 package models.api.requests;
 
+import java.util.concurrent.TimeUnit;
+
 public class CreateUserRequestForm extends CreateUserRequest {
 
-    // only exists for form binding, not existent in API!
+    // these exist for form binding, not existent in API!
     public boolean admin;
 
+    public boolean session_timeout_never = false;
+
+    public long timeout = 8;
+
+    public String timeout_unit = "hours";
+
     public CreateUserRequest toApiRequest() {
-        return new CreateUserRequest(this);
+        final CreateUserRequest request = new CreateUserRequest(this);
+        // -1 is "never"
+        if (session_timeout_never) {
+            request.sessionTimeoutMs = -1;
+        } else {
+            request.sessionTimeoutMs = TimeUnit.valueOf(timeout_unit.toUpperCase()).toMillis(timeout);
+        }
+        return request;
     }
 }

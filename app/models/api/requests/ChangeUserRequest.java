@@ -19,6 +19,7 @@
 package models.api.requests;
 
 import com.google.common.collect.Lists;
+import com.google.gson.annotations.SerializedName;
 import models.User;
 import play.data.validation.Constraints;
 
@@ -29,12 +30,14 @@ public class ChangeUserRequest extends ApiRequest {
     public String fullname;
     @Constraints.Required
     public String email;
-
     public List<String> permissions = Lists.newArrayList();
 
     public String timezone;
 
     public ChangeStartpageRequest startpage;
+
+    @SerializedName("session_timeout_ms")
+    public long sessionTimeoutMs;
 
     public ChangeUserRequest() { /* for data binding */ }
 
@@ -52,5 +55,6 @@ public class ChangeUserRequest extends ApiRequest {
             this.startpage.type = user.getStartpage().getType().toString().toLowerCase();
             this.startpage.id = user.getStartpage().getId();
         }
+        this.sessionTimeoutMs = user.getSessionTimeoutMs();
     }
 }

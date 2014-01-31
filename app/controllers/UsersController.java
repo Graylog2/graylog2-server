@@ -49,6 +49,7 @@ import javax.annotation.Nullable;
 import java.io.IOException;
 import java.util.List;
 import java.util.Set;
+import java.util.concurrent.TimeUnit;
 
 import static lib.security.RestPermissions.*;
 import static views.helpers.Permissions.isPermitted;
@@ -228,6 +229,20 @@ public class UsersController extends AuthenticatedController {
         }
 
         final ChangeUserRequestForm formData = requestForm.get();
+        // translate session timeout value from form fields to millis
+        if (!formData.session_timeout_never) {
+            TimeUnit timeoutUnit;
+            if (formData.timeout_unit != null) {
+                try {
+                    timeoutUnit = TimeUnit.valueOf(formData.timeout_unit.toUpperCase());
+                    formData.sessionTimeoutMs = timeoutUnit.toMillis(formData.timeout);
+                } catch (IllegalArgumentException e) {
+                    log.warn("Unknown value for session timeout unit. Cannot set session timeout value.", e);
+                }
+            }
+        } else {
+            formData.sessionTimeoutMs = -1; // which translates to "never".
+        }
         Set<String> permissions = Sets.newHashSet(user.getPermissions());
         // TODO this does not handle combined permissions like streams:edit,read:1,2 !
         // remove all streams:edit, streams:read permissions and add the ones from the form back.

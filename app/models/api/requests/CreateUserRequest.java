@@ -41,6 +41,7 @@ public class CreateUserRequest extends ChangeUserRequest {
         if (timezone != null) {
             this.timezone = timeZone.getID();
         }
+        this.sessionTimeoutMs = user.getSessionTimeoutMs();
     }
 
     public CreateUserRequest(CreateUserRequest c) {
@@ -51,6 +52,6 @@ public class CreateUserRequest extends ChangeUserRequest {
         permissions = c.permissions;
         timezone = c.timezone;
         startpage = c.startpage;
-
+        sessionTimeoutMs = c.sessionTimeoutMs;
     }
 }

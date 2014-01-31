@@ -253,6 +253,25 @@ $(document).ready(function() {
     // timezone chooser
     $(".timezone-select").chosen({search_contains:true, inherit_select_classes:true, allow_single_deselect:true});
 
+    // session timeout "never" vs "explicit value"
+    var toggleSessionTimeoutEditableState = function(neverTimeout){
+        // toggle the disabled state of all input fields
+        $(".session-timeout-fields").prop("disabled", neverTimeout);
+    };
+    $("#session-timeout-never").change(function(){
+        var enabledState = $(this).is(":checked");
+        toggleSessionTimeoutEditableState(enabledState)
+    });
+    toggleSessionTimeoutEditableState($("#session-timeout-never").is(":checked"));
+
+    $("#create-user-form").on("submit", function() {
+        return validate("#create-user-form")}
+    );
+
+    $("#edit-user-form").on("submit", function() {
+            return validate("#edit-user-form")}
+    );
+
     var createUsernameField = $("form#create-user-form #username");
     if (createUsernameField.length) {
         var domElement = createUsernameField[0];

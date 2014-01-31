@@ -160,4 +160,12 @@ public class Tools {
         }
         return defaultValue;
     }
+
+    public static boolean apiRequestShouldExtendSession() {
+        try {
+            return !("true".equalsIgnoreCase(Http.Context.current().request().getHeader("X-Graylog2-No-Session-Extension")));
+        } catch (Exception e) {
+            return true;
+        }
+    }
 }

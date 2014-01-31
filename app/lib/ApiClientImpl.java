@@ -62,6 +62,7 @@ class ApiClientImpl implements ApiClient {
     public void start() {
         AsyncHttpClientConfig.Builder builder = new AsyncHttpClientConfig.Builder();
         builder.setAllowPoolingConnection(false);
+        builder.setUserAgent("graylog2-web/" + Version.VERSION);
         client = new AsyncHttpClient(builder.build());
 
         shutdownHook = new Thread(new Runnable() {
@@ -160,6 +161,7 @@ class ApiClientImpl implements ApiClient {
         private boolean unauthenticated = false;
         private MediaType mediaType = MediaType.JSON_UTF_8;
         private String sessionId;
+        private Boolean extendSession;
 
         public ApiRequestBuilder(Method method, Class<T> responseClass) {
             this.method = method;
@@ -270,6 +272,12 @@ class ApiClientImpl implements ApiClient {
         @Override
         public lib.ApiRequestBuilder<T> session(String sessionId) {
             this.sessionId = sessionId;
+            return this;
+        }
+
+        @Override
+        public lib.ApiRequestBuilder<T> extendSession(boolean extend) {
+            this.extendSession = extend;
             return this;
         }
 
@@ -538,6 +546,15 @@ class ApiClientImpl implements ApiClient {
                 requestBuilder.addHeader("Accept", "application/json");
             }
             requestBuilder.addHeader("Accept-Charset", "utf-8");
+            // check for the request-global flag passed from the periodicals.
+            // you can override it per request, but that seems unlikely.
+            // this is a hack, if you have a better idea without touching dozens of methods, please share :)
+            if (extendSession == null) {
+                extendSession = Tools.apiRequestShouldExtendSession();
+            }
+            if (!extendSession) {
+                requestBuilder.addHeader("X-Graylog2-No-Session-Extension", "true");
+            }
             return requestBuilder;
         }
 

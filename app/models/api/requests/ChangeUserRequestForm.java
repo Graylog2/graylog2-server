@@ -22,6 +22,7 @@ import com.google.common.collect.Lists;
 import models.User;
 
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 public class ChangeUserRequestForm extends ChangeUserRequest {
 
@@ -33,12 +34,19 @@ public class ChangeUserRequestForm extends ChangeUserRequest {
 
     public List<String> dashboardeditpermissions = Lists.newArrayList();
 
+    public boolean session_timeout_never;
+
+    public String timeout_unit;
+
+    public long timeout;
+
     public ChangeUserRequest toApiRequest() {
         final ChangeUserRequest r = new ChangeUserRequest();
         r.email = email;
         r.fullname = fullname;
         r.startpage = startpage;
         r.timezone = timezone;
+        r.sessionTimeoutMs = sessionTimeoutMs;
         return r;
     }
 
@@ -48,5 +56,25 @@ public class ChangeUserRequestForm extends ChangeUserRequest {
 
     public ChangeUserRequestForm(User user) {
         super(user);
+        // -1 is "never"
+        if (sessionTimeoutMs == -1) {
+            session_timeout_never = true;
+        } else {
+            session_timeout_never = false;
+            // find the longest TimeUnit that will accommodate the given milliseconds
+            if (sessionTimeoutMs % TimeUnit.DAYS.toMillis(1) == 0) {
+                timeout_unit = "days";
+                timeout = TimeUnit.MILLISECONDS.toDays(sessionTimeoutMs);
+            } else if (sessionTimeoutMs % TimeUnit.HOURS.toMillis(1) == 0) {
+                timeout_unit = "hours";
+                timeout = TimeUnit.MILLISECONDS.toHours(sessionTimeoutMs);
+            } else if (sessionTimeoutMs % TimeUnit.MINUTES.toMillis(1) == 0) {
+                timeout_unit = "minutes";
+                timeout = TimeUnit.MILLISECONDS.toMinutes(sessionTimeoutMs);
+            } else if (sessionTimeoutMs % TimeUnit.SECONDS.toMillis(1) == 0) {
+                timeout_unit = "seconds";
+                timeout = TimeUnit.MILLISECONDS.toSeconds(sessionTimeoutMs);
+            }
+        }
     }
 }

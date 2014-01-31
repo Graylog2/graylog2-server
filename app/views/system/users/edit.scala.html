@@ -24,7 +24,7 @@
 
     <div class="row-fluid" style="margin-top: 30px;">
         <div class="span6">
-            <form class="form-horizontal" action="@routes.UsersController.saveChanges(username)" method="POST">
+            <form class="form-horizontal user-form" id="edit-user-form" action="@routes.UsersController.saveChanges(username)" method="POST">
                 <div class="control-group">
                     <label class="control-label" for="fullname">Full Name</label>
                     <div class="controls">
@@ -98,6 +98,27 @@
                     </div>
                 </div>
                 <div class="control-group">
+                    <label class="control-label" for="session-timeout-never">Session timeout</label>
+                    <div class="controls">
+                        <label class="checkbox">
+                            <input type="checkbox" id="session-timeout-never" name="session_timeout_never" @if("true".equals(form("session_timeout_never").value())) {checked} />
+                            Sessions do not time out
+                        </label>
+                    </div>
+                </div>
+                <div class="control-group">
+                    <label class="control-label" for="timeout"></label>
+                    <div class="controls">
+                        <input type="text" data-validate="positive_number" name="timeout" id="timeout" value="@form("timeout").value" class="span4 session-timeout-fields validatable" required />
+                        <select name="timeout_unit" id="timeout_unit" class="span4 session-timeout-fields">
+                            <option value="seconds" @if("seconds".equals(form("timeout_unit").value)) {selected}>Seconds</option>
+                            <option value="minutes" @if("minutes".equals(form("timeout_unit").value)) {selected}>Minutes</option>
+                            <option value="hours" @if("hours".equals(form("timeout_unit").value)) {selected}>Hours</option>
+                            <option value="days" @if("days".equals(form("timeout_unit").value)) {selected}>Days</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="control-group">
                     <div class="controls">
                     <button type="submit" class="btn btn-success create-user">
                         Save changes
@@ -142,7 +163,7 @@
     </div>
     @if(isPermitted(USERS_PERMISSIONSEDIT)) {
     <div class="row-fluid">
-        <h2><h2><i class="icon icon-bolt"></i> Reset Permissions</h2>
+        <h2><h2><i class="icon icon-bolt"></i> Change Permissions</h2>
 
         <form class="form form-horizontal" action="@routes.UsersController.resetPermissions(user.getName)" method="POST">
             <button class="btn btn-danger" type="submit" data-confirm="Really reset permissions for @user.getName?" style="margin-top: 10px; margin-bottom: 10px;">

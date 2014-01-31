@@ -19,7 +19,7 @@
     </div>
 
     <div class="row-fluid">
-        <form id="create-user-form" action="@routes.UsersController.create()" method="POST">
+        <form id="create-user-form" class="user-form" action="@routes.UsersController.create()" method="POST">
             <label for="username">Username</label>
             <span class="help-block">Select a unique user name used to log in with.</span>
             <input name="username" id="username" type="text" value="@form("username").value()" required />
@@ -55,6 +55,22 @@
             }
             </select>
             -->
+
+            <label class="checkbox">
+                <input type="checkbox" id="session-timeout-never" name="session_timeout_never" @if("true".equals(form("session_timeout_never").value())) {checked} />
+                Sessions do not time out
+            </label>
+            <span class="help-block">When checked sessions never time out due to inactivity.</span>
+
+            <label for="timeout">Explicit timeout</label>
+            <span class="help-block">Session automatically end after this amount of time, unless they are actively used.</span>
+            <input type="text" data-validate="positive_number" name="timeout" id="timeout" value="@form("timeout").value" class="span1 session-timeout-fields validatable" />
+            <select name="timeout_unit" id="timeout_unit" class="span2 session-timeout-fields">
+                <option value="seconds" @if("seconds".equals(form("timeout_unit").value)) {selected}>Seconds</option>
+                <option value="minutes" @if("minutes".equals(form("timeout_unit").value)) {selected}>Minutes</option>
+                <option value="hours" @if("hours".equals(form("timeout_unit").value)) {selected}>Hours</option>
+                <option value="days" @if("days".equals(form("timeout_unit").value)) {selected}>Days</option>
+            </select>
 
             <label for="timezone">Time Zone</label>
             <span class="help-block">Choose your local time zone or leave it as it is to use the system's default.</span>

@@ -62,6 +62,8 @@ public interface ApiRequestBuilder<T> {
 
     ApiRequestBuilder<T> session(String sessionId);
 
+    ApiRequestBuilder<T> extendSession(boolean extend);
+
     ApiRequestBuilder<T> unauthenticated();
 
     ApiRequestBuilder<T> body(ApiRequest body);

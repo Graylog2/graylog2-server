@@ -53,12 +53,13 @@ public class User {
     private final boolean readonly;
     private final boolean external;
     private final Startpage startpage;
+    private final long sessionTimeoutMs;
 
     private Subject subject;
 
     @AssistedInject
     public User(ApiClient api, @Assisted UserResponse ur, @Nullable @Assisted String sessionId) {
-        this(api, ur.id, ur.username, ur.email, ur.fullName, ur.permissions, sessionId, ur.timezone, ur.readonly, ur.external, ur.getStartpage());
+        this(api, ur.id, ur.username, ur.email, ur.fullName, ur.permissions, sessionId, ur.timezone, ur.readonly, ur.external, ur.getStartpage(), ur.sessionTimeoutMs);
     }
 
 	public User(ApiClient api,
@@ -71,8 +72,10 @@ public class User {
                 String timezone,
                 boolean readonly,
                 boolean external,
-                Startpage startpage) {
+                Startpage startpage,
+                long sessionTimeoutMs) {
         DateTimeZone timezone1 = null;
+        this.sessionTimeoutMs = sessionTimeoutMs;
         this.api = api;
         this.id = id;
         this.name = name;
@@ -189,6 +192,10 @@ public class User {
             cur.startpage.id = startpage.getId();
         }
         return update(cur);
+    }
+
+    public long getSessionTimeoutMs() {
+        return sessionTimeoutMs;
     }
 
     public interface Factory {

@@ -31,7 +31,7 @@ public class LocalAdminUser extends User {
     private static AtomicReference<models.LocalAdminUser> instance = new AtomicReference<>(null);
 
     LocalAdminUser(ApiClient api, String id, String name, String email, String fullName, List<String> permissions, String passwordHash, String tz) {
-        super(api, id, name, email, fullName, permissions, passwordHash, tz, true, false, null);
+        super(api, id, name, email, fullName, permissions, passwordHash, tz, true, false, null, 0);
     }
 
     public static void createSharedInstance(ApiClient api, String username, String passwordHash) {

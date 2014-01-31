@@ -45,6 +45,9 @@ public class UserResponse {
 
     public StartpageResponse startpage;
 
+    @SerializedName("session_timeout_ms")
+    public long sessionTimeoutMs;
+
     public Startpage getStartpage() {
         if (startpage == null || startpage.type == null || startpage.id == null) {
             return null;

@@ -66,6 +66,15 @@ public class RedirectAuthenticator extends Authenticator {
             // we redirect to a special controller, which won't try to load user.
             ctx.session().put("disconnected_orig_uri", ctx.request().uri());
             return redirect(routes.LonesomeInterfaceController.index());
+        } else {
+            // XMLHttpRequests should still get a 401 if the backend server couldn't authenticate, because the session
+            // has most likely expired.
+            // As such, the XHR code in the web interface should then redirect to /
+            final String xhr = ctx.request().getHeader("X-Requested-With");
+            if (xhr != null && xhr.equalsIgnoreCase("xmlhttprequest")) {
+                return status(Http.Status.UNAUTHORIZED);
+            }
+
         }
 		return redirect(controllers.routes.SessionsController.index());
 	}
