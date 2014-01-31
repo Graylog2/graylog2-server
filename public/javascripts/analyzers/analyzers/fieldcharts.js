@@ -152,7 +152,8 @@ $(document).ready(function() {
                         name: "value",
                         data: data.values,
                         color: '#26ADE4',
-                        gl2_query: opts.query
+                        gl2_query: opts.query,
+                        valuetype: opts.valuetype
                     } ]
                 });
 
@@ -173,7 +174,7 @@ $(document).ready(function() {
                     formatter: function(series, x, y) {
                         var date = '<span class="date">' + new Date(x * 1000).toString() + '</span>';
                         var swatch = '<span class="detail_swatch" style="background-color: ' + series.color + '"></span>';
-                        var content = swatch + '[' + opts.valuetype + '] ' + field + ': ' + parseInt(y) + '<br>' + date;
+                        var content = swatch + '[' + series.valuetype + '] ' + field + ': ' + parseInt(y) + '<br>' + date;
                         return content;
                     }
                 });
@@ -478,7 +479,8 @@ $(document).ready(function() {
             var addSeries = {
                 name: "value" + i,
                 color: lineColor,
-                gl2_query: query
+                gl2_query: query,
+                valuetype: draggedOpts.valuetype
             };
 
             addSeries["data"] = series.data;
