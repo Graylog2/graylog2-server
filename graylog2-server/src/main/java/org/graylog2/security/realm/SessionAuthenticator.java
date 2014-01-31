@@ -30,6 +30,8 @@ import org.graylog2.users.User;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.ws.rs.core.MultivaluedMap;
+
 public class SessionAuthenticator extends AuthenticatingRealm {
     private static final Logger log = LoggerFactory.getLogger(SessionAuthenticator.class);
 
@@ -65,7 +67,16 @@ public class SessionAuthenticator extends AuthenticatingRealm {
         if (log.isDebugEnabled()) {
             log.debug("Found session {} for user name {}", session.getId(), username);
         }
-        session.touch();
+
+        @SuppressWarnings("unchecked")
+        final MultivaluedMap<String, String> requestHeaders = (MultivaluedMap<String, String>) ThreadContext.get(
+                "REQUEST_HEADERS");
+        // extend session unless the relevant header was passed.
+        if (requestHeaders == null || !"true".equalsIgnoreCase(requestHeaders.getFirst("X-Graylog2-No-Session-Extension"))) {
+            session.touch();
+        } else {
+            log.debug("Not extending session because the request indicated not to.");
+        }
         ThreadContext.bind(subject);
 
         return new SimpleAccount(user.getName(), null, "session authenticator");

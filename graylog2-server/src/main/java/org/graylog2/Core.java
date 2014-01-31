@@ -47,6 +47,7 @@ import org.graylog2.inputs.InputRegistry;
 import org.graylog2.inputs.gelf.gelf.GELFChunkManager;
 import org.graylog2.jersey.container.netty.NettyContainer;
 import org.graylog2.metrics.jersey2.MetricsDynamicBinding;
+import org.graylog2.rest.RestAccessLogFilter;
 import org.graylog2.outputs.OutputRegistry;
 import org.graylog2.periodical.MongoDbMetricsReporter;
 import org.graylog2.plugin.GraylogServer;
@@ -378,7 +379,11 @@ public class Core implements GraylogServer, InputHost {
 
         ResourceConfig rc = new ResourceConfig()
                 .property(NettyContainer.PROPERTY_BASE_URI, configuration.getRestListenUri())
-                .registerClasses(MetricsDynamicBinding.class, JacksonPropertyExceptionMapper.class, AnyExceptionClassMapper.class, ShiroSecurityBinding.class)
+                .registerClasses(MetricsDynamicBinding.class,
+                                 JacksonPropertyExceptionMapper.class,
+                                 AnyExceptionClassMapper.class,
+                                 ShiroSecurityBinding.class,
+                                 RestAccessLogFilter.class)
                 .register(new Graylog2Binder())
                 .register(ObjectMapperProvider.class)
                 .register(JacksonJsonProvider.class)

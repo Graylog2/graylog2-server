@@ -19,6 +19,8 @@
  */
 package org.graylog2.rest.resources.users.requests;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 import java.util.List;
 
 /**
@@ -33,5 +35,7 @@ public class CreateRequest {
     public List<String> permissions;
     public String timezone;
     public StartpageSummary startpage;
+    @JsonProperty("sessionTimeoutMs")
+    public Long session_timeout_ms;
 
 }

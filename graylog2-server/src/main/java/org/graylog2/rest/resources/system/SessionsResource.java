@@ -33,6 +33,7 @@ import org.graylog2.rest.documentation.annotations.ApiOperation;
 import org.graylog2.rest.documentation.annotations.ApiParam;
 import org.graylog2.rest.resources.RestResource;
 import org.graylog2.security.ShiroSecurityContext;
+import org.graylog2.users.User;
 import org.joda.time.DateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -75,8 +76,14 @@ public class SessionsResource extends RestResource {
 
         try {
             subject.login(new UsernamePasswordToken(createRequest.username, createRequest.password));
-            // TODO make this configurable
-            subject.getSession().setTimeout(TimeUnit.HOURS.toMillis(8));
+            final User user = User.load(createRequest.username, core);
+            if (user != null) {
+                long timeoutInMillis = user.getSessionTimeoutMs();
+                subject.getSession().setTimeout(timeoutInMillis);
+            } else {
+                // set a sane default. really we should be able to load the user from above.
+                subject.getSession().setTimeout(TimeUnit.HOURS.toMillis(8));
+            }
             subject.getSession().touch();
 
             // save subject in session, otherwise we can't get the username back in subsequent requests.
@@ -91,6 +98,7 @@ public class SessionsResource extends RestResource {
             final org.apache.shiro.session.Session session = subject.getSession();
             id = session.getId();
             result.sessionId = id.toString();
+            // TODO is this even used by anyone yet?
             result.validUntil = new DateTime(session.getLastAccessTime()).plus(session.getTimeout()).toDate();
             return result;
         }
