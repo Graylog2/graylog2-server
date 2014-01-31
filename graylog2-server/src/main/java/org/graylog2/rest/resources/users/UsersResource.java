@@ -189,8 +189,10 @@ public class UsersResource extends RestResource {
         if (cr.startpage != null) {
             user.setStartpage(cr.startpage.type, cr.startpage.id);
         }
-        if (cr.session_timeout_ms != 0) {
-            user.setSessionTimeoutMs(cr.session_timeout_ms);
+        if (isPermitted("*")) {
+            if (cr.session_timeout_ms != 0) {
+                user.setSessionTimeoutMs(cr.session_timeout_ms);
+            }
         }
         try {
             // TODO JPA this is wrong, the primary key is the username
