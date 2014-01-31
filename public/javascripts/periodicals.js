@@ -367,8 +367,8 @@ $(document).ready(function() {
                         if (!$("#notification-badge").data("bouncing")) {
                             var bouncer = setInterval(function() {
                                 if ($("#notification-badge").data("bouncing"))
-                                    $("#notification-badge").effect("bounce")
-                            }, 2000);
+                                    $("#notification-badge").effect("fade", "fast")
+                            }, 250);
 
                             $("#notification-badge").data("bouncing", bouncer);
                         }
