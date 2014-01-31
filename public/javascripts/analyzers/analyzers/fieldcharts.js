@@ -129,7 +129,7 @@ $(document).ready(function() {
                 lines.push(JSON.stringify(opts));
                 template.attr("data-lines", lines);
 
-                $(".type-description", template).text("(" + opts.valuetype + ")");
+                $(".type-description", template).text("[" + opts.valuetype + "] " + opts.field + ", ");
 
                 if(opts.pinned) {
                     $(".pin", template).hide();
@@ -153,7 +153,8 @@ $(document).ready(function() {
                         data: data.values,
                         color: '#26ADE4',
                         gl2_query: opts.query,
-                        valuetype: opts.valuetype
+                        valuetype: opts.valuetype,
+                        field: opts.field
                     } ]
                 });
 
@@ -458,7 +459,6 @@ $(document).ready(function() {
         var draggedOpts = JSON.parse(draggedElem.attr("data-lines"));
 
         // Update title and description.
-        $(".type-description", targetElem).hide();
         $(".title", targetElem).text("Combined chart");
 
         for (var i = 0; i < draggedChart.series.length; i++) {
@@ -472,6 +472,7 @@ $(document).ready(function() {
 
             // Add query to query list of chart.
             var queryDescription = "<div class='field-graph-query-color' style='background-color: " + lineColor + ";'></div> "
+                + "<span class=\"type-description\">[" + htmlEscape(series.valuetype) + "] " + series.field + ", </span> "
                 + "Query: <span class='field-graph-query'>" + htmlEscape(query) + "</span>";
 
             $("ul.field-graph-query-container", targetElem).append("<li>" + queryDescription + "</li>");
@@ -480,7 +481,8 @@ $(document).ready(function() {
                 name: "value" + i,
                 color: lineColor,
                 gl2_query: query,
-                valuetype: draggedOpts.valuetype
+                valuetype: series.valuetype,
+                field: series.field
             };
 
             addSeries["data"] = series.data;
