@@ -148,6 +148,7 @@ $(document).ready(function() {
                     height: 175,
                     interpolation: opts.interpolation,
                     renderer: opts.renderer,
+
                     series: [ {
                         name: "value",
                         data: data.values,
@@ -191,10 +192,6 @@ $(document).ready(function() {
                 if (opts.renderer == "area") {
                     graph.renderer.stroke = true;
                 }
-
-                // TODO make this a graph options. what to choose by default? #471
-                graph.renderer.unstack = false;
-
 
                 graph.render();
 
@@ -490,8 +487,7 @@ $(document).ready(function() {
             targetChart.series.push(addSeries);
         }
 
-        // TODO make this a graph options. what to choose by default? #471
-        targetChart.renderer.unstack = false;
+        targetChart.renderer.unstack = true;
 
         $(".hide-combined-chart", targetElem).hide();
 
