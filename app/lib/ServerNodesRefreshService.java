@@ -36,6 +36,8 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
+import static lib.Configuration.apiTimeout;
+
 @Singleton
 public class ServerNodesRefreshService {
     private static final Logger log = LoggerFactory.getLogger(ServerNodesRefreshService.class);
@@ -92,7 +94,7 @@ public class ServerNodesRefreshService {
                         .path("/system/cluster/node")
                         .nodes(configuredNodes)
                         .unauthenticated()
-                        .timeout(2, TimeUnit.SECONDS)
+                        .timeout(apiTimeout("node_refresh", 2, TimeUnit.SECONDS))
                         .executeOnAll();
         List<Node> resolvedNodes = Lists.newArrayList();
         for (Map.Entry<Node, NodeSummaryResponse> nsr : responses.entrySet()) {

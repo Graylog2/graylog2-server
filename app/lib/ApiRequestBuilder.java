@@ -70,7 +70,9 @@ public interface ApiRequestBuilder<T> {
 
     ApiRequestBuilder<T> expect(int... httpStatusCodes);
 
-    ApiRequestBuilder<T> timeout(int value, TimeUnit unit);
+    ApiRequestBuilder<T> timeout(long value);
+
+    ApiRequestBuilder<T> timeout(long value, TimeUnit unit);
 
     ApiRequestBuilder<T> accept(MediaType mediaType);
 

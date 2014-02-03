@@ -28,6 +28,9 @@ import models.api.responses.SourcesResponse;
 import java.io.IOException;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
+
+import static lib.Configuration.apiTimeout;
 
 /**
  * @author Lennart Koopmann <lennart@torch.sh>
@@ -44,7 +47,10 @@ public class SourcesService {
     public List<Source> all() throws APIException, IOException {
         List<Source> list = Lists.newArrayList();
 
-        SourcesResponse response = api.get(SourcesResponse.class).path("/sources").execute();
+        SourcesResponse response = api.get(SourcesResponse.class)
+                .path("/sources")
+                .timeout(apiTimeout("sources_all", 20, TimeUnit.SECONDS))
+                .execute();
 
         for (Map.Entry<String, Long> source : response.sources.entrySet()) {
             list.add(new Source(source.getKey(), source.getValue()));

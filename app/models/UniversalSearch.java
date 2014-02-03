@@ -38,6 +38,8 @@ import javax.annotation.Nullable;
 import java.io.IOException;
 import java.util.concurrent.TimeUnit;
 
+import static lib.Configuration.apiTimeout;
+
 public class UniversalSearch {
     private static final Logger log = LoggerFactory.getLogger(UniversalSearch.class);
 
@@ -146,7 +148,7 @@ public class UniversalSearch {
                 .queryParam("query", query)
                 .queryParams(timeRange.getQueryParams())
                 .queryParam("filter", (filter == null ? "*" : filter))
-                .timeout(KEITH, TimeUnit.SECONDS)
+                .timeout(apiTimeout("search_universal_histogram", KEITH, TimeUnit.SECONDS))
                 .execute();
         return new DateHistogramResult(response.query, response.time, response.interval, response.results);
     }
@@ -158,7 +160,7 @@ public class UniversalSearch {
                 .queryParam("query", query)
                 .queryParams(timeRange.getQueryParams())
                 .queryParam("filter", (filter == null ? "*" : filter))
-                .timeout(KEITH, TimeUnit.SECONDS)
+                .timeout(apiTimeout("search_universal_stats", KEITH, TimeUnit.SECONDS))
                 .execute();
     }
 
@@ -169,7 +171,7 @@ public class UniversalSearch {
                 .queryParam("query", query)
                 .queryParams(timeRange.getQueryParams())
                 .queryParam("filter", (filter == null ? "*" : filter))
-                .timeout(KEITH, TimeUnit.SECONDS)
+                .timeout(apiTimeout("search_universal_terms", KEITH, TimeUnit.SECONDS))
                 .execute();
     }
 
@@ -181,7 +183,7 @@ public class UniversalSearch {
                 .queryParam("query", query)
                 .queryParams(timeRange.getQueryParams())
                 .queryParam("filter", (filter == null ? "*" : filter))
-                .timeout(KEITH, TimeUnit.SECONDS)
+                .timeout(apiTimeout("search_universal_fieldhistogram", KEITH, TimeUnit.SECONDS))
                 .execute();
     }
 
