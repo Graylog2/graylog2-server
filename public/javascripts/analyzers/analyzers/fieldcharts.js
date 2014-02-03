@@ -298,6 +298,8 @@ $(document).ready(function() {
             graph.renderer.stroke = true;
         }
 
+        graph.renderer.unstack = true;
+
         graph.render();
 
         // Is this chart pinned? We need to update it's settings then.
@@ -493,6 +495,7 @@ $(document).ready(function() {
 
         // Reflect all the chart changes we made.
         targetChart.update();
+        targetChart.render();
     }
 
     // Load all pinned charts
