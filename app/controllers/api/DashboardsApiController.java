@@ -74,6 +74,28 @@ public class DashboardsApiController extends AuthenticatedController {
         }
     }
 
+    public Result listWritable() {
+        try {
+            Map<String, Object> result = Maps.newHashMap();
+            for (Dashboard d : dashboardService.getAllWritable(currentUser())) {
+                Map<String, String> dashboard = Maps.newHashMap();
+
+                dashboard.put("title", d.getTitle());
+                dashboard.put("description", d.getDescription());
+                dashboard.put("created_by", d.getCreatorUser().getName());
+
+                result.put(d.getId(), dashboard);
+            }
+
+            return ok(new Gson().toJson(result)).as("application/json");
+        } catch (APIException e) {
+            String message = "Could not get dashboards. We expected HTTP 200, but got a HTTP " + e.getHttpCode() + ".";
+            return status(504, views.html.errors.error.render(message, e, request()));
+        } catch (IOException e) {
+            return status(504, views.html.errors.error.render(ApiClient.ERROR_MSG_IO, e, request()));
+        }
+    }
+
     public Result setWidgetPositions(String dashboardId) {
         JsonNode request = request().body().asJson();
         ObjectMapper mapper = new ObjectMapper();

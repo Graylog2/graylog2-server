@@ -1,8 +1,8 @@
 $(document).ready(function() {
 
-    // Load all dashboards in the global registry first.
+    // Load all writable dashboards in the global registry first.
     $.ajax({
-        url: '/a/dashboards',
+        url: '/a/dashboards/writable',
         success: function(data) {
             globalDashboards = data;
             applyDashboardsToAllSelectors();

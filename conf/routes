@@ -182,6 +182,7 @@ GET         /a/connection/available                                             
 
 # API: Dashboards
 GET         /a/dashboards                                                            @controllers.api.DashboardsApiController.index()
+GET         /a/dashboards/writable                                                   @controllers.api.DashboardsApiController.listWritable()
 POST        /a/dashboards/:id/positions                                              @controllers.api.DashboardsApiController.setWidgetPositions(id: String)
 GET         /a/dashboards/:dashboard_id/widgets/:widget_id/value                     @controllers.api.DashboardsApiController.widgetValue(dashboard_id: String, widget_id: String)
 POST        /a/dashboards/:dashboard_id/widgets                                      @controllers.api.DashboardsApiController.addWidget(dashboard_id: String)

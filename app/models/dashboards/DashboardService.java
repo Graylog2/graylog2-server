@@ -23,10 +23,13 @@ import com.google.common.collect.Lists;
 import com.google.inject.Inject;
 import lib.APIException;
 import lib.ApiClient;
+import lib.security.RestPermissions;
+import models.User;
 import models.api.requests.dashboards.CreateDashboardRequest;
 import models.api.responses.dashboards.DashboardSummaryResponse;
 import models.api.responses.dashboards.GetDashboardsResponse;
 import play.mvc.Http;
+import views.helpers.Permissions;
 
 import java.io.IOException;
 import java.util.List;
@@ -70,6 +73,18 @@ public class DashboardService {
         }
 
         return dashboards;
+    }
+
+    public List<Dashboard> getAllWritable(User user) throws APIException, IOException {
+        List<Dashboard> writable = Lists.newArrayList();
+
+        for(Dashboard dashboard : getAll()) {
+            if (Permissions.isPermitted(user, RestPermissions.DASHBOARDS_EDIT, dashboard.getId())) {
+                writable.add(dashboard);
+            }
+        }
+
+        return writable;
     }
 
     public void create(CreateDashboardRequest request) throws APIException, IOException {
