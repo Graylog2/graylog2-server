@@ -23,6 +23,18 @@
         <a href="#built-query" class="pull-right" role="button" data-toggle="modal" data-backdrop="true"><i class="icon-bug"></i></a>
     </p>
 
+    <p>
+    <h4>
+        0 messages found.
+
+        @if(stream == null) {
+            @views.html.partials.dashboards.add_to_dashboard.render("search_result_count", null)
+        } else {
+            @views.html.partials.dashboards.add_to_dashboard.render("stream_search_result_count", Array("data-stream-id='" + stream.getId + "'"))
+        }
+    </h4>
+    </p>
+
     @views.html.partials.support_sources()
 
     <div id="built-query" class="modal hide fade" tabindex="-1" role="dialog">
