@@ -125,6 +125,8 @@ public class Global extends GlobalSettings {
             @Override
             protected void configure() {
                 bind(URI[].class).annotatedWith(Names.named("Initial Nodes")).toInstance(initialNodes);
+                bind(Long.class).annotatedWith(Names.named("Default Timeout"))
+                        .toInstance(lib.Configuration.apiTimeout("DEFAULT"));
             }
         });
         modules.add(new ModelFactoryModule());

@@ -27,6 +27,7 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import com.google.inject.name.Named;
 import com.ning.http.client.*;
 import models.*;
 import models.api.requests.ApiRequest;
@@ -51,11 +52,13 @@ class ApiClientImpl implements ApiClient {
 
     private AsyncHttpClient client;
     private final ServerNodes serverNodes;
+    private final Long defaultTimeout;
     private Thread shutdownHook;
 
     @Inject
-    private ApiClientImpl(ServerNodes serverNodes) {
+    private ApiClientImpl(ServerNodes serverNodes, @Named("Default Timeout") Long defaultTimeout) {
         this.serverNodes = serverNodes;
+        this.defaultTimeout = defaultTimeout;
     }
 
     @Override
@@ -157,7 +160,7 @@ class ApiClientImpl implements ApiClient {
         private final ArrayList<F.Tuple<String, String>> queryParams = Lists.newArrayList();
         private Set<Integer> expectedResponseCodes = Sets.newHashSet();
         private TimeUnit timeoutUnit = TimeUnit.MILLISECONDS;
-        private long timeoutValue = Configuration.apiTimeout("DEFAULT");
+        private long timeoutValue = defaultTimeout;
         private boolean unauthenticated = false;
         private MediaType mediaType = MediaType.JSON_UTF_8;
         private String sessionId;

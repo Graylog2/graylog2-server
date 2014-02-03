@@ -37,6 +37,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.UUID;
+import java.util.concurrent.TimeUnit;
 
 public class BaseApiTest {
     protected ApiClient api;
@@ -51,6 +52,7 @@ public class BaseApiTest {
             @Override
             protected void configure() {
                 bind(URI[].class).annotatedWith(Names.named("Initial Nodes")).toInstance(initialNodes.toArray(new URI[initialNodes.size()]));
+                bind(Long.class).annotatedWith(Names.named("Default Timeout")).toInstance(TimeUnit.SECONDS.toMillis(5));
             }
         });
         return Guice.createInjector(modules);
