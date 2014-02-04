@@ -29,17 +29,16 @@ import org.graylog2.indexer.IndexHelper;
 import org.graylog2.indexer.results.TermsResult;
 import org.graylog2.indexer.searches.timeranges.InvalidRangeParametersException;
 import org.graylog2.indexer.searches.timeranges.RelativeRange;
+import org.graylog2.indexer.searches.timeranges.TimeRange;
 import org.graylog2.rest.documentation.annotations.Api;
 import org.graylog2.rest.documentation.annotations.ApiOperation;
+import org.graylog2.rest.documentation.annotations.ApiParam;
 import org.graylog2.rest.resources.RestResource;
 import org.graylog2.security.RestPermissions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.ws.rs.GET;
-import javax.ws.rs.Path;
-import javax.ws.rs.Produces;
-import javax.ws.rs.WebApplicationException;
+import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 import java.util.Map;
 import java.util.concurrent.Callable;
@@ -57,7 +56,7 @@ public class SourcesResource extends RestResource {
 
     private static final Logger LOG = LoggerFactory.getLogger(SourcesResource.class);
 
-    private static final String CACHE_KEY = "sources_list";
+    private static final String BASE_CACHE_KEY = "sources_list_all-";
 
     private static final Cache<String, TermsResult> cache = CacheBuilder.newBuilder()
             .maximumSize(1)
@@ -65,20 +64,26 @@ public class SourcesResource extends RestResource {
             .build();
 
     @GET @Timed
-    @ApiOperation(value = "Get a list of all sources (not more than 5000) that have messages in the current indices." +
+    @ApiOperation(value = "Get a list of sources (not more than 5000) that have messages in the current indices." +
             "The result is cached for 10 seconds.")
     @Produces(MediaType.APPLICATION_JSON)
-    public String list() {
+    public String list(@ApiParam(title = "all", description = "Get all sources or only those of last day? (true/false)", required = true) @QueryParam("all") boolean all) {
         TermsResult sources;
+
+        final int tr;
+        if (!all) {
+            tr = (int) TimeUnit.SECONDS.convert(1, TimeUnit.DAYS);
+        } else {
+            tr = 0;
+        }
+
         try {
-            sources = cache.get(CACHE_KEY, new Callable<TermsResult>() {
+            sources = cache.get(BASE_CACHE_KEY + all, new Callable<TermsResult>() {
                 @Override
                 public TermsResult call() throws Exception {
                     try {
-                        return core.getIndexer().searches().terms("source", 5000, "*", new RelativeRange(0));
+                        return core.getIndexer().searches().terms("source", 5000, "*", new RelativeRange(tr));
                     } catch (IndexHelper.InvalidRangeFormatException e) {
-                        throw new ExecutionException(e);
-                    } catch (InvalidRangeParametersException e) {
                         throw new ExecutionException(e);
                     }
                 }
