@@ -27,6 +27,7 @@ import com.google.inject.Inject;
 import controllers.AuthenticatedController;
 import lib.APIException;
 import lib.ApiClient;
+import lib.security.RestPermissions;
 import lib.timeranges.InvalidRangeParametersException;
 import lib.timeranges.TimeRange;
 import models.api.requests.dashboards.UserSetWidgetPositionsRequest;
@@ -36,6 +37,7 @@ import models.NodeService;
 import models.dashboards.widgets.*;
 import play.Logger;
 import play.mvc.Result;
+import views.helpers.Permissions;
 
 import java.io.IOException;
 import java.util.HashMap;
@@ -172,6 +174,7 @@ public class DashboardsApiController extends AuthenticatedController {
                         widget = new SearchResultCountWidget(dashboard, query, timerange, description);
                         break;
                     case STREAM_SEARCH_RESULT_COUNT:
+                        if (!canReadStream(streamId)) return unauthorized();
                         widget = new StreamSearchResultCountWidget(dashboard, query, timerange, description, streamId);
                         break;
                     case FIELD_CHART:
@@ -182,10 +185,12 @@ public class DashboardsApiController extends AuthenticatedController {
                             put("interpolation", params.get("interpolation"));
                             put("interval", params.get("interval"));
                         }};
+                        if (!canReadStream(streamId)) return unauthorized();
 
                         widget = new FieldChartWidget(dashboard, query, timerange, description, streamId, config);
                         break;
                     case QUICKVALUES:
+                        if (!canReadStream(streamId)) return unauthorized();
                         widget = new QuickvaluesWidget(dashboard, query, timerange, params.get("field"), description, streamId);
                         break;
                     default:
@@ -205,6 +210,11 @@ public class DashboardsApiController extends AuthenticatedController {
         } catch (IOException e) {
             return status(504, views.html.errors.error.render(ApiClient.ERROR_MSG_IO, e, request()));
         }
+    }
+
+    private boolean canReadStream(String streamId) {
+        if (streamId == null) return true;
+        return Permissions.isPermitted(RestPermissions.STREAMS_READ, streamId);
     }
 
     public Result removeWidget(String dashboardId, String widgetId) {
