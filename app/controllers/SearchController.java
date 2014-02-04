@@ -46,6 +46,10 @@ public class SearchController extends AuthenticatedController {
     @Inject
     protected SavedSearchService savedSearchService;
 
+    public Result globalSearch() {
+        return ok(views.html.search.global.render(currentUser()));
+    }
+
     public Result index(String q, String rangeType, int relative, String from, String to, String keyword, String interval, int page, String savedSearchId, String sortField, String sortOrder) {
         SearchSort sort = buildSearchSort(sortField, sortOrder);
 

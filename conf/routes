@@ -11,7 +11,10 @@ GET         /logout                                                             
 GET         /disconnected                                                            @controllers.LonesomeInterfaceController.index()
 
 # Home page
-GET         /                                                                        @controllers.StartpageController.redirect()
+GET         /                                                                        @controllers.SearchController.globalSearch()
+
+# Redirect for personal startpage.
+GET         /startpage                                                               @controllers.StartpageController.redirect()
 
 # Search
 GET         /search                                                                  @controllers.SearchController.index(q ?= "", rangetype ?= "", relative:Integer ?= -1, from ?= "", to ?= "", keyword ?= "", interval ?= "", page:Integer ?= 1, saved:String ?= "", sortField:String ?= "", sortOrder:String ?= "")

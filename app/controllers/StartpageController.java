@@ -39,7 +39,7 @@ public class StartpageController extends AuthenticatedController {
 
         Call call;
         if (startpage == null || startpage.getCall() == null) {
-            call = routes.SystemController.index(0);
+            call = routes.SearchController.globalSearch();
         } else {
             call = startpage.getCall();
         }
@@ -66,7 +66,7 @@ public class StartpageController extends AuthenticatedController {
                 redirectTarget = routes.DashboardsController.index();
                 break;
             default:
-                redirectTarget = routes.SystemController.index(0);
+                redirectTarget = routes.SearchController.globalSearch();
         }
 
         return redirect(redirectTarget);

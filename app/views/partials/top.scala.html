@@ -4,10 +4,10 @@
 <div id="top" class="navbar navbar-fixed-top">
  	<div class="container-fluid">
 	  	<div class="row-fluid">
-	  		<a href="/"><img src="@routes.Assets.at("images/toplogo.png")" id="toplogo" /></a>
+	  		<a href="@routes.SearchController.globalSearch()"><img src="@routes.Assets.at("images/toplogo.png")" id="toplogo" /></a>
 	  		
 	  		<ul id="topmenu">
-	  			<li><a href="/">Home</a></li>
+	  			<li><a href="@routes.SearchController.globalSearch()">Search</a></li>
 	  			<li><a href="@routes.StreamsController.index()">Streams</a></li>
                 <li><a href="@routes.DashboardsController.index()">Dashboards</a></li>
 
