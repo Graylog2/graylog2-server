@@ -29,4 +29,6 @@ public class SourcesResponse {
     public int total;
     public Map<String, Long> sources;
 
+    public int range;
+
 }

@@ -44,11 +44,12 @@ public class SourcesService {
         this.api = api;
     }
 
-    public List<Source> all() throws APIException, IOException {
+    public List<Source> all(int range) throws APIException, IOException {
         List<Source> list = Lists.newArrayList();
 
         SourcesResponse response = api.get(SourcesResponse.class)
                 .path("/sources")
+                .queryParam("range", range)
                 .timeout(apiTimeout("sources_all", 20, TimeUnit.SECONDS))
                 .execute();
 

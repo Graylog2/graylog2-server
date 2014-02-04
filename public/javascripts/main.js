@@ -547,6 +547,11 @@ $(document).ready(function() {
         $(this).css("cursor", "auto");
     });
 
+    $(".sources-range").on("change", function() {
+        var loc = new URI(window.location);
+        loc.setQuery("range", $(this).val());
+        window.location.href = loc.href();
+    });
     $(".sources").dynatable({
         inputs: {
             perPageText: "Per page: "
