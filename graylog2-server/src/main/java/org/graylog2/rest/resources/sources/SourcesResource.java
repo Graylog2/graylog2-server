@@ -29,17 +29,13 @@ import org.graylog2.indexer.IndexHelper;
 import org.graylog2.indexer.results.TermsResult;
 import org.graylog2.indexer.searches.timeranges.InvalidRangeParametersException;
 import org.graylog2.indexer.searches.timeranges.RelativeRange;
-import org.graylog2.rest.documentation.annotations.Api;
-import org.graylog2.rest.documentation.annotations.ApiOperation;
+import org.graylog2.rest.documentation.annotations.*;
 import org.graylog2.rest.resources.RestResource;
 import org.graylog2.security.RestPermissions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.ws.rs.GET;
-import javax.ws.rs.Path;
-import javax.ws.rs.Produces;
-import javax.ws.rs.WebApplicationException;
+import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 import java.util.Map;
 import java.util.concurrent.Callable;
@@ -65,17 +61,27 @@ public class SourcesResource extends RestResource {
             .build();
 
     @GET @Timed
-    @ApiOperation(value = "Get a list of all sources (not more than 5000) that have messages in the current indices." +
-            "The result is cached for 10 seconds.")
+    @ApiOperation(
+            value = "Get a list of all sources (not more than 5000) that have messages in the current indices. " +
+                    "The result is cached for 10 seconds.",
+            notes = "Range: The parameter is in seconds relative to the current time. 86400 means 'in the last day'," +
+                    "0 is special and means 'across all indices'")
+    @ApiResponses(value = {
+            @ApiResponse(code = 400, message = "Invalid range parameter provided.")
+    })
+
     @Produces(MediaType.APPLICATION_JSON)
-    public String list() {
+    public String list(
+            @ApiParam(title = "range", description = "Relative timeframe to search in. See method description.", required = true)
+            @QueryParam("range")
+            final int range) {
         TermsResult sources;
         try {
-            sources = cache.get(CACHE_KEY, new Callable<TermsResult>() {
+            sources = cache.get(CACHE_KEY + range, new Callable<TermsResult>() {
                 @Override
                 public TermsResult call() throws Exception {
                     try {
-                        return core.getIndexer().searches().terms("source", 5000, "*", new RelativeRange(0));
+                        return core.getIndexer().searches().terms("source", 5000, "*", new RelativeRange(range));
                     } catch (IndexHelper.InvalidRangeFormatException e) {
                         throw new ExecutionException(e);
                     } catch (InvalidRangeParametersException e) {
@@ -84,14 +90,20 @@ public class SourcesResource extends RestResource {
                 }
             });
         } catch (ExecutionException e) {
-            LOG.error("Could not calculate list of sources.", e);
-            throw new WebApplicationException(500);
+            if (e.getCause() instanceof InvalidRangeParametersException) {
+                LOG.error("Invalid relative time range value.", e);
+                throw new BadRequestException("Invalid time range " + range);
+            } else {
+                LOG.error("Could not calculate list of sources.", e);
+                throw new WebApplicationException(500);
+            }
         }
 
         Map<String, Object> result = Maps.newHashMap();
         result.put("total", sources.getTerms().size());
         result.put("sources", sources.getTerms());
         result.put("took_ms", sources.took().millis());
+        result.put("range", range);
 
         return json(result);
     }
