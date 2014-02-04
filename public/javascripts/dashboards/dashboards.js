@@ -10,6 +10,10 @@ $(document).ready(function() {
     });
 
     if ($(".gridster").size() > 0){
+        /* ducksboard/gridster.js#147 Hotfix - Part 1 */
+        var items = $(".gridster ul li");
+        items.detach();
+
         dashboardGrid = $(".gridster ul").gridster({
             widget_margins: [10, 10],
             widget_base_dimensions: [400, 150],
@@ -49,6 +53,16 @@ $(document).ready(function() {
                 }
             }
         }).data('gridster').disable();
+
+        /* ducksboard/gridster.js#147 Hotfix - Part 2 */
+        $.each(items , function (i, e) {
+            var item = $(this);
+            var columns = parseInt(item.attr("data-sizex"));
+            var rows = parseInt(item.attr("data-sizey"));
+            var col = parseInt(item.attr("data-col"));
+            var row = parseInt(item.attr("data-row"));
+            dashboardGrid.add_widget(item, columns, rows, col, row);
+        });
     }
 
     function applyDashboardsToAllSelectors() {
