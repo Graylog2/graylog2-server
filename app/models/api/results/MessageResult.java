@@ -19,11 +19,13 @@
  */
 package models.api.results;
 
+import com.google.common.base.Predicate;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import org.joda.time.DateTime;
 
+import javax.annotation.Nullable;
 import java.text.DecimalFormat;
 import java.util.*;
 
@@ -103,16 +105,13 @@ public class MessageResult {
     }
 
     public Map<String, Object> getFilteredFields() {
-        Map<String, Object> result = Maps.newHashMap();
-
-        for(Map.Entry<String, Object> entry : getFields().entrySet()) {
-            if(HIDDEN_FIELDS.contains(entry.getKey()))
-                continue;
-
-            result.put(entry.getKey(), entry.getValue());
-        }
-
-        return result;
+        // return a _view_ of the fields map, do not make a copy, because subsequent manipulation would get lost!
+        return Maps.filterEntries(getFields(), new Predicate<Map.Entry<String, Object>>() {
+            @Override
+            public boolean apply(@Nullable Map.Entry<String, Object> input) {
+                return !HIDDEN_FIELDS.contains(input.getKey());
+            }
+        });
     }
 
     public Map<String, Object> getFields() {
@@ -120,23 +119,20 @@ public class MessageResult {
     }
 
     public Map<String, Object> getFormattedFields() {
-        Map<String, Object> formatted = Maps.newHashMap();
         final DecimalFormat doubleFormatter = new DecimalFormat("#");
-        for (Map.Entry<String, Object> field : getFilteredFields().entrySet()) {
-            String key = field.getKey();
-            Object value = field.getValue();
 
-            // Get rid of .0 of doubles. 9001.0 becomes "9001", 9001.25 becomes "9001.25"
-            // Never format a double in scientific notation.
-            if(value instanceof Double) {
-                Double d = (Double) value;
-                value = (d.longValue() == d ? Long.toString(d.longValue()) : doubleFormatter.format(d));
+        return Maps.transformEntries(getFilteredFields(), new Maps.EntryTransformer<String, Object, Object>() {
+            @Override
+            public Object transformEntry(@Nullable String key, @Nullable Object value) {
+                // Get rid of .0 of doubles. 9001.0 becomes "9001", 9001.25 becomes "9001.25"
+                // Never format a double in scientific notation.
+                if(value instanceof Double) {
+                    Double d = (Double) value;
+                    value = (d.longValue() == d ? Long.toString(d.longValue()) : doubleFormatter.format(d));
+                }
+                return value;
             }
-
-            formatted.put(key, value);
-        }
-
-        return formatted;
+        });
     }
 
     public String getIndex() {
