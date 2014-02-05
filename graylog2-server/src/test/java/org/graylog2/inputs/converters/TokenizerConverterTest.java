@@ -152,5 +152,18 @@ public class TokenizerConverterTest {
 
         assertTrue(result.get("_id") != "123");
     }
+    
+    @Test
+    public void testDifferentDelimiter() {
+    	HashMap<String,Object> config = new HashMap<String,Object>();
+    	config.put("delimiter", ':');
+    	
+    	TokenizerConverter f = new TokenizerConverter(config);
+    	Map<String,String> result = (Map<String, String>) f.convert("happy otters k1:v1 k2: v2");
+    	
+    	assertEquals(2, result.size());
+    	assertEquals("v1", result.get("k1"));
+    	assertEquals("v2", result.get("k2"));
+    }
 
 }
