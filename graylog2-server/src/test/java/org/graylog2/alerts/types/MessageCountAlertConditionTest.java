@@ -26,20 +26,17 @@ import org.graylog2.indexer.IndexHelper;
 import org.graylog2.indexer.results.CountResult;
 import org.graylog2.indexer.searches.timeranges.TimeRange;
 import org.graylog2.plugin.Tools;
-import org.junit.Test;
-import org.junit.runner.RunWith;
 import org.powermock.core.classloader.annotations.PrepareForTest;
-import org.powermock.modules.junit4.PowerMockRunner;
+import org.testng.annotations.Test;
 
 import java.util.Map;
 
-import static org.junit.Assert.*;
 import static org.mockito.Mockito.*;
+import static org.testng.AssertJUnit.*;
 
 /**
  * @author Dennis Oelkers <dennis@torch.sh>
  */
-@RunWith(PowerMockRunner.class)
 @PrepareForTest(Alert.class)
 public class MessageCountAlertConditionTest extends AlertConditionTest {
     protected final int threshold = 100;

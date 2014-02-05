@@ -20,13 +20,15 @@
 
 package org.graylog2.blacklists;
 
-import java.util.ArrayList;
-import org.junit.Test;
-import static org.junit.Assert.*;
+import org.testng.annotations.Test;
 
+import java.util.ArrayList;
+
+import static org.testng.AssertJUnit.*;
+
+@Test
 public class BlacklistCacheTest {
 
-    @Test
     public void testGetInstance() {
         // First call should create instance.
         assertNotNull(BlacklistCache.getInstance());
@@ -35,7 +37,6 @@ public class BlacklistCacheTest {
         assertNotNull(BlacklistCache.getInstance());
     }
 
-    @Test
     public void testSetAndGet() {
         BlacklistCache.getInstance().set(new ArrayList<Blacklist>());
         BlacklistCache.getInstance().get();

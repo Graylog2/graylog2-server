@@ -21,7 +21,7 @@ package org.graylog2.inputs.converters;
 
 import org.graylog2.inputs.converters.SyslogPriFacilityConverter;
 import org.graylog2.plugin.inputs.Converter;
-import org.junit.Test;
+import org.testng.annotations.Test;
 
 import java.util.HashMap;
 

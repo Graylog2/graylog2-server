@@ -19,8 +19,8 @@
 package org.graylog2.security;
 
 import org.apache.commons.codec.binary.Hex;
-import org.junit.Assert;
-import org.junit.Test;
+import org.testng.Assert;
+import org.testng.annotations.Test;
 
 import java.security.SecureRandom;
 
@@ -32,7 +32,7 @@ public class AESToolsTest {
         new SecureRandom().nextBytes(iv);
         final String encrypt = AESTools.encrypt("I am secret", "1234567890123456", Hex.encodeHexString(iv));
         final String decrypt = AESTools.decrypt(encrypt, "1234567890123456", Hex.encodeHexString(iv));
-        Assert.assertEquals("I am secret", decrypt);
+        Assert.assertEquals(decrypt, "I am secret");
     }
 
 }

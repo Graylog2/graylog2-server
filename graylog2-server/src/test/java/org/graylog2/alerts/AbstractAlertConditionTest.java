@@ -20,13 +20,12 @@
 package org.graylog2.alerts;
 
 import org.graylog2.plugin.Tools;
-import org.junit.Before;
-import org.junit.Test;
+import org.testng.annotations.BeforeClass;
+import org.testng.annotations.Test;
 
 import java.util.Map;
 
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.testng.AssertJUnit.*;
 
 /**
  * @author Dennis Oelkers <dennis@torch.sh>
@@ -37,7 +36,7 @@ public class AbstractAlertConditionTest extends AlertConditionTest {
     final protected int time = 10;
 
     @Override
-    @Before
+    @BeforeClass
     public void setUp() throws Exception {
         super.setUp();
         alertCondition = getDummyAlertCondition(getParametersMap(grace, time, 0));

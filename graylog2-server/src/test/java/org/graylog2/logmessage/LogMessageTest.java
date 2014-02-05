@@ -23,12 +23,12 @@ package org.graylog2.logmessage;
 import org.graylog2.plugin.Message;
 import org.graylog2.plugin.Tools;
 import org.joda.time.DateTime;
-import org.junit.Test;
+import org.testng.annotations.Test;
 
 import java.util.HashMap;
 import java.util.Map;
 
-import static org.junit.Assert.*;
+import static org.testng.AssertJUnit.*;
 
 public class LogMessageTest {
 

@@ -25,35 +25,38 @@ import org.graylog2.indexer.Indexer;
 import org.graylog2.indexer.searches.Searches;
 import org.graylog2.plugin.Tools;
 import org.graylog2.plugin.streams.Stream;
-import org.junit.Before;
-import org.junit.runner.RunWith;
+import org.joda.time.DateTime;
 import org.powermock.api.mockito.PowerMockito;
 import org.powermock.core.classloader.annotations.PrepareForTest;
-import org.powermock.modules.junit4.PowerMockRunner;
+import org.powermock.modules.testng.PowerMockTestCase;
+import org.testng.annotations.BeforeClass;
 
 import java.util.Map;
 
-import static org.junit.Assert.*;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
+import static org.testng.AssertJUnit.*;
 
 /**
  * @author Dennis Oelkers <dennis@torch.sh>
  */
-@RunWith(PowerMockRunner.class)
 @PrepareForTest(Alert.class)
-public class AlertConditionTest {
-    protected Stream stream = mock(Stream.class);
-    protected Core core = mock(Core.class);
-    protected Indexer indexer = mock(Indexer.class);
-    protected Searches searches = mock(Searches.class);
+public class AlertConditionTest extends PowerMockTestCase {
+    protected Stream stream;
+    protected Core core;
+    protected Indexer indexer;
+    protected Searches searches;
 
     protected final String STREAM_ID = "STREAMMOCKID";
     protected final String STREAM_CREATOR = "MOCKUSER";
     protected final String CONDITION_ID = "CONDITIONMOCKID";
 
-    @Before
+    @BeforeClass
     public void setUp() throws Exception {
+        stream = mock(Stream.class);
+        core = mock(Core.class);
+        indexer = mock(Indexer.class);
+        searches = mock(Searches.class);
         when(stream.getId()).thenReturn(STREAM_ID);
         when(indexer.searches()).thenReturn(searches);
         when(core.getIndexer()).thenReturn(indexer);
@@ -85,5 +88,14 @@ public class AlertConditionTest {
     protected void alertLastTriggered(int seconds) {
         PowerMockito.mockStatic(Alert.class);
         PowerMockito.when(Alert.triggeredSecondsAgo(STREAM_ID, CONDITION_ID, core)).thenReturn(seconds);
+    }
+
+    protected <T extends AlertCondition> T getTestInstance(Class<T> klazz, Map<String, Object> parameters) {
+        try {
+            return klazz.getConstructor(Core.class, Stream.class, String.class, DateTime.class, String.class, Map.class)
+                    .newInstance(core, stream, CONDITION_ID, Tools.iso8601(), STREAM_CREATOR, parameters);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
     }
 }

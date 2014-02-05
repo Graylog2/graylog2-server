@@ -20,13 +20,13 @@
 package org.graylog2.plugin.configuration.fields;
 
 import com.google.common.collect.Maps;
-import org.junit.Test;
+import org.testng.annotations.Test;
 
 import java.util.HashMap;
 import java.util.Map;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.testng.AssertJUnit.assertEquals;
+import static org.testng.AssertJUnit.assertTrue;
 
 /**
  * @author Lennart Koopmann <lennart@torch.sh>

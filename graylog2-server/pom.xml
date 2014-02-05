@@ -67,7 +67,7 @@
         </dependency>
         <dependency>
             <groupId>org.powermock</groupId>
-            <artifactId>powermock-module-junit4</artifactId>
+            <artifactId>powermock-module-testng</artifactId>
             <version>1.5.4</version>
             <scope>test</scope>
         </dependency>

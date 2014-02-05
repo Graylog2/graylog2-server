@@ -27,24 +27,21 @@ import org.graylog2.indexer.results.FieldStatsResult;
 import org.graylog2.indexer.searches.Searches;
 import org.graylog2.indexer.searches.timeranges.RelativeRange;
 import org.graylog2.plugin.Tools;
-import org.junit.Test;
-import org.junit.runner.RunWith;
 import org.mockito.Matchers;
 import org.powermock.core.classloader.annotations.PrepareForTest;
-import org.powermock.modules.junit4.PowerMockRunner;
+import org.testng.annotations.Test;
 
 import java.util.Map;
 
-import static org.junit.Assert.assertNotNull;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
+import static org.testng.AssertJUnit.*;
 
 /**
  * @author Dennis Oelkers <dennis@torch.sh>
  */
-@RunWith(PowerMockRunner.class)
 @PrepareForTest(Alert.class)
 public class FieldValueAlertConditionTest extends AlertConditionTest {
     @Test
@@ -56,7 +53,7 @@ public class FieldValueAlertConditionTest extends AlertConditionTest {
                 0,
                 "response_time");
 
-        FieldValueAlertCondition fieldValueAlertCondition = getFieldValueAlertCondition(parameters);
+        final FieldValueAlertCondition fieldValueAlertCondition = getTestInstance(FieldValueAlertCondition.class, parameters);
 
         assertNotNull(fieldValueAlertCondition);
         assertNotNull(fieldValueAlertCondition.getDescription());
@@ -67,9 +64,8 @@ public class FieldValueAlertConditionTest extends AlertConditionTest {
         for (FieldValueAlertCondition.CheckType checkType : FieldValueAlertCondition.CheckType.values()) {
             final double threshold = 50.0;
             final double higherThanThreshold = threshold + 10;
-            FieldValueAlertCondition fieldValueAlertCondition = getFieldValueAlertCondition(getParametersMap(0, 0,
-                    FieldValueAlertCondition.ThresholdType.HIGHER,
-                    checkType, threshold, "response_time"));
+            final FieldValueAlertCondition fieldValueAlertCondition = getTestInstance(FieldValueAlertCondition.class,
+                    getParametersMap(0, 0, FieldValueAlertCondition.ThresholdType.HIGHER, checkType, threshold, "response_time"));
 
             fieldStatsShouldReturn(getFieldStatsResult(checkType, higherThanThreshold));
             alertLastTriggered(-1);

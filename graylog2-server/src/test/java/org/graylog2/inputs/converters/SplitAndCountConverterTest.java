@@ -20,7 +20,7 @@
 package org.graylog2.inputs.converters;
 
 import org.graylog2.ConfigurationException;
-import org.junit.Test;
+import org.testng.annotations.Test;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -41,12 +41,12 @@ public class SplitAndCountConverterTest {
         assertEquals(3, new SplitAndCountConverter(config(".")).convert("foo.bar.baz")); // Regex. Must be escaped.
     }
 
-    @Test(expected = ConfigurationException.class)
+    @Test(expectedExceptions = ConfigurationException.class)
     public void testWithEmptyConfig() throws Exception {
         assertEquals(null, new SplitAndCountConverter(config("")).convert("foo"));
     }
 
-    @Test(expected = ConfigurationException.class)
+    @Test(expectedExceptions = ConfigurationException.class)
     public void testWithNullConfig() throws Exception {
         assertEquals(null, new SplitAndCountConverter(config(null)).convert("foo"));
     }

@@ -1,5 +1,5 @@
-/**
- * Copyright 2013 Lennart Koopmann <lennart@torch.sh>
+/*
+ * Copyright 2013-2014 TORCH GmbH
  *
  * This file is part of Graylog2.
  *
@@ -13,28 +13,22 @@
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
  *
+ *
  * You should have received a copy of the GNU General Public License
  * along with Graylog2.  If not, see <http://www.gnu.org/licenses/>.
- *
  */
-package org.graylog2.database.validators;
 
+package org.graylog2;
 import static org.testng.AssertJUnit.*;
-import org.testng.annotations.Test;
 
 /**
- * @author Lennart Koopmann <lennart@torch.sh>
+ * @author Dennis Oelkers <dennis@torch.sh>
  */
-public class FilledStringValidatorTest {
-
-    @Test
-    public void testValidate() throws Exception {
-        Validator v = new FilledStringValidator();
-        assertFalse(v.validate(null));
-        assertFalse(v.validate(534));
-        assertFalse(v.validate(""));
-        assertFalse(v.validate(new String()));
-        assertTrue(v.validate("so valid"));
+public class AssertNotEquals {
+    public static <T> void assertNotEquals(String msg, T obj1, T obj2) {
+        if (obj1 == null)
+            assertFalse(msg, obj1 == null && obj2 == null);
+        else
+            assertFalse(msg, obj1.equals(obj2));
     }
-
 }

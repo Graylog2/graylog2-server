@@ -21,10 +21,10 @@ package org.graylog2.database.validators;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
-import org.junit.Test;
+import org.testng.annotations.Test;
 
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.testng.AssertJUnit.assertFalse;
+import static org.testng.AssertJUnit.assertTrue;
 
 public class ListValidatorTest {
     @Test
