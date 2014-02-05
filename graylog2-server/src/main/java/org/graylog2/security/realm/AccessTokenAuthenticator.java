@@ -22,6 +22,7 @@ import org.apache.shiro.authc.*;
 import org.apache.shiro.authc.credential.AllowAllCredentialsMatcher;
 import org.apache.shiro.realm.AuthenticatingRealm;
 import org.graylog2.Core;
+import org.graylog2.database.ValidationException;
 import org.graylog2.security.AccessToken;
 import org.graylog2.security.AccessTokenAuthToken;
 import org.graylog2.users.User;
@@ -57,6 +58,11 @@ public class AccessTokenAuthenticator extends AuthenticatingRealm {
         }
         if (log.isDebugEnabled()) {
             log.debug("Found user {} for access token.", user);
+        }
+        try {
+            accessToken.touch();
+        } catch (ValidationException e) {
+            log.warn("Unable to update access token's last access date.", e);
         }
         return new SimpleAccount(user.getName(), null, "access token realm");
     }
