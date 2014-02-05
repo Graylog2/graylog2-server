@@ -22,8 +22,8 @@ package org.graylog2.inputs.misc.jsonpath;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.junit.Test;
-import static junit.framework.Assert.assertEquals;
+import org.testng.annotations.Test;
+import static org.testng.AssertJUnit.assertEquals;
 
 /**
  * @author Lennart Koopmann <lennart@torch.sh>

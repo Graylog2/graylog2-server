@@ -23,8 +23,8 @@ package org.graylog2.inputs.gelf;
 import org.graylog2.inputs.TestHelper;
 import org.graylog2.inputs.gelf.gelf.GELFMessage;
 import org.graylog2.inputs.gelf.gelf.GELFMessageChunk;
-import org.junit.Test;
-import static org.junit.Assert.*;
+import org.testng.annotations.Test;
+import static org.testng.AssertJUnit.*;
 
 /**
  * @author lennart.koopmann

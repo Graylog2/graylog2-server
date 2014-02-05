@@ -22,11 +22,11 @@
 package org.graylog2.plugin;
 
 import org.graylog2.plugin.Version;
-import org.junit.Test;
+import org.testng.annotations.Test;
 
-import static junit.framework.Assert.assertEquals;
-import static junit.framework.Assert.assertFalse;
-import static junit.framework.Assert.assertTrue;
+import static org.testng.AssertJUnit.assertEquals;
+import static org.testng.AssertJUnit.assertFalse;
+import static org.testng.AssertJUnit.assertTrue;
 
 /**
  * @author Lennart Koopmann <lennart@torch.sh>

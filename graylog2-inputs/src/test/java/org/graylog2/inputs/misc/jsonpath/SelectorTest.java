@@ -21,11 +21,11 @@ package org.graylog2.inputs.misc.jsonpath;
 
 import com.google.common.collect.Maps;
 import com.jayway.jsonpath.JsonPath;
-import org.junit.Test;
+import org.testng.annotations.Test;
 
 import java.util.Map;
 
-import static junit.framework.Assert.assertEquals;
+import static org.testng.AssertJUnit.assertEquals;
 
 /**
  * @author Lennart Koopmann <lennart@torch.sh>
