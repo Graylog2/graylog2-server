@@ -164,7 +164,8 @@ $(document).ready(function() {
     })();
 
     // Change dashboard title.
-    $(".edit-dashboard").on("click", function() {
+    $(".edit-dashboard").on("click", function(e) {
+        e.preventDefault();
         $(this).closest("h1").hide();
         $(".dashboard-description").hide();
         $("form.edit-dashboard-form").show();
@@ -201,7 +202,8 @@ $(document).ready(function() {
         })
     });
 
-    $(".dashboard .widget .edit-description").on("click", function() {
+    $(".dashboard .widget .edit-description").on("click", function(e) {
+        e.preventDefault();
         var widget = $(this).closest(".widget");
 
         $(".description", widget).hide();
@@ -218,7 +220,8 @@ $(document).ready(function() {
         }
     });
 
-    $(".dashboard .widget .edit-cache-time").on("click", function() {
+    $(".dashboard .widget .edit-cache-time").on("click", function(e) {
+        e.preventDefault();
         var widget = $(this).closest(".widget");
 
         var dashboardId = widget.attr("data-dashboard-id");

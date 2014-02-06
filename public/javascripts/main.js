@@ -438,6 +438,11 @@ $(document).ready(function() {
             query.effect("bounce");
             var originalQuery = query.val();
 
+            // if query already includes this one, do not add it!
+            if (originalQuery.indexOf(ourQuery) >= 0) {
+                return;
+            }
+
             // If the query is "*", replace it fully. Makes no sense to generate "* AND foo:bar". (even though it would work)
             if ($.trim(originalQuery) == "*" || $.trim(originalQuery) == "") {
                 query.val(ourQuery);
