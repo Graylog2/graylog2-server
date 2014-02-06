@@ -28,8 +28,10 @@ import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import org.apache.shiro.mgt.DefaultSecurityManager;
 import org.cliffc.high_scale_lib.Counter;
 import org.glassfish.hk2.utilities.binding.AbstractBinder;
+import org.glassfish.jersey.message.GZipEncoder;
 import org.glassfish.jersey.server.ContainerFactory;
 import org.glassfish.jersey.server.ResourceConfig;
+import org.glassfish.jersey.server.filter.EncodingFilter;
 import org.glassfish.jersey.server.internal.scanning.PackageNamesScanner;
 import org.graylog2.blacklists.BlacklistCache;
 import org.graylog2.buffers.OutputBuffer;
@@ -380,14 +382,17 @@ public class Core implements GraylogServer, InputHost {
         ResourceConfig rc = new ResourceConfig()
                 .property(NettyContainer.PROPERTY_BASE_URI, configuration.getRestListenUri())
                 .registerClasses(MetricsDynamicBinding.class,
-                                 JacksonPropertyExceptionMapper.class,
-                                 AnyExceptionClassMapper.class,
-                                 ShiroSecurityBinding.class,
-                                 RestAccessLogFilter.class)
+                        JacksonPropertyExceptionMapper.class,
+                        AnyExceptionClassMapper.class,
+                        ShiroSecurityBinding.class,
+                        RestAccessLogFilter.class)
                 .register(new Graylog2Binder())
                 .register(ObjectMapperProvider.class)
                 .register(JacksonJsonProvider.class)
                 .registerFinder(new PackageNamesScanner(new String[]{"org.graylog2.rest.resources"}, true));
+
+        if (configuration.isRestEnableGzip())
+            EncodingFilter.enableFor(rc, GZipEncoder.class);
 
         if (configuration.isRestEnableCors()) {
             LOG.info("Enabling CORS for REST API");
