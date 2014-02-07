@@ -293,7 +293,7 @@
         if (navigator.userAgent.toLowerCase().indexOf('safari/') > -1) {
             if (this.path.indexOf("{") != -1) {
                 this.path = this.path.replace("{", "%7B");
-                this.path = this.path.replace("}", "%7C");
+                this.path = this.path.replace("}", "%7D");
             }
         }
         if (this.path.substring(0, 4) === 'http') {
