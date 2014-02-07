@@ -69,7 +69,7 @@ public class SyslogDispatcher extends SimpleChannelHandler {
 
     @Override
     public void exceptionCaught(ChannelHandlerContext ctx, ExceptionEvent e) throws Exception {
-        LOG.warn("Could not handle syslog message.", e.getCause());
+        LOG.debug("Could not handle syslog message.", e.getCause());
     }
 
 }
