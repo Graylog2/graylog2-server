@@ -21,3 +21,6 @@ application.secret=""
 # limit of message fields is 100. Set it to 0 if you always want to get all fields. They are for example used in the
 # search result sidebar or for autocompletion of field names.
 field_list_limit=100
+
+# You usually do not want to change this.
+application.global=lib.Global
