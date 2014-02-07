@@ -68,7 +68,7 @@ public class VersionCheckThread implements Runnable {
         HttpGet get = null;
         try {
             uri = new URIBuilder(core.getConfiguration().getVersionchecksUri());
-            uri.addParameter("anon-id", new String(DigestUtils.sha256(core.getNodeId()), Charset.forName("UTF-8")));
+            uri.addParameter("anonid", DigestUtils.sha256Hex(core.getNodeId()));
             uri.addParameter("version", ServerVersion.VERSION.toString());
 
             get = new HttpGet(uri.build());
