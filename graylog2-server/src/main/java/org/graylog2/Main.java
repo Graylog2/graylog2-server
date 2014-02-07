@@ -243,6 +243,7 @@ public final class Main extends NodeRunner {
         server.initializers().register(new MasterCacheWorkersInitializer());
         server.initializers().register(new ClusterHealthCheckInitializer());
         server.initializers().register(new StreamThroughputCounterInitializer());
+        server.initializers().register(new VersionCheckInitializer());
 
         // Register message filters. (Order is important here)
         server.registerFilter(new StaticFieldFilter());
