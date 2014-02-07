@@ -93,10 +93,8 @@ public abstract class InputRegistry {
                 try {
                     inputState.setState(InputState.InputStateType.STARTING);
                     input.launch();
-                    Notification.fixed(core, Notification.Type.NO_INPUT_RUNNING);
                     inputState.setState(InputState.InputStateType.RUNNING);
                     String msg = "Completed starting [" + input.getClass().getCanonicalName() + "] input with ID <" + input.getId() + ">";
-                    core.getActivityWriter().write(new Activity(msg, InputRegistry.class));
                     LOG.info(msg);
                 } catch (MisfireException e) {
                     handleLaunchException(e, input, inputState);
@@ -130,15 +128,7 @@ public abstract class InputRegistry {
 
         msg.append(causeMsg);
 
-        core.getActivityWriter().write(new Activity(msg.toString(), InputRegistry.class));
         LOG.error(msg.toString(), e);
-
-        Notification notification = Notification.buildNow(core);
-        notification.addType(Notification.Type.INPUT_FAILED_TO_START).addSeverity(Notification.Severity.NORMAL);
-        notification.addThisNode();
-        notification.addDetail("input_id", input.getId());
-        notification.addDetail("reason", causeMsg.toString());
-        notification.publishIfFirst();
 
         // Clean up.
         //cleanInput(input);
@@ -242,7 +232,7 @@ public abstract class InputRegistry {
 
     public InputState getRunningInputState(String inputStateId) {
         for (InputState inputState : inputStates) {
-            if (inputState.getId().equals(inputStateId))
+            if (inputState.getMessageInput().getId().equals(inputStateId))
                 return inputState;
         }
 

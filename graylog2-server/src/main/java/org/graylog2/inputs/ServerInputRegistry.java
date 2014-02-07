@@ -77,7 +77,10 @@ public class ServerInputRegistry extends InputRegistry {
     @Override
     protected void finishedLaunch(InputState state) {
         switch (state.getState()) {
-            case RUNNING: Notification.fixed(_core, Notification.Type.NO_INPUT_RUNNING);
+            case RUNNING:
+                Notification.fixed(_core, Notification.Type.NO_INPUT_RUNNING);
+                String msg = "Completed starting [" + state.getMessageInput().getClass().getCanonicalName() + "] input with ID <" + state.getMessageInput().getId() + ">";
+                _core.getActivityWriter().write(new Activity(msg, InputRegistry.class));
                 break;
             case FAILED:
                 _core.getActivityWriter().write(new Activity(state.getDetailedMessage(), InputRegistry.class));
@@ -86,7 +89,7 @@ public class ServerInputRegistry extends InputRegistry {
                 notification.addThisNode();
                 notification.addDetail("input_id", state.getMessageInput().getId());
                 notification.addDetail("reason", state.getDetailedMessage());
-                notification.publish();
+                notification.publishIfFirst();
                 break;
         }
     }
