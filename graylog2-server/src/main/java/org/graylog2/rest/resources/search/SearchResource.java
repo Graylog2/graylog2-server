@@ -193,7 +193,7 @@ public class SearchResource extends RestResource {
     }
 
     protected BadRequestException createRequestExceptionForParseFailure(String query, SearchPhaseExecutionException e) {
-        LOG.warn("Unable to execute search", e);
+        LOG.warn("Unable to execute search: {}", e.getMessage());
         // we won't actually iterate over all of the shard failures, only the first one,
         // since we assume that parse errors happen on all of the shards.
         for (ShardSearchFailure failure : e.shardFailures()) {
@@ -231,9 +231,12 @@ public class SearchResource extends RestResource {
                 sr.genericError.message = rootCause.getMessage();
                 return new BadRequestException(Response.status(Response.Status.BAD_REQUEST).entity(json(sr)).build());
             } else {
-                LOG.warn("Root cause of SearchParseException has unexpected type!" + rootCause.getClass(), e);
+                LOG.info("Root cause of SearchParseException has unexpected, generic type!" + rootCause.getClass());
                 final SearchResponse sr = new SearchResponse();
                 sr.query = query;
+                sr.genericError = new GenericError();
+                sr.genericError.exceptionName = rootCause.getClass().getCanonicalName();
+                sr.genericError.message = rootCause.getMessage();
                 return new BadRequestException(Response.status(Response.Status.BAD_REQUEST).entity(json(sr)).build());
             }
         }
