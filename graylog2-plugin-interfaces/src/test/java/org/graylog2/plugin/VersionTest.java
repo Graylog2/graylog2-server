@@ -56,4 +56,37 @@ public class VersionTest {
         assertFalse(new Version(0, 20, 0).equals(null));
     }
 
+    @Test
+    public void testGreaterMinor() throws Exception {
+        Version v = new Version(0, 20, 0);
+
+        assertTrue(v.greaterMinor(new Version(0, 19, 0)));
+        assertTrue(v.greaterMinor(new Version(0, 18, 2)));
+        assertTrue(v.greaterMinor(new Version(0, 19, 9001)));
+
+        assertFalse(v.greaterMinor(new Version(0, 20, 0)));
+        assertFalse(v.greaterMinor(new Version(1, 0, 0)));
+        assertFalse(v.greaterMinor(new Version(1, 0, 9001)));
+        assertFalse(v.greaterMinor(new Version(1, 20, 0)));
+        assertFalse(v.greaterMinor(new Version(1, 1, 0)));
+        assertFalse(v.greaterMinor(new Version(3, 2, 1)));
+
+        assertTrue(v.greaterMinor(new Version(0, 19, 0, "rc.1")));
+
+        v = new Version(1, 5, 0);
+
+        assertTrue(v.greaterMinor(new Version(0, 19, 0)));
+        assertTrue(v.greaterMinor(new Version(1, 0, 0)));
+        assertTrue(v.greaterMinor(new Version(0, 19, 9001)));
+
+        assertFalse(v.greaterMinor(new Version(1, 6, 0)));
+        assertFalse(v.greaterMinor(new Version(3, 0, 0)));
+        assertFalse(v.greaterMinor(new Version(1, 5, 9001)));
+        assertFalse(v.greaterMinor(new Version(1, 20, 0)));
+        assertFalse(v.greaterMinor(new Version(1, 20, 5)));
+        assertFalse(v.greaterMinor(new Version(3, 2, 1)));
+
+        assertTrue(v.greaterMinor(new Version(0, 19, 0, "rc.1")));
+    }
+
 }

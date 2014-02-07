@@ -194,6 +194,12 @@ public class Configuration {
     @Parameter(value = "elasticsearch_discovery_initial_state_timeout", required = false)
     private String esInitialStateTimeout = "3s";
 
+    @Parameter(value = "versionchecks", required = false)
+    private boolean versionchecks = true;
+
+    @Parameter(value = "versionchecks_uri", required = false)
+    private String versionchecksUri = "http://versioncheck.torch.sh/check";
+
     // Transport: Email
     @Parameter(value = "transport_email_enabled", required = false)
     private boolean emailTransportEnabled = false;
@@ -526,4 +532,13 @@ public class Configuration {
         return restEnableGzip;
     }
 
+    public boolean isVersionchecks() {
+        return versionchecks;
+    }
+
+    public String getVersionchecksUri() {
+        return versionchecksUri;
+    }
+
 }
+
