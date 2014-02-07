@@ -415,7 +415,7 @@ $(document).ready(function() {
             value = value.replace(/\]/g, "\\]");
             value = value.replace(/\(/g, "\\(");
             value = value.replace(/\)/g, "\\)");
-            value = value.replace(/\{/g, "\\}");
+            value = value.replace(/\{/g, "\\{");
             value = value.replace(/\}/g, "\\}");
         }
 
