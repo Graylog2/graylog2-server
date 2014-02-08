@@ -25,6 +25,7 @@
         <div class="subcontainer">
             Start by loading a message so we have an example to work on.
 
+            @if(!input.getGlobal) {
             <div class="buttons">
                 <button class="btn btn-success btn-small xtrc-load-recent" data-node-id="@node.getNodeId" data-input-id="@input.getId">
                     Load a message recently received by this input
@@ -34,9 +35,14 @@
                     Manually load a message
                 </button>
             </div>
+            }
         </div>
 
+        @if(!input.getGlobal) {
         <div class="manual-selector" style="display: none;">
+        } else {
+        <div class="manual-selector">
+        }
             You can load any message manually using the form below. The <em>message ID</em> and <em>index</em>
             can be found in the detail view of any message. Make sure that the selected message has the exact
             same format as those received by this input or your extractor might not match later.
