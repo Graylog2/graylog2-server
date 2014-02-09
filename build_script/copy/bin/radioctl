@@ -1,35 +1,43 @@
 #!/bin/bash
 
 CMD=$1
-NOHUP=`which nohup`
+NOHUP=${NOHUP:=$(which nohup)}
+
 
 # resolve links - $0 may be a softlink
 RADIOCTL="$0"
 
 while [ -h "$RADIOCTL" ]; do
-  ls=`ls -ld "$RADIOCTL"`
-  link=`expr "$ls" : '.*-> \(.*\)$'`
+  ls=$(ls -ld "$RADIOCTL")
+  link=$(expr "$ls" : '.*-> \(.*\)$')
   if expr "$link" : '/.*' > /dev/null; then
     RADIOCTL="$link"
   else
-    RADIOCTL=`dirname "$RADIOCTL"`/"$link"
+    RADIOCTL=$(dirname "$RADIOCTL")/"$link"
   fi
 done
 
-RADIOCTL_DIR=`dirname "$RADIOCTL"`
-RADIO_JAR=graylog2-radio.jar
-RADIO_CONF=/etc/graylog2-radio.conf
-RADIO_PID=/tmp/graylog2-radio.pid
-LOG_FILE=log/graylog2-radio.log
+RADIOCTL_DIR=${RADIOCTL_DIR:=$(dirname "$RADIOCTL")}
+RADIO_JAR=${RADIO_JAR:=graylog2-radio.jar}
+RADIO_CONF=${RADIO_CONF:=/etc/graylog2-radio.conf}
+RADIO_PID=${RADIO_PID:=/tmp/graylog2-radio.pid}
+LOG_FILE=${LOG_FILE:=log/graylog2-radio.log}
+LOG4J=${LOG4J:=}
 
 start() {
     echo "Starting graylog2-radio ..."
     cd "$RADIOCTL_DIR/.."
-    $NOHUP java -jar ${RADIO_JAR} -f ${RADIO_CONF} -p ${RADIO_PID} >> ${LOG_FILE} &
+    $NOHUP java ${LOG4J} -jar ${RADIO_JAR} -f ${RADIO_CONF} -p ${RADIO_PID} >> ${LOG_FILE} &
+}
+
+run() {
+    echo "Running graylog2-radio ..."
+    cd "$RADIOCTL_DIR/.."
+    exec java ${LOG4J} -jar ${RADIO_JAR} -f ${RADIO_CONF} -p ${RADIO_PID}
 }
 
 stop() {
-    PID=`cat ${RADIO_PID}`
+    PID=$(cat ${RADIO_PID})
     echo "Stopping graylog2-radio ($PID) ..."
     if kill $PID; then
         rm ${RADIO_PID}
@@ -78,7 +86,10 @@ case "$CMD" in
     status)
         status
         ;;
+    run)
+        run
+        ;;
     *)
-        echo "Usage $0 {start|stop|restart|status}"
+        echo "Usage $0 {start|stop|restart|status|run}"
         RETVAL=1
 esac
