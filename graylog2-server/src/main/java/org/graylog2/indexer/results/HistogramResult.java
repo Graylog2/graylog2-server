@@ -36,4 +36,5 @@ public abstract class HistogramResult extends IndexQueryResult {
 
     public abstract Indexer.DateHistogramInterval getInterval();
     public abstract Map getResults();
+
 }
