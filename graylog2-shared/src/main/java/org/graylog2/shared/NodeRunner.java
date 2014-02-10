@@ -22,6 +22,7 @@ package org.graylog2.shared;
 
 import com.beust.jcommander.internal.Lists;
 import com.google.inject.Module;
+import org.graylog2.plugin.configuration.Configuration;
 import org.graylog2.shared.bindings.GenericBindings;
 
 import java.util.List;
