@@ -23,6 +23,7 @@ import com.beust.jcommander.internal.Lists;
 import com.beust.jcommander.internal.Maps;
 import com.codahale.metrics.MetricRegistry;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
+import com.google.inject.Inject;
 import com.ning.http.client.AsyncHttpClient;
 import com.ning.http.client.AsyncHttpClientConfig;
 import org.cliffc.high_scale_lib.Counter;
@@ -83,6 +84,7 @@ public class Radio implements InputHost, MetricsHost, GraylogServer, ProcessingH
     public static final Version VERSION = RadioVersion.VERSION;
 
     private DateTime startedAt;
+    @Inject
     private MetricRegistry metricRegistry;
     private Configuration configuration;
 
@@ -113,10 +115,9 @@ public class Radio implements InputHost, MetricsHost, GraylogServer, ProcessingH
         httpClient = new AsyncHttpClient(builder.build());
     }
 
-    public void initialize(Configuration configuration, MetricRegistry metrics) {
+    public void initialize(Configuration configuration) {
         startedAt = new DateTime(DateTimeZone.UTC);
 
-        this.metricRegistry = metrics;
         this.configuration = configuration;
 
         NodeId id = new NodeId(configuration.getNodeIdFile());

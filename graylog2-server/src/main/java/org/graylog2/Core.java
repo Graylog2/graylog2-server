@@ -25,6 +25,7 @@ import com.fasterxml.jackson.jaxrs.json.JacksonJsonProvider;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
+import com.google.inject.Inject;
 import org.apache.shiro.mgt.DefaultSecurityManager;
 import org.cliffc.high_scale_lib.Counter;
 import org.glassfish.hk2.utilities.binding.AbstractBinder;
@@ -116,6 +117,7 @@ public class Core implements GraylogServer, InputHost, MetricsHost, ProcessingHo
 
     private static final Logger LOG = LoggerFactory.getLogger(Core.class);
 
+    @Inject
     private MongoConnection mongoConnection;
     private MongoBridge mongoBridge;
     private Configuration configuration;
@@ -171,6 +173,7 @@ public class Core implements GraylogServer, InputHost, MetricsHost, ProcessingHo
     private AtomicBoolean processingPauseLocked = new AtomicBoolean(false);
     
     private DateTime startedAt;
+    @Inject
     private MetricRegistry metricRegistry;
     private LdapUserAuthenticator ldapUserAuthenticator;
     private LdapConnector ldapConnector;
@@ -178,13 +181,12 @@ public class Core implements GraylogServer, InputHost, MetricsHost, ProcessingHo
     private MongoDbMetricsReporter metricsReporter;
     private AtomicReference<HashMap<String, Counter>> currentStreamThroughput = new AtomicReference<HashMap<String, Counter>>();
 
-    public void initialize(Configuration configuration, MetricRegistry metrics) {
+    public void initialize(Configuration configuration) {
     	startedAt = new DateTime(DateTimeZone.UTC);
 
         NodeId id = new NodeId(configuration.getNodeIdFile());
         this.nodeId = id.readOrGenerate();
 
-        this.metricRegistry = metrics;
         this.configuration = configuration; // TODO use dependency injection
 
         if (configuration.isMetricsCollectionEnabled()) {
@@ -205,17 +207,6 @@ public class Core implements GraylogServer, InputHost, MetricsHost, ProcessingHo
                 LOG.info("No rest_transport_uri set. Falling back to [{}].", transportStr);
                 this.configuration.setRestTransportUri(transportStr);
         }
-
-        mongoConnection = new MongoConnection();    // TODO use dependency injection
-        mongoConnection.setUser(configuration.getMongoUser());
-        mongoConnection.setPassword(configuration.getMongoPassword());
-        mongoConnection.setHost(configuration.getMongoHost());
-        mongoConnection.setPort(configuration.getMongoPort());
-        mongoConnection.setDatabase(configuration.getMongoDatabase());
-        mongoConnection.setUseAuth(configuration.isMongoUseAuth());
-        mongoConnection.setMaxConnections(configuration.getMongoMaxConnections());
-        mongoConnection.setThreadsAllowedToBlockMultiplier(configuration.getMongoThreadsAllowedToBlockMultiplier());
-        mongoConnection.setReplicaSet(configuration.getMongoReplicaSet());
 
         mongoBridge = new MongoBridge(this);
         mongoBridge.setConnection(mongoConnection); // TODO use dependency injection

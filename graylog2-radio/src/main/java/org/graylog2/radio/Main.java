@@ -27,6 +27,7 @@ import com.github.joschi.jadconfig.JadConfig;
 import com.github.joschi.jadconfig.RepositoryException;
 import com.github.joschi.jadconfig.ValidationException;
 import com.github.joschi.jadconfig.repositories.PropertiesRepository;
+import com.google.inject.Injector;
 import org.apache.commons.io.IOUtils;
 import org.apache.log4j.Level;
 import org.graylog2.inputs.gelf.http.GELFHttpInput;
@@ -40,6 +41,8 @@ import org.graylog2.inputs.raw.udp.RawUDPInput;
 import org.graylog2.inputs.syslog.tcp.SyslogTCPInput;
 import org.graylog2.inputs.syslog.udp.SyslogUDPInput;
 import org.graylog2.plugin.Tools;
+import org.graylog2.radio.bindings.RadioBindings;
+import org.graylog2.shared.NodeRunner;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.slf4j.bridge.SLF4JBridgeHandler;
@@ -53,7 +56,7 @@ import java.util.concurrent.ExecutionException;
 /**
  * @author Lennart Koopmann <lennart@torch.sh>
  */
-public class Main {
+public class Main extends NodeRunner {
 
     private static final Logger LOG = LoggerFactory.getLogger(Main.class);
 
@@ -101,8 +104,10 @@ public class Main {
             logLevel = Level.DEBUG;
         }
 
+        Injector injector = getInjector(new RadioBindings());
+
         // This is holding all our metrics.
-        final MetricRegistry metrics = new MetricRegistry();
+        final MetricRegistry metrics = injector.getInstance(MetricRegistry.class);
 
         // Report metrics via JMX.
         final JmxReporter reporter = JmxReporter.forRegistry(metrics).build();
@@ -124,8 +129,8 @@ public class Main {
             savePidFile(commandLineArguments.getPidFile());
         }
 
-        Radio radio = new Radio();
-        radio.initialize(configuration, metrics);
+        Radio radio = injector.getInstance(Radio.class);
+        radio.initialize(configuration);
 
         // Register in Graylog2 cluster.
         radio.ping();

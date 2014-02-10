@@ -28,8 +28,10 @@ import com.github.joschi.jadconfig.JadConfig;
 import com.github.joschi.jadconfig.RepositoryException;
 import com.github.joschi.jadconfig.ValidationException;
 import com.github.joschi.jadconfig.repositories.PropertiesRepository;
+import com.google.inject.Injector;
 import org.apache.commons.io.IOUtils;
 import org.apache.log4j.Level;
+import org.graylog2.bindings.ServerBindings;
 import org.graylog2.cluster.Node;
 import org.graylog2.cluster.NodeNotFoundException;
 import org.graylog2.filters.*;
@@ -51,6 +53,7 @@ import org.graylog2.outputs.ElasticSearchOutput;
 import org.graylog2.plugin.Tools;
 import org.graylog2.plugin.initializers.InitializerConfigurationException;
 import org.graylog2.plugins.PluginInstaller;
+import org.graylog2.shared.NodeRunner;
 import org.graylog2.system.activities.Activity;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -65,7 +68,7 @@ import java.io.Writer;
  *
  * @author Lennart Koopmann <lennart@socketfeed.com>
  */
-public final class Main {
+public final class Main extends NodeRunner {
 
     private static final Logger LOG = LoggerFactory.getLogger(Main.class);
 
@@ -94,25 +97,13 @@ public final class Main {
         String configFile = commandLineArguments.getConfigFile();
         LOG.info("Using config file: {}", configFile);
 
-        final Configuration configuration = new Configuration();
-        JadConfig jadConfig = new JadConfig(new PropertiesRepository(configFile), configuration);
-
-        LOG.info("Loading configuration");
-        try {
-            jadConfig.process();
-        } catch (RepositoryException e) {
-            LOG.error("Couldn't load configuration file: [{}]", configFile, e);
-            System.exit(1);
-        } catch (ValidationException e) {
-            LOG.error("Invalid configuration", e);
-            System.exit(1);
-        }
+        final Configuration configuration = getConfiguration(configFile);
 
         if (configuration.getPasswordSecret().isEmpty()) {
             LOG.error("No password secret set. Please define password_secret in your graylog2.conf.");
             System.exit(1);
         }
-        
+
         if (commandLineArguments.isInstallPlugin()) {
             System.out.println("Plugin installation requested.");
             PluginInstaller installer = new PluginInstaller(
@@ -132,8 +123,10 @@ public final class Main {
             logLevel = Level.DEBUG;
         }
 
+        Injector injector = getInjector(new ServerBindings(configuration));
+
         // This is holding all our metrics.
-        final MetricRegistry metrics = new MetricRegistry();
+        final MetricRegistry metrics = injector.getInstance(MetricRegistry.class);
 
         // Report metrics via JMX.
         final JmxReporter reporter = JmxReporter.forRegistry(metrics).build();
@@ -152,7 +145,7 @@ public final class Main {
 
         // If we only want to check our configuration, we just initialize the rules engine to check if the rules compile
         if (commandLineArguments.isConfigTest()) {
-            Core server = new Core();
+            Core server = injector.getInstance(Core.class);
             server.setConfiguration(configuration);
             DroolsInitializer drools = new DroolsInitializer();
             try {
@@ -170,8 +163,8 @@ public final class Main {
         }
 
         // Le server object. This is where all the magic happens.
-        Core server = new Core();
-        server.initialize(configuration, metrics);
+        Core server = injector.getInstance(Core.class);
+        server.initialize(configuration);
 
         // Register this node.
         Node.registerServer(server, configuration.isMaster(), configuration.getRestTransportUri());
@@ -287,6 +280,23 @@ public final class Main {
         }
     }
 
+    private static Configuration getConfiguration(String configFile) {
+        final Configuration configuration = new Configuration();
+        JadConfig jadConfig = new JadConfig(new PropertiesRepository(configFile), configuration);
+
+        LOG.info("Loading configuration");
+        try {
+            jadConfig.process();
+        } catch (RepositoryException e) {
+            LOG.error("Couldn't load configuration file: [{}]", configFile, e);
+            System.exit(1);
+        } catch (ValidationException e) {
+            LOG.error("Invalid configuration", e);
+            System.exit(1);
+        }
+        return configuration;
+    }
+
     private static void savePidFile(String pidFile) {
 
         String pid = Tools.getPID();
@@ -308,5 +318,6 @@ public final class Main {
             new File(pidFile).deleteOnExit();
         }
     }
+
 
 }
