@@ -217,6 +217,21 @@ public class Core implements GraylogServer, InputHost, ProcessingHost {
                 this.configuration.setRestTransportUri(transportStr);
         }
 
+        mongoConnection = new MongoConnection();    // TODO use dependency injection
+        mongoConnection.setUser(configuration.getMongoUser());
+        mongoConnection.setPassword(configuration.getMongoPassword());
+        mongoConnection.setHost(configuration.getMongoHost());
+        mongoConnection.setPort(configuration.getMongoPort());
+        mongoConnection.setDatabase(configuration.getMongoDatabase());
+        mongoConnection.setUseAuth(configuration.isMongoUseAuth());
+        mongoConnection.setMaxConnections(configuration.getMongoMaxConnections());
+        mongoConnection.setThreadsAllowedToBlockMultiplier(configuration.getMongoThreadsAllowedToBlockMultiplier());
+        mongoConnection.setReplicaSet(configuration.getMongoReplicaSet());
+
+        mongoBridge = new MongoBridge(this);
+        mongoBridge.setConnection(mongoConnection); // TODO use dependency injection
+        mongoConnection.connect();
+
         initializers = new Initializers(this);
         inputs = new ServerInputRegistry(this);
 
