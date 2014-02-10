@@ -22,6 +22,7 @@ package org.graylog2.bindings;
 
 import com.google.inject.AbstractModule;
 import org.graylog2.Configuration;
+import org.graylog2.database.MongoBridge;
 import org.graylog2.database.MongoConnection;
 
 /**
@@ -36,10 +37,12 @@ public class ServerBindings extends AbstractModule {
 
     @Override
     protected void configure() {
-        bind(MongoConnection.class).toInstance(getMongoConnection());
+        final MongoConnection mongoConnection = getMongoConnection();
+        bind(MongoConnection.class).toInstance(mongoConnection);
+        bind(MongoBridge.class).toInstance(new MongoBridge());
     }
 
-    protected MongoConnection getMongoConnection() {
+    private MongoConnection getMongoConnection() {
         MongoConnection mongoConnection = new MongoConnection();
         mongoConnection.setUser(configuration.getMongoUser());
         mongoConnection.setPassword(configuration.getMongoPassword());
@@ -50,6 +53,7 @@ public class ServerBindings extends AbstractModule {
         mongoConnection.setMaxConnections(configuration.getMongoMaxConnections());
         mongoConnection.setThreadsAllowedToBlockMultiplier(configuration.getMongoThreadsAllowedToBlockMultiplier());
         mongoConnection.setReplicaSet(configuration.getMongoReplicaSet());
+        mongoConnection.connect();
         return mongoConnection;
     }
 }

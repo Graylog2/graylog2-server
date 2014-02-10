@@ -119,6 +119,7 @@ public class Core implements GraylogServer, InputHost, MetricsHost, ProcessingHo
 
     @Inject
     private MongoConnection mongoConnection;
+    @Inject
     private MongoBridge mongoBridge;
     private Configuration configuration;
     private RulesEngineImpl rulesEngine;
@@ -207,10 +208,6 @@ public class Core implements GraylogServer, InputHost, MetricsHost, ProcessingHo
                 LOG.info("No rest_transport_uri set. Falling back to [{}].", transportStr);
                 this.configuration.setRestTransportUri(transportStr);
         }
-
-        mongoBridge = new MongoBridge(this);
-        mongoBridge.setConnection(mongoConnection); // TODO use dependency injection
-        mongoConnection.connect();
 
         initializers = new Initializers(this);
         inputs = new ServerInputRegistry(this);
