@@ -41,8 +41,9 @@ public class Version {
     public static final Version v0_20_0_PREVIEW_8 = new Version(0, 20, 0, "preview.8");
     public static final Version v0_20_0_RC_1 = new Version(0, 20, 0, "rc.1");
     public static final Version v0_20_0_RC_1_1 = new Version(0, 20, 0, "rc.1-1");
+    public static final Version v0_20_0_RC_2 = new Version(0, 20, 0, "rc.2");
 
-    public static final Version VERSION = v0_20_0_RC_1_1;
+    public static final Version VERSION = v0_20_0_RC_2;
 
     public final int major;
     public final int minor;
