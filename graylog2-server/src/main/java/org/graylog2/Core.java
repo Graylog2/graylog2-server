@@ -152,6 +152,7 @@ public class Core implements GraylogServer, InputHost, ProcessingHost {
     @Inject
     private FilterRegistry filterRegistry;
 
+    private List<MessageFilter> filters = Lists.newArrayList();
     private List<Transport> transports = Lists.newArrayList();
     private List<AlarmCallback> alarmCallbacks = Lists.newArrayList();
 
