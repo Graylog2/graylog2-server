@@ -65,6 +65,7 @@ import org.graylog2.shared.NodeRunner;
 import org.graylog2.shared.BaseConfiguration;
 import org.graylog2.shared.NodeRunner;
 import org.graylog2.shared.filters.FilterRegistry;
+import org.graylog2.shared.filters.FilterRegistry;
 import org.graylog2.system.activities.Activity;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

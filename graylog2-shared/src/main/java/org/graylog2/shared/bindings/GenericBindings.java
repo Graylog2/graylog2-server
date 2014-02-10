@@ -28,6 +28,7 @@ import org.graylog2.shared.buffers.processors.ProcessBufferProcessor;
 import org.graylog2.shared.filters.FilterRegistry;
 import org.graylog2.shared.periodical.ThroughputCounterManagerThread;
 import org.graylog2.shared.stats.ThroughputStats;
+import org.graylog2.shared.filters.FilterRegistry;
 
 /**
  * @author Dennis Oelkers <dennis@torch.sh>
