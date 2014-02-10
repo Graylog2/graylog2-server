@@ -193,16 +193,7 @@ h4 {
 }
 
 #result-graph {
-	margin-top: 15px;
-}
-
-#sidebar-graph {
-	margin-top: 15px;
-}
-
-#sidebar-inner.affix {
-	width: 31%;
-	top: 50px;
+	margin-top: 5px;
 }
 
 .messages tbody > tr {
@@ -1852,4 +1843,50 @@ input.required-input-highlight {
 
 .widget .replay-link:hover {
     text-decoration: none;
+}
+
+.result-distribution h3 {
+    display: inline;
+}
+
+hr.search-result-head-separator {
+    margin-top: 5px;
+    margin-bottom: 10px;
+}
+
+.dashboard .widget .search_result_chart .dashboard-search-result-chart {
+    position: relative;
+    top: 15px;
+    height: 70px;
+}
+
+.dashboard .widget .search_result_chart .dashboard-search-result-chart .x_tick {
+    top: 25px;
+}
+
+.dashboard .widget .search_result_chart .reloading {
+    line-height: 70px !important;
+    text-align: center;
+    font-size: 70px;
+    position: relative;
+    top: 5px;
+    color: #ebebeb;
+}
+
+.dashboard .widget .search_result_chart .description {
+    margin-top: 40px;
+    text-align: center;
+}
+
+.dashboard .widget .search_result_chart .description-form {
+    margin-top: 37px;
+    text-align: center;
+}
+
+.dashboard .widget .search_result_chart .loading-failed {
+    display: block;
+    text-align: center;
+    font-size: 70px;
+    position: relative;
+    top: -10px;
 }

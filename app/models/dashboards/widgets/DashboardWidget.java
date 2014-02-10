@@ -46,7 +46,8 @@ public abstract class DashboardWidget {
         SEARCH_RESULT_COUNT,
         STREAM_SEARCH_RESULT_COUNT,
         FIELD_CHART,
-        QUICKVALUES
+        QUICKVALUES,
+        SEARCH_RESULT_CHART
     }
 
     private final Type type;
@@ -185,6 +186,19 @@ public abstract class DashboardWidget {
                         TimeRange.factory((Map<String, Object>) w.config.get("timerange")),
                         (String) w.config.get("field"),
                         w.creatorUserId
+                );
+                break;
+            case SEARCH_RESULT_CHART:
+                widget = new SearchResultChartWidget(
+                        dashboard,
+                        w.id,
+                        w.description,
+                        (w.config.containsKey("stream_id") ? (String) w.config.get("stream_id") : null),
+                        w.cacheTime,
+                        (String) w.config.get("query"),
+                        TimeRange.factory((Map<String, Object>) w.config.get("timerange")),
+                        w.creatorUserId,
+                        (String) w.config.get("interval")
                 );
                 break;
             default:

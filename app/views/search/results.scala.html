@@ -110,8 +110,24 @@
 .y_ticks { color: #000; }
 </style>
 
+<hr class="search-result-head-separator" />
+
+<div class="result-distribution">
+    <h3>
+        <i class="icon icon-ellipsis-vertical"></i>
+        Total result histogram
+    </h3>
+
+    @if(stream == null) {
+        @views.html.partials.dashboards.add_to_dashboard.render("search_result_chart", Array("data-interval='" + histogram.getInterval() + "'"))
+    } else {
+        @views.html.partials.dashboards.add_to_dashboard.render("search_result_chart", Array("data-stream-id='" + streamId + "'", "data-interval='" + histogram.getInterval() + "'"))
+    }
+</div>
+
 <div id="y_axis"></div>
 <div id="result-graph"></div>
+
 
 <script>
     drawResultGraph = function() {
@@ -139,7 +155,7 @@
             pixelsPerTick: 30
         });
 
-        // Only show a x-axis (time) when there is more than one bucked.
+        // Only show a x-axis (time) when there is more than one bucket.
         if(resultGraph.series != undefined && resultGraph.series[0] != undefined && resultGraph.series[0].data.length > 1) {
             new Rickshaw.Graph.Axis.Time({
                 graph: resultGraph,
@@ -156,9 +172,9 @@
                 var content = parseInt(y) + ' messages<br>' + date;
                 return content;
             },
-        xFormatter: function(x) {
-        return new Date(x * 1000).toDateString();
-        },
+            xFormatter: function(x) {
+                return new Date(x * 1000).toDateString();
+            }
         });
 
         new Rickshaw.Graph.Graylog2Selector( {

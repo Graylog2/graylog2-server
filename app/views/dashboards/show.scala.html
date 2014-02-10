@@ -96,6 +96,10 @@
                                 @views.html.dashboards.widgets.quickvalues(widget.asInstanceOf[models.dashboards.widgets.QuickvaluesWidget])
                             }
 
+                            @if(widget.getType.equals(models.dashboards.widgets.DashboardWidget.Type.SEARCH_RESULT_CHART)) {
+                                @views.html.dashboards.widgets.search_result_chart(widget.asInstanceOf[models.dashboards.widgets.SearchResultChartWidget])
+                            }
+
                         </div>
                     </li>
                 }
