@@ -164,7 +164,7 @@ public final class Main extends NodeRunner {
 
         // Le server object. This is where all the magic happens.
         Core server = injector.getInstance(Core.class);
-        server.initialize(configuration);
+        server.initialize();
 
         // Register this node.
         Node.registerServer(server, configuration.isMaster(), configuration.getRestTransportUri());

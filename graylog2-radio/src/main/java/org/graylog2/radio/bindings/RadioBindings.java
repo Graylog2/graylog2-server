@@ -21,12 +21,20 @@
 package org.graylog2.radio.bindings;
 
 import com.google.inject.AbstractModule;
+import org.graylog2.radio.Configuration;
 
 /**
  * @author Dennis Oelkers <dennis@torch.sh>
  */
 public class RadioBindings extends AbstractModule {
+    private final Configuration configuration;
+
+    public RadioBindings(Configuration configuration) {
+        this.configuration = configuration;
+    }
+
     @Override
     protected void configure() {
+        bind(Configuration.class).toInstance(configuration);
     }
 }

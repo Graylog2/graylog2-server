@@ -32,6 +32,11 @@
             <artifactId>graylog2-plugin</artifactId>
             <version>${project.parent.version}</version>
         </dependency>
+        <dependency>
+            <groupId>com.google.inject</groupId>
+            <artifactId>guice</artifactId>
+            <version>3.0</version>
+        </dependency>
     </dependencies>
 
     <build>

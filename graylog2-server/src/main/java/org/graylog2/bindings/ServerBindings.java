@@ -37,6 +37,8 @@ public class ServerBindings extends AbstractModule {
 
     @Override
     protected void configure() {
+        bind(Configuration.class).toInstance(configuration);
+
         final MongoConnection mongoConnection = getMongoConnection();
         bind(MongoConnection.class).toInstance(mongoConnection);
         bind(MongoBridge.class).toInstance(new MongoBridge());

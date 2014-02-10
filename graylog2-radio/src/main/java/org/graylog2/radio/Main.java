@@ -104,7 +104,7 @@ public class Main extends NodeRunner {
             logLevel = Level.DEBUG;
         }
 
-        Injector injector = getInjector(new RadioBindings());
+        Injector injector = getInjector(new RadioBindings(configuration));
 
         // This is holding all our metrics.
         final MetricRegistry metrics = injector.getInstance(MetricRegistry.class);
@@ -130,7 +130,7 @@ public class Main extends NodeRunner {
         }
 
         Radio radio = injector.getInstance(Radio.class);
-        radio.initialize(configuration);
+        radio.initialize();
 
         // Register in Graylog2 cluster.
         radio.ping();

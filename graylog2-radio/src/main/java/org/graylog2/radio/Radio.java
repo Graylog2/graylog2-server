@@ -86,6 +86,7 @@ public class Radio implements InputHost, MetricsHost, GraylogServer, ProcessingH
     private DateTime startedAt;
     @Inject
     private MetricRegistry metricRegistry;
+    @Inject
     private Configuration configuration;
 
     private GELFChunkManager gelfChunkManager;
@@ -115,10 +116,8 @@ public class Radio implements InputHost, MetricsHost, GraylogServer, ProcessingH
         httpClient = new AsyncHttpClient(builder.build());
     }
 
-    public void initialize(Configuration configuration) {
+    public void initialize() {
         startedAt = new DateTime(DateTimeZone.UTC);
-
-        this.configuration = configuration;
 
         NodeId id = new NodeId(configuration.getNodeIdFile());
         this.nodeId = id.readOrGenerate();

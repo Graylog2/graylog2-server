@@ -23,6 +23,7 @@ package org.graylog2.shared;
 import com.google.inject.Guice;
 import com.google.inject.Injector;
 import com.google.inject.Module;
+import org.graylog2.plugin.configuration.Configuration;
 import org.graylog2.shared.bindings.GenericBindings;
 
 /**

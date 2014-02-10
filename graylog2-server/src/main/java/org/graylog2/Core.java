@@ -121,6 +121,7 @@ public class Core implements GraylogServer, InputHost, MetricsHost, ProcessingHo
     private MongoConnection mongoConnection;
     @Inject
     private MongoBridge mongoBridge;
+    @Inject
     private Configuration configuration;
     private RulesEngineImpl rulesEngine;
     private GELFChunkManager gelfChunkManager;
@@ -182,14 +183,11 @@ public class Core implements GraylogServer, InputHost, MetricsHost, ProcessingHo
     private MongoDbMetricsReporter metricsReporter;
     private AtomicReference<HashMap<String, Counter>> currentStreamThroughput = new AtomicReference<HashMap<String, Counter>>();
 
-    public void initialize(Configuration configuration) {
+    public void initialize() {
     	startedAt = new DateTime(DateTimeZone.UTC);
 
         NodeId id = new NodeId(configuration.getNodeIdFile());
         this.nodeId = id.readOrGenerate();
-
-        this.metricRegistry = metrics;
-        this.configuration = configuration; // TODO use dependency injection
 
         if (configuration.isMetricsCollectionEnabled()) {
             metricsReporter = MongoDbMetricsReporter.forRegistry(this, metricRegistry).build();
