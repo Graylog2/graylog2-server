@@ -21,10 +21,13 @@
 package org.graylog2.shared.buffers.processors;
 
 import com.codahale.metrics.Meter;
+import com.codahale.metrics.MetricRegistry;
 import com.codahale.metrics.Timer;
+import com.google.inject.Inject;
 import com.lmax.disruptor.EventHandler;
 import org.graylog2.plugin.GraylogServer;
 import org.graylog2.shared.ProcessingHost;
+import org.graylog2.shared.filters.FilterRegistry;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.graylog2.plugin.buffers.MessageEvent;
@@ -45,6 +48,12 @@ public class ProcessBufferProcessor implements EventHandler<MessageEvent> {
     private final Timer processTime;
     private final Meter filteredOutMessages;
     private final Meter outgoingMessages;
+
+    @Inject
+    private MetricRegistry metricRegistry;
+
+    @Inject
+    private FilterRegistry filterRegistry;
 
     private final long ordinal;
     private final long numberOfConsumers;
@@ -76,8 +85,8 @@ public class ProcessBufferProcessor implements EventHandler<MessageEvent> {
 
         LOG.debug("Starting to process message <{}>.", msg.getId());
 
-        for (MessageFilter filter : server.getFilters()) {
-            Timer timer = server.metrics().timer(name(filter.getClass(), "executionTime"));
+        for (MessageFilter filter : filterRegistry.all()) {
+            Timer timer = metricRegistry.timer(name(filter.getClass(), "executionTime"));
             final Timer.Context timerContext = timer.time();
 
             try {

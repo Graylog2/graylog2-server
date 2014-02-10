@@ -47,6 +47,7 @@ import org.graylog2.indexer.Indexer;
 import org.graylog2.initializers.Initializers;
 import org.graylog2.inputs.BasicCache;
 import org.graylog2.inputs.Cache;
+import org.graylog2.shared.filters.FilterRegistry;
 import org.graylog2.shared.inputs.InputRegistry;
 import org.graylog2.inputs.gelf.gelf.GELFChunkManager;
 import org.graylog2.jersey.container.netty.NettyContainer;
@@ -142,7 +143,9 @@ public class Core implements GraylogServer, InputHost, MetricsHost, ProcessingHo
             new AtomicReference<ConcurrentHashMap<String, Counter>>(new ConcurrentHashMap<String, Counter>());
     private long throughput = 0;
 
-    private List<MessageFilter> filters = Lists.newArrayList();
+    @Inject
+    private FilterRegistry filterRegistry;
+
     private List<Transport> transports = Lists.newArrayList();
     private List<AlarmCallback> alarmCallbacks = Lists.newArrayList();
 
@@ -249,10 +252,6 @@ public class Core implements GraylogServer, InputHost, MetricsHost, ProcessingHo
                 }
             }
         });
-    }
-
-    public void registerFilter(MessageFilter filter) {
-        this.filters.add(filter);
     }
 
     public void registerTransport(Transport transport) {
@@ -428,7 +427,7 @@ public class Core implements GraylogServer, InputHost, MetricsHost, ProcessingHo
             LOG.info("Loaded <{}> plugin [{}].", type.getSimpleName(), plugin.getClass().getCanonicalName());
 
             if (plugin instanceof MessageFilter) {
-                registerFilter((MessageFilter) plugin);
+                filterRegistry.register((MessageFilter) plugin);
             } else if (plugin instanceof MessageInput) {
                 inputs.register(plugin.getClass(), ((MessageInput) plugin).getName());
             } else if (plugin instanceof MessageOutput) {
@@ -503,10 +502,6 @@ public class Core implements GraylogServer, InputHost, MetricsHost, ProcessingHo
         return this.transports;
     }
     
-    public List<MessageFilter> getFilters() {
-        return this.filters;
-    }
-
     public List<AlarmCallback> getAlarmCallbacks() {
         return this.alarmCallbacks;
     }

@@ -18,20 +18,32 @@
  * along with Graylog2.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.graylog2.shared.bindings;
+package org.graylog2.shared.filters;
 
-import com.codahale.metrics.MetricRegistry;
-import com.google.inject.AbstractModule;
-import org.graylog2.shared.filters.FilterRegistry;
+import com.beust.jcommander.internal.Lists;
+import org.graylog2.plugin.filters.MessageFilter;
+
+import java.util.Iterator;
+import java.util.List;
 
 /**
  * @author Dennis Oelkers <dennis@torch.sh>
  */
-public class GenericBindings extends AbstractModule {
-    @Override
-    protected void configure() {
-        // This is holding all our metrics.
-        bind(MetricRegistry.class).toInstance(new MetricRegistry());
-        bind(FilterRegistry.class).toInstance(new FilterRegistry());
+public class FilterRegistry {
+    private final List<MessageFilter> messageFilters;
+    public FilterRegistry() {
+        messageFilters = Lists.newArrayList();
+    }
+
+    public boolean register(MessageFilter messageFilter) {
+        return messageFilters.add(messageFilter);
+    }
+
+    public int size() {
+        return messageFilters.size();
+    }
+
+    public List<MessageFilter> all() {
+        return messageFilters;
     }
 }

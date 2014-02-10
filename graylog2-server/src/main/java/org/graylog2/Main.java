@@ -54,6 +54,7 @@ import org.graylog2.plugin.Tools;
 import org.graylog2.plugin.initializers.InitializerConfigurationException;
 import org.graylog2.plugins.PluginInstaller;
 import org.graylog2.shared.NodeRunner;
+import org.graylog2.shared.filters.FilterRegistry;
 import org.graylog2.system.activities.Activity;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -246,11 +247,12 @@ public final class Main extends NodeRunner {
         server.initializers().register(new VersionCheckInitializer());
 
         // Register message filters. (Order is important here)
-        server.registerFilter(new StaticFieldFilter());
-        server.registerFilter(new ExtractorFilter());
-        server.registerFilter(new BlacklistFilter());
-        server.registerFilter(new StreamMatcherFilter());
-        server.registerFilter(new RewriteFilter());
+        final FilterRegistry filterRegistry = injector.getInstance(FilterRegistry.class);
+        filterRegistry.register(new StaticFieldFilter());
+        filterRegistry.register(new ExtractorFilter());
+        filterRegistry.register(new BlacklistFilter());
+        filterRegistry.register(new StreamMatcherFilter());
+        filterRegistry.register(new RewriteFilter());
 
         // Register outputs.
         server.outputs().register(new ElasticSearchOutput(server));
