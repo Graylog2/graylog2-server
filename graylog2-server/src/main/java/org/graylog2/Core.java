@@ -188,6 +188,7 @@ public class Core implements GraylogServer, InputHost, MetricsHost, ProcessingHo
         NodeId id = new NodeId(configuration.getNodeIdFile());
         this.nodeId = id.readOrGenerate();
 
+        this.metricRegistry = metrics;
         this.configuration = configuration; // TODO use dependency injection
 
         if (configuration.isMetricsCollectionEnabled()) {
