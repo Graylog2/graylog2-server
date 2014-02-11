@@ -22,6 +22,7 @@ package org.graylog2.rest.resources.streams.alerts;
 import com.codahale.metrics.annotation.Timed;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
+import org.apache.commons.mail.EmailException;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.graylog2.alerts.Alert;
 import org.graylog2.alerts.AlertCondition;
@@ -265,7 +266,10 @@ public class StreamAlertResource extends RestResource {
             @ApiResponse(code = 404, message = "Stream not found."),
             @ApiResponse(code = 400, message = "Invalid ObjectId.")
     })
-    public Response sendDummyAlert(@ApiParam(title = "streamId", description = "The stream id this new alert condition belongs to.", required = true) @PathParam("streamId") String streamid) {
+    public Response sendDummyAlert(@ApiParam(title = "streamId",
+            description = "The stream id this new alert condition belongs to.",
+            required = true) @PathParam("streamId") String streamid)
+            throws TransportConfigurationException, EmailException {
         checkPermission(RestPermissions.STREAMS_EDIT, streamid);
 
         StreamImpl stream;
@@ -275,17 +279,20 @@ public class StreamAlertResource extends RestResource {
             throw new WebApplicationException(404);
         }
 
-        AlertSender alertSender = null;
-        try {
-            alertSender = new AlertSender(core);
-        } catch (TransportConfigurationException e) {
-
-        }
+        AlertSender alertSender = new AlertSender(core);
 
         Map<String, Object> parameters = Maps.newHashMap();
         DummyAlertCondition dummyAlertCondition = new DummyAlertCondition(core, stream, null, null, Tools.iso8601(), "admin", parameters);
 
-        alertSender.sendEmails(stream, dummyAlertCondition.runCheck());
+        try {
+            AlertCondition.CheckResult checkResult = dummyAlertCondition.runCheck();
+            alertSender.sendEmails(stream,checkResult);
+        } catch (TransportConfigurationException e) {
+            return Response.serverError().entity("E-Mail transport is not or improperly configured.").build();
+        } catch (EmailException e) {
+            LOG.error("Sending dummy alert failed: {}", e);
+            return Response.serverError().entity(e.getMessage()).build();
+        }
 
         return Response.status(Response.Status.NO_CONTENT).build();
     }
