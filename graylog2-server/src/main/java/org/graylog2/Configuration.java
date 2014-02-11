@@ -36,7 +36,6 @@ import org.slf4j.LoggerFactory;
 
 import java.net.URI;
 import java.net.UnknownHostException;
-import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -199,6 +198,9 @@ public class Configuration {
 
     @Parameter(value = "versionchecks_uri", required = false)
     private String versionchecksUri = "http://versioncheck.torch.sh/check";
+
+    @Parameter(value = "http_proxy_uri", required = false)
+    private String httpProxyUri;
 
     // Transport: Email
     @Parameter(value = "transport_email_enabled", required = false)
@@ -540,5 +542,8 @@ public class Configuration {
         return versionchecksUri;
     }
 
+    public String getHttpProxyUri() {
+        return httpProxyUri;
+    }
 }
 
