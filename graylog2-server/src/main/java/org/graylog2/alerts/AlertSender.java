@@ -42,19 +42,17 @@ public class AlertSender {
 
     private final Core core;
 
-    public AlertSender(Core core) throws TransportConfigurationException {
+    public AlertSender(Core core) {
         this.core = core;
     }
 
-    public void sendEmails(StreamImpl stream, AlertCondition.CheckResult checkResult) {
+    public void sendEmails(StreamImpl stream, AlertCondition.CheckResult checkResult) throws TransportConfigurationException, EmailException {
         if(!core.getConfiguration().isEmailTransportEnabled()) {
-            LOG.info("Email transport is disabled. Not sending email alerts.");
-            return;
+            throw new TransportConfigurationException();
         }
 
         if (stream.getAlertReceivers() == null || stream.getAlertReceivers().isEmpty()) {
-            LOG.debug("Stream [{}] has no alert receivers.", stream);
-            return;
+            throw new RuntimeException("Stream [" + stream + "] has no alert receivers.");
         }
 
         // Send emails to subscribed users.
@@ -79,33 +77,33 @@ public class AlertSender {
 
     }
 
-    private void sendEmail(String emailAddress, StreamImpl stream, AlertCondition.CheckResult checkResult) {
-        try {
-            Email email = new SimpleEmail();
-            email.setHostName(core.getConfiguration().getEmailTransportHostname());
-            email.setSmtpPort(core.getConfiguration().getEmailTransportPort());
-            if (core.getConfiguration().isEmailTransportUseSsl()) {
-                email.setSslSmtpPort(Integer.toString(core.getConfiguration().getEmailTransportPort()));
-            }
-
-            if(core.getConfiguration().isEmailTransportUseAuth()) {
-                email.setAuthenticator(new DefaultAuthenticator(
-                        core.getConfiguration().getEmailTransportUsername(),
-                        core.getConfiguration().getEmailTransportPassword()
-                ));
-            }
-
-            email.setSSLOnConnect(core.getConfiguration().isEmailTransportUseSsl());
-            email.setStartTLSEnabled(core.getConfiguration().isEmailTransportUseTls());
-            email.setFrom(core.getConfiguration().getEmailTransportFromEmail());
-            email.setSubject(buildSubject(stream, checkResult, core.getConfiguration()));
-            email.setMsg(buildBody(stream, checkResult));
-            email.addTo(emailAddress);
-
-            email.send();
-        } catch(EmailException e) {
-            LOG.error("Could not send alert email.", e);
+    private void sendEmail(String emailAddress, StreamImpl stream, AlertCondition.CheckResult checkResult) throws TransportConfigurationException, EmailException {
+        if(!core.getConfiguration().isEmailTransportEnabled()) {
+            throw new TransportConfigurationException();
         }
+
+        Email email = new SimpleEmail();
+        email.setHostName(core.getConfiguration().getEmailTransportHostname());
+        email.setSmtpPort(core.getConfiguration().getEmailTransportPort());
+        if (core.getConfiguration().isEmailTransportUseSsl()) {
+            email.setSslSmtpPort(Integer.toString(core.getConfiguration().getEmailTransportPort()));
+        }
+
+        if(core.getConfiguration().isEmailTransportUseAuth()) {
+            email.setAuthenticator(new DefaultAuthenticator(
+                    core.getConfiguration().getEmailTransportUsername(),
+                    core.getConfiguration().getEmailTransportPassword()
+            ));
+        }
+
+        email.setSSLOnConnect(core.getConfiguration().isEmailTransportUseSsl());
+        email.setStartTLSEnabled(core.getConfiguration().isEmailTransportUseTls());
+        email.setFrom(core.getConfiguration().getEmailTransportFromEmail());
+        email.setSubject(buildSubject(stream, checkResult, core.getConfiguration()));
+        email.setMsg(buildBody(stream, checkResult));
+        email.addTo(emailAddress);
+
+        email.send();
     }
 
     private String buildSubject(StreamImpl stream, AlertCondition.CheckResult checkResult, Configuration config) {
