@@ -43,7 +43,7 @@ public class VersionCheckInitializer extends SimpleFixedRateScheduleInitializer 
     public void initialize(GraylogServer server, Map<String, String> config) throws InitializerConfigurationException {
         Core core = (Core) server;
 
-        if (core.getConfiguration().isVersionchecks()) {
+        if (core.getConfiguration().isVersionchecks() && !core.isLocalMode()) {
             configureScheduler(
                     core,
                     new VersionCheckThread(core),

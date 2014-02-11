@@ -19,11 +19,11 @@
  */
 package org.graylog2.periodical;
 
-import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.http.HttpEntity;
+import org.apache.http.HttpHost;
 import org.apache.http.client.config.RequestConfig;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
@@ -31,6 +31,7 @@ import org.apache.http.client.utils.URIBuilder;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.util.EntityUtils;
+import org.graylog2.Configuration;
 import org.graylog2.Core;
 import org.graylog2.ServerVersion;
 import org.graylog2.notifications.Notification;
@@ -41,6 +42,7 @@ import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.io.StringWriter;
+import java.net.URI;
 import java.net.URISyntaxException;
 import java.nio.charset.Charset;
 
@@ -64,21 +66,41 @@ public class VersionCheckThread implements Runnable {
 
     @Override
     public void run() {
-        URIBuilder uri = null;
-        HttpGet get = null;
+        final URIBuilder uri;
+        final HttpGet get;
         try {
-            uri = new URIBuilder(core.getConfiguration().getVersionchecksUri());
+            final Configuration config = core.getConfiguration();
+            uri = new URIBuilder(config.getVersionchecksUri());
             uri.addParameter("anonid", DigestUtils.sha256Hex(core.getNodeId()));
             uri.addParameter("version", ServerVersion.VERSION.toString());
 
             get = new HttpGet(uri.build());
-            get.setHeader("User-Agent", "graylog2-server");
-            get.setConfig(RequestConfig.custom()
+            final StringBuilder userAgent = new StringBuilder("graylog2-server (")
+                    .append(System.getProperty("java.vendor"))
+                    .append(", ")
+                    .append(System.getProperty("java.version"))
+                    .append(", ")
+                    .append(System.getProperty("os.name"))
+                    .append(", ")
+                    .append(System.getProperty("os.version"))
+                    .append(")");
+            get.setHeader("User-Agent", userAgent.toString());
+            final RequestConfig.Builder configBuilder = RequestConfig.custom()
                     .setConnectTimeout(10000)
                     .setSocketTimeout(10000)
-                    .setConnectionRequestTimeout(10000)
-                    .build()
-            );
+                    .setConnectionRequestTimeout(10000);
+            if (config.getHttpProxyUri() != null) {
+                try {
+                    final URIBuilder uriBuilder = new URIBuilder(config.getHttpProxyUri());
+                    final URI proxyURI = uriBuilder.build();
+
+                    configBuilder.setProxy(new HttpHost(proxyURI.getHost(), proxyURI.getPort(), proxyURI.getScheme()));
+                } catch (Exception e) {
+                    LOG.error("Invalid version check proxy URI: " + config.getHttpProxyUri(), e);
+                    return;
+                }
+            }
+            get.setConfig(configBuilder.build());
         } catch (URISyntaxException e) {
             LOG.error("Invalid version check URI.", e);
             return;
