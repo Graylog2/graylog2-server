@@ -30,7 +30,6 @@ import org.graylog2.buffers.processors.OutputBufferProcessor;
 import org.graylog2.database.MongoBridge;
 import org.graylog2.database.MongoConnection;
 import org.graylog2.outputs.OutputRegistry;
-import org.graylog2.streams.StreamNew;
 
 /**
  * @author Dennis Oelkers <dennis@torch.sh>
