@@ -895,6 +895,19 @@ function generateId() {
     };
 })(jQuery);
 
+// Browsers fail with all kinds of date formats. Passing every part of the date as a constructor parameter seems to be the safest way to go.
+function parseDateFromString(src) {
+    var parts = /(\d+)-(\d+)-(\d+) (\d+):(\d+):(\d+)/.exec(src);
+
+    var millis = 0;
+    if (parts[7] != "" && parts[7] != undefined) {
+        millis = parts[7];
+    }
+
+    // LOL SRSLY WTF JAVASCRIPT: -1
+    return new Date(parts[1], parts[2]-1, parts[3], parts[4], parts[5], parts[6], millis);
+}
+
 // This is holding all field graphs.
 fieldGraphs = {};
 

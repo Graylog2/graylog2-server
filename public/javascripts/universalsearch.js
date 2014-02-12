@@ -25,7 +25,8 @@ $(document).ready(function() {
         $(".timerange-selector-container .absolute input[type='text']").each(function() {
             var dateString = $(this).val();
             if (dateString) {
-                var date = new Date(dateString);
+                var date = new Date(parseDateFromString(dateString));
+
                 $("input[type='hidden']", $(this).parent()).val(date.toISOString());
             }
         });
