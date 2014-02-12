@@ -25,12 +25,9 @@ import lib.ApiClient;
 import lib.timeranges.InvalidRangeParametersException;
 import lib.timeranges.RelativeRange;
 import models.api.requests.AddStaticFieldRequest;
-import models.api.responses.EmptyResponse;
-import models.api.responses.MessageSummaryResponse;
 import models.api.responses.metrics.GaugeResponse;
 import models.api.responses.system.InputSummaryResponse;
 import models.api.results.MessageResult;
-import org.joda.time.DateTime;
 import org.slf4j.LoggerFactory;
 import play.mvc.Http;
 
@@ -51,6 +48,7 @@ public class Input {
 
     private final ApiClient api;
     private final UniversalSearch.Factory searchFactory;
+    private final FieldMapper fieldMapper;
     private final ClusterEntity node;
     private final String type;
     private final String id;
@@ -59,7 +57,6 @@ public class Input {
     private final String title;
     private final User creatorUser;
     private final Boolean global;
-    //private final DateTime startedAt;
     private final Map<String, Object> attributes;
     private final Map<String, String> staticFields;
 
@@ -67,10 +64,12 @@ public class Input {
     private Input(ApiClient api,
                   UniversalSearch.Factory searchFactory,
                   UserService userService,
+                  FieldMapper fieldMapper,
                   @Assisted InputSummaryResponse is,
                   @Assisted ClusterEntity node) {
         this.api = api;
         this.searchFactory = searchFactory;
+        this.fieldMapper = fieldMapper;
         this.node = node;
         this.type = is.type;
         this.id = is.inputId;
@@ -78,7 +77,6 @@ public class Input {
         this.name = is.name;
         this.title = is.title;
         this.global = is.global;
-        //this.startedAt = DateTime.parse(is.startedAt);
         this.creatorUser = userService.load(is.creatorUserId);
         this.attributes = is.attributes;
         this.staticFields = is.staticFields;
@@ -94,22 +92,20 @@ public class Input {
     public MessageResult getRecentlyReceivedMessage(String nodeId) throws IOException, APIException {
         String query = "gl2_source_node:" + nodeId + " AND gl2_source_input:" + id;
 
-        UniversalSearch search = null;
+        UniversalSearch search;
         try {
             search = searchFactory.queryWithRange(query, new RelativeRange(60 * 60 * 24));
         } catch (InvalidRangeParametersException e) {
             return null; // cannot happen(tm)
         }
-        List<MessageSummaryResponse> messages = search.search().getMessages();
+        List<MessageResult> messages = search.search().getMessages();
 
-        MessageSummaryResponse result;
+        MessageResult result;
         if (messages.size() > 0) {
-            result = messages.get(0);
+            return messages.get(0);
         } else {
             return null;
         }
-
-        return new MessageResult(result.message, result.index);
     }
 
     public String getId() {
@@ -135,10 +131,6 @@ public class Input {
     public User getCreatorUser() {
         return creatorUser;
     }
-
-    /*public DateTime getStartedAt() {
-        return startedAt;
-    }*/
 
     public Map<String, String> getStaticFields() {
         return staticFields;
@@ -206,7 +198,7 @@ public class Input {
             if (response == null) {
                 return -1L;
             } else {
-                return (Long) response.value;
+                return response.value;
             }
         } catch (APIException e) {
             log.error("Unable to read throughput info of input [{}]", this.id, e);

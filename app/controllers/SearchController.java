@@ -81,8 +81,6 @@ public class SearchController extends AuthenticatedController {
             if (searchResult.getError() != null) {
                 return ok(views.html.search.queryerror.render(currentUser(), q, searchResult, savedSearch, null));
             }
-            searchResult = FieldMapper.run(searchResult);
-
             searchResult.setAllFields(getAllFields());
 
             histogramResult = search.dateHistogram(interval);

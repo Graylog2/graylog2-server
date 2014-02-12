@@ -19,10 +19,6 @@
 package lib;
 
 import com.google.common.collect.Maps;
-import models.User;
-import models.UserService;
-import org.joda.time.DateTime;
-import org.joda.time.DateTimeZone;
 import play.api.templates.Html;
 import play.data.Form;
 import play.mvc.Controller;
@@ -77,6 +73,18 @@ public class Tools {
             }
         }
         return x;
+    }
+
+    public static Object optionalLongValue(Object value) {
+        if (value instanceof Double || value instanceof Float) {
+            Double doubleValue = (Double) value;
+            if (doubleValue == doubleValue.longValue()) {
+                // it's actually representable as a Long, use that instead
+                return doubleValue.longValue();
+            }
+        }
+        // it's either something else or not representable as a Long, just use whatever it is
+        return value;
     }
 
     public static String syslogLevelToHuman(int level) {

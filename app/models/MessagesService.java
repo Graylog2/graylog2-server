@@ -51,10 +51,12 @@ public class MessagesService {
     public static final String TOTAL_CNT_CACHE_KEY = "counts.total";
 
     private final ApiClient api;
+    private final FieldMapper fieldMapper;
 
     @Inject
-    private MessagesService(ApiClient api) {
+    private MessagesService(ApiClient api, FieldMapper fieldMapper) {
         this.api = api;
+        this.fieldMapper = fieldMapper;
     }
 
     public Set<String> getMessageFields() {
@@ -103,7 +105,7 @@ public class MessagesService {
         final GetMessageResponse r = api.get(GetMessageResponse.class)
                 .path("/messages/{0}/{1}", index, id)
                 .execute();
-		return new MessageResult(r.message, r.index);
+		return new MessageResult(r.message, r.index, fieldMapper);
 	}
 	
 	public MessageAnalyzeResult analyze(String index, String what) throws IOException, APIException {

@@ -23,6 +23,7 @@ import com.google.common.base.Predicate;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
+import models.FieldMapper;
 import org.joda.time.DateTime;
 
 import javax.annotation.Nullable;
@@ -49,8 +50,10 @@ public class MessageResult {
     private final String sourceRadioId;
     private final String sourceRadioInputId;
     private final List<String> streamIds;
+    private final FieldMapper fieldMapper;
 
-    public MessageResult(Map<String, Object> message, String index) {
+    public MessageResult(Map<String, Object> message, String index, FieldMapper fieldMapper) {
+        this.fieldMapper = fieldMapper;
         // this comparator sorts fields alphabetically, but always leaves full_message at the end.
         // it really is interface, but I don't want to put it into the template either.
         // doing it here also means we don't have to copy the entire map when sorting...
@@ -109,7 +112,7 @@ public class MessageResult {
         return Maps.filterEntries(getFields(), new Predicate<Map.Entry<String, Object>>() {
             @Override
             public boolean apply(@Nullable Map.Entry<String, Object> input) {
-                return !HIDDEN_FIELDS.contains(input.getKey());
+                return input != null && !HIDDEN_FIELDS.contains(input.getKey());
             }
         });
     }
@@ -128,9 +131,15 @@ public class MessageResult {
                 // Never format a double in scientific notation.
                 if(value instanceof Double) {
                     Double d = (Double) value;
-                    value = (d.longValue() == d ? Long.toString(d.longValue()) : doubleFormatter.format(d));
+                    if (d.longValue() == d) {
+                        // preserve the "numberness" of the value, so the field mappers can take this into account
+                        // basically wait with stringification until the last moment in the template
+                        value = d.longValue();
+                    } else {
+                        value = doubleFormatter.format(d);
+                    }
                 }
-                return value;
+                return fieldMapper.map(key, value);
             }
         });
     }

@@ -350,21 +350,17 @@
 	</thead>
 	<tbody>
 		@for(r <- searchResult.getMessages()) {
-		<tr data-message-id='@r.message.get("_id")' data-source-index="@r.index">
+		<tr data-message-id='@r.getFields.get("_id")' data-source-index="@r.getIndex">
 			<td>@DateTools.inUserTimeZoneShortFormat(r.getTimestamp)</td>
-			<td class="result-td-36cd38f49b9afa08222c0dc9ebfe35eb">@r.message.get("source")</td>
-			<td class="messages-message result-td-78e731027d8fd50ed642340b7c9a63b3">@r.message.get("message")</td>
+			<td class="result-td-36cd38f49b9afa08222c0dc9ebfe35eb">@r.getFields.get("source")</td>
+			<td class="messages-message result-td-78e731027d8fd50ed642340b7c9a63b3">@r.getFields.get("message")</td>
 			
 			@for(f <- searchResult.getPageFields()) {
 				@if(!f.isStandardSelected()) {
 					<td class="result-td-@f.getHash()"
                         @if(!search.getOrder.getField.equals(f.getName)) { style="display: none;" }
                     >
-                        @if(r.message.get(f.getName()).isInstanceOf[Double]) {
-                            @{new DecimalFormat("#").format(r.message.get(f.getName))}
-                        } else {
-                            @r.message.get(f.getName())
-                        }
+                    @r.getFormattedFields.get(f.getName)
                     </td>
 				}
 			}

@@ -21,6 +21,7 @@ package models.api.results;
 import com.google.common.collect.Lists;
 import lib.Field;
 import lib.timeranges.TimeRange;
+import models.FieldMapper;
 import models.api.responses.MessageSummaryResponse;
 import models.api.responses.SearchResultResponse;
 
@@ -33,7 +34,7 @@ public class SearchResult {
     private final TimeRange timeRange;
 	private final int totalResultCount;
 	private final int tookMs;
-	private final List<MessageSummaryResponse> results;
+	private final List<MessageResult> results;
     private final SearchResultResponse.QueryError error;
     private final List<Field> fields;
     private final List<String> usedIndices;
@@ -44,22 +45,31 @@ public class SearchResult {
                         TimeRange timeRange,
                         int totalResultCount,
                         int tookMs,
-                        List<MessageSummaryResponse> results,
+                        List<MessageSummaryResponse> summaryResponses,
                         List<String> fields,
                         List<String> usedIndices,
-                        SearchResultResponse.QueryError error) {
+                        SearchResultResponse.QueryError error,
+                        FieldMapper fieldMapper) {
         this.originalQuery = originalQuery;
         this.builtQuery = builtQuery;
         this.timeRange = timeRange;
 		this.totalResultCount = totalResultCount;
 		this.tookMs = tookMs;
-		this.results = results;
         this.error = error;
         this.fields = buildFields(fields);
         this.usedIndices = usedIndices;
-	}
+
+        // convert MessageSummaryResponses to MessageResult because of the post processing that happens there
+        // otherwise we'd have to duplicate it everywhere.
+        results = Lists.newArrayList();
+        if (summaryResponses != null) {
+            for (MessageSummaryResponse response : summaryResponses) {
+                results.add(new MessageResult(response.message, response.index, fieldMapper));
+            }
+        }
+    }
 	
-	public List<MessageSummaryResponse> getMessages() {
+	public List<MessageResult> getMessages() {
 		return results;
 	}
 	
