@@ -106,7 +106,24 @@ function validateAbsoluteTimerange(el) {
     var parent = $(el).parent().parent();
     var fromStr = $("input[name='from']", parent).val();
     var toStr = $("input[name='to']", parent).val();
-    var from = new Date(fromStr);
-    var to = new Date(toStr);
+    var from = parseDateFromString(fromStr);
+    var to = parseDateFromString(toStr);
+
+    // new Date(year, month, day, hours, minutes, seconds, milliseconds)
+
     return (from <= to)
+}
+
+// Browsers fail with all kinds of date formats. Passing every part of the date as a constructor parameter seems to be the safest way to go.
+function parseDateFromString(src) {
+    // src looks like this: 2014-02-12 17:26:22
+
+    var parts = /(\d+)-(\d+)-(\d+) (\d+):(\d+):(\d+)/.exec(src);
+
+    var millis = 0;
+    if (parts[7] != "" && parts[7] != undefined) {
+        millis = parts[7];
+    }
+
+    return new Date(parts[1], parts[2], parts[3], parts[4], parts[5], parts[6], millis);
 }
