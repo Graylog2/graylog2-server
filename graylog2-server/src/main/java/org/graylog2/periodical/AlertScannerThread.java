@@ -27,6 +27,7 @@ import org.graylog2.alerts.AlertCondition;
 import org.graylog2.alerts.AlertSender;
 import org.graylog2.notifications.Notification;
 import org.graylog2.plugin.Message;
+import org.graylog2.notifications.Notification;
 import org.graylog2.plugin.alarms.transports.TransportConfigurationException;
 import org.graylog2.plugin.streams.Stream;
 import org.graylog2.streams.StreamImpl;
