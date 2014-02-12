@@ -66,6 +66,7 @@ public class GELFProcessor {
             lm = parse(message.getJSON(), sourceInput);
         } catch (IllegalStateException e) {
             LOG.error("Corrupt or invalid message received: ", e);
+            return;
         }
 
         if (lm == null || !lm.isComplete()) {
