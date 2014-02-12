@@ -1,5 +1,5 @@
-/**
- * Copyright 2012 Lennart Koopmann <lennart@socketfeed.com>
+/*
+ * Copyright 2013-2014 TORCH GmbH
  *
  * This file is part of Graylog2.
  *
@@ -13,32 +13,36 @@
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
  *
+ *
  * You should have received a copy of the GNU General Public License
  * along with Graylog2.  If not, see <http://www.gnu.org/licenses/>.
- *
  */
 
 package org.graylog2.shared.buffers;
 
 import com.codahale.metrics.Meter;
+import com.codahale.metrics.MetricRegistry;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
+import com.google.inject.Inject;
+import com.google.inject.assistedinject.Assisted;
+import com.google.inject.assistedinject.AssistedInject;
 import com.lmax.disruptor.WaitStrategy;
 import com.lmax.disruptor.dsl.Disruptor;
 import com.lmax.disruptor.dsl.ProducerType;
-import org.graylog2.plugin.GraylogServer;
-import org.graylog2.shared.buffers.processors.ProcessBufferProcessor;
 import org.graylog2.inputs.Cache;
-import org.graylog2.plugin.buffers.Buffer;
+import org.graylog2.plugin.GraylogServer;
 import org.graylog2.plugin.Message;
+import org.graylog2.plugin.buffers.Buffer;
+import org.graylog2.plugin.buffers.BufferOutOfCapacityException;
 import org.graylog2.plugin.buffers.MessageEvent;
 import org.graylog2.plugin.buffers.ProcessingDisabledException;
 import org.graylog2.plugin.inputs.MessageInput;
+import org.graylog2.shared.buffers.processors.ProcessBufferProcessor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import org.graylog2.plugin.buffers.BufferOutOfCapacityException;
 
 import static com.codahale.metrics.MetricRegistry.name;
 
@@ -46,6 +50,9 @@ import static com.codahale.metrics.MetricRegistry.name;
  * @author Lennart Koopmann <lennart@socketfeed.com>
  */
 public class ProcessBuffer extends Buffer {
+    public interface Factory {
+        public ProcessBuffer create(GraylogServer server, Cache masterCache);
+    }
 
     private static final Logger LOG = LoggerFactory.getLogger(ProcessBuffer.class);
 
@@ -66,13 +73,22 @@ public class ProcessBuffer extends Buffer {
     private final Meter rejectedMessages;
     private final Meter cachedMessages;
 
-    public ProcessBuffer(GraylogServer server, Cache masterCache) {
+    private final MetricRegistry metricRegistry;
+
+    @Inject
+    ProcessBufferProcessor.Factory processBufferProcessorFactory;
+
+    @AssistedInject
+    public ProcessBuffer(MetricRegistry metricRegistry,
+                         @Assisted GraylogServer server,
+                         @Assisted Cache masterCache) {
+        this.metricRegistry = metricRegistry;
         this.server = server;
         this.masterCache = masterCache;
 
-        incomingMessages = server.metrics().meter(name(ProcessBuffer.class, "incomingMessages"));
-        rejectedMessages = server.metrics().meter(name(ProcessBuffer.class, "rejectedMessages"));
-        cachedMessages = server.metrics().meter(name(ProcessBuffer.class, "cachedMessages"));
+        incomingMessages = metricRegistry.meter(name(ProcessBuffer.class, "incomingMessages"));
+        rejectedMessages = metricRegistry.meter(name(ProcessBuffer.class, "rejectedMessages"));
+        cachedMessages = metricRegistry.meter(name(ProcessBuffer.class, "cachedMessages"));
 
         if (server.isServer()) {
             SOURCE_INPUT_ATTR_NAME = "gl2_source_input";
@@ -101,7 +117,8 @@ public class ProcessBuffer extends Buffer {
         ProcessBufferProcessor[] processors = new ProcessBufferProcessor[processBufferProcessors];
         
         for (int i = 0; i < processBufferProcessors; i++) {
-            processors[i] = new ProcessBufferProcessor(this.server, i, processBufferProcessors);
+            //processors[i] = new ProcessBufferProcessor(this.server, i, processBufferProcessors);
+            processors[i] = processBufferProcessorFactory.create(this.server, i, processBufferProcessors);
         }
         
         disruptor.handleEventsWith(processors);

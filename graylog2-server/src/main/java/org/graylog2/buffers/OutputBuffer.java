@@ -1,5 +1,5 @@
-/**
- * Copyright 2012 Lennart Koopmann <lennart@socketfeed.com>
+/*
+ * Copyright 2013-2014 TORCH GmbH
  *
  * This file is part of Graylog2.
  *
@@ -13,22 +13,26 @@
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
  *
+ *
  * You should have received a copy of the GNU General Public License
  * along with Graylog2.  If not, see <http://www.gnu.org/licenses/>.
- *
  */
 
 package org.graylog2.buffers;
 
 import com.codahale.metrics.Meter;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
+import com.google.inject.Inject;
+import com.google.inject.assistedinject.Assisted;
+import com.google.inject.assistedinject.AssistedInject;
 import com.lmax.disruptor.dsl.Disruptor;
 import com.lmax.disruptor.dsl.ProducerType;
 import org.graylog2.Core;
 import org.graylog2.buffers.processors.OutputBufferProcessor;
 import org.graylog2.inputs.Cache;
-import org.graylog2.plugin.buffers.Buffer;
 import org.graylog2.plugin.Message;
+import org.graylog2.plugin.buffers.Buffer;
+import org.graylog2.plugin.buffers.BufferOutOfCapacityException;
 import org.graylog2.plugin.buffers.MessageEvent;
 import org.graylog2.plugin.inputs.MessageInput;
 import org.slf4j.Logger;
@@ -36,7 +40,6 @@ import org.slf4j.LoggerFactory;
 
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import org.graylog2.plugin.buffers.BufferOutOfCapacityException;
 
 import static com.codahale.metrics.MetricRegistry.name;
 
@@ -44,6 +47,9 @@ import static com.codahale.metrics.MetricRegistry.name;
  * @author Lennart Koopmann <lennart@socketfeed.com>
  */
 public class OutputBuffer extends Buffer {
+    public interface Factory {
+        public OutputBuffer create(Core server, Cache overflowCache);
+    }
 
     private static final Logger LOG = LoggerFactory.getLogger(OutputBuffer.class);
 
@@ -61,7 +67,11 @@ public class OutputBuffer extends Buffer {
     private final Meter rejectedMessages;
     private final Meter cachedMessages;
 
-    public OutputBuffer(Core server, Cache overflowCache) {
+    @Inject
+    private OutputBufferProcessor.Factory outputBufferProcessorFactory;
+
+    @AssistedInject
+    public OutputBuffer(@Assisted Core server, @Assisted Cache overflowCache) {
         this.server = server;
         this.overflowCache = overflowCache;
 
@@ -83,10 +93,13 @@ public class OutputBuffer extends Buffer {
                 + "and wait strategy <{}>.", server.getConfiguration().getRingSize(),
                 server.getConfiguration().getProcessorWaitStrategy().getClass().getSimpleName());
 
-        OutputBufferProcessor[] processors = new OutputBufferProcessor[server.getConfiguration().getOutputBufferProcessors()];
+        int outputBufferProcessorCount = server.getConfiguration().getOutputBufferProcessors();
+
+        OutputBufferProcessor[] processors = new OutputBufferProcessor[outputBufferProcessorCount];
         
-        for (int i = 0; i < server.getConfiguration().getOutputBufferProcessors(); i++) {
-            processors[i] = new OutputBufferProcessor(this.server, i, server.getConfiguration().getOutputBufferProcessors());
+        for (int i = 0; i < outputBufferProcessorCount; i++) {
+            //processors[i] = new OutputBufferProcessor(this.server, i, server.getConfiguration().getOutputBufferProcessors());
+            processors[i] = outputBufferProcessorFactory.create(this.server, i, outputBufferProcessorCount);
         }
         
         disruptor.handleEventsWith(processors);

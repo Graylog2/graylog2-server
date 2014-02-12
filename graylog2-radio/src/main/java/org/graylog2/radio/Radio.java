@@ -1,5 +1,5 @@
-/**
- * Copyright 2013 Lennart Koopmann <lennart@torch.sh>
+/*
+ * Copyright 2013-2014 TORCH GmbH
  *
  * This file is part of Graylog2.
  *
@@ -13,9 +13,9 @@
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
  *
+ *
  * You should have received a copy of the GNU General Public License
  * along with Graylog2.  If not, see <http://www.gnu.org/licenses/>.
- *
  */
 package org.graylog2.radio;
 
@@ -47,14 +47,14 @@ import org.graylog2.plugin.streams.Stream;
 import org.graylog2.plugin.system.NodeId;
 import org.graylog2.radio.cluster.Ping;
 import org.graylog2.radio.inputs.RadioInputRegistry;
+import org.graylog2.radio.transports.RadioTransport;
+import org.graylog2.radio.transports.kafka.KafkaProducer;
 import org.graylog2.shared.MetricsHost;
 import org.graylog2.shared.ProcessingHost;
 import org.graylog2.shared.buffers.ProcessBuffer;
 import org.graylog2.shared.inputs.InputRegistry;
 import org.graylog2.shared.periodical.MasterCacheWorkerThread;
 import org.graylog2.shared.periodical.ThroughputCounterManagerThread;
-import org.graylog2.radio.transports.RadioTransport;
-import org.graylog2.radio.transports.kafka.KafkaProducer;
 import org.jboss.netty.bootstrap.ServerBootstrap;
 import org.jboss.netty.channel.ChannelPipeline;
 import org.jboss.netty.channel.ChannelPipelineFactory;
@@ -110,6 +110,9 @@ public class Radio implements InputHost, MetricsHost, GraylogServer, ProcessingH
 
     private String nodeId;
 
+    @Inject
+    private ProcessBuffer.Factory processBufferFactory;
+
     public Radio() {
         AsyncHttpClientConfig.Builder builder = new AsyncHttpClientConfig.Builder();
         builder.setAllowPoolingConnection(false);
@@ -126,7 +129,9 @@ public class Radio implements InputHost, MetricsHost, GraylogServer, ProcessingH
         gelfChunkManager.start();
 
         inputCache = new BasicCache();
-        processBuffer = new ProcessBuffer(this, inputCache);
+
+        processBuffer = processBufferFactory.create(this, inputCache);
+        //processBuffer = new ProcessBuffer(this, inputCache);
         processBuffer.initialize(this.getConfiguration().getRingSize(),
                 this.getConfiguration().getProcessorWaitStrategy(),
                 this.getConfiguration().getProcessBufferProcessors()

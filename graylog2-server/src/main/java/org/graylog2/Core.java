@@ -1,5 +1,5 @@
-/**
- * Copyright 2012, 2013 Lennart Koopmann <lennart@socketfeed.com>
+/*
+ * Copyright 2013-2014 TORCH GmbH
  *
  * This file is part of Graylog2.
  *
@@ -13,9 +13,9 @@
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
  *
+ *
  * You should have received a copy of the GNU General Public License
  * along with Graylog2.  If not, see <http://www.gnu.org/licenses/>.
- *
  */
 
 package org.graylog2;
@@ -36,10 +36,9 @@ import org.glassfish.jersey.server.filter.EncodingFilter;
 import org.glassfish.jersey.server.internal.scanning.PackageNamesScanner;
 import org.graylog2.blacklists.BlacklistCache;
 import org.graylog2.buffers.OutputBuffer;
-import org.graylog2.inputs.ServerInputRegistry;
-import org.graylog2.shared.buffers.ProcessBuffer;
 import org.graylog2.dashboards.DashboardRegistry;
 import org.graylog2.database.HostCounterCacheImpl;
+import org.graylog2.database.ModelService;
 import org.graylog2.database.MongoBridge;
 import org.graylog2.database.MongoConnection;
 import org.graylog2.indexer.Deflector;
@@ -47,12 +46,10 @@ import org.graylog2.indexer.Indexer;
 import org.graylog2.initializers.Initializers;
 import org.graylog2.inputs.BasicCache;
 import org.graylog2.inputs.Cache;
-import org.graylog2.shared.filters.FilterRegistry;
-import org.graylog2.shared.inputs.InputRegistry;
+import org.graylog2.inputs.ServerInputRegistry;
 import org.graylog2.inputs.gelf.gelf.GELFChunkManager;
 import org.graylog2.jersey.container.netty.NettyContainer;
 import org.graylog2.metrics.jersey2.MetricsDynamicBinding;
-import org.graylog2.rest.RestAccessLogFilter;
 import org.graylog2.outputs.OutputRegistry;
 import org.graylog2.periodical.MongoDbMetricsReporter;
 import org.graylog2.plugin.GraylogServer;
@@ -74,13 +71,18 @@ import org.graylog2.plugin.system.NodeId;
 import org.graylog2.plugins.PluginLoader;
 import org.graylog2.rest.CORSFilter;
 import org.graylog2.rest.ObjectMapperProvider;
+import org.graylog2.rest.RestAccessLogFilter;
 import org.graylog2.security.ShiroSecurityBinding;
 import org.graylog2.security.ShiroSecurityContextFactory;
 import org.graylog2.security.ldap.LdapConnector;
 import org.graylog2.security.realm.LdapUserAuthenticator;
 import org.graylog2.shared.MetricsHost;
 import org.graylog2.shared.ProcessingHost;
+import org.graylog2.shared.buffers.ProcessBuffer;
+import org.graylog2.shared.filters.FilterRegistry;
+import org.graylog2.shared.inputs.InputRegistry;
 import org.graylog2.streams.StreamImpl;
+import org.graylog2.streams.StreamNew;
 import org.graylog2.system.activities.Activity;
 import org.graylog2.system.activities.ActivityWriter;
 import org.graylog2.system.jobs.SystemJobManager;
@@ -151,6 +153,8 @@ public class Core implements GraylogServer, InputHost, MetricsHost, ProcessingHo
 
     private Initializers initializers;
     private ServerInputRegistry inputs;
+
+    @Inject
     private OutputRegistry outputs;
 
     private DashboardRegistry dashboards;
@@ -186,6 +190,16 @@ public class Core implements GraylogServer, InputHost, MetricsHost, ProcessingHo
     private MongoDbMetricsReporter metricsReporter;
     private AtomicReference<HashMap<String, Counter>> currentStreamThroughput = new AtomicReference<HashMap<String, Counter>>();
 
+    @Inject
+    private StreamNew.Factory streamFactory;
+    @Inject
+    private ProcessBuffer.Factory processBufferFactory;
+    @Inject
+    private OutputBuffer.Factory outputBufferFactory;
+
+    @Inject
+    private ModelService<StreamNew> streamService;
+
     public void initialize() {
     	startedAt = new DateTime(DateTimeZone.UTC);
 
@@ -213,7 +227,6 @@ public class Core implements GraylogServer, InputHost, MetricsHost, ProcessingHo
 
         initializers = new Initializers(this);
         inputs = new ServerInputRegistry(this);
-        outputs = new OutputRegistry(this);
 
         if (isMaster()) {
             dashboards = new DashboardRegistry(this);
@@ -228,14 +241,16 @@ public class Core implements GraylogServer, InputHost, MetricsHost, ProcessingHo
         
         inputCache = new BasicCache();
         outputCache = new BasicCache();
-    
-        processBuffer = new ProcessBuffer(this, inputCache);
+
+        processBuffer = processBufferFactory.create(this, inputCache);
+        //processBuffer = new ProcessBuffer(this, inputCache);
         processBuffer.initialize(this.getConfiguration().getRingSize(),
                 this.getConfiguration().getProcessorWaitStrategy(),
                 this.getConfiguration().getProcessBufferProcessors()
         );
 
-        outputBuffer = new OutputBuffer(this, outputCache);
+        outputBuffer = outputBufferFactory.create(this, outputCache);
+        //outputBuffer = new OutputBuffer(this, outputCache);
         outputBuffer.initialize();
 
         gelfChunkManager = new GELFChunkManager(this);

@@ -1,5 +1,5 @@
-/**
- * Copyright 2012 Lennart Koopmann <lennart@socketfeed.com>
+/*
+ * Copyright 2013-2014 TORCH GmbH
  *
  * This file is part of Graylog2.
  *
@@ -13,9 +13,9 @@
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
  *
+ *
  * You should have received a copy of the GNU General Public License
  * along with Graylog2.  If not, see <http://www.gnu.org/licenses/>.
- *
  */
 
 package org.graylog2.shared.buffers.processors;
@@ -23,16 +23,16 @@ package org.graylog2.shared.buffers.processors;
 import com.codahale.metrics.Meter;
 import com.codahale.metrics.MetricRegistry;
 import com.codahale.metrics.Timer;
-import com.google.inject.Inject;
+import com.google.inject.assistedinject.Assisted;
+import com.google.inject.assistedinject.AssistedInject;
 import com.lmax.disruptor.EventHandler;
 import org.graylog2.plugin.GraylogServer;
-import org.graylog2.shared.ProcessingHost;
+import org.graylog2.plugin.Message;
+import org.graylog2.plugin.buffers.MessageEvent;
+import org.graylog2.plugin.filters.MessageFilter;
 import org.graylog2.shared.filters.FilterRegistry;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.graylog2.plugin.buffers.MessageEvent;
-import org.graylog2.plugin.filters.MessageFilter;
-import org.graylog2.plugin.Message;
 
 import static com.codahale.metrics.MetricRegistry.name;
 
@@ -40,6 +40,14 @@ import static com.codahale.metrics.MetricRegistry.name;
  * @author Lennart Koopmann <lennart@socketfeed.com>
  */
 public class ProcessBufferProcessor implements EventHandler<MessageEvent> {
+
+    public interface Factory {
+        public ProcessBufferProcessor create(
+                GraylogServer server,
+                @Assisted("ordinal") final long ordinal,
+                @Assisted("numberOfConsumers") final long numberOfConsumers
+        );
+    }
 
     private static final Logger LOG = LoggerFactory.getLogger(ProcessBufferProcessor.class);
 
@@ -49,16 +57,20 @@ public class ProcessBufferProcessor implements EventHandler<MessageEvent> {
     private final Meter filteredOutMessages;
     private final Meter outgoingMessages;
 
-    @Inject
-    private MetricRegistry metricRegistry;
-
-    @Inject
-    private FilterRegistry filterRegistry;
+    private final MetricRegistry metricRegistry;
+    private final FilterRegistry filterRegistry;
 
     private final long ordinal;
     private final long numberOfConsumers;
-    
-    public ProcessBufferProcessor(GraylogServer server, final long ordinal, final long numberOfConsumers) {
+
+    @AssistedInject
+    public ProcessBufferProcessor(MetricRegistry metricRegistry,
+                                  FilterRegistry filterRegistry,
+                                  @Assisted GraylogServer server,
+                                  @Assisted("ordinal") final long ordinal,
+                                  @Assisted("numberOfConsumers") final long numberOfConsumers) {
+        this.metricRegistry = metricRegistry;
+        this.filterRegistry = filterRegistry;
         this.ordinal = ordinal;
         this.numberOfConsumers = numberOfConsumers;
         this.server = server;

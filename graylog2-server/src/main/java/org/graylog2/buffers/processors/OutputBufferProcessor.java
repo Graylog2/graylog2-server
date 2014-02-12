@@ -1,5 +1,5 @@
-/**
- * Copyright 2012 Lennart Koopmann <lennart@socketfeed.com>
+/*
+ * Copyright 2013-2014 TORCH GmbH
  *
  * This file is part of Graylog2.
  *
@@ -13,21 +13,26 @@
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
  *
+ *
  * You should have received a copy of the GNU General Public License
  * along with Graylog2.  If not, see <http://www.gnu.org/licenses/>.
- *
  */
 
 package org.graylog2.buffers.processors;
 
 import com.codahale.metrics.Histogram;
 import com.codahale.metrics.Meter;
+import com.codahale.metrics.MetricRegistry;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
+import com.google.inject.assistedinject.Assisted;
+import com.google.inject.assistedinject.AssistedInject;
 import com.lmax.disruptor.EventHandler;
 import org.bson.types.ObjectId;
+import org.graylog2.Configuration;
 import org.graylog2.Core;
+import org.graylog2.outputs.OutputRegistry;
 import org.graylog2.outputs.OutputRouter;
 import org.graylog2.outputs.OutputStreamConfigurationImpl;
 import org.graylog2.plugin.Message;
@@ -49,12 +54,21 @@ import static com.codahale.metrics.MetricRegistry.name;
  * @author Lennart Koopmann <lennart@socketfeed.com>
  */
 public class OutputBufferProcessor implements EventHandler<MessageEvent> {
+    public interface Factory {
+        public OutputBufferProcessor create(Core server,
+                                            @Assisted("ordinal") final long ordinal,
+                                            @Assisted("numberOfConsumers") final long numberOfCOnsumers);
+    }
 
     private static final Logger LOG = LoggerFactory.getLogger(OutputBufferProcessor.class);
 
     private final ExecutorService executor;
     
     private Core server;
+
+    private final Configuration configuration;
+    private final MetricRegistry metricRegistry;
+    private final OutputRegistry outputRegistry;
 
     private List<Message> buffer = Lists.newArrayList();
 
@@ -63,23 +77,33 @@ public class OutputBufferProcessor implements EventHandler<MessageEvent> {
 
     private final long ordinal;
     private final long numberOfConsumers;
-    
-    public OutputBufferProcessor(Core server, final long ordinal, final long numberOfConsumers) {
+
+    @AssistedInject
+    public OutputBufferProcessor(Configuration configuration,
+                                 MetricRegistry metricRegistry,
+                                 OutputRegistry outputRegistry,
+                                 @Assisted Core server,
+                                 @Assisted("ordinal") final long ordinal,
+                                 @Assisted("numberOfConsumers") final long numberOfConsumers) {
+        this.configuration = configuration;
+        this.metricRegistry = metricRegistry;
+        this.outputRegistry = outputRegistry;
+        this.server = server;
         this.ordinal = ordinal;
         this.numberOfConsumers = numberOfConsumers;
-        this.server = server;
+        //this.server = server;
         
         executor = new ThreadPoolExecutor(
-            server.getConfiguration().getOutputBufferProcessorThreadsCorePoolSize(),
-            server.getConfiguration().getOutputBufferProcessorThreadsMaxPoolSize(),
+            configuration.getOutputBufferProcessorThreadsCorePoolSize(),
+            configuration.getOutputBufferProcessorThreadsMaxPoolSize(),
             5, TimeUnit.SECONDS,
             new LinkedBlockingQueue<Runnable>(),
             new ThreadFactoryBuilder()
             .setNameFormat("outputbuffer-processor-" + ordinal + "-executor-%d")
             .build());
 
-        incomingMessages = server.metrics().meter(name(OutputBufferProcessor.class, "incomingMessages"));
-        batchSize = server.metrics().histogram(name(OutputBufferProcessor.class, "batchSize"));
+        incomingMessages = metricRegistry.meter(name(OutputBufferProcessor.class, "incomingMessages"));
+        batchSize = metricRegistry.histogram(name(OutputBufferProcessor.class, "batchSize"));
     }
 
     @Override
@@ -97,10 +121,10 @@ public class OutputBufferProcessor implements EventHandler<MessageEvent> {
 
         buffer.add(msg);
 
-        if (endOfBatch || buffer.size() >= server.getConfiguration().getOutputBatchSize()) {
+        if (endOfBatch || buffer.size() >= configuration.getOutputBatchSize()) {
 
-            final CountDownLatch doneSignal = new CountDownLatch(server.outputs().count());
-            for (final MessageOutput output : server.outputs().get()) {
+            final CountDownLatch doneSignal = new CountDownLatch(outputRegistry.count());
+            for (final MessageOutput output : outputRegistry.get()) {
                 final String typeClass = output.getClass().getCanonicalName();
 
                 try {

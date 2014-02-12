@@ -22,6 +22,9 @@ package org.graylog2.shared.bindings;
 
 import com.codahale.metrics.MetricRegistry;
 import com.google.inject.AbstractModule;
+import com.google.inject.assistedinject.FactoryModuleBuilder;
+import org.graylog2.shared.buffers.ProcessBuffer;
+import org.graylog2.shared.buffers.processors.ProcessBufferProcessor;
 import org.graylog2.shared.filters.FilterRegistry;
 
 /**
@@ -33,5 +36,8 @@ public class GenericBindings extends AbstractModule {
         // This is holding all our metrics.
         bind(MetricRegistry.class).toInstance(new MetricRegistry());
         bind(FilterRegistry.class).toInstance(new FilterRegistry());
+
+        install(new FactoryModuleBuilder().build(ProcessBuffer.Factory.class));
+        install(new FactoryModuleBuilder().build(ProcessBufferProcessor.Factory.class));
     }
 }
