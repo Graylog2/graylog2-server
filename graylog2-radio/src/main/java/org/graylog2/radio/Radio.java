@@ -47,6 +47,8 @@ import org.graylog2.plugin.system.NodeId;
 import org.graylog2.radio.buffers.processors.RadioProcessBufferProcessor;
 import org.graylog2.radio.cluster.Ping;
 import org.graylog2.radio.inputs.RadioInputRegistry;
+import org.graylog2.radio.transports.RadioTransport;
+import org.graylog2.radio.transports.kafka.KafkaProducer;
 import org.graylog2.shared.MetricsHost;
 import org.graylog2.shared.ProcessingHost;
 import org.graylog2.shared.buffers.ProcessBuffer;

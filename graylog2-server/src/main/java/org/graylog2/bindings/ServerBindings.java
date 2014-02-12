@@ -21,14 +21,16 @@
 package org.graylog2.bindings;
 
 import com.google.inject.AbstractModule;
+import com.google.inject.TypeLiteral;
 import com.google.inject.assistedinject.FactoryModuleBuilder;
 import org.graylog2.Configuration;
+import org.graylog2.buffers.processors.ServerProcessBufferProcessor;
 import org.graylog2.buffers.OutputBuffer;
 import org.graylog2.buffers.processors.OutputBufferProcessor;
-import org.graylog2.buffers.processors.ServerProcessBufferProcessor;
 import org.graylog2.database.MongoBridge;
 import org.graylog2.database.MongoConnection;
 import org.graylog2.outputs.OutputRegistry;
+import org.graylog2.streams.StreamNew;
 
 /**
  * @author Dennis Oelkers <dennis@torch.sh>
