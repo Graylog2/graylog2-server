@@ -38,7 +38,6 @@ import org.graylog2.blacklists.BlacklistCache;
 import org.graylog2.buffers.OutputBuffer;
 import org.graylog2.dashboards.DashboardRegistry;
 import org.graylog2.database.HostCounterCacheImpl;
-import org.graylog2.database.ModelService;
 import org.graylog2.database.MongoBridge;
 import org.graylog2.database.MongoConnection;
 import org.graylog2.indexer.Deflector;
@@ -82,7 +81,6 @@ import org.graylog2.shared.buffers.ProcessBuffer;
 import org.graylog2.shared.filters.FilterRegistry;
 import org.graylog2.shared.inputs.InputRegistry;
 import org.graylog2.streams.StreamImpl;
-import org.graylog2.streams.StreamNew;
 import org.graylog2.system.activities.Activity;
 import org.graylog2.system.activities.ActivityWriter;
 import org.graylog2.system.jobs.SystemJobManager;
@@ -191,14 +189,9 @@ public class Core implements GraylogServer, InputHost, MetricsHost, ProcessingHo
     private AtomicReference<HashMap<String, Counter>> currentStreamThroughput = new AtomicReference<HashMap<String, Counter>>();
 
     @Inject
-    private StreamNew.Factory streamFactory;
-    @Inject
     private ProcessBuffer.Factory processBufferFactory;
     @Inject
     private OutputBuffer.Factory outputBufferFactory;
-
-    @Inject
-    private ModelService<StreamNew> streamService;
 
     public void initialize() {
     	startedAt = new DateTime(DateTimeZone.UTC);
