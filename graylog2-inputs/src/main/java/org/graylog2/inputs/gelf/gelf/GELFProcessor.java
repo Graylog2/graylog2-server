@@ -13,9 +13,9 @@
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
  *
- *
  * You should have received a copy of the GNU General Public License
  * along with Graylog2.  If not, see <http://www.gnu.org/licenses/>.
+ *
  */
 
 package org.graylog2.inputs.gelf.gelf;
@@ -95,7 +95,6 @@ public class GELFProcessor {
             json = objectMapper.readTree(message);
         } catch (Exception e) {
             LOG.error("Could not parse JSON!", e);
-            LOG.debug("This is the failed message: ", message);
             json = null;
         }
 
