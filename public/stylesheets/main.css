@@ -196,6 +196,12 @@ h4 {
 	margin-top: 5px;
 }
 
+#sidebar-inner.affix {
+    width: 31%;
+    top: 50px;
+    margin-top: 5px;
+}
+
 .messages tbody > tr {
 	cursor: pointer;
 }
