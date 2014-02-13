@@ -23,14 +23,8 @@ package org.graylog2.database;
 import java.net.UnknownHostException;
 import java.util.List;
 
-import com.mongodb.BasicDBObject;
-import com.mongodb.DB;
-import com.mongodb.DBCollection;
-import com.mongodb.MongoClient;
-import com.mongodb.MongoClientOptions;
+import com.mongodb.*;
 import com.mongodb.MongoClientOptions.Builder;
-import com.mongodb.MongoException;
-import com.mongodb.ServerAddress;
 
 /**
  * MongoDB connection singleton
@@ -83,6 +77,7 @@ public final class MongoConnection {
                     m = new MongoClient(address, options.build());
                 }
                 db = m.getDB(database);
+                db.setWriteConcern(WriteConcern.SAFE);
 
                 // Try to authenticate if configured.
                 if (useAuth) {
