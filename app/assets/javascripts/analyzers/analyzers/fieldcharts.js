@@ -108,7 +108,7 @@ $(document).ready(function() {
         $('.field-graph-container[data-chart-id="' + opts.chartid + '"]', $("#field-graphs")).remove();
 
         $.ajax({
-            url: '/a/search/fieldhistogram',
+            url: appPrefixed(appPrefixed('/a/search/fieldhistogram')),
             data: params,
             success: function(data) {
                 var template = $("#field-graph-template").clone();

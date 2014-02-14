@@ -16,7 +16,7 @@ $(document).ready(function () {
     // Notification count badge.
     (function checkServerAvailability() {
         $.ajax({
-            url: '/a/connection/available',
+            url: appPrefixed('/a/connection/available'),
             success: function(data) {
                 var connected = data.connected;
                 var count = data.connected_nodes_count;

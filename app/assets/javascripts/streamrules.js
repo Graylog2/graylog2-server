@@ -111,7 +111,7 @@ $(document).ready(function() {
         }
 
         $.ajax({
-            url: url,
+            url: appPrefixed(url),
             type: "POST",
             data: rule,
             dataType: "html",
@@ -187,7 +187,7 @@ $(document).ready(function() {
         var data = { "message" : message.fields };
 
         $.ajax({
-            url: '/a/streams/' + streamId + '/testMatch',
+            url: appPrefixed('/a/streams/' + streamId + '/testMatch'),
             type: "POST",
             data: JSON.stringify(data),
             contentType: "application/json",

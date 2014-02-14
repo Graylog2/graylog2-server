@@ -40,7 +40,7 @@ $(document).ready(function() {
         }
 
         $.ajax({
-            url: '/a/search/fieldstats',
+            url: appPrefixed('/a/search/fieldstats'),
             data: params,
             success: function(data) {
                 statistics.show();

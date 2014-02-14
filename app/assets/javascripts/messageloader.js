@@ -44,7 +44,7 @@
             }
 
             $.ajax({
-                url: url + "/filtered",
+                url: appPrefixed(url + "/filtered"),
                 success: function(data) {
                     showMessage(messageContainer, data.fields, data.id);
                     selector.hide();

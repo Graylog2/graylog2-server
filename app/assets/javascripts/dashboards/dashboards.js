@@ -2,7 +2,7 @@ $(document).ready(function() {
 
     // Load all writable dashboards in the global registry first.
     $.ajax({
-        url: '/a/dashboards/writable',
+        url: appPrefixed('/a/dashboards/writable'),
         success: function(data) {
             globalDashboards = data;
             applyDashboardsToAllSelectors();
@@ -27,7 +27,7 @@ $(document).ready(function() {
                     }
 
                     $.ajax({
-                        url: '/a/dashboards/' + dashboardId + '/positions',
+                        url: appPrefixed('/a/dashboards/' + dashboardId + '/positions'),
                         type: 'POST',
                         data: JSON.stringify(payload),
                         processData: false,
@@ -105,7 +105,7 @@ $(document).ready(function() {
         var widget = $(this).closest(".widget");
 
         $.ajax({
-            url: '/a/dashboards/' + widget.attr("data-dashboard-id") + '/widgets/' + widget.attr("data-widget-id") + '/delete',
+            url: appPrefixed('/a/dashboards/' + widget.attr("data-dashboard-id") + '/widgets/' + widget.attr("data-widget-id") + '/delete'),
             type: 'POST',
             success: function() {
                 showSuccess("Widget has been removed from dashboard!")
@@ -146,7 +146,7 @@ $(document).ready(function() {
             $(".reloading", widget).show();
 
             $.ajax({
-                url: '/a/dashboards/' + dashboardId + '/widgets/' + widgetId + '/value',
+                url: appPrefixed('/a/dashboards/' + dashboardId + '/widgets/' + widgetId + '/value'),
                 type: 'GET',
                 success: function(data) {
                     // Pass to widget specific function to display actual value(s).
@@ -256,7 +256,7 @@ $(document).ready(function() {
         var widgetId = widget.attr("data-widget-id");
 
         $.ajax({
-            url: '/a/dashboards/' + dashboardId + '/widgets/' + widgetId + '/cachetime',
+            url: appPrefixed('/a/dashboards/' + dashboardId + '/widgets/' + widgetId + '/cachetime'),
             data: {
                 cacheTime: newVal
             },
@@ -283,7 +283,7 @@ $(document).ready(function() {
         var newVal = $(".description-value", widget).val().trim();
 
         $.ajax({
-            url: '/a/dashboards/' + dashboardId + '/widgets/' + widgetId + '/description',
+            url: appPrefixed('/a/dashboards/' + dashboardId + '/widgets/' + widgetId + '/description'),
             data: {
                 description: newVal
             },
@@ -318,7 +318,7 @@ function addWidget(dashboardId, description, params) {
     }
 
     $.ajax({
-        url: '/a/dashboards/' + dashboardId + '/widgets',
+        url: appPrefixed('/a/dashboards/' + dashboardId + '/widgets'),
         type: 'POST',
         data: params,
         success: function() {

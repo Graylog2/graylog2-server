@@ -1,5 +1,11 @@
 @import lib.security.RestPermissions._
 @import views.helpers.Permissions._
+@import lib.Configuration
+
+<script type="text/javascript">
+// needs to be global!
+gl2AppPathPrefix = "@Configuration.getApplicationContext";
+</script>
 
 <div id="top" class="navbar navbar-fixed-top">
  	<div class="container-fluid">

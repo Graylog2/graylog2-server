@@ -1,5 +1,7 @@
 @(title: String)(content: Html)
 
+@import lib.Configuration
+
 <!DOCTYPE html>
 
 <html>
@@ -20,6 +22,11 @@
     </head>
 
     <body>
+        <script type="text/javascript">
+        // needs to be global!
+        gl2AppPathPrefix = "@Configuration.getApplicationContext";
+        </script>
+
         @content
     </body>
 </html>
