@@ -51,7 +51,7 @@
                     messageContainer.show();
 
                     $.ajax({
-                        url: url,
+                        url: appPrefixed(url),
                         success: function(data) {
                             jQuery.data(document.body, "message", data);
                             messageContainer.trigger("sampleMessageChanged", data);
@@ -74,7 +74,6 @@
                 },
                 complete: function() {
                     hideSpinner(spinner);
-
                 }
             })
         }
