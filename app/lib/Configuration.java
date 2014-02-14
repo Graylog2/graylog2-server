@@ -51,6 +51,25 @@ public class Configuration {
         });
     }
 
+    /**
+     * Exposes the config setting application.context for JavaScript.
+     * This ensures that the prefix does not end with a '/' or is completely empty so that the javascript code doesn't
+     * have to deal with it when assembling the path.
+     *
+     * @return path prefix for the app
+     */
+    public static String getApplicationContext() {
+        final String prefix = Play.application().configuration().getString("application.context", "");
+        if (prefix.isEmpty() || !prefix.endsWith("/")) {
+            return prefix;
+        }
+        String p = prefix;
+        while (p.endsWith("/")) {
+            p = p.substring(0, p.length());
+        }
+        return p;
+    }
+
     public static List<String> getServerRestUris() {
         List<String> uris = Lists.newArrayList();
 

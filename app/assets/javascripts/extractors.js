@@ -30,7 +30,7 @@ $(document).ready(function() {
 
         button.html("<i class='icon-refresh icon-spin'></i> Trying...");
         $.ajax({
-            url: '/a/tools/regex_test',
+            url: appPrefixed('/a/tools/regex_test'),
             data: {
                 "string":$("#xtrc-example").text(),
                 "regex":$("#regex_value").val()
@@ -59,7 +59,7 @@ $(document).ready(function() {
 
         button.html("<i class='icon-refresh icon-spin'></i> Trying...");
         $.ajax({
-            url: '/a/tools/substring_test',
+            url: appPrefixed('/a/tools/substring_test'),
             data: {
                 "string":$("#xtrc-example").text(),
                 "start":$("#begin_index").val(),
@@ -89,7 +89,7 @@ $(document).ready(function() {
 
         button.html("<i class='icon-refresh icon-spin'></i> Trying...");
         $.ajax({
-            url: '/a/tools/split_and_index_test',
+            url: appPrefixed('/a/tools/split_and_index_test'),
             data: {
                 "string":$("#xtrc-example").text(),
                 "split_by":$("#split_by").val(),
@@ -186,7 +186,7 @@ $(document).ready(function() {
 
         button.html("<i class='icon-refresh icon-spin'></i> Trying...");
         $.ajax({
-            url: '/a/tools/regex_test',
+            url: appPrefixed('/a/tools/regex_test'),
             data: {
                 "string":$("#xtrc-example").text(),
                 "regex":$("#condition_value").val()

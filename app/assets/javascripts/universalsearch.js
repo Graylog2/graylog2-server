@@ -49,7 +49,7 @@ $(document).ready(function() {
             }
 
             $.ajax({
-                url: '/a/tools/natural_date_test',
+                url: appPrefixed('/a/tools/natural_date_test'),
                 data: {
                     "string": string
                 },
@@ -100,7 +100,7 @@ $(document).ready(function() {
         params.title = title
 
         $.ajax({
-            url: '/savedsearches/create',
+            url: appPrefixed('/savedsearches/create'),
             type: 'POST',
             data: {
                 "params": JSON.stringify(params)
@@ -144,7 +144,7 @@ $(document).ready(function() {
     // Fill saved searches selector.
     if ($("#saved-searches-selector").size() > 0) {
         $.ajax({
-            url: '/savedsearches',
+            url: appPrefixed('/savedsearches'),
             type: 'GET',
             success: function(data) {
                 // Convert to array for sorting.

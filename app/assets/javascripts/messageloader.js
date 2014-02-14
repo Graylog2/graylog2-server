@@ -44,7 +44,7 @@
             }
 
             $.ajax({
-                url: url + "/filtered",
+                url: appPrefixed(url + "/filtered"),
                 success: function(data) {
                     showMessage(messageContainer, data.fields, data.id);
                     selector.hide();
@@ -60,7 +60,7 @@
             });
 
             $.ajax({
-                url: url,
+                url: appPrefixed(url),
                 success: function(data) {
                     jQuery.data(document.body, "message", data);
                     messageContainer.trigger("sampleMessageChanged", data);
