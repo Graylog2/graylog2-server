@@ -1083,6 +1083,7 @@ searchViewState = {
         document.location.href = uri.toString();
     }
 };
+
 function appPrefixed(url) {
     return gl2AppPathPrefix + url;
 }
