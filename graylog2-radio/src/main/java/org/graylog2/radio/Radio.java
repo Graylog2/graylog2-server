@@ -17,6 +17,7 @@
  * You should have received a copy of the GNU General Public License
  * along with Graylog2.  If not, see <http://www.gnu.org/licenses/>.
  */
+
 package org.graylog2.radio;
 
 import com.beust.jcommander.internal.Lists;
@@ -49,12 +50,12 @@ import org.graylog2.radio.cluster.Ping;
 import org.graylog2.radio.inputs.RadioInputRegistry;
 import org.graylog2.radio.transports.RadioTransport;
 import org.graylog2.radio.transports.kafka.KafkaProducer;
-import org.graylog2.shared.MetricsHost;
 import org.graylog2.shared.ProcessingHost;
 import org.graylog2.shared.buffers.ProcessBuffer;
 import org.graylog2.shared.inputs.InputRegistry;
 import org.graylog2.shared.periodical.MasterCacheWorkerThread;
 import org.graylog2.shared.periodical.ThroughputCounterManagerThread;
+import org.graylog2.shared.stats.ThroughputStats;
 import org.jboss.netty.bootstrap.ServerBootstrap;
 import org.jboss.netty.channel.ChannelPipeline;
 import org.jboss.netty.channel.ChannelPipelineFactory;
@@ -77,7 +78,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 /**
  * @author Lennart Koopmann <lennart@torch.sh>
  */
-public class Radio implements InputHost, MetricsHost, GraylogServer, ProcessingHost {
+public class Radio implements InputHost, GraylogServer, ProcessingHost {
 
     private static final Logger LOG = LoggerFactory.getLogger(Radio.class);
 
@@ -112,6 +113,10 @@ public class Radio implements InputHost, MetricsHost, GraylogServer, ProcessingH
 
     @Inject
     private ProcessBuffer.Factory processBufferFactory;
+    @Inject
+    private ThroughputCounterManagerThread.Factory throughputCounterThreadFactory;
+    @Inject
+    private ThroughputStats throughputStats;
 
     public Radio() {
         AsyncHttpClientConfig.Builder builder = new AsyncHttpClientConfig.Builder();
@@ -164,7 +169,7 @@ public class Radio implements InputHost, MetricsHost, GraylogServer, ProcessingH
                 new ThreadFactoryBuilder().setNameFormat("scheduled-%d").build()
         );
 
-        ThroughputCounterManagerThread tt = new ThroughputCounterManagerThread(this);
+        ThroughputCounterManagerThread tt = throughputCounterThreadFactory.create();
         scheduler.scheduleAtFixedRate(tt, 0, 1, TimeUnit.SECONDS);
 
         MasterCacheWorkerThread masterCacheWorker = new MasterCacheWorkerThread(this, inputCache, processBuffer);
@@ -241,6 +246,7 @@ public class Radio implements InputHost, MetricsHost, GraylogServer, ProcessingH
         protected void configure() {
             bind(metricRegistry).to(MetricRegistry.class);
             bind(Radio.this).to(Radio.class);
+            bind(throughputStats).to(ThroughputStats.class);
         }
 
     }
@@ -282,18 +288,6 @@ public class Radio implements InputHost, MetricsHost, GraylogServer, ProcessingH
 
     public Cache getInputCache() {
         return inputCache;
-    }
-
-    public Counter getThroughputCounter() {
-        return throughputCounter;
-    }
-
-    public void setCurrentThroughput(long x) {
-        this.throughput = x;
-    }
-
-    public long getCurrentThroughput() {
-        return this.throughput;
     }
 
     public RadioTransport getTransport() {

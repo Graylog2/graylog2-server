@@ -1,5 +1,5 @@
-/**
- * Copyright 2010, 2011, 2012 Lennart Koopmann <lennart@socketfeed.com>
+/*
+ * Copyright 2013-2014 TORCH GmbH
  *
  * This file is part of Graylog2.
  *
@@ -13,9 +13,9 @@
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
  *
+ *
  * You should have received a copy of the GNU General Public License
  * along with Graylog2.  If not, see <http://www.gnu.org/licenses/>.
- *
  */
 
 package org.graylog2;
@@ -28,7 +28,9 @@ import com.github.joschi.jadconfig.JadConfig;
 import com.github.joschi.jadconfig.RepositoryException;
 import com.github.joschi.jadconfig.ValidationException;
 import com.github.joschi.jadconfig.repositories.PropertiesRepository;
+import com.google.inject.Guice;
 import com.google.inject.Injector;
+import com.google.inject.Module;
 import org.apache.commons.io.IOUtils;
 import org.apache.log4j.Level;
 import org.graylog2.bindings.ServerBindings;
@@ -36,8 +38,8 @@ import org.graylog2.cluster.Node;
 import org.graylog2.cluster.NodeNotFoundException;
 import org.graylog2.filters.*;
 import org.graylog2.initializers.*;
-import org.graylog2.inputs.gelf.tcp.GELFTCPInput;
 import org.graylog2.inputs.gelf.http.GELFHttpInput;
+import org.graylog2.inputs.gelf.tcp.GELFTCPInput;
 import org.graylog2.inputs.gelf.udp.GELFUDPInput;
 import org.graylog2.inputs.kafka.KafkaInput;
 import org.graylog2.inputs.misc.jsonpath.JsonPathInput;
@@ -63,6 +65,7 @@ import org.slf4j.bridge.SLF4JBridgeHandler;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.Writer;
+import java.util.List;
 
 /**
  * Main class of Graylog2.
@@ -124,7 +127,8 @@ public final class Main extends NodeRunner {
             logLevel = Level.DEBUG;
         }
 
-        Injector injector = getInjector(new ServerBindings(configuration));
+        List<Module> bindingsModules = getBindingsModules(new ServerBindings(configuration));
+        Injector injector = Guice.createInjector(bindingsModules);
 
         // This is holding all our metrics.
         final MetricRegistry metrics = injector.getInstance(MetricRegistry.class);
@@ -232,15 +236,15 @@ public final class Main extends NodeRunner {
         // Register initializers.
         server.initializers().register(new DroolsInitializer());
         server.initializers().register(new HostCounterCacheWriterInitializer());
-        server.initializers().register(new ThroughputCounterInitializer());
+        server.initializers().register(injector.getInstance(ThroughputCounterInitializer.class));
         server.initializers().register(new NodePingInitializer());
         server.initializers().register(new AlarmScannerInitializer());
         server.initializers().register(new DeflectorThreadsInitializer());
         server.initializers().register(new AnonymousInformationCollectorInitializer());
-        if (configuration.performRetention() && commandLineArguments.performRetention()) {
+        if (configuration.performRetention() && commandLineArguments.performRetention())
             server.initializers().register(new IndexRetentionInitializer());
-        }
-        if (commandLineArguments.isStats()) { server.initializers().register(new StatisticsPrinterInitializer()); }
+        if (commandLineArguments.isStats())
+            server.initializers().register(new StatisticsPrinterInitializer());
         server.initializers().register(new MasterCacheWorkersInitializer());
         server.initializers().register(new ClusterHealthCheckInitializer());
         server.initializers().register(new StreamThroughputCounterInitializer());

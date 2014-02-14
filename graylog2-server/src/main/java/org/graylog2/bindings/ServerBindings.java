@@ -21,7 +21,6 @@
 package org.graylog2.bindings;
 
 import com.google.inject.AbstractModule;
-import com.google.inject.TypeLiteral;
 import com.google.inject.assistedinject.FactoryModuleBuilder;
 import org.graylog2.Configuration;
 import org.graylog2.buffers.OutputBuffer;

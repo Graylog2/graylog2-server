@@ -40,6 +40,7 @@ import org.graylog2.plugin.buffers.MessageEvent;
 import org.graylog2.plugin.outputs.MessageOutput;
 import org.graylog2.plugin.outputs.OutputStreamConfiguration;
 import org.graylog2.plugin.streams.Stream;
+import org.graylog2.shared.stats.ThroughputStats;
 import org.graylog2.streams.StreamImpl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -69,6 +70,7 @@ public class OutputBufferProcessor implements EventHandler<MessageEvent> {
     private final Configuration configuration;
     private final MetricRegistry metricRegistry;
     private final OutputRegistry outputRegistry;
+    private final ThroughputStats throughputStats;
 
     private List<Message> buffer = Lists.newArrayList();
 
@@ -82,12 +84,14 @@ public class OutputBufferProcessor implements EventHandler<MessageEvent> {
     public OutputBufferProcessor(Configuration configuration,
                                  MetricRegistry metricRegistry,
                                  OutputRegistry outputRegistry,
+                                 ThroughputStats throughputStats,
                                  @Assisted Core server,
                                  @Assisted("ordinal") final long ordinal,
                                  @Assisted("numberOfConsumers") final long numberOfConsumers) {
         this.configuration = configuration;
         this.metricRegistry = metricRegistry;
         this.outputRegistry = outputRegistry;
+        this.throughputStats = throughputStats;
         this.server = server;
         this.ordinal = ordinal;
         this.numberOfConsumers = numberOfConsumers;
@@ -166,10 +170,10 @@ public class OutputBufferProcessor implements EventHandler<MessageEvent> {
             int messagesWritten = buffer.size();
 
             if (server.isStatsMode()) {
-                server.getBenchmarkCounter().add(messagesWritten);
+                throughputStats.getBenchmarkCounter().add(messagesWritten);
             }
 
-            server.getThroughputCounter().add(messagesWritten);
+            throughputStats.getThroughputCounter().add(messagesWritten);
             
             buffer.clear();
         }

@@ -18,22 +18,37 @@
  * along with Graylog2.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.graylog2.shared;
+package org.graylog2.shared.stats;
 
-import com.beust.jcommander.internal.Lists;
-import com.google.inject.Module;
-import org.graylog2.shared.bindings.GenericBindings;
-
-import java.util.List;
+import org.cliffc.high_scale_lib.Counter;
 
 /**
  * @author Dennis Oelkers <dennis@torch.sh>
  */
-public class NodeRunner {
-    protected static List<Module> getBindingsModules(Module specificModule) {
-        List<Module> result = Lists.newArrayList();
-        result.add(new GenericBindings());
-        result.add(specificModule);
-        return result;
+public class ThroughputStats {
+    private long currentThroughput;
+    private final Counter throughputCounter;
+    private final Counter benchmarkCounter;
+
+    public ThroughputStats() {
+        this.currentThroughput = 0;
+        this.throughputCounter = new Counter();
+        this.benchmarkCounter = new Counter();
+    }
+
+    public long getCurrentThroughput() {
+        return currentThroughput;
+    }
+
+    public Counter getThroughputCounter() {
+        return throughputCounter;
+    }
+
+    public Counter getBenchmarkCounter() {
+        return benchmarkCounter;
+    }
+
+    public void setCurrentThroughput(long currentThroughput) {
+        this.currentThroughput = currentThroughput;
     }
 }

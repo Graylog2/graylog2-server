@@ -75,11 +75,11 @@ import org.graylog2.security.ShiroSecurityBinding;
 import org.graylog2.security.ShiroSecurityContextFactory;
 import org.graylog2.security.ldap.LdapConnector;
 import org.graylog2.security.realm.LdapUserAuthenticator;
-import org.graylog2.shared.MetricsHost;
 import org.graylog2.shared.ProcessingHost;
 import org.graylog2.shared.buffers.ProcessBuffer;
 import org.graylog2.shared.filters.FilterRegistry;
 import org.graylog2.shared.inputs.InputRegistry;
+import org.graylog2.shared.stats.ThroughputStats;
 import org.graylog2.streams.StreamImpl;
 import org.graylog2.system.activities.Activity;
 import org.graylog2.system.activities.ActivityWriter;
@@ -114,7 +114,7 @@ import java.util.concurrent.atomic.AtomicReference;
  * 
  * @author Lennart Koopmann <lennart@socketfeed.com>
  */
-public class Core implements GraylogServer, InputHost, MetricsHost, ProcessingHost {
+public class Core implements GraylogServer, InputHost, ProcessingHost {
 
     private static final Logger LOG = LoggerFactory.getLogger(Core.class);
 
@@ -137,12 +137,8 @@ public class Core implements GraylogServer, InputHost, MetricsHost, ProcessingHo
 
     private HostCounterCacheImpl hostCounterCache;
 
-    private Counter benchmarkCounter = new Counter();
-    private Counter throughputCounter = new Counter();
     private AtomicReference<ConcurrentHashMap<String, Counter>> streamThroughput =
             new AtomicReference<ConcurrentHashMap<String, Counter>>(new ConcurrentHashMap<String, Counter>());
-    private long throughput = 0;
-
     @Inject
     private FilterRegistry filterRegistry;
 
@@ -192,6 +188,9 @@ public class Core implements GraylogServer, InputHost, MetricsHost, ProcessingHo
     private ProcessBuffer.Factory processBufferFactory;
     @Inject
     private OutputBuffer.Factory outputBufferFactory;
+
+    @Inject
+    private ThroughputStats throughputStats;
 
     public void initialize() {
     	startedAt = new DateTime(DateTimeZone.UTC);
@@ -357,8 +356,9 @@ public class Core implements GraylogServer, InputHost, MetricsHost, ProcessingHo
 
         @Override
         protected void configure() {
-            bind(metricRegistry).to(MetricRegistry.class);
             bind(Core.this).to(Core.class);
+            bind(metricRegistry).to(MetricRegistry.class);
+            bind(throughputStats).to(ThroughputStats.class);
         }
     }
 
@@ -581,22 +581,6 @@ public class Core implements GraylogServer, InputHost, MetricsHost, ProcessingHo
         }
         
         return streams;
-    }
-    
-    public Counter getBenchmarkCounter() {
-        return benchmarkCounter;
-    }
-
-    public Counter getThroughputCounter() {
-        return throughputCounter;
-    }
-
-    public void setCurrentThroughput(long x) {
-        this.throughput = x;
-    }
-
-    public long getCurrentThroughput() {
-        return this.throughput;
     }
 
     public Cache getInputCache() {

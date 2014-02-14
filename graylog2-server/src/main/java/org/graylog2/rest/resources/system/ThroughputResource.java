@@ -1,5 +1,5 @@
-/**
- * Copyright 2013 Lennart Koopmann <lennart@torch.sh>
+/*
+ * Copyright 2013-2014 TORCH GmbH
  *
  * This file is part of Graylog2.
  *
@@ -13,9 +13,9 @@
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
  *
+ *
  * You should have received a copy of the GNU General Public License
  * along with Graylog2.  If not, see <http://www.gnu.org/licenses/>.
- *
  */
 package org.graylog2.rest.resources.system;
 
@@ -27,7 +27,9 @@ import org.graylog2.rest.documentation.annotations.Api;
 import org.graylog2.rest.documentation.annotations.ApiOperation;
 import org.graylog2.rest.resources.RestResource;
 import org.graylog2.security.RestPermissions;
+import org.graylog2.shared.stats.ThroughputStats;
 
+import javax.inject.Inject;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
@@ -42,13 +44,16 @@ import java.util.Map;
 @Path("/system/throughput")
 public class ThroughputResource extends RestResource {
 
+    @Inject
+    private ThroughputStats throughputStats;
+
     @GET @Timed
     @RequiresPermissions(RestPermissions.THROUGHPUT_READ)
     @ApiOperation(value = "Current throughput of this node in messages per second")
     @Produces(MediaType.APPLICATION_JSON)
     public String total() {
         Map<String, Object> result = Maps.newHashMap();
-        result.put("throughput", core.getCurrentThroughput());
+        result.put("throughput", throughputStats.getCurrentThroughput());
 
         return json(result);
     }

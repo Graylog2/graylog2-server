@@ -1,5 +1,5 @@
-/**
- * Copyright 2013 Lennart Koopmann <lennart@torch.sh>
+/*
+ * Copyright 2013-2014 TORCH GmbH
  *
  * This file is part of Graylog2.
  *
@@ -13,18 +13,19 @@
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
  *
+ *
  * You should have received a copy of the GNU General Public License
  * along with Graylog2.  If not, see <http://www.gnu.org/licenses/>.
- *
  */
 package org.graylog2.initializers;
 
 import com.google.common.collect.Maps;
+import com.google.inject.Inject;
 import org.graylog2.Core;
-import org.graylog2.shared.periodical.ThroughputCounterManagerThread;
 import org.graylog2.plugin.GraylogServer;
 import org.graylog2.plugin.initializers.Initializer;
 import org.graylog2.plugin.initializers.InitializerConfigurationException;
+import org.graylog2.shared.periodical.ThroughputCounterManagerThread;
 
 import java.util.Map;
 
@@ -35,11 +36,14 @@ public class ThroughputCounterInitializer extends SimpleFixedRateScheduleInitial
 
     private static final String NAME = "Throughput counter";
 
+    @Inject
+    private ThroughputCounterManagerThread.Factory threadFactory;
+
     @Override
     public void initialize(GraylogServer server, Map<String, String> config) throws InitializerConfigurationException {
         configureScheduler(
                 (Core) server,
-                new ThroughputCounterManagerThread((Core) server),
+                threadFactory.create(),
                 ThroughputCounterManagerThread.INITIAL_DELAY,
                 ThroughputCounterManagerThread.PERIOD
         );
