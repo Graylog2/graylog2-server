@@ -21,6 +21,7 @@ package org.graylog2.radio.rest.resources.system;
 
 import com.codahale.metrics.annotation.Timed;
 import com.google.common.collect.Maps;
+import com.google.inject.Inject;
 import org.graylog2.radio.rest.resources.RestResource;
 import org.graylog2.shared.stats.ThroughputStats;
 

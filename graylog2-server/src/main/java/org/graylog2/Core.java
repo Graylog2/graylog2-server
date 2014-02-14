@@ -93,6 +93,7 @@ import org.graylog2.shared.stats.ThroughputStats;
 import org.graylog2.shared.buffers.ProcessBuffer;
 import org.graylog2.shared.filters.FilterRegistry;
 import org.graylog2.shared.inputs.InputRegistry;
+import org.graylog2.shared.stats.ThroughputStats;
 import org.graylog2.streams.StreamImpl;
 import org.graylog2.system.activities.Activity;
 import org.graylog2.system.activities.ActivityWriter;
@@ -151,6 +152,8 @@ public class Core implements GraylogServer, InputHost, ProcessingHost {
     public static final String GRAYLOG2_CODENAME = "Moose";
 
     private Indexer indexer;
+
+    private HostCounterCacheImpl hostCounterCache;
 
     private Counter benchmarkCounter = new Counter();
     private Counter throughputCounter = new Counter();
