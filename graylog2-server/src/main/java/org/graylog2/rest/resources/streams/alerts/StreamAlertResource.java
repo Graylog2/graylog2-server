@@ -20,6 +20,8 @@
 package org.graylog2.rest.resources.streams.alerts;
 
 import com.codahale.metrics.annotation.Timed;
+import com.google.common.cache.Cache;
+import com.google.common.cache.CacheBuilder;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import org.apache.commons.mail.EmailException;
@@ -36,7 +38,6 @@ import org.graylog2.rest.resources.RestResource;
 import org.graylog2.rest.resources.streams.alerts.requests.CreateConditionRequest;
 import org.graylog2.security.RestPermissions;
 import org.graylog2.streams.StreamImpl;
-import org.graylog2.users.User;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -46,6 +47,9 @@ import javax.ws.rs.core.Response;
 import java.io.IOException;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.TimeUnit;
 
 /**
  * @author Lennart Koopmann <lennart@torch.sh>
@@ -56,6 +60,12 @@ import java.util.Map;
 public class StreamAlertResource extends RestResource {
 
     private static final Logger LOG = LoggerFactory.getLogger(StreamAlertResource.class);
+
+    private static final String CACHE_KEY_BASE = "alerts";
+
+    private static final Cache<String, Map<String, Object>> cache = CacheBuilder.newBuilder()
+            .expireAfterWrite(Alert.REST_CHECK_CACHE_SECONDS, TimeUnit.SECONDS)
+            .build();
 
     @POST @Timed
     @Path("conditions")
@@ -133,6 +143,62 @@ public class StreamAlertResource extends RestResource {
         Map<String, Object> result = Maps.newHashMap();
         result.put("alerts", conditions);
         result.put("total", total);
+
+        return Response.status(Response.Status.OK).entity(json(result)).build();
+    }
+
+    @GET @Timed
+    @Path("check")
+    @ApiOperation(value = "Check for triggered alert conditions of this streams. Results cached for " + Alert.REST_CHECK_CACHE_SECONDS + " seconds.")
+    @Produces(MediaType.APPLICATION_JSON)
+    @ApiResponses(value = {
+            @ApiResponse(code = 404, message = "Stream not found."),
+            @ApiResponse(code = 400, message = "Invalid ObjectId.")
+    })
+    public Response checkConditions(@ApiParam(title = "streamId", description = "The ID of the stream to check.", required = true) @PathParam("streamId") String streamid) {
+        checkPermission(RestPermissions.STREAMS_READ, streamid);
+
+        final StreamImpl stream;
+        try {
+            stream = StreamImpl.load(loadObjectId(streamid), core);
+        } catch (org.graylog2.database.NotFoundException e) {
+            throw new WebApplicationException(404);
+        }
+
+        Map<String, Object> result;
+        try {
+            result = cache.get(CACHE_KEY_BASE + stream.getId(), new Callable<Map<String, Object>>() {
+                @Override
+                public Map<String, Object> call() throws Exception {
+                    List<Map<String, Object>> results = Lists.newArrayList();
+                    int triggered = 0;
+                    for (AlertCondition alertCondition : stream.getAlertConditions()) {
+                        Map<String, Object> conditionResult = Maps.newHashMap();
+                        conditionResult.put("condition", alertCondition.asMap());
+
+                        AlertCondition.CheckResult checkResult = alertCondition.triggered();
+                        conditionResult.put("triggered", checkResult.isTriggered());
+
+                        if (checkResult.isTriggered()) {
+                            triggered++;
+                            conditionResult.put("alert_description", checkResult.getResultDescription());
+                        }
+
+                        results.add(conditionResult);
+                    }
+
+                    Map<String, Object> result = Maps.newHashMap();
+                    result.put("results", results);
+                    result.put("calculated_at", Tools.getISO8601String(Tools.iso8601()));
+                    result.put("total_triggered", triggered);
+
+                    return result;
+                }
+            });
+        } catch (ExecutionException e) {
+            LOG.error("Could not check for alerts.", e);
+            throw new WebApplicationException(500);
+        }
 
         return Response.status(Response.Status.OK).entity(json(result)).build();
     }
