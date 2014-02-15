@@ -146,6 +146,11 @@ public abstract class AlertCondition implements EmbeddedPersistable {
         throw new NoSuchAlertConditionTypeException("Unhandled alert condition type: " + type);
     }
 
+    public CheckResult triggeredNoGrace() {
+        LOG.debug("Checking alert condition [{}] and not accounting grace time.", this);
+        return runCheck();
+    }
+
     public CheckResult triggered() {
         LOG.debug("Checking alert condition [{}]", this);
 
