@@ -176,7 +176,7 @@ public class StreamAlertResource extends RestResource {
                         Map<String, Object> conditionResult = Maps.newHashMap();
                         conditionResult.put("condition", alertCondition.asMap());
 
-                        AlertCondition.CheckResult checkResult = alertCondition.triggered();
+                        AlertCondition.CheckResult checkResult = alertCondition.triggeredNoGrace();
                         conditionResult.put("triggered", checkResult.isTriggered());
 
                         if (checkResult.isTriggered()) {
