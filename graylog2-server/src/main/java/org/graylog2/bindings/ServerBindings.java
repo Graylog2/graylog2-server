@@ -67,10 +67,6 @@ public class ServerBindings extends AbstractModule {
 
         install(new FactoryModuleBuilder().build(OutputBuffer.Factory.class));
         install(new FactoryModuleBuilder().build(OutputBufferProcessor.Factory.class));
-
-        install(new FactoryModuleBuilder().build(StreamNew.Factory.class));
-        TypeLiteral<ModelFactory<StreamNew>> type = new TypeLiteral<ModelFactory<StreamNew>>(){};
-        bind(type).to(StreamNew.Factory.class);
     }
 
     private MongoConnection getMongoConnection() {
