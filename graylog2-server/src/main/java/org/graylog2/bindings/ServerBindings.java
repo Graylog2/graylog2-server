@@ -21,22 +21,39 @@
 package org.graylog2.bindings;
 
 import com.google.inject.AbstractModule;
+import com.google.inject.TypeLiteral;
 import com.google.inject.assistedinject.FactoryModuleBuilder;
 import org.graylog2.Configuration;
 import org.graylog2.buffers.OutputBuffer;
 import org.graylog2.buffers.processors.OutputBufferProcessor;
+import org.graylog2.database.ModelFactory;
+import org.graylog2.database.ModelService;
 import org.graylog2.database.MongoBridge;
 import org.graylog2.database.MongoConnection;
 import org.graylog2.outputs.OutputRegistry;
+import org.graylog2.streams.StreamNew;
 
 /**
  * @author Dennis Oelkers <dennis@torch.sh>
  */
 public class ServerBindings extends AbstractModule {
     private final Configuration configuration;
+    private final MongoConnection mongoConnection;
 
     public ServerBindings(Configuration configuration) {
         this.configuration = configuration;
+
+        mongoConnection = new MongoConnection();
+        mongoConnection.setUser(configuration.getMongoUser());
+        mongoConnection.setPassword(configuration.getMongoPassword());
+        mongoConnection.setHost(configuration.getMongoHost());
+        mongoConnection.setPort(configuration.getMongoPort());
+        mongoConnection.setDatabase(configuration.getMongoDatabase());
+        mongoConnection.setUseAuth(configuration.isMongoUseAuth());
+        mongoConnection.setMaxConnections(configuration.getMongoMaxConnections());
+        mongoConnection.setThreadsAllowedToBlockMultiplier(configuration.getMongoThreadsAllowedToBlockMultiplier());
+        mongoConnection.setReplicaSet(configuration.getMongoReplicaSet());
+        mongoConnection.connect();
     }
 
     @Override
@@ -50,20 +67,13 @@ public class ServerBindings extends AbstractModule {
 
         install(new FactoryModuleBuilder().build(OutputBuffer.Factory.class));
         install(new FactoryModuleBuilder().build(OutputBufferProcessor.Factory.class));
+
+        install(new FactoryModuleBuilder().build(StreamNew.Factory.class));
+        TypeLiteral<ModelFactory<StreamNew>> type = new TypeLiteral<ModelFactory<StreamNew>>(){};
+        bind(type).to(StreamNew.Factory.class);
     }
 
     private MongoConnection getMongoConnection() {
-        MongoConnection mongoConnection = new MongoConnection();
-        mongoConnection.setUser(configuration.getMongoUser());
-        mongoConnection.setPassword(configuration.getMongoPassword());
-        mongoConnection.setHost(configuration.getMongoHost());
-        mongoConnection.setPort(configuration.getMongoPort());
-        mongoConnection.setDatabase(configuration.getMongoDatabase());
-        mongoConnection.setUseAuth(configuration.isMongoUseAuth());
-        mongoConnection.setMaxConnections(configuration.getMongoMaxConnections());
-        mongoConnection.setThreadsAllowedToBlockMultiplier(configuration.getMongoThreadsAllowedToBlockMultiplier());
-        mongoConnection.setReplicaSet(configuration.getMongoReplicaSet());
-        mongoConnection.connect();
-        return mongoConnection;
+        return this.mongoConnection;
     }
 }
