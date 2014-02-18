@@ -50,7 +50,8 @@ function updateWidget_search_result_chart(widget, data) {
 
     new Rickshaw.Graph.Axis.Y( {
         graph: graph,
-        tickFormat: Rickshaw.Fixtures.Number.formatKMBT
+        tickFormat: Rickshaw.Fixtures.Number.formatKMBT,
+        pixelsPerTick: 17
     });
 
     // Only show a x-axis (time) when there is more than one bucket.
