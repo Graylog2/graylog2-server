@@ -81,8 +81,8 @@ public class NodePingThread implements Runnable {
                                     NodePingThread.class));
                 }
             } catch (NodeNotFoundException e) {
-                LOG.warn("Our node has immediately been purged again. This should not happen and indicates a clock skew.");
-                Notification.buildNow(core)
+                LOG.debug("Our node has immediately been purged again. This should not happen and indicates a clock skew.");
+                /*Notification.buildNow(core)
                         .addThisNode()
                         .addType(Notification.Type.CHECK_SERVER_CLOCKS)
                         .addSeverity(Notification.Severity.URGENT)
@@ -91,7 +91,8 @@ public class NodePingThread implements Runnable {
                         new Activity("This graylog2 server node (" + core.getNodeId() + ") was immediately purged, " +
                                              "clock skew on other graylog2-server node is likely. Check your system clocks.",
                                      NodePingThread.class));
-
+                */
+                // Removed for now. https://github.com/Graylog2/graylog2-web-interface/issues/625
             }
         } catch (Exception e) {
             LOG.warn("Caught exception during node ping.", e);
