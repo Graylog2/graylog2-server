@@ -123,7 +123,7 @@ public class Core implements GraylogServer, InputHost {
     private ScheduledExecutorService scheduler;
 
     public static final Version GRAYLOG2_VERSION = ServerVersion.VERSION;
-    public static final String GRAYLOG2_CODENAME = "Amigo Humanos (Flipper)";
+    public static final String GRAYLOG2_CODENAME = "Moose";
 
     private Indexer indexer;
 
