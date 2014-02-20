@@ -25,7 +25,7 @@ import org.graylog2.plugin.configuration.ConfigurationException;
 import org.graylog2.plugin.configuration.ConfigurationRequest;
 import org.graylog2.plugin.inputs.MessageInput;
 import org.graylog2.plugin.inputs.MisfireException;
-import org.junit.Test;
+import org.testng.annotations.Test;
 
 import java.util.Map;
 

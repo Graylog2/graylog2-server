@@ -22,8 +22,8 @@ package org.graylog2.blacklists;
 
 import com.mongodb.BasicDBObject;
 import org.bson.types.ObjectId;
-import org.junit.Test;
-import static org.junit.Assert.*;
+import org.testng.annotations.Test;
+import static org.testng.AssertJUnit.*;
 
 public class BlacklistRuleTest {
 

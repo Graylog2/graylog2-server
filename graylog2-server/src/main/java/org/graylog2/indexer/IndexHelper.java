@@ -81,7 +81,9 @@ public class IndexHelper {
     }
 
     private static FilterBuilder fromRangeBuilder(FromRange range) {
-        return FilterBuilders.rangeFilter("timestamp").gte(Tools.buildElasticSearchTimeFormat(range.getFrom()));
+        return FilterBuilders.rangeFilter("timestamp")
+                .gte(Tools.buildElasticSearchTimeFormat(range.getFrom()))
+                .lte(Tools.buildElasticSearchTimeFormat(DateTime.now()));
     }
 
     private static String getPrefix(Set<String> names) {

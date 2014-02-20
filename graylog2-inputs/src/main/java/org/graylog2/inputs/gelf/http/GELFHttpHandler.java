@@ -36,6 +36,7 @@ import org.jboss.netty.channel.ChannelHandlerContext;
 import org.jboss.netty.channel.ExceptionEvent;
 import org.jboss.netty.channel.MessageEvent;
 import org.jboss.netty.channel.SimpleChannelHandler;
+import org.jboss.netty.channel.socket.DatagramChannel;
 import org.jboss.netty.handler.codec.http.DefaultHttpResponse;
 import org.jboss.netty.handler.codec.http.HttpHeaders;
 import org.jboss.netty.handler.codec.http.HttpMethod;
@@ -114,7 +115,11 @@ public class GELFHttpHandler extends SimpleChannelHandler {
     }
 
     @Override
-    public void exceptionCaught(final ChannelHandlerContext ctx, final ExceptionEvent e) throws Exception {
-        LOG.warn("Could not handle GELF message.", e.getCause());
+    public void exceptionCaught(ChannelHandlerContext ctx, ExceptionEvent e) throws Exception {
+        LOG.debug("Could not handle GELF HTTP message.", e.getCause());
+
+        if (ctx.getChannel() != null) {
+            ctx.getChannel().close();
+        }
     }
 }

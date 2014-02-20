@@ -26,6 +26,7 @@ import org.graylog2.plugin.InputHost;
 import org.graylog2.plugin.configuration.Configuration;
 import org.graylog2.plugin.inputs.MessageInput;
 import org.graylog2.inputs.syslog.SyslogProcessor;
+import org.jboss.netty.channel.socket.DatagramChannel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.jboss.netty.buffer.ChannelBuffer;
@@ -69,7 +70,11 @@ public class SyslogDispatcher extends SimpleChannelHandler {
 
     @Override
     public void exceptionCaught(ChannelHandlerContext ctx, ExceptionEvent e) throws Exception {
-        LOG.warn("Could not handle syslog message.", e.getCause());
+        LOG.debug("Could not handle syslog message.", e.getCause());
+
+        if (ctx.getChannel() != null && !(ctx.getChannel() instanceof DatagramChannel)) {
+            ctx.getChannel().close();
+        }
     }
 
 }

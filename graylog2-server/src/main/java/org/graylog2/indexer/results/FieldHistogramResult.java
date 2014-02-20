@@ -48,7 +48,8 @@ public class FieldHistogramResult extends HistogramResult {
 
     public Map<Long, Map<String, Object>> getResults() {
         Map<Long, Map<String, Object>> results = Maps.newTreeMap();
-
+        Long minTimestamp = Long.MAX_VALUE;
+        Long maxTimestamp = Long.MIN_VALUE;
         for (DateHistogramFacet.Entry e : result) {
             Map<String, Object> resultMap = Maps.newHashMap();
 
@@ -59,9 +60,32 @@ public class FieldHistogramResult extends HistogramResult {
             resultMap.put("total_count", e.getTotalCount());
             resultMap.put("mean", e.getMean());
 
-            results.put(e.getTime()/1000, resultMap);
-        }
+            final long timestamp = e.getTime() / 1000;
+            if (timestamp < minTimestamp) minTimestamp = timestamp;
+            if (timestamp > maxTimestamp) maxTimestamp = timestamp;
 
+            results.put(timestamp, resultMap);
+        }
+        long curTimestamp = minTimestamp;
+        while (curTimestamp < maxTimestamp) {
+            Map<String, Object> entry = results.get(curTimestamp);
+
+            // advance timestamp by the interval's seconds value
+            curTimestamp += interval.getPeriod().toStandardSeconds().getSeconds();
+
+            if (entry != null) {
+                continue;
+            }
+            // synthesize a 0 value for this timestamp
+            entry = Maps.newHashMap();
+            entry.put("count", 0);
+            entry.put("min", 0);
+            entry.put("max", 0);
+            entry.put("total", 0);
+            entry.put("total_count", 0);
+            entry.put("mean", 0);
+            results.put(curTimestamp, entry);
+        }
         return results;
     }
 

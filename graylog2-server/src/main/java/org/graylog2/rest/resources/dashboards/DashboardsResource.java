@@ -267,6 +267,15 @@ public class DashboardsResource extends RestResource {
             throw new WebApplicationException(e, Response.Status.BAD_REQUEST);
         }
 
+        // Bind to streams for reader users and check stream permission.
+        if (awr.config.containsKey("stream_id")) {
+            checkPermission(RestPermissions.STREAMS_READ, (String) awr.config.get("stream_id"));
+        } else {
+            checkPermission(RestPermissions.SEARCHES_ABSOLUTE);
+            checkPermission(RestPermissions.SEARCHES_RELATIVE);
+            checkPermission(RestPermissions.SEARCHES_KEYWORD);
+        }
+
         DashboardWidget widget;
         try {
             widget = DashboardWidget.fromRequest(core, awr);

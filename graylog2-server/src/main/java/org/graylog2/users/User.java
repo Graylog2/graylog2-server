@@ -41,6 +41,7 @@ import org.slf4j.LoggerFactory;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
 import static com.google.common.base.Objects.firstNonNull;
 
@@ -60,6 +61,7 @@ public class User extends Persisted {
     public static final String PERMISSIONS = "permissions";
     public static final String TIMEZONE = "timezone";
     public static final String EXTERNAL_USER = "external_user";
+    public static final String SESSION_TIMEOUT = "session_timeout_ms";
 
     public User(Map<String, Object> fields, Core core) {
         super(core, fields);
@@ -106,20 +108,6 @@ public class User extends Persisted {
             users.add(new User((ObjectId) dbObject.get("_id"), dbObject.toMap(), core));
         }
         return users;
-    }
-
-    // TODO remove this and use a proper salted digest, this is not secure at all
-    @Deprecated
-    public static String saltPass(String password, String salt) {
-        if (password == null || password.isEmpty()) {
-            throw new RuntimeException("No password given.");
-        }
-
-        if (salt == null || salt.isEmpty()) {
-            throw new RuntimeException("No salt given.");
-        }
-
-        return password + salt;
     }
 
     public boolean isReadOnly() {
@@ -178,6 +166,18 @@ public class User extends Persisted {
         }
 
         return startpage;
+    }
+
+    public long getSessionTimeoutMs() {
+        final Object o = fields.get(SESSION_TIMEOUT);
+        if (o != null && o instanceof Long) {
+            return (Long) o;
+        }
+        return TimeUnit.HOURS.toMillis(8);
+    }
+
+    public void setSessionTimeoutMs(long timeoutValue) {
+        fields.put(SESSION_TIMEOUT, timeoutValue);
     }
 
     public void setPermissions(List<String> permissions) {
@@ -310,6 +310,11 @@ public class User extends Persisted {
         @Override
         public List<String> getPermissions() {
             return Lists.newArrayList("*");
+        }
+
+        @Override
+        public long getSessionTimeoutMs() {
+            return TimeUnit.HOURS.toMillis(8);
         }
 
         @Override

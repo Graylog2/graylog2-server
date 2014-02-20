@@ -1,5 +1,5 @@
-/**
- * Copyright 2012, 2013 Lennart Koopmann <lennart@socketfeed.com>
+/*
+ * Copyright 2013-2014 TORCH GmbH
  *
  * This file is part of Graylog2.
  *
@@ -13,9 +13,9 @@
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
  *
+ *
  * You should have received a copy of the GNU General Public License
  * along with Graylog2.  If not, see <http://www.gnu.org/licenses/>.
- *
  */
 
 package org.graylog2.inputs.gelf.gelf;
@@ -61,9 +61,15 @@ public class GELFProcessor {
         server.metrics().meter(name(metricName, "incomingMessages")).mark();
 
         // Convert to LogMessage
-        Message lm = parse(message.getJSON(), sourceInput);
+        Message lm = null;
+        try {
+            lm = parse(message.getJSON(), sourceInput);
+        } catch (IllegalStateException e) {
+            LOG.error("Corrupt or invalid message received: ", e);
+            return;
+        }
 
-        if (!lm.isComplete()) {
+        if (lm == null || !lm.isComplete()) {
             server.metrics().meter(name(metricName, "incompleteMessages")).mark();
             LOG.debug("Skipping incomplete message.");
             return;
@@ -84,6 +90,7 @@ public class GELFProcessor {
             json = objectMapper.readTree(message);
         } catch (Exception e) {
             LOG.error("Could not parse JSON!", e);
+            LOG.debug("This is the failed message: ", message);
             json = null;
         }
 

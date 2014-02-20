@@ -29,6 +29,7 @@ import org.jboss.netty.channel.ChannelHandlerContext;
 import org.jboss.netty.channel.ExceptionEvent;
 import org.jboss.netty.channel.MessageEvent;
 import org.jboss.netty.channel.SimpleChannelHandler;
+import org.jboss.netty.channel.socket.DatagramChannel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -68,7 +69,11 @@ public class RawDispatcher extends SimpleChannelHandler {
 
     @Override
     public void exceptionCaught(ChannelHandlerContext ctx, ExceptionEvent e) throws Exception {
-        LOG.warn("Could not handle raw message.", e.getCause());
+        LOG.debug("Could not handle raw message.", e.getCause());
+
+        if (ctx.getChannel() != null && !(ctx.getChannel() instanceof DatagramChannel)) {
+            ctx.getChannel().close();
+        }
     }
 
 }

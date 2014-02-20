@@ -22,6 +22,9 @@ package org.graylog2.periodical;
 import org.graylog2.Core;
 import org.graylog2.cluster.Node;
 import org.graylog2.cluster.NodeNotFoundException;
+import org.graylog2.notifications.Notification;
+import org.graylog2.system.activities.Activity;
+import org.graylog2.system.activities.ActivityWriter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -49,9 +52,51 @@ public class NodePingThread implements Runnable {
             LOG.warn("Did not find meta info of this node. Re-registering.");
             Node.registerServer(core, core.isMaster(), core.getConfiguration().getRestTransportUri());
         }
+        try {
+            // Remove old nodes that are no longer running. (Just some housekeeping)
+            Node.dropOutdated(core);
 
-        // Remove old nodes that are no longer running. (Just some housekeeping)
-        Node.dropOutdated(core);
+            final ActivityWriter activityWriter = core.getActivityWriter();
+            try {
+                // Check that we still have a master node in the cluster, if not, warn the user.
+                if (Node.thisNode(core).isAnyMasterPresent()) {
+                    boolean removedNotification = Notification.build(core)
+                            .addType(Notification.Type.NO_MASTER)
+                            .fixed();
+                    if (removedNotification) {
+                        activityWriter.write(
+                            new Activity("Notification condition [" + Notification.Type.NO_MASTER + "] " +
+                                                 "has been fixed.", NodePingThread.class));
+                    }
+                } else {
+                    Notification.buildNow(core)
+                            .addThisNode()
+                            .addType(Notification.Type.NO_MASTER)
+                            .addSeverity(Notification.Severity.URGENT)
+                            .publishIfFirst();
+                    activityWriter.write(
+                            new Activity(
+                                    "No graylog2 master node available. Check the configuration for is_master=true " +
+                                            "on at least one node.",
+                                    NodePingThread.class));
+                }
+            } catch (NodeNotFoundException e) {
+                LOG.debug("Our node has immediately been purged again. This should not happen and indicates a clock skew.");
+                /*Notification.buildNow(core)
+                        .addThisNode()
+                        .addType(Notification.Type.CHECK_SERVER_CLOCKS)
+                        .addSeverity(Notification.Severity.URGENT)
+                        .publishIfFirst();
+                activityWriter.write(
+                        new Activity("This graylog2 server node (" + core.getNodeId() + ") was immediately purged, " +
+                                             "clock skew on other graylog2-server node is likely. Check your system clocks.",
+                                     NodePingThread.class));
+                */
+                // Removed for now. https://github.com/Graylog2/graylog2-web-interface/issues/625
+            }
+        } catch (Exception e) {
+            LOG.warn("Caught exception during node ping.", e);
+        }
     }
 
 }

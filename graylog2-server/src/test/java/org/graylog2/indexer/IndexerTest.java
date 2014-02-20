@@ -29,13 +29,14 @@ import com.google.common.collect.Maps;
 import com.google.common.io.Files;
 import org.graylog2.Configuration;
 import org.graylog2.Core;
-import org.junit.Test;
+import org.testng.annotations.Test;
 
 import java.io.File;
 import java.io.IOException;
 import java.util.Map;
 
-import static org.junit.Assert.*;
+import static org.testng.AssertJUnit.*;
+import static org.graylog2.AssertNotEquals.assertNotEquals;
 
 public class IndexerTest {
 

@@ -19,14 +19,14 @@
  */
 package org.graylog2.database.validators;
 
-import org.junit.Test;
+import org.testng.annotations.Test;
 
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.Map;
 import java.util.TreeMap;
 
-import static org.junit.Assert.*;
+import static org.testng.AssertJUnit.*;
 
 /**
  * @author Lennart Koopmann <lennart@torch.sh>

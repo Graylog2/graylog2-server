@@ -23,22 +23,24 @@ import org.apache.shiro.authc.AuthenticationException;
 import org.apache.shiro.authc.AuthenticationToken;
 import org.apache.shiro.subject.Subject;
 import org.apache.shiro.util.ThreadContext;
+import org.graylog2.jersey.container.netty.HeaderAwareSecurityContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.ws.rs.core.SecurityContext;
+import javax.ws.rs.core.MultivaluedMap;
 import java.security.Principal;
 
 /**
  * @author Kay Roepke <kay@torch.sh>
  */
-public class ShiroSecurityContext implements SecurityContext {
+public class ShiroSecurityContext implements HeaderAwareSecurityContext {
     private static final Logger log = LoggerFactory.getLogger(ShiroSecurityContext.class);
 
     private Subject subject;
     private final AuthenticationToken token;
     private final boolean secure;
     private final String authcScheme;
+    private MultivaluedMap<String, String> headers;
 
     public ShiroSecurityContext(Subject subject, AuthenticationToken token, boolean isSecure, String authcScheme) {
         this.subject = subject;
@@ -93,12 +95,24 @@ public class ShiroSecurityContext implements SecurityContext {
     }
 
     public void loginSubject() throws AuthenticationException {
+        // what a hack :(
+        ThreadContext.put("REQUEST_HEADERS", headers);
         subject.login(token);
         // the subject instance will change to include the session
         final Subject newSubject = ThreadContext.getSubject();
         if (newSubject != null) {
             subject = newSubject;
         }
+        ThreadContext.remove("REQUEST_HEADERS");
+    }
+
+    @Override
+    public void setHeaders(MultivaluedMap<String, String> headers) {
+        this.headers = headers;
+    }
+
+    public MultivaluedMap<String, String> getHeaders() {
+        return headers;
     }
 
     public class ShiroPrincipal implements Principal {

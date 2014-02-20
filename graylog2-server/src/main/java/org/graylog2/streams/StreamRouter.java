@@ -56,6 +56,7 @@ public class StreamRouter {
 
     private final Map<String, Meter> streamIncomingMeters = Maps.newHashMap();
     private final Map<String, Timer> streamExecutionTimers = Maps.newHashMap();
+    private final Map<String, Meter> streamExceptionMeters = Maps.newHashMap();
 
     private Boolean useCaching = false;
 
@@ -155,7 +156,7 @@ public class StreamRouter {
         for (StreamRule rule : streamRules) {
             try {
                 StreamRuleMatcher matcher = StreamRuleMatcherFactory.build(rule.getType());
-                result.put(rule, matchStreamRule(msg, matcher, rule));
+                result.put(rule, matchStreamRule(msg, matcher, rule, server));
             } catch (InvalidStreamRuleTypeException e) {
                 LOG.warn("Invalid stream rule type. Skipping matching for this rule. " + e.getMessage(), e);
             }
@@ -168,11 +169,12 @@ public class StreamRouter {
         return !ruleMatches.isEmpty() && !ruleMatches.values().contains(false);
     }
 
-    public boolean matchStreamRule(Message msg, StreamRuleMatcher matcher, StreamRule rule) {
+    public boolean matchStreamRule(Message msg, StreamRuleMatcher matcher, StreamRule rule, Core server) {
         try {
             return matcher.match(msg, rule);
         } catch (Exception e) {
-            LOG.warn("Could not match stream rule <" + rule.getType() + "/" + rule.getValue() + ">: " + e.getMessage(), e);
+            LOG.debug("Could not match stream rule <" + rule.getType() + "/" + rule.getValue() + ">: " + e.getMessage(), e);
+            getExceptionMeter(rule.getStreamId(), server).mark();
             return false;
         }
     }
@@ -195,6 +197,16 @@ public class StreamRouter {
         }
 
         return timer;
+    }
+
+    protected Meter getExceptionMeter(String streamId, GraylogServer server) {
+        Meter meter = this.streamExceptionMeters.get(streamId);
+        if (meter == null) {
+            meter = server.metrics().meter(MetricRegistry.name(Stream.class, streamId, "matchingExceptions"));
+            this.streamExceptionMeters.put(streamId, meter);
+        }
+
+        return meter;
     }
 
 }

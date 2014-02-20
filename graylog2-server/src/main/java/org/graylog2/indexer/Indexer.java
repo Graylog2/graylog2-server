@@ -28,6 +28,7 @@ import org.graylog2.indexer.messages.Messages;
 import org.graylog2.indexer.searches.Searches;
 import org.graylog2.plugin.Message;
 import org.graylog2.plugin.indexer.MessageGateway;
+import org.joda.time.Period;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -35,8 +36,8 @@ import java.io.File;
 import java.io.IOException;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.TimeUnit;
 
+import static java.util.concurrent.TimeUnit.SECONDS;
 import static org.elasticsearch.node.NodeBuilder.nodeBuilder;
 
 // TODO this class blocks for most of its operations, but is called from the main thread for some of them
@@ -57,7 +58,23 @@ public class Indexer {
     private Core server;
 
     public static enum DateHistogramInterval {
-        YEAR, QUARTER, MONTH, WEEK, DAY, HOUR, MINUTE
+        YEAR(Period.years(1)),
+        QUARTER(Period.months(3)), // TODO this isn't really correct, is it?
+        MONTH(Period.months(1)),
+        WEEK(Period.weeks(1)),
+        DAY(Period.days(1)),
+        HOUR(Period.hours(1)),
+        MINUTE(Period.minutes(1));
+
+        private final Period period;
+
+        DateHistogramInterval(Period period) {
+            this.period = period;
+        }
+
+        public Period getPeriod() {
+            return period;
+        }
     }
 
     public Indexer(Core graylogServer) {
@@ -73,7 +90,7 @@ public class Indexer {
         client = node.client();
 
         try {
-            client.admin().cluster().health(new ClusterHealthRequest().waitForYellowStatus()).actionGet(5, TimeUnit.SECONDS);
+            client.admin().cluster().health(new ClusterHealthRequest().waitForYellowStatus()).actionGet(5, SECONDS);
         } catch(ElasticSearchTimeoutException e) {
             UI.exitHardWithWall("No ElasticSearch master was found.", new String[]{ "graylog2-server/configuring-and-tuning-elasticsearch-for-graylog2-v0200" });
         }

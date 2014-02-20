@@ -36,7 +36,6 @@ import org.slf4j.LoggerFactory;
 
 import java.net.URI;
 import java.net.UnknownHostException;
-import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -194,6 +193,15 @@ public class Configuration {
     @Parameter(value = "elasticsearch_discovery_initial_state_timeout", required = false)
     private String esInitialStateTimeout = "3s";
 
+    @Parameter(value = "versionchecks", required = false)
+    private boolean versionchecks = true;
+
+    @Parameter(value = "versionchecks_uri", required = false)
+    private String versionchecksUri = "http://versioncheck.torch.sh/check";
+
+    @Parameter(value = "http_proxy_uri", required = false)
+    private String httpProxyUri;
+
     // Transport: Email
     @Parameter(value = "transport_email_enabled", required = false)
     private boolean emailTransportEnabled = false;
@@ -224,6 +232,12 @@ public class Configuration {
 
     @Parameter(value = "transport_email_from_email", required = false)
     private String emailTransportFromEmail;
+
+    @Parameter(value = "rest_enable_cors", required = false)
+    private boolean restEnableCors = false;
+
+    @Parameter(value = "rest_enable_gzip", required = false)
+    private boolean restEnableGzip = false;
 
     public boolean isMaster() {
         return isMaster;
@@ -512,4 +526,24 @@ public class Configuration {
         return emailTransportFromEmail;
     }
 
+    public boolean isRestEnableCors() {
+        return restEnableCors;
+    }
+
+    public boolean isRestEnableGzip() {
+        return restEnableGzip;
+    }
+
+    public boolean isVersionchecks() {
+        return versionchecks;
+    }
+
+    public String getVersionchecksUri() {
+        return versionchecksUri;
+    }
+
+    public String getHttpProxyUri() {
+        return httpProxyUri;
+    }
 }
+

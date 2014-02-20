@@ -28,8 +28,10 @@ import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import org.apache.shiro.mgt.DefaultSecurityManager;
 import org.cliffc.high_scale_lib.Counter;
 import org.glassfish.hk2.utilities.binding.AbstractBinder;
+import org.glassfish.jersey.message.GZipEncoder;
 import org.glassfish.jersey.server.ContainerFactory;
 import org.glassfish.jersey.server.ResourceConfig;
+import org.glassfish.jersey.server.filter.EncodingFilter;
 import org.glassfish.jersey.server.internal.scanning.PackageNamesScanner;
 import org.graylog2.blacklists.BlacklistCache;
 import org.graylog2.buffers.OutputBuffer;
@@ -47,6 +49,7 @@ import org.graylog2.inputs.InputRegistry;
 import org.graylog2.inputs.gelf.gelf.GELFChunkManager;
 import org.graylog2.jersey.container.netty.NettyContainer;
 import org.graylog2.metrics.jersey2.MetricsDynamicBinding;
+import org.graylog2.rest.RestAccessLogFilter;
 import org.graylog2.outputs.OutputRegistry;
 import org.graylog2.periodical.MongoDbMetricsReporter;
 import org.graylog2.plugin.GraylogServer;
@@ -66,6 +69,7 @@ import org.graylog2.plugin.rest.JacksonPropertyExceptionMapper;
 import org.graylog2.plugin.streams.Stream;
 import org.graylog2.plugin.system.NodeId;
 import org.graylog2.plugins.PluginLoader;
+import org.graylog2.rest.CORSFilter;
 import org.graylog2.rest.ObjectMapperProvider;
 import org.graylog2.security.ShiroSecurityBinding;
 import org.graylog2.security.ShiroSecurityContextFactory;
@@ -119,7 +123,7 @@ public class Core implements GraylogServer, InputHost {
     private ScheduledExecutorService scheduler;
 
     public static final Version GRAYLOG2_VERSION = ServerVersion.VERSION;
-    public static final String GRAYLOG2_CODENAME = "Amigo Humanos (Flipper)";
+    public static final String GRAYLOG2_CODENAME = "Moose";
 
     private Indexer indexer;
 
@@ -377,11 +381,25 @@ public class Core implements GraylogServer, InputHost {
 
         ResourceConfig rc = new ResourceConfig()
                 .property(NettyContainer.PROPERTY_BASE_URI, configuration.getRestListenUri())
-                .registerClasses(MetricsDynamicBinding.class, JacksonPropertyExceptionMapper.class, AnyExceptionClassMapper.class, ShiroSecurityBinding.class)
+                .registerClasses(MetricsDynamicBinding.class,
+                        JacksonPropertyExceptionMapper.class,
+                        AnyExceptionClassMapper.class,
+                        ShiroSecurityBinding.class,
+                        RestAccessLogFilter.class)
                 .register(new Graylog2Binder())
                 .register(ObjectMapperProvider.class)
                 .register(JacksonJsonProvider.class)
                 .registerFinder(new PackageNamesScanner(new String[]{"org.graylog2.rest.resources"}, true));
+
+        if (configuration.isRestEnableGzip())
+            EncodingFilter.enableFor(rc, GZipEncoder.class);
+
+        if (configuration.isRestEnableCors()) {
+            LOG.info("Enabling CORS for REST API");
+            rc.register(CORSFilter.class);
+        }
+
+        /*rc = rc.registerFinder(new PackageNamesScanner(new String[]{"org.graylog2.rest.resources"}, true));*/
 
         final NettyContainer jerseyHandler = ContainerFactory.createContainer(NettyContainer.class, rc);
         jerseyHandler.setSecurityContextFactory(new ShiroSecurityContextFactory(this));

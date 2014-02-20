@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 TORCH UG
+ * Copyright 2013-2014 TORCH GmbH
  *
  * This file is part of Graylog2.
  *
@@ -21,14 +21,17 @@ package org.graylog2.security.ldap;
 import com.google.common.collect.Maps;
 import com.mongodb.BasicDBObject;
 import com.mongodb.DBObject;
+import org.apache.shiro.codec.Hex;
 import org.bson.types.ObjectId;
 import org.graylog2.Core;
 import org.graylog2.database.Persisted;
 import org.graylog2.database.validators.Validator;
+import org.graylog2.security.AESTools;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.net.URI;
+import java.security.SecureRandom;
 import java.util.List;
 import java.util.Map;
 
@@ -39,6 +42,7 @@ public class LdapSettings extends Persisted {
     public static final String ENABLED = "enabled";
     public static final String SYSTEM_USERNAME = "system_username";
     public static final String SYSTEM_PASSWORD = "system_password";
+    public static final String SYSTEM_PASSWORD_SALT = "system_password_salt";
     public static final String LDAP_URI = "ldap_uri";
     public static final String SEARCH_PATTERN = "principal_search_pattern";
     public static final String SEARCH_BASE = "search_base";
@@ -63,7 +67,9 @@ public class LdapSettings extends Persisted {
             return null;
         }
         if (results.size() > 1) {
-            log.error("Graylog2 does not yet support multiple LDAP backends, but {} configurations were found. This is a bug, ignoring LDAP config.", results.size());
+            log.error(
+                    "Graylog2 does not yet support multiple LDAP backends, but {} configurations were found. This is a bug, ignoring LDAP config.",
+                    results.size());
             return null;
         }
         final DBObject settingsObject = results.get(0);
@@ -102,11 +108,45 @@ public class LdapSettings extends Persisted {
 
     public String getSystemPassword() {
         final Object o = fields.get(SYSTEM_PASSWORD);
-        return o != null ? o.toString() : "";
+        if (o == null) return "";
+        if (getSystemPasswordSalt().isEmpty()) {
+            // this is an old version of the database that doesn't have the salt value,
+            // simply return the password, because it's unencrypted.
+            // The next time we will generate a salt and then re-use that value.
+            // TODO remove this after 0.20 is out, and the RC versions are pulled.
+            log.debug("Old database version does not have salted, encrypted password. Please save the LDAP settings again.");
+            return o.toString();
+        }
+        String encryptedPw = o.toString();
+        return AESTools.decrypt(
+                encryptedPw,
+                core.getConfiguration().getPasswordSecret().substring(0, 16),
+                getSystemPasswordSalt());
     }
 
     public void setSystemPassword(String systemPassword) {
-        fields.put(SYSTEM_PASSWORD, systemPassword);
+        // set new salt value, if we didn't have any.
+        if (getSystemPasswordSalt().isEmpty()) {
+            log.debug("Generating new salt for LDAP system password.");
+            final SecureRandom random = new SecureRandom();
+            byte[] saltBytes = new byte[8];
+            random.nextBytes(saltBytes);
+            setSystemPasswordSalt(Hex.encodeToString(saltBytes));
+        }
+        final String encrypted = AESTools.encrypt(
+                systemPassword,
+                core.getConfiguration().getPasswordSecret().substring(0, 16),
+                getSystemPasswordSalt());
+        fields.put(SYSTEM_PASSWORD, encrypted);
+    }
+
+    public String getSystemPasswordSalt() {
+        Object o = fields.get(SYSTEM_PASSWORD_SALT);
+        return (o!= null) ? o.toString() : "";
+    }
+
+    public void setSystemPasswordSalt(String salt) {
+        fields.put(SYSTEM_PASSWORD_SALT, salt);
     }
 
     public URI getUri() {

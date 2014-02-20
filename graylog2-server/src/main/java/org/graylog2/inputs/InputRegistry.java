@@ -78,49 +78,53 @@ public class InputRegistry {
                     input.launch();
                     Notification.fixed(core, Notification.Type.NO_INPUT_RUNNING);
                     inputState.setState(InputState.InputStateType.RUNNING);
-                    LOG.info("Completed starting [{}] input with ID <{}>", input.getClass().getCanonicalName(), input.getId());
+                    String msg = "Completed starting [" + input.getClass().getCanonicalName() + "] input with ID <" + input.getId() + ">";
+                    core.getActivityWriter().write(new Activity(msg, InputRegistry.class));
+                    LOG.info(msg);
                 } catch (MisfireException e) {
-                    StringBuilder msg = new StringBuilder("The [" + input.getClass().getCanonicalName() + "] input with ID <" + input.getId() + "> " +
-                            "was accepted but misfired. Reason: ");
-
-                    StringBuilder causeMsg = new StringBuilder(e.getMessage());
-
-                    // Go down the whole cause chain to build a message that provides as much information as possible.
-                    int maxLevel = 7; // ;)
-                    Throwable cause = e.getCause();
-                    for (int i = 0; i < maxLevel; i++) {
-                        if (cause == null) {
-                            break;
-                        }
-
-                        causeMsg.append(", ").append(cause.getMessage());
-                        cause = cause.getCause();
-                    }
-
-                    msg.append(causeMsg);
-
-                    core.getActivityWriter().write(new Activity(msg.toString(), InputRegistry.class));
-                    LOG.error(msg.toString(), e);
-
-                    Notification notification = Notification.buildNow(core);
-                    notification.addType(Notification.Type.INPUT_FAILED_TO_START).addSeverity(Notification.Severity.NORMAL);
-                    notification.addThisNode();
-                    notification.addDetail("input_id", input.getId());
-                    notification.addDetail("reason", causeMsg.toString());
-                    notification.publish();
-
-                    // Clean up.
-                    //cleanInput(input);
-
-                    inputState.setState(InputState.InputStateType.FAILED);
-                } catch(Exception e) {
-                    LOG.error("Error in input <{}>", input.getId(), e);
-                    inputState.setState(InputState.InputStateType.FAILED);
+                    handleLaunchException(e, input, inputState);
+                } catch (Exception e) {
+                    handleLaunchException(e, input, inputState);
                 }
             }
         });
 
         return inputState.getId();
+    }
+
+    protected void handleLaunchException(Throwable e, MessageInput input, InputState inputState) {
+        StringBuilder msg = new StringBuilder("The [" + input.getClass().getCanonicalName() + "] input with ID <" + input.getId() + "> misfired. Reason: ");
+
+        StringBuilder causeMsg = new StringBuilder(e.getMessage());
+
+        // Go down the whole cause chain to build a message that provides as much information as possible.
+        int maxLevel = 7; // ;)
+        Throwable cause = e.getCause();
+        for (int i = 0; i < maxLevel; i++) {
+            if (cause == null) {
+                break;
+            }
+
+            causeMsg.append(", ").append(cause.getMessage());
+            cause = cause.getCause();
+        }
+
+        msg.append(causeMsg);
+
+        core.getActivityWriter().write(new Activity(msg.toString(), InputRegistry.class));
+        LOG.error(msg.toString(), e);
+
+        Notification notification = Notification.buildNow(core);
+        notification.addType(Notification.Type.INPUT_FAILED_TO_START).addSeverity(Notification.Severity.NORMAL);
+        notification.addThisNode();
+        notification.addDetail("input_id", input.getId());
+        notification.addDetail("reason", causeMsg.toString());
+        notification.publishIfFirst();
+
+        // Clean up.
+        //cleanInput(input);
+
+        inputState.setState(InputState.InputStateType.FAILED);
     }
 
     public String launch(final MessageInput input) {
@@ -231,7 +235,7 @@ public class InputRegistry {
             try {
                 input = InputRegistry.getMessageInput(io, core);
             } catch (NoSuchInputTypeException e) {
-                LOG.warn("Cannot launch persisted input. No such type [{}].", io.getType());
+                LOG.error("Cannot launch persisted input. No such type [{}].", io.getType());
                 continue;
             } catch (ConfigurationException e) {
                 LOG.error("Missing or invalid input plugin configuration.", e);

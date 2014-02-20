@@ -34,6 +34,7 @@ import org.graylog2.users.User;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.IOException;
 import java.util.concurrent.atomic.AtomicReference;
 
 public class LdapUserAuthenticator extends AuthenticatingRealm {
@@ -74,8 +75,9 @@ public class LdapUserAuthenticator extends AuthenticatingRealm {
         config.setCredentials(ldapSettings.getSystemPassword());
 
         final String principal = String.valueOf(token.getPrincipal());
+        LdapNetworkConnection connection = null;
         try {
-            final LdapNetworkConnection connection = ldapConnector.connect(config);
+            connection = ldapConnector.connect(config);
             final String password = String.valueOf(token.getPassword());
 
             final LdapEntry userEntry = ldapConnector.search(connection,
@@ -109,6 +111,14 @@ public class LdapUserAuthenticator extends AuthenticatingRealm {
         } catch (CursorException e) {
             log.error("Unable to read LDAP entry", e);
             return null;
+        } finally {
+            if (connection != null) {
+                try {
+                    connection.close();
+                } catch (IOException e) {
+                    log.error("Unable to close LDAP connection", e);
+                }
+            }
         }
         return new SimpleAccount(principal, null, "ldap realm");
     }

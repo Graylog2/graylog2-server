@@ -2554,7 +2554,7 @@ var Request = module.exports = function (xhr, params) {
     self.xhr = xhr;
     self.body = '';
     
-    var uri = params.host + ':' + params.port + encodeURI(params.path || '/');
+    var uri = params.host + ':' + params.port + (params.path || '/');
     
     xhr.open(
         params.method || 'GET',

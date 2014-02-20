@@ -5,11 +5,8 @@ import com.github.joschi.jadconfig.RepositoryException;
 import com.github.joschi.jadconfig.ValidationException;
 import com.github.joschi.jadconfig.repositories.InMemoryRepository;
 import com.google.common.collect.Maps;
-import org.junit.Assert;
-import org.bson.types.ObjectId;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
+import org.testng.Assert;
+import org.testng.annotations.*;
 
 import java.io.File;
 import java.io.IOException;
@@ -25,7 +22,7 @@ public class ConfigurationTest {
     Map<String, String> validProperties;
     private File tempFile;
 
-    @Before
+    @BeforeClass
     public void setUp() {
 
         validProperties = Maps.newHashMap();
@@ -61,12 +58,12 @@ public class ConfigurationTest {
         validProperties.put("retention_strategy", "delete");
     }
 
-    @After
+    @AfterClass
     public void tearDown() {
         tempFile.delete();
     }
 
-    @Test(expected = ValidationException.class)
+    @Test(expectedExceptions = ValidationException.class)
     public void testValidateMongoDbAuth() throws RepositoryException, ValidationException {
 
         validProperties.put("mongodb_useauth", "true");

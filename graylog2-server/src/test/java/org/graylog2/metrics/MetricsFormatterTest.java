@@ -20,12 +20,12 @@
 package org.graylog2.metrics;
 
 import com.google.common.collect.Maps;
-import org.junit.Test;
+import org.testng.annotations.Test;
 
 import java.util.HashMap;
 import java.util.Map;
 
-import static org.junit.Assert.assertEquals;
+import static org.testng.AssertJUnit.assertEquals;
 
 /**
  * @author Lennart Koopmann <lennart@torch.sh>

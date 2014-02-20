@@ -197,9 +197,10 @@ public final class Main {
                 server.getActivityWriter().write(new Activity(what, Main.class));
 
                 // Write a notification.
-                if (Notification.isFirst(server, Notification.Type.MULTI_MASTER)) {
-                    Notification.publish(server, Notification.Type.MULTI_MASTER, Notification.Severity.URGENT);
-                }
+                Notification.buildNow(server)
+                        .addType(Notification.Type.MULTI_MASTER)
+                        .addSeverity(Notification.Severity.URGENT)
+                        .publishIfFirst();
 
                 configuration.setIsMaster(false);
             } else {
@@ -249,6 +250,7 @@ public final class Main {
         server.initializers().register(new MasterCacheWorkersInitializer());
         server.initializers().register(new ClusterHealthCheckInitializer());
         server.initializers().register(new StreamThroughputCounterInitializer());
+        server.initializers().register(new VersionCheckInitializer());
 
         // Register message filters. (Order is important here)
         server.registerFilter(new StaticFieldFilter());

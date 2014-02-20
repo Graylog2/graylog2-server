@@ -1,5 +1,5 @@
-/**
- * Copyright 2013 Lennart Koopmann <lennart@torch.sh>
+/*
+ * Copyright 2014 TORCH GmbH
  *
  * This file is part of Graylog2.
  *
@@ -15,7 +15,6 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with Graylog2.  If not, see <http://www.gnu.org/licenses/>.
- *
  */
 package org.graylog2.alerts;
 
@@ -147,6 +146,11 @@ public abstract class AlertCondition implements EmbeddedPersistable {
         throw new NoSuchAlertConditionTypeException("Unhandled alert condition type: " + type);
     }
 
+    public CheckResult triggeredNoGrace() {
+        LOG.debug("Checking alert condition [{}] and not accounting grace time.", this);
+        return runCheck();
+    }
+
     public CheckResult triggered() {
         LOG.debug("Checking alert condition [{}]", this);
 
@@ -173,11 +177,11 @@ public abstract class AlertCondition implements EmbeddedPersistable {
     public boolean inGracePeriod() {
         int lastAlertSecondsAgo = Alert.triggeredSecondsAgo(stream.getId(), getId(), core);
 
-        if (lastAlertSecondsAgo == -1) {
+        if (lastAlertSecondsAgo == -1 || grace == 0) {
             return false;
         }
 
-        return lastAlertSecondsAgo < (grace*60)-2;
+        return lastAlertSecondsAgo < grace*60;
     }
 
     @Override
@@ -208,6 +212,10 @@ public abstract class AlertCondition implements EmbeddedPersistable {
             put("parameters", parameters);
             put("in_grace", inGracePeriod());
         }};
+    }
+
+    public int getGrace() {
+        return grace;
     }
 
     public static class NoSuchAlertConditionTypeException extends Throwable {

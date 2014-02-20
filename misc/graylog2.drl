@@ -1,16 +1,16 @@
-import org.graylog2.plugin.logmessage.LogMessage
+import org.graylog2.plugin.Message
 
 rule "Rewrite localhost host"
     when
-        m : LogMessage( host == "localhost" )
+        m : Message( source == "localhost" )
     then 
-        m.setHost( "localhost.example.com" );
+        m.addField("source", "localhost.example.com" );
         System.out.println( "[Overwrite localhost rule fired] : " + m.toString() );
 end
 
 rule "Drop UDP and ICMP Traffic from firewall"
     when
-        m : LogMessage( fullMessage matches "(?i).*(ICMP|UDP) Packet(.|\n|\r)*" && host == "firewall" )
+        m : Message( getField("full_message") matches "(?i).*(ICMP|UDP) Packet(.|\n|\r)*" && source == "firewall" )
     then
         m.setFilterOut(true);
         System.out.println("[Drop all syslog ICMP and UDP traffic] : " + m.toString() );

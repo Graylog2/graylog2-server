@@ -126,6 +126,9 @@ public class UsersResource extends RestResource {
         if (cr.timezone != null) {
             userData.put(User.TIMEZONE, cr.timezone);
         }
+        if (cr.session_timeout_ms != null) {
+            userData.put(User.SESSION_TIMEOUT, cr.session_timeout_ms);
+        }
         User user = new User(userData, core);
         ObjectId id;
         try {
@@ -186,7 +189,11 @@ public class UsersResource extends RestResource {
         if (cr.startpage != null) {
             user.setStartpage(cr.startpage.type, cr.startpage.id);
         }
-
+        if (isPermitted("*")) {
+            if (cr.session_timeout_ms != 0) {
+                user.setSessionTimeoutMs(cr.session_timeout_ms);
+            }
+        }
         try {
             // TODO JPA this is wrong, the primary key is the username
             user.save();
@@ -416,6 +423,7 @@ public class UsersResource extends RestResource {
         if (user.getTimeZone() != null) {
             map.put("timezone", user.getTimeZone().getID());
         }
+        map.put("session_timeout_ms", user.getSessionTimeoutMs());
         map.put("read_only", user.isReadOnly());
         map.put("external", user.isExternalUser());
         map.put("startpage", user.getStartpage());

@@ -4,10 +4,9 @@
  */
 package org.graylog2.buffers.processors;
 
-import org.junit.Ignore;
-import org.junit.Test;
+import org.testng.annotations.Test;
 
-import static org.junit.Assert.assertEquals;
+import static org.testng.AssertJUnit.assertEquals;
 
 /**
  *
@@ -15,8 +14,8 @@ import static org.junit.Assert.assertEquals;
  */
 public class OutputBufferProcessorTest {
     
-    @Test
-    @Ignore("Ignored until FakeStream class has been restored")
+    @Test(enabled = false)
+    // Ignored until FakeStream class has been restored
     public void testOnEventWritesToAllOutputsWhenGettingBatches() throws Exception {
         /*FakeOutput fo1 = new FakeOutput();
         FakeOutput fo2 = new FakeOutput();

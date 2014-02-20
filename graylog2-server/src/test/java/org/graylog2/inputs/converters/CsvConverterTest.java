@@ -20,11 +20,11 @@ package org.graylog2.inputs.converters;
 
 import com.google.common.collect.Maps;
 import org.graylog2.ConfigurationException;
-import org.junit.Test;
+import org.testng.annotations.Test;
 
 import java.util.Map;
 
-import static org.junit.Assert.*;
+import static org.testng.AssertJUnit.*;
 
 @SuppressWarnings("unchecked")
 public class CsvConverterTest {

@@ -20,8 +20,8 @@
 
 package org.graylog2;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
+import org.testng.annotations.Test;
+import static org.testng.AssertJUnit.*;
 
 /**
  * @author lennart

@@ -61,6 +61,24 @@ public class Version {
         return sb.toString();
     }
 
+    /**
+     * Check if this version is higher than the passed other version. Only taking major and minor version number in account.
+     *
+     * @param other version to compare
+     * @return
+     */
+    public boolean greaterMinor(Version other) {
+        if (other.major < this.major) {
+            return true;
+        }
+
+        if (other.major == this.major && other.minor < this.minor) {
+            return true;
+        }
+
+        return false;
+    }
+
     public boolean equals(Object obj) {
         if (obj == null || getClass() != obj.getClass()) {
             return false;

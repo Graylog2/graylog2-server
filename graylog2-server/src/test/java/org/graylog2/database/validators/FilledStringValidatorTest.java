@@ -19,8 +19,8 @@
  */
 package org.graylog2.database.validators;
 
-import static org.junit.Assert.*;
-import org.junit.Test;
+import static org.testng.AssertJUnit.*;
+import org.testng.annotations.Test;
 
 /**
  * @author Lennart Koopmann <lennart@torch.sh>

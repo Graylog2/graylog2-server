@@ -7,7 +7,7 @@
 
     <groupId>org.graylog2</groupId>
     <artifactId>graylog2-parent</artifactId>
-    <version>0.20.1-rc.1-2-SNAPSHOT</version>
+    <version>0.20.0</version>
     <packaging>pom</packaging>
     <name>graylog2</name>
     <url>http://graylog2.org/</url>
@@ -57,6 +57,7 @@
         <jackson.version>2.3.0</jackson.version>
         <jersey.version>2.5</jersey.version>
         <apache-directory-version>1.0.0-M20</apache-directory-version>
+        <surefire.version>2.13</surefire.version>
     </properties>
 
     <repositories>
@@ -114,9 +115,10 @@
             <version>5.5.0.Final</version>
         </dependency>
         <dependency>
-            <groupId>junit</groupId>
-            <artifactId>junit</artifactId>
-            <version>4.11</version>
+            <groupId>org.testng</groupId>
+            <artifactId>testng</artifactId>
+            <version>6.1.1</version>
+            <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>com.codahale.metrics</groupId>
@@ -206,7 +208,7 @@
         <dependency>
             <groupId>org.graylog2</groupId>
             <artifactId>jersey-netty</artifactId>
-            <version>1.1</version>
+            <version>1.2</version>
         </dependency>
         <dependency>
             <groupId>org.slf4j</groupId>
@@ -365,7 +367,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-plugin</artifactId>
-                <version>2.13</version>
+                <version>${surefire.version}</version>
                 <configuration>
                     <excludes>
                         <exclude>**/*IntegrationTest.java</exclude>
@@ -375,6 +377,13 @@
                         <include>**/*Test.class</include>
                     </includes>
                 </configuration>
+                <dependencies>
+                    <dependency>
+                        <groupId>org.apache.maven.surefire</groupId>
+                        <artifactId>surefire-testng</artifactId>
+                        <version>${surefire.version}</version>
+                    </dependency>
+                </dependencies>
             </plugin>
         </plugins>
         <testResources>
