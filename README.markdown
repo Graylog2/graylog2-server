@@ -1,6 +1,6 @@
 # graylog2-server
 
-020: [![Build Status](https://secure.travis-ci.org/Graylog2/graylog2-server.png?branch=020)](http://travis-ci.org/Graylog2/graylog2-server)
+[![Build Status](https://secure.travis-ci.org/Graylog2/graylog2-server.png?branch=020)](http://travis-ci.org/Graylog2/graylog2-server)
 
 This is Graylog2.
 
