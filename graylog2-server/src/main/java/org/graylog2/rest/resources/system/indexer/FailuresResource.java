@@ -77,11 +77,15 @@ public class FailuresResource extends RestResource {
     public Response single(@ApiParam(title = "page", description = "Page", required = false) @QueryParam("page") int page) {
         checkPermission(RestPermissions.INDICES_FAILURES);
 
-        List<Map<String, Object>> result = Lists.newArrayList();
+        Map<String, Object> result = Maps.newHashMap();
 
+        List<Map<String, Object>> failures = Lists.newArrayList();
         for (IndexFailure failure : IndexFailure.all(core, page)) {
-            result.add(failure.asMap());
+            failures.add(failure.asMap());
         }
+
+        result.put("failures", failures);
+        result.put("total", IndexFailure.totalCount(core, IndexFailure.COLLECTION));
 
         return Response.ok().entity(json(result)).build();
     }
