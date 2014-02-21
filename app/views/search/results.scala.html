@@ -2,7 +2,6 @@
 @(currentUser: User, search: UniversalSearch, searchResult: models.api.results.SearchResult, histogram: models.api.results.DateHistogramResult, query: String, page: Integer, savedSearch: SavedSearch)(implicit stream: Stream)
 @import lib.security.RestPermissions
 @import views.helpers.DateHistogramResolutionSelector
-@import java.text.DecimalFormat
 @import views.helpers.Permissions
 @import lib.DateTools
 @import controllers.routes;
@@ -15,7 +14,7 @@
 
 @highestPage() = @{
     if ((lowestPage() + paginatorLength()) * UniversalSearch.PER_PAGE >= searchResult.getTotalResultCount)
-        searchResult.getTotalResultCount / UniversalSearch.PER_PAGE  + 1
+        (searchResult.getTotalResultCount / UniversalSearch.PER_PAGE + 1).toInt
     else
         lowestPage() + paginatorLength()
 }

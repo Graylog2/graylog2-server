@@ -32,7 +32,7 @@ public class SearchResult {
 	private final String originalQuery;
     private final String builtQuery;
     private final TimeRange timeRange;
-	private final int totalResultCount;
+	private final long totalResultCount;
 	private final int tookMs;
 	private final List<MessageResult> results;
     private final SearchResultResponse.QueryError error;
@@ -43,7 +43,7 @@ public class SearchResult {
     public SearchResult(String originalQuery,
                         String builtQuery,
                         TimeRange timeRange,
-                        int totalResultCount,
+                        long totalResultCount,
                         int tookMs,
                         List<MessageSummaryResponse> summaryResponses,
                         List<String> fields,
@@ -85,7 +85,7 @@ public class SearchResult {
 		return tookMs;
 	}
 	
-	public int getTotalResultCount() {
+	public long getTotalResultCount() {
 		return totalResultCount;
 	}
 	

@@ -82,11 +82,11 @@ public class MessagesService {
         return Sets.newHashSet();
     }
 
-    public int total() {
+    public long total() {
         try {
-            return Cache.getOrElse(TOTAL_CNT_CACHE_KEY, new Callable<Integer>() {
+            return Cache.getOrElse(TOTAL_CNT_CACHE_KEY, new Callable<Long>() {
                 @Override
-                public Integer call() throws Exception {
+                public Long call() throws Exception {
                     MessageCountResponse response = api.get(MessageCountResponse.class).path("/count/total").execute();
                     return response.events;
                 }

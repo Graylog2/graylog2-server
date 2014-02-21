@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 TORCH UG
+ * Copyright 2013, 2014 TORCH GmbH
  *
  * This file is part of Graylog2.
  *
@@ -20,6 +20,6 @@ package models.api.responses;
 
 public class MessageCountResponse {
 
-    public int events;
+    public long events;
 
 }
