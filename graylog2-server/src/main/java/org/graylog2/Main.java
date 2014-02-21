@@ -251,6 +251,7 @@ public final class Main {
         server.initializers().register(new ClusterHealthCheckInitializer());
         server.initializers().register(new StreamThroughputCounterInitializer());
         server.initializers().register(new VersionCheckInitializer());
+        server.initializers().register(new IndexFailureWriterInitializer());
 
         // Register message filters. (Order is important here)
         server.registerFilter(new StaticFieldFilter());

@@ -91,6 +91,10 @@ public abstract class Persisted {
                         .skip(offset));
     }
 
+    protected static long count(DBObject query, Core core, String collectionName) {
+        return collection(core, collectionName).count(query);
+    }
+
     private static List<DBObject> cursorToList(DBCursor cursor) {
         List<DBObject> results = Lists.newArrayList();
 

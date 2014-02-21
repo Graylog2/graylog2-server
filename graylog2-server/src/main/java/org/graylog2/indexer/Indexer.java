@@ -8,6 +8,7 @@ import org.elasticsearch.action.WriteConsistencyLevel;
 import org.elasticsearch.action.admin.cluster.health.ClusterHealthRequest;
 import org.elasticsearch.action.admin.cluster.node.info.NodesInfoRequest;
 import org.elasticsearch.action.admin.cluster.node.info.NodesInfoResponse;
+import org.elasticsearch.action.bulk.BulkItemResponse;
 import org.elasticsearch.action.bulk.BulkRequestBuilder;
 import org.elasticsearch.action.bulk.BulkResponse;
 import org.elasticsearch.action.index.IndexRequest.OpType;
@@ -36,6 +37,8 @@ import java.io.File;
 import java.io.IOException;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.atomic.AtomicLong;
 
 import static java.util.concurrent.TimeUnit.SECONDS;
 import static org.elasticsearch.node.NodeBuilder.nodeBuilder;
@@ -54,7 +57,9 @@ public class Indexer {
     private Messages messages;
     private Cluster cluster;
     private Indices indices;
-	
+
+    private LinkedBlockingQueue<BulkItemResponse[]> failureQueue;
+
     private Core server;
 
     public static enum DateHistogramInterval {
@@ -79,6 +84,8 @@ public class Indexer {
 
     public Indexer(Core graylogServer) {
         this.server = graylogServer;
+
+        this.failureQueue = new LinkedBlockingQueue<BulkItemResponse[]>(1000);
     }
 
     public void start() {
@@ -214,9 +221,23 @@ public class Indexer {
         LOG.debug("Deflector index: Bulk indexed {} messages, took {} ms, failures: {}",
                 new Object[] { response.getItems().length, response.getTookInMillis(), response.hasFailures() });
 
+        if (response.hasFailures()) {
+            propagateFailure(response.getItems());
+        }
+
         return !response.hasFailures();
     }
-    
+
+    private void propagateFailure(BulkItemResponse[] items) {
+        LOG.error("Failed to index [{}] messages. Please check the index error log in your web interface for the reason.", items.length);
+
+        boolean r = this.failureQueue.offer(items);
+
+        if(!r) {
+            LOG.debug("Could not propagate failure to failure queue. Queue is full.");
+        }
+    }
+
     public Searches searches() {
     	return searches;
     }
@@ -236,14 +257,14 @@ public class Indexer {
     public Indices indices() {
         return indices;
     }
-    
+
+    public LinkedBlockingQueue<BulkItemResponse[]> getFailureQueue() {
+        return failureQueue;
+    }
+
     private IndexRequestBuilder buildIndexRequest(String index, Map<String, Object> source, String id) {
         final IndexRequestBuilder b = new IndexRequestBuilder(client);
-        
-        /*
-         * ID is set manually to allow inserting message into recent and total index
-         * with same ID. (Required for linking in frontend)
-         */
+
         b.setId(id);
         b.setSource(source);
         b.setIndex(index);

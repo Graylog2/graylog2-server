@@ -56,7 +56,7 @@ public class    MessagesResource extends RestResource {
     @ApiOperation(value = "Get internal Graylog2 system messages")
     @RequiresPermissions(RestPermissions.SYSTEMMESSAGES_READ)
     @Produces(MediaType.APPLICATION_JSON)
-    public String all( @ApiParam(title = "page", description = "Page", required = false) @QueryParam("page") int page) {
+    public String all(@ApiParam(title = "page", description = "Page", required = false) @QueryParam("page") int page) {
         List<Map<String, Object>> messages = Lists.newArrayList();
 
         for (SystemMessage sm : SystemMessage.all(core, page(page))) {
