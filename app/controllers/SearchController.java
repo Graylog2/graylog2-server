@@ -25,12 +25,14 @@ import lib.APIException;
 import lib.ApiClient;
 import lib.Field;
 import lib.SearchTools;
+import lib.security.RestPermissions;
 import lib.timeranges.InvalidRangeParametersException;
 import lib.timeranges.TimeRange;
 import models.*;
 import models.api.results.DateHistogramResult;
 import models.api.results.SearchResult;
 import play.mvc.Result;
+import views.helpers.Permissions;
 
 import java.io.IOException;
 import java.util.List;
@@ -47,7 +49,12 @@ public class SearchController extends AuthenticatedController {
     protected SavedSearchService savedSearchService;
 
     public Result globalSearch() {
-        return ok(views.html.search.global.render(currentUser()));
+        // User would not be allowed to do any global searches anyway, so we can redirect him to the streams page to avoid confusion.
+        if (Permissions.isPermitted(RestPermissions.SEARCHES_ABSOLUTE) || Permissions.isPermitted(RestPermissions.SEARCHES_RELATIVE) || Permissions.isPermitted(RestPermissions.SEARCHES_KEYWORD)) {
+            return ok(views.html.search.global.render(currentUser()));
+        } else {
+            return redirect(routes.StreamsController.index());
+        }
     }
 
     public Result index(String q, String rangeType, int relative, String from, String to, String keyword, String interval, int page, String savedSearchId, String sortField, String sortOrder) {

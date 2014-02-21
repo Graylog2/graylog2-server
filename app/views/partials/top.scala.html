@@ -7,7 +7,10 @@
 	  		<a href="@routes.SearchController.globalSearch()"><img src="@routes.Assets.at("images/toplogo.png")" id="toplogo" /></a>
 	  		
 	  		<ul id="topmenu">
-	  			<li><a href="@routes.SearchController.globalSearch()">Search</a></li>
+                @if((isPermitted(SEARCHES_ABSOLUTE) || isPermitted(SEARCHES_RELATIVE) || isPermitted(SEARCHES_KEYWORD))) {
+	  			    <li><a href="@routes.SearchController.globalSearch()">Search</a></li>
+                }
+
 	  			<li><a href="@routes.StreamsController.index()">Streams</a></li>
                 <li><a href="@routes.DashboardsController.index()">Dashboards</a></li>
 
