@@ -63,6 +63,11 @@ public class Version {
         this.additional = additional;
     }
 
+
+    public String getBranchName() {
+        return major + "." + minor;
+    }
+
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder();
