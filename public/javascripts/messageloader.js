@@ -49,25 +49,23 @@
                     showMessage(messageContainer, data.fields, data.id);
                     selector.hide();
                     messageContainer.show();
-                },
-                error: function() {
-                    showError("Could not load message. Make sure that ID and index are correct.");
-                    selector.show();
-                    return;
-                },
-                complete: function() {
-                }
-            });
 
-            $.ajax({
-                url: url,
-                success: function(data) {
-                    jQuery.data(document.body, "message", data);
-                    messageContainer.trigger("sampleMessageChanged", data);
-                    if (callback != undefined) {
-                        callback(data);
-                    }
-                    hideSpinner(spinner);
+                    $.ajax({
+                        url: url,
+                        success: function(data) {
+                            jQuery.data(document.body, "message", data);
+                            messageContainer.trigger("sampleMessageChanged", data);
+                            if (callback != undefined) {
+                                callback(data);
+                            }
+                            hideSpinner(spinner);
+                        },
+                        error: function() {
+                            showError("Could not load message. Make sure that ID and index are correct.");
+                            selector.show();
+                            return;
+                        }
+                    });
                 },
                 error: function() {
                     showError("Could not load message. Make sure that ID and index are correct.");
@@ -76,8 +74,9 @@
                 },
                 complete: function() {
                     hideSpinner(spinner);
+
                 }
-            });
+            })
         }
 
         function showSpinner(element) {
