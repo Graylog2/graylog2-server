@@ -72,6 +72,27 @@ public class IndicesController extends AuthenticatedController {
         }
     }
 
+    public Result failures(Integer page) {
+        BreadcrumbList bc = new BreadcrumbList();
+        bc.addCrumb("System", routes.SystemController.index(0));
+        bc.addCrumb("Indices", routes.IndicesController.index());
+        bc.addCrumb("Failures", routes.IndicesController.failures(0));
+
+        try {
+            return ok(views.html.system.indices.failures.render(
+                    currentUser(),
+                    bc,
+                    clusterService.getIndexerFailures(page-1),
+                    page
+            ));
+        } catch (APIException e) {
+            String message = "Could not get indexer failures. We expected HTTP 200, but got a HTTP " + e.getHttpCode() + ".";
+            return status(504, views.html.errors.error.render(message, e, request()));
+        } catch (IOException e) {
+            return status(504, views.html.errors.error.render(ApiClient.ERROR_MSG_IO, e, request()));
+        }
+    }
+
     public Result closeIndex(String index) {
         try {
             indexService.close(index);

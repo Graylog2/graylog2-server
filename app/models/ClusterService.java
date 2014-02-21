@@ -26,6 +26,12 @@ import lib.ApiClient;
 import lib.ServerNodes;
 import models.api.requests.SystemJobTriggerRequest;
 import models.api.responses.system.*;
+import models.api.responses.system.indices.IndexerFailureCountResponse;
+import models.api.responses.system.indices.IndexerFailureSummary;
+import models.api.responses.system.indices.IndexerFailuresResponse;
+import org.joda.time.DateTime;
+import org.joda.time.DateTimeZone;
+import org.joda.time.format.ISODateTimeFormat;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import play.libs.F;
@@ -78,6 +84,22 @@ public class ClusterService {
         api.delete()
                 .path("/system/notifications/{0}", type.toString().toLowerCase())
                 .expect(204)
+                .execute();
+    }
+
+    public long getIndexerFailureCountLast24Hours() throws APIException, IOException {
+        IndexerFailureCountResponse r = api.get(IndexerFailureCountResponse.class)
+                .path("/system/indexer/failures/count")
+                .queryParam("since", ISODateTimeFormat.dateTime().print(new DateTime(DateTimeZone.UTC).minusDays(1)))
+                .execute();
+
+        return r.count;
+    }
+
+    public IndexerFailuresResponse getIndexerFailures(int page) throws APIException, IOException {
+        return api.get(IndexerFailuresResponse.class)
+                .path("/system/indexer/failures")
+                .queryParam("page", page)
                 .execute();
     }
 

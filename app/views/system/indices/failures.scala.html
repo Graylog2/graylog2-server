@@ -1,0 +1,42 @@
+@(currentUser: User, breadcrumbs: lib.BreadcrumbList, failures: models.api.responses.system.indices.IndexerFailuresResponse, page: Integer)
+
+@main("Indexer failures", views.html.sidebars.standard.render(currentUser), "", currentUser) {
+
+    @views.html.partials.breadcrumbs(breadcrumbs)
+
+    <div class="row-fluid">
+        <h1><i class="icon icon-truck"></i> Indexer failures</h1>
+
+        This is a list of bulk message index attempts that failed. A failure means that a message you sent to Graylog2
+        was properly processed but writing it to the ElasticSearch cluster failed. Note that the list is capped to a
+        size of 50 MB so it will contain a lot of failure logs but not necessarily all that ever occurred.
+    </div>
+
+    TOTAL: @failures.total
+
+    @if(failures.failures.isEmpty) {
+        <div class="alert alert-info">
+            No recorded indexer failures.
+        </div>
+    } else {
+        <table class="sources table table-striped table-hover table-condensed">
+            <thead>
+                <tr>
+                    <th>Timestamp</th>
+                    <th>Index</th>
+                    <th>Error message</th>
+                </tr>
+            </thead>
+            <tbody>
+            @for(failure <- failures.failures) {
+                <tr>
+                    <td><span class="moment-from-now" title="@failure.timestamp">@failure.timestamp</span></td>
+                    <td>@failure.index</td>
+                    <td>@failure.message</td>
+                </tr>
+            }
+            </tbody>
+        </table>
+    }
+
+}

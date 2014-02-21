@@ -4,7 +4,8 @@
         systemMessages: List[SystemMessage],
         totalSystemMessages: Integer,
         page: Integer,
-        notifications: List[Notification])
+        notifications: List[Notification],
+        indexFailureCount: Long)
 
 @import lib.security.RestPermissions._
 @import views.helpers.Permissions._
@@ -102,6 +103,14 @@
 
         @views.html.partials.es_cluster_health.render(clusterHealth)
     </div>
+    }
+
+    @if(isPermitted(INDICES_FAILURES)) {
+        <div class="row-fluid">
+            <h2><i class="icon icon-truck"></i> Indexer failures</h2>
+
+            @views.html.partials.indexer_failures.render(indexFailureCount)
+        </div>
     }
 
     @if(isPermitted(SYSTEMMESSAGES_READ)) {

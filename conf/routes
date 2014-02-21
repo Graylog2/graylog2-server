@@ -83,6 +83,7 @@ POST        /system/nodes/:node_id/processing/resume                            
 GET         /system/indices/:index/close                                             @controllers.IndicesController.closeIndex(index: String)
 GET         /system/indices/:index/reopen                                            @controllers.IndicesController.reopenIndex(index: String)
 GET         /system/indices/:index/delete                                            @controllers.IndicesController.deleteIndex(index: String)
+GET         /system/indices/failures                                                 @controllers.IndicesController.failures(page:Integer ?= 1)
 
 # Saved searches
 GET         /savedsearches                                                           @controllers.api.SavedSearchesApiController.list()
