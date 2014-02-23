@@ -1,5 +1,7 @@
 @(currentUser: User, breadcrumbs: lib.BreadcrumbList, failures: models.api.responses.system.indices.IndexerFailuresResponse, page: Integer)
 
+@import org.joda.time.DateTime
+
 @main("Indexer failures", views.html.sidebars.standard.render(currentUser), "", currentUser) {
 
     @views.html.partials.breadcrumbs(breadcrumbs)
@@ -30,7 +32,11 @@
             <tbody>
             @for(failure <- failures.failures) {
                 <tr>
-                    <td><span class="moment-from-now" title="@failure.timestamp">@failure.timestamp</span></td>
+                    <td>
+                        <span title="@failure.timestamp">
+                            @lib.DateTools.inUserTimeZone(DateTime.parse(failure.timestamp))
+                        </span>
+                    </td>
                     <td>@failure.index</td>
                     <td>@failure.message</td>
                 </tr>
