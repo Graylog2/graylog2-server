@@ -74,13 +74,14 @@ public class FailuresResource extends RestResource {
     @GET @Timed
     @ApiOperation(value = "Get a list of failed index operations.")
     @Produces(MediaType.APPLICATION_JSON)
-    public Response single(@ApiParam(title = "page", description = "Page", required = false) @QueryParam("page") int page) {
+    public Response single(@ApiParam(title = "limit", description = "Limit", required = true) @QueryParam("limit") int limit,
+                           @ApiParam(title = "offset", description = "Offset", required = true) @QueryParam("offset") int offset) {
         checkPermission(RestPermissions.INDICES_FAILURES);
 
         Map<String, Object> result = Maps.newHashMap();
 
         List<Map<String, Object>> failures = Lists.newArrayList();
-        for (IndexFailure failure : IndexFailure.all(core, page)) {
+        for (IndexFailure failure : IndexFailure.all(core, limit, offset)) {
             failures.add(failure.asMap());
         }
 
