@@ -1,6 +1,4 @@
-@(currentUser: User, breadcrumbs: lib.BreadcrumbList, failures: models.api.responses.system.indices.IndexerFailuresResponse, page: Integer)
-
-@import org.joda.time.DateTime
+@(currentUser: User, breadcrumbs: lib.BreadcrumbList, totalFailures: Long, page: Integer)
 
 @main("Indexer failures", views.html.sidebars.standard.render(currentUser), "", currentUser) {
 
@@ -14,35 +12,21 @@
         size of 50 MB so it will contain a lot of failure logs but not necessarily all that ever occurred.
     </div>
 
-    TOTAL: @failures.total
+    <div class="row-fluid">
+        Collection containing a total of <em class="number-format" data-format="0,0">@totalFailures</em> indexer failures.
+    </div>
 
-    @if(failures.failures.isEmpty) {
-        <div class="alert alert-info">
-            No recorded indexer failures.
-        </div>
-    } else {
-        <table class="sources table table-striped table-hover table-condensed">
-            <thead>
-                <tr>
-                    <th>Timestamp</th>
-                    <th>Index</th>
-                    <th>Error message</th>
-                </tr>
-            </thead>
-            <tbody>
-            @for(failure <- failures.failures) {
-                <tr>
-                    <td>
-                        <span title="@failure.timestamp">
-                            @lib.DateTools.inUserTimeZone(DateTime.parse(failure.timestamp))
-                        </span>
-                    </td>
-                    <td>@failure.index</td>
-                    <td>@failure.message</td>
-                </tr>
-            }
-            </tbody>
-        </table>
-    }
+    <table class="indexer-failures table table-striped table-hover table-condensed">
+        <thead>
+            <tr>
+                <th style="width: 200px;">Timestamp</th>
+                <th>Index</th>
+                <th>Error message</th>
+            </tr>
+        </thead>
+        <tbody>
+            <!-- filled by dynatable -->
+        </tbody>
+    </table>
 
 }

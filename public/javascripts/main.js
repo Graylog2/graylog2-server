@@ -557,6 +557,7 @@ $(document).ready(function() {
         loc.setQuery("range", $(this).val());
         window.location.href = loc.href();
     });
+
     $(".sources").dynatable({
         inputs: {
             perPageText: "Per page: "
@@ -564,6 +565,21 @@ $(document).ready(function() {
         dataset: {
             perPageDefault: 50
         }
+    });
+
+    $('table.indexer-failures').dynatable({
+        dataset: {
+            ajax: true,
+            ajaxUrl: '/a/system/indices/failures/dynatable',
+            ajaxOnLoad: true,
+            records: [],
+            perPageDefault: 50,
+        },
+        features: {
+            sort: false,
+            pushState: true,
+            search: false
+        },
     });
 
     // Show sort order icons on message table hover.

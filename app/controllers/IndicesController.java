@@ -82,7 +82,7 @@ public class IndicesController extends AuthenticatedController {
             return ok(views.html.system.indices.failures.render(
                     currentUser(),
                     bc,
-                    clusterService.getIndexerFailures(page-1),
+                    clusterService.getIndexerFailures(0,0).total,
                     page
             ));
         } catch (APIException e) {

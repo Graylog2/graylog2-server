@@ -96,10 +96,11 @@ public class ClusterService {
         return r.count;
     }
 
-    public IndexerFailuresResponse getIndexerFailures(int page) throws APIException, IOException {
+    public IndexerFailuresResponse getIndexerFailures(int limit, int offset) throws APIException, IOException {
         return api.get(IndexerFailuresResponse.class)
                 .path("/system/indexer/failures")
-                .queryParam("page", page)
+                .queryParam("limit", limit)
+                .queryParam("offset", offset)
                 .execute();
     }
 
