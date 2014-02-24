@@ -115,10 +115,13 @@
       <scope>test</scope>
       <exclusions>
         <exclusion>
+<<<<<<< HEAD
           <artifactId>junit</artifactId>
           <groupId>junit</groupId>
         </exclusion>
         <exclusion>
+=======
+>>>>>>> 0.20
           <artifactId>bsh</artifactId>
           <groupId>org.beanshell</groupId>
         </exclusion>

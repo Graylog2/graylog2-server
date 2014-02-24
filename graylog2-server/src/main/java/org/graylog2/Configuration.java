@@ -185,6 +185,15 @@ public class Configuration extends BaseConfiguration {
     @Parameter(value = "elasticsearch_discovery_initial_state_timeout", required = false)
     private String esInitialStateTimeout = "3s";
 
+    @Parameter(value = "elasticsearch_network_host", required = false)
+    private String esNetworkHost;
+
+    @Parameter(value = "elasticsearch_network_bind_host", required = false)
+    private String esNetworkBindHost;
+
+    @Parameter(value = "elasticsearch_network_publish_host", required = false)
+    private String esNetworkPublishHost;
+
     @Parameter(value = "versionchecks", required = false)
     private boolean versionchecks = true;
 
@@ -426,6 +435,18 @@ public class Configuration extends BaseConfiguration {
 
     public String getEsInitialStateTimeout() {
         return esInitialStateTimeout;
+    }
+
+    public String getEsNetworkHost() {
+        return esNetworkHost;
+    }
+
+    public String getEsNetworkBindHost() {
+        return esNetworkBindHost;
+    }
+
+    public String getEsNetworkPublishHost() {
+        return esNetworkPublishHost;
     }
 
     public String getRetentionStrategy() {

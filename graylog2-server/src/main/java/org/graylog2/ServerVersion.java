@@ -41,6 +41,8 @@ public class ServerVersion {
     public static final Version v0_20_0_RC_2 = new Version(0, 20, 0, "rc.2");
     public static final Version v0_20_0_RC_3 = new Version(0, 20, 0, "rc.3");
 
+    public static final Version v0_20_0 = new Version(0, 20, 0);
+
     public static final Version v0_20_1_SNAPSHOT = new Version(0, 20, 1, "SNAPSHOT");
 
     public static final Version VERSION = v0_20_1_SNAPSHOT;

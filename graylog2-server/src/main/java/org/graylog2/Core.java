@@ -26,6 +26,8 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import com.google.inject.Inject;
+import com.mongodb.BasicDBObjectBuilder;
+import com.mongodb.DBObject;
 import org.apache.shiro.mgt.DefaultSecurityManager;
 import org.cliffc.high_scale_lib.Counter;
 import org.glassfish.hk2.utilities.binding.AbstractBinder;
@@ -41,6 +43,7 @@ import org.graylog2.database.HostCounterCacheImpl;
 import org.graylog2.database.MongoBridge;
 import org.graylog2.database.MongoConnection;
 import org.graylog2.indexer.Deflector;
+import org.graylog2.indexer.IndexFailure;
 import org.graylog2.indexer.Indexer;
 import org.graylog2.initializers.Initializers;
 import org.graylog2.inputs.BasicCache;
@@ -131,7 +134,7 @@ public class Core implements GraylogServer, InputHost, ProcessingHost {
     private ScheduledExecutorService scheduler;
 
     public static final Version GRAYLOG2_VERSION = ServerVersion.VERSION;
-    public static final String GRAYLOG2_CODENAME = "Amigo Humanos (Flipper)";
+    public static final String GRAYLOG2_CODENAME = "Moose";
 
     private Indexer indexer;
 
@@ -246,6 +249,16 @@ public class Core implements GraylogServer, InputHost, ProcessingHost {
         outputBuffer.initialize();
 
         gelfChunkManager = new GELFChunkManager(this);
+
+        // Make sure that the index failures collection is always created capped.
+        if(!mongoConnection.getDatabase().collectionExists(IndexFailure.COLLECTION)) {
+            DBObject options = BasicDBObjectBuilder.start()
+                    .add("capped", true)
+                    .add("size", 52428800) // 50MB max size.
+                    .get();
+
+            mongoConnection.getDatabase().createCollection(IndexFailure.COLLECTION, options);
+        }
 
         indexer = new Indexer(this);
         indexer.start();

@@ -85,6 +85,11 @@ public class FieldValueAlertCondition extends AlertCondition {
             String filter = "streams:"+stream.getId();
             FieldStatsResult fieldStatsResult = core.getIndexer().searches().fieldStats(field, "*", filter, new RelativeRange(time * 60));
 
+            if (fieldStatsResult.getCount() == 0) {
+                LOG.debug("Alert check <{}> did not match any messages. Returning not triggered.", type);
+                return new CheckResult(false);
+            }
+
             double result;
             switch (type) {
                 case MEAN:

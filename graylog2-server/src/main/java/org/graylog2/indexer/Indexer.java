@@ -1,6 +1,7 @@
 package org.graylog2.indexer;
 
 import com.google.common.base.Joiner;
+import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import org.apache.commons.io.FileUtils;
 import org.elasticsearch.ElasticSearchTimeoutException;
@@ -8,6 +9,7 @@ import org.elasticsearch.action.WriteConsistencyLevel;
 import org.elasticsearch.action.admin.cluster.health.ClusterHealthRequest;
 import org.elasticsearch.action.admin.cluster.node.info.NodesInfoRequest;
 import org.elasticsearch.action.admin.cluster.node.info.NodesInfoResponse;
+import org.elasticsearch.action.bulk.BulkItemResponse;
 import org.elasticsearch.action.bulk.BulkRequestBuilder;
 import org.elasticsearch.action.bulk.BulkResponse;
 import org.elasticsearch.action.index.IndexRequest.OpType;
@@ -36,6 +38,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.LinkedBlockingQueue;
 
 import static java.util.concurrent.TimeUnit.SECONDS;
 import static org.elasticsearch.node.NodeBuilder.nodeBuilder;
@@ -54,7 +57,9 @@ public class Indexer {
     private Messages messages;
     private Cluster cluster;
     private Indices indices;
-	
+
+    private LinkedBlockingQueue<List<DeadLetter>> deadLetterQueue;
+
     private Core server;
 
     public static enum DateHistogramInterval {
@@ -79,6 +84,8 @@ public class Indexer {
 
     public Indexer(Core graylogServer) {
         this.server = graylogServer;
+
+        this.deadLetterQueue = new LinkedBlockingQueue<List<DeadLetter>>(1000);
     }
 
     public void start() {
@@ -129,6 +136,16 @@ public class Indexer {
 
         if (conf.getEsUnicastHosts() != null) {
             settings.put("discovery.zen.ping.unicast.hosts", Joiner.on(",").join(conf.getEsUnicastHosts()));
+        }
+
+        if (conf.getEsNetworkHost() != null) {
+            settings.put("network.host", conf.getEsNetworkHost());
+        }
+        if (conf.getEsNetworkBindHost() != null) {
+            settings.put("network.bind_host", conf.getEsNetworkBindHost());
+        }
+        if (conf.getEsNetworkPublishHost() != null) {
+            settings.put("network.publish_host", conf.getEsNetworkPublishHost());
         }
 
         // Overwrite from a custom ElasticSearch config file.
@@ -214,9 +231,31 @@ public class Indexer {
         LOG.debug("Deflector index: Bulk indexed {} messages, took {} ms, failures: {}",
                 new Object[] { response.getItems().length, response.getTookInMillis(), response.hasFailures() });
 
+        if (response.hasFailures()) {
+            propagateFailure(response.getItems(), messages);
+        }
+
         return !response.hasFailures();
     }
-    
+
+    private void propagateFailure(BulkItemResponse[] items, List<Message> messages) {
+        LOG.error("Failed to index [{}] messages. Please check the index error log in your web interface for the reason.", items.length);
+
+        // Get all failed messages.
+        List<DeadLetter> deadLetters = Lists.newArrayList();
+        for (BulkItemResponse item : items) {
+            if (item.isFailed()) {
+                deadLetters.add(new DeadLetter(item, messages.get(item.getItemId())));
+            }
+        }
+
+        boolean r = this.deadLetterQueue.offer(deadLetters);
+
+        if(!r) {
+            LOG.debug("Could not propagate failure to failure queue. Queue is full.");
+        }
+    }
+
     public Searches searches() {
     	return searches;
     }
@@ -236,14 +275,14 @@ public class Indexer {
     public Indices indices() {
         return indices;
     }
-    
+
+    public LinkedBlockingQueue<List<DeadLetter>> getDeadLetterQueue() {
+        return deadLetterQueue;
+    }
+
     private IndexRequestBuilder buildIndexRequest(String index, Map<String, Object> source, String id) {
         final IndexRequestBuilder b = new IndexRequestBuilder(client);
-        
-        /*
-         * ID is set manually to allow inserting message into recent and total index
-         * with same ID. (Required for linking in frontend)
-         */
+
         b.setId(id);
         b.setSource(source);
         b.setIndex(index);

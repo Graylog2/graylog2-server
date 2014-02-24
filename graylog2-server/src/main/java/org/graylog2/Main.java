@@ -249,6 +249,7 @@ public final class Main extends NodeRunner {
         server.initializers().register(new ClusterHealthCheckInitializer());
         server.initializers().register(new StreamThroughputCounterInitializer());
         server.initializers().register(new VersionCheckInitializer());
+        server.initializers().register(new DeadLetterInitializer());
 
         // Register message filters. (Order is important here)
         final FilterRegistry filterRegistry = injector.getInstance(FilterRegistry.class);
