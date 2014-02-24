@@ -167,6 +167,8 @@ public class FieldValueAlertConditionTest extends AlertConditionTest {
         final Double value = (Double)retValue;
         final FieldStatsResult fieldStatsResult = mock(FieldStatsResult.class);
 
+        when(fieldStatsResult.getCount()).thenReturn(1L);
+
         switch (type) {
             case MIN:
                 when(fieldStatsResult.getMin()).thenReturn(value);
