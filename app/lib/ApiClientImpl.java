@@ -46,6 +46,8 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
+import static lib.Tools.rootCause;
+
 @Singleton
 class ApiClientImpl implements ApiClient {
     private static final Logger log = LoggerFactory.getLogger(ApiClient.class);
@@ -428,11 +430,11 @@ class ApiClientImpl implements ApiClient {
                     target.markFailure();
                     throw new Graylog2ServerUnavailableException(e);
                 }
-                log.error("REST call failed", e.getCause());
+                log.error("REST call failed", rootCause(e));
                 throw new APIException(request, e);
             } catch (IOException e) {
                 // TODO
-                log.error("unhandled IOException", e);
+                log.error("unhandled IOException", rootCause(e));
                 target.markFailure();
                 throw e;
             } catch (TimeoutException e) {
