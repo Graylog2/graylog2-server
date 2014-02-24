@@ -102,6 +102,9 @@ public class Configuration {
     @Parameter(value = "ring_size", required = true, validator = PositiveIntegerValidator.class)
     private int ringSize = 1024;
 
+    @Parameter(value = "dead_letters_enabled")
+    private boolean deadLettersEnabled = false;
+
     @Parameter(value = "elasticsearch_config_file", required = false, validator = FileReadableValidator.class)
     private String elasticSearchConfigFile; // = "/etc/graylog2-elasticsearch.yml";
 
@@ -566,5 +569,10 @@ public class Configuration {
     public String getHttpProxyUri() {
         return httpProxyUri;
     }
+
+    public boolean isDeadLettersEnabled() {
+        return deadLettersEnabled;
+    }
+
 }
 
