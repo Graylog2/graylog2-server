@@ -19,6 +19,8 @@
  */
 package org.graylog2.periodical;
 
+import com.codahale.metrics.Gauge;
+import com.codahale.metrics.MetricRegistry;
 import com.google.common.collect.Maps;
 import org.elasticsearch.action.bulk.BulkItemResponse;
 import org.graylog2.Core;
@@ -42,8 +44,15 @@ public class DeadLetterThread implements Runnable {
 
     private final Core core;
 
-    public DeadLetterThread(Core core) {
+    public DeadLetterThread(final Core core) {
         this.core = core;
+
+        core.metrics().register(MetricRegistry.name(DeadLetterThread.class, "queueSize"), new Gauge<Integer>() {
+            @Override
+            public Integer getValue() {
+                return core.getIndexer().getDeadLetterQueue().size();
+            }
+        });
     }
 
     @Override
