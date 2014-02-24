@@ -1,5 +1,5 @@
-/*
- * Copyright 2013, 2014 TORCH GmbH
+/**
+ * Copyright 2014 Lennart Koopmann <lennart@torch.sh>
  *
  * This file is part of Graylog2.
  *
@@ -15,11 +15,18 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with Graylog2.  If not, see <http://www.gnu.org/licenses/>.
+ *
  */
-package models.api.responses;
+package models.api.responses.system.indices;
 
-public class MessageCountResponse {
+import java.util.List;
 
-    public long events;
+/**
+ * @author Lennart Koopmann <lennart@torch.sh>
+ */
+public class IndexerFailuresResponse {
+
+    public long total;
+    public List<IndexerFailureSummary> failures;
 
 }

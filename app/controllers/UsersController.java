@@ -308,15 +308,15 @@ public class UsersController extends AuthenticatedController {
         final DynamicForm requestForm = Form.form().bindFromRequest();
 
         boolean isAdmin = false;
-        final String field = requestForm.get("admin");
-        if (field != null && field.equalsIgnoreCase("on")) {
+        final String field = requestForm.get("permissiontype");
+        if (field != null && field.equalsIgnoreCase("admin")) {
             isAdmin = true;
         }
         final User user = userService.load(username);
 
         if (!Permissions.isPermitted(USERS_PERMISSIONSEDIT) || user.isReadonly()) {
             flash("error", "Unable to reset permissions!");
-            return redirect(routes.UsersController.index());
+            return redirect(routes.UsersController.editUserForm(username));
         }
 
         final ChangeUserRequest changeRequest = new ChangeUserRequest(user);
@@ -331,7 +331,7 @@ public class UsersController extends AuthenticatedController {
         } else {
             flash("error", "Unable to reset permissions for user " + user.getFullName());
         }
-        return redirect(routes.UsersController.index());
+        return redirect(routes.UsersController.editUserForm(username));
     }
 
     private static BreadcrumbList breadcrumbs() {

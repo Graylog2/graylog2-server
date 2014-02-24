@@ -77,7 +77,8 @@ function updateWidget_field_chart(widget, data) {
 
     new Rickshaw.Graph.Axis.Y( {
         graph: graph,
-        tickFormat: Rickshaw.Fixtures.Number.formatKMBT
+        tickFormat: Rickshaw.Fixtures.Number.formatKMBT,
+        pixelsPerTick: 17
     });
 
     new Rickshaw.Graph.Axis.Time({

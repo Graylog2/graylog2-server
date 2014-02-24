@@ -80,7 +80,7 @@ public class MessagesController extends AuthenticatedController {
 
 	public Result partial(String index, String id) {
 		try {
-            MessageResult message = FieldMapper.run(messagesService.getMessage(index, id));
+            MessageResult message = messagesService.getMessage(index, id);
             Node sourceNode = getSourceNode(message);
             Radio sourceRadio = getSourceRadio(message);
             List<Stream> messageInStreams = Lists.newArrayList();
@@ -127,7 +127,7 @@ public class MessagesController extends AuthenticatedController {
             Map<String, Object> result = Maps.newHashMap();
             result.put("id", message.getId());
             if (filtered)
-                result.put("fields", message.getFilteredFields());
+                result.put("fields", message.getFormattedFields());
             else
                 result.put("fields", message.getFields());
 

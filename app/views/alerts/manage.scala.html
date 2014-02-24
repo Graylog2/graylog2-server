@@ -163,7 +163,7 @@
 
     <hr />
 
-    @if(stream.getUserAlertReceivers.size() > 0) {
+    @if(stream.getUserAlertReceivers.size() > 0 || stream.getEmailAlertReceivers.size() > 0) {
         <div class="sendDummyAlert">
             <form action="@routes.AlertsController.sendDummyAlert(stream.getId)" method="POST">
                 <button type="submit" class="btn btn-info btn-mini pull-right">Send test alert</button>

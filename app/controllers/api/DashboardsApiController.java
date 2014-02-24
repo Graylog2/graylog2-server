@@ -193,6 +193,10 @@ public class DashboardsApiController extends AuthenticatedController {
                         if (!canReadStream(streamId)) return unauthorized();
                         widget = new QuickvaluesWidget(dashboard, query, timerange, params.get("field"), description, streamId);
                         break;
+                    case SEARCH_RESULT_CHART:
+                        if (!canReadStream(streamId)) return unauthorized();
+                        widget = new SearchResultChartWidget(dashboard, query, timerange, description, streamId, params.get("interval"));
+                        break;
                     default:
                         throw new IllegalArgumentException();
                 }

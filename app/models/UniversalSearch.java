@@ -50,38 +50,40 @@ public class UniversalSearch {
 
     private final ApiClient api;
     private final String query;
+    private final FieldMapper fieldMapper;
     private final String filter;
     private final TimeRange timeRange;
     private final Integer page;
     private final SearchSort order;
 
     @AssistedInject
-    private UniversalSearch(ApiClient api, @Assisted TimeRange timeRange, @Assisted String query) {
-        this(api, timeRange, query, 0);
+    private UniversalSearch(ApiClient api, FieldMapper fieldMapper, @Assisted TimeRange timeRange, @Assisted String query) {
+        this(api, fieldMapper, timeRange, query, 0);
     }
 
     @AssistedInject
-    private UniversalSearch(ApiClient api, @Assisted TimeRange timeRange, @Assisted String query, @Assisted Integer page) {
-        this(api, timeRange, query, page, null, null);
+    private UniversalSearch(ApiClient api, FieldMapper fieldMapper, @Assisted TimeRange timeRange, @Assisted String query, @Assisted Integer page) {
+        this(api, fieldMapper, timeRange, query, page, null, null);
     }
 
     @AssistedInject
-    private UniversalSearch(ApiClient api, @Assisted String query, @Assisted TimeRange timeRange, @Nullable @Assisted("filter") String filter) {
-        this(api, timeRange, query, 0, filter, null);
+    private UniversalSearch(ApiClient api, FieldMapper fieldMapper, @Assisted String query, @Assisted TimeRange timeRange, @Nullable @Assisted("filter") String filter) {
+        this(api, fieldMapper, timeRange, query, 0, filter, null);
     }
 
     @AssistedInject
-    public UniversalSearch(ApiClient api, @Assisted TimeRange timeRange, @Assisted("query") String query, @Assisted Integer page, @Assisted("filter") String filter) {
-        this(api, timeRange, query, page, filter, null);
+    public UniversalSearch(ApiClient api, FieldMapper fieldMapper, @Assisted TimeRange timeRange, @Assisted("query") String query, @Assisted Integer page, @Assisted("filter") String filter) {
+        this(api, fieldMapper,timeRange, query, page, filter, null);
     }
 
     @AssistedInject
-    public UniversalSearch(ApiClient api, @Assisted TimeRange timeRange, @Assisted String query, @Assisted Integer page, @Assisted SearchSort order) {
-        this(api, timeRange, query, page, null, order);
+    public UniversalSearch(ApiClient api, FieldMapper fieldMapper, @Assisted TimeRange timeRange, @Assisted String query, @Assisted Integer page, @Assisted SearchSort order) {
+        this(api, fieldMapper, timeRange, query, page, null, order);
     }
 
     @AssistedInject
-    private UniversalSearch(ApiClient api, @Assisted TimeRange timeRange, @Assisted("query") String query, @Assisted Integer page, @Assisted("filter") String filter, @Assisted SearchSort order) {
+    private UniversalSearch(ApiClient api, FieldMapper fieldMapper, @Assisted TimeRange timeRange, @Assisted("query") String query, @Assisted Integer page, @Assisted("filter") String filter, @Assisted SearchSort order) {
+        this.fieldMapper = fieldMapper;
         this.filter = filter;
         this.api = api;
         this.query = query;
@@ -131,7 +133,8 @@ public class UniversalSearch {
                 response.messages,
                 response.fields,
                 response.usedIndices,
-                response.error != null ? response.error : response.genericError
+                response.error != null ? response.error : response.genericError,
+                fieldMapper
         );
 
         return result;

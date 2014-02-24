@@ -20,14 +20,10 @@ package models;
 
 import com.google.common.collect.Lists;
 import lib.Tools;
-import models.api.responses.MessageSummaryResponse;
-import models.api.results.MessageResult;
-import models.api.results.SearchResult;
 import org.apache.commons.lang3.StringEscapeUtils;
 import play.api.templates.Html;
 
 import java.util.List;
-import java.util.Map;
 
 /**
  * @author Lennart Koopmann <lennart@torch.sh>
@@ -35,74 +31,36 @@ import java.util.Map;
 public class FieldMapper {
 
     public enum Type {
-        SYSLOG_LEVEL,
-        NEWLINE_CONVERTER
+        SYSLOG_LEVEL("level"),
+        NEWLINE_CONVERTER("full_message");
+
+        public final String field;
+
+        Type(String field) {
+            this.field = field;
+        }
     }
 
-    private final String field;
-    private final Type type;
-
-    public FieldMapper(String field, Type type) {
-        this.field = field;
-        this.type = type;
-    }
+    public FieldMapper() {}
 
     // For now only the standard set.
-    public static List<FieldMapper> getAll() {
-        List<FieldMapper> mappers = Lists.newArrayList();
+    public static List<Type> getAll() {
+        List<Type> mappers = Lists.newArrayList();
 
-        mappers.add(new FieldMapper("level", Type.SYSLOG_LEVEL));
-        mappers.add(new FieldMapper("full_message", Type.NEWLINE_CONVERTER));
+        mappers.add(Type.SYSLOG_LEVEL);
+        mappers.add(Type.NEWLINE_CONVERTER);
         return mappers;
     }
 
-    public static MessageResult run(MessageResult msg) {
-        List<FieldMapper> mappers = getAll();
-
-        for (FieldMapper mapper : mappers) {
-            String field = mapper.getField();
-
-            if (msg.getFilteredFields().containsKey(field)) {
-                Object newVal = map(field, mapper.getType(), msg.getFilteredFields());
-
-                msg.getFilteredFields().remove(field);
-                msg.getFilteredFields().put(field, newVal);
-            }
+    // TODO this is temporary and needs to be cleaned up significantly in 0.20.1!
+    public Object map(String key, Object value) {
+        if (key.equals("level")) {
+            return mapSyslogLevel(value);
         }
-
-        return msg;
-    }
-
-    public static SearchResult run(SearchResult sr) {
-        List<FieldMapper> mappers = getAll();
-
-        if (sr != null) {
-            for(MessageSummaryResponse r : sr.getMessages()) {
-                for (FieldMapper mapper : mappers) {
-                    String field = mapper.getField();
-
-                    if (r.message.containsKey(field)) {
-                        Object newVal = map(field, mapper.getType(), r.message);
-
-                        r.message.remove(field);
-                        r.message.put(field, newVal);
-                    }
-                }
-            }
+        if (key.equals("full_message")) {
+            return convertNewlinesToBr(value);
         }
-
-        return sr;
-    }
-
-    private static Object map(String field, Type type, Map<String, Object> fields) {
-        switch (type) {
-            case SYSLOG_LEVEL:
-                return mapSyslogLevel(fields.get(field));
-            case NEWLINE_CONVERTER:
-                return convertNewlinesToBr(fields.get(field));
-            default:
-                throw new RuntimeException("Don't know how to map type: [" + type + "]");
-        }
+        return value;
     }
 
     private static Html convertNewlinesToBr(Object fullMessage) {
@@ -120,23 +78,13 @@ public class FieldMapper {
             return null;
         }
 
-        String human = "";
-        if (level instanceof Integer) {
-            human = Tools.syslogLevelToHuman((int) level);
-        } else if (level instanceof Double) {
-            human = Tools.syslogLevelToHuman((int) Math.round((double) level));
+        String human;
+        if (level instanceof Number) {
+            human = Tools.syslogLevelToHuman(((Number)level).intValue()); // casteria
         } else {
             return level.toString() + " [failed to map syslog level]";
         }
 
         return human + " [" + level.toString() + "]";
-    }
-
-    public String getField() {
-        return field;
-    }
-
-    public Type getType() {
-        return type;
     }
 }

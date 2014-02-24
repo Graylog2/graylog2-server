@@ -1,0 +1,13 @@
+@(indexFailureCount: Long)
+
+@if(indexFailureCount > 0) {
+    <div class="alert alert-error">
+        <i class="icon icon-ambulance"></i> &nbsp;<strong>There were <span class="number-format" data-format="0,0">@indexFailureCount</span> failed indexing attempts in the last 24 hours.</strong>
+        &nbsp; <a href="@routes.IndicesController.failures()"><i class="icon icon-caret-right"></i> Show errors</a>
+    </div>
+} else {
+    <div class="alert alert-success">
+        <i class="icon icon-ok-sign"></i> &nbsp;No failed indexing attempts in the last 24 hours.
+        &nbsp; <a href="@routes.IndicesController.failures()"><i class="icon icon-caret-right"></i> Show all errors</a>
+    </div>
+}

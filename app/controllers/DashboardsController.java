@@ -23,12 +23,15 @@ import com.google.inject.Inject;
 import lib.APIException;
 import lib.ApiClient;
 import lib.BreadcrumbList;
+import models.NodeService;
+import models.Startpage;
+import models.User;
+import models.api.requests.dashboards.CreateDashboardRequest;
 import models.api.requests.dashboards.UpdateDashboardRequest;
 import models.dashboards.Dashboard;
 import models.dashboards.DashboardService;
-import models.NodeService;
-import models.api.requests.dashboards.CreateDashboardRequest;
-import play.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import play.data.Form;
 import play.mvc.Result;
 
@@ -40,6 +43,7 @@ import java.util.Map;
  * @author Lennart Koopmann <lennart@torch.sh>
  */
 public class DashboardsController extends AuthenticatedController {
+    private static final Logger log = LoggerFactory.getLogger(DashboardsController.class);
 
     private static final Form<CreateDashboardRequest> createDashboardForm = Form.form(CreateDashboardRequest.class);
 
@@ -63,6 +67,7 @@ public class DashboardsController extends AuthenticatedController {
     }
 
     public Result show(String id) {
+        final User currentUser = currentUser();
         try {
             Dashboard dashboard = dashboardService.get(id);
 
@@ -70,8 +75,19 @@ public class DashboardsController extends AuthenticatedController {
             bc.addCrumb("Dashboards", routes.DashboardsController.index());
             bc.addCrumb(dashboard.getTitle(), routes.DashboardsController.show(dashboard.getId()));
 
-            return ok(views.html.dashboards.show.render(currentUser(), bc, dashboard));
+            return ok(views.html.dashboards.show.render(currentUser, bc, dashboard));
         } catch (APIException e) {
+            if (e.getHttpCode() == NOT_FOUND || e.getHttpCode() == FORBIDDEN) {
+                String msg = "The requested dashboard was deleted and no longer exists.";
+                final Startpage startpage = currentUser.getStartpage();
+                if (startpage != null) {
+                    if (new Startpage(Startpage.Type.DASHBOARD, id).equals(startpage)) {
+                        msg += " Please reset your startpage.";
+                    }
+                }
+                flash("error", msg);
+                return redirect(routes.DashboardsController.index());
+            }
             String message = "Could not get dashboard. We expected HTTP 200, but got a HTTP " + e.getHttpCode() + ".";
             return status(504, views.html.errors.error.render(message, e, request()));
         } catch (IOException e) {

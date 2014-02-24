@@ -557,6 +557,7 @@ $(document).ready(function() {
         loc.setQuery("range", $(this).val());
         window.location.href = loc.href();
     });
+
     $(".sources").dynatable({
         inputs: {
             perPageText: "Per page: "
@@ -564,6 +565,21 @@ $(document).ready(function() {
         dataset: {
             perPageDefault: 50
         }
+    });
+
+    $('table.indexer-failures').dynatable({
+        dataset: {
+            ajax: true,
+            ajaxUrl: '/a/system/indices/failures/dynatable',
+            ajaxOnLoad: true,
+            records: [],
+            perPageDefault: 50,
+        },
+        features: {
+            sort: false,
+            pushState: true,
+            search: false
+        },
     });
 
     // Show sort order icons on message table hover.
@@ -894,6 +910,19 @@ function generateId() {
         });
     };
 })(jQuery);
+
+// Browsers fail with all kinds of date formats. Passing every part of the date as a constructor parameter seems to be the safest way to go.
+function parseDateFromString(src) {
+    var parts = /(\d+)-(\d+)-(\d+) (\d+):(\d+):(\d+)/.exec(src);
+
+    var millis = 0;
+    if (parts[7] != "" && parts[7] != undefined) {
+        millis = parts[7];
+    }
+
+    // LOL SRSLY WTF JAVASCRIPT: -1
+    return new Date(parts[1], parts[2]-1, parts[3], parts[4], parts[5], parts[6], millis);
+}
 
 // This is holding all field graphs.
 fieldGraphs = {};

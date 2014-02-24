@@ -26,7 +26,7 @@ public class SearchResultResponse {
 	
 	public int time;
 	public String query;
-	public int total_results;
+	public long total_results;
 	public List<MessageSummaryResponse> messages;
 	public List<String> fields;
 

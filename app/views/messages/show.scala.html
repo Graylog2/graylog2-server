@@ -67,7 +67,7 @@
                     </ul>
                 </div>
             </dt>
-            <dd style="word-wrap: break-word;"><a href="#" data-field="@key" data-value="@lib.Tools.removeTrailingNewline(value)" class="search-link nolink">@lib.Tools.orNbsp(lib.Tools.removeTrailingNewline(value))</a></dd>
+            <dd style="word-wrap: break-word;"><a href="#" data-field="@key" data-value="@lib.Tools.optionalLongValue(lib.Tools.removeTrailingNewline(message.getFields.get(key)))" class="search-link nolink">@lib.Tools.orNbsp(lib.Tools.removeTrailingNewline(value))</a></dd>
         }
         </dl>
 

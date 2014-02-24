@@ -44,7 +44,7 @@ public class ServerNodes {
             configuredNodes.put(configuredNode, configuredNode);
         }
 
-        log.info("Creating ServerNodes with initial nodes {}", configuredNodes.keySet());
+        log.debug("Creating ServerNodes with initial nodes {}", configuredNodes.keySet());
         // resolve the configured nodes:
         // we only know a transport address where we can reach them, but we don't know any node ids yet.
         // thus we do not know anything about them, and cannot even match them to node information coming

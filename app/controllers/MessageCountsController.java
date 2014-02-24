@@ -37,9 +37,9 @@ public class MessageCountsController extends AuthenticatedController {
     private MessagesService messagesService;
 
     public Result total() {
-        int countResult = messagesService.total();
+        long countResult = messagesService.total();
 
-        Map<String, Integer> result = Maps.newHashMap();
+        Map<String, Long> result = Maps.newHashMap();
         result.put("events", countResult);
 
         return ok(new Gson().toJson(result)).as("application/json");

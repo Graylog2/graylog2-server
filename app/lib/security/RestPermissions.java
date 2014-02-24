@@ -54,6 +54,7 @@ public class RestPermissions {
     public static final String INDICES_READ = "indices:read";
     public static final String INDICES_CHANGESTATE = "indices:changestate";
     public static final String INDICES_DELETE = "indices:delete";
+    public static final String INDICES_FAILURES = "indices:failures";
     public static final String INPUTS_READ = "inputs:read";
     public static final String INPUTS_CREATE = "inputs:create";
     public static final String INPUTS_TERMINATE = "inputs:terminate";

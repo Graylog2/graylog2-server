@@ -2,7 +2,6 @@
 @(currentUser: User, search: UniversalSearch, searchResult: models.api.results.SearchResult, histogram: models.api.results.DateHistogramResult, query: String, page: Integer, savedSearch: SavedSearch)(implicit stream: Stream)
 @import lib.security.RestPermissions
 @import views.helpers.DateHistogramResolutionSelector
-@import java.text.DecimalFormat
 @import views.helpers.Permissions
 @import lib.DateTools
 @import controllers.routes;
@@ -15,7 +14,7 @@
 
 @highestPage() = @{
     if ((lowestPage() + paginatorLength()) * UniversalSearch.PER_PAGE >= searchResult.getTotalResultCount)
-        searchResult.getTotalResultCount / UniversalSearch.PER_PAGE  + 1
+        (searchResult.getTotalResultCount / UniversalSearch.PER_PAGE + 1).toInt
     else
         lowestPage() + paginatorLength()
 }
@@ -110,8 +109,24 @@
 .y_ticks { color: #000; }
 </style>
 
+<hr class="search-result-head-separator" />
+
+<div class="result-distribution">
+    <h3>
+        <i class="icon icon-ellipsis-vertical"></i>
+        Total result histogram
+    </h3>
+
+    @if(stream == null) {
+        @views.html.partials.dashboards.add_to_dashboard.render("search_result_chart", Array("data-interval='" + histogram.getInterval() + "'"))
+    } else {
+        @views.html.partials.dashboards.add_to_dashboard.render("search_result_chart", Array("data-stream-id='" + streamId + "'", "data-interval='" + histogram.getInterval() + "'"))
+    }
+</div>
+
 <div id="y_axis"></div>
 <div id="result-graph"></div>
+
 
 <script>
     drawResultGraph = function() {
@@ -139,7 +154,7 @@
             pixelsPerTick: 30
         });
 
-        // Only show a x-axis (time) when there is more than one bucked.
+        // Only show a x-axis (time) when there is more than one bucket.
         if(resultGraph.series != undefined && resultGraph.series[0] != undefined && resultGraph.series[0].data.length > 1) {
             new Rickshaw.Graph.Axis.Time({
                 graph: resultGraph,
@@ -156,9 +171,9 @@
                 var content = parseInt(y) + ' messages<br>' + date;
                 return content;
             },
-        xFormatter: function(x) {
-        return new Date(x * 1000).toDateString();
-        },
+            xFormatter: function(x) {
+                return new Date(x * 1000).toDateString();
+            }
         });
 
         new Rickshaw.Graph.Graylog2Selector( {
@@ -334,21 +349,17 @@
 	</thead>
 	<tbody>
 		@for(r <- searchResult.getMessages()) {
-		<tr data-message-id='@r.message.get("_id")' data-source-index="@r.index">
+		<tr data-message-id='@r.getFields.get("_id")' data-source-index="@r.getIndex">
 			<td>@DateTools.inUserTimeZoneShortFormat(r.getTimestamp)</td>
-			<td class="result-td-36cd38f49b9afa08222c0dc9ebfe35eb">@r.message.get("source")</td>
-			<td class="messages-message result-td-78e731027d8fd50ed642340b7c9a63b3">@r.message.get("message")</td>
+			<td class="result-td-36cd38f49b9afa08222c0dc9ebfe35eb">@r.getFields.get("source")</td>
+			<td class="messages-message result-td-78e731027d8fd50ed642340b7c9a63b3">@r.getFields.get("message")</td>
 			
 			@for(f <- searchResult.getPageFields()) {
 				@if(!f.isStandardSelected()) {
 					<td class="result-td-@f.getHash()"
                         @if(!search.getOrder.getField.equals(f.getName)) { style="display: none;" }
                     >
-                        @if(r.message.get(f.getName()).isInstanceOf[Double]) {
-                            @{new DecimalFormat("#").format(r.message.get(f.getName))}
-                        } else {
-                            @r.message.get(f.getName())
-                        }
+                    @r.getFormattedFields.get(f.getName)
                     </td>
 				}
 			}

@@ -41,6 +41,9 @@ public class Version {
     public static final Version v0_20_0_PREVIEW_8 = new Version(0, 20, 0, "preview.8");
     public static final Version v0_20_0_RC_1 = new Version(0, 20, 0, "rc.1");
     public static final Version v0_20_0_RC_1_1 = new Version(0, 20, 0, "rc.1-1");
+    public static final Version v0_20_0_RC_2 = new Version(0, 20, 0, "rc.2");
+    public static final Version v0_20_0_RC_3 = new Version(0, 20, 0, "rc.3");
+    public static final Version v0_20_0 = new Version(0, 20, 0);
 
     public static final Version v0_20_1_SNAPSHOT = new Version(0, 20, 1, "snapshot");
 
@@ -60,6 +63,11 @@ public class Version {
         this.minor = minor;
         this.patch = patch;
         this.additional = additional;
+    }
+
+
+    public String getBranchName() {
+        return major + "." + minor;
     }
 
     @Override
