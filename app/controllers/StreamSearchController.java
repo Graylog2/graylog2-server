@@ -8,7 +8,6 @@ import lib.timeranges.InvalidRangeParametersException;
 import models.*;
 import models.api.results.DateHistogramResult;
 import models.api.results.SearchResult;
-import play.mvc.Http;
 import play.mvc.Result;
 
 import java.io.IOException;
@@ -29,9 +28,15 @@ public class StreamSearchController extends SearchController {
         } catch (IOException e) {
             return status(504, views.html.errors.error.render(ApiClient.ERROR_MSG_IO, e, request()));
         } catch (APIException e) {
-            if(e.getHttpCode() == Http.Status.NOT_FOUND) {
-                // This stream does not exist.
-                flash("error", "The requested stream was deleted and no longer exist.");
+            if (e.getHttpCode() == NOT_FOUND || e.getHttpCode() == FORBIDDEN) {
+                String msg = "The requested stream was deleted and no longer exists.";
+                final Startpage startpage = currentUser().getStartpage();
+                if (startpage != null) {
+                    if (new Startpage(Startpage.Type.STREAM, streamId).equals(startpage)) {
+                        msg += " Please reset your startpage.";
+                    }
+                }
+                flash("error", msg);
                 return redirect(routes.StreamsController.index());
             }
 
