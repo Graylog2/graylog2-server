@@ -21,7 +21,7 @@ package org.graylog2.initializers;
 
 import com.google.common.collect.Maps;
 import org.graylog2.Core;
-import org.graylog2.periodical.IndexFailureWriterThread;
+import org.graylog2.periodical.DeadLetterThread;
 import org.graylog2.plugin.GraylogServer;
 import org.graylog2.plugin.initializers.Initializer;
 import org.graylog2.plugin.initializers.InitializerConfigurationException;
@@ -31,13 +31,13 @@ import java.util.Map;
 /**
  * @author Lennart Koopmann <lennart@torch.sh>
  */
-public class IndexFailureWriterInitializer implements Initializer {
+public class DeadLetterInitializer implements Initializer {
 
     private static final String NAME = "Index failure writer";
 
     @Override
     public void initialize(GraylogServer server, Map<String, String> config) throws InitializerConfigurationException {
-        Thread t = new Thread(new IndexFailureWriterThread((Core) server));
+        Thread t = new Thread(new DeadLetterThread((Core) server));
 
         t.setDaemon(true);
         t.start();

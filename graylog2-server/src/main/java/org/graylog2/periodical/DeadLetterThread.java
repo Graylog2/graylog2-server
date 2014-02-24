@@ -22,23 +22,27 @@ package org.graylog2.periodical;
 import com.google.common.collect.Maps;
 import org.elasticsearch.action.bulk.BulkItemResponse;
 import org.graylog2.Core;
+import org.graylog2.indexer.DeadLetter;
 import org.graylog2.indexer.IndexFailure;
+import org.graylog2.indexer.PersistedDeadLetter;
+import org.graylog2.plugin.Message;
 import org.graylog2.plugin.Tools;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.List;
 import java.util.Map;
 
 /**
  * @author Lennart Koopmann <lennart@torch.sh>
  */
-public class IndexFailureWriterThread implements Runnable {
+public class DeadLetterThread implements Runnable {
 
-    private static final Logger LOG = LoggerFactory.getLogger(IndexFailureWriterThread.class);
+    private static final Logger LOG = LoggerFactory.getLogger(DeadLetterThread.class);
 
     private final Core core;
 
-    public IndexFailureWriterThread(Core core) {
+    public DeadLetterThread(Core core) {
         this.core = core;
     }
 
@@ -46,32 +50,46 @@ public class IndexFailureWriterThread implements Runnable {
     public void run() {
         // Poll queue forever.
         while(true) {
-            BulkItemResponse[] items;
+            List<DeadLetter> items;
             try {
-                items = core.getIndexer().getFailureQueue().take();
+                items = core.getIndexer().getDeadLetterQueue().take();
             } catch (InterruptedException ignored) { continue; /* daemon thread */ }
 
-            for (BulkItemResponse failureResponse : items) {
+            for (DeadLetter item : items) {
+                // Try to write the failed message to MongoDB.
+                boolean written = false;
                 try {
-                    BulkItemResponse.Failure f = failureResponse.getFailure();
-
-                    if (f == null) {
-                        continue;
-                    }
+                    Message message = item.getMessage();
 
                     Map<String, Object> doc = Maps.newHashMap();
+                    doc.put("letter_id", item.getId());
+                    doc.put("timestamp", Tools.iso8601());
+                    doc.put("message", message.toElasticSearchObject());
+
+                    new PersistedDeadLetter(doc, core).saveWithoutValidation();
+                    written = true;
+                } catch(Exception e) {
+                    LOG.error("Could not write message to dead letter queue.", e);
+                }
+
+                // Write failure to index_failures.
+                try {
+                    BulkItemResponse.Failure f = item.getFailure().getFailure();
+
+                    Map<String, Object> doc = Maps.newHashMap();
+                    doc.put("letter_id", item.getId());
                     doc.put("index", f.getIndex());
                     doc.put("type", f.getType());
                     doc.put("message", f.getMessage());
-                    doc.put("timestamp", Tools.iso8601());
+                    doc.put("timestamp", item.getTimestamp());
+                    doc.put("written", written);
 
                     new IndexFailure(doc, core).saveWithoutValidation();
                 } catch(Exception e) {
-                    LOG.warn("Could not persist index failure.", e);
+                    LOG.error("Could not persist index failure.", e);
                     continue;
                 }
             }
-
         }
     }
 

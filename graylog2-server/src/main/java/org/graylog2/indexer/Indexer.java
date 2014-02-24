@@ -1,6 +1,7 @@
 package org.graylog2.indexer;
 
 import com.google.common.base.Joiner;
+import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import org.apache.commons.io.FileUtils;
 import org.elasticsearch.ElasticSearchTimeoutException;
@@ -38,7 +39,6 @@ import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.LinkedBlockingQueue;
-import java.util.concurrent.atomic.AtomicLong;
 
 import static java.util.concurrent.TimeUnit.SECONDS;
 import static org.elasticsearch.node.NodeBuilder.nodeBuilder;
@@ -58,7 +58,7 @@ public class Indexer {
     private Cluster cluster;
     private Indices indices;
 
-    private LinkedBlockingQueue<BulkItemResponse[]> failureQueue;
+    private LinkedBlockingQueue<List<DeadLetter>> deadLetterQueue;
 
     private Core server;
 
@@ -85,7 +85,7 @@ public class Indexer {
     public Indexer(Core graylogServer) {
         this.server = graylogServer;
 
-        this.failureQueue = new LinkedBlockingQueue<BulkItemResponse[]>(1000);
+        this.deadLetterQueue = new LinkedBlockingQueue<List<DeadLetter>>(1000);
     }
 
     public void start() {
@@ -222,16 +222,24 @@ public class Indexer {
                 new Object[] { response.getItems().length, response.getTookInMillis(), response.hasFailures() });
 
         if (response.hasFailures()) {
-            propagateFailure(response.getItems());
+            propagateFailure(response.getItems(), messages);
         }
 
         return !response.hasFailures();
     }
 
-    private void propagateFailure(BulkItemResponse[] items) {
+    private void propagateFailure(BulkItemResponse[] items, List<Message> messages) {
         LOG.error("Failed to index [{}] messages. Please check the index error log in your web interface for the reason.", items.length);
 
-        boolean r = this.failureQueue.offer(items);
+        // Get all failed messages.
+        List<DeadLetter> deadLetters = Lists.newArrayList();
+        for (BulkItemResponse item : items) {
+            if (item.isFailed()) {
+                deadLetters.add(new DeadLetter(item, messages.get(item.getItemId())));
+            }
+        }
+
+        boolean r = this.deadLetterQueue.offer(deadLetters);
 
         if(!r) {
             LOG.debug("Could not propagate failure to failure queue. Queue is full.");
@@ -258,8 +266,8 @@ public class Indexer {
         return indices;
     }
 
-    public LinkedBlockingQueue<BulkItemResponse[]> getFailureQueue() {
-        return failureQueue;
+    public LinkedBlockingQueue<List<DeadLetter>> getDeadLetterQueue() {
+        return deadLetterQueue;
     }
 
     private IndexRequestBuilder buildIndexRequest(String index, Map<String, Object> source, String id) {
