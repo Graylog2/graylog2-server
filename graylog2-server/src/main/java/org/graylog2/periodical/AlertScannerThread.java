@@ -19,15 +19,11 @@
  */
 package org.graylog2.periodical;
 
-import org.graylog2.ConfigurationException;
 import org.graylog2.Core;
 import org.graylog2.alerts.Alert;
 import org.graylog2.alerts.AlertCondition;
 import org.graylog2.alerts.AlertSender;
-<<<<<<< HEAD
 import org.graylog2.notifications.Notification;
-=======
->>>>>>> 0.20
 import org.graylog2.plugin.alarms.transports.TransportConfigurationException;
 import org.graylog2.plugin.streams.Stream;
 import org.graylog2.streams.StreamImpl;
