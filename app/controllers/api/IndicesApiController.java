@@ -57,6 +57,8 @@ public class IndicesApiController extends AuthenticatedController {
                 record.put("timestamp", DateTools.inUserTimeZone(DateTime.parse(failure.timestamp)).toString());
                 record.put("errorMessage", failure.message);
                 record.put("index", failure.index);
+                record.put("deadLetter", failure.written);
+                record.put("letterId", failure.letterId);
 
                 records.add(record);
             }
