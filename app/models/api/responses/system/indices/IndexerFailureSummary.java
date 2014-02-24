@@ -19,6 +19,8 @@
  */
 package models.api.responses.system.indices;
 
+import com.google.gson.annotations.SerializedName;
+
 /**
  * @author Lennart Koopmann <lennart@torch.sh>
  */
@@ -28,5 +30,9 @@ public class IndexerFailureSummary {
     public String timestamp;
     public String index;
     public String type;
+    public boolean written;
+
+    @SerializedName("letter_id")
+    public String letterId;
 
 }
