@@ -28,8 +28,18 @@ import play.mvc.Call;
 public class Startpage {
 
     public enum Type {
-        STREAM,
-        DASHBOARD
+        STREAM("Stream"),
+        DASHBOARD("Dashboard");
+
+        private final String description;
+
+        Type(String description) {
+            this.description = description;
+        }
+
+        public String getDescription() {
+            return description;
+        }
     }
 
     private final Type type;
@@ -49,6 +59,26 @@ public class Startpage {
             default:
                 return null;
         }
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        Startpage startpage = (Startpage) o;
+
+        if (id != null ? !id.equals(startpage.id) : startpage.id != null) return false;
+        if (type != startpage.type) return false;
+
+        return true;
+    }
+
+    @Override
+    public int hashCode() {
+        int result = type != null ? type.hashCode() : 0;
+        result = 31 * result + (id != null ? id.hashCode() : 0);
+        return result;
     }
 
     public Type getType() {
