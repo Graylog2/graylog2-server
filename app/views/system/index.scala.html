@@ -107,7 +107,7 @@
 
     @if(isPermitted(INDICES_FAILURES)) {
         <div class="row-fluid">
-            @partials.support.head_bubble("general/indexer-failures-explained")
+            @partials.support.head_bubble("general/indexer-failures-and-dead-letters-explained")
             <h2><i class="icon icon-truck"></i> Indexer failures</h2>
 
             @views.html.partials.indexer_failures.render(indexFailureCount)
