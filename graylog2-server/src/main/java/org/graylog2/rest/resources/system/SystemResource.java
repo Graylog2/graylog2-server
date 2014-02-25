@@ -37,6 +37,7 @@ import org.graylog2.rest.documentation.annotations.ApiParam;
 import org.graylog2.rest.resources.RestResource;
 import org.graylog2.rest.resources.system.responses.ReaderPermissionResponse;
 import org.graylog2.security.RestPermissions;
+import org.graylog2.system.shutdown.GracefulShutdown;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -49,6 +50,7 @@ import java.util.Set;
 
 import static javax.ws.rs.core.MediaType.APPLICATION_JSON;
 import static javax.ws.rs.core.MediaType.TEXT_PLAIN;
+import static javax.ws.rs.core.Response.accepted;
 import static javax.ws.rs.core.Response.ok;
 
 
@@ -219,4 +221,17 @@ public class SystemResource extends RestResource {
         response.permissions = Ordering.natural().sortedCopy(RestPermissions.readerPermissions(username));
         return response;
     }
+
+    @POST @Timed
+    @ApiOperation(value = "Shutdown this node gracefully.",
+                  notes = "Attempts to process all buffered and cached messages before exiting, " +
+                          "shuts down inputs first to make sure that no new messages are accepted.")
+    @Path("/shutdown")
+    public Response shutdown() {
+        checkPermission(RestPermissions.NODE_SHUTDOWN, core.getNodeId());
+
+        new Thread(new GracefulShutdown(core)).start();
+        return accepted().build();
+    }
+
 }
