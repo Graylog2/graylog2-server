@@ -263,6 +263,7 @@ public class Core implements GraylogServer, InputHost {
         Runtime.getRuntime().addShutdownHook(new Thread() {
             @Override
             public void run() {
+                LOG.info("Shutting down.");
                 activityWriter.write(new Activity("Shutting down.", GraylogServer.class));
                 if (Core.this.configuration.isMetricsCollectionEnabled() && metricsReporter != null) {
                     metricsReporter.stop();
