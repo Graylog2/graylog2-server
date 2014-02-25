@@ -74,6 +74,7 @@ public class SyslogTCPInput extends SyslogInputBase {
         );
 
         bootstrap.setPipelineFactory(new SyslogTCPPipelineFactory(graylogServer, configuration, this, throughputCounter, connectionCounter));
+        bootstrap.setOption("child.receiveBufferSize", getRecvBufferSize());
 
         try {
             channel = ((ServerBootstrap) bootstrap).bind(socketAddress);

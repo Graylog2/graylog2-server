@@ -50,6 +50,7 @@ import org.graylog2.notifications.Notification;
 import org.graylog2.outputs.ElasticSearchOutput;
 import org.graylog2.plugin.Tools;
 import org.graylog2.plugin.initializers.InitializerConfigurationException;
+import org.graylog2.plugin.inputs.MessageInput;
 import org.graylog2.plugins.PluginInstaller;
 import org.graylog2.system.activities.Activity;
 import org.slf4j.Logger;
@@ -220,6 +221,9 @@ public final class Main {
             LOG.info("Printing system utilization information.");
             server.setStatsMode(true);
         }
+
+        // propagate default size to input plugins
+        MessageInput.setDefaultRecvBufferSize(configuration.getUdpRecvBufferSizes());
 
         // Register standard inputs.
         server.inputs().register(SyslogUDPInput.class, SyslogUDPInput.NAME);

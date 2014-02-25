@@ -46,9 +46,7 @@ import org.slf4j.bridge.SLF4JBridgeHandler;
 
 import java.io.File;
 import java.io.FileWriter;
-import java.io.IOException;
 import java.io.Writer;
-import java.util.concurrent.ExecutionException;
 
 /**
  * @author Lennart Koopmann <lennart@torch.sh>

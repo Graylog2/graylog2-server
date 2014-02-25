@@ -90,6 +90,17 @@ public class ConfigurationRequest {
             );
         }
 
+        public static ConfigurationField recvBufferSize(String name, int size) {
+            return new NumberField(
+                    name,
+                    "Receive Buffer Size",
+                    size,
+                    "The size in bytes of the recvBufferSize for network connections to this input.",
+                    ConfigurationField.Optional.OPTIONAL,
+                    NumberField.Attribute.ONLY_POSITIVE
+            );
+        }
+
     }
 
 }

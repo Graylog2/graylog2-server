@@ -450,6 +450,10 @@ public class Configuration {
         this.restTransportUri = restTransportUri;
     }
 
+    public int getUdpRecvBufferSizes() {
+        return udpRecvBufferSizes;
+    }
+
     public String getEsClusterName() {
         return esClusterName;
     }

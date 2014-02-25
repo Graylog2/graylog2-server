@@ -38,6 +38,10 @@ import java.util.Map;
  */
 public abstract class MessageInput {
 
+    public static final String CK_RECV_BUFFER_SIZE = "recv_buffer_size";
+
+    private static long defaultRecvBufferSize = 1024 * 1024;
+
     protected String title;
     protected String creatorUserId;
     protected String persistId;
@@ -189,4 +193,14 @@ public abstract class MessageInput {
         }
     }
 
+    public static void setDefaultRecvBufferSize(long size) {
+        defaultRecvBufferSize = size;
+    }
+
+    public long getRecvBufferSize() {
+        if (configuration.intIsSet(CK_RECV_BUFFER_SIZE)) {
+            return configuration.getInt(CK_RECV_BUFFER_SIZE);
+        }
+        return defaultRecvBufferSize;
+    }
 }

@@ -69,6 +69,7 @@ public class GELFTCPInput extends GELFInputBase {
         );
 
         bootstrap.setPipelineFactory(new GELFTCPPipelineFactory(graylogServer, this, throughputCounter, connectionCounter));
+        bootstrap.setOption("child.receiveBufferSize", getRecvBufferSize());
 
         try {
             channel = ((ServerBootstrap) bootstrap).bind(socketAddress);
