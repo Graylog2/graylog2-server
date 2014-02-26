@@ -65,20 +65,23 @@ public class DeadLetterThread implements Runnable {
             } catch (InterruptedException ignored) { continue; /* daemon thread */ }
 
             for (DeadLetter item : items) {
-                // Try to write the failed message to MongoDB.
                 boolean written = false;
-                try {
-                    Message message = item.getMessage();
 
-                    Map<String, Object> doc = Maps.newHashMap();
-                    doc.put("letter_id", item.getId());
-                    doc.put("timestamp", Tools.iso8601());
-                    doc.put("message", message.toElasticSearchObject());
+                // Try to write the failed message to MongoDB if enabled.
+                if (core.getConfiguration().isDeadLettersEnabled()) {
+                    try {
+                        Message message = item.getMessage();
 
-                    new PersistedDeadLetter(doc, core).saveWithoutValidation();
-                    written = true;
-                } catch(Exception e) {
-                    LOG.error("Could not write message to dead letter queue.", e);
+                        Map<String, Object> doc = Maps.newHashMap();
+                        doc.put("letter_id", item.getId());
+                        doc.put("timestamp", Tools.iso8601());
+                        doc.put("message", message.toElasticSearchObject());
+
+                        new PersistedDeadLetter(doc, core).saveWithoutValidation();
+                        written = true;
+                    } catch(Exception e) {
+                        LOG.error("Could not write message to dead letter queue.", e);
+                    }
                 }
 
                 // Write failure to index_failures.

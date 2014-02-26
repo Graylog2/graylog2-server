@@ -24,7 +24,7 @@ import com.codahale.metrics.Gauge;
 import com.codahale.metrics.MetricRegistry;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import org.graylog2.inputs.syslog.SyslogInputBase;
-import org.graylog2.plugin.inputs.*;
+import org.graylog2.plugin.inputs.MisfireException;
 import org.jboss.netty.bootstrap.ConnectionlessBootstrap;
 import org.jboss.netty.channel.ChannelException;
 import org.jboss.netty.channel.FixedReceiveBufferSizePredictorFactory;
@@ -59,6 +59,7 @@ public class SyslogUDPInput extends SyslogInputBase {
 
         bootstrap = new ConnectionlessBootstrap(new NioDatagramChannelFactory(workerThreadPool));
         bootstrap.setOption("receiveBufferSizePredictorFactory", new FixedReceiveBufferSizePredictorFactory(8192));
+        bootstrap.setOption("receiveBufferSize", getRecvBufferSize());
         bootstrap.setPipelineFactory(new SyslogUDPPipelineFactory(graylogServer, configuration, this, throughputCounter));
 
         try {
