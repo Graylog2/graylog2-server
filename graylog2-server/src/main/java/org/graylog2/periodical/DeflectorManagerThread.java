@@ -19,7 +19,6 @@
  */
 package org.graylog2.periodical;
 
-import org.graylog2.Core;
 import org.graylog2.system.activities.Activity;
 import org.graylog2.indexer.Deflector;
 import org.graylog2.indexer.NoTargetIndexException;
@@ -30,18 +29,9 @@ import org.slf4j.LoggerFactory;
 /**
  * @author Lennart Koopmann <lennart@socketfeed.com>
  */
-public class DeflectorManagerThread implements Runnable { // public class Klimperkiste
+public class DeflectorManagerThread extends Periodical { // public class Klimperkiste
     
     private static final Logger LOG = LoggerFactory.getLogger(DeflectorManagerThread.class);
-    
-    public static final int INITIAL_DELAY = 0;
-    public static final int PERIOD = 10;
-    
-    private final Core graylogServer;
-    
-    public DeflectorManagerThread(Core graylogServer) {
-        this.graylogServer = graylogServer;
-    }
 
     @Override
     public void run() {
@@ -60,34 +50,34 @@ public class DeflectorManagerThread implements Runnable { // public class Klimpe
         long messageCountInTarget = 0;
         
         try {
-            currentTarget = this.graylogServer.getDeflector().getNewestTargetName();
-            messageCountInTarget = this.graylogServer.getIndexer().indices().numberOfMessages(currentTarget);
+            currentTarget = core.getDeflector().getNewestTargetName();
+            messageCountInTarget = core.getIndexer().indices().numberOfMessages(currentTarget);
         } catch(Exception e) {
             LOG.error("Tried to check for number of messages in current deflector target but did not find index. Aborting.", e);
             return;
         }
         
-        if (messageCountInTarget > graylogServer.getConfiguration().getElasticSearchMaxDocsPerIndex()) {
+        if (messageCountInTarget > core.getConfiguration().getElasticSearchMaxDocsPerIndex()) {
             LOG.info("Number of messages in <{}> ({}) is higher than the limit ({}). Pointing deflector to new index now!",
                     new Object[] {
                             currentTarget, messageCountInTarget,
-                            graylogServer.getConfiguration().getElasticSearchMaxDocsPerIndex()
+                            core.getConfiguration().getElasticSearchMaxDocsPerIndex()
                     });
-            graylogServer.getDeflector().cycle();
+            core.getDeflector().cycle();
         } else {
             LOG.debug("Number of messages in <{}> ({}) is lower than the limit ({}). Not doing anything.",
                     new Object[] {
                             currentTarget,messageCountInTarget,
-                            graylogServer.getConfiguration().getElasticSearchMaxDocsPerIndex()
+                            core.getConfiguration().getElasticSearchMaxDocsPerIndex()
                     });
         }
     }
 
     private void checkAndRepair() {
-        if (!graylogServer.getDeflector().isUp()) {
-            if (graylogServer.getIndexer().indices().exists(Deflector.DEFLECTOR_NAME)) {
+        if (!core.getDeflector().isUp()) {
+            if (core.getIndexer().indices().exists(Deflector.DEFLECTOR_NAME)) {
                 // Publish a notification if there is an *index* called graylog2_deflector
-                final boolean published = Notification.buildNow(graylogServer)
+                final boolean published = Notification.buildNow(core)
                         .addType(Notification.Type.DEFLECTOR_EXISTS_AS_INDEX)
                         .addSeverity(Notification.Severity.URGENT)
                         .publishIfFirst();
@@ -95,19 +85,19 @@ public class DeflectorManagerThread implements Runnable { // public class Klimpe
                     LOG.warn("There is an index called [" + Deflector.DEFLECTOR_NAME + "]. Cannot fix this automatically and published a notification.");
                 }
             } else {
-                graylogServer.getDeflector().setUp();
+                core.getDeflector().setUp();
             }
         } else {
             try {
-                String currentTarget = graylogServer.getDeflector().getCurrentActualTargetIndex();
-                String shouldBeTarget = graylogServer.getDeflector().getNewestTargetName();
+                String currentTarget = core.getDeflector().getCurrentActualTargetIndex();
+                String shouldBeTarget = core.getDeflector().getNewestTargetName();
 
                 if (!currentTarget.equals(shouldBeTarget)) {
                     String msg = "Deflector is pointing to [" + currentTarget + "], not the newest one: [" + shouldBeTarget + "]. Re-pointing.";
                     LOG.warn(msg);
-                    graylogServer.getActivityWriter().write(new Activity(msg, DeflectorManagerThread.class));
+                    core.getActivityWriter().write(new Activity(msg, DeflectorManagerThread.class));
 
-                    graylogServer.getDeflector().pointTo(shouldBeTarget, currentTarget);
+                    core.getDeflector().pointTo(shouldBeTarget, currentTarget);
                 }
             } catch (NoTargetIndexException e) {
                 LOG.warn("Deflector is not up. Not trying to point to another index.");
@@ -115,5 +105,40 @@ public class DeflectorManagerThread implements Runnable { // public class Klimpe
         }
 
     }
-    
+
+    @Override
+    public boolean runsForever() {
+        return false;
+    }
+
+    @Override
+    public boolean stopOnGracefulShutdown() {
+        return true;
+    }
+
+    @Override
+    public boolean masterOnly() {
+        return true;
+    }
+
+    @Override
+    public boolean startOnThisNode() {
+        return true;
+    }
+
+    @Override
+    public boolean isDaemon() {
+        return true;
+    }
+
+    @Override
+    public int getInitialDelaySeconds() {
+        return 0;
+    }
+
+    @Override
+    public int getPeriodSeconds() {
+        return 10;
+    }
+
 }

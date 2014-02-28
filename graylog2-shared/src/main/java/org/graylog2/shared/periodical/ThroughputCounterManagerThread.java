@@ -13,33 +13,55 @@
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
  *
- *
  * You should have received a copy of the GNU General Public License
  * along with Graylog2.  If not, see <http://www.gnu.org/licenses/>.
+ *
  */
 package org.graylog2.shared.periodical;
-
-import com.google.inject.Inject;
-import org.graylog2.shared.stats.ThroughputStats;
 
 /**
  * @author Lennart Koopmann <lennart@torch.sh>
  */
-public class ThroughputCounterManagerThread implements Runnable {
-    public interface Factory {
-        public ThroughputCounterManagerThread create();
-    }
-
-    public static final int INITIAL_DELAY = 0;
-    public static final int PERIOD = 1;
-
-    @Inject
-    private ThroughputStats throughputStats;
+public class ThroughputCounterManagerThread extends Periodical {
 
     @Override
     public void run() {
-        throughputStats.setCurrentThroughput(throughputStats.getThroughputCounter().get());
-        throughputStats.getThroughputCounter().set(0);
+        core.setCurrentThroughput(core.getThroughputCounter().get());
+        core.getThroughputCounter().set(0);
     }
 
+    @Override
+    public boolean runsForever() {
+        return false;
+    }
+
+    @Override
+    public boolean stopOnGracefulShutdown() {
+        return false;
+    }
+
+    @Override
+    public boolean masterOnly() {
+        return false;
+    }
+
+    @Override
+    public boolean startOnThisNode() {
+        return true;
+    }
+
+    @Override
+    public boolean isDaemon() {
+        return true;
+    }
+
+    @Override
+    public int getInitialDelaySeconds() {
+        return 0;
+    }
+
+    @Override
+    public int getPeriodSeconds() {
+        return 1;
+    }
 }

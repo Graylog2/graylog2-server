@@ -258,6 +258,10 @@ public class Configuration extends BaseConfiguration {
     public boolean performRetention() {
         return !noRetention;
     }
+
+    public void setPerformRetention(boolean retention) {
+        noRetention = !retention;
+    }
     
     public int getMaxNumberOfIndices() {
         return maxNumberOfIndices;

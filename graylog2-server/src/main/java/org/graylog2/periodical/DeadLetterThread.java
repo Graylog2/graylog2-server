@@ -38,22 +38,9 @@ import java.util.Map;
 /**
  * @author Lennart Koopmann <lennart@torch.sh>
  */
-public class DeadLetterThread implements Runnable {
+public class DeadLetterThread extends Periodical {
 
     private static final Logger LOG = LoggerFactory.getLogger(DeadLetterThread.class);
-
-    private final Core core;
-
-    public DeadLetterThread(final Core core) {
-        this.core = core;
-
-        core.metrics().register(MetricRegistry.name(DeadLetterThread.class, "queueSize"), new Gauge<Integer>() {
-            @Override
-            public Integer getValue() {
-                return core.getIndexer().getDeadLetterQueue().size();
-            }
-        });
-    }
 
     @Override
     public void run() {
@@ -103,6 +90,53 @@ public class DeadLetterThread implements Runnable {
                 }
             }
         }
+    }
+
+    @Override
+    public boolean runsForever() {
+        return true;
+    }
+
+    @Override
+    public boolean stopOnGracefulShutdown() {
+        return false;
+    }
+
+    @Override
+    public boolean masterOnly() {
+        return false;
+    }
+
+    @Override
+    public boolean startOnThisNode() {
+        return true;
+    }
+
+    @Override
+    public boolean isDaemon() {
+        return true;
+    }
+
+    @Override
+    public int getInitialDelaySeconds() {
+        return 0;
+    }
+
+    @Override
+    public int getPeriodSeconds() {
+        return 0;
+    }
+
+    @Override
+    public void initialize(final Core core) {
+        this.core = core;
+
+        core.metrics().register(MetricRegistry.name(DeadLetterThread.class, "queueSize"), new Gauge<Integer>() {
+            @Override
+            public Integer getValue() {
+                return core.getIndexer().getDeadLetterQueue().size();
+            }
+        });
     }
 
 }

@@ -21,10 +21,11 @@ package org.graylog2.initializers;
 
 import com.google.common.collect.Maps;
 import org.graylog2.Core;
-import org.graylog2.periodical.VersionCheckThread;
+import org.graylog2.periodical.Periodical;
 import org.graylog2.plugin.GraylogServer;
 import org.graylog2.plugin.initializers.Initializer;
 import org.graylog2.plugin.initializers.InitializerConfigurationException;
+import org.reflections.Reflections;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -33,37 +34,44 @@ import java.util.Map;
 /**
  * @author Lennart Koopmann <lennart@torch.sh>
  */
-public class VersionCheckInitializer extends SimpleFixedRateScheduleInitializer implements Initializer {
+public class PeriodicalsInitializer implements Initializer {
 
-    private static final Logger LOG = LoggerFactory.getLogger(VersionCheckInitializer.class);
+    private static final Logger LOG = LoggerFactory.getLogger(PeriodicalsInitializer.class);
 
-    private static final String NAME = "Versionchecks";
+    public static final String NAME = "Periodicals initializer";
 
     @Override
     public void initialize(GraylogServer server, Map<String, String> config) throws InitializerConfigurationException {
         Core core = (Core) server;
+        Reflections reflections = new Reflections("org.graylog2.periodical");
 
-        if (core.getConfiguration().isVersionchecks() && !core.isLocalMode()) {
-            configureScheduler(
-                    core,
-                    new VersionCheckThread(core),
-                    VersionCheckThread.INITIAL_DELAY,
-                    VersionCheckThread.PERIOD
-            );
-        } else {
-            LOG.info("Version checks are disabled. Not initializing version checker.");
+        for (Class<? extends Periodical> type : reflections.getSubTypesOf(Periodical.class)) {
+            try {
+                Periodical periodical = type.newInstance();
+
+                periodical.initialize(core);
+
+                if (periodical.masterOnly() && !core.isMaster()) {
+                    LOG.info("Not starting [{}] periodical. Only started on graylog2-server master nodes.", periodical.getClass().getCanonicalName());
+                    continue;
+                }
+
+                if (!periodical.startOnThisNode()) {
+                    LOG.info("Not starting [{}] periodical. Not configured to run on this node.", periodical.getClass().getCanonicalName());
+                    continue;
+                }
+
+                // Register and start.
+                core.periodicals().registerAndStart(periodical);
+            } catch (Exception e) {
+                LOG.error("Could not initialize periodical.", e);
+            }
         }
     }
 
     @Override
     public Map<String, String> getRequestedConfiguration() {
-        // Built in initializer. This is just for plugin compat. No special configuration required.
         return Maps.newHashMap();
-    }
-
-    @Override
-    public boolean masterOnly() {
-        return true;
     }
 
     @Override
@@ -71,4 +79,8 @@ public class VersionCheckInitializer extends SimpleFixedRateScheduleInitializer 
         return NAME;
     }
 
+    @Override
+    public boolean masterOnly() {
+        return false;
+    }
 }

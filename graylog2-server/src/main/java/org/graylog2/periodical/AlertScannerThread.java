@@ -35,24 +35,15 @@ import java.util.List;
 /**
  * @author Lennart Koopmann <lennart@socketfeed.com>
  */
-public class AlertScannerThread implements Runnable {
+public class AlertScannerThread extends Periodical {
 
     private static final Logger LOG = LoggerFactory.getLogger(AlertScannerThread.class);
-    
-    public static final int INITIAL_DELAY = 10;
-    public static final int PERIOD = 60;
-    
-    private final Core server;
-    
-    public AlertScannerThread(Core server) {
-        this.server = server;
-    }
     
     @Override
     public void run() {
         LOG.debug("Running alert checks.");
 
-        List<Stream> alertedStreams = StreamImpl.loadAllWithConfiguredAlertConditions(server);
+        List<Stream> alertedStreams = StreamImpl.loadAllWithConfiguredAlertConditions(core);
 
         LOG.debug("There are {} streams with configured alert conditions.", alertedStreams.size());
 
@@ -71,13 +62,13 @@ public class AlertScannerThread implements Runnable {
                         LOG.info("Alert condition [{}] is triggered. Sending alerts.", alertCondition);
 
                         // Persist alert.
-                        Alert alert = Alert.factory(result, server);
+                        Alert alert = Alert.factory(result, core);
                         alert.save();
 
                         // Send alerts.
                         if (stream.getAlertReceivers().size() > 0) {
                             try {
-                                AlertSender sender = new AlertSender(server);
+                                AlertSender sender = new AlertSender(core);
                                 sender.sendEmails(stream, result);
                             } catch (TransportConfigurationException e) {
                                 Notification notification = Notification.buildNow(server)
@@ -110,4 +101,38 @@ public class AlertScannerThread implements Runnable {
         }
     }
 
+    @Override
+    public boolean runsForever() {
+        return false;
+    }
+
+    @Override
+    public boolean isDaemon() {
+        return true;
+    }
+
+    @Override
+    public boolean stopOnGracefulShutdown() {
+        return true;
+    }
+
+    @Override
+    public boolean masterOnly() {
+        return true;
+    }
+
+    @Override
+    public boolean startOnThisNode() {
+        return true;
+    }
+
+    @Override
+    public int getInitialDelaySeconds() {
+        return 10;
+    }
+
+    @Override
+    public int getPeriodSeconds() {
+        return 60;
+    }
 }

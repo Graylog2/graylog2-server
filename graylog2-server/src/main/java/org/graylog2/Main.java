@@ -13,9 +13,9 @@
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
  *
- *
  * You should have received a copy of the GNU General Public License
  * along with Graylog2.  If not, see <http://www.gnu.org/licenses/>.
+ *
  */
 
 package org.graylog2;
@@ -226,6 +226,11 @@ public final class Main extends NodeRunner {
             server.setStatsMode(true);
         }
 
+
+        if (!commandLineArguments.performRetention()) {
+            configuration.setPerformRetention(false);
+        }
+
         // propagate default size to input plugins
         MessageInput.setDefaultRecvBufferSize(configuration.getUdpRecvBufferSizes());
 
@@ -245,21 +250,7 @@ public final class Main extends NodeRunner {
 
         // Register initializers.
         server.initializers().register(new DroolsInitializer());
-        server.initializers().register(new HostCounterCacheWriterInitializer());
-        server.initializers().register(injector.getInstance(ThroughputCounterInitializer.class));
-        server.initializers().register(new NodePingInitializer());
-        server.initializers().register(new AlarmScannerInitializer());
-        server.initializers().register(new DeflectorThreadsInitializer());
-        server.initializers().register(new AnonymousInformationCollectorInitializer());
-        if (configuration.performRetention() && commandLineArguments.performRetention())
-            server.initializers().register(new IndexRetentionInitializer());
-        if (commandLineArguments.isStats())
-            server.initializers().register(new StatisticsPrinterInitializer());
-        server.initializers().register(new MasterCacheWorkersInitializer());
-        server.initializers().register(new ClusterHealthCheckInitializer());
-        server.initializers().register(new StreamThroughputCounterInitializer());
-        server.initializers().register(new VersionCheckInitializer());
-        server.initializers().register(new DeadLetterInitializer());
+        server.initializers().register(new PeriodicalsInitializer());
 
         // Register message filters. (Order is important here)
         final FilterRegistry filterRegistry = injector.getInstance(FilterRegistry.class);
@@ -337,6 +328,5 @@ public final class Main extends NodeRunner {
             new File(pidFile).deleteOnExit();
         }
     }
-
 
 }

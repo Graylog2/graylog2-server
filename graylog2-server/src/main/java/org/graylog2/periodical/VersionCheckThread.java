@@ -49,20 +49,9 @@ import java.nio.charset.Charset;
 /**
  * @author Lennart Koopmann <lennart@torch.sh>
  */
-public class VersionCheckThread implements Runnable {
+public class VersionCheckThread extends Periodical {
 
     private static final Logger LOG = LoggerFactory.getLogger(VersionCheckThread.class);
-
-    public static final int INITIAL_DELAY = 0;
-
-    // Run every 30 minutes.
-    public static final int PERIOD = 1800;
-
-    private final Core core;
-
-    public VersionCheckThread(Core core) {
-        this.core = core;
-    }
 
     @Override
     public void run() {
@@ -160,4 +149,39 @@ public class VersionCheckThread implements Runnable {
         return mapper.readValue(httpBody, VersionCheckResponse.class);
     }
 
+    @Override
+    public boolean runsForever() {
+        return false;
+    }
+
+    @Override
+    public boolean stopOnGracefulShutdown() {
+        return true;
+    }
+
+    @Override
+    public boolean masterOnly() {
+        return true;
+    }
+
+    @Override
+    public boolean startOnThisNode() {
+        return core.getConfiguration().isVersionchecks() && !core.isLocalMode();
+    }
+
+    @Override
+    public boolean isDaemon() {
+        return true;
+    }
+
+    @Override
+    public int getInitialDelaySeconds() {
+        return 0;
+    }
+
+    @Override
+    public int getPeriodSeconds() {
+        // 30 minutes.
+        return 1800;
+    }
 }
