@@ -19,7 +19,9 @@
  */
 package org.graylog2.inputs.converters;
 
+import com.google.common.primitives.Doubles;
 import com.google.common.primitives.Ints;
+import com.google.common.primitives.Longs;
 import org.graylog2.plugin.inputs.Converter;
 
 import java.util.Map;
@@ -33,19 +35,35 @@ public class NumericConverter extends Converter {
         super(Type.NUMERIC, config);
     }
 
+	/**
+	 * Attempts to convert the provided string value to a numeric type,
+	 * trying Integer, Long and Double in order until successful.
+	 */
     @Override
     public Object convert(String value) {
         if (value == null || value.isEmpty()) {
             return value;
         }
 
-        Integer result = Ints.tryParse(value);
+        Object result = Ints.tryParse(value);
 
-        if (result == null) {
-            return value;
+        if (result != null) {
+            return result;
         }
 
-        return result;
+        result = Longs.tryParse(value);
+
+        if (result != null) {
+            return result;
+        }
+
+        result = Doubles.tryParse(value);
+
+        if (result != null) {
+            return result;
+        }
+
+        return value;
     }
 
     @Override
