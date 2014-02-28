@@ -7,7 +7,7 @@
 
     <groupId>org.graylog2</groupId>
     <artifactId>graylog2-parent</artifactId>
-    <version>0.20.1</version>
+    <version>0.20.1-SNAPSHOT</version>
     <packaging>pom</packaging>
     <name>graylog2</name>
     <url>http://graylog2.org/</url>
@@ -20,6 +20,7 @@
 
     <modules>
         <module>graylog2-plugin-interfaces</module>
+        <module>graylog2-shared</module>
         <module>graylog2-server</module>
         <module>graylog2-inputs</module>
         <module>graylog2-radio</module>

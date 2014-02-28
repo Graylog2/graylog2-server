@@ -1,5 +1,5 @@
-/**
- * Copyright 2010, 2011, 2012 Lennart Koopmann <lennart@socketfeed.com>
+/*
+ * Copyright 2013-2014 TORCH GmbH
  *
  * This file is part of Graylog2.
  *
@@ -13,9 +13,9 @@
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
  *
+ *
  * You should have received a copy of the GNU General Public License
  * along with Graylog2.  If not, see <http://www.gnu.org/licenses/>.
- *
  */
 
 package org.graylog2;
@@ -28,14 +28,18 @@ import com.github.joschi.jadconfig.JadConfig;
 import com.github.joschi.jadconfig.RepositoryException;
 import com.github.joschi.jadconfig.ValidationException;
 import com.github.joschi.jadconfig.repositories.PropertiesRepository;
+import com.google.inject.Guice;
+import com.google.inject.Injector;
+import com.google.inject.Module;
 import org.apache.commons.io.IOUtils;
 import org.apache.log4j.Level;
+import org.graylog2.bindings.ServerBindings;
 import org.graylog2.cluster.Node;
 import org.graylog2.cluster.NodeNotFoundException;
 import org.graylog2.filters.*;
 import org.graylog2.initializers.*;
-import org.graylog2.inputs.gelf.tcp.GELFTCPInput;
 import org.graylog2.inputs.gelf.http.GELFHttpInput;
+import org.graylog2.inputs.gelf.tcp.GELFTCPInput;
 import org.graylog2.inputs.gelf.udp.GELFUDPInput;
 import org.graylog2.inputs.kafka.KafkaInput;
 import org.graylog2.inputs.misc.jsonpath.JsonPathInput;
@@ -52,6 +56,8 @@ import org.graylog2.plugin.Tools;
 import org.graylog2.plugin.initializers.InitializerConfigurationException;
 import org.graylog2.plugin.inputs.MessageInput;
 import org.graylog2.plugins.PluginInstaller;
+import org.graylog2.shared.NodeRunner;
+import org.graylog2.shared.filters.FilterRegistry;
 import org.graylog2.system.activities.Activity;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -60,13 +66,14 @@ import org.slf4j.bridge.SLF4JBridgeHandler;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.Writer;
+import java.util.List;
 
 /**
  * Main class of Graylog2.
  *
  * @author Lennart Koopmann <lennart@socketfeed.com>
  */
-public final class Main {
+public final class Main extends NodeRunner {
 
     private static final Logger LOG = LoggerFactory.getLogger(Main.class);
 
@@ -95,25 +102,13 @@ public final class Main {
         String configFile = commandLineArguments.getConfigFile();
         LOG.info("Using config file: {}", configFile);
 
-        final Configuration configuration = new Configuration();
-        JadConfig jadConfig = new JadConfig(new PropertiesRepository(configFile), configuration);
-
-        LOG.info("Loading configuration");
-        try {
-            jadConfig.process();
-        } catch (RepositoryException e) {
-            LOG.error("Couldn't load configuration file: [{}]", configFile, e);
-            System.exit(1);
-        } catch (ValidationException e) {
-            LOG.error("Invalid configuration", e);
-            System.exit(1);
-        }
+        final Configuration configuration = getConfiguration(configFile);
 
         if (configuration.getPasswordSecret().isEmpty()) {
             LOG.error("No password secret set. Please define password_secret in your graylog2.conf.");
             System.exit(1);
         }
-        
+
         if (commandLineArguments.isInstallPlugin()) {
             System.out.println("Plugin installation requested.");
             PluginInstaller installer = new PluginInstaller(
@@ -133,8 +128,11 @@ public final class Main {
             logLevel = Level.DEBUG;
         }
 
+        List<Module> bindingsModules = getBindingsModules(new ServerBindings(configuration));
+        Injector injector = Guice.createInjector(bindingsModules);
+
         // This is holding all our metrics.
-        final MetricRegistry metrics = new MetricRegistry();
+        final MetricRegistry metrics = injector.getInstance(MetricRegistry.class);
 
         // Report metrics via JMX.
         final JmxReporter reporter = JmxReporter.forRegistry(metrics).build();
@@ -153,7 +151,7 @@ public final class Main {
 
         // If we only want to check our configuration, we just initialize the rules engine to check if the rules compile
         if (commandLineArguments.isConfigTest()) {
-            Core server = new Core();
+            Core server = injector.getInstance(Core.class);
             server.setConfiguration(configuration);
             DroolsInitializer drools = new DroolsInitializer();
             try {
@@ -171,8 +169,8 @@ public final class Main {
         }
 
         // Le server object. This is where all the magic happens.
-        Core server = new Core();
-        server.initialize(configuration, metrics);
+        Core server = injector.getInstance(Core.class);
+        server.initialize();
 
         // Register this node.
         Node.registerServer(server, configuration.isMaster(), configuration.getRestTransportUri());
@@ -242,15 +240,15 @@ public final class Main {
         // Register initializers.
         server.initializers().register(new DroolsInitializer());
         server.initializers().register(new HostCounterCacheWriterInitializer());
-        server.initializers().register(new ThroughputCounterInitializer());
+        server.initializers().register(injector.getInstance(ThroughputCounterInitializer.class));
         server.initializers().register(new NodePingInitializer());
         server.initializers().register(new AlarmScannerInitializer());
         server.initializers().register(new DeflectorThreadsInitializer());
         server.initializers().register(new AnonymousInformationCollectorInitializer());
-        if (configuration.performRetention() && commandLineArguments.performRetention()) {
+        if (configuration.performRetention() && commandLineArguments.performRetention())
             server.initializers().register(new IndexRetentionInitializer());
-        }
-        if (commandLineArguments.isStats()) { server.initializers().register(new StatisticsPrinterInitializer()); }
+        if (commandLineArguments.isStats())
+            server.initializers().register(new StatisticsPrinterInitializer());
         server.initializers().register(new MasterCacheWorkersInitializer());
         server.initializers().register(new ClusterHealthCheckInitializer());
         server.initializers().register(new StreamThroughputCounterInitializer());
@@ -258,11 +256,12 @@ public final class Main {
         server.initializers().register(new DeadLetterInitializer());
 
         // Register message filters. (Order is important here)
-        server.registerFilter(new StaticFieldFilter());
-        server.registerFilter(new ExtractorFilter());
-        server.registerFilter(new BlacklistFilter());
-        server.registerFilter(new StreamMatcherFilter());
-        server.registerFilter(new RewriteFilter());
+        final FilterRegistry filterRegistry = injector.getInstance(FilterRegistry.class);
+        filterRegistry.register(new StaticFieldFilter());
+        filterRegistry.register(new ExtractorFilter());
+        filterRegistry.register(new BlacklistFilter());
+        filterRegistry.register(new StreamMatcherFilter());
+        filterRegistry.register(new RewriteFilter());
 
         // Register outputs.
         server.outputs().register(new ElasticSearchOutput(server));
@@ -293,6 +292,23 @@ public final class Main {
         }
     }
 
+    private static Configuration getConfiguration(String configFile) {
+        final Configuration configuration = new Configuration();
+        JadConfig jadConfig = new JadConfig(new PropertiesRepository(configFile), configuration);
+
+        LOG.info("Loading configuration");
+        try {
+            jadConfig.process();
+        } catch (RepositoryException e) {
+            LOG.error("Couldn't load configuration file: [{}]", configFile, e);
+            System.exit(1);
+        } catch (ValidationException e) {
+            LOG.error("Invalid configuration", e);
+            System.exit(1);
+        }
+        return configuration;
+    }
+
     private static void savePidFile(String pidFile) {
 
         String pid = Tools.getPID();
@@ -314,5 +330,6 @@ public final class Main {
             new File(pidFile).deleteOnExit();
         }
     }
+
 
 }

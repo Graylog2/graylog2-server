@@ -1,5 +1,5 @@
-/**
- * Copyright 2012, 2013 Lennart Koopmann <lennart@socketfeed.com>
+/*
+ * Copyright 2013-2014 TORCH GmbH
  *
  * This file is part of Graylog2.
  *
@@ -13,9 +13,9 @@
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
  *
+ *
  * You should have received a copy of the GNU General Public License
  * along with Graylog2.  If not, see <http://www.gnu.org/licenses/>.
- *
  */
 
 package org.graylog2;
@@ -25,6 +25,7 @@ import com.fasterxml.jackson.jaxrs.json.JacksonJsonProvider;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
+import com.google.inject.Inject;
 import com.mongodb.BasicDBObjectBuilder;
 import com.mongodb.DBObject;
 import org.apache.shiro.mgt.DefaultSecurityManager;
@@ -37,7 +38,6 @@ import org.glassfish.jersey.server.filter.EncodingFilter;
 import org.glassfish.jersey.server.internal.scanning.PackageNamesScanner;
 import org.graylog2.blacklists.BlacklistCache;
 import org.graylog2.buffers.OutputBuffer;
-import org.graylog2.buffers.ProcessBuffer;
 import org.graylog2.dashboards.DashboardRegistry;
 import org.graylog2.database.HostCounterCacheImpl;
 import org.graylog2.database.MongoBridge;
@@ -48,11 +48,10 @@ import org.graylog2.indexer.Indexer;
 import org.graylog2.initializers.Initializers;
 import org.graylog2.inputs.BasicCache;
 import org.graylog2.inputs.Cache;
-import org.graylog2.inputs.InputRegistry;
+import org.graylog2.inputs.ServerInputRegistry;
 import org.graylog2.inputs.gelf.gelf.GELFChunkManager;
 import org.graylog2.jersey.container.netty.NettyContainer;
 import org.graylog2.metrics.jersey2.MetricsDynamicBinding;
-import org.graylog2.rest.RestAccessLogFilter;
 import org.graylog2.outputs.OutputRegistry;
 import org.graylog2.periodical.MongoDbMetricsReporter;
 import org.graylog2.plugin.GraylogServer;
@@ -74,10 +73,16 @@ import org.graylog2.plugin.system.NodeId;
 import org.graylog2.plugins.PluginLoader;
 import org.graylog2.rest.CORSFilter;
 import org.graylog2.rest.ObjectMapperProvider;
+import org.graylog2.rest.RestAccessLogFilter;
 import org.graylog2.security.ShiroSecurityBinding;
 import org.graylog2.security.ShiroSecurityContextFactory;
 import org.graylog2.security.ldap.LdapConnector;
 import org.graylog2.security.realm.LdapUserAuthenticator;
+import org.graylog2.shared.ProcessingHost;
+import org.graylog2.shared.buffers.ProcessBuffer;
+import org.graylog2.shared.filters.FilterRegistry;
+import org.graylog2.shared.inputs.InputRegistry;
+import org.graylog2.shared.stats.ThroughputStats;
 import org.graylog2.streams.StreamImpl;
 import org.graylog2.system.activities.Activity;
 import org.graylog2.system.activities.ActivityWriter;
@@ -112,12 +117,15 @@ import java.util.concurrent.atomic.AtomicReference;
  * 
  * @author Lennart Koopmann <lennart@socketfeed.com>
  */
-public class Core implements GraylogServer, InputHost {
+public class Core implements GraylogServer, InputHost, ProcessingHost {
 
     private static final Logger LOG = LoggerFactory.getLogger(Core.class);
 
+    @Inject
     private MongoConnection mongoConnection;
+    @Inject
     private MongoBridge mongoBridge;
+    @Inject
     private Configuration configuration;
     private RulesEngineImpl rulesEngine;
     private GELFChunkManager gelfChunkManager;
@@ -132,18 +140,18 @@ public class Core implements GraylogServer, InputHost {
 
     private HostCounterCacheImpl hostCounterCache;
 
-    private Counter benchmarkCounter = new Counter();
-    private Counter throughputCounter = new Counter();
     private AtomicReference<ConcurrentHashMap<String, Counter>> streamThroughput =
             new AtomicReference<ConcurrentHashMap<String, Counter>>(new ConcurrentHashMap<String, Counter>());
-    private long throughput = 0;
+    @Inject
+    private FilterRegistry filterRegistry;
 
-    private List<MessageFilter> filters = Lists.newArrayList();
     private List<Transport> transports = Lists.newArrayList();
     private List<AlarmCallback> alarmCallbacks = Lists.newArrayList();
 
     private Initializers initializers;
-    private InputRegistry inputs;
+    private ServerInputRegistry inputs;
+
+    @Inject
     private OutputRegistry outputs;
 
     private DashboardRegistry dashboards;
@@ -171,6 +179,7 @@ public class Core implements GraylogServer, InputHost {
     private AtomicBoolean processingPauseLocked = new AtomicBoolean(false);
     
     private DateTime startedAt;
+    @Inject
     private MetricRegistry metricRegistry;
     private LdapUserAuthenticator ldapUserAuthenticator;
     private LdapConnector ldapConnector;
@@ -178,14 +187,19 @@ public class Core implements GraylogServer, InputHost {
     private MongoDbMetricsReporter metricsReporter;
     private AtomicReference<HashMap<String, Counter>> currentStreamThroughput = new AtomicReference<HashMap<String, Counter>>();
 
-    public void initialize(Configuration configuration, MetricRegistry metrics) {
+    @Inject
+    private ProcessBuffer.Factory processBufferFactory;
+    @Inject
+    private OutputBuffer.Factory outputBufferFactory;
+
+    @Inject
+    private ThroughputStats throughputStats;
+
+    public void initialize() {
     	startedAt = new DateTime(DateTimeZone.UTC);
 
         NodeId id = new NodeId(configuration.getNodeIdFile());
         this.nodeId = id.readOrGenerate();
-
-        this.metricRegistry = metrics;
-        this.configuration = configuration; // TODO use dependency injection
 
         if (configuration.isMetricsCollectionEnabled()) {
             metricsReporter = MongoDbMetricsReporter.forRegistry(this, metricRegistry).build();
@@ -206,24 +220,8 @@ public class Core implements GraylogServer, InputHost {
                 this.configuration.setRestTransportUri(transportStr);
         }
 
-        mongoConnection = new MongoConnection();    // TODO use dependency injection
-        mongoConnection.setUser(configuration.getMongoUser());
-        mongoConnection.setPassword(configuration.getMongoPassword());
-        mongoConnection.setHost(configuration.getMongoHost());
-        mongoConnection.setPort(configuration.getMongoPort());
-        mongoConnection.setDatabase(configuration.getMongoDatabase());
-        mongoConnection.setUseAuth(configuration.isMongoUseAuth());
-        mongoConnection.setMaxConnections(configuration.getMongoMaxConnections());
-        mongoConnection.setThreadsAllowedToBlockMultiplier(configuration.getMongoThreadsAllowedToBlockMultiplier());
-        mongoConnection.setReplicaSet(configuration.getMongoReplicaSet());
-
-        mongoBridge = new MongoBridge(this);
-        mongoBridge.setConnection(mongoConnection); // TODO use dependency injection
-        mongoConnection.connect();
-
         initializers = new Initializers(this);
-        inputs = new InputRegistry(this);
-        outputs = new OutputRegistry(this);
+        inputs = new ServerInputRegistry(this);
 
         if (isMaster()) {
             dashboards = new DashboardRegistry(this);
@@ -238,11 +236,16 @@ public class Core implements GraylogServer, InputHost {
         
         inputCache = new BasicCache();
         outputCache = new BasicCache();
-    
-        processBuffer = new ProcessBuffer(this, inputCache);
-        processBuffer.initialize();
 
-        outputBuffer = new OutputBuffer(this, outputCache);
+        processBuffer = processBufferFactory.create(this, inputCache);
+        //processBuffer = new ProcessBuffer(this, inputCache);
+        processBuffer.initialize(this.getConfiguration().getRingSize(),
+                this.getConfiguration().getProcessorWaitStrategy(),
+                this.getConfiguration().getProcessBufferProcessors()
+        );
+
+        outputBuffer = outputBufferFactory.create(this, outputCache);
+        //outputBuffer = new OutputBuffer(this, outputCache);
         outputBuffer.initialize();
 
         gelfChunkManager = new GELFChunkManager(this);
@@ -270,10 +273,6 @@ public class Core implements GraylogServer, InputHost {
                 }
             }
         });
-    }
-
-    public void registerFilter(MessageFilter filter) {
-        this.filters.add(filter);
     }
 
     public void registerTransport(Transport transport) {
@@ -310,7 +309,7 @@ public class Core implements GraylogServer, InputHost {
         outputs().initialize();
 
         // Load persisted inputs.
-        inputs().launchPersisted();
+        inputs().launchAllPersisted();
 
         /*
         // Initialize all registered inputs.
@@ -371,8 +370,9 @@ public class Core implements GraylogServer, InputHost {
 
         @Override
         protected void configure() {
-            bind(metricRegistry).to(MetricRegistry.class);
             bind(Core.this).to(Core.class);
+            bind(metricRegistry).to(MetricRegistry.class);
+            bind(throughputStats).to(ThroughputStats.class);
         }
     }
 
@@ -449,7 +449,7 @@ public class Core implements GraylogServer, InputHost {
             LOG.info("Loaded <{}> plugin [{}].", type.getSimpleName(), plugin.getClass().getCanonicalName());
 
             if (plugin instanceof MessageFilter) {
-                registerFilter((MessageFilter) plugin);
+                filterRegistry.register((MessageFilter) plugin);
             } else if (plugin instanceof MessageInput) {
                 inputs.register(plugin.getClass(), ((MessageInput) plugin).getName());
             } else if (plugin instanceof MessageOutput) {
@@ -524,10 +524,6 @@ public class Core implements GraylogServer, InputHost {
         return this.transports;
     }
     
-    public List<MessageFilter> getFilters() {
-        return this.filters;
-    }
-
     public List<AlarmCallback> getAlarmCallbacks() {
         return this.alarmCallbacks;
     }
@@ -599,22 +595,6 @@ public class Core implements GraylogServer, InputHost {
         }
         
         return streams;
-    }
-    
-    public Counter getBenchmarkCounter() {
-        return benchmarkCounter;
-    }
-
-    public Counter getThroughputCounter() {
-        return throughputCounter;
-    }
-
-    public void setCurrentThroughput(long x) {
-        this.throughput = x;
-    }
-
-    public long getCurrentThroughput() {
-        return this.throughput;
     }
 
     public Cache getInputCache() {
@@ -702,5 +682,15 @@ public class Core implements GraylogServer, InputHost {
         }
 
         return dashboards;
+    }
+
+    @Override
+    public boolean isServer() {
+        return true;
+    }
+
+    @Override
+    public boolean isRadio() {
+        return false;
     }
 }

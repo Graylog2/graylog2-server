@@ -22,7 +22,7 @@ package org.graylog2.initializers;
 import com.google.common.collect.Maps;
 import java.util.Map;
 import org.graylog2.Core;
-import org.graylog2.periodical.MasterCacheWorkerThread;
+import org.graylog2.shared.periodical.MasterCacheWorkerThread;
 import org.graylog2.plugin.GraylogServer;
 import org.graylog2.plugin.initializers.Initializer;
 import org.graylog2.plugin.initializers.InitializerConfigurationException;

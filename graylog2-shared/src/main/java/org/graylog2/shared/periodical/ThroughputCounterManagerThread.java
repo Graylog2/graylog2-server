@@ -1,5 +1,5 @@
-/**
- * Copyright 2013 Lennart Koopmann <lennart@torch.sh>
+/*
+ * Copyright 2013-2014 TORCH GmbH
  *
  * This file is part of Graylog2.
  *
@@ -13,29 +13,33 @@
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
  *
+ *
  * You should have received a copy of the GNU General Public License
  * along with Graylog2.  If not, see <http://www.gnu.org/licenses/>.
- *
  */
-package org.graylog2.radio.rest.resources.system.inputs.requests;
+package org.graylog2.shared.periodical;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
-
-import java.util.Map;
+import com.google.inject.Inject;
+import org.graylog2.shared.stats.ThroughputStats;
 
 /**
  * @author Lennart Koopmann <lennart@torch.sh>
  */
-public class InputLaunchRequest {
+public class ThroughputCounterManagerThread implements Runnable {
+    public interface Factory {
+        public ThroughputCounterManagerThread create();
+    }
 
-    public String title;
-    public String type;
+    public static final int INITIAL_DELAY = 0;
+    public static final int PERIOD = 1;
 
-    public Boolean global;
+    @Inject
+    private ThroughputStats throughputStats;
 
-    @JsonProperty("creator_user_id")
-    public String creatorUserId;
-
-    public Map<String, Object> configuration;
+    @Override
+    public void run() {
+        throughputStats.setCurrentThroughput(throughputStats.getThroughputCounter().get());
+        throughputStats.getThroughputCounter().set(0);
+    }
 
 }

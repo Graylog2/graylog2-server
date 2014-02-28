@@ -21,7 +21,7 @@
 package org.graylog2;
 
 import com.codahale.metrics.MetricRegistry;
-import org.graylog2.buffers.ProcessBuffer;
+import org.graylog2.shared.buffers.ProcessBuffer;
 import org.graylog2.plugin.Message;
 
 /**

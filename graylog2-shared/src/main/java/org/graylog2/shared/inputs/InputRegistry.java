@@ -17,23 +17,17 @@
  * along with Graylog2.  If not, see <http://www.gnu.org/licenses/>.
  *
  */
-package org.graylog2.inputs;
+package org.graylog2.shared.inputs;
 
 
 import com.beust.jcommander.internal.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
-import com.mongodb.BasicDBObject;
-import org.bson.types.ObjectId;
-import org.graylog2.Core;
-import org.graylog2.notifications.Notification;
-import org.graylog2.plugin.configuration.Configuration;
+import org.graylog2.plugin.InputHost;
 import org.graylog2.plugin.configuration.ConfigurationException;
-import org.graylog2.plugin.inputs.Extractor;
 import org.graylog2.plugin.inputs.InputState;
 import org.graylog2.plugin.inputs.MessageInput;
 import org.graylog2.plugin.inputs.MisfireException;
-import org.graylog2.system.activities.Activity;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -46,26 +40,49 @@ import java.util.concurrent.Executors;
 /**
  * @author Lennart Koopmann <lennart@torch.sh>
  */
-public class InputRegistry {
+public abstract class InputRegistry {
 
-    private static final Logger LOG = LoggerFactory.getLogger(InputRegistry.class);
-
-    private final Core core;
-    private final List<InputState> inputStates;
-    private final Map<String, String> availableInputs;
-
-    private ExecutorService executor = Executors.newCachedThreadPool(
+    protected static final Logger LOG = LoggerFactory.getLogger(InputRegistry.class);
+    protected static final Map<String, ClassLoader> classLoaders = Maps.newHashMap();
+    protected final InputHost core;
+    protected final List<InputState> inputStates = Lists.newArrayList();
+    protected final Map<String, String> availableInputs = Maps.newHashMap();
+    protected final ExecutorService executor = Executors.newCachedThreadPool(
             new ThreadFactoryBuilder().setNameFormat("inputs-%d").build()
     );
-    private static Map<String, ClassLoader> classLoaders = Maps.newHashMap();
 
-    public InputRegistry(Core core) {
+    public InputRegistry(InputHost core) {
         this.core = core;
-        inputStates = Lists.newArrayList();
-        availableInputs = Maps.newHashMap();
+    }
+
+    public static MessageInput factory(String type) throws NoSuchInputTypeException {
+        try {
+            final ClassLoader classLoader = lookupClassLoader(type);
+            if (classLoader == null) {
+                throw new NoSuchInputTypeException("There is no classloader to load input of type <" + type + ">.");
+            }
+            Class c = Class.forName(type, true, classLoader);
+            return (MessageInput) c.newInstance();
+        } catch (ClassNotFoundException e) {
+            throw new NoSuchInputTypeException("There is no input of type <" + type + "> registered.");
+        } catch (Exception e) {
+            throw new RuntimeException("Could not create input of type <" + type + ">", e);
+        }
+    }
+
+    protected static ClassLoader lookupClassLoader(String type) {
+        return classLoaders.get(type);
     }
 
     public String launch(final MessageInput input, String id) {
+        return launch(input, id, false);
+    }
+
+    protected abstract void finishedLaunch(InputState state);
+
+    protected abstract void finishedTermination(InputState state);
+
+    public String launch(final MessageInput input, String id, boolean register) {
         final InputState inputState = new InputState(input, id);
         inputStates.add(inputState);
 
@@ -76,15 +93,15 @@ public class InputRegistry {
                 try {
                     inputState.setState(InputState.InputStateType.STARTING);
                     input.launch();
-                    Notification.fixed(core, Notification.Type.NO_INPUT_RUNNING);
                     inputState.setState(InputState.InputStateType.RUNNING);
                     String msg = "Completed starting [" + input.getClass().getCanonicalName() + "] input with ID <" + input.getId() + ">";
-                    core.getActivityWriter().write(new Activity(msg, InputRegistry.class));
                     LOG.info(msg);
                 } catch (MisfireException e) {
                     handleLaunchException(e, input, inputState);
                 } catch (Exception e) {
                     handleLaunchException(e, input, inputState);
+                } finally {
+                    finishedLaunch(inputState);
                 }
             }
         });
@@ -111,19 +128,12 @@ public class InputRegistry {
 
         msg.append(causeMsg);
 
-        core.getActivityWriter().write(new Activity(msg.toString(), InputRegistry.class));
         LOG.error(msg.toString(), e);
-
-        Notification notification = Notification.buildNow(core);
-        notification.addType(Notification.Type.INPUT_FAILED_TO_START).addSeverity(Notification.Severity.NORMAL);
-        notification.addThisNode();
-        notification.addDetail("input_id", input.getId());
-        notification.addDetail("reason", causeMsg.toString());
-        notification.publishIfFirst();
 
         // Clean up.
         //cleanInput(input);
 
+        inputState.setDetailedMessage(causeMsg.toString());
         inputState.setState(InputState.InputStateType.FAILED);
     }
 
@@ -162,60 +172,9 @@ public class InputRegistry {
         return getRunningInputs().size();
     }
 
-    public static MessageInput factory(String type) throws NoSuchInputTypeException {
-        try {
-            final ClassLoader classLoader = lookupClassLoader(type);
-            if (classLoader == null) {
-                throw new NoSuchInputTypeException("There is no classloader to load input of type <" + type + ">.");
-            }
-            Class c = Class.forName(type, true, classLoader);
-            return (MessageInput) c.newInstance();
-        } catch (ClassNotFoundException e) {
-             throw new NoSuchInputTypeException("There is no input of type <" + type + "> registered.");
-        } catch (Exception e) {
-            throw new RuntimeException("Could not create input of type <" + type + ">", e);
-        }
-    }
-
-    private static ClassLoader lookupClassLoader(String type) {
-        return classLoaders.get(type);
-    }
-
-    public static MessageInput getMessageInput(Input io, Core core) throws NoSuchInputTypeException, ConfigurationException {
-        MessageInput input = InputRegistry.factory(io.getType());
-
-        // Add all standard fields.
-        input.initialize(new Configuration(io.getConfiguration()), core);
-        input.setTitle(io.getTitle());
-        input.setCreatorUserId(io.getCreatorUserId());
-        input.setPersistId(io.getId());
-        input.setCreatedAt(io.getCreatedAt());
-        if (io.isGlobal())
-            input.setGlobal(true);
-
-        // Add extractors.
-        for (Extractor extractor : io.getExtractors()) {
-            input.addExtractor(extractor.getId(), extractor);
-        }
-
-        // Add static fields.
-        for (Map.Entry<String, String> field : io.getStaticFields().entrySet()) {
-            input.addStaticField(field.getKey(), field.getValue());
-        }
-
-        input.checkConfiguration();
-
-        return input;
-    }
-
     public void register(Class clazz, String name) {
         classLoaders.put(clazz.getCanonicalName(), clazz.getClassLoader());
         availableInputs.put(clazz.getCanonicalName(), name);
-    }
-
-    public void cleanInput(MessageInput input) {
-        // Remove in Mongo.
-        Input.destroy(new BasicDBObject("_id", new ObjectId(input.getPersistId())), core, Input.COLLECTION);
     }
 
     public void removeFromRunning(MessageInput input) {
@@ -229,23 +188,38 @@ public class InputRegistry {
         inputStates.remove(thisInputState);
     }
 
-    public void launchPersisted() {
-        for (Input io : Input.allOfThisNode(core)) {
-            MessageInput input = null;
-            try {
-                input = InputRegistry.getMessageInput(io, core);
-            } catch (NoSuchInputTypeException e) {
-                LOG.error("Cannot launch persisted input. No such type [{}].", io.getType());
-                continue;
-            } catch (ConfigurationException e) {
-                LOG.error("Missing or invalid input plugin configuration.", e);
-                continue;
-            }
+    public String launchPersisted(MessageInput input) {
+        try {
+            input.checkConfiguration();
+        } catch (ConfigurationException e) {
+            LOG.error("Missing or invalid input input configuration.", e);
+            return null;
+        }
 
-            launch(input, io.getInputId());
+        return launch(input);
+    }
+
+    protected abstract List<MessageInput> getAllPersisted();
+
+    public void launchAllPersisted() {
+        for (MessageInput input : getAllPersisted()) {
+            launchPersisted(input);
         }
     }
 
+    public InputState terminate(MessageInput input) {
+        InputState inputState = getRunningInputState(input.getId());
+
+        if (inputState == null)
+            return null;
+
+        input.stop();
+        removeFromRunning(input);
+        inputState.setState(InputState.InputStateType.TERMINATED);
+        finishedTermination(inputState);
+
+        return inputState;
+    }
 
     public MessageInput getRunningInput(String inputId) {
         for (InputState inputState : inputStates) {
@@ -258,8 +232,19 @@ public class InputRegistry {
 
     public InputState getRunningInputState(String inputStateId) {
         for (InputState inputState : inputStates) {
-            if (inputState.getId().equals(inputStateId))
+            if (inputState.getMessageInput().getId().equals(inputStateId))
                 return inputState;
+        }
+
+        return null;
+    }
+
+    public abstract void cleanInput(MessageInput input);
+
+    public MessageInput getPersisted(String inputId) {
+        for (MessageInput input : getAllPersisted()) {
+            if (input.getId().equals(inputId))
+                return input;
         }
 
         return null;

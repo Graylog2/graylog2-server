@@ -17,14 +17,14 @@
  * along with Graylog2.  If not, see <http://www.gnu.org/licenses/>.
  *
  */
-package org.graylog2.periodical;
+package org.graylog2.shared.periodical;
 
 import com.codahale.metrics.Meter;
-import org.graylog2.Core;
 import org.graylog2.inputs.Cache;
 import org.graylog2.plugin.Message;
 import org.graylog2.plugin.buffers.Buffer;
 import org.graylog2.plugin.buffers.BufferOutOfCapacityException;
+import org.graylog2.shared.ProcessingHost;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -43,12 +43,12 @@ public class MasterCacheWorkerThread implements Runnable {
     private final Cache cache;
     private final String cacheName;
     private final Buffer targetBuffer;
-    private final Core core;
+    private final ProcessingHost core;
 
     private final Meter writtenMessages;
     private final Meter outOfCapacity;
     
-    public MasterCacheWorkerThread(Core core, Cache cache, Buffer targetBuffer) {
+    public MasterCacheWorkerThread(ProcessingHost core, Cache cache, Buffer targetBuffer) {
         writtenMessages = core.metrics().meter(name(MasterCacheWorkerThread.class, "writtenMessages"));
         outOfCapacity =  core.metrics().meter(name(MasterCacheWorkerThread.class, "FailedWritesOutOfCapacity"));
 

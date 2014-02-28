@@ -1,5 +1,5 @@
-/**
- * Copyright 2013 Lennart Koopmann <lennart@torch.sh>
+/*
+ * Copyright 2013-2014 TORCH GmbH
  *
  * This file is part of Graylog2.
  *
@@ -13,26 +13,27 @@
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
  *
+ *
  * You should have received a copy of the GNU General Public License
  * along with Graylog2.  If not, see <http://www.gnu.org/licenses/>.
- *
  */
-package org.graylog2.radio.inputs;
+
+package org.graylog2.shared;
+
+import com.beust.jcommander.internal.Lists;
+import com.google.inject.Module;
+import org.graylog2.shared.bindings.GenericBindings;
+
+import java.util.List;
 
 /**
- * @author Lennart Koopmann <lennart@torch.sh>
+ * @author Dennis Oelkers <dennis@torch.sh>
  */
-public class NoSuchInputTypeException extends Throwable {
-
-    public NoSuchInputTypeException() {
+public class NodeRunner {
+    protected static List<Module> getBindingsModules(Module specificModule) {
+        List<Module> result = Lists.newArrayList();
+        result.add(new GenericBindings());
+        result.add(specificModule);
+        return result;
     }
-
-    public NoSuchInputTypeException(String s) {
-        super(s);
-    }
-
-    public NoSuchInputTypeException(String s, Throwable e) {
-        super(s, e);
-    }
-
 }

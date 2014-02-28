@@ -22,6 +22,7 @@ package org.graylog2.database;
 
 import com.beust.jcommander.internal.Lists;
 import com.google.common.collect.Maps;
+import com.google.inject.Inject;
 import com.mongodb.*;
 import org.bson.types.ObjectId;
 import org.graylog2.Core;
@@ -40,12 +41,11 @@ import java.util.Map;
  * @author Lennart Koopmann <lennart@torch.sh>
  */
 public abstract class Persisted {
-
     private static final Logger LOG = LoggerFactory.getLogger(Persisted.class);
 
     protected final Map<String, Object> fields;
     protected final ObjectId id;
-    
+
     protected final Core core;
 
     protected Persisted(Core core, Map<String, Object> fields) {

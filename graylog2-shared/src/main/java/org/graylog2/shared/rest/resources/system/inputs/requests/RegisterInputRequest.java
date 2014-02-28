@@ -17,7 +17,7 @@
  * along with Graylog2.  If not, see <http://www.gnu.org/licenses/>.
  *
  */
-package org.graylog2.radio.inputs.api;
+package org.graylog2.shared.rest.resources.system.inputs.requests;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import org.graylog2.plugin.inputs.MessageInput;

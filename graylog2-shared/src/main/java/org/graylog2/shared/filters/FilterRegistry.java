@@ -1,5 +1,5 @@
-/**
- * Copyright 2013 Lennart Koopmann <lennart@torch.sh>
+/*
+ * Copyright 2013-2014 TORCH GmbH
  *
  * This file is part of Graylog2.
  *
@@ -13,28 +13,37 @@
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
  *
+ *
  * You should have received a copy of the GNU General Public License
  * along with Graylog2.  If not, see <http://www.gnu.org/licenses/>.
- *
  */
-package org.graylog2.radio.periodical;
 
-import org.graylog2.radio.Radio;
+package org.graylog2.shared.filters;
+
+import com.beust.jcommander.internal.Lists;
+import org.graylog2.plugin.filters.MessageFilter;
+
+import java.util.Iterator;
+import java.util.List;
 
 /**
- * @author Lennart Koopmann <lennart@torch.sh>
+ * @author Dennis Oelkers <dennis@torch.sh>
  */
-public class ThroughputCounterManagerThread implements Runnable {
-
-    private final Radio radio;
-
-    public ThroughputCounterManagerThread(Radio radio) {
-        this.radio = radio;
+public class FilterRegistry {
+    private final List<MessageFilter> messageFilters;
+    public FilterRegistry() {
+        messageFilters = Lists.newArrayList();
     }
 
-    @Override
-    public void run() {
-        radio.setCurrentThroughput(radio.getThroughputCounter().get());
-        radio.getThroughputCounter().set(0);
+    public boolean register(MessageFilter messageFilter) {
+        return messageFilters.add(messageFilter);
+    }
+
+    public int size() {
+        return messageFilters.size();
+    }
+
+    public List<MessageFilter> all() {
+        return messageFilters;
     }
 }

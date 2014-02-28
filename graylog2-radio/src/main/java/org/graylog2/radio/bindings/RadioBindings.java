@@ -1,5 +1,5 @@
-/**
- * Copyright 2013 Lennart Koopmann <lennart@torch.sh>
+/*
+ * Copyright 2013-2014 TORCH GmbH
  *
  * This file is part of Graylog2.
  *
@@ -13,33 +13,28 @@
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
  *
+ *
  * You should have received a copy of the GNU General Public License
  * along with Graylog2.  If not, see <http://www.gnu.org/licenses/>.
- *
  */
-package org.graylog2.rest.resources.system.radio.requests;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
+package org.graylog2.radio.bindings;
 
-import java.util.Map;
+import com.google.inject.AbstractModule;
+import org.graylog2.radio.Configuration;
 
 /**
- * @author Lennart Koopmann <lennart@torch.sh>
+ * @author Dennis Oelkers <dennis@torch.sh>
  */
-public class RegisterInputRequest {
+public class RadioBindings extends AbstractModule {
+    private final Configuration configuration;
 
-    @JsonProperty("input_id")
-    public String inputId;
+    public RadioBindings(Configuration configuration) {
+        this.configuration = configuration;
+    }
 
-    public String title;
-    public String type;
-
-    public Map<String, Object> configuration;
-
-    @JsonProperty("radio_id")
-    public String radioId;
-
-    @JsonProperty("creator_user_id")
-    public String creatorUserId;
-
+    @Override
+    protected void configure() {
+        bind(Configuration.class).toInstance(configuration);
+    }
 }

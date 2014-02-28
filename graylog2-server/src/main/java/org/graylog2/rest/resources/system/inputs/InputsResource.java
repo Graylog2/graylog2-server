@@ -26,15 +26,16 @@ import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.bson.types.ObjectId;
 import org.graylog2.database.ValidationException;
 import org.graylog2.inputs.Input;
-import org.graylog2.inputs.InputRegistry;
+import org.graylog2.inputs.ServerInputRegistry;
+import org.graylog2.shared.inputs.InputRegistry;
 import org.graylog2.plugin.inputs.InputState;
-import org.graylog2.inputs.NoSuchInputTypeException;
+import org.graylog2.shared.inputs.NoSuchInputTypeException;
 import org.graylog2.plugin.configuration.Configuration;
 import org.graylog2.plugin.configuration.ConfigurationException;
 import org.graylog2.plugin.inputs.MessageInput;
 import org.graylog2.rest.documentation.annotations.*;
 import org.graylog2.rest.resources.RestResource;
-import org.graylog2.rest.resources.system.inputs.requests.InputLaunchRequest;
+import org.graylog2.shared.rest.resources.system.inputs.requests.InputLaunchRequest;
 import org.graylog2.security.RestPermissions;
 import org.graylog2.system.activities.Activity;
 import org.joda.time.DateTime;
@@ -220,14 +221,12 @@ public class InputsResource extends RestResource {
         LOG.info(msg);
         core.getActivityWriter().write(new Activity(msg, InputsResource.class));
 
-        // Shutdown actual input.
-        input.stop();
+        core.inputs().terminate(input);
 
         if (core.isMaster() || !input.getGlobal()) {
             // Remove from list and mongo.
             core.inputs().cleanInput(input);
         }
-        core.inputs().removeFromRunning(input);
 
         String msg2 = "Terminated input [" + input.getName()+ "]. Reason: REST request.";
         LOG.info(msg2);
@@ -246,7 +245,7 @@ public class InputsResource extends RestResource {
     public Response launchExisting(@ApiParam(title = "inputId", required = true) @PathParam("inputId") String inputId) {
         MessageInput input = null;
         try {
-             input = InputRegistry.getMessageInput(Input.findForThisNode(core, inputId), core);
+             input = ServerInputRegistry.getMessageInput(Input.findForThisNode(core, inputId), core);
         } catch (NoSuchInputTypeException e) {
             LOG.info("Cannot launch input. Input not found.");
             throw new WebApplicationException(404);
