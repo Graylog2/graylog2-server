@@ -3,7 +3,7 @@
 # ~~~~
 
 # Authentication
-GET         /login                                                                   @controllers.SessionsController.index()
+GET         /login                                                                   @controllers.SessionsController.index(destination: String ?= "")
 POST        /login                                                                   @controllers.SessionsController.create()
 GET         /logout                                                                  @controllers.SessionsController.destroy()
 

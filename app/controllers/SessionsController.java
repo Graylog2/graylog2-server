@@ -52,18 +52,26 @@ public class SessionsController extends BaseController {
 	@Inject
     RedirectAuthenticator authenticator;
 
-	public Result index() {
+	public Result index(String destination) {
         // Redirect if already logged in.
         String loggedInUserName = authenticator.getUsername(ctx());
         if (loggedInUserName != null) {
             log.debug("User {} already authenticated, redirecting to /", loggedInUserName);
-            return redirect("/");
+            if (destination != null && !destination.isEmpty()) {
+                return redirect(destination);
+            } else {
+                return redirect("/");
+            }
         }
         if (session("username") != null && !session("username").isEmpty()) {
-            return redirect("/");
+            if (destination != null && !destination.isEmpty()) {
+                return redirect(destination);
+            } else {
+                return redirect("/");
+            }
         }
         checkServerConnections();
-        return ok(views.html.sessions.login.render(userForm, !serverNodes.isConnected()));
+        return ok(views.html.sessions.login.render(userForm, !serverNodes.isConnected(), destination));
     }
 
     private void checkServerConnections() {
@@ -77,7 +85,7 @@ public class SessionsController extends BaseController {
 
 		if (loginRequest.hasErrors()) {
 			flash("error", "Please fill out all fields.");
-            return badRequest(views.html.sessions.login.render(loginRequest, !serverNodes.isConnected()));
+            return badRequest(views.html.sessions.login.render(loginRequest, !serverNodes.isConnected(), loginRequest.field("destination").value()));
 		}
 		
 		LoginRequest r = loginRequest.get();
@@ -92,6 +100,11 @@ public class SessionsController extends BaseController {
             final String cookieContent = Crypto.encryptAES(r.username + "\t" + sessionResponse.sessionId);
             Http.Context.current().session().put("sessionid", cookieContent);
 
+            // if we were redirected from somewhere else because the session had expired, redirect back to that page
+            // otherwise use the configured startpage (or skip it if that was requested)
+            if (r.destination != null) {
+                return redirect(r.destination);
+            }
             // upon redirect, the auth layer will load the user with the given session and log the user in.
             if(r.noStartpage) {
                 return redirect(routes.SystemController.index(0));
@@ -109,7 +122,7 @@ public class SessionsController extends BaseController {
             flash("error", "Unable to reach Graylog2 Server.");
         } catch (AuthenticationException e) {
         }
-        return badRequest(views.html.sessions.login.render(loginRequest, !serverNodes.isConnected()));
+        return badRequest(views.html.sessions.login.render(loginRequest, !serverNodes.isConnected(), loginRequest.field("destination").value()));
 	}
 
     @Security.Authenticated(RedirectAuthenticator.class)
