@@ -1,4 +1,4 @@
-@(loginForm: Form[LoginRequest], disconnected: Boolean)
+@(loginForm: Form[LoginRequest], disconnected: Boolean, destination: String)
 
 @loggedout(title = "Welcome to Graylog2 - Sign in") {
 
@@ -16,6 +16,7 @@
             }
 
             @helper.form(action = controllers.routes.SessionsController.create()) {
+                <input type="hidden" name="destination" value="@destination">
                 <input type="text" id="username" class="span4" name="username" placeholder="Username" value="@loginForm.field("username").value()" autofocus @if(disconnected) {disabled}>
                 <input type="password" id="password" class="span4" name="password" placeholder="Password" @if(disconnected) {disabled}>
                 <a id="checkconnection" class="btn btn-warning btn-block @if(!disconnected){hidden}" href="@routes.LonesomeInterfaceController.index()">Check server connections</a>

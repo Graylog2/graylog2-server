@@ -58,7 +58,7 @@ public class RedirectAuthenticator extends Authenticator {
             // the client is not "unauthorized" per se, but we couldn't reach any backend to authenticate against.
             // if this is a XMLHttpRequest, we respond with a 504 Gateway Timeout, to trigger the error handlers in Javascript
             final String xhr = ctx.request().getHeader("X-Requested-With");
-            if (xhr != null && xhr.equalsIgnoreCase("xmlhttprequest")) {
+            if ("xmlhttprequest".equalsIgnoreCase(xhr)) {
                 return status(Http.Status.GATEWAY_TIMEOUT);
             }
 
@@ -76,7 +76,12 @@ public class RedirectAuthenticator extends Authenticator {
             }
 
         }
-		return redirect(controllers.routes.SessionsController.index());
+        final String destination = ctx.request().uri();
+        // don't redirect to /logout directly after login ;)
+        if (routes.SessionsController.destroy().url().equals(destination)) {
+            return redirect(controllers.routes.SessionsController.index(""));
+        }
+        return redirect(controllers.routes.SessionsController.index(destination));
 	}
 	
 }
