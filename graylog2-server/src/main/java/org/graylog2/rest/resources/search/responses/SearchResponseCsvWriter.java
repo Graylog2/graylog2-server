@@ -75,6 +75,7 @@ public class SearchResponseCsvWriter implements MessageBodyWriter<SearchResponse
             for (String fieldName : sortedFields) {
                 final Object val = message.message.get(fieldName);
                 fieldValues[idx++] = ((val == null) ? null : val.toString().replaceAll("\n", "\\\\n"));
+                fieldValues[idx++] = ((val == null) ? null : val.toString().replaceAll("\r", "\\\\r"));
             }
             // write the complete line, some fields might not be present in the message, so there might be null values
             csvWriter.writeNext(fieldValues);
