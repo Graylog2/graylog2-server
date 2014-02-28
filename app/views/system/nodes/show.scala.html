@@ -69,15 +69,16 @@
     <div class="row-fluid">
         <h2><i class="icon icon-tasks"></i> Memory/Heap usage</h2>
 
-        <div class="progress node-heap-usage">
-            <div class="bar bar-warning" style="width: @node.jvm.usedMemoryPercentage()%;"></div>
-            <div class="bar" style="width: @(node.jvm.totalMemoryPercentage()-node.jvm.usedMemoryPercentage)%"></div>
+        <div class="node-heap-usage" data-node-id="@node.getNodeId">
+            <div class="progress">
+                <div class="bar bar-warning heap-used-percent" style="width: @node.jvm.usedMemoryPercentage()%;"></div>
+                <div class="bar heap-total-percent" style="width: @(node.jvm.totalMemoryPercentage()-node.jvm.usedMemoryPercentage)%"></div>
+            </div>
+            Master caches: <strong><span class="input-master-cache">@node.getBufferInfo.getInputMasterCache.size</span></strong> IMC / <strong><span class="output-master-cache">@node.getBufferInfo.getOutputMasterCache.size</span></strong> OMC.
+
+            The JVM is using <strong><span class="heap-used">@node.jvm.getUsedMemory.getMegabytes()</span> of <span class="heap-total">@node.jvm.getTotalMemory.getMegabytes()</span> MB</strong>
+            heap space and will not attempt to use more than <strong><span class="heap-max">@node.jvm.getMaxMemory.getMegabytes()</span> MB</strong>.
         </div>
-
-        Master caches: <strong>@node.getBufferInfo.getInputMasterCache.size</strong> IMC / <strong>@node.getBufferInfo.getOutputMasterCache.size</strong> OMC.
-
-        The JVM is using <strong>@node.jvm.getUsedMemory.getMegabytes() of @node.jvm.getTotalMemory.getMegabytes() MB</strong>
-        heap space and will not attempt to use more than <strong>@node.jvm.getMaxMemory.getMegabytes() MB</strong>.
     </div>
 
     <hr />
