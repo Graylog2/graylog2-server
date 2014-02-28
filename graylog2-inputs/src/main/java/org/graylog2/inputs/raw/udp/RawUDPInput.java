@@ -28,7 +28,6 @@ import org.jboss.netty.bootstrap.ConnectionlessBootstrap;
 import org.jboss.netty.channel.ChannelException;
 import org.jboss.netty.channel.FixedReceiveBufferSizePredictorFactory;
 import org.jboss.netty.channel.socket.nio.NioDatagramChannelFactory;
-import org.jboss.netty.handler.traffic.TrafficCounter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -60,6 +59,7 @@ public class RawUDPInput extends RawInputBase {
         bootstrap = new ConnectionlessBootstrap(new NioDatagramChannelFactory(workerThreadPool));
         bootstrap.setOption("receiveBufferSizePredictorFactory", new FixedReceiveBufferSizePredictorFactory(8192));
         bootstrap.setPipelineFactory(new RawUDPPipelineFactory(graylogServer, configuration, this, throughputCounter));
+        bootstrap.setOption("receiveBufferSize", getRecvBufferSize());
 
         try {
             channel = ((ConnectionlessBootstrap) bootstrap).bind(socketAddress);

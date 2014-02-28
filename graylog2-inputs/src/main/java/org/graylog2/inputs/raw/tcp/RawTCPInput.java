@@ -74,6 +74,7 @@ public class RawTCPInput extends RawInputBase {
         );
 
         bootstrap.setPipelineFactory(new RawTCPPipelineFactory(graylogServer, configuration, this, throughputCounter, connectionCounter));
+        bootstrap.setOption("child.receiveBufferSize", getRecvBufferSize());
 
         try {
             channel = ((ServerBootstrap) bootstrap).bind(socketAddress);
