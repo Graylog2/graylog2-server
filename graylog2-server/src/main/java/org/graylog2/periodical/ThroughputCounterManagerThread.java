@@ -19,21 +19,10 @@
  */
 package org.graylog2.periodical;
 
-import org.graylog2.Core;
-
 /**
  * @author Lennart Koopmann <lennart@torch.sh>
  */
-public class ThroughputCounterManagerThread implements Runnable {
-
-    public static final int INITIAL_DELAY = 0;
-    public static final int PERIOD = 1;
-
-    private final Core core;
-
-    public ThroughputCounterManagerThread(Core core) {
-        this.core = core;
-    }
+public class ThroughputCounterManagerThread extends Periodical {
 
     @Override
     public void run() {
@@ -41,4 +30,38 @@ public class ThroughputCounterManagerThread implements Runnable {
         core.getThroughputCounter().set(0);
     }
 
+    @Override
+    public boolean runsForever() {
+        return false;
+    }
+
+    @Override
+    public boolean stopOnGracefulShutdown() {
+        return false;
+    }
+
+    @Override
+    public boolean masterOnly() {
+        return false;
+    }
+
+    @Override
+    public boolean startOnThisNode() {
+        return true;
+    }
+
+    @Override
+    public boolean isDaemon() {
+        return true;
+    }
+
+    @Override
+    public int getInitialDelaySeconds() {
+        return 0;
+    }
+
+    @Override
+    public int getPeriodSeconds() {
+        return 1;
+    }
 }

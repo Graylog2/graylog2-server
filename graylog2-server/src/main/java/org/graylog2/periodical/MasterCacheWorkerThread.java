@@ -33,45 +33,47 @@ import static com.codahale.metrics.MetricRegistry.name;
 /**
  * @author Lennart Koopmann <lennart@socketfeed.com>
  */
-public class MasterCacheWorkerThread implements Runnable {
+public class MasterCacheWorkerThread extends Periodical {
 
     private static final Logger LOG = LoggerFactory.getLogger(MasterCacheWorkerThread.class);
 
-    public static final int INITIAL_DELAY = 0;
-    public static final int PERIOD = 1;
-
-    private final Cache cache;
-    private final String cacheName;
-    private final Buffer targetBuffer;
-    private final Core core;
-
-    private final Meter writtenMessages;
-    private final Meter outOfCapacity;
-    
-    public MasterCacheWorkerThread(Core core, Cache cache, Buffer targetBuffer) {
-        writtenMessages = core.metrics().meter(name(MasterCacheWorkerThread.class, "writtenMessages"));
-        outOfCapacity =  core.metrics().meter(name(MasterCacheWorkerThread.class, "FailedWritesOutOfCapacity"));
-
-        this.cache = cache;
-        this.cacheName = cache.getClass().getCanonicalName();
-        
-        this.targetBuffer = targetBuffer;
-        this.core = core;
-    }
+    private Meter writtenMessages;
+    private Meter outOfCapacity;
 
     @Override
     public void run() {
+        writtenMessages = core.metrics().meter(name(MasterCacheWorkerThread.class, "writtenMessages"));
+        outOfCapacity =  core.metrics().meter(name(MasterCacheWorkerThread.class, "FailedWritesOutOfCapacity"));
+
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                work(core.getInputCache(), core.getProcessBuffer());
+            }
+        }).start();
+
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                work(core.getOutputCache(), core.getOutputBuffer());
+            }
+        }).start();
+    }
+
+    private void work(Cache cache, Buffer targetBuffer) {
+        String cacheName = cache.getClass().getCanonicalName();;
+
         while(true) {
             try {
                 if (cache.size() > 0 && core.isProcessing()) {
                     LOG.debug("{} contains {} messages. Trying to process them.", cacheName, cache.size());
-                    
+
                     while (true) {
                         if (cache.size() <= 0) {
                             LOG.debug("Read all messages from {}.", cacheName);
                             break;
                         }
-                        
+
                         if (targetBuffer.hasCapacity() && core.isProcessing()) {
                             try {
                                 LOG.debug("Reading message from {}.", cacheName);
@@ -92,11 +94,45 @@ public class MasterCacheWorkerThread implements Runnable {
                     Thread.sleep(1000);
                 } catch(InterruptedException ex) { /* */ }
             }
-            
+
             try {
                 Thread.sleep(100);
             } catch(InterruptedException ex) { /* */ }
         }
     }
-    
+
+    @Override
+    public boolean runsForever() {
+        return false;
+    }
+
+    @Override
+    public boolean stopOnGracefulShutdown() {
+        return false;
+    }
+
+    @Override
+    public boolean masterOnly() {
+        return false;
+    }
+
+    @Override
+    public boolean startOnThisNode() {
+        return true;
+    }
+
+    @Override
+    public boolean isDaemon() {
+        return true;
+    }
+
+    @Override
+    public int getInitialDelaySeconds() {
+        return 0;
+    }
+
+    @Override
+    public int getPeriodSeconds() {
+        return 1;
+    }
 }

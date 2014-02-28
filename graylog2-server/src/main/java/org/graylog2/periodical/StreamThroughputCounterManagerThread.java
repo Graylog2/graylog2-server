@@ -24,21 +24,47 @@ import org.graylog2.Core;
 import java.util.HashMap;
 import java.util.Map;
 
-public class StreamThroughputCounterManagerThread implements Runnable {
-
-    public static final int INITIAL_DELAY = 0;
-    public static final int PERIOD = 1;
-
-    private final Core server;
-
-    public StreamThroughputCounterManagerThread(Core server) {
-        this.server = server;
-    }
+public class StreamThroughputCounterManagerThread extends Periodical {
 
     @Override
     public void run() {
         // cycleStreamThroughput clears the map already.
-        final Map<String,Counter> stringCounterMap = server.cycleStreamThroughput();
-        server.setCurrentStreamThroughput(new HashMap<String, Counter>(stringCounterMap));
+        final Map<String,Counter> stringCounterMap = core.cycleStreamThroughput();
+        core.setCurrentStreamThroughput(new HashMap<>(stringCounterMap));
+    }
+
+    @Override
+    public boolean runsForever() {
+        return false;
+    }
+
+    @Override
+    public boolean stopOnGracefulShutdown() {
+        return false;
+    }
+
+    @Override
+    public boolean masterOnly() {
+        return false;
+    }
+
+    @Override
+    public boolean startOnThisNode() {
+        return true;
+    }
+
+    @Override
+    public boolean isDaemon() {
+        return true;
+    }
+
+    @Override
+    public int getInitialDelaySeconds() {
+        return 0;
+    }
+
+    @Override
+    public int getPeriodSeconds() {
+        return 1;
     }
 }

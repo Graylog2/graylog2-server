@@ -1,6 +1,5 @@
 package org.graylog2.periodical;
 
-import org.graylog2.Core;
 import org.graylog2.cluster.Node;
 import org.graylog2.cluster.NodeNotFoundException;
 import org.graylog2.notifications.Notification;
@@ -10,17 +9,11 @@ import org.slf4j.LoggerFactory;
 /**
  * @author Dennis Oelkers <dennis@torch.sh>
  */
-public class ClusterHealthCheckThread implements  Runnable {
+public class ClusterHealthCheckThread extends Periodical {
     private static final Logger LOG = LoggerFactory.getLogger(ClusterHealthCheckThread.class);
 
     public static final int INITIAL_DELAY = 0;
     public static final int PERIOD = 20;
-
-    private final Core core;
-
-    public ClusterHealthCheckThread(Core core) {
-        this.core = core;
-    }
 
     @Override
     public void run() {
@@ -45,4 +38,40 @@ public class ClusterHealthCheckThread implements  Runnable {
 
         return notification;
     }
+
+    @Override
+    public boolean runsForever() {
+        return false;
+    }
+
+    @Override
+    public boolean isDaemon() {
+        return true;
+    }
+
+    @Override
+    public boolean stopOnGracefulShutdown() {
+        return true;
+    }
+
+    @Override
+    public boolean masterOnly() {
+        return true;
+    }
+
+    @Override
+    public boolean startOnThisNode() {
+        return true;
+    }
+
+    @Override
+    public int getInitialDelaySeconds() {
+        return 0;
+    }
+
+    @Override
+    public int getPeriodSeconds() {
+        return 20;
+    }
+
 }

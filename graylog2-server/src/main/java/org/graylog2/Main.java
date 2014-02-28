@@ -222,6 +222,11 @@ public final class Main {
             server.setStatsMode(true);
         }
 
+
+        if (!commandLineArguments.performRetention()) {
+            configuration.setPerformRetention(false);
+        }
+
         // propagate default size to input plugins
         MessageInput.setDefaultRecvBufferSize(configuration.getUdpRecvBufferSizes());
 
@@ -241,21 +246,7 @@ public final class Main {
 
         // Register initializers.
         server.initializers().register(new DroolsInitializer());
-        server.initializers().register(new HostCounterCacheWriterInitializer());
-        server.initializers().register(new ThroughputCounterInitializer());
-        server.initializers().register(new NodePingInitializer());
-        server.initializers().register(new AlarmScannerInitializer());
-        server.initializers().register(new DeflectorThreadsInitializer());
-        server.initializers().register(new AnonymousInformationCollectorInitializer());
-        if (configuration.performRetention() && commandLineArguments.performRetention()) {
-            server.initializers().register(new IndexRetentionInitializer());
-        }
-        if (commandLineArguments.isStats()) { server.initializers().register(new StatisticsPrinterInitializer()); }
-        server.initializers().register(new MasterCacheWorkersInitializer());
-        server.initializers().register(new ClusterHealthCheckInitializer());
-        server.initializers().register(new StreamThroughputCounterInitializer());
-        server.initializers().register(new VersionCheckInitializer());
-        server.initializers().register(new DeadLetterInitializer());
+        server.initializers().register(new PeriodicalsInitializer());
 
         // Register message filters. (Order is important here)
         server.registerFilter(new StaticFieldFilter());

@@ -19,7 +19,6 @@
  */
 package org.graylog2.periodical;
 
-import org.graylog2.Core;
 import org.graylog2.cluster.Node;
 import org.graylog2.cluster.NodeNotFoundException;
 import org.graylog2.notifications.Notification;
@@ -31,18 +30,9 @@ import org.slf4j.LoggerFactory;
 /**
  * @author Lennart Koopmann <lennart@torch.sh>
  */
-public class NodePingThread implements Runnable {
+public class NodePingThread extends Periodical {
 
     private static final Logger LOG = LoggerFactory.getLogger(NodePingThread.class);
-
-    public static final int INITIAL_DELAY = 0;
-    public static final int PERIOD = 1;
-
-    private final Core core;
-
-    public NodePingThread(Core core) {
-        this.core = core;
-    }
 
     @Override
     public void run() {
@@ -99,4 +89,38 @@ public class NodePingThread implements Runnable {
         }
     }
 
+    @Override
+    public boolean runsForever() {
+        return false;
+    }
+
+    @Override
+    public boolean stopOnGracefulShutdown() {
+        return false;
+    }
+
+    @Override
+    public boolean masterOnly() {
+        return false;
+    }
+
+    @Override
+    public boolean startOnThisNode() {
+        return true;
+    }
+
+    @Override
+    public boolean isDaemon() {
+        return true;
+    }
+
+    @Override
+    public int getInitialDelaySeconds() {
+        return 0;
+    }
+
+    @Override
+    public int getPeriodSeconds() {
+        return 1;
+    }
 }
