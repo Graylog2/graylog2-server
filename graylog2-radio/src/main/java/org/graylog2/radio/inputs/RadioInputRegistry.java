@@ -58,7 +58,7 @@ public class RadioInputRegistry extends InputRegistry {
     }
 
     protected MessageInput getMessageInput(InputSummaryResponse isr) {
-        MessageInput input = null;
+        MessageInput input;
         try {
             input = InputRegistry.factory(isr.type);
 
@@ -130,7 +130,7 @@ public class RadioInputRegistry extends InputRegistry {
         final UriBuilder uriBuilder = UriBuilder.fromUri(serverUrl);
         uriBuilder.path("/system/radios/" + core.getNodeId() + "/inputs");
 
-        List<InputSummaryResponse> response = null;
+        List<InputSummaryResponse> response;
         try {
             Future<Response> f = httpclient.prepareGet(uriBuilder.build().toString()).execute();
 
@@ -152,7 +152,10 @@ public class RadioInputRegistry extends InputRegistry {
         }
 
         for (InputSummaryResponse isr : response) {
-            result.add(getMessageInput(isr));
+            final MessageInput messageInput = getMessageInput(isr);
+            if (messageInput != null) {
+                result.add(messageInput);
+            }
         }
 
         return result;
