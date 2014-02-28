@@ -63,6 +63,9 @@ $(document).ready(function() {
             var row = parseInt(item.attr("data-row"));
             dashboardGrid.add_widget(item, columns, rows, col, row);
         });
+    } else {
+        $(".unlock-dashboard-widgets").hide()
+        $(".lock-dashboard-widgets").hide()
     }
 
     function applyDashboardsToAllSelectors() {
