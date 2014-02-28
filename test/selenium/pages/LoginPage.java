@@ -35,7 +35,7 @@ public class LoginPage extends FluentPage {
 
     @Override
     public String getUrl() {
-        return routes.SessionsController.index().url();
+        return routes.SessionsController.index("").url();
     }
 
     @Override
