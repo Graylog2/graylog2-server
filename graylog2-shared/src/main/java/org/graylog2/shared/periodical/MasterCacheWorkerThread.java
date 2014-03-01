@@ -102,7 +102,7 @@ public class MasterCacheWorkerThread extends Periodical {
 
     @Override
     public boolean runsForever() {
-        return false;
+        return true;
     }
 
     @Override
