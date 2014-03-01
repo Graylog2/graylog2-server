@@ -172,6 +172,20 @@ $(document).ready(function() {
             setTimeout(updateInputIO, interval);
             return;
         }
+        $(".global-input-io").each(function() {
+            var inputId = $(this).attr("data-input-id");
+            var io = $(this);
+            $.ajax({
+                url: '/a/system/inputs/global/' + encodeURIComponent(inputId) + '/io',
+                headers: { "X-Graylog2-No-Session-Extension" : "true"},
+                success: function(data) {
+                    $(".global-persec .rx", io).text(data.rx);
+                    $(".global-persec .tx", io).text(data.tx);
+                    $(".global-total .rx", io).text(data.total_rx);
+                    $(".global-total .tx", io).text(data.total_tx);
+                }
+            });
+        });
 
         $(".input-io").each(function() {
             var inputId = $(this).attr("data-input-id");
@@ -193,7 +207,6 @@ $(document).ready(function() {
                     $(".total .tx", io).data("total-tx-value", data.total_tx);
                 }
             });
-
         }).promise().done(function(){ setTimeout(updateInputIO, interval); });;
     })();
 
