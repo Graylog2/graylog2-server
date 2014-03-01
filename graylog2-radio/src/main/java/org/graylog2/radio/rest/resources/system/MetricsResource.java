@@ -24,6 +24,7 @@ import com.codahale.metrics.Meter;
 import com.codahale.metrics.Metric;
 import com.codahale.metrics.Timer;
 import com.codahale.metrics.annotation.Timed;
+import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import org.graylog2.radio.rest.resources.RestResource;
@@ -78,6 +79,53 @@ public class MetricsResource extends RestResource {
         return json(metric);
     }
 
+    @POST @Timed
+    @Path("/multiple")
+    public String multipleMetrics(MetricsReadRequest request) {
+        final Map<String, Metric> metrics = radio.metrics().getMetrics();
+
+        List<Map<String, Object>> metricsList = Lists.newArrayList();
+        if (request.metrics == null) {
+            throw new BadRequestException("Metrics cannot be empty");
+        }
+
+        for (String name : request.metrics) {
+            final Metric metric = metrics.get(name);
+            if (metric != null) {
+                metricsList.add(getMetricMap(name, metric));
+            }
+        }
+
+        Map<String, Object> result = Maps.newHashMap();
+        result.put("metrics", metricsList);
+        result.put("total", metricsList.size());
+        return json(result);
+    }
+
+    private Map<String, Object> getMetricMap(String metricName, Metric metric) {
+        String type = metric.getClass().getSimpleName().toLowerCase();
+
+        if (type.isEmpty()) {
+            type = "gauge";
+        }
+
+        Map<String, Object> metricMap = Maps.newHashMap();
+        metricMap.put("full_name", metricName);
+        metricMap.put("name", metricName.substring(metricName.lastIndexOf(".") + 1));
+        metricMap.put("type", type);
+
+        if (metric instanceof Timer) {
+            metricMap.put("metric", buildTimerMap((Timer) metric));
+        } else if(metric instanceof Meter) {
+            metricMap.put("metric", buildMeterMap((Meter) metric));
+        } else if(metric instanceof Histogram) {
+            metricMap.put("metric", buildHistogramMap((Histogram) metric));
+        } else {
+            metricMap.put("metric", metric);
+        }
+        return metricMap;
+    }
+
     @GET @Timed
     @Path("/namespace/{namespace}")
     @Produces(MediaType.APPLICATION_JSON)
@@ -129,4 +177,10 @@ public class MetricsResource extends RestResource {
         return json(result);
     }
 
+
+    @JsonAutoDetect
+    public static class MetricsReadRequest {
+
+        public String[] metrics;
+    }
 }
