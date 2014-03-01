@@ -33,6 +33,7 @@ import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.graylog2.rest.documentation.annotations.*;
 import org.graylog2.rest.resources.RestResource;
+import org.graylog2.rest.resources.system.requests.MetricsReadRequest;
 import org.graylog2.security.RestPermissions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -98,6 +99,37 @@ public class MetricsResource extends RestResource {
         return json(metric);
     }
 
+    @POST @Timed
+    @Path("/multiple")
+    @ApiOperation("Get the values of multiple metrics at once")
+    @ApiResponses(value = {
+            @ApiResponse(code = 400, message = "Malformed body")
+    })
+    public String multipleMetrics(@ApiParam(title = "Requested metrics", required = true) MetricsReadRequest request) {
+        final Map<String, Metric> metrics = core.metrics().getMetrics();
+
+        List<Map<String, Object>> metricsList = Lists.newArrayList();
+        if (request.metrics == null) {
+            throw new BadRequestException("Metrics cannot be empty");
+        }
+
+        for (String name : request.metrics) {
+            if (!isPermitted(RestPermissions.METRICS_READ, name)) {
+                continue;
+            }
+
+            final Metric metric = metrics.get(name);
+            if (metric != null) {
+                metricsList.add(getMetricMap(name, metric));
+            }
+        }
+
+        Map<String, Object> result = Maps.newHashMap();
+        result.put("metrics", metricsList);
+        result.put("total", metricsList.size());
+        return json(result);
+    }
+
     @GET @Timed
     @Path("/namespace/{namespace}")
     @ApiOperation(value = "Get all metrics of a namespace")
@@ -109,31 +141,13 @@ public class MetricsResource extends RestResource {
         List<Map<String, Object>> metrics = Lists.newArrayList();
 
         for(Map.Entry<String, Metric> e : core.metrics().getMetrics().entrySet()) {
-            if (e.getKey().startsWith(namespace) && isPermitted(RestPermissions.METRICS_READ, e.getKey())) {
+            final String metricName = e.getKey();
+            if (metricName.startsWith(namespace) && isPermitted(RestPermissions.METRICS_READ, metricName)) {
                 try {
-                    String type = e.getValue().getClass().getSimpleName().toLowerCase();
-                    String metricName = e.getKey();
+                    final Metric metric = e.getValue();
+                    Map<String, Object> metricMap = getMetricMap(metricName, metric);
 
-                    if (type.isEmpty()) {
-                        type = "gauge";
-                    }
-
-                    Map<String, Object> metric = Maps.newHashMap();
-                    metric.put("full_name", metricName);
-                    metric.put("name", metricName.substring(metricName.lastIndexOf(".") + 1));
-                    metric.put("type", type);
-
-                    if (e.getValue() instanceof Timer) {
-                        metric.put("metric", buildTimerMap((Timer) e.getValue()));
-                    } else if(e.getValue() instanceof Meter) {
-                        metric.put("metric", buildMeterMap((Meter) e.getValue()));
-                    } else if(e.getValue() instanceof Histogram) {
-                        metric.put("metric", buildHistogramMap((Histogram) e.getValue()));
-                    } else {
-                        metric.put("metric", e.getValue());
-                    }
-
-                    metrics.add(metric);
+                    metrics.add(metricMap);
                 } catch(Exception ex) {
                     LOG.warn("Could not read metric in namespace list.", ex);
                     continue;
@@ -151,6 +165,30 @@ public class MetricsResource extends RestResource {
         result.put("total", metrics.size());
 
         return json(result);
+    }
+
+    private Map<String, Object> getMetricMap(String metricName, Metric metric) {
+        String type = metric.getClass().getSimpleName().toLowerCase();
+
+        if (type.isEmpty()) {
+            type = "gauge";
+        }
+
+        Map<String, Object> metricMap = Maps.newHashMap();
+        metricMap.put("full_name", metricName);
+        metricMap.put("name", metricName.substring(metricName.lastIndexOf(".") + 1));
+        metricMap.put("type", type);
+
+        if (metric instanceof Timer) {
+            metricMap.put("metric", buildTimerMap((Timer) metric));
+        } else if(metric instanceof Meter) {
+            metricMap.put("metric", buildMeterMap((Meter) metric));
+        } else if(metric instanceof Histogram) {
+            metricMap.put("metric", buildHistogramMap((Histogram) metric));
+        } else {
+            metricMap.put("metric", metric);
+        }
+        return metricMap;
     }
 
     enum MetricType {
