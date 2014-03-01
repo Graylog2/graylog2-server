@@ -24,10 +24,13 @@ import com.google.inject.Inject;
 import lib.APIException;
 import lib.ApiClient;
 import lib.ServerNodes;
+import lib.metrics.Gauge;
+import lib.metrics.Metric;
+import models.api.requests.MultiMetricRequest;
 import models.api.requests.SystemJobTriggerRequest;
+import models.api.responses.metrics.MetricsListResponse;
 import models.api.responses.system.*;
 import models.api.responses.system.indices.IndexerFailureCountResponse;
-import models.api.responses.system.indices.IndexerFailureSummary;
 import models.api.responses.system.indices.IndexerFailuresResponse;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
@@ -46,14 +49,17 @@ public class ClusterService {
     private final ApiClient api;
     private final SystemJob.Factory systemJobFactory;
     private final ServerNodes serverNodes;
+    private final NodeService nodeService;
 
     @Inject
     private ClusterService(ApiClient api,
                            SystemJob.Factory systemJobFactory,
-                           ServerNodes serverNodes) {
+                           ServerNodes serverNodes,
+                           NodeService nodeService) {
         this.api = api;
         this.systemJobFactory = systemJobFactory;
         this.serverNodes = serverNodes;
+        this.nodeService = nodeService;
     }
 
     public void triggerSystemJob(SystemJob.Type type, User user) throws IOException, APIException {
@@ -174,5 +180,87 @@ public class ClusterService {
             t += entry.getValue().throughput;
         }
         return F.Tuple(t, responses.size());
+    }
+
+
+    // TODO duplicated
+    private long asLong(String read_bytes, Map<String, Metric> metrics) {
+        return ((Double) ((Gauge) metrics.get(read_bytes)).getValue()).longValue();
+    }
+
+    // TODO duplicated
+    private String buildNetworkIOMetricName(String base, boolean total) {
+        StringBuilder metricName = new StringBuilder(base).append("_");
+
+        if (total) {
+            metricName.append("total");
+        } else {
+            metricName.append("1sec");
+        }
+
+        return metricName.toString();
+    }
+
+    // TODO duplicated
+    private String qualifiedIOMetricName(String type, String id, String base, boolean total) {
+        return type + "." + id + "." + buildNetworkIOMetricName(base, total);
+    }
+
+    public Input.IoStats getGlobalInputIo(Input input) {
+        final Input.IoStats ioStats = new Input.IoStats();
+
+        final String inputId = input.getId();
+        final String type = input.getType();
+
+        try {
+            MultiMetricRequest request = new MultiMetricRequest();
+            final String read_bytes = qualifiedIOMetricName(type, inputId, "read_bytes", false);
+            final String read_bytes_total = qualifiedIOMetricName(type, inputId, "read_bytes", true);
+            final String written_bytes = qualifiedIOMetricName(type, inputId, "written_bytes", false);
+            final String written_bytes_total = qualifiedIOMetricName(type, inputId, "written_bytes", true);
+            request.metrics = new String[]{read_bytes, read_bytes_total, written_bytes, written_bytes_total};
+
+            final Map<Node, MetricsListResponse> results = api.post(MetricsListResponse.class)
+                    .body(request)
+                    .path("/system/metrics/multiple")
+                    .expect(200, 404)
+                    .executeOnAll();
+
+            for (MetricsListResponse response : results.values()) {
+                final Map<String, Metric> metrics = response.getMetrics();
+
+                ioStats.readBytes += asLong(read_bytes, metrics);
+                ioStats.readBytesTotal += asLong(read_bytes_total, metrics);
+                ioStats.writtenBytes += asLong(written_bytes, metrics);
+                ioStats.writtenBytesTotal += asLong(written_bytes_total, metrics);
+            }
+
+            for (Radio radio : nodeService.radios().values()) {
+                try {
+                    final MetricsListResponse radioResponse = api.post(MetricsListResponse.class)
+                            .body(request)
+                            .radio(radio)
+                            .path("/system/metrics/multiple")
+                            .expect(200, 404)
+                            .execute();
+                    final Map<String, Metric> metrics = radioResponse.getMetrics();
+
+                    ioStats.readBytes += asLong(read_bytes, metrics);
+                    ioStats.readBytesTotal += asLong(read_bytes_total, metrics);
+                    ioStats.writtenBytes += asLong(written_bytes, metrics);
+                    ioStats.writtenBytesTotal += asLong(written_bytes_total, metrics);
+                } catch (IOException e) {
+                    log.error("Unable to load metrics for radio node {}", radio.getId());
+                } catch (APIException e) {
+                    log.error("Unable to load metrics for radio node", radio.getId());
+                }
+            }
+
+        } catch (IOException e) {
+            log.error("Unable to load master node", e);
+        } catch (APIException e) {
+            log.error("Unable to load master node", e);
+        }
+        return ioStats;
     }
 }

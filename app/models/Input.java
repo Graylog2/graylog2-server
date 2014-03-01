@@ -22,10 +22,14 @@ import com.google.inject.assistedinject.Assisted;
 import com.google.inject.assistedinject.AssistedInject;
 import lib.APIException;
 import lib.ApiClient;
+import lib.metrics.Gauge;
+import lib.metrics.Metric;
 import lib.timeranges.InvalidRangeParametersException;
 import lib.timeranges.RelativeRange;
 import models.api.requests.AddStaticFieldRequest;
+import models.api.requests.MultiMetricRequest;
 import models.api.responses.metrics.GaugeResponse;
+import models.api.responses.metrics.MetricsListResponse;
 import models.api.responses.system.InputSummaryResponse;
 import models.api.results.MessageResult;
 import org.slf4j.LoggerFactory;
@@ -159,20 +163,64 @@ public class Input {
         return getGaugeValue("total_connections");
     }
 
+    @Deprecated
     public long getReadBytes() {
         return getGaugeValue(buildNetworkIOMetricName("read_bytes", false));
     }
 
+    @Deprecated
     public long getWrittenBytes() {
         return getGaugeValue(buildNetworkIOMetricName("written_bytes", false));
     }
 
+    @Deprecated
     public long getTotalReadBytes() {
         return getGaugeValue(buildNetworkIOMetricName("read_bytes", true));
     }
 
+    @Deprecated
     public long getTotalWrittenBytes() {
         return getGaugeValue(buildNetworkIOMetricName("written_bytes", true));
+    }
+
+    public IoStats getIoStats() {
+        MultiMetricRequest request = new MultiMetricRequest();
+        final String read_bytes = qualifiedIOMetricName("read_bytes", false);
+        final String read_bytes_total = qualifiedIOMetricName("read_bytes", true);
+        final String written_bytes = qualifiedIOMetricName("written_bytes", false);
+        final String written_bytes_total = qualifiedIOMetricName("written_bytes", true);
+        request.metrics = new String[] { read_bytes, read_bytes_total, written_bytes, written_bytes_total };
+        try {
+            final MetricsListResponse response = api.post(MetricsListResponse.class)
+                    .clusterEntity(node)
+                    .path("/system/metrics/multiple")
+                    .body(request)
+                    .expect(200, 404)
+                    .execute();
+
+            final Map<String,Metric> metrics = response.getMetrics();
+            final IoStats ioStats = new IoStats();
+            // these are all Gauges, if this ever changes almost everything is broken...
+            ioStats.readBytes = asLong(read_bytes, metrics);
+            ioStats.readBytesTotal = asLong(read_bytes_total, metrics);
+            ioStats.writtenBytes = asLong(written_bytes, metrics);
+            ioStats.writtenBytesTotal = asLong(written_bytes_total, metrics);
+            return ioStats;
+        } catch (APIException e) {
+            log.error("Unable to read IO metrics of input [{}]", this.id);
+        } catch (IOException e) {
+            log.error("Unable to read IO metrics of input [{}]", this.id);
+        }
+        log.debug("Returning empty iostats due to API error");
+        return new IoStats();
+    }
+
+    private long asLong(String read_bytes, Map<String, Metric> metrics) {
+        return ((Double)((Gauge)metrics.get(read_bytes)).getValue()).longValue();
+    }
+
+    private String qualifiedIOMetricName(String base, boolean total) {
+        return type + "." + id + "." + buildNetworkIOMetricName(base, total);
     }
 
     private String buildNetworkIOMetricName(String base, boolean total) {
@@ -232,5 +280,12 @@ public class Input {
     @Override
     public int hashCode() {
         return persistId.hashCode();
+    }
+
+    public static class IoStats {
+        public long readBytes;
+        public long readBytesTotal;
+        public long writtenBytes;
+        public long writtenBytesTotal;
     }
 }

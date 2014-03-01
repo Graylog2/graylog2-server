@@ -26,10 +26,13 @@ import controllers.AuthenticatedController;
 import lib.APIException;
 import lib.ApiClient;
 import lib.Tools;
+import models.ClusterService;
 import models.Input;
 import models.Node;
 import models.NodeService;
 import models.api.results.MessageResult;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import play.mvc.Result;
 
 import java.io.IOException;
@@ -39,9 +42,13 @@ import java.util.Map;
  * @author Lennart Koopmann <lennart@torch.sh>
  */
 public class InputsApiController extends AuthenticatedController {
+    private static final Logger log = LoggerFactory.getLogger(InputsApiController.class);
 
     @Inject
     private NodeService nodeService;
+
+    @Inject
+    private ClusterService clusterService;
 
     public Result io(String nodeId, String inputId) {
         try {
@@ -49,11 +56,12 @@ public class InputsApiController extends AuthenticatedController {
 
             final Node node = nodeService.loadNode(nodeId);
             final Input input = node.getInput(inputId);
+            final Input.IoStats ioStats = input.getIoStats();
 
-            result.put("total_rx", Tools.byteToHuman(input.getTotalReadBytes()));
-            result.put("total_tx", Tools.byteToHuman(input.getTotalWrittenBytes()));
-            result.put("rx", Tools.byteToHuman(input.getReadBytes()));
-            result.put("tx", Tools.byteToHuman(input.getWrittenBytes()));
+            result.put("total_rx", Tools.byteToHuman(ioStats.readBytesTotal));
+            result.put("total_tx", Tools.byteToHuman(ioStats.writtenBytesTotal));
+            result.put("rx", Tools.byteToHuman(ioStats.readBytes));
+            result.put("tx", Tools.byteToHuman(ioStats.writtenBytes));
 
             return ok(new Gson().toJson(result)).as("application/json");
         } catch (IOException e) {
@@ -63,6 +71,33 @@ public class InputsApiController extends AuthenticatedController {
         } catch (NodeService.NodeNotFoundException e) {
             return status(404, views.html.errors.error.render(ApiClient.ERROR_MSG_NODE_NOT_FOUND, e, request()));
         }
+    }
+
+    public Result globaIO(String inputId) {
+        Map<String, Object> result = Maps.newHashMap();
+
+        final Input globalInput;
+        try {
+            globalInput = nodeService.loadMasterNode().getInput(inputId);
+            if (!globalInput.getGlobal()) {
+                return badRequest();
+            }
+        } catch (IOException e) {
+            log.error("Could not load input.");
+            return internalServerError();
+        } catch (APIException e) {
+            log.error("Could not load input.");
+            return internalServerError();
+        }
+
+        final Input.IoStats ioStats = clusterService.getGlobalInputIo(globalInput);
+
+        result.put("total_rx", Tools.byteToHuman(ioStats.readBytesTotal));
+        result.put("total_tx", Tools.byteToHuman(ioStats.writtenBytesTotal));
+        result.put("rx", Tools.byteToHuman(ioStats.readBytes));
+        result.put("tx", Tools.byteToHuman(ioStats.writtenBytes));
+
+        return ok(new Gson().toJson(result)).as("application/json");
     }
 
     public Result connections(String nodeId, String inputId) {
