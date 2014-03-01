@@ -20,7 +20,6 @@
 package org.graylog2.periodical;
 
 import com.codahale.metrics.Meter;
-import org.graylog2.Core;
 import org.graylog2.inputs.Cache;
 import org.graylog2.plugin.Message;
 import org.graylog2.plugin.buffers.Buffer;
@@ -103,7 +102,7 @@ public class MasterCacheWorkerThread extends Periodical {
 
     @Override
     public boolean runsForever() {
-        return false;
+        return true;
     }
 
     @Override
