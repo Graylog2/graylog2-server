@@ -163,22 +163,18 @@ public class Input {
         return getGaugeValue("total_connections");
     }
 
-    @Deprecated
     public long getReadBytes() {
         return getGaugeValue(buildNetworkIOMetricName("read_bytes", false));
     }
 
-    @Deprecated
     public long getWrittenBytes() {
         return getGaugeValue(buildNetworkIOMetricName("written_bytes", false));
     }
 
-    @Deprecated
     public long getTotalReadBytes() {
         return getGaugeValue(buildNetworkIOMetricName("read_bytes", true));
     }
 
-    @Deprecated
     public long getTotalWrittenBytes() {
         return getGaugeValue(buildNetworkIOMetricName("written_bytes", true));
     }

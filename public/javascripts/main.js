@@ -88,15 +88,57 @@ $(document).ready(function() {
 		hash = $(this).attr("data-field-hash");
 		td = $(".result-td-" + hash);
 		th = $("#result-th-" + hash);
-
-		if ($(this).is(':checked')) {
+        var fieldname = $(this).data("field-name");
+        if ($(this).is(':checked')) {
+            console.log("adding field " + fieldname);
+            searchViewState.addField(fieldname);
 			th.show();
 			td.show();
 		} else {
-			th.hide();
+            console.log("removing field " + fieldname);
+            searchViewState.removeField(fieldname);
+            th.hide();
 			td.hide();
 		}
 	});
+
+
+    // initialize searchViewState from query fragment if present (for bookmarks and link sharing of a current page)
+    (function(){
+        var uri = new URI();
+        var fragment = uri.fragment(true);
+        if (fragment["fields"] !== undefined) {
+            if (fragment["fields"].length > 0) {
+                var fields = fragment["fields"].split(",");
+                for (var i = 0; i < fields.length; i++) {
+                    $(".field-selector[data-field-name="+fields[i]+"]").each(function(){
+                        if (!$(this).is(":checked")) {
+                            $(this).trigger("click"); // tick the checkbox if it wasn't checked before
+                        }
+                    });
+                }
+            }
+        }
+    })();
+    // turn on all pre-selected fields
+    $(".field-selector[checked]").each(function() {
+        searchViewState.addField($(this).data("field-name"));
+    });
+
+    $(".search-view-state").click(function(e) {
+        var fields = searchViewState.getFieldsString();
+        if (fields === undefined || fields.length === 0) {
+            // don't add the fields parameter if nothing is field in
+            return true;
+        }
+        // replace the href with our version containing the selected fields
+        var href = $(this).attr("href");
+        console.log(href);
+        var uri = new URI(href);
+        var existing = uri.removeQuery("fields");
+        uri.addQuery("fields", fields);
+        $(this).attr("href", uri.toString());
+    });
 
     // Call resizedWindow() only at end of resize event so we do not trigger all the time while resizing.
     var resizeMutex;
@@ -573,13 +615,13 @@ $(document).ready(function() {
             ajaxUrl: '/a/system/indices/failures/dynatable',
             ajaxOnLoad: true,
             records: [],
-            perPageDefault: 50,
+            perPageDefault: 50
         },
         features: {
             sort: false,
             pushState: true,
             search: false
-        },
+        }
     });
 
     // Show sort order icons on message table hover.
@@ -674,7 +716,9 @@ $(document).ready(function() {
     })();
 
     function onResizedWindow(){
-        drawResultGraph();
+        if(typeof drawResultGraph != "undefined") {
+            drawResultGraph();
+        }
 
         for (var field in fieldGraphs) {
             fieldGraphs[field].configure({ width: $("#main-content").width()-12 });
@@ -840,7 +884,9 @@ function hideSidebar() {
     $("#main-content").addClass("span12");
 
     // Rebuild search result graph. (only doing something is there is one)
-    drawResultGraph();
+    if(typeof drawResultGraph != "undefined") {
+        drawResultGraph();
+    }
 }
 
 function originalUniversalSearchSettings() {
@@ -929,3 +975,33 @@ fieldGraphs = {};
 
 // All dashboards.
 globalDashboards = {};
+
+// contains selected fields etc
+searchViewState = {
+    fields: {},
+
+    addField: function(name) {
+        this.fields[name] = true;
+        this.updateFragment();
+    },
+    removeField: function(name) {
+        delete this.fields[name];
+        this.updateFragment();
+    },
+    setSelectedFields: function(fieldsArray) {
+        console.log(fieldsArray);
+        for (var idx = 0; idx < fieldsArray.length; idx++) {
+            this.fields[fieldsArray[idx]] = true;
+        }
+        console.log(this.fields);
+        this.updateFragment();
+    },
+    getFieldsString: function() {
+        return Object.keys(this.fields).sort().join(",");
+    },
+    updateFragment: function() {
+        var uri = new URI();
+        uri.fragment({fields: this.getFieldsString()});
+        document.location.href = uri.toString();
+    }
+};

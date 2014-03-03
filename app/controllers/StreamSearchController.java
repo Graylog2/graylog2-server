@@ -11,6 +11,7 @@ import models.api.results.SearchResult;
 import play.mvc.Result;
 
 import java.io.IOException;
+import java.util.Set;
 
 /**
  * @author Dennis Oelkers <dennis@torch.sh>
@@ -19,7 +20,15 @@ public class StreamSearchController extends SearchController {
     @Inject
     private StreamService streamService;
 
-    public Result index(String streamId, String q, String rangeType, int relative, String from, String to, String keyword, String interval, int page, String savedSearchId, String sortField, String sortOrder) {
+    public Result index(String streamId,
+                        String q,
+                        String rangeType, int relative,
+                        String from, String to,
+                        String keyword, String interval,
+                        int page,
+                        String savedSearchId,
+                        String sortField, String sortOrder,
+                        String fields) {
         SearchSort sort = buildSearchSort(sortField, sortOrder);
 
         Stream stream;
@@ -58,6 +67,7 @@ public class StreamSearchController extends SearchController {
         SearchResult searchResult;
         DateHistogramResult histogramResult;
         SavedSearch savedSearch;
+        Set<String> selectedFields = getSelectedFields(fields);
         try {
             if(savedSearchId != null && !savedSearchId.isEmpty()) {
                 savedSearch = savedSearchService.get(savedSearchId);
@@ -72,7 +82,7 @@ public class StreamSearchController extends SearchController {
 
             searchResult = search.search();
             if (searchResult.getError() != null) {
-                return ok(views.html.search.queryerror.render(currentUser(), q, searchResult, savedSearch, stream));
+                return ok(views.html.search.queryerror.render(currentUser(), q, searchResult, savedSearch, fields, stream));
             }
             searchResult.setAllFields(getAllFields());
 
@@ -85,9 +95,9 @@ public class StreamSearchController extends SearchController {
         }
 
         if (searchResult.getTotalResultCount() > 0) {
-            return ok(views.html.search.results.render(currentUser(), search, searchResult, histogramResult, q, page, savedSearch, stream));
+            return ok(views.html.search.results.render(currentUser(), search, searchResult, histogramResult, q, page, savedSearch, selectedFields, stream));
         } else {
-            return ok(views.html.search.noresults.render(currentUser(), q, searchResult, savedSearch, stream));
+            return ok(views.html.search.noresults.render(currentUser(), q, searchResult, savedSearch, selectedFields, stream));
         }
     }
 

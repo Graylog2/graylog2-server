@@ -201,6 +201,7 @@ public class UniversalSearch {
         String to = Tools.stringSearchParamOrEmpty(request, "to");
         String keyword = Tools.stringSearchParamOrEmpty(request, "keyword");
         String interval = Tools.stringSearchParamOrEmpty(request, "interval");
+        String fields = Tools.stringSearchParamOrEmpty(request, "fields");
 
         // TODO we desperately need to pass the streamid and then build the filter here, instead of passing the filter and then trying to reassemble the streamid.
         if (filter != null && filter.startsWith("streams:")) {
@@ -216,7 +217,8 @@ public class UniversalSearch {
                     page,
                     "",
                     sortField,
-                    sortOrder
+                    sortOrder,
+                    fields
             );
         } else {
             return routes.SearchController.index(
@@ -230,7 +232,8 @@ public class UniversalSearch {
                     page,
                     "",
                     sortField,
-                    sortOrder
+                    sortOrder,
+                    fields
             );
         }
     }

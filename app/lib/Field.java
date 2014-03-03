@@ -18,20 +18,19 @@
  */
 package lib;
 
+import com.google.common.collect.ImmutableSet;
+import org.apache.commons.codec.binary.Hex;
+
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.Set;
-
-import org.apache.commons.codec.binary.Hex;
-
-import com.google.common.collect.ImmutableSet;
 
 public class Field {
 
 	private final String name;
 	private final String hash;
 	
-	private final static Set<String> STANDARD_SELECTED_FIELDS = ImmutableSet.of(
+	public final static Set<String> STANDARD_SELECTED_FIELDS = ImmutableSet.of(
 			"source",
 			"message"
 	);
@@ -60,5 +59,5 @@ public class Field {
 	public boolean isStandardSelected() {
 		return STANDARD_SELECTED_FIELDS.contains(name);
 	}
-	
+
 }

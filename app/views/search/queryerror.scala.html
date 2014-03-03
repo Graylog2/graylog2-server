@@ -1,4 +1,4 @@
-@(currentUser: User, query: String, searchResult: models.api.results.SearchResult, savedSearch: SavedSearch)(implicit stream: Stream)
+@(currentUser: User, query: String, searchResult: models.api.results.SearchResult, savedSearch: SavedSearch, fields: String)(implicit stream: Stream)
 
 @import views.helpers.QueryErrorHelper
 @import models.api.responses.SearchResultResponse.GenericError

@@ -1,5 +1,6 @@
 
-@(currentUser: User, search: UniversalSearch, searchResult: models.api.results.SearchResult, histogram: models.api.results.DateHistogramResult, query: String, page: Integer, savedSearch: SavedSearch)(implicit stream: Stream)
+@(currentUser: User, search: UniversalSearch, searchResult: models.api.results.SearchResult, histogram: models.api.results.DateHistogramResult, query: String, page: Integer, savedSearch: SavedSearch, selectedFields: java.util.Set[String])(implicit stream: Stream)
+
 @import lib.security.RestPermissions
 @import views.helpers.DateHistogramResolutionSelector
 @import views.helpers.Permissions
@@ -46,7 +47,7 @@
     }
 }
 
-@main("Search results", sidebars.searchresults(searchResult, streamId), query, currentUser) {
+@main("Search results", sidebars.searchresults(searchResult, streamId, selectedFields), query, currentUser) {
 
 <span id="original-search-query" style="display: none;">@searchResult.getOriginalQuery</span>
 <span id="original-search-timerange" style="display: none;">@searchResult.getTimeRange</span>
@@ -325,20 +326,23 @@
                 @views.html.search.partials.column_sorter.render("timestamp", search, page)
             </th>
 
-			<th style="width: 180px;" id="result-th-36cd38f49b9afa08222c0dc9ebfe35eb">
+			<th style="width: 180px;
+                @if(!(selectedFields.contains("source") || search.getOrder.getField.equals("source"))) { display: none;}"
+                    id="result-th-36cd38f49b9afa08222c0dc9ebfe35eb">
                 Source
                 @views.html.search.partials.column_sorter.render("source", search, page)
             </th>
 
-			<th id="result-th-78e731027d8fd50ed642340b7c9a63b3">
+			<th style="@if(!(selectedFields.contains("message") || search.getOrder.getField.equals("message"))) { display: none;}"
+            id="result-th-78e731027d8fd50ed642340b7c9a63b3">
                 Message
                 @views.html.search.partials.column_sorter.render("message", search, page)
             </th>
 			
 			@for(f <- searchResult.getPageFields()) {
-				@if(!f.isStandardSelected()) {
-					<th id="result-th-@f.getHash"
-                        @if(!search.getOrder.getField.equals(f.getName)) { style="display: none;" }
+                @if(!f.isStandardSelected) {
+                    <th id="result-th-@f.getHash"
+                        @if(!(selectedFields.contains(f.getName) || search.getOrder.getField.equals(f.getName))) { style="display: none;" }
                     >
                         @f.getName
                         @views.html.search.partials.column_sorter.render(f.getName, search, page)
@@ -351,13 +355,15 @@
 		@for(r <- searchResult.getMessages()) {
 		<tr data-message-id='@r.getFields.get("_id")' data-source-index="@r.getIndex">
 			<td>@DateTools.inUserTimeZoneShortFormat(r.getTimestamp)</td>
-			<td class="result-td-36cd38f49b9afa08222c0dc9ebfe35eb">@r.getFields.get("source")</td>
-			<td class="messages-message result-td-78e731027d8fd50ed642340b7c9a63b3">@r.getFields.get("message")</td>
+			<td @if(!(selectedFields.contains("source") || search.getOrder.getField.equals("source"))) { style="display: none;" }
+                class="result-td-36cd38f49b9afa08222c0dc9ebfe35eb">@r.getFields.get("source")</td>
+			<td @if(!(selectedFields.contains("message") || search.getOrder.getField.equals("message"))) { style="display: none;" }
+                class="messages-message result-td-78e731027d8fd50ed642340b7c9a63b3">@r.getFields.get("message")</td>
 			
 			@for(f <- searchResult.getPageFields()) {
-				@if(!f.isStandardSelected()) {
+                @if(!f.isStandardSelected) {
 					<td class="result-td-@f.getHash()"
-                        @if(!search.getOrder.getField.equals(f.getName)) { style="display: none;" }
+                        @if(!(selectedFields.contains(f.getName) || search.getOrder.getField.equals(f.getName))) { style="display: none;" }
                     >
                     @r.getFormattedFields.get(f.getName)
                     </td>
@@ -375,37 +381,37 @@
         @if(page == 1){
             <li class="disabled"><a href="#">Previous</a></li>
         } else {
-            <li><a href="@route(page-1)">Previous</a></li>
+            <li><a class="search-view-state" href="@route(page-1)">Previous</a></li>
         }
 
         @if(page < paginatorLength()) {
             <li class="disabled"><a href="#">&laquo;</a></li>
         } else {
             @if(lowestPage()-paginatorLength() <= 0) {
-                <li><a href="@route(1)">&laquo;</a></li>
+                <li><a class="search-view-state" href="@route(1)">&laquo;</a></li>
             } else {
-                <li><a href="@route(lowestPage()-paginatorLength())">&laquo;</a></li>
+                <li><a class="search-view-state" href="@route(lowestPage()-paginatorLength())">&laquo;</a></li>
             }
         }
 
         @for(i <- lowestPage().max(1) until page) {
-            <li><a href="@route(i)">@i</a></li>
+            <li><a class="search-view-state" href="@route(i)">@i</a></li>
         }
 
-        <li class="active"><a href="#">@page</a></li>
+        <li class="active"><a class="search-view-state" href="#">@page</a></li>
 
         @for(i <- page+1 to highestPage()) {
-            <li><a href="@route(i)">@i</a></li>
+            <li><a class="search-view-state" href="@route(i)">@i</a></li>
         }
 
         @if(highestPage() * UniversalSearch.PER_PAGE <= searchResult.getTotalResultCount && highestPage() > page && page * UniversalSearch.PER_PAGE != searchResult.getTotalResultCount) {
-            <li><a href="@route(highestPage())">&raquo;</a></li>
+            <li><a class="search-view-state" href="@route(highestPage())">&raquo;</a></li>
         } else {
             <li class="disabled"><a href="#">&raquo;</a></li>
         }
 
         @if(page < highestPage()) {
-            <li><a href="@route(page+1)">Next</a></li>
+            <li><a class="search-view-state" href="@route(page+1)">Next</a></li>
         } else {
             <li class="disabled"><a href="#">Next</a></li>
 

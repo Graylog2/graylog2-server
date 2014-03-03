@@ -109,7 +109,8 @@ public class SavedSearchesController extends AuthenticatedController {
                     0,
                     searchId,
                     "",
-                    ""
+                    "",
+                    ""  // TODO fields
             );
         } else {
             return routes.StreamSearchController.index(
@@ -124,7 +125,8 @@ public class SavedSearchesController extends AuthenticatedController {
                     0,
                     searchId,
                     "",
-                    ""
+                    "",
+                    "" // TODO fields
             );
         }
     }
