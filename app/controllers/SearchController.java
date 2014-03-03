@@ -18,7 +18,10 @@
  */
 package controllers;
 
+import com.google.common.base.Splitter;
+import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
+import com.google.common.collect.Sets;
 import com.google.common.net.MediaType;
 import com.google.inject.Inject;
 import lib.APIException;
@@ -36,6 +39,7 @@ import views.helpers.Permissions;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.Set;
 
 public class SearchController extends AuthenticatedController {
 
@@ -50,14 +54,25 @@ public class SearchController extends AuthenticatedController {
 
     public Result globalSearch() {
         // User would not be allowed to do any global searches anyway, so we can redirect him to the streams page to avoid confusion.
-        if (Permissions.isPermitted(RestPermissions.SEARCHES_ABSOLUTE) || Permissions.isPermitted(RestPermissions.SEARCHES_RELATIVE) || Permissions.isPermitted(RestPermissions.SEARCHES_KEYWORD)) {
+        if (Permissions.isPermitted(RestPermissions.SEARCHES_ABSOLUTE)
+                || Permissions.isPermitted(RestPermissions.SEARCHES_RELATIVE)
+                || Permissions.isPermitted(RestPermissions.SEARCHES_KEYWORD)) {
             return ok(views.html.search.global.render(currentUser()));
         } else {
             return redirect(routes.StreamsController.index());
         }
     }
 
-    public Result index(String q, String rangeType, int relative, String from, String to, String keyword, String interval, int page, String savedSearchId, String sortField, String sortOrder) {
+    public Result index(String q,
+                        String rangeType,
+                        int relative,
+                        String from, String to,
+                        String keyword,
+                        String interval,
+                        int page,
+                        String savedSearchId,
+                        String sortField, String sortOrder,
+                        String fields) {
         SearchSort sort = buildSearchSort(sortField, sortOrder);
 
         UniversalSearch search;
@@ -72,6 +87,7 @@ public class SearchController extends AuthenticatedController {
         SearchResult searchResult;
         DateHistogramResult histogramResult;
         SavedSearch savedSearch;
+        Set<String> selectedFields = getSelectedFields(fields);
         try {
             if(savedSearchId != null && !savedSearchId.isEmpty()) {
                 savedSearch = savedSearchService.get(savedSearchId);
@@ -86,7 +102,7 @@ public class SearchController extends AuthenticatedController {
 
             searchResult = search.search();
             if (searchResult.getError() != null) {
-                return ok(views.html.search.queryerror.render(currentUser(), q, searchResult, savedSearch, null));
+                return ok(views.html.search.queryerror.render(currentUser(), q, searchResult, savedSearch, fields, null));
             }
             searchResult.setAllFields(getAllFields());
 
@@ -99,10 +115,20 @@ public class SearchController extends AuthenticatedController {
         }
 
         if (searchResult.getTotalResultCount() > 0) {
-            return ok(views.html.search.results.render(currentUser(), search, searchResult, histogramResult, q, page, savedSearch, null));
+            return ok(views.html.search.results.render(currentUser(), search, searchResult, histogramResult, q, page, savedSearch, selectedFields, null));
         } else {
-            return ok(views.html.search.noresults.render(currentUser(), q, searchResult, savedSearch, null));
+            return ok(views.html.search.noresults.render(currentUser(), q, searchResult, savedSearch, selectedFields, null));
         }
+    }
+
+    protected Set<String> getSelectedFields(String fields) {
+        Set<String> selectedFields = Sets.newHashSet();
+        if (fields != null && !fields.isEmpty()) {
+            Iterables.addAll(selectedFields, Splitter.on(',').split(fields));
+        } else {
+            selectedFields.addAll(Field.STANDARD_SELECTED_FIELDS);
+        }
+        return selectedFields;
     }
 
     public Result exportAsCsv(String q, String filter, String rangeType, int relative, String from, String to, String keyword) {

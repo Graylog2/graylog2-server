@@ -1,4 +1,4 @@
-@(field: lib.Field, streamId: String)
+@(field: lib.Field, streamId: String, selectedFields: Set[String])
 
 <i class="icon icon-cog open-analyze-field"></i>
 &nbsp;
@@ -7,7 +7,8 @@
 id="field-selector-@field.getHash"
 class="field-selector"
 data-field-hash="@field.getHash"
-@if(field.isStandardSelected) { checked="checked" }
+data-field-name="@field.getName"
+@if(selectedFields.contains(field.getName)) { checked="checked" }
 />
 
 <label for="field-selector-@field.getHash" class="field-name">@field.getName()</label>

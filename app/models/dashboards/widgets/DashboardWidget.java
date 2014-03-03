@@ -25,13 +25,11 @@ import lib.ApiClient;
 import lib.DateTools;
 import lib.timeranges.InvalidRangeParametersException;
 import lib.timeranges.TimeRange;
-import models.Stream;
 import models.api.requests.dashboards.WidgetUpdateRequest;
 import models.api.responses.dashboards.DashboardWidgetResponse;
 import models.api.responses.dashboards.DashboardWidgetValueResponse;
 import models.dashboards.Dashboard;
 import org.joda.time.DateTime;
-import play.Logger;
 import play.mvc.Call;
 
 import java.io.IOException;
@@ -230,7 +228,8 @@ public abstract class DashboardWidget {
                 0,
                 "",
                 "",
-                ""
+                "",
+                "" // TODO fields
         );
     }
 
@@ -247,7 +246,8 @@ public abstract class DashboardWidget {
                 0,
                 "",
                 "",
-                ""
+                "",
+                "" // TODO fields
         );
     }
 

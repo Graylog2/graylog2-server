@@ -1,4 +1,4 @@
-@(searchResult: models.api.results.SearchResult, streamId: String)
+@(searchResult: models.api.results.SearchResult, streamId: String, selectedFields: Set[String])
 
 <h2>
 	<i class="icon-search"></i>
@@ -38,13 +38,13 @@
             <ul class="search-result-fields" data-selected="page">
                 @for(f <- searchResult.getPageFields().sortBy(_.getName)) {
                     <li class="search-result-field-type page">
-                        @views.html.sidebars.partials.search_result_field.render(f, streamId)
+                        @views.html.sidebars.partials.search_result_field.render(f, streamId, selectedFields)
                     </li>
                 }
 
                 @for(f <- searchResult.getAllFields().sortBy(_.getName)) {
                     <li class="search-result-field-type all" style="display: none;">
-                        @views.html.sidebars.partials.search_result_field.render(f, streamId)
+                        @views.html.sidebars.partials.search_result_field.render(f, streamId, selectedFields)
                     </li>
                 }
             </ul>

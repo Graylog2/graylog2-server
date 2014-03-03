@@ -53,7 +53,7 @@ public class Startpage {
     public Call getCall() {
         switch (type) {
             case STREAM:
-                return routes.StreamSearchController.index(id, "*", "relative", 3600, "", "", "", "", 0, "", "", "");
+                return routes.StreamSearchController.index(id, "*", "relative", 3600, "", "", "", "", 0, "", "", "", ""); // TODO fields
             case DASHBOARD:
                 return routes.DashboardsController.show(id);
             default:
