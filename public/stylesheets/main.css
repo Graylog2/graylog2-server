@@ -1896,3 +1896,9 @@ hr.search-result-head-separator {
     position: relative;
     top: -10px;
 }
+
+.zeroclipboard-is-hover {
+    color: #26ADE4;
+    cursor: move;
+}
+.zeroclipboard-is-active { color: #1a5273; }

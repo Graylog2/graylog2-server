@@ -8,11 +8,17 @@
     </div>
 
     <h2>
-        <i class="icon icon-envelope"></i>
+        <i class="icon icon-envelope copy-clipboard" data-clipboard-text="@message.getId" data-toggle="tooltip" data-initial-title="Copy Id" data-trigger="manual"></i>
         <a href="@routes.MessagesController.show(message.getIndex, message.getId)">
             @message.getId
         </a>
     </h2>
+    <script>
+        // this html is loaded via ajax, so we need to activate the clipboard plugin
+        $(document).ready(function() {
+            clipBoardClient.clip($(".copy-clipboard"));
+        });
+    </script>
 
     Received by
     @if(sourceInput != null) {

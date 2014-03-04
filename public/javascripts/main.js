@@ -1,6 +1,27 @@
 $(document).ready(function() {
 
-	// Opening messages in sidebar with click in message result table.
+    ZeroClipboard.config( { moviePath: "/assets/images/ZeroClipboard.swf" } );
+    clipBoardClient = new ZeroClipboard($(".copy-clipboard"));
+
+    clipBoardClient.on( 'mouseover', function(client, args) {
+        $(this)
+            .attr('data-original-title', $(this).attr('data-initial-title'))
+            .tooltip({delay: { show: 0, hide: 0 }})
+            .tooltip('fixTitle')
+            .tooltip('show');
+    });
+    clipBoardClient.on( 'mouseout', function(client, args) {
+        $(this).tooltip('hide');
+    });
+    clipBoardClient.on( 'complete', function(client, args) {
+        $(this).tooltip('destroy');
+        $(this).attr('data-original-title', "Copied.")
+            .tooltip({delay: { show: 0, hide: 250 }})
+            .tooltip('fixTitle')
+            .tooltip('show');
+    });
+
+    // Opening messages in sidebar with click in message result table.
 	$(".messages tbody > tr").bind("click", function() {
 		messageId = $(this).attr("data-message-id");
 		index = $(this).attr("data-source-index");
@@ -133,9 +154,8 @@ $(document).ready(function() {
         }
         // replace the href with our version containing the selected fields
         var href = $(this).attr("href");
-        console.log(href);
         var uri = new URI(href);
-        var existing = uri.removeQuery("fields");
+        uri.removeQuery("fields");
         uri.addQuery("fields", fields);
         $(this).attr("href", uri.toString());
     });
@@ -970,6 +990,8 @@ function parseDateFromString(src) {
     return new Date(parts[1], parts[2]-1, parts[3], parts[4], parts[5], parts[6], millis);
 }
 
+clipBoardClient = {};
+
 // This is holding all field graphs.
 fieldGraphs = {};
 
@@ -989,11 +1011,9 @@ searchViewState = {
         this.updateFragment();
     },
     setSelectedFields: function(fieldsArray) {
-        console.log(fieldsArray);
         for (var idx = 0; idx < fieldsArray.length; idx++) {
             this.fields[fieldsArray[idx]] = true;
         }
-        console.log(this.fields);
         this.updateFragment();
     },
     getFieldsString: function() {
