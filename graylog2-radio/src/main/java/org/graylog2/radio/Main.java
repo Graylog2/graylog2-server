@@ -148,6 +148,18 @@ public class Main extends NodeRunner {
             System.exit(1);
         }
 
+        // Register inputs. (find an automatic way here (annotations?) and do the same in graylog2-server.Main
+        radio.inputs().register(SyslogUDPInput.class, SyslogUDPInput.NAME);
+        radio.inputs().register(SyslogTCPInput.class, SyslogTCPInput.NAME);
+        radio.inputs().register(RawUDPInput.class, RawUDPInput.NAME);
+        radio.inputs().register(RawTCPInput.class, RawTCPInput.NAME);
+        radio.inputs().register(GELFUDPInput.class, GELFUDPInput.NAME);
+        radio.inputs().register(GELFTCPInput.class, GELFTCPInput.NAME);
+        radio.inputs().register(GELFHttpInput.class, GELFHttpInput.NAME);
+        radio.inputs().register(FakeHttpMessageInput.class, FakeHttpMessageInput.NAME);
+        radio.inputs().register(LocalMetricsInput.class, LocalMetricsInput.NAME);
+        radio.inputs().register(JsonPathInput.class, JsonPathInput.NAME);
+
         // Try loading persisted inputs. Retry until server connection succeeds.
         while(true) {
             try {
@@ -162,18 +174,6 @@ public class Main extends NodeRunner {
                 }
             }
         }
-
-        // Register inputs. (find an automatic way here (annotations?) and do the same in graylog2-server.Main
-        radio.inputs().register(SyslogUDPInput.class, SyslogUDPInput.NAME);
-        radio.inputs().register(SyslogTCPInput.class, SyslogTCPInput.NAME);
-        radio.inputs().register(RawUDPInput.class, RawUDPInput.NAME);
-        radio.inputs().register(RawTCPInput.class, RawTCPInput.NAME);
-        radio.inputs().register(GELFUDPInput.class, GELFUDPInput.NAME);
-        radio.inputs().register(GELFTCPInput.class, GELFTCPInput.NAME);
-        radio.inputs().register(GELFHttpInput.class, GELFHttpInput.NAME);
-        radio.inputs().register(FakeHttpMessageInput.class, FakeHttpMessageInput.NAME);
-        radio.inputs().register(LocalMetricsInput.class, LocalMetricsInput.NAME);
-        radio.inputs().register(JsonPathInput.class, JsonPathInput.NAME);
 
         LOG.info("Graylog2 Radio up and running.");
 

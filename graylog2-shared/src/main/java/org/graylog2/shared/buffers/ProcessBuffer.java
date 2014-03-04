@@ -75,9 +75,6 @@ public class ProcessBuffer extends Buffer {
 
     private final MetricRegistry metricRegistry;
 
-    @Inject
-    ProcessBufferProcessor.Factory processBufferProcessorFactory;
-
     @AssistedInject
     public ProcessBuffer(MetricRegistry metricRegistry,
                          @Assisted GraylogServer server,
@@ -101,7 +98,7 @@ public class ProcessBuffer extends Buffer {
         }
     }
 
-    public void initialize(int ringBufferSize, WaitStrategy waitStrategy, int processBufferProcessors) {
+    public void initialize(ProcessBufferProcessor[] processors, int ringBufferSize, WaitStrategy waitStrategy, int processBufferProcessors) {
         Disruptor disruptor = new Disruptor<MessageEvent>(
                 MessageEvent.EVENT_FACTORY,
                 ringBufferSize,
@@ -114,13 +111,6 @@ public class ProcessBuffer extends Buffer {
                 + "and wait strategy <{}>.", ringBufferSize,
                 waitStrategy.getClass().getSimpleName());
 
-        ProcessBufferProcessor[] processors = new ProcessBufferProcessor[processBufferProcessors];
-        
-        for (int i = 0; i < processBufferProcessors; i++) {
-            //processors[i] = new ProcessBufferProcessor(this.server, i, processBufferProcessors);
-            processors[i] = processBufferProcessorFactory.create(this.server, i, processBufferProcessors);
-        }
-        
         disruptor.handleEventsWith(processors);
         
         ringBuffer = disruptor.start();

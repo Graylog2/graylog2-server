@@ -24,6 +24,7 @@ import com.beust.jcommander.internal.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import org.graylog2.plugin.InputHost;
+import org.graylog2.plugin.Tools;
 import org.graylog2.plugin.configuration.ConfigurationException;
 import org.graylog2.plugin.inputs.InputState;
 import org.graylog2.plugin.inputs.MessageInput;
@@ -112,6 +113,20 @@ public abstract class InputRegistry {
     protected void handleLaunchException(Throwable e, MessageInput input, InputState inputState) {
         StringBuilder msg = new StringBuilder("The [" + input.getClass().getCanonicalName() + "] input with ID <" + input.getId() + "> misfired. Reason: ");
 
+        String causeMsg = extractMessageCause(e);
+
+        msg.append(causeMsg);
+
+        LOG.error(msg.toString(), e);
+
+        // Clean up.
+        //cleanInput(input);
+
+        inputState.setState(InputState.InputStateType.FAILED);
+        inputState.setDetailedMessage(causeMsg);
+    }
+
+    private String extractMessageCause(Throwable e) {
         StringBuilder causeMsg = new StringBuilder(e.getMessage());
 
         // Go down the whole cause chain to build a message that provides as much information as possible.
@@ -125,16 +140,7 @@ public abstract class InputRegistry {
             causeMsg.append(", ").append(cause.getMessage());
             cause = cause.getCause();
         }
-
-        msg.append(causeMsg);
-
-        LOG.error(msg.toString(), e);
-
-        // Clean up.
-        //cleanInput(input);
-
-        inputState.setDetailedMessage(causeMsg.toString());
-        inputState.setState(InputState.InputStateType.FAILED);
+        return causeMsg.toString();
     }
 
     public String launch(final MessageInput input) {

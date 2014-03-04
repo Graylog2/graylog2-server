@@ -28,6 +28,8 @@ import com.github.joschi.jadconfig.JadConfig;
 import com.github.joschi.jadconfig.RepositoryException;
 import com.github.joschi.jadconfig.ValidationException;
 import com.github.joschi.jadconfig.repositories.PropertiesRepository;
+import com.google.common.collect.Lists;
+import com.google.common.collect.Sets;
 import com.google.inject.Guice;
 import com.google.inject.Injector;
 import com.google.inject.Module;
@@ -56,6 +58,7 @@ import org.graylog2.plugin.Tools;
 import org.graylog2.plugin.initializers.InitializerConfigurationException;
 import org.graylog2.plugin.inputs.MessageInput;
 import org.graylog2.plugins.PluginInstaller;
+import org.graylog2.shared.BaseConfiguration;
 import org.graylog2.shared.NodeRunner;
 import org.graylog2.shared.filters.FilterRegistry;
 import org.graylog2.system.activities.Activity;
@@ -66,7 +69,10 @@ import org.slf4j.bridge.SLF4JBridgeHandler;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.Writer;
+import java.lang.reflect.Field;
+import java.util.Arrays;
 import java.util.List;
+import java.util.Set;
 
 /**
  * Main class of Graylog2.
@@ -306,6 +312,7 @@ public final class Main extends NodeRunner {
             LOG.error("Invalid configuration", e);
             System.exit(1);
         }
+
         return configuration;
     }
 

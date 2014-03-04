@@ -72,7 +72,7 @@ public class RadioInputRegistry extends InputRegistry {
 
             input.checkConfiguration();
         } catch (NoSuchInputTypeException e) {
-            LOG.warn("Cannot launch persisted input. No such type [{}].", isr.type);
+            LOG.warn("Cannot launch persisted input. No such type [{}]. Error: {}", isr.type, e);
             return null;
         } catch (ConfigurationException e) {
             LOG.error("Missing or invalid input input configuration.", e);
@@ -82,7 +82,7 @@ public class RadioInputRegistry extends InputRegistry {
     }
 
     // TODO make this use a generic ApiClient class that knows the graylog2-server node address(es) or something.
-    public void registerInCluster(MessageInput input) throws ExecutionException, InterruptedException, IOException {
+    public RegisterInputResponse registerInCluster(MessageInput input) throws ExecutionException, InterruptedException, IOException {
         final UriBuilder uriBuilder = UriBuilder.fromUri(serverUrl);
         uriBuilder.path("/system/radios/" + core.getNodeId() + "/inputs");
 
@@ -109,6 +109,8 @@ public class RadioInputRegistry extends InputRegistry {
         if (r.getStatusCode() != 201) {
             throw new RuntimeException("Expected HTTP response [201] for input registration but got [" + r.getStatusCode() + "].");
         }
+
+        return response;
     }
 
     public void unregisterInCluster(MessageInput input) throws ExecutionException, InterruptedException, IOException {
@@ -154,6 +156,7 @@ public class RadioInputRegistry extends InputRegistry {
         for (InputSummaryResponse isr : response) {
             final MessageInput messageInput = getMessageInput(isr);
             if (messageInput != null) {
+                messageInput.setPersistId(isr.id);
                 result.add(messageInput);
             }
         }
@@ -163,14 +166,6 @@ public class RadioInputRegistry extends InputRegistry {
 
     @Override
     protected void finishedLaunch(InputState state) {
-        MessageInput input = state.getMessageInput();
-        if (input.getPersistId() != null) {
-            try {
-                registerInCluster(input);
-            } catch (Exception e) {
-                LOG.error("Could not register input in Graylog2 cluster. It will be lost on next restart of this radio node.");
-            }
-        }
     }
 
     @Override
@@ -188,5 +183,20 @@ public class RadioInputRegistry extends InputRegistry {
         }
 
         LOG.info("Unregistered input [" + input.getName() + "] on server cluster.");
+    }
+
+    @Override
+    public String launch(MessageInput input, String id, boolean register) {
+        if (register) {
+            try {
+                final RegisterInputResponse response = registerInCluster(input);
+                if (response != null)
+                    input.setPersistId(response.persistId);
+            } catch (Exception e) {
+                LOG.error("Could not register input in Graylog2 cluster. It will be lost on next restart of this radio node.");
+                return null;
+            }
+        }
+        return super.launch(input, id, register);
     }
 }

@@ -27,7 +27,6 @@ import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import com.google.inject.Inject;
 import com.ning.http.client.AsyncHttpClient;
 import com.ning.http.client.AsyncHttpClientConfig;
-import org.cliffc.high_scale_lib.Counter;
 import org.glassfish.hk2.utilities.binding.AbstractBinder;
 import org.glassfish.jersey.server.ContainerFactory;
 import org.glassfish.jersey.server.ResourceConfig;
@@ -46,12 +45,14 @@ import org.graylog2.plugin.indexer.MessageGateway;
 import org.graylog2.plugin.rest.AnyExceptionClassMapper;
 import org.graylog2.plugin.streams.Stream;
 import org.graylog2.plugin.system.NodeId;
+import org.graylog2.radio.buffers.processors.RadioProcessBufferProcessor;
 import org.graylog2.radio.cluster.Ping;
 import org.graylog2.radio.inputs.RadioInputRegistry;
 import org.graylog2.radio.transports.RadioTransport;
 import org.graylog2.radio.transports.kafka.KafkaProducer;
 import org.graylog2.shared.ProcessingHost;
 import org.graylog2.shared.buffers.ProcessBuffer;
+import org.graylog2.shared.buffers.processors.ProcessBufferProcessor;
 import org.graylog2.shared.inputs.InputRegistry;
 import org.graylog2.shared.periodical.MasterCacheWorkerThread;
 import org.graylog2.shared.periodical.ThroughputCounterManagerThread;
@@ -100,19 +101,16 @@ public class Radio implements InputHost, GraylogServer, ProcessingHost {
     private ProcessBuffer processBuffer;
     private AtomicInteger processBufferWatermark = new AtomicInteger();
 
-    private Counter throughputCounter = new Counter();
-    private long throughput = 0;
-
     private Ping.Pinger pinger;
 
     private final AsyncHttpClient httpClient;
-
-    private RadioTransport transport;
 
     private String nodeId;
 
     @Inject
     private ProcessBuffer.Factory processBufferFactory;
+    @Inject
+    private RadioProcessBufferProcessor.Factory processBufferProcessorFactory;
     @Inject
     private ThroughputCounterManagerThread.Factory throughputCounterThreadFactory;
     @Inject
@@ -135,18 +133,25 @@ public class Radio implements InputHost, GraylogServer, ProcessingHost {
 
         inputCache = new BasicCache();
 
-        processBuffer = processBufferFactory.create(this, inputCache);
-        //processBuffer = new ProcessBuffer(this, inputCache);
-        processBuffer.initialize(this.getConfiguration().getRingSize(),
-                this.getConfiguration().getProcessorWaitStrategy(),
-                this.getConfiguration().getProcessBufferProcessors()
-        );
+        RadioTransport transport = new KafkaProducer(this);
 
-        transport = new KafkaProducer(this);
+        int processBufferProcessorCount = configuration.getProcessBufferProcessors();
+
+        ProcessBufferProcessor[] processors = new ProcessBufferProcessor[processBufferProcessorCount];
+
+        for (int i = 0; i < processBufferProcessorCount; i++) {
+            processors[i] = processBufferProcessorFactory.create(this, i, processBufferProcessorCount, transport);
+        }
+
+        processBuffer = processBufferFactory.create(this, inputCache);
+        processBuffer.initialize(processors, configuration.getRingSize(),
+                configuration.getProcessorWaitStrategy(),
+                configuration.getProcessBufferProcessors()
+        );
 
         this.inputs = new RadioInputRegistry(this,
                 this.getHttpClient(),
-                this.getConfiguration().getGraylog2ServerUri()
+                configuration.getGraylog2ServerUri()
         );
 
         if (this.configuration.getRestTransportUri() == null) {
@@ -244,9 +249,10 @@ public class Radio implements InputHost, GraylogServer, ProcessingHost {
 
         @Override
         protected void configure() {
-            bind(metricRegistry).to(MetricRegistry.class);
             bind(Radio.this).to(Radio.class);
+            bind(metricRegistry).to(MetricRegistry.class);
             bind(throughputStats).to(ThroughputStats.class);
+            bind(configuration).to(Configuration.class);
         }
 
     }
@@ -290,11 +296,7 @@ public class Radio implements InputHost, GraylogServer, ProcessingHost {
         return inputCache;
     }
 
-    public RadioTransport getTransport() {
-        return transport;
-    }
-
-    public AsyncHttpClient getHttpClient() {
+    private AsyncHttpClient getHttpClient() {
         return httpClient;
     }
 

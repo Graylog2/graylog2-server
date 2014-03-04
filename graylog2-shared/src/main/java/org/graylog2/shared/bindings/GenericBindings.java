@@ -41,7 +41,6 @@ public class GenericBindings extends AbstractModule {
         bind(ThroughputStats.class).toInstance(new ThroughputStats());
 
         install(new FactoryModuleBuilder().build(ProcessBuffer.Factory.class));
-        install(new FactoryModuleBuilder().build(ProcessBufferProcessor.Factory.class));
         install(new FactoryModuleBuilder().build(ThroughputCounterManagerThread.Factory.class));
     }
 }

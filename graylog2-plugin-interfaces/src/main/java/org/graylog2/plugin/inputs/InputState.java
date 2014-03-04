@@ -25,7 +25,7 @@ public class InputState {
     protected MessageInput messageInput;
     protected String id;
     protected InputStateType state;
-    protected String startedAt;
+    protected DateTime startedAt;
     protected String detailedMessage;
 
     public InputState(MessageInput input) {
@@ -44,7 +44,7 @@ public class InputState {
         this.state = state;
         this.messageInput = input;
         this.id = id;
-        this.startedAt = Tools.getISO8601String(DateTime.now());
+        this.startedAt = DateTime.now();
     }
 
 
@@ -65,11 +65,11 @@ public class InputState {
         this.setDetailedMessage(null);
     }
 
-    public String getStartedAt() {
+    public DateTime getStartedAt() {
         return startedAt;
     }
 
-    public void setStartedAt(String startedAt) {
+    public void setStartedAt(DateTime startedAt) {
         this.startedAt = startedAt;
     }
 
@@ -85,7 +85,7 @@ public class InputState {
         Map<String, Object> inputStateMap = Maps.newHashMap();
         inputStateMap.put("id", id);
         inputStateMap.put("state", state.toString().toLowerCase());
-        inputStateMap.put("started_at", startedAt);
+        inputStateMap.put("started_at", Tools.getISO8601String(startedAt));
         inputStateMap.put("message_input", messageInput.asMap());
         inputStateMap.put("detailed_message", detailedMessage);
 

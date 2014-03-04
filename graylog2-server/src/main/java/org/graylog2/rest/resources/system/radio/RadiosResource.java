@@ -43,6 +43,7 @@ import javax.ws.rs.core.Response;
 import java.io.IOException;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 
 import static javax.ws.rs.core.Response.ok;
 
@@ -119,7 +120,10 @@ public class RadiosResource extends RestResource {
         }
 
         Map<String, Object> inputData = Maps.newHashMap();
-        inputData.put("input_id", rir.inputId);
+        if (rir.inputId != null)
+            inputData.put("input_id", rir.inputId);
+        else
+            inputData.put("input_id", new ObjectId().toStringMongod());
         inputData.put("title", rir.title);
         inputData.put("type", rir.type);
         inputData.put("creator_user_id", rir.creatorUserId);

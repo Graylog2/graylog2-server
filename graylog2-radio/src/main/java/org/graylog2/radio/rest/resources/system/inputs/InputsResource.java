@@ -121,7 +121,7 @@ public class InputsResource extends RestResource {
         }
 
         String inputId = UUID.randomUUID().toString();
-        input.setPersistId(inputId);
+        //input.setPersistId(inputId);
 
         // Don't run if exclusive and another instance is already running.
         if (input.isExclusive() && radio.inputs().hasTypeRunning(input.getClass())) {

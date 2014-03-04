@@ -38,6 +38,7 @@ import org.glassfish.jersey.server.filter.EncodingFilter;
 import org.glassfish.jersey.server.internal.scanning.PackageNamesScanner;
 import org.graylog2.blacklists.BlacklistCache;
 import org.graylog2.buffers.OutputBuffer;
+import org.graylog2.buffers.processors.ServerProcessBufferProcessor;
 import org.graylog2.dashboards.DashboardRegistry;
 import org.graylog2.database.HostCounterCacheImpl;
 import org.graylog2.database.MongoBridge;
@@ -80,6 +81,7 @@ import org.graylog2.security.ldap.LdapConnector;
 import org.graylog2.security.realm.LdapUserAuthenticator;
 import org.graylog2.shared.ProcessingHost;
 import org.graylog2.shared.buffers.ProcessBuffer;
+import org.graylog2.shared.buffers.processors.ProcessBufferProcessor;
 import org.graylog2.shared.filters.FilterRegistry;
 import org.graylog2.shared.inputs.InputRegistry;
 import org.graylog2.shared.stats.ThroughputStats;
@@ -190,6 +192,8 @@ public class Core implements GraylogServer, InputHost, ProcessingHost {
     @Inject
     private ProcessBuffer.Factory processBufferFactory;
     @Inject
+    private ServerProcessBufferProcessor.Factory processBufferProcessorFactory;
+    @Inject
     private OutputBuffer.Factory outputBufferFactory;
 
     @Inject
@@ -237,16 +241,22 @@ public class Core implements GraylogServer, InputHost, ProcessingHost {
         inputCache = new BasicCache();
         outputCache = new BasicCache();
 
+        outputBuffer = outputBufferFactory.create(this, outputCache);
+        outputBuffer.initialize();
+
+        int processBufferProcessorCount = configuration.getProcessBufferProcessors();
+
+        ProcessBufferProcessor[] processors = new ProcessBufferProcessor[processBufferProcessorCount];
+
+        for (int i = 0; i < processBufferProcessorCount; i++) {
+            processors[i] = processBufferProcessorFactory.create(this, outputBuffer, i, processBufferProcessorCount);
+        }
+
         processBuffer = processBufferFactory.create(this, inputCache);
-        //processBuffer = new ProcessBuffer(this, inputCache);
-        processBuffer.initialize(this.getConfiguration().getRingSize(),
+        processBuffer.initialize(processors, this.getConfiguration().getRingSize(),
                 this.getConfiguration().getProcessorWaitStrategy(),
                 this.getConfiguration().getProcessBufferProcessors()
         );
-
-        outputBuffer = outputBufferFactory.create(this, outputCache);
-        //outputBuffer = new OutputBuffer(this, outputCache);
-        outputBuffer.initialize();
 
         gelfChunkManager = new GELFChunkManager(this);
 

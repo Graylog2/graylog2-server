@@ -43,6 +43,9 @@ public class RegisterInputRequest {
     @JsonProperty("creator_user_id")
     public String creatorUserId;
 
+    public RegisterInputRequest() {
+    }
+
     public RegisterInputRequest(MessageInput input, String radioId) {
         this.inputId = input.getId();
         this.title = input.getTitle();

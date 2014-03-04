@@ -22,9 +22,11 @@ package org.graylog2.radio.rest.resources.system;
 import com.codahale.metrics.annotation.Timed;
 import com.google.common.collect.Maps;
 import org.graylog2.plugin.buffers.BufferWatermark;
+import org.graylog2.radio.Configuration;
 import org.graylog2.radio.Radio;
 import org.graylog2.radio.rest.resources.RestResource;
 
+import javax.inject.Inject;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
@@ -36,6 +38,8 @@ import java.util.Map;
  */
 @Path("/system/buffers")
 public class BuffersResource extends RestResource {
+    @Inject
+    private Configuration configuration;
 
     @GET @Timed
     @Produces(MediaType.APPLICATION_JSON)
@@ -63,7 +67,7 @@ public class BuffersResource extends RestResource {
         Map<String, Object> input = Maps.newHashMap();
 
         BufferWatermark pWm = new BufferWatermark(
-                radio.getConfiguration().getRingSize(),
+                configuration.getRingSize(),
                 radio.processBufferWatermark()
         );
 

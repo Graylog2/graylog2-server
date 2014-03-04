@@ -21,7 +21,9 @@
 package org.graylog2.radio.bindings;
 
 import com.google.inject.AbstractModule;
+import com.google.inject.assistedinject.FactoryModuleBuilder;
 import org.graylog2.radio.Configuration;
+import org.graylog2.radio.buffers.processors.RadioProcessBufferProcessor;
 
 /**
  * @author Dennis Oelkers <dennis@torch.sh>
@@ -36,5 +38,6 @@ public class RadioBindings extends AbstractModule {
     @Override
     protected void configure() {
         bind(Configuration.class).toInstance(configuration);
+        install(new FactoryModuleBuilder().build(RadioProcessBufferProcessor.Factory.class));
     }
 }

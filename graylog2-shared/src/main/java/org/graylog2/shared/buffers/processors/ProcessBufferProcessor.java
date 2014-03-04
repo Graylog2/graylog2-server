@@ -34,51 +34,38 @@ import org.graylog2.shared.filters.FilterRegistry;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.concurrent.atomic.AtomicInteger;
+
 import static com.codahale.metrics.MetricRegistry.name;
 
 /**
  * @author Lennart Koopmann <lennart@socketfeed.com>
  */
-public class ProcessBufferProcessor implements EventHandler<MessageEvent> {
-
-    public interface Factory {
-        public ProcessBufferProcessor create(
-                GraylogServer server,
-                @Assisted("ordinal") final long ordinal,
-                @Assisted("numberOfConsumers") final long numberOfConsumers
-        );
-    }
-
+public abstract class ProcessBufferProcessor implements EventHandler<MessageEvent> {
     private static final Logger LOG = LoggerFactory.getLogger(ProcessBufferProcessor.class);
 
-    private GraylogServer server;
+    protected AtomicInteger processBufferWatermark;
     private final Meter incomingMessages;
     private final Timer processTime;
-    private final Meter filteredOutMessages;
     private final Meter outgoingMessages;
 
-    private final MetricRegistry metricRegistry;
-    private final FilterRegistry filterRegistry;
+    protected final MetricRegistry metricRegistry;
 
     private final long ordinal;
     private final long numberOfConsumers;
 
-    @AssistedInject
     public ProcessBufferProcessor(MetricRegistry metricRegistry,
-                                  FilterRegistry filterRegistry,
-                                  @Assisted GraylogServer server,
-                                  @Assisted("ordinal") final long ordinal,
-                                  @Assisted("numberOfConsumers") final long numberOfConsumers) {
+                                  AtomicInteger processBufferWatermark,
+                                  final long ordinal,
+                                  final long numberOfConsumers) {
         this.metricRegistry = metricRegistry;
-        this.filterRegistry = filterRegistry;
         this.ordinal = ordinal;
         this.numberOfConsumers = numberOfConsumers;
-        this.server = server;
+        this.processBufferWatermark = processBufferWatermark;
 
-        incomingMessages = server.metrics().meter(name(ProcessBufferProcessor.class, "incomingMessages"));
-        outgoingMessages = server.metrics().meter(name(ProcessBufferProcessor.class, "outgoingMessages"));
-        filteredOutMessages = server.metrics().meter(name(ProcessBufferProcessor.class, "filteredOutMessages"));
-        processTime = server.metrics().timer(name(ProcessBufferProcessor.class, "processTime"));
+        incomingMessages = metricRegistry.meter(name(ProcessBufferProcessor.class, "incomingMessages"));
+        outgoingMessages = metricRegistry.meter(name(ProcessBufferProcessor.class, "outgoingMessages"));
+        processTime = metricRegistry.timer(name(ProcessBufferProcessor.class, "processTime"));
     }
 
     @Override
@@ -88,7 +75,7 @@ public class ProcessBufferProcessor implements EventHandler<MessageEvent> {
             return;
         }
 
-        server.processBufferWatermark().decrementAndGet();
+        processBufferWatermark.decrementAndGet();
         
         incomingMessages.mark();
         final Timer.Context tcx = processTime.time();
@@ -97,30 +84,15 @@ public class ProcessBufferProcessor implements EventHandler<MessageEvent> {
 
         LOG.debug("Starting to process message <{}>.", msg.getId());
 
-        for (MessageFilter filter : filterRegistry.all()) {
-            Timer timer = metricRegistry.timer(name(filter.getClass(), "executionTime"));
-            final Timer.Context timerContext = timer.time();
-
-            try {
-                LOG.debug("Applying filter [{}] on message <{}>.", filter.getName(), msg.getId());
-
-                if (filter.filter(msg, server)) {
-                    LOG.debug("Filter [{}] marked message <{}> to be discarded. Dropping message.", filter.getName(), msg.getId());
-                    filteredOutMessages.mark();
-                    return;
-                }
-            } catch (Exception e) {
-                LOG.error("Could not apply filter [" + filter.getName() +"] on message <" + msg.getId() +">: ", e);
-            } finally {
-                timerContext.stop();
-            }
+        try {
+            handleMessage(msg);
+        } catch (Exception e) {
+            LOG.warn("Unable to process message <{}>: {}", msg.getId(), e);
+        } finally {
+            outgoingMessages.mark();
+            tcx.stop();
         }
-
-        LOG.debug("Finished processing message. Writing to output buffer.");
-        server.getOutputBuffer().insertCached(msg, null);
-        
-        outgoingMessages.mark();
-        tcx.stop();
     }
 
+    protected abstract void handleMessage(Message msg);
 }
