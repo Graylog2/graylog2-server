@@ -43,6 +43,8 @@ import org.slf4j.LoggerFactory;
 
 import java.util.concurrent.atomic.AtomicInteger;
 
+import java.util.concurrent.atomic.AtomicInteger;
+
 import static com.codahale.metrics.MetricRegistry.name;
 
 /**

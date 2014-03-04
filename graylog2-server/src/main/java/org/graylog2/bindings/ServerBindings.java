@@ -26,6 +26,7 @@ import org.graylog2.Configuration;
 import org.graylog2.buffers.processors.ServerProcessBufferProcessor;
 import org.graylog2.buffers.OutputBuffer;
 import org.graylog2.buffers.processors.OutputBufferProcessor;
+import org.graylog2.buffers.processors.ServerProcessBufferProcessor;
 import org.graylog2.database.MongoBridge;
 import org.graylog2.database.MongoConnection;
 import org.graylog2.outputs.OutputRegistry;

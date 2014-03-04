@@ -153,8 +153,6 @@ public class Core implements GraylogServer, InputHost, ProcessingHost {
 
     private Indexer indexer;
 
-    private HostCounterCacheImpl hostCounterCache;
-
     private Counter benchmarkCounter = new Counter();
     private Counter throughputCounter = new Counter();
     private AtomicReference<ConcurrentHashMap<String, Counter>> streamThroughput =
