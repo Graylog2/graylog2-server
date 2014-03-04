@@ -160,6 +160,59 @@ $(document).ready(function() {
         $(this).attr("href", uri.toString());
     });
 
+    $(".fields-set-chooser").click(function(e) {
+        e.preventDefault();
+        var setName = $(this).data('fields-set');
+        var fields = searchViewState.getFields();
+        var i = 0;
+        var field;
+
+        switch (setName) {
+            case "none":
+                for (i = 0; i < fields.length; i++) {
+                    field = fields[i];
+                    $(".field-selector[data-field-name="+field+"]").each(function(){
+                        if ($(this).is(":checked")) {
+                            $(this).trigger("click");
+                        }
+                    });
+                }
+                break;
+            case "default":
+                // iterate over all selected fields, and turn them off, except if it's source or message
+                for (i = 0; i < fields.length; i++) {
+                    field = fields[i];
+                    if (field === "source" || field === "message") {
+                        // leave source and message turned on
+                        continue;
+                    }
+                    $(".field-selector[data-field-name="+field+"]").each(function(){
+                        if ($(this).is(":checked")) {
+                            $(this).trigger("click");
+                        }
+                    });
+                }
+                // make sure source and message are on
+                $("#field-selector-36cd38f49b9afa08222c0dc9ebfe35eb, #field-selector-78e731027d8fd50ed642340b7c9a63b3").each(function(){
+                    if (!$(this).is(":checked")) {
+                        $(this).trigger("click");
+                    }
+                });
+                break;
+            case "all":
+                // for 'all' only toggle the page we are on, we don't need to toggle _all_ fields
+                var selectedPage = $(".search-result-fields").attr("data-selected");
+                $("." + selectedPage + " > .field-selector").each(function() {
+                    // turn those fields on that aren't checked.
+                    if (!$(this).is(":checked")) {
+                        $(this).trigger("click");
+                    }
+                });
+                break;
+            default: console.log("Error, unknown fields set " + setName);
+        }
+    });
+
     // Call resizedWindow() only at end of resize event so we do not trigger all the time while resizing.
     var resizeMutex;
     $(window).resize(function() {
@@ -215,7 +268,7 @@ $(document).ready(function() {
                             }
                         });
 
-                        if (!included) {                                              FA
+                        if (!included) {
                             $(this).removeClass("systemjob-progress");
                             $(".progress .bar", $(this)).css("width", "100%");
                             $(".progress", $(this)).removeClass("active");
@@ -1011,13 +1064,18 @@ searchViewState = {
         this.updateFragment();
     },
     setSelectedFields: function(fieldsArray) {
+        // reset the fields first
+        this.fields = {};
         for (var idx = 0; idx < fieldsArray.length; idx++) {
             this.fields[fieldsArray[idx]] = true;
         }
         this.updateFragment();
     },
+    getFields: function() {
+        return Object.keys(this.fields);
+    },
     getFieldsString: function() {
-        return Object.keys(this.fields).sort().join(",");
+        return this.getFields().sort().join(",");
     },
     updateFragment: function() {
         var uri = new URI();
